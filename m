@@ -1,78 +1,64 @@
-Return-Path: <netdev+bounces-267238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267239-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sGtMH3lYs2kRVQAAu9opvQ
-	(envelope-from <netdev+bounces-267238-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:21:13 +0100
+	id gGgDKNxYs2kRVQAAu9opvQ
+	(envelope-from <netdev+bounces-267239-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:22:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBB8327B8E2
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:21:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F14E427B90B
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:22:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5095A3067765
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 00:21:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9566E3061AEA
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 00:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7AFD25A2A4;
-	Fri, 13 Mar 2026 00:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA7828DB49;
+	Fri, 13 Mar 2026 00:22:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TzfOX2BK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gq9nHXeu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9394A191;
-	Fri, 13 Mar 2026 00:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEAC52853EE
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 00:22:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773361267; cv=none; b=k0SiSk6q+Zp1GHXdGQ+xFmtxxvEj2GE26XGicFozinqY1CG4mAXIHZ447lA7WyCFzFuS+tdMJM+xlxfcZ26e34ikQ3ZjCQ09clwUneKod3Lxqeo3bMYpFJj14ftnAR+pmDeWntdvAcekb0aOYyHoJ0L5Ul9p3raBFlZQ3MJ79ZQ=
+	t=1773361369; cv=none; b=g57gGa6jX5btOqMkuhIliVq9OfscR+2YUhz5/LVCyAFasgZ5zqWLLS6QhoBnFGuoZA3i8R5emyUfct7nuW1xmT8bDD4AN4g4IGAJkPl756zp6rngA2MC82j2ys8ctox2Wo0uYFldE9cItblf3arZV2VaEg8OfTRh4bpA9J2LElc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773361267; c=relaxed/simple;
-	bh=EGu7h6sqch53CVjj+74drrbwn+MhP5k4eHR8FWN8LjM=;
+	s=arc-20240116; t=1773361369; c=relaxed/simple;
+	bh=wI1M2N3RZJ2ZGEFBVZ0oz+Ohx1k+qHSBfOqMj5JSSV4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pAieOhl4H17uHIZeHkMJD8x1tzKYmHrYGCUf866lOSUlYHYjmMwr+BOuoknzxw12EkjiYPMzEbAy4c+LElcwUq5myL1O3M6xU9uLU1hpugTpBOpsEPReTJeJ1tO8N/yJqJIzfORk9iXSISeLg+YEyylQ/g1VQO4OoA4X2UVRs5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TzfOX2BK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4088C4CEF7;
-	Fri, 13 Mar 2026 00:21:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mu+Bb+iLqI9m72uWGiqfjK+VfMV2gNSpEt2YmBmzfY+50o178KKaRRFElTp/MeuBOSOrAmKoF810gX257IFjtYoGHZGyuZAmPKZFOnl7WldM4q3ujnKBrqkdiEnM6A50+1OrgOwlZ/Q8Z3/9Z09S/7jMthWGIHj1KQSvwMnzMuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gq9nHXeu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2455FC4CEF7;
+	Fri, 13 Mar 2026 00:22:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773361267;
-	bh=EGu7h6sqch53CVjj+74drrbwn+MhP5k4eHR8FWN8LjM=;
+	s=k20201202; t=1773361369;
+	bh=wI1M2N3RZJ2ZGEFBVZ0oz+Ohx1k+qHSBfOqMj5JSSV4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TzfOX2BKtrlz/XUUA32/AYFnB40A/Lg1pwVHbSHCw2QMhRcymAVqM3fJ/0MvuADtR
-	 1+oJpFiUWZn7koeq1wN0rE9sUdsG82bnHSOYi+/mNPYnGGVk+CMZwB/8ZndsyYvA+a
-	 +T0qHWxErFA6ejnhdxTRHVeHXMEWp7t+C0cwVPOufOcY7mc1MXYH0HDA9J0E7owrCm
-	 bGWBqHZd7R8xpN/SU00KCUtq6oupOX8XqBnrmJZMfMizUgQrsCDHncoCz92jD+VTP8
-	 UGj04yCM7l1Myx4deMxTcPm8j44oUrX5XsoynEIEAz8m+8T7hqmeSKUlLH+LR0CPfz
-	 0kA6bPFkrW5JQ==
-Date: Thu, 12 Mar 2026 17:21:04 -0700
+	b=gq9nHXeu+kEHaXkEFRtydIr1EtZQSG7QgbgG215lIgYebbhnpVIuXvY1VhlnK1bDq
+	 IzZIR4Poy9LRkeBH7U2Eb6vXo6G6XYXQailY5puZOY9d+Byq07nfffRyh6bLSOaE1D
+	 dYHVmdANm2v8xvZQhLo+zOMjQP6u0SXElZcDvyMVZROyKlL808xB1sPvUjHxyszUBY
+	 t4bQSmaYWFIdLKiosStIwC+v/s9xbpeAgKayhr7jwPM6CAptO4X3Ljbkhfcg+hvL0E
+	 I0EfKtAbFFaCxNK3+gvCbb2NT9LhrpLg4LHmGTtXHuvi35BCOg3J2dyiv89ubWAAhW
+	 SoLtBjMKvVM4Q==
+Date: Thu, 12 Mar 2026 17:22:48 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Donald Hunter
- <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, Naveen
- Mamindlapalli <naveenm@marvell.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Danielle Ratson <danieller@nvidia.com>,
- Hariprasad Kelam <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>,
- Kory Maincent <kory.maincent@bootlin.com>, Leon Romanovsky
- <leon@kernel.org>, Michael Chan <michael.chan@broadcom.com>, Oleksij Rempel
- <o.rempel@pengutronix.de>, Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Piergiorgio Beruto <piergiorgio.beruto@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan
- <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Willem de Bruijn
- <willemb@google.com>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
- definitions
-Message-ID: <20260312172104.2ed465f0@kernel.org>
-In-Reply-To: <171da8e9-fb09-4cfc-a29e-aefbdc8c3ce9@lunn.ch>
-References: <20260310104743.907818-1-bjorn@kernel.org>
-	<20260310104743.907818-3-bjorn@kernel.org>
-	<580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
-	<87tsum3b1o.fsf@all.your.base.are.belong.to.us>
-	<ed30934a-4931-40e5-a659-6fc8d12741b5@lunn.ch>
-	<20260311194716.600704aa@kernel.org>
-	<171da8e9-fb09-4cfc-a29e-aefbdc8c3ce9@lunn.ch>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: select QDMA block according
+ LAN/WAN configuration
+Message-ID: <20260312172248.68742f98@kernel.org>
+In-Reply-To: <abMsvOMnnuTdoG-9@lore-desk>
+References: <20260310-airoha-qdma-lan-wan-mode-v1-1-64ec74dea872@kernel.org>
+	<20260312172430.GA1267298@kernel.org>
+	<abMsvOMnnuTdoG-9@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,63 +72,50 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267238-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,bootlin.com,vger.kernel.org,davemloft.net,lunn.ch,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,broadcom.com,pengutronix.de,armlinux.org.uk];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267239-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: EBB8327B8E2
+X-Rspamd-Queue-Id: F14E427B90B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 12 Mar 2026 14:46:40 +0100 Andrew Lunn wrote:
-> > Which reminds me -- I was suggesting that we add an order / id to the
-> > stages, not just name. Because AFAIU being able to request the loopback
-> > "very last loopback point of MAC" or "first loopback point of PHY"  
+On Thu, 12 Mar 2026 22:14:36 +0100 Lorenzo Bianconi wrote:
+> > Is this a bug fix?
+> > If so, perhaps it is for net with a fixes tag.  
 > 
-> How do you define where the MAC ends?
-
-MAC may not be the greatest of names because I'd include in it
-everything past the PHY, up to the DMA blocks.
-
-> I suspect some vendors will include the PCS and the PMA, because the
-> MAC ends at the MII pins on their SoC. Other vendors are going to say
-> the MAC ends at the interface to the PCS, especially those who have
-> licensed the PCS, and are using the shared Linux driver for the
-> PCS. And the PMA might again be a shared implementation, since it is
-> also used for USB, PCIe and SATA.
+> I guess we do not need to target net tree since airoha_eth driver currently
+> supports just the LAN interface via the MT7530 DSA switch connected to GDM1
+> and there are no WAN interfaces officially supported (PCS/external phy is not
+> merged mainline yet, it is only available in OpenWrt).
 > 
-> If Linux is driving the hardware, using phylink, phylib, PCS drivers
-> and generic PHY, we are very likely to have a uniform definition of
-> all these parts. Are we happy firmware devices will have a much
-> fuzzier, different interpretation, conglomerating it all together?
+> > 
+> > And at any rate, could you add some description of the before and after
+> > behaviour?  
+> 
+> Theoretically, before this patch, GDM ports were equally distributed between
+> QDMA0 and QDMA1 while this patch assigns LAN interfaces to QDMA0 and WAN
+> interface to QDMA1. However, for the reason explained above, this change is
+> not currently visible to the user.
 
-As long as the kernel API lets "integrated" devices expose both a MAC
-and a PHY node I don't think we should let anyone conglomerate.
-
-I see your point that the enum would work nicely for PHY stages.
-But it will be limiting for MAC stages.
-These conflicting preferences make having all of loopback config 
-in one API tricky. I guess we could have a half-measure to add in
-the kernel the "well known" PHY stage name, and WARN_ON_ONCE() if 
-some driver exposes PHY stage in something that's not a PHY.
-Or uses an unknown name for a PHY stage?
+Please update the commit message. And please try harder to explain 
+the patches, this happens a lot with your submissions..
 
