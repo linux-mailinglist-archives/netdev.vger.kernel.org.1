@@ -1,201 +1,208 @@
-Return-Path: <netdev+bounces-267443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267444-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2P7BOdwHtGlvfwAAu9opvQ
-	(envelope-from <netdev+bounces-267443-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:49:32 +0100
+	id QBwsGOYItGlvfwAAu9opvQ
+	(envelope-from <netdev+bounces-267444-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:53:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E7CF283386
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:49:32 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CAAA28346F
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:53:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 477FC304D241
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:48:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5A27B3004699
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC0A37F72B;
-	Fri, 13 Mar 2026 12:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 751BE37FF72;
+	Fri, 13 Mar 2026 12:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ZWbi5m7F";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/gMItvD1";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ZWbi5m7F";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/gMItvD1"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="EmAzD+6Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E2034216C
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 12:48:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF60379EFD;
+	Fri, 13 Mar 2026 12:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773406122; cv=none; b=W6r1i+6o4WLOslIRpbmBCE4fxva6SodgeetEChjEoQRzyzQmWBd76EcACDi492PZNfR+Ejgwj2L1VUOSqBOaDVhX7jZ8glz7SiPMoTAPCdLKdrZWwtZrPKDilW/US7d/Uzw6unCrHQWxk4412lX4I9zi1TMgtqFMImoTt08ZvZQ=
+	t=1773406417; cv=none; b=oV8Xo+C6H1QuvQ3/e8wZHCulgs/mr7ZP+jf02QS8cuVxubYZp9FAj6wOaaxOsxpFcgc0sxEoUR/xmno44f/AM18BxPr6Dik9JgXXAHdXefkFRz/o54Le/sEOSquK1Bmr+Q0OQQ6gVT5IiZ5A+MzVe7ORF6teKFADxowerUW9fG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773406122; c=relaxed/simple;
-	bh=79NxmM+MkB1TRN1x7LdwDBd2mAtRT5MtMtXj1hldAyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aYTGIalwvm6nra9pr155XETekN9Gcp+bOouqtN9XS1LmbryWaXTc+DYJFp41lYo6WNCe8PhtxVoGkpTysQtIseLpT6yRID/C9mgpRvPQNndFbm9xhtvSZM+rPIVB0FT4NkVH5UxNJ/BQNS+Ex+EMn/LzDf2h0uiZ3ikxSF+1Rbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ZWbi5m7F; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/gMItvD1; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ZWbi5m7F; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/gMItvD1; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id C454F5BD15;
-	Fri, 13 Mar 2026 12:48:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773406118; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=eMkWZ1dQnPzBx9E00xU6bbEorgylJXE6cy6xk7cFZT0=;
-	b=ZWbi5m7FlzCT9NYvWaZeixzTYmPS+0karceJoFpHnxpTHJ1Khs5/QLI2Z5wIHAVqd5Dif2
-	ZmlbhqBBXzm6H8l1OghgA0m65xiNALAngHK2UGBfCOyUbJYxr2YzLvKGz/4jVpebHbo7fp
-	vL2ozYYDVyzbBBVgdfLY6ow4EtcZLyw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773406118;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=eMkWZ1dQnPzBx9E00xU6bbEorgylJXE6cy6xk7cFZT0=;
-	b=/gMItvD1IMkkpVKbbYc+u104npKOnYhmSVklqk3dRWpZ73SvmMLKxKNpH4l5vDY8Tjcyr0
-	PAe21pVfFvNQUqDA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ZWbi5m7F;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="/gMItvD1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773406118; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=eMkWZ1dQnPzBx9E00xU6bbEorgylJXE6cy6xk7cFZT0=;
-	b=ZWbi5m7FlzCT9NYvWaZeixzTYmPS+0karceJoFpHnxpTHJ1Khs5/QLI2Z5wIHAVqd5Dif2
-	ZmlbhqBBXzm6H8l1OghgA0m65xiNALAngHK2UGBfCOyUbJYxr2YzLvKGz/4jVpebHbo7fp
-	vL2ozYYDVyzbBBVgdfLY6ow4EtcZLyw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773406118;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=eMkWZ1dQnPzBx9E00xU6bbEorgylJXE6cy6xk7cFZT0=;
-	b=/gMItvD1IMkkpVKbbYc+u104npKOnYhmSVklqk3dRWpZ73SvmMLKxKNpH4l5vDY8Tjcyr0
-	PAe21pVfFvNQUqDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3262240521;
-	Fri, 13 Mar 2026 12:48:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id WeEmCaYHtGk6WQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Fri, 13 Mar 2026 12:48:38 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	shuah@kernel.org,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH net-next v3] selftests: net: add ipv6 RA route to ECMP merge test
-Date: Fri, 13 Mar 2026 13:48:27 +0100
-Message-ID: <20260313124827.3945-1-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1773406417; c=relaxed/simple;
+	bh=fVNG8XU8qrw3CqQjoIAdVbE7UZTFosXAF1TdDCwFDTw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JXFFaz83hJGssdXnX16itOySsy7pi1mbhoP4GA4uK5YY9zKQfVcOas7mseZRhWZca0UMLRe8Z6Jo2chUnlmUZ5Hv0r9eitSPAjN7A0F+848Vwlnq06wNJ1w+4N1TkoZU+jD13l118chARFYDwIN8tVxakbuK2fzOK9UlGcH7BgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=EmAzD+6Y; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1773406415; x=1804942415;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=fVNG8XU8qrw3CqQjoIAdVbE7UZTFosXAF1TdDCwFDTw=;
+  b=EmAzD+6YHvP4RsClACtw8wErxnzDSnmVytN0hXhBfoyjI0Uzzft2F7Q5
+   evgzuxqRWkHgEAvufWfPf3uQxKm3CSulkYx6KDx0wNZuDJ4kX2H9TPaPS
+   8YO1XrmulmP3o3kC+L8I+FytfcsjS1lJ9/UMmaeJSwMyHKuk7r5q01X/w
+   PmrkTnNpiyctLw2LsNIdmuUP2c1BnCWEL6vA7uqNBqvMNiDq6RVraVQ1n
+   9n1bhQ1gUu62a/QasXnzacH4S0MpetkkeYKcO8wNV84VSxpH5I0nOBZy2
+   xTbaLo38iDLPrV4ZUAVG2Bx8W4J+J0mLIRzo77TVSH2IJ81+/V6+z3ljE
+   w==;
+X-CSE-ConnectionGUID: 9ff1ETxjS+mW1ReyoyIBew==
+X-CSE-MsgGUID: A8XVWbAdTUWuAn2xe5oUOw==
+X-IronPort-AV: E=Sophos;i="6.23,118,1770620400"; 
+   d="scan'208";a="221880347"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2026 05:53:34 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
+ chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Fri, 13 Mar 2026 05:52:54 -0700
+Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58 via Frontend Transport; Fri, 13 Mar 2026 05:52:53 -0700
+Date: Fri, 13 Mar 2026 05:52:52 -0700
+From: Charles Perry <charles.perry@microchip.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <charles.perry@microchip.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+	<claudiu.beznea@tuxon.dev>, <linux-kernel@vger.kernel.org>,
+	<horms@kernel.org>, <conor+dt@kernel.org>, <devicetree@vger.kernel.org>,
+	<davem@davemloft.net>, <andrew+netdev@lunn.ch>, <edumazet@google.com>,
+	<nicolas.ferre@microchip.com>
+Subject: Re: [net-next,v2,1/3] dt-bindings: net: cdns,macb: add a compatible
+ for Microchip pic64hpsc
+Message-ID: <abQIpGEGi7m3LqWy@bby-cbu-swbuild03.eng.microchip.com>
+References: <20260310212202.3991199-2-charles.perry@microchip.com>
+ <20260313014943.1513621-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260313014943.1513621-1-kuba@kernel.org>
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267443-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-267444-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:dkim,suse.de:email,suse.de:mid]
-X-Rspamd-Queue-Id: 4E7CF283386
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,microchip.com:dkim,linux.dev:url,bby-cbu-swbuild03.eng.microchip.com:mid]
+X-Rspamd-Queue-Id: 5CAAA28346F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-As commit bbf4a17ad9ff ("ipv6: Fix ECMP sibling count mismatch when
-clearing RTF_ADDRCONF") pointed out, RA routes are not elegible for ECMP
-merging.
+On Thu, Mar 12, 2026 at 06:49:43PM -0700, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email says "Not sure about the first one but the second one looks
+> legit"
+> 
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> ---
+> dt-bindings: net: cdns,macb: add a compatible for Microchip pic64hpsc
+> 
+> This commit adds "microchip,pic64hpsc-gem" for "PIC64-HPSC" and
+> "microchip,pic64hx-gem" for "PIC64HX" compatible strings. It also adds a
+> conditional schema check to prevent adding PHYs under the GEM node for
+> hardware where MDIO controllers are unconnected from physical pins.
+> 
+> > diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+> > --- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
+> > +++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+> > @@ -70,6 +70,14 @@
+> >                - microchip,sama7d65-gem   # Microchip SAMA7D65 gigabit ethernet interface
+> >            - const: microchip,sama7g5-gem # Microchip SAMA7G5 gigabit ethernet interface
+> >
+> > +      - items:
+> > +          - const: microchip,pic64hpsc-gem # Microchip PIC64-HPSC
+> > +          - const: cdns,gem
+> > +      - items:
+> > +          - const: microchip,pic64hx-gem   # Microchip PIC64HX
+> > +          - const: microchip,pic64hpsc-gem # Microchip PIC64-HPSC
+> > +          - const: cdns,gem
+> 
+> The fallback structure appears reversed from what was recommended in v1
+> review. Conor Dooley suggested that pic64hpsc should fallback to pic64hx:
+> 
+>   - items:
+>       - const: microchip,pic64hx-gem
+>       - const: cdns,gem
+>   - items:
+>       - const: microchip,pic64hpsc-gem
+>       - const: microchip,pic64hx-gem
+>       - const: cdns,gem
+> 
+> However, the current implementation has pic64hx falling back to pic64hpsc
+> instead. Was this reversal intentional, or should the order match the
+> reviewer's recommendation?
+> 
 
-Add a test scenario mixing RA and static routes with gateway to check
-that they are not getting merged.
+Yes, this is intentional.
 
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
-v2: added CONFIG_IPV6_ROUTE_INFO to the config
-v3: added CONFIG_IPV6_ROUTER_PREF to the config, tested with virtme-ng
----
- tools/testing/selftests/net/config       |  2 ++
- tools/testing/selftests/net/fib_tests.sh | 17 +++++++++++++++++
- 2 files changed, 19 insertions(+)
+> https://lore.kernel.org/netdev/20260303-emperor-childlike-6c43d8a91753@spud/
+> 
+> >
+> >    reg:
+> >      minItems: 1
+> 
+> [ ... ]
+> 
+> > @@ -196,6 +204,17 @@
+> >        required:
+> >          - phys
+> >
+> > +  - if:
+> > +      properties:
+> > +        compatible:
+> > +          contains:
+> > +            const: microchip,p64h-gem
+> > +    then:
+> > +      patternProperties:
+> > +        "^ethernet-phy@[0-9a-f]$": false
+> > +      properties:
+> > +        mdio: false
+> 
+> The conditional check references 'microchip,p64h-gem', but the compatible
+> strings actually added above are 'microchip,pic64hpsc-gem' and
+> 'microchip,pic64hx-gem'. This causes the validation rule to never trigger
+> for the new hardware variants.
+> 
+> According to the commit message, the GEM IPs within pic64hpsc have their
+> MDIO controllers unconnected from physical pins, and this check should
+> prevent adding PHYs under the GEM node. However, device trees using
+> 'microchip,pic64hpsc-gem' or 'microchip,pic64hx-gem' with invalid
+> MDIO/ethernet-phy configurations will silently pass schema validation.
+> 
+> Should this check use 'microchip,pic64hpsc-gem' instead?
+> 
 
-diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-index cd49b7dfe216..2a390cae41bf 100644
---- a/tools/testing/selftests/net/config
-+++ b/tools/testing/selftests/net/config
-@@ -43,6 +43,8 @@ CONFIG_IPV6_ILA=m
- CONFIG_IPV6_IOAM6_LWTUNNEL=y
- CONFIG_IPV6_MROUTE=y
- CONFIG_IPV6_MULTIPLE_TABLES=y
-+CONFIG_IPV6_ROUTE_INFO=y
-+CONFIG_IPV6_ROUTER_PREF=y
- CONFIG_IPV6_RPL_LWTUNNEL=y
- CONFIG_IPV6_SEG6_LWTUNNEL=y
- CONFIG_IPV6_SIT=y
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index 439461080c60..05dadc3f55b1 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -1534,6 +1534,23 @@ fib6_ra_to_static()
- 
- 	log_test $ret 0 "ipv6 promote RA route to static"
- 
-+	# Prepare for RA route with gateway
-+	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.accept_ra_rt_info_max_plen=64
-+
-+	# Add initial route to cause ECMP merging
-+	$IP -6 route add 2001:12::/64 via fe80::dead:beef dev veth1
-+
-+	$NS_EXEC ra6 -i veth2 -d 2001:10::1 -R 2001:12::/64#1#120
-+
-+	# Routes are not merged as RA routes are not elegible for ECMP
-+	check_rt_num 2 "$($IP -6 route list | grep -c "2001:12::/64 via")"
-+
-+	$IP -6 route append 2001:12::/64 via fe80::dead:feeb dev veth1
-+
-+	check_rt_num 2 "$($IP -6 route list | grep -c "nexthop via")"
-+
-+	log_test "$ret" 0 "ipv6 RA route with nexthop do not merge into ECMP with static"
-+
- 	set +e
- 
- 	cleanup &> /dev/null
--- 
-2.53.0
+Oops! Good catch! I'll send a v3.
+
+Thanks,
+Charles 
 
 
