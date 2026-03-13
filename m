@@ -1,68 +1,92 @@
-Return-Path: <netdev+bounces-267452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267453-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kB9RLCoPtGlvfwAAu9opvQ
-	(envelope-from <netdev+bounces-267452-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:20:42 +0100
+	id WGSjCSYTtGlkgwAAu9opvQ
+	(envelope-from <netdev+bounces-267453-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:37:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ED3F283A71
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:20:42 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2255E28404E
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:37:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9064A30AD651
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:16:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1D13D304D9A7
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:25:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C32A22332E;
-	Fri, 13 Mar 2026 13:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113B039D6E9;
+	Fri, 13 Mar 2026 13:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="Ij5fSZTR"
+	dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b="Ec/UO7h4"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5A51C860A
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 13:16:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA5139DBE8
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 13:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773407795; cv=none; b=tIhGWZOaXebSBTH24trGQXZVDwiP7dkZ5WG4CIUaWA9m81Rxu0ZTZI0oy3XOiPaN0pmcHPAf7WiywcwM+wDIsVOOvTkclFgrpp54sMIMigIN9Ikp3UUhOY9hlVuhd3eBibu0EVTke1WBrgAKp1Ais3EYKx+NeasQqyfcEavE15s=
+	t=1773408226; cv=none; b=qlwkqlW2Dv4WD1HzJnkyoYWA/c6LseGMLLGu5CR5Wp/Ri/RBG6/P7lw0r+eBDArOG2hPIRWIPV25HZ8iorerGz9f17mxRE0tg+SMMfGS9SoyWCSRvKw2hnO2ac6oYMRdXqGAwgIGRCfRzPMOJmoqbGZ42+chuKBkimZY4krWq9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773407795; c=relaxed/simple;
-	bh=PTIXyQyDlwPJ3Xof3a3BmfGAp+M4OPOQDCa2TTf6ZqQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YsUNb9zKznWnH6xp82oU5xL91kvZgyXo8Jb8lOIhanbnX05RmnCaU4cikyC8uhGgfcGKMF5atPgAw9qMpEo8gREmq1opnUOnnzV/gLnOFqQlDEHfDFsQj87NGThDK6l+dhPXmGGtP5ETXkzOxmII5rYKHnMZrT1s1Z+02YHYB5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=Ij5fSZTR; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from x1 (198.223.13.160.dy.iij4u.or.jp [160.13.223.198])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 62DDGPtG073732
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 13 Mar 2026 22:16:25 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=PTIXyQyDlwPJ3Xof3a3BmfGAp+M4OPOQDCa2TTf6ZqQ=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20251215; t=1773407785; v=1;
-        b=Ij5fSZTRwLdzKF+NYeq9AGJZ93CQ7ZOCv8TrzhFVoqk3XUSd6fsusio7SjKHXVSa
-         9/KU0soicUNVKtfF2R5e14hUXi54a7wStpQWP59JnYVpEgAE1y7u/SxSLWjMP0X5
-         FM7k1upwn+1i7QgP/Dd7IIztfvsli21AR5blMvLYawRNIbuxMchdG97rJWMlBnZm
-         1QYjuoEJ55xp4VBKZm9rEQPjwmljb+xCi2+OtGWzdlWc2MHjuHU6dHrxUnkMAtp7
-         gOd51uchJIuJ70WdwpkqNISN+HTLGzNhp9rN5/70TVO6wGpjDNlsYRHka0/3NYBs
-         efy6GBIGqipxsOlh73/ZSA==
-From: Kohei Enju <kohei@enjuk.jp>
-To: technoboy85@gmail.com
-Cc: andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com, ast@kernel.org,
-        bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
-        edumazet@google.com, hawk@kernel.org, john.fastabend@gmail.com,
-        kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH net-next v2 0/2] e1000e: add XDP support
-Date: Fri, 13 Mar 2026 22:16:24 +0900
-Message-ID: <20260313131624.6562-1-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260312183817.104878-1-teknoraver@meta.com>
-References: <20260312183817.104878-1-teknoraver@meta.com>
+	s=arc-20240116; t=1773408226; c=relaxed/simple;
+	bh=EcEAR7cMwDtFqhxhdQDrdTczE4LmTtFe8qVXn+Aa2lY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dz00UGrk8rtTOKWeVEM832Rpox7G95mAs4A/Yxy5G6qT6aG8GN8eoqc4lKwnLAckHr6yDRrn2nXcnfs8fFSvszkSCyWPs/MKcYDoQP2h6TWv0YkGFRTaUrkGRYHI781mV+Ci9VnTCso3Bj10f1qNntVqejFdgCpojaeoQQFr5y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com; spf=pass smtp.mailfrom=allelesecurity.com; dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b=Ec/UO7h4; arc=none smtp.client-ip=74.125.82.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=allelesecurity.com
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-12732e6a123so2770560c88.1
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 06:23:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=allelesecurity.com; s=google; t=1773408225; x=1774013025; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QysejYucTpO+gpjK5YiHBGQ8tPcUtjODeWyyK1sWW1I=;
+        b=Ec/UO7h4I/GsmPkYtCX5z+wTb/DN1ie1dezecZooMF6A/cFMW8XENF1/x5HEBSOkAY
+         QWUemwpG5e8IseKgWNEWDtfFyAaGDtIbYKTO8NFEDyFhgtimYSyd48CrhnSTpUrWtDlA
+         YLVAvpN0BU9nf5R3qAbGu06aMwhPWxe4kUd7Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773408225; x=1774013025;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QysejYucTpO+gpjK5YiHBGQ8tPcUtjODeWyyK1sWW1I=;
+        b=MJrCGxhQC+BktR1NDfqSoD1DP4pIriDeneDrzZhzKToxCIjICpH8LDa26w3C5w60ru
+         Qd28MLeiTLfE+kSVQ6lWA4zzzVVVWGW2CIrh+0wSUVA66xEM5jELcoSErCvmdGLMr+oD
+         LrLcwO0Cjrut3zug3p7JzgivFG7gH0vjZrlaBqa6soP9SlYSwpx+gNKvoHSZdbprcRtS
+         CvIg1ZilJNtvLlKUjUBA6oL+soiSQuPrA9Mwn0oGwQqP+h7CzdSSnCIzPCL1/HrmBszr
+         A0D816lgShX3wCJiZHFyrtDXGnYRKLggEv0KL54viWOCjzsULrIrQbN1/13JI/UDwu23
+         xV0A==
+X-Forwarded-Encrypted: i=1; AJvYcCUxrB3nL9qliC9vxVuRTNrOenlxQTYDLGg3O5lshBjNAlc35VJvHt2/U5vZ6TaTQv/HOUMS0es=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKYUx9/DKteMijUnE1UuT0G8BMgxE2GtVUjau24DLjoAXGpWXz
+	XsX45KS+0eKLetFDYKXDPNBFLBx38WFS3OvQxBNOGPpxds+Ir+v3K4JxSLJSf6dF+L8=
+X-Gm-Gg: ATEYQzyMQz+50rTy2NSquVSy3RGXCj7QdRR6R4UlhKVGyJVS7hh14RXVvQojxbDQAPz
+	QvzO4EscseiKa7aX5uU98hneEKHCTEdfy9EQenUbCfqS76gJ5jT//wgIGn08n3J+pr0juNqo6Wd
+	hBOOg+Be8ztUUn4rlTVnNUuZI9io3KT1aBi4ghQMP7MtASqWR5N6i+VKWRfsAeS+1GS1vPiEaTy
+	cJ4t3t3T/RR8zir0R9DKvXON9ny9n791+cNybtvySffxAaahyu9USOzMCA1RzUfc/azsTKQJv/+
+	QwU9BWQBRgxRkResup03tMuIvIVCxulbHHhlfK4CReoTGlNprkoZ9mQiY2HwBpE+SJVQ7l3gTIE
+	wD3hUYOs8wcuXKGJ0skBO2EEVIVY7APiZHemnSaqb/GbILaVzlQViQ4Jsn77jrHpXBBzSMbg8f9
+	DIvlT8MxuqIUrlDZz2LIbe3J7TvPs=
+X-Received: by 2002:a05:7022:1a85:b0:123:348d:8576 with SMTP id a92af1059eb24-128f3d0dc31mr1713602c88.6.1773408224546;
+        Fri, 13 Mar 2026 06:23:44 -0700 (PDT)
+Received: from fedora ([179.105.152.20])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f6384f6csm1846358c88.9.2026.03.13.06.23.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Mar 2026 06:23:43 -0700 (PDT)
+From: Anderson Nascimento <anderson@allelesecurity.com>
+To: dhowells@redhat.com
+Cc: marc.dionne@auristor.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-afs@lists.infradead.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Anderson Nascimento <anderson@allelesecurity.com>
+Subject: [PATCH 0/2] rxrpc: Fix key and keyring reference count leaks
+Date: Fri, 13 Mar 2026 10:23:25 -0300
+Message-ID: <20260313132327.409785-1-anderson@allelesecurity.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,45 +94,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[allelesecurity.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[allelesecurity.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lunn.ch,intel.com,kernel.org,vger.kernel.org,iogearbox.net,davemloft.net,google.com,gmail.com,redhat.com];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[allelesecurity.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267452-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267453-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:dkim,enjuk.jp:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,osuosl.org:email]
-X-Rspamd-Queue-Id: 1ED3F283A71
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anderson@allelesecurity.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,allelesecurity.com:dkim,allelesecurity.com:mid]
+X-Rspamd-Queue-Id: 2255E28404E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 12 Mar 2026 19:38:15 +0100, Matteo Croce wrote:
-> Add XDP support to e1000e driver. First patch adds basic XDP support,
-> while the second one adds support for AF_XDP.
-> Tested on an Intel 82574L Gigabit card.
+Hello,
 
-I'd Cc intel-wired-lan@lists.osuosl.org since this series is about e1000e.
-Is there any reason not to Cc the list?
+While auditing the RxRPC protocol, I identified two separate reference count leaks related to security keys and keyrings.
+
+The first leak occurs during client call allocation if security initialization fails. The second occurs in the setsockopt path due to an incorrect struct member check, allowing multiple keyring assignments to the same socket. Both issues prevent the cleanup of key/keyring objects, as evidenced by /proc/keys remaining populated after the user processes exit.
+
+This series fixes both issues by ensuring key_put() is called on the error path in the call allocator and by correcting the logic in rxrpc_setsockopt().
+
+Patch Summary:
+
+rxrpc: Fix keyring reference count leak in rxrpc_setsockopt()
+
+Prevents multiple keyring assignments to a single socket by checking rx->securities instead of rx->key.
+
+rxrpc: Fix key reference count leak in rxrpc_alloc_client_call()
+
+Releases the key reference if rxrpc_init_client_call_security() fails.
+
+Testing was performed by monitoring /proc/keys and using a reproducer that triggers failed security initialization and repeated setsockopt calls.
+
+Anderson Nascimento (2):
+  rxrpc: Fix keyring reference count leak in rxrpc_setsockopt()
+  rxrpc: Fix key reference count leak in rxrpc_alloc_client_call()
+
+ net/rxrpc/af_rxrpc.c    | 2 +-
+ net/rxrpc/call_object.c | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+-- 
+2.53.0
+
 
