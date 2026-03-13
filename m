@@ -1,323 +1,229 @@
-Return-Path: <netdev+bounces-267461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267462-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aB1gM2cXtGlkgwAAu9opvQ
-	(envelope-from <netdev+bounces-267461-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:55:51 +0100
+	id qCSEBIUXtGlkgwAAu9opvQ
+	(envelope-from <netdev+bounces-267462-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:56:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B745284531
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:55:51 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A9DB284542
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:56:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0AB19310705A
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:42:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 00C063139717
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:44:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320D02DB787;
-	Fri, 13 Mar 2026 13:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48253390CAC;
+	Fri, 13 Mar 2026 13:44:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="h4a0wpuw"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="KtbSMsLt";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="SObXtzdR"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010017.outbound.protection.outlook.com [40.93.198.17])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD85258CD9;
-	Fri, 13 Mar 2026 13:42:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773409370; cv=fail; b=JJTY3Oan9hOdgV20PtoeFKFGuUmzJbOpTHa5kI/R+Npi0+7DB6bdOiOhRJvRKk7mFHL6dfsTmrRbFFIdxO1Qj5ztlxhv20bUO0GbOFYHszIKmVnlAQAbBRjLaOxFS9QHDHFoU6zFZ3DZ98V8cZJtwgsQS1bKXaPuIKwP99di3vw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773409370; c=relaxed/simple;
-	bh=TdAI98N3pQtFNV23Z/P9tkwuDc2aASCxqfHRrFOP08w=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=a46a2AGchZHfuDOZ/aXbPTTicLL4ACago3sUxDZIx0BqUKvUwHVTOai1Z/6LQBvJg+5gGdD1pauLVRrVTR9wQBn4FJ4RVBKiXne0FmE4RQsz0mNXIR03mDX4hHbwnF6LSspeg1Ut80bUoytw1hU1pvDJNFH4BUfsKGCJfW6Evlw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=h4a0wpuw; arc=fail smtp.client-ip=40.93.198.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=suakzPiFZ57+mPZHoG9G23eD5bVdqZsNohips8a7r3y7X4uPhPirNj6Z1y4sE1josKaZSEgMtMKGT4jVqEEe1bovQCGXeIZ50R6VUdvZ+HH7aR+WnC8GkvKWa7E7d6lV6IIMOdXJ20vLAlyya534m3urW/7K8ty6aXWgi//bnPoqlNjyh6FmlTNkEUDcNf6aPA+DqSuRXwOQt+MedrzsP47v/6f9Z7gu3MkXKRpc2GbIjrc00plLNKr4JCaLeFe46w0ddgD6hOaQILeNPkdz8EKL0mGoRvAcTCecdkTQmfqtYBYBiDTSJcw3yRWRsufrnHS/kzGlYN4LMlb5XfbdQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3tiDUcnR7HoFVFcnqP1aqWbRSC8sPchh5VFDoxe4Hq0=;
- b=woSd+GhfBspGPfPjITRdAXuRT7eSNsFlHJptrrHdoJPMZlKCJ6A1TVeYYZ7I8W1Xa8MGGyGwLMnDgs7EREE+zwpxx50d41tHjKwk9X0hCKJBJh7baIL00b17ru1mxf4Ubn0Kp/wQ1PBway3yHoX7ybPGjlqgvVtjg97ILj7C6QSEVt+kv+SU7LypukLdSpYcuvzX5IN47sQW72qvh5LlGoNAPqcrktc589lHZrz4QuyStow0aQLUiabYVFPxXp+0Nt/9pozpCUFsEc8BThRJpN3f9/4TV0iehBiZIM9Qxzo7nCX671uWYBKpPOkghbNtG5Sz4/x2l24NbTI+j1S1iA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3tiDUcnR7HoFVFcnqP1aqWbRSC8sPchh5VFDoxe4Hq0=;
- b=h4a0wpuwgWzmKAfzeuB5PC5Tz6CzSAl30hHIuWxuEtBCjeO34UMerSOFUOX7LVt8B92g2sTrrDb3rQLX2UIYOh1HVIhL7q4x22+0X+zJin8WH5tYoq4TEk6XR4+vTPUzO8OcEKrdy8HxfhQfBQKi+0/nTuA641BKPVmN4c9/MPo=
-Received: from BN9PR03CA0744.namprd03.prod.outlook.com (2603:10b6:408:110::29)
- by SJ2PR12MB8182.namprd12.prod.outlook.com (2603:10b6:a03:4fd::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.6; Fri, 13 Mar
- 2026 13:42:44 +0000
-Received: from BN2PEPF00004FBE.namprd04.prod.outlook.com
- (2603:10b6:408:110:cafe::4) by BN9PR03CA0744.outlook.office365.com
- (2603:10b6:408:110::29) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.27 via Frontend Transport; Fri,
- 13 Mar 2026 13:42:43 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- BN2PEPF00004FBE.mail.protection.outlook.com (10.167.243.184) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9700.17 via Frontend Transport; Fri, 13 Mar 2026 13:42:43 +0000
-Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 13 Mar
- 2026 08:42:40 -0500
-From: Raju Rangoju <Raju.Rangoju@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <pabeni@redhat.com>, <kuba@kernel.org>,
-	<edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
-	<Thomas.Lendacky@amd.com>, <maxime.chevallier@bootlin.com>, Raju Rangoju
-	<Raju.Rangoju@amd.com>
-Subject: [PATCH net] amd-xgbe: synchronize KR training with device operations
-Date: Fri, 13 Mar 2026 19:12:10 +0530
-Message-ID: <20260313134210.3824872-1-Raju.Rangoju@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52DF39182D
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 13:44:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773409458; cv=none; b=AD00BDDKNyhajOMX+GWiqIQBBBOH5fykk4PpgHQHYN4X8pcTAqnK0fWH4QJh/iIN0VvdGohYDY9GCWqkPcTPKEGfWnrGvr6PBIJzWBC+1CaLuyMrJTItrVsKX3WXXNp3osRg9f2XiZx4fAhP3Ny9pKt4HfhmqinDjFaWnWXHM/M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773409458; c=relaxed/simple;
+	bh=kPh4JRKsDotwPE2S/JesaTmap1N+yj7JN+2zbuQjdQk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AmFxYfu9rXD7yV8HzGx5XUKeBGSCc13YNwKHjIV9LWHJ6ZGizVvvzkp/J1rTtFwC3UjXZDqFoMiV0NsaEuLHPZY8PFnFVF6zcpJoOOsoPyTq/Fb84VDnPKRZowTPFSysaKY3a5bUP7396GAwGh9q6hvq5SRMMXwj/VO6co8f8YM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=KtbSMsLt; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=SObXtzdR; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62DDDr7F793612
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 13:44:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	QoZHIkugLvxBFz6S6an3vh8XxLW2VljccTx776RcMfw=; b=KtbSMsLtNsll432M
+	ZTzKQXe8T/DK/n7b9XjI6u2X8hEFxS6+vToHFGAIETMkOYmiyrVQx1Ron0HTNUGw
+	L/7hqLNFcZtO+7ieK6wWqj/GrMcUMTkirbNDQOXKEyEzX++Y07x36vS4BckJkiBw
+	i0e+TKFjJYkL6k4y12GD35M2kL8ToRgaS6v3aDis+sQW046oTfw6VRUKYvC55XyU
+	GavC+gmfdoZZxfCSN9TNUX7z0/IKdGFuTV1BuxzhmfyaKB9OzNJ/1nmkV5iIg9BW
+	H8cIWU+Z3DaF7xCU6hevUNHgxDD88Y9uGNl2srLPZ4lN68ffEs3Qj3IQtVVXyVOS
+	oZVnQA==
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cvdnt1eek-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 13:44:14 +0000 (GMT)
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8cd81506677so1290480285a.1
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 06:44:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1773409454; x=1774014254; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QoZHIkugLvxBFz6S6an3vh8XxLW2VljccTx776RcMfw=;
+        b=SObXtzdRrSru9OolzC5msz8Pripq93dY0a0iM5lbQwBl+ye+xEBpdd4zQo+KyfwEDv
+         IjVaqDl4PeUkPJvG9NwX5h06TTAtT63n6WvwVwhM3/ivwF63ScoL06ZURRW6dqXdKZw3
+         5CqDqvwBW9+CYcgEb19Qe9Qujf2oeXMYF9I1H7eh5cHzc0gutftPuWgchOsDymzclPfV
+         +5Lhm0zLaqsFJgg9Rqz21Pea1wWDDGoY6Jm6IuAHUBcIbIt+ne5itg+OeZYkFCYoKXdW
+         pc/ZxLpoRUQaFJQZtj+pBhe1xWGmcUAJL9fwI3qJAf/EXjc6qcN05uNOVvpy/76y5nNd
+         bn+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773409454; x=1774014254;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=QoZHIkugLvxBFz6S6an3vh8XxLW2VljccTx776RcMfw=;
+        b=l169hsSUdyPpqTBlgyyFXb1+uNkj6IgRv90xPfF7Qsz4Tn9e0yUL6UAm1fpDav5rn/
+         8OzqKL5UJvyGQmUe90uxIqK3sEXnfYMBbug44WhIJMSNwsNNPVuMxD8YPZhqxaVfhYMB
+         z0SQUYmNOYs71A97c24ST+Hce8I9Wmte0OBaerSPozllRG9HqjgTHaaEaVz8fMU0T/IY
+         jgWUkBmozbMzbHSk4fz2B53BwsUOVS3BvvoHlbSSYDVRay90kmfP1RpnE3DvtJS01hoN
+         NlMtjeADqGqjQN16RAZpAmaKRvLPksyQuakodZT8UM+Mvbhih4CInUpcnjuf3rXFvKmv
+         aZIA==
+X-Forwarded-Encrypted: i=1; AJvYcCUsOUphTjKyMUTmeYUTgm0cx6ZOJ78y1VU84/zNMSgzJOXgBqmd9hAPkz9PVmqJ6AbyLysXJDc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydKC8zlgPhIqMdIriHuK0ii8DCsa9qDP5i0oKI+PXsEJM4o0z0
+	tfStuZtBQ0PLDCcIyYOCVZZ7RgRon32TMg+hFE463AbPLDq6BwC8VJFC/r2hWEX9eMUtTyNmR9v
+	WMURoN7t+LptRjS00Af1B8qR/56pd8bQUr5pp/0IOrTuKy2jpM0umAt9tFpg=
+X-Gm-Gg: ATEYQzz8eqlTYjtDlADtHhJjt8QHk3qgLKzTRGL+h5BjISMBYQfLxMgEQJgX9aMIzcF
+	19zMIbcJoF/VcbC+C8w3gJ/HMMCMtkLL5y/e/csR2RiwExUKu940+JQB3JDtTJT/7iIlUpFPNS3
+	30t1cPEm2UYgkCn3ZKBH+tEr6qodCfQUnQFdzNFRHNjRnjH78IFB7WWv15dRQYNI8ZTfvcrLIVo
+	vGlEzlseYibxW6aeBwxZ5pyb1b0rYRauIW90ZUaBxQ8/dUV0i3/q/mo1+3YbFatYF8umGoBA0KZ
+	EJ2y0oDaUCppzkQ6EVIrcc8YXvadfh45Fi17juRzg1dPO+neicHKnihjqqSVaj0GNU3RpJayCoC
+	258duxsKlCW1UsujWZW0wl1U6fxg3adnPVl7yhT4RqpTevLtRvm8=
+X-Received: by 2002:a05:620a:4623:b0:8cd:8fb7:7aed with SMTP id af79cd13be357-8cdb5b5fb55mr457721585a.49.1773409453974;
+        Fri, 13 Mar 2026 06:44:13 -0700 (PDT)
+X-Received: by 2002:a05:620a:4623:b0:8cd:8fb7:7aed with SMTP id af79cd13be357-8cdb5b5fb55mr457712985a.49.1773409453455;
+        Fri, 13 Mar 2026 06:44:13 -0700 (PDT)
+Received: from brgl-qcom.home ([2a01:cb1d:dc:7e00:f055:6536:e7d6:661c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe20b4dasm17696873f8f.18.2026.03.13.06.43.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Mar 2026 06:44:12 -0700 (PDT)
+From: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+        Alexey Brodkin <abrodkin@synopsys.com>,
+        Vineet Gupta <vgupta@kernel.org>, Scott Wood <oss@buserror.net>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Liam Girdwood <lgirdwood@gmail.com>,
+        Mark Brown <broonie@kernel.org>, Linus Walleij <linusw@kernel.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Kevin Hilman <khilman@baylibre.com>,
+        Jerome Brunet <jbrunet@baylibre.com>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        Dvorkin Dmitry <dvorkin@tibbo.com>, Wells Lu <wellslutw@gmail.com>,
+        Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Sebastian Reichel <sre@kernel.org>,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
+        linux-amlogic@lists.infradead.org, linux-leds@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-pm@vger.kernel.org
+Subject: Re: (subset) [PATCH 00/14] gpio: remove uneeded Kconfig dependencies on OF_GPIO
+Date: Fri, 13 Mar 2026 14:43:53 +0100
+Message-ID: <177340937994.51547.9424773605486301589.b4-ty@oss.qualcomm.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260304-gpio-of-kconfig-v1-0-d597916e79e7@oss.qualcomm.com>
+References: <20260304-gpio-of-kconfig-v1-0-d597916e79e7@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF00004FBE:EE_|SJ2PR12MB8182:EE_
-X-MS-Office365-Filtering-Correlation-Id: 015e9a56-21e2-427f-0d49-08de81066789
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700016|376014|1800799024|56012099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	80tIov/O///3OuqWVNi6SzHQAIcPA/EDqvI6lSHcq7/ERDRGDIwoKjnpyoEiIef/Zp9j+WasV42vjyVhBBh+vRxWEy9qS3VLHssLtkuwNw4BNj8nbc4AN44I2i6jIC8bz2NNEIElYpQL9dN6tCjwl4tvmiiWaSbV+mI3eeEjefoP9NImbu2BFr1rQC9vP7VDsWEijT2zX2Gcai8GjUDQ0zlzamdDsd13i8U6gjkr9/SoPwfx2ZDB56/0twOiFCXZhVE9o1dzi9fiAACIAPXuB6HalNZWC/0Et97TYoOG3xdQMraB+CN1DiswiqtgglOmulRF+JqBDcLkR4Rnj8mkm6h76BA2YnhXQyzwHmefey2ynJU66rux+p8zslzGk5jMrVnVBK3Tcw2rrP3j/kuKDiukiUJYcqj8IIZErkpubE0wvTaeRv3oyh6wDqLEH61tP3clj1E3CzKj5PBMhOPhDBtgBkGAoXa4yHwQYhGli50Ib9tx0xkcoT6l8Qm2h7bPgWcyvOR6GLvJsbZQQZOSECAX29ls0aduydCAQZRTi9eb2ttilps06R+40npLVzreo1rL/B55DW9pWgkykMnzfkU60z76p0WCG/kQkPRfpMe41jwlJeE6h7RgQtDaTatZzD+jWsYudhmo43PXlic49PUMVm9WZ5AYvGW4muoENZfDy4y8WvuIYVzNrZHdcavt5COgPocJUhWx30jFW70l6yWMAF+uxirvA8fQQHlKl6VRBOi9lb/2S1zJIYVbSv9MboO3dXixI+WemUVkYcbfBA==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(376014)(1800799024)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	PbBOsY1wd8DsavJRJRNGxMl/EqLkq54WO0VlMP8QmhLzZUgpMTl6CW1EikPbD6eiUKnu/DU64RCRjuYaAgC7gMcGrGe+HOT/9zOziv+o35d20UfQXmZ7Ua36U8I4+qrJ5KxSsDCEA956uMQ/Ux6/qGZkFbtUHCcnIO5khbWuUq/5dmOC0Hq7vTElcUf1au2MKg4VwRKj5lGJjCgOYr+NI7dl00JZgSAy8wL3mgcEdRSE8wXsDBKVO6wPjDrqYhp3cPZocUdVc7b6RiR8OjdirjPfk5Vob3wFT4zHjUfv8hOFT25gU8d24Gyn3riquWstg5XRtL0M2soU74N2gT/ulKEVBrsJBe4cjeu7cDLfsusCasK0tSMIcBmXBgiI1KQiYYGpk7smUbs295E8Xic+4ffpZi333eh9h5I4NA4OLtumDJ09PM2pOSk4upXf5FRH
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2026 13:42:43.9573
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 015e9a56-21e2-427f-0d49-08de81066789
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF00004FBE.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8182
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Authority-Analysis: v=2.4 cv=KZrfcAYD c=1 sm=1 tr=0 ts=69b414ae cx=c_pps
+ a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22 a=VwQbUJbxAAAA:8
+ a=EUspDBNiAAAA:8 a=5BVL746LnNak5i1nQvMA:9 a=QEXdDO2ut3YA:10
+ a=PEH46H7Ffwr30OY-TuGO:22
+X-Proofpoint-GUID: LzjXsDX7g9lZjSuSwopsVzp69AxjlsT8
+X-Proofpoint-ORIG-GUID: LzjXsDX7g9lZjSuSwopsVzp69AxjlsT8
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEzMDEwOSBTYWx0ZWRfXxbNW+2uMMKe7
+ JMOi+cij0v8uN5SSx+CCgaypDNRMc5+EldnZc2gmdoeExV37gfzrc9gOon2kvYPiQEb1RxGL732
+ Ra/5pnnhRDbi7QGaOcwIxxvnyty2ubVeUeYlDlbe9afRiZE3WHtzXXrmmtRuQn0eAHRHq/fDSDz
+ VWmKpHqk/u0klvm56JTGgjmk2AJvCohRNQXr9N9on/opyggit9w7oAcRH9pJZg/z7oAmYfbFrf3
+ QCTC9pbSC/ypd6iR1AFkUe7jBexsJHECBEFPKWh/pYS+2ad4WFHKRrUkN14F979fnmkU0qIBuQI
+ pBOkj2pcT3zQOxQdW5UQhcCpvChan1gvTWQrh+D1r/u9MP3W6eTPLnXCx9aMjoG234sSJUJB4iQ
+ PHIsGujfUCOZXK/vj63P8unv6nPbnqpoo/9VDJW4bpnZb5i7DiyB1YIq3zC8mLmhzVxPl5u8Cjo
+ mgDzCpjrSMIUmNLi+PQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-13_02,2026-03-13_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 spamscore=0 lowpriorityscore=0 priorityscore=1501 bulkscore=0
+ malwarescore=0 impostorscore=0 adultscore=0 clxscore=1015 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603130109
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-267461-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267462-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,oss.qualcomm.com:mid,qualcomm.com:dkim,qualcomm.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	FREEMAIL_TO(0.00)[arm.com,kernel.org,synopsys.com,buserror.net,linux.ibm.com,ellerman.id.au,gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org,baylibre.com,googlemail.com,tibbo.com,roeck-us.net,linux-watchdog.org,linuxfoundation.org,oss.qualcomm.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[47];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Raju.Rangoju@amd.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[bartosz.golaszewski@oss.qualcomm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:dkim,amd.com:email,amd.com:mid]
-X-Rspamd-Queue-Id: 8B745284531
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 7A9DB284542
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-During 10GBASE-KR link training, the PHY state machine can be corrupted
-if device stop or rate change operations are initiated while training is
-in progress. This manifests as:
 
-  - Link stability issues after interface down/up cycles
-  - PHY state machine lockups requiring a full driver reset
-  - Intermittent link failures on Inphi re-driver configurations
+On Wed, 04 Mar 2026 10:02:21 +0100, Bartosz Golaszewski wrote:
+> NOTE: Each patch in this series can be picked up independently into
+> maintainer trees.
+> 
+> CONFIG_OF_GPIO is a switch that enables the compilation of the gpiolib-of
+> module. The module itself handles GPIO lookup via the OF-node tree and
+> is automatically enabled on all OF systems. It does not export any
+> public symbols to drivers. There is no reason for them to select or
+> depend on it in Kconfig.
+> 
+> [...]
 
-The root cause is that the firmware mailbox operations for device stop
-and rate changes can interfere with ongoing KR training sequences,
-leaving the PHY in an inconsistent state.
+I'm picking up the ones that were acked and will send a smaller series
+addressing the issue pointed out by Guenter.
 
-Add synchronization to prevent device operations from interrupting
-active KR training:
+[02/14] arc: axs10x: drop unneeded dependency on OF_GPIO
+        https://git.kernel.org/brgl/c/d2cd20f7c2a4e4bf4fca844c01e925b112c5a2c5
+[03/14] powerpc: drop unneeded dependency on OF_GPIO
+        https://git.kernel.org/brgl/c/dd1cdfb20e44e295512080dea508771b6a1f1c0a
+[05/14] regulator: drop unneeded dependencies on OF_GPIO
+        https://git.kernel.org/brgl/c/bf017304fce10933f18fafe140bf749fb9672058
 
-  - Introduce a mailbox mutex to serialize firmware command access
-  - Wait for KR training completion (or timeout) before proceeding
-    with stop/rate change operations
-  - Only wait when KR training is actually active (KR mode with
-    autoneg enabled or Inphi re-driver present)
-  - Use a 500ms timeout to handle hung training sequences
-
-The mailbox mutex protects the critical section of firmware command
-submission and completion checking, preventing concurrent mailbox
-access from multiple code paths.
-
-Testing on AMD platforms with both direct-attach and Inphi re-driver
-configurations shows this eliminates PHY state corruption during
-interface operations and link changes.
-
-Fixes: 549b32af9f7c ("amd-xgbe: Simplify mailbox interface rate change code")
-Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
----
- drivers/net/ethernet/amd/xgbe/xgbe-drv.c    |  2 +
- drivers/net/ethernet/amd/xgbe/xgbe-main.c   |  1 +
- drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c | 51 ++++++++++++++++++++-
- drivers/net/ethernet/amd/xgbe/xgbe.h        |  5 ++
- 4 files changed, 57 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-index 23beea48ae26..3913eb7e1da3 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-@@ -1321,6 +1321,8 @@ static void xgbe_stop(struct xgbe_prv_data *pdata)
- 
- 	DBGPR("-->xgbe_stop\n");
- 
-+	xgbe_check_kr_training_in_progress(pdata);
-+
- 	if (test_bit(XGBE_STOPPED, &pdata->dev_state))
- 		return;
- 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-main.c b/drivers/net/ethernet/amd/xgbe/xgbe-main.c
-index 7d45ea22a02e..5f3ab29707b7 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-main.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-main.c
-@@ -78,6 +78,7 @@ struct xgbe_prv_data *xgbe_alloc_pdata(struct device *dev)
- 
- 	spin_lock_init(&pdata->xpcs_lock);
- 	mutex_init(&pdata->rss_mutex);
-+	mutex_init(&pdata->mailbox_lock);
- 	spin_lock_init(&pdata->tstamp_lock);
- 	mutex_init(&pdata->i2c_mutex);
- 	init_completion(&pdata->i2c_complete);
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
-index b8cf6ccfe641..142eb952a29c 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
-@@ -2095,12 +2095,57 @@ static void xgbe_phy_pll_ctrl(struct xgbe_prv_data *pdata, bool enable)
- 	usleep_range(100, 200);
- }
- 
-+static bool xgbe_phy_port_is_inphi(struct xgbe_prv_data *pdata)
-+{
-+	struct xgbe_phy_data *phy_data = pdata->phy_data;
-+
-+	/* Re-driver models 4223 && 4227 are supported Inphi models */
-+	return phy_data->redrv &&
-+	       (phy_data->redrv_model == XGBE_PHY_REDRV_MODEL_4223 ||
-+		phy_data->redrv_model == XGBE_PHY_REDRV_MODEL_4227);
-+}
-+
-+void xgbe_check_kr_training_in_progress(struct xgbe_prv_data *pdata)
-+{
-+	struct xgbe_phy_data *phy_data = pdata->phy_data;
-+	unsigned long kr_timeout;
-+	int wait;
-+
-+	/* Only wait for KR training in specific conditions:
-+	 *  - Inphi re-driver is present, OR
-+	 *  - Currently in KR mode with autoneg enabled
-+	 */
-+	if (!xgbe_phy_port_is_inphi(pdata) &&
-+	    !(phy_data->cur_mode == XGBE_MODE_KR &&
-+	      pdata->phy.autoneg == AUTONEG_ENABLE))
-+		return;
-+
-+	wait = XGBE_KR_TRAINING_WAIT_ITER;
-+	while (wait--) {
-+		/* Check if we've exceeded the AN timeout window */
-+		kr_timeout = pdata->kr_start_time +
-+			msecs_to_jiffies(XGBE_AN_MS_TIMEOUT +
-+					XGBE_KR_TRAINING_WAIT_MS);
-+		if (time_after(jiffies, kr_timeout))
-+			break;
-+
-+		/* Training is complete - no need to wait */
-+		if (pdata->an_result == XGBE_AN_COMPLETE)
-+			return;
-+
-+		usleep_range(10000, 11000);
-+	}
-+}
-+
- static void xgbe_phy_perform_ratechange(struct xgbe_prv_data *pdata,
--					enum xgbe_mb_cmd cmd, enum xgbe_mb_subcmd sub_cmd)
-+					enum xgbe_mb_cmd cmd,
-+					enum xgbe_mb_subcmd sub_cmd)
- {
- 	unsigned int s0 = 0;
- 	unsigned int wait;
- 
-+	xgbe_check_kr_training_in_progress(pdata);
-+
- 	/* Disable PLL re-initialization during FW command processing */
- 	xgbe_phy_pll_ctrl(pdata, false);
- 
-@@ -2115,7 +2160,9 @@ static void xgbe_phy_perform_ratechange(struct xgbe_prv_data *pdata,
- 	XP_SET_BITS(s0, XP_DRIVER_SCRATCH_0, COMMAND, cmd);
- 	XP_SET_BITS(s0, XP_DRIVER_SCRATCH_0, SUB_COMMAND, sub_cmd);
- 
--	/* Issue the command */
-+	/* Acquire mailbox lock for firmware command */
-+	guard(mutex)(&pdata->mailbox_lock);
-+
- 	XP_IOWRITE(pdata, XP_DRIVER_SCRATCH_0, s0);
- 	XP_IOWRITE(pdata, XP_DRIVER_SCRATCH_1, 0);
- 	XP_IOWRITE_BITS(pdata, XP_DRIVER_INT_REQ, REQUEST, 1);
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-index 438033a71523..238eeee0d422 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-@@ -202,6 +202,7 @@
- #define XGBE_AN_MS_TIMEOUT		500
- #define XGBE_LINK_TIMEOUT		5
- #define XGBE_KR_TRAINING_WAIT_ITER	50
-+#define XGBE_KR_TRAINING_WAIT_MS	100
- 
- #define XGBE_SGMII_AN_LINK_DUPLEX	BIT(1)
- #define XGBE_SGMII_AN_LINK_SPEED	(BIT(2) | BIT(3))
-@@ -1015,6 +1016,9 @@ struct xgbe_prv_data {
- 	/* RSS addressing mutex */
- 	struct mutex rss_mutex;
- 
-+	/* Firmware mailbox mutex */
-+	struct mutex mailbox_lock;
-+
- 	/* Flags representing xgbe_state */
- 	unsigned long dev_state;
- 
-@@ -1252,6 +1256,7 @@ struct xgbe_prv_data {
- };
- 
- /* Function prototypes*/
-+void xgbe_check_kr_training_in_progress(struct xgbe_prv_data *pdata);
- struct xgbe_prv_data *xgbe_alloc_pdata(struct device *);
- void xgbe_free_pdata(struct xgbe_prv_data *);
- void xgbe_set_counts(struct xgbe_prv_data *);
+Best regards,
 -- 
-2.34.1
-
+Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 
