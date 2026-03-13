@@ -1,262 +1,149 @@
-Return-Path: <netdev+bounces-267565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267566-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8CY6CYlmtGm4nQAAu9opvQ
-	(envelope-from <netdev+bounces-267565-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 20:33:29 +0100
+	id +C5dISRntGnxnQAAu9opvQ
+	(envelope-from <netdev+bounces-267566-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 20:36:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69DC2289515
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 20:33:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC50E289552
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 20:36:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C748B318B913
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 19:23:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C384F31D25E7
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 19:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3DB33DD51C;
-	Fri, 13 Mar 2026 19:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A629F3E1CE8;
+	Fri, 13 Mar 2026 19:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="LImE69bQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bl7+eQ2R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 622F23890E7
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 19:23:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773429836; cv=pass; b=Sv5dH5F+NFGRDkDZ+7z2xpOQptlHVQ4XXq1fca88y3fRg8WPwXSTUVMTB/6KOwnHHpAELXkUDJazC1v4+Irg/FY3OeOJT827te/nop67BC1NSWf+ks+rcPzq/58+xSRZRvnJoWW7Owxb2SNmHwpoHYxCjRF8LU3CjCxUBDynEMM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773429836; c=relaxed/simple;
-	bh=hprIMvqXPDky5lABLmbn58PPpa0nP+LWPC9+kav2e0k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tKlC7hqBp2eHswWJxy4rD4QkdpP4rTsM55py7W/Sr4hruLyO5wvYEdjRrNzzZFJnyyyqxGS5ZjHSmVFeBa5PdDW1Ifx+HCxM+8VHlX8TdN5TpL2RbtIDOumN7zxsJURWVjUuDLKb0jfHWLtEBwhpS/LKitf1XhSGWJ+IT+skYFQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=LImE69bQ; arc=pass smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-829b2018c94so1558016b3a.0
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 12:23:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773429834; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Nz1q8AdhvJOno7cLHYxVn5vf2W7ewJmh6Fzcjc+etssVFfuNagG1KTDcb/UZ/jFCau
-         viKGu50lBJ8WrdVPs82xputjVOviCImzJuOINpEjy+t8klzllFxOJR5WbisoRFIpzerU
-         3eW00pc8rduyxxzV3hvioYLz4YAsJqJV0/K7fsZEgig+tTB+iBeolON+MuM5G7LQ+hCd
-         rLAn8TogDZum5gxCZJVb3LiqqT4mPslboxHqaGeKJAd3TMv0IhkGeMHGZ7GKeJr9e6Gj
-         i3NvT2USJAC2WlOaSh+7Kg/T0xWId+gxkh2HCxNqJWLvSQO18MR+xFjFaqQzDaBeqIgi
-         4cYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ZwHrNk6E0E2YLvgNXjK4jzrezPEbvpT/0KLKbXl49g0=;
-        fh=GwZSyst1/uwNDBzdOZIWelmvEDCuAqhGpiMErsPAPlU=;
-        b=VbfhXyiwAWt0kmZRg18zJmTzK/rU+hTOTPLMaB5I63UhwXBNWIsBG0v12Z/myg9D59
-         oikLNwHM3oHdZmZrLSjlNRyLXw0Vysrb0u96So6FI2slCkWB/7Z3G8/mjVmcbY6d4P7g
-         5+KjE1VCEUPsPwHZx9YVUu5QIE5ENma0QH3ULg1DqptPwEb6FCfIWSzWIQHOw4lQmrUm
-         6aYhC8WJpeUcKiv1gTjwUjAIkERVMcLktq3/4bdDOA6e/FHQnn47w0FrOheUWEszZi5t
-         JHOCPwszXCGww17U7iUeAbVyGnVMrzC0oLEvtOENJVQPXqUCS1dlNNLN5YwD3Sbb3nE1
-         zycg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1773429834; x=1774034634; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZwHrNk6E0E2YLvgNXjK4jzrezPEbvpT/0KLKbXl49g0=;
-        b=LImE69bQVf5MQ3PxSeHOoBV+0Zri7HeBRooeFdiAVONLqlACsRZ+q6MvLbIYlCoj49
-         Sb/IEMlPqpGZnKKrUa/XR3gq4zzfA3IvenXFguGlkaJd2JvPQwMSJ4W5vrzcvasiDkfb
-         kAPNoxJrMDkhqpZJJc21JJRUpAh0EF9PcvsJ5dBvADIDCEfjuEb7ApraTkma6ITyJqT3
-         ypzdU+akj5O4yT1P1U0DbPtNuV+Z3NCJd2zJo+JyndqAsYOE8VTNZt1VrRBlcG6WaauP
-         45ONlh7S+PB6sU18PLB8sjOLIvBsr36/MhikbD2lmiqes9we9DlCole67PeRxiHuVG9o
-         Rt6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773429834; x=1774034634;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZwHrNk6E0E2YLvgNXjK4jzrezPEbvpT/0KLKbXl49g0=;
-        b=Tut1GiZUfx8SeQ62bMh/Uh1kPewIpOHn+my0kwq/f7vFUTCGxsSISHHThZHxx0pPk+
-         B4IiI3TQX5xp3X9W4AtSlKmBYxDhOcpwLOHWijzL9XhHXKqKLs7dkhFnDxROfs+fQYYt
-         TPYo+eHPHfvXLtkRLR3KFQZzSMw6NVe0iEjQkH+qPVX7PJRa1mKKB/cQlg/svjzV40Jg
-         fqaye7WCSDEpNzorICZwx/3p2N7ibGVBspqyUFULLFxAhJ5KCd0aAUNtgCLQEMgfh/ls
-         GuE0Vdk67R8rOHQuy6aZUpdKgMeBRkWKRAUC7kOKVd74nmTgvV94sf7WMlIA/bzGe8ST
-         RUwQ==
-X-Gm-Message-State: AOJu0YxuQvOLmZ8bsvDPZt7VK2F3u7EDH7YrRu8/BVp0oh2m5VawPrXj
-	twD/ZB6p0q5NWTgiOsfsspRO2gaq166IBYSs1O5e35sDZRJdHxBj1NdnbOOi4pk3nVAyv6t5c/5
-	Aqk5cOa8yqjV6Soet5etlGJMSsrTs4Ba9OuUutMk/
-X-Gm-Gg: ATEYQzzBNrKT0UY+xMRRvEjlL+krA1mLL+GSCwIM3YgGxhEjGQfUTFi/vmzT3XBT0FO
-	CHaRXzrd89/gaDlhcfAzco7+PiZlx1+A5zODUi2rF2ffzXLWx8iIbySsz+nfyTwf1VKiKJpyBC/
-	8asW6UyCMjhuSISUz5smcI/m8bFcqdfcM+BCVYRW63nAeKZJXD1HmLp/JH9kf3xJmx3XAs7D9rG
-	8YYMAKljHGnbGANZhA9UMr+Az4cKUz5mZXLDNkivr7HumzxpZZJsbvYNF+EZ0UbeshSmgX/yVgm
-	gF1mt1p6q9DCywo=
-X-Received: by 2002:a05:6a00:94d1:b0:827:298e:b7c0 with SMTP id
- d2e1a72fcca58-82a198afd10mr4323267b3a.47.1773429833723; Fri, 13 Mar 2026
- 12:23:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281A23E1CE1;
+	Fri, 13 Mar 2026 19:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773430539; cv=none; b=WoHC2GgnM47qdf5f8VOgeeT6BuzWgR8tjAWN8KF49Mq6MRQn5fBjmfwf1EvyabqOrvrjR9xNOY1QeXFCY+xNBOytcAW237/xfR6CDEDHXoRiIMbJB8YbTPcJPHhlQu/JK6DfUDbqEaWPE+4jzYQzlFmaH2k0EGscHstyX3eKy5E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773430539; c=relaxed/simple;
+	bh=eCQhync3EAXJGeoq988vGwhmsvfzvBJwGHsI4P/nMcs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Eax44qxp1R51E2aYjzWGh5m32MTh1Z3NhWs1t8xKuaSfB6t5Hf35fNMjq1vIyi5s+XrVVLI9gNLxyVSqlFwlbzmuTRglUanrKaheT2LLquPjS/585VycLeI3uRNjVDw2oF7wCSCTJ/OTJs47McjWGLewaL9xyIc44MWIBp4q0S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bl7+eQ2R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C880BC19421;
+	Fri, 13 Mar 2026 19:35:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773430538;
+	bh=eCQhync3EAXJGeoq988vGwhmsvfzvBJwGHsI4P/nMcs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Bl7+eQ2RN6mQUBE1PzAvHumTx26YycZdF/Ogw065NNy5wti9Bn4EEukH//tvdeaOA
+	 IrzVEYJd8ije0Q2D6haaI/rtjpgHg4Q8d6Qg+UX5VvgtfOHQNRn7PcUiEMNeySXiHD
+	 WSkSvD8Er5A37UXXvElmGRqdVCQGwjnfQofYs5NPf5ndH5SEkkwkfRszHWZ/9NKirh
+	 KNwdWA7ZUcYRAVGGJ9wKsxyP4zIb1djIzX8WZPQE/hsp1RNaKxoUDk9Nv60vrP+epo
+	 v9xk5uPuSWHKAJA35pEXLktIxl9MroI8jva6oEWqExr6Vb2E9mppanpe4Vuu072EzB
+	 6+kuaqa0EpUzQ==
+Date: Fri, 13 Mar 2026 12:35:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org, Aaron Conole <aconole@redhat.com>, Eelco
+ Chaudron <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ dev@openvswitch.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v1] net: openvswitch: decouple flow_table from
+ ovs_mutex
+Message-ID: <20260313123535.4b2741b8@kernel.org>
+In-Reply-To: <20260313173114.1220551-1-amorenoz@redhat.com>
+References: <20260313173114.1220551-1-amorenoz@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250701232915.377351-1-xiyou.wangcong@gmail.com>
- <20260312165757.GA3411905@mingi> <CAM0EoM=v6AuzmR+s4OAiKa3jXp_Hb+qgp_gh7FeeGrvMiztiQQ@mail.gmail.com>
- <20260313133810.GA3431035@mingi>
-In-Reply-To: <20260313133810.GA3431035@mingi>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 13 Mar 2026 15:23:42 -0400
-X-Gm-Features: AaiRm50vr5rExQeQfkC-DPR4jLfnuwjr4OzpSSum2UrgxPYqlj88IlZDtGuWtR8
-Message-ID: <CAM0EoMmKnARRQxNNaEKO5Vg5vZBUgUmsximAgGfA9W-MO2iFJw@mail.gmail.com>
-Subject: Re: [RFC Patch net-next 0/2] net_sched: Move GSO segmentation to root qdisc
-To: Mingi Cho <mgcho.minic@gmail.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, mincho@theori.io, 
-	victor@mojatatu.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [13.84 / 15.00];
-	MW_SURBL_MULTI(7.50)[test:email];
-	ABUSE_SURBL(5.00)[test:email];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	CT_SURBL(0.00)[test:email];
-	R_DKIM_ALLOW(0.00)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	GREYLIST(0.00)[pass,body];
-	DMARC_NA(0.00)[mojatatu.com];
-	TO_DN_SOME(0.00)[];
-	CRACKED_SURBL(0.00)[test:email];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267565-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	DM_SURBL(0.00)[test:email];
-	NEURAL_HAM(-0.00)[-0.888];
-	PH_SURBL_MULTI(0.00)[test:email];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-267566-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,mojatatu-com.20230601.gappssmtp.com:dkim,test:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 69DC2289515
-X-Rspamd-Action: add header
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EC50E289552
+X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spam: Yes
 
-Hi,
+On Fri, 13 Mar 2026 18:31:12 +0100 Adrian Moreno wrote:
+> Currently the entire ovs module is write-protected using the global
+> ovs_mutex. While this simple approach works fine for control-plane
+> operations (such as vport configurations), requiring the global mutex
+> for flow modifications can be problematic.
 
-On Fri, Mar 13, 2026 at 9:38=E2=80=AFAM Mingi Cho <mgcho.minic@gmail.com> w=
-rote:
->
-> On Thu, Mar 12, 2026 at 04:21:07PM -0400, Jamal Hadi Salim wrote:
-> > On Thu, Mar 12, 2026 at 12:58=E2=80=AFPM Mingi Cho <mgcho.minic@gmail.c=
-om> wrote:
-> > >
-> > > On Tue, Jul 01, 2025 at 04:29:13PM -0700, Cong Wang wrote:
-> > > > This patchset attempts to move the GSO segmentation in Qdisc layer =
-from
-> > > > child qdisc up to root qdisc. It fixes the complex handling of GSO
-> > > > segmentation logic and unifies the code in a generic way. The end r=
-esult
-> > > > is cleaner (see the patch stat) and hopefully keeps the original lo=
-gic
-> > > > of handling GSO.
-> > > >
-> > > > This is an architectural change, hence I am sending it as an RFC. P=
-lease
-> > > > check each patch description for more details. Also note that altho=
-ugh
-> > > > this patchset alone could fix the UAF reported by Mingi, the origin=
-al
-> > > > UAF can also be fixed by Lion's patch [1], so this patchset is just=
- an
-> > > > improvement for handling GSO segmentation.
-> > > >
-> > > > TODO: Add some selftests.
-> > > >
-> > > > 1. https://lore.kernel.org/netdev/d912cbd7-193b-4269-9857-525bee8bb=
-b6a@gmail.com/
-> > > >
-> > > > ---
-> > > > Cong Wang (2):
-> > > >   net_sched: Move GSO segmentation to root qdisc
-> > > >   net_sched: Propagate per-qdisc max_segment_size for GSO segmentat=
-ion
-> > > >
-> > > >  include/net/sch_generic.h |  4 +-
-> > > >  net/core/dev.c            | 52 +++++++++++++++++++---
-> > > >  net/sched/sch_api.c       | 14 ++++++
-> > > >  net/sched/sch_cake.c      | 93 +++++++++++++----------------------=
-----
-> > > >  net/sched/sch_netem.c     | 32 +-------------
-> > > >  net/sched/sch_taprio.c    | 76 +++++++-------------------------
-> > > >  net/sched/sch_tbf.c       | 59 +++++--------------------
-> > > >  7 files changed, 123 insertions(+), 207 deletions(-)
-> > > >
-> > > > --
-> > > > 2.34.1
-> > > >
-> > >
-> > > Hi Cong,
-> > >
-> > > I tested the proposed patch and found that the reported bug was fixed=
-. A qlen mismatch between Qdiscs can potentially cause UAF, so I believe th=
-is patch needs to be applied.
-> > >
-> > > When executing the PoC on the latest kernel without the patch applied=
-, a warning message occurs in drr_dequeue() as shown below.
-> > >
-> > > Before applying the patch:
-> > >
-> > > root@test:~# ./poc
-> > > qdisc drr 1: dev lo root refcnt 2
-> > > qdisc tbf 2: dev lo parent 1:1 rate 1Mbit burst 1514b lat 50.0ms
-> > > qdisc choke 3: dev lo parent 2:1 limit 2p min 1p max 2p
-> > > [    7.588847] drr_dequeue: tbf qdisc 2: is non-work-conserving?
-> > >
-> > > Testing after applying the patch to the v6.17 kernel shows that the w=
-arning message has disappeared.
-> > >
-> > > After applying the patch:
-> > >
-> > > root@test:~# ./poc
-> > > qdisc drr 1: dev lo root refcnt 2
-> > > qdisc tbf 2: dev lo parent 1:1 rate 1Mbit burst 1514b lat 50.0ms
-> > > qdisc choke 3: dev lo parent 2:1 limit 2p min 1p max 2p
-> >
-> > Please test against latest net-next kernel then report back on the UAF
-> > - not a "potential" but a real one.
-> >
-> > cheers,
-> > jamal
->
-> As seen in a recent patch (https://lore.kernel.org/netdev/20260114160243.=
-913069-3-jhs@mojatatu.com/), it was possible to trigger a UAF using the QFQ=
- qdisc when qlen was handled incorrectly. I don't think this is the only wa=
-y to trigger a UAF. Since it is obvious that qlen is also being handled inc=
-orrectly during the GSO segment processing, I believe it would be better to=
- remove this potential risk.
->
+YNL selftest for ovs seems to trigger this:
 
-I may not be remembering the sequence of events correctly, and i am
-not sure if after all this time if that potential UAF hasnt been
-resolved. Your repro was fixed by:
-https://lore.kernel.org/netdev/d912cbd7-193b-4269-9857-525bee8bbb6a@gmail.c=
-om/
+[   88.995118][   T50] =============================
+[   88.995287][   T50] WARNING: suspicious RCU usage
+[   88.995448][   T50] 7.0.0-rc3-virtme #1 Not tainted
+[   88.995630][   T50] -----------------------------
+[   88.995788][   T50] net/openvswitch/datapath.c:2666 RCU-list traversed in non-reader section!!
+[   88.996122][   T50] 
+[   88.996122][   T50] other info that might help us debug this:
+[   88.996122][   T50] 
+[   88.996388][   T50] 
+[   88.996388][   T50] rcu_scheduler_active = 2, debug_locks = 1
+[   88.996640][   T50] 3 locks held by kworker/2:1/50:
+[   88.996800][   T50]  #0: ff11000001139b48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work+0xcb4/0x1390
+[   88.997092][   T50]  #1: ffa000000036fd10 ((work_completion)(&(&ovs_net->masks_rebalance)->work)){+.+.}-{0:0}, at: process_one_work+0xd16/0x1390
+[   88.997420][   T50]  #2: ffffffffc08038e8 (ovs_mutex){+.+.}-{4:4}, at: ovs_dp_masks_rebalance+0x29/0x270 [openvswitch]
+[   88.997707][   T50] 
+[   88.997707][   T50] stack backtrace:
+[   88.997898][   T50] CPU: 2 UID: 0 PID: 50 Comm: kworker/2:1 Not tainted 7.0.0-rc3-virtme #1 PREEMPT(full) 
+[   88.997903][   T50] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[   88.997904][   T50] Workqueue: events ovs_dp_masks_rebalance [openvswitch]
+[   88.997911][   T50] Call Trace:
+[   88.997914][   T50]  <TASK>
+[   88.997916][   T50]  dump_stack_lvl+0x6f/0xa0
+[   88.997921][   T50]  lockdep_rcu_suspicious.cold+0x4f/0xad
+[   88.997928][   T50]  ovs_dp_masks_rebalance+0x226/0x270 [openvswitch]
+[   88.997933][   T50]  process_one_work+0xd57/0x1390
+[   88.997940][   T50]  ? pwq_dec_nr_in_flight+0x700/0x700
+[   88.997942][   T50]  ? lock_acquire.part.0+0xbc/0x260
+[   88.997950][   T50]  worker_thread+0x4d6/0xd40
+[   88.997954][   T50]  ? rescuer_thread+0x1330/0x1330
+[   88.997956][   T50]  ? __kthread_parkme+0xb3/0x200
+[   88.997960][   T50]  ? rescuer_thread+0x1330/0x1330
+[   88.997962][   T50]  kthread+0x30f/0x3f0
+[   88.997964][   T50]  ? trace_irq_enable.constprop.0+0x13c/0x190
+[   88.997967][   T50]  ? kthread_affine_node+0x150/0x150
+[   88.997970][   T50]  ret_from_fork+0x472/0x6b0
+[   88.997974][   T50]  ? arch_exit_to_user_mode_prepare.isra.0+0x140/0x140
+[   88.997977][   T50]  ? __switch_to+0x538/0xcf0
+[   88.997980][   T50]  ? kthread_affine_node+0x150/0x150
+[   88.997983][   T50]  ret_from_fork_asm+0x11/0x20
+[   88.997991][   T50]  </TASK>
 
-Typically, a message like "is non-work-conserving?" means you have
-some bogus hierarchy. Find a way to create what you suggested is a
-potential UAF, and I will be more than happy to invest time.
-
-cheers,
-jamal
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/tools/net/ynl/tests/ovs.c
 
