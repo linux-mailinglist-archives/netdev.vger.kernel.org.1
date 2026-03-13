@@ -1,79 +1,78 @@
-Return-Path: <netdev+bounces-267490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267491-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4CF0L64ntGkQiQAAu9opvQ
-	(envelope-from <netdev+bounces-267490-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:05:18 +0100
+	id oGRMLLIntGkQiQAAu9opvQ
+	(envelope-from <netdev+bounces-267491-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:05:22 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6766428586F
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:05:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 58740285876
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:05:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0ED6732CF938
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:54:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 250EC32E0C62
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E183AEF57;
-	Fri, 13 Mar 2026 14:51:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928AC3AEF5C;
+	Fri, 13 Mar 2026 14:51:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
+Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B513AEF5C
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 14:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42FFA3ACA40
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 14:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413482; cv=none; b=PW993YjUnp5UpZV0GtJ4O+iHcFo0RX0cZ5kAQeMJvIEHYiS3VTH+N+YajnyqSqiBWJG2V9M+XHY8xhUt3GyO9eKr/dIOgvZyXLlgwrA7WRYUz0Sy4loWLfgnKdvs17jt+1r0spPMQHA23gLHBgLqfWV8vNq+pC4INKmVzLrNZEA=
+	t=1773413483; cv=none; b=J4GRKaz4AXS4ACosD5YVJkRT6Gp16XWxz3ebcTyNrBIRh+q4M8Y2rjv4dympkgT5lEX0k7LbHxUNKQUi7ouAeYol2UCjaxxZi1o9DilUBtsBYDGW+NdRrkdsIn6PnZnow0aK1ddBU/JKlJRJ+DrZTHKe9QMmucEpKbrFENSzUyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413482; c=relaxed/simple;
-	bh=Ox2ei4h2tAR7ypg+P25196/As4ti2WceOPIsJT/iHvA=;
+	s=arc-20240116; t=1773413483; c=relaxed/simple;
+	bh=6AsJbarJuKcJPcWPfgVpIH7BMjuy7BG3xDQpPK6V/lc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V43gZ/jiOyZtoA5AC4OGh3ZhA4E4ioqkWueelc3tFBOXHOoRaEXDpeZOr7jTlM/MGg50bl4QpDA1ZabQUgPLUCNCpu9RYSNKpPeYL/QOiBtN4NhiRvDty1En9k0XFVQejSxJ3AjjswHphmDIZdAkulqnhFbnwpW0R5qQiBYDmJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.82.173
+	 MIME-Version; b=Gy0lNPKZj6KZIciiXHN+2hIzkTAfbEpUsSNX1Pf6sLPeWCX/VtIRred53/nglnYR+q6PDnsa6ZC3qWWYnxmrRw1FI3wCQHrFmtKQ1423dRPA3wo+olY8py/wOvGyIF6lX34udd72kdvpBexJ0sAabd3QrMq2QpQm9u+Mspu5L10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.82.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2be9c886a0fso2937195eec.0
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 07:51:20 -0700 (PDT)
+Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2be27fa54feso3086088eec.0
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 07:51:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773413480; x=1774018280;
+        d=1e100.net; s=20251104; t=1773413481; x=1774018281;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Rw4PNOArPdEXsi9AQFyNFnSlGmCZ/hPaUqwpjsbqQVg=;
-        b=b8coEXsywsqwew3z0/52BYP5h+TbJ3rIMlhz6iSagdlFdKAlExLUQFHKC1h9scdk0P
-         SVzOePT+4W31UgSc9An6mMQKFz5n8MSQBHcWzCDSPNiUq/RUUPasbX9mFfHMstwBj9Xy
-         WuLO3VjQiaNcXCzf5OnThe6bgFieNejPtAkZuUq7M6iGz4Ayt7QWPcdusIls25WZpy75
-         cXjSr43zzbyCvl8M/dFwojvBK5DnkGz8NoAWD6q4xpVsRZuZQ8s0ADKnJG4vrQzfrPjP
-         +O8oUzPOn9T6xL1Sk8AeTqLzpBdkiE1B71eL9ruPg6shHY4/xj8CjsFuK+CXPy22zK6b
-         e9DA==
-X-Gm-Message-State: AOJu0Yz+SMpOadZSEfLtPd8K0gaY7CVM4hYLLEATJ8cuH1KmWqPk+JOL
-	2Q4SC5epK+/49Ql94pypv4wy5Mj8AcwLuWO2nD9hg2NBEk25IGCCRP9wUHJL
-X-Gm-Gg: ATEYQzx+asn0ivRDEKyw60CoecSz3dGduiIPh4784x3bP/IWO1EskG1mZGw3SOIJqDY
-	Y+1afHnWRFIRLKBiv+cbFnUYHK1Yz5U6aPjAiJvVnTdY78DSSxBHNPWEfzXMc4Fu8JXba1sk9Ly
-	y122q7RURJneZ/JBoFqV45iAqqvEMPNV3931Ozs4QYnWHCS2OiKg3JjoVDqJe8uXdWcDbZ4JUNp
-	c0q/Fl6M9Eg4ur+x54rSxJvaDLChT1HFiNL8McbgVIBCTEdsKfo18vU7Ks5Td3y+feDfLG0rwId
-	wGoKMBibmG+I+pLw09YQZOvgZg9JJuCoNw9YLjU4xsE2c/LaDEBcuVKWxBbAIMBpc5ahHtyeaVi
-	B7zh2wK58TAUcO/57p6ZVdi+VOoUN01u2LgyF88ieH7jncaLklVCa5Jimcj0ZhZ5EEWqB5G+JTt
-	ZoL3lZdk9CoHXZ0C2hMZq5MT/cFVxOeQYRT/pQqLBKNERwqkMCxu6EPqh1w7qFQ9l8haryRW1s3
-	bfciVD7izF2tzWlaw==
-X-Received: by 2002:a05:7300:a54c:b0:2ba:7606:ace0 with SMTP id 5a478bee46e88-2bea554b2d2mr1994702eec.25.1773413480091;
-        Fri, 13 Mar 2026 07:51:20 -0700 (PDT)
+        bh=1DUMAwxZqTdLUEMLvVYJSQMyD/W2a6tfmiwVuhAHo8k=;
+        b=QGLfPdD93T37tzSdgkmCXGq9ZmoppytJrt4za1gQtSDzaOMAXLRSBSCMwSedm1p08P
+         fuf+J0K7lF9a+uwSWjbWphapkRLQb8gStUArAS+D2qDo0KTXrVR6rnVJAHP1pf7YuGRN
+         u9MQVt9ccM8ed/NWaBf4+k5Bq8X/HWukilV1yXLWst4ofY63uAwjMIq3RsdBnCv2fTmO
+         j008Y2ZF6PDSJikrUi1IgiMVoW6w6zo6yxkbr4DXIFzPuHk6joOSBovtJJ3hGOossUwk
+         LFmsdfhLkv683wxa3bJR/JVOCxbyQp7OrWcVYT+OQH7s7/+Mb4bq0hOMDufDrF4AwM5e
+         NFKg==
+X-Gm-Message-State: AOJu0Ywj0qOmuoXBL/Os+04A2Nx2MqJUEBKFFVo+3R8htWPFgiiJdSo2
+	YwnvzpUzinylp3rtCAMA4CuGYhH7ESIXoZCYXpwxTQR/iXhAjHVkUXpKPde3
+X-Gm-Gg: ATEYQzxzYR/GTjr0AGyNQBmJw/YI8fEQoWIBIAs/YUuwYD+gq82Tyt8bPQAVCGyQzm3
+	HgsN981+VlHbRXjr6I1RIxbRvtAroue+Y0ePX3T9FeYJH4V2cbQ7CdHn58av/nvWE8NLnn+Nc/7
+	BYGtakcAdAKfAZhXBPBumYBOYYkoiOrowmxBuHsGloQCbHokZ30Re/6SlMv+gDgGche90U5LdDh
+	aPbHVWlMghS8dd2AGDLNjNVXozAMN7PYSTXONO8CrlxkaVpIUNgXuRl4IRBnD4RUFO7IFr9MfIv
+	+LjrI9Sg6KZZbqA/YcMhhwkmgEgbvX56vDicZb+muezzqJzB84Jm8wQ7vSpGJebkeB50E4mcIee
+	/UZYUMNFm30EQnxUngZs0UrhJnU1qit0H1CaeODHEA97OPCeLYUjjBE2XgCJX933h/zRQdKErjo
+	uPMjaozNX/snqQwajKseWvotTYiJhkz7IKYstFFTaEgezaTFMOn/4t7cNL/mxqDYLuU1rVicR8E
+	zxl8DNsWrYH/s7sT86Ktm5Tr2f0
+X-Received: by 2002:a05:7301:19a9:b0:2be:798f:23de with SMTP id 5a478bee46e88-2bea540d79fmr1517835eec.10.1773413481171;
+        Fri, 13 Mar 2026 07:51:21 -0700 (PDT)
 Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2beab3eec52sm3154824eec.14.2026.03.13.07.51.19
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2beab3a0c34sm2772577eec.7.2026.03.13.07.51.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2026 07:51:19 -0700 (PDT)
+        Fri, 13 Mar 2026 07:51:20 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>
-Subject: [PATCH net-next 05/11] mlx5: convert to ndo_set_rx_mode_async
-Date: Fri, 13 Mar 2026 07:51:07 -0700
-Message-ID: <20260313145113.1424442-6-sdf@fomichev.me>
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>
+Subject: [PATCH net-next 06/11] bnxt: convert to ndo_set_rx_mode_async
+Date: Fri, 13 Mar 2026 07:51:08 -0700
+Message-ID: <20260313145113.1424442-7-sdf@fomichev.me>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260313145113.1424442-1-sdf@fomichev.me>
 References: <20260313145113.1424442-1-sdf@fomichev.me>
@@ -92,7 +91,7 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267490-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267491-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
@@ -106,177 +105,143 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-0.957];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,fomichev.me:email,fomichev.me:mid]
-X-Rspamd-Queue-Id: 6766428586F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,fomichev.me:email,fomichev.me:mid,broadcom.com:email]
+X-Rspamd-Queue-Id: 58740285876
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Convert mlx5 from ndo_set_rx_mode to ndo_set_rx_mode_async. The
-driver's mlx5e_set_rx_mode now receives uc/mc snapshots and calls
-mlx5e_fs_set_rx_mode_work directly instead of queueing work.
-
-mlx5e_sync_netdev_addr and mlx5e_handle_netdev_addr now take
-explicit uc/mc list parameters and iterate with
+Convert bnxt from ndo_set_rx_mode to ndo_set_rx_mode_async.
+bnxt_set_rx_mode, bnxt_mc_list_updated and bnxt_uc_list_updated
+now take explicit uc/mc list parameters and iterate with
 netdev_hw_addr_list_for_each instead of netdev_for_each_{uc,mc}_addr.
 
-Fallback to netdev's uc/mc in a few places and grab addr lock.
+The bnxt_cfg_rx_mode internal caller passes the real lists under
+netif_addr_lock_bh.
 
-Cc: Saeed Mahameed <saeedm@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>
-Cc: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: Michael Chan <michael.chan@broadcom.com>
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- .../net/ethernet/mellanox/mlx5/core/en/fs.h   |  5 ++-
- .../net/ethernet/mellanox/mlx5/core/en_fs.c   | 33 ++++++++++++++-----
- .../net/ethernet/mellanox/mlx5/core/en_main.c | 16 ++++++---
- 3 files changed, 40 insertions(+), 14 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 31 +++++++++++++----------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h b/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
-index c3408b3f7010..091b80a67189 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
-@@ -201,7 +201,10 @@ int mlx5e_add_vlan_trap(struct mlx5e_flow_steering *fs, int  trap_id, int tir_nu
- void mlx5e_remove_vlan_trap(struct mlx5e_flow_steering *fs);
- int mlx5e_add_mac_trap(struct mlx5e_flow_steering *fs, int  trap_id, int tir_num);
- void mlx5e_remove_mac_trap(struct mlx5e_flow_steering *fs);
--void mlx5e_fs_set_rx_mode_work(struct mlx5e_flow_steering *fs, struct net_device *netdev);
-+void mlx5e_fs_set_rx_mode_work(struct mlx5e_flow_steering *fs,
-+			       struct net_device *netdev,
-+			       struct netdev_hw_addr_list *uc,
-+			       struct netdev_hw_addr_list *mc);
- int mlx5e_fs_vlan_rx_add_vid(struct mlx5e_flow_steering *fs,
- 			     struct net_device *netdev,
- 			     __be16 proto, u16 vid);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
-index 9352e2183312..3469b5a197db 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
-@@ -610,20 +610,31 @@ static void mlx5e_execute_l2_action(struct mlx5e_flow_steering *fs,
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index c982aac714d1..225217b32e4b 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -11040,7 +11040,8 @@ static int bnxt_setup_nitroa0_vnic(struct bnxt *bp)
  }
  
- static void mlx5e_sync_netdev_addr(struct mlx5e_flow_steering *fs,
--				   struct net_device *netdev)
-+				   struct net_device *netdev,
-+				   struct netdev_hw_addr_list *uc,
-+				   struct netdev_hw_addr_list *mc)
+ static int bnxt_cfg_rx_mode(struct bnxt *);
+-static bool bnxt_mc_list_updated(struct bnxt *, u32 *);
++static bool bnxt_mc_list_updated(struct bnxt *, u32 *,
++				 const struct netdev_hw_addr_list *);
+ 
+ static int bnxt_init_chip(struct bnxt *bp, bool irq_re_init)
  {
+@@ -11130,7 +11131,7 @@ static int bnxt_init_chip(struct bnxt *bp, bool irq_re_init)
+ 	} else if (bp->dev->flags & IFF_MULTICAST) {
+ 		u32 mask = 0;
+ 
+-		bnxt_mc_list_updated(bp, &mask);
++		bnxt_mc_list_updated(bp, &mask, &bp->dev->mc);
+ 		vnic->rx_mask |= mask;
+ 	}
+ 
+@@ -13519,17 +13520,17 @@ void bnxt_get_ring_drv_stats(struct bnxt *bp,
+ 		bnxt_get_one_ring_drv_stats(bp, stats, &bp->bnapi[i]->cp_ring);
+ }
+ 
+-static bool bnxt_mc_list_updated(struct bnxt *bp, u32 *rx_mask)
++static bool bnxt_mc_list_updated(struct bnxt *bp, u32 *rx_mask,
++				 const struct netdev_hw_addr_list *mc)
+ {
+ 	struct bnxt_vnic_info *vnic = &bp->vnic_info[BNXT_VNIC_DEFAULT];
+-	struct net_device *dev = bp->dev;
  	struct netdev_hw_addr *ha;
-+	bool unlock = false;
+ 	u8 *haddr;
+ 	int mc_count = 0;
+ 	bool update = false;
+ 	int off = 0;
  
--	netif_addr_lock_bh(netdev);
-+	if (!uc || !mc) {
-+		uc = &netdev->uc;
-+		mc = &netdev->mc;
-+
-+		netif_addr_lock_bh(netdev);
-+		unlock = true;
-+	}
- 
- 	mlx5e_add_l2_to_hash(fs->l2.netdev_uc, netdev->dev_addr);
--	netdev_for_each_uc_addr(ha, netdev)
-+
-+	netdev_hw_addr_list_for_each(ha, uc)
- 		mlx5e_add_l2_to_hash(fs->l2.netdev_uc, ha->addr);
- 
--	netdev_for_each_mc_addr(ha, netdev)
-+	netdev_hw_addr_list_for_each(ha, mc)
- 		mlx5e_add_l2_to_hash(fs->l2.netdev_mc, ha->addr);
- 
--	netif_addr_unlock_bh(netdev);
-+	if (unlock)
-+		netif_addr_unlock_bh(netdev);
+-	netdev_for_each_mc_addr(ha, dev) {
++	netdev_hw_addr_list_for_each(ha, mc) {
+ 		if (mc_count >= BNXT_MAX_MC_ADDRS) {
+ 			*rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_ALL_MCAST;
+ 			vnic->mc_list_count = 0;
+@@ -13553,17 +13554,17 @@ static bool bnxt_mc_list_updated(struct bnxt *bp, u32 *rx_mask)
+ 	return update;
  }
  
- static void mlx5e_fill_addr_array(struct mlx5e_flow_steering *fs, int list_type,
-@@ -725,7 +736,9 @@ static void mlx5e_apply_netdev_addr(struct mlx5e_flow_steering *fs)
- }
- 
- static void mlx5e_handle_netdev_addr(struct mlx5e_flow_steering *fs,
--				     struct net_device *netdev)
-+				     struct net_device *netdev,
-+				     struct netdev_hw_addr_list *uc,
-+				     struct netdev_hw_addr_list *mc)
+-static bool bnxt_uc_list_updated(struct bnxt *bp)
++static bool bnxt_uc_list_updated(struct bnxt *bp,
++				 const struct netdev_hw_addr_list *uc)
  {
- 	struct mlx5e_l2_hash_node *hn;
- 	struct hlist_node *tmp;
-@@ -737,7 +750,7 @@ static void mlx5e_handle_netdev_addr(struct mlx5e_flow_steering *fs,
- 		hn->action = MLX5E_ACTION_DEL;
+-	struct net_device *dev = bp->dev;
+ 	struct bnxt_vnic_info *vnic = &bp->vnic_info[BNXT_VNIC_DEFAULT];
+ 	struct netdev_hw_addr *ha;
+ 	int off = 0;
  
- 	if (fs->state_destroy)
--		mlx5e_sync_netdev_addr(fs, netdev);
-+		mlx5e_sync_netdev_addr(fs, netdev, uc, mc);
+-	if (netdev_uc_count(dev) != (vnic->uc_filter_count - 1))
++	if (netdev_hw_addr_list_count(uc) != (vnic->uc_filter_count - 1))
+ 		return true;
  
- 	mlx5e_apply_netdev_addr(fs);
+-	netdev_for_each_uc_addr(ha, dev) {
++	netdev_hw_addr_list_for_each(ha, uc) {
+ 		if (!ether_addr_equal(ha->addr, vnic->uc_list + off))
+ 			return true;
+ 
+@@ -13572,7 +13573,9 @@ static bool bnxt_uc_list_updated(struct bnxt *bp)
+ 	return false;
  }
-@@ -821,7 +834,9 @@ static void mlx5e_destroy_promisc_table(struct mlx5e_flow_steering *fs)
- }
  
- void mlx5e_fs_set_rx_mode_work(struct mlx5e_flow_steering *fs,
--			       struct net_device *netdev)
-+			       struct net_device *netdev,
-+			       struct netdev_hw_addr_list *uc,
-+			       struct netdev_hw_addr_list *mc)
+-static void bnxt_set_rx_mode(struct net_device *dev)
++static void bnxt_set_rx_mode(struct net_device *dev,
++			     struct netdev_hw_addr_list *uc,
++			     struct netdev_hw_addr_list *mc)
  {
- 	struct mlx5e_l2_table *ea = &fs->l2;
+ 	struct bnxt *bp = netdev_priv(dev);
+ 	struct bnxt_vnic_info *vnic;
+@@ -13593,7 +13596,7 @@ static void bnxt_set_rx_mode(struct net_device *dev)
+ 	if (dev->flags & IFF_PROMISC)
+ 		mask |= CFA_L2_SET_RX_MASK_REQ_MASK_PROMISCUOUS;
  
-@@ -851,7 +866,7 @@ void mlx5e_fs_set_rx_mode_work(struct mlx5e_flow_steering *fs,
- 	if (enable_broadcast)
- 		mlx5e_add_l2_flow_rule(fs, &ea->broadcast, MLX5E_FULLMATCH);
+-	uc_update = bnxt_uc_list_updated(bp);
++	uc_update = bnxt_uc_list_updated(bp, uc);
  
--	mlx5e_handle_netdev_addr(fs, netdev);
-+	mlx5e_handle_netdev_addr(fs, netdev, uc, mc);
+ 	if (dev->flags & IFF_BROADCAST)
+ 		mask |= CFA_L2_SET_RX_MASK_REQ_MASK_BCAST;
+@@ -13601,7 +13604,7 @@ static void bnxt_set_rx_mode(struct net_device *dev)
+ 		mask |= CFA_L2_SET_RX_MASK_REQ_MASK_ALL_MCAST;
+ 		vnic->mc_list_count = 0;
+ 	} else if (dev->flags & IFF_MULTICAST) {
+-		mc_update = bnxt_mc_list_updated(bp, &mask);
++		mc_update = bnxt_mc_list_updated(bp, &mask, mc);
+ 	}
  
- 	if (disable_broadcast)
- 		mlx5e_del_l2_flow_rule(fs, &ea->broadcast);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index f7009da94f0b..e86cf1ee108d 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -4108,11 +4108,16 @@ static void mlx5e_nic_set_rx_mode(struct mlx5e_priv *priv)
- 	queue_work(priv->wq, &priv->set_rx_mode_work);
- }
+ 	if (mask != vnic->rx_mask || uc_update || mc_update) {
+@@ -13620,7 +13623,7 @@ static int bnxt_cfg_rx_mode(struct bnxt *bp)
+ 	bool uc_update;
  
--static void mlx5e_set_rx_mode(struct net_device *dev)
-+static void mlx5e_set_rx_mode(struct net_device *dev,
-+			      struct netdev_hw_addr_list *uc,
-+			      struct netdev_hw_addr_list *mc)
- {
- 	struct mlx5e_priv *priv = netdev_priv(dev);
+ 	netif_addr_lock_bh(dev);
+-	uc_update = bnxt_uc_list_updated(bp);
++	uc_update = bnxt_uc_list_updated(bp, &dev->uc);
+ 	netif_addr_unlock_bh(dev);
  
--	mlx5e_nic_set_rx_mode(priv);
-+	if (mlx5e_is_uplink_rep(priv))
-+		return; /* no rx mode for uplink rep */
-+
-+	mlx5e_fs_set_rx_mode_work(priv->fs, dev, uc, mc);
- }
- 
- static int mlx5e_set_mac(struct net_device *netdev, void *addr)
-@@ -5287,7 +5292,7 @@ const struct net_device_ops mlx5e_netdev_ops = {
- 	.ndo_setup_tc            = mlx5e_setup_tc,
- 	.ndo_select_queue        = mlx5e_select_queue,
- 	.ndo_get_stats64         = mlx5e_get_stats,
--	.ndo_set_rx_mode         = mlx5e_set_rx_mode,
-+	.ndo_set_rx_mode_async   = mlx5e_set_rx_mode,
- 	.ndo_set_mac_address     = mlx5e_set_mac,
- 	.ndo_vlan_rx_add_vid     = mlx5e_vlan_rx_add_vid,
- 	.ndo_vlan_rx_kill_vid    = mlx5e_vlan_rx_kill_vid,
-@@ -6272,8 +6277,11 @@ void mlx5e_set_rx_mode_work(struct work_struct *work)
- {
- 	struct mlx5e_priv *priv = container_of(work, struct mlx5e_priv,
- 					       set_rx_mode_work);
-+	struct net_device *dev = priv->netdev;
- 
--	return mlx5e_fs_set_rx_mode_work(priv->fs, priv->netdev);
-+	netdev_lock_ops(dev);
-+	mlx5e_fs_set_rx_mode_work(priv->fs, dev, NULL, NULL);
-+	netdev_unlock_ops(dev);
- }
- 
- /* mlx5e generic netdev management API (move to en_common.c) */
+ 	if (!uc_update)
+@@ -15871,7 +15874,7 @@ static const struct net_device_ops bnxt_netdev_ops = {
+ 	.ndo_start_xmit		= bnxt_start_xmit,
+ 	.ndo_stop		= bnxt_close,
+ 	.ndo_get_stats64	= bnxt_get_stats64,
+-	.ndo_set_rx_mode	= bnxt_set_rx_mode,
++	.ndo_set_rx_mode_async	= bnxt_set_rx_mode,
+ 	.ndo_eth_ioctl		= bnxt_ioctl,
+ 	.ndo_validate_addr	= eth_validate_addr,
+ 	.ndo_set_mac_address	= bnxt_change_mac_addr,
 -- 
 2.53.0
 
