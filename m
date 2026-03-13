@@ -1,126 +1,165 @@
-Return-Path: <netdev+bounces-267338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267339-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8KbvCuXPs2ncbAAAu9opvQ
-	(envelope-from <netdev+bounces-267338-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 09:50:45 +0100
+	id gJybKSHRs2ncbAAAu9opvQ
+	(envelope-from <netdev+bounces-267339-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 09:56:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 761B327FF28
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 09:50:44 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 553F92800F4
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 09:56:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BF2463016515
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 08:50:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B7A893012D1B
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 08:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 778D6387367;
-	Fri, 13 Mar 2026 08:50:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4DA35F18B;
+	Fri, 13 Mar 2026 08:55:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="eDr52meg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TuNN/sds"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4DBDF6C
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 08:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ACBD31DD97
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 08:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773391840; cv=none; b=WUCLyTitulQC7bGw0YV/Jd61ST7AZf9BvwcH38Gh53e6YQFYamEQ9KQvDK8tLMN5xwyTqvWXnjBgwxEQrqgA0Z/YqSiZHFeKQ/fdgaZ+Icr2+YXXSXkLkXAJMbAq3tkgfNJ1x4Ltnw1XqZ7pgvh0MZwvWpcTmXpVvvU51YMpXoA=
+	t=1773392158; cv=none; b=QtCYTXKk1zgt0ieyA8tpxRQsg7sh4uy6WjvU7T1yODz2sOU5QWre+TU5V7dpOWPvxPqy1uGD7SYoXiVAo4v27d9Q4oMtVtzD+/zedHT/BOIgGDYrPVtBY4fq2nyYko2VYwM5paefx9OsAoGXjfrYz6JNJ3+xz9UKUOZVWMxDyGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773391840; c=relaxed/simple;
-	bh=HngBp9zwUVTOc8cWhCRSHEddVxXjIezmA8vRWVUUUEk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uek/Tb3hGC3Z4jiWcLSOJ+YOfEM4k7J2nTYzVxDUnJ7qJDHGUJaHya6YbNPgQeCg7Bfk2Ax8kt50qhtuWiQLnnuiSjBNJzfQk6RXX2aSyRPM0y7f/ORgApdkUSgtXiGUC2VCB/OtagjW+PtVjMp5pGNg74XEZ39dmEFUm7ccl4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=eDr52meg; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 0DB1C4E4266E;
-	Fri, 13 Mar 2026 08:50:36 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CC9D260027;
-	Fri, 13 Mar 2026 08:50:35 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F043710369044;
-	Fri, 13 Mar 2026 09:50:26 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773391834; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=CRbMmZcTVgqE5UCl76Xsr6hd1uo+lW/4EJBhIeZPwB0=;
-	b=eDr52megjJQxHtqmYRUkWlQDxRI8Iq4S2DcmFHREyTcxhqsnDLyk/xgun0DLxwbZlX/BoQ
-	WaZ42lZj4IClnTP0o4xR3KazLfMOMXVi0TULKwzp0+9vTCf+vl4AvL60Qure6XMqlmLgiI
-	7IvbcXUG2DiafOVIa/KRDQ8Tua2n5lOyaddZ+I9zSQcmoud/zIHTVTvM0H2hTvf9huf7Et
-	7JWbTTn8nPi5dbeEzApTxjJ176YbcT9bbFzqE/Czx2ImaTai0xGnhuVo9qY3quOAnXxbxJ
-	ow1R55q8/7akQ5uJViHyNxx1sVYF551H49OvGTEjnwofTxsd3jzGnIa9rJ8CnQ==
-Message-ID: <439753dc-496d-4e03-8480-ea409fb3d4bd@bootlin.com>
-Date: Fri, 13 Mar 2026 09:50:26 +0100
+	s=arc-20240116; t=1773392158; c=relaxed/simple;
+	bh=dIPXg2emkEHtVSMn/uiweeN0mkAf0sj6N0jCu1Xxr2I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ou7DlXi7rWTHgt/fyvU9xPwR2lud6M8ZK1ZDp8QkbEVnQ7W2Esl9h1rf/tNNApO6IgawGDcg8acas0tGk+E2G9wtdhmpOe5SQFqI3AHJbQJIurvLiaUMby0gYHXEj0UACwHwAcVsYDJ3UNZNd8o3AnUhwvmLZ1nWtXYmpC93Gto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TuNN/sds; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D4FDC2BCC9
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 08:55:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773392158;
+	bh=dIPXg2emkEHtVSMn/uiweeN0mkAf0sj6N0jCu1Xxr2I=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=TuNN/sdsSHwP/VHRKKsG1F4YTUS5ZhzO3eF6ZjflRECLSxm52GZn0O+a6DYtw8s9w
+	 AztRsZ6hwk6mFH9QjMLP6ul2unGjmpkpIqrGCVRM7XJ91lE5qjYrRo421vuqGU+Ips
+	 dUTvUP2lPwGo6cUpGRPiarN2csB7JvMb0jI/Ci+wBxM0t4CvddwnzhqGPCkq7OZ2uz
+	 q1FLHibPBhnYDoXHHAzK4gd8xjmC/HbpS/GJkB9AsODxRC/oP9dyHczV035sr3rZQ7
+	 zhugJAyuq9iyE0d58vLAu0TaPaxVAVMP78UrAtKR75moc4u0qVEPZakARFdazt8gZI
+	 bL3wWDwmcIB/Q==
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-38a870c777dso6944401fa.2
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 01:55:58 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWWdtMWkFzbUX4qBJARu+qNSr53vBLPn5rJfPaN8MS5IIOicYaN3fnMmcxw+T+0oNp87z+YTC0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWsGtDYKCpnPP3Q7z73AJ5clFHpet3n2+5EfVMI2NMedtmsAln
+	1LUVUYmKureBcVz8gBcRQ3TXWwlugMb/dcFNYGxaPXIDI9J+RweUFinU/uUfJuqhZabwDk8kG2h
+	CnbI/ZKyvf0RZX+KN9zl6dliZSYrzJqF9ppvzCGbXTQ==
+X-Received: by 2002:a2e:350d:0:b0:38a:878b:b567 with SMTP id
+ 38308e7fff4ca-38a897de73cmr6682211fa.36.1773392156502; Fri, 13 Mar 2026
+ 01:55:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v01 5/7] hinic3: Add MTU size validation
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Ioana Ciornei <ioana.ciornei@nxp.com>
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- luosifu <luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>,
- Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
- Shi Jing <shijing34@huawei.com>, Zheng Jiezhen <zhengjiezhen@h-partners.com>
-References: <cover.1773387649.git.zhuyikai1@h-partners.com>
- <53eb2c11ed4ccd93787352ef48ca56d6d51a150a.1773387649.git.zhuyikai1@h-partners.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <53eb2c11ed4ccd93787352ef48ca56d6d51a150a.1773387649.git.zhuyikai1@h-partners.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+References: <20260311-qcom-sa8255p-emac-v8-0-58227bcf1018@oss.qualcomm.com> <20260312181654.2d9ba69c@kernel.org>
+In-Reply-To: <20260312181654.2d9ba69c@kernel.org>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Fri, 13 Mar 2026 09:55:43 +0100
+X-Gmail-Original-Message-ID: <CAMRc=Md8i6oCAqOBB_3q9PkkbaUxrCftum+WBjvac2O+Hk8kTg@mail.gmail.com>
+X-Gm-Features: AaiRm5311s8a1dkokfIWdxBu9dTaoHy4sXAtnoSYnP4jjneoiOLY-XItyfiRHlE
+Message-ID: <CAMRc=Md8i6oCAqOBB_3q9PkkbaUxrCftum+WBjvac2O+Hk8kTg@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 0/6] net: stmmac: qcom-ethqos: add support for
+ SCMI power domains
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Vinod Koul <vkoul@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Chen-Yu Tsai <wens@kernel.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, 
+	Jerome Brunet <jbrunet@baylibre.com>, Shawn Guo <shawnguo@kernel.org>, 
+	Fabio Estevam <festevam@gmail.com>, Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com, 
+	Romain Gantois <romain.gantois@bootlin.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Magnus Damm <magnus.damm@gmail.com>, Maxime Ripard <mripard@kernel.org>, 
+	Christophe Roullier <christophe.roullier@foss.st.com>, Radu Rendec <rrendec@redhat.com>, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, Drew Fustini <dfustini@tenstorrent.com>, 
+	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org, 
+	linux-mips@vger.kernel.org, imx@lists.linux.dev, 
+	linux-renesas-soc@vger.kernel.org, linux-rockchip@lists.infradead.org, 
+	sophgo@lists.linux.dev, linux-riscv@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267338-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[oss.qualcomm.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,st.com,linaro.org,baylibre.com,oss.nxp.com,nxp.com,bootlin.com,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,tenstorrent.com,lists.linux.dev,googlemail.com,bp.renesas.com];
 	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-267339-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 761B327FF28
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 553F92800F4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+On Fri, Mar 13, 2026 at 2:16=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 11 Mar 2026 18:03:35 +0100 Bartosz Golaszewski wrote:
+> > Add support for the firmware-managed variant of the DesignWare MAC on
+> > the sa8255p platform. This series contains new DT bindings and driver
+> > changes required to support the MAC in the STMMAC driver.
+> >
+> > It also reorganizes the ethqos code quite a bit to make the introductio=
+n
+> > of power domains into the driver a bit easier on the eye.
+>
+> Not entirely sure what the conclusion was in the sub-thread with Russell
+> but FWIW this doesn't apply to net-next as posted so respin will be
+> needed either way.
 
-On 13/03/2026 08:54, Fan Gong wrote:
->   Check whether the MTU size is within a reasonable range.
+net-next is quite the moving target, isn't it? I did just that between
+v7 and v8. :)
 
-I don't get why this is needed when we have netdev->min_mtu and
-netdev->max_mtu already to sanitize these parameters.
+As for Russell's response: I think this is the third time we're doing
+this for this driver. :( This series is not touching the existing
+functionality and rebasing of Russell's changes on top of this should
+for most part be trivial. The core of the changeset is to add support
+for power domains to enable ethernet on SCMI driven SoCs. I would
+really appreciate it if we could get it upstream and then any
+subsequent rework can take into account the two types of systems we
+support.
 
-Is this patch needed, and if so can you explain why the
-netdev->min/max_mtu parameters aren't enough ?
+Russell: I see your point and didn't mind the first two times but it's
+been way too long since I posted v1.
 
-Maxime
-
+Bartosz
 
