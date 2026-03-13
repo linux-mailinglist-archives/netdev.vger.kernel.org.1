@@ -1,392 +1,235 @@
-Return-Path: <netdev+bounces-267361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267357-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cE/vI/rcs2ktcQAAu9opvQ
-	(envelope-from <netdev+bounces-267361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:46:34 +0100
+	id eMjmGQPds2ktcQAAu9opvQ
+	(envelope-from <netdev+bounces-267357-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:46:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 088C8280B7A
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:46:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7738280B81
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:46:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A41DC3014110
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 09:46:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 25E263035ABC
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 09:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B56145A1F;
-	Fri, 13 Mar 2026 09:46:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE803603C1;
+	Fri, 13 Mar 2026 09:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="X6RiS6DP";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="D9IaAyxs"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="bmdxAgpk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012005.outbound.protection.outlook.com [52.101.66.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C59032ED32
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 09:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773395187; cv=none; b=YxYdBjLy7Ioeert8L/qcNuU4x1My73NbEaDPvlFpSCO2eXpWes73l5HV9XKzqfXu+OpwTrwAoqpob4l0/4r1Y65dbpZE0YVYjTvMhYgnTIaQTYzFsiGf2DT95Mq3f7UZ86JgMCy18TPb/o3vt7UDDSyl1L+yLPum1Xj3WDT1Rhc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773395187; c=relaxed/simple;
-	bh=TYUKUEoBrM1BQyt6ClrZVUZafDom5ngzEiUEt/2EYQY=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Nheerj1E+rcd8joHIclW0RZMEHVQIuFVEyRs5j9XP/Vu5pE/5itszoe+5YpkIewMz6I5CP3je0LUT18EQvUoopbJZ2Y4PdkfQAz3wfN2Dhbs84nD3mbxmMWeZUm68o9s1Kb3rN+RAJYCI21lNqsd2IcS/AntX4HwTyidty8bc14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=X6RiS6DP; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=D9IaAyxs; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62D6oNmF793015
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 09:46:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	9Ar3ph1QO6x9yxfdvQm4f9T5MkufBjrKVBdUDfQCqBA=; b=X6RiS6DP+JpvTwrw
-	475rjaMemWDyshDpK6ovKpk6bxGoz+zEch3iiZBTuoCnCsF2dgtFbFHspHhLCVpf
-	71e2hOjQVJPmYbc7uW8NZY4DGbu31LMoEEVI+O9UXmixhjdwIjUdeaY7gbBbdnlp
-	ektEgjlIfB7gQgUv/KGCVT0hLLtvHvFQ6x5wyZpQMx1QRSRKJSSwMnzmPsQQgtf0
-	Z6/Ek6iR4UbqLnV32OjoLaBbXBIo3jO3t6r5IMF2wznSm7QlvxE5MemQKGFpDikd
-	5H+CLed2Z0A9mYBEIQoDfU1x/BqxrSOqMXnQ2eC8mZ8uisORmyC+VMnUfsleQdlw
-	UNftSA==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cvdnt0nc3-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 09:46:25 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8cd7de0e161so1349887985a.2
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 02:46:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1773395184; x=1773999984; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9Ar3ph1QO6x9yxfdvQm4f9T5MkufBjrKVBdUDfQCqBA=;
-        b=D9IaAyxsBKJKhXEhBjEwXLM0FiZXToxTui3yNOnSR7fjL9CYHckiQgENsORgzgXIP9
-         1PBgouDY9UAnbhI1dXTUUkP+0L/vZWwGg8MPBDiY6hvICZUv2O0wcbfff+WBPWhdTGU7
-         aoAWPsTV03rFKa7umeR919uVqoeIaJ5egxQnoU9+7W8db+w3QzAOAt+p5FTzY/Nna75Y
-         QwG3iaTKXdEKS9mfvDx9XpRofpjHzd461c7dUhE3BCR/BmAics4HRTqZv7uVOs0sNd9o
-         F3eyYfjJ3o72L4sDR4JvkksnotdLWSkNN5B7iKZnUJdkhuFRFeUVc3yMvY0rx7vVJ4I1
-         UOgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773395184; x=1773999984;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Ar3ph1QO6x9yxfdvQm4f9T5MkufBjrKVBdUDfQCqBA=;
-        b=Taj6o1cgdy1dKz1bC29z5/uIFRjeoX4sG4dm5qMEvEiFaO2W/Je9LeeAKsSRRKGz8d
-         BuJ+GQ5OREom3sHZujYQoxw4KvroAcjd8N/pAuueWAJK1Qk7tKdE2B4eYAP7mOX0cREz
-         zCiMAwScvyRdnxwzd+MfKTurPGT9XvdfMrUc8MXaZ5OFa4tuHIeTyaEbyp70PcBh9u9q
-         OlYjwTZkELAa/bKKzc19CRb6MFVx2uAeBJ0TlzWC6gqjOzNn1Nb/+UGnpb24vVmtdeJX
-         ubLetk9/fOU441TnvIjy+bHDVoPNaJVsLl6tpJfNAhpF+rAZwurQaxUJMNPfjsYx0Dy8
-         Jrcg==
-X-Forwarded-Encrypted: i=1; AJvYcCW7opp99eeYPI/uzjqgSjtEsO/dHUntG+RWFf/fOWQSZMVqKS9zy6SBrefeUcH59h+EE+rzRaQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSJowWXUOPD1+RttMa22jB1zNy0wI2eI1X8Jjlk/v+KRDvonw6
-	TL7ysJNDTz0txAgXAFNnUlgitC+aElF50UvrjYNccQ3en9yUKhO/snWa5m0059JNzxGsHL6HQEK
-	dGNU8f66FzE96FmbUloTbboq2cckNsXHmp1LY9mLSvYPGVIw/DVzZ1nyH+XE=
-X-Gm-Gg: ATEYQzztvrR2aRnmZnX5PMHEKsYTlgSA5mQDa/gJS6uycXHA+kNeNq14XoXmOPRNvWJ
-	+Uzam3Wac0hUaySNuZKsyybhEvl9KvkSLXyU5k3PgapBINyoo0xE5tda1MKdQwWMxEcUkfdgP0E
-	kaim4dv8Lr+VM0c/VMxHW9McyMc5tyExKgZ1JLoUW9uecMWc3mTKW4jgZVlEkdMKJ4CUORvfxSn
-	XoQ/wfgJ7dmyFAieTYWhUNb1ElteMWBgCO9QhiNpERQivWsBORQSdEckp36sru9CIsBa6Lx2Z3q
-	e+o+Vmz4IpiIHmuRbXoQ9YmotxnCcYnP3xJlVOiRG3zMZ7HPui1hz90Ja8Od9HiGn04TDai+o3g
-	WMFZVQTjRuXgn0oREq+i6zroW61ibif3Bl38eZyVv4+rrZFad
-X-Received: by 2002:a05:620a:4044:b0:8cd:9020:f043 with SMTP id af79cd13be357-8cdb5a1c711mr359688385a.7.1773395184365;
-        Fri, 13 Mar 2026 02:46:24 -0700 (PDT)
-X-Received: by 2002:a05:620a:4044:b0:8cd:9020:f043 with SMTP id af79cd13be357-8cdb5a1c711mr359685785a.7.1773395183891;
-        Fri, 13 Mar 2026 02:46:23 -0700 (PDT)
-Received: from [192.168.68.114] ([5.133.47.210])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4854b5e912fsm528764525e9.2.2026.03.13.02.46.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Mar 2026 02:46:22 -0700 (PDT)
-Message-ID: <efca6405-476d-4ab8-a2af-cea5ad4d8115@oss.qualcomm.com>
-Date: Fri, 13 Mar 2026 09:46:21 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6BA282F26;
+	Fri, 13 Mar 2026 09:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.5
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773395095; cv=fail; b=faflnGmKp8FavfQGUWwXhgm6z/+qWLsMRiCXvpC/PYQa+LlurKU0ruOEYIQstsMC/PUWVP6f71KFTAPOGcS5l4/T05rJRcP0np6SYlNjwz4ME1yxyuJyovVwJSzdSSJZFnpOCKmTJBtiWtkF3PQvuOw1NefNjYcwT+VBiIlWljE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773395095; c=relaxed/simple;
+	bh=AiI06e6o3tExuyvKphyLMkoeSdgbtwOSUzKXHncuVjo=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=r9cO7oIf8NGcCHP0yumueSIp9Tnw+nB4attsqJBhxV10RTDhurs/vV/J8kPZh+rWs1IMPPy6RTPKvvVOxmegul/TFxvoWYMkTLLGjwYthGlatV8FUX4XRw//Tnp6/aioYU0nT0RsCnMCJs4J9ZepZsb5c4P47oBF4/mO15r0ssQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=bmdxAgpk; arc=fail smtp.client-ip=52.101.66.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RxHD/DZJ5+ITgacWh8vGZ7bE7KV5suQdvQ5/CWcSbmzf5d5iovMKtk5wqN69ixYvOeI8o/uwUGZtPcZwGhT7ufL9MIe+8EtXZw8cpmhrzwIu8DSSfHGVUlKOs5PCTgmVqMsPcMolDMMUN7d4+03iJD1t2hzl68Eki4eLpHU7N1lqoI4f0/oIIIxopiy+stJV3hZ1trWrN/mcKh5qrbyaotWK1MmG/f+5xPEqQ8uNuYY5vIE0Ie3WSlySuFnAdrulT7sXaHltrAvXLZSi5tBc5OG54QkrtpyeZCstqt7Ekav8axRJ8cgsDgEvQae/L2drvtQnVFatyezM+Me3rVpm6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eLcSzPPneqHAn12m3EsuUTumkxmm9sEe5wz/AusRs7g=;
+ b=WKKVVsZNZ0ci3UHS+8KIsYaeGckxdlADxSuyIAP+bh2Bn3bj5NiRUN5+uvZUO8/8OLXK2om9Q7pMQu3EDf0hlmfu0Y2JLyn3pToxTqJces4sY2ya9gLKv87dABnYzhkH4UzzJ7Bxum10lbKxD2XiKeXU8o16pkcQ5sQahT/1lrxVCxOza2au9auxYg0aOWKtgXzDwzAswyFAaHeaaHKJMucIIJwARNTn/KlYZAOIG0olsEa5YZSXEaXkwP4NWwQABqzZEnX5Wgfd03DaTcWazJU2W6VisPqFDPIAXiMY45dabbVRCsPEWjFepHnWHKFHRUv2o9868yw9j6X3AUjBUw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eLcSzPPneqHAn12m3EsuUTumkxmm9sEe5wz/AusRs7g=;
+ b=bmdxAgpkngk9qhPHBhaJWFXXiXnmAQ33eLL05Mu9gRdQ7hKrdcANtxyOVLe2fmoviptXDCwtgMRxZF1t2+aB2nGasR2XRsa0F9RsajSzw9PIPh3k3X+b7M/TnpnMEA8ZJrE0hLLbfhSaVvgKruggo0kfX1ICOX4Ef8Neqk+vIi0NopKh9rrMMjVxOq//xzJDUIad9qab6aBe6vgiK68K/YR5aAT4rqeuduxNXnmOTPX3l7jexiY2Ube15nF6M/rqErGCGIYB1ipA8353HezBkDFZSXXbbn7gZEQyxKnJo/fIlaZaYk1zxj+HjLd7mA9SX/QJeyTvMO+MTBGQvw3IIg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by DU2PR04MB9100.eurprd04.prod.outlook.com (2603:10a6:10:2f3::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.22; Fri, 13 Mar
+ 2026 09:44:51 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::b476:c19a:24cd:3694]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::b476:c19a:24cd:3694%3]) with mapi id 15.20.9700.013; Fri, 13 Mar 2026
+ 09:44:51 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	Frank.Li@nxp.com,
+	horms@kernel.org,
+	saikrishnag@marvell.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev
+Subject: [PATCH v5 net 0/3] net: enetc: safely reinitialize TX BD ring when it has unsent frames
+Date: Fri, 13 Mar 2026 17:46:41 +0800
+Message-Id: <20260313094644.1132411-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MA5PR01CA0078.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:1ad::11) To PAXPR04MB8510.eurprd04.prod.outlook.com
+ (2603:10a6:102:211::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
-Subject: Re: [PATCH 4/7] arm64: dts: qcom: Add Arduino Monza (VENTUNOQ) board
- support
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
-        krzk+dt@kernel.org, conor+dt@kernel.org, richardcochran@gmail.com,
-        geert+renesas@glider.be, arnd@arndb.de, ebiggers@kernel.org,
-        michal.simek@amd.com, luca.weiss@fairphone.com, sven@kernel.org,
-        prabhakar.mahadev-lad.rj@bp.renesas.com,
-        kuninori.morimoto.gx@renesas.com, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, m.facchin@arduino.cc, r.mereu@arduino.cc,
-        loic.poulain@oss.qualcomm.com
-References: <20260309152420.1404349-1-srinivas.kandagatla@oss.qualcomm.com>
- <20260309152420.1404349-5-srinivas.kandagatla@oss.qualcomm.com>
- <xkxk22xnv4nkwq6hdbwxy4a5lct3pzbzjoahvdpugectjscifi@tftbseheg5p3>
-Content-Language: en-US
-In-Reply-To: <xkxk22xnv4nkwq6hdbwxy4a5lct3pzbzjoahvdpugectjscifi@tftbseheg5p3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authority-Analysis: v=2.4 cv=KZrfcAYD c=1 sm=1 tr=0 ts=69b3dcf1 cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=ZsC4DHZuhs/kKio7QBcDoQ==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22
- a=EUspDBNiAAAA:8 a=8PAWHovNJAAVPi20LiQA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=NFOGd7dJGGMPyQGDc5-O:22
-X-Proofpoint-GUID: d19_q-6h81zdsmmuz2hHE5apm-fhQxmO
-X-Proofpoint-ORIG-GUID: d19_q-6h81zdsmmuz2hHE5apm-fhQxmO
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEzMDA3NSBTYWx0ZWRfX3uOa2zAub2Ep
- 8p7pAt6b6MwG/+G/vqtbDGq41n+vW2CYmIc+qGKJTpOCs0WaYgs7Q9M9oU8olskFYMBCHqFEgHP
- 87ihQHkUp8lD9wSbFfCU5Ar3zfoHeEj/AMOuxtpFym8iRoLE/kVuf63Wjldl7CJFg0G0+JyNxX2
- y97JYv0oe9CnF+DXOD7E0KIE+KlEA6mMgauUQzRwRyPCvo9kMDxqHUwYWwN4+6ltNZLrNEx3n1i
- oWjIbx/jsgj786bZTtBduxXuAh0mtJ3cCyvQ2Oo957dVsRNJOZOoucl0/TwRrlexrS+4mP7132+
- AWgbwi4I+brbGEWLMtGl95ggyNkvm5vtzMfW12bRkSv1Zjh+xghTMaYsRE5XwIEm83qDJCzetKa
- rRlPabNN8GwZRkyUXTHHYT286NZwPLlIoTppQ9VWgejERBpOtsfHJStgnm6cNml9QXPq5ZYMOMS
- TyQT5ZmSNWC3x6dso8w==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-13_01,2026-03-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 spamscore=0 lowpriorityscore=0 priorityscore=1501 bulkscore=0
- malwarescore=0 impostorscore=0 adultscore=0 clxscore=1015 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603130075
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|DU2PR04MB9100:EE_
+X-MS-Office365-Filtering-Correlation-Id: 01ec08e6-fe73-4799-ac29-08de80e52c82
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|376014|7416014|1800799024|19092799006|366016|38350700014|921020|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	vPr8E83cbHN2PLwxmMfGS0gp+93eLtSUz4MjzaFI0tVDzei6fu0Ly8Ojs7iNxDn+7opHOLiJ3Ps65jAasJMCsVpNBZtYtQ8SfnAr5ONnipULj8ImQ67YmF4H15QTOhh6ZdA0UCmzf5RCMmxWqdm4/Zvp8xwOSLckz85cKymdQXIUlwC9jtVMrmipNa86hwuFVdnIOrqaeyiwAf8C5bsZ9rRUy+Df/2KRc79orVB81JhoBJ9cni5LTvfttvnazuvOB2Oh+rW3wl4UWEr5oLp5uT+10OMs16avgZwjBBOm8+I2yZSzg3CSlwqRm9mccIZG6SZ/nfqcI0a0/fqIk73evN7xZFxVXHDSFkmOMHjdNUwD52RV76gslNA/JQ+a7XWlqwP/yf38fksSYxIzyhzEZ87zyG89ZYycf1fHdhAxGic505eraA7D5IYetXaxvvyRA2gbE5lhq7g1o2Qk8XD134MGPW6U3OEm7lR7g+PIFRgFB9V73p1QkPdPTvJRyumi6ce5eoQRHAexpDK/WBDk/s9dqqu69giGD+Ix0rFDmIY6oOjkx/s78R1886UFo81Imhdh95WFwa5zJcZb0Ab6XlSHVRnTgean63fsImUIzcQY15YJmMsIZR7+0B9V92UwX9POW1CgpUnpJsWHPmh6p6v5Qzhh2Lu9gMHRXhOZ40/RJ9/D72LAf+3xM3U4GrvmB9zRMIzqWDaBrrLJUAqviwueS4rbGDDejqcHbPFfaqxRF9ofqMSA54drz+66MrZ7pyIQDAgRvgeP4e5ZXFALohsjL7+oner7xKgYkqRtRMJTWId+cLY8YSZAUC3/TRW7
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(7416014)(1800799024)(19092799006)(366016)(38350700014)(921020)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?KDQljse6cV5gaxDA9Hfp23j9Ci8l6EIx4HQPtW9eh8C7WQIftg3nRz3Rj/xA?=
+ =?us-ascii?Q?SHoKXyFiYJ/odI1bGLiGmHGteiaLGv+8BOl92wlT4w32JarRDqGDoTfmSzZO?=
+ =?us-ascii?Q?lY/a+sM7By3onwJqI+t0cdS8mnjp426a5PDrKuxD755rUgDhka5Hi1cDWV6X?=
+ =?us-ascii?Q?G4qS+PjKlN78DZF5RNQIXjJhg3FLmg9mHHzwCSdE9NnJy/Q5zmYox71zZnE7?=
+ =?us-ascii?Q?ZoNrwD7ClnAMf0C1CeotSVEhb8/fxG8O15zJIFiWSABLhVX9OOu2rjM+uzu+?=
+ =?us-ascii?Q?e8cwSDAnA/wfKN4RVB9b61usSg+BrCWfhmPAlMVZCcSFsJQpS3dE7b5M6FT0?=
+ =?us-ascii?Q?337T+JCStUrFhoYPLIJ5WgSjVJ+Fc1rjl2xbR5V1mhN/LhMiNf4fuZW2Ffmm?=
+ =?us-ascii?Q?HpXvcEEbqlV+uSbPFM+O9/P3JoM40SFBTfWJTMcudRlRcJkAdIdSU38oBQXe?=
+ =?us-ascii?Q?zJ2P3U4Qfl7335K4WciodIp8Jh2jyhaftqJFbPaT9R00Lb8tSo8BVma9bPN2?=
+ =?us-ascii?Q?12LvUoWV/wb8Yg4eo1AD6mIG4OT6uOJkqjq3XrAFLURKCEdSKqpO2pWzieOD?=
+ =?us-ascii?Q?c0nO3TwveRQixTYDPj5/39RxZ/tza8LEsPCXCRbGZ8MCo9f4oGJD/jHzwWmI?=
+ =?us-ascii?Q?PJIz1BKowFAC433nMovcC1bdvLjkZk+3yJM0mEHZf68JccVjMWr5MKJByvrO?=
+ =?us-ascii?Q?42TFpO2hl8Knyg8cnclQHmnVMB5fgPLKSa4Ohd/U0s0CRERpWBd7WnqJt6TH?=
+ =?us-ascii?Q?vCtFlwiEPJ1zzPD4nnuUE9OrCErjPSTuvGHmlJK6xHJr+35zr6iW8DZZUA0l?=
+ =?us-ascii?Q?M9ZJiuLO1F7yjm6cmNsqCTy7nxx25rD2cTwh97D3lW3a59p/HhjPn8hSk9Bd?=
+ =?us-ascii?Q?dH/LNQN4uPBRWQ2oa3ymA8gbmyjQFncGwcemHerPnazpFMbeQ2lUlNJmn5CG?=
+ =?us-ascii?Q?4SYTscl9uyciUFRnaEl4Q4KzTzNZsJUlebKcQM1ikXtRR1SGYVTAhzEf0Ybs?=
+ =?us-ascii?Q?guVj6J4xzKdiC/MMl/7S4Nf5a4imgasE7bTX9U3ya2Sxg36pWQ9F8lPSkAzE?=
+ =?us-ascii?Q?RPrU+DLS1u7VapcuElPj3llO1wFBaBVpRBxk/s9XGBMlZYWXF7WA3xn8su0c?=
+ =?us-ascii?Q?73D2YVCUPEWo+VLyS7ILcVnpE4YoWXsCNjSDZ6IgQsM7jLwvOqRU2aDGvaKE?=
+ =?us-ascii?Q?HTuDJDpGmxXwk1FAldWJLYkqlcNy0P8NhSlZT3jmyKZ58bvuib90cOXkjf6w?=
+ =?us-ascii?Q?ISIb5VKMxOzYEEsOdt+fG7NOOnmn4izO9Fx8h8yjVuOT90QtCcWOIaRqYNj/?=
+ =?us-ascii?Q?9v/L3Cb3IiVtDwP/bYWVo0fD3h3xEoYRg6HE6Rlf8RRXZSSdWi0Z0JgPQRmg?=
+ =?us-ascii?Q?D6ovb1DzuMaMJCWtpPIesb2Y3V1ccVtFI1XNEd/0S6MWzRdbe96Wbdsw9tBh?=
+ =?us-ascii?Q?ljRZQIpFRnGPkhqALdwI+E95yyJIPPoOtNTFvEqfRXOZDoOnsIjcvuQy/P2H?=
+ =?us-ascii?Q?f8tdObDa50qLDauT6nDRLhQrCmsT3KLXHdzbWj0YB1AXjtNfVxNZMgBPFP3/?=
+ =?us-ascii?Q?+a3WpzwDGC8dT3UF7qL1nsFV2y32n+QgW9Sc18HdbF0I8vA+ozMEbIt0FdDx?=
+ =?us-ascii?Q?YrdvxojjhE+3vaZEiMXw5UPbKtFYPpaB9T9w45UnyTHZsVHOIxcYDeuVDpTb?=
+ =?us-ascii?Q?QR63NVnjrjj0yfCwX9w/j+2PlW1w885q4SWoqsMNsorSTxmWnsK/FMUVLpHp?=
+ =?us-ascii?Q?bvavl3NUvQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01ec08e6-fe73-4799-ac29-08de80e52c82
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2026 09:44:51.7926
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Z+vgosCxCxmMD0cP+SJjqIHiBfcz4sKyubXxab5rUpLCwjX0c5AXkEs89wyKHnn5nfkOGe1tq2gEXLOwiKFsKg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB9100
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,glider.be,arndb.de,amd.com,fairphone.com,bp.renesas.com,renesas.com,vger.kernel.org,arduino.cc,oss.qualcomm.com];
-	TAGGED_FROM(0.00)[bounces-267361-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,qualcomm.com:email,0.0.0.0:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,0.0.0.1:email,0.0.0.2:email];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-267357-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[srinivas.kandagatla@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 088C8280B7A
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:dkim,nxp.com:mid]
+X-Rspamd-Queue-Id: C7738280B81
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/9/26 7:37 PM, Dmitry Baryshkov wrote:
-> On Mon, Mar 09, 2026 at 03:24:15PM +0000, Srinivas Kandagatla wrote:
->> From: Loic Poulain <loic.poulain@oss.qualcomm.com>
->>
->> Add device tree support for the Arduino VENTUNOQ board,
->> based on the Qualcomm QCS8300 (Monaco) SoC.
->>
->> The board features a Qualcomm Monza SoM and integrates various
->> peripherals, including:
->> - USB Type‑C connector with dual‑role support
->> - ADV7535 DSI‑to‑HDMI bridge
->> - MAX98091 audio codec
->> - 2.5G Ethernet PHY (HSGMII)
->> - PCIe0 (to onboard WiFi chipset and USB bridge)
->> - PCIe1 (to M2/nvme)
->> - Button (via GPIO‑keys)
->>
->> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
->> Co-developed-by: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
->> Signed-off-by: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
->> ---
->>  arch/arm64/boot/dts/qcom/Makefile             |   1 +
->>  .../boot/dts/qcom/monaco-arduino-monza.dts    | 446 ++++++++++++++++++
->>  2 files changed, 447 insertions(+)
->>  create mode 100644 arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
->>
->> diff --git a/arch/arm64/boot/dts/qcom/Makefile b/arch/arm64/boot/dts/qcom/Makefile
->> index 6d87be639aac..8a9093c4b534 100644
->> --- a/arch/arm64/boot/dts/qcom/Makefile
->> +++ b/arch/arm64/boot/dts/qcom/Makefile
->> @@ -47,6 +47,7 @@ lemans-evk-el2-dtbs := lemans-evk.dtb lemans-el2.dtbo
->>  dtb-$(CONFIG_ARCH_QCOM)	+= lemans-evk-el2.dtb
->>  dtb-$(CONFIG_ARCH_QCOM)	+= milos-fairphone-fp6.dtb
->>  dtb-$(CONFIG_ARCH_QCOM)	+= monaco-evk.dtb
->> +dtb-$(CONFIG_ARCH_QCOM) += monaco-arduino-monza.dtb
->>  dtb-$(CONFIG_ARCH_QCOM)	+= msm8216-samsung-fortuna3g.dtb
->>  dtb-$(CONFIG_ARCH_QCOM)	+= msm8916-acer-a1-724.dtb
->>  dtb-$(CONFIG_ARCH_QCOM)	+= msm8916-alcatel-idol347.dtb
->> diff --git a/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts b/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
->> new file mode 100644
->> index 000000000000..b6db2a7151f1
->> --- /dev/null
->> +++ b/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
->> @@ -0,0 +1,446 @@
->> +// SPDX-License-Identifier: BSD-3-Clause
->> +/*
->> + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
->> + */
->> +
->> +/dts-v1/;
->> +
->> +#include <dt-bindings/gpio/gpio.h>
->> +#include <dt-bindings/input/input.h>
->> +#include <dt-bindings/sound/qcom,q6dsp-lpass-ports.h>
->> +
->> +#include "monaco.dtsi"
->> +#include "monaco-pmics.dtsi"
->> +#include "monaco-monza-som.dtsi"
->> +
->> +/ {
->> +	model = "Arduino VENTUNOQ";
->> +	compatible = "arduino,monza", "qcom,qcs8300";
->> +
->> +	aliases {
->> +		ethernet0 = &ethernet0;
->> +		i2c1 = &i2c1;
->> +		serial0 = &uart7;
->> +	};
->> +
->> +	chosen {
->> +		stdout-path = "serial0:115200n8";
->> +	};
->> +
->> +	connector-0 {
->> +		compatible = "usb-c-connector";
->> +		label = "USB1-Type-C";
->> +		data-role = "device";
->> +		power-role = "dual";
->> +
->> +		ports {
->> +			#address-cells = <1>;
->> +			#size-cells = <0>;
->> +
->> +			port@0 {
->> +				reg = <0>;
->> +
->> +				usb1_con_hs_ep: endpoint {
->> +					remote-endpoint = <&usb_1_dwc3_hs>;
->> +				};
->> +			};
->> +
->> +			port@1 {
->> +				reg = <1>;
->> +
->> +				usb1_con_ss_ep: endpoint {
->> +					remote-endpoint = <&usb_1_dwc3_ss>;
-> 
-> No intermediate QMP PHY, no DP support?
+Currently the driver does not reset the producer index register (PIR) and
+consumer index register (CIR) when initializing a TX BD ring. The driver
+only reads the PIR and CIR and initializes the software indexes. If the
+TX BD ring is reinitialized when it still contains unsent frames, its PIR
+and CIR will not be equal after the reinitialization. However, the BDs
+between CIR and PIR have been freed and become invalid and this can lead
+to a hardware malfunction, causing the TX BD ring will not work properly.
 
-We are missing firmware support for this, it makes to really drop the
-usb-c connector node till we get a proper firmware support for this.
+Since the PIR and CIR are sofeware-configurable on ENETC v4. Therefore,
+the driver must reset them if they are not equal when reinitializing
+the TX BD ring.
 
-> 
->> +				};
->> +			};
->> +		};
->> +	};
->> +
-> 
-> [...]
-> 
->> +
->> +&pcie0 {
->> +	pinctrl-0 = <&pcie0_default_state>;
->> +	pinctrl-names = "default";
->> +
->> +	vddpe-3v3-supply = <&vdc_3v3>;
-> 
-> Is there a wired 3v3 support without an M.2 slot in play?
+However, resetting the PIR and CIR alone is insufficient, it cannot
+completely solve the problem. When a link-down event occurs while the TX
+BD ring is transmitting frames, subsequent reinitialization of the TX BD
+ring may cause it to malfunction. Because enetc4_pl_mac_link_down() only
+clears PMa_COMMAND_CONFIG[TX_EN] to disable MAC transmit data path. It
+doesn't set PORT[TXDIS] to 1 to flush the TX BD ring. Therefore, it is
+not safe to reinitialize the TX BD ring at this point.
 
-This is going to on board pcie packet swtich not to M.2.
+To safely reinitialize the TX BD ring after a link-down event, we checked
+with the NETC IP team, a proper Ethernet MAC graceful stop is necessary.
+Therefore, add the Ethernet MAC graceful stop to the link-down event
+handler enetc4_pl_mac_link_down(). Note that this patch set is not
+applicable to ENETC v1 (LS1028A).
 
-> 
->> +};
->> +
->> +&pcie1 {
->> +	pinctrl-0 = <&pcie1_default_state>;
->> +	pinctrl-names = "default";
->> +
->> +	vddpe-3v3-supply = <&vreg_nvme>;
->> +};
->> +
->> +&pcieport0 {
->> +	reset-gpios = <&tlmm 2 GPIO_ACTIVE_LOW>;
->> +
->> +	pci@0,0 {
->> +		#address-cells = <3>;
->> +		#size-cells = <2>;
->> +		device_type = "pci";
->> +		bus-range = <0x01 0xff>;
->> +		ranges;
->> +		reg = <0x010000 0x00 0x00 0x00 0x00>;
->> +
->> +		pci@2,0 {
->> +			#address-cells = <3>;
->> +			#size-cells = <2>;
->> +			device_type = "pci";
->> +			bus-range = <0x00 0xff>;
->> +			ranges;
->> +			reg = <0x021000 0x00 0x00 0x00 0x00>;
->> +
->> +			usb@0 {
->> +				compatible = "pci104c,8241";
->> +				reg = <0 0 0 0 0>;
->> +				ti,pwron-active-high;
->> +			};
->> +		};
->> +	};
->> +};
->> +
-> 
-> [..]
-> 
->> +
->> +&usb_1 {
->> +	maximum-speed = "super-speed-plus";
-> 
-> Do you need to specify it?
-It seems to work fine without it too.
+---
+v5:
+1. Add patch 3
+2. Correct the typo in commit message of patch 1
+v4 link: https://lore.kernel.org/imx/20260312095415.669128-1-wei.fang@nxp.com/
+v4:
+Correct the offset of ENETC4_PSR
+v3 link: https://lore.kernel.org/imx/20260311084105.3982037-1-wei.fang@nxp.com/
+v3:
+1. Split the v2 patch into two parts
+2. Update the comments regarding PIR and CIR in enetc_setup_txbdr()
+3. Use read_poll_timeout() instead of the while loop
+v2 link: https://lore.kernel.org/imx/20260309030412.2716984-1-wei.fang@nxp.com/
+v2:
+1. Remove unused register macros (ENETC_SISR and SISR_TX_BUSY)
+2. Remove spurious semicolon from enetc4_mac_wait_rx_empty()
+---
 
+Wei Fang (3):
+  net: enetc: reset PIR and CIR if they are not equal when initializing
+    TX ring
+  net: enetc: add graceful stop to safely reinitialize the TX Ring
+  net: enetc: do not access non-existent registers on pseudo MAC
 
-/:  Bus 005.Port 001: Dev 001, Class=root_hub, Driver=xhci-hcd/1p, 10000M
-    |__ Port 001: Dev 002, If 0, Class=Mass Storage, Driver=usb-storage,
-10000M
+ drivers/net/ethernet/freescale/enetc/enetc.c  |  13 +-
+ .../net/ethernet/freescale/enetc/enetc4_hw.h  |  11 ++
+ .../net/ethernet/freescale/enetc/enetc4_pf.c  | 118 +++++++++++++++---
+ 3 files changed, 127 insertions(+), 15 deletions(-)
 
-
-> 
->> +	usb-role-switch;
-> 
-> This should go to the monaco.dtsi.
-> 
-will move it to base dtsi
-
---srini
->> +	wakeup-source;
->> +
->> +	status = "okay";
->> +};
->> +
->> +&usb_1_dwc3_hs {
->> +	remote-endpoint = <&usb1_con_hs_ep>;
->> +};
->> +
->> +&usb_1_dwc3_ss {
->> +	remote-endpoint = <&usb1_con_ss_ep>;
->> +};
->> +
->> +/* Internally connected to the MCU (e.g. for DFU). */
->> +&usb_2 {
->> +	dr_mode = "host";
->> +
->> +	status = "okay";
->> +};
->> -- 
->> 2.47.3
->>
-> 
+-- 
+2.34.1
 
 
