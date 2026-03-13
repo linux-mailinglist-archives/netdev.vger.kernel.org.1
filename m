@@ -1,159 +1,170 @@
-Return-Path: <netdev+bounces-267519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267520-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qNf+A+UstGkEigAAu9opvQ
-	(envelope-from <netdev+bounces-267519-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:27:33 +0100
+	id SEbAOEUttGlYigAAu9opvQ
+	(envelope-from <netdev+bounces-267520-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:29:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6259E285F13
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:27:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FEFB285FE4
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:29:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 17F773013A55
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 15:23:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9DF623019F1C
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 15:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62FC9392C50;
-	Fri, 13 Mar 2026 15:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1447539DBEC;
+	Fri, 13 Mar 2026 15:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MqLfArxx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fv+rSfGY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC8E3AD503
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 15:23:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773415407; cv=pass; b=eRA11E32TdUkAOm8cDLr3acwEK0U4V+QWCyWAT0arPfjBMffrPUxtZWqg0yCtf7iAxZ8W2j3pdvueiroqY4/+m7OZAewk9IByB6xG+rrEOOpnuUdoz8ZsAm319tF4skuvKZnmhJYYP1fslUgloJhnvd06sgQBTcrnGiHi1OgZuE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773415407; c=relaxed/simple;
-	bh=9nXJ5BNxZns7pHSD1f69Ri0q7JU2QDu8jU/glDOJ10E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h0Wep8NmdSt/h0EUSlqZwhhBMl/VrTA1ytjBOF6zN4LL3UmlbC8ka4Xw7CxJHU0S2ukdtm4S+QDVaif0FZWwHi3/bgXNNvmS18TNjJUv7Ygp8DFgDQ0HE4ilb/2xpQnOx3vLpUWucqlSYTUq2SRmedet0LcBw+LYgAIMuyYmbI0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MqLfArxx; arc=pass smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-79885f4a8ffso21027837b3.3
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 08:23:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773415404; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YkIrYVqFvmfs9sVd1cNxPCYLnoWs+2IAFomjj/6QZWJ78iu3y7WrF6DXjEAHJjh9/3
-         Nw+M0+L0pEmARDWaTLWuUwtR4uSMkcCjJTwxbr/hBY17xkuHB36bhafZMGPB6apW8Adm
-         q0KoMgkoMX1XFmYv+xq5LQp/JfN/UCV+7kwnqouenkNzb63iC5McQhwylQRjM3ftXu17
-         Ec0tsYzCoW+arlws7AZ+XbhsS8lR1G+RM668HPYfuTB+708BmQuGHxAOvnuABYbK8Vp2
-         MJ2R3Uxe2ZKbvPGZbypK5cXrCdhdqGkmyWaq7S0lDGsR2+jTygBnuQN2JHEiCUnIRxb5
-         OSBA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=9nXJ5BNxZns7pHSD1f69Ri0q7JU2QDu8jU/glDOJ10E=;
-        fh=hi2rcLox9y5rxAOfqc/IyYsCp01kmKZcC5oXjGNggvA=;
-        b=YFQ3cal6MkktBdYKy++oxf/HqfJ2m9TVmqxPBbhsH6kF6ZEbBZiriBfx3gHn8oeOOZ
-         45inNE7ksOkhEa+TEclxSEKB3s6Br2o4jrQnJQBX0M45kVB2gGj0lt3QgAUxk1Hk2XOb
-         ozszmsii3g9N3TABi3sKlLMdyUU1/OQOOGuqnTikCvpJLH4Q0tgwTxqehXrIUGpjv5Xd
-         WUWUycBpieuQBPoMK/RE9Plup8CBx5gD9+7Mcg24CXIJ6VObwjAeLkEaGg+Yws+XIOvq
-         eXPT5BXRzhInDN/V4ZdLv36M1AEjWwrsEoo7d/1OI6kln2ZIRd9gTIp5HzXpBn6H/QTx
-         EDtQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773415404; x=1774020204; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9nXJ5BNxZns7pHSD1f69Ri0q7JU2QDu8jU/glDOJ10E=;
-        b=MqLfArxx9WavGOVcNbQ/YuikDXr8zrfI9pMe0VvodHyONDK2YYVYs7IpP9apEBlypP
-         Ez6x5SRvTBvRGER2SNjESUQ2YXaxRkjQa69ErILkq9lg4oHuwOyIL+mUnetUkw9uOzYD
-         MiNQGv/iuGVu5xzhi9l0MzUJFHUjEXVss35CJIubve1CgfqOR7/bJatkpPifQV8jtq39
-         z5LPpzeg3WjOQQOtcpHzolhS44W/kpZ/pYSIe9J5CSvPfJpcfM1Z4hKi9rJHYuuATXZs
-         br8HVDqKkQ8FPlUFhN9asfKCUmWAvofbONWOra37GZQizZfJj70IkNZk13GKLj/AGvGp
-         dRZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773415404; x=1774020204;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9nXJ5BNxZns7pHSD1f69Ri0q7JU2QDu8jU/glDOJ10E=;
-        b=I7hkqyliopv9tuIqZASGCj2RHcnNStbGcw4PpC/Vy2bUxy7UDkO9K5pgqpwYQ4bQqI
-         lgIKEr0D1SrEWfoZapBGm5X/FFM1tptXKo8W4+KNDesEellzX11dzMK7+EvhEjvjbVux
-         +qOXzADc5h86LRwja3fXoUFKosSMp8D0NaGgNqY45v6IljectPhtWgMhRzVTSNLNbx+c
-         GZVkitADoEk+ZXgZQLHbJd/lcGRZ6GvhQzXoXNqrgpFLZaI82I2i8Ad7w+ludjODoZ97
-         GnhaqCOmV3IsOPokHYG0OVLId3jqc496awku5Ca1qpuMfIwvZqEFIE/jOXXh+8AGBd94
-         JHuA==
-X-Gm-Message-State: AOJu0YyF47xWh1IGQu4SYfRtPPZ+jpYQD3PcCf1u1py0nDchd9Uqyyiv
-	3gftJDUcEG22YUTNBJ/oljf4tHtqGOZkoRNrC9sLkN8rfL64YVONqBoGlJAP456hSyORKLNrFtT
-	p5fOnl3hDu6holS/d4LLZjHiVQU/8ja+ICY6QXVdv
-X-Gm-Gg: ATEYQzwtCViul1wqjqVJSS1RFhZPM8+mMXvnzg/fqkz+E0n6BJXHQjXlaB72MvPK0wB
-	VMbDuH3dOKPucGcuq3xkZUkm+ARfaOUwzHE1kvHvKnl7XHcOkN4FmREBvxOOQfyyC+rRnT82FsU
-	+cjttcmaXwfMWVYyu1Uql9pVc+5QDx+a8kcdeX/ulBtt0NOiRon0OE28f47gGWR8RwI2hZmlils
-	6KHMclFlvIRiljWpXllQuIXRSNPnBDqe+U2dLbqP2a2l+yLHOG0zs9x13aVL8jbkUryC84Ue2Gr
-	t+SyCp1f
-X-Received: by 2002:a05:690c:d8d:b0:798:240:dc with SMTP id
- 00721157ae682-79a1c1ff74fmr39519447b3.44.1773415403629; Fri, 13 Mar 2026
- 08:23:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57DC38F649
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 15:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773415543; cv=none; b=EouEnDzj2TabWzIEz2AvYMKDuK0NyP1i/qe47k8sVz955RjF1hZb3ZHH0UXFm8l5sC2bxkKi7SOphqVAHPJkBUXxrp4ptLol7tS0ITHLQdHM+QtMzVZ2ygDoCc8kb9TKMUDXkADmOdI05wqM7uV9de8bW1QJvELThc1LKGv28VY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773415543; c=relaxed/simple;
+	bh=QN552TZqrouE4+tCPS0mMoQgQIkZUkN7DTnt9deeNgM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MThFLP7lLm7f1t2yfC6VHj/w8jIZakUaVLLMGJtKvTKqjqM0Yy7Hyz+jtVU5KUkKWcpZKwp/ylbgq9m5wZqIzYQs8FNB37+/SOXsUu6US0MEMyns2eDaqvUZ4sMef/vToTge44Hq9bSiHwahE/5NokkhtF0xyb7QUa7n85JhEKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fv+rSfGY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16977C19425;
+	Fri, 13 Mar 2026 15:25:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773415542;
+	bh=QN552TZqrouE4+tCPS0mMoQgQIkZUkN7DTnt9deeNgM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Fv+rSfGYabwP29m0niuzYlLhX9bOxuPNCmBYvMs+Ek1Dz3+5ljQy9LX0Cd2Dsx6As
+	 Q1OaGBzr6TzuiTRXxmFZHiXnz79grkRBVLyFXAeOnsHZO8frG+9i3VYFaTTpICT2Ar
+	 AtYKENf4NqVPykJDonzFGRhX2TD5cMBF1Og7tUv5RPKq9TOkyJetHCps0o3AYetZs0
+	 pV3DyvRCNjiRvL/ExWJbryBjn2OU6+ZmqPcRPAW3FhRp+v8+tjbSB5Y0x+NmTQJqTR
+	 cUMXJZdl5U+qAJDqjWPDxOtdUvurTS054bCgDfwMjYkRQWrMDwxY6RziW9bb2rkRad
+	 vtUc20nJA39oQ==
+Date: Fri, 13 Mar 2026 16:25:39 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: select QDMA block according
+ LAN/WAN configuration
+Message-ID: <abQsc6sPZ4d4tekm@lore-desk>
+References: <20260310-airoha-qdma-lan-wan-mode-v1-1-64ec74dea872@kernel.org>
+ <20260312172430.GA1267298@kernel.org>
+ <abMsvOMnnuTdoG-9@lore-desk>
+ <20260312172248.68742f98@kernel.org>
+ <abP2dLNIw6zqkxL4@lore-desk>
+ <20260313143018.GD461701@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260313151609.83026-1-bsdhenrymartin@gmail.com>
-In-Reply-To: <20260313151609.83026-1-bsdhenrymartin@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 13 Mar 2026 16:23:08 +0100
-X-Gm-Features: AaiRm52KxJMaf1ydBJZ_jjLOyjV7GYRKOtKNeJuwOG2OEoR0W86DQ9uF5UWnY0Q
-Message-ID: <CANn89iJSyAb+hrNEoGrum_W0Tfd_QY82dW4Y+YrvVqkPzdK=qA@mail.gmail.com>
-Subject: Re: [PATCH] net/smc: fix NULL pointer dereference in smc_tcp_syn_recv_sock
-To: bsdhenrymartin@gmail.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, alibuda@linux.alibaba.com, dust.li@linux.alibaba.com, 
-	sidraya@linux.ibm.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com, 
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com, horms@kernel.org, 
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="GSGfyO71opm8Yq0x"
+Content-Disposition: inline
+In-Reply-To: <20260313143018.GD461701@kernel.org>
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267519-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267520-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6259E285F13
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6FEFB285FE4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 13, 2026 at 4:16=E2=80=AFPM <bsdhenrymartin@gmail.com> wrote:
->
-> From: Henry Martin <bsdhenrymartin@gmail.com>
->
-> smc_tcp_syn_recv_sock() gets the SMC listener through
-> smc_clcsock_user_data(sk), but then dereferences it unconditionally.
->
-> During concurrent teardown, sk_user_data can already be cleared while the
-> hooked syn_recv_sock path is still reached, leaving smc as NULL. This
-> causes a NULL pointer dereference at atomic_read(&smc->queued_smc_hs).
 
-https://lkml.org/lkml/2026/3/11/173
+--GSGfyO71opm8Yq0x
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+> On Fri, Mar 13, 2026 at 12:35:16PM +0100, Lorenzo Bianconi wrote:
+> > > On Thu, 12 Mar 2026 22:14:36 +0100 Lorenzo Bianconi wrote:
+> > > > > Is this a bug fix?
+> > > > > If so, perhaps it is for net with a fixes tag. =20
+> > > >=20
+> > > > I guess we do not need to target net tree since airoha_eth driver c=
+urrently
+> > > > supports just the LAN interface via the MT7530 DSA switch connected=
+ to GDM1
+> > > > and there are no WAN interfaces officially supported (PCS/external =
+phy is not
+> > > > merged mainline yet, it is only available in OpenWrt).
+> > > >=20
+> > > > >=20
+> > > > > And at any rate, could you add some description of the before and=
+ after
+> > > > > behaviour? =20
+> > > >=20
+> > > > Theoretically, before this patch, GDM ports were equally distribute=
+d between
+> > > > QDMA0 and QDMA1 while this patch assigns LAN interfaces to QDMA0 an=
+d WAN
+> > > > interface to QDMA1. However, for the reason explained above, this c=
+hange is
+> > > > not currently visible to the user.
+> > >=20
+> > > Please update the commit message. And please try harder to explain=20
+> > > the patches, this happens a lot with your submissions..
+> >=20
+> > ack, fine. Sorry for not beeing very clear about this (and other
+> > patches), I will pay more attention in the future.
+> > Do you think we should target net-next or net for this patch?
+>=20
+> Hi Lorenzo,
+>=20
+> As per your explanation above it seems to me that there is
+> no user-visible change. And I assume that implies no bug manifests.
+>=20
+> If so, net-next sounds right to me.
+
+ack, I will rework the commit log and repost to net-next.
+
+Regards,
+Lorenzo
+
+--GSGfyO71opm8Yq0x
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCabQscwAKCRA6cBh0uS2t
+rCrfAQCuZd7o/lQVJ85m7ozENElbP9fJ7xRXRRkm8z78rsSGewEAt4L9X5zunMFy
+HP3y/+3pF9RbCTIWqcdw6i6Z4JT7yAA=
+=y/aX
+-----END PGP SIGNATURE-----
+
+--GSGfyO71opm8Yq0x--
 
