@@ -1,76 +1,79 @@
-Return-Path: <netdev+bounces-267453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267454-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WGSjCSYTtGlkgwAAu9opvQ
-	(envelope-from <netdev+bounces-267453-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:37:42 +0100
+	id kDzgAh8StGlkgwAAu9opvQ
+	(envelope-from <netdev+bounces-267454-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:33:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2255E28404E
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:37:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6225A283F64
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:33:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1D13D304D9A7
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:25:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4494A340332A
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113B039D6E9;
-	Fri, 13 Mar 2026 13:23:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F7B39F185;
+	Fri, 13 Mar 2026 13:23:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b="Ec/UO7h4"
+	dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b="k4Tf30qS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA5139DBE8
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 13:23:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E61B39F188
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 13:23:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773408226; cv=none; b=qlwkqlW2Dv4WD1HzJnkyoYWA/c6LseGMLLGu5CR5Wp/Ri/RBG6/P7lw0r+eBDArOG2hPIRWIPV25HZ8iorerGz9f17mxRE0tg+SMMfGS9SoyWCSRvKw2hnO2ac6oYMRdXqGAwgIGRCfRzPMOJmoqbGZ42+chuKBkimZY4krWq9g=
+	t=1773408232; cv=none; b=gk3aCsPDlFcfSjDdtCuf0LkShI9LfxE6dggTG3oUkM4+ZWq7VUrm7/F+k8lMqZDa4ZjTJ9syjYsVLmvq4nEnZM2kBCnLFK6MEkWjfZhbIII5zu75HHgBJmsTMZHAqTaPIWzKTeW4tI38LtwqqBKtCM4/oELwmwiYi1CDg0kkNRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773408226; c=relaxed/simple;
-	bh=EcEAR7cMwDtFqhxhdQDrdTczE4LmTtFe8qVXn+Aa2lY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dz00UGrk8rtTOKWeVEM832Rpox7G95mAs4A/Yxy5G6qT6aG8GN8eoqc4lKwnLAckHr6yDRrn2nXcnfs8fFSvszkSCyWPs/MKcYDoQP2h6TWv0YkGFRTaUrkGRYHI781mV+Ci9VnTCso3Bj10f1qNntVqejFdgCpojaeoQQFr5y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com; spf=pass smtp.mailfrom=allelesecurity.com; dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b=Ec/UO7h4; arc=none smtp.client-ip=74.125.82.45
+	s=arc-20240116; t=1773408232; c=relaxed/simple;
+	bh=huAQ5w0293U2jP8iOMKk9KrRIzZccMYrro5S8jiX+kU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=g6HmoRLNXlHlXNNHoU+b6TxciqiBqezLKDM1pA5zdg3gO8xJL4Dzb38Sj57NbFzb0mFRO7IP1AHjx6Nr3RgkgHC5pOKdO/cAaaV2guG9TjZXAMWkFi7dtzgLMykz3LFdR0DTVK6zxaMhjeqwcWS7j0jXJsoVRGdRxERrZD5dlmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com; spf=pass smtp.mailfrom=allelesecurity.com; dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b=k4Tf30qS; arc=none smtp.client-ip=74.125.82.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=allelesecurity.com
-Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-12732e6a123so2770560c88.1
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 06:23:45 -0700 (PDT)
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-1273349c56bso3229185c88.0
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 06:23:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=allelesecurity.com; s=google; t=1773408225; x=1774013025; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QysejYucTpO+gpjK5YiHBGQ8tPcUtjODeWyyK1sWW1I=;
-        b=Ec/UO7h4I/GsmPkYtCX5z+wTb/DN1ie1dezecZooMF6A/cFMW8XENF1/x5HEBSOkAY
-         QWUemwpG5e8IseKgWNEWDtfFyAaGDtIbYKTO8NFEDyFhgtimYSyd48CrhnSTpUrWtDlA
-         YLVAvpN0BU9nf5R3qAbGu06aMwhPWxe4kUd7Q=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773408225; x=1774013025;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=allelesecurity.com; s=google; t=1773408230; x=1774013030; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QysejYucTpO+gpjK5YiHBGQ8tPcUtjODeWyyK1sWW1I=;
-        b=MJrCGxhQC+BktR1NDfqSoD1DP4pIriDeneDrzZhzKToxCIjICpH8LDa26w3C5w60ru
-         Qd28MLeiTLfE+kSVQ6lWA4zzzVVVWGW2CIrh+0wSUVA66xEM5jELcoSErCvmdGLMr+oD
-         LrLcwO0Cjrut3zug3p7JzgivFG7gH0vjZrlaBqa6soP9SlYSwpx+gNKvoHSZdbprcRtS
-         CvIg1ZilJNtvLlKUjUBA6oL+soiSQuPrA9Mwn0oGwQqP+h7CzdSSnCIzPCL1/HrmBszr
-         A0D816lgShX3wCJiZHFyrtDXGnYRKLggEv0KL54viWOCjzsULrIrQbN1/13JI/UDwu23
-         xV0A==
-X-Forwarded-Encrypted: i=1; AJvYcCUxrB3nL9qliC9vxVuRTNrOenlxQTYDLGg3O5lshBjNAlc35VJvHt2/U5vZ6TaTQv/HOUMS0es=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKYUx9/DKteMijUnE1UuT0G8BMgxE2GtVUjau24DLjoAXGpWXz
-	XsX45KS+0eKLetFDYKXDPNBFLBx38WFS3OvQxBNOGPpxds+Ir+v3K4JxSLJSf6dF+L8=
-X-Gm-Gg: ATEYQzyMQz+50rTy2NSquVSy3RGXCj7QdRR6R4UlhKVGyJVS7hh14RXVvQojxbDQAPz
-	QvzO4EscseiKa7aX5uU98hneEKHCTEdfy9EQenUbCfqS76gJ5jT//wgIGn08n3J+pr0juNqo6Wd
-	hBOOg+Be8ztUUn4rlTVnNUuZI9io3KT1aBi4ghQMP7MtASqWR5N6i+VKWRfsAeS+1GS1vPiEaTy
-	cJ4t3t3T/RR8zir0R9DKvXON9ny9n791+cNybtvySffxAaahyu9USOzMCA1RzUfc/azsTKQJv/+
-	QwU9BWQBRgxRkResup03tMuIvIVCxulbHHhlfK4CReoTGlNprkoZ9mQiY2HwBpE+SJVQ7l3gTIE
-	wD3hUYOs8wcuXKGJ0skBO2EEVIVY7APiZHemnSaqb/GbILaVzlQViQ4Jsn77jrHpXBBzSMbg8f9
-	DIvlT8MxuqIUrlDZz2LIbe3J7TvPs=
-X-Received: by 2002:a05:7022:1a85:b0:123:348d:8576 with SMTP id a92af1059eb24-128f3d0dc31mr1713602c88.6.1773408224546;
-        Fri, 13 Mar 2026 06:23:44 -0700 (PDT)
+        bh=818LJ2WZpxF8xKN9wdQRxpqq9XKg+wYe4ViVF+2MlkM=;
+        b=k4Tf30qSNQ89W/3/PqRHo1Pjr3/s2D2Ul/UYaK0OAMbYQlPmissR/AvZq+egHsH02d
+         jFusnzAzXoQ0cIyCUwkz87k9mTaKMs3TDx8TY9aCZH4zuM7wwbPmNKbevQydp+Kcbt77
+         2bfbymSEhq3QLfABszaTu8+BtpnELjLkXY6XM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773408230; x=1774013030;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=818LJ2WZpxF8xKN9wdQRxpqq9XKg+wYe4ViVF+2MlkM=;
+        b=XsYrCcQveZwu6UCZt5cPCizC8vEiD9JxOTFPHnbe/TfklT7Sxletsyw/u9cNU37Act
+         XKWE2Gs2vwJ4wue3iWeu1d2f+uNhfaDZYFXs5mbBlHoJ93odkEZDXhbkhsAGEJqv3KBl
+         WEaAtAESYVwDcPWCLC1G70MS1Fc0zwn3kFOZc/rzdGT66d0pAjtBhFJxyB6gloYWpQNn
+         7lBm1J3/7tIie1USl932QVhgxJkRNcA+Bm23jrGaMEXF2G9V5/I297eutO98tFgcm6fj
+         IE9kj+Ba93OXpvXcZeJ6e0SjdK+U5n7I4Cd/Ce8Cd1yZDVWZ3ne5X3DXEYZSEJ3DupMJ
+         wgUA==
+X-Forwarded-Encrypted: i=1; AJvYcCWzQ0JK5i+ZZWCUQWG2s63ditpDMnr5CRCte3pUIePy6AGkPTGy5kwtEDhaj7BB4nHaThc+ZuQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyMPfqgettha8dobett/+0Bk+46LEdJebwx3vTVsEXyOOe5kAb
+	vj5V8UMaEZ/rewqzrLRcxR29l0C6y37vqLNW5ZkXUiHwH+nock3bWzpbNjb3oJtQQgvK3Xs/QCk
+	fhF0oHrw=
+X-Gm-Gg: ATEYQzw79lAqw8FbrL0YRyta5ot+XR6rd7FXElL9vpUOpgG5/lDP9XprxFTbxt6xjjF
+	cGsyQevPrLuCXIo0VvvWe1OdwsUHc5Idm8oSTQJg0b3Z5wQ1Az9toNQ4nFTcDe47Go9v6JBjZXv
+	ylUlTm+FN+MYNnCvZXArLSFTizAHl+lLTZwOcdUMav0aTu2P0i+AqJcmBS6FsomOEQCOju0nyFV
+	lXyo6kifdB/aePPbXr4FCZLorrS4/+aq8FXAYVJFclTeZ9CQ80kYFo7TSNbi0o4iESiChcFc+cc
+	M2Ln7K9jMN5welj7UbHo+YMpTqNN0iz33MTsvvZ2cNVHUCrB4n2WI/1ZLA5eqcQOGae4uqUwhKS
+	qjAvSc2okaKzaOhsO9fDPA1Y9dIY1TorK4yKZUID2b7IM6yn2HTx0VVLA3bmXY1lX5NGkDgXr/l
+	Ix1uAlFkquq/A/Se4A+X81K7W7ke8=
+X-Received: by 2002:a05:7022:4186:b0:128:d4db:4478 with SMTP id a92af1059eb24-128f3dcdb90mr1166079c88.24.1773408229994;
+        Fri, 13 Mar 2026 06:23:49 -0700 (PDT)
 Received: from fedora ([179.105.152.20])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f6384f6csm1846358c88.9.2026.03.13.06.23.39
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f6384f6csm1846358c88.9.2026.03.13.06.23.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2026 06:23:43 -0700 (PDT)
+        Fri, 13 Mar 2026 06:23:49 -0700 (PDT)
 From: Anderson Nascimento <anderson@allelesecurity.com>
 To: dhowells@redhat.com
 Cc: marc.dionne@auristor.com,
@@ -83,10 +86,12 @@ Cc: marc.dionne@auristor.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Anderson Nascimento <anderson@allelesecurity.com>
-Subject: [PATCH 0/2] rxrpc: Fix key and keyring reference count leaks
-Date: Fri, 13 Mar 2026 10:23:25 -0300
-Message-ID: <20260313132327.409785-1-anderson@allelesecurity.com>
+Subject: [PATCH 1/2] rxrpc: Fix keyring reference count leak in rxrpc_setsockopt()
+Date: Fri, 13 Mar 2026 10:23:26 -0300
+Message-ID: <20260313132327.409785-2-anderson@allelesecurity.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260313132327.409785-1-anderson@allelesecurity.com>
+References: <20260313132327.409785-1-anderson@allelesecurity.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,7 +104,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[allelesecurity.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[allelesecurity.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -107,7 +112,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[allelesecurity.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267453-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267454-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -115,44 +120,65 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[anderson@allelesecurity.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,allelesecurity.com:dkim,allelesecurity.com:mid]
-X-Rspamd-Queue-Id: 2255E28404E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,allelesecurity.com:dkim,allelesecurity.com:email,allelesecurity.com:mid]
+X-Rspamd-Queue-Id: 6225A283F64
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+In rxrpc_setsockopt(), the code checks 'rx->key' when handling the
+RXRPC_SECURITY_KEYRING option. However, this appears to be a logic error.
+The code should be checking 'rx->securities' to determine if a keyring
+has already been defined for the socket.
 
-While auditing the RxRPC protocol, I identified two separate reference count leaks related to security keys and keyrings.
+Currently, if a user calls setsockopt(RXRPC_SECURITY_KEYRING) multiple
+times on the same socket, the check 'if (rx->key)' fails to block
+subsequent calls because 'rx->key' has not been defined by the function.
+This results in a reference count leak on the keyring.
 
-The first leak occurs during client call allocation if security initialization fails. The second occurs in the setsockopt path due to an incorrect struct member check, allowing multiple keyring assignments to the same socket. Both issues prevent the cleanup of key/keyring objects, as evidenced by /proc/keys remaining populated after the user processes exit.
+This patch changes the check to 'rx->securities' to correctly identify
+if the socket security keyring has already been configured, returning -EINVAL
+on subsequent attempts.
 
-This series fixes both issues by ensuring key_put() is called on the error path in the call allocator and by correcting the logic in rxrpc_setsockopt().
+Before the patch:
 
-Patch Summary:
+It shows the keyring reference counter elevated.
 
-rxrpc: Fix keyring reference count leak in rxrpc_setsockopt()
+$ cat /proc/keys | grep AFSkeys1
+27aca8ae I--Q--- 24469721 perm 3f010000  1000  1000 keyring   AFSkeys1: empty
+$
 
-Prevents multiple keyring assignments to a single socket by checking rx->securities instead of rx->key.
+After the patch:
 
-rxrpc: Fix key reference count leak in rxrpc_alloc_client_call()
+The keyring reference counter remains stable and subsequent calls return an error:
 
-Releases the key reference if rxrpc_init_client_call_security() fails.
+$ ./poc
+setsockopt: Invalid argument
+$
 
-Testing was performed by monitoring /proc/keys and using a reproducer that triggers failed security initialization and repeated setsockopt calls.
+Fixes: 17926a7 ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
+Signed-off-by: Anderson Nascimento <anderson@allelesecurity.com>
+---
+ net/rxrpc/af_rxrpc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Anderson Nascimento (2):
-  rxrpc: Fix keyring reference count leak in rxrpc_setsockopt()
-  rxrpc: Fix key reference count leak in rxrpc_alloc_client_call()
-
- net/rxrpc/af_rxrpc.c    | 2 +-
- net/rxrpc/call_object.c | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
-
+diff --git a/net/rxrpc/af_rxrpc.c b/net/rxrpc/af_rxrpc.c
+index 0c2c68c4b07e..add72ac61f73 100644
+--- a/net/rxrpc/af_rxrpc.c
++++ b/net/rxrpc/af_rxrpc.c
+@@ -663,7 +663,7 @@ static int rxrpc_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 		case RXRPC_SECURITY_KEYRING:
+ 			ret = -EINVAL;
+-			if (rx->key)
++			if (rx->securities)
+ 				goto error;
+ 			ret = -EISCONN;
+ 			if (rx->sk.sk_state != RXRPC_UNBOUND)
 -- 
 2.53.0
 
