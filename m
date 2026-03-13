@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-267497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267498-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8H97FN0mtGl7hwAAu9opvQ
-	(envelope-from <netdev+bounces-267497-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:01:49 +0100
+	id yBP0L4cptGkQiQAAu9opvQ
+	(envelope-from <netdev+bounces-267498-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:13:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A83285792
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:01:48 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DA9E285B1A
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:13:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 332C132B17D4
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:57:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C15F130AD647
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 15:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 912CB3A5E68;
-	Fri, 13 Mar 2026 14:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276323A75AF;
+	Fri, 13 Mar 2026 15:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E3RdbZ9d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GwNG1XIw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0B13A2558
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 14:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B4232C937
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 15:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413793; cv=none; b=khze0N96IsoMR2MjIN8mU4asuhBLKy8sKHpw5Tm50SiYOFMkqLhOY5rvRidBQl+xVhJxsC8kak+m12thKNm3WrMPCeXJ/kUzdCpB8pI32IFjU497ippBOW0dVzOEUXGeu1hsLolFakuNPRyci1B0yStoTO8vHL4jQ+6FwFpNBNg=
+	t=1773414193; cv=none; b=ZmAMwUY1KRJ7tdctaRzyEHHw907Md0JnZzuf4NyREDxCfMw2y28ypuzNM4cLglwg5OlV1dcxRnIaHVND9wHtwXTJTs1vpCNu0SXcz+0Ss4CdPlm1MhsN5YK7WlHolXGYmtsL3pBlGKdggpHV85pOdDHk6IzKUUjiuJcrMd2kCvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413793; c=relaxed/simple;
-	bh=2FKwk7JQNn1KBP1EuttGVWJ/fhwdSmIPkJVOqoLSu7I=;
+	s=arc-20240116; t=1773414193; c=relaxed/simple;
+	bh=tRAeGE3gCsn6bmyyitbqFGSUPCagRgExw61eugFG9+Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kTenS7H/C5ismdFsC+a5H/vPacYoHbf3P+Nvl/yi7ofs8XZ6LLYRR+e0Oxtn1UsFZkQGbXQtJ7qNNYJqQFpW8y7J8YjlDUHCOdiG5p/Kvh7jboksIQ+DVDaaaMrCcEHF5Ni4COIAunZ3tSWkfagzSaa7vflTwMd/aeE+pDur00k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E3RdbZ9d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A32C19421;
-	Fri, 13 Mar 2026 14:56:32 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=TkGKyAAS7h+GzOP5xjJ6bTBW5TQyg/rsCFgGCxnh4w6j4I7LEwF3AB7iVVOq5zTBWjDcdUHnPrVqYLdvpqPao8yDFe+hC9E/9UAQh86SAKMd+49qG1larnDxi3Pq/NJqTZ7+Mowp3j8NjTGH6BFg362wLCDJOsgtYh/1tJpNSmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GwNG1XIw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EB5EC19421;
+	Fri, 13 Mar 2026 15:03:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773413793;
-	bh=2FKwk7JQNn1KBP1EuttGVWJ/fhwdSmIPkJVOqoLSu7I=;
+	s=k20201202; t=1773414192;
+	bh=tRAeGE3gCsn6bmyyitbqFGSUPCagRgExw61eugFG9+Q=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=E3RdbZ9d2U789m3l66jEFLrklRoaqY9MMgo9+cjX5cdcTq8ucMoeZ49Lrum+udoRe
-	 tQX9AuHafOhwDe+WKPBBnCD0km4eGKaYoytuzWEjItWkbIx87Dy1BraQqtLLK4xezR
-	 G112vrP2XV6AdSp9Vt9GhMl23eOziEth3v5UdjOYkhG3N6KIOZ9bUCzd1VagR0zKl1
-	 iWrDLa7scaWDQN2RtuMWJZskaS47cBmdGlL+mD1kd+xKAiW05hDsjdU0JGTi7qLi8h
-	 ILwt7LH4odCDevoHTbRIIV4ZuMGU8tUsyNFBfYwvGBZGMGa6B65XONCe8AXQ1G8xw+
-	 o9VlI4su1pWmw==
-Message-ID: <1644761b-4960-431f-bf3d-5593007212fc@kernel.org>
-Date: Fri, 13 Mar 2026 08:56:31 -0600
+	b=GwNG1XIw2jQFHZA1gtmaVwVAfRh1gE/APlmUhYsXq0hF0B2Ck0l/f46Y68F3hiDCu
+	 34IDjaIQOP0nZMVau1WCcI5LtO5yXuQjt+Gfqd+avIcSJKnGosC9kyNh/h2kEnZQ1S
+	 xYEgfz72vhxiz5IvVQQfRUvlgBg9ohPuiVzDJP8PZpPL6l1ZXwgnfLb0ok0HgKfjV6
+	 9rK/tGoQaYTdPePPRCXPdhQWh1I5avW1nEQ1+uGlu7mXBiML2KnHssnKazKxw9Toef
+	 SJ0GpMb9+Uvjsjcfb7ihQbSupcjezhukiVKkwkLn12D1HGfEwOeQIBWzd4pkQG8URq
+	 dL9TH2sxzPuzw==
+Message-ID: <20f079ac-3046-4b12-a9c4-381a077cf36a@kernel.org>
+Date: Fri, 13 Mar 2026 09:03:11 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,91 +53,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] ipv4: bump rt_genid when a relevant devconf value
- changes through netlink
-To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
-Cc: tgraf@infradead.org, horms@kernel.org, pabeni@redhat.com,
- kuba@kernel.org, edumazet@google.com, davem@davemloft.net
-References: <20260313144555.4956-1-fmancera@suse.de>
+Subject: Re: [PATCH v4 net 0/2] ipv6: Fix two GC issues with permanent routes.
 Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Kui-Feng Lee <thinker.li@gmail.com>, Xin Long <lucien.xin@gmail.com>,
+ Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org
+References: <20260311052954.1224278-1-kuniyu@google.com>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20260313144555.4956-1-fmancera@suse.de>
+In-Reply-To: <20260311052954.1224278-1-kuniyu@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267497-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-267498-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A8A83285792
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9DA9E285B1A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/13/26 8:45 AM, Fernando Fernandez Mancera wrote:
-> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-> index 537bb6c315d2..6dd8fd0a1323 100644
-> --- a/net/ipv4/devinet.c
-> +++ b/net/ipv4/devinet.c
-> @@ -2107,8 +2109,33 @@ static int inet_set_link_af(struct net_device *dev, const struct nlattr *nla,
->  		return -EINVAL;
->  
->  	if (tb[IFLA_INET_CONF]) {
-> -		nla_for_each_nested(a, tb[IFLA_INET_CONF], rem)
-> -			ipv4_devconf_set(in_dev, nla_type(a), nla_get_u32(a));
-> +		nla_for_each_nested(a, tb[IFLA_INET_CONF], rem) {
-> +			int new_value = (int)nla_get_u32(a);
-> +
-> +			if (ipv4_devconf_get(in_dev, nla_type(a)) == new_value)
-> +				continue;
-> +
-> +			ipv4_devconf_set(in_dev, nla_type(a), new_value);
-> +			switch (nla_type(a)) {
-> +			case IPV4_DEVCONF_FORWARDING:
-> +				if (new_value)
-> +					netif_disable_lro(dev);
-> +				fallthrough;
-> +			case IPV4_DEVCONF_NOXFRM:
-> +			case IPV4_DEVCONF_NOPOLICY:
-> +			case IPV4_DEVCONF_PROMOTE_SECONDARIES:
-> +			case IPV4_DEVCONF_ROUTE_LOCALNET:
-> +			case IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST:
-> +			case IPV4_DEVCONF_BC_FORWARDING:
-> +			case IPV4_DEVCONF_ACCEPT_LOCAL:
-> +				flush_cache = true;
-> +				break;
-> +			default:
-> +				break;
-> +			}
-> +		}
-> +		if (flush_cache)
-> +			rt_cache_flush(net);
->  	}
->  
->  	return 0;
+On 3/10/26 11:29 PM, Kuniyuki Iwashima wrote:
+> Patch 1 fixes the unbounded growth of tb6_gc_hlist due to
+> permanent routes whose exception routes have all expired.
+> 
+> Patch 2 fixes an issue where exception routes tied to
+> permanent routes are not properly aged.
+> 
+> 
 
-This replicates logic in devinet_conf_proc for example. Why not refactor
-devinet.c to handle changes to values in 1 place only.
-
-Also, you are flushing the cache for more values than sysfs does.
+There are several tests covering gc and changing routes from permanent
+to temp and back. Can you expand those tests to cover this problem?
 
