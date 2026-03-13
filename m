@@ -1,171 +1,102 @@
-Return-Path: <netdev+bounces-267268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267269-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mHGGOBtys2kEWQAAu9opvQ
-	(envelope-from <netdev+bounces-267268-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:10:35 +0100
+	id 0KcHKxdys2kEWQAAu9opvQ
+	(envelope-from <netdev+bounces-267269-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:10:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D78F27C8B0
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:10:35 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C05B27C89F
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B3ECD30804D3
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:08:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D4A833030BBD
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:09:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B9533EAE6;
-	Fri, 13 Mar 2026 02:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="O/jRRCf9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC5733D6EA;
+	Fri, 13 Mar 2026 02:09:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E1133DEE1;
-	Fri, 13 Mar 2026 02:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED232F6918;
+	Fri, 13 Mar 2026 02:09:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773367735; cv=none; b=nKBhl32q1D3bx6pVL9AoWDuf2RGRzjZpg3LHOJrlsaZ4JrXjFGvTeT5Hw6fEsQsUuN3tL4Ul5EXyWOiEZdwaTNCKDiJzHMADjpVJ/roNPSLZzLduw4Oo6no7gLiXyJ8R8C7uMS0yAEL0v4tlHUzRNF74frHsKo4D5xvJiA6PPg8=
+	t=1773367762; cv=none; b=ODW5E1HbpA5ReYFBDUHNJMJsOd1Yw6SuYNapAA8gPs8hb2KfDWiIMuGkx+6my9kCZMIXvMwr7IhF3YD3GCy2/tHEMkpsaViCThzvy6AlczyG1hGyTl+ALFCuz+G4FDWMwhQodIV8nauPG3ygEFj83LT914oPs8WM3dN0JNL2uXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773367735; c=relaxed/simple;
-	bh=iG9eoykzXKh3xkb4QWpnmXISxnpmcfVmw5TdguJu7C0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=abeXVdS00dOwZKzO9Epb1CjVPfAficQehC6E614y/e2gWEcgjS6Pg5Sr3pyvdQUQvniahuKcbH3BikG5ITE5bSvMqo6IstjjPGIRF2mofZKA+yjdiNbzhuvsvi73w5nuadqAmTF1ikNR3gBofFLN0GAVFdUWknamAa+UArsvljE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=O/jRRCf9; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62CDR8pM2347389;
-	Thu, 12 Mar 2026 19:08:37 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=6
-	SLus9YKMKbkG/Gi3bNPWa4rdN0TeilpxFrK1bpwIxk=; b=O/jRRCf9JEfSomcPT
-	HblGwbdFBwQSDGincCAm5y7SwHtPfzFnmahlZdMxcpJymaWlyYdfg8mOUmIhOwXR
-	otpgoWA+qptu6892lwdYIUMSASDBLZMr6Zi+QK104hj4iie+n2fNNRym0jYr9oJJ
-	1vhalK6Q5mxsWXvuhddnNpfjlQtIsUQA73KCNmKYMNRSFrswVM0JqMGEQZsrLYWZ
-	VcZi+vxitN4fvz9b9qbWF7/AWFDkhxJJSXokxtM7SvVYG6o2qJQuKu4RJSNiUQwO
-	2VUF84uaTTZ7z7D2ME2Eu6qQJdB2p7VuME9VjVDnLHUlLKB7jNhETJhxQHdp7kF9
-	POmaA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4cuh6kkepa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Mar 2026 19:08:36 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 12 Mar 2026 19:08:36 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Thu, 12 Mar 2026 19:08:36 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 553693F705C;
-	Thu, 12 Mar 2026 19:08:32 -0700 (PDT)
-Date: Fri, 13 Mar 2026 07:38:31 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: <cjubran@nvidia.com>, <matttbe@kernel.org>, <chuck.lever@oracle.com>,
-        <shshitrit@nvidia.com>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <sgoutham@marvell.com>, <jiri@resnulli.us>,
-        <davem@davemloft.net>, <saeedm@nvidia.com>, <kuba@kernel.org>,
-        <edumazet@google.com>, <pabeni@redhat.com>, <donald.hunter@gmail.com>
-Subject: Re: [v3,net-next,5/5] octeontx2-af: Add support for loading custom
- KPU profile from filesystem
-Message-ID: <abNxn9fGPNyKf1_6@rkannoth-OptiPlex-7090>
-References: <20260309024619.898211-6-rkannoth@marvell.com>
- <20260310172100.890161-1-horms@kernel.org>
+	s=arc-20240116; t=1773367762; c=relaxed/simple;
+	bh=R86LUqmopu7TAWDxKl5ENh6Ga5kt+ql44C+aY7LNBZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MmJCWt/saoYZMhaNfwGUi4BDqq6K57sDYnpFLkMPQ28e1W7Nup/0o46jxTh3l97B2XuGAnhN2PCHGxyRPQmd7lKRWmmZA40A6WYQAHviDtHCWQTJ1bafpueyuFShT8LTD5QKgzasGDRVqr+hUAATW7ANpO/4lcboYwJuY8oSz8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 3C97460735; Fri, 13 Mar 2026 03:09:18 +0100 (CET)
+Date: Fri, 13 Mar 2026 03:09:19 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Prasanna S Panchamukhi <panchamukhi@arista.com>
+Cc: netfilter-devel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH net-next v2] netfilter: conntrack: expose
+ gc_scan_interval_max via sysctl
+Message-ID: <abNxz9T_XB-JtBCj@strlen.de>
+References: <20260312223157.25083-1-panchamukhi@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260310172100.890161-1-horms@kernel.org>
-X-Authority-Analysis: v=2.4 cv=aLz9aL9m c=1 sm=1 tr=0 ts=69b371a4 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=VwQbUJbxAAAA:8
- a=-_xwQyW8Ut5iv-1M7J0A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=lhd_8Stf4_Oa5sg58ivl:22
-X-Proofpoint-ORIG-GUID: FRnnY3J4DRAsA8Xbpe9YLjTQzuZEi-jl
-X-Proofpoint-GUID: FRnnY3J4DRAsA8Xbpe9YLjTQzuZEi-jl
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEzMDAxNSBTYWx0ZWRfXwHZx0UPPH1yk
- FKrO1SwkFJ6GYoQNmlyMEQrVdL6PnfhW01KuRmqUy9VDD0VXL2PQyGGMbgv0FiVr+U2CTs4u030
- cllvYwsWs4CVNQO5S7z1deHrzLXfR62R+Gyt28GG/72xShL0m9D7AAZWBHjj3ZBf4zbjxHCo+vq
- +ZQMuawiJ9aerOFMu66OESNVoTzRTg7aucGykWBAGsg9GBBCKekXaFvj/fW/3PFuv0TeJEEsDgc
- ZyjPUnFwHco4Hg27eWJPBJlIBvPHm27DLOfybhkhWmht3CJdzKibqi7gkmmlS2JL1Vpjp6E4KuI
- J2nYtif1Gvkfx6t9K3Si1rldQs8+Uvwr9Tm/mRP5HONhe9Pb0FF8fm8hjQvh6XXHlv1cJ/U128e
- LNoVvIB21h7o/8DDzKxxVYpHB7BGf+QGlBWRxznVDS14ez9AS92erevHhk35o1LNltp2okLEZEV
- 3pyJN/hsNr5JkwlK9jw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-12_03,2026-03-12_01,2025-10-01_01
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <20260312223157.25083-1-panchamukhi@arista.com>
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267268-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-267269-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,oracle.com,vger.kernel.org,marvell.com,resnulli.us,davemloft.net,google.com,redhat.com,gmail.com];
+	DMARC_NA(0.00)[strlen.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 5D78F27C8B0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,strlen.de:mid,arista.com:email]
+X-Rspamd-Queue-Id: 0C05B27C89F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-03-10 at 22:51:00, Simon Horman (horms@kernel.org) wrote:
-> Could this loop overflow and hang the kernel if firmware specifies more
-> than 65535 entries?
->
-> The loop variable 'entry' is declared as u16:
->
->     u16 kpu, entry;
->
-> while 'entries' is an int:
->
->     entries = fw_kpu->entries;
->
-> In the from_fs path, 'entries' is read directly from the firmware blob
-> without capping it (unlike the !from_fs path which uses
-> min(fw_kpu->entries, KPU_MAX_CST_ENT)).
->
-> If a corrupt or malicious firmware file specifies fw_kpu->entries >
-> 65535, the u16 variable wraps around at 65536:
->
->     for (entry = 0; entry < entries; entry++)
->
-> When entry reaches 65535, incrementing it produces 0, which is still
-> less than entries, creating an infinite loop that hangs the kernel.
->
-> Should the code either cap entries in the from_fs path or use an
-> int-sized loop variable?
-Hi Simon, I made some code changes and inadvertently missed addressing this comment in v4.
-Sorry about that—I will address it in v5.
+Prasanna S Panchamukhi <panchamukhi@arista.com> wrote:
+> The conntrack garbage collection worker uses an adaptive algorithm that
+> adjusts the scan interval based on the average timeout of tracked
+> entries.  The upper bound of this interval is hardcoded as
+> GC_SCAN_INTERVAL_MAX (60 seconds).
 
->
-> >  	}
->
-> [ ... ]
+I already said that I'm not keen on this approach.
+Its a 'we can't do any better' type "solution".
+
+If anything I'd be more inclined to make a change that allows to
+more easily override the next_run computation via bpf.
 
