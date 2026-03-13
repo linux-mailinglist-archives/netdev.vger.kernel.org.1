@@ -1,161 +1,135 @@
-Return-Path: <netdev+bounces-267466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267465-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wBYOEb0btGlLhQAAu9opvQ
-	(envelope-from <netdev+bounces-267466-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 15:14:21 +0100
+	id kHfFMhsbtGlLhQAAu9opvQ
+	(envelope-from <netdev+bounces-267465-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 15:11:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85062284B10
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 15:14:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 423F82849FF
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 15:11:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6768D30F48C8
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:57:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 47E1130FB437
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:56:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9E739B94A;
-	Fri, 13 Mar 2026 13:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18B539A06A;
+	Fri, 13 Mar 2026 13:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DVrR7k3y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DPIxeMdw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF48A38A73E
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 13:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B0B395DB4;
+	Fri, 13 Mar 2026 13:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773410206; cv=none; b=CAGKwcTGCNjZ2K1RHRJfyTDAZVMUTtWUYs6yI5Abgd0h2+fMETicIEOUTYbaTv/TaEsUkNo74ndykYl9OVGfJ5BlW+LISL69pXpJpqvRdSDGZ24ewwToNnM6TQ1ezsuuDwH9RA0kPWRaFXjrQStfpa2EkcEva6mHrJ6vGwBPFgI=
+	t=1773410154; cv=none; b=kNYO/7IGRgeYQ0I/h4+sb3K00FsypUDNzFZnHFh5DLon6qWWSyJ3p66RdSl8+a8O6+T/qsBBuaYWVR01rzM8I+sDGCvLeUCiEEQdV57qkrmgveaJVZuWNy4H+t9UxiK8I4RJlJC8R5uVqyrSKUnKOviSrqwlvFTwoUa/77fIawg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773410206; c=relaxed/simple;
-	bh=k1o+8ednU+pN1tcSX1+1/PDr4H4RUWJrqtWTJzuBfM8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YDW29hfMRB2S6wvJNkF2zJaMKDGtGalAqnRVbeHmYGzmJDhDuv14D3sVEGiJfEWZTzpAnEcoLSpJ7s6gLDTj5NeT1qRBojdCoZGpBUGENELePdziCekai31jx1I5FVP5GXJ8lbGa7mErLOnIC9Y7qRYgLE2ypXco93LPeFFXuSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DVrR7k3y; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773410203; x=1804946203;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=k1o+8ednU+pN1tcSX1+1/PDr4H4RUWJrqtWTJzuBfM8=;
-  b=DVrR7k3yIsw3UKNJ8WChfG3Kk/Ef4WpCnlUVtWIrV2t1WfSmmiBh0tzI
-   RtTffQW1TZYN2Q00QFoAkUGahms9VyPU00c3uryaHZBgMHH4Mor/wckyJ
-   2yzAtgb/StQUtWm+8OK+eM4b8vgU3X5HYBmp+5VWaSeggecuqlMYmQf4d
-   dnE4xRga5SqG9oOC79eABHhA+ImCjz1V7g7ZoP3+jtNAb/ZoR51jZcC33
-   cBGFEUvYSryFjuEBcE9qAZPxbc5VEov4hgK+jfrTdxxIIP5AjE9yBxnhq
-   H+x86lK47s3YHm3aZSGEMw4O3ER1qeRMCan1NNpkT5y19ufxNipj1JUoB
-   A==;
-X-CSE-ConnectionGUID: XgbQ8zObRQaSCT4rju8p0Q==
-X-CSE-MsgGUID: 96n2YWWBSQCd4/77Wp8ong==
-X-IronPort-AV: E=McAfee;i="6800,10657,11728"; a="62086314"
-X-IronPort-AV: E=Sophos;i="6.23,118,1770624000"; 
-   d="scan'208";a="62086314"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2026 06:56:42 -0700
-X-CSE-ConnectionGUID: e/3J9FkJTJK/X1Wx2+joEQ==
-X-CSE-MsgGUID: 9MFof3REQJuJUCplZ+APbA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,118,1770624000"; 
-   d="scan'208";a="217176828"
-Received: from pae-d-dell-r7525-263.igk.intel.com ([172.28.191.240])
-  by fmviesa006.fm.intel.com with ESMTP; 13 Mar 2026 06:56:41 -0700
-From: Przemyslaw Korba <przemyslaw.korba@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Przemyslaw Korba <przemyslaw.korba@intel.com>
-Subject: [PATCH iwl-next v3] i40e: PTP: set supported flags in ptp_clock_info
-Date: Fri, 13 Mar 2026 14:54:10 +0100
-Message-ID: <20260313135802.499837-1-przemyslaw.korba@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1773410154; c=relaxed/simple;
+	bh=5XgquXITh//GqOCMKE6k7J7OKmDp/7BA6OGr0xoLEJM=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=CDC396kE9Kf7PpO9+FA1csEbVxb+Ec2ELnzDbEX2HpuFC8ovQYzwZT6eXBXae35CFbBwrdafn/r6uyo0vyenDUbc3fpeqP60oUdrmaeNX69oeRI7565i5ZkFE0sSZ8G4L3AYBCT/fOd4G7Bog2vh3UXQ633gyknewRCI0JrLdhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DPIxeMdw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80DA9C19425;
+	Fri, 13 Mar 2026 13:55:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773410154;
+	bh=5XgquXITh//GqOCMKE6k7J7OKmDp/7BA6OGr0xoLEJM=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=DPIxeMdw+T6VpY0QBSJWd6wMA0tk0RWbSSmUVjlBXLFbjVPKJSsUoqKyTRlRyOKDm
+	 OtvvHQHQKwZaHSlnoQBbS3aKWYFVf9FRtgU1XFlUFXyUODQUg5MUodlitN4YxHiUBr
+	 dA6HZXTzz1DWEewNTKt/jc06Jee2vRjUZ8uLN6dvveg1mMz8c1Y3HwKszTn8E7BSej
+	 G/WRa222FAX07cHGWBdJn3Cgdh85QQA/TiCsI99a4Xa4WuRym4ixlEemAmBqcjjF4h
+	 N+OGj1raZbcg2qDQ11s1leKLCllkXb62DIvl+ICf4eFupVbWjRtkmFWaDKSMv++w0E
+	 WA4Fdu2NTJ8xA==
+Content-Type: multipart/mixed; boundary="===============1568194592782735568=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Message-Id: <4955a2c6a7fff7f4e383149e3b699a2af5eab965e414f3f19443b1caa97ba53e@mail.kernel.org>
+In-Reply-To: <20260313130220.18590-3-slava.imameev@crowdstrike.com>
+References: <20260313130220.18590-3-slava.imameev@crowdstrike.com>
+Subject: Re: [PATCH bpf-next v5 2/2] selftests/bpf: Add trampolines single and multi-level pointer params test coverage
+From: bot+bpf-ci@kernel.org
+To: slava.imameev@crowdstrike.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org
+Cc: martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,horms@kernel.org,shuah@kernel.org,linux-kernel@vger.kernel.org,bpf@vger.kernel.org,netdev@vger.kernel.org,linux-kselftest@vger.kernel.org,linux-open-source@crowdstrike.com,slava.imameev@crowdstrike.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Fri, 13 Mar 2026 13:55:53 +0000 (UTC)
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org,crowdstrike.com,iogearbox.net,meta.com];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267466-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-267465-lists,netdev=lfdr.de,bpf-ci];
+	MIME_TRACE(0.00)[0:+,1:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 85062284B10
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.kernel.org:mid]
+X-Rspamd-Queue-Id: 423F82849FF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Since upstream commit d9f3e9ecc456 ("net: ptp: introduce
-.supported_perout_flags to ptp_clock_info") and commit 7c571ac57d9d ("net:
-ptp: introduce .supported_extts_flags to ptp_clock_info"), kernel core now
-requires that the driver set the .supported_perout_flags and
-.supported_extts_flags fields in PTP clock info. Otherwise, the additional
-flags will be rejected by the kernel automatically.
+--===============1568194592782735568==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Set supported flags field so we can set extts pins.
+> diff --git a/tools/testing/selftests/bpf/progs/verifier_ctx_ptr_param.c b/tools/testing/selftests/bpf/progs/verifier_ctx_ptr_param.c
+> new file mode 100644
+> index 000000000000..b507dc850543
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/verifier_ctx_ptr_param.c
 
-Fixes: d9f3e9ecc456 ("net: ptp: introduce .supported_perout_flags to ptp_clock_info")
-Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+[ ... ]
+
+> +SEC("fentry/bpf_fentry_test_ppfile")
+> +__description("fentry/struct file***: struct file *** inferred as scalar")
+
+The description says "struct file ***" (triple pointer), but
+bpf_fentry_test_ppfile() takes a struct file ** (double pointer):
+
+net/bpf/test_run.c:
+    noinline void bpf_fentry_test_ppfile(struct file **ppf)
+
+Should the description be
+"fentry/struct file**: struct file ** inferred as scalar" instead?
+
+> +__success __retval(0)
+> +__log_level(2)
+> +__msg("R1=ctx() R2=scalar()")
+> +__naked void fentry_ppfile_as_scalar(void)
+
+[ ... ]
+
+
 ---
-v3:
-- remove unnecessary flag checks for newer kernels and update commit
-message
-v2:
-- add fixes tag
-- remove old TODO comment
-v1: https://lore.kernel.org/intel-wired-lan/20260309141220.343224-1-przemyslaw.korba@intel.com/
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
- drivers/net/ethernet/intel/i40e/i40e_ptp.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-index 7bcea7d9720f..e7c4f871beec 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-@@ -598,7 +598,6 @@ static int i40e_ptp_feature_enable(struct ptp_clock_info *ptp,
- 	enum ptp_pin_function func;
- 	unsigned int chan;
- 
--	/* TODO: Implement flags handling for EXTTS and PEROUT */
- 	switch (rq->type) {
- 	case PTP_CLK_REQ_EXTTS:
- 		func = PTP_PF_EXTTS;
-@@ -1340,7 +1339,9 @@ static int i40e_init_pin_config(struct i40e_pf *pf)
- 	pf->ptp_caps.n_ext_ts = 2;
- 	pf->ptp_caps.pps = 1;
- 	pf->ptp_caps.n_per_out = 2;
--
-+	pf->ptp_caps.supported_extts_flags = PTP_RISING_EDGE |
-+					     PTP_FALLING_EDGE |
-+					     PTP_STRICT_FLAGS;
- 	pf->ptp_caps.pin_config = kzalloc_objs(*pf->ptp_caps.pin_config,
- 					       pf->ptp_caps.n_pins);
- 	if (!pf->ptp_caps.pin_config)
-
-base-commit: d5fbc991435eac7a1ead7cd2ddb5a743528718bb
--- 
-2.43.0
-
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/23052798110
+--===============1568194592782735568==--
 
