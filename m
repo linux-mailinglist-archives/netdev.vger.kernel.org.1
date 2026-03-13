@@ -1,212 +1,346 @@
-Return-Path: <netdev+bounces-267574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267576-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cA5jD3VvtGmboAAAu9opvQ
-	(envelope-from <netdev+bounces-267574-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:11:33 +0100
+	id eJOjN8RwtGm2oAAAu9opvQ
+	(envelope-from <netdev+bounces-267576-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:17:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4700289925
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:11:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B151289A62
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:17:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A963C3031363
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 20:11:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2CACC305A2CC
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 20:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F323DE44F;
-	Fri, 13 Mar 2026 20:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88A23E1D02;
+	Fri, 13 Mar 2026 20:15:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bT4aDX6C"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y4WtbCQ1";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vg/Sf4NA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B8F34165B;
-	Fri, 13 Mar 2026 20:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D32E3D300F
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 20:14:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773432686; cv=none; b=LTGDRhnbc43vhcY0AGPDhBVYm8oMVw1KVWhxpvtZrudzpnwGRCHJNvCnnRPxMTHLIooh//gjPuxHghY3FmoK1/BZBR4nqsYaDYr1rKPIY2ux4sgqufpA8igtuXgiN+QIO9ulLHoGb+r86GTX3mlfSlGLRTiWyxAL/FGfg5oquT8=
+	t=1773432900; cv=none; b=ZJ8ZsVr/2mYpHgiT09ofbcZHKQS/cuJvFLtu0qfLNbCRyd6Ys9kJZTuepew4qWXN5b+Yj9w7X4QcPPg17kBMXVS663A+Jyep85M4cy3icLrDCrpDKtqTKBLMmALUGthsHp2UqcWzX4oTrlZoGCW91vOixOUXsacoTfvzybyoKbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773432686; c=relaxed/simple;
-	bh=SMPmzclyOIKQEi+ShtklVqvxCpyJHokDbfVTltDu+3M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kRlToBvQ0BCe/FMuF7qd2IdGJKRvezvhHVWcQ2aXCz87xiOfNwU1gN3wzLOTqW23DciW4mNHlNfrVRyTzhsxPNh9YPaCGjESxgnfDccUh+ObaVL8H/UssL1Ol5q1uNPhap4qbHAsFJekW8m5lEvHWEL6BkZgKs1bnljeW9ZeE/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bT4aDX6C; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773432686; x=1804968686;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SMPmzclyOIKQEi+ShtklVqvxCpyJHokDbfVTltDu+3M=;
-  b=bT4aDX6CQcrOwxC21NijNFDx3OjWFPVlxOU3Fq5rOsiGlItu6GVicdM2
-   gBGXKpCQM+pKw0olRAXGm3eLWbINue2SsBh3o6BnUxdQP5Yaw+UXj6mky
-   +1H6iUs7A7bEqQMcATCSbbKLv25RZh9zH5qcQ15MD/qoUoDABRqR7TUpW
-   zrIieomoXV2kVULArviW3s8ooXfyCMLomLA6gT1baS3fS6BvCMmwWDJpx
-   3aiv0cQm2drgK9x466RftKxnIp/5DRdhCQJ/6tCbxYf5kI7ZElb82siWq
-   uV7bqP3FwBI2iPir203kOZsVobGn4oxvRHNx74jJEpHHBsd691hCunnEE
-   Q==;
-X-CSE-ConnectionGUID: a1Z5r507SLG30j1Uwh9gqA==
-X-CSE-MsgGUID: Sbj+0bzFSHCJVLLsp+9w7A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11728"; a="74517787"
-X-IronPort-AV: E=Sophos;i="6.23,118,1770624000"; 
-   d="scan'208";a="74517787"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2026 13:11:22 -0700
-X-CSE-ConnectionGUID: 2kUbeFEFSaKhLs70W7WvSQ==
-X-CSE-MsgGUID: ev3j7rCVSJW5exQ6b/MdoA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,118,1770624000"; 
-   d="scan'208";a="246403671"
-Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
-  by fmviesa001.fm.intel.com with ESMTP; 13 Mar 2026 13:11:16 -0700
-Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w18qn-000000003hZ-0QxX;
-	Fri, 13 Mar 2026 20:11:13 +0000
-Date: Fri, 13 Mar 2026 21:10:41 +0100
-From: kernel test robot <lkp@intel.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
+	s=arc-20240116; t=1773432900; c=relaxed/simple;
+	bh=yjnEtTiHZZdUML639HARbx55QaT9gfacyC59LzvaVSM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aUjfCnFjv3bWlAeKLVXWypu9xrdmxQlV9p2ScaXbbjcUKv7jOmaxxx3EkndrQbT/KrfB5Z/+MUodUT71OgPIu3ttmx9xL6SgCviwApl7C0YhpYpOHxBWWk2D4Gl70bpezZU9tlwV+O+eKwntZ8lOEJ50D3/RHipMFM1ReCxZWsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y4WtbCQ1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vg/Sf4NA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773432898;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EyQ3F7PYXzDNSIIjca2KJyYRw7efzhY8+Wiey1IuTkI=;
+	b=Y4WtbCQ1fa8o3z6FdhtjWn7/KP/CsrkoVwIRmQFm1OsNOwHYgxy5N2dPn+v1TFp2ZSTU5D
+	/CPc4ZvOeNNAdfv/FgceEcdJhTmqrcqkm2tqGIbDfnSPbc79OtigNyKhrioTQ38KgNAoHY
+	dLA6qnv2IGCuRqRf7SMIuGUWolwwOUs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-547-72KZCft4MyOoFHc4tfi8-Q-1; Fri, 13 Mar 2026 16:14:57 -0400
+X-MC-Unique: 72KZCft4MyOoFHc4tfi8-Q-1
+X-Mimecast-MFC-AGG-ID: 72KZCft4MyOoFHc4tfi8-Q_1773432896
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48544725bdeso29695295e9.2
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 13:14:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1773432895; x=1774037695; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EyQ3F7PYXzDNSIIjca2KJyYRw7efzhY8+Wiey1IuTkI=;
+        b=Vg/Sf4NAPXmsELjQ3IVkjtkw/CPeoCXYKFKifzi8y250yfMDPHCweBqnzgvRRLX8Vd
+         f01c4/b9m+UYZO3UTMv2Q07KsdkzDrnah3EF5hYnr2HlImKvwDRDcOHgiVuZGsKu4X1U
+         VXhhXngp/VaMAOA74URz2NPDsPS4xb+T8VTlpoPGQiXhLRqDlwee44R6SuiGox8kxvbF
+         nV5lKIGEFekKrEgvP7YLIvPRUBxmeNhUGnL3qOV08Ksrz7xcLNwvVV2tsKqVwPg7glrx
+         HOHsmlM6lMWeelsHFUOVJ8HyV5Z+7vP+umpG/wQN2srChQBtW9I2nNgHLbLUA9nBwpCQ
+         K0Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773432895; x=1774037695;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EyQ3F7PYXzDNSIIjca2KJyYRw7efzhY8+Wiey1IuTkI=;
+        b=pcuOwvGZN1/6MVTua1CegcztpNfGY93oteVdD6N9I5sJd1udwFx88JCvLwq/C0GHB6
+         NotgjmVnV3Mj47eBoVj95vEYw2/yZuYDm9bpv0R7rOG5zDI3P3dgvrZPSZh5TD3ABu+h
+         1ZH6AwmpHpqvG8RijZRJVNw8K4mrQUnZI3p/Mtb/S6vNAB/QU6EdYjjFGl79xs9Va+l/
+         s0ADuRM7JwdzAJxF9OeuVE+wTKa9LsN68w7D3OaWY4RfuMNHJQLhlxzM/2Zo856cdhOy
+         xFuadMAMhyzrL/EiLG5M1UxWJ0rCsNMuzsIoAUOy0BCRZkTnPXSGX1oDLBJoJ1T0Bkn9
+         j1eg==
+X-Gm-Message-State: AOJu0YxllAiqkRdioa5X35nBAuNQUJnaEtUBPbS7qeV/fOPL5tNZhfm6
+	2H8rTD6H08Z2Q9BJlpYo/So3tE6jxPeE6C4vmqFOdiWnVdOSgRhVwYkOJs/z1RByfi91SZM55y8
+	0dGqZRTygSJw/Thc7GhHUmedHqnOcmPKz6gTcZaJkm1zrS2bIY8Un0bGKeOjumNSk1Z1qNxEWLq
+	FuPTWyJVYbZlkfz4KZiYuzbTKZk0DSxAkLBvJ+GGLbCQ==
+X-Gm-Gg: ATEYQzy/uF+Jczmw5rsE8iESUXPp522jIDTAS9eOKuGLAxyfiTmzmLkB8Gouy/jk9+2
+	BhP/uftpPnuozvC9hwNbzyFfrvRXtQhehbF0U2/YrvP4f/QsWYQEXgWkFpboF03VNgivpzmbbg7
+	wEwgNkRZ5THDpsiQzJbSCwoscZ/1SZdStwejUPv4YelojGf0JlSdFEUZ/Ilpyxl0vK1Lm5atETx
+	0m3ZkJwuVxUBUMwQzz5CDoBtSb+tgrAsb+3lSa2JTTK8/P1QF6K9dB5X0o8qyvEDfHI+13ZyI0E
+	x2UOJPa64emZMLl9JzG5SMBRcTQorfJM+BEuhYJt9DZm5Ic561I65HinzrU2hUxb61VD6P9qNhT
+	7OxQ8HsqT+BjM1Owwb5/KQ5D6dQkEbOH0weYdFjrYAj76IJPk7UFhGMfacI4=
+X-Received: by 2002:a05:600c:354b:b0:483:2c98:4368 with SMTP id 5b1f17b1804b1-48556703401mr76560585e9.18.1773432894745;
+        Fri, 13 Mar 2026 13:14:54 -0700 (PDT)
+X-Received: by 2002:a05:600c:354b:b0:483:2c98:4368 with SMTP id 5b1f17b1804b1-48556703401mr76560065e9.18.1773432894215;
+        Fri, 13 Mar 2026 13:14:54 -0700 (PDT)
+Received: from localhost (net-93-146-155-42.cust.vodafonedsl.it. [93.146.155.42])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48541aba60esm373606085e9.5.2026.03.13.13.14.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Mar 2026 13:14:53 -0700 (PDT)
+From: Paolo Valerio <pvalerio@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH net-next v2 13/15] net: stmmac: add helper to set
- transmit tail pointer
-Message-ID: <202603132104.OVIsnpBk-lkp@intel.com>
-References: <E1w0czK-0000000CzH7-19Fb@rmk-PC.armlinux.org.uk>
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>,
+	Nicolai Buchwitz <nb@tipi-net.de>
+Subject: [PATCH net-next v5 0/8] net: macb: Add XDP support and page pool integration
+Date: Fri, 13 Mar 2026 21:14:25 +0100
+Message-ID: <20260313201433.2346119-1-pvalerio@redhat.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1w0czK-0000000CzH7-19Fb@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267574-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267576-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[pvalerio@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,01.org:url]
-X-Rspamd-Queue-Id: D4700289925
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5B151289A62
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Russell,
+Tested on Raspberry Pi 5.
+With rpi5 is not possible to test the !RSC case. It would be nice
+to test it, as it potentially changes the offset of the first frame
+(hw shifts of NET_IP_ALIGN bytes on rx).
 
-kernel test robot noticed the following build errors:
+All the changes are intended for gem only.
 
-[auto build test ERROR on net-next/main]
+The series consists of two main changes:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-stmmac-rearrange-stmmac_tx_info-members-to-pack-better/20260313-225823
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/E1w0czK-0000000CzH7-19Fb%40rmk-PC.armlinux.org.uk
-patch subject: [PATCH net-next v2 13/15] net: stmmac: add helper to set transmit tail pointer
-config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20260313/202603132104.OVIsnpBk-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260313/202603132104.OVIsnpBk-lkp@intel.com/reproduce)
+- Migration from netdev_alloc_skb() to page pool allocation model,
+  enabling skb recycling.
+  This also adds support for multi-descriptor frame reception,
+  removing the previous single-descriptor approach and avoiding
+  potentially large contiguous allocations for e.g. jumbo frames
+  with CONFIG_PAGE_SIZE_4KB.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603132104.OVIsnpBk-lkp@intel.com/
+- XDP support: Initial XDP implementation supporting major
+  verdicts (XDP_PASS, XDP_DROP, XDP_REDIRECT, XDP_TX) along with
+  the ndo_xdp_xmit function for packet redirection.
 
-All errors (new ones prefixed by >>):
+The driver now advertises NETDEV_XDP_ACT_BASIC, NETDEV_XDP_ACT_REDIRECT,
+NETDEV_XDP_ACT_NDO_XMIT capabilities.
 
-   drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c: In function 'dwmac4_display_ring':
->> drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:430:40: error: implicit declaration of function 'dma_desc_to_edesc' [-Wimplicit-function-declaration]
-     430 |                 struct dma_edesc *ep = dma_desc_to_edesc(head);
-         |                                        ^~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:430:40: error: initialization of 'struct dma_edesc *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+Some numbers (Andrew)
+=====================
+
+  Initially reported numbers (Mbps, w/ drops on the rx side):
+  
+  https://lore.kernel.org/netdev/b0bff7a8-a004-4eb7-bf1d-2137182e59f9@lunn.ch/
+  
+  The numbers are essentially always the same with these two packet sizes.
+  cpu0 doesn't appear overloaded. Not sure if there's a bottlneck at the
+  interface level on my hw, but it seems cpu can handle more.
+  
+  Second test run (with no drops on the rx side):
+  
+  tx side: iperf3 sending UDP (256B) packets roughly at line rate (no drops
+  on the receiving side).
+  
+  rx side:
+  - fixed cpu frequency
+  - single rxq on cpu 0
+  - iperf3 server on cpu 1-3
+  - average w/ mpstat 20s interval 20s count
+  
+  Baseline:
+  
+  Average:     CPU    %usr    %sys    %soft  %idle
+  Average:     all    3.64   15.05     0.87  80.42
+  Average:       0    0.05    0.15    10.23  89.56
+  Average:       1    4.20   16.98     0.00  78.81
+  Average:       2    3.67   15.53     0.00  80.79
+  Average:       3    4.07   16.83     0.00  79.09
+  
+  Page pool:
+  
+  Average:     CPU    %usr    %sys    %soft  %idle
+  Average:     all    3.76   14.91     0.74  80.57
+  Average:       0    0.05    0.12     7.81  91.98
+  Average:       1    3.88   15.53     0.00  80.58
+  Average:       2    4.35   17.23     0.00  78.42
+  Average:       3    4.22   16.63     0.00  79.11
 
 
-vim +/dma_desc_to_edesc +430 drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
+Previous versions
+=================
+  - v4: https://lore.kernel.org/all/20260309144353.1213770-1-pvalerio@redhat.com/
+  - v3: https://lore.kernel.org/netdev/20260302115232.1430640-1-pvalerio@redhat.com/
+  - v2: https://lore.kernel.org/netdev/20260223182632.1681809-1-pvalerio@redhat.com/
+  - v1: https://lore.kernel.org/netdev/20260115222531.313002-1-pvalerio@redhat.com/
+  - RFC v2: https://lore.kernel.org/netdev/20251220235135.1078587-1-pvalerio@redhat.com/
+  - RFC v1: https://lore.kernel.org/netdev/20251119135330.551835-1-pvalerio@redhat.com/
 
-   396	
-   397	static void dwmac4_display_ring(void *head, unsigned int size, bool rx,
-   398					dma_addr_t dma_rx_phy, unsigned int desc_size)
-   399	{
-   400		dma_addr_t dma_addr;
-   401		int i;
-   402	
-   403		pr_info("%s descriptor ring:\n", rx ? "RX" : "TX");
-   404	
-   405		if (desc_size == sizeof(struct dma_desc)) {
-   406			struct dma_desc *p = (struct dma_desc *)head;
-   407	
-   408			for (i = 0; i < size; i++) {
-   409				dma_addr = dma_rx_phy + i * sizeof(*p);
-   410				pr_info("%03d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
-   411					i, &dma_addr,
-   412					le32_to_cpu(p->des0), le32_to_cpu(p->des1),
-   413					le32_to_cpu(p->des2), le32_to_cpu(p->des3));
-   414				p++;
-   415			}
-   416		} else if (desc_size == sizeof(struct dma_extended_desc)) {
-   417			struct dma_extended_desc *extp = (struct dma_extended_desc *)head;
-   418	
-   419			for (i = 0; i < size; i++) {
-   420				dma_addr = dma_rx_phy + i * sizeof(*extp);
-   421				pr_info("%03d [%pad]: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n",
-   422					i, &dma_addr,
-   423					le32_to_cpu(extp->basic.des0), le32_to_cpu(extp->basic.des1),
-   424					le32_to_cpu(extp->basic.des2), le32_to_cpu(extp->basic.des3),
-   425					le32_to_cpu(extp->des4), le32_to_cpu(extp->des5),
-   426					le32_to_cpu(extp->des6), le32_to_cpu(extp->des7));
-   427				extp++;
-   428			}
-   429		} else if (desc_size == sizeof(struct dma_edesc)) {
- > 430			struct dma_edesc *ep = dma_desc_to_edesc(head);
-   431	
-   432			for (i = 0; i < size; i++) {
-   433				dma_addr = dma_rx_phy + i * sizeof(*ep);
-   434				pr_info("%03d [%pad]: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n",
-   435					i, &dma_addr,
-   436					le32_to_cpu(ep->des4), le32_to_cpu(ep->des5),
-   437					le32_to_cpu(ep->des6), le32_to_cpu(ep->des7),
-   438					le32_to_cpu(ep->basic.des0), le32_to_cpu(ep->basic.des1),
-   439					le32_to_cpu(ep->basic.des2), le32_to_cpu(ep->basic.des3));
-   440				ep++;
-   441			}
-   442		} else {
-   443			pr_err("unsupported descriptor!");
-   444		}
-   445	}
-   446	
+v4 -> v5
+========
+  - Call missing macb_tx_lpi_wake() in macb_xdp_submit_frame() (Nicolai Buchwitz)
+  - Restore old_prog (instead of NULL) in gem_xdp_setup() on macb_open() failure
+
+v3 -> v4
+========
+  - Remove inline from gem_rx_data_len() (Paolo Abeni)
+  - Rate limit the netdev_{err,warn} in gem_rx() and gem_rx_refill() with to avoid log 
+    flooding under error conditions (Paolo Abeni)
+  - Fix missing newline in netdev_err() for MTU validation in ndo_change_mtu (Paolo Abeni)
+
+v2 -> v3
+========
+  - Drop mog_init_rings() call in macb_open() reintroduced by mistake while
+    rebasing (Jakub Kicinski)
+  - Move [5/8] down in the series (was [6/8])
+  - s/void/sk_buff for the skb parameter instead of updating the documentation
+    because of its void type as this seems to better fit the scope of the
+    patch (Jakub Kicinski)
+  - Move [6/8] down in the series (was [7/8])
+  - Remove misleading check on tx buff type (MACB_TYPE_SKB) to improve
+    clarity as all buffers are MACB_TYPE_SKB (Jakub Kicinski)
+  - Update commit message to better fit with the patch content
+  - Move [7/8] up in the series (was [5/8]) as XDP_TX has now been folded in
+    this patch honoring the advertised features (Jakub Kicinski)
+  - explicitly return 0 in gem_create_page_pool() instead of err (Jakub Kicinski)
+  - Revisit gem_xdp_valid_mtu() and related helpers lifting the dependency with
+    bp->rx_headroom. It now always uses XDP_PACKET_HEADROOM (Jakub Kicinski)
+  - Use xdp_return_frame() in workqueue context (Jakub Kicinski)
+  - macb_tx_error_task() now locks tx_ptr_lock (Jakub Kicinski)
+  - Remove redundant check for clarity (Jakub Kicinski)
+  - Take into account head adjustment in macb_xdp_submit_frame() while syncing
+    in the XDP_TX path and for the XDP_PASS codepath.
+  - Some helpers renaming for clarity
+  - Do not to leave bp->prog pointer in gem_setup_xdp dangling on failure
+  - Revisit rx_buffer_size to better handle the RSC/non-RSC case
+  - Return error in ndo_xdp_xmit if the interface is not operating
+  - Handle packets count in macb_tx_complete() for the xdp case
+
+v1 -> v2
+========
+  - Fix potential NULL pointer dereference in gem_rx() when receiving an
+    unexpected non-starting frame without an active skb (Jakub Kicinski).
+  - Make sure to release both the pending skb and the current buff in fragment
+    overflow error path (Jakub Kicinski).
+  - Reuse the existing page pool instead of creating a new one in HRESP error
+    recovery (Jakub Kicinski).
+  - s/page/buffer/ in netdev_err() print out (Théo Lebrun)
+  - Ensure pending queue->skb is released in gem_free_rx_buffers() (Théo Lebrun).
+  - Use NET_SKB_PAD for the headroom when no xdp program is attached
+  - Add netdev to pp_params (for pp stats)
+  - Move ip_summed handling when RX_EOF is set as RX_SUM may not be reliable when
+    RX_EOF is not set.
+  - Sync for device no longer relies on PP_FLAG_DMA_SYNC_DEV reducing the
+    sync size.
+  - Introduce rx_ip_align field in struct macb
+  - Fix incorrect DMA direction for page pool when attaching XDP program by 
+    restoring close/open sequence as in a previous version (Jakub Kicinski).
+  - Rename release_buff() to macb_tx_release_buff() for clarity (Théo Lebrun).
+  - Do not unmap dma for XDP_TX buffers by ensuring tx_buff->mapping is zero for
+    MACB_TYPE_XDP_TX buff_type (Jakub Kicinski).
+  - Always return memory to pool on xdp_convert_buff_to_frame()
+    failure (Jakub Kicinski).
+  - Remove skip_xdp label (Théo, this is a bit different from your suggestion,
+    let me know if you have a strong preference here)
+
+RFC v2 -> v1
+============
+  - Removed bp->macbgem_ops.mog_init_rings(bp) call from macb_open()
+  - Fixed includes (remove unneeded, moved one from header to macb_main.c)
+  - Reverse xmas tree ordering (gem_rx, gem_rx_refill)
+  - print_hex_dump_debug() instead of print_hex_dump()
+  - Replaced rx frame length check with MACB_BIT(RX_EOF) for data_len
+    calculation
+  - Removed NET_IP_ALIGN handling in rx buffer size calculation
+  - Updated debug format string to include rx_headroom and total size
+  - Changed types to unsigned int in helper functions and variable
+  - Removed unneeded line break
+
+RFC v1 -> RFC v2
+================
+  - Squashed 1/6 and 2/6
+  - Reworked rx_buffer_size computation. It no longer takes into
+    accounts extra room.
+  - A bunch of renaming (rx_offset => rx_headroom, removed MACB_MAX_PAD,
+    MACB_PP_HEADROOM => XDP_PACKET_HEADROOM, data => ptr, xdp_q => xdp_rxq,
+    macb_xdp() => gem_xdp(), macb_xdp_xmit() => gem_xdp_xmit())
+  - Deduplicated buffer size computation in gem_xdp_valid_mtu()
+    and gem_xdp_setup()
+  - gem_xdp_setup() no longer close()/open()
+  - Renaming from rx_skbuff to rx_buff is now got split in a separate commit
+  - Open-coded gem_page_pool_get_buff()
+  - Added missing rx_buff re-initialization in the error path during rx
+  - Page pool creation failure now fails the device open
+  - Moved xdp buff preparation inside gem_xdp_run()
+  - Added missing rcu_access_pointer()
+  - Turned return value in -EOPNOTSUPP for macb_xdp() on failure
+  - moved tx_skb to tx_buff renaming to a separate commit
+  - Removed some unneeded code and set MACB_TYPE_SKB for lp->rm9200_txq[desc].type as well
+  - Replaced !!addr with a dedicated bool in macb_xdp_submit_frame()
+
+Paolo Valerio (7):
+  net: macb: rename rx_skbuff into rx_buff
+  net: macb: Add page pool support handle multi-descriptor frame rx
+  net: macb: use the current queue number for stats
+  net: macb: make macb_tx_skb generic
+  net: macb: generalize tx buffer handling
+  net: macb: add XDP support for gem
+  net: macb: introduce ndo_xdp_xmit support
+
+Théo Lebrun (1):
+  net: macb: move Rx buffers alloc from link up to open
+
+ drivers/net/ethernet/cadence/Kconfig     |   1 +
+ drivers/net/ethernet/cadence/macb.h      |  43 +-
+ drivers/net/ethernet/cadence/macb_main.c | 951 ++++++++++++++++++-----
+ 3 files changed, 770 insertions(+), 225 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.53.0
+
 
