@@ -1,183 +1,238 @@
-Return-Path: <netdev+bounces-267552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267553-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EM3ADMBRtGk4kAAAu9opvQ
-	(envelope-from <netdev+bounces-267552-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 19:04:48 +0100
+	id UDZzEE5XtGlbmAAAu9opvQ
+	(envelope-from <netdev+bounces-267553-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 19:28:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3B162887B8
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 19:04:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DF5F288BB7
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 19:28:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 83AA83060CF9
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 18:01:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 898E6301E3ED
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 18:28:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B4F3DA7C6;
-	Fri, 13 Mar 2026 18:01:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6BB3DD528;
+	Fri, 13 Mar 2026 18:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IkBQYwHq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m+4je4rl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940D63DA5B3
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 18:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CC83CCFDF
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 18:28:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773424900; cv=none; b=mGZnyOO80iKIH5avDBiYKH869O8VTGfKS5VtuM49qMs6KAKepQ0H4MnnA33f781Ta9TS2oIPgx3MSd4b0KyPl5buHYZwPFbadOMS9bF8ciaS0w53exWI3Ck6UVOR9fHwtNqHYzZlhjA8InLS1Iz2Zik+zm3QnMxae48AIzL4FlE=
+	t=1773426495; cv=none; b=GdB3ML89vcqwmIE3reFFxVmNZRS6PHeIpNldHMn5KqSoXAZ7/P4w/DDC4y5dXd+X0lPNxtAFYOEdj5GDo6HwXYrKdWte7cRgJjYGocPKSI4inAZqE7S3AWQJ2NE9qBGJttSzI9uC02qmJPtQhy+/mskSSj07O8flBvxJcMKpCFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773424900; c=relaxed/simple;
-	bh=MWXEFQ381SLQSXiwYPD6PgTvLJBhNSUHPAJpUG638dI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LgoXSe+r7vH3KTYORj+VR19pDr6sAH/VlUCs/QRPcHu/31C3pEZc1t0mE/UWcDcmRO8NoP3g8IHoREoj8ZIvFmieDqV4yjhA6EucAZkt0CXhF4+AcawbOQYq8mr2Z8cEQBtXkislU/11vd1PwKHzgXzqDq2J3iROjI/ZBdrh2nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IkBQYwHq; arc=none smtp.client-ip=209.85.128.170
+	s=arc-20240116; t=1773426495; c=relaxed/simple;
+	bh=3CjIp3swzP3/82xqRY2i6iQNJwGtqTqcznAwFIxaK8s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T7mTkkMgtgr7Wsd06R/q4jvCNbAdF3YnwISuKva1idpaKIO8l89GuZL9tls/+MbYAkxeWnzg886ekxkCUVjCalcqQQplz0iASMdGyqcDjLmXVdRnQxfB28KbTKlreV72cs3bvE+g+06tKU1CMS8dLB6coXdmtYRd46REjf7gAXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m+4je4rl; arc=none smtp.client-ip=74.125.224.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-79628fb5c05so20889127b3.2
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 11:01:39 -0700 (PDT)
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-64c28495b3dso278745d50.1
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 11:28:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773424899; x=1774029699; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773426493; x=1774031293; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MDVR6LO95DY7vyobG5JaDyJauzh65mLzZY7eX52aAWM=;
-        b=IkBQYwHqaHSHPu+6JjTmwo+VWeLZUhwwGliyMuoa2dHFK9guFuF80n6s6Q681+14Ni
-         t986a79tnycPyxYSgtJFM+NUhBzWVdsoAiioeiGFlJZxDR1hY34+0BlFn4bmO0J/aWmY
-         GqHs8ukPG+wCPH/md/l1u5FNRjhzDvA3OzZYX+F68+FSZ2xaw9Wlywsek+hN7Hc3zt78
-         LXtJHEKOrxgHXHvhZN9EIMRNeQ+3s/A9ppDcEjIBf0oY+gkvPxZEcPFHukBVDLIhauAD
-         mkdFC4GEBnIpK+zC1+o+1KX/VQRea59F0AjgJrL8isTA5l1n9SgQlNHBRsydWLqZTVP5
-         c1/g==
+        bh=yd1ogSKuUnIHlkYpBTpx9Vm9jbW8OTb/gVF2HdmYSdI=;
+        b=m+4je4rlpvsAQX/3am29u+V2+FtnqRzl/3rPG9YVPuhU2I6IrqCuDRuDXkql3FCCAX
+         dmPwMuposHrVJdOlg+2kQNDs4yxKcei7eYLlEMuH6vHmgAKrYTBDjzhtH0e8ScnCbOLr
+         mhgIxNvtpZ1BR9Ulb1WkkRHJ2vR3GymQLTamJFl5F8x9MAR6iNf1LI3cByJkVKkHdrFz
+         LoR+PKN0LdS5kkFsjCld4kK1nzBjn6aOmhEn5f99fLirJJ8n7wem0u62BdD0mq77444w
+         8QHflTOtnEwZcRuEuiehEkwTDk0Gtymj2gnb4arCk6srRc9Sl6WIKDHqDjF44IqS7zWD
+         CtEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773424899; x=1774029699;
+        d=1e100.net; s=20251104; t=1773426493; x=1774031293;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MDVR6LO95DY7vyobG5JaDyJauzh65mLzZY7eX52aAWM=;
-        b=qVmyEXo7HtlKlLHILipX3gsEHc7AoxB5KR3fMZwKYsM1b8VKuSLRLgl11HG1Vzb4fl
-         QkVOl7l7WMIlIG0KYRvprpN+SggiZN8CdWIh4TfX/VGoQvXZDFiN1rsl8cqWmkZygGyu
-         lIx4GsJbGWS5bvwqUZVM5nLyf0pfWiHo4BiEYVTcp4MGksy1ueeJ9auEFLgL9SO4yui1
-         In2Ze8rJsJsXEleldym0A8nnzT+2RYhwBSQ6HbUk2989xIY3KPc/Skhe+mW5z2CsfMqY
-         EX/v5kcXy3EeH1+NOU8otue3UJ/zeI5wZJkGBGW1TkrwAxB/m4LZNgilZF+1InwrE9j1
-         J85A==
-X-Forwarded-Encrypted: i=1; AJvYcCUfwRKtSNL52zLjM9uKQPqMyi3xLGfSKEhDDrzr6JTMQQ2RX3DIE1YC1AQgWnzfVUMxiG+niLE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyddmOmLfCCSglGjLO/ISDWYK2RFBPu4HJ6vKi9Kgl9iwuzHBC
-	ZNMWtwGobbc2g+5RzVtWaGzFrqBXun4/lvkOIigWyEOPnHTzaxMrEjNp
-X-Gm-Gg: ATEYQzwLrRtIqF8CxE+6/YFpAO1k8L2Fr95l//lodOD5p2bcFcG/4QUSlH9djzzk7dK
-	AriXu1BJD5Q5N9qGg8SXUdZxU/JwKkFF/rqA+lzzgoHNRPEBquKKS3NrFoPRTlRg4IA4W+ZETy9
-	XP1bd4oRHG8MtebV4lA+hs0CS00e30HIciOmwVOC726x2YfGlBiHTRQPuoWnBCivKOYua163xVV
-	LZGftv2ivT9qD76SRCSTEzq15eXCIgLxj3hanie89fr/ejdPqPHcNn3HKI19kiF65q/6kPzDPZ3
-	N6yyqTTn17hNoTjxtQJ2uOChw/MEQhLklSaxepjqGmY91mQWKpaVzUkXeW17OQLxRoI40pJeP4M
-	l8O60arsrO+NsgsFDvqo8z81EnmSNo6k/3FCdJ58LFJ0pzuLJEGZmmHJr+H4VSDjuQL4OAd3F8E
-	R7C3SqASSWKQZ4mNWnt6RkuII4v2GOkhHNLyQethHff9qthu9fBwUZ5qExaYMwdPsxIIv160djj
-	YQfYzKsRPMcKjm8IoMQKzrqoQOBRM+q7A==
-X-Received: by 2002:a05:690c:c50d:b0:798:5333:ce0d with SMTP id 00721157ae682-79a1c08d4ebmr44869727b3.4.1773424898390;
-        Fri, 13 Mar 2026 11:01:38 -0700 (PDT)
-Received: from localhost.localdomain (99-47-159-199.lightspeed.mmphtn.sbcglobal.net. [99.47.159.199])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-79917f42c4csm49980107b3.52.2026.03.13.11.01.37
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 13 Mar 2026 11:01:37 -0700 (PDT)
-From: David Baum <davidbaum461@gmail.com>
-To: pablo@netfilter.org,
-	fw@strlen.de
-Cc: phil@nwl.cc,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	David Baum <davidbaum461@gmail.com>
-Subject: [PATCH] netfilter: ipset: harden payload calculation in call_ad()
-Date: Fri, 13 Mar 2026 13:01:32 -0500
-Message-ID: <20260313180132.75655-1-davidbaum461@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        bh=yd1ogSKuUnIHlkYpBTpx9Vm9jbW8OTb/gVF2HdmYSdI=;
+        b=HRwYny4my2oH2+xispNxE/xN/YKPX+58/XZAWnZQgwR0orUd55BZ6aaBHPVrltutZ/
+         cPUJ3oQbInHvumGxa3UqO09sCBLZrI7mNlbpw1q/5BIlh43ZkcM+O27TF8xdp/tGChz/
+         kcZgjO957NKbJxg09A5F5+1skdW5nsUQtbOs4kI8ZqTu35qwo5SCuZp8y/Vqx9lcWdII
+         qyt1jXgR/cvyg4ATaMqmbQPqa30KzOecu72Abo8NUGo/lKeqXxXm8oT4UHHjWY/5/uTE
+         3Xr2qkmP4E15/2/pYtmdd4coreFSrJ1I6R8+ZDumrTTjJMqRnoQSoIsBfXUOEKC36c69
+         D53w==
+X-Gm-Message-State: AOJu0Yy1hY/9RJ+yhHfqUnK47vyBDEXrT9hUgOYETVOj4IbRfhcH/1uw
+	jquaU11/qQErGmrzsRgubxaxpToqv40V4dxtbg9rXV4dnjfBH3iAokOHhSGRRmRr
+X-Gm-Gg: ATEYQzzsQ8HI6qSwXHyiGryrCXvHYj3omHTB6tgM+PDs3JVgT8uRVCFrJKpggJEeKM0
+	KfMUUd3EAruw5ODTpvD0OqqY7nPwkOlvHHPlJJUTmp/Gpe0ocEExgc95GU3gfVdOiUnMyjTsXEx
+	CGh8C4HRsoeqj8/Ee/j5VKka221hYjCXWJiN73wiYsLISrffzJ4ywBm/WSqRPk2vU1yGandLOEt
+	ra3BEvZqFnj3IWKihchGa6hrMJ0KR0aKwd/TTj9GsJqz2vinK98UREqTSz7mEA9oFmvEpNEXXfk
+	Ho4j8s9jL80rE2tAlrfiy1Z1igFHLQQSGNYWRZMtLede0TEhFwmgr09zV2992l/wEM7eHqQXa97
+	Qg4wJBVW7gdB3PfM9t0o2kJ5r2CEnXHQuarhnKLJvBG8jJ0oOq6z/K97/PEEsA4hSdZC4KTa6fF
+	ldgoiAnu54c3Weq6AdyYYCUKYm
+X-Received: by 2002:a05:690c:6001:b0:79a:2535:a21d with SMTP id 00721157ae682-79a2535b14dmr20957657b3.7.1773426493440;
+        Fri, 13 Mar 2026 11:28:13 -0700 (PDT)
+Received: from localhost ([2a03:2880:21ff:10::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-79917f37b98sm51946917b3.49.2026.03.13.11.28.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Mar 2026 11:28:12 -0700 (PDT)
+From: Wei Wang <weibunny.kernel@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Daniel Zahka <daniel.zahka@gmail.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	David Wei <dw@davidwei.uk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Wei Wang <weibunny@fb.com>
+Subject: [PATCH v5 net-next 0/5] psp: Add support for dev-assoc/disassoc 
+Date: Fri, 13 Mar 2026 11:27:58 -0700
+Message-ID: <20260313182804.696100-1-weibunny.kernel@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	SUBJECT_ENDS_SPACES(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,netfilter.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-267552-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267553-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidbaum461@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.993];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: A3B162887B8
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9DF5F288BB7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-call_ad() computes the netlink error payload size with
-min(SIZE_MAX, sizeof(*errmsg) + nlmsg_len(nlh)), but min(SIZE_MAX, x)
-is always x, so the guard is a no-op.
+From: Wei Wang <weibunny@fb.com>
 
-Replace it with an explicit negative-length check and
-check_add_overflow() so the addition is validated before being passed
-to nlmsg_new().
+The main purpose of this feature is to associate virtual devices like
+veth or netkit with a real PSP device, so we could provide PSP
+functionality to the application running with virtual devices.
 
-Signed-off-by: David Baum <davidbaum461@gmail.com>
----
- net/netfilter/ipset/ip_set_core.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+A typical deployment that works with this feature is as follows:
+     Host Namespace:
+     psp_dev_local  ←──physically linked──→ psp_dev_peer
+	  (PSP device)
+	       │
+	       │ BPF on psp_dev_local ingress: bpf_redirect_peer() to nk_guest
+	       │
+	  nk_host / veth_host
+	       │
+	       │ BPF on nk_host ingress: bpf_redirect_neigh() to psp_dev_local
+	       │
+      Guest Namespace (netns):
+	       │
+	  nk_guest / veth_guest
+	  ★ PSP application run here
 
-diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
-index a2fe711cb5e3..11d3854d9b11 100644
---- a/net/netfilter/ipset/ip_set_core.c
-+++ b/net/netfilter/ipset/ip_set_core.c
-@@ -10,6 +10,7 @@
- #include <linux/module.h>
- #include <linux/moduleparam.h>
- #include <linux/ip.h>
-+#include <linux/overflow.h>
- #include <linux/skbuff.h>
- #include <linux/spinlock.h>
- #include <linux/rculist.h>
-@@ -1763,13 +1764,18 @@ call_ad(struct net *net, struct sock *ctnl, struct sk_buff *skb,
- 		struct nlmsghdr *rep, *nlh = nlmsg_hdr(skb);
- 		struct sk_buff *skb2;
- 		struct nlmsgerr *errmsg;
--		size_t payload = min(SIZE_MAX,
--				     sizeof(*errmsg) + nlmsg_len(nlh));
-+		int nlmsg_payload_len = nlmsg_len(nlh);
-+		size_t payload;
- 		int min_len = nlmsg_total_size(sizeof(struct nfgenmsg));
- 		struct nlattr *cda[IPSET_ATTR_CMD_MAX + 1];
- 		struct nlattr *cmdattr;
- 		u32 *errline;
- 
-+		if (nlmsg_payload_len < 0 ||
-+		    check_add_overflow(sizeof(*errmsg),
-+				       (size_t)nlmsg_payload_len, &payload))
-+			return -ENOMEM;
-+
- 		skb2 = nlmsg_new(payload, GFP_KERNEL);
- 		if (!skb2)
- 			return -ENOMEM;
+      Remote Namespace (_netns):
+	  psp_dev_peer
+	  ★ PSP server application runs here
+
+Note:
+The general requirement for this feature to work:
+For PSP to work correctly, the egress device at validate_xmit_skb()
+time must have psp_dev matching the association's psd. Any device
+stacking or traffic redirection that changes the egress device will
+cause either:
+1. TX validation failure (SKB_DROP_REASON_PSP_OUTPUT) - fail-safe
+2. RX policy failure after tx-assoc - packets without PSP extension
+   are rejected by receiver expecting encrypted traffic
+
+Here are a few examples that this feature would not work:
+- Bonding with load balancing in round-robin, XOR, 802.3ad mode across
+  multiple PSP devices, or mixed PSP and non-PSP devices
+- Bonding with active-backup mode might work without PSP migration for
+  failover case.
+- ipvlan/macvlan in bridge mode would not work given packets are
+  loopbacked locally without going through the PSP device.
+
+Changes since v4:
+- Address compilation warning in patch 3
+- Removed the call to psp_nl_has_listeners_any_ns() and check listeners
+  when looping through netns in psp_nl_notify_dev() in patch 2. This
+  makes sure we only send notification to netns that has listeners.
+
+Changes since v3:
+- Make nsid optional for dev-assoc/dev-disassoc operation, and use
+  the ns user is in when it's not specified. Also added a test for this.
+- Fix psp_nl_notify_dev() to compute the correct nsid relative to the
+  listener's netns.
+- Only register the new netdev event for psp dev cleanup upon the first
+  successful dev-assoc operation.
+- Change the following in selftest:
+  - Add CONFIG_NETKIT to driver/net's config
+  - Fall back to NetDrvEpEnv and run basic test cases if NetDrvContEnv
+    does not load
+  - Use ksft_variants instead of psp_ip_ver_test_builder
+
+Changes since v2:
+- Change the newly added parameter to psp_device_get_and_lock() to
+  admin in patch 1. Introduce 2 device check functions:
+  - psp_device_get_locked_admin() for dev-set and key-rotate
+  - psp_device_get_locked() for all other operations
+  Flip the logic for checking the dev_assoc_list accordingly in patch 2.
+- Move psp_nl_notify_dev() before removing the dev from assoc_dev_list
+  in psp_nl_dev_disassoc_doit() and correct the typo in commit msg in
+  patch 2.
+- Remove the threading and subprocess and some comment updates in patch 5. 
+
+Changes since v1:
+- Update the first 4 patches to reflect the latest changes in
+  https://lore.kernel.org/netdev/20260302053315.1919859-1-dw@davidwei.uk/
+- Update patch 9 to add a param to NetDrvContEnv to control the loading
+  of the tx forwarding bpf program
+
+Wei Wang (5):
+  psp: add admin/non-admin version of psp_device_get_locked
+  psp: add new netlink cmd for dev-assoc and dev-disassoc
+  psp: add a new netdev event for dev unregister
+  selftests/net: Add bpf skb forwarding program
+  selftest/net: psp: Add test for dev-assoc/disassoc
+
+ Documentation/netlink/specs/psp.yaml          |  71 ++-
+ include/net/psp/types.h                       |  15 +
+ include/uapi/linux/psp.h                      |  13 +
+ net/psp/psp-nl-gen.c                          |  36 +-
+ net/psp/psp-nl-gen.h                          |   4 +
+ net/psp/psp.h                                 |   3 +-
+ net/psp/psp_main.c                            | 104 +++-
+ net/psp/psp_nl.c                              | 344 +++++++++++-
+ tools/testing/selftests/drivers/net/config    |   1 +
+ .../drivers/net/hw/nk_redirect.bpf.c          |  60 +++
+ .../selftests/drivers/net/lib/py/env.py       |  54 +-
+ tools/testing/selftests/drivers/net/psp.py    | 500 ++++++++++++++++--
+ 12 files changed, 1145 insertions(+), 60 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/nk_redirect.bpf.c
+
 -- 
-2.50.1 (Apple Git-155)
+2.52.0
 
 
