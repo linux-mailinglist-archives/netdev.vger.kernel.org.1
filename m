@@ -1,148 +1,208 @@
-Return-Path: <netdev+bounces-267298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267299-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CN2uL5Ous2kvZwAAu9opvQ
-	(envelope-from <netdev+bounces-267298-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 07:28:35 +0100
+	id gPe6CfC0s2l5aAAAu9opvQ
+	(envelope-from <netdev+bounces-267299-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 07:55:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F39A127E1BA
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 07:28:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9954827E637
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 07:55:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2EE9A31B7D5F
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 06:23:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2BCDF301AB8B
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 06:55:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B405D33E374;
-	Fri, 13 Mar 2026 06:22:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6920430CDAF;
+	Fri, 13 Mar 2026 06:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Sjgk/651"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw2.hygon.cn (unknown [101.204.27.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6DA233F36B
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 06:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.204.27.37
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D2D5474F;
+	Fri, 13 Mar 2026 06:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773382957; cv=none; b=AbqyCykr8meLterBXRTlm8ighfBt28SLSlXF2jqQxMnoXxpv3vtYxatYZPYaX87eZcnMZrkJ1PAcQcZGARRkwx1LeakRaXMS46U0oppKJaMr0KiW434EFIc44lBuMNHgN+PbmWo779NaRstRIXmTgiYqUUmvlzLUR1XqC5F+sbA=
+	t=1773384939; cv=none; b=RNUC5YWRcNPn1a0t2HpYv/a8PlXk4+yZLw0hFFUEHIOWSp1K/4QmAfz/MpLPoQ7qSzl5jUT3IucKlC183LOxKwU/nm9Fvw8uBhtEF1QNggWizfNiC/3KiwDxtCjqNB37jKkxYagVUYZ3RINhAQxttr8jb8cx5jask4oWuOtyb2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773382957; c=relaxed/simple;
-	bh=F56GQyNSFLF0AdZyevYHXAOzQQafsSNM4kdqW9Ok01w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Ht7IL6pFr5rkoo8kXAlU2vxgt1EjLRUvW/YpOJ4idb3gvg2NZB0+eZW66KAfGt9pCdIwa0Y8C29434rq5YvaCBWt+/6XHvHkd3ImXuyEkVq5Fl4GG3lRhuPrKTMiTBIPifqdK235Mta+/14zsGoT8a4twGSXgiCGp3KX36gEGXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn; spf=pass smtp.mailfrom=hygon.cn; arc=none smtp.client-ip=101.204.27.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
-Received: from maildlp1.hygon.cn (unknown [127.0.0.1])
-	by mailgw2.hygon.cn (Postfix) with ESMTP id 4fXDsz05C2z1YQpmD;
-	Fri, 13 Mar 2026 14:22:15 +0800 (CST)
-Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
-	by mailgw2.hygon.cn (Postfix) with ESMTP id 4fXDsy14hJz1YQpmD;
-	Fri, 13 Mar 2026 14:22:14 +0800 (CST)
-Received: from cncheex05.Hygon.cn (unknown [172.23.18.115])
-	by maildlp1.hygon.cn (Postfix) with ESMTPS id 5EF7A1D6;
-	Fri, 13 Mar 2026 14:22:06 +0800 (CST)
-Received: from cncheex04.Hygon.cn (172.23.18.114) by cncheex05.Hygon.cn
- (172.23.18.115) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Fri, 13 Mar
- 2026 14:22:14 +0800
-Received: from cncheex04.Hygon.cn ([fe80::1b6f:6c58:58a4:430d]) by
- cncheex04.Hygon.cn ([fe80::1b6f:6c58:58a4:430d%10]) with mapi id
- 15.02.1544.036; Fri, 13 Mar 2026 14:22:14 +0800
-From: Zhud <zhud@hygon.cn>
-To: Jason Wang <jasowang@redhat.com>
-CC: "mst@redhat.com" <mst@redhat.com>, "xuanzhuo@linux.alibaba.com"
-	<xuanzhuo@linux.alibaba.com>, "eperezma@redhat.com" <eperezma@redhat.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, Jing Li
-	<lijing@hygon.cn>, Zhiwei Ying <yingzhiwei@hygon.cn>
-Subject: RE: [PATCH net] virtio-net: clear NETIF_F_GRO_HW if no GRO-related
- offloads are capable
-Thread-Topic: [PATCH net] virtio-net: clear NETIF_F_GRO_HW if no GRO-related
- offloads are capable
-Thread-Index: AQHcsokJYSEJvH0W90iKftd05A/cWrWrdOQAgACGyrA=
-Date: Fri, 13 Mar 2026 06:22:14 +0000
-Message-ID: <a0aa07c8b6a2423aa1e363c09b54392d@hygon.cn>
-References: <20260313013040.896924-1-zhud@hygon.cn>
- <CACGkMEvwR2WWyKvho-WU=_06OmWsYTSDSkML9JS9pSkzOQVkTA@mail.gmail.com>
-In-Reply-To: <CACGkMEvwR2WWyKvho-WU=_06OmWsYTSDSkML9JS9pSkzOQVkTA@mail.gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1773384939; c=relaxed/simple;
+	bh=j3+p5+i5VDxxgE0WM6Ud50FOzeWOCZydwKAn+qv/VSM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UjhFD9/bv9Of9Lhng0CGUynbhbibw4XXyT7gZDYQH86frW7RlGgQKH8Rq3ELjnOwbVh9D4YRZQJTwMPOdr1uuzyRb22O/UE3+2XB5TvRdNglmC5U5ORdTKFUN3NnsRinrDIQwSmcQlhHiUFcKo4MMqXc486ftAiDBwhgVsfa0mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Sjgk/651; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=hZnEtLPqcaQ8qA3z/Vzbhjzdoofj5lcVtonecwvZDRM=; b=Sjgk/651R0+MoyArzAn9BLaPmZ
+	d/d4NPW7QAzlEBiMU7MT/ihC4nddwki4u8xJCDuOPvsNuoa7yVARPcCAAiTJn6f9Ahwkzo/IMAWqj
+	kimTEVuKKoQveZtI6BCzTQbWLkyDFIO8tzjMdKk+cccwsWH6Fvkb1eyBWEzq5JtNjQK6vNucS1jYi
+	1VUvPJmU7/7qnAQelCUiC5DIZ8+iJBDQeg4RG013hkKAlHKpgvgcPOBTl1UgtprU0WVy6AGF8n4LY
+	yOoaMniWTcbZLjg9ebEn94FWabd6tg4PQfoCM9XkcAgcCFet4fRrFluV9OIyKMzuAqSMG+Kiqb7BZ
+	OaxRY0+A==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1w0wQm-0009qL-1w;
+	Fri, 13 Mar 2026 07:55:32 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: kuba@kernel.org
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	jhs@mojatatu.com,
+	Keenan Dong <keenanat2000@gmail.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>
+Subject: [PATCH net] clsact: Fix use-after-free in init/destroy rollback asymmetry
+Date: Fri, 13 Mar 2026 07:55:31 +0100
+Message-ID: <20260313065531.98639-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [0.24 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27938/Thu Mar 12 07:24:01 2026)
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[hygon.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-267298-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267299-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhud@hygon.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hygon.cn:email,hygon.cn:mid]
-X-Rspamd-Queue-Id: F39A127E1BA
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9954827E637
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-PiBPbiBGcmksIE1hciAxMywgMjAyNiBhdCA5OjM34oCvQU0gRGkgWmh1IDx6aHVkQGh5Z29uLmNu
-PiB3cm90ZToNCj4gPg0KPiA+IEFsdGhvdWdoIFZJUlRJT19ORVRfRl9DVFJMX0dVRVNUX09GRkxP
-QURTIGlzIG5lZ290aWF0ZWQsIHdoaWNoDQo+ID4gaW5kaWNhdGVzIHRoZSBkZXZpY2Ugc3VwcG9y
-dHMgZHluYW1pYyBjb250cm9sIG9mIGd1ZXN0IG9mZmxvYWRzLCBpdA0KPiA+IGRvZXMgbm90IG5l
-Y2Vzc2FyaWx5IG1lYW4gdGhlIGRldmljZSBzdXBwb3J0cyBzcGVjaWZpYyBoYXJkd2FyZSBHUk8g
-ZmVhdHVyZXMuDQo+ID4NCj4gPiBJZiBub25lIG9mIHRoZSBmZWF0dXJlcyBkZWZpbmVkIGluIEdV
-RVNUX09GRkxPQURfR1JPX0hXX01BU0sgKHN1Y2ggYXMNCj4gPiBUU080LCBUU082LCBvciBVRk8p
-IGFyZSBwcmVzZW50IGluIHZpLT5ndWVzdF9vZmZsb2Fkc19jYXBhYmxlLCB0aGUNCj4gPiBkZXZp
-Y2UgZWZmZWN0aXZlbHkgbGFja3MgdGhlIGhhcmR3YXJlIGNhcGFiaWxpdHkgdG8gcGVyZm9ybSBH
-Uk8uDQo+ID4NCj4gPiBJbiB0aGlzIGNhc2UsIE5FVElGX0ZfR1JPX0hXIHNob3VsZCBiZSBjbGVh
-cmVkIGZyb20gZGV2LT5od19mZWF0dXJlcw0KPiA+IHRvIHByZXZlbnQgdGhlIHN0YWNrIGZyb20g
-YXR0ZW1wdGluZyB0byBlbmFibGUgYW4gdW5zdXBwb3J0ZWQgaGFyZHdhcmUNCj4gPiBvZmZsb2Fk
-IGNvbmZpZ3VyYXRpb24uDQo+ID4NCj4gPiBGaXhlczogYTAyZTg5NjRlYWY5ICgidmlydGlvLW5l
-dDogZXRodG9vbCBjb25maWd1cmFibGUgTFJPIikNCj4gPiBTaWduZWQtb2ZmLWJ5OiBEaSBaaHUg
-PHpodWRAaHlnb24uY24+DQo+ID4gLS0tDQo+ID4gIGRyaXZlcnMvbmV0L3ZpcnRpb19uZXQuYyB8
-IDMgKysrDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKykNCj4gPg0KPiA+IGRp
-ZmYgLS1naXQgYS9kcml2ZXJzL25ldC92aXJ0aW9fbmV0LmMgYi9kcml2ZXJzL25ldC92aXJ0aW9f
-bmV0LmMgaW5kZXgNCj4gPiA3MmQ2YTljNmE1YTIuLjQ5YTYwYWY2ODRkNSAxMDA2NDQNCj4gPiAt
-LS0gYS9kcml2ZXJzL25ldC92aXJ0aW9fbmV0LmMNCj4gPiArKysgYi9kcml2ZXJzL25ldC92aXJ0
-aW9fbmV0LmMNCj4gPiBAQCAtNzA1OCw2ICs3MDU4LDkgQEAgc3RhdGljIGludCB2aXJ0bmV0X3By
-b2JlKHN0cnVjdCB2aXJ0aW9fZGV2aWNlICp2ZGV2KQ0KPiA+ICAgICAgICAgfQ0KPiA+ICAgICAg
-ICAgdmktPmd1ZXN0X29mZmxvYWRzX2NhcGFibGUgPSB2aS0+Z3Vlc3Rfb2ZmbG9hZHM7DQo+ID4N
-Cj4gPiArICAgICAgIGlmICghKHZpLT5ndWVzdF9vZmZsb2Fkc19jYXBhYmxlICYgR1VFU1RfT0ZG
-TE9BRF9HUk9fSFdfTUFTSykpDQo+ID4gKyAgICAgICAgICAgICAgIGRldi0+aHdfZmVhdHVyZXMg
-Jj0gfk5FVElGX0ZfR1JPX0hXOw0KPiA+ICsNCj4gDQo+IEl0IGxvb2tzIHRvIG1lIHRoZSByb290
-IGNhdXNlIGlzIHRoaXMgZHVyaW5nIHByb2JlPw0KPiANCj4gICAgICAgICBpZiAodmlydGlvX2hh
-c19mZWF0dXJlKHZkZXYsIFZJUlRJT19ORVRfRl9DVFJMX0dVRVNUX09GRkxPQURTKSkNCj4gICAg
-ICAgICAgICAgICAgIGRldi0+aHdfZmVhdHVyZXMgfD0gTkVUSUZfRl9HUk9fSFc7DQo+IA0KPiBU
-aGFua3MNCg0KCUV4YWN0bHkuIEl0IHNlZW1zIHRoZSBjb2RlIGJsaW5kbHkgZW5hYmxlcyBORVRJ
-Rl9GX0dST19IVyBhcyBsb25nIGFzIHRoZSANCmNvbnRyb2wgY2hhbm5lbCBpcyBwcmVzZW50LCB3
-aXRob3V0IHZlcmlmeWluZyBpZiB0aGUgYmFja2VuZCBhY3R1YWxseSBzdXBwb3J0cyB0aGUNCm9m
-ZmxvYWQgZmVhdHVyZXMuDQoNCj4gDQo+ID4gICAgICAgICBydG5sX3VubG9jaygpOw0KPiA+DQo+
-ID4gICAgICAgICBlcnIgPSB2aXJ0bmV0X2NwdV9ub3RpZl9hZGQodmkpOw0KPiA+IC0tDQo+ID4g
-Mi4zNC4xDQo+ID4NCj4gPg0KPiANCg0K
+Fix a use-after-free in the clsact qdisc upon init/destroy rollback asymmetry.
+The latter is achieved by first fully initializing a clsact instance, and
+then in a second step having a replacement failure for the new clsact qdisc
+instance. clsact_init() initializes ingress first and then takes care of the
+egress part. This can fail midway, for example, via tcf_block_get_ext(). Upon
+failure, the kernel will trigger the clsact_destroy() callback.
+
+Commit 1cb6f0bae504 ("bpf: Fix too early release of tcx_entry") details the
+way how the transition is happening. If tcf_block_get_ext on the q->ingress_block
+ends up failing, we took the tcx_miniq_inc reference count on the ingress
+side, but not yet on the egress side. clsact_destroy() tests whether the
+{ingress,egress}_entry was non-NULL. However, even in midway failure on the
+replacement, both are in fact non-NULL with a valid egress_entry from the
+previous clsact instance.
+
+What we really need to test for is whether the qdisc instance-specific ingress
+or egress side previously got initialized. This adds a small helper for checking
+the miniq initialization called mini_qdisc_pair_inited, and utilizes that upon
+clsact_destroy() in order to fix the use-after-free scenario. Convert the
+ingress_destroy() side as well so both are consistent to each other.
+
+Fixes: 1cb6f0bae504 ("bpf: Fix too early release of tcx_entry")
+Reported-by: Keenan Dong <keenanat2000@gmail.com>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Martin KaFai Lau <martin.lau@kernel.org>
+---
+ include/net/sch_generic.h |  5 +++++
+ net/sched/sch_ingress.c   | 14 ++++++++------
+ 2 files changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index d5d55cb21686..beeacf2a1229 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -1429,6 +1429,11 @@ void mini_qdisc_pair_init(struct mini_Qdisc_pair *miniqp, struct Qdisc *qdisc,
+ void mini_qdisc_pair_block_init(struct mini_Qdisc_pair *miniqp,
+ 				struct tcf_block *block);
+ 
++static inline bool mini_qdisc_pair_inited(struct mini_Qdisc_pair *miniqp)
++{
++	return !!miniqp->p_miniq;
++}
++
+ void mq_change_real_num_tx(struct Qdisc *sch, unsigned int new_real_tx);
+ 
+ int sch_frag_xmit_hook(struct sk_buff *skb, int (*xmit)(struct sk_buff *skb));
+diff --git a/net/sched/sch_ingress.c b/net/sched/sch_ingress.c
+index cc6051d4f2ef..c3e18bae8fbf 100644
+--- a/net/sched/sch_ingress.c
++++ b/net/sched/sch_ingress.c
+@@ -113,14 +113,15 @@ static void ingress_destroy(struct Qdisc *sch)
+ {
+ 	struct ingress_sched_data *q = qdisc_priv(sch);
+ 	struct net_device *dev = qdisc_dev(sch);
+-	struct bpf_mprog_entry *entry = rtnl_dereference(dev->tcx_ingress);
++	struct bpf_mprog_entry *entry;
+ 
+ 	if (sch->parent != TC_H_INGRESS)
+ 		return;
+ 
+ 	tcf_block_put_ext(q->block, sch, &q->block_info);
+ 
+-	if (entry) {
++	if (mini_qdisc_pair_inited(&q->miniqp)) {
++		entry = rtnl_dereference(dev->tcx_ingress);
+ 		tcx_miniq_dec(entry);
+ 		if (!tcx_entry_is_active(entry)) {
+ 			tcx_entry_update(dev, NULL, true);
+@@ -290,10 +291,9 @@ static int clsact_init(struct Qdisc *sch, struct nlattr *opt,
+ 
+ static void clsact_destroy(struct Qdisc *sch)
+ {
++	struct bpf_mprog_entry *ingress_entry, *egress_entry;
+ 	struct clsact_sched_data *q = qdisc_priv(sch);
+ 	struct net_device *dev = qdisc_dev(sch);
+-	struct bpf_mprog_entry *ingress_entry = rtnl_dereference(dev->tcx_ingress);
+-	struct bpf_mprog_entry *egress_entry = rtnl_dereference(dev->tcx_egress);
+ 
+ 	if (sch->parent != TC_H_CLSACT)
+ 		return;
+@@ -301,7 +301,8 @@ static void clsact_destroy(struct Qdisc *sch)
+ 	tcf_block_put_ext(q->ingress_block, sch, &q->ingress_block_info);
+ 	tcf_block_put_ext(q->egress_block, sch, &q->egress_block_info);
+ 
+-	if (ingress_entry) {
++	if (mini_qdisc_pair_inited(&q->miniqp_ingress)) {
++		ingress_entry = rtnl_dereference(dev->tcx_ingress);
+ 		tcx_miniq_dec(ingress_entry);
+ 		if (!tcx_entry_is_active(ingress_entry)) {
+ 			tcx_entry_update(dev, NULL, true);
+@@ -309,7 +310,8 @@ static void clsact_destroy(struct Qdisc *sch)
+ 		}
+ 	}
+ 
+-	if (egress_entry) {
++	if (mini_qdisc_pair_inited(&q->miniqp_egress)) {
++		egress_entry = rtnl_dereference(dev->tcx_egress);
+ 		tcx_miniq_dec(egress_entry);
+ 		if (!tcx_entry_is_active(egress_entry)) {
+ 			tcx_entry_update(dev, NULL, false);
+-- 
+2.43.0
 
 
