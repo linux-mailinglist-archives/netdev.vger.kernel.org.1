@@ -1,217 +1,212 @@
-Return-Path: <netdev+bounces-267573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267574-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cPFeDf9qtGn9ngAAu9opvQ
-	(envelope-from <netdev+bounces-267573-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 20:52:31 +0100
+	id cA5jD3VvtGmboAAAu9opvQ
+	(envelope-from <netdev+bounces-267574-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:11:33 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAA2F289772
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 20:52:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4700289925
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:11:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 393E63026901
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 19:52:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A963C3031363
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 20:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3782F1E1A3B;
-	Fri, 13 Mar 2026 19:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F323DE44F;
+	Fri, 13 Mar 2026 20:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bT4aDX6C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC18C3B7B8C
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 19:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B8F34165B;
+	Fri, 13 Mar 2026 20:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773431547; cv=none; b=e0Hvt46QgRBBZRSjzCGLeCg1itp3hpkEnmWzfHBL55Edy2BGf+MZHGKf5jIHfZZfxQDdn/AOL7PM8w5IOrUWCcVt5VaX0ASNlJPZXzz+l+pDymIcdL7TmJe/hlNQ9nRIfb37UQhy1qvOyCfd1KJHYXC9EWjX1iw2df3QipLJcYc=
+	t=1773432686; cv=none; b=LTGDRhnbc43vhcY0AGPDhBVYm8oMVw1KVWhxpvtZrudzpnwGRCHJNvCnnRPxMTHLIooh//gjPuxHghY3FmoK1/BZBR4nqsYaDYr1rKPIY2ux4sgqufpA8igtuXgiN+QIO9ulLHoGb+r86GTX3mlfSlGLRTiWyxAL/FGfg5oquT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773431547; c=relaxed/simple;
-	bh=YApBVlUu+2S/kapEhJuQSZPcmgeIHWX8hy5i7qXFVqE=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=c4IrVhxcScu0uwW4cP8OgsK2k8mlaVO3kLs+g52lNYpOIVr1trcb3Z8RrLWXEYTcwAA9EAmlTz/pLHZsxACxssNoGDKQ4/611CDVOyA0LiF+ROS1s70oKrpOYLaZqkGV7UhIgx+xbLwT8XRJojL6xoiatoi/7l2C6GOTi+07BBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7d75b6b8500so24206658a34.2
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 12:52:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773431543; x=1774036343;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QlcCzVqc4HMaVVGRWjma4uIl3cVOYrUWB4AkvWKgRKQ=;
-        b=WtAYUT5k5DfpYSxT1x+5KIOkPDSHycRgtEvgSi+9mJ/dVtc3t9ksUJQx6eSNMICGAC
-         jhoVgWTo8madAxVYFB8zPTN/Lfh29chxuJ5PSMOBtqjlYejg7rmBKvCNIG52d4Sh+d69
-         bSSle0LAegH2CbHIV1Y1qfL1VpFhPoE88wAIM+4URHFFbDzuPvwOKUwPF/0uyWrdZ26j
-         JaEmTXVra9/3qItoA5AVyjCgxem0WjYSG3VDr0OWibjgZ27SGv3mMw1crAFiD+t0H1B4
-         aTNfzbiOoQ0lGWQzI65cg+5HsgFPukv00qGQHzRRDfPpaPJMmZAX7prLnnZ4Viarxy4y
-         a8NQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV8u2eVDiMic6sndvtFbM9vI4Jg6flSkAWaphc8J7Ean364UzKx0Bw4td4dVJDhFJp1QjgXHCI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUQuqLLhgKfFZh7NG00B6foBa/Nta+s+PWdO4k6eDFH9xLUHZJ
-	TGw09CVBllTt5zhsOrhzw1BreV4v5onk8e2MyjNXCu8IdS0EisIWByQkrGRBijRHUMIDooGvQMC
-	P+syk9SzZOzo3ZWDP3WuRyMt+Xt4jr7ukFcHrwh7RgR6njHsFpdlOyC63c+4=
+	s=arc-20240116; t=1773432686; c=relaxed/simple;
+	bh=SMPmzclyOIKQEi+ShtklVqvxCpyJHokDbfVTltDu+3M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kRlToBvQ0BCe/FMuF7qd2IdGJKRvezvhHVWcQ2aXCz87xiOfNwU1gN3wzLOTqW23DciW4mNHlNfrVRyTzhsxPNh9YPaCGjESxgnfDccUh+ObaVL8H/UssL1Ol5q1uNPhap4qbHAsFJekW8m5lEvHWEL6BkZgKs1bnljeW9ZeE/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bT4aDX6C; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773432686; x=1804968686;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SMPmzclyOIKQEi+ShtklVqvxCpyJHokDbfVTltDu+3M=;
+  b=bT4aDX6CQcrOwxC21NijNFDx3OjWFPVlxOU3Fq5rOsiGlItu6GVicdM2
+   gBGXKpCQM+pKw0olRAXGm3eLWbINue2SsBh3o6BnUxdQP5Yaw+UXj6mky
+   +1H6iUs7A7bEqQMcATCSbbKLv25RZh9zH5qcQ15MD/qoUoDABRqR7TUpW
+   zrIieomoXV2kVULArviW3s8ooXfyCMLomLA6gT1baS3fS6BvCMmwWDJpx
+   3aiv0cQm2drgK9x466RftKxnIp/5DRdhCQJ/6tCbxYf5kI7ZElb82siWq
+   uV7bqP3FwBI2iPir203kOZsVobGn4oxvRHNx74jJEpHHBsd691hCunnEE
+   Q==;
+X-CSE-ConnectionGUID: a1Z5r507SLG30j1Uwh9gqA==
+X-CSE-MsgGUID: Sbj+0bzFSHCJVLLsp+9w7A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11728"; a="74517787"
+X-IronPort-AV: E=Sophos;i="6.23,118,1770624000"; 
+   d="scan'208";a="74517787"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2026 13:11:22 -0700
+X-CSE-ConnectionGUID: 2kUbeFEFSaKhLs70W7WvSQ==
+X-CSE-MsgGUID: ev3j7rCVSJW5exQ6b/MdoA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,118,1770624000"; 
+   d="scan'208";a="246403671"
+Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
+  by fmviesa001.fm.intel.com with ESMTP; 13 Mar 2026 13:11:16 -0700
+Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w18qn-000000003hZ-0QxX;
+	Fri, 13 Mar 2026 20:11:13 +0000
+Date: Fri, 13 Mar 2026 21:10:41 +0100
+From: kernel test robot <lkp@intel.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH net-next v2 13/15] net: stmmac: add helper to set
+ transmit tail pointer
+Message-ID: <202603132104.OVIsnpBk-lkp@intel.com>
+References: <E1w0czK-0000000CzH7-19Fb@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1b05:b0:672:f683:7c54 with SMTP id
- 006d021491bc7-67bdaa924a6mr3110120eaf.69.1773431543561; Fri, 13 Mar 2026
- 12:52:23 -0700 (PDT)
-Date: Fri, 13 Mar 2026 12:52:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69b46af7.050a0220.36eb34.000e.GAE@google.com>
-Subject: [syzbot] [net?] general protection fault in bond_header_create
-From: syzbot <syzbot+3d8bc31c45e11450f24c@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	jv@jvosburgh.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [1.14 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1w0czK-0000000CzH7-19Fb@rmk-PC.armlinux.org.uk>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=ccef46afa67b2b19];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_FROM(0.00)[bounces-267573-lists,netdev=lfdr.de,3d8bc31c45e11450f24c];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,appspotmail.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,goo.gl:url,googlegroups.com:email,storage.googleapis.com:url];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267574-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: CAA2F289772
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: D4700289925
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+Hi Russell,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build errors:
 
-HEAD commit:    8004279c41ad Merge tag 'nfs-for-7.0-2' of git://git.linux-..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1593c416580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ccef46afa67b2b19
-dashboard link: https://syzkaller.appspot.com/bug?extid=3d8bc31c45e11450f24c
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=172d1416580000
+[auto build test ERROR on net-next/main]
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-8004279c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f56a78af5be3/vmlinux-8004279c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/89a6ba48229d/bzImage-8004279c.xz
+url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-stmmac-rearrange-stmmac_tx_info-members-to-pack-better/20260313-225823
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/E1w0czK-0000000CzH7-19Fb%40rmk-PC.armlinux.org.uk
+patch subject: [PATCH net-next v2 13/15] net: stmmac: add helper to set transmit tail pointer
+config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20260313/202603132104.OVIsnpBk-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260313/202603132104.OVIsnpBk-lkp@intel.com/reproduce)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3d8bc31c45e11450f24c@syzkaller.appspotmail.com
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603132104.OVIsnpBk-lkp@intel.com/
 
-Oops: general protection fault, probably for non-canonical address 0xe000080fee63d21a: 0000 [#1] SMP KASAN NOPTI
-KASAN: probably user-memory-access in range [0x0000607f731e90d0-0x0000607f731e90d7]
-CPU: 0 UID: 0 PID: 54 Comm: kworker/0:2 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-Workqueue: mld mld_ifc_work
-RIP: 0010:bond_header_create+0x150/0x300 drivers/net/bonding/bond_main.c:1524
-Code: e8 25 bd 59 fb 45 85 f6 0f 84 a5 00 00 00 e8 d7 b8 59 fb eb 05 e8 d0 b8 59 fb 48 85 ed 0f 84 89 00 00 00 48 89 e8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 ef e8 71 81 c5 fb 48 8b 6d 00 4c 8d 75
-RSP: 0018:ffffc90000b0f600 EFLAGS: 00010202
-RAX: 00000c0fee63d21a RBX: ffffffff866bf37b RCX: ffff888000c524c0
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 0000607f731e90d0 R08: ffffffff866bf37b R09: ffffffff8e75e420
-R10: dffffc0000000000 R11: ffffffff866bf340 R12: 00000000000086dd
-R13: ffff8880127763c0 R14: 0000000000000001 R15: dffffc0000000000
-FS:  0000000000000000(0000) GS:ffff88808ca55000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f2fbfe3ff8c CR3: 0000000012645000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- dev_hard_header include/linux/netdevice.h:3439 [inline]
- neigh_connected_output+0x286/0x460 net/core/neighbour.c:1644
- __ip6_finish_output net/ipv6/ip6_output.c:-1 [inline]
- ip6_finish_output+0x2e5/0x740 net/ipv6/ip6_output.c:219
- NF_HOOK_COND include/linux/netfilter.h:307 [inline]
- ip6_output+0x340/0x550 net/ipv6/ip6_output.c:246
- dst_output include/net/dst.h:470 [inline]
- NF_HOOK+0x177/0x4f0 include/linux/netfilter.h:318
- mld_sendpack+0x8b4/0xe40 net/ipv6/mcast.c:1855
- mld_send_cr net/ipv6/mcast.c:2154 [inline]
- mld_ifc_work+0x835/0xe70 net/ipv6/mcast.c:2693
- process_one_work kernel/workqueue.c:3275 [inline]
- process_scheduled_works+0xb02/0x1830 kernel/workqueue.c:3358
- worker_thread+0xa50/0xfc0 kernel/workqueue.c:3439
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:bond_header_create+0x150/0x300 drivers/net/bonding/bond_main.c:1524
-Code: e8 25 bd 59 fb 45 85 f6 0f 84 a5 00 00 00 e8 d7 b8 59 fb eb 05 e8 d0 b8 59 fb 48 85 ed 0f 84 89 00 00 00 48 89 e8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 ef e8 71 81 c5 fb 48 8b 6d 00 4c 8d 75
-RSP: 0018:ffffc90000b0f600 EFLAGS: 00010202
-RAX: 00000c0fee63d21a RBX: ffffffff866bf37b RCX: ffff888000c524c0
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 0000607f731e90d0 R08: ffffffff866bf37b R09: ffffffff8e75e420
-R10: dffffc0000000000 R11: ffffffff866bf340 R12: 00000000000086dd
-R13: ffff8880127763c0 R14: 0000000000000001 R15: dffffc0000000000
-FS:  0000000000000000(0000) GS:ffff88808ca55000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055e232d92000 CR3: 000000000e54c000 CR4: 0000000000352ef0
-----------------
-Code disassembly (best guess):
-   0:	e8 25 bd 59 fb       	call   0xfb59bd2a
-   5:	45 85 f6             	test   %r14d,%r14d
-   8:	0f 84 a5 00 00 00    	je     0xb3
-   e:	e8 d7 b8 59 fb       	call   0xfb59b8ea
-  13:	eb 05                	jmp    0x1a
-  15:	e8 d0 b8 59 fb       	call   0xfb59b8ea
-  1a:	48 85 ed             	test   %rbp,%rbp
-  1d:	0f 84 89 00 00 00    	je     0xac
-  23:	48 89 e8             	mov    %rbp,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	48 89 ef             	mov    %rbp,%rdi
-  34:	e8 71 81 c5 fb       	call   0xfbc581aa
-  39:	48 8b 6d 00          	mov    0x0(%rbp),%rbp
-  3d:	4c                   	rex.WR
-  3e:	8d                   	.byte 0x8d
-  3f:	75                   	.byte 0x75
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c: In function 'dwmac4_display_ring':
+>> drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:430:40: error: implicit declaration of function 'dma_desc_to_edesc' [-Wimplicit-function-declaration]
+     430 |                 struct dma_edesc *ep = dma_desc_to_edesc(head);
+         |                                        ^~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:430:40: error: initialization of 'struct dma_edesc *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+vim +/dma_desc_to_edesc +430 drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+   396	
+   397	static void dwmac4_display_ring(void *head, unsigned int size, bool rx,
+   398					dma_addr_t dma_rx_phy, unsigned int desc_size)
+   399	{
+   400		dma_addr_t dma_addr;
+   401		int i;
+   402	
+   403		pr_info("%s descriptor ring:\n", rx ? "RX" : "TX");
+   404	
+   405		if (desc_size == sizeof(struct dma_desc)) {
+   406			struct dma_desc *p = (struct dma_desc *)head;
+   407	
+   408			for (i = 0; i < size; i++) {
+   409				dma_addr = dma_rx_phy + i * sizeof(*p);
+   410				pr_info("%03d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
+   411					i, &dma_addr,
+   412					le32_to_cpu(p->des0), le32_to_cpu(p->des1),
+   413					le32_to_cpu(p->des2), le32_to_cpu(p->des3));
+   414				p++;
+   415			}
+   416		} else if (desc_size == sizeof(struct dma_extended_desc)) {
+   417			struct dma_extended_desc *extp = (struct dma_extended_desc *)head;
+   418	
+   419			for (i = 0; i < size; i++) {
+   420				dma_addr = dma_rx_phy + i * sizeof(*extp);
+   421				pr_info("%03d [%pad]: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n",
+   422					i, &dma_addr,
+   423					le32_to_cpu(extp->basic.des0), le32_to_cpu(extp->basic.des1),
+   424					le32_to_cpu(extp->basic.des2), le32_to_cpu(extp->basic.des3),
+   425					le32_to_cpu(extp->des4), le32_to_cpu(extp->des5),
+   426					le32_to_cpu(extp->des6), le32_to_cpu(extp->des7));
+   427				extp++;
+   428			}
+   429		} else if (desc_size == sizeof(struct dma_edesc)) {
+ > 430			struct dma_edesc *ep = dma_desc_to_edesc(head);
+   431	
+   432			for (i = 0; i < size; i++) {
+   433				dma_addr = dma_rx_phy + i * sizeof(*ep);
+   434				pr_info("%03d [%pad]: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n",
+   435					i, &dma_addr,
+   436					le32_to_cpu(ep->des4), le32_to_cpu(ep->des5),
+   437					le32_to_cpu(ep->des6), le32_to_cpu(ep->des7),
+   438					le32_to_cpu(ep->basic.des0), le32_to_cpu(ep->basic.des1),
+   439					le32_to_cpu(ep->basic.des2), le32_to_cpu(ep->basic.des3));
+   440				ep++;
+   441			}
+   442		} else {
+   443			pr_err("unsupported descriptor!");
+   444		}
+   445	}
+   446	
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
