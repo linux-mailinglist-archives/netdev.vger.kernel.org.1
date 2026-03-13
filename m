@@ -1,97 +1,86 @@
-Return-Path: <netdev+bounces-267602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267603-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNteGfl4tGmOogAAu9opvQ
-	(envelope-from <netdev+bounces-267602-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:52:09 +0100
+	id uOUXBMt+tGmuowAAu9opvQ
+	(envelope-from <netdev+bounces-267603-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:16:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 461FF289E82
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:52:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 588C128A13B
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:16:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3D82B302052D
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 20:52:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 02F98300A7EB
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 650A337F8AB;
-	Fri, 13 Mar 2026 20:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F25366DDB;
+	Fri, 13 Mar 2026 21:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="OsQB6JVr"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="xHrLuRMf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C28C37F8A5
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 20:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D4032D0F5
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 21:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773435127; cv=none; b=PK9xxyTBZH6Hjv8fk4TUB6TZjV8B0rqCdJ0rsRdapSlgqtgJgA66xchFgxiFTu3S4x6JmrvxKuBUbk/D6msKrXdsYbOnA34ky7MpcnStHJ/Ud6rBF0mHxh9oixrNfLux+DznwwFM08CaDm5di9g/rlEfd7lkuLLNVaTHYtH4UAA=
+	t=1773436616; cv=none; b=Acraqys93lUchvm38m6vU8HXzToc6G86Xq3U4XjgGT5MvjIPCQR8jhTI2EJPw6WBhzVkFep/slBoEO7XVvblTzkFHoEzQtEwgoKXeWf2OBxLVG3Bd7Hk2mP5zNsptS7NFv4kR4gL/eY8YOIlThKP6JfcdIVUQOtlv8KbGHaNkMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773435127; c=relaxed/simple;
-	bh=AFP9NZ/vqopfXgtkXW92y3xf2b8sr19klfhl7CQ56Jk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RGTWgXqyfqnAd4146nZ0luOw6TRhbYXQRf/duYooYnBbNTEY/S7nZ/vMb0+2zpEtdzjtWHZe1ios292TK+uzYCPG+TJ3uRsuXNppto9T527CQ9W1xYvHdGQeJL6u2x8aIzcmXQjnNPhcZFtXWXj3p+Bh7fjlw2UvZxzbmTYhW3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=OsQB6JVr; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-439ac15f35fso2263450f8f.0
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 13:52:02 -0700 (PDT)
+	s=arc-20240116; t=1773436616; c=relaxed/simple;
+	bh=eQfIYN4GbvFu6UA9ULp8eiVff//t+eMqXCXbSvrRc+0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GfZz30Jz64MlKr2j/Pvkg/NGdX/ZvkRCYe48reGQoxavUPheBJAgcCrRUe+hazGBO/YOg+y4kEkp3RVFccImse3mu8ZbPUEyKqaPanQ7FNZSX6QzV6g/j9JdrF7J0kzIMUlpPMPHiS0mevbEtQfrsWgOhjeNpxLM/L5K+ZgnVgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=xHrLuRMf; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2aaed195901so13065515ad.0
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 14:16:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1773435120; x=1774039920; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jPEi0ax5mTDuEvjQZIR/MRm1RUNDHNmjGN20GR2EhTI=;
-        b=OsQB6JVrlPcTJXd8d7g2y4/aKgET5B90LSx1WnqqciZbotPt03guwRXRsLwc98LmA7
-         gJFRSjWS0SAaa9ck0zw27jSjDQyQ2ne65lu2IDSihI9u6rbmcQahf3BGHx5xb9lhjHbA
-         lC1sn+egNPeNVXzJ+nbs4wI8CFhdm+l5i/7L5iP0T3dVQbvb82Gjuu2CCAviJ4cHP7LZ
-         194tUxJZFt/aXj34JnHLq8SDkk72olou78GZYf1fDC8gIh2rA7G8fZGbz9SKOMW4C7+j
-         3+b2Vz00mI9Wq02QyqxZlUahnoYUIoXn2foYM8TMgIqYVEMu+gKYefTiSbt6OiT1M1D1
-         3Vgg==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1773436614; x=1774041414; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tuqBXdlXf4e+rC//lnngpZombr90MC18ngsqsjbpz5I=;
+        b=xHrLuRMfMz6F+lc0re7XjuV1UZ7suOTumGKwqIkn9XWiwxOuoqnkzmy5qITUBvujRd
+         mJUlJHnD6BFgOD4m0tXjv8xPg3ohSw1lruV3VDADSyDThhcUDBVK7i3rwKVKtSnxIRZ/
+         wG+HkGApQnSDgWpL/4rnuA7oJbdfiS8svUY4rUsDdJN4AMsalh4KibfWZ9P+YdFWl4b8
+         YViiqxfOlzUPLrUwAbPuVguXYfgsHkJsX/qTd+aCNCzvK3xdX+We4RpVRHmZVgpbqxiF
+         AGdMszMz0JumikIGQ7WPSqmaYKCQV5CtyqnhF+TJd+UtNgQl7ZV6syvb0jFhLiOPCStU
+         kkQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773435120; x=1774039920;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=jPEi0ax5mTDuEvjQZIR/MRm1RUNDHNmjGN20GR2EhTI=;
-        b=P16HX9gqXO+WiFYZ3izRlpb+RsQ/htVbvdSGpvtBd8gFTwzRl8yMjR5IxeKcFH7ZkI
-         xItzapCYfVhD1zTdLm7KKyhNhQKQCbODZSreA2eTfAWuxJzLlI/4WBjVWC3Z/VUjQ5Ql
-         ei5uTsrWEPn+JSEKiB7KI/ukAZPnXfkGqu2bLbGDqxGV9fvSQwxL8KuVilP4gmzbYduY
-         ketLnxP4Qm0MBBh36d87VmrA+pxfK5A9SHMNUJODsl9gvLQwOfIfTQnt4N9cUbB0G6K7
-         QKpe7NalFBXRJvfHEbdpXPda8G5HUb6bqoLWub3nW+joVnMyrifPXNtW/wnlkZhIHLkS
-         RGMg==
-X-Gm-Message-State: AOJu0YzZ4V7YfB7mgh9BhhmpB+T/YRvHe1kmTafD3beowHRUbkJXfOWA
-	1zPeEVtcq96xI1D+ko8YxIa6j1e9k4nCG5qaIkn0PrdjsGUDJmj40iGFvhfIQpSPUXGmcfCPlAJ
-	90pr4Kd+ZP32+GdFLwQXo7ITFyIc/fP9cZZ8K3uxNwUdP2ZQXvXWysQTfO5+KBzvl
-X-Gm-Gg: ATEYQzwLPNX6wdMd7Ddb4BnFo/yKgimUgf8LAG31hoC11w8uUBA7MpFd8Hgve8F7WJ3
-	/vJXX6GZMd8oRKu8vvyLpoh5DVhl0v8J97OabvnSL6tAQ43a9pOc3fMeqVDsLLfe2gU0yg/K4kz
-	aMWA00fHiunVklRMi8V4iFC0vgxkuomThzwr4soNWIzgtGFy6XsuE2D4a48s9sxWphVFELBPc9M
-	vxfXTPvMvI51OFHzal3xe9HC/Wny4Hsq5nF684KYrZctbM/FG1vTH1B4j3lGI5U7X2cfDVQH5QA
-	Krf+JOXAu5Pxbh29RRjG9XtevIVtBtE2xZffcxNSf8iLUlE4tE1GP7P1p5XmmfWqbF6H6Uw/Lgc
-	fdURfJAyN0ek62k38p+RdGSR6LgaQShIu5X3q3se5AAudilQeyFJhoB2RQU0qZIkVx5FU4LKXpg
-	jk+pmMkSOcw2I4xvKjVbQM/i1xrO60QIUpnqIm
-X-Received: by 2002:a05:6000:2288:b0:439:b79d:b9a5 with SMTP id ffacd0b85a97d-43a04dae73dmr9252950f8f.37.1773435120133;
-        Fri, 13 Mar 2026 13:52:00 -0700 (PDT)
-Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:9684:4355:e76d:6ae9])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe2273d9sm23120468f8f.34.2026.03.13.13.51.58
+        d=1e100.net; s=20251104; t=1773436614; x=1774041414;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tuqBXdlXf4e+rC//lnngpZombr90MC18ngsqsjbpz5I=;
+        b=Wm5/Pcx9lYrATEdVz5ptdAWTKK0J+WZ7Nx6It6JDA6zTgMX7TUmLdwL8mZt+0SJ3Mh
+         OcqzKWJ+42/OTEblIfZOtGRCflHO0HHcTQpCx8jAsczclbG/ipv8CCbUIE4bh9fzQEXK
+         9Eu6Y4t2ICJMY7CaP/L2urSKE+RcX9u/jmdlXFQlaqYU4bVzLCCPRuNbIFNur10huk1x
+         4vUUuzkKcnMipAiYzDqoawF1TNYX6MU0QpW1ONsdv84sxKbakLBHZjCr0Kd6bBiD9mVU
+         nxkr80lVdkJ9s+lDyxozfWEymhJUxXHdxHOU2tP4xQXNeX+OhYxR5sXmhznZIrpxapQL
+         AzNg==
+X-Gm-Message-State: AOJu0Yz+mMA7iFbZyezZFxZe96RoRcdUF0gty2p1vT4Gt9Y+Tr2YlEUo
+	R02gc2TalLQmGtvk6nYxNbLujCIJbea4BcRH82h51vYAIlefp5v+cso4T1tAFHG6O25ZHYruayi
+	0U1uePlE=
+X-Gm-Gg: ATEYQzymNfM1eJyAdoMq58FrRPeMyDO/eiZ4AXkOtgx1mnr+9pGqmaV5Ag5DsHU82nn
+	uDn4TN4Kd7tyGoYU+MO0I001TClBEMhfglpNdjI9LsQb6IQG8Okuk9dtOTK/AlZpa2we/oFLVO/
+	2yZPXWgx7uWyrBhK1WRS8mqSypik+WAscEkSboo0uHiDQEQYIOjsVmR/gYp6d9M9ooRImZ+eMTm
+	lhFPsX77pY2BImYAjoKLUQGXvQOU7CqRz7t26dvM1JLjD2DD9kg0ixutS/tWbH3LSnbz0yx8S9H
+	TLe1IWhrx0VRALaKWqEfu2o2uqawfQbUFD5i6no/ZMMuCGBVFEEG/NL0TobX3h6K+ovdp0ReG2J
+	JubmIYMlZYEfIUJCIBVeIvzeTITJ4scfmN+7GwTCQrJosxdxAYGbe0LFIpkOOXqyAX/UvKqRfVQ
+	/aIw0G/4Z5OWNuVAhI3siZp1nhBE72OfDx
+X-Received: by 2002:a17:903:104a:b0:2ae:a624:cd57 with SMTP id d9443c01a7336-2aeca92c3c5mr30803675ad.7.1773436613356;
+        Fri, 13 Mar 2026 14:16:53 -0700 (PDT)
+Received: from phoenix.lan ([104.202.29.139])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece81afccsm31204195ad.68.2026.03.13.14.16.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2026 13:51:59 -0700 (PDT)
-From: Antonio Quartulli <antonio@openvpn.net>
+        Fri, 13 Mar 2026 14:16:53 -0700 (PDT)
+From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
-Cc: ralf@mandelbit.com,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net-next 9/9] ovpn: consolidate crypto allocations in one chunk
-Date: Fri, 13 Mar 2026 21:51:39 +0100
-Message-ID: <20260313205139.2950-10-antonio@openvpn.net>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260313205139.2950-1-antonio@openvpn.net>
-References: <20260313205139.2950-1-antonio@openvpn.net>
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH 00/12] netem: fixes, cleanup, and selftest
+Date: Fri, 13 Mar 2026 14:15:00 -0700
+Message-ID: <20260313211646.12549-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,350 +88,112 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267602-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWO(0.00)[2];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267603-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[openvpn.net:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[queasysnail.net:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 461FF289E82
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber.org:mid]
+X-Rspamd-Queue-Id: 588C128A13B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Ralf Lici <ralf@mandelbit.com>
+The netem packet scheduler is widely used for network emulation but
+has not gotten enough of my attention lately.
 
-Currently ovpn uses three separate dynamically allocated structures to
-set up cryptographic operations for both encryption and decryption. This
-adds overhead to performance-critical paths and contribute to memory
-fragmentation.
+The response to CVE-2024-45016 introduced check_netem_in_tree()
+which was a clear regression. It rejected valid configurations
+that have worked for over a decade -- HTB or HFSC trees with netem
+leaves, including examples from our own documentation. A fix that
+breaks existing users to paper over a bug that only occurred with
+hostile misconfiguration should never have been merged.
+Several approaches to undo the damage were discussed over
+the past year but none landed, and in the meantime we've
+accumulated four more CVE's and user bug reports.
 
-This commit consolidates those allocations into a single temporary blob,
-similar to what esp_alloc_tmp() does.
+The kernel management style doc says "the name of the game is to
+avoid having to make a decision" and to "not get ushered into a
+corner from which you cannot escape." Well, four CVE's and a pile
+of user bug reports later, I'm in that corner. Time to decide.
 
-The resulting performance gain is +7.7% and +4.3% for UDP when using AES
-and ChaChaPoly respectively, and +4.3% for TCP.
+I sat down with AI (Claude), reviewed the prior discussion, and
+put together a working solution. While I was at it, I had it do
+a deeper analysis of sch_netem.c which turned up several additional
+bugs that have been lurking for years.
 
-Signed-off-by: Ralf Lici <ralf@mandelbit.com>
-Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
----
- drivers/net/ovpn/crypto_aead.c | 160 +++++++++++++++++++++++++--------
- drivers/net/ovpn/io.c          |   8 +-
- drivers/net/ovpn/skb.h         |  13 ++-
- 3 files changed, 135 insertions(+), 46 deletions(-)
+The series:
 
-diff --git a/drivers/net/ovpn/crypto_aead.c b/drivers/net/ovpn/crypto_aead.c
-index 59848c41b7b2..8f07c418622b 100644
---- a/drivers/net/ovpn/crypto_aead.c
-+++ b/drivers/net/ovpn/crypto_aead.c
-@@ -36,6 +36,104 @@ static int ovpn_aead_encap_overhead(const struct ovpn_crypto_key_slot *ks)
- 		crypto_aead_authsize(ks->encrypt);	/* Auth Tag */
- }
- 
-+/**
-+ * ovpn_aead_crypto_tmp_size - compute the size of a temporary object containing
-+ *			       an AEAD request structure with extra space for SG
-+ *			       and IV.
-+ * @tfm: the AEAD cipher handle
-+ * @nfrags: the number of fragments in the skb
-+ *
-+ * This function calculates the size of a contiguous memory block that includes
-+ * the initialization vector (IV), the AEAD request, and an array of scatterlist
-+ * entries. For alignment considerations, the IV is placed first, followed by
-+ * the request, and then the scatterlist.
-+ * Additional alignment is applied according to the requirements of the
-+ * underlying structures.
-+ *
-+ * Return: the size of the temporary memory that needs to be allocated
-+ */
-+static unsigned int ovpn_aead_crypto_tmp_size(struct crypto_aead *tfm,
-+					      const unsigned int nfrags)
-+{
-+	unsigned int len = OVPN_NONCE_SIZE;
-+
-+	DEBUG_NET_WARN_ON_ONCE(crypto_aead_ivsize(tfm) != OVPN_NONCE_SIZE);
-+
-+	/* min size for a buffer of ivsize, aligned to alignmask */
-+	len += crypto_aead_alignmask(tfm) & ~(crypto_tfm_ctx_alignment() - 1);
-+	/* round up to the next multiple of the crypto ctx alignment */
-+	len = ALIGN(len, crypto_tfm_ctx_alignment());
-+
-+	/* reserve space for the AEAD request */
-+	len += sizeof(struct aead_request) + crypto_aead_reqsize(tfm);
-+	/* round up to the next multiple of the scatterlist alignment */
-+	len = ALIGN(len, __alignof__(struct scatterlist));
-+
-+	/* add enough space for nfrags + 2 scatterlist entries */
-+	len += array_size(sizeof(struct scatterlist), nfrags + 2);
-+	return len;
-+}
-+
-+/**
-+ * ovpn_aead_crypto_tmp_iv - retrieve the pointer to the IV within a temporary
-+ *			     buffer allocated using ovpn_aead_crypto_tmp_size
-+ * @aead: the AEAD cipher handle
-+ * @tmp: a pointer to the beginning of the temporary buffer
-+ *
-+ * This function retrieves a pointer to the initialization vector (IV) in the
-+ * temporary buffer. If the AEAD cipher specifies an IV size, the pointer is
-+ * adjusted using the AEAD's alignment mask to ensure proper alignment.
-+ *
-+ * Returns: a pointer to the IV within the temporary buffer
-+ */
-+static u8 *ovpn_aead_crypto_tmp_iv(struct crypto_aead *aead, void *tmp)
-+{
-+	return likely(crypto_aead_ivsize(aead)) ?
-+		      PTR_ALIGN((u8 *)tmp, crypto_aead_alignmask(aead) + 1) :
-+		      tmp;
-+}
-+
-+/**
-+ * ovpn_aead_crypto_tmp_req - retrieve the pointer to the AEAD request structure
-+ *			      within a temporary buffer allocated using
-+ *			      ovpn_aead_crypto_tmp_size
-+ * @aead: the AEAD cipher handle
-+ * @iv: a pointer to the initialization vector in the temporary buffer
-+ *
-+ * This function computes the location of the AEAD request structure that
-+ * immediately follows the IV in the temporary buffer and it ensures the request
-+ * is aligned to the crypto transform context alignment.
-+ *
-+ * Returns: a pointer to the AEAD request structure
-+ */
-+static struct aead_request *ovpn_aead_crypto_tmp_req(struct crypto_aead *aead,
-+						     const u8 *iv)
-+{
-+	return (void *)PTR_ALIGN(iv + crypto_aead_ivsize(aead),
-+				 crypto_tfm_ctx_alignment());
-+}
-+
-+/**
-+ * ovpn_aead_crypto_req_sg - locate the scatterlist following the AEAD request
-+ *			     within a temporary buffer allocated using
-+ *			     ovpn_aead_crypto_tmp_size
-+ * @aead: the AEAD cipher handle
-+ * @req: a pointer to the AEAD request structure in the temporary buffer
-+ *
-+ * This function computes the starting address of the scatterlist that is
-+ * allocated immediately after the AEAD request structure. It aligns the pointer
-+ * based on the alignment requirements of the scatterlist structure.
-+ *
-+ * Returns: a pointer to the scatterlist
-+ */
-+static struct scatterlist *ovpn_aead_crypto_req_sg(struct crypto_aead *aead,
-+						   struct aead_request *req)
-+{
-+	return (void *)ALIGN((unsigned long)(req + 1) +
-+			     crypto_aead_reqsize(aead),
-+			     __alignof__(struct scatterlist));
-+}
-+
- int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 		      struct sk_buff *skb)
- {
-@@ -45,6 +143,7 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	struct scatterlist *sg;
- 	int nfrags, ret;
- 	u32 pktid, op;
-+	void *tmp;
- 	u8 *iv;
- 
- 	ovpn_skb_cb(skb)->peer = peer;
-@@ -71,13 +170,17 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	if (unlikely(nfrags + 2 > (MAX_SKB_FRAGS + 2)))
- 		return -ENOSPC;
- 
--	/* sg may be required by async crypto */
--	ovpn_skb_cb(skb)->sg = kmalloc(sizeof(*ovpn_skb_cb(skb)->sg) *
--				       (nfrags + 2), GFP_ATOMIC);
--	if (unlikely(!ovpn_skb_cb(skb)->sg))
-+	/* allocate temporary memory for iv, sg and req */
-+	tmp = kmalloc(ovpn_aead_crypto_tmp_size(ks->encrypt, nfrags),
-+		      GFP_ATOMIC);
-+	if (unlikely(!tmp))
- 		return -ENOMEM;
- 
--	sg = ovpn_skb_cb(skb)->sg;
-+	ovpn_skb_cb(skb)->crypto_tmp = tmp;
-+
-+	iv = ovpn_aead_crypto_tmp_iv(ks->encrypt, tmp);
-+	req = ovpn_aead_crypto_tmp_req(ks->encrypt, iv);
-+	sg = ovpn_aead_crypto_req_sg(ks->encrypt, req);
- 
- 	/* sg table:
- 	 * 0: op, wire nonce (AD, len=OVPN_OP_SIZE_V2+OVPN_NONCE_WIRE_SIZE),
-@@ -105,13 +208,6 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	if (unlikely(ret < 0))
- 		return ret;
- 
--	/* iv may be required by async crypto */
--	ovpn_skb_cb(skb)->iv = kmalloc(OVPN_NONCE_SIZE, GFP_ATOMIC);
--	if (unlikely(!ovpn_skb_cb(skb)->iv))
--		return -ENOMEM;
--
--	iv = ovpn_skb_cb(skb)->iv;
--
- 	/* concat 4 bytes packet id and 8 bytes nonce tail into 12 bytes
- 	 * nonce
- 	 */
-@@ -130,12 +226,6 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	/* AEAD Additional data */
- 	sg_set_buf(sg, skb->data, OVPN_AAD_SIZE);
- 
--	req = aead_request_alloc(ks->encrypt, GFP_ATOMIC);
--	if (unlikely(!req))
--		return -ENOMEM;
--
--	ovpn_skb_cb(skb)->req = req;
--
- 	/* setup async crypto operation */
- 	aead_request_set_tfm(req, ks->encrypt);
- 	aead_request_set_callback(req, 0, ovpn_encrypt_post, skb);
-@@ -156,6 +246,7 @@ int ovpn_aead_decrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	struct aead_request *req;
- 	struct sk_buff *trailer;
- 	struct scatterlist *sg;
-+	void *tmp;
- 	u8 *iv;
- 
- 	payload_offset = OVPN_AAD_SIZE + tag_size;
-@@ -184,13 +275,17 @@ int ovpn_aead_decrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	if (unlikely(nfrags + 2 > (MAX_SKB_FRAGS + 2)))
- 		return -ENOSPC;
- 
--	/* sg may be required by async crypto */
--	ovpn_skb_cb(skb)->sg = kmalloc(sizeof(*ovpn_skb_cb(skb)->sg) *
--				       (nfrags + 2), GFP_ATOMIC);
--	if (unlikely(!ovpn_skb_cb(skb)->sg))
-+	/* allocate temporary memory for iv, sg and req */
-+	tmp = kmalloc(ovpn_aead_crypto_tmp_size(ks->decrypt, nfrags),
-+		      GFP_ATOMIC);
-+	if (unlikely(!tmp))
- 		return -ENOMEM;
- 
--	sg = ovpn_skb_cb(skb)->sg;
-+	ovpn_skb_cb(skb)->crypto_tmp = tmp;
-+
-+	iv = ovpn_aead_crypto_tmp_iv(ks->decrypt, tmp);
-+	req = ovpn_aead_crypto_tmp_req(ks->decrypt, iv);
-+	sg = ovpn_aead_crypto_req_sg(ks->decrypt, req);
- 
- 	/* sg table:
- 	 * 0: op, wire nonce (AD, len=OVPN_OPCODE_SIZE+OVPN_NONCE_WIRE_SIZE),
-@@ -213,24 +308,11 @@ int ovpn_aead_decrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	/* append auth_tag onto scatterlist */
- 	sg_set_buf(sg + ret + 1, skb->data + OVPN_AAD_SIZE, tag_size);
- 
--	/* iv may be required by async crypto */
--	ovpn_skb_cb(skb)->iv = kmalloc(OVPN_NONCE_SIZE, GFP_ATOMIC);
--	if (unlikely(!ovpn_skb_cb(skb)->iv))
--		return -ENOMEM;
--
--	iv = ovpn_skb_cb(skb)->iv;
--
- 	/* copy nonce into IV buffer */
- 	memcpy(iv, skb->data + OVPN_OPCODE_SIZE, OVPN_NONCE_WIRE_SIZE);
- 	memcpy(iv + OVPN_NONCE_WIRE_SIZE, ks->nonce_tail_recv,
- 	       OVPN_NONCE_TAIL_SIZE);
- 
--	req = aead_request_alloc(ks->decrypt, GFP_ATOMIC);
--	if (unlikely(!req))
--		return -ENOMEM;
--
--	ovpn_skb_cb(skb)->req = req;
--
- 	/* setup async crypto operation */
- 	aead_request_set_tfm(req, ks->decrypt);
- 	aead_request_set_callback(req, 0, ovpn_decrypt_post, skb);
-@@ -273,7 +355,11 @@ static struct crypto_aead *ovpn_aead_init(const char *title,
- 		goto error;
- 	}
- 
--	/* basic AEAD assumption */
-+	/* basic AEAD assumption
-+	 * all current algorithms use OVPN_NONCE_SIZE.
-+	 * ovpn_aead_crypto_tmp_size and ovpn_aead_encrypt/decrypt
-+	 * expect this.
-+	 */
- 	if (crypto_aead_ivsize(aead) != OVPN_NONCE_SIZE) {
- 		pr_err("%s IV size must be %d\n", title, OVPN_NONCE_SIZE);
- 		ret = -EINVAL;
-diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
-index 955c9a37e1f8..db43a1f8a07a 100644
---- a/drivers/net/ovpn/io.c
-+++ b/drivers/net/ovpn/io.c
-@@ -119,9 +119,7 @@ void ovpn_decrypt_post(void *data, int ret)
- 	peer = ovpn_skb_cb(skb)->peer;
- 
- 	/* crypto is done, cleanup skb CB and its members */
--	kfree(ovpn_skb_cb(skb)->iv);
--	kfree(ovpn_skb_cb(skb)->sg);
--	aead_request_free(ovpn_skb_cb(skb)->req);
-+	kfree(ovpn_skb_cb(skb)->crypto_tmp);
- 
- 	if (unlikely(ret < 0))
- 		goto drop;
-@@ -248,9 +246,7 @@ void ovpn_encrypt_post(void *data, int ret)
- 	peer = ovpn_skb_cb(skb)->peer;
- 
- 	/* crypto is done, cleanup skb CB and its members */
--	kfree(ovpn_skb_cb(skb)->iv);
--	kfree(ovpn_skb_cb(skb)->sg);
--	aead_request_free(ovpn_skb_cb(skb)->req);
-+	kfree(ovpn_skb_cb(skb)->crypto_tmp);
- 
- 	if (unlikely(ret == -ERANGE)) {
- 		/* we ran out of IVs and we must kill the key as it can't be
-diff --git a/drivers/net/ovpn/skb.h b/drivers/net/ovpn/skb.h
-index 64430880f1da..4fb7ea025426 100644
---- a/drivers/net/ovpn/skb.h
-+++ b/drivers/net/ovpn/skb.h
-@@ -18,12 +18,19 @@
- #include <linux/socket.h>
- #include <linux/types.h>
- 
-+/**
-+ * struct ovpn_cb - ovpn skb control block
-+ * @peer: the peer this skb was received from/sent to
-+ * @ks: the crypto key slot used to encrypt/decrypt this skb
-+ * @crypto_tmp: pointer to temporary memory used for crypto operations
-+ *		containing the IV, the scatter gather list and the aead request
-+ * @payload_offset: offset in the skb where the payload starts
-+ * @nosignal: whether this skb should be sent with the MSG_NOSIGNAL flag (TCP)
-+ */
- struct ovpn_cb {
- 	struct ovpn_peer *peer;
- 	struct ovpn_crypto_key_slot *ks;
--	struct aead_request *req;
--	struct scatterlist *sg;
--	u8 *iv;
-+	void *crypto_tmp;
- 	unsigned int payload_offset;
- 	bool nosignal;
- };
+  Patch 01: selftest covering basic ops, multi-netem trees,
+            inner qdisc combos, and crash-resistance scenarios
+            for the CVE topologies.
+
+  Patch 02: Revert the check_netem_in_tree() restriction.
+  Patch 03: Replace it with a per-CPU recursion guard -- the
+            approach that was discussed but dismissed prematurely.
+  Patch 04: Restructure dequeue to eliminate the re-entrancy path
+            that causes HFSC eltree corruption (CVE-2025-37890,
+            CVE-2025-38001).
+
+  Patch 05: Fix probability gaps in the 4-state loss model.
+  Patch 06: Fix slot delay calculation overflow for ranges > 2.1s.
+  Patch 07: Include reordered packets in the queue limit check.
+  Patch 08: Null-terminate the tfifo linear queue tail.
+  Patch 09: Only reseed PRNG when seed is explicitly provided.
+
+  Patch 10: Move state enums out of struct (cleanup).
+  Patch 11: Remove useless VERSION string.
+  Patch 12: Replace pr_info with netlink extack messages.
+
+Patches 01-04 are the CVE-related fixes and should go to net.
+Patches 05-09 are additional bug fixes.
+Patches 10-12 are cleanup and could go to net-next if preferred.
+
+Stephen Hemminger (12):
+  selftests: net: add netem qdisc test
+  Revert "net/sched: Restrict conditions for adding duplicating netems
+    to qdisc tree"
+  net/sched: netem: add per-CPU recursion guard for duplication
+  net/sched: netem: restructure dequeue to avoid re-entrancy with child
+    qdisc
+  net/sched: netem: fix probability gaps in 4-state loss model
+  net/sched: netem: fix slot delay calculation overflow
+  net/sched: netem: fix queue limit check to include reordered packets
+  net/sched: netem: null-terminate tfifo linear queue tail
+  net/sched: netem: only reseed PRNG when seed is explicitly provided
+  net/sched: netem: move state enums out of struct netem_sched_data
+  net/sched: netem: remove useless VERSION
+  net/sched: netem: replace pr_info with netlink extack error messages
+
+ MAINTAINERS                          |   1 +
+ net/sched/sch_netem.c                | 219 ++++----
+ tools/testing/selftests/net/Makefile |   1 +
+ tools/testing/selftests/net/config   |   3 +
+ tools/testing/selftests/net/netem.sh | 802 +++++++++++++++++++++++++++
+ 5 files changed, 923 insertions(+), 103 deletions(-)
+ create mode 100755 tools/testing/selftests/net/netem.sh
+
 -- 
-2.52.0
+2.51.0
 
 
