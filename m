@@ -1,193 +1,183 @@
-Return-Path: <netdev+bounces-267243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267244-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UBKKIglds2nfVQAAu9opvQ
-	(envelope-from <netdev+bounces-267243-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:40:41 +0100
+	id AOScMwtfs2lcVgAAu9opvQ
+	(envelope-from <netdev+bounces-267244-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:49:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E823327BAE9
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:40:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32BB127BF0E
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:49:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 441363087E19
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 00:39:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 85E51316D921
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 00:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831862D46B3;
-	Fri, 13 Mar 2026 00:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F95305968;
+	Fri, 13 Mar 2026 00:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HcjYSCiO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EL4whyQg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D1B2C1584
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 00:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773362358; cv=none; b=Lo+WFCwd0CQMQtnutQjlAcUN1RyL+pTbDTopU3HaxY3edzCDUbpJdUd8TWdKMUdG7hULJfyxFuj4ZADBpZmSwkLKeBh9+jvdkzVCtp1zpHU7sgms6S9xQ78kwyAmAj6LJ1Yr4gWusmONZAYERrMNmfXTPcAfaf5pQh9EQluZn38=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773362358; c=relaxed/simple;
-	bh=OAu8UlbgUd1nMPgKQB2dY98piL++9stgqPW2B9hO9gE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ta1Tie+vEpJFbCw9yRdXdm1kbAGf221D8GjA0yCtoJNf2TtRr1kzi5a9RSRo4+PlEXm/P7eagP9b1NoRs60ev43/nPMjXNNs+9+W1BmdS8DT6s1w/iEoI+W9jGlbyhyPC/Xb6VuHg1ZsGD/JHEeCvmNsuS/gnttzFeWaYI/GVBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HcjYSCiO; arc=none smtp.client-ip=209.85.167.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA9530AAD8
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 00:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773362687; cv=pass; b=NyB93oTlzdVTvAu4br6XrkPLY5bDowFYx5XbZqu0+FUE2zCAyEP3T3EFuwFIm2m5R7PuG5gE8s+uXL3NupOOFxV7atUBxFrorb0U1jP7dw3a9/7uW4kbhTkV/8tAmxT3M4XO6oSnhOxuoYC5sH2oMdvv6XXyKpjOu+6du6lpBLg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773362687; c=relaxed/simple;
+	bh=vEE4ep3471N407vnkg/dcy+srHoLtul6c5WBfTWv6RE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SJwiysUAkLAr8HdLvfd8/9L14x9ZOtBBoec0vpkZdzWkfMPGA/uKyBeiQ1A4GOyak8g8JLlrjxA2RZeNx45orVL41pSsJOeo5vmpbR5IyYDXWjmZ0UxJltxdiFJHrsSy6fW6gm4zgCq/BOFGZ+7WidYzRR6Dd7x99YfKxh68pPM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EL4whyQg; arc=pass smtp.client-ip=209.85.208.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-466f1c3c627so1192900b6e.1
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 17:39:15 -0700 (PDT)
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-38a3c62d7d2so12307281fa.1
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 17:44:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773362682; cv=none;
+        d=google.com; s=arc-20240605;
+        b=devrf+q3TEab1clHEYl0RbF6L6LgirbOKAJXfHIKftta+N7+p9Zu1pOiMfVxwC6kmu
+         5DFc3n6UTW/+WY/wbAvx61kObn+9aTTN+lmWvzx0VMJl9yXFcsQrSC9kTOXHXzlb0yPj
+         4fRPvcLVYs1j/TrQxef5gBeoRALky1hGtcmmcFqXHEFTnFTufrou75PgMSLyyIyCgOow
+         wYDoj2SdNsM3ufyk1nDKGeRUs9LUuSsUIyWq58ZUXXX2bqY2frK36QLVQXGfFF7S6yCe
+         0233TT+Zf0XdpAmzhSrWtQeLQ+cbSVo+uNmp6DnqZNXRoODTsPWEurDBamkUGkEMYURp
+         xBjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=vEE4ep3471N407vnkg/dcy+srHoLtul6c5WBfTWv6RE=;
+        fh=ed4O/8ZCiyAId0BwWRvmKLZt4v5N6Z/mU/J7suH7CyA=;
+        b=Zz9gUyAcmrbi3XaFbiGNXMTty4qnpXytkl5/z/GPOuEW/wYegvhsX5wWGeqx39BTHq
+         62CUN1n6fBdGq1mSBjCZ8onzQiM3tkEmwvelOAKphD9+nx7FQsqajwVl38UnaxBoddhX
+         obJMVVaGRn2KUWc55S4ogK0qZFyG3CGQ2CtuSWZt1KcnvdvJfh8Ci+AWCkesZwBlHdCh
+         MO4nriYYYcVyh6x6nvZ2QOHXIFvewv463wfVFM2p2Qrx/Slg9o0p7i3MkST3dS8If5iv
+         vZ/jApLq2yEDmRASPeFVR2GVhuPlr/jPErfv915oMvUFCXBgIxU8mgXGThANPRlEhuP9
+         Iq0A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773362354; x=1773967154; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zNk5qBnCRvn/ZWo31W3zBycf6HNs4s8EDW3tGXetEGw=;
-        b=HcjYSCiO7XfWyTezFyt76j2dNuHQVMj36+JN3W78Z0xoguF6zHDghDFsfpmj388amQ
-         C/dY74X3JyAn6HrWBisUbuQr62VEx9QU7d9iqq/4fvSsd7jHxKMaCpnUtzVVFCrjE8Mc
-         vqTLH34JTzZ7IFyPoM/kWht2L1OjfWfMzfLRl9M/9F1OiSmgdZPysnXFGLABAlCAUFxM
-         DELNzeoY5RqWdQYgEYblJ15k2/PXt5ghebn1yNMT1S4StjwqbZjQUbO1fGKEPKooAeTK
-         x4Nxh9vDjWCr819l2hyRNRxJCRePZXjxdCnJGQkLIAosRZZN8CuOAH0uxmM4RMRvKREV
-         Z00A==
+        d=gmail.com; s=20230601; t=1773362682; x=1773967482; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vEE4ep3471N407vnkg/dcy+srHoLtul6c5WBfTWv6RE=;
+        b=EL4whyQgfIx79t8s+q3Z/G7NOlkIkec9mqzp+SHDkWZFDJ/KSTde25MORvdBTbCgjB
+         IjUxtXAj9UuOBeJc4GAY5gGaAfIlm8DidGISJazKd0yIUOAAiBIw1QGNhZmItdessXED
+         z86w3WJkr7/UKYnHIM10adyjnom1oaPj6UkUDzFa/9HCbJsbVDQCuKyplk2Wu7ZyZyAf
+         qFKJEGn+uTBKhsRvPoNS7LMuTvDTA695qkpRViLGJOH6GOLQTzrk5eAs1xI3uUKOrp59
+         UjG9VdVPBHatf5WpVZHKegwTFuA4VjBszPn2iRwQXuMim7hKGQeovM3H9YIuYjxntOiT
+         hpwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773362354; x=1773967154;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1773362682; x=1773967482;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zNk5qBnCRvn/ZWo31W3zBycf6HNs4s8EDW3tGXetEGw=;
-        b=KgWwLHmLMRH+kqbSOUtXAJmSD1sTVMt1NDUDkyAKgwzU8GJDKpuHe/vq92PFszUAC+
-         dbEDGS5+ga39UfHrY9ehTkuH7rLZzn3LHxXCCN1Gn1u5krowHt+tcD03mQQDl14/FE4k
-         xG5Px4gqVBGgDYEg2ykniRLCQmf9ZadOJnzX/WnLXRB6U3rar7TUYruN4FkkuGVEDjCW
-         eSSDb8827ldxEiy0reJCbxR1ZugSiRCye3w7fINiWZJGDzeCJZ2UFLI2BJVsiriWvQ/o
-         vqjH7JGR/QRwOg+SXKiiLRv6JBEAfytiDHvVxK6GeSPYgKiZyUnw/07xFJLaDBdzD17O
-         DULA==
-X-Gm-Message-State: AOJu0YwNOYr/RN903PeTxDuui1WvPcFrBQDVHTB9bnrTKs/G/W8e+1Tt
-	zGYAqo8W9RCBQ9D4iQ18nDzCOrx3kn9dSRwxfGZ8gs2Q0oZmk6kBqc6OQcIVcmupKQs=
-X-Gm-Gg: ATEYQzxyxcvyiKzJz9JBhoHJ+PzhlvoQ6YWWMcmGTYC7ShAE6/AcN5dg2iZNiUAEjl2
-	B/NVJ9GnzO5NZba68c1yvXmRPMCVMk1TQqQLilE/8FL4qN5ziPuiCWl2WaZbJkHVhRI+8BQtVAL
-	XjPZPv6vT9qPesfXsjQkA5RD0xMg80l79y1L3MoUIj55jNJ8NGA3dCHWf06ccpfh0l+smyn6PkC
-	iqYNlwIzyv/kTeL/FeInKe0pxXM1ZiEKgd3+dSYSRCfdjRA0uLBG6jx47+L0uFDyrj33P1A83ss
-	DeYLTYfAWwgWwGpetLqhJa/Xp6NeJcHMU/fIRLT+2xmsd5IR7b0Db12kTugxbBVktJFUF5LDYBW
-	eUkLevucwbDziOvGcRfHeb7blsC5JdL/6wUQbufu2o2wrvWrod4rI3nqhrAheeOuosr68jgP/nw
-	1aKRf+DcjgVxsM7kXro5cDMLS2cx5TOMPDbduUt5HTwLxl7i9ZekOy1Zzn8XG1w5gHvu2UkgSVs
-	QgF0vhxrrXU
-X-Received: by 2002:a05:6808:c1d8:b0:463:8fba:5df5 with SMTP id 5614622812f47-46757196fdbmr782847b6e.24.1773362353889;
-        Thu, 12 Mar 2026 17:39:13 -0700 (PDT)
-Received: from ShravyaPC.. (r74-192-25-180.bcstcmta01.clsttx.tl.dh.suddenlink.net. [74.192.25.180])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-46743aca62fsm2448030b6e.2.2026.03.12.17.39.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 17:39:13 -0700 (PDT)
-From: ShravyaPanchagiri <shravy112@gmail.com>
-To: netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	ShravyaPanchagiri <shravy112@gmail.com>
-Subject: [PATCH] net: ifb: fix space after comma in for loops
-Date: Thu, 12 Mar 2026 19:36:51 -0500
-Message-ID: <20260313003651.65612-1-shravy112@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=vEE4ep3471N407vnkg/dcy+srHoLtul6c5WBfTWv6RE=;
+        b=FdKf21pBcRJmLdFiVPxS+LzThSuQIAQP1bi1gt9JRNi2utNhXUEmZZVykeu/U7Xkq5
+         czDA7gSUPg6FmkPWtu8FOYhYkapD2AB7uKW4GFFWISg9I1o54PoOLYBB+L2Gz7REszuM
+         zPf21QKJ24V0FHH69a9FOEqMptqkr2BJPsD2+7qQ7ZzmoOxxYepeFanay6G9wZpVih6P
+         scxdKVDYLh5wCNIXy0ymNx93a0RrVulINHPXPEMMLjNXIJ+Gl+6Zu/UKifbrDtX1UoJU
+         TVkZNgSXSzyUDD1FB4HRVev2CyOdSuIS+d5Zgw7lFsYeu5ehy/u9aV+fnOUNvxcS2i+a
+         L4tA==
+X-Forwarded-Encrypted: i=1; AJvYcCWPKbPLjwAyQvqOLTQF+Or7SfuLiMaiJ2dg/IIDEH9deCSjmm6AyIV3UkkZwFNu36IoitQa3w0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlA/c/7xKGqa0sgSbAEeMf1naiSpOVxuutZTg28qF9qhZGd2Rk
+	d0NsPV35dxfK3bPBfABJvtq0MM4acaZHuFWoBUpbJnhMkpJ+AqpOESzwq4WALop/0npmSeL3MEZ
+	Jul5Cv8o52vOTXkJIJ4jL2AG0VxtRtXU=
+X-Gm-Gg: ATEYQzzUnOih37Un4+bfn2ovUsrnZeAb72eobw4wjCZlegAdCbPA0+lYkkv28O+JiqK
+	7i79llto+Xn0hDq2thfNLj1I0JUrhZrHzpTKI5oKK/kARYyVRvUch/Q4drdBkCZLWIlws1SPTiR
+	vpJJEUIcLI81olZ69Qcwz37EfHd4Ra4JNE93K97MPznpCBrZnuqLOG+8tTb6R8IoH6QDBBrpQTJ
+	iLriQRabknJPFVJoPMKbgSAejsOb9rLJAgIVdg2kHHJJgupKsy3esBM6hEqEw5mY52BGFAfjwHb
+	CRboBP0oaQ==
+X-Received: by 2002:a2e:b165:0:b0:38a:523a:7fdc with SMTP id
+ 38308e7fff4ca-38a89815630mr2973321fa.34.1773362681777; Thu, 12 Mar 2026
+ 17:44:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+References: <20260310151935.33197-1-muchamadcoirulanwar@gmail.com>
+ <917edd8c-cda0-4d35-8300-47205a975a81@lunn.ch> <CAO26r3S_zF4CWt1Ms3rwWqR-Rm4FCu4YRCTKVYbtJdmJEnVwQg@mail.gmail.com>
+ <64ea50d9-4c7f-4c91-a686-718f0700580d@lunn.ch>
+In-Reply-To: <64ea50d9-4c7f-4c91-a686-718f0700580d@lunn.ch>
+From: Muchamad Coirul Anwar <muchamadcoirulanwar@gmail.com>
+Date: Fri, 13 Mar 2026 07:44:29 +0700
+X-Gm-Features: AaiRm52aNzX4g59LYjJhJCLj610l2cWD5rtEGSfp77I63CPBYNzCO18hevaT9_E
+Message-ID: <CAO26r3RjhPdU1-y909xuPRw0xp6PS5O2LRZcEr7-EMB=R-siGg@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] net: phy: rust: add experimental Davicom PHY driver
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: hkallweit1@gmail.com, ojeda@kernel.org, linux@armlinux.org.uk, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267244-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,armlinux.org.uk,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267243-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shravy112@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[muchamadcoirulanwar@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E823327BAE9
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,lunn.ch:email]
+X-Rspamd-Queue-Id: 32BB127BF0E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add missing space after comma in for loop to fix checkpatch errors.
+Hi Andrew,
 
-Signed-off-by: ShravyaPanchagiri <shravy112@gmail.com>
----
- drivers/net/ifb.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+On Wed, Mar 11, 2026 at 20:36 Andrew Lunn <andrew@lunn.ch> wrote:
+> That is not really how Linux works. The Maintainers don't go out
+> searching for hardware which should be supported. Developers come to
+> us with patches.
+>
+> One place you might look is Openwrt. They often have drivers for
+> hardware which never make it upstream to Mainline. Take such a driver,
+> buy the hardware, and port it to Rust. But please make sure it is
+> really a new device, not just a variant of an existing family of
+> devices which already has a driver.
 
-diff --git a/drivers/net/ifb.c b/drivers/net/ifb.c
-index 5407d2ed71b3..58a49ed5aabe 100644
---- a/drivers/net/ifb.c
-+++ b/drivers/net/ifb.c
-@@ -18,12 +18,10 @@
- 	You need the tc action  mirror or redirect to feed this device
- 	packets.
- 
--
- 	Authors:	Jamal Hadi Salim (2005)
- 
- */
- 
--
- #include <linux/module.h>
- #include <linux/kernel.h>
- #include <linux/netdevice.h>
-@@ -148,7 +146,6 @@ static void ifb_ri_tasklet(struct tasklet_struct *t)
- 		txp->tasklet_pending = 1;
- 		tasklet_schedule(&txp->ifb_tasklet);
- 	}
--
- }
- 
- static void ifb_stats64(struct net_device *dev,
-@@ -160,7 +157,7 @@ static void ifb_stats64(struct net_device *dev,
- 	u64 packets, bytes;
- 	int i;
- 
--	for (i = 0; i < dev->num_tx_queues; i++,txp++) {
-+	for (i = 0; i < dev->num_tx_queues; i++, txp++) {
- 		do {
- 			start = u64_stats_fetch_begin(&txp->rx_stats.sync);
- 			packets = u64_stats_read(&txp->rx_stats.packets);
-@@ -191,7 +188,7 @@ static int ifb_dev_init(struct net_device *dev)
- 	if (!txp)
- 		return -ENOMEM;
- 	dp->tx_private = txp;
--	for (i = 0; i < dev->num_tx_queues; i++,txp++) {
-+	for (i = 0; i < dev->num_tx_queues; i++, txp++) {
- 		txp->txqnum = i;
- 		txp->dev = dev;
- 		__skb_queue_head_init(&txp->rq);
-@@ -299,7 +296,7 @@ static void ifb_dev_free(struct net_device *dev)
- 	struct ifb_q_private *txp = dp->tx_private;
- 	int i;
- 
--	for (i = 0; i < dev->num_tx_queues; i++,txp++) {
-+	for (i = 0; i < dev->num_tx_queues; i++, txp++) {
- 		tasklet_kill(&txp->ifb_tasklet);
- 		__skb_queue_purge(&txp->rq);
- 		__skb_queue_purge(&txp->tq);
--- 
-2.43.0
+Thank you for the excellent pointer regarding OpenWrt. I wasn't fully
+aware of how many out-of-tree drivers are maintained there out of
+necessity.
 
+I will spend the next week researching the OpenWrt source tree for
+unsupported PHY chips. My goal is to find a device that strictly meets
+three criteria: it is a genuinely new chip (not a variant), the
+hardware is physically purchasable, and the register datasheet is
+publicly available without an NDA.
+
+If hardware availability or closed documentation proves to be a hard
+blocker after this timeboxed research, I will likely pivot to other
+subsystems (such as IIO or hwmon) where hardware documentation is
+generally more open, to continue my Rust driver contributions.
+
+I will drop this Davicom RFC for now. Thank you again for your time,
+review, and for pointing me in the right direction. It has been
+incredibly helpful.
+
+Best regards,
+
+Muchamad Coirul Anwar
 
