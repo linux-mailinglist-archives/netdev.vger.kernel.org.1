@@ -1,185 +1,206 @@
-Return-Path: <netdev+bounces-267533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267534-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6FqVBMw8tGmDjQAAu9opvQ
-	(envelope-from <netdev+bounces-267533-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 17:35:24 +0100
+	id wPAUAyo9tGlljgAAu9opvQ
+	(envelope-from <netdev+bounces-267534-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 17:36:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A449287196
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 17:35:23 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7967D287246
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 17:36:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 28E56302EA87
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:35:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CDEAC300F112
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:36:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741F63C5DD9;
-	Fri, 13 Mar 2026 16:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA563C73FF;
+	Fri, 13 Mar 2026 16:36:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vyZ719YD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V7TXBfDT"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D0B3C278F
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 16:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A637313E00;
+	Fri, 13 Mar 2026 16:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773419721; cv=none; b=VM+oWtiCAJ+9HxP/8CZ4bNmzR89qOS1hmaDOHslsohNqvYF9icVmZHfXeQonLPlST3VjGOloP8REzXkhho5xPe2hbSDf45HTIzIiZg2e3Pn41kmcVMstkKx1i57fWVd3kjRGbk0/nTzGqxelN4cgb5xz6uX9GB1nllMMst2W9vg=
+	t=1773419814; cv=none; b=JxhmkMcX8N80bcHnL2XfyJ9oxGNK/+LDONu1/DuwySXn3gPqqnqz7U3fngmsKDj6jKmU5LZZ8Cikeih8hq6Rf5YgshBlV4YNmslRNV6snzM59wFroYcM72FvibA/ENeASw8Gu3RhmknvYCvWDfbO3G8Z6LRGo8dlHLNo5aocJ4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773419721; c=relaxed/simple;
-	bh=np69cj0ha6lIKpsgdPN3ovhuYbn1R54I4uN1jWBDB8o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JPJxp0dkjJT6RNz3nKoLBWSs2iYfFX+PYN+/22Dbs/MDgKPjief6rjD4rWSuYnMEyJ8ZLX9VXM9S6GdVk3dQze3+EYQJ0Fc2/fAkVuiTVDloHKKPYc5Fqp+jgzJAYr/3cnRB1vIzyuLbqb5XLBxr5Q9nrMCNu+OtFlk/uZJGvv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vyZ719YD; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=K4UYISWV9qsLkjeT4fVqIPgPQOAh7Ipf/hHHbX4km0c=; b=vyZ719YDZ7x1Wv2Yziaf0ilgd8
-	GVAoLBpJyrEPbe/ZVuu4/iCYIeN9QzHcaKjigbe1Z44LRjN4ubkTSVUtWj4wiuRIv4f0UwdTYGwdp
-	H2ZBENCKH2+jP4v+/CkRpbantH82zSQVIcpIpUlM1L75V8Aawc1pKeJ5ZZQFOHZtiNkHsCRL3qwAU
-	Hx3LNSUvhGGRFKO22eIQi2lDAgRqWOMbZScTQLvCiTUucBwrW2O19RQSwlS/O+CgSMwUaCx+CxiLt
-	JqaTPxXl4XY3wp96Js9j8TnBGh1XV/V6H/pIhubXOZh7zkShC5wmh6k4Da0t45rXYwEtkWGT3iYrK
-	vPvVrgvA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47814)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w15Td-000000001GI-369L;
-	Fri, 13 Mar 2026 16:35:05 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w15Ta-000000008MN-2V7O;
-	Fri, 13 Mar 2026 16:35:02 +0000
-Date: Fri, 13 Mar 2026 16:35:02 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Georg Gottleuber <ggo@tuxedocomputers.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Christoffer Sandberg <cs@tuxedocomputers.com>,
-	Werner Sembach <wse@tuxedocomputers.com>
-Subject: Re: [PATCH net-next] net: stmmac: fix dwmac4 transmit performance
- regression
-Message-ID: <abQ8tlRYrU5W4VaK@shell.armlinux.org.uk>
-References: <E1vgY1k-00000003vOC-0Z1H@rmk-PC.armlinux.org.uk>
- <6f4929c3-d727-44a3-abc5-c33923dc69d7@tuxedocomputers.com>
+	s=arc-20240116; t=1773419814; c=relaxed/simple;
+	bh=yxUcqh0AcpHROQQEEoQ7r7oTAaEg7FuJwAC+SAMDP3M=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=gpcTNvkcNjkBY+VpT7UUKvI+rn5nYauTwn7xKk/CzjzIvuD1gIsIYPD1QZo1uBZO46+/W1F3EYHTu9VkqADX6Niv+98579sAk5dhUCuk6NqtLLWnuo8IMPXwL5fIjOCpRrDoIRbbTsmyFPKAHa6Qjc4lw8LfhroRT+DEaQrzSnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V7TXBfDT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E272C19421;
+	Fri, 13 Mar 2026 16:36:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773419813;
+	bh=yxUcqh0AcpHROQQEEoQ7r7oTAaEg7FuJwAC+SAMDP3M=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=V7TXBfDT+CWpXuMQM09aE4/F+wrh1K/CJsOpJgtGA3GokfzWsZ6ey1lMex3vO/GhS
+	 6ol7Unp8+Nhqy5zTzKw4T3KEDN0+hOWQRgxSe0roTmXq2OJDSRRLrnxk4JTXN75a9Z
+	 8XmobYHZnGWO+Ce/hcjgfI0ZLq9ouZFbW0WVuTHspOQp9Dv3f9xHypO9pj71+J4ppH
+	 yXRpy1K5WfbHHgMxxJh8c3SYYLaFGVDfKzVornauyGzZiIAs8lJclxTOQEGp+SIhd4
+	 3kXnt3O63pv9mVulOmuNRhOHWAhFPptQlhXnXLDF2H7HRuJh54KSQzmkmt+uu8BPO8
+	 tcCtb20WFuZUw==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, Donald Hunter <donald.hunter@gmail.com>, Eric
+ Dumazet <edumazet@google.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Naveen Mamindlapalli
+ <naveenm@marvell.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Danielle Ratson <danieller@nvidia.com>, Hariprasad
+ Kelam <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>, Kory Maincent
+ <kory.maincent@bootlin.com>, Leon Romanovsky <leon@kernel.org>, Michael
+ Chan <michael.chan@broadcom.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Saeed
+ Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>, Tariq Toukan
+ <tariqt@nvidia.com>, Willem de Bruijn <willemb@google.com>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 01/11] ethtool: Add dump_one_dev callback for
+ per-device sub-iteration
+In-Reply-To: <20260311193221.3306811b@kernel.org>
+References: <20260310104743.907818-1-bjorn@kernel.org>
+ <20260310104743.907818-2-bjorn@kernel.org>
+ <20260311193221.3306811b@kernel.org>
+Date: Fri, 13 Mar 2026 17:36:50 +0100
+Message-ID: <87eclny9ct.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6f4929c3-d727-44a3-abc5-c33923dc69d7@tuxedocomputers.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.10 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MIXED_CHARSET(0.56)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267533-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,redhat.com,tuxedocomputers.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-267534-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,gmail.com,google.com,bootlin.com,marvell.com,redhat.com,kernel.org,nvidia.com,broadcom.com,pengutronix.de,armlinux.org.uk];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.985];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,armlinux.org.uk:url,et.al:url,shell.armlinux.org.uk:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7A449287196
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,all.your.base.are.belong.to.us:mid]
+X-Rspamd-Queue-Id: 7967D287246
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 13, 2026 at 04:03:16PM +0100, Georg Gottleuber wrote:
-> Am 16.01.26 um 01:49 schrieb Russell King (Oracle):
-> > dwmac4's transmit performance dropped by a factor of four due to an
-> > incorrect assumption about which definitions are for what. This
-> > highlights the need for sane register macros.
-> > 
-> > Commit 8409495bf6c9 ("net: stmmac: cores: remove many xxx_SHIFT
-> > definitions") changed the way the txpbl value is merged into the
-> > register:
-> > 
-> >         value = readl(ioaddr + DMA_CHAN_TX_CONTROL(dwmac4_addrs, chan));
-> > -       value = value | (txpbl << DMA_BUS_MODE_PBL_SHIFT);
-> > +       value = value | FIELD_PREP(DMA_BUS_MODE_PBL, txpbl);
-> > 
-> > With the following in the header file:
-> > 
-> >  #define DMA_BUS_MODE_PBL               BIT(16)
-> > -#define DMA_BUS_MODE_PBL_SHIFT         16
-> > 
-> > The assumption here was that DMA_BUS_MODE_PBL was the mask for
-> > DMA_BUS_MODE_PBL_SHIFT, but this turns out not to be the case.
-> > 
-> > The field is actually six bits wide, buts 21:16, and is called
-> > TXPBL.
-> > 
-> > What's even more confusing is, there turns out to be a PBLX8
-> > single bit in the DMA_CHAN_CONTROL register (0x1100 for channel 0),
-> > and DMA_BUS_MODE_PBL seems to be used for that. However, this bit
-> > et.al. was listed under a comment "/* DMA SYS Bus Mode bitmap */"
-> > which is for register 0x1004.
-> > 
-> > Fix this up by adding an appropriately named field definition under
-> > the DMA_CHAN_TX_CONTROL() register address definition.
-> > 
-> > Move the RPBL mask definition under DMA_CHAN_RX_CONTROL(), correctly
-> > renaming it as well.
-> > 
-> > Also move the PBL bit definition under DMA_CHAN_CONTROL(), correctly
-> > renaming it.
-> > 
-> > This removes confusion over the PBL fields.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> Thank you for this patch, which significantly speeds up the transmit (by
-> more than a factor of nine on our devices with Motorcomm yt6801).
-> 
-> Unfortunately, this patch also causes DMA errors on two of our devices;
-> logs from a iperf3 test are attached.
-> 
-> Strangely enough, a third device with the same Motorcomm yt6801 does not
-> appear to be affected by the DMA errors. However, further testing is needed.
-> 
-> Do you have any ideas for further tests?
+Jakub Kicinski <kuba@kernel.org> writes:
 
-I would suggest dumping the contents of these control registers prior
-to commit 8409495bf6c9, and after this commit, comparing their values
-to identify what has changed. I'm sorry, I don't have the bandwidth to
-inspect the patches to see what may have been inadvertently changed.
+> On Tue, 10 Mar 2026 11:47:31 +0100 Bj=C3=B6rn T=C3=B6pel wrote:
+>> The per-PHY specific dump functions share a lot functionality of with
+>> the default dumpit infrastructure, but does not share the actual code.
+>> By introducing a new sub-iterator function, the two dumpit variants
+>> can be folded into one set of functions.
+>>=20
+>> Add a new dump_one_dev callback in ethnl_request_ops. When
+>> ops->dump_one_dev is set, ethnl_default_start() saves the target
+>> device's ifindex for filtered dumps, and ethnl_default_dumpit()
+>> delegates per-device iteration to the callback instead of calling
+>> ethnl_default_dump_one() directly. No separate start/dumpit/done
+>> functions are needed.
+>>=20
+>> For the existing per-PHY commands (PSE, PLCA, PHY, MSE), the shared
+>> ethnl_perphy_dump_one_dev helper provides the xa_for_each_start loop
+>> over the device's PHY topology.
+>>=20
+>> This prepares the ethtool infrastructure for other commands that need
+>> similar per-device sub-iteration.
+>
+> Feels like this could be split into two patches for ease of review.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Hmm, OK! My take was the it was mostly moving stuff.
+
+> Warning: net/ethtool/netlink.h:441 struct member 'dump_one_dev' not descr=
+ibed in 'ethnl_request_ops'
+> Warning: net/ethtool/netlink.h:441 struct member 'dump_one_dev' not descr=
+ibed in 'ethnl_request_ops'
+
+Thanks! (I've looked thru all the pw complaints, and fixed locally!)
+
+>
+>> @@ -616,17 +580,41 @@ static int ethnl_default_dumpit(struct sk_buff *sk=
+b,
+>>  				struct netlink_callback *cb)
+>>  {
+>>  	struct ethnl_dump_ctx *ctx =3D ethnl_dump_context(cb);
+>> +	const struct genl_info *info =3D genl_info_dump(cb);
+>>  	struct net *net =3D sock_net(skb->sk);
+>>  	netdevice_tracker dev_tracker;
+>>  	struct net_device *dev;
+>>  	int ret =3D 0;
+>>=20=20
+>> +	if (ctx->ops->dump_one_dev && ctx->ifindex) {
+>> +		dev =3D netdev_get_by_index(net, ctx->ifindex, &dev_tracker,
+>> +					  GFP_KERNEL);
+>> +		if (!dev)
+>> +			return -ENODEV;
+>> +
+>> +		ctx->req_info->dev =3D dev;
+>> +		ret =3D ctx->ops->dump_one_dev(skb, ctx, &ctx->pos_sub, info);
+>> +
+>> +		if (ret < 0 && ret !=3D -EOPNOTSUPP && likely(skb->len))
+>> +			ret =3D skb->len;
+>> +
+>> +		netdev_put(dev, &dev_tracker);
+>> +		return ret;
+>> +	}
+>> +
+>>  	rcu_read_lock();
+>>  	for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
+>>  		netdev_hold(dev, &dev_tracker, GFP_ATOMIC);
+>>  		rcu_read_unlock();
+>>=20=20
+>> -		ret =3D ethnl_default_dump_one(skb, dev, ctx, genl_info_dump(cb));
+>> +		if (ctx->ops->dump_one_dev) {
+>> +			ctx->req_info->dev =3D dev;
+>> +			ret =3D ctx->ops->dump_one_dev(skb, ctx, &ctx->pos_sub,
+>> +						     info);
+>> +			ctx->req_info->dev =3D NULL;
+>> +		} else {
+>> +			ret =3D ethnl_default_dump_one(skb, dev, ctx, info);
+>> +		}
+>>=20=20
+>>  		rcu_read_lock();
+>>  		netdev_put(dev, &dev_tracker);
+>
+> Not sure if it works here but another way to implementing single dump
+> and a loop dump concisely is to init both ifindex and pos_ifindex when
+> request is parsed and then add
+>
+> 	if (ctx->ifindex && ctx->ifindex !=3D ctx->pos_ifindex)
+> 		break;
+>
+> at the start of the loop. That way the body of the loop doesn't have to
+> be repeated in a separate if=20
+
+Indeed! I think that would work, and that'd be cleaner!
+
+Cheers!
 
