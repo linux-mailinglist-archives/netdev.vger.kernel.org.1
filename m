@@ -1,179 +1,315 @@
-Return-Path: <netdev+bounces-267381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267382-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cDwNIwLls2ktcQAAu9opvQ
-	(envelope-from <netdev+bounces-267381-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 11:20:50 +0100
+	id WNHhDWjns2nZcwAAu9opvQ
+	(envelope-from <netdev+bounces-267382-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 11:31:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E62B4281595
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 11:20:49 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C935B281739
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 11:31:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D07B8303E2C8
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:20:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E67863019463
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31C036C9E4;
-	Fri, 13 Mar 2026 10:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E74262BEFF5;
+	Fri, 13 Mar 2026 10:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="cDvUl9ur"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="GyFXt/SN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF99309F1D
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 10:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773397230; cv=pass; b=UjH6w2qWndmn1UNciai+T5+cQYhXtkLWyPc7uL65I8/mCM8A9WFaU/IL7zfcwDSLp13W0qvgRi7Sszdidc5deCMxYnOErIyLi/MrpY7A3ypNBZ1ejq8NOr8Xvy3f0jFk3iVlRrTI2YotmuzSwmQiolewFOrNJqqq+WzJX+swZjU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773397230; c=relaxed/simple;
-	bh=+B8uqafmAg1ZCzAAhnDnZ9Muoo/hahpr6Lp382JFWr4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CHdrbDyoblgR2Az61bF/+BM7rTdBolW6oc78BUFtsQ0lWfIK26SVrt5jB1l1b2CXnmhb72GaihavCIfYTzejAWWdJDeMVOQZ7yFulY6jiZRTGJBbSb95ey36fyX2Tr9YTJg7cSe5swAmJnEcHhlgkkDBY4ri+3ColM798POdxyI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=cDvUl9ur; arc=pass smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-662b933f8d1so3357683a12.2
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 03:20:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773397225; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MUwvloMhc6xV+mbs+J0rT5GMiflcUBpwaxQpB6n3IvSqGU2sf6FsxVk+2EKOf2vhzz
-         osSjZF3Y6RcWrLh2Z3EcI46vVnALS1dH/o0SfkHfdNO7dM5B/7a1TFXtYsN3iRt/Bq9b
-         gDXvqEwMBxpEV89ztVSekuJzetSiVPyvlUXHF7W0fiIIY4CP9QtDyozC186PqFhed4ww
-         ZJpNagGHHi8mQhfZg8S+/osQ/0h+50bumVwYRqE99bkZ/dRmersJ3ga+RGSq18fzrGPQ
-         S/p68KzwV7MpLmjFrEzgGueTNU2epx066rIYmhuJafwqUvr+rMCCOrLHfNm1pXD20iWx
-         j5yQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=+B8uqafmAg1ZCzAAhnDnZ9Muoo/hahpr6Lp382JFWr4=;
-        fh=e+w0bpo4WS5DcuYPiOuAnM4Hww4/js6moFInRLdu3Jk=;
-        b=VcRxv0WOdGR7LZevu4FB3f07k6CnvoPcuQ2afUqmNhDw8wUJmZ+sRt2EUOlP90Tc81
-         UzqsiSVsPKdjTJYD+od8vhe5UH2TOQt+fQi7ZCDJ32YS+PxoolXDDnpyhaytcBRiCPuJ
-         ybDe1b3pJY8AhuLjpGx6c4NyJEY5baDdvtYzKLJhuTkvDKDhCmzvI5H/SOd/lsPmQP1r
-         tPXd9jWH9DhDcheLcPBwtFT5OpMZejTCpytIqfZ/nX8EOQHm3eq7T6gYJ3ca44JIiAby
-         QurvIhYlTgrBv/x53xrz6qn3dswFt9vnPEMXi92aUlXy8pXRU2G6lixeeypaB48ZP6KY
-         7L7g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1773397225; x=1774002025; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+B8uqafmAg1ZCzAAhnDnZ9Muoo/hahpr6Lp382JFWr4=;
-        b=cDvUl9ur6B3HCEntDQAN1lfLadcYFznVO2Zi7dPzaXwHbTzqibCerBBDGWBjHjNj1X
-         rK8k92I3MZGP3GCoVQOh5zfbjbbrwiaWW9D2SV6+BcuUAQGIuaLD7y1ryl+qWeEMd+Kf
-         LCtfrXds6mpWWZR0i7gmcflKF56gOUOj8EUmq+OHH0RGe5UmCflABt6ai6R7Qv34ehr4
-         sCXeNc4I5m0SA/vm0oR7fRcVQty4MROhf76/1BrmGhxhW/eReuQOebQvKcLYcg30keno
-         lnRIY7P1YMwz1t5zkOVSX5FxOowzS1QrRdKjqXnugr3WhjLR970ZxO4xnok+p9zZuAr8
-         2IUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773397225; x=1774002025;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+B8uqafmAg1ZCzAAhnDnZ9Muoo/hahpr6Lp382JFWr4=;
-        b=AF/6VNgorn0ZLrN2kXgo9C+l6HWKSWpjhKC0Dhgj+Ysm1S3RA73YwmKw0W36u537ek
-         kgZbluHgKjRmRlfej45AM7NpXIjS+NM9ydv7NsuozEVl+O3yPfxCxDolPFQM3mEMMCl6
-         fgR388NYf7YsewS9SXYcWp+l0j1pZ5Qzdg9rOGS9mRDYeDnpC1WdQovyMSgKBYstU6Nu
-         e+wl/7GU6UtkpYO6kIMtUSm2q3zws+Ji9pWCW/gawQ0steL+AOkZ48OgQEVChhnfpKXa
-         Z+K0lvrT6R+KrT+EA5kz98KaissrQj8G5nfwwujhDpl8k6i8m9YV7BTcl+27WRCcH+IN
-         msAw==
-X-Forwarded-Encrypted: i=1; AJvYcCV2Miy0+AOSLwk+tZvcxfBw27SFpouw7TTUg+LheI8wp5wFLAYa07b7OlpgMbPYUGYLkvkgJ8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKfLh1X9+NHiFJvVvmwC8bGp0KZc6DVcbZA/9agPreMcfSbb3Y
-	BRa26VZe0s+uoSaQ6qQ6YEeQFnPxd/5viEpa3+1sN9zl83tv9j+92xyUjnOF+m1w7tRVB3/JGVp
-	81KKf1Pk8g4cSBByurXCc83ZOjEqOOYl0IE2uEcJCMQ==
-X-Gm-Gg: ATEYQzyoxS7cweqeTl7VNjB78lfX7jvbzg2/qxHnl1ZbYjwDCZ+DOpUDjKRgPZ4XfKx
-	ufyoyIoeLhW6xk5tddhhpqVM6dJOaW1A5aKS6zD09uslkS6YNHCshqgInpyJY8nYoa2SUAep5+c
-	O4wbmiBZBjnDlYApwh7QeEwy/ARJORfBOJavZ8hQJ6Bl57V860rGadnx+/yUwo045QewQK2KVJl
-	z6xee5uWXI8AEGnSXs8y5e3SepELU3L5WNB7KUQtwzAK+q0C062EMUbw+OVscdSyvHzCydIkhZV
-	hIfkZbBXvESMXl6NuIwPecN6tchnDMymE4ZNoQWH2A==
-X-Received: by 2002:a05:6402:5204:b0:658:3972:3a3d with SMTP id
- 4fb4d7f45d1cf-663babcf3b6mr1577955a12.15.1773397224529; Fri, 13 Mar 2026
- 03:20:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E09D2BEFEB
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 10:30:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773397861; cv=none; b=QOtTsnhRVEw5wzXIOHTufJTC2GIMABDZmvD4B4k2+3OeLroP49AhzYG16gHk7lGL0YzQkO5g4CrTTFxbKslOvVNtoXcIpyKihV3bp6fcI1XWhwj1korUVZpTHYRSvlsvoSpr3tTEsV/lovuNrbATuCeOuurNw/ErVh8u8wW1rA8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773397861; c=relaxed/simple;
+	bh=HZuYA/l8jHv8gNl6MTHYBvYRSriXaB44b9n0Eia2dVw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WTZNDvOcD85jBoOoFQ7Ev97Ck/3cunkva0FB8o82npEMMe/VdfFFoANIjy0Qd5JWaVoVmpJdpVKH3sFXseRAihu7PeBdJa1Na+0G2GHGUYq+5plW6F6daquGC/pEsKY2nmCs9rLJStB0ymgmg1YNUdFWXTnAoEzAqgDy4dkNjH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=GyFXt/SN; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1773397855; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=106rSoa5GHZ6ekgbYj0GZnh99Y3zxMGMED+UeTiWu98=;
+	b=GyFXt/SN81Hr89f4+oN5QPvbix+kxYoI6jHmgyKL5JhLN43lGVT52kmuamWMTx4oPxd/hH+BNMe6uq3AcWkAUGUcdCJT9ANxEhKB15Sw2xRvadmkinPvdr/bKw9XH/fI/wFsFHgW5hMLRuUrFcoAqrjJFO1yHa06Q3mMQi2lFEM=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R411e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0X-s8lrb_1773397854;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X-s8lrb_1773397854 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 13 Mar 2026 18:30:54 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Dong Yibo <dong100@mucse.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: [PATCH net-next v30 0/8] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
+Date: Fri, 13 Mar 2026 18:30:46 +0800
+Message-Id: <20260313103054.77901-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260311152845.278354-1-justin.iurman@6wind.com>
- <20260313030220.af70f3b5f2c5d2cb7b4a840e@uniroma2.it> <CAOY2Bqz8_8iT2Auw=sWob0-XUQg-sPmdAFvzRLg+KszrU6LMqA@mail.gmail.com>
- <43e16e45-5fb1-4413-bbd1-4752bbcdec7d@6wind.com>
-In-Reply-To: <43e16e45-5fb1-4413-bbd1-4752bbcdec7d@6wind.com>
-From: Justin Iurman <justin.iurman@6wind.com>
-Date: Fri, 13 Mar 2026 10:20:12 +0000
-X-Gm-Features: AaiRm51vK-Q8dBYr1rv86TC6wilDXIPypW7VQyRgd_sYFBT0mHAsSI6ovya1eww
-Message-ID: <CAOY2Bqx6jjBc5FCoRg+64v2L17bBsaAE8sy7P4JCwVXc+1n7_Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] seg6: add per-route tunnel source address
-To: nicolas.dichtel@6wind.com
-Cc: Andrea Mayer <andrea.mayer@uniroma2.it>, netdev@vger.kernel.org, davem@davemloft.net, 
-	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, justin.iurman@gmail.com, stefano.salsano@uniroma2.it
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Git-Hash: 0cc74e1a4769
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[uniroma2.it,vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-267381-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-267382-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justin.iurman@6wind.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,uniroma2.it:email,6wind.com:dkim,6wind.com:email]
-X-Rspamd-Queue-Id: E62B4281595
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.alibaba.com:dkim,linux.alibaba.com:mid]
+X-Rspamd-Queue-Id: C935B281739
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 13, 2026 at 9:47=E2=80=AFAM Nicolas Dichtel
-<nicolas.dichtel@6wind.com> wrote:
->
-> Le 13/03/2026 =C3=A0 09:44, Justin Iurman a =C3=A9crit :
-> > On Fri, Mar 13, 2026 at 2:02=E2=80=AFAM Andrea Mayer <andrea.mayer@unir=
-oma2.it> wrote:
-> >>
-> >> On Wed, 11 Mar 2026 16:28:45 +0100
-> >> Justin Iurman <justin.iurman@6wind.com> wrote:
->
+Add a driver framework for EEA that will be available in the future.
 
-[snip]
+This driver is currently quite minimal, implementing only fundamental
+core functionalities. Key features include: I/O queue management via
+adminq, basic PCI-layer operations, and essential RX/TX data
+communication capabilities. It also supports the creation,
+initialization, and management of network devices (netdev). Furthermore,
+the ring structures for both I/O queues and adminq have been abstracted
+into a simple, unified, and reusable library implementation,
+facilitating future extension and maintenance.
 
-> >> Whether to also reject link-local is debatable: ip6_forward() does
-> >> drop it, but is there a legitimate use case where a link-local tunnel
-> >> source would actually be needed?!
-> >> I'd argue we should reject link-local addresses as well.
-> >> For instance, using them as a tunnel source violates scope boundaries =
-and
-> >> breaks ICMPv6 error reporting.
-> >
-> > IMHO, I also think we could reasonably forbid LLs.
->
-> Why rejecting LL? It's legal to use LL as a source address of a tunnel (a=
-nd
-> forwarding packets in this tunnel). Is this forbidden with srv6?
+v30:
+   1. fix some small problems
 
-Well, this is indeed legal (at least nothing prevents it), but they're
-not routable. So question is does it make sense at all? We're talking
-about two nodes on the same layer-2 link as the only valid use-case
-here. I'm not sure it makes sense, especially in the context of SRv6.
+v29:
+    Address AI-generated review suggestions from the previous version.
+
+v28:
+    Address AI-generated review suggestions from the previous version.
+
+v27:
+    Address AI-generated review suggestions from the previous version.
+
+v26:
+    Adopting suggestions from the previous AI review, another significant
+    change is the introduction of an IRQ block to implement IRQ proxying. With
+    this design, when an IRQ occurs, we no longer invoke the RX data structure
+    directly -- instead, the IRQ block serves as an intermediary proxy. This
+    approach offers several advantages: IRQ resources no longer need to be
+    reallocated during reset operations, and IRQs are decoupled from RX
+    structures. Consequently, when certain errors occur, we can fall back and
+    safely reuse the original memory resources.
+
+v25:
+    I have adopted most of the suggestions from the AI's feedback. However, I
+    believe some of the feedback is incorrect. I have already replied in the
+    previous thread. http://lore.kernel.org/all/1770002612.3297296-2-xuanzhuo@linux.alibaba.com
+
+v24:
+    1. Add null checks for enet->rx and enet->tx in eea_get_ethtool_stat to
+       prevent errors when reading rx = enet->rx[i] in case enet->rx is null.
+       tx is similar. With rtnl protection in place, this check is sufficient.
+    2. Use 'received' as the return value in eea_poll.
+
+v23:
+    I have moved netif_set_real_num_queues() out of eea_start_rxtx(), so
+    eea_start_rxtx() is now a void function. I believe enet_bind_new_q_and_cfg()
+    is a more suitable place to include netif_set_real_num_queues(). In
+    eea_active_ring_and_irq(), I first execute request_irq() before interacting
+    with the hardware to create queues. Therefore, during the NIC setup process,
+    all driver-internal operations (memory allocation, IRQ initialization, sysfs
+    configuration, etc.) will be completed before the final notification to the
+    hardware.
+
+v22:
+    1. Use the budget from the NAPI poll function as the parameter for
+       napi_consume_skb.
+    2. Stop the TX queue when the remaining ring slots cannot hold an SKB.
+
+v21:
+    Fix two issues from the previous version:
+    1, a DMA unmap operation was missing.
+    2, RCU APIs were not used in eea_stats. Although the standard practice when
+        using RCU would require adding the __rcu annotation to both the rx and
+        tx fields, in many cases these fields are read without needing RCU
+        protection.  Therefore, I do not want to add the __rcu annotation.
+        Instead, I use a spin lock to protect modifications to rx and tx.
+
+v20:
+    Fix the partially initialized structure passed to db. @Jakub
+    http://lore.kernel.org/all/20260113172353.2ae6ef81@kernel.org
+
+v19:
+    fix the comments from @Simon Horman
+
+v18:
+    v17 with [PATCH] prefix.
+
+v17:
+    1. In `eea_adminq_dev_status`, uniformly use `enet->cfg.rx_ring_num`.
+    2. Add a `struct eea_net_cfg *cfg` parameter to `eea_free_rx` and
+        `eea_free_tx`. When called in the normal path, pass `enet->cfg` as
+        the argument; when called during initialization, pass the temporary
+        `cfg` instead.
+    3. Move the `.ndo_get_stats64` callback into `eea_net.c`.
+    4. In the `.ndo_get_stats64` callback, add a comment explaining how the TX
+        and RX statistics are protected by RCU.
+
+       /* This function is protected by RCU. Here uses enet->tx and enet->rx
+        * to check whether the TX and RX structures are safe to access. In
+        * eea_free_rxtx_q_mem, before freeing the TX and RX resources, enet->rx
+        * and enet->tx are set to NULL, and synchronize_net is called.
+        */
+
+
+v16:
+    1. follow the advices from @ALOK TIWARI
+       http://lore.kernel.org/all/5ff95a71-69e5-4cb6-9b2a-5224c983bdc2@oracle.com
+
+v15:
+    1. remove 'default m' from eea kconfig
+    2. free the resources when open failed.
+
+v14:
+    1. some tiny fixes
+
+v13:
+    1. fix some tiny fixes @Simon
+
+v12:
+    I encountered some issues with sending the v11 patches, as they were quite
+    messy. Therefore, I'm resending them as v12.
+
+v11:
+    1. remove auto clean __free(kfree)
+    2. some tiny fixes
+
+v10:
+    1. name the jump labels after the target @Jakub
+    2. rm __GFP_ZERO from dma_alloc_coherent @Jakub
+v9:
+    1. some fixes for ethtool from http://lore.kernel.org/all/20251027183754.52fe2a2c@kernel.org
+
+v8: 1. rename eea_net_tmp to eea_net_init_ctx
+    2. rm code that allocs memory to destroy queues
+    3. some other minor changes
+
+v7: 1. remove the irrelative code from ethtool commit
+    2. build every commits with W12
+
+v6: Split the big one commit to five commits
+v5: Thanks for the comments from Kalesh Anakkur Purayil, ALOK TIWARI
+v4: Thanks for the comments from Troy Mitchell, Przemek Kitszel, Andrew Lunn, Kalesh Anakkur Purayil
+v3: Thanks for the comments from Paolo Abenchi
+v2: Thanks for the comments from Simon Horman and Andrew Lunn
+v1: Thanks for the comments from Simon Horman and Andrew Lunn
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Xuan Zhuo (8):
+  eea: introduce PCI framework
+  eea: introduce ring and descriptor structures
+  eea: probe the netdevice and create adminq
+  eea: create/destroy rx,tx queues for netdevice open and stop
+  eea: implement packet receive logic
+  eea: implement packet transmit logic
+  eea: introduce ethtool support
+  eea: introduce callback for ndo_get_stats64
+
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/alibaba/Kconfig          |  28 +
+ drivers/net/ethernet/alibaba/Makefile         |   5 +
+ drivers/net/ethernet/alibaba/eea/Makefile     |   9 +
+ drivers/net/ethernet/alibaba/eea/eea_adminq.c | 444 ++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_adminq.h |  75 ++
+ drivers/net/ethernet/alibaba/eea/eea_desc.h   | 134 +++
+ .../net/ethernet/alibaba/eea/eea_ethtool.c    | 243 ++++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.h    |  49 ++
+ drivers/net/ethernet/alibaba/eea/eea_net.c    | 807 ++++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_net.h    | 195 +++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.c    | 617 +++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.h    |  73 ++
+ drivers/net/ethernet/alibaba/eea/eea_ring.c   | 252 ++++++
+ drivers/net/ethernet/alibaba/eea/eea_ring.h   |  88 ++
+ drivers/net/ethernet/alibaba/eea/eea_rx.c     | 786 +++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_tx.c     | 403 +++++++++
+ 19 files changed, 4218 insertions(+)
+ create mode 100644 drivers/net/ethernet/alibaba/Kconfig
+ create mode 100644 drivers/net/ethernet/alibaba/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_desc.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_rx.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_tx.c
+
+--
+2.32.0.3.g01195cf9f
+
 
