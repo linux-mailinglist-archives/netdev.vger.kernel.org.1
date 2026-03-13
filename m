@@ -1,57 +1,53 @@
-Return-Path: <netdev+bounces-267263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267261-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +HfeBsBss2noWAAAu9opvQ
-	(envelope-from <netdev+bounces-267263-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:47:44 +0100
+	id IB2YKv5qs2mPWAAAu9opvQ
+	(envelope-from <netdev+bounces-267261-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:40:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 749DD27C4BC
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:47:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FBFD27C490
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:40:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4B8BF300A583
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:47:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2A2230221F4
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC9CA318140;
-	Fri, 13 Mar 2026 01:47:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1D72FC881;
+	Fri, 13 Mar 2026 01:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QoQsDSeW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw2.hygon.cn (unknown [101.204.27.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B776025CC40
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 01:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.204.27.37
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0362F532F;
+	Fri, 13 Mar 2026 01:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773366456; cv=none; b=Ix3ZlGDCQ1XG4gmyYElxby6eg/6xSQXy3XxqXSM0/KcBR/9V0Cek6TL0rFYsnjz8L5daWYscG8m8wYg8vHns5LL1xXfAbNvD72niRBDAige4Vy+9lMh3NXsA/PBW1KnU1LbNDRyMutBlsUuEHZiCIoMg6Ke/TlWWt0S7BIkQnL0=
+	t=1773366010; cv=none; b=uLo9xQV7NFk82ylsavpUY494L6u8qeiEHeFfQ1Tb81lLgahow0zQmJhE3SerXGxQFWE+zwwlmDiOyOolbb25As3qFPfQELydG/fbvKUDSlWbqqZ+6nYTmo0kDTJ0j2Z3/wa2U9occjCDd3xdfwsOFFVGR61Q9Tm0TKKcMLLLaWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773366456; c=relaxed/simple;
-	bh=cARjo3b5CBMHUcYu6xnyXwuPlwMkezzMLIuyLwut6pg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pP+nFdKPaympR82VKKSuqjavwl8vVUq+cO7TMICuyQTbacKJB63LyTgyiEqNS7aIdO65WjtANVETq+KecfTddWNph6Fe7tDEyrFDVlHuKWgsunyjkXKUsmlemv8IhVo+2cTCD8v22uz8ZPBwKVvPwwh9nVQM/eJWBrkBJeIlJ4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn; spf=pass smtp.mailfrom=hygon.cn; arc=none smtp.client-ip=101.204.27.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
-Received: from maildlp2.hygon.cn (unknown [127.0.0.1])
-	by mailgw2.hygon.cn (Postfix) with ESMTP id 4fX6Pq3Tszz1YHN2l;
-	Fri, 13 Mar 2026 09:30:55 +0800 (CST)
-Received: from maildlp2.hygon.cn (unknown [172.23.18.61])
-	by mailgw2.hygon.cn (Postfix) with ESMTP id 4fX6Pp6PYDz1YHN2l;
-	Fri, 13 Mar 2026 09:30:54 +0800 (CST)
-Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
-	by maildlp2.hygon.cn (Postfix) with ESMTPS id A0FA531C620A;
-	Fri, 13 Mar 2026 09:29:39 +0800 (CST)
-Received: from SZ-4DN1M34.Hygon.cn (172.28.22.30) by cncheex04.Hygon.cn
- (172.23.18.114) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Fri, 13 Mar
- 2026 09:30:54 +0800
-From: Di Zhu <zhud@hygon.cn>
-To: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
-	<eperezma@redhat.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <virtualization@lists.linux.dev>
-CC: <zhud@hygon.cn>, <lijing@hygon.cn>, <yingzhiwei@hygon.cn>
-Subject: [PATCH net] virtio-net: clear NETIF_F_GRO_HW if no GRO-related offloads are capable
-Date: Fri, 13 Mar 2026 09:30:40 +0800
-Message-ID: <20260313013040.896924-1-zhud@hygon.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1773366010; c=relaxed/simple;
+	bh=9julhPHix0+n/imzVgiojmJlJVQn8OgQW7B4wlRNCxM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=U0TrwyGJI7ckEez53HEQUFgsMfe0r+GnJZvMTV0r5jza1meLI6xHRK1EgC1Jrg8Cejgkrh7d1ayn8WndhOHMs74ix4coL6RHlO5gwvqHILhuwk5eKwbuhK89jnnGZx41L+LrTXvVkmO3S+4Rlpa0mJqc+Psa0bFEE8B4gcK7w0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QoQsDSeW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1461AC4CEF7;
+	Fri, 13 Mar 2026 01:40:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773366010;
+	bh=9julhPHix0+n/imzVgiojmJlJVQn8OgQW7B4wlRNCxM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QoQsDSeW9b5iSvak8E9HDpJCuBmmK+tGe/dfQ6Jkn5S67eC5AnhN88f9MV8MpGPW9
+	 kKut4lFNP7UhcrkC/eyHcmiK0MO5NihXJTJ9ZAU688c4v+nuCksoO7/7u4lX14Rud5
+	 h4nrbGK7IWMSfRMl0stPB1NPyWvvSqCqgFBX0TckSzXGwgd0pLmihhvE3wlSqNmd77
+	 2/ix87JTA1uVCOqeKD4KEVaNlODQOuocjiPf9q9ByJwaOD/5CMWOMwE71WY9HEzBCD
+	 ZGT+/nq6VTqJLV/NRdNPk8gtSswwoMXFdKZhcdwNwofwdmA7GAOG51K+WBy4f93701
+	 baZIHKGojT6cQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF4E3808200;
+	Fri, 13 Mar 2026 01:40:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,72 +55,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: cncheex05.Hygon.cn (172.23.18.115) To cncheex04.Hygon.cn
- (172.23.18.114)
-X-Spamd-Result: default: False [1.64 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Subject: Re: [PATCH net] bridge: cfm: Fix race condition in peer_mep deletion
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177336600530.628795.16179964876225068685.git-patchwork-notify@kernel.org>
+Date: Fri, 13 Mar 2026 01:40:05 +0000
+References: <abBgYT5K_FI9rD1a@v4bel>
+In-Reply-To: <abBgYT5K_FI9rD1a@v4bel>
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: razor@blackwall.org, idosch@nvidia.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ bridge@lists.linux.dev, netdev@vger.kernel.org
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[hygon.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267263-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhud@hygon.cn,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-267261-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.965];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 749DD27C4BC
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0FBFD27C490
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Although VIRTIO_NET_F_CTRL_GUEST_OFFLOADS is negotiated, which indicates
-the device supports dynamic control of guest offloads, it does not
-necessarily mean the device supports specific hardware GRO features.
+Hello:
 
-If none of the features defined in GUEST_OFFLOAD_GRO_HW_MASK (such as
-TSO4, TSO6, or UFO) are present in vi->guest_offloads_capable, the
-device effectively lacks the hardware capability to perform GRO.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-In this case, NETIF_F_GRO_HW should be cleared from dev->hw_features
-to prevent the stack from attempting to enable an unsupported
-hardware offload configuration.
+On Wed, 11 Mar 2026 03:18:09 +0900 you wrote:
+> When a peer MEP is being deleted, cancel_delayed_work_sync() is called
+> on ccm_rx_dwork before freeing. However, br_cfm_frame_rx() runs in
+> softirq context under rcu_read_lock (without RTNL) and can re-schedule
+> ccm_rx_dwork via ccm_rx_timer_start() between cancel_delayed_work_sync()
+> returning and kfree_rcu() being called.
+> 
+> The following is a simple race scenario:
+> 
+> [...]
 
-Fixes: a02e8964eaf9 ("virtio-net: ethtool configurable LRO")
-Signed-off-by: Di Zhu <zhud@hygon.cn>
----
- drivers/net/virtio_net.c | 3 +++
- 1 file changed, 3 insertions(+)
+Here is the summary with links:
+  - [net] bridge: cfm: Fix race condition in peer_mep deletion
+    https://git.kernel.org/netdev/net/c/3715a0085531
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 72d6a9c6a5a2..49a60af684d5 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -7058,6 +7058,9 @@ static int virtnet_probe(struct virtio_device *vdev)
- 	}
- 	vi->guest_offloads_capable = vi->guest_offloads;
- 
-+	if (!(vi->guest_offloads_capable & GUEST_OFFLOAD_GRO_HW_MASK))
-+		dev->hw_features &= ~NETIF_F_GRO_HW;
-+
- 	rtnl_unlock();
- 
- 	err = virtnet_cpu_notif_add(vi);
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
