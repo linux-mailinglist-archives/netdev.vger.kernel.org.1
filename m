@@ -1,170 +1,157 @@
-Return-Path: <netdev+bounces-267421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OKlKM8n2s2nYdgAAu9opvQ
-	(envelope-from <netdev+bounces-267421-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:36:41 +0100
+	id 6LRWDI32s2nYdgAAu9opvQ
+	(envelope-from <netdev+bounces-267422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:35:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E6DE2824CE
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:36:41 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 533B72824A3
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:35:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4258C3193630
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 11:34:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4384E302CC2E
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 11:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A21962ED848;
-	Fri, 13 Mar 2026 11:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513E5359A70;
+	Fri, 13 Mar 2026 11:35:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Nmp1sZYB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o6JNIl1M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD99028BA95;
-	Fri, 13 Mar 2026 11:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3CF345721
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 11:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773401663; cv=none; b=J5pw7VhKDoaWBHWvjGp7j9c6b7jU9FiLK+ZEqv71aClH8Swr240rVvIovBaqDDozkRjqSMLSdebjTgYjZUCVC8+seWL5ao0dM3l87sZ7t0wWkewwquIE06PjVk40BusodJxi1RclefQkrYS+5WLC+EGm9RTf6/nt3pSbDdTJwR8=
+	t=1773401719; cv=none; b=d9chpzKSCJLsJrGgTnEG82YoJ6SZ+qsBP7JYVVsl+5OMbVr9kbC37TGeMV/1Da2SgGxxQgmcrav4ytRmpeV/xvOgA185NLEZc3yg1OQs9FuFP2Eo60PCQISR9+FIPtI0xI5BYsCeXr3LBecJ2dciFpn/R54+PjQwEFLQpx//SaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773401663; c=relaxed/simple;
-	bh=Is90Lbq1TqckLWjdloG7Ms2MmpgjtHfLDupPvwdQTI0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MWsdpn2BJXqgMhtszbeOdfwjpubpqj7uNcsvQmR/tt6BmT9D5auXxT3qFTOp4feAW2iN4/G0+KH3z23OwcbHFnZs5yO2HHmNAWNRjvn5F9hZcUd9Lzm7+xzC4q1aQ49uOwICh46wtPmkriCkpt42ChzzqcRzh1rf4xk13Bp2Mkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Nmp1sZYB; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 01D2B201A7;
-	Fri, 13 Mar 2026 12:34:19 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r30F7oMHMAnP; Fri, 13 Mar 2026 12:34:18 +0100 (CET)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 62A3920184;
-	Fri, 13 Mar 2026 12:34:18 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 62A3920184
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1773401658;
-	bh=auH0wLDZVzJv1DswK/GkLmTiWQz/vTXAvedisJlEgZI=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=Nmp1sZYBTcuKTpJMYdRslINLBiB3OPQYPxQMwMHCeASoHMa+F28une8jSRejkLhJp
-	 /Iu7rNtSEdILxz/CPFn9Q5vKA0WZcaqfydRM3LniQf/oeF1qPJGaZwdNPKlikFvoeg
-	 9lbqpVt1MG7Ac6ynXlTPWkjATm/qSGFAss0lYbXh/GOLV3sKt0CUPjdBDVUnYP5yYo
-	 lJSJ53ZCVjBdcSWOfUjFgEHspwgdonCdUQh55UJ0mcgtlDHG0Ih/tUGae4KfEMPHPy
-	 kFj0E59iyEIbi4gk4wluDZHM6UkvrTA6Kj+gG0a4JLxf0BfspHrXHA1KZg1gMw0jrJ
-	 8nVIerN4Md3/Q==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 13 Mar
- 2026 12:34:17 +0100
-Received: (nullmailer pid 3889090 invoked by uid 1000);
-	Fri, 13 Mar 2026 11:34:16 -0000
-Date: Fri, 13 Mar 2026 12:34:16 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Paul Moses <p@1g4.org>
-CC: <netdev@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <chopps@labn.net>,
-	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
-Subject: Re: [PATCH net v2] xfrm: iptfs: only publish mode_data after clone
- setup
-Message-ID: <abP2OKsk9wbCH892@secunet.com>
-References: <20260312113843.2883169-1-p@1g4.org>
+	s=arc-20240116; t=1773401719; c=relaxed/simple;
+	bh=6UUBpcPvPMAWRYqT1JRM1Mjfzyj2T0c0/GqtAU3kekg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uSM42SMODgQcyma5mkpqyjVmFmNf5LeK5DwoVNBFNX529CNoIdRknMOAZCVDcdCLLWSSRoSLjPH9rT5nlnZtA5TEoeFopMq5p9aD/W0AvY2mBYmJoHaXRBsrkk0o/EOdzIcVQ9tcR3Oy2DHZZ5t1Mg4rpPpj/dzK0esggN++6AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o6JNIl1M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E3B0C19421;
+	Fri, 13 Mar 2026 11:35:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773401718;
+	bh=6UUBpcPvPMAWRYqT1JRM1Mjfzyj2T0c0/GqtAU3kekg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o6JNIl1MfZo9S0LPzeyR1gEJNG3JxCj/7FNZtIxtHQ/c0Pln/241h3TeIM0rcKeEs
+	 Qr4JPB8imfy4+s02TXe0/iMzV3geD63eEQXQUEfugyZuoYSU5SrKxc3ipDRV9Nxc71
+	 MDkaopq+JvPWDzU5AYb5qnTPPh0GVeaHBH7yuuKYMCxYAlngD9rqWw4yX5LpFLi8Yv
+	 +tPO9Xbdl4yY0vV2p7YvMfYCu9bUM0P8bAk66FkSbwmjMHD/EJZicJhxmSvyPFEr9M
+	 qbwGNS+rcKCnBwOwQPru4ZZT50YABI/4tYzzwCNCV7uuFuA0aMvyytt7/M7RyFgCtS
+	 X0k8mFCwIO2vg==
+Date: Fri, 13 Mar 2026 12:35:16 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: select QDMA block according
+ LAN/WAN configuration
+Message-ID: <abP2dLNIw6zqkxL4@lore-desk>
+References: <20260310-airoha-qdma-lan-wan-mode-v1-1-64ec74dea872@kernel.org>
+ <20260312172430.GA1267298@kernel.org>
+ <abMsvOMnnuTdoG-9@lore-desk>
+ <20260312172248.68742f98@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="MeKNmnGIFj0GyFIk"
 Content-Disposition: inline
-In-Reply-To: <20260312113843.2883169-1-p@1g4.org>
-X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260312172248.68742f98@kernel.org>
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	TAGGED_FROM(0.00)[bounces-267421-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267422-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,1g4.org:email,secunet.com:dkim,secunet.com:mid];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 3E6DE2824CE
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 533B72824A3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 12, 2026 at 11:39:09AM +0000, Paul Moses wrote:
-> iptfs_clone_state() stores x->mode_data before allocating the reorder
-> window. If that allocation fails, the code frees the cloned state and
-> returns -ENOMEM, leaving x->mode_data pointing at freed memory.
-> 
-> The xfrm clone unwind later runs destroy_state() through x->mode_data,
-> so the failed clone path tears down IPTFS state that clone_state()
-> already freed.
-> 
-> Keep the cloned IPTFS state private until all allocations succeed so
-> failed clones leave x->mode_data unset. The destroy path already
-> handles a NULL mode_data pointer.
-> 
-> Fixes: 6be02e3e4f37 ("xfrm: iptfs: handle reordering of received packets")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paul Moses <p@1g4.org>
-> ---
-> Changes in v2:
-> - Fix Fixes tag to point to 6be02e3e4f37
-> 
->  net/xfrm/xfrm_iptfs.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-> index 050a82101ca51..4d7a925f59b7c 100644
-> --- a/net/xfrm/xfrm_iptfs.c
-> +++ b/net/xfrm/xfrm_iptfs.c
-> @@ -2653,9 +2653,6 @@ static int iptfs_clone_state(struct xfrm_state *x, struct xfrm_state *orig)
->  	if (!xtfs)
->  		return -ENOMEM;
->  
-> -	x->mode_data = xtfs;
-> -	xtfs->x = x;
-> -
->  	xtfs->ra_newskb = NULL;
->  	if (xtfs->cfg.reorder_win_size) {
->  		xtfs->w_saved = kzalloc_objs(*xtfs->w_saved,
-> @@ -2666,6 +2663,9 @@ static int iptfs_clone_state(struct xfrm_state *x, struct xfrm_state *orig)
->  		}
->  	}
->  
-> +	x->mode_data = xtfs;
-> +	xtfs->x = x;
-> +
->  	return 0;
->  }
 
-This does not apply to the ipsec tree. Can you rebase on top of the
-current ipsec tree?
+--MeKNmnGIFj0GyFIk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks!
+> On Thu, 12 Mar 2026 22:14:36 +0100 Lorenzo Bianconi wrote:
+> > > Is this a bug fix?
+> > > If so, perhaps it is for net with a fixes tag. =20
+> >=20
+> > I guess we do not need to target net tree since airoha_eth driver curre=
+ntly
+> > supports just the LAN interface via the MT7530 DSA switch connected to =
+GDM1
+> > and there are no WAN interfaces officially supported (PCS/external phy =
+is not
+> > merged mainline yet, it is only available in OpenWrt).
+> >=20
+> > >=20
+> > > And at any rate, could you add some description of the before and aft=
+er
+> > > behaviour? =20
+> >=20
+> > Theoretically, before this patch, GDM ports were equally distributed be=
+tween
+> > QDMA0 and QDMA1 while this patch assigns LAN interfaces to QDMA0 and WAN
+> > interface to QDMA1. However, for the reason explained above, this chang=
+e is
+> > not currently visible to the user.
+>=20
+> Please update the commit message. And please try harder to explain=20
+> the patches, this happens a lot with your submissions..
+
+ack, fine. Sorry for not beeing very clear about this (and other
+patches), I will pay more attention in the future.
+Do you think we should target net-next or net for this patch?
+
+Regards,
+Lorenzo
+
+--MeKNmnGIFj0GyFIk
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCabP2dAAKCRA6cBh0uS2t
+rE54AQC1mMaAyrYlZgokGGCJNLPOxAyImBcax4o0k8v1VJY9UwEA0dzu7dEQaV39
+KehzNqgq9qHcA+qpmY3Zu8uwmj+WzAc=
+=9Tm6
+-----END PGP SIGNATURE-----
+
+--MeKNmnGIFj0GyFIk--
 
