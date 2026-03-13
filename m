@@ -1,64 +1,62 @@
-Return-Path: <netdev+bounces-267457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267458-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iG2hNhcWtGlkgwAAu9opvQ
-	(envelope-from <netdev+bounces-267457-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:50:15 +0100
+	id aCmQAY0WtGlkgwAAu9opvQ
+	(envelope-from <netdev+bounces-267458-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:52:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A287C2843AB
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:50:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7617A284443
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6374430E7515
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:38:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7075F30B4871
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:39:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1A4395D80;
-	Fri, 13 Mar 2026 13:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2574A38F636;
+	Fri, 13 Mar 2026 13:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DWjdx58w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oZJFFGOD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5737390CAC;
-	Fri, 13 Mar 2026 13:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034793659FF
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 13:34:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773408680; cv=none; b=twKwn1Yy7YVs9bGIsJPw9cDrMwk//OVQtNCphjSzoMA7lJcTT91Q9O8q2O34Qlt74CWTO4OXBuvip4Pb7ybcy+9jBiAaYnZ1ZmIQXgqJO+mNg+qEYmkCcg9BJQDYF9M0foT+WUrqc3pdS6veRKNy9Rp+dLYroQNcABXsiRYbVSk=
+	t=1773408896; cv=none; b=BEyalX53rKLD+OYKNX+/uiiKtEiMn0mQvVZ00FL5/z2ms8lNcmzZWXi7KfGinPdNaY4BeseCm6Ymp+tJTPdxrVamq7i1llIKKNBLBERvdoht+m5HIlvW8sEhLHutr+gYH23Bl8awVgEkgyH3UYULaoWLqlnMyzQA/R1Y6os+rb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773408680; c=relaxed/simple;
-	bh=rjDxboEbN9PBbRfJRIEBNS24aeg6irTXidxj5ateeII=;
+	s=arc-20240116; t=1773408896; c=relaxed/simple;
+	bh=90zTevJdzu6deh7sGl/tQMJmAekN5bujMcUwaYFzm0U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b33C79n3AYIdLw0Md1H3rPhe0ksZK2J30ZlXLEBsi0M/bFm6SqRJPd3EGoQm6Gnwnk2ig8agSfjIAR4RCVBlUs2x1QaTwEfmsDhdyLj+HvlPwSxaivkWwRRAI16m9Y7e99iG3hSwu/6a0dVRioZoPdF2jnORUR+5oJOWq9CnmFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DWjdx58w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03FCAC19421;
-	Fri, 13 Mar 2026 13:31:17 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=urr6QsAlCWxJUY5Joor9KZa5Vei/5Lu0xHs9D5+x20VDyLM+tnt93HzMA+M9hQS6mGokwzHDpnyEuTSvrx//iTXqGZ/+72xhE1a+ZFBk12rSbKelUMCMPwTYyyPefUr4pIufTDACdLoXbvKY03WhAwU/mRHi906234wmpJl7Iss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oZJFFGOD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57F81C19421;
+	Fri, 13 Mar 2026 13:34:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773408680;
-	bh=rjDxboEbN9PBbRfJRIEBNS24aeg6irTXidxj5ateeII=;
+	s=k20201202; t=1773408895;
+	bh=90zTevJdzu6deh7sGl/tQMJmAekN5bujMcUwaYFzm0U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DWjdx58wOVYhoSoJR4FcnGaavF+YH3YlsFNH428rWhwV0xwvYXeoC869SDVfXZwTV
-	 k53lIQ2crmAWyD4Vq2fPYN8YQuTVYH8DI6zS1tR1CzNYAmfob+s2zJlrQWfRulxhd7
-	 hZdlFqRNnD5avftUsauqGZR39Wb3yioCecz+S2tAttstBnRtH+aSno0VoWFHU3Dg++
-	 2idSw6g9i9+IEUCcxJprhjvWvqrYsAabqzSXznSVLkYGSOZIUi6m308foPG42kniva
-	 k8yuh6rGI1K0lbpatLeDoDhHh/jhKLTsd+hg27bIbr28jhSGSzYY1ey74u6ay6kpMo
-	 VS9g4dUeIKZKQ==
-Date: Fri, 13 Mar 2026 13:31:15 +0000
+	b=oZJFFGODrGFjZfTI78cukJYH9nCTl70Nhlfep/6evq0ipXyIcAZsklsedjWx3yVpp
+	 Ykch0ynhqDRalKtgLfA8W2acek6+ri/g3/NnrIsFP2VxUEtmkIhamQYdejvcSLYdTA
+	 NmYwtzVXg5K7j/843T62Ej/WSbhtg82SKcTh74cTOAAHmCheZjRj/kIVa+JaZwIy9V
+	 xw2ohNR236NogKdOJ0uXfZ+hCdIkHUpdkz6/wNUGXRDx7xJmhJudRPBWJ+BwEmmYbf
+	 q5/marx+kVbAZi7BAqx1zOsAAZyIItt7STh/1YFMU7MS8oCyvghWdfUMH1ELjdvhD4
+	 9M9I4KWRti+wA==
+Date: Fri, 13 Mar 2026 13:34:51 +0000
 From: Simon Horman <horms@kernel.org>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Meghana Malladi <m-malladi@ti.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH net-next v2] net: ti: icssg-prueth: Add HSR multicast FDB
- port membership management
-Message-ID: <20260313133115.GY461701@kernel.org>
-References: <20260311082923.2962937-1-danishanwar@ti.com>
+To: "Korba, Przemyslaw" <przemyslaw.korba@intel.com>
+Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"Keller, Jacob E" <jacob.e.keller@intel.com>
+Subject: Re: [PATCH iwl-next] i40e: PTP: set supported flags in ptp_clock_info
+Message-ID: <20260313133451.GZ461701@kernel.org>
+References: <20260309141220.343224-1-przemyslaw.korba@intel.com>
+ <20260310182458.GQ461701@kernel.org>
+ <PH0PR11MB49044CA89B5D8780D477561D9447A@PH0PR11MB4904.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,26 +65,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260311082923.2962937-1-danishanwar@ti.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <PH0PR11MB49044CA89B5D8780D477561D9447A@PH0PR11MB4904.namprd11.prod.outlook.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267457-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-267458-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TO_DN_SOME(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
@@ -94,55 +92,90 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,ti.com:email]
-X-Rspamd-Queue-Id: A287C2843AB
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,osuosl.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7617A284443
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 01:59:23PM +0530, MD Danish Anwar wrote:
-> In HSR offload mode, multicast addresses can be added via HSR master
-> (hsr0) or directly to slave ports (eth1/eth2). The FDB must track port
-> membership: P0 (0x1) for HSR master, P1 (0x2) for slave port 1, and P2
-> (0x4) for slave port 2. When the same address is added from multiple
-> paths, memberships must accumulate.
-> 
-> Implement a hybrid approach using __dev_mc_sync() callbacks to track
-> basic add/delete operations, checking netdev_hw_addr->synced to
-> distinguish HSR-synced addresses from direct additions. Post-process
-> to handle overlapping memberships by checking refcount:
-> - refcount=2 with synced=1: HSR only (P0)
-> - refcount>=3 with synced=1: HSR + direct (P0|P1/P2)
-> - synced=0 with P0 set: HSR removed, clean up orphaned P0
-> 
-> On add operations, accumulate new membership with existing ports. On
-> delete operations, remove only the specific port and clean up orphaned
-> P0 bits if needed.
-> 
-> Add error handling for icssg_fdb_lookup() which can return negative
-> error codes (e.g., -ETIMEDOUT). On lookup failure in add/delete path,
-> default to no existing membership. In the post-processing path, skip
-> the address update to avoid corrupting FDB entries with garbage values.
-> 
-> VLAN Interface Handling:
-> Add support for multicast addresses added to VLAN interfaces on the HSR
-> master (e.g., hsr0.7). These addresses require P0 (HSR master) bit to be
-> set along with the port bits, since VLAN-tagged packets use separate FDB
-> entries per VLAN ID. Without P0, the HSR master would not receive
-> multicast packets on VLAN interfaces.
-> 
-> Track whether the add/del operation came from a VLAN interface path and
-> set P0 when in HSR offload mode with VLAN interfaces. Update orphaned P0
-> cleanup logic to preserve P0 for VLAN interfaces.
-> 
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> ---
-> v1 -> v2: 
->    Added a helper function as suggested by Simon Horman <horms@kernel.org>
+On Wed, Mar 11, 2026 at 12:42:10PM +0000, Korba, Przemyslaw wrote:
+> > -----Original Message-----
+> > From: Simon Horman <horms@kernel.org>
+> > Sent: Tuesday, March 10, 2026 7:25 PM
+> > To: Korba, Przemyslaw <przemyslaw.korba@intel.com>
+> > Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> > <przemyslaw.kitszel@intel.com>; Keller, Jacob E <jacob.e.keller@intel.com>
+> > Subject: Re: [PATCH iwl-next] i40e: PTP: set supported flags in ptp_clock_info
+> > 
+> > + Jacob
+> > 
+> > On Mon, Mar 09, 2026 at 03:11:51PM +0100, Przemyslaw Korba wrote:
+> > > Since upstream commit d9f3e9ecc456 ("net: ptp: introduce
+> > > .supported_perout_flags to ptp_clock_info") and commit 7c571ac57d9d ("net:
+> > > ptp: introduce .supported_extts_flags to ptp_clock_info"), kernel core
+> > > now requires that the driver set the .supported_perout_flags and
+> > > .supported_extts_flags fields in PTP clock info. Otherwise, the
+> > > additional flags will be rejected by the kernel automatically.
+> > >
+> > > i40e does not support perout flags, so reject any request with perout
+> > > flags.
+> > >
+> > > Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+> > > ---
+> > >  drivers/net/ethernet/intel/i40e/i40e_ptp.c | 12 +++++++++++-
+> > >  1 file changed, 11 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+> > > b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+> > > index 7bcea7d9720f..8d7958692235 100644
+> > > --- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+> > > +++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+> > > @@ -601,10 +601,18 @@ static int i40e_ptp_feature_enable(struct ptp_clock_info *ptp,
+> > >  	/* TODO: Implement flags handling for EXTTS and PEROUT */
+> > >  	switch (rq->type) {
+> > >  	case PTP_CLK_REQ_EXTTS:
+> > > +		if (rq->extts.flags & ~(PTP_ENABLE_FEATURE |
+> > > +					PTP_RISING_EDGE |
+> > > +					PTP_FALLING_EDGE |
+> > > +					PTP_STRICT_FLAGS))
+> > > +			return -EOPNOTSUPP;
+> > > +
+> > >  		func = PTP_PF_EXTTS;
+> > >  		chan = rq->extts.index;
+> > >  		break;
+> > >  	case PTP_CLK_REQ_PEROUT:
+> > > +		if (rq->perout.flags)
+> > > +			return -EOPNOTSUPP;
+> > >  		func = PTP_PF_PEROUT;
+> > >  		chan = rq->perout.index;
+> > >  		break;
+> > 
+> > I am a little confused.
+> > 
+> > My understanding of the cited patches is that they add checking of flags to the code. So code like the above isn't needed in drivers.
+>  
+> Hi Simon, thank you very much for the review. My understanding is that the driver needs to set the supported flags field, otherwise requests won't go through kernel. The test I've been doing confirm my theory. Here's also example patch, that adds supported flags to drivers: https://lore.kernel.org/intel-wired-lan/20250414-jk-supported-perout-flags-v2-1-f6b17d15475c@intel.com/
 
-Thanks for the update.
+Sorry for the slow response.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+My understanding is that the hunk above is not required.
+But the hunk below is.
 
-It is unclear to me why this is marked as Not Applicable in patchwork.
+> 
+> > > @@ -1340,7 +1348,9 @@ static int i40e_init_pin_config(struct i40e_pf *pf)
+> > >  	pf->ptp_caps.n_ext_ts = 2;
+> > >  	pf->ptp_caps.pps = 1;
+> > >  	pf->ptp_caps.n_per_out = 2;
+> > > -
+> > > +	pf->ptp_caps.supported_extts_flags = PTP_RISING_EDGE |
+> > > +					     PTP_FALLING_EDGE |
+> > > +					     PTP_STRICT_FLAGS;
+> > >  	pf->ptp_caps.pin_config = kzalloc_objs(*pf->ptp_caps.pin_config,
+> > >  					       pf->ptp_caps.n_pins);
+> > >  	if (!pf->ptp_caps.pin_config)
+> > >
+> > > base-commit: d5fbc991435eac7a1ead7cd2ddb5a743528718bb
+> > > --
+> > > 2.43.0
+> > >
 
