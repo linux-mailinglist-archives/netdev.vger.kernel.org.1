@@ -1,188 +1,140 @@
-Return-Path: <netdev+bounces-267276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267277-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gLHQKrR3s2mwWgAAu9opvQ
-	(envelope-from <netdev+bounces-267276-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:34:28 +0100
+	id sA0mIY54s2nDWwAAu9opvQ
+	(envelope-from <netdev+bounces-267277-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:38:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DDA327CD0B
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:34:28 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CD4927CD52
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:38:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A03683018698
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:34:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1279830325F1
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AFF133FE15;
-	Fri, 13 Mar 2026 02:34:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2CD346A13;
+	Fri, 13 Mar 2026 02:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZcCYKwjA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZmGErku"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618C33385BC;
-	Fri, 13 Mar 2026 02:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498E62E888C;
+	Fri, 13 Mar 2026 02:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773369263; cv=none; b=oneWcIAeYkuN4H41Bao/7gJ5qubHMxUEba+BGU/jMZXjfpPN+DvH168I8V6J6TOCP3GmdcrAiO7R+i0qdSF4Of7pDat/HsfbNQ5zq+ick8GnGNOIumjoyeTZyc+Uwox/6JOk0SSONr8fXIaQkSDD8J0kHST+t/nq6NXRs9KL40I=
+	t=1773369484; cv=none; b=r0ed694OnDkf9OEHyaNG4nOZkCLr87wVVmQaNSVLEv3bnpyrzFqbSaRHyBprLcwxgp1ohSBfsIZAN4jRHHLRWEGeTPRlkpHyDf+kOmxoUekMormy5TReSvNfmwkqfRtiAEvGmiQuuC/3MvQUQSJS0KAn/0mSM6Tm1iJGHrqQnhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773369263; c=relaxed/simple;
-	bh=fI4DMsqLEbxULT+64Hl2jZcUeY9iULBhKP8OUx2adlY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FuqgulYScQzeWunX5dOdMnDS/NDTN7QwVXkFUjU2Y9Ko5jTAlDGEYTKZmdtOZ343JN8xpjLpou+8TqgVPnWzTm0QesnhbK82Y7/G+Y9x7jXiu9+OsVCVOxmyWhXBsTIMONfEF41JeHJDl8BKsCGq1rg15sTk6BA2ZcKyoJzpJuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZcCYKwjA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D41CC4CEF7;
-	Fri, 13 Mar 2026 02:34:21 +0000 (UTC)
+	s=arc-20240116; t=1773369484; c=relaxed/simple;
+	bh=cXgUEDCxpb0VJM5NocwDb3y+egwZEcpfq0JderV9xYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pPkuoJSJKfRJSZA7FIqsk+rXtgO/qRTwHQ6HVKNZ7+AYGnX6Dhy49az/cz0coUwpRyBVOwQbx+3eTECncnfqNPe3XOodQ5MJXA6pVi1GgIM1txh50jxeC6kXzzQDxPmDRPZ929hx4v7JnOLKgy7nkbijaJ5HAOXas0umEvi2jHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HZmGErku; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 268FAC116C6;
+	Fri, 13 Mar 2026 02:38:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773369262;
-	bh=fI4DMsqLEbxULT+64Hl2jZcUeY9iULBhKP8OUx2adlY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZcCYKwjAaTbe42TPu6skNnR42pX3ozbbmWH6WAa9A+ON5RVxKNJg0YgrHdHdIlH2e
-	 /SKtBOGHV52hJPL6XqnVnI/RM/P100HpyrxOb7wCh6B5AlpTImeIZVogeSpjBZA28C
-	 /RDPzVL08Nq3iEGqM33KIJwkzK8MsyCeIrHHGSmoVKPgg2MD/7oc8hb+0GpQSbe7/r
-	 B/2foPwYR2Uwzw30bQZP+wSmEefkG0vi9eCx4ia+eDY4gaI8CMY3YigLOW+ctNeC1W
-	 IeRjERcG4zRbRscT5zZubZnp9lJYppdupwyyygvM0nNxaq14tcDX/Xq9jUyUSALKas
-	 efy3yzSqXsIXQ==
+	s=k20201202; t=1773369483;
+	bh=cXgUEDCxpb0VJM5NocwDb3y+egwZEcpfq0JderV9xYo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HZmGErkudO/UsvBnemx/cgWFLZAevqTXjslEtTDHabT3yxPJIFMTX6Q7ygD4VcNO9
+	 d4ZrG9RBHupYbJglUOLEKhH2YmSgDCHSN2QxcrTxkBrQtKlHbhRQScs+xcc4HNr1O2
+	 vFJOmjJnM5rvMY6e8TZt1hNTI4L3NKSELZNOW8mYvwSkU0Aeaz3X3qWVskEfm1g34d
+	 9b+hsVvMuRKOnBDLs0BqDCDLy9059cwWrfQQ+eHylhVGC1K5uzQo76MwefIGxnnJkK
+	 D1YY8jw3tzyoHrpIBmdtMloiXb1A+qepUI/C4U8QK4TVdj0CQnqkfoOboUxvVi6aJ+
+	 byWPAXlZ+c2QQ==
+Date: Thu, 12 Mar 2026 19:38:01 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: inochiama@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	boon.khai.ng@altera.com,
-	rmk+kernel@armlinux.org.uk,
-	linux-arm-kernel@lists.infradead.org,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	joabreu@synopsys.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	looong.bin@gmail.com,
-	maxime.chevallier@bootlin.com,
-	siyanteng@cqsoftware.com.cn,
-	conor+dt@kernel.org,
-	wens@kernel.org,
-	krzk+dt@kernel.org,
-	mcoquelin.stm32@gmail.com,
-	pjw@kernel.org,
-	edumazet@google.com,
-	palmer@dabbelt.com,
-	alex@ghiti.fr,
-	spacemit@lists.linux.dev,
-	prabhakar.mahadev-lad.rj@bp.renesas.com,
-	devicetree@vger.kernel.org,
-	robh@kernel.org,
-	aou@eecs.berkeley.edu,
-	vladimir.oltean@nxp.com,
-	dlan@kernel.org,
-	me@ziyao.cc,
-	peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com,
-	pabeni@redhat.com,
-	weishangjuan@eswincomputing.com,
-	netdev@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	dlan@gentoo.org,
-	quentin.schulz@cherry.de,
-	richardcochran@gmail.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next,v9,1/4] dt-bindings: net: Add support for Spacemit K3 dwmac
-Date: Thu, 12 Mar 2026 19:34:17 -0700
-Message-ID: <20260313023417.1577310-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260312012232.373713-2-inochiama@gmail.com>
-References: <20260312012232.373713-2-inochiama@gmail.com>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Yixun Lan
+ <dlan@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, Richard Cochran
+ <richardcochran@gmail.com>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti
+ <alex@ghiti.fr>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Yao
+ Zi <me@ziyao.cc>, Yanteng Si <siyanteng@cqsoftware.com.cn>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Lad Prabhakar
+ <prabhakar.mahadev-lad.rj@bp.renesas.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Chen-Yu Tsai <wens@kernel.org>, Shangjuan
+ Wei <weishangjuan@eswincomputing.com>, Boon Khai Ng
+ <boon.khai.ng@altera.com>, Quentin Schulz <quentin.schulz@cherry.de>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu
+ <joabreu@synopsys.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ spacemit@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>, Longbin
+ Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next v9 3/4] net: stmmac: Add glue layer for
+ Spacemit K3 SoC
+Message-ID: <20260312193801.61c30de4@kernel.org>
+In-Reply-To: <20260312012232.373713-4-inochiama@gmail.com>
+References: <20260312012232.373713-1-inochiama@gmail.com>
+	<20260312012232.373713-4-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267276-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267277-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[38];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,foss.st.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,armlinux.org.uk,ziyao.cc,cqsoftware.com.cn,nxp.com,bp.renesas.com,bootlin.com,eswincomputing.com,altera.com,cherry.de,st.com,synopsys.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,st-md-mailman.stormreply.com,gentoo.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,altera.com,armlinux.org.uk,lists.infradead.org,davemloft.net,lunn.ch,synopsys.com,st-md-mailman.stormreply.com,gmail.com,bootlin.com,cqsoftware.com.cn,google.com,dabbelt.com,ghiti.fr,lists.linux.dev,bp.renesas.com,vger.kernel.org,eecs.berkeley.edu,nxp.com,ziyao.cc,st.com,foss.st.com,redhat.com,eswincomputing.com,gentoo.org,cherry.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4DDA327CD0B
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2CD4927CD52
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Some nit picks only to be addressed in case the AI complaint on patch 1
+is legit..
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-dt-bindings: net: Add support for Spacemit K3 dwmac
+On Thu, 12 Mar 2026 09:22:25 +0800 Inochi Amaoto wrote:
+> +config DWMAC_SPACEMIT
+> +	tristate "Spacemit dwmac support"
+> +	depends on OF && (ARCH_SPACEMIT || COMPILE_TEST)
+> +	select MFD_SYSCON
+> +	default m if ARCH_SPACEMIT
 
-The GMAC IP on Spacemit K3 is almost a standard Synopsys DesignWare MAC
-(version 5.40a) with some extra clock. This patch adds the necessary
-compatible string for this device, along with a new binding document
-defining the required properties.
+I know other STMMAC sub-drivers do it but isn't the defconfig for 
+the platform the right place to add this sort of default?
 
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index 38bc34dc4f09..98ebb6276bc6 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -109,6 +109,7 @@ properties:
->          - snps,dwmac-5.10a
->          - snps,dwmac-5.20
->          - snps,dwmac-5.30a
-> +        - snps,dwmac-5.40a
->          - snps,dwxgmac
->          - snps,dwxgmac-2.10
->          - sophgo,sg2042-dwmac
+> +	apmu = syscon_regmap_lookup_by_phandle_args(pdev->dev.of_node,
+> +						    "spacemit,apmu", 2,
+> +						    offset);
+> +	if (IS_ERR(apmu))
+> +		return dev_err_probe(dev, PTR_ERR(apmu),
+> +				"Failed to get apmu regmap\n");
 
-[ ... ]
-
-> @@ -656,6 +657,7 @@ allOf:
->                  - snps,dwmac-5.10a
->                  - snps,dwmac-5.20
->                  - snps,dwmac-5.30a
-> +                - snps,dwmac-5.40a
->                  - snps,dwxgmac
->                  - snps,dwxgmac-2.10
->                  - st,spear600-gmac
-
-Is snps,dwmac-5.40a missing from the select block? The binding document has
-a comment at lines 14-17 stating:
-
-    # Select every compatible, including the deprecated ones. This way, we
-    # will be able to report a warning when we have that compatible, since
-    # we will validate the node thanks to the select.
-
-Every other snps,dwmac-* version from 3.40a through 5.30a appears in all three
-locations: the select block (lines 19-43), the properties.compatible enum
-(lines 95-118), and the allOf conditional block (lines 643-673). However,
-snps,dwmac-5.40a only appears in the properties.compatible enum and the allOf
-block.
-
-Without the entry in the select block, a device tree node using
-'snps,dwmac-5.40a' as a standalone compatible (without a vendor-specific first
-entry like 'spacemit,k3-dwmac') would not be selected by this schema for
-validation.
-
-[ ... ]
+looks mis-aligned 
 
