@@ -1,150 +1,130 @@
-Return-Path: <netdev+bounces-267260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267263-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eF0YJqtos2klWAAAu9opvQ
-	(envelope-from <netdev+bounces-267260-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:30:19 +0100
+	id +HfeBsBss2noWAAAu9opvQ
+	(envelope-from <netdev+bounces-267263-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:47:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1641227C42C
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:30:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 749DD27C4BC
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:47:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DA3C0305CA02
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:30:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4B8BF300A583
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B26B2798EA;
-	Fri, 13 Mar 2026 01:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HMW8rj0B"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC9CA318140;
+	Fri, 13 Mar 2026 01:47:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584E8156677;
-	Fri, 13 Mar 2026 01:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mailgw2.hygon.cn (unknown [101.204.27.37])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B776025CC40
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 01:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.204.27.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773365416; cv=none; b=JeD+m23xzb/l+LHoPbNck18NfXDH2V6enCQLd9NEQDubmagunJvMojdRWt78gELRnLTURj1WlyT3o4MF4UM48oS9ewJaEUmeMR2J9HoZmxD0sPWt1g3PAS6sY4dFom5Q/wqahEh+RuDIBJZ9ZlrKji7NGECTAVlXqwn0EGb4+RA=
+	t=1773366456; cv=none; b=Ix3ZlGDCQ1XG4gmyYElxby6eg/6xSQXy3XxqXSM0/KcBR/9V0Cek6TL0rFYsnjz8L5daWYscG8m8wYg8vHns5LL1xXfAbNvD72niRBDAige4Vy+9lMh3NXsA/PBW1KnU1LbNDRyMutBlsUuEHZiCIoMg6Ke/TlWWt0S7BIkQnL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773365416; c=relaxed/simple;
-	bh=MbFGjkKbgw4ZDpQA4ICNacpqF+CouYS6lH+ZiFq2ofk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aLVr3M3ZXfE+JZLuskyxOLduTIspLcD2UJZ2a49D/Uadih+D/C4DOBgFi3JEcqcE0zMPrru+hNEe080thaOTO02xw3KXesJlPqfZw4JKN17FhEL83kwUgQ4siDAcApc4z/ufLHPi02t4OOmT/RJkbilIS+JuYJciLQMSpkVDxb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HMW8rj0B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34CE4C4CEF7;
-	Fri, 13 Mar 2026 01:30:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773365415;
-	bh=MbFGjkKbgw4ZDpQA4ICNacpqF+CouYS6lH+ZiFq2ofk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HMW8rj0BhL/TuRONoJ/qimsUnVigFKmOt2h/G8lJ3CxWYk6qOhsVVRong8KKVIOST
-	 Cc3bZ9jUm2p3ZPmu3xszro1j2cLK2e3XbYBtw8e43ocZzLLVWPs8sA7uHTo7zVje9o
-	 kLx9Ak0mzk7We8YpkMpfsL8tmOL9qbHE21N2XNp4bpG7E6uXapb4QpcHT6k/S+QvHV
-	 FmkchlKMOvm42uUsSJ3MRnAmuFaXx4cFKPVijGKbQTgqwr+1iGkGgDWSPXd44q4/6d
-	 U+mi4nlfynP/LqmERwNTtocrUc7Qimgb2AUjYv9sEecvRyTmsk9U3ai0YZSghF7Xuw
-	 DYIBrhLhTTnrA==
-Date: Thu, 12 Mar 2026 18:30:14 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Vladimir Kondratiev
- <vladimir.kondratiev@mobileye.com>, Gregory CLEMENT
- <gregory.clement@bootlin.com>, =?UTF-8?B?QmVub8OudA==?= Monin
- <benoit.monin@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Paolo Valerio
- <pvalerio@redhat.com>
-Subject: Re: [PATCH net-next v2 2/2] net: macb: distribute evenly Tx SRAM
- segments
-Message-ID: <20260312183014.658ffa8b@kernel.org>
-In-Reply-To: <20260311-macb-set-channels-v2-2-982693a1f5fc@bootlin.com>
-References: <20260311-macb-set-channels-v2-0-982693a1f5fc@bootlin.com>
-	<20260311-macb-set-channels-v2-2-982693a1f5fc@bootlin.com>
+	s=arc-20240116; t=1773366456; c=relaxed/simple;
+	bh=cARjo3b5CBMHUcYu6xnyXwuPlwMkezzMLIuyLwut6pg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pP+nFdKPaympR82VKKSuqjavwl8vVUq+cO7TMICuyQTbacKJB63LyTgyiEqNS7aIdO65WjtANVETq+KecfTddWNph6Fe7tDEyrFDVlHuKWgsunyjkXKUsmlemv8IhVo+2cTCD8v22uz8ZPBwKVvPwwh9nVQM/eJWBrkBJeIlJ4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn; spf=pass smtp.mailfrom=hygon.cn; arc=none smtp.client-ip=101.204.27.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
+Received: from maildlp2.hygon.cn (unknown [127.0.0.1])
+	by mailgw2.hygon.cn (Postfix) with ESMTP id 4fX6Pq3Tszz1YHN2l;
+	Fri, 13 Mar 2026 09:30:55 +0800 (CST)
+Received: from maildlp2.hygon.cn (unknown [172.23.18.61])
+	by mailgw2.hygon.cn (Postfix) with ESMTP id 4fX6Pp6PYDz1YHN2l;
+	Fri, 13 Mar 2026 09:30:54 +0800 (CST)
+Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
+	by maildlp2.hygon.cn (Postfix) with ESMTPS id A0FA531C620A;
+	Fri, 13 Mar 2026 09:29:39 +0800 (CST)
+Received: from SZ-4DN1M34.Hygon.cn (172.28.22.30) by cncheex04.Hygon.cn
+ (172.23.18.114) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Fri, 13 Mar
+ 2026 09:30:54 +0800
+From: Di Zhu <zhud@hygon.cn>
+To: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
+	<eperezma@redhat.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <virtualization@lists.linux.dev>
+CC: <zhud@hygon.cn>, <lijing@hygon.cn>, <yingzhiwei@hygon.cn>
+Subject: [PATCH net] virtio-net: clear NETIF_F_GRO_HW if no GRO-related offloads are capable
+Date: Fri, 13 Mar 2026 09:30:40 +0800
+Message-ID: <20260313013040.896924-1-zhud@hygon.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: cncheex05.Hygon.cn (172.23.18.115) To cncheex04.Hygon.cn
+ (172.23.18.114)
+X-Spamd-Result: default: False [1.64 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[hygon.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267260-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-267263-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhud@hygon.cn,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.965];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1641227C42C
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 749DD27C4BC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 11 Mar 2026 17:41:54 +0100 Th=C3=A9o Lebrun wrote:
-> GEM has registers to configure the Tx SRAM segments distribution across
-> queues. The reset value is apprioriate (even spread) but we need to
-> care if/when number of active queues is modified (or if we inherited
-> unevenly initialised hardware from bootloader).
->=20
-> To distribute segments, we take as input the number of queues
-> (bp->num_queues) and the number of segments (found inside DCFG6).
-> Its output is a number of segments for each queue, formatted as
-> powers-of-two (eg 2 for queue 0 means it has 2^2=3D4 segments)
+Although VIRTIO_NET_F_CTRL_GUEST_OFFLOADS is negotiated, which indicates
+the device supports dynamic control of guest offloads, it does not
+necessarily mean the device supports specific hardware GRO features.
 
-allmodconfig builds are not happy with whatever is going on here:
+If none of the features defined in GUEST_OFFLOAD_GRO_HW_MASK (such as
+TSO4, TSO6, or UFO) are present in vi->guest_offloads_capable, the
+device effectively lacks the hardware capability to perform GRO.
 
-ld.lld: error: undefined symbol: gem_sram_distribute_segments
->>> referenced by macb_kunit.c:13 (drivers/net/ethernet/cadence/macb_kunit.=
-c:13)
->>>               vmlinux.o:(macb_sram_segments_test)
->>> referenced by macb_kunit.c:51 (drivers/net/ethernet/cadence/macb_kunit.=
-c:51)
->>>               vmlinux.o:(macb_sram_segments_gen_params)
+In this case, NETIF_F_GRO_HW should be cleared from dev->hw_features
+to prevent the stack from attempting to enable an unsupported
+hardware offload configuration.
 
-ld.lld: error: undefined symbol: kunit_binary_assert_format
->>> referenced by macb_kunit.c:29 (drivers/net/ethernet/cadence/macb_kunit.=
-c:29)
->>>               vmlinux.o:(macb_sram_segments_test)
->>> referenced by macb_kunit.c:34 (drivers/net/ethernet/cadence/macb_kunit.=
-c:34)
->>>               vmlinux.o:(macb_sram_segments_test)
+Fixes: a02e8964eaf9 ("virtio-net: ethtool configurable LRO")
+Signed-off-by: Di Zhu <zhud@hygon.cn>
+---
+ drivers/net/virtio_net.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-ld.lld: error: undefined symbol: __kunit_do_failed_assertion
->>> referenced by macb_kunit.c:29 (drivers/net/ethernet/cadence/macb_kunit.=
-c:29)
->>>               vmlinux.o:(macb_sram_segments_test)
->>> referenced by macb_kunit.c:34 (drivers/net/ethernet/cadence/macb_kunit.=
-c:34)
->>>               vmlinux.o:(macb_sram_segments_test)
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 72d6a9c6a5a2..49a60af684d5 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -7058,6 +7058,9 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 	}
+ 	vi->guest_offloads_capable = vi->guest_offloads;
+ 
++	if (!(vi->guest_offloads_capable & GUEST_OFFLOAD_GRO_HW_MASK))
++		dev->hw_features &= ~NETIF_F_GRO_HW;
++
+ 	rtnl_unlock();
+ 
+ 	err = virtnet_cpu_notif_add(vi);
+-- 
+2.34.1
 
-ld.lld: error: undefined symbol: __kunit_abort
->>> referenced by macb_kunit.c:29 (drivers/net/ethernet/cadence/macb_kunit.=
-c:29)
->>>               vmlinux.o:(macb_sram_segments_test)
->>> referenced by macb_kunit.c:34 (drivers/net/ethernet/cadence/macb_kunit.=
-c:34)
->>>               vmlinux.o:(macb_sram_segments_test)
+
 
