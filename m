@@ -1,203 +1,186 @@
-Return-Path: <netdev+bounces-267428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267429-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4C1ONSj9s2mWewAAu9opvQ
-	(envelope-from <netdev+bounces-267428-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:03:52 +0100
+	id 4HWWJxL+s2mWewAAu9opvQ
+	(envelope-from <netdev+bounces-267429-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:07:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D7F1282A52
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:03:52 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DC8C282B34
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:07:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E0C163012E60
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:03:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 82F59306CDE2
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0EB934D3B8;
-	Fri, 13 Mar 2026 12:03:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 306923914FA;
+	Fri, 13 Mar 2026 12:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MWzAq3E9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m6zIYfOx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88BC02DA755
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 12:03:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0F22C0F6F
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 12:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773403430; cv=none; b=dMMsqiRAM2CxZZhs2W3xH0hvrG8gO+80345ldfiJb3XTPnguiUGcaEd7xVZshJ2lIr9AzvnVIENm2mxhv+xdXW3MeHoIs+cyreB61/YiF5KbTOPGqw034XnOQKBFpnztqrlEdAmfk4X4EXvCNkxNjQGMTVwUvFuBV11d07T4UpI=
+	t=1773403638; cv=none; b=mktueaXnajngHUsb+MDZYGh/V8ivMsoITNBhFyFjNTb6Du0xFEGIsgEd6DXil5L5szEp+l8Xl4N2fdSpRwCwSh6e6EQWQmKP9Af9dD2Oomd0Hg1az5vlaODsZiy0e/Ly5gJzTVYz56D5PXiN7fE/HbFA88H1gZXq/8ERxbfAI+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773403430; c=relaxed/simple;
-	bh=8ImYfB2tzqYGjOu1vTOY7m3nyhM1vkSu8wedccPHmC8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hzjqRd2XU+3p6jujeNKL6Wfud2ZLYHMYPWATuKefQO1O0mbPvft5vCnQuM/xsXinc6hR+S3YMDXGb2oCvLnRXW8/zMayI2Q1gUr1cvs4nNUr4DBKIPjVN0XFPRZBm8aDtFYsgnX8nICqIXUdZdnKyv6b/18KH4lUjpk+dWqQghM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MWzAq3E9; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-89a174bd442so62097996d6.2
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 05:03:49 -0700 (PDT)
+	s=arc-20240116; t=1773403638; c=relaxed/simple;
+	bh=WyGBrZEqneOMA36Rq97DAhfkG/b1VNMLozC8HuoKhOM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oQ85YL04kNDSl9xnidpAWri1yA9tMno1OIbf/pJ56b9ayvCZkUs1VLl42qWNgzM7gkjp5RK4IiA1mlnzJs0a2MJoUxAZLBBtDC1+gu1LRJH2zXPREO4aN2sG/NCCvsEMTk2obDifVb69wBXWh7Pg2wZqmRX0KKDll2IZMWhPKNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m6zIYfOx; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-48334ee0aeaso19485525e9.1
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 05:07:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773403428; x=1774008228; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=D6xnvSgowOgdv9q8gQbo09TVpLkgC6pEH5sJ9cGcOC0=;
-        b=MWzAq3E9mUJ3RRohMDFlu3SeaBo9QGxkGL1unefXJY54VmBMP8Ed3AQPYj2S/2cVwX
-         8pKWNY30eIr1ic56+2vKJiJxtTmk+RwP9b8mczeft0cbJo00YwdVI28Fhc/OAS/M77HF
-         8dSzpXONX1pC34fRqkEzSpeNVhA7YaF+f8cB/F/dGXfF6tY9Y1aj3ySOwg8t230AyYe0
-         r+aoqbmcLIeD3TAYB7xD7nq06Xq5jKUchko3+pYzrrgFii21g2Rz4ZpPFqggme0JN1WH
-         XHCIs1K5T68ypSREeuhoxBJIJ6ikH1j9L4YWwOE2KqQaVBBJJreisHbFuxZUkTo1Dq94
-         vEYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773403428; x=1774008228;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=gmail.com; s=20230601; t=1773403635; x=1774008435; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=D6xnvSgowOgdv9q8gQbo09TVpLkgC6pEH5sJ9cGcOC0=;
-        b=i6kV4LryKOYxcSRy590QS5ziVvQg1s0mKnmZLUbX8z9M/KbWT2jYbhgzZLTeeTHlmO
-         xhyhL8xDftxuCyj2zEN9kEPCrWt+u1pOZBbZ0pxvHaAXTAPX+d0BWpgTQGBXCtB15hvH
-         fBksw64Jb7NaZfpSeau2G9lFLa2W3GyJ7iD5VIa4ZTulsZxJrrasjtZ8K1zVLijAyFQE
-         +wTwBFWFQFsQpaLQ4zpnBiyVacTK2tNuGWShtDmrrCPoJg761NO/pPw6RtucZvIHNUqQ
-         m5Ef06/Po8JLWaothyGNbGSHeb6BKZILdefppQIk4mwXplDhPdLg3FSjQNudoCj/pxXN
-         0ByQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU4BpJHbe1899LdrDBM1VZ85uSEq6c0Q310B/yVncSUxBZiRNW5U4AnFVfuHcY24xBWBfcuEnI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWmgYeZhrTlecJbHzMBA+t/b56/MyYE67VCfIRoy/uXhV3EQ0H
-	tis5C6rJJotzkxqz+sVKp9wBcxRypAXDhg7iSEt9WwHnI17Yzx8yj3nX93tfM+Q6WMQW3pyzGCx
-	W+etUDaoDw64faA==
-X-Received: from qvboh2.prod.google.com ([2002:a05:6214:4382:b0:899:f84a:7819])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:d66:b0:899:e567:f04d with SMTP id 6a1803df08f44-89a81d3283cmr47236576d6.11.1773403428262;
- Fri, 13 Mar 2026 05:03:48 -0700 (PDT)
-Date: Fri, 13 Mar 2026 12:03:46 +0000
+        bh=Qi4fWV4Vp6Y6RIKcKR3GE504LvU1lft8ajgS4e4DM4s=;
+        b=m6zIYfOx3yTsNgqrqlmjtcPLbNHg3Ib3LMXpl1hy+sbUV9SvqJEdtcH0mEluk9KWJk
+         pUJ5LKjXH2b4KsbsbzW2ADXPf3ImZ3m576MB6cm7cAcB3U2G/84vOrOQCxQJMqwyqnIO
+         +IA4FW8UGAwzv48siqVBarpGCeGA7XOIPFmNDpKjJ0b59i6v4FCYHLsSIXgoCOoHExeC
+         qCDtOBelUdarLsqT4B/mEdJYTr8Ej1ynr1bCaY41+wRfR9qwL8kqO9bkQJ68J/YYUhqA
+         TzaUH2i4CyaDpcYiVcQYYxvMxOELjAOHKb2JhJ2tkQakLlYryTrIA/JMng8j2VDixXc2
+         bozQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773403635; x=1774008435;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Qi4fWV4Vp6Y6RIKcKR3GE504LvU1lft8ajgS4e4DM4s=;
+        b=Y58jNARJACVnSLuzF3S57w3vbace0kY7MK3ja3xyTNDZ6zkB02RyJa2zdPtgLH3FVd
+         NgWjpxdxQYouH3zBmAPp+3dijMr9qEDcQ1spcUjRulUzndxV+nDLsJqqSMIVtqRoFZT1
+         VgMzFFvNBjlkaVLyt9tT08swkp04tImHxo2mk5ZnAT546wpJF4QuSah9OruPqUPmoO0N
+         FyYBE+K6rD7Iw50t2wGmDb2b+sEL+9huak/Lbd0uoNjpG3shPuHHxa8gy3OkELNZlcGy
+         TggAtX3BczfmYA/fHzcloExK0cFgSgB+cD6INFhA1PlxxWnFXZFPt9d9KyEr/5N2oPXI
+         ck0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVjBDspHQdM5nffdm0zKsjNg1zQz5sKzbglQDyCIoWFU5sx6AgkTzTzlku4WPI2fh3t82MWmWQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxc/0x0qsMbTOszvkUuX/5Q1AZtIXZFAsqPVWKk4vzwIHAG7MVB
+	5U98yN9lN7G7Kt+mcHYle3hxdXYTksZSX4E7b4ZlxJs7qyS98U33BlZXvsJTag==
+X-Gm-Gg: ATEYQzyKGuf3Rl8iYP7G9FISIworjk+eSgw/irWp65EoB3cgsIMmDEROuwe8XgfY3gf
+	Vu/x3fg77NXVu9LXh3rVa4b9nUoH+f5gNus5aaKcMdem/a6tGFOUrQCVTc0zNs1RyWj4MLEh8um
+	W3goOAjdOW+5oPISuTexo76EUGxso+dARWl9rE72wIm5EAyog5olo0XzugMvXa396Co24GRcqxQ
+	Q63VhZIrq+wHgnlrGoPn3YFFBkLnJqfaOYhSaoe0yEyb//yJ/e47bROgghrVMy7XACXCQTYC5m2
+	x1MnRwNyv2dafW4Hu3HJcqOE6Y1absGF8kP86syG3NuZLLkNh3SUE8sHaJZ++Q5pgVXdgEn8kL1
+	bIcTPIyRyK/bLXFMechCC3bWFOrFgSyFv2UlGlt7DwlWQGeBS7v4OR+ou8YwsPpFut2NPZF3Be9
+	Q4tz883VQq6Jm9rZP8k3Lc+VNh4+IUAMoi7u3NrawMkQ9VHzsENh62+PzHuSkKwRHCHKnf578gY
+	yFayxPnijuCFA==
+X-Received: by 2002:a05:600c:1f8e:b0:485:3f58:da1 with SMTP id 5b1f17b1804b1-485566e936amr52710955e9.9.1773403634782;
+        Fri, 13 Mar 2026 05:07:14 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe226473sm15837450f8f.32.2026.03.13.05.07.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Mar 2026 05:07:14 -0700 (PDT)
+Message-ID: <9748039f-3bba-4420-8da9-7644022d1ffc@gmail.com>
+Date: Fri, 13 Mar 2026 12:07:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.880.g73c4285caa-goog
-Message-ID: <20260313120346.3378811-1-edumazet@google.com>
-Subject: [PATCH v2 net-next] tcp: improve inet6_ehashfn() entropy
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 05/10 net-next v2] drivers: net: drop ipv6_stub usage and
+ use direct function calls
+To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, open list <linux-kernel@vger.kernel.org>,
+ "open list:SFC NETWORK DRIVER" <linux-net-drivers@amd.com>
+References: <20260310153506.5181-1-fmancera@suse.de>
+ <20260310153506.5181-6-fmancera@suse.de>
+Content-Language: en-GB
+From: Edward Cree <ecree.xilinx@gmail.com>
+In-Reply-To: <20260310153506.5181-6-fmancera@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267428-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267429-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[ecreexilinx@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7D7F1282A52
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3DC8C282B34
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Instead of only using the 32 low order bits of the local address,
-use all of them.
+On 10/03/2026 15:34, Fernando Fernandez Mancera wrote:
+> As IPv6 is built-in only, the ipv6_stub infrastructure is no longer
+> necessary.
+> 
+> Convert all drivers currently utilizing ipv6_stub to make direct
+> function calls. The fallback functions introduced previously will
+> prevent linkage errors when CONFIG_IPV6 is disabled.
+> 
+> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+...
+> diff --git a/drivers/net/ethernet/sfc/tc_counters.c b/drivers/net/ethernet/sfc/tc_counters.c
+> index d168282f30bf..d8a5f9fd1007 100644
+> --- a/drivers/net/ethernet/sfc/tc_counters.c
+> +++ b/drivers/net/ethernet/sfc/tc_counters.c
+> @@ -112,7 +112,7 @@ static void efx_tc_counter_work(struct work_struct *work)
+>  					 encap->neigh->egdev);
+>  		else
+>  #if IS_ENABLED(CONFIG_IPV6)
+> -			n = neigh_lookup(ipv6_stub->nd_tbl,
+> +			n = neigh_lookup(ipv6_get_nd_tbl(),
+>  					 &encap->neigh->dst_ip6,
+>  					 encap->neigh->egdev);
+>  #else
+> diff --git a/drivers/net/ethernet/sfc/tc_encap_actions.c b/drivers/net/ethernet/sfc/tc_encap_actions.c
+> index da35705cc5e1..63d8f794b869 100644
+> --- a/drivers/net/ethernet/sfc/tc_encap_actions.c
+> +++ b/drivers/net/ethernet/sfc/tc_encap_actions.c
+> @@ -149,8 +149,7 @@ static int efx_bind_neigh(struct efx_nic *efx,
+>  #if IS_ENABLED(CONFIG_IPV6)
+>  			struct dst_entry *dst;
+>  
+> -			dst = ipv6_stub->ipv6_dst_lookup_flow(net, NULL, &flow6,
+> -							      NULL);
+> +			dst = ip6_dst_lookup_flow(net, NULL, &flow6, NULL);
+>  			rc = PTR_ERR_OR_ZERO(dst);
+>  			if (rc) {
+>  				NL_SET_ERR_MSG_MOD(extack, "Failed to lookup route for IPv6 encap");
+> @@ -531,7 +530,7 @@ static int efx_neigh_event(struct efx_nic *efx, struct neighbour *n)
+>  	if (n->tbl == &arp_tbl) {
+>  		keysize = sizeof(keys.dst_ip);
+>  #if IS_ENABLED(CONFIG_IPV6)
+> -	} else if (n->tbl == ipv6_stub->nd_tbl) {
+> +	} else if (n->tbl == ipv6_get_nd_tbl()) {
+>  		ipv6 = true;
+>  		keysize = sizeof(keys.dst_ip6);
+>  #endif
 
-Xor net_hash_mix(net) with the 32 high order bits of the local address
-so that we can use __jhash_mix() three times.
-
-If we were hashing 4 extra bytes, we would need one __jhash_final()
-which is a bit expensive.
-
-Using net_hash_mix() at the beginning allows beter register allocation.
-
-We no longer use a cascade of two jhash and inet6_ehash_secret,
-this was dubious/weak.
-
-Add a comment explaining why @lport is not part of the jhash computation.
-
-$ scripts/bloat-o-meter -t vmlinux.0 vmlinux.1
-add/remove: 0/0 grow/shrink: 0/1 up/down: 0/-24 (-24)
-Function                                     old     new   delta
-inet6_ehashfn                                330     306     -24
-Total: Before=24855958, After=24855934, chg -0.00%
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
-v2: do not include @lport in the jhash computation.
-    Add a comment explaining why we need @lport being added.
-
- net/ipv6/inet6_hashtables.c | 40 ++++++++++++++++++++++++++++++++-----
- 1 file changed, 35 insertions(+), 5 deletions(-)
-
-diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
-index 72bc68fef48abc2c423c688b47154256828555e4..109fbf620ad7cde54300b937db58ada0d5c80664 100644
---- a/net/ipv6/inet6_hashtables.c
-+++ b/net/ipv6/inet6_hashtables.c
-@@ -35,13 +35,43 @@ u32 inet6_ehashfn(const struct net *net,
- 		  const struct in6_addr *laddr, const u16 lport,
- 		  const struct in6_addr *faddr, const __be16 fport)
- {
--	u32 lhash, fhash;
-+	u32 a, b, c;
-+
-+	/*
-+	 * Please look at jhash() implementation for reference.
-+	 * Hash laddr + faddr + lport/fport + net_hash_mix.
-+	 * Notes:
-+	 * We combine laddr[0] (high order 32 bits of local address)
-+	 * with net_hash_mix() to avoid using __jhash_final(a, b, c).
-+	 *
-+	 * We do not include JHASH_INITVAL + 36 contribution
-+	 * to initial values of a, b, c.
-+	 */
-+
-+	a = b = c = tcp_ipv6_hash_secret;
-+
-+	a += (__force u32)laddr->s6_addr32[0] ^ net_hash_mix(net);
-+	b += (__force u32)laddr->s6_addr32[1];
-+	c += (__force u32)laddr->s6_addr32[2];
-+	__jhash_mix(a, b, c);
- 
--	lhash = (__force u32)laddr->s6_addr32[3];
--	fhash = __ipv6_addr_jhash(faddr, tcp_ipv6_hash_secret);
-+	a += (__force u32)laddr->s6_addr32[3];
-+	b += (__force u32)faddr->s6_addr32[0];
-+	c += (__force u32)faddr->s6_addr32[1];
-+	__jhash_mix(a, b, c);
- 
--	return lport + __inet6_ehashfn(lhash, 0, fhash, fport,
--				       inet6_ehash_secret + net_hash_mix(net));
-+	a += (__force u32)faddr->s6_addr32[2];
-+	b += (__force u32)faddr->s6_addr32[3];
-+	c += (__force u32)fport;
-+	__jhash_mix(a, b, c);
-+
-+	/* Note: We need to add @lport instead of fully hashing it.
-+	 * See commits 9544d60a2605 ("inet: change lport contribution
-+	 * to inet_ehashfn() and inet6_ehashfn()") and d4438ce68bf1
-+	 * ("inet: call inet6_ehashfn() once from inet6_hash_connect()")
-+	 * for references.
-+	 */
-+	return lport + c;
- }
- EXPORT_SYMBOL_GPL(inet6_ehashfn);
- 
--- 
-2.53.0.880.g73c4285caa-goog
-
+# for sfc:
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 
