@@ -1,193 +1,397 @@
-Return-Path: <netdev+bounces-267638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267639-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AaSfKj+atGktrAAAu9opvQ
-	(envelope-from <netdev+bounces-267638-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 00:14:07 +0100
+	id OBESCd+btGmHrAAAu9opvQ
+	(envelope-from <netdev+bounces-267639-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 00:21:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 476FD28A9D7
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 00:14:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5049028AA64
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 00:21:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8499E300AB1D
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 23:14:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CEA0D3076720
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 23:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61A93876C5;
-	Fri, 13 Mar 2026 23:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 129573E4C9B;
+	Fri, 13 Mar 2026 23:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="xXc7051f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pukSWFd8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C70437DEAC;
-	Fri, 13 Mar 2026 23:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D8E3E4C60;
+	Fri, 13 Mar 2026 23:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773443643; cv=none; b=qILY5dHtLPJMEE9GpWlzUS1phNrHuHBkBLOv5BAbT4fkuJ6H94D6igupE1PzQPQuWdmamMXn1yRdEs24XeiVfsuPJqdr0r00v5UfvTzUW2yYOTb23WS7eRXwzqBz4++5hB8ZX0jPWBVpLSYaWEK73qf1oD/O2HtlH32DM8loR/o=
+	t=1773444049; cv=none; b=RjDXvUzI12LGlULh2gpZf+KEGrP6VcWnWXJaB8ocUesKvPz0xu0fN3UXfrPtym2larnOLf90NCPZ144RxzaqAlquj5wTLAhP4rYtwj7xQVIK1KS75hR0FWhERvuRGCZGp6QU7jnrtnp4rum9Pc3aeBcJvgi7zIh89qKNK0Lhm3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773443643; c=relaxed/simple;
-	bh=e8Enhk3QXOf5yExYNdKIRG+B0oRQhLkMaPFJgAFIUOw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QbKOOAg4kPYbSZF2wFi2YCnGGYCcwOnVApO+rjAMr/Ks7P9YtoZxx5xocljOh7fGIjDAbB/Fd/sC/63kep6jJDcEiveCHEzJ6cUfdST+a6GuGONj4+WaE0KZTVcUKR1ELwlZFAM2XnhwbcJA88ayxbRH8/VH8rTEMpH8QR9KA9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=xXc7051f; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=888cROttyB4Mj3b/fjU2ay+60B251y1m25xcSu13rsg=; b=xXc7051f1MEEuQmjSkevTHfm/f
-	RVZsc7Fd5Ygud2adC6JbbtX3Gmvt5co0Ax3Y5gXAyQdtdCV9avbke7TyZ5nzj/rOnizztf1BZkKOe
-	OteMcqZE3GJC2GRj5jGTPbyGoN8HLOWvwtfziTMe8ZnCn7oIuYFIr781jB7sd3kj+qIzWIeobG8vW
-	ggrGLs77qR9CY4gcyPhv3qmtzowjlqJ5D4TPPjivUbOYGYDmFdV+a3RmfIsk5GQeb7S40aXnkbNPX
-	yrVGyWKdQEJYUm8Q8lhA1pLjo00eiAdN2HNX580Dha9HC7SaJGDsydNDvEH2+z37o8datC3XxZfy3
-	sBJkoPRA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54294)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w1BhZ-000000001bH-1R66;
-	Fri, 13 Mar 2026 23:13:53 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w1BhR-000000000Bt-4A74;
-	Fri, 13 Mar 2026 23:13:46 +0000
-Date: Fri, 13 Mar 2026 23:13:45 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "\\Jitendra Vegiraju" <jitendra.vegiraju@broadcom.com>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	bcm-kernel-feedback-list@broadcom.com, richardcochran@gmail.com,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, rohan.g.thomas@altera.com,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org,
-	andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
-	me@ziyao.cc, siyanteng@cqsoftware.com.cn,
-	prabhakar.mahadev-lad.rj@bp.renesas.com,
-	weishangjuan@eswincomputing.com, wens@kernel.org,
-	vladimir.oltean@nxp.com, lizhi2@eswincomputing.com,
-	boon.khai.ng@altera.com, maxime.chevallier@bootlin.com,
-	matthew.gerlach@altera.com, chenchuangyu@xiaomi.com,
-	yangtiezhu@loongson.cn, ovidiu.panait.rb@renesas.com,
-	chenhuacai@kernel.org, florian.fainelli@broadcom.com,
-	quic_abchauha@quicinc.com
-Subject: Re: [PATCH net-next v7 2/5] net: stmmac: Add DW25GMAC support in
- stmmac core driver
-Message-ID: <abSaKe3d4fcBMqLm@shell.armlinux.org.uk>
-References: <20260313222206.778760-1-jitendra.vegiraju@broadcom.com>
- <20260313222206.778760-3-jitendra.vegiraju@broadcom.com>
+	s=arc-20240116; t=1773444049; c=relaxed/simple;
+	bh=cGqiI5xuJik7Tou8GjfeWbop/vKbAKRDllFYzK95mUs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AmOFzwjFF/HbY4hmSLSaYRGu8SND0WptDHLeu8E3VGp1qAzGUnZK93+XkEUXbsmC6bK7U2qNLklBV9qPw2+qpt86EqqTaj8p2TerB7pm9t+qtjE6LJqUwr5lVrsxljwt11p6qRinbyy91kHJAV4UHp5qLF2xvQi4PeNgAaeC4PQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pukSWFd8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64BECC19421;
+	Fri, 13 Mar 2026 23:20:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773444048;
+	bh=cGqiI5xuJik7Tou8GjfeWbop/vKbAKRDllFYzK95mUs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pukSWFd8filQiwpH+ixlWoiKrSqx1tzIU8i9t69ixJmKA53dfzsn0GvCrgK4la19c
+	 udCMmxCfW+5yfurF/ZXt/u7FPUWjr47AsyH5pQqWsAi02AvNQWmY/eeEPbWVe763ii
+	 krCJHbrPyPPOdL+lg0Kq+E/YJXLw5YRr20GCM48K8NZZRLaazaGVjMmoqfc1Covyxh
+	 WXVFrq3P2mzr/PDMVEx45XVgd+VaWBZq5HnfOJCm2Pw6OB9sTrbxnQoeAQfPyEwGJX
+	 8Tiq5YK7ii6T5lWgqe8DyzVOECditKVakElYM74GljWYeQ/9A6wgGpshp85turhtg0
+	 5iHIvJZu6KCOA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	donald.hunter@gmail.com,
+	shuah@kernel.org,
+	sdf@fomichev.me,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] tools: ynl: rework policy access to support recursion
+Date: Fri, 13 Mar 2026 16:20:47 -0700
+Message-ID: <20260313232047.2068518-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260313222206.778760-3-jitendra.vegiraju@broadcom.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267638-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,foss.st.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,broadcom.com,iogearbox.net,altera.com,st-md-mailman.stormreply.com,lists.infradead.org,lunn.ch,fomichev.me,ziyao.cc,cqsoftware.com.cn,bp.renesas.com,eswincomputing.com,nxp.com,bootlin.com,xiaomi.com,loongson.cn,renesas.com,quicinc.com];
-	RCPT_COUNT_TWELVE(0.00)[38];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,fomichev.me];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267639-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.950];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: 476FD28A9D7
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,args.do:url,fomichev.me:email]
+X-Rspamd-Queue-Id: 5049028AA64
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 13, 2026 at 03:22:03PM -0700, \Jitendra Vegiraju wrote:
-> @@ -42,13 +42,18 @@
->  #define DWXGMAC_CORE_2_20	0x22
->  #define DWXLGMAC_CORE_2_00	0x20
->  
-> +#define DW25GMAC_CORE_3_20	0x32
-> +#define DW25GMAC_CORE_4_00	0x40
-> +
+Donald points out that the current naive implementation using dicts
+breaks if policy is recursive (child nest uses policy idx already
+used by its parent).
 
-Do these live in the same versioning numberspace as DWXGMAC and
-DWXLGMAC?
+Lean more into the NlPolicy class. This lets us "render" the policy
+on demand, when user accesses it. If someone wants to do an infinite
+walk that's on them :) Show policy info as attributes of the class
+and use dict format to descend into sub-policies for extra neatness.
 
-> +int dw25gmac_setup(struct stmmac_priv *priv)
-> +{
-> +	struct mac_device_info *mac = priv->hw;
-> +
-> +	dev_info(priv->device, "\tDW25GMAC\n");
-> +
-> +	priv->dev->priv_flags |= IFF_UNICAST_FLT;
-> +	mac->pcsr = priv->ioaddr;
-> +	mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
-> +	mac->unicast_filter_entries = priv->plat->unicast_filter_entries;
-> +	mac->mcast_bits_log2 = 0;
-> +
-> +	if (mac->multicast_filter_bins)
-> +		mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: donald.hunter@gmail.com
+CC: shuah@kernel.org
+CC: sdf@fomichev.me
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/net/ynl/pyynl/cli.py               |   4 +-
+ tools/net/ynl/pyynl/lib/ynl.py           | 152 ++++++++++++++++-------
+ tools/testing/selftests/net/nl_nlctrl.py |  26 ++--
+ 3 files changed, 120 insertions(+), 62 deletions(-)
 
-The above seems to be common amongst the other two setup functions.
-Maybe there should be a helper for this?
-
-> +
-> +	mac->link.caps = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-> +			 MAC_1000FD | MAC_2500FD | MAC_5000FD |
-> +			 MAC_10000FD | MAC_25000FD;
-> +	mac->link.duplex = 0;
-> +	mac->link.speed10 = XGMAC_CONFIG_SS_10_MII;
-> +	mac->link.speed100 = XGMAC_CONFIG_SS_100_MII;
-> +	mac->link.speed1000 = XGMAC_CONFIG_SS_1000_GMII;
-> +	mac->link.speed2500 = XGMAC_CONFIG_SS_2500_GMII;
-> +	mac->link.xgmii.speed2500 = XGMAC_CONFIG_SS_2500;
-> +	mac->link.xgmii.speed5000 = XGMAC_CONFIG_SS_5000;
-> +	mac->link.xgmii.speed10000 = XGMAC_CONFIG_SS_10000;
-> +	mac->link.xgmii.speed25000 = XGMAC_CONFIG_SS_25000;
-> +	mac->link.speed_mask = XGMAC_CONFIG_SS_MASK;
-
-Is there any point populating link.speed10 and link.speed100 ?
-You're telling phylink that 10/100M speeds aren't supported in
-link.caps, so these speeds won't ever be used.
-
-> +
-> +	mac->mii.addr = XGMAC_MDIO_ADDR;
-> +	mac->mii.data = XGMAC_MDIO_DATA;
-> +	mac->mii.addr_mask = GENMASK(20, 16);
-> +	mac->mii.reg_mask = GENMASK(15, 0);
-> +	mac->mii.clk_csr_mask = GENMASK(21, 19);
-
-This will be the third instance of this particular mii data setup.
-Please consider adding a function to do this setup.
-
-Thanks.
-
+diff --git a/tools/net/ynl/pyynl/cli.py b/tools/net/ynl/pyynl/cli.py
+index fc9e84754e4b..8275a806cf73 100755
+--- a/tools/net/ynl/pyynl/cli.py
++++ b/tools/net/ynl/pyynl/cli.py
+@@ -313,11 +313,11 @@ RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
+     if args.policy:
+         if args.do:
+             pol = ynl.get_policy(args.do, 'do')
+-            output(pol.attrs if pol else None)
++            output(pol.to_dict() if pol else None)
+             args.do = None
+         if args.dump:
+             pol = ynl.get_policy(args.dump, 'dump')
+-            output(pol.attrs if pol else None)
++            output(pol.to_dict() if pol else None)
+             args.dump = None
+ 
+     if args.ntf:
+diff --git a/tools/net/ynl/pyynl/lib/ynl.py b/tools/net/ynl/pyynl/lib/ynl.py
+index 0eedeee465d8..9c078599cea0 100644
+--- a/tools/net/ynl/pyynl/lib/ynl.py
++++ b/tools/net/ynl/pyynl/lib/ynl.py
+@@ -143,32 +143,117 @@ from .nlspec import SpecFamily
+     pass
+ 
+ 
+-# pylint: disable=too-few-public-methods
+ class NlPolicy:
+     """Kernel policy for one mode (do or dump) of one operation.
+ 
+-    Returned by YnlFamily.get_policy(). Contains a dict of attributes
+-    the kernel accepts, with their validation constraints.
++    Returned by YnlFamily.get_policy(). Attributes of the policy
++    are accessible as attributes of the object. Nested policies
++    can be accessed indexing the object like a dictionary::
+ 
+-    Attributes:
+-        attrs: dict mapping attribute names to policy dicts, e.g.
+-        page-pool-stats-get do policy::
++        pol = ynl.get_policy('page-pool-stats-get', 'do')
++        pol['info'].type            # 'nested'
++        pol['info']['id'].type      # 'uint'
++        pol['info']['id'].min_value # 1
+ 
+-            {
+-                'info': {'type': 'nested', 'policy': {
+-                    'id':      {'type': 'uint', 'min-value': 1,
+-                                'max-value': 4294967295},
+-                    'ifindex': {'type': 'u32', 'min-value': 1,
+-                                'max-value': 2147483647},
+-                }},
+-            }
++    Each policy entry always has a 'type' attribute (e.g. u32, string,
++    nested). Optional attributes depending on the 'type': min-value,
++    max-value, min-length, max-length, mask.
+ 
+-        Each policy dict always contains 'type' (e.g. u32, string,
+-        nested). Optional keys: min-value, max-value, min-length,
+-        max-length, mask, policy.
++    Policies can form infinite nesting loops. These loops are trimmed
++    when policy is converted to a dict with pol.to_dict().
+     """
+-    def __init__(self, attrs):
+-        self.attrs = attrs
++    def __init__(self, ynl, policy_idx, policy_table, attr_set, props=None):
++        self._policy_idx = policy_idx
++        self._policy_table = policy_table
++        self._ynl = ynl
++        self._props = props or {}
++        self._entries = {}
++        self._cache = {}
++        if policy_idx is not None and policy_idx in policy_table:
++            for attr_id, decoded in policy_table[policy_idx].items():
++                if attr_set and attr_id in attr_set.attrs_by_val:
++                    spec = attr_set.attrs_by_val[attr_id]
++                    name = spec['name']
++                else:
++                    spec = None
++                    name = f'attr-{attr_id}'
++                self._entries[name] = (spec, decoded)
++
++    def __getitem__(self, name):
++        """Descend into a nested policy by attribute name."""
++        if name not in self._cache:
++            spec, decoded = self._entries[name]
++            props = dict(decoded)
++            child_idx = None
++            child_set = None
++            if 'policy-idx' in props:
++                child_idx = props.pop('policy-idx')
++                if spec and 'nested-attributes' in spec.yaml:
++                    child_set = self._ynl.attr_sets[spec.yaml['nested-attributes']]
++            self._cache[name] = NlPolicy(self._ynl, child_idx,
++                                         self._policy_table,
++                                         child_set, props)
++        return self._cache[name]
++
++    def __getattr__(self, name):
++        """Access this policy entry's own properties (type, min-value, etc.).
++
++        Underscores in the name are converted to dashes, so that
++        pol.min_value looks up "min-value".
++        """
++        key = name.replace('_', '-')
++        try:
++            # Hack for level-0 which we still want to have .type but we don't
++            # want type to pointlessly show up in the dict / JSON form.
++            if not self._props and name == "type":
++                return "nested"
++            return self._props[key]
++        except KeyError:
++            raise AttributeError(name)
++
++    def get(self, name, default=None):
++        """Look up a child policy entry by attribute name, with a default."""
++        try:
++            return self[name]
++        except KeyError:
++            return default
++
++    def __contains__(self, name):
++        return name in self._entries
++
++    def __len__(self):
++        return len(self._entries)
++
++    def __iter__(self):
++        return iter(self._entries)
++
++    def keys(self):
++        """Return attribute names accepted by this policy."""
++        return self._entries.keys()
++
++    def to_dict(self, seen=None):
++        """Convert to a plain dict, suitable for JSON serialization.
++
++        Nested NlPolicy objects are expanded recursively. Cyclic
++        references are trimmed (resolved to just {"type": "nested"}).
++        """
++        if seen is None:
++            seen = set()
++        result = dict(self._props)
++        if self._policy_idx is not None:
++            if self._policy_idx not in seen:
++                seen = seen | {self._policy_idx}
++                children = {}
++                for name in self:
++                    children[name] = self[name].to_dict(seen)
++                if self._props:
++                    result['policy'] = children
++                else:
++                    result = children
++        return result
++
++    def __repr__(self):
++        return repr(self.to_dict())
+ 
+ 
+ class NlAttr:
+@@ -1308,28 +1393,6 @@ from .nlspec import SpecFamily
+     def do_multi(self, ops):
+         return self._ops(ops)
+ 
+-    def _resolve_policy(self, policy_idx, policy_table, attr_set):
+-        attrs = {}
+-        if policy_idx not in policy_table:
+-            return attrs
+-        for attr_id, decoded in policy_table[policy_idx].items():
+-            if attr_set and attr_id in attr_set.attrs_by_val:
+-                spec = attr_set.attrs_by_val[attr_id]
+-                name = spec['name']
+-            else:
+-                spec = None
+-                name = f'attr-{attr_id}'
+-            if 'policy-idx' in decoded:
+-                sub_set = None
+-                if spec and 'nested-attributes' in spec.yaml:
+-                    sub_set = self.attr_sets[spec.yaml['nested-attributes']]
+-                nested = self._resolve_policy(decoded['policy-idx'],
+-                                              policy_table, sub_set)
+-                del decoded['policy-idx']
+-                decoded['policy'] = nested
+-            attrs[name] = decoded
+-        return attrs
+-
+     def get_policy(self, op_name, mode):
+         """Query running kernel for the Netlink policy of an operation.
+ 
+@@ -1341,8 +1404,8 @@ from .nlspec import SpecFamily
+             mode: 'do' or 'dump'
+ 
+         Returns:
+-            NlPolicy with an attrs dict mapping attribute names to
+-            their policy properties (type, min/max, nested, etc.),
++            NlPolicy acting as a read-only dict mapping attribute names
++            to their policy properties (type, min/max, nested, etc.),
+             or None if the operation has no policy for the given mode.
+             Empty policy usually implies that the operation rejects
+             all attributes.
+@@ -1353,5 +1416,4 @@ from .nlspec import SpecFamily
+         if mode not in op_policy:
+             return None
+         policy_idx = op_policy[mode]
+-        attrs = self._resolve_policy(policy_idx, policy_table, op.attr_set)
+-        return NlPolicy(attrs)
++        return NlPolicy(self, policy_idx, policy_table, op.attr_set)
+diff --git a/tools/testing/selftests/net/nl_nlctrl.py b/tools/testing/selftests/net/nl_nlctrl.py
+index d19e206c2c02..fe1f66dc9435 100755
+--- a/tools/testing/selftests/net/nl_nlctrl.py
++++ b/tools/testing/selftests/net/nl_nlctrl.py
+@@ -68,39 +68,35 @@ from lib.py import NetdevFamily, EthtoolFamily, NlctrlFamily
+     # dev-get: do has a real policy with ifindex, dump has no policy
+     # (only the reject-all policy with maxattr=0)
+     pol = ndev.get_policy('dev-get', 'do')
+-    ksft_in('ifindex', pol.attrs,
+-            comment="dev-get do policy should have ifindex")
+-    ksft_eq(pol.attrs.get('ifindex', {}).get('type'), 'u32')
++    ksft_in('ifindex', pol, comment="dev-get do policy should have ifindex")
++    ksft_eq(pol['ifindex'].type, 'u32')
+ 
+     pol_dump = ndev.get_policy('dev-get', 'dump')
+-    ksft_eq(len(pol_dump.attrs), 0,
+-            comment="dev-get should not accept any attrs")
++    ksft_eq(len(pol_dump), 0, comment="dev-get should not accept any attrs")
+ 
+     # napi-get: both do and dump have real policies
+     pol_do = ndev.get_policy('napi-get', 'do')
+-    ksft_ge(len(pol_do.attrs), 1)
++    ksft_ge(len(pol_do), 1)
+ 
+     pol_dump = ndev.get_policy('napi-get', 'dump')
+-    ksft_ge(len(pol_dump.attrs), 1)
++    ksft_ge(len(pol_dump), 1)
+ 
+     # -- ethtool (full ops) --
+     et = EthtoolFamily()
+ 
+     # strset-get (has both do and dump, full ops share policy)
+     pol_do = et.get_policy('strset-get', 'do')
+-    ksft_ge(len(pol_do.attrs), 1, comment="strset-get should have a do policy")
++    ksft_ge(len(pol_do), 1, comment="strset-get should have a do policy")
+ 
+     pol_dump = et.get_policy('strset-get', 'dump')
+-    ksft_ge(len(pol_dump.attrs), 1,
+-            comment="strset-get should have a dump policy")
++    ksft_ge(len(pol_dump), 1, comment="strset-get should have a dump policy")
+ 
+     # Same policy means same attribute names
+-    ksft_eq(set(pol_do.attrs.keys()), set(pol_dump.attrs.keys()))
++    ksft_eq(set(pol_do.keys()), set(pol_dump.keys()))
+ 
+     # linkinfo-set is do-only (SET command), no dump
+     pol_do = et.get_policy('linkinfo-set', 'do')
+-    ksft_ge(len(pol_do.attrs), 1,
+-            comment="linkinfo-set should have a do policy")
++    ksft_ge(len(pol_do), 1, comment="linkinfo-set should have a do policy")
+ 
+     pol_dump = et.get_policy('linkinfo-set', 'dump')
+     ksft_eq(pol_dump, None,
+@@ -113,9 +109,9 @@ from lib.py import NetdevFamily, EthtoolFamily, NlctrlFamily
+ 
+     # dev-get do policy should have named attributes from the spec
+     pol = ndev.get_policy('dev-get', 'do')
+-    ksft_ge(len(pol.attrs), 1)
++    ksft_ge(len(pol), 1)
+     # All attr names should be resolved (no 'attr-N' fallbacks)
+-    for name in pol.attrs:
++    for name in pol:
+         ksft_true(not name.startswith('attr-'),
+                   comment=f"unresolved attr name: {name}")
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.53.0
+
 
