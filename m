@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-267456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267457-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sAAIFSQUtGlkgwAAu9opvQ
-	(envelope-from <netdev+bounces-267456-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:41:56 +0100
+	id iG2hNhcWtGlkgwAAu9opvQ
+	(envelope-from <netdev+bounces-267457-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:50:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE642284164
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:41:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A287C2843AB
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:50:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DA3C3311D0C7
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:35:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6374430E7515
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:38:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B9339F17D;
-	Fri, 13 Mar 2026 13:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1A4395D80;
+	Fri, 13 Mar 2026 13:31:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ibl/Eflx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DWjdx58w"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F5A39EF2C;
-	Fri, 13 Mar 2026 13:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5737390CAC;
+	Fri, 13 Mar 2026 13:31:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773408416; cv=none; b=BzFTDMliOd6iJCCnUY/o5mwplxDFg6olAJLo1shxjZA0MBXDSn59dNC4cZ7du2K0CX7wOaI0QXw/LoVvPq8uaOrZkZObTLgoaN6Mriq5w3YDY5Jj/ajDaVX9tbfpiXDx9KwBPsDM0j8zY8j5z3z6MLc1WMTLXj65AhPsbGeUD98=
+	t=1773408680; cv=none; b=twKwn1Yy7YVs9bGIsJPw9cDrMwk//OVQtNCphjSzoMA7lJcTT91Q9O8q2O34Qlt74CWTO4OXBuvip4Pb7ybcy+9jBiAaYnZ1ZmIQXgqJO+mNg+qEYmkCcg9BJQDYF9M0foT+WUrqc3pdS6veRKNy9Rp+dLYroQNcABXsiRYbVSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773408416; c=relaxed/simple;
-	bh=F9cOpm8W4P/nWFLXyOd/EvHTLgFjGGk8Em0lkrGtBaA=;
+	s=arc-20240116; t=1773408680; c=relaxed/simple;
+	bh=rjDxboEbN9PBbRfJRIEBNS24aeg6irTXidxj5ateeII=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o1Tdk6vZvY5Xl7fCckc9/AjrdTyhBnCM8U0zWjGb9us8UMBUdYhDsGCUQA2TQedYCw1/tXTlgnm5Wi0WsLsOWkIWinZKDFJQNGmm/JAVnabTTk14QS+ljJ93S3qP+vaoMkIYTS5vGT1H6aWRm+wyylVDMcdbq1saIyEZt3cEnco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ibl/Eflx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57948C2BC86;
-	Fri, 13 Mar 2026 13:26:54 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=b33C79n3AYIdLw0Md1H3rPhe0ksZK2J30ZlXLEBsi0M/bFm6SqRJPd3EGoQm6Gnwnk2ig8agSfjIAR4RCVBlUs2x1QaTwEfmsDhdyLj+HvlPwSxaivkWwRRAI16m9Y7e99iG3hSwu/6a0dVRioZoPdF2jnORUR+5oJOWq9CnmFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DWjdx58w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03FCAC19421;
+	Fri, 13 Mar 2026 13:31:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773408416;
-	bh=F9cOpm8W4P/nWFLXyOd/EvHTLgFjGGk8Em0lkrGtBaA=;
+	s=k20201202; t=1773408680;
+	bh=rjDxboEbN9PBbRfJRIEBNS24aeg6irTXidxj5ateeII=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ibl/EflxRAb1s/BT2MHYRKpmtqYS73HREXhQgZx8x0LcHDJXgosjHtLczbZaOCMH1
-	 5Tsyz6DIYA/ZTPA1VG+sUVG5BbErRSsISmHfMdLxjEfAxaICS+0OOFlIHeOGQznebB
-	 geR3Bs9MsQ01rLEPPheFrzz9ZVv5bG79TPTCwiKb7OAtXjgYAD9akGZtYr+2WuHOWW
-	 MdF5R4qLOn7ggSnyn3qNZDyKuVNs+NRRO2O2a2PRBK/Fn5AwN2tWyBnZnodNC6ivi2
-	 oXcKKk04A5vMivrYpcEwP4yzANTrnEquzSc4ofcaMH4slibHBSv5S/Mtjq7S8MZSUB
-	 eqmrs6ivFWLmQ==
-Date: Fri, 13 Mar 2026 13:26:51 +0000
+	b=DWjdx58wOVYhoSoJR4FcnGaavF+YH3YlsFNH428rWhwV0xwvYXeoC869SDVfXZwTV
+	 k53lIQ2crmAWyD4Vq2fPYN8YQuTVYH8DI6zS1tR1CzNYAmfob+s2zJlrQWfRulxhd7
+	 hZdlFqRNnD5avftUsauqGZR39Wb3yioCecz+S2tAttstBnRtH+aSno0VoWFHU3Dg++
+	 2idSw6g9i9+IEUCcxJprhjvWvqrYsAabqzSXznSVLkYGSOZIUi6m308foPG42kniva
+	 k8yuh6rGI1K0lbpatLeDoDhHh/jhKLTsd+hg27bIbr28jhSGSzYY1ey74u6ay6kpMo
+	 VS9g4dUeIKZKQ==
+Date: Fri, 13 Mar 2026 13:31:15 +0000
 From: Simon Horman <horms@kernel.org>
-To: cedric.jehasse@luminex.be
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v8 1/2] net/sched: cls_flower: remove unions
- from fl_flow_key
-Message-ID: <20260313132651.GX461701@kernel.org>
-References: <20260311-net-next-mv88e6xxx-tcam-v8-0-32dd5ba30002@luminex.be>
- <20260311-net-next-mv88e6xxx-tcam-v8-1-32dd5ba30002@luminex.be>
+	Meghana Malladi <m-malladi@ti.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Roger Quadros <rogerq@kernel.org>
+Subject: Re: [PATCH net-next v2] net: ti: icssg-prueth: Add HSR multicast FDB
+ port membership management
+Message-ID: <20260313133115.GY461701@kernel.org>
+References: <20260311082923.2962937-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,18 +67,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260311-net-next-mv88e6xxx-tcam-v8-1-32dd5ba30002@luminex.be>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260311082923.2962937-1-danishanwar@ti.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,mojatatu.com,resnulli.us,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-267456-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267457-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -94,74 +94,55 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BE642284164
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,ti.com:email]
+X-Rspamd-Queue-Id: A287C2843AB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 11:46:18AM +0100, Cedric Jehasse via B4 Relay wrote:
-> From: Cedric Jehasse <cedric.jehasse@luminex.be>
+On Wed, Mar 11, 2026 at 01:59:23PM +0530, MD Danish Anwar wrote:
+> In HSR offload mode, multicast addresses can be added via HSR master
+> (hsr0) or directly to slave ports (eth1/eth2). The FDB must track port
+> membership: P0 (0x1) for HSR master, P1 (0x2) for slave port 1, and P2
+> (0x4) for slave port 2. When the same address is added from multiple
+> paths, memberships must accumulate.
 > 
-> When creating a flower classifier with an ipv4 address the
-> flow_dissector has both FLOW_DISSECTOR_KEY_IPV4_ADDRS and
-> FLOW_DISSECTOR_KEY_IPV6_ADDRS bits set in used_keys.
-> This happens because ipv4/ipv6 fields are a union and
-> FL_KEY_SET_IF_MASKED() will interpret either being set as both.
+> Implement a hybrid approach using __dev_mc_sync() callbacks to track
+> basic add/delete operations, checking netdev_hw_addr->synced to
+> distinguish HSR-synced addresses from direct additions. Post-process
+> to handle overlapping memberships by checking refcount:
+> - refcount=2 with synced=1: HSR only (P0)
+> - refcount>=3 with synced=1: HSR + direct (P0|P1/P2)
+> - synced=0 with P0 set: HSR removed, clean up orphaned P0
 > 
-> Removing the unions fixes this behavior without needing special handling
-> for union fields.
+> On add operations, accumulate new membership with existing ports. On
+> delete operations, remove only the specific port and clean up orphaned
+> P0 bits if needed.
 > 
-> Example of a command that caused FLOW_DISSECTOR_KEY_IPV4_ADDRS and
-> FLOW_DISSECTOR_KEY_IPV6_ADDRS to be set:
-> tc filter add dev p1 ingress protocol ip flower skip_sw \
->     dst_ip 224.0.1.129 action trap
+> Add error handling for icssg_fdb_lookup() which can return negative
+> error codes (e.g., -ETIMEDOUT). On lookup failure in add/delete path,
+> default to no existing membership. In the post-processing path, skip
+> the address update to avoid corrupting FDB entries with garbage values.
 > 
-> Signed-off-by: Cedric Jehasse <cedric.jehasse@luminex.be>
-
-Hi Cedric,
-
-This doesn't seem to be the right approach to me.
-
-It seems to me that the use of a union is intentional here, as either IPv4
-or IPv6 addresses can be present in each case - never both.  And that
-control.addr_type and enc_control.addr_type are intended to allow
-differentiation of the address type in use for each of these unions.
-
+> VLAN Interface Handling:
+> Add support for multicast addresses added to VLAN interfaces on the HSR
+> master (e.g., hsr0.7). These addresses require P0 (HSR master) bit to be
+> set along with the port bits, since VLAN-tagged packets use separate FDB
+> entries per VLAN ID. Without P0, the HSR master would not receive
+> multicast packets on VLAN interfaces.
+> 
+> Track whether the add/del operation came from a VLAN interface path and
+> set P0 when in HSR offload mode with VLAN interfaces. Update orphaned P0
+> cleanup logic to preserve P0 for VLAN interfaces.
+> 
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 > ---
->  net/sched/cls_flower.c | 12 ++++--------
->  1 file changed, 4 insertions(+), 8 deletions(-)
-> 
-> diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-> index 7669371c1354..b95dbe847dde 100644
-> --- a/net/sched/cls_flower.c
-> +++ b/net/sched/cls_flower.c
-> @@ -59,18 +59,14 @@ struct fl_flow_key {
->  	struct flow_dissector_key_eth_addrs eth;
->  	struct flow_dissector_key_vlan vlan;
->  	struct flow_dissector_key_vlan cvlan;
-> -	union {
-> -		struct flow_dissector_key_ipv4_addrs ipv4;
-> -		struct flow_dissector_key_ipv6_addrs ipv6;
-> -	};
-> +	struct flow_dissector_key_ipv4_addrs ipv4;
-> +	struct flow_dissector_key_ipv6_addrs ipv6;
->  	struct flow_dissector_key_ports tp;
->  	struct flow_dissector_key_icmp icmp;
->  	struct flow_dissector_key_arp arp;
->  	struct flow_dissector_key_keyid enc_key_id;
-> -	union {
-> -		struct flow_dissector_key_ipv4_addrs enc_ipv4;
-> -		struct flow_dissector_key_ipv6_addrs enc_ipv6;
-> -	};
-> +	struct flow_dissector_key_ipv4_addrs enc_ipv4;
-> +	struct flow_dissector_key_ipv6_addrs enc_ipv6;
->  	struct flow_dissector_key_ports enc_tp;
->  	struct flow_dissector_key_mpls mpls;
->  	struct flow_dissector_key_tcp tcp;
-> 
-> -- 
-> 2.43.0
-> 
-> 
+> v1 -> v2: 
+>    Added a helper function as suggested by Simon Horman <horms@kernel.org>
+
+Thanks for the update.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+It is unclear to me why this is marked as Not Applicable in patchwork.
 
