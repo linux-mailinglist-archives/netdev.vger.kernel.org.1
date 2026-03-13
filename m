@@ -1,135 +1,135 @@
-Return-Path: <netdev+bounces-267273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267275-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kF+zDF51s2loWgAAu9opvQ
-	(envelope-from <netdev+bounces-267273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:24:30 +0100
+	id 4A9CIwx2s2mwWgAAu9opvQ
+	(envelope-from <netdev+bounces-267275-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:27:24 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93B7E27CB2F
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:24:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F03CF27CB90
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:27:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9867C308B745
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:22:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB76D3097A66
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712D6340286;
-	Fri, 13 Mar 2026 02:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GAfkFZLt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ACB933FE05;
+	Fri, 13 Mar 2026 02:27:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A3E33FE05;
-	Fri, 13 Mar 2026 02:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35C7248166;
+	Fri, 13 Mar 2026 02:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773368573; cv=none; b=gG+rO6tWB+khB0gvestj2dnInaUkfmHMjO2aKU2zNAr85GxKaQnkjEdBwlnV5qyHf5VrPAyJ+b9m4HU0jzVwSgDtyTfu50MGJ8TQpMdStQVESMVLyI7JUY0fVrN1zwMQI3o3HR/m8MtvVRgCh5SeP0IfBRBpV+gSkfDLqTT4/AY=
+	t=1773368823; cv=none; b=fPw3i+s0Q5MtZ1MbocTAuyC8eVeocfO8ENrOrNB5seEcywE/lEbXZ7i0patO6DReZVfYBOB4DU2PxzlTV9e9pbGo0P4o1IEBWjmJYHVw1CwgCKvqCkaQsC7qlWqq+PEnNFwWrKiZht2MyIexlAs76fawFKHrg7Z+fe0XzD2FkKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773368573; c=relaxed/simple;
-	bh=70xGEyGDgOgnf31VEtVCOBWcG9h6+8Ya5+AMeOljfx0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HjKK3WkvpoqdnAIFKDGAsCi7IHK3pQvjBGFgBjzA6pCQe5OBNIRoqMcknDySclupW8xEKWm2KkGDwKQEtgV9Ri4PsM/X3sy+uQuSgW4wgEDBFMRgi1lHfcDKZjk+nS9W3oSw6UdQvXmCHhgy3zcp9F6m8p5A05tGwvUPevsQGFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GAfkFZLt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EE1DC4CEF7;
-	Fri, 13 Mar 2026 02:22:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773368573;
-	bh=70xGEyGDgOgnf31VEtVCOBWcG9h6+8Ya5+AMeOljfx0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GAfkFZLtVma5j9wqieMccxhCfXv/0Kb6OKAnVtm9AxDmRZBCjs+xEbb5LBLrEpF+i
-	 Q7cgDngvSkBkOSo9HTxYi5SpsK0/NXbtjfkXr7Rq4op+4bxovPRQKZu8kRCctzew0i
-	 L4BzdHaL7gcZHzbU4BBNNiyOU3vJwa+i2T8lLmPvKmOZDyEKEFPrJVPlJdStqYMrQR
-	 I5+683fEtaEuiHHSMlU/09vmGB0t/bMGpWgyMpj9pMyhIEwzH+8YBWO5DaVhC/7LfK
-	 G5xU7F0Jx0e2CeXtcitBUUE7RDW7YBDeQ/VMe9j+cNzLgm/HIp8RXqL+Y5qgeF6lPF
-	 pVa0/gQ/dol5g==
-Date: Thu, 12 Mar 2026 19:22:51 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
- vikas.gupta@broadcom.com
-Subject: Re: [PATCH net-next v6 10/10] bng_en: add support for ethtool -S
- stats display
-Message-ID: <20260312192251.61243873@kernel.org>
-In-Reply-To: <20260310144044.21672-11-bhargava.marreddy@broadcom.com>
-References: <20260310144044.21672-1-bhargava.marreddy@broadcom.com>
-	<20260310144044.21672-11-bhargava.marreddy@broadcom.com>
+	s=arc-20240116; t=1773368823; c=relaxed/simple;
+	bh=OiMc9YAZ8ONZEE7YERToNzRgA0ZJiBBxz0m/eLAT+K0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=eFZO/8osyM+TA+8OwqGvdmwnXwSEKpicyXSHjCJ/mA3fFQIIBJXNTuIDW9bSKryBIS9khkuOG6Ti3nvMIhGDEBY0sZunKQ5xL47n0AYC8dTzivPHds/kO7h+DTd4PFDjlYW+nQVeDtmuWMfNNkQRJe8S3mjby0e56H51UcRWV+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 12862e941e8411f1a21c59e7364eecb8-20260313
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.11,REQID:7eb3ec22-c341-4a81-882e-f6ee0116d5b4,IP:0,U
+	RL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:25
+X-CID-META: VersionHash:89c9d04,CLOUDID:cc7cb362049be88cf2253c05f17cd667,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:81|82|102|850|898,TC:nil,Content:0|15|50
+	,EDM:5,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OS
+	A:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 12862e941e8411f1a21c59e7364eecb8-20260313
+X-User: heminhong@kylinos.cn
+Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <heminhong@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 539483965; Fri, 13 Mar 2026 10:26:42 +0800
+From: Minhong He <heminhong@kylinos.cn>
+To: edumazet@google.com
+Cc: andrea.mayer@uniroma2.it,
+	davem@davemloft.net,
+	david.lebrun@uclouvain.be,
+	dsahern@kernel.org,
+	heminhong@kylinos.cn,
+	horms@kernel.org,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net v2] ipv6: sr: Add NULL check for idev in seg6_hmac_validate_skb
+Date: Fri, 13 Mar 2026 10:26:34 +0800
+Message-Id: <20260313022634.51885-1-heminhong@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CANn89iLBN-fxUQ11Txtn73XQ6M9mrpaWEfjK=EfMU8UO1yOdBw@mail.gmail.com>
+References: <CANn89iLBN-fxUQ11Txtn73XQ6M9mrpaWEfjK=EfMU8UO1yOdBw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267273-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267275-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DMARC_NA(0.00)[kylinos.cn];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 93B7E27CB2F
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[heminhong@kylinos.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.966];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,kylinos.cn:email,kylinos.cn:mid]
+X-Rspamd-Queue-Id: F03CF27CB90
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 10 Mar 2026 20:10:44 +0530 Bhargava Marreddy wrote:
-> Implement the legacy ethtool statistics interface (.get_sset_count,
-> .get_strings, and .get_ethtool_stats) to provide per-queue and
-> port-level visibility.
-> 
-> A. Exclusions:
->   To comply with the "no duplication" policy, excluded all stats already
->   covered by rtnl_link_stats64.
->   For ex:
->   1. tx_err
->   2. tx_fifo_underruns
->   3. tx_total_collisions
-> 
-> B. Retained Stats Analysis:
->   Retained the counters which provide unique per-queue granularity or
->   represent different hardware events:
-> 
->   1. rxqN_errors
->   2. txqN_errors
-> 
->    These provide per-ring visibility for debugging.
->    While they look similar to ndo_get_stats64's [rx/tx]_errors counters,
->    they map to different hardware sources:
->    For ex:
->    - ethtool rxqN_errors: ctx_hw_stats->rx_error_pkts (per-ring)
->    - ndo_get_stats64 rx_errors: (rx_port_stats->rx_false_carrier_frames +
->      rx_jbr_frames) (per-port)
+In seg6_hmac_validate_skb(), the pointer returned by __in6_dev_get()
+can be NULL if the network device lacks proper IPv6 initialization
+or is being torn down. Add a NULL check to avoid potential NULL pointer
+dereference in subsequent code.
 
-Still a lot of stuff here that has standard APIs. Here is random 4:
- - oom_discards
- - rx_total_frames
- - link_down_event
- - rx_fec_corrected_blocks
-Please explain what the per-ring errors and discards are exactly.
+Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
+Signed-off-by: Minhong He <heminhong@kylinos.cn>
+---
+ net/ipv6/seg6_hmac.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
+index ee6bac0160ac..e6964c6b0d38 100644
+--- a/net/ipv6/seg6_hmac.c
++++ b/net/ipv6/seg6_hmac.c
+@@ -184,6 +184,8 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
+ 	int require_hmac;
+ 
+ 	idev = __in6_dev_get(skb->dev);
++	if (!idev)
++		return false;
+ 
+ 	srh = (struct ipv6_sr_hdr *)skb_transport_header(skb);
+ 
+-- 
+2.25.1
+
 
