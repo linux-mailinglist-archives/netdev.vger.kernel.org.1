@@ -1,244 +1,167 @@
-Return-Path: <netdev+bounces-267271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267272-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6NPQHQN0s2k7WgAAu9opvQ
-	(envelope-from <netdev+bounces-267271-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:18:43 +0100
+	id QOxGAJJ0s2k7WgAAu9opvQ
+	(envelope-from <netdev+bounces-267272-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:21:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A888E27CA19
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:18:42 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8009B27CA55
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:21:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4F68330B3D60
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:18:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D5778303727A
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92CB33F5AC;
-	Fri, 13 Mar 2026 02:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 180363090F5;
+	Fri, 13 Mar 2026 02:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9YU44i9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dAQMYHmn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922ED33A039;
-	Fri, 13 Mar 2026 02:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B0C2FE07D
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 02:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773368286; cv=none; b=oK1mpnQF36QBdRTHdrPwO8iYKc57O/qRWiU/B7VbgwNEOJLp1148Q3qUoPfTm1TVClQiCm1pYvGMxitPnJFM4WDsV1i3b7lByqAN0W5HQ3krvXhnFldsf+1s+TR5qHY9+bkyDsSB9WQhYfrdFXaSTn6GkWzYXKmdTgPl5Wr+w9M=
+	t=1773368457; cv=none; b=YKZvNtoMm4VSYod1uX8q9sbxqcxvJLMtaCW+bqo18/1A3Q2uPLknN6yejF5lEnDqRS9wuuUFwyGAGkyDXLbZTLMcKisdHrXZz3PF9evT8A44JY4ataIacuewDMoXp2HseITgvyveHvP4fMVPAxRumriTazI9K+txOF3i3ds6zXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773368286; c=relaxed/simple;
-	bh=pMX8ns367KAe/DECqpzeywg4bF/jQ8/m+yCCjoFZ/8s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kqhjd0tMJbcw4ndhWCimH7BZSdx2h7v34ljI32IIEVMtpQ2YCuXNyAErGkMta+EeQGInxa4ESJhgxvwrFkupNB1ukXzODqyYK1lZR0+CGSZNLAOBGwY/1hneRSTcO5+vHc39h96rYtiM5OH5v2QN2mxakHzEe9J9KCfKjXwSpos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9YU44i9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E6B0C2BC87;
-	Fri, 13 Mar 2026 02:18:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773368286;
-	bh=pMX8ns367KAe/DECqpzeywg4bF/jQ8/m+yCCjoFZ/8s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q9YU44i9P00C4NUIQRwwuG4r0caWI1FFtQiKwTGuWGEgp7/TUnak68X3lPRjKm/MT
-	 YwyytH5CZfrzmpZ9ZQ5Jm7VxaBO55V5rZzzHtxtTSYsLWZjlrIKeMb3YsMacrpwnjf
-	 MvrenhHCuRGo2KTXm++YOXbhkE7jLaIb4/2WuFzWoQW+AljJLsXL6D4TZ9sBbbNzmi
-	 5Bz1ByH5Sx8EKa3joxIRE3A9dRAw79rU1u7D5Ok05+3X0PzGjxxrnaFFTX5sLp4LoZ
-	 nfZICtZrmJntUEV+JvLRQdVTeUP0s7Zlz8QTSNUaCoLU2CK7vXVua42JNHNJqddt2U
-	 TPZ+P2HbeLh9w==
-From: Jakub Kicinski <kuba@kernel.org>
-To: bhargava.marreddy@broadcom.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	andrew+netdev@lunn.ch,
-	ajit.khaparde@broadcom.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	rajashekar.hudumula@broadcom.com,
-	linux-kernel@vger.kernel.org,
-	davem@davemloft.net,
-	horms@kernel.org,
-	rahul-rg.gupta@broadcom.com,
-	edumazet@google.com,
-	michael.chan@broadcom.com,
-	vikas.gupta@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com,
-	pavan.chebbi@broadcom.com
-Subject: Re: [net-next,v6,02/10] bng_en: query PHY capabilities and report link status
-Date: Thu, 12 Mar 2026 19:18:00 -0700
-Message-ID: <20260313021800.1546107-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260310144044.21672-3-bhargava.marreddy@broadcom.com>
-References: <20260310144044.21672-3-bhargava.marreddy@broadcom.com>
+	s=arc-20240116; t=1773368457; c=relaxed/simple;
+	bh=qbDmf7zIJOAQUpItzNpTlj9NfQ6ptyWW+Upm5xAut3k=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=ghvZ9Vq8tkoS9vkmFucPLUGgkqQP3Ah4u024Snj0EL3EzZOy2qMwYr8sEs3unN2U/EGsbEhn1HRBHytlF30mxRxYkCKbYUIqDbi7iybimalbo3oOzGjEqElZjeJk0ZKNaZXQrWWFQhDbFzTl57X2ilxKPkRQZDAAYdIrGyq+quM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dAQMYHmn; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-50902b1006cso14524991cf.3
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 19:20:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773368455; x=1773973255; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=//VljFbNIl/c4QUY13kH9t3ieZj9jbA4O4nh8AcWsvs=;
+        b=dAQMYHmno+BvkHKoat4pHXrZ9/+OYa8lCk9HtvFBPhcSGNy0UWBuOnTLPdP0FHKjrH
+         WrE7RJWuMNSWc2/vh4Bi9ZlE8Wfs1mhmAZUo6bqezVU0C94nVR+MFX+ak7R1czUKzDKW
+         VBE7HZoNtwdWZ06aei0w1dXJgdhR3sGrOrZ6XhNPMIgxWKJJqsYkurYmGn4pAGwAIxWN
+         dc0Xo7xyMIs6eROEgAJWz7qrHwT6RN2J7YKYDw7vNATnlyL7GUCEYSR6SuUvKJz8pb5l
+         RiKHAo/YYtoRq5+77gcSYS6Njt7jFSf08oQFvQB8K4pzs3C3nrZa5bgmmCHEcsTyWDsy
+         g5WQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773368455; x=1773973255;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=//VljFbNIl/c4QUY13kH9t3ieZj9jbA4O4nh8AcWsvs=;
+        b=qVrLmwGYqz22VTFHJgzan/PYVBmzXHb417AL12MMyvJffrdaR5cPHEmAQx+ecRCpVQ
+         zBagNRSMiKWwb3x0vIynOP7yi42hmrnYyW6xAjwh88PJdtiX/5js8F39hdenkdsmDCaq
+         +EVIiObrdFmc4KjK/p04fLtx/Iazr1/iyC7qTNm8dwVMn3Dyx0MaasUPmq+56dfIdpDe
+         wo+HGjzXFGmGVtWlVKqNQIG2rb4Cw5Vh1zL5h/efUHg1TKVNTfXlZL8O4aknIMKc5rOa
+         TZxtlckuCddfNW0VC7P5vi5c5Y8kmIt5C2mvozRJ/xyDuPUul6UvWHw8J7QLWEvx+koM
+         BqAg==
+X-Forwarded-Encrypted: i=1; AJvYcCVwFu3+w5cI79xZVQVsjSG+2bmgy3jCbiwPGl5dbo/ZPDcV/wkeP1hn9VeE7orChM8C46JdbrE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzR/ZAgxpZtA6vvvfGNm8yDtPfju9HJYlKfL/D//1yDpJ0mS02S
+	tsiuLjbboKRZ9UYEfmB1iNXX04Kz+mx8eDJ3yG7z+Fllu/ZL/9DXgCLP
+X-Gm-Gg: ATEYQzyFSnUUQLzwvUoeMXRdjMjMUjCNmSsu44blU2yK3k3PcEbvs/Kd7NGhH03ANtL
+	0N96bdrZw/OX28L9Yb12eq5gLnwSaKFoR1scJvQ5Xv5V2VosbbHGXk92XIpdXuAiRJWpvzgp8QO
+	UEMnt+H9p2grHmw+vAiTHXT8hsUMj3SoE7pngkqMrK6e9TJ96A57ddbYbvSnZ0mD8kNDzszg7wl
+	Vzcifo1lmzJisbgpMswVyDzw9ckc1Fod5tQ9oHAt90NfHJBGMFTZod2r2KovCcDeYy6v99Rdc4h
+	heP7aYWcw0aJQMRGW4FIM3src8eiunp5pRLS2QhuQZFTFc06EmAkif7qHD/2vWDacm72JzDDIBX
+	zUfd8aUnNvoc6hdc7FEYTRu+qr4BPwvuheOvpxRRUjxKCGJHV9yGVttKNm95G8wWvpAmnGfz14Q
+	gzHlBhlAhaW9ihbMjcVDY0QYdX7qp5mMdePSx+DPu3thxBADcye4xX96Nca9L1GV23aghjutclN
+	3uu
+X-Received: by 2002:a05:622a:244:b0:509:3141:312c with SMTP id d75a77b69052e-50957e11044mr22356631cf.40.1773368454774;
+        Thu, 12 Mar 2026 19:20:54 -0700 (PDT)
+Received: from gmail.com (180.134.85.34.bc.googleusercontent.com. [34.85.134.180])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-89a65beb4b3sm46632586d6.14.2026.03.12.19.20.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Mar 2026 19:20:54 -0700 (PDT)
+Date: Thu, 12 Mar 2026 22:20:53 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ David Ahern <dsahern@kernel.org>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, 
+ Florian Westphal <fw@strlen.de>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Kuniyuki Iwashima <kuni1840@gmail.com>, 
+ netdev@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.2a1f71cccc0e5@gmail.com>
+In-Reply-To: <20260311052020.1213705-8-kuniyu@google.com>
+References: <20260311052020.1213705-1-kuniyu@google.com>
+ <20260311052020.1213705-8-kuniyu@google.com>
+Subject: Re: [PATCH v3 net-next 07/15] udp: Remove partial csum code in RX.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-267271-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267272-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,strlen.de,google.com,gmail.com,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[google.com,gmail.com,kernel.org,davemloft.net,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: A888E27CA19
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8009B27CA55
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Kuniyuki Iwashima wrote:
+> UDP-Lite supports the partial checksum and the coverage is
+> stored in the position of the length field of struct udphdr.
+> 
+> In RX paths, udp4_csum_init() / udp6_csum_init() save the value
+> in UDP_SKB_CB(skb)->cscov and set UDP_SKB_CB(skb)->partial_cov
+> to 1 if the coverage is not full.
+> 
+> The subsequent processing diverges depending on the value,
+> but such paths are now dead.
+> 
+> Also, these functions have some code guarded for UDP:
+> 
+>   * udp_unicast_rcv_skb / udp6_unicast_rcv_skb
+>   * __udp4_lib_rcv() and __udp6_lib_rcv().
+> 
+> Let's remove the partial csum code and the unnecessary
+> guard for UDP-Lite in RX.
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
+> v3: Correct ulen < skb->len case in __udp4_lib_rcv()
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-bng_en: query PHY capabilities and report link status
-
-This commit queries PHY capabilities and supported speeds from firmware,
-retrieves current link state (speed, duplex, pause, FEC), logs the
-information, and seeds initial link state during probe.
-
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_link.c b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-> new file mode 100644
-> index 000000000000..0c76cbc794f7
-> --- /dev/null
-> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-
-[ ... ]
-
-> +void bnge_init_ethtool_link_settings(struct bnge_net *bn)
-> +{
-> +	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
-> +	struct bnge_link_info *link_info;
-> +	struct bnge_dev *bd = bn->bd;
-> +
-> +	link_info = &bd->link_info;
-> +
-> +	if (BNGE_AUTO_MODE(link_info->auto_mode)) {
-> +		elink_info->autoneg = BNGE_AUTONEG_SPEED;
-> +		if (link_info->auto_pause_setting &
-> +		    PORT_PHY_CFG_REQ_AUTO_PAUSE_AUTONEG_PAUSE)
-> +			elink_info->autoneg |= BNGE_AUTONEG_FLOW_CTRL;
-> +		bnge_set_auto_speed(bn);
-> +	} else {
-> +		bnge_set_force_speed(bn);
-> +		elink_info->req_duplex = link_info->duplex_setting;
-> +	}
-
-Does the forced-speed (else) branch need to clear elink_info->autoneg?
-
-When called only at probe time on a zero-initialized struct, leaving
-autoneg uninitialized is harmless. However, commit f833dbb3f7ab
-('bng_en: add support for link async events') in this same series adds
-a re-init call path from bnge_sp_task() in response to
-BNGE_LINK_CFG_CHANGE_SP_EVENT async firmware events.
-
-If the PHY transitions from auto-negotiation to forced-speed mode (e.g.,
-via BMC/management configuration change), the stale BNGE_AUTONEG_SPEED
-and BNGE_AUTONEG_FLOW_CTRL bits in elink_info->autoneg persist. This
-causes:
-
-bnge_hwrm_set_link_common() to send auto-negotiation configuration to
-firmware instead of forced-speed:
-
-    if (elink_info->autoneg & BNGE_AUTONEG_SPEED) {
-        req->auto_mode |= PORT_PHY_CFG_REQ_AUTO_MODE_SPEED_MASK;
-        ...
-
-bnge_hwrm_set_pause_common() to configure auto-negotiation pause
-instead of forced pause:
-
-    if (bn->eth_link_info.autoneg & BNGE_AUTONEG_FLOW_CTRL) {
-        req->auto_pause = PORT_PHY_CFG_REQ_AUTO_PAUSE_AUTONEG_PAUSE;
-        ...
-
-bnge_update_phy_setting() to make incorrect speed-change decisions:
-
-    if (!(elink_info->autoneg & BNGE_AUTONEG_SPEED)) {
-        if (BNGE_AUTO_MODE(link_info->auto_mode))
-            update_link = true;
-
-The bnxt reference driver (bnxt_init_ethtool_link_settings) has the same
-pattern, but this doesn't excuse introducing it in a new driver.
-
-No fix was found later in the series (checked through 2d7643a78ddb).
-
-> +	if (elink_info->autoneg & BNGE_AUTONEG_FLOW_CTRL)
-> +		elink_info->req_flow_ctrl =
-> +			link_info->auto_pause_setting & BNGE_LINK_PAUSE_BOTH;
-> +	else
-> +		elink_info->req_flow_ctrl = link_info->force_pause_setting;
-> +}
-
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-> index edbb42efb70b..db3a19bbf75a 100644
-> --- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-
-[ ... ]
-
-> @@ -2532,6 +2562,14 @@ static int bnge_open_core(struct bnge_net *bn)
->
-> 	bnge_enable_napi(bn);
->
-> +	rc = bnge_update_phy_setting(bn);
-> +	if (rc) {
-> +		netdev_warn(bn->netdev, "failed to update PHY settings (rc: %d)\n",
-> +			    rc);
-> +		bd->link_info.phy_retry = true;
-> +		bd->link_info.phy_retry_expires = jiffies + 5 * HZ;
-> +	}
-> +
-
-Does stale phy_retry state from a previous open/close cycle cause spurious
-warnings?
-
-When bnge_update_phy_setting() fails during bnge_open_core(),
-bd->link_info.phy_retry is set to true and phy_retry_expires is set to
-jiffies + 5*HZ. Neither bnge_close_core() nor bnge_close() clears
-phy_retry.
-
-If the interface is closed and then reopened with a successful
-bnge_update_phy_setting() call (rc=0), the stale phy_retry remains true
-with an expired phy_retry_expires. On the next timer tick, bnge_timer()
-sees:
-
-    if (bd->link_info.phy_retry) {
-        if (time_after(jiffies, bd->link_info.phy_retry_expires)) {
-            bd->link_info.phy_retry = false;
-            netdev_warn(bn->netdev, "failed to update PHY settings after maximum retries.\n");
-
-and logs a spurious warning even though the PHY update succeeded on reopen.
-
-No later fix was found in the series (searched git range
-f342d5af0695..2d7643a78ddb).
-
-> 	set_bit(BNGE_STATE_OPEN, &bd->state);
->
-> 	bnge_enable_int(bn);
-
-[ ... ]
--- 
-pw-bot: cr
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
