@@ -1,179 +1,158 @@
-Return-Path: <netdev+bounces-267635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267637-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YK49Nv2VtGndqgAAu9opvQ
-	(envelope-from <netdev+bounces-267635-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 23:55:57 +0100
+	id 0OjVNH6XtGluqwAAu9opvQ
+	(envelope-from <netdev+bounces-267637-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 00:02:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2B2B28A8E8
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 23:55:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD5F28A92E
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 00:02:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A3519300F2B8
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:55:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2579131931BC
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 23:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4813E317D;
-	Fri, 13 Mar 2026 22:55:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902A0387572;
+	Fri, 13 Mar 2026 23:01:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="LvQ7+Aoj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="veeipGsj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362CB377EA6
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 22:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773442552; cv=pass; b=oKnscye2mT2JuLxD5U0o+61gzmHjdofy8fAbfmA8xut+/xYQc9eXBUtJKbNjr/PAAklsotj5XllEfCd2kMQWfAVtSaAqO7sEs6IpmIHIkFgP+XJ8/J3vWeOrKWK/UevW6sO+jQGxIGgBHSjKKqpwa1UKiL5STFPgzFbzS9Rhhl0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773442552; c=relaxed/simple;
-	bh=1Ty0xY5cZA829vovRzYzuYeyQoqsHZ6EMyQIZz33Oxo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SUxaMbCuAjGB3RZIzWdLyEymTsUnhp4nZ0ewiUtXggGU6Vnv3vaIYzB3dAA+i//+C3YvOXvTFbNUY3E8SYVDhxoTG3v4H9Gpgyv/u2nCcYSRsV80Migf1mtNc+cwnSgNBPQnBg508HVxvoquryjFcxCtdlbTOpC/ZK8cZeicqWA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=LvQ7+Aoj; arc=pass smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-59e5aa4ca41so2409197e87.2
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 15:55:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773442549; cv=none;
-        d=google.com; s=arc-20240605;
-        b=G2l02ve2A2BqMXdlTNaIldI4goNAH9Gwvrnn1IJRsiIgvAvuhMPWwjVijiePWi+UMv
-         lb+UJUbvLnWoMmpy9AyD4g2KcdyPOeiVyheUtbqg5y+b7O+fCwb607NGddQNXXVxoHDn
-         hhDoRkHqgylW8SQ5Eu2/l2xBqBXHuB57k4ALrL6KOrIc2rVLYSWNUFUUPspLhTytaTB3
-         iNKwLOLTzRYdrDa5YGSsFQKfrxYkjIs7DQj3ej5v65/oSX7x7SAN+WbFxeivJ3KqEeHq
-         b17TEUVrfsUtExojtGufuH1AwDHZSlHMtMrSkPsjeDKLEO4qtyHGv+tLwq1nZj8FBMVM
-         qg9g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=W3QNx1W8EImhWG5G2h7xr/vJQj2kmarfg6d7Z6ksV9w=;
-        fh=yUop17RoBf3QcEq4adbpXkX/YNh6BJrMnGFzPWERoYw=;
-        b=bNnjJB4mgfx9cn6EsPlxQxDIqatcHJmft0snWWDI0679vJ5VxsKQMPIsfh1abBjhmp
-         qkgy0LfKCIYeb0jGJ4IwiavYKI2a8QKK3hcksPcHknQtOlvKmKJJ0Fxmw79g77SBXFiG
-         UaOylPhQve8f+yX3msGz5X9LLDqmGW8QyNHoeE8nAqTSExoYHg+yrlaw4Ec/0Gpl56xP
-         ojEDR6v0PMrSofXqc/jYrfry7DZtMf5xf0YPFXqtn1+HAl96POyD4pTQ5Qv/DxUl+zqs
-         5lQlppC08+XdN59To4iJBZyMEr4NWjHnvVX0Z4L4xySfTAD+oKP0fqbCKKE6+4QDxcT4
-         55zQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1773442549; x=1774047349; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W3QNx1W8EImhWG5G2h7xr/vJQj2kmarfg6d7Z6ksV9w=;
-        b=LvQ7+AojIQWbWslVxV6LZp++FCtfugv49r69G25dyddJVQ9fPkxdSjNimICXT1G3RT
-         yteZJtN4o43lx5JI9ETEBiPHRQUuYuVt+Y2bqPbCdA6ZSX8ic2t62emO7/JsN1LrfnP0
-         GKHCPYWxD5DiwyI7H4bda8dma8dX3n+0KRrUQs5iNgQEFZSSBb8gtD2DWkdT15jp8bC0
-         VufTk410tXmf+a+ZS9Z3onFFt4HURkznVec9CNUXuj9a2omod4iiPXOFMka6sbFzUrCg
-         xsia3X3JlB+QfnmIuBi4pwgW5SlGehvapj4envNOBrZpXA+IOgsPpVRGRzEilcV1HeZB
-         SYFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773442549; x=1774047349;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=W3QNx1W8EImhWG5G2h7xr/vJQj2kmarfg6d7Z6ksV9w=;
-        b=oSERMb6T4nHC9KoGc5K4auhMiLVAwT6zBwCgncjhTGFrBKmHtExiuMiUP3xBzmRpAF
-         K8f+Mk4SLIY3E7g9+M2WC8/GV5BkN4lWHE/IIgjHFWMS8+V6X8tJJiMSmVXhRxsdQn0L
-         lyj9qnDaXyb2QJtdLKLc88asQThJxQSJF6cv6tRLF7Lz2oTslHY0TWX6syF4NxQdzLh0
-         NTXgsttH9eCJWK6D0DL7UFZsLc64fsrWtAfL2+QR2zSAZ8qLR7jUAgxZ/DtzFSonnSqY
-         UFHoXAKtB7uJOeYMALDIRUXIM8PKei9EJ6aYfuwbjBZhK5hGs0s/M0x6C2fdrzmOrYax
-         ljwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVKPAY90Er7hFMAX6tGoyGlEhRqIQiIKL1Yr0N134H8uOiECyl1HHM7FKeN+gsSthLdwy4LBmw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFqsWBHcVJLYSrUSQNibGPBhOU2rFR2Oui72ilCJjaUgn9Hspg
-	eWv5GQs7saXXOlUmcRFMFQRuQ8TZt13W/oVnfyOrL+ucQSz4Tia2KEe+n/JaHOyBkySwB2Xz8bi
-	SUOCAEqMtMWItn6kb1x941Y/R5w8j8IVIYxgzHPP6
-X-Gm-Gg: ATEYQzxg0nc1RaxKrJnlefurYBpOe1r23eQxyMh/Wdvmj2polhfMfjyEAYGZNh3kXy0
-	RZ4XnWxuaEA3RvQJhGUGqSGZixYKI0Zjn7ry2tpQXbnaieldW0nsdQepEFKwcIczMIzAyYkCl+T
-	r+BItJxn8341PDVn0hzp4MGlW+9b2auyxO9Be5CqdG8we3ARZS+6IWii7NEl2EcsNV9a2uPfGG2
-	mDzgwKc/J539p2yU8Co56J1TT8F3kJdi3RShs+WkmcS7y5O4WsvxNDs2AwIGDQpPceAY57U7uM2
-	GflIPghPIzbPhS+7b8E+BUMwg0Bgyn5Hsns9oL6nDA==
-X-Received: by 2002:ac2:41c4:0:b0:5a1:227e:2753 with SMTP id
- 2adb3069b0e04-5a162705a51mr1219058e87.7.1773442549289; Fri, 13 Mar 2026
- 15:55:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847AA38756E;
+	Fri, 13 Mar 2026 23:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773442905; cv=none; b=kNa1L/EKh/qXl4hk/73D05SVzdsM9yXpBOS4CSCbR0lFIzhVWEARsf9QHDS8KqKSo4l3a3qSNjbVYrBHBCExHFTopqHZtHyr98k7nDswqf0mORWdGMjWY0cbfVjQLrlHTCf6RD6sE8gT6jxP2o4yyG9n3V5tHRVnrz2ecUzF5xk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773442905; c=relaxed/simple;
+	bh=Cv25KOBNiALz6d9VfnKlw+KbVur5w0PQtR/sSTyT2vU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XzHNDtsGNZ8e4bYZqu5VQ+CK+cQ0firyhWJdmZoVdntWonk9ok890xKJk3QMa7lugPEMxG66lNFf6FKiTrNIeLLdZP2zYncWxXo6QDd8usaSLCeAgxgF90hhhaqjGTzzAGAnRja/VtfCkuMOg5pUqntShKibLjYnHpPbGqOV4Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=veeipGsj; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9olc9FEMIPBTpzCEvFssSp2raytyU4R431IhWwd+KXk=; b=veeipGsjcHjrrKyYCG8wldOYrj
+	q1y+pb/krI5uUkJrOb3dQr/Z9cW5CYxF22iriL9I6hQEK5wYsPnZ/GZAs91Ns0hDROPlWzZL010d7
+	C28mEDCcmUYekCMXSna37l/Zm1HlSfw81pJ0pk01GGGsQHTVRi4vR63Xtg1TpIzWkOaPjtaYJ6yAW
+	MFnkD/tcYTKrpwk8mi/e+pZx9q0fjbXqfbnZRwjV+hlKWAkklQUpI36/EaGx7yFzZq+f2Ww+V2UQ2
+	vvS5Bc+yGDoFjdeU1ALdgFL4rD2eW8igCpmMFvgqzJDq1Sq+xvQ39xG0JAZwAMUVGlkb2v7M3jDHs
+	uzopc42A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57004)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w1BVb-000000001aJ-24ij;
+	Fri, 13 Mar 2026 23:01:31 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w1BVP-000000000Ar-3IxC;
+	Fri, 13 Mar 2026 23:01:19 +0000
+Date: Fri, 13 Mar 2026 23:01:19 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "\\Jitendra Vegiraju" <jitendra.vegiraju@broadcom.com>
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	bcm-kernel-feedback-list@broadcom.com, richardcochran@gmail.com,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com, rohan.g.thomas@altera.com,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org,
+	andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
+	me@ziyao.cc, siyanteng@cqsoftware.com.cn,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	weishangjuan@eswincomputing.com, wens@kernel.org,
+	vladimir.oltean@nxp.com, lizhi2@eswincomputing.com,
+	boon.khai.ng@altera.com, maxime.chevallier@bootlin.com,
+	matthew.gerlach@altera.com, chenchuangyu@xiaomi.com,
+	yangtiezhu@loongson.cn, ovidiu.panait.rb@renesas.com,
+	chenhuacai@kernel.org, florian.fainelli@broadcom.com,
+	quic_abchauha@quicinc.com
+Subject: Re: [PATCH net-next v7 4/5] net: stmmac: Add PCI driver support for
+ BCM8958x
+Message-ID: <abSXP3gMFQEiC5Lm@shell.armlinux.org.uk>
+References: <20260313222206.778760-1-jitendra.vegiraju@broadcom.com>
+ <20260313222206.778760-5-jitendra.vegiraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260312223157.25083-1-panchamukhi@arista.com>
- <abNxz9T_XB-JtBCj@strlen.de> <abPVr5RtRmZeyszb@chamomile>
-In-Reply-To: <abPVr5RtRmZeyszb@chamomile>
-From: Prasanna Panchamukhi <panchamukhi@arista.com>
-Date: Fri, 13 Mar 2026 15:55:38 -0700
-X-Gm-Features: AaiRm53c8uPZmtPIEF5jDrLrZEH8Dcp_VPBm6r1Z8iuHGq0Ct2Kh-ySBjwFklDE
-Message-ID: <CACqWiXBYJgM3S+QfON-fJQ=dPX3r21CVMN9rAXcxM+hi=DzydA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] netfilter: conntrack: expose
- gc_scan_interval_max via sysctl
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Florian Westphal <fw@strlen.de>, netfilter-devel@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Phil Sutter <phil@nwl.cc>, 
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, coreteam@netfilter.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[arista.com,reject];
-	R_DKIM_ALLOW(-0.20)[arista.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260313222206.778760-5-jitendra.vegiraju@broadcom.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267635-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-267637-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,foss.st.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,broadcom.com,iogearbox.net,altera.com,st-md-mailman.stormreply.com,lists.infradead.org,lunn.ch,fomichev.me,ziyao.cc,cqsoftware.com.cn,bp.renesas.com,eswincomputing.com,nxp.com,bootlin.com,xiaomi.com,loongson.cn,renesas.com,quicinc.com];
+	RCPT_COUNT_TWELVE(0.00)[38];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[panchamukhi@arista.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[arista.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.957];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,arista.com:dkim,arista.com:email,netfilter.org:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E2B2B28A8E8
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: 3FD5F28A92E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 13, 2026 at 2:15=E2=80=AFAM Pablo Neira Ayuso <pablo@netfilter.=
-org> wrote:
->
-> On Fri, Mar 13, 2026 at 03:09:19AM +0100, Florian Westphal wrote:
-> > Prasanna S Panchamukhi <panchamukhi@arista.com> wrote:
-> > > The conntrack garbage collection worker uses an adaptive algorithm th=
-at
-> > > adjusts the scan interval based on the average timeout of tracked
-> > > entries.  The upper bound of this interval is hardcoded as
-> > > GC_SCAN_INTERVAL_MAX (60 seconds).
-> >
-> > I already said that I'm not keen on this approach.
-> > Its a 'we can't do any better' type "solution".
-> >
-> > If anything I'd be more inclined to make a change that allows to
-> > more easily override the next_run computation via bpf.
->
-> It is regrettable that the request for this knob appears to be
-> intended to enable a potentially proprietary hardware offload
-> extension, implemented through a userspace daemon and a proprietary
-> SDK.
->
-> It's 2026, there is plenty of infrastructure to offload the connection
-> tracking upstream, such as act_ct.c and the flowtable.
+On Fri, Mar 13, 2026 at 03:22:05PM -0700, \Jitendra Vegiraju wrote:
+> +	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+> +	if (!plat)
+> +		return -ENOMEM;
+> +
+> +	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg),
+> +				     GFP_KERNEL);
+> +	if (!plat->dma_cfg)
+> +		return -ENOMEM;
 
-Thank you Pablo, for the suggestion. We will look into adopting the
-hardware offload feature soon.
+Please use stmmac_plat_dat_alloc() - this will allocate and initialise
+struct plat_stmmacenet_data, and as of commit 7a6387dec8ce in net-next,
+will also avoid the need to allocate  dma_cfg.
 
-Thanks,
-Prasanna
+> +
+> +	plat->suspend		= stmmac_pci_plat_suspend;
+> +	plat->resume		= brcm_pci_resume;
+> +	plat->bsp_priv = brcm_priv;
+
+Populating suspend/resume means that plat->init and plat->exit
+will only be called on driver probe (former), probe failure (latter)
+or remove (latter). Please consider using these to ensure that
+all appropriate resources are properly cleaned up in all cases.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
