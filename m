@@ -1,185 +1,191 @@
-Return-Path: <netdev+bounces-267652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267653-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OKY9Fr+qtGn+rgAAu9opvQ
-	(envelope-from <netdev+bounces-267652-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:24:31 +0100
+	id iMvlL86qtGn+rgAAu9opvQ
+	(envelope-from <netdev+bounces-267653-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:24:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFA1328AEB7
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:24:30 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD5D528AEC7
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:24:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D8B130BDF33
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 00:24:20 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 537D0300008B
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 00:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8105F27A107;
-	Sat, 14 Mar 2026 00:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C0A257459;
+	Sat, 14 Mar 2026 00:24:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i0nggihj"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="I4xtLASO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011039.outbound.protection.outlook.com [52.101.65.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6C91E1DFC;
-	Sat, 14 Mar 2026 00:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773447857; cv=none; b=OmkocTklgA31pph7YOFzSAPAIu9zBaDf4y45ruIhU0+40SD0g/vLUJ7qimS2NoWqjMLV1VnwcOzEEMoNfFwCtJp11/tE55yrT/tlaOaf/te6EbxJXo5rPn3UsJ+BGfgL3hd5/fnKrokdT+gM4fx1cJodd0sUuGlZ9NWiLxeKbtY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773447857; c=relaxed/simple;
-	bh=WQRXpjIwf6KYkSpJNf4xnZTekqBOFUxWV+yK0mOoxb8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IuXgEA8LGhFGAY716oX5be948llbvXznJxvd45NbEuNc0+F6rONKtXKYfWsPqkyhToOiDU0x9i09RVRYOv1NEaLi90l2V7mzYTW5u5is/EJ21nH6vc8euzuipTFjZN/qNJMlKrtJJbLKBCgHsYrSpZkuemFfRjcR4XX5iP4fVxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i0nggihj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 088E7C19421;
-	Sat, 14 Mar 2026 00:24:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773447856;
-	bh=WQRXpjIwf6KYkSpJNf4xnZTekqBOFUxWV+yK0mOoxb8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i0nggihjXmXTKML8sut6lB5srcFWHmMKN3tSb0vnbiKDcMNVltZU2CmPxcxFrG3o3
-	 nQrXA1wQ5YuTbmhgcTPNORS+379TzqDGm/7lSrQ1+WOrB6YJhRCIjKA7zUUcBgPch0
-	 EYChM4p2xmMbNvogwcdaYFHJ9nHAZ56sOZLrj4G67jwJtQWWuJzeM6LK+rXxZtPvPL
-	 7hsCy1/fez24lkAmdr6y8xZG7yqBOpidyJ0h37yL3W7fcEPRQk675mEsDmHjbA8Xn+
-	 hN93oY8bX37rGdXAEkgAe3QI7f5zrI2DHLm42gIk1V7HmETARtzUHgwH52MHcPBfBz
-	 VF6ZMYEbGWSgg==
-Date: Fri, 13 Mar 2026 18:24:12 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Vineeth Remanan Pillai <vineeth@bitbyteword.org>
-Cc: Peter Zijlstra <peterz@infradead.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Dmitry Ilvokhin <d@ilvokhin.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	io-uring@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>, Jon Maloy <jmaloy@redhat.com>,
-	Aaron Conole <aconole@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, linux-sctp@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net, dev@openvswitch.org,
-	Oded Gabbay <ogabbay@kernel.org>, Koby Elbaz <koby.elbaz@intel.com>,
-	dri-devel@lists.freedesktop.org,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	"Gautham R. Shenoy" <gautham.shenoy@amd.com>,
-	Huang Rui <ray.huang@amd.com>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Len Brown <lenb@kernel.org>,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	linux-pm@vger.kernel.org, MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Chanwoo Choi <cw00.choi@samsung.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	linaro-mm-sig@lists.linaro.org, Eddie James <eajames@linux.ibm.com>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Joel Stanley <joel@jms.id.au>, linux-fsi@lists.ozlabs.org,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Philipp Stanner <phasta@kernel.org>,
-	Harry Wentland <harry.wentland@amd.com>,
-	Leo Li <sunpeng.li@amd.com>, amd-gfx@lists.freedesktop.org,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	linux-input@vger.kernel.org,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	linux-i2c@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-	Michael Hennerich <michael.hennerich@analog.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	linux-spi@vger.kernel.org,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org, Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 01/15] tracepoint: Add trace_invoke_##name() API
-Message-ID: <abSqrJ1J59RQC47U@kbusch-mbp>
-References: <20260312150523.2054552-1-vineeth@bitbyteword.org>
- <20260312150523.2054552-2-vineeth@bitbyteword.org>
- <20260312111255.7925b4e2@gandalf.local.home>
- <CAO7JXPhg-Etspj9YahZrq8cmZ2K6AGWDrMnHO+oD96P_SmOLBw@mail.gmail.com>
- <20260312155326.GB1282955@noisy.programming.kicks-ass.net>
- <CAO7JXPiu8-LE_gG001_GQLoGVYakPdzmH2SXLqfzJjEUxbn1Rw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC7A1E1DFC;
+	Sat, 14 Mar 2026 00:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.39
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773447862; cv=fail; b=uEFw4NoJ2Dg3/NLHCVddyq5HbwSX8RmEyDlJZmBtfd5kRNvdCWW2c3Pb2OLdAzXLcSK7B6lL/hpZLCNnVs1/PlJSZwnk6U4Ol69fXLtNT9/mRGGQfezZCukO5ArEDiSlXFIW0YNKwMQs3t0gxhBkYOpMRpU+Ot6FzKavZfA5TDs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773447862; c=relaxed/simple;
+	bh=M6ngw5cIB/XFrioc8TH85B6fFmQU7R0a72ZjR/BjVJQ=;
+	h=Date:From:To:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=PIzJm1RRwXgYS5dv+jRqtMQaAMf+JC3PMPwBDVI2Fuo30be6HyPqvIkLDEV/MZNaZDvZWVi/E+FDz54+H4vDHTforBx1TId9Icpl/aomQL9nI9xoEvkKGmvUTvmGXqwjQ22X49AqDb5RDM8Y4yKSl3m41oMASWrOhN3b3G5NIxY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=I4xtLASO; arc=fail smtp.client-ip=52.101.65.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=llP/8YhIcJ6TkcrNihWgKchZv8k6jc9pjJB8ZcVpZ9xSe8uDXYguQaJiUOqVW5XkeiNGyLHN6xXUBH9dr45TEqRYO5FWzf1c4e/P49hxdtTWu5c6Z3QgkX7tfPjgXRyRIq9KvSIKdWnKjdeOA0iUP1ILXtyYFI58Ayv2m8kc7Wqv/dHRH7xf1VYsdW1KQgYmC1LnErU8A1y0B4EiCeNfIgkb49RRAy2eMu9BObrNcr/3PpfXJMkFl6drfyFqbl3njQUmQOfJdyBx6CtgDcUpr8bFx4q+D6xtRk2KVtwoKf4hhFpvqpzsoTZSHDlzRyj3kIvyR4IkBCfvmwynBLCn0g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YA9rEL1LFRQR1hrCZ3RZuGY+BRn5tbSmP+h6VmlFn/0=;
+ b=ofv5tvheZXwhigf2MsEMusipHnISf2NYY0kKSDS4F0Lqkt/BvAJqz2028naXBfvrPVaYqGxyYLD1nu5VUAfSi9E2wFttwwnw+rGfvdIFfDMjdx0ggZcLH9mzVcYyFyeUG2ENn9/FxOTxWey/hzLqDApIPB5PLLLNdfaOrrvrDnBDVr0xnfjoiu0JV5iQgfktpZ4hy73ZuHoFBBlsAMGVAH8yUTbcMIJW1oFIHz1xt/n08NXHHzUgNLv+lmR7R+50qNP2f8o5wTXQYceBnrEZiTeZivMGUv9cXZXp5/+kl7cakxTsALVlEyrs/MadD4dPppC+uoAY0B+xfHxjnM5VCw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YA9rEL1LFRQR1hrCZ3RZuGY+BRn5tbSmP+h6VmlFn/0=;
+ b=I4xtLASOfAKZuGUU0pYBen4x3mZUK/GPqlWXJOtAL3MTr+MMX7Gx3kKyPyt0VdBh+eCbPwgPuns6USxB2/WBFVHnV8uAG25TAqlcfrhbb46tB+65HMLpP0bAeryZFtCO29JO4EHW8Fi0dexbhpj8WLJ6S81jXQ/L4QCdorY/SlbN66ympXBO7i++RZwjygBJsjI25mXwC29zhXHDXYf/frmfzMnqOG5VJOuvVslPVf4FXkk/4nZtNxvrzCVIuvPi2a5OdWhFMPkos16ROiNyMIuhsLzqeAdne2wiIYAP2ZwmfgCeTxoJGxwdqaBPMnOj8/EtVZfVMhTkih6IgJ4nZw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by AS8PR04MB9175.eurprd04.prod.outlook.com (2603:10a6:20b:44a::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.16; Sat, 14 Mar
+ 2026 00:24:13 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9700.010; Sat, 14 Mar 2026
+ 00:24:00 +0000
+Date: Sat, 14 Mar 2026 02:24:13 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Joe Damato <joe@dama.to>, Wei Fang <wei.fang@nxp.com>,
+	claudiu.manoil@nxp.com, xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Subject: Re: [PATCH net-next] net: enetc: remove stray semicolon
+Message-ID: <20260314002413.i36jrsuih6j2lmtc@skbuf>
+References: <20260313112454.427191-1-wei.fang@nxp.com>
+ <abSnSjp7cIj/qWGG@devvm20253.cco0.facebook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <abSnSjp7cIj/qWGG@devvm20253.cco0.facebook.com>
+X-ClientProxiedBy: WA0P291CA0019.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1::21) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAO7JXPiu8-LE_gG001_GQLoGVYakPdzmH2SXLqfzJjEUxbn1Rw@mail.gmail.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|AS8PR04MB9175:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7a7cccf5-4a37-4593-51d5-08de815ffcf3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|19092799006|1800799024|366016|10070799003|921020|18002099003|56012099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	56eyVjrZsLzmpbFoFYq3RrVmw4kqmp6oKGjx7p4B7GAj/YwDDW3rl/miIL3PN8RM2WIQtXkk/U9ha21vGxeJZfJL2uHKsNDkz2IOzrApDxbl9yIvjuBFIKqnxZA486iy/yt6UFz0wE0MK9xK1yczicwDz3PZROmGAzXqp+VshtGQlCrDfmYw72bcKpGuae3J3xfocGyczXLOLqZBLvOqN5cZccf4ENjrxu2AAPcYcHrj0hArEj1oZrHf3FQuH9i1fcBDfLR7TyML8G2Jc8dKXGMJnnI0UWBPBbebfIEJJ9F1xxH1ouVkMTQIrfdT2f/enQwUYUuTZHvHfr9zSAl7K4IprONwN/ErUMzodSGlu8xJ0C/WlBUP+rAhHcvE/Vf6192DqOfoPgNE3euOwQ1EZPWQe69F+RwEe2fW9gEu8gLnZGCAkKHeXMx04Iw4kaXVpGMaqGanJHsizsZis44jL4KDPoUUKt023CQ9zUXvxuP8aiCR3eQRaS/MbywngqHljW2GSjU1Rm1d278y+LSdOIs+aO3Zr8JXZwJ1xojVvnAFHhsMv55ehXWK9Q2BMEa1BJD5T7izt9/3AI032wbr5bB0nFfCmIHvhP2DtGH4k5e0tJDJ3L9EIXEhTNOAzBq65xO5SxgNQIWfeabTk7ZOQu5AERpv4gHAXGeDS9JFwr0pVyQMmk1bXlaZFkhwPO2TSRsspxIbK79AfMwFsiA74fqJxiC78T681S0TcPCgS1rfScJPpOCI3K45lH01HGeOblBIF+sCs8OJ3I1bHAx9PquXVuYnbf0DXj5pM5/+MXY=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(19092799006)(1800799024)(366016)(10070799003)(921020)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?cQHAPvm2gMqwXJCd7Wr6MBZ+w6o3aX/kEFSBVovX8LKVdRshGr9E+xN6sCkk?=
+ =?us-ascii?Q?dD1hyKjV/11j9VVzTQS6Zx/m6D8dHYNn4t72D7xcDvSBkZjHmMdy9oRZfT5z?=
+ =?us-ascii?Q?UFjJu1xC8lTJZ38JqeED7fON7L6AjVwZR9Wxi9JxXPbJ+rGJ+3x12v2+rLv6?=
+ =?us-ascii?Q?jMNAhpOcJRKQi+j7hY73HaIb12w2BW1kHpbiU0V0PdiFS0T7nFcSwVBvG9WV?=
+ =?us-ascii?Q?LXllqFRWuchLe8+8n2oylggUN6tjz9Q7IovlUzx2kHWtu5zL5tOqB+X0/lRx?=
+ =?us-ascii?Q?t4EacnsFSw0CFhRBzTA5VRX5b/2bbRDo5231Z6XULvlCxYboxJ791Do2U3a5?=
+ =?us-ascii?Q?lcBvZ6NhK901IcPfZwKUWOz2LnWt/NZaDQD1MDUlPiHT+tOY/iCEJnFq8TWc?=
+ =?us-ascii?Q?TZWqOyWkr3DoXkT5yhq0MNBvJwKnnYk+pwLxkIOJSvcoD1VchfAeskY/c1RN?=
+ =?us-ascii?Q?nmcoZZEZ5SxjPHTsXMnK8sXc8lV6oDFdqzslY5xY3K6zXquWk5ou1QDg+HDv?=
+ =?us-ascii?Q?3HpU0JOW6UUP7yeoaMrLWINwJcBlakuTuScgQPur84DFheP3EFLS9qP3raAG?=
+ =?us-ascii?Q?T6GKcjpVdX/9Kht9ksU0BfYXeUZiJVIxkGpTuMyIyRfGx86/k13l1ckF9dBQ?=
+ =?us-ascii?Q?2FT50mKq0B1CgSFd0nU9Oah6m8kHnFgLz2fH2nY849AxqtkBpwGW4IGckxn5?=
+ =?us-ascii?Q?sHcOywsC+rFmPksfTVsV6ZBMlcWRz3fTic0anh7ov7O+btm09RrcQGgB7o4I?=
+ =?us-ascii?Q?QvylG6bhh+6rxaLc7Db2JtAbnepbYTWuU8FpyLLQKmLf47ssLhEfGKBWdFmH?=
+ =?us-ascii?Q?eXyV1uRkkkU3Wx3vEtMym6WELh1JUHPO5zYDayZQ52mMhn4/gCtt+3idfWuI?=
+ =?us-ascii?Q?klIrvXgbAwkoB+xAmVdeuOuooaF2vAcMUKpNPQhjcmJ77cDNEhH+649sYe2/?=
+ =?us-ascii?Q?v3CjHhGJ3eTU8thrld8wIuddh2alWEeh3dvlwN4OGnn38HLnQQKHAjqKRDYk?=
+ =?us-ascii?Q?hNjrQjoiOx0paaQ+IEcL8DDeULr32yiNjpPVd9vwSdpLMGmd9RMKgu4x7jeS?=
+ =?us-ascii?Q?dBHEbm8Zn226+3JtdZctF7KlCXtyquezGIOPZvz7ebqd/9e+FVjVMt9SETju?=
+ =?us-ascii?Q?DRkn0+Rtwyc/EnBKmcUmFBQJcByoLLPejxB8OuTVDfd35/WOk/dbasrVbbL3?=
+ =?us-ascii?Q?jQbAue75myP4CTMnS9pkpSI0sr1Ds4gw9DArPKl9dd3XWXUcc4IW4nXqbMpZ?=
+ =?us-ascii?Q?fkIt1UZAIxblT+7ipUHNGb3mb2HAwo/jgdFN2KNlQvQHFVJun2X5Cu58d6uu?=
+ =?us-ascii?Q?v907+9PBGJYzS7tdBST+2DjyO+RR84DTitbAJLir4RRzvJCgU7pTcvFE/YG3?=
+ =?us-ascii?Q?9t1387jOHy7i7Gx6ly9Mq+cOTka85XDCsuRVwgYvbYO++lCuOnrqaThPLBWE?=
+ =?us-ascii?Q?SZbN7QzdClfP2mweErxIuAxzoYex1bQgkkV1cJI8o/2wyGWVL+JQvpaDw2TJ?=
+ =?us-ascii?Q?V6oEnHWIBCHTAccBztGyIOtCLBgwfhRM9zjcq8l1e1Uh2mHJeYor5omFf6U6?=
+ =?us-ascii?Q?RlibzdjwUUorRrLeTR4LZ7OE43TEAJ2cutBEvA2MCKPuCm8kbFWJlgps6Fps?=
+ =?us-ascii?Q?CQFeUTNWjQc2qLS+1UN+TWgvF2yRpzF9HgvsnbG1SOBrCveKu1iK+EY5nvtd?=
+ =?us-ascii?Q?SRSRoXm1HQXI1fEcza2XnWl4SfGWm/JKEuNL1gwMvj/rrP4+qysbXbRtaHdM?=
+ =?us-ascii?Q?Z8PXvf/PSnbKnB/IqDFr1c58dC7Dsx+XPMuNsZcD2kI35dg6nf5Yx+7adHHG?=
+X-MS-Exchange-AntiSpam-MessageData-1: 9sGB4p0iJi0U7Q==
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a7cccf5-4a37-4593-51d5-08de815ffcf3
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2026 00:24:00.1567
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2iDrxT40Qvwc++O5Q+SC42yCJXhvNhnVT6OFr1xfHn0hHDpcU4yi8JGoUpO9QycGivA/QfD7s7ly+p2Nex9r6g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9175
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267652-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267653-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[infradead.org,goodmis.org,ilvokhin.com,kernel.org,efficios.com,redhat.com,kernel.dk,vger.kernel.org,davemloft.net,google.com,iogearbox.net,gmail.com,ovn.org,lists.sourceforge.net,openvswitch.org,intel.com,lists.freedesktop.org,linaro.org,amd.com,linux.intel.com,samsung.com,lists.linaro.org,linux.ibm.com,codeconstruct.com.au,jms.id.au,lists.ozlabs.org,ffwll.ch,sang-engineering.com,analog.com,hansenpartnership.com,oracle.com,fb.com,suse.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[73];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kbusch@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EFA1328AEB7
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,nxp.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CD5D528AEC7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 12, 2026 at 12:05:37PM -0400, Vineeth Remanan Pillai wrote:
-> On Thu, Mar 12, 2026 at 11:53 AM Peter Zijlstra <peterz@infradead.org> wrote:
+On Fri, Mar 13, 2026 at 05:09:46PM -0700, Joe Damato wrote:
+> On Fri, Mar 13, 2026 at 07:24:54PM +0800, Wei Fang wrote:
+> > Remove stray semicolon from ntmp_table_name().
 > >
-> > That seems like an unreasonable waste of energy. You could've had claude
-> > write a Coccinelle script for you and saved a ton of tokens.
+> > Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> > ---
+> >  drivers/net/ethernet/freescale/enetc/ntmp.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
 > 
-> Yeah true, Steve also mentioned this to me offline. Haven't used
-> Coccinelle before, but now I know :-)
+> Hm, I'm not sure, but I suspect this might be rejected due to the note about
+> cleanup in the docs, which generally seems to discourage this sort of thing:
+> 
+> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#clean-up-patches
 
-[+ Chris Mason]
+"simple clean-ups, which are not in the context of other work"
 
-At the risk of creating a distraction...
-
-This discussion got me thinking the right skill loaded should have the
-AI implicitly use coccinelle to generate the patchset rather than do it
-by hand. You could prompt with simple language for a pattern
-substitution rather than explicitly request coccinelle, and it should
-generate a patch set using a script rather than spending tokens on doing
-it "by hand".
-
-I sent such a "skill" to Chris' kernel "review-prompts":
-
-  https://github.com/masoncl/review-prompts/pull/35
-
-I used patch one from this series as the starting point and let the AI
-figure the rest out. The result actually found additional patterns that
-could take advantage of the optimisation that this series did not
-include. The resulting kernel tree that the above github pull request
-references cost 2.8k tokens to create with the skill.
+The ENETC NTMP code is under active development, and Wei is developing it.
+The semicolon was added in May last year and was found as part of other
+review touching that area.
 
