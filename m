@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-267803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267804-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPImLD+gtWn42gAAu9opvQ
-	(envelope-from <netdev+bounces-267803-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:51:59 +0100
+	id cEJ4EYGgtWn42gAAu9opvQ
+	(envelope-from <netdev+bounces-267804-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:53:05 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2609628E378
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:51:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B392E28E3C5
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:53:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A9DE5301946D
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 17:51:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2517F304D673
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 17:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D66318140;
-	Sat, 14 Mar 2026 17:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2389A333725;
+	Sat, 14 Mar 2026 17:51:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="BSdHGcuV"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="QVkqjw8+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AC515665C
-	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 17:51:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D612932E121
+	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 17:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773510703; cv=none; b=q6FTbOFMt7U1oIHzgRIwn0tkDPyGvsurdZpJZ4KOIebQDPLqmILVKjAf6BUYav8a16QjixShxT7lRuZwlerpWxZnLmOLsnVYADpEofnx3HpIR1DsQnjEch1CLi15j1mwN+o1gFkUbnlTboGKDO3k+SZmg0j1ShgwN9Iqg2qSiXw=
+	t=1773510707; cv=none; b=rhJ4TBps/9pUcMplnCzj08rjmBTqFFe6ssO3cxPNL/EV1oDhxTRtZ3yCqCZBcuBOZYyzhKdrq93w5ok08ma7Lk/2sVLvxSVXc5FkzgT2syMVCRqrprYfdlndApptXj7T2EfntE6NdADgMH4JNQaPXTgx4x6bGYQebTtQHDWvvo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773510703; c=relaxed/simple;
-	bh=/W2h7qSrJKD95QsxjmbKLwHiCyH7RA6BX4Ejs6Czpsk=;
+	s=arc-20240116; t=1773510707; c=relaxed/simple;
+	bh=klvZP/40lxt5y+UXET4CuAE7+juOWbIR9nJ0dt62MGs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pvSQDkxcEwq2BtuvYhN+GE5ndrjQpV65/Y20QA59bpXBh6KstPqdgsllJPhw0fVLV5cYz2kUapUmtqqHevURGcC132GylsdPABgrioEgkhu7v654ypy5jswuENR3IYwooukWXCU6GBhSpkScIqHVBiHioi5muzqiM73vMnr4uQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=BSdHGcuV; arc=none smtp.client-ip=74.125.82.50
+	 MIME-Version; b=kdW6V5v1Rwp9oyOegYNCwq3AYwQxboL+5FDk8zjGsc7A8IrDdZ5Wb/WOkGqZ85GyE/bPX51lQqTjfH3u0ojc/H3TH4u+6PbZw+JVYfjSZFX3QyJkvSM334QiA2p1you/XEQBYQqgcd0nL/v42ntT8aaqthDp77ngEAGeJ+GwXr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=QVkqjw8+; arc=none smtp.client-ip=74.125.82.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-128d2e3082eso1967626c88.0
-        for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 10:51:42 -0700 (PDT)
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-127380532eeso2854207c88.1
+        for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 10:51:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1773510702; x=1774115502; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1773510705; x=1774115505; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FstFq72HN4LsI2mBA0U2uqbzUPh2nVAMeGBt+tKiwDE=;
-        b=BSdHGcuVmAG0CSe/ZVpsI/whLkxmG7yaHnxJNfBVliPkQtWx/NgvVpPBm2cJo0w1sP
-         ipnkzRvds+/wNFOAXGn2k62T8nvBlSGAATaRDMsf9xwO+sDdEnAq6QBezXCncci8SDcp
-         iNHkjeNdLKGVgYvRIB9lwhXPi9eiUJHgYPi71iza0N+2o4B39AMWpLacIrSB9Puk/0U6
-         gMlfu0qmEqK2oFcqUWOgq/g8gOqg+Q7EwvkezwHJkC0OLAvp6QO6aMos6VmvFxTplmQH
-         4duS2g/7kgEzaGNcJa/SfutHNTjo7N5DFQVp7EyLhrUp/xzc8x14aBJczQPnW918YQyg
-         wDHA==
+        bh=+QegOAViTxtS33SKXmCA6KrdOEhc+r5S58UzkPIWvA4=;
+        b=QVkqjw8+v5ihMp73dt7Vl74nOIRTzYOGbmI7FKekaJcNiW22emh+obviiM7uLbfPZj
+         EdURCddcc0/G/Iv8BQVQPIe8WuoqSNJosYJhZCPhqg2olzkTTMr7zWBShMnvPPSXNY0c
+         EL08I56nzEcJuY1XeSUSjYLEDaGX4PzHAaeXI1xzgm7+NtkLwVPy1Bna1X7ZMFonB2iI
+         esMtft/wRjwbbSlzTN4yz9zzGoPMVrHa0jHb8dntbpLQuiyhas9MCwKTGIkvFzq8ARpi
+         hg6LakyB9LMSF9wZuzKYjL56p9eU4v0BZ5vlSdl1abfOZIMxlJn5/DT7FxMooQbzJoEb
+         Jt5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773510702; x=1774115502;
+        d=1e100.net; s=20251104; t=1773510705; x=1774115505;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=FstFq72HN4LsI2mBA0U2uqbzUPh2nVAMeGBt+tKiwDE=;
-        b=eY2r33EdfYyWHal07K2EbwCo2Lg6fCN8ssJU9oI/MiWMWTObZ4Zlqxg6I9XvFBiB6q
-         4OI/bgh5zOm853vuPI13k/8Ohqavya1sIA8xTJPANGNwP3VApsXXLKnE1/ukghGDty8I
-         FsVsdLXftknR7cLM5jyFDl7S7dyexAl4FUgPw3CBqyilxHKiOhH+brYRwNYu/GQ9quAz
-         /zt5nBd6BiIKlNEts4mgBQpJ+MTKsO49dB/9MxEFx03ohYJmZR4em278SzWhFGxl7Wuc
-         sz7BcCxSdjDCbLkvEckl4yfQACsGDcnjcaY68FB09Hx4nUIoD8Wp1Tt8sDlRtCoI71Tp
-         Vdvg==
-X-Forwarded-Encrypted: i=1; AJvYcCUKHslHBKzR6xs4TxnYsIhcpKcmKiE20uDxrFXGLHJA1w616gs2U90TCRnU/rQ9Nn09fv8Ocxg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRWl0zmFdJX3OZ7jtbZS3z8hHTlXyVCg8uMlKrhR3HqDQSUu8h
-	dZJ7akvIvcrBLNQQScrGkZXOsFuJUyRfJqWCcQ60cJ11lnsswa/tt/2P1NyR6o3kvA==
-X-Gm-Gg: ATEYQzym8EsT+PRDzSQGQtrI504EcwOAXWMbJj32wuMlLzLknlS7krBY69vv8rp465K
-	9u4oi2Anaews+88oWIWnwIKYFU22w+YL8Cj1yeuNbIDpmS0v9rn3tYdCfkrZxvPYYHQ5c0TkiiD
-	rp7G00RF7RgOGl+JlblXyxRHSCSoBtYJLb5mZy9hmOtR2bQNsaPa1ou2zLT10xVsuyZnoMBmVpn
-	plGTwQDb6W1rdj2LWgEeEtYAu8SEdPiuhgFgkkHMYibYoXFLU0140ZRKeiFiU4JycaWg0Ys4K0c
-	x20x4Pg4tC44WV8ISn6O/4gLZyhwQ7wAOxftb2RyMrivtydaKcD62o4p2vACq/FU9NzBkYJOETn
-	XrFd1joHR8wJ658sinzhTQeBfog8SeLDQ4xCTXrdrSpWg17p7itFiMESvd6+xLZ0tUOmTXfL+aQ
-	HWE5WJrRUXbhAW2dVezu6B9zquh5PGXr4Rznf8ogmja3yXL5Jy59iRE8VXUQsj0ZzCQBCgUg==
-X-Received: by 2002:a05:7022:eacf:b0:128:bb7e:b5f7 with SMTP id a92af1059eb24-128f3e20421mr3561469c88.36.1773510701651;
-        Sat, 14 Mar 2026 10:51:41 -0700 (PDT)
+        bh=+QegOAViTxtS33SKXmCA6KrdOEhc+r5S58UzkPIWvA4=;
+        b=Ws5J0c9vl10iC4KVJuSfe8mQyN0I7FjjCv0bftRcPihtf7YtpI+trMW/tEJawMr22o
+         ihGqdE0mhh6RY5MZfpCAGyseS6jTk/0QyCLEVjoLshZ96llkEaEq9WqBlJsDYZ9NunTA
+         fTcahkJHrDX2fgNY1jRfEabGUF7l75DVXL8cHWd4LnxpIwM5b2ngqwjv0YmWc7UXdCDx
+         VOlEoES8jXiqzTS/sIk3OFPwjlMho5ToOXxsvCHXXuhLJX1qNsCPGmzTvHzoucQpFbcV
+         5EMNw0NG9B3RjQUNMZLDCCkHUqJqpr7IMPZIN3/19i0UbIiVpcJNqQ0dLw4X9OKTwCFp
+         OxEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUPTpVb2ss1w3zlLRqA+4rMii7pFFod/SyG0ppmqwRI0mW/O1wrAeeSl1DKcYB+ROjZQ2wg2sI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywjFIzIPHAyc62La9uu9+g77jATXWXxaw7Dj08rzNDbMSeyJYp
+	FaVcZyCi+Tbz4+iF1NWmUQ4/l4YEHBkGVhuvZuDqb5NF/KeDCLW/bCnNlOgeCTanjA==
+X-Gm-Gg: ATEYQzxWXuiqubf3oa5qVIWev1Fb07wa11Q7tO1rtQ4NmJxqMLNxxjYtNsh9BHuJWvC
+	unp8q/P2oaZccYE/CJJXKeqmIon+TtmpILS/vsDMY+NkR4a9UF98Eum7PPZ97awb9udi39qjkAb
+	GSk7SnDYo5CpfiKFo8vmv3OtJzT25Q4Z9oz/h9Hd+8LbZ7RlnP36/Qtk/gqyTTCHKGUl77lvGP4
+	gwvi0kCApf0EHSGssTxsNYraFsHGC9YVWUkNdHfl19seqHWJBaj2lKDKig4H1L8SICDLB1m9Kr3
+	72GoDAS+WY80pKlovDh24TRuUfd0AzPDQULoy8rsJsKN7gOd0dWkvcpu8jtXkS246C+laFyx6Mz
+	7NSoCtSkZ9z2dZOf3FAWNLZ4KN/jgWJPdNUghIqzLafIx6HysVW8svKAn6c2m6SeVw4LPQtVVV5
+	aJ1z4c1EHQnGuf7xdccoJbNrHG/BERbIrWzgKEFPFQKy9yha6UCF3MpukB6JwrvWIpHu+tbw==
+X-Received: by 2002:a05:7022:6283:b0:122:153:d161 with SMTP id a92af1059eb24-128f3d7b662mr4111936c88.17.1773510704875;
+        Sat, 14 Mar 2026 10:51:44 -0700 (PDT)
 Received: from pong.herbertland.com ([2601:646:8980:b330:eb38:94c4:209f:a764])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f6384f6csm5917206c88.9.2026.03.14.10.51.40
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f6384f6csm5917206c88.9.2026.03.14.10.51.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Mar 2026 10:51:41 -0700 (PDT)
+        Sat, 14 Mar 2026 10:51:44 -0700 (PDT)
 From: Tom Herbert <tom@herbertland.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -84,10 +84,11 @@ To: davem@davemloft.net,
 	willemdebruijn.kernel@gmail.com,
 	pabeni@redhat.com
 Cc: Tom Herbert <tom@herbertland.com>,
-	Justin Iurman <justin.iurman@gmail.com>
-Subject: [PATCH net-next v9 02/10] ipv6: Cleanup IPv6 TLV definitions
-Date: Sat, 14 Mar 2026 10:51:16 -0700
-Message-ID: <20260314175124.47010-3-tom@herbertland.com>
+	Justin Iurman <justin.iurman@gmail.com>,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next v9 03/10] ipv6: Add case for IPV6_TLV_TNL_ENCAP_LIMIT in EH TLV switch
+Date: Sat, 14 Mar 2026 10:51:17 -0700
+Message-ID: <20260314175124.47010-4-tom@herbertland.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260314175124.47010-1-tom@herbertland.com>
 References: <20260314175124.47010-1-tom@herbertland.com>
@@ -109,10 +110,10 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[herbertland.com,gmail.com];
+	FREEMAIL_CC(0.00)[herbertland.com,gmail.com,google.com];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,vger.kernel.org,uliege.be,gmail.com,redhat.com];
-	TAGGED_FROM(0.00)[bounces-267803-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267804-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[herbertland.com:+];
@@ -123,71 +124,59 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[herbertland.com:dkim,herbertland.com:email,herbertland.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2609628E378
+X-Rspamd-Queue-Id: B392E28E3C5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Move IPV6_TLV_TNL_ENCAP_LIMIT to uapi/linux/in6.h to be with the rest
-of the TLV definitions. Label each of the TLV definitions as to whether
-they are a Hop-by-Hop option, Destination option, or both.
+IPV6_TLV_TNL_ENCAP_LIMIT is a recognized Destination option that is
+processed in ip6_tunnel.c. Add a case for it in the switch in
+ip6_parse_tlv so that it is recognized as a known option.
+
+Also remove the unlikely around the check for max_count < 0 since the
+default limits for HBH and Destination options can be less than zero.
 
 Signed-off-by: Tom Herbert <tom@herbertland.com>
 Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
- include/uapi/linux/in6.h        | 21 ++++++++++++++-------
- include/uapi/linux/ip6_tunnel.h |  1 -
- 2 files changed, 14 insertions(+), 8 deletions(-)
+ net/ipv6/exthdrs.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/in6.h b/include/uapi/linux/in6.h
-index 5a47339ef7d7..438283dc5fde 100644
---- a/include/uapi/linux/in6.h
-+++ b/include/uapi/linux/in6.h
-@@ -140,14 +140,21 @@ struct in6_flowlabel_req {
+diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+index 113efbc19abe..e61d97621108 100644
+--- a/net/ipv6/exthdrs.c
++++ b/net/ipv6/exthdrs.c
+@@ -122,7 +122,7 @@ static bool ip6_parse_tlv(bool hopbyhop,
+ 	int tlv_count = 0;
+ 	int padlen = 0;
  
- /*
-  *	IPv6 TLV options.
-+ *
-+ *	Hop-by-Hop and Destination options share the same number space.
-+ *	For each option below whether it is a Hop-by-Hop option or
-+ *	a Destination option is indicated by HBH or DestOpt.
-  */
--#define IPV6_TLV_PAD1		0
--#define IPV6_TLV_PADN		1
--#define IPV6_TLV_ROUTERALERT	5
--#define IPV6_TLV_CALIPSO	7	/* RFC 5570 */
--#define IPV6_TLV_IOAM		49	/* RFC 9486 */
--#define IPV6_TLV_JUMBO		194
--#define IPV6_TLV_HAO		201	/* home address option */
-+#define IPV6_TLV_PAD1		0	/* HBH or DestOpt */
-+#define IPV6_TLV_PADN		1	/* HBH or DestOpt */
-+#define IPV6_TLV_TNL_ENCAP_LIMIT 4	/* RFC 2473, DestOpt */
-+#define IPV6_TLV_ROUTERALERT	5	/* HBH */
-+#define IPV6_TLV_CALIPSO	7	/* RFC 5570, HBH */
-+#define IPV6_TLV_IOAM		49	/* RFC 9486, HBH or Destopt
-+					 * IOAM sent and rcvd as HBH
+-	if (unlikely(max_count < 0)) {
++	if (max_count < 0) {
+ 		disallow_unknowns = true;
+ 		max_count = -max_count;
+ 	}
+@@ -202,6 +202,16 @@ static bool ip6_parse_tlv(bool hopbyhop,
+ 					if (!ipv6_dest_hao(skb, off))
+ 						return false;
+ 					break;
++#endif
++#if IS_ENABLED(CONFIG_IPV6_TUNNEL)
++				case IPV6_TLV_TNL_ENCAP_LIMIT:
++					/* The tunnel encapsulation option.
++					 * This is handled in ip6_tunnel.c so
++					 * we don't need to do anything here
++					 * except to accept it as a recognized
++					 * option
 +					 */
-+#define IPV6_TLV_JUMBO		194	/* HBH */
-+#define IPV6_TLV_HAO		201	/* home address option, DestOpt */
- 
- /*
-  *	IPV6 socket options
-diff --git a/include/uapi/linux/ip6_tunnel.h b/include/uapi/linux/ip6_tunnel.h
-index 85182a839d42..35af4d9c35fb 100644
---- a/include/uapi/linux/ip6_tunnel.h
-+++ b/include/uapi/linux/ip6_tunnel.h
-@@ -6,7 +6,6 @@
- #include <linux/if.h>		/* For IFNAMSIZ. */
- #include <linux/in6.h>		/* For struct in6_addr. */
- 
--#define IPV6_TLV_TNL_ENCAP_LIMIT 4
- #define IPV6_DEFAULT_TNL_ENCAP_LIMIT 4
- 
- /* don't add encapsulation limit if one isn't present in inner packet */
++					break;
+ #endif
+ 				default:
+ 					if (!ip6_tlvopt_unknown(skb, off,
 -- 
 2.43.0
 
