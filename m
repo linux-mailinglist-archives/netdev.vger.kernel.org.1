@@ -1,399 +1,299 @@
-Return-Path: <netdev+bounces-267727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267728-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EGjxGOpNtWmHzAAAu9opvQ
-	(envelope-from <netdev+bounces-267727-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 13:00:42 +0100
+	id 8Cw3MxZPtWm8zAAAu9opvQ
+	(envelope-from <netdev+bounces-267728-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 13:05:42 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EAAB28CF7F
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 13:00:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3518828CFD0
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 13:05:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 10B45302F989
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 12:00:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C885302529C
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 12:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662C62BEC5F;
-	Sat, 14 Mar 2026 12:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC672BEC5F;
+	Sat, 14 Mar 2026 12:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F3muLuS+"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="FpR8xluT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F5F1A256E
-	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 12:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773489632; cv=pass; b=Ufm0pUjGMbafUOXWbh1/3rBSXZJzxCupMo7vLlNHYzUovAvuRh8f6TleeaGlLu7/0/A9+5Da87B00Xud2Zfb84lenAThu+umid8C7XWSrpOvjYDOeP7o97xfDq7zzXX/AV74uwfepikrNVZwmDHeF0Ov/x1+yA/0YoJgmlBxIjg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773489632; c=relaxed/simple;
-	bh=Q2ek1cQSBGnSxStpxbeUAfhmZ6rQV759eIi2QdRx2jM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WT7YoiV0bqOav5YTl5f2vhCySRDo0J2zk4tYFPcG0PMUqSVNE11a8xKG7U4KY3QzIw2eIWt/JW1gZQMOvHmCYrzvzu4wkZ+jr44KVKJXHb6WUCt/p60fUSYBPg/M4ICWHQxgQfGRgMHtjwgHyKE06IO44OqZhOq5eIWGPdX42aQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F3muLuS+; arc=pass smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-79902e1fb71so31634947b3.3
-        for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 05:00:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773489629; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ETDhZ+zUh1a/kMLceuYNOVGQ86wRHaL1hjNHyweKx7TvMX4TZ5MhjgT98zEJdcW+zG
-         H+E7P3HVit2fQpNqn9c06buFjl6WXZ59FJgEaKPAWYLo0ZCjH2b16ntl6nmcaC1paLl0
-         b7xzKBH2PWqcX1z4j8umpMZwg3usoBJPBv2VL/ufEABMk+Sn3Ipdleclp4BONfk7YFdf
-         aDH9Zjdw+uAACbgf3bIcV50NYYW96oVMolFYVWv9mL9hpZjA6qWUno05bBosRUG38fYm
-         qmRaX/BEHvAPfcxsdZ8yqIBBHYHRcBxcwRgYOSNnfe8r/uQwggmRxKKs56LPZBi+aI2b
-         35RQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=aRw+xGf1nKdZl3tqrmO9Bg5DWxX6iENeUrIC32RiYhI=;
-        fh=0f+4JLvPZlKXWsm2JjAIqKvJodAQlApR3zrurewaQ+Q=;
-        b=R7FLOhgDarVb6tLjnHGvyzl2PtttNbrD2WD0+d2VTjnQ387nrbhZyvix6MJed9xlBZ
-         pI+4JxkbUsv+TNYuaMJ6DrMf73YWOnDM/HYNQYbqcDMTnKcClyjGrQIx2ujMzqRxrwo0
-         ALF+a9N0UshiWM5Z1SCjD81TV3Hlfpr8598MTNZJEzdcUkTprXvaFb5x3s7/he1/X4pD
-         nAOhIT62o1ixtwfbtuMzrTDU1k4OWfUsIZ0UZGIuLxpCDcITgcIIK23Yy59nYft+NsNI
-         GRgHGffmKBtVl/XFnxboPUfJFZ1L0yzFliZgxCHhRnUDRYz1M3Pq4cnuh8z9Bosvd7ty
-         CCnA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773489629; x=1774094429; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aRw+xGf1nKdZl3tqrmO9Bg5DWxX6iENeUrIC32RiYhI=;
-        b=F3muLuS+8SYaKzEULttyGMV6Ffs2E59McYSlmI/rWyYKYIA1m6JWLZqUDPs7ISsqRI
-         H9WJCI9J342RU3yVLqdUqkz6+ZP+10LOp0z/46mVdfRRSzzEO86e2fNuaykUp+AG9OeG
-         QyKxLqtmYUYE7EKZ1FT88m7sWtiXxo19OohiGYdyEvE8JAA1HyP3/laZuC5PELHh8f8W
-         z1o2xfmXH76q/zbr8AU9fDdnQKosrQDIaXbYaSsup5E4s3RFo+0zSa+thjFBiCqCD57q
-         1KxmtdM7xtVeqcPukFemNuuzlK4S7idEWsGAqiLlFKqz/BJ48rHTpyO938Idk77ZiMTt
-         QRrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773489629; x=1774094429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=aRw+xGf1nKdZl3tqrmO9Bg5DWxX6iENeUrIC32RiYhI=;
-        b=gKjQwt/8nasCIGsnWATjA/H9NuxjrnIsnq5AvNRjGaB4CQVAJCP67Uc11LCEWO/MCy
-         2kP7+mGIEbYD9zjKG1xIV0QJlrb2OVbruTdGo4zQ1X0lNeWBjFuewr+6+4pVrdultq9T
-         M/0PwtBRZUrS0pLX2wgpzvJ8DutJ7mgkmfjMhOzfg3i4yuV2dw8VeZY0JViwXkE4Gd5J
-         i3i5/ab3Qop/Zq+bOhwvMlFKaDgHpkd8DpSFtpwXQzVYsTDgFaVXYAG78+vZXg90Pven
-         e7nUB/QbwfeL385pPpWiXChqRmyklArD3b6ArsBqHc0NcnSgfbITz6dgmd8HbFWmawg1
-         BWzg==
-X-Forwarded-Encrypted: i=1; AJvYcCXVLHqC8Bnp4y2ha/QeqILw7RpSxlzt9g2IuL4EvHL6Z7X7QVG8aR52Kf5jxV3pAGYIa8WYEps=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAwYFjmgu+bDoJCgIW7tzez21/XFxpV5dM8IJQw3p3Vho3BJKU
-	1ww41sLQx7NLrgKlXVZC1LAXUzXHhhKSgatxwUpm0fdIA9ilQFyhINEHSpm3pVnznb0vi3cRnKn
-	jGG6QYUeECo/YItirX3aUVBqmdC4ORHg=
-X-Gm-Gg: ATEYQzxajYBH04JIbZRo8+nsjbOaoIa9utzU2Irf8gKPJHa1g41vfY0Imynx47+k7PQ
-	653kzk4EaizIg6SC1AAAqiOx4jMuib9jVmTfW8NhR9Ojm4cxLpjjURsD6d+YH9z6n+R3T0VVJpJ
-	wnnnhOQypMh8F7PoJ+/+6vQgfjYqJcAa9g6EzuPDBKjb4A+4nfNnjeEeDsCUkgp6cu4QTpL9NSI
-	XakXUH264YCsumRzjD2wMZHpthShhpvz/d6keRiFBV/PCb3Sdx/7HT27yJdVoRHYnrSCr92Wrbm
-	jt7tR0HRRSIXTO+t8VNtuA6LPPFOsytuVYDBGNxWJdxjdNM8bIaJfwWmU5GlwHVoO4eC1rE2
-X-Received: by 2002:a05:690c:91:b0:798:58be:3251 with SMTP id
- 00721157ae682-79a1c20cfb8mr69234117b3.58.1773489628565; Sat, 14 Mar 2026
- 05:00:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A9D218845
+	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 12:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773489924; cv=none; b=ofTqpy8A7EGfaIxz4+BAs8YfiFnOYC39N/r9hdV+pI8xNURxwdeUOtWLEXPQgnIzhleEzLWbPhRFXQgdJsbkc16BWbQAcfrAx76leZRsV/av+uf2xlfcn7Xs2GGw7rHbIxrNmYwSxQwyxpf9DgRepeD87WLqMPajC6CSH1fqKls=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773489924; c=relaxed/simple;
+	bh=qLmcIw+Hj4TApV0WtGh0y0Stdq1Gy5XVj7W4sk7bnbQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q9wDX9DJ0hOUkU4QH8lfkl1D3dgDia/2mMdyiqMxHTZA5YoRKXZCRBjc4V50BbPM9L6B5lhIGVOuNx4hgnvWM1IlP2dPMo2yi2GTY6RBvLaUF0+Hr0METW2qtYqM9+r3+QncIVvqR8PNuehJHCNGcrFycMfewCkUt6lxnfhtG3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=FpR8xluT; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
+	Content-Type; bh=I/SPfk7cM5JyMT6wL0mBGNiv6YjXXe0SS159ngKbMhY=;
+	b=FpR8xluTUv/vgdWpBQZ2ZzJ+PND2NZnLOz0uOf6/LSAisTK2m5n2jS9IwgdGDj
+	cXUtk4gcLoPJIQTShphJHSUB9FXRefYvD+xjLKCkhqhsHkfR7ZghH6F+T8L6Li5z
+	K45nlAzD4zGQ/seOIMvpac/RLy4HyHlPXJRE/TMwv+53I=
+Received: from [10.54.29.130] (unknown [])
+	by gzsmtp3 (Coremail) with SMTP id PigvCgAX8OqWTrVppYNaSg--.208S2;
+	Sat, 14 Mar 2026 20:03:37 +0800 (CST)
+Message-ID: <03134b09-5bcd-4898-bb2d-d866e1acd97a@163.com>
+Date: Sat, 14 Mar 2026 20:03:34 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260309155908.508768-1-kartikey406@gmail.com>
-In-Reply-To: <20260309155908.508768-1-kartikey406@gmail.com>
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-Date: Sat, 14 Mar 2026 17:30:17 +0530
-X-Gm-Features: AaiRm52fxEFqm7gz9xSiYpsf7u81HLWdn75TozcvGoN2JOhTZu5ctxxO4GUlN4Y
-Message-ID: <CADhLXY7gQ=OgC1dVdRHF31CLww+J3-KePfvoKJMm8gxRZzrUmw@mail.gmail.com>
-Subject: Re: [PATCH v2] atm: lec: fix use-after-free in sock_def_readable()
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org
-Cc: mingo@kernel.org, tglx@kernel.org, jiayuan.chen@shopee.com, 
-	kees@kernel.org, netdev@vger.kernel.org, dan.carpenter@linaro.org, 
-	linux-kernel@vger.kernel.org, 
-	syzbot+f50072212ab792c86925@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] bonding: prevent potential infinite loop in
+ bond_header_parse()
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, Jiayuan Chen <jiayuan.chen@shopee.com>,
+ Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>
+References: <20260314115650.3646361-1-edumazet@google.com>
+From: Jiayuan Chen <mrpre@163.com>
+In-Reply-To: <20260314115650.3646361-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:PigvCgAX8OqWTrVppYNaSg--.208S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3JrWkWw4fKw4rWr17Wr1fXrb_yoWfJr17pa
+	1DCa4xJr4xtr4Fg34Dur4Uur1Yv34UGa4a9F4Iq3sIgFnIqF95WFy8KFy7Cr13XrW8WF13
+	Xr4a9rs5Gan7XrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UQ6pPUUUUU=
+X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbCwxmBKWm1TpkfDQAA3r
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267727-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267728-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,shopee.com,jvosburgh.net,lunn.ch];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kartikey406@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,f50072212ab792c86925];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mrpre@163.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[163.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,appspotmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0EAAB28CF7F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,shopee.com:email,jvosburgh.net:email]
+X-Rspamd-Queue-Id: 3518828CFD0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 9, 2026 at 9:29=E2=80=AFPM Deepanshu Kartikey <kartikey406@gmai=
-l.com> wrote:
+
+On 3/14/26 7:56 PM, Eric Dumazet wrote:
+> bond_header_parse() can loop if a stack of two bonding devices is setup,
+> because skb->dev always points to the hierarchy top.
 >
-> A race condition exists between lec_atm_close() setting priv->lecd
-> to NULL and concurrent access to priv->lecd in send_to_lecd(),
-> lec_handle_bridge(), and lec_atm_send(). When the socket is freed
-> via RCU while another thread is still using it, a use-after-free
-> occurs in sock_def_readable() when accessing the socket's wait queue.
+> Add new "const struct net_device *dev" parameter to
+> (struct header_ops)->parse() method to make sure the recursion
+> is bounded, and that the final leaf parse method is called.
 >
-> The root cause is that lec_atm_close() clears priv->lecd without
-> any synchronization, while callers dereference priv->lecd without
-> any protection against concurrent teardown.
->
-> Fix this by converting priv->lecd to an RCU-protected pointer:
-> - Mark priv->lecd as __rcu in lec.h
-> - Use rcu_assign_pointer() in lec_atm_close() and lecd_attach()
->   for safe pointer assignment
-> - Use rcu_access_pointer() for NULL checks that do not dereference
->   the pointer in lec_start_xmit(), lec_push(), send_to_lecd() and
->   lecd_attach()
-> - Use rcu_read_lock/rcu_dereference/rcu_read_unlock in send_to_lecd(),
->   lec_handle_bridge() and lec_atm_send() to safely access lecd
-> - Use rcu_assign_pointer() followed by synchronize_rcu() in
->   lec_atm_close() to ensure all readers have completed before
->   proceeding. This is safe since lec_atm_close() is called from
->   vcc_release() which holds lock_sock(), a sleeping lock.
-> - Remove the manual sk_receive_queue drain from lec_atm_close()
->   since vcc_destroy_socket() already drains it after lec_atm_close()
->   returns.
->
-> v2: Switch from spinlock + sock_hold/put approach to RCU to properly
->     fix the race. The v1 spinlock approach had two issues pointed out
->     by Eric Dumazet:
->     1. priv->lecd was still accessed directly after releasing the
->        lock instead of using a local copy.
->     2. The spinlock did not prevent packets being queued after
->        lec_atm_close() drains sk_receive_queue since timer and
->        workqueue paths bypass netif_stop_queue().
->
-> Note: Syzbot patch testing was attempted but the test VM terminated
->     unexpectedly with "Connection to localhost closed by remote host",
->     likely due to a QEMU AHCI emulation issue unrelated to this fix.
->     Compile testing with "make W=3D1 net/atm/lec.o" passes cleanly.
->
-> Reported-by: syzbot+f50072212ab792c86925@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3Df50072212ab792c86925
-> Link: https://lore.kernel.org/all/20260309093614.502094-1-kartikey406@gma=
-il.com/T/ [v1]
-> Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
+> Fixes: 950803f72547 ("bonding: fix type confusion in bond_setup_by_slave()")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Jiayuan Chen <jiayuan.chen@shopee.com>
+> Cc: Jay Vosburgh <jv@jvosburgh.net>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
 > ---
->  net/atm/lec.c | 70 +++++++++++++++++++++++++++++++++------------------
->  net/atm/lec.h |  2 +-
->  2 files changed, 46 insertions(+), 26 deletions(-)
+>   drivers/firewire/net.c          | 5 +++--
+>   drivers/net/bonding/bond_main.c | 8 +++++---
+>   include/linux/etherdevice.h     | 3 ++-
+>   include/linux/if_ether.h        | 3 ++-
+>   include/linux/netdevice.h       | 6 ++++--
+>   net/ethernet/eth.c              | 3 ++-
+>   net/ipv4/ip_gre.c               | 3 ++-
+>   net/mac802154/iface.c           | 4 +++-
+>   net/phonet/af_phonet.c          | 5 ++++-
+>   9 files changed, 27 insertions(+), 13 deletions(-)
 >
-> diff --git a/net/atm/lec.c b/net/atm/lec.c
-> index fb93c6e1c329..32adf28663a0 100644
-> --- a/net/atm/lec.c
-> +++ b/net/atm/lec.c
-> @@ -154,10 +154,19 @@ static void lec_handle_bridge(struct sk_buff *skb, =
-struct net_device *dev)
->                                         /* 0x01 is topology change */
->
->                 priv =3D netdev_priv(dev);
-> -               atm_force_charge(priv->lecd, skb2->truesize);
-> -               sk =3D sk_atm(priv->lecd);
-> -               skb_queue_tail(&sk->sk_receive_queue, skb2);
-> -               sk->sk_data_ready(sk);
-> +               struct atm_vcc *vcc;
+> diff --git a/drivers/firewire/net.c b/drivers/firewire/net.c
+> index f1a2bee39bf113fe78f4640ba92a7b4e602c213a..82b3b6d9ed2df6423d5cb7a35282d01775e6cee5 100644
+> --- a/drivers/firewire/net.c
+> +++ b/drivers/firewire/net.c
+> @@ -257,9 +257,10 @@ static void fwnet_header_cache_update(struct hh_cache *hh,
+>   	memcpy((u8 *)hh->hh_data + HH_DATA_OFF(FWNET_HLEN), haddr, net->addr_len);
+>   }
+>   
+> -static int fwnet_header_parse(const struct sk_buff *skb, unsigned char *haddr)
+> +static int fwnet_header_parse(const struct sk_buff *skb, const struct net_device *dev,
+> +			      unsigned char *haddr)
+>   {
+> -	memcpy(haddr, skb->dev->dev_addr, FWNET_ALEN);
+> +	memcpy(haddr, dev->dev_addr, FWNET_ALEN);
+>   
+>   	return FWNET_ALEN;
+>   }
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index 707419270ebf217a71b0593880c7a9a1481b7171..33f414d03ab913c58cf2406a4ab25e611c528159 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -1530,9 +1530,11 @@ static int bond_header_create(struct sk_buff *skb, struct net_device *bond_dev,
+>   	return ret;
+>   }
+>   
+> -static int bond_header_parse(const struct sk_buff *skb, unsigned char *haddr)
+> +static int bond_header_parse(const struct sk_buff *skb,
+> +			     const struct net_device *dev,
+> +			     unsigned char *haddr)
+>   {
+> -	struct bonding *bond = netdev_priv(skb->dev);
+> +	struct bonding *bond = netdev_priv(dev);
+>   	const struct header_ops *slave_ops;
+>   	struct slave *slave;
+>   	int ret = 0;
+> @@ -1542,7 +1544,7 @@ static int bond_header_parse(const struct sk_buff *skb, unsigned char *haddr)
+>   	if (slave) {
+>   		slave_ops = READ_ONCE(slave->dev->header_ops);
+>   		if (slave_ops && slave_ops->parse)
+> -			ret = slave_ops->parse(skb, haddr);
+> +			ret = slave_ops->parse(skb, slave->dev, haddr);
+>   	}
+>   	rcu_read_unlock();
+>   	return ret;
+> diff --git a/include/linux/etherdevice.h b/include/linux/etherdevice.h
+> index 9a1eacf35d37087ba8877bf31c017445929041ed..df8f88f63a7063fbd1df5248d2fc02c859a7bc74 100644
+> --- a/include/linux/etherdevice.h
+> +++ b/include/linux/etherdevice.h
+> @@ -42,7 +42,8 @@ extern const struct header_ops eth_header_ops;
+>   
+>   int eth_header(struct sk_buff *skb, struct net_device *dev, unsigned short type,
+>   	       const void *daddr, const void *saddr, unsigned len);
+> -int eth_header_parse(const struct sk_buff *skb, unsigned char *haddr);
+> +int eth_header_parse(const struct sk_buff *skb, const struct net_device *dev,
+> +		     unsigned char *haddr);
+>   int eth_header_cache(const struct neighbour *neigh, struct hh_cache *hh,
+>   		     __be16 type);
+>   void eth_header_cache_update(struct hh_cache *hh, const struct net_device *dev,
+> diff --git a/include/linux/if_ether.h b/include/linux/if_ether.h
+> index 61b7335aa037c7232a0caa45572043057c02dde3..ca9afa824aa4faf832658043bda6fb430633e476 100644
+> --- a/include/linux/if_ether.h
+> +++ b/include/linux/if_ether.h
+> @@ -40,7 +40,8 @@ static inline struct ethhdr *inner_eth_hdr(const struct sk_buff *skb)
+>   	return (struct ethhdr *)skb_inner_mac_header(skb);
+>   }
+>   
+> -int eth_header_parse(const struct sk_buff *skb, unsigned char *haddr);
+> +int eth_header_parse(const struct sk_buff *skb, const struct net_device *dev,
+> +		     unsigned char *haddr);
+>   
+>   extern ssize_t sysfs_format_mac(char *buf, const unsigned char *addr, int len);
+>   
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index d7aac6f185bcab8a93a204c349272fc7c1b15ee7..7ca01eb3f7d2b22a188502583dc95121adff7cc9 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -311,7 +311,9 @@ struct header_ops {
+>   	int	(*create) (struct sk_buff *skb, struct net_device *dev,
+>   			   unsigned short type, const void *daddr,
+>   			   const void *saddr, unsigned int len);
+> -	int	(*parse)(const struct sk_buff *skb, unsigned char *haddr);
+> +	int	(*parse)(const struct sk_buff *skb,
+> +			 const struct net_device *dev,
+> +			 unsigned char *haddr);
+>   	int	(*cache)(const struct neighbour *neigh, struct hh_cache *hh, __be16 type);
+>   	void	(*cache_update)(struct hh_cache *hh,
+>   				const struct net_device *dev,
+> @@ -3445,7 +3447,7 @@ static inline int dev_parse_header(const struct sk_buff *skb,
+>   
+>   	if (!dev->header_ops || !dev->header_ops->parse)
+>   		return 0;
+> -	return dev->header_ops->parse(skb, haddr);
+> +	return dev->header_ops->parse(skb, dev, haddr);
+>   }
+>   
+>   static inline __be16 dev_parse_header_protocol(const struct sk_buff *skb)
+> diff --git a/net/ethernet/eth.c b/net/ethernet/eth.c
+> index 13a63b48b7eeb896dfe98eb0070a261eed2c384b..9d159d1cc57d42747f794cdf43fe0ccaf04818b2 100644
+> --- a/net/ethernet/eth.c
+> +++ b/net/ethernet/eth.c
+> @@ -198,7 +198,8 @@ EXPORT_SYMBOL(eth_type_trans);
+>    * @skb: packet to extract header from
+>    * @haddr: destination buffer
+>    */
+> -int eth_header_parse(const struct sk_buff *skb, unsigned char *haddr)
+> +int eth_header_parse(const struct sk_buff *skb, const struct net_device *dev,
+> +		     unsigned char *haddr)
+>   {
+>   	const struct ethhdr *eth = eth_hdr(skb);
+>   	memcpy(haddr, eth->h_source, ETH_ALEN);
+> diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+> index e13244729ad8d5b1c2b9c483d25bff0e438134b5..35f0baa99d4092fd499a4795f7f52db33a1fe4e2 100644
+> --- a/net/ipv4/ip_gre.c
+> +++ b/net/ipv4/ip_gre.c
+> @@ -919,7 +919,8 @@ static int ipgre_header(struct sk_buff *skb, struct net_device *dev,
+>   	return -(t->hlen + sizeof(*iph));
+>   }
+>   
+> -static int ipgre_header_parse(const struct sk_buff *skb, unsigned char *haddr)
+> +static int ipgre_header_parse(const struct sk_buff *skb, const struct net_device *dev,
+> +			      unsigned char *haddr)
+>   {
+>   	const struct iphdr *iph = (const struct iphdr *) skb_mac_header(skb);
+>   	memcpy(haddr, &iph->saddr, 4);
+> diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+> index 9e4631fade90c980887803f313727e9ff943bc73..000be60d9580343e40f33ff872ec0aff7daa41d0 100644
+> --- a/net/mac802154/iface.c
+> +++ b/net/mac802154/iface.c
+> @@ -469,7 +469,9 @@ static int mac802154_header_create(struct sk_buff *skb,
+>   }
+>   
+>   static int
+> -mac802154_header_parse(const struct sk_buff *skb, unsigned char *haddr)
+> +mac802154_header_parse(const struct sk_buff *skb,
+> +		       const struct net_device *dev,
+> +		       unsigned char *haddr)
+>   {
+>   	struct ieee802154_hdr hdr;
+>   
+> diff --git a/net/phonet/af_phonet.c b/net/phonet/af_phonet.c
+> index 238a9638d2b0f6a23070b0871515302d8cba864f..d89225d6bfd3bf7668edf3d0fe563f7bbc97de2c 100644
+> --- a/net/phonet/af_phonet.c
+> +++ b/net/phonet/af_phonet.c
+> @@ -129,9 +129,12 @@ static int pn_header_create(struct sk_buff *skb, struct net_device *dev,
+>   	return 1;
+>   }
+>   
+> -static int pn_header_parse(const struct sk_buff *skb, unsigned char *haddr)
+> +static int pn_header_parse(const struct sk_buff *skb,
+> +			   const struct net_device *dev,
+> +			   unsigned char *haddr)
+>   {
+>   	const u8 *media = skb_mac_header(skb);
 > +
-> +               rcu_read_lock();
-> +               vcc =3D rcu_dereference(priv->lecd);
-> +               if (vcc) {
-> +                       atm_force_charge(vcc, skb2->truesize);
-> +                       sk =3D sk_atm(vcc);
-> +                       skb_queue_tail(&sk->sk_receive_queue, skb2);
-> +                       sk->sk_data_ready(sk);
-> +               } else {
-> +                       dev_kfree_skb(skb2);
-> +               }
-> +               rcu_read_unlock();
->         }
->  }
->  #endif /* IS_ENABLED(CONFIG_BRIDGE) */
-> @@ -216,7 +225,7 @@ static netdev_tx_t lec_start_xmit(struct sk_buff *skb=
-,
->         int is_rdesc;
->
->         pr_debug("called\n");
-> -       if (!priv->lecd) {
-> +       if (!rcu_access_pointer(priv->lecd)) {
->                 pr_info("%s:No lecd attached\n", dev->name);
->                 dev->stats.tx_errors++;
->                 netif_stop_queue(dev);
-> @@ -449,10 +459,19 @@ static int lec_atm_send(struct atm_vcc *vcc, struct=
- sk_buff *skb)
->                                 break;
->                         skb2->len =3D sizeof(struct atmlec_msg);
->                         skb_copy_to_linear_data(skb2, mesg, sizeof(*mesg)=
-);
-> -                       atm_force_charge(priv->lecd, skb2->truesize);
-> -                       sk =3D sk_atm(priv->lecd);
-> -                       skb_queue_tail(&sk->sk_receive_queue, skb2);
-> -                       sk->sk_data_ready(sk);
-> +                       struct atm_vcc *vcc;
-> +
-> +                       rcu_read_lock();
-> +                       vcc =3D rcu_dereference(priv->lecd);
-> +                       if (vcc) {
-> +                               atm_force_charge(vcc, skb2->truesize);
-> +                               sk =3D sk_atm(vcc);
-> +                               skb_queue_tail(&sk->sk_receive_queue, skb=
-2);
-> +                               sk->sk_data_ready(sk);
-> +                       } else {
-> +                               dev_kfree_skb(skb2);
-> +                       }
-> +                       rcu_read_unlock();
->                 }
->         }
->  #endif /* IS_ENABLED(CONFIG_BRIDGE) */
-> @@ -468,23 +486,16 @@ static int lec_atm_send(struct atm_vcc *vcc, struct=
- sk_buff *skb)
->
->  static void lec_atm_close(struct atm_vcc *vcc)
->  {
-> -       struct sk_buff *skb;
->         struct net_device *dev =3D (struct net_device *)vcc->proto_data;
->         struct lec_priv *priv =3D netdev_priv(dev);
->
-> -       priv->lecd =3D NULL;
-> +       rcu_assign_pointer(priv->lecd, NULL);
-> +       synchronize_rcu();
->         /* Do something needful? */
->
->         netif_stop_queue(dev);
->         lec_arp_destroy(priv);
->
-> -       if (skb_peek(&sk_atm(vcc)->sk_receive_queue))
-> -               pr_info("%s closing with messages pending\n", dev->name);
-> -       while ((skb =3D skb_dequeue(&sk_atm(vcc)->sk_receive_queue))) {
-> -               atm_return(vcc, skb->truesize);
-> -               dev_kfree_skb(skb);
-> -       }
-> -
->         pr_info("%s: Shut down!\n", dev->name);
->         module_put(THIS_MODULE);
->  }
-> @@ -510,12 +521,14 @@ send_to_lecd(struct lec_priv *priv, atmlec_msg_type=
- type,
->              const unsigned char *mac_addr, const unsigned char *atm_addr=
-,
->              struct sk_buff *data)
->  {
-> +       struct atm_vcc *vcc;
->         struct sock *sk;
->         struct sk_buff *skb;
->         struct atmlec_msg *mesg;
->
-> -       if (!priv || !priv->lecd)
-> +       if (!priv || !rcu_access_pointer(priv->lecd))
->                 return -1;
-> +
->         skb =3D alloc_skb(sizeof(struct atmlec_msg), GFP_ATOMIC);
->         if (!skb)
->                 return -1;
-> @@ -532,18 +545,27 @@ send_to_lecd(struct lec_priv *priv, atmlec_msg_type=
- type,
->         if (atm_addr)
->                 memcpy(&mesg->content.normal.atm_addr, atm_addr, ATM_ESA_=
-LEN);
->
-> -       atm_force_charge(priv->lecd, skb->truesize);
-> -       sk =3D sk_atm(priv->lecd);
-> +       rcu_read_lock();
-> +       vcc =3D rcu_dereference(priv->lecd);
-> +       if (!vcc) {
-> +               rcu_read_unlock();
-> +               kfree_skb(skb);
-> +               return -1;
-> +       }
-> +
-> +       atm_force_charge(vcc, skb->truesize);
-> +       sk =3D sk_atm(vcc);
->         skb_queue_tail(&sk->sk_receive_queue, skb);
->         sk->sk_data_ready(sk);
->
->         if (data !=3D NULL) {
->                 pr_debug("about to send %d bytes of data\n", data->len);
-> -               atm_force_charge(priv->lecd, data->truesize);
-> +               atm_force_charge(vcc, data->truesize);
->                 skb_queue_tail(&sk->sk_receive_queue, data);
->                 sk->sk_data_ready(sk);
->         }
->
-> +       rcu_read_unlock();
->         return 0;
->  }
->
-> @@ -618,7 +640,7 @@ static void lec_push(struct atm_vcc *vcc, struct sk_b=
-uff *skb)
->
->                 atm_return(vcc, skb->truesize);
->                 if (*(__be16 *) skb->data =3D=3D htons(priv->lecid) ||
-> -                   !priv->lecd || !(dev->flags & IFF_UP)) {
-> +                   !rcu_access_pointer(priv->lecd) || !(dev->flags & IFF=
-_UP)) {
->                         /*
->                          * Probably looping back, or if lecd is missing,
->                          * lecd has gone down
-> @@ -753,12 +775,12 @@ static int lecd_attach(struct atm_vcc *vcc, int arg=
-)
->                 priv =3D netdev_priv(dev_lec[i]);
->         } else {
->                 priv =3D netdev_priv(dev_lec[i]);
-> -               if (priv->lecd)
-> +               if (rcu_access_pointer(priv->lecd))
->                         return -EADDRINUSE;
->         }
->         lec_arp_init(priv);
->         priv->itfnum =3D i;       /* LANE2 addition */
-> -       priv->lecd =3D vcc;
-> +       rcu_assign_pointer(priv->lecd, vcc);
->         vcc->dev =3D &lecatm_dev;
->         vcc_insert_socket(sk_atm(vcc));
->
-> diff --git a/net/atm/lec.h b/net/atm/lec.h
-> index be0e2667bd8c..ec85709bf818 100644
-> --- a/net/atm/lec.h
-> +++ b/net/atm/lec.h
-> @@ -91,7 +91,7 @@ struct lec_priv {
->                                                  */
->         spinlock_t lec_arp_lock;
->         struct atm_vcc *mcast_vcc;              /* Default Multicast Send=
- VCC */
-> -       struct atm_vcc *lecd;
-> +       struct atm_vcc __rcu *lecd;
->         struct delayed_work lec_arp_work;       /* C10 */
->         unsigned int maximum_unknown_frame_count;
->                                                 /*
-> --
-> 2.43.0
->
+>   	*haddr = *media;
+>   	return 1;
+>   }
 
-Hi Eric,
 
-Gentle ping on the v2 patch below.
-Please let me know if you have any concerns.
+My bad, I missed the recursion issue with stacked bonds.
 
-Thanks,
-Deepanshu Kartikey
+I reproduced it and verified the fix works correctly.
+And I will add a test to tools/testing/selftests.
+
+Reviewed-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+Tested-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+
 
