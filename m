@@ -1,156 +1,178 @@
-Return-Path: <netdev+bounces-267688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267695-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iL2aLocltWnVwwAAu9opvQ
-	(envelope-from <netdev+bounces-267688-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 10:08:23 +0100
+	id UCcALj4ttWkXxQAAu9opvQ
+	(envelope-from <netdev+bounces-267695-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 10:41:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E4EA28C48A
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 10:08:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17F7328C6E3
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 10:41:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 598093040AB4
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 09:06:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7C19F300FEDF
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 09:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8D2A314A6B;
-	Sat, 14 Mar 2026 09:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 046A933C192;
+	Sat, 14 Mar 2026 09:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="CVjeTl5l"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="F5lSuzgx";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="F5lSuzgx"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D2130170F;
-	Sat, 14 Mar 2026 09:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A707831E859;
+	Sat, 14 Mar 2026 09:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773479178; cv=none; b=nA1WFYWO9fqXM0RYcBPrntFVA6N2Au+rIFFEUlZy+MujAFMqW3d2Kx5zBP4oGh1DQNmqlw9wXew9KU32G41mptft2skzA+5yv9UJJJMyN8m64e0WX1/LEFnQ6lPIQnb/Lni7/5PHQzXwrv7ikoNxEHo8krHCAfuD0QfQjbrh1FY=
+	t=1773481267; cv=none; b=Uh11CWrUBuxHGrZIDoEAiPR8C86ePjGRq8oGXC0//aprqnsb4IkuwRSD3aL1vqLrnh5mVyszqPIAu/w6RiqqK/A+0NaTnG7fzn4HpCQ2VfXz6aj4662f0TDoz0yaRxurFh0eYU6p78wibUxS0v3r05n8UuMOHjqMWJGCpp30Y/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773479178; c=relaxed/simple;
-	bh=QdR4k2ftYM+FzozJExw6VdKV0B5HUFfyuR43EeKZ26k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nvW7tTIrh5xb+ARLnN2rlE5dGEfwQJTCtYtic1W3Vs674fXhPE9xptxxSyC1FPBGweOwkHlGXOsr95xIU0EiSOOVoH78/KaURuvPomu6NuzYsh3jxGGVFHZs5CQcpt/BdpYSbUX7Jxclk2ROePfQJ8CJnNbwjehc5oSvfcIL2bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=CVjeTl5l; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=XDHPMvvelJ2Cr8JQOMK4y8zlX+CoeMjJj597Pacfiqc=; b=CVjeTl5lsBzj08RYWflxLr2KVH
-	bX0l/VwUAC9hKb+4vICTdrttfBP+sNjvSlPz0tV5AZ6t1BdMBsLP8Jf9yKDLaMePUM7xKoedOaDFL
-	bx/9IUvP/qbEQ5cBtP2C40LfTEoIRwYzJlKXpPFgEv7kKi239Gnm0nk4RV/X6g37jt2DFOZeiOuJK
-	lGI9g2ieVtAd31zKvwwwFFbL2dkqBNQldSOc1oGle2DvXGjv+OaaMU8V7y2cjhj3fGSLxCe5/MO1y
-	DtL2oXPouRqgMKp2JoHM6nN7MQ5a2l0dEZrHFo1qZLVT8Ix7+Y3kGRoTfc42+2hvozLosmF50Smsp
-	M7TmoiMQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41936)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w1Kwm-000000001xR-01Hj;
-	Sat, 14 Mar 2026 09:06:12 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w1Kwj-000000000f7-0P6b;
-	Sat, 14 Mar 2026 09:06:09 +0000
-Date: Sat, 14 Mar 2026 09:06:08 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Charles Perry <charles.perry@microchip.com>, netdev@vger.kernel.org,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: macb: set default_an_inband to true for
- SGMII
-Message-ID: <abUlANami1hWAfgf@shell.armlinux.org.uk>
-References: <20260313142140.4040647-1-charles.perry@microchip.com>
- <20260313190631.382df727@kernel.org>
+	s=arc-20240116; t=1773481267; c=relaxed/simple;
+	bh=H/kSyRr0L2VYaxHlrNL1/UDci7GYRLAyO6lHLHMf8O4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=am+B7fzTu+4jRcAQ5yyNxytR4BjSqgKOoxsQZSt77cf0EwmoJTsPKoHKySpG6fLnE/rDf35DoT+IlB9JYE0e/a5g6GvLG2Iq6uGlsukcElDay6YDLfEq+ChxGfzBhrRp89vKQ21F1kp7zalZQQxdKyBd+W1Lf3IfTwWyI7vosYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=F5lSuzgx; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=F5lSuzgx; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1773480702;
+	bh=H/kSyRr0L2VYaxHlrNL1/UDci7GYRLAyO6lHLHMf8O4=;
+	h=From:Subject:Date:To:Cc:From;
+	b=F5lSuzgxG3Zr9R4tlPViYUykAJT7Zr5Yw2T8pUVswE4tP8y8EgsL295zmg1l1dpUL
+	 YoLVA8GFHOwje7e6+GmqvO7lH6hwWBFE+7p7XNYRwdwAG9EydPDcLHAUEXEbsQD//Z
+	 B19u5hotimACcg8JWbgjpTKC1J3OQ2oBesXSZo379ITh+OwSYRiu/jOgP99fJjzkBS
+	 T/6kvmprMwXD3ONYOibMOVIWCnV391mi9sc8w+bAZmmQ4E0dWQHpCbbeHNn34iEkpL
+	 3Ff2I4Jfz8dY51zRRnpdC0muUfigD1cBWUkIt84H0gdwx7Q7qea/oynFaxVjxhvaaX
+	 NKWiKCUsZesIQ==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id D31513FCB9; Sat, 14 Mar 2026 09:31:42 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1773480702;
+	bh=H/kSyRr0L2VYaxHlrNL1/UDci7GYRLAyO6lHLHMf8O4=;
+	h=From:Subject:Date:To:Cc:From;
+	b=F5lSuzgxG3Zr9R4tlPViYUykAJT7Zr5Yw2T8pUVswE4tP8y8EgsL295zmg1l1dpUL
+	 YoLVA8GFHOwje7e6+GmqvO7lH6hwWBFE+7p7XNYRwdwAG9EydPDcLHAUEXEbsQD//Z
+	 B19u5hotimACcg8JWbgjpTKC1J3OQ2oBesXSZo379ITh+OwSYRiu/jOgP99fJjzkBS
+	 T/6kvmprMwXD3ONYOibMOVIWCnV391mi9sc8w+bAZmmQ4E0dWQHpCbbeHNn34iEkpL
+	 3Ff2I4Jfz8dY51zRRnpdC0muUfigD1cBWUkIt84H0gdwx7Q7qea/oynFaxVjxhvaaX
+	 NKWiKCUsZesIQ==
+Received: from AMDDesktop.lan (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 146673FC9A;
+	Sat, 14 Mar 2026 09:31:42 +0000 (UTC)
+From: Birger Koblitz <mail@birger-koblitz.de>
+Subject: [PATCH net-next 0/9] r8152: Add support for the RTL8157 5Gbit USB
+ Ethernet chip
+Date: Sat, 14 Mar 2026 10:31:36 +0100
+Message-Id: <20260314-rtl8157_next-v1-0-9ba77b428afd@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260313190631.382df727@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPgqtWkC/x2M7QpAMBhGb0XvbyszH8utSBoevKXRtqTk3o2fp
+ 845N3k4hqcmucnhZM+7jSDThMbV2AWCp8iUZ3mVKVkIFzYty7q3uIIwkLrSCkMxG4rJ4TDz9e9
+ asgjis6h7nhdJU8YoaAAAAA==
+X-Change-ID: 20260314-rtl8157_next-ae18683eb4fa
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Birger Koblitz <mail@birger-koblitz.de>
+X-Mailer: b4 0.14.2
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	DKIM_TRACE(0.00)[birger-koblitz.de:+];
+	TAGGED_FROM(0.00)[bounces-267695-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[birger-koblitz.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267688-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.878];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1E4EA28C48A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[birger-koblitz.de:dkim,birger-koblitz.de:email,birger-koblitz.de:mid]
+X-Rspamd-Queue-Id: 17F7328C6E3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 13, 2026 at 07:06:31PM -0700, Jakub Kicinski wrote:
-> On Fri, 13 Mar 2026 07:21:39 -0700 Charles Perry wrote:
-> > Most platforms using GEM in SGMII mode use in-band autonegotiation
-> > because it is on by default in GEM's 1G PCS and is always on since
-> > commit e276e5e40e92 ("net: macb: Disable PCS auto-negotiation for SGMII
-> > fixed-link mode"). Leave it on if possible using the "default_an_inband"
-> > flag of "struct phylink_config" so that platforms that lack in-band
-> > autonegotiation configurability at the PHY do not break with commit
-> > 1338cfef1ff1 ("net: macb: fix SGMII with inband aneg disabled") which
-> > will turn off in-band autoneg for non hot pluggable PHYs.
-> > 
-> > Once the majority of the PHY drivers that support SGMII have the
-> > ->config_inband() callback, this commit could be reverted so that non  
-> > hot pluggable PHY use outband negotiation with macb, like its the case
-> > for other MACs.
-> 
-> I'm assuming this needs a respin now to account for the erronously
-> merged patch?
+Add support for the RTL8157, which is a 5GBit USB-Ethernet adapter
+chip in the RTL815x family of chips.
 
-It can be merged as well as the vitesse patch.
+The RTL8157 uses a different frame descriptor format, and different
+SRAM/ADV access methods, plus offers 5GBit/s Ethernet, so support for these
+features is added in addition to chip initialization and configuration.
 
-The problem with the vitesse patch is it _would_ break for MACs that
-use phylink and always enable SGMII inband against phylink's
-instruction as the vitesse PHY comes up with SGMII inband enabled.
-Do we know of any MACs that are like that... well yes. There's at
-least one, the thorn of a driver, the poor implementation, known as
-stmmac. However, that wasn't the only one - the patch which caused
-this regression shows that macb also ignored phylink's wishes.
+The module was tested with an OEM RTL8157 USB adapter:
+[25758.328238] usb 4-1: new SuperSpeed Plus Gen 2x1 USB device number 2 using xhci_hcd
+[25758.345565] usb 4-1: New USB device found, idVendor=0bda, idProduct=8157, bcdDevice=30.00
+[25758.345585] usb 4-1: New USB device strings: Mfr=1, Product=2, SerialNumber=7
+[25758.345593] usb 4-1: Product: USB 10/100/1G/2.5G/5G LAN
+[25758.345599] usb 4-1: Manufacturer: Realtek
+[25758.345605] usb 4-1: SerialNumber: 000300E04C68xxxx
+[25758.534241] r8152-cfgselector 4-1: reset SuperSpeed Plus Gen 2x1 USB device number 2 using xhci_hcd
+[25758.603511] r8152 4-1:1.0: skip request firmware
+[25758.653351] r8152 4-1:1.0 eth0: v1.12.13
+[25758.689271] r8152 4-1:1.0 enx00e04c68xxxx: renamed from eth0
+[25763.271682] r8152 4-1:1.0 enx00e04c68xxxx: carrier on
 
-Are there others? We don't know. This makes the vitesse patch
-potentially unsafe and potentially being reverted if problems are
-found during 7.1-rc.
+The RTL8157 adapter was tested against an AQC107 PCIe-card supporting
+10GBit/s and an RTL8126 5Gbit PCIe-card supporting 5GBit/s for
+performance, link speed and EEE negotiation. Using USB3.2 Gen 1 with
+the RTL8157 USB adapter and running iperf3 against the AQC107 PCIe
+card resulted in 3.47 Gbits/sec, whereas using USB3.2 Gen2 resulted
+in 4.70 Gbits/sec, speeds against the RTL8126-card were the same.
 
-So, I think having both patches in gives to best approach for now -
-at least if the vitesse patch gets reverted, macb won't regress.
+As the code integrates the RTL8157-specific code with existing RTL8156 code
+in order to improve code maintainability (instead of adding RTL8157-specific
+functions duplicaing most of the RTL8156 code), regression tests were done
+with an Edimax EU-4307 V1.0 USB-Ethernet adapter with RTL8156.
 
+The code is based on the out-of-tree r8152 driver published by Realtek under
+the GPL.
+
+This patch is on top of linux-next as the code re-uses the 2.5 Gbit EEE
+recently added in r8152.c.
+
+Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
+---
+Birger Koblitz (9):
+      r8152: Add support for RTL8157 RX/TX descriptor format
+      r8152: Add support for RTL8157 SRAM access and ADV indirect access
+      r8152: Add support for configuring the PHY of the RTL8157
+      r8152: Add RTL8157 initialization
+      r8152: Add RTL8157 startup
+      r8152: Add support for chip version RTL_VER_16
+      r8152: Add support for 5Gbit Link Speeds
+      r8152: Add support for 5GBit EEE
+      r8152: Detect RTL8157 and setup
+
+ drivers/net/usb/r8152.c | 1092 ++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 845 insertions(+), 247 deletions(-)
+---
+base-commit: 5c9e55fecf9365890c64f14761a80f9413a3b1d1
+change-id: 20260314-rtl8157_next-ae18683eb4fa
+
+Best regards,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Birger Koblitz <mail@birger-koblitz.de>
+
 
