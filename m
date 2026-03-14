@@ -1,162 +1,179 @@
-Return-Path: <netdev+bounces-267750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267751-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SHgMJMF+tWmK1AAAu9opvQ
-	(envelope-from <netdev+bounces-267750-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 16:29:05 +0100
+	id OHyRHj+BtWne1AAAu9opvQ
+	(envelope-from <netdev+bounces-267751-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 16:39:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 169A428DADF
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 16:29:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD54528DB8E
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 16:39:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7D4543036E8D
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 15:28:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C5BA3034DCC
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 15:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326492EDD6C;
-	Sat, 14 Mar 2026 15:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8D08277017;
+	Sat, 14 Mar 2026 15:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mmpsystems.pl header.i=@mmpsystems.pl header.b="ZNPvi+Mc"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="2soXUTo4"
 X-Original-To: netdev@vger.kernel.org
-Received: from s106b.cyber-folks.pl (s106b.cyber-folks.pl [195.78.66.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0508C2D8376;
-	Sat, 14 Mar 2026 15:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.78.66.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376F64317D
+	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 15:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773502125; cv=none; b=i8V1ymbXEv9IjMhxXK+AhCcRGeHsPZXLhPL87vUd4tbVVSE5mdWlEEvhePEC+oCbAd2l6kXdENw6dVEHCCeDVY4HbnMsJsiAa9/nZLXr1t9MPX7sH7h9+3nVyB6Jgodi9BwCqhUHBYlwV7T1v7FG4LaypJnme3hmq4FBUhs9Hzo=
+	t=1773502780; cv=none; b=pAnvOeaYZ0xxgfTSnZqiz+qjMDXlt64gxEdYI0LBDOiPR/AhLBol2TLvEg4urJ9BM39ZRO2If5BgNvNYYuc0ePTdzKfaLqwgEEOw7z+j7nUM0FhyVc2F+TZAze7uAeE62YsjyvQYX8rPZvwfJYP+reFT/4iSNOuSUSL5Nf9P7J0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773502125; c=relaxed/simple;
-	bh=/vy+c1nLswFOkWzuqJsjFYoXMYDn1ssIa4VCRdJjqZI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ZDwICtU4hxDVLUJUc/7pAuo99ULPpKrWZSZzRs1J0UAbkMu4j45VfhrgfX7IGfo6vLl9j3LDQnHvEppfpyUhHoIZ8G5xUHXj4k+RArj5eClR63Q9uWn3aiXP8bJGFYrqwHg8sO46tQLTvZcAZSnBZ//PaB+irKab76JQO63l5hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mmpsystems.pl; spf=pass smtp.mailfrom=mmpsystems.pl; dkim=pass (2048-bit key) header.d=mmpsystems.pl header.i=@mmpsystems.pl header.b=ZNPvi+Mc; arc=none smtp.client-ip=195.78.66.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mmpsystems.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mmpsystems.pl
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=mmpsystems.pl; s=x; h=Cc:To:Message-Id:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Subject:Date:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EgCsQpLfP6jlSC3mUtz80d1LyhN5q7HHT6hn2BMEbcI=; b=ZNPvi+McsNM6sE7cSCcvs2gMnt
-	OsbLb7qY/gGb/PN6F/geAZ+HRQmKgclGugspuJIQa16LMG74KvYVkzb9Ikt1ykW4FsJqUoGHOYffM
-	BmbysA7+7zM9YaHvTMh2B2IfOxjl2Y2oK4wF43p/3+xeChXWl2dpGzU+nZI6ckmYM8BCyTxjoM62H
-	FLFPMVK4/W8RxaLgiHkLeyZ65J7KQKvnG8HEJTv1AwlH8rqqs2lvnLkVCIJnNcXFH29WgItZLjS+W
-	CUP3XtsrKfKEfGPM6W07UVbcn2GwfspKJYjg7AjiRJqn/cEtfQRQhgakkzglQGa49doBw6abKTMXM
-	hXYDmBfg==;
-Received: from user-5-173-16-20.play-internet.pl ([5.173.16.20] helo=localhost)
-	by s106.cyber-folks.pl with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <michal.piekos@mmpsystems.pl>)
-	id 1w1Qur-00000006o6Z-2wCk;
-	Sat, 14 Mar 2026 16:28:37 +0100
-From: Michal Piekos <michal.piekos@mmpsystems.pl>
-Date: Sat, 14 Mar 2026 16:27:46 +0100
-Subject: [PATCH] net: stmmac: skip VLAN restore when VLAN hash ops are
- missing
+	s=arc-20240116; t=1773502780; c=relaxed/simple;
+	bh=XyVRHmq3ZBJqtfX1mx701c7pNEJxwUU7t8igX9Sjq4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DRsBYMN0NYYzrui6+iil1/DuVX+oTXbjhV2QNIbZHfbsJloN0O/Pkh80J3yK2Bl/DCTYgLcFZYdVkIdEOI9a5sE59BhDgwby1L8xla58I8yKS9vUYeZLVQpg0dYcst9RFsa6uHTPjdAqaKZY4ssywgUw1Plf5VcpjTwa012eJOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=2soXUTo4; arc=none smtp.client-ip=74.125.82.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-2be27fa54feso4140477eec.0
+        for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 08:39:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1773502778; x=1774107578; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UQ/kEFe5EtaJoItlhc0KGn/LPzGM7ff2rqYzEoAICNQ=;
+        b=2soXUTo42PdWpyVqCzcOCQ/sj3OaHbAOybvs5Vf88NJzXdWo6ibwMIlZxOi5eSkDCe
+         XlNV9dOnIHSQmGAQMvhDs6a+NhbPkXuxvLE+HxmznT4hRaVo4/KuOwbT8xBuln5/g2me
+         aM47NBupupD5HGiIt6ErGMJvu1hqCjma6/LervtGnduJeNa5PeldET3vGf+kICTGC69g
+         XWjNu9IzbvebmWP13NIVQGrranBXFei/UWmcENIuTMGx+cxsBTudQmq95wgPwfulzrMh
+         ktM8uzLSBuGMp9XnbokYbDpvrODAkUW459N+pS7oikmj/+s96OYK97pz9kKInFL+RFTh
+         QOsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773502778; x=1774107578;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=UQ/kEFe5EtaJoItlhc0KGn/LPzGM7ff2rqYzEoAICNQ=;
+        b=fre6S/9Ws8YEFum1Yd/+jYhDFUkD/Ow6BoHTHeVVr2lbJcCfnNNSmydrp+n2XTHYNh
+         gsOXxpaHWduxI3325t7wcxYIs2CxWOt6upJDdXDrmZ6e6KXXiUGZVxOCHSJTSYrWGy2i
+         2UrqNu6d16nYAUd034rZLUDt6QaT+lIxzidYM8lTi2JjlzSSOLlg39bRGaN/UJsRWkOF
+         T/RrraN+T0v5CcnQ9I/aWFGFOtTQESW/mePR5Yt2xmS4LqqkEJK0y/vrD1Q+lzEpb5/q
+         Xcemut4sOleLDg1+WjRNjdxnE6SLmUFp5TN/HbXDyP2LwwHKr1WYeA/hHqLgE/TcJ0DV
+         hO+Q==
+X-Gm-Message-State: AOJu0YwhH7snAbqAhiO0FSftwgtsTEHNvl3ZMKJtn/jzyU2cx37BH/zr
+	o5DW4q54i8LJj/orOuDOTDAHBkWiJQ1meOSpmAdR0TtwJbtoVVoOWdBP8YzdlwR3BLHSPSQDI1W
+	Fibit
+X-Gm-Gg: ATEYQzykiGvue6F0M2YD6VQSt5m0RcVeYtjcvMl5YyQj9+h+n7Bwcht68aaayugz0kj
+	GvgTeyRYC0//PlBDm4SzZcLGUWVg9spZbj6yCLfLmp1qmGuncmztuIM2e8yRzy9SSpJkz4PU8GT
+	WVfj3MChGYkVu7ALlwMo1bk8sjHCsEqASjp7qiW7U2sKOfYjcrKhSU6ZhKFtitJegJgE7vK6Shk
+	YAkQ1pDslcT8ZDiFXCGtQFPcxqGVoeWaD9osnFkU0MeeQHLGYu37ateyNV6V66Uh/XoTRbM1sb0
+	QdQJBpWPx7TJmxU73qwDEJsX02vbmVjfld3Bz+5fRH4+yD/6SRIugnjzZHNDSwJCuq+xrxstZr8
+	EWAjafmqCHih05Um8wKy2OZ/cbtotw+gSIPF4Bpx5vjj8AzAOh0247Ukf6Kf6TKGxkEJJ9Nk0+6
+	kUmi4WEiwtL4Nxz7nkLJCZjGp1J8WBccPnSXs=
+X-Received: by 2002:a05:7301:290e:b0:2be:79a:69ef with SMTP id 5a478bee46e88-2bea54eed35mr3357681eec.20.1773502778223;
+        Sat, 14 Mar 2026 08:39:38 -0700 (PDT)
+Received: from phoenix.local ([104.202.29.139])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2beab3a1122sm7003198eec.1.2026.03.14.08.39.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Mar 2026 08:39:38 -0700 (PDT)
+Date: Sat, 14 Mar 2026 08:39:33 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH 00/12] netem: fixes, cleanup, and selftest
+Message-ID: <20260314083933.060c1449@phoenix.local>
+In-Reply-To: <20260314070902.4025c388@kernel.org>
+References: <20260313211646.12549-1-stephen@networkplumber.org>
+	<20260314070902.4025c388@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260314-vlan-restore-error-v1-1-4fc6c3e2115f@mmpsystems.pl>
-X-B4-Tracking: v=1; b=H4sIAHF+tWkC/x3MTQqAIBBA4avIrBvQ/ukq0cJqrIHQGCOC8O5Jy
- 2/x3guRhCnCoF4Qujly8BmmULDs1m+EvGZDqctWV6bG+7AeheIVhJBEgqDr58qapXONtpDDU8j
- x80/HKaUP7JbUyWQAAAA=
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Michal Piekos <michal.piekos@mmpsystems.pl>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1773502079; l=1719;
- i=michal.piekos@mmpsystems.pl; s=20260301; h=from:subject:message-id;
- bh=/vy+c1nLswFOkWzuqJsjFYoXMYDn1ssIa4VCRdJjqZI=;
- b=Cu15vltkrAWQrlPZvWghHLF0X7ub3MupcOdEB2OM0WisVyNFkoVZePcUctt+43i2PwPh4l1Fk
- e83DoBoc1+pApN/haQ4gv2Vm+I4+fIuayVxZpr3tYcRVbiPRIH0qIQa
-X-Developer-Key: i=michal.piekos@mmpsystems.pl; a=ed25519;
- pk=Aixyx03If7ZDamiKKN0lsa+0mtA+WjIuIf2ZQVYNBqg=
-X-Authenticated-Id: michal.piekos@mmpsystems.pl
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[mmpsystems.pl:s=x];
+X-Spamd-Result: default: False [-1.56 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[mmpsystems.pl : SPF not aligned (relaxed),none];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267750-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,renesas.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-267751-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.531];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michal.piekos@mmpsystems.pl,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mmpsystems.pl:-];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 169A428DADF
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,phoenix.local:mid,networkplumber-org.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: AD54528DB8E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-stmmac_vlan_restore() unconditionally calls stmmac_vlan_update() when
-NETIF_F_VLAN_FEATURES is set. On platforms where priv->hw->vlan (or
-->update_vlan_hash) is not provided, stmmac_update_vlan_hash() returns
--EINVAL via stmmac_do_void_callback(), resulting in a spurious
-"Failed to restore VLANs" error even when no VLAN filtering is in use.
+On Sat, 14 Mar 2026 07:09:02 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-Check presence of VLAN hash ops before stmmac_vlan_update().
+> On Fri, 13 Mar 2026 14:15:00 -0700 Stephen Hemminger wrote:
+> > The netem packet scheduler is widely used for network emulation but
+> > has not gotten enough of my attention lately.  
+> 
+> There's a few tests in tdcs which need adjusting:
+> 
+> # not ok 363 d34d - NETEM test qdisc duplication restriction in qdisc tree in netem_change root
+> # Command exited with 0, expected 2
+> # 
+> # not ok 364 b33f - NETEM test qdisc duplication restriction in qdisc tree in netem_change non-root
+> # Command exited with 0, expected 2
+> # 
+> # not ok 365 cafe - NETEM test qdisc duplication restriction in qdisc tree
+> # Command exited with 0, expected 2
+> # 
+> # not ok 366 1337 - NETEM test qdisc duplication restriction in qdisc tree across branches
+> # Command exited with 0, expected 2
 
-Fixes: bd7ad51253a7 ("net: stmmac: Fix VLAN HW state restore")
-Signed-off-by: Michal Piekos <michal.piekos@mmpsystems.pl>
----
-This patch fixes a noisy "Failed to restore VLANs" message on platforms
-where stmmac VLAN hash ops are not implemented.
-stmmac_vlan_restore() calls stmmac_vlan_update() without checking for
-VLAN hash ops presence which results in -EINVAL. 
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 +++
- 1 file changed, 3 insertions(+)
+That make sense.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 6827c99bde8c..bc09439ec00b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -6869,6 +6869,9 @@ static int stmmac_vlan_restore(struct stmmac_priv *priv)
- 	if (priv->hw->num_vlan)
- 		stmmac_restore_hw_vlan_rx_fltr(priv, priv->dev, priv->hw);
- 
-+	if (!priv->hw->vlan || !priv->hw->vlan->update_vlan_hash)
-+		return 0;
-+
- 	ret = stmmac_vlan_update(priv, priv->num_double_vlans);
- 	if (ret)
- 		netdev_err(priv->dev, "Failed to restore VLANs\n");
+If you run the new test on unpatched kernel expect three failures.
+$ sudo ./netem.sh 
+    PASS: basic netem delay
+    PASS: basic netem duplicate 50%
+    PASS: basic netem loss 30%
+    PASS: basic netem corrupt 10%
+    PASS: basic netem reorder 25% gap 5
+    PASS: netem with pfifo child qdisc
+    PASS: HTB root, two netem leaves (no dup)
+# tc rejected multi-netem tree (check_netem_in_tree bug)
+    FAIL: HTB root, one netem with dup, one without
+    PASS: HFSC root, netem child (CVE-2025-37890 topology)
+    PASS: HFSC root, netem child with duplicate
+    PASS: HFSC root, two classes each with netem
+    PASS: netem with TBF child (non-work-conserving)
+    PASS: HTB -> netem -> TBF chain
+    PASS: netem with SFQ child qdisc
+    PASS: netem duplicate 100% (stress)
+    PASS: netem duplicate 100% with zero delay
+    PASS: netem all impairments simultaneously
+    PASS: rapid qdisc add/change/delete cycling
+    PASS: netem limit 1 with duplication
+    PASS: netem slot configuration
+    PASS: netem rate limiting
+# tc rejected multi-netem dup tree (check_netem_in_tree bug)
+    FAIL: HTB root, two netem leaves both duplicating
+# nested netem rejected by kernel (check_netem_in_tree bug)
+    FAIL: nested netem (netem inside netem child)
 
----
-base-commit: 1c9982b4961334c1edb0745a04cabd34bc2de675
-change-id: 20260314-vlan-restore-error-f8b3a1c7f50a
-
-Best regards,
--- 
-Michal Piekos <michal.piekos@mmpsystems.pl>
-
+Summary: 20 pass, 3 fail, 0 skip
 
