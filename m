@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-267820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267821-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wPMnH/qotWmw3AAAu9opvQ
-	(envelope-from <netdev+bounces-267820-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 19:29:14 +0100
+	id ULJAHBmptWmw3AAAu9opvQ
+	(envelope-from <netdev+bounces-267821-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 19:29:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E7AE28E72B
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 19:29:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CC7E28E756
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 19:29:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 67D633013703
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:28:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2B7253018426
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88D7336885;
-	Sat, 14 Mar 2026 18:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 343EE3368B5;
+	Sat, 14 Mar 2026 18:29:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bAATbJb3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A8OnXMaK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9EE3B28D
-	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 18:28:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4B3336885
+	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 18:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773512930; cv=none; b=lEDwnFTKNF51n3pSlAUmuz2iIhn1GaiprP9HkZUifor7ofKMk+Ns72PiCXRGlBex25hAy7ceEa7vRFRSc7EOhzv4OYfWZH6SHIkWyhSPE96XMWEYQ9tAJjBvLLG5kszscy1kjzOaefwjMYllVgmvpxJwWli/uV+ENo52NaIy780=
+	t=1773512941; cv=none; b=llh81fSj6bxvXq9udAO9QazipszFjEmf1PxZSlOUQqEqMEUQbg3I20Mu6fA47b22IZdElhCNLlVZ7+uBelufllFYLjXp+10VVQz4YX8CNEv0apwxz7UVl9NabOkrN3EWm9he4AjjEXPxfHkCH8OP/rE8BH2MLY8PMjElAgghizo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773512930; c=relaxed/simple;
-	bh=bPSZT7dVTriF4TZgmZTUAw22Sgou+Fmk1o1FCPOSVME=;
+	s=arc-20240116; t=1773512941; c=relaxed/simple;
+	bh=e0azMONBUhPqODHGElI9gDKQUWDLTjuAbw7z9MqCdJc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LxWjtGj/eldov03e6tGc5BZkb/x0kzYT+OS96DozEbkAeMF1bpiqi24kpcSwHe5ITqUmw6qwUc9cC0LsluQllYV/Z5VUmi/pfGGujvVnENMUC9KnAbiBdyck+ShuKCy5wYnPiIxBISH56l4Ml7AV/PXuaT3jXZVmifAjngU+z1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bAATbJb3; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=XFd8wKM9TSEaXot5VUysyJyGbIwlH2g+Onnkg2j60nMXrov0AwcLKBsjk+ZS9/CkvCuKRxRH1/TcfpqMVYUlDwUTWgD8X5xwZ4ConBdj+g1qTUyQnp7JH7lzNZ0DRmGzVAjEUTHCaXrkqRhvv3FAuLAwCui/jyHWp7H+tjFDpqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A8OnXMaK; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2ad21f437eeso25728005ad.0
-        for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 11:28:49 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2a9296b3926so25748735ad.1
+        for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 11:28:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773512929; x=1774117729; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773512939; x=1774117739; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4KgmmudIxXUanwK3aFbv0ip54pwkZrkMg6RJuyR+qxA=;
-        b=bAATbJb3Ii4e802Gy4kD7idMwljBlOjFyMjcXs25aop8D1oVDo0uAQ0gjeslGZmfc3
-         B9xUIjHrX2sUgyCP+p9uN5R0nhdV4TqszMkZjnSwH5xzPKpxe5SJly2/X/9eSJWS0eU7
-         PrQMlDvYzY/LkI7r7b7qL+m5zXT6dveayYBFNdqLNKJ9+mR5B6w6ZSW1xI0ERvv+6xkM
-         pbjBjNWAY7vxO0Vy4tZZnk+49RMhHEGPEKFcAVFaYtrhJ5gMIxdHMeJwq9DcjcqE0YTm
-         etrImy77Hb6/BASxW/+gNC0vNEI4oxugx6NTmv3gZgIjT3hy+p/CJzlO1PdYxmsla4DD
-         HzBQ==
+        bh=bTvcRjBg7RZQjPVbwsm/XKOCF/7oOgDehhwAe6xkRiI=;
+        b=A8OnXMaKRZKYCc6kwZnF8R2+VjgYCQrWkTopFySDxtDOsYzXFgQnKWY9CXHE2lzfzK
+         bboTNchUDmYAGOHpi2xPkkBlH+NVG/LI855VSLzMq996atA2wIQQLLEiD6vey7MK3J4h
+         Odqshg/L5bW4XLRFS1QW1HnccLnn6KLEmJvGRFEATllh1kvapLt/IP0KgJ2nwL8xctvF
+         N1376rjGOnjysrnpRqNsK9gmPcmvRHfnes6MBc0LjFg6LrnDHCjZOfTXCIxyXLy4ozRq
+         yVMUg2Bhv24NslGNxRgj75G+XkKJHzPrERYpqOZpeSCIZbH3DjFZDJjWJPmVJH4zjByT
+         Pcyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773512929; x=1774117729;
+        d=1e100.net; s=20251104; t=1773512939; x=1774117739;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=4KgmmudIxXUanwK3aFbv0ip54pwkZrkMg6RJuyR+qxA=;
-        b=OI7ks9fOPvBhKGENRSxk/YQQvv+UyDl24jQ5K/lV1cRpI/z77CfBMjDQukdmwNjIL9
-         MPA1/+xsGjLGdJvEGbL7788DwTlUm8MVg4Y1K9ZeZjV9cRhwFD4iA22k7h9RtioZUZhh
-         HUStC8OZLStVET0bp52NFhbXzXxamG7+/y7h48KptaFa7nHZBUn4B21wHsiF+USDbnfy
-         LBCclEX8mgCASmKMhnTucqNNE2VZKzNBapkXCFL1n4Rs/pRumi9/+lr8sY24kE88yaxI
-         8+rHLVGUDypn8R/HlnNK9JRVYfZUjpxTkj5CqneWYpByaHLeVDEZ7LSwKPHKo+ulyNB/
-         ppPA==
-X-Forwarded-Encrypted: i=1; AJvYcCVG8On8CPcZATnvPyBK7ux7OjZl6UJ40SA7vrEXe3RsR7qJhPF9noxZobKwuhbN2OBne9wldlI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuEXIYrfrxOZ/D7wHkcmJybircOi/iqor1M5GSd9Ikuf9dH39V
-	YATZvGWasSED2/SG/6ZluKvhTfWuz5+u5Yf3UztGQS3R6JrHWusmgcV5
-X-Gm-Gg: ATEYQzzFrJXLfLBQil5RSWBmg5swz5c5VF5+Ypy3cTw3bnBWs9qRQy6lll9+EvhK3Tj
-	7tyY8OR1OMFTZDzeWOXZantqspELnuD+Gf2sOQCMHfWGEjkApOWxHlpQwr6ECloIOpMSs2okMXu
-	BIWo5852tj07PzHj+i22lKyI1ZNXU/2TwY/lcHYagkTvqqAdFqy7ohivGptwO+2VFgiV/ykFkLl
-	soW/u2OFCVqoXozBpYXZMGFCzxl83xScUKmRhOwuZg8N4he+ktT6a2UQbFrhQ51B1QRRdj9Z41t
-	cxjTxUmq+mITi3UttZ9LXHilkpQzxr8K7WVmjYZ4w78DiKe2H7smA9XUfmGgzZWyycItfHb5VtG
-	2cKemt/hQBvVfRs3SVcV001B5AowuWvU7UpolbCHGMeyDhaf3Bvqt1u9soup4SfKRCgeEnGrFg1
-	H4Rmodl2EvZaAzE6FVpTE7zNYn7OAwwJYi3fP7ruqUwf71M+WI7icF6YU58XP6srwDQZ3NzVrAd
-	Crklg==
-X-Received: by 2002:a17:902:ea09:b0:2b0:4cbe:fbea with SMTP id d9443c01a7336-2b04cbf0114mr7880195ad.25.1773512928560;
-        Sat, 14 Mar 2026 11:28:48 -0700 (PDT)
+        bh=bTvcRjBg7RZQjPVbwsm/XKOCF/7oOgDehhwAe6xkRiI=;
+        b=KVDPqteJu6GfZWHf1jq1n4mVHCRRpE202m7jxteQb5MrrvoolkHevQ9W/VqFWgn8Qg
+         i8lMC7KcU30c4VTK5lIBlOZgLNtMo042MajXPs32+HJrxNYkunuThDh32rt3uCTs2F+L
+         C6iD1cWmrsfPskszYKsEIvg+qYIWOZpxoagqFv8IdNzHDjjO9/FpE4iSfZvwWzvbwAk6
+         Ybj1vd2l0RW6E4tpatUJJCu5oXNYdmiKV+VR2msv5h5kgSmFADDgAeijodrzs2vwe4Qu
+         LTsZQlae+qber0io3ut0ffuRLeZEipZ7JISvz6kr980TmbqED6rCV+QJ9RjnrOUxoaOt
+         TBCg==
+X-Forwarded-Encrypted: i=1; AJvYcCVvui0dOU/3JYh+QBhyCMz1lgKlvaDsREpkyvVFQb4Cy/NGUghrhNnYrsuOIpUIsOuGhsbF1rA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1IiKjkLR0iBcvkEnis55Ew2Ro3DBnttNAED2BDbZR9qbX5W8c
+	8TxMtvcNnxDyUxoBYzkUA5K563lEIxcy1e95O/9oI+M64rpj/Nw39Ech
+X-Gm-Gg: ATEYQzyqqKx9mRwA8vqvNjusxfT7osD17quMfDkCSdQmfOgCRGWFDrl9+ifF8h1fWB5
+	AjUP3rAeiOMg1h34Kq1OtEygBDvuPRFYAtm4mpXZOJn3Lwjyit//BDtrSExLj0ZKrzU0aAQGlxP
+	YSu7s/MuIP8SjMxU3eC9eHS1Nu9hC/Ol4svfXluUZg3cBkl23RzY6bK6bvXEZl5dAfIJNc5l32j
+	mQz1L8X9BPJxJxbnzJeNyonlYfzIcHhrXGqcB2bHMMjrxQfZQGOEg8Sbp1EaGMlt2G90vr5to9/
+	WujvOSyeQPjQEsneLb2kIZFhGZW4vQVwMhiJL3oVIHOBkfdYp4G6Rekq8wf4dHuBSe7xX6I1ou5
+	rMVXiTv2svh3D6Sw7Uvs9JICyo3DWM5iqLSFFb2syL1LsMq5IdObyq/6KceAFDRwUaBirKe+e4E
+	1v9wlKsGkBk816vQBpbIeYGUOMM+ODhZlDWWvTdRLvIFfBahvne/d7qMFcyMm6XVa5d5C4ynx/Z
+	H62XiwdWL5Z7zhh
+X-Received: by 2002:a17:902:ce92:b0:2ae:41d1:344b with SMTP id d9443c01a7336-2aeca967ad1mr74232365ad.6.1773512938770;
+        Sat, 14 Mar 2026 11:28:58 -0700 (PDT)
 Received: from localhost.localdomain ([122.168.66.151])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece62c581sm77673525ad.33.2026.03.14.11.28.39
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece62c581sm77673525ad.33.2026.03.14.11.28.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Mar 2026 11:28:47 -0700 (PDT)
+        Sat, 14 Mar 2026 11:28:58 -0700 (PDT)
 From: I Viswanath <viswanathiyyappan@gmail.com>
 To: stfomichev@gmail.com,
 	horms@kernel.org,
@@ -100,9 +100,9 @@ Cc: bcm-kernel-feedback-list@broadcom.com,
 	intel-wired-lan@lists.osuosl.org,
 	linux-kernel@vger.kernel.org,
 	I Viswanath <viswanathiyyappan@gmail.com>
-Subject: [PATCH net-next v9 1/7] net: core: Add state tracking for async netdev ops
-Date: Sat, 14 Mar 2026 23:58:03 +0530
-Message-ID: <20260314182809.362808-2-viswanathiyyappan@gmail.com>
+Subject: [PATCH net-next v9 2/7] net: core: Introduce callback ndo_set_rx_mode_async
+Date: Sat, 14 Mar 2026 23:58:04 +0530
+Message-ID: <20260314182809.362808-3-viswanathiyyappan@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260314182809.362808-1-viswanathiyyappan@gmail.com>
 References: <20260314182809.362808-1-viswanathiyyappan@gmail.com>
@@ -120,13 +120,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[broadcom.com,vger.kernel.org,lists.linux.dev,lists.osuosl.org,gmail.com];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-267820-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267821-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[22];
@@ -141,230 +141,518 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6E7AE28E72B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0CC7E28E756
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Async netdev ops are tricky because of the following problems:
+The set_rx_mode callback is invoked under the addr_lock spinlock which
+makes it illegal to sleep. This means set_rx_mode is prone to
+sleep-in-atomic bugs as drivers have a tendency to do the I/O directly
+in the callback.
 
-1) Freeing the context associated with async netdev ops might require
-   waiting for completion of the associated work which might require the
-   rtnl lock or the instance lock. However this will deadlock in
-   __dev_close_many as the cleanup is done with those locks already held.
+This problem can be avoided if set_rx_mode were done in 2 stages: snapshot
+and commit. A handful of drivers implement this idea by implementing the
+rx_mode update as work and scheduling it in the set_rx_mode callback.
 
-2) We need a way to enable/disable async netdev ops depending on the PM
-   state to allow/prevent hardware access as appropriate.
+Implement this idea in net/core as this is not driver specific. To
+facilitate this transition, a new async callback set_rx_mode_async
+is introduced.
 
-We solve these problems by introducing a state variable to track
-the current state of netdev. This can take the following values:
-- ACTIVE (up and normal operation)
-- DOWN (down)
-- INACTIVE (in suspend/shutdown)
+When this callback is provided, the set_rx_mode callback customizes
+the snapshot creation and the work behaviour as required while the
+set_rx_mode_async callback is run async as work and commits the
+prepared snapshot.
 
-To solve 1, we set the state to down in __dev_close_many. In the
-associated op handler, we check for the current state and return if
-the netdev is down.
+Apart from this, the drivers need to be updated to have all the RX mode
+updates pass through the netif_set_rx_mode helper to ensure correctness.
 
-To solve 2, the commit introduces the following functions:
-- netif_enable_async_ops  -> sets state to ACTIVE
-- netif_disable_async_ops -> sets state to INACTIVE and cancels any
-			     pending work as required.
-
-The op implementation can use the state information to do the required
-processing.
-
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: I Viswanath <viswanathiyyappan@gmail.com>
 ---
- include/linux/netdevice.h | 29 ++++++++++++++
- net/core/dev.c            | 84 ++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 111 insertions(+), 2 deletions(-)
+ include/linux/netdevice.h |  94 +++++++++++++-
+ include/net/netdev_lock.h |   8 ++
+ net/core/dev.c            | 251 +++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 347 insertions(+), 6 deletions(-)
 
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index ae269a2e7f4d..6d426dc66af9 100644
+index 6d426dc66af9..a69377068f4a 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -1062,6 +1062,16 @@ struct netdev_net_notifier {
- 	struct notifier_block *nb;
+@@ -1068,7 +1068,36 @@ enum netif_async_state {
+ 	NETIF_ASYNC_INACTIVE
  };
  
-+enum netif_async_state {
-+	NETIF_ASYNC_ACTIVE,
-+	NETIF_ASYNC_DOWN,
-+	NETIF_ASYNC_INACTIVE
++enum netif_rx_mode_cfg {
++	NETIF_RX_MODE_CFG_ALLMULTI,
++	NETIF_RX_MODE_CFG_PROMISC,
++	NETIF_RX_MODE_CFG_BROADCAST
 +};
 +
-+struct netif_async_ctx {
-+	enum netif_async_state state;
++enum netif_rx_mode_flags {
++	NETIF_RX_MODE_READY,
++	NETIF_RX_MODE_UC_SKIP,
++	NETIF_RX_MODE_MC_SKIP
 +};
 +
- /*
-  * This structure defines the management hooks for network devices.
-  * The following hooks can be defined; unless noted otherwise, they are
-@@ -2027,6 +2037,8 @@ enum netdev_reg_state {
-  *	@sfp_bus:	attached &struct sfp_bus structure.
-  *
-  *	@qdisc_tx_busylock: lockdep class annotating Qdisc->busylock spinlock
-+ *	@async_ctx	  : Context required for async ops
-+ *	@needs_async_ctx  : Does dev need async op context?
-  *
-  *	@proto_down:	protocol port state information can be sent to the
-  *			switch driver and used to set the phys state of the
-@@ -2454,6 +2466,8 @@ struct net_device {
- 	struct phy_device	*phydev;
- 	struct sfp_bus		*sfp_bus;
- 	struct lock_class_key	*qdisc_tx_busylock;
-+	struct netif_async_ctx  *async_ctx;
-+	bool			needs_async_ctx;
- 	bool			proto_down;
- 	bool			irq_affinity_auto;
- 	bool			rx_cpu_rmap_auto;
-@@ -3376,6 +3390,21 @@ int dev_loopback_xmit(struct net *net, struct sock *sk, struct sk_buff *newskb);
- u16 dev_pick_tx_zero(struct net_device *dev, struct sk_buff *skb,
- 		     struct net_device *sb_dev);
++struct netif_rx_mode_config {
++	char    *uc_addrs;
++	char    *mc_addrs;
++	int     uc_count;
++	int     mc_count;
++	int     cfg;
++};
++
++struct netif_rx_mode_work {
++	struct netif_rx_mode_config *pending;
++	struct netif_rx_mode_config *ready;
++	struct work_struct work;
++	struct net_device *dev;
++	int flags;
++};
++
+ struct netif_async_ctx {
++	struct netif_rx_mode_work *rx_mode_work;
+ 	enum netif_async_state state;
+ };
  
-+void netif_disable_async_ops(struct net_device *dev);
-+void netif_enable_async_ops(struct net_device *dev);
+@@ -1124,9 +1153,15 @@ struct netif_async_ctx {
+  *	changes to configuration when multicast or promiscuous is enabled.
+  *
+  * void (*ndo_set_rx_mode)(struct net_device *dev);
+- *	This function is called device changes address list filtering.
++ *	This function is called when device changes address list filtering.
+  *	If driver handles unicast address filtering, it should set
+- *	IFF_UNICAST_FLT in its priv_flags.
++ *	IFF_UNICAST_FLT in its priv_flags. If the ndo_set_rx_mode_async
++ *	callback is provided, This would be used to set up the
++ *	rx mode snapshot that will be committed by ndo_set_rx_mode_async.
++ *
++ * void (*ndo_set_rx_mode_async)(struct net_device *dev);
++ *	This function will be scheduled by dev_set_rx_mode and is
++ *	responsible for committing the rx_mode snapshot to the hardware.
+  *
+  * int (*ndo_set_mac_address)(struct net_device *dev, void *addr);
+  *	This function  is called when the Media Access Control address
+@@ -1447,6 +1482,7 @@ struct net_device_ops {
+ 	void			(*ndo_change_rx_flags)(struct net_device *dev,
+ 						       int flags);
+ 	void			(*ndo_set_rx_mode)(struct net_device *dev);
++	void			(*ndo_set_rx_mode_async)(struct net_device *dev);
+ 	int			(*ndo_set_mac_address)(struct net_device *dev,
+ 						       void *addr);
+ 	int			(*ndo_validate_addr)(struct net_device *dev);
+@@ -3405,6 +3441,60 @@ netif_get_async_state(struct net_device *dev)
+ 	return dev->async_ctx->state;
+ }
+ 
++void netif_set_rx_mode(struct net_device *dev);
 +
-+static inline void netif_set_async_state(struct net_device *dev,
-+					 enum netif_async_state state)
++/* Helpers to be used in the set_rx_mode callback */
++static inline void netif_set_rx_mode_cfg(struct net_device *dev, int b,
++					 bool val)
 +{
-+	dev->async_ctx->state = state;
++	if (val)
++		dev->async_ctx->rx_mode_work->pending->cfg |= BIT(b);
++	else
++		dev->async_ctx->rx_mode_work->pending->cfg &= ~BIT(b);
 +}
 +
-+static inline enum netif_async_state
-+netif_get_async_state(struct net_device *dev)
++static inline void netif_set_rx_mode_flag(struct net_device *dev, int b,
++					  bool val)
 +{
-+	return dev->async_ctx->state;
++	if (val)
++		dev->async_ctx->rx_mode_work->flags |= BIT(b);
++	else
++		dev->async_ctx->rx_mode_work->flags &= ~BIT(b);
 +}
++
++/* Helpers to be used in the set_rx_mode_async callback */
++static inline bool netif_get_rx_mode_cfg(struct net_device *dev, int b)
++{
++	return !!(dev->async_ctx->rx_mode_work->ready->cfg & BIT(b));
++}
++
++static inline bool netif_get_rx_mode_flag(struct net_device *dev, int b)
++{
++	return !!(dev->async_ctx->rx_mode_work->flags & BIT(b));
++}
++
++static inline int netif_rx_mode_uc_count(struct net_device *dev)
++{
++	return dev->async_ctx->rx_mode_work->ready->uc_count;
++}
++
++static inline int netif_rx_mode_mc_count(struct net_device *dev)
++{
++	return dev->async_ctx->rx_mode_work->ready->mc_count;
++}
++
++#define netif_rx_mode_for_each_uc_addr(ha_addr, dev, __i) \
++	for (__i = 0, \
++	     ha_addr = (dev)->async_ctx->rx_mode_work->ready->uc_addrs; \
++	     __i < (dev)->async_ctx->rx_mode_work->ready->uc_count; \
++	     __i++, ha_addr += (dev)->addr_len)
++
++#define netif_rx_mode_for_each_mc_addr(ha_addr, dev, __i) \
++	for (__i = 0, \
++	     ha_addr = (dev)->async_ctx->rx_mode_work->ready->mc_addrs; \
++	     __i < (dev)->async_ctx->rx_mode_work->ready->mc_count; \
++	     __i++, ha_addr += (dev)->addr_len)
 +
  int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev);
  int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id);
  
+diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
+index 3d3aef80beac..118fa89232a0 100644
+--- a/include/net/netdev_lock.h
++++ b/include/net/netdev_lock.h
+@@ -80,6 +80,14 @@ netdev_ops_assert_locked_or_invisible(const struct net_device *dev)
+ 		netdev_ops_assert_locked(dev);
+ }
+ 
++static inline bool netdev_trylock_ops_compat(struct net_device *dev)
++{
++	if (netdev_need_ops_lock(dev))
++		return netdev_trylock(dev);
++	else
++		return rtnl_trylock();
++}
++
+ static inline void netdev_lock_ops_compat(struct net_device *dev)
+ {
+ 	if (netdev_need_ops_lock(dev))
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 200d44883fc1..b1797bd28a6b 100644
+index b1797bd28a6b..acf46a304d62 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -1664,6 +1664,33 @@ static int napi_kthread_create(struct napi_struct *n)
+@@ -1664,6 +1664,92 @@ static int napi_kthread_create(struct napi_struct *n)
  	return err;
  }
  
-+static int __netif_alloc_async_ctx(struct net_device *dev)
++static void dev_set_rx_mode_async(struct work_struct *param)
 +{
-+	dev->async_ctx = kzalloc_obj(*dev->async_ctx);
-+	if (!dev->async_ctx)
-+		return -ENOMEM;
++	struct netif_rx_mode_work *ctx;
++	struct net_device *dev;
 +
-+	netif_set_async_state(dev, NETIF_ASYNC_ACTIVE);
++	ctx = container_of(param, struct netif_rx_mode_work, work);
++	dev = ctx->dev;
++
++	/* This handler requires the instance lock and we cancel this work
++	 * in dev_close where it is already held, resulting in a deadlock.
++	 * Avoid that scenario by trying to acquire the lock and bailing
++	 * out when we are in teardown.
++	 */
++	while (!netdev_trylock_ops_compat(dev)) {
++		if (netif_get_async_state(dev) == NETIF_ASYNC_DOWN)
++			return;
++
++		msleep(20);
++	}
++
++	/* We could introduce a new lock for this but reusing the addr
++	 * lock works well enough
++	 */
++	netif_addr_lock_bh(dev);
++	if (!netif_get_rx_mode_flag(dev, NETIF_RX_MODE_READY)) {
++		netif_addr_unlock_bh(dev);
++		goto out;
++	}
++	swap(ctx->ready, ctx->pending);
++	netif_set_rx_mode_flag(dev, NETIF_RX_MODE_READY, false);
++	netif_addr_unlock_bh(dev);
++
++	dev->netdev_ops->ndo_set_rx_mode_async(dev);
++out:
++	netdev_unlock_ops_compat(dev);
++}
++
++static int netif_alloc_rx_mode_ctx(struct net_device *dev)
++{
++	struct netif_rx_mode_work *rx_mode_work;
++
++	rx_mode_work = kzalloc_obj(*rx_mode_work);
++	if (!rx_mode_work)
++		goto fail;
++
++	rx_mode_work->ready = kzalloc_obj(*rx_mode_work->ready);
++	if (!rx_mode_work->ready)
++		goto fail_ready;
++
++	rx_mode_work->pending = kzalloc_obj(*rx_mode_work->pending);
++	if (!rx_mode_work->pending)
++		goto fail_pending;
++
++	INIT_WORK(&rx_mode_work->work, dev_set_rx_mode_async);
++	rx_mode_work->dev = dev;
++
++	dev->async_ctx->rx_mode_work = rx_mode_work;
++	return 0;
++
++fail_pending:
++	kfree(rx_mode_work->ready);
++fail_ready:
++	kfree(rx_mode_work);
++fail:
++	return -ENOMEM;
++}
++
++static void netif_free_rx_mode_ctx(struct net_device *dev)
++{
++	if (!dev->async_ctx->rx_mode_work)
++		return;
++
++	cancel_work_sync(&dev->async_ctx->rx_mode_work->work);
++
++	kfree(dev->async_ctx->rx_mode_work->ready->uc_addrs);
++	kfree(dev->async_ctx->rx_mode_work->ready->mc_addrs);
++	kfree(dev->async_ctx->rx_mode_work->ready);
++
++	kfree(dev->async_ctx->rx_mode_work->pending->uc_addrs);
++	kfree(dev->async_ctx->rx_mode_work->pending->mc_addrs);
++	kfree(dev->async_ctx->rx_mode_work->pending);
++
++	kfree(dev->async_ctx->rx_mode_work);
++	dev->async_ctx->rx_mode_work = NULL;
++}
++
+ static int __netif_alloc_async_ctx(struct net_device *dev)
+ {
+ 	dev->async_ctx = kzalloc_obj(*dev->async_ctx);
+@@ -1676,17 +1762,27 @@ static int __netif_alloc_async_ctx(struct net_device *dev)
+ 
+ static int netif_alloc_async_ctx(struct net_device *dev)
+ {
++	const struct net_device_ops *ops = dev->netdev_ops;
+ 	int ret;
+ 
+ 	ret = __netif_alloc_async_ctx(dev);
++
++	if (!ret && ops->ndo_set_rx_mode_async)
++		ret = netif_alloc_rx_mode_ctx(dev);
++
+ 	return ret;
+ }
+ 
+ static void netif_free_async_ctx(struct net_device *dev)
+ {
++	const struct net_device_ops *ops = dev->netdev_ops;
++
+ 	if (!dev->async_ctx)
+ 		return;
+ 
++	if (ops->ndo_set_rx_mode_async)
++		netif_free_rx_mode_ctx(dev);
++
+ 	kfree(dev->async_ctx);
+ 	dev->async_ctx = NULL;
+ }
+@@ -1868,6 +1964,8 @@ EXPORT_SYMBOL(netif_close);
+  */
+ void netif_disable_async_ops(struct net_device *dev)
+ {
++	const struct net_device_ops *ops = dev->netdev_ops;
++
+ 	netdev_lock_ops_compat(dev);
+ 
+ 	if (!dev->needs_async_ctx || !netif_running(dev)) {
+@@ -1877,6 +1975,9 @@ void netif_disable_async_ops(struct net_device *dev)
+ 
+ 	netif_set_async_state(dev, NETIF_ASYNC_INACTIVE);
+ 	netdev_unlock_ops_compat(dev);
++
++	if (ops->ndo_set_rx_mode_async)
++		cancel_work_sync(&dev->async_ctx->rx_mode_work->work);
+ }
+ EXPORT_SYMBOL(netif_disable_async_ops);
+ 
+@@ -9749,6 +9850,88 @@ int netif_set_allmulti(struct net_device *dev, int inc, bool notify)
+ 	return 0;
+ }
+ 
++static int __netif_prepare_rx_mode(struct net_device *dev)
++{
++	bool skip_uc = false, skip_mc = false;
++	struct netif_rx_mode_config *pending;
++	int uc_count = 0, mc_count = 0;
++	struct netdev_hw_addr *ha;
++	char *tmp;
++	int i;
++
++	pending = dev->async_ctx->rx_mode_work->pending;
++
++	skip_uc = netif_get_rx_mode_flag(dev, NETIF_RX_MODE_UC_SKIP);
++	skip_mc = netif_get_rx_mode_flag(dev, NETIF_RX_MODE_MC_SKIP);
++
++	/* The allocations need to be atomic since this will be called under
++	 * netif_addr_lock_bh()
++	 */
++	if (!skip_uc) {
++		uc_count = netdev_uc_count(dev);
++		tmp = krealloc(pending->uc_addrs, uc_count * dev->addr_len,
++			       GFP_ATOMIC);
++		if (!tmp)
++			return -ENOMEM;
++
++		i = 0;
++		pending->uc_addrs = tmp;
++		pending->uc_count = uc_count;
++		netdev_for_each_uc_addr(ha, dev)
++			memcpy(pending->uc_addrs + (i++) * dev->addr_len,
++			       ha->addr, dev->addr_len);
++	}
++
++	if (!skip_mc) {
++		mc_count = netdev_mc_count(dev);
++		tmp = krealloc(pending->mc_addrs, mc_count * dev->addr_len,
++			       GFP_ATOMIC);
++		if (!tmp)
++			return -ENOMEM;
++
++		i = 0;
++		pending->mc_addrs = tmp;
++		pending->mc_count = mc_count;
++		netdev_for_each_mc_addr(ha, dev)
++			memcpy(pending->mc_addrs + (i++) * dev->addr_len,
++			       ha->addr, dev->addr_len);
++	}
++
 +	return 0;
 +}
 +
-+static int netif_alloc_async_ctx(struct net_device *dev)
++/* Attempt to prepare the rx_mode snapshot and if successful,
++ * signal that it's ready.
++ */
++static int netif_prepare_rx_mode(struct net_device *dev)
 +{
-+	int ret;
++	int rc;
 +
-+	ret = __netif_alloc_async_ctx(dev);
-+	return ret;
++	lockdep_assert_held(&dev->addr_list_lock);
++	rc = __netif_prepare_rx_mode(dev);
++	netif_set_rx_mode_flag(dev, NETIF_RX_MODE_READY, (rc == 0));
++	return rc;
 +}
 +
-+static void netif_free_async_ctx(struct net_device *dev)
++static void netif_schedule_rx_mode_work(struct net_device *dev)
 +{
-+	if (!dev->async_ctx)
++	const struct net_device_ops *ops = dev->netdev_ops;
++
++	if (ops->ndo_set_rx_mode)
++		ops->ndo_set_rx_mode(dev);
++
++	if (!ops->ndo_set_rx_mode_async)
 +		return;
 +
-+	kfree(dev->async_ctx);
-+	dev->async_ctx = NULL;
++	if (netif_get_async_state(dev) == NETIF_ASYNC_INACTIVE)
++		return;
++
++	if (netif_prepare_rx_mode(dev))
++		return;
++
++	schedule_work(&dev->async_ctx->rx_mode_work->work);
 +}
 +
- static int __dev_open(struct net_device *dev, struct netlink_ext_ack *extack)
+ /*
+  *	Upload unicast and multicast address lists to device and
+  *	configure RX filtering. When the device doesn't support unicast
+@@ -9757,8 +9940,6 @@ int netif_set_allmulti(struct net_device *dev, int inc, bool notify)
+  */
+ void __dev_set_rx_mode(struct net_device *dev)
  {
- 	const struct net_device_ops *ops = dev->netdev_ops;
-@@ -1698,14 +1725,18 @@ static int __dev_open(struct net_device *dev, struct netlink_ext_ack *extack)
- 	if (ops->ndo_validate_addr)
- 		ret = ops->ndo_validate_addr(dev);
+-	const struct net_device_ops *ops = dev->netdev_ops;
+-
+ 	/* dev_open will call this function so the list will stay sane. */
+ 	if (!(dev->flags&IFF_UP))
+ 		return;
+@@ -9779,8 +9960,7 @@ void __dev_set_rx_mode(struct net_device *dev)
+ 		}
+ 	}
  
-+	if (!ret && dev->needs_async_ctx)
-+		ret = netif_alloc_async_ctx(dev);
-+
- 	if (!ret && ops->ndo_open)
- 		ret = ops->ndo_open(dev);
- 
- 	netpoll_poll_enable(dev);
- 
--	if (ret)
-+	if (ret) {
- 		clear_bit(__LINK_STATE_START, &dev->state);
--	else {
-+		netif_free_async_ctx(dev);
-+	} else {
- 		netif_set_up(dev, true);
- 		dev_set_rx_mode(dev);
- 		dev_activate(dev);
-@@ -1772,6 +1803,11 @@ static void __dev_close_many(struct list_head *head)
- 
- 		netdev_ops_assert_locked(dev);
- 
-+		if (dev->needs_async_ctx) {
-+			netif_set_async_state(dev, NETIF_ASYNC_DOWN);
-+			netif_free_async_ctx(dev);
-+		}
-+
- 		if (ops->ndo_stop)
- 			ops->ndo_stop(dev);
- 
-@@ -1821,6 +1857,50 @@ void netif_close(struct net_device *dev)
+-	if (ops->ndo_set_rx_mode)
+-		ops->ndo_set_rx_mode(dev);
++	netif_schedule_rx_mode_work(dev);
  }
- EXPORT_SYMBOL(netif_close);
  
-+/* netif_disable_async_ops - disable execution of async NDOs.
+ void dev_set_rx_mode(struct net_device *dev)
+@@ -9790,6 +9970,66 @@ void dev_set_rx_mode(struct net_device *dev)
+ 	netif_addr_unlock_bh(dev);
+ }
+ 
++/* netif_set_rx_mode() - Helper to centralize RX mode requests in core.
 + *
-+ * To be used in cases of the device shutting down, suspending or
-+ * failing to resume.
++ * If ndo_set_rx_mode_async is provided, perform the required
++ * setup and invoke ndo_set_rx_mode_async callback. Otherwise this is the
++ * same as invoking the ndo_set_rx_mode callback.
 + *
-+ * Should be called in the shutdown callback and in the PM suspend
-+ * callbacks: @suspend(), @freeze(), @poweroff() and in the error
-+ * path of PM resume callbacks.
++ * If ndo_set_rx_mode_async is implemented, the driver must perform all
++ * RX mode updates via this function and invoking the set_rx_mode callback
++ * directly is a bug.
 + */
-+void netif_disable_async_ops(struct net_device *dev)
++void netif_set_rx_mode(struct net_device *dev)
 +{
-+	netdev_lock_ops_compat(dev);
++	const struct net_device_ops *ops = dev->netdev_ops;
++	struct netif_rx_mode_work *ctx;
++	bool netif_down;
++	int rc = 0;
 +
-+	if (!dev->needs_async_ctx || !netif_running(dev)) {
-+		netdev_unlock_ops_compat(dev);
++	if (WARN_ON(!ops->ndo_set_rx_mode))
++		return;
++
++	if (!ops->ndo_set_rx_mode_async) {
++		ops->ndo_set_rx_mode(dev);
 +		return;
 +	}
 +
-+	netif_set_async_state(dev, NETIF_ASYNC_INACTIVE);
-+	netdev_unlock_ops_compat(dev);
-+}
-+EXPORT_SYMBOL(netif_disable_async_ops);
++	netdev_ops_assert_locked(dev);
 +
-+/* netif_enable_async_ops - enable execution of async NDOs.
-+ *
-+ * To be used when the device attempts to resume or fails to suspend.
-+ *
-+ * Should be called in the PM resume callbacks: @resume(), @thaw(),
-+ * @restore() and in the error path of PM suspend callbacks.
-+ */
-+void netif_enable_async_ops(struct net_device *dev)
-+{
-+	netdev_lock_ops_compat(dev);
-+
-+	if (!dev->needs_async_ctx || !netif_running(dev)) {
-+		netdev_unlock_ops_compat(dev);
-+		return;
++	netif_down = !netif_running(dev);
++	if (netif_down) {
++		rc = __netif_alloc_async_ctx(dev);
++		if (!rc)
++			rc = netif_alloc_rx_mode_ctx(dev);
++		if (rc)
++			goto out;
 +	}
 +
-+	netif_set_async_state(dev, NETIF_ASYNC_ACTIVE);
-+	netdev_unlock_ops_compat(dev);
-+}
-+EXPORT_SYMBOL(netif_enable_async_ops);
++	netif_addr_lock_bh(dev);
++	ops->ndo_set_rx_mode(dev);
++	rc = netif_prepare_rx_mode(dev);
++	if (rc) {
++		netif_addr_unlock_bh(dev);
++		goto out;
++	}
 +
- void netif_disable_lro(struct net_device *dev)
- {
- 	struct net_device *lower_dev;
++	/* There might be a work scheduled by dev_set_rx_mode before
++	 * this function's execution that could be using outdated
++	 * config. Clear the ready bit to prevent that work's execution.
++	 */
++	ctx = dev->async_ctx->rx_mode_work;
++	swap(ctx->ready, ctx->pending);
++	netif_set_rx_mode_flag(dev, NETIF_RX_MODE_READY, false);
++	netif_addr_unlock_bh(dev);
++
++	ops->ndo_set_rx_mode_async(dev);
++out:
++	if (netif_down)
++		netif_free_async_ctx(dev);
++}
++EXPORT_SYMBOL(netif_set_rx_mode);
++
+ /**
+  * netif_get_flags() - get flags reported to userspace
+  * @dev: device
+@@ -11451,6 +11691,9 @@ int register_netdevice(struct net_device *dev)
+ 		}
+ 	}
+ 
++	if (dev->netdev_ops->ndo_set_rx_mode_async)
++		dev->needs_async_ctx = true;
++
+ 	if (((dev->hw_features | dev->features) &
+ 	     NETIF_F_HW_VLAN_CTAG_FILTER) &&
+ 	    (!dev->netdev_ops->ndo_vlan_rx_add_vid ||
 -- 
 2.47.3
 
