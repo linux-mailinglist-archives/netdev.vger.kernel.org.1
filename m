@@ -1,90 +1,67 @@
-Return-Path: <netdev+bounces-267756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267757-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aj2oFQeEtWlv1QAAu9opvQ
-	(envelope-from <netdev+bounces-267756-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 16:51:35 +0100
+	id wDKjKEeEtWlv1QAAu9opvQ
+	(envelope-from <netdev+bounces-267757-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 16:52:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A349F28DBF3
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 16:51:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2112328DBFB
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 16:52:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8D56301FFAA
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 15:51:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1A366301CFCC
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 15:52:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9A71DD525;
-	Sat, 14 Mar 2026 15:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0DC525B2FA;
+	Sat, 14 Mar 2026 15:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="g59SS0Tl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mCX8HljM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081CD8C1F
-	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 15:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C78A10E3;
+	Sat, 14 Mar 2026 15:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773503492; cv=none; b=hHZSKoGccBRcxsO821lp6PRgSDdaeT4+Ca8QN+cWuTqdIHT+Au34GrQEYODr5fy1U/w+w8T4kC+/OKSHYLbrJ38j8YIDQb3jgwIRpKKk/JR9AV/NggVZXZ0gzUD4paV+oebIVILgQPQlG+asChaNHlHrIyyRz8k0gwVRzQ5d48s=
+	t=1773503554; cv=none; b=HR+T6oO+FCGBE9x2ZL3hzTyxTAaN95PJ5lvPHRXqzN5h8/yO/JsD0/sWvTqnbiGSO4lZlatk/6dilIFvRVBDmIAWYGTbdBZdIYdMRmlvi5D4RdvnqAEJHHpkTqotS44ID6uOsmCHvrovv7LGtfeI0b5/XjJwe1tYKzDdgLUWe9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773503492; c=relaxed/simple;
-	bh=Vz4KBAKp7S2fgkbp+iIuHclARYluKXtjq8ntt2mtgaE=;
+	s=arc-20240116; t=1773503554; c=relaxed/simple;
+	bh=lmhf33+qHK/vgfIIOKevHtIBkxesI9cNqyczpIwkR6A=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qINPCHu5JotSKhytqfwfIw2qpPAhtrmC1JXYBU1SxHbIekKmIx44L/svl4XjKvtwXdsLRkK4NuAgXKgDWbULOZV8gpYz2LfDec1LNX4m4VraxOF/DJ4nFirljUu0ajGbhvuMX9gaDPUnQ+e73XdDwxGD0KmIEZhVICf3iUvVUfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=g59SS0Tl; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-c73fbdd9b53so69486a12.3
-        for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 08:51:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1773503490; x=1774108290; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D07Z7V9MNfYO2AzIv9EBrR5rP0cZnLiLY3ziDWX26PQ=;
-        b=g59SS0TlW2mJlSyD7M98eK0dI8niF/5l6HEwXDtT73NpsIlsKL+CnkEHBnzPZiptd8
-         5yiiBIvHTY8pkWsuP7mx/7lz9ulHosLUlEMcEPgSjpTK9TndebYKpBoPSYpHtjhsqV1F
-         rhyewrYyxfhljwU/Zj+xWvlP9OXh82V2hqgO32xL1kFgPuMJdIMpqNL2RjjpwXeYhNZH
-         4cYhrufVBhDxm55THziR34/SBmpPpih1j72KXhv8+TOLFZAR2YEUe10F7qYWa6vpHWKW
-         HbQyk1Uy46p4HegnDMeeASSnKKcaICmp93g3HcwWKdRu7rbE1znIFt6hVv8vdZvEWWti
-         CyRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773503490; x=1774108290;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=D07Z7V9MNfYO2AzIv9EBrR5rP0cZnLiLY3ziDWX26PQ=;
-        b=ULRwmF8rP4rwQEv0titNvLYaPAUjeE0ZVIvGWAXUp3yi3abpBMJLasaUKJoMJ7fUOX
-         s0IAPuKKqJT204StIPhtQvzskSjZXL+8bg7Y4QYfLdzwrbqzmTTetZTNyI+v3jHZKTz9
-         oarU8qTArIzvPHC4Q23SU7eBalO7KgXN/7DMj3mJy4B19J+QQVeIsZ7U8q6ZNJwYjnHi
-         snZAttERI6Iqx3jmB/xhvqsJwAWGC4RZPxFEI6z2hYPKIM/fJxfEvafpX6vbK4edIjrS
-         f0zT1o4tRcPouMUYKKYibBwHSYOb883yUcbcuCNHRxigHZujwp+V0NOQPhj48jPQQJxF
-         0/mA==
-X-Gm-Message-State: AOJu0YxecJKxEIcIadmwc+eTUGFYuXEAveuWlU5RTMfraUOMR22pThIa
-	0wmjyhBLtyyHRPX0+9U3lKLhy+/4gejxbv6gfrqb0t1nXcrr0KixcxCK2yW5aZGS7JWgDy9kcW2
-	AD6zp
-X-Gm-Gg: ATEYQzxI9LrcXC02IPNI2WVjfr3cSlPB8DxmF1Araj8/tCaK+bzYpn0Jj2Vqc3IxusC
-	gNbOdh2hj7/aDEIoBFVhvR+PKZTTn4joP+o1lrHyqIL94QupeGBMAJfekUX+I5LbPt5cooA0joE
-	IZkr5MXamYd+tLkg5xVuUYIWzdFvymSk2EWx3nQPtPwkmUH9IDCYNL2CJEOJwxiR82tdil5b95W
-	R5YavtAtmOcHYfv29Hfi9n8BzjenYB18e41RkaO/BGGLutUQ4OiwMpkjXxH8cwWDjznSVmuSvOY
-	nB/owApEYpVgTfk94m8NwHhyfiwScu0xo7tR3LCiNv+ca/rLV150S1NDPEXxlCO7CK6fXkBhfj9
-	nt8RAAviMz/kovM0kd9uUmgPBMzDjJscja6Q4LLlD5wmDrvX2CUbqYxFASiHMwQyKh41uOY6KIn
-	Ztd92hg/OrkmKrbBn8pJFqRz1ZRyLI+lq+xzY=
-X-Received: by 2002:a17:902:ebcd:b0:2ae:4d93:ba36 with SMTP id d9443c01a7336-2aeca95946fmr71163845ad.11.1773503490276;
-        Sat, 14 Mar 2026 08:51:30 -0700 (PDT)
-Received: from phoenix.local ([104.202.29.139])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece838d3fsm76466955ad.77.2026.03.14.08.51.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Mar 2026 08:51:30 -0700 (PDT)
-Date: Sat, 14 Mar 2026 08:51:23 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH 00/12] netem: fixes, cleanup, and selftest
-Message-ID: <20260314085123.52203ca4@phoenix.local>
-In-Reply-To: <20260314070902.4025c388@kernel.org>
-References: <20260313211646.12549-1-stephen@networkplumber.org>
-	<20260314070902.4025c388@kernel.org>
+	 MIME-Version:Content-Type; b=lWtlGoV5ISyq+xYvzyP4p5FMWwCKQIxmyJlFMbAxny77Y1nV2iicSNC9QJDUaaD3cfk1FokSaEBl4u3Inp1SEnvQqnKAwIVjlEzA8/NOIIPi6PlcU861gVfXPdlbl0rQjM1QzgScmoFeNw2pvY+kmFYw+m7hjzMjwo8QQe4g5/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mCX8HljM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85C40C116C6;
+	Sat, 14 Mar 2026 15:52:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773503554;
+	bh=lmhf33+qHK/vgfIIOKevHtIBkxesI9cNqyczpIwkR6A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mCX8HljMp8HlBMbXGHXtEOiJ17g0v2KRMZJwH7EyytyRY4hsIDaxq+zh1JoHF/7fI
+	 JA4z61gajsoGkY+BXv2NsJ1TfhURynNGCKMIYTJ+oLugd7ZlyWitzfbxeYJYGWIUbB
+	 fbmW8BaQeAnNopPJ+/DJ8vk+d6NV5awrFlEwBKZWzdBsQW19JzUrwKaisZ1SUqMnzy
+	 kh5bjN9slWjyUgXPC61Aq99ZCjI6TB7rwkZeYocM2u86mDNHNP3PDI9HBglZuWgGYo
+	 TqHMHDe4z0DL6MGs6v5A1b+UkNT8aDcUjBhRo15O5imsptBAPii6lBrFxVWavGzgnv
+	 aHzptjW+o3XFg==
+Date: Sat, 14 Mar 2026 08:52:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Doug Berger <opendmb@gmail.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Vikas Gupta
+ <vikas.gupta@broadcom.com>, Bhargava Marreddy
+ <bhargava.marreddy@broadcom.com>, Rajashekar Hudumula
+ <rajashekar.hudumula@broadcom.com>, Eric Biggers <ebiggers@kernel.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Markus =?UTF-8?B?QmzDtmNobA==?=
+ <mbloch@rooftopnetworks.de>, Arnd Bergmann <arnd@arndb.de>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 0/6] net: bcmgenet: add XDP support
+Message-ID: <20260314085232.089ea669@kernel.org>
+In-Reply-To: <20260313092101.1344954-1-nb@tipi-net.de>
+References: <20260313092101.1344954-1-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,71 +70,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.56 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-267757-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267756-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,broadcom.com,kernel.org,rooftopnetworks.de,arndb.de,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber-org.20230601.gappssmtp.com:dkim,phoenix.local:mid]
-X-Rspamd-Queue-Id: A349F28DBF3
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2112328DBFB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, 14 Mar 2026 07:09:02 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
-
-> On Fri, 13 Mar 2026 14:15:00 -0700 Stephen Hemminger wrote:
-> > The netem packet scheduler is widely used for network emulation but
-> > has not gotten enough of my attention lately.  
+On Fri, 13 Mar 2026 10:20:55 +0100 Nicolai Buchwitz wrote:
+> Add XDP support to the bcmgenet driver, covering XDP_PASS, XDP_DROP,
+> XDP_TX, XDP_REDIRECT, and ndo_xdp_xmit.
 > 
-> There's a few tests in tdcs which need adjusting:
+> The first patch converts the RX path from the existing kmalloc-based
+> allocation to page_pool, which is a prerequisite for XDP. The remaining
+> patches incrementally add XDP functionality and per-action statistics.
 > 
-> # not ok 363 d34d - NETEM test qdisc duplication restriction in qdisc tree in netem_change root
-> # Command exited with 0, expected 2
-> # 
-> # not ok 364 b33f - NETEM test qdisc duplication restriction in qdisc tree in netem_change non-root
-> # Command exited with 0, expected 2
-> # 
-> # not ok 365 cafe - NETEM test qdisc duplication restriction in qdisc tree
-> # Command exited with 0, expected 2
-> # 
-> # not ok 366 1337 - NETEM test qdisc duplication restriction in qdisc tree across branches
-> # Command exited with 0, expected 2
+> Tested on Raspberry Pi CM4 (BCM2711, bcmgenet, 1Gbps link):
+> - XDP_PASS: 943 Mbit/s TX, 935 Mbit/s RX (no regression vs baseline)
+> - XDP_PASS latency: 0.164ms avg, 0% packet loss
+> - XDP_DROP: all inbound traffic blocked as expected
+> - XDP_TX: TX counter increments (packet reflection working)
+> - Link flap with XDP attached: no errors
+> - Program swap under iperf3 load: no errors
 
-I have a basic infrastructure question about testing.
-Some of the new tests can just go in tdc they are just equivalent
-functional test in different format.
-
-But some of the traffic tests where it wants to make sure
-that delay, clobber, etc are working don't really fit into tdc
-which is API test.
-
-And lastly some of the new tests are designed to ensure that
-there is no regression from recursion bugs. Is it ok to have
-a test which might lock up the SUT. I assume syszbot does that
-all the time.
-
-How about I move the the basic "can you run these tc commands"
-into netem.json and leave the shell script for the traffic and
-regression tests?
+Have you had a chance to run the XDP tests from 
+tools/testing/selftests/drivers/net/hw/
+?
 
