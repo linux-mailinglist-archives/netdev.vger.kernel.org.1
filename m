@@ -1,84 +1,85 @@
-Return-Path: <netdev+bounces-267642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267643-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IA8XMmCltGlvrgAAu9opvQ
-	(envelope-from <netdev+bounces-267642-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:01:36 +0100
+	id IN4QI2yltGlvrgAAu9opvQ
+	(envelope-from <netdev+bounces-267643-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:01:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3226528AC9E
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:01:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 059A828ACC4
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:01:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EA7593139E36
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 00:00:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CA932314465C
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 00:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB6B175A79;
-	Sat, 14 Mar 2026 00:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A62A518D658;
+	Sat, 14 Mar 2026 00:00:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QN2vWmB7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KY9C0Kum"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675DA70809
-	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 00:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E5F33EC
+	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 00:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773446451; cv=none; b=VzWtHRe7Ktw6MIc6mxtBfggpaZ36S+Ayd/005TqUPoYItOIhtCltIRKwE/J8E+btcyN0yFb0FWgBw+YjEzQ9OyecSOzFUG1FRWM/mSUf8f86FvPQZDkSziDJ5aAHDIAE+7yzhMMSbpffILrpQQCqlRNirV8Eok+KfcSjdgmVxMI=
+	t=1773446452; cv=none; b=iFvjVWahQbSduRX/HH3EMlkmY0il+B/pde0fU6YYeGta1mVR/yUHp5wobloYxxIyaMWzRplg5EyTpX+f0Y5FA9UJwz++9SsSthby9mhYLhMP8wKi8k2RatyuBVTHUxvXxPZUmr7UXaaqKBUWUvklt9X81JbGejMzEdYhLXXIuKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773446451; c=relaxed/simple;
-	bh=SzNVxez9V7PcAZk5QZpuj9c+Tw1VVy/fO1zY3LpJVPE=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GGH6eGAakOACr7C5R3oUC8bNnBfJAxk8mYwXsARcejPWPCD9tQ/wnT9DCrsLORlMvAJ0PE5oigXRukv9av15Y63atZAoAVK3dJZdFEkE8/afijwfTCz7k0EKmSp/7as6UCXAdHqpa/iz67faTzizpVzbS4PFD0MI/x/kP6kWdhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QN2vWmB7; arc=none smtp.client-ip=209.85.128.179
+	s=arc-20240116; t=1773446452; c=relaxed/simple;
+	bh=3QJbJv8nDTe9UFWDuhjUpYU/uYCzaMl40LclqolWBe4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=SILZd9Iq3jjQtSfeVXKB5Ux10FJHyLSJr5hk8sD5O8BEoxufFl9ECUsJiWtTpeyd3zuDd/44lknjxQ+tX4W8tjVQsSBBJ0BN7r6O3EKa5Xp8sVOEa4/oAcYdyq1SadNrYi+irF1jZwQtM2zWtL6Qu28uhTs/sH/auaI6NW5Mtb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KY9C0Kum; arc=none smtp.client-ip=209.85.128.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7986e0553bdso24627907b3.2
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 17:00:50 -0700 (PDT)
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-78fc4425b6bso28723607b3.1
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 17:00:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773446449; x=1774051249; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WNbQtouWXaM1HjP+6LQU3raUMR1ZrEf/jm2QyUp1DKQ=;
-        b=QN2vWmB7n3xuS/e1Uh9/uWXSL4iSDvOe272H/UGq/jF62o76DizbTK4/4XvPxuRFe4
-         cgdaddZjqW78NeY2hZoWk5oSOZc3BQnYifOv+EmmldtgPFtvpG/Avj4LpAusxHlHva8b
-         +8nFU24KdWKPHN3MdnKSgXAF8c0JTA4rSqz3Kf5tgnD6Tn52HTX5M9fomXHgv5TCw/9q
-         HOeEblGPxYxG6UegVl1kEhgYXi4TfBYXZHb/fPg/b8G7HJuNk8kxLvjkFe1QcO9XavhW
-         TaxWe7SGOQLf7SrPnlAIdy2D/PKHsRsRDho7Ff5G3dumCqmdTgCqLoKHcqpm4lijkzVa
-         sqOA==
+        d=gmail.com; s=20230601; t=1773446450; x=1774051250; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7Z7785Nihx26mdg32kyA0yD1bLg4oGypoWx8npW/Glg=;
+        b=KY9C0KumKzeU02ILZfuBgAwQviCfd0XPb8iCT0FGtxktjJ5mEWdZ5n2ii+WvGZYECf
+         niQ22wo9yDCs25cEI+VxGqjb6eTSwg+B+yD0SFufneNbt2EywYbrgHlN9ItLyYTGPtwO
+         i8OVPX4fLpO6SYHWXHhPhryYYj4VdJhbOBGLyqmYScFczQPStJXgfOlZwX/AbR7weKXA
+         5Rvpgrt3iunzW8nMsg7oBl/ytCeE6X597f0NPF0VKLLOHTkUh8txZd0eN/U9haP75i+t
+         U7fAXp7o37v/fidONvqXsXq5UVrMx01sihK0CvkAONn1wtHuzG2QYAjSYzZUP0xENGyS
+         VJ0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773446449; x=1774051249;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WNbQtouWXaM1HjP+6LQU3raUMR1ZrEf/jm2QyUp1DKQ=;
-        b=iMsB5EN5wzTm5FfKWtqrnxWUhg3MSka3rDrkrOE430cnTyB4fHypGlAZAx85el26yI
-         okbkRAf7CaQRV/2gRZ0bzXtJZoOLKPSjDJ2/Q8wYunfeLXvyHZ72h0DgJhiqS47yz48T
-         di14CfpVcRNVWAUNBusHyyZQjNsIuW0X/cd//X92gZEthDngWPt0u3U5M5R1B7F5OXPH
-         tVC7cs2QWoZN7suHfT12oKMCCZ2wpgfoEASvMy0gSMAZ5OWTWgH0OE7opOO0Pq39UYcE
-         krHBnbU7ymOx00UDQOSFZVzPnMSRbt+cUKdZ94B2KL+p8rNCaUnGregUPjk96ReAD/tZ
-         HtvA==
-X-Forwarded-Encrypted: i=1; AJvYcCVNflRY2ofw7F6IDQ+pAErX5Puox1TmwTWybuC2MiCjt87WCmoRi6TNvArDG1dhRsmPfBk4gTs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwY5Z0MP1OaZGe72eJSkM4kd7vCEiY0o44QwOr8UWeuIxrt+GIk
-	vxlZk/cdDKlSpFrdc+iEm0+TkAGT3CglfE4B1WUdo1K6LOSFeZ9omnKW
-X-Gm-Gg: ATEYQzwMMIgq/Av4Xu9cHgda/C2oLH/3ieABXGAQHXjwmVzgetKzrr6sLUhCwxi0LIj
-	ulhoPFNsyiLCS+WnIuFxC1cQ2WokaiJjoCE7TxC3CqH7wEzt/V7ghb7pTb+v2DB7xD7HP1p2E/P
-	DU0TnQQkyv2EmcCoOqXmGhwXbnxZUjMemkx/9UUeWmm4HoHnmUnaSJlXjJ4/IAYXIDMKve+4QwQ
-	yUxwZHGq78bAMtyYh/t6u2Cx08j5mNHoGq6PSgrYdMaIK4ATAFXrxVTcMkFWJwxqVZdAc/ZPfgv
-	1W72Hjqq3hrpK0HTRvIuXHHmzHJh23T2r7l9LKKOi9qI1D5Gp4Ay04m1EsTq/s/0CDqrtw1tk+a
-	os+mOje6+TRFLVyXqAhnJndaj3eN/USDC609SnfuStw77KTaQCdECQheq0GB6qKTMjPALioHFVq
-	QsSv6LrpzR3ClcVRZ1FhErrsHm310HX3o=
-X-Received: by 2002:a05:690c:ec8:b0:796:5a14:87c6 with SMTP id 00721157ae682-79a1c0892b5mr54774307b3.4.1773446449477;
-        Fri, 13 Mar 2026 17:00:49 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:7::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7991923673asm55811097b3.21.2026.03.13.17.00.49
+        d=1e100.net; s=20251104; t=1773446450; x=1774051250;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=7Z7785Nihx26mdg32kyA0yD1bLg4oGypoWx8npW/Glg=;
+        b=nsOZvaUShaBiOI3eh/FqBw7x+zSd0w0hK0eYHlgbvKdUVuVtW1K/df/5O7RrhShvbX
+         VWmYuJ2+QvA7AE9BQKCTDHNeOrdgOGJuALOyiS9/VKZSvPpihTh2awORKHKVGgXCdnJ0
+         4PwncBclqXWgIijVTZLo7rBqjT/uzfj7vGBHcsG000ytraijGpcshnpH0VoFHAi5tMYX
+         RyWX86UA6dzF+FU7WJq4V4uEOX2B46QMcrcDKNE+wFgfPIbCZH3wxhCo8cRhCIoUa5/p
+         7FmYBDygZgrXGYgROpK9iUWHlfgZXN6si6YC1mwZJHXzqIZjiSHjxIQV8Qm8NmyX36w3
+         8wYw==
+X-Forwarded-Encrypted: i=1; AJvYcCWqdQ3LevKNbjhvI8f5+4WQuC0sjkUw4lKroHqQZgLCatWIfFwRnL+7hqFrBoLd3DjjR3ur22U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+iTI1gCxNnaOioDNiSWoZ0Fn6PFPLTLcP1JkEYmuWzJROhlUa
+	gLQ784aNbY519VK6itGtzU9hzcysmyGO+TFONNDTB4jbgxU82tw1AfV0
+X-Gm-Gg: ATEYQzxkhHqEakP5vKe2vSHvu5g5lqK8Qke9h8hDF47hnBocqDTRumGF9MxXjwBXEWi
+	a7paI+dIQnWLHkcopl1zgFPNvhKEwu2C+Nm5MNX5xxFpi8y3/zzb26H6PqI2+SfSImCojQtJQIw
+	874ehfnG2CCWdgxD2NuNWhsqfsE4Rt1z18QiPJL3m5vKDCDsJeReHIWsWmauu8xL/nVs1l/LYt2
+	p3XzcmM5ApaWaPSLqZuaZqvyvYKx5OHAoTMUxWTyQ2PgH7UASpZ/YJcBlToo49YohIexj0yxBA0
+	z7Lx1DpE5pX9bMu69adjjQ0etF80cRDtrx318JReNrEwa2cHw5uVZHjl358TrKvvSkNGBpfAiGo
+	Yw55NWYXmWccJYGOA7YdZf132TfY7COcjM0VYwZ9R8Y5eNoLqqYgXCM8J/vB4CfqnI1jIWqNJ3F
+	o+5zpjeEl810/Bs1J897w6jg==
+X-Received: by 2002:a05:690c:e3ee:b0:799:1773:527d with SMTP id 00721157ae682-79a1c100004mr58333657b3.29.1773446450219;
+        Fri, 13 Mar 2026 17:00:50 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:55::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-79917ee4fdfsm57042447b3.25.2026.03.13.17.00.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 13 Mar 2026 17:00:49 -0700 (PDT)
 From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Subject: [PATCH net-next 0/2] selftests/vsock: support nested VM runner for
- vmtest.sh
-Date: Fri, 13 Mar 2026 17:00:13 -0700
-Message-Id: <20260313-vsock-vmtest-nested-fixes-v1-0-d0e6274c3193@meta.com>
+Date: Fri, 13 Mar 2026 17:00:14 -0700
+Subject: [PATCH net-next 1/2] selftests/vsock: fix vmtest.sh for read-only
+ nested VM runners
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,10 +88,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAA6ltGkC/x3KQQqDMBAF0KsMf+2AMUVqrlK6EPNtQ2ksmRAE8
- e6lXb93wFgSDUEOFLZkacsI4jrB8pzzg5oigmDoh7H3zmuzbXlpe1da1UyrjLqmnaaTu67xEv0
- 8jQ6d4FP4BwS5IfO394r7eX4B8SxAJXUAAAA=
-X-Change-ID: 20260313-vsock-vmtest-nested-fixes-918fd4d3a961
+Message-Id: <20260313-vsock-vmtest-nested-fixes-v1-1-d0e6274c3193@meta.com>
+References: <20260313-vsock-vmtest-nested-fixes-v1-0-d0e6274c3193@meta.com>
+In-Reply-To: <20260313-vsock-vmtest-nested-fixes-v1-0-d0e6274c3193@meta.com>
 To: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>
 Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
  linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -99,12 +99,12 @@ X-Mailer: b4 0.14.3
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267642-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267643-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -117,38 +117,119 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.995];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.992];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vmtest.sh:url,meta.com:email,meta.com:mid]
-X-Rspamd-Queue-Id: 3226528AC9E
+X-Rspamd-Queue-Id: 059A828ACC4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This series fixes a few issues trying to launch vmtest.sh in a nested VM
-environment and were discovered when trying to prepare the tests for
-netdev CI/CD.
+From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-When taken together these patches make vmtest.sh work both on bare metal
-and in nested VMs, regardless of the outer VM's user, coincidental path
-overlaps, or filesystem settings.
+When running vmtest.sh inside a nested VM, there occurs a problem
+with stacking two sets of virtiofs/overlay layers (the first set from
+the outer VM and the second set from the inner VM). The virtme init
+scripts (sshd, udhcpd, etc...) fail to execute basic programs (e.g.,
+/bin/cat) and load library dependencies (e.g., libpam) due to ESTALE.
+This only occurs when both layers (outer and inner) use virtiofs. Work
+around this by using 9p in the inner VM via --force-9p.
+
+Additionally, when the outer VM is read-only, the inner VM's attempt at
+populating SSH keys to the root filesystem fails:
+
+virtme-ng-init: mkdir: cannot create directory '/root/.cache': Read-only file system
+
+Work around this by creating a temporary home directory with generated
+SSH keys and passing it through to the guest as /root via --rwdir.
+Disable strict host key checking in vm_ssh() since the VM will be seen
+as a new host each run.
+
+The --rw arg had to be removed to prevent a vng complaint about overlay
+(in combination with the other parameters). The guest doesn't really
+need write access anyway, so this was probably overly permissive to
+begin with.
 
 Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
 ---
-Bobby Eshleman (2):
-      selftests/vsock: fix vmtest.sh for read-only nested VM runners
-      selftests/vsock: fix vsock_test path shadowing in nested VMs
+ tools/testing/selftests/vsock/vmtest.sh | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
- tools/testing/selftests/vsock/vmtest.sh | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
----
-base-commit: 8f921f61005450589c0bc1a941a5ddde21d9aed9
-change-id: 20260313-vsock-vmtest-nested-fixes-918fd4d3a961
+diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+index 86e338886b33..c2cfcdf05d99 100755
+--- a/tools/testing/selftests/vsock/vmtest.sh
++++ b/tools/testing/selftests/vsock/vmtest.sh
+@@ -42,6 +42,8 @@ readonly KERNEL_CMDLINE="\
+ 	virtme.ssh virtme_ssh_channel=tcp virtme_ssh_user=$USER \
+ "
+ readonly LOG=$(mktemp /tmp/vsock_vmtest_XXXX.log)
++readonly TEST_HOME=$(mktemp -d /tmp/vmtest_home_XXXX)
++readonly SSH_KEY_PATH="${TEST_HOME}"/.ssh/id_ed25519
+ 
+ # Namespace tests must use the ns_ prefix. This is checked in check_netns() and
+ # is used to determine if a test needs namespace setup before test execution.
+@@ -257,7 +259,12 @@ vm_ssh() {
+ 
+ 	shift
+ 
+-	${ns_exec} ssh -q -o UserKnownHostsFile=/dev/null -p "${SSH_HOST_PORT}" localhost "$@"
++	${ns_exec} ssh -q \
++		-i "${SSH_KEY_PATH}" \
++		-o UserKnownHostsFile=/dev/null \
++		-o StrictHostKeyChecking=no \
++		-p "${SSH_HOST_PORT}" \
++		localhost "$@"
+ 
+ 	return $?
+ }
+@@ -265,6 +272,7 @@ vm_ssh() {
+ cleanup() {
+ 	terminate_pidfiles "${!PIDFILES[@]}"
+ 	del_namespaces
++	rm -rf "${TEST_HOME}"
+ }
+ 
+ check_args() {
+@@ -382,6 +390,11 @@ handle_build() {
+ 	popd &>/dev/null
+ }
+ 
++setup_home() {
++	mkdir -p "$(dirname "${SSH_KEY_PATH}")"
++	ssh-keygen -t ed25519 -f "${SSH_KEY_PATH}" -N "" -q
++}
++
+ create_pidfile() {
+ 	local pidfile
+ 
+@@ -451,11 +464,14 @@ vm_start() {
+ 		--run \
+ 		${kernel_opt} \
+ 		${verbose_opt} \
++		--rwdir=/root=${TEST_HOME} \
++		--force-9p \
++		--cwd /root \
+ 		--qemu-opts="${qemu_opts}" \
+ 		--qemu="${qemu}" \
+ 		--user root \
+ 		--append "${KERNEL_CMDLINE}" \
+-		--rw  &> ${logfile} &
++		&> ${logfile} &
+ 
+ 	timeout "${WAIT_QEMU}" \
+ 		bash -c 'while [[ ! -s '"${pidfile}"' ]]; do sleep 1; done; exit 0'
+@@ -1532,6 +1548,7 @@ check_deps
+ check_vng
+ check_socat
+ handle_build
++setup_home
+ 
+ echo "1..${#ARGS[@]}"
+ 
 
-Best regards,
 -- 
-Bobby Eshleman <bobbyeshleman@meta.com>
+2.52.0
 
 
