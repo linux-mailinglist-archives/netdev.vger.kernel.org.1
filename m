@@ -1,60 +1,79 @@
-Return-Path: <netdev+bounces-267672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267673-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eC5xFXn2tGkHvAAAu9opvQ
-	(envelope-from <netdev+bounces-267672-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 06:47:37 +0100
+	id YHixOZP9tGkAvQAAu9opvQ
+	(envelope-from <netdev+bounces-267673-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 07:17:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3C9828BD37
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 06:47:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6602E28BDA2
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 07:17:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F074A305B086
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 05:47:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 12078303CED2
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 06:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9512F1FC3;
-	Sat, 14 Mar 2026 05:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0958003D;
+	Sat, 14 Mar 2026 06:17:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=me.com header.i=@me.com header.b="D4hACL+f"
+	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="x/BDMSS9"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster5-host6-snip4-2.eps.apple.com [57.103.79.95])
+Received: from mx0a-00206402.pphosted.com (mx0a-00206402.pphosted.com [148.163.148.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE9D264614
-	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 05:47:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.79.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE23218B0F;
+	Sat, 14 Mar 2026 06:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.148.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773467224; cv=none; b=kHFcSxty6QKW0aCSnT4S64bzQ1856KjvPAZeqiGmAV/DNmgrX5FP1He7nROBDVCVKz8k+Dy2Fc2LIimwn9XUlNVbcEOKf+9VtE6H4mVsPFO+puDrAGAGE8/4tNTXYLNFTp44YYGmPLbQxlqrb/odzr1VHKJCk4vFD4fpmbtca34=
+	t=1773469068; cv=none; b=uoGaxFuE0GhSDughn2AEHI+EHUEVXavAT/1hFsGxfTARfZG6ZckNkuV7YT1pwtMJ+cHftq5ofbFn0AeEe1gxoS0i+YGJ1qbeRAKYnB6nSqcF5ILY8KQxdeIUykRQ7NynsLbLZPNPOvx3Yl1VGFVxdwYSxIo6fLxVqIs7mwL0jcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773467224; c=relaxed/simple;
-	bh=r/Y9+eV0y9NRXpqsmsVhkOxb3EJuKBHFAD9Z9PX0OJ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EzOqTZaOvrVsAf3J6PqGUW/8ZbglVOLq95LakvwDe486aO+ZKZgNsrMxl4GfxYCwPte1tP4jlvum3cdaRL4yoxlyzDQsGYpuxe8v3yhbXB9pkYVf6zJ7Un0OX2rR3a9Atg8Pv1QCoY02tsM78UQUMPWifbkspvinMYnzs3MZUH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=me.com; spf=pass smtp.mailfrom=me.com; dkim=pass (2048-bit key) header.d=me.com header.i=@me.com header.b=D4hACL+f; arc=none smtp.client-ip=57.103.79.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=me.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=me.com
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-3 (Postfix) with ESMTPS id C0A8518000BC;
-	Sat, 14 Mar 2026 05:46:58 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=me.com; s=1a1hai; t=1773467222; x=1776059222; bh=ByIdtOQ7hDJ1Q78bJf0XQmaMBtIrKorokTIO5FAIGkg=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=D4hACL+fMz2BKR8ne2CPlHfSmC1EMgAS7seSUUct3kiaOKjctP6Qnx2zh8btnLyafvbR7wXBG1xFRP7mjoJYgbvcwPKX+i2eLhHpjR3GEe8t7tvg2YZv6Yy6S3c/t/hHnQfDCXIDCcsHun9BdAOKorgN654jIJAC9sZLnGlTuIfKC9lgXzx1gE5greNGjTv6vopncSpoVbk+ZUIj2lACY7AZjVt2rTBZ/V1/rezzCXh0QV2iEvVj+LaLZPSmCqLXVHvHXFlV9O0aabeu/pK02qp7CPo/Gzx5fAodlMJF6x03ogApUfJu251psTFh0UKbuz7gB0CGUVY7sic3GXTqXg==
-Received: from bimmer.. (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-3 (Postfix) with ESMTPSA id 01BE8180009D;
-	Sat, 14 Mar 2026 05:46:56 +0000 (UTC)
-From: tobgaertner <tob.gaertner@me.com>
-To: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Cc: kuba@kernel.org,
-	gregkh@linuxfoundation.org,
-	oneukum@suse.com,
-	bjorn@mork.no,
-	Tobi Gaertner <tob.gaertner@me.com>
-Subject: [PATCH v3 2/2] net: usb: cdc_ncm: add ndpoffset to NDP32 nframes bounds check
-Date: Fri, 13 Mar 2026 22:46:40 -0700
-Message-ID: <20260314054640.2895026-3-tob.gaertner@me.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260314054640.2895026-1-tob.gaertner@me.com>
-References: <20260314054640.2895026-1-tob.gaertner@me.com>
+	s=arc-20240116; t=1773469068; c=relaxed/simple;
+	bh=exSq1+nyMdnVYrdoedu76d6IsOt5pNWn9a7vuf+Cq18=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=prsy6iS4zJolPi7Y7HkH8OA3HeuBEo0IqjLTExNWqGOM0fRwaKzl3YlKKdRyT8dj9L2gYpdJDY4fvpxZQ8LCNQXZMFTMTnALwNdZqpfWL2bhRCsxn7YPDWw2Ea0dNhnS4ISIAqDDBQEBjOn2pH6ekQpxcUGwt4NcbyOlezOEf78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=x/BDMSS9; arc=none smtp.client-ip=148.163.148.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crowdstrike.com
+Received: from pps.filterd (m0354652.ppops.net [127.0.0.1])
+	by mx0a-00206402.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62E3x0Lw3051533;
+	Sat, 14 Mar 2026 06:17:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crowdstrike.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	default; bh=PW0Y12woatit9y13BzrGbqEQrxprAIQiZw7ZpldBc/8=; b=x/BD
+	MSS918ZkuLpiKfe8kuTdv1qrkrMzh5t1dfNqaXVYTVLt8vtIlQL0leKr/zwfRY2A
+	Qg9q59cxCx4NGs3om3xPqNI8b6nCvdsa04ZuDZ8rceudRMj5gTp5BWc0r8uUVCMP
+	SAlP4oKorXpDqTgak8HrZLRFKZABGQtDG/bVM/cuftWirIamm3kVf073ghBr/jiv
+	UIpS+TWXFl6zMHNCy7qFuUGEEAdlxK3L1pAYrn/aVfGGXrWxldWHfjW7CpOkPIYZ
+	9f1yyo1qraVwxrDAs5wgAERBQhtNeUPuznfeefJLJx13zKsyGEagAZFvIV0qSizT
+	YZ7Fu7zhfut0z5XKog==
+Received: from mail.crowdstrike.com (dragosx.crowdstrike.com [208.42.231.60] (may be forged))
+	by mx0a-00206402.pphosted.com (PPS) with ESMTPS id 4cw08eg904-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 14 Mar 2026 06:17:03 +0000 (GMT)
+Received: from ML-CTVHTF21DX.crowdstrike.sys (10.100.11.122) by
+ 04WPEXCH006.crowdstrike.sys (10.100.11.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Sat, 14 Mar 2026 06:16:56 +0000
+From: Slava Imameev <slava.imameev@crowdstrike.com>
+To: <alexei.starovoitov@gmail.com>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bot+bpf-ci@kernel.org>,
+        <bpf@vger.kernel.org>, <clm@meta.com>, <daniel@iogearbox.net>,
+        <davem@davemloft.net>, <eddyz87@gmail.com>, <edumazet@google.com>,
+        <haoluo@google.com>, <horms@kernel.org>, <ihor.solodrai@linux.dev>,
+        <john.fastabend@gmail.com>, <jolsa@kernel.org>, <kpsingh@kernel.org>,
+        <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-open-source@crowdstrike.com>,
+        <martin.lau@kernel.org>, <martin.lau@linux.dev>,
+        <netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@fomichev.me>,
+        <shuah@kernel.org>, <slava.imameev@crowdstrike.com>, <song@kernel.org>,
+        <yonghong.song@linux.dev>
+Subject: Re: [PATCH bpf-next v5 2/2] selftests/bpf: Add trampolines single and multi-level pointer params test coverage
+Date: Sat, 14 Mar 2026 17:16:54 +1100
+Message-ID: <20260314061654.3858-1-slava.imameev@crowdstrike.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <CAADnVQKcutn9QO4UjfcnPw+Tnv2pmHavXCa-BC083rrgP8w_ng@mail.gmail.com>
+References: <CAADnVQKcutn9QO4UjfcnPw+Tnv2pmHavXCa-BC083rrgP8w_ng@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,104 +81,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: YiFsOpSpNtPmcu0EKWRIpdaXii9R1PUl
-X-Authority-Info-Out: v=2.4 cv=eb0wvrEH c=1 sm=1 tr=0 ts=69b4f654
- cx=c_apl:c_pps:t_out a=YrL12D//S6tul8v/L+6tKg==:117
- a=YrL12D//S6tul8v/L+6tKg==:17 a=Yq5XynenixoA:10 a=x7bEGLp0ZPQA:10
- a=C3-SEi6G3EkA:10 a=VkNPw1HP01LnGYTKEx00:22 a=HHGDD-5mAAAA:8
- a=LUIGT9A1_zUNolzWI8IA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE0MDAzOSBTYWx0ZWRfX+MdZNBbllHwk
- /gi1hr50s+x/NywSbA3hODeYJi1QcdWqQ5vY+M/B6fbpLLNvhDfS7lcgGyZQ6Kw4xEdSKjqA28L
- iSGFHJ3hqOxmcf0zfcY6JV0nxWUNYAWbUtCzFoXko1PuQM/Hv2MyyZKbcpfrjuwb3CVTxRNlxSF
- IzQixgHZAJlwWAsy3b44DXoz6D6bKdZuMbEX2JDkG7ucrW1M3cNcp5TUwHVJF8JIH9wO7vBRDB1
- dhIfasvQbZsJvKyqvcQ595nrQWZMOaHcDF5+EUvLzS6KGoDzN8Z6+u7sZEhV43nYZrp5FFG6qIq
- Cl9L26kWobrukkmu/PwwXP2zJ13vHoUxMuglPln9+jyx/gVeXMiJvJ7+tqbfOc=
-X-Proofpoint-GUID: YiFsOpSpNtPmcu0EKWRIpdaXii9R1PUl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-14_02,2026-03-13_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- bulkscore=0 mlxscore=0 adultscore=0 spamscore=0 mlxlogscore=800 phishscore=0
- lowpriorityscore=0 suspectscore=0 clxscore=1015 classifier=spam authscore=0
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2603140039
-X-JNJ: AAAAAAAB/+u1cLqjkcN8Ea3ZcclNdBqvxRNNL3hMAsmOBmoTQOPN+dJsr0dg6igthqnr8MhdvSrne1gTMrmKGxZqJPmPQgf3R3/k7nMCiqe3kxIJ8KiQ2IixxLq7NTsj6/c9iVrDYkKApQ/mM8eaQ+GZwIraFSKb/z7mjbOYCXIUVjUOtwU8wct7LTzV3yWqQlPcU7Gft9e2MdxXxQkUZSEgIrFsqescGKcfp72XK7JuloY1Bl2KZaXo8T1c91AgHICzAUhIF8AgiHJAv2wjqNH3RC6x3N5EN9hjoG+fm7Vp1D1fCCGf1CFkI3FcFpFHblXXQoau6EgRt/b35so1mD3xtilW/ygLp/AbARTp7FoXYFSCHx9hWkU1cr+NcGjZ9r3b9+8K+tAJ5Vd8BG5M/tODll7iXjCcXovNl5sa+E7aycZ0cneS4293wYvA68XpeCNsz5KMPHTlkP71ccqkvziVv2DwqmIHsDliAemm8NrYEzPq8w9bB/iB97PzA0iQAFYqWjfqbebMOPHCiU8NoIDkGTsglXzYDKOKtEO6qFkQ2LY29whm8MJI6O18wl3JbMYJmSp1epjgJkde6uV+XbRmN4CsGuowF3zbMeC2C+L4DNcK5dXDvtYXSwGOtNs6pSc7sLptXeyK2NqksVqoo9oJsMtkQD9kIhnxAT+3C2OV8SZI3vOXFrjq/zeVFqjSXtReeDM1b5MHQBI=
-X-Apple-Category-Label: Mjg5MDYwMTc4OiRjYXRlZ29yeSRfUGVyc29uYWws
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+Content-Type: text/plain
+X-ClientProxiedBy: 04WPEXCH014.crowdstrike.sys (10.100.11.87) To
+ 04WPEXCH006.crowdstrike.sys (10.100.11.70)
+X-Disclaimer: USA
+X-Proofpoint-ORIG-GUID: ZMTuJ3E3jwqQugIzRAMkUAe_Ok94aS14
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE0MDA0NiBTYWx0ZWRfX9okSR4b0OCKa
+ awFeTYZwiyKmgfIoHONfTvPibTe31XIi944+vaBk53kEIhFK95ngo2YD5BPSPERM7w0xVon+DbB
+ I41hupbyIbrZGkm4IgefdlcCEedKbf3MljYhfczuL5ovHy0MqKMLkrnERRHL6dKKkJHH/I3mkGg
+ f/w/i8lWHPdmfNT65vbGgfS1HoRAUAitFPX0BXuHTBYT+pDyZb68ZZtAJG6idNCoQhCpOLR4Kkf
+ Z2xwztIhCaBLjIvpFEpt0xYLw6EpMXAUnUps78M82HQzOatRwWqTtkUCqUvvCFdv4y0U9rTEfoi
+ WQ+CMgKxBtVhmpTFeaIJHrqsQBK+inHacJM7Rb9NA/bAd6vWejCyCFRFm7GOQEKkNLwFlBxDKyr
+ cZSU90dxwcGEEWOaOTPeigWKLXQHNZ0slWV2Vd1PBrTQTTiCNfU194aEi7XWTaJEFHe5L90spKL
+ Yi9GNv9ETpjhI/b7u3w==
+X-Authority-Analysis: v=2.4 cv=fsfRpV4f c=1 sm=1 tr=0 ts=69b4fd5f cx=c_pps
+ a=1d8vc5iZWYKGYgMGCdbIRA==:117 a=1d8vc5iZWYKGYgMGCdbIRA==:17
+ a=EjBHVkixTFsA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=T2KQ53IYiC3MXPrxx8bB:22 a=2KvRFfd_T_-xjmS8C1aD:22 a=VwQbUJbxAAAA:8
+ a=DICdAnnu9tm1VdgAv38A:9
+X-Proofpoint-GUID: ZMTuJ3E3jwqQugIzRAMkUAe_Ok94aS14
+X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11728
+ signatures=596818
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 priorityscore=1501 malwarescore=0 clxscore=1015 bulkscore=0
+ suspectscore=0 spamscore=0 phishscore=0 impostorscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603140046
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[me.com,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[me.com:s=1a1hai];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[crowdstrike.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[crowdstrike.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,linuxfoundation.org,suse.com,mork.no,me.com];
-	TAGGED_FROM(0.00)[bounces-267672-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,meta.com,iogearbox.net,davemloft.net,gmail.com,google.com,linux.dev,crowdstrike.com,redhat.com,fomichev.me];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tob.gaertner@me.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-267673-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_NEQ_ENVFROM(0.00)[slava.imameev@crowdstrike.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[crowdstrike.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[me.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[me.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[me.com:dkim,me.com:email,me.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C3C9828BD37
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[crowdstrike.com:dkim,crowdstrike.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6602E28BDA2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Tobi Gaertner <tob.gaertner@me.com>
+On Sat, 14 Mar 2026 02:42:28 Alexei Starovoitov wrote:
+> On Fri, Mar 13, 2026 at 6:55=E2=80=AFAM <bot+bpf-ci@kernel.org> wrote:
+> >
+> > > diff --git a/tools/testing/selftests/bpf/progs/verifier_ctx_ptr_param.c=
+>  b/tools/testing/selftests/bpf/progs/verifier_ctx_ptr_param.c
+> > > new file mode 100644
+> > > index 000000000000..b507dc850543
+> > > --- /dev/null
+> > > +++ b/tools/testing/selftests/bpf/progs/verifier_ctx_ptr_param.c
+> >
+> > [ ... ]
+> >
+> > > +SEC("fentry/bpf_fentry_test_ppfile")
+> > > +__description("fentry/struct file***: struct file *** inferred as scal=
+> ar")
+> >
+> > The description says "struct file ***" (triple pointer), but
+> > bpf_fentry_test_ppfile() takes a struct file ** (double pointer):
+> >
+> > net/bpf/test_run.c:
+>     noinline void bpf_fentry_test_ppfile(struct file **ppf)
+> >
+> > Should the description be
+> > "fentry/struct file**: struct file ** inferred as scalar" instead?
+> 
+> Pls don't ignore bot reviews...
+> Do you agree or not?
 
-The same bounds-check bug fixed for NDP16 in the previous patch also
-exists in cdc_ncm_rx_verify_ndp32(). The DPE array size is validated
-against the total skb length without accounting for ndpoffset, allowing
-out-of-bounds reads when the NDP32 is placed near the end of the NTB.
+I'm not ignoring the bot - I'm in Australia and pushed this
+patch late at night at 12:05 AM Saturday. The bot replied 50 minutes
+later at 12:55 AM Saturday, and I was already not at my desktop.
 
-Add ndpoffset to the nframes bounds check and use struct_size_t() to
-express the NDP-plus-DPE-array size more clearly.
-
-Compile-tested only.
-
-Fixes: 0fa81b304a79 ("cdc_ncm: Implement the 32-bit version of NCM Transfer Block")
-Signed-off-by: Tobi Gaertner <tob.gaertner@me.com>
----
- drivers/net/usb/cdc_ncm.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/usb/cdc_ncm.c b/drivers/net/usb/cdc_ncm.c
-index a9d0162b5..81d7e99fc 100644
---- a/drivers/net/usb/cdc_ncm.c
-+++ b/drivers/net/usb/cdc_ncm.c
-@@ -1693,6 +1693,7 @@ int cdc_ncm_rx_verify_ndp32(struct sk_buff *skb_in, int ndpoffset)
- 	struct usbnet *dev = netdev_priv(skb_in->dev);
- 	struct usb_cdc_ncm_ndp32 *ndp32;
- 	int ret = -EINVAL;
-+	size_t ndp_len;
- 
- 	if ((ndpoffset + sizeof(struct usb_cdc_ncm_ndp32)) > skb_in->len) {
- 		netif_dbg(dev, rx_err, dev->net, "invalid NDP offset  <%u>\n",
-@@ -1712,8 +1713,8 @@ int cdc_ncm_rx_verify_ndp32(struct sk_buff *skb_in, int ndpoffset)
- 					sizeof(struct usb_cdc_ncm_dpe32));
- 	ret--; /* we process NDP entries except for the last one */
- 
--	if ((sizeof(struct usb_cdc_ncm_ndp32) +
--	     ret * (sizeof(struct usb_cdc_ncm_dpe32))) > skb_in->len) {
-+	ndp_len = struct_size_t(struct usb_cdc_ncm_ndp32, dpe32, ret);
-+	if (ndpoffset + ndp_len > skb_in->len) {
- 		netif_dbg(dev, rx_err, dev->net, "Invalid nframes = %d\n", ret);
- 		ret = -EINVAL;
- 	}
--- 
-2.43.0
-
+I will make the necessary changes to the test description. The bot is
+correct that it should have been "struct file **" - I mistakenly
+carried over the triple pointer description when copy-pasting the
+comments.
 
