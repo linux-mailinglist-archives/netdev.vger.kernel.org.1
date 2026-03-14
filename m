@@ -1,152 +1,260 @@
-Return-Path: <netdev+bounces-267656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267657-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MK8xEtSttGmDrwAAu9opvQ
-	(envelope-from <netdev+bounces-267656-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:37:40 +0100
+	id MDI7Op62tGm4sAAAu9opvQ
+	(envelope-from <netdev+bounces-267657-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 02:15:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B375928AF9B
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:37:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E57D28B326
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 02:15:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5E37B303D8AE
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 00:37:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D1E9731A9205
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 899AF282F2E;
-	Sat, 14 Mar 2026 00:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92BA82DCBEC;
+	Sat, 14 Mar 2026 01:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gvEPv2PX"
+	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="OZeUODa/";
+	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="EWTg8vRf"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7431A0BD6;
-	Sat, 14 Mar 2026 00:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875A62E11D2
+	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 01:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773448655; cv=none; b=BE5HOitTzoppDufkTJDTGW6rLLDauDL4bggHQfriCjU/t2CJs7NTbv5K3smMDtePSmd6PSZwKaImEsXkao+KwBlTwBID9c0/uyDut0GIY/to9rHEg6+d2vdbcixz7yLrEWDwyFIolKLby5iRjEVXRRWl3umZMPiy0GNNJc1nTy0=
+	t=1773450589; cv=none; b=Tah3ueDTUtObMW6HaRmnBpIVoq8CLnuf2+RkxZs1b278md2cLDZ0yjMO0Ue9tk1Jmv0sL4MyNcHcy2vK0rG4pie5l1u7kBYqcUz40sdSmF/RPzkRwnW6hZ290DGGSc+53b/5OV3FgegsIKIW9RkcixYY0ZDnvC+zRNlQ8ybsL0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773448655; c=relaxed/simple;
-	bh=8Xhm0BI6G0WN1odJrirW3+Ubnsz1u/9Up3kuHfBpF6k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XLN5Q37Cw/DumYVakSTLpqm8Gm4y04qr9hpK8ywdngvs1ufWngqdTawfr+kJzap7bfaCAye/jz5RIERWFRsbaCGxDx9qsC0+gm9sWAkmC977Yolzau8IMeFsGb7Vsf9FN60ASrffm0GMrMNXGY3xFdV8ljt2OuWIdFhdoOno30s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gvEPv2PX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=eZWqpZg1vOaiKoR4DSlmunCSlEkK8XZEpM9MEr5G5jo=; b=gvEPv2PX110hBhxslOImfIn0f9
-	LWAqEeoOdUn5h2RMYq340b79VLWjiw8QYQT8S9fpGdRrjvWvRXJhojIqIPrYBOtaPIfTAsVbmbnT0
-	LchiVCn6TZbpvagNcWV2HN9SKb1EYKqM6Z4jH5qMBbd8Q9AnoU7NgPSkFh+GeDGq1xVTc8gOqtNKr
-	EblEw+cHjU2I0ypHpYMQU4Z+W2NuLabkTO3euT5SO6bX/teM6DkzXhlhjbiphjuH98pVp1xy3FI5T
-	7q/ta1QFx5ut7ow/Wv187iiSm2oPibYZ3AiX1bHmgMXmM2Xk0eHDUAZ6AFv8UGuNl+wlncRxUk/Bg
-	py9Xu4KQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48042)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w1D0M-000000001eZ-3hM7;
-	Sat, 14 Mar 2026 00:37:22 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w1D0J-000000000FZ-3Cxy;
-	Sat, 14 Mar 2026 00:37:19 +0000
-Date: Sat, 14 Mar 2026 00:37:19 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Linus Walleij <linusw@kernel.org>
-Cc: Christophe Roullier <christophe.roullier@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	antonio.borneo@foss.st.com,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] net: stmmac: fix pinctrl management during
- suspend/resume
-Message-ID: <abStv0IPLfkKMD-W@shell.armlinux.org.uk>
-References: <20260313105718.359614-1-christophe.roullier@foss.st.com>
- <20260313105718.359614-2-christophe.roullier@foss.st.com>
- <abPwHh12MLwMwOIs@shell.armlinux.org.uk>
- <CAD++jLmBP5Puwf1ZuFOzF6U0XowoF1nfqEL3gwLy-svXsXrbJA@mail.gmail.com>
+	s=arc-20240116; t=1773450589; c=relaxed/simple;
+	bh=QNFUDaCsrOLeka2kBpol1pLbhT3GpOqMWFxBJkqesvE=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=RCIv6eZ/0eqZOPLv+0TL3pi3i68CDLJ//n85XvO9VopLpgnX7qOZlZAx4vASiZq59X9egGnKTQKSXK2545diAT5NKjzvf1B5XciV3y5l409/DBPxhTqmWzxDDqTh7yVfon5aoHSFltLICl5QdHPhV2LWOJy3+CpZY/uCwSFsN/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=OZeUODa/; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=EWTg8vRf; arc=none smtp.client-ip=160.80.4.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth-2019-1.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 62E198b4022517;
+	Sat, 14 Mar 2026 02:09:13 +0100
+Received: from lubuntu-18.04 (unknown [160.80.103.126])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 931EB12045B;
+	Sat, 14 Mar 2026 02:09:04 +0100 (CET)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1773450544; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=355Vr8wgyQcWOEFBUm/IrvEz2FsjymlSTqRmbfmeUao=;
+	b=OZeUODa/05Dq2RLqE2cOB7nnEOQhRG/XBQRvBNFHOM5hp6oFIai0UR/yQy6elOBHJQubo+
+	lpa0YOTb2OW1hLAA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1773450544; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=355Vr8wgyQcWOEFBUm/IrvEz2FsjymlSTqRmbfmeUao=;
+	b=EWTg8vRfGRXmnWhTzpyIKgGwOnYJKmhPv7G0fHxqaMYfHmftdpasYqOfvsb8HJtkbo7kzo
+	0fPJQDt2xL2TWExUUj85isZGCWGSGWvMF5rFaRXNmFfLZVZKOTp2VHyz2DW4BB8A/FymCR
+	tT3lg5OBVDKHObvGMWm1ZbihqAutKfmzHhFDOheNoxMMizqIpbSF/imTBVBuPJNiRmOrkw
+	xACEV6k0hWR4buLslajnfvEidf+ydC49cQnyTlN8TW1i024pIIw6xhAYW8y6WZGD7EHNun
+	7Qgj3xyQcEN4iP5S8/KMulaplTj41GueV04tDHkN0+3ajU+nhLZZHrx3KbtFuw==
+Date: Sat, 14 Mar 2026 02:09:04 +0100
+From: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: Justin Iurman <justin.iurman@6wind.com>,
+        Nicolas Dichtel
+ <nicolas.dichtel@6wind.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org, justin.iurman@gmail.com, stefano.salsano@uniroma2.it,
+        paolo.lungaroni@uniroma2.it, ahabdels@cisco.com,
+        Andrea Mayer
+ <andrea.mayer@uniroma2.it>
+Subject: Re: [PATCH net-next v2] seg6: add per-route tunnel source address
+Message-Id: <20260314020904.3ec2344109a66ee70b2ec1ac@uniroma2.it>
+In-Reply-To: <CAOY2BqwgYYibttTCc15a2SD=4RHMj43F47Ev20_u-a-siPzuOg@mail.gmail.com>
+References: <20260311152845.278354-1-justin.iurman@6wind.com>
+	<20260313030220.af70f3b5f2c5d2cb7b4a840e@uniroma2.it>
+	<CAOY2Bqz8_8iT2Auw=sWob0-XUQg-sPmdAFvzRLg+KszrU6LMqA@mail.gmail.com>
+	<43e16e45-5fb1-4413-bbd1-4752bbcdec7d@6wind.com>
+	<CAOY2Bqx6jjBc5FCoRg+64v2L17bBsaAE8sy7P4JCwVXc+1n7_Q@mail.gmail.com>
+	<3d9d384f-d001-4293-b7d5-7a88596ffc1d@6wind.com>
+	<CAOY2BqwgYYibttTCc15a2SD=4RHMj43F47Ev20_u-a-siPzuOg@mail.gmail.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAD++jLmBP5Puwf1ZuFOzF6U0XowoF1nfqEL3gwLy-svXsXrbJA@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267656-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,bootlin.com,nxp.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com,uniroma2.it,cisco.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267657-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[uniroma2.it:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.968];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: B375928AF9B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,uniroma2.it:dkim,uniroma2.it:email,uniroma2.it:mid,6wind.com:email,bootlin.com:url,srv6_hencap_red_l3vpn_test.sh:url,srv6_hl2encap_red_l2vpn_test.sh:url]
+X-Rspamd-Queue-Id: 4E57D28B326
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 14, 2026 at 12:44:56AM +0100, Linus Walleij wrote:
-> On Fri, Mar 13, 2026 at 12:08 PM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> > On Fri, Mar 13, 2026 at 11:57:16AM +0100, Christophe Roullier wrote:
-> > > In the deepest low-power modes, the pinctrl configuration is lost
-> > > and is never restored if the interface is down.
-> > > This commit ensures that the pinctrl state is set in all cases.
+Hi Justin, Nicolas,
+
+First of all, thanks both for the discussion on the link-local addresses.
+
+On Fri, 13 Mar 2026 14:06:26 +0000
+Justin Iurman <justin.iurman@6wind.com> wrote:
+
+> On Fri, Mar 13, 2026 at 10:59 AM Nicolas Dichtel
+> <nicolas.dichtel@6wind.com> wrote:
 > >
-> > Shouldn't the pin state be restored by the pinctrl layer?
+> > Le 13/03/2026 à 11:20, Justin Iurman a écrit :
+> > > On Fri, Mar 13, 2026 at 9:47 AM Nicolas Dichtel
+> > > <nicolas.dichtel@6wind.com> wrote:
+> > >>
+> > >> Le 13/03/2026 à 09:44, Justin Iurman a écrit :
+> > >>> On Fri, Mar 13, 2026 at 2:02 AM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
+> > >>>>
+> > >>>> On Wed, 11 Mar 2026 16:28:45 +0100
+> > >>>> Justin Iurman <justin.iurman@6wind.com> wrote:
+> > >>
+> > >
+> > > [snip]
+> > >
+> > >>>> Whether to also reject link-local is debatable: ip6_forward() does
+> > >>>> drop it, but is there a legitimate use case where a link-local tunnel
+> > >>>> source would actually be needed?!
+> > >>>> I'd argue we should reject link-local addresses as well.
+> > >>>> For instance, using them as a tunnel source violates scope boundaries and
+> > >>>> breaks ICMPv6 error reporting.
+> > >>>
+> > >>> IMHO, I also think we could reasonably forbid LLs.
+> > >>
+> > >> Why rejecting LL? It's legal to use LL as a source address of a tunnel (and
+> > >> forwarding packets in this tunnel). Is this forbidden with srv6?
+> > >
+> > > Well, this is indeed legal (at least nothing prevents it), but they're
+> > > not routable. So question is does it make sense at all? We're talking
+> > > about two nodes on the same layer-2 link as the only valid use-case
+> > > here. I'm not sure it makes sense, especially in the context of SRv6.
+> > Yes, you're probably right. I'm usually uncomfortable with a configuration being
+> > forbidden without any real problem/reason.
 > 
-> What we have in the device core only applies "init" and "default"
-> states, and provides these handles for transitioning to "sleep"
-> and "default" again (like a state machine).
+> After consideration, it looks like ip6_forward() does filter LL source
+> addresses (see [1]), so such packets are never forwarded and there is
+> no violation of scope boundaries. I agree it makes little sense to
+> allow LL source addresses in the context of SRv6, but Nicolas has a
+> point too (i.e., it's not harmful, let's not restrict things
+> unnecessarily). I guess both ways are fine, maybe others can shim in
+> and share their opinions. For v3, I'll just keep it as is, we can
+> still make a change later.
+> 
+>  [1] https://elixir.bootlin.com/linux/v6.19.7/source/net/ipv6/ip6_output.c#L643
 
-What I was meaning is that - for a driver using the "default" state,
-if the hardware loses the pinctrl state during sleep, isn't it the
-responsibility of the pinctrl driver to restore the state rather
-than leaving it in whatever states it happens to be when the SoC
-comes back from suspend?
+Justin, the ip6_forward() check is exactly the drop behavior I was referring
+to. My initial concern was architectural, since a router wouldn't forward a
+packet with a LL source anyway.
 
-If that is not the case, then don't we have a major issue where
-drivers using pinctrl but do not issue any pinctrl calls in the
-resume function are buggy?
+Nicolas, you make a fair point: nothing explicitly forbids using it.
+I initially raised the question just to be on the safe side from the very
+beginning and figure out the best path forward.
+While it is a niche scenario, there can indeed exist valid use cases
+(e.g., a host doing SRv6 encap with a LL source, sending it to a
+directly connected SRv6 router that simply applies a decap behavior).
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Since it doesn't harm the kernel, I agree we shouldn't artificially
+forbid it. Allowing LLs in v3 is fine by me. Let's also see if anyone
+else on the list has further thoughts on this.
+
+
+
+Justin, regarding the other questions from your previous email about
+selftests:
+ 
+On Fri, 13 Mar 2026 08:44:04 +0000
+Justin Iurman <justin.iurman@6wind.com> wrote:
+
+> On Fri, Mar 13, 2026 at 2:02 AM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
+> >
+> > On Wed, 11 Mar 2026 16:28:45 +0100
+> > Justin Iurman <justin.iurman@6wind.com> wrote:
+> >
+> > > Add SEG6_IPTUNNEL_SRC in the uapi for users to configure a specific
+> > > tunnel source address. Make seg6_iptunnel handle the new attribute
+> > > correctly. It has priority over the configured per-netns tunnel
+> > > source address, if any.
+> > >
+> > > Signed-off-by: Justin Iurman <justin.iurman@6wind.com>
+> > > ---
+> [snip]
+> 
+> I agree. The reason why I did not is simply that, IIRC, none of the
+> srv6 selftests actually check the source address ("ip sr tunsrc set
+> xxx" is not even used, and dynamic resolution is the default
+> behavior). Note that the source address is specifically checked in
+> ioam6 selftest though (packet capture + parsing), but srv6 selftests
+> are not designed the same way. What I suggest is to not overcomplicate
+> things and simply modify srv6_hencap_red_l3vpn_test.sh and
+> srv6_hl2encap_red_l2vpn_test.sh to include a test that does encap with
+> "tunsrc" (and we could also add the same with "ip sr tunsrc set xxx").
+> It wouldn't check for a specific source address though, would just
+> make sure connectivity doesn't break like for other tests. Also, the
+> other question is should we duplicate all tests for those cases: with
+> "ip sr tunsrc set xxx", and with "tunsrc". WDYT?
+
+To answer your questions:
+
+1) Just checking for connectivity might not be sufficient here. If an
+   issue causes the kernel to fall back to the default interface IP, a
+   simple ping would still succeed, giving us a false positive. To verify
+   the actual outer source address without overcomplicating things, we
+   could maybe use policy routing (ip -6 rule) or a simple ip6tables/nftables
+   rule on the receiving netns to drop the probe (ping) packet if its source
+   address doesn't match the expected tunsrc.
+   This is just a suggestion, of course; if you want, we can sync offline
+   on this to figure out the best way to handle the selftest.
+
+2) I don't think we need to duplicate the tests right now. We can
+   consider extending the per-route tunsrc selftest to also cover the
+   per-netns tunsrc later, when we start working on that specific
+   per-netns fix.
+
+>
+> [snip]
+>
+> I agree. We could synchronize offline to squash the same fix for ioam6_iptunnel.
+
+Yes, for sure!
+
+Thanks,
+Andrea
 
