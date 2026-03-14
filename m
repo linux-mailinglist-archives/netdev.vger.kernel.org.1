@@ -1,57 +1,67 @@
-Return-Path: <netdev+bounces-267735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267736-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gHlQMwJstWlJ0QAAu9opvQ
-	(envelope-from <netdev+bounces-267735-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 15:09:06 +0100
+	id +Gn2M2pztWmi0gAAu9opvQ
+	(envelope-from <netdev+bounces-267736-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 15:40:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FD1E28D6F3
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 15:09:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3659628D878
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 15:40:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5334302E40F
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 14:09:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CDAB43037478
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 14:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A85C2459C5;
-	Sat, 14 Mar 2026 14:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF55378D83;
+	Sat, 14 Mar 2026 14:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XHq60I1r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fe4C0h2l"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38ABA13DBA0
-	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 14:09:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE09B336885;
+	Sat, 14 Mar 2026 14:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773497344; cv=none; b=AKE1827pjjzBadzxhwmNRSnQ6CPPn6Q8zZ+hZBFcGuhKscMWhn2ZudAUT95PPINnQ3g4hFuNbQNj50FvjeL5JXu+K4+QTqRwDRgV6UcmC/Lx7KeeMAKRWYZHWPm8+fNwBHzpVQKtergY7NqY4F03DkM6pndvhJfSLPKPK/2vEcY=
+	t=1773499161; cv=none; b=h55nsdTkAqxWRCOV0/9u/fshNp70FDztCl0+ruUHwklG7U/Jzlz8nzcwij4XYUAgZ1NNuXa0+Cb+RhlUP5HvQetS6/7j2Li3EC6ATSp28E8z865txFHRKzmTQ5qOYDwAVIDrwzfEqJYaV94AtsAqAzerLMWhKXFp+hkBM/G+CQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773497344; c=relaxed/simple;
-	bh=JeZBxGCWTdgnXP24AZ2xzC4EEtua14BDZ4rDTKgA530=;
+	s=arc-20240116; t=1773499161; c=relaxed/simple;
+	bh=aQt3yN9oC3u1DOXjtnYQ5HIfBnNmVUHhH7ZmHIhVroA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Lh3DDYPSEoAKGLUczqCF2X6NWuTDG1zBmKvk+i3gKhhHCDPZblUP9v7dYyCc/dbVtPs+s6u935+qP0oi089uM2/SCyTKX5cotJ1ba7mZFmlquu6lTuqlE7C6tON/wjPtW3TaPfhL4WDfGeM/BxEDg29GYbPynmJsdEe3cSHhbFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XHq60I1r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A28EEC116C6;
-	Sat, 14 Mar 2026 14:09:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=i9R3L+gh/R+6urQcMg7KdaJvtYMAFWoV1LSlwJomLLnx1PlYA1Cp2w12jR8S3oX5y6kQDkcmQLELNlaYQ/t6rZHOpL2ho3a6kjxHlS5AjU8lNmZwkj82kYEIQ7upJlH8znPwIEOmluP8EFT+dy8v11WmkcNb83ARvxAcxDbGvEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fe4C0h2l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECB1CC116C6;
+	Sat, 14 Mar 2026 14:39:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773497343;
-	bh=JeZBxGCWTdgnXP24AZ2xzC4EEtua14BDZ4rDTKgA530=;
+	s=k20201202; t=1773499161;
+	bh=aQt3yN9oC3u1DOXjtnYQ5HIfBnNmVUHhH7ZmHIhVroA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XHq60I1rfSm0Qcqq5pRaoe8+LR3P4vrdZzFNzrdYsxEWGir5l/Yc9pjO3d5HW6jNQ
-	 104bzJF9qo2FzAETRPEOuZJJ8+PUPdjsxhj9O3eTOYvJVXn/dtH2Cili5ESfb2bcZx
-	 4gBVel9PQfwri33zOmqAUChOyzEtmsL0mU5KotUvSiH3Y9KOssE8iHm8HrIwzM9Lbc
-	 tDOPi3ottYyLJnEI6URma8mvVAFpjpdGdWU1SNx6cdHsqvc1grKt48kv5Vg/ns329Y
-	 atAkudt1gqOEbUzC8EZ1o4XBZiHPhfrmtEaaRfm3WFs8sGHDD3QL0whZrtaNnypYuE
-	 aSJimDP5Rsi+g==
-Date: Sat, 14 Mar 2026 07:09:02 -0700
+	b=fe4C0h2lchpICgSlw+ppLPYHruXnZ693hXcbr8PGWUJynuH/xCXsqBNBNqTKYBBWU
+	 JFGaF9Eg/7Bpq0U3Ii/Syh1OiXBYkh1/1j6EbLo4xk4YR9wLYR/68Z1QU2QhLPD4VN
+	 GM9m3fod9gbqSiJ9GCNhUepzy/clCbd6FhRxbdNpdZ6JFglAqHLyHkxFEugI4Dy5lD
+	 plly/5Hxhknq/WaxaK/jbOaflkCpMoMTr4EYxdnGtxyFHdJ1pgIrQBmOlJNNxs6GSC
+	 ZgIYskqHCxZWE7pyWy26Psu0o/XTgbEIpJQeZCp78ifF44GX/1+QmiFrjBUhFBNao8
+	 yUxs22wZp2ryA==
+Date: Sat, 14 Mar 2026 07:39:19 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH 00/12] netem: fixes, cleanup, and selftest
-Message-ID: <20260314070902.4025c388@kernel.org>
-In-Reply-To: <20260313211646.12549-1-stephen@networkplumber.org>
-References: <20260313211646.12549-1-stephen@networkplumber.org>
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>
+Cc: Sabrina Dubroca <sd@queasysnail.net>, John Fastabend
+ <john.fastabend@gmail.com>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
+ <skhan@linuxfoundation.org>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Alistair Francis
+ <alistair.francis@wdc.com>, Damien Le'Moal <dlemoal@kernel.org>, Wilfred
+ Mallawa <wilfred.mallawa@wdc.com>
+Subject: Re: [RFC net-next 1/3] net/tls_sw: support randomized zero padding
+Message-ID: <20260314073919.2f92b966@kernel.org>
+In-Reply-To: <abQOGm6BqAE5eEln@krikkit>
+References: <20260309054837.2299732-2-wilfred.opensource@gmail.com>
+	<20260309054837.2299732-3-wilfred.opensource@gmail.com>
+	<abQOGm6BqAE5eEln@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,53 +70,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267735-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267736-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[queasysnail.net,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,lwn.net,linuxfoundation.org,vger.kernel.org,wdc.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 5FD1E28D6F3
+X-Rspamd-Queue-Id: 3659628D878
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 13 Mar 2026 14:15:00 -0700 Stephen Hemminger wrote:
-> The netem packet scheduler is widely used for network emulation but
-> has not gotten enough of my attention lately.
+On Fri, 13 Mar 2026 14:16:10 +0100 Sabrina Dubroca wrote:
+> 2026-03-09, 15:48:36 +1000, Wilfred Mallawa wrote:
+> > From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+> > 
+> > Currently, for TLS 1.3, ktls does not support record zero padding [1].
+> > Record zero padding is used to allow the sender to hide the size of the
+> > traffic patterns from an observer. TLS is susceptible to a variety of traffic
+> > analysis attacks based on observing the length and timing of encrypted
+> > packets [2]. Upcoming Western Digital NVMe-TCP hardware controllers
+> > implement TLS 1.3. Which from a security perspective, can benefit from having
+> > record zero padding enabled to mitigate against traffic analysis attacks [2].
+> > 
+> > Thus, for TX, add support to appending a randomized number of zero padding
+> > bytes to end-of-record (EOR) records that are not full. The number of zero  
+> 
+> I don't think this is the right behavior. I expect that a user that
+> enables zero-padding would want _every_ record they send to be padded,
+> and their payload is going to be split into however many records that
+> requires. This could mean that data that would just fit in a record
+> will get split into one full + one very small record.
+> 
+> As it is, if I repeatedly call send with MSG_MORE to let ktls chunk
+> this for me, zero-padding has no effect. That doesn't seem right.
+> 
+> Does that make sense?
 
-There's a few tests in tdcs which need adjusting:
+Or maybe you could refer to existing implementations of this feature
+in user space libs? The padding feature seems slightly nebulous, 
+I wasn't aware of anyone actually using it. Maybe I should ask...
+are you actually planning to use it, or are you checking a box?
 
-# not ok 363 d34d - NETEM test qdisc duplication restriction in qdisc tree in netem_change root
-# Command exited with 0, expected 2
-# 
-# not ok 364 b33f - NETEM test qdisc duplication restriction in qdisc tree in netem_change non-root
-# Command exited with 0, expected 2
-# 
-# not ok 365 cafe - NETEM test qdisc duplication restriction in qdisc tree
-# Command exited with 0, expected 2
-# 
-# not ok 366 1337 - NETEM test qdisc duplication restriction in qdisc tree across branches
-# Command exited with 0, expected 2
--- 
-pw-bot: cr
+Second question - do we also need to support zero-byte records (entire
+record is padding) to prevent timing attacks?
 
