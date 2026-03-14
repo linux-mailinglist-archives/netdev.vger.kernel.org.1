@@ -1,301 +1,329 @@
-Return-Path: <netdev+bounces-267874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267875-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mysVKjTytWl87QAAu9opvQ
-	(envelope-from <netdev+bounces-267874-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 00:41:40 +0100
+	id WJ5GCUf4tWlj7wAAu9opvQ
+	(envelope-from <netdev+bounces-267875-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 01:07:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0612028F886
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 00:41:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B8E328F9C1
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 01:07:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7A4F93067427
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 23:41:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AC84E3025732
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 00:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0545238424A;
-	Sat, 14 Mar 2026 23:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7F1E571;
+	Sun, 15 Mar 2026 00:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="jRyrJJdE"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from szelinsky.de (szelinsky.de [85.214.127.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FC033CEA9
-	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 23:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7B68F49;
+	Sun, 15 Mar 2026 00:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.127.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773531697; cv=none; b=r2f00Za0l3A0tVndoFYkKR5/45DCTLo13uTfBacWd0/+ykDX2Pt78HI5DHB15p/05y4ENrFWUVMuXk6VS/YBtwrjijCJsFxD4qmAs+J7ysm2QourjCWzovKwTACHu+wI1JvtJUIaGvbM85SFOT2/Me77o8sbynD4Npd6VsED5KI=
+	t=1773533247; cv=none; b=m+7K+N9pE0mDzKGRlJ6s4eWTYLx1oZyiKuZ1PBgFFUNise12mF6NE01FJFBCYg9nVWJlJHOyT++9tcmoAixdEdP/HHZ71EMQZtMlXvVY6MO5XIi0yRW4OzzHOIPIO6u0F+fQbUYzhs5k3m79gRgRua6yCW5fn4h6e3/LP475RfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773531697; c=relaxed/simple;
-	bh=ln0JKYSPlLKndnaxJu9eHeXCEbf733ZdJjQ4gstrnYQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i2vQvF/rJE51bRAZnCU3J332M/zv2wWSTj1RpJhsQPKps3IMW5PhfUYwqve/1LndgqjXNprlUUKDFz55yFHv5XAYd8cjD+XImtC1KEg1BbTpHVNp/OUSB0WM+LkrlhWvxid5l+YfGoXzQgNLdjV890tR2XWMNOg7jnP8k+PkHs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1w1Ybr-000000003r4-1KkR;
-	Sat, 14 Mar 2026 23:41:31 +0000
-Date: Sat, 14 Mar 2026 23:41:28 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Joris Vaisvila <joey@tinyisr.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
-	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
-	olteanv@gmail.com, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [RFC v2 3/3] net: dsa: initial support for MT7628 embedded switch
-Message-ID: <abXyKK4wxiBySHI2@makrotopia.org>
-References: <20260314150845.653866-1-joey@tinyisr.com>
- <20260314150845.653866-4-joey@tinyisr.com>
+	s=arc-20240116; t=1773533247; c=relaxed/simple;
+	bh=JjA6pojnoM+Iv5bhk1cKoBfStTT3cRrx54QoCRXKnno=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E/eCtRObscSev9fPlMxA1Dx8bIrkRQfqXXCkQuzK53OuavSABaK7qRh0jIbWxeKaMGFoKptoUOr7lxJZTSfRILrkN9GgDAQ1MNLCqKpcFAmPeDL4ZuH/WjWO2B1lKmPq5GP1jKRcPr5fivnkSei8v8f7KePxtX0EN9+cJ0ZaSQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=jRyrJJdE; arc=none smtp.client-ip=85.214.127.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szelinsky.de
+Received: from localhost (localhost [127.0.0.1])
+	by szelinsky.de (Postfix) with ESMTP id 1BF52E840EA;
+	Sun, 15 Mar 2026 01:00:40 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
+	s=mail; t=1773532840;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SL7OAj90xF/ZqaIJX0boOrXHuc0BelOCYCyK/KJ68B4=;
+	b=jRyrJJdEu22cyobBBdTwvzpHu94NmA5Ab/fT+ZVArcl8ZTGCIMSO4/lk3FFcaHWXkWRqwS
+	DyUWlcGf0SUL2XgqhRhNipJ0gCD8yBOUHq21iJRxPJrFNiBEj2E5cWuttz3chsdqr1NA2P
+	IMwR7+AZyFJHv1ZZvqw2xzJZdqVgSJpyy8L7jaUvqFCXYeZx34JyGEhSddmXf0lC/U0eu/
+	oHGgdz7GHi3PszE065X+oJtM5Y1GkWzX6KqOtgC+w3FEwAlB+EdLz/L1Ek7a+mGUX987M3
+	8EQmMc+pgF/a+eAcDVfU2WrXU70KGd2VTp8o2kDw2n2DdLVYLxNBLvTMoTp2RA==
+X-Virus-Scanned: Debian amavisd-new at szelinsky.de
+Received: from szelinsky.de ([127.0.0.1])
+	by localhost (szelinsky.de [127.0.0.1]) (amavisd-new, port 10025)
+	with ESMTP id oxgus_yQ6ymR; Sun, 15 Mar 2026 01:00:40 +0100 (CET)
+Received: from p14sgen5.fritz.box (p57843ab9.dip0.t-ipconnect.de [87.132.58.185])
+	by szelinsky.de (Postfix) with ESMTPSA;
+	Sun, 15 Mar 2026 01:00:39 +0100 (CET)
+From: Carlo Szelinsky <github@szelinsky.de>
+To: o.rempel@pengutronix.de,
+	kory.maincent@bootlin.com
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Carlo Szelinsky <github@szelinsky.de>
+Subject: [PATCH] net: pse-pd: add LED trigger support
+Date: Sun, 15 Mar 2026 00:59:16 +0100
+Message-ID: <20260314235916.2391678-1-github@szelinsky.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260314150845.653866-4-joey@tinyisr.com>
-X-Spamd-Result: default: False [-1.46 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,davemloft.net,gmail.com,lunn.ch];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267875-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267874-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[makrotopia.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	DKIM_TRACE(0.00)[szelinsky.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,makrotopia.org:mid]
-X-Rspamd-Queue-Id: 0612028F886
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,szelinsky.de:dkim,szelinsky.de:email,szelinsky.de:mid]
+X-Rspamd-Queue-Id: 2B8E328F9C1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 14, 2026 at 05:08:45PM +0200, Joris Vaisvila wrote:
-> Add support for the MT7628 embedded switch.
+Add LED trigger registration and polling into the PSE core subsystem.
+Per-PI "delivering" and "enabled" triggers are registered for each PSE
+controller, with a configurable poll interval via the DT property
+"led-poll-interval-ms".
 
-Thank you for working on this, MT7628 (especially in "IoT" mode with 3
-UARTs and MMC bus exposed instead of the additional switch ports)
-still has it's special niche somewhere in between ESP32 and "proper"
-Linux-running SoCs ;)
+Signed-off-by: Carlo Szelinsky <github@szelinsky.de>
+---
+ drivers/net/pse-pd/pse_core.c | 123 ++++++++++++++++++++++++++++++++++
+ include/linux/pse-pd/pse.h    |  23 +++++++
+ 2 files changed, 146 insertions(+)
 
-> 
-> The switch has 5 built-in 100Mbps ports (ports 0-4) and 2x 1Gbps ports.
-> One of the 1Gbps ports (port 6) is internally attached to the SoCs CPU
-> MAC and serves as the CPU port. The other 1Gbps port (port 5) requires
-> an external MAC to function.
+diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+index 3beaaaeec9e1..589a9b403916 100644
+--- a/drivers/net/pse-pd/pse_core.c
++++ b/drivers/net/pse-pd/pse_core.c
+@@ -15,6 +15,7 @@
+ #include <linux/regulator/machine.h>
+ #include <linux/rtnetlink.h>
+ #include <net/net_trackers.h>
++#include <linux/leds.h>
+ 
+ #define PSE_PW_D_LIMIT INT_MAX
+ 
+@@ -1030,6 +1031,122 @@ static void pse_send_ntf_worker(struct work_struct *work)
+ 	}
+ }
+ 
++#if IS_ENABLED(CONFIG_LEDS_TRIGGERS)
++static void pse_led_poll_work(struct work_struct *work)
++{
++	struct pse_controller_dev *pcdev =
++		container_of(work, struct pse_controller_dev,
++			     led_poll_work.work);
++	int i;
++
++	mutex_lock(&pcdev->lock);
++	for (i = 0; i < pcdev->nr_lines; i++) {
++		struct pse_pi_led_triggers *trigs = &pcdev->pi_led_trigs[i];
++		struct pse_pw_status pw_status = {};
++		struct pse_admin_state admin_state = {};
++		bool delivering, enabled;
++
++		if (!pcdev->pi[i].rdev)
++			continue;
++
++		if (pcdev->ops->pi_get_pw_status(pcdev, i, &pw_status))
++			continue;
++		if (pcdev->ops->pi_get_admin_state(pcdev, i, &admin_state))
++			continue;
++
++		delivering = pw_status.c33_pw_status ==
++			ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING;
++		enabled = admin_state.c33_admin_state ==
++			ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED;
++
++		if (trigs->last_delivering != delivering) {
++			trigs->last_delivering = delivering;
++			led_trigger_event(&trigs->delivering,
++					  delivering ? LED_FULL : LED_OFF);
++		}
++
++		if (trigs->last_enabled != enabled) {
++			trigs->last_enabled = enabled;
++			led_trigger_event(&trigs->enabled,
++					  enabled ? LED_FULL : LED_OFF);
++		}
++	}
++	mutex_unlock(&pcdev->lock);
++
++	schedule_delayed_work(&pcdev->led_poll_work,
++			      msecs_to_jiffies(pcdev->led_poll_interval_ms));
++}
++
++static int pse_led_triggers_register(struct pse_controller_dev *pcdev)
++{
++	struct device *dev = pcdev->dev;
++	const char *node_name;
++	int i, ret;
++
++	node_name = dev->of_node ? dev->of_node->name : dev_name(dev);
++
++	of_property_read_u32(dev->of_node, "led-poll-interval-ms",
++			     &pcdev->led_poll_interval_ms);
++	if (!pcdev->led_poll_interval_ms)
++		pcdev->led_poll_interval_ms = 500;
++
++	pcdev->pi_led_trigs = devm_kcalloc(dev, pcdev->nr_lines,
++					   sizeof(*pcdev->pi_led_trigs),
++					   GFP_KERNEL);
++	if (!pcdev->pi_led_trigs)
++		return -ENOMEM;
++
++	INIT_DELAYED_WORK(&pcdev->led_poll_work, pse_led_poll_work);
++
++	for (i = 0; i < pcdev->nr_lines; i++) {
++		struct pse_pi_led_triggers *trigs = &pcdev->pi_led_trigs[i];
++
++		if (!pcdev->pi[i].rdev)
++			continue;
++
++		trigs->delivering.name = devm_kasprintf(dev, GFP_KERNEL,
++							"%s:port%d:delivering",
++							node_name, i);
++		if (!trigs->delivering.name)
++			return -ENOMEM;
++
++		ret = devm_led_trigger_register(dev, &trigs->delivering);
++		if (ret)
++			return ret;
++
++		trigs->enabled.name = devm_kasprintf(dev, GFP_KERNEL,
++						     "%s:port%d:enabled",
++						     node_name, i);
++		if (!trigs->enabled.name)
++			return -ENOMEM;
++
++		ret = devm_led_trigger_register(dev, &trigs->enabled);
++		if (ret)
++			return ret;
++	}
++
++	schedule_delayed_work(&pcdev->led_poll_work,
++			      msecs_to_jiffies(pcdev->led_poll_interval_ms));
++
++	return 0;
++}
++
++static void pse_led_triggers_cancel(struct pse_controller_dev *pcdev)
++{
++	if (pcdev->pi_led_trigs)
++		cancel_delayed_work_sync(&pcdev->led_poll_work);
++}
++#else
++static int pse_led_triggers_register(struct pse_controller_dev *pcdev)
++{
++	return 0;
++}
++
++static void pse_led_triggers_cancel(struct pse_controller_dev *pcdev)
++{
++}
++#endif /* CONFIG_LEDS_TRIGGERS */
++
+ /**
+  * pse_controller_register - register a PSE controller device
+  * @pcdev: a pointer to the initialized PSE controller device
+@@ -1104,6 +1221,11 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
+ 	list_add(&pcdev->list, &pse_controller_list);
+ 	mutex_unlock(&pse_list_mutex);
+ 
++	ret = pse_led_triggers_register(pcdev);
++	if (ret)
++		dev_warn(pcdev->dev, "Failed to register LED triggers: %d\n",
++			 ret);
++
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(pse_controller_register);
+@@ -1114,6 +1236,7 @@ EXPORT_SYMBOL_GPL(pse_controller_register);
+  */
+ void pse_controller_unregister(struct pse_controller_dev *pcdev)
+ {
++	pse_led_triggers_cancel(pcdev);
+ 	pse_flush_pw_ds(pcdev);
+ 	pse_release_pis(pcdev);
+ 	if (pcdev->irq)
+diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+index 4e5696cfade7..9e5d0123223e 100644
+--- a/include/linux/pse-pd/pse.h
++++ b/include/linux/pse-pd/pse.h
+@@ -11,6 +11,7 @@
+ #include <uapi/linux/ethtool.h>
+ #include <uapi/linux/ethtool_netlink_generated.h>
+ #include <linux/regulator/driver.h>
++#include <linux/leds.h>
+ 
+ /* Maximum current in uA according to IEEE 802.3-2022 Table 145-1 */
+ #define MAX_PI_CURRENT 1920000
+@@ -266,6 +267,23 @@ struct pse_pi {
+ 	int pw_allocated_mW;
+ };
+ 
++#if IS_ENABLED(CONFIG_LEDS_TRIGGERS)
++/**
++ * struct pse_pi_led_triggers - LED trigger state for a PSE PI
++ *
++ * @delivering: LED trigger for power delivering state
++ * @enabled: LED trigger for admin enabled state
++ * @last_delivering: cached delivering state for change detection
++ * @last_enabled: cached enabled state for change detection
++ */
++struct pse_pi_led_triggers {
++	struct led_trigger delivering;
++	struct led_trigger enabled;
++	bool last_delivering;
++	bool last_enabled;
++};
++#endif
++
+ /**
+  * struct pse_ntf - PSE notification element
+  *
+@@ -317,6 +335,11 @@ struct pse_controller_dev {
+ 	struct work_struct ntf_work;
+ 	DECLARE_KFIFO_PTR(ntf_fifo, struct pse_ntf);
+ 	spinlock_t ntf_fifo_lock; /* Protect @ntf_fifo writer */
++#if IS_ENABLED(CONFIG_LEDS_TRIGGERS)
++	struct pse_pi_led_triggers *pi_led_trigs;
++	struct delayed_work led_poll_work;
++	unsigned int led_poll_interval_ms;
++#endif
+ };
+ 
+ /**
+-- 
+2.43.0
 
-I thought port 5 is a dead-end on MT76x8. Afaik it was only used on
-Ralink Rt3052 for RGMII/xMII with this switch IP, and not wired to
-any external pins nor to an internal MAC on all other SoCs which came
-after.
-
-> 
-> The switch hardware has a very limited 16 entry VLAN table. Configuring
-> VLANs is the only way to control switch forwarding. Currently 7 entries
-> are used by tag_8021q to isolate the ports. Double tag feature is
-> enabled to force the switch to append the VLAN tag even if the incoming
-> packet is already tagged, this simulates VLAN-unaware functionality and
-> simplifies the tagger implementation.
-> 
-> Signed-off-by: Joris Vaisvila <joey@tinyisr.com>
-
-> +config NET_DSA_MT7628
-> +	tristate "MT7628 Embedded ethernet switch support"
-> +	select NET_DSA_TAG_MT7628
-> +	select MEDIATEK_FE_SOC_PHY
-> +	help
-> +	  This enables support for the switch in the MT7628 SoC.
-
-And potentially many others (Rt3052, Rt3050, Rt3352, Rt5350).
-As support for the Rt5350 is present in mtk_eth_soc at least that
-sounds like it would be worth mentioning (or even naming the driver
-and tagger interely after rt3050 which is the origin of that IP
-block).
-
-> +static int mt7628_mii_read(struct mii_bus *bus, int port, int regnum)
-> +{
-> +	struct mt7628_esw *esw = bus->priv;
-> +	int ret;
-> +	u32 val;
-> +
-> +	ret =
-> +	    regmap_read_poll_timeout(esw->regmap, MT7628_ESW_REG_PCR1, val,
-
-Unnecessary linebreak.
-
-> +				     !(val & MT7628_ESW_PCR1_RD_DONE), 10,
-> +				     5000);
-> +	if (ret)
-> +		goto out;
-> +
-> +	ret = regmap_write(esw->regmap, MT7628_ESW_REG_PCR0,
-> +			   FIELD_PREP(MT7628_ESW_PCR0_CPU_PHY_REG,
-> +				      regnum) |
-> +			   FIELD_PREP(MT7628_ESW_PCR0_CPU_PHY_ADDR,
-> +				      port) | MT7628_ESW_PCR0_RD_PHY_CMD);
-> +	if (ret)
-> +		goto out;
-> +
-> +	ret =
-> +	    regmap_read_poll_timeout(esw->regmap, MT7628_ESW_REG_PCR1, val,
-
-Here as well.
-
-> +				     (val & MT7628_ESW_PCR1_RD_DONE), 10,
-> +				     5000);
-> +out:
-> +	if (ret) {
-> +		dev_err(&bus->dev, "read failed. MDIO timeout?\n");
-> +		return -ETIMEDOUT;
-> +	}
-> +	return FIELD_GET(MT7628_ESW_PCR1_RD_DATA, val);
-> +}
-> +
-> +static int mt7628_mii_write(struct mii_bus *bus, int port, int regnum,
-> +			    u16 dat)
-> +{
-> +	struct mt7628_esw *esw = bus->priv;
-> +	u32 val;
-> +	int ret;
-> +
-> +	ret =
-> +	    regmap_read_poll_timeout(esw->regmap, MT7628_ESW_REG_PCR1, val,
-
-Here as well.
-
-> +				     !(val & MT7628_ESW_PCR1_WT_DONE), 10,
-> +				     5000);
-> +	if (ret)
-> +		goto out;
-> +
-> +	ret = regmap_write(esw->regmap, MT7628_ESW_REG_PCR0,
-> +			   FIELD_PREP(MT7628_ESW_PCR0_WT_NWAY_DATA, dat) |
-> +			   FIELD_PREP(MT7628_ESW_PCR0_CPU_PHY_REG,
-> +				      regnum) |
-> +			   FIELD_PREP(MT7628_ESW_PCR0_CPU_PHY_ADDR,
-> +				      port) | MT7628_ESW_PCR0_WT_PHY_CMD);
-> +	if (ret)
-> +		goto out;
-> +
-> +	ret =
-> +	    regmap_read_poll_timeout(esw->regmap, MT7628_ESW_REG_PCR1, val,
-
-And here as well.
-
-> [...]
-> +static void esw_set_vlan_id(struct mt7628_esw *esw, unsigned int vlan,
-> +			    unsigned int vid)
-> +{
-> +	unsigned int s = MT7628_ESW_VLANI_VID_S * (vlan % 2);
-> +
-> +	regmap_update_bits(esw->regmap, MT7628_ESW_REG_VLANI(vlan / 2),
-> +			   MT7628_ESW_VLANI_VID_M << s,
-> +			   (vid & MT7628_ESW_VLANI_VID_M) << s);
-
-Please add helper macros for those registers and field in them
-
-> +}
-> +
-> +static void esw_set_pvid(struct mt7628_esw *esw, unsigned int port,
-> +			 unsigned int pvid)
-> +{
-> +	unsigned int s = MT7628_ESW_PVIDC_PVID_S * (port % 2);
-> +
-> +	regmap_update_bits(esw->regmap, MT7628_ESW_REG_PVIDC(port / 2),
-> +			   MT7628_ESW_PVIDC_PVID_M << s,
-> +			   (pvid & MT7628_ESW_PVIDC_PVID_M) << s);
-
-and those as well
-
-> +}
-> +
-> +static void esw_set_vmsc(struct mt7628_esw *esw, unsigned int vlan,
-> +			 unsigned int msc)
-> +{
-> +	unsigned int s = MT7628_ESW_VMSC_MSC_S * (vlan % 4);
-> +
-> +	regmap_update_bits(esw->regmap, MT7628_ESW_REG_VMSC(vlan / 4),
-> +			   MT7628_ESW_VMSC_MSC_M << s,
-> +			   (msc & MT7628_ESW_VMSC_MSC_M) << s);
-
-those too
-
-> +}
-> +
-> +static void esw_set_vub(struct mt7628_esw *esw, unsigned int vlan,
-> +			unsigned int msc)
-> +{
-> +	unsigned int s = MT7628_ESW_VUB_S * (vlan % 4);
-> +
-> +	regmap_update_bits(esw->regmap, MT7628_ESW_REG_VUB(vlan / 4),
-> +			   MT7628_ESW_VUB_M << s,
-> +			   (msc & MT7628_ESW_VUB_M) << s);
-
-and those.
-
-> [...]
-> +static void mt7628_phylink_get_caps(struct dsa_switch *ds, int port,
-> +				    struct phylink_config *config)
-> +{
-> +	config->mac_capabilities = MAC_100 | MAC_10;
-> +	__set_bit(PHY_INTERFACE_MODE_MII, config->supported_interfaces);
-> +	__set_bit(PHY_INTERFACE_MODE_GMII, config->supported_interfaces);
-
-This looks a bit wrong.
-Aren't all 5 PHYs internal? PHY_INTERFACE_INTERNAL would be best to
-describe them then. And doesn't the CPU port (6) connect with 1000M,
-if so it should have MAC_1000 set as well (as neither the Ethernet
-driver nor the DSA driver do anything to configure the interface that
-is purely cosmetic, but still)
-
-Iff you want to support port 5 on Rt3052 (which will also require
-setting the correct interface mode in .mac_config) I'd expect something
-like this:
-
-config->mac_capabilities = MAC_100 | MAC_10;
-
-switch (port) {
-case 0...4:
-	__set_bit(PHY_INTERFACE_INTERNAL, config->supported_interfaces);
-	break;
-case 5:
-	__set_bit(PHY_INTERFACE_MODE_MII, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_REVMII, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_RMII, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_RGMII, config->supported_interfaces);
-	config->mac_capabilities |= MAC_1000;
-	break;
-case 6:
-	__set_bit(PHY_INTERFACE_INTERNAL, config->supported_interfaces);
-	config->mac_capabilities |= MAC_1000;
-	break;
-default:
-	return;
-}
-
-If you don't want to deal with port 5 you should skip it here as well.
-
-
-Cheers
-
-
-Daniel
 
