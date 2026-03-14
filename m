@@ -1,159 +1,301 @@
-Return-Path: <netdev+bounces-267873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267874-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id x7xJGkHmtWmu6gAAu9opvQ
-	(envelope-from <netdev+bounces-267873-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 23:50:41 +0100
+	id mysVKjTytWl87QAAu9opvQ
+	(envelope-from <netdev+bounces-267874-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 00:41:40 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A812028F627
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 23:50:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0612028F886
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 00:41:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2780D3019BA1
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 22:50:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7A4F93067427
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 23:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23AAA2BDC1B;
-	Sat, 14 Mar 2026 22:50:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="1nFApjyX";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="KY7pqByN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0545238424A;
+	Sat, 14 Mar 2026 23:41:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505E526AF4;
-	Sat, 14 Mar 2026 22:50:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FC033CEA9
+	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 23:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773528638; cv=none; b=G0oRyxdkmV/XkNbjpvGc/WDtOWBsqsjvwN05pjerVdnaE5Zqnt4BFbJYN4OFMMQsHm4kQFiVLWyK3AMtRKYjEnFjEbPS+MKWG0rIPHUg7E4/utEGxnPRnqwlUllSdD1uNvcK7pa3Cr8C8m54DGpEViBbskVMo5kz/Zvzp9BO5Qo=
+	t=1773531697; cv=none; b=r2f00Za0l3A0tVndoFYkKR5/45DCTLo13uTfBacWd0/+ykDX2Pt78HI5DHB15p/05y4ENrFWUVMuXk6VS/YBtwrjijCJsFxD4qmAs+J7ysm2QourjCWzovKwTACHu+wI1JvtJUIaGvbM85SFOT2/Me77o8sbynD4Npd6VsED5KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773528638; c=relaxed/simple;
-	bh=6EyydFPsyH1ISmFBbWN/w/tsShrpyxuDQ7w2ztxMe7A=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=ttoQPGfAjGq9APVNU0HgLsXNelL9BfHqfXCEBo78MCRAT4sZs0XjD7vsuDtDgIS50lNHgteNRNNlbvjgQ0Y3Wlp9P04rwI5buoR8s9iqz1OsBT1yqI5rbS0MHbq6SzmLJAjFb3UGedyM1v+m0uiUfT4QayK6evcK7/tKN8a3F/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=1nFApjyX; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=KY7pqByN; arc=none smtp.client-ip=160.80.4.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth-2019-1.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 62EMnjsw007100;
-	Sat, 14 Mar 2026 23:49:50 +0100
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id DD35912092C;
-	Sat, 14 Mar 2026 23:49:40 +0100 (CET)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1773528581; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T/2pdgsqG958Qca9XpmH2JKqIajppVZlp8GpPu96sYw=;
-	b=1nFApjyXvqQFtFI0ikHBrW6Z88uCWAXgf21wdwNTNW+9hWU3322d8XnnFFV17B28e5p4SE
-	ixjjn2g2ZqN8NLCA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1773528581; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T/2pdgsqG958Qca9XpmH2JKqIajppVZlp8GpPu96sYw=;
-	b=KY7pqByNchj8dio90HIXIYU9VvlszXszzbbrJNWahaJvGhU8igi1BdJIc6PJlhJShVVq7A
-	J+g3woDPSYHyo22dyqN91+8OWod8nbmFPQBtmDIzNqlnOOd7ikcrvFJlsWrsyFM1PlYMJq
-	zFvPm+HGEUjFqFonfsPY3HWidnXmgBFPIlZLYAgQQ/vnrutsCgQz9JCV9v/TO8n7rCqJnR
-	0ua5dWhJq+Q9xsPkmXrhNW+VQqD9tt+KfOQPyJ+MhjWd63mqfR78s83kIy97jRJyU4C8tR
-	iEXQjOEioebbrLtCXFXn/jU69AlM+wEZlDrmi8WDWEnqTVvfNfKMfQYMclNCVQ==
-Date: Sat, 14 Mar 2026 23:49:40 +0100
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: Minhong He <heminhong@kylinos.cn>
-Cc: edumazet@google.com, davem@davemloft.net, david.lebrun@uclouvain.be,
-        dsahern@kernel.org, horms@kernel.org, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, stefano.salsano@uniroma2.it,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: Re: [PATCH net v2] ipv6: sr: Add NULL check for idev in
- seg6_hmac_validate_skb
-Message-Id: <20260314234940.5dd74e5e508bc915eb0b4cb8@uniroma2.it>
-In-Reply-To: <20260313022634.51885-1-heminhong@kylinos.cn>
-References: <CANn89iLBN-fxUQ11Txtn73XQ6M9mrpaWEfjK=EfMU8UO1yOdBw@mail.gmail.com>
-	<20260313022634.51885-1-heminhong@kylinos.cn>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1773531697; c=relaxed/simple;
+	bh=ln0JKYSPlLKndnaxJu9eHeXCEbf733ZdJjQ4gstrnYQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i2vQvF/rJE51bRAZnCU3J332M/zv2wWSTj1RpJhsQPKps3IMW5PhfUYwqve/1LndgqjXNprlUUKDFz55yFHv5XAYd8cjD+XImtC1KEg1BbTpHVNp/OUSB0WM+LkrlhWvxid5l+YfGoXzQgNLdjV890tR2XWMNOg7jnP8k+PkHs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1w1Ybr-000000003r4-1KkR;
+	Sat, 14 Mar 2026 23:41:31 +0000
+Date: Sat, 14 Mar 2026 23:41:28 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Joris Vaisvila <joey@tinyisr.com>
+Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+	olteanv@gmail.com, Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [RFC v2 3/3] net: dsa: initial support for MT7628 embedded switch
+Message-ID: <abXyKK4wxiBySHI2@makrotopia.org>
+References: <20260314150845.653866-1-joey@tinyisr.com>
+ <20260314150845.653866-4-joey@tinyisr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
-X-Spamd-Result: default: False [-1.66 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260314150845.653866-4-joey@tinyisr.com>
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267873-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,davemloft.net,gmail.com,lunn.ch];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[uniroma2.it:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267874-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	R_DKIM_NA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,uniroma2.it:dkim,uniroma2.it:mid,kylinos.cn:email]
-X-Rspamd-Queue-Id: A812028F627
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,makrotopia.org:mid]
+X-Rspamd-Queue-Id: 0612028F886
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 13 Mar 2026 10:26:34 +0800
-Minhong He <heminhong@kylinos.cn> wrote:
+On Sat, Mar 14, 2026 at 05:08:45PM +0200, Joris Vaisvila wrote:
+> Add support for the MT7628 embedded switch.
 
-> In seg6_hmac_validate_skb(), the pointer returned by __in6_dev_get()
-> can be NULL if the network device lacks proper IPv6 initialization
-> or is being torn down. Add a NULL check to avoid potential NULL pointer
-> dereference in subsequent code.
+Thank you for working on this, MT7628 (especially in "IoT" mode with 3
+UARTs and MMC bus exposed instead of the additional switch ports)
+still has it's special niche somewhere in between ESP32 and "proper"
+Linux-running SoCs ;)
+
 > 
-> Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
-> Signed-off-by: Minhong He <heminhong@kylinos.cn>
-> ---
->  net/ipv6/seg6_hmac.c | 2 ++
->  1 file changed, 2 insertions(+)
+> The switch has 5 built-in 100Mbps ports (ports 0-4) and 2x 1Gbps ports.
+> One of the 1Gbps ports (port 6) is internally attached to the SoCs CPU
+> MAC and serves as the CPU port. The other 1Gbps port (port 5) requires
+> an external MAC to function.
+
+I thought port 5 is a dead-end on MT76x8. Afaik it was only used on
+Ralink Rt3052 for RGMII/xMII with this switch IP, and not wired to
+any external pins nor to an internal MAC on all other SoCs which came
+after.
+
 > 
+> The switch hardware has a very limited 16 entry VLAN table. Configuring
+> VLANs is the only way to control switch forwarding. Currently 7 entries
+> are used by tag_8021q to isolate the ports. Double tag feature is
+> enabled to force the switch to append the VLAN tag even if the incoming
+> packet is already tagged, this simulates VLAN-unaware functionality and
+> simplifies the tagger implementation.
+> 
+> Signed-off-by: Joris Vaisvila <joey@tinyisr.com>
 
-Hi Minhong,
-Do you have a crash log or a way to reproduce this?
+> +config NET_DSA_MT7628
+> +	tristate "MT7628 Embedded ethernet switch support"
+> +	select NET_DSA_TAG_MT7628
+> +	select MEDIATEK_FE_SOC_PHY
+> +	help
+> +	  This enables support for the switch in the MT7628 SoC.
 
-Thanks,
-Andrea
+And potentially many others (Rt3052, Rt3050, Rt3352, Rt5350).
+As support for the Rt5350 is present in mtk_eth_soc at least that
+sounds like it would be worth mentioning (or even naming the driver
+and tagger interely after rt3050 which is the origin of that IP
+block).
+
+> +static int mt7628_mii_read(struct mii_bus *bus, int port, int regnum)
+> +{
+> +	struct mt7628_esw *esw = bus->priv;
+> +	int ret;
+> +	u32 val;
+> +
+> +	ret =
+> +	    regmap_read_poll_timeout(esw->regmap, MT7628_ESW_REG_PCR1, val,
+
+Unnecessary linebreak.
+
+> +				     !(val & MT7628_ESW_PCR1_RD_DONE), 10,
+> +				     5000);
+> +	if (ret)
+> +		goto out;
+> +
+> +	ret = regmap_write(esw->regmap, MT7628_ESW_REG_PCR0,
+> +			   FIELD_PREP(MT7628_ESW_PCR0_CPU_PHY_REG,
+> +				      regnum) |
+> +			   FIELD_PREP(MT7628_ESW_PCR0_CPU_PHY_ADDR,
+> +				      port) | MT7628_ESW_PCR0_RD_PHY_CMD);
+> +	if (ret)
+> +		goto out;
+> +
+> +	ret =
+> +	    regmap_read_poll_timeout(esw->regmap, MT7628_ESW_REG_PCR1, val,
+
+Here as well.
+
+> +				     (val & MT7628_ESW_PCR1_RD_DONE), 10,
+> +				     5000);
+> +out:
+> +	if (ret) {
+> +		dev_err(&bus->dev, "read failed. MDIO timeout?\n");
+> +		return -ETIMEDOUT;
+> +	}
+> +	return FIELD_GET(MT7628_ESW_PCR1_RD_DATA, val);
+> +}
+> +
+> +static int mt7628_mii_write(struct mii_bus *bus, int port, int regnum,
+> +			    u16 dat)
+> +{
+> +	struct mt7628_esw *esw = bus->priv;
+> +	u32 val;
+> +	int ret;
+> +
+> +	ret =
+> +	    regmap_read_poll_timeout(esw->regmap, MT7628_ESW_REG_PCR1, val,
+
+Here as well.
+
+> +				     !(val & MT7628_ESW_PCR1_WT_DONE), 10,
+> +				     5000);
+> +	if (ret)
+> +		goto out;
+> +
+> +	ret = regmap_write(esw->regmap, MT7628_ESW_REG_PCR0,
+> +			   FIELD_PREP(MT7628_ESW_PCR0_WT_NWAY_DATA, dat) |
+> +			   FIELD_PREP(MT7628_ESW_PCR0_CPU_PHY_REG,
+> +				      regnum) |
+> +			   FIELD_PREP(MT7628_ESW_PCR0_CPU_PHY_ADDR,
+> +				      port) | MT7628_ESW_PCR0_WT_PHY_CMD);
+> +	if (ret)
+> +		goto out;
+> +
+> +	ret =
+> +	    regmap_read_poll_timeout(esw->regmap, MT7628_ESW_REG_PCR1, val,
+
+And here as well.
+
+> [...]
+> +static void esw_set_vlan_id(struct mt7628_esw *esw, unsigned int vlan,
+> +			    unsigned int vid)
+> +{
+> +	unsigned int s = MT7628_ESW_VLANI_VID_S * (vlan % 2);
+> +
+> +	regmap_update_bits(esw->regmap, MT7628_ESW_REG_VLANI(vlan / 2),
+> +			   MT7628_ESW_VLANI_VID_M << s,
+> +			   (vid & MT7628_ESW_VLANI_VID_M) << s);
+
+Please add helper macros for those registers and field in them
+
+> +}
+> +
+> +static void esw_set_pvid(struct mt7628_esw *esw, unsigned int port,
+> +			 unsigned int pvid)
+> +{
+> +	unsigned int s = MT7628_ESW_PVIDC_PVID_S * (port % 2);
+> +
+> +	regmap_update_bits(esw->regmap, MT7628_ESW_REG_PVIDC(port / 2),
+> +			   MT7628_ESW_PVIDC_PVID_M << s,
+> +			   (pvid & MT7628_ESW_PVIDC_PVID_M) << s);
+
+and those as well
+
+> +}
+> +
+> +static void esw_set_vmsc(struct mt7628_esw *esw, unsigned int vlan,
+> +			 unsigned int msc)
+> +{
+> +	unsigned int s = MT7628_ESW_VMSC_MSC_S * (vlan % 4);
+> +
+> +	regmap_update_bits(esw->regmap, MT7628_ESW_REG_VMSC(vlan / 4),
+> +			   MT7628_ESW_VMSC_MSC_M << s,
+> +			   (msc & MT7628_ESW_VMSC_MSC_M) << s);
+
+those too
+
+> +}
+> +
+> +static void esw_set_vub(struct mt7628_esw *esw, unsigned int vlan,
+> +			unsigned int msc)
+> +{
+> +	unsigned int s = MT7628_ESW_VUB_S * (vlan % 4);
+> +
+> +	regmap_update_bits(esw->regmap, MT7628_ESW_REG_VUB(vlan / 4),
+> +			   MT7628_ESW_VUB_M << s,
+> +			   (msc & MT7628_ESW_VUB_M) << s);
+
+and those.
+
+> [...]
+> +static void mt7628_phylink_get_caps(struct dsa_switch *ds, int port,
+> +				    struct phylink_config *config)
+> +{
+> +	config->mac_capabilities = MAC_100 | MAC_10;
+> +	__set_bit(PHY_INTERFACE_MODE_MII, config->supported_interfaces);
+> +	__set_bit(PHY_INTERFACE_MODE_GMII, config->supported_interfaces);
+
+This looks a bit wrong.
+Aren't all 5 PHYs internal? PHY_INTERFACE_INTERNAL would be best to
+describe them then. And doesn't the CPU port (6) connect with 1000M,
+if so it should have MAC_1000 set as well (as neither the Ethernet
+driver nor the DSA driver do anything to configure the interface that
+is purely cosmetic, but still)
+
+Iff you want to support port 5 on Rt3052 (which will also require
+setting the correct interface mode in .mac_config) I'd expect something
+like this:
+
+config->mac_capabilities = MAC_100 | MAC_10;
+
+switch (port) {
+case 0...4:
+	__set_bit(PHY_INTERFACE_INTERNAL, config->supported_interfaces);
+	break;
+case 5:
+	__set_bit(PHY_INTERFACE_MODE_MII, config->supported_interfaces);
+	__set_bit(PHY_INTERFACE_MODE_REVMII, config->supported_interfaces);
+	__set_bit(PHY_INTERFACE_MODE_RMII, config->supported_interfaces);
+	__set_bit(PHY_INTERFACE_MODE_RGMII, config->supported_interfaces);
+	config->mac_capabilities |= MAC_1000;
+	break;
+case 6:
+	__set_bit(PHY_INTERFACE_INTERNAL, config->supported_interfaces);
+	config->mac_capabilities |= MAC_1000;
+	break;
+default:
+	return;
+}
+
+If you don't want to deal with port 5 you should skip it here as well.
 
 
-> diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-> index ee6bac0160ac..e6964c6b0d38 100644
-> --- a/net/ipv6/seg6_hmac.c
-> +++ b/net/ipv6/seg6_hmac.c
-> @@ -184,6 +184,8 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
->  	int require_hmac;
->  
->  	idev = __in6_dev_get(skb->dev);
-> +	if (!idev)
-> +		return false;
->  
->  	srh = (struct ipv6_sr_hdr *)skb_transport_header(skb);
->  
-> -- 
-> 2.25.1
->
+Cheers
+
+
+Daniel
 
