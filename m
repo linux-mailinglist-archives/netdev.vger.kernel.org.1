@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-267686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267687-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CGupM/catWlZwgAAu9opvQ
-	(envelope-from <netdev+bounces-267686-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 09:23:19 +0100
+	id KLTXKOUatWlZwgAAu9opvQ
+	(envelope-from <netdev+bounces-267687-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 09:23:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49A0628C1C9
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 09:23:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2998328C1C1
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 09:23:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD671305C6F2
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 08:22:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 09043302DE26
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 08:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A4043264E2;
-	Sat, 14 Mar 2026 08:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 953EE314D18;
+	Sat, 14 Mar 2026 08:22:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="G92QFbWG"
+	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="s2F+ab/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00206402.pphosted.com (mx0b-00206402.pphosted.com [148.163.152.16])
+Received: from mx0a-00206402.pphosted.com (mx0a-00206402.pphosted.com [148.163.148.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A9D3033E3;
-	Sat, 14 Mar 2026 08:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.152.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFBD246778;
+	Sat, 14 Mar 2026 08:22:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.148.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773476551; cv=none; b=ZGn7b78QCNkMiBicpCoM6By0c64E2/P/mw+DxdMZGsptoz83pDZLFEU9rRHg2/G9DuQs3/muzi4ZO66cGmzdm+aXR5fcTTv8C+ORv5fx59rCa1Qo2MuEYjenQgC8thLFQzbveukouPxC64U+2B6E1ltEC/w5YXPxn3kkfb6OB7c=
+	t=1773476558; cv=none; b=O/YaCzW55zne/2ZGVb3IJQeFGcSQDNjI+CPgIu9gavDqdyEnnuEwzeMAEZACivr36Y1Q7lPZfDo+pkynjdHP0OGAPEl1tjn4YLectnab2lAY1+nIe5rKsZmEiKCzP9qLQf/JTs5MkTxgtjSRKTnUzTKg9TbNMdHtDhpwhLWn+aY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773476551; c=relaxed/simple;
-	bh=1zmQ8zQMj4MGfJJo7YfPo05bQHIBl28jvNdCXvqs8x0=;
+	s=arc-20240116; t=1773476558; c=relaxed/simple;
+	bh=660Vy3EMsjhWe5OrruCu5GUjTQfy+9Nleh1gLGZXUBI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uFkuAFGkMrc/lMQWahTYDdPy9zW8zC6ynKIAWhVYyXJJgvliQcZ5owYYOUuSt/xnHY8KM+VDP3eEINHuuHJTAbwXGOIXDA+CUqqFSQs+jlWuMcNCmxlQGxNHBwXLhXmZgQMuBMMikzcXRKFvdFSzlcxJ7kFBiBf5M8neKN2Nu0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=G92QFbWG; arc=none smtp.client-ip=148.163.152.16
+	 MIME-Version:Content-Type; b=VAGPN32aDPa1OtgU5o/2lNyr7J6nEMM92Pqj5Wk17z2bhQZL064+ywoElrEweaVR3XBVMMiq44HudSGs8bIMPF6l6pTrkAQwLF3GkWgRlK/FRDoJlFRKcjZK4224TKiVvNcqNIcFEdBWmGct72XyeTAwkD7ybQpEan45kXhFGo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=s2F+ab/Q; arc=none smtp.client-ip=148.163.148.77
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crowdstrike.com
-Received: from pps.filterd (m0354653.ppops.net [127.0.0.1])
-	by mx0b-00206402.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62E5ccfv1296094;
-	Sat, 14 Mar 2026 08:21:53 GMT
+Received: from pps.filterd (m0354652.ppops.net [127.0.0.1])
+	by mx0a-00206402.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62E4E1Wo3079559;
+	Sat, 14 Mar 2026 08:21:58 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crowdstrike.com;
 	 h=cc:content-transfer-encoding:content-type:date:from
 	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	default; bh=DuoEQ2pV/7yVh3IEgtmtI4tqjtw5lKwCATX4jI1eMJk=; b=G92Q
-	FbWGUyeaAtrlNys5MsNK9voTKi1fHW7iCyUNu4PkGWvFU0DolXTbQLHIf7SE1rZv
-	QFBYUvvwRB4Ks71UkfutkEuT1UxZBLZwRQr/QeLU3y/VfGuMq9DjcCdSYZmRp0MK
-	w8XW1RjfNUKiZnC7v5eZtbmTtRmN0093tEdV0matNoPRaB+tDNNIRZXNWjpAeeqx
-	zhGODtYeG+c4qxoSCofsmuQ5OG2XanNinWUj9l9y37+p0nG48zIfP6if74zvzD/5
-	ZG0G64rTq6rwK9lR9POj4jMQMB8NHFYh6Vlu11GEjFJ7U3oB+AGplnN3mKnf0v1/
-	OhfSfjxHM4q+2PZyTA==
+	default; bh=xsYk8lAVJywbgjJCX2hXfmP74QOpx5+xy0dSbZAf6yE=; b=s2F+
+	ab/QTkSaF+Iot5v2RAO9sqtgQc4qNTlQpmlQO0d418n636NlskvKWUTcUacGV9q9
+	YJfVDYu8DPMcTAfJKUe3fdTFxBkZuDwsShoQUCGXDtL7xa01wF+49y+AyYEVb8C0
+	ccPAnDrLQOayM7escBn+L3W21j+1G1oy/n4dS4mLPjgpSqPj+SSG/8A7j1oUBkbb
+	vW/69w9uftDFUzsfxCR5Fk1ZWhl8XWobVItx5LOrWa40YXxJmxVkla8AyMWJK/xH
+	JsfMQBCGCSEGleyYCcvof4ggsiCfOHujKnGF1ORA+l42aPpaWmBNvCRgO1/yKlOz
+	8+9L1sNlQ/xBloSrYw==
 Received: from mail.crowdstrike.com (dragosx.crowdstrike.com [208.42.231.60] (may be forged))
-	by mx0b-00206402.pphosted.com (PPS) with ESMTPS id 4cw02m8jbu-1
+	by mx0a-00206402.pphosted.com (PPS) with ESMTPS id 4cw08eghff-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 14 Mar 2026 08:21:53 +0000 (GMT)
+	Sat, 14 Mar 2026 08:21:57 +0000 (GMT)
 Received: from ML-CTVHTF21DX.crowdstrike.sys (10.100.11.122) by
  04WPEXCH006.crowdstrike.sys (10.100.11.70) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Sat, 14 Mar 2026 08:21:47 +0000
+ 15.2.2562.35; Sat, 14 Mar 2026 08:21:52 +0000
 From: Slava Imameev <slava.imameev@crowdstrike.com>
 To: <ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>
 CC: <martin.lau@linux.dev>, <eddyz87@gmail.com>, <song@kernel.org>,
@@ -67,9 +67,9 @@ CC: <martin.lau@linux.dev>, <eddyz87@gmail.com>, <song@kernel.org>,
         <linux-kselftest@vger.kernel.org>, <linux-open-source@crowdstrike.com>,
         Slava Imameev
 	<slava.imameev@crowdstrike.com>
-Subject: [PATCH bpf-next v6 1/2] bpf: Support pointer param types via SCALAR_VALUE for trampolines
-Date: Sat, 14 Mar 2026 19:21:26 +1100
-Message-ID: <20260314082127.7939-2-slava.imameev@crowdstrike.com>
+Subject: [PATCH bpf-next v6 2/2] selftests/bpf: Add trampolines single and multi-level pointer params test coverage
+Date: Sat, 14 Mar 2026 19:21:27 +1100
+Message-ID: <20260314082127.7939-3-slava.imameev@crowdstrike.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20260314082127.7939-1-slava.imameev@crowdstrike.com>
 References: <20260314082127.7939-1-slava.imameev@crowdstrike.com>
@@ -84,26 +84,26 @@ Content-Type: text/plain
 X-ClientProxiedBy: 04WPEXCH016.crowdstrike.sys (10.100.11.68) To
  04WPEXCH006.crowdstrike.sys (10.100.11.70)
 X-Disclaimer: USA
-X-Proofpoint-GUID: aWKXgUJwixLwsF0nrwHW4v5Qds_iaiM5
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE0MDA2MyBTYWx0ZWRfX7kEmr5OH01+P
- pGy0SMMMdgtncOUV6NF5WgCX/w/tU5jCIQ1D5uc86xysD54kdgTl3AXOY3mRILMvTBCpvo+Wp6W
- EJJmzegq9JgPO0z3kguOFufNAORaDvvLHniLAwxNbI4ih0PM71xyouH50+dlzwt4ZrA00cf1gL6
- 9J5CK0ewF8mWjRqi4yULxeYy0uawdy8iEeWZ0DcRMG/GK5wj8hTWW3FNXGWpdXhfdF6iAdJR8ay
- oyYtYmWw9tcCpJfv5qPfomqDaaQLLh93meHCLrrc1Pmyxs9GpycA+zB+BnsDSU7bJyJvyGFqJmK
- TF+IEqcpCUdEOX/babsr21U1T484GdP6CGnGIv27uny7vOxM0ilIBEs8/EDdvjO+0PFKRuQVLpQ
- TAgEswMH/DCi2h5DrhMCU5yw0NLxpCx9hWiBSTl5idX/ZRAhgnGPHqJre1oaA5z3K3i9dyT6u6T
- ou/d/WRCqW3t3/2sHUg==
-X-Proofpoint-ORIG-GUID: aWKXgUJwixLwsF0nrwHW4v5Qds_iaiM5
-X-Authority-Analysis: v=2.4 cv=cKPtc1eN c=1 sm=1 tr=0 ts=69b51aa1 cx=c_pps
+X-Proofpoint-ORIG-GUID: ZC9jvN8Q3D7pSg_JcINvUUnfgNmJ0gs3
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE0MDA2MyBTYWx0ZWRfX7t+Sry/pwNWr
+ rS2qF0zt1mq3SIQVU3fe+p4uRhSREXmFfsi0nqrXgbPCiXqjP7WyWUxQ0Mdcu/ab+YzN+8n2Psv
+ FXK2cEi+frTjB7EbaZM11zobGovdY7JVJyZXsXDYWI9Dem+V+juzAzOshvCqnCbeGYqPmEZ56gK
+ I6Yb+hFfSYyiZqD1gF6uYWKARq5pMddkZt+i/pyPX1N+WIQimObP6681rq6kBnR+LEEOgestXbc
+ e9fsjE2fBaIgPEnGBHufKztPMISROQgrPD+dENVQY2q755epG6zUYbIFM57M8r0aZm5hVsGobcy
+ tqIPOAsp8TJyZ+acOIj7NMso/wRuVm1jQ2uglW1YKffw1rDvvb9Ru/TFHJCxRBdXLpWH5Wxt66M
+ FB1S0wFWYqtzeDhYU18aKElOVUpw+zfVdWbirRvKD5UYewJ0SVXFGcyeHRSPkzPasPW8Wlg4Po9
+ wBc2F100GN1LnVuRuOw==
+X-Authority-Analysis: v=2.4 cv=fsfRpV4f c=1 sm=1 tr=0 ts=69b51aa6 cx=c_pps
  a=1d8vc5iZWYKGYgMGCdbIRA==:117 a=1d8vc5iZWYKGYgMGCdbIRA==:17
  a=EjBHVkixTFsA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=T2KQ53IYiC3MXPrxx8bB:22 a=GCXdLZfFv8EKBZhKOxZ5:22 a=pl6vuDidAAAA:8
- a=QHqYeUcJvB07a7jHZo8A:9
+ a=T2KQ53IYiC3MXPrxx8bB:22 a=2KvRFfd_T_-xjmS8C1aD:22 a=pl6vuDidAAAA:8
+ a=Vh-PTBDqdCVuQZtVsP0A:9
+X-Proofpoint-GUID: ZC9jvN8Q3D7pSg_JcINvUUnfgNmJ0gs3
 X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11728
  signatures=596818
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0 phishscore=0 bulkscore=0 lowpriorityscore=0
- impostorscore=0 suspectscore=0 clxscore=1015 adultscore=0 priorityscore=1501
+ adultscore=0 priorityscore=1501 malwarescore=0 clxscore=1015 bulkscore=0
+ suspectscore=0 spamscore=0 phishscore=0 impostorscore=0 lowpriorityscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603140063
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -112,7 +112,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[crowdstrike.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[crowdstrike.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -120,7 +120,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org,crowdstrike.com];
 	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-267686-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267687-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -132,70 +132,147 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[crowdstrike.com:dkim,crowdstrike.com:email,crowdstrike.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 49A0628C1C9
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,crowdstrike.com:dkim,crowdstrike.com:email,crowdstrike.com:mid]
+X-Rspamd-Queue-Id: 2998328C1C1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add BPF verifier support for single- and multi-level pointer
-parameters and return values in BPF trampolines by treating these
-parameters as SCALAR_VALUE.
-
-This extends the existing support for int and void pointers that are
-already treated as SCALAR_VALUE.
-
-This provides consistent logic for single and multi-level pointers:
-if a type is treated as SCALAR for a single-level pointer, the same
-applies to multi-level pointers. The exception is pointer-to-struct,
-which is currently PTR_TO_BTF_ID for single-level but treated as
-scalar for multi-level pointers since the verifier lacks context
-to infer the size of target memory regions.
-
-Safety is ensured by existing BTF verification, which rejects invalid
-pointer types at the BTF verification stage.
+Add single and multi-level pointer parameters and return value test
+coverage for BPF trampolines. Includes verifier tests for single and
+multi-level pointers. The tests check verifier logs for pointers
+inferred as scalar() type.
 
 Signed-off-by: Slava Imameev <slava.imameev@crowdstrike.com>
 ---
- kernel/bpf/btf.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ net/bpf/test_run.c                            | 17 +++++
+ .../selftests/bpf/prog_tests/verifier.c       |  2 +
+ .../bpf/progs/verifier_ctx_ptr_param.c        | 68 +++++++++++++++++++
+ 3 files changed, 87 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/progs/verifier_ctx_ptr_param.c
 
-diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-index 09fcbb125155..524bb2d6d964 100644
---- a/kernel/bpf/btf.c
-+++ b/kernel/bpf/btf.c
-@@ -6508,13 +6508,6 @@ struct btf *bpf_prog_get_target_btf(const struct bpf_prog *prog)
- 		return prog->aux->attach_btf;
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index 56bc8dc1e281..14c4814a7dab 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -567,6 +567,23 @@ noinline void bpf_fentry_test_sinfo(struct skb_shared_info *sinfo)
+ {
  }
  
--static bool is_void_or_int_ptr(struct btf *btf, const struct btf_type *t)
--{
--	/* skip modifiers */
--	t = btf_type_skip_modifiers(btf, t->type, NULL);
--	return btf_type_is_void(t) || btf_type_is_int(t);
--}
--
- u32 btf_ctx_arg_idx(struct btf *btf, const struct btf_type *func_proto,
- 		    int off)
++noinline void bpf_fentry_test_ppvoid(void **pp)
++{
++}
++
++noinline void bpf_fentry_test_pppvoid(void ***ppp)
++{
++}
++
++noinline void bpf_fentry_test_ppfile(struct file **ppf)
++{
++}
++
++noinline struct file **bpf_fexit_test_ret_ppfile(void)
++{
++	return (struct file **)NULL;
++}
++
+ __bpf_kfunc int bpf_modify_return_test(int a, int *b)
  {
-@@ -6903,10 +6896,14 @@ bool btf_ctx_access(int off, int size, enum bpf_access_type type,
- 	}
+ 	*b += 1;
+diff --git a/tools/testing/selftests/bpf/prog_tests/verifier.c b/tools/testing/selftests/bpf/prog_tests/verifier.c
+index 8cdfd74c95d7..bcf01cb4cfe4 100644
+--- a/tools/testing/selftests/bpf/prog_tests/verifier.c
++++ b/tools/testing/selftests/bpf/prog_tests/verifier.c
+@@ -115,6 +115,7 @@
+ #include "verifier_lsm.skel.h"
+ #include "verifier_jit_inline.skel.h"
+ #include "irq.skel.h"
++#include "verifier_ctx_ptr_param.skel.h"
  
- 	/*
--	 * If it's a pointer to void, it's the same as scalar from the verifier
--	 * safety POV. Either way, no futher pointer walking is allowed.
-+	 * If it's a single or multilevel pointer, except a pointer
-+	 * to a structure, it's the same as scalar from the verifier
-+	 * safety POV. Multilevel pointers to structures are treated as
-+	 * scalars. The verifier lacks the context to infer the size of
-+	 * their target memory regions. Either way, no further pointer
-+	 * walking is allowed.
- 	 */
--	if (is_void_or_int_ptr(btf, t))
-+	if (!btf_type_is_struct_ptr(btf, t))
- 		return true;
+ #define MAX_ENTRIES 11
  
- 	/* this is a pointer to another type */
+@@ -259,6 +260,7 @@ void test_verifier_lsm(void)                  { RUN(verifier_lsm); }
+ void test_irq(void)			      { RUN(irq); }
+ void test_verifier_mtu(void)		      { RUN(verifier_mtu); }
+ void test_verifier_jit_inline(void)               { RUN(verifier_jit_inline); }
++void test_verifier_ctx_ptr_param(void)       { RUN(verifier_ctx_ptr_param); }
+ 
+ static int init_test_val_map(struct bpf_object *obj, char *map_name)
+ {
+diff --git a/tools/testing/selftests/bpf/progs/verifier_ctx_ptr_param.c b/tools/testing/selftests/bpf/progs/verifier_ctx_ptr_param.c
+new file mode 100644
+index 000000000000..d5cc8fc01fe6
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/verifier_ctx_ptr_param.c
+@@ -0,0 +1,68 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Verifier tests for single- and multi-level pointer parameter handling
++ * Copyright (c) 2026 CrowdStrike, Inc.
++ */
++
++#include <linux/bpf.h>
++#include <bpf/bpf_helpers.h>
++#include <bpf/bpf_tracing.h>
++#include "bpf_misc.h"
++
++SEC("fentry/bpf_fentry_test_ppvoid")
++__description("fentry/void**: void ** inferred as scalar")
++__success __retval(0)
++__log_level(2)
++__msg("R1=ctx() R2=scalar()")
++__naked void fentry_ppvoid_as_scalar(void)
++{
++    asm volatile ("					\
++	r2 = *(u64 *)(r1 + 0);	\
++	r0 = 0;	\
++	exit;	\
++	" ::: __clobber_all);
++}
++
++SEC("fentry/bpf_fentry_test_pppvoid")
++__description("fentry/void***: void *** inferred as scalar")
++__success __retval(0)
++__log_level(2)
++__msg("R1=ctx() R2=scalar()")
++__naked void fentry_pppvoid_as_scalar(void)
++{
++    asm volatile ("					\
++	r2 = *(u64 *)(r1 + 0);	\
++	r0 = 0;	\
++	exit;	\
++	" ::: __clobber_all);
++}
++
++SEC("fentry/bpf_fentry_test_ppfile")
++__description("fentry/struct file**: struct file ** inferred as scalar")
++__success __retval(0)
++__log_level(2)
++__msg("R1=ctx() R2=scalar()")
++__naked void fentry_ppfile_as_scalar(void)
++{
++    asm volatile ("					\
++	r2 = *(u64 *)(r1 + 0);	\
++	r0 = 0;	\
++	exit;	\
++	" ::: __clobber_all);
++}
++
++SEC("fexit/bpf_fexit_test_ret_ppfile")
++__description("fexit/return struct file**: returned struct file ** inferred as scalar")
++__success __retval(0)
++__log_level(2)
++__msg("R1=ctx() R2=scalar()")
++__naked void fexit_ppfile_as_scalar(void)
++{
++    asm volatile ("					\
++	r2 = *(u64 *)(r1 + 0);	\
++	r0 = 0;	\
++	exit;	\
++	" ::: __clobber_all);
++}
++
++char _license[] SEC("license") = "GPL";
 -- 
 2.34.1
 
