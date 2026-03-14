@@ -1,70 +1,69 @@
-Return-Path: <netdev+bounces-267690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267692-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MHi/KQwrtWnNxAAAu9opvQ
-	(envelope-from <netdev+bounces-267690-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 10:31:56 +0100
+	id IDEfDU8rtWnNxAAAu9opvQ
+	(envelope-from <netdev+bounces-267692-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 10:33:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A22428C5E2
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 10:31:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBA7F28C62B
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 10:33:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 721BD3015B41
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 09:31:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4C94230620F6
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 09:32:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 153CF329371;
-	Sat, 14 Mar 2026 09:31:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D750234EEF3;
+	Sat, 14 Mar 2026 09:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="gD5GNwlN";
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="NBOQjM5T"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="0UbRGwfp";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="KJwFy/8I"
 X-Original-To: netdev@vger.kernel.org
 Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984CB54768;
-	Sat, 14 Mar 2026 09:31:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B6F33BBD7;
+	Sat, 14 Mar 2026 09:31:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773480714; cv=none; b=ok9AaqvTQt/czx3L4c7Fq1bawRSalHH6JUMfIRl+IkY9CpujR5c463au2VfXa+t8HSp8TNLFON4bjSvjo00rIAuP4L7fvDbJDSH0pWJ7i0m4KPkA5p+RkbdAhuV+xIV7+7aSCp4jJ9E+6hikBALcOSr8rdW4OaB6qIiUo1UbYDc=
+	t=1773480715; cv=none; b=R1LI3BWowWMh9Q42xi+4TRsZFoUBr82HlHxfIYut1hzU5bVwhJ4qIBsSg+uYnG1pJ2PpKTAOK6WcLK6AdE5rRIezntcv+IXP0LlNpdXdEnZJrDc3ftJo/8cVTddUG4/YnC6UuMYfJ03aUljCPSGyPN0GmFMsO1KMx9Ai9dQLuDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773480714; c=relaxed/simple;
-	bh=kg1M5KLfR5Qb64R4Q4qeIgsFHFjGRkixCYeT1nI+vj4=;
+	s=arc-20240116; t=1773480715; c=relaxed/simple;
+	bh=7ahNTLag8CqBDyorUoSHN0rIlNE+4LrcQBoVWiPbrfY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GuwIOywMCXp7jEowDkJJUHAbT0W8Rl0PReEhpWLOtNvc67FPW1H0xDO2rtxTapOWwblK5n32aAxMhzWC89TIUj6aAHDoGEqXYb681pzYVg9ScIcChM4j4w9X1wrtIxAEGayVlZqdYaZQDAtv6ElKbc9gmH5UpCbdYxnCRu06ZYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=gD5GNwlN; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=NBOQjM5T; arc=none smtp.client-ip=23.88.97.239
+	 In-Reply-To:To:Cc; b=sYglxPqHdE5BEY8CidbTCWu46MSekgN4+5TPh6Y7UGpiBYFH9baX691bAUaBjwebE5P02AfbovdQYINqHeO7YQNwSKRWqNkGRqtrISNbf3rOVzetQOdVmW4A8NGRKZ4B72VBtEyDtnLGd69/NLkzjyHRa8H7IpTESFEM3l4Hjlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=0UbRGwfp; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=KJwFy/8I; arc=none smtp.client-ip=23.88.97.239
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1773480708;
-	bh=kg1M5KLfR5Qb64R4Q4qeIgsFHFjGRkixCYeT1nI+vj4=;
+	s=default; t=1773480709;
+	bh=7ahNTLag8CqBDyorUoSHN0rIlNE+4LrcQBoVWiPbrfY=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=gD5GNwlNXXqcTpXRYkq2EQsz6YXshvERChvfGl8buAhaBjIOt5V0uN+tFNUlrFPdL
-	 blThdTJeeRdUbTiJrYNMCfXehJI7fVOEGPqLikbleVKO6laLI5R6WxFL8Eazm+GCw1
-	 X69B6fHDv4S1D6ZL6yT9jTTlnh5kP1XgL42dwWTo+AWe+uWLTzoGYRBjA2S3MZeq0M
-	 bS5Rlc5UHwjPtsMGi5wB/T/00ImSRnQyEvM7bnNyQRceCRQG+xp/IOVht9N0asyUwc
-	 6S0YPBJ0wUrBJ4fwRYFsp9janNAkbO09qrSyHJQ107HTds/rHM3b0Xsdl1wMIR3ylZ
-	 eRGUMkX4in5mQ==
+	b=0UbRGwfp4FdBg3EeozogzobI0ftBhSbCWVY4SqlaOKJB4r3nhT2/OfN+q5n/H/8Ro
+	 +XdPmVlYRpd6QB5J62I5EfZthMbWXbEvz4Q5kJO/0HRFu9K3+zBH9AUIFyCwlq/SLb
+	 Hpx/Hl/WKgHpRdpBuX3bY4ZysHbBVBnz/tLKTiC4lpD+QfSivU0kQFu2NvT1RvfZjY
+	 bn6SdBYxXb8utJoGWAdzS/FDm1RVXiPB5XQQ2j5i9tbrbRgb4nlI9wDq+nCfGHezr5
+	 ouyR+udS4sdyKFfnRQwsXOkPISFXgOTFpFZ7LQJ3f1Ep65LK6R/5oUewZhN9VW5+H1
+	 /2nTZTvIhZvHA==
 Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
-	id 48DCB3FCDC; Sat, 14 Mar 2026 09:31:48 +0000 (UTC)
+	id 682CB3FCDA; Sat, 14 Mar 2026 09:31:49 +0000 (UTC)
 X-Spam-Level: 
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1773480703;
-	bh=kg1M5KLfR5Qb64R4Q4qeIgsFHFjGRkixCYeT1nI+vj4=;
+	s=default; t=1773480704;
+	bh=7ahNTLag8CqBDyorUoSHN0rIlNE+4LrcQBoVWiPbrfY=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=NBOQjM5Tw2RdJozW1/QWjqX0lQwP+acBgEyl/rOe3PB25G1TiqxtWAd2y6r8nEQ0t
-	 JX4hgVXYagIkxQY/Y8TXtoECNS3tXJ9d++agqUfBHhu1ShI5I14G6QaZn8pFXw63mI
-	 ou7UGsocvgc7bBNf5+siE+Yn+06TxRa8jU6HVc7WOz6unDPzpzu/yOL1533C/Arno/
-	 E1XcC4ZhP0mIvEIvz7dvMOGpuYgg7w95OYNpSRrJ0QWaErVAOkhkO2gNs5+It/PI7l
-	 vTb0vgl9hM+3uepUnsChS1nXQQTBIcvqJzsXAQB6JWur5ke8djGBADw0mDdlyfOt68
-	 70zVNEwvCcYPw==
+	b=KJwFy/8IkG8qF2B6vz7TvW8XgCabaxLwBIHKFfZI7BGZ1pJWsZ9RfsiH3pi46gmho
+	 dttR+vCbCg8+LgWG+cPBEEIrDn6wC43LSAi1UH94QNjCOTMG9A8SBKMKyOJphbp2cV
+	 4Ddwbqua7UUM6MtGKcHuCJ/oVNd1AVEs/Jdc7kcEL0OSOPR57L8kbPsoudsKIsHy1t
+	 n1/uRRig9nmpAXIU3KmCuHWRlPiOwVRcSQ2XNukn0GWV/zMjezNMeMQpRdEKzeWz2F
+	 XWAaqrZYyy7XybPULwsWB0rckVwpFPEXpWmxosmvqhC7Le+DiXM2W2MActsTtRxX/m
+	 c04zdwioLiTOA==
 Received: from AMDDesktop.lan (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
-	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id A38993FCC8;
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id E14093FCCB;
 	Sat, 14 Mar 2026 09:31:43 +0000 (UTC)
 From: Birger Koblitz <mail@birger-koblitz.de>
-Date: Sat, 14 Mar 2026 10:31:42 +0100
-Subject: [PATCH net-next 6/9] r8152: Add support for chip version
- RTL_VER_16
+Date: Sat, 14 Mar 2026 10:31:43 +0100
+Subject: [PATCH net-next 7/9] r8152: Add support for 5Gbit Link Speeds
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,7 +72,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260314-rtl8157_next-v1-6-9ba77b428afd@birger-koblitz.de>
+Message-Id: <20260314-rtl8157_next-v1-7-9ba77b428afd@birger-koblitz.de>
 References: <20260314-rtl8157_next-v1-0-9ba77b428afd@birger-koblitz.de>
 In-Reply-To: <20260314-rtl8157_next-v1-0-9ba77b428afd@birger-koblitz.de>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -86,12 +85,12 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	DKIM_TRACE(0.00)[birger-koblitz.de:+];
-	TAGGED_FROM(0.00)[bounces-267690-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267692-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DMARC_NA(0.00)[birger-koblitz.de];
 	RCVD_TLS_LAST(0.00)[];
@@ -103,219 +102,154 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4A22428C5E2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,birger-koblitz.de:dkim,birger-koblitz.de:email,birger-koblitz.de:mid]
+X-Rspamd-Queue-Id: BBA7F28C62B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The RTL8157 uses RTL_VER_16. Add support for this version in all
-remaining configuration functions for power management and RX/TX
-configuration.
+The RTL8157 supports 5GBit Link speeds. Add support for this speed
+in the setup and setting/getting through ethool.
 
 Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
 ---
- drivers/net/usb/r8152.c | 71 ++++++++++++++++++++++++++++---------------------
- 1 file changed, 40 insertions(+), 31 deletions(-)
+ drivers/net/usb/r8152.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 40 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 435ab6bbae6f2f3a5df59d20ba8838217bf0a841..bef38211c3157b5774ceccbfd923b227f285aaaf 100644
+index bef38211c3157b5774ceccbfd923b227f285aaaf..f9498c39dc6ec8bf4605b17e2c81bbe180b1b2d3 100644
 --- a/drivers/net/usb/r8152.c
 +++ b/drivers/net/usb/r8152.c
-@@ -3609,6 +3609,7 @@ static void r8153_set_rx_early_timeout(struct r8152 *tp)
- 	case RTL_VER_12:
- 	case RTL_VER_13:
- 	case RTL_VER_15:
-+	case RTL_VER_16:
- 		ocp_write_word(tp, MCU_TYPE_USB, USB_RX_EARLY_TIMEOUT,
- 			       640 / 8);
- 		ocp_write_word(tp, MCU_TYPE_USB, USB_RX_EXTRA_AGGR_TMR,
-@@ -3652,6 +3653,10 @@ static void r8153_set_rx_early_size(struct r8152 *tp)
- 		ocp_write_word(tp, MCU_TYPE_USB, USB_RX_EARLY_SIZE,
- 			       ocp_data / 8);
- 		break;
-+	case RTL_VER_16:
-+		ocp_write_word(tp, MCU_TYPE_USB, USB_RX_EARLY_SIZE,
-+			       ocp_data / 16);
-+		break;
- 	default:
- 		WARN_ON_ONCE(1);
- 		break;
-@@ -3777,6 +3782,7 @@ static void rtl_rx_vlan_en(struct r8152 *tp, bool enable)
- 	case RTL_VER_12:
- 	case RTL_VER_13:
- 	case RTL_VER_15:
-+	case RTL_VER_16:
- 	default:
- 		ocp_data = ocp_read_word(tp, MCU_TYPE_PLA, PLA_RCR1);
- 		if (enable)
-@@ -4468,6 +4474,14 @@ static void rtl8156_runtime_enable(struct r8152 *tp, bool enable)
- 	}
- }
+@@ -620,6 +620,7 @@ enum spd_duplex {
+ 	FORCE_100M_FULL,
+ 	FORCE_1000M_FULL,
+ 	NWAY_2500M_FULL,
++	NWAY_5000M_FULL,
+ };
  
-+static void rtl8157_runtime_enable(struct r8152 *tp, bool enable)
-+{
-+	r8153_queue_wake(tp, enable);
-+	r8153b_u1u2en(tp, false);
-+	r8157_u2p3en(tp, false);
-+	rtl_runtime_suspend_enable(tp, enable);
-+}
+ /* OCP_ALDPS_CONFIG */
+@@ -741,6 +742,7 @@ enum spd_duplex {
+ #define BP4_SUPER_ONLY		0x1578	/* RTL_VER_04 only */
+ 
+ enum rtl_register_content {
++	_5000bps	= BIT(12),
+ 	_2500bps	= BIT(10),
+ 	_1250bps	= BIT(9),
+ 	_500bps		= BIT(8),
+@@ -754,6 +756,7 @@ enum rtl_register_content {
+ };
+ 
+ #define is_speed_2500(_speed)	(((_speed) & (_2500bps | LINK_STATUS)) == (_2500bps | LINK_STATUS))
++#define is_speed_5000(_speed)	(((_speed) & (_5000bps | LINK_STATUS)) == (_5000bps | LINK_STATUS))
+ #define is_flow_control(_speed)	(((_speed) & (_tx_flow | _rx_flow)) == (_tx_flow | _rx_flow))
+ 
+ #define RTL8152_MAX_TX		4
+@@ -1004,6 +1007,7 @@ struct r8152 {
+ 	unsigned int pipe_in, pipe_out, pipe_intr, pipe_ctrl_in, pipe_ctrl_out;
+ 
+ 	u32 support_2500full:1;
++	u32 support_5000full:1;
+ 	u32 lenovo_macpassthru:1;
+ 	u32 dell_tb_rx_agg_bug:1;
+ 	u16 ocp_base;
+@@ -1255,6 +1259,7 @@ enum tx_csum_stat {
+ #define RTL_ADVERTISED_1000_HALF		BIT(4)
+ #define RTL_ADVERTISED_1000_FULL		BIT(5)
+ #define RTL_ADVERTISED_2500_FULL		BIT(6)
++#define RTL_ADVERTISED_5000_FULL		BIT(7)
+ 
+ /* Maximum number of multicast addresses to filter (vs. Rx-all-multicast).
+  * The RTL chips use a 64 element hash table based on the Ethernet CRC.
+@@ -6669,6 +6674,9 @@ static int rtl8152_set_speed(struct r8152 *tp, u8 autoneg, u32 speed, u8 duplex,
+ 
+ 			if (tp->support_2500full)
+ 				support |= RTL_ADVERTISED_2500_FULL;
 +
- static void r8153_teredo_off(struct r8152 *tp)
- {
- 	u32 ocp_data;
-@@ -4495,6 +4509,7 @@ static void r8153_teredo_off(struct r8152 *tp)
- 	case RTL_VER_13:
- 	case RTL_VER_14:
- 	case RTL_VER_15:
-+	case RTL_VER_16:
- 	default:
- 		/* The bit 0 ~ 7 are relative with teredo settings. They are
- 		 * W1C (write 1 to clear), so set all 1 to disable it.
-@@ -4551,6 +4566,7 @@ static void rtl_clear_bp(struct r8152 *tp, u16 type)
- 		bp_num = 8;
- 		break;
- 	case RTL_VER_14:
-+	case RTL_VER_16:
- 	default:
- 		ocp_write_word(tp, type, USB_BP2_EN, 0);
- 		bp_num = 16;
-@@ -4666,6 +4682,7 @@ static bool rtl8152_is_fw_phy_speed_up_ok(struct r8152 *tp, struct fw_phy_speed_
- 	case RTL_VER_11:
- 	case RTL_VER_12:
- 	case RTL_VER_14:
-+	case RTL_VER_16:
- 		goto out;
- 	case RTL_VER_13:
- 	case RTL_VER_15:
-@@ -5831,6 +5848,7 @@ static void rtl_eee_enable(struct r8152 *tp, bool enable)
- 	case RTL_VER_12:
- 	case RTL_VER_13:
- 	case RTL_VER_15:
-+	case RTL_VER_16:
- 		if (enable) {
- 			r8156_eee_en(tp, true);
- 			ocp_reg_write(tp, OCP_EEE_ADV, tp->eee_adv);
-@@ -6967,26 +6985,24 @@ static void rtl8156_up(struct r8152 *tp)
- 		return;
++			if (tp->support_5000full)
++				support |= RTL_ADVERTISED_5000_FULL;
+ 		}
  
- 	r8153b_u1u2en(tp, false);
--	r8153_u2p3en(tp, false);
-+	if (tp->version != RTL_VER_16)
-+		r8153_u2p3en(tp, false);
- 	r8153_aldps_en(tp, false);
+ 		if (!(advertising & support))
+@@ -6714,15 +6722,20 @@ static int rtl8152_set_speed(struct r8152 *tp, u8 autoneg, u32 speed, u8 duplex,
+ 				r8152_mdio_write(tp, MII_CTRL1000, new1);
+ 		}
  
- 	rxdy_gated_en(tp, true);
- 	r8153_teredo_off(tp);
+-		if (tp->support_2500full) {
++		if (tp->support_2500full || tp->support_5000full) {
+ 			orig = ocp_reg_read(tp, OCP_10GBT_CTRL);
+-			new1 = orig & ~MDIO_AN_10GBT_CTRL_ADV2_5G;
++			new1 = orig & ~(MDIO_AN_10GBT_CTRL_ADV2_5G | MDIO_AN_10GBT_CTRL_ADV5G);
  
--	ocp_data = ocp_read_dword(tp, MCU_TYPE_PLA, PLA_RCR);
--	ocp_data &= ~RCR_ACPT_ALL;
--	ocp_write_dword(tp, MCU_TYPE_PLA, PLA_RCR, ocp_data);
-+	ocp_word_clr_bits(tp, MCU_TYPE_PLA, PLA_RCR, RCR_ACPT_ALL);
+ 			if (advertising & RTL_ADVERTISED_2500_FULL) {
+ 				new1 |= MDIO_AN_10GBT_CTRL_ADV2_5G;
+ 				tp->ups_info.speed_duplex = NWAY_2500M_FULL;
+ 			}
  
- 	rtl8152_nic_reset(tp);
- 	rtl_reset_bmu(tp);
- 
--	ocp_data = ocp_read_byte(tp, MCU_TYPE_PLA, PLA_OOB_CTRL);
--	ocp_data &= ~NOW_IS_OOB;
--	ocp_write_byte(tp, MCU_TYPE_PLA, PLA_OOB_CTRL, ocp_data);
-+	ocp_byte_clr_bits(tp, MCU_TYPE_PLA, PLA_OOB_CTRL, NOW_IS_OOB);
- 
--	ocp_data = ocp_read_word(tp, MCU_TYPE_PLA, PLA_SFF_STS_7);
--	ocp_data &= ~MCU_BORW_EN;
--	ocp_write_word(tp, MCU_TYPE_PLA, PLA_SFF_STS_7, ocp_data);
-+	if (tp->version == RTL_VER_16)
-+		ocp_word_clr_bits(tp, MCU_TYPE_PLA, PLA_RCR1, BIT(3));
++			if (advertising & RTL_ADVERTISED_5000_FULL) {
++				new1 |= MDIO_AN_10GBT_CTRL_ADV5G;
++				tp->ups_info.speed_duplex = NWAY_5000M_FULL;
++			}
 +
-+	ocp_word_clr_bits(tp, MCU_TYPE_PLA, PLA_SFF_STS_7, MCU_BORW_EN);
+ 			if (orig != new1)
+ 				ocp_reg_write(tp, OCP_10GBT_CTRL, new1);
+ 		}
+@@ -9263,6 +9276,9 @@ int rtl8152_get_link_ksettings(struct net_device *netdev,
+ 	linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+ 			 cmd->link_modes.supported, tp->support_2500full);
  
- 	rtl_rx_vlan_en(tp, tp->netdev->features & NETIF_F_HW_VLAN_CTAG_RX);
- 
-@@ -6996,9 +7012,7 @@ static void rtl8156_up(struct r8152 *tp)
- 	case RTL_TEST_01:
- 	case RTL_VER_10:
- 	case RTL_VER_11:
--		ocp_data = ocp_read_word(tp, MCU_TYPE_USB, USB_BMU_CONFIG);
--		ocp_data |= ACT_ODMA;
--		ocp_write_word(tp, MCU_TYPE_USB, USB_BMU_CONFIG, ocp_data);
-+		ocp_word_set_bits(tp, MCU_TYPE_USB, USB_BMU_CONFIG, ACT_ODMA);
- 		break;
- 	default:
- 		break;
-@@ -7010,13 +7024,11 @@ static void rtl8156_up(struct r8152 *tp)
- 	ocp_data |= 0x08;
- 	ocp_write_word(tp, MCU_TYPE_PLA, PLA_RXFIFO_FULL, ocp_data);
- 
--	ocp_data = ocp_read_word(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3);
--	ocp_data &= ~PLA_MCU_SPDWN_EN;
--	ocp_write_word(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3, ocp_data);
-+	ocp_word_clr_bits(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3, PLA_MCU_SPDWN_EN);
- 
--	ocp_data = ocp_read_word(tp, MCU_TYPE_USB, USB_SPEED_OPTION);
--	ocp_data &= ~(RG_PWRDN_EN | ALL_SPEED_OFF);
--	ocp_write_word(tp, MCU_TYPE_USB, USB_SPEED_OPTION, ocp_data);
-+	if (tp->version != RTL_VER_16)
-+		ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_SPEED_OPTION,
-+				  RG_PWRDN_EN | ALL_SPEED_OFF);
- 
- 	ocp_write_dword(tp, MCU_TYPE_USB, USB_RX_BUF_TH, 0x00600400);
- 
-@@ -7028,7 +7040,7 @@ static void rtl8156_up(struct r8152 *tp)
- 	r8153_aldps_en(tp, true);
- 	r8153_u2p3en(tp, true);
- 
--	if (tp->udev->speed >= USB_SPEED_SUPER)
-+	if (tp->version != RTL_VER_16 && tp->udev->speed >= USB_SPEED_SUPER)
- 		r8153b_u1u2en(tp, true);
- }
- 
-@@ -7041,13 +7053,13 @@ static void rtl8156_down(struct r8152 *tp)
- 		return;
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
++			 cmd->link_modes.supported, tp->support_5000full);
++
+ 	if (tp->support_2500full) {
+ 		linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+ 				 cmd->link_modes.advertising,
+@@ -9276,6 +9292,19 @@ int rtl8152_get_link_ksettings(struct net_device *netdev,
+ 			cmd->base.speed = SPEED_2500;
  	}
  
--	ocp_data = ocp_read_word(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3);
--	ocp_data |= PLA_MCU_SPDWN_EN;
--	ocp_write_word(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3, ocp_data);
-+	ocp_word_set_bits(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3, PLA_MCU_SPDWN_EN);
- 
- 	r8153b_u1u2en(tp, false);
--	r8153_u2p3en(tp, false);
--	r8153b_power_cut_en(tp, false);
-+	if (tp->version != RTL_VER_16) {
-+		r8153_u2p3en(tp, false);
-+		r8153b_power_cut_en(tp, false);
++	if (tp->support_5000full) {
++		linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
++				 cmd->link_modes.advertising,
++				 ocp_reg_read(tp, OCP_10GBT_CTRL) & MDIO_AN_10GBT_CTRL_ADV5G);
++
++		linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
++				 cmd->link_modes.lp_advertising,
++				 ocp_reg_read(tp, OCP_10GBT_STAT) & MDIO_AN_10GBT_STAT_LP5G);
++
++		if (is_speed_5000(rtl8152_get_speed(tp)))
++			cmd->base.speed = SPEED_5000;
 +	}
- 	r8153_aldps_en(tp, false);
++
+ 	mutex_unlock(&tp->control);
  
- 	ocp_data = ocp_read_byte(tp, MCU_TYPE_PLA, PLA_OOB_CTRL);
-@@ -7071,13 +7083,9 @@ static void rtl8156_down(struct r8152 *tp)
- 	 */
- 	ocp_write_word(tp, MCU_TYPE_PLA, PLA_TEREDO_WAKE_BASE, 0x00ff);
+ 	usb_autopm_put_interface(tp->intf);
+@@ -9323,6 +9352,10 @@ static int rtl8152_set_link_ksettings(struct net_device *dev,
+ 		     cmd->link_modes.advertising))
+ 		advertising |= RTL_ADVERTISED_2500_FULL;
  
--	ocp_data = ocp_read_byte(tp, MCU_TYPE_PLA, PLA_OOB_CTRL);
--	ocp_data |= NOW_IS_OOB;
--	ocp_write_byte(tp, MCU_TYPE_PLA, PLA_OOB_CTRL, ocp_data);
-+	ocp_byte_set_bits(tp, MCU_TYPE_PLA, PLA_OOB_CTRL, NOW_IS_OOB);
++	if (test_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
++		     cmd->link_modes.advertising))
++		advertising |= RTL_ADVERTISED_5000_FULL;
++
+ 	mutex_lock(&tp->control);
  
--	ocp_data = ocp_read_word(tp, MCU_TYPE_PLA, PLA_SFF_STS_7);
--	ocp_data |= MCU_BORW_EN;
--	ocp_write_word(tp, MCU_TYPE_PLA, PLA_SFF_STS_7, ocp_data);
-+	ocp_word_set_bits(tp, MCU_TYPE_PLA, PLA_SFF_STS_7, MCU_BORW_EN);
- 
- 	rtl_rx_vlan_en(tp, true);
- 	rxdy_gated_en(tp, false);
-@@ -10418,6 +10426,7 @@ static int rtl8152_probe_once(struct usb_interface *intf,
- 	case RTL_VER_12:
- 	case RTL_VER_13:
- 	case RTL_VER_15:
-+	case RTL_VER_16:
- 		netdev->max_mtu = size_to_mtu(16 * 1024);
- 		break;
- 	case RTL_VER_01:
+ 	ret = rtl8152_set_speed(tp, cmd->base.autoneg, cmd->base.speed,
+@@ -10456,6 +10489,11 @@ static int rtl8152_probe_once(struct usb_interface *intf,
+ 		} else {
+ 			tp->speed = SPEED_1000;
+ 		}
++		if (tp->support_5000full &&
++		    tp->udev->speed >= USB_SPEED_SUPER) {
++			tp->speed = SPEED_5000;
++			tp->advertising |= RTL_ADVERTISED_5000_FULL;
++		}
+ 		tp->advertising |= RTL_ADVERTISED_1000_FULL;
+ 	}
+ 	tp->duplex = DUPLEX_FULL;
 
 -- 
 2.47.3
