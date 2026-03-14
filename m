@@ -1,260 +1,264 @@
-Return-Path: <netdev+bounces-267657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267658-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MDI7Op62tGm4sAAAu9opvQ
-	(envelope-from <netdev+bounces-267657-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 02:15:10 +0100
+	id eMH2GkW3tGkLsQAAu9opvQ
+	(envelope-from <netdev+bounces-267658-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 02:17:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E57D28B326
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 02:15:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2B028B34C
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 02:17:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D1E9731A9205
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:10:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 657EB3039303
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 01:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92BA82DCBEC;
-	Sat, 14 Mar 2026 01:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD565260566;
+	Sat, 14 Mar 2026 01:17:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="OZeUODa/";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="EWTg8vRf"
+	dkim=pass (2048-bit key) header.d=LIVE.FR header.i=@LIVE.FR header.b="pJWXWCD1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazolkn19011032.outbound.protection.outlook.com [52.103.33.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875A62E11D2
-	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 01:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773450589; cv=none; b=Tah3ueDTUtObMW6HaRmnBpIVoq8CLnuf2+RkxZs1b278md2cLDZ0yjMO0Ue9tk1Jmv0sL4MyNcHcy2vK0rG4pie5l1u7kBYqcUz40sdSmF/RPzkRwnW6hZ290DGGSc+53b/5OV3FgegsIKIW9RkcixYY0ZDnvC+zRNlQ8ybsL0k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773450589; c=relaxed/simple;
-	bh=QNFUDaCsrOLeka2kBpol1pLbhT3GpOqMWFxBJkqesvE=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=RCIv6eZ/0eqZOPLv+0TL3pi3i68CDLJ//n85XvO9VopLpgnX7qOZlZAx4vASiZq59X9egGnKTQKSXK2545diAT5NKjzvf1B5XciV3y5l409/DBPxhTqmWzxDDqTh7yVfon5aoHSFltLICl5QdHPhV2LWOJy3+CpZY/uCwSFsN/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=OZeUODa/; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=EWTg8vRf; arc=none smtp.client-ip=160.80.4.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth-2019-1.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 62E198b4022517;
-	Sat, 14 Mar 2026 02:09:13 +0100
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 931EB12045B;
-	Sat, 14 Mar 2026 02:09:04 +0100 (CET)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1773450544; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=355Vr8wgyQcWOEFBUm/IrvEz2FsjymlSTqRmbfmeUao=;
-	b=OZeUODa/05Dq2RLqE2cOB7nnEOQhRG/XBQRvBNFHOM5hp6oFIai0UR/yQy6elOBHJQubo+
-	lpa0YOTb2OW1hLAA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1773450544; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=355Vr8wgyQcWOEFBUm/IrvEz2FsjymlSTqRmbfmeUao=;
-	b=EWTg8vRfGRXmnWhTzpyIKgGwOnYJKmhPv7G0fHxqaMYfHmftdpasYqOfvsb8HJtkbo7kzo
-	0fPJQDt2xL2TWExUUj85isZGCWGSGWvMF5rFaRXNmFfLZVZKOTp2VHyz2DW4BB8A/FymCR
-	tT3lg5OBVDKHObvGMWm1ZbihqAutKfmzHhFDOheNoxMMizqIpbSF/imTBVBuPJNiRmOrkw
-	xACEV6k0hWR4buLslajnfvEidf+ydC49cQnyTlN8TW1i024pIIw6xhAYW8y6WZGD7EHNun
-	7Qgj3xyQcEN4iP5S8/KMulaplTj41GueV04tDHkN0+3ajU+nhLZZHrx3KbtFuw==
-Date: Sat, 14 Mar 2026 02:09:04 +0100
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: Justin Iurman <justin.iurman@6wind.com>,
-        Nicolas Dichtel
- <nicolas.dichtel@6wind.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        horms@kernel.org, justin.iurman@gmail.com, stefano.salsano@uniroma2.it,
-        paolo.lungaroni@uniroma2.it, ahabdels@cisco.com,
-        Andrea Mayer
- <andrea.mayer@uniroma2.it>
-Subject: Re: [PATCH net-next v2] seg6: add per-route tunnel source address
-Message-Id: <20260314020904.3ec2344109a66ee70b2ec1ac@uniroma2.it>
-In-Reply-To: <CAOY2BqwgYYibttTCc15a2SD=4RHMj43F47Ev20_u-a-siPzuOg@mail.gmail.com>
-References: <20260311152845.278354-1-justin.iurman@6wind.com>
-	<20260313030220.af70f3b5f2c5d2cb7b4a840e@uniroma2.it>
-	<CAOY2Bqz8_8iT2Auw=sWob0-XUQg-sPmdAFvzRLg+KszrU6LMqA@mail.gmail.com>
-	<43e16e45-5fb1-4413-bbd1-4752bbcdec7d@6wind.com>
-	<CAOY2Bqx6jjBc5FCoRg+64v2L17bBsaAE8sy7P4JCwVXc+1n7_Q@mail.gmail.com>
-	<3d9d384f-d001-4293-b7d5-7a88596ffc1d@6wind.com>
-	<CAOY2BqwgYYibttTCc15a2SD=4RHMj43F47Ev20_u-a-siPzuOg@mail.gmail.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E27227456;
+	Sat, 14 Mar 2026 01:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.33.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773451071; cv=fail; b=t6YOV+HVdkPTHMyKbPPrugdTha9tHuN9ouBJiShnIVtygdxDZ8MifU9UsDWfWLuIzOk1bW64bccj2suW3NlbQYppgENn0/m9tb7DnwZzEb3+6uy0repKwQGlkiRRk2Q663l7i+rqrc0LJ1kftACi4GPvKgDEF7MSqsDhOT1jOyk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773451071; c=relaxed/simple;
+	bh=K7seYPGFGU/Pj3vAp3u+VtchUj5bYQvVfTjwgltR4gg=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=DVjdm3GWCg+A7GMi2OQesBoB7n1I44Lu+IcubacQ9ogXgVed7Za3cIqmsC3V91tMH7R8Q7kBzjn6kEMRegjlmVBMtoRIMHq/oNr4Yyr2/XMgaOerG/FdmJDOy6RHvbcq12Cyu7L6XGFBrckr4ayMLf7r7nUKpXGwuKNp0XdTZ9k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=live.fr; spf=pass smtp.mailfrom=live.fr; dkim=pass (2048-bit key) header.d=LIVE.FR header.i=@LIVE.FR header.b=pJWXWCD1; arc=fail smtp.client-ip=52.103.33.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=live.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=live.fr
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gqs9lTA8iMOBtm9QZWnzueny1X+ktZRiFwONlnM08mUXkn+HeZbpIBKy4inlibifW+goCGcfUaTJHwCaphDRIXL7GgcvGK46z7ob2rWXVzP7WLug0D1bEMKcfn5H5TjRUZ/CFVBWZnGsr88DVrysLa4p9zgIwmeVrl09zdF/rPUDH8BXYkiV3mzDXiagHXp9gOhsSy2lZebf4pXa9zr/7lYaYybKXgk/aZxemIPtkjL2/ReDqqQnR4Q6A/8Wla+k0d6lSXfYUa3NV+Gzz58cWwZgNp+k2NlEZstervP2XiIQN+8wB/YVtNobEc/4Ezarnxuc5Cnpphcey4dT83TgQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UE8kfAQ+yd71w51euHBXnslcx8xcYnXRIfXHwqFBQzE=;
+ b=cwmzn/D494iiOdSn1831U/N6VDvtXMd/DBm9uvh170PX+iN4Bhs6/e+SQ/6mxjDa26DPuihdMQg1hMmgGP9WQYdFmMpw2UCQGUiBs8eKvWKgsZleJeyvjLCOZSzQh0iGP9EptCm02AwkHQvXkAPWxHgppx2azXyLaOIHbJ8Vl7QscHu/tT/ANHB7RCkasZNLFV47rlfudKwXu7IxYNKpyJfJWMAkDHbLojzvVdMBTUoa7M/NjrAL1PPsms5g19dX/IjStycppwHTq3U+KU2dHs34KjCD3pNc6ym4yGEodxSCwAsrvG8czR6TOPhVkiJBoctOsCzcXHsuE7J0/nbOkg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=LIVE.FR; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UE8kfAQ+yd71w51euHBXnslcx8xcYnXRIfXHwqFBQzE=;
+ b=pJWXWCD1PUnMeMYQIPxwC6N1NOJlKQ6P7xLNu2fLo6ly0rjRzsYBjbvNeRC7w40uKSY7aOuTPemgWal0S4r+dmT2RllCNIxZfQFIvoALkPdO/e5GLXesKIjkRWOqxDr2N9F/RFSRMhBVDX61ImdjYwfYCPApaKfGGuG/N5K2hTaY/+f5H3yzjfQp1DfiYRAoJM1sfag7BZTZYV7XfEXKYKXl9wMdlIfW10JQs7c3B/2JMB6qQaOL8A/NUtlERkg1dMKFQNHfm9G4py8y7Cc4bVQdirzQXUGYmarORrX0b0EKd6O4q+Ao0uIkuxWlHbWzj9adcqPe1ixM+9RGa5cAsw==
+Received: from PAWP192MB2411.EURP192.PROD.OUTLOOK.COM (2603:10a6:102:46e::17)
+ by GV1P192MB2395.EURP192.PROD.OUTLOOK.COM (2603:10a6:150:1ec::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.17; Sat, 14 Mar
+ 2026 01:17:45 +0000
+Received: from PAWP192MB2411.EURP192.PROD.OUTLOOK.COM
+ ([fe80::9c57:1e4e:325e:d2e7]) by PAWP192MB2411.EURP192.PROD.OUTLOOK.COM
+ ([fe80::9c57:1e4e:325e:d2e7%5]) with mapi id 15.20.9654.015; Sat, 14 Mar 2026
+ 01:17:45 +0000
+From: Martin Olivier <martin.olivier@live.fr>
+To: netdev@vger.kernel.org,
+	linux-ppp@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	dqfext@gmail.com,
+	Martin Olivier <martin.olivier@live.fr>
+Subject: [PATCH net-next v2] ppp: add IFLA_PPP_UNIT netlink attribute
+Date: Sat, 14 Mar 2026 02:14:29 +0100
+Message-ID:
+ <PAWP192MB2411A808BB36F0086A9B00B99742A@PAWP192MB2411.EURP192.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.51.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: PA7P264CA0440.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:102:37d::7) To PAWP192MB2411.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:102:46e::17)
+X-Microsoft-Original-Message-ID:
+ <20260314011619.11603-1-martin.olivier@live.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
-X-Spamd-Result: default: False [-0.16 / 15.00];
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAWP192MB2411:EE_|GV1P192MB2395:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6f53536d-49e5-48ab-e361-08de81677d93
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|461199028|25031999004|51005399006|23021999003|12121999013|19110799012|5072599009|5062599005|15080799012|8060799015|1602099012|40105399003|3412199025|4302099013|440099028|10035399007|1710799026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xqhtjVnAajt7dwVbjJCC+bNMusBQFrUEGQ3cF/HZ9pi8ZHNOVxUnectQ4MKr?=
+ =?us-ascii?Q?f3j6BQElcm37A+RuAllZO4MHgjuNh7beAm5F5fB6KT/woHSDr1LIwjOX2RCF?=
+ =?us-ascii?Q?pVDTlvqA6YIGQt/nMgFGWAfMwl+miKybXS3ZHPV8EYqgGE+9gdhi+YpxmmYJ?=
+ =?us-ascii?Q?D2ZreqHLKBeIVK9CjXgfvqdN8thLyWMdKwEelA23o2McgMbRjIExDLuYOcr6?=
+ =?us-ascii?Q?WpuY4lQQfsgnyTacetqE1bZ4iXCz2ScpHSxRFkTBM3mg1Z1FtVw/b0cX8d41?=
+ =?us-ascii?Q?+xOyLfDf9zIw9qPI2SkPNWD/yTKA6ViOnPXxJWSgcuDWfVF7HXjFKHCGA7D1?=
+ =?us-ascii?Q?E6x3uB/u6At6a4D7xNSAovVGFj53pojMr8XP5tDaKUysXtpt6I2jUeKnEOMM?=
+ =?us-ascii?Q?naa6WoG3i6o/iwuzg54NcdlwCOdK+zbcWy0L2bcUO/9dfj3+KOkm1SCGJiGU?=
+ =?us-ascii?Q?S1kPQ0lDgiF3pVkROkybdyfKih/lANYypQNhu7l/PP/QS/C3aq6GMk/Qkx36?=
+ =?us-ascii?Q?/PzdDA3hkn7eGrQo1Ovqvi+I4fYAfVsXcOmxc0k726dytJLerBK7pB1UQQvD?=
+ =?us-ascii?Q?gBAMNpauNwbOaCOWJjPPzTxO+qFscZFE9MbdDrNSxrJzBpXWM7oO4nyyPf3J?=
+ =?us-ascii?Q?1GYeMIPUwLe49b8sc2y0qQ6ADVMCi2M0ys8C9w5R9wuAWiCpAa1rYgkkhhjh?=
+ =?us-ascii?Q?OEgXRD4w+2hsel37KHyaablZ0guEM048DvBsOOYRFRTSzfZA1L8NOrG/pF46?=
+ =?us-ascii?Q?8osKLLHe+UzeKSUlZteMU4oCNHzLDUL+dlHWfysPbtxfAzMzfiRT1BGQvaA6?=
+ =?us-ascii?Q?UlK0iEgn0nDVV3FknN+7ddxdRvWxbW3kwxhPFRop3Hh0laZjHjx1NBJyFyxd?=
+ =?us-ascii?Q?RvSYDlHGeBnnitZKYvYxpGShnZA2JYje4FDPTqPAvC1/EionPvNUBCrEnt8C?=
+ =?us-ascii?Q?2L3cp2XMoFOwYG9zURYQehnF2AzwbZaiZk2HHxiM6hyydDI4Yfdp9zR5m47O?=
+ =?us-ascii?Q?P1/f6djJdowVymrjKU7rOgg38bgM9FcdWxiOnkeji8tcl6HdO3hiaEfcXQgk?=
+ =?us-ascii?Q?1Oyb/z1x26/qPXD8xpwWIlt0eUxyhyK+f0j4KGR1g66TaTtHUInLsn+ZoEOZ?=
+ =?us-ascii?Q?7LiII7GdawEb6YbXuYcwDymdPPo+zPeMoStcsKBPpAswmY0NgeD2pZs=3D?=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?gaLhWwYnWeby6yKEuHcvIgzHjP5M1G35AmC408zcxF5n3GMz4LP7ZlreSleQ?=
+ =?us-ascii?Q?YnMSmCbS0eTW4dExJAJrjUXkonGJOXcIq52PSSY5mwbG1aUgHV5PfV7D+w73?=
+ =?us-ascii?Q?0PuCcZnnTkkRoU9Aa9volg2kFdR3d5nNIpM1of2tEzam1Q9kDyi9AiRNdxAr?=
+ =?us-ascii?Q?3V0ZKsp4BtaqlmjtCELq7mzfJbTS0puK/Ryc86m6gxsQjyZ9PaBMnWUegrEb?=
+ =?us-ascii?Q?t40q0Q+xtTyZ+TRV1cWsIAuCcHmpRVPHp08CYwk4F+5NsXmI4s2Tv4CL+25z?=
+ =?us-ascii?Q?zGFcg64ONNN8f9qL5noDf1O/wJKfB+rES9VZnJ1Tn6nTdxysfS5xtjcXZZYW?=
+ =?us-ascii?Q?UiJtHxIQw7qah2pn+PG8eC0WfLMo3l5d+Xh9FtU5aWoF9BPF+6pyM8y9nUvz?=
+ =?us-ascii?Q?yPZ4q5TGJgI5bCpZtnSk5nELlMovexHApR9Xa/UZhVvE0o59rngn0G5uNva8?=
+ =?us-ascii?Q?/wlwAQBooERXaGWDmDbjotL3rrU28PMDnX3UbKjvPzlUcoEwetCSWhLDFk3t?=
+ =?us-ascii?Q?DkYv3M9cnoT3w7bIo19b4FIt9D4dgiqzrKQptFJiXwWdxhsMLZZ8JDJdGgor?=
+ =?us-ascii?Q?wmLetIO5WV66/sCyAjU61R8uMhwi5vlMiP+NpVQlqpZYYuMdNPuy9rX9MRnD?=
+ =?us-ascii?Q?K86fmQ90ZFQpdeGnTSt0H+ho/IfhYuDWmJumto3w/ICUNkU1ye0EvJQyaavh?=
+ =?us-ascii?Q?LTJc47WSMer/wOaPiXNM9aWkWhyyWREafQKjmE2MN+8b6KjzB7rOPCNwM39/?=
+ =?us-ascii?Q?gBpnZKpXVYfuWXoRjWQEGXA3wC7Qj+hCq3/eB7g+wIsly/pLLnXZYiFky6fK?=
+ =?us-ascii?Q?XAkg9o8cf94tnprPFAkBpZBnjcLDy6kDHEPlb+IvVnTD76wRjS37t3g8zIgL?=
+ =?us-ascii?Q?wV+F0MDz01VTL33gjhNJfAdVRsOVSLszcoF81w9o36cEuflOn/bxbxWA7hvZ?=
+ =?us-ascii?Q?f3kh6b3NZKvMX6WzrmDGrlMiFTvLIXjbH4BfThZleYRgs9o9KSpfJpr0r2HH?=
+ =?us-ascii?Q?2Ih7W87QG5P4gA8Oic+N3sXHAOsLQ+QzB41mDgjAsOjhXcoUUixC3FYqOJ+Y?=
+ =?us-ascii?Q?WS+m0fHvXUsUWlz9bWmjEJ9iPLu621CVZ6rob3SDa2P2a3Q2QeYO8wEgUn/3?=
+ =?us-ascii?Q?4DTNG6Ovgl0xZu9mIH8hJAp3b55rPedy+wbBgZkSvaquMUznlR9buXIXKwaA?=
+ =?us-ascii?Q?wQUqw8c77guGMz1fRj+LX1bS/fVhsDgJePkHxfxdQM6Yz02+pM62Z0RXuMWl?=
+ =?us-ascii?Q?Ad/IpM0dui393Y5j/nQyMez80dVCzIyWo6PivCY7IpGyaihC6RePaviNF9jb?=
+ =?us-ascii?Q?6DB0aRIOHm71ZgyNJTfz6v7qq5r47l07I64RaM693qggUWrIPWQYaI1MnK4d?=
+ =?us-ascii?Q?1H1JzRFv9rVUnxITVMQQt4JkLpR1?=
+X-OriginatorOrg: sct-15-20-9412-4-msonline-outlook-4fb8a.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f53536d-49e5-48ab-e361-08de81677d93
+X-MS-Exchange-CrossTenant-AuthSource: PAWP192MB2411.EURP192.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2026 01:17:42.5243
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1P192MB2395
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[live.fr,none];
+	R_DKIM_ALLOW(-0.20)[LIVE.FR:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com,uniroma2.it,cisco.com];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com,live.fr];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267657-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[uniroma2.it:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-267658-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[live.fr];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.olivier@live.fr,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[LIVE.FR:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,uniroma2.it:dkim,uniroma2.it:email,uniroma2.it:mid,6wind.com:email,bootlin.com:url,srv6_hencap_red_l3vpn_test.sh:url,srv6_hl2encap_red_l2vpn_test.sh:url]
-X-Rspamd-Queue-Id: 4E57D28B326
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,LIVE.FR:dkim,live.fr:email]
+X-Rspamd-Queue-Id: DD2B028B34C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Justin, Nicolas,
+Currently, the PPP rtnetlink API allows creating a new network interface
+with a custom ifname, but it lacks the ability to specify a custom PPP
+unit id.
 
-First of all, thanks both for the discussion on the link-local addresses.
+Setting a specific unit id is currently only possible with the
+PPPIOCNEWUNIT ioctl. If a user-space program also requires a custom
+interface name, it must create the interface first with PPPIOCNEWUNIT
+and then rename it.
 
-On Fri, 13 Mar 2026 14:06:26 +0000
-Justin Iurman <justin.iurman@6wind.com> wrote:
+Resolve this by introducing the IFLA_PPP_UNIT netlink attribute. This
+allows user-space programs to atomically request both a custom ifname
+and a specific PPP unit id during the RTM_NEWLINK creation process,
+eliminating the post-creation renaming for this use case.
 
-> On Fri, Mar 13, 2026 at 10:59 AM Nicolas Dichtel
-> <nicolas.dichtel@6wind.com> wrote:
-> >
-> > Le 13/03/2026 à 11:20, Justin Iurman a écrit :
-> > > On Fri, Mar 13, 2026 at 9:47 AM Nicolas Dichtel
-> > > <nicolas.dichtel@6wind.com> wrote:
-> > >>
-> > >> Le 13/03/2026 à 09:44, Justin Iurman a écrit :
-> > >>> On Fri, Mar 13, 2026 at 2:02 AM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
-> > >>>>
-> > >>>> On Wed, 11 Mar 2026 16:28:45 +0100
-> > >>>> Justin Iurman <justin.iurman@6wind.com> wrote:
-> > >>
-> > >
-> > > [snip]
-> > >
-> > >>>> Whether to also reject link-local is debatable: ip6_forward() does
-> > >>>> drop it, but is there a legitimate use case where a link-local tunnel
-> > >>>> source would actually be needed?!
-> > >>>> I'd argue we should reject link-local addresses as well.
-> > >>>> For instance, using them as a tunnel source violates scope boundaries and
-> > >>>> breaks ICMPv6 error reporting.
-> > >>>
-> > >>> IMHO, I also think we could reasonably forbid LLs.
-> > >>
-> > >> Why rejecting LL? It's legal to use LL as a source address of a tunnel (and
-> > >> forwarding packets in this tunnel). Is this forbidden with srv6?
-> > >
-> > > Well, this is indeed legal (at least nothing prevents it), but they're
-> > > not routable. So question is does it make sense at all? We're talking
-> > > about two nodes on the same layer-2 link as the only valid use-case
-> > > here. I'm not sure it makes sense, especially in the context of SRv6.
-> > Yes, you're probably right. I'm usually uncomfortable with a configuration being
-> > forbidden without any real problem/reason.
-> 
-> After consideration, it looks like ip6_forward() does filter LL source
-> addresses (see [1]), so such packets are never forwarded and there is
-> no violation of scope boundaries. I agree it makes little sense to
-> allow LL source addresses in the context of SRv6, but Nicolas has a
-> point too (i.e., it's not harmful, let's not restrict things
-> unnecessarily). I guess both ways are fine, maybe others can shim in
-> and share their opinions. For v3, I'll just keep it as is, we can
-> still make a change later.
-> 
->  [1] https://elixir.bootlin.com/linux/v6.19.7/source/net/ipv6/ip6_output.c#L643
+Signed-off-by: Martin Olivier <martin.olivier@live.fr>
+---
+Changes in v2:
+- use nl policy to set IFLA_PPP_UNIT min allowed value instead of a manual check in ppp_nl_validate()
+- use of nla_get_s32_default() to collect IFLA_PPP_UNIT value
+Link to v1: https://lore.kernel.org/netdev/PAWP192MB2411A5E7D3BE1B55E155A92F9747A@PAWP192MB2411.EURP192.PROD.OUTLOOK.COM/
+---
+ drivers/net/ppp/ppp_generic.c      | 3 ++-
+ include/uapi/linux/if_link.h       | 1 +
+ tools/include/uapi/linux/if_link.h | 1 +
+ 3 files changed, 4 insertions(+), 1 deletion(-)
 
-Justin, the ip6_forward() check is exactly the drop behavior I was referring
-to. My initial concern was architectural, since a router wouldn't forward a
-packet with a LL source anyway.
-
-Nicolas, you make a fair point: nothing explicitly forbids using it.
-I initially raised the question just to be on the safe side from the very
-beginning and figure out the best path forward.
-While it is a niche scenario, there can indeed exist valid use cases
-(e.g., a host doing SRv6 encap with a LL source, sending it to a
-directly connected SRv6 router that simply applies a decap behavior).
-
-Since it doesn't harm the kernel, I agree we shouldn't artificially
-forbid it. Allowing LLs in v3 is fine by me. Let's also see if anyone
-else on the list has further thoughts on this.
-
-
-
-Justin, regarding the other questions from your previous email about
-selftests:
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index e9b41777be80..3d5d5fe8bad3 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -1292,6 +1292,7 @@ static int ppp_dev_configure(struct net *src_net, struct net_device *dev,
  
-On Fri, 13 Mar 2026 08:44:04 +0000
-Justin Iurman <justin.iurman@6wind.com> wrote:
+ static const struct nla_policy ppp_nl_policy[IFLA_PPP_MAX + 1] = {
+ 	[IFLA_PPP_DEV_FD]	= { .type = NLA_S32 },
++	[IFLA_PPP_UNIT]		= NLA_POLICY_MIN(NLA_S32, 0),
+ };
+ 
+ static int ppp_nl_validate(struct nlattr *tb[], struct nlattr *data[],
+@@ -1316,7 +1317,6 @@ static int ppp_nl_newlink(struct net_device *dev,
+ 	struct nlattr **data = params->data;
+ 	struct nlattr **tb = params->tb;
+ 	struct ppp_config conf = {
+-		.unit = -1,
+ 		.ifname_is_set = true,
+ 	};
+ 	struct file *file;
+@@ -1342,6 +1342,7 @@ static int ppp_nl_newlink(struct net_device *dev,
+ 	}
+ 
+ 	conf.file = file;
++	conf.unit = nla_get_s32_default(data[IFLA_PPP_UNIT], -1);
+ 
+ 	/* Don't use device name generated by the rtnetlink layer when ifname
+ 	 * isn't specified. Let ppp_dev_configure() set the device name using
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index e9b5f79e1ee1..40523cd01a8b 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -1477,6 +1477,7 @@ enum {
+ enum {
+ 	IFLA_PPP_UNSPEC,
+ 	IFLA_PPP_DEV_FD,
++	IFLA_PPP_UNIT,
+ 	__IFLA_PPP_MAX
+ };
+ #define IFLA_PPP_MAX (__IFLA_PPP_MAX - 1)
+diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uapi/linux/if_link.h
+index 7e46ca4cd31b..150a582ae498 100644
+--- a/tools/include/uapi/linux/if_link.h
++++ b/tools/include/uapi/linux/if_link.h
+@@ -1465,6 +1465,7 @@ enum {
+ enum {
+ 	IFLA_PPP_UNSPEC,
+ 	IFLA_PPP_DEV_FD,
++	IFLA_PPP_UNIT,
+ 	__IFLA_PPP_MAX
+ };
+ #define IFLA_PPP_MAX (__IFLA_PPP_MAX - 1)
+-- 
+2.51.0
 
-> On Fri, Mar 13, 2026 at 2:02 AM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
-> >
-> > On Wed, 11 Mar 2026 16:28:45 +0100
-> > Justin Iurman <justin.iurman@6wind.com> wrote:
-> >
-> > > Add SEG6_IPTUNNEL_SRC in the uapi for users to configure a specific
-> > > tunnel source address. Make seg6_iptunnel handle the new attribute
-> > > correctly. It has priority over the configured per-netns tunnel
-> > > source address, if any.
-> > >
-> > > Signed-off-by: Justin Iurman <justin.iurman@6wind.com>
-> > > ---
-> [snip]
-> 
-> I agree. The reason why I did not is simply that, IIRC, none of the
-> srv6 selftests actually check the source address ("ip sr tunsrc set
-> xxx" is not even used, and dynamic resolution is the default
-> behavior). Note that the source address is specifically checked in
-> ioam6 selftest though (packet capture + parsing), but srv6 selftests
-> are not designed the same way. What I suggest is to not overcomplicate
-> things and simply modify srv6_hencap_red_l3vpn_test.sh and
-> srv6_hl2encap_red_l2vpn_test.sh to include a test that does encap with
-> "tunsrc" (and we could also add the same with "ip sr tunsrc set xxx").
-> It wouldn't check for a specific source address though, would just
-> make sure connectivity doesn't break like for other tests. Also, the
-> other question is should we duplicate all tests for those cases: with
-> "ip sr tunsrc set xxx", and with "tunsrc". WDYT?
-
-To answer your questions:
-
-1) Just checking for connectivity might not be sufficient here. If an
-   issue causes the kernel to fall back to the default interface IP, a
-   simple ping would still succeed, giving us a false positive. To verify
-   the actual outer source address without overcomplicating things, we
-   could maybe use policy routing (ip -6 rule) or a simple ip6tables/nftables
-   rule on the receiving netns to drop the probe (ping) packet if its source
-   address doesn't match the expected tunsrc.
-   This is just a suggestion, of course; if you want, we can sync offline
-   on this to figure out the best way to handle the selftest.
-
-2) I don't think we need to duplicate the tests right now. We can
-   consider extending the per-route tunsrc selftest to also cover the
-   per-netns tunsrc later, when we start working on that specific
-   per-netns fix.
-
->
-> [snip]
->
-> I agree. We could synchronize offline to squash the same fix for ioam6_iptunnel.
-
-Yes, for sure!
-
-Thanks,
-Andrea
 
