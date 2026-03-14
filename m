@@ -1,250 +1,313 @@
-Return-Path: <netdev+bounces-267732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267733-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WOLmJBdVtWnAzQAAu9opvQ
-	(envelope-from <netdev+bounces-267732-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 13:31:19 +0100
+	id cHcYI8ZltWl90AAAu9opvQ
+	(envelope-from <netdev+bounces-267733-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 14:42:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94FAD28D253
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 13:31:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04D4128D56F
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 14:42:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 98E03300D4EE
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 12:31:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5FF283022557
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 13:42:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D0A1EDA32;
-	Sat, 14 Mar 2026 12:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BA37378813;
+	Sat, 14 Mar 2026 13:42:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ZFXNB1u3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="A7BirgDy"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012066.outbound.protection.outlook.com [40.93.195.66])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E33F335BA;
-	Sat, 14 Mar 2026 12:31:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773491472; cv=fail; b=uLJMf+1NqHOwdWVl7iK5fQTHxCGDQNx9R8/aLwuH/YP6gLTkg5E4gHnht7MG4rv5gerPRCUVsNdRY/cJYbNBPAph8d+9W9l1f3K4+J7HeeS8kA68O5GJyNnnaPX93vk6xLjVWRjC5U/OmXRk5qChGaa4CJtqjNYIT71VUndlxUU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773491472; c=relaxed/simple;
-	bh=Lw6Nwa3ZTPU8J6+w0A6BDw0C/CnXJ/jgNUnGt+LpTX0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=mw3oy7svs4b5elASiNDnXC16Tekx35n5Xj0AJyQnrI7ihh+hsbbTdVCdxEQJ6jy9IbVzUeFhcwh66Q3P8wsO3dPdaLCa+q6lccmzbjJrVSlR5G1Tubl/O4aQjylxmrDSrZl578llGM9UvLjPVCaLTJfVMtFZYz3No1xSjwKzv2M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ZFXNB1u3; arc=fail smtp.client-ip=40.93.195.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LV7wZz1hbixNQ76nVmkdGhGVypOIOT0UtirISGSC0l77xWQA9y7jt3+bdxhOvFOSUxAlK8J2KiMHXa0MWNMpoRUQ/+k5qDSw1J8t2cHoLVL+CT8M3Ui5qVhqQlVIXFz+wslIVXk/RI9FrEurEYhzBBvrnj6fRoQ4s6USh5odAeqnPA10gU+/uulJOT7yMsg4w34JubHdVYSyeuyoy4YfOGYhFxcc6wvNifDPMaKYHz7+Fv/gQhwa2+mOP18pGOvDMvdcB4b15sujGdOwpW+NPYaXBtowH0cCtvvNXt2syZ4IVV7+5ruTfEXu5uJ+QUIn2rqbIWfPbggd823jVlRe/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DntHmpJj+bDX0jcQ4UQcCYmUV05Ksghxyk2jWxSek1s=;
- b=NM5dJU4U4+4bC8ReIypgwSoBFiJcv7/d8UZo7/bCaETHpXcePdCDix30rHT2LlhAsv7k78iFgyZ5gcG0uthF/pFmGsfEgG8rGI/orZAFLV0UoPq02mda5BLE5UsiFXfqx8aE/9ETif6Txz3UnOY1g6Xd/kRYDSlVZVbrXH8OPBbfcvbj+3jLQ/9gbmPGs2eTvnVSWDd6RV/t2NB1/eRPcZ1uUcI0wB6hxBlPBWhqtLvfKgQ5zhkHfJ4IG20MdIpXLANu8O5E59R/Gc+9Y2tg5inMBVkziUgbCuVaLIaf9RCk1JNOZmzGanktYQqY+bJpkjVPgHX9LvSdG/YNIXCgag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.194) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DntHmpJj+bDX0jcQ4UQcCYmUV05Ksghxyk2jWxSek1s=;
- b=ZFXNB1u3f7N1bDg3OQ1XdNpZoALCmpAHdFpSsk9uMFjTYThwVpQvZX+nFrjQBmStAilBZ4WNKv/7Cui7WTcLW4Ql1lxSEd53omjztThFHu7qbQ+kcKzrz1G8Toq1y21iKqsBK3hIUVF1bw5ilFCI9CXgU8dwn5mevdMmzaK0gxs=
-Received: from CH2PR07CA0057.namprd07.prod.outlook.com (2603:10b6:610:5b::31)
- by IA4PR10MB8398.namprd10.prod.outlook.com (2603:10b6:208:56d::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.16; Sat, 14 Mar
- 2026 12:31:08 +0000
-Received: from CH1PEPF0000AD80.namprd04.prod.outlook.com
- (2603:10b6:610:5b:cafe::9d) by CH2PR07CA0057.outlook.office365.com
- (2603:10b6:610:5b::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.21 via Frontend
- Transport; Sat, 14 Mar 2026 12:31:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.194)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
-Received: from flwvzet200.ext.ti.com (198.47.21.194) by
- CH1PEPF0000AD80.mail.protection.outlook.com (10.167.244.90) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9700.17 via Frontend Transport; Sat, 14 Mar 2026 12:31:07 +0000
-Received: from DFLE203.ent.ti.com (10.64.6.61) by flwvzet200.ext.ti.com
- (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 14 Mar
- 2026 07:31:06 -0500
-Received: from DFLE202.ent.ti.com (10.64.6.60) by DFLE203.ent.ti.com
- (10.64.6.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 14 Mar
- 2026 07:31:06 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE202.ent.ti.com
- (10.64.6.60) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Sat, 14 Mar 2026 07:31:06 -0500
-Received: from [172.24.233.103] (uda0132425.dhcp.ti.com [172.24.233.103])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62ECV2C01738719;
-	Sat, 14 Mar 2026 07:31:03 -0500
-Message-ID: <8598edfa-4201-47b4-8929-be80dcca4617@ti.com>
-Date: Sat, 14 Mar 2026 18:01:01 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DE0352C52
+	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 13:42:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773495745; cv=none; b=R3iXfeelBIPQRCIk1IdcSYfbYlGwcKwoiW6KjQ4E7EpVq1RWmpIePread93/aKcpaVNLAyV7wCJjTQLeUlNmPFZGc/qhB0qk2fjviLtYuRjGUIeEodfvVietqDcQni9orS+Oj4zs3D4qvBMk/UABlw/Pj+ze8owMGXH26T7x3n8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773495745; c=relaxed/simple;
+	bh=vD0lWqO8uPTniXCR2wzvzqwCRNCqPfEZxRMIzwdc90o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F50F9HxFPNT33Iq4CvbDHYoII+DuXiB1Mopg5urwETlUqg0pmn6vEbpa9DW7P3/17QEsDDbhRcIMD0jaIeR0HymKDnC/QbDsAXdhPeppbd8S7i7KXk+9Uee3jI/MyGbUuAnl344KnwXjU7RcWWutwffAFAMkeHCBsx4cDQFAh/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=A7BirgDy; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773495741;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=OitJ18LbV3U8rIZ7uUZRphAgZiJyxDjT4DUpok4Nlpw=;
+	b=A7BirgDycIkrKxpduErh6TtnO3g1rvWxWRAz4oB4AOJ4lU3EPtc8Z3jCl4qvieXD6L/HgS
+	TXp5YLGteQV+l+Fq9IqnYkzimJohlcxQVv/um1xYZXinKhWX2SnOFVhoaJmoR4Tah+nYzR
+	CM9FEO49PV8d89/TSEqHkQfgs8t6vUI=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org,
+	edumazet@google.com
+Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net v1] selftests: bonding: add test for stacked bond header_parse recursion
+Date: Sat, 14 Mar 2026 21:42:05 +0800
+Message-ID: <20260314134211.33405-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/2] arm64: dts: ti: k3-am642-evm: Add ICSSG0 overlay
- for dual EMAC support
-To: Meghana Malladi <m-malladi@ti.com>, Nishanth Menon <nm@ti.com>
-CC: Tero Kristo <kristo@kernel.org>, Rob Herring <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-	<danishanwar@ti.com>
-References: <20260311053852.1034244-1-m-malladi@ti.com>
- <20260311053852.1034244-2-m-malladi@ti.com>
-From: Vignesh Raghavendra <vigneshr@ti.com>
-Content-Language: en-US
-In-Reply-To: <20260311053852.1034244-2-m-malladi@ti.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD80:EE_|IA4PR10MB8398:EE_
-X-MS-Office365-Filtering-Correlation-Id: 58652406-3a30-4dd2-8108-08de81c59108
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|82310400026|376014|1800799024|22082099003|56012099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	3h5WVmB20IsZQ7MO5JCR5zqioDmSQ4TMpOR9dXhVPaPL/G0d/lmcm9g9DQQNZGipZW/tzakPdeHpFdfdrX5/6c0wcf3UGINxdpNFJZFyoUovfcOiL25AyJmxOcV6H/1mDvvVu8TIlT1HRbF4LbPMFP3W8hO42rePwDfSGz6C0JNEFGZoawn25Me/zOZWZ7+FqYz3zhFlvBBGrtrpjsuG/t8sIYOSdZCo9M9755ms/BlTi/laCKTx5xCf63cC5bMaiASwoMFjj91YkeHn/UouEupCmGDaNTzfyrKReJ8dJJGDquESdpg27qh+aRQWM0F+n2cVazv0RS0FkuAR2vmBf4cmhlmpQ6BOj4Qf3eE4V0B6SoyzYYzlYd0n619dJWiNF6SR07oyAocYPWrKpD2cOiF0rSchze52TOfCHK+pMSrlskBrSc7w/lgYtaiU4ahp35kOnBVmr/t11GgL5f6v47H/eQE4sFYfAlbWsSwydEgD0+GBV143XShaPqnJceCBZXwgtJoKRhmhou/hO/enjxCrY1bM7dACy5VtAvswVS/0wh9NWRtY+HxJqnNTehLweFWzvaCLq2R302zeII+5+3O99JmnegVHnfZlIJdiHFsW2thfKis+OCsxZYLG6KZhJf7yOgZ8274cwhera9soNLRsGRgh9WT515EVb8Npbr7TTtp757SQkfnDMI6s/tGurrrZmlbBCXnfm4rcsmB5HVi88gtBaw+CYYNZdIDtFoY=
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(376014)(1800799024)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	2+A+/27YowM7M0ThtbF2cNAy9TPTvmW++IFougVq16WViyTJqCkp1w2CFzActlMUbG4C1BkIeEhNNt1yj5ZMwyx1jrGFzfkt1b/rQBOhLqTWdB4XJrhyEKbjEWESLm0GbpNZnJxBvQ3e6BtGyN2nAs4ZmfW5FX1E2Rl/KQUS+byVYZkTWRLU9IZW0Y+k0a28SUfjr4wCM6lpl0qWAyCHMK8WJHcxh1UPSnI4Z2HCE6KKd4IUXoknyCDs5cjoCe1CFZG6KU3eLVMgmF6yrxTnN1HuHbSj0SivbI5kIl1u9eLtO6SrtGgGZpCiZd/8J2yEXtAQ+R694jXArh5y9v/sax8AwZ/r5tiXzYwU2qzDkye7GupLCs/I7NkPottkVaSn1pUauylIkf7qEmDNQVxWrqCvwhTWh1saFnlgBJWhlr0CdCCOaLu5JIVdTUIb9agl
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2026 12:31:07.4019
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 58652406-3a30-4dd2-8108-08de81c59108
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD80.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR10MB8398
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267732-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:dkim,ti.com:mid,ti.com:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-267733-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[ti.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vigneshr@ti.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 94FAD28D253
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bond-lladdr-target.sh:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bond-eth-type-change.sh:url,linux.dev:dkim,linux.dev:email,linux.dev:mid]
+X-Rspamd-Queue-Id: 04D4128D56F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi
+From: Jiayuan Chen <jiayuan.chen@shopee.com>
 
-[...]
+Add a selftest to reproduce the infinite recursion in bond_header_parse()
+when bonds are stacked (bond1 -> bond0 -> gre). When a packet is received
+via AF_PACKET SOCK_DGRAM on the topmost bond, dev_parse_header() calls
+bond_header_parse() which used skb->dev (always the topmost bond) to get
+the bonding struct. This caused it to recurse back into itself
+indefinitely, leading to stack overflow.
 
-On 11/03/26 11:08, Meghana Malladi wrote
-> diff --git a/arch/arm64/boot/dts/ti/k3-am642-evm-icssg0.dtso b/arch/arm64/boot/dts/ti/k3-am642-evm-icssg0.dtso
-> new file mode 100644
-> index 000000000000..f19acf1896c3
-> --- /dev/null
-> +++ b/arch/arm64/boot/dts/ti/k3-am642-evm-icssg0.dtso
-> @@ -0,0 +1,168 @@
-> +// SPDX-License-Identifier: GPL-2.0-only OR MIT
-> +/**
-> + * DT overlay for enabling ICSSG0 dual EMAC on AM642 EVM
-> + *
-> + * AM642 EVM Product link: https://www.ti.com/tool/TMDS64EVM
-> + * DP83TG720 daughter card link: https://www.ti.com/tool/DP83TG720-IND-SPE-EVM
-> + *
-> + * Copyright (C) 2020-2026 Texas Instruments Incorporated - https://www.ti.com/
-> + */
-> +
-> +/dts-v1/;
-> +/plugin/;
-> +
-> +#include <dt-bindings/gpio/gpio.h>
-> +#include "k3-pinctrl.h"
-> +
-> +&{/} {
-> +	icssg0_eth: icssg0-eth {
-> +		compatible = "ti,am642-icssg-prueth";
-> +		pinctrl-names = "default";
-> +		pinctrl-0 = <&pru_icssg0_rgmii1_pins_default>, <&pru_icssg0_rgmii2_pins_default>;
-> +		sram = <&oc_sram>;
-> +
-> +		dmas = <&main_pktdma 0xc100 0>, /* egress slice 0 */
-> +		       <&main_pktdma 0xc101 0>, /* egress slice 0 */
-> +		       <&main_pktdma 0xc102 0>, /* egress slice 0 */
-> +		       <&main_pktdma 0xc103 0>, /* egress slice 0 */
-> +		       <&main_pktdma 0xc104 0>, /* egress slice 1 */
-> +		       <&main_pktdma 0xc105 0>, /* egress slice 1 */
-> +		       <&main_pktdma 0xc106 0>, /* egress slice 1 */
-> +		       <&main_pktdma 0xc107 0>, /* egress slice 1 */
-> +		       <&main_pktdma 0x4100 0>, /* ingress slice 0 */
-> +		       <&main_pktdma 0x4101 0>; /* ingress slice 1 */
+Before Eric's fix [2], the test triggers:
 
+  ./bond-stacked-header-parse.sh
 
-Any particular reason to use ASEL = 0 unlike every other definition of
-main_pktdma that uses ASEL=15?
+  [  71.999481] BUG: MAX_LOCK_DEPTH too low!
+  [  72.000170] turning off the locking correctness validator.
+  [  72.001029] Please attach the output of /proc/lock_stat to the bug report
+  [  72.002079] depth: 48  max: 48!
+  ...
 
-> +		dma-names = "tx0-0", "tx0-1", "tx0-2", "tx0-3",
-> +			    "tx1-0", "tx1-1", "tx1-2", "tx1-3",
-> +			    "rx0", "rx1";
-> +
-> +		interrupt-parent = <&icssg0_intc>;
-> +		interrupts = <24 0 2>, <25 1 3>;
-> +		interrupt-names = "tx_ts0", "tx_ts1";
-> +
-> +		ti,prus = <&pru0_0>, <&rtu0_0>, <&tx_pru0_0>, <&pru0_1>, <&rtu0_1>, <&tx_pru0_1>;
-> +		firmware-name = "ti-pruss/am64x-sr2-pru0-prueth-fw.elf",
-> +				"ti-pruss/am64x-sr2-rtu0-prueth-fw.elf",
-> +				"ti-pruss/am64x-sr2-txpru0-prueth-fw.elf",
-> +				"ti-pruss/am64x-sr2-pru1-prueth-fw.elf",
-> +				"ti-pruss/am64x-sr2-rtu1-prueth-fw.elf",
-> +				"ti-pruss/am64x-sr2-txpru1-prueth-fw.elf";
-> +
-> +		ti,pruss-gp-mux-sel = <2>,	/* MII mode */
-> +				      <2>,
-> +				      <2>,
-> +				      <2>,	/* MII mode */
-> +				      <2>,
-> +				      <2>;
-> +
-> +		ti,mii-g-rt = <&icssg0_mii_g_rt>;
-> +		ti,mii-rt = <&icssg0_mii_rt>;
-> +		ti,iep = <&icssg0_iep0>,  <&icssg0_iep1>;
-> +		ti,pa-stats = <&icssg0_pa_stats>;
-> +
+After Eric's fix [2], everything works fine:
 
+  ./bond-stacked-header-parse.sh
+  TEST: Stacked bond header_parse does not recurse                  [ OK ]
+
+Also verified via make run_tests -C drivers/net/bonding:
+
+  ...
+  ok 3 selftests: drivers/net/bonding: bond-eth-type-change.sh
+  # timeout set to 1200
+  # selftests: drivers/net/bonding: bond-stacked-header-parse.sh
+  # TEST: Stacked bond header_parse does not recurse                [ OK ]
+  ok 4 selftests: drivers/net/bonding: bond-stacked-header-parse.sh
+  # timeout set to 1200
+  # selftests: drivers/net/bonding: bond-lladdr-target.sh
+  # PASS
+  ...
+
+[1] https://lore.kernel.org/netdev/CANn89iK2EURqsjtd=OVP4awYTJHGcR-UU-V9WovpWR1Z3f03oQ@mail.gmail.com/
+[2] https://lore.kernel.org/netdev/20260314115650.3646361-1-edumazet@google.com/
+
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
+Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+---
+ .../selftests/drivers/net/bonding/Makefile    |   1 +
+ .../net/bonding/bond-stacked-header-parse.sh  | 142 ++++++++++++++++++
+ 2 files changed, 143 insertions(+)
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond-stacked-header-parse.sh
+
+diff --git a/tools/testing/selftests/drivers/net/bonding/Makefile b/tools/testing/selftests/drivers/net/bonding/Makefile
+index 6c5c60adb5e8..055f6af03b5d 100644
+--- a/tools/testing/selftests/drivers/net/bonding/Makefile
++++ b/tools/testing/selftests/drivers/net/bonding/Makefile
+@@ -5,6 +5,7 @@ TEST_PROGS := \
+ 	bond-arp-interval-causes-panic.sh \
+ 	bond-break-lacpdu-tx.sh \
+ 	bond-eth-type-change.sh \
++	bond-stacked-header-parse.sh \
+ 	bond-lladdr-target.sh \
+ 	bond_ipsec_offload.sh \
+ 	bond_lacp_prio.sh \
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond-stacked-header-parse.sh b/tools/testing/selftests/drivers/net/bonding/bond-stacked-header-parse.sh
+new file mode 100755
+index 000000000000..d377bedaef63
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/bonding/bond-stacked-header-parse.sh
+@@ -0,0 +1,142 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++#
++# Test that bond_header_parse() does not infinitely recurse with stacked bonds.
++#
++# When a non-Ethernet device (e.g. GRE) is enslaved to a bond that is itself
++# enslaved to another bond (bond1 -> bond0 -> gre), receiving a packet via
++# AF_PACKET SOCK_DGRAM triggers dev_parse_header() -> bond_header_parse().
++# Since parse() used skb->dev (always the topmost bond) instead of a passed-in
++# dev pointer, it would recurse back into itself indefinitely.
++
++ALL_TESTS="
++	bond_test_stacked_header_parse
++"
++REQUIRE_MZ=no
++NUM_NETIFS=0
++lib_dir=$(dirname "$0")
++source "$lib_dir"/../../../net/forwarding/lib.sh
++
++require_command()
++{
++	if ! command -v "$1" &>/dev/null; then
++		echo "SKIP: $1 is not installed"
++		exit "$ksft_skip"
++	fi
++}
++
++bond_test_stacked_header_parse()
++{
++	local devdummy="test-dummy0"
++	local devgre="test-gre0"
++	local devbond0="test-bond0"
++	local devbond1="test-bond1"
++
++	RET=0
++
++	# Setup: dummy -> gre -> bond0 -> bond1
++	modprobe dummy 2>/dev/null
++	modprobe ip_gre 2>/dev/null
++	modprobe bonding 2>/dev/null
++
++	ip link add name "$devdummy" type dummy
++	if [ $? -ne 0 ]; then
++		log_test_skip "could not create dummy device (CONFIG_DUMMY)"
++		return
++	fi
++	ip addr add 10.0.0.1/24 dev "$devdummy"
++	ip link set "$devdummy" up
++
++	ip link add name "$devgre" type gre local 10.0.0.1
++	if [ $? -ne 0 ]; then
++		log_test_skip "could not create GRE device (CONFIG_NET_IPGRE)"
++		ip link del "$devdummy" 2>/dev/null
++		return
++	fi
++
++	ip link add name "$devbond0" type bond mode active-backup
++	check_err $? "could not create bond0"
++	ip link add name "$devbond1" type bond mode active-backup
++	check_err $? "could not create bond1"
++
++	ip link set "$devgre" master "$devbond0"
++	check_err $? "could not enslave $devgre to $devbond0"
++	ip link set "$devbond0" master "$devbond1"
++	check_err $? "could not enslave $devbond0 to $devbond1"
++
++	ip link set "$devgre" up
++	ip link set "$devbond0" up
++	ip link set "$devbond1" up
++
++	# Send a GRE-encapsulated packet to 10.0.0.1 while an AF_PACKET
++	# SOCK_DGRAM socket is listening on bond1. The receive path calls
++	# dev_parse_header() which invokes bond_header_parse(). With the
++	# bug, this recurses infinitely and causes a stack overflow.
++	#
++	# Use Python to:
++	# 1. Open AF_PACKET SOCK_DGRAM on bond1
++	# 2. Send a GRE packet to 10.0.0.1 via raw socket
++	# 3. Try to receive (triggers parse path)
++	python3 -c "
++import socket, struct, time
++
++# AF_PACKET SOCK_DGRAM on bond1
++ETH_P_ALL = 0x0003
++pkt_fd = socket.socket(socket.AF_PACKET, socket.SOCK_DGRAM,
++                       socket.htons(ETH_P_ALL))
++pkt_fd.settimeout(2)
++pkt_fd.bind(('$devbond1', ETH_P_ALL))
++
++# Build GRE-encapsulated IP packet
++def build_ip_hdr(proto, saddr, daddr, payload_len):
++    ihl_ver = 0x45
++    total_len = 20 + payload_len
++    hdr = struct.pack('!BBHHHBBH4s4s',
++        ihl_ver, 0, total_len, 0, 0, 64, proto, 0,
++        socket.inet_aton(saddr), socket.inet_aton(daddr))
++    # compute checksum
++    words = struct.unpack('!10H', hdr)
++    s = sum(words)
++    while s >> 16:
++        s = (s & 0xffff) + (s >> 16)
++    chksum = ~s & 0xffff
++    hdr = hdr[:10] + struct.pack('!H', chksum) + hdr[12:]
++    return hdr
++
++inner = build_ip_hdr(17, '192.168.1.1', '192.168.1.2', 8) + b'\x00' * 8
++gre_hdr = struct.pack('!HH', 0, 0x0800)  # flags=0, proto=IP
++outer = build_ip_hdr(47, '10.0.0.2', '10.0.0.1', len(gre_hdr) + len(inner))
++pkt = outer + gre_hdr + inner
++
++raw_fd = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
++raw_fd.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
++raw_fd.sendto(pkt, ('10.0.0.1', 0))
++raw_fd.close()
++
++try:
++    pkt_fd.recv(2048)
++except socket.timeout:
++    pass
++pkt_fd.close()
++" 2>/dev/null
++
++	# If we get here without a kernel crash/hang, the test passed.
++	# Also check dmesg for signs of the recursion bug.
++	if dmesg | tail -20 | grep -q "BUG: MAX_LOCK_DEPTH\|stack-overflow\|stack overflow"; then
++		check_err 1 "kernel detected recursion in bond_header_parse"
++	fi
++
++	# Cleanup
++	ip link del "$devbond1" 2>/dev/null
++	ip link del "$devbond0" 2>/dev/null
++	ip link del "$devgre" 2>/dev/null
++	ip link del "$devdummy" 2>/dev/null
++
++	log_test "Stacked bond header_parse does not recurse"
++}
++
++require_command python3
++
++tests_run
++
++exit "$EXIT_STATUS"
 -- 
-Regards
-Vignesh
-https://ti.com/opensource
+2.43.0
 
 
