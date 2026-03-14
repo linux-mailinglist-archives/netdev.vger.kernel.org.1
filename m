@@ -1,160 +1,136 @@
-Return-Path: <netdev+bounces-267840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267841-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id FNG5GI27tWkd4QAAu9opvQ
-	(envelope-from <netdev+bounces-267840-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 20:48:29 +0100
+	id mC5fLya8tWlD4QAAu9opvQ
+	(envelope-from <netdev+bounces-267841-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 20:51:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A47C28EA76
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 20:48:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60CAF28EA9F
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 20:51:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 26F3C30095C7
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 19:48:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8238F302DA33
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 19:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC0AC37F019;
-	Sat, 14 Mar 2026 19:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C4B37F727;
+	Sat, 14 Mar 2026 19:50:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="jXlK+OI1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ck3kZJWS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E6A37F012;
-	Sat, 14 Mar 2026 19:48:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6091A2545;
+	Sat, 14 Mar 2026 19:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773517703; cv=none; b=E+nCjYN4/3exXv6lnyDcYZ2aiKFQb7FWayKNbyEVrwiH0YmnqnLQ3Qi6mK6OZxY+vpe79WD/b3Sk76iXdfbZniQPIBIVYSQqIjM4Rgl6maEbSYdrGXhc90ve/kPc9wn670iiLpA24Yde2Lhzi/YqFbhNrvHFZfwGBwq11hYELs0=
+	t=1773517856; cv=none; b=IPJsdN0d1bAWUzQkgdgWMpkRRIy7M9MVUJu4pi3GjPrg8pxjEiPPxhVuBj23Sjluf/iM8tndGzuDRpbinJB9DZz9s92dbY7fCL8wr6UtM7V8ko0qZlBQuERTnpvBvw4C0/rGhMpxa1h32lrfNkvFwr1U672uvZ32D4bXY+N0T94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773517703; c=relaxed/simple;
-	bh=BRmPvP2djIc9Yo/5niOAz8y1AvHloANjfvMUPdo+SWM=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=tVEAPEV+kSML1lSleWV1st3i/tX5A+39POffSeIcfLBT1abV4vmfJt3+ML/VfOsthD3WaLhdyviL7l0IPgtBEAasDSud9PMiBm9cQxJuawUIKaa6+NGifApc4exgHVsoAMdDyYnBODcBeyacb3t5itxzkMBx+f53gqtNcrMcbTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=jXlK+OI1; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 13C4FA03C2;
-	Sat, 14 Mar 2026 20:48:07 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1773517692; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=Ok9tNM7h4Im+PSk7ldF+1yMBmVwrI9z/4FmaPuam2SA=;
-	b=jXlK+OI157yt4ln9lRiDcIv1qC7vYD569l4XzBCa9yOauwMXqkm/s5s1BB2xKJCeHyxZiZ
-	O1ObJESiGZdEPfbKwkW/1OfMdqVwag2ee4J7wgZLBsx9pskeL31UlJHcxgQE1QoM03NC7C
-	CyKPJPHjBnnUFyf6mUhRstJG3hNJWicpumeAyYR9ZiPOas3y3BKRkHrvHZVhT4NwMhBGQR
-	43FlK5J9MZGf/PaQrFd/iw3JdPHrf+F/ClstXRq/A9sHdGREipCPCwQ9KE9pqTux026yg4
-	lcyZSUgpjneMpi27GsOZ/9qfYR2LsetEVoBVQI8dbYELGs08nN0sRA0SH+Laew==
+	s=arc-20240116; t=1773517856; c=relaxed/simple;
+	bh=x83of3pCZL5zt0JL1Vs+J0mJZUPe+x1bQnV5yZKxK/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q6gZYng9V+qFOTUKw+SbhK++fRsNQJlY6N6+Nz+pqqNqDNqHiOaOtIhTc09jJzKi580q1WpKGJX3v0vdkzvsQLkYDoKk8P68vi1aZsBEgAt/ia7npwP1YuUuAsHh9ziJxdxeg8O5JIEvQtoraXtyXhoGluGmumZHxMIgbrNZoIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ck3kZJWS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBAD8C116C6;
+	Sat, 14 Mar 2026 19:50:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773517855;
+	bh=x83of3pCZL5zt0JL1Vs+J0mJZUPe+x1bQnV5yZKxK/k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ck3kZJWSzRE+ThVhaipuz+gu8TIY/DirFQgn8+akov6U4C9igeHq7zrvycfWE4vvv
+	 +XGN83/OwtXZBsI8nuoSb3Q3oWSJQ33VQK84RqQ+M9QwuXm952WIPC+XbXrpN4iEZc
+	 xYgdQjHJsyUfqkOwMurzh8vSFwD5icq0hUNbGV0B72hCRKcvNI6hgIm4ZL5rDb0nTx
+	 MLSFykdS0qQbBrl/lFfP9mFXWiK0uty8S5Xk7mQbyqaN1xbmh3S+xSlecBrahoVZhM
+	 e+vHlAV2z4W8hfK7mpom1qNSVbDFDbxNEeteoEi2jYQRyjh1wV51Uce47xsrj6jvO9
+	 wmN1AxP/bW/qw==
+Date: Sat, 14 Mar 2026 12:50:53 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+ longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next, v3] net: mana: Force full-page RX buffers for
+ 4K page size on specific systems.
+Message-ID: <20260314125053.41d6221b@kernel.org>
+In-Reply-To: <abDo8XTu1EiQFC7T@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <abDo8XTu1EiQFC7T@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Sat, 14 Mar 2026 20:48:07 +0100
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Doug Berger
- <opendmb@gmail.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Vikas Gupta
- <vikas.gupta@broadcom.com>, Bhargava Marreddy
- <bhargava.marreddy@broadcom.com>, Rajashekar Hudumula
- <rajashekar.hudumula@broadcom.com>, Eric Biggers <ebiggers@kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>, =?UTF-8?Q?Markus_Bl=C3=B6chl?=
- <mbloch@rooftopnetworks.de>, Arnd Bergmann <arnd@arndb.de>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/6] net: bcmgenet: add basic XDP support
- (PASS/DROP)
-In-Reply-To: <e3d33a3e-9552-4f2d-99b6-76a1e203603d@broadcom.com>
-References: <20260313092101.1344954-1-nb@tipi-net.de>
- <20260313092101.1344954-4-nb@tipi-net.de>
- <e3d33a3e-9552-4f2d-99b6-76a1e203603d@broadcom.com>
-Message-ID: <efdd4208d96c720e34bf314dd1ba5d28@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267840-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-267841-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,broadcom.com,rooftopnetworks.de,arndb.de,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid]
-X-Rspamd-Queue-Id: 5A47C28EA76
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 60CAF28EA9F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 13.3.2026 23:48, Florian Fainelli wrote:
-> On 3/13/26 02:20, Nicolai Buchwitz wrote:
->> Add XDP program attachment via ndo_bpf and execute XDP programs in the
->> RX path. Supported actions:
->> 
->>    - XDP_PASS: build SKB from the (possibly modified) xdp_buff and 
->> pass
->>      to the network stack, handling xdp_adjust_head/tail correctly
->>    - XDP_DROP: return the page to page_pool, no SKB allocated
->>    - XDP_ABORTED: same as DROP with trace_xdp_exception
->> 
->> XDP_TX and XDP_REDIRECT are not yet supported and will return
->> XDP_ABORTED.
->> 
->> The XDP hook runs after the HW error checks but before SKB 
->> construction,
->> so dropped packets avoid all SKB allocation overhead.
->> 
->> Advertise NETDEV_XDP_ACT_BASIC in xdp_features.
->> 
->> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
->> ---
-> 
-> [snip]
-> 
->> @@ -2345,12 +2397,6 @@ static unsigned int bcmgenet_desc_rx(struct 
->> bcmgenet_rx_ring *ring,
->>   		hard_start = page_address(rx_page) + rx_off;
->>   		status = (struct status_64 *)hard_start;
->>   		dma_length_status = status->length_status;
->> -		if (dev->features & NETIF_F_RXCSUM) {
->> -			rx_csum = (__force __be16)(status->rx_csum & 0xffff);
->> -			if (rx_csum) {
->> -				/* defer csum setup to after skb is built */
->> -			}
->> -		}
-> 
-> Did you intend for that hunk to be deleted?
+On Tue, 10 Mar 2026 21:00:49 -0700 Dipayaan Roy wrote:
+> On certain systems configured with 4K PAGE_SIZE, utilizing page_pool
+> fragments for RX buffers results in a significant throughput regression.
+> Profiling reveals that this regression correlates with high overhead in the
+> fragment allocation and reference counting paths on these specific
+> platforms, rendering the multi-buffer-per-page strategy counterproductive.
 
-Yes, (kinda) intentional. Patch 1 moved the csum setup after SKB 
-construction
-(since we no longer have an SKB at that point), but left the early read
-as a dead no-op - patch 3 then removed it. I'll clean this up in v2 by
-dropping the dead block directly in patch 1 instead.
+Can you say more ? We could technically take two references on the page
+right away if MTU is small and avoid some of the cost.
 
-Nicolai
+The driver doesn't seem to set skb->truesize accordingly after this
+change. So you're lying to the stack about how much memory each packet
+consumes. This is a blocker for the change.
+
+> To mitigate this, bypass the page_pool fragment path and force a single RX
+> packet per page allocation when all the following conditions are met:
+>   1. The system is configured with a 4K PAGE_SIZE.
+>   2. A processor-specific quirk is detected via SMBIOS Type 4 data.
+
+I don't think we want the kernel to be in the business of carrying
+matching on platform names and providing optimal config by default.
+This sort of logic needs to live in user space or the hypervisor 
+(which can then pass a single bit to the driver to enable the behavior)
+
+> This approach restores expected line-rate performance by ensuring
+> predictable RX refill behavior on affected hardware.
+> 
+> There is no behavioral change for systems using larger page sizes
+> (16K/64K), or platforms where this processor-specific quirk do not
+> apply.
+-- 
+pw-bot: cr
 
