@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-267791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267792-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6MvwCrmetWms2gAAu9opvQ
-	(envelope-from <netdev+bounces-267791-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:45:29 +0100
+	id mOjLA8aetWms2gAAu9opvQ
+	(envelope-from <netdev+bounces-267792-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:45:42 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA6FC28E2E5
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:45:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81D1228E2ED
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:45:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C88903042992
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 17:44:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3329E304734F
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 17:44:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFA931E82D;
-	Sat, 14 Mar 2026 17:44:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B612DEA62;
+	Sat, 14 Mar 2026 17:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="PJ1gTm+q"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="DDGd+WxR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
+Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D67D31B810
-	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 17:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776E2315785
+	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 17:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773510264; cv=none; b=JIH363uO5HAMrjrgAScsRzD4G8FmrsSJbG9ZjTP93dcpM13rDAPzuuTX41cFI9VpETUcaRbAF/Be/Qah9HhCkvGxhVwDITrC3BcWDuHmkvaiwnxYUwXfaxUVFWPQ0g0g2huj4B3wIjI+pJxHKahqx1z3SXHdy/V40Y7WI7JrCjQ=
+	t=1773510267; cv=none; b=Eh9wd/cR2mM9pcs9xOtKNS18kOq80dAsayWbrqD5MnlinbiguHXqLis6YlOia4pjtTg30BgRVQ7hKbgKlGxYeROJDt6JJC+kTerEWZhcmgx1/ZrjCLAhD2B2dPAX1gwOnIyiAPERlLBDXAWWhynO4ijv5DqJnT4mAqH5C7G2FwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773510264; c=relaxed/simple;
-	bh=frWgSWG27yonhkZnYVR7Cyo3zFu3CXbaE5aovhFkMh8=;
+	s=arc-20240116; t=1773510267; c=relaxed/simple;
+	bh=qKqtxCzBXIzGk8JlmvBjYx71RKayrMcxp+vv//+DAyc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pc7eIwQJGIo7U/f7OtpzZ6MRKryFFXj4joiGjUtvHelHV6serNorBrZ+iCTssOTodoDU89czygMsXHNUBPN3lfQ0wjK24CqVl4V79KHSETqkPmktkMXqkih9RrOZwhIK62rsi/PYg1GjI5D7aVaZZFtF/8AgzY0Bcf5hu16uZxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=PJ1gTm+q; arc=none smtp.client-ip=74.125.82.49
+	 MIME-Version; b=lUFO++xKoLn5a7nPgCpMjSLuOWdwX9RDRhCVcAYu5fqkR+cdRGhBbMbg0i2Sb2AZk8NGJh34Ip94Ei8Qd6tSjdDBrEQJ+1adlAkhFoMNJ/pdYAyOJIdnA5kGWaNxQh0WgGtZzE0i4BBZhsQmcirG8Dyr85z4cp2EDLWtZ23fho8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=DDGd+WxR; arc=none smtp.client-ip=74.125.82.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-128d2e3074fso4364731c88.0
-        for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 10:44:22 -0700 (PDT)
+Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-127380532eeso2846284c88.1
+        for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 10:44:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1773510262; x=1774115062; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1773510265; x=1774115065; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PIKavAffZ1+gxX0cCOwrEUAoSgWiMZHyrxQLW6QzRoY=;
-        b=PJ1gTm+ql1k/8HwYYbCdJtZtZQMKx/XvjOieWMcsPW9PACFFFW8bwo0ZHkhliSbywO
-         LtWCuU1M3lnLDI3+sT1kb2HWezrA9ZK04hzAQ02+iQCz32W/4hFPBmAQ966Qh9QfsY1t
-         wmDWrLMbAgh22rDwZWdvrUjrfbDSKUaaKLmFdCgH9u/4u3haohAo5DdnrLjzIb8QSHw8
-         XGWFdYaOpc5YRAmItwOUrdRVn2lZEeVywsJnsIBPj5VHMN88dSU4a3JYSuNpH3fuLVsy
-         Djm9WUs1bxakHfv7BxZUUYUAm5exLF3RYO49n52M4t8wnnW8zQJNMi6Nge7oqHcUpywc
-         MSUw==
+        bh=ffNE/V5dVULFOqPtPyBXTaniKjCJVhXKcrWx81ht9Ek=;
+        b=DDGd+WxRLZkNLYgWUzktbmH+U4DiTdTPGH0la3Cvdqojch+y3FFOGPx5iKo/Uco26D
+         dQg+ovklsSEiPS0J6Jgt5ZACLl+LODJyQyZyZNSr/CJLZxDJGS9QWEQS2DR5bMT5qOA3
+         NBWX7luvQen7BEzWd+UMrEXSdmzc1FoSBXsoFEf1nqSRKyyXGOd4gS/vMNzs6ytDMrRe
+         2M9MJ6xLmeMVKNSTKAnJxynPdSn3PO7BXhUL2f4pGKYR09uv29ljyu91t0zf4nhchMih
+         xk6i/N9o6KliyvWaOner7VBe75B+dN9cgqRIypWV3msLGgS73uJwS37rIzMlb7dV7PC/
+         KHww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773510262; x=1774115062;
+        d=1e100.net; s=20251104; t=1773510265; x=1774115065;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=PIKavAffZ1+gxX0cCOwrEUAoSgWiMZHyrxQLW6QzRoY=;
-        b=iPoEEH2fcpslSqLb8fLxdjDAhOumDx+WGx7l0kQVaQ9ts/shBRYEMuxvYqpldZpT7D
-         ClJzfdSZYOEKRxO3NnSjlGSkps7abNNm642spIygUkiGpXLutdiDDOGuhr5ArCJ0lJDW
-         wbm/8GaErQAZ1vWd6pmHai4iba3lTbg4BxIgrleIiFNWYEyiMcYk/5Y6Dc24DbUDir8e
-         N5iLDjIxCp3J1y1E2wIo5qyK7UmO42Sq4HJpwPgM9gNIgw13T9PGBwLz72hCLweDsnN8
-         2KOTVSiyrLgmCGaqPAJ25w3YlY1f1LT5NVcylCOlud7dqtr1goM9plghTUT32qzfHfsm
-         Dglw==
-X-Forwarded-Encrypted: i=1; AJvYcCWS2rEQYxFFCrNqyxEs0L5NfFWPwUOkC2ZfEahMfYvyzML2ZOemzvIKa62mV06JmSW7KuQzTuA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYPHMnZ5TwDq7hzereidDij3J8AX6j3lmp4Ahmo9qHMRgWDrlu
-	8CGCxad77FoiDN9FHD4xDCI4HAvUDhHd7+aYhmowqjR61wn39tFvyMgLAiWuF8YgIg==
-X-Gm-Gg: ATEYQzyDEszhPGVtO26K28XJYMJQWqgljASlwr8LOkQroqHaclfFuknaplQrLcnTni/
-	iqSzxzLs8xDxbN4/3824p7fkGA5ZnsCEpTqZ85PeEzJvOtH9xwMWXeNS0B8xxRH+PYHtCI0UP9r
-	ZOf6OLsxVfz/EpRI+0nCCl0LjdfB2GYzRxPxQLRZ/lpMZR6Z1AXrOicIkPKIRlDJuih6NjjA7d2
-	Z81C0X0GgNRuITgZkKfMLgqAaRwTSCU+vcPJckLYbs0PlhWUr0H1UfzlaQMHGIxCX7SZFMT5gjW
-	xwUKMD4whvhQscYi+ml2MPzFBjMhPXlgGRFQfviPxPSInGw9D8aBPN/AM+P51S8ArkPkV2fgHDZ
-	Pxk30/rbnAwpIYu5KFU/zuSioINW9bOAlaiN9k0EJYM2D3I+kWR41LHwUxWYIyGUgEBHlRLgGuq
-	Bn8VUXaqWFZArJk6+Owp6+L3cKqht+LSq/i3UQfaLccGWaNg0OKLD8X4CuSquCKmwggLgjqA==
-X-Received: by 2002:a05:7022:309:b0:119:e56c:18ab with SMTP id a92af1059eb24-128f3d4fd5bmr3075377c88.19.1773510262105;
-        Sat, 14 Mar 2026 10:44:22 -0700 (PDT)
+        bh=ffNE/V5dVULFOqPtPyBXTaniKjCJVhXKcrWx81ht9Ek=;
+        b=NoJnCWG4JOZhHVdIevvPatZCcd8WqPVyrW3/4sFXzULAx8tvHmeqaKCwvNKAk3dbyZ
+         eTl06F+ru1lzWVt7K0WoCb4OMH2Qdy1BXKptwUrJhbspnF+QELh8ZU/XhwBuhGPx1OU0
+         DBprdVjP791Y6D+HxMs4w8cT3XP3PadL5HVyKVWox1mQaWHKdByCELnZjvG21kS2lPrk
+         GdQcmL0o46RBvc9vnoGgMT7IhUZxHCQi2HuW79iiXB2PYOfPJlwK7SpvYHGsnEdChRLo
+         KstlFC7OAzU9s0RQcnaBv+JsRVd47QnnY6Cy05RqHQpw49zNieleKZX/IdY61Cw7zzjI
+         tB7A==
+X-Forwarded-Encrypted: i=1; AJvYcCXi60bq3DI0zozUh3GN80Ye1RI3n6E9zvxQ26x1PerZPDSzOzS2Neng4mZpJLE0mxEjz+7rSiE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywvZUNbLN+vqVyUgxaXJhg6/kR3a6rcLL6sA+iIyW71TyUqDg1
+	2spuCMVFwLUcqypmvKtdIJq6Qm1ZnHbPPgYNpkH4Hegs4tTZYQjB+CkZWFA/G04y4w==
+X-Gm-Gg: ATEYQzxS7PoJ30DdDAIZpqLvDDep1WGAYyJ9Lijs+SVHHkEXYUZAb4lmFl0vyend9ge
+	rHwuUu3xx4MbS/4WKokiq1IZ1yji0o95GYOgidhYdhI3chaIxYC1mt221K544MwjMOEUJsX8ybC
+	LoaIOeA6rQLCiekKLliiEEjBsQvaFHAXEFGDLJJEyhd457S2k9aJF3GmtsiJbZ4Thjy5e9HHMty
+	EwADGfaFQ9YGmjxug2+kfyQbL5TEzVs1VRAVRtbrycQU+fsb/zncEc2Ama8Bk+Le/QxbebMY3qy
+	2WmMCG+NPRnHyKVMCDTmB5a+t8Avftyjn9EszpNHm9uMaPZL3yWas2TC+bkhhuOqjGlEwlbapqG
+	P+ptmgbqUIwzj97Nbdiz1B2sl6pxtFp9dTa4e6sBAbg5xfAkR0EZYttwCWUlR0VtMtHihnfWadD
+	MFZh6dM8roLT6HR0Ae2DD9QoJpTuZPZpWXudVtrxVnkxi8+50hlfbsBDRjXWre9fozdnP078402
+	VfFDcNS
+X-Received: by 2002:a05:7022:b9d:b0:11b:8278:9f3a with SMTP id a92af1059eb24-128f3d1bfd5mr3724311c88.8.1773510264562;
+        Sat, 14 Mar 2026 10:44:24 -0700 (PDT)
 Received: from pong.herbertland.com ([2601:646:8980:b330:eb38:94c4:209f:a764])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f62837ccsm8326734c88.3.2026.03.14.10.44.20
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f62837ccsm8326734c88.3.2026.03.14.10.44.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Mar 2026 10:44:21 -0700 (PDT)
+        Sat, 14 Mar 2026 10:44:24 -0700 (PDT)
 From: Tom Herbert <tom@herbertland.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -84,9 +85,9 @@ To: davem@davemloft.net,
 	willemdebruijn.kernel@gmail.com,
 	pabeni@redhat.com
 Cc: Tom Herbert <tom@herbertland.com>
-Subject: [net-next v8 06/10] ipv6: Enforce Extension Header ordering
-Date: Sat, 14 Mar 2026 10:43:29 -0700
-Message-ID: <20260314174333.46406-7-tom@herbertland.com>
+Subject: [net-next v8 07/10] ipv6: Document enforce_ext_hdr_order sysctl
+Date: Sat, 14 Mar 2026 10:43:30 -0700
+Message-ID: <20260314174333.46406-8-tom@herbertland.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260314174333.46406-1-tom@herbertland.com>
 References: <20260314174333.46406-1-tom@herbertland.com>
@@ -109,7 +110,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,vger.kernel.org,uliege.be,gmail.com,redhat.com];
-	TAGGED_FROM(0.00)[bounces-267791-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267792-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -125,241 +126,60 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[herbertland.com:dkim,herbertland.com:email,herbertland.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BA6FC28E2E5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,herbertland.com:dkim,herbertland.com:email,herbertland.com:mid]
+X-Rspamd-Queue-Id: 81D1228E2ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-RFC8200 highly recommends that different Extension Headers be sent in
-a prescribed order and all Extension Header types occur at most once
-in a packet with the exception of Destination Options that may
-occur twice. This patch enforces the ordering be followed in received
-packets.
-
-The allowed order of Extension Headers is:
-
-    IPv6 header
-    Hop-by-Hop Options header
-    Destination Options before the Routing Header
-    Routing header
-    Fragment header
-    Authentication header
-    Encapsulating Security Payload header
-    Destination Options header
-    Upper-Layer header
-
-Each Extension Header may be present only once in a packet expect
-for Destination Options that may occur twice.
-
-net.ipv6.enforce_ext_hdr_order is a sysctl to enable or disable
-enforcement of extension Header order. If it is set to zero then
-Extension Header order and number of occurrences is not checked
-in receive processing (except for Hop-by-Hop Options that
-must be the first Extension Header and can only occur once in
-a packet).
+Document the enforce_ext_hdr_order sysctl that controls whether
+Extension Header order is enforced on receive.
 
 Signed-off-by: Tom Herbert <tom@herbertland.com>
 ---
- include/net/netns/ipv6.h   |  1 +
- include/net/protocol.h     | 14 +++++++++++++
- net/ipv6/af_inet6.c        |  1 +
- net/ipv6/exthdrs.c         |  2 ++
- net/ipv6/ip6_input.c       | 42 ++++++++++++++++++++++++++++++++++++++
- net/ipv6/reassembly.c      |  1 +
- net/ipv6/sysctl_net_ipv6.c |  7 +++++++
- net/ipv6/xfrm6_protocol.c  |  2 ++
- 8 files changed, 70 insertions(+)
+ Documentation/networking/ip-sysctl.rst | 30 ++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
-index 499e4288170f..af14cfa99c01 100644
---- a/include/net/netns/ipv6.h
-+++ b/include/net/netns/ipv6.h
-@@ -61,6 +61,7 @@ struct netns_sysctl_ipv6 {
- 	u8 fib_notify_on_flag_change;
- 	u8 icmpv6_error_anycast_as_unicast;
- 	u8 icmpv6_errors_extension_mask;
-+	u8 enforce_ext_hdr_order;
- };
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index 453643c70c8d..fa0ed1936f59 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -2617,6 +2617,36 @@ ioam6_id_wide - LONG INTEGER
  
- struct netns_ipv6 {
-diff --git a/include/net/protocol.h b/include/net/protocol.h
-index b2499f88f8f8..0f1676625570 100644
---- a/include/net/protocol.h
-+++ b/include/net/protocol.h
-@@ -50,6 +50,19 @@ struct net_protocol {
- };
+         Default: 0xFFFFFFFFFFFFFF
  
- #if IS_ENABLED(CONFIG_IPV6)
++enforce_ext_hdr_order - BOOLEAN
++	Enforce recommended Extension Header ordering in RFC8200.
++	If the sysctl is set to 1 then the ordering is enforced in
++	received packets and each Extension Header may be present
++	at most once per packet (except for Destination Options that
++	may occur twice). If the sysctl is set to 0 then ordering is
++	not enforced and Extension Headers may be present in any
++	order and have any number of occurrences per packet (except
++	for Hop-by-Hop Options that must always be the first Extension
++	Header and occur at most once in a packet)).
 +
-+/* Order of extension headers as prescribed in RFC8200. The ordering and
-+ * number of extension headers in a packet can be enforced in IPv6 receive
-+ * processing.
-+ */
-+#define IPV6_EXT_HDR_ORDER_HOP			BIT(0)
-+#define IPV6_EXT_HDR_ORDER_DEST_BEFORE_RH	BIT(1)
-+#define IPV6_EXT_HDR_ORDER_ROUTING		BIT(2)
-+#define IPV6_EXT_HDR_ORDER_FRAGMENT		BIT(3)
-+#define IPV6_EXT_HDR_ORDER_AUTH			BIT(4)
-+#define IPV6_EXT_HDR_ORDER_ESP			BIT(5)
-+#define IPV6_EXT_HDR_ORDER_DEST			BIT(6)
++	The Extension Header order is:
 +
- struct inet6_protocol {
- 	int	(*handler)(struct sk_buff *skb);
- 
-@@ -61,6 +74,7 @@ struct inet6_protocol {
- 
- 	unsigned int	flags;	/* INET6_PROTO_xxx */
- 	u32		secret;
-+	u32		ext_hdr_order;
- };
- 
- #define INET6_PROTO_NOPOLICY	0x1
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index eb9fff86baa1..c5387c119570 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -953,6 +953,7 @@ static int __net_init inet6_net_init(struct net *net)
- 	net->ipv6.sysctl.max_dst_opts_len = IP6_DEFAULT_MAX_DST_OPTS_LEN;
- 	net->ipv6.sysctl.max_hbh_opts_len = IP6_DEFAULT_MAX_HBH_OPTS_LEN;
- 	net->ipv6.sysctl.fib_notify_on_flag_change = 0;
-+	net->ipv6.sysctl.enforce_ext_hdr_order = 1;
- 	atomic_set(&net->ipv6.fib6_sernum, 1);
- 
- 	net->ipv6.sysctl.ioam6_id = IOAM6_DEFAULT_ID;
-diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-index e61d97621108..a66a8339dc8d 100644
---- a/net/ipv6/exthdrs.c
-+++ b/net/ipv6/exthdrs.c
-@@ -845,11 +845,13 @@ static int ipv6_rthdr_rcv(struct sk_buff *skb)
- static const struct inet6_protocol rthdr_protocol = {
- 	.handler	=	ipv6_rthdr_rcv,
- 	.flags		=	INET6_PROTO_NOPOLICY,
-+	.ext_hdr_order	=	IPV6_EXT_HDR_ORDER_ROUTING,
- };
- 
- static const struct inet6_protocol destopt_protocol = {
- 	.handler	=	ipv6_destopt_rcv,
- 	.flags		=	INET6_PROTO_NOPOLICY,
-+	.ext_hdr_order	=	IPV6_EXT_HDR_ORDER_DEST,
- };
- 
- static const struct inet6_protocol nodata_protocol = {
-diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
-index 967b07aeb683..1b22bac9a164 100644
---- a/net/ipv6/ip6_input.c
-+++ b/net/ipv6/ip6_input.c
-@@ -395,6 +395,27 @@ void ipv6_list_rcv(struct list_head *head, struct packet_type *pt,
- 		ip6_sublist_rcv(&sublist, curr_dev, curr_net);
- }
- 
-+static u32 check_dst_opts_before_rh(const struct inet6_protocol *ipprot,
-+				    u32 ext_hdrs)
-+{
-+	/* Check if Destination Options before the Routing Header are
-+	 * present.
-+	 */
-+	if (ipprot->ext_hdr_order != IPV6_EXT_HDR_ORDER_ROUTING ||
-+	    !(ext_hdrs & IPV6_EXT_HDR_ORDER_DEST))
-+		return ext_hdrs;
++	    IPv6 header
++	    Hop-by-Hop Options header
++	    Destination Options before the Routing header
++	    Routing header
++	    Fragment header
++	    Authentication header
++	    Encapsulating Security Payload header
++	    Destination Options header
++	    Upper-Layer header
 +
-+	/* We have Destination Options before the Routing Header. Set
-+	 * the mask of received extension headers to reflect that. We promote
-+	 * the bit from indicating just Destination Options present to
-+	 * Destination Options before the Routing Header being present
-+	 */
-+	ext_hdrs = (ext_hdrs & ~IPV6_EXT_HDR_ORDER_DEST) |
-+		IPV6_EXT_HDR_ORDER_DEST_BEFORE_RH;
++	Possible values:
 +
-+	return ext_hdrs;
-+}
++	- 0 (disabled)
++	- 1 (enabled)
 +
- INDIRECT_CALLABLE_DECLARE(int tcp_v6_rcv(struct sk_buff *));
- 
- /*
-@@ -406,6 +427,7 @@ void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int nexthdr,
- 	const struct inet6_protocol *ipprot;
- 	struct inet6_dev *idev;
- 	unsigned int nhoff;
-+	u32 ext_hdrs = 0;
- 	SKB_DR(reason);
- 	bool raw;
- 
-@@ -467,6 +489,26 @@ void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int nexthdr,
- 				goto discard;
- 			}
- 		}
++	Default: 1 (enabled)
 +
-+		if (ipprot->ext_hdr_order &&
-+		    READ_ONCE(net->ipv6.sysctl.enforce_ext_hdr_order)) {
-+			/* The protocol is an extension header and EH ordering
-+			 * is being enforced. Discard packet if we've already
-+			 * seen this EH or one that is lower in the order list
-+			 */
-+			if (ipprot->ext_hdr_order <= ext_hdrs) {
-+				/* Check if there's Destination Options
-+				 * before the Routing Header
-+				 */
-+				ext_hdrs = check_dst_opts_before_rh(ipprot,
-+								    ext_hdrs);
-+				if (ipprot->ext_hdr_order <= ext_hdrs)
-+					goto discard;
-+			}
-+
-+			ext_hdrs |= ipprot->ext_hdr_order;
-+		}
-+
- 		if (!(ipprot->flags & INET6_PROTO_NOPOLICY)) {
- 			if (!xfrm6_policy_check(NULL, XFRM_POLICY_IN, skb)) {
- 				SKB_DR_SET(reason, XFRM_POLICY);
-diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
-index 11f9144bebbe..e17876bf945a 100644
---- a/net/ipv6/reassembly.c
-+++ b/net/ipv6/reassembly.c
-@@ -420,6 +420,7 @@ static int ipv6_frag_rcv(struct sk_buff *skb)
- static const struct inet6_protocol frag_protocol = {
- 	.handler	=	ipv6_frag_rcv,
- 	.flags		=	INET6_PROTO_NOPOLICY,
-+	.ext_hdr_order	=	IPV6_EXT_HDR_ORDER_FRAGMENT,
- };
+ IPv6 Fragmentation:
  
- #ifdef CONFIG_SYSCTL
-diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
-index d2cd33e2698d..543b6acdb11d 100644
---- a/net/ipv6/sysctl_net_ipv6.c
-+++ b/net/ipv6/sysctl_net_ipv6.c
-@@ -213,6 +213,13 @@ static struct ctl_table ipv6_table_template[] = {
- 		.proc_handler	= proc_doulongvec_minmax,
- 		.extra2		= &ioam6_id_wide_max,
- 	},
-+	{
-+		.procname	= "enforce_ext_hdr_order",
-+		.data		= &init_net.ipv6.sysctl.enforce_ext_hdr_order,
-+		.maxlen		= sizeof(u8),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dou8vec_minmax,
-+	},
- };
- 
- static struct ctl_table ipv6_rotable[] = {
-diff --git a/net/ipv6/xfrm6_protocol.c b/net/ipv6/xfrm6_protocol.c
-index ea2f805d3b01..5826edf67f64 100644
---- a/net/ipv6/xfrm6_protocol.c
-+++ b/net/ipv6/xfrm6_protocol.c
-@@ -197,12 +197,14 @@ static const struct inet6_protocol esp6_protocol = {
- 	.handler	=	xfrm6_esp_rcv,
- 	.err_handler	=	xfrm6_esp_err,
- 	.flags		=	INET6_PROTO_NOPOLICY,
-+	.ext_hdr_order	=	IPV6_EXT_HDR_ORDER_ESP,
- };
- 
- static const struct inet6_protocol ah6_protocol = {
- 	.handler	=	xfrm6_ah_rcv,
- 	.err_handler	=	xfrm6_ah_err,
- 	.flags		=	INET6_PROTO_NOPOLICY,
-+	.ext_hdr_order	=	IPV6_EXT_HDR_ORDER_AUTH
- };
- 
- static const struct inet6_protocol ipcomp6_protocol = {
+ ip6frag_high_thresh - INTEGER
 -- 
 2.43.0
 
