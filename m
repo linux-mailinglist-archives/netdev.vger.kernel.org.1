@@ -1,138 +1,213 @@
-Return-Path: <netdev+bounces-267844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267845-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2PgQLXK8tWlD4QAAu9opvQ
-	(envelope-from <netdev+bounces-267844-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 20:52:18 +0100
+	id eCGHKvy8tWlD4QAAu9opvQ
+	(envelope-from <netdev+bounces-267845-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 20:54:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 292BB28EABE
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 20:52:18 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE8A728EB03
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 20:54:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 76E58301CFDF
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 19:52:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CF09D30060BB
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 19:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA4937F744;
-	Sat, 14 Mar 2026 19:52:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70221346E5D;
+	Sat, 14 Mar 2026 19:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="fCLn28nb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DXOpG0pa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D8B3126D7;
-	Sat, 14 Mar 2026 19:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD701A2545;
+	Sat, 14 Mar 2026 19:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773517935; cv=none; b=swotoCYXzjfb28kRjzKfTKJ/yLA0ehB7G5KaQmpWjotBjA7WEDe25Y7H5EV/Hs7oXfd5dmpDEzv9q/5OcaHiiFartWHK+s1fLKFptRs3DvTm8Ak4cJH3agh3KslHMtElqOSy1ZiYsYu9DNQDMpWvstHzESorMvPwZuvIMUNbsUM=
+	t=1773518070; cv=none; b=r/zsM2/zkwUMGhTljKU6hMAmd53VNy9yYq+oDDewiZrFFFt5mjOCJlge6c820+tHu6DCYhwbaY6zzUopj/pkZe0vsdY4acebYdqIY8DoPXbFSsfCUtqN1rYkIA85kpscjX1uYcbmXo7/Y8itoUstCt2yWNcnXlnatyDxcTKNVLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773517935; c=relaxed/simple;
-	bh=05c/9binp24LS+w7F7qkuVqW7oXNweubfMnrDJ655lc=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=bxXAKrX9+7VDgwjpFxX8zlzaGQ5fY8MFXDQg2fG+Td9b+5wxvlTPtN7RYq5JbdDfyj1yFipQFLGOC8ZcNpR6VEnwsuUDRwl3LqbSGoSLB708PcgpXGd805jlgz7Em1VDkJ5Dk5fl+vSyqSxW2GqSbUii6pKnUiYVgOL/9jDdnhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=fCLn28nb; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BB7EEA0304;
-	Sat, 14 Mar 2026 20:52:11 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1773517932; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=TleW7hTd/KTKAu03za2P5eXbX0UrARAzI5aPN15z5fE=;
-	b=fCLn28nbuzPYu6B6/fMvxoZj+fAFNB+rV4pNwnG/jjnGWWIheCYHliv1gPSvEEV3WEPEmn
-	+8gS/esPbVujhoVlwENAzonU9St8LTCguF4LNNvAuwy7GfcYa1J+HFkRbz1UUWaG4STu0X
-	QjU6ZE4jdrhu3k7tacHT+JUd1a5j2wqhn1h0f67LryMy4iQwipn2X9mBYOOI6BM1HUr8R7
-	ozqrvkXGdIrhDAdROB+CdxvCnSkXwvNBYqrdj24NIYy40mxwBTXF1H6lMhJk9+yUodh78k
-	0ItIH617JuPQm+5KkGvUFNswhkU4NrhD9kHRlKRr65tup5vNWtUi1Ci68tXM2w==
+	s=arc-20240116; t=1773518070; c=relaxed/simple;
+	bh=bJuGitTBA6p6rQY56Y79glcnOKva1Edg3uB876JYbo8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Bh0HKd48PtwBO4ZRzRIuFn+hZC8oYRmwgMBdCGiBJQMupg7DXCeB4FmlYyCVTaWss6I+vzca1JWZnFv8NfVLhZHslJbWtq74vqSv60uupaniTw+Fmib+mZSvcoICVIqhOOSb/bCI4LekFRN00G0mxURJ0RTlU2HLw8gwqUGgfAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DXOpG0pa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68B40C116C6;
+	Sat, 14 Mar 2026 19:54:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773518069;
+	bh=bJuGitTBA6p6rQY56Y79glcnOKva1Edg3uB876JYbo8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=DXOpG0paxGYARHEzxEVC/LBjfeV0FO3VeDg6NdKuRawWE1FyY6cKVnR8eqMT8VdJr
+	 yFdcODMNeO+/In3O8+7r+m3CpAVt02Rt1/DoPSkpZEgCtanTT2Rk3tyGR0HOxMHkLZ
+	 Byb4BfGPMG8IC+aYxKDxpP/3T0h9KvrMm7DEa0xpsYP5GfdV0/vzhfIiC7bLnAwk0p
+	 bWEFUVBXLQXqcDNCBt4BRrmQSLSpnggcltihc9ly0OWGzMbFGVOteJLolJfE/XR5AA
+	 vgmurXGKJdc5YZWelA9yp3eUDeWHrmi0ingYZjQjIr/n7rvJa9L0UQAxrNozmGLAsq
+	 XeZZNTwn+FnlA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: ivecera@redhat.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	mschmidt@redhat.com,
+	linux-kernel@vger.kernel.org,
+	Prathosh.Satish@microchip.com,
+	horms@kernel.org,
+	vadim.fedorenko@linux.dev,
+	arkadiusz.kubalewski@intel.com,
+	jiri@resnulli.us,
+	poros@redhat.com,
+	netdev@vger.kernel.org
+Subject: Re: [net-next,5/6] dpll: zl3073x: add reference priority to zl3073x_chan
+Date: Sat, 14 Mar 2026 12:53:59 -0700
+Message-ID: <20260314195358.2710968-2-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260311190055.139006-6-ivecera@redhat.com>
+References: <20260311190055.139006-6-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Sat, 14 Mar 2026 20:52:11 +0100
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Doug Berger <opendmb@gmail.com>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Vikas Gupta
- <vikas.gupta@broadcom.com>, Bhargava Marreddy
- <bhargava.marreddy@broadcom.com>, Rajashekar Hudumula
- <rajashekar.hudumula@broadcom.com>, Eric Biggers <ebiggers@kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>, =?UTF-8?Q?Markus_Bl=C3=B6chl?=
- <mbloch@rooftopnetworks.de>, Arnd Bergmann <arnd@arndb.de>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/6] net: bcmgenet: add XDP support
-In-Reply-To: <20260314085232.089ea669@kernel.org>
-References: <20260313092101.1344954-1-nb@tipi-net.de>
- <20260314085232.089ea669@kernel.org>
-Message-ID: <78fb6651f668390bd877a60597ba52fd@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267844-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267845-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,broadcom.com,kernel.org,rooftopnetworks.de,arndb.de,vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:dkim,tipi-net.de:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 292BB28EABE
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AE8A728EB03
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 14.3.2026 16:52, Jakub Kicinski wrote:
-> On Fri, 13 Mar 2026 10:20:55 +0100 Nicolai Buchwitz wrote:
->> Add XDP support to the bcmgenet driver, covering XDP_PASS, XDP_DROP,
->> XDP_TX, XDP_REDIRECT, and ndo_xdp_xmit.
->> 
->> The first patch converts the RX path from the existing kmalloc-based
->> allocation to page_pool, which is a prerequisite for XDP. The 
->> remaining
->> patches incrementally add XDP functionality and per-action statistics.
->> 
->> Tested on Raspberry Pi CM4 (BCM2711, bcmgenet, 1Gbps link):
->> - XDP_PASS: 943 Mbit/s TX, 935 Mbit/s RX (no regression vs baseline)
->> - XDP_PASS latency: 0.164ms avg, 0% packet loss
->> - XDP_DROP: all inbound traffic blocked as expected
->> - XDP_TX: TX counter increments (packet reflection working)
->> - Link flap with XDP attached: no errors
->> - Program swap under iperf3 load: no errors
-> 
-> Have you had a chance to run the XDP tests from
-> tools/testing/selftests/drivers/net/hw/
-> ?
+This is an AI-generated review of your patch. The human sending this
+email says "Is this legit? Quite hard to follow the logic of this change :/"
 
-Not yet - thanks for the poibter. I will run it and include results in 
-v2.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+dpll: zl3073x: add reference priority to zl3073x_chan
 
-Nicolai
+This commit caches the ZL_REG_DPLL_REF_PRIO registers in the zl3073x_chan
+cfg group, adding a ref_prio[] array and inline helpers for accessing
+priority values. It extends state_fetch and state_set with DPLL mailbox
+operations to read and write these priority registers.
+
+> diff --git a/drivers/dpll/zl3073x/chan.c b/drivers/dpll/zl3073x/chan.c
+> index 10189c8a5ded..74d00cee624e 100644
+> --- a/drivers/dpll/zl3073x/chan.c
+> +++ b/drivers/dpll/zl3073x/chan.c
+
+[ ... ]
+
+> @@ -85,7 +102,9 @@ const struct zl3073x_chan *zl3073x_chan_state_get(struct zl3073x_dev *zldev,
+>   * @chan: desired channel state
+>   *
+>   * Skips the HW write if the configuration is unchanged, and otherwise
+> - * writes the mode_refsel register to hardware.
+> + * writes only the changed registers to hardware. The mode_refsel register
+> + * is written directly, while the reference priority registers are written
+> + * via the DPLL mailbox interface.
+>   *
+>   * Return: 0 on success, <0 on HW error
+>   */
+> @@ -93,14 +112,48 @@ int zl3073x_chan_state_set(struct zl3073x_dev *zldev, u8 index,
+>  			   const struct zl3073x_chan *chan)
+>  {
+>  	struct zl3073x_chan *dchan = &zldev->chan[index];
+> -	int rc;
+> +	int rc, i;
+>
+>  	/* Skip HW write if configuration hasn't changed */
+>  	if (!memcmp(&dchan->cfg, &chan->cfg, sizeof(chan->cfg)))
+>  		return 0;
+>
+> -	rc = zl3073x_write_u8(zldev, ZL_REG_DPLL_MODE_REFSEL(index),
+> -			      chan->mode_refsel);
+> +	/* Direct register write for mode_refsel */
+> +	if (dchan->mode_refsel != chan->mode_refsel) {
+> +		rc = zl3073x_write_u8(zldev, ZL_REG_DPLL_MODE_REFSEL(index),
+> +				      chan->mode_refsel);
+> +		if (rc)
+> +			return rc;
+> +	}
+> +
+> +	/* Mailbox write for ref_prio if changed */
+> +	if (!memcmp(dchan->ref_prio, chan->ref_prio, sizeof(chan->ref_prio))) {
+> +		dchan->cfg = chan->cfg;
+> +		return 0;
+> +	}
+> +
+> +	guard(mutex)(&zldev->multiop_lock);
+> +
+> +	/* Read DPLL configuration into mailbox */
+> +	rc = zl3073x_mb_op(zldev, ZL_REG_DPLL_MB_SEM, ZL_DPLL_MB_SEM_RD,
+> +			   ZL_REG_DPLL_MB_MASK, BIT(index));
+> +	if (rc)
+> +		return rc;
+> +
+> +	/* Update changed ref_prio registers */
+> +	for (i = 0; i < ARRAY_SIZE(chan->ref_prio); i++) {
+> +		if (dchan->ref_prio[i] != chan->ref_prio[i]) {
+> +			rc = zl3073x_write_u8(zldev,
+> +					      ZL_REG_DPLL_REF_PRIO(i),
+> +					      chan->ref_prio[i]);
+> +			if (rc)
+> +				return rc;
+> +		}
+> +	}
+> +
+> +	/* Commit DPLL configuration */
+> +	rc = zl3073x_mb_op(zldev, ZL_REG_DPLL_MB_SEM, ZL_DPLL_MB_SEM_WR,
+> +			   ZL_REG_DPLL_MB_MASK, BIT(index));
+>  	if (rc)
+>  		return rc;
+>
+
+Could this function leave the cache and hardware out of sync?
+
+When both mode_refsel and ref_prio have changed, the function writes
+mode_refsel to hardware first. If the subsequent mailbox operation fails
+(during the mailbox read, a ref_prio write, or the mailbox commit), the
+function returns an error without executing 'dchan->cfg = chan->cfg'.
+
+This leaves dchan->mode_refsel cached at the old value while the hardware
+has the new value:
+
+zl3073x_chan_state_set()
+    dchan->mode_refsel != chan->mode_refsel is true
+    zl3073x_write_u8(... mode_refsel) succeeds
+        hardware now has new mode_refsel value
+    zl3073x_mb_op(...READ...) fails
+    return rc without updating dchan->cfg
+        dchan->mode_refsel still has old value
+
+Later calls that get state via zl3073x_chan_state_get() will see the stale
+cached mode_refsel. If they try to set mode_refsel back to the old value,
+the comparison 'dchan->mode_refsel != chan->mode_refsel' evaluates to false
+(both match the old value), skipping the write, while hardware retains the
+new value.
+
+Before this patch, mode_refsel was written in a single atomic step with no
+possibility of partial failure, so this desynchronization scenario couldn't
+occur.
 
