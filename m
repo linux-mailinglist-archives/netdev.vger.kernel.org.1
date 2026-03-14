@@ -1,198 +1,138 @@
-Return-Path: <netdev+bounces-267812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OH5gNLOhtWk02wAAu9opvQ
-	(envelope-from <netdev+bounces-267812-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:58:11 +0100
+	id KKXGDGChtWk02wAAu9opvQ
+	(envelope-from <netdev+bounces-267813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:56:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52E0C28E521
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:58:11 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C168628E4AE
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 18:56:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 552B2304F5F5
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 17:53:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4EC31302A9CC
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 17:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B8573264C5;
-	Sat, 14 Mar 2026 17:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A373F3264DA;
+	Sat, 14 Mar 2026 17:54:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="N1WCBJc3";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Xpq1NMNc";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="mbeSQ/eU";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="miCoIsaP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sLFlyPES"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079E912D1F1
-	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 17:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805892E11B0;
+	Sat, 14 Mar 2026 17:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773510739; cv=none; b=IIpSyCSdCEKFiL4flqiH0ny16/PE9wIXeb/p+gjSzK+vLYaMVZKHqCJ+JZb6Lf5ApAEIM5NCc7HaDHRXlMqZz/2mec/ub7NP7MgX43EtT273Jd2Bl1GjAu4nxrFyxQIF5Xu+dMxt1IBvBJawWz6ukKbcSmq2gsoOYvbYM0QykFI=
+	t=1773510868; cv=none; b=O82JKMOjxEX04JaV0JBvmBmBfgRmSIacQOPuDCkbFY9torT9qk4SefbCidukiaTnJGxg1mBJl0xUMTO1Eyhus5e72KoX5hbp8ccnVIVPhLQlDh3vnAJaXTrCrl8bUii0XbDloinoxGGAsoqwCtsVq6U8BqnE7FRuMmqahy5gWGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773510739; c=relaxed/simple;
-	bh=//UWKM5jaT6jgXKFCZpBMZ4bI6qvcYXtswSo/v0thZ8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pqRd7lWZV+Y2BycFNEChOvRtIpEZ9lXLGXhKFtiNfXnIzq98D14137lR8H+3fLTMLMrremRkb7itJwYZlfbOmUXhIcxfXCBH+RikA+FEWmBl+/dd3zRu4gILIJZg9YMLynInJk07sW04BaroPDASNOmHn2/xCF12UzKON/RE3G4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=N1WCBJc3; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Xpq1NMNc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=mbeSQ/eU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=miCoIsaP; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id EEC185BCEF;
-	Sat, 14 Mar 2026 17:52:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773510736; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6Ojej/sUCpOz+E4rO877kHndCUA16+Ful5u0xuu3gjw=;
-	b=N1WCBJc3dKZX1feQ0bqGUPxRfbTAv0NVYRHcJk7xRoByETNSI4H1TlfFJ2p86ThxxX52yp
-	UsUsbw1aq4AqqkCUZUFP+OrAGW5JoBud6vDD7D9k3FWI6F+Zf+DJkTGzoJ0OlVl7gZMmAC
-	9ToL70P/DONFpXr9gmqQ+jHvhdIEdc8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773510736;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6Ojej/sUCpOz+E4rO877kHndCUA16+Ful5u0xuu3gjw=;
-	b=Xpq1NMNckX3r9K48TuuYITg7udfxA5Z2A3ug31glcT1qfg5apdFQ1GLDhUWWIPek038Goo
-	Aowr7xNT+xj74nAQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="mbeSQ/eU";
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=miCoIsaP
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773510735; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6Ojej/sUCpOz+E4rO877kHndCUA16+Ful5u0xuu3gjw=;
-	b=mbeSQ/eUME/EmcP3F/viuyOR9lKW7vSAq9vU9d19OxF1QnnExkwfehAsLvRgFVdgYkN5rF
-	lPv4f2akG9TI83uYtPnOY4ls3+TgdWPvoRXLsmkby0HP6E2txWzK6a0CO5Z/mBWKVoWV07
-	VOQnfOxoGqVeXXgfXmDie7TCrUDXafM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773510735;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6Ojej/sUCpOz+E4rO877kHndCUA16+Ful5u0xuu3gjw=;
-	b=miCoIsaP3Fvg/G+7aKaVQk9NR74KYnhyMv+sHmdj0C2B0ACViiuF9BAKBbcsW9dnkOwqZi
-	ALbHDrzqoKxWgKBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7409542724;
-	Sat, 14 Mar 2026 17:52:15 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 4NDMGE+gtWlfCQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Sat, 14 Mar 2026 17:52:15 +0000
-Message-ID: <40ccd028-af31-4e8d-9c83-209fab888cdd@suse.de>
-Date: Sat, 14 Mar 2026 18:52:14 +0100
+	s=arc-20240116; t=1773510868; c=relaxed/simple;
+	bh=qKw3eIwgpxDMpDQ9HWLk0v6mGLeCdoZuhJ7h/0EWDyQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dS4hhyzMJJcD+9Gm0GRNfuED4WU3SFFmJTUzyA3GwRzeRYPkFlXwF2MWDJv8tgyp9eigcigYyvk1oNJYww1VESIDvGi2VGddGjjnfzmQKZNM/xe45NUqriIpI0CWh5N4nIfDB9d8rAr479n0lOItANPvFwsSc79VFEoD1QrPqMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sLFlyPES; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5886FC116C6;
+	Sat, 14 Mar 2026 17:54:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773510868;
+	bh=qKw3eIwgpxDMpDQ9HWLk0v6mGLeCdoZuhJ7h/0EWDyQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sLFlyPESRMMPREle/UUhRuvd2TvhBQH7TnOwKEDUITamc0AzJPpI1+gSydNYsBiya
+	 olBKkVVI7GIsHMOVZ6QHxk59nu+/eHulP0mucJVLsfEGjIyjz8iVmvUjGCEESTclg1
+	 IrBWp83xIRM2uzU/bTpaFokizO+bD8eVtC0G0Q6XWoihzETbrUJC6JUmlDe39tSVlr
+	 Ft/oe/6BG35Il3CGb5XZ/gBaEh3105bHaPVTJpUCqRkyxu29ihSswcZa8ymmhmnwnc
+	 5x8EZH07zJRo19BJG+/Y2R0i3rpaOX2jqtuDTaaqr96y8Y9rht8XS/ZnMYyzaNytRM
+	 W9V3fIOxOXzLA==
+Date: Sat, 14 Mar 2026 10:54:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: lirongqing <lirongqing@baidu.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Paul
+ E . McKenney" <paulmck@kernel.org>, Frederic Weisbecker
+ <frederic@kernel.org>, <netdev@vger.kernel.org>,
+ <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, liyongkang <liyongkang01@baidu.com>
+Subject: Re: [PATCH][net-next] net/mlx5: Expedite notifier unregistration
+ during device teardown
+Message-ID: <20260314105426.36ae4cba@kernel.org>
+In-Reply-To: <20260312094804.2744-1-lirongqing@baidu.com>
+References: <20260312094804.2744-1-lirongqing@baidu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] ipv4: bump rt_genid when a relevant devconf value
- changes through netlink
-To: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, tgraf@infradead.org, horms@kernel.org,
- pabeni@redhat.com, edumazet@google.com, davem@davemloft.net
-References: <20260313144555.4956-1-fmancera@suse.de>
- <1644761b-4960-431f-bf3d-5593007212fc@kernel.org>
- <633f5de1-daeb-48ac-aba1-92b3c3ccf5c8@suse.de>
- <20260314090614.116f38cc@kernel.org>
- <41885d77-2509-445c-af01-0b1e556703ec@kernel.org>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <41885d77-2509-445c-af01-0b1e556703ec@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267813-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267812-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 52E0C28E521
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C168628E4AE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/14/26 5:16 PM, David Ahern wrote:
-> On 3/14/26 10:06 AM, Jakub Kicinski wrote:
->> On Fri, 13 Mar 2026 16:13:20 +0100 Fernando Fernandez Mancera wrote:
->>>> Also, you are flushing the cache for more values than sysfs does.
->>>
->>> I don't think so. The problem is that the handling of sysctl is
->>> scattered in several places.
->>>
->>> IPV4_DEVCONF_FORWARDING is flushed at devinet_sysctl_forward().
->>>
->>> IPV4_DEVCONF_NOXFRM, IPV4_DEVCONF_NOPOLICY,
->>> IPV4_DEVCONF_PROMOTE_SECONDARIES, IPV4_DEVCONF_ROUTE_LOCALNET, and
->>> IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST are flushed at
->>> ipv4_doint_and_flush() used by macro DEVINET_SYSCTL_FLUSHING_ENTRY.
->>>
->>> Finally, IPV4_DEVCONF_BC_FORWARDING and IPV4_DEVCONF_ACCEPT_LOCAL are
->>> flushed at devinet_conf_proc().
->>>
->>> Yes, I know, the fact that they are scattered around is quite confusing.
->>> This could be all unified in a single place but that would be too much
->>> for net tree IMHO.
->>>
->>> Please let me know if I am missing something.
->>
->> I think David means that for some knobs procfs only flushes when value
->> changes "in one direct", eg
->>
->>                  if (i == IPV4_DEVCONF_ACCEPT_LOCAL - 1 ||
->>                      i == IPV4_DEVCONF_ROUTE_LOCALNET - 1)
->>                          if ((new_value == 0) && (old_value != 0))
->>                                  rt_cache_flush(net);
->>
->> which means only flush on the 1 -> 0 transition.
+On Thu, 12 Mar 2026 05:48:04 -0400 lirongqing wrote:
+> During device hot-unplug, the mlx5 driver expects quickly unregister
+> notification chains. The standard atomic_notifier_chain_unregister()
+> calls synchronize_rcu(), which introduces significant latency and
+> can become a bottleneck during mass resource cleanup.
 > 
-> logic subtleties like this example is why I was asking about a proper
-> refactor.
+> Introduce atomic_notifier_chain_unregister_expedited() to leverage
+> synchronize_rcu_expedited(), and use it significantly reducing wait
+> times in the following paths:
+>  - Event Queue (EQ) notifier chain
+>  - Firmware event notifier chain
+>  - IRQ notifier chain
 > 
-> since this bug has been around for years, why worry about a patch for
-> -net and the back propagation to stable releases that will follow?
-> 
+> This acceleration ensures faster teardown during hot-unplug events.
 
-I don't mind re-routing this net-next and put it together with a 
-re-work. I will drop the fixes tag in such case. Is that fine for you Jakub?
+Some detailed example and how long the whole operation takes would be
+great in the commit msg.
 
-Thanks,
-Fernando.
+>  /**
+> + *	atomic_notifier_chain_unregister_expedited - Remove notifier from an atomic notifier chain
+> + *	@nh: Pointer to head of the atomic notifier chain
+> + *	@n: Entry to remove from notifier chain
+> + *
+> + *	Removes a notifier from an atomic notifier chain and forcefully
+> + *	accelerates the RCU grace period.
+> + *
+> + *	Returns zero on success or %-ENOENT on failure.
+
+Warning: kernel/notifier.c:211 No description found for return value of 'atomic_notifier_chain_unregister_expedited'
+
+kdoc wants you to use Return: or Returns: the colon is how it knows this
+is the doc for return value not just a random mention of the word
+Returns
+-- 
+pw-bot: cr
 
