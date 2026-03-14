@@ -1,106 +1,210 @@
-Return-Path: <netdev+bounces-267764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267765-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mLCHApCItWn11QAAu9opvQ
-	(envelope-from <netdev+bounces-267764-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 17:10:56 +0100
+	id cJ1wNg+JtWn11QAAu9opvQ
+	(envelope-from <netdev+bounces-267765-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 17:13:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 857B828DD19
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 17:10:55 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E402D28DD3F
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 17:13:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6DE8C30151D6
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 16:10:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A51BA300D4C5
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 16:12:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA4C310644;
-	Sat, 14 Mar 2026 16:10:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A1F03148D0;
+	Sat, 14 Mar 2026 16:12:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2KbxPS1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FkRG+E/J"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880C02EA468;
-	Sat, 14 Mar 2026 16:10:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E7210E3;
+	Sat, 14 Mar 2026 16:12:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773504650; cv=none; b=J4mcr4rqs5jSuOK/+yUYKBR8Rn+VEZni5YHXYceGzGUIho3DbhZnUjQWrMsPhu5yH25D0wLtNRX8fi6OgVVnBRB8ZskUBjKMQNdWKoYtn1CFbn7sTfNjfCAQ8mDD/uDM0RbiEoK+oJChNgE36eXYlDJwGm6ThAwbWMmPdvAuabg=
+	t=1773504776; cv=none; b=d2LsK8vHhhR2Hprp+159Lcc73emAQG6fkLJGYnuInWvcIRZOA3Cmg/4L/kqF+5dD57+ex5tCOzDxAvxl3VnhSjyHuewddmtFet0wMiGsW4HZWc7wsotUj2KNawMQ4qscvMtGb7JGZ//sEx8lTvsbZ5BdCW3azFQdSNVNf2zVIkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773504650; c=relaxed/simple;
-	bh=vUuiW6H+E9qWxWvj3TcDAxsvRhpeLxb2lGwQr6xrK4Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Dpgkx7eDlN+4cBRH6vdZxaDiVTbgC+672FJ7CbbLWvPScENHOQOMrLVotBOqmRgmueWEDvBWjBtFCjxsaZg/JMOZ9QDkjeQER3c9p096qGvdDBkgHSYax4tJOaTWLrgF5GeR8P6D/kdbqpq4uUV1cVboJtIV9uzN46vCPfNzO0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K2KbxPS1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8FB0C116C6;
-	Sat, 14 Mar 2026 16:10:49 +0000 (UTC)
+	s=arc-20240116; t=1773504776; c=relaxed/simple;
+	bh=7sf2uWzMvNSCCtjzHOwj8ITgXe8jBNiCxVKw7yg6T5E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=m9i/r3LXq2iX1QmLxME6cM679sPPFVXRbFiJ9+YMP847o4v9de7irbS3PlBI1kyjsqCQYFOt1H/wVVvH0583QcylzMIVnvm+oBdp3dRoJd/wZA7EdjnnhBhYnHjUoAhLXD6KUNO8TNZ7dUR3BjOt9EDF6qxO8CIX2jSvhHNaRbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FkRG+E/J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A99EC116C6;
+	Sat, 14 Mar 2026 16:12:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773504650;
-	bh=vUuiW6H+E9qWxWvj3TcDAxsvRhpeLxb2lGwQr6xrK4Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K2KbxPS1Ekd46+EHoQQlk2mgAYc+tClo7K+acRUwZHVWkmy5dhgclXLqmpnlZh1fS
-	 suiRlfnVM31XfZgMFTNgb9HVYcZ+k9iM9nRJzqpA7G9Hu+6PBHSy+osrNejUDLXoh9
-	 B9LF8M6yAxNGr2w7KiLctuYNxlXQSK/R+Sys86uRNUF5BKAIIGQEwXS6G5cqlZQu8V
-	 rz6xXMCPyfPY/5E+MXgfGwI00vOglAaeAYMM8DLOIZmi7KufBUbMvNmkxcgNd+s97N
-	 LwHHkV3ShZq/Nr/4MmUhowATdX2s5bNciknVzVwKix0Pp1HoTo7IBzMkSFrCSjO74Y
-	 pTXWHM7aVSkzQ==
-Date: Sat, 14 Mar 2026 09:10:48 -0700
+	s=k20201202; t=1773504775;
+	bh=7sf2uWzMvNSCCtjzHOwj8ITgXe8jBNiCxVKw7yg6T5E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=FkRG+E/J3cl9YBqX/Pm//DHD3LLPk5hBRmxuhBvPehOdkhzcaVnPoiGmnO1RStckE
+	 7ypKf/ZY/jOdyu2C+NVERI21jd/aMkt/Wuqt6Pt6RtrxK8lJChVJf5an4O1eE1vchB
+	 Jt0r15FBLrkbT1UAZeCzR+Q87pCxAC4vk3Bv/pUSm9OS5gzR6eSjJSTbbvGfuYbGz1
+	 YHMu2LC4dR1PTPRiyXn5mEdHkp6XjEX5ETL9+Gx9c2QZfNVGUo0yA77HQKqJOMpbr2
+	 qWh4BHEfKwxwe8LK1Nh9sPwac/w1Uut55ijiLMx7oCyBVKmPbM7tzVM3cE8pgU3uVR
+	 L0G+XSoei5hvw==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: <intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] idpf: Replace use of system_unbound_wq with
- system_dfl_wq
-Message-ID: <20260314091048.235a6d0b@kernel.org>
-In-Reply-To: <0ca7f92b-ec4e-469c-ad2b-648d278bcfe9@intel.com>
-References: <20260313150917.271086-1-marco.crivellari@suse.com>
-	<0ca7f92b-ec4e-469c-ad2b-648d278bcfe9@intel.com>
+To: fw@strlen.de
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	edumazet@google.com,
+	pablo@netfilter.org,
+	netdev@vger.kernel.org,
+	davem@davemloft.net,
+	netfilter-devel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: Re: [net,06/11] netfilter: nf_conntrack_h323: fix OOB read in decode_int() CONS case
+Date: Sat, 14 Mar 2026 09:12:36 -0700
+Message-ID: <20260314161236.2454291-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260313150614.21177-7-fw@strlen.de>
+References: <20260313150614.21177-7-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267764-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267765-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 857B828DD19
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E402D28DD3F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 13 Mar 2026 17:08:57 +0100 Przemek Kitszel wrote:
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Process question - even tho you are also a maintainer I only read
-Tony's tags as "please apply directly". LMK if that's right, I'll
-try to remember / make a note..
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+netfilter: nf_conntrack_h323: fix OOB read in decode_int() CONS case
+
+This patch adds a boundary check in the CONS case of decode_int() to
+prevent reading beyond the buffer after get_bits() returns a length
+value. The fix validates that len bytes remain before calling
+get_uint().
+
+> diff --git a/net/netfilter/nf_conntrack_h323_asn1.c b/net/netfilter/nf_conntrack_h323_asn1.c
+> index 62aa22a07876..c972e9488e16 100644
+> --- a/net/netfilter/nf_conntrack_h323_asn1.c
+> +++ b/net/netfilter/nf_conntrack_h323_asn1.c
+> @@ -331,6 +331,8 @@ static int decode_int(struct bitstr *bs, const struct field_t *f,
+>  		if (nf_h323_error_boundary(bs, 0, 2))
+>  			return H323_ERROR_BOUND;
+>  		len = get_bits(bs, 2) + 1;
+> +		if (nf_h323_error_boundary(bs, len, 0))
+> +			return H323_ERROR_BOUND;
+>  		BYTE_ALIGN(bs);
+>  		if (base && (f->attr & DECODE)) {	/* timeToLive */
+>  			unsigned int v = get_uint(bs, len) + f->lb;
+
+This patch fixes the CONS case, but the UNCO case in the same function
+has the same vulnerability. In the UNCO case, get_len(bs) can return up
+to 0x3FFF (16383 bytes), and the code advances bs->cur by that amount
+without checking that len bytes remain:
+
+	case UNCO:
+		BYTE_ALIGN(bs);
+		if (nf_h323_error_boundary(bs, 2, 0))
+			return H323_ERROR_BOUND;
+		len = get_len(bs);
+		bs->cur += len;
+		break;
+
+The check only validates 2 bytes for get_len() itself, not the
+subsequent len bytes that will be skipped. Does this need the same fix
+pattern?
+
+The decode_bitstr() function has a similar issue. In the SEMI case, it
+calls get_len(bs) which can return up to 0x3FFF bits, then advances the
+buffer by len >> 3 bytes plus partial bits without checking that
+sufficient buffer space exists:
+
+	case SEMI:
+		if (nf_h323_error_boundary(bs, 2, 0))
+			return H323_ERROR_BOUND;
+		len = get_len(bs);
+		break;
+	}
+
+	bs->cur += len >> 3;
+	bs->bit = len & 7;
+
+The check at the top only validates 2 bytes for the get_len() call. The
+actual advance at the bottom can be up to 2047 bytes. Should this be
+checked as well?
+
+The decode_octstr() function has the same pattern in both the SEMI case
+and the default case:
+
+	case SEMI:
+		BYTE_ALIGN(bs);
+		if (nf_h323_error_boundary(bs, 2, 0))
+			return H323_ERROR_BOUND;
+		len = get_len(bs) + f->lb;
+		break;
+	default:		/* 2 <= Range <= 255 */
+		if (nf_h323_error_boundary(bs, 0, f->sz))
+			return H323_ERROR_BOUND;
+		len = get_bits(bs, f->sz) + f->lb;
+		BYTE_ALIGN(bs);
+		break;
+	}
+
+	bs->cur += len;
+
+In the SEMI case, get_len() can return up to 0x3FFF and f->lb is added.
+In the default case, get_bits(bs, f->sz) returns an attacker-controlled
+value based on field size and f->lb is added. Both cases then advance by
+len bytes without checking. The existing checks only validate the bytes
+needed to READ the length value, not the len bytes that will be
+consumed. Should boundary checks be added after both break statements?
+
+Similarly, decode_bmpstr() (which handles 2-byte character strings) has
+the same issue in both the BYTE case and default case:
+
+	case BYTE:		/* Range == 256 */
+		BYTE_ALIGN(bs);
+		if (nf_h323_error_boundary(bs, 1, 0))
+			return H323_ERROR_BOUND;
+		len = (*bs->cur++) + f->lb;
+		break;
+	default:		/* 2 <= Range <= 255 */
+		if (nf_h323_error_boundary(bs, 0, f->sz))
+			return H323_ERROR_BOUND;
+		len = get_bits(bs, f->sz) + f->lb;
+		BYTE_ALIGN(bs);
+		break;
+	}
+
+	bs->cur += len << 1;
+
+After computing len from packet data plus f->lb, the function advances
+by len << 1 bytes (doubling for 2-byte characters) without verifying
+that len << 1 bytes are available. Should this also be checked?
 
