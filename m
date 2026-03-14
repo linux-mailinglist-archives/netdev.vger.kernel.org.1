@@ -1,251 +1,239 @@
-Return-Path: <netdev+bounces-267667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267668-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4WUsNffctGnAtgAAu9opvQ
-	(envelope-from <netdev+bounces-267667-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 04:58:47 +0100
+	id 0hk+Ho7gtGlutwAAu9opvQ
+	(envelope-from <netdev+bounces-267668-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 05:14:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43C8528B7F6
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 04:58:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6DEC28B899
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 05:14:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2811230172D3
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 03:58:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 486C6303B7DA
+	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 04:14:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC10320CB1;
-	Sat, 14 Mar 2026 03:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05A5314A64;
+	Sat, 14 Mar 2026 04:14:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JTgqP31w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cZD1JkgY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFA3317164
-	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 03:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565522DB7BD
+	for <netdev@vger.kernel.org>; Sat, 14 Mar 2026 04:14:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773460723; cv=pass; b=KtoTFF5tXJilSFHqCEbXrDL1sLdTw8J4ssIutdvqw6RNDsoLNiDF1MOEsCFMzs1PoLEkPeGMyyLSykSdr3ErFPNIl+ilsgcqhqsZ92W5LgrKuQ0lUHwXXa1F3Q95+58p3TP72mCq2drTMGap1kToD141yUulhVnoCd+VRybrUps=
+	t=1773461642; cv=pass; b=AU2xQlv8l2uLKmmUCVTjU7m0bc+2kF1Q0hkFR/HR/vLlGaeYrlcGQn+gqE07+ET4CaC967JMPjUR1y2VTaSpOCC6CO+1sw4DsJUd8m9zk07nZ8JvycJHFzrQmy7JhOCf/L2NJfZdllvbnZgTA06xgmkzs3M0VbKq9t3FptsF5oo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773460723; c=relaxed/simple;
-	bh=GcSrDIphKrI2//HgDsteTWBHlxHzmnPMjkm0w3xQYSg=;
+	s=arc-20240116; t=1773461642; c=relaxed/simple;
+	bh=HzsNQ9jkXHrU1GlKgD93zLJxHSJuQW4od8SyC7cW01M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CeT56epdPdyvSgrbDhpydxLQ8Bi6t+HeRi8SU9ci0BYtLdqGhYsGlJgM4nmBdPOZD6VjVybTEWCwwab89UqM+ARblbvtmoUpfYN8PjDBFreCEZ6wZ9JyG8FYk5754wj4H//MrY9XH8GQEPeYrKvHSoePGHHN9DoBJU7Y+/H8a8Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JTgqP31w; arc=pass smtp.client-ip=209.85.160.181
+	 To:Cc:Content-Type; b=rVTf4eaTiKKKJ3mU2iSL0OCRaoAFnJZEvCsyTNcRy2gRk3T/hQDe9EWw0XUZ5G1F8QZ3sJT2qmGbU6SScKnw65T6kCNgAykGy7wyUVxOwvkLs0J2VZAswGlTKhrdSAvJJqXedk8tDV06E+jM6WGKXezBCE2aPCBuNyEPFNlb1OA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cZD1JkgY; arc=pass smtp.client-ip=209.85.160.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-506a747448dso24934441cf.0
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 20:58:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773460720; cv=none;
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-5094ba0af1aso29147311cf.0
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 21:14:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773461640; cv=none;
         d=google.com; s=arc-20240605;
-        b=SkSTKGImpv6BhYQQQZ/YzMhALsNARzR0m39ndmryTYL03pFTgcpFrtpSqLVtpt1Qkv
-         NmURQI7fyhZVuHK8cUiz35AQSmZXbuXKDG/qHZptWYtlaUr/KIZivUh3JOkaVXoBDHty
-         Ha9jKwnFKXSBihAoTn8AfKedRA8nCcqQ4uXUA41KjVCN+nnfLfoPK0b0nN0aJo+c8I7D
-         AdDRlgz8ka2KY1A5eG3rPyp8gR3I8eTfaZ96Pp/6f8eaRNB8RZohtwKu4ySMvbYJCHWe
-         lrfZrmtOsG4UP4d/20oIm8gSqSJKPjFKzmIDo3zR+cUvUEw9LxYtsMsO8UXyIdFkZ0j0
-         KtLg==
+        b=GbyxpS60Bq418BcGzjI+XH+FfZ8Lj8XE3655c+yG9SYlfKPZNYQSPrr+DukUUuwhfh
+         +flp436JpBpYscVgXN7zztaftz2Y58zhVYLkVJGz3hPwZ4cNbsnCIoYp+Oj7vnI3o3D4
+         CxfjoZeEM6p4mdnMj0zdscnc1L1m7w6XVUZlJbTfUe/R9aMwkBO0G2OrBhmHWITeVAuc
+         jhsT3yJB4D1O2ZuK13oHVRgnTh3xldRx/2y7gXULBZL7Jl1CjDq+NdQKGyWRO+0MOu7h
+         WcpCmtX01ZMQBE2Rc6fnOYPN4m9Zyi7CcDWV+IwnKACZ3aY1tzSqZRbQvNcMGpeSnm0C
+         x04g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=OUQRi5vl7ger1FCyv6fx+Ok5M5QQpxd6KNaAJfpodDo=;
-        fh=CthJ4a86oUa6QoQzzNQB3u4TeW1ks45MH6nLKaLOVFE=;
-        b=eQL5HYG93ZSaBmA6Thet6QsitkB6bPIDfEFCua+/O8UMSECdDASmsU+Wu5k8VnvIlO
-         VePHf1p694gXhH5K5mQuLBrsGYAGWyZ1Xn0mhW6/i9dn4uQqUhi5n7Lo7sjBnut7xENW
-         mipPU9Ex//Sb23W2t3mM0E+yZSEL525ZGLLPnmwefvMxfwpOz8zMUtwCfseJLpkjFhc/
-         tlAY1Rv6AN63GrKIi/LUzW0K3H4TDgspsEcge/VjSwk2lwVxzSnX3vBvot9qWUTqwxiO
-         TCyDQOhwnQ4E0bGSRahk2SG7faYwhKCY/4YzFXL1a1PmyauaGSHI7rlYNXpjJ00902DV
-         4qoQ==;
+        bh=sly2qHIvbY051CLg2hvc6NuzuyJY6s6PgyFRPoLcPfw=;
+        fh=tAOl/i5YQ1Mv0dbpbaYdswiIxf65qo9EIYIJ4TWTSXI=;
+        b=BGBrfti8VGOJc/RK2vUvtgGlZ3XgBdGHjZvD31KJPOGchNXcol5B2Aglw7dtH2HRoo
+         5ujyhOAl0yl+XG4HBHPy3gPaw7NA+F8YqNiMCx7bZygePXsGDNUbj3A3LNJ6fkLSAWlH
+         DFY4PHIY1qaHdIDj+4E90Q3XMcy/e3+fiNRGuqb0yl413nkPfYf/z2Qs5DMF7Nlmj0mB
+         YEDr3JvnF1EEh8RZfdiqrRuLQtrbn6X1cZ3Iwxh5p/rjMO1KzCaHi6cF0ZUeNlKphE+Z
+         YEAXwnMuLMfFfs7DyZp2cQBqq4tZ01ZGTYFteDlA6zA3ehnPGwzR5N8urxtTdaC2frY4
+         FV+Q==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773460720; x=1774065520; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1773461640; x=1774066440; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OUQRi5vl7ger1FCyv6fx+Ok5M5QQpxd6KNaAJfpodDo=;
-        b=JTgqP31wUjvJW6J0fs1XR8UDn/WHbk6yG/ugdEzIIaBtN6qVCOZt5ZlJkVL4ze4py7
-         vdoUVii8IYXkGuHIJRJP3zprLeUjJom3ZiwoCW2qE9xAh1LW2zI4rLVFNYqFNONbCtm8
-         Lbd1gzNK6JkyNFRW5BGgC5FaiCtCyGVmIGG5tayTBrZaFNcIj8sZsPza7i0ZUMTK1Oa5
-         Wkn5cZWexZf2YXMryIyu+zoVJ99k/2oE4CGLyaHENCYN+3N1YOq+enZ830YT1Q5529dr
-         UMCw/NccyvFo9IDZvLPNfrqa8UYIyd9T8DUfVWpPoYNSEH6GkaZdB0IvHOQjyKCxAWR+
-         rxHA==
+        bh=sly2qHIvbY051CLg2hvc6NuzuyJY6s6PgyFRPoLcPfw=;
+        b=cZD1JkgYSpgQ5ijPgMKIvRJhVMp9Zzx0fii638rG8IjM35vc45XKylJlsKyvdfQ2Hx
+         fcquSBWbnTQ3gzDtx1eNePXuc+9cK85pn6akCd3G9BM83LSnqM68z2S8112OBuCFz/kl
+         haNc4Fyk9VvLw2T/KPlTScNORy5X86KwduuQqLSc+WTKOH8VEucM+QJiUMz0J7c5UpaA
+         VdKSgKTKz12xuSD9pWzMBc/vXcY64RLTOFe64uYOf2XFlM3be7FMxqNL7lgAPns7NA51
+         FnltTVW6LRzY/BC5lC+D4KJY1godKJu2QGv00zYqRxo0F/OhiUUbLbQPJ8ZMlcHXuB7I
+         eUjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773460720; x=1774065520;
+        d=1e100.net; s=20251104; t=1773461640; x=1774066440;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=OUQRi5vl7ger1FCyv6fx+Ok5M5QQpxd6KNaAJfpodDo=;
-        b=EnMcAq3YgT9pD1YGhV1og4FA5alcblS0xKcu+hHfpsWcAK9WNnYvTDMNy+HymJpbNx
-         1DMbEO+H8EAo/9oQqhYSPp9xOWIjwbZPgiY8wMayftwMqvx5RYg3+Yplwa9PUGgHvFqU
-         NsDaS/zMvOF+ybW196rJKvZuFENbv7ANHmAQNOw9AO7AAv7whdAozTX7GmPTB+biP1dT
-         eQNTfeEKC706yd0DjPHXVQnFZvwD0CYfDmOZEbiFFfAlF5GElJKQhjfhQvv1eXq3fx49
-         XRAyrmKnVDzg4c8SFjOYfQSKqVPWUc55LGBw56rpYny1BOBwoQmpkh7udlSG88CveNXu
-         YcQg==
-X-Forwarded-Encrypted: i=1; AJvYcCWMtd16lrXCex28NRginpY7j8ktme7HsEPhXYjF0qESyl8JguvwwaAGFYPXN72ojoRiYWCpIz4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvkPMVrsD/dhr26TOVne6Z+wyfgI26GnNO8qZ4fDaoEspW2lF6
-	Xql8+IdF6DqKUVri+0ijO9E5zuwhQn1CcNTj8Bg2GmoRIA/kwyf8ivezkIIme2hyRbQFL3tJX9x
-	McPbDI+BfiqK+9pVUNT5d6A1znOC3aYBo47OGQkhx
-X-Gm-Gg: ATEYQzxMxWgc6QD64PnWlvE89tZBgM45KXIkXLBDPI+LNiSqzj0I0BHh+feA7LzJY5G
-	iIvFghJrx/9R9MzRCCl6fgoUtLIQ7U11CxQ+Z/sy/Z2Og2aIijvx5JJsQdKOjybla9ppRgkry7L
-	DJsvwGyvblzYUQZKji0X9Yp2HbW34d540nRnxrVy/rx1g/inFh9Enc4smdhi/6lMowAm6/xdBZJ
-	rrgZtM3zJ8lNkHGaSfNo98NYNGM13uCYUVDWQQUUiayFd9mBLp0DPsiZx0J+zoNHD6CbN7RQ//7
-	uctwdw==
-X-Received: by 2002:a05:622a:190c:b0:509:1a72:e332 with SMTP id
- d75a77b69052e-50957cb6dffmr75230961cf.16.1773460719740; Fri, 13 Mar 2026
- 20:58:39 -0700 (PDT)
+        bh=sly2qHIvbY051CLg2hvc6NuzuyJY6s6PgyFRPoLcPfw=;
+        b=eHTmijgxbcDozPkXF9SXllNl08s6bMK6lbTx5+IZ5Z3YIok26j0AGXt/LcvvcRJw5p
+         BPkhMt9PW33xJ+1FFPvSK6a3Hp18VqZnJGi5m8fwapnp9rPuhNvYQbq7a9VYWcq4+HGR
+         NPqigA8FPE6NwOH+jJ1OVw6TyIX0pgWzSyq64ltPNE1KLg00GtLrOi8yjUMIg1VYu+6C
+         FHoDk/Re9n4B/LTpCBFxw1N5jdEAYYQt+gyPEuWDNwNiIgBIljX5kyzhgjfAYgD8A8o9
+         7O9iG+TCK3L39jlXL1p1p1KJUecQipTH5MlskkIa3v2lJR2BGTChC9FwX9i1kY4irWnW
+         PHZw==
+X-Forwarded-Encrypted: i=1; AJvYcCX3RysIFLJkzaXCwD7fGRD8bzpRWYw8/ilUPai/MwrlKyrbbwMcFKh1hgn5XWCTdim0tqlHQ38=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFC0+gFT9ZD7HmiVNBV8DPjLmwBSbWqd+6EBM/1chh99LJb5Mm
+	MyawtS/cix4bnprQShrRXEQ9CR7SWZSB7dOY1N2vxoOCT6QSuFHFYTuSGCDReH1/v3NRPbjLYiS
+	4I0FvQnM2VxSYdbmksQDzmjzni31n8PsGWyzxNbPz
+X-Gm-Gg: ATEYQzw3stbfZgeJPuiSU+vL5a4/9nsl2VQJzfzof4CGkNB7uEaMecyHJS1IvpKNkgP
+	VsOMRNdQn4AAmvvK+m8oqk9L5V1JtaDu51VulN7qgsFgVMXMkGisbaEJN7946hUX5xjFDhVmr2L
+	/zZZCP13yfmJcz9eRNIkH1DZ82fQUt9evX0R6MfBkJzPqK8iENPxONaRUcfUSXydHc8kLki0CMd
+	3pjQWrH88J0sCT6FUabVDO0t54PUbi3ecg9ewz0I8sw0A0Mhs55xSLZEHAH0stlF/in/xLi0OB/
+	5cYtuQ==
+X-Received: by 2002:a05:622a:1313:b0:506:9e57:8ba9 with SMTP id
+ d75a77b69052e-50957e6e003mr72479211cf.35.1773461639854; Fri, 13 Mar 2026
+ 21:13:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260309-tcp_rfc7323_retract_wnd_rfc-v3-0-4c7f96b1ec69@gmail.com>
- <20260309-tcp_rfc7323_retract_wnd_rfc-v3-6-4c7f96b1ec69@gmail.com>
- <CANn89i+PypF1cK4mnp8L_eCG_z+3Aj6uxJoohm_=DwGfR1=4FA@mail.gmail.com> <abCkmiCSPkmxzECa@gandalf.schnuecks.de>
-In-Reply-To: <abCkmiCSPkmxzECa@gandalf.schnuecks.de>
+References: <20260313202802.1201129-1-edumazet@google.com> <20260313150710.0edaa6b9@kernel.org>
+In-Reply-To: <20260313150710.0edaa6b9@kernel.org>
 From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 14 Mar 2026 04:58:28 +0100
-X-Gm-Features: AaiRm523CLjVQFOb0ZjB_qB2iBvlpRhw-o_SCZwCK7X6f1nBivXOPbA_-nmtd5w
-Message-ID: <CANn89iKYxs644ardFFSKo8d0EXL_2A5eUQjWZ3yp9-Q4tVLKzQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 6/6] selftests/net: packetdrill: add tcp_rcv_neg_window.pkt
-To: Simon Baatz <gmbnomis@gmail.com>
-Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, David Ahern <dsahern@kernel.org>, 
-	Jon Maloy <jmaloy@redhat.com>, Jason Xing <kerneljasonxing@gmail.com>, mfreemon@cloudflare.com, 
-	Shuah Khan <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>, 
-	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	mptcp@lists.linux.dev
+Date: Sat, 14 Mar 2026 05:13:48 +0100
+X-Gm-Features: AaiRm51IdcwHMOXlrp4s0qw7_yj7U0iqt6-vxL441rZyOdgylq1jy2-yic19gGw
+Message-ID: <CANn89iJen547z-NOnu4QBe5K=92+tfeaO8T5A0X=_0vHdgQ4RQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: add cwnd_event_tx_start to tcp_congestion_ops
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267667-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-267668-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,cloudflare.com,vger.kernel.org,lists.linux.dev];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 43C8528B7F6
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C6DEC28B899
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 12:09=E2=80=AFAM Simon Baatz <gmbnomis@gmail.com> w=
+On Fri, Mar 13, 2026 at 11:07=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
 rote:
 >
-> Hi Eric,
->
-> On Tue, Mar 10, 2026 at 09:54:58AM +0100, Eric Dumazet wrote:
-> > On Mon, Mar 9, 2026 at 9:03???AM Simon Baatz via B4 Relay
-> > <devnull+gmbnomis.gmail.com@kernel.org> wrote:
-> > >
-> > > From: Simon Baatz <gmbnomis@gmail.com>
-> > >
-> > > The test ensures we correctly apply the maximum advertised window lim=
-it
-> > > when rcv_nxt advances past rcv_mwnd_seq, so that the "usable window"
-> > > is properly clamped to zero rather than becoming negative.
-> > >
-> > > Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
-> > > ---
-> > >  .../net/packetdrill/tcp_rcv_neg_window.pkt         | 26 ++++++++++++=
-++++++++++
-> > >  1 file changed, 26 insertions(+)
-> > >
-> > > diff --git a/tools/testing/selftests/net/packetdrill/tcp_rcv_neg_wind=
-ow.pkt b/tools/testing/selftests/net/packetdrill/tcp_rcv_neg_window.pkt
-> > > new file mode 100644
-> > > index 0000000000000000000000000000000000000000..15a9b4938f16d175ac54f=
-3fd192ed2b59b0a4399
-> > > --- /dev/null
-> > > +++ b/tools/testing/selftests/net/packetdrill/tcp_rcv_neg_window.pkt
-> > > @@ -0,0 +1,26 @@
-> > > +// SPDX-License-Identifier: GPL-2.0
-> > > +
-> > > +--mss=3D1000
-> > > +
-> > > +`./defaults.sh`
-> > > +
-> > > +// Establish a connection.
-> > > +   +0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
-> > > +   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
-> > > +   +0 setsockopt(3, SOL_SOCKET, SO_RCVBUF, [20000], 4) =3D 0
-> > > +   +0 bind(3, ..., ...) =3D 0
-> > > +   +0 listen(3, 1) =3D 0
-> > > +
-> > > +   +0 < S 0:0(0) win 32792 <mss 1000,nop,wscale 7>
-> > > +   +0 > S. 0:0(0) ack 1 win 18980 <mss 1460,nop,wscale 0>
-> > > +  +.1 < . 1:1(0) ack 1 win 257
-> > > +
-> > > +   +0 accept(3, ..., ...) =3D 4
-> > > +
-> > > +// A too big packet is accepted if the receive queue is empty
-> > > +   +0 < P. 1:20001(20000) ack 1 win 257
+> On Fri, 13 Mar 2026 20:28:02 +0000 Eric Dumazet wrote:
+> > (tcp_congestion_ops)->cwnd_event() is called very often, with
+> > @event oscillating between CA_EVENT_TX_START and other values.
 > >
-> > We do not see the answer, it seems this test is not complete ?
+> > This is not branch prediction friendly.
+> >
+> > Provide a new cwnd_event_tx_start pointer dedicated for CA_EVENT_TX_STA=
+RT.
+> >
+> > Both BBR and CUBIC benefit from this change, since they only care
+> > about CA_EVENT_TX_START.
 >
-> Actually we do not want to see an answer.  The packet won't trigger
-> an immediate ACK (it is larger than the advertised window, but does
-> not cause immediate memory pressure).
->
-> When we then send a RST before the delayed ACK would be generated:
->
-> > > +// Send a RST immediately so that there is no rcv_wup/rcv_mwnd_seq u=
-pdate yet
-> > > +   +0 < R. 20001:20001(0) ack 1 win 257
->
-> We are in a state where rcv_wup, rcv_wnd, and rcv_mwnd_seq have not
-> been updated yet, but we must still accept the RST
-> (rcv_nxt =3D=3D 20001 > rcv_mwnd_seq, tcp_max_receive_window() =3D=3D 0)
->
-> > > +
-> > > +  +.1 %{ assert tcpi_state =3D=3D TCP_CLOSE, tcpi_state }%
->
-> And we verify that we accepted the RST here.
->
-> Given how subtle this sequence is, and considering the limited value
-> of this test, I am also fine with dropping it if it is too fragile or
-> confusing.
+> BPF selftest are not happy:
+> 857
+>   progs/tcp_ca_kfunc.c:121:33: error: use of undeclared identifier 'cwnd_=
+event_tx_start'
+>     121 |         .cwnd_event_tx_start =3D (void *)cwnd_event_tx_start,
+>         |                                        ^~~~~~~~~~~~~~~~~~~
+> --
+> pw-bot: cr
 
-Sorry I missed your answer.
+Ah, I missed this because the bpf tests on my side have many errors.
 
-Ok then please use :
-
-// A too big packet is accepted if the receive queue is empty
-   +0 < P. 1:20001(20000) ack 1 win 257
-   +0 %{ assert tcpi_bytes_received =3D=3D 20000, tcpi_bytes_received;
-assert tcpi_bytes_acked =3D=3D 0, tcpi_bytes_acked }%
-
-// Send a RST immediately so that there is no rcv_wup/rcv_mwnd_seq update y=
-et
-   +0 < R. 20001:20001(0) ack 1 win 257
-
-  +.1 %{ assert tcpi_state =3D=3D TCP_CLOSE, tcpi_state }%
-
-
-
-Then add my
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+progs/bpf_qdisc_fifo.c:38:3: error: call to undeclared function
+'bpf_qdisc_skb_drop'; ISO C99 and later do not support implicit
+function declarations [-Wimplicit-function-declaration]
+   38 |                 bpf_qdisc_skb_drop(skb, to_free);
+      |                 ^
+  CLNG-BPF [test_progs] for_each_multi_maps.bpf.o
+  CLNG-BPF [test_progs] free_timer.bpf.o
+progs/bpf_qdisc_fq.c:280:11: error: call to undeclared function
+'bpf_skb_get_hash'; ISO C99 and later do not support implicit function
+declarations [-Wimplicit-function-declaration]
+  280 |                         hash =3D bpf_skb_get_hash(skb) & q.orphan_m=
+ask;
+      |                                ^
+progs/bpf_qdisc_fq.c:287:11: error: call to undeclared function
+'bpf_skb_get_hash'; ISO C99 and later do not support implicit function
+declarations [-Wimplicit-function-declaration]
+  287 |                         hash =3D bpf_skb_get_hash(skb) & q.orphan_m=
+ask;
+      |                                ^
+  CLNG-BPF [test_progs] freplace_attach_probe.bpf.o
+  CLNG-BPF [test_progs] freplace_cls_redirect.bpf.o
+  CLNG-BPF [test_progs] freplace_connect4.bpf.o
+  CLNG-BPF [test_progs] freplace_connect_v4_prog.bpf.o
+progs/bpf_qdisc_fifo.c:71:2: error: call to undeclared function
+'bpf_qdisc_bstats_update'; ISO C99 and later do not support implicit
+function declarations [-Wimplicit-function-declaration]
+   71 |         bpf_qdisc_bstats_update(sch, skb);
+      |         ^
+progs/bpf_qdisc_fifo.c:106:4: error: call to undeclared function
+'bpf_kfree_skb'; ISO C99 and later do not support implicit function
+declarations [-Wimplicit-function-declaration]
+  106 |                         bpf_kfree_skb(skb);
+      |                         ^
+  CLNG-BPF [test_progs] freplace_dead_global_func.bpf.o
+progs/bpf_qdisc_fq.c:375:3: error: call to undeclared function
+'bpf_qdisc_skb_drop'; ISO C99 and later do not support implicit
+function declarations [-Wimplicit-function-declaration]
+  375 |                 bpf_qdisc_skb_drop(skb, to_free);
+      |                 ^
+3 errors generated.
+  CLNG-BPF [test_progs] freplace_get_constant.bpf.o
+make: *** [Makefile:772:
+/usr/local/google/home/edumazet/git/net-next/tools/testing/selftests/bpf/bp=
+f_qdisc_fifo.bpf.o]
+Error 1
+make: *** Waiting for unfinished jobs....
+progs/bpf_qdisc_fail__incompl_ops.c:13:2: error: call to undeclared
+function 'bpf_qdisc_skb_drop'; ISO C99 and later do not support
+implicit function declarations [-Wimplicit-function-declaration]
+   13 |         bpf_qdisc_skb_drop(skb, to_free);
+      |         ^
+1 error generated.
+progs/bpf_qdisc_fq.c:614:3: error: call to undeclared function
+'bpf_qdisc_bstats_update'; ISO C99 and later do not support implicit
+function declarations [-Wimplicit-function-declaration]
+  614 |                 bpf_qdisc_bstats_update(sch, skb);
+      |                 ^
+make: *** [Makefile:772:
+/usr/local/google/home/edumazet/git/net-next/tools/testing/selftests/bpf/bp=
+f_qdisc_fail__incompl_ops.bpf.o]
+Error 1
+progs/bpf_qdisc_fq.c:619:3: error: call to undeclared function
+'bpf_qdisc_watchdog_schedule'; ISO C99 and later do not support
+implicit function declarations [-Wimplicit-function-declaration]
+  619 |                 bpf_qdisc_watchdog_schedule(sch,
+cb_ctx.expire, q.timer_slack);
+      |                 ^
 
