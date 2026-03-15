@@ -1,546 +1,322 @@
-Return-Path: <netdev+bounces-267923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267924-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GCkMHNzStmnfJAEAu9opvQ
-	(envelope-from <netdev+bounces-267923-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:40:12 +0100
+	id ILCzF0PWtmkDJgEAu9opvQ
+	(envelope-from <netdev+bounces-267924-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:54:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C65B6291399
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:40:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 960AC291480
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:54:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9EF053010B9E
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 15:40:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 539553023371
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 15:54:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A37D235BE2;
-	Sun, 15 Mar 2026 15:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E175F36E462;
+	Sun, 15 Mar 2026 15:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rnhVcM6o"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="bj8t6OVX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 726912BE7DC
-	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 15:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D39368941
+	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 15:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773589208; cv=none; b=LkGje/WUZ6JSYVqFh5RxQQzqCGMQ+KtmR8ox4nJ8De8pMz/pCSWalpT+z9+5tWLRpEdndlpqYJXme3khnFJ/BnGnzdt1KRab5ScRoUu1fYFQczbIgkbHAvF0dt8qUGkDnVuuJ7m1twz9DmfDmkO4qxaoaYTMonqk9cd6JFXqJ9M=
+	t=1773590080; cv=none; b=ll40FracsuT2DoXYtbsALNeYqLIWPOfOC7Hs1i8yosodrra4+taFtNrkP78Eux3YCY4McP0jJhoYRhkSqB3VCUy9+S5lEwPrJs32fSx4wPHQmF38G/VW+VSScXPTkir5eP4wOSlLC4prjBpMctJ7t+oydQAQ8skf46aZuQRzHyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773589208; c=relaxed/simple;
-	bh=rCMlem8e5TruBfIu5X7OS2S1fARSqAVDDEExnKEBr9U=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KGt+8+R2LtcqBwtDHN710QdGmoS6pxy/CEsAvHstdZ2Pfz9w7HN+QASx4VxbvrztqKnqxnBn3iGdqtBbsjKXcOP/vVK3tqXGCNvHJ0OSs4Bk0Ee6+1477k0zCyILb11u0Q84E4pfXx4X/X8xUfb0BM8xWPkFQwQ8kY+dYG0iY+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rnhVcM6o; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8cd767c51efso438463085a.2
-        for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 08:40:06 -0700 (PDT)
+	s=arc-20240116; t=1773590080; c=relaxed/simple;
+	bh=S5jvZCEQqQf4z9JLruedsXvdC+qRBkkS5+tcKM54mXM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IHmQzteJUMEHvRPHLV7gpMu4AjL5M7nqww5ZRfNLA1GSoaPi4/GKMvxvSTgMX/6r6vy6/LV0zivnnSCHWTMW3eEv2fA+7Bnt9vrZK/ydEBBCfM3SXDkpRJ/aM6UoaifV4p4pDY0P7zD75W3Kj2ZAk7BiNx1cvOTV5rK/e0yJbZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=bj8t6OVX; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-899fbf92bdbso50113896d6.0
+        for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 08:54:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773589205; x=1774194005; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=s7oNerO01Dtvy03udNCpISDaC4xZmNPeoVaTRKLSKuQ=;
-        b=rnhVcM6oCztw4U109YmKTDEipGUxxaUo+3JyT6dvQkhOYLHRwmaAYpyD626ZF/c/9P
-         HqrrXzP6biEYWl0e0NgmuxvZhdR7SPtw5AkHBChuDhwGxPRc4TdS2XSh1jOtM4ybBN+2
-         qWegEyvGyGO2ZFjLgBFgbWbgEh8nLDdvJ5VEwkKwj9hVW2HrtYHQ/NFq87441g5Cbjte
-         Ua3wYl83aPPelT5tYv/6btq2FmlqNkNrafICQiQq3YhnxYDSRDVNQbHBRc7Yl8teyIlF
-         ObiMuPTbVuVBspCrADJsnsJk2QbIKIK+k73NeWhoZ4xBnXRoBm8JkfcLVYCAS9+2mTTa
-         GIlA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1773590077; x=1774194877; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=P02NgkOon5+R73dtOQYvmE0YQTuOQwhyaum++5yhdVY=;
+        b=bj8t6OVXiR4yGMQGSBHZwMkH+LiiKAJM/09eYoG1+TIKIknNWIktXRIbL46kytKQLx
+         FknkbI7sxEn/ojFNvbS3XyAczbSKYDSLCoRgTLUDx4SAEQbjgyY8bYw25gIPvWNoabhZ
+         ECjjsiq3E8b3+GPaLIqSUXKLk7HEPMVd8V9FsjZ0FKlVYmIcVWyTdcZhYQUz4/UgKPNP
+         fYMC+cptfOa3ktm9OMtsQk5/YJ95mHXCdwwraVrIhUcfafuDehdWIq7j0jLv+ZJP2CJE
+         H7Am/sy3ijV2M1yhIyLcW/OG6iacGHLdznZ6iSBqNjnzlfk/syuS6IbCxnAERClNJwZH
+         ITWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773589205; x=1774194005;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s7oNerO01Dtvy03udNCpISDaC4xZmNPeoVaTRKLSKuQ=;
-        b=Ov8GmFNMdYFC2PJYHb00v0DuLWRgyxNUCJf5BV4U+UTt9OLOgsLevG+CON+u8f450h
-         JlIff+nQrQ1vIMdymbpM7Hq5cROIBny6zKfi+Bw9MOy4u2ZQqYBAI6mppIhjdL/IA42N
-         3kHY6k4a7pzjwg1U5t6ZeJ+H9UoiXHi2epEeBxwhB59Xoe7r/h57d8XQ7VfZihMn6SmN
-         3aq7fweghEx7ZADa8bogFwqoGeKiJUoc7zZwTOkrxqh1G3LiTh0jv1Y+9FEGvVF1I4Z3
-         lu0O/1nmcu49aaZg/5VA/EYk33VV3L9CbeFkEKDY9Mymy4iJK5qxme1TzGpSQrRhTRM3
-         hqaw==
-X-Forwarded-Encrypted: i=1; AJvYcCVq8ol0qm4z4xSkKnLE92vcKXm6RPFcVUVDk5UawkgL1T6yYcClrIfKOfXEF8LemL7QPok4im8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5wjd/SCGcBzkTD0kFhvHsZW2DwE8ExJHbM0N2Af1DsKP5Vnnu
-	p6Q7NlJlTDCZ6I9BW7dk/wz818+rG5rfm4ICq/h0BFVKSzpit7nB5E/XBCFnefvEtdNWahaSJvK
-	K2QoWUtAYyYGldg==
-X-Received: from qkd8.prod.google.com ([2002:a05:620a:a008:b0:8cd:8bfb:a60])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:218f:b0:8cd:8ee3:5004 with SMTP id af79cd13be357-8cdb5a4c477mr915635385a.27.1773589205023;
- Sun, 15 Mar 2026 08:40:05 -0700 (PDT)
-Date: Sun, 15 Mar 2026 15:40:03 +0000
+        d=1e100.net; s=20251104; t=1773590077; x=1774194877;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P02NgkOon5+R73dtOQYvmE0YQTuOQwhyaum++5yhdVY=;
+        b=HUvQ7dqwS0WwrNsLNeUW8nzVSw++KXrFqTCX0jTCGo9a2sGo4KCfTpcNfZJF6U8uMY
+         Dgx1iGeFo/ErWoQZ6+bwjD2F/HR5zOF6/QoHFGU+1Nxnl1WnogYtLeKrDF1YzSJitM8e
+         dspx+NIErSYdpg6Ek8r0aaQxSNmJtJcuyTyjQelSA1BjyfmAwVTsArx8otDc1d1TFIHT
+         YV6J8ANl0cJJ7ijYocVBEL842banmiaok+zTWfF78u+Ctlbl9yezy6YmH0m1sryY3KwB
+         JQdd6paBwkwlcBCS5D3JeICgTwdj6UxWzS1PT8pVJYuKtsnzg2CKerXAfw2NFw3b5z9L
+         vtPA==
+X-Gm-Message-State: AOJu0Yw4Z3Nzs1QU3D/qxUjl7R1VITbqGUsNtH7hQ1ER0FmDD4EyCnCo
+	6zbw2FpMTVzw+6M3oFeEJlTerfuF7qH3OS+zOWOV5BcIhxR2bkUNRcwuuKmgnaMgzmTTI3DX9sQ
+	u0Sc=
+X-Gm-Gg: ATEYQzw/TU86LDbAv51G5TCh9ibuCdLq68GRIMAyqvScowZ+yhMJDdk8FgwavjeJXNj
+	/uAyfg9zW1ClJon+5+JQIZMCOozcC2rQjENwrMOVu1ABaZFRzys+iP4DtaD1fSaoP3CsOymrfQu
+	USDoa0n1ps+oShn9SSYuTDQKoqBBJxFDlj6ESXxjKe45epblx/xZpvKskmryktterdC2ufV3jdI
+	73zO3IKpv7N46rjvn65svswPF7kvJfjn48tXw3RXj3OCCUtu+Ze3XdP8Tjb/78gzMToi9Rt3xb9
+	vDel1Apv0l0OJhBwMFrbbCrPY+HT50VmtYTnLhAQCqojrDevk/FREeExybvNRqXOC0rL8TcRQdZ
+	+IpgmV6jRXvW+p3KP386hMNJtoBfWNJlwwXB6CxorThI4kheh7EKGKJ6vkA0hqWJ2iv+b5w6KvY
+	XRwDbEEJg/98gKk+WNKYMywPo=
+X-Received: by 2002:a05:6214:40d:b0:89a:c09:aa8b with SMTP id 6a1803df08f44-89a81ec266emr168638176d6.39.1773590077413;
+        Sun, 15 Mar 2026 08:54:37 -0700 (PDT)
+Received: from majuu.waya ([70.50.89.69])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65cfc409sm103662326d6.35.2026.03.15.08.54.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Mar 2026 08:54:36 -0700 (PDT)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	jiri@resnulli.us,
+	keenanat2000@gmail.com,
+	security@kernel.org,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Victor Nogueira <victor@mojatatu.com>
+Subject: [PATCH net 1/1] net/sched: teql: Fix double-free in teql_master_xmit
+Date: Sun, 15 Mar 2026 11:54:22 -0400
+Message-Id: <20260315155422.147256-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.851.ga537e3e6e9-goog
-Message-ID: <20260315154003.1851513-1-edumazet@google.com>
-Subject: [PATCH v3 net-next] tcp: add cwnd_event_tx_start to tcp_congestion_ops
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267923-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267924-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,gmail.com,mojatatu.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C65B6291399
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 960AC291480
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-(tcp_congestion_ops)->cwnd_event() is called very often, with
-@event oscillating between CA_EVENT_TX_START and other values.
+Whenever a TEQL devices has a lockless Qdisc as root, qdisc_reset should
+be called using the seq_lock to avoid racing with the datapath. Failure
+to do so may cause crashes like the following:
 
-This is not branch prediction friendly.
+[  238.028993][  T318] BUG: KASAN: double-free in skb_release_data (net/core/skbuff.c:1139)
+[  238.029328][  T318] Free of addr ffff88810c67ec00 by task poc_teql_uaf_ke/318
+[  238.029749][  T318]
+[  238.029900][  T318] CPU: 3 UID: 0 PID: 318 Comm: poc_teql_ke Not tainted 7.0.0-rc3-00149-ge5b31d988a41 #704 PREEMPT(full)
+[  238.029906][  T318] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[  238.029910][  T318] Call Trace:
+[  238.029913][  T318]  <TASK>
+[  238.029916][  T318]  dump_stack_lvl (lib/dump_stack.c:122)
+[  238.029928][  T318]  print_report (mm/kasan/report.c:379 mm/kasan/report.c:482)
+[  238.029940][  T318]  ? skb_release_data (net/core/skbuff.c:1139)
+[  238.029944][  T318]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
+...
+[  238.029957][  T318]  ? skb_release_data (net/core/skbuff.c:1139)
+[  238.029969][  T318]  kasan_report_invalid_free (mm/kasan/report.c:221 mm/kasan/report.c:563)
+[  238.029979][  T318]  ? skb_release_data (net/core/skbuff.c:1139)
+[  238.029989][  T318]  check_slab_allocation (mm/kasan/common.c:231)
+[  238.029995][  T318]  kmem_cache_free (mm/slub.c:2637 (discriminator 1) mm/slub.c:6168 (discriminator 1) mm/slub.c:6298 (discriminator 1))
+[  238.030004][  T318]  skb_release_data (net/core/skbuff.c:1139)
+...
+[  238.030025][  T318]  sk_skb_reason_drop (net/core/skbuff.c:1256)
+[  238.030032][  T318]  pfifo_fast_reset (./include/linux/ptr_ring.h:171 ./include/linux/ptr_ring.h:309 ./include/linux/skb_array.h:98 net/sched/sch_generic.c:827)
+[  238.030039][  T318]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
+...
+[  238.030054][  T318]  qdisc_reset (net/sched/sch_generic.c:1034)
+[  238.030062][  T318]  teql_destroy (./include/linux/spinlock.h:395 net/sched/sch_teql.c:157)
+[  238.030071][  T318]  __qdisc_destroy (./include/net/pkt_sched.h:328 net/sched/sch_generic.c:1077)
+[  238.030077][  T318]  qdisc_graft (net/sched/sch_api.c:1062 net/sched/sch_api.c:1053 net/sched/sch_api.c:1159)
+[  238.030089][  T318]  ? __pfx_qdisc_graft (net/sched/sch_api.c:1091)
+[  238.030095][  T318]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
+[  238.030102][  T318]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
+[  238.030106][  T318]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
+[  238.030114][  T318]  tc_get_qdisc (net/sched/sch_api.c:1529 net/sched/sch_api.c:1556)
+...
+[  238.072958][  T318] Allocated by task 303 on cpu 5 at 238.026275s:
+[  238.073392][  T318]  kasan_save_stack (mm/kasan/common.c:58)
+[  238.073884][  T318]  kasan_save_track (mm/kasan/common.c:64 (discriminator 5) mm/kasan/common.c:79 (discriminator 5))
+[  238.074230][  T318]  __kasan_slab_alloc (mm/kasan/common.c:369)
+[  238.074578][  T318]  kmem_cache_alloc_node_noprof (./include/linux/kasan.h:253 mm/slub.c:4542 mm/slub.c:4869 mm/slub.c:4921)
+[  238.076091][  T318]  kmalloc_reserve (net/core/skbuff.c:616 (discriminator 107))
+[  238.076450][  T318]  __alloc_skb (net/core/skbuff.c:713)
+[  238.076834][  T318]  alloc_skb_with_frags (./include/linux/skbuff.h:1383 net/core/skbuff.c:6763)
+[  238.077178][  T318]  sock_alloc_send_pskb (net/core/sock.c:2997)
+[  238.077520][  T318]  packet_sendmsg (net/packet/af_packet.c:2926 net/packet/af_packet.c:3019 net/packet/af_packet.c:3108)
+[  238.081469][  T318]
+[  238.081870][  T318] Freed by task 299 on cpu 1 at 238.028496s:
+[  238.082761][  T318]  kasan_save_stack (mm/kasan/common.c:58)
+[  238.083481][  T318]  kasan_save_track (mm/kasan/common.c:64 (discriminator 5) mm/kasan/common.c:79 (discriminator 5))
+[  238.085348][  T318]  kasan_save_free_info (mm/kasan/generic.c:587 (discriminator 1))
+[  238.085900][  T318]  __kasan_slab_free (mm/kasan/common.c:287)
+[  238.086439][  T318]  kmem_cache_free (mm/slub.c:6168 (discriminator 3) mm/slub.c:6298 (discriminator 3))
+[  238.087007][  T318]  skb_release_data (net/core/skbuff.c:1139)
+[  238.087491][  T318]  consume_skb (net/core/skbuff.c:1451)
+[  238.087757][  T318]  teql_master_xmit (net/sched/sch_teql.c:358)
+[  238.088116][  T318]  dev_hard_start_xmit (./include/linux/netdevice.h:5324 ./include/linux/netdevice.h:5333 net/core/dev.c:3871 net/core/dev.c:3887)
+[  238.088468][  T318]  sch_direct_xmit (net/sched/sch_generic.c:347)
+[  238.088820][  T318]  __qdisc_run (net/sched/sch_generic.c:420 (discriminator 1))
+[  238.089166][  T318]  __dev_queue_xmit (./include/net/sch_generic.h:229 ./include/net/pkt_sched.h:121 ./include/net/pkt_sched.h:117 net/core/dev.c:4196 net/core/dev.c:4802)
 
-Provide a new cwnd_event_tx_start pointer dedicated for CA_EVENT_TX_START.
+Workflow to reproduce:
+1. Initialize a TEQL topology (dummy0 and ifb0 as slaves, teql0 up).
+2. Start multiple sender workers continuously transmitting packets
+   through teql0 to drive teql_master_xmit().
+3. In parallel, repeatedly delete and re-add the root qdisc on
+   dummy0 and ifb0 via RTNETLINK, forcing frequent teardown and reset activity
+   (teql_destroy() / qdisc_reset()).
+4. After running both workloads concurrently for several iterations,
+   KASAN reports slab-use-after-free or double-free in the skb free path.
 
-Both BBR and CUBIC benefit from this change, since they only care
-about CA_EVENT_TX_START.
+Fix this by moving dev_reset_queue to sch_generic.h and calling it, instead
+of qdisc_reset, in teql_destroy since it handles both the lock and lockless
+cases correctly for root qdiscs.
 
-No change in kernel size:
-
-$ scripts/bloat-o-meter -t vmlinux.0 vmlinux
-add/remove: 4/4 grow/shrink: 3/1 up/down: 564/-568 (-4)
-Function                                     old     new   delta
-bbr_cwnd_event_tx_start                        -     450    +450
-cubictcp_cwnd_event_tx_start                   -      70     +70
-__pfx_cubictcp_cwnd_event_tx_start             -      16     +16
-__pfx_bbr_cwnd_event_tx_start                  -      16     +16
-tcp_unregister_congestion_control             93      99      +6
-tcp_update_congestion_control                518     521      +3
-tcp_register_congestion_control              422     425      +3
-__tcp_transmit_skb                          3308    3306      -2
-__pfx_cubictcp_cwnd_event                     16       -     -16
-__pfx_bbr_cwnd_event                          16       -     -16
-cubictcp_cwnd_event                           80       -     -80
-bbr_cwnd_event                               454       -    -454
-Total: Before=25240512, After=25240508, chg -0.00%
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Fixes: 96009c7d500e ("sched: replace __QDISC_STATE_RUNNING bit with a spin lock")
+Reported-by: Xianrui Dong <keenanat2000@gmail.com>
+Tested-by: Xianrui Dong <keenanat2000@gmail.com>
+Co-developed-by: Victor Nogueira <victor@mojatatu.com>
+Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
-v3: fix tools/testing/selftests/bpf/progs/tcp_ca_kfunc.c (Jakub)
-v2: fix tools/testing/selftests/bpf/progs/bpf_cc_cubic.c (Jakub)
-v1: https://lore.kernel.org/netdev/20260313202802.1201129-1-edumazet@google.com/
+ include/net/sch_generic.h | 28 ++++++++++++++++++++++++++++
+ net/sched/sch_generic.c   | 27 ---------------------------
+ net/sched/sch_teql.c      |  7 ++-----
+ 3 files changed, 30 insertions(+), 32 deletions(-)
 
- include/net/tcp.h                             |  8 +++++
- net/ipv4/tcp_bbr.c                            |  8 ++---
- net/ipv4/tcp_cubic.c                          | 35 +++++++++----------
- net/ipv4/tcp_dctcp.c                          | 11 ++++--
- net/ipv4/tcp_vegas.c                          |  9 +++--
- net/ipv4/tcp_vegas.h                          |  1 +
- net/ipv4/tcp_veno.c                           |  8 ++++-
- net/ipv4/tcp_yeah.c                           |  1 +
- .../selftests/bpf/progs/bpf_cc_cubic.c        |  8 ++---
- tools/testing/selftests/bpf/progs/bpf_cubic.c | 33 ++++++++---------
- .../selftests/bpf/progs/tcp_ca_kfunc.c        | 16 ++++++---
- 11 files changed, 83 insertions(+), 55 deletions(-)
-
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index f87bdacb5a6995422851e88cfb65734702c84093..39ff4cf3c810f5619a479dcd92192043374a1739 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1341,6 +1341,9 @@ struct tcp_congestion_ops {
- 	/* call when cwnd event occurs (optional) */
- 	void (*cwnd_event)(struct sock *sk, enum tcp_ca_event ev);
- 
-+	/* call when CA_EVENT_TX_START cwnd event occurs (optional) */
-+	void (*cwnd_event_tx_start)(struct sock *sk);
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index d5d55cb21686..cafb266a0b80 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -716,6 +716,34 @@ void qdisc_destroy(struct Qdisc *qdisc);
+ void qdisc_put(struct Qdisc *qdisc);
+ void qdisc_put_unlocked(struct Qdisc *qdisc);
+ void qdisc_tree_reduce_backlog(struct Qdisc *qdisc, int n, int len);
 +
- 	/* call when ack arrives (optional) */
- 	void (*in_ack_event)(struct sock *sk, u32 flags);
- 
-@@ -1440,6 +1443,11 @@ static inline void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)
- {
- 	const struct inet_connection_sock *icsk = inet_csk(sk);
- 
-+	if (event == CA_EVENT_TX_START) {
-+	    if (icsk->icsk_ca_ops->cwnd_event_tx_start)
-+			icsk->icsk_ca_ops->cwnd_event_tx_start(sk);
++static inline void dev_reset_queue(struct net_device *dev,
++				   struct netdev_queue *dev_queue,
++				   void *_unused)
++{
++	struct Qdisc *qdisc;
++	bool nolock;
++
++	qdisc = rtnl_dereference(dev_queue->qdisc_sleeping);
++	if (!qdisc)
 +		return;
++
++	nolock = qdisc->flags & TCQ_F_NOLOCK;
++
++	if (nolock)
++		spin_lock_bh(&qdisc->seqlock);
++	spin_lock_bh(qdisc_lock(qdisc));
++
++	qdisc_reset(qdisc);
++
++	spin_unlock_bh(qdisc_lock(qdisc));
++	if (nolock) {
++		clear_bit(__QDISC_STATE_MISSED, &qdisc->state);
++		clear_bit(__QDISC_STATE_DRAINING, &qdisc->state);
++		spin_unlock_bh(&qdisc->seqlock);
 +	}
- 	if (icsk->icsk_ca_ops->cwnd_event)
- 		icsk->icsk_ca_ops->cwnd_event(sk, event);
- }
-diff --git a/net/ipv4/tcp_bbr.c b/net/ipv4/tcp_bbr.c
-index 05d52372ca8fb068530a9b3379f1ae0f9d0b362a..1ddc20a399b07054f8175b5f6459f8ae6dbf34bb 100644
---- a/net/ipv4/tcp_bbr.c
-+++ b/net/ipv4/tcp_bbr.c
-@@ -330,12 +330,12 @@ static void bbr_save_cwnd(struct sock *sk)
- 		bbr->prior_cwnd = max(bbr->prior_cwnd, tcp_snd_cwnd(tp));
- }
- 
--__bpf_kfunc static void bbr_cwnd_event(struct sock *sk, enum tcp_ca_event event)
-+__bpf_kfunc static void bbr_cwnd_event_tx_start(struct sock *sk)
- {
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	struct bbr *bbr = inet_csk_ca(sk);
- 
--	if (event == CA_EVENT_TX_START && tp->app_limited) {
-+	if (tp->app_limited) {
- 		bbr->idle_restart = 1;
- 		bbr->ack_epoch_mstamp = tp->tcp_mstamp;
- 		bbr->ack_epoch_acked = 0;
-@@ -1149,7 +1149,7 @@ static struct tcp_congestion_ops tcp_bbr_cong_ops __read_mostly = {
- 	.cong_control	= bbr_main,
- 	.sndbuf_expand	= bbr_sndbuf_expand,
- 	.undo_cwnd	= bbr_undo_cwnd,
--	.cwnd_event	= bbr_cwnd_event,
-+	.cwnd_event_tx_start	= bbr_cwnd_event_tx_start,
- 	.ssthresh	= bbr_ssthresh,
- 	.min_tso_segs	= bbr_min_tso_segs,
- 	.get_info	= bbr_get_info,
-@@ -1161,7 +1161,7 @@ BTF_ID_FLAGS(func, bbr_init)
- BTF_ID_FLAGS(func, bbr_main)
- BTF_ID_FLAGS(func, bbr_sndbuf_expand)
- BTF_ID_FLAGS(func, bbr_undo_cwnd)
--BTF_ID_FLAGS(func, bbr_cwnd_event)
-+BTF_ID_FLAGS(func, bbr_cwnd_event_tx_start)
- BTF_ID_FLAGS(func, bbr_ssthresh)
- BTF_ID_FLAGS(func, bbr_min_tso_segs)
- BTF_ID_FLAGS(func, bbr_set_state)
-diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
-index 76c23675ae50ab50c977dc1de79a3df57db98ef6..ab78b5ae8d0e3d13a39bd1adf1e105b84f806b63 100644
---- a/net/ipv4/tcp_cubic.c
-+++ b/net/ipv4/tcp_cubic.c
-@@ -139,24 +139,21 @@ __bpf_kfunc static void cubictcp_init(struct sock *sk)
- 		tcp_sk(sk)->snd_ssthresh = initial_ssthresh;
++}
++
+ #ifdef CONFIG_NET_SCHED
+ int qdisc_offload_dump_helper(struct Qdisc *q, enum tc_setup_type type,
+ 			      void *type_data);
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index 98ffe64de51f..9e726c3bd86b 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -1288,33 +1288,6 @@ static void dev_deactivate_queue(struct net_device *dev,
+ 	}
  }
  
--__bpf_kfunc static void cubictcp_cwnd_event(struct sock *sk, enum tcp_ca_event event)
-+__bpf_kfunc static void cubictcp_cwnd_event_tx_start(struct sock *sk)
- {
--	if (event == CA_EVENT_TX_START) {
--		struct bictcp *ca = inet_csk_ca(sk);
--		u32 now = tcp_jiffies32;
--		s32 delta;
+-static void dev_reset_queue(struct net_device *dev,
+-			    struct netdev_queue *dev_queue,
+-			    void *_unused)
+-{
+-	struct Qdisc *qdisc;
+-	bool nolock;
 -
--		delta = now - tcp_sk(sk)->lsndtime;
--
--		/* We were application limited (idle) for a while.
--		 * Shift epoch_start to keep cwnd growth to cubic curve.
--		 */
--		if (ca->epoch_start && delta > 0) {
--			ca->epoch_start += delta;
--			if (after(ca->epoch_start, now))
--				ca->epoch_start = now;
--		}
+-	qdisc = rtnl_dereference(dev_queue->qdisc_sleeping);
+-	if (!qdisc)
 -		return;
-+	struct bictcp *ca = inet_csk_ca(sk);
-+	u32 now = tcp_jiffies32;
-+	s32 delta;
-+
-+	delta = now - tcp_sk(sk)->lsndtime;
-+
-+	/* We were application limited (idle) for a while.
-+	 * Shift epoch_start to keep cwnd growth to cubic curve.
-+	 */
-+	if (ca->epoch_start && delta > 0) {
-+		ca->epoch_start += delta;
-+		if (after(ca->epoch_start, now))
-+			ca->epoch_start = now;
- 	}
- }
- 
-@@ -481,7 +478,7 @@ static struct tcp_congestion_ops cubictcp __read_mostly = {
- 	.cong_avoid	= cubictcp_cong_avoid,
- 	.set_state	= cubictcp_state,
- 	.undo_cwnd	= tcp_reno_undo_cwnd,
--	.cwnd_event	= cubictcp_cwnd_event,
-+	.cwnd_event_tx_start = cubictcp_cwnd_event_tx_start,
- 	.pkts_acked     = cubictcp_acked,
- 	.owner		= THIS_MODULE,
- 	.name		= "cubic",
-@@ -492,7 +489,7 @@ BTF_ID_FLAGS(func, cubictcp_init)
- BTF_ID_FLAGS(func, cubictcp_recalc_ssthresh)
- BTF_ID_FLAGS(func, cubictcp_cong_avoid)
- BTF_ID_FLAGS(func, cubictcp_state)
--BTF_ID_FLAGS(func, cubictcp_cwnd_event)
-+BTF_ID_FLAGS(func, cubictcp_cwnd_event_tx_start)
- BTF_ID_FLAGS(func, cubictcp_acked)
- BTF_KFUNCS_END(tcp_cubic_check_kfunc_ids)
- 
-diff --git a/net/ipv4/tcp_dctcp.c b/net/ipv4/tcp_dctcp.c
-index 03abe0848420d7fb7b514e6ad24f4c702954ab14..8ce84890feeea3094b6f46001295e2761c35f1da 100644
---- a/net/ipv4/tcp_dctcp.c
-+++ b/net/ipv4/tcp_dctcp.c
-@@ -203,15 +203,19 @@ __bpf_kfunc static void dctcp_cwnd_event(struct sock *sk, enum tcp_ca_event ev)
- 		tcp_plb_update_state_upon_rto(sk, &ca->plb);
- 		dctcp_react_to_loss(sk);
- 		break;
--	case CA_EVENT_TX_START:
--		tcp_plb_check_rehash(sk, &ca->plb); /* Maybe rehash when inflight is 0 */
--		break;
- 	default:
- 		/* Don't care for the rest. */
- 		break;
- 	}
- }
- 
-+__bpf_kfunc static void dctcp_cwnd_event_tx_start(struct sock *sk)
-+{
-+	struct dctcp *ca = inet_csk_ca(sk);
-+
-+	tcp_plb_check_rehash(sk, &ca->plb); /* Maybe rehash when inflight is 0 */
-+}
-+
- static size_t dctcp_get_info(struct sock *sk, u32 ext, int *attr,
- 			     union tcp_cc_info *info)
- {
-@@ -252,6 +256,7 @@ static struct tcp_congestion_ops dctcp __read_mostly = {
- 	.init		= dctcp_init,
- 	.in_ack_event   = dctcp_update_alpha,
- 	.cwnd_event	= dctcp_cwnd_event,
-+	.cwnd_event_tx_start = dctcp_cwnd_event_tx_start,
- 	.ssthresh	= dctcp_ssthresh,
- 	.cong_avoid	= tcp_reno_cong_avoid,
- 	.undo_cwnd	= dctcp_cwnd_undo,
-diff --git a/net/ipv4/tcp_vegas.c b/net/ipv4/tcp_vegas.c
-index 786848ad37ea8d5f9bd817666181905f3f6ec9d4..cf12fb6be079d8ccd65f297a3a90a9a5e90036e8 100644
---- a/net/ipv4/tcp_vegas.c
-+++ b/net/ipv4/tcp_vegas.c
-@@ -151,12 +151,17 @@ EXPORT_SYMBOL_GPL(tcp_vegas_state);
-  */
- void tcp_vegas_cwnd_event(struct sock *sk, enum tcp_ca_event event)
- {
--	if (event == CA_EVENT_CWND_RESTART ||
--	    event == CA_EVENT_TX_START)
-+	if (event == CA_EVENT_CWND_RESTART)
- 		tcp_vegas_init(sk);
- }
- EXPORT_SYMBOL_GPL(tcp_vegas_cwnd_event);
- 
-+void tcp_vegas_cwnd_event_tx_start(struct sock *sk)
-+{
-+	tcp_vegas_init(sk);
-+}
-+EXPORT_SYMBOL_GPL(tcp_vegas_cwnd_event_tx_start);
-+
- static inline u32 tcp_vegas_ssthresh(struct tcp_sock *tp)
- {
- 	return  min(tp->snd_ssthresh, tcp_snd_cwnd(tp));
-diff --git a/net/ipv4/tcp_vegas.h b/net/ipv4/tcp_vegas.h
-index 4f24d0e37d9c1e9d5336e8e99253e660143362c9..602af8e600c7f85603ff1a53008e1144617ea14b 100644
---- a/net/ipv4/tcp_vegas.h
-+++ b/net/ipv4/tcp_vegas.h
-@@ -20,6 +20,7 @@ void tcp_vegas_init(struct sock *sk);
- void tcp_vegas_state(struct sock *sk, u8 ca_state);
- void tcp_vegas_pkts_acked(struct sock *sk, const struct ack_sample *sample);
- void tcp_vegas_cwnd_event(struct sock *sk, enum tcp_ca_event event);
-+void tcp_vegas_cwnd_event_tx_start(struct sock *sk);
- size_t tcp_vegas_get_info(struct sock *sk, u32 ext, int *attr,
- 			  union tcp_cc_info *info);
- 
-diff --git a/net/ipv4/tcp_veno.c b/net/ipv4/tcp_veno.c
-index 366ff6f214b2ee746cecdf10353e4624252478e0..1b2e1b947901f3ca6004aced8e6d39c131f1fb68 100644
---- a/net/ipv4/tcp_veno.c
-+++ b/net/ipv4/tcp_veno.c
-@@ -112,10 +112,15 @@ static void tcp_veno_state(struct sock *sk, u8 ca_state)
-  */
- static void tcp_veno_cwnd_event(struct sock *sk, enum tcp_ca_event event)
- {
--	if (event == CA_EVENT_CWND_RESTART || event == CA_EVENT_TX_START)
-+	if (event == CA_EVENT_CWND_RESTART)
- 		tcp_veno_init(sk);
- }
- 
-+static void tcp_veno_cwnd_event_tx_start(struct sock *sk)
-+{
-+	tcp_veno_init(sk);
-+}
-+
- static void tcp_veno_cong_avoid(struct sock *sk, u32 ack, u32 acked)
- {
- 	struct tcp_sock *tp = tcp_sk(sk);
-@@ -213,6 +218,7 @@ static struct tcp_congestion_ops tcp_veno __read_mostly = {
- 	.pkts_acked	= tcp_veno_pkts_acked,
- 	.set_state	= tcp_veno_state,
- 	.cwnd_event	= tcp_veno_cwnd_event,
-+	.cwnd_event_tx_start = tcp_veno_cwnd_event_tx_start,
- 
- 	.owner		= THIS_MODULE,
- 	.name		= "veno",
-diff --git a/net/ipv4/tcp_yeah.c b/net/ipv4/tcp_yeah.c
-index 18b07ff5d20e6c5eefe9ab54c6b8e429f01d64b9..b22b3dccd05efddfe11203578950eddecee14887 100644
---- a/net/ipv4/tcp_yeah.c
-+++ b/net/ipv4/tcp_yeah.c
-@@ -212,6 +212,7 @@ static struct tcp_congestion_ops tcp_yeah __read_mostly = {
- 	.cong_avoid	= tcp_yeah_cong_avoid,
- 	.set_state	= tcp_vegas_state,
- 	.cwnd_event	= tcp_vegas_cwnd_event,
-+	.cwnd_event_tx_start = tcp_vegas_cwnd_event_tx_start,
- 	.get_info	= tcp_vegas_get_info,
- 	.pkts_acked	= tcp_vegas_pkts_acked,
- 
-diff --git a/tools/testing/selftests/bpf/progs/bpf_cc_cubic.c b/tools/testing/selftests/bpf/progs/bpf_cc_cubic.c
-index 9af19dfe4e80b00bc09fe40c7d6c9642cdfb4a23..bccf677b94b61226a3dd0517e0b2e64168de711f 100644
---- a/tools/testing/selftests/bpf/progs/bpf_cc_cubic.c
-+++ b/tools/testing/selftests/bpf/progs/bpf_cc_cubic.c
-@@ -23,7 +23,7 @@
- #define TCP_REORDERING (12)
- 
- extern void cubictcp_init(struct sock *sk) __ksym;
--extern void cubictcp_cwnd_event(struct sock *sk, enum tcp_ca_event event) __ksym;
-+extern void cubictcp_cwnd_event_tx_start(struct sock *sk) __ksym;
- extern __u32 cubictcp_recalc_ssthresh(struct sock *sk) __ksym;
- extern void cubictcp_state(struct sock *sk, __u8 new_state) __ksym;
- extern __u32 tcp_reno_undo_cwnd(struct sock *sk) __ksym;
-@@ -108,9 +108,9 @@ void BPF_PROG(bpf_cubic_init, struct sock *sk)
- }
- 
- SEC("struct_ops")
--void BPF_PROG(bpf_cubic_cwnd_event, struct sock *sk, enum tcp_ca_event event)
-+void BPF_PROG(bpf_cubic_cwnd_event_tx_start, struct sock *sk)
- {
--	cubictcp_cwnd_event(sk, event);
-+	cubictcp_cwnd_event_tx_start(sk);
- }
- 
- SEC("struct_ops")
-@@ -172,7 +172,7 @@ struct tcp_congestion_ops cc_cubic = {
- 	.cong_control	= (void *)bpf_cubic_cong_control,
- 	.set_state	= (void *)bpf_cubic_state,
- 	.undo_cwnd	= (void *)bpf_cubic_undo_cwnd,
--	.cwnd_event	= (void *)bpf_cubic_cwnd_event,
-+	.cwnd_event_tx_start	= (void *)bpf_cubic_cwnd_event_tx_start,
- 	.pkts_acked     = (void *)bpf_cubic_acked,
- 	.name		= "bpf_cc_cubic",
- };
-diff --git a/tools/testing/selftests/bpf/progs/bpf_cubic.c b/tools/testing/selftests/bpf/progs/bpf_cubic.c
-index 46fb2b37d3a70671485af37ed700a991c0975cd2..ce18a4db813fab877aec0c73d72cc9c958312ad3 100644
---- a/tools/testing/selftests/bpf/progs/bpf_cubic.c
-+++ b/tools/testing/selftests/bpf/progs/bpf_cubic.c
-@@ -185,24 +185,21 @@ void BPF_PROG(bpf_cubic_init, struct sock *sk)
- }
- 
- SEC("struct_ops")
--void BPF_PROG(bpf_cubic_cwnd_event, struct sock *sk, enum tcp_ca_event event)
-+void BPF_PROG(bpf_cubic_cwnd_event_tx_start, struct sock *sk)
- {
--	if (event == CA_EVENT_TX_START) {
--		struct bpf_bictcp *ca = inet_csk_ca(sk);
--		__u32 now = tcp_jiffies32;
--		__s32 delta;
 -
--		delta = now - tcp_sk(sk)->lsndtime;
+-	nolock = qdisc->flags & TCQ_F_NOLOCK;
 -
--		/* We were application limited (idle) for a while.
--		 * Shift epoch_start to keep cwnd growth to cubic curve.
--		 */
--		if (ca->epoch_start && delta > 0) {
--			ca->epoch_start += delta;
--			if (after(ca->epoch_start, now))
--				ca->epoch_start = now;
--		}
--		return;
-+	struct bpf_bictcp *ca = inet_csk_ca(sk);
-+	__u32 now = tcp_jiffies32;
-+	__s32 delta;
-+
-+	delta = now - tcp_sk(sk)->lsndtime;
-+
-+	/* We were application limited (idle) for a while.
-+	 * Shift epoch_start to keep cwnd growth to cubic curve.
-+	 */
-+	if (ca->epoch_start && delta > 0) {
-+		ca->epoch_start += delta;
-+		if (after(ca->epoch_start, now))
-+			ca->epoch_start = now;
- 	}
- }
- 
-@@ -537,7 +534,7 @@ struct tcp_congestion_ops cubic = {
- 	.cong_avoid	= (void *)bpf_cubic_cong_avoid,
- 	.set_state	= (void *)bpf_cubic_state,
- 	.undo_cwnd	= (void *)bpf_cubic_undo_cwnd,
--	.cwnd_event	= (void *)bpf_cubic_cwnd_event,
-+	.cwnd_event_tx_start	= (void *)bpf_cubic_cwnd_event_tx_start,
- 	.pkts_acked     = (void *)bpf_cubic_acked,
- 	.name		= "bpf_cubic",
- };
-diff --git a/tools/testing/selftests/bpf/progs/tcp_ca_kfunc.c b/tools/testing/selftests/bpf/progs/tcp_ca_kfunc.c
-index f95862f570b73f4c86fa6d7b6a912c4b055d02fb..0a3e9d35bf6f0c4c988c741c010fb7f3405fb43c 100644
---- a/tools/testing/selftests/bpf/progs/tcp_ca_kfunc.c
-+++ b/tools/testing/selftests/bpf/progs/tcp_ca_kfunc.c
-@@ -8,7 +8,7 @@ extern void bbr_init(struct sock *sk) __ksym;
- extern void bbr_main(struct sock *sk, u32 ack, int flag, const struct rate_sample *rs) __ksym;
- extern u32 bbr_sndbuf_expand(struct sock *sk) __ksym;
- extern u32 bbr_undo_cwnd(struct sock *sk) __ksym;
--extern void bbr_cwnd_event(struct sock *sk, enum tcp_ca_event event) __ksym;
-+extern void bbr_cwnd_event_tx_start(struct sock *sk) __ksym;
- extern u32 bbr_ssthresh(struct sock *sk) __ksym;
- extern u32 bbr_min_tso_segs(struct sock *sk) __ksym;
- extern void bbr_set_state(struct sock *sk, u8 new_state) __ksym;
-@@ -16,6 +16,7 @@ extern void bbr_set_state(struct sock *sk, u8 new_state) __ksym;
- extern void dctcp_init(struct sock *sk) __ksym;
- extern void dctcp_update_alpha(struct sock *sk, u32 flags) __ksym;
- extern void dctcp_cwnd_event(struct sock *sk, enum tcp_ca_event ev) __ksym;
-+extern void dctcp_cwnd_event_tx_start(struct sock *sk) __ksym;
- extern u32 dctcp_ssthresh(struct sock *sk) __ksym;
- extern u32 dctcp_cwnd_undo(struct sock *sk) __ksym;
- extern void dctcp_state(struct sock *sk, u8 new_state) __ksym;
-@@ -24,7 +25,7 @@ extern void cubictcp_init(struct sock *sk) __ksym;
- extern u32 cubictcp_recalc_ssthresh(struct sock *sk) __ksym;
- extern void cubictcp_cong_avoid(struct sock *sk, u32 ack, u32 acked) __ksym;
- extern void cubictcp_state(struct sock *sk, u8 new_state) __ksym;
--extern void cubictcp_cwnd_event(struct sock *sk, enum tcp_ca_event event) __ksym;
-+extern void cubictcp_cwnd_event_tx_start(struct sock *sk) __ksym;
- extern void cubictcp_acked(struct sock *sk, const struct ack_sample *sample) __ksym;
- 
- SEC("struct_ops")
-@@ -69,9 +70,15 @@ u32 BPF_PROG(undo_cwnd, struct sock *sk)
- SEC("struct_ops")
- void BPF_PROG(cwnd_event, struct sock *sk, enum tcp_ca_event event)
+-	if (nolock)
+-		spin_lock_bh(&qdisc->seqlock);
+-	spin_lock_bh(qdisc_lock(qdisc));
+-
+-	qdisc_reset(qdisc);
+-
+-	spin_unlock_bh(qdisc_lock(qdisc));
+-	if (nolock) {
+-		clear_bit(__QDISC_STATE_MISSED, &qdisc->state);
+-		clear_bit(__QDISC_STATE_DRAINING, &qdisc->state);
+-		spin_unlock_bh(&qdisc->seqlock);
+-	}
+-}
+-
+ static bool some_qdisc_is_busy(struct net_device *dev)
  {
--	bbr_cwnd_event(sk, event);
- 	dctcp_cwnd_event(sk, event);
--	cubictcp_cwnd_event(sk, event);
-+}
-+
-+SEC("struct_ops")
-+void BPF_PROG(cwnd_event_tx_start, struct sock *sk)
-+{
-+	bbr_cwnd_event_tx_start(sk);
-+	dctcp_cwnd_event_tx_start(sk);
-+	cubictcp_cwnd_event_tx_start(sk);
- }
+ 	unsigned int i;
+diff --git a/net/sched/sch_teql.c b/net/sched/sch_teql.c
+index 783300d8b019..ec4039a201a2 100644
+--- a/net/sched/sch_teql.c
++++ b/net/sched/sch_teql.c
+@@ -146,15 +146,12 @@ teql_destroy(struct Qdisc *sch)
+ 					master->slaves = NEXT_SLAVE(q);
+ 					if (q == master->slaves) {
+ 						struct netdev_queue *txq;
+-						spinlock_t *root_lock;
  
- SEC("struct_ops")
-@@ -111,6 +118,7 @@ struct tcp_congestion_ops tcp_ca_kfunc = {
- 	.sndbuf_expand	= (void *)sndbuf_expand,
- 	.undo_cwnd	= (void *)undo_cwnd,
- 	.cwnd_event	= (void *)cwnd_event,
-+	.cwnd_event_tx_start = (void *)cwnd_event_tx_start,
- 	.ssthresh	= (void *)ssthresh,
- 	.min_tso_segs	= (void *)min_tso_segs,
- 	.set_state	= (void *)set_state,
+ 						txq = netdev_get_tx_queue(master->dev, 0);
+ 						master->slaves = NULL;
+ 
+-						root_lock = qdisc_root_sleeping_lock(rtnl_dereference(txq->qdisc));
+-						spin_lock_bh(root_lock);
+-						qdisc_reset(rtnl_dereference(txq->qdisc));
+-						spin_unlock_bh(root_lock);
++						dev_reset_queue(master->dev,
++								txq, NULL);
+ 					}
+ 				}
+ 				skb_queue_purge(&dat->q);
 -- 
-2.53.0.851.ga537e3e6e9-goog
+2.34.1
 
 
