@@ -1,154 +1,304 @@
-Return-Path: <netdev+bounces-267927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267928-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0A4eIRPYtmlfJgEAu9opvQ
-	(envelope-from <netdev+bounces-267927-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:02:27 +0100
+	id WA4JLAjZtmmkJgEAu9opvQ
+	(envelope-from <netdev+bounces-267928-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:06:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 866B529155A
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:02:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1533529157D
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:06:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6EDB7300602A
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:02:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7F6E3028ED7
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CFA6366074;
-	Sun, 15 Mar 2026 16:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34831370D61;
+	Sun, 15 Mar 2026 16:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O0ze5lFV"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ndoctVTI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1113612EC;
-	Sun, 15 Mar 2026 16:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867F236C584
+	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 16:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773590541; cv=none; b=uFEnXTG8XSiReH+JAucue/pveUzQvGBwSYw+vvGoBElMxTvk8Vc8oh01NUFD3M0O3FgzDtXb30Ay357KCU8gC0slH2G7HuH8W02VAOOeAjAY+Eg4Y5Uz5G9q+/a34IRq1XEIuO+zRHR0JC+ITfZjpluho6NhjJFCz6lT7Eac67A=
+	t=1773590788; cv=none; b=enu5ipIJH1vqJW8dRYvmCtzbVxOaW0uQ+miGejAt+TeFePxKIqIQPPXvdIEToUsg1dzJ1EibKfX9/iA9mVUzW9R2lbNl/ojekAmzcXqzoOfNSNBq9xosiCI8Cgo2+6ykpotUoWVzNeidnZO6Tf/cJMspEzwkrvPLZ6SH17Me5WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773590541; c=relaxed/simple;
-	bh=g37uOew/Ysp4He6RhgYqU2PvBldpmfoVonmrNv2Somg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j9wR6WlOg5tp9FDSfsOiiLv0Htlbasark/OX37Cn3pAl1pmvFa0m4Ab4jxf56bSN9ICuLYVVz6nC0Tpe5dXgIf/EIJcC+aqisX2l72AgS5D3sy5nDZKhVO24a5OVvI0Zh7iuag4Hq59IlDujs5BWFMZwCyTf5E+T5tI9DSUphvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O0ze5lFV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAB70C4CEF7;
-	Sun, 15 Mar 2026 16:02:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773590541;
-	bh=g37uOew/Ysp4He6RhgYqU2PvBldpmfoVonmrNv2Somg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=O0ze5lFVO2T4YDScVpzAtRdOahwMsgESjbmrBZv0K1ZPUskKUP4uV/DT4XhQ6cqXz
-	 yIcJ3WXoXwNfPicx01dPFhhLnLUzN5nMNpUetUgL3ur9POK7IuC8dRrVNRROvS7yX0
-	 QG8gcxF6wAk5B51f4ARlB/YECg7S//ZXl/uSrDytP5RhcPERJLmXrgFsCtT+/US8dR
-	 vkOVO6YaZnCPiJxF4ttgLwe6KALemGyyBSCy/0QDN8Sp7QNH+5z+h065lrbMTGWGAm
-	 Y0LjY5LqdBloZ485ZFowdNATlIUR8le+m+/0StxpGIvB4gd54XDSMgwPp3y0lVLU7E
-	 vGrs2vIwMMr6g==
-From: Simon Horman <horms@kernel.org>
-To: heminhong@kylinos.cn
-Cc: Simon Horman <horms@kernel.org>,
-	davem@davemloft.net,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	dsahern@kernel.org,
-	andrea.mayer@uniroma2.it,
-	kuba@kernel.org,
-	edumazet@google.com,
-	david.lebrun@uclouvain.be,
-	pabeni@redhat.com
-Subject: Re: [net,v2] ipv6: sr: Add NULL check for idev in seg6_hmac_validate_skb
-Date: Sun, 15 Mar 2026 16:01:59 +0000
-Message-ID: <20260315160159.1394504-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260313022634.51885-1-heminhong@kylinos.cn>
-References: <20260313022634.51885-1-heminhong@kylinos.cn>
+	s=arc-20240116; t=1773590788; c=relaxed/simple;
+	bh=A7BBMyaNlHjkuSwtW3AHVo4AvDjTAS1SpJCd2fQJshY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HG/aaLbwIUnXXmy0jXSXbkgQTKBD5p5xT3szCxvt7L+zOPAKkPfM3iwCab0k1WZDEEYgAfZQ0FT8ETcQgvXfb4YbfFSGo27GHPJLKGdWOrG8nLdFJ0MPlLgA6TDHvpSkC0chYaApYAZG3Gf/o1fJ+kFcpqpi4TQDldFVeI54Z/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ndoctVTI; arc=none smtp.client-ip=74.125.82.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-12732165d1eso4708643c88.1
+        for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 09:06:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1773590785; x=1774195585; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bLy7K36SCDNZjs+7kWXoLXCj2s7+No3O6Cv8E2hX2vU=;
+        b=ndoctVTIJl0RcROP04iN4KPYezQifz1b/kxDcDFgjx741Yl9UCIamak6hPsaXCa3Mm
+         EPh2VH8o35/8snwJTb8jE8Di8n5TMVXaF8ht4O2k5K09Rf+go197pP4oKl28KswTiH1V
+         D7aPBZSkHSxPEDOwucSbHxajm9Lc4nQwj//a4tDaHbZ7rfW110bVX0Qtu5tAWgK59zQ6
+         qN5Ffa0OFMM2ggnGfJSvM+2z4HAyFr+jIVv6SrOh/74Mg0ZxaeLAGdaNs6MTrWXgIduG
+         utB5TTCsNaq0NI0cuZX3GVeKIPSL083aY03VXc/Nd3YTqkPEMHFsmHWpHTOEYtCiQkp1
+         jWjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773590785; x=1774195585;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=bLy7K36SCDNZjs+7kWXoLXCj2s7+No3O6Cv8E2hX2vU=;
+        b=sGxDsxK6o7ADhce7K3Y73DHF8gdSIouBQtnrf1oeKf2WSObaqPOXURb3ug4mEzn4YC
+         TLvrd/HzkmJovIQIRrA8iZhP1uSfAW96ev05G+p5YWBMUuI9coHovCiY1lKMcvUKYAet
+         627SABbeVuIqX9poRJtG+aZuFXlOVSPvnEwSdaFhW2tpHPjj7mk0gfoDH+7ps0iCCk/L
+         /5zLYpR0BShEtA7c+SlhRx5S0gp1HF3kBJJtaAm77eJtHN6460MnpMBe3qefJijZR6/9
+         KRorbZ7iRjHJSB1XdnDXVWvkKQ9oCdC9kJLzF/4H04x88OMQmqUBuh1ABlH1cx12b9BK
+         Wjjw==
+X-Gm-Message-State: AOJu0YzjrdCw+jeGtf+C1j5jIupKQVI/8MJSQ9wG3bDoXFC8n5Yx/4qq
+	IoxQrd9UCOV/QR7EoGXhQETza9J0L/7PEwJUUe5h2L6AkBnDpCgyyjX9oiHbn21qvGA=
+X-Gm-Gg: ATEYQzzUC2DrXgpLre6YA9f+UvX8cpZ8U9LaMPnlkVogYO86ZBowh/3KF40N4wFKIQt
+	aiBOFa+ZM+xaCy2h3dlrqmLUzFDSVvnSIi69ypyk7harh1vz21V+74/Bd+/yY1gpxHCqG9gmVM+
+	nOPz2Poa+j1Zs0L70hegP4O2HKc9oRELo+YX8uHWvTXzrl6PnegrNqf13SPA+eNaCrvynVK/tew
+	Lz8QJTI78/wudL/icxP9WLFfMMhmdTtk1uP2XrBEOQLb7QPQ32s7tUY5orTUIeWKkQBycxMApIu
+	RwOQWGOqKXglObK3Ox54aV1OvHVAS1GRCRJsj1OUbRZulvhqNj20Gfr+JjsKjHRLWbsJ325AkkV
+	KH9LcK1JXH/JiIJAOlxs2Ku7D+Nr72iEVYw+clo6IbN6P9Vg1FtSfsYGaiJQqcic88FcHPyTC7J
+	BpfbiUuHDRmUbirVseDWxWa/LRfxbPhz0vLKE=
+X-Received: by 2002:a05:7022:2388:b0:128:c1be:152b with SMTP id a92af1059eb24-128f3d17a47mr3979973c88.4.1773590785354;
+        Sun, 15 Mar 2026 09:06:25 -0700 (PDT)
+Received: from phoenix.local ([104.202.29.139])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f62af8desm8122292c88.6.2026.03.15.09.06.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Mar 2026 09:06:25 -0700 (PDT)
+Date: Sun, 15 Mar 2026 09:06:22 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: William Liu <will@willsroot.io>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, Savino Dicanosa
+ <savy@syst3mfailure.io>, Jamal Hadi Salim <jhs@mojatatu.com>, Victor
+ Nogueira <victor@mojatatu.com>
+Subject: Re: [PATCH 03/12] net/sched: netem: add per-CPU recursion guard for
+ duplication
+Message-ID: <20260315090622.5fbdf074@phoenix.local>
+In-Reply-To: <ydqKfVXU_4_kSsU89EbfSyd66aGeaCaVHFr6kXhrF-qG7G2WCAAOS51LTAM2y_thGnB0pp-pbGLDWqM4XooMX-jelz30W0KbpE3KzCKiWqo=@willsroot.io>
+References: <20260313211646.12549-1-stephen@networkplumber.org>
+	<20260313211646.12549-4-stephen@networkplumber.org>
+	<ydqKfVXU_4_kSsU89EbfSyd66aGeaCaVHFr6kXhrF-qG7G2WCAAOS51LTAM2y_thGnB0pp-pbGLDWqM4XooMX-jelz30W0KbpE3KzCKiWqo=@willsroot.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.56 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267927-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267928-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 866B529155A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syst3mfailure.io:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber.org:email]
+X-Rspamd-Queue-Id: 1533529157D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Sat, 14 Mar 2026 19:29:10 +0000
+William Liu <will@willsroot.io> wrote:
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-ipv6: sr: Add NULL check for idev in seg6_hmac_validate_skb
+> Looping in Jamal and Victor.
+>=20
+> On Friday, March 13th, 2026 at 9:17 PM, Stephen Hemminger <stephen@networ=
+kplumber.org> wrote:
+>=20
+> > Add a per-CPU recursion depth counter to netem_enqueue(). When netem
+> > duplicates a packet, the clone is re-enqueued at the root qdisc. If
+> > the tree contains other netem instances, this can recurse without
+> > bound, causing soft lockups and OOM.
+> >=20
+> > This approach was previously considered but rejected on the grounds
+> > that netem_dequeue calling enqueue on a child netem could bypass the
+> > depth check. That concern does not apply: the child netem's
+> > netem_enqueue() increments the same per-CPU counter, so the total
+> > nesting depth across all netem instances in the call chain is tracked
+> > correctly. =20
+>=20
+> I'm assuming you are referring to [1] (and other relevant followup messag=
+es), but has this setup been tested against the original repro? I think the=
+re was a similar draft fix originally but it failed during testing because =
+DOS still happened [2].
+>=20
+> If I remember correctly,  the issue is less so the recursive depth but mo=
+re so being able to differentiate between packets that are previously invol=
+ved in duplication or not.
+>=20
+> >=20
+> > A depth limit of 4 is generous for any legitimate configuration.
+> >=20
+> > Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
+> > Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D220774
+> > Cc: stable@vger.kernel.org
+> > Reported-by: William Liu <will@willsroot.io>
+> > Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
+> >=20
+> > Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> > ---
+> >  net/sched/sch_netem.c | 22 ++++++++++++++++++++++
+> >  1 file changed, 22 insertions(+)
+> >=20
+> > diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+> > index 0ccf74a9cb82..085fa3ad6f83 100644
+> > --- a/net/sched/sch_netem.c
+> > +++ b/net/sched/sch_netem.c
+> > @@ -21,6 +21,7 @@
+> >  #include <linux/rtnetlink.h>
+> >  #include <linux/reciprocal_div.h>
+> >  #include <linux/rbtree.h>
+> > +#include <linux/percpu.h>
+> >=20
+> >  #include <net/gso.h>
+> >  #include <net/netlink.h>
+> > @@ -29,6 +30,15 @@
+> >=20
+> >  #define VERSION "1.3"
+> >=20
+> > +/*
+> > + * Limit for recursion from duplication.
+> > + * Duplicated packets are re-enqueued at the root qdisc, which may
+> > + * reach this or another netem instance, causing nested calls to
+> > + * netem_enqueue(). This per-CPU counter limits the total depth.
+> > + */
+> > +static DEFINE_PER_CPU(unsigned int, netem_enqueue_depth);
+> > +#define NETEM_RECURSION_LIMIT	4
+> > +
+> >  /*	Network Emulation Queuing algorithm.
+> >  	=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >=20
+> > @@ -460,6 +470,14 @@ static int netem_enqueue(struct sk_buff *skb, stru=
+ct Qdisc *sch,
+> >  	/* Do not fool qdisc_drop_all() */
+> >  	skb->prev =3D NULL;
+> >=20
+> > +	/* Guard against recursion from duplication re-injection. */
+> > +	if (unlikely(this_cpu_inc_return(netem_enqueue_depth) >
+> > +		     NETEM_RECURSION_LIMIT)) {
+> > +		this_cpu_dec(netem_enqueue_depth);
+> > +		qdisc_drop(skb, sch, to_free);
+> > +		return NET_XMIT_DROP;
+> > +	}
+> > +
+> >  	/* Random duplication */
+> >  	if (q->duplicate && q->duplicate >=3D get_crandom(&q->dup_cor, &q->pr=
+ng))
+> >  		++count;
+> > @@ -474,6 +492,7 @@ static int netem_enqueue(struct sk_buff *skb, struc=
+t Qdisc *sch,
+> >  	if (count =3D=3D 0) {
+> >  		qdisc_qstats_drop(sch);
+> >  		__qdisc_drop(skb, to_free);
+> > +		this_cpu_dec(netem_enqueue_depth);
+> >  		return NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
+> >  	}
+> >=20
+> > @@ -529,6 +548,7 @@ static int netem_enqueue(struct sk_buff *skb, struc=
+t Qdisc *sch,
+> >  		qdisc_drop_all(skb, sch, to_free);
+> >  		if (skb2)
+> >  			__qdisc_drop(skb2, to_free);
+> > +		this_cpu_dec(netem_enqueue_depth);
+> >  		return NET_XMIT_DROP;
+> >  	}
+> >=20
+> > @@ -643,8 +663,10 @@ static int netem_enqueue(struct sk_buff *skb, stru=
+ct Qdisc *sch,
+> >  		/* Parent qdiscs accounted for 1 skb of size @prev_len */
+> >  		qdisc_tree_reduce_backlog(sch, -(nb - 1), -(len - prev_len));
+> >  	} else if (!skb) {
+> > +		this_cpu_dec(netem_enqueue_depth);
+> >  		return NET_XMIT_DROP;
+> >  	}
+> > +	this_cpu_dec(netem_enqueue_depth);
+> >  	return NET_XMIT_SUCCESS;
+> >  }
+> >=20
+> > --
+> > 2.51.0
+> >=20
+> >  =20
+>=20
+> What about the last suggestion for a robust fix from [3]?
+>=20
+> Best,
+> Will
+>=20
+> [1] https://lore.kernel.org/netdev/DISZZlS5CdbUKITzkIyT3jki3inTWSMecT6Fpl=
+NmkpYs9bJizbs0iwRbTGMrnqEXrL3-__IjOQxdULPdZwGdKFSXJ1DZYIj6xmWPBZxerdk=3D@wi=
+llsroot.io/
+> [2] https://lore.kernel.org/netdev/q7G0Z7oMR2x9TWwNHOiPNsZ8lHzAuXuVgrZgGm=
+AgkH8lkIYyTgeqXwcDrelE_fdS9OdJ4TlfS96px6O9SvnmKigNKFkiaFlStvAGPIJ3b84=3D@wi=
+llsroot.io/
+> [3] https://lore.kernel.org/netdev/20260111163947.811248-6-jhs@mojatatu.c=
+om/
 
-In seg6_hmac_validate_skb(), the pointer returned by __in6_dev_get()
-can be NULL if the network device lacks proper IPv6 initialization
-or is being torn down. Add a NULL check to avoid potential NULL pointer
-dereference in subsequent code.
+Thanks, this is a tight corner here, and not all solutions work out.
 
-> diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-> --- a/net/ipv6/seg6_hmac.c
-> +++ b/net/ipv6/seg6_hmac.c
-> @@ -184,6 +184,8 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
->  	int require_hmac;
->
->  	idev = __in6_dev_get(skb->dev);
-> +	if (!idev)
-> +		return false;
->
->  	srh = (struct ipv6_sr_hdr *)skb_transport_header(skb);
->
+You're right that the per-CPU guard alone doesn't cover the
+dequeue-to-child-enqueue path you described. That's exactly why
+the series has two patches working together:
 
-The patch adds a NULL check in seg6_hmac_validate_skb() to handle the
-case when __in6_dev_get() returns NULL. However, does this fix the
-complete issue?
+Patch 02 adds the per-CPU recursion guard, which handles the
+direct enqueue recursion (rootq->enqueue duplicated packet hits
+another netem_enqueue in the same call chain).
 
-Looking at ipv6_srh_rcv() in net/ipv6/exthdrs.c, there's an earlier use
-of the same __in6_dev_get() call:
+Patch 04 restructures netem_dequeue to eliminate the pump. The
+old code had "goto tfifo_dequeue" which looped back after each
+child enqueue, so packets the child duplicated back to root would
+immediately get picked up by the same dequeue iteration. The new
+code transfers all currently-ready packets from the tfifo to the
+child in one batch, then does a single dequeue from the child and
+returns. Packets that the child duplicates back to root land in
+the tfifo but won't be processed until the next dequeue call from
+the parent =E2=80=94 breaking the loop you diagrammed.
 
-net/ipv6/exthdrs.c:ipv6_srh_rcv() {
-    ...
-    idev = __in6_dev_get(skb->dev);
+The original repro is:
 
-    accept_seg6 = min(READ_ONCE(net->ipv6.devconf_all->seg6_enabled),
-                      READ_ONCE(idev->cnf.seg6_enabled));
-    ...
-#ifdef CONFIG_IPV6_SEG6_HMAC
-    if (!seg6_hmac_validate_skb(skb)) {
-    ...
-}
+  tc qdisc add dev lo root handle 1: netem delay 1ms duplicate 100%
+  tc qdisc add dev lo parent 1:1 handle 2: netem delay 1ms duplicate 100%
+  ping -f localhost
 
-The idev pointer is dereferenced on line 384 (idev->cnf.seg6_enabled)
-before seg6_hmac_validate_skb() is called. If __in6_dev_get() can return
-NULL as the commit message states, wouldn't this cause a NULL pointer
-dereference before the new check in seg6_hmac_validate_skb() has a
-chance to catch it?
+This is covered by tdc test f2a3 (nested netem config acceptance)
+and test 7a07 (nested netem with duplication, traffic via scapy).
+More tests are added in the new version.
 
-Should ipv6_srh_rcv() also check for NULL after calling __in6_dev_get()?
+Jamal's proposed change with skb ttl would also work but
+it was rejected because it required adding ttl field to skb
+and skb size is a performance critical. As Cong pointed out
+adding a couple of bits for ttl makes it increase.
+So considered the idea and decided against it.
+
+Thanks.
 
