@@ -1,58 +1,89 @@
-Return-Path: <netdev+bounces-267919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267920-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id fYFZOJfKtmlyIwEAu9opvQ
-	(envelope-from <netdev+bounces-267919-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:04:55 +0100
+	id OA6HAOTLtmlyIwEAu9opvQ
+	(envelope-from <netdev+bounces-267920-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:10:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 256B42911F5
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:04:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A2129123E
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:10:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E027F3007B19
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 15:04:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C6E8C3005A9C
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 15:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CDB33ADA7;
-	Sun, 15 Mar 2026 15:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ESv+RZSm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CFD361663;
+	Sun, 15 Mar 2026 15:10:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15CE47262A;
-	Sun, 15 Mar 2026 15:04:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4870978F4A
+	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 15:10:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773587089; cv=none; b=i7U9JHqbudFhGeATX2MtKF1pvSWCb3NdDksZH06zMYuJirQ5dRBPlKCurZdDkVESgaEgh6g+03LoIrSHq9W10SEhwmeFL3MXnFK5VX7RKpmj4sVgW87rnYND70ql/LtgvWFFhskS66rUhnib8TPj2W4B1T/6HCpfP3Fjn03dyeo=
+	t=1773587425; cv=none; b=OtI8V3ldif1CX9CIaR0DAuhAa4WBvuSLNkfnBnXRZCQPkpfR9Y+6Oxir0f+Fa1Tdp5DRLSrT6Yas97KbGLS2pXe5JD0QoVur3V4/Y84Uqh/HWGK1U2lssV6HgOc/NPvNvXXJm2qF3dvrxuf4uwhUHA5K/UxvBRMaVf9xwTlrY+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773587089; c=relaxed/simple;
-	bh=22hRzVUqhEm77L9voUSqkR8kEB47a+7hiGRxVV5wCr0=;
+	s=arc-20240116; t=1773587425; c=relaxed/simple;
+	bh=Qa1V7r4AhB22UlPVP7Mo0d/+CLYO6p016uQvDzPsgKY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PBw6oAekFhdRLO4FFUJoQTvwrQ3gN5qMlgCedAGQqTTPrW+mIXobedb/jqbNPrvFg3mrBeCwkyu60uNAhr3Mk1eRR36OFJi8PjEo2dlJURZ4y+SfbMpmUmiyHiQMqgg7eAW1HxZpId6dOBvEcm4Ajv+51F22IGyM1sVOaiMyB94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ESv+RZSm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93F73C4CEF7;
-	Sun, 15 Mar 2026 15:04:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773587088;
-	bh=22hRzVUqhEm77L9voUSqkR8kEB47a+7hiGRxVV5wCr0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ESv+RZSmwKPpCavgFFGs73ecnixOLhFRiuxorjGJGlGgXd4ytcqtrzc7V6GNJFtTK
-	 5SJRSIze9fVBIZGQNFS9TRZzpzC/ESujQvy4vPMqvtk4WpworGZbXCaXjK+ONH9+qU
-	 AQcpZ1jwq/N+qBEvOcNuw7MxpTLn5AiAtvMkEcKmxu2rtkis5mwC5vY77PRP7X0WbE
-	 r4B4N8lBNHQpmn5SIKYcXxCX39dcx02Fe2pTLJ7oTGLHeJibDHs1ITnaOme8ygHUev
-	 DOTed17085zfjrWsmIv0j2d6wvQ0hB+ZEEwLWkGvGomS05E43rTwmvFkrJm4+ux1oI
-	 zOIE+BOmUX22A==
-Date: Sun, 15 Mar 2026 11:04:47 -0400
-From: Konstantin Ryabitsev <mricon@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, helpdesk@kernel.org, 
-	davem@davemloft.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [GIT PULL] bluetooth 2026-03-12
-Message-ID: <20260315-majestic-beluga-of-fragrance-cf42c6@lemur>
-References: <20260312200655.1215688-1-luiz.dentz@gmail.com>
- <20260314104436.31bcf68b@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BLO4sixHKbNHs2gn1/fI7bEVWN281DhpKAFMhndgdOGfRWPQLgQWxHklxPNxxiZcovpZdv9Q2cHyjRj4mbkMOC3XjgLeuzMjgdwBfQHPRL9JBJ9KaHjqXal9P2UQTrmsYraHAfRpgq4GSQ8YAmTrLlaAQa3h8TxtCWIMgqXxyeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w1n6E-0003EN-Ou; Sun, 15 Mar 2026 16:09:50 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w1n6B-000QDS-3A;
+	Sun, 15 Mar 2026 16:09:47 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w1n6B-00000003djm-3O4a;
+	Sun, 15 Mar 2026 16:09:47 +0100
+Date: Sun, 15 Mar 2026 16:09:47 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Naveen Mamindlapalli <naveenm@marvell.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Danielle Ratson <danieller@nvidia.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
+ definitions
+Message-ID: <abbLu-OjngRjcc09@pengutronix.de>
+References: <20260310104743.907818-3-bjorn@kernel.org>
+ <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
+ <b3825c0d-02e5-4625-831f-4346ce4eabd2@lunn.ch>
+ <085bb0a9-85d3-4d62-9ac4-3461b61da5f3@bootlin.com>
+ <438dae03-4dac-4e66-9f4d-e08b0434c9b4@lunn.ch>
+ <20260311195052.1202174f@kernel.org>
+ <abJJY8whzSOB8O-X@pengutronix.de>
+ <7c45ebf6-0cb2-4a4c-ac12-f4f9bb59c908@lunn.ch>
+ <42abf88e-4fbf-4966-9490-8315f118ddea@bootlin.com>
+ <873423y27k.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,53 +92,157 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260314104436.31bcf68b@kernel.org>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <873423y27k.fsf@all.your.base.are.belong.to.us>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[bootlin.com,lunn.ch,kernel.org,vger.kernel.org,davemloft.net,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,broadcom.com,armlinux.org.uk];
+	TAGGED_FROM(0.00)[bounces-267920-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267919-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[pengutronix.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mricon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6]
-X-Rspamd-Queue-Id: 256B42911F5
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 94A2129123E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 14, 2026 at 10:44:36AM -0700, Jakub Kicinski wrote:
-> To be clear I have pulled already, if any of the AI reports looks
-> urgent please send a follow up.
+Hi Björn,
+
+On Fri, Mar 13, 2026 at 08:11:11PM +0100, Björn Töpel wrote:
+> Folks, thanks for the elaborate discussion (accidental complexity vs
+> essential complexity comes to mind...)!
+
+Sorry for overthinking :)
+
+> Maxime Chevallier <maxime.chevallier@bootlin.com> writes:
 > 
-> Hello helpdesk! The patchwork reply bot has not been replying to pull
-> requests for us in the last few weeks. Is this an intentional change?
+> > Hi Andrew,
+> >
+> >>> One more issue is the test data generator location. The data generator
+> >>> is not always the CPU. We have HW generators located in components like
+> >>> PHYs or we may use external source (remote loopback).
+> >> 
+> >> At the moment, we don't have a Linux model for such generators. There
+> >> is interest in them, but nobody has actually stepped up and proposed
+> >> anything. I do see there is an intersect, we need to be able to
+> >> represent them in the topology, and know which way they are pointing,
+> >> but i don't think they have a direct influence on loopback.
+> >
+> > If I'm following Oleksij, the idea would be to have on one side the
+> > ability to "dump" the link topology with a finer granularity so that we
+> > can see all the different blocks (pcs, pma, pmd, etc.), how they are
+> > chained together and who's driving them (MAC, PHY (+ phy_index), module,
+> > etc.), and on another side commands to configure loopback on them, with
+> > the ability to also configure traffic generators in the future, gather
+> > stats, etc.
+> >
+> > Another can of worms for sure, and probably too much for what Björn is
+> > trying to achieve. It's hard to say if this is overkill or not, there's
+> > interest in that for sure, but also quite a lot of work to do...
+> 
+> It's great to have these discussion as input to the first (minimal!)
+> series, so we can extend/build on it later.
+> 
+> If I try to make sense of the above discussions...
+> 
+> Rough agreement on:
+> 
+>  - Depth/ordering should be local to a component, not global across the
+>    whole path.
 
-It was an intentional change to make it work more reliably, but we clearly
-failed because it stopped matching altogether. *sigh*
+ack
 
-I think I found where the match was failing and added tests to check for it.
-It won't work retroactively, but it should find future pull requests
-(hopefully!)
+>  - Cross-component ordering comes from existing infrastructure (PHY link
+>    topology, phy_index).
 
-Regards,
+ack
+
+>  - The current component set (MAC/PHY/MODULE) is reasonable for a first
+>    pass.
+
+I do not have strong opinion here. 
+
+>  - HW traffic generators and full topology dumps are interesting but out
+>    of scope for now (Please? ;-)).
+
+It didn't tried to push it here. My point is - image me or may be you,
+will need to implement it in the next step. This components will need to
+cooperate and user will need to understand the relation and/or topology.
+
+The diagnostic is all about topology.
+
+> So, maybe the next steps are:
+> 
+>  1. Keep the current component model (MAC/PHY/MODULE) and the
+>     NEAR_END/FAR_END direction (naming need to change as Maxime said).
+
+Probably good to document that NEAR_END/FAR_END or local/remote is
+related to the viewpoint convention. Otherwise it will get confusing
+with components which mount in a unusual direction (embedded worlds is
+full of it :))
+
+>  2. Add a depth (or order?) field to ETHTOOL_A_LOOPBACK_ENTRY as Jakub
+>     suggested, local to each component instance. This addresses the
+>     "multiple loopback points within one MAC" case without requiring a
+>     global ordering. I hope it addresses what Oleksij's switch example
+>     needs (multiple local loops at different depths within one
+>     component) *insert that screaming emoji*.
+
+ack. I guess "depth" fits to the "viewpoint" terminology.
+
+>  3. Document the viewpoint convention clearly.
+
+ack
+
+>  4. Punt on the grand topology dump. Too much to chew.
+
+ack
+
+>  5. Don't worry about DSA CPU ports - they don't have a netif, so
+>     loopback doesn't apply there today. If someone adds netifs for CPU
+>     ports later, depth handles it.
+
+ack
+
+> TL;DR: Add depth, document the viewpoint convention, and ship
+> it^W^Winterate.
+> 
+> Did I get that right?
+
+I'm ok with it, but maintainers will have the last word.
+
+Best Regards,
+Oleksij
 -- 
-KR
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
