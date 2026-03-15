@@ -1,93 +1,71 @@
-Return-Path: <netdev+bounces-267967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267968-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8HijEZAot2nzNAEAu9opvQ
-	(envelope-from <netdev+bounces-267967-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 22:45:52 +0100
+	id IClCOMMpt2kLNQEAu9opvQ
+	(envelope-from <netdev+bounces-267968-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 22:50:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7F89292AF7
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 22:45:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 470C5292B78
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 22:50:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3B9D330067B1
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 21:45:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1D5DD301379D
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 21:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 383FA37B3F2;
-	Sun, 15 Mar 2026 21:45:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B76137C109;
+	Sun, 15 Mar 2026 21:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e46myE3R"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="a2pZBRDD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F9C374E68
-	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 21:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049C737754B;
+	Sun, 15 Mar 2026 21:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773611148; cv=none; b=IHVFNTo8+eOvA2RMKDl4HJ9TzArpEzNlTC2j8GI6S9mFWnMy/HJ+Q7x5vQ8524S2HZlpmvk2lkUgM1hV6B5sNvur3PqeOMbMgyYPLHVB0mC5nVGuRWmoDHOjKh3klY7Gg75rKQT8aWfyu1pcevvrXlfBmUFiR1qHyjIPo0pFCNQ=
+	t=1773611408; cv=none; b=qLEFUHJHQh0mRQosSAtSO42KlLCbrqWlHhkiztCI9Lan/rvvNvEb+2gwqfrTogPPVTbB8I1J64zlKJTN178RIXvifhY/mzDbjeSVlBXFIUB1s7+fi2NJwvpB9bEFIucLXvWstpUfmIDrNoRmcZKLQrBcZjhcr49mEwoS+FYZ37U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773611148; c=relaxed/simple;
-	bh=aDq5/Ah0sdh1k75i3B0WqESBbxVClGyPzVCwYciSCos=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JApQPNbtz37Z7Tjv+GdF8LCKVcmDEF1zsbapMy07BOzDdSLqWGEj9KNLVs8fMInoKZGHS0bKqLlpy33AZ9miICW+6x6xZebN1dxSXVFkZsFzgd3q3D8Op6OG4ohnczI0WwOlPJomtYNjZYsCkWRXF4m5a4bVhEHy5MyZhu58p6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e46myE3R; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c73c990a96dso1407677a12.0
-        for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 14:45:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773611146; x=1774215946; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8OTxU8esPzpyCl9gls//ZpDXaOoC5yMxz5Pjw0QxFzU=;
-        b=e46myE3R2+4C1Ttg2vGQ9BwrrLBhgp/D95ZHi9KD3mG0hI7ZXeY7ss73tPEOxUI5ZH
-         rqq/j0Y1zhZNYNrC7T3LMhoiFeyavf98ulcRWISC6XpKxUzslAojARf9tYqaoVzW7OiE
-         IJ4dguQv8yq5jw5mN+03/7gs3j+jSxL3MZdWgLtbP0Cgn5rUgdXDXeWmyTHnZ+bw1HX0
-         4lGJmuPiHSiyqZ16wk9xm7hNln62ofe/8DVupIZi8oVN/CenVtezTpzF6fQMarWprKRN
-         OpCtYJt0lMF9sAS0BOz49jynSdxtdFbUJreFs4/ZE8O2p/Ka5glmFL+2rgOXhsFVYrGP
-         7liQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773611146; x=1774215946;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8OTxU8esPzpyCl9gls//ZpDXaOoC5yMxz5Pjw0QxFzU=;
-        b=B/eRAFG4f7dnAPiOeRCPCQPQveqhdkVTvLHTIUSgMiVyUwZcwSrvKurjxdqgrYNein
-         fS8oZKEOyF7JxJnjMx3PXL6CHhi5JO+Lcs72LwTQGJ4U/8f8BjOzhZlqvJ+8Lm58iEym
-         2wYMOC/faR1o5867ssm/La0GeZcpo6ULBgCyQ2WYdFBSDLb+UpMclJaKTM/l7hZl1Ox/
-         RYYHVR6lnK+AwMO1zhj/EsZZVnhIlL5QsD+7ZMsZ140MLG+3BHW6JXUkHGB2eM4z5ntM
-         SRB21H8F0D0vlxUdNzhFPL95Hd2WhrEz3qsKjiPiqzuyPSCfKqDaziYcgmPXBNi1V47T
-         pU5A==
-X-Gm-Message-State: AOJu0YwsTlhJm7nl3QnOowEBghp1z0XdCPESmIzTJmTVHNGVXZPReXLL
-	Z+bfGwqpJqRrsEf3QKB4oyN5yWtW6RV+ioD36lRHY3wFF4FLyA8QwzhuphnQ3A==
-X-Gm-Gg: ATEYQzxstPfpSaIG4IkaaMmAMmijHf/TWw88GM4YdNsJf6hy7gJUnY5VTU/cPftNU3k
-	sgs4I+dJt7V1BeJWYwSspd5LZfkpo/aJVMFKful1UIqmrtU3nHyaQNrqaFcz6D+oKag7rJXNmKO
-	8eF1MnN80N8YNoaV0K6C4chd2fw6Mlio/mBCLELyJYPGf3gWcNKCs5hlciorQW4FKf4H9MDh++s
-	s5kg6TsqD4rtqd13REWuu2q4mOWs0jBfRWu409zHCad4vb8N/k+5OE0+Qb6S5kyPt2BnzXpc23y
-	EKTmb6hhf3ClPv0fRXMhRckgLP62NEglvRXhvRPHGs6uwPyz/e9buY9TXdEQ4Oor7NkyN8fRp6b
-	Cj4bRBkaqoyXEqZPbZ536XMq+3X5twsaKh2ZOVEHnJ2HCn/sRk2KGFACcrsRya8BRnvFPIHZOu3
-	M5CChjHNN5NIRASynaH4urzugv9FBGE7/E1AIg6ui4CnscsDRVyw9f0Hw=
-X-Received: by 2002:a05:6a21:1f81:b0:398:9c2b:c93c with SMTP id adf61e73a8af0-398ecb28d26mr10410807637.28.1773611146107;
-        Sun, 15 Mar 2026 14:45:46 -0700 (PDT)
-Received: from ryzen ([2601:644:8000:56f5::8bd])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c74029fa6eesm1687638a12.20.2026.03.15.14.45.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Mar 2026 14:45:45 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1773611408; c=relaxed/simple;
+	bh=d+WIJIXyXTkDIv/eHNe+vwweu639NsTf18saykCWjls=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tMukStGK/k8Re8m34PmLyRo4/XjxgBcPnpNFM39tBl4gmOMs0Z12p3gGYsbslZwmXYyndpoMkt/bvzdTjK6ZjYA9P0pm7ncfbM4A6WppGE3EEXQWX8fQGk2jPsfkr7PLsMpVApXssm/nvZjwxR/llgZVJu8VXDFwr+nzqbUjv5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=a2pZBRDD; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 29938A0304;
+	Sun, 15 Mar 2026 22:49:51 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1773611397; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=u0vASF/3eYmA3ofjMgZY9cyEbjg2KFkibsZbj/8hDVQ=;
+	b=a2pZBRDDybGOPrz/4C2YOacdDQrCt/fKKh9yrXCk1vXCZx9+68L6eDCA7npYeH0LZDfr9s
+	cFwAQJ+igm1iTn+WVv6KShIOEwrXh0TDVparluzSx6ejrssK6fRMXVwY2hixKf/bY2bkHR
+	6yVDd0aLOMECpS9MoC1jzDzMZi4MKDFRW0O1/PnkFnETh0qdl5Iqw3QSHZSmZukFEKyz5n
+	Q1tJ7RCnycdNLurW8kbY7NQEDP6QzJ/uA+FNQlqWqLevq0LPfPnP9jpbBOhmYMTru3YMzw
+	/c3o8HKBN0VQYgVhsx7SJ6n7FaTat2wCS6RZ2g9EwhA9xWorVcEavo2GfoNFaw==
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] net: phy: microchip_rds_ptp: simplify allocation
-Date: Sun, 15 Mar 2026 14:45:27 -0700
-Message-ID: <20260315214527.4113-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Vikas Gupta <vikas.gupta@broadcom.com>,
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	=?UTF-8?q?Markus=20Bl=C3=B6chl?= <mbloch@rooftopnetworks.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Nicolai Buchwitz <nb@tipi-net.de>
+Subject: [PATCH net-next v2 0/6] net: bcmgenet: add XDP support
+Date: Sun, 15 Mar 2026 22:49:08 +0100
+Message-ID: <20260315214914.1555777-1-nb@tipi-net.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,94 +73,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267967-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[tipi-net.de];
+	TAGGED_FROM(0.00)[bounces-267968-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,broadcom.com];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[broadcom.com,kernel.org,gmail.com,rooftopnetworks.de,arndb.de,vger.kernel.org,tipi-net.de];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: D7F89292AF7
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:dkim,tipi-net.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 470C5292B78
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Simplifies allocations by using a flexible array member in this struct.
+Add XDP support to the bcmgenet driver, covering XDP_PASS, XDP_DROP,
+XDP_TX, XDP_REDIRECT, and ndo_xdp_xmit.
 
-Remove memset as it's now allocated by kzalloc.
+The first patch converts the RX path from the existing kmalloc-based
+allocation to page_pool, which is a prerequisite for XDP. The remaining
+patches incrementally add XDP functionality and per-action statistics.
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/phy/microchip_rds_ptp.c | 10 ++--------
- drivers/net/phy/microchip_rds_ptp.h |  2 +-
- 2 files changed, 3 insertions(+), 9 deletions(-)
+Tested on Raspberry Pi CM4 (BCM2711, bcmgenet, 1Gbps link):
+- XDP_PASS: 943 Mbit/s TX, 935 Mbit/s RX (no regression vs baseline)
+- XDP_PASS latency: 0.164ms avg, 0% packet loss
+- XDP_DROP: all inbound traffic blocked as expected
+- XDP_TX: TX counter increments (packet reflection working)
+- Link flap with XDP attached: no errors
+- Program swap under iperf3 load: no errors
 
-diff --git a/drivers/net/phy/microchip_rds_ptp.c b/drivers/net/phy/microchip_rds_ptp.c
-index 2ad95d5c9d86..4e6ed11f9334 100644
---- a/drivers/net/phy/microchip_rds_ptp.c
-+++ b/drivers/net/phy/microchip_rds_ptp.c
-@@ -1246,7 +1246,8 @@ struct mchp_rds_ptp_clock *mchp_rds_ptp_probe(struct phy_device *phydev, u8 mmd,
- 	struct mchp_rds_ptp_clock *clock;
- 	int rc;
+Changes since v1:
+  - Fixed tx_rings[DESC_INDEX] out-of-bounds access. Expanded array
+    to DESC_INDEX+1 and initialized ring 16 with dedicated BDs.
+  - Use ring 16 (hardware default descriptor ring) for XDP TX,
+    isolating from normal SKB TX queues.
+  - Piggyback ring 16 TX completion on RX NAPI poll (INTRL2_1 bit
+    collision with RX ring 0).
+  - Fixed ring 16 TX reclaim: skip INTRL2_1 clear, skip BQL
+    completion, use non-destructive reclaim in RX poll path.
+  - Prepend zeroed TSB before XDP TX frame data (TBUF_64B_EN requires
+    64-byte struct status_64 prefix on all TX buffers).
+  - Tested with upstream XDP selftests (xdp.py): pass_sb, drop_sb,
+    tx_sb all passing. The multi-buffer tests (pass_mb, drop_mb,
+    tx_mb) fail because bcmgenet does not support jumbo frames /
+    MTU changes; I plan to add ndo_change_mtu support in a follow-up
+    series.
 
--	clock = devm_kzalloc(&phydev->mdio.dev, sizeof(*clock), GFP_KERNEL);
-+	clock = devm_kzalloc(&phydev->mdio.dev,
-+			struct_size(clock, pin_config, MCHP_RDS_PTP_N_PIN), GFP_KERNEL);
- 	if (!clock)
- 		return ERR_PTR(-ENOMEM);
+Nicolai Buchwitz (6):
+  net: bcmgenet: convert RX path to page_pool
+  net: bcmgenet: register xdp_rxq_info for each RX ring
+  net: bcmgenet: add basic XDP support (PASS/DROP)
+  net: bcmgenet: add XDP_TX support
+  net: bcmgenet: add XDP_REDIRECT and ndo_xdp_xmit support
+  net: bcmgenet: add XDP statistics counters
 
-@@ -1255,17 +1256,10 @@ struct mchp_rds_ptp_clock *mchp_rds_ptp_probe(struct phy_device *phydev, u8 mmd,
- 	clock->mmd		= mmd;
+ drivers/net/ethernet/broadcom/Kconfig         |   1 +
+ .../net/ethernet/broadcom/genet/bcmgenet.c    | 607 +++++++++++++++---
+ .../net/ethernet/broadcom/genet/bcmgenet.h    |  20 +-
+ 3 files changed, 536 insertions(+), 92 deletions(-)
 
- 	mutex_init(&clock->ptp_lock);
--	clock->pin_config = devm_kmalloc_array(&phydev->mdio.dev,
--					       MCHP_RDS_PTP_N_PIN,
--					       sizeof(*clock->pin_config),
--					       GFP_KERNEL);
--	if (!clock->pin_config)
--		return ERR_PTR(-ENOMEM);
-
- 	for (int i = 0; i < MCHP_RDS_PTP_N_PIN; ++i) {
- 		struct ptp_pin_desc *p = &clock->pin_config[i];
-
--		memset(p, 0, sizeof(*p));
- 		snprintf(p->name, sizeof(p->name), "pin%d", i);
- 		p->index = i;
- 		p->func = PTP_PF_NONE;
-diff --git a/drivers/net/phy/microchip_rds_ptp.h b/drivers/net/phy/microchip_rds_ptp.h
-index 25af68337b94..f5c6ab585fff 100644
---- a/drivers/net/phy/microchip_rds_ptp.h
-+++ b/drivers/net/phy/microchip_rds_ptp.h
-@@ -199,7 +199,7 @@ struct mchp_rds_ptp_clock {
- 	u8 mmd;
- 	int mchp_rds_ptp_event;
- 	int event_pin;
--	struct ptp_pin_desc *pin_config;
-+	struct ptp_pin_desc pin_config[];
- };
-
- struct mchp_rds_ptp_rx_ts {
---
-2.53.0
+-- 
+2.51.0
 
 
