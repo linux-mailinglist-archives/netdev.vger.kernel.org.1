@@ -1,66 +1,68 @@
-Return-Path: <netdev+bounces-267888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267889-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SPJQOJgHtmku8gAAu9opvQ
-	(envelope-from <netdev+bounces-267888-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 02:12:56 +0100
+	id CDw+GdkItmlq8gAAu9opvQ
+	(envelope-from <netdev+bounces-267889-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 02:18:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB71A28FB67
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 02:12:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07FD928FB9A
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 02:18:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A0AAD302510B
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 01:12:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7FD95305CA97
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 01:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671E81F7569;
-	Sun, 15 Mar 2026 01:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA15918DB01;
+	Sun, 15 Mar 2026 01:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SdJGaiPB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fuKl9SZ+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3591D7995;
-	Sun, 15 Mar 2026 01:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AEF40DFA7;
+	Sun, 15 Mar 2026 01:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773537165; cv=none; b=l30lVvoyG4M3lI72HS7uqy9QVF6319Cp1+Oyuao/EjldmizYSnyC+v22/H2oY6n/62vA5Wc3FZlGbUe+xPDF/4PoJfV/nxp5ic1fYL5qRnKV7dsDdVNAq9FWm8eST0odqStiWk6hZTrj5k7HDwHko+6eY+MA72ijO2BScnlTL7E=
+	t=1773537487; cv=none; b=CrjeVg3fc2iJLYx9f4gU8pCsvz+zoH7mdZgtlhJAjQsSg9nJgIfRb+gUA5s0JpDrQzmfn3sNUPRB+hq7KL1oi3yLfZFoSDn5oGMAu2lb8AFJsHMYxCfVN/IdCTyAyulsTK5MTAXCHFN3lina+mb8guaHfNkxsS5dMPxSPIVzIiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773537165; c=relaxed/simple;
-	bh=JAs/1nlYTkYCSuyox/Z4p/qg35k7HFn5402MuhdAo3g=;
+	s=arc-20240116; t=1773537487; c=relaxed/simple;
+	bh=YNQnPMfrXLEjO1gWNZbgBw3RHFV96tMCV2Aa+tznba0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AnD2/JXwCPxdzKQRkM7Jr62d+YW1CdXvQgijjTtbsDCFJ5J9mc1kunZ0cROSygi/tFm7Bg3y8auPekG3jg5TyW8fVEUq73iJwcM9P006PbMqjH+NrI/A411Nk8mvsyPkSFjzqz45xxg15e8kMJemGkDJmmI749O+lJsG291TaFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SdJGaiPB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31517C116C6;
-	Sun, 15 Mar 2026 01:12:44 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mKxmCgw2853uaUYP3shs5oQ+oAgbHVf1Fv5M/rDzew9hK9Qq4m4MveFtYLUt1z/s4vUC16vCmpXb0VPTX4nUYaJ/U4k0K4Tm3DwIUtmn/0g5OCiv+uMDD726AaxqrTFvlUJwztJWpu/L/8wrAePai4VOdYoBQ6HY3nGqqAd3ghg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fuKl9SZ+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0AA4C116C6;
+	Sun, 15 Mar 2026 01:18:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773537164;
-	bh=JAs/1nlYTkYCSuyox/Z4p/qg35k7HFn5402MuhdAo3g=;
+	s=k20201202; t=1773537487;
+	bh=YNQnPMfrXLEjO1gWNZbgBw3RHFV96tMCV2Aa+tznba0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SdJGaiPB8kA5VjEf+HBii1iPWqlVB7gSwv1gRkXcjcRaA4X4OKNCqrYHtzVEjwt/2
-	 W3mkfCxb+FPk1cKpiwjN0HxpK3XsF9DD9Y/VsaHRx7MiS/WtoDi+/R7ncZnOiyfESU
-	 jkkIE6Xo2rS9Y9HoPkCPfa9k1TC2paVUmx34NFKhFJoiPKssfm2cxW64dYwsc/2Krw
-	 p5kWl6r01Or1MCuoSW1i3tykayDGqvfGxmf3YqN3poJxvIycu4cS9nEUkslBpbm/Ws
-	 En1AzOmiQrz5sBBZh5U9qu/4vtXcNtWD/5orhm6a3wX9K8vT+/Fa2a/gK7WpPmZOJe
-	 ru63pHsk7191w==
-Date: Sat, 14 Mar 2026 18:12:43 -0700
+	b=fuKl9SZ+Ulc7B/DFdGYYyeLo5paKdwGEpW+ed9iWNLFm2nbdGOSlQdpsqfGG3Nduh
+	 yRfWtKdWaP6RfMb8K86w26xHj/6HqxOlbg9YqiCw1BgIu5W1fgdb6hr/4mYJsQ7kMn
+	 BJqz1cKYH0Zq74hmOjF+wxQxLPdkBwYzDgakdkg5Ob3IhmuB6P1GrjAAdHG78ZD+kc
+	 tQSjbRQiOkIBsqnhJNJbhuytGzffjfged/REw/iD1qPCRvmHN0U6IIBbGUwbLdJt39
+	 QpeKGaxgIq6LEawDh3n+C0jRzLBiDfrxJOpBfzLkh5q9VxQ/5ED05BCCSTR4shRRg4
+	 ib8fKxP4GLnzw==
+Date: Sat, 14 Mar 2026 18:18:04 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: xietangxin <xietangxin@yeah.net>, "Michael S . Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, "David S . Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
- =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, netdev@vger.kernel.org,
- virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH net v2] virtio_net: Fix UAF on dst_ops when
- IFF_XMIT_DST_RELEASE is cleared and napi_tx is false
-Message-ID: <20260314181243.177d4ab4@kernel.org>
-In-Reply-To: <CANn89iJHp+nCcAo7tzMTfH5yW2qDsEXP_u=RzdV=DC9ZvDH9Fg@mail.gmail.com>
-References: <20260312025406.15641-1-xietangxin@yeah.net>
-	<20260314124017.59206dac@kernel.org>
-	<CANn89iJHp+nCcAo7tzMTfH5yW2qDsEXP_u=RzdV=DC9ZvDH9Fg@mail.gmail.com>
+To: atwellwea@gmail.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, ncardwell@google.com, linux-kernel@vger.kernel.org,
+ linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ mptcp@lists.linux.dev, dsahern@kernel.org, horms@kernel.org,
+ kuniyu@google.com, andrew+netdev@lunn.ch, willemdebruijn.kernel@gmail.com,
+ jasowang@redhat.com, skhan@linuxfoundation.org, corbet@lwn.net,
+ matttbe@kernel.org, martineau@kernel.org, geliang@kernel.org,
+ rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ 0x7f454c46@gmail.com
+Subject: Re: [PATCH net-next v2 13/14] netdevsim: add peer RX truesize
+ support for selftests
+Message-ID: <20260314181804.6f62712c@kernel.org>
+In-Reply-To: <20260314201348.1786972-14-atwellwea@gmail.com>
+References: <20260314201348.1786972-1-atwellwea@gmail.com>
+	<20260314201348.1786972-14-atwellwea@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,51 +76,52 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267888-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[yeah.net,redhat.com,davemloft.net,lunn.ch,linux.alibaba.com,vger.kernel.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,redhat.com,google.com,lists.linux.dev,kernel.org,lunn.ch,gmail.com,linuxfoundation.org,lwn.net,goodmis.org,efficios.com];
+	TAGGED_FROM(0.00)[bounces-267889-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,yeah.net:email]
-X-Rspamd-Queue-Id: EB71A28FB67
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 07FD928FB9A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, 14 Mar 2026 21:11:33 +0100 Eric Dumazet wrote:
-> > On Thu, 12 Mar 2026 10:54:06 +0800 xietangxin wrote:  
-> > > Fixes: f2fc6a54585a ("[NETNS][IPV6] route6 - move ip6_dst_ops inside the network namespace")
-> > > Cc: stable@vger.kernel.org
-> > > Signed-off-by: xietangxin <xietangxin@yeah.net>  
-> >
-> > The Fixes tag should be:
-> >
-> > Fixes: 0287587884b1 ("net: better IFF_XMIT_DST_RELEASE support")  
-> 
-> I disagree
-> 
-> What was the situation before this patch ?
+On Sat, 14 Mar 2026 14:13:47 -0600 atwellwea@gmail.com wrote:
+> diff --git a/tools/testing/selftests/drivers/net/netdevsim/Makefile b/tools/testing/selftests/drivers/net/netdevsim/Makefile
+> index 1a228c5430f5..9e9e48d5913b 100644
+> --- a/tools/testing/selftests/drivers/net/netdevsim/Makefile
+> +++ b/tools/testing/selftests/drivers/net/netdevsim/Makefile
+> @@ -14,6 +14,7 @@ TEST_PROGS := \
+>  	macsec-offload.sh \
+>  	nexthop.sh \
+>  	peer.sh \
+> +	peer-rx-truesize.sh \
+>  	psample.sh \
+>  	tc-mq-visibility.sh \
+>  	udp_tunnel_nic.sh \
 
-My thinking process was that it's fairly unusual that the dst is kept
-because the stack decided so. Normally its the device driver that asks
-for dst to be kept when its xmit is called. I thought 0287587884b1 was
-the first time when stack could make the dst decision behind device
-driver's back. But my analysis was very shallow, could well be wrong.
+I think our order checker thinks that is not alphabetical.
+You can find the scripts here:
+https://github.com/linux-netdev/nipa/tree/main/tests/patch/check_selftest
+
+It'd be good if you can try the "running locally" section from README
 
