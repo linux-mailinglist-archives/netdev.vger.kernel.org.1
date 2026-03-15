@@ -1,195 +1,255 @@
-Return-Path: <netdev+bounces-267955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267956-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKsvH7YHt2kALwEAu9opvQ
-	(envelope-from <netdev+bounces-267955-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 20:25:42 +0100
+	id 6JJUMCcMt2n4LwEAu9opvQ
+	(envelope-from <netdev+bounces-267956-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 20:44:39 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8546292391
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 20:25:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 401B22923F8
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 20:44:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0EAE930053A6
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 19:25:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 45CAA300C82E
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 19:44:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3CE37AA88;
-	Sun, 15 Mar 2026 19:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C2C372689;
+	Sun, 15 Mar 2026 19:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="K7Fry/mE"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="UDtr+lpq"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11020093.outbound.protection.outlook.com [52.101.69.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FC21A073F;
-	Sun, 15 Mar 2026 19:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.93
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773602738; cv=fail; b=SyciT3GmnpyV5lE/hdlgysp9oHeU88nkNPxCCHPEFv7MUxmKb4ukw/JimDcaB2QR0KBAbLHS/Xp0AAan3wHSTq4iMjPxMvb73rGUnS8gTEyKbfoFohh51asDZDt0FaFm6g2LQ0ZSWpmowKsfNLSwcpdHINfhPRkot1a8HfzvzIU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773602738; c=relaxed/simple;
-	bh=Y0+3lvUf5L4DwI4XmtSXwj5/a+lLNKr2HJZh/e0/Lwk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=noK8vI8V3FpoX2tu50oV/qN5NZ70RNm3djNuvtDKCRrMf8AZA02g8Y6Sx9rJvcAawQskhciW+uWNW32gBlDMjqmQvzlb7aka75hp+Mv4HG5mt/s4I+Ar1xLYuT1XY+V+8l7YX7Rhy3PeS+ZicV6KsspvGQQDlhqqq6GGDG+xacc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=K7Fry/mE; arc=fail smtp.client-ip=52.101.69.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rPpZKCSKR9lQWxeG/nY6NwRtqLCJ4fflcoJg1yo9inNpchpsTpQ5k6CqKzOOpNpiqvJ06vlFFpqcvSjNNQwABG3A5YGDefc/JRyUfg1REPP/k8jHG4Bk7u8y2/kYscqoW8Y2mAfqkt0K2vqaAYbwcPIyZEEBx6NiTF897eDYIBVIS/Vce5yTTyiE6MsJfWHDIbixYP1QwynmhgozWv4RimQXensLRNt/NNXIeal053+NnZ80NKk1T5+C2GEe6RyrzAyL61ytxeg3x/QMTWiVHxJhxaqx/dbD/mQHtIJSdtqquayPplrY+H7yhPUPVsbFw6+eMM4+Y0R61aKTJ1xFaQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bCeSyObV25oPF47N4W+zkBLe/LQx+ZH31BuxPu8eCW0=;
- b=RLh/CXlU+1SPY+cRtfUQoOEF/LCqVdo+lUDPxuVU4q7K/nGfA79M3gSREHBKBv6CQb7gCy2QbxrYh1bRHRK0zu5+yJDHYV8vi8bETujB3ynjMvqGwKXx4xVHRpNMctp9PRG7cdOKdNCUiGJR/52NZqlH7Q7m1oZTZfzAPXYYP/iIHwEzepMOya3ysq2qpK6Oj/8DpTWwhrAx0HMl3OKGRjM31W+7xUXAFtE1yLMjtNtiUjsYA58gsfUlyOB0lh8jC60rGa20jaJJIX8zyWfJKs3aSP7AmbFtcIOAf9n475Sm/f7i705mvxRuqyYKwNBv7Llgmf6kokqBDxO+lKL+gw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bCeSyObV25oPF47N4W+zkBLe/LQx+ZH31BuxPu8eCW0=;
- b=K7Fry/mEyzEeFqcPAN/gfHfRk225WvxYCBTDw0KGXP9W67q0dZZXh5okkxAeJtLlYDsaPZcU4xtniXwCnh5moFaIhlSBEtCtowYTOim86qiwdSYTKsP6KOwnqbXqgSSdpLlX86FHYdYLM5DL5alRQMH+CWVMUbRdOUAv8TXtQzbS756oWgE5lX8Cd/z+CfncsQykk/RR+ikq2JV6uVGbdb+ZVi71gwbNUaLO3FfIHrLv2xMVr6mBsul8aDcXvK5IE5kGii5/16kmFouWmWcg7i/d9Lbn7k1+DYDl45udxqT/ITDF72RqfbqjPnj3hPVCcH8nElJ+s4vX+4Q84PK6fQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM8PR08MB6355.eurprd08.prod.outlook.com (2603:10a6:20b:363::24)
- by PAXPR08MB7319.eurprd08.prod.outlook.com (2603:10a6:102:220::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.24; Sun, 15 Mar
- 2026 19:25:33 +0000
-Received: from AM8PR08MB6355.eurprd08.prod.outlook.com
- ([fe80::79bf:15ff:6428:dea9]) by AM8PR08MB6355.eurprd08.prod.outlook.com
- ([fe80::79bf:15ff:6428:dea9%4]) with mapi id 15.20.9700.021; Sun, 15 Mar 2026
- 19:25:33 +0000
-Message-ID: <dd1f8981-b8ad-4a4d-b6c8-3333fb05c93b@virtuozzo.com>
-Date: Sun, 15 Mar 2026 20:25:31 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4 3/5] selftests: net: rename pmtu.sh to pmtu-test.sh
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Aaron Conole <aconole@redhat.com>, Ilya Maximets <imaximet@redhat.com>,
- Eelco Chaudron <echaudro@redhat.com>, Stefano Brivio <sbrivio@redhat.com>,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, dev@openvswitch.org
-References: <20260309152013.565216-1-aleksey.oladko@virtuozzo.com>
- <20260309152013.565216-4-aleksey.oladko@virtuozzo.com>
- <20260311201057.049950d1@kernel.org>
-Content-Language: en-US
-From: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-In-Reply-To: <20260311201057.049950d1@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR0P278CA0140.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:40::19) To AM8PR08MB6355.eurprd08.prod.outlook.com
- (2603:10a6:20b:363::24)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937692264A7
+	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 19:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773603876; cv=none; b=NdpX4BV8lXeezIRgyeYlOXsDHdauC2xU/ZSZiftV1P0oAlyaZfcStItzmLHNq4GEBRUsZKReHL04zS5OQJXhWTd9uH/GS4gR8pqmZneKiwcjJIDGdAWcxJMXekFFmOatEASy5/+QxU8MQTbz9g1AChcFmVLTwLNOoZXixLtBnGs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773603876; c=relaxed/simple;
+	bh=28lD2rM8n+jSuYNXIMh5HC05mHTu40WVs5trqvzKg0k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ARNrBbvDsJYygSjwteICCls7b0bGGKTOuX833JZLo0CYkU+sMZj9YsM67PL/aEUeq9WkcpoKtbAkPpaaf3jVq66tu8hpqa7yu9yxCwyzROUz8XQiI0iSQ2GOw1fQT4hDCBRI3hqMzKDLxRBKnj2smp4TihZ1Km+3WWPAH5nU2nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=UDtr+lpq; arc=none smtp.client-ip=74.125.82.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-1271195d2a7so438712c88.0
+        for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 12:44:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1773603873; x=1774208673; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+yYsTafHnvLzwH325mKhSnqifh+Fojch7qFIE6cN8d0=;
+        b=UDtr+lpqxSSpbF7ErIihgRjrDZmvoWLUxE2eDEO5F94v3X+Q1vgFdkQDMIZytMfZ9m
+         qwOQesd99/DIdftxaDyiFD8wkKO3YILdNEDUBpTk9VcTc8+DACed1RC8ib/aatSmgZAY
+         BewEmeurbgAU7dNlKSTk8pPYszINiP8fm0mIDy4SaOIbxG/uhSLkqlAK3lOXNLglPLuM
+         qow8Ets1pX5zOhu3HoNi0nnCRy2ruc2CllQ5+SSLJZXDKOoZNkP3YsvenBbypWMQFdpr
+         kgauKv3pdPM+a5X34pi99NpjpEVR1gthhfa/Ev1vNjNAbB1tezp1vl2EPQqHXYg25xXJ
+         oCgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773603873; x=1774208673;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+yYsTafHnvLzwH325mKhSnqifh+Fojch7qFIE6cN8d0=;
+        b=QKxMIPVHavzVKDiSefMOzbKEdXXhntsZmtEsrytFnMH18iKcr8cQq1EX6PlqiuXQeI
+         Y0iXtg6pOqJlVKCKjxA3OkLVeC00w9CGfZU/0JvDl7hmumohcm64cnl8g3wHKANqWzly
+         dWxVXOPbKYM7A+ewaYM5B8dkOo2yrlX5WWIM2eKzi7sKauso89mP7LjXFgVbHXCd+qNU
+         cZk1rpo0d+K1LFyr2eGRgMq/WstZFn2b97OZaxoLrwcfbkBxiDPGIVGQUJCKc8XQSnCn
+         X5HnjWVkyVzDYKa9T8ezfevayfjAJk6iR/XUeLt5RdqdYxdTonn0wJ6du0ml0dtiidHw
+         NGHQ==
+X-Gm-Message-State: AOJu0YyxQKkNnYCLm+U2JrjBupSz5np8vDi9uJ8nDqNQOnYM/oIijYam
+	DgqmWASaKOrhwME1KIutrHVXTDVsvI+ZGmtZmtcIGKIUXeH/z6Ce0kv44NSLS4I3/F7/qtCSg3E
+	cEnYjzA==
+X-Gm-Gg: ATEYQzzq9DnL4Ci2IsARa0I/f1hXfFFchXogHF+O+3movqUBPE2COJtcEGXSNa8CtkR
+	i/49MEF4UWdajhuO3rOgWYLINqsHZy+B5NsqoPN28MbfoHyf/I6dYsPCxXWuBXjQjFJ6azAyCCr
+	1yiari7pe6294hKnUPXR5ReYODdGhXd+J4W53YuMVYt/N1H4iCUoQ5RjPPnwKbxC3d+qeln4ot1
+	/9AXRjbIbjs8Zqh2rIVU8vpoK/CmLuGp/bSlVJqEynCJ0XGNGbMnOevt1JETRlh/lMs+ey9RODl
+	QtGHpxqC7mGaU5BdxgneymLdl3OiOOv0jV+ZtSljm7eJqrJ7Jg/eqTsrtmYwrs4QaA4VKl3g5kt
+	QymAZ1cES8xKTVT69S7CBfPeKD7rcGl2eIh/guTaqBKMp306mpZ1VJwdBl0r3tWtClRl4Ae/hcL
+	Zo1QX0zTxBowLo/8oj0cXwTx3JlMJPW2Hs8QSRkViiNObAcX6Dfjr+Zw==
+X-Received: by 2002:a05:7022:4397:b0:128:d34a:320f with SMTP id a92af1059eb24-128f3d3be43mr5024017c88.12.1773603873356;
+        Sun, 15 Mar 2026 12:44:33 -0700 (PDT)
+Received: from p1.scai.dhcp.asu.edu (209-147-138-15.nat.asu.edu. [209.147.138.15])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f639a160sm9675766c88.12.2026.03.15.12.44.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Mar 2026 12:44:32 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: netdev@vger.kernel.org
+Cc: jv@jvosburgh.net,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bestswngs@gmail.com,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net] net: bonding: fix NULL deref in bond_debug_rlb_hash_show
+Date: Sun, 15 Mar 2026 12:44:04 -0700
+Message-ID: <20260315194404.579122-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR08MB6355:EE_|PAXPR08MB7319:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3bd52146-5419-43cc-82f1-08de82c8a0bb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|22082099003|56012099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	RCO1bljwtzUxoMs3u/NKETg89G+5CdxFrH6/S8LKZpSDEPQ6t50Uz0e+Am4mrMCqmfRbXwjcKzzZddK959obQVGIs58GO52bHCzKiCC7DnneoG/MijtQW4d7YDRxHOfNoBoshfqLmr+4e/IG5MkwULP25JQWiCE+PQ18yuI5BvaU61n5uSR1ePLv1Lr8RPWz4V3CpoXxsPaxwpmAFqMQ2s6NNAIh40nHssQiFQtjjfVcXjiw2z1K+kjlD5nyQQ6QEtnMXVaWm3AdMjrslbIC27JYImgEf2jsv+cL3mLZmEY/dnWxbgbxdRTGWGlTUoXQC7BnpF76KAINvNFlhqwgcnMraoabMMuyyMwodaE4D/VaRfJCyLWYp4xE0SEvcLgmFl1ekTve2XoZOJ5tdWcpShvSMtNZyyt02SeIltYlnscYSiPFFwWTQKRxq/R0NUQsWSQhYj9THVFT7/16mQtprH+CJgPBujNDco6+8njCjV0YG0HlEc8p1zZ+2XNm1imuDo/sUklHvPxSTemPZfLSvzJTIj2sHegJ5bXL8p/sBsr8cLoX6jbUGq/p6M4rH6Ajakd5xVinkf/n48FU5fw4H1THlhYb0o16/eytOfcV190NcD84qL42TLzw7DikaKWcLM/jun2FytUT0HV5Jnv8/Tfc1gnh02bLDoH4r1xLfvq8mN64KeUGbvORTCHVJNY3HexXJVa9FBgu7sjTcw+3ZatZ7glxU6HNZHw5JMinolQ=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR08MB6355.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aFVYeUNCMlJ1WGpLNFowWEsyZXUzMVdkN1N5bDc1V2o2b2JBY2p2M0V2SUR4?=
- =?utf-8?B?dGNXNkVOczBjZGRXcG82Z0RkLzRDa0VxMnVDN3lxQXUra3ZWbHB2R1VlTEt1?=
- =?utf-8?B?bGxUTWVJSis4TW5TR1gvQXJGSjVKdWY2RXZ1VW9wa1JmM0YzVWw0M1pxRmlY?=
- =?utf-8?B?b1Jya0YwdGZBdUJzYnc1MVNkMzBULzVtdGs5cXlyNUZvbG9ZbEltYTdRaWRx?=
- =?utf-8?B?QWtYbG5Nbm5nSG5yOUhnN2dNOVJMNzBOaVFIWVFSdEdYLzNPMnlKdElKeXdh?=
- =?utf-8?B?bklFbkFVUW1WZXpwRWdXN0tkbnFidmNkUFY3cTlwMXo3UHFZRmJ3Rms2NDhz?=
- =?utf-8?B?ZmNnYldSZytGVDlQdVZwREJSWW1wUlhPdkRPdk9UVEptTXZLMzVWYUVkV3Zs?=
- =?utf-8?B?TXhMQmhvdUZDYmlqRXI3VHJHR1ZHZklWcVI4aFhzSFJGa3RhZE8weUU5QXNH?=
- =?utf-8?B?VUlHc1NUZkxXQjRUK2M4b1M4U3hFOGpCUGJ1bGJlc3FiMHllYlNselFRSFla?=
- =?utf-8?B?N3hNRkYrelhrNEZkbFlWOXNVR1hqc3JPZXp6TWxMNUx3YzNWK3dlMlptbVd1?=
- =?utf-8?B?QUFldkRDUklCVzFGeEdOSnZBSEtVSUJXMm13WEs0dXRkejkxaTlEdHZlbzVi?=
- =?utf-8?B?ZlZaTU5yNW5ZWWgySWQ0MmNJUEN0NU9NME9XNUxyMytFZUlKb0lOaHNjRE9q?=
- =?utf-8?B?TXlmdmMraHNVYm43clBQREZaQTNMV1hmSmwxQ1VYRDh5KzZKN1lEOFJHUnRt?=
- =?utf-8?B?NGhwMWU5Z0pkdGJXa3BhK2xWa0w2OUhnbVlBVWZMbzhLZ0p3RWtsNFUwRzdr?=
- =?utf-8?B?NlN2MENKbU1BckUzcjc3MlM5TWZVeW9IeVJiRmFxZ3Q4NkpZNnBBRHpnZkpu?=
- =?utf-8?B?M0FPUTBwbkcwT0l3WFpYZ1JVSkxOaklESFNrenozU0Jld1phQWNPSWNGN1VB?=
- =?utf-8?B?bXp5MkpqNHh5bUx0eFUrVEhYczkzdklSbUxDWUhZNG12ZXg2cnJFeVIzZ05J?=
- =?utf-8?B?cDJNckhtbUg5a3lxOEJjbjFuNThyaFdSc3VLbU1yOUk0VjkveEg3MkprZ3cw?=
- =?utf-8?B?NTRVdWZKODcrVDlWSjRaRVp3VFI4SmpJcGNxd2ZFeWU4ZzJWV05tVnRNSVpX?=
- =?utf-8?B?ZjV3ZnRCUXZ0SGwxZkk3My9OUjVJaDJickxPMFVRd0tmV0x4MmFsdG5rZVgy?=
- =?utf-8?B?TG52VFVSSTVQYVpsaHEydHJ5WlBGd0VKa2U4TDZVSUdGeWJ4UlhiL1hCSWE2?=
- =?utf-8?B?TVk3UWVsY2lYMEpic3FpNWVIbTdDWHAzMm5sMFhtUkl1SG9kU3NZa1NOejYx?=
- =?utf-8?B?Vm1DMGpQSjFHVjFJZUNLWGdMS05XdkxiZnJ6dHFKNTAvVFZqbWpXTUprQ2hx?=
- =?utf-8?B?QUlHVmg3aWFJTVFQaUVhQVpmSDRKMVArVStmYURSOWJDR0hsQ3l2MStJOUl5?=
- =?utf-8?B?MEp0SXFMblZ1ZjkrV2MzeEhRNE9sZ1E2OE9oNENkWFgwbHdwc0svbXNiUUxP?=
- =?utf-8?B?ZGx2TnlvOEJPZ3luYW1PUEJwNEdZeHdMTWtISkhkdEQxbmt3ZnRrdnFRVU9W?=
- =?utf-8?B?bkdpQnVUNlhZZHhyWEF4NUtVTmVjNGo5VHVKdjFIaVFtYUgvRHV3ZzR5Sm9l?=
- =?utf-8?B?QzJ5V05QNDRrVGppUE9CLzZid1VzcTFoOW5zUEVCN04rWDBFTjZrb0s2OXg3?=
- =?utf-8?B?ajAwSVViaWNPajhYak9EczhwNnhrMnUrVDJsempmbTVVT1JHYlpZU2NyZjM0?=
- =?utf-8?B?dG4yZHdOeDZhU0N1Q1hITk1MamNXZ3VSaVFFdEpFN3pDRVRUazU1T08zK1Z6?=
- =?utf-8?B?V2tvck9JWmxrV1ZXM1A5NXd2eUtzN25icXVFcEtoV2x0aXdxcmlyVGZhQU1W?=
- =?utf-8?B?NkRhaXVqQ0JhdVkwUHh6ZWxLRDlTZXlPemRSdWJENzB1U0ptUDdRQkR3Q3pw?=
- =?utf-8?B?SFBtdnFrdVdiQ2dqaWxyWTdaWlcrbWRTOGxCb3diNzVlOFh2M2tmb01ES0Iw?=
- =?utf-8?B?T0FSYjJWRE5uWFB6N2pzL1pVTis3dkltVWVNVlg0ZjJ1MzlyK0JiTnY3elRT?=
- =?utf-8?B?SWxZc3Y0UjRiTCtxTnJ1L2dubVh4VXB3ekhqczkxU2x6SEhkbUUwbHM3aFBk?=
- =?utf-8?B?cE84RE9aUzlXYjQ5dTJkTzF0dDBqOVZhNnpxVUl6TUlLY3dlL0JxNDMyWlk1?=
- =?utf-8?B?ZzUyaExEZkZ3NUxqQkNiSmtHdjRpOXcyOExkbktDa1cybDByUVdsc0dnRWI2?=
- =?utf-8?B?dU9BbHBaWVJBVWU4bk50RWg1NjFzNnVLalQzSWVDU3VZVkNmYkU1OEM1N3B1?=
- =?utf-8?B?TTBNNFRXUm1STmVPM2JEVzdnMjdPbVJ4TlljSzRjbnpEOG5zSkI3bStGamF5?=
- =?utf-8?Q?vI0jjOGNC6Fvs0WQ=3D?=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3bd52146-5419-43cc-82f1-08de82c8a0bb
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR08MB6355.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Mar 2026 19:25:33.6134
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +4hYT8ExQlRVqJMiUH1L3PrvWNChIdjNf4YFx0WsSB5twQw9vLC+HlgqtvFUTfkG05xTd0WpfYhZUTRafoNSYfY92nxBoze2jK3dnKsBTp4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR08MB7319
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=selector2];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267955-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,asu.edu];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[virtuozzo.com:+];
+	TAGGED_FROM(0.00)[bounces-267956-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[asu.edu:+];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksey.oladko@virtuozzo.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[virtuozzo.com:dkim,virtuozzo.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,pmtu-test.sh:url]
-X-Rspamd-Queue-Id: C8546292391
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 401B22923F8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In v2 
-(https://lore.kernel.org/linux-kselftest/f7t1pj9v8h7.fsf@redhat.com/T/#m80f10ade0ba8963ac6b09b8aba07163cb3e4cf59), 
-I was asked to rename the main script for tracking purposes. Should I 
-proceed with this setup?
+rlb_clear_slave intentionally keeps RLB hash-table entries on
+the rx_hashtbl_used_head list with slave set to NULL when no
+replacement slave is available. However, bond_debug_rlb_hash_show
+visites client_info->slave without checking if it's NULL.
 
-On 3/12/26 4:10 AM, Jakub Kicinski wrote:
-> On Mon,  9 Mar 2026 15:20:11 +0000 Aleksei Oladko wrote:
->> Rename the pmtu.sh test script to pmtu-test.sh. No functional
->> changes are made, only the file name is updated.
-> Please try to fix the test ?
+Other used-list iterators in bond_alb.c already handle this NULL-slave
+state safely:
+
+- rlb_update_client returns early on !client_info->slave
+- rlb_req_update_slave_clients, rlb_clear_slave, and rlb_rebalance
+compare slave values before visiting
+- lb_req_update_subnet_clients continues if slave is NULL
+
+The following NULL deref crash can be trigger in
+bond_debug_rlb_hash_show:
+
+[    1.289791] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[    1.290262] #PF: supervisor read access in kernel mode
+[    1.290494] #PF: error_code(0x0000) - not-present page
+[    1.290724] PGD 102a98067 P4D 102a98067 PUD 102831067 PMD 0
+[    1.291013] Oops: Oops: 0000 [#1] SMP NOPTI
+[    1.291202] CPU: 1 UID: 0 PID: 145 Comm: exploit Not tainted 7.0.0-rc3-virtme #1 PREEMPTLAZY
+[    1.291555] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.or4
+[    1.292058] RIP: 0010:bond_debug_rlb_hash_show (drivers/net/bonding/bond_debugfs.c:41)
+[    1.292286] Code: 83 fb ff 74 3c 48 c1 e3 06 49 03 9c 24 f0 00 00 00 48 c7 c6 d5 aa 9d 83 48 89 ef 48 8b 43 30 48 85
+
+Code starting with the faulting instruction
+===========================================
+   0:	83 fb ff             	cmp    $0xffffffff,%ebx
+   3:	74 3c                	je     0x41
+   5:	48 c1 e3 06          	shl    $0x6,%rbx
+   9:	49 03 9c 24 f0 00 00 	add    0xf0(%r12),%rbx
+  10:	00
+  11:	48 c7 c6 d5 aa 9d 83 	mov    $0xffffffff839daad5,%rsi
+  18:	48 89 ef             	mov    %rbp,%rdi
+  1b:	48 8b 43 30          	mov    0x30(%rbx),%rax
+  1f:	48                   	rex.W
+  20:	85                   	.byte 0x85
+[    1.293101] RSP: 0018:ffffc900004a7d00 EFLAGS: 00010286
+[    1.293333] RAX: 0000000000000000 RBX: ffff888102b48200 RCX: ffff888102b48204
+[    1.293631] RDX: ffff888102b48200 RSI: ffffffff839daad5 RDI: ffff888102815078
+[    1.293924] RBP: ffff888102815078 R08: ffff888102b4820e R09: 0000000000000000
+[    1.294267] R10: 0000000000000000 R11: 0000000000000000 R12: ffff888100f929c0
+[    1.294564] R13: ffff888100f92a00 R14: 0000000000000001 R15: ffffc900004a7ed8
+[    1.294864] FS:  0000000001395380(0000) GS:ffff888196e75000(0000) knlGS:0000000000000000
+[    1.295239] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.295480] CR2: 0000000000000000 CR3: 0000000102adc004 CR4: 0000000000772ef0
+[    1.295775] PKRU: 55555554
+[    1.295897] Call Trace:
+[    1.296031]  <TASK>
+[    1.296134]  seq_read_iter (fs/seq_file.c:231)
+[    1.296341]  seq_read (fs/seq_file.c:164)
+[    1.296493]  full_proxy_read (fs/debugfs/file.c:378 (discriminator 1))
+[    1.296658]  vfs_read (fs/read_write.c:572)
+[    1.296804]  ? _raw_spin_unlock (./arch/x86/include/asm/paravirt-spinlock.h:40 ./arch/x86/include/asm/paravirt-spinlock.h:72 ./include/linux/spinlock.h:204 ./include/linux/spinlock_api_smp.h:168 kernel/locking/spinlock.c:186)
+[    1.296981]  ksys_read (fs/read_write.c:717)
+[    1.297132]  do_syscall_64 (arch/x86/entry/syscall_64.c:63 (discriminator 1) arch/x86/entry/syscall_64.c:94 (discriminator 1))
+[    1.297325]  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+[    1.297553] RIP: 0033:0x41c9d1
+[    1.297693] Code: f7 d8 64 89 02 b8 ff ff ff ff eb ba e8 f8 14 00 00 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 80 3d 8d 9c
+
+Code starting with the faulting instruction
+===========================================
+   0:	f7 d8                	neg    %eax
+   2:	64 89 02             	mov    %eax,%fs:(%rdx)
+   5:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
+   a:	eb ba                	jmp    0xffffffffffffffc6
+   c:	e8 f8 14 00 00       	call   0x1509
+  11:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  18:	00
+  19:	f3 0f 1e fa          	endbr64
+  1d:	80                   	.byte 0x80
+  1e:	3d                   	.byte 0x3d
+  1f:	8d                   	.byte 0x8d
+  20:	9c                   	pushf
+[    1.298516] RSP: 002b:00007ffdd99e07d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+[    1.298834] RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 000000000041c9d1
+[    1.299163] RDX: 0000000000001000 RSI: 00007ffdd99e07f0 RDI: 0000000000000003
+[    1.299483] RBP: 00007ffdd99e1800 R08: 00007ffdd99e0740 R09: 0000000000000014
+[    1.299786] R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffdd99e1918
+[    1.300106] R13: 00007ffdd99e1928 R14: 00000000004b0868 R15: 0000000000000001
+[    1.300419]  </TASK>
+[    1.300523] Modules linked in:
+[    1.300667] CR2: 0000000000000000
+[    1.300820] ---[ end trace 0000000000000000 ]---
+
+Add a NULL check and print "(none)" for entries with no assigned slave.
+
+Fixes: caafa84251b88 ("bonding: add the debugfs interface to see RLB hash table")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+---
+ drivers/net/bonding/bond_debugfs.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/bonding/bond_debugfs.c b/drivers/net/bonding/bond_debugfs.c
+index 8adbec7c5084..8967b65f6d84 100644
+--- a/drivers/net/bonding/bond_debugfs.c
++++ b/drivers/net/bonding/bond_debugfs.c
+@@ -34,11 +34,17 @@ static int bond_debug_rlb_hash_show(struct seq_file *m, void *v)
+ 	for (; hash_index != RLB_NULL_INDEX;
+ 	     hash_index = client_info->used_next) {
+ 		client_info = &(bond_info->rx_hashtbl[hash_index]);
+-		seq_printf(m, "%-15pI4 %-15pI4 %-17pM %s\n",
+-			&client_info->ip_src,
+-			&client_info->ip_dst,
+-			&client_info->mac_dst,
+-			client_info->slave->dev->name);
++		if (client_info->slave)
++			seq_printf(m, "%-15pI4 %-15pI4 %-17pM %s\n",
++				   &client_info->ip_src,
++				   &client_info->ip_dst,
++				   &client_info->mac_dst,
++				   client_info->slave->dev->name);
++		else
++			seq_printf(m, "%-15pI4 %-15pI4 %-17pM (none)\n",
++				   &client_info->ip_src,
++				   &client_info->ip_dst,
++				   &client_info->mac_dst);
+ 	}
+ 
+ 	spin_unlock_bh(&bond->mode_lock);
+-- 
+2.43.0
+
 
