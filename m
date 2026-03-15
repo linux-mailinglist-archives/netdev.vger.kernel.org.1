@@ -1,119 +1,116 @@
-Return-Path: <netdev+bounces-267928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267929-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WA4JLAjZtmmkJgEAu9opvQ
-	(envelope-from <netdev+bounces-267928-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:06:32 +0100
+	id VHD0MMPZtmnBJgEAu9opvQ
+	(envelope-from <netdev+bounces-267929-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:09:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1533529157D
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:06:32 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B619F291590
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:09:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7F6E3028ED7
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:06:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7700D3004600
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:09:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34831370D61;
-	Sun, 15 Mar 2026 16:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00826371869;
+	Sun, 15 Mar 2026 16:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ndoctVTI"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="rVdpOlrX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
+Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867F236C584
-	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 16:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C69D1A3157
+	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 16:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773590788; cv=none; b=enu5ipIJH1vqJW8dRYvmCtzbVxOaW0uQ+miGejAt+TeFePxKIqIQPPXvdIEToUsg1dzJ1EibKfX9/iA9mVUzW9R2lbNl/ojekAmzcXqzoOfNSNBq9xosiCI8Cgo2+6ykpotUoWVzNeidnZO6Tf/cJMspEzwkrvPLZ6SH17Me5WE=
+	t=1773590973; cv=none; b=Dz6R9eBdpfom/qet7je06otdzmf1aEPa4DKO4BRBilTadh7sxvMZVnBFVb5B+3rfSLd63Aik/mBK7HON04tFDXt550yuVdVmqypuXK7EGJZ+EFUru/2i3YVWVY1c0KqWEYFj9GTfxfF5M1C0UUDXg/pi9A8u35riCE7WwkxePq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773590788; c=relaxed/simple;
-	bh=A7BBMyaNlHjkuSwtW3AHVo4AvDjTAS1SpJCd2fQJshY=;
+	s=arc-20240116; t=1773590973; c=relaxed/simple;
+	bh=T2vp3844fJTBrEDvl19e3BV77MqfhOXX2yA53rOUILY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HG/aaLbwIUnXXmy0jXSXbkgQTKBD5p5xT3szCxvt7L+zOPAKkPfM3iwCab0k1WZDEEYgAfZQ0FT8ETcQgvXfb4YbfFSGo27GHPJLKGdWOrG8nLdFJ0MPlLgA6TDHvpSkC0chYaApYAZG3Gf/o1fJ+kFcpqpi4TQDldFVeI54Z/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ndoctVTI; arc=none smtp.client-ip=74.125.82.46
+	 MIME-Version:Content-Type; b=g1gmSmNbuRQd4Md52YPhjYh1ZZXbOfndeyb4spyHNzrAp+NgTOLAp9zk2zqSpjMi7/ymBAATcLdLifvwmXZyR0bXiWjOciB0YI0ZibNBEd6vs6zk30X7I5WDvTQMgu15rpPXwlgYkaPWH6ph+wL7ustHI0K1U+/xQnUgSQRd3As=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=rVdpOlrX; arc=none smtp.client-ip=74.125.82.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-12732165d1eso4708643c88.1
-        for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 09:06:26 -0700 (PDT)
+Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-126ea4b77adso4488901c88.1
+        for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 09:09:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1773590785; x=1774195585; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1773590972; x=1774195772; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bLy7K36SCDNZjs+7kWXoLXCj2s7+No3O6Cv8E2hX2vU=;
-        b=ndoctVTIJl0RcROP04iN4KPYezQifz1b/kxDcDFgjx741Yl9UCIamak6hPsaXCa3Mm
-         EPh2VH8o35/8snwJTb8jE8Di8n5TMVXaF8ht4O2k5K09Rf+go197pP4oKl28KswTiH1V
-         D7aPBZSkHSxPEDOwucSbHxajm9Lc4nQwj//a4tDaHbZ7rfW110bVX0Qtu5tAWgK59zQ6
-         qN5Ffa0OFMM2ggnGfJSvM+2z4HAyFr+jIVv6SrOh/74Mg0ZxaeLAGdaNs6MTrWXgIduG
-         utB5TTCsNaq0NI0cuZX3GVeKIPSL083aY03VXc/Nd3YTqkPEMHFsmHWpHTOEYtCiQkp1
-         jWjA==
+        bh=2qJ+hHVKiROPoKaNf1w0wFOK4ImNMy0k37ajAkoMv14=;
+        b=rVdpOlrXHTQFEfyY5Yen9zonvuylB7JMnaFDb21SjS/H/fdwHHcu6ANRmh7ORY/mw/
+         uP1SK9qRlpszTxwpiO8a07/v8HLHg94ziARNKe6TPI+2nT+sLZvZc5opVcAv9OIN0GRy
+         5LpbDoOXs/fMjIeMd0jK3Anw+01yL2ZKZPsPtNyMEaZjX62fLtc1tE8a3rhF0aagEgOp
+         wS529i2DTUCwobTB0SKb64Wf3q+d6/0673jfm3QBeNUALF/A7yQufnx7cwXArgUFcr0k
+         5IA/fe3lYh9ysKHGOQv9B3aAct0317S3ojYXFu5gGCXWh28/yGyRJUekJbf94JrxxbQD
+         MoSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773590785; x=1774195585;
+        d=1e100.net; s=20251104; t=1773590972; x=1774195772;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=bLy7K36SCDNZjs+7kWXoLXCj2s7+No3O6Cv8E2hX2vU=;
-        b=sGxDsxK6o7ADhce7K3Y73DHF8gdSIouBQtnrf1oeKf2WSObaqPOXURb3ug4mEzn4YC
-         TLvrd/HzkmJovIQIRrA8iZhP1uSfAW96ev05G+p5YWBMUuI9coHovCiY1lKMcvUKYAet
-         627SABbeVuIqX9poRJtG+aZuFXlOVSPvnEwSdaFhW2tpHPjj7mk0gfoDH+7ps0iCCk/L
-         /5zLYpR0BShEtA7c+SlhRx5S0gp1HF3kBJJtaAm77eJtHN6460MnpMBe3qefJijZR6/9
-         KRorbZ7iRjHJSB1XdnDXVWvkKQ9oCdC9kJLzF/4H04x88OMQmqUBuh1ABlH1cx12b9BK
-         Wjjw==
-X-Gm-Message-State: AOJu0YzjrdCw+jeGtf+C1j5jIupKQVI/8MJSQ9wG3bDoXFC8n5Yx/4qq
-	IoxQrd9UCOV/QR7EoGXhQETza9J0L/7PEwJUUe5h2L6AkBnDpCgyyjX9oiHbn21qvGA=
-X-Gm-Gg: ATEYQzzUC2DrXgpLre6YA9f+UvX8cpZ8U9LaMPnlkVogYO86ZBowh/3KF40N4wFKIQt
-	aiBOFa+ZM+xaCy2h3dlrqmLUzFDSVvnSIi69ypyk7harh1vz21V+74/Bd+/yY1gpxHCqG9gmVM+
-	nOPz2Poa+j1Zs0L70hegP4O2HKc9oRELo+YX8uHWvTXzrl6PnegrNqf13SPA+eNaCrvynVK/tew
-	Lz8QJTI78/wudL/icxP9WLFfMMhmdTtk1uP2XrBEOQLb7QPQ32s7tUY5orTUIeWKkQBycxMApIu
-	RwOQWGOqKXglObK3Ox54aV1OvHVAS1GRCRJsj1OUbRZulvhqNj20Gfr+JjsKjHRLWbsJ325AkkV
-	KH9LcK1JXH/JiIJAOlxs2Ku7D+Nr72iEVYw+clo6IbN6P9Vg1FtSfsYGaiJQqcic88FcHPyTC7J
-	BpfbiUuHDRmUbirVseDWxWa/LRfxbPhz0vLKE=
-X-Received: by 2002:a05:7022:2388:b0:128:c1be:152b with SMTP id a92af1059eb24-128f3d17a47mr3979973c88.4.1773590785354;
-        Sun, 15 Mar 2026 09:06:25 -0700 (PDT)
+        bh=2qJ+hHVKiROPoKaNf1w0wFOK4ImNMy0k37ajAkoMv14=;
+        b=Z0QHubfEIhrj5fEBEiF0DwJWxi4TyE44gmZEekm/qZAgpajSW8VInk/ZErbBwmT+w+
+         vVIXisFvP1hXwjvPvYoWQ3cDfgJDngK8lCNJHmyIpRRy1li1I+A5qjNoHWbLkpehGQXw
+         9k8gH4onx3P+5KqSHQd3Ylalr3pN/XSHkIM5B06E6Pb7TzdbS3inuPxvSbn3EnsGV5OE
+         bfOLXJUyYIY9C7kslc6eD/Mi0S6DiJI4FuRrEWMinCEp7hNwP+ZOO5eCXYrY5MPRqA8H
+         v8U/pqweqOhiF4lBe1/TG1GGP8kbiapJ4LPT2Weezyy94xQwmz+EHyHd3AlJqfoiXSPL
+         AJjA==
+X-Gm-Message-State: AOJu0Yw7Ie3HymnuObGBjBHRhRujpLEcXtQpQ730W1gQERsdTtfa2mOn
+	RfGLfv9zoh6MDMxwPaPMGDYzA86xvZ39ohoPZ6ZQIQULrnl0T+F0RJbKXy4TiYRDhLltnXYNk8p
+	K0cUR
+X-Gm-Gg: ATEYQzxYVWs9VQGaAGdP3H10Tkf5w4LHUudzN13YDat44c0/STT2E1YvqnJdQFy6pyW
+	cRt1C1oeAqoMla0smV8Lj98fyWgET6Sr4tPf23KDdtI3l33G7H8PL001svPdEDLt1Ei2uhAUCB6
+	8BINcpgPZkHf9Ix3v/2SVcTZTrL9UyLEXGhY0k1WvYk4tEKaDQWl/0IxXSPy7LuhqBMXX4w+zHK
+	QE4NAoWSfrvQlP7/Q5tQgMn2OlC5KeOMVZXw46giFmXWiXbJAnhwXYb/pI+1Akm+7OdqO+CkzKm
+	jr2BW0P5tVlL9xyo8D1hN1izABnmkv4lbz/DrtcCnQJ7F/q67cwBOQHKiXvXCNxmmgM/333fDCF
+	KWZn8fEuSYvVbc/vnIFJCyQ4MK5PaitGvjLJ5uZczPw/GtGLONzLYXatB0gM2kOs5m3ilBipOu/
+	QDm+hzpSjuzEZJuvJJiN1uZcH2l90iu19j0XE=
+X-Received: by 2002:a05:7022:309:b0:119:e56c:18ab with SMTP id a92af1059eb24-128f3d4fd5bmr4135038c88.19.1773590971642;
+        Sun, 15 Mar 2026 09:09:31 -0700 (PDT)
 Received: from phoenix.local ([104.202.29.139])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f62af8desm8122292c88.6.2026.03.15.09.06.24
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f62b2100sm8420862c88.8.2026.03.15.09.09.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Mar 2026 09:06:25 -0700 (PDT)
-Date: Sun, 15 Mar 2026 09:06:22 -0700
+        Sun, 15 Mar 2026 09:09:31 -0700 (PDT)
+Date: Sun, 15 Mar 2026 09:09:29 -0700
 From: Stephen Hemminger <stephen@networkplumber.org>
-To: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org, Savino Dicanosa
- <savy@syst3mfailure.io>, Jamal Hadi Salim <jhs@mojatatu.com>, Victor
- Nogueira <victor@mojatatu.com>
-Subject: Re: [PATCH 03/12] net/sched: netem: add per-CPU recursion guard for
- duplication
-Message-ID: <20260315090622.5fbdf074@phoenix.local>
-In-Reply-To: <ydqKfVXU_4_kSsU89EbfSyd66aGeaCaVHFr6kXhrF-qG7G2WCAAOS51LTAM2y_thGnB0pp-pbGLDWqM4XooMX-jelz30W0KbpE3KzCKiWqo=@willsroot.io>
-References: <20260313211646.12549-1-stephen@networkplumber.org>
-	<20260313211646.12549-4-stephen@networkplumber.org>
-	<ydqKfVXU_4_kSsU89EbfSyd66aGeaCaVHFr6kXhrF-qG7G2WCAAOS51LTAM2y_thGnB0pp-pbGLDWqM4XooMX-jelz30W0KbpE3KzCKiWqo=@willsroot.io>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net v2 00/10] netem: fixes and selftests
+Message-ID: <20260315090929.7cf2c132@phoenix.local>
+In-Reply-To: <20260315081953.3ceb7a84@kernel.org>
+References: <20260315001649.23931-1-stephen@networkplumber.org>
+	<20260315081953.3ceb7a84@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-1.56 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267928-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267929-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
@@ -121,184 +118,123 @@ X-Spamd-Result: default: False [-1.56 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syst3mfailure.io:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber.org:email]
-X-Rspamd-Queue-Id: 1533529157D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,networkplumber-org.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: B619F291590
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, 14 Mar 2026 19:29:10 +0000
-William Liu <will@willsroot.io> wrote:
+On Sun, 15 Mar 2026 08:19:53 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-> Looping in Jamal and Victor.
->=20
-> On Friday, March 13th, 2026 at 9:17 PM, Stephen Hemminger <stephen@networ=
-kplumber.org> wrote:
->=20
-> > Add a per-CPU recursion depth counter to netem_enqueue(). When netem
-> > duplicates a packet, the clone is re-enqueued at the root qdisc. If
-> > the tree contains other netem instances, this can recurse without
-> > bound, causing soft lockups and OOM.
-> >=20
-> > This approach was previously considered but rejected on the grounds
-> > that netem_dequeue calling enqueue on a child netem could bypass the
-> > depth check. That concern does not apply: the child netem's
-> > netem_enqueue() increments the same per-CPU counter, so the total
-> > nesting depth across all netem instances in the call chain is tracked
-> > correctly. =20
->=20
-> I'm assuming you are referring to [1] (and other relevant followup messag=
-es), but has this setup been tested against the original repro? I think the=
-re was a similar draft fix originally but it failed during testing because =
-DOS still happened [2].
->=20
-> If I remember correctly,  the issue is less so the recursive depth but mo=
-re so being able to differentiate between packets that are previously invol=
-ved in duplication or not.
->=20
-> >=20
-> > A depth limit of 4 is generous for any legitimate configuration.
-> >=20
-> > Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
-> > Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D220774
-> > Cc: stable@vger.kernel.org
-> > Reported-by: William Liu <will@willsroot.io>
-> > Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
-> >=20
-> > Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-> > ---
-> >  net/sched/sch_netem.c | 22 ++++++++++++++++++++++
-> >  1 file changed, 22 insertions(+)
-> >=20
-> > diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> > index 0ccf74a9cb82..085fa3ad6f83 100644
-> > --- a/net/sched/sch_netem.c
-> > +++ b/net/sched/sch_netem.c
-> > @@ -21,6 +21,7 @@
-> >  #include <linux/rtnetlink.h>
-> >  #include <linux/reciprocal_div.h>
-> >  #include <linux/rbtree.h>
-> > +#include <linux/percpu.h>
-> >=20
-> >  #include <net/gso.h>
-> >  #include <net/netlink.h>
-> > @@ -29,6 +30,15 @@
-> >=20
-> >  #define VERSION "1.3"
-> >=20
-> > +/*
-> > + * Limit for recursion from duplication.
-> > + * Duplicated packets are re-enqueued at the root qdisc, which may
-> > + * reach this or another netem instance, causing nested calls to
-> > + * netem_enqueue(). This per-CPU counter limits the total depth.
-> > + */
-> > +static DEFINE_PER_CPU(unsigned int, netem_enqueue_depth);
-> > +#define NETEM_RECURSION_LIMIT	4
-> > +
-> >  /*	Network Emulation Queuing algorithm.
-> >  	=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >=20
-> > @@ -460,6 +470,14 @@ static int netem_enqueue(struct sk_buff *skb, stru=
-ct Qdisc *sch,
-> >  	/* Do not fool qdisc_drop_all() */
-> >  	skb->prev =3D NULL;
-> >=20
-> > +	/* Guard against recursion from duplication re-injection. */
-> > +	if (unlikely(this_cpu_inc_return(netem_enqueue_depth) >
-> > +		     NETEM_RECURSION_LIMIT)) {
-> > +		this_cpu_dec(netem_enqueue_depth);
-> > +		qdisc_drop(skb, sch, to_free);
-> > +		return NET_XMIT_DROP;
-> > +	}
-> > +
-> >  	/* Random duplication */
-> >  	if (q->duplicate && q->duplicate >=3D get_crandom(&q->dup_cor, &q->pr=
-ng))
-> >  		++count;
-> > @@ -474,6 +492,7 @@ static int netem_enqueue(struct sk_buff *skb, struc=
-t Qdisc *sch,
-> >  	if (count =3D=3D 0) {
-> >  		qdisc_qstats_drop(sch);
-> >  		__qdisc_drop(skb, to_free);
-> > +		this_cpu_dec(netem_enqueue_depth);
-> >  		return NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
-> >  	}
-> >=20
-> > @@ -529,6 +548,7 @@ static int netem_enqueue(struct sk_buff *skb, struc=
-t Qdisc *sch,
-> >  		qdisc_drop_all(skb, sch, to_free);
-> >  		if (skb2)
-> >  			__qdisc_drop(skb2, to_free);
-> > +		this_cpu_dec(netem_enqueue_depth);
-> >  		return NET_XMIT_DROP;
-> >  	}
-> >=20
-> > @@ -643,8 +663,10 @@ static int netem_enqueue(struct sk_buff *skb, stru=
-ct Qdisc *sch,
-> >  		/* Parent qdiscs accounted for 1 skb of size @prev_len */
-> >  		qdisc_tree_reduce_backlog(sch, -(nb - 1), -(len - prev_len));
-> >  	} else if (!skb) {
-> > +		this_cpu_dec(netem_enqueue_depth);
-> >  		return NET_XMIT_DROP;
-> >  	}
-> > +	this_cpu_dec(netem_enqueue_depth);
-> >  	return NET_XMIT_SUCCESS;
-> >  }
-> >=20
-> > --
-> > 2.51.0
-> >=20
-> >  =20
->=20
-> What about the last suggestion for a robust fix from [3]?
->=20
-> Best,
-> Will
->=20
-> [1] https://lore.kernel.org/netdev/DISZZlS5CdbUKITzkIyT3jki3inTWSMecT6Fpl=
-NmkpYs9bJizbs0iwRbTGMrnqEXrL3-__IjOQxdULPdZwGdKFSXJ1DZYIj6xmWPBZxerdk=3D@wi=
-llsroot.io/
-> [2] https://lore.kernel.org/netdev/q7G0Z7oMR2x9TWwNHOiPNsZ8lHzAuXuVgrZgGm=
-AgkH8lkIYyTgeqXwcDrelE_fdS9OdJ4TlfS96px6O9SvnmKigNKFkiaFlStvAGPIJ3b84=3D@wi=
-llsroot.io/
-> [3] https://lore.kernel.org/netdev/20260111163947.811248-6-jhs@mojatatu.c=
-om/
+> On Sat, 14 Mar 2026 17:14:04 -0700 Stephen Hemminger wrote:
+> > The check_netem_in_tree() restriction added for CVE-2024-45016 rejects
+> > valid configurations such as HTB or HFSC trees with netem on multiple
+> > branches -- including examples from the netem documentation itself.
+> > This has been an open issue for over a year (kernel.org bug #220774).
+> > 
+> > This series replaces it with a per-CPU recursion guard, restructures
+> > dequeue to fix the HFSC eltree corruption, and addresses several
+> > additional bugs found during a code audit.  
+> 
+> # not ok 379 7a01 - NETEM passes traffic with delay
+> # Could not match regex pattern. Verify command output:
+> # qdisc netem 1: root refcnt 33 limit 1000 delay 1ms seed 151499771072372938
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
+> # not ok 380 7b02 - NETEM passes traffic with duplication
+> # Could not match regex pattern. Verify command output:
+> # qdisc netem 1: root refcnt 33 limit 1000 delay 1ms duplicate 50% seed 4449138859105539433
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
+> # not ok 381 7c03 - NETEM passes traffic with loss
+> # Could not match regex pattern. Verify command output:
+> # qdisc netem 1: root refcnt 33 limit 1000 delay 1ms loss 30% seed 17755509090945397811
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
+> # not ok 382 7d04 - NETEM passes traffic with corrupt
+> # Could not match regex pattern. Verify command output:
+> # qdisc netem 1: root refcnt 33 limit 1000 delay 1ms corrupt 10% seed 15571003730150948945
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
+> # not ok 383 7e05 - NETEM passes traffic under HTB with two netem leaves
+> # Could not match regex pattern. Verify command output:
+> # qdisc htb 1: root refcnt 33 r2q 10 default 0x10 direct_packets_stat 0 direct_qlen 1000
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # qdisc netem 10: parent 1:10 limit 1000 delay 1ms duplicate 25% seed 7229481943258718053
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # qdisc netem 20: parent 1:20 limit 1000 delay 1ms duplicate 25% seed 2614650852791982394
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
+> # not ok 384 7f06 - NETEM passes traffic under HFSC with duplication
+> # Could not match regex pattern. Verify command output:
+> # qdisc hfsc 1: root refcnt 33  default 0x1 
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # qdisc netem 10: parent 1:1 limit 1000 delay 1ms duplicate 25% seed 1742473429681626986
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
+> # not ok 385 7a07 - NETEM passes traffic with nested netem
+> # Could not match regex pattern. Verify command output:
+> # qdisc netem 1: root refcnt 33 limit 1000 delay 1ms seed 959619114654116267
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # qdisc netem 10: parent 1:1 limit 1000 delay 1ms duplicate 10% seed 1402527459214356892
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
+> # not ok 386 7b08 - NETEM passes traffic with TBF child
+> # Could not match regex pattern. Verify command output:
+> # qdisc netem 1: root refcnt 33 limit 1000 delay 1ms seed 3026058286388988065
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # qdisc tbf 10: parent 1:1 rate 1Mbit burst 10Kb lat 50ms 
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
+> # not ok 387 7c09 - NETEM passes traffic with all impairments
+> # Could not match regex pattern. Verify command output:
+> # qdisc netem 1: root refcnt 33 limit 1000 delay 1ms  500us loss 5% duplicate 10% reorder 25% 50% corrupt 1% seed 4173999615992747611 gap 5
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
+> # not ok 388 7d0a - NETEM passes traffic with reorder
+> # Could not match regex pattern. Verify command output:
+> # qdisc netem 1: root refcnt 33 limit 1000 delay 10ms reorder 25% 50% seed 16878270064950901169 gap 5
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
+> # not ok 389 7e0b - NETEM passes traffic with slot pacing
+> # Could not match regex pattern. Verify command output:
+> # qdisc netem 1: root refcnt 33 limit 1000 delay 1ms slot 20ms 40ms packets 5 bytes 1500 seed 12148330044418512905
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
+> # not ok 390 7f0c - NETEM passes traffic with rate limiting
+> # Could not match regex pattern. Verify command output:
+> # qdisc netem 1: root refcnt 33 limit 1000 delay 1ms rate 1Mbit seed 17545598048030611383
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
+> # not ok 391 7a0d - NETEM passes traffic with SFQ child
+> # Could not match regex pattern. Verify command output:
+> # qdisc netem 1: root refcnt 33 limit 1000 delay 1ms seed 7568266806072117190
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # qdisc sfq 10: parent 1:1 limit 127p quantum 1514b depth 127 divisor 1024 perturb 10sec 
+> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+> #  backlog 0b 0p requeues 0
+> # 
 
-Thanks, this is a tight corner here, and not all solutions work out.
 
-You're right that the per-CPU guard alone doesn't cover the
-dequeue-to-child-enqueue path you described. That's exactly why
-the series has two patches working together:
-
-Patch 02 adds the per-CPU recursion guard, which handles the
-direct enqueue recursion (rootq->enqueue duplicated packet hits
-another netem_enqueue in the same call chain).
-
-Patch 04 restructures netem_dequeue to eliminate the pump. The
-old code had "goto tfifo_dequeue" which looped back after each
-child enqueue, so packets the child duplicated back to root would
-immediately get picked up by the same dequeue iteration. The new
-code transfers all currently-ready packets from the tfifo to the
-child in one batch, then does a single dequeue from the child and
-returns. Packets that the child duplicates back to root land in
-the tfifo but won't be processed until the next dequeue call from
-the parent =E2=80=94 breaking the loop you diagrammed.
-
-The original repro is:
-
-  tc qdisc add dev lo root handle 1: netem delay 1ms duplicate 100%
-  tc qdisc add dev lo parent 1:1 handle 2: netem delay 1ms duplicate 100%
-  ping -f localhost
-
-This is covered by tdc test f2a3 (nested netem config acceptance)
-and test 7a07 (nested netem with duplication, traffic via scapy).
-More tests are added in the new version.
-
-Jamal's proposed change with skb ttl would also work but
-it was rejected because it required adding ttl field to skb
-and skb size is a performance critical. As Cong pointed out
-adding a couple of bits for ttl makes it increase.
-So considered the idea and decided against it.
-
-Thanks.
+The new tests use scapy like the other qdisc tests, looks like CI is not
+setting up the interfaces the same as local test. Is there something needed
+elsewhere? The codel test does similar things.
 
