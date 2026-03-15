@@ -1,341 +1,245 @@
-Return-Path: <netdev+bounces-267931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267932-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iM6sLiPctmkQJwEAu9opvQ
-	(envelope-from <netdev+bounces-267931-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:19:47 +0100
+	id 6IivL0LctmkQJwEAu9opvQ
+	(envelope-from <netdev+bounces-267932-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:20:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22F932915F5
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:19:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40B1F291605
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:20:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5B8FA303674A
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:19:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5AD03301466C
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6732F36C584;
-	Sun, 15 Mar 2026 16:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B07370D60;
+	Sun, 15 Mar 2026 16:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="jff+/rka"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l6v0bcg1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FF6371D02
-	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 16:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773591557; cv=pass; b=deMD4ndCqza5mdC0oyoSeeIuOr/wSarWtCoQAolUgV050vqyX6IGlIaCPd5vruMJKJRYbSSXhytSqQ4Piwoom5wtY7WgdHD0DbALFvJ3uBgS6BRLSOCziljhp4QFjSR1fBCYdpTw/XxqCNuXaB8guU63P4byZcJ8GUhQ54vpfvw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773591557; c=relaxed/simple;
-	bh=g4CAao8ZqmqtdUy+SgdyMkVPd3ywREDYdYWdkUz51Ao=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OhegusLWfIs0Zz+GMMZBW9mZwudra+RxP1JgeH7a0XgMUMJ/s1g/PM7lR2daGHiDGW5hWAIFoLxW0bAQqwAf8hoemPlLMzOiSmwLeUpszsg4kdTSY31qIRiPsJVrWIQKy4sm0qX0hXxWTzULBVoT6bb9idd0rhGk+rvPFyYKuyU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=jff+/rka; arc=pass smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-829781b2b01so2367358b3a.2
-        for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 09:19:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773591553; cv=none;
-        d=google.com; s=arc-20240605;
-        b=QHCE4GWSdaExsTMtE9oDDcPC12eK0Zx4qpCHhuCpnyflzdxYrvZEk2X8B9q+aTWC9f
-         71Umobh5BrVgs2eXWTO90UIAJEkuFoKholq5AYHdOiLtmWCZh4dz+v3gmyJvvwGrCK92
-         YV8talOMJs3EoG1/x+9KGYZlTFumplLqMQisCTkTyGqdnpMS4xit8UsvuIfe4YwL3mYN
-         RYeuK43jhMB2UbannqTooVtF9NDuGpqWU6Te6WqYZskKUd/NpXdds9IGpkOtoKN0oggp
-         qUYaF0QerIuo43v9XMfaxmNsiYdeTonnTuJKa8ueAPM9x1Teq8ZfckMw/2TUzR7DZgRD
-         JERw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=7EulIjs457FDWkH8ubZ5UiSY4G2+TWHJgcekVUzvkrM=;
-        fh=hUdb059ur6kStDEgsTEH5ASFT4GLOjpx2uAlVODnNQ8=;
-        b=MYAnYPGthQ9nC9ljBaHkU+a1IS0ag7+5XlxC4+qOXtejLB/rD52dasdww9MQJpYz6g
-         5KN5yIN36ro4fmCwLzBRJCCa/VX53d4o7Q1ZfHs2zCx/QoUtP5E5O1iuSWqGAgZqmbf4
-         RSRK6/11V3vLHvEs3G0RSxeKd806UDfs3m0Zk54LaB5bA8PakimrRYShdiNKCyXLyN2p
-         nkCKvhcLC1Y10kv5sugsLSyzvdYo1Egsc3mEdJDvonZnXOBb8E8xUNOA1vCrivm3nrJB
-         uQfN9ERna6eXEHFgqdF4c+Rg8ECXIYj9z1s+51JzI5HPU6Flcv/3Dqvq0Cj6SUQzm9kj
-         dpmA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1773591553; x=1774196353; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7EulIjs457FDWkH8ubZ5UiSY4G2+TWHJgcekVUzvkrM=;
-        b=jff+/rkaOcGtqnXwBzjKgIbY+vfsrKH0CTIhjNj6SDNzZCTmdXifqO49WPQO5jn/db
-         QpUN5hQJReCNEu8UrNylPagVMzztgHEUkD67y4Ba9mvv+/mqZkbdP6Ml7P6rbDU2SRi0
-         Lbyb3VbsgfbO7wrtAFCaBeovyAn34I6Vw9FEAySTedqBC2oDw15QF3lYl4pH4IL/WqBv
-         itqsNTYXOUUdP0hsifv+dhOReNRAOlZFnKY3qUbXr3GbbTP9SDEw/dPogRwTc4W9KSBI
-         rzfi1WST3ulqofHC65fqE5uJqG6YG9kVnYK9dRP3WO+S/OzHRXhpKczadFQOMM7Eu3Iq
-         1xbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773591553; x=1774196353;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7EulIjs457FDWkH8ubZ5UiSY4G2+TWHJgcekVUzvkrM=;
-        b=Lnjel+tOplcyAm+R+kgjZV8ZKz7DmbEbxcBxMjhj4CgcQx992U0+qn/ci195SJaHRl
-         sYkFbjK4wCVBlnjNxGgE7SFCRRcWmtNPSg5Z1re18I5jArQeq5aOF5/fJzNDtxR/JzsM
-         Rztr66ZbYg8TwaAWTN70DTg7FQsmrdlhD85Ng9NwcMyeWHshLwLtfuwNEBd8uG0VllWC
-         T/S8rJatlR2PBOjxYRG6hxTSTr98wgNuNmXOoaMB9Vyi0bDeV9VKsKy6imeWFDRO+Igz
-         TsSGHwNuuL0yjvct9ZYER1wYsxtkklBmBos1zyHkdk5+v4epxCBrnGAe+MvvtdPzThEj
-         MoFw==
-X-Forwarded-Encrypted: i=1; AJvYcCVYyPWtt/xNbsMYxsF7ZCkF+WiebhlmApjfFdqQfn+tDnfUQyCGGmJvxNTXo9wx+YIpnT1o0S0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRLU45XDIorElmERGjdADRtEvNMzwtxqGHpsIRMXMZF3StW2W5
-	z2yHmnPBtp683Zc3w1vYsxcAJ4WNadpsZwo22pMGNm6OMEKQ87O1NSpnyslTDcpkHkUhSh5dSDb
-	b42ydikRqt3/DisJngouBvehBAXK/+APXFGKppE16
-X-Gm-Gg: ATEYQzxj+mdnJniMLVEdddtw0FckFqeX6oNz1JQHLCTSIt59l2n3lCi57p/sgARWpBm
-	vYa1LzS1gNNVSgMx7tQHk3XdlRjrNbjw8q8LMWoHCB6I0U5PWQewf8ZmfdNXrJr9viw6m/EiG94
-	zFpAS6kVln/AkfbMFmjXknJwQl9XRx/L65/crSEDuunSCYoJ8zdNF4Y6Nvi3hrjV13E9J8QJ1FN
-	NDBZy/432y9Zgl0+czt9OxQDHfGkNRGLyVUrrePuo8H/SKi//YasTWSk/uNhQERjN+VOMYcddc6
-	0Qu7UBm0BcjIlto=
-X-Received: by 2002:a05:6a00:a0b:b0:81f:3c92:1699 with SMTP id
- d2e1a72fcca58-82a19906fb3mr9218500b3a.59.1773591553433; Sun, 15 Mar 2026
- 09:19:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB5B1ACEDE;
+	Sun, 15 Mar 2026 16:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773591605; cv=none; b=GYtq1pn1L/9Fx95vX1bAOgiX8+OirGQbXHisK/Zo2xHdjboZw+5+EjyNkPfQLvWZgN76SR7+Eud2qYdpOkEUG2uw9YOxQGHbBgSY8pqNDwii88HaCkKVZ405z8dFi+xxLwRVkA1Wzoso74yd2FCuqG5FbsU2tMJ/azH79yzNN6c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773591605; c=relaxed/simple;
+	bh=xKcg+NTA0s52zOEQyQVg1Ut0WOeVb7Uq3enq4JxfLQY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DOE0NcWdD3yWySdlYtWSa3qSDMlM0Kh++eGX8ugLZ54whKVsIrGLOVpvBO0kRab42S0RMQvQbFMCv+w6DbDh2jsvDUqM30L2v8hZ2lgT4x/cog35tbwq1JESwSUD4dmI5Jgf/iR/F9HOn8YhY2HLZPh/mqs45//CWCK1HF38X6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l6v0bcg1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20446C4CEF7;
+	Sun, 15 Mar 2026 16:20:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773591605;
+	bh=xKcg+NTA0s52zOEQyQVg1Ut0WOeVb7Uq3enq4JxfLQY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=l6v0bcg1/4c6og5Yc3zBqP0okAf48DeD4p5YEPR/28oEiJN9DO58EKVa0HALzsRWA
+	 lsclwYR5gx4iC/fIeuVlhRMA/adZU3buCFevMTjlVjIlLx112mez8ivwwPlSGYWDSj
+	 BNz839tnkybucvN7sigl9DXMA0NVXbnpCELHWoUKuLM/+q6MFansR6zZVsY1gFNTVK
+	 Pg/gnradb3OMNQFVYBZqzbnrIYutSG5DY46LSUu6SvGRoM7E/pWLFWYZqp8WDYCsQr
+	 yQ28Bi28p+KEjP11xh2lpDtgxiLwlorvSSOqdiPpfkxRV7dpNzec1PE9lRnGo9SZNr
+	 06xiqcq/4DKQQ==
+From: Simon Horman <horms@kernel.org>
+To: liuhangbin@gmail.com
+Cc: Simon Horman <horms@kernel.org>,
+	jv@jvosburgh.net,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	davem@davemloft.net,
+	sd@queasysnail.net,
+	andrew+netdev@lunn.ch,
+	pabeni@redhat.com,
+	sridhar.samudrala@intel.com,
+	jiri@resnulli.us,
+	bridge@lists.linux.dev,
+	edumazet@google.com,
+	kuba@kernel.org,
+	razor@blackwall.org,
+	idosch@nvidia.com
+Subject: Re: [net-next,v2,1/4] net: use ndo_set_features to set offload features for bonding/bridge/team
+Date: Sun, 15 Mar 2026 16:19:43 +0000
+Message-ID: <20260315161943.1419237-1-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260313-offload_compute-v2-1-ffbc8ce5d50c@gmail.com>
+References: <20260313-offload_compute-v2-1-ffbc8ce5d50c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260313211646.12549-1-stephen@networkplumber.org>
- <20260313211646.12549-4-stephen@networkplumber.org> <ydqKfVXU_4_kSsU89EbfSyd66aGeaCaVHFr6kXhrF-qG7G2WCAAOS51LTAM2y_thGnB0pp-pbGLDWqM4XooMX-jelz30W0KbpE3KzCKiWqo=@willsroot.io>
- <20260315090622.5fbdf074@phoenix.local>
-In-Reply-To: <20260315090622.5fbdf074@phoenix.local>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sun, 15 Mar 2026 12:19:02 -0400
-X-Gm-Features: AaiRm513oKjUthr-xSwhQVj8uBsPnNyc0vXXYZ0a13It-xuC4iLxEunSj8BSBKo
-Message-ID: <CAM0EoMnh7gYjEGVB0eqGfannC=i=R5YQZbBfZK1K+CqKJyOMOQ@mail.gmail.com>
-Subject: Re: [PATCH 03/12] net/sched: netem: add per-CPU recursion guard for duplication
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: William Liu <will@willsroot.io>, netdev@vger.kernel.org, stable@vger.kernel.org, 
-	Savino Dicanosa <savy@syst3mfailure.io>, Victor Nogueira <victor@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-267932-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-267931-lists,netdev=lfdr.de];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[willsroot.io:email,networkplumber.org:email,mail.gmail.com:mid,mojatatu-com.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syst3mfailure.io:email]
-X-Rspamd-Queue-Id: 22F932915F5
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 40B1F291605
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Mar 15, 2026 at 12:06=E2=80=AFPM Stephen Hemminger
-<stephen@networkplumber.org> wrote:
->
-> On Sat, 14 Mar 2026 19:29:10 +0000
-> William Liu <will@willsroot.io> wrote:
->
-> > Looping in Jamal and Victor.
-> >
-> > On Friday, March 13th, 2026 at 9:17 PM, Stephen Hemminger <stephen@netw=
-orkplumber.org> wrote:
-> >
-> > > Add a per-CPU recursion depth counter to netem_enqueue(). When netem
-> > > duplicates a packet, the clone is re-enqueued at the root qdisc. If
-> > > the tree contains other netem instances, this can recurse without
-> > > bound, causing soft lockups and OOM.
-> > >
-> > > This approach was previously considered but rejected on the grounds
-> > > that netem_dequeue calling enqueue on a child netem could bypass the
-> > > depth check. That concern does not apply: the child netem's
-> > > netem_enqueue() increments the same per-CPU counter, so the total
-> > > nesting depth across all netem instances in the call chain is tracked
-> > > correctly.
-> >
-> > I'm assuming you are referring to [1] (and other relevant followup mess=
-ages), but has this setup been tested against the original repro? I think t=
-here was a similar draft fix originally but it failed during testing becaus=
-e DOS still happened [2].
-> >
-> > If I remember correctly,  the issue is less so the recursive depth but =
-more so being able to differentiate between packets that are previously inv=
-olved in duplication or not.
-> >
-> > >
-> > > A depth limit of 4 is generous for any legitimate configuration.
-> > >
-> > > Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
-> > > Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D220774
-> > > Cc: stable@vger.kernel.org
-> > > Reported-by: William Liu <will@willsroot.io>
-> > > Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
-> > >
-> > > Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-> > > ---
-> > >  net/sched/sch_netem.c | 22 ++++++++++++++++++++++
-> > >  1 file changed, 22 insertions(+)
-> > >
-> > > diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> > > index 0ccf74a9cb82..085fa3ad6f83 100644
-> > > --- a/net/sched/sch_netem.c
-> > > +++ b/net/sched/sch_netem.c
-> > > @@ -21,6 +21,7 @@
-> > >  #include <linux/rtnetlink.h>
-> > >  #include <linux/reciprocal_div.h>
-> > >  #include <linux/rbtree.h>
-> > > +#include <linux/percpu.h>
-> > >
-> > >  #include <net/gso.h>
-> > >  #include <net/netlink.h>
-> > > @@ -29,6 +30,15 @@
-> > >
-> > >  #define VERSION "1.3"
-> > >
-> > > +/*
-> > > + * Limit for recursion from duplication.
-> > > + * Duplicated packets are re-enqueued at the root qdisc, which may
-> > > + * reach this or another netem instance, causing nested calls to
-> > > + * netem_enqueue(). This per-CPU counter limits the total depth.
-> > > + */
-> > > +static DEFINE_PER_CPU(unsigned int, netem_enqueue_depth);
-> > > +#define NETEM_RECURSION_LIMIT      4
-> > > +
-> > >  /* Network Emulation Queuing algorithm.
-> > >     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > >
-> > > @@ -460,6 +470,14 @@ static int netem_enqueue(struct sk_buff *skb, st=
-ruct Qdisc *sch,
-> > >     /* Do not fool qdisc_drop_all() */
-> > >     skb->prev =3D NULL;
-> > >
-> > > +   /* Guard against recursion from duplication re-injection. */
-> > > +   if (unlikely(this_cpu_inc_return(netem_enqueue_depth) >
-> > > +                NETEM_RECURSION_LIMIT)) {
-> > > +           this_cpu_dec(netem_enqueue_depth);
-> > > +           qdisc_drop(skb, sch, to_free);
-> > > +           return NET_XMIT_DROP;
-> > > +   }
-> > > +
-> > >     /* Random duplication */
-> > >     if (q->duplicate && q->duplicate >=3D get_crandom(&q->dup_cor, &q=
-->prng))
-> > >             ++count;
-> > > @@ -474,6 +492,7 @@ static int netem_enqueue(struct sk_buff *skb, str=
-uct Qdisc *sch,
-> > >     if (count =3D=3D 0) {
-> > >             qdisc_qstats_drop(sch);
-> > >             __qdisc_drop(skb, to_free);
-> > > +           this_cpu_dec(netem_enqueue_depth);
-> > >             return NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
-> > >     }
-> > >
-> > > @@ -529,6 +548,7 @@ static int netem_enqueue(struct sk_buff *skb, str=
-uct Qdisc *sch,
-> > >             qdisc_drop_all(skb, sch, to_free);
-> > >             if (skb2)
-> > >                     __qdisc_drop(skb2, to_free);
-> > > +           this_cpu_dec(netem_enqueue_depth);
-> > >             return NET_XMIT_DROP;
-> > >     }
-> > >
-> > > @@ -643,8 +663,10 @@ static int netem_enqueue(struct sk_buff *skb, st=
-ruct Qdisc *sch,
-> > >             /* Parent qdiscs accounted for 1 skb of size @prev_len */
-> > >             qdisc_tree_reduce_backlog(sch, -(nb - 1), -(len - prev_le=
-n));
-> > >     } else if (!skb) {
-> > > +           this_cpu_dec(netem_enqueue_depth);
-> > >             return NET_XMIT_DROP;
-> > >     }
-> > > +   this_cpu_dec(netem_enqueue_depth);
-> > >     return NET_XMIT_SUCCESS;
-> > >  }
-> > >
-> > > --
-> > > 2.51.0
-> > >
-> > >
-> >
-> > What about the last suggestion for a robust fix from [3]?
-> >
-> > Best,
-> > Will
-> >
-> > [1] https://lore.kernel.org/netdev/DISZZlS5CdbUKITzkIyT3jki3inTWSMecT6F=
-plNmkpYs9bJizbs0iwRbTGMrnqEXrL3-__IjOQxdULPdZwGdKFSXJ1DZYIj6xmWPBZxerdk=3D@=
-willsroot.io/
-> > [2] https://lore.kernel.org/netdev/q7G0Z7oMR2x9TWwNHOiPNsZ8lHzAuXuVgrZg=
-GmAgkH8lkIYyTgeqXwcDrelE_fdS9OdJ4TlfS96px6O9SvnmKigNKFkiaFlStvAGPIJ3b84=3D@=
-willsroot.io/
-> > [3] https://lore.kernel.org/netdev/20260111163947.811248-6-jhs@mojatatu=
-.com/
->
-> Thanks, this is a tight corner here, and not all solutions work out.
->
-> You're right that the per-CPU guard alone doesn't cover the
-> dequeue-to-child-enqueue path you described. That's exactly why
-> the series has two patches working together:
->
-> Patch 02 adds the per-CPU recursion guard, which handles the
-> direct enqueue recursion (rootq->enqueue duplicated packet hits
-> another netem_enqueue in the same call chain).
->
-> Patch 04 restructures netem_dequeue to eliminate the pump. The
-> old code had "goto tfifo_dequeue" which looped back after each
-> child enqueue, so packets the child duplicated back to root would
-> immediately get picked up by the same dequeue iteration. The new
-> code transfers all currently-ready packets from the tfifo to the
-> child in one batch, then does a single dequeue from the child and
-> returns. Packets that the child duplicates back to root land in
-> the tfifo but won't be processed until the next dequeue call from
-> the parent =E2=80=94 breaking the loop you diagrammed.
->
-> The original repro is:
->
->   tc qdisc add dev lo root handle 1: netem delay 1ms duplicate 100%
->   tc qdisc add dev lo parent 1:1 handle 2: netem delay 1ms duplicate 100%
->   ping -f localhost
->
-> This is covered by tdc test f2a3 (nested netem config acceptance)
-> and test 7a07 (nested netem with duplication, traffic via scapy).
-> More tests are added in the new version.
->
-> Jamal's proposed change with skb ttl would also work but
-> it was rejected because it required adding ttl field to skb
-> and skb size is a performance critical. As Cong pointed out
-> adding a couple of bits for ttl makes it increase.
-> So considered the idea and decided against it.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-It was not "rejected" - other than Cong making those claims (which i
-responded to).
-Last posting i had some feedback from Willem but i dropped the ball.
-And that variant i posted had issues which were not caught by the AI
-review - required human knowledge (it didnt consider the GRO code
-path).
-If you want to go this path - i am fine with it, I will just focus on
-the mirred loop.
-Also tell your AI to Cc the stakeholders next time it posts via
-get_maintainers (and not cc stable) - then i will be fine reviewing.
-Commit log (or cover letter) would help if you cite the "documented
-examples" you said were broken.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: use ndo_set_features to set offload features for bonding/bridge/team
 
-cheers,
-jamal
+This commit converts bonding, bridge, and team drivers to use the
+ndo_set_features callback instead of manually calling
+netdev_compute_master_upper_features() during port add/remove operations.
 
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index 90b71bd53040..2c84d3ce3b04 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
 
-> Thanks.
+[ ... ]
+
+> @@ -5953,6 +5957,7 @@ static const struct net_device_ops bond_netdev_ops = {
+>  	.ndo_add_slave		= bond_enslave,
+>  	.ndo_del_slave		= bond_release,
+>  	.ndo_fix_features	= bond_fix_features,
+> +	.ndo_set_features	= bond_set_features,
+>  	.ndo_features_check	= passthru_features_check,
+>  	.ndo_get_xmit_slave	= bond_xmit_get_slave,
+>  	.ndo_sk_get_lower_dev	= bond_sk_get_lower_dev,
+
+[ ... ]
+
+> diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+> index b7282f5c9632..4906ea3717b1 100644
+> --- a/drivers/net/team/team_core.c
+> +++ b/drivers/net/team/team_core.c
+
+[ ... ]
+
+> @@ -2007,6 +2010,7 @@ static const struct net_device_ops team_netdev_ops = {
+>  	.ndo_add_slave		= team_add_slave,
+>  	.ndo_del_slave		= team_del_slave,
+>  	.ndo_fix_features	= team_fix_features,
+> +	.ndo_set_features	= team_set_features,
+>  	.ndo_change_carrier     = team_change_carrier,
+>  	.ndo_features_check	= passthru_features_check,
+>  };
+
+[ ... ]
+
+> diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
+> index f7502e62dd35..f82082050e36 100644
+> --- a/net/bridge/br_device.c
+> +++ b/net/bridge/br_device.c
+
+[ ... ]
+
+> @@ -456,6 +462,7 @@ static const struct net_device_ops br_netdev_ops = {
+>  	.ndo_add_slave		 = br_add_slave,
+>  	.ndo_del_slave		 = br_del_slave,
+>  	.ndo_fix_features        = br_fix_features,
+> +	.ndo_set_features        = br_set_features,
+>  	.ndo_fdb_add		 = br_fdb_add,
+>  	.ndo_fdb_del		 = br_fdb_delete,
+>  	.ndo_fdb_del_bulk	 = br_fdb_delete_bulk,
+
+[ ... ]
+
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index f48dc299e4b2..16b3fc620807 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -8920,6 +8920,9 @@ static int __netdev_upper_dev_link(struct net_device *dev,
+>  	__netdev_walk_all_upper_dev(upper_dev, __netdev_update_lower_level,
+>  				    priv);
+>
+> +	/* re-compute all features after adding link */
+> +	netdev_change_features(upper_dev);
+> +
+>  	return 0;
+>
+>  rollback:
+
+Can the feature computation skip updating ancillary fields when features
+don't change?
+
+The new architecture routes computation through netdev_change_features() ->
+__netdev_update_features() -> ndo_set_features(). However,
+__netdev_update_features() has this check:
+
+net/core/dev.c:__netdev_update_features() {
+    ...
+    if (dev->features == features)
+        goto sync_lower;
+
+This skips the ndo_set_features callback entirely when computed features
+match current features. This means netdev_compute_master_upper_features() is
+never called when dev->features doesn't change, even though it updates
+several ancillary fields independent of dev->features:
+
+- vlan_features
+- hw_enc_features
+- mpls_features
+- gso_partial_features
+- tso_max_size
+- tso_max_segs
+- hard_header_len
+- needed_headroom
+- needed_tailroom
+
+For example, adding a second bond slave with identical dev->features but
+different tso_max_size or vlan_features will not trigger ndo_set_features,
+leaving the bond's ancillary fields stale.
+
+In the old code, netdev_compute_master_upper_features() was called
+unconditionally and always updated these fields regardless of whether
+dev->features changed.
+
+> @@ -9012,6 +9015,9 @@ static void __netdev_upper_dev_unlink(struct net_device *dev,
+>  	__netdev_update_lower_level(upper_dev, priv);
+>  	__netdev_walk_all_upper_dev(upper_dev, __netdev_update_lower_level,
+>  				    priv);
+> +
+> +	/* re-compute all features after removing link */
+> +	netdev_change_features(upper_dev);
+>  }
+
+The same issue applies here. When a port is removed but dev->features
+doesn't change, the ancillary fields won't be recomputed.
+
+> @@ -12874,8 +12880,6 @@ void netdev_compute_master_upper_features(struct net_device *dev, bool update_he
+>
+>  	netif_set_tso_max_segs(dev, tso_max_segs);
+>  	netif_set_tso_max_size(dev, tso_max_size);
+> -
+> -	netdev_change_features(dev);
+>  }
+>  EXPORT_SYMBOL(netdev_compute_master_upper_features);
 
