@@ -1,179 +1,193 @@
-Return-Path: <netdev+bounces-267896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267897-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GZcMJxZtmkDAwEAu9opvQ
-	(envelope-from <netdev+bounces-267896-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 08:02:52 +0100
+	id 0KLcGbN8tml0CQEAu9opvQ
+	(envelope-from <netdev+bounces-267897-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 10:32:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4CFC290206
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 08:02:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF32F290567
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 10:32:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 68A89300E482
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 07:02:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E43B301ECD3
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 09:32:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3036B2940D;
-	Sun, 15 Mar 2026 07:02:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D94123817E;
+	Sun, 15 Mar 2026 09:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b="txER8Kg9";
-	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="awfVH11H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KV2+rUr7"
 X-Original-To: netdev@vger.kernel.org
-Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A43BA21
-	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 07:02:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.202.193.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD66F7080D
+	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 09:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773558167; cv=none; b=Hlb5+6nUi+nYyz9bz0ikM4dBeYx6pz2Ucqe73gDk7fH1hGr98ouMSwRxaa0KtPT7Y2eYfnDH8WvtlBkFJC+FXZz/nawEQ7tJG4o7fRY/lJg9P8sMr9CDfrVWatBgeb+3z/Lji4Iitfg6r3PInFK2+68RZ1gDsLJlAJmhdauYYf4=
+	t=1773567152; cv=none; b=n/PUaxti9lfP3BfbY1UW+L/Em8sXa+Jcd/AgufCE33sBtz1JsqbhY3KEz58ak5YQ48P9HDhFg7Bup1jVAskb+qSF7pyGjMl8tIrHB0E2YzuegPhiAhvRt8gWLqmIGBEu3xhdy0e6poAhTgU2xArfugCqMIqHtKH2K/RW0jPbPYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773558167; c=relaxed/simple;
-	bh=TGxhI6Vk3lH7/anHLok5wN584g0vZdCgnyeMCZQDUrc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UCSqc8DfBQNLxgzUY/AwkCkyaYTMJVDzwW/KEs7sBshLVPjFkUMRRGGd/+PFh+Ap+gKAnFQvpXSjaka+xLsrNviIGF8hI49QxX2GLXdOuS9YYyHlFGQTlsnLB/h6vT1NJKzzk9YRi2tyoe9ojhEqwYOzhpnJflKXFmbn33SDjmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com; spf=pass smtp.mailfrom=tinyisr.com; dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b=txER8Kg9; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=awfVH11H; arc=none smtp.client-ip=34.202.193.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tinyisr.com
-DKIM-Signature: a=rsa-sha256; b=txER8Kg9ps/ry1599Q410NrYYw95Z75lov/Zgd1ZHXADcwPcU2+SkIasolsuloq/xZtTwFraSVpspJIpIXqYgoIib4rWbJFHG5839x01re/frDfodgJbS9RJCeeMuoM32h20jyCXpj6D0RnoFazwz+OB81yjmpsHM/woCkqiXIeB78XA2MLz57h0Aj1BqvUrkKkv1cRTQsdpHNVzhbe1kyOvocZr0NFkDFj8/+HwMuvEmOo/m+ViV0sVevAGt0DWe3Qmi87D9rtFsAbFymuIUI+KyV8XnRxCfAErEM+OceYXvx8rhDVD4HsUwcv0HLNfxsnSwZ+DemoDvit6n6ACCg==; s=purelymail2; d=tinyisr.com; v=1; bh=TGxhI6Vk3lH7/anHLok5wN584g0vZdCgnyeMCZQDUrc=; h=Received:Date:From:To:Subject;
-DKIM-Signature: a=rsa-sha256; b=awfVH11H6DLHJfVEFWCfrTborc7zC7Jy2NFwYYvhHPTVQ/XwX37XRQyEUJM5KKbDMcIUvUtUwU2JFrsb86xFziLL29hwaxC+5FCfOIEWoamaCItywL2S04Zj0DM1U22pdZqm0GOBY+kFRqqo11D32+QYC9CZVoAn5VRuZ0KLwyyJtm0O8egVPhRpgXlNjt5Z+Hf6l8QUCG4iWAxSHAXobdFVxAX+mP0I76/B745zei61GWYMnd9EsnYS6jMo6HL+EBV2Pg4LK74LX+YyBzLrKPWWdFfqqmeLSfe3+yiDLyg3kwiAbctmP/4gMecD4bwSDSNjFWVE5KBJTpUiWoyetw==; s=purelymail2; d=purelymail.com; v=1; bh=TGxhI6Vk3lH7/anHLok5wN584g0vZdCgnyeMCZQDUrc=; h=Feedback-ID:Received:Date:From:To:Subject;
-Feedback-ID: 99681:12517:null:purelymail
-X-Pm-Original-To: netdev@vger.kernel.org
-Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 1857942808;
-          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
-          Sun, 15 Mar 2026 07:02:32 +0000 (UTC)
-Date: Sun, 15 Mar 2026 09:02:25 +0200
-From: Joris =?utf-8?B?VmFpxaF2aWxh?= <joey@tinyisr.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com, 
-	kuba@kernel.org, edumazet@google.com, davem@davemloft.net, olteanv@gmail.com, 
-	Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [RFC v2 3/3] net: dsa: initial support for MT7628 embedded switch
-Message-ID: <abZTnRlDRFl2deFY@archlinux>
-References: <20260314150845.653866-1-joey@tinyisr.com>
- <20260314150845.653866-4-joey@tinyisr.com>
- <abXyKK4wxiBySHI2@makrotopia.org>
+	s=arc-20240116; t=1773567152; c=relaxed/simple;
+	bh=FmRCycyBIUbm5kiRYkD7w62G9DPkNBhPT9e3rW3AMRM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W036fKG0iV92YjlvtJaUdGYvMZcs3W/L0UoFNkxnoXulFvO6ZHK0hUWCj7YqmSijSz1+n16LPm3cM+TUJGWO1BeZV4CcZ/iSc0URKNuuPmD8gnmTG8lKPD3gWd2JbaWeL1dlO9rYr6S9rKyaHXo7ppeHOOqiADjgcNHsME18pZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KV2+rUr7; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-43b3f91a7abso173094f8f.1
+        for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 02:32:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773567149; x=1774171949; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Anp4aTpFoqEgS8zfJ6ldVdzdk7GNYjztJwdtkYgS9Jw=;
+        b=KV2+rUr7JvYMmhOfx3Agv0BZN8ogKF/qh3V5sijrN4Ws8ePnT3hXt0zRUv7S+QEruJ
+         br3ugIOF8xypsGQDYucFyCUVqP/8MCj3bIeTrrbhqEZOUrTXVv6hne5+9XIhS1W4ZrSc
+         l2uVtToiYFmssxmVtirEFij8pz1cYbnTpY4sd+sza2J0dGuQM7AaeqIeugvKDKvwfcxY
+         6lZ/bAwFuJ8eRgkBdu9/bYjBM6mISyLsOz9GG06rigWoo/sH90YIp2ndg6YSY0Lw+ds2
+         cz3IMzf/L2eJkfrlwwdqwv40T70mS2VK+5q5mLueRY3HmK0iAxVbKRQGcJ48XACk/4dW
+         Nblw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773567149; x=1774171949;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Anp4aTpFoqEgS8zfJ6ldVdzdk7GNYjztJwdtkYgS9Jw=;
+        b=B446S5JfOcyalEMtp9gxySw9fGF5LFztRATN9QzdPSUUSqiB8UoOQwg+jBo/pN4h+3
+         BdMThAdWNEvk4Cm88DLQwIwfETSzAWF/dWSsVy2ddWnlGIY9l8B+eRXHGutKRI15hmj7
+         VmbWPEuepWODL8aHrjw4+VpwApuhqK/ZW/dW3z0iXqRtg3jorOni587NRHgHy4nDGVSO
+         nyv4lSYJ69nKO/0VGsQ5QjNgCAJT4LIhPaL9qM28g7vSIf0JQ4JstlqOanslssz3VEFT
+         qd6DAATfg0H1QoRGP8hVbcfydwW2y1dzrVF0hxhaXBQWF0EIKCqTu5oDiB45vX5QfO2l
+         PWzw==
+X-Gm-Message-State: AOJu0YwnskgLSattFKFN3x8rII5cZRLp9N2G88EpvlRGV5z7hf+7G+H8
+	FQITVaMpZZlGxip5tmHU92/PSz8PUHxkAX3u50aiCJz417hsuYfQYco3
+X-Gm-Gg: ATEYQzzagldzGAirZsUbVMnTVEhDU6Wk6Ss5A+qijiwY418CQrEE/L1JaysAMKn4DiM
+	6BV0xKNdZ9B1DivNmMWJZRUkA+eGxuh1XADG9lHCDcKGs5Apx8LuRyzAaHFpj3PdZ45Z+hfgL/H
+	sZc1gP7tWuWZa+1eY3ic0ZIzwuYf9viJye4G+GqDXU5UwykET6Q4WBbmmnVok2wAORcQQJleemt
+	FMEYiiRiuwxTvYKYk2ADYVeTsGpp8XP7lF2RcTBhqfusEI1/j3yW6yWLEEIvVnhSQIwkZE3Vco6
+	lSXfKaO2KzI6gNSG8R8Rjs1TsD8UdFWcgHC3kNpGEBWUTAmqRfdjE89IB3cWFkXaMsuc6kCYAS4
+	heJ4nGTTIdIjTJHVyp2eaSswo4V0QdFvsR+L7/Phffj/wOW/WRk4Ik5caUQaNwW22W9wahClVny
+	TdoZ4PeBFxzdmwo/QTTBbTZzzIuJ4RiPF0wWpeqh591aNeicW3kTQoAz7gWaH/Ul3grmg6vgVhx
+	mwfUooso/mmn6MzsihPVWHRNigOXNB18x1tv8OKwoM/60zRdEMUNmTl8bFWM4SbkQ==
+X-Received: by 2002:a5d:588b:0:b0:439:be4b:6868 with SMTP id ffacd0b85a97d-43a04db4bddmr16701874f8f.47.1773567148874;
+        Sun, 15 Mar 2026 02:32:28 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f19:c400:5d7d:7d8b:dc1a:ae45? (p200300ea8f19c4005d7d7d8bdc1aae45.dip0.t-ipconnect.de. [2003:ea:8f19:c400:5d7d:7d8b:dc1a:ae45])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe20bd9csm32454362f8f.21.2026.03.15.02.32.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 15 Mar 2026 02:32:28 -0700 (PDT)
+Message-ID: <322ac707-cb11-4543-bd56-d9f7cce4b52f@gmail.com>
+Date: Sun, 15 Mar 2026 10:32:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <abXyKK4wxiBySHI2@makrotopia.org>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: r8169: RTL8125B restores default LEDSEL values on Link Up,
+ preventing persistent LED configuration
+To: Huan Zhao <ms.huan.zhao@gmail.com>, Chun-Hao Lin <hau@realtek.com>,
+ Javen <javen_xu@realsil.com.cn>
+Cc: netdev@vger.kernel.org
+References: <20260315014636.30074-1-ms.huan.zhao@gmail.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <20260315014636.30074-1-ms.huan.zhao@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[tinyisr.com,reject];
-	R_DKIM_ALLOW(-0.20)[tinyisr.com:s=purelymail2,purelymail.com:s=purelymail2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,davemloft.net,gmail.com,lunn.ch];
-	TAGGED_FROM(0.00)[bounces-267896-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267897-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,realtek.com,realsil.com.cn];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[tinyisr.com:+,purelymail.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joey@tinyisr.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,purelymail.com:dkim,tinyisr.com:dkim]
-X-Rspamd-Queue-Id: B4CFC290206
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AF32F290567
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 14, 2026 at 11:41:28PM +0000, Daniel Golle wrote:
-> > The switch has 5 built-in 100Mbps ports (ports 0-4) and 2x 1Gbps ports.
-> > One of the 1Gbps ports (port 6) is internally attached to the SoCs CPU
-> > MAC and serves as the CPU port. The other 1Gbps port (port 5) requires
-> > an external MAC to function.
+On 15.03.2026 02:46, Huan Zhao wrote:
+> Hardware: Beelink SER8 mini PC
+> NIC: Realtek RTL8125B (XID 0x641, RTL_GIGA_MAC_VER_63, rev 05)
+> Kernel: 6.19.6-arch1-1
+> Driver: r8169 (in-tree)
+> CONFIG_R8169_LEDS=y
+> CONFIG_LEDS_TRIGGER_NETDEV=m
 > 
-> I thought port 5 is a dead-end on MT76x8. Afaik it was only used on
-> Ralink Rt3052 for RGMII/xMII with this switch IP, and not wired to
-> any external pins nor to an internal MAC on all other SoCs which came
-> after.
-
-I assumed this was true as that's what the datasheet says, but looking
-at the pinout it really doesn't have any pins to attach an external mac.
-
-> > +	  This enables support for the switch in the MT7628 SoC.
+> Problem:
+> The RTL8125B chip restores its LEDSEL registers to hardware default values
+> on every Link Up event. The r8169 driver does not reapply the LED
+> configuration after Link Up, making it impossible to persistently configure
+> LEDs (e.g. disable them) through the standard kernel LED subsystem.
 > 
-> And potentially many others (Rt3052, Rt3050, Rt3352, Rt5350).
-> As support for the Rt5350 is present in mtk_eth_soc at least that
-> sounds like it would be worth mentioning (or even naming the driver
-> and tagger interely after rt3050 which is the origin of that IP
-> block).
-
-The RT3050 does not support all the same features the RT5350 does (which
-I believe the MT7628 is based on). The DSA tag is now set up in a way
-that only the MT7628 and potentially RT5350 can support. The DSA tag
-does not appear to be working as described in the datasheet on these
-switches and I do not have any of the ralink switches to test this on.
-I don't think it's a good idea to assert support for hardware that has
-not been tested with this.
-
-I thought it would be fitting for the driver to be called after the
-MT7628 as that would be the first supported SoC and add support for the
-ralink switches later.
-
-> > [...]
-> > +static void mt7628_phylink_get_caps(struct dsa_switch *ds, int port,
-> > +				    struct phylink_config *config)
-> > +{
-> > +	config->mac_capabilities = MAC_100 | MAC_10;
-> > +	__set_bit(PHY_INTERFACE_MODE_MII, config->supported_interfaces);
-> > +	__set_bit(PHY_INTERFACE_MODE_GMII, config->supported_interfaces);
+> Details:
 > 
-> This looks a bit wrong.
-> Aren't all 5 PHYs internal? PHY_INTERFACE_INTERNAL would be best to
-> describe them then. And doesn't the CPU port (6) connect with 1000M,
-> if so it should have MAC_1000 set as well (as neither the Ethernet
-> driver nor the DSA driver do anything to configure the interface that
-> is purely cosmetic, but still)
-
-Will fix this and coding style issues in v3.
-
-> Iff you want to support port 5 on Rt3052 (which will also require
-> setting the correct interface mode in .mac_config) I'd expect something
-> like this:
+> The Link Up path in the driver is:
 > 
-> config->mac_capabilities = MAC_100 | MAC_10;
+>   r8169_phylink_handler()       [r8169_main.c:4757]
+>     -> rtl_link_chg_patch()     [r8169_main.c:1597]
+>     -> rtl_enable_tx_lpi()
+>     -> pm_request_resume()
 > 
-> switch (port) {
-> case 0...4:
-> 	__set_bit(PHY_INTERFACE_INTERNAL, config->supported_interfaces);
-> 	break;
-> case 5:
-> 	__set_bit(PHY_INTERFACE_MODE_MII, config->supported_interfaces);
-> 	__set_bit(PHY_INTERFACE_MODE_REVMII, config->supported_interfaces);
-> 	__set_bit(PHY_INTERFACE_MODE_RMII, config->supported_interfaces);
-> 	__set_bit(PHY_INTERFACE_MODE_RGMII, config->supported_interfaces);
-> 	config->mac_capabilities |= MAC_1000;
-> 	break;
-> case 6:
-> 	__set_bit(PHY_INTERFACE_INTERNAL, config->supported_interfaces);
-> 	config->mac_capabilities |= MAC_1000;
-> 	break;
-> default:
-> 	return;
-> }
+> rtl_link_chg_patch() has no handling for RTL_GIGA_MAC_VER_63 and does not
+> touch the LEDSEL registers. Similarly, rtl_hw_start_8125b() and
+> rtl_hw_start_8125_common(), which are called on hardware initialization,
+> do not write to any LEDSEL register (LEDSEL0=0x18, LEDSEL1=0x86,
+> LEDSEL2=0x84, LEDSEL3=0x96).
 > 
-> If you don't want to deal with port 5 you should skip it here as well.
+> The only driver code that writes LEDSEL registers is rtl8125_set_led_mode()
+> in r8169_leds.c, called exclusively from the LED classdev hw_control
+> callbacks. Therefore, any LED configuration applied via sysfs is silently
+> overwritten by the hardware chip's own firmware on every Link Up event,
+> before the driver has a chance to reapply it.
+> 
+> This was verified by observing that:
+> 1. Writing 0x0000 to all LEDSEL registers (via BAR0 MMIO) before Link Up
+>    successfully turns off all LEDs.
+> 2. After Link Up completes, the LEDSEL registers revert to their hardware
+>    defaults, turning the LEDs back on.
+> 3. Writing 0x0000 to LEDSEL registers immediately after Link Up (via
+>    NetworkManager dispatcher triggered on dhcp4-change) successfully keeps
+>    the LEDs off persistently.
+> 
+> Original LEDSEL register values (hardware defaults) on this machine:
+>   LEDSEL0 (0x18) = 0x0002  (LINK_100)
+>   LEDSEL1 (0x86) = 0x0028  (LINK_2500 + LINK_1000)
+>   LEDSEL2 (0x84) = 0x022b  (ACT + LINK_2500 + LINK_1000 + LINK_100 + LINK_10)
+>   LEDSEL3 (0x96) = 0x0020  (LINK_2500)
+> 
+Thanks for the report. For preparation of a fix it would be helpful to know
+whether this behavior is specific to RTL8125B, or whether this applies
+to all chip variants supported by the driver.
+A reset to defaults after a deep power-saving state I'd understand, but
+a reset to power-up defaults on link-up sounds quirky. But maybe it's
+not power-up defaults, but link speed specific defaults.
 
-Will skip port 5 for now, due to this driver likely not working on
-RT3052 as it is anyway for the aforementioned reasons.
+Hau, Javen: As I don't have access to chip documentation, I'd appreciate
+a comment from your side. Thanks!
 
-Thanks for the review.
 
