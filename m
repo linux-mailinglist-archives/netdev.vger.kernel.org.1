@@ -1,298 +1,195 @@
-Return-Path: <netdev+bounces-267954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267955-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sACXEk/1tmnTKwEAu9opvQ
-	(envelope-from <netdev+bounces-267954-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 19:07:11 +0100
+	id aKsvH7YHt2kALwEAu9opvQ
+	(envelope-from <netdev+bounces-267955-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 20:25:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6E4D291DCE
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 19:07:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8546292391
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 20:25:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D56093013783
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 18:07:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0EAE930053A6
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 19:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64304379EF0;
-	Sun, 15 Mar 2026 18:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3CE37AA88;
+	Sun, 15 Mar 2026 19:25:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BrrQ4neL"
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="K7Fry/mE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11020093.outbound.protection.outlook.com [52.101.69.93])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3BFA377EC3
-	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 18:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773598023; cv=none; b=BwoLDkbMkJPDu2zNc4lWDLWouw7jV22lKf4pfhmhfQrWra8aDbJBhFI7HXPSghr31j77VqEu/4oZWnRcVKZYz1WOb5luJI7P6S8+UxM3cGhcrUulFEIfAKV6vXEg7ulZ6KYr2ZAFbJCrmyc8/L5/YyRfWPmyNQwBTAbHykSD5f0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773598023; c=relaxed/simple;
-	bh=BftRfJXzfFqfC2FLieEMDANX6gygF20kTbh21b0YpAg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A8C1z2l7XKWrWwdUKIvwF/8hTcvZtTj2crAGZLZcB2vBoANX5sOF1HSF9KT+s3R3l30T3pcM0W99ziJ570NckErxG5CJyfSvK9/4bHQp9AGZORfavGYghxCS+RD/GD/hyljO8wchTg+MPX0kdCXDknKumBnRZ64DI4RRVr9WW6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BrrQ4neL; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4853c1ca73aso30766555e9.2
-        for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 11:07:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773598020; x=1774202820; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ql/34LxpYRTd6r967aMLxyZ9vnvzKJ6h/Q1dOJk0pTE=;
-        b=BrrQ4neL2JnbkJxi/37p4v3qRyNBxbNyIUlLv3n1OmXLLpGoJmcWAJfUmNaorfcrdi
-         /ZqCiETo6lRjRY2o3c/YbE9uwu6xJZh1jWuAQXhUT3NNrnbfk3XTRUTdWVS9YRRC9V8V
-         aek4WKTfpL6bJYlavJQI7ED1uHE9mqllJAV2Xt/4nhpBV8PWjJUavBaZCCJQhnJtE5Gz
-         lv2T6s0jDS4N2sOVsY9IjwtVJjuv9rnFEul8YUtFZ1sl4zVvEzHa4FKfQzn6eXnRXIfv
-         H9SxAb5qPvLqEpKgK7S7l7jL6NN2EP4Pa/VbiojpkrwnQ1ajjJShG+uUCNUvD977/aeP
-         vfnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773598020; x=1774202820;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ql/34LxpYRTd6r967aMLxyZ9vnvzKJ6h/Q1dOJk0pTE=;
-        b=FB7JPgWqlesMOK6u216nDWoR6zi1EB9RVNYovvlZJ0jKFsoH21VsU7h8azMtYRCqi/
-         EG4eFCfcJVi39TbNXOb00+j1hd5RdC4O7xFiXbwUga37/kFM1nXpBZpn5Nkt6Rtk+ntM
-         RidYh/wdxCpIaYXVyVJyL5/vfGJsvUfvPlKB4vRSKhNsDL+oR+zIHKA5knrnCXIIYGvu
-         qQCOZqMP3leyPBUo0K+xgzMmPA1NH7Cx49qTAYefAGDnSP+RV9CcQjRtfCZhAs3cXLeW
-         NkCUntu/5YZuAioFogXGzompO1WiILTDrhqzjFJwVtRJ+JCKgNsMpytLoeOcc+zoeSm5
-         wgcg==
-X-Gm-Message-State: AOJu0YwYzgUAMtGZLlziD7vEirMOjtJC35YKs8Lbm/ca9K4BgKC5YeLX
-	olQZd7Dr1ogaZFL4hcfi2zYProQeZyZKKz025ZJ5Yr5nWXTMpQ5Jzj0cotMfJw==
-X-Gm-Gg: ATEYQzy49s5zebNTd4AHLOv+yPWpg29BLPfAQTYMUrQqvBghQovy8cruSCkgQsS4Mlp
-	x+97ZusMZAiwS2mc39WOrZ3jLvzec+rLBX8OOnORZxxXv6oDoBcBpNox9HmLpK6yMf1wOwMu7oW
-	vlo4NFUM/KxISr2wRG6kM3GdBcVtjonhHIcUKdyYH8s8xVE2oP7cMLLB240XcUEjHPrge6Sbu63
-	laU5HMoW2uivqtjejc9BiT+0k3W28J0in5xVr5caOXeLPzpnImEH5AaJo6nimz79ZCUa8z0yuEx
-	Y7VB3g+OjAkgQL4+1TuN6uFkZAEdMuXZDWfs+PPRCeOvefQ8QH8lhs+3iVBJOGpq0OwZXUPuj+E
-	3ofvy4UM85+Dg4+z86GOsNleLHaRZa9FldHrxifeeQVEI2XyNBXzzI89nZq/YltLXwCGe5LuABd
-	RePbXs+n1CBIU+PnwCHjkVxj0nvVyN7pnAtdsGV2NgVhPPy3aAKfrdmlA8Fj/Nf9La5otDlCLfM
-	x0MQDSFaW1u9HepdMlIJJguuH3CENDTh5TSONle+OGQ9PdguE2lVIh1lebmhU4LLg==
-X-Received: by 2002:a05:600c:8b2c:b0:485:3f65:94a1 with SMTP id 5b1f17b1804b1-48556714b4dmr179867695e9.18.1773598019683;
-        Sun, 15 Mar 2026 11:06:59 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f19:c400:5d7d:7d8b:dc1a:ae45? (p200300ea8f19c4005d7d7d8bdc1aae45.dip0.t-ipconnect.de. [2003:ea:8f19:c400:5d7d:7d8b:dc1a:ae45])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48557c7220dsm71062035e9.30.2026.03.15.11.06.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 15 Mar 2026 11:06:59 -0700 (PDT)
-Message-ID: <67e97f82-1539-4334-8c95-df6b2f01e769@gmail.com>
-Date: Sun, 15 Mar 2026 19:06:58 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FC21A073F;
+	Sun, 15 Mar 2026 19:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.93
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773602738; cv=fail; b=SyciT3GmnpyV5lE/hdlgysp9oHeU88nkNPxCCHPEFv7MUxmKb4ukw/JimDcaB2QR0KBAbLHS/Xp0AAan3wHSTq4iMjPxMvb73rGUnS8gTEyKbfoFohh51asDZDt0FaFm6g2LQ0ZSWpmowKsfNLSwcpdHINfhPRkot1a8HfzvzIU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773602738; c=relaxed/simple;
+	bh=Y0+3lvUf5L4DwI4XmtSXwj5/a+lLNKr2HJZh/e0/Lwk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=noK8vI8V3FpoX2tu50oV/qN5NZ70RNm3djNuvtDKCRrMf8AZA02g8Y6Sx9rJvcAawQskhciW+uWNW32gBlDMjqmQvzlb7aka75hp+Mv4HG5mt/s4I+Ar1xLYuT1XY+V+8l7YX7Rhy3PeS+ZicV6KsspvGQQDlhqqq6GGDG+xacc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=K7Fry/mE; arc=fail smtp.client-ip=52.101.69.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rPpZKCSKR9lQWxeG/nY6NwRtqLCJ4fflcoJg1yo9inNpchpsTpQ5k6CqKzOOpNpiqvJ06vlFFpqcvSjNNQwABG3A5YGDefc/JRyUfg1REPP/k8jHG4Bk7u8y2/kYscqoW8Y2mAfqkt0K2vqaAYbwcPIyZEEBx6NiTF897eDYIBVIS/Vce5yTTyiE6MsJfWHDIbixYP1QwynmhgozWv4RimQXensLRNt/NNXIeal053+NnZ80NKk1T5+C2GEe6RyrzAyL61ytxeg3x/QMTWiVHxJhxaqx/dbD/mQHtIJSdtqquayPplrY+H7yhPUPVsbFw6+eMM4+Y0R61aKTJ1xFaQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bCeSyObV25oPF47N4W+zkBLe/LQx+ZH31BuxPu8eCW0=;
+ b=RLh/CXlU+1SPY+cRtfUQoOEF/LCqVdo+lUDPxuVU4q7K/nGfA79M3gSREHBKBv6CQb7gCy2QbxrYh1bRHRK0zu5+yJDHYV8vi8bETujB3ynjMvqGwKXx4xVHRpNMctp9PRG7cdOKdNCUiGJR/52NZqlH7Q7m1oZTZfzAPXYYP/iIHwEzepMOya3ysq2qpK6Oj/8DpTWwhrAx0HMl3OKGRjM31W+7xUXAFtE1yLMjtNtiUjsYA58gsfUlyOB0lh8jC60rGa20jaJJIX8zyWfJKs3aSP7AmbFtcIOAf9n475Sm/f7i705mvxRuqyYKwNBv7Llgmf6kokqBDxO+lKL+gw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bCeSyObV25oPF47N4W+zkBLe/LQx+ZH31BuxPu8eCW0=;
+ b=K7Fry/mEyzEeFqcPAN/gfHfRk225WvxYCBTDw0KGXP9W67q0dZZXh5okkxAeJtLlYDsaPZcU4xtniXwCnh5moFaIhlSBEtCtowYTOim86qiwdSYTKsP6KOwnqbXqgSSdpLlX86FHYdYLM5DL5alRQMH+CWVMUbRdOUAv8TXtQzbS756oWgE5lX8Cd/z+CfncsQykk/RR+ikq2JV6uVGbdb+ZVi71gwbNUaLO3FfIHrLv2xMVr6mBsul8aDcXvK5IE5kGii5/16kmFouWmWcg7i/d9Lbn7k1+DYDl45udxqT/ITDF72RqfbqjPnj3hPVCcH8nElJ+s4vX+4Q84PK6fQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM8PR08MB6355.eurprd08.prod.outlook.com (2603:10a6:20b:363::24)
+ by PAXPR08MB7319.eurprd08.prod.outlook.com (2603:10a6:102:220::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.24; Sun, 15 Mar
+ 2026 19:25:33 +0000
+Received: from AM8PR08MB6355.eurprd08.prod.outlook.com
+ ([fe80::79bf:15ff:6428:dea9]) by AM8PR08MB6355.eurprd08.prod.outlook.com
+ ([fe80::79bf:15ff:6428:dea9%4]) with mapi id 15.20.9700.021; Sun, 15 Mar 2026
+ 19:25:33 +0000
+Message-ID: <dd1f8981-b8ad-4a4d-b6c8-3333fb05c93b@virtuozzo.com>
+Date: Sun, 15 Mar 2026 20:25:31 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4 3/5] selftests: net: rename pmtu.sh to pmtu-test.sh
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Aaron Conole <aconole@redhat.com>, Ilya Maximets <imaximet@redhat.com>,
+ Eelco Chaudron <echaudro@redhat.com>, Stefano Brivio <sbrivio@redhat.com>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, dev@openvswitch.org
+References: <20260309152013.565216-1-aleksey.oladko@virtuozzo.com>
+ <20260309152013.565216-4-aleksey.oladko@virtuozzo.com>
+ <20260311201057.049950d1@kernel.org>
+Content-Language: en-US
+From: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+In-Reply-To: <20260311201057.049950d1@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZR0P278CA0140.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:40::19) To AM8PR08MB6355.eurprd08.prod.outlook.com
+ (2603:10a6:20b:363::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: r8169: RTL8125B restores default LEDSEL values on Link Up,
- preventing persistent LED configuration
-To: Huan Zhao <ms.huan.zhao@gmail.com>
-Cc: netdev@vger.kernel.org
-References: <20260315014636.30074-1-ms.huan.zhao@gmail.com>
- <b2f4f1e3-f542-4394-93a3-9023b705e676@gmail.com>
- <abbs0Zp-HeOaC_69@ser8.localdomain>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <abbs0Zp-HeOaC_69@ser8.localdomain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR08MB6355:EE_|PAXPR08MB7319:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3bd52146-5419-43cc-82f1-08de82c8a0bb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|22082099003|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	RCO1bljwtzUxoMs3u/NKETg89G+5CdxFrH6/S8LKZpSDEPQ6t50Uz0e+Am4mrMCqmfRbXwjcKzzZddK959obQVGIs58GO52bHCzKiCC7DnneoG/MijtQW4d7YDRxHOfNoBoshfqLmr+4e/IG5MkwULP25JQWiCE+PQ18yuI5BvaU61n5uSR1ePLv1Lr8RPWz4V3CpoXxsPaxwpmAFqMQ2s6NNAIh40nHssQiFQtjjfVcXjiw2z1K+kjlD5nyQQ6QEtnMXVaWm3AdMjrslbIC27JYImgEf2jsv+cL3mLZmEY/dnWxbgbxdRTGWGlTUoXQC7BnpF76KAINvNFlhqwgcnMraoabMMuyyMwodaE4D/VaRfJCyLWYp4xE0SEvcLgmFl1ekTve2XoZOJ5tdWcpShvSMtNZyyt02SeIltYlnscYSiPFFwWTQKRxq/R0NUQsWSQhYj9THVFT7/16mQtprH+CJgPBujNDco6+8njCjV0YG0HlEc8p1zZ+2XNm1imuDo/sUklHvPxSTemPZfLSvzJTIj2sHegJ5bXL8p/sBsr8cLoX6jbUGq/p6M4rH6Ajakd5xVinkf/n48FU5fw4H1THlhYb0o16/eytOfcV190NcD84qL42TLzw7DikaKWcLM/jun2FytUT0HV5Jnv8/Tfc1gnh02bLDoH4r1xLfvq8mN64KeUGbvORTCHVJNY3HexXJVa9FBgu7sjTcw+3ZatZ7glxU6HNZHw5JMinolQ=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR08MB6355.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aFVYeUNCMlJ1WGpLNFowWEsyZXUzMVdkN1N5bDc1V2o2b2JBY2p2M0V2SUR4?=
+ =?utf-8?B?dGNXNkVOczBjZGRXcG82Z0RkLzRDa0VxMnVDN3lxQXUra3ZWbHB2R1VlTEt1?=
+ =?utf-8?B?bGxUTWVJSis4TW5TR1gvQXJGSjVKdWY2RXZ1VW9wa1JmM0YzVWw0M1pxRmlY?=
+ =?utf-8?B?b1Jya0YwdGZBdUJzYnc1MVNkMzBULzVtdGs5cXlyNUZvbG9ZbEltYTdRaWRx?=
+ =?utf-8?B?QWtYbG5Nbm5nSG5yOUhnN2dNOVJMNzBOaVFIWVFSdEdYLzNPMnlKdElKeXdh?=
+ =?utf-8?B?bklFbkFVUW1WZXpwRWdXN0tkbnFidmNkUFY3cTlwMXo3UHFZRmJ3Rms2NDhz?=
+ =?utf-8?B?ZmNnYldSZytGVDlQdVZwREJSWW1wUlhPdkRPdk9UVEptTXZLMzVWYUVkV3Zs?=
+ =?utf-8?B?TXhMQmhvdUZDYmlqRXI3VHJHR1ZHZklWcVI4aFhzSFJGa3RhZE8weUU5QXNH?=
+ =?utf-8?B?VUlHc1NUZkxXQjRUK2M4b1M4U3hFOGpCUGJ1bGJlc3FiMHllYlNselFRSFla?=
+ =?utf-8?B?N3hNRkYrelhrNEZkbFlWOXNVR1hqc3JPZXp6TWxMNUx3YzNWK3dlMlptbVd1?=
+ =?utf-8?B?QUFldkRDUklCVzFGeEdOSnZBSEtVSUJXMm13WEs0dXRkejkxaTlEdHZlbzVi?=
+ =?utf-8?B?ZlZaTU5yNW5ZWWgySWQ0MmNJUEN0NU9NME9XNUxyMytFZUlKb0lOaHNjRE9q?=
+ =?utf-8?B?TXlmdmMraHNVYm43clBQREZaQTNMV1hmSmwxQ1VYRDh5KzZKN1lEOFJHUnRt?=
+ =?utf-8?B?NGhwMWU5Z0pkdGJXa3BhK2xWa0w2OUhnbVlBVWZMbzhLZ0p3RWtsNFUwRzdr?=
+ =?utf-8?B?NlN2MENKbU1BckUzcjc3MlM5TWZVeW9IeVJiRmFxZ3Q4NkpZNnBBRHpnZkpu?=
+ =?utf-8?B?M0FPUTBwbkcwT0l3WFpYZ1JVSkxOaklESFNrenozU0Jld1phQWNPSWNGN1VB?=
+ =?utf-8?B?bXp5MkpqNHh5bUx0eFUrVEhYczkzdklSbUxDWUhZNG12ZXg2cnJFeVIzZ05J?=
+ =?utf-8?B?cDJNckhtbUg5a3lxOEJjbjFuNThyaFdSc3VLbU1yOUk0VjkveEg3MkprZ3cw?=
+ =?utf-8?B?NTRVdWZKODcrVDlWSjRaRVp3VFI4SmpJcGNxd2ZFeWU4ZzJWV05tVnRNSVpX?=
+ =?utf-8?B?ZjV3ZnRCUXZ0SGwxZkk3My9OUjVJaDJickxPMFVRd0tmV0x4MmFsdG5rZVgy?=
+ =?utf-8?B?TG52VFVSSTVQYVpsaHEydHJ5WlBGd0VKa2U4TDZVSUdGeWJ4UlhiL1hCSWE2?=
+ =?utf-8?B?TVk3UWVsY2lYMEpic3FpNWVIbTdDWHAzMm5sMFhtUkl1SG9kU3NZa1NOejYx?=
+ =?utf-8?B?Vm1DMGpQSjFHVjFJZUNLWGdMS05XdkxiZnJ6dHFKNTAvVFZqbWpXTUprQ2hx?=
+ =?utf-8?B?QUlHVmg3aWFJTVFQaUVhQVpmSDRKMVArVStmYURSOWJDR0hsQ3l2MStJOUl5?=
+ =?utf-8?B?MEp0SXFMblZ1ZjkrV2MzeEhRNE9sZ1E2OE9oNENkWFgwbHdwc0svbXNiUUxP?=
+ =?utf-8?B?ZGx2TnlvOEJPZ3luYW1PUEJwNEdZeHdMTWtISkhkdEQxbmt3ZnRrdnFRVU9W?=
+ =?utf-8?B?bkdpQnVUNlhZZHhyWEF4NUtVTmVjNGo5VHVKdjFIaVFtYUgvRHV3ZzR5Sm9l?=
+ =?utf-8?B?QzJ5V05QNDRrVGppUE9CLzZid1VzcTFoOW5zUEVCN04rWDBFTjZrb0s2OXg3?=
+ =?utf-8?B?ajAwSVViaWNPajhYak9EczhwNnhrMnUrVDJsempmbTVVT1JHYlpZU2NyZjM0?=
+ =?utf-8?B?dG4yZHdOeDZhU0N1Q1hITk1MamNXZ3VSaVFFdEpFN3pDRVRUazU1T08zK1Z6?=
+ =?utf-8?B?V2tvck9JWmxrV1ZXM1A5NXd2eUtzN25icXVFcEtoV2x0aXdxcmlyVGZhQU1W?=
+ =?utf-8?B?NkRhaXVqQ0JhdVkwUHh6ZWxLRDlTZXlPemRSdWJENzB1U0ptUDdRQkR3Q3pw?=
+ =?utf-8?B?SFBtdnFrdVdiQ2dqaWxyWTdaWlcrbWRTOGxCb3diNzVlOFh2M2tmb01ES0Iw?=
+ =?utf-8?B?T0FSYjJWRE5uWFB6N2pzL1pVTis3dkltVWVNVlg0ZjJ1MzlyK0JiTnY3elRT?=
+ =?utf-8?B?SWxZc3Y0UjRiTCtxTnJ1L2dubVh4VXB3ekhqczkxU2x6SEhkbUUwbHM3aFBk?=
+ =?utf-8?B?cE84RE9aUzlXYjQ5dTJkTzF0dDBqOVZhNnpxVUl6TUlLY3dlL0JxNDMyWlk1?=
+ =?utf-8?B?ZzUyaExEZkZ3NUxqQkNiSmtHdjRpOXcyOExkbktDa1cybDByUVdsc0dnRWI2?=
+ =?utf-8?B?dU9BbHBaWVJBVWU4bk50RWg1NjFzNnVLalQzSWVDU3VZVkNmYkU1OEM1N3B1?=
+ =?utf-8?B?TTBNNFRXUm1STmVPM2JEVzdnMjdPbVJ4TlljSzRjbnpEOG5zSkI3bStGamF5?=
+ =?utf-8?Q?vI0jjOGNC6Fvs0WQ=3D?=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3bd52146-5419-43cc-82f1-08de82c8a0bb
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR08MB6355.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Mar 2026 19:25:33.6134
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +4hYT8ExQlRVqJMiUH1L3PrvWNChIdjNf4YFx0WsSB5twQw9vLC+HlgqtvFUTfkG05xTd0WpfYhZUTRafoNSYfY92nxBoze2jK3dnKsBTp4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR08MB7319
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267954-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267955-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[virtuozzo.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[aleksey.oladko@virtuozzo.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A6E4D291DCE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[virtuozzo.com:dkim,virtuozzo.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,pmtu-test.sh:url]
+X-Rspamd-Queue-Id: C8546292391
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 15.03.2026 18:41, Huan Zhao wrote:
-> You are correct. I apologize for the incorrect analysis in my previous
-> email. Further testing has clarified the actual behavior.
-> 
-> Summary of findings after additional testing:
-> 
-> 1. The LEDSEL registers do NOT reset on Link Up.
-> 
->    After writing 0x0000 to all LEDSEL registers via BAR0 MMIO and
->    triggering multiple Link Up/Down cycles, the registers retained
->    their zero values throughout. The hardware does not restore any
->    defaults on link state changes.
-> 
-> 2. The real problem is CONFIG_LEDS_TRIGGER_NETDEV=m on Arch Linux.
-> 
->    As you clarified, the LED classdev registers successfully without
->    ledtrig_netdev present — just without a trigger assigned. However,
->    the link_* sysfs files (link_100, link_2500, etc.) do not appear
->    until the netdev trigger is explicitly assigned. Without these
->    files, there is no way to configure the LED modes through the
->    standard interface.
-> 
->    The workaround is to ensure ledtrig_netdev loads before r8169
->    via /etc/modules-load.d/.
+In v2 
+(https://lore.kernel.org/linux-kselftest/f7t1pj9v8h7.fsf@redhat.com/T/#m80f10ade0ba8963ac6b09b8aba07163cb3e4cf59), 
+I was asked to rename the main script for tracking purposes. Should I 
+proceed with this setup?
 
-The netdev trigger module can be loaded also after r8169, and then
-be assigned as trigger.
-
-> 
-> 3. Persistent LED disable works correctly via the standard interface.
-> 
->    With ledtrig_netdev loaded before r8169, the following sequence
->    successfully and persistently disables all LEDs:
-> 
->      echo netdev > /sys/class/leds/enp2s0-N::lan/trigger
-
-How is it if you add a small delay here? I'd have check whether
-assigning a trigger is fully synchronous.
-
->      echo 0 > /sys/class/leds/enp2s0-N::lan/link_10
->      echo 0 > /sys/class/leds/enp2s0-N::lan/link_100
->      echo 0 > /sys/class/leds/enp2s0-N::lan/link_1000
->      echo 0 > /sys/class/leds/enp2s0-N::lan/link_2500
->      echo 0 > /sys/class/leds/enp2s0-N::lan/tx
->      echo 0 > /sys/class/leds/enp2s0-N::lan/rx
-> 
->    This survives Link Up/Down cycles and network cable
->    insertion/removal without any further intervention.
-> 
->    This is implemented as a systemd oneshot service running after
->    network.target, at which point all link_* files are immediately
->    writable with no waiting required.
-> 
-> 4. Remaining question: udev timing issue.
-> 
->    When the same script runs from a udev RUN rule (triggered on
->    ACTION=="move" for the network interface rename), the link_*
->    files are not yet writable at that point, even after
->    trigger=netdev is set. The files only become writable after
->    a delay of up to several seconds. Is there a reliable udev
->    event or sysfs condition that indicates hw_control is fully
->    ready for writing?
-> 
-> Thanks,
-> Huan Zhao
-> 
-> On Sun, Mar 15, 2026 at 02:55:17PM +0100, Heiner Kallweit wrote:
->> On 15.03.2026 02:46, Huan Zhao wrote:
->>> Hardware: Beelink SER8 mini PC
->>> NIC: Realtek RTL8125B (XID 0x641, RTL_GIGA_MAC_VER_63, rev 05)
->>> Kernel: 6.19.6-arch1-1
->>> Driver: r8169 (in-tree)
->>> CONFIG_R8169_LEDS=y
->>> CONFIG_LEDS_TRIGGER_NETDEV=m
->>>
->>> Problem:
->>> The RTL8125B chip restores its LEDSEL registers to hardware default values
->>> on every Link Up event. The r8169 driver does not reapply the LED
->>> configuration after Link Up, making it impossible to persistently configure
->>> LEDs (e.g. disable them) through the standard kernel LED subsystem.
->>>
->>> Details:
->>>
->>> The Link Up path in the driver is:
->>>
->>>   r8169_phylink_handler()       [r8169_main.c:4757]
->>>     -> rtl_link_chg_patch()     [r8169_main.c:1597]
->>>     -> rtl_enable_tx_lpi()
->>>     -> pm_request_resume()
->>>
->>> rtl_link_chg_patch() has no handling for RTL_GIGA_MAC_VER_63 and does not
->>> touch the LEDSEL registers. Similarly, rtl_hw_start_8125b() and
->>> rtl_hw_start_8125_common(), which are called on hardware initialization,
->>> do not write to any LEDSEL register (LEDSEL0=0x18, LEDSEL1=0x86,
->>> LEDSEL2=0x84, LEDSEL3=0x96).
->>>
->>> The only driver code that writes LEDSEL registers is rtl8125_set_led_mode()
->>> in r8169_leds.c, called exclusively from the LED classdev hw_control
->>> callbacks. Therefore, any LED configuration applied via sysfs is silently
->>> overwritten by the hardware chip's own firmware on every Link Up event,
->>> before the driver has a chance to reapply it.
->>>
->>> This was verified by observing that:
->>> 1. Writing 0x0000 to all LEDSEL registers (via BAR0 MMIO) before Link Up
->>>    successfully turns off all LEDs.
->>> 2. After Link Up completes, the LEDSEL registers revert to their hardware
->>>    defaults, turning the LEDs back on.
->>> 3. Writing 0x0000 to LEDSEL registers immediately after Link Up (via
->>>    NetworkManager dispatcher triggered on dhcp4-change) successfully keeps
->>>    the LEDs off persistently.
->>>
->>> Original LEDSEL register values (hardware defaults) on this machine:
->>>   LEDSEL0 (0x18) = 0x0002  (LINK_100)
->>>   LEDSEL1 (0x86) = 0x0028  (LINK_2500 + LINK_1000)
->>>   LEDSEL2 (0x84) = 0x022b  (ACT + LINK_2500 + LINK_1000 + LINK_100 + LINK_10)
->>>   LEDSEL3 (0x96) = 0x0020  (LINK_2500)
->>>
->>> Secondary issue: CONFIG_LEDS_TRIGGER_NETDEV=m causes silent failure
->>>
->>> On Arch Linux, CONFIG_LEDS_TRIGGER_NETDEV=m (module, not built-in).
->>> The r8169 driver uses /* ignore errors */ when calling
->>> led_classdev_register() in rtl8125_setup_led_ldev(). If ledtrig_netdev
->>> is not loaded when r8169 initializes, the registration fails silently.
->>
->> No, it doesn't fail. Just that no trigger is assigned by default.
->> Once you load ledtrig-netdev module and assign netdev trigger to
->> the LED, you can control LED hw modes.
->>
->>
->>> The result is that /sys/class/leds/enp2s0-* entries appear to exist but
->>> are dummy stubs with no hardware control capability. Writing to their
->>> trigger or brightness attributes has no effect on the physical LEDs.
->>>
->> Setting brightness manually isn't supported by HW.
->>
->>> This was verified by manually loading ledtrig_netdev before r8169, which
->>> resulted in functional LED classdev entries. The fix was to add
->>> ledtrig_netdev to /etc/modules-load.d/ to ensure it loads before r8169.
->>>
->>> However, even with ledtrig_netdev loaded correctly and offloaded=1
->>> confirmed, the LED configuration is still lost on every Link Up due to
->>> the hardware reset described above.
->>>
->>> Suggested fix:
->>>
->>> In r8169_phylink_handler(), after Link Up is confirmed, reapply the
->>> current LED configuration by notifying the LED classdevs. For example:
->>>
->>>   if (netif_carrier_ok(ndev)) {
->>>       rtl_link_chg_patch(tp);
->>>       rtl_enable_tx_lpi(tp, tp->phydev->enable_tx_lpi);
->>>       /* Reapply LED configuration after hardware resets LEDSEL on Link Up */
->>>       if (tp->leds)
->>>           led_classdev_notify_clients(tp->leds);  /* or equivalent */
->>>       pm_request_resume(d);
->>>   }
->>>
->>> The exact mechanism for reapplying the LED configuration (whether through
->>> the LED classdev framework or by directly re-calling rtl8125_set_led_mode()
->>> with saved values) is left to your discretion.
->>>
->>> Thanks,
->>> Huan Zhao
->>
-
+On 3/12/26 4:10 AM, Jakub Kicinski wrote:
+> On Mon,  9 Mar 2026 15:20:11 +0000 Aleksei Oladko wrote:
+>> Rename the pmtu.sh test script to pmtu-test.sh. No functional
+>> changes are made, only the file name is updated.
+> Please try to fix the test ?
 
