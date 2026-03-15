@@ -1,124 +1,341 @@
-Return-Path: <netdev+bounces-267930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267931-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4NRzBEratmnfJgEAu9opvQ
-	(envelope-from <netdev+bounces-267930-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:11:54 +0100
+	id iM6sLiPctmkQJwEAu9opvQ
+	(envelope-from <netdev+bounces-267931-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:19:47 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 675A229159A
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:11:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22F932915F5
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:19:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D51CC302617C
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:11:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5B8FA303674A
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A305371869;
-	Sun, 15 Mar 2026 16:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6732F36C584;
+	Sun, 15 Mar 2026 16:19:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N3Mm/T6g"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="jff+/rka"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D97366546;
-	Sun, 15 Mar 2026 16:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773591110; cv=none; b=EbMbyQ/etrpKKrq6Yb45lauWbn+3/UMFOB8NW9qOoaj6QBcEG2cVbVPb5B3LiaAxT+8F/uZPR+Yr7mxX4NeoO/z3pfcfXpEzq2KgdXZKNm9Y86znCwg0ZtahSBpYFUOKmp7hcxqaHJZhfGrIXeIuwUomagzlq/S/ZEuk8f2+Ti8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773591110; c=relaxed/simple;
-	bh=ysGCy3hRZ0k9cAzYYMnSd2CSwEnVozMuThlxlhsUDm8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U2qepmCS+eGzCbNvbspHMz6dnH5ZpgAaixFJ99XASzjy6jbZLS88idhdF8G5c6edwlb8P2bAlPRUrm/c2uU20eD/qpaFJ9yZtOHBn9pTq9PSVeCQSn15pVkQsF69MwPH8w76vb8G1AF3jJhKvetaycmKtwuVDBd7xQnRigUovN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N3Mm/T6g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48962C4CEF7;
-	Sun, 15 Mar 2026 16:11:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773591110;
-	bh=ysGCy3hRZ0k9cAzYYMnSd2CSwEnVozMuThlxlhsUDm8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N3Mm/T6gJRYibqZqBNZ9YIx1+/oFvQxBnOlBL7Ry6RpGLwocK8vPcKRx5St0EZqw6
-	 3W5kfYyBqXsPwDpjCD+qPX/zb1D452Lqiroy/9h13YUVQcDyFPagZguYwrVvmYiMSU
-	 tuFCtW+2bKNP5So1fj0i/tse5owRoIkW5s5kOSqKuTTKDRd3t4A6fejohvD1QWsEDk
-	 tqqDmnsdggfRA7Zur140Z/pRjnWhRbtRiMxrKn4pcbxu+kCl9vOJ1qMCFftp2O4QUC
-	 2Swz9g+b1pwQWsFzYooiCVIFzt9IcQxBVGN/mrOMMZbA4vwrMrkW1noH/btEcv6QbK
-	 YO+S5TZAcMYkw==
-Date: Sun, 15 Mar 2026 16:11:46 +0000
-From: Simon Horman <horms@kernel.org>
-To: Haiyang Zhang <haiyangz@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	haiyangz@microsoft.com, paulros@microsoft.com
-Subject: Re: [PATCH net-next v5 0/3] add ethtool COALESCE_RX_CQE_FRAMES/NSECS
- and use it in MANA driver
-Message-ID: <20260315161146.GA1369074@kernel.org>
-References: <20260312193725.994833-1-haiyangz@linux.microsoft.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FF6371D02
+	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 16:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773591557; cv=pass; b=deMD4ndCqza5mdC0oyoSeeIuOr/wSarWtCoQAolUgV050vqyX6IGlIaCPd5vruMJKJRYbSSXhytSqQ4Piwoom5wtY7WgdHD0DbALFvJ3uBgS6BRLSOCziljhp4QFjSR1fBCYdpTw/XxqCNuXaB8guU63P4byZcJ8GUhQ54vpfvw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773591557; c=relaxed/simple;
+	bh=g4CAao8ZqmqtdUy+SgdyMkVPd3ywREDYdYWdkUz51Ao=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OhegusLWfIs0Zz+GMMZBW9mZwudra+RxP1JgeH7a0XgMUMJ/s1g/PM7lR2daGHiDGW5hWAIFoLxW0bAQqwAf8hoemPlLMzOiSmwLeUpszsg4kdTSY31qIRiPsJVrWIQKy4sm0qX0hXxWTzULBVoT6bb9idd0rhGk+rvPFyYKuyU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=jff+/rka; arc=pass smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-829781b2b01so2367358b3a.2
+        for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 09:19:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773591553; cv=none;
+        d=google.com; s=arc-20240605;
+        b=QHCE4GWSdaExsTMtE9oDDcPC12eK0Zx4qpCHhuCpnyflzdxYrvZEk2X8B9q+aTWC9f
+         71Umobh5BrVgs2eXWTO90UIAJEkuFoKholq5AYHdOiLtmWCZh4dz+v3gmyJvvwGrCK92
+         YV8talOMJs3EoG1/x+9KGYZlTFumplLqMQisCTkTyGqdnpMS4xit8UsvuIfe4YwL3mYN
+         RYeuK43jhMB2UbannqTooVtF9NDuGpqWU6Te6WqYZskKUd/NpXdds9IGpkOtoKN0oggp
+         qUYaF0QerIuo43v9XMfaxmNsiYdeTonnTuJKa8ueAPM9x1Teq8ZfckMw/2TUzR7DZgRD
+         JERw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=7EulIjs457FDWkH8ubZ5UiSY4G2+TWHJgcekVUzvkrM=;
+        fh=hUdb059ur6kStDEgsTEH5ASFT4GLOjpx2uAlVODnNQ8=;
+        b=MYAnYPGthQ9nC9ljBaHkU+a1IS0ag7+5XlxC4+qOXtejLB/rD52dasdww9MQJpYz6g
+         5KN5yIN36ro4fmCwLzBRJCCa/VX53d4o7Q1ZfHs2zCx/QoUtP5E5O1iuSWqGAgZqmbf4
+         RSRK6/11V3vLHvEs3G0RSxeKd806UDfs3m0Zk54LaB5bA8PakimrRYShdiNKCyXLyN2p
+         nkCKvhcLC1Y10kv5sugsLSyzvdYo1Egsc3mEdJDvonZnXOBb8E8xUNOA1vCrivm3nrJB
+         uQfN9ERna6eXEHFgqdF4c+Rg8ECXIYj9z1s+51JzI5HPU6Flcv/3Dqvq0Cj6SUQzm9kj
+         dpmA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1773591553; x=1774196353; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7EulIjs457FDWkH8ubZ5UiSY4G2+TWHJgcekVUzvkrM=;
+        b=jff+/rkaOcGtqnXwBzjKgIbY+vfsrKH0CTIhjNj6SDNzZCTmdXifqO49WPQO5jn/db
+         QpUN5hQJReCNEu8UrNylPagVMzztgHEUkD67y4Ba9mvv+/mqZkbdP6Ml7P6rbDU2SRi0
+         Lbyb3VbsgfbO7wrtAFCaBeovyAn34I6Vw9FEAySTedqBC2oDw15QF3lYl4pH4IL/WqBv
+         itqsNTYXOUUdP0hsifv+dhOReNRAOlZFnKY3qUbXr3GbbTP9SDEw/dPogRwTc4W9KSBI
+         rzfi1WST3ulqofHC65fqE5uJqG6YG9kVnYK9dRP3WO+S/OzHRXhpKczadFQOMM7Eu3Iq
+         1xbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773591553; x=1774196353;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7EulIjs457FDWkH8ubZ5UiSY4G2+TWHJgcekVUzvkrM=;
+        b=Lnjel+tOplcyAm+R+kgjZV8ZKz7DmbEbxcBxMjhj4CgcQx992U0+qn/ci195SJaHRl
+         sYkFbjK4wCVBlnjNxGgE7SFCRRcWmtNPSg5Z1re18I5jArQeq5aOF5/fJzNDtxR/JzsM
+         Rztr66ZbYg8TwaAWTN70DTg7FQsmrdlhD85Ng9NwcMyeWHshLwLtfuwNEBd8uG0VllWC
+         T/S8rJatlR2PBOjxYRG6hxTSTr98wgNuNmXOoaMB9Vyi0bDeV9VKsKy6imeWFDRO+Igz
+         TsSGHwNuuL0yjvct9ZYER1wYsxtkklBmBos1zyHkdk5+v4epxCBrnGAe+MvvtdPzThEj
+         MoFw==
+X-Forwarded-Encrypted: i=1; AJvYcCVYyPWtt/xNbsMYxsF7ZCkF+WiebhlmApjfFdqQfn+tDnfUQyCGGmJvxNTXo9wx+YIpnT1o0S0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRLU45XDIorElmERGjdADRtEvNMzwtxqGHpsIRMXMZF3StW2W5
+	z2yHmnPBtp683Zc3w1vYsxcAJ4WNadpsZwo22pMGNm6OMEKQ87O1NSpnyslTDcpkHkUhSh5dSDb
+	b42ydikRqt3/DisJngouBvehBAXK/+APXFGKppE16
+X-Gm-Gg: ATEYQzxj+mdnJniMLVEdddtw0FckFqeX6oNz1JQHLCTSIt59l2n3lCi57p/sgARWpBm
+	vYa1LzS1gNNVSgMx7tQHk3XdlRjrNbjw8q8LMWoHCB6I0U5PWQewf8ZmfdNXrJr9viw6m/EiG94
+	zFpAS6kVln/AkfbMFmjXknJwQl9XRx/L65/crSEDuunSCYoJ8zdNF4Y6Nvi3hrjV13E9J8QJ1FN
+	NDBZy/432y9Zgl0+czt9OxQDHfGkNRGLyVUrrePuo8H/SKi//YasTWSk/uNhQERjN+VOMYcddc6
+	0Qu7UBm0BcjIlto=
+X-Received: by 2002:a05:6a00:a0b:b0:81f:3c92:1699 with SMTP id
+ d2e1a72fcca58-82a19906fb3mr9218500b3a.59.1773591553433; Sun, 15 Mar 2026
+ 09:19:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260312193725.994833-1-haiyangz@linux.microsoft.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+References: <20260313211646.12549-1-stephen@networkplumber.org>
+ <20260313211646.12549-4-stephen@networkplumber.org> <ydqKfVXU_4_kSsU89EbfSyd66aGeaCaVHFr6kXhrF-qG7G2WCAAOS51LTAM2y_thGnB0pp-pbGLDWqM4XooMX-jelz30W0KbpE3KzCKiWqo=@willsroot.io>
+ <20260315090622.5fbdf074@phoenix.local>
+In-Reply-To: <20260315090622.5fbdf074@phoenix.local>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Sun, 15 Mar 2026 12:19:02 -0400
+X-Gm-Features: AaiRm513oKjUthr-xSwhQVj8uBsPnNyc0vXXYZ0a13It-xuC4iLxEunSj8BSBKo
+Message-ID: <CAM0EoMnh7gYjEGVB0eqGfannC=i=R5YQZbBfZK1K+CqKJyOMOQ@mail.gmail.com>
+Subject: Re: [PATCH 03/12] net/sched: netem: add per-CPU recursion guard for duplication
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: William Liu <will@willsroot.io>, netdev@vger.kernel.org, stable@vger.kernel.org, 
+	Savino Dicanosa <savy@syst3mfailure.io>, Victor Nogueira <victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267930-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-267931-lists,netdev=lfdr.de];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 675A229159A
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[willsroot.io:email,networkplumber.org:email,mail.gmail.com:mid,mojatatu-com.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syst3mfailure.io:email]
+X-Rspamd-Queue-Id: 22F932915F5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 12, 2026 at 12:37:03PM -0700, Haiyang Zhang wrote:
-> From: Haiyang Zhang <haiyangz@microsoft.com>
-> 
-> Add two parameters for drivers supporting Rx CQE Coalescing.
-> 
-> ETHTOOL_A_COALESCE_RX_CQE_FRAMES:
-> Maximum number of frames that can be coalesced into a CQE.
-> 
-> ETHTOOL_A_COALESCE_RX_CQE_NSECS:
-> Time out value in nanoseconds after the first packet arrival in a
-> coalesced CQE to be sent.
-> 
-> Also implement in MANA driver with the new parameter and
-> counters.
-> 
-> 
-> Haiyang Zhang (3):
->   net: ethtool: add ethtool COALESCE_RX_CQE_FRAMES/NSECS
->   net: mana: Add support for RX CQE Coalescing
->   net: mana: Add ethtool counters for RX CQEs in coalesced type
+On Sun, Mar 15, 2026 at 12:06=E2=80=AFPM Stephen Hemminger
+<stephen@networkplumber.org> wrote:
+>
+> On Sat, 14 Mar 2026 19:29:10 +0000
+> William Liu <will@willsroot.io> wrote:
+>
+> > Looping in Jamal and Victor.
+> >
+> > On Friday, March 13th, 2026 at 9:17 PM, Stephen Hemminger <stephen@netw=
+orkplumber.org> wrote:
+> >
+> > > Add a per-CPU recursion depth counter to netem_enqueue(). When netem
+> > > duplicates a packet, the clone is re-enqueued at the root qdisc. If
+> > > the tree contains other netem instances, this can recurse without
+> > > bound, causing soft lockups and OOM.
+> > >
+> > > This approach was previously considered but rejected on the grounds
+> > > that netem_dequeue calling enqueue on a child netem could bypass the
+> > > depth check. That concern does not apply: the child netem's
+> > > netem_enqueue() increments the same per-CPU counter, so the total
+> > > nesting depth across all netem instances in the call chain is tracked
+> > > correctly.
+> >
+> > I'm assuming you are referring to [1] (and other relevant followup mess=
+ages), but has this setup been tested against the original repro? I think t=
+here was a similar draft fix originally but it failed during testing becaus=
+e DOS still happened [2].
+> >
+> > If I remember correctly,  the issue is less so the recursive depth but =
+more so being able to differentiate between packets that are previously inv=
+olved in duplication or not.
+> >
+> > >
+> > > A depth limit of 4 is generous for any legitimate configuration.
+> > >
+> > > Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
+> > > Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D220774
+> > > Cc: stable@vger.kernel.org
+> > > Reported-by: William Liu <will@willsroot.io>
+> > > Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
+> > >
+> > > Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> > > ---
+> > >  net/sched/sch_netem.c | 22 ++++++++++++++++++++++
+> > >  1 file changed, 22 insertions(+)
+> > >
+> > > diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+> > > index 0ccf74a9cb82..085fa3ad6f83 100644
+> > > --- a/net/sched/sch_netem.c
+> > > +++ b/net/sched/sch_netem.c
+> > > @@ -21,6 +21,7 @@
+> > >  #include <linux/rtnetlink.h>
+> > >  #include <linux/reciprocal_div.h>
+> > >  #include <linux/rbtree.h>
+> > > +#include <linux/percpu.h>
+> > >
+> > >  #include <net/gso.h>
+> > >  #include <net/netlink.h>
+> > > @@ -29,6 +30,15 @@
+> > >
+> > >  #define VERSION "1.3"
+> > >
+> > > +/*
+> > > + * Limit for recursion from duplication.
+> > > + * Duplicated packets are re-enqueued at the root qdisc, which may
+> > > + * reach this or another netem instance, causing nested calls to
+> > > + * netem_enqueue(). This per-CPU counter limits the total depth.
+> > > + */
+> > > +static DEFINE_PER_CPU(unsigned int, netem_enqueue_depth);
+> > > +#define NETEM_RECURSION_LIMIT      4
+> > > +
+> > >  /* Network Emulation Queuing algorithm.
+> > >     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > >
+> > > @@ -460,6 +470,14 @@ static int netem_enqueue(struct sk_buff *skb, st=
+ruct Qdisc *sch,
+> > >     /* Do not fool qdisc_drop_all() */
+> > >     skb->prev =3D NULL;
+> > >
+> > > +   /* Guard against recursion from duplication re-injection. */
+> > > +   if (unlikely(this_cpu_inc_return(netem_enqueue_depth) >
+> > > +                NETEM_RECURSION_LIMIT)) {
+> > > +           this_cpu_dec(netem_enqueue_depth);
+> > > +           qdisc_drop(skb, sch, to_free);
+> > > +           return NET_XMIT_DROP;
+> > > +   }
+> > > +
+> > >     /* Random duplication */
+> > >     if (q->duplicate && q->duplicate >=3D get_crandom(&q->dup_cor, &q=
+->prng))
+> > >             ++count;
+> > > @@ -474,6 +492,7 @@ static int netem_enqueue(struct sk_buff *skb, str=
+uct Qdisc *sch,
+> > >     if (count =3D=3D 0) {
+> > >             qdisc_qstats_drop(sch);
+> > >             __qdisc_drop(skb, to_free);
+> > > +           this_cpu_dec(netem_enqueue_depth);
+> > >             return NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
+> > >     }
+> > >
+> > > @@ -529,6 +548,7 @@ static int netem_enqueue(struct sk_buff *skb, str=
+uct Qdisc *sch,
+> > >             qdisc_drop_all(skb, sch, to_free);
+> > >             if (skb2)
+> > >                     __qdisc_drop(skb2, to_free);
+> > > +           this_cpu_dec(netem_enqueue_depth);
+> > >             return NET_XMIT_DROP;
+> > >     }
+> > >
+> > > @@ -643,8 +663,10 @@ static int netem_enqueue(struct sk_buff *skb, st=
+ruct Qdisc *sch,
+> > >             /* Parent qdiscs accounted for 1 skb of size @prev_len */
+> > >             qdisc_tree_reduce_backlog(sch, -(nb - 1), -(len - prev_le=
+n));
+> > >     } else if (!skb) {
+> > > +           this_cpu_dec(netem_enqueue_depth);
+> > >             return NET_XMIT_DROP;
+> > >     }
+> > > +   this_cpu_dec(netem_enqueue_depth);
+> > >     return NET_XMIT_SUCCESS;
+> > >  }
+> > >
+> > > --
+> > > 2.51.0
+> > >
+> > >
+> >
+> > What about the last suggestion for a robust fix from [3]?
+> >
+> > Best,
+> > Will
+> >
+> > [1] https://lore.kernel.org/netdev/DISZZlS5CdbUKITzkIyT3jki3inTWSMecT6F=
+plNmkpYs9bJizbs0iwRbTGMrnqEXrL3-__IjOQxdULPdZwGdKFSXJ1DZYIj6xmWPBZxerdk=3D@=
+willsroot.io/
+> > [2] https://lore.kernel.org/netdev/q7G0Z7oMR2x9TWwNHOiPNsZ8lHzAuXuVgrZg=
+GmAgkH8lkIYyTgeqXwcDrelE_fdS9OdJ4TlfS96px6O9SvnmKigNKFkiaFlStvAGPIJ3b84=3D@=
+willsroot.io/
+> > [3] https://lore.kernel.org/netdev/20260111163947.811248-6-jhs@mojatatu=
+.com/
+>
+> Thanks, this is a tight corner here, and not all solutions work out.
+>
+> You're right that the per-CPU guard alone doesn't cover the
+> dequeue-to-child-enqueue path you described. That's exactly why
+> the series has two patches working together:
+>
+> Patch 02 adds the per-CPU recursion guard, which handles the
+> direct enqueue recursion (rootq->enqueue duplicated packet hits
+> another netem_enqueue in the same call chain).
+>
+> Patch 04 restructures netem_dequeue to eliminate the pump. The
+> old code had "goto tfifo_dequeue" which looped back after each
+> child enqueue, so packets the child duplicated back to root would
+> immediately get picked up by the same dequeue iteration. The new
+> code transfers all currently-ready packets from the tfifo to the
+> child in one batch, then does a single dequeue from the child and
+> returns. Packets that the child duplicates back to root land in
+> the tfifo but won't be processed until the next dequeue call from
+> the parent =E2=80=94 breaking the loop you diagrammed.
+>
+> The original repro is:
+>
+>   tc qdisc add dev lo root handle 1: netem delay 1ms duplicate 100%
+>   tc qdisc add dev lo parent 1:1 handle 2: netem delay 1ms duplicate 100%
+>   ping -f localhost
+>
+> This is covered by tdc test f2a3 (nested netem config acceptance)
+> and test 7a07 (nested netem with duplication, traffic via scapy).
+> More tests are added in the new version.
+>
+> Jamal's proposed change with skb ttl would also work but
+> it was rejected because it required adding ttl field to skb
+> and skb size is a performance critical. As Cong pointed out
+> adding a couple of bits for ttl makes it increase.
+> So considered the idea and decided against it.
 
-Thanks for the update addressing my review of v4.
-Overall, this looks good to me.
+It was not "rejected" - other than Cong making those claims (which i
+responded to).
+Last posting i had some feedback from Willem but i dropped the ball.
+And that variant i posted had issues which were not caught by the AI
+review - required human knowledge (it didnt consider the GRO code
+path).
+If you want to go this path - i am fine with it, I will just focus on
+the mirred loop.
+Also tell your AI to Cc the stakeholders next time it posts via
+get_maintainers (and not cc stable) - then i will be fine reviewing.
+Commit log (or cover letter) would help if you cite the "documented
+examples" you said were broken.
 
-For the series:
+cheers,
+jamal
 
-Reviewed-by: Simon Horman <horms@kernel.org>
 
+> Thanks.
 
