@@ -1,248 +1,318 @@
-Return-Path: <netdev+bounces-267920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267922-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OA6HAOTLtmlyIwEAu9opvQ
-	(envelope-from <netdev+bounces-267920-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:10:28 +0100
+	id sMrlMCjOtmkPJAEAu9opvQ
+	(envelope-from <netdev+bounces-267922-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:20:08 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94A2129123E
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:10:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 492A62912C2
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:20:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C6E8C3005A9C
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 15:10:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AFCA030087C9
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 15:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CFD361663;
-	Sun, 15 Mar 2026 15:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05B036F42A;
+	Sun, 15 Mar 2026 15:20:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4870978F4A
-	for <netdev@vger.kernel.org>; Sun, 15 Mar 2026 15:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CFA3B2A0;
+	Sun, 15 Mar 2026 15:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773587425; cv=none; b=OtI8V3ldif1CX9CIaR0DAuhAa4WBvuSLNkfnBnXRZCQPkpfR9Y+6Oxir0f+Fa1Tdp5DRLSrT6Yas97KbGLS2pXe5JD0QoVur3V4/Y84Uqh/HWGK1U2lssV6HgOc/NPvNvXXJm2qF3dvrxuf4uwhUHA5K/UxvBRMaVf9xwTlrY+k=
+	t=1773588004; cv=none; b=Jne8pWvikFmvLX1Lpw30rEAlPxZMbS1Fd1yaJbcJVNWLJwjDIn/7/oZx9mxJOKeRz5V9q3aoHbo5afmqKGsQUDB+nvbhaTsBkEV16vB1wM+wVdXHgHINPuhbkh19NEUClBd8wL1xpSFiuCK36cfmN6qY8/h+DAwmJNHuTSyr0nM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773587425; c=relaxed/simple;
-	bh=Qa1V7r4AhB22UlPVP7Mo0d/+CLYO6p016uQvDzPsgKY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BLO4sixHKbNHs2gn1/fI7bEVWN281DhpKAFMhndgdOGfRWPQLgQWxHklxPNxxiZcovpZdv9Q2cHyjRj4mbkMOC3XjgLeuzMjgdwBfQHPRL9JBJ9KaHjqXal9P2UQTrmsYraHAfRpgq4GSQ8YAmTrLlaAQa3h8TxtCWIMgqXxyeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w1n6E-0003EN-Ou; Sun, 15 Mar 2026 16:09:50 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w1n6B-000QDS-3A;
-	Sun, 15 Mar 2026 16:09:47 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w1n6B-00000003djm-3O4a;
-	Sun, 15 Mar 2026 16:09:47 +0100
-Date: Sun, 15 Mar 2026 16:09:47 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Naveen Mamindlapalli <naveenm@marvell.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Danielle Ratson <danieller@nvidia.com>,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	s=arc-20240116; t=1773588004; c=relaxed/simple;
+	bh=m1seJc8oqN9Jir8dhipS2Ife7Xs7bNz3x5k7GGWv8cw=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=W2qM5t/uL7+Ds0ty18KpB6uWUW/HWZ+5K2lmIElJDSwCynFb9kYfH9yM+M38FRyhO7l0i9+KJo4GwMB/aw1NYcvBGcVtSBS4j0xw9giQ9rIHTR0RRfgazvCdwI+0RqVbLpYl/YsrDOfEqFLOJHH1EXFXGknql/vfAW1T1mjuaHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1w1nFv-000000005qn-0qHU;
+	Sun, 15 Mar 2026 15:19:51 +0000
+Date: Sun, 15 Mar 2026 15:19:44 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Xu Liang <lxu@maxlinear.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
-	Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
- definitions
-Message-ID: <abbLu-OjngRjcc09@pengutronix.de>
-References: <20260310104743.907818-3-bjorn@kernel.org>
- <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
- <b3825c0d-02e5-4625-831f-4346ce4eabd2@lunn.ch>
- <085bb0a9-85d3-4d62-9ac4-3461b61da5f3@bootlin.com>
- <438dae03-4dac-4e66-9f4d-e08b0434c9b4@lunn.ch>
- <20260311195052.1202174f@kernel.org>
- <abJJY8whzSOB8O-X@pengutronix.de>
- <7c45ebf6-0cb2-4a4c-ac12-f4f9bb59c908@lunn.ch>
- <42abf88e-4fbf-4966-9490-8315f118ddea@bootlin.com>
- <873423y27k.fsf@all.your.base.are.belong.to.us>
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] net: phy: mxl-gpy: add PHY-level statistics via
+ ethtool
+Message-ID: <0029a2fb29bfdcc26abff828d2e18400067b5c58.1773587924.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <873423y27k.fsf@all.your.base.are.belong.to.us>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[bootlin.com,lunn.ch,kernel.org,vger.kernel.org,davemloft.net,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,broadcom.com,armlinux.org.uk];
-	TAGGED_FROM(0.00)[bounces-267920-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267922-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[maxlinear.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	MID_RHS_MATCH_FROM(0.00)[];
 	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 94A2129123E
+X-Rspamd-Queue-Id: 492A62912C2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Björn,
+Report PCS receive error counts for all supported GPY115x, GPY2xx and
+MxL862xx PHYs.
 
-On Fri, Mar 13, 2026 at 08:11:11PM +0100, Björn Töpel wrote:
-> Folks, thanks for the elaborate discussion (accidental complexity vs
-> essential complexity comes to mind...)!
+Accumulate the vendor-specific PHY_ERRCNT read-clear counter
+(SEL=RXERR) in .update_stats() and expose it as both IEEE 802.3
+SymbolErrorDuringCarrier and generic rx_errors via
+.get_phy_stats().
 
-Sorry for overthinking :)
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+v2: rebase on top of current net-next
 
-> Maxime Chevallier <maxime.chevallier@bootlin.com> writes:
-> 
-> > Hi Andrew,
-> >
-> >>> One more issue is the test data generator location. The data generator
-> >>> is not always the CPU. We have HW generators located in components like
-> >>> PHYs or we may use external source (remote loopback).
-> >> 
-> >> At the moment, we don't have a Linux model for such generators. There
-> >> is interest in them, but nobody has actually stepped up and proposed
-> >> anything. I do see there is an intersect, we need to be able to
-> >> represent them in the topology, and know which way they are pointing,
-> >> but i don't think they have a direct influence on loopback.
-> >
-> > If I'm following Oleksij, the idea would be to have on one side the
-> > ability to "dump" the link topology with a finer granularity so that we
-> > can see all the different blocks (pcs, pma, pmd, etc.), how they are
-> > chained together and who's driving them (MAC, PHY (+ phy_index), module,
-> > etc.), and on another side commands to configure loopback on them, with
-> > the ability to also configure traffic generators in the future, gather
-> > stats, etc.
-> >
-> > Another can of worms for sure, and probably too much for what Björn is
-> > trying to achieve. It's hard to say if this is overkill or not, there's
-> > interest in that for sure, but also quite a lot of work to do...
-> 
-> It's great to have these discussion as input to the first (minimal!)
-> series, so we can extend/build on it later.
-> 
-> If I try to make sense of the above discussions...
-> 
-> Rough agreement on:
-> 
->  - Depth/ordering should be local to a component, not global across the
->    whole path.
+ drivers/net/phy/mxl-gpy.c | 66 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 64 insertions(+), 2 deletions(-)
 
-ack
-
->  - Cross-component ordering comes from existing infrastructure (PHY link
->    topology, phy_index).
-
-ack
-
->  - The current component set (MAC/PHY/MODULE) is reasonable for a first
->    pass.
-
-I do not have strong opinion here. 
-
->  - HW traffic generators and full topology dumps are interesting but out
->    of scope for now (Please? ;-)).
-
-It didn't tried to push it here. My point is - image me or may be you,
-will need to implement it in the next step. This components will need to
-cooperate and user will need to understand the relation and/or topology.
-
-The diagnostic is all about topology.
-
-> So, maybe the next steps are:
-> 
->  1. Keep the current component model (MAC/PHY/MODULE) and the
->     NEAR_END/FAR_END direction (naming need to change as Maxime said).
-
-Probably good to document that NEAR_END/FAR_END or local/remote is
-related to the viewpoint convention. Otherwise it will get confusing
-with components which mount in a unusual direction (embedded worlds is
-full of it :))
-
->  2. Add a depth (or order?) field to ETHTOOL_A_LOOPBACK_ENTRY as Jakub
->     suggested, local to each component instance. This addresses the
->     "multiple loopback points within one MAC" case without requiring a
->     global ordering. I hope it addresses what Oleksij's switch example
->     needs (multiple local loops at different depths within one
->     component) *insert that screaming emoji*.
-
-ack. I guess "depth" fits to the "viewpoint" terminology.
-
->  3. Document the viewpoint convention clearly.
-
-ack
-
->  4. Punt on the grand topology dump. Too much to chew.
-
-ack
-
->  5. Don't worry about DSA CPU ports - they don't have a netif, so
->     loopback doesn't apply there today. If someone adds netifs for CPU
->     ports later, depth handles it.
-
-ack
-
-> TL;DR: Add depth, document the viewpoint convention, and ship
-> it^W^Winterate.
-> 
-> Did I get that right?
-
-I'm ok with it, but maintainers will have the last word.
-
-Best Regards,
-Oleksij
+diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
+index 5f99766fb64c3..0da2d4e9d8548 100644
+--- a/drivers/net/phy/mxl-gpy.c
++++ b/drivers/net/phy/mxl-gpy.c
+@@ -38,12 +38,17 @@
+ #define PHY_CTL1_MDICD		BIT(3)
+ #define PHY_CTL1_MDIAB		BIT(2)
+ #define PHY_CTL1_AMDIX		BIT(0)
++#define PHY_ERRCNT		0x15	/* Error counter */
+ #define PHY_MIISTAT		0x18	/* MII state */
+ #define PHY_IMASK		0x19	/* interrupt mask */
+ #define PHY_ISTAT		0x1A	/* interrupt status */
+ #define PHY_LED			0x1B	/* LEDs */
+ #define PHY_FWV			0x1E	/* firmware version */
+ 
++#define PHY_ERRCNT_SEL		GENMASK(11, 8)
++#define PHY_ERRCNT_COUNT	GENMASK(7, 0)
++#define PHY_ERRCNT_SEL_RXERR	0
++
+ #define PHY_MIISTAT_SPD_MASK	GENMASK(2, 0)
+ #define PHY_MIISTAT_DPX		BIT(3)
+ #define PHY_MIISTAT_LS		BIT(10)
+@@ -134,6 +139,7 @@ struct gpy_priv {
+ 	u8 fw_major;
+ 	u8 fw_minor;
+ 	u32 wolopts;
++	u64 rx_errors;
+ 
+ 	/* It takes 3 seconds to fully switch out of loopback mode before
+ 	 * it can safely re-enter loopback mode. Record the time when
+@@ -331,8 +337,9 @@ static int gpy_mbox_read(struct phy_device *phydev, u32 addr)
+ 
+ static int gpy_config_init(struct phy_device *phydev)
+ {
+-	/* Nothing to configure. Configuration Requirement Placeholder */
+-	return 0;
++	/* Count MDI RX errors (SymbolErrorDuringCarrier) */
++	return phy_write(phydev, PHY_ERRCNT,
++			 FIELD_PREP(PHY_ERRCNT_SEL, PHY_ERRCNT_SEL_RXERR));
+ }
+ 
+ static int gpy21x_config_init(struct phy_device *phydev)
+@@ -1067,6 +1074,31 @@ static int gpy_config_inband(struct phy_device *phydev, unsigned int modes)
+ 			      VSPEC1_SGMII_ANEN_ANRS);
+ }
+ 
++static int gpy_update_stats(struct phy_device *phydev)
++{
++	struct gpy_priv *priv = phydev->priv;
++	int ret;
++
++	/* PHY_ERRCNT: 8-bit read-clear counter, SEL set to RXERR */
++	ret = phy_read(phydev, PHY_ERRCNT);
++	if (ret < 0)
++		return ret;
++
++	priv->rx_errors += FIELD_GET(PHY_ERRCNT_COUNT, ret);
++
++	return 0;
++}
++
++static void gpy_get_phy_stats(struct phy_device *phydev,
++			      struct ethtool_eth_phy_stats *eth_stats,
++			      struct ethtool_phy_stats *stats)
++{
++	struct gpy_priv *priv = phydev->priv;
++
++	eth_stats->SymbolErrorDuringCarrier = priv->rx_errors;
++	stats->rx_errors = priv->rx_errors;
++}
++
+ static struct phy_driver gpy_drivers[] = {
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_GPY2xx),
+@@ -1091,6 +1123,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.led_hw_control_get = gpy_led_hw_control_get,
+ 		.led_hw_control_set = gpy_led_hw_control_set,
+ 		.led_polarity_set = gpy_led_polarity_set,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		.phy_id		= PHY_ID_GPY115B,
+@@ -1116,6 +1150,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.led_hw_control_get = gpy_led_hw_control_get,
+ 		.led_hw_control_set = gpy_led_hw_control_set,
+ 		.led_polarity_set = gpy_led_polarity_set,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_GPY115C),
+@@ -1140,6 +1176,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.led_hw_control_get = gpy_led_hw_control_get,
+ 		.led_hw_control_set = gpy_led_hw_control_set,
+ 		.led_polarity_set = gpy_led_polarity_set,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		.phy_id		= PHY_ID_GPY211B,
+@@ -1165,6 +1203,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.led_hw_control_get = gpy_led_hw_control_get,
+ 		.led_hw_control_set = gpy_led_hw_control_set,
+ 		.led_polarity_set = gpy_led_polarity_set,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_GPY211C),
+@@ -1189,6 +1229,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.led_hw_control_get = gpy_led_hw_control_get,
+ 		.led_hw_control_set = gpy_led_hw_control_set,
+ 		.led_polarity_set = gpy_led_polarity_set,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		.phy_id		= PHY_ID_GPY212B,
+@@ -1214,6 +1256,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.led_hw_control_get = gpy_led_hw_control_get,
+ 		.led_hw_control_set = gpy_led_hw_control_set,
+ 		.led_polarity_set = gpy_led_polarity_set,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_GPY212C),
+@@ -1238,6 +1282,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.led_hw_control_get = gpy_led_hw_control_get,
+ 		.led_hw_control_set = gpy_led_hw_control_set,
+ 		.led_polarity_set = gpy_led_polarity_set,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		.phy_id		= PHY_ID_GPY215B,
+@@ -1263,6 +1309,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.led_hw_control_get = gpy_led_hw_control_get,
+ 		.led_hw_control_set = gpy_led_hw_control_set,
+ 		.led_polarity_set = gpy_led_polarity_set,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_GPY215C),
+@@ -1287,6 +1335,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.led_hw_control_get = gpy_led_hw_control_get,
+ 		.led_hw_control_set = gpy_led_hw_control_set,
+ 		.led_polarity_set = gpy_led_polarity_set,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_GPY241B),
+@@ -1306,6 +1356,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.set_wol	= gpy_set_wol,
+ 		.get_wol	= gpy_get_wol,
+ 		.set_loopback	= gpy_loopback,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_GPY241BM),
+@@ -1325,6 +1377,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.set_wol	= gpy_set_wol,
+ 		.get_wol	= gpy_get_wol,
+ 		.set_loopback	= gpy_loopback,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_GPY245B),
+@@ -1344,6 +1398,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.set_wol	= gpy_set_wol,
+ 		.get_wol	= gpy_get_wol,
+ 		.set_loopback	= gpy_loopback,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_MXL86211C),
+@@ -1368,6 +1424,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.led_hw_control_get = gpy_led_hw_control_get,
+ 		.led_hw_control_set = gpy_led_hw_control_set,
+ 		.led_polarity_set = gpy_led_polarity_set,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 	},
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_MXL86252),
+@@ -1385,6 +1443,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.set_wol	= gpy_set_wol,
+ 		.get_wol	= gpy_get_wol,
+ 		.set_loopback	= gpy_loopback,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 		.led_brightness_set = gpy_led_brightness_set,
+ 		.led_hw_is_supported = gpy_led_hw_is_supported,
+ 		.led_hw_control_get = gpy_led_hw_control_get,
+@@ -1407,6 +1467,8 @@ static struct phy_driver gpy_drivers[] = {
+ 		.set_wol	= gpy_set_wol,
+ 		.get_wol	= gpy_get_wol,
+ 		.set_loopback	= gpy_loopback,
++		.update_stats	= gpy_update_stats,
++		.get_phy_stats	= gpy_get_phy_stats,
+ 		.led_brightness_set = gpy_led_brightness_set,
+ 		.led_hw_is_supported = gpy_led_hw_is_supported,
+ 		.led_hw_control_get = gpy_led_hw_control_get,
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.53.0
 
