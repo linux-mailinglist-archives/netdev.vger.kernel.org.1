@@ -1,245 +1,180 @@
-Return-Path: <netdev+bounces-267932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267933-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6IivL0LctmkQJwEAu9opvQ
-	(envelope-from <netdev+bounces-267932-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:20:18 +0100
+	id 4JwbMHPctmkQJwEAu9opvQ
+	(envelope-from <netdev+bounces-267933-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:21:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40B1F291605
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:20:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 081DE291613
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 17:21:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5AD03301466C
-	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:20:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AADCD3013AA3
+	for <lists+netdev@lfdr.de>; Sun, 15 Mar 2026 16:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B07370D60;
-	Sun, 15 Mar 2026 16:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l6v0bcg1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D094236C584;
+	Sun, 15 Mar 2026 16:20:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB5B1ACEDE;
-	Sun, 15 Mar 2026 16:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F521A3164;
+	Sun, 15 Mar 2026 16:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773591605; cv=none; b=GYtq1pn1L/9Fx95vX1bAOgiX8+OirGQbXHisK/Zo2xHdjboZw+5+EjyNkPfQLvWZgN76SR7+Eud2qYdpOkEUG2uw9YOxQGHbBgSY8pqNDwii88HaCkKVZ405z8dFi+xxLwRVkA1Wzoso74yd2FCuqG5FbsU2tMJ/azH79yzNN6c=
+	t=1773591654; cv=none; b=gR/Qf55faZngBLgt1wFOJ0tmLntbR+WDja0BoeNKLLfat4r90EEv2cXP2v7XAQgdOuBHHlmbJhYugZEds5vwZ8J0+zGj12kfCschk/2i9o8pwEcqYYrp9VZGyUI8iLZQszBaew5pkncAHyKgr7jmBDtLQcRtexUsR3zsD5ab6pQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773591605; c=relaxed/simple;
-	bh=xKcg+NTA0s52zOEQyQVg1Ut0WOeVb7Uq3enq4JxfLQY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DOE0NcWdD3yWySdlYtWSa3qSDMlM0Kh++eGX8ugLZ54whKVsIrGLOVpvBO0kRab42S0RMQvQbFMCv+w6DbDh2jsvDUqM30L2v8hZ2lgT4x/cog35tbwq1JESwSUD4dmI5Jgf/iR/F9HOn8YhY2HLZPh/mqs45//CWCK1HF38X6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l6v0bcg1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20446C4CEF7;
-	Sun, 15 Mar 2026 16:20:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773591605;
-	bh=xKcg+NTA0s52zOEQyQVg1Ut0WOeVb7Uq3enq4JxfLQY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=l6v0bcg1/4c6og5Yc3zBqP0okAf48DeD4p5YEPR/28oEiJN9DO58EKVa0HALzsRWA
-	 lsclwYR5gx4iC/fIeuVlhRMA/adZU3buCFevMTjlVjIlLx112mez8ivwwPlSGYWDSj
-	 BNz839tnkybucvN7sigl9DXMA0NVXbnpCELHWoUKuLM/+q6MFansR6zZVsY1gFNTVK
-	 Pg/gnradb3OMNQFVYBZqzbnrIYutSG5DY46LSUu6SvGRoM7E/pWLFWYZqp8WDYCsQr
-	 yQ28Bi28p+KEjP11xh2lpDtgxiLwlorvSSOqdiPpfkxRV7dpNzec1PE9lRnGo9SZNr
-	 06xiqcq/4DKQQ==
-From: Simon Horman <horms@kernel.org>
-To: liuhangbin@gmail.com
-Cc: Simon Horman <horms@kernel.org>,
-	jv@jvosburgh.net,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	sd@queasysnail.net,
-	andrew+netdev@lunn.ch,
-	pabeni@redhat.com,
-	sridhar.samudrala@intel.com,
-	jiri@resnulli.us,
-	bridge@lists.linux.dev,
-	edumazet@google.com,
-	kuba@kernel.org,
-	razor@blackwall.org,
-	idosch@nvidia.com
-Subject: Re: [net-next,v2,1/4] net: use ndo_set_features to set offload features for bonding/bridge/team
-Date: Sun, 15 Mar 2026 16:19:43 +0000
-Message-ID: <20260315161943.1419237-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260313-offload_compute-v2-1-ffbc8ce5d50c@gmail.com>
-References: <20260313-offload_compute-v2-1-ffbc8ce5d50c@gmail.com>
+	s=arc-20240116; t=1773591654; c=relaxed/simple;
+	bh=HJaMInJ91NGAp+ywmlUPCxVAqjZbn35OwDjFmULe/YA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Wr6p2Dtkcuck3H6j4TXfniJlBRmHRl/t3bjPmh9jYecdnUG4fW0TNDG32Vb10tgNRE5Q+gZorSsF+2VcvQ8PKVvwaGcXKYrPWV/YPeWO7DSldTT2ldLQ1UpJefxhd8flyskPkvFgC3JmQebbmkxgefFB8a4nTBFhNBJuKaGWgZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1w1oCp-0000000060F-1ILM;
+	Sun, 15 Mar 2026 16:20:43 +0000
+Date: Sun, 15 Mar 2026 16:20:39 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH net-next v5 0/2] net: dsa: mxl862xx: add support for bridge
+ offloading
+Message-ID: <cover.1773591297.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-267932-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
+	TAGGED_FROM(0.00)[bounces-267933-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: 40B1F291605
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mxl862xx_mac_table_read.tci:url,bridge_vlan_aware.sh:url,bridge_vlan_unaware.sh:url,makrotopia.org:mid]
+X-Rspamd-Queue-Id: 081DE291613
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+As a next step to complete the mxl862xx DSA driver, add support for
+offloading forwarding between bridged ports to the switch hardware.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: use ndo_set_features to set offload features for bonding/bridge/team
+This works pretty much without any big surprises, apart from two
+subtleties:
+ * per-port control over flooding behavior has to be implemented by
+   (ab)using a 0-rate QoS meters as stopper in lack of any better
+   option.
+ * STP state transition unconditionally enables learning on a port
+   even if it was previously explicitely disabled (a firmware bug)
 
-This commit converts bonding, bridge, and team drivers to use the
-ndo_set_features callback instead of manually calling
-netdev_compute_master_upper_features() during port add/remove operations.
+Note that as the driver is still lacking all VLAN features (which
+are going to be added next), at this point some of the
+bridge_vlan_aware.sh tests are failing after applying this series.
 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index 90b71bd53040..2c84d3ce3b04 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
+This is expected and cannot be avoided without implementing
+port_vlan_filtering + port_vlan_add/del. And adding both bridge and
+VLAN offloading at the same time would be too much for anyone to
+review, so VLAN support is going to be submitted in a follow-up
+series immediately after this series has been accepted.
 
-[ ... ]
+All other relevant selftests (including bridge_vlan_unaware.sh) are
+still passing.
 
-> @@ -5953,6 +5957,7 @@ static const struct net_device_ops bond_netdev_ops = {
->  	.ndo_add_slave		= bond_enslave,
->  	.ndo_del_slave		= bond_release,
->  	.ndo_fix_features	= bond_fix_features,
-> +	.ndo_set_features	= bond_set_features,
->  	.ndo_features_check	= passthru_features_check,
->  	.ndo_get_xmit_slave	= bond_xmit_get_slave,
->  	.ndo_sk_get_lower_dev	= bond_sk_get_lower_dev,
+Changes since v4:
+ * move link-local check before dsa_strip_etype_header()
+ * introduce port_map helpers
+ * properly implement port_mdb_{add,del} operations
 
-[ ... ]
+Changes since v3:
+ * add missing cpu_to_le32 in mxl862xx_bridge_config_fwd()
+ * use little-endian 32-bit type for (unused) age_timer API field
+ * better comment in port_set_host_flood() documenting architectural
+   limitation
+ * fix typo in comment "matche" should be "matches"
+ * few whitespace fixes
 
-> diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-> index b7282f5c9632..4906ea3717b1 100644
-> --- a/drivers/net/team/team_core.c
-> +++ b/drivers/net/team/team_core.c
+Changes since v2:
+ * refactor .port_bridge_join and .port_bridge_leave as requested
+   by Vladimir Oltean
+ * include linux/etherdevice.h which was missing and causing build
+   to fail (it accidentally slipped into a follow-up patch)
+ * remove left-over manual reset of learning state for port leaving
+   bridge
+ * remove unnecessary call to mxl862xx_port_fast_age() for port
+   leaving bridge
+ * add kernel-doc comments in mxl862xx.h instead of sporadic inline
+   comments covering only some of the struct members
+ * some other minor cosmetics (linebreaks, whitespace) here and there
 
-[ ... ]
+Changes since v1:
+ * don't set dsa_default_offload_fwd_mark() on link-local frames
+ * fix kernel-doc comments in API header
+ * use bitfield helpers for compound tci field in fdb API
+ * add missing endian conversion for mxl862xx_stp_port_cfg.port_state
+   as well as mxl862xx_mac_table_read.tci (spotted by AI review)
+ * drop manually resetting port learning state on bridge<->standalone
+   transitions, DSA framework takes care of that
+ * don't abort updating bridge ports on error, return error at the end
+ * report error in mxl862xx_port_bridge_leave()
+ * create mxl862xx_get_fid() helper and use it in
+   mxl862xx_port_fdb_add() and mxl862xx_port_fdb_del()
+ * propagete error of callback function in mxl862xx_port_fdb_dump()
+ * manually mxl862xx_port_fast_age() in mxl862xx_port_stp_state_set()
+   to avoid FDB poisoning due to race condition
 
-> @@ -2007,6 +2010,7 @@ static const struct net_device_ops team_netdev_ops = {
->  	.ndo_add_slave		= team_add_slave,
->  	.ndo_del_slave		= team_del_slave,
->  	.ndo_fix_features	= team_fix_features,
-> +	.ndo_set_features	= team_set_features,
->  	.ndo_change_carrier     = team_change_carrier,
->  	.ndo_features_check	= passthru_features_check,
->  };
+Daniel Golle (2):
+  dsa: tag_mxl862xx: set dsa_default_offload_fwd_mark()
+  net: dsa: mxl862xx: implement bridge offloading
 
-[ ... ]
+ drivers/net/dsa/mxl862xx/mxl862xx-api.h | 225 +++++++-
+ drivers/net/dsa/mxl862xx/mxl862xx-cmd.h |  20 +-
+ drivers/net/dsa/mxl862xx/mxl862xx.c     | 658 ++++++++++++++++++++++--
+ drivers/net/dsa/mxl862xx/mxl862xx.h     | 123 +++++
+ net/dsa/tag_mxl862xx.c                  |   3 +
+ 5 files changed, 995 insertions(+), 34 deletions(-)
 
-> diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
-> index f7502e62dd35..f82082050e36 100644
-> --- a/net/bridge/br_device.c
-> +++ b/net/bridge/br_device.c
-
-[ ... ]
-
-> @@ -456,6 +462,7 @@ static const struct net_device_ops br_netdev_ops = {
->  	.ndo_add_slave		 = br_add_slave,
->  	.ndo_del_slave		 = br_del_slave,
->  	.ndo_fix_features        = br_fix_features,
-> +	.ndo_set_features        = br_set_features,
->  	.ndo_fdb_add		 = br_fdb_add,
->  	.ndo_fdb_del		 = br_fdb_delete,
->  	.ndo_fdb_del_bulk	 = br_fdb_delete_bulk,
-
-[ ... ]
-
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index f48dc299e4b2..16b3fc620807 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -8920,6 +8920,9 @@ static int __netdev_upper_dev_link(struct net_device *dev,
->  	__netdev_walk_all_upper_dev(upper_dev, __netdev_update_lower_level,
->  				    priv);
->
-> +	/* re-compute all features after adding link */
-> +	netdev_change_features(upper_dev);
-> +
->  	return 0;
->
->  rollback:
-
-Can the feature computation skip updating ancillary fields when features
-don't change?
-
-The new architecture routes computation through netdev_change_features() ->
-__netdev_update_features() -> ndo_set_features(). However,
-__netdev_update_features() has this check:
-
-net/core/dev.c:__netdev_update_features() {
-    ...
-    if (dev->features == features)
-        goto sync_lower;
-
-This skips the ndo_set_features callback entirely when computed features
-match current features. This means netdev_compute_master_upper_features() is
-never called when dev->features doesn't change, even though it updates
-several ancillary fields independent of dev->features:
-
-- vlan_features
-- hw_enc_features
-- mpls_features
-- gso_partial_features
-- tso_max_size
-- tso_max_segs
-- hard_header_len
-- needed_headroom
-- needed_tailroom
-
-For example, adding a second bond slave with identical dev->features but
-different tso_max_size or vlan_features will not trigger ndo_set_features,
-leaving the bond's ancillary fields stale.
-
-In the old code, netdev_compute_master_upper_features() was called
-unconditionally and always updated these fields regardless of whether
-dev->features changed.
-
-> @@ -9012,6 +9015,9 @@ static void __netdev_upper_dev_unlink(struct net_device *dev,
->  	__netdev_update_lower_level(upper_dev, priv);
->  	__netdev_walk_all_upper_dev(upper_dev, __netdev_update_lower_level,
->  				    priv);
-> +
-> +	/* re-compute all features after removing link */
-> +	netdev_change_features(upper_dev);
->  }
-
-The same issue applies here. When a port is removed but dev->features
-doesn't change, the ancillary fields won't be recomputed.
-
-> @@ -12874,8 +12880,6 @@ void netdev_compute_master_upper_features(struct net_device *dev, bool update_he
->
->  	netif_set_tso_max_segs(dev, tso_max_segs);
->  	netif_set_tso_max_size(dev, tso_max_size);
-> -
-> -	netdev_change_features(dev);
->  }
->  EXPORT_SYMBOL(netdev_compute_master_upper_features);
+-- 
+2.53.0
 
