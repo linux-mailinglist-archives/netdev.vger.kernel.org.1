@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-268233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268234-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mOAkJjFDuGmLbAEAu9opvQ
-	(envelope-from <netdev+bounces-268233-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:51:45 +0100
+	id eE2AI0BDuGmLbAEAu9opvQ
+	(envelope-from <netdev+bounces-268234-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:52:00 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FDF229E8DC
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:51:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B5E129E8F4
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:52:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 35EE6308C749
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:46:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9C3E4308FF0B
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8CE33A9F8;
-	Mon, 16 Mar 2026 17:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC3A332EDE;
+	Mon, 16 Mar 2026 17:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FC0Zw45Q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N9nIBfdA"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43BB933BBAF;
-	Mon, 16 Mar 2026 17:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66A833AD8A;
+	Mon, 16 Mar 2026 17:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773683202; cv=none; b=XqdjoFhxGAjFGcVxa6407jxRf5iZN1rYHgrz5yA61/DnP99S42O1SHODsoDZ5+deke3w5ZZZAUcVn+fzl1HgHKTkhQP6qkVhRiKtjClV1AnsZWEiacA7JBdM8rciT8hMdTv+YQCxmO2LkVNyQ6Uz5dlDm/1W2P5OkvzmGb141Zk=
+	t=1773683204; cv=none; b=p3arKwtX51njlQ47+iO5tsSwhgmhltJvD/E0PzOEyYyHuUeFdT2hgkr7XVc5doMZGlZ3FXkhrPy9GIVe5ySAGt2c08e1ryKEyUaJ50to75UMDcYOuueBC5l1YxR/KFQMlT5TkRD3CJPnnhbCwFTLaITuM4EouJLCTAa36ew9RyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773683202; c=relaxed/simple;
-	bh=GSNjTvX6rPE2U6QE5SmWIoplG6IQUGCakMAmfogFQUo=;
+	s=arc-20240116; t=1773683204; c=relaxed/simple;
+	bh=mUaN9OyVf9HbCRicI/4FWvNTeCTlSydlvJ4GVQj7bGg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QCgJLE7VAWTG7Gld9x9lIyiNDVVta5yEc3t/NPicOH08UlH3gGZUnBo9eq6UTY6IDlgTBnZ8YCCGsOdwXI9uFUut59X/IAoY+/XSLnko56y+2R+K9xK9x3D9K6qVfnqg8RYNqyH7q6asPX1dVkHRD0Jph2NgNzswqnaTjNORinY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FC0Zw45Q; arc=none smtp.client-ip=192.198.163.16
+	 MIME-Version; b=bVYCy0u7FEVNk+7B1KPMO/R0CRaFpuZZCbN/LwkAVdd6Q2bf/PVmjKGFrQkB1hhxI6T1u1nB4RU7AifNhIgltctMLijJL3/4oUOEbzoM+lSTTZTcXmgbrQMFQZm1RpkeAWscLJlMlwPG68DnnXp2hmJTZsOZQ9p3CR41NXHDt6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N9nIBfdA; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773683201; x=1805219201;
+  t=1773683203; x=1805219203;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GSNjTvX6rPE2U6QE5SmWIoplG6IQUGCakMAmfogFQUo=;
-  b=FC0Zw45QU7qfOWO7luFeux18ek8V/26DSTAg+HVx3bG2XZki69CZjq5/
-   U/zLbbLRL7H2y36bMZCcPexqIPd5dgYpPgb/sg6bqjCNbk9EHFhUNOu06
-   P2JxfpGkD0O009kGt9WB0jPinzNvjMFK0zxZ0nerS41bh8z1KhN+h84p9
-   6BECUlo4P6/SiwMLsuNZN34ZjxmceITolf9nGrD7EEZZ7Yfi1ckgzx3oE
-   p0C8h/z9xC30TKK21ynUc0Gt2JvH8WeQG/ii3G6GPsbB919oTj3I9/9DS
-   q8LjW9S4ZWIYrJju+kvka3+xGCZGiVTEqHeu5GjWFUPwT+uztT9Z09BAZ
-   w==;
-X-CSE-ConnectionGUID: xbD7L3XjS2uBCSSJ8fHQZA==
-X-CSE-MsgGUID: 5vcxNw27QU2b+mI/1tbovA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11731"; a="62275711"
+  bh=mUaN9OyVf9HbCRicI/4FWvNTeCTlSydlvJ4GVQj7bGg=;
+  b=N9nIBfdA5eTOnIo2ybZPu0jKt47wtfe2Y01cz1U79lPQy7iGM3Z2AtLP
+   OK88nqZWgYwWH5e0yhY54/m70JTbldy/Kom5pyJnRRXA87Ko1RZK1kq9D
+   iTe0YHetiOjeqnkx+tWx0sMXU7uBCEYW6oDNDUGorf302P0jGpcf32ibo
+   GHr68RfrxZn2XX7YefWt0/i8irqMh9sKLgC5Vz2FmZQ98IpMKB7LQh6x4
+   oDBHgB3Dhj7lD+2japmdrkyl97a3PXyFQaMDXZqskO4b1RuifLb+fo4rd
+   IwzwvQ5OAsAMbRGKXLLMahzbFoOZEgSuEqfBlzwb1/a0pkQ3yRBOvzCRG
+   g==;
+X-CSE-ConnectionGUID: /qHtbq0RR+u3C6co0cQYEg==
+X-CSE-MsgGUID: Wn7P1qG9SV2LPkhwKSPjww==
+X-IronPort-AV: E=McAfee;i="6800,10657,11731"; a="62275721"
 X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
-   d="scan'208";a="62275711"
+   d="scan'208";a="62275721"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2026 10:46:40 -0700
-X-CSE-ConnectionGUID: tjUsOBb3SaeMsgwrWcs3GA==
-X-CSE-MsgGUID: Yd4u7mUcRVSTic6twFEGaQ==
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2026 10:46:42 -0700
+X-CSE-ConnectionGUID: uBqSR16yRUyCepRJfYKn8g==
+X-CSE-MsgGUID: uZAy85NtTji1O+vE+imavw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
-   d="scan'208";a="222075742"
+   d="scan'208";a="222075747"
 Received: from boxer.igk.intel.com ([10.102.20.173])
-  by orviesa008.jf.intel.com with ESMTP; 16 Mar 2026 10:46:37 -0700
+  by orviesa008.jf.intel.com with ESMTP; 16 Mar 2026 10:46:40 -0700
 From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 To: netdev@vger.kernel.org
 Cc: bpf@vger.kernel.org,
@@ -72,9 +72,9 @@ Cc: bpf@vger.kernel.org,
 	larysa.zaremba@intel.com,
 	aleksander.lobakin@intel.com,
 	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH net 3/6] i40e: do not round up result of dbuff calculation for xsk pool
-Date: Mon, 16 Mar 2026 18:45:47 +0100
-Message-Id: <20260316174550.462177-4-maciej.fijalkowski@intel.com>
+Subject: [PATCH net 4/6] xsk: validate MTU against usable frame size on bind
+Date: Mon, 16 Mar 2026 18:45:48 +0100
+Message-Id: <20260316174550.462177-5-maciej.fijalkowski@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20260316174550.462177-1-maciej.fijalkowski@intel.com>
 References: <20260316174550.462177-1-maciej.fijalkowski@intel.com>
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268233-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268234-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -112,53 +112,69 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: 0FDF229E8DC
+X-Rspamd-Queue-Id: 0B5E129E8F4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When programming dbuff on rx queue context, avoid division round up as
-it causes to actually corrupt the tailroom for AF_XDP ZC. Below is an
-example based on 4k chunk size when xsk pool pointer is valid on given
-rx ring:
+AF_XDP bind currently accepts zero-copy pool configurations without
+verifying that the device MTU fits into the usable frame space provided
+by the UMEM chunk.
 
-chunk_size = 4096
-headroom = 256
-tailroom = 320
+This becomes a problem since we started to respect tailroom which is
+subtracted from chunk_size (among with headroom). 2k chunk size might
+not provide enough space for standard 1500 MTU, so let us catch such
+settings at bind time.
 
-ring->rx_buf_len = 4096 - 256 - 320 = 3520
+This prevents creating an already-invalid setup and complements the
+MTU change restriction for devices with an attached XSK pool.
 
-rx_ctx.dbuff = DIV_ROUND_UP(3520, 128) ->
-3520 / 128 = 27.5 -> round up results in 28
-
-dbuff programming unit is 128. If we give 128 * 28 = 3584. So HW will
-corrupt 64 bytes from tailroom. Doing plain division will floor the
-result and would not exceed reserved space at the end.
-
-Fixes: 1c9ba9c14658 ("i40e: xsk: add RX multi-buffer support")
 Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_main.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ net/xdp/xsk_buff_pool.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 926d001b2150..f37cf6ab4461 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -3621,9 +3621,11 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
- skip:
- 	xdp_init_buff(&ring->xdp, xdp_frame_sz, &ring->xdp_rxq);
+diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+index 2cfc19e363e3..0a6d76df97dc 100644
+--- a/net/xdp/xsk_buff_pool.c
++++ b/net/xdp/xsk_buff_pool.c
+@@ -157,6 +157,7 @@ static void xp_disable_drv_zc(struct xsk_buff_pool *pool)
+ int xp_assign_dev(struct xsk_buff_pool *pool,
+ 		  struct net_device *netdev, u16 queue_id, u16 flags)
+ {
++	bool mbuf = flags & XDP_USE_SG;
+ 	bool force_zc, force_copy;
+ 	struct netdev_bpf bpf;
+ 	int err = 0;
+@@ -178,7 +179,7 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
+ 	if (err)
+ 		return err;
  
--	rx_ctx.dbuff = DIV_ROUND_UP(ring->rx_buf_len,
--				    BIT_ULL(I40E_RXQ_CTX_DBUFF_SHIFT));
--
-+	if (ring->xsk_pool)
-+		rx_ctx.dbuff = ring->rx_buf_len / BIT_ULL(I40E_RXQ_CTX_DBUFF_SHIFT);
-+	else
-+		rx_ctx.dbuff = DIV_ROUND_UP(ring->rx_buf_len,
-+					    BIT_ULL(I40E_RXQ_CTX_DBUFF_SHIFT));
- 	rx_ctx.base = (ring->dma / 128);
- 	rx_ctx.qlen = ring->count;
+-	if (flags & XDP_USE_SG)
++	if (mbuf)
+ 		pool->umem->flags |= XDP_UMEM_SG_FLAG;
  
+ 	if (flags & XDP_USE_NEED_WAKEUP)
+@@ -200,11 +201,19 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
+ 		goto err_unreg_pool;
+ 	}
+ 
+-	if (netdev->xdp_zc_max_segs == 1 && (flags & XDP_USE_SG)) {
++	if (netdev->xdp_zc_max_segs == 1 && mbuf) {
+ 		err = -EOPNOTSUPP;
+ 		goto err_unreg_pool;
+ 	}
+ 
++	if (!mbuf) {
++		if (netdev->mtu + netdev->hard_header_len >
++				xsk_pool_get_rx_frame_size(pool)) {
++			err = -EOPNOTSUPP;
++			goto err_unreg_pool;
++		}
++	}
++
+ 	if (dev_get_min_mp_channel_count(netdev)) {
+ 		err = -EBUSY;
+ 		goto err_unreg_pool;
 -- 
 2.43.0
 
