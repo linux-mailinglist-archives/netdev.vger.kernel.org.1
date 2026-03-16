@@ -1,193 +1,206 @@
-Return-Path: <netdev+bounces-268258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268259-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kJMtE7ZWuGmKcAEAu9opvQ
-	(envelope-from <netdev+bounces-268258-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:15:02 +0100
+	id aOB4NOBYuGmKcAEAu9opvQ
+	(envelope-from <netdev+bounces-268259-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:24:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7C3C29F9FB
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:15:01 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8B4829FC89
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:24:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 732EA302DB55
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:15:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E02A93002932
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F4D33C186;
-	Mon, 16 Mar 2026 19:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4A6328B58;
+	Mon, 16 Mar 2026 19:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YPjYEWGq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cUdYsjCL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f226.google.com (mail-qk1-f226.google.com [209.85.222.226])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1ADC40DFAD
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 19:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB30933F361
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 19:24:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773688499; cv=none; b=ZVkzwXBPySa/8vCa9YXWU7h8U6YvKhwC7QVPxXniu8r+dRazZFdTvzrt4opyqcgI+IWGisLl39bPY98VTB32YjIGQE/iHiWvDshuuBkNXIQp7FHPZj6u1Zp3/N8r/c1xogc+MsLXZd1HhK4JNLwFB1kW/GJbPUYyCKK1RRNhlFA=
+	t=1773689049; cv=none; b=HvmRFnt7lBpd1MyYhO8Wd5Z0R4Ruf5DLR2wjSB3YcJn7mF04AU/UZoVh5TcawDn9TlGrRHmhMyOMTNUVoExO9TsT/Xt2CDyO07Vcb+D5EfOKRW02xX+hHGhmmhR+XJkbeojyZ38Y8IM2F2Ji/w3Je7tZ0aNQeQvPRnePhAzNQ+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773688499; c=relaxed/simple;
-	bh=l2RUckc+LA+qYeS2PCfv5ll2OoQ7cg0zAcJflcviVVk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iHL+Y7qHXbJejKy0ho5Siq4teCqmwkyKs3uOwJJtbh4ioHzFR45O9HhkbO0zGu6ufqw1FUjHSZHhtNsnUWwE+1Y0KbyB1M0sS1tQITAbxKlxOEQSZOXqIc6Brkwk58qN9XlA+jxDTQtUklNoneULOxR4VQrkDdCexcJCu3ao/rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YPjYEWGq; arc=none smtp.client-ip=209.85.222.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f226.google.com with SMTP id af79cd13be357-8cd7284782dso320806185a.1
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 12:14:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773688497; x=1774293297;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:dkim-signature:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+W8/RIjjg4WP9hrfNS+7/4D2wAv5/ZjcISe8mQCT/9U=;
-        b=QSnANTV4gFKor2e+oo/0YDVs1x8Kg5sTSWiSvHzEMRWHefgM4D+vWIMbAYb73/cpwe
-         veEJHAI0VpbqPIOH1la6dFD0i+X7JQCszIR0VlQln0vaiBtYe22+I+ta/zTbmvu8ldbx
-         aevvOJuytgi3Z2Fp7c9/zwrDczuCcy8G3PgjTKPaPCtzSMfLsO679qYuZu1sxX5bJX4R
-         OKpjLpRB/hpdZqWDgyh6EAlhGghXo0jp+FL/r3caS6oRjSGHI8j4WeR16+VXhdfkUftD
-         zBHWvaRLkICpKPkjBjk9c3W22jAPaJrx2cIOV9fR1e/XPmClbuM95Wt2dwxxaM0h5ffJ
-         Lw7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXyA25fMfDNauHoj3WPnZ9v48eTHCICLWgKagDWr4o1edWh+ZHHt7QqMhApDuWRzWr0Mp3zzKk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYEJgZV81q4l5jVVga15xqYlvea5yfdxZUHu8CfhwGujiLz4Yi
-	UaNDhvzVJvlEamvF9Q8TmAFlUTd/WTHCCZJfvH+Ma0V1yo7KgIqHJMSszSqdVopdNThU+0SAWzZ
-	gNsjqj9DNFXhw4eL+5fbYpoMDzptdLKK9a2JLWXjUhKrQOdDHvcheyNz2od9P8ynp0ITPB8rcPp
-	s+6jamJ4XrPqo3lb//93287hifSuAfCeYSpW3sdj9y9K1kzZWRtyj8flcUbUnN6FFmBfBAhqIXW
-	zTFLwhZlKmHK/+G
-X-Gm-Gg: ATEYQzwodFOYxX/VeSTIcHHXNbSsn6qbWG7OyMMQGNkFYTGbHB7UxXzZa4ZlOQdfivc
-	/g8Ot5U07Uai0z7Xk0fBS3L9BPOVzXubNMSs2GzGUpCshIUuT6kbv4j+ObMHQR++dcs2T9Hw19P
-	ZL87gDDyXJQnmUdfwJYVDIDp8ijL9Krg4vdAYf57CbKc/4OmwLpNVi18XSr/e9DrDzvNKOtlU7I
-	+chDsIvID2/OPlnNtxHDPSqopwszVR2yR/uoPKTCnWt84Re9roBaORCTtK3vXDnDsNlot40CeSA
-	v8bHAVW9cymcyk9jRiGS5OlvfHKQm8T5XvLk949p+IOa45zBdBFY6AoSYHLtZ5V42K1E2/hmi7K
-	Xty8E670twfycbMFyYZBoqjeDbIRWXmtXNofsMxNuJm8ze4tY4EXakyuFdzfnLVhdrmsrpJfGN2
-	/moLVS5L4Ovoh+CKe3DFdxKmQVIFVo59J8cu7/fXDlhUADhtUFvvaC3awi4C2dZQ==
-X-Received: by 2002:ac8:588a:0:b0:509:21ce:1a9 with SMTP id d75a77b69052e-50957cb6081mr197065271cf.10.1773688496764;
-        Mon, 16 Mar 2026 12:14:56 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-63.dlp.protect.broadcom.com. [144.49.247.63])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-89c5482a471sm2873176d6.28.2026.03.16.12.14.56
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 16 Mar 2026 12:14:56 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dl1-f69.google.com with SMTP id a92af1059eb24-12721cd1a2aso21463840c88.1
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 12:14:56 -0700 (PDT)
+	s=arc-20240116; t=1773689049; c=relaxed/simple;
+	bh=mok+0GN/V4P5qG+TDfFZAcX6xlih6/hGqugS54vAftM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TquhanGFtdAYxXH9xnWAbKypNUzwUnBbPYC9MKXVzm8TxvFThyCfPnHb9rVPRpMmJDZFEj85KCR5ZPLd4VS360rlEJJN5yephpch1AtAluoWyD4Wg9HzCY9uPu0NtqQk0WAC5iPYD1ARXb5zDorClVj4RRwCrsOtyoH3EZ0RDeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cUdYsjCL; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5a133502accso6173431e87.3
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 12:24:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1773688495; x=1774293295; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+W8/RIjjg4WP9hrfNS+7/4D2wAv5/ZjcISe8mQCT/9U=;
-        b=YPjYEWGq4t58Sx456JjeCr3vZphoMVLwk28Hcp/zT+Lx5QPbSVzw5kXzSMql95080R
-         7tnryauC808jUyTXat2/Mi5jwtJUNzxobrSZ5T7pw6CZreFH0P+VP3N0jV3OqJPe905L
-         ixBgn6SF72V+srqYefqYmzw2GGn/9gMJTFgaE=
-X-Forwarded-Encrypted: i=1; AJvYcCWkoQhcjMahHFnthVzD2hIGwbGOczqTiyIBef9QKHYkYuZ3lnQIKaW6Gpm1QOWX/tLR/wJEEL8=@vger.kernel.org
-X-Received: by 2002:a05:7022:239c:b0:124:9dea:188d with SMTP id a92af1059eb24-128f3e1280emr7688096c88.30.1773688495343;
-        Mon, 16 Mar 2026 12:14:55 -0700 (PDT)
-X-Received: by 2002:a05:7022:239c:b0:124:9dea:188d with SMTP id a92af1059eb24-128f3e1280emr7688062c88.30.1773688494513;
-        Mon, 16 Mar 2026 12:14:54 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f62837ccsm17024146c88.3.2026.03.16.12.14.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Mar 2026 12:14:53 -0700 (PDT)
-Message-ID: <b63ed1da-ea55-49a7-8e25-03f85535d51c@broadcom.com>
-Date: Mon, 16 Mar 2026 12:14:52 -0700
+        d=gmail.com; s=20230601; t=1773689046; x=1774293846; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OeUzdNtqUzZ05FUtZtH1B/y/MvIg739iNl7JRLf75nM=;
+        b=cUdYsjCLfkfGisMsB6atTIWyDnwnl5jGLkNwUxIaa+oNVaNoo6viKvQ8keYDqgfPKh
+         ll/OaULgXEp+ou6cJmRT36Cq6+/maAKQ467d0qHUGWUrZ5IcRGg2u09od3LyJE2PeCoI
+         wrqkKM2T2ygassWzo7gP8HO1lOXphgthoZWiHCqgIqdmQff8r1wIeZR0eyjBQYzbUm3k
+         NtzID1RTmsxeTrG4Ofd/fJ4sGDAWs7ThGupNzc9RmujikGRgIM7XIATRS0zpgtvdz4dZ
+         aQBr6Mh/licPGfmHBycO/Yya1T1RzFxn+GLo6p2agvW4kAvcmAJcebLgLtth4oJJeHpQ
+         lQjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773689046; x=1774293846;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OeUzdNtqUzZ05FUtZtH1B/y/MvIg739iNl7JRLf75nM=;
+        b=MUxa+dOJhnRhdyG5bROxWy/tJb4yMUTj0VBzVbRJD7sHU/QoDzUnj6s5KsY9gOlSJo
+         6pfwgnthDc+XZXAyeRuQb3R8BBmCdaHh2WTwVsCUo/vZHlCO+fRB0RyAGBBS+iPxPaQp
+         k55mYe4YFvaPaGD/Az1PZvxEh0MO/x+W+AI7F7Nwcaa8/l13WZx3Mrk9ok646/+BoJ5M
+         YAih2HPIDcGEf4A/bia7aEfczamKjai9naJopKk4YJtTNdAa3iLrIRUsrPsB028gGgDk
+         OnE/B3neVtNZN0Ydc516SRsfPq4Tyyujj73vX0s8LKWtq9eht+nPlOY8tp/K8f+8/xlu
+         olAw==
+X-Forwarded-Encrypted: i=1; AJvYcCXHtXVrZVfYtbnhNTeWZe19IFTmb7VpXUTc4kYW0JH5xoTQcdgW2Zw4eudeHrK3uJFL8/ZCu70=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNTIghYgV62EBceeVID7VQ8j7XxnZHwcVEnGLpWoqZJl/DMgFV
+	NWXxXYhfZJ7E5nORTk9x9F7MxbHMmUCetVKI+So6gxRohS6HxhuGaC2m
+X-Gm-Gg: ATEYQzzUwdwyYzNWqbJ/LIfZGki1KRxRE/wU0PPo9xaixoA8RbbOrALV9Y+TRlbRpbw
+	6lVDI04syp0Gb+qF/Vjo1j7CVGd4N6b0ZQl8MqBnhyTjkm6hRdJJVNfPZATnFCrhzhRl5+kGlPo
+	gJnScRDKYnBbg9ET8rlo0/JkoxJ9F69OuLjHiRiejOoAmI597lWk34tucu+MA0uQn3T69uIsIsL
+	sH6/J7lPq7HhysYF+H2x1U/sOPSiaovTPM25TtJfx0pSYO7IJIBKvzy9zuue+a6MJeEEVVoO28+
+	PI2bOVA/n9LZttyEjSzJi1acnCuwKvO0b+xtbcBVYP7UZzlBYgqBr3Fx3+3idmcTDpG5EYn/tj+
+	EthefAc0/+tHUZtHG2cDSVj63Y70SuoS6yno4/sSbI6v/+VM7vvspaO49aMyCRnvPAKstk0qx2S
+	5NGYBBoB7BlNhfOLMGiJpu0S5EUlALxffuHRAlTni5ymGzDv8IwafauttUy9EBAwq8pRAJtJsaf
+	A==
+X-Received: by 2002:ac2:43c8:0:b0:5a1:2ccd:ad56 with SMTP id 2adb3069b0e04-5a162aee2b1mr3140079e87.9.1773689045753;
+        Mon, 16 Mar 2026 12:24:05 -0700 (PDT)
+Received: from T6NXCV08J99224A.lan (81-237-238-191-no600.tbcn.telia.com. [81.237.238.191])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a16c8eb1bcsm1708226e87.41.2026.03.16.12.24.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Mar 2026 12:24:04 -0700 (PDT)
+From: Oskar Ray-Frayssinet <rayfraytech@gmail.com>
+To: jdmason@kudzu.us
+Cc: dave.jiang@intel.com,
+	allenbh@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	stephen@networkplumber.org,
+	ntb@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Oskar Ray-Frayssinet <rayfraytech@gmail.com>
+Subject: [PATCH v3] net: ntb_netdev: add SPDX tag and remove boilerplate license text
+Date: Mon, 16 Mar 2026 20:22:48 +0100
+Message-ID: <20260316192248.518-1-rayfraytech@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] net: bcmasp: fix double disable of clk
-To: justin.chen@broadcom.com, netdev@vger.kernel.org
-Cc: bcm-kernel-feedback-list@broadcom.com, horms@kernel.org,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch
-References: <20260316180202.3371477-1-justin.chen@broadcom.com>
- <20260316180202.3371477-3-justin.chen@broadcom.com>
-Content-Language: en-US, fr-FR
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20260316180202.3371477-3-justin.chen@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DKIM_TRACE(0.00)[broadcom.com:+];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,gmail.com,davemloft.net,kernel.org,networkplumber.org,lists.linux.dev,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-268259-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268258-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[florian.fainelli@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rayfraytech@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: A7C3C29F9FB
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D8B4829FC89
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/16/26 11:02, justin.chen@broadcom.com wrote:
-> From: Justin Chen <justin.chen@broadcom.com>
-> 
-> Switch to devm_clk_get_optional() so we can manage the clock ourselves.
-> We dynamically control the clocks depending on the state of the interface
-> for power savings. The default state is clock disabled, so unbinding the
-> driver causes a double disable.
-> 
-> Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
-> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+Add SPDX-License-Identifier tag to reflect the dual
+GPL-2.0-only/BSD-3-Clause license, remove the redundant
+boilerplate license text, and keep the driver description
+and contact information.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Signed-off-by: Oskar Ray-Frayssinet <rayfraytech@gmail.com>
+Acked-by: Dave Jiang <dave.jiang@intel.com>
+---
+v3: Keep driver description and contact information as
+    suggested by Dave Jiang
+v2: Also remove redundant boilerplate license text as
+    suggested by Stephen Hemminger
+v1: Add SPDX-License-Identifier tag only
+
+ drivers/net/ntb_netdev.c | 44 +---------------------------------------
+ 1 file changed, 1 insertion(+), 43 deletions(-)
+
+diff --git a/drivers/net/ntb_netdev.c b/drivers/net/ntb_netdev.c
+index fbeae05817e9..48482b18c73e 100644
+--- a/drivers/net/ntb_netdev.c
++++ b/drivers/net/ntb_netdev.c
+@@ -1,47 +1,5 @@
++// SPDX-License-Identifier: GPL-2.0-only OR BSD-3-Clause
+ /*
+- * This file is provided under a dual BSD/GPLv2 license.  When using or
+- *   redistributing this file, you may do so under either license.
+- *
+- *   GPL LICENSE SUMMARY
+- *
+- *   Copyright(c) 2012 Intel Corporation. All rights reserved.
+- *   Copyright (C) 2015 EMC Corporation. All Rights Reserved.
+- *
+- *   This program is free software; you can redistribute it and/or modify
+- *   it under the terms of version 2 of the GNU General Public License as
+- *   published by the Free Software Foundation.
+- *
+- *   BSD LICENSE
+- *
+- *   Copyright(c) 2012 Intel Corporation. All rights reserved.
+- *   Copyright (C) 2015 EMC Corporation. All Rights Reserved.
+- *
+- *   Redistribution and use in source and binary forms, with or without
+- *   modification, are permitted provided that the following conditions
+- *   are met:
+- *
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copy
+- *       notice, this list of conditions and the following disclaimer in
+- *       the documentation and/or other materials provided with the
+- *       distribution.
+- *     * Neither the name of Intel Corporation nor the names of its
+- *       contributors may be used to endorse or promote products derived
+- *       from this software without specific prior written permission.
+- *
+- *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+- *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+- *   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+- *   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+- *   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+- *   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+- *   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+- *   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+- *   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+- *   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+  * PCIe NTB Network Linux driver
+  *
+  * Contact Information:
 -- 
-Florian
+2.43.0
+
 
