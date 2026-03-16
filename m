@@ -1,317 +1,156 @@
-Return-Path: <netdev+bounces-268210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268209-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WMOzHIIxuGmvaAEAu9opvQ
-	(envelope-from <netdev+bounces-268210-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:36:18 +0100
+	id GC8ACWkxuGmvaAEAu9opvQ
+	(envelope-from <netdev+bounces-268209-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:35:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A95029D7A7
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:36:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64C3929D791
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:35:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8169430C6276
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 16:30:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BCA60304B4C3
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 16:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9ACD3B8D79;
-	Mon, 16 Mar 2026 16:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065773A0E93;
+	Mon, 16 Mar 2026 16:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="SGbR1334"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="Y8A64Kl6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f99.google.com (mail-ej1-f99.google.com [209.85.218.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6E03A1A59
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 16:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089D33A2577
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 16:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773678658; cv=none; b=nWLoeY1+iIWGqcWBirnoFrQWZ49RhY8nJek46CEBaWu/br9sFUhnt7GeNqZ5TJAW/eJIdyurGFcjWwNGC1/q6n0FuUx+yS8e2ZqvrhTAplzdrTeb2a3ElUds0/DSvhaDx+3yGFBgM8Qe6JNfXnZ8s0mcJkF6XMcfkjeLnOJLBXc=
+	t=1773678656; cv=none; b=sc1+S3lljsdaPJgu1Sy+NgVNTL4dODK9FwC3JmJ87tExNi/iVVg/qmZasbFEwV0V8nCUowqyynQEK8FAj5F2HYXT//KbhpsrKphx6LA/1zNtNeJFxGXn16KmvAud4OuCwIt93QNOFwGnla3x46Xthg2CySVmjaux8Shau013SXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773678658; c=relaxed/simple;
-	bh=3eOUF/0t4xtstufAr4jTFkqeyICqNkit2RzVHVoXX9U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VSdAdGBCEeqE76N16yfTX0KDBc/lLfFcLI7pmuYus0oV2QJRohg5RVgof5BZh93vZFOw9YFCBflEk4L04JZ48EyfhJiuRHt4cR1x30gkrEMVdLXhEbgjNrcytgQD+XhCJUsgoP9m+4FDrde3fjVCCUtZ4LCjFdloD/4O3BRa3ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=SGbR1334; arc=none smtp.client-ip=209.85.218.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ej1-f99.google.com with SMTP id a640c23a62f3a-b97b30fa5e5so236088866b.3
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 09:30:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1773678656; x=1774283456; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PEh7BRKAizp8GGJ568E4oqZ+Kbjdlfk2PW2zSqId4BE=;
-        b=SGbR1334Yg4AoRJiyHGpNvoqEmL9aQ9JHHBd6NvcTyJMJoo+UPf28Di7AMablVTPFN
-         bxy0JSGI+544TgExv97J20eSql+dV7HsI7x42ZwBBZsFTkEjB4fBQfvbk50cK5s7yIfQ
-         KFBKsHWhnHkD9gmw12q2/sV5Ki01EC8f4YoXrm8dmSa1j9jliVXp1s1XjMHEP5EapKGl
-         L7ahAWcXaq+1jDKXT1aB1lckJ/KUMVtjO7LM7RYg5V0mSUV95ZTdi+e+R8tX9uviJYlw
-         4RsfGMt4zT3Uf2Adm9Uxof67OFppbaGfESbeSJLDA8EMpuq2CsSkEV2Z3QbdMWkyLTcp
-         UQdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773678656; x=1774283456;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PEh7BRKAizp8GGJ568E4oqZ+Kbjdlfk2PW2zSqId4BE=;
-        b=mspFe0mCGY/l1hShMiSVAe+zVvMY2XNteTstM7gh9hCMzQsWf31hf6wAHTNf70bJxO
-         ZlljN9sHPCicztDlNC2f9lSCKS9mTsZh6gkDIRjKHRYYZPYRZ0f+g7IGiZhPsK1E+5K3
-         l2KZ431dBUdBpFzvsyZl6MmMnT7WZyVUIUdewU6+1beIrR67qeatJE6+2SMH0wf56oIC
-         xL2iDY2FTW0ICfuNyTAVDIStF4FcHBOHThi2mYFANhxQsKXOMdK5p5aORUnn3bjeTWc/
-         XaGs0VeagLyE9ga82vvfoWuqqMLB6O49KrKHVww4xgDmGzJLxCQ/yUV4VUzj5Kohqsnv
-         53Rw==
-X-Gm-Message-State: AOJu0YxjafFrifJGHyMj/VXH9lRSoes9SGmHrg5IhITbaWZPk6dC2b44
-	fcjgH47Ud1xDR3jywtEbKzTakok0ZnZWKB6SYJDlA+HyijDN5BVk5VRY0MLZzbefJH0+S95YFsR
-	MIvLqH9mK7haWTD9a042BZqA+MCZEiZUZDYVl
-X-Gm-Gg: ATEYQzwLw36mgb3d2FWeoV8L/dpA959YMs4kCm8d3ntaHaVRgdlFOr4kG8vERWBrniZ
-	P001vXwMfYfVhIcb7jV2MmYd1249SWP/ONUT2UmDkjxBCokeD++0tDjrrhgj8QERjkK+vrbSBXc
-	O3HGgLGVp71JY9C1Ii5QGhD3PRVIFtC8Pchb7E49qMAcA9p5dZt0Gf3OLDt1QKY04cK56SQnNAO
-	mErF9giSSVC1IDPneyk5JVuxzG9S7PJwW4meiRqVmOY/IeoL85VLcOJor99/W+r/a6ZVe91F8uo
-	YfNxOsJBa9A0j5ml3a1Cn5yu20o5E4a73x0QcFWcf7EZx82IUWsbfBajBLWJU4cE4iLOTqOPEm4
-	Y/TuNvCyaOFJgsrcfM4YleDDA0/36PYa3+P/l6QorddDacuLl/u/wuNjOndQsuGs6NYRpdQWgcw
-	==
-X-Received: by 2002:a17:907:e106:b0:b8f:9525:1099 with SMTP id a640c23a62f3a-b9765345c16mr499076666b.35.1773678655357;
-        Mon, 16 Mar 2026 09:30:55 -0700 (PDT)
-Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-b97a4dac429sm45802566b.17.2026.03.16.09.30.55;
-        Mon, 16 Mar 2026 09:30:55 -0700 (PDT)
-X-Relaying-Domain: 6wind.com
-Received: from localhost (kadavar.dev.6wind.com [10.17.1.232])
-	by smtpservice.6wind.com (Postfix) with ESMTP id 3111E19F7B;
-	Mon, 16 Mar 2026 17:30:55 +0100 (CET)
-From: Justin Iurman <justin.iurman@6wind.com>
-To: netdev@vger.kernel.org
-Cc: andrea.mayer@uniroma2.it,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	justin.iurman@gmail.com,
-	nicolas.dichtel@6wind.com,
-	stefano.salsano@uniroma2.it,
-	paolo.lungaroni@uniroma2.it,
-	ahabdels@cisco.com,
-	Justin Iurman <justin.iurman@6wind.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v3 2/2] selftests: add check for seg6 tunsrc
-Date: Mon, 16 Mar 2026 17:29:55 +0100
-Message-Id: <20260316162955.1253225-3-justin.iurman@6wind.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20260316162955.1253225-1-justin.iurman@6wind.com>
-References: <20260316162955.1253225-1-justin.iurman@6wind.com>
+	s=arc-20240116; t=1773678656; c=relaxed/simple;
+	bh=rMNAi2AgDi1NBiTr89Ord7U5y/ThrBP3gmI618ezBrA=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=oyipVvbUZyjWRNhfIIbtZRPiG9aZ/KNG/3tpw0988Expnh1g0D4IJeMNweJjBaBYMTbNSntiuCl/3auTYqcRrPvQ4jEmZN4nHPL52J8Deo2CB/Xqo3Q+9xhINvTl4SGnttCnPIJ4Otu/DveANvB44TQEHCr4pak1eApx5O6ja+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=Y8A64Kl6; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7128DA39EE;
+	Mon, 16 Mar 2026 17:30:48 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1773678651; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=wpVHxs8zy+XUpbmCWveFnfH2aJvNj49E/UNL6+EVSHw=;
+	b=Y8A64Kl6cB6XNboJ1u5EYtYKlwMpxgxRaai+tTDx9zaxHdP13lMiSjbxPuoxNUeD81lubq
+	aKUjbQwmWxu/Vn9amCrIStnpqeDFGVsAmPK5WnunLdzCVFx1Z2v38JbJfCHo8+4LdzvTD8
+	K0Tv8z9muoHCY5o8tEP+gF4t9cGLL7I/EHwubiOGDf8u1JUX/ccsMAUmtUw7ipOvNHtTVy
+	sQb6Ffnk2yDiCJZRnu8cGinR5wnFV8rMcrDMtv8+KRS0pCm31PqtkXeI/VDD5vOvZaJFlk
+	MdIPyfolZczfg1MzNrXB5kw/frDkxK2ikq+VgzYO8rDCpsOo5DazXUL7k7hWBw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Date: Mon, 16 Mar 2026 17:30:48 +0100
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Paolo Valerio <pvalerio@redhat.com>
+Cc: netdev@vger.kernel.org, Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH net-next v5 4/8] net: macb: use the current queue number
+ for stats
+In-Reply-To: <20260313201433.2346119-5-pvalerio@redhat.com>
+References: <20260313201433.2346119-1-pvalerio@redhat.com>
+ <20260313201433.2346119-5-pvalerio@redhat.com>
+Message-ID: <500d698680fb51285f78fa68b6e41875@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_CC(0.00)[uniroma2.it,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,6wind.com,cisco.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268210-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justin.iurman@6wind.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-268209-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,encaps.red:url,srv6_hencap_red_l3vpn_test.sh:url,6wind.com:dkim,6wind.com:email,6wind.com:mid,encap.red:url]
-X-Rspamd-Queue-Id: 1A95029D7A7
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 64C3929D791
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Extend srv6_hencap_red_l3vpn_test.sh to include checks for the new
-"tunsrc" feature.
+On 13.3.2026 21:14, Paolo Valerio wrote:
+> gem_get_ethtool_stats calculates the size of the statistics
+> data to copy always considering maximum number of queues.
+> 
+> The patch makes sure the statistics are copied only for the
+> active queues as returned in the string set count op.
+> 
+> Signed-off-by: Paolo Valerio <pvalerio@redhat.com>
+> ---
+>  drivers/net/ethernet/cadence/macb_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c 
+> b/drivers/net/ethernet/cadence/macb_main.c
+> index 06ad8c8ec036..fbeaa85b4a9c 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -3528,7 +3528,7 @@ static void gem_get_ethtool_stats(struct 
+> net_device *dev,
+>  	spin_lock_irq(&bp->stats_lock);
+>  	gem_update_stats(bp);
+>  	memcpy(data, &bp->ethtool_stats, sizeof(u64)
+> -			* (GEM_STATS_LEN + QUEUE_STATS_LEN * MACB_MAX_QUEUES));
+> +			* (GEM_STATS_LEN + QUEUE_STATS_LEN * bp->num_queues));
 
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: linux-kselftest@vger.kernel.org
-Signed-off-by: Justin Iurman <justin.iurman@6wind.com>
----
- .../net/srv6_hencap_red_l3vpn_test.sh         | 65 ++++++++++++++-----
- 1 file changed, 50 insertions(+), 15 deletions(-)
+This is an out-of-bounds write, not just a cosmetic change.
+gem_get_sset_count() returns GEM_STATS_LEN + QUEUE_STATS_LEN *
+bp->num_queues, and ethtool allocates the data buffer based on that 
+count.
+The old memcpy with MACB_MAX_QUEUES (8) writes past the end of the
+buffer on any GEM instance with fewer than 8 hardware queues.
 
-diff --git a/tools/testing/selftests/net/srv6_hencap_red_l3vpn_test.sh b/tools/testing/selftests/net/srv6_hencap_red_l3vpn_test.sh
-index 6a68c7eff1dc..bdc485640f79 100755
---- a/tools/testing/selftests/net/srv6_hencap_red_l3vpn_test.sh
-+++ b/tools/testing/selftests/net/srv6_hencap_red_l3vpn_test.sh
-@@ -345,6 +345,10 @@ setup_rt_networking()
- 		ip -netns "${nsname}" addr \
- 			add "${net_prefix}::${rt}/64" dev "${devname}" nodad
- 
-+		ip -netns "${nsname}" addr \
-+			add "${net_prefix}::dead:${rt}/64" dev "${devname}" \
-+			nodad preferred_lft 0
-+
- 		ip -netns "${nsname}" link set "${devname}" up
- 	done
- 
-@@ -419,7 +423,8 @@ setup_rt_local_sids()
- #  $4 - SRv6 router configured for removing the SRv6 Policy (router connected
- #       to the destination host)
- #  $5 - encap mode (full or red)
--#  $6 - traffic type (IPv6 or IPv4)
-+#  $6 - force tunsrc (true or false)
-+#  $7 - traffic type (IPv6 or IPv4)
- __setup_rt_policy()
- {
- 	local dst="$1"
-@@ -427,11 +432,40 @@ __setup_rt_policy()
- 	local end_rts="$3"
- 	local dec_rt="$4"
- 	local mode="$5"
--	local traffic="$6"
-+	local with_tunsrc="$6"
-+	local traffic="$7"
- 	local nsname
- 	local policy=''
-+	local tunsrc=''
- 	local n
- 
-+	if [ "$with_tunsrc" = "true" ]; then
-+		local net_prefix
-+		local drule
-+		local nxt
-+
-+		[ "$end_rts" = "" ] && nxt="${dec_rt}" || nxt="${end_rts%% *}"
-+
-+		net_prefix="$(get_network_prefix "${encap_rt}" "${nxt}")"
-+		tunsrc="tunsrc ${net_prefix}::dead:${encap_rt}"
-+
-+		eval nsname=\${$(get_rtname "${dec_rt}")}
-+
-+		drule="PREROUTING \
-+		       -d ${VPN_LOCATOR_SERVICE}:${dec_rt}::${DT46_FUNC} \
-+		       -j DROP"
-+
-+		if ! ip netns exec "${nsname}" \
-+			ip6tables -t raw -C ${drule} &>/dev/null; then
-+			ip netns exec "${nsname}" ip6tables -t raw -A ${drule}
-+		fi
-+
-+		ip netns exec "${nsname}" ip6tables -t raw -I PREROUTING 1 \
-+			-s "${net_prefix}::dead:${encap_rt}" \
-+			-d ${VPN_LOCATOR_SERVICE}:${dec_rt}::${DT46_FUNC} \
-+			-j ACCEPT
-+	fi
-+
- 	eval nsname=\${$(get_rtname "${encap_rt}")}
- 
- 	for n in ${end_rts}; do
-@@ -444,7 +478,7 @@ __setup_rt_policy()
- 	if [ "${traffic}" -eq 6 ]; then
- 		ip -netns "${nsname}" -6 route \
- 			add "${IPv6_HS_NETWORK}::${dst}" vrf "${VRF_DEVNAME}" \
--			encap seg6 mode "${mode}" segs "${policy}" \
-+			encap seg6 mode "${mode}" ${tunsrc} segs "${policy}" \
- 			dev "${VRF_DEVNAME}"
- 
- 		ip -netns "${nsname}" -6 neigh \
-@@ -455,7 +489,7 @@ __setup_rt_policy()
- 		# received, otherwise the proxy arp does not work.
- 		ip -netns "${nsname}" -4 route \
- 			add "${IPv4_HS_NETWORK}.${dst}" vrf "${VRF_DEVNAME}" \
--			encap seg6 mode "${mode}" segs "${policy}" \
-+			encap seg6 mode "${mode}" ${tunsrc} segs "${policy}" \
- 			dev "${VRF_DEVNAME}"
- 	fi
- }
-@@ -463,13 +497,13 @@ __setup_rt_policy()
- # see __setup_rt_policy
- setup_rt_policy_ipv6()
- {
--	__setup_rt_policy "$1" "$2" "$3" "$4" "$5" 6
-+	__setup_rt_policy "$1" "$2" "$3" "$4" "$5" "$6" 6
- }
- 
- #see __setup_rt_policy
- setup_rt_policy_ipv4()
- {
--	__setup_rt_policy "$1" "$2" "$3" "$4" "$5" 4
-+	__setup_rt_policy "$1" "$2" "$3" "$4" "$5" "$6" 4
- }
- 
- setup_hs()
-@@ -567,41 +601,41 @@ setup()
- 	# the network path between hs-1 and hs-2 traverses several routers
- 	# depending on the direction of traffic.
- 	#
--	# Direction hs-1 -> hs-2 (H.Encaps.Red)
-+	# Direction hs-1 -> hs-2 (H.Encaps.Red + tunsrc)
- 	#  - rt-3,rt-4 (SRv6 End behaviors)
- 	#  - rt-2 (SRv6 End.DT46 behavior)
- 	#
- 	# Direction hs-2 -> hs-1 (H.Encaps.Red)
- 	#  - rt-1 (SRv6 End.DT46 behavior)
--	setup_rt_policy_ipv6 2 1 "3 4" 2 encap.red
--	setup_rt_policy_ipv6 1 2 "" 1 encap.red
-+	setup_rt_policy_ipv6 2 1 "3 4" 2 encap.red true
-+	setup_rt_policy_ipv6 1 2 "" 1 encap.red false
- 
- 	# create an IPv4 VPN between hosts hs-1 and hs-2
- 	# the network path between hs-1 and hs-2 traverses several routers
- 	# depending on the direction of traffic.
- 	#
--	# Direction hs-1 -> hs-2 (H.Encaps.Red)
-+	# Direction hs-1 -> hs-2 (H.Encaps.Red + tunsrc)
- 	# - rt-2 (SRv6 End.DT46 behavior)
- 	#
- 	# Direction hs-2 -> hs-1 (H.Encaps.Red)
- 	#  - rt-4,rt-3 (SRv6 End behaviors)
- 	#  - rt-1 (SRv6 End.DT46 behavior)
--	setup_rt_policy_ipv4 2 1 "" 2 encap.red
--	setup_rt_policy_ipv4 1 2 "4 3" 1 encap.red
-+	setup_rt_policy_ipv4 2 1 "" 2 encap.red true
-+	setup_rt_policy_ipv4 1 2 "4 3" 1 encap.red false
- 
- 	# create an IPv6 VPN between hosts hs-3 and hs-4
- 	# the network path between hs-3 and hs-4 traverses several routers
- 	# depending on the direction of traffic.
- 	#
--	# Direction hs-3 -> hs-4 (H.Encaps.Red)
-+	# Direction hs-3 -> hs-4 (H.Encaps.Red + tunsrc)
- 	# - rt-2 (SRv6 End Behavior)
- 	# - rt-4 (SRv6 End.DT46 behavior)
- 	#
- 	# Direction hs-4 -> hs-3 (H.Encaps.Red)
- 	#  - rt-1 (SRv6 End behavior)
- 	#  - rt-3 (SRv6 End.DT46 behavior)
--	setup_rt_policy_ipv6 4 3 "2" 4 encap.red
--	setup_rt_policy_ipv6 3 4 "1" 3 encap.red
-+	setup_rt_policy_ipv6 4 3 "2" 4 encap.red true
-+	setup_rt_policy_ipv6 3 4 "1" 3 encap.red false
- 
- 	# testing environment was set up successfully
- 	SETUP_ERR=0
-@@ -819,6 +853,7 @@ test_command_or_ksft_skip ip
- test_command_or_ksft_skip ping
- test_command_or_ksft_skip sysctl
- test_command_or_ksft_skip grep
-+test_command_or_ksft_skip ip6tables
- 
- test_iproute2_supp_or_ksft_skip
- test_vrf_or_ksft_skip
--- 
-2.39.2
+KASAN confirms on RP1 (1 queue) without this patch applied:
 
+   BUG: KASAN: vmalloc-out-of-bounds in gem_get_ethtool_stats+0x50/0x78
+   Write of size 760 at addr ffffffc0822e7000 by task ethtool/922
+
+The overflow stays within the vzalloc page slack, so the practical
+impact is low - but it's still an out-of-bounds write that exists in
+the current upstream code. Might be worth splitting this out as a
+standalone fix targeting net with a Fixes: tag, and updating the commit
+message accordingly?
+
+>  	spin_unlock_irq(&bp->stats_lock);
+>  }
+
+Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+
+Thanks
+Nicolai
 
