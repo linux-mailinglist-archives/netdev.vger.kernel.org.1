@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-268002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268003-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNwfIEtkt2kMQwEAu9opvQ
-	(envelope-from <netdev+bounces-268002-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 03:00:43 +0100
+	id qJSlLFlkt2kMQwEAu9opvQ
+	(envelope-from <netdev+bounces-268003-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 03:00:57 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE87D293B9C
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 03:00:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CCDC293BA3
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 03:00:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 604233034577
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 01:58:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5335E3039805
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 01:58:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7FC2DECC6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCF12DF701;
 	Mon, 16 Mar 2026 01:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="sYaXfXK2"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="gLGTFFCB"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5632E0B5C
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 01:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B460915CD74
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 01:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773626325; cv=none; b=MxHP5A2imEmLMO9d7R56ziMfY3oAkekcfKQsuTS72eUn691LpQtRka+p9wqIQc8z/JaaMzN7ts0rCuAz/q/VFSo/pC1a5bAiPgVeE7QhLAi8mKvHUwIQ0VmzLbRa/MqMkmgHOxmTfEEjn4ZBkhVl3qY6ZiYcwIx6aAqYP1+EdFw=
+	t=1773626325; cv=none; b=JpbMgCJrwxKv1EEhzMP6neL0OZnBv8Zs7qbMwgcKoFsFVAdgoKKE5nRQaBGhYK1TR2rrKxWV5BfGPi8SxLO6etBkVG365xK/yJomZm2d1VX1QSdbghd9UEdRXVqxg3njx9gQKppX0cPBp3Cn4MsrmQs52m+GUkiPDPfQQXfxQ6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773626325; c=relaxed/simple;
-	bh=fm+5xUZbPsSbaLKaCEdPC6IBJ7b5vPnCzOF89MsiFFM=;
+	bh=uKQO7zzsw9pn5//DZYD/b3rEY5IjLIh3vtm/Yo2NUEA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QbIjPT+LE8TL4HZJX4nWuK8xRHaud1Cki/UYdkfZZ86JtdrsXINsuUCfTDJCJcowFdxEAmo0g6xKKkt4ZvZq/ijWm0k0X2r5m+hUiiT5Irt/g6X9dvCj5CslQktfIcIXn0jW+Ky8s1WitH/d/3mrYkjK2DTsH4B/TC+QJ0r2whU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=sYaXfXK2; arc=none smtp.client-ip=115.124.30.101
+	 MIME-Version; b=mvM4nM9AyZVUoTcE54viKRSciYlff/qIyOXlidn17Na6g701i9w81EP7UckxMz8bi6M26JvEPrccD+/bY5ZBRKCaniWsZwQ6NCQtFFshdzNiSXM1YSE1iLkOeyaYpRab4iBh2EkTMPA3Tt/zuDCJo26Nh0EzIyvGeHd3/89KhSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=gLGTFFCB; arc=none smtp.client-ip=115.124.30.98
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1773626315; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=/O1dMOPOZ62TQB3c5wutYvGXvJw1n73TIdCuzEkYBKY=;
-	b=sYaXfXK2zVl9urIHCororhtnAQs98ORVNRLOkc/Igg8FLVSQiwAFzcL9qJXI8H8LN8F+E+5MoMGiq/TW7mz5PRo2Tvh42zXG6CqMhYe7+oIj4Jg8dMYwRkceRpeRbuwq6hbpv/7Qq+mNSs3guk+4Sekv+b9jI9Y52zDajWpAcfU=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R831e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032089153;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0X.-7JaS_1773626313;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X.-7JaS_1773626313 cluster:ay36)
+	t=1773626316; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=z3L4T/9WuKQxkSfd1XgtjOJ7a7Jkonw989U20eQcGRU=;
+	b=gLGTFFCBPzmxLpxObpl5ppald+xait3zYnUY7sy7kk4RzcY+NOv9jd1GGE+T7OPcAa2qYImYryxPBXU3H6FNP6cZx0xg/7bSeHqw0uyxf5F/AygN0wPe1qzSLswWhFBJhYRmu9vxl3cdT26mH+643PyVQmfrGX9ScMRsfPCEW5U=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R671e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0X.-Bob-_1773626314;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X.-Bob-_1773626314 cluster:ay36)
           by smtp.aliyun-inc.com;
           Mon, 16 Mar 2026 09:58:34 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
@@ -57,9 +57,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Dong Yibo <dong100@mucse.com>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Dust Li <dust.li@linux.alibaba.com>
-Subject: [PATCH net-next v32 5/8] eea: implement packet receive logic
-Date: Mon, 16 Mar 2026 09:58:26 +0800
-Message-Id: <20260316015829.65383-6-xuanzhuo@linux.alibaba.com>
+Subject: [PATCH net-next v32 6/8] eea: implement packet transmit logic
+Date: Mon, 16 Mar 2026 09:58:27 +0800
+Message-Id: <20260316015829.65383-7-xuanzhuo@linux.alibaba.com>
 X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 In-Reply-To: <20260316015829.65383-1-xuanzhuo@linux.alibaba.com>
 References: <20260316015829.65383-1-xuanzhuo@linux.alibaba.com>
@@ -85,7 +85,7 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-268002-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268003-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -100,573 +100,334 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,alibaba.com:email,linux.alibaba.com:dkim,linux.alibaba.com:mid]
-X-Rspamd-Queue-Id: DE87D293B9C
+X-Rspamd-Queue-Id: 3CCDC293BA3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Implement the core logic for receiving packets in the EEA RX path,
-including packet buffering and basic validation.
+Implement the core logic for transmitting packets in the EEA TX path,
+including packet preparation and submission to the underlying transport.
 
 Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
 Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
 Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
 Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 ---
- drivers/net/ethernet/alibaba/eea/eea_net.h |   2 +
- drivers/net/ethernet/alibaba/eea/eea_rx.c  | 502 ++++++++++++++++++++-
- 2 files changed, 502 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/alibaba/eea/eea_tx.c | 283 +++++++++++++++++++++-
+ 1 file changed, 280 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/ethernet/alibaba/eea/eea_net.h
-index bff349f6747f..98b333871eda 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.h
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
-@@ -62,6 +62,7 @@ struct eea_net_rx_pkt_ctx {
- 	bool data_valid;
- 	bool do_drop;
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_tx.c b/drivers/net/ethernet/alibaba/eea/eea_tx.c
+index 5b3df2e582e1..5986dd34094b 100644
+--- a/drivers/net/ethernet/alibaba/eea/eea_tx.c
++++ b/drivers/net/ethernet/alibaba/eea/eea_tx.c
+@@ -11,6 +11,11 @@
+ #include "eea_pci.h"
+ #include "eea_ring.h"
  
-+	u32 recv_len;
- 	struct sk_buff *head_skb;
- 	struct sk_buff *curr_skb;
- };
-@@ -167,6 +168,7 @@ void eea_init_ctx(struct eea_net *enet, struct eea_net_init_ctx *ctx);
- int eea_queues_check_and_reset(struct eea_device *edev);
- 
- /* rx apis */
-+
- void enet_rx_stop(struct eea_net_rx *rx);
- void enet_rx_start(struct eea_net_rx *rx);
- 
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_rx.c b/drivers/net/ethernet/alibaba/eea/eea_rx.c
-index fe04d1bb5f6a..b6acaa3ada15 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_rx.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_rx.c
-@@ -16,6 +16,39 @@
- 
- #define EEA_PAGE_FRAGS_NUM 1024
- 
-+#define EEA_RX_BUF_ALIGN 128
-+
-+struct eea_rx_ctx {
-+	u32 len;
-+	u32 hdr_len;
-+
-+	u16 flags;
-+	bool more;
-+
-+	u32 frame_sz;
-+
-+	struct eea_rx_meta *meta;
++struct eea_sq_free_stats {
++	u64 packets;
++	u64 bytes;
 +};
 +
-+static struct eea_rx_meta *eea_rx_meta_get(struct eea_net_rx *rx)
+ struct eea_tx_meta {
+ 	struct eea_tx_meta *next;
+ 
+@@ -28,21 +33,293 @@ struct eea_tx_meta {
+ 	u16 dma_len;
+ };
+ 
++static struct eea_tx_meta *eea_tx_meta_get(struct eea_net_tx *tx)
 +{
-+	struct eea_rx_meta *meta;
++	struct eea_tx_meta *meta;
 +
-+	if (!rx->free)
++	if (!tx->free)
 +		return NULL;
 +
-+	meta = rx->free;
-+	rx->free = meta->next;
++	meta = tx->free;
++	tx->free = meta->next;
 +
 +	return meta;
 +}
 +
-+static void eea_rx_meta_put(struct eea_net_rx *rx, struct eea_rx_meta *meta)
++static void eea_tx_meta_put_and_unmap(struct eea_net_tx *tx,
++				      struct eea_tx_meta *meta)
 +{
-+	meta->next = rx->free;
-+	rx->free = meta;
++	struct eea_tx_meta *head;
++
++	head = meta;
++
++	while (true) {
++		if (head == meta)
++			dma_unmap_single(tx->dma_dev, meta->dma_addr,
++					 meta->dma_len, DMA_TO_DEVICE);
++		else
++			dma_unmap_page(tx->dma_dev, meta->dma_addr,
++				       meta->dma_len, DMA_TO_DEVICE);
++
++		if (meta->next) {
++			meta = meta->next;
++			continue;
++		}
++
++		break;
++	}
++
++	meta->next = tx->free;
++	tx->free = head;
 +}
 +
- static void eea_free_rx_buffer(struct eea_net_rx *rx, struct eea_rx_meta *meta)
++static void eea_meta_free_xmit(struct eea_net_tx *tx,
++			       struct eea_tx_meta *meta,
++			       int budget,
++			       struct eea_tx_cdesc *desc,
++			       struct eea_sq_free_stats *stats)
++{
++	struct sk_buff *skb = meta->skb;
++
++	if (unlikely((skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) && desc)) {
++		struct skb_shared_hwtstamps ts = {};
++
++		ts.hwtstamp = EEA_DESC_TS(desc) + tx->enet->hw_ts_offset;
++		skb_tstamp_tx(skb, &ts);
++	}
++
++	++stats->packets;
++	stats->bytes += meta->skb->len;
++	napi_consume_skb(meta->skb, budget);
++
++	meta->data = NULL;
++}
++
++static u32 eea_clean_tx(struct eea_net_tx *tx, int budget)
++{
++	struct eea_sq_free_stats stats = {0};
++	struct eea_tx_cdesc *desc;
++	struct eea_tx_meta *meta;
++	int desc_n;
++	u16 id;
++
++	while ((desc = ering_cq_get_desc(tx->ering))) {
++		id = le16_to_cpu(desc->id);
++		if (unlikely(id >= tx->ering->num)) {
++			netdev_err(tx->enet->netdev, "tx invalid id %d\n", id);
++			ering_cq_ack_desc(tx->ering, 1);
++			continue;
++		}
++
++		meta = &tx->meta[id];
++
++		if (meta->data) {
++			eea_tx_meta_put_and_unmap(tx, meta);
++			eea_meta_free_xmit(tx, meta, budget, desc, &stats);
++			desc_n = meta->num;
++		} else {
++			netdev_err(tx->enet->netdev,
++				   "tx meta->data is null. id %d num: %d\n",
++				   meta->id, meta->num);
++			desc_n = 1;
++		}
++
++		ering_cq_ack_desc(tx->ering, desc_n);
++	}
++
++	return stats.packets;
++}
++
+ int eea_poll_tx(struct eea_net_tx *tx, int budget)
  {
- 	u32 drain_count;
-@@ -28,6 +61,63 @@ static void eea_free_rx_buffer(struct eea_net_rx *rx, struct eea_rx_meta *meta)
- 	meta->page = NULL;
- }
- 
-+static void meta_align_offset(struct eea_net_rx *rx, struct eea_rx_meta *meta)
-+{
-+	int h, b;
+-	/* Empty function; will be implemented in a subsequent commit. */
++	struct eea_net *enet = tx->enet;
++	u32 index = tx - enet->tx;
++	struct netdev_queue *txq;
++	u32 cleaned;
 +
-+	h = rx->headroom;
-+	b = meta->offset + h;
++	txq = netdev_get_tx_queue(enet->netdev, index);
 +
-+	/* For better performance, we align the buffer address to
-+	 * EEA_RX_BUF_ALIGN, as required by the device design.
-+	 */
-+	b = ALIGN(b, EEA_RX_BUF_ALIGN);
++	__netif_tx_lock(txq, smp_processor_id());
 +
-+	meta->offset = b - h;
-+}
++	cleaned = eea_clean_tx(tx, budget);
 +
-+static int eea_alloc_rx_buffer(struct eea_net_rx *rx, struct eea_rx_meta *meta)
-+{
-+	struct page *page;
++	if (netif_tx_queue_stopped(txq) && cleaned > 0)
++		netif_tx_wake_queue(txq);
 +
-+	if (meta->page)
-+		return 0;
-+
-+	page = page_pool_dev_alloc_pages(rx->pp);
-+	if (!page)
-+		return -ENOMEM;
-+
-+	page_pool_fragment_page(page, EEA_PAGE_FRAGS_NUM);
-+
-+	meta->page = page;
-+	meta->dma = page_pool_get_dma_addr(page);
-+	meta->offset = 0;
-+	meta->frags = 0;
-+
-+	meta_align_offset(rx, meta);
++	__netif_tx_unlock(txq);
 +
 +	return 0;
 +}
 +
-+static void eea_consume_rx_buffer(struct eea_net_rx *rx,
-+				  struct eea_rx_meta *meta,
-+				  u32 consumed)
++static int eea_fill_desc_from_skb(const struct sk_buff *skb,
++				  struct eea_tx_desc *desc)
 +{
-+	int min;
++	if (skb_is_gso(skb)) {
++		struct skb_shared_info *sinfo = skb_shinfo(skb);
 +
-+	meta->offset += consumed;
-+	++meta->frags;
++		desc->gso_size = cpu_to_le16(sinfo->gso_size);
++		if (sinfo->gso_type & SKB_GSO_TCPV4)
++			desc->gso_type = EEA_TX_GSO_TCPV4;
 +
-+	min = SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-+	min += rx->headroom;
-+	min += ETH_DATA_LEN;
++		else if (sinfo->gso_type & SKB_GSO_TCPV6)
++			desc->gso_type = EEA_TX_GSO_TCPV6;
 +
-+	meta_align_offset(rx, meta);
++		else if (sinfo->gso_type & SKB_GSO_UDP_L4)
++			desc->gso_type = EEA_TX_GSO_UDP_L4;
 +
-+	if (min + meta->offset > PAGE_SIZE)
-+		eea_free_rx_buffer(rx, meta);
-+}
++		else
++			return -EINVAL;
 +
- static void eea_free_rx_hdr(struct eea_net_rx *rx, struct eea_net_cfg *cfg)
- {
- 	struct eea_rx_meta *meta;
-@@ -93,12 +183,420 @@ static int eea_alloc_rx_hdr(struct eea_net_init_ctx *ctx, struct eea_net_rx *rx)
- 	return -ENOMEM;
- }
- 
--static int eea_poll(struct napi_struct *napi, int budget)
-+static void eea_rx_meta_dma_sync_for_cpu(struct eea_net_rx *rx,
-+					 struct eea_rx_meta *meta, u32 len)
-+{
-+	dma_sync_single_for_cpu(rx->enet->edev->dma_dev,
-+				meta->dma + meta->offset + meta->headroom,
-+				len, DMA_FROM_DEVICE);
-+}
-+
-+static int eea_harden_check_overflow(struct eea_rx_ctx *ctx,
-+				     struct eea_net *enet)
- {
--	/* Empty function; will be implemented in a subsequent commit. */
-+	u32 max_len;
-+
-+	max_len = ctx->meta->truesize - ctx->meta->headroom -
-+		ctx->meta->tailroom;
-+
-+	if (unlikely(ctx->len > max_len)) {
-+		pr_debug("%s: rx error: len %u exceeds truesize %u\n",
-+			 enet->netdev->name, ctx->len, max_len);
-+		return -EINVAL;
++		if (sinfo->gso_type & SKB_GSO_TCP_ECN)
++			desc->gso_type |= EEA_TX_GSO_ECN;
++	} else {
++		desc->gso_type = EEA_TX_GSO_NONE;
 +	}
++
++	if (skb->ip_summed == CHECKSUM_PARTIAL) {
++		desc->csum_start = cpu_to_le16(skb_checksum_start_offset(skb));
++		desc->csum_offset = cpu_to_le16(skb->csum_offset);
++	}
++
++	return 0;
++}
++
++static struct eea_tx_meta *eea_tx_desc_fill(struct eea_net_tx *tx,
++					    dma_addr_t addr, u32 len,
++					    bool is_last, void *data, u16 flags)
++{
++	struct eea_tx_meta *meta;
++	struct eea_tx_desc *desc;
++
++	meta = eea_tx_meta_get(tx);
++
++	desc = ering_sq_alloc_desc(tx->ering, meta->id, is_last, flags);
++	desc->addr = cpu_to_le64(addr);
++	desc->len = cpu_to_le16(len);
++
++	meta->next     = NULL;
++	meta->dma_len  = len;
++	meta->dma_addr = addr;
++	meta->data     = data;
++	meta->num      = 1;
++	meta->desc     = desc;
++
++	return meta;
++}
++
++static int eea_tx_add_skb_frag(struct eea_net_tx *tx,
++			       struct eea_tx_meta *head_meta,
++			       const skb_frag_t *frag, bool is_last)
++{
++	u32 len = skb_frag_size(frag);
++	struct eea_tx_meta *meta;
++	dma_addr_t addr;
++
++	addr = skb_frag_dma_map(tx->dma_dev, frag, 0, len, DMA_TO_DEVICE);
++	if (unlikely(dma_mapping_error(tx->dma_dev, addr)))
++		return -ENOMEM;
++
++	meta = eea_tx_desc_fill(tx, addr, len, is_last, NULL, 0);
++
++	meta->next = head_meta->next;
++	head_meta->next = meta;
 +
  	return 0;
  }
  
-+static int eea_harden_check_size(struct eea_rx_ctx *ctx, struct eea_net *enet)
++static int eea_tx_post_skb(struct eea_net_tx *tx, struct sk_buff *skb)
 +{
-+	int err;
-+
-+	err = eea_harden_check_overflow(ctx, enet);
-+	if (err)
-+		return err;
-+
-+	if (ctx->hdr_len) {
-+		if (unlikely(ctx->hdr_len < ETH_HLEN)) {
-+			pr_debug("%s: short hdr %u\n", enet->netdev->name,
-+				 ctx->hdr_len);
-+			return -EINVAL;
-+		}
-+
-+		if (unlikely(ctx->hdr_len > enet->cfg.split_hdr)) {
-+			pr_debug("%s: rx error: hdr len %u exceeds hdr buffer size %u\n",
-+				 enet->netdev->name, ctx->hdr_len,
-+				 enet->cfg.split_hdr);
-+			return -EINVAL;
-+		}
-+
-+		return 0;
-+	}
-+
-+	if (unlikely(ctx->len < ETH_HLEN)) {
-+		pr_debug("%s: short packet %u\n", enet->netdev->name, ctx->len);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static struct sk_buff *eea_build_skb(void *buf, u32 buflen, u32 headroom,
-+				     u32 len)
-+{
-+	struct sk_buff *skb;
-+
-+	skb = build_skb(buf, buflen);
-+	if (unlikely(!skb))
-+		return NULL;
-+
-+	skb_reserve(skb, headroom);
-+	skb_put(skb, len);
-+
-+	return skb;
-+}
-+
-+static struct sk_buff *eea_rx_build_split_hdr_skb(struct eea_net_rx *rx,
-+						  struct eea_rx_ctx *ctx)
-+{
-+	struct eea_rx_meta *meta = ctx->meta;
-+	struct sk_buff *skb;
-+	u32 truesize;
-+
-+	dma_sync_single_for_cpu(rx->enet->edev->dma_dev, meta->hdr_dma,
-+				ctx->hdr_len, DMA_FROM_DEVICE);
-+
-+	skb = napi_alloc_skb(rx->napi, ctx->hdr_len);
-+	if (unlikely(!skb))
-+		return NULL;
-+
-+	truesize = meta->headroom + ctx->len;
-+
-+	skb_put_data(skb, ctx->meta->hdr_addr, ctx->hdr_len);
-+
-+	if (ctx->len) {
-+		skb_add_rx_frag(skb, 0, meta->page,
-+				meta->offset + meta->headroom,
-+				ctx->len, truesize);
-+
-+		eea_consume_rx_buffer(rx, meta, truesize);
-+	}
-+
-+	skb_mark_for_recycle(skb);
-+
-+	return skb;
-+}
-+
-+static struct sk_buff *eea_rx_build_skb(struct eea_net_rx *rx,
-+					struct eea_rx_ctx *ctx)
-+{
-+	struct eea_rx_meta *meta = ctx->meta;
-+	u32 len, shinfo_size, truesize;
-+	struct sk_buff *skb;
-+	struct page *page;
-+	void *buf, *pkt;
-+
-+	page = meta->page;
-+	if (!page)
-+		return NULL;
-+
-+	shinfo_size = SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-+
-+	buf = page_address(page) + meta->offset;
-+	pkt = buf + meta->headroom;
-+	len = ctx->len;
-+	truesize = meta->headroom + ctx->len + shinfo_size;
-+
-+	skb = eea_build_skb(buf, truesize, pkt - buf, len);
-+	if (unlikely(!skb))
-+		return NULL;
-+
-+	eea_consume_rx_buffer(rx, meta, truesize);
-+	skb_mark_for_recycle(skb);
-+
-+	return skb;
-+}
-+
-+static int eea_skb_append_buf(struct eea_net_rx *rx, struct eea_rx_ctx *ctx)
-+{
-+	struct sk_buff *curr_skb = rx->pkt.curr_skb;
-+	struct sk_buff *head_skb = rx->pkt.head_skb;
-+	int num_skb_frags;
-+	int offset;
-+
-+	if (!curr_skb)
-+		curr_skb = head_skb;
-+
-+	num_skb_frags = skb_shinfo(curr_skb)->nr_frags;
-+	if (unlikely(num_skb_frags == MAX_SKB_FRAGS)) {
-+		struct sk_buff *nskb = alloc_skb(0, GFP_ATOMIC);
-+
-+		if (unlikely(!nskb))
-+			return -ENOMEM;
-+
-+		skb_mark_for_recycle(nskb);
-+
-+		if (curr_skb == head_skb)
-+			skb_shinfo(curr_skb)->frag_list = nskb;
-+		else
-+			curr_skb->next = nskb;
-+
-+		curr_skb = nskb;
-+		head_skb->truesize += nskb->truesize;
-+		num_skb_frags = 0;
-+
-+		rx->pkt.curr_skb = curr_skb;
-+	}
-+
-+	if (curr_skb != head_skb) {
-+		head_skb->data_len += ctx->len;
-+		head_skb->len += ctx->len;
-+		head_skb->truesize += ctx->meta->truesize;
-+	}
-+
-+	offset = ctx->meta->offset + ctx->meta->headroom;
-+
-+	skb_add_rx_frag(curr_skb, num_skb_frags, ctx->meta->page,
-+			offset, ctx->len, ctx->meta->truesize);
-+
-+	eea_consume_rx_buffer(rx, ctx->meta, ctx->meta->headroom + ctx->len);
-+
-+	return 0;
-+}
-+
-+static int process_remain_buf(struct eea_net_rx *rx, struct eea_rx_ctx *ctx)
-+{
-+	struct eea_net *enet = rx->enet;
-+
-+	if (eea_harden_check_overflow(ctx, enet))
-+		goto err;
-+
-+	if (eea_skb_append_buf(rx, ctx))
-+		goto err;
-+
-+	return 0;
-+
-+err:
-+	dev_kfree_skb(rx->pkt.head_skb);
-+	rx->pkt.do_drop = true;
-+	rx->pkt.head_skb = NULL;
-+	return 0;
-+}
-+
-+static int process_first_buf(struct eea_net_rx *rx, struct eea_rx_ctx *ctx)
-+{
-+	struct eea_net *enet = rx->enet;
-+	struct sk_buff *skb = NULL;
-+
-+	if (eea_harden_check_size(ctx, enet))
-+		goto err;
-+
-+	rx->pkt.data_valid = ctx->flags & EEA_DESC_F_DATA_VALID;
-+
-+	if (ctx->hdr_len)
-+		skb = eea_rx_build_split_hdr_skb(rx, ctx);
-+	else
-+		skb = eea_rx_build_skb(rx, ctx);
-+
-+	if (unlikely(!skb))
-+		goto err;
-+
-+	rx->pkt.head_skb = skb;
-+
-+	return 0;
-+
-+err:
-+	rx->pkt.do_drop = true;
-+	return 0;
-+}
-+
-+static void eea_submit_skb(struct eea_net_rx *rx, struct sk_buff *skb,
-+			   struct eea_rx_cdesc *desc)
-+{
-+	struct eea_net *enet = rx->enet;
-+
-+	if (rx->pkt.data_valid)
-+		skb->ip_summed = CHECKSUM_UNNECESSARY;
-+
-+	if (enet->cfg.ts_cfg.rx_filter == HWTSTAMP_FILTER_ALL)
-+		skb_hwtstamps(skb)->hwtstamp = EEA_DESC_TS(desc) +
-+			enet->hw_ts_offset;
-+
-+	skb_record_rx_queue(skb, rx->index);
-+	skb->protocol = eth_type_trans(skb, enet->netdev);
-+
-+	napi_gro_receive(rx->napi, skb);
-+}
-+
-+static int eea_rx_desc_to_ctx(struct eea_net_rx *rx,
-+			      struct eea_rx_ctx *ctx,
-+			      struct eea_rx_cdesc *desc)
-+{
-+	u16 id;
-+
-+	ctx->meta = NULL;
-+
-+	id = le16_to_cpu(desc->id);
-+	if (unlikely(id >= rx->ering->num)) {
-+		netdev_err(rx->enet->netdev, "rx invalid id %d\n", id);
-+		return -EINVAL;
-+	}
-+
-+	ctx->meta = &rx->meta[id];
-+	ctx->len = le16_to_cpu(desc->len);
-+	if (unlikely(ctx->len > ctx->meta->len)) {
-+		netdev_err(rx->enet->netdev, "rx invalid len(%d) id:%d\n",
-+			   ctx->len, id);
-+		return -EINVAL;
-+	}
-+
-+	ctx->flags = le16_to_cpu(desc->flags);
-+
-+	ctx->hdr_len = 0;
-+	if (ctx->flags & EEA_DESC_F_SPLIT_HDR) {
-+		ctx->hdr_len = le16_to_cpu(desc->len_ex) &
-+			EEA_RX_CDESC_HDR_LEN_MASK;
-+	}
-+
-+	ctx->more = ctx->flags & EEA_RING_DESC_F_MORE;
-+
-+	return 0;
-+}
-+
-+static int eea_cleanrx(struct eea_net_rx *rx, int budget,
-+		       struct eea_rx_ctx *ctx)
-+{
-+	struct eea_rx_cdesc *desc;
-+	struct eea_rx_meta *meta;
-+	int packets, err;
-+
-+	for (packets = 0; packets < budget; ) {
-+		desc = ering_cq_get_desc(rx->ering);
-+		if (!desc)
-+			break;
-+
-+		err = eea_rx_desc_to_ctx(rx, ctx, desc);
-+		if (unlikely(err)) {
-+			if (ctx->meta)
-+				eea_rx_meta_put(rx, ctx->meta);
-+
-+			if (rx->pkt.idx)
-+				dev_kfree_skb(rx->pkt.head_skb);
-+
-+			ctx->more = false;
-+			goto ack;
-+		}
-+
-+		meta = ctx->meta;
-+
-+		if (unlikely(rx->pkt.do_drop))
-+			goto skip;
-+
-+		eea_rx_meta_dma_sync_for_cpu(rx, meta, ctx->len);
-+
-+		rx->pkt.recv_len += ctx->len;
-+		rx->pkt.recv_len += ctx->hdr_len;
-+
-+		if (!rx->pkt.idx)
-+			process_first_buf(rx, ctx);
-+		else
-+			process_remain_buf(rx, ctx);
-+
-+		++rx->pkt.idx;
-+
-+		if (!ctx->more && rx->pkt.head_skb) {
-+			eea_submit_skb(rx, rx->pkt.head_skb, desc);
-+			++packets;
-+		}
-+
-+skip:
-+		eea_rx_meta_put(rx, meta);
-+ack:
-+		ering_cq_ack_desc(rx->ering, 1);
-+
-+		if (!ctx->more)
-+			memset(&rx->pkt, 0, sizeof(rx->pkt));
-+	}
-+
-+	return packets;
-+}
-+
-+static bool eea_rx_post(struct eea_net_rx *rx)
-+{
-+	u32 tailroom, headroom, room, len;
-+	struct eea_rx_meta *meta;
-+	struct eea_rx_desc *desc;
-+	int err = 0, num = 0;
++	const struct skb_shared_info *shinfo = skb_shinfo(skb);
++	u32 hlen = skb_headlen(skb);
++	struct eea_tx_meta *meta;
 +	dma_addr_t addr;
++	int i, err;
++	u16 flags;
 +
-+	tailroom = SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-+	headroom = rx->headroom;
-+	room = headroom + tailroom;
++	addr = dma_map_single(tx->dma_dev, skb->data, hlen, DMA_TO_DEVICE);
++	if (unlikely(dma_mapping_error(tx->dma_dev, addr)))
++		return -ENOMEM;
 +
-+	while (true) {
-+		meta = eea_rx_meta_get(rx);
-+		if (!meta)
-+			break;
++	flags = skb->ip_summed == CHECKSUM_PARTIAL ? EEA_DESC_F_DO_CSUM : 0;
 +
-+		err = eea_alloc_rx_buffer(rx, meta);
-+		if (err) {
-+			eea_rx_meta_put(rx, meta);
-+			break;
-+		}
++	meta = eea_tx_desc_fill(tx, addr, hlen, !shinfo->nr_frags, skb, flags);
 +
-+		len = PAGE_SIZE - meta->offset - room;
-+		addr = meta->dma + meta->offset + headroom;
++	err = eea_fill_desc_from_skb(skb, meta->desc);
++	if (err)
++		goto err_cancel;
 +
-+		desc = ering_sq_alloc_desc(rx->ering, meta->id, true, 0);
-+		desc->addr = cpu_to_le64(addr);
-+		desc->len = cpu_to_le16(len);
++	for (i = 0; i < shinfo->nr_frags; i++) {
++		const skb_frag_t *frag = &shinfo->frags[i];
++		bool is_last = i == (shinfo->nr_frags - 1);
 +
-+		if (meta->hdr_addr)
-+			desc->hdr_addr = cpu_to_le64(meta->hdr_dma);
-+
-+		ering_sq_commit_desc(rx->ering);
-+
-+		meta->truesize = len + room;
-+		meta->headroom = headroom;
-+		meta->tailroom = tailroom;
-+		meta->len = len;
-+		++num;
++		err = eea_tx_add_skb_frag(tx, meta, frag, is_last);
++		if (err)
++			goto err_cancel;
 +	}
 +
-+	if (num)
-+		ering_kick(rx->ering);
++	meta->num = shinfo->nr_frags + 1;
++	ering_sq_commit_desc(tx->ering);
 +
-+	/* true means busy, napi should be called again. */
-+	return !!err;
++	return 0;
++
++err_cancel:
++	ering_sq_cancel(tx->ering);
++	eea_tx_meta_put_and_unmap(tx, meta);
++	meta->data = NULL;
++	return err;
 +}
 +
-+static int eea_poll(struct napi_struct *napi, int budget)
++static void eea_tx_kick(struct eea_net_tx *tx)
 +{
-+	struct eea_irq_blk *blk = container_of(napi, struct eea_irq_blk, napi);
-+	struct eea_net_rx *rx = blk->rx;
-+	struct eea_net_tx *tx = &rx->enet->tx[rx->index];
-+	struct eea_rx_ctx ctx = {};
-+	bool busy = false;
-+	u32 received;
-+
-+	eea_poll_tx(tx, budget);
-+
-+	received = eea_cleanrx(rx, budget, &ctx);
-+
-+	if (rx->ering->num_free > budget)
-+		busy |= eea_rx_post(rx);
-+
-+	busy |= received >= budget;
-+
-+	if (busy)
-+		return budget;
-+
-+	if (napi_complete_done(napi, received))
-+		ering_irq_active(rx->ering, tx->ering);
-+
-+	return received;
++	ering_kick(tx->ering);
 +}
 +
- static void eea_free_rx_buffers(struct eea_net_rx *rx, struct eea_net_cfg *cfg)
+ netdev_tx_t eea_tx_xmit(struct sk_buff *skb, struct net_device *netdev)
  {
- 	struct eea_rx_meta *meta;
+-	/* Empty function; will be implemented in a subsequent commit. */
+-	dev_kfree_skb_any(skb);
++	struct eea_net *enet = netdev_priv(netdev);
++	int qnum = skb_get_queue_mapping(skb);
++	struct eea_net_tx *tx = &enet->tx[qnum];
++	struct netdev_queue *txq;
++	int err, n;
++
++	txq = netdev_get_tx_queue(netdev, qnum);
++
++	skb_tx_timestamp(skb);
++
++	err = eea_tx_post_skb(tx, skb);
++	if (unlikely(err))
++		dev_kfree_skb_any(skb);
++
++	/* NETDEV_TX_BUSY is expensive. So stop advancing the TX queue. */
++	n = MAX_SKB_FRAGS + 1;
++	netif_txq_maybe_stop(txq, tx->ering->num_free, n, n);
++
++	if (!netdev_xmit_more() || netif_xmit_stopped(txq))
++		eea_tx_kick(tx);
++
+ 	return NETDEV_TX_OK;
+ }
+ 
+ static void eea_free_meta(struct eea_net_tx *tx, struct eea_net_cfg *cfg)
+ {
++	struct eea_sq_free_stats stats = {0};
++	struct eea_tx_meta *meta;
++	int i;
++
++	while ((meta = eea_tx_meta_get(tx)))
++		meta->skb = NULL;
++
++	for (i = 0; i < cfg->tx_ring_depth; i++) {
++		meta = &tx->meta[i];
++
++		if (!meta->skb)
++			continue;
++
++		eea_tx_meta_put_and_unmap(tx, meta);
++
++		eea_meta_free_xmit(tx, meta, 0, NULL, &stats);
++	}
++
+ 	kvfree(tx->meta);
+ 	tx->meta = NULL;
+ }
 -- 
 2.32.0.3.g01195cf9f
 
