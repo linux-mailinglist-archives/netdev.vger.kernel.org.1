@@ -1,473 +1,234 @@
-Return-Path: <netdev+bounces-268215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268216-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CLThOaE3uGkDagEAu9opvQ
-	(envelope-from <netdev+bounces-268215-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:02:25 +0100
+	id IGjnOsM2uGkDagEAu9opvQ
+	(envelope-from <netdev+bounces-268216-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:58:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C03B29DC90
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:02:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 678F629DBF5
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:58:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2F915300463B
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 16:55:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5645E3006B22
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 16:58:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B06301004;
-	Mon, 16 Mar 2026 16:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082893B7B83;
+	Mon, 16 Mar 2026 16:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cj1CvGqa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c3WRjAqI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F179A1D514E
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 16:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773680150; cv=none; b=pQ6m0/Zk07xoVaqaLhx7HDyiE/TYNKz+DLUZLiurNoUfvJM0+yYpzU3NGWfh9IN21hjV2pjFSwm6RgLJH9wuGmW3vY07/vryD1lCTweTxBSjP3VhFxDCizTS7bPmJ80Jkmhaaobko/Kv4PvLC6EUQmzHz04Uzwk6A72KHhr1sQw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773680150; c=relaxed/simple;
-	bh=9FUVRfv9jp3i8A4zAT1Jgn9wzyoaHr/Z5ObrWLSnu7M=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Zbh04B+bqQjntx1sbI6BQ4Ug2J1W+HvkGwIaW6THUlM8MOF5okqh4V4YJFc10d8qc2zudCkRSprSpuPRdpyFYty9kLG11WgCEV1UmK4iWltVKWumadtkAdOSW/08gwYTcqEAo1L79daPgsUck7AArYZBbQagHKTNqABHGe7rmWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cj1CvGqa; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-79885f4a8ffso39576737b3.3
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 09:55:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773680148; x=1774284948; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BEQk6TShGfgUniH5e7A2QjrTMt8OtZfAyJLSs4yaYmU=;
-        b=cj1CvGqaa5TH0nL/TgnSvi79MVJMT5aKklU50VHMKlGA9+WFi/iiy7VYjFVGlJ97ND
-         idnNAVoiti0Hf+IsATFwOVFgCu33955Dsf/i3tAZtf99sAT+i2DxAjAhyqeh1uGSeOfi
-         OmK6hfEA8HOocxOJsA1HhTTvB/mj16MotBHhvrK+JQ35Q4kDp7id9WKbR5FgZ/kpl/pp
-         Od7OFHr1xAWb9o4VBXQBLV3IJ8hGdFzeJ4cO0tJ6gnhABph0A1BieZv2OCwA9Rso7SG1
-         6und1KXWQ5F3QTSQ8amWv1FBmKjCovtjAdSqG+e/zxnpyklVy0ehxKwqk0GBPSYn5yMq
-         dfEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773680148; x=1774284948;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BEQk6TShGfgUniH5e7A2QjrTMt8OtZfAyJLSs4yaYmU=;
-        b=Yly0yiLottB9r2iGLACQg0Gw68cWtRajLXqvB3E4iRixEXDlrlpNfdv+NNuu6xMEZa
-         CWymYGWde2qCDPuTcmVwpGCiehqXGq+JYgD+d6QV/46wbbjT6zJnO9SOnwcXugSnDUEO
-         5nPdKVSdSHqLEJaqzSR20EIj6FEISQRQs74Ux4xlz90ccnucK8pozURwfO3e4+EbQjYZ
-         sgf+bKHO82tTJhF5+5IJZ58dLOCZKjK5v7k4h3kQiOb51zcYiO2GvBsD387f4P6DQ8Z/
-         LHVtxvWCD7DeMm3zI82fzfpy9JqNcx+INQvkO/hatK26Bj0qzF8IU9jFzPIDgDBBYlGV
-         GGkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVuOeUOXrQZ18ffNC4INKgYXK/KcNuraDOL3palv7/KlkfCyvBBuPe9iUgiMAF7EQTyqG9IBqo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+zhl4dj3J0p1ba+I6BKkbyOoeVY8zOOcAGSk8eAaHPkE7hSDQ
-	+q8got1nr4GgsRqqwDzhmcRzZuHwDtsMZfoSs6zQ9x4DegX366e/OrNE
-X-Gm-Gg: ATEYQzzdRVIM8E4OH4f5PwPn/RAMZu1YnS650T9iRNOvpRB5ab2uj6EJruULJnWr5Xw
-	gOG+b3ZBq/KSc7DhgSz0aSamw3mD0RFt6MZ188ZtFHwLVYogq65mgQlfED3ACG/Rs85sX5BQtEL
-	xfUsrcT28/k7lu/yEnivIq3xaLpL1Y792c2JwarqseJTYQb30qpFDDVMl5Oqsp7B+tB2eAD1stu
-	h4e1WXb99BRYuLvtaykBgbaZc7JrT+TKhGWvpJ7XeFt5xcxJB7gBOiw3G2TUz1MUuB1JeTvh6+N
-	+BYf0AL4xvmcR435aO5ipr1PnmqK6iUc1gdLITgfR7zL/E5dOEHgHtwMHMrrfTnWW+nxsIwo/RA
-	+e+a8GECCDHYR80B3ymxTHqkItT72iiAbpy6yZyuWaWmxfVHDJEYmwGZKfEEcKgbhepSzXJ3Vjs
-	Zi2ZS8FCuKv6SGQIdfUjQfj6q6TovUK/BBc/mpqkFIP1lcEQM9tM1BMK3fRKoKhxrTY03zdacNH
-	Xt1
-X-Received: by 2002:a05:690c:298:b0:79a:2ef2:7f7 with SMTP id 00721157ae682-79a2ef20c4fmr93273177b3.23.1773680147650;
-        Mon, 16 Mar 2026 09:55:47 -0700 (PDT)
-Received: from gmail.com (180.134.85.34.bc.googleusercontent.com. [34.85.134.180])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-79a55cced89sm10809717b3.5.2026.03.16.09.55.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2026 09:55:46 -0700 (PDT)
-Date: Mon, 16 Mar 2026 12:55:46 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- xietangxin <xietangxin@yeah.net>, 
- Jakub Ramaseuski <jramaseu@redhat.com>, 
- netdev@vger.kernel.org
-Cc: kuba@kernel.org, 
- horms@kernel.org, 
- edumazet@google.com, 
- sdf@fomichev.me, 
- ahmed.zaki@intel.com, 
- aleksander.lobakin@intel.com, 
- benoit.monin@gmx.fr, 
- willemb@google.com, 
- Tianhao Zhao <tizhao@redhat.com>, 
- Michal Schmidt <mschmidt@redhat.com>
-Message-ID: <willemdebruijn.kernel.54bd6f56da38@gmail.com>
-In-Reply-To: <efd6d059-a6e5-4fe4-bec4-84c74fb0b871@redhat.com>
-References: <20250814105119.1525687-1-jramaseu@redhat.com>
- <0414e7e2-9a1c-4d7c-a99d-b9039cf68f40@yeah.net>
- <willemdebruijn.kernel.d12bc5fb9c16@gmail.com>
- <49dac359-326a-4f3a-8c18-9897ea7be498@redhat.com>
- <d6b8909d-705e-498d-ad9a-e61fa24c9d88@yeah.net>
- <9186ce75-4038-4467-b492-7a7821659842@redhat.com>
- <willemdebruijn.kernel.2e5ca236c023e@gmail.com>
- <efd6d059-a6e5-4fe4-bec4-84c74fb0b871@redhat.com>
-Subject: Re: [PATCH net v3] net: gso: Forbid IPv6 TSO with extensions on
- devices with only IPV6_CSUM
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3087326945;
+	Mon, 16 Mar 2026 16:58:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773680319; cv=fail; b=jok2E8pP5Ga9E9FxncfPBqUB02CUnj9HQkPikJ8WmLdV0VAfVQ/dkqKH19YXwKzTcQFl2sOwffeWsZk02d8Ff+WhW4qJtEbDBP+dle3wThlJYSDXCNRxZN7vFlS6xPav/MjV3z0FVZ2duCyYxbDgW1rm2fYynQLDW56roonsLJI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773680319; c=relaxed/simple;
+	bh=wqyuVObRZ0bTljOJnh6Daar52+KYHF/6gE2TToYAMRo=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=YJnSV2UFlOtbZPUIStj2YKpgjoPLsi9AcgUmtbC0xP6qXlebjUO1hp+SiJ/AZT5kPmCIxzlZBMCmflDQYA/OQ1Kwl4V0uvLG6AfHtpvjJeMrILoP0ajITRMJ+ene+/Lo+dLWaV5WJdrJBaJDVUav1BN+iV8yykBrK0dopqFSN9A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c3WRjAqI; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773680317; x=1805216317;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=wqyuVObRZ0bTljOJnh6Daar52+KYHF/6gE2TToYAMRo=;
+  b=c3WRjAqIuDzjiBgosOPGAnOqjIfFzvOfQHKkr+16Rm0DjxmbFdlKhtV3
+   DF2zqcKqtwLXv64CHqDB/Ix73X/xx318BxeSi3EGklqToP9YqV9dfbkQ7
+   WmlwgxhRqz+pRj9YLdYnfxRAOQZ0g/hxx7ZdXbxU0yLyroChxwfFB592z
+   aY4f8+BdRe69uI4twIHgZpOUbPPm2MAc7+a7aA9HvamNqhRgC5iR22Czx
+   M3DXSYZM20ceOgDr9mt7eM20/TWdnWbWfpEqFBPB56If2ZaBsu9ve0Wcv
+   BO4sQUL4Qn1s77tfnbRX81hrj7slmzqqtp81XCXEC4dfn0YtgUCDcnPs6
+   w==;
+X-CSE-ConnectionGUID: +Kk+wbdbTQW9HUxwMe9k5g==
+X-CSE-MsgGUID: RdZuXPZDQ1+sghpQDYjvTg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11731"; a="77311990"
+X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
+   d="scan'208";a="77311990"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2026 09:58:36 -0700
+X-CSE-ConnectionGUID: vRD+J/gfQd+4ayEX5Ja+jQ==
+X-CSE-MsgGUID: BXottG87Sc+/t+ztUWXxAw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
+   d="scan'208";a="226433612"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2026 09:58:37 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 16 Mar 2026 09:58:36 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 16 Mar 2026 09:58:36 -0700
+Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.65) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 16 Mar 2026 09:58:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DyZgitaXpYklLh488/6gSp1b0VCu3s3JbLggEmq7O6PJNz099hzbgopgTizdfZ1u8LCUALTTbutmbZI2hjApLDRvZHJuyqsiYMiM6EOlvI7XGBKsWerBtVWj+KqDUiUmP1S1aU01pzF2rbwViEYtUKnRdb4tInQSbzrXMyGgygx0rETVKR97HXDn8fKI8zT2wmwW5YoXZfeEMD6hHDWYZunf/0dvSr2Ee8P7hoeYZ/vBbh+eadlRqnkOZTZUpWtYNkyVFejAiWudsRp2RGPzrrSeN7tJ5NjXIQu7toNOrrdoPr2H4Ywsdq7QtXj3sqd1IVehyjwAnyUURSR2ua/HeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9vzasmGQ4FQCA3N0khHDw5BkBfbgZdqA2jNfUga+p0g=;
+ b=Yu2O1Tr3IxxRSlsnzT0BH7aeo1ZZn4+ULKTNOxz6hZYRelLYARv4Ek/WDsgRO2mqiDgMjO97+QZJt4mxrQ+whOvk+j0itddj1+4++6unl/n4ClliX1DSmbz+qbwHL9ibcRdSo6bEerWOp/p/J5mUhpdr5tgTJPomez81ZboWyAQT6oySL4EsXfujBk7kdNScSPswqqKvx9f83hloUqm2yQZJuj4OITc+ZXUQIayr5d4DMjaRFk0gYpiv6egybsNVGPtA7UUVsCy1RZdyW/INms1+wzelPn4ngsYA4p+No+JcoW58nO3gx3tM4Z+B4m85pYXQ3Xgy0M4zzWM6nOf2QA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8230.namprd11.prod.outlook.com (2603:10b6:8:158::21)
+ by DM3PPF341F90799.namprd11.prod.outlook.com (2603:10b6:f:fc00::f19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.10; Mon, 16 Mar
+ 2026 16:58:32 +0000
+Received: from DS0PR11MB8230.namprd11.prod.outlook.com
+ ([fe80::2592:f5a9:a751:be40]) by DS0PR11MB8230.namprd11.prod.outlook.com
+ ([fe80::2592:f5a9:a751:be40%4]) with mapi id 15.20.9723.016; Mon, 16 Mar 2026
+ 16:58:32 +0000
+Message-ID: <878cd07a-b7fb-491a-9cec-8ddbab2bb13b@intel.com>
+Date: Mon, 16 Mar 2026 09:58:29 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] idpf: Replace use of system_unbound_wq with system_dfl_wq
+To: Jakub Kicinski <kuba@kernel.org>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Paolo
+ Abeni" <pabeni@redhat.com>
+References: <20260313150917.271086-1-marco.crivellari@suse.com>
+ <0ca7f92b-ec4e-469c-ad2b-648d278bcfe9@intel.com>
+ <20260314091048.235a6d0b@kernel.org>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <20260314091048.235a6d0b@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4P220CA0004.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:303:115::9) To DS0PR11MB8230.namprd11.prod.outlook.com
+ (2603:10b6:8:158::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.16 / 15.00];
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8230:EE_|DM3PPF341F90799:EE_
+X-MS-Office365-Filtering-Correlation-Id: fd50bf98-6ac5-48ed-d682-08de837d414d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info: Vb401KQmH1+iFRzoWJm+qX9jwk920stHKpNwUe8lr1pLMCvE10yv5wZDU65pMtcG+RfCm7RUcFhZM4HpSSOnXIt2aMSuwX69/yIP6H01BApCZe8K0lBYA+f+gv5HLV1PdqR1nrLhRhHLjBMlInIfo4AG89ClOpbdl+phyG9Vi/o09ljFXWipT63ZBTIsGK6uTpnyhgi8vfIXfgsKB2ekzl8pzztgOBovI1J/jFFU9hlVltKXVnn6mDBcJKuYbXuqJtcy4E9aOR7Jt9Ok1QxyM/yzlEk7IcVd7WQPNQGnW5KFDTtiWJaBTzWhnBlCDj3LwLHXGfIrzpQBPliyrJ+OjjS1Mf4jJQlypD/Px9mLknaIq66xXYJt2Yl9A7elwSknYfqmGbE5Cw1Hu6knmNS2bXcS4LN+b1Jqc8sIEPb60pbnVHAQMqRez/4/lVZAEnDXPkC3wMwY6bHeFBQ09bXluVox243FdQ3Hc9ukxDu+yRn0YX5sdtBjsQbSn6Yrm4Z+maYHULPlNPo5Xr/kOvFJjMEM9sdD4JGVoem9TNAd2Zj/5sGrKhZxSEUf6oocP2qXyy6AIt5/vEnP30Tc5vfnu7YpY2qAjDmLdK1BRMMY/kmSXH7hvuXvFgGiYxsxZr78TGiCHS1bcN6hG75SjYRuuomauUTRupNCECjssAnUVFZsIErR4+temO0gLA71d+/Pn8zRE2NtkNXcbp039OhcKBASWtuqbwjLjLjdyBm9pp0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8230.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YXQxTThYQmtQUmdCcG83U21CM3F2NzZOYmlYYXdqWU10cmpvejltaEFScWli?=
+ =?utf-8?B?RGRQcjlsWFNqZ1Zidy9LeE5Qek5CWGQ0YjhWV3BlV05mVTZrQUU2UjkwVmRG?=
+ =?utf-8?B?U2Z0YVFiYWl6VFUwcjA0T1haNFU5TUN3aUlkd3ROU08zak8zanlMZU5RQlVN?=
+ =?utf-8?B?YWNDdFcvYkJMeXlaNkFtbnNGZmZ4WlU5V29kWjBWcXhVOFpNQTJISGRVWDFE?=
+ =?utf-8?B?MnJqaGxVY3ZQakIrSDdUbFg5RlpFZ0xVRnRNOVVNalhLNHo2NjYvWndyM1FF?=
+ =?utf-8?B?SGZlY2hhVGxXa0VRZ2c1M016RkROMzNHYngxMlk0Rm1CMU5MUTZSa3hVNHo5?=
+ =?utf-8?B?RWUwVWxzTHRjS2NjK0s3dk5zZ2NOVE8vR2N5cmE0QU5ocWxpOGJPL3JSeklQ?=
+ =?utf-8?B?d3ZRSFdMNG9yODRWWTFrMDhqb2dsVVNLeGFzU01RczdQL0VvcUlmaUZGMzYr?=
+ =?utf-8?B?T2lwTDJlendkcTI5RFdpaDMxaUZicTFzbHdGM0Y3Zitya25Dbjd3VTJBSEhj?=
+ =?utf-8?B?KytHTnZGdFRYWVA1VG9hZWVTSEc3NmtBSjFqZVM2aXVZNlptM0pJMWJYYjd3?=
+ =?utf-8?B?V0kySXFoWERhWU90N0plREF4ZmxQMXd2azdWM09Pd3dBenNIWGp2MTBaQjZX?=
+ =?utf-8?B?N2Z5Mml0ZGpNNGFwaXYybGFNSnR2ZzREdVAwTEN3Mnp5emFncmNndkMzWGx0?=
+ =?utf-8?B?dGpKNnBBOFZmdlJjcGtSTUVvQ0gweVd5SW45RE1BUllpSGIrdDNwakxkWUY3?=
+ =?utf-8?B?dUFJNTUxVnBqRlYzMDYxQmlNYkhqaXhXQWp3YXQzeWM3TnovMXVNMklNdjJv?=
+ =?utf-8?B?VUV3cXFocXF3WllndzVINmdCTzg4UlRNcFkyYnNPUnNyRXRqSHVYWE1IT1Fh?=
+ =?utf-8?B?MTNjalpWRUJTSVorSFZYcXh4SHVkMDkwNzgyQW5EYVFGVGw4QW5lNXdZVDZw?=
+ =?utf-8?B?ajBURDJXd3luUXkyQXB0ME5VTFBYaTA3aVZSQmZnK3dCWHE0eEJkWXpmVS9w?=
+ =?utf-8?B?YndVVTMxeVhHMFRPV2ZpSWtzRXRhV05HRXR3enhKaGlFNmJSWHhaa2tuY0p1?=
+ =?utf-8?B?UmlEWFJaNjRyQjhIWjFFUmtCVG5xVEhyeEdTVU54MmREeHlpakR6Mm40VFNT?=
+ =?utf-8?B?MVRycU5WNFNXZ3JXVkI4R0hUSVFPRCtzY3FpY0huaVU0Q0tuaERMUHVRdytT?=
+ =?utf-8?B?RXVWSkZhYXhTVHdobCtQZW1FTEV5Y2c3anVhaTBVcWdiamY5TENaUzA0UzNI?=
+ =?utf-8?B?QXRRTW5QY1l6bW5oQ1BKOUVMOU9ZdHpVUGpLMmUyczcvc05uVjIzb2Z2TEg3?=
+ =?utf-8?B?VlNoN0I3dFZ1UVJjWHlydkUyU0kzRytoZlZtYVl0c3RSZGNDWlBKZitEZ2tn?=
+ =?utf-8?B?NnJTL00vRm5ReGRsQ0RIQ1NkbS8vcEl6U1BHMFg5UG1LZUl3c2JaeTNWOTFI?=
+ =?utf-8?B?eUNLTy8rR00zTm1odE9GUkJVUER2Y3NNZWNtMzZaMTcxTERhYmQ5YjRLM0kz?=
+ =?utf-8?B?R0RzR0hZeFpPWVVheWtEVXcvYkRielpGVldSOXh1K0VqTERKb1k4azJpQ1B1?=
+ =?utf-8?B?dWRJRGh3WHdWQmxRdk9wZlJvdHBTWlJJNUU0YkRXSEx0VGhkU3h0VUVFbkhT?=
+ =?utf-8?B?Y2tsc2dvNmlqMjZuclFLZ2pnTkF4ay9KbVlnWk1tYnpLWm9xUERsWHdLQVhk?=
+ =?utf-8?B?VVpLREVVK3d3UHZSZmVrUStiMFJXSW5QQU8xbHlvcEpMVjZrN3MwZitwRkRh?=
+ =?utf-8?B?NERPUmNGODdvRHNSM2VsSFYyZSt3Q1lWSkdRNGtQS01rNHhkTlcvajI5dTlo?=
+ =?utf-8?B?YVpjQVV0elBrQk5WK2g5U1M4NGUxQ1l4MVdnN1lOei9VbjZ3TUNFV1F3SDUx?=
+ =?utf-8?B?blZCQk5mM0lJa1lOOXFQR21iSW1nUmJld0JLS29GenMzOFl6dXE5NitIRFhP?=
+ =?utf-8?B?aXdyMGtWVnpPbDdUcDR2TGxWWHdBSEdaSHFwTlNzUXdteXVHYXR1SVhVMXor?=
+ =?utf-8?B?YU5rUzhNSHFkSnlBUGF3Y2VoTGxqZ3VQbThnMGFzckFNaWZiUXpncGl6Y3hG?=
+ =?utf-8?B?TWhjeWtFNzBQMFYvbHF0UGhIblVkTWdEczNXZG5nc254WlliSjJpckpxenVJ?=
+ =?utf-8?B?MEVQK3V3emdLemZaUndnVjE2YTZndmZhRFU4YUFxSld3eHBMVEJZaGlSS1Mr?=
+ =?utf-8?B?OXRQNS9FQ1hrK2JVVUV5cUp4TFIxbzR4ZUpwUG8rWUdZcDVOZ0xJQll4YVRJ?=
+ =?utf-8?B?S2VKVm5tcFV4Zkc3S3dpUmtRKzlwVWtYalJtRDFHU0FzS3hleUtjalFtZkNz?=
+ =?utf-8?B?cHJEK3hoTVhQQVE1RTF0Vk81M0FzS0lVL3NWMWNMOWZGTW5LdEZBY0oxTDFG?=
+ =?utf-8?Q?Roa6GUtK6/sxvTnY=3D?=
+X-Exchange-RoutingPolicyChecked: AjSptmYKtbZRQNYGg4eJiYc47iy1hXJ1myS1QHwK0sHuzZbDzYJgAFRGm198Poh7JWLX/mQpmM7ScOFEIlDvkeWmA5IApfqXldMyMxAJkyO5FS9WMUg/wskrW0cSjJM1s7J9shKhh4GKOUVc+4VUyMDHUOUbdyxFGn+BuksS/SmDqdWuyw3QZqVd30ojU0pIJ5pzV3rejfGwbgGv9rFM02/J+v8f/DVlUqUkGk8Jdwi7X6gsyoQU9tEoWMkox7w12BgPhK162YyW9OwNvLz25ba5x2UuPkM5IfwiTR37kSCiea2G7H7MlK+YQj5v1TDvkmjG/N8u8vOesu88kl3u7g==
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd50bf98-6ac5-48ed-d682-08de837d414d
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8230.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Mar 2026 16:58:32.5257
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: j+gr6osRSvnCnpkpTkiyhRw+nvUGtGkWir1/NtOQGVG2t65PtSoWyvTBiSe8xGYuBo+1SOKs6PlJIAMnwSkm+GvHsLuLbRygVGEKs8w+XIo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPF341F90799
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268215-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[redhat.com,gmail.com,yeah.net,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-268216-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,fomichev.me,intel.com,gmx.fr,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 3C03B29DC90
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 678F629DBF5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Paolo Abeni wrote:
-> On 3/14/26 5:19 PM, Willem de Bruijn wrote:
-> > Paolo Abeni wrote:
-> >> On 3/6/26 7:32 AM, xietangxin wrote:
-> >>> On 3/5/2026 11:21 PM, Paolo Abeni wrote:
-> >>>> On 3/5/26 3:57 PM, Willem de Bruijn wrote:
-> >>>>> xietangxin wrote:
-> >>>>>> =E5=9C=A8 2025/8/14 18:51, Jakub Ramaseuski =E5=86=99=E9=81=93:
-> >>>>>>> When performing Generic Segmentation Offload (GSO) on an IPv6 p=
-acket that
-> >>>>>>> contains extension headers, the kernel incorrectly requests che=
-cksum offload
-> >>>>>>> if the egress device only advertises NETIF_F_IPV6_CSUM feature,=
- which has =
 
-> >>>>>>> a strict contract: it supports checksum offload only for plain =
-TCP or UDP =
 
-> >>>>>>> over IPv6 and explicitly does not support packets with extensio=
-n headers.
-> >>>>>>> The current GSO logic violates this contract by failing to disa=
-ble the feature
-> >>>>>>> for packets with extension headers, such as those used in GREoI=
-Pv6 tunnels.
-> >>>>>>>
-> >>>>>>> This violation results in the device being asked to perform an =
-operation
-> >>>>>>> it cannot support, leading to a `skb_warn_bad_offload` warning =
-and a collapse
-> >>>>>>> of network throughput. While device TSO/USO is correctly bypass=
-ed in favor
-> >>>>>>> of software GSO for these packets, the GSO stack must be explic=
-itly told not =
+On 3/14/2026 9:10 AM, Jakub Kicinski wrote:
+> On Fri, 13 Mar 2026 17:08:57 +0100 Przemek Kitszel wrote:
+>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> 
+> Process question - even tho you are also a maintainer I only read
+> Tony's tags as "please apply directly". LMK if that's right, I'll
+> try to remember / make a note..
 
-> >>>>>>> to request checksum offload.
-> >>>>>>>
-> >>>>>>> Mask NETIF_F_IPV6_CSUM, NETIF_F_TSO6 and NETIF_F_GSO_UDP_L4
-> >>>>>>> in gso_features_check if the IPv6 header contains extension hea=
-ders to compute
-> >>>>>>> checksum in software.
-> >>>>>>>
-> >>>>>>> The exception is a BIG TCP extension, which, as stated in commi=
-t
-> >>>>>>> 68e068cabd2c6c53 ("net: reenable NETIF_F_IPV6_CSUM offload for =
-BIG TCP packets"):
-> >>>>>>> "The feature is only enabled on devices that support BIG TCP TS=
-O.
-> >>>>>>> The header is only present for PF_PACKET taps like tcpdump,
-> >>>>>>> and not transmitted by physical devices."
-> >>>>>>>
-> >>>>>>> kernel log output (truncated):
-> >>>>>>> WARNING: CPU: 1 PID: 5273 at net/core/dev.c:3535 skb_warn_bad_o=
-ffload+0x81/0x140
-> >>>>>>> ...
-> >>>>>>> Call Trace:
-> >>>>>>>  <TASK>
-> >>>>>>>  skb_checksum_help+0x12a/0x1f0
-> >>>>>>>  validate_xmit_skb+0x1a3/0x2d0
-> >>>>>>>  validate_xmit_skb_list+0x4f/0x80
-> >>>>>>>  sch_direct_xmit+0x1a2/0x380
-> >>>>>>>  __dev_xmit_skb+0x242/0x670
-> >>>>>>>  __dev_queue_xmit+0x3fc/0x7f0
-> >>>>>>>  ip6_finish_output2+0x25e/0x5d0
-> >>>>>>>  ip6_finish_output+0x1fc/0x3f0
-> >>>>>>>  ip6_tnl_xmit+0x608/0xc00 [ip6_tunnel]
-> >>>>>>>  ip6gre_tunnel_xmit+0x1c0/0x390 [ip6_gre]
-> >>>>>>>  dev_hard_start_xmit+0x63/0x1c0
-> >>>>>>>  __dev_queue_xmit+0x6d0/0x7f0
-> >>>>>>>  ip6_finish_output2+0x214/0x5d0
-> >>>>>>>  ip6_finish_output+0x1fc/0x3f0
-> >>>>>>>  ip6_xmit+0x2ca/0x6f0
-> >>>>>>>  ip6_finish_output+0x1fc/0x3f0
-> >>>>>>>  ip6_xmit+0x2ca/0x6f0
-> >>>>>>>  inet6_csk_xmit+0xeb/0x150
-> >>>>>>>  __tcp_transmit_skb+0x555/0xa80
-> >>>>>>>  tcp_write_xmit+0x32a/0xe90
-> >>>>>>>  tcp_sendmsg_locked+0x437/0x1110
-> >>>>>>>  tcp_sendmsg+0x2f/0x50
-> >>>>>>> ...
-> >>>>>>> skb linear:   00000000: e4 3d 1a 7d ec 30 e4 3d 1a 7e 5d 90 86 =
-dd 60 0e
-> >>>>>>> skb linear:   00000010: 00 0a 1b 34 3c 40 20 11 00 00 00 00 00 =
-00 00 00
-> >>>>>>> skb linear:   00000020: 00 00 00 00 00 12 20 11 00 00 00 00 00 =
-00 00 00
-> >>>>>>> skb linear:   00000030: 00 00 00 00 00 11 2f 00 04 01 04 01 01 =
-00 00 00
-> >>>>>>> skb linear:   00000040: 86 dd 60 0e 00 0a 1b 00 06 40 20 23 00 =
-00 00 00
-> >>>>>>> skb linear:   00000050: 00 00 00 00 00 00 00 00 00 12 20 23 00 =
-00 00 00
-> >>>>>>> skb linear:   00000060: 00 00 00 00 00 00 00 00 00 11 bf 96 14 =
-51 13 f9
-> >>>>>>> skb linear:   00000070: ae 27 a0 a8 2b e3 80 18 00 40 5b 6f 00 =
-00 01 01
-> >>>>>>> skb linear:   00000080: 08 0a 42 d4 50 d5 4b 70 f8 1a
-> >>>>>>>
-> >>>>>>> Fixes: 04c20a9356f283da ("net: skip offload for NETIF_F_IPV6_CS=
-UM if ipv6 header contains extension")
-> >>>>>>> Reported-by: Tianhao Zhao <tizhao@redhat.com>
-> >>>>>>> Suggested-by: Michal Schmidt <mschmidt@redhat.com>
-> >>>>>>> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com=
->
-> >>>>>>> Signed-off-by: Jakub Ramaseuski <jramaseu@redhat.com>
-> >>>>>>> ---
-> >>>>>>> ---
-> >>>>>>>  net/core/dev.c | 12 ++++++++++++
-> >>>>>>>  1 file changed, 12 insertions(+)
-> >>>>>>>
-> >>>>>>> diff --git a/net/core/dev.c b/net/core/dev.c
-> >>>>>>> index b28ce68830b2b..1d8a4d1da911e 100644
-> >>>>>>> --- a/net/core/dev.c
-> >>>>>>> +++ b/net/core/dev.c
-> >>>>>>> @@ -3778,6 +3778,18 @@ static netdev_features_t gso_features_ch=
-eck(const struct sk_buff *skb,
-> >>>>>>>  		if (!(iph->frag_off & htons(IP_DF)))
-> >>>>>>>  			features &=3D ~NETIF_F_TSO_MANGLEID;
-> >>>>>>>  	}
-> >>>>>>> +
-> >>>>>>> +	/* NETIF_F_IPV6_CSUM does not support IPv6 extension headers,=
+I talked to Przemek about this a little this morning. Since the 
+Reviewed-by tag is used more prevalently in our process, perhaps an 
+Acked-by could mean take this directly and the Reviewed-by keeps the 
+same process of going through IWL. Other thought would be to explicitly 
+ask/state for it to get taken directly. Open to other ideas as well if 
+there's something else you'd prefer.
 
-> >>>>>>> +	 * so neither does TSO that depends on it.
-> >>>>>>> +	 */
-> >>>>>>> +	if (features & NETIF_F_IPV6_CSUM &&
-> >>>>>>> +	    (skb_shinfo(skb)->gso_type & SKB_GSO_TCPV6 ||
-> >>>>>>> +	     (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4 &&
-> >>>>>>> +	      vlan_get_protocol(skb) =3D=3D htons(ETH_P_IPV6))) &&
-> >>>>>>> +	    skb_transport_header_was_set(skb) &&
-> >>>>>>> +	    skb_network_header_len(skb) !=3D sizeof(struct ipv6hdr) &=
-&
-> >>>>>>> +	    !ipv6_has_hopopt_jumbo(skb))
-> >>>>>>> +		features &=3D ~(NETIF_F_IPV6_CSUM | NETIF_F_TSO6 | NETIF_F_G=
-SO_UDP_L4);
-> >>>>>>>  =
-
-> >>>>>>>  	return features;
-> >>>>>>>  }
-> >>>>>> question about this patch affecting tunneled IPv6-in-IPv4 packet=
-s
-> >>>>>>
-> >>>>>> In our environment with a hinic NIC, we use VXLAN tunnels where
-> >>>>>> the outer header is IPv4 and the inner is IPv6. After this commi=
-t,
-> >>>>>> large packets no longer use hardware TSO and fall back to softwa=
-re segmentation.
-> >>>>>>
-> >>>>>> In the VXLAN IPv6-in-IPv4 case, `skb_shinfo(skb)->gso_type` incl=
-udes
-> >>>>>> `SKB_GSO_TCPV6` (inner is IPv6 TCP), but the network header poin=
-ts to the outer
-> >>>>>> IPv4 header. Thus `skb_network_header_len(skb)` returns the IPv4=
- header length
-> >>>>>> (usually 20), which is not equal to `sizeof(struct ipv6hdr)` (40=
-). This causes
-> >>>>>> the condition to trigger and clears `NETIF_F_TSO6`, even though =
-the inner IPv6
-> >>>>>> packet has no extension headers and the device is capable of han=
-dling TSO for
-> >>>>>> such packets.
-> >>>>>>
-> >>>>>> Is it the intended behavior to disable TSO for all tunneled IPv6=
--in-IPv4 packets
-> >>>>>> when the NIC lacks NETIF_F_HW_CSUM, even if the inner IPv6 heade=
-r has no extensions?
-> >>>>>>
-> >>>>>> Any feedback or guidance would be greatly appreciated.
-> >>>>>
-> >>>>> That is definitely unintended.
-> >>>>>
-> >>>>> Thanks for the clear analysis.
-> >>>>>
-> >>>>> I was about to write a refinement that might catch this case,
-> >>>>> something like
-> >>>>>
-> >>>>> @@ -3819,8 +3819,10 @@ static netdev_features_t gso_features_chec=
-k(const struct sk_buff *skb,
-> >>>>>             (skb_shinfo(skb)->gso_type & SKB_GSO_TCPV6 ||
-> >>>>>              (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4 &&
-> >>>>>               vlan_get_protocol(skb) =3D=3D htons(ETH_P_IPV6))) &=
-&
-> >>>>> -           skb_transport_header_was_set(skb) &&
-> >>>>> -           skb_network_header_len(skb) !=3D sizeof(struct ipv6hd=
-r))
-> >>>>> +             ((!skb->encapsulation &&
-> >>>>> +               skb_transport_header_was_set(skb) &&
-> >>>>> +               skb_network_header_len(skb) !=3D sizeof(struct ip=
-v6hdr)) ||
-> >>>>> +              (skb_inner_network_header_len(skb) !=3D sizeof(str=
-uct ipv6hdr))))
-> >>>>>                 features &=3D ~(NETIF_F_IPV6_CSUM | NETIF_F_TSO6 =
-| NETIF_F_GSO_UDP_L4);
-> >>>>>
-> >>>>> But, how are these VXLAN IPv6-in-IPv4 packets having
-> >>>>> vlan_get_protocol(skb) =3D=3D htons(ETH_P_IPV6)?
-> >>>>>
-> >>>>> Shouldn't that be the protocol of the outer headr, so ETH_P_IP, a=
-nd
-> >>>>> thus this branch not reached at all? (Which itself would leave a =
-false
-> >>>>> positive as now an inner network header with extensions would not=
- be
-> >>>>> caught..)
-> >>>>
-> >>>> Also the tunnel could have ENCAP_TYPE_IPPROTO, and likely we need =
-to
-> >>>> disable csum even in that case? Possibly something alike the follo=
-wing
-> >>>> could work?
-> >>>>
-> >>>> Side note, I *think* that replacing SKB_GSO_UDP_L4 with separate
-> >>>> SKB_GSO_UDPV4_L4 SKB_GSO_UDPV6_L4 would remove a bit of complexity=
- in
-> >>>> serveral places, but I'm not sure how much invasive would be such =
-a change.
-> >>>>
-> >>>> ---
-> >>>> diff --git a/net/core/dev.c b/net/core/dev.c
-> >>>> index 4af4cf2d63a4..f9824dfef376 100644
-> >>>> --- a/net/core/dev.c
-> >>>> +++ b/net/core/dev.c
-> >>>> @@ -3769,6 +3769,22 @@ static netdev_features_t
-> >>>> dflt_features_check(struct sk_buff *skb,
-> >>>>  	return vlan_features_check(skb, features);
-> >>>>  }
-> >>>>
-> >>>> +static bool skb_gso_has_extension_hdr(const struct sk_buff *skb)
-> >>>> +{
-> >>>> +	if (!skb->encapsulation)
-> >>>> +		return ((skb_shinfo(skb)->gso_type & SKB_GSO_TCPV6 ||
-> >>>> +			(skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4 &&
-> >>>> +			 vlan_get_protocol(skb) =3D=3D htons(ETH_P_IPV6))) &&
-> >>>> +			skb_transport_header_was_set(skb) &&
-> >>>> +			skb_network_header_len(skb) !=3D sizeof(struct ipv6hdr));
-> >>>> +
-> >>>> +	return (skb->inner_protocol_type =3D=3D ENCAP_TYPE_IPPROTO ||
-> >>>> +		((skb_shinfo(skb)->gso_type & SKB_GSO_TCPV6 ||
-> >>>> +		  (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4 &&
-> >>>> +		   inner_ip_hdr(skb)->version =3D=3D 6)) &&
-> >>>> +		 skb_inner_network_header_len(skb) !=3D sizeof(struct ipv6hdr))=
-);
-> >>>> +}
-> >>>> +
-> >>>>  static netdev_features_t gso_features_check(const struct sk_buff =
-*skb,
-> >>>>  					    struct net_device *dev,
-> >>>>  					    netdev_features_t features)
-> >>>> @@ -3815,12 +3831,7 @@ static netdev_features_t gso_features_check=
-(const
-> >>>> struct sk_buff *skb,
-> >>>>  	/* NETIF_F_IPV6_CSUM does not support IPv6 extension headers,
-> >>>>  	 * so neither does TSO that depends on it.
-> >>>>  	 */
-> >>>> -	if (features & NETIF_F_IPV6_CSUM &&
-> >>>> -	    (skb_shinfo(skb)->gso_type & SKB_GSO_TCPV6 ||
-> >>>> -	     (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4 &&
-> >>>> -	      vlan_get_protocol(skb) =3D=3D htons(ETH_P_IPV6))) &&
-> >>>> -	    skb_transport_header_was_set(skb) &&
-> >>>> -	    skb_network_header_len(skb) !=3D sizeof(struct ipv6hdr))
-> >>>> +	if (features & NETIF_F_IPV6_CSUM && skb_gso_has_extension_hdr(sk=
-b))
-> >>>>  		features &=3D ~(NETIF_F_IPV6_CSUM | NETIF_F_TSO6 | NETIF_F_GSO_=
-UDP_L4);
-> >>>>
-> >>>>  	return features;
-> >>>>
-> >>> Hi Paolo, Willem,
-> >>>
-> >>> Thank you both for the insightful analysis and the proposed fix.
-> >>>
-> >>> I have backported and tested Paolo's patch in our environment with =
-hinic NIC.
-> >>> We focused on the VXLAN (IPv6-in-IPv4) scenario and the Native IPv6=
- scenario :
-> >>>
-> >>> Scenario               | IPv6 Ext-Headers | Result | Behavior
-> >>> -----------------------|------------------|--------|---------------=
-
-> >>> VXLAN (IPv6-in-IPv4)   | No               | PASS   | HW TSO enabled=
-
-> >>> VXLAN (IPv6-in-IPv4)   | Yes              | PASS   | SW GSO fallbac=
-k
-> >>> Native IPv6            | No               | PASS   | HW TSO enabled=
-
-> >>> Native IPv6            | Yes              | PASS   | SW GSO fallbac=
-k
-> >>>
-> >>> Thanks again for the help!
-> >> Please, if you will and can, take it over to cook it in a formal pat=
-ch.
-> > =
-
-> > Otherwise I can.
-> > =
-
-> > The check is also needed for tunnels that set ENCAP_TYPE_IPPROTO, suc=
-h
-> > as sit. That condition can be removed as far as I can tell?
-> =
-
-> I was thinking about i.e. sctp over UDP tunnel where we have:
-> =
-
-> <outer IP{v6}><outer transport (UDP><SCTP>
-> =
-
-> and no inner IP{v6} header. Possibly it's better to replace:
-> =
-
-> 	skb->inner_protocol_type =3D=3D ENCAP_TYPE_IPPROTO
-> =
-
-> with:
-> =
-
-> 	!skb_inner_network_header_was_set()
-> =
-
-> (forcing segmentation if the the inner network header was not set).
-
-Thanks. I was not aware of RFC 6951 UDP encap of SCTP w/o inner L3.
-That check looks great to me too based on sctp_v4_xmit.
+Thanks,
+Tony
 
