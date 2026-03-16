@@ -1,174 +1,226 @@
-Return-Path: <netdev+bounces-268254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268255-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJ9+NmJSuGmKcAEAu9opvQ
-	(envelope-from <netdev+bounces-268254-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:56:34 +0100
+	id iOBFFb5RuGmKcAEAu9opvQ
+	(envelope-from <netdev+bounces-268255-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:53:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6115929F5F1
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:56:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB3DC29F572
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:53:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B2AB33039300
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:51:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9FD5A3042269
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D6A3E5EFC;
-	Mon, 16 Mar 2026 18:51:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B0A83E6386;
+	Mon, 16 Mar 2026 18:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TI9OwbAr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IV2jeEmG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703053DB627;
-	Mon, 16 Mar 2026 18:51:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA88B3DA5D9;
+	Mon, 16 Mar 2026 18:52:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773687086; cv=none; b=YmsSDPBcJEIr1uXMFqpWBwEjOL0V/ku2qDkc7iE0jbIU2moG6oP5qekM378sA6ujnDJe8IIK/jKZF87E8Mg4zTvVnEG5WYl+P2olMazrt10r5Dd1TpIVhZtQQP+sIYvkfQQ4bNJXxHpY2HmtzccH5TylW46tEsGGbdngdGGc7Is=
+	t=1773687164; cv=none; b=i8NrMSSpeufRibsDTqFFZEQqXliIpIIYjpCsYv/H+unvIBZfvTmv6B2cQUzdccNBZuowByj5ld1XfUiUe0z0+oXO90XvpfHNzHcM8/mIbeorPyKtFf3S0PwHf8AgDOUBxoYEuRJyxcXvXgd4QWqgAk1sk4GvblY75pdqdl2ckPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773687086; c=relaxed/simple;
-	bh=c5BLHuGtkY+WxXe6JvvfcNckrVRMkknyPNj8lzgWAGA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=IAAzVioqjhOqWVazLmgUEV9s+jmbtcgaLoCU6qiX+Nwk2Wrisi2cc8v3y8plHfSn4e0sm23GwXvKKRM6FbuCVMcmsi2apmd6O0rI7kBYR4/335kCuiBsIjiKs6N2LaPyvfV4bGqWttqfD0D+2R4HZYoTbIGI7YW5cPAuCXukrgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TI9OwbAr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 122A7C19421;
-	Mon, 16 Mar 2026 18:51:26 +0000 (UTC)
+	s=arc-20240116; t=1773687164; c=relaxed/simple;
+	bh=KX/ElHW2NVnmxewJnwZxA85/Oodw4mPDntSMLYXwv64=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c84MMGVOcTarh4z3i4/9zl49torDaVCKG0p9oHssjQqi//m3wf33V6VACMTu6ntKbmLqjIUYaCan2sk2Lq+OImh9OqWb8WbnFNDEjDZd6m7SDpJYsogHzkmcFjGM/4NrzgVeZ5phlA/B+aIKBXYyC3ULt+PLl3u+XSpy8nSCwYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IV2jeEmG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DF05C19421;
+	Mon, 16 Mar 2026 18:52:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773687086;
-	bh=c5BLHuGtkY+WxXe6JvvfcNckrVRMkknyPNj8lzgWAGA=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=TI9OwbAreyKJpxRuEvgrPZSlxbkvbS3zpQMBLErdVOEHD8TWXPhbo0t96YGso2gCF
-	 zum9L1rdWr1k9XWY+eTu2LriBGySqk2YAfgNk94ejcBRM21mBBO58PfsHHt2XwKgcq
-	 ecRvTpui7tgQiy0daUGqiYc7cS5EJi8sYlJYAqz7m8044Z86tuKNHtfAQDgrDka2Ma
-	 /9qwMdBfTXSK0k4SRss3toaFySzx547ix/livfiscNQ0uGx9N8vQGhlMm2E3+GD9Vo
-	 9bZmMKZUF2ktVE3g02F21tthRZwiEs1gyMM/7a8aiDvr4RtN5xOKGN0wPXHb42rrxc
-	 +rVx6Uj6qqshA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 026DAF53D8B;
-	Mon, 16 Mar 2026 18:51:26 +0000 (UTC)
-From: Simon Baatz via B4 Relay <devnull+gmbnomis.gmail.com@kernel.org>
-Date: Mon, 16 Mar 2026 19:51:10 +0100
-Subject: [PATCH net-next] selftests/net: packetdrill: improve
- tcp_rcv_neg_window.pkt
+	s=k20201202; t=1773687164;
+	bh=KX/ElHW2NVnmxewJnwZxA85/Oodw4mPDntSMLYXwv64=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IV2jeEmG7kKevDW2JHVvNUI5TtUV+Eej8klDzmn6zOa0IVB0gzweG+SeIH8pc+wmH
+	 edu4CofnesZyl8vYHk5P4xynFuVfbyFoznynGVrJnqjjOy5fyu6RMFZmsP9AsUBVGv
+	 Io0dF+PHkETjjX5QaBytZ10tsmJsFar+N5XHwO0NTHkHvK/CV+HAUKN7b2LBLj3+LL
+	 54h+ovGZowocyrZcpTu7mVrhHF7E0eqJTzwm1LDy+9eQ4H84NidIQsugqHsBcuvXDC
+	 JCtpCFqfp9tkOzA73EmSPgRLnvdTMK1VRqAvwSj7j7IqB+P9dtPyzMs6ThNT6QmQaU
+	 TdeLNZ9MSoktA==
+Message-ID: <ee2ec279-ee5d-4d6d-b6ff-35187e3f03e6@kernel.org>
+Date: Mon, 16 Mar 2026 19:52:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 3/3] arm: dts: ti: Add device tree support for PRU-ICSS
+ on AM335x
+To: Parvathi Pudi <parvathi@couthit.com>, Kevin Hilman <khilman@baylibre.com>
+Cc: nm <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, afd <afd@ti.com>,
+ rogerq <rogerq@kernel.org>, tony <tony@atomide.com>, robh <robh@kernel.org>,
+ krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>,
+ richardcochran <richardcochran@gmail.com>,
+ aaro koskinen <aaro.koskinen@iki.fi>, andreas <andreas@kemnade.info>,
+ Andrew Lunn <andrew@lunn.ch>, linux-omap <linux-omap@vger.kernel.org>,
+ devicetree <devicetree@vger.kernel.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>, netdev
+ <netdev@vger.kernel.org>, danishanwar <danishanwar@ti.com>,
+ pratheesh <pratheesh@ti.com>, j-rameshbabu <j-rameshbabu@ti.com>,
+ praneeth <praneeth@ti.com>, srk <srk@ti.com>, rogerq <rogerq@ti.com>,
+ m-malladi <m-malladi@ti.com>, krishna <krishna@couthit.com>,
+ mohan <mohan@couthit.com>, pmohan <pmohan@couthit.com>,
+ basharath <basharath@couthit.com>, Murali Karicheri <m-karicheri2@ti.com>
+References: <20260307122641.738450-1-parvathi@couthit.com>
+ <20260307122641.738450-4-parvathi@couthit.com> <7ho6ks1r4s.fsf@baylibre.com>
+ <91797572.667989.1773662409130.JavaMail.zimbra@couthit.local>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <91797572.667989.1773662409130.JavaMail.zimbra@couthit.local>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260316-improve_tcp_neg_usable_wnd_test-v1-1-f16d5e365107@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3NQQrCMBBG4auUWRtoUivoVUSGmPzWAZ2GJNZC6
- d0NLr/NexsVZEGhS7dRxiJFZm2wh47C0+sEI7GZXO9O/WBHI++U5wVcQ2LFxJ/i7y/wVyNXlGq
- ct4M7x2PwdqRWSRkPWf+HKymqUayVbvv+AxTGEoB7AAAA
-X-Change-ID: 20260315-improve_tcp_neg_usable_wnd_test-2a1329d4ca15
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Simon Baatz <gmbnomis@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1773687085; l=2076;
- i=gmbnomis@gmail.com; s=20260220; h=from:subject:message-id;
- bh=ns9OJwOj9IGXzUoNWp91AiRCpz66QceoQnlEDdYlvAg=;
- b=aGLkhiswPMUPyKJ30KormGEXHe9rlLCtTcgK3UyAcW1S57f5CBIuxVzZENkkCoVI0stE9jFtS
- 15RLqZ4BcOvBtElun7+2vJzfo+ZGtH9lmc+5i+iqgra7IWtpM6KQ5yN
-X-Developer-Key: i=gmbnomis@gmail.com; a=ed25519;
- pk=T/JIz/6F5bf1uQJr69lmyi7czVG+F9TVZ/8x5z9Wtqw=
-X-Endpoint-Received: by B4 Relay for gmbnomis@gmail.com/20260220 with
- auth_id=641
-X-Original-From: Simon Baatz <gmbnomis@gmail.com>
-Reply-To: gmbnomis@gmail.com
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268254-lists,netdev=lfdr.de,gmbnomis.gmail.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_REPLYTO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	HAS_REPLYTO(0.00)[gmbnomis@gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.929];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268255-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
+	FREEMAIL_CC(0.00)[ti.com,kernel.org,atomide.com,gmail.com,iki.fi,kemnade.info,lunn.ch,vger.kernel.org,couthit.com];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6115929F5F1
+	RCPT_COUNT_TWELVE(0.00)[30];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ti.com:email]
+X-Rspamd-Queue-Id: EB3DC29F572
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Simon Baatz <gmbnomis@gmail.com>
+On 16/03/2026 13:00, Parvathi Pudi wrote:
+> Hi,
+> 
+>> Parvathi Pudi <parvathi@couthit.com> writes:
+>>
+>>> From: Roger Quadros <rogerq@ti.com>
+>>>
+>>> The TI Sitara AM335x ICE-V2 consists of single PRU-ICSS instance,
+>>> This patch adds the new device tree overlay file in-order to enable
+>>> PRU-ICSS instance, along with makefile changes.
+>>>
+>>> PRU-ICSS instance consists of two PRU cores along with various
+>>> peripherals such as the Interrupt Controller (PRU_INTC), the Industrial
+>>> Ethernet Peripheral(IEP), the Real Time Media Independent Interface
+>>> controller (MII_RT), and the Enhanced Capture (eCAP) event module.
+>>>
+>>> am33xx-l4.dtsi - Adds IEP and eCAP peripheral as child nodes
+>>> of the PRUSS subsystem node.
+>>>
+>>> am335x-icev2-prueth.dtso - Adds PRU-ICSS instance node along with PRU
+>>> eth port information and corresponding port configuration. It includes
+>>> interrupt mapping for packet reception, HW timestamp collection, and PRU
+>>> Ethernet ports in MII mode,
+>>>
+>>> GPIO configuration, boot strapping along with delay configuration for
+>>> individual PRU Ethernet port and other required nodes.
+>>>
+>>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>>> Signed-off-by: Andrew F. Davis <afd@ti.com>
+>>> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
+>>> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
+>>> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+>>
+>> [...]
+>>
+>>> +/*
+>>> + * Disable CPSW switch node and
+>>> + * MDIO configuration to prevent
+>>> + * conflict with PRU-ICSS
+>>> + */
+>>> +&mac_sw {
+>>> +        status = "disable";
+>>> +};
+>>> +
+>>> +&davinci_mdio_sw {
+>>> +        status = "disable";
+>>> +};
+>>
+>> I think you need s/disable/disabled/?  (note the trailing 'd').  Without
+>> that, I don't think you're disabling these nodes, so I'm curious how it
+>> is not conflicting with the PRU-ICSS.
+>>
+>> Kevin
+> 
+> Thank you for pointing out this typo.
+> 
+> We checked the kernel code as to why this did not create any issue in our
+> testing.  We found that the device availability check goes through
+> of_device_is_available(), which only treats "ok" or "okay" as enabled.
+> Anything else is effectively treated as not enabled.
+> 
+> So even though "disable" isn't the usual DT value, it still prevents the
+> node from being probed since it doesn't match "ok"/"okay".
 
-The test depends on accepting a packet that is larger than the
-advertised window and that does not trigger an immediate ACK.
 
-Previously, the test might still pass even if kernel behavior changed
-unexpectedly. Add assertions verifying that the large packet was
-accepted and no ACK was sent.
-
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
----
- .../selftests/net/packetdrill/tcp_rcv_neg_window.pkt       | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_rcv_neg_window.pkt b/tools/testing/selftests/net/packetdrill/tcp_rcv_neg_window.pkt
-index 15a9b4938f16d175ac54f3fd192ed2b59b0a4399..b9ab264b2a118f273af269d83a371740ae47359c 100644
---- a/tools/testing/selftests/net/packetdrill/tcp_rcv_neg_window.pkt
-+++ b/tools/testing/selftests/net/packetdrill/tcp_rcv_neg_window.pkt
-@@ -1,4 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
-+// Test maximum advertised window limit when rcv_nxt advances past
-+// rcv_mwnd_seq. The "usable window" must be properly clamped to zero
-+// rather than becoming negative.
- 
- --mss=1000
- 
-@@ -17,10 +20,15 @@
- 
-    +0 accept(3, ..., ...) = 4
- 
--// A too big packet is accepted if the receive queue is empty
-+// A too big packet is accepted if the receive queue is empty. It
-+// does not trigger an immediate ACK.
-    +0 < P. 1:20001(20000) ack 1 win 257
-+   +0 %{ assert tcpi_bytes_received == 20000, tcpi_bytes_received; }%
-+
- // Send a RST immediately so that there is no rcv_wup/rcv_mwnd_seq update yet
-    +0 < R. 20001:20001(0) ack 1 win 257
- 
--  +.1 %{ assert tcpi_state == TCP_CLOSE, tcpi_state }%
--
-+// Verify that the RST was accepted. Indirectly this also verifies that no
-+// immediate ACK was sent for the data packet above.
-+   +0 < . 20001:20001(0) ack 1 win 257
-+   +0 > R 1:1(0)
-
----
-base-commit: 5446b8691eb8278f10deca92048fad84ffd1e4d5
-change-id: 20260315-improve_tcp_neg_usable_wnd_test-2a1329d4ca15
+The question is whether you build tested your code (so dtbs_check). And
+if not, why?
 
 Best regards,
--- 
-Simon Baatz <gmbnomis@gmail.com>
-
-
+Krzysztof
 
