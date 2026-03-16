@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-268208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268210-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KItlD1gxuGmvaAEAu9opvQ
-	(envelope-from <netdev+bounces-268208-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:35:36 +0100
+	id WMOzHIIxuGmvaAEAu9opvQ
+	(envelope-from <netdev+bounces-268210-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:36:18 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 985CB29D78A
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:35:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A95029D7A7
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:36:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8BC2D303E2FD
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 16:30:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8169430C6276
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 16:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A813A0E84;
-	Mon, 16 Mar 2026 16:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9ACD3B8D79;
+	Mon, 16 Mar 2026 16:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="XfJUf125"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="SGbR1334"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f99.google.com (mail-wr1-f99.google.com [209.85.221.99])
+Received: from mail-ej1-f99.google.com (mail-ej1-f99.google.com [209.85.218.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508D615CD74
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 16:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6E03A1A59
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 16:30:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773678650; cv=none; b=V95xcQ/ZXRwxtKHqHYu9xz14zVOy/ywUDHpIvkp2X1oF/koD8viur6fsAPnC+ddYeTMePDr5KXk4ePeyiYlffh7lyTS8auF9DWo7ITL3utQ1NMkZZdar7amfmyDu4d9mKTPXydybTTNM2kFmJa7HZ5GZ3IiAI2a2+6mzKDBE8VU=
+	t=1773678658; cv=none; b=nWLoeY1+iIWGqcWBirnoFrQWZ49RhY8nJek46CEBaWu/br9sFUhnt7GeNqZ5TJAW/eJIdyurGFcjWwNGC1/q6n0FuUx+yS8e2ZqvrhTAplzdrTeb2a3ElUds0/DSvhaDx+3yGFBgM8Qe6JNfXnZ8s0mcJkF6XMcfkjeLnOJLBXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773678650; c=relaxed/simple;
-	bh=j5bJdZdQOQONP5KETjxTJRPRw4KzD30sh0sI0PNlTvQ=;
+	s=arc-20240116; t=1773678658; c=relaxed/simple;
+	bh=3eOUF/0t4xtstufAr4jTFkqeyICqNkit2RzVHVoXX9U=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=b2jll04qTCQxmj6wgxAomvwMzKaLQW60nd5Gerwyg3AIU90EaEz71vsQRzSSQ5fohoouQbs97lIlNffQEzDa6M+LVrsRgbs5Qc/OeXA4z91gPawZBxTfGDenYMp5LL7LHQztFZqv3oozl23AzNPsVYTJsMlP7z7YHhqQEQjbc00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=XfJUf125; arc=none smtp.client-ip=209.85.221.99
+	 MIME-Version; b=VSdAdGBCEeqE76N16yfTX0KDBc/lLfFcLI7pmuYus0oV2QJRohg5RVgof5BZh93vZFOw9YFCBflEk4L04JZ48EyfhJiuRHt4cR1x30gkrEMVdLXhEbgjNrcytgQD+XhCJUsgoP9m+4FDrde3fjVCCUtZ4LCjFdloD/4O3BRa3ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=SGbR1334; arc=none smtp.client-ip=209.85.218.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f99.google.com with SMTP id ffacd0b85a97d-43b3f91a7abso971638f8f.1
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 09:30:48 -0700 (PDT)
+Received: by mail-ej1-f99.google.com with SMTP id a640c23a62f3a-b97b30fa5e5so236088866b.3
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 09:30:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1773678646; x=1774283446; darn=vger.kernel.org;
+        d=6wind.com; s=google; t=1773678656; x=1774283456; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I+KCYYSes6vGobZd5Ejvl+WWW0UQGCsSz49m3tsEPsw=;
-        b=XfJUf125fs6y1BitV33qrwa7/1iIcKdUL/fW+pYu2AbBQOOXjjqhDVstt2PX2UdpbD
-         88PV8nJDrN8BfOvKpD8FKe90Jzu+3w5Zdq6oqjBl/U2TBVS3QVO9DJ990YK8MHeU5+pb
-         6ELMEkw39GZuAiVTvf3V+bcfAj5Phtkv09KFGRtMh08Yr9aMHTxxY84Sqg8vuatwFxSt
-         Hjy/T1aC5KaL709X7nNTjx09uAfY9lxQe81I1i/zwBPwEjq1EEL5j4PtRbeCxAwF8DiZ
-         DsTGj/cattODrc6TCWyvOpuCHVg02FgzgWyEuu/PMMMDplLUficw7mkUguMeR2X5DTwp
-         yMUQ==
+        bh=PEh7BRKAizp8GGJ568E4oqZ+Kbjdlfk2PW2zSqId4BE=;
+        b=SGbR1334Yg4AoRJiyHGpNvoqEmL9aQ9JHHBd6NvcTyJMJoo+UPf28Di7AMablVTPFN
+         bxy0JSGI+544TgExv97J20eSql+dV7HsI7x42ZwBBZsFTkEjB4fBQfvbk50cK5s7yIfQ
+         KFBKsHWhnHkD9gmw12q2/sV5Ki01EC8f4YoXrm8dmSa1j9jliVXp1s1XjMHEP5EapKGl
+         L7ahAWcXaq+1jDKXT1aB1lckJ/KUMVtjO7LM7RYg5V0mSUV95ZTdi+e+R8tX9uviJYlw
+         4RsfGMt4zT3Uf2Adm9Uxof67OFppbaGfESbeSJLDA8EMpuq2CsSkEV2Z3QbdMWkyLTcp
+         UQdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773678646; x=1774283446;
+        d=1e100.net; s=20251104; t=1773678656; x=1774283456;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=I+KCYYSes6vGobZd5Ejvl+WWW0UQGCsSz49m3tsEPsw=;
-        b=TogDNGKhTskq4bu/uzysQvpFNIksI78fWpdc0MyUrisnyCbFJ5IgodScpvbQsrp8ez
-         UGY22ihq54qDDFlh4ToXJmYWGKOR/AMGCYw2FOfComf+BY318XEtV188oN47XaBZegEj
-         XNJmdKX8vz37u8rdT83Dq10DIsgSmdZTp168+SsLk435G0UaKgDeR+Ba67NdrTcOKLBb
-         aXHC4vSfJjYRHQUe+vY92eJsIep3kD3vv89sJniprHeirM5JSARIJUlYZciR5oio87tK
-         T/X7iI0Eleoe6c+K4o+1Sqd6zzTLPR2YimEAfXjaecgh6usw0l763UvIm7262CAYq2Wc
-         TDPA==
-X-Gm-Message-State: AOJu0YzxHK0j2n8iSVaqr3V4jqtpkM9gqA646ap30lE4aVZF5LLqFgb0
-	UPsKs9A5l57K3h0I0STSFr5vNRoL2tjd6AtJJasDmOUgGd8nj2WAs53xCwTYqx3Qm4dPavsXjcn
-	Si0KRkDeAUHHru3rPw4Fgf29Abntlr1SmAjzO
-X-Gm-Gg: ATEYQzzFsOF5wzfjQxZvcHpn0Xf0fcZU3QMwevR4YxwzkqLoCrtt89QfaIHzMhavZps
-	OTxnqXgixPzKG4m8ZrpjRV1kowYnEgSgFDZ9Fzk17tgQX3ifa9BvFgR+2PTAK59rqFkwObc2l2A
-	tmEnmeFJqZxy+ddI5kQOGa9cuHzr+QIc7TuybgFSF1pfLFUOtEPxbnn0jNNYfb7e7Z3lQGkXv2J
-	AZAKtI8eHbFSkkhd09HFkSPvIT2xWBrLIt2AfaNeOBt240TySLBu2a1n3TZbdSFJL5yrnRsbpZA
-	q36+yM0vqqUBkuO2jUrbmJpAt7Xvx8oDUTxDsizQXV3mukqRX9MeUfz1McxNiqZDhMHjAUVzlO1
-	sSL8HeFRt9+tIxztrEOHb3C1RiR6FGdkPHFOKroMQhDCbGEZqwvCcs+9FdHQoUrHHcKcUwL6mvA
+        bh=PEh7BRKAizp8GGJ568E4oqZ+Kbjdlfk2PW2zSqId4BE=;
+        b=mspFe0mCGY/l1hShMiSVAe+zVvMY2XNteTstM7gh9hCMzQsWf31hf6wAHTNf70bJxO
+         ZlljN9sHPCicztDlNC2f9lSCKS9mTsZh6gkDIRjKHRYYZPYRZ0f+g7IGiZhPsK1E+5K3
+         l2KZ431dBUdBpFzvsyZl6MmMnT7WZyVUIUdewU6+1beIrR67qeatJE6+2SMH0wf56oIC
+         xL2iDY2FTW0ICfuNyTAVDIStF4FcHBOHThi2mYFANhxQsKXOMdK5p5aORUnn3bjeTWc/
+         XaGs0VeagLyE9ga82vvfoWuqqMLB6O49KrKHVww4xgDmGzJLxCQ/yUV4VUzj5Kohqsnv
+         53Rw==
+X-Gm-Message-State: AOJu0YxjafFrifJGHyMj/VXH9lRSoes9SGmHrg5IhITbaWZPk6dC2b44
+	fcjgH47Ud1xDR3jywtEbKzTakok0ZnZWKB6SYJDlA+HyijDN5BVk5VRY0MLZzbefJH0+S95YFsR
+	MIvLqH9mK7haWTD9a042BZqA+MCZEiZUZDYVl
+X-Gm-Gg: ATEYQzwLw36mgb3d2FWeoV8L/dpA959YMs4kCm8d3ntaHaVRgdlFOr4kG8vERWBrniZ
+	P001vXwMfYfVhIcb7jV2MmYd1249SWP/ONUT2UmDkjxBCokeD++0tDjrrhgj8QERjkK+vrbSBXc
+	O3HGgLGVp71JY9C1Ii5QGhD3PRVIFtC8Pchb7E49qMAcA9p5dZt0Gf3OLDt1QKY04cK56SQnNAO
+	mErF9giSSVC1IDPneyk5JVuxzG9S7PJwW4meiRqVmOY/IeoL85VLcOJor99/W+r/a6ZVe91F8uo
+	YfNxOsJBa9A0j5ml3a1Cn5yu20o5E4a73x0QcFWcf7EZx82IUWsbfBajBLWJU4cE4iLOTqOPEm4
+	Y/TuNvCyaOFJgsrcfM4YleDDA0/36PYa3+P/l6QorddDacuLl/u/wuNjOndQsuGs6NYRpdQWgcw
 	==
-X-Received: by 2002:a05:6000:1ac6:b0:43b:4153:c2a5 with SMTP id ffacd0b85a97d-43b4153c3a0mr9381229f8f.49.1773678645341;
-        Mon, 16 Mar 2026 09:30:45 -0700 (PDT)
+X-Received: by 2002:a17:907:e106:b0:b8f:9525:1099 with SMTP id a640c23a62f3a-b9765345c16mr499076666b.35.1773678655357;
+        Mon, 16 Mar 2026 09:30:55 -0700 (PDT)
 Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id ffacd0b85a97d-43b3e0c4a01sm197879f8f.15.2026.03.16.09.30.45;
-        Mon, 16 Mar 2026 09:30:45 -0700 (PDT)
+        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-b97a4dac429sm45802566b.17.2026.03.16.09.30.55;
+        Mon, 16 Mar 2026 09:30:55 -0700 (PDT)
 X-Relaying-Domain: 6wind.com
 Received: from localhost (kadavar.dev.6wind.com [10.17.1.232])
-	by smtpservice.6wind.com (Postfix) with ESMTP id 0E7C019F79;
-	Mon, 16 Mar 2026 17:30:45 +0100 (CET)
+	by smtpservice.6wind.com (Postfix) with ESMTP id 3111E19F7B;
+	Mon, 16 Mar 2026 17:30:55 +0100 (CET)
 From: Justin Iurman <justin.iurman@6wind.com>
 To: netdev@vger.kernel.org
 Cc: andrea.mayer@uniroma2.it,
@@ -93,10 +93,11 @@ Cc: andrea.mayer@uniroma2.it,
 	paolo.lungaroni@uniroma2.it,
 	ahabdels@cisco.com,
 	Justin Iurman <justin.iurman@6wind.com>,
-	David Ahern <dsahern@kernel.org>
-Subject: [PATCH net-next v3 1/2] seg6: add per-route tunnel source address
-Date: Mon, 16 Mar 2026 17:29:54 +0100
-Message-Id: <20260316162955.1253225-2-justin.iurman@6wind.com>
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v3 2/2] selftests: add check for seg6 tunsrc
+Date: Mon, 16 Mar 2026 17:29:55 +0100
+Message-Id: <20260316162955.1253225-3-justin.iurman@6wind.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20260316162955.1253225-1-justin.iurman@6wind.com>
 References: <20260316162955.1253225-1-justin.iurman@6wind.com>
@@ -113,321 +114,203 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[uniroma2.it,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,6wind.com,cisco.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268208-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[uniroma2.it,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,6wind.com,cisco.com];
-	DKIM_TRACE(0.00)[6wind.com:+];
+	TAGGED_FROM(0.00)[bounces-268210-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[justin.iurman@6wind.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[6wind.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 985CB29D78A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,encaps.red:url,srv6_hencap_red_l3vpn_test.sh:url,6wind.com:dkim,6wind.com:email,6wind.com:mid,encap.red:url]
+X-Rspamd-Queue-Id: 1A95029D7A7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add SEG6_IPTUNNEL_SRC in the uapi for users to configure a specific
-tunnel source address. Make seg6_iptunnel handle the new attribute
-correctly. It has priority over the configured per-netns tunnel
-source address, if any.
+Extend srv6_hencap_red_l3vpn_test.sh to include checks for the new
+"tunsrc" feature.
 
-Cc: David Ahern <dsahern@kernel.org>
+Cc: Shuah Khan <shuah@kernel.org>
+Cc: linux-kselftest@vger.kernel.org
 Signed-off-by: Justin Iurman <justin.iurman@6wind.com>
 ---
- include/uapi/linux/seg6_iptunnel.h |   1 +
- net/ipv6/seg6_iptunnel.c           | 114 +++++++++++++++++++++--------
- 2 files changed, 84 insertions(+), 31 deletions(-)
+ .../net/srv6_hencap_red_l3vpn_test.sh         | 65 ++++++++++++++-----
+ 1 file changed, 50 insertions(+), 15 deletions(-)
 
-diff --git a/include/uapi/linux/seg6_iptunnel.h b/include/uapi/linux/seg6_iptunnel.h
-index ae78791372b8..485889b19900 100644
---- a/include/uapi/linux/seg6_iptunnel.h
-+++ b/include/uapi/linux/seg6_iptunnel.h
-@@ -20,6 +20,7 @@
- enum {
- 	SEG6_IPTUNNEL_UNSPEC,
- 	SEG6_IPTUNNEL_SRH,
-+	SEG6_IPTUNNEL_SRC,	/* struct in6_addr */
- 	__SEG6_IPTUNNEL_MAX,
- };
- #define SEG6_IPTUNNEL_MAX (__SEG6_IPTUNNEL_MAX - 1)
-diff --git a/net/ipv6/seg6_iptunnel.c b/net/ipv6/seg6_iptunnel.c
-index 3e1b9991131a..e76cc0cc481e 100644
---- a/net/ipv6/seg6_iptunnel.c
-+++ b/net/ipv6/seg6_iptunnel.c
-@@ -49,6 +49,7 @@ static size_t seg6_lwt_headroom(struct seg6_iptunnel_encap *tuninfo)
+diff --git a/tools/testing/selftests/net/srv6_hencap_red_l3vpn_test.sh b/tools/testing/selftests/net/srv6_hencap_red_l3vpn_test.sh
+index 6a68c7eff1dc..bdc485640f79 100755
+--- a/tools/testing/selftests/net/srv6_hencap_red_l3vpn_test.sh
++++ b/tools/testing/selftests/net/srv6_hencap_red_l3vpn_test.sh
+@@ -345,6 +345,10 @@ setup_rt_networking()
+ 		ip -netns "${nsname}" addr \
+ 			add "${net_prefix}::${rt}/64" dev "${devname}" nodad
  
- struct seg6_lwt {
- 	struct dst_cache cache;
-+	struct in6_addr tunsrc;
- 	struct seg6_iptunnel_encap tuninfo[];
- };
++		ip -netns "${nsname}" addr \
++			add "${net_prefix}::dead:${rt}/64" dev "${devname}" \
++			nodad preferred_lft 0
++
+ 		ip -netns "${nsname}" link set "${devname}" up
+ 	done
  
-@@ -65,6 +66,7 @@ seg6_encap_lwtunnel(struct lwtunnel_state *lwt)
+@@ -419,7 +423,8 @@ setup_rt_local_sids()
+ #  $4 - SRv6 router configured for removing the SRv6 Policy (router connected
+ #       to the destination host)
+ #  $5 - encap mode (full or red)
+-#  $6 - traffic type (IPv6 or IPv4)
++#  $6 - force tunsrc (true or false)
++#  $7 - traffic type (IPv6 or IPv4)
+ __setup_rt_policy()
+ {
+ 	local dst="$1"
+@@ -427,11 +432,40 @@ __setup_rt_policy()
+ 	local end_rts="$3"
+ 	local dec_rt="$4"
+ 	local mode="$5"
+-	local traffic="$6"
++	local with_tunsrc="$6"
++	local traffic="$7"
+ 	local nsname
+ 	local policy=''
++	local tunsrc=''
+ 	local n
  
- static const struct nla_policy seg6_iptunnel_policy[SEG6_IPTUNNEL_MAX + 1] = {
- 	[SEG6_IPTUNNEL_SRH]	= { .type = NLA_BINARY },
-+	[SEG6_IPTUNNEL_SRC]	= NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
- };
++	if [ "$with_tunsrc" = "true" ]; then
++		local net_prefix
++		local drule
++		local nxt
++
++		[ "$end_rts" = "" ] && nxt="${dec_rt}" || nxt="${end_rts%% *}"
++
++		net_prefix="$(get_network_prefix "${encap_rt}" "${nxt}")"
++		tunsrc="tunsrc ${net_prefix}::dead:${encap_rt}"
++
++		eval nsname=\${$(get_rtname "${dec_rt}")}
++
++		drule="PREROUTING \
++		       -d ${VPN_LOCATOR_SERVICE}:${dec_rt}::${DT46_FUNC} \
++		       -j DROP"
++
++		if ! ip netns exec "${nsname}" \
++			ip6tables -t raw -C ${drule} &>/dev/null; then
++			ip netns exec "${nsname}" ip6tables -t raw -A ${drule}
++		fi
++
++		ip netns exec "${nsname}" ip6tables -t raw -I PREROUTING 1 \
++			-s "${net_prefix}::dead:${encap_rt}" \
++			-d ${VPN_LOCATOR_SERVICE}:${dec_rt}::${DT46_FUNC} \
++			-j ACCEPT
++	fi
++
+ 	eval nsname=\${$(get_rtname "${encap_rt}")}
  
- static int nla_put_srh(struct sk_buff *skb, int attrtype,
-@@ -87,23 +89,32 @@ static int nla_put_srh(struct sk_buff *skb, int attrtype,
+ 	for n in ${end_rts}; do
+@@ -444,7 +478,7 @@ __setup_rt_policy()
+ 	if [ "${traffic}" -eq 6 ]; then
+ 		ip -netns "${nsname}" -6 route \
+ 			add "${IPv6_HS_NETWORK}::${dst}" vrf "${VRF_DEVNAME}" \
+-			encap seg6 mode "${mode}" segs "${policy}" \
++			encap seg6 mode "${mode}" ${tunsrc} segs "${policy}" \
+ 			dev "${VRF_DEVNAME}"
+ 
+ 		ip -netns "${nsname}" -6 neigh \
+@@ -455,7 +489,7 @@ __setup_rt_policy()
+ 		# received, otherwise the proxy arp does not work.
+ 		ip -netns "${nsname}" -4 route \
+ 			add "${IPv4_HS_NETWORK}.${dst}" vrf "${VRF_DEVNAME}" \
+-			encap seg6 mode "${mode}" segs "${policy}" \
++			encap seg6 mode "${mode}" ${tunsrc} segs "${policy}" \
+ 			dev "${VRF_DEVNAME}"
+ 	fi
+ }
+@@ -463,13 +497,13 @@ __setup_rt_policy()
+ # see __setup_rt_policy
+ setup_rt_policy_ipv6()
+ {
+-	__setup_rt_policy "$1" "$2" "$3" "$4" "$5" 6
++	__setup_rt_policy "$1" "$2" "$3" "$4" "$5" "$6" 6
  }
  
- static void set_tun_src(struct net *net, struct net_device *dev,
--			struct in6_addr *daddr, struct in6_addr *saddr)
-+			struct in6_addr *daddr, struct in6_addr *saddr,
-+			struct in6_addr *route_tunsrc)
+ #see __setup_rt_policy
+ setup_rt_policy_ipv4()
  {
- 	struct seg6_pernet_data *sdata = seg6_pernet(net);
- 	struct in6_addr *tun_src;
- 
--	rcu_read_lock();
--
--	tun_src = rcu_dereference(sdata->tun_src);
--
--	if (!ipv6_addr_any(tun_src)) {
--		memcpy(saddr, tun_src, sizeof(struct in6_addr));
-+	/* Priority order to select tunnel source address:
-+	 *  1. per route source address (if configured)
-+	 *  2. per network namespace source address (if configured)
-+	 *  3. dynamic resolution
-+	 */
-+	if (route_tunsrc && !ipv6_addr_any(route_tunsrc)) {
-+		memcpy(saddr, route_tunsrc, sizeof(struct in6_addr));
- 	} else {
--		ipv6_dev_get_saddr(net, dev, daddr, IPV6_PREFER_SRC_PUBLIC,
--				   saddr);
--	}
-+		rcu_read_lock();
-+		tun_src = rcu_dereference(sdata->tun_src);
-+
-+		if (!ipv6_addr_any(tun_src)) {
-+			memcpy(saddr, tun_src, sizeof(struct in6_addr));
-+		} else {
-+			ipv6_dev_get_saddr(net, dev, daddr,
-+					   IPV6_PREFER_SRC_PUBLIC, saddr);
-+		}
- 
--	rcu_read_unlock();
-+		rcu_read_unlock();
-+	}
+-	__setup_rt_policy "$1" "$2" "$3" "$4" "$5" 4
++	__setup_rt_policy "$1" "$2" "$3" "$4" "$5" "$6" 4
  }
  
- /* Compute flowlabel for outer IPv6 header */
-@@ -125,7 +136,8 @@ static __be32 seg6_make_flowlabel(struct net *net, struct sk_buff *skb,
- }
+ setup_hs()
+@@ -567,41 +601,41 @@ setup()
+ 	# the network path between hs-1 and hs-2 traverses several routers
+ 	# depending on the direction of traffic.
+ 	#
+-	# Direction hs-1 -> hs-2 (H.Encaps.Red)
++	# Direction hs-1 -> hs-2 (H.Encaps.Red + tunsrc)
+ 	#  - rt-3,rt-4 (SRv6 End behaviors)
+ 	#  - rt-2 (SRv6 End.DT46 behavior)
+ 	#
+ 	# Direction hs-2 -> hs-1 (H.Encaps.Red)
+ 	#  - rt-1 (SRv6 End.DT46 behavior)
+-	setup_rt_policy_ipv6 2 1 "3 4" 2 encap.red
+-	setup_rt_policy_ipv6 1 2 "" 1 encap.red
++	setup_rt_policy_ipv6 2 1 "3 4" 2 encap.red true
++	setup_rt_policy_ipv6 1 2 "" 1 encap.red false
  
- static int __seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh,
--			       int proto, struct dst_entry *cache_dst)
-+			       int proto, struct dst_entry *cache_dst,
-+			       struct in6_addr *route_tunsrc)
- {
- 	struct dst_entry *dst = skb_dst(skb);
- 	struct net_device *dev = dst_dev(dst);
-@@ -182,7 +194,7 @@ static int __seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh,
- 	isrh->nexthdr = proto;
+ 	# create an IPv4 VPN between hosts hs-1 and hs-2
+ 	# the network path between hs-1 and hs-2 traverses several routers
+ 	# depending on the direction of traffic.
+ 	#
+-	# Direction hs-1 -> hs-2 (H.Encaps.Red)
++	# Direction hs-1 -> hs-2 (H.Encaps.Red + tunsrc)
+ 	# - rt-2 (SRv6 End.DT46 behavior)
+ 	#
+ 	# Direction hs-2 -> hs-1 (H.Encaps.Red)
+ 	#  - rt-4,rt-3 (SRv6 End behaviors)
+ 	#  - rt-1 (SRv6 End.DT46 behavior)
+-	setup_rt_policy_ipv4 2 1 "" 2 encap.red
+-	setup_rt_policy_ipv4 1 2 "4 3" 1 encap.red
++	setup_rt_policy_ipv4 2 1 "" 2 encap.red true
++	setup_rt_policy_ipv4 1 2 "4 3" 1 encap.red false
  
- 	hdr->daddr = isrh->segments[isrh->first_segment];
--	set_tun_src(net, dev, &hdr->daddr, &hdr->saddr);
-+	set_tun_src(net, dev, &hdr->daddr, &hdr->saddr, route_tunsrc);
+ 	# create an IPv6 VPN between hosts hs-3 and hs-4
+ 	# the network path between hs-3 and hs-4 traverses several routers
+ 	# depending on the direction of traffic.
+ 	#
+-	# Direction hs-3 -> hs-4 (H.Encaps.Red)
++	# Direction hs-3 -> hs-4 (H.Encaps.Red + tunsrc)
+ 	# - rt-2 (SRv6 End Behavior)
+ 	# - rt-4 (SRv6 End.DT46 behavior)
+ 	#
+ 	# Direction hs-4 -> hs-3 (H.Encaps.Red)
+ 	#  - rt-1 (SRv6 End behavior)
+ 	#  - rt-3 (SRv6 End.DT46 behavior)
+-	setup_rt_policy_ipv6 4 3 "2" 4 encap.red
+-	setup_rt_policy_ipv6 3 4 "1" 3 encap.red
++	setup_rt_policy_ipv6 4 3 "2" 4 encap.red true
++	setup_rt_policy_ipv6 3 4 "1" 3 encap.red false
  
- #ifdef CONFIG_IPV6_SEG6_HMAC
- 	if (sr_has_hmac(isrh)) {
-@@ -202,14 +214,15 @@ static int __seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh,
- /* encapsulate an IPv6 packet within an outer IPv6 header with a given SRH */
- int seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh, int proto)
- {
--	return __seg6_do_srh_encap(skb, osrh, proto, NULL);
-+	return __seg6_do_srh_encap(skb, osrh, proto, NULL, NULL);
- }
- EXPORT_SYMBOL_GPL(seg6_do_srh_encap);
+ 	# testing environment was set up successfully
+ 	SETUP_ERR=0
+@@ -819,6 +853,7 @@ test_command_or_ksft_skip ip
+ test_command_or_ksft_skip ping
+ test_command_or_ksft_skip sysctl
+ test_command_or_ksft_skip grep
++test_command_or_ksft_skip ip6tables
  
- /* encapsulate an IPv6 packet within an outer IPv6 header with reduced SRH */
- static int seg6_do_srh_encap_red(struct sk_buff *skb,
- 				 struct ipv6_sr_hdr *osrh, int proto,
--				 struct dst_entry *cache_dst)
-+				 struct dst_entry *cache_dst,
-+				 struct in6_addr *route_tunsrc)
- {
- 	__u8 first_seg = osrh->first_segment;
- 	struct dst_entry *dst = skb_dst(skb);
-@@ -272,7 +285,7 @@ static int seg6_do_srh_encap_red(struct sk_buff *skb,
- 	if (skip_srh) {
- 		hdr->nexthdr = proto;
- 
--		set_tun_src(net, dev, &hdr->daddr, &hdr->saddr);
-+		set_tun_src(net, dev, &hdr->daddr, &hdr->saddr, route_tunsrc);
- 		goto out;
- 	}
- 
-@@ -308,7 +321,7 @@ static int seg6_do_srh_encap_red(struct sk_buff *skb,
- 
- srcaddr:
- 	isrh->nexthdr = proto;
--	set_tun_src(net, dev, &hdr->daddr, &hdr->saddr);
-+	set_tun_src(net, dev, &hdr->daddr, &hdr->saddr, route_tunsrc);
- 
- #ifdef CONFIG_IPV6_SEG6_HMAC
- 	if (unlikely(!skip_srh && sr_has_hmac(isrh))) {
-@@ -383,9 +396,11 @@ static int seg6_do_srh(struct sk_buff *skb, struct dst_entry *cache_dst)
- {
- 	struct dst_entry *dst = skb_dst(skb);
- 	struct seg6_iptunnel_encap *tinfo;
-+	struct seg6_lwt *slwt;
- 	int proto, err = 0;
- 
--	tinfo = seg6_encap_lwtunnel(dst->lwtstate);
-+	slwt = seg6_lwt_lwtunnel(dst->lwtstate);
-+	tinfo = slwt->tuninfo;
- 
- 	switch (tinfo->mode) {
- 	case SEG6_IPTUN_MODE_INLINE:
-@@ -410,11 +425,11 @@ static int seg6_do_srh(struct sk_buff *skb, struct dst_entry *cache_dst)
- 			return -EINVAL;
- 
- 		if (tinfo->mode == SEG6_IPTUN_MODE_ENCAP)
--			err = __seg6_do_srh_encap(skb, tinfo->srh,
--						  proto, cache_dst);
-+			err = __seg6_do_srh_encap(skb, tinfo->srh, proto,
-+						  cache_dst, &slwt->tunsrc);
- 		else
--			err = seg6_do_srh_encap_red(skb, tinfo->srh,
--						    proto, cache_dst);
-+			err = seg6_do_srh_encap_red(skb, tinfo->srh, proto,
-+						    cache_dst, &slwt->tunsrc);
- 
- 		if (err)
- 			return err;
-@@ -436,12 +451,12 @@ static int seg6_do_srh(struct sk_buff *skb, struct dst_entry *cache_dst)
- 
- 		if (tinfo->mode == SEG6_IPTUN_MODE_L2ENCAP)
- 			err = __seg6_do_srh_encap(skb, tinfo->srh,
--						  IPPROTO_ETHERNET,
--						  cache_dst);
-+						  IPPROTO_ETHERNET, cache_dst,
-+						  &slwt->tunsrc);
- 		else
- 			err = seg6_do_srh_encap_red(skb, tinfo->srh,
--						    IPPROTO_ETHERNET,
--						    cache_dst);
-+						    IPPROTO_ETHERNET, cache_dst,
-+						    &slwt->tunsrc);
- 
- 		if (err)
- 			return err;
-@@ -678,6 +693,10 @@ static int seg6_build_state(struct net *net, struct nlattr *nla,
- 		if (family != AF_INET6)
- 			return -EINVAL;
- 
-+		if (tb[SEG6_IPTUNNEL_SRC]) {
-+			NL_SET_ERR_MSG(extack, "incompatible mode for tunsrc");
-+			return -EINVAL;
-+		}
- 		break;
- 	case SEG6_IPTUN_MODE_ENCAP:
- 		break;
-@@ -702,13 +721,23 @@ static int seg6_build_state(struct net *net, struct nlattr *nla,
- 	slwt = seg6_lwt_lwtunnel(newts);
- 
- 	err = dst_cache_init(&slwt->cache, GFP_ATOMIC);
--	if (err) {
--		kfree(newts);
--		return err;
--	}
-+	if (err)
-+		goto free_lwt_state;
- 
- 	memcpy(&slwt->tuninfo, tuninfo, tuninfo_len);
- 
-+	if (tb[SEG6_IPTUNNEL_SRC]) {
-+		slwt->tunsrc = nla_get_in6_addr(tb[SEG6_IPTUNNEL_SRC]);
-+
-+		if (ipv6_addr_any(&slwt->tunsrc) ||
-+		    ipv6_addr_is_multicast(&slwt->tunsrc) ||
-+		    ipv6_addr_loopback(&slwt->tunsrc)) {
-+			NL_SET_ERR_MSG(extack, "invalid tunsrc address");
-+			err = -EINVAL;
-+			goto free_dst_cache;
-+		}
-+	}
-+
- 	newts->type = LWTUNNEL_ENCAP_SEG6;
- 	newts->flags |= LWTUNNEL_STATE_INPUT_REDIRECT;
- 
-@@ -720,6 +749,12 @@ static int seg6_build_state(struct net *net, struct nlattr *nla,
- 	*ts = newts;
- 
- 	return 0;
-+
-+free_dst_cache:
-+	dst_cache_destroy(&slwt->cache);
-+free_lwt_state:
-+	kfree(newts);
-+	return err;
- }
- 
- static void seg6_destroy_state(struct lwtunnel_state *lwt)
-@@ -731,29 +766,46 @@ static int seg6_fill_encap_info(struct sk_buff *skb,
- 				struct lwtunnel_state *lwtstate)
- {
- 	struct seg6_iptunnel_encap *tuninfo = seg6_encap_lwtunnel(lwtstate);
-+	struct seg6_lwt *slwt = seg6_lwt_lwtunnel(lwtstate);
- 
- 	if (nla_put_srh(skb, SEG6_IPTUNNEL_SRH, tuninfo))
- 		return -EMSGSIZE;
- 
-+	if (!ipv6_addr_any(&slwt->tunsrc) &&
-+	    nla_put_in6_addr(skb, SEG6_IPTUNNEL_SRC, &slwt->tunsrc))
-+		return -EMSGSIZE;
-+
- 	return 0;
- }
- 
- static int seg6_encap_nlsize(struct lwtunnel_state *lwtstate)
- {
- 	struct seg6_iptunnel_encap *tuninfo = seg6_encap_lwtunnel(lwtstate);
-+	struct seg6_lwt *slwt = seg6_lwt_lwtunnel(lwtstate);
-+	int nlsize;
-+
-+	nlsize = nla_total_size(SEG6_IPTUN_ENCAP_SIZE(tuninfo));
- 
--	return nla_total_size(SEG6_IPTUN_ENCAP_SIZE(tuninfo));
-+	if (!ipv6_addr_any(&slwt->tunsrc))
-+		nlsize += nla_total_size(sizeof(slwt->tunsrc));
-+
-+	return nlsize;
- }
- 
- static int seg6_encap_cmp(struct lwtunnel_state *a, struct lwtunnel_state *b)
- {
- 	struct seg6_iptunnel_encap *a_hdr = seg6_encap_lwtunnel(a);
- 	struct seg6_iptunnel_encap *b_hdr = seg6_encap_lwtunnel(b);
-+	struct seg6_lwt *a_slwt = seg6_lwt_lwtunnel(a);
-+	struct seg6_lwt *b_slwt = seg6_lwt_lwtunnel(b);
- 	int len = SEG6_IPTUN_ENCAP_SIZE(a_hdr);
- 
- 	if (len != SEG6_IPTUN_ENCAP_SIZE(b_hdr))
- 		return 1;
- 
-+	if (!ipv6_addr_equal(&a_slwt->tunsrc, &b_slwt->tunsrc))
-+		return 1;
-+
- 	return memcmp(a_hdr, b_hdr, len);
- }
- 
+ test_iproute2_supp_or_ksft_skip
+ test_vrf_or_ksft_skip
 -- 
 2.39.2
 
