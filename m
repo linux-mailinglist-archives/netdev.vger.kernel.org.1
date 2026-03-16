@@ -1,372 +1,171 @@
-Return-Path: <netdev+bounces-268321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268326-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MFIOEBSIuGksfgEAu9opvQ
-	(envelope-from <netdev+bounces-268321-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 23:45:40 +0100
+	id iJ2HORCKuGmJfgEAu9opvQ
+	(envelope-from <netdev+bounces-268326-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 23:54:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 145422A1ACB
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 23:45:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 898002A1BEC
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 23:54:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D9C5C302D19A
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 22:45:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 96F0A305F3E9
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 22:52:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A6B378D63;
-	Mon, 16 Mar 2026 22:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C304B372B2C;
+	Mon, 16 Mar 2026 22:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uIVarzt1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lNQFh/t9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F873378826;
-	Mon, 16 Mar 2026 22:45:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965E5364E9F
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 22:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773701117; cv=none; b=GhNmukDRlrIg72XfmcmJpeCnp6VsgLbnrrDZKENhmUttwoudWbMSWtWYGWw9NSiipmBpZVOlXEWOwOvMEkzRuqpARhihXszWi5jgtHjCFuJZDycDBx5Hcro9SdTV5m9hh71RTjJWIp4Uyk5VNPmslk5E0PPZlobOkNs7d6NeFLY=
+	t=1773701541; cv=none; b=jerjaf+6ECq6eSkvrTC5y9++pnI+UCghtb7O0ko8twWz6LXcWMh1h1l+Pw1wwmXcsX60xNDuk/oMlBDpe8+3KXG2vHZJUUSG0jhH3w/XaN/uyt1z17G9ICaDl5dunyIwVmdYtqNkJj7DVxdV5Pvp9G85f5M6MfqAry8SIXvPuVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773701117; c=relaxed/simple;
-	bh=32rlDhmCkQ4jOtAgK9feJws4V+wYoAB+fZ/p02O4mpA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IkwvEPZvno7aA6YGwkAd5CIhR5i5vR5KrW0iU4x7muowyjkGscMJQ74pv6h0KQTlSdwgeIoeL7/uL4iV5Am1DeNxw4GcsTUX3SHk2dNybo1xBaBbnZ+PnWBHCvOhc0Mj9QgOELdy9P5BJRBhLjYvkIr6vvZjHsBpcGkZSR3LUAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uIVarzt1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEB8EC2BCAF;
-	Mon, 16 Mar 2026 22:45:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773701117;
-	bh=32rlDhmCkQ4jOtAgK9feJws4V+wYoAB+fZ/p02O4mpA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uIVarzt1/mgxRouM/oaieOoLqsSSzQoZ93D8x0S9RIqw8wJXFZ1mkP9ynsc7qSaK7
-	 NHPPUZD8UaKsksAFXroO4Wpj7a0cPMzMHDomvF/ULuCd6lloBlW9kNeqFvnncBEOcl
-	 mKx0nXrvK0+vdIhsl8YbrpvTK/vxBr2KUN749b8ZGxAaOl/PMgg7GvdI2qMyG7NAe9
-	 MskKQWFMN0W/ctw1IdyU1ctrAUNEKsOsOnvXz5/4XRPL8Y2KnZZaNLrO5N+nSB6GKL
-	 KW6ozR/FJ7vlWTDY0PeBHNO4P2O9MTfbVDs9ELUznYERB8CXYWFgnbw4n2eDKbKKql
-	 fB7HBWCbAJOUw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	shuah@kernel.org,
-	willemb@google.com,
-	petrm@nvidia.com,
-	dw@davidwei.uk,
-	mst@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 6/6] selftests: drv-net: gro: add a test for GRO depth
-Date: Mon, 16 Mar 2026 15:45:05 -0700
-Message-ID: <20260316224505.279672-7-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260316224505.279672-1-kuba@kernel.org>
-References: <20260316224505.279672-1-kuba@kernel.org>
+	s=arc-20240116; t=1773701541; c=relaxed/simple;
+	bh=nXKKpVU0EaOuK0WL/FjvLMBDolhz9xqKdL1OufHkpxs=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SrTs9UtrjpWIGzYy76mV0+3tFpF1k9iojLHb4/1mrX9iMXINB/s6fZLYjyei8E0vU6r1MR7nGtzOmR29BS6LhhovUhoyPvchhOYUUjE+OZvCz7DyWmQ4nOlf4H/+8GLAbkaB7TBOc0fT7e6qqbkBuFQmrCCeIy5FbG76WX6kwwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lNQFh/t9; arc=none smtp.client-ip=74.125.82.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-12732e6a123so537386c88.1
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 15:52:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773701540; x=1774306340; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZgmlfZZe7YWlllpAdANad5O+7C+v/m6YJ647o+2yW2k=;
+        b=lNQFh/t9M0HY6QqhfPcLcKuzvXO7lvZEe+5ZEj+m7mmmalpWApEQOQXq4fVlR0xKSt
+         GdfVfHnhaGE1DkEAPfw67s/UShMFxGHYivqhFwBbv4kiv82wgE9m9CQ3EBkCiIolzfvW
+         VvafzTUZDTC0jaSSeB3okYi8HaX08jSIb5MGON/xxgL+EA24JVPNpkckLaRwUOo1bQyI
+         VFRPQbQTjJEKHB+j6yALd/ELHrqWPcDbllGbnk+/yFxB4Gqn0ji8I3z0q1+kdbHTCT4q
+         p1SL58UzGWf09KdZuUpctIsIdjuYQe2cFlgHu7Y36oz2Q0AgNvKxMJZLaN8ZnCEvO5lZ
+         mhHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773701540; x=1774306340;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZgmlfZZe7YWlllpAdANad5O+7C+v/m6YJ647o+2yW2k=;
+        b=G1y2rP3eXSKUcxH3O9OVmiLfzk+vLu82uDHGYLAHqg58FYj6adNjuCYnuy/DFHr0dt
+         pXyZxLWuc/a4i6ckMxBXry6sW3Smf8zzFOcZYSiQsSYIMjs5Vwb1dlKX3WDfaQHXWY1G
+         /9eVGkmAHDqEKyHQKklbgxPeYUjA3Bee9whFvRRQyFxdfvi1kSSyfysbPbiNFtTAj1/Y
+         RvN8JSYjqJTyJlPzKXqpZjmIC7LJ/SH177a7WCMcvvUkag9w6Mt2melOpsJ9LbZZOPOb
+         lXs8AVOqRv+f6XOiSZM6qtLT0r/8ajxq4tOc/b7vjhseNiZRezM2j4kl5Ve/sTGI5xZY
+         Ptxw==
+X-Gm-Message-State: AOJu0YwNAcZW2P9kJJpEYTPF7ic24sSLDTi01SzP3+yG7KnRDDpAQCPe
+	PxMl2oWQeuCCfLA+zVlpKAYlj6jyYJPU0W2iv3aXE+Znr/SyyzT2fBXZ
+X-Gm-Gg: ATEYQzxSBapshBiGIMRaVKoSnIn+y1W3fO1C452zisaIcDbjLX9VrMxR9coRfyITNZF
+	9c7BpKVvJ1X8FA34FRi2DcgzuZixegZqhTlkhODWjxEFZN7oinQxKGbjL5EkLAP83GJU3+e1LcS
+	De3XmK6150z0TEbyJYKhEmHKMeuOipSovIYyS8yMJaKbMIdd3EexYaCBiiQVKxpXHTJYgHTVlMW
+	v61AeJh2vnZqOxoXTA8iKVXnpH+VZq0I8mRkYyO5Wy8C11HmYbhYkFbUsSusWMHJyxgQCIIzUZb
+	TIwAMFc0fW62fSSh20VEbUNQKFE1WFETVvc3aGu4s9mPVPWookNitPYcQZwY8xn/t5kWInqIvtU
+	6MvmkKHkOO0lBm2ieZcZd0GiBgOhKYlmcXShD+2YBJH0FRpe/DHDL0WQAjhnss1Y7gW1Ni/VsCm
+	0eyaOkrs5oTk+yPZ0aByZn/CuVnBWAYKFmByC5EEQN3Oun9dhLJcdusRVG4eM=
+X-Received: by 2002:a05:7022:7a4:b0:11e:f6ef:4988 with SMTP id a92af1059eb24-128f3df7206mr7239752c88.36.1773701539661;
+        Mon, 16 Mar 2026 15:52:19 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c096:14a::7bc? ([2620:10d:c090:600::76f6])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f63baa3dsm16688566c88.15.2026.03.16.15.52.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Mar 2026 15:52:19 -0700 (PDT)
+Message-ID: <9c6173d7de643bceb8bd35eec185155d4172b123.camel@gmail.com>
+Subject: Re: [RFC PATCH bpf-next v2 03/11] bpf: Unify dynptr handling in the
+ verifier
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
+ 	daniel@iogearbox.net, memxor@gmail.com, martin.lau@kernel.org, 
+	kernel-team@meta.com
+Date: Mon, 16 Mar 2026 15:52:17 -0700
+In-Reply-To: <20260307064439.3247440-4-ameryhung@gmail.com>
+References: <20260307064439.3247440-1-ameryhung@gmail.com>
+	 <20260307064439.3247440-4-ameryhung@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-268321-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	TAGGED_FROM(0.00)[bounces-268326-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[eddyz87@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lib.py:url]
-X-Rspamd-Queue-Id: 145422A1ACB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 898002A1BEC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Reuse the long sequence test to max out the GRO contexts.
-Repeat for a single queue, 8 queues, and default number
-of queues but flow steering to just one.
+On Fri, 2026-03-06 at 22:44 -0800, Amery Hung wrote:
+> Simplify dynptr checking for helper and kfunc by unifying it. Remember
+> initialized dynptr in process_dynptr_func() so that we can easily
+> retrieve the information for verification later.
+>=20
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
 
-The SW GRO's capacity should be around 64 per queue
-(8 buckets, up to 8 skbs in a chain).
+Acked-by: Eduard Zingerman <eddyz87@gmail.com>
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - move this "test" to SW, we can check SW GRO capacity too
-v1: https://lore.kernel.org/20260205220541.2992807-10-kuba@kernel.org
----
- tools/testing/selftests/drivers/net/gro.py | 201 +++++++++++++++++++--
- 1 file changed, 181 insertions(+), 20 deletions(-)
+[...]
 
-diff --git a/tools/testing/selftests/drivers/net/gro.py b/tools/testing/selftests/drivers/net/gro.py
-index 2da53686354f..795dbcc583a3 100755
---- a/tools/testing/selftests/drivers/net/gro.py
-+++ b/tools/testing/selftests/drivers/net/gro.py
-@@ -35,11 +35,18 @@ coalescing behavior.
-   - large_rem: Large packet remainder handling
- """
- 
-+import glob
- import os
-+import re
- from lib.py import ksft_run, ksft_exit, ksft_pr
- from lib.py import NetDrvEpEnv, KsftXfailEx
-+from lib.py import NetdevFamily, EthtoolFamily
- from lib.py import bkg, cmd, defer, ethtool, ip
--from lib.py import ksft_variants
-+from lib.py import ksft_variants, KsftNamedVariant
-+
-+
-+# gro.c uses hardcoded DPORT=8000
-+GRO_DPORT = 8000
- 
- 
- def _resolve_dmac(cfg, ipver):
-@@ -113,6 +120,98 @@ from lib.py import ksft_variants
-         ksft_pr(eth_cmd)
- 
- 
-+def _get_queue_stats(cfg, queue_id):
-+    """Get stats for a specific Rx queue."""
-+    cfg.wait_hw_stats_settle()
-+    data = cfg.netnl.qstats_get({"ifindex": cfg.ifindex, "scope": ["queue"]},
-+                                dump=True)
-+    for q in data:
-+        if q.get('queue-type') == 'rx' and q.get('queue-id') == queue_id:
-+            return q
-+    return {}
-+
-+
-+def _setup_isolated_queue(cfg):
-+    """Set up an isolated queue for testing using ntuple filter.
-+
-+    Remove queue 1 from the default RSS context and steer test traffic to it.
-+    """
-+    test_queue = 1
-+
-+    qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
-+    if qcnt < 2:
-+        raise KsftXfailEx(f"Need at least 2 queues, have {qcnt}")
-+
-+    # Remove queue 1 from default RSS context by setting its weight to 0
-+    weights = ["1"] * qcnt
-+    weights[test_queue] = "0"
-+    ethtool(f"-X {cfg.ifname} weight " + " ".join(weights))
-+    defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    # Set up ntuple filter to steer our test traffic to the isolated queue
-+    flow  = f"flow-type tcp{cfg.addr_ipver} "
-+    flow += f"dst-ip {cfg.addr} dst-port {GRO_DPORT} action {test_queue}"
-+    output = ethtool(f"-N {cfg.ifname} {flow}").stdout
-+    ntuple_id = int(output.split()[-1])
-+    defer(ethtool, f"-N {cfg.ifname} delete {ntuple_id}")
-+
-+    return test_queue
-+
-+
-+def _setup_queue_count(cfg, num_queues):
-+    """Configure the NIC to use a specific number of queues."""
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < num_queues:
-+        raise KsftXfailEx(f"Need at least {num_queues} queues, max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+    ethtool(f"-L {cfg.ifname} combined {num_queues}")
-+
-+
-+def _run_gro_bin(cfg, test_name, protocol=None, num_flows=None,
-+                 order_check=False, verbose=False, fail=False):
-+    """Run gro binary with given test and return the process result."""
-+    if not hasattr(cfg, "bin_remote"):
-+        cfg.bin_local = cfg.net_lib_dir / "gro"
-+        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
-+
-+    if protocol is None:
-+        ipver = cfg.addr_ipver
-+        protocol = f"ipv{ipver}"
-+    else:
-+        ipver = "6" if protocol[-1] == "6" else "4"
-+
-+    dmac = _resolve_dmac(cfg, ipver)
-+
-+    base_args = [
-+        f"--{protocol}",
-+        f"--dmac {dmac}",
-+        f"--smac {cfg.remote_dev['address']}",
-+        f"--daddr {cfg.addr_v[ipver]}",
-+        f"--saddr {cfg.remote_addr_v[ipver]}",
-+        f"--test {test_name}",
-+    ]
-+    if num_flows:
-+        base_args.append(f"--num-flows {num_flows}")
-+    if order_check:
-+        base_args.append("--order-check")
-+    if verbose:
-+        base_args.append("--verbose")
-+
-+    args = " ".join(base_args)
-+
-+    rx_cmd = f"{cfg.bin_local} {args} --rx --iface {cfg.ifname}"
-+    tx_cmd = f"{cfg.bin_remote} {args} --iface {cfg.remote_ifname}"
-+
-+    with bkg(rx_cmd, ksft_ready=True, exit_wait=True, fail=fail) as rx_proc:
-+        cmd(tx_cmd, host=cfg.remote)
-+
-+    return rx_proc
-+
-+
- def _setup(cfg, mode, test_name):
-     """ Setup hardware loopback mode for GRO testing. """
- 
-@@ -233,30 +332,14 @@ from lib.py import ksft_variants
- 
-     _setup(cfg, mode, test_name)
- 
--    base_cmd_args = [
--        f"--{protocol}",
--        f"--dmac {_resolve_dmac(cfg, ipver)}",
--        f"--smac {cfg.remote_dev['address']}",
--        f"--daddr {cfg.addr_v[ipver]}",
--        f"--saddr {cfg.remote_addr_v[ipver]}",
--        f"--test {test_name}",
--        "--verbose"
--    ]
--    base_args = " ".join(base_cmd_args)
--
-     # Each test is run 6 times to deflake, because given the receive timing,
-     # not all packets that should coalesce will be considered in the same flow
-     # on every try.
-     max_retries = 6
-     for attempt in range(max_retries):
--        rx_cmd = f"{cfg.bin_local} {base_args} --rx --iface {cfg.ifname}"
--        tx_cmd = f"{cfg.bin_remote} {base_args} --iface {cfg.remote_ifname}"
--
-         fail_now = attempt >= max_retries - 1
--
--        with bkg(rx_cmd, ksft_ready=True, exit_wait=True,
--                 fail=fail_now) as rx_proc:
--            cmd(tx_cmd, host=cfg.remote)
-+        rx_proc = _run_gro_bin(cfg, test_name, protocol=protocol,
-+                               verbose=True, fail=fail_now)
- 
-         if rx_proc.ret == 0:
-             return
-@@ -270,11 +353,89 @@ from lib.py import ksft_variants
-         ksft_pr(f"Attempt {attempt + 1}/{max_retries} failed, retrying...")
- 
- 
-+def _capacity_variants():
-+    """Generate variants for capacity test: mode x queue setup."""
-+    setups = [
-+        ("isolated", _setup_isolated_queue),
-+        ("1q", lambda cfg: _setup_queue_count(cfg, 1)),
-+        ("8q", lambda cfg: _setup_queue_count(cfg, 8)),
-+    ]
-+    for mode in ["sw", "hw", "lro"]:
-+        for name, func in setups:
-+            yield KsftNamedVariant(f"{mode}_{name}", mode, func)
-+
-+
-+@ksft_variants(_capacity_variants())
-+def test_gro_capacity(cfg, mode, setup_func):
-+    """
-+    Probe GRO capacity.
-+
-+    Start with 8 flows and increase by 2x on each successful run.
-+    Retry up to 3 times on failure.
-+
-+    Variants combine mode (sw, hw, lro) with queue setup:
-+      - isolated: Use a single queue isolated from RSS
-+      - 1q: Configure NIC to use 1 queue
-+      - 8q: Configure NIC to use 8 queues
-+    """
-+    max_retries = 3
-+
-+    _setup(cfg, mode, "capacity")
-+    queue_id = setup_func(cfg)
-+
-+    num_flows = 8
-+    while True:
-+        success = False
-+        for attempt in range(max_retries):
-+            if queue_id is not None:
-+                stats_before = _get_queue_stats(cfg, queue_id)
-+
-+            rx_proc = _run_gro_bin(cfg, "capacity", num_flows=num_flows)
-+            output = rx_proc.stdout
-+
-+            if queue_id is not None:
-+                stats_after = _get_queue_stats(cfg, queue_id)
-+                qstat_pkts = (stats_after.get('rx-packets', 0) -
-+                              stats_before.get('rx-packets', 0))
-+                gro_pkts = (stats_after.get('rx-hw-gro-packets', 0) -
-+                            stats_before.get('rx-hw-gro-packets', 0))
-+                qstat_str = f" qstat={qstat_pkts} hw-gro={gro_pkts}"
-+            else:
-+                qstat_str = ""
-+
-+            # Parse and print STATS line
-+            match = re.search(
-+                r'STATS: received=(\d+) wire=(\d+) coalesced=(\d+)', output)
-+            if match:
-+                received = int(match.group(1))
-+                wire = int(match.group(2))
-+                coalesced = int(match.group(3))
-+                status = "PASS" if received == num_flows else "FAIL"
-+                ksft_pr(f"flows={num_flows} attempt={attempt + 1} "
-+                        f"received={received} wire={wire} "
-+                        f"coalesced={coalesced}{qstat_str} [{status}]")
-+                if received == num_flows:
-+                    success = True
-+                    break
-+            else:
-+                ksft_pr(rx_proc)
-+                ksft_pr(f"flows={num_flows} attempt={attempt + 1}"
-+                        f"{qstat_str} [FAIL - can't parse stats]")
-+
-+        if not success:
-+            ksft_pr(f"Stopped at {num_flows} flows")
-+            break
-+
-+        num_flows *= 2
-+
-+
- def main() -> None:
-     """ Ksft boiler plate main """
- 
-     with NetDrvEpEnv(__file__) as cfg:
--        ksft_run(cases=[test], args=(cfg,))
-+        cfg.ethnl = EthtoolFamily()
-+        cfg.netnl = NetdevFamily()
-+        ksft_run(cases=[test, test_gro_capacity], args=(cfg,))
-     ksft_exit()
- 
- 
--- 
-2.53.0
+> @@ -8825,6 +8821,20 @@ static int process_dynptr_func(struct bpf_verifier=
+_env *env, int regno, int insn
+>  		}
+> =20
+>  		err =3D mark_dynptr_read(env, reg);
+> +
+> +		if (initialized_dynptr) {
+> +			struct bpf_func_state *state =3D func(env, reg);
+> +			int spi;
+> +
+> +			if (reg->type !=3D CONST_PTR_TO_DYNPTR) {
+> +				spi =3D dynptr_get_spi(env, reg);
+> +				reg =3D &state->stack[spi].spilled_ptr;
+> +			}
+> +
+> +			initialized_dynptr->id =3D reg->id;
+> +			initialized_dynptr->type =3D reg->dynptr.type;
+> +			initialized_dynptr->ref_obj_id =3D reg->ref_obj_id;
+> +		}
 
+Nit: Maybe fill `initialized_dynptr` unconditionally (regardless of
+     MEM_UNINIT check above I mean)?
+     Remembering under which conditions it is filled might be a bit
+     cumbersome when working with this function in the future.
+
+[...]
 
