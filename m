@@ -1,117 +1,119 @@
-Return-Path: <netdev+bounces-268111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268112-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YFpwG4jft2mcWAEAu9opvQ
-	(envelope-from <netdev+bounces-268111-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:46:32 +0100
+	id iOS7Herft2mcWAEAu9opvQ
+	(envelope-from <netdev+bounces-268112-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:48:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 143072982E5
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:46:32 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 309AC29834C
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:48:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D033D301DC09
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 10:44:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4AD4E3002B5D
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 10:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E14B38F93B;
-	Mon, 16 Mar 2026 10:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C7D38F62A;
+	Mon, 16 Mar 2026 10:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G848RMsI";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="uLuI/13o"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UGRhmHK/";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ptMh1i5P"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2266386577
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 10:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392AA38D6A9
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 10:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773657849; cv=none; b=RCru/XGN0daCkVMTfOpp5e8nlnLSKLLlsbmP08u2dRBR7fg9nLAlXHFaCIziCJnokig2kggG8Hkcu1T58TL5GbX+Nxd4L/wS7AdqeSpwysCL0XD1YY4YK1WRUPTuwY5vu19+3eG58m7r+xDM2VJIf4YcDNf2n+l50id+flHUPnI=
+	t=1773658083; cv=none; b=NZ6fMmKjR7u71YsNYrc6mk9pmaD2eVeGLb1GrXMHicYYHjgMqs2fVf56w/hbrUs2cUn4iBYYWqJbOxqkJYzuIt2NiEXsZB7AgU+dNoXtz+a47SHmF/mD9vd6vrR+08hfEjiXi1s/0LvdQgC1aFJCkBAyXDDiILg5V7Ivn2dg3TI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773657849; c=relaxed/simple;
-	bh=Sfai54yGfVswX06wKRJbvlx+Ae5w4/tFvgMB8FyVF0w=;
+	s=arc-20240116; t=1773658083; c=relaxed/simple;
+	bh=1QFgAt6v5G8ZF6zVoJAv0kj7kMi7gvlUjuhjHhXigUw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IuB74gJc/JwglA/pHVID2kmDkjMyqJDuKMLU/oAKp+pYPbWOLzKqrrc77yfJq4tfqCtX2QG5NbPyOf+4E240tJDNmFgVbR2l6yHIv8sym1BaF020hUcH0EfYV+s+DjGp3P5H7f2pWkCkY39n/VNk9zPgmzBTfp/hQeYdL69kIrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G848RMsI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=uLuI/13o; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=i18zZuGmC/DuKIw6StzFjClPb0TFYwTe/k338UCbc/IHmmMfqR3yXDheLNGzVHmvSmlx5RYneAK7IqYOh/yGvlXNzwFD9/lwAZnUVhALNsPNnC5/JEq9yEo8HP2AX7e8zOX+8ljRAHyPhRQUsp5LKWLsYnJqRcNIhldBq9Dteb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UGRhmHK/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ptMh1i5P; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773657846;
+	s=mimecast20190719; t=1773658081;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=N/gyi8r2QqrmKNfnuildAwIe3Wu8jqbPwSPfbNMez1o=;
-	b=G848RMsIykfGvEzrRxY+2+Ez7Sc7my0bZqfvakOq16UZT8IgiyQbbk/SM5WBSuYzuA5JtS
-	TxAqz43MRUsp61Du0qrXvfKK7Qd4gTxwFTuNbT7rI4WEV9DLOo2i+CkDWP+R1JoaRvsvja
-	hlazSUMepqzlAbK/+Ntj2/M/SdJcCDI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=BfYGvWXFyEp3tl8sYK4EkCi7nOSDVzMxt5VwgIY+JXA=;
+	b=UGRhmHK/IuvGb2g2bMUsy9/e7eiL50CLcPxClCLx2AyyTgXnk0A0mvjMpV6qH/n0S3/DXk
+	ogn0N7SzQrV2SKVBs3GBU3NB1Fi5OM/K90Y8VqPu5AhofMYRyZQCrZjHuSVdAszFS9wz5Q
+	gPAEuuTOhrPtzI3qI9JvPRUOBY0P5gI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-195-PF0IuuE0OLWv3kISjfRnBg-1; Mon, 16 Mar 2026 06:44:04 -0400
-X-MC-Unique: PF0IuuE0OLWv3kISjfRnBg-1
-X-Mimecast-MFC-AGG-ID: PF0IuuE0OLWv3kISjfRnBg_1773657843
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-439cbc5fd75so2830926f8f.0
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 03:44:04 -0700 (PDT)
+ us-mta-624-QH-Tf6TfMey2Q6KsZznIqA-1; Mon, 16 Mar 2026 06:47:59 -0400
+X-MC-Unique: QH-Tf6TfMey2Q6KsZznIqA-1
+X-Mimecast-MFC-AGG-ID: QH-Tf6TfMey2Q6KsZznIqA_1773658079
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48541cac34dso41696505e9.0
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 03:47:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773657843; x=1774262643; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1773658078; x=1774262878; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N/gyi8r2QqrmKNfnuildAwIe3Wu8jqbPwSPfbNMez1o=;
-        b=uLuI/13oe4sif2ofwTZvB8fNufqkvPnefy1nmZnOsEdwVaNHzyRfqNQKk7cQgGQbxd
-         jLBzjKsbguZ4UXPxr+6U4ZqD7ziXbH15f1q1hl1vNuHzcFgcdTzdftdITzbcazDKRx/V
-         mCCNqalZFEgO22aVHUycXwOEzRPHy9MltoqYrAiTvdRnH8qCviYGQWagABYli6P8I8OJ
-         Iec393l7Kemhh2TtaAvxXN862zmjgfi1wsg+PUKyRstHUUbco9LN+fFPfD+GWna1o0ic
-         USeiCCzcxdHx1j3V3T8V+eR0X0lY+hAzzZPeSmtk7WRwZUmD19AoaLbeX8j+n6o2Ypp2
-         hJ0g==
+        bh=BfYGvWXFyEp3tl8sYK4EkCi7nOSDVzMxt5VwgIY+JXA=;
+        b=ptMh1i5P2tbchnYhOvY5pVcd/UtNdP4iQsVxkzuPFhEg0JFtIChciqhbIle0TihC/t
+         7JHmpCjYU2apUBX/Lu2h+jF5zSHrm1s+yNWbrgyXxLNjlfUu3PRUYFQtwnZpfkG3qWz4
+         dAFQF2dTUM0WZhyzoovsy/4a094OMKXkfgEZKzUphOhzHxqp/tHoeFdPolbS8ROvxyCO
+         ++y2eS7EPqEj23pYtx/1OTOLBR0Xn52OuEf76CNBUdk5kk5FGHNvYdBn27hYcO6GkxEi
+         0SAVEF/KyxAgrjf8QNmY1J5fMThNPZDYsM0w7kpryDmdYvMquLnUMm9dftdaxT1fWIMM
+         G2/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773657843; x=1774262643;
+        d=1e100.net; s=20251104; t=1773658078; x=1774262878;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=N/gyi8r2QqrmKNfnuildAwIe3Wu8jqbPwSPfbNMez1o=;
-        b=YY7K5YjLiEPvSonhimAsEoWqxtPUaCH/mKo5NR5IqC2nlFsd1ReeNWl9bAiJ5OFln3
-         PbWSYzLAowlwxp3QCXZIdmhw7kGNhFOfRCqD3sthuI7SI4NVyociHfI2BtmkB6m7eGSm
-         RMT9G9tIMrwCOzFbJ2K6JzAYusnWJGLcEytMz+8DCC1sS19/v99IX2RF5hUFGMJpKaRz
-         PuUe3n97G95GVdEgD1EasWK1fTc4dqnD86kaJQJEZvYwoyQhwFu3hcJYbCHPD5sJXGxU
-         U6fTCR33h23Xt2YdZYPkhsLsQOVQLMUkurt6J5cqnHW5GG+8HOWIO2NXKdjjC6nEy3WE
-         Acww==
-X-Forwarded-Encrypted: i=1; AJvYcCVCM1WmIQpeDwfP133BN+hEN33FTZTGZ9NpSr6YXfsnDANERE9Hd5TJr2/bRyIUvTSv0pNTu3o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKhrBbxN/VwrLCPCFGhyID2LHa0ElTWtOgNLF75hNcLbQ5dGKd
-	/pdfkEtUGoWaCCin+P/uSb+KPcjN3ATcT6tPI66T5xOFM9x5c8TIOJ/A1Q4RhhroikfU3HMgr55
-	iLEr7K5fgEkQhT4Lw67NmgNSoO1aL25714M4i6UXelpFSLvz6cZ8EJtVrmw==
-X-Gm-Gg: ATEYQzyA5funPoKU8LogTBgkv5ZOosX1gzSpiuuoy7bTh0LFuCNO0JoCenS4188p4E5
-	+u7NGorN0y80CU6zdtk4ucjqjzbGa1c6yNaZ3Gc1T0xYMIq+62TQgvtcY53LIfNOXXqRtrwFV/g
-	lg6YNY5XrAcZrThG1wrPcsO/d/0gVy4CEMMv8v/bmKZl1hOTJ66pFjAVvmNXO7sAwZIsT5JXgzS
-	JQPLrwPqtwy60KN3QhdhNiMI/N/yr0Gd2AThQjfQFCQexo7sWOrzAMVt+IZfueh6J1bbg4TtZnI
-	UmP7YA4tGlf1+nUG0ytIu7/698mPBZ7dWdVVHVLEOKkEgDQa/ch81wBYjEEs6KlFuDqiLNtiahY
-	9azX2zIbyQDjwd2RpDPZgpr6tnBnuIfOgsUNk0ML+r/OV4A==
-X-Received: by 2002:a05:6000:381:b0:439:d8cb:1392 with SMTP id ffacd0b85a97d-43a04d91a43mr23683339f8f.26.1773657843205;
-        Mon, 16 Mar 2026 03:44:03 -0700 (PDT)
-X-Received: by 2002:a05:6000:381:b0:439:d8cb:1392 with SMTP id ffacd0b85a97d-43a04d91a43mr23683282f8f.26.1773657842675;
-        Mon, 16 Mar 2026 03:44:02 -0700 (PDT)
+        bh=BfYGvWXFyEp3tl8sYK4EkCi7nOSDVzMxt5VwgIY+JXA=;
+        b=JxiVIcHIFWevxLb7icSLKHVLH5VOdUyXsEOMgLQ05MVPIVuRfCt5Y9v/nDS05WaHL2
+         JhX2Cbi3gqCEDbCWaRZnpWQHyI04+bmCIXy896/ynzVn/qXS+hxgunj9n2t8wfEkldU4
+         6owRyZpCuhyAKYXRQFQ3BihPuVlraDI3iDG81PaiEvAyIfrynWJ38Vr89utxEjxGZjOU
+         MnPpTJ3l5VcVVSHULT4wV3xsqTxVnHGli6/9Bpz5UvEntSLWD05aux+/jyjBiMgoDbe1
+         lIoAhJBYSvoSBBe8vAycVkZYjUtv9O/kXt0pSobOyjYcpq34pONjaUsN3nGSw3CPY8J8
+         stow==
+X-Forwarded-Encrypted: i=1; AJvYcCVCG1xpjrpZdLMFJ0ZIaesynn5l+UD+ups8EVPj6SJBBG+IpAM7Vn2m1jCD9BugKOK5u0gQDAU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyH4PETnR/AIuIIJJHUU1WWDlMNrgfa7wNQgGzs8EYmOk1L6t8U
+	8J7z/VD8Tz0RaerCXgcxzI7Oc0GLdKOxBiCqDmmIxL7SnvQm3vmg8t07HYkzrcGIdmI9hzgZkps
+	vIK8qfbTFJcQhpnYY6R5hgWqfIxh/zGp4OSv2Gup3FplrvKR05bVJ+hN7Swz0f2p94A==
+X-Gm-Gg: ATEYQzxHjwkVyFpAOzSh1M1wlEFBBBhGeU1EDsTfoS+dyO899Z/owJNhuJKEWD7ycXi
+	ZvG6M3eE9yc7QSTYuwHWxF5LCPqGtSY/rjd7q5Q285Hsr1mDflme/7UOO6cTMjK04wxF0OsKiPL
+	mkqLrgNRr6lvzeEo7HSggDxKQpKcqyRGIRtz7BsTbFnEb/Njk+0NbIxyYhHPHg/cDqXQOR+7M++
+	Zc+QbP63s9U7N/znkIBOaItZtwKYwa8EEdasGgH/VAcsduk9PwFo9EAKXn8GtPmyFIfeZmdpHSU
+	joMVGTxFiPfB+ElUsXMrtKPYBJiXpGJ9H0FoH4m2CySJaI7rr98x6Sbu6iNg5SJ0voDTy9aQWhE
+	gwXA1RwwRVFOkEu5xMX7Z6WpN685TM39hsE4HdsZ5HHnsAQ==
+X-Received: by 2002:a05:600c:4f8f:b0:485:4371:539a with SMTP id 5b1f17b1804b1-4855670f7admr178896755e9.31.1773658078259;
+        Mon, 16 Mar 2026 03:47:58 -0700 (PDT)
+X-Received: by 2002:a05:600c:4f8f:b0:485:4371:539a with SMTP id 5b1f17b1804b1-4855670f7admr178896555e9.31.1773658077775;
+        Mon, 16 Mar 2026 03:47:57 -0700 (PDT)
 Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b45e51681sm3730121f8f.25.2026.03.16.03.44.00
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4854b66ffe2sm383282095e9.13.2026.03.16.03.47.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2026 03:44:02 -0700 (PDT)
-Date: Mon, 16 Mar 2026 06:43:58 -0400
+        Mon, 16 Mar 2026 03:47:57 -0700 (PDT)
+Date: Mon, 16 Mar 2026 06:47:54 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Vishwanath Seshagiri <vishs@meta.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Wei <dw@davidwei.uk>, Matteo Croce <technoboy85@gmail.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH net-next v11] virtio_net: add page_pool support for
- buffer allocation
-Message-ID: <20260316064256-mutt-send-email-mst@kernel.org>
-References: <20260310183107.2822016-1-vishs@meta.com>
- <20260316054232-mutt-send-email-mst@kernel.org>
+To: Zhud <zhud@hygon.cn>
+Cc: "jasowang@redhat.com" <jasowang@redhat.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	"eperezma@redhat.com" <eperezma@redhat.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"willemb@google.com" <willemb@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	Jing Li <lijing@hygon.cn>, Zhiwei Ying <yingzhiwei@hygon.cn>
+Subject: Re: [PATCH net-next v2] virtio-net: enable NETIF_F_GRO_HW only if
+ GRO-related offloads are supported
+Message-ID: <20260316063139-mutt-send-email-mst@kernel.org>
+References: <20260316072152.910857-1-zhud@hygon.cn>
+ <20260316051327-mutt-send-email-mst@kernel.org>
+ <607818aba89a44d88afa213f39611451@hygon.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -120,78 +122,129 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260316054232-mutt-send-email-mst@kernel.org>
+In-Reply-To: <607818aba89a44d88afa213f39611451@hygon.cn>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268111-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,google.com,kernel.org,davidwei.uk,gmail.com,linaro.org,vger.kernel.org,lists.linux.dev,meta.com];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268112-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 143072982E5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,hygon.cn:email]
+X-Rspamd-Queue-Id: 309AC29834C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 16, 2026 at 05:56:20AM -0400, Michael S. Tsirkin wrote:
-> On Tue, Mar 10, 2026 at 11:31:04AM -0700, Vishwanath Seshagiri wrote:
-> > @@ -5857,7 +5863,7 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
-> >  	/* In big_packets mode, xdp cannot work, so there is no need to
-> >  	 * initialize xsk of rq.
-> >  	 */
-> > -	if (vi->big_packets && !vi->mergeable_rx_bufs)
-> > +	if (!vi->rq[qid].page_pool)
-> >  		return -ENOENT;
-> >  
-> >  	if (qid >= vi->curr_queue_pairs)
+On Mon, Mar 16, 2026 at 10:18:04AM +0000, Zhud wrote:
+> > Thanks! Yes something to improve:
+> > 
+> > On Mon, Mar 16, 2026 at 03:21:52PM +0800, Di Zhu wrote:
+> > > Although VIRTIO_NET_F_CTRL_GUEST_OFFLOADS is negotiated, which
+> > > indicates the device supports dynamic control of guest offloads, it
+> > > does not necessarily mean the device supports specific hardware GRO features.
+> > >
+> > > If none of the features defined in GUEST_OFFLOAD_GRO_HW_MASK (such as
+> > > TSO4, TSO6, or UFO) are present in vi->guest_offloads_capable, the
+> > > device effectively lacks the hardware capability to perform GRO.
+> > 
+> > So what is the user-visible problem this is trying to address?
 > 
-> 
-> 
-> It seems that a qid that exceeds curr_queue_pairs would previously get
-> -EINVAL and now gets -ENOENT.
+> A key concern is that once a user enables NETIF_F_GRO_HW via ethtool, 
+> they might manually disable software GRO (ethtool -K eth0 gro off) assuming the 
+> hardware is now handling the aggregation.
 
-Or maybe this if (qid >= vi->curr_queue_pairs) is dead code?
-I looked at it some more and I can't find a path where this
-triggers.
+Thanks!
+Sorry could you be even more specific please?
+Is this a theoretical concern or did some users encounter this?
+Note that NETIF_F_GRO_HW is best effort anyway: e.g.
+it can apply only to TCPv6 and v4 will still need software.
 
-> Maybe reorder the checks:
+> Secondly, while we haven't encountered a specific hardware failure yet, 
+> enabling a hardware offload feature that the DPU does not physically support 
+> introduces the risk of undefined hardware behavior
+
+This would be a major concern but I don't get it - how would one trigger this?
+It seems that guest_offloads_capable only includes offloads actually
+supported.
+
+> > >
+> > > So, making NETIF_F_GRO_HW conditional on these feature bits ensures
+> > > the stack does not enable an unsupported hardware offload configuration.
+> > 
+> > I guess the assumption is that without this, something enables such a config? Which
+> > stack is this and what happens then?
+> > 
 > 
->         if (qid >= vi->curr_queue_pairs)
->                 return -EINVAL;
+> Sorry for the confusion, let me clarify the intent.
+> The 'stack' here refers to the ethtool interface and the netset (ioctl/netlink) path. 
+
+
+A bit more detail about the specific set of commands that leads to
+confusion in the commit log would be helpful.
+Thanks!
+
+> > 
+> > > Fixes: a02e8964eaf9 ("virtio-net: ethtool configurable LRO")
+> > > Signed-off-by: Di Zhu <zhud@hygon.cn>
+> > 
+> > judging by this, has something to do with LRO?
+> > 
+> > > ---
+> > > /* v2 */
+> > >   -make the modified logic clearer
+> > > ---
+> > >  drivers/net/virtio_net.c | 6 ++++--
+> > >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c index
+> > > 72d6a9c6a5a2..b233c99925e9 100644
+> > > --- a/drivers/net/virtio_net.c
+> > > +++ b/drivers/net/virtio_net.c
+> > > @@ -6781,8 +6781,6 @@ static int virtnet_probe(struct virtio_device *vdev)
+> > >  	if (virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_TSO4) ||
+> > >  	    virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_TSO6))
+> > >  		dev->features |= NETIF_F_GRO_HW;
+> > > -	if (virtio_has_feature(vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS))
+> > > -		dev->hw_features |= NETIF_F_GRO_HW;
+> > >
+> > >  	dev->vlan_features = dev->features;
+> > >  	dev->xdp_features = NETDEV_XDP_ACT_BASIC |
+> > NETDEV_XDP_ACT_REDIRECT |
+> > > @@ -7058,6 +7056,10 @@ static int virtnet_probe(struct virtio_device *vdev)
+> > >  	}
+> > >  	vi->guest_offloads_capable = vi->guest_offloads;
+> > >
+> > > +	if (virtio_has_feature(vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS) &&
+> > > +	    (vi->guest_offloads_capable & GUEST_OFFLOAD_GRO_HW_MASK))
+> > > +		dev->hw_features |= NETIF_F_GRO_HW;
+> > > +
+> > >  	rtnl_unlock();
+> > >
+> > >  	err = virtnet_cpu_notif_add(vi);
+> > > --
+> > > 2.34.1
+> > >
+> > 
 > 
->         /* In big_packets mode, xdp cannot work, so there is no need to
->          * initialize xsk of rq.
->          */ 
->        if (!vi->rq[qid].page_pool)
->                return -ENOENT;
-> 
-> 
-> Alternatively I think we can completely drop this chunk: we already seem
-> to init page_pull at all times except for big packets mode, so the
-> current code is fine I think.
-> 
-> 
-> -- 
-> MST
 
 
