@@ -1,63 +1,65 @@
-Return-Path: <netdev+bounces-268105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268106-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKS1AHXft2mcWAEAu9opvQ
-	(envelope-from <netdev+bounces-268105-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:46:13 +0100
+	id gEqWOpHft2mcWAEAu9opvQ
+	(envelope-from <netdev+bounces-268106-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:46:41 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D8C82982C0
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:46:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9621F2982FA
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:46:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 882E7303980C
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 10:42:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 802FF3055DFB
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 10:42:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70EF38E5C5;
-	Mon, 16 Mar 2026 10:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A866938F953;
+	Mon, 16 Mar 2026 10:42:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OKpYU/jG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IAUI8YNl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8DB352FB0
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 10:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C3638F633
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 10:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773657743; cv=none; b=XZPRZVldBXUBp/oOdRIIx6b2uOcumyDPzj+zYVqL/OFDvu/Nlq0Bu9U6m3n0MG4RbjoQIupCqjRmGBy48fIv5XMSAfBF3d421mwr5NI5AVCKZ5cnfhtZMQjdlK9wEvz0F5pGTDC7C0XAG1ey9aVZHXKsPWDLNYm9Nu5s/1+KTg0=
+	t=1773657745; cv=none; b=dKqARC8uEUNTzMvlLhE5/l/qVbInmz3pLzALHtrH9n1XBmNraly2onXcVbCFsIC69+dF/vStL77t15XBYZVcWexvQyhYqxL5IQuuDktDrw0ZpRhsuuqMIiijkH202pHiA5ezyYbydyqtjVDaJ1t0bVBansFQYK3roa0rJcwYexk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773657743; c=relaxed/simple;
-	bh=8Qy1DBIxqkYwn2wXhlkbjB394PF3wV9MJQ2OC1yioog=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MBkgxa9L9Xpi3j5adjYYzgUvbsKooH1aSX8eqMGWWPZxpJoIYBlRfGLe9G88ZTxHaP8VhGjGKGLCvQ/ELWn2bwGCoZS70Fqdc/RLaaJdqGgrC/6A4ZHqIl7L+vV2zHmLLpJpVgTTFhLbeUBRDcxyn4EwV0Q+hfI3R8CJvbnZG14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OKpYU/jG; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1773657745; c=relaxed/simple;
+	bh=c2KF/gaurLuOL9n21+yl+uvd1IemrDLGiIKtJu0QIBg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=guVLN5eneMHId2P0ZvcpyyguJcc7sFCQ/VuC4QG/Z7HB7afQEkx4Dja/6b3ImkC0gTEgXMC/6ELBsFQ1NK6z6lR5wnXwGMoEQxY3OEvHOlYBEkYS+6fr4Brcqhg2njaaAde65l3OEX+O25Z1Ie3qLdn0gpoew2C07hpFJ81gj3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IAUI8YNl; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773657741;
+	s=mimecast20190719; t=1773657743;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=iwCjK/8BbuVWkdj/Kq+vjZgwo9eNY1olqWaI6BrfiNo=;
-	b=OKpYU/jGHsdTIwkP9bnEAEyceP5aWi9nC5mPn1l1UoQ3boJgQEkPqHIaGwnkjbNgPkkV44
-	mvNfmRHNzF2qe20kCatv6piTVoX4bw0Orv7v4ZMtqdRiQd5VKpMT4+LuHDkznCriabyCMV
-	7t6blMg+Za652u4IpWSGWblp02IlqsU=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ncsRh6apqUu7E9HPi27BmsmzD0caQNYcAoNEUyrUMUo=;
+	b=IAUI8YNlez6pTnuXypGADvq7x30hBGKbFI5DyRmobA/yJ9IDv+sDplJgf8x4muvNVoOXX8
+	l934/x1XMnShIJfiCBRnwzlsHsJEey/MTcVkDCUnm5qZOzr08InXlnkIEIiuBOmVXZt0vj
+	HjxbnS60L3HYmCOefKgT1eKJTMWiv3Y=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-438-bDlMZFYfOuW7prj0v2ZDtg-1; Mon,
- 16 Mar 2026 06:42:17 -0400
-X-MC-Unique: bDlMZFYfOuW7prj0v2ZDtg-1
-X-Mimecast-MFC-AGG-ID: bDlMZFYfOuW7prj0v2ZDtg_1773657736
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-663-k1oUlIuWOZai5fgpmNXITQ-1; Mon,
+ 16 Mar 2026 06:42:21 -0400
+X-MC-Unique: k1oUlIuWOZai5fgpmNXITQ-1
+X-Mimecast-MFC-AGG-ID: k1oUlIuWOZai5fgpmNXITQ_1773657740
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0A148195609D;
-	Mon, 16 Mar 2026 10:42:16 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CE89D1956065;
+	Mon, 16 Mar 2026 10:42:19 +0000 (UTC)
 Received: from ShadowPeak.redhat.com (unknown [10.45.224.235])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E6E57180035F;
-	Mon, 16 Mar 2026 10:42:11 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6D859180035F;
+	Mon, 16 Mar 2026 10:42:16 +0000 (UTC)
 From: Petr Oros <poros@redhat.com>
 To: netdev@vger.kernel.org
 Cc: jacob.e.keller@intel.com,
@@ -71,9 +73,11 @@ Cc: jacob.e.keller@intel.com,
 	Paolo Abeni <pabeni@redhat.com>,
 	intel-wired-lan@lists.osuosl.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-next 0/4] iavf: fix VLAN filter state machine races
-Date: Mon, 16 Mar 2026 11:42:05 +0100
-Message-ID: <20260316104209.1285962-1-poros@redhat.com>
+Subject: [PATCH iwl-next 1/4] iavf: rename IAVF_VLAN_IS_NEW to IAVF_VLAN_ADDING
+Date: Mon, 16 Mar 2026 11:42:06 +0100
+Message-ID: <20260316104209.1285962-2-poros@redhat.com>
+In-Reply-To: <20260316104209.1285962-1-poros@redhat.com>
+References: <20260316104209.1285962-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,7 +101,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268105-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268106-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -110,100 +114,76 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7D8C82982C0
+X-Rspamd-Queue-Id: 9621F2982FA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The iavf VLAN filter state machine has several design issues that lead
-to race conditions between userspace add/del calls and the watchdog
-task's virtchnl processing.  Filters can get lost or leak HW resources,
-especially during interface down/up cycles and namespace moves.
+Rename the IAVF_VLAN_IS_NEW state to IAVF_VLAN_ADDING to better
+describe what the state represents: an ADD request has been sent to
+the PF and is waiting for a response.
 
-The root problems:
+This is a pure rename with no behavioral change, preparing for a
+cleanup of the VLAN filter state machine.
 
-1) On interface down, all VLAN filters are sent as DEL to PF and
-   re-added on interface up.  This is unnecessary and creates multiple
-   race windows (details below).
+Signed-off-by: Petr Oros <poros@redhat.com>
+---
+ drivers/net/ethernet/intel/iavf/iavf.h          | 2 +-
+ drivers/net/ethernet/intel/iavf/iavf_virtchnl.c | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-2) The DELETE path immediately frees the filter struct after sending
-   the DEL message, without waiting for PF confirmation.  If the PF
-   rejects the DEL, the filter remains in HW but the driver lost its
-   tracking structure.  Race conditions between a pending DEL and
-   add/reset operations cannot be resolved because the struct is gone.
-
-3) VIRTCHNL_OP_ADD_VLAN (V1) had no success completion handler, so
-   filters stayed in IS_NEW state permanently.
-
-
-Why removing VLAN filters on down/up is unnecessary:
-
-Unlike MAC filters, which need to be re-evaluated on up because the
-PF can administratively change the MAC address during down, VLAN
-filters are purely user-controlled.  The PF cannot change them while
-the VF is down.  When the VF goes down, VIRTCHNL_OP_DISABLE_QUEUES
-stops all traffic -- VLAN filters sitting in PF HW are harmless
-because no packets flow through the disabled queues.
-
-Compare with other filter types in iavf_down():
-- MAC filters: only the current MAC is removed (it gets re-read from
-  PF on up in case it was administratively changed)
-- Cloud filters: left as-is across down/up
-- FDIR filters: left as-is across down/up
-
-VLAN filters were the only type going through a full DEL+ADD cycle,
-and this caused real problems:
-
-- With spoofcheck enabled, the PF activates TX VLAN anti-spoof on
-  the first non-zero VLAN ADD.  During the re-add phase after up,
-  the filter list is transiently incomplete -- traffic for VLANs not
-  yet re-added gets dropped by anti-spoof.
-
-- Rapid down/up can overlap with pending DEL messages.  The old code
-  used DISABLE/INACTIVE states to track this, but the DISABLE state
-  could overwrite a concurrent REMOVE from userspace, causing the
-  filter to be restored instead of deleted.
-
-- Namespace moves trigger implicit ndo_vlan_rx_kill_vid() calls
-  concurrent with the down/up sequence.  The DEL from the namespace
-  teardown races with the DISABLE from iavf_down(), and the filter
-  can end up leaked in num_vlan_filters with no associated netdev.
-
-After reset, VF-configured VLAN filters are properly re-added via
-the VIRTCHNL_OP_GET_VF_RESOURCES / GET_OFFLOAD_VLAN_V2_CAPS response
-handlers, which unconditionally set all filters to ADD state.  This
-path is unaffected by these changes.
-
-
-This series addresses all three issues:
-
-Patch 1 renames IS_NEW to ADDING for clarity.
-
-Patch 2 removes the DISABLE/INACTIVE state machinery so VLAN filters
-stay ACTIVE across down/up cycles.  This is the core behavioral
-change -- VLAN filters are no longer sent as DEL to PF on interface
-down, and iavf_restore_filters() is removed since there is nothing
-to restore.
-
-Patch 3 adds a REMOVING state to make the DELETE path symmetric with
-ADD -- filters are only freed after PF confirms the deletion.  If the
-PF rejects the DEL, the filter reverts to ACTIVE instead of being
-lost.
-
-Patch 4 hardens the remaining race windows: adds V1 ADD success
-handler and prevents redundant DEL on filters already in REMOVING
-state.
-
-Petr Oros (4):
-  iavf: rename IAVF_VLAN_IS_NEW to IAVF_VLAN_ADDING
-  iavf: stop removing VLAN filters from PF on interface down
-  iavf: wait for PF confirmation before removing VLAN filters
-  iavf: harden VLAN filter state machine race handling
-
- drivers/net/ethernet/intel/iavf/iavf.h        |  9 +--
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 53 ++++---------
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 76 +++++++++----------
- 3 files changed, 54 insertions(+), 84 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
+index a87e0c6d4017ad..8e6db72828ae14 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf.h
++++ b/drivers/net/ethernet/intel/iavf/iavf.h
+@@ -158,7 +158,7 @@ struct iavf_vlan {
+ enum iavf_vlan_state_t {
+ 	IAVF_VLAN_INVALID,
+ 	IAVF_VLAN_ADD,		/* filter needs to be added */
+-	IAVF_VLAN_IS_NEW,	/* filter is new, wait for PF answer */
++	IAVF_VLAN_ADDING,	/* ADD sent to PF, waiting for response */
+ 	IAVF_VLAN_ACTIVE,	/* filter is accepted by PF */
+ 	IAVF_VLAN_DISABLE,	/* filter needs to be deleted by PF, then marked INACTIVE */
+ 	IAVF_VLAN_INACTIVE,	/* filter is inactive, we are in IFF_DOWN */
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+index 88156082a41da6..5114934fe81fa6 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+@@ -746,7 +746,7 @@ static void iavf_vlan_add_reject(struct iavf_adapter *adapter)
+ 
+ 	spin_lock_bh(&adapter->mac_vlan_list_lock);
+ 	list_for_each_entry_safe(f, ftmp, &adapter->vlan_filter_list, list) {
+-		if (f->state == IAVF_VLAN_IS_NEW) {
++		if (f->state == IAVF_VLAN_ADDING) {
+ 			list_del(&f->list);
+ 			kfree(f);
+ 			adapter->num_vlan_filters--;
+@@ -812,7 +812,7 @@ void iavf_add_vlans(struct iavf_adapter *adapter)
+ 			if (f->state == IAVF_VLAN_ADD) {
+ 				vvfl->vlan_id[i] = f->vlan.vid;
+ 				i++;
+-				f->state = IAVF_VLAN_IS_NEW;
++				f->state = IAVF_VLAN_ADDING;
+ 				if (i == count)
+ 					break;
+ 			}
+@@ -874,7 +874,7 @@ void iavf_add_vlans(struct iavf_adapter *adapter)
+ 				vlan->tpid = f->vlan.tpid;
+ 
+ 				i++;
+-				f->state = IAVF_VLAN_IS_NEW;
++				f->state = IAVF_VLAN_ADDING;
+ 			}
+ 		}
+ 
+@@ -2911,7 +2911,7 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+ 
+ 		spin_lock_bh(&adapter->mac_vlan_list_lock);
+ 		list_for_each_entry(f, &adapter->vlan_filter_list, list) {
+-			if (f->state == IAVF_VLAN_IS_NEW)
++			if (f->state == IAVF_VLAN_ADDING)
+ 				f->state = IAVF_VLAN_ACTIVE;
+ 		}
+ 		spin_unlock_bh(&adapter->mac_vlan_list_lock);
 -- 
 2.52.0
 
