@@ -1,199 +1,154 @@
-Return-Path: <netdev+bounces-268261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268262-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MAOJFsRauGk7cgEAu9opvQ
-	(envelope-from <netdev+bounces-268261-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:32:20 +0100
+	id UAZABQZcuGl0cgEAu9opvQ
+	(envelope-from <netdev+bounces-268262-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:37:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47D4729FCF9
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:32:19 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACA4829FD86
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:37:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E60FC30116AC
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:32:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0A05E302A396
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:37:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACAEE33C186;
-	Mon, 16 Mar 2026 19:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D74B3ED112;
+	Mon, 16 Mar 2026 19:37:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="aVxk91BJ"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="V9gJGEMJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.77.92])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526717DA66;
-	Mon, 16 Mar 2026 19:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.77.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C3734F486
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 19:37:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773689527; cv=none; b=Ypnby8Q7HiPUtWVT/iuLNMSf+Y4kBgm0v+JLW+C1HwLIe8YQrOZYZp8vrfq6XzMGlh9v8u5d1EHFGGDBwxz/dwt5QLFkqMlEBIjO1e7JwdZkgjAWhpdsUc9+H04qgK9XPuKwDXQthrBuLthJ4n886LyJ3LMgwxZLKOAMG9m73Yw=
+	t=1773689859; cv=none; b=e/5NTATdYOUCtb4bULJwq/bcI/UsLNDYaCFZkwKMXHSBWfeevNcIsjweGba5nMSPXf8FQ1tOnKOwmuvuuCmWAnmCRZgaqYgXvFcGiAYTRrma9pRTMj0komGQ1RN0crYzRo/JbiD+Szi7uhVN/h+SSWLz80OnO04f6P8hH7+TYKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773689527; c=relaxed/simple;
-	bh=bXGIvtLZW4T8uQHwrxZgF5OdXg/Br/wvKn4OcYtILOA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PBb75ejuTwhyuzfc1OUiYeVX+zzjhWNWye9YjbSUpY7yTfjx2jV+7ulQZLnMdQ8BGlLg+kB4MPRB5Ga8VyVDG18BCO2ZLhR9WnfKKySQ53pNjsFuQ5N1x5WfBQJuXKo4+xCGW2GEN5A3y78YFjZKMPpFz3fYzfjNlNnMQDyHix4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=aVxk91BJ; arc=none smtp.client-ip=44.246.77.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1773689859; c=relaxed/simple;
+	bh=ZvsXSyiI3XkbsKZuNkcSgsTni+v4WLMdb2x9NUrXcM4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h3pCAyt26X/2IJCi2zkD7tUPBqMlo27cg7Ilo96XEYcA0JtNYlubLi4AAHQCg3PbcM0uqgJV/y2VrIK3o6T8GZbnoDWfWgrMIkhFSWc2h0H0214ArP3QldI/L/NGQWRUfpMst7zLmglAPP/5NfHbezLkwH3j8qkLtKCVDoorJ5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=V9gJGEMJ; arc=none smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7d1872504cbso69604a34.0
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 12:37:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1773689526; x=1805225526;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=hhknY0Mb6RUOEmemmsi44lfiShqeiitZKXcXHjSjtK0=;
-  b=aVxk91BJEuCz8OFcS55JYZMH9aPJ55vGzIu7jpLDAvQ03p2NzR3njVAh
-   ZOAakMMwoUFTRUY3LlnzMnZufaOJc9mdnzTml44nfyHW+d6bWPybeBKZN
-   0CUJ2edYwvmjuradUiivY9tT3QyxPqGKoZ55tUIPIHfvGKyzfBEn/D0cJ
-   K/9plj7xei7aMJkFHd0mPQ+xrco0vay3XkbRMcAvp3L8gXMEivdKhGtrs
-   RR3jMBQeo3x+U90Uz234BMJ3iQfeEZvSxMCgcx5eyVMC7uO2WMXFd67ud
-   nO1EecnY1SVx5cXiZrxAIkLiURi3dttt8CkwKx/BmFGVvvSfCNmVhyE+p
-   A==;
-X-CSE-ConnectionGUID: +GeasfBxRc6TOMCohlqAMg==
-X-CSE-MsgGUID: NLdedqH5Sp2zGQnXizKt6Q==
-X-IronPort-AV: E=Sophos;i="6.23,124,1770595200"; 
-   d="scan'208";a="15141234"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2026 19:32:05 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [205.251.233.105:18209]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.27:2525] with esmtp (Farcaster)
- id 293eb4bd-c085-4413-8129-6fd28858c630; Mon, 16 Mar 2026 19:32:05 +0000 (UTC)
-X-Farcaster-Flow-ID: 293eb4bd-c085-4413-8129-6fd28858c630
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 16 Mar 2026 19:32:04 +0000
-Received: from 842f577f6371.amazon.com (10.106.101.53) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 16 Mar 2026 19:32:03 +0000
-From: Muhammad Hammad Ijaz <mhijaz@amazon.com>
-To: <marcin.s.wojtas@gmail.com>, <linux@armlinux.org.uk>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <stefanc@marvell.com>, <gunnarku@amazon.com>, <mhijaz@amazon.com>
-Subject: [PATCH] net: mvpp2: guard flow control update with global_tx_fc in buffer switching
-Date: Mon, 16 Mar 2026 12:31:01 -0700
-Message-ID: <20260316193157.65748-1-mhijaz@amazon.com>
-X-Mailer: git-send-email 2.53.0
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1773689857; x=1774294657; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yTI4ZGyhMvb0csBBlNJg9TpIQ4OoSUyId0bqLGFvRG4=;
+        b=V9gJGEMJeyQPEUQoq9izwPN833JdTjNkNnsg4VZ/+fCFTH48JFcd8wv+fsWT8ST/yU
+         klaxnuhF6HFEsSdeMgQwqanoKL/qJ+quPTuHr3gYGCAp0XmpMvHHkKjPCK6R6sv7tm3m
+         vjvFoOi2OItk0dQPsz6Uj1UvINuWVdab+kma3F7x2JkQUD9rVR+ddS65zDiAYR8RfJsr
+         pxr7ojJq5IHyxUtV8KJ2jMkKbj4jjyRyzF67oaCRQ0hFY1J4WZsFggqVVpDz0tnOplVD
+         OGQYZliyau63hDIggJOS/5aPQi4M+OC+t0xjnvbEdbKeZUpLs1MqwiH2Fhmw9m7x8Ra7
+         BWbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773689857; x=1774294657;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yTI4ZGyhMvb0csBBlNJg9TpIQ4OoSUyId0bqLGFvRG4=;
+        b=rWADEw97tn6DKWpmfYwQdfrPe7V/IV5HLl0i3gwISHFbUfT2IUSDdNPxSW1v6ce/t+
+         yJTxydE0ZZqKayMyARmshWqT2CNMz01AEmNo84RdG5J3FJYM/jvbMIeivwuAUBMkg76N
+         zmV54we0U3ID3hSQLHm5uvisKI1nFBnVBzAJz2u9QBkg4s0DNV1zFqUWppQ7++A4xPAb
+         yDSZK/vDSS9tkC/AE4z1QueYYR9GML5GggY4cwpAn6SGOevvJxwnNReausGAd7E3F82X
+         mRVwxViXPsbonG9OKHLByK+c/iRiCXAvAlAOdTDTI3w8MuNwDwS/aVgGFi7ozxlLWhbh
+         m4SA==
+X-Forwarded-Encrypted: i=1; AJvYcCVhF7+yrDO9nhsfVHdUljDQ1umFx2dzR1U9prfoH015JyETWBFe2Da2QAatWVVWD6eKrp9SziE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZ6+4K10edzhHL/NmnqRqmgGVCx10IqmS+Kii+Ao8FnEJAb2Yp
+	qTzVM88f2GefCHKNvWr9V2J8QoI9bvBlHRKJ0+xHJNCDHQQlIpwAg8m85n/9E8K4C8X64Ki1HZ4
+	oxt6dDDI=
+X-Gm-Gg: ATEYQzwh4QZh30FkfsQpzYcHrNf1rQYVyhE6f3K/StxF0/nq7nUnHicFXAB9nCVjwjy
+	9COXo0LT2swsJm4Yml0ULUILRKBzppBvbAOJfGE5Mn/v+gaDGF8cbmEMdDUIuqxLzKp58TK8R2A
+	ebsJJDro91vwpYgv8tRSWM+bAwV+70aRTZYA3LTSurd/vnF8+bSv+sHfsCyxKssHb5BEujtY5C4
+	hu4g3mp+h5Jrm6WV10++tSKAGhX7gJGpBVNIbEPS/tJU2qY5zUQVdq0p6c3EC846+4VzJXLdBWC
+	kXf5EuJ7Wp82TVpkY5qbqXojxw51hLNORA4s1CEuEEbZYEugJiFyH1AADFJRBjydoFuTAstQdEb
+	6rJ8XUniaWMjAwIpuGt6Cgcnfg/TvWBVgxkVmJLdNUNdr8pDTaRLEXg5RMfL1tEnanp8NEKCbHa
+	2eMCkOhm318TFguCzUiczy41SW+ygyLyFD0YErlDG7RAnOcQadld1Y1O3FyEgovYw2hNt/s8GgA
+	9ut79Ckhw==
+X-Received: by 2002:a05:6830:3591:b0:7d7:4c90:ddce with SMTP id 46e09a7af769-7d7bb6c99b9mr470879a34.7.1773689857004;
+        Mon, 16 Mar 2026 12:37:37 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d76ae39b39sm13970767a34.15.2026.03.16.12.37.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Mar 2026 12:37:36 -0700 (PDT)
+Message-ID: <1f79957a-5b23-4bbd-af8d-9d1c86791645@kernel.dk>
+Date: Mon, 16 Mar 2026 13:37:35 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWB001.ant.amazon.com (10.13.139.133) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] io_uring: cast id to u64 before shifting in
+ io_allocate_rbuf_ring()
+To: Anas Iqbal <mohd.abd.6602@gmail.com>,
+ Pavel Begunkov <asml.silence@gmail.com>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260316150636.2123-1-mohd.abd.6602@gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260316150636.2123-1-mohd.abd.6602@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel-dk.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-268262-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268261-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
-	FREEMAIL_TO(0.00)[gmail.com,armlinux.org.uk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[kernel.dk];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhijaz@amazon.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[amazon.com:+];
+	DKIM_TRACE(0.00)[kernel-dk.20230601.gappssmtp.com:+];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 47D4729FCF9
+	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,kernel.dk:mid,kernel-dk.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: ACA4829FD86
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-mvpp2_bm_switch_buffers() unconditionally calls
-mvpp2_bm_pool_update_priv_fc() when switching between per-cpu and
-shared buffer pool modes. This function programs CM3 flow control
-registers via mvpp2_cm3_read()/mvpp2_cm3_write(), which dereference
-priv->cm3_base without any NULL check.
+On 3/16/26 9:06 AM, Anas Iqbal wrote:
+> Smatch warns:
+> io_uring/zcrx.c:393 io_allocate_rbuf_ring() warn: should 'id << 16' be a 64 bit type?
+> 
+> The expression 'id << IORING_OFF_PBUF_SHIFT' is evaluated using 32-bit
+> arithmetic because id is a u32. This may overflow before being promoted
+> to the 64-bit mmap_offset.
+> 
+> Cast id to u64 before shifting to ensure the shift is performed in
+> 64-bit arithmetic.
 
-When the CM3 SRAM resource is not present in the device tree (the
-third reg entry added by commit 60523583b07c ("dts: marvell: add CM3
-SRAM memory to cp11x ethernet device tree")), priv->cm3_base remains
-NULL and priv->global_tx_fc is false. Any operation that triggers
-mvpp2_bm_switch_buffers(), for example an MTU change that crosses
-the jumbo frame threshold, will crash:
+I'd be impressed if 'id' could be large enough to cause this to
+overflow. AFAICT, you'd need more than 64K interface queues registered
+to hit this. So I think this should be reframed as a cleanup, to appease
+smatch.
 
-  Unable to handle kernel NULL pointer dereference at
-  virtual address 0000000000000000
-  Mem abort info:
-    ESR = 0x0000000096000006
-    EC = 0x25: DABT (current EL), IL = 32 bits
-  pc : readl+0x0/0x18
-  lr : mvpp2_cm3_read.isra.0+0x14/0x20
-  Call trace:
-   readl+0x0/0x18
-   mvpp2_bm_pool_update_fc+0x40/0x12c
-   mvpp2_bm_pool_update_priv_fc+0x94/0xd8
-   mvpp2_bm_switch_buffers.isra.0+0x80/0x1c0
-   mvpp2_change_mtu+0x140/0x380
-   __dev_set_mtu+0x1c/0x38
-   dev_set_mtu_ext+0x78/0x118
-   dev_set_mtu+0x48/0xa8
-   dev_ifsioc+0x21c/0x43c
-   dev_ioctl+0x2d8/0x42c
-   sock_ioctl+0x314/0x378
+I'll defer to Pavel on that one.
 
-Every other flow control call site in the driver already guards
-hardware access with either priv->global_tx_fc or port->tx_fc.
-mvpp2_bm_switch_buffers() is the only place that omits this check.
-
-Add the missing priv->global_tx_fc guard to both the disable and
-re-enable calls in mvpp2_bm_switch_buffers(), consistent with the
-rest of the driver.
-
-Fixes: 3a616b92a9d1 ("net: mvpp2: Add TX flow control support for jumbo frames")
-Signed-off-by: Muhammad Hammad Ijaz <mhijaz@amazon.com>
-Reviewed-by: Gunnar Kudrjavets <gunnarku@amazon.com>
----
-Testing:
-- Tested on Marvell Armada 7040 board without CM3 SRAM in device tree
-- Without the fix, MTU change triggers a NULL pointer dereference
-in mvpp2_cm3_read()
-- With the fix, MTU change completes successfully
----
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index d1b8650cb4b4..f442b874bb59 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -5016,7 +5016,7 @@ static int mvpp2_bm_switch_buffers(struct mvpp2 *priv, bool percpu)
- 	if (priv->percpu_pools)
- 		numbufs = port->nrxqs * 2;
- 
--	if (change_percpu)
-+	if (change_percpu && priv->global_tx_fc)
- 		mvpp2_bm_pool_update_priv_fc(priv, false);
- 
- 	for (i = 0; i < numbufs; i++)
-@@ -5041,7 +5041,7 @@ static int mvpp2_bm_switch_buffers(struct mvpp2 *priv, bool percpu)
- 			mvpp2_open(port->dev);
- 	}
- 
--	if (change_percpu)
-+	if (change_percpu && priv->global_tx_fc)
- 		mvpp2_bm_pool_update_priv_fc(priv, true);
- 
- 	return 0;
 -- 
-2.53.0
-
+Jens Axboe
 
