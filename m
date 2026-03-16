@@ -1,255 +1,170 @@
-Return-Path: <netdev+bounces-267998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268006-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kHNhJ9Rjt2kMQwEAu9opvQ
-	(envelope-from <netdev+bounces-267998-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 02:58:44 +0100
+	id CGBtJcJkt2kMQwEAu9opvQ
+	(envelope-from <netdev+bounces-268006-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 03:02:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FA28293B40
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 02:58:44 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5882F293BE9
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 03:02:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3F7E430059B6
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 01:58:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D18B330104BF
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 02:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34F42DEA9B;
-	Mon, 16 Mar 2026 01:58:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8440830AAA6;
+	Mon, 16 Mar 2026 02:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Ii7015Mv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PaY9HkVE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDE2C2DEA7B
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 01:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5496C2DE702;
+	Mon, 16 Mar 2026 02:02:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773626321; cv=none; b=f8DhWJ0cz9VySTYfHIHh2q6/xwBx+I83k5OhxdAtdAjmVmqfYm8V83UYJgU6aA3ZHKSdsapT0C5DFeqzMHOK4ouRf+BAON7j8BVdQO/oTUuQnPHeRTdVsQM/DjsBRzJmZ4E7YOl4GXTIy4Cl0oC0mPtqGOqg32lUMKBI2Ayxhwo=
+	t=1773626546; cv=none; b=bda71OqaRw/56iijCXvOSdf8TBl4gpGB7SiAOHBZUBXphXMpQyrmBxcVbOSVx9DA4nNnjmXSMKsfjMKfHGRvFp1mOvYFvAfnPQwpcDARbZLa1d++DY922tbtGCDPU9IeXZvR8yFrEqtVJjanOqYpI2Oo+QvcH0SPoF/ujlBKAII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773626321; c=relaxed/simple;
-	bh=ZyAlxZoxCBvDcd9jwNMN2ZpmkQcshawu3PdmgMoOpzg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bjd+6H0V2hZd8NuTWx5L1O3vU1RLquHc1du5+ox1nf4Dm9gOmUm9eHBttZ0wiPR/5pwxXWsomX4vUBhifrGF9MwHIgweXnSeP1Tdz3G9Mx5ljcvEXJHVVqJpti9MkcANJzYGW1qNRRMLJS0cEuVc5HLdYtP7Gh9vxIU9s4b5AbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Ii7015Mv; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1773626317; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=9rLiBzmVsy5AgfXpvEYSoKEPq7n1Ma/une26xJ5jCE8=;
-	b=Ii7015MvWerrDOtDu+25vJD5vwoMnn/eW8/6LZe7f2GnK+uw0wPMrtegFtwVfqjn5TjqUslHHmodxc4v/bwBU22ZRTwn6tqK67LNS4mYsIyBZKuuTV+dLCiD0MOsnXR+VZt0dP/A0LuUoliLBCQt4ybRZEUJRS3iw9w0CBVZe0g=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R241e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037026112;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0X.-3zaP_1773626316;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X.-3zaP_1773626316 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 16 Mar 2026 09:58:36 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Dong Yibo <dong100@mucse.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Dust Li <dust.li@linux.alibaba.com>
-Subject: [PATCH net-next v32 8/8] eea: introduce callback for ndo_get_stats64
-Date: Mon, 16 Mar 2026 09:58:29 +0800
-Message-Id: <20260316015829.65383-9-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20260316015829.65383-1-xuanzhuo@linux.alibaba.com>
-References: <20260316015829.65383-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1773626546; c=relaxed/simple;
+	bh=kkXUNwiD69Xpf87E5BcMyOtlNTMPeQ7/lEHjHLgRL+A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W/JhU8K7rphWRiYlmYtHhijyCL0H46MHWJoAJJBJAWlZvb0T02gnWshqtbfiiKcxOPkK0OKzpdI1zN5f8VZ5E1XdzOpCbQfyYEVOkCCZcJov6GbIxLIJHSYqYmN56fmKrTWLSulDLGezxM9liThq8omAlerZmI9ahe1ry7RoOpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PaY9HkVE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24C2DC2BC9E;
+	Mon, 16 Mar 2026 02:02:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773626545;
+	bh=kkXUNwiD69Xpf87E5BcMyOtlNTMPeQ7/lEHjHLgRL+A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PaY9HkVEV6krRsQgLxwkiO7yZMgrlVrPpLXeYQAR7IAx5MDR7TUwQaFz5V5qBSv+A
+	 3YoimJldxSYQPdNcTuf1q8DiCAdq3vsH/5xg42nBbHksinhtYNfrYPZega6m4y/sYo
+	 dSVfROBNQjnwOQiwv2Iv9yfHYtnCcqA+93lxvlHWuuM58XLuXbmq+J2EL7r6iTqBTr
+	 Zn8z8tWJ2xCvEIfT8gIb/4uorPM0rZ/envKWWfSJ/4LQJZFfI5sEgx7a5FPCeNQBPE
+	 96u6lp0SEhMsftM3FyXouu+2DSxMYqsHHr06OStUhqnzmBbQFyHf9bdRGjM036xEQk
+	 f7OGCBrm7fLPg==
+Date: Sun, 15 Mar 2026 21:02:19 -0500
+From: Bjorn Andersson <andersson@kernel.org>
+To: Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>
+Cc: Jeff Johnson <jeff.johnson@oss.qualcomm.com>, konradybcio@kernel.org, 
+	linux-kernel@vger.kernel.org, Alex Elder <elder@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Jeff Johnson <jjohnson@kernel.org>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, Srinivas Kandagatla <srini@kernel.org>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Kees Cook <kees@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Mark Brown <broonie@kernel.org>, 
+	Wesley Cheng <quic_wcheng@quicinc.com>, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath10k@lists.infradead.org, ath11k@lists.infradead.org, ath12k@lists.infradead.org, 
+	linux-arm-msm@vger.kernel.org, linux-remoteproc@vger.kernel.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH v1 0/8] Group QMI service IDs into the QMI header
+Message-ID: <abdkE2qWX5Amf5Jo@baldur>
+References: <20260309230346.3584252-1-daniel.lezcano@oss.qualcomm.com>
+ <9cc7638f-1232-4cb7-b4d7-cdac66a2f4ba@oss.qualcomm.com>
+ <3283cbae-4100-484c-9b00-1d7111c62456@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: a318e03b9506
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3283cbae-4100-484c-9b00-1d7111c62456@oss.qualcomm.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-267998-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268006-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,alibaba.com:email]
-X-Rspamd-Queue-Id: 3FA28293B40
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5882F293BE9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This commit introduces ndo_get_stats64 support.
+On Tue, Mar 10, 2026 at 01:09:08AM +0100, Daniel Lezcano wrote:
+> On 3/10/26 00:50, Jeff Johnson wrote:
+> > On 3/9/2026 4:03 PM, Daniel Lezcano wrote:
+> > > The different subsystems implementing the QMI service protocol are
+> > > using their own definition of the service id. It is not a problem but
+> > > it results on having those duplicated with different names but the
+> > > same value and without consistency in their name.
+> > > 
+> > > It makes more sense to unify their names and move the definitions in
+> 
+> [ ... ]
+> 
+> > prefix for wireless drivers is simply wifi: <driver>:
+> > so s/net: drivers: wireless:/wifi:/
+> 
+> Noted, thanks
+> 
+> > >    remoteproc: qcom: Use the unified QMI service ID instead of defining
+> > >      it locally
+> > >    slimbus: qcom-ngd-ctrl: Use the unified QMI service ID instead of
+> > >      defining it locally
+> > >    soc: qcom: pdr: Use the unified QMI service ID instead of defining it
+> > >      locally
+> > >    ALSA: usb-audio: qcom: Use the unified QMI service ID instead of
+> > >      defining it locally
+> > >    samples: qmi: Use the unified QMI service ID instead of defining it
+> > >      locally
+> > > 
+> > >   drivers/net/ipa/ipa_qmi.c                      |  6 ++----
+> > >   drivers/net/wireless/ath/ath10k/qmi.c          |  2 +-
+> > >   drivers/net/wireless/ath/ath10k/qmi_wlfw_v01.h |  1 -
+> > >   drivers/net/wireless/ath/ath11k/qmi.c          |  2 +-
+> > >   drivers/net/wireless/ath/ath11k/qmi.h          |  1 -
+> > >   drivers/net/wireless/ath/ath12k/qmi.c          |  2 +-
+> > >   drivers/net/wireless/ath/ath12k/qmi.h          |  1 -
+> > >   drivers/remoteproc/qcom_sysmon.c               |  2 +-
+> > >   drivers/slimbus/qcom-ngd-ctrl.c                |  5 ++---
+> > >   drivers/soc/qcom/pdr_interface.c               |  4 ++--
+> > >   drivers/soc/qcom/pdr_internal.h                |  3 ---
+> > >   drivers/soc/qcom/qcom_pd_mapper.c              |  2 +-
+> > >   include/linux/soc/qcom/qmi.h                   | 12 ++++++++++++
+> > >   samples/qmi/qmi_sample_client.c                |  2 +-
+> > >   sound/usb/qcom/qc_audio_offload.c              |  2 +-
+> > >   sound/usb/qcom/usb_audio_qmi_v01.h             |  1 -
+> > 
+> > You are touching a lot of subsystems with a single series.
+> > How do you plan on having these land?
+> > Do you have a maintainer who will take all of these through their tree?
+> 
+> Yes I thought Bjorn or Konrad would take them with the acked-by from the
+> different subsystems
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- drivers/net/ethernet/alibaba/eea/eea_net.c | 57 ++++++++++++++++++++++
- drivers/net/ethernet/alibaba/eea/eea_net.h |  5 ++
- 2 files changed, 62 insertions(+)
+As we haven't received any such acks, I pulled patch 1 into an immutable
+branch and pushed it here:
 
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
-index 888a2a520ca8..fdb3daae8ee9 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
-@@ -112,6 +112,8 @@ static void eea_bind_q_and_cfg(struct eea_net *enet,
- 	struct eea_net_tx *tx;
- 	int i;
- 
-+	spin_lock(&enet->stats_lock);
-+
- 	enet->cfg = ctx->cfg;
- 	enet->rx = ctx->rx;
- 	enet->tx = ctx->tx;
-@@ -131,6 +133,8 @@ static void eea_bind_q_and_cfg(struct eea_net *enet,
- 
- 		blk->rx = rx;
- 	}
-+
-+	spin_unlock(&enet->stats_lock);
- }
- 
- static void eea_unbind_q_and_cfg(struct eea_net *enet,
-@@ -140,6 +144,8 @@ static void eea_unbind_q_and_cfg(struct eea_net *enet,
- 	struct eea_net_rx *rx;
- 	int i;
- 
-+	spin_lock(&enet->stats_lock);
-+
- 	ctx->cfg = enet->cfg;
- 	ctx->rx = enet->rx;
- 	ctx->tx = enet->tx;
-@@ -156,6 +162,8 @@ static void eea_unbind_q_and_cfg(struct eea_net *enet,
- 
- 		blk->rx = NULL;
- 	}
-+
-+	spin_unlock(&enet->stats_lock);
- }
- 
- static void eea_free_rxtx_q_mem(struct eea_net_init_ctx *ctx)
-@@ -342,6 +350,50 @@ static int eea_netdev_open(struct net_device *netdev)
- 	return err;
- }
- 
-+static void eea_stats(struct net_device *netdev, struct rtnl_link_stats64 *tot)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u64 packets, bytes;
-+	u32 start;
-+	int i;
-+
-+	spin_lock(&enet->stats_lock);
-+
-+	if (enet->rx) {
-+		for (i = 0; i < enet->cfg.rx_ring_num; i++) {
-+			struct eea_net_rx *rx = enet->rx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&rx->stats.syncp);
-+				packets = u64_stats_read(&rx->stats.packets);
-+				bytes = u64_stats_read(&rx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&rx->stats.syncp,
-+						       start));
-+
-+			tot->rx_packets += packets;
-+			tot->rx_bytes   += bytes;
-+		}
-+	}
-+
-+	if (enet->tx) {
-+		for (i = 0; i < enet->cfg.tx_ring_num; i++) {
-+			struct eea_net_tx *tx = &enet->tx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&tx->stats.syncp);
-+				packets = u64_stats_read(&tx->stats.packets);
-+				bytes = u64_stats_read(&tx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&tx->stats.syncp,
-+						       start));
-+
-+			tot->tx_packets += packets;
-+			tot->tx_bytes   += bytes;
-+		}
-+	}
-+
-+	spin_unlock(&enet->stats_lock);
-+}
-+
- /* resources: ring, buffers, irq */
- int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_ctx *ctx)
- {
-@@ -349,7 +401,9 @@ int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_ctx *ctx)
- 	int err, error;
- 
- 	if (!netif_running(enet->netdev) || !enet->started) {
-+		spin_lock(&enet->stats_lock);
- 		enet->cfg = ctx->cfg;
-+		spin_unlock(&enet->stats_lock);
- 		return 0;
- 	}
- 
-@@ -570,6 +624,7 @@ static const struct net_device_ops eea_netdev = {
- 	.ndo_stop           = eea_netdev_stop,
- 	.ndo_start_xmit     = eea_tx_xmit,
- 	.ndo_validate_addr  = eth_validate_addr,
-+	.ndo_get_stats64    = eea_stats,
- 	.ndo_features_check = passthru_features_check,
- };
- 
-@@ -603,6 +658,8 @@ static struct eea_net *eea_netdev_alloc(struct eea_device *edev, u32 pairs)
- 		return NULL;
- 	}
- 
-+	spin_lock_init(&enet->stats_lock);
-+
- 	return enet;
- }
- 
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/ethernet/alibaba/eea/eea_net.h
-index a16d662c7fb3..c53c5bcb6bfc 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.h
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
-@@ -163,6 +163,11 @@ struct eea_net {
- 	u32 speed;
- 
- 	u64 hw_ts_offset;
-+
-+	/* Protect the tx and rx of struct eea_net, when eea_stats accesses the
-+	 * stats from rx and tx queues.
-+	 */
-+	spinlock_t stats_lock;
- };
- 
- int eea_net_probe(struct eea_device *edev);
--- 
-2.32.0.3.g01195cf9f
+  https://git.kernel.org/pub/scm/linux/kernel/git/qcom/linux.git 20260309230346.3584252-2-daniel.lezcano@oss.qualcomm.com
 
+Other maintainers can use this to pull respective changes, or you can
+repost the individual patches with this (or follow up once it's in
+-rc1).
+
+Regards,
+Bjorn
 
