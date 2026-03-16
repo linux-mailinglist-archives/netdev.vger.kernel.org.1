@@ -1,58 +1,66 @@
-Return-Path: <netdev+bounces-268052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268053-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QJ8YMCm/t2n5UwEAu9opvQ
-	(envelope-from <netdev+bounces-268052-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 09:28:25 +0100
+	id 2KAgEXPBt2n5UwEAu9opvQ
+	(envelope-from <netdev+bounces-268053-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 09:38:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DD94296236
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 09:28:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90B342964B8
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 09:38:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B6D9B300647A
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 08:28:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E624C302BE32
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 08:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16088372ED2;
-	Mon, 16 Mar 2026 08:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584F93815EE;
+	Mon, 16 Mar 2026 08:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I6ER312L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fUGkNkmd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FC8372B5D
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 08:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3438B378D8B;
+	Mon, 16 Mar 2026 08:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773649702; cv=none; b=QxCoIdj4HjE1jnBqc5GmJG+qsfFj6bQXwLQp9SNuIR/bGjWnxUB9SUQ0++gkn2zWutTsBMp9DQLDeN8inLz8s3/AV/bdGpBSwrI6Iqf6jahibuJs5WLFY4qom/+3l6scPguHyatOQm5qB+WRC1J6SPe11R2Qu3dDvyfizQXJb4A=
+	t=1773650092; cv=none; b=nvB8IrXo03sD4dbAHm2bN+sI+81AbikI8nsC3AB7eBJEcTMu8l35WwaKadLqgTeT6dpWB1QyCZD0cfcP+eycUiFp1uQNW9LUTD7xSMDbi1p0SuSs/jYlosP9jYLZyFJpWy3MQPZBALDcjUIM8zLX84r+A0+yEKPxvy5/4hIUqS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773649702; c=relaxed/simple;
-	bh=0J3y0IVZqh1BHNCtlTy05Hxtl91NRHnn6YjIoAdL7xw=;
+	s=arc-20240116; t=1773650092; c=relaxed/simple;
+	bh=hMqbwfvRVhSS49NZ+HECA3aCvX2neT+KBSR2v6gZ184=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SRGDuQuk+BY/yUqCGI34epqsmBeoSJzSyhmVQzFXKkb7PaW1/gNUmb7qTVMID0eg1YDJGkZzE/uLTBQDRoL1pcb96NB2i9FTTy0rD/MvrIXrnhTo07KXg1vbDlg/C2jyMTUioF3+v6GBJ4i5Yy6+E6zBFz4kXCN5JZKC8ZqPkHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I6ER312L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E20AC19421;
-	Mon, 16 Mar 2026 08:28:20 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=YxwlclehayxdLpp6EuLxJWYEGcXICnOMGzKRw9Ck8aVzJw+tKK69Dp+CyeqqyeME/E8f/ejWf05ikZdUPXakc+mBhagB5xNpbZ5OSKtaPW6EiHkfphhkJgxyeH5T+JvjLCckzDvh6jU/ZfIkoIjbxIaT0sDhwhgl0+QHwfdE95Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fUGkNkmd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88D58C19421;
+	Mon, 16 Mar 2026 08:34:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773649701;
-	bh=0J3y0IVZqh1BHNCtlTy05Hxtl91NRHnn6YjIoAdL7xw=;
+	s=k20201202; t=1773650091;
+	bh=hMqbwfvRVhSS49NZ+HECA3aCvX2neT+KBSR2v6gZ184=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I6ER312Lpu6WqfeQN3Hp6ACP4D+61Z653Fy/SCZmCGkIcnCB8RxbGo4peX7Vk9L4E
-	 mtVCWLHxSrbgL9xne/KJynM+7IaQjTSVurJ/WP1dkTEF+fnxMgSPYta6lEXSwNewuW
-	 +WN+fr64viHup9tscgRz2MXS5qCcH8apJfzEJRXa9y6RjAcyaVt6kGEh9wo/U9cAvk
-	 8xowXdOp6R9tH1yn5JA6wL3W3zPGb2zdlv7eZ+7pH9uxG4Krqh8n4nIuuvCkdkv00f
-	 IeR3UkA1BgjBVUT3NSxaT1Sbg1uo2dXp6F49B8tWz+dANp9fQnEI4GvryOQmPwe43R
-	 C2QIrH5a+jcWg==
-Date: Mon, 16 Mar 2026 08:28:17 +0000
+	b=fUGkNkmdNI7ymhURA3KNomJCg+rnaDxsvZMpDNSJLDEaVeQlj8PwvfrGkhfvUV6R7
+	 KEJya/byxyTrmzCb8lyAMrWfNFrsCYhPhnK+MHR6Tae7vkfK9ly1FiOOEUzLTVajnn
+	 owhjI2Pbndcj/mxOMpxp/wnZATCNAxdUHfQLtKBNhd80QhdaEqFMtamVWtyE/JKdTS
+	 3tBEoWMm4X0wb5D7ReGDeIlW64H6ckV0b89S8riBH64zobRgRE7MBrbmg4Xj8Pzahp
+	 sRW60HW/VYGySSvAEtpP3A9sWMF/gdIk6W+D10P4L2j9S4ePKGNH9eLSoSTFhxsY1V
+	 A/jLYLoTV9p5A==
+Date: Mon, 16 Mar 2026 08:34:47 +0000
 From: Simon Horman <horms@kernel.org>
-To: Przemyslaw Korba <przemyslaw.korba@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH iwl-next v3] i40e: PTP: set supported flags in
- ptp_clock_info
-Message-ID: <20260316082817.GC1369074@kernel.org>
-References: <20260313135802.499837-1-przemyslaw.korba@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: cedric.jehasse@luminex.be, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v8 1/2] net/sched: cls_flower: remove unions
+ from fl_flow_key
+Message-ID: <20260316083447.GD1369074@kernel.org>
+References: <20260311-net-next-mv88e6xxx-tcam-v8-0-32dd5ba30002@luminex.be>
+ <20260311-net-next-mv88e6xxx-tcam-v8-1-32dd5ba30002@luminex.be>
+ <20260313132651.GX461701@kernel.org>
+ <20260314100002.122c8c73@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,25 +69,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260313135802.499837-1-przemyslaw.korba@intel.com>
+In-Reply-To: <20260314100002.122c8c73@kernel.org>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268052-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[luminex.be,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,mojatatu.com,resnulli.us,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-268053-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
@@ -87,81 +96,32 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: 4DD94296236
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 90B342964B8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 13, 2026 at 02:54:10PM +0100, Przemyslaw Korba wrote:
-> Since upstream commit d9f3e9ecc456 ("net: ptp: introduce
-> .supported_perout_flags to ptp_clock_info") and commit 7c571ac57d9d ("net:
-> ptp: introduce .supported_extts_flags to ptp_clock_info"), kernel core now
-> requires that the driver set the .supported_perout_flags and
-> .supported_extts_flags fields in PTP clock info. Otherwise, the additional
-> flags will be rejected by the kernel automatically.
+On Sat, Mar 14, 2026 at 10:00:02AM -0700, Jakub Kicinski wrote:
+> On Fri, 13 Mar 2026 13:26:51 +0000 Simon Horman wrote:
+> > It seems to me that the use of a union is intentional here, as either IPv4
+> > or IPv6 addresses can be present in each case - never both.  And that
+> > control.addr_type and enc_control.addr_type are intended to allow
+> > differentiation of the address type in use for each of these unions.
 > 
-> Set supported flags field so we can set extts pins.
+> My reading was that the initial author simply wanted to save space in
+> the struct.
 > 
-> Fixes: d9f3e9ecc456 ("net: ptp: introduce .supported_perout_flags to ptp_clock_info")
-> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+> As the commit message explains this leads to complications in the logic
+> which sets the keys. The alternative is to complicate
+> FL_KEY_SET_IF_MASKED - doable, but given that the union feels like a
+> micro-optimization in the first place the simpler approach of separating
+> fields seems okay too? (TBH my mind also initially went down the
+> FL_KEY_SET_IF_MASKED rabbit hole but once I saw the simplicity of
+> Cedric's patch I changed my mind)
 
-I don't think it is particularly important, but the AI generated review
-points out that citing the following commit may be more appropriate,
-as this patch deals with extts_flags rather than perout_flags.
+Sure, now this has been put to me more than once I agree.
 
-7c571ac57d9d ("net: ptp: introduce .supported_extts_flags to ptp_clock_info")
-
-Also, as this is for iwl-next I do wonder if there should be a fixes tag
-at all. I do see that Paul asked for one in v1. But is this fixing a bug?
-And if so, should it be targeted at iwl-net?
-
-> ---
-> v3:
-> - remove unnecessary flag checks for newer kernels and update commit
-> message
-
-Thanks for the update.
-
-> v2:
-> - add fixes tag
-> - remove old TODO comment
-> v1: https://lore.kernel.org/intel-wired-lan/20260309141220.343224-1-przemyslaw.korba@intel.com/
-
-FTR, the AI generated review also notes that the TODO covers both EXTTS and
-PEROUT, while the patch only deals with the later. But I agree with Dawid's
-review of v1. And that it is best to remove the TODO entirely.
-
-> 
->  drivers/net/ethernet/intel/i40e/i40e_ptp.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-> index 7bcea7d9720f..e7c4f871beec 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-> @@ -598,7 +598,6 @@ static int i40e_ptp_feature_enable(struct ptp_clock_info *ptp,
->  	enum ptp_pin_function func;
->  	unsigned int chan;
->  
-> -	/* TODO: Implement flags handling for EXTTS and PEROUT */
->  	switch (rq->type) {
->  	case PTP_CLK_REQ_EXTTS:
->  		func = PTP_PF_EXTTS;
-> @@ -1340,7 +1339,9 @@ static int i40e_init_pin_config(struct i40e_pf *pf)
->  	pf->ptp_caps.n_ext_ts = 2;
->  	pf->ptp_caps.pps = 1;
->  	pf->ptp_caps.n_per_out = 2;
-> -
-> +	pf->ptp_caps.supported_extts_flags = PTP_RISING_EDGE |
-> +					     PTP_FALLING_EDGE |
-> +					     PTP_STRICT_FLAGS;
->  	pf->ptp_caps.pin_config = kzalloc_objs(*pf->ptp_caps.pin_config,
->  					       pf->ptp_caps.n_pins);
->  	if (!pf->ptp_caps.pin_config)
-> 
-> base-commit: d5fbc991435eac7a1ead7cd2ddb5a743528718bb
-> -- 
-> 2.43.0
-> 
+But if we go this way, then can we also simplify some of the existing logic?
+As a follow-up?
 
