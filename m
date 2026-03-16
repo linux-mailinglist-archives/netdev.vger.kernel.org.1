@@ -1,226 +1,135 @@
-Return-Path: <netdev+bounces-268342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268343-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +LRlFSCSuGkUgAEAu9opvQ
-	(envelope-from <netdev+bounces-268342-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 00:28:32 +0100
+	id iBGOGQKTuGkUgAEAu9opvQ
+	(envelope-from <netdev+bounces-268343-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 00:32:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F34632A1F59
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 00:28:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0904A2A2005
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 00:32:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1293C3030EF3
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 23:28:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 34085303DAD8
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 23:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEB7437AA94;
-	Mon, 16 Mar 2026 23:28:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C9C933C53A;
+	Mon, 16 Mar 2026 23:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nKbpKf1C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hN1fRzFk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8977379EDF
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 23:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D5B26E6FA;
+	Mon, 16 Mar 2026 23:31:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773703695; cv=none; b=aKCp3zFre3v5RM/dke8bT5KTA6TGJxqdKpZWQOm+POjxQwAVZcZe4lEVlbCEx6FtHeWTBjz84btYUKmKwNbk6hUAMkcp9BRN9BUg87P4i80h4/Crcxay02em7fwtCBfpZ2KZaZA85PA6ZtEsjrVXG/Jk7k7M87EePEA2db9DI1c=
+	t=1773703893; cv=none; b=Bm5R16rDIjgpLUcSpKh0wilSgvZ2KWx11yckNZu4T8Sj44VNnITX4yTHMmKSoLAF7xBOV2aM/kJ2PWxrOeWPMr5IccM6DmEFLxLqrNoFpuyqvHqqyWUpMLmRDjLL+MSJmicxNuA4R0iOMpASRw91DQ/FdeZcOlqlsfzFNilh9xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773703695; c=relaxed/simple;
-	bh=nJt5cqUTWvKZ5Rt96Sel33VW4JvIuW+Q0gz9SxemFJw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=XNHvnBn3qtSwUYGmVMnuQy/vOb2gG2yqQx+hGjDHVGgLMUWRoEaDTSZ9DjZ0eZ1ifZYoa4KKXpCf7ws/gzysv50KVoNjD+CNEeksYg8khUVoWbdY7jm3nSgbWndA2UlK4qSAGwtOfJ0fZyKqBOVWU4tuwUEhdhJPvyxHz+b1DC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nKbpKf1C; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773703694; x=1805239694;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=nJt5cqUTWvKZ5Rt96Sel33VW4JvIuW+Q0gz9SxemFJw=;
-  b=nKbpKf1CKm2FI9gWt3iB25a45dWr73DI62gO6aAwIT9xTb9qbKxGMlud
-   OKgYY3rXDG8ttQZStZInPYD4bUhhOv84CRXCwAjsJPLL8S3X+XuLini9X
-   WR+F8IAeKO0QI7AphRhbTaBH6INh9ujDJuOCrV4XBUFO5QcFiOsSQbj5b
-   0xAUVAVvH11z6vBGdn0YOlmNMscxTnUEI54LJWaXojmrdisxIyXsp83Tp
-   Ttb/+LJSzxEHgOQik4xTQoeRanYLvNS57VlKi+ZAKrqj1LvOSPDmYQXku
-   YElj/iu3IZrMdjdeM92rJPhQllmJW4iBgU/P2wtyThBSCM1AFRebbw38z
-   g==;
-X-CSE-ConnectionGUID: uPb6uIE/R/6Vj45tyqxZMg==
-X-CSE-MsgGUID: w+t5k4vZTg6y6hcQHJqL9Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11731"; a="74912825"
-X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
-   d="scan'208";a="74912825"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2026 16:28:12 -0700
-X-CSE-ConnectionGUID: dmis1Qs0TlyGH7f2PDwXmw==
-X-CSE-MsgGUID: 7wMGXJ5KRYWjAoT2z5Wbjg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
-   d="scan'208";a="246842475"
-Received: from estantil-desk.jf.intel.com ([10.166.241.24])
-  by fmviesa001.fm.intel.com with ESMTP; 16 Mar 2026 16:28:12 -0700
-From: Emil Tantilov <emil.s.tantilov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bigeasy@linutronix.de,
-	clrkwllms@kernel.org,
-	rostedt@goodmis.org,
-	linux-rt-devel@lists.linux.dev,
-	sgzhang@google.com,
-	boolli@google.com
-Subject: [PATCH iwl-net 3/3] idpf: fix PREEMPT_RT raw/bh spinlock nesting for async VC handling
-Date: Mon, 16 Mar 2026 16:28:19 -0700
-Message-Id: <20260316232819.6872-4-emil.s.tantilov@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20260316232819.6872-1-emil.s.tantilov@intel.com>
-References: <20260316232819.6872-1-emil.s.tantilov@intel.com>
+	s=arc-20240116; t=1773703893; c=relaxed/simple;
+	bh=mokbVaSNGRbUCQQ4SGbI4E3yKDImZ3QdINhNbLzi8Po=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oJOxktom5xoSENDTSL6KYlNk5xLg/ZFHmKCTk/7PNpeuPAtJ1fqvrfOoThwvOPdpP5gtRYVsv751Y0iXrtySzmHawfvtq6Na3fGveEKbj6yXc6/8TqiJgpnFdgAWSlp4OwnbrZKVFZDxIh7k1cqUfq9cyF4vviGIUAGQPDVWboA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hN1fRzFk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A749C19421;
+	Mon, 16 Mar 2026 23:31:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773703893;
+	bh=mokbVaSNGRbUCQQ4SGbI4E3yKDImZ3QdINhNbLzi8Po=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hN1fRzFkuoAPo5qf7cCUj/3UZ74Zrg2FGMIpeV+WXs3DgSmup1ufDh90hMZjFc0TC
+	 DFJ5TZCjZPQKQKjORnD6nXc/kg4X+SL6SJtuFZKzc/SmJH8x3Lpni7zXRGSJmC7zCx
+	 g7VH7wJOZJqANs6wbO3dzR0eI7+48NtQaOEffLB3o9yHJpLmt0FdQpGcv1EWJJtNb/
+	 ADvmnC44FS9xSHGIWnlJtVwSRO6c9ouBQkKC+O0VI4rosda2SYh3oAyxbDRgyDV0SU
+	 SPJVnJB69/VFFVSBjUhPhbnu67KO1WBCN7X1nUwGRmGsi0HPAY8in067EPcMCo8ChC
+	 2fFBt9f9P7NSg==
+Date: Mon, 16 Mar 2026 16:31:31 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>, Pavan
+ Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, linux-kselftest@vger.kernel.org, Willem de Bruijn
+ <willemb@google.com>, Shuah Khan <shuah@kernel.org>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
+ intel-wired-lan@lists.osuosl.org, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH net-next v4 0/3] ethtool: Dynamic RSS context
+ indirection table resizing
+Message-ID: <20260316163131.2ff161c5@kernel.org>
+In-Reply-To: <87a4w9p95i.fsf@all.your.base.are.belong.to.us>
+References: <20260313071322.3489243-1-bjorn@kernel.org>
+	<20260314093518.43b820b7@kernel.org>
+	<87a4w9p95i.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-X-Spamd-Result: default: False [0.84 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-268342-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268343-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[emil.s.tantilov@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: F34632A1F59
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 0904A2A2005
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Restructure the ASYNC case to allow calling idpf_vc_xn_forward_reply()
-outside of idpf_vc_xn_lock(). This avoids invalid wait context reported by
-the kernel due to the async handler taking BH spinlock:
+On Sun, 15 Mar 2026 13:30:33 +0100 Bj=C3=B6rn T=C3=B6pel wrote:
+> Jakub Kicinski <kuba@kernel.org> writes:
+>=20
+> > On Fri, 13 Mar 2026 08:13:12 +0100 Bj=C3=B6rn T=C3=B6pel wrote: =20
+> >> Some NICs (e.g. bnxt) change their RSS indirection table size based on
+> >> the queue count, because the hardware table is a shared resource. The
+> >> ethtool core locks ctx->indir_size at context creation, so drivers
+> >> have to reject channel changes when RSS contexts exist.
+> >>=20
+> >> This series adds resize helpers and wires them up in bnxt. =20
+> >
+> > Sorry Bjorn, I was typing the explanation below and I realized that=20
+> > we may be violating user intent. We should already record the user_size
+> > from rss_set_prep_indir() as part of the context (and presumably some
+> > netdev state for the main context?) and don't allow shrinking the
+> > context below that mark.. =20
+>=20
+> Don't be sorry! Good catch, and glad you caught it now rather than after
+> it landed.
+>=20
+> I'll respin with user_size tracked in the context (and netdev state for
+> context 0) as a lower bound, so resize never folds below the size the
+> user explicitly configured.
+>=20
+> WDYT?
 
-[  805.726977] =============================
-[  805.726991] [ BUG: Invalid wait context ]
-[  805.727006] 7.0.0-rc2-net-devq-031026+ #28 Tainted: G S         OE
-[  805.727026] -----------------------------
-[  805.727038] kworker/u261:0/572 is trying to lock:
-[  805.727051] ff190da6a8dbb6a0 (&vport_config->mac_filter_list_lock){+...}-{3:3}, at: idpf_mac_filter_async_handler+0xe9/0x260 [idpf]
-[  805.727099] other info that might help us debug this:
-[  805.727111] context-{5:5}
-[  805.727119] 3 locks held by kworker/u261:0/572:
-[  805.727132]  #0: ff190da6db3e6148 ((wq_completion)idpf-0000:83:00.0-mbx){+.+.}-{0:0}, at: process_one_work+0x4b5/0x730
-[  805.727163]  #1: ff3c6f0a6131fe50 ((work_completion)(&(&adapter->mbx_task)->work)){+.+.}-{0:0}, at: process_one_work+0x1e5/0x730
-[  805.727191]  #2: ff190da765190020 (&x->wait#34){+.+.}-{2:2}, at: idpf_recv_mb_msg+0xc8/0x710 [idpf]
-[  805.727218] stack backtrace:
-...
-[  805.727238] Workqueue: idpf-0000:83:00.0-mbx idpf_mbx_task [idpf]
-[  805.727247] Call Trace:
-[  805.727249]  <TASK>
-[  805.727251]  dump_stack_lvl+0x77/0xb0
-[  805.727259]  __lock_acquire+0xb3b/0x2290
-[  805.727268]  ? __irq_work_queue_local+0x59/0x130
-[  805.727275]  lock_acquire+0xc6/0x2f0
-[  805.727277]  ? idpf_mac_filter_async_handler+0xe9/0x260 [idpf]
-[  805.727284]  ? _printk+0x5b/0x80
-[  805.727290]  _raw_spin_lock_bh+0x38/0x50
-[  805.727298]  ? idpf_mac_filter_async_handler+0xe9/0x260 [idpf]
-[  805.727303]  idpf_mac_filter_async_handler+0xe9/0x260 [idpf]
-[  805.727310]  idpf_recv_mb_msg+0x1c8/0x710 [idpf]
-[  805.727317]  process_one_work+0x226/0x730
-[  805.727322]  worker_thread+0x19e/0x340
-[  805.727325]  ? __pfx_worker_thread+0x10/0x10
-[  805.727328]  kthread+0xf4/0x130
-[  805.727333]  ? __pfx_kthread+0x10/0x10
-[  805.727336]  ret_from_fork+0x32c/0x410
-[  805.727345]  ? __pfx_kthread+0x10/0x10
-[  805.727347]  ret_from_fork_asm+0x1a/0x30
-[  805.727354]  </TASK>
-
-Fixes: 34c21fa894a1 ("idpf: implement virtchnl transaction manager")
-Reported-by: Ray Zhang <sgzhang@google.com>
-Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
- .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 21 +++++++------------
- 1 file changed, 8 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 6b9692b30040..8ceabd86e172 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -546,32 +546,24 @@ static int
- idpf_vc_xn_forward_async(struct idpf_adapter *adapter, struct idpf_vc_xn *xn,
- 			 const struct idpf_ctlq_msg *ctlq_msg)
- {
--	int err = 0;
--
- 	if (ctlq_msg->cookie.mbx.chnl_opcode != xn->vc_op) {
- 		dev_err_ratelimited(&adapter->pdev->dev, "Async message opcode does not match transaction opcode (msg: %d) (xn: %d)\n",
- 				    ctlq_msg->cookie.mbx.chnl_opcode, xn->vc_op);
- 		xn->reply_sz = 0;
--		err = -EINVAL;
--		goto release_bufs;
-+		return -EINVAL;
- 	}
- 
--	if (xn->async_handler) {
--		err = xn->async_handler(adapter, xn, ctlq_msg);
--		goto release_bufs;
--	}
-+	if (xn->async_handler)
-+		return xn->async_handler(adapter, xn, ctlq_msg);
- 
- 	if (ctlq_msg->cookie.mbx.chnl_retval) {
- 		xn->reply_sz = 0;
- 		dev_err_ratelimited(&adapter->pdev->dev, "Async message failure (op %d)\n",
- 				    ctlq_msg->cookie.mbx.chnl_opcode);
--		err = -EINVAL;
-+		return -EINVAL;
- 	}
- 
--release_bufs:
--	idpf_vc_xn_release_bufs(xn);
--
--	return err;
-+	return 0;
- }
- 
- /**
-@@ -631,7 +623,10 @@ idpf_vc_xn_forward_reply(struct idpf_adapter *adapter,
- 		 * can evaluate the response.
- 		 */
- 		xn->reply_sz = ctlq_msg->data_len;
-+		idpf_vc_xn_unlock(xn);
- 		err = idpf_vc_xn_forward_async(adapter, xn, ctlq_msg);
-+		idpf_vc_xn_lock(xn);
-+		idpf_vc_xn_release_bufs(xn);
- 		idpf_vc_xn_unlock(xn);
- 		idpf_vc_xn_push_free(adapter->vcxn_mngr, xn);
- 		return err;
--- 
-2.37.3
-
+Yes, keep in mind that AFAIR context 0 is not currently tracked
+in the xarray. So maybe add the size of the main / default context=20
+as a field in struct ethtool_netdev_state ?  Or we can start tracking
+it (partially). IDK what's cleaner.
 
