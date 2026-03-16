@@ -1,131 +1,166 @@
-Return-Path: <netdev+bounces-268277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268278-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJPrKzFwuGn5dgEAu9opvQ
-	(envelope-from <netdev+bounces-268277-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 22:03:45 +0100
+	id SPK3ErdwuGn5dgEAu9opvQ
+	(envelope-from <netdev+bounces-268278-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 22:05:59 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 240E62A0826
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 22:03:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C2FC2A0859
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 22:05:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 51DB730AA158
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:59:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 42289303DD1A
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 21:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C923D35C1A6;
-	Mon, 16 Mar 2026 20:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C1E35F5FC;
+	Mon, 16 Mar 2026 21:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RFEVXzfs"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="MI98/Wtb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A657130BF4F;
-	Mon, 16 Mar 2026 20:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB0A35B126
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 21:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773694757; cv=none; b=mjs0VtR7LP0x2T49g/2IbY1IqppJDkOpBGzPW3nSapLZu8ZWQEsyQ/nVYaerPLC8nVRUqxJbT0hcEzvAEUQ1Y79DddJ7mIbSp5ciCBeD0yxXVEXHgoR5uCZy1FLYlPQJSUso1wHyI+uhvqpEpjkkPbfDv2cZjCCDoNxZs5+FYeQ=
+	t=1773694949; cv=none; b=tPpJhD9VI2AWzz8IBFkz+z3gg8bNMQK7IHtAVfNc+syVBcP0Wq+iHiGWE6CCEYgM55PGpp7ik80GUDXuJyBQZ/whiu2jbntrNXJZNY0HrmANr6/+YVNUw7ROMtF45aUBosyMxd6V5vlhb9hqKvgh+k0ryiAajVRSL+GS8iBnxXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773694757; c=relaxed/simple;
-	bh=OmDOMlVBBy6YetFqHSZ7R4cjd4+2Jdw8ISAECi+XxFk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g+8fqWitsq2LHdVgBNMtxkRCmrZdGwwUyw9O5LMlQupJc9diiRQIj5LFybAb+3XGhjLP2BJsPsAzk7E6SQpCJDLL00kT6WVWNQMOuvW12qX1eoveA9ZDBSoqScKFnI3P4Hl4nOc9qmEGAhR483MUxRJb8l3PbYg3bR0zumFKPTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RFEVXzfs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D892DC19421;
-	Mon, 16 Mar 2026 20:59:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773694757;
-	bh=OmDOMlVBBy6YetFqHSZ7R4cjd4+2Jdw8ISAECi+XxFk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RFEVXzfs0t6Vpib9Q7Emee0DitRl3sYSa4e0rbL6T7tqRCBghIBEyCpClfVjtP/04
-	 v5jgyARu8hDaZ8Dn+tC97+cHXzVyhziAfY4/ONkdfZT2VAgBlJdzsVeWxEy0XPUJgd
-	 RscF8LHAQjthyLgkinOBuBSxzQsotVUAltC2G8gIQ5phDHqzI/Pniwrwl4DOfMn24W
-	 X8vk/dNEGUpb4pp9I9ueg75RzWisOp1O+qoKS1MUU6mUDMXqNtG3zYfzU8a/caG/4c
-	 uOZ33aVBcrPFtF8PmdleFNf+SX+UuarSAfNAS0XL4X9vKZRcIUQpqFDDy7Mift4Z3R
-	 ct+I9Q9KuIzHg==
-Date: Mon, 16 Mar 2026 13:59:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: Nicolai Buchwitz <nb@tipi-net.de>, Doug Berger <opendmb@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, bcm-kernel-feedback-list@broadcom.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: bcmgenet: enable EEE TX LPI by default
-Message-ID: <20260316135915.28c64ec8@kernel.org>
-In-Reply-To: <997daf22-260b-40c4-a2d6-8c63f59df9a7@broadcom.com>
-References: <20260303160225.542613-1-nb@tipi-net.de>
-	<997daf22-260b-40c4-a2d6-8c63f59df9a7@broadcom.com>
+	s=arc-20240116; t=1773694949; c=relaxed/simple;
+	bh=clFfAapLposgODwSVOgRioct5h0pswpgRcVBIoHAreg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Umu+OgaHHu9JqDs4ujBnbSIP/NuS5uVmF4vg7jmsX9ChvE+SGYXT3WvKxLTlVhR+QcO4SaxBbkn405rOqp6V84BLrsl8Awblyln30QiLTeu32OlqesS9z1WNDv9WBo0KAZVuzJgVVp+4dtQvoJRY4LInZC7WZKoRpOonqqKy95k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=MI98/Wtb; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-82989744ee0so4674840b3a.2
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 14:02:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1773694948; x=1774299748; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/rGEOeHBziMkO8NOwhTu0zAUiSPeT582b+R/Bae5NL8=;
+        b=MI98/WtbZQNL8aLFr3HR0cXGsPHXWlT5VzUtj3mZHEp5kLEnuCXdZRjnT7ce7WiZGg
+         YvX+38UiAAvshwojypw8Q5B1lfKzljBhXwijRYOUY0O1lvpXvOGpf7qF52pz9+Nlysv3
+         UYQjD2uQWs4i5zqhEeZ2W/c8T1IN0v7hIkHk/MofzSm9d4rOv7oi9kYNKzf6G7otYHn5
+         OeRJHmT6Mpf5Cs4aYxIqFPH9JEmu1JYPqe2irQm17CAQRSeLkkuhW1oTB/GbiFFQrdqo
+         24enZUVySbXnErJScCMM0bCaMsiu+GFHPiMSkGKvsdonNOxdIytQhEIVOE7XSqc1L4+m
+         5A0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773694948; x=1774299748;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/rGEOeHBziMkO8NOwhTu0zAUiSPeT582b+R/Bae5NL8=;
+        b=YkEUu65ZlwEbNhLYLfiUiiaYqAfOzn+MUqFzVCpgKxHnMdVRPBv7SyquxFyTQJCq52
+         k7jkSMZSQTRje5DNbRDqPWBtM9TtbgpBt3XG87tPYgDYN3sZcj3DixfdkEA3M5BMWidu
+         S438rq+QRdTlh8PX9KWOU5wr+0ipqG0c2yKFtubwsZkoAxhEsgHfWJQp7iJukgKvXPP8
+         fSV1EdbzCzBok/c2qYB5FeoBPX03UCsANKRRxq91PKyPh5GAd/iZ3FlEgJ5dXlFAeIAk
+         md+6fCEUS4VzXxhYPHM/i7vcwb3jk8oqbQ55ak6hXV6FjnsJVkQ3RK8+Six9Mpz9DjVT
+         ffDw==
+X-Gm-Message-State: AOJu0Yxtx99GRL3EYW7f7WC34ulMpRFUyg4sDrx+xvFkWGDcFluErXgF
+	tdBDNYkkGX42Jhz+znRdbxvvo9zaPFRb1A+CFpGXSYzziWcMZrKXLYgoCRNXbiplCmw=
+X-Gm-Gg: ATEYQzyaWUQBjzPfw4bNGTj1b3IZcyqWmvMLlhrJdcbLYH4w8PwjthD/9kGhdpkY0Z5
+	OCOhLr5N8ZkA/VEgRc36FnO7JZDzit5FNP1qohdk5jZJG6M+43F+H0Y6CLqz7+k87qiHkLyDlOM
+	FV8TNgWOovZBO85ue2OIG3/t+U1/I/cum+TNdCSz7QQzi6a2nd+HzYg4ZuKE+bjEOjDCJpgp/Mp
+	Bm06gUKvijlOVdLme9tn6VYPnLWoFFZJ04n/SsHZXFUkd87nq+tcsU1LRSZOvXFgdULyVHoRjok
+	eyIQUD1hUjQrTKLjiOqnhVE15fWhPvMq55/KphDZxuUvNeZoKW3kP05LYpfC71NX4gqEDeTYw2L
+	xeTXKUm7wv1TPu7bIEwNYb5YJV0S7Hmhd/aodTNT0963wFKIShWYIXq+zi744xDLURgvL8wNHHy
+	kXlbGm
+X-Received: by 2002:a05:6a00:14c7:b0:81f:3cac:38a1 with SMTP id d2e1a72fcca58-82a196f5893mr12202997b3a.6.1773694947630;
+        Mon, 16 Mar 2026 14:02:27 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:71::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82a072422desm14800519b3a.1.2026.03.16.14.02.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Mar 2026 14:02:27 -0700 (PDT)
+Date: Mon, 16 Mar 2026 14:02:26 -0700
+From: Joe Damato <joe@dama.to>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: netdev@vger.kernel.org, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, linux-kernel@vger.kernel.org,
+	Marek Szyprowski <m.szyprowski@samsung.com>
+Subject: Re: [RFC net-next v2 00/12] Add TSO map-once DMA helpers and bnxt SW
+ USO support
+Message-ID: <abhv4mjRyJooCjun@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+	linux-kernel@vger.kernel.org,
+	Marek Szyprowski <m.szyprowski@samsung.com>
+References: <20260312223457.1999489-1-joe@dama.to>
+ <20260316194419.GH61385@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260316194419.GH61385@unreal>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[tipi-net.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,broadcom.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-268277-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[dama.to];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-268278-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:email]
-X-Rspamd-Queue-Id: 240E62A0826
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dama-to.20230601.gappssmtp.com:dkim,devvm20253.cco0.facebook.com:mid]
+X-Rspamd-Queue-Id: 9C2FC2A0859
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 16 Mar 2026 12:54:46 -0700 Florian Fainelli wrote:
-> On 3/3/26 08:02, Nicolai Buchwitz wrote:
-> > GENET never initializes priv->eee.eee_enabled or
-> > priv->eee.tx_lpi_enabled to true, so the link-change callback in
-> > bcmgenet_mac_config() always calls bcmgenet_eee_enable_set() with
-> > enable=false.  The result is that EEE is negotiated at the PHY level
-> > but the MAC never enters Low Power Idle, wasting the power savings
-> > that EEE is designed to provide.
+On Mon, Mar 16, 2026 at 09:44:19PM +0200, Leon Romanovsky wrote:
+> On Thu, Mar 12, 2026 at 03:34:37PM -0700, Joe Damato wrote:
+> > Greetings:
 > > 
-> > Users can work around this with 'ethtool --set-eee eth0 eee on tx-lpi
-> > on tx-timer 250', but the MAC should enable TX LPI out of the box when
-> > the hardware supports it, consistent with how phylink-managed MACs
-> > behave (phylink calls phy_support_eee() which sets eee_enabled=true and
-> > tx_lpi_enabled=true by default).
-> > 
-> > Initialize EEE software state during bcmgenet_open() on GENET v2+ so
-> > that the link-change path activates EEE in hardware once the PHY
-> > negotiates it.  Use an LPI timer of 250 us, matching the default used
-> > by other MAC drivers (mvneta, mvpp2).
-> > 
-> > Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>  
+> > This series extends net/tso to add a data structure and some helpers allowing
+> > drivers to DMA map headers and packet payloads a single time. The helpers can
+> > then be used to reference slices of shared mapping for each segment. This
+> > helps to avoid the cost of repeated DMA mappings, especially on systems which
+> > use an IOMMU.
 > 
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> In modern kernels, it is done by using DMA IOVA API, see NVMe
+> driver/block layer for the most comprehensive example.
+> 
+> The pseudo code is:
+>  if (with_iommu)
+>     use dma_iova_link/dma_iova_unlink
+>  else
+>     use dma_map_phys()
+> 
+> https://lore.kernel.org/all/cover.1746424934.git.leon@kernel.org/
+> https://lore.kernel.org/all/20250623141259.76767-1-hch@lst.de/
+> https://lwn.net/Articles/997563/
 
-FWIW this patch is set to Changes Requested, I _think_ based on this
-reply from Andrew:
+Thanks for the pointer. 
 
-https://lore.kernel.org/all/d352039f-4cbb-41e6-9aeb-0b4f3941b54c@lunn.ch/
+I agree it's the right approach. Batching the IOVA allocation and IOTLB sync
+across all regions is a clear win over the per-region
+dma_map_single/skb_frag_dma_map calls I had in v2.
 
-LMK if the patch is good as is.
+I'll submit a v3 with the tso_dma_map internals updated to use
+dma_iova_try_alloc + dma_iova_link + dma_iova_sync, with a
+dma_map_phys fallback. 
 
