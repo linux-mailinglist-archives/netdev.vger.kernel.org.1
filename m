@@ -1,203 +1,187 @@
-Return-Path: <netdev+bounces-268252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268253-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6G0oJ3xRuGmKcAEAu9opvQ
-	(envelope-from <netdev+bounces-268252-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:52:44 +0100
+	id UHbMMJxQuGmKcAEAu9opvQ
+	(envelope-from <netdev+bounces-268253-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:49:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07BBD29F51F
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:52:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CD7229F40F
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A9625303D671
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:46:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 28EF3307C4AB
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EE593DF015;
-	Mon, 16 Mar 2026 18:46:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A13C3E6381;
+	Mon, 16 Mar 2026 18:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="YDZKP+6q"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Zdep9znd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-106116.protonmail.ch (mail-106116.protonmail.ch [79.135.106.116])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D76D330D50
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 18:46:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF293E5EF9;
+	Mon, 16 Mar 2026 18:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773686764; cv=none; b=ecL4ZPiyT0My0ya49l+1H5/0o7zoPJSriweP7EISAmdUrn5/DnJLdrDg2CmubzauMApKLgSOfJ/zKduDE2rd4FZyZmlASLIcl1+tGUmKeuphgQRSK0BPTU84AHbNdqtcGtdijBn98AccEnR7K+ESpgPjo2Zc4djhpKPxkrtSiE0=
+	t=1773686874; cv=none; b=G2qM9ghxisQQI6fxHLbqW0TlG4Fjg3ExEQ2sM3tzJUSlkbBa9ZCQCOmT40FukvAQc9vq+QsBpahnuqfijOkFqVaEmkisvk1v2J6fUexTjZeYD/3iC6pqDp77OLgfa2cPdaSh5H8AhP+5m8q8X4FZMtAnMMNuNwMAVplOCXboG+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773686764; c=relaxed/simple;
-	bh=GhaGTWaAC9f2cyezBsr1nAmhVqDMM4husB5sfRHYLqs=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bXoSsxU4/kMEFDo8UiycbgX28lT56NKoaqTl9qMREqWeJe6/+MEyu76vQihLBblCoQ4nEKfbLphooM4ZfxqMAn9ITWBXNm3ZJYUJJk0UhrAHQFaPJAVvoBIstbdgWcea1gRCVXahAg8JYSm5ivb95umbLjVKVbe6KrdDD/wxt6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=YDZKP+6q; arc=none smtp.client-ip=79.135.106.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1773686752; x=1773945952;
-	bh=jYCSUK08Navzfq6Y6W1JAa1hQPi9EJkF7xj1O3nnbBI=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=YDZKP+6qwHw+vopjjYN5aLZgLhIQPPMnBe3awSYFntqha02lWBIT5q3fcgI4lC6Kv
-	 WfGP+ZJwrEerUHwcKGni4trdlzGETmk4PrrPh53BFfh2ZuVzp+7HflXSHnqzyJ926n
-	 IRTPaECiUgAyIeLzNbTSp2WwAjYKAQR/m786KejOQGXqZDQy63ECrHnY/15huN82uC
-	 m+8YCeedD4A7mcHjeG7hGQhaWeM+VtzbppYISK+N2kVQ6uaCoJ+Woi6xVrSyRtLcJl
-	 6F8Gz7jhdRHCuBq7B3oBiuibHPXRwQhzkh/343Km2tqwGE5LW0jVgJl1pmtpdxeC8H
-	 ytpCf9rPLxRAg==
-Date: Mon, 16 Mar 2026 18:45:48 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-From: Paul Moses <p@1g4.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net-shapers: clear hierarchy pointer and defer flush frees with RCU
-Message-ID: <hHYLQqDrBCcK_2x6uSbGsBott3QuXe8o-R9tj4vNmw8UUEFxpzoD_PCMiHMyyOnySAtQbJtCAB8yVoCmWxzO07C02Q5o0J6fHu4NLEa-ggY=@1g4.org>
-In-Reply-To: <20260310192842.3c3b2070@kernel.org>
-References: <20260309173450.538026-1-p@1g4.org> <20260310192842.3c3b2070@kernel.org>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: 0ccbae606882ace79d5a92f44365f6688dda9b9d
+	s=arc-20240116; t=1773686874; c=relaxed/simple;
+	bh=+k/vh+t2Ou9nkNec8Wuif2/eQbkXmHc5dOYsgUKptbw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mjczXmBwB5cayh93XNfj6swtzOSWvid6ZmccHCysH/T9DayzBAas4OgdogAfNs0MOnsuO0kmtFOzIKfxVC3qMmK03SIg8DLqGPxjklPrbkqfoRzYdeucZ70kp+buJsYMNJIMngRacG8MpkyKOglZjLKMwy80VbJAywJpTHPmQ9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Zdep9znd; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1773686872; x=1805222872;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=+k/vh+t2Ou9nkNec8Wuif2/eQbkXmHc5dOYsgUKptbw=;
+  b=Zdep9znduvnJ4mkg0A9optEbL+vaFeZzIJ+5Nn5hPSFl02X/ZfMWE57z
+   vXlBYk6IdLOOQAAqTnVGHM7YWgTu5/5OnuNzw/N5v0btToO6bqx+WjI3V
+   LTHe9lJu9TgUc8GlXhQNehdkxefZBWs1OSW39QmngSh0ueO3h7asAExRy
+   u+zP0sGPTMmyrYLhie1aj4EpvBLJGTt1eBI0xq9dx6B3HJvWD7YQYnCd+
+   OvOVHXMDVczJMF9jXdTY/7Ng/80eiUGCZFL4NCe2/03/LxdkFEWU5G49k
+   qQSvrrPBEYv5ts2ju2p800goIbIuomb3BP0/onlJDAdY7PmUZmY7PrCGN
+   Q==;
+X-CSE-ConnectionGUID: NYZhdgGsTtykT1Pwm+qYxg==
+X-CSE-MsgGUID: xUBWVD07SjqIdcPeFUP6Jw==
+X-IronPort-AV: E=Sophos;i="6.23,124,1770620400"; 
+   d="scan'208";a="221993711"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2026 11:47:51 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
+ chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Mon, 16 Mar 2026 11:47:44 -0700
+Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58 via Frontend Transport; Mon, 16 Mar 2026 11:47:43 -0700
+Date: Mon, 16 Mar 2026 11:47:41 -0700
+From: Charles Perry <charles.perry@microchip.com>
+To: =?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
+CC: Charles Perry <charles.perry@microchip.com>, <netdev@vger.kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Nicolas
+ Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
+	<claudiu.beznea@tuxon.dev>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 0/3] Initial support for PIC64-HPSC/HX
+ Ethernet endpoint
+Message-ID: <abhQTWsPI6TfpWxh@bby-cbu-swbuild03.eng.microchip.com>
+References: <20260313140610.3681752-1-charles.perry@microchip.com>
+ <DH4DU4Z4X9MM.398FQ3BIZQIJB@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DH4DU4Z4X9MM.398FQ3BIZQIJB@bootlin.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268252-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268253-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	DKIM_TRACE(0.00)[1g4.org:+];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 07BBD29F51F
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:dkim,bby-cbu-swbuild03.eng.microchip.com:mid]
+X-Rspamd-Queue-Id: 2CD7229F40F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> This is not the right fix. The shaper hierarchy as a while is not under
-> RCU. The problem is that we take a ref on netdev and then lock it,
-> assuming that it's still alive. But it may have gotten unregistered in
-> the meantime. The correct fix is to check that the netdev is still
-> alive after we lock the binding or take RCU from the Netlink side.
+On Mon, Mar 16, 2026 at 06:28:39PM +0100, Théo Lebrun wrote:
+> Hello Charles,
+> 
+> On Fri Mar 13, 2026 at 3:06 PM CET, Charles Perry wrote:
+> > Hello,
+> >
+> > This series add basic support for Microchip "PIC64-HPSC" and "PIC64HX"
+> > Ethernet endpoint. Both SoCs contain 4 GEM IP with support for
+> > MII/RGMII/SGMII/USXGMII at rates of 10M to 10G. Only RGMII and SGMII at a
+> > rate of 1G is tested for now. Each GEM IP has 8 priority queues and the
+> > revision register reads 0x220c010e.
+> 
+> Do you have plans to test higher rate? We might get our hands on GEMs
+> that support >1G and would like to know if CCing you would make sense.
 
-Ok I see it now, I didn't care about anything except queue because it's the=
- only=20
-path that affected both drivers. This is an entirely different issue.
+Yes. I don't have a 10G setup right now but that's definitively in my TODO
+list for this year.
 
-1. net_shaper_nl_pre_doit() =E2=86=92 net_shaper_ctx_setup()
-=09gets dev =3D netdev_get_by_index(...) (ref only, no alive check)=20
-2. Before doit runs, unregister can do:
-=09- unlist_netdevice(dev) (dev.c:12388)
-=09- dev->reg_state =3D NETREG_UNREGISTERING=20
-3. Doit then runs:
-=09- net_shaper_lock(binding)=20
-=09- continues without checking reg_state
-=09- may call ops->set/delete/group() on a dying device
+> 
+> > One particularity of this instantiation of GEM is that the MDIO controller
+> > within the GEM IP is disconnected from any physical pin and the SoC rely on
+> > another standalone MDIO controller.
+> 
+> Ah, that means you instantiate the MDIO bus for no good reason.
+> Code looks like:
+> 
+> static int macb_mii_init(struct macb *bp)
+> {
+> 	struct device_node *mdio_np, *np = bp->pdev->dev.of_node;
+> 	int err = -ENXIO;
+> 
+> 	/* With fixed-link, we don't need to register the MDIO bus,
+> 	 * except if we have a child named "mdio" in the device tree.
+> 	 * In that case, some devices may be attached to the MACB's MDIO bus.
+> 	 */
+> 	mdio_np = of_get_child_by_name(np, "mdio");
+> 	if (!mdio_np && of_phy_is_fixed_link(np))
+> 		return macb_mii_probe(bp->dev);
+> 
+> 	// ... probe MDIO bus ...
+> }
+> 
+> So to *not* get the bus we need to be in fixed link config. Do you care
+> about that? I think that the proper fix would be to lazy probe the MDIO
+> bus until a PHY (ours or some other MAC's) asks for it.
 
-Here's the flow of reported issue:
+Yes, I do have a bunch of unusable MDIO buses in sysfs. It would be great
+if those just didn't exist but that would be yet more code and one more
+MACB_CAPS for little benefit IMO.
 
-1) A userspace GET doit path does this:
-
-  net_shaper_nl_get_doit()
-    -> rcu_read_lock()
-    -> net_shaper_lookup()
-         -> net_shaper_hierarchy()
-              -> READ_ONCE(dev->net_shaper_hierarchy)
-         -> xa_get_mark() / xa_load()
-              -> dereference hierarchy->shapers
-    -> rcu_read_unlock()
-
-That can race with netdevice unregister teardown:
-
-  net_shaper_flush_netdev()
-    -> net_shaper_flush()
-         -> xa_for_each(...) {
-              __xa_erase(...)
-              kfree(cur)
-            }
-         -> kfree(hierarchy)
-
-The problem is that readers walk the published hierarchy locklessly under
-an RCU read-side section, but teardown reclaims both the shapers and the
-hierarchy with plain kfree() rather than kfree_rcu().
-
-2) The original flush path does this:
-
-  net_shaper_flush()
-    -> hierarchy =3D net_shaper_hierarchy(binding)
-    -> ... free shapers ...
-    -> kfree(hierarchy)
-    -> no WRITE_ONCE(dev->net_shaper_hierarchy, NULL)
-
-So a later GET reader can still do:
-
-  net_shaper_hierarchy()
-    -> return stale non-NULL pointer
-
-and then walk the freed hierarchy through xa_* operations.
-
-The only remaining issue I found after fully reviewing this is the dump
-path, but I have not been able to reproduce it so far:
-
-- kfree_rcu() only protects readers that have already entered
-  rcu_read_lock()
-- In the old net_shaper_nl_get_dumpit(), hierarchy was loaded before
-  rcu_read_lock()
-- So this sequence is possible:
-    1. dump path reads the hierarchy pointer
-    2. gets preempted
-    3. teardown detaches the pointer and queues kfree_rcu()
-    4. the grace period ends and the object is freed
-    5. dump resumes, enters rcu_read_lock(), and dereferences the stale
-       pointer
-
-=09diff --git a/net/shaper/shaper.c b/net/shaper/shaper.c
-=09index ab0de415546d6..452557c52488b 100644
-=09--- a/net/shaper/shaper.c
-=09+++ b/net/shaper/shaper.c
-=09@@ -779,11 +779,13 @@ int net_shaper_nl_get_dumpit(struct sk_buff *skb,
- =09
- =09=09/* Don't error out dumps performed before any set operation. */
- =09=09binding =3D net_shaper_binding_from_ctx(ctx);
-=09+=09rcu_read_lock();
- =09=09hierarchy =3D net_shaper_hierarchy(binding);
-=09-=09if (!hierarchy)
-=09+=09if (!hierarchy) {
-=09+=09=09rcu_read_unlock();
- =09=09=09return 0;
-=09+=09}
- =09
-=09-=09rcu_read_lock();
- =09=09for (; (shaper =3D xa_find(&hierarchy->shapers, &ctx->start_index,
- =09=09=09=09 =09U32_MAX, XA_PRESENT)); ctx->start_index++) {
- =09=09=09ret =3D net_shaper_fill_one(skb, binding, shaper, info);
-=09--=20
-=092.53.GIT
-
-
-So I still have no more changes besides possibly the inclusion of this patc=
-h.
+As for the fixed link, I can't specify that just to not instantiate the
+MDIO bus because that would cause other problems since my link has a PHY
+with a negotiated rate/duplex/etc.
 
 Thanks,
-Paul
+Charles
+
+> 
+> Thanks,
+> 
+> --
+> Théo Lebrun, Bootlin
+> Embedded Linux and Kernel engineering
+> https://bootlin.com
+> 
 
