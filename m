@@ -1,179 +1,318 @@
-Return-Path: <netdev+bounces-268179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268180-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aOmROl0XuGl/YwEAu9opvQ
-	(envelope-from <netdev+bounces-268179-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 15:44:45 +0100
+	id EFLFGRQauGn/YwEAu9opvQ
+	(envelope-from <netdev+bounces-268180-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 15:56:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A4FD29B9AE
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 15:44:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC38129BD48
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 15:56:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 775D7300B594
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 14:44:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A92F32B2953
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 14:47:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6E52D8768;
-	Mon, 16 Mar 2026 14:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5912EB874;
+	Mon, 16 Mar 2026 14:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="WZ1B2ldm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BaiEYL2c";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="SR2kWO+j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09B21EA84
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 14:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BFF2EC090
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 14:47:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773672283; cv=none; b=Vm8qJF0Vk6YG8kysTODMg8QuoizAqTCfuaJeakH1LnbFV9Jvd+Ra+BvoVrUTPazIhMtJcVme/24KbNxtLUXM+MylDtbMFHStf0L7O6uh9lof1N/e/yeC/Dz8PzqotB+FealiYHC4iT+ZhvdhWFEb6oJGawTWwwb8W3Xk7VDJvFA=
+	t=1773672425; cv=none; b=ENlg6H4geA0SMgWB1e8vuYfgLV3d4dj+amDXrLIFCzpsT3T0bf7mWw+zcUeIXLgVQccFIVXnRqRKkXpVCBhgVb3yQVbjgdN3nXFkWinpuk6C7HVhDDVXOiC8LXesu0vs7BHunVhJ3zOrdUQmBaC6qj7H5dJQc+3GlzXBUoylsTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773672283; c=relaxed/simple;
-	bh=1g5WFjlGiiibxjESiyPtDH+1591pyc/aUWQxj5T23FA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ljBCVgyNnG6VjUwSLD3obg7w3rHOWoJ8O6N8C9n5Bx1R7Y57BB7ITFdiAZJ1w+2xgkkZovp8Mr7sop+SYoqMe7Q2nKjYXLlSu+iEX9FYuCJDpEAxUiKkIDwAtN8Bz198Wv1KodJdYTCddllwJJ+O9AoEK+Q7QbIUlu/W2DWuews=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=WZ1B2ldm; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 969C2C55049;
-	Mon, 16 Mar 2026 14:45:02 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E60935FC4A;
-	Mon, 16 Mar 2026 14:44:38 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B67A4103721B9;
-	Mon, 16 Mar 2026 15:44:34 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773672278; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=IGC4VRqY81B5t0LIt3uvpRW2LAZUsttTwB9fKzsqiPo=;
-	b=WZ1B2ldmHUrwJtX6hcemVq7m7JX8V4W54BcuX8XPzk9wqSZ2WzEVTN03RC2oX433BtNFKe
-	6EnPBWpLdUa144oPlN6LI0KlDJT5uJZ8NypT1e00IyuED9gPGec0cq14ln+SW1vwTTWmLc
-	BNKfzN2o9X0uVZjmKBRc+Ixa+yR7OI1TFYWQIln/XIVP76k2eab6uddIqA8u44GzlNXSbq
-	HEKfGPNvMgxHxJ96fAA4vWdS87Fc1/9AhaN+aDunoFX4AhdVaV6/L2ZuVY4sC5JdR6/jtp
-	KHiOfTNXhUNr3pc7fhzBtr832hjNOR9UrMCPjWMTx5yTCeD9mbhu+IqSjp7Zpg==
-Date: Mon, 16 Mar 2026 15:44:33 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Carlo Szelinsky <github@szelinsky.de>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: pse-pd: add LED trigger support
-Message-ID: <20260316154433.032346e5@kmaincent-XPS-13-7390>
-In-Reply-To: <abblHRq6Q85j5lXA@pengutronix.de>
-References: <20260314235916.2391678-1-github@szelinsky.de>
-	<abblHRq6Q85j5lXA@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1773672425; c=relaxed/simple;
+	bh=ZZfSolL28liTEnsaqqekR1GwI4GeyNvw1ffBWs0x/Fs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rhUxk7aJjpQeBpzYrOIGwxJgR97rPWcohwct9HpRPwGG1FFeWoiuzKnoVFOUovUpIiAzr1ftuh3M8gqk4oNMWDwVZSCgTr5OCkL8SUN8k4ys71CJXl5fZGYTpqmGrVRDvwfImQ8QU2DesnDFyB46lnH5ckLYj07G2rdu6mcy5e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BaiEYL2c; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=SR2kWO+j; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773672422;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TKhHuHBXRJ+I0jn8wxM059uZWEF8kMlWUss6Y6JwesI=;
+	b=BaiEYL2cpZ3K1N9k/nVH2bcS0Qvebuok/TPP3dYoFsAJkJ/g55FGA3PVAymjc3X+Vv8P4o
+	cD+gwHBbE57Mb00sEIZU1HQWIt/ky3A6RrknM7B9D03j3yQ+IV9XaiDO/xvqaO8i25hDqn
+	FECcRzPy1Gb9KxFnhVNUELLze3TStQM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-656-iaPjHggfPYmyUt_VvJhIVQ-1; Mon, 16 Mar 2026 10:47:01 -0400
+X-MC-Unique: iaPjHggfPYmyUt_VvJhIVQ-1
+X-Mimecast-MFC-AGG-ID: iaPjHggfPYmyUt_VvJhIVQ_1773672420
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43b42cd4becso892347f8f.1
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 07:47:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1773672420; x=1774277220; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TKhHuHBXRJ+I0jn8wxM059uZWEF8kMlWUss6Y6JwesI=;
+        b=SR2kWO+jMgL85zef0bwB0X6Ka8jo+Q3PoUlwheL3DulTIhWWFXrq7kV3wGMpD3ehvD
+         0D28yWrvN9tEx4bAR5LprmzjpR3nWY0TN97Q5RFHKjCDiqZ6XSovkTFSbAgd5bxUatOI
+         NSqDRrgJQI8EFXSDpIP+euxXHLSiQPuWpNrqgkqAylcXCpFSly+0z7TlhIdPcj0j9IhI
+         UuJOTe4uFkNND9v2pXdVBKOytXlmWRV76PqY6NpL1cDMiduskm4CMpqfuq64mS7FuuKq
+         63Vgqh19vexsJFCnybeHblOJkC+voUfPSrQPubs8YrBycq2TsUF1etSUTqrLCitgnqMk
+         XlVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773672420; x=1774277220;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TKhHuHBXRJ+I0jn8wxM059uZWEF8kMlWUss6Y6JwesI=;
+        b=Np73J76/kN/g/dO3cAmOsFizXY9PyFiDhcEwh7nw6Sw5NDA/AYvqOmKQJQ66MqU7io
+         fCU2U0/YM3fvPSAKn+5Q4SmnBjKHcVW+R8YuwWD0XHBcWxaYnL+ZUd1zexR4TMAocgTd
+         Yz43HFem30UdBWzyn+n3G4wdaohak0qLfU59EDp2ztj1ElDeKWsg0Vs2iqRyGTmq+P52
+         1mn/w8du8fplub4pIPjneffHSkFC3DThgCA+t4Zw2M6q5YtHeay4yI96KeViZqntPdWp
+         uYCllCXG9R0iqbHxyGf1eFgp2TNSOmg/Gh0x9hjdtmMNnYqismcnXWWW6wP1DEw6ej6t
+         YP4g==
+X-Forwarded-Encrypted: i=1; AJvYcCWu6Ngm0TWBlDgVVRN3WFGobAEEHHZb72N10nMMpTeWEniryvxS6X3HYqnBdmBXtvkJed6EUP8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy68VLi/b6KR4XOPqjLqlm0v8gmKXxDWW9J1TBgoibxhRSV1QD+
+	clGN1W/o0TQzTXa8Am2eeRt0wxQQjVFMs7ENC/Cmx7c20X1JzBWcUp6qL8AwVWvufrp5lPMnB4U
+	rg3YyTT+x6StkjBAz/5ebp11WP9NOaw4pCIHNg3QiGsYDpkLdD0LYhqNB0g==
+X-Gm-Gg: ATEYQzwNC+AAxMbwy4cB1aaEFjU8S+SKB/9cjht1KlTDSzGTECN38nwnOUGH6aCHcdZ
+	q/CpbsiAj5eszIwM1evVlZw2dL1b2xAMHjQl4RitBiXsxpSSncV8/Qh93ckGZNo5h+X6W0ikoCh
+	Jqztfz9k5VOXQizmJ/p0MXK5I/NgN7yBsnMDYDdNueMWFyBMWvmnfoJ+vzNsz9Pbyshs1I9Ax8M
+	KKQqGazUWualqpycKGFUsdQ5s5qBncHdd/gmQVRuieBD5yw/bl8bKcEAj8xxpYwlST5xYABkUFr
+	1eEJKeH6GG0VuI7XnXX5kkqX7g+k4i8nggUKCTjUA6Vvg8cg6n42W0W4OZxRzQVnCQQrtFLhdJP
+	gXMMRSd/Qsl0VvzTRkPD7M4AvX7ibPjvMlb5BYvRoyC07oA==
+X-Received: by 2002:a05:6000:420c:b0:439:9812:35ea with SMTP id ffacd0b85a97d-439fdf347efmr31647537f8f.3.1773672420167;
+        Mon, 16 Mar 2026 07:47:00 -0700 (PDT)
+X-Received: by 2002:a05:6000:420c:b0:439:9812:35ea with SMTP id ffacd0b85a97d-439fdf347efmr31647475f8f.3.1773672419567;
+        Mon, 16 Mar 2026 07:46:59 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b41dd93c0sm10828039f8f.10.2026.03.16.07.46.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Mar 2026 07:46:58 -0700 (PDT)
+Date: Mon, 16 Mar 2026 10:46:55 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Zhud <zhud@hygon.cn>
+Cc: "jasowang@redhat.com" <jasowang@redhat.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	"eperezma@redhat.com" <eperezma@redhat.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"willemb@google.com" <willemb@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	Jing Li <lijing@hygon.cn>, Zhiwei Ying <yingzhiwei@hygon.cn>
+Subject: Re: [PATCH net-next v2] virtio-net: enable NETIF_F_GRO_HW only if
+ GRO-related offloads are supported
+Message-ID: <20260316095919-mutt-send-email-mst@kernel.org>
+References: <20260316072152.910857-1-zhud@hygon.cn>
+ <20260316051327-mutt-send-email-mst@kernel.org>
+ <607818aba89a44d88afa213f39611451@hygon.cn>
+ <20260316063139-mutt-send-email-mst@kernel.org>
+ <a82cd6088e554fe1bb3daa6ad3df18dc@hygon.cn>
+ <20260316092707-mutt-send-email-mst@kernel.org>
+ <4e3ce2d6120545719a286d3daafbef38@hygon.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4e3ce2d6120545719a286d3daafbef38@hygon.cn>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268179-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268180-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,pengutronix.de:email]
-X-Rspamd-Queue-Id: 6A4FD29B9AE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hygon.cn:email]
+X-Rspamd-Queue-Id: DC38129BD48
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello Carlo,
+On Mon, Mar 16, 2026 at 01:57:22PM +0000, Zhud wrote:
+>  > On Mon, Mar 16, 2026 at 12:57:00PM +0000, Zhud wrote:
+> > > > On Mon, Mar 16, 2026 at 10:18:04AM +0000, Zhud wrote:
+> > > > > > Thanks! Yes something to improve:
+> > > > > >
+> > > > > > On Mon, Mar 16, 2026 at 03:21:52PM +0800, Di Zhu wrote:
+> > > > > > > Although VIRTIO_NET_F_CTRL_GUEST_OFFLOADS is negotiated, which
+> > > > > > > indicates the device supports dynamic control of guest
+> > > > > > > offloads, it does not necessarily mean the device supports
+> > > > > > > specific hardware GRO
+> > > > features.
+> > > > > > >
+> > > > > > > If none of the features defined in GUEST_OFFLOAD_GRO_HW_MASK
+> > > > > > > (such as TSO4, TSO6, or UFO) are present in
+> > > > > > > vi->guest_offloads_capable, the device effectively lacks the hardware
+> > capability to perform GRO.
+> > > > > >
+> > > > > > So what is the user-visible problem this is trying to address?
+> > > > >
+> > > > > A key concern is that once a user enables NETIF_F_GRO_HW via
+> > > > > ethtool, they might manually disable software GRO (ethtool -K eth0
+> > > > > gro off) assuming the hardware is now handling the aggregation.
+> > > >
+> > > > Thanks!
+> > > > Sorry could you be even more specific please?
+> > > > Is this a theoretical concern or did some users encounter this?
+> > > > Note that NETIF_F_GRO_HW is best effort anyway: e.g.
+> > > > it can apply only to TCPv6 and v4 will still need software.
+> > >
+> > > This might not be the best example, but I want to draw an analogy to
+> > > show how this hardware offload capability can be misleading. For
+> > > instance, if I enable GRO_HW expecting to see lower CPU usage when
+> > > receiving packets, but it doesn't happen, that would be very confusing.
+> > 
+> > It still can happen if hardware does not offload the specific traffic, yes?
+> 
+> Yes, of course, but there's still a difference between "best-effort" and "no-effort." Right?
 
-On Sun, 15 Mar 2026 17:58:05 +0100
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+I am not saying this does not improve the user experience.
+But let us set the expectations correctly.
 
-> Hi Carlo,
+What this does (I think):
 
-Nice to see you trying upstreaming the PSE LED work.
-=20
-> On Sun, Mar 15, 2026 at 12:59:16AM +0100, Carlo Szelinsky wrote:
-> > Add LED trigger registration and polling into the PSE core subsystem.
-> > Per-PI "delivering" and "enabled" triggers are registered for each PSE
-> > controller, with a configurable poll interval via the DT property
-> > "led-poll-interval-ms". =20
->=20
-> Nice work. However, this needs an architectural shift.
->=20
-> Since the hardware lacks interrupts, we need a core polling mechanism.
-> However, the PSE core already has an event notification framework. The
-> new polling should integrate with it instead of being LED-specific.
->=20
-> Please consider this approach:
->=20
-> - Add a generic polling loop in the PSE core. It should simulate the IRQ
->   handler pse_isr() by detecting state changes and pushing standard
->   events into the existing ntf_fifo to be processed by
->   pse_send_ntf_worker()
+	When a virtio device does not have either GUEST_TSO6 or
+	GUEST_TSO4 offloads, this means it can't really do
+	hardware GRO.
 
-Careful with pse_isr() there is a tricky case between software and hardware
-managed power control. And the irq support was mainly designed to support t=
-he
-software managed power control case.
+	however, the driver will set NETIF_F_GRO_HW whenever
+	the device allows control over offload support - even
+	if the offloads that can be controlled have nothing
+	to do with GRO.
 
-Adding a generic polling loop should be indeed similar to what happen in the
-interrupt process. This mean we need a polling_handler to report the events
-from the driver similarly to the irq one:
-https://elixir.bootlin.com/linux/v6.19.6/source/drivers/net/pse-pd/tps23881=
-.c#L1348
-And either modify the devm_pse_irq_helper() supporting the case when the ir=
-q is
-null or adding a new devm_pse_poll_helper() helper. So either the core deci=
-de
-to use polling instead of irq either this choice comes from the driver.
+	As a result, in such a setup, rx-gro-hw reported for the device
+	is too optimistic.  Improve the situation by masking off
+	NETIF_F_GRO_HW.
 
-We have two cases, interrupt not supported by the controller or interrupt
-supported but not wired and the polling case should comply with both.
 
-Note: You may also need to modify pse_pw_d_is_sw_pw_control() accordingly.
+	Out of abundance of caution, this does not change the
+	current behaviour for hardware with just v6 or just v4 GRO:
+	current interfaces do not allow
+	distinguishing between v6/v4 GRO, so we can't expose
+	them to userspace precisely.
 
-> - Do not poll inside the LED code. The core state tracker should trigger
->   LED events as a reaction to state changes.
+Also:
+> Fixes: a02e8964eaf9 ("virtio-net: ethtool configurable LRO")
 
-+1
+are you sure it's right?
 
-> - Please add a define for the default polling interval. Include a
->   comment explaining why this specific value is chosen.
 
-+1
+> > 
+> > > > > Secondly, while we haven't encountered a specific hardware failure
+> > > > > yet, enabling a hardware offload feature that the DPU does not
+> > > > > physically support introduces the risk of undefined hardware
+> > > > > behavior
+> > > >
+> > > > This would be a major concern but I don't get it - how would one trigger this?
+> > > > It seems that guest_offloads_capable only includes offloads actually supported.
+> > >
+> > > You're absolutely right. Upon rechecking the code,
+> > > virtnet_set_features already ensures that only bits within
+> > vi->guest_offloads_capable are sent to the device.
+> > > Thank you for pointing that out.
+> > >
+> > > > > > >
+> > > > > > > So, making NETIF_F_GRO_HW conditional on these feature bits
+> > > > > > > ensures the stack does not enable an unsupported hardware
+> > > > > > > offload
+> > > > configuration.
+> > > > > >
+> > > > > > I guess the assumption is that without this, something enables
+> > > > > > such a config? Which stack is this and what happens then?
+> > > > > >
+> > > > >
+> > > > > Sorry for the confusion, let me clarify the intent.
+> > > > > The 'stack' here refers to the ethtool interface and the netset (ioctl/netlink)
+> > path.
+> > > >
+> > > >
+> > > > A bit more detail about the specific set of commands that leads to
+> > > > confusion in the commit log would be helpful.
+> > >
+> > > > Thanks!
+> > > >
+> > > > > >
+> > > > > > > Fixes: a02e8964eaf9 ("virtio-net: ethtool configurable LRO")
+> > > > > > > Signed-off-by: Di Zhu <zhud@hygon.cn>
+> > > > > >
+> > > > > > judging by this, has something to do with LRO?
+> > > > > >
+> > > > > > > ---
+> > > > > > > /* v2 */
+> > > > > > >   -make the modified logic clearer
+> > > > > > > ---
+> > > > > > >  drivers/net/virtio_net.c | 6 ++++--
+> > > > > > >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/drivers/net/virtio_net.c
+> > > > > > > b/drivers/net/virtio_net.c index
+> > > > > > > 72d6a9c6a5a2..b233c99925e9 100644
+> > > > > > > --- a/drivers/net/virtio_net.c
+> > > > > > > +++ b/drivers/net/virtio_net.c
+> > > > > > > @@ -6781,8 +6781,6 @@ static int virtnet_probe(struct virtio_device
+> > *vdev)
+> > > > > > >  	if (virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_TSO4) ||
+> > > > > > >  	    virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_TSO6))
+> > > > > > >  		dev->features |= NETIF_F_GRO_HW;
+> > > > > > > -	if (virtio_has_feature(vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS))
+> > > > > > > -		dev->hw_features |= NETIF_F_GRO_HW;
+> > > > > > >
+> > > > > > >  	dev->vlan_features = dev->features;
+> > > > > > >  	dev->xdp_features = NETDEV_XDP_ACT_BASIC |
+> > > > > > NETDEV_XDP_ACT_REDIRECT |
+> > > > > > > @@ -7058,6 +7056,10 @@ static int virtnet_probe(struct virtio_device
+> > *vdev)
+> > > > > > >  	}
+> > > > > > >  	vi->guest_offloads_capable = vi->guest_offloads;
+> > > > > > >
+> > > > > > > +	if (virtio_has_feature(vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS)
+> > &&
+> > > > > > > +	    (vi->guest_offloads_capable &
+> > GUEST_OFFLOAD_GRO_HW_MASK))
+> > > > > > > +		dev->hw_features |= NETIF_F_GRO_HW;
+> > > > > > > +
+> > > > > > >  	rtnl_unlock();
+> > > > > > >
+> > > > > > >  	err = virtnet_cpu_notif_add(vi);
+> > > > > > > --
+> > > > > > > 2.34.1
+> > > > > > >
+> > > > > >
+> > > > >
+> > > >
+> > >
+> > 
+> 
 
-> @K=C3=B6ry, How should we decide when to enable polling?  Should we check=
- if
-> no IRQ is registered? Or add a flag if the controller lacks IRQ support?
-
-Replied above.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
