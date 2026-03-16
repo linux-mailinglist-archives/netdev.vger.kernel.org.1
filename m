@@ -1,172 +1,168 @@
-Return-Path: <netdev+bounces-268247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268248-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +EveI1FKuGlTbgEAu9opvQ
-	(envelope-from <netdev+bounces-268247-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:22:09 +0100
+	id yJZ8LmtLuGlTbgEAu9opvQ
+	(envelope-from <netdev+bounces-268248-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:26:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A622429EF8C
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:22:08 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C79E29F037
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:26:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D32143050A29
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:21:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 32B7B302FB29
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C8B3DA7C4;
-	Mon, 16 Mar 2026 18:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D8F3DC4D1;
+	Mon, 16 Mar 2026 18:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VgxaMzVl"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="EPyIZ9B9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084C73DA5CA
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 18:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773685276; cv=pass; b=VHyzyvnUlZU4lcpvQR7ZE8cmZROhYeSz2IAYYU/N5jxqhMEcHqMpvMBG+mqjghC2sW+V9iOPpyT0hTY9k6ybNXJhQwGROG4OYrlpwH28t6VaIjR5uzoaPN4UZVrqWd55Bd5bXEBZhlzP+0p4T+8AMLebxwzlaOYI2e4Zd80p0/4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773685276; c=relaxed/simple;
-	bh=1WGZaRegkTbu0RNsDZ9nemDUYNIx1H8x+OQUag52hqY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kYu4W9L56Qd2yaLrJtjSom3i2pqEs3Z6o6p161v3VeVYALu6w9YZwkvcqpFbM01Vz4ysxyNuULo1LQbeuRRyi2VA9/yfIWQNyERw6B3vWvCTSme0G33XHE1La0GzkAPJPJbNVmrgHc6zyfNxPAMAPomo96U4ESW+vGI/cBMPeiI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VgxaMzVl; arc=pass smtp.client-ip=209.85.161.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-67baea690b3so657087eaf.3
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 11:21:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773685265; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AOKXPUHM6nSA8GEoJtw7oRCA0AvLiQkJJOJeZGkudd2jkBs7//kYTjJpgvIVK4p9/b
-         y2pCrIxNGXGSQWSETFxfrkqO4Hu+0kdKM+m16Aq7/2VOvEmM8W1F4RoF1/7cSC8TtbtG
-         2xrLqCXiILif3lSrUXfGgsipAOW60ugQXFJNEtyITgOjr6GT+l7qkfsBah+hAyD9AG9j
-         YNiuPqKEkctt62jYA9CxvmpB4/9cev0RAUA2Ej+ueLasXGPFUA5ANECeM1b4i1CB3Kzk
-         OmUyombPFD00oQnhPPk//QAb4Y3QaBHw5lYmXi+WHBw+GzXXHju4jO1p422BtZCQqGiB
-         THuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=yrRqGFR7LSpD3RcUmAhH7YzL19Oke7FUmWQwnuf/vmo=;
-        fh=m+MlybpBgAvXRatjRUI4/rwZ0BxaHes2eWqCG1qWzds=;
-        b=N/xKRsq28cXIMC+f7/zTNawiRPLAJdtwN5QOPnIAp0MTouV4icbRDNxxttUaRbX5Kf
-         qdAxq+JAmS+9JsxzAEpGE8UnH8eI7V1L6YcFbIOwcPjED314aBHUnUCyKcSO6DK8QAmV
-         ysTyfaClaB91NUjd/tu6MdhS8LQzUFzwVeOU1Nd4OM7oO3frRwvk7sTBLoW+uaam5aIF
-         l+/lyY/O/DoqluNFLT0cOtc6XuMyvSJISx627RP17nlqD1jqFgy6VnMi2Ip1gM3PGrlE
-         uJUSVrKiYm9QoNb7NhaUmnEYnvVRIh+ts2yJE0R3fuCna1h2xFP2/KNma3uhEo95vcZ9
-         adrA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773685265; x=1774290065; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yrRqGFR7LSpD3RcUmAhH7YzL19Oke7FUmWQwnuf/vmo=;
-        b=VgxaMzVljNeDei9cy80ktZaIxif82GlLAzAXHqIKsN3pTjORSXf1GblEfulB91B7+V
-         bhUsDV1v6ETZuON+OM2NW/xSm9stHSxCL11EiIFhDabEP+ia78oYoHRyBEQZGlkgmxje
-         DcLzqmktglXOhfRuXS71pCdzoazLcJXetL0MDF+o2mG5ClU3aVcmvo2SbXlN4wQ+2/lY
-         s5UTZQk1Fddp1apaCICI6aKFT4KwlNfICKyeaKtndnYDqS7C6YTfHO+PKF3C4P4xOm+2
-         nZzkH2ojc02mdQWEmuDOgq6XiDx2ItLuuaT6H/JIxyER9QVkIUp3U9WwBNW3s0Duzyhm
-         azNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773685265; x=1774290065;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yrRqGFR7LSpD3RcUmAhH7YzL19Oke7FUmWQwnuf/vmo=;
-        b=oUF8ykmXAfuWdGqVT5MpmMnH5hYN7fff9NLXdvCFCMZeVeVIzBKkaLZbQhaAFQ95O/
-         JxN9LZlhfd2b6IBQIApPjGObjyEcaM9jx9cuqyV6GGijgRl0e9kIZZvFl1LImpUpE8b7
-         dAzgbYMyYNvUVyHFLu2cMvlxXbKk1rdWW/wQaDbkeOID5ehOdhzKUj4zdpIsD86hs3+Z
-         62P/bKryFKN+SnUinR9xnejNQZ/87DY43iDqa3PqT5nSn3vQZq6ywuY3F+QG67J0JEPK
-         +fLcKiW/Ityc4XzrYXE6VV6iFi7MkUsHfa2OIN8U6jzny14Hf2ojUmaZHgeyy1PQURKS
-         7WTw==
-X-Gm-Message-State: AOJu0YzN+I2ygWuukSsKJ71wveAClIn8z475zYgzg5mJwdBA+O/fBWuy
-	OjjEnZ4gZNaKC0Z8Jqs5Q0DCTSjit5UkO1UgA0f6sJxJKQP4mXEWvKZqvaGVM397o5A6ZXS8DTE
-	Nh5GHtjzYhuk8Ehfukl4hN+r6e5xF82U=
-X-Gm-Gg: ATEYQzybiyfCHPmJt3IvrFubsYF0fyzbOoWRjmd4WEEX+WJuS54fgX8IK6bWcDaPaWP
-	gxBdsuleIBQUwyGtcp1Vn/1Js83VyAocYVpdL7Ni6DvSsVOl/5QPRw0/27xKYM9F9tek2P1C/Kl
-	xQhZC+qcxirb7XGvVp5BjkthudpqnfP9yQOxXfPQ/R2757viSFMVvEcDFLPAOltnnVU6HsadD26
-	AB3fa42ztzygjiLsxorJb60tBHn9qRb3MoWCYeLV5tQD7d9JX1wG//C/a4hf0DhI0Yq1o1hs8fm
-	H7y29KM41Y7DbaHgLNebjpo=
-X-Received: by 2002:a05:6820:4df7:b0:67b:d8ff:1ac7 with SMTP id
- 006d021491bc7-67bda97c830mr6666894eaf.1.1773685264651; Mon, 16 Mar 2026
- 11:21:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE31E3DB629;
+	Mon, 16 Mar 2026 18:26:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773685598; cv=none; b=kYZKTSv44pNW1TBBUjq8UsGZ88q5UeWGm56WeroO2LNBv5LzB1ldkPVDx2abjxXkbfHOAkI2Qip0aSKRa25X5jfxyVuP1G7wm0X7DSl8ZLUzMtEiU2NyOaKFj2Ncii9DyoFH2E8g5X3P74YKsAOqwhqyvSKQ4mQMr7LmsREaF2w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773685598; c=relaxed/simple;
+	bh=apYbyYOui1rckZizxTSjd9acpbvjHeFKs0eEOgcSTFA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ljEUe1SmVcYCn85n4nDOySw89xegIhPiMDq8+f9kvSx2AR3DCwbQL/cwGyYjw9ozLxDaYqJjzOPJyTOC9hupoqHfmzp+eSyouw9UpIHTx+8l/2vrWb3CwWoyYB8Tk0E1fRQOG4SQnRcWQH3NgGQ0noFVGizs/urLTh8um3ORoq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=EPyIZ9B9; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1773685591; x=1805221591;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=apYbyYOui1rckZizxTSjd9acpbvjHeFKs0eEOgcSTFA=;
+  b=EPyIZ9B9jZAOBvnv7Olkb7e9hjF/dJy+8/i87l9oOQjDGHfr2M4Y4YaQ
+   wHBN2+E6mDX2OMKTTcKJ0r57VJVphhdTdkpONxZgs6XedkPEmEnXsoIT0
+   UuNyYZjGiwSmAowO7RQy7D4t+RcBf0VV7IvhDRGe4WZGmmvpIuT+UZSTB
+   aXhX1SkEfjmBX+OdPIeP11Lg0Vg9D2R8kUN/7WN7wpLcABSgkiyCpoyqY
+   OgbaRGjD7mkIVoFianBEYGGMFzg758Da/8XFFXjOTxoRGdywAo1SwRFS9
+   JMhJJD94AD2vyqLD8wVJKXYdUSRsYRkF9TRINwmD1f4d2pEaC4QmvhcgG
+   Q==;
+X-CSE-ConnectionGUID: pXnfX7B6TmWvfChuAYU54Q==
+X-CSE-MsgGUID: +XnZOguVSHOT87prE55n1Q==
+X-IronPort-AV: E=Sophos;i="6.23,124,1770620400"; 
+   d="scan'208";a="55155074"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Mar 2026 11:26:29 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Mon, 16 Mar 2026 11:26:08 -0700
+Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58 via Frontend Transport; Mon, 16 Mar 2026 11:26:05 -0700
+Date: Mon, 16 Mar 2026 11:26:03 -0700
+From: Charles Perry <charles.perry@microchip.com>
+To: =?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
+CC: Charles Perry <charles.perry@microchip.com>, <netdev@vger.kernel.org>,
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Nicolas Ferre <nicolas.ferre@microchip.com>, "Claudiu
+ Beznea" <claudiu.beznea@tuxon.dev>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 2/3] net: macb: add safeguards for jumbo
+ frame larger than 10240
+Message-ID: <abhLO8fna/ioyd6O@bby-cbu-swbuild03.eng.microchip.com>
+References: <20260313140610.3681752-1-charles.perry@microchip.com>
+ <20260313140610.3681752-3-charles.perry@microchip.com>
+ <DH4DORKIV5RB.3P7Z2RTRNCXH7@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260313182804.696100-1-weibunny.kernel@gmail.com>
- <20260313182804.696100-4-weibunny.kernel@gmail.com> <258780b6-f0d1-4a96-87a8-f26cd4fe595d@gmail.com>
-In-Reply-To: <258780b6-f0d1-4a96-87a8-f26cd4fe595d@gmail.com>
-From: Wei Wang <weibunny.kernel@gmail.com>
-Date: Mon, 16 Mar 2026 11:20:53 -0700
-X-Gm-Features: AaiRm53X23O5KZet3VNvz5WWmBK5macK_KZv_M_Tg09AkLEEwR4dEggMtUIl-M4
-Message-ID: <CAGqc4nVUXqp_GOaE9SEpZC9XrXGvr6Q6GMdaK_9QVj=9Djbc9g@mail.gmail.com>
-Subject: Re: [PATCH v5 net-next 3/5] psp: add a new netdev event for dev unregister
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Wei <dw@davidwei.uk>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Wei Wang <weibunny@fb.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DH4DORKIV5RB.3P7Z2RTRNCXH7@bootlin.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268247-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,fb.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268248-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: A622429EF8C
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,bootlin.com:url]
+X-Rspamd-Queue-Id: 9C79E29F037
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 16, 2026 at 8:58=E2=80=AFAM Daniel Zahka <daniel.zahka@gmail.co=
-m> wrote:
->
->
->
-> On 3/13/26 2:28 PM, Wei Wang wrote:
-> > +
-> > +static void __exit psp_exit(void)
-> > +{
-> > +     genl_unregister_family(&psp_nl_family);
-> > +     if (psp_notifier_registered)
-> > +             unregister_netdevice_notifier(&psp_netdev_notifier);
-> > +}
-> > +
-> >   subsys_initcall(psp_init);
-> > +module_exit(psp_exit);
->
-> INET_PSP is a bool Kconfig option, so psp_exit() is dead code.
+On Mon, Mar 16, 2026 at 06:21:38PM +0100, Théo Lebrun wrote:
+> Hello Charles,
+> 
+> On Fri Mar 13, 2026 at 3:06 PM CET, Charles Perry wrote:
+> > The RX buffers for GEM can have a maximum size of 16320 bytes
+> > (0xff in the RXBS field of the DMACFG register means 255*64 =
+> > 16320 bytes).
+> >
+> > The GEM IP has configurable maximum jumbo frame length that can go up to
+> > 16383. The actual value for this limit can be found in the
+> >        "jumbo_max_length" field (bits 0..13) of the DCFG2 register.
+> > Currently, the macb driver doesn't use the DCFG2 register when
+> > determining the max MTU, instead an hardcoded value (jumbo_max_len in
+> > struct macb_config) is used for each platform. Right now the maximum
+> > value for jumbo_max_len is 10240 (0x2800).
+> 
+> If DCFG2 contains the value then we can runtime detect it. With that, we
+> could make the macb_config->jumbo_max_len attribute optional. Then
+> start dropping it from platforms where we know we can trust the DCFG2
+> value.
+> 
 
-Oh good point. Let me remove this. I will just not take the unregister
-action given it is only registered upon first assoc-dev operation. Let
-me know if you think otherwise.
+Hello Théo,
+
+That would be a good idea. We could use "jumbo_max_len == 0" as a way to
+signal that the DCFG2 register should be used for determining the max MTU.
+
+However, that's a new feature and it doesn't belong in this patch. All I
+want to do in this patchset is put the real value of jumbo_max_length in
+the PIC64-HPSC macb_config and make sure the driver doesn't overflow when
+that's used.
+
+Thanks,
+Charles
+
+> An alternative would be to validate macb_config->jumbo_max_len against
+> the DCFG2 value, but that is less useful.
+> 
+> Thanks,
+> 
+> --
+> Théo Lebrun, Bootlin
+> Embedded Linux and Kernel engineering
+> https://bootlin.com
+> 
 
