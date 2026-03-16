@@ -1,51 +1,103 @@
-Return-Path: <netdev+bounces-268118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268119-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0IdsIofit2mzWwEAu9opvQ
-	(envelope-from <netdev+bounces-268118-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:59:19 +0100
+	id +PHOKM3kt2mzWwEAu9opvQ
+	(envelope-from <netdev+bounces-268119-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 12:09:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24C1A2985CF
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:59:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ED9A2987D8
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 12:09:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8287B3006535
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 10:58:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C12E73055E63
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03FC38E5D1;
-	Mon, 16 Mar 2026 10:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9FC273816;
+	Mon, 16 Mar 2026 11:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OpavZOSX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICET6ahO";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="QtAnVNWo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5075CDF1;
-	Mon, 16 Mar 2026 10:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAEBD225403
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 11:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773658690; cv=none; b=BFPKb3QsjmiERNFkew2l+i+mpqo5vxwNYml1DIbNLKNr9qiI2SJBicih2KZXxigVmQy3bBLMzvbNdYZEw5IPUrMN1V8OFWv64YMT1hsPQMHljL8IJknzzvwMT1suQYWzhi9ZkkU31eDCMB/1SkAeeStuZGN/pBLR2+Nx5hQnVKA=
+	t=1773659054; cv=none; b=fxY+p+RmGr8F184fFzfYFADt8D/G+9eppDyU+RsGIrFAuWTVA2JTvXuFPrQ5TVSsp9SBPM3w+5sNzvze0HAR9m5Et/OO8GOgeL4in9PtHIRHv5UGy/GRsKNRkRFjKPNYqQCv+w2FZMIYQh5REawa+wgEFGTtm0vBtP/h5NOrtpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773658690; c=relaxed/simple;
-	bh=Ol5g0tfyPP2c5CQQGMl3FEu3vNrwbd/8i1lOYncDEpU=;
+	s=arc-20240116; t=1773659054; c=relaxed/simple;
+	bh=1Z2K5uAxzV9s8L4/BC8KNuwonWVfjkCKvcQHutx8mBU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bO4JNHubo7xab0T3NbJv6JBIHi5xCs64UzAwTWxcVHbDV3tyrjFjGOgFwecWefBsH7c1CBuQGVkdSjlE2UnCx3tuX4G4M94NnKRFsyM3BMkCHaKn1HdVkknBzqboNwiBkb+QcSfDDtV8JW90WzmY7vXN5Cw6hoM500AQy1apAOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OpavZOSX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B253C19421;
-	Mon, 16 Mar 2026 10:58:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773658690;
-	bh=Ol5g0tfyPP2c5CQQGMl3FEu3vNrwbd/8i1lOYncDEpU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OpavZOSXWVWEfiU6dgCjK2I20j9rTRZl5FQTqkYLHelxOD+PMT25IWPKr7uSu3Or5
-	 Qjn0IFyytKaXmd39683rTWt3xvzfx4rQ7eVvQGNXvp9FpFeH83I/FhH4gbwSLdk8+W
-	 RHJeJxew6toDNaGLRWh9LTTW2nT0/GpenPFI8TFEChN8Bkp/ZIT3OyqaEoKUEiJdRl
-	 tV7XsO/OJ2pzhLUVSsi9AQjpZVEPM//uq3pXWcFqJsDJDPGvJE0tiPhrwiI2SB+jv6
-	 cDZD3H46uQ65FL9jFzMc53hvauBg8NF1DOfbJIgyTTYeKJB9SiLnEmiMHRUGhhANGY
-	 NavxKe34Y5ptA==
-Message-ID: <e1f861be-51e8-4d58-ab70-2395bb433291@kernel.org>
-Date: Mon, 16 Mar 2026 11:58:06 +0100
+	 In-Reply-To:Content-Type; b=u5H/dUiqG8MQk41Yn8KlVL4qw2hMu/og+jCAhI/fDGfoHgNGwWx/OmKyRThSsYWMk2nwg7ASDpAQFJfGzsSt+qcaJHHUgI1YIzVUwNDKSCYbTFUoOZVag3A/nCYYcfZw3nWOQ2ZsYEKGCfKkvDbyouolALB8Sr18qJZLoUac138=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICET6ahO; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QtAnVNWo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773659051;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EGzcfaMu1FLaomn7Oe2DL0qLnEzAPj3x2+LI9gIhWi0=;
+	b=ICET6ahOcEmeSuifDilNtqfn6IujVNVMITSg+N695hw1weOf/TEE9NR+TROs2JM8Cu8WyD
+	4RvKYifVMRb3P80EWCBsRXMRegfvwx5SWgy2H3jwY828vKQ//la3PmWgJus+I2rSKa5ziO
+	WH5BvuHC4Pb1QQ9XdxyWwIG0tawGIVI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-133-1R0JRykzPE6a3IjUyt9Kdw-1; Mon, 16 Mar 2026 07:04:10 -0400
+X-MC-Unique: 1R0JRykzPE6a3IjUyt9Kdw-1
+X-Mimecast-MFC-AGG-ID: 1R0JRykzPE6a3IjUyt9Kdw_1773659049
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-43b3e6eb998so1113662f8f.3
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 04:04:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1773659049; x=1774263849; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EGzcfaMu1FLaomn7Oe2DL0qLnEzAPj3x2+LI9gIhWi0=;
+        b=QtAnVNWo8RDAYP2tynSJuh1yaXc/I/KwuthId2CwkLuKRJ2Ky7ltkEerd2MdzITida
+         L0tpSUOcrNABSep9Av9XKMsdGm24g4HXTRpeLv+aXS0vgIIiyfWTr+LpDxVK8qKNrb2e
+         VkqUzEmlKoU6Tb1LiwOlxg2ctSE4SmWYO428jIcQsfpY9O5Q2REAlxsXpzZASD9INOZs
+         I4gWwuIW6q2MBl2ybkZZHqQ2tOSmKjkBQyI0ld+L5YB8B15AzmAagP0GlK69bKLh/ocI
+         EmGF57lM8e1L/Ww5Ja58yVJiBkt1+N1Q78Zmtb6Z6SGsuaCceIDHKZwr/CN8j12p0P3x
+         oXpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773659049; x=1774263849;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EGzcfaMu1FLaomn7Oe2DL0qLnEzAPj3x2+LI9gIhWi0=;
+        b=mvmmRoRp40Bs2hBuajosHH68Ljk/qKm/UhQ/ege9d+6U5h9bJgmxtk+rBSyIOCB1LD
+         kHzdJeTOPZMqHaws4DLyfHWVbzp0sCcJhpHSld1gZNUDtS8QH8cUzs0qarZU5VULt+tu
+         R8ikYralaRwm7ZZQxtx0Ye1xNtObFLOIqWbRkJvRjJZ2THeYrhKO8BeiFbPkv5TxKQFi
+         acph0Y/94QjJ7Aj8UofAAaz80s9s2n8Ix8I+BS7A+aZzqD5DORjoDX/gFgQ3Fl5bBzUP
+         jjjCWxl/LcKStpgPzA2FjLIVu5jP6PliOZs/La12aG5DEkyZfkEkjeGTox+9mryzs/yD
+         9tTA==
+X-Forwarded-Encrypted: i=1; AJvYcCVY/MXV60x1A8ec6dfBFSDgItHXBC8eqxB7yj3+TLTZb4xeszKattYxkwJONrdpDFyI2pKObG4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0d9Xnh8gXz2fZZ0MTgRIu7LCOemfAldssfBGjovfuK/Abaou4
+	Qs0ZupJNCie5xmWH8xzyhi4fPGbsoyKs/4P0fDPAm0xP5H8a6IU6rgrWsKqNRDLn6ykczK/3xni
+	uh2ogVtvnjtegHJ9r8hrYf5nAa7LH7R7CfKOpPFqualeBTVRZNIh1xlALBg==
+X-Gm-Gg: ATEYQzz472hUta6oZVf4VNAv212wpCZMBOxiF5S7z13kaW80lwc21aqQ7u5c7yde89p
+	x2I9N1mNvp1Acw/xlsKyAKYeDuDgrLnTpocaiTWakfPS3W0ELXWI9FbfoF81yiVGNbyuMsKxUWd
+	nl3sEgw13PR9+Drw6yqAh42al4lsDgfyfxahSaPxiPSx16WT8Fu6s6GnjBN6GcxHsnFz+Pp3bqi
+	oStbGIl6s8mv9RCnOabPoEKpxOw4F1dVffka9BVnJfMxXCCsMbAT+3sRKLKacUZWVm4kLOrUDIS
+	nLwHW5ciE2rDw7ZF2V9L1oDVrp2M9mptddPk7FmXVuikW456V7gEhAW+9+RELSHD64UHjP2hBRY
+	IGUtPv9m39LQ8ijUP7N4L+PCodfzT6A6LTpbw44Ax2JgAyWUGiv+UYXU=
+X-Received: by 2002:a05:6000:2901:b0:439:b3d2:376b with SMTP id ffacd0b85a97d-43a04d86856mr21339352f8f.14.1773659049144;
+        Mon, 16 Mar 2026 04:04:09 -0700 (PDT)
+X-Received: by 2002:a05:6000:2901:b0:439:b3d2:376b with SMTP id ffacd0b85a97d-43a04d86856mr21339273f8f.14.1773659048589;
+        Mon, 16 Mar 2026 04:04:08 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.95])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe19aec5sm41595197f8f.4.2026.03.16.04.04.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Mar 2026 04:04:08 -0700 (PDT)
+Message-ID: <442cfa35-78b1-48f4-9565-e884e7e60d79@redhat.com>
+Date: Mon, 16 Mar 2026 12:04:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,127 +105,149 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/10 net-next] Convert CONFIG_IPV6 to built-in and remove
- stubs
-To: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>,
- Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org
-References: <20260309022013.5199-1-fmancera@suse.de>
- <48ccec3f-dbc8-45c8-afda-e4f7e8f150d6@kernel.org>
- <cd87ed46-b774-4896-b25e-4806eec9e0b3@suse.de>
- <6c005900-3461-4e3c-a396-b2984735af9b@kernel.org>
- <51102620-fb8a-467e-9144-786d1fe27e31@iogearbox.net>
- <4e3cd289-2b7a-4f64-99f6-05eb9d67c0fc@kernel.org>
- <c28d7cba-3805-4e6d-8051-d12e923c1973@lucifer.local>
- <a1dc7907-39a0-4417-8589-c48a4a7cc839@kernel.org>
- <7a5a442e-aa0d-4d01-b27c-c4479d53df06@lucifer.local>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net-next v2 05/14] tcp: grow rcvbuf to back scaled-window
+ quantization slack
+To: atwellwea@gmail.com, netdev@vger.kernel.org, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, ncardwell@google.com
+Cc: linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, mptcp@lists.linux.dev,
+ dsahern@kernel.org, horms@kernel.org, kuniyu@google.com,
+ andrew+netdev@lunn.ch, willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+ skhan@linuxfoundation.org, corbet@lwn.net, matttbe@kernel.org,
+ martineau@kernel.org, geliang@kernel.org, rostedt@goodmis.org,
+ mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 0x7f454c46@gmail.com
+References: <20260314201348.1786972-1-atwellwea@gmail.com>
+ <20260314201348.1786972-6-atwellwea@gmail.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <7a5a442e-aa0d-4d01-b27c-c4479d53df06@lucifer.local>
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260314201348.1786972-6-atwellwea@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268118-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org,davemloft.net,kernel.org,google.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,kernel.org,google.com,lunn.ch,gmail.com,redhat.com,linuxfoundation.org,lwn.net,goodmis.org,efficios.com];
+	TAGGED_FROM(0.00)[bounces-268119-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 24C1A2985CF
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[27]
+X-Rspamd-Queue-Id: 4ED9A2987D8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 16/03/2026 11:50, Lorenzo Stoakes (Oracle) wrote:
->>
->>>
->>> If I'm wrong and somehow Amiga isn't legacy in 2026, then SAY SO instead of
->>> giving an unnecessarily mean, dismissive and frankly embarassing response
->>> like the above.
->>
->> Calling something legacy in this thread is not really appropriate
->> because it is diminishing its important or requirements.
->>
->> Till we support given hardware, we are supposed to consider its
->> requirements. If you do not consider these requirements, then you do not
->> consider that hardware as worth being supported and this means you
->> should first propose patch to remove that hardware.
->>
->> If you do not want to care about that hardware, don't use arguments
->> "legacy" in discussions, but simply drop it. We do such with "legacy"
->> architectures.
+On 3/14/26 9:13 PM, atwellwea@gmail.com wrote:
+> From: Wesley Atwell <atwellwea@gmail.com>
 > 
-> Perhaps you could have replied with this instead of rudely making the
-> ludicrious claim that Amiga isn't legacy in 2026?
+> Teach TCP to grow sk_rcvbuf when scale rounding would otherwise expose
+> more sender-visible window than the current hard receive-memory backing
+> can cover.
+> 
+> The new helper keeps backlog and memory-pressure limits in the same
+> units as the rest of the receive path, while __tcp_select_window()
+> backs any rounding slack before advertising it.
+> 
+> Signed-off-by: Wesley Atwell <atwellwea@gmail.com>
+> ---
+>  include/net/tcp.h     | 12 ++++++++++++
+>  net/ipv4/tcp_input.c  | 36 ++++++++++++++++++++++++++++++++++--
+>  net/ipv4/tcp_output.c | 15 +++++++++++++--
+>  3 files changed, 59 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index fc22ab6b80d5..5b479ad44f89 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -397,6 +397,7 @@ int tcp_ioctl(struct sock *sk, int cmd, int *karg);
+>  enum skb_drop_reason tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb);
+>  void tcp_rcv_established(struct sock *sk, struct sk_buff *skb);
+>  void tcp_rcvbuf_grow(struct sock *sk, u32 newval);
+> +bool tcp_try_grow_rcvbuf(struct sock *sk, int needed);
+>  void tcp_rcv_space_adjust(struct sock *sk);
+>  int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp);
+>  void tcp_twsk_destructor(struct sock *sk);
+> @@ -1844,6 +1845,17 @@ static inline int tcp_rwnd_avail(const struct sock *sk)
+>  	return tcp_rmem_avail(sk) - READ_ONCE(sk->sk_backlog.len);
+>  }
+>  
+> +/* Passive children clone the listener's sk_socket until accept() grafts
+> + * their own struct socket, so only sockets that point back to themselves
+> + * should autotune receive-buffer backing.
+> + */
+> +static inline bool tcp_rcvbuf_grow_allowed(const struct sock *sk)
+> +{
+> +	struct socket *sock = READ_ONCE(sk->sk_socket);
+> +
+> +	return sock && READ_ONCE(sock->sk) == sk;
 
-Initial comment about "legacy" lacked any arguments why it is legacy,
-thus I don't see what is rude in response "Dunno what is legacy
-there..." except that it is not that helpful to understand the point.
-Just like the original comment wasn't helpful.
+This is executed under the sk socket lock, ONCE annotation not needed.
 
-Best regards,
-Krzysztof
+> +}
+> +
+>  /* Note: caller must be prepared to deal with negative returns */
+>  static inline int tcp_space(const struct sock *sk)
+>  {
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 352f814a4ff6..32256519a085 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -774,6 +774,38 @@ static void tcp_init_buffer_space(struct sock *sk)
+>  				    (u32)TCP_INIT_CWND * tp->advmss);
+>  }
+>  
+> +/* Try to grow sk_rcvbuf so the hard receive-memory limit covers @needed
+> + * bytes beyond sk_rmem_alloc while preserving sender-visible headroom
+> + * already consumed by sk_backlog.len.
+> + */
+> +bool tcp_try_grow_rcvbuf(struct sock *sk, int needed)
+> +{
+> +	struct net *net = sock_net(sk);
+> +	int backlog;
+> +	int rmem2;
+> +	int target;
+> +
+> +	needed = max(needed, 0);
+> +	backlog = READ_ONCE(sk->sk_backlog.len);
+> +	target = tcp_rmem_used(sk) + backlog + needed;
+> +
+> +	if (target <= READ_ONCE(sk->sk_rcvbuf))
+> +		return true;
+> +
+> +	rmem2 = READ_ONCE(net->ipv4.sysctl_tcp_rmem[2]);
+> +	if (READ_ONCE(sk->sk_rcvbuf) >= rmem2 ||
+> +	    (sk->sk_userlocks & SOCK_RCVBUF_LOCK) ||
+> +	    tcp_under_memory_pressure(sk) ||
+> +	    sk_memory_allocated(sk) >= sk_prot_mem_limits(sk, 0))
+> +		return false;
+> +
+> +	WRITE_ONCE(sk->sk_rcvbuf,
+> +		   min_t(int, rmem2,
+> +			 max_t(int, READ_ONCE(sk->sk_rcvbuf), target)));
+> +
+> +	return target <= READ_ONCE(sk->sk_rcvbuf);
+
+Same here, and more cases below.
+
+/P
+
 
