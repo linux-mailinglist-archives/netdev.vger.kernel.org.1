@@ -1,174 +1,166 @@
-Return-Path: <netdev+bounces-268206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268207-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KEI/Bh0xuGmvaAEAu9opvQ
-	(envelope-from <netdev+bounces-268206-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:34:37 +0100
+	id SKrPEPIwuGmvaAEAu9opvQ
+	(envelope-from <netdev+bounces-268207-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:33:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E6B429D763
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:34:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB89629D71E
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:33:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 670403079522
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 16:29:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0FDEB3013024
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 16:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87106339714;
-	Mon, 16 Mar 2026 16:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321C1355F3B;
+	Mon, 16 Mar 2026 16:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PB1aWblS"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="JTR70VLt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f103.google.com (mail-wr1-f103.google.com [209.85.221.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634FB324B1E;
-	Mon, 16 Mar 2026 16:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2BD3B5312
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 16:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.103
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773678555; cv=none; b=WDW6kNv+w2VxxmEEW2pZ0rhcgyzH4mRkrcUMnniGjjfc11YU8JMWySfUyCBimswTcMTcZujOx3r/92rNS+y9/8zUJr4ahZZIgju/2nau64plkPB5ElLDEflhh4YgyGCBFUi4YptZWnMj8HRGwJeTSQot6u96mlRpaE8bTCQ1Uhk=
+	t=1773678637; cv=none; b=VQgi2oeaMS8IdYEloxcfEBAMIgAa472qnOWGWG1LRqeFI0DyXOSwune3RQuHe1vVGL7xwveQDHED/1BJ4CCVX2zOXQwzhlo9Mb/A3jPJnvTKpahp9f4AQm5Kvz+SgbkOuXjbARSC/dfNbm4z/pC2kQoNhVQ/zkg7qyzBBpbvf+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773678555; c=relaxed/simple;
-	bh=Rmg15hCCHZS43GwzcGSrLfteJf12na0B9zF/Jtahl2c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FSx4NbxsIYh6N/Y2MXL/d7DmnDejWzaarl/p+NxmdV3t/qiJL7DDjoHkpBC3zAC2F7o2abFX18cyAJej5QIT4mKT/YipFqkoT2DMEozcfhvcRISLRL/z1Oo6SUbFclEPEfLuTyhCHqJ7trhWqZ3G+CoiWjw56pJ8CygTmX+XMIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PB1aWblS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17816C19421;
-	Mon, 16 Mar 2026 16:29:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773678555;
-	bh=Rmg15hCCHZS43GwzcGSrLfteJf12na0B9zF/Jtahl2c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PB1aWblS4HYzJ/IcBWxbCQJwvb3uZqn9Jfj8jz0mHZwPgWLd1wfB1x8fS8CCXA1MH
-	 RkI+161R7bIGQTeBOqOiWRuUFbpMaCN8t3JdsNabKLRH2i3qgYbXbZt4nJUV7FyN0h
-	 zmLKsLdTUQ7lzFrrPNclJ7cC7oBsiY5V5a811WHWe5m6OMSfY15IHrN6YdpwHFuF4v
-	 AN9uZzuqk08gHFsrVbmILccFcfLEN93pSjmw6mTXEq2FUZ0QStfuYOEEW3ZVDbFyoZ
-	 L31h+0yU2C/IWKDaok0aZs04rGYjIFG5zIz4VQeEtHkasPFyX5iokxWjmGgbi950C8
-	 u2+CGVzc4l3qA==
-Date: Mon, 16 Mar 2026 18:29:09 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Jiayuan Chen <jiayuan.chen@shopee.com>,
-	Jianzhou Zhao <luckd0g@163.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Mark Bloch <mbloch@nvidia.com>, Edward Srouji <edwards@nvidia.com>,
-	Or Har-Toov <ohartoov@nvidia.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Patrisious Haddad <phaddad@nvidia.com>,
-	Maher Sanalla <msanalla@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>, Kees Cook <kees@kernel.org>,
-	Jang Ingyu <ingyujang25@korea.ac.kr>,
-	Moni Shoua <monis@mellanox.com>, Doug Ledford <dledford@redhat.com>,
-	Christian Benvenuti <benve@cisco.com>,
-	Selvin Xavier <selvin.xavier@broadcom.com>,
-	Yuval Shaia <yuval.shaia@oracle.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v1] IB/core: Fix use-after-free of ipvlan phy_dev in
- ib_get_eth_speed
-Message-ID: <20260316162909.GG61385@unreal>
-References: <20260311100313.284589-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1773678637; c=relaxed/simple;
+	bh=fuUjAufc9frlAw1lUECQdQ0UVuzBVzySv83Nfpdvm/k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uEZdtNZ9oSNssUuY3IkRlLllbIwAyRDNaqWvlghSramDKMUTZd4cdxl+oLoWcqzm9K96ptV+NxtQz+eC/s9hBozdIG5L8zDxrHEQ0rs5Jws56eRtnENhk4zgm9s5DlXaS50bIbgxvbHBhDhJmjchPFWk6g6LR0V4qS5K1S6Vk4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=JTR70VLt; arc=none smtp.client-ip=209.85.221.103
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wr1-f103.google.com with SMTP id ffacd0b85a97d-439cd6b0aedso3811772f8f.1
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 09:30:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1773678634; x=1774283434; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5p3gsIxPQVOfXPfqPJJWIKHuD6O2URWJsyp0o2Rhwdg=;
+        b=JTR70VLtsI7Wqg3mW3whK4LGzumnSG7y3xifZXoBoAn9qIkhZpZHqMb2jr1b52cPdd
+         7vbjHH1IvJlnddJEAs7z/J6zvJUvjAK85SdO08DTj23n49arwVyzcwkSmSvHIMJ5lLOR
+         7bijtKg6eO8hfc1nnKwtTLLRlVgijBhmUDJLru4pvkX3or4+02sTkmVDZJFrxY1FoUkP
+         GFu6CAUcbqP4tJlwNAmpb6fa0V0k7LE3HOpLXWO1iTVeX+0ZMCIN4glr9jAISM7e8Rh3
+         5Sw28Yu4kag8PUUrh4z9O5XzIWqgbKZnqbvU6QR9ACotqhw768K9BoAk8SfTbbQz/uHP
+         XpTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773678634; x=1774283434;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5p3gsIxPQVOfXPfqPJJWIKHuD6O2URWJsyp0o2Rhwdg=;
+        b=TbLUrILXipP24OnLlei9hcuvLiXgbEiMpOfdlvmqV3qAwu1Ov+P9QqXMUyHrGVtY9c
+         HFNkIdcGDQOHmjFmwoz7+dYEP6USOW3/iA89j9+qEkcLjBzk27QD9HSqRL/BUOWEES5p
+         bzt4i9fyX8U9n6VlrJsbOEkzetrmfwYm34PXgHxKoRMsEYPY4Xd/WKqRMN+LTa+DD2hD
+         AYNX5nHSV+hTozZVOjf9PcR4wNf1mCxqjGj+sMieBM78U4oLbZaCUMoPP5IP274aFrjn
+         bZv2Kqb2kWMXg57K6lSg2YS46VeBcOMJ/JRzn08tDSGl2WIZD2arlwFmhP/nmlPhsnoA
+         FO2g==
+X-Gm-Message-State: AOJu0YzyOYnwsV0I7ZRM/ccXkkp+GcP31jGX93xhNA4K1c5+DvFhmo1e
+	kg/YpIfP/6vUWIrj6rIlDxWeS4JlHhiZ6W9WtTEdEeWgDO6Ia/pRKeeL4ZCNwFii8XOKlRW6ri0
+	nkydxxYHmKu3WmLSnqfS1f9S4VeMt9YfQalQl
+X-Gm-Gg: ATEYQzyNoblgDHk6NIcw03+mOS8+QOC/GilsgSmTTSrnNO+Un5JbbCR9Wn+OPOJdnRE
+	E/Tmfqbs3aNOPjyf8zdWs+NZ2hydCE5Uo4hgvd6qj1WvXSML5JvcMPlS8y4VsTfKZiqmp9sl7tW
+	wqQaOqgTX4yM068RM1OsHquHIYxpkG1rs8y0StFUzhIcYKao1npQuxJu2BmoX+pV1GLTu09poRQ
+	nCl7ngeCx69T/pwj5hf//YOPXnovPhAtQymmv0huOfTYukKEFgYu/I/U0D9vKArgcAzdy4cMPln
+	OMBR+jjXQCJNzX7G2LXJxX39sTwdLXnXKo0oxL8EinBOCu6qNVmWBJcn7AqjjmWvaawXInNrnfA
+	sxDA2eqyPtQIYe35pt+GefSOeFq3mE7+lg3CXX0Z49ma4EHA+UTXYIkW/k1H9KgbDC5Mx1Ncehw
+	==
+X-Received: by 2002:a5d:584e:0:b0:43b:45ea:824c with SMTP id ffacd0b85a97d-43b45ea82ebmr5062636f8f.26.1773678633560;
+        Mon, 16 Mar 2026 09:30:33 -0700 (PDT)
+Received: from smtpservice.6wind.com ([185.13.181.2])
+        by smtp-relay.gmail.com with ESMTP id ffacd0b85a97d-439fdf0895asm613655f8f.0.2026.03.16.09.30.33;
+        Mon, 16 Mar 2026 09:30:33 -0700 (PDT)
+X-Relaying-Domain: 6wind.com
+Received: from localhost (kadavar.dev.6wind.com [10.17.1.232])
+	by smtpservice.6wind.com (Postfix) with ESMTP id 522E719F77;
+	Mon, 16 Mar 2026 17:30:33 +0100 (CET)
+From: Justin Iurman <justin.iurman@6wind.com>
+To: netdev@vger.kernel.org
+Cc: andrea.mayer@uniroma2.it,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	justin.iurman@gmail.com,
+	nicolas.dichtel@6wind.com,
+	stefano.salsano@uniroma2.it,
+	paolo.lungaroni@uniroma2.it,
+	ahabdels@cisco.com,
+	Justin Iurman <justin.iurman@6wind.com>
+Subject: [PATCH net-next v3 0/2] Add support for seg6 tunsrc
+Date: Mon, 16 Mar 2026 17:29:53 +0100
+Message-Id: <20260316162955.1253225-1-justin.iurman@6wind.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260311100313.284589-1-jiayuan.chen@linux.dev>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-268207-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268206-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,163.com,ziepe.ca,nvidia.com,broadcom.com,kernel.org,korea.ac.kr,mellanox.com,redhat.com,cisco.com,oracle.com];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[uniroma2.it,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,6wind.com,cisco.com];
+	DKIM_TRACE(0.00)[6wind.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[justin.iurman@6wind.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 6E6B429D763
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: CB89629D71E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 06:03:08PM +0800, Jiayuan Chen wrote:
-> From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> 
-> Jianzhou Zhao reported a NULL pointer dereference in
-> __ethtool_get_link_ksettings [1]. The root cause is a use-after-free
-> of ipvlan->phy_dev.
-> 
-> In ib_get_eth_speed(), ib_device_get_netdev() obtains a reference to the
-> ipvlan device outside of rtnl_lock(). This creates a race window: between
-> ib_device_get_netdev() and rtnl_lock(), the underlying phy_dev (e.g. a
-> dummy device) can be unregistered and freed by another thread.
+This series adds support for the new per-route seg6 "tunsrc" parameter.
+Some tests are extended to check for it.
 
-If ib_device_get_netdev() worked as it was supposed to work, it can't.
-That function grabs reference on netdev and returns or netdev with elevated
-reference counter which can't be freed or returns NULL.
+Example:
+ip -6 r a 2001:db8:1::/64 encap seg6 mode encap tunsrc 2001:db8:ab::
+    segs 2001:db8:42::1,2001:db8:ffff::2 dev eth0
 
-Thanks
 
-> When the ethtool call later recurses through ipvlan_ethtool_get_link_ksettings()
-> into the freed phy_dev, it dereferences freed memory whose ethtool_ops
-> reads as NULL, causing the crash at offset 0x1f8.
-> 
-> Fix this by moving ib_device_get_netdev() inside the rtnl_lock() section
-> so that netdev lookup and the ethtool call are atomic with respect to
-> device unregistration. Under RTNL, if the phy_dev has been deleted, the
-> ipvlan device is also unregistered and ib_device_get_netdev() returns NULL
-> safely.
-> 
-> None of the existing callers of ib_get_eth_speed() hold rtnl_lock, so this
-> change does not introduce any deadlock.
-> 
-> [1] https://lore.kernel.org/netdev/94089b74-def5-4dd0-9143-1cfbc722fe73@linux.dev/T/#t
-> 
-> Fixes: d41861942fc5 ("IB/core: Add generic function to extract IB speed from netdev")
-> Reported-by: Jianzhou Zhao <luckd0g@163.com>
-> Closes: https://lore.kernel.org/netdev/94089b74-def5-4dd0-9143-1cfbc722fe73@linux.dev/T/#t
-> Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
-> ---
->  drivers/infiniband/core/verbs.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/infiniband/core/verbs.c b/drivers/infiniband/core/verbs.c
-> index 575b4a4b200b..f16d11e7c2e3 100644
-> --- a/drivers/infiniband/core/verbs.c
-> +++ b/drivers/infiniband/core/verbs.c
-> @@ -2046,11 +2046,13 @@ int ib_get_eth_speed(struct ib_device *dev, u32 port_num, u16 *speed, u8 *width)
->  	if (rdma_port_get_link_layer(dev, port_num) != IB_LINK_LAYER_ETHERNET)
->  		return -EINVAL;
->  
-> +	rtnl_lock();
->  	netdev = ib_device_get_netdev(dev, port_num);
-> -	if (!netdev)
-> +	if (!netdev) {
-> +		rtnl_unlock();
->  		return -ENODEV;
-> +	}
->  
-> -	rtnl_lock();
->  	rc = __ethtool_get_link_ksettings(netdev, &lksettings);
->  	rtnl_unlock();
->  
-> -- 
-> 2.43.0
-> 
-> 
+Justin Iurman (2):
+  seg6: add per-route tunnel source address
+  selftests: add check for seg6 tunsrc
+
+ include/uapi/linux/seg6_iptunnel.h            |   1 +
+ net/ipv6/seg6_iptunnel.c                      | 114 +++++++++++++-----
+ .../net/srv6_hencap_red_l3vpn_test.sh         |  65 +++++++---
+ 3 files changed, 134 insertions(+), 46 deletions(-)
+
+---
+v3:
+ - add selftest for tunsrc
+ - tunsrc: forbid loopback and multicast addresses as well
+
+v2: https://lore.kernel.org/netdev/20260311152845.278354-1-justin.iurman@6wind.com/T/#u
+
+v1: https://lore.kernel.org/netdev/CAOY2BqxUswHYoisKjABPunMUC5QJ-B-O9aXu=wKrhTZaqSqedQ@mail.gmail.com/T/
+
+--
+2.39.2
+
 
