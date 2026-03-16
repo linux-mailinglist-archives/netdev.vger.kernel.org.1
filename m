@@ -1,318 +1,209 @@
-Return-Path: <netdev+bounces-268180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268181-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EFLFGRQauGn/YwEAu9opvQ
-	(envelope-from <netdev+bounces-268180-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 15:56:20 +0100
+	id eCbMDTcZuGn/YwEAu9opvQ
+	(envelope-from <netdev+bounces-268181-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 15:52:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC38129BD48
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 15:56:19 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA85829BBDA
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 15:52:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A92F32B2953
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 14:47:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 22A4F3027971
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 14:51:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5912EB874;
-	Mon, 16 Mar 2026 14:47:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D472EF660;
+	Mon, 16 Mar 2026 14:51:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BaiEYL2c";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="SR2kWO+j"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="DcI4vo6b"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BFF2EC090
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 14:47:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9CB2ED846
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 14:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773672425; cv=none; b=ENlg6H4geA0SMgWB1e8vuYfgLV3d4dj+amDXrLIFCzpsT3T0bf7mWw+zcUeIXLgVQccFIVXnRqRKkXpVCBhgVb3yQVbjgdN3nXFkWinpuk6C7HVhDDVXOiC8LXesu0vs7BHunVhJ3zOrdUQmBaC6qj7H5dJQc+3GlzXBUoylsTc=
+	t=1773672683; cv=none; b=cWvEQs4WN+UXyuQ905QYZLGCnQ4nRK6S3nH9eIW5C/Fq38YaSxvBFhOAIhEWHhI7eB4591Af81CwDhQnfli/J8wlYBkah+YdYUrJ6FCQ829kNpcQL9iSZyTp4QKrvV3XWLSwsO8rF9pQnmnvX93O7xBff1+WNE6X2z1YPgovSvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773672425; c=relaxed/simple;
-	bh=ZZfSolL28liTEnsaqqekR1GwI4GeyNvw1ffBWs0x/Fs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rhUxk7aJjpQeBpzYrOIGwxJgR97rPWcohwct9HpRPwGG1FFeWoiuzKnoVFOUovUpIiAzr1ftuh3M8gqk4oNMWDwVZSCgTr5OCkL8SUN8k4ys71CJXl5fZGYTpqmGrVRDvwfImQ8QU2DesnDFyB46lnH5ckLYj07G2rdu6mcy5e8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BaiEYL2c; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=SR2kWO+j; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773672422;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TKhHuHBXRJ+I0jn8wxM059uZWEF8kMlWUss6Y6JwesI=;
-	b=BaiEYL2cpZ3K1N9k/nVH2bcS0Qvebuok/TPP3dYoFsAJkJ/g55FGA3PVAymjc3X+Vv8P4o
-	cD+gwHBbE57Mb00sEIZU1HQWIt/ky3A6RrknM7B9D03j3yQ+IV9XaiDO/xvqaO8i25hDqn
-	FECcRzPy1Gb9KxFnhVNUELLze3TStQM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-656-iaPjHggfPYmyUt_VvJhIVQ-1; Mon, 16 Mar 2026 10:47:01 -0400
-X-MC-Unique: iaPjHggfPYmyUt_VvJhIVQ-1
-X-Mimecast-MFC-AGG-ID: iaPjHggfPYmyUt_VvJhIVQ_1773672420
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43b42cd4becso892347f8f.1
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 07:47:01 -0700 (PDT)
+	s=arc-20240116; t=1773672683; c=relaxed/simple;
+	bh=JOC8TluRZ5LfoZmQsiDxTcli1TkS+BCArlTy4qOrkrw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JcGxGtykdenKYfhaopvzu7OaygR5KjeeTiJ3C91teraqTiLFBwVIP/uF2ggdwDz+HdPtZe1T39yHPxlHpBk1up+CLd2mbT6MnuDotA+/XXBAg1MuFlT9E0oCzjlveE+OaRHihrkg7EUSGaDWfQAaWtoiND3ENjhZZBC936B/izw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=DcI4vo6b; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-439b9b1900bso3033978f8f.1
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 07:51:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773672420; x=1774277220; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TKhHuHBXRJ+I0jn8wxM059uZWEF8kMlWUss6Y6JwesI=;
-        b=SR2kWO+jMgL85zef0bwB0X6Ka8jo+Q3PoUlwheL3DulTIhWWFXrq7kV3wGMpD3ehvD
-         0D28yWrvN9tEx4bAR5LprmzjpR3nWY0TN97Q5RFHKjCDiqZ6XSovkTFSbAgd5bxUatOI
-         NSqDRrgJQI8EFXSDpIP+euxXHLSiQPuWpNrqgkqAylcXCpFSly+0z7TlhIdPcj0j9IhI
-         UuJOTe4uFkNND9v2pXdVBKOytXlmWRV76PqY6NpL1cDMiduskm4CMpqfuq64mS7FuuKq
-         63Vgqh19vexsJFCnybeHblOJkC+voUfPSrQPubs8YrBycq2TsUF1etSUTqrLCitgnqMk
-         XlVg==
+        d=openvpn.net; s=google; t=1773672680; x=1774277480; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MCrOxQ7WUV2RUMrZWJgAQ3A3Vue8UTWjby4ddZSv+WA=;
+        b=DcI4vo6bOHdXoF7fstUxv3qj/xqXzPwjmrDlUiaUIfZaTbt/2jsfZa7KenmwNlklOf
+         egbiDVMPOA2m7vX1CXoQLAUZFelc5nR2Wiuj4JJRRljgeUlKxkT0mM/9cQSdkLqJBjxL
+         nHdjXO40kp1R7NBrfpNYZzBRAKQv0D2shBUonT4vfXCArkIzZ16eCTzas4Z0hPlgKMk9
+         PDEchjA1KXEu92Q1UwheKM5OcPW4pIXhOtLQn3jFsi8zcSDp9OxbakuhEZCU9w33ecj6
+         gMcVLlyFexfVPm4OMr2EGmEzwXeAWKXOwO1jk8Ytx4i8NNX7NzwPK4A8LAdHMTAB+gnd
+         Tsow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773672420; x=1774277220;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TKhHuHBXRJ+I0jn8wxM059uZWEF8kMlWUss6Y6JwesI=;
-        b=Np73J76/kN/g/dO3cAmOsFizXY9PyFiDhcEwh7nw6Sw5NDA/AYvqOmKQJQ66MqU7io
-         fCU2U0/YM3fvPSAKn+5Q4SmnBjKHcVW+R8YuwWD0XHBcWxaYnL+ZUd1zexR4TMAocgTd
-         Yz43HFem30UdBWzyn+n3G4wdaohak0qLfU59EDp2ztj1ElDeKWsg0Vs2iqRyGTmq+P52
-         1mn/w8du8fplub4pIPjneffHSkFC3DThgCA+t4Zw2M6q5YtHeay4yI96KeViZqntPdWp
-         uYCllCXG9R0iqbHxyGf1eFgp2TNSOmg/Gh0x9hjdtmMNnYqismcnXWWW6wP1DEw6ej6t
-         YP4g==
-X-Forwarded-Encrypted: i=1; AJvYcCWu6Ngm0TWBlDgVVRN3WFGobAEEHHZb72N10nMMpTeWEniryvxS6X3HYqnBdmBXtvkJed6EUP8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy68VLi/b6KR4XOPqjLqlm0v8gmKXxDWW9J1TBgoibxhRSV1QD+
-	clGN1W/o0TQzTXa8Am2eeRt0wxQQjVFMs7ENC/Cmx7c20X1JzBWcUp6qL8AwVWvufrp5lPMnB4U
-	rg3YyTT+x6StkjBAz/5ebp11WP9NOaw4pCIHNg3QiGsYDpkLdD0LYhqNB0g==
-X-Gm-Gg: ATEYQzwNC+AAxMbwy4cB1aaEFjU8S+SKB/9cjht1KlTDSzGTECN38nwnOUGH6aCHcdZ
-	q/CpbsiAj5eszIwM1evVlZw2dL1b2xAMHjQl4RitBiXsxpSSncV8/Qh93ckGZNo5h+X6W0ikoCh
-	Jqztfz9k5VOXQizmJ/p0MXK5I/NgN7yBsnMDYDdNueMWFyBMWvmnfoJ+vzNsz9Pbyshs1I9Ax8M
-	KKQqGazUWualqpycKGFUsdQ5s5qBncHdd/gmQVRuieBD5yw/bl8bKcEAj8xxpYwlST5xYABkUFr
-	1eEJKeH6GG0VuI7XnXX5kkqX7g+k4i8nggUKCTjUA6Vvg8cg6n42W0W4OZxRzQVnCQQrtFLhdJP
-	gXMMRSd/Qsl0VvzTRkPD7M4AvX7ibPjvMlb5BYvRoyC07oA==
-X-Received: by 2002:a05:6000:420c:b0:439:9812:35ea with SMTP id ffacd0b85a97d-439fdf347efmr31647537f8f.3.1773672420167;
-        Mon, 16 Mar 2026 07:47:00 -0700 (PDT)
-X-Received: by 2002:a05:6000:420c:b0:439:9812:35ea with SMTP id ffacd0b85a97d-439fdf347efmr31647475f8f.3.1773672419567;
-        Mon, 16 Mar 2026 07:46:59 -0700 (PDT)
-Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b41dd93c0sm10828039f8f.10.2026.03.16.07.46.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2026 07:46:58 -0700 (PDT)
-Date: Mon, 16 Mar 2026 10:46:55 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Zhud <zhud@hygon.cn>
-Cc: "jasowang@redhat.com" <jasowang@redhat.com>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	"eperezma@redhat.com" <eperezma@redhat.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"willemb@google.com" <willemb@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	Jing Li <lijing@hygon.cn>, Zhiwei Ying <yingzhiwei@hygon.cn>
-Subject: Re: [PATCH net-next v2] virtio-net: enable NETIF_F_GRO_HW only if
- GRO-related offloads are supported
-Message-ID: <20260316095919-mutt-send-email-mst@kernel.org>
-References: <20260316072152.910857-1-zhud@hygon.cn>
- <20260316051327-mutt-send-email-mst@kernel.org>
- <607818aba89a44d88afa213f39611451@hygon.cn>
- <20260316063139-mutt-send-email-mst@kernel.org>
- <a82cd6088e554fe1bb3daa6ad3df18dc@hygon.cn>
- <20260316092707-mutt-send-email-mst@kernel.org>
- <4e3ce2d6120545719a286d3daafbef38@hygon.cn>
+        d=1e100.net; s=20251104; t=1773672680; x=1774277480;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MCrOxQ7WUV2RUMrZWJgAQ3A3Vue8UTWjby4ddZSv+WA=;
+        b=V1Rpu2SlzsdICOZnW/nz67igxByl0c/x3bezLPk6V8EsaG9wx4I2A/n1IpHVeGfnr/
+         Z9oDe95XKyjKIrD9LRervzEYYh0olfSP6zvvRfR3b8Vpn3VuYbZ9cde/IICpDXLudbnv
+         NjPf/kcSNFohkY4s2lN0e4oDXLfH6q7BCFIfcvSlYpBaJQOxTWByTkc7rXTpN+fuPzJr
+         KB5y731C+qInVOShjJIoIuS+Aly+a/V3/99A8I52ZLCnUP3vtMGlmJqvp2JBigic9ER5
+         930HVcEsixH/xsbMv3WuZKyIL8ofYQW6h1dNfQjmJ/sTDqyuBVZtqVDEs2cbhup7Amk7
+         mQ4g==
+X-Forwarded-Encrypted: i=1; AJvYcCWt7JI08jqfXEgyMfKdAmEv+M76JffrYMq3sAU3qoM/00MXJVaJbRMzDrRCOUXUffFK9jbE/H8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzE8rl/zxubk9U0A5IjJYDvrdEV3126n9+HjcwtWn5GE1BnBsYn
+	SHRTR6KfIMuvC0kpwi4ACez+iBMgdDNnt39koOSr5TmJS6YyKqUuNZ1IZu9nCcskLSBqCPbUJnO
+	sAW6T45Vm9lqjw71Wu8pgomXFUe+qszivD1SxNPngzTtugBVdeNU=
+X-Gm-Gg: ATEYQzxBINgEN8SKNU6BIBgVvkL+R5KaIDfRR2iNOJWgFFQm52QtmhUzaOyhHUaTS0a
+	/6AgcAi9otVj/IIXgbAYAd7IartdO4AlYcnoGT61Tpta0mN5WYrj3Rkl6KvYA9OgPBmGJYt+cHt
+	L131BUiyuQM1nHZyLCbc05nvuXfZWn84szhNanouuDmtonAFQ43TAtkXyQonYMZSBt5gBEtwwVO
+	k8/SpmVypV+VCStpJVQ1gsf5g4vzstdoyExxsbUaeo6erJzf1UZXL7PvYXSn0YSGlCT0BQs4u6E
+	JFiBaOLtcA9CdKkc+P1Ec5oBKlTkjuAT0lreg9MIr+kEqBOsr+DNzn//jozSjdSeLL0s7X/liBL
+	Mrl68jmwiAnEi/0RoSq6Kq9V7vDJd9aV39TrrsOuZGUWQHRNEjmz1QwOhibRyCCv5jmIqgb4etr
+	5PA8y0dU16jo1nefHqCEjpAPVk+fCY5zkKlLgwjjvKEijsFY5ZD5n+BtuMSMySjvHMuqdVwQ==
+X-Received: by 2002:a05:6000:2403:b0:439:b564:7a71 with SMTP id ffacd0b85a97d-43a04d782c1mr23135253f8f.1.1773672679557;
+        Mon, 16 Mar 2026 07:51:19 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:1:ac7c:99a7:e90:f86c? ([2001:67c:2fbc:1:ac7c:99a7:e90:f86c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b468cf785sm4968408f8f.12.2026.03.16.07.51.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Mar 2026 07:51:18 -0700 (PDT)
+Message-ID: <792bf7ef-6a0e-4929-89d1-d8ba81bbd7cb@openvpn.net>
+Date: Mon, 16 Mar 2026 15:51:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4e3ce2d6120545719a286d3daafbef38@hygon.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/9] pull request: ovpn 2026-03-13
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: ralf@mandelbit.com, Sabrina Dubroca <sd@queasysnail.net>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+References: <20260313205139.2950-1-antonio@openvpn.net>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <20260313205139.2950-1-antonio@openvpn.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268180-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	HAS_ORG_HEADER(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268181-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[openvpn.net:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hygon.cn:email]
-X-Rspamd-Queue-Id: DC38129BD48
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,openvpn.net:dkim,openvpn.net:mid]
+X-Rspamd-Queue-Id: EA85829BBDA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 16, 2026 at 01:57:22PM +0000, Zhud wrote:
->  > On Mon, Mar 16, 2026 at 12:57:00PM +0000, Zhud wrote:
-> > > > On Mon, Mar 16, 2026 at 10:18:04AM +0000, Zhud wrote:
-> > > > > > Thanks! Yes something to improve:
-> > > > > >
-> > > > > > On Mon, Mar 16, 2026 at 03:21:52PM +0800, Di Zhu wrote:
-> > > > > > > Although VIRTIO_NET_F_CTRL_GUEST_OFFLOADS is negotiated, which
-> > > > > > > indicates the device supports dynamic control of guest
-> > > > > > > offloads, it does not necessarily mean the device supports
-> > > > > > > specific hardware GRO
-> > > > features.
-> > > > > > >
-> > > > > > > If none of the features defined in GUEST_OFFLOAD_GRO_HW_MASK
-> > > > > > > (such as TSO4, TSO6, or UFO) are present in
-> > > > > > > vi->guest_offloads_capable, the device effectively lacks the hardware
-> > capability to perform GRO.
-> > > > > >
-> > > > > > So what is the user-visible problem this is trying to address?
-> > > > >
-> > > > > A key concern is that once a user enables NETIF_F_GRO_HW via
-> > > > > ethtool, they might manually disable software GRO (ethtool -K eth0
-> > > > > gro off) assuming the hardware is now handling the aggregation.
-> > > >
-> > > > Thanks!
-> > > > Sorry could you be even more specific please?
-> > > > Is this a theoretical concern or did some users encounter this?
-> > > > Note that NETIF_F_GRO_HW is best effort anyway: e.g.
-> > > > it can apply only to TCPv6 and v4 will still need software.
-> > >
-> > > This might not be the best example, but I want to draw an analogy to
-> > > show how this hardware offload capability can be misleading. For
-> > > instance, if I enable GRO_HW expecting to see lower CPU usage when
-> > > receiving packets, but it doesn't happen, that would be very confusing.
-> > 
-> > It still can happen if hardware does not offload the specific traffic, yes?
+Jakub,
+
+the AI has identified a valid issue in the commit message of patch 7.
+
+I am gonna fix that and resend the patchset....
+
+Regards,
+
+On 13/03/2026 21:51, Antonio Quartulli wrote:
+> Hello netdev team!
 > 
-> Yes, of course, but there's still a difference between "best-effort" and "no-effort." Right?
-
-I am not saying this does not improve the user experience.
-But let us set the expectations correctly.
-
-What this does (I think):
-
-	When a virtio device does not have either GUEST_TSO6 or
-	GUEST_TSO4 offloads, this means it can't really do
-	hardware GRO.
-
-	however, the driver will set NETIF_F_GRO_HW whenever
-	the device allows control over offload support - even
-	if the offloads that can be controlled have nothing
-	to do with GRO.
-
-	As a result, in such a setup, rx-gro-hw reported for the device
-	is too optimistic.  Improve the situation by masking off
-	NETIF_F_GRO_HW.
-
-
-	Out of abundance of caution, this does not change the
-	current behaviour for hardware with just v6 or just v4 GRO:
-	current interfaces do not allow
-	distinguishing between v6/v4 GRO, so we can't expose
-	them to userspace precisely.
-
-Also:
-> Fixes: a02e8964eaf9 ("virtio-net: ethtool configurable LRO")
-
-are you sure it's right?
-
-
-> > 
-> > > > > Secondly, while we haven't encountered a specific hardware failure
-> > > > > yet, enabling a hardware offload feature that the DPU does not
-> > > > > physically support introduces the risk of undefined hardware
-> > > > > behavior
-> > > >
-> > > > This would be a major concern but I don't get it - how would one trigger this?
-> > > > It seems that guest_offloads_capable only includes offloads actually supported.
-> > >
-> > > You're absolutely right. Upon rechecking the code,
-> > > virtnet_set_features already ensures that only bits within
-> > vi->guest_offloads_capable are sent to the device.
-> > > Thank you for pointing that out.
-> > >
-> > > > > > >
-> > > > > > > So, making NETIF_F_GRO_HW conditional on these feature bits
-> > > > > > > ensures the stack does not enable an unsupported hardware
-> > > > > > > offload
-> > > > configuration.
-> > > > > >
-> > > > > > I guess the assumption is that without this, something enables
-> > > > > > such a config? Which stack is this and what happens then?
-> > > > > >
-> > > > >
-> > > > > Sorry for the confusion, let me clarify the intent.
-> > > > > The 'stack' here refers to the ethtool interface and the netset (ioctl/netlink)
-> > path.
-> > > >
-> > > >
-> > > > A bit more detail about the specific set of commands that leads to
-> > > > confusion in the commit log would be helpful.
-> > >
-> > > > Thanks!
-> > > >
-> > > > > >
-> > > > > > > Fixes: a02e8964eaf9 ("virtio-net: ethtool configurable LRO")
-> > > > > > > Signed-off-by: Di Zhu <zhud@hygon.cn>
-> > > > > >
-> > > > > > judging by this, has something to do with LRO?
-> > > > > >
-> > > > > > > ---
-> > > > > > > /* v2 */
-> > > > > > >   -make the modified logic clearer
-> > > > > > > ---
-> > > > > > >  drivers/net/virtio_net.c | 6 ++++--
-> > > > > > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/drivers/net/virtio_net.c
-> > > > > > > b/drivers/net/virtio_net.c index
-> > > > > > > 72d6a9c6a5a2..b233c99925e9 100644
-> > > > > > > --- a/drivers/net/virtio_net.c
-> > > > > > > +++ b/drivers/net/virtio_net.c
-> > > > > > > @@ -6781,8 +6781,6 @@ static int virtnet_probe(struct virtio_device
-> > *vdev)
-> > > > > > >  	if (virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_TSO4) ||
-> > > > > > >  	    virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_TSO6))
-> > > > > > >  		dev->features |= NETIF_F_GRO_HW;
-> > > > > > > -	if (virtio_has_feature(vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS))
-> > > > > > > -		dev->hw_features |= NETIF_F_GRO_HW;
-> > > > > > >
-> > > > > > >  	dev->vlan_features = dev->features;
-> > > > > > >  	dev->xdp_features = NETDEV_XDP_ACT_BASIC |
-> > > > > > NETDEV_XDP_ACT_REDIRECT |
-> > > > > > > @@ -7058,6 +7056,10 @@ static int virtnet_probe(struct virtio_device
-> > *vdev)
-> > > > > > >  	}
-> > > > > > >  	vi->guest_offloads_capable = vi->guest_offloads;
-> > > > > > >
-> > > > > > > +	if (virtio_has_feature(vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS)
-> > &&
-> > > > > > > +	    (vi->guest_offloads_capable &
-> > GUEST_OFFLOAD_GRO_HW_MASK))
-> > > > > > > +		dev->hw_features |= NETIF_F_GRO_HW;
-> > > > > > > +
-> > > > > > >  	rtnl_unlock();
-> > > > > > >
-> > > > > > >  	err = virtnet_cpu_notif_add(vi);
-> > > > > > > --
-> > > > > > > 2.34.1
-> > > > > > >
-> > > > > >
-> > > > >
-> > > >
-> > >
-> > 
+> This is (yet) another resend of the previous PR.
+> The selftest Makefile has been adjusted and we have also
+> addressed all AI's concerns (some were valid).
+> Thanks for pointing out the nipa URL, so that we could
+> double check the Makefile locally.
 > 
+> 
+> This batch includes the following changes:
+> * use correct constant when declaring nlattr array in ovpn_nl_key_swap_doit
+> * use bitops.h API when possible
+> * send netlink notification in case of client float event
+> * implement support for asymmetric peer IDs
+> * consolidate memory allocations during crypto operations
+> * add netlink notification check in selftests
+> * add asymmetric peer IDs check in selftest
+> * add FW mark check in selftest
+> 
+> 
+> Please pull or let me know of any issue!
+> 
+> Thanks a lot.
+> Antonio,
+
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
 
