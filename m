@@ -1,110 +1,110 @@
-Return-Path: <netdev+bounces-268273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268274-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qABTImFpuGlEdgEAu9opvQ
-	(envelope-from <netdev+bounces-268273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 21:34:41 +0100
+	id SBViDoZpuGlEdgEAu9opvQ
+	(envelope-from <netdev+bounces-268274-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 21:35:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3CFF2A0432
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 21:34:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 760AB2A0442
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 21:35:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E2B5C31B9BA3
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:28:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 42DC2301F157
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:35:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1543EF64F;
-	Mon, 16 Mar 2026 20:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4C79329E5A;
+	Mon, 16 Mar 2026 20:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aINYCfZK"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="R9dOOq1A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f226.google.com (mail-yw1-f226.google.com [209.85.128.226])
+Received: from mail-yw1-f227.google.com (mail-yw1-f227.google.com [209.85.128.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E50B13F54D9
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 20:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702842874FA
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 20:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.227
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773692875; cv=pass; b=PRy/u8s4BlnFvQ6NiEjz9mNpHJCt5dfil40PbSVWHsKZcfCykk+77LQ4DTBvH8QBz20bYmDVBxcY+Pnx43Bfh4AhfK23sFhfQgkkK2zJh3kRZiBcZvbvw/9nwlce+8gyM/cjHdk+HGekITy6C5Cfr5Co/AOO+gmc06ApJINFxaM=
+	t=1773693313; cv=pass; b=tEY6nvHl5Q89chCV1yEUTVzvTQd9+ji1pcsYlnJKkU7NzV34Fr25EhOLTTj+fUJctYpbm4L7tB9MGeEECngzdFO5nHwSbEtJpIylh1/eWIqVvW2hhdNgE2X07j5N3O+4Sid4cMZQIQZ7nPo9/QZdGPTaeEIKcrXKNGGrcAz3oBk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773692875; c=relaxed/simple;
-	bh=EFWPhMQF7D9Y4uLWlTVeq50HQ1WT/ZRuIUP9FH5T/qk=;
+	s=arc-20240116; t=1773693313; c=relaxed/simple;
+	bh=o75TdYWGALdxUgcWfOhVr29Ui6eb8MN4I5FdUibyeXQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uGZhXFaVvBeKhstVpWTUgXqgH4/KM57FpJrZnCOPi7U0OisrcSsQUI6ZnHsIqa9PTtv3Ta03fYS4LMV9FYw9dOoA0jCzcGC3ZxIYZeiQQhcjQ8SRmNd1Jm7zwZIRGLYx9NsZH1/zxMTgzs5yy9XWozrhrTU25pUirfYMLET+24E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=aINYCfZK; arc=pass smtp.client-ip=209.85.128.226
+	 To:Cc:Content-Type; b=HjxNJxxFxtXKvZXzJxUUQRZfZGLEDWTv/xsNrhJtdj0vOu1TiS/aDQGs5xK3JS7BW7mz46BEwhrXiGRYFTq1mxdMNVbDS9kMejCnoRjhGVZFz1oRlQ5H+SCL8fibTyRtd/V8wejaLCFkf8hKV78KN/RhxMW6mbUtFFMfYRBK5pk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=R9dOOq1A; arc=pass smtp.client-ip=209.85.128.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yw1-f226.google.com with SMTP id 00721157ae682-79a51edef1fso1690017b3.1
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 13:27:48 -0700 (PDT)
+Received: by mail-yw1-f227.google.com with SMTP id 00721157ae682-79a4e5caad6so13189377b3.2
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 13:35:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773692868; x=1774297668;
+        d=1e100.net; s=20251104; t=1773693311; x=1774298111;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HSm0SI8wDEVphLG992Lz8xcJhsbpy962xvT0PxDLY+k=;
-        b=Ii4Qcce9rD4CO9het/bYyiala52JFdrm5N7iTALXspV+ZJRHK5rveDSxLVgczK3gUV
-         QRHr8v6GbMj65M6jywZzabRln+PuRbRxVWe6i6kG4Bd9kj6R5SnhAHXNEAWR9yP9rc7u
-         5X+SzIbtz7HGsTo7cAuJ8xNHNlG6k5gEp+qfKITKe0NG/KdYMjwBcDkSzleXcRgf2WkH
-         /7kBDF3a3tm/o3Zn9pQSNwEZLUg/yvOJC4NVd3YMzTB0AZGmqogHGs6rQa0Bnxa8sIch
-         7NeJkLsGBpR2HanqGlL4Fg+E1gRc4jx2taaZwoRoTbuzNVXrJdDABYQy7YfMCV+9upD7
-         4lmw==
-X-Gm-Message-State: AOJu0YyKcM/mfo+7PlOVZOzUCd/ZefzFM9j22EZ/rc1TZQZ0S9IqRN5R
-	B9H8NPMSZw+eeRo0cKT8Ii8nHtHPH4VMiemTtZT2aER0mPtB/LhI+teW+FP6eB4nbFobxu9S3Mk
-	Fe586g3efZRX/ds0bJAGA+aDGcjR3K/eq06E3mtVg/LSdZTvfIxL9meaykRytnT5ta4ptJQhCiy
-	loSYuo/dxWj4jK81DjbVtFG0LJt7uJ1OvbAXToMJx8u920krE5F0NOZN2lNGz6b7vwO3e68zZYh
-	LTBXPJwvpixH8S3kg==
-X-Gm-Gg: ATEYQzygMqV6RVxXNKdwkgIqhqQHtJHYYMdTI1MMmTXhIYbnoxxm7jMnP9CykyIe6Uc
-	obwjEZoAll/UlMdvxECaHoZn4ILEEfekL6+4xwfiqN8dnmFjDBcnGkzCDxpDqMEP8MpZ1mHn+lO
-	HRoAxVyXX6nUKtpYbu64GRUOKfomhamd1F3rNv3FJ5hOYXTDMjV81nxBrocbd7D7vBeV2wuwnp4
-	4P5WvtntIbCKJMUa7WDDgQ0uCVxOnhO/f7IphdwyPBDMA+WeXiDkeqgWck0DoxJfV3EYvezdYJN
-	MVcrqPAcuIieQzbY5dw9aaVTPPelfUbtWzmap8EZstEfaqE6E0bc44ivC9xk2LOxKn9nb/j9z5E
-	31+FnJ31DiUNjWhb+cXpL7hxryJd7NeXOg6bC6W44szivUTA9o9d1REM6s1aHYaKKxo/oGOYZ67
-	ku7jVYHBfhymCF5J37gw2GtSb/+gz968DfYNDP1Y86trDCVFtcHeQ8X4zmL1BA5W8=
-X-Received: by 2002:a05:690c:350f:b0:79a:3968:f77d with SMTP id 00721157ae682-79a61888651mr8821417b3.18.1773692867740;
-        Mon, 16 Mar 2026 13:27:47 -0700 (PDT)
+        bh=D6ORC8aVhkt2CnmNTZN4yJ/ALFp0AzEvt0uEOdC26Aw=;
+        b=VNr1bZsZ79YVqQUliDsaoV12NFixJ+v2atIvgVWuEBFaz8nL93jr8z5QWtvwnF/aw2
+         pX/QiCTiU81FzNyiCR1I+Xr0rCONR2KIdpRr/kDeG7bvxonYhzMn5cWGZfKUFqMrcSga
+         qC+QFf4CPEclkZ0ggF9nbnd8gr5p79FdVDewpEyKSz3kg3Ipz1UsGOXJN5vA2fPpZFTM
+         ew+rt1neo4jgky6UBI8LPyEs/SCBi5r+4ZCxPdSdTJ3DkRd8mKraZ/yPqlP5wfwE0hdf
+         tiPcFKJ6db3pI94tFk3Q/cduu2ZksxQbTuYAB4Qq+NXFn8oPw8sNaQG59YzxN+F8wR5y
+         I3aQ==
+X-Gm-Message-State: AOJu0YwQomI5gOLU8o3sfE97qPIJ2hCBDYy3MpksliDVp6G/Y03cUqld
+	rMQOXibK0CoVyszecSY1ob6MbOD+Hz9cpV4WAqvw8aN4x/ZlXO2WElchzYi8FLWvd5QEf6L3lOU
+	f0Ku/idRrGYYlxfdl/3zg8m1yh9+wpqqyBAv/chyrjtWOWR/pdrPZJKzfWnEFht2n7LzcdPwbfI
+	+9XLJakS2hk75ni9pONpT3cvE0IWf9zX745tfRtgI1+ZcASbfJ7MG/ESWY9wCJHYKDco029xegc
+	soZw9LM+6YJc0Vy7Q==
+X-Gm-Gg: ATEYQzxB1cvFbubTXTlaYTzluhSPYfsDMZ0jFM6qTgnoHW7ADUYVnposDbhE0EZPeyN
+	x2P4q1B99p15h5rHlXu9Rx+K09qcTXq/w+bnlKwhR8IYN1lb6A4/NHabSg9cY39/vs+rHuRgsJ7
+	PYHJIzX+OYfV/N3OmjEgik1LA1NaLCkO3OSFjlEe7NWYWB2iiVYHpl406FeuLDRL+OUCvdaHggV
+	uPgxTfRxBfReuLW98w9qfMItsIMGV895CUftCuUySAlDRpRBT4dIdIo8kuHILXQS/+8OB+/M48e
+	9LEGM7fKqg6sgfQ6Q1RkXIPcF1XW+Ojb0BMimRPWBAP49PDZc6kD44ShdRTzhWFAtu8zO37ts+1
+	Ql3o8AVKtXQtkuGGL8+/6AXV6vF998mzrUB/QdOuvSxtn4RF/Q9TtQESdGGy2pDCS2G4ZiJxlPC
+	38/O+DIQ2xPfdCu+ynRCbnLC7tqcY3yEDI7JyRmatWd/HFMoETcE4Zyo6FX4/VP2Y=
+X-Received: by 2002:a05:690c:e3ea:b0:79a:649e:265d with SMTP id 00721157ae682-79a649e3a2cmr1337987b3.49.1773693311188;
+        Mon, 16 Mar 2026 13:35:11 -0700 (PDT)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-22.dlp.protect.broadcom.com. [144.49.247.22])
-        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-79a1ecda81asm10236337b3.11.2026.03.16.13.27.47
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-79917ec2ba9sm16204597b3.15.2026.03.16.13.35.10
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 16 Mar 2026 13:27:47 -0700 (PDT)
+        Mon, 16 Mar 2026 13:35:11 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43b46b2b161so1294272f8f.0
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 13:27:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773692866; cv=none;
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43b40c22eaeso1134291f8f.2
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 13:35:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773693309; cv=none;
         d=google.com; s=arc-20240605;
-        b=hoeW0Zi8OSeo5FW0dsQIbkKjrC+xPaQCBxqDoQApxwAQliJ7BAzWLBNUtdidLcn9ds
-         lWfKmggHbrDdx3n7ulR2DNGjxSy03iaO0eam0zP9max9zX0jjZiKaSq2mP+DmPcqzGAu
-         cpD8p79EwsONrI1Ku4VzGuXbuQI+gAMLwsjet7lMmtbE/HYVvzkj9DBgZIfI6E1ssMK2
-         nmUMcpq5ZJFQbGiiYQVs9YUwRNTKgx1RE96XycQn94PS6lSMsN4bMhki4UDGb36t56l5
-         sPyoDjReFH9cieJSq52hU3RdHaEBqaFY0zve9T6tcxoGmu/KeGtDgXo9fPpA8QgLljb3
-         7tpQ==
+        b=B8HFdAp1/QgYfoI4n78TqYBsOlzwzEkzWoEmPLy1avjZgb5Xa+bivEkUMQhnVO/DEx
+         pcfQWlci97pDaDsDlSgXmMr5kw1fTUdDrITpClU2HbVURRwX6kdg7q71XNjV1OdkIir3
+         joJpg+Dkgp/lgCu/yUk+TLvMfaUUXbpHpMJ4tzI3m2Qwq3jkQSsrS/pqr38jhlw8TmeC
+         lqf731vXJcV6DoI7nIoqaNeX5G6lHplS82pSIiK0wcY3fr20WXSR2HROAaw7SBSHSebK
+         JStv7tCuqh48GhLLUuOen0rys3JVyIRWGSEV3sbnT3lFOfg7gr4miy14mctFnwOzuGg3
+         XL3g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=HSm0SI8wDEVphLG992Lz8xcJhsbpy962xvT0PxDLY+k=;
+        bh=D6ORC8aVhkt2CnmNTZN4yJ/ALFp0AzEvt0uEOdC26Aw=;
         fh=8DXXuIeKI527N/XFWk/hIggMQY8iurASBgxxY00/rsA=;
-        b=IYot/hmD91c7x5u33JI4m17oPphJHwTbJ3WGihFpw09+IBSRuMjCBKXiuGN3sdY9jW
-         dBU97cnhEMucKBZgHEfAnCbFpIbFfUQXg7tDSa86BlnRVCrlaHGmQ0JDtWbK+Zmq+OwM
-         Ze5ejmU4YD0QNGqahr+xWjjoi5p+eKKAZZ8mF3McFYuU8KK/DrmodgshcY1Dhz3atAOu
-         Yu3dTjhURMqMFAPgTxwgMNZA5ggof2xE9hIr/zent3mb+kp4Onxy56IUWOHBPo3dA4dC
-         V4XsHMjLet1UKZdt2bgyStZWyQ8Fz4Ph86dhe3+n5SojEY6eT78Beu9HaCR5pZUoVKTR
-         QTag==;
+        b=LPmrRrNTn/tx/7yAWPPcaGivB+grF67u0vZVbQozVqSoA92zXG3Xa1yhiRQNLCrySt
+         KETB3Z5VJ6IxQDphypu5hPcH+EmE+oK+xnl+x8JtQKBD2nmZ50RCmH62/CXgvbuUisg4
+         ivNgKub7ik6hBVaeOF3DD/uoNQiASN3o+8juVRua3bmZU/OFyr5CRhfnld+qa+73gc8i
+         JKYAnNwSXtKL7S9fmfRrZcWB9LTA1yDg0p23fe30Yi1Cju17o/pHMP/yWSx7qSv7tGHZ
+         e0DwzvpcpooRXMx7XXSvLEH3xQVIDfeWenX8OSXLbum7bC/5O56IQrz/7GAr7648zLh7
+         4hmA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1773692866; x=1774297666; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1773693309; x=1774298109; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HSm0SI8wDEVphLG992Lz8xcJhsbpy962xvT0PxDLY+k=;
-        b=aINYCfZKUuDDx6Ec2niJAlF68ZV6bsyWn5sZIULK3YP+Fum1sKRepG2hWDuPrQzTuN
-         Gdi19th6lN7GpL8OuIYUPwrwg2EGHcUyCUhkp02svfgLrXn1MwRhfzGtoQxWcBcVZRSP
-         +xc2vxm5/ZpGCmYuR2o6h9ZE9O4AXezaw1r3E=
-X-Received: by 2002:a05:6000:2403:b0:439:c5cf:fc73 with SMTP id ffacd0b85a97d-43a04d7a050mr25499235f8f.12.1773692865769;
-        Mon, 16 Mar 2026 13:27:45 -0700 (PDT)
-X-Received: by 2002:a05:6000:2403:b0:439:c5cf:fc73 with SMTP id
- ffacd0b85a97d-43a04d7a050mr25499179f8f.12.1773692865235; Mon, 16 Mar 2026
- 13:27:45 -0700 (PDT)
+        bh=D6ORC8aVhkt2CnmNTZN4yJ/ALFp0AzEvt0uEOdC26Aw=;
+        b=R9dOOq1AO9YoTiP8+Wa6QtK/nTgIpt4nFa7R2qOeAWqsFt94pJHnjdTKWOweRfFdQb
+         q2E73q0ggoZAJO1ujeM0qvAOVF1z6nqLj/1sZTVz11l6Q+7OqDGf+nDI/I+lSSRuFloU
+         UC6JSIh+/SNWOpJZUph8ITfIXBkGCEYXpfY2E=
+X-Received: by 2002:a05:6000:250d:b0:439:b440:b8a2 with SMTP id ffacd0b85a97d-43a04daf226mr25965207f8f.28.1773693308638;
+        Mon, 16 Mar 2026 13:35:08 -0700 (PDT)
+X-Received: by 2002:a05:6000:250d:b0:439:b440:b8a2 with SMTP id
+ ffacd0b85a97d-43a04daf226mr25965158f8f.28.1773693308039; Mon, 16 Mar 2026
+ 13:35:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -112,15 +112,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20260313222206.778760-1-jitendra.vegiraju@broadcom.com>
- <20260313222206.778760-3-jitendra.vegiraju@broadcom.com> <abSaKe3d4fcBMqLm@shell.armlinux.org.uk>
- <CAMdnO-+UEb8sVf8=Aj7G6UgY-DxWe3bFYbSbKJRdU4woEX+dWQ@mail.gmail.com>
-In-Reply-To: <CAMdnO-+UEb8sVf8=Aj7G6UgY-DxWe3bFYbSbKJRdU4woEX+dWQ@mail.gmail.com>
+ <20260313222206.778760-5-jitendra.vegiraju@broadcom.com> <abSXP3gMFQEiC5Lm@shell.armlinux.org.uk>
+In-Reply-To: <abSXP3gMFQEiC5Lm@shell.armlinux.org.uk>
 From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Date: Mon, 16 Mar 2026 13:27:33 -0700
-X-Gm-Features: AaiRm53K7fiQEZkpJI-MOvV-cHRkeznqwMJWGxhDHPBRcNZi_mzV70LOImU7VIY
-Message-ID: <CAMdnO-La1d7AfqLHPxTX0Y3_17Cpn6SeAqFgW-vJUg+2OZp-xA@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 2/5] net: stmmac: Add DW25GMAC support in
- stmmac core driver
+Date: Mon, 16 Mar 2026 13:34:55 -0700
+X-Gm-Features: AaiRm50w76AAv0tqrNyqbBxs9zisrjJFbvYKHonV6ktQNKEkvqexn7CcgoG0Gu4
+Message-ID: <CAMdnO-LYAPfyvM4vgmGcZgy-aagHSkP+VDmpRskNU-414j3gnQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 4/5] net: stmmac: Add PCI driver support for BCM8958x
 To: "Russell King (Oracle)" <linux@armlinux.org.uk>
 Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, davem@davemloft.net, 
 	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
@@ -138,19 +136,19 @@ Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, davem@davemloft.net,
 	florian.fainelli@broadcom.com, quic_abchauha@quicinc.com
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000003abaa6064d2a0d9c"
+	boundary="000000000000a312ec064d2a2705"
 X-Spamd-Result: default: False [-2.76 / 15.00];
 	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268273-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268274-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -164,105 +162,57 @@ X-Spamd-Result: default: False [-2.76 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[jitendra.vegiraju@broadcom.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[broadcom.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,armlinux.org.uk:email,armlinux.org.uk:url,broadcom.com:dkim,broadcom.com:email]
-X-Rspamd-Queue-Id: F3CFF2A0432
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,broadcom.com:dkim,armlinux.org.uk:email,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: 760AB2A0442
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---0000000000003abaa6064d2a0d9c
+--000000000000a312ec064d2a2705
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Sorry, missed one answer in the previous response.
-On Mon, Mar 16, 2026 at 1:14=E2=80=AFPM Jitendra Vegiraju
-<jitendra.vegiraju@broadcom.com> wrote:
+On Fri, Mar 13, 2026 at 4:01=E2=80=AFPM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
 >
-> Hi Russell,
-> Thank you for reviewing the patches.
+> On Fri, Mar 13, 2026 at 03:22:05PM -0700, \Jitendra Vegiraju wrote:
+> > +     plat =3D devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+> > +     if (!plat)
+> > +             return -ENOMEM;
+> > +
+> > +     plat->dma_cfg =3D devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg)=
+,
+> > +                                  GFP_KERNEL);
+> > +     if (!plat->dma_cfg)
+> > +             return -ENOMEM;
 >
+> Please use stmmac_plat_dat_alloc() - this will allocate and initialise
+> struct plat_stmmacenet_data, and as of commit 7a6387dec8ce in net-next,
+> will also avoid the need to allocate  dma_cfg.
+Ack, will incorporate stmmac_plat_dat_alloc() and further cleanup in v8.
 >
-> On Fri, Mar 13, 2026 at 4:14=E2=80=AFPM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > On Fri, Mar 13, 2026 at 03:22:03PM -0700, \Jitendra Vegiraju wrote:
-> > > @@ -42,13 +42,18 @@
-> > >  #define DWXGMAC_CORE_2_20    0x22
-> > >  #define DWXLGMAC_CORE_2_00   0x20
-> > >
-> > > +#define DW25GMAC_CORE_3_20   0x32
-> > > +#define DW25GMAC_CORE_4_00   0x40
-> > > +
-> >
-> > Do these live in the same versioning numberspace as DWXGMAC and
-> > DWXLGMAC?
-> >
-Yes. We were informed by Synopsys that 0x32 is an early adopter
-release and 0x4x is general availability release for DW25GMAC.
-Device ID value for 25GMAC is 0x55.
+> > +
+> > +     plat->suspend           =3D stmmac_pci_plat_suspend;
+> > +     plat->resume            =3D brcm_pci_resume;
+> > +     plat->bsp_priv =3D brcm_priv;
+>
+> Populating suspend/resume means that plat->init and plat->exit
+> will only be called on driver probe (former), probe failure (latter)
+> or remove (latter). Please consider using these to ensure that
+> all appropriate resources are properly cleaned up in all cases.
+>
 
-> > > +int dw25gmac_setup(struct stmmac_priv *priv)
-> > > +{
-> > > +     struct mac_device_info *mac =3D priv->hw;
-> > > +
-> > > +     dev_info(priv->device, "\tDW25GMAC\n");
-> > > +
-> > > +     priv->dev->priv_flags |=3D IFF_UNICAST_FLT;
-> > > +     mac->pcsr =3D priv->ioaddr;
-> > > +     mac->multicast_filter_bins =3D priv->plat->multicast_filter_bin=
-s;
-> > > +     mac->unicast_filter_entries =3D priv->plat->unicast_filter_entr=
-ies;
-> > > +     mac->mcast_bits_log2 =3D 0;
-> > > +
-> > > +     if (mac->multicast_filter_bins)
-> > > +             mac->mcast_bits_log2 =3D ilog2(mac->multicast_filter_bi=
-ns);
-> >
-> > The above seems to be common amongst the other two setup functions.
-> > Maybe there should be a helper for this?
-> >
-> Ack. Will address this in v8.
-> > > +
-> > > +     mac->link.caps =3D MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-> > > +                      MAC_1000FD | MAC_2500FD | MAC_5000FD |
-> > > +                      MAC_10000FD | MAC_25000FD;
-> > > +     mac->link.duplex =3D 0;
-> > > +     mac->link.speed10 =3D XGMAC_CONFIG_SS_10_MII;
-> > > +     mac->link.speed100 =3D XGMAC_CONFIG_SS_100_MII;
-> > > +     mac->link.speed1000 =3D XGMAC_CONFIG_SS_1000_GMII;
-> > > +     mac->link.speed2500 =3D XGMAC_CONFIG_SS_2500_GMII;
-> > > +     mac->link.xgmii.speed2500 =3D XGMAC_CONFIG_SS_2500;
-> > > +     mac->link.xgmii.speed5000 =3D XGMAC_CONFIG_SS_5000;
-> > > +     mac->link.xgmii.speed10000 =3D XGMAC_CONFIG_SS_10000;
-> > > +     mac->link.xgmii.speed25000 =3D XGMAC_CONFIG_SS_25000;
-> > > +     mac->link.speed_mask =3D XGMAC_CONFIG_SS_MASK;
-> >
-> > Is there any point populating link.speed10 and link.speed100 ?
-> > You're telling phylink that 10/100M speeds aren't supported in
-> > link.caps, so these speeds won't ever be used.
-> >
-> Thanks, I missed this. Will remove 10/100M entries.
-> > > +
-> > > +     mac->mii.addr =3D XGMAC_MDIO_ADDR;
-> > > +     mac->mii.data =3D XGMAC_MDIO_DATA;
-> > > +     mac->mii.addr_mask =3D GENMASK(20, 16);
-> > > +     mac->mii.reg_mask =3D GENMASK(15, 0);
-> > > +     mac->mii.clk_csr_mask =3D GENMASK(21, 19);
-> >
-> > This will be the third instance of this particular mii data setup.
-> > Please consider adding a function to do this setup.
-> >
-> I will move this code segment to common helper function.
-> > Thanks.
-> >
-> > --
-> > RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks for pointing this out. I will check resource cleanup more closely.
 
---0000000000003abaa6064d2a0d9c
+> Thanks.
+>
+> --
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+--000000000000a312ec064d2a2705
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -355,14 +305,14 @@ Y/1/C9Jv/mWm/2lK8nvusOFxhKmbG83Hx8toQdZ5F1kYk6zAWjfB7lwXr/En9mCmLieJ18hen9EK
 qbYyUkmCmuoLi5GXFMJy+iQv6DgMVQ7CACagybU6FUrmL9lVa+A6caBEEh4xggJXMIICUwIBATBi
 MFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9i
 YWxTaWduIEdDQyBSNiBTTUlNRSBDQSAyMDIzAgwYdforFgrdZbZjKmswDQYJYIZIAWUDBAIBBQCg
-gccwLwYJKoZIhvcNAQkEMSIEIEmds8YruXz+kLzusi9PvUSj4X/xjlJST+Hyz+O6WN5QMBgGCSqG
-SIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDMxNjIwMjc0NlowXAYJKoZI
+gccwLwYJKoZIhvcNAQkEMSIEIEVXcjSjz56AI0w+HsGXeUxkTOKzBC+efQ7f15h8z9swMBgGCSqG
+SIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDMxNjIwMzUwOVowXAYJKoZI
 hvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG
-9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAG1Ud31IjVSh
-QFZsf6AaDp7pdhVd8kOhGr6bXM6EFiH5Qps9qB57B034/QB2FI5yq0Gp2/JGfIWbrw9c9EbZ67Rm
-M4HOoEBQq+cDrQc5+lqMYDVnxmspJqeVC9lMH+MjbcIsONAHoRYoLum3bbQxnjHgHc7JX5PjSW6S
-ufSXY8KBrEyDGVCz7/leqfmAnlNAW4e/Xayjcfcwsgt3UykT/bZUkg3SZjQzzczws9jixWlFOYqj
-lvp0iRRkK/IB/abdrpKo11OZ7IgboALFQz/7NMlVzIIp5sgTmF77kQ43ujw7kxHjCdqdHakkI3o9
-l5FvQ/i6WnfhUmz6yCP+vv5L2Bo=
---0000000000003abaa6064d2a0d9c--
+9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAFKLRiMUO18y
+a0BAKLhgr2qjeDHvAmd7g/MkO4V2joJ7Uuw+71a0lK2str1PnrliHtxBtcnLjEkypr9kg8UJsCXk
+jJkEVaYOBV21HU+6NjLpaxLFWdVA76lEX7ev06oQvqaHpUDAMdErV4fUZ0OLgcb5ZZVnlRkfp5Qt
+tBw9JYgUu3eQjGnW4E2Ky90xy347h7IiE9GMB4aMLmrOHxH7lH9n7aOCGWse//hCGmx+Ndz6ZRf+
+HLg7aqfN8icTZ/FsoHMnuHAoL1dABftDygbJYMVJxOFss7ozIsk9pVrqN4RME28/iwXspEonsqN1
+suZE6y05oullO+na7hNowFV6sMk=
+--000000000000a312ec064d2a2705--
 
