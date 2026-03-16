@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-268225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268226-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yFhjJsQ9uGmpagEAu9opvQ
-	(envelope-from <netdev+bounces-268225-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:28:36 +0100
+	id OK47JFg/uGnSawEAu9opvQ
+	(envelope-from <netdev+bounces-268226-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:35:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1009529E377
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:28:35 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3600229E595
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 18:35:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 39FDC3088EE8
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:22:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 575A5307AFFF
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:29:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEBF13CFF62;
-	Mon, 16 Mar 2026 17:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB7B3D301E;
+	Mon, 16 Mar 2026 17:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LXvHwC5B"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="2RfqEAqk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF07191F94
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 17:21:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550383D1CAE;
+	Mon, 16 Mar 2026 17:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773681708; cv=none; b=Rm3JTHUUenN1gLL/yzmApAp5duYX8SAcDGAhrvVagd4Ar83rw40LXPMkYDcKVoFHzTq54qMO/9oaBk8Ea67Z/Dy25krPGRR5msFNpai1Sqc/kiBSFH4YLEPKlMWH8v5NGLoIC+WNA+0Wt3zDTuRXQgg0j9PEz/zYa9LLRdEKEHU=
+	t=1773682130; cv=none; b=f6fB+C2L2kFjaz9U3uqcXo1IYsAKQ6ObKz6fJYzZpJQTZU++ivbSJEXi0pRmAUlB7jaxW1m4Au6IwWK2laJ/sQlLAkwjuybssLWkBATRpjMelBq280s08O3KGQI+rINHIkwrWRmL/Dj96wGtQFgubsP2WNZgubPsMcWfIPUhK9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773681708; c=relaxed/simple;
-	bh=XFTDd7Tadlm0/od3TW1ezaMppdHeqpU3S8hzc5cs31E=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
-	 References:In-Reply-To; b=Hv8Eg3wIFtKjtv1d1ZmLgapheKRQ9MjT3luCKvpUr9DtAw5ZqhnSUN1av34MbUVaXiPcBMFJPNDUPHRIlgHdfdc0E0kOiyp3SVRrf8d6Ao0az6R0bJ0PFMbjPjt18siDgXFDqpHfcM2V+bjikXVATBImXanW71NtM7bbcyRqtIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LXvHwC5B; arc=none smtp.client-ip=185.246.84.56
+	s=arc-20240116; t=1773682130; c=relaxed/simple;
+	bh=NecQNIbJVjR4QKynRnsWGLEM/FjCA8nKBtIf4lM6MYU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=Rq9D0caax9XrW/3aV7kkMPLkpzn4qlfxluBphqk3aJOrlLfHDDe0ekXtVc2d+sila/TfGWsbgDmh8wo2j/JgQyX//hpFRSSCbf4EI+nuIINt29x+1q/38uoVjqDACCge5Fi67UIULj7i86XkAe7biZIWCI5eHiPbgsXxFARKusM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=2RfqEAqk; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 42DF01A2E71;
-	Mon, 16 Mar 2026 17:21:45 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 75F08C55049;
+	Mon, 16 Mar 2026 17:29:10 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 095B65FC4A;
-	Mon, 16 Mar 2026 17:21:45 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0AAD510372204;
-	Mon, 16 Mar 2026 18:21:38 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 959E35FC4A;
+	Mon, 16 Mar 2026 17:28:43 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F415210372205;
+	Mon, 16 Mar 2026 18:28:39 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773681703; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1773682122; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=5hJQPcQB/mfn4z9kBexUJFaQDGdy8HXhWPjLr20ro9s=;
-	b=LXvHwC5Bv+dbRiyfi15dVgmJUz8kDDC8Thu7YT4mTKLEbQKg9kDD7SIg2o24Nn3hD9LZ2Q
-	k4ZuWypoYPtb00sl5wGKGTxPJjDTjSnydQJdzzdw6gwXkg01jj0xgnWQ+AQjXC7cvGAmwk
-	pkXWq/wEyhtZFeZFXcuMXE6x0rxUJmizD8gTF2YmGoUDab9d5Lqa+U77P4+lH4yExZdyPX
-	yB6k/AhheVUfkWviIwPwQoHUS6k6oikyWFzRGFD8S8RjFLg1kP9lQNCxb4Hxy/ZObbFTL+
-	8jp5K26+DTV3tAjV3yT4H9OsSou9BsfquwLceXPCQJ8AN0uK8q2ns6UqWqxJ0w==
+	bh=gz0O9gf9DYS/9ki+LBzB+Kc7tz7JAV4ntvwkaPEiz9o=;
+	b=2RfqEAqkQVxA/RBKfoUw4sivzmpo/J3yIH3PRNOSIqcaI+6j1jCXdiZw0OrgYrhyrk9uxE
+	gnIRJ+LHMMTEN3pxnTANZm4QcvoarnjEPeumXPbQ3uEKOusXCLZ7Abt5w8m1ioKPYDk9UG
+	rHYPSxLNQoI3oZxFkrQ9xfek7YrfKznFUlbRPeE5wWQ9EyNBs3iXCdpjjP69JQdnapQ8oN
+	z8fdwhle17H+7c+9iu/gOrkyroc9MhlSO9pcY8ET5j5Tggtat2tkzJguMOBpFXrpbqhw0t
+	tMLOg3DwLiyWxAcNbkl6Q+EDosicnHRpZu/TAzWT2PlMKujUYVfk1VUHuZv9eQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,31 +59,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Mon, 16 Mar 2026 18:21:38 +0100
-Message-Id: <DH4DORKIV5RB.3P7Z2RTRNCXH7@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next v3 2/3] net: macb: add safeguards for jumbo
- frame larger than 10240
-Cc: "Simon Horman" <horms@kernel.org>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
- "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
+Date: Mon, 16 Mar 2026 18:28:39 +0100
+Message-Id: <DH4DU4Z4X9MM.398FQ3BIZQIJB@bootlin.com>
+Subject: Re: [PATCH net-next v3 0/3] Initial support for PIC64-HPSC/HX
+ Ethernet endpoint
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Rob
+ Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
+ "Conor Dooley" <conor+dt@kernel.org>, "Nicolas Ferre"
+ <nicolas.ferre@microchip.com>, "Claudiu Beznea" <claudiu.beznea@tuxon.dev>,
+ <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 To: "Charles Perry" <charles.perry@microchip.com>, <netdev@vger.kernel.org>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
 X-Mailer: aerc 0.21.0-0-g5549850facc2
 References: <20260313140610.3681752-1-charles.perry@microchip.com>
- <20260313140610.3681752-3-charles.perry@microchip.com>
-In-Reply-To: <20260313140610.3681752-3-charles.perry@microchip.com>
+In-Reply-To: <20260313140610.3681752-1-charles.perry@microchip.com>
 X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -92,46 +90,66 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268225-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268226-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 1009529E377
+X-Rspamd-Queue-Id: 3600229E595
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello Charles,
 
 On Fri Mar 13, 2026 at 3:06 PM CET, Charles Perry wrote:
-> The RX buffers for GEM can have a maximum size of 16320 bytes
-> (0xff in the RXBS field of the DMACFG register means 255*64 =3D
-> 16320 bytes).
+> Hello,
 >
-> The GEM IP has configurable maximum jumbo frame length that can go up to
-> 16383. The actual value for this limit can be found in the
->        "jumbo_max_length" field (bits 0..13) of the DCFG2 register.
-> Currently, the macb driver doesn't use the DCFG2 register when
-> determining the max MTU, instead an hardcoded value (jumbo_max_len in
-> struct macb_config) is used for each platform. Right now the maximum
-> value for jumbo_max_len is 10240 (0x2800).
+> This series add basic support for Microchip "PIC64-HPSC" and "PIC64HX"
+> Ethernet endpoint. Both SoCs contain 4 GEM IP with support for
+> MII/RGMII/SGMII/USXGMII at rates of 10M to 10G. Only RGMII and SGMII at a
+> rate of 1G is tested for now. Each GEM IP has 8 priority queues and the
+> revision register reads 0x220c010e.
 
-If DCFG2 contains the value then we can runtime detect it. With that, we
-could make the macb_config->jumbo_max_len attribute optional. Then
-start dropping it from platforms where we know we can trust the DCFG2
-value.
+Do you have plans to test higher rate? We might get our hands on GEMs
+that support >1G and would like to know if CCing you would make sense.
 
-An alternative would be to validate macb_config->jumbo_max_len against
-the DCFG2 value, but that is less useful.
+> One particularity of this instantiation of GEM is that the MDIO controlle=
+r
+> within the GEM IP is disconnected from any physical pin and the SoC rely =
+on
+> another standalone MDIO controller.
+
+Ah, that means you instantiate the MDIO bus for no good reason.
+Code looks like:
+
+static int macb_mii_init(struct macb *bp)
+{
+	struct device_node *mdio_np, *np =3D bp->pdev->dev.of_node;
+	int err =3D -ENXIO;
+
+	/* With fixed-link, we don't need to register the MDIO bus,
+	 * except if we have a child named "mdio" in the device tree.
+	 * In that case, some devices may be attached to the MACB's MDIO bus.
+	 */
+	mdio_np =3D of_get_child_by_name(np, "mdio");
+	if (!mdio_np && of_phy_is_fixed_link(np))
+		return macb_mii_probe(bp->dev);
+
+	// ... probe MDIO bus ...
+}
+
+So to *not* get the bus we need to be in fixed link config. Do you care
+about that? I think that the proper fix would be to lazy probe the MDIO
+bus until a PHY (ours or some other MAC's) asks for it.
 
 Thanks,
 
