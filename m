@@ -1,154 +1,123 @@
-Return-Path: <netdev+bounces-268262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268263-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UAZABQZcuGl0cgEAu9opvQ
-	(envelope-from <netdev+bounces-268262-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:37:42 +0100
+	id 5bBKCdpcuGnXcgEAu9opvQ
+	(envelope-from <netdev+bounces-268263-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:41:14 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACA4829FD86
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:37:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A640F29FDC0
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 20:41:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0A05E302A396
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:37:41 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 08CD43026B7E
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 19:41:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D74B3ED112;
-	Mon, 16 Mar 2026 19:37:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D52A93E717B;
+	Mon, 16 Mar 2026 19:41:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="V9gJGEMJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t6gf85r8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C3734F486
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 19:37:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B361A9FAF;
+	Mon, 16 Mar 2026 19:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773689859; cv=none; b=e/5NTATdYOUCtb4bULJwq/bcI/UsLNDYaCFZkwKMXHSBWfeevNcIsjweGba5nMSPXf8FQ1tOnKOwmuvuuCmWAnmCRZgaqYgXvFcGiAYTRrma9pRTMj0komGQ1RN0crYzRo/JbiD+Szi7uhVN/h+SSWLz80OnO04f6P8hH7+TYKo=
+	t=1773690069; cv=none; b=iiPbCehsUJTikfMM022U0njNo/SF22o3AAfyEv3IqbThRiMG9m1yZGe1SybhUudOtdSumCZzGT1yvBS6IcfhqszL+svX8aYNDmr1u3Ghlo4TbSTfXHBhl2nsTk63Fj+w2m9fCh2BAuVmtBkGQ4y97/nulL2i1ye/fcCUoNq0raw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773689859; c=relaxed/simple;
-	bh=ZvsXSyiI3XkbsKZuNkcSgsTni+v4WLMdb2x9NUrXcM4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h3pCAyt26X/2IJCi2zkD7tUPBqMlo27cg7Ilo96XEYcA0JtNYlubLi4AAHQCg3PbcM0uqgJV/y2VrIK3o6T8GZbnoDWfWgrMIkhFSWc2h0H0214ArP3QldI/L/NGQWRUfpMst7zLmglAPP/5NfHbezLkwH3j8qkLtKCVDoorJ5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=V9gJGEMJ; arc=none smtp.client-ip=209.85.210.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7d1872504cbso69604a34.0
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 12:37:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1773689857; x=1774294657; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yTI4ZGyhMvb0csBBlNJg9TpIQ4OoSUyId0bqLGFvRG4=;
-        b=V9gJGEMJeyQPEUQoq9izwPN833JdTjNkNnsg4VZ/+fCFTH48JFcd8wv+fsWT8ST/yU
-         klaxnuhF6HFEsSdeMgQwqanoKL/qJ+quPTuHr3gYGCAp0XmpMvHHkKjPCK6R6sv7tm3m
-         vjvFoOi2OItk0dQPsz6Uj1UvINuWVdab+kma3F7x2JkQUD9rVR+ddS65zDiAYR8RfJsr
-         pxr7ojJq5IHyxUtV8KJ2jMkKbj4jjyRyzF67oaCRQ0hFY1J4WZsFggqVVpDz0tnOplVD
-         OGQYZliyau63hDIggJOS/5aPQi4M+OC+t0xjnvbEdbKeZUpLs1MqwiH2Fhmw9m7x8Ra7
-         BWbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773689857; x=1774294657;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yTI4ZGyhMvb0csBBlNJg9TpIQ4OoSUyId0bqLGFvRG4=;
-        b=rWADEw97tn6DKWpmfYwQdfrPe7V/IV5HLl0i3gwISHFbUfT2IUSDdNPxSW1v6ce/t+
-         yJTxydE0ZZqKayMyARmshWqT2CNMz01AEmNo84RdG5J3FJYM/jvbMIeivwuAUBMkg76N
-         zmV54we0U3ID3hSQLHm5uvisKI1nFBnVBzAJz2u9QBkg4s0DNV1zFqUWppQ7++A4xPAb
-         yDSZK/vDSS9tkC/AE4z1QueYYR9GML5GggY4cwpAn6SGOevvJxwnNReausGAd7E3F82X
-         mRVwxViXPsbonG9OKHLByK+c/iRiCXAvAlAOdTDTI3w8MuNwDwS/aVgGFi7ozxlLWhbh
-         m4SA==
-X-Forwarded-Encrypted: i=1; AJvYcCVhF7+yrDO9nhsfVHdUljDQ1umFx2dzR1U9prfoH015JyETWBFe2Da2QAatWVVWD6eKrp9SziE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZ6+4K10edzhHL/NmnqRqmgGVCx10IqmS+Kii+Ao8FnEJAb2Yp
-	qTzVM88f2GefCHKNvWr9V2J8QoI9bvBlHRKJ0+xHJNCDHQQlIpwAg8m85n/9E8K4C8X64Ki1HZ4
-	oxt6dDDI=
-X-Gm-Gg: ATEYQzwh4QZh30FkfsQpzYcHrNf1rQYVyhE6f3K/StxF0/nq7nUnHicFXAB9nCVjwjy
-	9COXo0LT2swsJm4Yml0ULUILRKBzppBvbAOJfGE5Mn/v+gaDGF8cbmEMdDUIuqxLzKp58TK8R2A
-	ebsJJDro91vwpYgv8tRSWM+bAwV+70aRTZYA3LTSurd/vnF8+bSv+sHfsCyxKssHb5BEujtY5C4
-	hu4g3mp+h5Jrm6WV10++tSKAGhX7gJGpBVNIbEPS/tJU2qY5zUQVdq0p6c3EC846+4VzJXLdBWC
-	kXf5EuJ7Wp82TVpkY5qbqXojxw51hLNORA4s1CEuEEbZYEugJiFyH1AADFJRBjydoFuTAstQdEb
-	6rJ8XUniaWMjAwIpuGt6Cgcnfg/TvWBVgxkVmJLdNUNdr8pDTaRLEXg5RMfL1tEnanp8NEKCbHa
-	2eMCkOhm318TFguCzUiczy41SW+ygyLyFD0YErlDG7RAnOcQadld1Y1O3FyEgovYw2hNt/s8GgA
-	9ut79Ckhw==
-X-Received: by 2002:a05:6830:3591:b0:7d7:4c90:ddce with SMTP id 46e09a7af769-7d7bb6c99b9mr470879a34.7.1773689857004;
-        Mon, 16 Mar 2026 12:37:37 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d76ae39b39sm13970767a34.15.2026.03.16.12.37.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Mar 2026 12:37:36 -0700 (PDT)
-Message-ID: <1f79957a-5b23-4bbd-af8d-9d1c86791645@kernel.dk>
-Date: Mon, 16 Mar 2026 13:37:35 -0600
+	s=arc-20240116; t=1773690069; c=relaxed/simple;
+	bh=+r/rKSDJHKoEyUKWlrdPrbGCuVC2E2OzQyf0nGl0zCc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=vBKbY1tMzHPzVY5+YicK3GjTE4RqVB/PWI0kvmOdbpI1VzqRJ0Yk4wzcQbKQTuS/rnvWShWZTaLDmw9rkJNJZYpntx1V60MAQd2L3GoHunrjSRXe9zZdx6A203lTqQOvI9HjhhPZnvW9fmIdkHFMbsIWeVTojR53hq/hHRWbrBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t6gf85r8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FBBCC19421;
+	Mon, 16 Mar 2026 19:41:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773690069;
+	bh=+r/rKSDJHKoEyUKWlrdPrbGCuVC2E2OzQyf0nGl0zCc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=t6gf85r8cnydejSet9c0sttbHQI2BMNRJUEL4LM4qSqlCJPzzGrYam2YVn67iGS6l
+	 UsQQkMIXKR/3xG0sCF3Wxa4rzDUn8mCMroPEAiHofQNkMgtxKsvXC5lI6kVEmpsmnA
+	 qSraGb/SPn2C47x4f/prj3MqR7r6mTTJFdCNdgPhrjnCRGyyOSKsN/UJFO60tGmw3b
+	 9qcfktfmvpFSoaPZl/ufmkfdQYL2LDdO7qV7v7psaivdxOReDjwVRD+NozCIzeAzPa
+	 Pf5gxG1Aq5ju6cAFsij9yibQ2GqLAQM7cFvAxE+zIwfMaj7Y8qQYql8y4xa9qf/MJW
+	 Qoo16doqzV/Tg==
+Date: Mon, 16 Mar 2026 12:41:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ <intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>,
+ <netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Paolo
+ Abeni" <pabeni@redhat.com>
+Subject: Re: [PATCH] idpf: Replace use of system_unbound_wq with
+ system_dfl_wq
+Message-ID: <20260316124107.0dd3cc2b@kernel.org>
+In-Reply-To: <878cd07a-b7fb-491a-9cec-8ddbab2bb13b@intel.com>
+References: <20260313150917.271086-1-marco.crivellari@suse.com>
+	<0ca7f92b-ec4e-469c-ad2b-648d278bcfe9@intel.com>
+	<20260314091048.235a6d0b@kernel.org>
+	<878cd07a-b7fb-491a-9cec-8ddbab2bb13b@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] io_uring: cast id to u64 before shifting in
- io_allocate_rbuf_ring()
-To: Anas Iqbal <mohd.abd.6602@gmail.com>,
- Pavel Begunkov <asml.silence@gmail.com>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260316150636.2123-1-mohd.abd.6602@gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260316150636.2123-1-mohd.abd.6602@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel-dk.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268262-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[kernel.dk];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel-dk.20230601.gappssmtp.com:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268263-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,kernel.dk:mid,kernel-dk.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: ACA4829FD86
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A640F29FDC0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/16/26 9:06 AM, Anas Iqbal wrote:
-> Smatch warns:
-> io_uring/zcrx.c:393 io_allocate_rbuf_ring() warn: should 'id << 16' be a 64 bit type?
+On Mon, 16 Mar 2026 09:58:29 -0700 Tony Nguyen wrote:
+> On 3/14/2026 9:10 AM, Jakub Kicinski wrote:
+> > On Fri, 13 Mar 2026 17:08:57 +0100 Przemek Kitszel wrote:  
+> >> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>  
+> > 
+> > Process question - even tho you are also a maintainer I only read
+> > Tony's tags as "please apply directly". LMK if that's right, I'll
+> > try to remember / make a note..  
 > 
-> The expression 'id << IORING_OFF_PBUF_SHIFT' is evaluated using 32-bit
-> arithmetic because id is a u32. This may overflow before being promoted
-> to the 64-bit mmap_offset.
-> 
-> Cast id to u64 before shifting to ensure the shift is performed in
-> 64-bit arithmetic.
+> I talked to Przemek about this a little this morning. Since the 
+> Reviewed-by tag is used more prevalently in our process, perhaps an 
+> Acked-by could mean take this directly and the Reviewed-by keeps the 
+> same process of going through IWL. Other thought would be to explicitly 
+> ask/state for it to get taken directly. Open to other ideas as well if 
+> there's something else you'd prefer.
 
-I'd be impressed if 'id' could be large enough to cause this to
-overflow. AFAICT, you'd need more than 64K interface queues registered
-to hit this. So I think this should be reframed as a cleanup, to appease
-smatch.
-
-I'll defer to Pavel on that one.
-
--- 
-Jens Axboe
+Sounds complicated :S Let me continue ignoring Przemek's tags for the
+purpose of direct application. I guess it's more about who sends the
+PRs than who is a maintainer. If you send PRs I naturally never see
+your review tags, as the patches will eventually come out with your SoB.
 
