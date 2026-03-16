@@ -1,474 +1,425 @@
-Return-Path: <netdev+bounces-268302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268325-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sBj+FeaFuGltfAEAu9opvQ
-	(envelope-from <netdev+bounces-268302-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 23:36:22 +0100
+	id 4LecOW6IuGksfgEAu9opvQ
+	(envelope-from <netdev+bounces-268325-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 23:47:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89BFA2A191E
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 23:36:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A87D2A1B01
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 23:47:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C042230746E3
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 22:31:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ACE293022F5A
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 22:47:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F8E35F5FE;
-	Mon, 16 Mar 2026 22:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76CCE37755D;
+	Mon, 16 Mar 2026 22:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="kMg6xcL3"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262EB15FA81;
-	Mon, 16 Mar 2026 22:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1AF6364EBC
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 22:47:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773700290; cv=none; b=iZhcKQVyNBG/cDhgJ8LHjyrYOwJgjuCqkwrpMoI/5F/AF1EsxODeRp5I7v2mJq9DuqYHkap2S2ZE1IBl/Pte/HAtcwtYbp0mowyjeLw5m6p81gqFFBSvndSzSdtEMk1Xkh+Kt0wIqDRkrXZDB+1pSY2IEXhqk16HPJyosxMI7BU=
+	t=1773701224; cv=none; b=Wi/CflbtjM5CM3BkFJyzs4YydeZcTpVlLbVx8o87qY9qWfY3ekL4TFgVEoJITFAwQQpknJvld47phJIssGi/GjeJOVE9r2JcSmV0G/SyLYrenSqj9go8v2Wa1xGDEM7iqsAjAFYxWHkzksoBYuZz0hMB6NJQl0UQe5pKgdbx0kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773700290; c=relaxed/simple;
-	bh=xyHC9ohvcAWbYaHq/N8MzMZhhf2bNvPa9wrZkAo/RJY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HVluME9pdB6K0g2ju7ArdxgPCRP0alWBGGBpNWENYwBSZ34VRluP0Toi/ZIDkvmMQeRC5Glzr3Pn1WSZgg03Bq6YQPiAc+5gT6HBxFwiUapolpAdpj5sx+5OymjSJ2CZzQ2jX6QHAwj0o+FQJSuE43N2i/eYrGXlz4I5jdFkL38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c2dff70000001609-56-69b884bcd352
-From: Byungchul Park <byungchul@sk.com>
-To: linux-mm@kvack.org,
-	akpm@linux-foundation.org,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	kernel_team@skhynix.com,
-	harry.yoo@oracle.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
-	andrew+netdev@lunn.ch,
+	s=arc-20240116; t=1773701224; c=relaxed/simple;
+	bh=hynLvD2cY5DNchazYZBdLhDJ+WE9Ig6PbZmwFubpKgY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qgrREU5Dlw5hvhuUjuYw62rPXQzdVhOiLs2XZ63H3+7q1Hag3nBqSkTVbarfhge13c3WR1nQKjlln+hlA6QHrurcFtoCbhWJBJvFiWuXfk/YnekqKhHynRqDZShMOA0OLwKacHIxc+WW6xyyDdhhFCYEx0U0UbpcOXZXbHMhZ4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=kMg6xcL3; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=5ODu3WzdO0qOz2KA9etUSR+AdMPFazy4ztrmUcQpPM8=; t=1773701222; x=1774565222; 
+	b=kMg6xcL3Tf+Qkm/iPzOyjPdbgZa8m8pL4S3stBPZaNIces+mNyAHGV6Eh4jY53b8FcgLkit35dK
+	ocvK+R/QdctXhRIojvAfqgYecQlVTgWQyhq7fNDxmWFKTzHYoNIFUkcuy/f+t3JEZhn47B07IN9Ff
+	l06I357mFx8W7t0mU+qz6a/76R6wmJHtDpOzZULTVcqdR3KFRKKIrqdb9Uj7HgzyHuWiYcTyTNOUA
+	hWc6v+CecMo+bPU3Q7MmMzTMQm9plOjyMJuTdiSOHJUu2CdW+Z+eigYBfNEutZlN4W1J91xZ6h0g1
+	lZa4mcgiKgqaEu2q6GIgtSPQSyDqtWSnt16A==;
+Received: from ouster448.stanford.edu ([172.24.72.71]:53396 helo=ouster2022)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1w2GUG-0004uJ-54; Mon, 16 Mar 2026 15:32:37 -0700
+From: John Ousterhout <ouster@cs.stanford.edu>
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com,
 	edumazet@google.com,
-	pabeni@redhat.com,
-	david@redhat.com,
-	lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com,
-	vbabka@suse.cz,
-	rppt@kernel.org,
-	surenb@google.com,
-	mhocko@suse.com,
 	horms@kernel.org,
-	jackmanb@google.com,
-	hannes@cmpxchg.org,
-	ziy@nvidia.com,
-	ilias.apalodimas@linaro.org,
-	willy@infradead.org,
-	brauner@kernel.org,
-	kas@kernel.org,
-	yuzhao@google.com,
-	usamaarif642@gmail.com,
-	baolin.wang@linux.alibaba.com,
-	almasrymina@google.com,
-	toke@redhat.com,
-	asml.silence@gmail.com,
-	bpf@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	sfr@canb.auug.org.au,
-	dw@davidwei.uk,
-	ap420073@gmail.com,
-	dtatulea@nvidia.com
-Subject: [PATCH v5] mm: introduce a new page type for page pool in page type
-Date: Tue, 17 Mar 2026 07:31:13 +0900
-Message-Id: <20260316223113.20097-1-byungchul@sk.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20260316222901.GA59948@system.software.com>
-References: <20260316222901.GA59948@system.software.com>
+	kuba@kernel.org,
+	John Ousterhout <ouster@cs.stanford.edu>
+Subject: [PATCH net-next v17 00/14] Begin upstreaming Homa transport protocol
+Date: Mon, 16 Mar 2026 15:32:12 -0700
+Message-ID: <20260316223228.2611-1-ouster@cs.stanford.edu>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SW2yLYRjHvd/7nVYanxrecUEqIog5hHgWh7hw8ZFNCC6clX2xz7puaW02
-	CemYYNE5Lqor2SJqh9LprO2WFTuYDWGZjdZhmzEW7JBtRk1MaxHufnme///33Dw8Vj1kJvOy
-	br+k12m0alZBK7rG5M31Znjk+cMuHqwOOwtF31PhepuHgYD9IwXWQheCgcArDoa9tQj6ax6w
-	8Lm6D8HVvEEM1qcZNHx1/MBQVv4RwSfzDRY6ats5KHLGQKvtAw0Vx90Y2k/XsWDKGMLgDXRz
-	cMSTHxSXGDlocGUxcOHHNQxuYxsHz8qtLLTYhxn4UGWiod5SQENvdg2G1qyVUJs7EQYffUFQ
-	43BTMHjqMgvNl8opKPU2c3C+MZeFdxmtCBqr22nI/nmChZz0LARD34PK7jMDDOTcb+FWRorp
-	Ph8rVn/pweLtAj8lPjefpUXfnYeUWGZ5w4m5zmSxJH+2mOlrxKKz8CQrOvvOceLr5xWsWGce
-	osWyt1FimaefEk1Hu9l1E7YolsVKWjlF0s9bsUsR13mihEr6tT21x/6NMaL86EwUxhNhEel/
-	+pL7yy/q/FSIWWEm8fkCOMThQgy56WpCmUjBY6GbIxV3v7GhxXghmtS9CPxhWphB0i900SFW
-	CotJz7XHaEQ6lRQV3wuKeD5MiCKPOteHxioBSG9TBTMSH0fqL72nQxEcvOu4ogqNcbB5tDQH
-	h84SoZcnZnMpNaKMIJX5PvoMEiz/1S3/6pb/6rkIFyKVrEtJ0MjaRZFxaTo5NXJPYoITBT/M
-	dujnVg/qa9hQhQQeqccofYxHVjGaFENaQhUiPFaHK201LlmljNWkHZT0iTv1yVrJUIWm8LR6
-	knLh4IFYlbBXs1+Kl6QkSf93S/Fhk40omR1y2JY0JJkinuwYy7jvHl61zaZbUr+j80HlgdHF
-	4S89m590yP7s4xZv/L5of9Pe9Mzpd6IMczZHdLhjYrXl796Ex6+xd82pxAPNLWtNknX6tnZt
-	XvRFI7HosmdlrZ16bOPyq5v8q42Jt9qWniuwFMdXjmp1BqbN2h21gt/OvB2tpg1xmgWzsd6g
-	+Q2S4FsTXQMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHec97bo5GxyV2sEIadIXSouCJbtKXjreoT0EUOvPUTuqUrUyL
-	QnOQSTNNBZ0aRuVlzqyZc8rUUvNSQTlLF6s0K0srDTNtKtVWRH37839+z+/58rBYYaYCWElz
-	XNRqVPFKWkbK9mzNWGfX26TgzDcboKTWTEP19xSoGLJR4Da/J6DEZEUw5XYx8LO5E8HXji4a
-	PrZPIrh2dRpDyWM9Cd9qZzE0Nr1HMFZYQ8O7zmEGqi2RMFg+QoL9fAOG4UvdNBj0cxia3eMM
-	nLNVesR1aQy0l/ZQ8MSaTUH+7A0MDWlDDPQ1ldDwyvyTgpE2Awk9xioSvhR0YBjMDoHOMn+Y
-	fvgJQUdtAwHTF0tpeFbUREB98zMG8hxlNLzRDyJwtA+TUDCfSUNxejaCue8e5XjOFAXF918x
-	IUFCutNJC+2fJrBwp+o5IfQX5pKCs+UBITQaXzJCmeWEUFe5VshyOrBgMV2gBcvkZUZ40W+n
-	he7COVJofL1FaLR9JQRDxji91/+AbFusGC8li9qgHdEy9YfMOiLpx6GUCfMMlYYqI7KQD8tz
-	m/iB7ueEN9PcKt7pdGNv9uMi+ZvWpygLyVjMjTO8vXWG9g4WcRF894D7dya5FXx6/mfSm+Xc
-	Zn7ixiP0RxrIV9+66xGxrA+3hX/4YZ+3VnDAf3lqp/7gvnxP0VvSi2DP3dorCm+NPZsZ9cU4
-	B8mN/1HGf5TxP6oMYRPykzTJCSopfvN6XZw6VSOlrD+cmGBBnh8qPzOfa0NTfbvbEMci5QK5
-	k7JJCkqVrEtNaEM8i5V+8vIOq6SQx6pST4naxCjtiXhR14aWsKRysTxsvxit4I6qjotxopgk
-	av9OCdYnIA25rKsHpJR7vuS+k60JqlnNxx2jLnG3YSSO3WUtWhp2TD1UZzjPjK50VLTuPc1d
-	PzJ0Jzh4Z6grSJ8od2w/1ane2BtzN3AqdDggvGZNcpXv5LVzOktLVU/UyYJyHNMFeS3L0NuF
-	0TVJP0LD7VvHGnpdufnKnQfP9l+8HfHCtDzAT0nq1KoNa7FWp/oFypO+ET8DAAA=
-X-CFilter-Loop: Reflected
-X-Spamd-Result: default: False [1.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spam-Score: -101.0
+X-Scan-Signature: 1f26ecfccd24954124942d3c02091509
+X-Spamd-Result: default: False [1.14 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_REJECT(1.00)[cs.stanford.edu:s=cs2308];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[cs.stanford.edu : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268302-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[sk.com];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_CC(0.00)[vger.kernel.org,skhynix.com,oracle.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.cz,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[byungchul@sk.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-268325-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.017];
+	FROM_NEQ_ENVFROM(0.00)[ouster@cs.stanford.edu,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[cs.stanford.edu:-];
+	NEURAL_HAM(-0.00)[-0.969];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email,cmpxchg.org:email]
-X-Rspamd-Queue-Id: 89BFA2A191E
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,cs.stanford.edu:mid]
+X-Rspamd-Queue-Id: 6A87D2A1B01
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Currently, the condition 'page->pp_magic == PP_SIGNATURE' is used to
-determine if a page belongs to a page pool.  However, with the planned
-removal of @pp_magic, we should instead leverage the page_type in struct
-page, such as PGTY_netpp, for this purpose.
+This patch series begins the process of upstreaming the Homa transport
+protocol. Homa is an alternative to TCP for use in datacenter
+environments. It provides 10-100x reductions in tail latency for short
+messages relative to TCP. Its benefits are greatest for mixed workloads
+containing both short and long messages running under high network loads.
+Homa is not API-compatible with TCP: it is connectionless and message-
+oriented (but still reliable and flow-controlled). Homa's new API not
+only contributes to its performance gains, but it also eliminates the
+massive amount of connection state required by TCP for highly connected
+datacenter workloads (Homa uses ~ 1 socket per application, whereas
+TCP requires a separate socket for each peer).
 
-Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(),
-and __ClearPageNetpp() instead, and remove the existing APIs accessing
-@pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
-netmem_clear_pp_magic().
+For more details on Homa, please consult the Homa Wiki:
+https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
+The Wiki has pointers to two papers on Homa (one of which describes
+this implementation) as well as man pages describing the application
+API and other information.
 
-Plus, add @page_type to struct net_iov at the same offset as struct page
-so as to use the page_type APIs for struct net_iov as well.  While at it,
-reorder @type and @owner in struct net_iov to avoid a hole and
-increasing the struct size.
+There is also a GitHub repo for Homa:
+https://github.com/PlatformLab/HomaModule
+The GitHub repo contains a superset of this patch set, including:
+* Additional source code that will eventually be upstreamed
+* Extensive unit tests (which will also be upstreamed eventually)
+* Application-level library functions (which need to go in glibc?)
+* Man pages (which need to be upstreamed as well)
+* Benchmarking and instrumentation code
 
-This work was inspired by the following link:
+For this patch series, Homa has been stripped down to the bare minimum
+functionality capable of actually executing remote procedure calls. (about
+8000 lines of source code, compared to 20000 lines in the complete Homa).
+The remaining code will be upstreamed in smaller batches once this patch
+series has been accepted. Note: the code in this patch series is
+functional but its performance is not very interesting (about the same
+as TCP).
 
-  https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com/
+The patch series is arranged to introduce the major functional components
+of Homa. Until the last patch has been applied, the code is inert (it
+will not be compiled).
 
-While at it, move the sanity check for page pool to on the free path.
+Note: this implementation of Homa supports both IPv4 and IPv6.
 
-Suggested-by: David Hildenbrand <david@redhat.com>
-Co-developed-by: Pavel Begunkov <asml.silence@gmail.com>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-Signed-off-by: Byungchul Park <byungchul@sk.com>
-Acked-by: David Hildenbrand <david@redhat.com>
-Acked-by: Zi Yan <ziy@nvidia.com>
-Acked-by: Vlastimil Babka <vbabka@suse.cz>
-Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
-Acked-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
-Acked-by: Johannes Weiner <hannes@cmpxchg.org>
----
-The following 'Acked-by's were given only for mm part:
+Changes for v17:
+* This revision contains only minor changes to reflect changes elsewhere
+  in the kernel, such as the addition of kmalloc_obj and
+  struct sockaddr_unsized.
 
-  Acked-by: David Hildenbrand <david@redhat.com>
-  Acked-by: Zi Yan <ziy@nvidia.com>
-  Acked-by: Vlastimil Babka <vbabka@suse.cz>
-  Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+Major changes for v16 (see individual patches for additional details):
+* Remove homa_pacer.c
+* Refactor homa_peer.c to simplify and clean up reference counting
+* Implement HOMAIOCINFO ioctl.
+* Use refcount_t instead of atomic_t for reference counts
+* Use consume_skb and kfree_skb_reason instead of kfree_skb
+* Use set_bit, clear_bit, etc. for flag bits
 
-This patch changes both mm and page-pool, but I'm currently targetting
-mm tree because Jakub asked and I also think it's more about mm change.
-See the following link:
+Changes for v15:
+* This series is a resubmit of the v14 series to repair broken Author
+  email addresses in the commits. There are no other changes.
 
-  https://lore.kernel.org/all/20250813075212.051b5178@kernel.org/
+Changes for v14:
+* There were no comments on the v13 patch series.
+* Fix a couple of bugs and clean up a few APIs (see individual patches for
+  details).
 
-Changes from v4:
-	1. Gate the sanity check, 'if (unlikely(PageNetpp(page)))' on
-	   free path, with is_check_pages_enabled(). (Feedbacked by
-	   Johannes Weiner)
-	2. Add 'Acked-by's.  Thanks.
+Changes for v13:
+* Modify all files to include GPL-2.0+ as an option in the SPDX license line
+* Fix a couple of bugs in homa_outgoing.c and one bug in homa_plumbing.c
 
-Changes from v3:
-	1. Rebase on mm-new as of Feb 24, 2026.
-	2. Fix an issue reported by kernel test robot due to incorrect
-	   type.
-	3. Add 'Acked-by: Vlastimil Babka <vbabka@suse.cz>'.  Thanks.
+Major changes for v12:
+* There were no comments on the v11 patch series, so there are no major
+  changes in this version. See individual patch files for a few small
+  local changes.
 
-Changes from v2:
-	1. Fix an issue reported by kernel test robot due to incorrect
-	   type in argument of __netmem_to_page().
+Major changes for v11 (see individual patches for additional details):
+* There were no comments on the v10 patch series, so there are not many
+  changes in this version
+* Rework the mechanism for waking up RPCs that stalled waiting for
+  buffer pool space (the old approach deprioritized waking RPCs, which
+  led to starvation and server overload).
+* Cleanup and simplify use of RPC reference counts. Before, references were
+  only acquired to bridge gaps in lock ownership; this was complicated and
+  error-prone. Now, reference counts are acquired at the "top level" when
+  an RPC is selected for working on. Any function that receives a homa_rpc as
+  argument can assume it is protected with a reference.
+* Clean up sparse annotations (use name of lock variable, not address)
 
-Changes from v1:
-	1. Drop the finalizing patch removing the pp fields of struct
-	   page since I found that there is still code accessing a pp
-	   field via struct page.  I will retry the finalizing patch
-	   after resolving the issue.
----
- .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  2 +-
- include/linux/mm.h                            | 27 +++----------------
- include/linux/page-flags.h                    |  6 +++++
- include/net/netmem.h                          | 15 +++++++++--
- mm/page_alloc.c                               | 13 ++++++---
- net/core/netmem_priv.h                        | 23 +++++++---------
- net/core/page_pool.c                          | 24 +++++++++++++++--
- 7 files changed, 64 insertions(+), 46 deletions(-)
+Major changes for v10 (see individual patches for additional details):
+- Refactor resend mechanism: consolidate code for sending RESEND packets
+  in new function homa_request_retrans (simplifies homa_timer.c); a few
+  bug fixes (updating "granted" field in homa_resend_pkt, etc.)
+- Revise sparse annotations to eliminate __context__ definition
+- Use the destroy function from struct proto properly (fixes races in
+  socket cleanup)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-index 80f9fc10877ad..7d90d2485c787 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-@@ -707,7 +707,7 @@ static void mlx5e_free_xdpsq_desc(struct mlx5e_xdpsq *sq,
- 				xdpi = mlx5e_xdpi_fifo_pop(xdpi_fifo);
- 				page = xdpi.page.page;
- 
--				/* No need to check page_pool_page_is_pp() as we
-+				/* No need to check PageNetpp() as we
- 				 * know this is a page_pool page.
- 				 */
- 				page_pool_recycle_direct(pp_page_to_nmdesc(page)->pp,
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 52206525af7c7..6f0a3edb24e14 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -5197,10 +5197,9 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
-  * DMA mapping IDs for page_pool
-  *
-  * When DMA-mapping a page, page_pool allocates an ID (from an xarray) and
-- * stashes it in the upper bits of page->pp_magic. We always want to be able to
-- * unambiguously identify page pool pages (using page_pool_page_is_pp()). Non-PP
-- * pages can have arbitrary kernel pointers stored in the same field as pp_magic
-- * (since it overlaps with page->lru.next), so we must ensure that we cannot
-+ * stashes it in the upper bits of page->pp_magic. Non-PP pages can have
-+ * arbitrary kernel pointers stored in the same field as pp_magic (since
-+ * it overlaps with page->lru.next), so we must ensure that we cannot
-  * mistake a valid kernel pointer with any of the values we write into this
-  * field.
-  *
-@@ -5235,26 +5234,6 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
- #define PP_DMA_INDEX_MASK GENMASK(PP_DMA_INDEX_BITS + PP_DMA_INDEX_SHIFT - 1, \
- 				  PP_DMA_INDEX_SHIFT)
- 
--/* Mask used for checking in page_pool_page_is_pp() below. page->pp_magic is
-- * OR'ed with PP_SIGNATURE after the allocation in order to preserve bit 0 for
-- * the head page of compound page and bit 1 for pfmemalloc page, as well as the
-- * bits used for the DMA index. page_is_pfmemalloc() is checked in
-- * __page_pool_put_page() to avoid recycling the pfmemalloc page.
-- */
--#define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
--
--#ifdef CONFIG_PAGE_POOL
--static inline bool page_pool_page_is_pp(const struct page *page)
--{
--	return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
--}
--#else
--static inline bool page_pool_page_is_pp(const struct page *page)
--{
--	return false;
--}
--#endif
--
- #define PAGE_SNAPSHOT_FAITHFUL (1 << 0)
- #define PAGE_SNAPSHOT_PG_BUDDY (1 << 1)
- #define PAGE_SNAPSHOT_PG_IDLE  (1 << 2)
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index 7223f6f4e2b40..0e03d816e8b9d 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -923,6 +923,7 @@ enum pagetype {
- 	PGTY_zsmalloc		= 0xf6,
- 	PGTY_unaccepted		= 0xf7,
- 	PGTY_large_kmalloc	= 0xf8,
-+	PGTY_netpp		= 0xf9,
- 
- 	PGTY_mapcount_underflow = 0xff
- };
-@@ -1055,6 +1056,11 @@ PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
- PAGE_TYPE_OPS(Unaccepted, unaccepted, unaccepted)
- PAGE_TYPE_OPS(LargeKmalloc, large_kmalloc, large_kmalloc)
- 
-+/*
-+ * Marks page_pool allocated pages.
-+ */
-+PAGE_TYPE_OPS(Netpp, netpp, netpp)
-+
- /**
-  * PageHuge - Determine if the page belongs to hugetlbfs
-  * @page: The page to test.
-diff --git a/include/net/netmem.h b/include/net/netmem.h
-index a96b3e5e5574c..85e3b26ec547f 100644
---- a/include/net/netmem.h
-+++ b/include/net/netmem.h
-@@ -110,10 +110,21 @@ struct net_iov {
- 			atomic_long_t pp_ref_count;
- 		};
- 	};
--	struct net_iov_area *owner;
-+
-+	unsigned int page_type;
- 	enum net_iov_type type;
-+	struct net_iov_area *owner;
- };
- 
-+/* Make sure 'the offset of page_type in struct page == the offset of
-+ * type in struct net_iov'.
-+ */
-+#define NET_IOV_ASSERT_OFFSET(pg, iov)			\
-+	static_assert(offsetof(struct page, pg) ==	\
-+		      offsetof(struct net_iov, iov))
-+NET_IOV_ASSERT_OFFSET(page_type, page_type);
-+#undef NET_IOV_ASSERT_OFFSET
-+
- struct net_iov_area {
- 	/* Array of net_iovs for this area. */
- 	struct net_iov *niovs;
-@@ -256,7 +267,7 @@ static inline unsigned long netmem_pfn_trace(netmem_ref netmem)
-  */
- #define pp_page_to_nmdesc(p)						\
- ({									\
--	DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));		\
-+	DEBUG_NET_WARN_ON_ONCE(!PageNetpp(p));				\
- 	__pp_page_to_nmdesc(p);						\
- })
- 
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 9f2fe46ff69a1..ee81f5c67c18f 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -1044,7 +1044,6 @@ static inline bool page_expected_state(struct page *page,
- #ifdef CONFIG_MEMCG
- 			page->memcg_data |
- #endif
--			page_pool_page_is_pp(page) |
- 			(page->flags.f & check_flags)))
- 		return false;
- 
-@@ -1071,8 +1070,6 @@ static const char *page_bad_reason(struct page *page, unsigned long flags)
- 	if (unlikely(page->memcg_data))
- 		bad_reason = "page still charged to cgroup";
- #endif
--	if (unlikely(page_pool_page_is_pp(page)))
--		bad_reason = "page_pool leak";
- 	return bad_reason;
- }
- 
-@@ -1381,9 +1378,17 @@ __always_inline bool __free_pages_prepare(struct page *page,
- 		mod_mthp_stat(order, MTHP_STAT_NR_ANON, -1);
- 		folio->mapping = NULL;
- 	}
--	if (unlikely(page_has_type(page)))
-+	if (unlikely(page_has_type(page))) {
-+		/* networking expects to clear its page type before releasing */
-+		if (is_check_pages_enabled()) {
-+			if (unlikely(PageNetpp(page))) {
-+				bad_page(page, "page_pool leak");
-+				return false;
-+			}
-+		}
- 		/* Reset the page_type (which overlays _mapcount) */
- 		page->page_type = UINT_MAX;
-+	}
- 
- 	if (is_check_pages_enabled()) {
- 		if (free_page_is_bad(page))
-diff --git a/net/core/netmem_priv.h b/net/core/netmem_priv.h
-index 23175cb2bd866..3e6fde8f1726f 100644
---- a/net/core/netmem_priv.h
-+++ b/net/core/netmem_priv.h
-@@ -8,21 +8,18 @@ static inline unsigned long netmem_get_pp_magic(netmem_ref netmem)
- 	return netmem_to_nmdesc(netmem)->pp_magic & ~PP_DMA_INDEX_MASK;
- }
- 
--static inline void netmem_or_pp_magic(netmem_ref netmem, unsigned long pp_magic)
--{
--	netmem_to_nmdesc(netmem)->pp_magic |= pp_magic;
--}
--
--static inline void netmem_clear_pp_magic(netmem_ref netmem)
--{
--	WARN_ON_ONCE(netmem_to_nmdesc(netmem)->pp_magic & PP_DMA_INDEX_MASK);
--
--	netmem_to_nmdesc(netmem)->pp_magic = 0;
--}
--
- static inline bool netmem_is_pp(netmem_ref netmem)
- {
--	return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) == PP_SIGNATURE;
-+	struct page *page;
-+
-+	/* XXX: Now that the offset of page_type is shared between
-+	 * struct page and net_iov, just cast the netmem to struct page
-+	 * unconditionally by clearing NET_IOV if any, no matter whether
-+	 * it comes from struct net_iov or struct page.  This should be
-+	 * adjusted once the offset is no longer shared.
-+	 */
-+	page = (struct page *)((__force unsigned long)netmem & ~NET_IOV);
-+	return PageNetpp(page);
- }
- 
- static inline void netmem_set_pp(netmem_ref netmem, struct page_pool *pool)
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 265a729431bb7..877bbf7a19389 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -702,8 +702,18 @@ s32 page_pool_inflight(const struct page_pool *pool, bool strict)
- 
- void page_pool_set_pp_info(struct page_pool *pool, netmem_ref netmem)
- {
-+	struct page *page;
-+
- 	netmem_set_pp(netmem, pool);
--	netmem_or_pp_magic(netmem, PP_SIGNATURE);
-+
-+	/* XXX: Now that the offset of page_type is shared between
-+	 * struct page and net_iov, just cast the netmem to struct page
-+	 * unconditionally by clearing NET_IOV if any, no matter whether
-+	 * it comes from struct net_iov or struct page.  This should be
-+	 * adjusted once the offset is no longer shared.
-+	 */
-+	page = (struct page *)((__force unsigned long)netmem & ~NET_IOV);
-+	__SetPageNetpp(page);
- 
- 	/* Ensuring all pages have been split into one fragment initially:
- 	 * page_pool_set_pp_info() is only called once for every page when it
-@@ -718,7 +728,17 @@ void page_pool_set_pp_info(struct page_pool *pool, netmem_ref netmem)
- 
- void page_pool_clear_pp_info(netmem_ref netmem)
- {
--	netmem_clear_pp_magic(netmem);
-+	struct page *page;
-+
-+	/* XXX: Now that the offset of page_type is shared between
-+	 * struct page and net_iov, just cast the netmem to struct page
-+	 * unconditionally by clearing NET_IOV if any, no matter whether
-+	 * it comes from struct net_iov or struct page.  This should be
-+	 * adjusted once the offset is no longer shared.
-+	 */
-+	page = (struct page *)((__force unsigned long)netmem & ~NET_IOV);
-+	__ClearPageNetpp(page);
-+
- 	netmem_set_pp(netmem, NULL);
- }
- 
--- 
-2.17.1
+Major changes for v9 (see individual patches for additional details):
+- Introduce homa_net objects; there is now a single global struct homa
+  shared by all network namespaces, with one homa_net per network namespace
+  with netns-specific information. Most info, including socket table and
+  peer table, is stored in the struct homa.
+- Introduce homa_clock as an abstraction layer for the fine-grain clock.
+- Implement limits on the number of active homa_peer objects. This includes
+  adding reference counts in homa_peers and adding code to release peers
+  where there are too many.
+- Switch to using rhashtable to store homa_peers; the table is shared
+  across all network namespaces, though individual peers are namespace-
+  specific.
+
+v8 changes:
+- There were no reviews of the v7 patch series, so there are not many changes
+  in this version
+- Pull out pacer code into separate files pacer.h and pacer.c
+- Refactor homa_pool APIs (move allocation/deallocation into homa_pool.c,
+  move locking responsibility out)
+- Fix various problems from sparse, checkpatch, and kernel-doc
+
+v7 changes:
+- Add documentation files reap.txt and sync.txt.
+- Replace __u64 with _u64 (and __s64 with s64) in non-uapi settings.
+- Replace '__aligned(L1_CACHE_BYTES)' with '____cacheline_aligned_in_smp'.
+- Use alloc_percpu_gfp for homa_pool::cores.
+- Extract bool homa_bpage_available from homa_pool_get_pages.
+- Rename homa_rpc_free to homa_rpc_end.
+- Use skb_queue_purge in homa_rpc_reap instead of hand-coding.
+- Clean up RCU usage in several places:
+  - Eliminate unnecessary use of RCU for homa_sock::dead_rpcs.
+  - Eliminate use of RCU for homa::throttled_rpcs (unnecessary, unclear
+    that it would have worked). Added return value from homa_pacer_xmit.
+  - Call rcu_read_lock/unlock in homa_peer_find (just to be safe; probably
+    isn't necessary)
+  - Eliminate extraneous use of RCU in homa_pool_allocate.
+  - Cleaned up RCU usage around homa_sock::active_rpcs.
+  - Change homa_sock_find to take a reference on the returned socket;
+    caller no longer has to worry about RCU issues.
+- Remove "locker" arguments from homa_lock_rpc, homa_lock_sock,
+  homa_rpc_try_lock, and homa_bucket_lock (shouldn't be needed, given
+  CONFIG_PROVE_LOCKING).
+- Use __GFP_ZERO in *alloc calls instead of initializing individual
+  struct fields to zero.
+- Don't use raw_smp_processor_id; use smp_processor_id instead.
+- Remove homa_peertab_get_peers from this patch series (and also fix
+  problems in it related to RCU usage).
+- Add annotation to homa_peertab_gc_dsts requiring write_lock.
+- Remove "lock_slow" functions, which don't add functionality in this patch
+  series.
+- Remove unused fields from homa_peer structs.
+- Reorder fields in homa_rpc_bucket to squeeze out padding.
+- Refactor homa_sock_start_scan etc.
+  - Take a reference on the current socket to keep it from being freed.
+  - No need now for homa_socktab::active_scans or struct homa_socktab_links.
+  - rcu_read_lock/unlock is now entirely in the homa_sock scan methods;
+    no need for callers to worry about this.
+- Add homa_rpc_hold and homa_rpc_put. Replaces several ad-hoc mechanisms,
+  such as RPC_COPYING_FROM_USER and RPC_COPYING_TO_USER, with a single
+  general-purpose mechanism.
+- Use __skb_queue_purge instead of skb_queue_purge (locking isn't needed
+  because Homa has its own locks).
+- Rename UNKNOWN packet type to RPC_UNKNOWN.
+- Add hsk->is_server plus SO_HOMA_SERVER setsockopt: by default, sockets
+  will not accept incoming RPCs unless they have been bound.
+- Refactor waiting mechanism for incoming packets: simplify wait
+  criteria and use standard mechanisms (wait_event_*) for blocking
+  threads. Create homa_interest.c and homa_interest.h.
+* Add memory accounting for outbound messages (e.g. new sysctl value
+  wmem_max); senders now block when memory limit is exceeded.
+* Made Homa a pernet subsystem (a separate Homa transport for each
+  network namespace).
+
+v6 changes:
+- Make hrtimer variable in homa_timer_main static instead of stack-allocated
+  (avoids complaints when in debug mode).
+- Remove unnecessary cast in homa_dst_refresh.
+- Replace erroneous uses of GFP_KERNEL with GFP_ATOMIC.
+- Check for "all ports in use" in homa_sock_init.
+- Refactor API for homa_rpc_reap to incorporate "reap all" feature,
+  eliminate need for callers to specify exact amount of work to do
+  when in "reap a few" mode.
+- Fix bug in homa_rpc_reap (wasn't resetting rx_frees for each iteration
+  of outer loop).
+
+v5 changes:
+- Change type of start in struct homa_rcvbuf_args from void* to __u64;
+  also add more __user annotations.
+- Refactor homa_interest: replace awkward ready_rpc field with two
+  fields: rpc and rpc_ready. Added new functions homa_interest_get_rpc
+  and homa_interest_set_rpc to encapsulate/clarify access to
+  interest->rpc_ready.
+- Eliminate use of LIST_POISON1 etc. in homa_interests (use list_del_init
+  instead of list_del).
+- Remove homa_next_skb function, which is obsolete, unused, and incorrect
+- Eliminate ipv4_to_ipv6 function (use ipv6_addr_set_v4mapped instead)
+- Eliminate is_mapped_ipv4 function (use ipv6_addr_v4mapped instead)
+- Use __u64 instead of uint64_t in homa.h
+- Remove 'extern "C"' from homa.h
+- Various fixes from patchwork checks (checkpatch.pl, etc.)
+- A few improvements to comments
+
+v4 changes:
+- Remove sport argument for homa_find_server_rpc (unneeded). Also
+  remove client_port field from struct homa_ack
+- Refactor ICMP packet handling (v6 was incorrect)
+- Check for socket shutdown in homa_poll
+- Fix potential for memory garbling in homa_symbol_for_type
+- Remove unused ETHERNET_MAX_PAYLOAD declaration
+- Rename classes in homa_wire.h so they all have "homa_" prefixes
+- Various fixes from patchwork checks (checkpatch.pl, etc.)
+- A few improvements to comments
+
+v3 changes:
+- Fix formatting in Kconfig
+- Set ipv6_pinfo_offset in struct proto
+- Check return value of inet6_register_protosw
+- In homa_load cleanup, don't cleanup things that haven't been
+  initialized
+- Add MODULE_ALIAS_NET_PF_PROTO_TYPE to auto-load module
+- Check return value from kzalloc call in homa_sock_init
+- Change SO_HOMA_SET_BUF to SO_HOMA_RCVBUF
+- Change struct homa_set_buf_args to struct homa_rcvbuf_args
+- Implement getsockopt for SO_HOMA_RCVBUF
+- Return ENOPROTOOPT instead of EINVAL where appropriate in
+  setsockopt and getsockopt
+- Fix crash in homa_pool_check_waiting if pool has no region yet
+- Check for NULL msg->msg_name in homa_sendmsg
+- Change addr->in6.sin6_family to addr->sa.sa_family in homa_sendmsg
+  for clarity
+- For some errors in homa_recvmsg, return directly rather than "goto done"
+- Return error from recvmsg if offsets of returned read buffers are bogus
+- Added comments to clarify lock-unlock pairs for RPCs
+- Renamed homa_try_bucket_lock to homa_try_rpc_lock
+- Fix issues found by test robot and checkpatch.pl
+- Ensure first argument to do_div is 64 bits
+- Remove C++ style comments
+- Removed some code that will only be relevant in future patches that
+  fill in missing Homa functionality
+
+v2 changes:
+- Remove sockaddr_in_union declaration from public API in homa.h
+- Remove kernel wrapper functions (homa_send, etc.) from homa.h
+- Fix many sparse warnings (still more work to do here) and other issues
+  uncovered by test robot
+- Fix checkpatch.pl issues
+- Remove residual code related to unit tests
+- Remove references to tt_record from comments
+- Make it safe to delete sockets during homa_socktab scans
+- Use uintptr_t for portability fo 32-bit platforms
+- Use do_div instead of "/" for portability
+- Remove homa->busy_usecs and homa->gro_busy_usecs (not needed in
+  this stripped down version of Homa)
+- Eliminate usage of cpu_khz, use sched_clock instead of get_cycles
+- Add missing checks of kmalloc return values
+- Remove "inline" qualifier from functions in .c files
+- Document that pad fields must be zero
+- Use more precise type "uint32_t" rather than "int"
+- Remove unneeded #include of linux/version.h
+
+John Ousterhout (14):
+  net: homa: define user-visible API for Homa
+  net: homa: create homa_wire.h
+  net: homa: create shared Homa header files
+  net: homa: create homa_pool.h and homa_pool.c
+  net: homa: create homa_peer.h and homa_peer.c
+  net: homa: create homa_sock.h and homa_sock.c
+  net: homa: create homa_interest.h and homa_interest.c
+  net: homa: create homa_rpc.h and homa_rpc.c
+  net: homa: create homa_outgoing.c
+  net: homa: create homa_utils.c
+  net: homa: create homa_incoming.c
+  net: homa: create homa_timer.c
+  net: homa: create homa_plumbing.c
+  net: homa: create Makefile and Kconfig
+
+ MAINTAINERS               |    7 +
+ include/uapi/linux/homa.h |  300 +++++++++
+ net/Kconfig               |    1 +
+ net/Makefile              |    1 +
+ net/homa/Kconfig          |   21 +
+ net/homa/Makefile         |   15 +
+ net/homa/homa_impl.h      |  585 +++++++++++++++++
+ net/homa/homa_incoming.c  |  887 ++++++++++++++++++++++++++
+ net/homa/homa_interest.c  |  114 ++++
+ net/homa/homa_interest.h  |   93 +++
+ net/homa/homa_outgoing.c  |  568 +++++++++++++++++
+ net/homa/homa_peer.c      |  565 +++++++++++++++++
+ net/homa/homa_peer.h      |  312 +++++++++
+ net/homa/homa_plumbing.c  | 1259 +++++++++++++++++++++++++++++++++++++
+ net/homa/homa_pool.c      |  507 +++++++++++++++
+ net/homa/homa_pool.h      |  137 ++++
+ net/homa/homa_rpc.c       |  698 ++++++++++++++++++++
+ net/homa/homa_rpc.h       |  532 ++++++++++++++++
+ net/homa/homa_sock.c      |  448 +++++++++++++
+ net/homa/homa_sock.h      |  424 +++++++++++++
+ net/homa/homa_stub.h      |   91 +++
+ net/homa/homa_timer.c     |  136 ++++
+ net/homa/homa_utils.c     |  110 ++++
+ net/homa/homa_wire.h      |  360 +++++++++++
+ net/homa/murmurhash3.h    |   44 ++
+ 25 files changed, 8215 insertions(+)
+ create mode 100644 include/uapi/linux/homa.h
+ create mode 100644 net/homa/Kconfig
+ create mode 100644 net/homa/Makefile
+ create mode 100644 net/homa/homa_impl.h
+ create mode 100644 net/homa/homa_incoming.c
+ create mode 100644 net/homa/homa_interest.c
+ create mode 100644 net/homa/homa_interest.h
+ create mode 100644 net/homa/homa_outgoing.c
+ create mode 100644 net/homa/homa_peer.c
+ create mode 100644 net/homa/homa_peer.h
+ create mode 100644 net/homa/homa_plumbing.c
+ create mode 100644 net/homa/homa_pool.c
+ create mode 100644 net/homa/homa_pool.h
+ create mode 100644 net/homa/homa_rpc.c
+ create mode 100644 net/homa/homa_rpc.h
+ create mode 100644 net/homa/homa_sock.c
+ create mode 100644 net/homa/homa_sock.h
+ create mode 100644 net/homa/homa_stub.h
+ create mode 100644 net/homa/homa_timer.c
+ create mode 100644 net/homa/homa_utils.c
+ create mode 100644 net/homa/homa_wire.h
+ create mode 100644 net/homa/murmurhash3.h
+
+--
+2.43.0
 
 
