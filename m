@@ -1,202 +1,231 @@
-Return-Path: <netdev+bounces-268101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268113-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cHrmC9Pdt2mcWAEAu9opvQ
-	(envelope-from <netdev+bounces-268101-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:39:15 +0100
+	id YJukFKvgt2mcWAEAu9opvQ
+	(envelope-from <netdev+bounces-268113-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:51:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82B2B298039
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:39:14 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD8CF2983EA
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:51:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 158C8301A72A
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 10:38:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 787DC3005AF9
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 10:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D251038D009;
-	Mon, 16 Mar 2026 10:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840AD38E130;
+	Mon, 16 Mar 2026 10:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="pzKAgnIH";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="fJ58h0dm"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="Wg+EpSmr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D496388E6B
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 10:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CEC38F647;
+	Mon, 16 Mar 2026 10:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773657503; cv=none; b=do5xw4B7m64NLTmgVrG8CZZ7Y8v9cFKmY5gz2RAhxTEIMkVC3cpToSt2yKOkosMc8iI++EwKnE5ijb4+n0/nRjboDaUl9tp0maXfxtE6fKDOyj3+uEXDXP5bI48mnXIxSnKW+TjEqHSnHBpvcx7jMb6HgpV2xp8/6A9AVa6hcls=
+	t=1773658148; cv=none; b=h/ToasZI4aLv2/crV2Kz0A+xzyUFnzMLe6V+OOT+9wmi/HucjDGXTOpsl4EU07i0NuE5i8dhn0teDgqcDHDccqqiIz55E88W1pmwz/LUYX6KvpLLN9R0dMm3IdWILzMJ+nb/f2BNL5q6wVtNjYkMNIPQLBiAKGwmcn0fVEw1xgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773657503; c=relaxed/simple;
-	bh=N0ETczg47Hthwni1YXRrWbd0jR+hnMv9HzsCGURdEAs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uY4xbKm1bjAuYiYNEGPm6db98NMYJNibXJz/NW6xd6i0+baswedlD5oSEYlqsojg/UStukPhqE0u3sbmKvlP79iC9LqagIGQn4vPUaafw4R5vrnCfc7ggpe7hWeGR4Fl1tqFLhiwiuD40/SXy9CM2vNLFisKdTvsKn7oOSVqSJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=pzKAgnIH; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=fJ58h0dm; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62G64h0A323609
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 10:38:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ALirnm3qVmuyZak9zQ35S0q/tHtzUERhG5D7Dbo0hbo=; b=pzKAgnIHrkOsZWEB
-	S59RUnQKyn/HQ5klGqlYSvo9pg9gnc/+1PRVu11XTdbHGdky048gwuZx/4ABNmDF
-	M06DrP4rbscBFV6cmQ5wSmYqZnPt5pYK6A7T4It8UrAbL1m3m5AlokaaQxywxfvz
-	UFsyqcr2m/BPuZXedBTGBKZX9oeoyPev0lr80B31FEhQme5DqzzjFjowJbhKvz4m
-	U1LC9ZKL1MrTNCFiitTXelvlGkr0G/ZTaTuEjf+Vdf2E79OTZuOf/Ni7yKsm7DJ9
-	TAZjcaMs/bmjZpHdiR46XToSJtIe++GI0J0dMOqhxwYfEm7+XSib7OMvnIu4miQV
-	sw2Ovw==
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cw03qnc43-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 10:38:20 +0000 (GMT)
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8cb456d53a5so302819985a.2
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 03:38:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1773657500; x=1774262300; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ALirnm3qVmuyZak9zQ35S0q/tHtzUERhG5D7Dbo0hbo=;
-        b=fJ58h0dmqPmE5Qwx4c9PgUBg9V44sxrn5cNHmRDD5k+ZtuVHOvvPqAkDytQZzplAXz
-         qZ8Vus/fb8nbZTLKCeNQXVM5A3jrFj8ln7f1Ob7z4qNzgbxVyCX3avTahbRYURDDTRXh
-         P9TSaUnaxZyYIxB8n0bc7rIRga6farn7P82QfbIJb2s4dPeV0AMw59xHgUrioCTCleCy
-         g/7gDXj1Rql7Fhut5ayWTgCRd2j+InD4SWfE/hvphwym7AWQBSoQ4Io/dbU9A7GIrlhr
-         v4B27wqDWnydZKkmoAS7mob0g9ALiRNpAArc0q9/k+6gVmWBrz/lKV14TlsBHtonLEBr
-         ging==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773657500; x=1774262300;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ALirnm3qVmuyZak9zQ35S0q/tHtzUERhG5D7Dbo0hbo=;
-        b=iJ+9rietUvd5Yjx/keIBhX+wMvTR2PTrawHt7C7iswGJd48LB3Bvp+SnUlJVrm6ncY
-         IaN1tLpN/q0jCecF7KQ7fW6Z/IxMYATbBSvZ+jnbTjPfGlWxVL9WXPk8avjaukHrIj9b
-         wpiYipdJvd0mMbN6Fr9FjGNlb6vi/6DmOartnaLQ4ILKZDnCx1GQJWivzTLXmwM54zUM
-         mNxXmVkwgNtTveeKPnJBqh/4nlyTUqVr73l9NvJWhCFmtSC01EW0SxyYdJppE7TnyiaN
-         9awsNW7238EWXxU+LqyyKerF48gCU6IFaWKQelp5H8y7gnHCMV27NzfH0e5aCLDuJ0Y2
-         qSuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVi/UrdclkiJimYAqWHciFo1IQhTMMrnv9a6G/S4gfPdcczqM8Bp7mhtt4Z23++JH9IlVzmfJc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDIO90bkEXOGfFCZ4uUEhud+szU562Nw5H16OiO3sEG158Umli
-	nRK66IW/s1LzanTn9GJQaOKtClp9RtrD28zLEMVjh0DWJLmLog7G1OswTf3eN9Kf0esxnT5zbtE
-	660Xpi38HGKfsSlcyUkyUUe1XGNAQH83+IrzQ0xkgKWWrfsb+cFQbHMG+dKmkiUMo7e4=
-X-Gm-Gg: ATEYQzyzQkF6mnthJRfViG+G7ILzsz6mvonwpDlmB1/Nyh0376Y9LeesUw2Ax+jQua2
-	cjhKmBKg9rZM+PnNO+avqTRdFD8HmUWLBI7U816STFS2aoCgtwVOfY/EPXHVXvasifFESbXT7Wf
-	AQVRlCrvqOzr+KUvEWa3Y0MeRrHJ0HaVikxU7aJU5bURHEhlfarcXT3vguZDxeCdUn/Bd4qjYoV
-	698EgoZuTo1a+sn55LFq0JopqFNb5kiH1nvCtykE3SfYl23o+CSSYa/RlJpZC3lMFMArvTNtlEH
-	YikKCvMP5H82knjey5TJ1E2m3VkYnpzE5+VtpgUbfxixMPAlqwOUOTLuEnGr2hgwCiCmy067HLO
-	/x1otgnFQVfp4XIPIpjS/2wpq70M6+vcClLM48LhHujZEmO+rQqCTUBDWyp+UJxTf5C6wYvUIBt
-	pRLl0=
-X-Received: by 2002:a05:620a:3193:b0:8cd:923a:87a8 with SMTP id af79cd13be357-8cdb5a2d141mr1275006085a.1.1773657499697;
-        Mon, 16 Mar 2026 03:38:19 -0700 (PDT)
-X-Received: by 2002:a05:620a:3193:b0:8cd:923a:87a8 with SMTP id af79cd13be357-8cdb5a2d141mr1275003885a.1.1773657499223;
-        Mon, 16 Mar 2026 03:38:19 -0700 (PDT)
-Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6634fbb9b24sm4875162a12.6.2026.03.16.03.38.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Mar 2026 03:38:18 -0700 (PDT)
-Message-ID: <a87a13b0-2bb9-45bf-a3d1-2d08aac2a171@oss.qualcomm.com>
-Date: Mon, 16 Mar 2026 11:38:15 +0100
+	s=arc-20240116; t=1773658148; c=relaxed/simple;
+	bh=pcBInRXljuxWY7idQ1IavWdC4W1j9biZUfLQAdA/ZYo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XQn2vXf8zo1RPg57YDLmoArkY8BTLx3BFNaZr56ffBEyOy4PtIn6QDvJZ645lmhhiCiajqVkn1PtA3CJlrUZ+ReyHhViYcYZcwoHbkfT590G7PcV951uEbc3Wd5xXUirZH4xPs/Hj50LLKV5/QV6yc6644ZcoNXVhIO9NNbYNuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=Wg+EpSmr; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from debian.intra.ispras.ru (unknown [10.10.165.34])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 08BA5413A4D8;
+	Mon, 16 Mar 2026 10:39:28 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 08BA5413A4D8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1773657568;
+	bh=cNyD/KYGWkpwWO1lBjOBW0L9+aqawWpVjwVrtSSo5fs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Wg+EpSmryxhx46thTb9IQiXZJqjaAtV4V6NYGkZZ9nQP6TyrsBiyYX2ceuKNVCbn/
+	 GzQcf/5P5rG5XQT0RrytCnW/zW6CYv3uj/gHNjM8F3FMvqFrsmjg6NPuJG8lrm3FVt
+	 +5uzZ5wuo/NA57vqks736YHjuH5qsBvUrKfUlLN8=
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Rafal Ozieblo <rafalo@cadence.com>,
+	"Andrei.Pistirica@microchip.com" <Andrei.Pistirica@microchip.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: [PATCH net 1/2] net: macb: fix use-after-free access to PTP clock
+Date: Mon, 16 Mar 2026 13:38:24 +0300
+Message-ID: <20260316103826.74506-1-pchelkin@ispras.ru>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/7] arm64: dts: qcom: monaco: Add HS/SS endpoints for
- USB1 controller
-To: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>,
-        andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
-        krzk+dt@kernel.org, conor+dt@kernel.org
-Cc: richardcochran@gmail.com, r.mereu@arduino.cc, m.facchin@arduino.cc,
-        geert+renesas@glider.be, arnd@arndb.de,
-        dmitry.baryshkov@oss.qualcomm.com, ebiggers@kernel.org,
-        michal.simek@amd.com, luca.weiss@fairphone.com, sven@kernel.org,
-        prabhakar.mahadev-lad.rj@bp.renesas.com,
-        kuninori.morimoto.gx@renesas.com, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, Loic Poulain <loic.poulain@oss.qualcomm.com>
-References: <20260313103824.2634519-1-srinivas.kandagatla@oss.qualcomm.com>
- <20260313103824.2634519-2-srinivas.kandagatla@oss.qualcomm.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260313103824.2634519-2-srinivas.kandagatla@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: U-_z_f_KJPO-LoWouFJTTos-RzmXgT0e
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE2MDA4MSBTYWx0ZWRfXzauFpnUo8Bs/
- Goczc90h2IQ6cPK+qL8MaWd2WENaFOdbgSEznBhWaz7BtS3CclLwdXX8wvp5lOTdt5rFc/3auZZ
- Xy6peKoJrx7ZDb6tTrP7/njdvebS0EYl6gd8Xy+b4Ln7haldYbcFYB0zx067sF4/15b7nP/wfxn
- MhPypd7hMpc/t9WvMX5sB3/q+PpA8/SMOLIab4iJj9ZoTKnmB+sS7MqRIE9qHzhyFCYczh6goqE
- zcEA52xEGh7Kv2m10cs3vcafzmugqQLkcZ1pbKJSDdDSvD8cS6MD6YiKUSJFZH+bb88BqK9XiMJ
- IzepBnIKs06RrN9/1/jIigC89JrqlghglrDbm+3uPv++PNMAX0nBumFSrcZ6DluiCtUjwrJh16i
- r9fDK+6TGCeMskfNaGrowp1O59Im2v0RjzW9yaeoaRosboBLCuZg78NVdFt6dOTBviadkJxnBAe
- KHLexpwR4QeSyU9myqA==
-X-Proofpoint-ORIG-GUID: U-_z_f_KJPO-LoWouFJTTos-RzmXgT0e
-X-Authority-Analysis: v=2.4 cv=ZbQQ98VA c=1 sm=1 tr=0 ts=69b7dd9c cx=c_pps
- a=HLyN3IcIa5EE8TELMZ618Q==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
- a=EUspDBNiAAAA:8 a=od1gnLZaB1Y5O4OfTGMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=bTQJ7kPSJx9SKPbeHEYW:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-16_04,2026-03-13_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 priorityscore=1501 adultscore=0 suspectscore=0
- lowpriorityscore=0 malwarescore=0 clxscore=1015 phishscore=0 spamscore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
- definitions=main-2603160081
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[ispras.ru,none];
+	R_DKIM_ALLOW(-0.20)[ispras.ru:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,arduino.cc,glider.be,arndb.de,oss.qualcomm.com,kernel.org,amd.com,fairphone.com,bp.renesas.com,renesas.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-268101-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oss.qualcomm.com:dkim,oss.qualcomm.com:mid];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[ispras.ru,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,cadence.com,microchip.com,vger.kernel.org,linuxtesting.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-268113-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[pchelkin@ispras.ru,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[ispras.ru:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 82B2B298039
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxtesting.org:url,qemu.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ispras.ru:dkim,ispras.ru:email,ispras.ru:mid]
+X-Rspamd-Queue-Id: BD8CF2983EA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/13/26 11:38 AM, Srinivas Kandagatla wrote:
-> From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> 
-> Add a port node exposing the High‑Speed and Super‑Speed endpoints,
-> allowing the USB controller to be linked through the device‑tree
-> graph.
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Signed-off-by: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
-> Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-> ---
+PTP clock is registered on every opening of the interface and destroyed on
+every closing.  However it may be accessed via get_ts_info ethtool call
+which is possible while the interface is just present in the kernel.
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+BUG: KASAN: use-after-free in ptp_clock_index+0x47/0x50 drivers/ptp/ptp_clock.c:426
+Read of size 4 at addr ffff8880194345cc by task syz.0.6/948
 
-Konrad
+CPU: 1 PID: 948 Comm: syz.0.6 Not tainted 6.1.164+ #109
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.1-0-g3208b098f51a-prebuilt.qemu.org 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x8d/0xba lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:316 [inline]
+ print_report+0x17f/0x496 mm/kasan/report.c:420
+ kasan_report+0xd9/0x180 mm/kasan/report.c:524
+ ptp_clock_index+0x47/0x50 drivers/ptp/ptp_clock.c:426
+ gem_get_ts_info+0x138/0x1e0 drivers/net/ethernet/cadence/macb_main.c:3349
+ macb_get_ts_info+0x68/0xb0 drivers/net/ethernet/cadence/macb_main.c:3371
+ __ethtool_get_ts_info+0x17c/0x260 net/ethtool/common.c:558
+ ethtool_get_ts_info net/ethtool/ioctl.c:2367 [inline]
+ __dev_ethtool net/ethtool/ioctl.c:3017 [inline]
+ dev_ethtool+0x2b05/0x6290 net/ethtool/ioctl.c:3095
+ dev_ioctl+0x637/0x1070 net/core/dev_ioctl.c:510
+ sock_do_ioctl+0x20d/0x2c0 net/socket.c:1215
+ sock_ioctl+0x577/0x6d0 net/socket.c:1320
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x18c/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:46 [inline]
+ do_syscall_64+0x35/0x80 arch/x86/entry/common.c:76
+ entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+ </TASK>
+
+Allocated by task 457:
+ kmalloc include/linux/slab.h:563 [inline]
+ kzalloc include/linux/slab.h:699 [inline]
+ ptp_clock_register+0x144/0x10e0 drivers/ptp/ptp_clock.c:235
+ gem_ptp_init+0x46f/0x930 drivers/net/ethernet/cadence/macb_ptp.c:375
+ macb_open+0x901/0xd10 drivers/net/ethernet/cadence/macb_main.c:2920
+ __dev_open+0x2ce/0x500 net/core/dev.c:1501
+ __dev_change_flags+0x56a/0x740 net/core/dev.c:8651
+ dev_change_flags+0x92/0x170 net/core/dev.c:8722
+ do_setlink+0xaf8/0x3a80 net/core/rtnetlink.c:2833
+ __rtnl_newlink+0xbf4/0x1940 net/core/rtnetlink.c:3608
+ rtnl_newlink+0x63/0xa0 net/core/rtnetlink.c:3655
+ rtnetlink_rcv_msg+0x3c6/0xed0 net/core/rtnetlink.c:6150
+ netlink_rcv_skb+0x15d/0x430 net/netlink/af_netlink.c:2511
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x6d7/0xa30 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x97e/0xeb0 net/netlink/af_netlink.c:1872
+ sock_sendmsg_nosec net/socket.c:718 [inline]
+ __sock_sendmsg+0x14b/0x180 net/socket.c:730
+ __sys_sendto+0x320/0x3b0 net/socket.c:2152
+ __do_sys_sendto net/socket.c:2164 [inline]
+ __se_sys_sendto net/socket.c:2160 [inline]
+ __x64_sys_sendto+0xdc/0x1b0 net/socket.c:2160
+ do_syscall_x64 arch/x86/entry/common.c:46 [inline]
+ do_syscall_64+0x35/0x80 arch/x86/entry/common.c:76
+ entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+
+Freed by task 938:
+ kasan_slab_free include/linux/kasan.h:177 [inline]
+ slab_free_hook mm/slub.c:1729 [inline]
+ slab_free_freelist_hook mm/slub.c:1755 [inline]
+ slab_free mm/slub.c:3687 [inline]
+ __kmem_cache_free+0xbc/0x320 mm/slub.c:3700
+ device_release+0xa0/0x240 drivers/base/core.c:2507
+ kobject_cleanup lib/kobject.c:681 [inline]
+ kobject_release lib/kobject.c:712 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1cd/0x350 lib/kobject.c:729
+ put_device+0x1b/0x30 drivers/base/core.c:3805
+ ptp_clock_unregister+0x171/0x270 drivers/ptp/ptp_clock.c:391
+ gem_ptp_remove+0x4e/0x1f0 drivers/net/ethernet/cadence/macb_ptp.c:404
+ macb_close+0x1c8/0x270 drivers/net/ethernet/cadence/macb_main.c:2966
+ __dev_close_many+0x1b9/0x310 net/core/dev.c:1585
+ __dev_close net/core/dev.c:1597 [inline]
+ __dev_change_flags+0x2bb/0x740 net/core/dev.c:8649
+ dev_change_flags+0x92/0x170 net/core/dev.c:8722
+ dev_ifsioc+0x151/0xe00 net/core/dev_ioctl.c:326
+ dev_ioctl+0x33e/0x1070 net/core/dev_ioctl.c:572
+ sock_do_ioctl+0x20d/0x2c0 net/socket.c:1215
+ sock_ioctl+0x577/0x6d0 net/socket.c:1320
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x18c/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:46 [inline]
+ do_syscall_64+0x35/0x80 arch/x86/entry/common.c:76
+ entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+
+Set the PTP clock pointer to NULL after unregistering.
+
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+
+Fixes: c2594d804d5c ("macb: Common code to enable ptp support for MACB/GEM")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+---
+ drivers/net/ethernet/cadence/macb_ptp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/cadence/macb_ptp.c b/drivers/net/ethernet/cadence/macb_ptp.c
+index c9e77819196e..d91f7b1aa39c 100644
+--- a/drivers/net/ethernet/cadence/macb_ptp.c
++++ b/drivers/net/ethernet/cadence/macb_ptp.c
+@@ -357,8 +357,10 @@ void gem_ptp_remove(struct net_device *ndev)
+ {
+ 	struct macb *bp = netdev_priv(ndev);
+ 
+-	if (bp->ptp_clock)
++	if (bp->ptp_clock) {
+ 		ptp_clock_unregister(bp->ptp_clock);
++		bp->ptp_clock = NULL;
++	}
+ 
+ 	gem_ptp_clear_timer(bp);
+ 
+-- 
+2.53.0
+
 
