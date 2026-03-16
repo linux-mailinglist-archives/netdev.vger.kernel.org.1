@@ -1,170 +1,150 @@
-Return-Path: <netdev+bounces-268211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268212-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPPFDsAxuGmvaAEAu9opvQ
-	(envelope-from <netdev+bounces-268211-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:37:20 +0100
+	id EGmlNpw0uGnXaQEAu9opvQ
+	(envelope-from <netdev+bounces-268212-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:49:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D995D29D7E2
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:37:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 759E829DA30
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:49:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6D0A830F0D6D
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 16:31:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 531C5300D70D
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 16:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10C83B2FD7;
-	Mon, 16 Mar 2026 16:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD643ACEF8;
+	Mon, 16 Mar 2026 16:49:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="I0gsVnV8"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="RwFEXyDf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-lf1-f98.google.com (mail-lf1-f98.google.com [209.85.167.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8EE73A1D07
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 16:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCED13CE4B5
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 16:49:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773678699; cv=none; b=gZBJDVrgv+nCu4VkfUDZUgCpMiKPKrHjwTmu+/wkb8kqbd7KL9QOTNJcHJhL4cFQe5ByQGuUcEK4mh1TY9qkNcHjW5JSlIxFdGWHG6niL8PzUL3YsUndvU0yv36b0Swxwsq5lvDdZyk7JDTf/eCNRR5AQV5sN4K5ZEUXZi1wlrQ=
+	t=1773679770; cv=none; b=GM5PUmXtNEUrB6yX9vXw3tMfF68cRuipPgqCkXZX/UZlTA5hDarZJfK0KB3oWwJTFpDsq3VLnukGOvhnq5sIOATAgJS0zDgvcsH3UCYQu7teVt9+H3UoHGTFzmKWX8gYolTUQssoMDwgzX4ZK8jxuAnlNfkg5hf/4cgXeWcDfmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773678699; c=relaxed/simple;
-	bh=weUvuiugfWiI0Sg/ND1RsnpboRhIU5iRpS1NkIweLQQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dj/rZBJKGGSDEex32emJDRjzvk2Lrp3MOIzKVw5sLlxQetzL7tEPFHNrJPufDWW8FRrMEf3325lDqMGvdYhcDxfkEPcEGpM6WZmYr2fG2BIEGiEljIhdSkIxhQ3ZKda6gw0ztb1gYymdkcTagrq6RU/p6EB8zgGY1i6muRos9cE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=I0gsVnV8; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c73bc3dd25fso1826596a12.1
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 09:31:37 -0700 (PDT)
+	s=arc-20240116; t=1773679770; c=relaxed/simple;
+	bh=FhZtqePpHiDmUz3kiu5dJsvvDDTQqWtAFcUhiOp8xbc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Q397l9k3eVpyNWamSmUWtUOHnN1ZjKsrZ8W4dh83nognX3kZWCOF92N6uNiNpKgBgR19FWKxrirM8/p0sKuwac4apX8yMFyTwwn8eSrvozvUgtmz5l6pflOd1eUPQs4TgI3KqKVTwGetpJYzhAVO7mpf0nvJ9G6z25MfUPdUuPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=RwFEXyDf; arc=none smtp.client-ip=209.85.167.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-lf1-f98.google.com with SMTP id 2adb3069b0e04-5a12cd0bcd8so5529712e87.3
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 09:49:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1773678697; x=1774283497; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SYHkrP1b0p79WeAJVelEfbeQEyFeubJRPvMAd91XCok=;
-        b=I0gsVnV8rgg7XDdBRr2scbCmFbB86Q1l/+aMhZLeX+ovVsAzo6DKGjMFKliHcGUldh
-         6o4jE61/Q4apP/AvP7dezSS4nN8ZcVzGYBLxcpkA0R83I70tQQpEe1t35Ol5u3FxgvwG
-         JMLmL2DiRjHxUjipqF/+HPP3tMdku4MFTXwgB/sJTJxgk2DkdB4ttlWxAysLt1tVh6T8
-         H3yBZWD4GOGtoAeCZgSsW2D1aA8d/8exrPvHqVTdl+of4lKuWft1LgKIKDMQmcUuGnY2
-         mVwe4saU9kfWyLajcvqDwNVwKjQUs/plMyixjuWtxkcdPZ2OFl8VYA4QAdGoVhnfM1ju
-         jXZA==
+        d=6wind.com; s=google; t=1773679767; x=1774284567; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=REy0ulTuPqZXnhB/EsRa7VlyQlK2ftmiDyWrH5fDGzc=;
+        b=RwFEXyDfUIOKTUn8ympWeCgo8NgO5HBLuALGOwoykijnoFtGZ6QOeJWhRH9ML9hcJJ
+         VjK5ovPAREq7IdX0s8FqDByY5CmKyTtqJ0OT+Zn84FvZ0AmmGT+nXUS0wlpL5gwiVMFc
+         UjLCxxA/xVmbpZwKzf8CtOuYvsv6Wl4tFKNvT09yOVwZIM3tVLHgqfDA7dyHy8QVtkTs
+         mmCJzCRRY4o/Tnay9zqWJQbLoTfJt7pLqPu2+5FXEtwJXw+7eXgf5YIFdwkMB0b9PrfE
+         U1qmhEUzuJfY0KMGEwsMBNpyqFmQoFUrfH1x6HlaXSP+0Cb/stVmNDzh56lbTkmSGJxL
+         aNzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773678697; x=1774283497;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SYHkrP1b0p79WeAJVelEfbeQEyFeubJRPvMAd91XCok=;
-        b=GjQPLNCn0uyFgBZx5sNuq+057UxrwIcHsYs064Xu9F6EDS6ebMNb0ef5Ktr32hQIq+
-         AMJXdbONZ/2ON8TeskbUwU6CL/ehdbIBUe+pdm463lrKoe1LYi+nsjzoEkb75TEVkvu/
-         JSbT3U+HAg/O5L0UlkPpVl5zsEm2TZ+iC+OvcdFa2aYWRuexTaIr+Kn/ex1k88BulFuX
-         d5bSyZF1oV2m9DGa+QD2Q4XPssnXMPUWkFHrCkZYPhxARD82OjdqJIpxCMj302TpYxxF
-         YvHia+BJY2SfDZJNJW54118xH+J/B8xB31ImQ+tBOASGnsLb+ReQSlN6VX8P4+NDesr9
-         4n/w==
-X-Forwarded-Encrypted: i=1; AJvYcCVBB9JesolI8YKNk4Lca8p1Je+Ol05+0tHq0BTZUKXA6NuuYwQHjpD20q8f1+gRHBMX89pk5FE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGVkncm2OkWOnEWflrcbH4lTQP7AZJ4rEC0MbaJ/WkfO1zzbs3
-	WgAEm+Gtiv+jnvRzJG7NbonTELpFo8ieQibtbIaPgl8lDd/3Q/Ronullbw/crj6vncY=
-X-Gm-Gg: ATEYQzy0gHzNufolGzuDzy0FkoFJbaWNmVp03raGL4QJfJUz/QkRE4wNrBrVn9wEgst
-	TLsgw6nsb35xOPirI2xTdIs9atxJe7l0Jd80Cexy6Cm1u/WHozuloWc9r3nYquhU0NmCxYY+tOu
-	Ieu1L+igNpb2BAzWeWTNKhvjOarycAhl4wvt3gEmih4rTfPykgBZm79qE57fSsKS6rpWyvwp4jn
-	zxzTVybyVPxGJwlgsrX/hYIJX2BsWwrgDTyLK3gZ8jY9JlcFPFn9S6QKif+qPCqX7H+h0q0hdOC
-	Y4vtvdLYHWTO0eJnMrCR91CvER3Xbl44LtJdrOAxEVXDOF91zP3veYR7XbJligyI5BXSCcLZDui
-	Zv5UUJ32P/aTGkrYirEcT9TVWR3AeuDryIyk7GzaXMaWkp8RTN0y+H4h8JWWzgC9rxsYhgWpBnK
-	CU6hCk
-X-Received: by 2002:a17:903:41ce:b0:2b0:5968:a6d5 with SMTP id d9443c01a7336-2b05968aa46mr35648275ad.18.1773678697057;
-        Mon, 16 Mar 2026 09:31:37 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:48::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece8453cdsm107729715ad.84.2026.03.16.09.31.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2026 09:31:36 -0700 (PDT)
-Date: Mon, 16 Mar 2026 09:31:35 -0700
-From: Joe Damato <joe@dama.to>
-To: Ryohei Kinugawa <ryohei.kinugawa@gmail.com>
-Cc: rrameshbabu@nvidia.com, saeedm@nvidia.com, leon@kernel.org,
-	tariqt@nvidia.com, mbloch@nvidia.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, corbet@lwn.net, skhan@linuxfoundation.org,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next] docs/mlx5: Fix typo subfuction
-Message-ID: <abgwZ0ye440CPdVw@devvm20253.cco0.facebook.com>
-Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Ryohei Kinugawa <ryohei.kinugawa@gmail.com>, rrameshbabu@nvidia.com,
-	saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
-	mbloch@nvidia.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, skhan@linuxfoundation.org, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org
-References: <20260316015621.41630-1-ryohei.kinugawa@gmail.com>
+        d=1e100.net; s=20251104; t=1773679767; x=1774284567;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=REy0ulTuPqZXnhB/EsRa7VlyQlK2ftmiDyWrH5fDGzc=;
+        b=Vvz6dcWPIaiSZXlnyRuKRr3b7xb+OspWLeWxcIXSbiqlAEnv83jW+sQuaCt8WTf3AJ
+         K1/baDS63yX8h0wKlnlikoU6TGSfBm3Olq/n8gt2/u4GJzIuMKYDo8hCPH6PJxUdmRby
+         WS2t2jMw+NjwhQtfgGBMSpqNMwmQB5IqRryURNyZYiGFRUaAlubtm+oBwAQdUltWMOGm
+         mNCbgWICvsBdf2sWmgWCTtSclpvp45wr+S79Ho2agFd2ckTFvudDyWMUHnTHRe++2cmp
+         S0R9aR3xVka3MwfgdaPuCdDN1TEgAfTYyIa5jzivUszjZYrPjfqDJSc2oxraF53psaso
+         Fo1Q==
+X-Gm-Message-State: AOJu0Yw7AndegCtw4EcSMCwmxHNFNcFsMefSkcOQ043sA+zdbxXdzEn4
+	3dz3UQMRsUWvIIU0u83iZCSSc9Li/XdJ59w/IQwknsDP5WYzK28lQeX3wf878ivdxlsNgKT6a/9
+	0UQXSyfto7GRZWSu+cnVmEdJpZ2yVf0KvRN1F
+X-Gm-Gg: ATEYQzwjesGfbXI/Z9WIbniLdhvooJgk8ozHNW3FRfJFm8duNAU2oCTkMFapN3OQkT/
+	XB9jqEviDfQDg4zVfPpG99G9JQqwN5bZUa30K3NefLu5j2h6ekLIydLKfDBf9eJk063z0YRlYts
+	uW+WAJ708r1D2jsXEkUnaBAXZo2KVX9R/HkfcVL0pw48J6o+VdCAH7PnsBhnSmhLUUFXFu6LMQ2
+	ZM9AhoayzEnNf7pEAL3qnqthpBuh1hJykebWOcXl+BK952XAY9SjpjV7qw8jpXzCNwTGNl75/gf
+	3c6x4XTljSPDu6M0w4nLwj2F5dq07plW9E/BwS6fDz0DP6LIG5UF4XAz7gM/HTSbydnZGgW1low
+	mkr9e5KEZohvPq0r0nEIUy4ga+JcfUndm2CIo/vzFdPlyq8fLofZjaK8CU0+9EdI26wkK463Fqw
+	==
+X-Received: by 2002:a05:6512:3b85:b0:5a1:3f3f:a299 with SMTP id 2adb3069b0e04-5a162b20052mr4219023e87.45.1773679766799;
+        Mon, 16 Mar 2026 09:49:26 -0700 (PDT)
+Received: from smtpservice.6wind.com ([185.13.181.2])
+        by smtp-relay.gmail.com with ESMTP id 2adb3069b0e04-5a156154b2dsm1355421e87.45.2026.03.16.09.49.26;
+        Mon, 16 Mar 2026 09:49:26 -0700 (PDT)
+X-Relaying-Domain: 6wind.com
+Received: from localhost (kadavar.dev.6wind.com [10.17.1.232])
+	by smtpservice.6wind.com (Postfix) with ESMTP id 58FDA19FB5;
+	Mon, 16 Mar 2026 17:49:26 +0100 (CET)
+From: Justin Iurman <justin.iurman@6wind.com>
+To: netdev@vger.kernel.org
+Cc: dsahern@kernel.org,
+	stephen@networkplumber.org,
+	andrea.mayer@uniroma2.it,
+	justin.iurman@gmail.com,
+	nicolas.dichtel@6wind.com,
+	stefano.salsano@uniroma2.it,
+	paolo.lungaroni@uniroma2.it,
+	ahabdels@cisco.com,
+	Justin Iurman <justin.iurman@6wind.com>
+Subject: [PATCH iproute2-next 0/2] Add support for seg6 tunsrc
+Date: Mon, 16 Mar 2026 17:49:05 +0100
+Message-Id: <20260316164907.1255510-1-justin.iurman@6wind.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260316015621.41630-1-ryohei.kinugawa@gmail.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[dama.to];
-	TAGGED_FROM(0.00)[bounces-268211-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,uniroma2.it,gmail.com,6wind.com,cisco.com];
+	TAGGED_FROM(0.00)[bounces-268212-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
+	FROM_NEQ_ENVFROM(0.00)[justin.iurman@6wind.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[6wind.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dama-to.20230601.gappssmtp.com:dkim,devvm20253.cco0.facebook.com:mid,dama.to:email]
-X-Rspamd-Queue-Id: D995D29D7E2
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[6wind.com:dkim,6wind.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 759E829DA30
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 16, 2026 at 10:56:14AM +0900, Ryohei Kinugawa wrote:
-> 'subfuction' should be 'subfunction'
-> 
-> Signed-off-by: Ryohei Kinugawa <ryohei.kinugawa@gmail.com>
-> ---
->  .../device_drivers/ethernet/mellanox/mlx5/kconfig.rst           | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
-> index 34e911480108..d549b43e00fa 100644
-> --- a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
-> +++ b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
-> @@ -120,7 +120,7 @@ Enabling the driver and kconfig options
->  
->  **CONFIG_MLX5_SF_MANAGER=(y/n)**
->  
-> -|    Build support for subfuction port in the NIC. A Mellanox subfunction
-> +|    Build support for subfunction port in the NIC. A Mellanox subfunction
->  |    port is managed through devlink.  A subfunction supports RDMA, netdevice
->  |    and vdpa device. It is similar to a SRIOV VF but it doesn't require
->  |    SRIOV support.
+This series adds support for the new per-route seg6 "tunsrc" parameter.
 
-It looks like "subfunction" is mispelled in the section directly above:
+A rebase of uapi headers is required (net-next patch is being reviewed).
 
-  "Subfunctons are more light weight than PCI SRIOV VFs."
+Justin Iurman (2):
+  seg6: add tunsrc support in iproute_lwtunnel
+  man8: update seg6 encap documentation
 
-Maybe fix that one too and resubmit the patch? If you do that, you can feel
-free to add my tag:
+ ip/iproute_lwtunnel.c  | 31 +++++++++++++++++++++++++++++++
+ man/man8/ip-route.8.in | 13 ++++++++++++-
+ 2 files changed, 43 insertions(+), 1 deletion(-)
 
-Reviewed-by: Joe Damato <joe@dama.to>
+-- 
+2.39.2
+
 
