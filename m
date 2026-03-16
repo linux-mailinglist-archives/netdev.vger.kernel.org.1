@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-268280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268281-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uAGuBvpxuGn5dgEAu9opvQ
-	(envelope-from <netdev+bounces-268280-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 22:11:22 +0100
+	id yBqSEgFzuGn5dgEAu9opvQ
+	(envelope-from <netdev+bounces-268281-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 22:15:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7453F2A08E6
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 22:11:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A86062A0A79
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 22:15:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A78593037915
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 21:11:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 652BE3169C9F
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 21:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA7C364059;
-	Mon, 16 Mar 2026 21:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E314B363C60;
+	Mon, 16 Mar 2026 21:11:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="kge1sFTu"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="0TOgnUWy"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED156363C4B
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 21:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402E636403F
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 21:11:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773695473; cv=none; b=hPENmysfffOij2cilfn2UbIGVMPRh5iMlkfzQlAlaEmqxW6qVvxXj55IdQ5Jqdms0JXGMBT24CLLuU81kZI31kj+FULYHGhE/3p6eeyK8V0JuUapMcxhcUKAjxAdZmODIunxxqSa8QxKW6+SQiQAmavfWKKwNaWsA2VkHx+o/BM=
+	t=1773695475; cv=none; b=S6iaUGZ39kGhShpcmfxBWke/3X9J4tpOKO5KiBOmSuMQvW+MkNti5mljPxxb12FLTZ4bBHhyiLalj++nMxXfkzU0gyUjLE2IsausFVo+QHkvqdXs61x2jUNFZzDVsqhryfOpiAZHrTq2+hnftp2GVe6A6MaCXk20rAEswxo33Mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773695473; c=relaxed/simple;
-	bh=LP1yTjJCYmJX/Qb0pJVCqjTxejEZ29Qbej1b+86KPL8=;
+	s=arc-20240116; t=1773695475; c=relaxed/simple;
+	bh=CAsS4J/t10sG/T5I0JKSMPwaRbUDZapGaHx1j261f38=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mBdjObVTM+7Qbt/blJDNk4oz1OI8TR/tAy076d5xN+C/TU7RXM7hHLSOB2iW4XHgRzWQCYo+0iAwxygVIZx52l4CtbOXuKANWeGLCKMNB4byoSipboM8baDVWFbV3fo3djrJq1L75X3tOYgwr8+xALwr49cIdW5hE2QWVB/fiLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=kge1sFTu; arc=none smtp.client-ip=209.85.219.43
+	 MIME-Version; b=a/NqZFHUoK8meTiaZCVSBmLLBXp/zmxf8ZEUSA/ND5ZmcJvjkzPTRkpgtOwdCQvWSVgaaAhSbxKLFPL/E72r//0h7lYwv6421gCmm/tbwgsKm1SdgFz4HHxUcigp08ak/bbm8URmSlRSBJuXBo/0gO9Vqc2QUgAwNCiP7QOyj/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=0TOgnUWy; arc=none smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-89c5d795248so5960096d6.2
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 14:11:11 -0700 (PDT)
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-89a465bd7edso36601566d6.0
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 14:11:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1773695471; x=1774300271; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1773695473; x=1774300273; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tg+mzcurkRW/3R0O9EYZ+r/Yt99nB5ySaE+pg+ckKCo=;
-        b=kge1sFTuBvUfdBvpsjyMvjd9gmpp6TOIVhl1Sv8aIx10sfGt2PHjiAbAZszC+btnCK
-         vqwNTVMCmRkg0fmOoLgvXjmjfFyVdUxWDHJOFCFzQ7lSmf9XfXhP0X+T0tfABcBu7KZ+
-         IgtzpAfKp8WhbExTEi0vQMR8atr/EfS+l4DFtf1DicV6yKSk0qQNtbMZreJXa2o/sk5Z
-         p+Kf7Dhc07+LpguoIHCkO1PwBnCuqTTHQMzsshRJ3HmnBcIgS4492GDQF6B0FoRl7JC+
-         7VpZp1Q5GVmTu1bVGfVyXpPFqd+1/eAfyAnEd8pQec6VOjIYHbuU4+z/h16RcYrS920g
-         1GIg==
+        bh=mV2WxSgOnrukTiiplrhReP9OynL7VhGvdToCkKNiSXQ=;
+        b=0TOgnUWylaA5JXzVLPIy/zuML6n4sa4jerdpRE1EmYQrS9+Lnzw0LtxyyMWVdMNEK3
+         4ZO/aghWaBBa8VM2sjG5gvCrPpfQic/8Ze4dz4Kbu5+Ep6oqGH99x6FEsE50kWxX/wMQ
+         eg7e7DBzRAuarPkGIDVhlF5eVP6Kdq7bQmFG44GK1ZLqLvBndGr5V+vneHB9YZOcCt9L
+         0gmL7mtTevKANQzqBd2vdj8EFVqx+QjowuBeZDIh3eWwxubE9cWjaSNVb2Aaw9ITx+t6
+         MI6hSdXAsCG23Dd25PM/nqy0/KB5wudiNSTCQIeaIz9KS57S9i3vxa23hG1YNjWLpD0X
+         SBOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773695471; x=1774300271;
+        d=1e100.net; s=20251104; t=1773695473; x=1774300273;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=tg+mzcurkRW/3R0O9EYZ+r/Yt99nB5ySaE+pg+ckKCo=;
-        b=hgVEzFzphdAcPwHcCgsDNyemQJCqCIrQda30zMlqevywiUn63ro83MFKxpUp95w0yV
-         EIINXpobFiRG4HwlaDToxebCI4gCtasihAjnCIhjmTLgdjTi+W6h/kIYPwAttEgDrTqR
-         RpTEyMRUPRbTz5gOK12r6WWiJd/sQElEAFRi+5OnfDEzV0hoYPHAkucd8z4pzHA5/cEP
-         SAzJ/ctilrIXWHXUq2NxpgU85xLosqd/WWXT5AZXv2PB1Ekxsyrvl4uBt+k5GoGmcxKL
-         xGm1huYo5Kkqn6dRICVCZtl/2qVeL42q5KZ6c6xSwEhZLyxB0zAwXxxAN1DrUNfig9Jh
-         +kvA==
-X-Gm-Message-State: AOJu0YyX7zcxYidOvQhdr38aGxviMSTDlBCDqFK42pyaRksm+V8m8txq
-	3RRW8eXJEBeZL+BD+5pInBvFNcnlhXrEeMjyP9A174Xh3FehYPrx/t9KtHHCm5NvP/SyN0R/i6V
-	6huY=
-X-Gm-Gg: ATEYQzzcSoZbxIkJR+DqhKuNR5BRgRa591y+RWDN9mKBl2CHY43p4+gdXkqbYBldtby
-	/t8bJV/FkucrB7Ey9qY8KOMhFMQ3dexc1vwjwIrdPuKPmUbyZ26G0mg0whXQzKBeaN2yLqhtGD3
-	3qwJxgaFEbK1WGplQlXzg/NkZ2za/q+yHRNAyMEnefRbr83fDJ5HmSr3QMXn0DfA9AyoCjWUJiy
-	m/Pf970hVku9DM+LWitPQXdYLRa8N0ECMM5vLRH//RX4BNdHLrjvfaB1x66hj3a+1zBZK/WLLF/
-	uzCMDboyjG+DHPtm/lwLRVGKemwB2T7mJM0oYZ55VY1tRiX6EcJZ9daZvZXwt/42o1kALvG+L2e
-	TyHFf6IvyZbWeoqRcpW5+rAN1N/6SHxj+PqyzlL2kfE1xwR7ICsUh5Jlh+3aM6PIb4B0TKBn7ZW
-	VriMMCgpX1EcpTUNOLI0xECjA=
-X-Received: by 2002:a05:6214:1254:b0:89a:9ef:1922 with SMTP id 6a1803df08f44-89a81f72f57mr220305906d6.40.1773695470538;
-        Mon, 16 Mar 2026 14:11:10 -0700 (PDT)
+        bh=mV2WxSgOnrukTiiplrhReP9OynL7VhGvdToCkKNiSXQ=;
+        b=PvojH0gxlTpeIKPoJdx9v2LoNQkCY+qT1jjHMC18a6pjoHC36VMar7naKmsFIPflZt
+         EdXvicsYe99l4o3Paw18l4ObmS4qaaiZT1l4AkJ0m0JPHPURVx/Nz8WGlNvEg73cetrb
+         oUa2r17let52t2OJYlp6ygM2CWzgQePqk0gG40WfDYDGGCY6BBuZMKepqRGxbjBzZ3oG
+         awCYfyMe+0OwquK13XB1eqT9JNKCQI98ex8xZDtpeIeIF/JuKPN2mDA0Sf1JoUY/WBCh
+         A3fhphdWJ6SlpTSMR3sURP+D48jus9AIemvdzIfFHl9bya1Ua+OSQBMHQoPCxhkc/VZu
+         UXrQ==
+X-Gm-Message-State: AOJu0YxU84J2PXORDy53B2tx4qFUukXQShOc6oUsojnMLBjoNDln2MQh
+	oWESnbjulCTpIV7puV7CgnRIyqPbgq3u7rudc2JmPuYRYiwUIdyMcVqIHuCjD3whKuSKMmaQaVE
+	r38A=
+X-Gm-Gg: ATEYQzx9DTZIn8+Fwou1qTR7oKpuNiqyC4TcKEw8hL0PV/kuyzbJNU53618uKH7ylNe
+	HdOqtA/RLKkm5ngV5KLFqTdZEZqZNsBlnxQ6tZC01jVL1pTTikjK1K6xGjWrGJjhAUKCN2C5KYy
+	KvNc4k7xUQ3NmmY1uKorMvwHfH95usKJMS0/2Qp7O8lGWPIy3k2pVpHo3jOS18Mw51R9mZsHGPK
+	5PnHn3Cu7FcjLnsrnvfihHjWHRFXksUE7xk3vooCz0ZvvR1wAvickmYNm5gjxoVgr/vmef306ON
+	r05dhB6JOfxtRyIS9Om2ETFGbLFIJGpaG5nUdR31OCDfNrtUu9EuMOLomcvOpSCSRUsZIKfvreC
+	qGES92NQ2akY/4lNXIH+Tuf/D16fFsnuBEGnKCjuM7CZdnoUCBeobCN8M4EFsqJ8CD0FBl7qdDw
+	PIJ3aTXx0auF3vVHP6RebhQ3FVaYB2Dy69xA==
+X-Received: by 2002:a05:6214:c6f:b0:89c:5385:3476 with SMTP id 6a1803df08f44-89c53853f1cmr65618776d6.39.1773695472727;
+        Mon, 16 Mar 2026 14:11:12 -0700 (PDT)
 Received: from majuu.waya ([70.50.89.69])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89c53374573sm27356266d6.7.2026.03.16.14.11.09
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89c53374573sm27356266d6.7.2026.03.16.14.11.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2026 14:11:09 -0700 (PDT)
+        Mon, 16 Mar 2026 14:11:11 -0700 (PDT)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -94,9 +94,9 @@ Cc: davem@davemloft.net,
 	toke@toke.dk,
 	willemdebruijnkernel@gmail.com,
 	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net v2 1/6] net: Introduce skb ttl field to track packet loops
-Date: Mon, 16 Mar 2026 17:10:47 -0400
-Message-Id: <20260316211052.332383-2-jhs@mojatatu.com>
+Subject: [PATCH net v2 2/6] net/sched: Fix ethx:ingress -> ethy:egress -> ethx:ingress mirred loop
+Date: Mon, 16 Mar 2026 17:10:48 -0400
+Message-Id: <20260316211052.332383-3-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260316211052.332383-1-jhs@mojatatu.com>
 References: <20260316211052.332383-1-jhs@mojatatu.com>
@@ -112,11 +112,11 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268280-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268281-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,networkplumber.org,mojatatu.com,willsroot.io,asu.edu,syst3mfailure.io,toke.dk,gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
@@ -124,7 +124,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	DMARC_NA(0.00)[mojatatu.com];
 	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
@@ -134,86 +134,143 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7453F2A08E6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu.com:email,mojatatu.com:mid,mojatatu-com.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A86062A0A79
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In order to keep track of loops across the stack we need to _remember the global
-loop state in the skb_.
-We introduce a 2 bit per-skb ttl field to keep track of this state.
-The following shows the before and after pahole diff:
+When mirred redirects to ingress (from either ingress or egress) the loop
+state from sched_mirred_dev array dev is lost because of 1) the packet
+deferral into the backlog and 2) the fact the sched_mirred_dev array is
+cleared. In such cases, if there was a loop we won't discover it.
 
-pahole before(-) and after (+) diff looks like:
-   __u8       slow_gro:1;           /*   132: 3  1 */
-   __u8       csum_not_inet:1;      /*   132: 4  1 */
-   __u8       unreadable:1;         /*   132: 5  1 */
- + __u8       ttl:2;                /*   132: 6  1 */
+Here's a simple test to reproduce:
+ip a add dev port0 10.10.10.11/24
 
- - /* XXX 2 bits hole, try to pack */
-   /* XXX 1 byte hole, try to pack */
+tc qdisc add dev port0 clsact
+tc filter add dev port0 egress protocol ip \
+   prio 10 matchall action mirred ingress redirect dev port1
 
-   __u16      tc_index;             /*   134     2 */
+tc qdisc add dev port1 clsact
+tc filter add dev port1 ingress protocol ip \
+   prio 10 matchall action mirred egress redirect dev port0
 
-There used to be a ttl field removed as part of tc_verd in commit aec745e2c520
-("net-tc: remove unused tc_verd fields"). It was already unused by
-that time removed earlier in commit c19ae86a510c ("tc: remove unused redirect
-ttl").
+ping -c 1 -W0.01 10.10.10.10
 
-An existing per-cpu loop count, MIRRED_NEST_LIMIT, exists; however, this
-count assumes a single call stack assumption and suffers from two challenges:
-1)if we queue the packet somewhere and then restart processing later the
-per-cpu state is lost (example, it gets wiped out the moment we go
-egress->ingress and queue the packet in the backlog and later packets
-are being pulled from backlog)
-2) If we have X/RPS where a packet came in one CPU but may end up on a
-different CPU.
+Another bug fixed here is a false positive, example current code will claim
+this is a loop when its not:
+tc qdisc add dev port0 clsact
+tc qdisc add dev port1 clsact
+# port0 ingress --> port1 ingress
+tc filter add dev port0 ingress protocol ip \
+   prio 10 matchall action mirred ingress redirect dev port1
+# port1 ingress --> port1 egress
+tc filter add dev port1 ingress protocol ip \
+   prio 10 matchall action mirred egress redirect dev port1
+#port1 egress --> port0 egress
+tc filter add dev port1 egress protocol ip \
+   prio 11 matchall action mirred egress redirect dev port0
 
-Our first attempt was to "liberate" the skb->from_ingress bit into the skb->cb
-field (v1) and after a lot of deeper reviews found that it does get trampled in
-case of hardware offload via the mlnx driver.
-Our second attempt (which we didnt post) was to "liberate" the
-skb->tc_skip_classify bit into the skb->cb - but that led us to a path of making
-changes that are sensitive such as making mods to dev queue xmit.
-
-This is our third attempt.
-
-Use cases:
-1) Mirred increments the ttl whenever it sees an skb. This in combination with
-MIRRED_NEST_LIMIT helps us resolve both challenges mentioned above.
-This is ilustrated in patch #2.
-
-2) netem increments the ttl when using the "duplicate" feature and catches it
-when it sees the packet the second time.
-This is ilustrated in patch #5.
+ping -c 1 -W0.01 10.10.10.10
+And see the ping fail
 
 Fixes: fe946a751d9b ("net/sched: act_mirred: add loop detection")
-Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
 Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- include/linux/skbuff.h | 2 ++
- 1 file changed, 2 insertions(+)
+ net/sched/act_mirred.c | 45 ++++++++++++++++++++++++++----------------
+ 1 file changed, 28 insertions(+), 17 deletions(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index daa4e4944ce3..f1326c4b4bcc 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -848,6 +848,7 @@ enum skb_tstamp_type {
-  *		CHECKSUM_UNNECESSARY (max 3)
-  *	@unreadable: indicates that at least 1 of the fragments in this skb is
-  *		unreadable.
-+ *	@ttl: time to live counter for packet loops.
-  *	@dst_pending_confirm: need to confirm neighbour
-  *	@decrypted: Decrypted SKB
-  *	@slow_gro: state present at GRO time, slower prepare step required
-@@ -1030,6 +1031,7 @@ struct sk_buff {
- 	__u8			csum_not_inet:1;
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index 05e0b14b5773..9ef261e19e40 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -26,6 +26,8 @@
+ #include <net/tc_act/tc_mirred.h>
+ #include <net/tc_wrapper.h>
+ 
++#define MIRRED_DEFER_LIMIT 3
++
+ static LIST_HEAD(mirred_list);
+ static DEFINE_SPINLOCK(mirred_list_lock);
+ 
+@@ -234,12 +236,15 @@ tcf_mirred_forward(bool at_ingress, bool want_ingress, struct sk_buff *skb)
+ {
+ 	int err;
+ 
+-	if (!want_ingress)
++	if (!want_ingress) {
+ 		err = tcf_dev_queue_xmit(skb, dev_queue_xmit);
+-	else if (!at_ingress)
+-		err = netif_rx(skb);
+-	else
+-		err = netif_receive_skb(skb);
++	} else {
++		skb->ttl++;
++		if (!at_ingress)
++			err = netif_rx(skb);
++		else
++			err = netif_receive_skb(skb);
++	}
+ 
+ 	return err;
+ }
+@@ -426,6 +431,7 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
+ 	struct netdev_xmit *xmit;
+ 	bool m_mac_header_xmit;
+ 	struct net_device *dev;
++	bool want_ingress;
+ 	int i, m_eaction;
+ 	u32 blockid;
+ 
+@@ -434,7 +440,8 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
+ #else
+ 	xmit = this_cpu_ptr(&softnet_data.xmit);
  #endif
- 	__u8			unreadable:1;
-+	__u8			ttl:2;
- #if defined(CONFIG_NET_SCHED) || defined(CONFIG_NET_XGRESS)
- 	__u16			tc_index;	/* traffic control index */
- #endif
+-	if (unlikely(xmit->sched_mirred_nest >= MIRRED_NEST_LIMIT)) {
++	if (unlikely(xmit->sched_mirred_nest >= MIRRED_NEST_LIMIT ||
++		     skb->ttl >= MIRRED_DEFER_LIMIT)) {
+ 		net_warn_ratelimited("Packet exceeded mirred recursion limit on dev %s\n",
+ 				     netdev_name(skb->dev));
+ 		return TC_ACT_SHOT;
+@@ -453,23 +460,27 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
+ 		tcf_action_inc_overlimit_qstats(&m->common);
+ 		return retval;
+ 	}
+-	for (i = 0; i < xmit->sched_mirred_nest; i++) {
+-		if (xmit->sched_mirred_dev[i] != dev)
+-			continue;
+-		pr_notice_once("tc mirred: loop on device %s\n",
+-			       netdev_name(dev));
+-		tcf_action_inc_overlimit_qstats(&m->common);
+-		return retval;
+-	}
+ 
+-	xmit->sched_mirred_dev[xmit->sched_mirred_nest++] = dev;
++	m_eaction = READ_ONCE(m->tcfm_eaction);
++	want_ingress = tcf_mirred_act_wants_ingress(m_eaction);
++	if (!want_ingress) {
++		for (i = 0; i < xmit->sched_mirred_nest; i++) {
++			if (xmit->sched_mirred_dev[i] != dev)
++				continue;
++			pr_notice_once("tc mirred: loop on device %s\n",
++				       netdev_name(dev));
++			tcf_action_inc_overlimit_qstats(&m->common);
++			return retval;
++		}
++		xmit->sched_mirred_dev[xmit->sched_mirred_nest++] = dev;
++	}
+ 
+ 	m_mac_header_xmit = READ_ONCE(m->tcfm_mac_header_xmit);
+-	m_eaction = READ_ONCE(m->tcfm_eaction);
+ 
+ 	retval = tcf_mirred_to_dev(skb, m, dev, m_mac_header_xmit, m_eaction,
+ 				   retval);
+-	xmit->sched_mirred_nest--;
++	if (!want_ingress)
++		xmit->sched_mirred_nest--;
+ 
+ 	return retval;
+ }
 -- 
 2.34.1
 
