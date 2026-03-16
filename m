@@ -1,210 +1,210 @@
-Return-Path: <netdev+bounces-268104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268105-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0A3VBmHet2mcWAEAu9opvQ
-	(envelope-from <netdev+bounces-268104-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:41:37 +0100
+	id AKS1AHXft2mcWAEAu9opvQ
+	(envelope-from <netdev+bounces-268105-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:46:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 878A72980BC
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:41:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D8C82982C0
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 11:46:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 412DC3013A48
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 10:41:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 882E7303980C
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 10:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 623CA38F636;
-	Mon, 16 Mar 2026 10:41:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70EF38E5C5;
+	Mon, 16 Mar 2026 10:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="JeYwaiyS";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Hhwb/yxW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OKpYU/jG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3353238E5DE
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 10:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8DB352FB0
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 10:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773657691; cv=none; b=Q6tmLLp4Q9SjXM2M9rIsRA1h3cg89YfJQAzTa86i1pLQ8TssIaE2Xct0K1EfIU81S+KRjlhkuvChcfX63PXuIeGe9C/992FlzFGw6WgCM30kHGHpFQFSKyF8G3LzeH1VibSsuFr1Me24fw7qf7YsmLSIWug3+pIcdydFAAW831o=
+	t=1773657743; cv=none; b=XZPRZVldBXUBp/oOdRIIx6b2uOcumyDPzj+zYVqL/OFDvu/Nlq0Bu9U6m3n0MG4RbjoQIupCqjRmGBy48fIv5XMSAfBF3d421mwr5NI5AVCKZ5cnfhtZMQjdlK9wEvz0F5pGTDC7C0XAG1ey9aVZHXKsPWDLNYm9Nu5s/1+KTg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773657691; c=relaxed/simple;
-	bh=xGsdO9lvHQTEQqegkv3PbncSFZyHZckPB8k6omLSYbI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c05dSJMRa6HnFTMuWERTSW29YBdHugEZTnaMvvg2TEyCc3qee457j5pp4vPr8rqhxwDlIXI23TwBw+Rjbt8drKDr0EdNVh1yrRN417GfxaAD7O9wFzvdIHuTcqjkAo1mo2y6WcPbEipdvqnjC/6uZBE/EZcVKvwDTYsmzHTEKiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=JeYwaiyS; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Hhwb/yxW; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62G7n2WD041968
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 10:41:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	1QqnBdYN2J1s3k4Tlc9PyCtgucdWDLMMCEFYmM+WSvM=; b=JeYwaiySR8LxK/ap
-	VGxH/KN5SNQsjCsh99I76ZWxnIQiAPWgYgZkNiomfJ9kwyBPtWS5BrZ9FFxZ+CgS
-	74n0hAiZk6i0Grc6OqGTYAcM/9eUGap/KMM/zIpFKS5QACQvoB/iPomCOC8KXxt9
-	T942vHJEBh30gUu/rKg9sRWL4Amocgdh8Q2IlfaWhJUgSX0e4WIBK6iwDyBI39sx
-	1ZoRtAISamPcu9V4PPnS37lzfvketUEiZZjvpj8OyoZgqI6GeD05Io5pjqRPgjsk
-	KFjdJpf2rAH/V2ugTFIKY8QpjGS4C0dkzhs8HWasGJ8j81F/A/Y64ya3VNYNmcDZ
-	5QMtyw==
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cxdt80m2x-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 10:41:29 +0000 (GMT)
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8cb50dfd542so310794385a.0
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 03:41:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1773657688; x=1774262488; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1QqnBdYN2J1s3k4Tlc9PyCtgucdWDLMMCEFYmM+WSvM=;
-        b=Hhwb/yxW2T6KbiivzMYmpuUhNeydgT2dCen1/8SbJZbF36qkTqv3l2DEmx9FpyuD6k
-         WnXOVuzNKc6Bk9EJb7JqgLAMkkz/cxC+bOjbhPIgGD0kGeFTerjbjUPVBF2iVAwPXvsZ
-         qW8m2OlHlM0PMtVI8IV5ceV/LsgN9oEuALxG2oHoYvZ7dibfzvzi/XRU1EOSmQAvWQhs
-         caw3IBcvKB7KZeBH6x28dgissiJYCoRY0jC+zKWvvztS6ptdwwuTrIJ3N4X1x0dk6+op
-         z9+N+Gj/phE78AzdCfKjRHBhaWWRpvubm1dIEqmxinoRvB96SbsTFPxYhuWtXrl89xL0
-         FhQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773657688; x=1774262488;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1QqnBdYN2J1s3k4Tlc9PyCtgucdWDLMMCEFYmM+WSvM=;
-        b=ZDzbgHR0ZH7yfDWD4MVHM3zVRfzU/UbdkK/JjJBckW6se8hG2+8z5Pmqybp5bbfhGL
-         plQNy2RGLPOdgmvMxQ/j/S44OyGNJabaTY3VpEH/7lEYRQtavyTpBRKRmCLv6PQHuoFu
-         ZM3siLRGLDFait9gXJJ+mZJruMubmWHd6Zog746YFozxogpAiuWqUgloX+zoCHb/lqEe
-         rW38GY40Cc2lJ19hxV9WvA++n0dwUAewTc9X+BFDJQb8wIRTp79SQb6D0ABkovsa8mWH
-         mzXluUidESB6IGIv5TRB4hENeOsmgyaWP9lcxDzFTbXxEEuwMwuPQ1zD+1lCpM/kk+cM
-         GQyg==
-X-Forwarded-Encrypted: i=1; AJvYcCWbSCjpMDfh5g40M5Cbt8lt4InkL+C+pfdqPAHdmTPsBBjKtyfiUhcoLxNK74ChmtH0TLvk59I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXUrwEbg/GRd2m4/lAu5ISH/OSjDXfEvhN/AmmcabR0aQA0gPE
-	hRi6vesLMEW8HCYdysDCswb0doHkSyDNM/5UpxLH04M5fUHtg3QxRJwSmSts86G1uJm0sY1ks0K
-	Zyff2NMyFnsSod6KZ3wb5JEQ0rof7+R03927Svw9qsVhgCxvseNKoqSMZEfI=
-X-Gm-Gg: ATEYQzylfZwI0lWW5WB5RWMm71v2IOPsbrBzquAYQ5MZwW0AVvVeAVTokbp+emtQegU
-	p3pP8u1tVjTu6bJemnqg4PjoPYBFqidi33O9TnGobjU0b7IRvAYdaI3R3jZmJD9wv2t32qe5zT9
-	LjPQdXcQXPYW1zlg3d6G/UO7D+YqLGTFji7VW2JwhlS3D7fcAMxzpllvMJOwJNQsXTwiENcWgIn
-	Ye/xOMCks5DhUzKpg6jYU0m82W6eieelH9FzvlWcQj5oWuEEQxK8/mDlYAZHBAEdPBKgiGkgyIA
-	kMJZADEIKr0DRlKI/d4DFC4ys+jA9imXNKQUrc9CGRz68R/fwOkGLV5TzxCQLhMF8N1mJQWPUdd
-	l+9Atr2pooBaMILTZpI9gEyPZupEe9TqIxU1dFd7Xpkpd3viSvriWXeQjzkvYKwdwIVTd0ndKeN
-	xC8To=
-X-Received: by 2002:a05:620a:290e:b0:8cd:8736:9fc3 with SMTP id af79cd13be357-8cdb5b8a614mr1280364985a.7.1773657688610;
-        Mon, 16 Mar 2026 03:41:28 -0700 (PDT)
-X-Received: by 2002:a05:620a:290e:b0:8cd:8736:9fc3 with SMTP id af79cd13be357-8cdb5b8a614mr1280362485a.7.1773657688178;
-        Mon, 16 Mar 2026 03:41:28 -0700 (PDT)
-Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b976cf49fa6sm537613066b.58.2026.03.16.03.41.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Mar 2026 03:41:27 -0700 (PDT)
-Message-ID: <c9b4481e-f109-4acf-b58f-2235efc7cd5b@oss.qualcomm.com>
-Date: Mon, 16 Mar 2026 11:41:24 +0100
+	s=arc-20240116; t=1773657743; c=relaxed/simple;
+	bh=8Qy1DBIxqkYwn2wXhlkbjB394PF3wV9MJQ2OC1yioog=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MBkgxa9L9Xpi3j5adjYYzgUvbsKooH1aSX8eqMGWWPZxpJoIYBlRfGLe9G88ZTxHaP8VhGjGKGLCvQ/ELWn2bwGCoZS70Fqdc/RLaaJdqGgrC/6A4ZHqIl7L+vV2zHmLLpJpVgTTFhLbeUBRDcxyn4EwV0Q+hfI3R8CJvbnZG14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OKpYU/jG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773657741;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=iwCjK/8BbuVWkdj/Kq+vjZgwo9eNY1olqWaI6BrfiNo=;
+	b=OKpYU/jGHsdTIwkP9bnEAEyceP5aWi9nC5mPn1l1UoQ3boJgQEkPqHIaGwnkjbNgPkkV44
+	mvNfmRHNzF2qe20kCatv6piTVoX4bw0Orv7v4ZMtqdRiQd5VKpMT4+LuHDkznCriabyCMV
+	7t6blMg+Za652u4IpWSGWblp02IlqsU=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-438-bDlMZFYfOuW7prj0v2ZDtg-1; Mon,
+ 16 Mar 2026 06:42:17 -0400
+X-MC-Unique: bDlMZFYfOuW7prj0v2ZDtg-1
+X-Mimecast-MFC-AGG-ID: bDlMZFYfOuW7prj0v2ZDtg_1773657736
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0A148195609D;
+	Mon, 16 Mar 2026 10:42:16 +0000 (UTC)
+Received: from ShadowPeak.redhat.com (unknown [10.45.224.235])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E6E57180035F;
+	Mon, 16 Mar 2026 10:42:11 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: jacob.e.keller@intel.com,
+	Petr Oros <poros@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-next 0/4] iavf: fix VLAN filter state machine races
+Date: Mon, 16 Mar 2026 11:42:05 +0100
+Message-ID: <20260316104209.1285962-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6/7] arm64: dts: qcom: Add Arduino Monza (VENTUNO Q)
- board support
-To: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>,
-        andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
-        krzk+dt@kernel.org, conor+dt@kernel.org
-Cc: richardcochran@gmail.com, r.mereu@arduino.cc, m.facchin@arduino.cc,
-        geert+renesas@glider.be, arnd@arndb.de,
-        dmitry.baryshkov@oss.qualcomm.com, ebiggers@kernel.org,
-        michal.simek@amd.com, luca.weiss@fairphone.com, sven@kernel.org,
-        prabhakar.mahadev-lad.rj@bp.renesas.com,
-        kuninori.morimoto.gx@renesas.com, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, Loic Poulain <loic.poulain@oss.qualcomm.com>
-References: <20260313103824.2634519-1-srinivas.kandagatla@oss.qualcomm.com>
- <20260313103824.2634519-7-srinivas.kandagatla@oss.qualcomm.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260313103824.2634519-7-srinivas.kandagatla@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: BWcNYY2AEofW0QKRO9RcmLeV9mCAbBnI
-X-Authority-Analysis: v=2.4 cv=CKInnBrD c=1 sm=1 tr=0 ts=69b7de59 cx=c_pps
- a=HLyN3IcIa5EE8TELMZ618Q==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22
- a=EUspDBNiAAAA:8 a=5D_ixgJ-nfAih4ZOxbkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=bTQJ7kPSJx9SKPbeHEYW:22
-X-Proofpoint-ORIG-GUID: BWcNYY2AEofW0QKRO9RcmLeV9mCAbBnI
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE2MDA4MiBTYWx0ZWRfX2h2UOmwYVE/R
- rjE3Dg4yYooG+plzxmFeikPjFL5g4OUfo253c4mI6L736goLa1x6ff/gaVLuI7kwyzALXn39HQ4
- ZTIRPWqsLiPaLGnmyYzgnTgDQtJr2gcrL9cUN+epows+HVspRY507ZUZfwDeZ9l8FoiiNdog2dN
- Iqodpxa+4hB5Ry+X0yCu9jtjWkt7YPK/q2yX/SCSAXIJnoEP6asOefCyNPzySHIGZtBL/3hv5B5
- 641BH5f3Ix2R4sIh5NhkEFVjIMQudTlB+ehGE7R7R3CbB0uNUFBph3tgokwIIeUxaFe/k9ZnsyO
- O/Vdy1mAYbWK+j+NJSdEsogR5rVkY0xopKd9aVES9Ifg17TaAHqbq0aeXXrmohkmdWOHMUOyfXV
- 4S5Yyd7xrn++P1/PH9j99BghMze6AC7bOoqFtCG15CYdYXHuXq3eSUA2VE67dDvBAANZl/Uq4Hk
- eFqDywkvYcUfA3taOqw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-16_04,2026-03-13_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 lowpriorityscore=0 phishscore=0 priorityscore=1501 bulkscore=0
- adultscore=0 impostorscore=0 suspectscore=0 spamscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603160082
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,arduino.cc,glider.be,arndb.de,oss.qualcomm.com,kernel.org,amd.com,fairphone.com,bp.renesas.com,renesas.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-268104-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,oss.qualcomm.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,qualcomm.com:dkim,qualcomm.com:email];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268105-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 878A72980BC
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7D8C82982C0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/13/26 11:38 AM, Srinivas Kandagatla wrote:
-> From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> 
-> Add device tree support for the Arduino VENTUNO Q board,
-> based on the Qualcomm QCS8300 (Monaco) SoC.
-> 
-> The board features a Qualcomm Monza SoM and integrates various
-> peripherals, including:
-> - USB Type‑C connector with dual‑role support
-> - ADV7535 DSI‑to‑HDMI bridge
-> - MAX98091 audio codec
-> - 2.5G Ethernet PHY (HSGMII)
-> - PCIe0 (to onboard WiFi chipset and USB bridge)
-> - PCIe1 (to M2/nvme)
-> - Button (via GPIO‑keys)
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Co-developed-by: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
-> Signed-off-by: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
-> ---
+The iavf VLAN filter state machine has several design issues that lead
+to race conditions between userspace add/del calls and the watchdog
+task's virtchnl processing.  Filters can get lost or leak HW resources,
+especially during interface down/up cycles and namespace moves.
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+The root problems:
 
-Konrad
+1) On interface down, all VLAN filters are sent as DEL to PF and
+   re-added on interface up.  This is unnecessary and creates multiple
+   race windows (details below).
+
+2) The DELETE path immediately frees the filter struct after sending
+   the DEL message, without waiting for PF confirmation.  If the PF
+   rejects the DEL, the filter remains in HW but the driver lost its
+   tracking structure.  Race conditions between a pending DEL and
+   add/reset operations cannot be resolved because the struct is gone.
+
+3) VIRTCHNL_OP_ADD_VLAN (V1) had no success completion handler, so
+   filters stayed in IS_NEW state permanently.
+
+
+Why removing VLAN filters on down/up is unnecessary:
+
+Unlike MAC filters, which need to be re-evaluated on up because the
+PF can administratively change the MAC address during down, VLAN
+filters are purely user-controlled.  The PF cannot change them while
+the VF is down.  When the VF goes down, VIRTCHNL_OP_DISABLE_QUEUES
+stops all traffic -- VLAN filters sitting in PF HW are harmless
+because no packets flow through the disabled queues.
+
+Compare with other filter types in iavf_down():
+- MAC filters: only the current MAC is removed (it gets re-read from
+  PF on up in case it was administratively changed)
+- Cloud filters: left as-is across down/up
+- FDIR filters: left as-is across down/up
+
+VLAN filters were the only type going through a full DEL+ADD cycle,
+and this caused real problems:
+
+- With spoofcheck enabled, the PF activates TX VLAN anti-spoof on
+  the first non-zero VLAN ADD.  During the re-add phase after up,
+  the filter list is transiently incomplete -- traffic for VLANs not
+  yet re-added gets dropped by anti-spoof.
+
+- Rapid down/up can overlap with pending DEL messages.  The old code
+  used DISABLE/INACTIVE states to track this, but the DISABLE state
+  could overwrite a concurrent REMOVE from userspace, causing the
+  filter to be restored instead of deleted.
+
+- Namespace moves trigger implicit ndo_vlan_rx_kill_vid() calls
+  concurrent with the down/up sequence.  The DEL from the namespace
+  teardown races with the DISABLE from iavf_down(), and the filter
+  can end up leaked in num_vlan_filters with no associated netdev.
+
+After reset, VF-configured VLAN filters are properly re-added via
+the VIRTCHNL_OP_GET_VF_RESOURCES / GET_OFFLOAD_VLAN_V2_CAPS response
+handlers, which unconditionally set all filters to ADD state.  This
+path is unaffected by these changes.
+
+
+This series addresses all three issues:
+
+Patch 1 renames IS_NEW to ADDING for clarity.
+
+Patch 2 removes the DISABLE/INACTIVE state machinery so VLAN filters
+stay ACTIVE across down/up cycles.  This is the core behavioral
+change -- VLAN filters are no longer sent as DEL to PF on interface
+down, and iavf_restore_filters() is removed since there is nothing
+to restore.
+
+Patch 3 adds a REMOVING state to make the DELETE path symmetric with
+ADD -- filters are only freed after PF confirms the deletion.  If the
+PF rejects the DEL, the filter reverts to ACTIVE instead of being
+lost.
+
+Patch 4 hardens the remaining race windows: adds V1 ADD success
+handler and prevents redundant DEL on filters already in REMOVING
+state.
+
+Petr Oros (4):
+  iavf: rename IAVF_VLAN_IS_NEW to IAVF_VLAN_ADDING
+  iavf: stop removing VLAN filters from PF on interface down
+  iavf: wait for PF confirmation before removing VLAN filters
+  iavf: harden VLAN filter state machine race handling
+
+ drivers/net/ethernet/intel/iavf/iavf.h        |  9 +--
+ drivers/net/ethernet/intel/iavf/iavf_main.c   | 53 ++++---------
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 76 +++++++++----------
+ 3 files changed, 54 insertions(+), 84 deletions(-)
+
+-- 
+2.52.0
+
 
