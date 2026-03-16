@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-268213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268214-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4NMnKaE1uGkDagEAu9opvQ
-	(envelope-from <netdev+bounces-268213-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:53:53 +0100
+	id eNjLJLI1uGkDagEAu9opvQ
+	(envelope-from <netdev+bounces-268214-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:54:10 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2515829DB05
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:53:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC38A29DB28
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 17:54:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6EDBB3099214
-	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 16:49:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BFA92309B435
+	for <lists+netdev@lfdr.de>; Mon, 16 Mar 2026 16:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00FF3B8BBF;
-	Mon, 16 Mar 2026 16:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E4C43CEB8F;
+	Mon, 16 Mar 2026 16:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Cz4yt6QL"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="QtrDs+XG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f99.google.com (mail-lf1-f99.google.com [209.85.167.99])
+Received: from mail-wm1-f99.google.com (mail-wm1-f99.google.com [209.85.128.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 432743CE4B5
-	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 16:49:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD8232548B
+	for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 16:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773679778; cv=none; b=npJuaVHG/Ogy/5u59KnM21WoF+Bis+r6rQDWIUtSR67fVAcclVUa7/v5m5afIKJq28/l8TpRRy76xGtOlYN150YlRsjHG3Pzs2oNTrURLDRXjpL7YDgWbp1fDNjUbVaYDyIRb1dbS6l9ovSSI9ugP+/cHDoriuhqcQMHCB+5M54=
+	t=1773679784; cv=none; b=PQEIIkkVWHTzk2r4wSL5i6mOyZ3Y0TII7xupRBeHtejZpXX7/K7NZkqbpWFpUHpRMBWBAL+nZD2dFEqRDPJu7lvY8am/bEuFdl2ehbDsi5MJfnyBgnuRP+556qmMFDjDzZOHvFfxjOLV8mgprJcuYZzu+/VYzbZNifG57qcmlUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773679778; c=relaxed/simple;
-	bh=dXfsihbB/0u17xAbJe/nwOIJEY3qa5b9DOczSyGYNmA=;
+	s=arc-20240116; t=1773679784; c=relaxed/simple;
+	bh=KiBVHnyid/175KoQibneA2tjHy3gP6LEhUa0zYra11c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=E+izt7D4zZ2AGetQCLsXYYwco7SEqX7tDFshUKChbSDYdGchahvcxn+zzf76Uxfqj6Map5XQabVkcrWRmbe5piSlvEbEOCn8S5BWn8pbILqHvYXfQVbX8rUYq599P9fKnhl4pSV/2/ruQFjNUNQ62A1ypHrbTiG3Ab4vhucWz4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=Cz4yt6QL; arc=none smtp.client-ip=209.85.167.99
+	 MIME-Version; b=k1nrT9d2cZF2ApP7Cxi2Kdwf30TGT8RviBhG4I1rKbBUOdogC7wJEAvGSB/kwlf3GRxpZdciRMq1V3lS8IB4lIqEr76m0SHTfSXmQLM/4QYC1bMCu82ZEoJHbYGiHHG8bLF9dWdJnLM58sjHv2HY52Bcvh3XT9kH+9s0OUPNlIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=QtrDs+XG; arc=none smtp.client-ip=209.85.128.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-lf1-f99.google.com with SMTP id 2adb3069b0e04-5a12c19affeso6713242e87.1
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 09:49:37 -0700 (PDT)
+Received: by mail-wm1-f99.google.com with SMTP id 5b1f17b1804b1-48539cbb7b1so28248835e9.3
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 09:49:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1773679775; x=1774284575; darn=vger.kernel.org;
+        d=6wind.com; s=google; t=1773679781; x=1774284581; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GebID9Fz+svTro9iiiZ+sDepPKQe8Gm/XzKmqqFUaQw=;
-        b=Cz4yt6QLVZOMWRoyO80+gNM1Pwl7F/N+PSmdcPRJhS3R35jEoUOJo/wznZ3wYQ3UEG
-         3S1UAVYSL/5lVCvt6T6obrmKdXl8UzC5cDE6pBGhSVvkG1wlxUNij5QSLXAgY2jZ0NUX
-         MzAEKvxh5N1i1dCFsrsS8L9nqDM2Z28y81vCBKEGFxTwbuB3gjgYeLrtAJnfAaLAzwxM
-         +uf0y5T0kgOn3VjZ6cyVcBvErLGncpsMKDJ4PBg50xIKI2BHD0VSzQn4r/DQ+wJ51TW/
-         FEZomS+YD/V+moLO9S5ERTsmHfQSN6xGKRJYbn0v8vQNCz4IxypoaIqyGM1Safy9rr/Z
-         K5ow==
+        bh=BSfZnsUZ5ZrY37SobT5lyXeDO7LsprFFC3V8XppCRdM=;
+        b=QtrDs+XGgRfBHqGv3L62ZrtMYgWQbJyZsFBCfokMBNy5tJbXgVyj6yIY5JPzks7m1D
+         smjrTGQ95CAthIRkLzBZWOXVtKsgzWQi70y8C0AvUirTfUuC7v2f026z3SdkIs+7iHIq
+         AZHxFaU1CJy9s57nMPdrlEIbnPzbI8oF6UKcB6kgHNouenaw2zFnAgWn/45KvCo6YS9K
+         YiyRSLFd79nMExodFQpQRz/cCEaI2HeMAyH9w2bhrWDbve7n42p7R7j0qCDkNxyOfM3g
+         XrSpZeJXTTVbCHdyxtBlROXeecIgfULVA2OKqnKH5dtNE60RLWXkT0H17zfL6053mnHQ
+         ovkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773679775; x=1774284575;
+        d=1e100.net; s=20251104; t=1773679781; x=1774284581;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=GebID9Fz+svTro9iiiZ+sDepPKQe8Gm/XzKmqqFUaQw=;
-        b=i0BaPigsOqytwIQAP4Ked9XIn/sqkC36gkAa2VyRAThMFjrXfxxGcQW4CA9HvfkZ3P
-         N/+Y9kKb8RQ99r2EUwRALIvS36jGbiIlzKyDJIDnxkZFGSkZ8qDOklWsVYvXLfVodrYt
-         psv5sbDxsQIxRGy57XMCl7Xbe6Tp5YxaWDCZUDsmVyB6ZbTgnlIM8sxomj5YzJLNPuGo
-         k+RSXdMpgj2vv54or1hjc3VUfD0rO48qv6k1/Vk//X0suvpH7YRT3X7zyATKOdPphZal
-         cG71L5CIZUfvC9GUa4kRqHF2IB0QxefovYQ/iFQ7d0uTGyxJlRrdUslWl0uj8OejrgnL
-         mZ4g==
-X-Gm-Message-State: AOJu0YxfDs7WrbvojPVoM0Or34rdRknsa2Wq/4EvXtHpoZ1Llb8ZKeDV
-	hSE7SgAZC/33kLP+k5XD0wQTLtfhnp24hhpRTiq7L+ShDMwujKA9EPyP5GBPFg5uykDJHsGS3vt
-	DixmMeF6FMIbiioAxfWuKFYcItGxZEXYNjt0w
-X-Gm-Gg: ATEYQzxewSNe18diXs8UTNT7bUIQ+sWz7oSDqgqNBGke9g7jH2cm3aptotlDasfNuQw
-	wIbCDbbuEqm5o5fkvdX7VsguT09gD8oZHADu2cLHKIbEXbGhO52G3XrJe1LIThu947nUMDBWnkE
-	d2FHlZ3p6L4t9wrvAUGiR9icB3MnzyTF5yIJlHtVR0b4TiepJi8fNPFY5D6b44Bek3MWZHAGi4C
-	QXVW+d3c8D3W1Vu449QmuaCcMmTU8YqGXIJKfCvPEko0e3pTgaw4icxZ2nFhANcsz1G7We5RxXu
-	nGYt4BTs6Lbs1dERQcQnavnxMHA7jbhzxGjBeiDhlnDZ1pkdbqZoqhe9ZEor9ussIj004doAA0Z
-	UJz4USvr7h9soTbJx8XrR9Ta42K4/UVINAYnQnlxaODGK+9oFPX2dHoewhWUh6uzwajG4/nyVUQ
+        bh=BSfZnsUZ5ZrY37SobT5lyXeDO7LsprFFC3V8XppCRdM=;
+        b=E2CBsa8ZWjENY267BbMJuM3Ryt6FUoKtFpt3VhhK+05RipH8TPlLo0sCEHa3BW0BPw
+         /T9oem4/OkTgynodu+rGG7RbUXf735lOavSHLFg+aaGaAgsClqJLs4WTVkBbP6wZTglU
+         mIYrR2lBHeDdw/sud3nCf8j51lFrzbqBiA5L9C61GVcM099poKYGnReHCBOI+Di2YTLu
+         n3tgsu41tKbs2ct6MXP/A6aQNINSt58IMnBqLSxVozeYrCdv4pw9dPC/rab/w0kHDHN3
+         YT/6M4As5i/1DDQIqQV4FBHG+zDdRkAkQHvHhgU4GhAw5UUBY8qVn37aC+AitiaoE/gN
+         Pnfg==
+X-Gm-Message-State: AOJu0Yz5+aZ0+J8Sq8wovCHpUPp5xx+9NA5OuSY1bjkOb6oI+fQ5PPbP
+	6Xaj5ZnPeqY4Yp1WevJpqnfY5vgIRyL1jUFxkENBn21/wgK5iwCwK3pa7cABd4s1Cw2UXjMYc44
+	xztOxeRn+qh6kh2uf3otYSPJJPX2/dD9tBcqU
+X-Gm-Gg: ATEYQzwZNe6hbL51SyULhQ0UTafVXnVmqIvImRgIb/g+5laMNNufRBPxNTIMK/26007
+	muj29mzgrUmj231uewd/+mnv/nxG4e2iOZekCNLzG64XV0rXNIPmoA9euzMZjQ16pjMaV0yEAc+
+	392za8W+t3T+upHeHWGhALrYC9daMAYI5mC1Huxpr1KbSieeDvlCq0qcTDHOo+OS6cgm9Lw3on1
+	uAOxF9csSziNCpf7XS+WJdNugmmoJXqsBQGLRY49UDv2JlICr6FGxS8PbYVYGhuSZ9t11y7Kkvd
+	HKuBUz9/vu0/l/TsQ2fAsXwCf6ebbYepwrnYcv+bP0EFkXbdFWfD/rk0jOHlbeYzKgPE/B3SWiV
+	+88wMHwhuhX9j3bAW8mqY3nf9pcBq5lUqvu5Gkf4TgkpLhCw2j5xg0WcehnudGwVEJxWhCt0wAA
 	==
-X-Received: by 2002:a05:6512:3091:b0:5a1:2ffd:1504 with SMTP id 2adb3069b0e04-5a173b9a153mr81655e87.3.1773679775309;
-        Mon, 16 Mar 2026 09:49:35 -0700 (PDT)
+X-Received: by 2002:a05:600c:8b82:b0:483:709e:f239 with SMTP id 5b1f17b1804b1-4855a8d6c53mr215449065e9.22.1773679780865;
+        Mon, 16 Mar 2026 09:49:40 -0700 (PDT)
 Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id 2adb3069b0e04-5a156154789sm1340089e87.41.2026.03.16.09.49.35;
-        Mon, 16 Mar 2026 09:49:35 -0700 (PDT)
+        by smtp-relay.gmail.com with ESMTP id ffacd0b85a97d-439fe1faf0fsm615780f8f.20.2026.03.16.09.49.40;
+        Mon, 16 Mar 2026 09:49:40 -0700 (PDT)
 X-Relaying-Domain: 6wind.com
 Received: from localhost (kadavar.dev.6wind.com [10.17.1.232])
-	by smtpservice.6wind.com (Postfix) with ESMTP id DA5AC19FB6;
-	Mon, 16 Mar 2026 17:49:34 +0100 (CET)
+	by smtpservice.6wind.com (Postfix) with ESMTP id B981719FB7;
+	Mon, 16 Mar 2026 17:49:40 +0100 (CET)
 From: Justin Iurman <justin.iurman@6wind.com>
 To: netdev@vger.kernel.org
 Cc: dsahern@kernel.org,
@@ -90,9 +90,9 @@ Cc: dsahern@kernel.org,
 	paolo.lungaroni@uniroma2.it,
 	ahabdels@cisco.com,
 	Justin Iurman <justin.iurman@6wind.com>
-Subject: [PATCH iproute2-next 1/2] seg6: add tunsrc support in iproute_lwtunnel
-Date: Mon, 16 Mar 2026 17:49:06 +0100
-Message-Id: <20260316164907.1255510-2-justin.iurman@6wind.com>
+Subject: [PATCH iproute2-next 2/2] man8: update seg6 encap documentation
+Date: Mon, 16 Mar 2026 17:49:07 +0100
+Message-Id: <20260316164907.1255510-3-justin.iurman@6wind.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20260316164907.1255510-1-justin.iurman@6wind.com>
 References: <20260316164907.1255510-1-justin.iurman@6wind.com>
@@ -116,7 +116,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,uniroma2.it,gmail.com,6wind.com,cisco.com];
-	TAGGED_FROM(0.00)[bounces-268213-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268214-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -131,87 +131,49 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,saddr.family:url,6wind.com:dkim,6wind.com:email,6wind.com:mid]
-X-Rspamd-Queue-Id: 2515829DB05
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,6wind.com:dkim,6wind.com:email,6wind.com:mid,encap.red:url]
+X-Rspamd-Queue-Id: EC38A29DB28
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add support for the new optional "tunsrc" parameter. Now, a tunnel
-source address can be configured per route and has priority over the
-configured per-netns source address (if any).
-
-Example:
-ip -6 r a 2001:db8:1::/64 encap seg6 mode encap tunsrc 2001:db8:ab::
-    segs 2001:db8:42::1,2001:db8:ffff::2 dev eth0
+Include "tunsrc" in the man page.
 
 Signed-off-by: Justin Iurman <justin.iurman@6wind.com>
 ---
- ip/iproute_lwtunnel.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ man/man8/ip-route.8.in | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/ip/iproute_lwtunnel.c b/ip/iproute_lwtunnel.c
-index a7885dba28c1..00b4f7565be6 100644
---- a/ip/iproute_lwtunnel.c
-+++ b/ip/iproute_lwtunnel.c
-@@ -266,6 +266,13 @@ static void print_encap_seg6(FILE *fp, struct rtattr *encap)
- 	print_string(PRINT_ANY, "mode",
- 		     "mode %s ", format_seg6mode_type(tuninfo->mode));
+diff --git a/man/man8/ip-route.8.in b/man/man8/ip-route.8.in
+index aafa6d98a4c2..9f29fd436f59 100644
+--- a/man/man8/ip-route.8.in
++++ b/man/man8/ip-route.8.in
+@@ -240,7 +240,9 @@ throw " | " unreachable " | " prohibit " | " blackhole " | " nat " ]"
+ .IR ENCAP_SEG6 " := "
+ .B seg6
+ .BR mode " [ "
+-.BR encap " | " encap.red " | " inline " | " l2encap " | " l2encap.red " ] "
++.BR encap " | " encap.red " | " inline " | " l2encap " | " l2encap.red " ] ["
++.B tunsrc
++.IR ADDRESS " ]"
+ .B segs
+ .IR SEGMENTS " [ "
+ .B hmac
+@@ -893,6 +895,15 @@ applying the reduced segment list. When there is only one segment
+ and the HMAC is not present, the SRH is omitted.
+ .sp
  
-+	if (tb[SEG6_IPTUNNEL_SRC]) {
-+		print_color_string(PRINT_ANY, COLOR_INET6,
-+				   "tunsrc", "tunsrc %s ",
-+				   rt_addr_n2a_rta(AF_INET6,
-+						   tb[SEG6_IPTUNNEL_SRC]));
-+	}
++.B tunsrc
++.I ADDRESS
++- IPv6 address of the tunnel source (outer header), not used with inline mode.
++It is optional: if not provided, the tunnel source address is chosen based on
++the per-netns configuration ("ip sr tunsrc set ADDRESS") or, if not configured,
++it is dynamically resolved. If provided, it takes priority over the per-netns
++configuration and dynamic resolution.
++.sp
 +
- 	print_srh(fp, tuninfo->srh);
- }
- 
-@@ -953,6 +960,8 @@ static int parse_encap_seg6(struct rtattr *rta, size_t len, int *argcp,
- 	struct ipv6_sr_hdr *srh;
- 	char **argv = *argvp;
- 	char segbuf[1024] = "";
-+	bool tunsrc = false;
-+	inet_prefix saddr;
- 	int argc = *argcp;
- 	int encap = -1;
- 	__u32 hmac = 0;
-@@ -967,6 +976,22 @@ static int parse_encap_seg6(struct rtattr *rta, size_t len, int *argcp,
- 			encap = read_seg6mode_type(*argv);
- 			if (encap < 0)
- 				invarg("\"mode\" value is invalid\n", *argv);
-+		} else if (strcmp(*argv, "tunsrc") == 0) {
-+			NEXT_ARG();
-+			if (encap == -1)
-+				invarg("\"tunsrc\" provided before \"mode\"\n",
-+				       *argv);
-+			if (encap == SEG6_IPTUN_MODE_INLINE)
-+				invarg("\"tunsrc\" invalid with inline mode\n",
-+				       *argv);
-+			if (tunsrc)
-+				duparg2("tunsrc", *argv);
-+
-+			get_addr(&saddr, *argv, AF_INET6);
-+			if (saddr.family != AF_INET6 || saddr.bytelen != 16)
-+				invarg("\"tunsrc\" value is invalid\n", *argv);
-+
-+			tunsrc = true;
- 		} else if (strcmp(*argv, "segs") == 0) {
- 			NEXT_ARG();
- 			if (segs_ok++)
-@@ -1005,6 +1030,12 @@ static int parse_encap_seg6(struct rtattr *rta, size_t len, int *argcp,
- 			  sizeof(*tuninfo) + srhlen))
- 		goto out;
- 
-+	if (tunsrc) {
-+		if (rta_addattr_l(rta, len, SEG6_IPTUNNEL_SRC,
-+				  &saddr.data, saddr.bytelen))
-+			goto out;
-+	}
-+
- 	*argcp = argc + 1;
- 	*argvp = argv - 1;
- 	ret = 0;
+ .I SEGMENTS
+ - List of comma-separated IPv6 addresses
+ .sp
 -- 
 2.39.2
 
