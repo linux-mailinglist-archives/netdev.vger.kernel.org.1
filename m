@@ -1,148 +1,160 @@
-Return-Path: <netdev+bounces-268667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268668-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KA/pNNZ6uWnQGQIAu9opvQ
-	(envelope-from <netdev+bounces-268667-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:01:26 +0100
+	id sIUMIg17uWnQGQIAu9opvQ
+	(envelope-from <netdev+bounces-268668-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:02:21 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CED82AD761
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:01:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 338722AD7D9
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:02:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DD60030DA216
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:00:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5F53730BD830
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF6B2F39CE;
-	Tue, 17 Mar 2026 16:00:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b="gcYa9d+H"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B072B2F616A;
+	Tue, 17 Mar 2026 16:01:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+Received: from relay.hostedemail.com (smtprelay0013.hostedemail.com [216.40.44.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6528C2EDD78;
-	Tue, 17 Mar 2026 16:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29C1284880;
+	Tue, 17 Mar 2026 16:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773763216; cv=none; b=UPCEJvRu4Ts3M6Ex9iWI768KFZiWKTWSak0GA84JfaapD3g45omf09jIlmDir3xhMeKttZeD2v6fG0qlCmKoxREn3LtsvxqUsRsWFNCh80mbNMkfOgOq/nyYM+WOpXVjQS4xnPfLkuJ6PPSPSc+Afu/S6/Mmv/ggGZsWVzxYHyk=
+	t=1773763262; cv=none; b=IvBJD1tUpstreucyZicV1V+yIi7ZSHFUhEHLLmp7BC4+Ajh7ZKy22pgH9jTTmT3IT+h6qqq5YBBJTAI8mRaDYsXhsUS3wFpgGE/ZJk1ht4XfsgDJbNlMPyI0DZBilK9l8aaa3CTEqGYSbIhcrm7vw7wAOHFJU3GNaagUdksT6H0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773763216; c=relaxed/simple;
-	bh=DpcV5NN4oIQAYTrETu51T9FOwpaAuK7Z8d64V62Uo8k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VkXiIHCE0qXBjJFIYUHLDQNRLKOLPu+x3W1BrBNlZ2CVGhZlg7KyAV/ioOOXoeEgVa0K5311fm1WbHAj1tjNrHIpsf5ux994R+6pvtwdkltkzVpAlBweEGfAosKZOj4QH9Sg2dg6YShSH5/iAIbn8xFV0ylI9jFIl02YMIKhJnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=gcYa9d+H; arc=none smtp.client-ip=23.88.38.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1773763204;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9xx7mjI2MofOxW6iU5Fob/w9bvKDeUmPtcm6wJ652Ow=;
-	b=gcYa9d+HZBCXiDYZTLSwbEcTys8KHFnDaShmRPpIlHNKm+lWIyTeCxvvGE2O2Oxl5o60QB
-	9BwxhlW2xJwZiAcLsdUl4tMCuxMZ3Q4LS1LOGp3W32GCi2lA1dgBe6llcRhKUs9csM8Fib
-	7hVRmtNLKEruKiG2tcv2rdXH1c0KQ+1NNIZQ0ZYqMkiLHAvgr1+GBLrmBGmosy6kmmmvRe
-	Fk+jr5nD8X+i1yvkq/HmmxalTD7/FWpNoBn0K1H2GkRjCYoU1TGWcwFVoNoLvS9cDJ6GHx
-	wcDijEtQKYYnGbGIms9+f1ZNtnwhbzq10gahJsQmp2Humcb7sShsIaDPuf8DsA==
-From: Simon Wunderlich <sw@simonwunderlich.de>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	Yang Yang <n05ec@lzu.edu.cn>,
-	stable@vger.kernel.org,
-	Yifan Wu <yifanwucs@gmail.com>,
-	Juefei Pu <tomapufckgml@gmail.com>,
-	Yuan Tan <tanyuan98@outlook.com>,
-	Xin Liu <bird@lzu.edu.cn>,
-	Sven Eckelmann <sven@narfation.org>,
-	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net 1/1] batman-adv: avoid OGM aggregation when skb tailroom is insufficient
-Date: Tue, 17 Mar 2026 17:00:02 +0100
-Message-ID: <20260317160002.1869478-2-sw@simonwunderlich.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260317160002.1869478-1-sw@simonwunderlich.de>
-References: <20260317160002.1869478-1-sw@simonwunderlich.de>
+	s=arc-20240116; t=1773763262; c=relaxed/simple;
+	bh=GV6iBi3pSdNVXd8yD+APD3iD5U8pEoZAWjKTtickfCc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ik9TulYnmUjn2BZMknzC8cQDR41wnDwSPfmVbpX2aieuHCcBbgZupRxw/wJ1Rd9H2krUjS5LOHmp0PWfBtuTZq+3eFNkoyTgkNVHnoZu8zOOqoiaXM4jAruzVW/SuENdTbCM8GVpudZfEXb767Klx7Wow6UqJ/Rbkmo4HFn8u70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf14.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay04.hostedemail.com (Postfix) with ESMTP id 86DB61A02AC;
+	Tue, 17 Mar 2026 16:00:51 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf14.hostedemail.com (Postfix) with ESMTPA id D0DF733;
+	Tue, 17 Mar 2026 16:00:23 +0000 (UTC)
+Date: Tue, 17 Mar 2026 12:00:49 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vineeth Remanan Pillai <vineeth@bitbyteword.org>
+Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Peter Zijlstra <peterz@infradead.org>,
+ Dmitry Ilvokhin <d@ilvokhin.com>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ io-uring@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Marcelo Ricardo Leitner
+ <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, Jon Maloy
+ <jmaloy@redhat.com>, Aaron Conole <aconole@redhat.com>, Eelco Chaudron
+ <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-sctp@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net, dev@openvswitch.org, Oded Gabbay
+ <ogabbay@kernel.org>, Koby Elbaz <koby.elbaz@intel.com>,
+ dri-devel@lists.freedesktop.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Viresh Kumar <viresh.kumar@linaro.org>, "Gautham R. Shenoy"
+ <gautham.shenoy@amd.com>, Huang Rui <ray.huang@amd.com>, Mario Limonciello
+ <mario.limonciello@amd.com>, Len Brown <lenb@kernel.org>, Srinivas
+ Pandruvada <srinivas.pandruvada@linux.intel.com>, linux-pm@vger.kernel.org,
+ MyungJoo Ham <myungjoo.ham@samsung.com>, Kyungmin Park
+ <kyungmin.park@samsung.com>, Chanwoo Choi <cw00.choi@samsung.com>,
+ Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, Sumit Semwal
+ <sumit.semwal@linaro.org>, linaro-mm-sig@lists.linaro.org, Eddie James
+ <eajames@linux.ibm.com>, Andrew Jeffery <andrew@codeconstruct.com.au>, Joel
+ Stanley <joel@jms.id.au>, linux-fsi@lists.ozlabs.org, David Airlie
+ <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Alex Deucher
+ <alexander.deucher@amd.com>, Danilo Krummrich <dakr@kernel.org>, Matthew
+ Brost <matthew.brost@intel.com>, Philipp Stanner <phasta@kernel.org>, Harry
+ Wentland <harry.wentland@amd.com>, Leo Li <sunpeng.li@amd.com>,
+ amd-gfx@lists.freedesktop.org, Jiri Kosina <jikos@kernel.org>, Benjamin
+ Tissoires <bentiss@kernel.org>, linux-input@vger.kernel.org, Wolfram Sang
+ <wsa+renesas@sang-engineering.com>, linux-i2c@vger.kernel.org, Mark Brown
+ <broonie@kernel.org>, Michael Hennerich <michael.hennerich@analog.com>,
+ Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, linux-spi@vger.kernel.org,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K.
+ Petersen" <martin.petersen@oracle.com>, linux-scsi@vger.kernel.org, Chris
+ Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
+ linux-btrfs@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/15] tracepoint: Avoid double static_branch evaluation
+ at guarded call sites
+Message-ID: <20260317120049.6a60fa88@gandalf.local.home>
+In-Reply-To: <CAO7JXPgHYZ9zF1HFahb2447X85YRZCQQBHB6ihOwKSDtiZi8kQ@mail.gmail.com>
+References: <20260312150523.2054552-1-vineeth@bitbyteword.org>
+	<1e3c2830-765e-4271-89f7-0b6784b37597@efficios.com>
+	<20260312112354.3dd99e36@gandalf.local.home>
+	<219d015d-076b-4c80-8f63-88569115fdad@efficios.com>
+	<20260312114041.5193c729@gandalf.local.home>
+	<1becdbce-2c01-468a-bbab-42b5dea9fdf8@efficios.com>
+	<CAO7JXPjnnruhM5oC6xMgnYaQ9efzYFqMCFiJLNM3HCQ+ZeCiJw@mail.gmail.com>
+	<CAEf4BzbnfyhCqp0ne=2gRnVxp-mdGmuZwDeFRyhRYH+eDcz2-w@mail.gmail.com>
+	<20260312130255.6476e560@gandalf.local.home>
+	<CAO7JXPgHYZ9zF1HFahb2447X85YRZCQQBHB6ihOwKSDtiZi8kQ@mail.gmail.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Stat-Signature: eiowgk7zro9iwz8nfcjutbggq8cc8mcu
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX1/EZ/m41FERFj32TQCYYTyPgc7E7WqasUA=
+X-HE-Tag: 1773763223-363035
+X-HE-Meta: U2FsdGVkX1+o+fNh+z7n3E+PiUwqBZ68nGRwauLM+oVgtgpFs5MonLd3fqHB3rXD6BFYZexukj4pxl1VM45GwWde/4JCtp52s0VQK6pZ4Xqa4tvZvLsT4iKLFRi+KAPOR9ciwGsqu0KypbHl9hRVpw7ii/Socjjk14+RdTNwtL/9W3CF6CygSSKoXB/8hsfV+wEeLIu0+Vu7k1X1TT489JEuNfPyBVCGV+jWtTwa1GJMzmbQZEKNLjPpFlUNh0lxNaKm6XtoF736vhCLAK8SYy2ZwNIf/KDqLxnTevPHb/LrRG7US/kzn6HxPRPvbJNoIgt7v+iuU8ZuIBjndA9wdY4FVl8DtE3i2S6cBnN1WxdJr/SxTYBW2cUmiC+3UkuX
+X-Spamd-Result: default: False [0.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
-	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[goodmis.org : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.open-mesh.org,lzu.edu.cn,gmail.com,outlook.com,narfation.org,simonwunderlich.de];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-268667-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[gmail.com,efficios.com,infradead.org,ilvokhin.com,kernel.org,redhat.com,kernel.dk,vger.kernel.org,davemloft.net,google.com,iogearbox.net,ovn.org,lists.sourceforge.net,openvswitch.org,intel.com,lists.freedesktop.org,linaro.org,amd.com,linux.intel.com,samsung.com,lists.linaro.org,linux.ibm.com,codeconstruct.com.au,jms.id.au,lists.ozlabs.org,ffwll.ch,sang-engineering.com,analog.com,hansenpartnership.com,oracle.com,fb.com,suse.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[simonwunderlich.de:+];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268668-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,outlook.com:email,simonwunderlich.de:dkim,simonwunderlich.de:email,simonwunderlich.de:mid,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: 0CED82AD761
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rostedt@goodmis.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.829];
+	RCPT_COUNT_GT_50(0.00)[73];
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bitbyteword.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,gandalf.local.home:mid]
+X-Rspamd-Queue-Id: 338722AD7D9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Yang Yang <n05ec@lzu.edu.cn>
+On Fri, 13 Mar 2026 10:02:32 -0400
+Vineeth Remanan Pillai <vineeth@bitbyteword.org> wrote:
 
-When OGM aggregation state is toggled at runtime, an existing forwarded
-packet may have been allocated with only packet_len bytes, while a later
-packet can still be selected for aggregation. Appending in this case can
-hit skb_put overflow conditions.
+> >
+> > Perhaps: call_trace_foo() ?
+> >  
+> call_trace_foo has one collision with the tracepoint
+> sched_update_nr_running and a function
+> call_trace_sched_update_nr_running. I had considered this and later
+> moved to trace_invoke_foo() because of the collision. But I can rename
+> call_trace_sched_update_nr_running to something else if call_trace_foo
+> is the general consensus.
 
-Reject aggregation when the target skb tailroom cannot accommodate the new
-packet. The caller then falls back to creating a new forward packet
-instead of appending.
+OK, then lets go with: trace_call__foo()
 
-Fixes: c6c8fea29769 ("net: Add batman-adv meshing protocol")
-Cc: stable@vger.kernel.org
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Signed-off-by: Yuan Tan <tanyuan98@outlook.com>
-Signed-off-by: Xin Liu <bird@lzu.edu.cn>
-Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
-Signed-off-by: Yang Yang <n05ec@lzu.edu.cn>
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
----
- net/batman-adv/bat_iv_ogm.c | 3 +++
- 1 file changed, 3 insertions(+)
+The double underscore should prevent any name collisions.
 
-diff --git a/net/batman-adv/bat_iv_ogm.c b/net/batman-adv/bat_iv_ogm.c
-index b75c2228e69a6..f28e9cbf8ad5f 100644
---- a/net/batman-adv/bat_iv_ogm.c
-+++ b/net/batman-adv/bat_iv_ogm.c
-@@ -473,6 +473,9 @@ batadv_iv_ogm_can_aggregate(const struct batadv_ogm_packet *new_bat_ogm_packet,
- 	if (aggregated_bytes > max_bytes)
- 		return false;
- 
-+	if (skb_tailroom(forw_packet->skb) < packet_len)
-+		return false;
-+
- 	if (packet_num >= BATADV_MAX_AGGREGATION_PACKETS)
- 		return false;
- 
--- 
-2.47.3
+Does anyone have an objections?
 
+-- Steve
 
