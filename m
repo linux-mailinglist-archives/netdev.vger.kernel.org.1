@@ -1,74 +1,53 @@
-Return-Path: <netdev+bounces-268399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268400-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8HCjLVXAuGnSiwEAu9opvQ
-	(envelope-from <netdev+bounces-268399-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:45:41 +0100
+	id C4bDHWvBuGkfjAEAu9opvQ
+	(envelope-from <netdev+bounces-268400-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:50:19 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 347B32A2E61
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:45:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC0942A2EC2
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:50:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BABB83028127
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 02:45:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A97B43027321
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 02:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA62D1F12E9;
-	Tue, 17 Mar 2026 02:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A93E29B789;
+	Tue, 17 Mar 2026 02:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BaZG9cFa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RbcR9wHA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50EA54723;
-	Tue, 17 Mar 2026 02:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17AAF199949
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 02:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773715536; cv=none; b=PGO92xmWFDCfeM3qSaychfzb7Xl4jSFfkEWzcx5L7xSia+9E785OXuFY/ZSZG9GLB3d439H+KlGWMebbO/z3OkpljLNFxy73YpNSe+pjGt2UYyXPgFzI/Xqky96zo900DJTctIDgGr/zUdPGW0lyP01IJ749wBUEpmCwCNB0feQ=
+	t=1773715815; cv=none; b=YHH827nxOdHjfqZmlxN1/ugDiDSV1t3tc4OCo7ABIssEtpqKByJuR79SvQ73jgLq3KBKjZaSkx8ysPnsxHGNUW5k2FTh8LcGMe4Njd0vT0m3/FynWGA/9mNHEhNPGC5e1B7K/N5lnFKkDsKtJ6fOI749qGnFHCUBpbJDqo/bHEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773715536; c=relaxed/simple;
-	bh=o4KKEzECa0c9M2MuhD0pbm/LOj6Ot3Hiam15eo1ahHU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TdIv+Kp3uvtNf3r0LwPURxKUvkFdvAHjobvhDZjTdfXbew9nr+1KlHRqhuP+MFC5mZTqMbJ0CTvBld5/hzg8btIi+EMHT/I4vR/BCD/flZNkOAvz6QkDZhOhzWhJy8qqxa7E/r2kGXVuhiJ+xiy7AebrvjFuNNsY9+6JoJj8r/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BaZG9cFa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A37CC19421;
-	Tue, 17 Mar 2026 02:45:35 +0000 (UTC)
+	s=arc-20240116; t=1773715815; c=relaxed/simple;
+	bh=PqSQafLyFw/dZ1o9wq+fGyAME5CbNSrN7NB1S1Hd6EE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DK9SNm3D2H6Ef5lyAS0giJGGVi9VGZlBQVmdGm2OeH3mWjh3xuifIwT+feQ7/S9ERX1QUTjqVKxLfSdU9mUgekZPsH4JPeM16vUDG7Z51776Mgotxe/Nn4ySQ/ruddAO77kKDjWfkNq1OGopUkIf83lq6PWhjH7IguSz4JJ7u7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RbcR9wHA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98A6DC19421;
+	Tue, 17 Mar 2026 02:50:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773715536;
-	bh=o4KKEzECa0c9M2MuhD0pbm/LOj6Ot3Hiam15eo1ahHU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BaZG9cFalAXv2WDdl0pf+EDyBk7oQxbUGElaV9B3674mLjUkDZx7p9rgOH0s7rKuX
-	 0gxlFsG75qG1MoA7VngD/uWJaCUM8+xWAZ+nCrXckr+pQOZZb8hZAvWVpJ7hCrtrPJ
-	 8WCaMU7aKYOyWKHBhdcL28wVjTFLXaOXKUstfLJolJDERe27H/PJ5wQ/115Q/bJyUD
-	 Mqyybm1vOOYe1O6fWFO5459cv7j5l0CehgG7lZzlGu7I4w3b0oHuSwn+CMnwreptov
-	 IOC5AeXEckXk7hDcvSNSRTO73LC1n85NorhfKT6oUwqei+onGHsSfsLg0zs12PomMk
-	 TN16J/NB+HSwA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: alibuda@linux.alibaba.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	edumazet@google.com,
-	tonylu@linux.alibaba.com,
-	wenjia@linux.ibm.com,
-	pabeni@redhat.com,
-	guwen@linux.alibaba.com,
-	davem@davemloft.net,
-	linux-kernel@vger.kernel.org,
-	mjambigi@linux.ibm.com,
-	dust.li@linux.alibaba.com,
-	oliver.yang@linux.alibaba.com,
-	sidraya@linux.ibm.com,
-	linux-s390@vger.kernel.org,
-	horms@kernel.org,
-	pasic@linux.ibm.com,
-	linux-rdma@vger.kernel.org
-Subject: Re: [net-next] net/smc: cap allocation order for SMC-R physically contiguous buffers
-Date: Mon, 16 Mar 2026 19:45:34 -0700
-Message-ID: <20260317024534.588136-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260312082154.36971-1-alibuda@linux.alibaba.com>
-References: <20260312082154.36971-1-alibuda@linux.alibaba.com>
+	s=k20201202; t=1773715814;
+	bh=PqSQafLyFw/dZ1o9wq+fGyAME5CbNSrN7NB1S1Hd6EE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RbcR9wHAX/eUe/plMv6Xoqf6ln1+L9uL9Gh87UdZA5oM1EtRkBiRjFhvB5k4XCmVV
+	 TFQjYPY5cgkNWWVyDkokpIPrAvw/JNUl9RrWnS09Dr0zhgsE5C8eyEEY6fYjWgHzEQ
+	 95njUx0Jx11pSAf0XqU0qe6LXj11jPvwr6OxZEU4HgGFhT3EgiLzmVY8tBW3Dq3IaJ
+	 GS1VXBoTWWvZzT48ZOCisCsthqLPMMrgLSd3E0Z8yX9GXI2QDQZf9nZcRENs66WeUs
+	 ViI14QuFtmnYKlLyvlTs5bQacx75UMRIwzfdzuX/R75jpjhCwqgsjUxvUjBpyKdVdo
+	 ncdBl7zK3onfw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D0753808200;
+	Tue, 17 Mar 2026 02:50:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,185 +55,127 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Subject: Re: [PATCH net 1/1] net/sched: teql: Fix double-free in
+ teql_master_xmit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177371580729.3402731.13769692238630260864.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Mar 2026 02:50:07 +0000
+References: <20260315155422.147256-1-jhs@mojatatu.com>
+In-Reply-To: <20260315155422.147256-1-jhs@mojatatu.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us,
+ keenanat2000@gmail.com, security@kernel.org, victor@mojatatu.com
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268399-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268400-lists,netdev=lfdr.de,netdevbpf];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,gmail.com,mojatatu.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: 347B32A2E61
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: DC0942A2EC2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Hello:
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net/smc: cap allocation order for SMC-R physically contiguous buffers
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-The alloc_page() cannot satisfy requests exceeding MAX_PAGE_ORDER, and
-attempting such allocations will lead to guaranteed failures and potential
-kernel warnings. For SMCR_PHYS_CONT_BUFS, cap the allocation order to
-MAX_PAGE_ORDER. This ensures the attempts to allocate the largest possible
-physically contiguous chunk succeed. For SMCR_MIXED_BUFS, if its order
-exceeds MAX_PAGE_ORDER, skip the physical allocation attempt and fallback to
-virtual memory immediately.
+On Sun, 15 Mar 2026 11:54:22 -0400 you wrote:
+> Whenever a TEQL devices has a lockless Qdisc as root, qdisc_reset should
+> be called using the seq_lock to avoid racing with the datapath. Failure
+> to do so may cause crashes like the following:
+> 
+> [  238.028993][  T318] BUG: KASAN: double-free in skb_release_data (net/core/skbuff.c:1139)
+> [  238.029328][  T318] Free of addr ffff88810c67ec00 by task poc_teql_uaf_ke/318
+> [  238.029749][  T318]
+> [  238.029900][  T318] CPU: 3 UID: 0 PID: 318 Comm: poc_teql_ke Not tainted 7.0.0-rc3-00149-ge5b31d988a41 #704 PREEMPT(full)
+> [  238.029906][  T318] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+> [  238.029910][  T318] Call Trace:
+> [  238.029913][  T318]  <TASK>
+> [  238.029916][  T318]  dump_stack_lvl (lib/dump_stack.c:122)
+> [  238.029928][  T318]  print_report (mm/kasan/report.c:379 mm/kasan/report.c:482)
+> [  238.029940][  T318]  ? skb_release_data (net/core/skbuff.c:1139)
+> [  238.029944][  T318]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
+> ...
+> [  238.029957][  T318]  ? skb_release_data (net/core/skbuff.c:1139)
+> [  238.029969][  T318]  kasan_report_invalid_free (mm/kasan/report.c:221 mm/kasan/report.c:563)
+> [  238.029979][  T318]  ? skb_release_data (net/core/skbuff.c:1139)
+> [  238.029989][  T318]  check_slab_allocation (mm/kasan/common.c:231)
+> [  238.029995][  T318]  kmem_cache_free (mm/slub.c:2637 (discriminator 1) mm/slub.c:6168 (discriminator 1) mm/slub.c:6298 (discriminator 1))
+> [  238.030004][  T318]  skb_release_data (net/core/skbuff.c:1139)
+> ...
+> [  238.030025][  T318]  sk_skb_reason_drop (net/core/skbuff.c:1256)
+> [  238.030032][  T318]  pfifo_fast_reset (./include/linux/ptr_ring.h:171 ./include/linux/ptr_ring.h:309 ./include/linux/skb_array.h:98 net/sched/sch_generic.c:827)
+> [  238.030039][  T318]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
+> ...
+> [  238.030054][  T318]  qdisc_reset (net/sched/sch_generic.c:1034)
+> [  238.030062][  T318]  teql_destroy (./include/linux/spinlock.h:395 net/sched/sch_teql.c:157)
+> [  238.030071][  T318]  __qdisc_destroy (./include/net/pkt_sched.h:328 net/sched/sch_generic.c:1077)
+> [  238.030077][  T318]  qdisc_graft (net/sched/sch_api.c:1062 net/sched/sch_api.c:1053 net/sched/sch_api.c:1159)
+> [  238.030089][  T318]  ? __pfx_qdisc_graft (net/sched/sch_api.c:1091)
+> [  238.030095][  T318]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
+> [  238.030102][  T318]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
+> [  238.030106][  T318]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
+> [  238.030114][  T318]  tc_get_qdisc (net/sched/sch_api.c:1529 net/sched/sch_api.c:1556)
+> ...
+> [  238.072958][  T318] Allocated by task 303 on cpu 5 at 238.026275s:
+> [  238.073392][  T318]  kasan_save_stack (mm/kasan/common.c:58)
+> [  238.073884][  T318]  kasan_save_track (mm/kasan/common.c:64 (discriminator 5) mm/kasan/common.c:79 (discriminator 5))
+> [  238.074230][  T318]  __kasan_slab_alloc (mm/kasan/common.c:369)
+> [  238.074578][  T318]  kmem_cache_alloc_node_noprof (./include/linux/kasan.h:253 mm/slub.c:4542 mm/slub.c:4869 mm/slub.c:4921)
+> [  238.076091][  T318]  kmalloc_reserve (net/core/skbuff.c:616 (discriminator 107))
+> [  238.076450][  T318]  __alloc_skb (net/core/skbuff.c:713)
+> [  238.076834][  T318]  alloc_skb_with_frags (./include/linux/skbuff.h:1383 net/core/skbuff.c:6763)
+> [  238.077178][  T318]  sock_alloc_send_pskb (net/core/sock.c:2997)
+> [  238.077520][  T318]  packet_sendmsg (net/packet/af_packet.c:2926 net/packet/af_packet.c:3019 net/packet/af_packet.c:3108)
+> [  238.081469][  T318]
+> [  238.081870][  T318] Freed by task 299 on cpu 1 at 238.028496s:
+> [  238.082761][  T318]  kasan_save_stack (mm/kasan/common.c:58)
+> [  238.083481][  T318]  kasan_save_track (mm/kasan/common.c:64 (discriminator 5) mm/kasan/common.c:79 (discriminator 5))
+> [  238.085348][  T318]  kasan_save_free_info (mm/kasan/generic.c:587 (discriminator 1))
+> [  238.085900][  T318]  __kasan_slab_free (mm/kasan/common.c:287)
+> [  238.086439][  T318]  kmem_cache_free (mm/slub.c:6168 (discriminator 3) mm/slub.c:6298 (discriminator 3))
+> [  238.087007][  T318]  skb_release_data (net/core/skbuff.c:1139)
+> [  238.087491][  T318]  consume_skb (net/core/skbuff.c:1451)
+> [  238.087757][  T318]  teql_master_xmit (net/sched/sch_teql.c:358)
+> [  238.088116][  T318]  dev_hard_start_xmit (./include/linux/netdevice.h:5324 ./include/linux/netdevice.h:5333 net/core/dev.c:3871 net/core/dev.c:3887)
+> [  238.088468][  T318]  sch_direct_xmit (net/sched/sch_generic.c:347)
+> [  238.088820][  T318]  __qdisc_run (net/sched/sch_generic.c:420 (discriminator 1))
+> [  238.089166][  T318]  __dev_queue_xmit (./include/net/sch_generic.h:229 ./include/net/pkt_sched.h:121 ./include/net/pkt_sched.h:117 net/core/dev.c:4196 net/core/dev.c:4802)
+> 
+> [...]
 
-> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-> index e2d083daeb7e..a18730edb7e0 100644
-> --- a/net/smc/smc_core.c
-> +++ b/net/smc/smc_core.c
-> @@ -2314,6 +2314,10 @@ int smcr_buf_reg_lgr(struct smc_link *lnk)
->  	return rc;
->  }
->
-> +/*
-> + * smcr_new_buf_create may allocate a buffer smaller than the requested
-> + * bufsize. Use buf_desc->len to determine the actual allocated size.
-> + */
->  static struct smc_buf_desc *smcr_new_buf_create(struct smc_link_group *lgr,
->  						int bufsize)
->  {
-> @@ -2326,18 +2330,22 @@ static struct smc_buf_desc *smcr_new_buf_create(struct smc_link_group *lgr,
->
->  	switch (lgr->buf_type) {
->  	case SMCR_PHYS_CONT_BUFS:
-> +		bufsize = min(bufsize, (int)PAGE_SIZE << MAX_PAGE_ORDER);
-> +		fallthrough;
->  	case SMCR_MIXED_BUFS:
->  		buf_desc->order = get_order(bufsize);
-> -		buf_desc->pages = alloc_pages(GFP_KERNEL | __GFP_NOWARN |
-> -					      __GFP_NOMEMALLOC | __GFP_COMP |
-> -					      __GFP_NORETRY | __GFP_ZERO,
-> -					      buf_desc->order);
-> -		if (buf_desc->pages) {
-> -			buf_desc->cpu_addr =
-> -				(void *)page_address(buf_desc->pages);
-> -			buf_desc->len = bufsize;
-> -			buf_desc->is_vm = false;
-> -			break;
-> +		if (buf_desc->order <= MAX_PAGE_ORDER) {
-> +			buf_desc->pages = alloc_pages(GFP_KERNEL | __GFP_NOWARN |
-> +						      __GFP_NOMEMALLOC | __GFP_COMP |
-> +						      __GFP_NORETRY | __GFP_ZERO,
-> +						      buf_desc->order);
-> +			if (buf_desc->pages) {
-> +				buf_desc->cpu_addr =
-> +					(void *)page_address(buf_desc->pages);
-> +				buf_desc->len = bufsize;
-> +				buf_desc->is_vm = false;
-> +				break;
-> +			}
->  		}
->  		if (lgr->buf_type == SMCR_PHYS_CONT_BUFS)
->  			goto out;
+Here is the summary with links:
+  - [net,1/1] net/sched: teql: Fix double-free in teql_master_xmit
+    https://git.kernel.org/netdev/net/c/66360460cab6
 
-[ ... ]
-
-> @@ -2476,7 +2484,7 @@ static int __smc_buf_create(struct smc_sock *smc, bool is_smcd, bool is_rmb)
->  		}
->
->  		SMC_STAT_RMB_ALLOC(smc, is_smcd, is_rmb);
-> -		SMC_STAT_RMB_SIZE(smc, is_smcd, is_rmb, true, bufsize);
-> +		SMC_STAT_RMB_SIZE(smc, is_smcd, is_rmb, true, buf_desc->len);
->  		buf_desc->used = 1;
->  		down_write(lock);
->  		smc_lgr_buf_list_add(lgr, is_rmb, buf_list, buf_desc);
->  		up_write(lock);
->  		break; /* found */
->  	}
->
->  	if (IS_ERR(buf_desc))
->  		return PTR_ERR(buf_desc);
->
->  	if (!is_smcd) {
->  		if (smcr_buf_map_usable_links(lgr, buf_desc, is_rmb)) {
->  			smcr_buf_unuse(buf_desc, is_rmb, lgr);
->  			return -ENOMEM;
->  		}
->  	}
->
->  	if (is_rmb) {
->  		conn->rmb_desc = buf_desc;
->  		conn->rmbe_size_comp = bufsize_comp;
->  		smc->sk.sk_rcvbuf = bufsize * 2;
->  		atomic_set(&conn->bytes_to_rcv, 0);
->  		conn->rmbe_update_limit =
->  			smc_rmb_wnd_update_limit(buf_desc->len);
->  		if (is_smcd)
->  			smc_ism_set_conn(conn); /* map RMB/smcd_dev to conn */
->  	} else {
->  		conn->sndbuf_desc = buf_desc;
->  		smc->sk.sk_sndbuf = bufsize * 2;
->  		atomic_set(&conn->sndbuf_space, bufsize);
-                                                 ^^^^^^^
-
-The comment added at smcr_new_buf_create() says "Use buf_desc->len to
-determine the actual allocated size," but __smc_buf_create() still uses the
-uncapped bufsize for several critical fields. Is this correct?
-
-For SMCR_PHYS_CONT_BUFS, smcr_new_buf_create() now caps bufsize internally
-to PAGE_SIZE << MAX_PAGE_ORDER (typically 4MB), so buf_desc->len can be
-smaller than the requested bufsize.
-
-However, __smc_buf_create() continues using the original uncapped bufsize
-for:
-
-    if (is_rmb) {
-        conn->rmbe_size_comp = bufsize_comp;
-        smc->sk.sk_rcvbuf = bufsize * 2;
-    } else {
-        smc->sk.sk_sndbuf = bufsize * 2;
-        atomic_set(&conn->sndbuf_space, bufsize);
-    }
-
-The sndbuf_space mismatch is particularly concerning. Looking at
-smc_tx.c:274, the comment states: "0 <= sndbuf_space <= sndbuf_desc->len".
-When sndbuf_space exceeds sndbuf_desc->len, smc_tx_sendmsg() could calculate
-writespace incorrectly:
-
-    int writespace = atomic_read(&conn->sndbuf_space);
-
-and the two-chunk copy loop might write beyond the actual buffer boundary.
-This is reachable with default sysctl settings (SMCR_PHYS_CONT_BUFS) and
-socket buffer sizes exceeding 4MB.
-
-Should these assignments use buf_desc->len instead of bufsize? For example:
-
-    atomic_set(&conn->sndbuf_space, buf_desc->len);
-    smc->sk.sk_sndbuf = buf_desc->len * 2;
-    smc->sk.sk_rcvbuf = buf_desc->len * 2;
-
-And should rmbe_size_comp be recalculated from buf_desc->len? The
-rmbe_size_comp value is sent to the peer via CLC messages in smc_clc.c:1125,
-and an inflated value might cause the peer to believe the RMB is larger than
-it actually is.
-
->  	}
->  	return 0;
->  }
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
