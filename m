@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-268643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268644-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qD5gLHtvuWm8EgIAu9opvQ
-	(envelope-from <netdev+bounces-268643-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:12:59 +0100
+	id mM68InxvuWm8EgIAu9opvQ
+	(envelope-from <netdev+bounces-268644-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:13:00 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FB182ACC01
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:12:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3691B2ACC08
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:13:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1E620300A3B9
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:05:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 67025319E224
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:05:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F9743EBF2D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F5C3EBF3B;
 	Tue, 17 Mar 2026 15:04:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iQMudSae"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mB1GlEcO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E133D3E928A;
-	Tue, 17 Mar 2026 15:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9462A3EBF2F;
+	Tue, 17 Mar 2026 15:04:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773759887; cv=none; b=hwJBbp9PdKswXYq/bpWumd9C4O/2kfzLhFFs2pOLTI+cVR3eXCFruvBTvdamEsNCWln4RCSGsKAhxCFyfQLeGLER9iKSji7QlJm1k5Le/hS1F/duGDTNNpth8DaxkkKlOA2E6/rxO28tuKI58Pxw9LvdMI1VSr30CUl8H2eRW84=
+	t=1773759887; cv=none; b=mWYPkpokSRRhfSStUCu93Iv4e1Z5Ox+tF17F7a1BM+hAy1m+g8yEFKOPbn/yYlRoq7t0KWOg91qCYnOFNxtBTn4zTuT1C22W1BE8Em8hfFrIPuqCT34ToPu5AI+fKwrqyDuhN00TsXw664FnlhWw8TuZSufyw4465358GumtMU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773759887; c=relaxed/simple;
-	bh=mvbTCT9oZuKgIjAfId10KTxCViW0Z75S+wpElFT6Ag4=;
+	bh=JWtjh4+cdElJ7unPNOnu3KFOg/jqroPna1WCpqJCjKs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RH/okgvg198Pl6IHtC/Fht6WQxIF89GdA6yyZ07WqwXpDMHmMxkzyTFW6oUS0YeAUHvnbmO/CXo63E0F5v6kK2/EwbeBibe/sOvfRhczZ5DHvT+YQt+iXPolEpbPDMZOHR/1/sEseOD6no06pUGJrpwMdjIl/+uOsHAQLKAD1uQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iQMudSae; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2154C19424;
-	Tue, 17 Mar 2026 15:04:45 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JhXuoTcieo05RkWGiLPUy2SNFof8Q6vgKfDLRLCq1RxdaIZEinLGbnij0l2Ly4Rt+hW3DpjefDZOVmuSNxf3VYKvTEt1wsqjDwvoCTKAJcAQiF/D3nxojsEI+iSPz0u/ueJhiTK5Fdwk8K63FTYs1KkO3svSkywOLGOSXjtmq1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mB1GlEcO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD782C2BCAF;
+	Tue, 17 Mar 2026 15:04:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773759886;
-	bh=mvbTCT9oZuKgIjAfId10KTxCViW0Z75S+wpElFT6Ag4=;
+	s=k20201202; t=1773759887;
+	bh=JWtjh4+cdElJ7unPNOnu3KFOg/jqroPna1WCpqJCjKs=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=iQMudSaeGVodzHbGRJZ/tY0VpNU1rqfSJM9DBCck291pCmoItxQqAY1n4sQzTP62r
-	 I/nvA5zMxDRIQH77PwwsYG3U4396FUF6TT0ikTC78kijX7en8SY7Zy5e0efXXSYRGH
-	 G7pEpv5kIL2mb4AWgSchMpZBjI14x411kO0d9CCNyeyqrPO76Mm5jm3qJa8vZWU5ZV
-	 odC9QnyvRu/YJ51ZTUgUKpnZTWB6VzMETRde5pwT6TRo3woviCLzbAINkNtJeMsIDZ
-	 TS1brNgRe1oKFQUY3ul55pS1I+QQ/ZtbyI+uXEnhWwkinVNg+9+T+ctu4dttaB02pU
-	 sBRa0VUpVhz2Q==
+	b=mB1GlEcOsKdDYkl6ev9WSrAH3psRGDIHvv8bLhY9f8nv7/WlxQ66fP2AM6tv4SW1P
+	 xJQIfXVyfXRBMU7aX8nOfkdIMjMgef2Te+SO9fhMcybRqegMaCHQLL6Pn6WIDjFCEz
+	 PeCK5rNC/XFF3iy5Drr2u81tmqmovN9FEx7/a+Gl3E3f83Q+3GcW8aS0rVu/htkfg6
+	 I07jWbowEiHmzeBQdbJ2NzDbQ1YZPShTH7EGhHtz/D1w1LUy39VCi2WVQ2Yno4sDuT
+	 0jcc+wwMC0sIrOje8mFIKurxEZuqIW4zmZxW0cu1ekeSzx2+pnrWe2L7H9tQFeY/Ws
+	 GTGVMkcTmRmPw==
 From: Chuck Lever <cel@kernel.org>
-Date: Tue, 17 Mar 2026 11:04:16 -0400
-Subject: [PATCH PATCH net-next v4 3/8] tls: Fix dangling skb pointer in
- tls_sw_read_sock()
+Date: Tue, 17 Mar 2026 11:04:17 -0400
+Subject: [PATCH PATCH net-next v4 4/8] tls: Factor tls_strp_msg_release()
+ from tls_strp_msg_done()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260317-tls-read-sock-v4-3-ab1086ec600f@oracle.com>
+Message-Id: <20260317-tls-read-sock-v4-4-ab1086ec600f@oracle.com>
 References: <20260317-tls-read-sock-v4-0-ab1086ec600f@oracle.com>
 In-Reply-To: <20260317-tls-read-sock-v4-0-ab1086ec600f@oracle.com>
 To: john.fastabend@gmail.com, kuba@kernel.org, sd@queasysnail.net
@@ -64,21 +64,21 @@ Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev,
  Chuck Lever <chuck.lever@oracle.com>, Hannes Reinecke <hare@suse.de>, 
  Alistair Francis <alistair.francis@wdc.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1692;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2315;
  i=chuck.lever@oracle.com; h=from:subject:message-id;
- bh=WmgXzZq5D9MSoBw3hB8UIgm+pezKCNTdwkRs3+5yxgo=;
- b=kA0DAAoBM2qzM29mf5cByyZiAGm5bYqiL4OonVdZhDFuWB508Q44FAKcDz3UcmtM4Gsajyt+h
- 4kCMwQAAQoAHRYhBCiy5bASht8kPPI+/jNqszNvZn+XBQJpuW2KAAoJEDNqszNvZn+Xo98QAKv0
- 2ammD/qhva99c/7wTIYZu3zMBb323IVJjyswjP7bdqPGfPkitqjFh46MPYlGJMW8ASWt5jbFUd2
- AnM0hxwJStuzLgw31/M7s7l7RKpWsc3WKX0BvrNB8/i419T69E0/nVJBX5Wb2N9Ky0pd+rYQ7EZ
- 9eFUzNH+9z+WZuL9aDi5XiUcvUluDx0BUUprq/OApAY/kXLpz3M4bpfiF6FXUQUY6u+M6vBQYMB
- T8wbk7HUnbXYmQhzxGKV6N/A+6qb95finFDHuXmuvElYL5GmeY7dZFZzVMqR8IqiqjAoN20cq4G
- tUcyk7rvdX5xn/YT2hIinc3jmJGiPq87BllNvaZobzyGwjjRGj82QvedUQPcXgT1nWYub1/DTO6
- YpJ3Zj59qBMqY0JgjT58RkHZAQceTUYMgIEr0g4V2y7gJ8Z81FnEeXYZPhubbCTBRQmhNi0F7+o
- Zb7uMVIjzP/CxkGQxNoa549gXc6XEnSthsiI1daEjkmiUf4cnZrJcLuVs9SJ7NbEfiV8pHnLnGZ
- Z1lm2rV/Nz5u1Bh5qEIkOZNNo5CBuOJBfPaLqmnJ+HXUC3G7uM4E6LP1GJQwXkcIR+ii9Ke9nh5
- 0uDhnpkpznHPdiXlQCfkPKangykeqCj/exITmBlBsfz3QkfozolWvHChIhtaD+3XI69eNmZ+F1v
- Eu/VY
+ bh=Fdn1LkdSx4Wpg++8M8voi9DhohpzepZCgQ+gLF5v+48=;
+ b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBpuW2KsGGYnadDsD2yH3kcjUiE2IYGOu3BxvBRZ
+ 3fqWfD2QryJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCabltigAKCRAzarMzb2Z/
+ l60RD/wIbBuBkwgp23/WPaCtPqcgjzRh+Viig9DXn8t/QtmS1b5NIxiFzmAPnjmLfvhf3p9SXaw
+ WKcolKuo7JbZz4CJ9wjq05f49wGPqTmt1QJG5arxN6W+T2nsrLKBWq8K/Y8EyxHJ/qp5O1BfaCZ
+ fcx1dUKE3K3plLrmLU7b0BNhQTSMBb5mQIKSQdnI3ITfbr83X3ayxe5mu6ErbRKoXzd/R55JR+O
+ 6jc3043gEDphf+kwq9tadi+tOKowb4TjUu5eAezefHObZlh5DGD1xrScJeqQfBads02c0fdbmTs
+ 9Y7Y7KKNgPteGMIbE48ScGFdP2P7Argo9+Nam1b+XBJXrWyuKigDCdxVtOZHKN5WGc6v6MSPPkk
+ JkmrwEKwykn2Ul4BkCHwGT8eU4LsVvbYMnsVQZE7lgbYlGZ9Cy5/qW7RT8E5gFqQYJMVqU1KdQN
+ +8ymWE5gYQaUuR8FsZ+Fp2Eczfk7+378rVs+JEjChx8ZNanPele0L0iF97UjxeDAeT2FmUTZ3/j
+ NT0x0QfkUL/mOrHN9nDL8mpj/Wa0hKWg7VkK+YCUru1CYyEFlne/4oNsiizTQ+EdVloPptqqpBT
+ h976Hbh81whubR7WSupor0EGFhfK0uuoV4fzOukBneKLA+2LIKbr4I6gxIXzTLgAkOZZwg4liws
+ hVqu7iW9jfggRwA==
 X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
  fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -91,7 +91,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268643-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268644-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,kernel.org,queasysnail.net];
@@ -107,59 +107,74 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[wdc.com:email,oracle.com:email,oracle.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:email]
-X-Rspamd-Queue-Id: 5FB182ACC01
+	DBL_BLOCKED_OPENRESOLVER(0.00)[wdc.com:email,oracle.com:email,oracle.com:mid,suse.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3691B2ACC08
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Chuck Lever <chuck.lever@oracle.com>
 
-Per ISO/IEC 9899:2011 section 6.2.4p2, a pointer value becomes
-indeterminate when the object it points to reaches the end of its
-lifetime; Annex J.2 classifies the use of such a value as undefined
-behavior. In tls_sw_read_sock(), consume_skb(skb) in the
-fully-consumed path frees the skb, but the "do { } while (skb)"
-loop condition then evaluates that freed pointer. Although the
-value is never dereferenced -- the loop either continues and
-overwrites skb, or exits -- any future change that adds a
-dereference between consume_skb() and the loop condition would
-produce a silent use-after-free.
+tls_strp_msg_done() conflates releasing the current record with
+checking for the next one via tls_strp_check_rcv(). Batch
+processing requires releasing a record without immediately
+triggering that check, so the release step is separated into
+tls_strp_msg_release(). tls_strp_msg_done() is preserved as a
+wrapper for existing callers.
 
-Fixes: 662fbcec32f4 ("net/tls: implement ->read_sock()")
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
 ---
- net/tls/tls_sw.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ net/tls/tls.h      |  1 +
+ net/tls/tls_strp.c | 15 ++++++++++++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index bdbdaf40b3384298c80082c3acabcdb9a2becfc8..07f4a3d1a6f854acc7762608cc7741b3de95c195 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -2364,7 +2364,7 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
- 		goto read_sock_end;
+diff --git a/net/tls/tls.h b/net/tls/tls.h
+index e8f81a006520027110962655f7b69a5ca58d7fb6..a97f1acef31d3a4ad1442c20c6914a9f5198a1e0 100644
+--- a/net/tls/tls.h
++++ b/net/tls/tls.h
+@@ -193,6 +193,7 @@ int tls_strp_init(struct tls_strparser *strp, struct sock *sk);
+ void tls_strp_data_ready(struct tls_strparser *strp);
  
- 	decrypted = 0;
--	do {
-+	for (;;) {
- 		if (!skb_queue_empty(&ctx->rx_list)) {
- 			skb = __skb_dequeue(&ctx->rx_list);
- 			rxm = strp_msg(skb);
-@@ -2413,10 +2413,11 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
- 				goto read_sock_requeue;
- 		} else {
- 			consume_skb(skb);
-+			skb = NULL;
- 			if (!desc->count)
--				skb = NULL;
-+				break;
- 		}
--	} while (skb);
-+	}
+ void tls_strp_check_rcv(struct tls_strparser *strp);
++void tls_strp_msg_release(struct tls_strparser *strp);
+ void tls_strp_msg_done(struct tls_strparser *strp);
  
- read_sock_end:
- 	tls_rx_reader_release(sk, ctx);
+ int tls_rx_msg_size(struct tls_strparser *strp, struct sk_buff *skb);
+diff --git a/net/tls/tls_strp.c b/net/tls/tls_strp.c
+index 98e12f0ff57e5158c7518385aa0579528520d63f..a7648ebde162b1bd944f53d44c89cd7da4cef082 100644
+--- a/net/tls/tls_strp.c
++++ b/net/tls/tls_strp.c
+@@ -581,7 +581,16 @@ static void tls_strp_work(struct work_struct *w)
+ 	release_sock(strp->sk);
+ }
+ 
+-void tls_strp_msg_done(struct tls_strparser *strp)
++/**
++ * tls_strp_msg_release - release the current strparser message
++ * @strp: TLS stream parser instance
++ *
++ * Release the current record without triggering a check for the
++ * next record. Callers must invoke tls_strp_check_rcv() before
++ * releasing the socket lock, or queued data will stall until
++ * the next tls_strp_data_ready() event.
++ */
++void tls_strp_msg_release(struct tls_strparser *strp)
+ {
+ 	WARN_ON(!strp->stm.full_len);
+ 
+@@ -592,7 +601,11 @@ void tls_strp_msg_done(struct tls_strparser *strp)
+ 
+ 	WRITE_ONCE(strp->msg_ready, 0);
+ 	memset(&strp->stm, 0, sizeof(strp->stm));
++}
+ 
++void tls_strp_msg_done(struct tls_strparser *strp)
++{
++	tls_strp_msg_release(strp);
+ 	tls_strp_check_rcv(strp);
+ }
+ 
 
 -- 
 2.53.0
