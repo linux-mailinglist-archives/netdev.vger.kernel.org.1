@@ -1,113 +1,92 @@
-Return-Path: <netdev+bounces-268371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WNLoMiSouGkthAEAu9opvQ
-	(envelope-from <netdev+bounces-268371-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 02:02:28 +0100
+	id ADRnHrOouGkthAEAu9opvQ
+	(envelope-from <netdev+bounces-268372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 02:04:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A4B42A26B1
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 02:02:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE4102A271C
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 02:04:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 970E73008C23
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 01:02:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 61A27306814E
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 01:02:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D620622A817;
-	Tue, 17 Mar 2026 01:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A058248F68;
+	Tue, 17 Mar 2026 01:02:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NPy8v28/"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="Hpah+D83"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8927F1CAA78
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 01:02:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254AC1EEA31
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 01:02:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773709345; cv=none; b=nePpKT4DJX5V92Xp5wI7YvBjzDh2TI1Qe/sNJ3mTaIq9JYmoNVFN8DQMJedJ5CxbTQx4oT3CyukYYiTivJHJu9IZX6ok2lc/C3xo5klymOJroIcTOmp+iDY08rrBUfh1ERG1CZFDcsn1zLNjWOK/bAwOr39GeaetVmt0Y7VhFws=
+	t=1773709378; cv=none; b=HMUo8LHpu2p2HQfV8Nk9YoqUZtSO5pZu9CkYyApJJUxVb9Dtu76R57RLH29jgtmMVmjeLEJdc6+17h/SIP4yvNCrpCXm2DJhnnDvf+sqlR5gqzUI3UmLnc1odn9XnG3nsMmLqE8rBaQulf57xPxKdspBOol0TJhXKjNoEIR8pTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773709345; c=relaxed/simple;
-	bh=w43A32ElWzUFHVnnYSmGYUdM4Z3ZT7EHYE2wZgx0qf4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WEFtT0fkM7DR+YnOLRPz7GquKkOhbsnuLZzYVlp/DI7KkpWhqfwNxtf5UhrJIKrw+ROqMNUfSm1R2cYDpqBWH9WvXv0qaX10t5PZVg4ngO/A9iQEYTk4GD3iXVm6vCgRxsGXtfp+tUP7F+/bNS+Zq3xjRz4YksVNfPB8AFDcAv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NPy8v28/; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-79a5fb98316so8679207b3.3
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 18:02:24 -0700 (PDT)
+	s=arc-20240116; t=1773709378; c=relaxed/simple;
+	bh=qDNEzauro0+SBrAy62SvRJY9fbSOQ5Uj3v81Q/YVXzc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jer/FSN0kvak/yj/AY6s5iUQx/f2i09w9vidq749OfMRWqOagL52IuUZkLpjPSVJ/6Bo076GurpPzU+0Qu6Z4D2Oh8RXEz3/xqiN1zmNYffw+XzRg/RM1ISccur791murfg5CFYs/lZvnjb23bPOVjhuBs/aSqFBF7M8YN03xlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=Hpah+D83; arc=none smtp.client-ip=74.125.82.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-126ea4b77adso6333065c88.1
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 18:02:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773709343; x=1774314143; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7KbolAMX4QbaXf52snOUv/EVQt0h5F1GAcLobkdxUR8=;
-        b=NPy8v28/Mx4iyzHi1X7oeZh7A1HfHM20aINasF0hgEdtKE0jXuMEPmtvbTpQuCeVvm
-         GqZ+kLmolmAXWRAyT8k5O/5yO7vrqESMQbqUgRKPHQRD7wL6dV3B3l2MCT+Rpfgga8Fq
-         e8R+ibIUKrE1nb0at0aSo+4TR4JYmEDUiUH96ypRY/rXNq/r6/bqO1mS87TASy4Cs0vz
-         Ipdm8rTsZDCeEN4aSid89a0vrs3d18SJRZ+DybFOEYFkIPA36H157nDbDom3seTheaMM
-         /W10tRp4CPtRG2+1YqY2k26GWWx9O9ad0P81yInnSKqxRtEW5/sqo2z7LZOArOs+ysVP
-         DzkQ==
+        d=asu.edu; s=google; t=1773709376; x=1774314176; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1t/fBFfC5j2uQ+R+/eWNtya/cuYmhJ8SyDP+c8BXEVI=;
+        b=Hpah+D83A4tvz9t1ZM8xiH7L+5PE3maksAuDNIyPpLrLd9Zyoge10sMKVrbeAd7OkH
+         gBqM0kCKs3RVTNDvGhH2PMhm7JB1d1nMu020ifIfxcWcxMDHINr3CAmQ+/9I4hej0tA8
+         Mer0xcCVMaxffihuExnB05vKYeqh8LdGJU0y9hI6rkaFjP1n6LbQtDrDd1sE5LMp/+To
+         16o38HRx8C9o1ZosoG0XXXzwf0/KujAR/VlpxVFReT6jfT3yjZ4vsMfV8Z6Wu6+YyyBH
+         +ZyToZ/LsIaKgAC0qTIeFqqYn6zcLquZT+NwWW7HbhtiM+Dzkbe3G54V7tXG/9rA1kpJ
+         lwMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773709343; x=1774314143;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7KbolAMX4QbaXf52snOUv/EVQt0h5F1GAcLobkdxUR8=;
-        b=DBHGRbfJVZurc7voLjqrtG0CUyj0B7LT16ugfYXyIaSbMDCjqVk423XVYkPw8kFdeZ
-         ToQgZGYtYseQ2NtEMxFz2KWhNZC5bB4pk7E396VMirQx9SB264EYxfHGIO13L3mDCZU6
-         vr8XgPKnpNNWqjQEsg+beQsrYvw8Z9P2zdP2JIhSNCVQ29umhK3xhQwEZNvcVsnUSTW5
-         bBh9CUPEDavc6lRWwc1jwq+xRh7nqns+v8LAItkh6FdlhepP8/CGSNo5Q3c6lwDfiovY
-         tTIkfwiyEOfGLRf9nzbsr51TOJNZG5/Yxu0b/zGfBFWos89csp6sAJ9x7w5uixnUIs/x
-         oZOg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZLw2jP2pkpOqkSv9qKaQRjAzCKiUHb1wcuTU/NhqD5pXpI+Bf4rNtYchW6RHllCLgxlAGW0g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeOjm6cGzPeqqUolnjcYF2c1tTtbZuYtp2MfglrFcPlp6L4qwI
-	SORvBKQCB1HBVNzkiCig+URwbhhjRu6DyiL7cGZRi3p8H2yYLbABEMCp
-X-Gm-Gg: ATEYQzzmXf0N/zJidrWvhL/QwxMLji6yqxjyYqFy4SWcLeUbjhTgaaYkUoKlbce1S7N
-	ncPwPNr+2ThGliGYCNAugPXmW5eYMh4OKCOyB+vqIvvVQrOejD7HMdXJehLgHTc2m1+H9fcXg6R
-	U+15yuAB63PH454JH+Mx8n1sMRFn4uutD5Me7LF5LfKgsi2GISyk/gS/rd9WqjfND6JAurxVWHQ
-	BJOrwYQd6AJinN6M89mzKvvXHe8fmjgU20GE2E9Ol14FyoYO2MtBUEvPV1XPfChIdv0geHlA0oj
-	nysyYvEpFg/b9LWhmg1yjwPJq32ZjgWkjtPAXwwLTKFJmSxAhw94ZovfNfzbRyoIhaR2ES1rCYn
-	GloPg0kzmoNpIJnNhHII5qFH5j+2mlH7D6SPXyfW6HLTUb2cso/aW5hJSyUvVbmEThfE7uoQhIa
-	Coe5ELYwKB0OGStR2XGd1U4CpO0TNrBAGAIMAPXPyWYKg7olkWtv+EvUClNolTNpvRkvU7LovXx
-	oZDEGcFEv65ssRu1GOy48c=
-X-Received: by 2002:a05:690c:260c:b0:799:266:83e3 with SMTP id 00721157ae682-79a1c1d2627mr148456747b3.50.1773709343410;
-        Mon, 16 Mar 2026 18:02:23 -0700 (PDT)
-Received: from localhost.localdomain (108-214-96-168.lightspeed.sntcca.sbcglobal.net. [108.214.96.168])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-79917f1df91sm99596507b3.44.2026.03.16.18.02.17
+        d=1e100.net; s=20251104; t=1773709376; x=1774314176;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1t/fBFfC5j2uQ+R+/eWNtya/cuYmhJ8SyDP+c8BXEVI=;
+        b=YsUkpyOlImrzvIbDqRnQ696kn8alrS3atYp6ZUFknHtRzeK5HnACnjfZ7GzV6nk3ss
+         bdBC41h8aktt0utlirIF075nJb5y5/OzDNDP4fVY9RWOCqua57dPjOWzXBak7byJ2j9g
+         Rfm6isX4t9Im/GQmi6WTUuWpv8dVRpSsQQRPdVPE/sRU4r7IUMLKGZxuiRf3SWpQl+nH
+         6BupMOMvzVzGdvBQHlOVXUYX5fPlBKXwtzjA+ow5qltkeL8otBFD2JutrDV7jWZ1fsVc
+         scGyOIrR4SEmqzTopFN6eHayRlx27jmXRNl04S853xEyzBVOpqfR1vFqz+XRXS1u8NYk
+         zQ4A==
+X-Gm-Message-State: AOJu0Yw68ls+4H7ZMJnMWeubFjwGQFqa0i5nBuzPd3up03atGQCaewp8
+	RDCoLPuj1j8Ai9GgBVum1kamEFWpna6CzIcwtLSYtAeiOxR4Q7+yDNwyfuDG5XhdXl428c4g4UV
+	dYreAuQ==
+X-Gm-Gg: ATEYQzxLhJsCksfDkJLStnOni6/nop5nf2PBbVdjEbM14aO0+vN2IKl8QdI5VxWwx8Y
+	90Yx30HDtbL8R5ibKUJB+VdlzdmYDD/lNl/5UovZoTrnOs1eyOUaqb2gqvtrsetEpzp18GynWvs
+	EYN7CTLET+WD9PDrhlnBezxzbjUOmZIoJ3QTFQvBD1xXM+IRReOSXjrXjHcZwl05UWO5LBqbKGf
+	f0cQzAqBqPUWSKtpaoyXH+RfRLe+Fh5d+tsHvynmbE+88GBXIW3NEYzFQJbskq8tvQJnORfF2+a
+	CDdCYxwkN17OsTpDhq5/OhoGDWiynbQ5EkSmo7qv5o4TLYViTGUXUiOoDo3242AxN7/9OqkT4lP
+	qJ/F/X243naG5vOkG7WOLAnX23+T+NgGagU3V1MtZCtHNljHxdnRKGzNGPx+8Dh+Fw/h8Y0PF4n
+	CcNt9Z/G2UtM+DeGAJYg3higIPGUOwcsp67iAvbfJFRHxgdxOcrzxo9Q==
+X-Received: by 2002:a05:7022:688b:b0:128:ea68:27f1 with SMTP id a92af1059eb24-128f3dc5fd4mr6067455c88.23.1773709375725;
+        Mon, 16 Mar 2026 18:02:55 -0700 (PDT)
+Received: from p1.scai.dhcp.asu.edu (209-147-138-15.nat.asu.edu. [209.147.138.15])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2beab3a0b3fsm17813510eec.5.2026.03.16.18.02.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2026 18:02:23 -0700 (PDT)
-From: Sun Jian <sun.jian.kdev@gmail.com>
-To: bpf@vger.kernel.org
-Cc: ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	davem@davemloft.net,
+        Mon, 16 Mar 2026 18:02:55 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	horms@kernel.org,
-	shuah@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	paul.chaignon@gmail.com,
-	Sun Jian <sun.jian.kdev@gmail.com>
-Subject: [PATCH v2] selftests/bpf: trampoline_count: use dedicated target function
-Date: Tue, 17 Mar 2026 09:02:09 +0800
-Message-ID: <20260317010209.8779-1-sun.jian.kdev@gmail.com>
+	bestswngs@gmail.com,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net v2] udp_tunnel: fix NULL deref caused by udp_sock_create6 when CONFIG_IPV6=n
+Date: Mon, 16 Mar 2026 18:02:41 -0700
+Message-ID: <20260317010241.1893893-1-xmei5@asu.edu>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260315054227.118344-1-sun.jian.kdev@gmail.com>
-References: <20260315054227.118344-1-sun.jian.kdev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -115,142 +94,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-268371-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268372-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,asu.edu];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[asu.edu:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 5A4B42A26B1
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:dkim,asu.edu:email,asu.edu:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CE4102A271C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-trampoline_count fills all trampoline attachment slots for a single
-target function and verifies that one extra attach fails with -E2BIG.
+When CONFIG_IPV6 is disabled, the udp_sock_create6() function returns 0
+(success) without actually creating a socket. Callers such as
+fou_create() then proceed to dereference the uninitialized socket
+pointer, resulting in a NULL pointer dereference.
 
-It currently targets bpf_modify_return_test, which is also used by
-modify_return and get_func_ip_test. When those tests run in parallel,
-they can contend for the same per-function trampoline quota and
-cause unexpected attach failures. This issue is currently masked by
-harness serialization.
+The captured NULL deref crash:
+  BUG: kernel NULL pointer dereference, address: 0000000000000018
+  RIP: 0010:fou_nl_add_doit (net/ipv4/fou_core.c:590 net/ipv4/fou_core.c:764)
+  [...]
+  Call Trace:
+    <TASK>
+    genl_family_rcv_msg_doit.constprop.0 (net/netlink/genetlink.c:1114)
+    genl_rcv_msg (net/netlink/genetlink.c:1194 net/netlink/genetlink.c:1209)
+    [...]
+    netlink_rcv_skb (net/netlink/af_netlink.c:2550)
+    genl_rcv (net/netlink/genetlink.c:1219)
+    netlink_unicast (net/netlink/af_netlink.c:1319 net/netlink/af_netlink.c:1344)
+    netlink_sendmsg (net/netlink/af_netlink.c:1894)
+    __sock_sendmsg (net/socket.c:727 (discriminator 1) net/socket.c:742 (discriminator 1))
+    __sys_sendto (./include/linux/file.h:62 (discriminator 1) ./include/linux/file.h:83 (discriminator 1) net/socket.c:2183 (discriminator 1))
+    __x64_sys_sendto (net/socket.c:2213 (discriminator 1) net/socket.c:2209 (discriminator 1) net/socket.c:2209 (discriminator 1))
+    do_syscall_64 (arch/x86/entry/syscall_64.c:63 (discriminator 1) arch/x86/entry/syscall_64.c:94 (discriminator 1))
+    entry_SYSCALL_64_after_hwframe (net/arch/x86/entry/entry_64.S:130)
 
-Add a dedicated bpf_trampoline_count_test target and switch
-trampoline_count to use it. This keeps the test semantics unchanged
-while isolating it from other modify_return-based selftests, so it no
-longer needs to run in serial mode. Remove the TODO comment as
-well.
+This patch makes udp_sock_create6 return -EPFNOSUPPORT instead, so
+callers correctly take their error paths. There is only one caller of
+the vulnerable function and only privileged users can trigger it.
 
-Tested:
-  ./test_progs -t trampoline_count -vv
-  ./test_progs -t modify_return -vv
-  ./test_progs -t get_func_ip_test -vv
-  ./test_progs -j$(nproc) -t trampoline_count -vv
-  ./test_progs -j$(nproc) -t
-    trampoline_count,modify_return,get_func_ip_test -vv
-
-Tested-by: Paul Chaignon <paul.chaignon@gmail.com>
-Signed-off-by: Sun Jian <sun.jian.kdev@gmail.com>
+Fixes: fd384412e199b ("udp_tunnel: Seperate ipv6 functions into its own file.")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
 ---
+ include/net/udp_tunnel.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v2:
-- add Paul's Tested-by
-
- net/bpf/test_run.c                                        | 7 +++++++
- tools/testing/selftests/bpf/prog_tests/trampoline_count.c | 3 +--
- tools/testing/selftests/bpf/progs/test_trampoline_count.c | 6 +++---
- 3 files changed, 11 insertions(+), 5 deletions(-)
-
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 178c4738e63b..b41147a29f16 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -580,6 +580,12 @@ __bpf_kfunc int bpf_modify_return_test2(int a, int *b, short c, int d,
- 	return a + *b + c + d + (long)e + f + g;
+diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
+index d9c6d04bb3b5..fc1fc43345b5 100644
+--- a/include/net/udp_tunnel.h
++++ b/include/net/udp_tunnel.h
+@@ -52,7 +52,7 @@ int udp_sock_create6(struct net *net, struct udp_port_cfg *cfg,
+ static inline int udp_sock_create6(struct net *net, struct udp_port_cfg *cfg,
+ 				   struct socket **sockp)
+ {
+-	return 0;
++	return -EPFNOSUPPORT;
  }
+ #endif
  
-+__bpf_kfunc int bpf_trampoline_count_test(int a, int *b)
-+{
-+	*b += 1;
-+	return a + *b;
-+}
-+
- __bpf_kfunc int bpf_modify_return_test_tp(int nonce)
- {
- 	trace_bpf_trigger_tp(nonce);
-@@ -635,6 +641,7 @@ BTF_KFUNCS_START(bpf_test_modify_return_ids)
- BTF_ID_FLAGS(func, bpf_modify_return_test)
- BTF_ID_FLAGS(func, bpf_modify_return_test2)
- BTF_ID_FLAGS(func, bpf_modify_return_test_tp)
-+BTF_ID_FLAGS(func, bpf_trampoline_count_test)
- BTF_ID_FLAGS(func, bpf_fentry_test1, KF_SLEEPABLE)
- BTF_KFUNCS_END(bpf_test_modify_return_ids)
- 
-diff --git a/tools/testing/selftests/bpf/prog_tests/trampoline_count.c b/tools/testing/selftests/bpf/prog_tests/trampoline_count.c
-index 6cd7349d4a2b..b19358aed126 100644
---- a/tools/testing/selftests/bpf/prog_tests/trampoline_count.c
-+++ b/tools/testing/selftests/bpf/prog_tests/trampoline_count.c
-@@ -30,8 +30,7 @@ static struct bpf_program *load_prog(char *file, char *name, struct inst *inst)
- 	return prog;
- }
- 
--/* TODO: use different target function to run in concurrent mode */
--void serial_test_trampoline_count(void)
-+void test_trampoline_count(void)
- {
- 	char *file = "test_trampoline_count.bpf.o";
- 	char *const progs[] = { "fentry_test", "fmod_ret_test", "fexit_test" };
-diff --git a/tools/testing/selftests/bpf/progs/test_trampoline_count.c b/tools/testing/selftests/bpf/progs/test_trampoline_count.c
-index 7765720da7d5..911d282fd423 100644
---- a/tools/testing/selftests/bpf/progs/test_trampoline_count.c
-+++ b/tools/testing/selftests/bpf/progs/test_trampoline_count.c
-@@ -3,19 +3,19 @@
- #include <bpf/bpf_helpers.h>
- #include <bpf/bpf_tracing.h>
- 
--SEC("fentry/bpf_modify_return_test")
-+SEC("fentry/bpf_trampoline_count_test")
- int BPF_PROG(fentry_test, int a, int *b)
- {
- 	return 0;
- }
- 
--SEC("fmod_ret/bpf_modify_return_test")
-+SEC("fmod_ret/bpf_trampoline_count_test")
- int BPF_PROG(fmod_ret_test, int a, int *b, int ret)
- {
- 	return 0;
- }
- 
--SEC("fexit/bpf_modify_return_test")
-+SEC("fexit/bpf_trampoline_count_test")
- int BPF_PROG(fexit_test, int a, int *b, int ret)
- {
- 	return 0;
-
-base-commit: 267594792a71018788af69e836c52e34bb8054af
 -- 
 2.43.0
 
