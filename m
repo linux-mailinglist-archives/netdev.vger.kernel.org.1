@@ -1,275 +1,172 @@
-Return-Path: <netdev+bounces-268720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268721-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qEAANaSquWkhLwIAu9opvQ
-	(envelope-from <netdev+bounces-268720-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:25:24 +0100
+	id uCBeDxWruWlDMAIAu9opvQ
+	(envelope-from <netdev+bounces-268721-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:27:17 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CEDC2B1871
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:25:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F8D72B18A0
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:27:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CEC05317526A
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:20:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 746C230D1C8D
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8499329E46;
-	Tue, 17 Mar 2026 19:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEBE433A02F;
+	Tue, 17 Mar 2026 19:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="WmTLXZYZ"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="N+HwWDtK"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABD621772A;
-	Tue, 17 Mar 2026 19:19:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103682C234A;
+	Tue, 17 Mar 2026 19:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773775200; cv=none; b=b3vS1c7p/CEo5fkSEENDHimeSzeJ3GoGr/WxAZMzcgMY2BRsavKlDnA+C1RE9morI8aedcJVzw89xzL0FmLOAXe6NLrk0iaWBIxzxQ+NFw4hHf4b3McGlBCKRbTs4kGEskQx8SaKZzU7edcSCq7egTO6neR8PgCuEbJwo+S1j40=
+	t=1773775547; cv=none; b=Z7faxttX4Q37sUI2a9Yx/hDXaFFYk60oICbEyldrk0L2mn638GrIGK3uMxa0DvtB+Sn+UEyvzq5jbF5y0AL6nF5pg1q+H4aEs9B4Tdk3l3stBaEp38eDhRCH5od2NdY78Z6x6QV7PAEV6ZmN/13udjMChujaCH7kXqfTN2ThrYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773775200; c=relaxed/simple;
-	bh=0+l9O99i0d3GRyCU8WTd4BdfEun3zXuGATcIxQ4nYTg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gh+gVe8jRMSgxqUgy+f1URxosAtfw2EthLZ+D6G/iBhIy7F/6o1lqK11ODCUlHbynJHHBFmMjTXr6MTWpIPy6XpU8bKVBQksUrUXIZQeaK31eB3qTddqDf1pRSkKy7mw4r0psNOtAXSn7AYmCJw2NZLmUPdcglPj0OoRh5MiwDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=WmTLXZYZ; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1006)
-	id 9E12620B7001; Tue, 17 Mar 2026 12:19:59 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9E12620B7001
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1773775199;
-	bh=2Cb9Dg0S1shGdYbGN4o0uYJzPDq4gEGvE8yUpEn8c8o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WmTLXZYZwzy1sTOYpLaKrptctktt1aj5ew4MW7EZYhaJBMqeN2xr4Quu29K7V96zl
-	 lzYi1hFig0hIu5uGuTBG9akx2J/bos/arqdPJ/Qghw4HYP7Gpx1EEzEtiuARQTJ4k3
-	 t8bE43U3fg7QtIjxLHo0v88Zetq1PCWAJLPbVxII=
-From: Haiyang Zhang <haiyangz@linux.microsoft.com>
-To: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
-	Aditya Garg <gargaditya@linux.microsoft.com>,
-	Shiraz Saleem <shirazsaleem@microsoft.com>,
-	Kees Cook <kees@kernel.org>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Breno Leitao <leitao@debian.org>,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: paulros@microsoft.com
-Subject: [PATCH net-next v6 3/3] net: mana: Add ethtool counters for RX CQEs in coalesced type
-Date: Tue, 17 Mar 2026 12:18:07 -0700
-Message-ID: <20260317191826.1346111-4-haiyangz@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260317191826.1346111-1-haiyangz@linux.microsoft.com>
-References: <20260317191826.1346111-1-haiyangz@linux.microsoft.com>
+	s=arc-20240116; t=1773775547; c=relaxed/simple;
+	bh=LVtdzrz+CfKQeR9PIzXXHL3xpnIjxt3oa5d7Xk5WDEA=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=bsAkueMTHHyla7iok1Ki3YMbxASkvLiteOWP6681pQI0zbtS+lRQcIjcp13KYoNNrNTTWsBEFGJQw5tRZLjsUpevCxYhg2HvlT8ZlGmUmCeCIdrq4UNUXnXEFOxDe/aKoUPN1h0OYicBJfJvJ9r1Ttrj4lHHYXKi3FCTS9n+CTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=N+HwWDtK; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EC72AA5005;
+	Tue, 17 Mar 2026 20:25:38 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1773775542; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=JtZHJKH8B+jPdquQz03PKnwuqGYHc8VkwThcSvgSfwY=;
+	b=N+HwWDtKwGn3F4M/O6m7rcohZgsDJZ3kYMSux6/9RAVle57lrfszCS1NKOO+61XJytL67n
+	KRNEXVNPWl/EI+GWn6qiIt0TWoawx6CQI0h9yyuM340/CNKkCjvxBNwJOsL0yAeGcM6Ypd
+	ov4sa9RwicNja0jrO9QO06Id5/kwgfgZmqFVC/ynDkNKRsLzaPakxsWfAEKw/VnVrQmQV9
+	zfVEvABFhVFw/R/ysschxY8cDDYPq+4gPHFE8e4XLupove7aoXrONbNAiGg75R+dVXVBL7
+	5S5MayzkqTRZTRX01icHMSpC2s9RWqcPuNS0U6CcxzoPowvn8vqP/hOAgYHLPQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Date: Tue, 17 Mar 2026 20:25:38 +0100
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Simon Horman <horms@kernel.org>
+Cc: kuba@kernel.org, opendmb@gmail.com, arnd@arndb.de, hkallweit1@gmail.com,
+ florian.fainelli@broadcom.com, bhargava.marreddy@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, edumazet@google.com,
+ andrew+netdev@lunn.ch, pabeni@redhat.com, mbloch@rooftopnetworks.de,
+ netdev@vger.kernel.org, davem@davemloft.net,
+ rajashekar.hudumula@broadcom.com, linux-kernel@vger.kernel.org,
+ ebiggers@kernel.org, vikas.gupta@broadcom.com
+Subject: Re: [net-next,v2,4/6] net: bcmgenet: add XDP_TX support
+In-Reply-To: <20260317162030.1759004-1-horms@kernel.org>
+References: <20260315214914.1555777-5-nb@tipi-net.de>
+ <20260317162030.1759004-1-horms@kernel.org>
+Message-ID: <a93f7e93293e18e12501839af3c328bf@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-268720-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268721-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,arndb.de,broadcom.com,google.com,lunn.ch,redhat.com,rooftopnetworks.de,vger.kernel.org,davemloft.net];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haiyangz@linux.microsoft.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.microsoft.com:dkim,linux.microsoft.com:mid]
-X-Rspamd-Queue-Id: 4CEDC2B1871
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tipi-net.de:dkim,tipi-net.de:mid,linux.dev:url]
+X-Rspamd-Queue-Id: 9F8D72B18A0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Haiyang Zhang <haiyangz@microsoft.com>
+On 17.3.2026 17:20, Simon Horman wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> 
+> For local reproduction steps see 
+> https://netdev-ai.bots.linux.dev/ai-local.html
+> ---
+> net: bcmgenet: add XDP_TX support
+> 
+> Implement XDP_TX using ring 16 (DESC_INDEX), the hardware default
+> descriptor ring, dedicated to XDP TX for isolation from SKB TX queues.
+> Ring 16 gets 32 BDs carved from ring 0's allocation. TX completion is
+> piggybacked on RX NAPI poll since ring 16's INTRL2_1 bit collides with
+> RX ring 0, similar to how bnxt, ice, and other XDP drivers handle TX
+> completion within the RX poll path.
+> 
+>> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c 
+>> b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+>> index f6a2567af7cb..922895bc7461 100644
+>> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+>> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> 
+> [ ... ]
+> 
+>> @@ -3637,6 +3782,7 @@ static void bcmgenet_timeout(struct net_device 
+>> *dev, unsigned int txqueue)
+>> 
+>>  	for (q = 0; q <= priv->hw_params->tx_queues; q++)
+>>  		bcmgenet_dump_tx_queue(&priv->tx_rings[q]);
+>> +	bcmgenet_dump_tx_queue(&priv->tx_rings[DESC_INDEX]);
+> 
+> Does this trigger an out-of-bounds array access?
+> 
+> Looking at bcmgenet_dump_tx_queue():
+> 
+> static void bcmgenet_dump_tx_queue(struct bcmgenet_tx_ring *ring)
+> {
+> 	...
+> 	struct netdev_queue *txq = netdev_get_tx_queue(priv->dev, 
+> ring->index);
+> 	...
+> }
+> 
+> For the XDP TX ring, ring->index is DESC_INDEX (16), so this calls
+> netdev_get_tx_queue(priv->dev, 16). But the device only has 5 TX queues
+> (indices 0-4), allocated via alloc_etherdev_mqs() with 
+> GENET_MAX_MQ_CNT+1=5.
+> 
+> This means the code accesses dev->_tx[16] which is beyond the allocated
+> array, and the returned txq pointer points to memory past the array. 
+> This
+> is then dereferenced by netif_tx_queue_stopped(txq) which reads 
+> txq->state
+> from invalid memory.
+> 
+> In debug builds this triggers DEBUG_NET_WARN_ON_ONCE, and it could 
+> crash or
+> corrupt data.
 
-For RX CQEs with type CQE_RX_COALESCED_4, to measure the coalescing
-efficiency, add counters to count how many contains 2, 3, 4 packets
-respectively.
-Also, add a counter for the error case of first packet with length == 0.
+I must have overlooked this, when I was refactoring to ring 16 in v2. 
+Will be fixed in v3
 
-Reviewed-by: Long Li <longli@microsoft.com>
-Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
----
-v5:
-  Combine the accounting logics as suggested by Simon Horman.
-
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 24 +++++++++++++------
- .../ethernet/microsoft/mana/mana_ethtool.c    | 15 ++++++++++--
- include/net/mana/mana.h                       |  9 ++++---
- 3 files changed, 36 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index fa30046dcd3d..49c65cc1697c 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -2147,14 +2147,8 @@ static void mana_process_rx_cqe(struct mana_rxq *rxq, struct mana_cq *cq,
- 	for (i = 0; i < MANA_RXCOMP_OOB_NUM_PPI; i++) {
- 		old_buf = NULL;
- 		pktlen = oob->ppi[i].pkt_len;
--		if (pktlen == 0) {
--			if (i == 0)
--				netdev_err_once(
--					ndev,
--					"RX pkt len=0, rq=%u, cq=%u, rxobj=0x%llx\n",
--					rxq->gdma_id, cq->gdma_id, rxq->rxobj);
-+		if (pktlen == 0)
- 			break;
--		}
- 
- 		curr = rxq->buf_index;
- 		rxbuf_oob = &rxq->rx_oobs[curr];
-@@ -2175,6 +2169,22 @@ static void mana_process_rx_cqe(struct mana_rxq *rxq, struct mana_cq *cq,
- 		if (!coalesced)
- 			break;
- 	}
-+
-+	/* Collect coalesced CQE count based on packets processed.
-+	 * Coalesced CQEs have at least 2 packets, so index is i - 2.
-+	 */
-+	if (i > 1) {
-+		u64_stats_update_begin(&rxq->stats.syncp);
-+		rxq->stats.coalesced_cqe[i - 2]++;
-+		u64_stats_update_end(&rxq->stats.syncp);
-+	} else if (!i && !pktlen) {
-+		u64_stats_update_begin(&rxq->stats.syncp);
-+		rxq->stats.pkt_len0_err++;
-+		u64_stats_update_end(&rxq->stats.syncp);
-+		netdev_err_once(ndev,
-+				"RX pkt len=0, rq=%u, cq=%u, rxobj=0x%llx\n",
-+				rxq->gdma_id, cq->gdma_id, rxq->rxobj);
-+	}
- }
- 
- static void mana_poll_rx_cq(struct mana_cq *cq)
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-index 4b234b16e57a..6a4b42fe0944 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-@@ -149,7 +149,7 @@ static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
- {
- 	struct mana_port_context *apc = netdev_priv(ndev);
- 	unsigned int num_queues = apc->num_queues;
--	int i;
-+	int i, j;
- 
- 	if (stringset != ETH_SS_STATS)
- 		return;
-@@ -168,6 +168,9 @@ static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
- 		ethtool_sprintf(&data, "rx_%d_xdp_drop", i);
- 		ethtool_sprintf(&data, "rx_%d_xdp_tx", i);
- 		ethtool_sprintf(&data, "rx_%d_xdp_redirect", i);
-+		ethtool_sprintf(&data, "rx_%d_pkt_len0_err", i);
-+		for (j = 0; j < MANA_RXCOMP_OOB_NUM_PPI - 1; j++)
-+			ethtool_sprintf(&data, "rx_%d_coalesced_cqe_%d", i, j + 2);
- 	}
- 
- 	for (i = 0; i < num_queues; i++) {
-@@ -201,6 +204,8 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
- 	u64 xdp_xmit;
- 	u64 xdp_drop;
- 	u64 xdp_tx;
-+	u64 pkt_len0_err;
-+	u64 coalesced_cqe[MANA_RXCOMP_OOB_NUM_PPI - 1];
- 	u64 tso_packets;
- 	u64 tso_bytes;
- 	u64 tso_inner_packets;
-@@ -209,7 +214,7 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
- 	u64 short_pkt_fmt;
- 	u64 csum_partial;
- 	u64 mana_map_err;
--	int q, i = 0;
-+	int q, i = 0, j;
- 
- 	if (!apc->port_is_up)
- 		return;
-@@ -239,6 +244,9 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
- 			xdp_drop = rx_stats->xdp_drop;
- 			xdp_tx = rx_stats->xdp_tx;
- 			xdp_redirect = rx_stats->xdp_redirect;
-+			pkt_len0_err = rx_stats->pkt_len0_err;
-+			for (j = 0; j < MANA_RXCOMP_OOB_NUM_PPI - 1; j++)
-+				coalesced_cqe[j] = rx_stats->coalesced_cqe[j];
- 		} while (u64_stats_fetch_retry(&rx_stats->syncp, start));
- 
- 		data[i++] = packets;
-@@ -246,6 +254,9 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
- 		data[i++] = xdp_drop;
- 		data[i++] = xdp_tx;
- 		data[i++] = xdp_redirect;
-+		data[i++] = pkt_len0_err;
-+		for (j = 0; j < MANA_RXCOMP_OOB_NUM_PPI - 1; j++)
-+			data[i++] = coalesced_cqe[j];
- 	}
- 
- 	for (q = 0; q < num_queues; q++) {
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index a7f89e7ddc56..3336688fed5e 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -61,8 +61,11 @@ enum TRI_STATE {
- 
- #define MAX_PORTS_IN_MANA_DEV 256
- 
-+/* Maximum number of packets per coalesced CQE */
-+#define MANA_RXCOMP_OOB_NUM_PPI 4
-+
- /* Update this count whenever the respective structures are changed */
--#define MANA_STATS_RX_COUNT 5
-+#define MANA_STATS_RX_COUNT (6 + MANA_RXCOMP_OOB_NUM_PPI - 1)
- #define MANA_STATS_TX_COUNT 11
- 
- #define MANA_RX_FRAG_ALIGNMENT 64
-@@ -73,6 +76,8 @@ struct mana_stats_rx {
- 	u64 xdp_drop;
- 	u64 xdp_tx;
- 	u64 xdp_redirect;
-+	u64 pkt_len0_err;
-+	u64 coalesced_cqe[MANA_RXCOMP_OOB_NUM_PPI - 1];
- 	struct u64_stats_sync syncp;
- };
- 
-@@ -227,8 +232,6 @@ struct mana_rxcomp_perpkt_info {
- 	u32 pkt_hash;
- }; /* HW DATA */
- 
--#define MANA_RXCOMP_OOB_NUM_PPI 4
--
- /* Receive completion OOB */
- struct mana_rxcomp_oob {
- 	struct mana_cqe_header cqe_hdr;
--- 
-2.34.1
-
+Thanks
+Nicolai
 
