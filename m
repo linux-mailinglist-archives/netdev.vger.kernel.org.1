@@ -1,176 +1,125 @@
-Return-Path: <netdev+bounces-268662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268663-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CJDWJ6l3uWnQGQIAu9opvQ
-	(envelope-from <netdev+bounces-268662-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:47:53 +0100
+	id mCBoIFt4uWnQGQIAu9opvQ
+	(envelope-from <netdev+bounces-268663-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:50:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D7472AD48C
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:47:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 099362AD4F9
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:50:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C801A3019FDC
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:47:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B72DD306F394
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE8F271A7C;
-	Tue, 17 Mar 2026 15:47:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4478F27A47F;
+	Tue, 17 Mar 2026 15:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="GOKgP+4a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dAA//BHw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58325221265
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 15:47:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6F726F293;
+	Tue, 17 Mar 2026 15:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773762470; cv=none; b=Ar/2ih3RUnWD8KqY6s0nSsNC9opczXTtcb3VbbyQar+qUd3rjjVhUE27r5yp5r9nNlxweukV5K+5t863eK6Bbyc7GNR5t+R/QqxwZ7tFQuHG9VXKotIn+0dveGu/6oezHsJXC+SH/Y891cbGDFHEWwmbrFBMYP02a+eG8awCQ5U=
+	t=1773762627; cv=none; b=FBCZJF93bCTvI7xY0dXnySeX+XUE6jsnmh7o4Xu+iM6V+Pdrdu+mgO4EMkR0K/LF7Sdduf+idIm+xJPZBrU4u7POtDJJVQI4V0rKqm0QTHLkY2n5VkkSJQMhIV5hfRnrsNrQaTrAVMFbcQghuuwfWdqB/fWtoCnWOUG44ipqq+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773762470; c=relaxed/simple;
-	bh=IjrsCxwkBJOYLk4aZ6wtP5PCepQhlJsiDOrbtIUG05c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u5lmD1NcZoDSiLTq6ZKeKRYmKNzZWsXBxqYAhlaZVUzx4BMkoGAIdo4Lp88hMEZ8w2T8TWkNkH8FJECLsy0nBz3D8wesRJETSIubQ/HKm7eeJ2KzRHlreKrN+jW3UDREgrlcj/6OOahPjhW5vDR9o7/O51EpDdWU3fUypUmmYWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=GOKgP+4a; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4856cd3f1ffso18421455e9.3
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 08:47:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1773762467; x=1774367267; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BWTbSNP2WHzhEIrAEAxvT9LPjTJQPOi5iCIjuQ8jmQA=;
-        b=GOKgP+4ai/XEdjAJTPYrQiwtoq5enJR2T09vveK+WC3ytUZXf7Js1+gQd9Jooyu5qy
-         evfqED7ehLPqEv3N9JPZk0Lt/Kxebs/7yIIJG5DpE5ALpKXMpzwnNrypXr0Pb7PSw7Qd
-         09zQdJ92O+V0ohAaWJmr51azduIUtN2iVSyQ78DxPdIMRyWlbZGhpE46waxdxUtkPEIl
-         cCZboJum1zu3Y62RGkiUihsU1rU+rdciTmoDbeERfPrXtRVdM+dgHtephzirAGRjab/l
-         6nJEoDQgD1f71//RPzLBXAJJFFs4BSM+F5k5YoQyRqZgHC6BOXw++luyRbgml6aZkF6K
-         EuOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773762467; x=1774367267;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BWTbSNP2WHzhEIrAEAxvT9LPjTJQPOi5iCIjuQ8jmQA=;
-        b=o8MwCbwaEm0HFjHLsw7tbAkVaUgyHnE1j+ZIjNnVjIdsbicE55QY3RHnY5fDAivYFl
-         Y6MM5emJRGSipjY0XYa1x1LfMx7d4ToMRWvwWcnebGz+arenpISdXYA6LyYfS5WY1YbB
-         b7ul+aSC7xhnzY99cBqs4/C/N4QEcwIW4s/08fETrjun7g0vpqhK0r7j4mWGfYHGRzKV
-         I1hIIHm6AxIG/Y4DZV9xx2ZjfDt0k56WePjHDI3R706mLj5s7IwfkpgsYt14w5rKBy1p
-         Yj8XP+h4GuO75chVcu/VnVZObHwPnb8R25ygf5arUjkefGi3EPFvkNmYOYkNIXUH8WUz
-         r8sw==
-X-Forwarded-Encrypted: i=1; AJvYcCVMy2z66MweRf76ttU/A+9AjpHXcWm9mSn8CaxcLjc0HgC4jIPS8iKvHda1gqwRT/4cunqOzU0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRPmrMvlKYTWUexPP6p5/Ozw1aRXPOJ0JQTCtWoC+sTRsg+3aZ
-	1dayf7XUlLij4dOCw70vKPHkuRf5kUTFsLgeOkEM3M2X6v0yWL3FMgS8+ZB3EHZDCAA=
-X-Gm-Gg: ATEYQzwaZ+fND2zbKYLJ2SEI3ylcL01+CCtR1DzRM/vpLRncMdup2I1vv4R1uZxnSSP
-	oEBRe1liMpujFRqvKNR3nC5tXFMuohwB1TJCbepL4MkEPyJTpAaGQbqcZ7bzvMErSO/VUqqdq5o
-	vPIcm4hcu7amWAWIHCWfMPvfmAvcLly+abtT882vInkvqaavF0lzxlipOXcNYiza2DIYMVqAEqm
-	XThh6vNi4b1K3ERcD8ffJ9mSVwyHLXELHkzffdeIsin0RXAumrKMFlWLO1FAxBxh+mZP7qowL4y
-	4KCPsUlj4kh8nbRxrlaALkRHFcKo8bVMDNyk4lr5MmFauXZatAuMUWQk3arYHZYD49TqksYZ7OI
-	X4HaILh2nMFfcn8amBMjQxV6sjpGVM/uPJq2toIEiGKHpydUpTIYn9+5XR0P2yPxOyIa9W76qXG
-	/Pm6kVdcz78Z3rF7kakp7eR4PAoApolfSDc3hpebrtLYgNhcecOsLbmPthn9uSDaWBB6gYVf9Aw
-	NVpTy7Wn5lwIxk=
-X-Received: by 2002:a05:600c:8483:b0:485:3f72:3230 with SMTP id 5b1f17b1804b1-486f4430051mr276845e9.15.1773762466590;
-        Tue, 17 Mar 2026 08:47:46 -0700 (PDT)
-Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4856ea8fad1sm132412305e9.1.2026.03.17.08.47.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Mar 2026 08:47:45 -0700 (PDT)
-Message-ID: <085c9532-5440-4879-bcde-4d70c980c839@linbit.com>
-Date: Tue, 17 Mar 2026 16:47:44 +0100
+	s=arc-20240116; t=1773762627; c=relaxed/simple;
+	bh=HCwVp7+lOBovxuC973RVOpigY41qLdZOHjba578u8Vk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K9b+X2+PXG3eQg9oCvlB+VOFeqJk7F+j4TtNZOw2rYj0bZDvdiHXsBpWZXYwLYZaWGBal4kbf8FUn8cWFdbsFrDD6mcqi9ZvqjlBeE8zmpfUChsgABtbiGdRkhaHaa3HGddf46YozkRP/B1AaNsI48+wVnSnwquSdEVVUgP5BOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dAA//BHw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 012AFC4CEF7;
+	Tue, 17 Mar 2026 15:50:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773762626;
+	bh=HCwVp7+lOBovxuC973RVOpigY41qLdZOHjba578u8Vk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dAA//BHwK7ycYboaUTZKCLJR3naxTVJLH9Mj/84DNRmAAMC6f5cZHt1JA2bCb6ozE
+	 wx/9ISxSFb5ddul2gw0cOUmSAxl7/XvSb6HNjembVxAK9NMsCC34FJNeukf39f/kFO
+	 QvZRJkb7h8eNCEcSgaHdYnGBSS/PPG9edVy0qGvegacIiO7thjc59wDzGlhqTrKVP3
+	 Gf+XgP4LmrK02iEeB8O1rB8oVF0Rif4i5gMGQvHFxxqF4xg1YKkqcUxmDYr46iD9Gm
+	 asuthqNejYVEyzrG3UxZGStYqXGzKXLZXWmW8BVaY5Dv8kv0XeGMAKYzFwSStVJLw2
+	 Q2ymQ2HfShoBw==
+Date: Tue, 17 Mar 2026 08:50:25 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: <anthony.l.nguyen@intel.com>, <horms@kernel.org>, <edumazet@google.com>,
+ <sdf@fomichev.me>, <aleksandr.loktionov@intel.com>, <ast@kernel.org>,
+ <john.fastabend@gmail.com>, <bpf@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+ <hawk@kernel.org>, <nxne.cnse.osdt.itp.upstreaming@intel.com>,
+ <magnus.karlsson@intel.com>, <pabeni@redhat.com>,
+ <jacob.e.keller@intel.com>, <daniel@iogearbox.net>,
+ <maciej.fijalkowski@intel.com>
+Subject: Re: [net-next,3/5] ice: migrate to netdev ops lock
+Message-ID: <20260317085025.6459821c@kernel.org>
+In-Reply-To: <a95fa7f2-909e-4b1c-b25a-1ee88b292ecf@intel.com>
+References: <20260310220624.537917-4-anthony.l.nguyen@intel.com>
+	<20260313014628.1509116-1-kuba@kernel.org>
+	<4537e162-6610-4c3f-b8d5-e62415322282@intel.com>
+	<20260316161630.2d9ac04e@kernel.org>
+	<a95fa7f2-909e-4b1c-b25a-1ee88b292ecf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] genetlink: add multi-version family support for
- protocol negotiation
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Alok Tiwari <alok.a.tiwari@oracle.com>, Kees Cook <kees@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260316151507.3958299-2-christoph.boehmwalder@linbit.com>
- <20260316113736.1085a124@kernel.org>
-From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Content-Language: en-US
-In-Reply-To: <20260316113736.1085a124@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.56 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[linbit-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[linbit.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linbit-com.20230601.gappssmtp.com:+];
-	TAGGED_FROM(0.00)[bounces-268662-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268663-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,kernel.org,google.com,fomichev.me,gmail.com,vger.kernel.org,davemloft.net,lunn.ch,redhat.com,iogearbox.net];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[christoph.boehmwalder@linbit.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linbit-com.20230601.gappssmtp.com:dkim,linbit.com:mid]
-X-Rspamd-Queue-Id: 1D7472AD48C
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 099362AD4F9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Am 16.03.26 um 19:37 schrieb Jakub Kicinski:
-> What's the delta between the families? Do you have any examples of 
-> the the version ends up being used?
+On Tue, 17 Mar 2026 16:30:26 +0100 Alexander Lobakin wrote:
+> BTW, if it's not top secret, how do you run these AI reviews? Because
+> Tony used the same link as these reports provide to deploy a setup, but
+> we didn't manage to get as meaningful results as yours. That's why
+> several respins of this series only due to your AI reviews, sorry =\
 
-The main difference between DRBD 8 and 9 in general is that 8 only
-replicates to a single peer, while 9 has support for multiple peers.
-This also introduces major changes in the genl family. For example, the
-"connect" command works completely differently between the v1 and v2
-families.
-In v1, it takes all the net_conf parameters and immediately sets up the
-connection.
-In v2, you need a new_peer / new_path command first; the net_conf is
-passed to new_peer in this case. The connect command then only
-"activates" the connection.
-So the semantics are completely different.
+Nothing secret, I didn't push it to the main NIPA repo because it
+mostly vibecoded crap which is embarrassing. You can see it here:
 
-Other commands (like "state_info") were removed entirely and split up
-into different commands.
+https://github.com/kuba-moo/nipa/tree/air
 
-The specific exact diff is available as part of our prototype DRBD 9
-branch (included in linux-next):
-https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/diff/include/linux/drbd_genl.h?id=11b8887a3efae2868037f2bd8dbbc68a8591f66c
+It is just Chris's prompts + semcode. We run the prompts with
+sub-agents enabled (the "orc" prompt). Right now it runs on Claude,
+the subagents are supposed to pick the model by themselves depending 
+on complexity.
 
-As for the usage: the plan is for drbd to register its family with
-min_version=1, max_version=2. Then we would dispatch the v2 commands
-normally, and the v1 commands through a thin compat layer.
-In the in-tree DRBD, the version is currently unused. In the (still
-out-of-tree) DRBD 9 though, we do check that the version is what we expect:
-https://github.com/LINBIT/drbd/blob/master/drbd/drbd_nl.c#L426
-
-This would be replaced by the mentioned compat dispatch logic once we
-have in-kernel infrastructure for supporting multiple versions.
-
-Best Regards,
-Christoph
-
--- 
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
-
+I don't think we do anything special, if anything it's probably the
+mode (orc mode thing) that makes a difference?
 
