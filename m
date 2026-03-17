@@ -1,357 +1,250 @@
-Return-Path: <netdev+bounces-268575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268566-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WM13A8Y7uWmvwAEAu9opvQ
-	(envelope-from <netdev+bounces-268575-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:32:22 +0100
+	id oJOzHTc7uWmvwAEAu9opvQ
+	(envelope-from <netdev+bounces-268566-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:29:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B10732A8D72
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:32:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13B862A8B94
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:29:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2FEF9308C597
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:30:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 088FD3039F7B
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46DA3AF651;
-	Tue, 17 Mar 2026 11:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB6E3932F0;
+	Tue, 17 Mar 2026 11:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="IUNa/SaA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PiD4dPhS";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="sWzBeiYU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C733AE19A;
-	Tue, 17 Mar 2026 11:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F86A34403D
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 11:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773746983; cv=none; b=taaZmCMpOCKAUDCaQuSjipupdwaFsxJ4VYQfCkdF1RUBTRdOYzCFpsNDg+qZddxlR1PN6RbVz+UkhfWnWAKZxBiPV5V38mIZqNkTTwQlLci1TPRPPDRupLD1gYNlGSuSki0Dn7fvhTMRxBz1435lRTg8cRTAeEmHKJPH/MRQZD4=
+	t=1773746965; cv=none; b=ooQGgdIwm5HwV7E674GVBvfJMiqCVOcHKQrAMTjRv7z8Yh3UCdSM9RTBZcb7GYyq0RuOQrYuV5dzlz/tEpMkt66feFV50KMK7enhQagAR9iNJFkk82BLP3sBedFwx6L23IYYLcePUQw12RMJR8+yTGxNBxET/yKQlIMWm1oTp+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773746983; c=relaxed/simple;
-	bh=cv6wZ8dWLrgsnV3oBF+YY6vLLKiC/IoeN0IEuXPcyfg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LJ+SfuODkoKIm6RkLMZ7m7PDzGSinh+sInuM9BrdfbvMumYL2zyREH6DDEcj/2RKusbVM1rZeKKFniBKc24HId6zuUm1T9Vhyo80K33HJkRnoyTrmG/Vh5VfBQHqOw8qt91zh69u3IojFMx2EttZmBNQcLjkIgdlHuagaP7eTEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=IUNa/SaA; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 0AD236026B;
-	Tue, 17 Mar 2026 12:29:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1773746980;
-	bh=ZYJeK+aud/ltHHtuFINdU7sSNOijRKxbP50/Tcgt9Mo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IUNa/SaA05Bdzm8fcNC++Deh/pA/njvLf2sEm+Hkpd7EYk2sj+mkK+1RzFsGIeCKv
-	 CCPGl5BWZdCeTgvbUziW6/otRPDT5v+ehROFmyQgbrLlQY3r4xhM4Y4I8l/fMy5jgH
-	 IwkPnlDKXnto9LfROjpCxOVYUCHAc7lhE57ECQfnt6eASj1a85nb4rpMekUkNWYGvq
-	 ZaMhl6dX1d8uex/VUCWVJpUU/S/c2nI1JG3D7FuIuDn+W+3zq54Q+clqhPzD073lUQ
-	 C/s0M0PUIH3Si39hCXBybopskFbM4igTaaaz+WoFDsU5ApKLKnYZg08eFNUCiUSxz7
-	 f2NmsVmNGVEeg==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org,
-	steffen.klassert@secunet.com,
-	antony.antony@secunet.com
-Subject: [PATCH net-next,RFC 8/8] net: add dev_queue_xmit_list() and use it
+	s=arc-20240116; t=1773746965; c=relaxed/simple;
+	bh=4CSx9ZjbeRXfiJMtz5ON1cC5JPSin5oI4O9rPe/Ec7U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Nnk5WdC1WxeEgzF1goSJsUmNkHyc5HaGihrtLPzX3hmm9pXWkmswzcPogHildNVmo9/38DSqsZTQ0FJoVLM4LdkrmxGKUoCdkGt7a4LxtKHZauNVUL5nY5CGmlxkza/iLZsBFaiDRDsstKfB2yp1awNMnW11CTH4XyT7O+JPt24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PiD4dPhS; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=sWzBeiYU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773746962;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dFs80zw2O4/2NJrV7I0/zYaOrXH4RPoeh7BrpBnFPW0=;
+	b=PiD4dPhSmic8eSbnKmpg6kHiBFhUA0GuO6qOkVD9BBzZfEUA+/azLwKZoNN2/2SneBFj3U
+	ze8FfldDeWAGTkS5b1vKJH3c7I+qSQ4HPuSzNNn5DjW0cnMZtNsBjA/PNhCJs75ag1SVcp
+	miMJIDMfPtAR4hlbJo1ftDLRuPPkYf8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-55-v0ydwhs2Oau2_LtKPP_T4Q-1; Tue, 17 Mar 2026 07:29:21 -0400
+X-MC-Unique: v0ydwhs2Oau2_LtKPP_T4Q-1
+X-Mimecast-MFC-AGG-ID: v0ydwhs2Oau2_LtKPP_T4Q_1773746960
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4839fc4cef6so5651235e9.0
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 04:29:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1773746960; x=1774351760; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dFs80zw2O4/2NJrV7I0/zYaOrXH4RPoeh7BrpBnFPW0=;
+        b=sWzBeiYUy8H7s5XxDhNTm8JhTr3wPEQgGlQP3c3viaNdE90HLM3f96NJxqVT7MAtGa
+         7a0EQ5XoI8atBx6RqDvpxhagFgDH5UNPbXtgSTxifTlQ/B2+qtukmDYb1I5HHs15JFzt
+         s8f/nHnKAYRd1ip4042zgVFIXXazGb/CqIPReSFYGOV+r+ssDlIJ+fFl8sK4hIJJ/lQx
+         LZwa6fFUCxlt4G96sniheg7joW+WQgVP48iv38YUe3FIS1Vsxni2XAXWXZSqVp5Od3WK
+         gMyStnPTfcefdJ7JdDNsQDJ8PNIhpntaox2CHJy/JWsdLmZVYCjg30Q5NDZZOm/P3MYn
+         wULw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773746960; x=1774351760;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dFs80zw2O4/2NJrV7I0/zYaOrXH4RPoeh7BrpBnFPW0=;
+        b=jqnihRNepsqfzqWFJYzqY72Pt8exK0J5lKj91AvdSju1npyz+u8nf8oVqYYl7Qgv8B
+         y3MLZCDBE/6Rkgc76rE7O7Dsbh6flg4tXX+h8Ki1k5AL0rJ0iRUG/fXFoqAkPAYOLAR+
+         0k22+LqKNM9eRxk5j3uAANd0Vs7e+RvB9EcSP6c1YpCkYqTQCKqjAhAvSTcyo0BuardF
+         e94AfBKsAZWd10jvJOA2EFi1Tt9r2XJVfx1f7RyLIR8HkT6b8kKQf8Sk+aLuzwZGu/ZN
+         y/DQWdDkzEyC42X1EFxtCqCWU47hNmkoehbFGveFG5S5+CciLkkzBWk22I18HNv0M1G/
+         w4ew==
+X-Forwarded-Encrypted: i=1; AJvYcCVBqhrklXnrLK+TdkX/DirXpDdopQnA4Z2/goXbXZbXZlcKtgKkXvUD6mF91a7DxED3/5vYVfA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIECVHrtmKi0TqjP+R8/e0ojDHjdFbVTLL26YhfzABWo/JqAyx
+	vdrOkDvlettOSdHy+RjI0xiRfNILn1CBt6U2UGWMhkX0AMjR5QY2QVdGmR1Qz2z8Rk4sI4oFZ0J
+	+GEjRNPB0h9F1rVB9enBiLE2zwn2L22TjzktMPIp/W4Fank2X7MUMQZEi9g==
+X-Gm-Gg: ATEYQzw4jYynhD5BVD+BHG+oNLnoKY73H58yV5CK5kXWwrmgnZfb0JHGmaxam14B1F9
+	KuvSRaFI+kkggM/4HAOF7DJTWyBGZZ1sSZeSf8d3eRjTDapcsRhFrbUVVNNP+9bF++wXn+aT66Z
+	uIglyW2dXh1y+JlPYOLgbImqG+goERYfFCr5xKGn86FaA08UMMxDaikfqNy1ToO7tFVs50h4URX
+	UxOEr0RcZcejxA1yCF5PxaLDPs7+5FWZYMz3aR8oHYIhi6tU/IrtC7TZsyrylkHMelQ/y7rfybs
+	eZytU1530utl3fAd9luBiQZsJZe5uza+FIO/dHAb/aJMr76pQVE5flbcv7QWu8OeIBdUjR4KCi0
+	1qOKyBiFLuxkt/UcTdVfXrANXeMznJj6D/lfEefWcEUUfHOJNkdL6Q9g=
+X-Received: by 2002:a05:600c:5249:b0:485:38f1:5cec with SMTP id 5b1f17b1804b1-4856eac2b35mr51298685e9.7.1773746959754;
+        Tue, 17 Mar 2026 04:29:19 -0700 (PDT)
+X-Received: by 2002:a05:600c:5249:b0:485:38f1:5cec with SMTP id 5b1f17b1804b1-4856eac2b35mr51298285e9.7.1773746959237;
+        Tue, 17 Mar 2026 04:29:19 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.95])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4857f224d5asm16069915e9.24.2026.03.17.04.29.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Mar 2026 04:29:18 -0700 (PDT)
+Message-ID: <bc3a66a1-8c0d-4038-9b92-0fe3d10b1555@redhat.com>
 Date: Tue, 17 Mar 2026 12:29:17 +0100
-Message-ID: <20260317112917.4170466-9-pablo@netfilter.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260317112917.4170466-1-pablo@netfilter.org>
-References: <20260317112917.4170466-1-pablo@netfilter.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v10 1/2] virtio-net: correct hdr_len handling for
+ VIRTIO_NET_F_GUEST_HDRLEN
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>, Alvaro Karsz <alvaro.karsz@solid-run.com>,
+ virtualization@lists.linux.dev
+References: <20260313075930.105466-1-xuanzhuo@linux.alibaba.com>
+ <20260313075930.105466-2-xuanzhuo@linux.alibaba.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260313075930.105466-2-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	DMARC_NA(0.00)[netfilter.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268575-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,resnulli.us,solid-run.com,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-268566-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,netfilter.org:dkim,netfilter.org:email,netfilter.org:mid]
-X-Rspamd-Queue-Id: B10732A8D72
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,alibaba.com:email]
+X-Rspamd-Queue-Id: 13B862A8B94
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add listified skb tx path and use it to implement the flowtable TX
-datapath. Use the dev_dst_drop() and dev_noqueue_xmit_list() helper
-functions to build dev_queue_xmit_list().
+On 3/13/26 8:59 AM, Xuan Zhuo wrote:
+> The commit be50da3e9d4a ("net: virtio_net: implement exact header length
+> guest feature") introduces support for the VIRTIO_NET_F_GUEST_HDRLEN
+> feature in virtio-net.
+> 
+> This feature requires virtio-net to set hdr_len to the actual header
+> length of the packet when transmitting, the number of
+> bytes from the start of the packet to the beginning of the
+> transport-layer payload.
+> 
+> However, in practice, hdr_len was being set using skb_headlen(skb),
+> which is clearly incorrect. This commit fixes that issue.
+> 
+> Fixes: be50da3e9d4a ("net: virtio_net: implement exact header length guest feature")
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/net/tun_vnet.h     |  2 +-
+>  drivers/net/virtio_net.c   |  6 +++++-
+>  include/linux/virtio_net.h | 33 +++++++++++++++++++++++++++++----
+>  3 files changed, 35 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
+> index a5f93b6c4482..fa5cab9d3e55 100644
+> --- a/drivers/net/tun_vnet.h
+> +++ b/drivers/net/tun_vnet.h
+> @@ -244,7 +244,7 @@ tun_vnet_hdr_tnl_from_skb(unsigned int flags,
+>  
+>  	if (virtio_net_hdr_tnl_from_skb(skb, tnl_hdr, has_tnl_offload,
+>  					tun_vnet_is_little_endian(flags),
+> -					vlan_hlen, true)) {
+> +					vlan_hlen, true, false)) {
+>  		struct virtio_net_hdr_v1 *hdr = &tnl_hdr->hash_hdr.hdr;
+>  		struct skb_shared_info *sinfo = skb_shinfo(skb);
+>  
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 72d6a9c6a5a2..7106333ef904 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3267,8 +3267,12 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
+>  	struct virtio_net_hdr_v1_hash_tunnel *hdr;
+>  	int num_sg;
+>  	unsigned hdr_len = vi->hdr_len;
+> +	bool feature_hdrlen;
+>  	bool can_push;
+>  
+> +	feature_hdrlen = virtio_has_feature(vi->vdev,
+> +					    VIRTIO_NET_F_GUEST_HDRLEN);
+> +
+>  	pr_debug("%s: xmit %p %pM\n", vi->dev->name, skb, dest);
+>  
+>  	/* Make sure it's safe to cast between formats */
+> @@ -3288,7 +3292,7 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
+>  
+>  	if (virtio_net_hdr_tnl_from_skb(skb, hdr, vi->tx_tnl,
+>  					virtio_is_little_endian(vi->vdev), 0,
+> -					false))
+> +					false, feature_hdrlen))
+>  		return -EPROTO;
+>  
+>  	if (vi->mergeable_rx_bufs)
+> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+> index 75dabb763c65..48de4a16a96a 100644
+> --- a/include/linux/virtio_net.h
+> +++ b/include/linux/virtio_net.h
+> @@ -207,6 +207,22 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+>  	return __virtio_net_hdr_to_skb(skb, hdr, little_endian, hdr->gso_type);
+>  }
+>  
+> +static inline void virtio_net_set_hdrlen(const struct sk_buff *skb,
+> +					 struct virtio_net_hdr *hdr,
+> +					 bool little_endian)
+> +{
+> +	u16 hdr_len;
+> +
+> +	hdr_len = skb_transport_offset(skb);
+> +
+> +	if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
+> +		hdr_len += sizeof(struct udphdr);
+> +	else
+> +		hdr_len += tcp_hdrlen(skb);
+> +
+> +	hdr->hdr_len = __cpu_to_virtio16(little_endian, hdr_len);
+> +}
 
-100dfa74cad9 ("net: dev_queue_xmit() llist adoption") requires to
-reverse the skb list and then splice this list to the the last pending
-skbuff for transmission.
+The series LGTM, let's wait for Jason and or Michael.
 
-A few notes:
+If another revision is needed, please consider factoring out a
+__virtio_net_set_hdrlen() helper taking an additional explicit
+transport_offset argument, to deduplicate a bit the code between patch
+1/2 and 2.2. Not a blocked anyway for me.
 
-- I removed:
-
-       if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_SCHED_TSTAMP))
-               return -1;
-
-Only possible if skb->sk is set on, if my assumption is not correct, this
-can be checked from flowtable path.
-
-Reducing the size of dev_queue_xmit_list() is convenient, to focus only
-on speeding up what it can be really speed up, so let's return -1 if
-either:
-
-- qdisc is not empty
-
-OR
-
-- qdisc is not work-conserving (no TCQ_F_CAN_BYPASS is set on)
-
-Then, the flowtable falls back to call dev_queue_xmit() for each single
-skbuff.
-
-Co-developed-by: Steffen Klassert <steffen.klassert@secunet.com>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- include/linux/netdevice.h        |   2 +
- net/core/dev.c                   | 157 +++++++++++++++++++++++++++++++
- net/netfilter/nf_flow_table_ip.c |  18 ++--
- 3 files changed, 169 insertions(+), 8 deletions(-)
-
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index c0174aa1037f..34747e9b85d2 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3401,6 +3401,8 @@ static inline int dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
- 	return ret;
- }
- 
-+int dev_queue_xmit_list(struct sk_buff *skb);
-+
- int register_netdevice(struct net_device *dev);
- void unregister_netdevice_queue(struct net_device *dev, struct list_head *head);
- void unregister_netdevice_many(struct list_head *head);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 8f5bef5a715c..8f114f5af537 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4920,6 +4920,163 @@ int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
- }
- EXPORT_SYMBOL(__dev_direct_xmit);
- 
-+static int dev_queue_xmit_skb_list(struct sk_buff *skb, struct Qdisc *q,
-+				   struct net_device *dev,
-+				   struct netdev_queue *txq)
-+{
-+	struct sk_buff *next, *to_free = NULL, *to_free2 = NULL;
-+	spinlock_t *root_lock = qdisc_lock(q);
-+	struct llist_node *ll_list, *first_n;
-+	unsigned long defer_count = 0;
-+	int rc = -1;
-+
-+	tcf_set_drop_reason(skb, SKB_DROP_REASON_QDISC_DROP);
-+
-+	if (q->flags & TCQ_F_NOLOCK) {
-+		if (q->flags & TCQ_F_CAN_BYPASS && nolock_qdisc_is_empty(q) &&
-+		    qdisc_run_begin(q)) {
-+			/* Retest nolock_qdisc_is_empty() within the protection
-+			 * of q->seqlock to protect from racing with requeuing.
-+			 */
-+			if (unlikely(!nolock_qdisc_is_empty(q))) {
-+				to_free2 = qdisc_run_end(q);
-+				goto free_skbs;
-+			}
-+
-+			if (sch_direct_xmit(skb, q, dev, txq, NULL, false) &&
-+			    !nolock_qdisc_is_empty(q))
-+				__qdisc_run(q);
-+
-+			to_free2 = qdisc_run_end(q);
-+			rc = NET_XMIT_SUCCESS;
-+			goto free_skbs;
-+		}
-+	}
-+
-+	/* Transform skb list to llist in reverse order to splice this batch
-+	 * into the defer_list. The next field of skb chain and llist use the
-+	 * memory layout.
-+	 */
-+	ll_list = llist_reverse_order(&skb->ll_node);
-+
-+	/* Open code llist_add(&skb->ll_node, &q->defer_list) + queue limit.
-+	 * In the try_cmpxchg() loop, we want to increment q->defer_count
-+	 * at most once to limit the number of skbs in defer_list.
-+	 * We perform the defer_count increment only if the list is not empty,
-+	 * because some arches have slow atomic_long_inc_return().
-+	 */
-+	first_n = READ_ONCE(q->defer_list.first);
-+	do {
-+		if (first_n && !defer_count) {
-+			defer_count = atomic_long_inc_return(&q->defer_count);
-+			if (unlikely(defer_count > READ_ONCE(net_hotdata.qdisc_max_burst))) {
-+				kfree_skb_reason(skb, SKB_DROP_REASON_QDISC_BURST_DROP);
-+				return NET_XMIT_DROP;
-+			}
-+                }
-+		/* Splice using last skb in the reverse list. */
-+		skb->ll_node.next = first_n;
-+	} while (!try_cmpxchg(&q->defer_list.first, &first_n, ll_list));
-+
-+	/* If defer_list was not empty, we know the cpu which queued
-+	 * the first skb will process the whole list for us.
-+	 */
-+	if (first_n)
-+		return NET_XMIT_SUCCESS;
-+
-+	spin_lock(root_lock);
-+
-+	ll_list = llist_del_all(&q->defer_list);
-+	/* There is a small race because we clear defer_count not atomically
-+	 * with the prior llist_del_all(). This means defer_list could grow
-+	 * over qdisc_max_burst.
-+	 */
-+	atomic_long_set(&q->defer_count, 0);
-+
-+	ll_list = llist_reverse_order(ll_list);
-+
-+	if (unlikely(test_bit(__QDISC_STATE_DEACTIVATED, &q->state))) {
-+		llist_for_each_entry_safe(skb, next, ll_list, ll_node)
-+			__qdisc_drop(skb, &to_free);
-+		rc = NET_XMIT_DROP;
-+		goto unlock;
-+	}
-+
-+	if ((q->flags & TCQ_F_CAN_BYPASS) && !qdisc_qlen(q) &&
-+	    !llist_next(ll_list) && qdisc_run_begin(q)) {
-+		/*
-+		 * This is a work-conserving queue; there are no old skbs
-+		 * waiting to be sent out; and the qdisc is not running -
-+		 * xmit the skb directly.
-+		 */
-+		DEBUG_NET_WARN_ON_ONCE(skb != llist_entry(ll_list,
-+							  struct sk_buff,
-+							  ll_node));
-+		qdisc_bstats_update(q, skb);
-+		if (sch_direct_xmit(skb, q, dev, txq, root_lock, true))
-+			__qdisc_run(q);
-+		to_free2 = qdisc_run_end(q);
-+		rc = NET_XMIT_SUCCESS;
-+	}
-+unlock:
-+	spin_unlock(root_lock);
-+
-+free_skbs:
-+	tcf_kfree_skb_list(to_free);
-+	tcf_kfree_skb_list(to_free2);
-+	return rc;
-+}
-+
-+int dev_queue_xmit_list(struct sk_buff *skb)
-+{
-+	struct net_device *dev = skb->dev;
-+	struct netdev_queue *txq;
-+	struct sk_buff *iter;
-+	struct Qdisc *q;
-+	int rc;
-+
-+	/* Disable soft irqs for various locks below. Also
-+	 * stops preemption for RCU.
-+	 */
-+	rcu_read_lock_bh();
-+
-+	/* Intentionally, no egress hooks here. This is called from the ingress
-+	 * path, which should have already classified packets before calling
-+	 * this function.
-+	 */
-+
-+	txq = netdev_tx_queue_mapping(dev, skb);
-+	if (!txq)
-+		txq = netdev_core_pick_tx(dev, skb, NULL);
-+
-+	q = rcu_dereference_bh(txq->qdisc);
-+
-+	iter = skb;
-+	while (iter) {
-+		dev_dst_drop(dev, iter);
-+		skb_copy_queue_mapping(iter, skb);
-+		iter = iter->next;
-+	}
-+
-+	if (q->enqueue) {
-+		rc = dev_queue_xmit_skb_list(skb, q, dev, txq);
-+		goto out;
-+	}
-+
-+	rc = dev_noqueue_xmit_list(skb, dev, txq);
-+	rcu_read_unlock_bh();
-+
-+	if (rc < 0) {
-+		dev_core_stats_tx_dropped_inc(dev);
-+		kfree_skb_list(skb);
-+	}
-+	return rc;
-+out:
-+	rcu_read_unlock_bh();
-+	return rc;
-+}
-+EXPORT_SYMBOL(dev_queue_xmit_list);
-+
- /*************************************************************************
-  *			Receiver routines
-  *************************************************************************/
-diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-index 98b5d5e022c8..3d2d02be0f0d 100644
---- a/net/netfilter/nf_flow_table_ip.c
-+++ b/net/netfilter/nf_flow_table_ip.c
-@@ -863,14 +863,16 @@ static void nf_flow_neigh_xmit_list(struct sk_buff *skb, struct net_device *outd
- 		iter = iter->next;
- 	}
- 
--	iter = skb;
--	while (iter) {
--		struct sk_buff *next;
--
--		next = iter->next;
--		iter->next = NULL;
--		dev_queue_xmit(iter);
--		iter = next;
-+	if (dev_queue_xmit_list(skb) == -1) {
-+		iter = skb;
-+		while (iter) {
-+			struct sk_buff *next;
-+
-+			next = iter->next;
-+			iter->next = NULL;
-+			dev_queue_xmit(iter);
-+			iter = next;
-+		}
- 	}
- }
- 
--- 
-2.47.3
+/P
 
 
