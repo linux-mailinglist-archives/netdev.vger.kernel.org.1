@@ -1,199 +1,163 @@
-Return-Path: <netdev+bounces-268603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268604-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UHw3H6NVuWnYAgIAu9opvQ
-	(envelope-from <netdev+bounces-268603-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:22:43 +0100
+	id yK+sDZZWuWnYAgIAu9opvQ
+	(envelope-from <netdev+bounces-268604-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:26:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76B762AAC67
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:22:42 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A52E12AAD69
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:26:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 62B7C3040F3C
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:11:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E0A3E30B0208
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC25E3CA48A;
-	Tue, 17 Mar 2026 13:11:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F1B3CBE87;
+	Tue, 17 Mar 2026 13:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="EPue8tD3"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="doUzSZJH"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D333A5E71;
-	Tue, 17 Mar 2026 13:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5A73CB2C3
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 13:22:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773753102; cv=none; b=hk0iGn32mTpqeVLf/gvYH2cVHTZ4qTcZotYxic/Fa7n62iB/bLy5JJc7O0Iq6aUUgw7fAhcNt0ICIgRddzqZCH10wqngCmq9lKcd3RaviCJMrTieCUb7MfuugedH7zjY9wcMPqI4+htzHkrxz1dx0qD86MRwSNdTyYZtFGAnL5E=
+	t=1773753762; cv=none; b=qgJQEkuApA465DGpU8tSUR7oHYm3qeD/SWmZKpnBD16tx60dKEiqebXOhb1AzBS/BB+jYfehTS3duDDfHMKm0sh5oCuKtUAb4xL0giBtx1vq+gx3l/dbMz0vIql2ljZ51NfOBnFkfhnxx75GD8obIF3YB8Ha7O1Qd/3LZwpQRI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773753102; c=relaxed/simple;
-	bh=J8k7FTZIqVHfmNw+1TbR8Tjv/+Yx+BVsPl6Elo2H/Zw=;
+	s=arc-20240116; t=1773753762; c=relaxed/simple;
+	bh=MAPRBQrsmlR+ctLXsk0UD+nGbNi7DGZvwoI5nYD81WU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AsIOzIOZ0kkmC30J+ZnJA9dnB8Xnl1SrE89oUx0wEwCu7Sss6sKGoNNQCj/PfqlRHwvuA76pzBjH+TNytkTkAn/f/8Mdn7dgxA/Sbq/Wq9t2KYYESEE9I5d7IsxWZ7paPkAdjpysyZA1fgF26r06WyNQMf4E0pN1s9g2HEPyiyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=EPue8tD3; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wVX+e0F9KN8dfj/SwmnvICc5jP1yDHnEZ0Sn7ozoJNs=; b=EPue8tD3UjFJLyx+/NIDJIFQFG
-	CCdoKdaIuUH7eJ+4tYTn/wTRk4U9UzHLkBcTwnYjtu/CHI3q1EnJ8OewQDOdHV574I/ua1i2KjrRW
-	nkCrgvXJhhR+/9zsyJiTVlb6FfW43WjKokDq1KCt8MwUtRl/Xhx5k4HHazKF6A89/7AuzUZm8xC2T
-	h9C/Ubvqtb3MjEYh2KUtoCR5RwEzeUDZXmkoBRnbDG+n2B3ALsAKXB2hM/XIu6N40n7ORJVbrI9t3
-	3SASwFucwlFauZh+LFefZI35v/Uq8R7ND0OoYkbdR1cOhEutZM7ZBFcrngrETuzhPl+i1e5P8SoyB
-	ajRZrEMw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59600)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w2UCl-000000005EG-45Ud;
-	Tue, 17 Mar 2026 13:11:28 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w2UCi-00000000649-1jir;
-	Tue, 17 Mar 2026 13:11:24 +0000
-Date: Tue, 17 Mar 2026 13:11:24 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Linus Walleij <linusw@kernel.org>
-Cc: Christophe Roullier <christophe.roullier@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	antonio.borneo@foss.st.com,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] net: stmmac: fix pinctrl management during
- suspend/resume
-Message-ID: <ablS_C8oEQFeSU1Q@shell.armlinux.org.uk>
-References: <20260313105718.359614-1-christophe.roullier@foss.st.com>
- <20260313105718.359614-2-christophe.roullier@foss.st.com>
- <abPwHh12MLwMwOIs@shell.armlinux.org.uk>
- <CAD++jLmBP5Puwf1ZuFOzF6U0XowoF1nfqEL3gwLy-svXsXrbJA@mail.gmail.com>
- <abStv0IPLfkKMD-W@shell.armlinux.org.uk>
- <CAD++jL=Av5K7Ag95LYou4TMKGR59TmtiQpxcnpcj+4tZFtzRug@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fAz5se4apFvWQ/Rgd8cD0A/3tFO+5zRKMWCoWncVyDvaJUAm76jmGNn84t5ZkxBzqi6blT/SIF2HIU6zHImBwURMH4wcy0QBALru5Ahy171zfYuh+GtwdqM/hy4OMV0ZX7CuOurYAt25yP77joZgMUOpYots1CRD6UEbaV/CYuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=doUzSZJH; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-43b41b545d9so2949463f8f.2
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 06:22:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1773753757; x=1774358557; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SjtHn1mz2ERVQdx3tsJyIVFy5VgkRZINLg+TTVUhtdE=;
+        b=doUzSZJHWYFheR6Ton0zwohLWxTO02JjcvPQjQGtpXjdwsi4AICVhhGS5S0LXAUSmc
+         II4So7/aHF8qhwYyrGIT8HvaYHV1UGq8Uen/faKn/ZcZsWCkR2oxX1e5omi2BrhcU6vX
+         5pc50kKs3AMpLCsNZ1xrv+gS9O9oxnBdlruA07UK+f75gFl9KYVsjm0GHZCSWkNr5AY9
+         vI/Whn9lQE7326T6O7i3w/Z2zKWRwBg/86arTJwoiWABDplaz4KdFxP4EMJSCUV3Rs/o
+         s6YUh81x1WALkIMR/l26H2dH4Ui+RSYxDmk+td9dvNnfacFiTqvuBghHF3zW2RqC9V78
+         /fhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773753757; x=1774358557;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SjtHn1mz2ERVQdx3tsJyIVFy5VgkRZINLg+TTVUhtdE=;
+        b=fb+96RqTSTy2t0YQZGVwQlrMoec0C+h4VlkxSjSjykgdRMtA+TTETleb4xMVYMbu2m
+         KZ25B/LPWodd3/JGWrv1Ln0xq6o+jRj0JRYOyOAQW1SIVItOpSY9QHHcDzg73qyi69ar
+         ZmrhSBg9aOz58tVXPDDTczkuY22VpYS06qFeWC2yZo9W79F8Zb3i6m37FGEaDMTmbz6S
+         cJPmBOU58X/wLEynvrvcycu9SBzBVtpbwAGbK6JEzsrK0cge6K62PRcY9TVdiq/ZK3tr
+         XhWJtswdfUoqG4DCEOsRsV8QkgfToO+3427/IRmQ1MH04pM8DCMzmA7ti7gn2bj6Uqce
+         bgMg==
+X-Gm-Message-State: AOJu0YzErCyXYgsnapeSvNQsvDdMeT2iWVKiLTFelcoHNPaAe07S6vxN
+	5xk6cdVs+/7rjI7wXmPZYiOcOP1CZZ163utYCePB3pY24vfhY/1Vi/wwqQGWugtuqec=
+X-Gm-Gg: ATEYQzySTFka15UZEV1Ey2SL7k6AUZ64x9a9fB3keO4RxMKXesNt8aX0pAZ6mVeNbzK
+	JcIgCiq7qYQT9omAdJ9C52CAC7MQ5Kit1HcOFW5KwAuoubqpPA2xRGxqHTCoSaFIXzBmNEQHVdt
+	hNvcOgziO359+Cw87hoqZj9Dw3EAUV1NWgFOOrcGJ9RR2u+ngMUv8ZY1ingO9di/MWJzTZwOeJG
+	7sVvOO4zPZOYEsDk7DwHcT6wm/Iq6L/yPK/e982/XGU66b96rIS1+6udTtEgMEqbDQWoMy11MlJ
+	ibAzbqxHFyeSdH9IooZa7FdLz2IjNJ/24QbvxIq9VEfwfhY05sjsHDP+J1zTALWC0wf6O+yIfoi
+	r8r3mdTyRs0spb8hMSgrS6H7RUnNgz3Lf8MDu5O0GK86+hYSoGd1kZf3+1avDAArgl89M02Y5PX
+	Rt+70Yx0d7X96lACLO2v+lzZsnsRZ3QB75nwmOIzsL+w==
+X-Received: by 2002:a05:6000:2912:b0:43b:4e13:2220 with SMTP id ffacd0b85a97d-43b4e132b9cmr3563285f8f.41.1773753756316;
+        Tue, 17 Mar 2026 06:22:36 -0700 (PDT)
+Received: from FV6GYCPJ69 ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe21b631sm56946650f8f.27.2026.03.17.06.22.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Mar 2026 06:22:35 -0700 (PDT)
+Date: Tue, 17 Mar 2026 14:22:32 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, donald.hunter@gmail.com, 
+	chuck.lever@oracle.com, matttbe@kernel.org, cjubran@nvidia.com, shshitrit@nvidia.com, 
+	Saeed Mahameed <saeedm@nvidia.com>
+Subject: Re: [PATCH v4 net-next 2/5] devlink: Implement devlink param multi
+ attribute nested data values
+Message-ID: <f3l4lzzumqlkluikqv2a3fopzotgjnoadnbzqoc3wllgew62zy@jj2jaseglkop>
+References: <20260312022754.2029595-1-rkannoth@marvell.com>
+ <20260312022754.2029595-3-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAD++jL=Av5K7Ag95LYou4TMKGR59TmtiQpxcnpcj+4tZFtzRug@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+In-Reply-To: <20260312022754.2029595-3-rkannoth@marvell.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268603-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,bootlin.com,nxp.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268604-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,oracle.com,nvidia.com];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.600];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,armlinux.org.uk:email,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: 76B762AAC67
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,marvell.com:email,nvidia.com:email,resnulli-us.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: A52E12AAD69
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 17, 2026 at 01:13:14AM +0100, Linus Walleij wrote:
-> On Sat, Mar 14, 2026 at 1:37 AM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> > On Sat, Mar 14, 2026 at 12:44:56AM +0100, Linus Walleij wrote:
-> > > On Fri, Mar 13, 2026 at 12:08 PM Russell King (Oracle)
-> > > <linux@armlinux.org.uk> wrote:
-> > > > On Fri, Mar 13, 2026 at 11:57:16AM +0100, Christophe Roullier wrote:
-> > > > > In the deepest low-power modes, the pinctrl configuration is lost
-> > > > > and is never restored if the interface is down.
-> > > > > This commit ensures that the pinctrl state is set in all cases.
-> > > >
-> > > > Shouldn't the pin state be restored by the pinctrl layer?
-> > >
-> > > What we have in the device core only applies "init" and "default"
-> > > states, and provides these handles for transitioning to "sleep"
-> > > and "default" again (like a state machine).
-> >
-> > What I was meaning is that - for a driver using the "default" state,
-> > if the hardware loses the pinctrl state during sleep, isn't it the
-> > responsibility of the pinctrl driver to restore the state rather
-> > than leaving it in whatever states it happens to be when the SoC
-> > comes back from suspend?
-> 
-> Aha I understand.
+Thu, Mar 12, 2026 at 03:27:51AM +0100, rkannoth@marvell.com wrote:
+>From: Saeed Mahameed <saeedm@nvidia.com>
 
-I'm not so sure. My point is that if a driver binds, and pinctrl
-ends up using the default pinctrl settings, then should it not
-be the case that after a suspend/resume cycle, the pinctrl
-settings remain configured in the default state with no driver
-intervention?
+[..]
 
-This is my point - a driver that is unaware of pinctrl should not
-have to do anything special in its resume path to ensure that the
-pinctrl state that was configured by generic code at probe time
-is maintained after a resume - that state should not be lost.
+>+
+>+	case DEVLINK_PARAM_TYPE_U32_ARRAY:
+>+		cnt = 0;
+>+		nla_for_each_attr_type(param_data,
+>+				       DEVLINK_ATTR_PARAM_VALUE_DATA,
+>+				       genlmsg_data(info->genlhdr),
+>+				       genlmsg_len(info->genlhdr), rem) {
+>+			if (cnt >= __DEVLINK_PARAM_MAX_ARRAY_SIZE)
+>+				return -EMSGSIZE;
+>+
+>+			if (nla_len(param_data) != sizeof(u32))
+>+				return -EINVAL;
+>+
+>+			value->u32arr.val[cnt] = nla_get_u32(param_data);
 
-I'm trying to get an answer on this, because the original patch
-description here says:
+Now that we have UINT to be used everywhere for new netlink attributes,
+wouldn't it make sense to have rather UINT array?
 
-| In the deepest low-power modes, the pinctrl configuration is
-| lost and is never restored if the interface is down.
 
-stmmac uses the "default" pinctrl state at probe time. This commit
-says that is lost over suspend/resume - which to me sounds like
-a pinctrl driver bug, because on resume, the pinctrl driver is not
-ensuring that the pinctrl state is restored to whatever it was when
-the suspend happened (whether the driver explicitly changed it or
-not.)
+>+			cnt++;
+>+		}
+>+
+>+		value->u32arr.size = cnt;
+>+		break;
 
-To put it another way...
-
-On entry to probe for a non-pinctrl driver, if DT describes a default
-pinctrl state, that state will be selected by core code.
-
-On suspend, the driver is free to select another state if it so wishes,
-or do nothing (e.g. it's unaware of pinctrl.)
-
-On resume, the pinctrl layer, what is expected to happen. Surely, it
-is reasonable for a pinctrl unaware driver, or at least a driver which
-has _not_ changed the pinctrl state to expect that the default pinctrl
-state is still in effect when its resume function is called - and if
-that is not the case, then there's a bug here.
-
-Another way to put it...
-
-We shouldn't be expecting device drivers to have to mess with pinctrl
-e.g. switching to a sleep state and then back to a default state just
-to have pinctrl settings restored to a functional state on resume.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+[..]
 
