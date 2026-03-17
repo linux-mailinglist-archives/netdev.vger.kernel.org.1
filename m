@@ -1,137 +1,263 @@
-Return-Path: <netdev+bounces-268528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268529-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0K68HhUouWkAtAEAu9opvQ
-	(envelope-from <netdev+bounces-268528-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:08:21 +0100
+	id iLIKLj4ouWkAtAEAu9opvQ
+	(envelope-from <netdev+bounces-268529-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:09:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BADF02A78E2
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:08:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32ACC2A7919
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 88E2B303F89E
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:02:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 45EDA30996BC
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D48E39FCD1;
-	Tue, 17 Mar 2026 10:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689A43A4F3A;
+	Tue, 17 Mar 2026 10:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iLK1kV0b"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p0Bg2Nmm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442E835838B;
-	Tue, 17 Mar 2026 10:02:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773741762; cv=none; b=jCzAFskxAKNxosihU3I3/FgNDWb1M4Egjm1mz5r2XvByxTtafbKNawEQREpItUX91tg1x5ZyC2y0obSVRaO+PyCLDKTaAN1lc7hPwvhwBkQgf3RZ5nz4dM2c36wwF91Iqb+FH8ZSWXIa1dlu296BCHNpGHToHMQgU0WNogf9M+Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773741762; c=relaxed/simple;
-	bh=zOhE3MyoOIAA0bgcSSk1uYsIQSRxBFkKa/QEeH/yO6Y=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
-	 References:In-Reply-To; b=YiJ4YCIVG2AZ7kT+KrGi37ikAEv67pMEp6W7gfirU3nxzrrAZJtLF+dplIuaEl/MJ62HVkbaFxZlrJI2Lf0xhyYDcCLPAa0TzxyUdz+4hlBpNkSIoEbvV65GC2lSSLw3qNj1tfCBoBJu5K1RStwN0clVIULujcOL/bK4p3S+nWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iLK1kV0b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA0BCC4CEF7;
-	Tue, 17 Mar 2026 10:02:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773741761;
-	bh=zOhE3MyoOIAA0bgcSSk1uYsIQSRxBFkKa/QEeH/yO6Y=;
-	h=Date:Cc:To:From:Subject:References:In-Reply-To:From;
-	b=iLK1kV0bEUnBKSlVECk17rCfbiRFOK8e9m2VQ9Eam8FJnejzsncMSvQLAFJIvb1Pr
-	 Vrqp1T/Wu3PeHwdqqCKwH5HHxvI/GlAmEOIi3tfcPHkHrB8vT93is7PF8gwaUAqxb5
-	 JzSXmNuoes9ApijJJRYovbhvzhwBUi9fykKAQygrEKxHzTjISn8Gl4qVh9MTfnmzrh
-	 TNuhmnwPHHmX99KzVtklCPpGYF2T12iw9QXIf1B/lIEfIYXfpjXuCSQXEHjD38avMb
-	 Glyz74CIMcdU9eEVsElTX638WBp72ugjDLW4ZSO4Lo+vmLbkcaTgsemgoqv6sedF7Q
-	 8HzUvbG0bQqeA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B4B39FCD1
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 10:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773741867; cv=pass; b=DKrf/pT6kg372QgRXNSQ0EqAyVGIPhbGXUEBinjmF821kKjDWfsAWMuuTrg3dzT3z39so9l8CPBoFmKPPQjFASrg0rD/tB3xFPBjJsiBnwlZkvVrSSQZIvnxgOqRaV8Bw5FoJJpSPrYSE5Ig/qjGeOkxDFhJIb2QLn9w/SFF5vY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773741867; c=relaxed/simple;
+	bh=VMcaJiK0n+Mh3FmYhue0PD5uIx7SxJhXZnJ+mVJvuvY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EVbfSBx65VnspuPmZ22rfeVWXZPhpE2f3W9qJfe9aSBC9HpBp6ZS+D6BJoMpJx13/dfF7YGeFTC06upERMEvFpXAPLyOSSiQi2tlHEanUW8AUEzcd/TLba2Cm1o/wk1dJzFsiOGZkDkyHa6MCamwtDs3zpeok7VwA9Pe8to0J7s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=p0Bg2Nmm; arc=pass smtp.client-ip=74.125.224.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-64ad9238d8fso6318898d50.3
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 03:04:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773741863; cv=none;
+        d=google.com; s=arc-20240605;
+        b=HCXdKhoOeWIznYOa55rGI7b5lK/cgOCEsR+ZciB/KXfM5GlBP8uScfimO32lRk+ULt
+         wTYUMbLEyPefLc7ojPCTzZgzZMEisZ8aChlkeHVSrAyS9tdpsCWDoPW6TQ9v1JdnBwrr
+         Ch1KnwcB+/76obT/FhTOUIjn9CwKmf0Zi7O92NMePQZyDP4LeG7/bkz8zqAwRFSO4V3T
+         A399SQUbbjnPuyRjJP2uElEMQYgYluC7AQSsNIYXQ+mLjN4RZp09SwS4Itqh860BodNo
+         JxUNPFN+hvz95WCHwWr6JGNeOh1vT2WF+rrApVgBYLgZUsdWQdVusQhGKsOU/OmD9FTi
+         VbfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=sJ1Pc/1QKu2lLSHomCR6iKHtySw3Kp4fd1PA2wd2pgs=;
+        fh=zZg/bfcT5dS6qOa3hPpz1fP8NyVhMSILl4qyZVgg5QE=;
+        b=TAi2fp3iY8kQ+8KdCNhf5/ISE5nRxOkaJNQONXlJBhg/pryTqQh6DY4quzW8p1krUA
+         XjWGsr1XEhDukIxw/3bk3Mucgv6CpLWaZYxYpcCSmuhiElS6SyxVgWwgS0hg1ghhbDmu
+         WKhLlxIq9reA2tL159DoPLxQUR0VnvXfICQqpQtGEuUnp8e3CLQrBGSUoLNy8/IfuDt9
+         IJtVDCKkOblpAW7hxOXrgUKR5SmWI4OE50FcSi4eoIs9Siq1cgvl4zOAl13gr90XkUcL
+         JCSp2SPZ4/cHu442UFmo18GnNCuHj4t5QZoRdkazUoUoCjO/H9LyixPWyInXOeaYjAfa
+         odHQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1773741863; x=1774346663; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sJ1Pc/1QKu2lLSHomCR6iKHtySw3Kp4fd1PA2wd2pgs=;
+        b=p0Bg2NmmIKyboHpUMRTohcqtKsgqmTRvZ6VESwm3wzUXCUZTLvpR4pW87SLwEVZAXO
+         a715hwTYDcQ66YJ5E6tCxRSczk0n8vIUf+XWJF99Dw0Ou63ItdoeBlBpZY0K+PSMqeuT
+         GzR92G1MbpDNpHNgsm2UAbxHCeLxx4Cxo8oiKu80ohZ2DTt38SO3zx4YzoW9OR3xksI7
+         wfFP74KJwfNquWCf2cF485aw5B6/Ex2p61WNpIjLwwoBDNyvmTYf29QePQQH5Kyrv1xN
+         vnGdCFk3u5Vu7dOuyf6cZtxL8AQOaDbDMpOq4/2KoD8pDV36foKhVoAo5kuh1OaCqZAC
+         +kAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773741863; x=1774346663;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sJ1Pc/1QKu2lLSHomCR6iKHtySw3Kp4fd1PA2wd2pgs=;
+        b=WB380lsDvp+4hdIDBwEzyQboiRDaNeRGeYYWBxz2uUHyCrXo5AzkJWZ8b0F/Rhkm09
+         03SZ/4gOYf4ToHfvrFfmcmU2HQpGNwg4hlvaYI8xEWjosrZkimZMf9Jjht78VTWlbjzb
+         enxP/O3Y7mQUDbKxgW0EuUsPexCrpgL5g7OlS1piw3lVx2ibJ0e7t0r/qyYCeHvmFjRy
+         AZ8fMIsTtF59udhZneWw5IK9wEypeCMdpGgD8bWB37MCr/g+dHaxU4XrunM21hQp1NRl
+         QhFo4NIhDN+A+aoXAAbBYdWv1hh+SN1ixY5lTxSL4cM1zgHTvAVtdvYFlBIjvIfprQJ3
+         Cq9g==
+X-Forwarded-Encrypted: i=1; AJvYcCU3K+ywChygWHqrmLVmYAYKNCcZi+wxzdRExI/yqIXEqm6qZIDdI1nJvI1S8Ci3tpzdxdDhWMc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYZparUlJEIyB6V+Mvy6x7JPJ0JSmEIc+82r6IaOWZz9CQqtla
+	NlPsl+Xs749YH61z36TxX+qoeyMnql0ba7yquPzlgSgqwpXraCh5gCLQR7KxzNGWcuP05RKt2HV
+	8qCdhNn+DtgdV9EgVgPHCQcsfECdlaF32S1uKD9fkGg==
+X-Gm-Gg: ATEYQzznehNP+mjmTqNjtnJ19z0US1qNjcjMPtOhNt3Hph90db+GQ98bIWazkqBQyEj
+	xG6Znh/VtXwrVA+EKBnoxN6R5QK3BUqsQHYfhiKkJr8/o6eoDk6+EYTJ6EAY+/t5eFAaVKB3YbO
+	gTBoZGKVqRX6z7na5La4QQsJw6BZ6835/LouqAcvK0aBK1DmDon6peoBAGRlHfn4Bzz00yHAyKq
+	Dg8D1YWhiDFivpNmoR83aqU8Ug6TCF4r/9O79FxMN2ofsgv+5GV90Yf9OtDMS2R9HG/isUymCvs
+	EhuOmzV8RFi9exxsXhheT/XuzlRo+6c2LKrRsWQu95G73QmykJin5dhiIlMAzgFBeQTGqVhmDdU
+	sTYcQqb5fmDpVIYlNYZt4mMvVo8aXJYenZzfw01Kvhwg7CE2JNeFVZQ9wJyZ6KjS3EtjDUe4JWV
+	Eqe6unXADIRqv2Kv7sylgiTIwuEGqKtD5Mlcym97342bRAIt4prZej7MntG9uivvJ0uwQ67/ZRI
+	HCA7AR8y4apzQQaOJqAPFFZhuDOzhT98TCjhP0fiMASZPYYR16z586fCzHj805r9qNDfU8kvLqr
+	BrkypGB1U2O4RpxjBePZV8g6ugahy+LwbfT5b5IBzNIY
+X-Received: by 2002:a53:df4f:0:b0:64c:ea3d:a895 with SMTP id
+ 956f58d0204a3-64e6306d33fmr11868511d50.61.1773741863199; Tue, 17 Mar 2026
+ 03:04:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 17 Mar 2026 11:02:34 +0100
-Message-Id: <DH4YZ4XEWDVH.25QOLQ4QJ4PXD@kernel.org>
-Cc: "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>, "Douglas
- Anderson" <dianders@chromium.org>, "Greg Kroah-Hartman"
- <gregkh@linuxfoundation.org>, "Rafael J . Wysocki" <rafael@kernel.org>,
- <stable@vger.kernel.org>, "Andrew Lunn" <andrew@lunn.ch>, "Daniel Scally"
- <djrscally@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Fabio Estevam" <festevam@gmail.com>,
- "Frank Li" <Frank.Li@nxp.com>, "Heikki Krogerus"
- <heikki.krogerus@linux.intel.com>, "Heiner Kallweit"
- <hkallweit1@gmail.com>, "Jakub Kicinski" <kuba@kernel.org>, "Len Brown"
- <lenb@kernel.org>, "Mark Brown" <broonie@kernel.org>, "Paolo Abeni"
- <pabeni@redhat.com>, "Pengutronix Kernel Team" <kernel@pengutronix.de>,
- "Rob Herring" <robh@kernel.org>, "Russell King" <linux@armlinux.org.uk>,
- "Sakari Ailus" <sakari.ailus@linux.intel.com>, "Saravana Kannan"
- <saravanak@kernel.org>, "Sascha Hauer" <s.hauer@pengutronix.de>,
- <devicetree@vger.kernel.org>, <driver-core@lists.linux.dev>,
- <imx@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-spi@vger.kernel.org>,
- <netdev@vger.kernel.org>
-To: "Wolfram Sang" <wsa+renesas@sang-engineering.com>
-From: "Danilo Krummrich" <dakr@kernel.org>
-Subject: Re: [PATCH] device property: Make modifications of fwnode "flags"
- thread safe
-References: <20260316154159.1.I0a4d03104ecd5103df3d76f66c8d21b1d15a2e38@changeid> <abkCPU3rxHI49N4_@shikoro> <abkD-VLprcbbEbB1@ashevche-desk.local> <abkF0GO01sMcOhvb@shikoro> <abkLEgrZbdb03VWg@ashevche-desk.local> <abkLY4AAQuFlTRC7@ashevche-desk.local> <abkT_jpjIki6pvX1@shikoro>
-In-Reply-To: <abkT_jpjIki6pvX1@shikoro>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+MIME-Version: 1.0
+References: <20260316222901.GA59948@system.software.com> <20260316223113.20097-1-byungchul@sk.com>
+ <ebd00055-d4aa-4612-8bf3-ef0a308512f8@kernel.org>
+In-Reply-To: <ebd00055-d4aa-4612-8bf3-ef0a308512f8@kernel.org>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Tue, 17 Mar 2026 12:03:47 +0200
+X-Gm-Features: AaiRm50_gMBZxX2vRtFxvpOCPSPD6sNew1gAwSuCX31B_IpupUaMwz2w2jjcEa0
+Message-ID: <CAC_iWjKXvfJuVn_uGgj4SsPsZnvMMepd7BesZcXgRYDPm9yUhg@mail.gmail.com>
+Subject: Re: [PATCH v5] mm: introduce a new page type for page pool in page type
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org, akpm@linux-foundation.org, 
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Mina Almasry <almasrymina@google.com>, Toke Hoiland Jorgensen <toke@redhat.com>, linux-kernel@vger.kernel.org, 
+	kernel_team@skhynix.com, harry.yoo@oracle.com, ast@kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, john.fastabend@gmail.com, 
+	sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, 
+	mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com, 
+	pabeni@redhat.com, david@redhat.com, lorenzo.stoakes@oracle.com, 
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com, 
+	mhocko@suse.com, horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org, 
+	ziy@nvidia.com, willy@infradead.org, brauner@kernel.org, kas@kernel.org, 
+	yuzhao@google.com, usamaarif642@gmail.com, baolin.wang@linux.alibaba.com, 
+	asml.silence@gmail.com, bpf@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268528-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[linux.intel.com,chromium.org,linuxfoundation.org,kernel.org,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,nxp.com,redhat.com,pengutronix.de,armlinux.org.uk,lists.linux.dev,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-268529-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[47];
+	FREEMAIL_CC(0.00)[sk.com,kvack.org,linux-foundation.org,vger.kernel.org,kernel.org,google.com,redhat.com,skhynix.com,oracle.com,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,suse.cz,suse.com,cmpxchg.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dakr@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BADF02A78E2
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ilias.apalodimas@linaro.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linaro.org:dkim,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 32ACC2A7919
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue Mar 17, 2026 at 9:42 AM CET, Wolfram Sang wrote:
->
->> > What's the alignment for the u8 member in your SoC? 4 bytes or 8 bytes=
-?
->> > (I assume it's 64-bit SoC.)
->>=20
->> FWIW, with the given change it will be still inside 64-byte data structu=
-re
->> which most likely occupies a single cache line (before this patch and af=
-ter
->> as well).
->
-> I consider this directon of the discussion irrelevant. If the number is
-> (maybe? That's to be discussed!) needlessly bigger than 0, then it
-> doesn't matter how big the number is.
->
-> Why don't you like the idea of taking the lock?
+Hi Jesper,
 
-Which lock are we talking about, the device lock? If so, please not use it =
-to
-protect arbitrary other structures.
+On Tue, 17 Mar 2026 at 11:20, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
+>
+>
+>
+>
+> On 16/03/2026 23.31, Byungchul Park wrote:
+> > Currently, the condition 'page->pp_magic == PP_SIGNATURE' is used to
+> > determine if a page belongs to a page pool.  However, with the planned
+> > removal of @pp_magic, we should instead leverage the page_type in struct
+> > page, such as PGTY_netpp, for this purpose.
+> >
+> > Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(),
+> > and __ClearPageNetpp() instead, and remove the existing APIs accessing
+> > @pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
+> > netmem_clear_pp_magic().
+> >
+> > Plus, add @page_type to struct net_iov at the same offset as struct page
+> > so as to use the page_type APIs for struct net_iov as well.  While at it,
+> > reorder @type and @owner in struct net_iov to avoid a hole and
+> > increasing the struct size.
+> >
+> > This work was inspired by the following link:
+> >
+> >    https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com/
+> >
+> > While at it, move the sanity check for page pool to on the free path.
+> >
+> [...]
+> see below
+>
+> > diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> > index 9f2fe46ff69a1..ee81f5c67c18f 100644
+> > --- a/mm/page_alloc.c
+> > +++ b/mm/page_alloc.c
+> > @@ -1044,7 +1044,6 @@ static inline bool page_expected_state(struct page *page,
+> >   #ifdef CONFIG_MEMCG
+> >                       page->memcg_data |
+> >   #endif
+> > -                     page_pool_page_is_pp(page) |
+> >                       (page->flags.f & check_flags)))
+> >               return false;
+> >
+> > @@ -1071,8 +1070,6 @@ static const char *page_bad_reason(struct page *page, unsigned long flags)
+> >       if (unlikely(page->memcg_data))
+> >               bad_reason = "page still charged to cgroup";
+> >   #endif
+> > -     if (unlikely(page_pool_page_is_pp(page)))
+> > -             bad_reason = "page_pool leak";
+> >       return bad_reason;
+> >   }
+> >
+> > @@ -1381,9 +1378,17 @@ __always_inline bool __free_pages_prepare(struct page *page,
+> >               mod_mthp_stat(order, MTHP_STAT_NR_ANON, -1);
+> >               folio->mapping = NULL;
+> >       }
+> > -     if (unlikely(page_has_type(page)))
+> > +     if (unlikely(page_has_type(page))) {
+> > +             /* networking expects to clear its page type before releasing */
+> > +             if (is_check_pages_enabled()) {
+> > +                     if (unlikely(PageNetpp(page))) {
+> > +                             bad_page(page, "page_pool leak");
+> > +                             return false;
+> > +                     }
+> > +             }
+> >               /* Reset the page_type (which overlays _mapcount) */
+> >               page->page_type = UINT_MAX;
+> > +     }
+>
+> I need some opinions here.  When CONFIG_DEBUG_VM is enabled we get help
+> finding (hard to find) page_pool leaks and mark the page as bad.
+>
+
+You mean we get debug messages about the leak right? Nothing is
+silently freed with that config enabled.
+
+> When CONFIG_DEBUG_VM is disabled we silently "allow" leaking.
+> Should we handle this more gracefully here? (release pp resources)
+>
+> Allowing the page to be reused at this point, when a page_pool instance
+> is known to track life-time and (likely) have the page DMA mapped, seems
+> problematic to me.  Code only clears page->page_type, but IIRC Toke
+> added DMA tracking in other fields (plus xarray internally).
+
+If we can reliably track and release the pages, I think we should do
+this regardless of CONFIG_DEBUG_VM being enabled or not. But the
+question is how did that leak happen? Is it a misuse of the API from
+the driver?
+
+Thanks
+/Ilias
+>
+> I was going to suggest to simply re-export page_pool_release_page() that
+> was hidden by 535b9c61bdef ("net: page_pool: hide
+> page_pool_release_page()"), but that functionality was lost in
+> 07e0c7d3179d ("net: page_pool: merge page_pool_release_page() with
+> page_pool_return_page()"). (Cc Jakub/Kuba for that choice).
+> Simply page_pool_release_page(page->pp, page).
+>
+> Opinions?
+>
+> --Jesper
 
