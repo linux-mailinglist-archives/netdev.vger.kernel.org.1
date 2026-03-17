@@ -1,124 +1,188 @@
-Return-Path: <netdev+bounces-268495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268496-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KDgKHVcYuWmOpgEAu9opvQ
-	(envelope-from <netdev+bounces-268495-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:01:11 +0100
+	id 8In3BtAZuWkBqgEAu9opvQ
+	(envelope-from <netdev+bounces-268496-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:07:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1F712A6304
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:01:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 691982A63D0
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:07:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 116B1302196C
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:01:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 46D493044B5B
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:07:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E031D299A81;
-	Tue, 17 Mar 2026 09:00:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F8235838D;
+	Tue, 17 Mar 2026 09:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SLQ3uN6Y";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UbrxvkWh"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QTsRRDYM";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sEhq3izu";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QTsRRDYM";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sEhq3izu"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B61DB142E83
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 09:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF58346763
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 09:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773738058; cv=none; b=W4UWu+GFTsLw5Sijua537zn9rTEBgVQ1wbZnhvvXkquu+ae5rH+hmWm/8G+tiLg/n9LgXEQUjCYZdGRFCQLiJ9t8boUEQ2mGlDxUDM0J0iWx3nL4e9/X894QmS1+l29ACbo0jczBFVx3py3/eRkNFKal1D2pnmuDSd9F4OboLzo=
+	t=1773738445; cv=none; b=cfuvdZiwnR712KSa0U4bOjl674xyeLzv8UK9JqdqW6nfOHPbh6/J1KHjzlBAJ0nqWJEOtZnQGmIsYNQZRBUWyYj22fRgiSge0zyG0LMiXLrJvTye1iU7rsFcsvyw9ttIWKrM9mlYGsA36rNmZjIyRaWEliJzSMna9zb6y/abTMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773738058; c=relaxed/simple;
-	bh=ahQZAi5UZ/EMROopvwD9BjhlLPRYdS0kr3F4/01wIuM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PnXG9PnER8aVYo8CNVMmOXgpxQKm4mCSYCm1m8VYB5tkpdqTuZtvM3mwzN02pMdIJ0pnW0NEXKFtLGlRPTsMtkc/P0dOsp3IRArCxnhWEi4FgvSBkW/bh1r6zqhXHA1fLiMr7TmhXx5Qw6UySI4xhtIyw/u6RzgX9HRp63xMTPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=SLQ3uN6Y; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UbrxvkWh; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 17 Mar 2026 10:00:54 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1773738056;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1773738445; c=relaxed/simple;
+	bh=QuYrBAsBv7vcdizE/S4T63R7Qg05vTZjRNFb3DPTF7o=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CaC4rsu/NG++I998GcYZvDnWo50mcDXqUUyOxaXpwgzcoZIwY/6sSq3/n7NchduI3aJQ8DgF5EtDqlYHLN6DSeJBHOyID3q1nzTYNADb2OVQPtSyESBr5SBQb/auWQt6Yk+ZRn7WN6fOdcirPSdryMLV1cXY/jLJB2oYTjDdB5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QTsRRDYM; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sEhq3izu; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QTsRRDYM; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sEhq3izu; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 8E5F54D301;
+	Tue, 17 Mar 2026 09:07:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773738441; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ojgsEh5obRGiSq1T5vrGWdb+Psz+QfVFhSaFy+wU9pg=;
-	b=SLQ3uN6YVuQEg9kQON08A+uY+LzsYogYGBF7WzKqp6aoAg3T5JlIvHYGN8zvU3k3CdOnpZ
-	2Jg2yvFNQTvabKDfBp7RhgeZjkGDUGRMQOn7ahIkopEC4k4woJfiAlRuusg77RPsfBXSf8
-	cSkQUm6rAv6bJZurgBFWhvRDvfjkQgYJZWIble8dNDWYf/7CWXoQRniv26Z/HfU223GRTk
-	AANgoYNmPEjUM+TnUB/5FmDTHaMTF54iirhdrsPimpfjHHNFnrsgpCNpgaE4IO1z/7Af6t
-	RVkImuD7anFB2pqhswu8OXdF+RTUILeT4WknwXNjZ1r2X5GPdRAm+KIxVIPE+g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1773738056;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	bh=H6iQDme+4pl0VVtlEzwn4J0Z5GPchMZ4qJMefnm2uWA=;
+	b=QTsRRDYMLYhsJNdBEPITMfAVz818hsTy9ECgT4e9MaQNJOwNAS31S+qtDfZlm8BtE65kWT
+	hLxRqWxmcm5rkQ2iC/QcL+0yE+0vVZIhmnk18tASSgWKXfZhTFuRPKcL1NXaDtoJOYAz7X
+	oGtvuaxJWTQfLq8QfD2Wu0rJe8RNaf4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773738441;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ojgsEh5obRGiSq1T5vrGWdb+Psz+QfVFhSaFy+wU9pg=;
-	b=UbrxvkWhkDSOs+slId8jQ4SyV8kdAoHk7Q+mesTO1eEAkG3Da51ejvSL2WnUEuXdS8Fqll
-	HSEHKiRrtHStMHAg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Emil Tantilov <emil.s.tantilov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, aleksandr.loktionov@intel.com,
-	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, clrkwllms@kernel.org, rostedt@goodmis.org,
-	linux-rt-devel@lists.linux.dev, sgzhang@google.com,
-	boolli@google.com
-Subject: Re: [PATCH iwl-net 0/3] idpf: virtchnl locking and async fixes
-Message-ID: <20260317090054.DuPZ6O0O@linutronix.de>
-References: <20260316232819.6872-1-emil.s.tantilov@intel.com>
+	bh=H6iQDme+4pl0VVtlEzwn4J0Z5GPchMZ4qJMefnm2uWA=;
+	b=sEhq3izugF5n7YcaEZFEsBVf+7dmR7cXPGILdBbnajzu50dYzKaJOz+alDwJkKTXal6V7N
+	wShGAzLpvEbJztAw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=QTsRRDYM;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=sEhq3izu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773738441; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H6iQDme+4pl0VVtlEzwn4J0Z5GPchMZ4qJMefnm2uWA=;
+	b=QTsRRDYMLYhsJNdBEPITMfAVz818hsTy9ECgT4e9MaQNJOwNAS31S+qtDfZlm8BtE65kWT
+	hLxRqWxmcm5rkQ2iC/QcL+0yE+0vVZIhmnk18tASSgWKXfZhTFuRPKcL1NXaDtoJOYAz7X
+	oGtvuaxJWTQfLq8QfD2Wu0rJe8RNaf4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773738441;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H6iQDme+4pl0VVtlEzwn4J0Z5GPchMZ4qJMefnm2uWA=;
+	b=sEhq3izugF5n7YcaEZFEsBVf+7dmR7cXPGILdBbnajzu50dYzKaJOz+alDwJkKTXal6V7N
+	wShGAzLpvEbJztAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C778B4273B;
+	Tue, 17 Mar 2026 09:07:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id FtMGLsgZuWkjEgAAD6G6ig
+	(envelope-from <tiwai@suse.de>); Tue, 17 Mar 2026 09:07:20 +0000
+Date: Tue, 17 Mar 2026 10:07:20 +0100
+Message-ID: <875x6ug6yf.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>
+Cc: konradybcio@kernel.org,
+	andersson@kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alex Elder <elder@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Kees Cook <kees@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Mark Brown <broonie@kernel.org>,
+	Wesley Cheng <quic_wcheng@quicinc.com>,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ath10k@lists.infradead.org,
+	ath11k@lists.infradead.org,
+	ath12k@lists.infradead.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-remoteproc@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>
+Subject: Re: [PATCH v2 4/4] ALSA: usb-audio: qcom: Use the unified QMI service ID instead of defining it locally
+In-Reply-To: <20260316171419.2619620-5-daniel.lezcano@oss.qualcomm.com>
+References: <20260316171419.2619620-1-daniel.lezcano@oss.qualcomm.com>
+	<20260316171419.2619620-5-daniel.lezcano@oss.qualcomm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/30.2 Mule/6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260316232819.6872-1-emil.s.tantilov@intel.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Flag: NO
+X-Spam-Score: -2.01
+X-Spam-Level: 
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_HAS_DN(0.00)[];
-	RSPAMD_URIBL_FAIL(0.00)[linutronix.de:query timed out];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	TAGGED_FROM(0.00)[bounces-268496-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	ASN_FAIL(0.00)[74.135.232.172.asn.rspamd.com:query timed out];
-	TAGGED_FROM(0.00)[bounces-268495-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[linutronix.de:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tiwai@suse.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.de:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linutronix.de:dkim,linutronix.de:mid]
-X-Rspamd-Queue-Id: B1F712A6304
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,suse.de:mid,qualcomm.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 691982A63D0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-03-16 16:28:16 [-0700], Emil Tantilov wrote:
-> The first patch in this series improves the locking around the setting
-> and clearing of the free_xn_bm bitmap. Previously the lock was only
-> taken during init shutdown and pop, but not the push function.
+On Mon, 16 Mar 2026 18:14:14 +0100,
+Daniel Lezcano wrote:
 > 
-> Patches 2 and 3 are fixes for the async handler. Patch 2 ensures the
-> payload size is set before the async handler is called, and patch 3 fixes
-> an sleeping bug due to nesting of raw/bh spinlocks.
+> Instead of defining a local macro with a custom name for the QMI
+> service identifier, use the one provided in qmi.h and remove the
+> locally defined macro.
+> 
+> Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+> Signed-off-by: Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>
 
-Why is there a raw_spinlock_t? From a quick look a spinlock_t would do
-just fine with not runtime change for !PREEMPT_RT.
+For the sound bits,
 
-Sebastian
+Reviewed-by: Takashi Iwai <tiwai@suse.de>
+
+
+thanks,
+
+Takashi
 
