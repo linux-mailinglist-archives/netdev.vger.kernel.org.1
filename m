@@ -1,97 +1,96 @@
-Return-Path: <netdev+bounces-268366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268367-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2CRGHESmuGkthAEAu9opvQ
-	(envelope-from <netdev+bounces-268366-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 01:54:28 +0100
+	id qJSyFfimuGkthAEAu9opvQ
+	(envelope-from <netdev+bounces-268367-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 01:57:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78B92A25E8
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 01:54:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 932C22A2624
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 01:57:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 60294301D328
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 00:54:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E0A1A303309A
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 00:55:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21BD822A817;
-	Tue, 17 Mar 2026 00:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 138F8221FB1;
+	Tue, 17 Mar 2026 00:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Btn3RrMF"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="PpWd/Z1P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85907219303
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 00:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9F321C160
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 00:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773708864; cv=none; b=VLIVqXva3YhQ7EU837i91+YwSotc3miSl24AXhI92JUw/o5uzDQEUZPBDCAxMpiZshI8AuU/3q6F800jT+Umai8uGMnjz4w83eVICxKtoJ4kI/lc4SWzMK99iCCrNPcujdE/FUsycVJsejH/FyzL4u/FC85LG4I9FVbMXGkiNK4=
+	t=1773708931; cv=none; b=DL6hfsrHsyn0ojYKC9bfMHhGNnmqU2tvOX6EMWOLOkkt+ZUTsqFtD5Ykq4RXsV2fGNXLKXODirjR9kqBwR4YQOaiN9dpZPJ+tpkQdLOJVAh59Ndxn08JmCAmbIjljsp9OPbe8bSHmanqWVXVCHBkOxm3BB4AFRbTKpLJgEqdWzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773708864; c=relaxed/simple;
-	bh=caPGF/+uDup7Y/QzYuvTP1/tLOuEOtlg/onfpGqB6/s=;
+	s=arc-20240116; t=1773708931; c=relaxed/simple;
+	bh=fKItGyuXH2mFbACzPqtA0yQGZq5TH0CL/xP4z5Jd+u8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SJQNitFpAShudKbzBZNzjBDFk39SXSZSxvsb5SKv/ACDH2Xd6gJawKOljpRqTI1UuWqVqFL2Av5kABZopebRx7t6VrzczfX6sLcRXaB4BOUW+s5yLCKvlcxbctVfROgsLNIzg9GrJFZgacOlQB09AOtPkWwAFkgqN3M20Wr9AzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Btn3RrMF; arc=none smtp.client-ip=209.85.214.176
+	 MIME-Version:Content-Type; b=Hd5XjYB/L5ETIFkJ2l/6qP5MKvOuvWTevUxlpq77gEbdR1HwD+ClGp6fqYNX+XmqFHJVHBaiXH86NHUsAl7WAVSweFVKwsPS8tU3vzIacDthRSf1PVdlyGqAVM8pGK0NFU9jO1L99W9TKrrhjWswD5LR+sx/iiCpD8tMKc1SV1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=PpWd/Z1P; arc=none smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2b05761bec1so921095ad.1
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 17:54:22 -0700 (PDT)
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-35b98def50bso1312413a91.0
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 17:55:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1773708862; x=1774313662; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1773708929; x=1774313729; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JQf+XocBbjw+0Q/6vJsd5xscgeA40AqvzPM/4HU1+tY=;
-        b=Btn3RrMFoAPvIxAEWob7g9aSgjE8G6fCD4646bGflrvr65tCIkQs+bqvqz+xL/+9hY
-         6u9D+N3Z5BJxb5uA0sfuMBxNTiDoTPiFB9WsRdN2x3MR0Av2s8e38jnvHMIEJFaPYEiO
-         fhkO/sZpar9HtRAWx6vLCKlItvxbsBKysVu4PmfyeiR0McwgKUvQ7kA0PuLmRYkqZ3ay
-         UqwxvSMR+4WDFsvS5kImV+KzdD+k/zJRGaF2W5DPeV0I3u0S4oB2oLVDdAOb/4/EEy9F
-         31/6GYwO6DWBz/8HQBLM2zhbyA/r0uXhI2+w8hKV9NY4VmsjscoJJ57yWmk9YZwX3T15
-         AhEw==
+        bh=gsLpt8lcv5WQpxHKp0h6sX5BtmKvbqo1zBFdOaFwJSI=;
+        b=PpWd/Z1PQvR+yJhO4LtN7JbmTlQtrNznC7TOSsdaw0bUDzQ49Q6fK2yqTaTZ4pkey1
+         CcH00FKZFXCVz27y9OgnMLzUWruZ826XkG2cz/oYi2T96dOijKeQTPPgnWs/AYSUkxA4
+         aqSMQXQNnB1y0pYlE+y5RPny70DTlvPJIKHm6ECc9VT8wmIytCTUD/s1yELUeyUVx0Yx
+         siU2V2zH5Si4dKBtcy8uAmRA7pk4xyNnl7pBWYVQqOo+hzK0EJ1+dy/uzKIkpds3RVQJ
+         qhr7LbpnXzbmhThXTRsE/K0v8lySuMLg68fDcVexICt7z8PHscMRkQKfdylVTpTNt0Zr
+         96WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773708862; x=1774313662;
+        d=1e100.net; s=20251104; t=1773708929; x=1774313729;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=JQf+XocBbjw+0Q/6vJsd5xscgeA40AqvzPM/4HU1+tY=;
-        b=R7FCGQqrJqoFS0z6HtWirYX51ueS9tAGmxKfV0BxeRxPOcrfNdtdDFNvlE3Yxuom0a
-         TV0ovw0FLH1OQxntgHi6YzVUF5pvzMlNlkmslsuImZsKv1eRmxz8GuwcRMLSBxG352uW
-         +PELcH7b5dFsa//cxW37rjFE0VxgEx+6qpqkK5MZQaZshS+HHB56S0ipesJvytWw8AgL
-         UV/GE9beISdBWv5AzdkV334N43vBf7sykc+/b7DFKUxRc8dQItrJKPJy2ocHU0RFK71R
-         fndvAoQgpsbaGGLiDd7etB2ITt7TD1SdhW5VKSTjE2WxveuiyYIO6qc1X67HIbasgBNU
-         cQrg==
-X-Gm-Message-State: AOJu0Yy1xbe+QV8bQRVkR5hF4IVE2iyKTNclFa1WGg2pT/mPbCdqvLsM
-	76K751Eh0UECZGgY+jL9T46dM1FkY7nwjThFJKrFWbliHmY4DrSfYm7Gn3lXL4RttoE=
-X-Gm-Gg: ATEYQzzKSzitvQxXrZl7Gf0QRcPdikJs1yb7QdbyopZlvD/PAWOjTLVEJKcAevcHWHF
-	4AxRF+2iY+ehuZz/fNL8wYGVMRohYjBjENbMpbBYUTq2Ik1H+AebrROYDBKU7S5L+pTf74Jie4I
-	7xLtMjx5NJB0iYM55HHLAZuGGP1BO+FqK41wAaPRMbuDXDfynx7pE+VWOmZ68Hg4ba6rZnnNutJ
-	FJmpj5pJuUipJVdg4qzuWwjk/kmy6Kqp18AnUFpvyZA55S7mirdGpavFCTGQLFM9i0y/2vxC9eR
-	IXJ63n/QVk6Ur+rslLb0rmbGhAk/kJ7zCdHFSLaPAHdPXUdUSg+32d8me/EVVcp9Py60qWNALMg
-	dfjMA3rekFhrcSks1B58dBLijeAPOGxCADFmkNr0aC+RjlUwt/XWEz5FF/21KnIi7MBYx/Xwz3h
-	6BaNHijbQ0qSsi6pLZ0C1l5WI4uh8To2NicUbB9LPh/9GzGGAQra3RNbiaSE/0SbyjXA203vTK8
-	etO7S70OgvJpTl4ITmtmA==
-X-Received: by 2002:a17:902:ce07:b0:2ae:be67:722f with SMTP id d9443c01a7336-2b063758ee6mr12290245ad.22.1773708861829;
-        Mon, 16 Mar 2026 17:54:21 -0700 (PDT)
+        bh=gsLpt8lcv5WQpxHKp0h6sX5BtmKvbqo1zBFdOaFwJSI=;
+        b=nRG+Rvhadq9uicEXVjbtJzB6qzgy6YLXJrxXzVHqz75sBKZiCDGWKOsGaJxwUQP0hg
+         Bs+iMOnbgVwuabG324jz+dp3th0ZUY0ndLEDSRbYHx9Sv1G2T15mCVxlDUBje7ctLP1F
+         ybxZYysIndIrzRrlK1ma7YptzwuNPeebkvlTkcH2xcdefzlEpDjNojNvJKwObk0/6ryx
+         7rCY2jxnQR0pFrK+iR7/HbF1Sk2nUN3K9B4lDI3VtkGWUi5djNc0ldi4u4YaYWNJKKtd
+         12Hxdj88hqWfJhhK8rqs2Hx9KK+YREzccjEC5vVtHGEo/z+Jv6ErnIhjNvaVt2gX6ZT3
+         R3eQ==
+X-Gm-Message-State: AOJu0YwAfnlqXXvPHV+W4gtmHp8L5UKLYf4SaNrSi0KIv1b6d0QakdeZ
+	8hqdQuHCBYOmRmZD8cS4irhFphOMaUxPGyE4FU1eLijjor6Y79cCkQfK/+/lIUjGDdxEg/f0sha
+	621H1
+X-Gm-Gg: ATEYQzzYEhz6ymCz6wMtb/+A5q08YEd8ntcqgPvmzJdOeDNpU4QlFRWWBmCcG+f0wyP
+	ieqdJ23TYgxi0aI3IUtcWCtoyMXld3shskgJBCzHjj2FgaMnovpHkWPkz2pc9SPP5O0Xlcjiqw7
+	ITb746R1e69RkUKXMlGdhtf3MPlXeFfeDvJdTtGtKqoNmoCY1lh+/DEHCF0UI7BaMO6iv/BG+aF
+	uRPtls5Y8V1J2EGJzt6fG8zPqpRx3bPubo03Ra1eEWdRil7wZOUzb40sP9886iBHyDQRwFnmLVj
+	ubTdeBwhK9KGVdOeGrcoMkU6lkL/5PkzVhE7mZWNFSbHhdFLA9pJg1Mki1IJO2os6KuiEiwei06
+	MakWdP1B4T2zEj8NE4T+wk5vlKy7bdznrCl1EmO3cFDof9RMxyfCmHZCiynhZPTz/1DR6JXzIjc
+	9lcjznRQkZuYlfV2Wr0bbWxoxWK+WvLnL7+22vlCplR9ooRZZNL46IUTwtY+LfvaFJulSWrHP+D
+	1Zn2Xy4RftfkggTgt8p0A==
+X-Received: by 2002:a17:90b:4e8b:b0:35b:a53a:7d08 with SMTP id 98e67ed59e1d1-35ba53a7e81mr3761711a91.26.1773708929199;
+        Mon, 16 Mar 2026 17:55:29 -0700 (PDT)
 Received: from stephen-xps.local (h216-87-238-89.thvror.broadband.dynamic.tds.net. [216.87.238.89])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b063e53a40sm7811455ad.3.2026.03.16.17.54.20
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35bada43329sm913671a91.6.2026.03.16.17.55.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2026 17:54:21 -0700 (PDT)
-Date: Mon, 16 Mar 2026 17:54:18 -0700
+        Mon, 16 Mar 2026 17:55:29 -0700 (PDT)
+Date: Mon, 16 Mar 2026 17:55:25 -0700
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: Jamal Hadi Salim <jhs@mojatatu.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
  kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us,
  victor@mojatatu.com, will@willsroot.io, xmei5@asu.edu,
  pctammela@mojatatu.com, savy@syst3mfailure.io, kuniyu@google.com,
- toke@toke.dk, willemdebruijnkernel@gmail.com, Ji-Soo Chung
- <jschung2@proton.me>, Gerlinde <lrGerlinde@mailfence.com>, zyc zyc
- <zyc199902@zohomail.cn>, Manas Ghandat <ghandatmanas@gmail.com>
-Subject: Re: [PATCH net v2 3/6] Revert "net/sched: Restrict conditions for
- adding duplicating netems to qdisc tree"
-Message-ID: <20260316175418.595d4690@stephen-xps.local>
-In-Reply-To: <20260316211052.332383-4-jhs@mojatatu.com>
+ toke@toke.dk, willemdebruijnkernel@gmail.com
+Subject: Re: [PATCH net v2 4/6] Revert "selftests/tc-testing: Add tests for
+ restrictions on netem duplication"
+Message-ID: <20260316175525.4f455ca5@stephen-xps.local>
+In-Reply-To: <20260316211052.332383-5-jhs@mojatatu.com>
 References: <20260316211052.332383-1-jhs@mojatatu.com>
-	<20260316211052.332383-4-jhs@mojatatu.com>
+	<20260316211052.332383-5-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,20 +102,20 @@ Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-1.56 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268366-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268367-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,mojatatu.com,willsroot.io,asu.edu,syst3mfailure.io,toke.dk,gmail.com,proton.me,mailfence.com,zohomail.cn];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,mojatatu.com,willsroot.io,asu.edu,syst3mfailure.io,toke.dk,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -126,28 +125,18 @@ X-Spamd-Result: default: False [-1.56 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,networkplumber.org:email,stephen-xps.local:mid,mailfence.com:email,networkplumber-org.20230601.gappssmtp.com:dkim,mojatatu.com:email]
-X-Rspamd-Queue-Id: A78B92A25E8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber-org.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,stephen-xps.local:mid,mojatatu.com:email]
+X-Rspamd-Queue-Id: 932C22A2624
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 16 Mar 2026 17:10:49 -0400
+On Mon, 16 Mar 2026 17:10:50 -0400
 Jamal Hadi Salim <jhs@mojatatu.com> wrote:
 
-> This reverts commit ec8e0e3d7adef940cdf9475e2352c0680189d14e.
+> This reverts commit ecdec65ec78d67d3ebd17edc88b88312054abe0d.
 > 
-> Reported-by: Ji-Soo Chung <jschung2@proton.me>
-> Reported-by: Gerlinde <lrGerlinde@mailfence.com>
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=220774
-> Reported-by: zyc zyc <zyc199902@zohomail.cn>
-> Closes: https://lore.kernel.org/all/19adda5a1e2.12410b78222774.9191120410578703463@zohomail.cn/
-> Reported-by: Manas Ghandat <ghandatmanas@gmail.com>
-> Closes: https://lore.kernel.org/netdev/f69b2c8f-8325-4c2e-a011-6dbc089f30e4@gmail.com/
 > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> ---
 
-I would prefer that the commit messag have the reason why this was reverted.
-Someone in the future might not see the netdev history.
-
-Acked-by: Stephen Hemminger <stephen@networkplumber.org>
+Are the tests being replaced in a later patch.
+Want more tests so that this is covered.
 
