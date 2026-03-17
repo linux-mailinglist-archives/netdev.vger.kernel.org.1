@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-268827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268828-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OBO8OWPpuWkRPgIAu9opvQ
-	(envelope-from <netdev+bounces-268827-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 00:53:07 +0100
+	id +ISbN2rpuWkRPgIAu9opvQ
+	(envelope-from <netdev+bounces-268828-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 00:53:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC94A2B47A1
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 00:53:04 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4648B2B47B0
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 00:53:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8854D310A3B5
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 23:52:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E6DA831299B9
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 23:52:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66DD433AD8B;
-	Tue, 17 Mar 2026 23:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55163A783D;
+	Tue, 17 Mar 2026 23:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y0JVRjtE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VM0d+XUu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBCD3A783D
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 23:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C263A7F62
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 23:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773791555; cv=none; b=HoKVHyMLvHGDHcc9gDOOBDCVaw0D7UZgTJyc1FEMwOT92E2KlqYjTgjCYneMut26qc1MYQ8FbL+iF6zfuzSLJOymIV5w7kyv2W9NoQKRuqOQzafPL6eimaWwUO2BykAqMqbwRoYGbgWu06mKGT283+nD1fc226IjwAGVVJdzDsI=
+	t=1773791556; cv=none; b=LIcx8+MQVI5/h8zqJSYQjFMYJB7ccCN5n3livUqXYIHHs6eu5wmucv4/QrRCvct2APV8wFDL2dndRk5wudI7xZjQwo28uDVbucawjxAAS1hgnFsyV7Yut+NZoc0mShuSB7WK/sw1qrXMCVNHkP/2r7RJrRZV1iPmovi6FjOQ8oQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773791555; c=relaxed/simple;
-	bh=xaAQwmB/emLJGJW95qBKo9fy65VJw13GM2llD/jyJl8=;
+	s=arc-20240116; t=1773791556; c=relaxed/simple;
+	bh=zT2RqGd3nP3UCMWCKPndkuHNOyLMnz4Yhzwh6iq/cJM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IZ7qQ16NEcRmgdQ5m5Lh7dbsfJS1Keqr8bksXosYIcopvfgq/ebsQH5i/3xKSDZMAfX3m/hoihMMlZxAOZp9dMfCcPFfCB7ESHBGW3wzd3CfyoJH4qw2KEyLoEC0nJxLB2nd2w2tyWeS43nxHZsA6uiFlx1ST7g2FkuR7EKjHjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y0JVRjtE; arc=none smtp.client-ip=74.125.224.43
+	 MIME-Version; b=FLp0X1VaG68Qd/Bh+Lg9FYLbO3hZorSW7OcHuIObsvl1yoYghI9rtolwcgZNpclXRZiWJhak96bUBhM/sKNOzZ9dY44mswXvpGDiT+XZdhzlxYozJzfdNrGFWcjD4vwVnOB2JNU+ZADzAZSWhapJQiMGUEK9FUKXi08EQOkIp0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VM0d+XUu; arc=none smtp.client-ip=209.85.128.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-64cb34a81c5so750985d50.3
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 16:52:33 -0700 (PDT)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-79907132d9fso5205827b3.1
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 16:52:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773791553; x=1774396353; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773791554; x=1774396354; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zuJHg8h2oSkf9cXwpBXu1Y4TRq+6ictsegM8LgmkOkY=;
-        b=Y0JVRjtEwCXqm6V4lUhc5NzXETTcPEJdYF9yZiMa4dD9UJfMnpm0fqGb7p1xJ9imbX
-         r9UirFWk/hHScPpfYNc+p0vZziPx2z0svqXhjwBBdv5n6fpfiJGL8P2uXseWz7ihs+Ip
-         Y6+rXTh8Lh/YdQVnW2ZBnYnwyt4GPsvwyXDFRnCs8UF+ZvPuA6glmJFxmLSGKNuWk7u2
-         Ent0CwE2c2YFpxyTXuBF/Cea3SuCs1+WNh3/nUHZh9ZpH1GEI0Tj1VqF0Uz7PNCz9TEk
-         zty51Z9XIbt9J5IXclGC0rxlhju7/G0WUFdRBFJcutR8tD8Hiczbr2x2bICUq7f5Vknv
-         Yt0g==
+        bh=LYF9EK7KgmEP8ho0Nd5jF1xsN/C9b5ZrS1epvozHDgQ=;
+        b=VM0d+XUuUFztImt6zTwy8LFBdBK+3oIAY7oW4y+A6T/kYTHIkt4IW65RfMMBalUyNH
+         cw34hbdbH1NebJ05GvZrxSBfGNqSpYpgFVfAVU7WjuTF9KecWDqAwIIhwSrjESR5hW8G
+         8bBkHtP2JMh2kbkZ2qb/qSzCoP3R/ugzHk6E+AK0GTLlEqq7gVB6UqJHi3LryuWtJ39v
+         RjrgheY206wkOdf7DY5JaHEKXP5jcOcoAjd3zDvZFbA1DgP3JwWUOQLZza1s04mwsZKj
+         G3Tx67xeO1kOSA74sIOODtKHYc4cLN0kT+WZbJi0VtngKwsswysXJo/guMSobta8KBbp
+         bhhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773791553; x=1774396353;
+        d=1e100.net; s=20251104; t=1773791554; x=1774396354;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=zuJHg8h2oSkf9cXwpBXu1Y4TRq+6ictsegM8LgmkOkY=;
-        b=l57ddsnPfyi78v/G7KzX5vIj8XFX1YO4HU8IOD3M3QnlGk7QdZrMSHglIjoxIVvQg0
-         HtnSpkA+uo3atOPPGwc4qRjHy6yfNrvrv7sB5xicoNQHTDYjJk3nt56Cv9bMuFp5mShE
-         ACizKCHCmuxSPvd19EQECJRwPmjlVuCuaSbUj46hqfEc3ARfc81KHDPXvarYgxB02yw+
-         /NXQdA8b21WweSxvKUVMz5fTNh657KWVqDjE9Il6pEjLxTgvTQuTmt2Ys8G/QfqdJNok
-         nFsAKDhIlbnEh8JK09Mzh0x4v4qOgQXa6kk3kAkDlBqRglG114Pmw5Z3/gX6d45ZSkYB
-         qctQ==
-X-Gm-Message-State: AOJu0YxaGXWw/7LoGslGl0g+wVCgDUONxbsYN5YkBaco74BN6nyGO9gs
-	KnIHRNY9ncbkxDEzJVCpBIkWx/XBiVAM3u4zhBVX9DdSjzJ/r0sX+f9tqD1Yhdcs
-X-Gm-Gg: ATEYQzznz7/t0Vy413oB3W1KqA8Rk1S325zJ9qDGArIEMxEycCdO5xce4eTz1LWQ3h4
-	QnDWBA/5ordO8GT6eUgCqAek45u6rxuQ3eHgqf8lNOgf6uS4wDAq8o4dfunm2fg5BOX+hAhyvcF
-	/wdOZIyZkOxmm0Qys6rvQcwWU48nzhlYIzugaEVuIC9j24BFwgwpMB9FH5+jQrzzwMu2vyTMnhb
-	nyA4dUO4jwGubI52EFtEI8xuf8Fr+9eKZ/7kiVktKPWpxY5dafxGK8XkeKDpbhPHInuKK5aAhpN
-	Q60B+XUbHTfBPSDdgbKrpVSuTdcKmoWkD//itkOSW/IFHrSe3WHhzvF6hG7M3JEfpY3/86Oh0QH
-	ArsCwPlLapU2aM/fHy26P5GlzUDTt8ptWtFUsD2QSggwZYqVcWMJ4yniw8K/8UUK86DDn3OFENy
-	Bgj+mDUmR+KBwU0EKwnD0UQsI=
-X-Received: by 2002:a05:690e:1c17:b0:64d:294e:9c34 with SMTP id 956f58d0204a3-64e910e4c7amr1478025d50.0.1773791552839;
-        Tue, 17 Mar 2026 16:52:32 -0700 (PDT)
-Received: from localhost ([2a03:2880:21ff:2::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64e915d9c04sm735196d50.0.2026.03.17.16.52.32
+        bh=LYF9EK7KgmEP8ho0Nd5jF1xsN/C9b5ZrS1epvozHDgQ=;
+        b=Evu7bibd8+Kd5Bso06FKfF4JmWgjgJM1URetY6Mn78Y1/Yj+iFLLz2F66fAv10sNLC
+         OKlGholPrJwDFYRsxcomnpowmO9bn8ISAhQG91Q4XnmXlhb7XBobkE7sCHq+xIcOO+m2
+         Qgw2x9Kslx4z5A0gYvmHjyOCANzeoXnYHP4ViRsGXXpFXmobcq54Ae4op3U2rLbAlhCi
+         kSNIKb29KSdpUPHF30yIQcXB7XJdKiwOais5YDu+EvKpQOTd0t1HNwmilJzEji0/OiWO
+         ofIwYtcTEJ7nILD4oqPGc/QKeWEReAhH//XpWfMihLfctUIcEhkJASQoZKGDbbKq4c3X
+         NENg==
+X-Gm-Message-State: AOJu0Yy8BDSgaciURiiEoYXdz9mMFzaWbTG+NE/bhI72/IpGMY1wRF6l
+	n89eShi0frCOdqSScwp5uydl22qiV/nbiTObZfk3mgb6sgxplcV9YEp/zTBiau/l
+X-Gm-Gg: ATEYQzzJnWlLFepf2Gys13VFHOXD7VINod7DF0riyfrMzOWkCS/tUbtFTbc5+ouoQDV
+	mGMcF4zlBaNIP91RIgx7PcrnVoMSci1LrWvKPgZZlUEP1IDT3q/AIQsugfETpI8a3IYQeUk6g06
+	0+CVNdMypAdrig+oL6/eYDvhHCDY2zifs3X60buUOYAZghd3Kn3J4jQAoxi/gImQDfEL1AsgVm2
+	fLsOjBft/O249AcuKlJuL++7Ld3clUhWLvKZReEhor1K3PCod7Y+uGHSsdwndShdL1wE79WKF0L
+	BpYTmBzFBilJlZomnrgjEryy6vPmb1vv6QSGbfsYR8DjexF5OWNWq9p53y0HrQ0QC5KKnP6hCoL
+	+WoFM9+Q2L6MV4kdGGEsDmM9YfxJI1h9lGG4HyckHlcN6G7jeFghAJE4687KN9uL9rxDl8ASHiP
+	A1syrXydGW0u/jQlzuyWdFv5B1irkJbrs=
+X-Received: by 2002:a05:690c:b87:b0:79a:39db:9c78 with SMTP id 00721157ae682-79a7162fd08mr11230487b3.0.1773791554346;
+        Tue, 17 Mar 2026 16:52:34 -0700 (PDT)
+Received: from localhost ([2a03:2880:21ff::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-79a71593c08sm6750677b3.24.2026.03.17.16.52.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 16:52:32 -0700 (PDT)
+        Tue, 17 Mar 2026 16:52:34 -0700 (PDT)
 From: Wei Wang <weibunny.kernel@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -84,10 +84,11 @@ To: netdev@vger.kernel.org,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>
-Cc: Wei Wang <weibunny@fb.com>
-Subject: [PATCH v6 net-next 3/5] psp: add a new netdev event for dev unregister
-Date: Tue, 17 Mar 2026 16:52:16 -0700
-Message-ID: <20260317235222.700615-4-weibunny.kernel@gmail.com>
+Cc: Wei Wang <weibunny@fb.com>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: [PATCH v6 net-next 4/5] selftests/net: Add bpf skb forwarding program
+Date: Tue, 17 Mar 2026 16:52:17 -0700
+Message-ID: <20260317235222.700615-5-weibunny.kernel@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260317235222.700615-1-weibunny.kernel@gmail.com>
 References: <20260317235222.700615-1-weibunny.kernel@gmail.com>
@@ -103,12 +104,12 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268827-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268828-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -116,150 +117,103 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: EC94A2B47A1
+X-Rspamd-Queue-Id: 4648B2B47B0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Wei Wang <weibunny@fb.com>
 
-Add a new netdev event for dev unregister and handle the removal of this
-dev from psp->assoc_dev_list, upon the first successful dev-assoc
-operation.
+Add nk_redirect.bpf.c, a BPF program that forwards skbs matching some IPv6
+prefix received on eth0 ifindex to a specified dev ifindex.
+bpf_redirect_neigh() is used to make sure neighbor lookup is performed
+and proper MAC addr is being used.
 
 Signed-off-by: Wei Wang <weibunny@fb.com>
+Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
+Tested-by: Bobby Eshleman <bobbyeshleman@meta.com>
 ---
- net/psp/psp.h      |  1 +
- net/psp/psp_main.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++
- net/psp/psp_nl.c   |  7 +++++
- 3 files changed, 78 insertions(+)
+ .../drivers/net/hw/nk_redirect.bpf.c          | 60 +++++++++++++++++++
+ 1 file changed, 60 insertions(+)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/nk_redirect.bpf.c
 
-diff --git a/net/psp/psp.h b/net/psp/psp.h
-index 0f9c4e4e52cb..fd7457dedd30 100644
---- a/net/psp/psp.h
-+++ b/net/psp/psp.h
-@@ -15,6 +15,7 @@ extern struct mutex psp_devs_lock;
- 
- void psp_dev_free(struct psp_dev *psd);
- int psp_dev_check_access(struct psp_dev *psd, struct net *net, bool admin);
-+void psp_attach_netdev_notifier(void);
- 
- void psp_nl_notify_dev(struct psp_dev *psd, u32 cmd);
- 
-diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
-index 178b848989f1..db4593e76fa7 100644
---- a/net/psp/psp_main.c
-+++ b/net/psp/psp_main.c
-@@ -375,10 +375,80 @@ int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
- }
- EXPORT_SYMBOL(psp_dev_rcv);
- 
-+static void psp_dev_disassoc_one(struct psp_dev *psd, struct net_device *dev)
-+{
-+	struct psp_assoc_dev *entry, *tmp;
-+
-+	list_for_each_entry_safe(entry, tmp, &psd->assoc_dev_list, dev_list) {
-+		if (entry->assoc_dev == dev) {
-+			list_del(&entry->dev_list);
-+			rcu_assign_pointer(entry->assoc_dev->psp_dev, NULL);
-+			netdev_put(entry->assoc_dev, &entry->dev_tracker);
-+			kfree(entry);
-+			return;
-+		}
-+	}
-+}
-+
-+static int psp_netdev_event(struct notifier_block *nb, unsigned long event,
-+			    void *ptr)
-+{
-+	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
-+	struct psp_dev *psd;
-+
-+	if (event != NETDEV_UNREGISTER)
-+		return NOTIFY_DONE;
-+
-+	rcu_read_lock();
-+	psd = rcu_dereference(dev->psp_dev);
-+	if (psd && psp_dev_tryget(psd)) {
-+		rcu_read_unlock();
-+		mutex_lock(&psd->lock);
-+		psp_dev_disassoc_one(psd, dev);
-+		mutex_unlock(&psd->lock);
-+		psp_dev_put(psd);
-+	} else {
-+		rcu_read_unlock();
-+	}
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block psp_netdev_notifier = {
-+	.notifier_call = psp_netdev_event,
-+};
-+
-+static bool psp_notifier_registered;
-+
-+/**
-+ * psp_attach_netdev_notifier() - register netdev notifier on first use
-+ *
-+ * Register the netdevice notifier when the first device association
-+ * is created. In many installations no associations will be created and
-+ * the notifier won't be needed.
-+ *
-+ * Must be called without psd->lock held, due to lock ordering:
-+ * rtnl_lock -> psd->lock (the notifier callback runs under rtnl_lock
-+ * and takes psd->lock).
+diff --git a/tools/testing/selftests/drivers/net/hw/nk_redirect.bpf.c b/tools/testing/selftests/drivers/net/hw/nk_redirect.bpf.c
+new file mode 100644
+index 000000000000..7ac9ffd50f15
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/hw/nk_redirect.bpf.c
+@@ -0,0 +1,60 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * BPF program for redirecting traffic using bpf_redirect_neigh().
++ * Unlike bpf_redirect() which preserves L2 headers, bpf_redirect_neigh()
++ * performs neighbor lookup and fills in the correct L2 addresses for the
++ * target interface. This is necessary when redirecting across different
++ * device types (e.g., from netdevsim to netkit).
 + */
-+void psp_attach_netdev_notifier(void)
-+{
-+	if (READ_ONCE(psp_notifier_registered))
-+		return;
++#include <linux/bpf.h>
++#include <linux/pkt_cls.h>
++#include <linux/if_ether.h>
++#include <linux/ipv6.h>
++#include <linux/in6.h>
++#include <bpf/bpf_endian.h>
++#include <bpf/bpf_helpers.h>
 +
-+	mutex_lock(&psp_devs_lock);
-+	if (!psp_notifier_registered) {
-+		register_netdevice_notifier(&psp_netdev_notifier);
-+		WRITE_ONCE(psp_notifier_registered, true);
-+	}
-+	mutex_unlock(&psp_devs_lock);
++#define TC_ACT_OK 0
++#define ETH_P_IPV6 0x86DD
++
++#define ctx_ptr(field)		((void *)(long)(field))
++
++#define v6_p64_equal(a, b)	(a.s6_addr32[0] == b.s6_addr32[0] && \
++				 a.s6_addr32[1] == b.s6_addr32[1])
++
++volatile __u32 redirect_ifindex;
++volatile __u8 ipv6_prefix[16];
++
++SEC("tc/ingress")
++int tc_redirect(struct __sk_buff *skb)
++{
++	void *data_end = ctx_ptr(skb->data_end);
++	void *data = ctx_ptr(skb->data);
++	struct in6_addr *match_prefix;
++	struct ipv6hdr *ip6h;
++	struct ethhdr *eth;
++
++	match_prefix = (struct in6_addr *)ipv6_prefix;
++
++	if (skb->protocol != bpf_htons(ETH_P_IPV6))
++		return TC_ACT_OK;
++
++	eth = data;
++	if ((void *)(eth + 1) > data_end)
++		return TC_ACT_OK;
++
++	ip6h = data + sizeof(struct ethhdr);
++	if ((void *)(ip6h + 1) > data_end)
++		return TC_ACT_OK;
++
++	if (!v6_p64_equal(ip6h->daddr, (*match_prefix)))
++		return TC_ACT_OK;
++
++	/*
++	 * Use bpf_redirect_neigh() to perform neighbor lookup and fill in
++	 * correct L2 addresses for the target interface.
++	 */
++	return bpf_redirect_neigh(redirect_ifindex, NULL, 0, 0);
 +}
 +
- static int __init psp_init(void)
- {
- 	mutex_init(&psp_devs_lock);
- 
- 	return genl_register_family(&psp_nl_family);
- }
-+
- subsys_initcall(psp_init);
-diff --git a/net/psp/psp_nl.c b/net/psp/psp_nl.c
-index aa60a8277829..44e00add4211 100644
---- a/net/psp/psp_nl.c
-+++ b/net/psp/psp_nl.c
-@@ -515,6 +515,13 @@ int psp_nl_dev_assoc_doit(struct sk_buff *skb, struct genl_info *info)
- 
- 	psp_nl_notify_dev(psd, PSP_CMD_DEV_CHANGE_NTF);
- 
-+	/* Register netdev notifier for assoc cleanup on success.
-+	 * Must drop psd->lock to ensure lock ordering: rtnl_lock -> psd->lock
-+	 */
-+	mutex_unlock(&psd->lock);
-+	psp_attach_netdev_notifier();
-+	mutex_lock(&psd->lock);
-+
- 	return psp_nl_reply_send(rsp, info);
- }
- 
++char __license[] SEC("license") = "GPL";
 -- 
 2.52.0
 
