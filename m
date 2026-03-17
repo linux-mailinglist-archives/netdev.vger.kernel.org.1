@@ -1,153 +1,138 @@
-Return-Path: <netdev+bounces-268551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268552-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OIOkLIIxuWn4uAEAu9opvQ
-	(envelope-from <netdev+bounces-268551-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:48:34 +0100
+	id 0K+JI5YwuWn4uAEAu9opvQ
+	(envelope-from <netdev+bounces-268552-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:44:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 037092A83C8
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:48:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07AF02A82C8
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:44:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4C730300D16D
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:42:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 62A44304262D
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7333D3A6B79;
-	Tue, 17 Mar 2026 10:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD143A7826;
+	Tue, 17 Mar 2026 10:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="b8oBytzJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A+mRoSiX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C443A6EE5
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 10:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0844B3A6F1E
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 10:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773744163; cv=none; b=WopH0cQCwCfaAmUAQrjpHR5UbiM/06ux2BnE1p0MR77QCJ+CDzRhnwTfd1VI6pWdc+d5UkQNfFVWWNnkWwOtZpSv2E6I++gqU9mREmvz3fTQ+LVJmaevnvHOJJP2zbRFR3j1Hc/xUndHfrS2T9wT9hGA18x6N/GS2zTSJK/LMVI=
+	t=1773744270; cv=none; b=Xy3bHpcw0xgRA4FRlS2MciD0lNXZ2z7q7I0krx0UnrqOUdG/IEOZGrqj71bI89MwucIjaI5ylAjbhQ2/NS8r4fINWJAv3d0FypS/cSrbq7N/ovhCbBUqStVNzLstl7qYAsG3KDbdyhdLUa3ncB+9iz20cUy5MGQCKlSqmQd+CFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773744163; c=relaxed/simple;
-	bh=J/rLAy+MarupWrvyAXpP4A+sqnGRpacd/t9XOlTXSk4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XViAIzuS23wWogkwE4JIyjmztyJ1RBEKroRjh2hU9sqI8/s4erxmZIFObrJkDuGZhIoiil1rmoSSteEEQwXcYn1AV25fAU6/vojBqnuCsGFx03lxWDAvO12NM19joPXRx3/JOIfNB31O6xQUjrWOofI/TF+5y46RVV4DnVg1oVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=b8oBytzJ; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 1725D20660;
-	Tue, 17 Mar 2026 11:42:40 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Rh7o5ZaKEkUZ; Tue, 17 Mar 2026 11:42:38 +0100 (CET)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 8FB7720520;
-	Tue, 17 Mar 2026 11:42:38 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 8FB7720520
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1773744158;
-	bh=L9MkpAJtr8uyTo98kPwRP2spnR8dVQx+3wVJOZ3mIqw=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=b8oBytzJYN0ndXIaUOfpQlUvXewogk98kFjFHsKt5CYVeDd2tI+JL6P4lN2qGS6Jb
-	 COJkTQFKGpOoQV36t82xpGLYP7zlQBj+s4/mA5pbge5VVtc7BktSviMIFs/GNSOhyr
-	 A+DTyRhLVslcKGooMNWI37/XlE/be4/iq3XQLLW7XfbVsH/4oV8uydmVcJKka+wtZX
-	 QtyxUZV32gpEw+xjcTeQMIbHUQ1Gd/zVOCqVkBZemvH7wEGJ5XayVO2geKSkTQ+f8j
-	 20pI+U4wcc8JBe6aG8skJGhPaR3TOR6SZ8EBVN8m5g4UyHHqi9A37PuICSdnsesmzG
-	 ChOEwwh0jTuKQ==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 17 Mar
- 2026 11:42:37 +0100
-Received: (nullmailer pid 1926784 invoked by uid 1000);
-	Tue, 17 Mar 2026 10:42:36 -0000
-Date: Tue, 17 Mar 2026 11:42:36 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Eric Dumazet <edumazet@google.com>
-CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, <netdev@vger.kernel.org>, <eric.dumazet@gmail.com>,
-	<syzbot+b518dfc8e021988fbd55@syzkaller.appspotmail.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>
-Subject: Re: [PATCH net] af_key: validate families in pfkey_send_migrate()
-Message-ID: <abkwHKnsm-AWwinP@secunet.com>
-References: <20260314170210.4039941-1-edumazet@google.com>
+	s=arc-20240116; t=1773744270; c=relaxed/simple;
+	bh=UQyonz/fROOd+E5ux5wnd2FwnDxCTcUUFUb5qdccPbk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kfYajtAupdjc2+iQVSUcv72KR7fducIjYW6qFfqMPNMHgIV4T9PzZd+F6Yohj7113XpEjVH3fPjnJIBB9m+bj49z4Q+sSk6TuvMX4p3f1K3qVCwSWyfhuO/zdzGKrATMRg2NFkR2uvz4cs9A0a2VYmYwlr7s/dVhbnPF5qMdp74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A+mRoSiX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94709C2BCC9
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 10:44:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773744269;
+	bh=UQyonz/fROOd+E5ux5wnd2FwnDxCTcUUFUb5qdccPbk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=A+mRoSiXRnP0rpmp94IIjRt+NqHylOr8sISWSQVsw6FsnP9W4Gy1oFyPwBK0+kEuq
+	 YfLXzK/+3b1dFclBnrbc2ImOIsXdkanWgEHrSTR11nomzEdwbZ2MsrKnz7L0qjTSVw
+	 PyQWSqVlidOEPJwz1i8qLiBH3MOkd1512mPLL7fdIyQ+0uombK85JScW2GEnHLEXq1
+	 ii/+gSwQ7AZdwIxfJaD2EebjNRUlYfVnUmrBr5fCQAGacIXTgVxS9TELk6L6l2pg6K
+	 F9OzwUfvdSlqSRKO0bcQ3m8PyQo3ZvX5dzdqs0+spfSqu35ViQI1qzscOxz9lkf0bc
+	 GWJmm9fFt5Qdw==
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-466f00535cfso3754433b6e.1
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 03:44:29 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVYuCZPLTguiyJHcD43yu/FUVrNnXRv5NH7DPHnm9cAzWFdSusxHzk2Ou5fWG3FZzdbEwatB+c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmxpZazgX9qLp6gblrOyD1rTwkPg27oHHRvosVdSXSakL1utLE
+	ULl/rczG5a5BemvLIHfhAR9uoR5w+rS12QrvMtPjYUiDAo4cWfSM3furpOxasVUEbVkVRhsXaRd
+	5bA5VLV7f21Tdg66FzpcNiVHdvX/v6sg=
+X-Received: by 2002:a05:6808:66c1:b0:464:a1ee:c412 with SMTP id
+ 5614622812f47-4675754332emr7723340b6e.31.1773744268614; Tue, 17 Mar 2026
+ 03:44:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260314170210.4039941-1-edumazet@google.com>
-X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
- (10.32.0.171)
+References: <20260316154159.1.I0a4d03104ecd5103df3d76f66c8d21b1d15a2e38@changeid>
+ <abkCPU3rxHI49N4_@shikoro> <abkD-VLprcbbEbB1@ashevche-desk.local>
+ <abkF0GO01sMcOhvb@shikoro> <abkLEgrZbdb03VWg@ashevche-desk.local>
+ <abkLY4AAQuFlTRC7@ashevche-desk.local> <abkT_jpjIki6pvX1@shikoro>
+ <abkqEni3phP8dqqw@ashevche-desk.local> <abkuNpwmYGa6qJPZ@shikoro>
+In-Reply-To: <abkuNpwmYGa6qJPZ@shikoro>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Tue, 17 Mar 2026 11:44:16 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0g=_HW7i8-emNdTtw_0Kjqri8qTehHvms52u-w7jqG6bQ@mail.gmail.com>
+X-Gm-Features: AaiRm51cRor4ZZDDr_mxj0wmImR4wUCy3F3N-SYcdW3xJYMr5MLA4gbqvDIFXzk
+Message-ID: <CAJZ5v0g=_HW7i8-emNdTtw_0Kjqri8qTehHvms52u-w7jqG6bQ@mail.gmail.com>
+Subject: Re: [PATCH] device property: Make modifications of fwnode "flags"
+ thread safe
+To: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	Douglas Anderson <dianders@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J . Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, stable@vger.kernel.org, 
+	Andrew Lunn <andrew@lunn.ch>, Daniel Scally <djrscally@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Fabio Estevam <festevam@gmail.com>, Frank Li <Frank.Li@nxp.com>, 
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Len Brown <lenb@kernel.org>, Mark Brown <broonie@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, Rob Herring <robh@kernel.org>, 
+	Russell King <linux@armlinux.org.uk>, Sakari Ailus <sakari.ailus@linux.intel.com>, 
+	Saravana Kannan <saravanak@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
+	devicetree@vger.kernel.org, driver-core@lists.linux.dev, imx@lists.linux.dev, 
+	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-i2c@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-spi@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com,gondor.apana.org.au];
-	TAGGED_FROM(0.00)[bounces-268551-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:dkim,secunet.com:email,secunet.com:mid,appspotmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,apana.org.au:email];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-268552-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux.intel.com,chromium.org,linuxfoundation.org,kernel.org,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,nxp.com,redhat.com,pengutronix.de,armlinux.org.uk,lists.linux.dev,lists.infradead.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rafael@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,b518dfc8e021988fbd55];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 037092A83C8
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sang-engineering.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 07AF02A82C8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 14, 2026 at 05:02:10PM +0000, Eric Dumazet wrote:
-> syzbot was able to trigger a crash in skb_put() [1]
-> 
-> Issue is that pfkey_send_migrate() does not check old/new families,
-> and that set_ipsecrequest() @family argument was truncated,
-> thus possibly overfilling the skb.
-> 
-> Validate families early, do not wait set_ipsecrequest().
-> 
-> [1]
-> 
-> skbuff: skb_over_panic: text:ffffffff8a752120 len:392 put:16 head:ffff88802a4ad040 data:ffff88802a4ad040 tail:0x188 end:0x180 dev:<NULL>
->  kernel BUG at net/core/skbuff.c:214 !
-> Call Trace:
->  <TASK>
->   skb_over_panic net/core/skbuff.c:219 [inline]
->   skb_put+0x159/0x210 net/core/skbuff.c:2655
->   skb_put_zero include/linux/skbuff.h:2788 [inline]
->   set_ipsecrequest net/key/af_key.c:3532 [inline]
->   pfkey_send_migrate+0x1270/0x2e50 net/key/af_key.c:3636
->   km_migrate+0x155/0x260 net/xfrm/xfrm_state.c:2848
->   xfrm_migrate+0x2140/0x2450 net/xfrm/xfrm_policy.c:4705
->   xfrm_do_migrate+0x8ff/0xaa0 net/xfrm/xfrm_user.c:3150
-> 
-> Fixes: 08de61beab8a ("[PFKEYV2]: Extension for dynamic update of endpoint address(es)")
-> Reported-by: syzbot+b518dfc8e021988fbd55@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/69b5933c.050a0220.248e02.00f2.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+On Tue, Mar 17, 2026 at 11:34=E2=80=AFAM Wolfram Sang
+<wsa+renesas@sang-engineering.com> wrote:
+>
+>
+> > Like Danilo I am also not sure what lock protects fwnode accesses.
+>
+> This is basically the question I asked to Doug. If he also don't see
+> one, let's take this patch as is.
 
-Applied to the ipsec tree, thanks a lot Eric!
+I don't recall using any lock for this purpose.
+
+IIRC, the original assumption was that device fwnodes wouldn't be
+updated once set.
 
