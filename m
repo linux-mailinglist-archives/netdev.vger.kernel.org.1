@@ -1,164 +1,184 @@
-Return-Path: <netdev+bounces-268714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268715-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eLDTCF6iuWmiLQIAu9opvQ
-	(envelope-from <netdev+bounces-268714-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:50:06 +0100
+	id iGt+LriiuWmiLQIAu9opvQ
+	(envelope-from <netdev+bounces-268715-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:51:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27AB32B12CE
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:50:05 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60E932B1361
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:51:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id ABA453005339
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 18:49:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A0C14300C323
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 18:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8103E123D;
-	Tue, 17 Mar 2026 18:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4753F660D;
+	Tue, 17 Mar 2026 18:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bGThrhZ3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZcWDAlA7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692E134DCC4
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 18:49:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1E337C91B
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 18:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773773380; cv=none; b=dHxIsDn9E05sbm64el3PnoxKp7DFgXtGrMdQTctvbBggLOopsDQb7Mg53Qrl/JFgfSfXMe4kr4ImZCVxdC4rfFjE9F09wSMkG1f7AfN0IE4VUSWe76NyE2o+W+PxCKAGcVHmLyf47C/V9DrtFRD3LpfnC3KqUpnAoLH+qo/M6vI=
+	t=1773773494; cv=none; b=Yk4sCQIKpK/u0hUiR3doT7zxJphirW55zoxuXrVIQ5/60g47F7WFZNdS9ZzSO6CgV3A93GeH2fSh090lbgZRlrgUjt8ER3CIi1DxcdT8YxNdXT4BntbE5P6DW+gVXpY+iDvMNrxFql+aurAtiCCNgDRYxQ5b/lcM9BvKUp9y+E4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773773380; c=relaxed/simple;
-	bh=gn4xRhGUeUFSqpXwVFn4olG8Lc/o5U5g9uUQbuHmFrQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JBXpoE3xuRHXU2KvcU3ou/JyG6McZfu5s3/CruC/qSNbupfub6QLtqWEcH0lKtA8N3gPF52GszCoBCOlmYBQs76wlkmlhDLQl9RgAdmNNRCq3I9UIQJ+WS5QpVz9H7mzgL4tvUREY8XiPFbWw4V1WSrEYGgDqqhmd3IBrIHf6LY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bGThrhZ3; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c741692db4cso62197a12.1
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 11:49:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773773379; x=1774378179; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=gn4xRhGUeUFSqpXwVFn4olG8Lc/o5U5g9uUQbuHmFrQ=;
-        b=bGThrhZ3iIU9T+FWRxPHnh5lHqDFZRRmRQeScJpqa85lV/yx1EO2W6lpQ0tdHq8Pzu
-         psjvnSddvYs/JGw4VJrVMmMEZK87PAkYNiaJMZvhGL479vi3HMm8wev3yqbDuX+YXb6M
-         t5CxDJAH1DQ9cC92ZYjoAud+hnTKXbVDX8Cs32HWan7RgEaWL0k5A1CssD/h1GGf1FaX
-         OtmerThvm+jP3c6kcS67SQlxxLb4GlPbbKp+g0tY8Qsvz9g8R/qy1c4bpOziht1NBp53
-         3Q9cIEp2TgHkt/vCwcAMFNYQlf3WQCXgbq9u9mDbt5zBuPpvZva5vDGUXgD2CWfhxk6/
-         eeEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773773379; x=1774378179;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gn4xRhGUeUFSqpXwVFn4olG8Lc/o5U5g9uUQbuHmFrQ=;
-        b=QqLy6j4c6x4wfd5PU0dwjjLwktqfUbN2VRp8r1sj9mwhzu9mKyNbAp/E1YwBXe2WEa
-         DEfJe1htKPugpw4I/Vj7GJVvIkSs+wsemDteE5c+ZhGC/bUa0S2E/OO8LqDbvRMZZ2a1
-         M1HWXpBTCthH8x3EhX4XnD5B+rK/gEYZHUPd0p/cp2eXqWaXENViZEvPMFKS4caMkY8P
-         T68XAU2MPZNuIyBvNJAvWsRyg8Zz3tPAeIWIb6c5FIXi2sPmtiT+NFnji1yFL2lz3ODR
-         /4VU68Uyg+q00Nyq17nmHPTaV3Y8hQLlFUPPxT1GSrJBcA0MLMMDVVLe1u76iECUtBY3
-         C/Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCWcrVSf7wyGava9ZaWsNDhmoes210l4YWMjc+NLMXpEJXF3/m4Zk9uzHawyGT1y7JLHnlaHcqY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCEsyBzOOZIk9Qv28VWPqEmROZEsiGSjVPyDcLqMPKFsX1Hcm6
-	SejKYVLCxWZ4ZulRqzOSUSBaJFygwd5lOkhrHVr+nLtd22mwDpV/cLLm
-X-Gm-Gg: ATEYQzwU2jZyRRcmeeskphNGTf9i+LuF8gBzSIjKTB0nxV1xx1jRSYPAxZYsViHtNTn
-	ERQXNhoQsriksFoRzE3iP8qrBxnDYgnEn0DE8EhPC9G2HtL7baCP2dEvPgex7/nmfa/aYb16dDO
-	7LkIRQDTWi/DG4W1Y3MWYdr195V6XSmvKGClquKCMS0TKq72LdAufjc/8ErQtRbdYDIgJ5wX1A1
-	gNQblcPAVlbxvbajdI+hIvnPoOT/RQ5sgv1yt9JF8+9wyQGF1eBVdxD4J49X8R7n01gLcePKlxP
-	1GECR3ggh7Nf27Ou2Yv7QerdfUtnJGPyz2uR5fqdneVhMm1XoVVa2+KqY5idyTrpfzo0hd/lyDQ
-	QLa5Zr6LbBZW4fdheTXmgP1rfZL47ryG/K7ttkx1MjtwvzLHZdt5LA9ITErVCmjUYqdng6VMInt
-	9L5aC0LAU4ODoTTXuEz0vuaiE/Dlu86cNffJyJokobkTl5z52uvDsv
-X-Received: by 2002:a05:6a20:d43:b0:398:5f66:bf59 with SMTP id adf61e73a8af0-39b7e0766e4mr3735686637.36.1773773378682;
-        Tue, 17 Mar 2026 11:49:38 -0700 (PDT)
-Received: from [192.168.0.226] ([38.34.87.7])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c741e546877sm328725a12.17.2026.03.17.11.49.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 11:49:38 -0700 (PDT)
-Message-ID: <c867fba43c9182113604fa2435abff782bea254c.camel@gmail.com>
-Subject: Re: [RFC PATCH bpf-next v2 05/11] bpf: Preserve reg->id of pointer
- objects after null-check
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>, Alexei Starovoitov
-	 <alexei.starovoitov@gmail.com>
-Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
-  Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Kumar Kartikeya Dwivedi	 <memxor@gmail.com>, Martin
- KaFai Lau <martin.lau@kernel.org>, Kernel Team	 <kernel-team@meta.com>
-Date: Tue, 17 Mar 2026 11:49:35 -0700
-In-Reply-To: <CAMB2axOmWD8oDc-TVxS2NzWjvvwXCo+N-kyqj2UWV8OTe5_yiw@mail.gmail.com>
-References: <20260307064439.3247440-1-ameryhung@gmail.com>
-	 <20260307064439.3247440-6-ameryhung@gmail.com>
-	 <CAADnVQKkXKyqqW5zFC+N2NaU+7wD1XouqF9T=ReNivCKDWcFiQ@mail.gmail.com>
-	 <CAADnVQLCKi_QL1FeybW+6MH6FAOAoRJyW06UvtX3my3yNSH5eQ@mail.gmail.com>
-	 <CAMB2axOmWD8oDc-TVxS2NzWjvvwXCo+N-kyqj2UWV8OTe5_yiw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
+	s=arc-20240116; t=1773773494; c=relaxed/simple;
+	bh=Yb2DCeLzNtUt5enlhMNxpE5dFjaCvOsc/ytqk6bDheU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P9mX4VaUN0HjYVXANCWt0UIREDszYUcHekK0s61C7JNCsCJNTjucBw4XaDlDf9pmbz/QlarBosUi/Q0Ur3A8prFb1DiACkKeXkRwFiVZKOlTZSgvWJjRWdy9gwpIKDh7PgGf6ipeExofcuhbUr7SXrhtsCM2lcGqLFvJwQ5diMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZcWDAlA7; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773773492; x=1805309492;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Yb2DCeLzNtUt5enlhMNxpE5dFjaCvOsc/ytqk6bDheU=;
+  b=ZcWDAlA7TXyfDXWNIur1S3gaSk1PASiUaZ8A3jof0XkQNuEWN6nYdiBq
+   /xM7OQR6OZwvxaJGIX8fBMZ+KyH+gXSKVdBoWdryBMv35E7CWKCnnK7Z8
+   /IKnV4M89Prwe4NPg2XD/Zy4OIMKIHh2b7gaEkEPua+keh0gZtx4lGxIU
+   mPUqz7NoxR0p139/CzQC4hcNpxTHH4f9ETIo1ZkIDROiHTea3kgmMKmS4
+   AOmwNdTVLLATTOltZjQJH8cu/kf80fktvl1LENLq6fbdTIWOJfgrUJFG1
+   hKwy42VUsQyDpmcH0pcMqFjChGtNvDEHGsHEdZECIRhXolPrhawiQpm0e
+   g==;
+X-CSE-ConnectionGUID: 7NkHgbnoTiG5vjjeQ0wsHw==
+X-CSE-MsgGUID: camel/LJTI6o0+kGwt917Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11732"; a="100274509"
+X-IronPort-AV: E=Sophos;i="6.23,126,1770624000"; 
+   d="scan'208";a="100274509"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 11:51:32 -0700
+X-CSE-ConnectionGUID: KW0y3OcqQn6DEaTNSyoWYA==
+X-CSE-MsgGUID: pBVoPaVWR1m2+kvt1tF/7Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,126,1770624000"; 
+   d="scan'208";a="226503096"
+Received: from lkp-server01.sh.intel.com (HELO 63737dd503cb) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 17 Mar 2026 11:51:29 -0700
+Received: from kbuild by 63737dd503cb with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w2ZVm-000000001pV-2vuF;
+	Tue, 17 Mar 2026 18:51:26 +0000
+Date: Wed, 18 Mar 2026 02:51:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, pabeni@redhat.com, edumazet@google.com,
+	horms@kernel.org, kuba@kernel.org,
+	John Ousterhout <ouster@cs.stanford.edu>
+Subject: Re: [PATCH net-next v17 14/14] net: homa: create Makefile and Kconfig
+Message-ID: <202603180241.OVIQpOJ1-lkp@intel.com>
+References: <20260316223228.2611-15-ouster@cs.stanford.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260316223228.2611-15-ouster@cs.stanford.edu>
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com,meta.com];
-	TAGGED_FROM(0.00)[bounces-268714-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_ALL(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_FROM(0.00)[bounces-268715-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eddyz87@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 27AB32B12CE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,01.org:url,intel.com:dkim,intel.com:email,intel.com:mid]
+X-Rspamd-Queue-Id: 60E932B1361
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 2026-03-11 at 16:46 -0700, Amery Hung wrote:
-> On Wed, Mar 11, 2026 at 3:30=E2=80=AFPM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
-> >=20
-> > On Wed, Mar 11, 2026 at 3:26=E2=80=AFPM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
+Hi John,
 
-[...]
+kernel test robot noticed the following build errors:
 
-> > One more thing...
-> >=20
-> > How does it interact with reg_is_init_pkt_pointer() ?
-> >=20
-> > That pointer has to have id =3D=3D 0.
->=20
-> I haven't looked deep into the case. Currently, skb is non-referenced
-> for non-qdisc programs, so skb dynptr won't need to track it.
->=20
-> If there is ever a need to track it, we can assign a reserved non-zero
-> id to the unmodified pkt pointer. For reg_is_init_pkt_pointer(), it is
-> already checking tnum_equals_const(reg->var_off, 0), so maybe it is
-> fine to drop the id check (not sure).
+[auto build test ERROR on net-next/main]
 
-Looks like dropping id =3D=3D 0 check in reg_is_init_pkt_pointer() should b=
-e fine.
+url:    https://github.com/intel-lab-lkp/linux/commits/John-Ousterhout/net-homa-define-user-visible-API-for-Homa/20260317-070659
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260316223228.2611-15-ouster%40cs.stanford.edu
+patch subject: [PATCH net-next v17 14/14] net: homa: create Makefile and Kconfig
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20260318/202603180241.OVIQpOJ1-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260318/202603180241.OVIQpOJ1-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603180241.OVIQpOJ1-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> net/homa/homa_plumbing.c:94:30: error: initialization of 'int (*)(struct sock *, struct msghdr *, size_t,  int)' {aka 'int (*)(struct sock *, struct msghdr *, unsigned int,  int)'} from incompatible pointer type 'int (*)(struct sock *, struct msghdr *, size_t,  int,  int *)' {aka 'int (*)(struct sock *, struct msghdr *, unsigned int,  int,  int *)'} [-Wincompatible-pointer-types]
+      94 |         .recvmsg           = homa_recvmsg,
+         |                              ^~~~~~~~~~~~
+   net/homa/homa_plumbing.c:94:30: note: (near initialization for 'homa_prot.recvmsg')
+   In file included from net/homa/homa_plumbing.c:7:
+   net/homa/homa_impl.h:402:10: note: 'homa_recvmsg' declared here
+     402 | int      homa_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+         |          ^~~~~~~~~~~~
+   net/homa/homa_plumbing.c:111:30: error: initialization of 'int (*)(struct sock *, struct msghdr *, size_t,  int)' {aka 'int (*)(struct sock *, struct msghdr *, unsigned int,  int)'} from incompatible pointer type 'int (*)(struct sock *, struct msghdr *, size_t,  int,  int *)' {aka 'int (*)(struct sock *, struct msghdr *, unsigned int,  int,  int *)'} [-Wincompatible-pointer-types]
+     111 |         .recvmsg           = homa_recvmsg,
+         |                              ^~~~~~~~~~~~
+   net/homa/homa_plumbing.c:111:30: note: (near initialization for 'homav6_prot.recvmsg')
+   net/homa/homa_impl.h:402:10: note: 'homa_recvmsg' declared here
+     402 | int      homa_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+         |          ^~~~~~~~~~~~
+
+
+vim +94 net/homa/homa_plumbing.c
+
+fda29e883f7618 John Ousterhout 2026-03-16   77  
+fda29e883f7618 John Ousterhout 2026-03-16   78  /* This structure also defines functions that handle various operations
+fda29e883f7618 John Ousterhout 2026-03-16   79   * on Homa sockets. However, these functions are lower-level than those
+fda29e883f7618 John Ousterhout 2026-03-16   80   * in homa_proto_ops: they are specific to the PF_INET or PF_INET6
+fda29e883f7618 John Ousterhout 2026-03-16   81   * protocol family, and in many cases they are invoked by functions in
+fda29e883f7618 John Ousterhout 2026-03-16   82   * homa_proto_ops. Most of these functions have Homa-specific implementations.
+fda29e883f7618 John Ousterhout 2026-03-16   83   */
+fda29e883f7618 John Ousterhout 2026-03-16   84  static struct proto homa_prot = {
+fda29e883f7618 John Ousterhout 2026-03-16   85  	.name		   = "HOMA",
+fda29e883f7618 John Ousterhout 2026-03-16   86  	.owner		   = THIS_MODULE,
+fda29e883f7618 John Ousterhout 2026-03-16   87  	.close		   = homa_close,
+fda29e883f7618 John Ousterhout 2026-03-16   88  	.connect	   = ip4_datagram_connect,
+fda29e883f7618 John Ousterhout 2026-03-16   89  	.init		   = homa_socket,
+fda29e883f7618 John Ousterhout 2026-03-16   90  	.destroy	   = homa_sock_destroy,
+fda29e883f7618 John Ousterhout 2026-03-16   91  	.setsockopt	   = homa_setsockopt,
+fda29e883f7618 John Ousterhout 2026-03-16   92  	.getsockopt	   = homa_getsockopt,
+fda29e883f7618 John Ousterhout 2026-03-16   93  	.sendmsg	   = homa_sendmsg,
+fda29e883f7618 John Ousterhout 2026-03-16  @94  	.recvmsg	   = homa_recvmsg,
+fda29e883f7618 John Ousterhout 2026-03-16   95  	.hash		   = homa_hash,
+fda29e883f7618 John Ousterhout 2026-03-16   96  	.unhash		   = homa_unhash,
+fda29e883f7618 John Ousterhout 2026-03-16   97  	.obj_size	   = sizeof(struct homa_sock),
+fda29e883f7618 John Ousterhout 2026-03-16   98  	.no_autobind       = 1,
+fda29e883f7618 John Ousterhout 2026-03-16   99  };
+fda29e883f7618 John Ousterhout 2026-03-16  100  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
