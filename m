@@ -1,229 +1,366 @@
-Return-Path: <netdev+bounces-268611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268617-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sJp4Ba9euWnYAgIAu9opvQ
-	(envelope-from <netdev+bounces-268611-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:01:19 +0100
+	id 0BBTJu9guWlsCwIAu9opvQ
+	(envelope-from <netdev+bounces-268617-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:10:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 527382AB552
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:01:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06E192AB888
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:10:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0DEE4300B47F
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:01:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A5E33290ED5
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC73D3E1203;
-	Tue, 17 Mar 2026 14:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="X2ml0pbA";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="nz8bGRKe";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="PzLpze84";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="cbS+TY6W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD393E3DBB;
+	Tue, 17 Mar 2026 14:03:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D35A3E121D
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 14:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D7D3E314C
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 14:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773756068; cv=none; b=CMl2p1c6YweEsnfe1Hu6+a6I0zL2gOpKaDTTC68FIEJ/5b9F6YHuvK0rvegUJSasCsXz7PBu+fARbBY49YvfNaOUsNlNyvP4CkHRzkAdrQ+PlNYe9qh2/kUb5JXpAS3BSSFhrs8QaBkUVpNARwBxxhI32pzH06qT6qiRe4VMRrA=
+	t=1773756208; cv=none; b=okhYpTX8YmvS5tscZvRgp5GCHDFyB1iNj7UH0twqzOLr/nLuKrvr18LH6EOamIzAHvcR6yn0V0uAMpa2wEN/GD4OKoX9c/tKiuqFY4Kq3jcrtvTtWDkLFc5CR11Bquj0k5TNn7aRmZoUnozS8UZ/FHhgHD9coOWWz/907cE4Ot8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773756068; c=relaxed/simple;
-	bh=gyxmVw9w8IIW8kTl7ewnjbhQM9u6OeTRE5QFfrT/5N0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WRzGQ3TIp2JSM9fMSP3fOYOTcLsaOkptVUjzgrKxlWg4nAGvRsg/09/d5H1K69OpSgyOxwni/Nxm80umFIKbxE3dJUh8D6cGAiUp9z276mv/GBLQjleIY7xiLWHy4N2mcAWogBgGnodPEIX7QWsQ72OrHQ50LY2l0r7BA6WvHHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=X2ml0pbA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=nz8bGRKe; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=PzLpze84; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=cbS+TY6W; arc=none smtp.client-ip=195.135.223.130
+	s=arc-20240116; t=1773756208; c=relaxed/simple;
+	bh=gJat9vltMTb74jlqY6V4kCMB3tDnjFb5AcNadu1XYEc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D3y2PD0pxjzwcwjWBb7C3AidExUYVVhDqcRULSCARSyoc/LF+ZS1Z+jwEyb78LFdMD6H7qBlmj9MtiNwzqy4ieB01Pj825igJJrT0eaRJp9W+DmAXXiUWEgXT5PktWmM7VaU3r4+8x5wF1RAs6SX9DAQ/CFNtfzbqQ75OAT99W4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 58AA24D337;
-	Tue, 17 Mar 2026 14:01:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773756065; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=Z42gc913v7qs82hn1hB8yx7ErxPW9ggLXqvAyIcz4oU=;
-	b=X2ml0pbAFz/6aqKGt6pgRhQL2Hl/w2d00SJVS1d3/5Q/qixaw5J6Vg5Il628neoi7RGf9K
-	3iKg/q5tCHivR2YRENH8bkKwFERBNJL9wXOg4CqwOyzcv8EP/fjQgNuHboQnzTZQZOOGph
-	BSbzSCO8QLeaHJ3liB/AjpEvUTQ4Nf8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773756065;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=Z42gc913v7qs82hn1hB8yx7ErxPW9ggLXqvAyIcz4oU=;
-	b=nz8bGRKefAFc1zH48fLvTHd8x8eVYwyQv9s+xoo0my4hQlYqwORkLGVER8EuznKvuj7Hjv
-	DN7pw2uIdq08ndDg==
-Authentication-Results: smtp-out1.suse.de;
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 594E25BE0D;
+	Tue, 17 Mar 2026 14:03:25 +0000 (UTC)
+Authentication-Results: smtp-out2.suse.de;
 	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773756062; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=Z42gc913v7qs82hn1hB8yx7ErxPW9ggLXqvAyIcz4oU=;
-	b=PzLpze84/YZswWKbOpqheJUOTvlrxh2kCUc8N1qRZxvh5FfpY56/Rl20eg/FWJXMlnbAMj
-	NQcpP5Jxk9L1gt3SjwpJ+EulLpUeKVrhxuK4oYnhig/lxAVwysW2z3z0FeyWzrB/ao/qNj
-	Ys+LIGU0agQautlsYYHuHQjXdUp/i/Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773756062;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=Z42gc913v7qs82hn1hB8yx7ErxPW9ggLXqvAyIcz4oU=;
-	b=cbS+TY6W/h6Kw4wDA0lmiglzupArg2cW7RfwkwQM0ant1e4YuLVUnw0dMYVowzSmNzK9/b
-	jR/JSY0wjT3N+ZAQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 395684273B;
-	Tue, 17 Mar 2026 14:01:02 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B4A464273B;
+	Tue, 17 Mar 2026 14:03:24 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id HNbyDZ5euWmjYgAAD6G6ig
-	(envelope-from <iluceno@suse.de>); Tue, 17 Mar 2026 14:01:02 +0000
-From: Ismael Luceno <iluceno@suse.de>
-To: linux-kernel@vger.kernel.org,
-	Simon Horman <horms@verge.net.au>,
-	Julian Anastasov <ja@ssi.bg>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	"David S . Miller" <davem@davemloft.net>,
+	id eKQPKSxfuWmpYwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 17 Mar 2026 14:03:24 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: Fernando Fernandez Mancera <fmancera@suse.de>,
+	=?UTF-8?q?Ricardo=20B=2E=20Marli=C3=A8re?= <rbm@suse.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Ismael Luceno <iluceno@suse.de>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Federico Pinca <federico.pinca@suse.com>,
-	Andreas Taschner <andreas.taschner@suse.com>,
-	Brad Bendily <brad.bendily@suse.com>,
-	Brendon Caligari <brendon.caligari@suse.com>,
-	Clemens Famulla-Conrad <cfamullaconrad@suse.com>,
-	Firo Yang <firo.yang@suse.com>,
-	Gabriel Krisman Bertazi <gabriel.bertazi@suse.com>,
-	Hans van den Heuvel <hvdheuvel@suse.com>,
-	Jean Delvare <jdelvare@suse.com>,
-	Michal Hocko <mhocko@suse.com>,
-	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-	Petr Mladek <pmladek@suse.com>,
-	Petr Tesarik <ptesarik@suse.com>,
-	Richard Thompson <richard.thompson@suse.com>,
-	William Preston <wpreston@suse.com>,
-	Yu Xu <yu.xu@suse.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org
-Subject: [PATCH] ipvs: Move defense_work to system_dfl_long_wq
-Date: Tue, 17 Mar 2026 15:00:59 +0100
-Message-ID: <20260317140100.24993-2-iluceno@suse.de>
-X-Mailer: git-send-email 2.53.0
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 04/10 net-next v3] ipv6: prepare headers for ipv6_stub removal
+Date: Tue, 17 Mar 2026 15:01:00 +0100
+Message-ID: <20260317140141.5723-5-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260317140141.5723-1-fmancera@suse.de>
+References: <20260317140141.5723-1-fmancera@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spam-Score: -4.00
 X-Spam-Level: 
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[suse.de : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268617-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268611-lists,netdev=lfdr.de];
-	RSPAMD_EMAILBL_FAIL(0.00)[iluceno.suse.de:query timed out];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[iluceno@suse.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	SEM_URIBL_FRESH15_UNKNOWN_FAIL(0.00)[suse.de:query timed out];
-	SEM_URIBL_UNKNOWN_FAIL(0.00)[suse.de:query timed out];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.987];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RBL_SEM_IPV6_FAIL(0.00)[2600:3c15:e001:75::12fc:5321:query timed out];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,suse.de:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 527382AB552
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:email,suse.de:mid]
+X-Rspamd-Queue-Id: 06E192AB888
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Under synflood conditions binding defense_work to system_long_wq may
-pin it to a saturated CPU.
+In preparation for dropping ipv6_stub and converting its users to direct
+function calls, introduce static inline dummy functions and fallback
+macros in the IPv6 networking headers.
 
-We've observed improved throughtput on a DPDK/VPP application with
-this change. We attribute this to the reduced context switching.
+These fallbacks ensure that when CONFIG_IPV6 is completely disabled,
+there are no compiling or linking errors due to code paths not guarded
+by preprocessor macro IS_ENABLED(CONFIG_IPV6).
 
-The defense_work handler has no per-CPU data dependencies and no cache
-locality requirements that would justify this.
+In addition, export ndisc_send_na(), ip6_route_input() and
+ip6_fragment().
 
-Signed-off-by: Ismael Luceno <iluceno@suse.de>
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+Tested-by: Ricardo B. Marlière <rbm@suse.com>
 ---
-Depends-on: wq/for-7.1 c116737e972e ("workqueue: Add system_dfl_long_wq for long unbound works")
+ include/net/ip6_fib.h   | 32 ++++++++++++++++++++++++++++++++
+ include/net/ip6_route.h | 26 ++++++++++++++++++++++++++
+ include/net/ipv6.h      | 10 ++++++++++
+ include/net/ndisc.h     | 13 ++++++++++++-
+ net/ipv6/ip6_output.c   |  1 +
+ net/ipv6/ndisc.c        |  1 +
+ net/ipv6/route.c        |  1 +
+ 7 files changed, 83 insertions(+), 1 deletion(-)
 
- net/netfilter/ipvs/ip_vs_ctl.c | 6 +++---
- net/netfilter/ipvs/ip_vs_est.c | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-index 35642de2a0fe..948ae5882a70 100644
---- a/net/netfilter/ipvs/ip_vs_ctl.c
-+++ b/net/netfilter/ipvs/ip_vs_ctl.c
-@@ -234,7 +234,7 @@ #define DEFENSE_TIMER_PERIOD	1*HZ
- 	update_defense_level(ipvs);
- 	if (atomic_read(&ipvs->dropentry))
- 		ip_vs_random_dropentry(ipvs);
--	queue_delayed_work(system_long_wq, &ipvs->defense_work,
-+	queue_delayed_work(system_dfl_long_wq, &ipvs->defense_work,
- 			   DEFENSE_TIMER_PERIOD);
- }
- #endif
-@@ -273,7 +273,7 @@ #define DEFENSE_TIMER_PERIOD	1*HZ
- 	atomic_set(&ipvs->est_genid_done, genid);
- 
- 	if (repeat)
--		queue_delayed_work(system_long_wq, &ipvs->est_reload_work,
-+		queue_delayed_work(system_dfl_long_wq, &ipvs->est_reload_work,
- 				   delay);
- 
- unlock:
-@@ -4377,7 +4377,7 @@ do_ip_vs_get_ctl(struct sock *sk, int cmd, void __user *user, int *len)
- 		goto err;
- 
- 	/* Schedule defense work */
--	queue_delayed_work(system_long_wq, &ipvs->defense_work,
-+	queue_delayed_work(system_dfl_long_wq, &ipvs->defense_work,
- 			   DEFENSE_TIMER_PERIOD);
- 
- 	return 0;
-diff --git a/net/netfilter/ipvs/ip_vs_est.c b/net/netfilter/ipvs/ip_vs_est.c
-index b17de33314da..454ea24828cc 100644
---- a/net/netfilter/ipvs/ip_vs_est.c
-+++ b/net/netfilter/ipvs/ip_vs_est.c
-@@ -235,7 +235,7 @@ #define pr_fmt(fmt) "IPVS: " fmt
- 	ip_vs_est_stopped_recalc(ipvs);
- 	/* Bump the kthread configuration genid */
- 	atomic_inc(&ipvs->est_genid);
--	queue_delayed_work(system_long_wq, &ipvs->est_reload_work, 0);
-+	queue_delayed_work(system_dfl_long_wq, &ipvs->est_reload_work, 0);
+diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+index 39c98c3d8ac5..1705cd6aab18 100644
+--- a/include/net/ip6_fib.h
++++ b/include/net/ip6_fib.h
+@@ -486,11 +486,30 @@ void rt6_get_prefsrc(const struct rt6_info *rt, struct in6_addr *addr)
+ 	rcu_read_unlock();
  }
  
- /* Start kthread task with current configuration */
++#if IS_ENABLED(CONFIG_IPV6)
+ int fib6_nh_init(struct net *net, struct fib6_nh *fib6_nh,
+ 		 struct fib6_config *cfg, gfp_t gfp_flags,
+ 		 struct netlink_ext_ack *extack);
+ void fib6_nh_release(struct fib6_nh *fib6_nh);
+ void fib6_nh_release_dsts(struct fib6_nh *fib6_nh);
++#else
++static inline int fib6_nh_init(struct net *net, struct fib6_nh *fib6_nh,
++			       struct fib6_config *cfg, gfp_t gfp_flags,
++			       struct netlink_ext_ack *extack)
++{
++	NL_SET_ERR_MSG(extack, "IPv6 support not enabled in kernel");
++	return -EAFNOSUPPORT;
++}
++
++static inline void fib6_nh_release(struct fib6_nh *fib6_nh)
++{
++}
++
++static inline void fib6_nh_release_dsts(struct fib6_nh *fib6_nh)
++{
++}
++#endif
++
+ 
+ int call_fib6_entry_notifiers(struct net *net,
+ 			      enum fib_event_type event_type,
+@@ -502,8 +521,15 @@ int call_fib6_multipath_entry_notifiers(struct net *net,
+ 					unsigned int nsiblings,
+ 					struct netlink_ext_ack *extack);
+ int call_fib6_entry_notifiers_replace(struct net *net, struct fib6_info *rt);
++#if IS_ENABLED(CONFIG_IPV6)
+ void fib6_rt_update(struct net *net, struct fib6_info *rt,
+ 		    struct nl_info *info);
++#else
++static inline void fib6_rt_update(struct net *net, struct fib6_info *rt,
++				  struct nl_info *info)
++{
++}
++#endif
+ void inet6_rt_notify(int event, struct fib6_info *rt, struct nl_info *info,
+ 		     unsigned int flags);
+ 
+@@ -568,7 +594,13 @@ unsigned int fib6_tables_seq_read(const struct net *net);
+ int fib6_tables_dump(struct net *net, struct notifier_block *nb,
+ 		     struct netlink_ext_ack *extack);
+ 
++#if IS_ENABLED(CONFIG_IPV6)
+ void fib6_update_sernum(struct net *net, struct fib6_info *rt);
++#else
++static inline void fib6_update_sernum(struct net *net, struct fib6_info *rt)
++{
++}
++#endif
+ void fib6_update_sernum_upto_root(struct net *net, struct fib6_info *rt);
+ void fib6_update_sernum_stub(struct net *net, struct fib6_info *f6i);
+ 
+diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
+index 0c8eeb6abe7a..09ffe0f13ce7 100644
+--- a/include/net/ip6_route.h
++++ b/include/net/ip6_route.h
+@@ -77,7 +77,14 @@ static inline bool rt6_qualify_for_ecmp(const struct fib6_info *f6i)
+ 		f6i->fib6_nh->fib_nh_gw_family;
+ }
+ 
++#if IS_ENABLED(CONFIG_IPV6)
+ void ip6_route_input(struct sk_buff *skb);
++#else
++static inline void ip6_route_input(struct sk_buff *skb)
++{
++}
++#endif
++
+ struct dst_entry *ip6_route_input_lookup(struct net *net,
+ 					 struct net_device *dev,
+ 					 struct flowi6 *fl6,
+@@ -119,7 +126,15 @@ int ipv6_route_ioctl(struct net *net, unsigned int cmd,
+ int ip6_route_add(struct fib6_config *cfg, gfp_t gfp_flags,
+ 		  struct netlink_ext_ack *extack);
+ int ip6_ins_rt(struct net *net, struct fib6_info *f6i);
++#if IS_ENABLED(CONFIG_IPV6)
+ int ip6_del_rt(struct net *net, struct fib6_info *f6i, bool skip_notify);
++#else
++static inline int ip6_del_rt(struct net *net, struct fib6_info *f6i,
++			     bool skip_notify)
++{
++	return -EAFNOSUPPORT;
++}
++#endif
+ 
+ void rt6_flush_exceptions(struct fib6_info *f6i);
+ void rt6_age_exceptions(struct fib6_info *f6i, struct fib6_gc_args *gc_args,
+@@ -270,8 +285,19 @@ static inline bool ipv6_anycast_destination(const struct dst_entry *dst,
+ 	return __ipv6_anycast_destination(&rt->rt6i_dst, rt->rt6i_flags, daddr);
+ }
+ 
++#if IS_ENABLED(CONFIG_IPV6)
+ int ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
+ 		 int (*output)(struct net *, struct sock *, struct sk_buff *));
++#else
++static inline int ip6_fragment(struct net *net, struct sock *sk,
++			       struct sk_buff *skb,
++			       int (*output)(struct net *, struct sock *,
++					     struct sk_buff *))
++{
++	kfree_skb(skb);
++	return -EAFNOSUPPORT;
++}
++#endif
+ 
+ /* Variant of dst_mtu() for IPv6 users */
+ static inline u32 dst6_mtu(const struct dst_entry *dst)
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 0958cc5c6ec3..f99f273341f0 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -1044,8 +1044,18 @@ static inline struct sk_buff *ip6_finish_skb(struct sock *sk)
+ 
+ int ip6_dst_lookup(struct net *net, struct sock *sk, struct dst_entry **dst,
+ 		   struct flowi6 *fl6);
++#if IS_ENABLED(CONFIG_IPV6)
+ struct dst_entry *ip6_dst_lookup_flow(struct net *net, const struct sock *sk, struct flowi6 *fl6,
+ 				      const struct in6_addr *final_dst);
++#else
++static inline struct dst_entry *ip6_dst_lookup_flow(struct net *net, const struct sock *sk,
++						    struct flowi6 *fl6,
++						    const struct in6_addr *final_dst)
++{
++	return ERR_PTR(-EAFNOSUPPORT);
++}
++#endif
++
+ struct dst_entry *ip6_sk_dst_lookup_flow(struct sock *sk, struct flowi6 *fl6,
+ 					 const struct in6_addr *final_dst,
+ 					 bool connected);
+diff --git a/include/net/ndisc.h b/include/net/ndisc.h
+index d38783a2ce57..6152401f29f1 100644
+--- a/include/net/ndisc.h
++++ b/include/net/ndisc.h
+@@ -69,6 +69,12 @@ struct prefix_info;
+ 
+ extern struct neigh_table nd_tbl;
+ 
++#if IS_ENABLED(CONFIG_IPV6)
++#define ipv6_get_nd_tbl() (&nd_tbl)
++#else
++#define ipv6_get_nd_tbl() NULL
++#endif
++
+ struct nd_msg {
+         struct icmp6hdr	icmph;
+         struct in6_addr	target;
+@@ -356,7 +362,8 @@ static inline u32 ndisc_hashfn(const void *pkey, const struct net_device *dev, _
+ 
+ static inline struct neighbour *__ipv6_neigh_lookup_noref(struct net_device *dev, const void *pkey)
+ {
+-	return ___neigh_lookup_noref(&nd_tbl, neigh_key_eq128, ndisc_hashfn, pkey, dev);
++	return ___neigh_lookup_noref(ipv6_get_nd_tbl(), neigh_key_eq128,
++				     ndisc_hashfn, pkey, dev);
+ }
+ 
+ static inline
+@@ -406,6 +413,7 @@ static inline void __ipv6_confirm_neigh_stub(struct net_device *dev,
+ static inline struct neighbour *ip_neigh_gw6(struct net_device *dev,
+ 					     const void *addr)
+ {
++#if IS_ENABLED(CONFIG_IPV6)
+ 	struct neighbour *neigh;
+ 
+ 	neigh = __ipv6_neigh_lookup_noref_stub(dev, addr);
+@@ -413,6 +421,9 @@ static inline struct neighbour *ip_neigh_gw6(struct net_device *dev,
+ 		neigh = __neigh_create(ipv6_stub->nd_tbl, addr, dev, false);
+ 
+ 	return neigh;
++#else
++	return ERR_PTR(-EAFNOSUPPORT);
++#endif
+ }
+ 
+ int ndisc_init(void);
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index 8e2a6b28cea7..315808dc2a07 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -1045,6 +1045,7 @@ int ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
+ 	kfree_skb(skb);
+ 	return err;
+ }
++EXPORT_SYMBOL_GPL(ip6_fragment);
+ 
+ static inline int ip6_rt_check(const struct rt6key *rt_key,
+ 			       const struct in6_addr *fl_addr,
+diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+index f6a5d8c73af9..f76fb8a85452 100644
+--- a/net/ipv6/ndisc.c
++++ b/net/ipv6/ndisc.c
+@@ -576,6 +576,7 @@ void ndisc_send_na(struct net_device *dev, const struct in6_addr *daddr,
+ 
+ 	ndisc_send_skb(skb, daddr, src_addr);
+ }
++EXPORT_SYMBOL_GPL(ndisc_send_na);
+ 
+ static void ndisc_send_unsol_na(struct net_device *dev)
+ {
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index e206777785d4..b66a2f791e3f 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -2655,6 +2655,7 @@ void ip6_route_input(struct sk_buff *skb)
+ 	skb_dst_set_noref(skb, ip6_route_input_lookup(net, skb->dev,
+ 						      &fl6, skb, flags));
+ }
++EXPORT_SYMBOL_GPL(ip6_route_input);
+ 
+ INDIRECT_CALLABLE_SCOPE struct rt6_info *ip6_pol_route_output(struct net *net,
+ 					     struct fib6_table *table,
+-- 
+2.53.0
+
 
