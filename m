@@ -1,203 +1,211 @@
-Return-Path: <netdev+bounces-268578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268579-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QOxzNyY+uWkowQEAu9opvQ
-	(envelope-from <netdev+bounces-268578-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:42:30 +0100
+	id EB1NK4U9uWkowQEAu9opvQ
+	(envelope-from <netdev+bounces-268579-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:39:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F8E2A9196
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:42:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52B7F2A90CC
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:39:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9F0673010BAD
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:37:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A1B4230219E0
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:39:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 037B035F180;
-	Tue, 17 Mar 2026 11:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B115D36EAA9;
+	Tue, 17 Mar 2026 11:39:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gamghP8C";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qnVY+glx"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="X3VWJmPc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23CF34DCD1
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 11:37:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C24534F486;
+	Tue, 17 Mar 2026 11:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773747440; cv=none; b=sFHEKKhcu6GYPdQ4eh3xCpwMEthpnTE8RrJBgOSOMf0oVsG/rloINkRkSTbXequVJwOFborLliQuzbJJcO4Vy9x8pfsPZe5pyuXpIPk+MXiy41A8HwhZVe/+l2foNEMDNJAqXOhOjz+VrM5H+t8Y2e1T5rKMnP35lP+cjKGf3Oo=
+	t=1773747563; cv=none; b=gtxRJRnH/0lpyI0fk3CZJhEJzgEfoHUrJbpeSdOnLGRuoc0RQOrataff7Fd7d0fktZtLHVQxVcpNy11ru8kR5PqiFhdunYf2DsjWk1g/bFzDxZE9t8TDQaBP9g1r+3pquQgWIHOlqN9F9a11p9hBVbn6PIsQIZNqFtTI8QUAVUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773747440; c=relaxed/simple;
-	bh=5HV6z4bHFLNbBfcyV9bHXKPjl1fpAvjok3Roqp0mPs4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JVkdT58nJd4K+k1EJ5i1Wa+an/4SUAMB9ciG+2Eo8q5X349Zdpp3YhgIBJ211XQhccUQm7HjHpH+AW1quzAtfU3qvQ12YQid0q2OD8AL/E38MXtYiJgGKD3jxwROnWaVtzr5iKk5IG3f1BBGYO1dkskv+kfPiNDbR+3jzSvQegE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gamghP8C; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qnVY+glx; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773747438;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Dq2eU6Fwh8wnXD0wsmW8g52vWTNneSdO+JhFXQZ/JP4=;
-	b=gamghP8CGIbz8GElsGmcdyKA/tR4yMsWeEH1sbifU1X0sABYIuJXh5aAv8/rbYVDd1pIRv
-	jbmmJwdBCRYngNQ+7mMRfNanEp1hs80KAZsXSaTyyhjL/D/f75CBbGmnGjOljNZIdPWum+
-	o9pXlj3Ljrza1WuvqVaufTGJNTemSZ0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-519-6Ygc_KxqNMunS6gRToal0A-1; Tue, 17 Mar 2026 07:37:17 -0400
-X-MC-Unique: 6Ygc_KxqNMunS6gRToal0A-1
-X-Mimecast-MFC-AGG-ID: 6Ygc_KxqNMunS6gRToal0A_1773747436
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-439bab2d095so3431278f8f.3
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 04:37:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773747436; x=1774352236; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Dq2eU6Fwh8wnXD0wsmW8g52vWTNneSdO+JhFXQZ/JP4=;
-        b=qnVY+glxE2PXh1U06GdsBXVobHKiJvGvBdEacg3+KpJ8o1PF8IX861KlyRY0Q4alxN
-         DaYdKZl/HInKEauQr9L5Wgbo8i0DSOT0jvAm6vcJU0p6T3QYQPh9fRfnGJNM+HTPtL+/
-         Crq6FB98heRpbvK8vUFGFRq3JXymq5gYQBPiO3Vy/JutMAdZec5sOsS7XRoiaC2uO6gE
-         ly40srtvzpgY42PTwm6y2fxBN9LzbrRCpHGoOV+ynmOICeDX5A4zYpQR+1YglW+WAQMJ
-         3SKkO/eXFyPXPln9QW/egVCuPfSSVOk0BxivwRORAMha5WWXkHfe8zDSFrGlxtybG9dc
-         y1Hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773747436; x=1774352236;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Dq2eU6Fwh8wnXD0wsmW8g52vWTNneSdO+JhFXQZ/JP4=;
-        b=KqDaOthrYsEOdEtM0SJgQLhixr9qmb5VTNFWV5dPp/ijiApxoULqMovZTgh2QYu+5g
-         g3I8wmXnU6c8s5caUvZqDNC2maWhcXediWrR7TNb7Eu9XxvKqGEpVLJJNz7EhRFQF8DL
-         rkNu6Y8NpxX+0TtWIQAHxryNYy3jUlR+3DOA0YMoYYXv7aQdK1BVjhmkOETzzekCOzJX
-         LyBQlrVTeXPwAY0gtUCH1rxEW/3BdwytxM18obf1fYcaf9dujCpg1IdYnpWgNCxoZdgp
-         HF6/ZdGzytLp0LmMMAoGco6f9Y9pkFb73JMJe/6dyxSetb680J7cwqztBCYNiD+F+NIf
-         8ipg==
-X-Forwarded-Encrypted: i=1; AJvYcCWQlw61711TjS+dpSL0+T5OMrys0fCD8h9LKUhoXKOTXPH5++uOorA0/EMSbwKp1umiZhGWULU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynEvby1GYDkNLt+HF+aj+rJsadn+apPvzLnFQVLipowZuOUy9u
-	PFRhBY8dA5z26aQAjIgz76LQZBrtXd45wWCWHJWJnILqRsQXrbJtBeArXnxOYvc2VcJZ86RhaUK
-	WJNHD7pr9ShYsMF1Q3nQZCLNqKEylqT7dguLoN3pYhVy8SaUh9n+CR79P1w==
-X-Gm-Gg: ATEYQzxBvbzK2s43UrqInEj50TPWP/vUTOfefsD2e0EUEb9gvNayINBbW2wMStR67u1
-	QWyw6RbHCHb7g3sn/Bvq6HTvxiK1WkYXWnC15RewhO6K6ioLKfviFSder0fBhVlxOxfgJL7mZuA
-	D9n0PaTyD1FUugBr2IXF56Yo+5V4q4ubz3w0+x9hp+KPlHXXT/AwIEKYDAF5kDZpsQUueGFkDbR
-	oD8gHQ7F3kNs4HU6wFaJivsQzb2e36fyEzRJ4GI2sN/SvRjb2YV+XvUa/tnW2SG7bEIqfNxxBIp
-	AphttF6J20Uky9F/twKQbosfupqgjZtereV3vZYU5VgaGl7u8zP8t5pDF3kqbOJFI65LTy0IV0I
-	Bn/5vkBgnD4c+1oVQ6nQqRmN3zkOWWoVZmAN/ZB46y3deIgVlC0zYR08=
-X-Received: by 2002:a05:6000:2882:b0:439:b636:1fa4 with SMTP id ffacd0b85a97d-43a04dcbd70mr29866040f8f.48.1773747435976;
-        Tue, 17 Mar 2026 04:37:15 -0700 (PDT)
-X-Received: by 2002:a05:6000:2882:b0:439:b636:1fa4 with SMTP id ffacd0b85a97d-43a04dcbd70mr29865978f8f.48.1773747435468;
-        Tue, 17 Mar 2026 04:37:15 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.11.95])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe228986sm46926790f8f.35.2026.03.17.04.37.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Mar 2026 04:37:15 -0700 (PDT)
-Message-ID: <726e1d40-6a29-4e6f-964c-1a4d0cf7d4eb@redhat.com>
-Date: Tue, 17 Mar 2026 12:37:14 +0100
+	s=arc-20240116; t=1773747563; c=relaxed/simple;
+	bh=kdQ+1+afZ0cU27XQrMbqyykm1KyvnmBwhXqTYx7wVyc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YOptF6cPxvUsDaqGTY616P8duOty2OE0G9swzcpzMHuoKntEZ+wUyb3VHuUBByuEHBh/pibfViehRWcEHlxT+rHfJrZmOwNWAbA709gHbvjOfXbm2727jLIrIHCciyzQFK0AfdTdLoF2AiNKsu6EGmUjTg82Wi45939dI2xS1Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=X3VWJmPc; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 5E2C560275;
+	Tue, 17 Mar 2026 12:39:20 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1773747560;
+	bh=P33V43oP3dkCUdsRMCD8YrJZ9UrUUPnTwpPVsaX6Q9U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X3VWJmPc3wHHLmTk7yNGFmtyTNGuIZoIdvaMlyfbKfjthmfm+ND6C63mEIPFS4VJa
+	 o2hHxkWo0hWSDfjlelLylNrjpmGfILY7FlfcEImF1cmRzRtWI66Zs/8DUXxgl54XrD
+	 bmg20HqxJbOwuBWQXXmGZVzHB+Ufe1B0s0vpxtZuwayc6sbpLEZidRVVLqZhrpSs3a
+	 bab6ThnxoQd5xckRS32kUp09SDjEyr/oN2BH35NvVHPK0lTbrYeex8FSA7/WfJl+2n
+	 ADdK3j3XJQEaes2kT38+bCwv9mC73UVwODFkuZVwcrLqOEMeSseWC0AHN0Gtm5d7Sb
+	 5ZP7nonEKc8Gg==
+Date: Tue, 17 Mar 2026 12:39:17 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, fw@strlen.de,
+	horms@kernel.org, steffen.klassert@secunet.com,
+	antony.antony@secunet.com
+Subject: Re: [PATCH net-next,RFC 0/8] netfilter: flowtable bulking
+Message-ID: <abk9ZQoc7GxfgODn@chamomile>
+References: <20260317112917.4170466-1-pablo@netfilter.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 00/11] net: tunnel: introduce noref xmit flows
- for tunnels
-To: Marek Mietus <mmietus97@yahoo.com>, netdev@vger.kernel.org,
- sd@queasysnail.net, kuba@kernel.org
-Cc: Jason@zx2c4.com
-References: <20260312155657.25676-1-mmietus97.ref@yahoo.com>
- <20260312155657.25676-1-mmietus97@yahoo.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260312155657.25676-1-mmietus97@yahoo.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260317112917.4170466-1-pablo@netfilter.org>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268578-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268579-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[yahoo.com,vger.kernel.org,queasysnail.net,kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 77F8E2A9196
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux-ipsec.org:url]
+X-Rspamd-Queue-Id: 52B7F2A90CC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/12/26 4:56 PM, Marek Mietus wrote:
-> Currently, tunnel xmit flows always take a reference on the dst_entry
-> for each xmitted packet. These atomic operations are redundant in some
-> flows.
+Missing links:
+
+[1] https://lore.kernel.org/netdev/20180614141947.3580-1-pablo@netfilter.org/
+[2] https://linux-ipsec.org/2025-linux-kernel-flowtable-bulk-forwarding-and-xfrm-pcpu-forwarding-testing-results.html
+
+On Tue, Mar 17, 2026 at 12:29:09PM +0100, Pablo Neira Ayuso wrote:
+> Hi,
+>  
+> Back in 2018 [1], a new fast forwarding combining the flowtable and
+> GRO/GSO was proposed, however, "GRO is specialized to optimize the
+> non-forwarding case", so it was considered "counter-intuitive to base a
+> fast forwarding path on top of it".
+>  
+> Then, Steffen Klassert proposed the idea of adding a new engine for the
+> flowtable that operates on the skb list that is provided after the NAPI
+> cycle. The idea is to process this skb list to create bulks grouped by
+> the ethertype, output device, next hop and tos/dscp. Then, add a
+> specialized xmit path that can deal with these skb bulks. Note that GRO
+> needs to be disabled so this new forwarding engine obtains the list of
+> skbs that resulted from the NAPI cycle.
+>  
+> Before grouping skbs in bulks, there is a flowtable lookup to check if
+> this flow is already in the flowtable, otherwise, the packet follows
+> slow path. In case the flowtable lookup returns an entry, then this
+> packet follows fast path: the ttl is decremented, the corresponding NAT
+> mangling on the packet and layer 2/3 tunnel encapsulation (layer 2:
+> vlan/pppoe, layer 3: ipip) are performed.
+>  
+> The fast forwarding path is enabled through explicit user policy, so the
+> user needs to request this behaviour from control plane, the following
+> example shows how to place flows in the new fast forwarding path from
+> the forward chain:
 > 
-> This patchset introduces the infrastructure required for converting
-> the tunnel xmit flows to noref, and converts them where possible.
+>  table x {
+>         flowtable f {
+>                 hook early_ingress priority 0; devices = { eth0, eth1 }
+>         }
+>  
+>         chain y {
+>                 type filter hook forward priority 0;
+>                 ip protocol tcp flow offload @f counter
+>         }
+>  }
+>  
+>  
+> The example above sets up a fastpath for TCP flows that are placed in
+> the flowtable 'f', this flowtable is hooked at the new early_ingress
+> hook.  The initial TCP packets that match this rule from the standard
+> fowarding path create an entry in the flowtable.
+>  
+> Note that tcpdump only shows the packets in the tx path, since this
+> new early_ingress hook happens before the ingress tap.
 > 
-> These changes improve tunnel performance, since less atomic operations
-> are used.
+> The patch series contains 8 patches:
 > 
-> There are already noref optimizations in both ipv4 and ip6.
-> (See __ip_queue_xmit, inet6_csk_xmit)
-> This patchset implements similar optimizations in ip and udp tunnels.
+> - #1 and #2 adds the basic RX flowtable bulking infrastructure for
+>   IPv4 and IPv6.
+> - #3 adds the early_ingress netfilter hook.
+> - #4 adds a helper function to prepare for the netfilter chain for
+>   the early_ingress hook.
+> - #5 adds the early_ingress filter chain.
+> - #6 and #7 add helper functions to reuse TX path codebase.
+> - #8 adds the custom TX path for listified skbs and updates
+>   the flowtable bulking to use it.
 > 
-> Benchmarks:
-> I used a vxlan tunnel over a pair of veth peers and measured the average
-> throughput over multiple samples.
+> = Benchmark numbers =
 > 
-> I ran 100 samples on a clean build, and another 100 on a patched
-> build. Each sample ran for 120 seconds. These were my results:
+> Using the following testbed with 4 hosts with this topology:
+>  
+>  | sunset |-----| west |====| east |----| sunrise |
+>  
+> And this hardware:
+>  
+> * Supermicro H13SSW Motherboard
+> * AMD EPYC 9135 16-Core Processor (a.k.a. Bergamo, or Zen 5)
+> * NIC: Mellanox MT28800 ConnectX-5 Ex (100Gbps NIc)
+> * NIC: Broadcom BCM57508 NetXtreme-E (only on sunrise, 100Gbps NIc)
+>  
+> With 128 byte packets:
+>  
+> * From ~2 Mpps (baseline) to ~4 Mpps with 1 flow.
+> * From ~10.6 Mpps (baseline) to ~15.7 Mpps with 10 flows.
+>  
+> Antony Antony collected performance numbers and made a report describing
+> this the benchmarking[2]. This report includes numbers from the IPsec
+> support which is not included in this series.
+>
+> Comments welcome, thanks.
 > 
-> clean:      72.52 gb/sec, stddev = 1.39
-> patched:    75.39 gb/sec, stddev = 0.94
+> Pablo Neira Ayuso (8):
+>   netfilter: flowtable: Add basic bulking infrastructure for early ingress hook
+>   netfilter: flowtable: Add IPv6 bulking infrastructure for early ingress hook
+>   netfilter: nf_tables: add flowtable early_ingress support
+>   netfilter: nf_tables: add nft_set_pktinfo_ingress()
+>   netfilter: nf_tables: add early ingress chain
+>   net: add dev_dst_drop() helper function
+>   net: add dev_noqueue_xmit_list() helper function
+>   net: add dev_queue_xmit_list() and use it
 > 
-> TL;DR - This patchset results in a 4% improvement in throughput for
-> vxlan. It's safe to assume that we might see similar results when testing
-> other tunnels.
-
-Sabrina noted I wrongly replied on an old revision. Reporting my
-statements here for completeness.
-
-IMHO this performance delta is not enough to justify this amount of changes.
-
-Additionally, the measured impact of removing the dst_hold/dst_release
-does not fit with my direct experience on the same matter: it should be
-below noise level in practice, as dst are per-cpu and and no
-contention/false sharing is expected in a good setup.
-
-I think you are observing larger impact because in the veth test
-dst_release can happen on a remote CPU. Note that this setup (vxlan over
-veth) is not very relevant in practice.
-
-I'm sorry I'm not applying this series.
-
-Side note: if you are interested into improving (UDP) tunnel
-performances have a look to big TCP support work from Alice Mikityanska:
-
-https://lore.kernel.org/netdev/20260226201600.222044-1-alice.kernel@fastmail.im/
-
-/P
-
+>  include/linux/netdevice.h             |   2 +
+>  include/net/netfilter/nf_flow_table.h |  13 +-
+>  net/core/dev.c                        | 297 ++++++++++++++++----
+>  net/netfilter/nf_flow_table_inet.c    |  81 ++++++
+>  net/netfilter/nf_flow_table_ip.c      | 384 ++++++++++++++++++++++++++
+>  net/netfilter/nf_tables_api.c         |  12 +-
+>  net/netfilter/nft_chain_filter.c      | 164 +++++++++--
+>  7 files changed, 872 insertions(+), 81 deletions(-)
+> 
+> -- 
+> 2.47.3
+> 
+> 
 
