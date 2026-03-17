@@ -1,198 +1,255 @@
-Return-Path: <netdev+bounces-268697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268698-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qEj1BXWTuWk5KQIAu9opvQ
-	(envelope-from <netdev+bounces-268697-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 18:46:29 +0100
+	id 6CHoF/eTuWnKKgIAu9opvQ
+	(envelope-from <netdev+bounces-268698-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 18:48:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C98D32B01D2
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 18:46:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B0992B0261
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 18:48:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E5087300B3C9
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:43:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7DF5C3037F22
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AB5A37BE84;
-	Tue, 17 Mar 2026 17:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A5A332628;
+	Tue, 17 Mar 2026 17:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ef2eap+F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5A836493D
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 17:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCCE1A6802;
+	Tue, 17 Mar 2026 17:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773769412; cv=none; b=oasNqWBtdbBFN5i7vY1dj6fl8wXSIt24XNgWxx31ch+X4SuTLzNHpilUZcx0QQI8kLj8NyrTjPn67xAedk01RvRj3gWGxJ4mpohPp/sl0x/tG/yiIgfSJ4ltrdBJ0QlhBJ75KVocgvpRBv7PKn/d9JDeGLmei01f/4B6UrUQkC0=
+	t=1773769566; cv=none; b=olTHGdmLOtc62fP/5U8GWemGWusCO4eha8607/Rhms5WEnsdJh5XABv8RjEiRIOeV5hFSIyMfc73qZCn8oDzyshRFOb0S+x/PGb58lpKJA/qElwaZJvB+qGFTBZ/l719Sw4mH7t3jkeyUqVCapXX3GwwzvsHK1l7HRJURSOUIeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773769412; c=relaxed/simple;
-	bh=+SXVrqZI0qMsIBsgCyQfCxi3fESHXlzzXdpTBR29ovk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=GqgwqzJNZq6Sgi2zjLRbvLZocJGyzHmNZUfMbv6e2/kXSFf0UDTVMHCrkHWF7U7bZYQ0rEFtdt/s8EAIFTPvwSh/jPBXtUWZdlZk5ia1fJUp7zqeYkWjaoUC54fXDe+WZvkOt5KmAGC26yJip3B3Ti1p+AiaxIoXJm61wpXTwWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-67bd009429dso39261604eaf.0
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 10:43:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773769410; x=1774374210;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7FNF9bTbNaLSfoRgrdQVVr2etTEHLQhXtfiXec0IJH8=;
-        b=oByK2L4WguJJvOD+e7fnb4x0zcEj4TlqkM0vM6Pzg1vvaM0hWTmDVf4LzQ9XL0Cufn
-         9oGPH4V3D9cS+OEDAliou5mc217PeJtc8hcEzY6t+S8iueL1FDqVP5KJRHhgmdB+93Ds
-         COe+xLRKT17es94TMR82p/90C3bnuYm2Kl+JRC5eGmlC9t4zXZhAiFFSKkHo/YPmLrc4
-         Lq3yqzzglBqMLHufR/oN346+od2+hCVrLNpfWIZR9eDT50D2YfYvO604Nfv5QYzz1kWp
-         ghR4iwG4Oi8Ji6/g2OEGpE2QPIH5h5qb8sj1qR+iPwHEeL9Sp9sB/qymYv04B0WwHwJX
-         WIKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXYD1y+176POEcn1yqpKKqY/blR5tYIoSIauK1LdYRBOcoFUQkY3Nc2s+pkoGD66gqSxgi5aSU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy20QSe2fxBsLalw5K6i7486Qb2Jflf6oqk01NH4AaOnsdx+8e9
-	ea/6L+9i2EBH0Ou0DnP94+ABNhpwlKcmVjBuOtm5Vho8/VvA+V36rG3vhJVZNIadLrfhSBidsIl
-	xUOW6QsXYAj/yEI7fLsJzrWhZgZqpox27y7MSfV/AUId3mNp3UcC6+9D3K9Q=
+	s=arc-20240116; t=1773769566; c=relaxed/simple;
+	bh=meDOgFZsp9t8qHxBQVBAJcgZFytRkiMISoWsVNRBdkw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MgaPaY5c1mqm3TYdZU5PIJ0l2NraAJ+behqMGaDj2BizF1Lt42Wtq/TSM4uZBpzlTWVNwNxJY1K0L7UqLdzferym9f8EcaD4S+g+OEcZQATEZGPZ8OnNcD81//2q5TwWopLiFlaww6qsenHxtiLUzKyZxqE4oNiMpMogNIP7Rqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ef2eap+F; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773769564; x=1805305564;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=meDOgFZsp9t8qHxBQVBAJcgZFytRkiMISoWsVNRBdkw=;
+  b=Ef2eap+Fv8EwbLyCRlQawjfsTEOFYyRQzwkxR+FdV1eVGwrLrEoIoAz7
+   KKZRnpvqLpZ34tyL5FVh9q5g6og9NsdR4ZQduormoJ9yN9P92HLQlHR83
+   JeXOdRKeYyNiFToVPHQOl+CPZY8n+bZPw7Ej6skNsZjkl5mqVBpGbmWEt
+   iEgjLrmwzR9c7ZrY3y2rfWlVFPvxGWFLv8l296RclJDClIcOluAOplOEJ
+   oujy4XCa8/9Voj3r/KtuntLX5aNGbo0VUiqemEGm2Ane2PtGl+ModvFdy
+   FE8hRBMdC2fGn1AXqGpfelOAjDQPqrXQzD+rcQLTpBFYT3vg783QhdLsM
+   Q==;
+X-CSE-ConnectionGUID: enwiFh5FQ/KPk3LVY6aBjg==
+X-CSE-MsgGUID: lSogaHaHR+uHOECjKNMkvg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11732"; a="85508071"
+X-IronPort-AV: E=Sophos;i="6.23,126,1770624000"; 
+   d="scan'208";a="85508071"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 10:46:03 -0700
+X-CSE-ConnectionGUID: iqhCGTDgRcug5ssz+7tWTg==
+X-CSE-MsgGUID: nPwSKXBMSCutlgLu2VIUqQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,126,1770624000"; 
+   d="scan'208";a="221408834"
+Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
+  by orviesa006.jf.intel.com with ESMTP; 17 Mar 2026 10:46:00 -0700
+Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w2YUO-000000004TV-3Qvi;
+	Tue, 17 Mar 2026 17:45:56 +0000
+Date: Tue, 17 Mar 2026 18:45:25 +0100
+From: kernel test robot <lkp@intel.com>
+To: Anand Moon <linux.amoon@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Shawn Lin <shawn.lin@rock-chips.com>,
+	Hans Zhang <18255117159@163.com>, Niklas Cassel <cassel@kernel.org>,
+	linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Anand Moon <linux.amoon@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Danilo Krummrich <dakr@kernel.org>
+Subject: Re: [PATCH next v1] r8169: Fix PHY lookup for mdiobus_get_phy() and
+ improve error reporting during probe
+Message-ID: <202603171855.OtM7sS7W-lkp@intel.com>
+References: <20260317061700.7734-1-linux.amoon@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:20b:b0:67b:f24a:a53f with SMTP id
- 006d021491bc7-67c0dabe1e5mr119000eaf.24.1773769410643; Tue, 17 Mar 2026
- 10:43:30 -0700 (PDT)
-Date: Tue, 17 Mar 2026 10:43:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69b992c2.050a0220.248e02.0132.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in cfg80211_chandef_create
-From: syzbot <syzbot+d9f5fabbbcf4b377d01f@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.36 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260317061700.7734-1-linux.amoon@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=e7280ad1f68b2dce];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-268697-lists,netdev=lfdr.de,d9f5fabbbcf4b377d01f];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmail.com,arm.com,kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-268698-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,rock-chips.com,163.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.981];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,syzkaller.appspot.com:url,goo.gl:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,googlegroups.com:email,appspotmail.com:email]
-X-Rspamd-Queue-Id: C98D32B01D2
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,01.org:url]
+X-Rspamd-Queue-Id: 4B0992B0261
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+Hi Anand,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build warnings:
 
-HEAD commit:    b84a0ebe421c Add linux-next specific files for 20260313
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=11308216580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e7280ad1f68b2dce
-dashboard link: https://syzkaller.appspot.com/bug?extid=d9f5fabbbcf4b377d01f
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1090c8da580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=179338da580000
+[auto build test WARNING on 95c541ddfb0815a0ea8477af778bb13bb075079a]
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/09145161a8a9/disk-b84a0ebe.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b64c254e474c/vmlinux-b84a0ebe.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a7c33f5f7f45/bzImage-b84a0ebe.xz
+url:    https://github.com/intel-lab-lkp/linux/commits/Anand-Moon/r8169-Fix-PHY-lookup-for-mdiobus_get_phy-and-improve-error-reporting-during-probe/20260317-183327
+base:   95c541ddfb0815a0ea8477af778bb13bb075079a
+patch link:    https://lore.kernel.org/r/20260317061700.7734-1-linux.amoon%40gmail.com
+patch subject: [PATCH next v1] r8169: Fix PHY lookup for mdiobus_get_phy() and improve error reporting during probe
+config: x86_64-kexec (https://download.01.org/0day-ci/archive/20260317/202603171855.OtM7sS7W-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260317/202603171855.OtM7sS7W-lkp@intel.com/reproduce)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d9f5fabbbcf4b377d01f@syzkaller.appspotmail.com
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603171855.OtM7sS7W-lkp@intel.com/
 
-------------[ cut here ]------------
-chan->band == NL80211_BAND_60GHZ || chan->band == NL80211_BAND_S1GHZ
-WARNING: net/wireless/chan.c:35 at cfg80211_chandef_create+0x99/0x3d0 net/wireless/chan.c:34, CPU#1: syz.0.17/6021
-Modules linked in:
-CPU: 1 UID: 0 PID: 6021 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
-RIP: 0010:cfg80211_chandef_create+0x99/0x3d0 net/wireless/chan.c:34
-Code: 8b 26 4c 89 e7 48 c7 c6 20 78 26 90 e8 60 be ad f6 49 83 fc 04 74 0d 41 83 fc 02 75 12 e8 cf b8 ad f6 eb 05 e8 c8 b8 ad f6 90 <0f> 0b 90 eb 05 e8 bd b8 ad f6 89 ef 48 c7 c6 40 78 26 90 e8 2f be
-RSP: 0018:ffffc90003986f30 EFLAGS: 00010293
-RAX: ffffffff8b193a38 RBX: ffffc900039870a0 RCX: ffff888032143d00
-RDX: 0000000000000000 RSI: ffffffff90267820 RDI: 0000000000000004
-RBP: 0000000000000002 R08: ffff888032143d00 R09: 0000000000000002
-R10: 0000000000000004 R11: 0000000000000000 R12: 0000000000000004
-R13: dffffc0000000000 R14: ffff888012a762f8 R15: ffffc900039870a8
-FS:  0000555592955500(0000) GS:ffff888124ee0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fbf5f187600 CR3: 0000000077436000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- _nl80211_parse_chandef+0x437/0x1300 net/wireless/nl80211.c:3637
- __nl80211_set_channel+0x248/0x880 net/wireless/nl80211.c:3761
- nl80211_set_wiphy+0x116b/0x2fa0 net/wireless/nl80211.c:-1
- genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1114
- genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
- genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1209
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec+0x112/0x150 net/socket.c:796
- __sock_sendmsg net/socket.c:811 [inline]
- ____sys_sendmsg+0x589/0x8c0 net/socket.c:2668
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2722
- __sys_sendmsg net/socket.c:2754 [inline]
- __do_sys_sendmsg net/socket.c:2759 [inline]
- __se_sys_sendmsg net/socket.c:2757 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2757
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fbf5f19c799
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe1eb2d0b8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fbf5f415fa0 RCX: 00007fbf5f19c799
-RDX: 0000000000000000 RSI: 0000200000000040 RDI: 0000000000000004
-RBP: 00007fbf5f232c99 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fbf5f415fac R14: 00007fbf5f415fa0 R15: 00007fbf5f415fa0
- </TASK>
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/realtek/r8169_main.c:5467:17: warning: variable 'phydev' is used uninitialized whenever 'for' loop exits because its condition is false [-Wsometimes-uninitialized]
+    5467 |         for (addr = 0; addr < PHY_MAX_ADDR; addr++) {
+         |                        ^~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/realtek/r8169_main.c:5476:7: note: uninitialized use occurs here
+    5476 |         if (!phydev) {
+         |              ^~~~~~
+   drivers/net/ethernet/realtek/r8169_main.c:5467:17: note: remove the condition if it is always true
+    5467 |         for (addr = 0; addr < PHY_MAX_ADDR; addr++) {
+         |                        ^~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/realtek/r8169_main.c:5430:27: note: initialize the variable 'phydev' to silence this warning
+    5430 |         struct phy_device *phydev;
+         |                                  ^
+         |                                   = NULL
+   1 warning generated.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+vim +5467 drivers/net/ethernet/realtek/r8169_main.c
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+  5425	
+  5426	static int r8169_mdio_register(struct rtl8169_private *tp)
+  5427	{
+  5428		struct pci_dev *pdev = tp->pci_dev;
+  5429		struct mii_bus *new_bus;
+  5430		struct phy_device *phydev;
+  5431		int ret, addr;
+  5432	
+  5433		/* On some boards with this chip version the BIOS is buggy and misses
+  5434		 * to reset the PHY page selector. This results in the PHY ID read
+  5435		 * accessing registers on a different page, returning a more or
+  5436		 * less random value. Fix this by resetting the page selector first.
+  5437		 */
+  5438		if (tp->mac_version == RTL_GIGA_MAC_VER_25 ||
+  5439		    tp->mac_version == RTL_GIGA_MAC_VER_26)
+  5440			r8169_mdio_write(tp, 0x1f, 0);
+  5441	
+  5442		new_bus = devm_mdiobus_alloc(&pdev->dev);
+  5443		if (!new_bus)
+  5444			return -ENOMEM;
+  5445	
+  5446		new_bus->name = "r8169";
+  5447		new_bus->priv = tp;
+  5448		new_bus->parent = &pdev->dev;
+  5449		new_bus->irq[0] = PHY_MAC_INTERRUPT;
+  5450		new_bus->phy_mask = GENMASK(31, 1);
+  5451		snprintf(new_bus->id, MII_BUS_ID_SIZE, "r8169-%x-%x",
+  5452			 pci_domain_nr(pdev->bus), pci_dev_id(pdev));
+  5453	
+  5454		new_bus->read = r8169_mdio_read_reg;
+  5455		new_bus->write = r8169_mdio_write_reg;
+  5456	
+  5457		if (tp->mac_version >= RTL_GIGA_MAC_VER_40) {
+  5458			new_bus->read_c45 = r8169_mdio_read_reg_c45;
+  5459			new_bus->write_c45 = r8169_mdio_write_reg_c45;
+  5460		}
+  5461	
+  5462		ret = devm_mdiobus_register(&pdev->dev, new_bus);
+  5463		if (ret)
+  5464			return ret;
+  5465	
+  5466		/* find the first (lowest address) PHY on the current MAC's MII bus */
+> 5467		for (addr = 0; addr < PHY_MAX_ADDR; addr++) {
+  5468			struct phy_device *tmp = mdiobus_get_phy(new_bus, addr);
+  5469	
+  5470			if (tmp) {
+  5471				phydev = tmp;
+  5472				break;
+  5473			}
+  5474		}
+  5475	
+  5476		if (!phydev) {
+  5477			dev_err(&pdev->dev, "no PHY found on bus\n");
+  5478			return -ENODEV;
+  5479		}
+  5480	
+  5481		/* Most chip versions fail with the genphy driver.
+  5482		 * Therefore ensure that the dedicated PHY driver is loaded.
+  5483		 */
+  5484		if (!phydev->drv) {
+  5485			dev_err(&pdev->dev, "no dedicated PHY driver found for PHY ID 0x%08x, maybe realtek.ko needs to be added to initramfs?\n",
+  5486				phydev->phy_id);
+  5487			return -EUNATCH;
+  5488		}
+  5489	
+  5490		tp->phydev = phydev;
+  5491		tp->phydev->mac_managed_pm = true;
+  5492		if (rtl_supports_eee(tp))
+  5493			phy_support_eee(tp->phydev);
+  5494		phy_support_asym_pause(tp->phydev);
+  5495	
+  5496		/* mimic behavior of r8125/r8126 vendor drivers */
+  5497		if (tp->mac_version == RTL_GIGA_MAC_VER_61)
+  5498			phy_disable_eee_mode(tp->phydev,
+  5499					     ETHTOOL_LINK_MODE_2500baseT_Full_BIT);
+  5500	
+  5501		/* PHY will be woken up in rtl_open() */
+  5502		phy_suspend(tp->phydev);
+  5503	
+  5504		return 0;
+  5505	}
+  5506	
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
