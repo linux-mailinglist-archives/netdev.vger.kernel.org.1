@@ -1,177 +1,169 @@
-Return-Path: <netdev+bounces-268725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268726-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OC5cKQasuWmEMAIAu9opvQ
-	(envelope-from <netdev+bounces-268725-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:31:18 +0100
+	id cJS3IJSsuWmEMAIAu9opvQ
+	(envelope-from <netdev+bounces-268726-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:33:40 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 103232B18EF
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:31:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA39F2B192A
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:33:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C536A3051A9F
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:31:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 465E73093456
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:33:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D932340D91;
-	Tue, 17 Mar 2026 19:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8ABC342517;
+	Tue, 17 Mar 2026 19:33:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="nFraTJCw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LWLr0bS1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6953C42A80
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 19:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D6C33FE27
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 19:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773775876; cv=none; b=uWP1jdCKvurtnAZ80QqYBLe4Q4r7cfA/HuvLKGNk1AYVqXwx5rrJhV0OgcRRHcQeublv0qZeRUYGLOxCFXoS3Y1gNJXoA24rxfC8aJlxwoDxww9Ii3jz3ImsKsYgGNyuCFekddLJ5E9C9RXxXzUggDh9u7yh0Pg/cKP02EeFi1A=
+	t=1773776017; cv=none; b=YPwECfn9eQXlAv/NzTpF3pa3nI7hXA/Bb5LKJ5gGfJWI/6RWaCB10TEXNL6q1u60HlAe2/iwl03WuVYH9gVaZldpRWEcy+rcYir7cBqPtlPzdrI7MvwMW2+bqJe4ntE5PJTsnPvQPnjEnTn2OUQGTMMJxsXDrlyB0pva/H0N718=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773775876; c=relaxed/simple;
-	bh=e3mfkChrK8O6x2CXYuQFA55MxHVetS7pHIH1Lz97IC0=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=kPE35UWcurY2iRe4tCn63jQpoA9hEypZyaLOxZM3qlqJSRz9GAuVxvZi5qmVLUW1ClVWyVjCOMdp04g8gxtL4jxl/TRR7+bbEJebizTcGCBr2nkzW66kRnvCG+PW6uIGKz3ue/ADXjebLta1FvgBvM2ocvzyBZJ6YRxSo5c9vSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=nFraTJCw; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 25161A1F89;
-	Tue, 17 Mar 2026 20:31:11 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1773775872; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=73lFawFjfbxkADcW8JHnUcOGH+i8xrgR+O/Yuf/gY2I=;
-	b=nFraTJCwY90Ea+oB15FJoS+OSfjXlHmgNu7nwsO6D260kYLwSG/1CjRfOfLkmUDz04L14s
-	sYKA4MTz5dni3rjVNCsoF+GSQpLl6joC13gxNEJmoD0sOl/Qza8bKqWZungS6prOVydap3
-	5yqf1f5s2mVTSGKofhCIIT3iRFFEh9WWTjNlKLbtrYZFkf7AaOvPvp9dYoXOruDz1r8VY/
-	85u77GXD8Rl8FMP8JQfvKFttVmF3p91vYSzFY9fzbf643OIfPCrX9w+2Kl28Yp3V1YqcUF
-	sCE6oh5SrRVkSQBR2jERA7rwjIl7t0U+0kbTASzSJFtTm28w1nWm2UG7e1IroQ==
+	s=arc-20240116; t=1773776017; c=relaxed/simple;
+	bh=1w5mBrG4E7fVBBHMJEtrWa7YPEjrNOaytymj5XbhXbU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JF4aJWRy2/JnlsDcOhJCUehgdyFS5K6BsznTa88pK06K6tTogNxzQxQaZ6lScIzf0TkOohWAi8vt3XuGkqvB5zQIEI47dwOgx8LQ/BGu2/PzwEc7ERekSB7r0I4gf29eXp0EJNrr6ckUyOHYw+zsFpo+HXa2FJscSMCVqP0zRwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LWLr0bS1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2839C4CEF7;
+	Tue, 17 Mar 2026 19:33:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773776017;
+	bh=1w5mBrG4E7fVBBHMJEtrWa7YPEjrNOaytymj5XbhXbU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=LWLr0bS1xznPFNDN4vFWfVJPvYvk2yfJRlnxEHbAZSmTpB96c0zq4jc7CzuhSllrm
+	 ofp1YL6Z0Dq6oslZh6Fro6eq9Kj1ec1bXPrnm6DDxoJxhl5+JwhszEB2P5c+yppbCG
+	 xU8tphUTDTbAXTnLJN5NJ/Zpm30Cy99An85d6B+veRJmk+iKagm3tAss8UBBd/J9o4
+	 WttBN09TBjY7KWiYAPEYLMmmpe4zM1ZQkSJGuSw+Iy68BV9PoWQnoALFYcy71TJ5CK
+	 LDDTBkvov3Ba1breToeFkMWU65EjmYt2VjOFfZJgRBYHthyUSrUYbzqfNCdKaIw8G1
+	 vlSeMLsr7rYxQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	ian.ray@gehealthcare.com,
+	ilane@ti.com,
+	linville@tuxdriver.com
+Subject: [PATCH net] nfc: nci: fix circular locking dependency in nci_close_device
+Date: Tue, 17 Mar 2026 12:33:34 -0700
+Message-ID: <20260317193334.988609-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 17 Mar 2026 20:31:10 +0100
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: macb: allow MTU changes while the interface
- is running
-In-Reply-To: <DH57URLYG3TU.B4HGNJATLFMU@bootlin.com>
-References: <20260316092720.39198-1-nb@tipi-net.de>
- <DH57URLYG3TU.B4HGNJATLFMU@bootlin.com>
-Message-ID: <1175cc7425e073a0b8b84b2da04ee1b1@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268725-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268726-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid,bootlin.com:email,bootlin.com:url]
-X-Rspamd-Queue-Id: 103232B18EF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tuxdriver.com:email,ti.com:email]
+X-Rspamd-Queue-Id: DA39F2B192A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Théo
+nci_close_device() flushes rx_wq and tx_wq while holding req_lock.
+This causes a circular locking dependency because nci_rx_work()
+running on rx_wq can end up taking req_lock too:
 
-Thanks for the review and testing!
+  nci_rx_work -> nci_rx_data_packet -> nci_data_exchange_complete
+    -> __sk_destruct -> rawsock_destruct -> nfc_deactivate_target
+    -> nci_deactivate_target -> nci_request -> mutex_lock(&ndev->req_lock)
 
-On 17.3.2026 18:00, Théo Lebrun wrote:
-> Hello Nicolai,
-> 
-> On Mon Mar 16, 2026 at 10:27 AM CET, Nicolai Buchwitz wrote:
->> macb_change_mtu() currently returns -EBUSY if the interface is 
->> running,
->> requiring users to bring the interface down before changing the MTU. 
->> This
->> is unnecessarily restrictive.
-> 
-> One valid reasoning for making the operation return -EBUSY is that
-> macb_close() will lead to packet loss for a few seconds. Users might
-> not expect an MTU change to trigger that. -EBUSY means user (be it
-> human or software) becomes aware and has time for a second thought.
-> 
-> But clearly, it becomes annoying as the user in the long run, when you
-> own your platform and know the implications.
+Move the flush of rx_wq after req_lock has been released.
+This should safe (I think) because NCI_UP has already been cleared
+and the transport is closed, so the work will see it and return
+-ENETDOWN.
 
-Since setting the MTU already requires elevated rights and usually 
-involves reconfiguring surrounding infrastructure that may also drop 
-packets, I think the better UX is worth the brief interruption.
+NIPA has been hitting this running the nci selftest with a debug
+kernel on roughly 4% of the runs.
 
-> 
->> Instead, close and reopen the interface around the MTU change so that 
->> RX
->> DMA buffers are reallocated for the new MTU. This is the same approach
->> used by many other network drivers (e.g. igb, tg3, stmmac).
->> 
->> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
->> ---
->>  drivers/net/ethernet/cadence/macb_main.c | 9 +++++++--
->>  1 file changed, 7 insertions(+), 2 deletions(-)
->> 
->> diff --git a/drivers/net/ethernet/cadence/macb_main.c 
->> b/drivers/net/ethernet/cadence/macb_main.c
->> index 5e27e0e87a55..8dd01031250d 100644
->> --- a/drivers/net/ethernet/cadence/macb_main.c
->> +++ b/drivers/net/ethernet/cadence/macb_main.c
->> @@ -3262,11 +3262,16 @@ static int macb_close(struct net_device *dev)
->> 
->>  static int macb_change_mtu(struct net_device *dev, int new_mtu)
->>  {
->> -	if (netif_running(dev))
->> -		return -EBUSY;
->> +	bool was_running = netif_running(dev);
->> +
->> +	if (was_running)
->> +		macb_close(dev);
->> 
->>  	WRITE_ONCE(dev->mtu, new_mtu);
->> 
->> +	if (was_running)
->> +		return macb_open(dev);
->> +
->>  	return 0;
->>  }
-> 
-> Reviewed-by: Théo Lebrun <theo.lebrun@bootlin.com>
-> Tested-by: Théo Lebrun <theo.lebrun@bootlin.com> # on eyeq5-epm
-> 
-> Thanks,
-> 
-> --
-> Théo Lebrun, Bootlin
-> Embedded Linux and Kernel engineering
-> https://bootlin.com
+Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: ian.ray@gehealthcare.com
+CC: ilane@ti.com
+CC: linville@tuxdriver.com
+---
+ net/nfc/nci/core.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Cheers
-Nicolai
+diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
+index 43d871525dbc..5f46c4b5720f 100644
+--- a/net/nfc/nci/core.c
++++ b/net/nfc/nci/core.c
+@@ -579,8 +579,7 @@ static int nci_close_device(struct nci_dev *ndev)
+ 	skb_queue_purge(&ndev->rx_q);
+ 	skb_queue_purge(&ndev->tx_q);
+ 
+-	/* Flush RX and TX wq */
+-	flush_workqueue(ndev->rx_wq);
++	/* Flush TX wq, RX wq flush can't be under the lock */
+ 	flush_workqueue(ndev->tx_wq);
+ 
+ 	/* Reset device */
+@@ -592,13 +591,13 @@ static int nci_close_device(struct nci_dev *ndev)
+ 		      msecs_to_jiffies(NCI_RESET_TIMEOUT));
+ 
+ 	/* After this point our queues are empty
+-	 * and no works are scheduled.
++	 * rx work may be running but will see that NCI_UP was cleared
+ 	 */
+ 	ndev->ops->close(ndev);
+ 
+ 	clear_bit(NCI_INIT, &ndev->flags);
+ 
+-	/* Flush cmd wq */
++	/* Flush cmd and tx wq */
+ 	flush_workqueue(ndev->cmd_wq);
+ 
+ 	timer_delete_sync(&ndev->cmd_timer);
+@@ -613,6 +612,9 @@ static int nci_close_device(struct nci_dev *ndev)
+ 
+ 	mutex_unlock(&ndev->req_lock);
+ 
++	/* rx_work may take req_lock via nci_deactivate_target */
++	flush_workqueue(ndev->rx_wq);
++
+ 	return 0;
+ }
+ 
+-- 
+2.53.0
+
 
