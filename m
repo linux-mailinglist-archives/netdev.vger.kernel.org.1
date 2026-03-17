@@ -1,54 +1,55 @@
-Return-Path: <netdev+bounces-268449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268451-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wKv9JxvzuGncmAEAu9opvQ
-	(envelope-from <netdev+bounces-268449-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:22:19 +0100
+	id QOVCLjvzuGncmAEAu9opvQ
+	(envelope-from <netdev+bounces-268451-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:22:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB842A4441
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:22:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44D6C2A4466
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:22:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 07BD93023E35
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 06:22:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DCFA13031CDA
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 06:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A3C833E36A;
-	Tue, 17 Mar 2026 06:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABF535F60D;
+	Tue, 17 Mar 2026 06:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="bENC7S77"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="naFxhx57"
 X-Original-To: netdev@vger.kernel.org
 Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1101AB6F1
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 06:22:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B27737F744
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 06:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773728537; cv=none; b=KvgnKJ2d01yr+EfLCEGCUf6lpeyWNbf6N8ZpEeTS0Su9OrlPgsboNsXBpf48dgREu8aEKlq9ITtmlwq0XuC745VwTmK2DMzMTJHRnNBOOmdP/w/DNp6dZipTJ28q3jjQMoPbQ3T7XfTOYZB/rixI4Fh8yNQhXYPmXe7dezmxFHQ=
+	t=1773728540; cv=none; b=Rjyk4NNYI2Kerjq4298P9ZtibOBQcqNo1st0nME77jjImTjZs0NIpqP+sgMf0JVuT+aZU58d3hZmTNXQFVppbL8YGKzPyH3a81B23ASkiPZf3qU4W6k3G+KezISr3WID8cQdYjzGGN7yhHE+IUfalPNFFlY7XXuk/6OXPNH3QRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773728537; c=relaxed/simple;
-	bh=3VxuFkplE+a9skwOUU3cx1fLi+KJLKiAjzyvfE9109M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s/AfDjwwCZ0KfOaReNJJyVpNyxE900UFZybnHZ+7uSc+RXixai9GijewA4Uialb8rh+h64aSQL07PnImfj68dWs2tAb9lomQhdx1JoZLpRIScjfgugqa9OMr8IFGsDRtUI6CMAfeuAL/bmzqSQ3vfS3ca5xaZ25shff4PmDsAj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=bENC7S77; arc=none smtp.client-ip=49.212.198.91
+	s=arc-20240116; t=1773728540; c=relaxed/simple;
+	bh=rBYJQmkgsKaSv613RrkdKVJsLZP+8bywc9OZhFEU9dw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DS9+9yj5ltWISwtJYIpt2lUiiKsUwXZL1pJSgqcb0Ra+Eymj5tH2mN6nH14IpfJHDv4P4yyG0oUiIbDaEkbe2pzFX7NshVIgnI6ENPIeblB1ZUAvp2quyiQCkXTm3js+iWDUyd9gp8h0xTh050yx1KjPrL0GMo1bRMgO0pqpn7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=naFxhx57; arc=none smtp.client-ip=49.212.198.91
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
 Received: from ms-a2 (16.4.31.150.dy.iij4u.or.jp [150.31.4.16])
 	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 62H6M6QA068854
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 62H6MBPV068957
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Tue, 17 Mar 2026 15:22:07 +0900 (JST)
+	Tue, 17 Mar 2026 15:22:11 +0900 (JST)
 	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=hE1KLtWcCiihV09QvqyDwy7PHPmXiAwI6Mr7+XOi074=;
+DKIM-Signature: a=rsa-sha256; bh=FSGEy83Ejkug+FTTykT/GYOYqYSI90bywuoJAtinwXs=;
         c=relaxed/relaxed; d=enjuk.jp;
         h=From:Message-ID:To:Subject:Date;
-        s=rs20251215; t=1773728527; v=1;
-        b=bENC7S770d7A2k9Enlge0rzfK6U0j/+EsIgTIYsZrFnoC8oqIjy2RfEpz+UPPWtj
-         bqUD8CMxnywIsD3xEOG+J95Kq1LjKdhGkYu2u9qMZ95611PPFZ7YKAtc22u5k6DX
-         NC0gQAqEIY1IMPDJLKMMmdP2dbpuGJrXCb6ev0C3pJj77ht+RwDTivohJmM9V6IH
-         l3a6CIM7paGjDVYeW5G+rfbVNfYH0xGwBxcWFi+iVWlTw94Z5xNrONIZedqFqeXg
-         aBaKnwk26PQWdHwl10GTXVoiheX4sI4rtymCtAEbmfp1IGBJui8pcKHrcR6TprRL
-         tv8oISYklkjGFj/C/isc6g==
+        s=rs20251215; t=1773728532; v=1;
+        b=naFxhx571U3+TZ4vOApOb3aP/gHwlhPXLNOiF02sU0376595d9Mnd93qitlYL+QA
+         2Zrxmz+FB24w/waeqCRV5EqZY88RhK6AK607jBDe8+wY5kmf33ySX4LDtvKdeBTg
+         czheDR4m62aqNPB+kyOo1JS3aLuFXbwpski5HEwx23xZohbEfYiHVt6tgtQSrhYu
+         6CO2fTOBe0zgCDHN/D7LmIkB0jjYaClSK97CFfkGB994kMKDbdF3fRkW0uokbkK5
+         NkiePoxVCcImcnlQfL9Q/gR/u6ThxqgBww8fyjYhp0ai0w5LgNqK6+UoNoh+/5A1
+         CstwXAic7Alo3VcUGftqlg==
 From: Kohei Enju <kohei@enjuk.jp>
 To: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
 Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
@@ -57,11 +58,14 @@ Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, dima.ruinskiy@intel.com,
-        kohei.enju@gmail.com, Kohei Enju <kohei@enjuk.jp>
-Subject: [PATCH iwl-next v2 0/2] igc: enable build_skb path
-Date: Tue, 17 Mar 2026 06:21:44 +0000
-Message-ID: <20260317062205.39406-1-kohei@enjuk.jp>
+        kohei.enju@gmail.com, Kohei Enju <kohei@enjuk.jp>,
+        Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH iwl-next v2 1/2] igc: set RX hardware timestamps in igc_build_skb()
+Date: Tue, 17 Mar 2026 06:21:45 +0000
+Message-ID: <20260317062205.39406-2-kohei@enjuk.jp>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260317062205.39406-1-kohei@enjuk.jp>
+References: <20260317062205.39406-1-kohei@enjuk.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,14 +80,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,enjuk.jp];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-268449-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-268451-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -96,36 +100,61 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1CB842A4441
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:dkim,enjuk.jp:email,enjuk.jp:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
+X-Rspamd-Queue-Id: 44D6C2A4466
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This series enables the build_skb RX path in igc, which is currently not
-enabled in any configuration.
+igc_construct_skb() sets RX hardware timestamps, but igc_build_skb()
+does not. This has not been observable so far since igc currently does
+not enable the build_skb RX path.
 
-Patch 1/2 adds missing RX hardware timestamp handling in the build_skb
-path.
-Patch 2/2 enables the build_skb path when XDP is inactive and other
-conditions are met.
+Set RX hardware timestamps in igc_build_skb() as well so that both skb
+construction paths provide the same behavior.
 
-Tested on Intel Corporation Ethernet Controller I226-V (rev 04).
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+---
+ drivers/net/ethernet/intel/igc/igc_main.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-Changes:
-  v2:
-    - don't insist on reverse christmas tree, reducing net diff in the
-      patch 1/2 (Dima)
-  v1: https://lore.kernel.org/intel-wired-lan/20260307182808.155027-1-kohei@enjuk.jp/
-
-Kohei Enju (2):
-  igc: set RX hardware timestamps in igc_build_skb()
-  igc: enable build_skb on the non-XDP small-frame RX path
-
- drivers/net/ethernet/intel/igc/igc.h      |  4 ++++
- drivers/net/ethernet/intel/igc/igc_main.c | 14 ++++++++++++--
- 2 files changed, 16 insertions(+), 2 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index cad5a26cc84d..79192b02e6be 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -1964,8 +1964,9 @@ static void igc_add_rx_frag(struct igc_ring *rx_ring,
+ 
+ static struct sk_buff *igc_build_skb(struct igc_ring *rx_ring,
+ 				     struct igc_rx_buffer *rx_buffer,
+-				     struct xdp_buff *xdp)
++				     struct igc_xdp_buff *ctx)
+ {
++	struct xdp_buff *xdp = &ctx->xdp;
+ 	unsigned int size = xdp->data_end - xdp->data;
+ 	unsigned int truesize = igc_get_rx_frame_truesize(rx_ring, size);
+ 	unsigned int metasize = xdp->data - xdp->data_meta;
+@@ -1979,6 +1980,11 @@ static struct sk_buff *igc_build_skb(struct igc_ring *rx_ring,
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
++	if (ctx->rx_ts) {
++		skb_shinfo(skb)->tx_flags |= SKBTX_HW_TSTAMP_NETDEV;
++		skb_hwtstamps(skb)->netdev_data = ctx->rx_ts;
++	}
++
+ 	/* update pointers within the skb to store the data */
+ 	skb_reserve(skb, xdp->data - xdp->data_hard_start);
+ 	__skb_put(skb, size);
+@@ -2681,7 +2687,7 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
+ 		} else if (skb)
+ 			igc_add_rx_frag(rx_ring, rx_buffer, skb, size);
+ 		else if (ring_uses_build_skb(rx_ring))
+-			skb = igc_build_skb(rx_ring, rx_buffer, &ctx.xdp);
++			skb = igc_build_skb(rx_ring, rx_buffer, &ctx);
+ 		else
+ 			skb = igc_construct_skb(rx_ring, rx_buffer, &ctx);
+ 
 -- 
 2.51.0
 
