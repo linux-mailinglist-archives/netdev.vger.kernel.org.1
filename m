@@ -1,182 +1,140 @@
-Return-Path: <netdev+bounces-268727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268728-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AAWRAImuuWnOMAIAu9opvQ
-	(envelope-from <netdev+bounces-268727-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:42:01 +0100
+	id WOa8HaeuuWnOMAIAu9opvQ
+	(envelope-from <netdev+bounces-268728-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:42:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 030262B19C7
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:41:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2113F2B19CF
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:42:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0277B3019391
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:41:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 835CA303E35F
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA0D34321A;
-	Tue, 17 Mar 2026 19:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71B1134402B;
+	Tue, 17 Mar 2026 19:42:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CYxaeQps"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="Qo2ar6v5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A24342CA7
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 19:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773776515; cv=pass; b=iRNruvQHQ/FdLwwp1bIHjLbRq6w4K+u3U5eWMY7iI+5Z//fuP3CZozYGvNFSrCeGw5qP8auh/1rQ+zUgKSNUvfPVo/jTw77Fiuu4WdrdDFOnbEDsK+ktcTp/L9WoMnw1BGtBGmgCA346ibWmh7zpX8INOtl373zonMi+JTN1n0U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773776515; c=relaxed/simple;
-	bh=QCWMHpVVu+D5FW7JPVSE0ebuTyTslAu5xJTTJuekyOA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CgRP5BhevgAjcOXe0cPgRACj+I18FWRJby2Vte8qZGDPM7zI2pI/y6ErUDfg3cnbSn6+AqR2UB9AO4KTYkEQEkkmKAP/rinfoaRfJFqPKTvKb/c2fu6ulF+BJAjFuBHjh/9k9JOcRJYfp9aOfSuQjgMMNvJxsfArPGlsXuqRjv4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CYxaeQps; arc=pass smtp.client-ip=74.125.82.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-128ce536fe0so2562c88.0
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 12:41:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773776513; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Q13hjH7jVPPahmnEa9LQuU5xiUCbenaqZuDcVQt1hcG4n1Axxvpd1ntfStkewFdRvl
-         VKs/TrpmyWJ+YVsqpf3C0QsmOcmz9QEa6SwMUX4j+361Yiqpo4zQc+Elk72NTKIWA7vB
-         IdXPyLWuPDttQQ/go3+iPj2kd8nOKtf3Xn8u+HUCLUr58UsOskHmlbvgDh+2MZAeLrR2
-         6DM9OHFgsQQ6shtpY8Q/nvvvoy6ijniBoTC091PK6SQeCEIhwK5CX1H8yIQ9C+K7es4x
-         z16N2ssLVyzDQ0hqGl/eEcNsr40WdI57fBAAwEYVpGJD7NeNezIDLOgjgLiN+kIe7CaR
-         oSiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=QCWMHpVVu+D5FW7JPVSE0ebuTyTslAu5xJTTJuekyOA=;
-        fh=6TgwdaheTAKaMlb5XFbFXKFjiu1ItXpoi0K4G9JmAPY=;
-        b=SPLPVZMfNpJ1P+xXCL8QmqtJ6FwP1iwXNlQDrG70hTNg2ay/ILByXLSv2LEIJUQdwP
-         uTL4a44CawShnNPCr70iWVhut3gBflGJYVWUTEHAQSVc3jxm56R4F4XLdh79VsqQm3rH
-         fuNumfkFNQKcFgTKP4TMn8Xce6LLLFanACv3DLP90Gr1K6QyfGKoL4eRDkUfohGjp5nl
-         oSi0TF1Ic5GyorOF8DHaOm92ASeSfjigHYHXvDGjVBvsoFdNvqMBTCDDjHDvS7BeqsSA
-         r86xB8mohiTOaiOK7OvTvwlp6CCjC6Yv/yJiPAG9bsk/Q/x89b8rAqFcgYjsk9ioUdOh
-         STHg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773776513; x=1774381313; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QCWMHpVVu+D5FW7JPVSE0ebuTyTslAu5xJTTJuekyOA=;
-        b=CYxaeQps4RN9jBYSY4sOLIVrag4J0zL5LaTITmTU2hahhXWb0nznwdKTUqEn9iqwUk
-         2sWufqDAtkEJaTLuPlGVL36VCD4FsfsRLfV0HAuN190YXvreIoeoZEspj6tmyUU+nxib
-         HVUZ+Oo/3+Jsx/I4nxmHVWHzYsXridN4S0ugu8/r3fhKBiuJhzI+zYwMk+TVU/a32tAd
-         IRh1C7bspCZEVo9lQqVGp28F3lPyxktc9GApvpSQPbfLXf3MtcSzIU32jhVZGYgjzXG+
-         g9dbw/7T03Xb7AYTmAwKXQeXZ4gTVjta5DAC6wjm7y/7uTdNkEcFsnD8jlgsQTuF3Wbi
-         HYKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773776513; x=1774381313;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QCWMHpVVu+D5FW7JPVSE0ebuTyTslAu5xJTTJuekyOA=;
-        b=H78wt+PvTeeuPYWJ891hwU0+DL5t4391a2mGEoFrDvmXt069FPR9+05J6xeSz3Dw6K
-         IeXkG7PGM5L/Pa1gZLIOXzQGSstyQVXI8P26Taf9H39G5Yluz+MSg5PkiH8n46+Bc1jv
-         oVF4pnFQS1GV5gZN0MHnI1I+pa11DfJc2/GJdQkHX0U38Um9AXXYrm0Rgh7CNMsUGe2u
-         aAQara1anpW19FEfeky29qUAWXnWSLN6PPUDT7Es9lulKwEOAPSHZ/IHtMUEKbCNtLYK
-         uNuVqAGnriIbENNLNFB4crSYnNs91AhOepd8neORLNuDEP0GgO/QWnNsTTn+ogWXI0Jl
-         tC4Q==
-X-Gm-Message-State: AOJu0Yxq+mK6fYfVltZ5qXkfh8W5+EBknteT32xqxEvugzZWlrnLwdwe
-	qJstd91ry9/5PODhnIIooKzEOdKguZt7gm/eVSghXz+ebi6lEmsCeDljgTOKE4dHf3a+6/uVk7h
-	yebaAV1Ku7dcFJjrFSkNfruvxwSnZTvikmU35VFTe
-X-Gm-Gg: ATEYQzwnZG83M6GsIPOj474oFiX8cdf1crnebdZqqKxdUu6UljG7/wRXb0UwkkE2sb8
-	sGmuK7uwpChl1ly+bdwTRu8CpOUhc2n767As8K7qEp2x7goe/rpbkE6tN76RjpiFS/FWi1GzuFL
-	MvJYQHB/ngI/V+sbbT9Q0D1E5jss4s3oYZPti0gQtkjiUTMcArwqRn1EzEAPhSHr71Ui+RzGZDX
-	IK2iCrk2l19oEuRF6KSUWl2RIpgh4og8nC85IRTtS2aw9kfPbgsDm3Qlu8xkdUmm3ZWitSrlepb
-	sLT+vAU=
-X-Received: by 2002:a05:7022:fa1:b0:119:e56b:c1d9 with SMTP id
- a92af1059eb24-129c589735emr56420c88.4.1773776512501; Tue, 17 Mar 2026
- 12:41:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D845342517
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 19:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773776549; cv=none; b=dpijwnhkx0GLFfR2iFVgtj28iJlUnzC1sl5wb6i0nLcH5G5gu+KXym908F4RtlYVEPzai4LJlaOAVAcU2ETMJ+lEB6EcG9Plmz9GIsEcGmlf0Q3+s+zRSiPGYKzs56c+YorRX/j8EZHJ5NEb/7c5ZPIsjLUcH3/oZVE2Nt0gcOQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773776549; c=relaxed/simple;
+	bh=8v0bkqpq04Zoro8Gk9P1+D2UFHff2TDCo6MaSPEpI/M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UU/8nBq/nEZlT+fVYLQkoZd6fnIZNL8sleIZRSdVG3ETxBQgcUXsAzt1fwY5RpAlR+D4tiThVgpn2r9aXSvyQz5Th/40Cw4clfOLq8rjD14rDRzTeqXcmChPow+OU8hpm/i0hfFON/n2cpAA3/M+eI3b6PVFnoCt0g1rWHxJLR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=Qo2ar6v5; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=JxrGPLoHP6jjNOpRSJAJJ6cHZmgAETlbZ9QiMFvN838=; b=Qo2ar6v54C720+VDgyetSX6yX2
+	BKhRP4jfIEVY9y1j9S9B9TWhA1KAHt2FdQ0+bBTG7wteO6b4l1F3epVibewDDAZAqlIQhlCCSJKwz
+	8fzp4TS5MkngcvAcIx4St3s+P9Ck04OlAPkeO58iyylLHUC4ENvDz/wFnPkRwNVyQgshicPxwN5Jh
+	FkPegNjS7MFqfIboOo/5GdikvJbNr7PrchNYGzjIId6dxMu5UHF8pVu0m4uRnPj/Nbv32QxczeQe6
+	LcRq5u9xSFa4cZyJkKjRTcKqif8kk4sLX3Vn8C+uMYHKMvukmVdlOLInM65ydTn5EYPHx+UnUVwVr
+	iiI8uvDw==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1w2aIt-0037Hf-3h; Tue, 17 Mar 2026 19:42:09 +0000
+Date: Tue, 17 Mar 2026 12:42:04 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: macb: allow MTU changes while the
+ interface is running
+Message-ID: <abmtcI4NX_zFyAwA@gmail.com>
+References: <20260316092720.39198-1-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260309113852.2c654de5@kernel.org>
-In-Reply-To: <20260309113852.2c654de5@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 17 Mar 2026 12:41:39 -0700
-X-Gm-Features: AaiRm51yQOS8nElDOuajtwRwi-_yfgi3tvt3IjaOteKHRazfMZt5Xp-qTk_MGd4
-Message-ID: <CAHS8izMBx3j1nJwJ=b+ctGoJuEgTtMx8WsH2y-W=Sine+wo_3Q@mail.gmail.com>
-Subject: Re: fbnic qemu is open source
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Zinc Lim <zinclim@meta.com>, willemb@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260316092720.39198-1-nb@tipi-net.de>
+X-Debian-User: leitao
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268727-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268728-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	DMARC_NA(0.00)[debian.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[debian.org:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[almasrymina@google.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 030262B19C7
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,tipi-net.de:email]
+X-Rspamd-Queue-Id: 2113F2B19CF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 9, 2026 at 11:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> Hi!
->
-> The fbnic QEMU repo is now open source and available at:
->
-> https://github.com/facebook/fbnic_qemu
->
-> It contains the emulated datapath for the fbnic device, the FW
-> components are not included (PHY programming, NC-SI, init, sensors
-> and such).
->
-> The main practical use I imagine is being able to test TCP Rx zero
-> copy (kernel and/or user space) without any HW dependency.
-> There's work on adding relevant features to virtio but it's going
-> a little slowly. Also being able to test code and selftests with
-> a more "real" device than netdevsim with vng is super convenient :)
->
-> Big thanks to Zinc Lim for the open source heavy lifting (isolating
-> and mocking out the FW parts, cleaning up the code base and getting
-> it thru corporate reviews).
->
-> No plans at this stage to upstream it to QEMU because TBH I don't
-> expect that QEMU would care to carry random HW emulation drivers.
->
-> Sorry if the announcement is a bit self-serving but folks expressed
-> interest off list in being able to test the queue API and zero-copy
-> Rx without real HW so I thought it's relevant.
+On Mon, Mar 16, 2026 at 10:27:20AM +0100, Nicolai Buchwitz wrote:
+> macb_change_mtu() currently returns -EBUSY if the interface is running,
+> requiring users to bring the interface down before changing the MTU. This
+> is unnecessarily restrictive.
+> 
+> Instead, close and reopen the interface around the MTU change so that RX
+> DMA buffers are reallocated for the new MTU. This is the same approach
+> used by many other network drivers (e.g. igb, tg3, stmmac).
+> 
+> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+> ---
+>  drivers/net/ethernet/cadence/macb_main.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 5e27e0e87a55..8dd01031250d 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -3262,11 +3262,16 @@ static int macb_close(struct net_device *dev)
+>  
+>  static int macb_change_mtu(struct net_device *dev, int new_mtu)
+>  {
+> -	if (netif_running(dev))
+> -		return -EBUSY;
+> +	bool was_running = netif_running(dev);
+> +
+> +	if (was_running)
+> +		macb_close(dev);
+>  
+>  	WRITE_ONCE(dev->mtu, new_mtu);
+>  
+> +	if (was_running)
+> +		return macb_open(dev);
 
-Wow, very cool! (Sorry I missed this announcement initially) I'm a bit
-of a noob but I'm a bit surprised a 'real' driver can work no qemu
-with a bit of magic.
+Would you like to keep the new_mtu set, even if macb_open() fails?
 
-Is fbnic-on-qemu about as feature-rich as fbnic-on-real-hardware? Do
-most of what it can do on real hardware it can do on qemu, or is it
-just really zerocopy that fully works?
-
---=20
-Thanks,
-Mina
+Other than that, it looks good to me.
+--breno
 
