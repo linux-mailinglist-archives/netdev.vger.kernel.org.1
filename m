@@ -1,202 +1,145 @@
-Return-Path: <netdev+bounces-268500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268501-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mH+RGj4euWmbrQEAu9opvQ
-	(envelope-from <netdev+bounces-268500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:26:22 +0100
+	id EK1SO7YeuWmbrQEAu9opvQ
+	(envelope-from <netdev+bounces-268501-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:28:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE552A6A2C
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:26:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C38B2A6B09
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:28:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D4517306762E
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:20:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3DF8E308E288
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E2835B62F;
-	Tue, 17 Mar 2026 09:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783EB35DA57;
+	Tue, 17 Mar 2026 09:21:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q3mMbdgS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Egc45Cpk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD52355F47;
-	Tue, 17 Mar 2026 09:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D7935CB87;
+	Tue, 17 Mar 2026 09:21:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773739221; cv=none; b=Ddbd9q5PbtBkB/ysZoih+Kq+cG0wKNHPQc2tiImppd7fy4F1dR33LP/CoEhPLE1tdNrx2mnZe2l6eWx36+QePcSZr258lomPIDZ+UfhcTdJWtfHMWujMzPBWXZLf7TFo7tv7LOKoWEsbtqn+54Ilwt/WMkCSwUvWQvk0p7niZRw=
+	t=1773739264; cv=none; b=lu7XPxs49IMSm4r5t1kOYl9CQd5b3feEvcslmtbp86uu/iQgateg7RH4rGDbfUWWftHnnNoM8nrWj9C51YyMaU7fAlax5WiixoIk8y2Lt2WUWvFvKQJFR56sG40koUgfPgIX+9PrwjU2KleM/m3uRlzwIdHUNfH4Zet68UwJqtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773739221; c=relaxed/simple;
-	bh=xP5eeh+0a9lPEEEUwZteoXw337RUHoxL4t15/sE4OyQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k5bz8A1mUAXNsjcaUJmYP6jjsm/T6HFL+MhKNhIE9TTT5Um9Mo4z0cPzPGh0NF/+ixJEFfwxnV7ttbGPiREmFhPDAu6BgcobvjJ2fDuHfyctOJbrdNssfpFkctCMnxbC9Xlar+rc1OomdisyBIlPG2S95pLfJFxR6hfNtzbnPQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q3mMbdgS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F197EC4CEF7;
-	Tue, 17 Mar 2026 09:20:10 +0000 (UTC)
+	s=arc-20240116; t=1773739264; c=relaxed/simple;
+	bh=5oTyZ1K8Ny0oP/DwI3MzKd7vmK/CIuyGhJB3xMfiehk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=prXrkbPGeoNrbOwffZMRVIxRGR4JMF5yLDQuSAAyILC1Xhf8qXQmH5iDQ4LqryUnh1YdP1idXL4vXjLq19PzP83ySCnq1qMOmLVxRqLwCFZT1NuE5eI9vducbL2Esz8bSX8UpdOftWMaqwPneffxXMlDDJ47q7B+yTTamMC+agM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Egc45Cpk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82598C2BC9E;
+	Tue, 17 Mar 2026 09:21:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773739220;
-	bh=xP5eeh+0a9lPEEEUwZteoXw337RUHoxL4t15/sE4OyQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Q3mMbdgSSCoLb+Sp3+NLMDtSmduFKJ1HwBvWTNYqaZZrhOMgjV3NLCz+1Mo80CqlV
-	 mA2/HTSJXUeM6c/hGvrXdQO3BlsuYbjvXvPYPFXZB81glWCytcEIHBWi58Dk1yXGux
-	 wvBrH3ZVkhAo9fxbiWu7TKPHrUaPHgz5VRNHuNoESIhN5sBk4/itodd6tiWozDEb3f
-	 sJBxbSQ3etYNS/ptv4SVDIsmTKRDWs6MfUTieQcQVvLcWI71Fa/BZwrrzOJKTbqXhY
-	 XUbs8zOP7T+vpbfLLu/MbQ7V61SISUqGtsTc9IFXJKnoFMX+7YRldqFTvi5ou2J/Zm
-	 pON1rcXFZLIhA==
-Message-ID: <ebd00055-d4aa-4612-8bf3-ef0a308512f8@kernel.org>
-Date: Tue, 17 Mar 2026 10:20:08 +0100
+	s=k20201202; t=1773739264;
+	bh=5oTyZ1K8Ny0oP/DwI3MzKd7vmK/CIuyGhJB3xMfiehk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=Egc45CpknDt3zjpmdcJWbYzexnCUT4CEFBDSibzKKlck7MmmSlEs5YyPbg5ryt2DA
+	 g+XvQRzhFwdBZ+S9HbeaNKjfVtvNFLsB6YWwtFbmmlB0YGUrGxsJl2DqOYgO2CvAhq
+	 vYsiqYlaDCLi6ir+gK8hnpdIU9BTfDYmA4hlGkKkCv3GaxF9M3mh19ok+UPQNATLj6
+	 rEW4px6uTym0KLTdeDrT8SLxiJcYEZ/oRLypgDCBVYrS7/xt7XA4yWXf8I4mHClUIP
+	 cvBmj0E/PhsOR3bRTfEQ6YkYVkvWMhQp9pp2AXB0r5ymthmv8RNFeitbvvBZcXH8Ja
+	 hfQOZ8pxO/UnQ==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, magnus.karlsson@intel.com, stfomichev@gmail.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ larysa.zaremba@intel.com, aleksander.lobakin@intel.com, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>
+Subject: Re: [PATCH net 2/6] ice: do not round up result of dbuff
+ calculation for xsk pool
+In-Reply-To: <20260316174550.462177-3-maciej.fijalkowski@intel.com>
+References: <20260316174550.462177-1-maciej.fijalkowski@intel.com>
+ <20260316174550.462177-3-maciej.fijalkowski@intel.com>
+Date: Tue, 17 Mar 2026 10:21:00 +0100
+Message-ID: <874imerev7.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5] mm: introduce a new page type for page pool in page
- type
-To: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
- akpm@linux-foundation.org, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>,
- Toke Hoiland Jorgensen <toke@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
- harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, kuba@kernel.org, john.fastabend@gmail.com,
- sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com,
- pabeni@redhat.com, david@redhat.com, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com,
- mhocko@suse.com, horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
- ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
- brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
- usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
- almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com,
- bpf@vger.kernel.org, linux-rdma@vger.kernel.org, sfr@canb.auug.org.au,
- dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com
-References: <20260316222901.GA59948@system.software.com>
- <20260316223113.20097-1-byungchul@sk.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20260316223113.20097-1-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,skhynix.com,oracle.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.cz,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
-	TAGGED_FROM(0.00)[bounces-268500-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268501-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4AE552A6A2C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[all.your.base.are.belong.to.us:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email]
+X-Rspamd-Queue-Id: 8C38B2A6B09
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
 
+> When programming dbuff on rx queue context, avoid division round up as
+> it causes to actually corrupt the tailroom for AF_XDP ZC. Below is an
+> example based on 4k chunk size when xsk pool pointer is valid on given
+> rx ring:
+>
+> chunk_size = 4096
+> headroom = 256
+> tailroom = 320
+>
+> ring->rx_buf_len = 4096 - 256 - 320 = 3520
+>
+> rx_ctx.dbuff = DIV_ROUND_UP(3520, 128) ->
+> 3520 / 128 = 27.5 -> round up results in 28
+>
+> dbuff programming unit is 128. If we give 128 * 28 = 3584. So HW will
+> corrupt 64 bytes from tailroom. Doing plain division will floor the
+> result and would not exceed reserved space at the end.
+>
+> Also, restore ::rx_buf_len setting via xsk_pool_get_rx_frame_size() as
+> of now it respects the tailroom.
+>
+> Fixes: 1bbc04de607b ("ice: xsk: add RX multi-buffer support")
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_base.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+> index 1667f686ff75..930688bd3476 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_base.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_base.c
+> @@ -498,8 +498,11 @@ static int ice_setup_rx_ctx(struct ice_rx_ring *ring)
+>  	/* Receive Packet Data Buffer Size.
+>  	 * The Packet Data Buffer Size is defined in 128 byte units.
+>  	 */
+> -	rlan_ctx.dbuf = DIV_ROUND_UP(ring->rx_buf_len,
+> -				     BIT_ULL(ICE_RLAN_CTX_DBUF_S));
+> +	if (ring->xsk_pool)
+> +		rlan_ctx.dbuf = ring->rx_buf_len / BIT_ULL(ICE_RLAN_CTX_DBUF_S);
+> +	else
+> +		rlan_ctx.dbuf = DIV_ROUND_UP(ring->rx_buf_len,
+> +					     BIT_ULL(ICE_RLAN_CTX_DBUF_S));
 
-
-On 16/03/2026 23.31, Byungchul Park wrote:
-> Currently, the condition 'page->pp_magic == PP_SIGNATURE' is used to
-> determine if a page belongs to a page pool.  However, with the planned
-> removal of @pp_magic, we should instead leverage the page_type in struct
-> page, such as PGTY_netpp, for this purpose.
-> 
-> Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(),
-> and __ClearPageNetpp() instead, and remove the existing APIs accessing
-> @pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
-> netmem_clear_pp_magic().
-> 
-> Plus, add @page_type to struct net_iov at the same offset as struct page
-> so as to use the page_type APIs for struct net_iov as well.  While at it,
-> reorder @type and @owner in struct net_iov to avoid a hole and
-> increasing the struct size.
-> 
-> This work was inspired by the following link:
-> 
->    https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com/
-> 
-> While at it, move the sanity check for page pool to on the free path.
-> 
-[...]
-see below
-
-> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> index 9f2fe46ff69a1..ee81f5c67c18f 100644
-> --- a/mm/page_alloc.c
-> +++ b/mm/page_alloc.c
-> @@ -1044,7 +1044,6 @@ static inline bool page_expected_state(struct page *page,
->   #ifdef CONFIG_MEMCG
->   			page->memcg_data |
->   #endif
-> -			page_pool_page_is_pp(page) |
->   			(page->flags.f & check_flags)))
->   		return false;
->   
-> @@ -1071,8 +1070,6 @@ static const char *page_bad_reason(struct page *page, unsigned long flags)
->   	if (unlikely(page->memcg_data))
->   		bad_reason = "page still charged to cgroup";
->   #endif
-> -	if (unlikely(page_pool_page_is_pp(page)))
-> -		bad_reason = "page_pool leak";
->   	return bad_reason;
->   }
->   
-> @@ -1381,9 +1378,17 @@ __always_inline bool __free_pages_prepare(struct page *page,
->   		mod_mthp_stat(order, MTHP_STAT_NR_ANON, -1);
->   		folio->mapping = NULL;
->   	}
-> -	if (unlikely(page_has_type(page)))
-> +	if (unlikely(page_has_type(page))) {
-> +		/* networking expects to clear its page type before releasing */
-> +		if (is_check_pages_enabled()) {
-> +			if (unlikely(PageNetpp(page))) {
-> +				bad_page(page, "page_pool leak");
-> +				return false;
-> +			}
-> +		}
->   		/* Reset the page_type (which overlays _mapcount) */
->   		page->page_type = UINT_MAX;
-> +	}
-
-I need some opinions here.  When CONFIG_DEBUG_VM is enabled we get help
-finding (hard to find) page_pool leaks and mark the page as bad.
-
-When CONFIG_DEBUG_VM is disabled we silently "allow" leaking.
-Should we handle this more gracefully here? (release pp resources)
-
-Allowing the page to be reused at this point, when a page_pool instance
-is known to track life-time and (likely) have the page DMA mapped, seems
-problematic to me.  Code only clears page->page_type, but IIRC Toke
-added DMA tracking in other fields (plus xarray internally).
-
-I was going to suggest to simply re-export page_pool_release_page() that
-was hidden by 535b9c61bdef ("net: page_pool: hide
-page_pool_release_page()"), but that functionality was lost in
-07e0c7d3179d ("net: page_pool: merge page_pool_release_page() with
-page_pool_return_page()"). (Cc Jakub/Kuba for that choice).
-Simply page_pool_release_page(page->pp, page).
-
-Opinions?
-
---Jesper
+nit: Maybe put the BIT_ULL() in a variable (steps/unit?) and use ?: 
 
