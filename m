@@ -1,265 +1,245 @@
-Return-Path: <netdev+bounces-268607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268606-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oHYHN59XuWnYAgIAu9opvQ
-	(envelope-from <netdev+bounces-268607-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:31:11 +0100
+	id eOd+JgNYuWnYAgIAu9opvQ
+	(envelope-from <netdev+bounces-268606-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:32:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 822632AAE5A
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:31:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B3F22AAE90
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:32:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D4CAC301CCB2
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:31:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C133430B6B3F
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4B325A62E;
-	Tue, 17 Mar 2026 13:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A6624C692;
+	Tue, 17 Mar 2026 13:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q5/D/0lT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dcay63gh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52633264A9D;
-	Tue, 17 Mar 2026 13:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0B81A23AC
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 13:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773754268; cv=none; b=KOR1ubEnWamUna0f75DjmXa3b73z9SrxJgIFRbkgYFvkh/iqftjtham4vBxDaJzc2glZ0JRocu0xi8cC5IErJVFbm+MbF179flJKLAp+RBgbSjqWU4SYb5MRBgYNq4Q7yDmaszL3Ei+Y+DpmOQgjO/qIQxy0n+SbqQ2MOBTljsQ=
+	t=1773754225; cv=none; b=tOTzqUezWdP2hNxaLWIaESK2PUoueVuXpn5mhE5pwzL5GilqbtGpPHgADHl4yAswpnDeQA6pCsgc7WQ2pmh+AFnjbwspNUFnk+dYn87gz1R7Ak4HgRp9eyhFLdhWOKsvgD1KLxlqUWZjQlOlTI5G2osiBO3zJZIgJQ4Ne1IssiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773754268; c=relaxed/simple;
-	bh=lIWsD2ci2/DmvQPAIxFhRhk/jEMsvah2g+VU1OXqBHM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EAm3zKpnH4NXCeDKNHO+I5vzgpps8qKOFqQI5ba05kl29ND7vKpb2/2OliXWXVbDFiqlyhFR9yD/pchfRUyzVpX8/+dtC5biXh4A7xNR6dUaNsljzD2IRzzjPpW4Yv0egxTR42HefeGRzS1E50oDdb+XMpc8xnHsJHTPwEn0bY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q5/D/0lT; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773754266; x=1805290266;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lIWsD2ci2/DmvQPAIxFhRhk/jEMsvah2g+VU1OXqBHM=;
-  b=Q5/D/0lTKYGdD71rnTyTW4M/Vl/G3CpgrexpdMHX2PKMoE43BxbhSvZY
-   BpTQ2VWMQgtoM3fZW71BD0M/eIEWUDCkukghVSAPmFqA8ZFT/f5I9mnbU
-   wAxsHo2YN6jXt7yVNOmBqg13uxgngPKVM4RZrmKnLqUupPb0crCDYNY8O
-   kNuJl1W3HvF0mZrCdjuFd2HJzciEzuBZhD6yVeoStlKg03QZHnZKmHt3F
-   7D6XS1/nMroNA/Q2KqU+XLPXtrEQWLHl9Px2A6bik3PwM4nOeHPoJcWwV
-   u5I3mHqvMPBhNMpBhEdBe7qQdBI96vx6TsweoRzsgeOaP82eWusL3iMnH
-   Q==;
-X-CSE-ConnectionGUID: Pt13bwh4TK2RyjV9UQMJlg==
-X-CSE-MsgGUID: k14SCLzbT22XwmLWXut9SQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11732"; a="74864521"
-X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
-   d="scan'208";a="74864521"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 06:31:05 -0700
-X-CSE-ConnectionGUID: tOdRrbAJSgilkEWdhpJ4kw==
-X-CSE-MsgGUID: iW5TAUcCSFynXaZPGd9kSg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
-   d="scan'208";a="222225635"
-Received: from lkp-server01.sh.intel.com (HELO 63737dd503cb) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 17 Mar 2026 06:31:02 -0700
-Received: from kbuild by 63737dd503cb with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w2UVf-000000000Sr-19nC;
-	Tue, 17 Mar 2026 13:30:59 +0000
-Date: Tue, 17 Mar 2026 21:30:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Adrian Moreno <amorenoz@redhat.com>,
-	Aaron Conole <aconole@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, dev@openvswitch.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v1] net: openvswitch: decouple flow_table from
- ovs_mutex
-Message-ID: <202603172153.FuWl19zD-lkp@intel.com>
-References: <20260313173114.1220551-1-amorenoz@redhat.com>
+	s=arc-20240116; t=1773754225; c=relaxed/simple;
+	bh=WTklFd+xAu4hGzmNTuliFYPoc4TDU1mCc0XJBj9j7Ic=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=GsW+rRabUEWaApythJKrQBX2wwKQQ40nDZEtYg3nUI3MsauFJjSgQ7AcVEU+gsqSMLJTWcMKK8v1bzFjVZ+VZEaTbzxassC00K5X4Wu1E0EB3BQEeacepJSLxXin2MfVM0Q9LW1eFskhhMePfAp9CrwkFza6TKQUw46GwIGVxqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dcay63gh; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-79a2ee65171so30832547b3.2
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 06:30:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773754222; x=1774359022; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o+OZHdz7JUIXbfLO4py8nXeTNKDtHpNLhBh45s0nxME=;
+        b=dcay63ghRmUbcvLXKdLJlS+RJrvic4H2PSNKb0ztxbdB4pkFo2kKaw3Qk1nbIppe+I
+         rFhSqt80K3+F8PdhvQVyLpiAZ1kS0p5pTXDuUiMnqwsqTYYoEDLFycvmltjewaxhYb87
+         VAKMefKwMAL9KUf1lpcjybKayzgoAxdUqg/Wp0cvbE1nQsTYHCkfapyxd7fjR9AKG862
+         qtr1Ha9mXF8nz3Pl5eyYW/2G5FZcPwS8ydAKPK8HXphVtdCD5I425K6Wh1QAQYV86Ymk
+         ef9kpb0wSUVmWKHuToc0PEkyNYBIlqHsz7n+PLV2sk1OraYVl5aPVTspBzdSkj83EGme
+         N9qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773754222; x=1774359022;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=o+OZHdz7JUIXbfLO4py8nXeTNKDtHpNLhBh45s0nxME=;
+        b=QiavjHTut+pDNrGhr7arGym20erheCTltf3lz1o4a3xOQOFbrGB7KahZsEYxP3XDbj
+         QYKXLQBktfs3UKFMx4ZYqSnMnj1QYTEkAwPQ6WT02Bfw0oatrSQv+7I+3eD1TzQU3Evv
+         cs3msXn5sc8Z4+Lrbc0YUT5IfvjD0tdgETDts8fm2rVERHYcVNhM1wGVsEbuT5AS/B5v
+         H1Lqdvdv3W2WDrY3ufM2Juh3F4rTc7Ndf/Z5xJSRm3Pa7d8myjYNh8cRp5cp990mfWL2
+         bT9pa+naowwYvJEBb9zL3ZF+Id+4DCuH1N7cAH2L4VYTBQ6ohu8FHdthm10erRmG7e/o
+         yHzg==
+X-Forwarded-Encrypted: i=1; AJvYcCXOrK0YoUqpEnMh7njFELxmJlq9MKHERBKCU4nnoB/nNRdYQEOv6X0uWb+hHKEUrJT7gaSuGo8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJjyv4IWX4lKn/fM7LiL0GGanv0TFKyGxC4RJYt+qjCoho3+pb
+	zZ4rs9a8hpd65IKkOjghPMXBQiJ23ZFMDZCxMxZfuLciVTtMa0mgBNyF
+X-Gm-Gg: ATEYQzyDB+oeXnYHWKBx9ASNvCYkrFE/zjG/4oyFAu0+xKLhrMAQPzsCVNBtHat6TT9
+	+BYYGpNKNoadoZEO4cOC4FuionD8uksuy1cD0LsAMVLRZCP9YtA5/xtPV44jwoha5LjKg4B4TKG
+	fe4G1x2l/m5tKuMdmgzyYJGC/6QVsc+PAMdqMhNnBZdsTk7hOyUWD5+iMZEAPXe54dsrsSnY+Yn
+	u0346GsvIp2VaXZLv/Y91KcPkm2Tn7NvojxXwdudELbh6eeqcK+yuAPLHLTWHoOty8tn6YWKaC+
+	GVBRF+93Icmwo8Yff1sp+0lud1et3DIZfR0GmZeEi8QHXmJUcBW82ySkMhnBLc+hXVdzZan3k1v
+	r1y3JDuoMsRxrlZLkSgJELbnBmvFXhdEpOFGhrfTA1OlzIvGnd+AoWKZGTkln0MjXjK4QZlTaf2
+	Ik+/nXA7ZHmWZnev8ic4Ht073CIcYRffKlrKQsNiedTpsc0Sg3A8W2JFXBBnEYA8Jf80AaNPAKS
+	WfB
+X-Received: by 2002:a05:690c:84:b0:798:c349:7207 with SMTP id 00721157ae682-79a1c0ab6f1mr165122397b3.4.1773754221917;
+        Tue, 17 Mar 2026 06:30:21 -0700 (PDT)
+Received: from gmail.com (180.134.85.34.bc.googleusercontent.com. [34.85.134.180])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-79a1688ca84sm78216867b3.48.2026.03.17.06.30.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Mar 2026 06:30:20 -0700 (PDT)
+Date: Tue, 17 Mar 2026 09:30:20 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Nick Hudson <nhudson@akamai.com>, 
+ bpf@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Nick Hudson <nhudson@akamai.com>, 
+ Max Tottenham <mtottenh@akamai.com>, 
+ Anna Glasgall <aglasgal@akamai.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.4f5a568542ec@gmail.com>
+In-Reply-To: <20260317121429.2399539-5-nhudson@akamai.com>
+References: <20260317121429.2399539-1-nhudson@akamai.com>
+ <20260317121429.2399539-5-nhudson@akamai.com>
+Subject: Re: [PATCH v1 4/5] bpf: add guard rails for new DECAP flags
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260313173114.1220551-1-amorenoz@redhat.com>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268607-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268606-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FREEMAIL_CC(0.00)[gmail.com,akamai.com,kernel.org,iogearbox.net,linux.dev,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,01.org:url]
-X-Rspamd-Queue-Id: 822632AAE5A
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,akamai.com:email]
+X-Rspamd-Queue-Id: 3B3F22AAE90
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Adrian,
+Nick Hudson wrote:
+> Add checks to require shrink-only decap, reject conflicting decap flag combinations, and verify removed length is sufficient for claimed header decapsulation.
+> 
+> Co-developed-by: Max Tottenham <mtottenh@akamai.com>
+> Signed-off-by: Max Tottenham <mtottenh@akamai.com>
+> Co-developed-by: Anna Glasgall <aglasgal@akamai.com>
+> Signed-off-by: Anna Glasgall <aglasgal@akamai.com>
+> Signed-off-by: Nick Hudson <nhudson@akamai.com>
 
-kernel test robot noticed the following build warnings:
 
-[auto build test WARNING on net-next/main]
+This patch probably should come before 3, as 3 enables the features
+without the guard rails in place.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Adrian-Moreno/net-openvswitch-decouple-flow_table-from-ovs_mutex/20260314-152511
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260313173114.1220551-1-amorenoz%40redhat.com
-patch subject: [PATCH net-next v1] net: openvswitch: decouple flow_table from ovs_mutex
-config: arm-randconfig-r132-20260317 (https://download.01.org/0day-ci/archive/20260317/202603172153.FuWl19zD-lkp@intel.com/config)
-compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project f46a5153850c1303d687233d4adf699b01041da8)
-sparse: v0.6.5-rc1
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260317/202603172153.FuWl19zD-lkp@intel.com/reproduce)
+> ---
+>  net/core/filter.c | 45 ++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 36 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index ac7e1068fe4c..437e0da34f84 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -56,6 +56,7 @@
+>  #include <net/sock_reuseport.h>
+>  #include <net/busy_poll.h>
+>  #include <net/tcp.h>
+> +#include <net/gre.h>
+>  #include <net/xfrm.h>
+>  #include <net/udp.h>
+>  #include <linux/bpf_trace.h>
+> @@ -3745,20 +3746,46 @@ BPF_CALL_4(bpf_skb_adjust_room, struct sk_buff *, skb, s32, len_diff,
+>  		return -ENOTSUPP;
+>  	}
+>  
+> -	if (flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) {
+> +	if (flags & BPF_F_ADJ_ROOM_DECAP_MASK) {
+> +		u32 len_decap_min = 0;
+> +
+>  		if (!shrink)
+>  			return -EINVAL;
+>  
+> -		switch (flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) {
+> -		case BPF_F_ADJ_ROOM_DECAP_L3_IPV4:
+> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) ==
+> +		    BPF_F_ADJ_ROOM_DECAP_L3_MASK)
+> +			return -EINVAL;
+> +
+> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_MASK) ==
+> +		    BPF_F_ADJ_ROOM_DECAP_L4_MASK)
+> +			return -EINVAL;
+> +
+> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK) ==
+> +		    BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK)
+> +			return -EINVAL;
+> +
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603172153.FuWl19zD-lkp@intel.com/
+Are these equality tests shorthand based on knowledge that each only
+have two options, so equality implies more than one option set? That
+is not obvious/self documenting. Please add a brief comment.
 
-sparse warnings: (new ones prefixed by >>)
->> net/openvswitch/datapath.c:2016:28: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct flow_table *table @@     got struct flow_table [noderef] __rcu *table @@
-   net/openvswitch/datapath.c:2016:28: sparse:     expected struct flow_table *table
-   net/openvswitch/datapath.c:2016:28: sparse:     got struct flow_table [noderef] __rcu *table
+> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_MASK) &&
+> +		    (flags & BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK))
+> +			return -EINVAL;
+> +
+> +		if (mode == BPF_ADJ_ROOM_MAC)
+> +			len_decap_min += proto == htons(ETH_P_IP) ?
+> +					 sizeof(struct iphdr) : sizeof(struct ipv6hdr);
 
-vim +2016 net/openvswitch/datapath.c
+MAC is not a GSO related decap, can be used for insertion/deletion of
+L2.5 headers. This should be dropped.
 
-  1913	
-  1914	static int ovs_dp_cmd_new(struct sk_buff *skb, struct genl_info *info)
-  1915	{
-  1916		struct nlattr **a = info->attrs;
-  1917		struct flow_table *table;
-  1918		struct vport_parms parms;
-  1919		struct sk_buff *reply;
-  1920		struct datapath *dp;
-  1921		struct vport *vport;
-  1922		struct ovs_net *ovs_net;
-  1923		int err;
-  1924	
-  1925		err = -EINVAL;
-  1926		if (!a[OVS_DP_ATTR_NAME] || !a[OVS_DP_ATTR_UPCALL_PID])
-  1927			goto err;
-  1928	
-  1929		reply = ovs_dp_cmd_alloc_info();
-  1930		if (!reply)
-  1931			return -ENOMEM;
-  1932	
-  1933		err = -ENOMEM;
-  1934		dp = kzalloc_obj(*dp);
-  1935		if (dp == NULL)
-  1936			goto err_destroy_reply;
-  1937	
-  1938		ovs_dp_set_net(dp, sock_net(skb->sk));
-  1939	
-  1940		/* Allocate table. */
-  1941		table = ovs_flow_tbl_alloc();
-  1942		if (IS_ERR(table)) {
-  1943			err = PTR_ERR(table);
-  1944			goto err_destroy_dp;
-  1945		}
-  1946		rcu_assign_pointer(dp->table, table);
-  1947	
-  1948		err = ovs_dp_stats_init(dp);
-  1949		if (err)
-  1950			goto err_destroy_table;
-  1951	
-  1952		err = ovs_dp_vport_init(dp);
-  1953		if (err)
-  1954			goto err_destroy_stats;
-  1955	
-  1956		err = ovs_meters_init(dp);
-  1957		if (err)
-  1958			goto err_destroy_ports;
-  1959	
-  1960		/* Set up our datapath device. */
-  1961		parms.name = nla_data(a[OVS_DP_ATTR_NAME]);
-  1962		parms.type = OVS_VPORT_TYPE_INTERNAL;
-  1963		parms.options = NULL;
-  1964		parms.dp = dp;
-  1965		parms.port_no = OVSP_LOCAL;
-  1966		parms.upcall_portids = a[OVS_DP_ATTR_UPCALL_PID];
-  1967		parms.desired_ifindex = nla_get_s32_default(a[OVS_DP_ATTR_IFINDEX], 0);
-  1968	
-  1969		/* So far only local changes have been made, now need the lock. */
-  1970		ovs_lock();
-  1971	
-  1972		err = ovs_dp_change(dp, a);
-  1973		if (err)
-  1974			goto err_unlock_and_destroy_meters;
-  1975	
-  1976		vport = new_vport(&parms);
-  1977		if (IS_ERR(vport)) {
-  1978			err = PTR_ERR(vport);
-  1979			if (err == -EBUSY)
-  1980				err = -EEXIST;
-  1981	
-  1982			if (err == -EEXIST) {
-  1983				/* An outdated user space instance that does not understand
-  1984				 * the concept of user_features has attempted to create a new
-  1985				 * datapath and is likely to reuse it. Drop all user features.
-  1986				 */
-  1987				if (info->genlhdr->version < OVS_DP_VER_FEATURES)
-  1988					ovs_dp_reset_user_features(skb, info);
-  1989			}
-  1990	
-  1991			goto err_destroy_portids;
-  1992		}
-  1993	
-  1994		err = ovs_dp_cmd_fill_info(dp, reply, info->snd_portid,
-  1995					   info->snd_seq, 0, OVS_DP_CMD_NEW);
-  1996		BUG_ON(err < 0);
-  1997	
-  1998		ovs_net = net_generic(ovs_dp_get_net(dp), ovs_net_id);
-  1999		list_add_tail_rcu(&dp->list_node, &ovs_net->dps);
-  2000	
-  2001		ovs_unlock();
-  2002	
-  2003		ovs_notify(&dp_datapath_genl_family, reply, info);
-  2004		return 0;
-  2005	
-  2006	err_destroy_portids:
-  2007		kfree(rcu_dereference_raw(dp->upcall_portids));
-  2008	err_unlock_and_destroy_meters:
-  2009		ovs_unlock();
-  2010		ovs_meters_exit(dp);
-  2011	err_destroy_ports:
-  2012		kfree(dp->ports);
-  2013	err_destroy_stats:
-  2014		free_percpu(dp->stats_percpu);
-  2015	err_destroy_table:
-> 2016		ovs_flow_tbl_put(dp->table);
-  2017	err_destroy_dp:
-  2018		kfree(dp);
-  2019	err_destroy_reply:
-  2020		kfree_skb(reply);
-  2021	err:
-  2022		return err;
-  2023	}
-  2024	
+> +
+> +		if (flags & BPF_F_ADJ_ROOM_DECAP_L4_UDP)
+> +			len_decap_min += sizeof(struct udphdr);
+> +
+> +		if (flags & BPF_F_ADJ_ROOM_DECAP_L4_GRE)
+> +			len_decap_min += sizeof(struct gre_base_hdr);
+> +
+> +		if (len_diff_abs < len_decap_min)
+> +			return -EINVAL;
+> +
+> +		if (flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV4)
+>  			len_min = sizeof(struct iphdr);
+> -			break;
+> -		case BPF_F_ADJ_ROOM_DECAP_L3_IPV6:
+> +
+> +		if (flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
+>  			len_min = sizeof(struct ipv6hdr);
+> -			break;
+> -		default:
+> -			return -EINVAL;
+> -		}
+>  	}
+>  
+>  	len_cur = skb->len - skb_network_offset(skb);
+> -- 
+> 2.34.1
+> 
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
 
