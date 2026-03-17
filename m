@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-268741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268742-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULIoIHHFuWmcNQIAu9opvQ
-	(envelope-from <netdev+bounces-268741-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 22:19:45 +0100
+	id QA/8DpDFuWmcNQIAu9opvQ
+	(envelope-from <netdev+bounces-268742-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 22:20:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0DCE2B294B
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 22:19:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 932DC2B2953
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 22:20:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A875A3034289
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 21:19:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E249230A5870
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 21:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B6E38F93B;
-	Tue, 17 Mar 2026 21:19:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64BDE391825;
+	Tue, 17 Mar 2026 21:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eC6F1RuL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QCkazCu7"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E6932E121
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 21:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78662349B06
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 21:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773782361; cv=none; b=exf7fjG6sw+c8Rn9E51n6gtldz7+nFdb8Uj0tWmQQ5YKl8aob6S8kw+Z+YyQ7PLP2q3jaOjTSc1uXt4T5owap5AiYGAPoIikbF52Pr7UP/Nm9C/9mG46ucUE1SHcvw0l9dPfkjzuA5FPTIEfeKg+KXOjBDn+PL/GFGi5snzb9ME=
+	t=1773782362; cv=none; b=pC8XsFV7s1eD4K9euSh3Yoa4iH7ddwL9nLsXI/p7CAp7iRXbEHhMXpHrSZjSRkz2bgr8CxwiMOlbKfH0RZiz6wmZIYTAZS4Kfe4/m6qpjf+VqGBYn8T53bbrmLLNYUQhQR5A1gsturEL2zJ0oW539+6CfKSoopBEZ6kkcJpy7lQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773782361; c=relaxed/simple;
-	bh=zkYdbfmdrcIKYpzUl1+b+JGnCDLTbSlWTXdz8lul9+s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IPmQkrcaKLpobi80GamSD8x09u84mhP2rKp9nswVYXcCAglEKJpHuiUNWTwHvxiN+5KuXRMswesnwdTcoFGNa2mCfSDRoIOIlgUHN3fTDLfP33tHVWMdq0IwJyYwP8x7N1RZ67Hhg/f6Fr8pYgdfdFpX3um9fEpV/hAQww+bfao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eC6F1RuL; arc=none smtp.client-ip=192.198.163.9
+	s=arc-20240116; t=1773782362; c=relaxed/simple;
+	bh=CW3Uufj1yyZo9C/fNxOh86kcdkL9BMr9ffzUXlUe+HM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=i2Rp/tFLUPxLw56aCijSOdr0oJx7i8427a8ioKwU9OlgutPteuWfjb35jb2rQ5IbGW/erKpEphXxfeBXvAmbMxxP47xBJO8C7DTO3VSEyzuT9mky1LbLDdZd/lCz+/XVHLJ1NkpfA+LQASE8A8EinHdPLRBq9us3woekpmx9eaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QCkazCu7; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773782359; x=1805318359;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=zkYdbfmdrcIKYpzUl1+b+JGnCDLTbSlWTXdz8lul9+s=;
-  b=eC6F1RuL9YoUeaN2+so036njWSd+ZornvhJLIlPgd2Sy70PM3imGilgG
-   Sv/Q42z9V1mC8ULYOCBU3IqQGIkS+9PzRIHz6minzmYPWgv0/IitFkr/N
-   emJlZbX0gUNS1f+5GjJiJ+F4dXXGRqsL/Pn48T4kM4HzjffU9V0J37Io3
-   P4DHZWoO0qI8vW+zh3cS+pfqDMVRs/zstIqvpTmRlutW0PZrsWs5MFiwH
-   31tI5Zk2gUMMSB8lu2iMO1lWIMroSdxymjFl9diaO0a/+1kwN4f3p6ZJX
-   KhWTasBICN9PxXUFxC2wtr/Qu+GOenqzzUIPlLimTyjsJM4TigrGT9Z1E
-   A==;
-X-CSE-ConnectionGUID: MYCCdXHfQ0uyZqZWEUMFhg==
-X-CSE-MsgGUID: OdEB7ejzRJmZAFZ85Jqosg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11732"; a="85524754"
+  t=1773782360; x=1805318360;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=CW3Uufj1yyZo9C/fNxOh86kcdkL9BMr9ffzUXlUe+HM=;
+  b=QCkazCu7FKMuT3jhE5kbxLEdNAQ9rbCoFTAT2K5xULITllE0DvXpQq1P
+   RnRUgRjZcv847ZaWdkuYG91+0DRAOhs85I8sFgmVAmXHIJWbi5LXxVzYQ
+   qOQZHg1uj3CDbSZU/OhDC/nokbaiLvjn4pitldccUDd+MJ27uxu4XSkA2
+   iPn4QAQKzNl8PC++aCRm4R2Zl182rK/srGthnxYG0nmh8ZtCy2SeIO5iM
+   Ko/LlVkvCbjpdevI1ERLLMqwn9yJZgpBsUjibBi/+KQvOU7i/Cb+4RsD9
+   qgDny/tET1tFkXgiIKZJ3CZVeDxrNJVpZ0a2dbAIoBAj+0kSPhEPdhEIX
+   g==;
+X-CSE-ConnectionGUID: rP/L9xd4Q8Ghwhz+K96M3Q==
+X-CSE-MsgGUID: vpp7ppksQUOa/jMmBfmtrg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11732"; a="85524761"
 X-IronPort-AV: E=Sophos;i="6.23,126,1770624000"; 
-   d="scan'208";a="85524754"
+   d="scan'208";a="85524761"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
   by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 14:19:12 -0700
-X-CSE-ConnectionGUID: bOna9mFDTMilE0HpiA78uQ==
-X-CSE-MsgGUID: VW8veLJKRkeiI6LNOh6fMA==
+X-CSE-ConnectionGUID: EXEu2wXXQ3u8+3QSXIlEyg==
+X-CSE-MsgGUID: AGC4ofpfRsaYdXJ/ypOraQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,126,1770624000"; 
-   d="scan'208";a="219477568"
+   d="scan'208";a="219477572"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa007.fm.intel.com with ESMTP; 17 Mar 2026 14:19:11 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -67,11 +68,19 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: [PATCH net 0/4][pull request] Intel Wired LAN Driver Updates 2026-03-17 (igc, iavf, libie)
-Date: Tue, 17 Mar 2026 14:19:01 -0700
-Message-ID: <20260317211906.115505-1-anthony.l.nguyen@intel.com>
+Cc: Kohei Enju <kohei@enjuk.jp>,
+	anthony.l.nguyen@intel.com,
+	kohei.enju@gmail.com,
+	dima.ruinskiy@intel.com,
+	Simon Horman <horms@kernel.org>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Avigail Dahan <avigailx.dahan@intel.com>
+Subject: [PATCH net 1/4] igc: fix missing update of skb->tail in igc_xmit_frame()
+Date: Tue, 17 Mar 2026 14:19:02 -0700
+Message-ID: <20260317211906.115505-2-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20260317211906.115505-1-anthony.l.nguyen@intel.com>
+References: <20260317211906.115505-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,71 +90,70 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[enjuk.jp,intel.com,gmail.com,kernel.org,molgen.mpg.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-268742-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268741-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: D0DCE2B294B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mpg.de:email]
+X-Rspamd-Queue-Id: 932DC2B2953
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Kohei Enju adds use of helper function to add missing update of
-skb->tail when padding is needed for igc.
+From: Kohei Enju <kohei@enjuk.jp>
 
-Zdenek Bouska clears stale XSK timestamps when taking down Tx rings on
-igc.
+igc_xmit_frame() misses updating skb->tail when the packet size is
+shorter than the minimum one.
+Use skb_put_padto() in alignment with other Intel Ethernet drivers.
 
-Petr Oros changes handling of iavf VLAN filter handling when an added
-VLAN is also on the delete list to which can race and cause the VLAN
-filter to not be added.
+Fixes: 0507ef8a0372 ("igc: Add transmit and receive fastpath and interrupt handlers")
+Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+ drivers/net/ethernet/intel/igc/igc_main.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Michal frees cmd_buf for libie firmware logging to stop memory leaks.
-
-The following are changes since commit 069c8f5aebe4d5224cf62acc7d4b3486091c658a:
-  net: usb: aqc111: Do not perform PM inside suspend callback
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 1GbE
-
-Kohei Enju (1):
-  igc: fix missing update of skb->tail in igc_xmit_frame()
-
-Michal Swiatkowski (1):
-  libie: prevent memleak in fwlog code
-
-Petr Oros (1):
-  iavf: fix VLAN filter lost on add/delete race
-
-Zdenek Bouska (1):
-  igc: fix page fault in XDP TX timestamps handling
-
- drivers/net/ethernet/intel/iavf/iavf_main.c |  9 ++--
- drivers/net/ethernet/intel/igc/igc.h        |  2 +
- drivers/net/ethernet/intel/igc/igc_main.c   | 14 +++---
- drivers/net/ethernet/intel/igc/igc_ptp.c    | 33 ++++++++++++++
- drivers/net/ethernet/intel/libie/fwlog.c    | 49 +++++++++++++++------
- 5 files changed, 86 insertions(+), 21 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index b2e8d0c0f827..1c5d7b23f225 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -1730,11 +1730,8 @@ static netdev_tx_t igc_xmit_frame(struct sk_buff *skb,
+ 	/* The minimum packet size with TCTL.PSP set is 17 so pad the skb
+ 	 * in order to meet this minimum size requirement.
+ 	 */
+-	if (skb->len < 17) {
+-		if (skb_padto(skb, 17))
+-			return NETDEV_TX_OK;
+-		skb->len = 17;
+-	}
++	if (skb_put_padto(skb, 17))
++		return NETDEV_TX_OK;
+ 
+ 	return igc_xmit_frame_ring(skb, igc_tx_queue_mapping(adapter, skb));
+ }
 -- 
 2.47.1
 
