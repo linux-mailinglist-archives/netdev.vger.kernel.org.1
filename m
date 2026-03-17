@@ -1,147 +1,203 @@
-Return-Path: <netdev+bounces-268531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268532-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4DKHGjYquWkAtAEAu9opvQ
-	(envelope-from <netdev+bounces-268531-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:17:26 +0100
+	id 2BAsE8IquWmVtQEAu9opvQ
+	(envelope-from <netdev+bounces-268532-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:19:46 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD32B2A7B27
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:17:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD10D2A7BBE
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:19:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DBEF030B2225
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:11:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BCDC63030E92
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:15:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF81A3A3E73;
-	Tue, 17 Mar 2026 10:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09ADC39E6CD;
+	Tue, 17 Mar 2026 10:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j6n1QXn7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T2wV8MV2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4303A168C
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 10:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09FE330D43
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 10:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773742263; cv=none; b=LorbPNFyTKV5NO1oE6nQIoxOXWQuxbTjBSd7UWkACgSLXR9XlJZV18KDuC8lZeFpK+adgLJP6xYnXo8p3CdJdyxCdipuKQ21C6O5H/hSKp1LxJ13q/ynegtq1n7DR6P+wo/MBalFdgAl4F12g55h4XEMn86G2mA9jT7q1EzeqT8=
+	t=1773742542; cv=none; b=QN1gU1MpdoQtivrHrv4t+UCG8+WcX/PfygzDYDd87XVOr66LtnHpviCi7KhoZimWyR1pQVq13XPSYhMR14CMtpqzxXNF/uD07F7cARNFx75pFX32fCvrnPDZHOy55vbCqCMOcd7x1/59Tk+3qPeWZpHdbR1MWtYgMKj2Rct5VzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773742263; c=relaxed/simple;
-	bh=G8XoS1TYQKC+tZYU4Ara5WZJMLSwIp9nwLYY9towWNI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e4Aa2kIbntTHEx0ijrrIGedCKVXsBreC8fmjLX094LpjusiyuWu8AW949WD/WjZp94F5MqwbBm08u/KI6Jhms1h//Pge3sXCivekXZ1/AnVKaUFbsk02rkMyJF38F5B/oDih4j70zfWy1IVAi/8X7nTueSDiuWM1RInps76FjeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j6n1QXn7; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773742258; x=1805278258;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=G8XoS1TYQKC+tZYU4Ara5WZJMLSwIp9nwLYY9towWNI=;
-  b=j6n1QXn78KXxB6gcAdEbhuPGwPnAuAybiJI4M4kR+8iSne4fDi1Gs0y6
-   yOTT/h2bHSZms7F1UKGDt3LAevvADMZSDIByPzE/JhMFV3wkgl7jWSK7h
-   fPO+TmuFpllLdmsih9gZZ36u5ZE2+ocvUTQmOxZwPUSZ2L+PhJQ4RUeSf
-   BmvXKeI8nv/bDF4hD6BWUrVc1z7tfES2LtZbeAcowSPOkjvI/1+zlei+G
-   UMSKSEEaj1BTqLLSSJ/goQl3imxutI3htl2qZo70RR5el2H28xCW6dtVM
-   GBSUsdTwOJD2SZngn2Zh5MimygLw1FskAQianGtHVQm/JXIponKQ6aHSv
-   A==;
-X-CSE-ConnectionGUID: W3p/lPIzQkWahDDJcpYVcg==
-X-CSE-MsgGUID: kxrQArquQY6W/LxblJCMFw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11731"; a="74887361"
-X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
-   d="scan'208";a="74887361"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 03:10:58 -0700
-X-CSE-ConnectionGUID: Rxzhb+4DRZ+CCr2qhhaX3g==
-X-CSE-MsgGUID: 6LgERUjXRAKl9RGMGj261Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
-   d="scan'208";a="222448493"
-Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
-  by orviesa007.jf.intel.com with ESMTP; 17 Mar 2026 03:10:56 -0700
-Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w2RO1-000000004Pz-3AVE;
-	Tue, 17 Mar 2026 10:10:53 +0000
-Date: Tue, 17 Mar 2026 11:10:28 +0100
-From: kernel test robot <lkp@intel.com>
-To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, pabeni@redhat.com, edumazet@google.com,
-	horms@kernel.org, kuba@kernel.org,
-	John Ousterhout <ouster@cs.stanford.edu>
-Subject: Re: [PATCH net-next v17 01/14] net: homa: define user-visible API
- for Homa
-Message-ID: <202603171139.hOLQ0YKl-lkp@intel.com>
-References: <20260316223228.2611-2-ouster@cs.stanford.edu>
+	s=arc-20240116; t=1773742542; c=relaxed/simple;
+	bh=qQsRsRo1lwM6NZ4V6oJfN2UKgfC38t0H7ex14ZKedEk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bO2QNLMLiRC+VmjiZJZplU17Ka3z3xUWe9L+hlZYQsR6W/Kaih+LvvAQTB1cqgXqFVMlKU17LIxUkYb3wsxbDd/dMdd1NMc0gi4iBidBQwE03YwSC9aYovmZJJnHXWjSjhayyp1EnGFfKoMgeKLsyE6MeryrLJQdrUTA+S/ydJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T2wV8MV2; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b9358bc9c50so690493066b.1
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 03:15:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773742540; x=1774347340; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=iRfjqfC/TBsGVHqBrwzxSIT/mb5DrDQmAIZikbq0tmE=;
+        b=T2wV8MV2NyFc103MuvEJc+GKaXi1VZl8XQR9cc65Jj8cITqe2nmlhyRT/jVOTmn5ta
+         0V2lti5sbKPPHjpWy0amNJNRxPDQ1mgb5/Yi3Zrp/KS0NUj8P2g3YPjP+vCgrrLi/pV4
+         j+hApRBIGHV22TsSomHI2KVKbFOwjpnuDvfl1k8bv3BRtzjxDgICpu/bCDzUGS/nXNGr
+         IMWETVVglpOl3uNIC8s9P7cets1qXPJTSuVEpt4CZzhvcLVRttn4W9R2tGL1wXZXh5qq
+         h2mbb5+aZdfArlc710yTktryLtbRrT0611UkH4gLUAPLkEz7D6FA0AhY2SFxJlcCVhMx
+         dg7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773742540; x=1774347340;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iRfjqfC/TBsGVHqBrwzxSIT/mb5DrDQmAIZikbq0tmE=;
+        b=IXlI491MBtJVlIdK9Hmj0tDRylsFrDsOapfrQXuJ6G8Egcw60YSPCuITIPG/Lo5fqn
+         99OiAPn9eftAGYVf5PqeTwTJz15Y1hA+yeUKsGfsfX6bj8eMWYJ0hei3Tl6eAyqWBujZ
+         YJr8t2bKxWcRjvxLqG9tWz8o6/ujTkLh6BGbk122uYQ/YpZ3Irz+K71Oy9xnoY7nnZ3C
+         yMezpGR8BJrD7wx5Wl22EkViNndovHVpy5aLd7sU5CECnwNR17efVaApSAQWY0IM5QB+
+         FIjx+2ZNruiQMZXspDPXxg05gGxodhDu76k0tMJ7HdJmW9FfbtPHDmMhlwDmyvVcLsRA
+         lxuA==
+X-Forwarded-Encrypted: i=1; AJvYcCXlIx++aoiMy0z5g7Ws3/5neT/dvmg/LdWbcgY+yxL4NWeY13jL/A8xP9R8pPVIfyY0MsGHeUg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxw0InGF7SO14GwPZRJ0l4XUXmFTLPNlwR6kHvNZwnlFA76sl5o
+	q4kQzJE/hIYnwkqQ2ZsHeLVrSXMyZcJJIQNg0jETdyUgCUQHIYHNmn2R
+X-Gm-Gg: ATEYQzxZPXWYQvpGe40CIDTNXUZc0jBK1c5qsN7bSq4OIEpgHyUBW8brQHKL43m8X9y
+	axoabU7qvaFW1QtUSOiMotAnCU5/ai8pUuCfsmDzaJkFm+bYXpdGSsx9nBxcAOqTffiqxCdSo+D
+	uDsRJyUm9czaf5S/iDdKqOSNNbrkAUqQHWgYn1EP8mD7OIkbeBwKTkOi8oTifKl3JP4x/+dlxIR
+	UtziqgjrsM7xsmec1aY9+p3ZjT2nPc1EH5i0FP4ROBLzBX5/6wJeSduz6ubXIsUm5G+cH4m1xbk
+	4JOCpjs437vlHwI4MShmULz24tzeMCQEmFn8p6T5FpQLs2McZO2bhZ9qKbF3WJ8JgYpwTKaUEJI
+	WOtN4DJ12ovcYPeJfKvY+cOdnVbcD44LLX2qnk6yOn9BpyRcGNrRtieyV5BgoRdwBU4PBvQM23R
+	W/fJnYL1PSGnjXKnkzj69yvpfv8Hs6ozKYcojpKyGupYzePARJSX+2y5HFrqL4EdAwWSeid5rd9
+	yGerwVOgzRJR2vNwCZ+6C+QVkkUPsHOXdVwMZa5rQteepIvtJqrrfk=
+X-Received: by 2002:a17:907:9343:b0:b97:3bbe:e432 with SMTP id a640c23a62f3a-b97650e9a55mr945539466b.23.1773742539481;
+        Tue, 17 Mar 2026 03:15:39 -0700 (PDT)
+Received: from eric (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9781914f96sm656674666b.47.2026.03.17.03.15.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Mar 2026 03:15:39 -0700 (PDT)
+From: Eric Woudstra <ericwouds@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: [PATCH v12 nf-next] netfilter: nft_flow_offload: Add DEV_PATH_MTK_WDMA to nft_dev_path_info()
+Date: Tue, 17 Mar 2026 11:15:25 +0100
+Message-ID: <20260317101525.358016-1-ericwouds@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260316223228.2611-2-ouster@cs.stanford.edu>
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,gmail.com,blackwall.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-268532-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	TAGGED_FROM(0.00)[bounces-268531-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: CD32B2A7B27
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bridge_fastpath.sh:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,blackwall.org:email]
+X-Rspamd-Queue-Id: BD10D2A7BBE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi John,
+In case of using mediatek wireless, in nft_dev_fill_forward_path(), the
+forward path is filled, ending with mediatek wlan1.
 
-kernel test robot noticed the following build errors:
+Because DEV_PATH_MTK_WDMA is unknown inside nft_dev_path_info() it returns
+with info.indev = NULL. Then nft_dev_forward_path() returns without
+setting the direct transmit parameters.
 
-[auto build test ERROR on net-next/main]
+This results in a neighbor transmit, and direct transmit not possible.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/John-Ousterhout/net-homa-define-user-visible-API-for-Homa/20260317-070659
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260316223228.2611-2-ouster%40cs.stanford.edu
-patch subject: [PATCH net-next v17 01/14] net: homa: define user-visible API for Homa
-config: x86_64-rhel-9.4-ltp (https://download.01.org/0day-ci/archive/20260317/202603171139.hOLQ0YKl-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260317/202603171139.hOLQ0YKl-lkp@intel.com/reproduce)
+So this patch adds DEV_PATH_MTK_WDMA to nft_dev_path_info() and makes
+direct transmission possible.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603171139.hOLQ0YKl-lkp@intel.com/
+(Also needed for flow between bridged interfaces, maybe implemented
+later.)
 
-All errors (new ones prefixed by >>):
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+[ Rebased; moved to nf_flow_table_path.c ]
 
-   In file included from <command-line>:
->> ./usr/include/linux/homa.h:11:10: fatal error: netinet/in.h: No such file or directory
-      11 | #include <netinet/in.h>
-         |          ^~~~~~~~~~~~~~
-   compilation terminated.
+Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 
+---
+
+Changes in v12:
+ -Split from [PATCH v11 nf-next] netfilter: fastpath fixes
+
+Changes in v11: (results of testing with bridge_fastpath.sh)
+- Dropped "No ingress_vlan forward info for dsa user port" patch.
+- Added Introduce DEV_PATH_BR_VLAN_KEEP_HW, which changed from
+   applying only in the bridge-fastpath to all fastpaths. Added
+   a better explanation to the description.
+
+Changes in v10:
+- Split from patch-set: bridge-fastpath and related improvements v9
+
+ net/netfilter/nf_flow_table_path.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/net/netfilter/nf_flow_table_path.c b/net/netfilter/nf_flow_table_path.c
+index 6bb9579dcc2a..f2d7822824bc 100644
+--- a/net/netfilter/nf_flow_table_path.c
++++ b/net/netfilter/nf_flow_table_path.c
+@@ -103,6 +103,7 @@ static void nft_dev_path_info(const struct net_device_path_stack *stack,
+ 		switch (path->type) {
+ 		case DEV_PATH_ETHERNET:
+ 		case DEV_PATH_DSA:
++		case DEV_PATH_MTK_WDMA:
+ 		case DEV_PATH_VLAN:
+ 		case DEV_PATH_PPPOE:
+ 		case DEV_PATH_TUN:
+@@ -116,6 +117,10 @@ static void nft_dev_path_info(const struct net_device_path_stack *stack,
+ 				i = stack->num_paths;
+ 				break;
+ 			}
++			if (path->type == DEV_PATH_MTK_WDMA) {
++				i = stack->num_paths;
++				break;
++			}
+ 
+ 			/* DEV_PATH_VLAN, DEV_PATH_PPPOE and DEV_PATH_TUN */
+ 			if (path->type == DEV_PATH_TUN) {
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.53.0
+
 
