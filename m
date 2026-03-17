@@ -1,244 +1,226 @@
-Return-Path: <netdev+bounces-268453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268454-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sGZVL0T6uGkumgEAu9opvQ
-	(envelope-from <netdev+bounces-268453-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:52:52 +0100
+	id wHFsJW/6uGkumgEAu9opvQ
+	(envelope-from <netdev+bounces-268454-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:53:35 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B9FE2A4797
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:52:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 416FB2A47C4
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:53:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 285243008A60
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 06:51:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9D453041A60
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 06:51:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA4F347505;
-	Tue, 17 Mar 2026 06:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0CE347FC8;
+	Tue, 17 Mar 2026 06:51:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bRBZ5bTi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MTteQ1J8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE020346FB0
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 06:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331B1347526
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 06:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773730281; cv=none; b=CCKpjvg8Huh8WsgiLrtzuYN7Np7+uAJjVg4IUtI3mIP6uBhfX2Bie28esqGSo+LPalBYG1Pu56VHh+lUhiiHxwESEOagxmMAjp9BOK7nLatCM+aabaZuEYcMcdo4zFkYp7d59+mSBlAwmQIbciCau8CBDD7butFllZVl/IY5sZE=
+	t=1773730310; cv=none; b=A6JU3lg7HIUhbtQ4cYsTV1K+RZvO6DV1k/1gTO0xM7yAQE3EvaOnTiwKWhPSLzJ1b8/hjiu7i/S7C6cA9lK+ZMvL+TanhH9vFXWXatS9+YB8NMdQm1HzekHmAmB8k5kJOiP4Ir5+SG/u01b8A84oRPVEydcIerT4FYmG1SWA0XM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773730281; c=relaxed/simple;
-	bh=P6QOj79uGqUUTmFWWCgwizDSXV2Y8VLx9ZssNjQzs/A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h/6XPQdW54UO/nw/I2RDCkqzwemP1x4qfrVws5ZbJ35juonH0wzLAChY6JXfe8c6quX51NulQRqfl1lhXa7irS+9Wan7Xe+Qnm5qg+20DCjNkIdvOO2dXebh58BcTvrc8HWalkdyPQTlhGtXGBq0MMgM8nTxHUKx0KEod5iqi4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bRBZ5bTi; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1773730310; c=relaxed/simple;
+	bh=lQepeT2k5Fl+bQiBTdo/2RKQeJqwOuJNKIE68wRejzg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mGR89Lhj0roINcecD70YG9aO3+JL4+SH75qzOITK/3TPW19ugf8eIvSU5eVEer/YlJSDRJ6wFuHXUXiAWhanZG0o1D/RO1AyFjOp1G6QO2ZZf3hN49t3FtZQSvfGbqzaAXd565pJPuC1HfUYUqpYhSKaqqbVbQVvw4mKdCkQM/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MTteQ1J8; arc=none smtp.client-ip=209.85.210.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-48557c8ad47so31992245e9.0
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 23:51:19 -0700 (PDT)
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7d756f2a06dso399180a34.1
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 23:51:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773730278; x=1774335078; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kRFgjjgGVyYNyHCeB8CPE6JtG10vzKcx3Yh72acI/E8=;
-        b=bRBZ5bTinHZsmVbc8rWAL2V6q6cxKX+NwI5I6nSXGTtnA0jN/hb3sBRwO3cLakRdP2
-         OP0CqW82q9Of+dhxsqPL3J/H6WC57mXGf1WvfTSqgXyacoAKFuL7KHRBEeqJGi84M2FI
-         PeAGQFPVOQUnUtF7YpzYN46S+GxmvjtffC7FGDw/3b15Id9cWSihd//BoNV+GIYrnlqN
-         e1oXRA9cf5ufiyzVKgyEQTV51+9nIrJX8QC2HfBr1sXQzpN7Fydb0FXx09VjbRXACgLM
-         TEUAv6BziXtqMNRM7Vv0A2cg8eNc3t8Yi9Y2gUswn7kGXdJV8lEXdZUKk/UafPFSrO/f
-         NHvA==
+        d=gmail.com; s=20230601; t=1773730308; x=1774335108; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qtZywvH13a+APguVp2Hp2i8RvJD5haTPVdtJ4uElfYY=;
+        b=MTteQ1J8C1UOOsadyvZkzxhhzWq4e6J80QNolx6BDnVMOryMC/iakMZhAsbr9AZumZ
+         OJoQg2+wmr2QiZIliQxAkkLhk6vDG7ZmMsBkdWNQ1kW4pVKUm3FStSk17n/7FApNdFpz
+         /bOs00J3L02OcsDt9FJ9CrOXUZOs2QSGaPTQXO3RGgjkfmr8n0i8aAZg6ySeqcdK+AWp
+         EI7QfbhB4/PHw+ac86fnXaWlMZeV45QR7H+8v/I+noAOGOB/7gHcM1S0UmyVf+6vyqhe
+         59JS9cBTNeK1LvnpvGOOR69v7j0pNUmjyOtTmeCykXOtRMSv4thDgQkDTy+2RQDJ6LFf
+         Liwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773730278; x=1774335078;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kRFgjjgGVyYNyHCeB8CPE6JtG10vzKcx3Yh72acI/E8=;
-        b=T1jrixwHrIeexAYScdeRUk47vg6+CpqSS21m0MDJNXopA82p4vvgMnAAIjeBFB+M+L
-         bgzcS439z5H21pdIbwjenEsIa97smbkiO3jB3rPz9+cfcql/f+8N/RzCCo6wjvjpV2Q9
-         Xt2kRwWps+kaioshB/jYGQ8R/bz0X+Ss1sVj+EdfTx9chMf5dW+gU4pWE8GWoEeW7SVO
-         o+jmcXDjrhZc//TQfZ7n4AWPlFIqGMyQyYusIq67CvpdloH7inMAyoBC/AnQEXSKct/Y
-         EIpBQ7+0g4j5zUizLoDxSUlmyEDKH6/S71vtHb6Z1FJZW6sZpSSo+usIghINMEltdOcH
-         9akg==
-X-Forwarded-Encrypted: i=1; AJvYcCXFVlLCP5T7JH6YO5oHDDD7k7kiGzkSBHkbn360cqWzxqqxesljJo4uBfJiNV+hDWdiLZ+BdCQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtPwnmHT9IqRfixMAqssgD4/vxkvAdUhti28MYuLBrQp2IH4BQ
-	cS699ZH4RxsxZg0IPrI9rmgtRRHKCv/ew6v8UmjJcMlfKMXOI6JGR0WU
-X-Gm-Gg: ATEYQzx2Jo3fV7ciSn4RMAyVZ1ZluYuAs96r4P5vfEuT09EXUx9c00oCkk7x8EbngUx
-	31zR2QW4Gnl4C8eM8cyXqHyepdS2d34Xqp/09+VQMYngbxpvPD3g93QKEMp/gDyVx+IE6wojQJ3
-	b7iGu5ScqbkzMfYEPA7OZrYu8NyxvO5tTlfyL27oKom+tQpqFJ6QiV3K89YYi2PlJyBQYnMwpFp
-	Fji0ja1MEAfGee2vAWRnJ0urHN4362Ah/wg+rd2QbwY6M6Z2e/RORpGB60Hl8BM2qvIjhWbLztK
-	QB93bHba7XsaDSLWmlV7QVs7NExAxiIm7NXk8gzzWR2v5ogC9b3JxdGUxPiS5ciwzaRiN4WA+7x
-	kdZDP7bt2ZoHoHJXhvqt9GVf22379y95zwjsPPTRZZLa8OGDxpwOsKuBEuelybsdgdu9XQ7bMvq
-	JAn2R+GkYs0NdeFvODUswjCus19QuQhhrVZyhGvPXNBnifc34LeywediAfFZQ8W8S7SbRZmb882
-	Cl8UhxsPUxEITbUScTBD6HGe++75gjsgMxiZMjbHQq+P0wGFaTmibf4lJz1IGHNTQ==
-X-Received: by 2002:a05:600c:8b28:b0:485:a4de:f4f9 with SMTP id 5b1f17b1804b1-485a4def6dbmr14764955e9.27.1773730278003;
-        Mon, 16 Mar 2026 23:51:18 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f31:8700:fc4e:d1e5:d744:5c14? (p200300ea8f318700fc4ed1e5d7445c14.dip0.t-ipconnect.de. [2003:ea:8f31:8700:fc4e:d1e5:d744:5c14])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4856eae3396sm46175465e9.9.2026.03.16.23.51.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Mar 2026 23:51:17 -0700 (PDT)
-Message-ID: <c630aa45-0904-4b3c-a1f6-90b167741d27@gmail.com>
-Date: Tue, 17 Mar 2026 07:51:14 +0100
+        d=1e100.net; s=20251104; t=1773730308; x=1774335108;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qtZywvH13a+APguVp2Hp2i8RvJD5haTPVdtJ4uElfYY=;
+        b=HJN+uUwd2zGl2+kVOV+p0PloetEdRAH2r3gJuygWAE0HJLx+HSxQ3eGzpgjPGHiwbB
+         uOsh7zL3Hm0ctlbj1FmfNwB8pgenm59L0JjuFJsXIGa220IUN0RoXJw9efqG2QWiYh4E
+         Yfq2U04RxQ1PgN8/+3treyygT6XhgFfocy+hCyfOupI6+ZLEamoOev0pcKutdi44AvkB
+         0fYHxyuAQyN3UMME48SeNp75MVU+s0/wz3kQmXkiO96nXTys2NXX9oj9LPKloog97Gjm
+         UyD/fyb8c+XGnPFy9f6v+yHF4FTTUUMzakLbVj8wCEFzVfgCTQIfcBTYlIi1Wv/9pr6a
+         INUw==
+X-Gm-Message-State: AOJu0YzdEG3giYVsWs7q9Roq2QsnmDEvOJ9PfM2JQ+zOguviZzTs1pGM
+	uCD8fwywPXjtl6hN+Vvu7jjEUPFCi4LRwuTrbITb0/NMrCBeGcqaS7rlt78uYyEKht4=
+X-Gm-Gg: ATEYQzyFMx1NltYKZqekUTT4CYaR7bY4PtTzwRFphHSYw+lhj0IGqdwgvPbABZubq2l
+	WNIU6aDIvI1MuhYmmfSkx60v1y8VvcctXkmQ6uX2Gk4NZ2J469Kwy69vIsLPMsGc1cs+wTL4gkq
+	6Vr4erI2xL41lCsR251ltbdHZuq02wuYT31U4AgADJ97ck39J3CmEVuQNn/m2xy//HlD4HtFgpM
+	JsDWG5zbzimBLvx5AevYQEFl0JLJQx9cmsTSbsFq1GmmVqfAWy4Vi0K/Wtz5akTeTS7ejTu5bq3
+	ipG6uEJ8VuZpumJWJYNx4JvPx6QhYkK/h4n2amf6I+mVMVGnIZogM4F6ggVV6E+R2IAbeoGUu6M
+	i0J2lhom4Bl8/Ye4mqWmwHYqH5llMmlEJ4GiYsWQf2EcDA69WOBO7KWE4o5I2PmqKkoVgnE1u3X
+	LFj64LmNduFKFfgh/whk4TkXdA19nOt+bj/rgsy93viVGUt57BlgEYD1dFIsDSYMteiFFqS0tXZ
+	7QaVPWHp1dhWQJj8dfk3Vx+lcOoH87Hyee6tQZSAw==
+X-Received: by 2002:a05:6830:3d95:b0:7d7:45b7:ed8a with SMTP id 46e09a7af769-7d7bb6c0f7cmr936737a34.5.1773730307840;
+        Mon, 16 Mar 2026 23:51:47 -0700 (PDT)
+Received: from Atwell-Laptop.. (108-212-132-20.lightspeed.irvnca.sbcglobal.net. [108.212.132.20])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d76ae68a4bsm14058432a34.19.2026.03.16.23.51.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Mar 2026 23:51:47 -0700 (PDT)
+From: Wesley Atwell <atwellwea@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	kuniyu@google.com,
+	ncardwell@google.com,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	Wesley Atwell <atwellwea@gmail.com>
+Subject: [PATCH net-next 0/3] tcp: fix scaled no-shrink rwnd quantization slack
+Date: Tue, 17 Mar 2026 00:51:34 -0600
+Message-ID: <20260317065137.1533226-1-atwellwea@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH next v1] r8169: Fix PHY lookup for mdiobus_get_phy() and
- improve error reporting during probe
-To: Anand Moon <linux.amoon@gmail.com>,
- "maintainer:8169 10/100/1000 GIGABIT ETHERNET DRIVER"
- <nic_swsd@realtek.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Manivannan Sadhasivam <mani@kernel.org>, Shawn Lin
- <shawn.lin@rock-chips.com>, Hans Zhang <18255117159@163.com>,
- Niklas Cassel <cassel@kernel.org>,
- "open list:8169 10/100/1000 GIGABIT ETHERNET DRIVER"
- <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Cc: Robin Murphy <robin.murphy@arm.com>, Danilo Krummrich <dakr@kernel.org>
-References: <20260317061700.7734-1-linux.amoon@gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <20260317061700.7734-1-linux.amoon@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_ALL(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268453-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,rock-chips.com,163.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-268454-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[atwellwea@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2B9FE2A4797
+X-Rspamd-Queue-Id: 416FB2A47C4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 17.03.2026 07:16, Anand Moon wrote:
-> The driver currently assumes the PHY is always at address 0. On some
-> hardware or buggy BIOS implementations, the PHY may reside at a
-> different address on the MDIO bus. Update r8169_mdio_register()
-> to scan the bus for the first available PHY instead of hardcoding
-> address 0.
+Hi,
 
-No. The PHY always shows up at (virtual) address 0, due to the
-MAC register based way of accessing the internal PHY.
-Do you have any concrete example of such a "hardware or buggy bios"?
+this is a new, narrow series for one specific receive-window problem in
+the scaled no-shrink path.
 
-> 
-> Additionally, switch to dev_err_probe() in the main probe path to
-> provide standardized error handling and cleaner log output for
-> registration failures.
-> 
-> Link: https://lore.kernel.org/all/87bc37ee-234c-4568-b72e-955c130a6838@arm.com/
-> Fixes: ec392abc9593 ("PCI: dw-rockchip: Enable async probe by default")
-> Cc: Robin Murphy <robin.murphy@arm.com>
-> Cc: Danilo Krummrich <dakr@kernel.org>
-> Cc: Niklas Cassel <cassel@kernel.org>
-> Signed-off-by: Anand Moon <linux.amoon@gmail.com>
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 34 ++++++++++++++++-------
->  1 file changed, 24 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 791277e750ba..0fd735beff92 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -5427,7 +5427,8 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
->  {
->  	struct pci_dev *pdev = tp->pci_dev;
->  	struct mii_bus *new_bus;
-> -	int ret;
-> +	struct phy_device *phydev;
-> +	int ret, addr;
->  
->  	/* On some boards with this chip version the BIOS is buggy and misses
->  	 * to reset the PHY page selector. This results in the PHY ID read
-> @@ -5462,18 +5463,31 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
->  	if (ret)
->  		return ret;
->  
-> -	tp->phydev = mdiobus_get_phy(new_bus, 0);
-> -	if (!tp->phydev) {
-> +	/* find the first (lowest address) PHY on the current MAC's MII bus */
-> +	for (addr = 0; addr < PHY_MAX_ADDR; addr++) {
-> +		struct phy_device *tmp = mdiobus_get_phy(new_bus, addr);
-> +
-> +		if (tmp) {
-> +			phydev = tmp;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (!phydev) {
-> +		dev_err(&pdev->dev, "no PHY found on bus\n");
->  		return -ENODEV;
-> -	} else if (!tp->phydev->drv) {
-> -		/* Most chip versions fail with the genphy driver.
-> -		 * Therefore ensure that the dedicated PHY driver is loaded.
-> -		 */
+The earlier larger receive-window accounting series tried to address
+multiple cases at once: quantization slack, live scaling-ratio drift,
+retracted windows, repair state, MPTCP state, and extra test plumbing.
+Review on that version was useful, but it also made clear that the
+series was trying to carry more mechanism than the currently proven
+problem justified.
 
-This check is needed. It's seems your actual intention is something completely
-different from what you state in the commit message. You try to find a workaround
-for the issues with request_module() from async contect, caused by the referenced
-change to Rockchip PCI.
+This repost keeps only the part with a clear fail-before/pass-after
+story today, and it keeps the stored receive-window state representable
+so later no-shrink decisions continue to reason from a right edge the
+peer could actually have seen on the wire.
 
-> +	}
-> +
-> +	/* Most chip versions fail with the genphy driver.
-> +	 * Therefore ensure that the dedicated PHY driver is loaded.
-> +	 */
-> +	if (!phydev->drv) {
->  		dev_err(&pdev->dev, "no dedicated PHY driver found for PHY ID 0x%08x, maybe realtek.ko needs to be added to initramfs?\n",
-> -			tp->phydev->phy_id);
-> +			phydev->phy_id);
->  		return -EUNATCH;
->  	}
->  
-> +	tp->phydev = phydev;
->  	tp->phydev->mac_managed_pm = true;
->  	if (rtl_supports_eee(tp))
->  		phy_support_eee(tp->phydev);
-> @@ -5790,11 +5804,11 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  
->  	rc = r8169_mdio_register(tp);
->  	if (rc)
-> -		return rc;
-> +		return dev_err_probe(&pdev->dev, rc, "mdio register failure\n");
->  
->  	rc = register_netdev(dev);
->  	if (rc)
-> -		return rc;
-> +		return dev_err_probe(&pdev->dev, rc, "register newdev failure\n");
->  
->  	if (IS_ENABLED(CONFIG_R8169_LEDS)) {
->  		if (rtl_is_8125(tp))
-> 
-> base-commit: 95c541ddfb0815a0ea8477af778bb13bb075079a
+Problem
+=======
 
+In the scaled no-shrink path, __tcp_select_window() rounds free_space up
+to the receive-window scale quantum:
+
+  window = ALIGN(free_space, 1 << tp->rx_opt.rcv_wscale);
+
+When free_space sits just below the next quantum, that can expose fresh
+sender-visible credit that is not actually backed by the current receive
+memory state.
+
+That is not just a presentation artifact. Later hard admission can still
+reject data which is within the sender-visible offer.
+
+A narrower first rework that stored raw free_space would not have been
+safe either. Later no-shrink preservation derives the current offer from
+
+  tp->rcv_wup + tp->rcv_wnd - tp->rcv_nxt
+
+so the stored window still needs to remain representable in scaled
+units.
+
+Approach
+========
+
+Instead of rounding larger raw windows up in the scaled no-shrink path,
+keep only the cases we actually need:
+
+  - relax one unrelated packetdrill test which was pinning an
+    incidental advertised window
+  - keep tp->rcv_wnd representable in scaled units by rounding larger
+    windows down to the scale quantum
+  - preserve only the small non-zero case that would otherwise scale
+    away to zero
+  - rely on the existing tcp_select_window() no-shrink preservation
+    logic for already-exposed credit
+
+That removes the larger-window quantization slack from rounding
+free_space up, while preserving the small non-zero case needed to avoid
+scaling away to zero.
+
+Tests
+=====
+
+The packetdrill reproducer exercises both the immediate quantization
+case and a follow-on ACK after a small OOO receive-memory change.
+Before the TCP change, it fails on the first outbound packet with the
+advertised window one scaled unit too large:
+
+  expected: win 84
+    actual: win 85
+
+After the TCP change, the reproducer passes and the follow-on ACK also
+stays at 84.
+
+Series layout
+=============
+
+  1/3 selftests: packetdrill: stop pinning rwnd in tcp_ooo_rcv_mss
+  2/3 tcp: keep scaled no-shrink window representable
+  3/3 selftests: packetdrill: cover scaled rwnd quantization slack
+
+Thanks,
+Wesley Atwell
+
+---
+ net/ipv4/tcp_output.c                              | 16 +++++---
+ .../selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt |  8 ++--
+ .../packetdrill/tcp_rcv_quantization_credit.pkt   | 45 ++++++++++++++++++++++
+ 3 files changed, 61 insertions(+), 8 deletions(-)
+
+-- 
+2.43.0
 
