@@ -1,238 +1,185 @@
-Return-Path: <netdev+bounces-268507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268508-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kGPOOMQhuWkrrwEAu9opvQ
-	(envelope-from <netdev+bounces-268507-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:41:24 +0100
+	id cJTVG4UiuWkrrwEAu9opvQ
+	(envelope-from <netdev+bounces-268508-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:44:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89BE62A706F
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:41:24 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E002A7181
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:44:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B1FA83050673
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:37:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6191F300752A
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:42:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FA2372EDA;
-	Tue, 17 Mar 2026 09:37:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="U0028KqX";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="BEvPHZHk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DB3390C82;
+	Tue, 17 Mar 2026 09:42:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C2E315D58
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 09:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882F1371CFD;
+	Tue, 17 Mar 2026 09:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773740257; cv=none; b=Y/x5VNZ8YRUgwROZhMGJSbrQ7/3oCDrE+1SfgLfABXMPqGNCti9pCTBgqMc9ThJAs+Mfy8BPzCR7uUSsAKQ+UXrdhOiSMzL/F1MFbDmbxerNOufxAwL4IjY/ggPpqfSxJIWeaT6b3tgroQW75OdcGVZwGUQjy+KTdOlVwW+OFKk=
+	t=1773740533; cv=none; b=XCOCWab/JDVBLiBgT4nb24P+d9Nc4o56TJo+CZhPjCoI13J/l0kXAPE6FDmt3rIvAAXFsFd8znxdNX9tz8nU52Gnm91EIeLcq7bu+K6Ig5AhGmzUhfu2zgWhTCnw7wqYGM4qP9Pkr71kUvwzLT/MyPnKdlNfykGSxmQmcfNrxys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773740257; c=relaxed/simple;
-	bh=jVZYIYYu5NR2kUW827DS2lDNFxhHlkq/RhwYjreU5TY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HtivbZJTMxaEfY4JVzeOzoqQS9V4i6gr08gaONXEqqswPfzIgZiGf7u+f0wnmpUQd0I/iKtLpOWRNtEr8VFcnt8BuJa/LSeg56G53hS1g03MqRaYZDpV2dPQBfNleyLzETxfSKvOrjACtx844J638guqePhn9Io9c5PLnJTqJ3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=U0028KqX; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=BEvPHZHk; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62H7Tw8N2375024
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 09:37:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Q4LiO/KWyB0NlyXq+QE2s63PD+DYwoW6khx52RDakjA=; b=U0028KqXKvwf6SWU
-	C7xG0NhalfELkLxjnlY0jMUkk/Sa7dX27XKQdENvxt/FgMDmZz4ygjw1+VVNZJXX
-	Ugbj9gC1dADoAXhut/GKm3gdJnS7WHa78d2Ghj00V/SQI51Zxvor3fRPZ9/JSeZJ
-	h9/Ov8Qud++CaLO7cD8t4RzzqOxumIX56xhzbNH/GVM4Egbk1L+U+wCFsyNAJ31q
-	xg4XOE+3jp785PrF3zYAuPqjeUQcGjMpo3QSpgYVVjXpYC1b1mISG8TCRiIsRHcN
-	efGJYzc7mrQPt6+ySZSMU/IEHSX/xTm0mPMrejpZ2Y7aDOcQXWZXtE1SU4NiVOe3
-	NATj5g==
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cxkby3mej-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 09:37:35 +0000 (GMT)
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8cd7d66afceso3800659785a.3
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 02:37:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1773740255; x=1774345055; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q4LiO/KWyB0NlyXq+QE2s63PD+DYwoW6khx52RDakjA=;
-        b=BEvPHZHk9j6CasUYw+A2J2fj+Uu8kiGh6xQMcTw8wLhURHfLiLtrIpx8zlzWvcpkB4
-         DDOTRn2W8mLwxs8w5HRKrUozydzHduL0cAggdJsvT/v8ZcoMX5f5IprOna+hJoB1vFMr
-         S3Fja1srsPfXk4yrYU93snX2xolPZiSM8Jyq5k510puJijCpne6ekZxOkZ56zxPf88vQ
-         JoKlL2OOMcmiMEfwIhIzO1XVCikog3e03HhMDTp8kFzSLs3fcp5QH5rLX3nSewYlt/dJ
-         ImKPhzfqhHJvCeWmbUtvEdmY4tFZD8CqqhQapdYrWR2ogGKLhm9Pt7sgZ/FUrn822jpv
-         SGlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773740255; x=1774345055;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q4LiO/KWyB0NlyXq+QE2s63PD+DYwoW6khx52RDakjA=;
-        b=PhM60Ozbb3YBIPvWeXfoxokxyA+X1oy3r0/gKVNL7at0nVSQtQgV4JaaA+UHmVyR1W
-         w67Lo27SLkOAZ9BsXeFWk/tZD4rc5v51AyvFgV6ekNKCkfL0obH23sZ2SXkRyXFvbNbl
-         vrpnu/IXpnZra5F5zkqM2edL1D9KyvYXAF0i3p+6eXt1FfvWQZfczHgr+EtH0pZaA9wC
-         Iu1SeFKE+EfFTTiKsI2xSA0X2UnqQ2cRgx27/ILmPtbtfiKxwaEOqgOLjd3AASy+8/gS
-         gW0eS98rdxoFXctmso58k99vriToIc2MxYDF/x31YaVwqoxi9GJMRUA962lfwPkJQg4D
-         SYlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUd0COG5PfIdklN4FN1jSZFIDpBoPhaRPDNll29oyUIWcnuu4zRUVgVTJxSQ5SsH9zY9aq0u9U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyfngm5OKaiB+gX7TwrCFa72ME6hWeyVONeXyykDmzVCLmBNLE5
-	ZmPBr5J+nmZK20k5t1OEnzhAXJPudo4z26BUViYIXrQkhdoBbDvc+l63pGfh00CAJ8O4zOV0Ld8
-	iWrHdGT9RbS++3Ws5p1TdqddkKydIWMzcw/1KvLBWgfQz+H39B9OukEypzfU=
-X-Gm-Gg: ATEYQzw/I3EHJj/ZmUq2LHco/hkS7Se35U8kQeEdtNz3gyy6A3yzyP/yt9meGyGRaps
-	tVs7sGO4UUhJtMAlzKraIcJHTgXHPm34I0zEPnn9iAs3T+V1Kc591pJ8uJ3WiVTXG8DY/im/cbT
-	bx7bWnnHyQ8aVtCdRQXHvnDReI6YAQ2U914BQyHaJas5d1J1XmJS3+Iaav2LqyLvJE+mcGdMqBD
-	HehXGTpDG3pQBtbedOpjIPVxWiaMTwjImk3Nk8rRxeBu6Sy4tvaIDMO/8q1yecXswc9hJso6S9f
-	MZuuL8ND6tnF3fW5JcJkdVl5GqS89tumR2mz9ci/LeelPQEwWs2JOm5M8DU/FQ7lwKpktUQyt2p
-	DEdW2aARsDtELt/OhZQQ3S7QOkg4VjWBpx1xWQZwpSaYk5d/PeGb2/hHwSIsDjYtvOyho4v3ugf
-	kcAK39mRf6
-X-Received: by 2002:a05:620a:29d5:b0:8cd:b317:a0b4 with SMTP id af79cd13be357-8cdb5a6ea0emr1991590985a.27.1773740254712;
-        Tue, 17 Mar 2026 02:37:34 -0700 (PDT)
-X-Received: by 2002:a05:620a:29d5:b0:8cd:b317:a0b4 with SMTP id af79cd13be357-8cdb5a6ea0emr1991586485a.27.1773740254241;
-        Tue, 17 Mar 2026 02:37:34 -0700 (PDT)
-Received: from ?IPV6:2a05:6e02:1041:c10:67fb:53f6:20ba:ff45? ([2a05:6e02:1041:c10:67fb:53f6:20ba:ff45])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b42bd696dsm16981086f8f.37.2026.03.17.02.37.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Mar 2026 02:37:33 -0700 (PDT)
-Message-ID: <e25754a0-edd2-48a0-abc4-9b45d119ede5@oss.qualcomm.com>
-Date: Tue, 17 Mar 2026 10:37:32 +0100
+	s=arc-20240116; t=1773740533; c=relaxed/simple;
+	bh=mBTbmBbpG2uyUXoGOuB4Kz8zu1lGzlN5yFqU2E6eFcI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YLcdbEjWSFT5jjOvR4K0VYoDZTKjU1ak3glxe79UeZM+dVxyX55BIF7bNzypOjSv2lXGZm2hiF9tjMrS6+Phsfc5IKSJ2DOSBcME+Qefa7WB8ZuhW0x6ajnJBTGqHsgo8mGra0YWEVRgp0QHNjfO9eB3FX/1Z1pZgICwgrzhLvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; arc=none smtp.client-ip=210.160.252.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
+X-CSE-ConnectionGUID: Sq44JQhLQLWGRoOlVUXS5g==
+X-CSE-MsgGUID: ZSM1/nJ/S+2/EVGkRPn/Iw==
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie5.idc.renesas.com with ESMTP; 17 Mar 2026 18:42:01 +0900
+Received: from [127.0.1.1] (unknown [10.226.78.135])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 445B24015D64;
+	Tue, 17 Mar 2026 18:41:59 +0900 (JST)
+From: Michael Dege <michael.dege@renesas.com>
+Subject: [net-next PATCH 00/13] net: renesas: rswitch: R-Car S4 add VLAN
+ aware switching
+Date: Tue, 17 Mar 2026 10:41:53 +0100
+Message-Id: <20260317-rswitch_add_vlans-v1-0-3a57bfa0f2d1@renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/4] Use the QMI service IDs from the QMI header
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, konradybcio@kernel.org,
-        andersson@kernel.org, linux-kernel@vger.kernel.org,
-        Alex Elder <elder@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Srinivas Kandagatla <srini@kernel.org>,
-        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-        Kees Cook <kees@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Mark Brown <broonie@kernel.org>,
-        Wesley Cheng <quic_wcheng@quicinc.com>, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
-        ath11k@lists.infradead.org, ath12k@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-sound@vger.kernel.org
-References: <20260316171419.2619620-1-daniel.lezcano@oss.qualcomm.com>
- <20260316172251.2d57d0aa@kernel.org>
- <8757aec7-8c36-446a-9a34-f0717f64202a@oss.qualcomm.com>
- <2026031717-ethanol-zoning-80b5@gregkh>
-Content-Language: en-US
-From: Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>
-In-Reply-To: <2026031717-ethanol-zoning-80b5@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: 4FeBctNWdQbiNU3QirFqGZ0pFKp2xfKY
-X-Proofpoint-ORIG-GUID: 4FeBctNWdQbiNU3QirFqGZ0pFKp2xfKY
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE3MDA4NCBTYWx0ZWRfXx3GkLkVpHuWo
- BiIAsiBOBtnbp4cP0HgKVveBxFcZwrAybrDQhB/XLB3YyGtjov0ez4OfJjxQkPUbf8tVE160h0a
- uEOlRHJJ4ZCnPmsf8S3GFUHuTamrRejFWYZ0w+KghOmUXgHXSgd0p0XCKZEqWiBHcLsU29ZpeFh
- Hi8kYs/YdTBaUhvAcCvDhgdWAARUZmPpDn8lr0pDcf8urw3sJfo14mlKqgrUN3k3htnkMWPjpXo
- VeStpeUSPuXt4L1P3GhMX/CpYyA9VUe67EVUIu7M6HZZAqrqNkr8Dg3BlqtvK7Ni//ImIi0TR6R
- b4yEdq9h7mFUnEj3aYuSBUdtr8NX8/PNqotdNkqzWoJ9W7gLy7tDIiU9d/Zm+sezcsrq+LYYxxi
- hSigNjLr7z4f45sLTnTsbaAeepmkCKVAnM64q5r+jmosk8Yogz/ObUDpHBbCYWWjqQXYyOvewka
- Hinw2UZQpuGfwGSHZVg==
-X-Authority-Analysis: v=2.4 cv=ZpLg6t7G c=1 sm=1 tr=0 ts=69b920df cx=c_pps
- a=50t2pK5VMbmlHzFWWp8p/g==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22 a=VwQbUJbxAAAA:8
- a=EUspDBNiAAAA:8 a=6xCDiqM1XSE8sYu1eLsA:9 a=QEXdDO2ut3YA:10
- a=IoWCM6iH3mJn3m4BftBB:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-17_01,2026-03-16_06,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 suspectscore=0 bulkscore=0 clxscore=1015
- priorityscore=1501 malwarescore=0 impostorscore=0 adultscore=0 phishscore=0
- spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
- definitions=main-2603170084
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-B4-Tracking: v=1; b=H4sIAOEhuWkC/x3MQQqAIBBA0avErBPUIrKrRIjpVANh4UQF0d2Tl
+ m/x/wOMiZChKx5IeBLTFjNUWYBfXJxRUMgGLXUjlZYi8UWHX6wLwZ6riywqU7ftOI3aNB5ytye
+ c6P6f/fC+H6IMMd1jAAAA
+X-Change-ID: 20260120-rswitch_add_vlans-39488bfb296c
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Michael Dege <michael.dege@renesas.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1773740518; l=3277;
+ i=michael.dege@renesas.com; s=20251023; h=from:subject:message-id;
+ bh=mBTbmBbpG2uyUXoGOuB4Kz8zu1lGzlN5yFqU2E6eFcI=;
+ b=gwYQOb8Dh3qDmfsd3jWHboA63lzfsv5jZENDGVVwW6qOpSLzjmT7X+uCng9fFEPUQZueQ4j4t
+ t9B8XqlV8ShBqyrc1+jeBX0OOr7BtxO642x6vFy0fq31RpzLFOC3dxn
+X-Developer-Key: i=michael.dege@renesas.com; a=ed25519;
+ pk=gu1rwIcCrAxNMv2I8fIfiQvt51xzZwnQy4Ua/DscQt8=
+X-Spamd-Result: default: False [0.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[renesas.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268507-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,oss.qualcomm.com:mid,qualcomm.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel.lezcano@oss.qualcomm.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-268508-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 89BE62A706F
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michael.dege@renesas.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.666];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:email,renesas.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 16E002A7181
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hello!
 
-Hi Greg,
+The current R-Car S4 rswitch driver only supports basic HW offloading
+for L2 switching/bridgeing. This patchset extends the driver with
+support for VLAN aware switching.
 
-On 3/17/26 10:07, Greg Kroah-Hartman wrote:
-> On Tue, Mar 17, 2026 at 09:51:32AM +0100, Daniel Lezcano wrote:
->> On 3/17/26 01:22, Jakub Kicinski wrote:
->>> On Mon, 16 Mar 2026 18:14:10 +0100 Daniel Lezcano wrote:
->>>> This series is based on the immutable branch [1] containing the QMI
->>>> service id definitions along with some drivers using them.
->>>>
->>>> How a patch can be merged ?
->>>
->>> Wait for the dependency to appear in respective trees after the merge
->>> window then repost the patches individually. I'm starting to get
->>> annoyed with all this cross-tree QMI/MHI noise.
->>
->> An ack is simpler for everyone, especially when they are trivial
-> 
-> Why isn't this 4 different patches, all for different branches/trees as
-> there does not seem to be any dependencies here?
-> 
-> confused,
+1. For every port mode change from configuration to operation and
+   vice-versa you need to change to disabled mode first. The
+   functions rswitch_<port>_change_mode now take care of this. 
 
-The dependency is on the definitions posted in v1 in patch1/8 [1]
+2. In upcomming changes for adding vlan support struct net_device
+   will not be available in all cases, therefore use struct device
+   instead.
 
-The first version of this series was bigger. The definitions were in the 
-first patch of the initial series. It has been picked up by Bjorn in the 
-corresponding tree along with 4 other patches for subsystems he is in 
-charge of and let the other patches left.
+3. Fix typo in register define macro and remove duplicate macro.
 
-He put in place an immutable branch for those who want to pick the 
-corresponding patch in their tree [2]
+4. Add register definitions needed fo vlan support.
 
-I sent this v2 with a subject prefix fixed and a pointer to the 
-immutable branch. So people can just ack the patch or use the branch if 
-they want to pick it through their tree.
+5. Add exception path for packets with unknown destitination MAC
+   addresses.
 
-   -- Daniel
+6. Make the helper functions rswitch_reg_wait(),
+   rswitch_etha_change_mode() and rswitch_etha_change_mode()
+   available to the whole driver.
 
-[1] 
-https://lore.kernel.org/all/20260309230346.3584252-2-daniel.lezcano@oss.qualcomm.com/
+7. Add basic start-up time initialization needed to support VLANs.
 
-[2] https://lore.kernel.org/all/abdkE2qWX5Amf5Jo@baldur/
+8. Update ETHA and GWCA port HW initializations.
 
+9. Clean up is_rdev() rswitch_device checking.
+
+10. Provide struct rswitch_private to notifiers.
+
+11. Add handler for FDB notifications to configure bridge MAC address
+    to GWCA registers and update static MAC table entry.
+
+12. Add vlan support to L2 HW bridge.
+
+Configuration example:
+ip link add name br0 type bridge vlan_filtering 1
+ip link set dev tsn0 master br0
+ip link set dev tsn1 master br0
+ip link set dev br0 up
+ip link set dev tsn0 up
+ip link set dev tsn1 up
+bridge vlan add dev tsn0 vid 4
+bridge vlan add dev tsn1 vid 4
+bridge vlan add dev br0 vid 4 self
+ip a a 192.168.1.20/24 dev br0
+ip l a link br0 name br0.1 type vlan id 1
+ip l a link br0 name br0.4 type vlan id 4
+ip a a 192.168.2.20/24 dev br0.1
+ip a a 192.168.4.20/24 dev br0.4
+ip link set dev br0.1 up
+ip link set dev br0.4 up
+
+Signed-off-by: Michael Dege <michael.dege@renesas.com>
+---
+Michael Dege (13):
+      net: renesas: rswitch: improve port change mode functions
+      net: renesas: rswitch: use device instead of net_device
+      net: renesas: rswitch: fix FWPC2 register access macros
+      net: renesas: rswitch: add register definitions for vlan support
+      net: renesas: rswitch: add exception path for packets with unknown dst MAC
+      net: renesas: rswitch: add forwarding rules for gwca
+      net: renesas: rswitch: make helper functions available to whole driver
+      net: renesas: rswitch: add basic vlan init to rswitch_fwd_init
+      net: renesas: rswitch: update port HW init
+      net: renesas: rswitch: clean up is_rdev rswitch_device checking
+      net: renesas: rswitch: add passing of rswitch_private into notifiers
+      net: renesas: rswitch: add handler for FDB notification
+      net: renesas: rswitch: add vlan aware switching
+
+ drivers/net/ethernet/renesas/rswitch.h      | 181 +++++++-
+ drivers/net/ethernet/renesas/rswitch_l2.c   | 641 ++++++++++++++++++++++++----
+ drivers/net/ethernet/renesas/rswitch_l2.h   |   6 +-
+ drivers/net/ethernet/renesas/rswitch_main.c | 203 ++++++---
+ 4 files changed, 875 insertions(+), 156 deletions(-)
+---
+base-commit: 1f318b96cc84d7c2ab792fcc0bfd42a7ca890681
+change-id: 20260120-rswitch_add_vlans-39488bfb296c
+
+Best regards,
+-- 
+Michael Dege <michael.dege@renesas.com>
 
 
