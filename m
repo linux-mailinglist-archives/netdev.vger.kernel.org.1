@@ -1,266 +1,189 @@
-Return-Path: <netdev+bounces-268681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268678-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAjRIFaBuWmxHAIAu9opvQ
-	(envelope-from <netdev+bounces-268681-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:29:10 +0100
+	id APnlBx9/uWmxHAIAu9opvQ
+	(envelope-from <netdev+bounces-268678-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:19:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0CC32ADF84
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:29:09 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B93F92ADCE9
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:19:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 48CBF309E7F2
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:20:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 59D8B3034C7B
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D7B30FF3C;
-	Tue, 17 Mar 2026 16:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA657306B31;
+	Tue, 17 Mar 2026 16:19:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KqhRzX1b"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ch0WEW4W"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D666230FC30;
-	Tue, 17 Mar 2026 16:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2264D309EF9;
+	Tue, 17 Mar 2026 16:19:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773764380; cv=none; b=bnDtZHYqw2DBHhWdEWuRJ4X7CCO40Fi8xL4PmROOfIWOhhlxUsPhbgbxdoo/ocwimx+3Yap0MH534HDrPUFPGfv3O45l8bMLuM2N5kZ8QBdW8Ty5U5MWJRij54o+aoLWu7nW+j9VSh95S8k54liebyB6A9BBZ71ZyM4dAeQTyZ0=
+	t=1773764364; cv=none; b=CH3adTn/2kB0v/AWi2fQI0a5OhyB6IRF74B54r8RkJgCSyPJHKBGR+2iNYdAQCjczE9ldXxf878kyLo0nZx/A1rcj3uLyMBY3Hhya4FDcP5qSIOLr1KwKtB2kooBsjsNxgCqC1IqqhIEc1sC0//xaGe7exQtfYdDCYtOuTCE1JA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773764380; c=relaxed/simple;
-	bh=uh/Y+uh/UZQi80vVK131ehjTzcA57hfTsEhbK174g4E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EkBHFzFPoPjqXYCLzKVe39r3KYLQW4TlNpJaRdw7sSIPDvWRjd6GV4iX7PdfAR4TTpIp/379XmvY1vwzQ2SapLplcQIHawYRwv/OpxDzOFlIuHA3VCkmmlR8HNuD1QeXg9ZL/8V1OaS3zL4oLl61nfOCoelJZpVZmiQKZAHE1U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KqhRzX1b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D8C6C19424;
-	Tue, 17 Mar 2026 16:19:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773764380;
-	bh=uh/Y+uh/UZQi80vVK131ehjTzcA57hfTsEhbK174g4E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KqhRzX1bH181/59/+W0DB/lE03mZhUjO0FzyO4L7yR4MNs1X2Sn6LhlgvwK2BQq6i
-	 lUUxkKjKqoxLuR5By25SNEJ0DJQqTvwhw2Jj+fW2AKmTn1F4aWHRJHZsh8JPFtymap
-	 y8Z/ceH1N3taq+D/Djl8LxiMwwmemDgrerPOjuQ2Diu7Lj9Gg3Osfc+nOjPrv9KkJk
-	 wfFe8ceatDCjxwEgjr7K1I1SXlnadhSPw3eOMqsRCsZ/BQkjE5LxDY0Jys7dv7Fntj
-	 PzeRtCAerl7sxOpeb1enXJbtZ3y8UjjJrHMV/JCLhqynDPDA7/lIu0gsg2r/qT9w27
-	 UWY1hYxNem8IQ==
-From: Simon Horman <horms@kernel.org>
-To: nb@tipi-net.de
-Cc: Simon Horman <horms@kernel.org>,
-	davem@davemloft.net,
-	mbloch@rooftopnetworks.de,
-	edumazet@google.com,
-	linux-kernel@vger.kernel.org,
-	vikas.gupta@broadcom.com,
-	rajashekar.hudumula@broadcom.com,
-	opendmb@gmail.com,
-	bhargava.marreddy@broadcom.com,
-	netdev@vger.kernel.org,
-	ebiggers@kernel.org,
-	andrew+netdev@lunn.ch,
-	hkallweit1@gmail.com,
-	florian.fainelli@broadcom.com,
-	kuba@kernel.org,
-	arnd@arndb.de,
-	bcm-kernel-feedback-list@broadcom.com,
-	pabeni@redhat.com
-Subject: Re: [net-next,v2,3/6] net: bcmgenet: add basic XDP support (PASS/DROP)
-Date: Tue, 17 Mar 2026 16:19:06 +0000
-Message-ID: <20260317161906.1758581-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260315214914.1555777-4-nb@tipi-net.de>
-References: <20260315214914.1555777-4-nb@tipi-net.de>
+	s=arc-20240116; t=1773764364; c=relaxed/simple;
+	bh=bl7AFz1ukel+Q8DeXTgCfmG4N1OLXXAx92mqWosOac0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CmQx1/zLOftI+o4ck5GjmWLCXWl52csRMp3GiG7Bn9RCMZv0mjZSve/nA0AgWc+ol9vbns3NAmfyxaxgPfepQKyITn71c8XiOJmFschDqQWAZG61poDoVPHKI0Ak/lNULS+gQpMyMkp7Eg9ZG09lLA+XiWRkKZK7kSFu8Bws1gU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ch0WEW4W; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 5A9594E426D0;
+	Tue, 17 Mar 2026 16:19:20 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 104455FC9A;
+	Tue, 17 Mar 2026 16:19:20 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6797810450640;
+	Tue, 17 Mar 2026 17:19:15 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773764358; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=th6/tJ8KIrKVzPm4D39/MqG3gFzhiRP5oHdvb/5lKP4=;
+	b=ch0WEW4WaC5bomXNwmHUlxYrNp/RpcmW4x0siHT/0rtGxev5VYnPI1YGq7Du5QR4mzCAhp
+	4PtyuQ+T4VAiUdcYllJDEXXMFhFs2uN6Uqfc52ULexSaBl/8pwS957rCj0CLWops7ErnjZ
+	g+Zcc/rpnThoHZfsBA663ncEMue1dZTrfCoVqwR63XUnOTE0LU2hvaNY9zYjrHTPOr7Q41
+	HjY6sHsPGFbb57rbdFUAT4P7nbB4P2uv8CqB9g4WWdNQ+eUQsatsYTvm+iCECsccJWukRy
+	oiKGiTjmDnP/bkT3bf2cJaniRRVFB4X3LqM2GKZYkPDhRh5xO/Wt3V4Vu9LCWg==
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: [PATCH net-next v4 0/2] net: macb: implement ethtool set channels
+ count operation
+Date: Tue, 17 Mar 2026 17:19:07 +0100
+Message-Id: <20260317-macb-set-channels-v4-0-1bd4f4ffcfca@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-B4-Tracking: v=1; b=H4sIAPt+uWkC/33NQQ6CMBAF0KuQrq1pO1LAlfcwLtoylSbYmpYQD
+ OHuVlYYicufP//NTBJGh4mci5lEHF1ywedwOhTEdMrfkbo2ZyKYkAxYSR/KaJpwoJ/aY59oqa1
+ EVlkQFSN594xo3bSaV+LzpcdpILfcdC4NIb7WZyNf+z/uyCmjokZQjVTQGrjoEIbe+aMJj9Ubx
+ cbgfM8Q2WhqIRtQ3JbW/BqwNWDPgGwYKXVV1bxtdf1tLMvyBsRp6jlGAQAA
+X-Change-ID: 20260305-macb-set-channels-5bf6e07f3270
+To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
+ Gregory CLEMENT <gregory.clement@bootlin.com>, 
+ =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
+ Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Paolo Valerio <pvalerio@redhat.com>, 
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: b4 0.15-dev
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,rooftopnetworks.de,google.com,vger.kernel.org,broadcom.com,gmail.com,lunn.ch,arndb.de,redhat.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-268681-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268678-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A0CC32ADF84
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B93F92ADCE9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Add support for changing the active number of queues. Tested on Mobileye
+EyeQ5. The first patch is as expected. However the second one might be
+more surprising:
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+GEM has per-queue Tx SRAM segmentation. If we do not touch SRAM
+distribution then we'll only be able to exploit a portion of it when a
+smaller queue count is configured. It also is beneficial if bootloader
+stages write to the register and we don't reset it but attempt to use
+all queues (the default).
+
+The operation is only hidden behind MACB_CAPS_QUEUE_DISABLE, we do not
+introduce yet another feature flag.
+
+Have a nice day,
+Thanks,
+Théo
+
+Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
-net: bcmgenet: add basic XDP support (PASS/DROP)
+Changes in v4:
+- macb_set_channels(): drop `count == old_count` check, it is redundant
+  with both netlink and ioctl codepaths. See early returns in
+  ethnl_set_channels() and ethtool_set_channels(). Discussion @ V2.
+- Rebase to latest net-next (8737d7194d6d); nothing to report.
+- Link to v3: https://patch.msgid.link/20260313-macb-set-channels-v3-0-c66b7781ddb8@bootlin.com
 
-This commit adds XDP program attachment via ndo_bpf and executes XDP
-programs in the RX path. XDP_PASS builds an SKB from the xdp_buff
-(handling xdp_adjust_head/tail), and XDP_DROP returns the page to
-page_pool without SKB allocation.
+Changes in v3:
+- Makefile: fix compilation of kunit tests. This bug was hidden before
+  because everything was builtin so it ended up linked together anyway.
+  Now macb.o is the amalgation of macb_{main,ptp,utils}.o and
+  macb_test.o is the amalgation of macb_{kunit,utils}.o.
+- Kconfig CONFIG_MACB_KUNIT_TEST entry:
+  - Turn into tristate; no good reason to restrict to bool.
+  - Drop "depends on MACB". We do not need to compile the full MACB
+    driver to test gem_sram_distribute_segments().
+- Add usual MODULE_*() macros to macb_kunit.c.
+- Drop unused init value of `ret` in macb_set_channels().
+- Rebase to latest net-next; nothing to report.
+- Link to v2: https://patch.msgid.link/20260311-macb-set-channels-v2-0-982693a1f5fc@bootlin.com
 
-> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> index 6e610e73e12f..f6a2567af7cb 100644
-> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+Changes in v2:
+- Move gem_sram_distribute_segments() from macb_main.c to macb_utils.c
+  and kunit tests from macb_main.c to macb_kunit.c.
+- macb_set_channels():
+  - Add comment about MACB_CAPS_QUEUE_DISABLE.
+  - Refuse operation if netif_running(), with code comment.
+  - Drop useless sanity checks on ch->{combined,rx,tx}_count.
+- Add help text to CONFIG_MACB_KUNIT_TEST.
+- Fix `checkpatch --max-line-length=80` warnings.
+- Rebase onto latest net-next; nothing to report.
+- Link to v1: https://lore.kernel.org/r/20260305-macb-set-channels-v1-0-28e3a96a3dc3@bootlin.com
 
-[ ... ]
+---
+Théo Lebrun (2):
+      net: macb: implement ethtool_ops.get|set_channels()
+      net: macb: distribute evenly Tx SRAM segments
 
-> @@ -2274,6 +2276,53 @@ static int bcmgenet_rx_refill(struct bcmgenet_rx_ring *ring,
->  	return 0;
->  }
->
-> +static struct sk_buff *bcmgenet_xdp_build_skb(struct bcmgenet_rx_ring *ring,
-> +					      struct xdp_buff *xdp,
-> +					      struct page *rx_page)
-> +{
-> +	unsigned int metasize;
-> +	struct sk_buff *skb;
-> +
-> +	skb = napi_build_skb(xdp->data_hard_start, PAGE_SIZE);
-> +	if (unlikely(!skb))
-> +		return NULL;
-> +
-> +	skb_mark_for_recycle(skb);
-> +
-> +	metasize = xdp->data - xdp->data_meta;
-> +	skb_reserve(skb, xdp->data - xdp->data_hard_start);
-> +	__skb_put(skb, xdp->data_end - xdp->data);
-> +
-> +	if (metasize)
-> +		skb_metadata_set(skb, metasize);
-                          ^^^^
+ drivers/net/ethernet/cadence/Kconfig      |  12 ++++
+ drivers/net/ethernet/cadence/Makefile     |   5 +-
+ drivers/net/ethernet/cadence/macb.h       |   9 +++
+ drivers/net/ethernet/cadence/macb_kunit.c |  77 ++++++++++++++++++++
+ drivers/net/ethernet/cadence/macb_main.c  | 115 +++++++++++++++++++++++++-----
+ drivers/net/ethernet/cadence/macb_utils.c |  56 +++++++++++++++
+ 6 files changed, 257 insertions(+), 17 deletions(-)
+---
+base-commit: 1b0fdd40f80731e63c6c7559d67ffde224a63bd2
+change-id: 20260305-macb-set-channels-5bf6e07f3270
 
-Can this corrupt memory? Looking at bcmgenet_desc_rx(), the xdp_buff is
-initialized with meta_valid=false:
+Best regards,
+--  
+Théo Lebrun <theo.lebrun@bootlin.com>
 
-	xdp_prepare_buff(&xdp, page_address(rx_page),
-			 GENET_RX_HEADROOM, pkt_len, false);
-
-When meta_valid is false, xdp_prepare_buff() sets xdp->data_meta to
-xdp->data + 1 as a sentinel value to indicate no metadata is present.
-
-In bcmgenet_xdp_build_skb(), the metasize calculation becomes:
-
-	metasize = xdp->data - xdp->data_meta
-	         = xdp->data - (xdp->data + 1)
-	         = (ptrdiff_t)-1
-
-When assigned to 'unsigned int metasize', this wraps to UINT_MAX. The
-'if (metasize)' check passes since UINT_MAX != 0, and
-skb_metadata_set(skb, metasize) truncates UINT_MAX to u8, setting
-skb_shinfo(skb)->meta_len = 255.
-
-This incorrect meta_len of 255 can cause downstream SKB consumers (TC BPF
-programs, skb_data_move) to read or write 255 bytes before
-skb_mac_header(skb) when accessing the metadata region.
-
-Other XDP drivers that use skb_metadata_set() (bnxt, mvneta, ixgbe,
-i40e, virtio_net) all pass meta_valid=true to xdp_prepare_buff(), which
-sets data_meta=data, giving metasize=0 and correctly skipping
-skb_metadata_set().
-
-Should xdp_prepare_buff() be called with meta_valid=true instead of
-false, since bcmgenet_xdp_build_skb() handles XDP metadata?
-
-> +
-> +	return skb;
-> +}
-
-[ ... ]
-
-> @@ -2403,26 +2455,52 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
->  			goto next;
->  		} /* error packet */
->
-> -		/* Build SKB from the page - data starts at hard_start,
-> -		 * frame begins after RSB(64) + pad(2) = 66 bytes.
-> -		 */
-> -		skb = napi_build_skb(hard_start, PAGE_SIZE - GENET_XDP_HEADROOM);
-> -		if (unlikely(!skb)) {
-> -			BCMGENET_STATS64_INC(stats, dropped);
-> -			page_pool_put_full_page(ring->page_pool, rx_page,
-> -						true);
-> -			goto next;
-> -		}
-> -
-> -		skb_mark_for_recycle(skb);
-> +		/* XDP: frame data starts after RSB + pad */
-> +		if (xdp_prog) {
-> +			struct xdp_buff xdp;
-> +			unsigned int xdp_act;
-> +			int pkt_len;
-> +
-> +			pkt_len = len - GENET_RSB_PAD;
-> +			if (priv->crc_fwd_en)
-> +				pkt_len -= ETH_FCS_LEN;
-> +
-> +			xdp_init_buff(&xdp, PAGE_SIZE, &ring->xdp_rxq);
-> +			xdp_prepare_buff(&xdp, page_address(rx_page),
-> +					 GENET_RX_HEADROOM, pkt_len, false);
-> +
-> +			xdp_act = bcmgenet_run_xdp(ring, xdp_prog, &xdp,
-> +						   rx_page);
-> +			if (xdp_act != XDP_PASS)
-> +				goto next;
-> +
-> +			/* XDP_PASS: build SKB from (possibly modified) xdp */
-> +			skb = bcmgenet_xdp_build_skb(ring, &xdp, rx_page);
-> +			if (unlikely(!skb)) {
-> +				BCMGENET_STATS64_INC(stats, dropped);
-> +				page_pool_put_full_page(ring->page_pool,
-> +							rx_page, true);
-> +				goto next;
-> +			}
-> +		} else {
-> +			/* Build SKB from the page - data starts at
-> +			 * hard_start, frame begins after RSB(64) + pad(2).
-> +			 */
-> +			skb = napi_build_skb(hard_start,
-> +					     PAGE_SIZE - GENET_XDP_HEADROOM);
-> +			if (unlikely(!skb)) {
-> +				BCMGENET_STATS64_INC(stats, dropped);
-> +				page_pool_put_full_page(ring->page_pool,
-> +							rx_page, true);
-> +				goto next;
-> +			}
->
-> -		/* Reserve the RSB + pad, then set the data length */
-> -		skb_reserve(skb, GENET_RSB_PAD);
-> -		__skb_put(skb, len - GENET_RSB_PAD);
-> +			skb_mark_for_recycle(skb);
-> +			skb_reserve(skb, GENET_RSB_PAD);
-> +			__skb_put(skb, len - GENET_RSB_PAD);
->
-> -		if (priv->crc_fwd_en) {
-> -			skb_trim(skb, skb->len - ETH_FCS_LEN);
-> -			len -= ETH_FCS_LEN;
-> +			if (priv->crc_fwd_en)
-> +				skb_trim(skb, skb->len - ETH_FCS_LEN);
->  		}
-
-[ ... ]
 
