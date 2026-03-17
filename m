@@ -1,62 +1,122 @@
-Return-Path: <netdev+bounces-268498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268499-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gA9eA8QcuWm+qwEAu9opvQ
-	(envelope-from <netdev+bounces-268498-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:20:04 +0100
+	id 6PLBMOkduWmbrQEAu9opvQ
+	(envelope-from <netdev+bounces-268499-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:24:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7F1C2A680A
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:20:03 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC28C2A6998
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:24:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0E7DC301346E
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:20:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C5CB53053F1C
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 583D7358D00;
-	Tue, 17 Mar 2026 09:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835A636EA93;
+	Tue, 17 Mar 2026 09:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LJWhNAj+"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="TEGwqO50";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="pqtKTrB2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB6635F16A;
-	Tue, 17 Mar 2026 09:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CED35B62F;
+	Tue, 17 Mar 2026 09:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773739170; cv=none; b=jno97LcHylOdTkUTSbb7CdwVShVwmvD1KGVcMIGOZdkvu+PFJnAvNgNuxWmT10wVDfkx6lJDa96o6c162poHR972fGj+WRtGH3+Pftut7hufxw0XJSzvHIV+Er/uFgxZ7VsKAfmon1IRcZ4pKX5c4qLG97PMUouUBdeo9CzpL6Y=
+	t=1773739177; cv=none; b=KKXOencYyjnAdffkL43jQDszBmUT4DhzT1kJWsiH1dpEjVUYXM1FKUz1gfdsILWXHqqGQ9VvrVWv71/wjw98OdBMkuakKvn8DDb2Mndf4cpjf/7FEwotdSrJ0xGqhGDd37pSo2aKliRXowBpAXeyJnUWw279aTQqkSMKfq2jpEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773739170; c=relaxed/simple;
-	bh=DCURi86uRcFMWZ3j+SUJmdI96P+kkRuQLQRIMxxqF/Q=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=mal2IGSVqyXKoHc8xDs4QPcur88Ib9nquVxY4IztyiRsqTUJ+E5wV6oPLLn3qSFhikHECUMfb26Y+7M3kFidZxgGe8M0ksqAp1BMLGS2LlhrSfecrKbWxTuypC8dk+JujhEIBcsUfeJQfWZU3S0LRTvCvv9kA/jbIYfpL97WAt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LJWhNAj+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D2AEC2BCAF;
-	Tue, 17 Mar 2026 09:19:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773739169;
-	bh=DCURi86uRcFMWZ3j+SUJmdI96P+kkRuQLQRIMxxqF/Q=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=LJWhNAj+KLnBF1VSVZ2Z6bhXbRuqCVntYP3bL0IN7gXmXMztNa81BlY9YdmTL/AIZ
-	 3AuRDWi60YgL9blUlNFktQ6isdWv3ayVTLFJ9BfIm/p1MJpIkRFkojp4DuXtgFgVNS
-	 B20vIgNll1r9ymWyYCehwUNTS4e7dxLFWwHRzrOTcCKEekY5QCjwVQfjZbg5o0uxti
-	 sXR35MAqCcBgxLV5cp34deoO3JZzoml1EbcvGMkva1L/ObEcSyy3/eYgt0IK51WqLh
-	 dY6qFvDrUIm7S6unJ2wquw1u0t1lC5KCdWPEyQDq9vHF2G4bpGLm75HxUH2Xji+kub
-	 6qvm6Whe+3zHw==
-From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, magnus.karlsson@intel.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- larysa.zaremba@intel.com, aleksander.lobakin@intel.com
-Subject: Re: [PATCH net 1/6] xsk: respect tailroom for ZC setups
-In-Reply-To: <abiJ2C_q62bn7EC3@mini-arch>
-References: <20260316174550.462177-1-maciej.fijalkowski@intel.com>
- <20260316174550.462177-2-maciej.fijalkowski@intel.com>
- <abiJ2C_q62bn7EC3@mini-arch>
-Date: Tue, 17 Mar 2026 10:19:25 +0100
-Message-ID: <878qbqrexu.fsf@all.your.base.are.belong.to.us>
+	s=arc-20240116; t=1773739177; c=relaxed/simple;
+	bh=OyOWpIYAg37ljOOCQd/vHb4rHlLIRmAfgms8yuzkksU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WfPNLHfqZcOjAOqDMl3YhpKJS0qcy9gxEC3RNxA50QbAOeL0sw8G7de9y7iyrzYmoibnwv0zcrflXI3aUT8P4YNoSM/GBKu3XYOfMUcmAawJ0DeTl+WKhQz91VUYCvfhWDNMonJsbOJaGhX/Onq/iHQnJgJ8TEp/vk73TxeOPKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=TEGwqO50; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=pqtKTrB2; arc=none smtp.client-ip=202.12.124.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.stl.internal (Postfix) with ESMTP id 8C30D1D00144;
+	Tue, 17 Mar 2026 05:19:30 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Tue, 17 Mar 2026 05:19:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1773739170; x=
+	1773825570; bh=mxpAyC1s7/VO7u79kIstiYH59Ic5wP4Xx6EiPC23nvs=; b=T
+	EGwqO50SMtz9UyggQ52u8YvsBX7yzsbhhh5DTWTA2zP+ARSRgtQF5yMZ17Z9tajz
+	sBPNsIgmcn1+b2MwmOw9GlPEzi1uYVJqaN9ERw13lAkt7VGkSxjbTmKpv55xHlYX
+	Vk/omvB/Rgg8AvB8X3gUsQij0Zm5mS6ER3f9ZBQU6fwhM2RXWX73koke+wwe3Lwq
+	F+HkqgXGrZrcamB3EOhM+u3qYMwAMhErnZ8iIAv+5J+VrYB+A/nw00KW0NhZee31
+	6OTykKi0WAkiw/56WgWvnwU+g+bBKMRbMigOeaDitlmWzRSl82cvpheNTvoJkJo+
+	ul/kQwpy2DNJtA94qz18Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1773739170; x=1773825570; bh=mxpAyC1s7/VO7u79kIstiYH59Ic5wP4Xx6E
+	iPC23nvs=; b=pqtKTrB2XSyR/rYthSoZw1JQ8J28pcLV1vmG/RTHo5oYJzoWcVm
+	b2i5OWJESUR7ytmtRUE00THEg4qqHmUX+mxzwz+jQKgZqGrovPeCNXrqAmHTmfaO
+	rBl1c54NWAE5DndmKBTkXz+v9dRtRmihGKOCo7Pmw0ANvwyev8DYikIahhwz3qP6
+	PGyeKCCFI1ESL9/QlIZA2oN1f4AyihTUwPMQkauDLRMHzfZxxOprYoOW4Z6549BQ
+	cqXLnvO0Vei+uGx7r5ztSppos0Cb3TJWx7s8AwUrT+TQKR0fVGUWSPfEhh5z0DqO
+	u99QQn8YMdMadOcV05qBmz/D3ZZAn5P5z6A==
+X-ME-Sender: <xms:oRy5aZJLMGALHEU0PXuFBca-kCszg21I8-FhGL1vxgCXqT8sWautnw>
+    <xme:oRy5aRcjj0xNEJxPMiom2eQSuFQRYHxH6u0geKVTfWmCA-QP8ZLy0UqwOa_QqMRmi
+    ml9f4-8Le3fr-4aH_Gynavqv2b14aFV3qG_mJzmaH11OXkCb8lCLb4>
+X-ME-Received: <xmr:oRy5aTU9ojeMG5U21JkI2w2voBL8Pu2U8EERYwzzvZ-Zo_CB7iiaIl45lOuF>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftddtkeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedujedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopeifihhlfhhrvggurdhmrghllhgrfigrseifuggtrdgtohhmpdhrtghpthht
+    oheptghorhgsvghtsehlfihnrdhnvghtpdhrtghpthhtohepughlvghmohgrlheskhgvrh
+    hnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdp
+    rhgtphhtthhopehlihhnuhigqdguohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtoheplhhinhhugidqkhhsvghlfhhtvghsthesvhhgvghrrdhkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprh
+    gtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:oRy5aXhsMh_C4C6O2OHrvx5B4nS42vvuqxMWcuI7k-41_Kz-Bi1oHQ>
+    <xmx:oRy5aVibbWeh0kI7O8_xJ1gHSK4QvCimMxkoHRkR9ag-4T2lqD8P0w>
+    <xmx:oRy5aUsNAivdeU3hTtKobJe7-EOxtNwG4ot852dfVaarkAG1pxDutg>
+    <xmx:oRy5abu9tH9IcKdOOXExGsKbCSBitrMBzBLrZDQoi3vr5edPpkkQIQ>
+    <xmx:ohy5aekr5c4ZeVFDRhwSPowm0KuWnqPAsNqU63DuH2ryTD5yVBRZ9pM6>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 17 Mar 2026 05:19:29 -0400 (EDT)
+Date: Tue, 17 Mar 2026 10:19:27 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"dlemoal@kernel.org" <dlemoal@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"skhan@linuxfoundation.org" <skhan@linuxfoundation.org>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	Daiki Ueno <dueno@redhat.com>, Simo Sorce <ssorce@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [RFC net-next 1/3] net/tls_sw: support randomized zero padding
+Message-ID: <abkcnzIJ5q0XCVJ7@krikkit>
+References: <20260309054837.2299732-2-wilfred.opensource@gmail.com>
+ <20260309054837.2299732-3-wilfred.opensource@gmail.com>
+ <abQOGm6BqAE5eEln@krikkit>
+ <20260314073919.2f92b966@kernel.org>
+ <9e9f6eb89ba95e9fbb764e2807420e98b566bf37.camel@wdc.com>
+ <20260316180355.37d45785@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,186 +124,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.45 / 15.00];
+Content-Disposition: inline
+In-Reply-To: <20260316180355.37d45785@kernel.org>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.71)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268498-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268499-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,intel.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[queasysnail.net];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[wdc.com,lwn.net,kernel.org,davemloft.net,vger.kernel.org,gmail.com,redhat.com,linuxfoundation.org,google.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: A7F1C2A680A
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: BC28C2A6998
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Stanislav Fomichev <stfomichev@gmail.com> writes:
+2026-03-16, 18:03:55 -0700, Jakub Kicinski wrote:
+> On Tue, 17 Mar 2026 00:53:07 +0000 Wilfred Mallawa wrote:
+> > > Or maybe you could refer to existing implementations of this feature
+> > > in user space libs? The padding feature seems slightly nebulous, 
+> > > I wasn't aware of anyone actually using it. Maybe I should ask...
+> > > are you actually planning to use it, or are you checking a box?  
+> > 
+> > For upcoming WD hardware, we were planning on informing users to use
+> > this feature if an extra layer of security can benefit their particular
+> > configuration. But to answer your question, I think this falls more
+> > into the "checking a box"...
+> > 
+> > I'm happy to drop this series if there's not much added value from
+> > having this as an available option for users.
+> 
+> I'm not much of a security person, and maybe Sabrina will disagree
+> but I feel like it's going to be hard for us to design this feature
+> in a sensible way if we don't know at least one potential attack :S
 
-> On 03/16, Maciej Fijalkowski wrote:
->> Multi-buffer XDP stores information about frags in skb_shared_info that
->> sits at the tailroom of a packet. The storage space is reserved via
->> xdp_data_hard_end():
->>=20
->> 	((xdp)->data_hard_start + (xdp)->frame_sz -	\
->> 	 SKB_DATA_ALIGN(sizeof(struct skb_shared_info)))
->>=20
->> and then we refer to it via macro below:
->>=20
->> static inline struct skb_shared_info *
->> xdp_get_shared_info_from_buff(const struct xdp_buff *xdp)
->> {
->>         return (struct skb_shared_info *)xdp_data_hard_end(xdp);
->> }
->>=20
->> Currently we do not respect this tailroom space in multi-buffer AF_XDP
->> ZC scenario. To address this, introduce xsk_pool_get_tailroom() and use
->> it within xsk_pool_get_rx_frame_size() which is used in ZC drivers to
->> configure length of HW Rx buffer.
->>=20
->> xsk_pool_get_tailroom() is only reserving necessary space when pool is
->> zc and underlying netdev supports zc multi-buffer. Since this function
->> relies on pool->umem->zc setting, set it before ndo_bpf during zc
->> configuration, so that driver that actually calls
->> xsk_pool_get_rx_frame_size() inside ndo_bpf will get correct tailroom
->> value.
->>=20
->> Fixes: 24ea50127ecf ("xsk: support mbuf on ZC RX")
->> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
->> ---
->>  include/net/xdp_sock_drv.h | 21 ++++++++++++++++++++-
->>  net/xdp/xsk_buff_pool.c    |  3 ++-
->>  2 files changed, 22 insertions(+), 2 deletions(-)
->>=20
->> diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
->> index 6b9ebae2dc95..13b2aae00737 100644
->> --- a/include/net/xdp_sock_drv.h
->> +++ b/include/net/xdp_sock_drv.h
->> @@ -41,6 +41,19 @@ static inline u32 xsk_pool_get_headroom(struct xsk_bu=
-ff_pool *pool)
->>  	return XDP_PACKET_HEADROOM + pool->headroom;
->>  }
->>=20=20
->> +static inline u32 xsk_pool_get_tailroom(struct xsk_buff_pool *pool)
->> +{
->> +	struct xdp_umem *umem =3D pool->umem;
->> +
->> +	/* Reserve tailroom only for zero-copy pools that opted into
->> +	 * multi-buffer. The reserved area is used for skb_shared_info,
->> +	 * matching the XDP core's xdp_data_hard_end() layout.
->> +	 */
->> +	if (umem->zc && (umem->flags & XDP_UMEM_SG_FLAG))
->> +		return SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
->> +	return 0;
->> +}
->> +
->>  static inline u32 xsk_pool_get_chunk_size(struct xsk_buff_pool *pool)
->>  {
->>  	return pool->chunk_size;
->> @@ -48,7 +61,8 @@ static inline u32 xsk_pool_get_chunk_size(struct xsk_b=
-uff_pool *pool)
->>=20=20
->>  static inline u32 xsk_pool_get_rx_frame_size(struct xsk_buff_pool *pool)
->>  {
->> -	return xsk_pool_get_chunk_size(pool) - xsk_pool_get_headroom(pool);
->> +	return xsk_pool_get_chunk_size(pool) - xsk_pool_get_headroom(pool) -
->> +	       xsk_pool_get_tailroom(pool);
->>  }
->>=20=20
->>  static inline u32 xsk_pool_get_rx_frag_step(struct xsk_buff_pool *pool)
->> @@ -332,6 +346,11 @@ static inline u32 xsk_pool_get_headroom(struct xsk_=
-buff_pool *pool)
->>  	return 0;
->>  }
->
-> [..]
->=20=20
->> +static inline u32 xsk_pool_get_tailroom(struct xsk_buff_pool *pool)
->> +{
->> +	return 0;
->> +}
->
-> Not sure it's needed? xsk_pool_get_tailroom is only used by
-> CONFIG_XDP_SOCKETS' version of xsk_pool_get_rx_frame_size.
->
->>  static inline u32 xsk_pool_get_chunk_size(struct xsk_buff_pool *pool)
->>  {
->>  	return 0;
->> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
->> index 37b7a68b89b3..2cfc19e363e3 100644
->> --- a/net/xdp/xsk_buff_pool.c
->> +++ b/net/xdp/xsk_buff_pool.c
->> @@ -213,6 +213,7 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
->>  	bpf.command =3D XDP_SETUP_XSK_POOL;
->>  	bpf.xsk.pool =3D pool;
->>  	bpf.xsk.queue_id =3D queue_id;
->> +	pool->umem->zc =3D true;
->>=20=20
->>  	netdev_ops_assert_locked(netdev);
->>  	err =3D netdev->netdev_ops->ndo_bpf(netdev, &bpf);
->> @@ -224,13 +225,13 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
->>  		err =3D -EINVAL;
->>  		goto err_unreg_xsk;
->>  	}
->> -	pool->umem->zc =3D true;
->>  	pool->xdp_zc_max_segs =3D netdev->xdp_zc_max_segs;
->>  	return 0;
->>=20=20
->>  err_unreg_xsk:
->>  	xp_disable_drv_zc(pool);
->>  err_unreg_pool:
->> +	pool->umem->zc =3D false;
->>  	if (!force_zc)
->>  		err =3D 0; /* fallback to copy mode */
->>  	if (err) {
->
-> I'm not super familiar with the shared umem patch, but is it safe to
-> unconditionally undo pool->umem->zc =3D false here? xp_assign_dev_shared
-> looks at this umem->zc flag.. Presumably other places do as well on
-> teardown?
+No, same here, that's why I tried to CC some userspace developers on
+the cover (as well as for awareness of what's going on in the kernel
+and the API being discussed -- adding them here again).
 
-Good catch!
+My understanding is that attacks of this type are mainly "observers
+will figure out what type of traffic I'm doing based on message
+length", and I feel all those "traffic pattern masking" features are
+only interesting for very paranoid users. The RFC links to some
+research, and maybe the kind of statistics/machine learning that those
+attacks require has improved since, which could make such attacks more
+realistic? No idea.
 
-I can elaborate a bit; the zero-copy property of umem is shared between
-all users (sockets) of that umem. IOW, all sockets sharing an umem,
-inherits whatever the first socket negotiated.
-
-So, we could get into something like:
-
-1. Socket A binds queue 0, ndo_bpf OK (umem->zc =3D true)
-2. Socket B binds queue 1 via xp_assign_dev_shared()
-   reads umem->zc =3D=3D true, so flags =3D XDP_ZEROCOPY
-   xp_assign_dev() sets umem->zc =3D true
-   ndo_bpf() NOK for queue 1 -> error path: umem->zc =3D false (oops)
-3. Socket A is still active on queue 0 in ZC mode, but umem->zc is now
-   false
-
-...and we'll have a bunch of checks on umem->zc that now has incorrect
-state.
-
-From this follows that the zc flag shouldn't be toggled on a shared
-resource without checking if other consumers exist. I think a per-pool
-zc flag is needed here or smth. :-(
-
-
-Bj=C3=B6rn
+-- 
+Sabrina
 
