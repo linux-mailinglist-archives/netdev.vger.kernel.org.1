@@ -1,369 +1,181 @@
-Return-Path: <netdev+bounces-268472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268474-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oGpTAa4FuWmEnAEAu9opvQ
-	(envelope-from <netdev+bounces-268472-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 08:41:34 +0100
+	id aOFeIAYGuWmEnAEAu9opvQ
+	(envelope-from <netdev+bounces-268474-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 08:43:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97EB72A4F93
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 08:41:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F21A12A5009
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 08:43:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 44F5B30247FF
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:40:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D3FCE30421D8
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9BC7391840;
-	Tue, 17 Mar 2026 07:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FFBB391509;
+	Tue, 17 Mar 2026 07:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JpcIVgEC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4F23491C2
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 07:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C65573921EA
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 07:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773733245; cv=none; b=SdW9dsQw2o6+dM+4D4WqYj09QzYZFRHdjvwoGH6bfMuoQUz6NuUHV2qC6f3tXVVbif83ztigwV6JsD07xSB/lq/MmnfsieOYcLexWQen2uFXa5vOVlCR/+YhZAp4kxFncYPj3p7zquaEXOfZBAt47MREaa/nIiuO5lilF6BAb2w=
+	t=1773733326; cv=none; b=HlKfifaeJm5n0OzLHfph8dJZOMakOLvxZeJGuoP+Vh6V6LDo0ezyrremKkJyDMT09wyDR6DoJLMZQkCH3FfilRUyAADnMRpnjlVhJ042S0S9yztPH2X4DhlXeq1AE5PBd+mSsPvJDzRUuhLt2dX930v52in9F7OBx7w4cLhlU5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773733245; c=relaxed/simple;
-	bh=7j/lb6s+VK46dImS1+Ar8a3H+IBMEXjqblZk7UYCyNM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NH3CLA5faEVce7xDYLchncRsrVmOb4GRUNi8VEVFXzAAnBJfC2VVoERCaaQFeqEA4Idap0pvFc74KXStlvsZEWQdhAYBxFz6cZwdka5qJq8iiwh/JdILFEIQHYsvRfy58MAVRFtSYLCam0bbZS8FJpnw7/M+CPC+M6zialUVxTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=15.184.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpgz11t1773733152t12f2f6ec
-X-QQ-Originating-IP: yIw6zd3gn0Wy6ld5z/fCEXONoB1JhCClREn0LfSTZVQ=
-Received: from lap-jiawenwu.trustnetic.com ( [122.235.239.227])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 17 Mar 2026 15:39:10 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 16871393163967411464
-EX-QQ-RecipientCnt: 18
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Kees Cook <kees@kernel.org>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Joe Damato <joe@dama.to>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Abdun Nihaal <abdun.nihaal@gmail.com>,
-	Breno Leitao <leitao@debian.org>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v5 11/11] net: wangxun: implement pci_error_handlers ops
-Date: Tue, 17 Mar 2026 15:38:27 +0800
-Message-Id: <20260317073827.4300-12-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20260317073827.4300-1-jiawenwu@trustnetic.com>
-References: <20260317073827.4300-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1773733326; c=relaxed/simple;
+	bh=xg9tpnpgfg5SClBenXIK/4GssEYnuYsuYHsNrY8UiCY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lYmuJiiM0Y09LXvtR57R5nRpMGM9lMjxAmWbwWlNq+m7qdSqM4JtmtZDGMxd5M7zL5vRgwqT/QO/l85eJidt2AG4lATPd5jbnqkG8L/JGzOt+HvpGp+K+5FJSiLPzzM5tScjOQeyZ7Q9+cieNmf4BWCJGg1YYmCNgzG+VwzT3lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JpcIVgEC; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-827270d50d4so5073548b3a.3
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 00:42:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773733324; x=1774338124; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3gTRwPvoaoGKMWruMLfYdpsxbqLbc2avIWpIrbVdsbs=;
+        b=JpcIVgECwDFb+TNPexhIipO6ke7VswbUB0j0IrxMxTVU9yWPxZ1M3pFpxFTfMjHRqu
+         7OZ52HKI2W/WDmfJXv8tRfrAtZTQH1cVshLQZjnz6X2BfQEpaeGA0yrMZHKGVwVTw/LN
+         o2j1Gk4n5jTGZYb6s4xRWFmZyZmCJx9ejOVorc98HrPG+w9sGSh5Hh2b2w7iVXGd6fwb
+         hGQkvYeQIOG0yUmdr9Ib6Nh3qdLtJTCHc59g3vJX/rxVjXNa+zN7b+hgQ/OyMIdOvfJr
+         +DYDXJfmltmdO5ilOMDCzSTlz09u6B2rDcaojNAv7st/53wwMwLe35MSZG1gZDJvT6Aw
+         GjBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773733324; x=1774338124;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3gTRwPvoaoGKMWruMLfYdpsxbqLbc2avIWpIrbVdsbs=;
+        b=VyFf67+KGKny5axFqrLMSqsYs5c3VpsqWbEpvWymFOA4ZSmTo+yPOAQVQPx+6Ya8rv
+         xYp5w6IJLufnH4gvWcsdaLWY5HG+NS1enu31olbo3LI0KtzYOXpNi/IYwZPL/dLZFASh
+         EPcYX5esipUnl2D6Hw9WMJE1YFJSaZPfQEBgupM7fScv3LBJvM6z9bjeq8MCqmFGp9eI
+         WZb1eRYje/7NFGi0WN73wt1ImRAL9jlG69YKrap6gYAKbstGa9Mk17RAWn8FjtAnqzw/
+         jlKh37tIpt7BIwwmkvzT95Wq0npMbD71wgEK36/+MuWnrMtDp+9c9LdMh+gDbKwyuGZc
+         xVUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV2U/4xfCml1QyEYRM5L0rdpKBIaIHiTGH+qcbBiTbMwVLp+D4HGTsrQIPAICvHYhRptPpj/Cs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxK0NdJv/iDZgDrsckGTR+W5wl1scNpvtCJmm9RXqHSix+y0VHt
+	GVwioweqSImkVn+gJCMIqQ2BSb+tRStu2Uxd2gg1LvADb7etHS1jM2xw
+X-Gm-Gg: ATEYQzx7Bw+QjZWnMdmU+sa2HxezSNuVtm95fEJ6QwteWKWRLVON8nqFojqsz7VhxpW
+	fAqnwuYlRgSlbqE/WlAofdWTyVdE+6AMrvMTV/9BdncqY9yS5qQAwGEei7zmSHawsAAA6UlPSuq
+	HDMnaOwo+w7zwxP/dbV/1ocbPVgsFcMNgEim/ZOWwCMd9ibz2Ov7rzPjaE7r81DGQ97XvHEW2kC
+	MvFertwmIRwqBzl8ckk+ATE8LGg5EUxEiGH7tqJhv/aage4QnfoNoa600+sXfU6MCliYEzgdNAq
+	uiMTA3PG5Nu8/0EJO0BGJuNoyZ7/RdnDT6fimc/qhowUyFtRt0e7IZ1uY5BSAEHh4cucb0c6gZh
+	bXWEj3AFVF+Q1vj1qvemi2FhIznPhMiPasN5SiZ7Y/sPtHHMmceXDRs2JTDy3kc2isbPPpUQoxY
+	deIXhUGlNcYp8fBCUXr0xEP7E=
+X-Received: by 2002:aa7:88c9:0:b0:81f:4675:c2a9 with SMTP id d2e1a72fcca58-82a1957f3b6mr14731969b3a.0.1773733324070;
+        Tue, 17 Mar 2026 00:42:04 -0700 (PDT)
+Received: from localhost ([2001:19f0:8001:1b2d:5400:5ff:fefa:a95d])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82a0736deb4sm15367325b3a.44.2026.03.17.00.42.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Mar 2026 00:42:03 -0700 (PDT)
+Date: Tue, 17 Mar 2026 15:41:56 +0800
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alex@ghiti.fr>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
+	Yao Zi <me@ziyao.cc>, Yanteng Si <siyanteng@cqsoftware.com.cn>, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
+	Shangjuan Wei <weishangjuan@eswincomputing.com>, Chen-Yu Tsai <wens@kernel.org>, 
+	Zhi Li <lizhi2@eswincomputing.com>, Boon Khai Ng <boon.khai.ng@altera.com>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Quentin Schulz <quentin.schulz@cherry.de>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	spacemit@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next v10 1/4] dt-bindings: net: Add support for
+ Spacemit K3 dwmac
+Message-ID: <abkEPCRBkQIgx5rx@inochi.infowork>
+References: <20260316010041.164360-1-inochiama@gmail.com>
+ <20260316010041.164360-2-inochiama@gmail.com>
+ <20260316202147.431d9aeb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: NwAkWDBpYC4Zq2NjlJO6HbhViPBlPq/B2ERSX3fiA3dUoXiv6OO8chip
-	MPcF9yWkGZyfA+ef30ZKWydM06sfuAoPGD7EiMno9mSqPhxQCcyYZBCNPvIY7o6QXTId2q0
-	CtB+r8gYyT+1PZJybuE23FWMJkqD0tWa+wL5km7sqI3K5qZsdHdbfED6AmigM1HzEQYO6tG
-	YBeEu661Mqe2nmryKIVEutC4c7nZroHpCBFhs5K+c1jTmPiR5GPKy8KGUeSqn2//zmJua+K
-	DDt+JWS9i/dWIb66RHwirtfgfzqIPtd3XWbE66nTCwKxm8UI5J8HAHC/q2D+EzC2o7HuSK2
-	r9lD22RpBfGvguldWpd8h6qPHjfsVQ7rvwt64OVfiDwHprvQsCup7XGt8Rok/70Lo0skCgm
-	cBtI4bu7kjz8M5KSWwMiHGRWEO359a6RcAnReA7Clwn5sc3GO7imX1kuT4y+abTo/Jj1StU
-	gQtV574LwPhK7YbrJelKOkbI3b1Y1Jj+D6m/5kT6xzxfUOCpWAaf5hHsjJyrvLwHURp9rjj
-	eKUfYJIViWc0EvkpqZ/Ug4ASuclei73Fn+LIjtAuWAvd99Qyu0Kcd6NYWf4TZPcjldq9+ie
-	F1UaPwag+zj9NlTnjhz0wh63Bpl9ndtz3A2oAeQz3tg3KZXc5rx16K0lCelyDmXDLR0qVF2
-	m9eHNaG4BR69HKuWTXv2an1aPXL/3ZLSfH9qXzVQGYBlekP/BAqcjiVGYgj/OyygJo0ReNi
-	LUzueud7waeLo4LtqVwl/BpSyspXMDNBCWhs88tMDZHuAv3mAKk86xf7/9hKgcSdb9hBlmJ
-	UwzdTBslqzPtoda7AzmtXElAFROQl2UuJ8vcDihkK3lmbz/npARXzGzx3RISPHGs1F/uK7J
-	MytoszsfvBPmLd1V/vdzMrn2V+oRug47QYKZnlHdrsXzvmcbx2WVIO9cRj/TKrvDNBNlNuH
-	vKU8uWIKwsqBzO5bYKa8xUljEsJH5VSNYnqqRryspaamnZHqh+y4sRVxgIOx7+5CVcVwcHk
-	K88ZNAK8fN9yJiZOEjTCEnvzRXGQeaq+F0RP5xrjyE/99ILZeUE5JdAlfJ1iwuvQltxC46U
-	3J/gQubWTQOSxIbdZVVgLA=
-X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
-X-QQ-RECHKSPAM: 0
-X-Spamd-Result: default: False [1.54 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260316202147.431d9aeb@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268472-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[trustnetic.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,dama.to,debian.org,trustnetic.com];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-268474-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[39];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,foss.st.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,armlinux.org.uk,ziyao.cc,cqsoftware.com.cn,nxp.com,bp.renesas.com,eswincomputing.com,altera.com,bootlin.com,cherry.de,st.com,synopsys.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,st-md-mailman.stormreply.com,gentoo.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.814];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[trustnetic.com:email,trustnetic.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 97EB72A4F93
+	FROM_NEQ_ENVFROM(0.00)[inochiama@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[inochi.infowork:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F21A12A5009
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Support AER driver to handle the PCIe errors.
+On Mon, Mar 16, 2026 at 08:21:47PM -0700, Jakub Kicinski wrote:
+> On Mon, 16 Mar 2026 09:00:37 +0800 Inochi Amaoto wrote:
+> > The GMAC IP on Spacemit K3 is almost a standard Synopsys DesignWare
+> > MAC (version 5.40a) with some extra clock.
+> > 
+> > Add necessary compatible string for this device.
+> 
+> In the previous version the AI reviewer complained that we're not
+> adding the new entry to the select at the top of the file. Other
+> compatibles appear in 3 places in
+> Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> 
+> Also I asked whether we can drop the "default m"
+> 
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_err.c   | 102 ++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_err.h   |   2 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   |   5 +-
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |   1 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   5 +-
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   5 +-
- 6 files changed, 117 insertions(+), 3 deletions(-)
+For the Kconfig, I think it is better to keep the thing the
+same as others. And I guess this question may be related to
+some compromise that I do not know, and it is a hard thing
+for me to answer.
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-index bb77bdce69d2..86b318647a3c 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-@@ -3,11 +3,113 @@
- 
- #include <linux/netdevice.h>
- #include <linux/pci.h>
-+#include <linux/aer.h>
- 
- #include "wx_type.h"
- #include "wx_lib.h"
- #include "wx_err.h"
- 
-+/**
-+ * wx_io_error_detected - called when PCI error is detected
-+ * @pdev: Pointer to PCI device
-+ * @state: The current pci connection state
-+ *
-+ * Return: pci_ers_result_t.
-+ *
-+ * This function is called after a PCI bus error affecting
-+ * this device has been detected.
-+ */
-+static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
-+					     pci_channel_state_t state)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+
-+	netdev = wx->netdev;
-+	if (!netif_device_present(netdev))
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	rtnl_lock();
-+	netif_device_detach(netdev);
-+
-+	if (netif_running(netdev))
-+		wx->close_suspend(wx);
-+
-+	if (state == pci_channel_io_perm_failure) {
-+		rtnl_unlock();
-+		return PCI_ERS_RESULT_DISCONNECT;
-+	}
-+
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
-+	rtnl_unlock();
-+
-+	/* Request a slot reset. */
-+	return PCI_ERS_RESULT_NEED_RESET;
-+}
-+
-+/**
-+ * wx_io_slot_reset - called after the pci bus has been reset.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * Return: pci_ers_result_t.
-+ *
-+ * Restart the card from scratch, as if from a cold-boot.
-+ */
-+static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	pci_ers_result_t result;
-+
-+	if (pci_enable_device_mem(pdev)) {
-+		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-+		result = PCI_ERS_RESULT_DISCONNECT;
-+	} else {
-+		/* make all bar access done before reset. */
-+		smp_mb__before_atomic();
-+		clear_bit(WX_STATE_DISABLED, wx->state);
-+		pci_set_master(pdev);
-+		pci_restore_state(pdev);
-+		pci_save_state(pdev);
-+		pci_wake_from_d3(pdev, false);
-+
-+		wx->do_reset(wx->netdev, false);
-+		result = PCI_ERS_RESULT_RECOVERED;
-+	}
-+
-+	pci_aer_clear_nonfatal_status(pdev);
-+
-+	return result;
-+}
-+
-+/**
-+ * wx_io_resume - called when traffic can start flowing again.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * This callback is called when the error recovery driver tells us that
-+ * its OK to resume normal operation.
-+ */
-+static void wx_io_resume(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+
-+	netdev = wx->netdev;
-+	rtnl_lock();
-+	if (netif_running(netdev))
-+		netdev->netdev_ops->ndo_open(netdev);
-+
-+	netif_device_attach(netdev);
-+	rtnl_unlock();
-+}
-+
-+const struct pci_error_handlers wx_err_handler = {
-+	.error_detected = wx_io_error_detected,
-+	.slot_reset = wx_io_slot_reset,
-+	.resume = wx_io_resume,
-+};
-+EXPORT_SYMBOL(wx_err_handler);
-+
- static void wx_reset_subtask(struct wx *wx)
- {
- 	if (!test_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.h b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-index e317e6c8d928..8b1a7863b5b1 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-@@ -7,6 +7,8 @@
- #ifndef _WX_ERR_H_
- #define _WX_ERR_H_
- 
-+extern const struct pci_error_handlers wx_err_handler;
-+
- void wx_handle_errors_subtask(struct wx *wx);
- void wx_tx_timeout(struct net_device *netdev, unsigned int txqueue);
- void wx_handle_tx_hang(struct wx_ring *tx_ring, unsigned int next);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 5a21478a592b..fdf14c21cd5e 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -3418,7 +3418,8 @@ static void wx_dev_shutdown(struct pci_dev *pdev, bool *enable_wake)
- 	*enable_wake = !!wufc;
- 	wx_control_hw(wx, false);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- int wx_suspend(struct pci_dev *pdev, pm_message_t state)
-@@ -3446,6 +3447,8 @@ int wx_resume(struct pci_dev *pdev)
- 		wx_err(wx, "Cannot enable PCI device from suspend\n");
- 		return err;
- 	}
-+
-+	clear_bit(WX_STATE_DISABLED, wx->state);
- 	pci_set_master(pdev);
- 	device_wakeup_disable(&pdev->dev);
- 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 510fab4b3a0f..117cebbb9a67 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1208,6 +1208,7 @@ enum wx_state {
- 	WX_STATE_PTP_RUNNING,
- 	WX_STATE_PTP_TX_IN_PROGRESS,
- 	WX_STATE_SERVICE_SCHED,
-+	WX_STATE_DISABLED,
- 	WX_STATE_NBITS		/* must be last */
- };
- 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index 07e816720747..a382671d4c6d 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -818,6 +818,7 @@ static int ngbe_probe(struct pci_dev *pdev,
- 		goto err_register;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	return 0;
- 
-@@ -868,7 +869,8 @@ static void ngbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static struct pci_driver ngbe_driver = {
-@@ -880,6 +882,7 @@ static struct pci_driver ngbe_driver = {
- 	.resume   = wx_resume,
- 	.shutdown = wx_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(ngbe_driver);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index e9439e4ebe61..4f0af47260a9 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -885,6 +885,7 @@ static int txgbe_probe(struct pci_dev *pdev,
- 		goto err_remove_phy;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	netif_tx_stop_all_queues(netdev);
- 
-@@ -955,7 +956,8 @@ static void txgbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static struct pci_driver txgbe_driver = {
-@@ -967,6 +969,7 @@ static struct pci_driver txgbe_driver = {
- 	.resume   = wx_resume,
- 	.shutdown = wx_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(txgbe_driver);
--- 
-2.48.1
+> Did you disagree with those comments or did you miss them?
+> stmmac is a strange beast I don't really know what's going on in 
+> the binding, so just double checking this is intentional.. 
 
+Oh, I have forgot to reply to the binding.
+
+Currently, I disagree to add something in the select, as a
+new binding is always required for a new device. Even if it
+is already supported in the existing kernel, the new device
+is required to add at least a new compatiable string for it.
+
+Regards,
+Inochi
 
