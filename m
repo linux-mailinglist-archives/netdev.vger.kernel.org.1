@@ -1,392 +1,162 @@
-Return-Path: <netdev+bounces-268680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268682-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iHz9B0CAuWmxHAIAu9opvQ
-	(envelope-from <netdev+bounces-268680-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:24:32 +0100
+	id aBFLInmBuWmxHAIAu9opvQ
+	(envelope-from <netdev+bounces-268682-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:29:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96DF72ADE7B
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:24:31 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F4182ADFB1
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 17:29:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 10BFD3093BC1
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:19:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4D0CC3020676
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E1B31159C;
-	Tue, 17 Mar 2026 16:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8ED030C617;
+	Tue, 17 Mar 2026 16:20:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="G1rl72b1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S16UhQT8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C5A30CD95
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 16:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F6A306B31;
+	Tue, 17 Mar 2026 16:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773764367; cv=none; b=DlACFWaUKfTqTE9AMRBu41NDcQGBOZNl3j88ALWl/RmshBx75sS2gc7QRQ767MIsHZMbBovbMsPap3oQrIO63emvgomRYa5LMfEoQDsVnaxvqVODNFVrNLMnr+by3a8jMzL2bj8J+sHsxNLZR+Gj/MlTHIXDheY78TSu044RIvE=
+	t=1773764438; cv=none; b=JKmWv3xltK+Sdxbp6M1ssYkUs8rPsO5GN+kYqVXoa42nDgVeCIz3u2vyMegwVqEMbLrNjzhez2JwCFe8EO+7BHxDpfaaZq4CZGqdQx52p2aJRM2ytA2eoaLJWhTbbpC/w5kMN34QWX+7Byy/DYY/s/zJAziirSGJ6gX8OaXHSfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773764367; c=relaxed/simple;
-	bh=TneQYt0VQiojcBauXkwQBO86ZLSF5yvrb2b8fwe8fzg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YiN3LJKir6sc+0WLLTH4Wok+fV24aSgwXSEO0wmEZtA1dxY+aswP5T4DEoIp/IT84iVpfP6pwxFsWKw7i9OWyLRnQqDbrPMa/u7W/NcHK1Kw9DfzGSH4n4wDCLhRQYKdG7hm+ycPYsZ6kqu22tJR3RwxiftHjJXumahp7++E/+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=G1rl72b1; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 833241A2E71;
-	Tue, 17 Mar 2026 16:19:23 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5A2EE5FC9A;
-	Tue, 17 Mar 2026 16:19:23 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1CE2E10450642;
-	Tue, 17 Mar 2026 17:19:20 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773764362; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=Ly8NZ3ouwZjTQ5B+9TAvb+jFQVcLh7JxlJ53wZIAmZY=;
-	b=G1rl72b1ETx2hcUn8xqHQ1XZx8CQDJxKm6pyszzbo3mdAWnMjtbRbR75zkwrO9Fk1YeMFD
-	7F8Li5L5+Itu2r6VGJc0fGNu9q4n5Z4vcBqzvCsxb5Yb0AMx/GpAmnVRVE2hi5EGqAD/3e
-	qt8moWG3/GsYUaEoT87skcKsTELF3Qomi9aXVy3/cohISJZlELkOLJJjf9dpbniAQm76TY
-	gc9oVxwMj4Ka9x12LaoCZh+ojKcKE2lEq3FUn9XsjQugcZS10L50RjTU4t/idyhnk9WdTF
-	0ue3vUlHfcKYKmbeMEFNA/2DGPF1VhRxgGeixefLClD2db0Gg5rYtTaJMRH+9g==
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Tue, 17 Mar 2026 17:19:09 +0100
-Subject: [PATCH net-next v4 2/2] net: macb: distribute evenly Tx SRAM
- segments
+	s=arc-20240116; t=1773764438; c=relaxed/simple;
+	bh=eZn0o8PN+VBSA5tcV2K+3PiV1G+nIqHRRVawlw+TQ+w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZqkD48B72J8SfY3r9LRJCdQBVg5RCKxOfxq2fhKab+aGKcKDQfyPCI6QNApTOkO68CmV6oT/XZG8M7m9nweHJEVp9iuW3s17uHV7uOVjUCWKak5pPuN4Fmef8hvVE4JYCzkHf8UVloHO/3JrmOCC+60+Kdb8oAVBYKnTlwidm64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S16UhQT8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD14AC4CEF7;
+	Tue, 17 Mar 2026 16:20:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773764438;
+	bh=eZn0o8PN+VBSA5tcV2K+3PiV1G+nIqHRRVawlw+TQ+w=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=S16UhQT8bb2nXpM4hdL0HYCSTk5YMwQ4mIPUSfXcsrievR3IXMNei7dv5Ot9b4XVo
+	 6TLhBxLmUZDDRLSSQnHnMevosHrh0NZJigKWAUa0uM29cEVUCvkC7QABtIGwBG9bku
+	 L2poa9fZInWvBGjYDe1Cx0fj4psafrvIJV9FQGeh2gjwsmNi5kgGs8n1ZAioemjZN/
+	 fqJ62q09skuFzdwcB4TBLBDkPRUG0HgvOoyQDpbozLEVSBC1yywWQoUTaFTiNI4e39
+	 UDRpb9lfrB9KcyC7ycVYaGAKSIqEtVU6iIc62GlkUwbX7IE4XMvcueJ8HUqXYtgJ/D
+	 enJrKSwHtIZ+g==
+From: Simon Horman <horms@kernel.org>
+To: nb@tipi-net.de
+Cc: Simon Horman <horms@kernel.org>,
+	kuba@kernel.org,
+	opendmb@gmail.com,
+	arnd@arndb.de,
+	hkallweit1@gmail.com,
+	florian.fainelli@broadcom.com,
+	bhargava.marreddy@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	pabeni@redhat.com,
+	mbloch@rooftopnetworks.de,
+	netdev@vger.kernel.org,
+	davem@davemloft.net,
+	rajashekar.hudumula@broadcom.com,
+	linux-kernel@vger.kernel.org,
+	ebiggers@kernel.org,
+	vikas.gupta@broadcom.com
+Subject: Re: [net-next,v2,4/6] net: bcmgenet: add XDP_TX support
+Date: Tue, 17 Mar 2026 16:20:30 +0000
+Message-ID: <20260317162030.1759004-1-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260315214914.1555777-5-nb@tipi-net.de>
+References: <20260315214914.1555777-5-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260317-macb-set-channels-v4-2-1bd4f4ffcfca@bootlin.com>
-References: <20260317-macb-set-channels-v4-0-1bd4f4ffcfca@bootlin.com>
-In-Reply-To: <20260317-macb-set-channels-v4-0-1bd4f4ffcfca@bootlin.com>
-To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
- Gregory CLEMENT <gregory.clement@bootlin.com>, 
- =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Paolo Valerio <pvalerio@redhat.com>, 
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: b4 0.15-dev
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268680-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,arndb.de,broadcom.com,google.com,lunn.ch,redhat.com,rooftopnetworks.de,vger.kernel.org,davemloft.net];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-268682-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 96DF72ADE7B
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8F4182ADFB1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-GEM has registers to configure the Tx SRAM segments distribution across
-queues. The reset value is apprioriate (even spread) but we need to
-care if/when number of active queues is modified (or if we inherited
-unevenly initialised hardware from bootloader).
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-To distribute segments, we take as input the number of queues
-(bp->num_queues) and the number of segments (found inside DCFG6).
-Its output is a number of segments for each queue, formatted as
-powers-of-two (eg 2 for queue 0 means it has 2^2=4 segments).
-
-As the distribution logic is quite complex (at least its initial
-versions had bugs), it is kunit-tested in macb_kunit.c and the
-implementation lives in macb_utils.c. To test:
-
-⟩ env --unset=CROSS_COMPILE make ARCH=um mrproper
-⟩ env --unset=CROSS_COMPILE ./tools/testing/kunit/kunit.py run \
-        --kconfig_add CONFIG_NET=y \
-        --kconfig_add CONFIG_COMMON_CLK=y macb
-
-Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
- drivers/net/ethernet/cadence/Kconfig      | 12 +++++
- drivers/net/ethernet/cadence/Makefile     |  5 +-
- drivers/net/ethernet/cadence/macb.h       |  8 ++++
- drivers/net/ethernet/cadence/macb_kunit.c | 77 +++++++++++++++++++++++++++++++
- drivers/net/ethernet/cadence/macb_main.c  | 15 ++++++
- drivers/net/ethernet/cadence/macb_utils.c | 56 ++++++++++++++++++++++
- 6 files changed, 172 insertions(+), 1 deletion(-)
+net: bcmgenet: add XDP_TX support
 
-diff --git a/drivers/net/ethernet/cadence/Kconfig b/drivers/net/ethernet/cadence/Kconfig
-index 5b2a461dfd28..a901f74fd4ab 100644
---- a/drivers/net/ethernet/cadence/Kconfig
-+++ b/drivers/net/ethernet/cadence/Kconfig
-@@ -51,4 +51,16 @@ config MACB_PCI
- 	  To compile this driver as a module, choose M here: the module
- 	  will be called macb_pci.
- 
-+config MACB_KUNIT_TEST
-+	tristate "KUnit test for MACB" if !KUNIT_ALL_TESTS
-+	depends on KUNIT
-+	default KUNIT_ALL_TESTS
-+	help
-+	  Build KUnit tests for the MACB driver.
-+
-+	  For more information on KUnit and unit tests in general,
-+	  please refer to the KUnit documentation.
-+
-+	  If unsure, say N.
-+
- endif # NET_VENDOR_CADENCE
-diff --git a/drivers/net/ethernet/cadence/Makefile b/drivers/net/ethernet/cadence/Makefile
-index 1f33cdca9a3c..a0740da68649 100644
---- a/drivers/net/ethernet/cadence/Makefile
-+++ b/drivers/net/ethernet/cadence/Makefile
-@@ -2,7 +2,7 @@
- #
- # Makefile for the Atmel network device drivers.
- #
--macb-y	:= macb_main.o
-+macb-y	:= macb_main.o macb_utils.o
- 
- ifeq ($(CONFIG_MACB_USE_HWSTAMP),y)
- macb-y	+= macb_ptp.o
-@@ -10,3 +10,6 @@ endif
- 
- obj-$(CONFIG_MACB) += macb.o
- obj-$(CONFIG_MACB_PCI) += macb_pci.o
-+
-+obj-$(CONFIG_MACB_KUNIT_TEST) += macb_test.o
-+macb_test-y := macb_kunit.o macb_utils.o
-diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index b08afe340996..0464e774273a 100644
---- a/drivers/net/ethernet/cadence/macb.h
-+++ b/drivers/net/ethernet/cadence/macb.h
-@@ -197,6 +197,9 @@
- #define GEM_TXBDCTRL	0x04cc /* TX Buffer Descriptor control register */
- #define GEM_RXBDCTRL	0x04d0 /* RX Buffer Descriptor control register */
- 
-+#define GEM_TXQSEGALLOC_LOWER	0x05A0 /* Tx queue segment allocation (low) */
-+#define GEM_TXQSEGALLOC_UPPER	0x05A4 /* Tx queue segment allocation (high) */
-+
- /* Screener Type 2 match registers */
- #define GEM_SCRT2		0x540
- 
-@@ -549,6 +552,8 @@
- #define GEM_PBUF_CUTTHRU_SIZE			1
- #define GEM_DAW64_OFFSET			23
- #define GEM_DAW64_SIZE				1
-+#define GEM_SEGMENTS_BIT_SIZE_OFFSET		16
-+#define GEM_SEGMENTS_BIT_SIZE_SIZE		3
- 
- /* Bitfields in DCFG8. */
- #define GEM_T1SCR_OFFSET			24
-@@ -1494,4 +1499,7 @@ struct macb_queue_enst_config {
- 	u8 queue_id;
- };
- 
-+u64 gem_sram_distribute_segments(unsigned int num_queues,
-+				 unsigned int num_segments);
-+
- #endif /* _MACB_H */
-diff --git a/drivers/net/ethernet/cadence/macb_kunit.c b/drivers/net/ethernet/cadence/macb_kunit.c
-new file mode 100644
-index 000000000000..b91a10bda623
---- /dev/null
-+++ b/drivers/net/ethernet/cadence/macb_kunit.c
-@@ -0,0 +1,77 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include <kunit/test.h>
-+#include <linux/netdevice.h>
-+#include "macb.h"
-+
-+struct macb_sram_segments_case {
-+	unsigned int num_queues, num_segments;
-+};
-+
-+static void macb_sram_segments_test(struct kunit *test)
-+{
-+	const struct macb_sram_segments_case *p = test->param_value;
-+	u64 val = gem_sram_distribute_segments(p->num_queues, p->num_segments);
-+	unsigned int i, sum_segments = 0, max_assigned_segments;
-+	unsigned int num_queues = min(p->num_queues, p->num_segments);
-+
-+	for (i = 0; i < num_queues; i++) {
-+		unsigned int q_segments = (val >> (i * 4)) & 0b11;
-+
-+		q_segments = 1U << q_segments;
-+		sum_segments += q_segments;
-+		KUNIT_ASSERT_GT_MSG(test, q_segments, 0, "queue %d, val %#llx",
-+				    i, val);
-+	}
-+
-+	for (i = num_queues; i < 16; i++) {
-+		unsigned int pow = (val >> (i * 4)) & 0b11;
-+
-+		KUNIT_ASSERT_EQ_MSG(test, pow, 0, "queue %d, val %#llx",
-+				    i, val);
-+	}
-+
-+	max_assigned_segments = min(p->num_segments, 8 * p->num_queues);
-+	KUNIT_ASSERT_EQ_MSG(test, sum_segments, max_assigned_segments,
-+			    "val %#llx", val);
-+}
-+
-+struct macb_sram_segments_case macb_sram_segments_cases[] = {
-+	/* num_segments can only be powers of two. */
-+	{ .num_queues = 4,  .num_segments = 2 },
-+	{ .num_queues = 1,  .num_segments = 16 },
-+	{ .num_queues = 4,  .num_segments = 16 },
-+	{ .num_queues = 5,  .num_segments = 16 },
-+	{ .num_queues = 15, .num_segments = 16 },
-+	{ .num_queues = 16, .num_segments = 16 },
-+};
-+
-+static void macb_sram_segments_case_desc(struct macb_sram_segments_case *t,
-+					 char *desc)
-+{
-+	u64 val = gem_sram_distribute_segments(t->num_queues, t->num_segments);
-+
-+	snprintf(desc, KUNIT_PARAM_DESC_SIZE,
-+		 "num_queues=%d num_segments=%d TXQSEGALLOC=%#llx",
-+		 t->num_queues, t->num_segments, val);
-+}
-+
-+KUNIT_ARRAY_PARAM(macb_sram_segments,
-+		  macb_sram_segments_cases,
-+		  macb_sram_segments_case_desc);
-+
-+static struct kunit_case macb_test_cases[] = {
-+	KUNIT_CASE_PARAM(macb_sram_segments_test,
-+			 macb_sram_segments_gen_params),
-+	{}
-+};
-+
-+static struct kunit_suite macb_test_suite = {
-+	.name = "macb",
-+	.test_cases = macb_test_cases,
-+};
-+
-+kunit_test_suite(macb_test_suite);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Cadence MACB/GEM Ethernet driver kunit tests");
-+MODULE_AUTHOR("Théo Lebrun");
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index dd066f481200..f6c4b31ef75a 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -3053,6 +3053,21 @@ static void macb_init_hw(struct macb *bp)
- 	if (bp->caps & MACB_CAPS_JUMBO)
- 		bp->rx_frm_len_mask = MACB_RX_JFRMLEN_MASK;
- 
-+	/*
-+	 * Distribute Tx SRAM segments evenly based on active number of queues.
-+	 */
-+	if (macb_is_gem(bp)) {
-+		unsigned int num_segments;
-+		u64 val;
-+
-+		num_segments = 1U << GEM_BFEXT(SEGMENTS_BIT_SIZE,
-+					       gem_readl(bp, DCFG6));
-+		val = gem_sram_distribute_segments(bp->num_queues,
-+						   num_segments);
-+		gem_writel(bp, TXQSEGALLOC_LOWER, val);
-+		gem_writel(bp, TXQSEGALLOC_UPPER, val >> 32);
-+	}
-+
- 	macb_configure_dma(bp);
- 
- 	/* Enable RX partial store and forward and set watermark */
-diff --git a/drivers/net/ethernet/cadence/macb_utils.c b/drivers/net/ethernet/cadence/macb_utils.c
-new file mode 100644
-index 000000000000..77e0b5c1df86
---- /dev/null
-+++ b/drivers/net/ethernet/cadence/macb_utils.c
-@@ -0,0 +1,56 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include <linux/netdevice.h>
-+#include "macb.h"
-+
-+/*
-+ * Distribute evenly available segments across queues. The computation is
-+ * complex because (1) segments are counted in powers of two and (2) a queue
-+ * can only use up to 8 segments. There are four types of cases:
-+ *  - Sharing all segments equally is doable. Take num_queues=4 and
-+ *    num_segments=16. Each queue will get 2^2=4 segments.
-+ *  - Sharing all segments is doable. Take num_queues=5 and num_segments=16.
-+ *    Three queues will get 2^2=4 segments and two will get 2^1=2 segments.
-+ *  - Sharing all segments is not doable because not enough queues are
-+ *    available. Take num_queues=1 and num_segments=16; queue 0 can only have 8
-+ *    segments.
-+ *  - Sharing all segments is not doable because not enough segments are
-+ *    available. Take num_queues=4 and num_segments=2.
-+ *
-+ * We start by computing the power each queue will have. For num_queues=5 and
-+ * num_segments=16, each queue will have at least 2^1 segments. That leaves us
-+ * with remaining_segments=6. If we increase the power for a queue, we get a
-+ * delta of 2 (2^2-2^1). The first three queues will therefore be advantaged
-+ * and each have 2^2 segments. The remaining 2 queues will only have 2^1
-+ * segments.
-+ */
-+u64 gem_sram_distribute_segments(unsigned int num_queues,
-+				 unsigned int num_segments)
-+{
-+	unsigned int pow, remaining_segments, i;
-+	unsigned int num_advantaged_queues = 0;
-+	u64 val = 0;
-+
-+	/* pow=0 for all queues. ilog2(0) is dangerous. */
-+	if (num_queues >= num_segments)
-+		return 0;
-+
-+	pow = min(ilog2(num_segments / num_queues), 3);
-+	remaining_segments = num_segments - num_queues * (1U << pow);
-+
-+	/*
-+	 * We can only distribute remaining segments if (1) there are remaining
-+	 * segments and (2) we did not reach the max segments per queue (2^3).
-+	 */
-+	if (remaining_segments != 0 && pow != 3) {
-+		unsigned int delta = (1U << (pow + 1)) - (1U << pow);
-+
-+		num_advantaged_queues = remaining_segments / delta;
-+	}
-+
-+	for (i = 0; i < num_advantaged_queues; i++)
-+		val |= ((pow + 1) & 0b11) << (i * 4);
-+	for (i = num_advantaged_queues; i < num_queues; i++)
-+		val |= (pow & 0b11) << (i * 4);
-+
-+	return val;
-+}
+Implement XDP_TX using ring 16 (DESC_INDEX), the hardware default
+descriptor ring, dedicated to XDP TX for isolation from SKB TX queues.
+Ring 16 gets 32 BDs carved from ring 0's allocation. TX completion is
+piggybacked on RX NAPI poll since ring 16's INTRL2_1 bit collides with
+RX ring 0, similar to how bnxt, ice, and other XDP drivers handle TX
+completion within the RX poll path.
 
--- 
-2.53.0
+> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> index f6a2567af7cb..922895bc7461 100644
+> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
 
+[ ... ]
+
+> @@ -3637,6 +3782,7 @@ static void bcmgenet_timeout(struct net_device *dev, unsigned int txqueue)
+>
+>  	for (q = 0; q <= priv->hw_params->tx_queues; q++)
+>  		bcmgenet_dump_tx_queue(&priv->tx_rings[q]);
+> +	bcmgenet_dump_tx_queue(&priv->tx_rings[DESC_INDEX]);
+
+Does this trigger an out-of-bounds array access?
+
+Looking at bcmgenet_dump_tx_queue():
+
+static void bcmgenet_dump_tx_queue(struct bcmgenet_tx_ring *ring)
+{
+	...
+	struct netdev_queue *txq = netdev_get_tx_queue(priv->dev, ring->index);
+	...
+}
+
+For the XDP TX ring, ring->index is DESC_INDEX (16), so this calls
+netdev_get_tx_queue(priv->dev, 16). But the device only has 5 TX queues
+(indices 0-4), allocated via alloc_etherdev_mqs() with GENET_MAX_MQ_CNT+1=5.
+
+This means the code accesses dev->_tx[16] which is beyond the allocated
+array, and the returned txq pointer points to memory past the array. This
+is then dereferenced by netif_tx_queue_stopped(txq) which reads txq->state
+from invalid memory.
+
+In debug builds this triggers DEBUG_NET_WARN_ON_ONCE, and it could crash or
+corrupt data.
 
