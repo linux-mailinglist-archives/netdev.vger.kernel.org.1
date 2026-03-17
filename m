@@ -1,239 +1,242 @@
-Return-Path: <netdev+bounces-268582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268583-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ECMpHOxDuWmK+QEAu9opvQ
-	(envelope-from <netdev+bounces-268582-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:07:08 +0100
+	id 0NZdCrRFuWmK+QEAu9opvQ
+	(envelope-from <netdev+bounces-268583-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:14:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C13812A982A
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:07:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 888622A9A4A
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:14:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A0EC7301AF49
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:04:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5AFA83219374
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:08:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB9D3BAD9D;
-	Tue, 17 Mar 2026 12:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0769D3BC674;
+	Tue, 17 Mar 2026 12:08:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c3x96tee";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lg5XTv8Z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K2UI/KCu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303F73BA25E
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 12:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E033B7B67
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 12:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773749071; cv=none; b=JJBdPx/0usILcRFMox+Dn8LLHe45fo/LL/D9Enmp4Yo5Al6kiQzMlV1+A/PoYmdcf8MGPQ0D80sNIJNwdaX19Kv6NhNgUtMlOj5fVsCp5NmVhFnV9jzIWgjbIYvRTdupRlPbJ7WkTK8zZsCq0xIS7RlQJwuTIEIas0pZ8jCkskY=
+	t=1773749302; cv=none; b=kPzZyscqcHb8T9IQJqL3ozsYlamMaxvRQTTlLmdukZdFCriQCaQUbPSgM11gAaqHQhdnPO8H/FGJvUIo+jvO7AaFh8e71fyP6G/PRMc9a0FqQqxvLz+rHC4La+k03F0SIJXGZHxPJ/jhXDRgfrl0hxWGHnkqjkXQDIm+6/GAjlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773749071; c=relaxed/simple;
-	bh=gXf7h6m3QFucjAyYb0Chs97a79d9hUiTRP/yW6fiHjo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QUaTsEH4oRcZISDUdjZnLvcSJ8t9Z+gxJSp24EhNf9CLEw/Lu5WYMz/PJ0UkE6Rx8cFVvabMTQPFotVe1vFDBRBM+0RE0pxi78+63Ec4fQvzjVKF15bniRCTw/vMDXMjj0AnoZ/bNld/AF7cLfnyvvxzfiLq52oQWAKyEPq1Wx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c3x96tee; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lg5XTv8Z; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1773749302; c=relaxed/simple;
+	bh=xs1LoIyu6wA9qMtDrH92lf22DIh5iJvAvuHhaGq4R2Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XoNo7PIk31OgAcfHeSIT8fX2llWRXnhn86sznUdkPbwyRBmnWOH/hntnbeP3Yzd3Z7sl/pP4XEK4QcTNirEJjypiy8Yt3Xj40+pc5uQC+U/vLut7Ge6CSx+LuSf2fF4xO37IzoaqSw/N6dieUM+oHOR8OWHBdyJBILKcZoHdOrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K2UI/KCu; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773749067;
+	s=mimecast20190719; t=1773749299;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8OUPcuOst/Vgj50RX9iunVkzL2by2SSGoTL5fXS6O4A=;
-	b=c3x96tee3Cls7nn1ernOcqND0b5B0eHy+TFC3w43rHIfUiwpt6IMOhzmhSMfqdW3Cvblb5
-	2oUS5ZeYaCja2f2QAv9j6NPL9lZHQtvoYDsBNH7B6pe4M3P8H4VETCB/LCv2YwWoUxxmw5
-	fFMRcYNwZxRylQUhXBpWFrqOnNG5KVA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-394-KPwWUr2BOJa7GQoW136hlw-1; Tue, 17 Mar 2026 08:04:25 -0400
-X-MC-Unique: KPwWUr2BOJa7GQoW136hlw-1
-X-Mimecast-MFC-AGG-ID: KPwWUr2BOJa7GQoW136hlw_1773749064
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4853466655dso53077655e9.3
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 05:04:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773749064; x=1774353864; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8OUPcuOst/Vgj50RX9iunVkzL2by2SSGoTL5fXS6O4A=;
-        b=Lg5XTv8ZBF2gjJurzAyNukRbceWh5m/PkiAy0M+0hw9azRk9f12cAx6w91uz0wAB3F
-         ma2VeYlTLOWC/RNQcM9sugwkOrd0fcZERER2/AjB4vW+KGNOyz1QrU5hh/jj8xm6G6on
-         zjtTbaKqLjVWJnr5BwewKyn/KPOGpEQjlN74zYS0Xy2i5VsENaJMMGXCQ/VfSDA4ucgb
-         upMcOJG2qLOQwtNBGtIXWZkEqg/oMzUb2glbg/4cI8bYDsb5gdu3+oIPisOQvcFCg7Ce
-         w1MVIVcN3Q+3HoOxUMpuelWXm8QFE0CUHC5QsuSr5ZjiTBX+5nRWF/7hjHZKqIEkIK86
-         +Crg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773749064; x=1774353864;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8OUPcuOst/Vgj50RX9iunVkzL2by2SSGoTL5fXS6O4A=;
-        b=XEPrQ0QZswLVITt/LIXVkUoFvsTp1RQ7eyRDLyoC8yVi7yUyYMhGBVhOH6BTfMVawJ
-         p5QpEo/Oi8zpSbfq4j8b69gGZsMcLjkdoFSyARUIFFWiQHtufASCfBn/+qkFbNvOKfeu
-         esQSMBzNtBrgfoRsZ18JaXofRGdD1a2GYRdnA3GZ8vgX3kJlGB5dRKd3n1++jFS32kUT
-         h0NgRMuBD0w5YObEvuaku5PA/zoOJJtFUSQo/Mj3Yxd/5/dwHf3ZnEMm42fyl/Rbvvfq
-         +so1EnV5sUTbQQmz5DrJXFyJQLt/KOMQNAN1DMXglAecQG/Fd5C4qq+3Dfl++Df1GZV+
-         c5aw==
-X-Forwarded-Encrypted: i=1; AJvYcCUeveeKbgbgdFuzxZ8HYI8LxgevE+WZKgNxATPla3L/s9CP2oxNWCXLHzMLWHoJRCt2xNtZDkI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWjaJjH2VHNcwT3vVJNnQDKvj1v1smlsP24h1JjaXAVoZL1dcJ
-	y8EIb5eLtglhwdkcssQl1ociKbbC7CI9ztq1MCv7OpQMol8F89IKKkVNt46opdDfVb6pSJzVxZ2
-	za2+BfyPqBKSINzPPTYH2DdKyHnuM1dsw8n21UM0Q/2fgm7BoJwMgTwln9Q==
-X-Gm-Gg: ATEYQzyBP/+O4FJgrx9NuEztv9sD03OUAN5i/qf9cqG3eE9ynmz5252tX2JvoK19U5/
-	azfGnFWH4yzqVEsZQ5joyvqYdZINp67ScLj+T4zESzaPBGFXg5sDfVNi2ihWdZZbb8RQDAReepi
-	L6fPUo0cgKnZxT65by+KoUSoHEPMRdp1OIaZzfas/jbzY4CP/QXJ5N7CHk1M/FFcZH/Ec9OahgB
-	k9OB2ygGnQZZiw3CXmtEZTXjS0/e7PJ68t3Pfn0Rm6cxNgYqOifS9ssN9aFn48QFQHxXkLoPwK9
-	skPJxjA56qwdt80n6FTNIX8tKoXqxRggu14Y9MK2+pg7eEFvIwnkPtrda/Rn87CafnCLhssJr29
-	zelcrm7MX3z7tsq9bhmSTCA/SIAkL40GQjnFUwePHrCQtFQ==
-X-Received: by 2002:a05:600c:1d0e:b0:471:700:f281 with SMTP id 5b1f17b1804b1-4855671fac1mr306212655e9.25.1773749063418;
-        Tue, 17 Mar 2026 05:04:23 -0700 (PDT)
-X-Received: by 2002:a05:600c:1d0e:b0:471:700:f281 with SMTP id 5b1f17b1804b1-4855671fac1mr306211665e9.25.1773749062823;
-        Tue, 17 Mar 2026 05:04:22 -0700 (PDT)
-Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48557c6586csm118112975e9.20.2026.03.17.05.04.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 05:04:22 -0700 (PDT)
-Date: Tue, 17 Mar 2026 08:04:18 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Di Zhu <zhud@hygon.cn>
-Cc: jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, willemb@google.com,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	lijing@hygon.cn, yingzhiwei@hygon.cn,
-	Philo Lu <lulie@linux.alibaba.com>, Joe Damato <jdamato@fastly.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH net v3] virtio-net: enable NETIF_F_GRO_HW only if
- GRO-related offloads are supported
-Message-ID: <20260317074739-mutt-send-email-mst@kernel.org>
-References: <20260317113433.927022-1-zhud@hygon.cn>
+	bh=HWi0P4vO22+fUdb+J0wcLHg3NJLhq6aK6f+WlF3LnGs=;
+	b=K2UI/KCuGlPaeXRIm0Nb0voKY2exr97peH1W3bgcUTgDDvDcZLs/TpYj6ceZp2ORR/gpTa
+	vQQcqNstHw/1KUslvJzP/94/YHnXIqrgdrPCl+po9HDbyYEVf/PLAs3Xz3sqSaWAJ6jw8f
+	iZ1P0dbj/FhMU2wmvJoVB1+1c1fFGJw=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-pE6JdfO2NfWyvqRUopxgyw-1; Tue,
+ 17 Mar 2026 08:08:16 -0400
+X-MC-Unique: pE6JdfO2NfWyvqRUopxgyw-1
+X-Mimecast-MFC-AGG-ID: pE6JdfO2NfWyvqRUopxgyw_1773749294
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 229DA1800637;
+	Tue, 17 Mar 2026 12:08:14 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.192])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 505AA180035F;
+	Tue, 17 Mar 2026 12:08:10 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: Raju.Rangoju@amd.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	pabeni@redhat.com,
+	Thomas.Lendacky@amd.com,
+	maxime.chevallier@bootlin.com,
+	edumazet@google.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net] amd-xgbe: synchronize KR training with device operations
+Date: Tue, 17 Mar 2026 13:08:05 +0100
+Message-ID: <20260317120805.163436-1-pabeni@redhat.com>
+In-Reply-To: <20260313134210.3824872-1-Raju.Rangoju@amd.com>
+References: <20260313134210.3824872-1-Raju.Rangoju@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260317113433.927022-1-zhud@hygon.cn>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268582-lists,netdev=lfdr.de];
+	TO_DN_NONE(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-268583-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hygon.cn:email]
-X-Rspamd-Queue-Id: C13812A982A
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 888622A9A4A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 17, 2026 at 07:34:33PM +0800, Di Zhu wrote:
-> Negotiating VIRTIO_NET_F_CTRL_GUEST_OFFLOADS indicates the device
-> allows control over offload support, but the offloads that can be
-> controlled may have nothing to do with GRO (e.g., if neither GUEST_TSO4
-> nor GUEST_TSO6 is supported).
-> 
-> In such a setup, reporting NETIF_F_GRO_HW as available for the device
-> is too optimistic and misleading to the user.
-> 
-> Improve the situation by masking off NETIF_F_GRO_HW unless the device
-> possesses actual GRO-related offload capabilities. Out of an abundance
-> of caution, this does not change the current behaviour for hardware with
-> just v6 or just v4 GRO: current interfaces do not allow distinguishing
-> between v6/v4 GRO, so we can't expose them to userspace precisely.
-> 
-> Fixes: dbcf24d15388 ("virtio-net: use NETIF_F_GRO_HW instead of NETIF_F_LRO")
-> Signed-off-by: Di Zhu <zhud@hygon.cn>
-> ---
-> /* v3 */
->   -Update Fixes tag to dbcf24d15388
->   -Refine commit message using Maintainer's "too optimistic" 
->     phrasing to clarify the risk of misleading configurations.
-> 
-> /* v2 */
->   -make the modified logic clearer
-> ---
->  drivers/net/virtio_net.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 72d6a9c6a5a2..b233c99925e9 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -6781,8 +6781,6 @@ static int virtnet_probe(struct virtio_device *vdev)
->  	if (virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_TSO4) ||
->  	    virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_TSO6))
->  		dev->features |= NETIF_F_GRO_HW;
-> -	if (virtio_has_feature(vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS))
-> -		dev->hw_features |= NETIF_F_GRO_HW;
->  
->  	dev->vlan_features = dev->features;
->  	dev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
-> @@ -7058,6 +7056,10 @@ static int virtnet_probe(struct virtio_device *vdev)
->  	}
->  	vi->guest_offloads_capable = vi->guest_offloads;
->  
-> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS) &&
-> +	    (vi->guest_offloads_capable & GUEST_OFFLOAD_GRO_HW_MASK))
-> +		dev->hw_features |= NETIF_F_GRO_HW;
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+amd-xgbe: synchronize KR training with device operations
+
+This commit adds synchronization to prevent device operations from
+interrupting active KR training by introducing a mailbox mutex and waiting
+for KR training completion before proceeding with stop/rate change
+operations.
+
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+> index 23beea48ae26..3913eb7e1da3 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+> index b8cf6ccfe641..142eb952a29c 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+
+[ ... ]
+
+> @@ -2095,12 +2095,57 @@ static void xgbe_phy_pll_ctrl(struct xgbe_prv_data *pdata, bool enable)
+>  	usleep_range(100, 200);
+>  }
+>
+> +static bool xgbe_phy_port_is_inphi(struct xgbe_prv_data *pdata)
+> +{
+> +	struct xgbe_phy_data *phy_data = pdata->phy_data;
+> +
+> +	/* Re-driver models 4223 && 4227 are supported Inphi models */
+> +	return phy_data->redrv &&
+> +	       (phy_data->redrv_model == XGBE_PHY_REDRV_MODEL_4223 ||
+> +		phy_data->redrv_model == XGBE_PHY_REDRV_MODEL_4227);
+> +}
+> +
+> +void xgbe_check_kr_training_in_progress(struct xgbe_prv_data *pdata)
+> +{
+> +	struct xgbe_phy_data *phy_data = pdata->phy_data;
+> +	unsigned long kr_timeout;
+> +	int wait;
+> +
+> +	/* Only wait for KR training in specific conditions:
+> +	 *  - Inphi re-driver is present, OR
+> +	 *  - Currently in KR mode with autoneg enabled
+> +	 */
+> +	if (!xgbe_phy_port_is_inphi(pdata) &&
+> +	    !(phy_data->cur_mode == XGBE_MODE_KR &&
+> +	      pdata->phy.autoneg == AUTONEG_ENABLE))
+> +		return;
+> +
+> +	wait = XGBE_KR_TRAINING_WAIT_ITER;
+> +	while (wait--) {
+> +		/* Check if we've exceeded the AN timeout window */
+> +		kr_timeout = pdata->kr_start_time +
+> +			msecs_to_jiffies(XGBE_AN_MS_TIMEOUT +
+> +					XGBE_KR_TRAINING_WAIT_MS);
+> +		if (time_after(jiffies, kr_timeout))
+> +			break;
+> +
+> +		/* Training is complete - no need to wait */
+> +		if (pdata->an_result == XGBE_AN_COMPLETE)
+> +			return;
+> +
+> +		usleep_range(10000, 11000);
+> +	}
+> +}
+> +
+>  static void xgbe_phy_perform_ratechange(struct xgbe_prv_data *pdata,
+> -					enum xgbe_mb_cmd cmd, enum xgbe_mb_subcmd sub_cmd)
+> +					enum xgbe_mb_cmd cmd,
+> +					enum xgbe_mb_subcmd sub_cmd)
+>  {
+>  	unsigned int s0 = 0;
+>  	unsigned int wait;
+>
+> +	xgbe_check_kr_training_in_progress(pdata);
+> +
+>  	/* Disable PLL re-initialization during FW command processing */
+>  	xgbe_phy_pll_ctrl(pdata, false);
+>
+> @@ -2115,7 +2160,9 @@ static void xgbe_phy_perform_ratechange(struct xgbe_prv_data *pdata,
+>  	XP_SET_BITS(s0, XP_DRIVER_SCRATCH_0, COMMAND, cmd);
+>  	XP_SET_BITS(s0, XP_DRIVER_SCRATCH_0, SUB_COMMAND, sub_cmd);
+>
+> -	/* Issue the command */
+> +	/* Acquire mailbox lock for firmware command */
+> +	guard(mutex)(&pdata->mailbox_lock);
 > +
 
-Hmm wait a second. Isn't this late? netdev registered, even link is
-up already.
+Can this cause a recursive deadlock? xgbe_phy_perform_ratechange() acquires
+mailbox_lock, but when called with sub_cmd XGBE_MB_SUBCMD_RX_ADAP, it goes
+through do_rx_adaptation which calls xgbe_phy_rx_adaptation().
 
-Documentation/networking/netdev-features.rst says:
+xgbe_phy_rx_adaptation() has two code paths that both lead back to
+xgbe_phy_perform_ratechange():
 
- 1. netdev->hw_features set contains features whose state may possibly
-    be changed (enabled or disabled) for a particular device by user's
-    request.  This set should be initialized in ndo_init callback and not
-    changed later.
+Path 1:
+    xgbe_phy_rx_adaptation()
+        -> xgbe_phy_rrc()
+            -> xgbe_phy_perform_ratechange(pdata, XGBE_MB_CMD_RRC, ...)
+                -> guard(mutex)(&pdata->mailbox_lock)  // deadlock
 
+Path 2:
+    xgbe_phy_rx_adaptation()
+        -> xgbe_rx_adaptation()
+            -> xgbe_set_rx_adap_mode()
+                -> xgbe_phy_perform_ratechange(...)
+                    -> guard(mutex)(&pdata->mailbox_lock)  // deadlock
 
+Since kernel mutexes are not recursive, attempting to lock an already-held
+mutex from the same thread causes a permanent deadlock.
 
-I'd say let's move it up?
+>  	XP_IOWRITE(pdata, XP_DRIVER_SCRATCH_0, s0);
+>  	XP_IOWRITE(pdata, XP_DRIVER_SCRATCH_1, 0);
+>  	XP_IOWRITE_BITS(pdata, XP_DRIVER_INT_REQ, REQUEST, 1);
 
-
-
-
-
-Having said that, we already have a bug:
-
-  dev->hw_features &= ~NETIF_F_RXHASH;                                                                                                   
-is after register, too.
-
-This is because we take pains to recover from these commands failing.
-Except, we completely ignore that in virtnet_set_rxfh ...
-
-
-Cc relevant contributors to maybe take a look at fixing all that.
-
-
-
->  	rtnl_unlock();
->  
->  	err = virtnet_cpu_notif_add(vi);
-> -- 
-> 2.34.1
-> 
+[ ... ]
 
 
