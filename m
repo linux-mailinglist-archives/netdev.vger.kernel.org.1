@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-268455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268456-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eA8kOxT6uGkumgEAu9opvQ
-	(envelope-from <netdev+bounces-268455-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:52:04 +0100
+	id 0IocELX6uGkumgEAu9opvQ
+	(envelope-from <netdev+bounces-268456-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:54:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03B602A4772
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:52:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D54972A4817
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 07:54:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E88803019FE7
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 06:51:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 43FFD3018742
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 06:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A314349B12;
-	Tue, 17 Mar 2026 06:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2FA348445;
+	Tue, 17 Mar 2026 06:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VEttchVN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="edP9a+/P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4203347FF4
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 06:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A49349B03
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 06:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773730312; cv=none; b=EpwaBkumCR5adUHkhIb9teZoR23BAWVR5mEGQDEmLMq/G+Q1av4e+OdGUfF7XXKu2A3gOkbUmeu937yvhzzGoGQqLlIpAa9mqHN9kcD5jRjfkDoY1jGTooZQjenegbGOm+vvtsu/MciNHWFKhkvCwDEjkgbCqnkbolmVC6jU96Q=
+	t=1773730313; cv=none; b=flmanqIwFthpfwE0fU3ZL15h8hFi67aem06sd6dMZGi3QghQiKFiXOfkofl+c75zVCL7BLOQdUwRKlb6BUdrjg518jWejc3yteAcpnddl3QFWw4YyJKQPz39p4YDWj2Nmal4c92OL9+lgN+TWozBPQaBCvU97hBTEvzOPXk/gHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773730312; c=relaxed/simple;
-	bh=ImbWQoR+dgm8+9dV9PXvczLRAxo2SxKksFr3fwuIhLo=;
+	s=arc-20240116; t=1773730313; c=relaxed/simple;
+	bh=evB/X8tNk78bHrQ/MFYt8wsGBWuU1gJMZqIau8s3uvk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S1DTxfuLdkBQJZmuNTIWR8aZmUOZ0YJ2oTccdQkczPUJQHVv76GArF5/qLA5fFE36pmEVVcZcK1KNql3Qwwu640ZmsEXiUy38vEVrSgoRZpOxsMEro56zOo+6pyusS8ftNo4MWTTK1Xs0xj+yIW96GeSdcCa+MOnDqtilRBPPBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VEttchVN; arc=none smtp.client-ip=209.85.210.49
+	 MIME-Version; b=qUU/+OTlEtMjeqA0+xujPcF6gZmrPo53w5+RSDhm3Wb9X9TvyCAY4rz9SkqH/ZTdSFC2tsK3hE6of0jJ2jV0JUyopU5Mh721I2sMlvLWdOEf5Kqp6d0b1E1ap8tz9qXqj0j9bOHFBLEdHnu69/FJTslXn5+vBK47dnChD1P3HDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=edP9a+/P; arc=none smtp.client-ip=209.85.210.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7d4be94eeacso6124901a34.2
-        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 23:51:50 -0700 (PDT)
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7d556c1a79eso5940815a34.3
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 23:51:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773730309; x=1774335109; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773730311; x=1774335111; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j+IJ2HT7GzgVpfj7oyAsWSh4v8318zxK4LdAKWsY7NU=;
-        b=VEttchVNmTAHva0Ips9bn6B3mdor+xxVQf0380ZUVMKtJtDtfk/gyhYG7XLoFWKkPw
-         6etKYvToF3rOsEG49LUZbO369awuHZec7IBpfrx2ITkKnfDMo/jp57EMC4blBav62+7C
-         dkSuoB4EL9fD1eCFQGT96caDptfve5+p2WuKUz7QSfY1diQyndBSkphZ/yL7UP2O7xs1
-         paQ0V9pLgewZ6DggzyTaN330Ruy56PqJgXT+dh2CQfNF8KbZqdMgwPB6he8jb2U4tdvm
-         akiXfYAAULVp0jqVV17GwqNpHDP6QiQDFCPT+nPGwNu6jlg1cWXYwdfu2QxnmLLGjgoe
-         bPyA==
+        bh=+Nu5fdG7ljOunxtDElL00N3RnG2qS7orERGCqEegHO8=;
+        b=edP9a+/PyTUTASdPoNDae9hEmSrVrYiE3pYK+ouU7XZYN1Uoz8hmzs3m8hFmfksg9L
+         PsMf8Zr8y8zP50ENDvqudplXcgjFFma/vRm0koa/UVv2O19db83cOReSAukJi1QLKsqr
+         I4bnkrCHkMc/uVs9YI2Y4PCXYlgqJTIQN2w2zoxVYI6Bp7eW/cuT45+/HG55DRviOqVH
+         6vvpjRye3yvNvgOTWlAcwRXIFDcyqWKHgTPyoH8Xu26VNXH8LiY61QysGfmk6YSAnyu2
+         JPRsAM6pPyd/qpgxf7OtYuQ56lN7gtJnFZ+1NImZMeFckZNFTxYKNADZJslJ+aWlHYE1
+         jbAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773730309; x=1774335109;
+        d=1e100.net; s=20251104; t=1773730311; x=1774335111;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=j+IJ2HT7GzgVpfj7oyAsWSh4v8318zxK4LdAKWsY7NU=;
-        b=P3t7P7kCT4e1Upbv3ZiUWsbwuyt5iNSqrdhPff7f+zs7S9s+IdewnEcLGpZuimwQcN
-         JEu6ul9o1VsLOxjsERFe2FrW/WuVwOh7HdHDcNZGMHXULX8uYChdq/nlCPSQzKsZCP+K
-         oUuwWcCKqPpy7OlD40YEiemlSBn9+tv+KUmOwgL8Dwjsl9tsyxtG6lB5U/FKfRjvf2nr
-         cs+KHTCOZNsyJrHsYhhDBg62RWC9ajvxxBCL1ARB4HRrAKjBTjOXsMHoBmonjyzv6VlL
-         SOXUOwZxvcuVYbJ8YMjTSKiJcucvffVM75qG4bAKgBMnAfcHFWZztvdg0qK6q77yteaH
-         tYog==
-X-Gm-Message-State: AOJu0Yyrx/ISXyHNh+8296SgU8hVYBtwJeSid2UYWOMgtacqx//mNIa+
-	s9oKLlGH6NvpQRTBD1ROtY9n3WBrk9KHptd8honK4VSjZ/oGveAt3FGuiptpET3zXRY=
-X-Gm-Gg: ATEYQzzCnKLmr9qdme8ohbXIdaMsSsowu9ssmVkOHQHSeupBBmjI679P6Ujs7sh0OR7
-	OiFxkspJe9piJ4lrfgFdg+LvcEqjNp35MU2CQOj7aJxEPD7fMZZIidkcdTNbcs61lnAZJlwlnAd
-	rTmLx8ZIvC7fYdk27eXS+29IMkf1xHftmlfA4yT6Kx3wGXAD95RPxuwdhfeQaJV2a7+AoEDNzUV
-	nYBwLCpYxQ0qsf9V4OfZDIntV8bHBErh0slzbMRZ7kAbAaLFdin5pDyjmT+Exyesdve5maEG7W8
-	PxfYs4/yDWx5hhlP0ibv3SV0l5t4yhD+3c2HBTgJqQkxHs07MzQN2KSWyEp842+gifAZ4kCaBT3
-	LwGh1rjZNFBGXLUj9RQtMkc0A1DOp/V8jG5Qf0FZrCceuYGL2LfOcyHPhE+wQqk7IQV/PlsiIgB
-	lBnuSm25ASoPAj+ssPte6gkcv+fIQA3AZ3+h8e/ixV3uCutXJoCSBFb7K4LWb8gz6x0+EllDuIh
-	RUTDHpuwlfQ8M6POtoUiWLg/b5CY6ZeZYJLnwnOpg==
-X-Received: by 2002:a05:6830:3686:b0:7d7:4721:9a56 with SMTP id 46e09a7af769-7d78260bee6mr11651705a34.32.1773730309488;
-        Mon, 16 Mar 2026 23:51:49 -0700 (PDT)
+        bh=+Nu5fdG7ljOunxtDElL00N3RnG2qS7orERGCqEegHO8=;
+        b=CJW1ziYL3StRhpbDXh1Ifz4ALtpen7yiC8PdD4Cjr/7Y+MWzXHbzwm+FrVSHxbYARM
+         m9/k2JZBgmNs5N+rHTq7ulXtpOr7ep6XSMAB7rWHxPfSzGCyUzsaCIwbqfHUaPqBeqGJ
+         MfkG5vXPGA6FXDVnd1krJmpSqoQg0y6/R6IvrKfINlbtMrOXESg7WU5B6kvJBOm+3yrf
+         RoLXg20nUNzX4mWmA9hjaytD77m+RXczBDhCk5i1+2TdY+sJKphIZq/31LyBOA2ZDjUT
+         GJGt6qqrjoLfQbtJOIUrFEre7+Rtd3yL5AQZQd3JB+tqiPi3U5ZaeL8k6dc5BX2iJuTY
+         9odQ==
+X-Gm-Message-State: AOJu0YywcvjglgkIEsADv112L3cDwfBZleSR+JdDi3rlz0QmhGeVKFXl
+	oYdOiAHAw5ZmwzyqJ9p3YBrZ0pDNFX+OoAlbGNy766YZGwyLgkqhf8fTik6yXoVGEp0=
+X-Gm-Gg: ATEYQzzy+VlIy3BudP5IPBrXwXOijI51jPO2SSL2aBRwRGfj8I54XuJkhz8/gudV4HC
+	z9/yBy/+C3de1fBIFXiRnTOvY1XuQN+q+17osXQgE4I8RKqP95znOBkvQiE9DHK2tbn85eDn410
+	RD9vE+3wt0VpEHO3Xfr/cqG4IQvjX5FaHv2YSeAel05II5Sqjc8mQZO5nBglF82z6XKVrhU2xCr
+	konRhwJ31FfkTpsz3pRCkZFYR8j5cXKGHGSdfr0ETzpdI1cuehcf/pordJACzXecsVsdFSgXnGV
+	RISCO1Pp4tCsxZ30VLQOco9D//XdiMXF1E3NewIvMM+V/KMp05bxPglxgrHrAyzFFeO9e4UpLRs
+	a0jvtaeAzquSoBxsWrZydqMlWDnoI/Um7O9VARYtOl8wLrSpqFwyr0HvdMa+MqfzA2OgafhLDaA
+	N3OyKJFEHBeWQuhMSxI0Wb7HLey3BTNSVLStzZ4rVO+QJdnJccoIMMGc7QCX8ldmSBJn+bj/7Vo
+	LOn0L8MGOptraYmc+Ua976gtrLx/6wGq9MKgzU0Ig==
+X-Received: by 2002:a05:6830:6619:b0:7d7:466f:b2fd with SMTP id 46e09a7af769-7d78246af9bmr10197156a34.2.1773730310733;
+        Mon, 16 Mar 2026 23:51:50 -0700 (PDT)
 Received: from Atwell-Laptop.. (108-212-132-20.lightspeed.irvnca.sbcglobal.net. [108.212.132.20])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d76ae68a4bsm14058432a34.19.2026.03.16.23.51.47
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d76ae68a4bsm14058432a34.19.2026.03.16.23.51.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2026 23:51:48 -0700 (PDT)
+        Mon, 16 Mar 2026 23:51:50 -0700 (PDT)
 From: Wesley Atwell <atwellwea@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -90,9 +90,9 @@ Cc: linux-kernel@vger.kernel.org,
 	pabeni@redhat.com,
 	shuah@kernel.org,
 	Wesley Atwell <atwellwea@gmail.com>
-Subject: [PATCH net-next 1/3] selftests: packetdrill: stop pinning rwnd in tcp_ooo_rcv_mss
-Date: Tue, 17 Mar 2026 00:51:35 -0600
-Message-ID: <20260317065137.1533226-2-atwellwea@gmail.com>
+Subject: [PATCH net-next 2/3] tcp: keep scaled no-shrink window representable
+Date: Tue, 17 Mar 2026 00:51:36 -0600
+Message-ID: <20260317065137.1533226-3-atwellwea@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260317065137.1533226-1-atwellwea@gmail.com>
 References: <20260317065137.1533226-1-atwellwea@gmail.com>
@@ -109,18 +109,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-268455-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268456-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[atwellwea@gmail.com,netdev@vger.kernel.org];
@@ -131,47 +131,64 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 03B602A4772
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D54972A4817
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-tcp_ooo_rcv_mss.pkt cares about the OOO SACK state and the resulting
-tcpi_rcv_mss update.
+In the scaled no-shrink path, __tcp_select_window() currently rounds the
+raw free-space value up to the receive-window scale quantum.
 
-Its exact advertised receive-window value is incidental to that test and
-can legitimately move when unrelated rwnd accounting changes adjust the
-ACK window.
+That can expose fresh sender-visible credit beyond the currently backed
+free space.
 
-Drop the hard-coded win 81 checks and keep only the ACK/SACK shape and
-the tcpi_rcv_mss assertion.
+Fix this without changing the meaning of the stored receive-window
+state. Keep tp->rcv_wnd representable in scaled units by rounding larger
+windows down to the scale quantum and preserving only the small
+non-zero case that would otherwise scale away to zero.
+
+tcp_select_window() already preserves the no-shrink guarantee from the
+currently offered window, so later no-shrink decisions continue to
+reason from a right edge the peer actually saw on the wire.
+
+This removes the larger-window quantization slack from rounding
+free_space up, while preserving the small non-zero case needed to avoid
+scaling away to zero.
 
 Signed-off-by: Wesley Atwell <atwellwea@gmail.com>
 ---
- tools/testing/selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ net/ipv4/tcp_output.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt b/tools/testing/selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt
-index 7e6bc5fb0c8d78f36dc3d18842ff11d938c4e41b..0b19de9f9307b3d0ee579bc9e3a2b9219a88cd8a 100644
---- a/tools/testing/selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt
-+++ b/tools/testing/selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt
-@@ -17,11 +17,13 @@ sysctl -q net.ipv4.tcp_rmem="4096 131072 $((32*1024*1024))"`
-    +0 accept(3, ..., ...) = 4
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 35c3b0ab5a0cb714155d5720fe56888f71aecced..bd3a43148a87e891bc632a47ffb5b82c475e8f6f 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -3375,13 +3375,19 @@ u32 __tcp_select_window(struct sock *sk)
+ 	 * scaled window will not line up with the MSS boundary anyway.
+ 	 */
+ 	if (tp->rx_opt.rcv_wscale) {
+-		window = free_space;
++		u32 gran = 1U << tp->rx_opt.rcv_wscale;
  
-    +0 < . 2001:11001(9000) ack 1 win 257
--   +0 > . 1:1(0) ack 1 win 81 <nop,nop,sack 2001:11001>
-+// This test cares about the OOO SACK state and the resulting tcpi_rcv_mss.
-+// Keep the ACK/SACK shape exact, but do not pin the precise advertised
-+// receive window here because unrelated rwnd accounting changes can adjust it.
-+   +0 > . 1:1(0) ack 1 <nop,nop,sack 2001:11001>
- 
- // check that ooo packet properly updates tcpi_rcv_mss
-    +0 %{ assert tcpi_rcv_mss == 1000, tcpi_rcv_mss }%
- 
-    +0 < . 11001:21001(10000) ack 1 win 257
--   +0 > . 1:1(0) ack 1 win 81 <nop,nop,sack 2001:21001>
--
-+   +0 > . 1:1(0) ack 1 <nop,nop,sack 2001:21001>
+-		/* Advertise enough space so that it won't get scaled away.
+-		 * Import case: prevent zero window announcement if
+-		 * 1<<rcv_wscale > mss.
++		/* Keep tp->rcv_wnd representable in scaled units so later
++		 * no-shrink decisions reason about the same right edge we
++		 * can advertise on the wire. Preserve only a small non-zero
++		 * offer that would otherwise get scaled away to zero.
+ 		 */
+-		window = ALIGN(window, (1 << tp->rx_opt.rcv_wscale));
++		if (free_space >= gran)
++			window = round_down(free_space, gran);
++		else if (free_space > 0)
++			window = gran;
++		else
++			window = 0;
+ 	} else {
+ 		window = tp->rcv_wnd;
+ 		/* Get the largest window that is a nice multiple of mss.
 -- 
 2.43.0
 
