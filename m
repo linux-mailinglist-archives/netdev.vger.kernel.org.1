@@ -1,62 +1,113 @@
-Return-Path: <netdev+bounces-268579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268580-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EB1NK4U9uWkowQEAu9opvQ
-	(envelope-from <netdev+bounces-268579-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:39:49 +0100
+	id WKxyJFZDuWkk+QEAu9opvQ
+	(envelope-from <netdev+bounces-268580-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:04:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52B7F2A90CC
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:39:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA15B2A973D
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:04:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A1B4230219E0
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:39:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D317C308860F
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B115D36EAA9;
-	Tue, 17 Mar 2026 11:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D2D3B7779;
+	Tue, 17 Mar 2026 11:59:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="X3VWJmPc"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="sBGSXHmV";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KoFhcBVO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C24534F486;
-	Tue, 17 Mar 2026 11:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345163B776A;
+	Tue, 17 Mar 2026 11:58:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773747563; cv=none; b=gtxRJRnH/0lpyI0fk3CZJhEJzgEfoHUrJbpeSdOnLGRuoc0RQOrataff7Fd7d0fktZtLHVQxVcpNy11ru8kR5PqiFhdunYf2DsjWk1g/bFzDxZE9t8TDQaBP9g1r+3pquQgWIHOlqN9F9a11p9hBVbn6PIsQIZNqFtTI8QUAVUM=
+	t=1773748742; cv=none; b=pEik2o/fWZW/GL2AfHRgLcywF27RXKYeANLFa6f1ZDuYeNrCIp/zWVG5cTl1kefd39oJHnMpvZv0DxooYLG7B/YgXbx4C3aI9Yt2qRE8Qxlitq9URyFUSKgUZ8kEe6mFpEM5zO8/7/jRMNQIs6s/aVbfJ07iASTpTU/5PX2Z/as=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773747563; c=relaxed/simple;
-	bh=kdQ+1+afZ0cU27XQrMbqyykm1KyvnmBwhXqTYx7wVyc=;
+	s=arc-20240116; t=1773748742; c=relaxed/simple;
+	bh=WzpohQTFAg+/+5fjgYupL5nMEp8YLjnG0HBxCA/Fido=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YOptF6cPxvUsDaqGTY616P8duOty2OE0G9swzcpzMHuoKntEZ+wUyb3VHuUBByuEHBh/pibfViehRWcEHlxT+rHfJrZmOwNWAbA709gHbvjOfXbm2727jLIrIHCciyzQFK0AfdTdLoF2AiNKsu6EGmUjTg82Wi45939dI2xS1Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=X3VWJmPc; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 5E2C560275;
-	Tue, 17 Mar 2026 12:39:20 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1773747560;
-	bh=P33V43oP3dkCUdsRMCD8YrJZ9UrUUPnTwpPVsaX6Q9U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X3VWJmPc3wHHLmTk7yNGFmtyTNGuIZoIdvaMlyfbKfjthmfm+ND6C63mEIPFS4VJa
-	 o2hHxkWo0hWSDfjlelLylNrjpmGfILY7FlfcEImF1cmRzRtWI66Zs/8DUXxgl54XrD
-	 bmg20HqxJbOwuBWQXXmGZVzHB+Ufe1B0s0vpxtZuwayc6sbpLEZidRVVLqZhrpSs3a
-	 bab6ThnxoQd5xckRS32kUp09SDjEyr/oN2BH35NvVHPK0lTbrYeex8FSA7/WfJl+2n
-	 ADdK3j3XJQEaes2kT38+bCwv9mC73UVwODFkuZVwcrLqOEMeSseWC0AHN0Gtm5d7Sb
-	 5ZP7nonEKc8Gg==
-Date: Tue, 17 Mar 2026 12:39:17 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, fw@strlen.de,
-	horms@kernel.org, steffen.klassert@secunet.com,
-	antony.antony@secunet.com
-Subject: Re: [PATCH net-next,RFC 0/8] netfilter: flowtable bulking
-Message-ID: <abk9ZQoc7GxfgODn@chamomile>
-References: <20260317112917.4170466-1-pablo@netfilter.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NKmB6nUrjVLGIjA7GhjAFBhgp6ltcQqGCNbFNi+uc8CnvfysVXBO68c5GLVMFUFmhrj8OUSbrZAQLkiN47uFTeVwx3S2Tftl2EzYpnrkhKolnSxiupUJCziZykxKuCPatxJSGW1XiO27gIgd/U7JRq0Fvvoxx+DKQcwiYoPq9lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=sBGSXHmV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KoFhcBVO; arc=none smtp.client-ip=202.12.124.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.stl.internal (Postfix) with ESMTP id A68CB1D00175;
+	Tue, 17 Mar 2026 07:58:57 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Tue, 17 Mar 2026 07:58:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1773748737; x=
+	1773835137; bh=LQKKJmXb+zrz4f+7W1idnzMcDl0vzLq+F8OkS2Y6DOc=; b=s
+	BGSXHmVDI4CGagxvI+Aqoo7MErNV32aqTztJ67/hkY/49eLmgh9irqikMUvyhSKd
+	6gmh5uc96OUkfeWNgy3NTMsIqVWaJxsO1vOz6YhUMUGK62zxxepU0D4Zxt75vTWe
+	2kpbTiSJYg9NPmxmCD3xaPPTRzaY30OS2eoPxPEz5EQY6BfpELg0HKQGFD9a2ZT/
+	+tvyZMsp9LCO+9mCAVVJ9ZCwGpBQFwINaoWUiMFhayV728yi7OQVSMFZWxNLOCCI
+	RkXIZc30LOVfmPr/w4qQN+Z4ee5+vyelKDJm/WVUJBqdKPtLNUL3ezrmMOPOb0gy
+	2AoYGXlrUKSsTtg+75tYg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1773748737; x=1773835137; bh=LQKKJmXb+zrz4f+7W1idnzMcDl0vzLq+F8O
+	kS2Y6DOc=; b=KoFhcBVOcfAMJPRVhaorXh8apoVVymXAMIWNkDwQZ+MdwTs7WmE
+	GwrJMTQZ44hKVUSw0DHXYRlc7z5ZvfFF7HdEo5S2Uc4lg1inmKqAfGt622Ez8NY8
+	wshjKtNBgcUYFhbnQLh2UVWLgKPWZdT79gNvwgclu0jK8UuOqCv+M5koNif8TV3Y
+	HSJWGjbmVXHpfxA2dTs33tjd4s5/snXNzeXZnr5yIdxpoiJZhbj9QdKU7ZdsW1da
+	zOBGjRa8ZReTxjeb/3AMSvBnw02FNceMANYpdBuVMK7JJ2k/wfRqUMaZek2ITJgy
+	ocwnf7Ud/Qhxv9XaTfYpQxtOxYGAleJurhA==
+X-ME-Sender: <xms:AEK5aYBgOAUIMneYJa2E9tIMHlWwuvco_YDmcnmEiAlNa5oGB4PIKA>
+    <xme:AEK5aZ86G_FBOs_yfE5kGGV4duJUZ2jRA7YhI9UtPjgxfP86Hriy2pACjYBcQXdk6
+    FGMhEaA97nnN0Wq6dJfGRiYwO7m19U3DAvOGWpQOPObAxYZ5ZudLXeq>
+X-ME-Received: <xmr:AEK5acrUAaDX-L7fqdcIX2uJg_tJCv6dGgtMC1KKO_50asgt8fM6-esKfgBN>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdduudelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduhedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrd
+    gtohhmpdhrtghpthhtohepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhrtghpthhtohep
+    rghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmse
+    gurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
+    vgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehjihhrihesrhgvshhn
+    uhhllhhirdhushdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhg
+X-ME-Proxy: <xmx:AEK5aTGJ108I1jkgAh5qvj26DOfg8XJL7Fk5wFfh8UUZJXfovuJscQ>
+    <xmx:AEK5aQ_gFvwQxGKQFCZ9z2JXrQhXzuP2CSkX0Rw4SF-jSfnevmK10Q>
+    <xmx:AEK5aQSwcMmWJpsOjK5wPX_scMjt8TKvg5MvQLPzC-OICIjKARZjTA>
+    <xmx:AEK5aVqUedkZC0oMc44wEgQTf0pj5Fr5cDF4bYbcSNWoaa7EeJL-ag>
+    <xmx:AUK5aTn9OHBOk8MwvW468Thfg8UQ9GotY6GAcUnEeOJibWZB90tl6RXK>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 17 Mar 2026 07:58:55 -0400 (EDT)
+Date: Tue, 17 Mar 2026 12:58:54 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>, Simon Horman <horms@kernel.org>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bridge@lists.linux.dev
+Subject: Re: [PATCH net-next v3 3/5] macsec: move netdev_upper_dev_link()
+ after macsec_changelink_common()
+Message-ID: <ablB_tdLxMPoYtv3@krikkit>
+References: <20260316-offload_compute-v3-0-a5d4a07d86d3@gmail.com>
+ <20260316-offload_compute-v3-3-a5d4a07d86d3@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,147 +116,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260317112917.4170466-1-pablo@netfilter.org>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+In-Reply-To: <20260316-offload_compute-v3-3-a5d4a07d86d3@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268579-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-268580-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux-ipsec.org:url]
-X-Rspamd-Queue-Id: 52B7F2A90CC
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[queasysnail.net:dkim,queasysnail.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EA15B2A973D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Missing links:
+2026-03-16, 12:26:11 +0800, Hangbin Liu wrote:
+> After calling netdev_change_features() in __netdev_upper_dev_link(),
+> the call stack looks like:
+> 
+> - netdev_upper_dev_link
+>   - __netdev_upper_dev_link
+>     - netdev_change_features
+>       - notifier_call_chain
+>         - rtnetlink_event
+>           - rtmsg_ifinfo_event
+>             - rtmsg_ifinfo_build_skb
+> 
+> In macsec, we call netdev_upper_dev_link() before
+> macsec_changelink_common(), which causes the fields of the MACsec
+> Security Entity to be uninitialized. Later, macsec_fill_info() returns
+> -EMSGSIZE and triggers WARN_ON() in rtmsg_ifinfo_build_skb.
+> 
+> Fix this by moving netdev_upper_dev_link() after
+> macsec_changelink_common(), and return 0 if secy->key_len is not
+> initialized yet.
+> 
+> Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>  drivers/net/macsec.c | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
 
-[1] https://lore.kernel.org/netdev/20180614141947.3580-1-pablo@netfilter.org/
-[2] https://linux-ipsec.org/2025-linux-kernel-flowtable-bulk-forwarding-and-xfrm-pcpu-forwarding-testing-results.html
+I'm not sure I'll manage to look at the rest of the series before it's
+applied, but for this patch:
 
-On Tue, Mar 17, 2026 at 12:29:09PM +0100, Pablo Neira Ayuso wrote:
-> Hi,
->  
-> Back in 2018 [1], a new fast forwarding combining the flowtable and
-> GRO/GSO was proposed, however, "GRO is specialized to optimize the
-> non-forwarding case", so it was considered "counter-intuitive to base a
-> fast forwarding path on top of it".
->  
-> Then, Steffen Klassert proposed the idea of adding a new engine for the
-> flowtable that operates on the skb list that is provided after the NAPI
-> cycle. The idea is to process this skb list to create bulks grouped by
-> the ethertype, output device, next hop and tos/dscp. Then, add a
-> specialized xmit path that can deal with these skb bulks. Note that GRO
-> needs to be disabled so this new forwarding engine obtains the list of
-> skbs that resulted from the NAPI cycle.
->  
-> Before grouping skbs in bulks, there is a flowtable lookup to check if
-> this flow is already in the flowtable, otherwise, the packet follows
-> slow path. In case the flowtable lookup returns an entry, then this
-> packet follows fast path: the ttl is decremented, the corresponding NAT
-> mangling on the packet and layer 2/3 tunnel encapsulation (layer 2:
-> vlan/pppoe, layer 3: ipip) are performed.
->  
-> The fast forwarding path is enabled through explicit user policy, so the
-> user needs to request this behaviour from control plane, the following
-> example shows how to place flows in the new fast forwarding path from
-> the forward chain:
-> 
->  table x {
->         flowtable f {
->                 hook early_ingress priority 0; devices = { eth0, eth1 }
->         }
->  
->         chain y {
->                 type filter hook forward priority 0;
->                 ip protocol tcp flow offload @f counter
->         }
->  }
->  
->  
-> The example above sets up a fastpath for TCP flows that are placed in
-> the flowtable 'f', this flowtable is hooked at the new early_ingress
-> hook.  The initial TCP packets that match this rule from the standard
-> fowarding path create an entry in the flowtable.
->  
-> Note that tcpdump only shows the packets in the tx path, since this
-> new early_ingress hook happens before the ingress tap.
-> 
-> The patch series contains 8 patches:
-> 
-> - #1 and #2 adds the basic RX flowtable bulking infrastructure for
->   IPv4 and IPv6.
-> - #3 adds the early_ingress netfilter hook.
-> - #4 adds a helper function to prepare for the netfilter chain for
->   the early_ingress hook.
-> - #5 adds the early_ingress filter chain.
-> - #6 and #7 add helper functions to reuse TX path codebase.
-> - #8 adds the custom TX path for listified skbs and updates
->   the flowtable bulking to use it.
-> 
-> = Benchmark numbers =
-> 
-> Using the following testbed with 4 hosts with this topology:
->  
->  | sunset |-----| west |====| east |----| sunrise |
->  
-> And this hardware:
->  
-> * Supermicro H13SSW Motherboard
-> * AMD EPYC 9135 16-Core Processor (a.k.a. Bergamo, or Zen 5)
-> * NIC: Mellanox MT28800 ConnectX-5 Ex (100Gbps NIc)
-> * NIC: Broadcom BCM57508 NetXtreme-E (only on sunrise, 100Gbps NIc)
->  
-> With 128 byte packets:
->  
-> * From ~2 Mpps (baseline) to ~4 Mpps with 1 flow.
-> * From ~10.6 Mpps (baseline) to ~15.7 Mpps with 10 flows.
->  
-> Antony Antony collected performance numbers and made a report describing
-> this the benchmarking[2]. This report includes numbers from the IPsec
-> support which is not included in this series.
->
-> Comments welcome, thanks.
-> 
-> Pablo Neira Ayuso (8):
->   netfilter: flowtable: Add basic bulking infrastructure for early ingress hook
->   netfilter: flowtable: Add IPv6 bulking infrastructure for early ingress hook
->   netfilter: nf_tables: add flowtable early_ingress support
->   netfilter: nf_tables: add nft_set_pktinfo_ingress()
->   netfilter: nf_tables: add early ingress chain
->   net: add dev_dst_drop() helper function
->   net: add dev_noqueue_xmit_list() helper function
->   net: add dev_queue_xmit_list() and use it
-> 
->  include/linux/netdevice.h             |   2 +
->  include/net/netfilter/nf_flow_table.h |  13 +-
->  net/core/dev.c                        | 297 ++++++++++++++++----
->  net/netfilter/nf_flow_table_inet.c    |  81 ++++++
->  net/netfilter/nf_flow_table_ip.c      | 384 ++++++++++++++++++++++++++
->  net/netfilter/nf_tables_api.c         |  12 +-
->  net/netfilter/nft_chain_filter.c      | 164 +++++++++--
->  7 files changed, 872 insertions(+), 81 deletions(-)
-> 
-> -- 
-> 2.47.3
-> 
-> 
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+
+Thanks Hangbin.
+
+-- 
+Sabrina
 
