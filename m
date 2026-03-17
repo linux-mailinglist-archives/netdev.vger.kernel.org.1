@@ -1,325 +1,283 @@
-Return-Path: <netdev+bounces-268559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268560-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kExODO41uWmcvAEAu9opvQ
-	(envelope-from <netdev+bounces-268559-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:07:26 +0100
+	id uBRyDOA1uWmcvAEAu9opvQ
+	(envelope-from <netdev+bounces-268560-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:07:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD5CA2A877A
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:07:25 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8BEA2A8764
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:07:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C05163022608
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:04:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 38910301FBB4
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 273483A6B91;
-	Tue, 17 Mar 2026 11:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660C03A784B;
+	Tue, 17 Mar 2026 11:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OgO5Ns7W"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FaQBo1Bi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012021.outbound.protection.outlook.com [40.107.200.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC8F359A9F
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 11:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773745443; cv=none; b=L+S57hdKaO7yuSXT7UevzD0YxBUq69lPti2jsVzFXoq07MNJjK+5vELx5/y9AI8Lv6djySj0OJJCKgS3xTdpn1RzTezB3/CiHoSt3HUYC1B0u/foKp/mcFuVM5v/g1s+1700bdgCFW3HeHbAN1ujheLOCubm5Isy/olJ5WQdJjc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773745443; c=relaxed/simple;
-	bh=KNMdTz0dMtsZ0/bH1FzXk+0DNsqD2IF/dA5rxowQT18=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Rx3tGjTQ8EcNcvgOr86gBhMabuB07YZiP+IlzXbHElP6sHQfOLMocLsZxHWKefpViNQeFmbrM5LYWZmBx7ccFdmYNk/xccDOeQ3uAE+KEhVhciI01IJksex45cqj5ENiyHp+MI+8PcJ8gXW+kArs0d5sYLoaihbncSEYKU0iCTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OgO5Ns7W; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b979d16dd0cso442194466b.1
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 04:04:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773745440; x=1774350240; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=N+sB1F9ylcq5EEMpOQgUFXx9/JMgB+sZnio0KZ13MVg=;
-        b=OgO5Ns7WLfKdW2/u+iUMNWrD3g+Gp8awfDhS9vA4/291hZClk594QsheW0UQu4HelG
-         J73i7x5kMI9vJ3w1b9ADmZltai2BmOUyvxyl6wzYtBaQAeobpMAa4+n31mhhz19Vlhiu
-         yA4OBhCVmiLtwCvkD6YpEI6odDLuHmqb4Gjje4NzCQjjdHLmaF1VHCVl5QxUKZBTF7qV
-         EZPHF9SqIeqRy1czO4nIxfK1nKYeUMAQGgsAoTi8JZHpiK7waTZ+6VQAgktogIc7MQk0
-         2xpTin/OtUPmr7stXO8Hj7iK/cMNgnLf9xlEDEDhc7lgxPPDjEgNyM6eGDfZhJhjJ0Po
-         HKXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773745440; x=1774350240;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N+sB1F9ylcq5EEMpOQgUFXx9/JMgB+sZnio0KZ13MVg=;
-        b=YtZTSRiBNaSVPh9955r5VVTdgrTsPA50x72rK8DRU5qjIqLqzowd9byzzJZb4KRasE
-         2cxiHrfkNuNzRRAu2fA44VbqK2yKSzOsJ0m7Mevxn2ih0Q/Y7QcCXwpuuWPmbhirzDTA
-         hnBL78s9f58ty1gny7SYP+HqTzjWeZigTmHFiKdhzFtCwEVdf08/UEYPA2yxb9hXx2NU
-         5SQpUSiY1s31yXLIpvcjM7bPz4aDUurmxAJiaO7EnelIlKvzU3W3p7DpVTBZtUU3Tuj9
-         GuO++q9Kh5iY+PC0cjHJK8kwmZUKmxWkeOVZRKHsubu/PUmchbLwlWwCYzPEqzSbEfmV
-         6VLg==
-X-Gm-Message-State: AOJu0Yzyi9FlVVqpL192LMwtzzVv2OBnKW1OoHIxpG6AIDPHVXh4c7nA
-	fzylC7XXX39ausW6NrpKOz+FA/v90t7Invp9yBc+ZvFWePeIlCqFMXo6
-X-Gm-Gg: ATEYQzzVTx4qBJHUBYKA1p3ZIvOne9Dr8BsD6RoT3rJKD3wjffNZESm60hVBVLZYzje
-	vwhgqievFx99h/J2d4zsEIWC3w98ZVrWAFt7Q1Px1JPmWAzMRoppE/z0accF99faVGkfhl+iqqE
-	SZRk1obTot4KpbSm5uATw7Z2CTgE0Wosgq4LpyDzRwe2nZdu13AU6Zc6oyLgI/kUhpHLGCOfp2I
-	U66UiAEEp2eY9Z0lan9VVASp6l7b/DksDep8FqjXtoTuvsv8cwDMP34nEIrh8VKLUbmiUBdyd60
-	+PhcsYFKSahtQrnP3ZyRVsBfqZca+sX+6HKe7Nm6RhkDGlaBnjvwNRykl0D+c89ypBD3zKFRAem
-	ODtykiowXeU4xVKM4naTKn0ZTgLtkEZUXAdXC5hMmhCrsUl1V7IyuZONkAro7maHZ/SOxZ+tZ09
-	ZOyTzFlG45s+B36w7gFCXpUQdCA0zQAqV5DiFgjs1xpZggCwKWkIqoGWJjOAWf4SYK980BD7Vjo
-	1/54mr/ceNA1M5RucHGnSQr2z2KOJud5X9XOTutHmGMfnjRM2GjcAg=
-X-Received: by 2002:a17:907:94d6:b0:b97:9076:f84f with SMTP id a640c23a62f3a-b979077179cmr655488666b.45.1773745439719;
-        Tue, 17 Mar 2026 04:03:59 -0700 (PDT)
-Received: from eric (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9791c30cf3sm594116866b.2.2026.03.17.04.03.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 04:03:59 -0700 (PDT)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: Jiri Pirko <jiri@resnulli.us>,
-	Ivan Vecera <ivecera@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org,
-	bridge@lists.linux.dev,
-	netfilter-devel@vger.kernel.org,
-	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH v12 net-next] bridge: No DEV_PATH_BR_VLAN_UNTAG_HW for dsa foreign
-Date: Tue, 17 Mar 2026 12:03:47 +0100
-Message-ID: <20260317110347.363875-1-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065D134DCD1;
+	Tue, 17 Mar 2026 11:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773745629; cv=fail; b=MXaEe4w6lfx4QyUQxdmVfisf0PHVD+QSP7Q6BmUkVXaxRfz/2MZVQnjNNvtNbckZhSisseOTNi/ehJ9ylXZJwXke2AQSOJYUHHu8at9Qj8BZu08G21sOSrTXAenXj6h8qHKhx+PuUwxNLFRJNMwOrlOQUDVZS+b7i7jCZXro9AI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773745629; c=relaxed/simple;
+	bh=QZ4gEzCp87UwWQ74jTw5cjaY799ntH6gGfPT6EZMTok=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=o1ctZQlHRQ4NtzIOxqfSslUzr83ChOemxey59/DLsWAYQU50xseQkv0+I888snuP5RUmrd/zbEfxk4dnZFxt8JcecrqbXFA6E0eI0CHnMQg0/wS7Qd8ewRsykkMO0EKR/N/GXyFKgz4CULA+U3k+FhPzb3rPTS3mKVPXmGIpi30=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FaQBo1Bi; arc=fail smtp.client-ip=40.107.200.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MBe0/ZSTm+ic6T6n+YwgXrtaVECbtVJn4e/lYsucGsc7icCgMhjZojKNePD8QCfVjClE4PViXddrWrkp7v53+NYCEgnEUGxg+13HOgkh6uVBRNjgjZXJuH7fYHrrLubwOJ+MIgA8uku0Cc/yJ55MqVwjjYA4Dp730GWdQkzXrqbnFvfa+si3TQCk5prLHQfwNJs5D9EfsPKTvYEVQfEPskMXA6/r+z7udS421PX74bO8YepuPrH98HG7081hq1LpHWiaQVKZqyX2nvwcKphgpUgW1BddykoPtlbl3xpmj0lSKRS3GSmVnTz89XMjY+iM0u1z3fg07RaaHgAA4b9nkg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZJlS+z/oy5pPxJLyMXp1QH22d8twnoSTGHxxZdVALhQ=;
+ b=TY2nRLDWwl81eUTpJRSri5666orSWuKFj7V41w/IxDo8CRn0MloF4WcPCsMrTelBismm0us5dzulNM2fS7G4kv0SqUhIfLffd7drdZOUJ7w0seH38JspNmpk8BkdZTfKIDann2go15A3F/GWGySgQ0nUkcM4Ctao6A8jC8F6hZkStW5Ov33DRjmNyJyWwZkaV1W4br6cu9mz00bFrov2r9H76ia/T70RS46qjspa6XcQ8C+T3xbThNEX3SCnspKIDuXECqS9ww4BAcce7VNjZecrgbu82fPxvCBz0sxuUrzkUve7aEjOxLlSa9yOeoZ8KLQJZJxM0pQ+aDQ6Xflnhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZJlS+z/oy5pPxJLyMXp1QH22d8twnoSTGHxxZdVALhQ=;
+ b=FaQBo1BiV5I1s9kLQ7UAd+NNlJEbDKwLylCDMtGXUkW/yq4KBRA97BAcuj1BaE6Atvpl3Xr1GXmXM4H1N+PlSM1nPYskGFK6c2fTXyxbYX0ygCcc6VCOUwnksEycVzVXYnTU1fElLVG98oCpVNufm0jZ7eqiwnEOAYdRSWwULbsRtDdvACVF/G+wMWNdaJaB77ZahqAzbY0RRfKpSf2Jey8ZvL09Z2+iOUi4pRWPYs9OCVz/QB++O8Gg8o/2D4r8n3Daa9VahmwR39Y1Q80muy5KxyWED1iXaJCPf0ayftGwXHY9V9RP3hCtFPl9bWECuBM32l7P/zTForxYr4zZDw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from IA0PR12MB8716.namprd12.prod.outlook.com (2603:10b6:208:485::18)
+ by IA1PR12MB7759.namprd12.prod.outlook.com (2603:10b6:208:420::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Tue, 17 Mar
+ 2026 11:07:02 +0000
+Received: from IA0PR12MB8716.namprd12.prod.outlook.com
+ ([fe80::c18d:8eab:b36c:32da]) by IA0PR12MB8716.namprd12.prod.outlook.com
+ ([fe80::c18d:8eab:b36c:32da%3]) with mapi id 15.20.9723.014; Tue, 17 Mar 2026
+ 11:07:01 +0000
+Message-ID: <05c0db9b-c92f-4758-a356-e035a174b5dd@nvidia.com>
+Date: Tue, 17 Mar 2026 12:06:51 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5] mm: introduce a new page type for page pool in page
+ type
+To: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
+ akpm@linux-foundation.org, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>,
+ Toke Hoiland Jorgensen <toke@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+ harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
+ davem@davemloft.net, john.fastabend@gmail.com, sdf@fomichev.me,
+ saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+ andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+ david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+ vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com,
+ horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
+ ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org,
+ kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com,
+ baolin.wang@linux.alibaba.com, asml.silence@gmail.com, bpf@vger.kernel.org,
+ linux-rdma@vger.kernel.org, sfr@canb.auug.org.au, dw@davidwei.uk,
+ ap420073@gmail.com
+References: <20260316222901.GA59948@system.software.com>
+ <20260316223113.20097-1-byungchul@sk.com>
+ <ebd00055-d4aa-4612-8bf3-ef0a308512f8@kernel.org>
+Content-Language: en-US
+From: Dragos Tatulea <dtatulea@nvidia.com>
+In-Reply-To: <ebd00055-d4aa-4612-8bf3-ef0a308512f8@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0335.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:ea::15) To CH3PR12MB8728.namprd12.prod.outlook.com
+ (2603:10b6:610:171::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA0PR12MB8716:EE_|IA1PR12MB7759:EE_
+X-MS-Office365-Filtering-Correlation-Id: b506fb3e-c508-4cfd-3f2f-08de8415502e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	UQJeP8hPUrCrSMAfIc+2CaNS6GMMDStaHmlyOqY1hozRsAT+Zz0SpERi0KAvhrQfqpcPxc4nGyT2JQ9iyh2kj82lrSt9w0x0FxSz1+UEMYDynPmZylEoek+GK/OFNbzOpIoIyxEey60OqsxsPeEQRUgzWe49kST86P8LDqz6mRl+5d+5kJU7mXH8X6bpAmP307rAet+2QrUQsPTcAjG8SzwCXRf9Y0RHA3EOSl+lTwj6x+UU39IS6cqM+eJaUNjeMK8M/SlKieiJwG8rATVvOpzo0JCUNk/L+4bIy5JiazVIXEyM23giI2pIhExMAV5x3MZFkc1Uc/36OykVZZr7ZW3WaiZ5y5n8qpapWvLV044bboOiX8F57D/esRqXzlte3B++JtgIzVGhPqjQDm0qTEVjPZnlp5egK3yPVzW74siothy5ZSCXXYz9/LWoJcJEbipY4IFTGSPWpcDTOa/80qDfaSknuoRniRxN+NO7ENTHgNWpCfDJwKSegEOictQT3TsnJx2P8/mdrtKB4/rXewiqWeQQ5bb5jlIlXhnkWvmRsfW8WQkK7NUDO+Z5QwANa171m7nUVZMfBlh6TNU2vQj01zajKJ/FZx9M09HVtxzkucjlD1t8qJzLP8tQT/VYQnlqWR0wGcniIMDP/ws/Rz/6uJ5fum0RGfrZ8rPykJKBQpZ9agMg7wPRdRzMoxwxA72j0IPcxoNcx96Kg0/YThtVSuQ4wZDqtQi4gJWun6o=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR12MB8716.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?S2hka2dtcGJKM2FzNStucllCVyt2K3ZvS09iK2MyS0V1Z2VMYy9jcjRGbXBV?=
+ =?utf-8?B?NXY5dC9NMCtHWnR5UW5KeGQ1Rk8zYldWWGNKYzZxN1cwY211Mm1WTW5UaTJ1?=
+ =?utf-8?B?ZnZZR0RVeThvdVB2UWpha2E2ZEpzZVgwYjMyYlBlZTdWQmJ1TERFVkZjd3JB?=
+ =?utf-8?B?NVhJdTBWRjV2MmprVE5pdnFXb01uc0U2eXNPU3lrTGdJODh2c3c2R2pNN1hK?=
+ =?utf-8?B?Vi9VeldrU2xKMkhrWVNnVnE3K3kyS0N5bUJyNmJFOEVFcHpPZzNEb3FYQ3JJ?=
+ =?utf-8?B?RCtIY0R2RXdFeUVWZXpCSEQ5VXlrL2c2Z3NBVTR5RmNXcU5GVFU1RUJrUC9L?=
+ =?utf-8?B?ZHRPaGJ2VG5oeWhHa3h0d1dTSVRNYTJOZlRyTkc0bmI0MW9lNnVyc0JuZDNy?=
+ =?utf-8?B?MXZNaTVydUlUUkVaVVc4ajJUT3NjTitVcjBrc29HRTVTMXhIbUNMWWFKb3Qz?=
+ =?utf-8?B?d0xhVlpKY01kcUFCQmkxSFhEaVVycjVPS0tkaU9POCsrRlg1KzN1bHljYWNI?=
+ =?utf-8?B?dWZCWFNBUDloQS9NZm05WERjOUZrSFhtSXMxN0lqdldmLy9mTGhVYWN0M0tl?=
+ =?utf-8?B?M01tb0Z5eUhjMjRyTnZNYWVKdWVqbU5leHVYMjU2MFZyNjdDbnh3ekZNc1pz?=
+ =?utf-8?B?QnVQaHI5T1c4eWMwR3gwNmNLL1pOVGd3OTc5eUZ0RWpqdzB6empLNHpFcE5C?=
+ =?utf-8?B?dnRHODQ4NWk1OVdKKytZaTNYVERDcFdOUDFSK1Jvbm95aWpRRTk1amZzNEhx?=
+ =?utf-8?B?UFpjWkJTWko2UUNOU1N3ZlFYWG00cTNuRXlhbjV5dHBqUnpGVWhPOVB3U2lU?=
+ =?utf-8?B?S1NHTWpRN1QvY2lSaExXanpzbFU2aWJkOWxrVTJPczNTdXZRbm1xWWQvdUFQ?=
+ =?utf-8?B?OGhQK1Q4dWFScHdMMGJkMHI1U0VBeUZoOVJCanVMaUhvek0yeEg5b0RwdHF3?=
+ =?utf-8?B?OTkwQ3FFcGxFVG43cnJGdW1sZE0rU0JVTXkxQUx5MUljUFhCNEs0cHFEUEIr?=
+ =?utf-8?B?UVBiMkFzRWxvc1E5aHYwaWdPa0dhU3RRYTZmWVV0RklLcEdtcGJ4Q29SVU5G?=
+ =?utf-8?B?ZVJQOUxmTVpFcjQySjliSFRuNThabXlXMmttbEIxWlZMVWY4a0hGSFdxZXNq?=
+ =?utf-8?B?d3NwSW1lMnBxWXFHTVorc0hxTU1qSWowOFBSSTYxMTQvcFNNRFdYNWxlMnk5?=
+ =?utf-8?B?dStxcHBydW15UHhVaG1wTWc0Q2ZlN1VpRWZjS1orNVBBYWhUQlAzWDQvK1ZO?=
+ =?utf-8?B?Ri82QXpmdXlSM2NkeGxTMVdJTEVhaG5QOVN2Nng0UW5zSWR5R05DTmxJcHB1?=
+ =?utf-8?B?cEt5QnV6OThCRmhQZFo4TnpmM045a001ZFVxejc0d1orSkxWZkdkalVUYjBy?=
+ =?utf-8?B?YmZHbFdNRC9HN3RLR0Q5cytrZ2daalZiN1pkTzVpRjYxd2VQb1Zpak1qWUFn?=
+ =?utf-8?B?cHpvbHQzRmNZQlprTHowTW1weEliVTR4QXNWRG5vTWY2YWlnV29VNENUbFhV?=
+ =?utf-8?B?eUlpc2t0cU1GVzlwZ0VwRnpHLzZxVHJlc1hXVjVPbkVRU0N2ZkVVTVozWWlC?=
+ =?utf-8?B?UkpkNkExRlpBR2VnWGwyOFRhbmdYbjdFQzZ1RGN2RmdkVkc1K2F5VnhJdkxa?=
+ =?utf-8?B?N0JXTXVjbTg4Z3Avekw4SlRMOTIybVpDSWRYVG1YaWEzaFdkeHkvTUFpK1Fw?=
+ =?utf-8?B?WlNVWFNESjFPTHdBYkRpaGxCcFM3aUcxdUg2b21xbGkxamJmVVRsWFY4MlVC?=
+ =?utf-8?B?RVQ5UWlmVU1nbHlQQk9PVmJVQ3hxN2dnZk1zbTRHRWt5cXVENDkvUnZoaGNo?=
+ =?utf-8?B?MVVyRm10TUJzNENiN2Y1OWorU0s2YmJsRGZUM3podUR5T3o5bDRXTEpRZFhn?=
+ =?utf-8?B?VmJuRjRLU05TdGN3amFmYUlOaEdMdU0rRnpSTnQxZHdscExtbklSM0ZsVjcx?=
+ =?utf-8?B?N01pQWFGSVQzdmZCbXYrdkdmeXU5MXRtcmFTKzhZa0lLVzZRS2VFaXVWRXpn?=
+ =?utf-8?B?RXUwaVJtVkxpWEZFOExWQzE3czBJcXlGMGZzZGNidE10Y3JSanl5ejRocXZz?=
+ =?utf-8?B?WTNQQzcvNWR6MVFHbWx3dmNjOHk1UG5qVEJqbUMyS3hWd3VaWldVbE9rMmJI?=
+ =?utf-8?B?RlFMdEQ0cmhyaFJWQkxOQ1NmVkxneEZDRG5PcGMwSjN2Mm5Ta2xlZUdQNUpS?=
+ =?utf-8?B?dVNmM0szZ0ZqekhDUTJaWDYvd3lKTWorbktWT2VTRTMxZHFVZldWc214U2Fi?=
+ =?utf-8?B?VkRuWHNIbTRkcHdoamNDc094Ym93RWI2Z3FVWmwvbmppaTZhZGZjeWZObWpM?=
+ =?utf-8?B?bngyRXpDZkpheFpTY0Y1eTRnQzV6TkRsb3lEV2dycmVBSW1KNkRlZz09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b506fb3e-c508-4cfd-3f2f-08de8415502e
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2026 11:07:01.7670
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: y6v+3fczj7LZIGfo6SODTFueix45pQK13LydVG7c2+81stZOS5NpQdGk8wFN/h3lWHB3dmhHXbR60MzAuaRJpg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7759
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,gmail.com];
-	TAGGED_FROM(0.00)[bounces-268559-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[47];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-268560-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,skhynix.com,oracle.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.cz,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CD5CA2A877A
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,Nvidia.com:dkim]
+X-Rspamd-Queue-Id: C8BEA2A8764
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In network setup as below:
 
-             fastpath bypass
- .----------------------------------------.
-/                                          \
-|                        IP - forwarding    |
-|                       /                \  v
-|                      /                  wan ...
-|                     /
-|                     |
-|                     |
-|                   brlan.1
-|                     |
-|    +-------------------------------+
-|    |           vlan 1              |
-|    |                               |
-|    |     brlan (vlan-filtering)    |
-|    |               +---------------+
-|    |               |  DSA-SWITCH   |
-|    |    vlan 1     |               |
-|    |      to       |               |
-|    |   untagged    1     vlan 1    |
-|    +---------------+---------------+
-.         /                   \
- ----->wlan1                 lan0
-       .                       .
-       .                       ^
-       ^                     vlan 1 tagged packets
-     untagged packets
 
-br_vlan_fill_forward_path_mode() sets DEV_PATH_BR_VLAN_UNTAG_HW when
-filling in from brlan.1 towards wlan1. But it should be set to
-DEV_PATH_BR_VLAN_UNTAG in this case. Using BR_VLFLAG_ADDED_BY_SWITCHDEV
-is not correct. The dsa switchdev adds it as a foreign port.
+On 17.03.26 10:20, Jesper Dangaard Brouer wrote:
+> 
+> 
+> 
+> On 16/03/2026 23.31, Byungchul Park wrote:
+>> Currently, the condition 'page->pp_magic == PP_SIGNATURE' is used to
+>> determine if a page belongs to a page pool.  However, with the planned
+>> removal of @pp_magic, we should instead leverage the page_type in struct
+>> page, such as PGTY_netpp, for this purpose.
+>>
+>> Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(),
+>> and __ClearPageNetpp() instead, and remove the existing APIs accessing
+>> @pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
+>> netmem_clear_pp_magic().
+>>
+>> Plus, add @page_type to struct net_iov at the same offset as struct page
+>> so as to use the page_type APIs for struct net_iov as well.  While at it,
+>> reorder @type and @owner in struct net_iov to avoid a hole and
+>> increasing the struct size.
+>>
+>> This work was inspired by the following link:
+>>
+>>    https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com/
+>>
+>> While at it, move the sanity check for page pool to on the free path.
+>>
+> [...]
+> see below
+> 
+>> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+>> index 9f2fe46ff69a1..ee81f5c67c18f 100644
+>> --- a/mm/page_alloc.c
+>> +++ b/mm/page_alloc.c
+>> @@ -1044,7 +1044,6 @@ static inline bool page_expected_state(struct page *page,
+>>   #ifdef CONFIG_MEMCG
+>>               page->memcg_data |
+>>   #endif
+>> -            page_pool_page_is_pp(page) |
+>>               (page->flags.f & check_flags)))
+>>           return false;
+>>   @@ -1071,8 +1070,6 @@ static const char *page_bad_reason(struct page *page, unsigned long flags)
+>>       if (unlikely(page->memcg_data))
+>>           bad_reason = "page still charged to cgroup";
+>>   #endif
+>> -    if (unlikely(page_pool_page_is_pp(page)))
+>> -        bad_reason = "page_pool leak";
+>>       return bad_reason;
+>>   }
+>>   @@ -1381,9 +1378,17 @@ __always_inline bool __free_pages_prepare(struct page *page,
+>>           mod_mthp_stat(order, MTHP_STAT_NR_ANON, -1);
+>>           folio->mapping = NULL;
+>>       }
+>> -    if (unlikely(page_has_type(page)))
+>> +    if (unlikely(page_has_type(page))) {
+>> +        /* networking expects to clear its page type before releasing */
+>> +        if (is_check_pages_enabled()) {
+>> +            if (unlikely(PageNetpp(page))) {
+>> +                bad_page(page, "page_pool leak");
+>> +                return false;
+>> +            }
+>> +        }
+>>           /* Reset the page_type (which overlays _mapcount) */
+>>           page->page_type = UINT_MAX;
+>> +    }
+> 
+> I need some opinions here.  When CONFIG_DEBUG_VM is enabled we get help
+> finding (hard to find) page_pool leaks and mark the page as bad.
+> 
+> When CONFIG_DEBUG_VM is disabled we silently "allow" leaking.
+Some leaks could still be caught at the page_pool level through
+the YNL api of disconnected page_pools. Not the nasty/interesting
+ones though...
 
-The same problem for all foreignly added dsa vlans on the bridge.
+> Should we handle this more gracefully here? (release pp resources)
+> 
+Releasing of a leaked page_pool page could lead to many harder to track
+side-effects further down the line. Isn't it better to simply let the
+page in a leaked state?
 
-First add the vlan, trying only native devices.
-If this fails, we know this may be a vlan from a foreign device.
+Having a way to track this leaked state though would certainly be
+useful though.
 
-Use BR_VLFLAG_TAGGING_BY_SWITCHDEV to make sure DEV_PATH_BR_VLAN_UNTAG_HW
-is set only when there if no foreign device involved.
-
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-
----
-
-This patch has started in v2 of my original patch-set. It remains
-unchanged from v4, always moving along in a patch-set. The Acked-by
-from Nikolay Aleksandrov was added in v5.
-
-Changes in v12:
- - Moved to net-next.git
- - Split from [PATCH v11 nf-next] netfilter: fastpath fixes
-
-Changes in v10:
-- Moved to nf-next.git
-- Split from patch-set: bridge-fastpath and related improvements v9
-
-Changes in v9:
-- Moved from net-next.git to nf.git
-
-Changes in v4:
-- Added !CONFIG_NET_SWITCHDEV version of
-   br_switchdev_port_vlan_no_foreign_add().
-
- include/net/switchdev.h   |  1 +
- net/bridge/br_private.h   | 10 ++++++++++
- net/bridge/br_switchdev.c | 15 +++++++++++++++
- net/bridge/br_vlan.c      |  7 ++++++-
- net/switchdev/switchdev.c |  2 +-
- 5 files changed, 33 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/switchdev.h b/include/net/switchdev.h
-index 8346b0d29542..ee500706496b 100644
---- a/include/net/switchdev.h
-+++ b/include/net/switchdev.h
-@@ -15,6 +15,7 @@
- #define SWITCHDEV_F_NO_RECURSE		BIT(0)
- #define SWITCHDEV_F_SKIP_EOPNOTSUPP	BIT(1)
- #define SWITCHDEV_F_DEFER		BIT(2)
-+#define SWITCHDEV_F_NO_FOREIGN		BIT(3)
- 
- enum switchdev_attr_id {
- 	SWITCHDEV_ATTR_ID_UNDEFINED,
-diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index b9b2981c4841..5a6f7d8fca1f 100644
---- a/net/bridge/br_private.h
-+++ b/net/bridge/br_private.h
-@@ -182,6 +182,7 @@ enum {
- 	BR_VLFLAG_MCAST_ENABLED = BIT(2),
- 	BR_VLFLAG_GLOBAL_MCAST_ENABLED = BIT(3),
- 	BR_VLFLAG_NEIGH_SUPPRESS_ENABLED = BIT(4),
-+	BR_VLFLAG_TAGGING_BY_SWITCHDEV = BIT(5),
- };
- 
- /**
-@@ -2224,6 +2225,8 @@ void br_switchdev_mdb_notify(struct net_device *dev,
- 			     int type);
- int br_switchdev_port_vlan_add(struct net_device *dev, u16 vid, u16 flags,
- 			       bool changed, struct netlink_ext_ack *extack);
-+int br_switchdev_port_vlan_no_foreign_add(struct net_device *dev, u16 vid, u16 flags,
-+					  bool changed, struct netlink_ext_ack *extack);
- int br_switchdev_port_vlan_del(struct net_device *dev, u16 vid);
- void br_switchdev_init(struct net_bridge *br);
- 
-@@ -2307,6 +2310,13 @@ static inline int br_switchdev_port_vlan_add(struct net_device *dev, u16 vid,
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int br_switchdev_port_vlan_no_foreign_add(struct net_device *dev, u16 vid,
-+							u16 flags, bool changed,
-+							struct netlink_ext_ack *extack)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline int br_switchdev_port_vlan_del(struct net_device *dev, u16 vid)
- {
- 	return -EOPNOTSUPP;
-diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
-index fe3f7bbe86ee..556ed24700db 100644
---- a/net/bridge/br_switchdev.c
-+++ b/net/bridge/br_switchdev.c
-@@ -190,6 +190,21 @@ int br_switchdev_port_vlan_add(struct net_device *dev, u16 vid, u16 flags,
- 	return switchdev_port_obj_add(dev, &v.obj, extack);
- }
- 
-+int br_switchdev_port_vlan_no_foreign_add(struct net_device *dev, u16 vid, u16 flags,
-+					  bool changed, struct netlink_ext_ack *extack)
-+{
-+	struct switchdev_obj_port_vlan v = {
-+		.obj.orig_dev = dev,
-+		.obj.id = SWITCHDEV_OBJ_ID_PORT_VLAN,
-+		.obj.flags = SWITCHDEV_F_NO_FOREIGN,
-+		.flags = flags,
-+		.vid = vid,
-+		.changed = changed,
-+	};
-+
-+	return switchdev_port_obj_add(dev, &v.obj, extack);
-+}
-+
- int br_switchdev_port_vlan_del(struct net_device *dev, u16 vid)
- {
- 	struct switchdev_obj_port_vlan v = {
-diff --git a/net/bridge/br_vlan.c b/net/bridge/br_vlan.c
-index ce72b837ff8e..636c86fa1183 100644
---- a/net/bridge/br_vlan.c
-+++ b/net/bridge/br_vlan.c
-@@ -109,6 +109,11 @@ static int __vlan_vid_add(struct net_device *dev, struct net_bridge *br,
- 	/* Try switchdev op first. In case it is not supported, fallback to
- 	 * 8021q add.
- 	 */
-+	err = br_switchdev_port_vlan_no_foreign_add(dev, v->vid, flags, false, extack);
-+	if (err != -EOPNOTSUPP) {
-+		v->priv_flags |= BR_VLFLAG_ADDED_BY_SWITCHDEV | BR_VLFLAG_TAGGING_BY_SWITCHDEV;
-+		return err;
-+	}
- 	err = br_switchdev_port_vlan_add(dev, v->vid, flags, false, extack);
- 	if (err == -EOPNOTSUPP)
- 		return vlan_vid_add(dev, br->vlan_proto, v->vid);
-@@ -1491,7 +1496,7 @@ int br_vlan_fill_forward_path_mode(struct net_bridge *br,
- 
- 	if (path->bridge.vlan_mode == DEV_PATH_BR_VLAN_TAG)
- 		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_KEEP;
--	else if (v->priv_flags & BR_VLFLAG_ADDED_BY_SWITCHDEV)
-+	else if (v->priv_flags & BR_VLFLAG_TAGGING_BY_SWITCHDEV)
- 		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG_HW;
- 	else
- 		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG;
-diff --git a/net/switchdev/switchdev.c b/net/switchdev/switchdev.c
-index 4d5fbacef496..bf252d116ed3 100644
---- a/net/switchdev/switchdev.c
-+++ b/net/switchdev/switchdev.c
-@@ -760,7 +760,7 @@ static int __switchdev_handle_port_obj_add(struct net_device *dev,
- 	/* Event is neither on a bridge nor a LAG. Check whether it is on an
- 	 * interface that is in a bridge with us.
- 	 */
--	if (!foreign_dev_check_cb)
-+	if (!foreign_dev_check_cb || port_obj_info->obj->flags & SWITCHDEV_F_NO_FOREIGN)
- 		return err;
- 
- 	br = netdev_master_upper_dev_get(dev);
--- 
-2.53.0
-
+Thanks,
+Dragos
 
