@@ -1,136 +1,131 @@
-Return-Path: <netdev+bounces-268634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268635-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cIw2E4VpuWmZDwIAu9opvQ
-	(envelope-from <netdev+bounces-268634-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:47:33 +0100
+	id sAuRK9RnuWmZDwIAu9opvQ
+	(envelope-from <netdev+bounces-268635-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:40:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A3B62AC448
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:47:32 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF1652AC243
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:40:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5AFBA3138E7E
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:38:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EB99B3036D07
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:39:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51483E7168;
-	Tue, 17 Mar 2026 14:38:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B68083E8661;
+	Tue, 17 Mar 2026 14:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qcyX76dM"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CAqrgaus";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="84bu404I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815FF3E3C6A;
-	Tue, 17 Mar 2026 14:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CA03A9DB6
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 14:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773758320; cv=none; b=lbxdfZqjGWf1M4HcpEa1bx7w8DHCgvi0h/vQIybV2JTYl+Kjqs+yOLAXd1IYPEGicqpR1eSjD5O0RRJL8hBIzItb882VWhNS0vabyF1eL4xAG2Mx+F3pjzvkDLSIJ7FTaf74GannZOyVY1RhdjTIu28OQRKL7jd2P+Pfrn5++mM=
+	t=1773758335; cv=none; b=nt5k5RWlXRgpB+h+nqh4vpIJoLR86Uz0BVGNhuW2Yv+ECNqUyWjo9DFBxmV8QSSzeXKXoYi38JgJzVInF/aaR3xdAQvZAkAO14p9kYH4lVyLsG6ohrU+GWmVnc+h/GF/agd9AuYT9G27f/kZgvPJDA1kImtuqsOrkV7JtnflAZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773758320; c=relaxed/simple;
-	bh=PcAzoRBi0yShLCkc16qsSlrcC/1E0YR+hxCsyFSB/4o=;
+	s=arc-20240116; t=1773758335; c=relaxed/simple;
+	bh=mmphkqcG93FqderNmd/L1cinawqh36y76fm1wNIAD9o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iMhE5gjRr26mIHaKrcv3P/KXEwWrEYwkd9K2LqlE3cb/dcetLLmAAV1vZUBfn0UYcju51UJRRgUatU3T2wSJJnTKiAbA0477rcgWbGuFn0fq3DNBrE+BFbnPX1ucO3lCXEpO5M26QcMuVgXWUtLVjqZfA/OqCFeNBR9vl9ENdjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qcyX76dM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2D2DC4CEF7;
-	Tue, 17 Mar 2026 14:38:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773758320;
-	bh=PcAzoRBi0yShLCkc16qsSlrcC/1E0YR+hxCsyFSB/4o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qcyX76dMmj3/+2SWIEJra5NLxObLyvxsnKcZX8/hQJ50qQAXKDghHSmioaEmPf/mo
-	 WbOfTb7hSNxGLvjZR0bZhAMBYNHM2GqDO7NaSvnmMzZtRpWWsT8wcYVENH8uh4mwjP
-	 IYVfDpQnBflWcNYEnJo/OiNKhzgTzuwXSmPTMrYG1ioW3F/8G4pLDuipTNlnUb+1M7
-	 nzb7Q3xoFtRlhvumM7DVSr4FPH0fDaPpoXRQKR8hC4Y4Y0XNOyA92zvx0j2hpaMLTg
-	 NIIxA/KGW/sr4pOCVagifFK6Qz5uPfJwuqDuHtwdQm8YjL6rmkV9dFRiFwr6/aA6kW
-	 WgpBAfd/Y6FBA==
-Date: Tue, 17 Mar 2026 14:38:35 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: cedric.jehasse@luminex.be, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v8 1/2] net/sched: cls_flower: remove unions
- from fl_flow_key
-Message-ID: <20260317143835.GB1710951@horms.kernel.org>
-References: <20260311-net-next-mv88e6xxx-tcam-v8-0-32dd5ba30002@luminex.be>
- <20260311-net-next-mv88e6xxx-tcam-v8-1-32dd5ba30002@luminex.be>
- <20260313132651.GX461701@kernel.org>
- <20260314100002.122c8c73@kernel.org>
- <20260316083447.GD1369074@kernel.org>
- <20260316161917.76f1ea87@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=T9216W8msOafae79XNnKDGNKhNQeSl2up1Mqdck5pU+i9LvxMfbEbKZdj8sNmvtl0GkJBfTX+BaqaAZDlsA/eprU2UvgfDFylAbkveR/llkbIo/ChZhgjNGU2K68a5vXisvJNCglM5OVnmD8RJ9rZ89xXr06r4O9mHpaWNqi+HI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CAqrgaus; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=84bu404I; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 17 Mar 2026 15:38:50 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1773758332;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4dwiQtjV0URScOIyDH89kknET1vSDADAowJTLNm5SWs=;
+	b=CAqrgaus2MC0i0ZA73W1BgaQkEPeGXkI36AQ10M7pSsfgysl9ZTEuCxyefNd2bwX+cTtgH
+	reyD8HZoqjeRHtw2HeEZtk+C1T222jYnG1iwH+1olsve8OJUn4wuvgNhGL6G5v5YqCZbtZ
+	f4j4w4+gKi3I9mps/rnIEBk2XJbNRLQQ8ZGRq4uxY6z7yF6Kpeo9jYkYo7G8poM71IPhPM
+	fVhA0+hc9TUxZaIR64ZodGqKF7xWI6MTvwUvhfZgk/QBEAocv1SkZPYi5Fp+IVnCqizB+h
+	oH2IgzEfULR3Pu05W8kBCo6NP+fS/LVwuS32HHSJI5/+I4SslxYugAvcfEciuQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1773758332;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4dwiQtjV0URScOIyDH89kknET1vSDADAowJTLNm5SWs=;
+	b=84bu404IaCUK9e3YVljsj9RC5Ra9wg3tAMbQJPB3/MA7gyjRQM14VVZtJQH6QS/AJSLPzV
+	WddHZhtlwmYG9SBA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: "Tantilov, Emil S" <emil.s.tantilov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, aleksandr.loktionov@intel.com,
+	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, clrkwllms@kernel.org, rostedt@goodmis.org,
+	linux-rt-devel@lists.linux.dev, sgzhang@google.com,
+	boolli@google.com
+Subject: Re: [PATCH iwl-net 0/3] idpf: virtchnl locking and async fixes
+Message-ID: <20260317143850.BLrnAox8@linutronix.de>
+References: <20260316232819.6872-1-emil.s.tantilov@intel.com>
+ <20260317090054.DuPZ6O0O@linutronix.de>
+ <7247024b-fc8d-4a75-ba15-a10399db03bc@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260316161917.76f1ea87@kernel.org>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <7247024b-fc8d-4a75-ba15-a10399db03bc@intel.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[luminex.be,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,mojatatu.com,resnulli.us,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-268634-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-268635-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9A3B62AC448
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:dkim,linutronix.de:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,bootlin.com:url]
+X-Rspamd-Queue-Id: BF1652AC243
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 16, 2026 at 04:19:17PM -0700, Jakub Kicinski wrote:
-> On Mon, 16 Mar 2026 08:34:47 +0000 Simon Horman wrote:
-> > On Sat, Mar 14, 2026 at 10:00:02AM -0700, Jakub Kicinski wrote:
-> > > On Fri, 13 Mar 2026 13:26:51 +0000 Simon Horman wrote:  
-> > > > It seems to me that the use of a union is intentional here, as either IPv4
-> > > > or IPv6 addresses can be present in each case - never both.  And that
-> > > > control.addr_type and enc_control.addr_type are intended to allow
-> > > > differentiation of the address type in use for each of these unions.  
-> > > 
-> > > My reading was that the initial author simply wanted to save space in
-> > > the struct.
-> > > 
-> > > As the commit message explains this leads to complications in the logic
-> > > which sets the keys. The alternative is to complicate
-> > > FL_KEY_SET_IF_MASKED - doable, but given that the union feels like a
-> > > micro-optimization in the first place the simpler approach of separating
-> > > fields seems okay too? (TBH my mind also initially went down the
-> > > FL_KEY_SET_IF_MASKED rabbit hole but once I saw the simplicity of
-> > > Cedric's patch I changed my mind)  
-> > 
-> > Sure, now this has been put to me more than once I agree.
-> > 
-> > But if we go this way, then can we also simplify some of the existing logic?
-> > As a follow-up?
+On 2026-03-17 07:20:18 [-0700], Tantilov, Emil S wrote:
+> > Why is there a raw_spinlock_t? From a quick look a spinlock_t would do
+> > just fine with not runtime change for !PREEMPT_RT.
 > 
-> Which logic do you have in mind? Sorry if I'm being slow.
+> The handling of the virtchannel messages is done via the completion API
+> and the transactions are using the raw spinlock from struct
+> swait_queue_head:
+> 
+> https://elixir.bootlin.com/linux/v6.19.8/source/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c#L298
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue.git/tree/include/linux/swait.h?h=dev-queue#n44
 
-Sorry for being vague.
-Let me do my homework and come back if I have a concrete suggestion.
+I am aware that completions use a raw_spinlock_t. I don't see the link.
+What would break if you make that lock a spinlock_t?
+
+> Thanks,
+> Emil
+
+Sebastian
 
