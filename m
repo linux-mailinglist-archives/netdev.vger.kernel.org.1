@@ -1,66 +1,64 @@
-Return-Path: <netdev+bounces-268751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268752-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2OUWMIPNuWm6NwIAu9opvQ
-	(envelope-from <netdev+bounces-268751-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 22:54:11 +0100
+	id ACEDCcTQuWmMOAIAu9opvQ
+	(envelope-from <netdev+bounces-268752-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 23:08:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 675062B2E11
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 22:54:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82F0B2B2F0E
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 23:08:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5AD3C30489FB
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 21:54:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 305B1305092B
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 22:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 173143093CB;
-	Tue, 17 Mar 2026 21:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5331C35DA7A;
+	Tue, 17 Mar 2026 22:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gSKIvBKF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KtgAt3+M"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E368013B7A3;
-	Tue, 17 Mar 2026 21:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCD234D90E;
+	Tue, 17 Mar 2026 22:07:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773784449; cv=none; b=ha9WO+mFo77xz2YIBgc/k+m1n8kNLb5qlNfy0YtSI/hOOVxeb1683MtE5ijPE1Q7OriiIoI4l8HrKuk2wF5jiMZO45OUW12PBG4waZNhqrR3O+uAw9/Pe+YUeelhbky0WVzY9ktm1PjrDMkcjv6VwYhY9giNVOqzrNVo+/yaQa8=
+	t=1773785279; cv=none; b=lW9XDsqiX0cF/M9lvEgEiMCOMUm/3ujkL31VXfo6/FSgryaDFNwWmQJcaKB7Tazr2S3C0vRB7qHQOJE+sWDwn/1Z06AXSCtS9OKmOqXAtbAPOod/VM4pQjfpLm53tdFJxNyUGKCV6Z77kXLoM1Rwtic9oXe4+LsUXRVDdOmE4Iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773784449; c=relaxed/simple;
-	bh=+aR42J36uhJrB5PKeHnzhQaVlsl8gxIqMtR/iL7GlXI=;
+	s=arc-20240116; t=1773785279; c=relaxed/simple;
+	bh=YMWl9JylU67g9q2CU2HLFbVGLCVT1Yku1DRbMSM05EU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PzGd8/hsgxMcvFHkTbmty+qAuskBq97qbIirAb07+/sSzZ+uvPW+QfrREKhNxeOi9Y6wizY/KzrssucSqY1RAgfRsv3IEKvqQXVqQQAemtntSv40V1DpqNawX7hO/ioPFL0pkzErHUtFYJGYo/enHfd6pvNfo/m6fWwehSsqvic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gSKIvBKF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B425C4CEF7;
-	Tue, 17 Mar 2026 21:54:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=nfuTmI/B9BkwEXP065pXmNLogxH8zl1QmauQHkrMFpqsq94HxeRnO84cQheD0mLQ2rTtdaOhQc5W6+gSD3o1PFydjBsO+ObD7Q0ua52vOlmGLI6635zqzVCTi+9bMAi+n5RjN32QN+rBVz2WDCZkBbx2I8Tr5BBRE6FIjzwuB1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KtgAt3+M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38377C4CEF7;
+	Tue, 17 Mar 2026 22:07:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773784448;
-	bh=+aR42J36uhJrB5PKeHnzhQaVlsl8gxIqMtR/iL7GlXI=;
+	s=k20201202; t=1773785278;
+	bh=YMWl9JylU67g9q2CU2HLFbVGLCVT1Yku1DRbMSM05EU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gSKIvBKFJ8ehsTp88qZHnKolnfCNU9n3x9KsZcKh4wT046FpIleebUppRaHs6VUoT
-	 u2QIBqHu0J8vtexULb+Da2A2EJg1hGZFGG4MyxIBLZoRDRCPCVpq+EQWyAbejArywu
-	 OmXH/zQCDhJ5T4rwso3+1V9HF07wzh5h/E7LXISxd3zmffxKpiONfKQJzfn53a28wg
-	 EC3jvpSMz7xaU4QzaRKz8wYEdOsHgNfJrgGQmr3T9YGQs0c3PAzU7ypE1ARvLeAa7p
-	 zS195rRa4vv5D8jJ3FlcJX9yMHHcSeQ1t0WEFW+9O4BqYwpvlq5pjQwJ/kGOjAOZ5E
-	 pyuHP5dUBNi8A==
-Date: Tue, 17 Mar 2026 14:54:07 -0700
+	b=KtgAt3+Mj9CRMFLFmw4JBiJ3qfkmbBJdywyO73Y8kOpXFMyfEci2kViyTXxfEmkRQ
+	 5j/bMhioOEhl6PeJmKOTfF6iF+xE3lSJI4acRFNpNS7j+8ohrwVcRhGVxqja+Z3DVc
+	 cwrW3f59LSHPv97wWUL7RQkP0PPtXQJw3Snjr+9/FovzpDO+U7T4gyRTF6yyqYD3t7
+	 VLwZF2fBTaYDH/po0qomoDumzGxLxjzq5uZzbFa5MRKhKxxUQelb7FblJnkadUWVOI
+	 eMt00Dndxw6fHC6caYAJskDKXRdYF1WINbWRaFxNlLQoPlXU8+Bjpkp6GSg1sCw64O
+	 R/IArxW9O9EmQ==
+Date: Tue, 17 Mar 2026 15:07:57 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Allison Henderson <allison.henderson@oracle.com>
-Cc: "achender@kernel.org" <achender@kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
- "shuah@kernel.org" <shuah@kernel.org>, "rds-devel@oss.oracle.com"
- <rds-devel@oss.oracle.com>, "horms@kernel.org" <horms@kernel.org>,
- "edumazet@google.com" <edumazet@google.com>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH net-next v1] selftest: rds: add
- tools/testing/selftests/net/rds/config
-Message-ID: <20260317145407.244ee071@kernel.org>
-In-Reply-To: <d33e764e33b5a4c6464a692371afc41d4a01c15d.camel@oracle.com>
-References: <20260316235848.2395654-1-achender@kernel.org>
-	<728fc0aa-4c07-4092-91bb-6b9f76c2f3eb@redhat.com>
-	<d33e764e33b5a4c6464a692371afc41d4a01c15d.camel@oracle.com>
+To: Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: Justin Iurman <justin.iurman@6wind.com>, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, justin.iurman@gmail.com, nicolas.dichtel@6wind.com,
+ stefano.salsano@uniroma2.it, paolo.lungaroni@uniroma2.it,
+ ahabdels@cisco.com, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] selftests: add check for seg6 tunsrc
+Message-ID: <20260317150757.3419e6b9@kernel.org>
+In-Reply-To: <20260317115430.cfd3846b20c1e2314d468b5d@uniroma2.it>
+References: <20260316162955.1253225-1-justin.iurman@6wind.com>
+	<20260316162955.1253225-3-justin.iurman@6wind.com>
+	<20260317115430.cfd3846b20c1e2314d468b5d@uniroma2.it>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,83 +67,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268751-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268752-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[6wind.com,vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,uniroma2.it,cisco.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 675062B2E11
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 82F0B2B2F0E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 17 Mar 2026 18:26:10 +0000 Allison Henderson wrote:
-> On Tue, 2026-03-17 at 15:41 +0100, Paolo Abeni wrote:
-> > On 3/17/26 12:58 AM, Allison Henderson wrote:  
-> > > diff --git a/tools/testing/selftests/net/rds/config.sh b/tools/testing/selftests/net/rds/config.sh
-> > > index 791c8dbe1095..7cf56ee8882f 100755
-> > > --- a/tools/testing/selftests/net/rds/config.sh
-> > > +++ b/tools/testing/selftests/net/rds/config.sh
-> > > @@ -24,7 +24,7 @@ while getopts "g" opt; do
-> > >    esac
-> > >  done
-> > >  
-> > > -CONF_FILE="tools/testing/selftests/net/config"
-> > > +CONF_FILE="tools/testing/selftests/net/rds/config"
-> > >  
-> > >  # no modules
-> > >  scripts/config --file "$CONF_FILE" --disable CONFIG_MODULES  
-> > 
-> > This looks wrong?!? The script is going to update the config file which
-> > is under git control. You probably want to copy the default config in a
-> > tmp file file, edit the latter and add it to .gitignore and EXTRA_CLEAN.
-> > 
-> > The issue looks pre-existent, but since you are touching this part...
-
-Well spotted.
-
-> Sure, so config.sh isnt actually called by anything within the self
-> tests or testing harness.  It more intended to be a stand alone tool
-> for when developers want to enable/disable gcov.  If you like we can
-> adjust the target to a rds/config.local and copy rds/config there.  
+On Tue, 17 Mar 2026 11:54:30 +0100 Andrea Mayer wrote:
+> > @@ -819,6 +853,7 @@ test_command_or_ksft_skip ip
+> >  test_command_or_ksft_skip ping
+> >  test_command_or_ksft_skip sysctl
+> >  test_command_or_ksft_skip grep
+> > +test_command_or_ksft_skip ip6tables
 > 
-> CONF_FILE="tools/testing/selftests/net/rds/config.local"  
-> cp tools/testing/selftests/net/rds/config "$CONF_FILE"
+> This will skip the entire script if ip6tables is not present, which
+> takes down the baseline tests too.
+> I think a probe at startup that checks for both tunsrc support and
+> ip6tables would work well here. If either is missing, we can
+> just gracefully skip the new tunsrc tests and let the rest of the script
+> run as usual.
 > 
-> Alternately we could simply have the script default to config.local,
-> and add a parameter that allows the caller to specify the config
-> path.  Let me know what you prefer.
-> 
-> I may split off the config.sh changes into a separate patch so that
-> Jakub can start using the config though.
+> The bottom line is that the script needs to keep working exactly as
+> before when tunsrc is not supported or its dependencies are missing.
 
-How do you actually use it? Presumably we should be modifying the config
-used for build directly not a snippet.
-
-By default scripts/config will already use .config in current directory
-which should be what people would want 99% of the time?
-We can add --file to the script to select the config user wants to
-change but keep the default of not specifying the file hence .config?
+FWIW that's not the general guidance for networking tests.
+If it's easy to handle cleanly then sure, but we should try to avoid
+complicating tests with workarounds for degraded environments.
 
