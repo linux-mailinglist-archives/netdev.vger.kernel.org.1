@@ -1,180 +1,137 @@
-Return-Path: <netdev+bounces-268527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268528-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GBZDAmImuWm1sQEAu9opvQ
-	(envelope-from <netdev+bounces-268527-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:01:06 +0100
+	id 0K68HhUouWkAtAEAu9opvQ
+	(envelope-from <netdev+bounces-268528-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:08:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA2742A76A7
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:00:55 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BADF02A78E2
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:08:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6FC063037D54
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:57:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 88E2B303F89E
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:02:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA8D3A4507;
-	Tue, 17 Mar 2026 09:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D48E39FCD1;
+	Tue, 17 Mar 2026 10:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c1KBpy8h";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="UTpBMRpM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iLK1kV0b"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71103A3E97
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 09:57:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442E835838B;
+	Tue, 17 Mar 2026 10:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773741467; cv=none; b=fnhJpz/TZ9JaMAW//D7wil8Sunclet0lMJM6lW7W0jI5cHmYIQ5fa380z4433F1aOSIqhmJH7UKlvCoLksnhZ8eiS3Nv0ZRZ/OfRnT9Zfb6CYa83zMpT33iqF6wsXgjuavfxBHW7j7oR7sjTOAwJ0XKzrupb4dw27w4+hWasdhI=
+	t=1773741762; cv=none; b=jCzAFskxAKNxosihU3I3/FgNDWb1M4Egjm1mz5r2XvByxTtafbKNawEQREpItUX91tg1x5ZyC2y0obSVRaO+PyCLDKTaAN1lc7hPwvhwBkQgf3RZ5nz4dM2c36wwF91Iqb+FH8ZSWXIa1dlu296BCHNpGHToHMQgU0WNogf9M+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773741467; c=relaxed/simple;
-	bh=mKVRVOSt/fsx4ilTPwxMzDSFGIg2+3/bIQ+LVhC/BS8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rKvN7bWVQZDLvGE4QgnbquA6dZ+yJJ/KfnKKibki3sRicvDMwDd1FuhijynznZ+kK/k0Rbm8JZ2gXN0F++EpG/b6gi5Q5m/yHqj5w94okhIrTzLUYdhuHPaLbootBVAGrKpvaYqI1QnNXa/QVNlv6KuA0nww0SwvG7CSaMBTr40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c1KBpy8h; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=UTpBMRpM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773741463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FVn25Xo84DjYnUkEutgl608g8cHLDvs9Iup/54uYbZk=;
-	b=c1KBpy8hiXCxTSwZzQa4hh/3EE3idRi3FeLzOMBejLnjAY+NW9h4FFI6waGebx6YNXcff4
-	VN2bNBFl1t+rnJIFMxdw27oxXqd83AY12db4PztXHBmv2fRhrGxfr5wZzLf3DaZOE53CNw
-	VQgHjgr9jAjyeO7K/8VeqsyWLsim+rE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-61-zK1WYmyYOYCgjSIRpVpXZg-1; Tue, 17 Mar 2026 05:57:42 -0400
-X-MC-Unique: zK1WYmyYOYCgjSIRpVpXZg-1
-X-Mimecast-MFC-AGG-ID: zK1WYmyYOYCgjSIRpVpXZg_1773741461
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-43b40c22eaeso1449261f8f.2
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 02:57:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773741461; x=1774346261; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FVn25Xo84DjYnUkEutgl608g8cHLDvs9Iup/54uYbZk=;
-        b=UTpBMRpM4dBaOfKIjN8h9Ycd4Rd0V5pnqJvgX1SGb5Hgg/9LwrZDbxDUrhdKOM6Et1
-         66JMZW8CSZ7OutsqoLVLW3NelfHDYrufO5zo9Q5VJLuQ7XXQyQP70VCqbbg4DHqfEIJq
-         812rBY6Uieaq1gOC/rPFU7gmDzR2NErVs3aJpyQDI5XTffPfySHqBKwwl3dzZavJXxVq
-         Ls5mk2pzWsiqtDXMT8wOyUr9GanrymfVLHocKXMvN5JG5ZyzZGg+jjJKyej05jLZcvQu
-         lE+tyvwdlw2CVULa1XiE8wB1YksPN6xJ2sdtUcEL3dsEVe4zQ/IeMOZx4KSalg9w/zSX
-         he6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773741461; x=1774346261;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FVn25Xo84DjYnUkEutgl608g8cHLDvs9Iup/54uYbZk=;
-        b=rGSAOGOnJmW2iiflTn6/XV35QuGX5UDZp7JSX3JdJV196ioEmBY2q9yZ9/Lz1hUEzm
-         bcv+ZwBV3BXixHNDMnTY1Xlx+k2vsEDYK2vmSudSEIczO+j2aCWbNFniz8NkvGKE2r8p
-         1tB9Hk9+b4ehywdz5wkcZZl1v64w6O21xKH8mMAcuTOZLkOIjj+HXQ/cdKFG/8V/e1wV
-         shLOJmU4yYvE/TbmWtvvZejxNyl4rMcgQ1Yfn4TBUWme1/v0E+vHeNvkOfH1vwTIPlDd
-         J/T5vf69LJEdi8y0fdhhwO9wzTBcHSddGWFbfHCRLVM9PRs5f+5nM66ApsQf8x+2o3tY
-         n6eQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUpHNePx/jR/w2DH/RKcEi679Dk3ORBqYj33A/lQwlnJN6E22fOV0ufpGescjcQ6OHUBCgq88U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6CxT9KHSH2TxrerjANLgrxMfr0u1Ni5Cacvdhp4TT+g1WE+Q2
-	umbwMBE3KJ+MXs9SMsDG5J1Al7oJkHJ4o0NvXM5tkk8MfoVpXRoII/9HU7mOjAmdIn7BCAN9wVN
-	AHjMxVyCnAQuxAs/gHihD2MqW/fZuS59EG2TAk8K5Sw4+/I45jESjTfrf1g==
-X-Gm-Gg: ATEYQzzLcIAx1jdpAxZ8nE0scbqYhRH6yvav7BBcIKXu28bauquZABsPVE8678X+mNl
-	1JHYz32/AtMMZan7EL1W8VhnXmWbpoE8ryQU4W0sv9ALBomT1OYX4Sh1crmDJgs3WXr1AU7y/Yk
-	yEjGvkY8CylKa3uIAS0xi6+XKnDDqG8bmm++luw8bFgHLC6jVSsfnx51K3Q5rHUTzUF8qD1cVHP
-	e2dvMJKY4RKM4Sy025d5txwWJDW3tXsKhansGYew+Owo+U/zWQisj5z9KT6SUwptdVEzZM0vrmI
-	zWwIXjA9Efn3C3K7xBBqpQdRrfiXYQx2Cy9RnhtEOdmz+CP/yMyxzT7elH5W9wnSgGztHEl3pIF
-	YuaEKqORMjfAVvLDKFkXYqN4QSIyaT95ZxDtxvLm5j1ivQAbCoaWEtu4=
-X-Received: by 2002:a05:6000:2288:b0:439:b79d:b9a5 with SMTP id ffacd0b85a97d-43a04dae73dmr29950119f8f.37.1773741461025;
-        Tue, 17 Mar 2026 02:57:41 -0700 (PDT)
-X-Received: by 2002:a05:6000:2288:b0:439:b79d:b9a5 with SMTP id ffacd0b85a97d-43a04dae73dmr29950070f8f.37.1773741460554;
-        Tue, 17 Mar 2026 02:57:40 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.11.95])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe1affe9sm51534817f8f.15.2026.03.17.02.57.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Mar 2026 02:57:40 -0700 (PDT)
-Message-ID: <7b082017-5245-434c-9668-49b630af6484@redhat.com>
-Date: Tue, 17 Mar 2026 10:57:38 +0100
+	s=arc-20240116; t=1773741762; c=relaxed/simple;
+	bh=zOhE3MyoOIAA0bgcSSk1uYsIQSRxBFkKa/QEeH/yO6Y=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
+	 References:In-Reply-To; b=YiJ4YCIVG2AZ7kT+KrGi37ikAEv67pMEp6W7gfirU3nxzrrAZJtLF+dplIuaEl/MJ62HVkbaFxZlrJI2Lf0xhyYDcCLPAa0TzxyUdz+4hlBpNkSIoEbvV65GC2lSSLw3qNj1tfCBoBJu5K1RStwN0clVIULujcOL/bK4p3S+nWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iLK1kV0b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA0BCC4CEF7;
+	Tue, 17 Mar 2026 10:02:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773741761;
+	bh=zOhE3MyoOIAA0bgcSSk1uYsIQSRxBFkKa/QEeH/yO6Y=;
+	h=Date:Cc:To:From:Subject:References:In-Reply-To:From;
+	b=iLK1kV0bEUnBKSlVECk17rCfbiRFOK8e9m2VQ9Eam8FJnejzsncMSvQLAFJIvb1Pr
+	 Vrqp1T/Wu3PeHwdqqCKwH5HHxvI/GlAmEOIi3tfcPHkHrB8vT93is7PF8gwaUAqxb5
+	 JzSXmNuoes9ApijJJRYovbhvzhwBUi9fykKAQygrEKxHzTjISn8Gl4qVh9MTfnmzrh
+	 TNuhmnwPHHmX99KzVtklCPpGYF2T12iw9QXIf1B/lIEfIYXfpjXuCSQXEHjD38avMb
+	 Glyz74CIMcdU9eEVsElTX638WBp72ugjDLW4ZSO4Lo+vmLbkcaTgsemgoqv6sedF7Q
+	 8HzUvbG0bQqeA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] ppp: remove pch->chan NULL checks from tx
- path
-To: Qingfang Deng <dqfext@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-ppp@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Paul Mackerras <paulus@ozlabs.org>
-References: <20260312093732.277254-1-dqfext@gmail.com>
- <20260312093732.277254-2-dqfext@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260312093732.277254-2-dqfext@gmail.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Date: Tue, 17 Mar 2026 11:02:34 +0100
+Message-Id: <DH4YZ4XEWDVH.25QOLQ4QJ4PXD@kernel.org>
+Cc: "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>, "Douglas
+ Anderson" <dianders@chromium.org>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ <stable@vger.kernel.org>, "Andrew Lunn" <andrew@lunn.ch>, "Daniel Scally"
+ <djrscally@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Fabio Estevam" <festevam@gmail.com>,
+ "Frank Li" <Frank.Li@nxp.com>, "Heikki Krogerus"
+ <heikki.krogerus@linux.intel.com>, "Heiner Kallweit"
+ <hkallweit1@gmail.com>, "Jakub Kicinski" <kuba@kernel.org>, "Len Brown"
+ <lenb@kernel.org>, "Mark Brown" <broonie@kernel.org>, "Paolo Abeni"
+ <pabeni@redhat.com>, "Pengutronix Kernel Team" <kernel@pengutronix.de>,
+ "Rob Herring" <robh@kernel.org>, "Russell King" <linux@armlinux.org.uk>,
+ "Sakari Ailus" <sakari.ailus@linux.intel.com>, "Saravana Kannan"
+ <saravanak@kernel.org>, "Sascha Hauer" <s.hauer@pengutronix.de>,
+ <devicetree@vger.kernel.org>, <driver-core@lists.linux.dev>,
+ <imx@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+ <netdev@vger.kernel.org>
+To: "Wolfram Sang" <wsa+renesas@sang-engineering.com>
+From: "Danilo Krummrich" <dakr@kernel.org>
+Subject: Re: [PATCH] device property: Make modifications of fwnode "flags"
+ thread safe
+References: <20260316154159.1.I0a4d03104ecd5103df3d76f66c8d21b1d15a2e38@changeid> <abkCPU3rxHI49N4_@shikoro> <abkD-VLprcbbEbB1@ashevche-desk.local> <abkF0GO01sMcOhvb@shikoro> <abkLEgrZbdb03VWg@ashevche-desk.local> <abkLY4AAQuFlTRC7@ashevche-desk.local> <abkT_jpjIki6pvX1@shikoro>
+In-Reply-To: <abkT_jpjIki6pvX1@shikoro>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268527-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268528-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.b.d.0.0.1.0.0.e.a.0.c.3.0.0.6.2.asn6.rspamd.com:query timed out];
+	FREEMAIL_CC(0.00)[linux.intel.com,chromium.org,linuxfoundation.org,kernel.org,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,nxp.com,redhat.com,pengutronix.de,armlinux.org.uk,lists.linux.dev,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[33];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	RSPAMD_EMAILBL_FAIL(0.00)[dqfext.gmail.com:query timed out];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dakr@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AA2742A76A7
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BADF02A78E2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/12/26 10:37 AM, Qingfang Deng wrote:
-> Now that ppp_disconnect_channel() is called before pch->chan is set to
-> NULL, a channel from ppp->channels list on the transmit path is
-> guaranteed to have non-NULL pch->chan.
-> 
-> Remove the pch->chan NULL checks from ppp_push(), ppp_mp_explode(), and
-> ppp_fill_forward_path(), where a channel is obtained from the list.
-> Remove the corresponding WRITE/READ_ONCE annotations as they no longer
-> race.
-> 
-> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+On Tue Mar 17, 2026 at 9:42 AM CET, Wolfram Sang wrote:
+>
+>> > What's the alignment for the u8 member in your SoC? 4 bytes or 8 bytes=
+?
+>> > (I assume it's 64-bit SoC.)
+>>=20
+>> FWIW, with the given change it will be still inside 64-byte data structu=
+re
+>> which most likely occupies a single cache line (before this patch and af=
+ter
+>> as well).
+>
+> I consider this directon of the discussion irrelevant. If the number is
+> (maybe? That's to be discussed!) needlessly bigger than 0, then it
+> doesn't matter how big the number is.
+>
+> Why don't you like the idea of taking the lock?
 
-Looks sane to me.
-
-It looks like you are investing a significant amount of effort to
-improve the ppp driver. I strongly suggest you to create some functional
-self-tests before any other changes in this area.
-
-The code is pretty intricate and obscure, a reasonable code coverage
-could add significant confidence in non trivial changes, and could
-possibly help revisiting/cleaning-up the locking schema (which is AFAICS
-the most significant pain-point).
-
-/P
-
+Which lock are we talking about, the device lock? If so, please not use it =
+to
+protect arbitrary other structures.
 
