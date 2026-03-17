@@ -1,171 +1,144 @@
-Return-Path: <netdev+bounces-268659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268660-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2BYlFNt0uWm8EgIAu9opvQ
-	(envelope-from <netdev+bounces-268659-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:35:55 +0100
+	id IK54E+J0uWm8EgIAu9opvQ
+	(envelope-from <netdev+bounces-268660-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:36:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A75872AD1FF
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:35:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C437E2AD206
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 16:36:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1755E30C8A18
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:32:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A003830CF780
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:32:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80772D73BE;
-	Tue, 17 Mar 2026 15:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071AA3E3C7F;
+	Tue, 17 Mar 2026 15:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XbKSfdcL"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VfaB9n5K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43261A8F84
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 15:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD862D3A7B;
+	Tue, 17 Mar 2026 15:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773761546; cv=none; b=dAuqnEVYrHI2jjzWlqTfXDVb+6iSZeVPxxA9jRKcspJfRN2i6vQFQbc0xZ2nne9zYby6a+kK+6cdUapzOsZCW0qMM3M0Jldrhb9S8lMU99pXKUP3hnmjKCLEuQW0YgBMal+yfU5QGp9xC0ctNpN9PWhG/l5J92I971Oav7MqvTk=
+	t=1773761549; cv=none; b=huNLHUbI4NqL8Yd0w3zXxsWkrWiohKv7OmSdweCPBkLFcySFOvCcCxGT5pO9t9pUzl66XX0JOfKWVaORZQ2XSQGPASJZvTXwkK3pJ4558XwXTR5sMtq0/2WYCfIDdjRODrz1GEtQa+12XINmfcSxlmF09vV9xaDDVqSHdS+9bjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773761546; c=relaxed/simple;
-	bh=Q5lrsh5HjZNL/TFE1ebWiJnYZcKV+HazAKdcTxR1viU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mBYHe7qrlRKaQdvB0f6HZNcYjiY7vPMz3IpLSAbpF+7s7De5tor2dnFOIsFgMrDg1Eylig0tAWtL3xvlB2J1CjCSYOqZrOQ1OXnbsK36GYD1cEyeU9rdBSiamnJgNqJwo3Mp5ahR3hHMYDUtaGFwAwqGIISKZXk5v4/p8Xm6Odg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XbKSfdcL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEB58C19424;
-	Tue, 17 Mar 2026 15:32:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773761546;
-	bh=Q5lrsh5HjZNL/TFE1ebWiJnYZcKV+HazAKdcTxR1viU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XbKSfdcL4lxHKKOq2TCRHIJUrm4AlSGbq2TX7Yn3N3rMcLOckF92oOlqw9bKHkjLS
-	 3ijDa7UHroP07/wqeLS9VSdS2dUcSbOUzIFpR1coNdHnU1qO3fAaBnIrUyc9ZUvhqr
-	 BTm7YWXX7SjpU+6xY882tPA5h6KYNpq38sMb5QJta43OZY8aKZSOnHuU8ampMmf0VT
-	 Ia/3LL1GTFpCyBk9zWEjcX2wtd5MG5fjMNlso35ggiT94mIonZvTs2Xvzv4++j/w4S
-	 pxk80+epN7QdxGwGQ0Q9sCqndYYA0bGBMvvHVBzJk4zKZQ+MNEpnc+oa1678hSMxVA
-	 8VRP2MCISoh7A==
-Date: Tue, 17 Mar 2026 15:32:22 +0000
-From: Simon Horman <horms@kernel.org>
-To: Tom Herbert <tom@herbertland.com>
-Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
-	justin.iurman@uliege.be, willemdebruijn.kernel@gmail.com,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next v9 10/10] test: Add networking selftest for eh
- limits
-Message-ID: <20260317153222.GD1710951@horms.kernel.org>
-References: <20260314175124.47010-1-tom@herbertland.com>
- <20260314175124.47010-11-tom@herbertland.com>
+	s=arc-20240116; t=1773761549; c=relaxed/simple;
+	bh=dB5xlhv0AK8726vApRjjf7WxxwLj9XH/7EBSZ5F8wFU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
+	 References:In-Reply-To; b=FDIUn0q5RoEyoNdgJWuWjfJmluwwTdorcSL1ezJJSnqwJjRNfrokd5gb4FSvHOdziIq2P+llO8QYs9cH1RoWw4fmNsFjRRFyNtrsWyxz0Zn8KEseSKEj/Hcocx3nNHuhoTnbId/Y/Mi9e9JVnsNlC6HBgnBYC0sdi9ArA10dwF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VfaB9n5K; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 63BDC4E42659;
+	Tue, 17 Mar 2026 15:32:27 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2E2715FC9A;
+	Tue, 17 Mar 2026 15:32:27 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 255331045061A;
+	Tue, 17 Mar 2026 16:32:23 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773761546; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=9/oN1sDc0ufWvDNWTMdGmLevclcivf0GDYvT6kTHMY8=;
+	b=VfaB9n5KmeBybFfomLE3xUwaa/H1/AiyGm3thS8N8hpeZrhW647TsPwykSpVQFprdq49LL
+	W/nT5TaiFOfJ9xwYU9/MfYYKD7DfET62UD5PeCNAfNQ7vRaOHzD9Y5/+D8bVEU4CCWfb+U
+	18wfggiV2AqLZIq09jmMOGLyoci/ZB22mhQau4yNV9YQ86iL9XPFw7dh4eEuLeDBNW7+pq
+	3deJm7lXnnKDAVtzwOs+wLCw/YHsVEjt3iUBZsO1vBF0Zts5HClTwdzf9jifbeZ96S3YHU
+	SsKeSEZ7djDTzirJcKoiTRKq9RgsOLGMdl2m6JezMwTrW0qX9Ax7CEx+ZSx8aA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260314175124.47010-11-tom@herbertland.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 17 Mar 2026 16:32:23 +0100
+Message-Id: <DH55ZO0TJKBD.1K8FXCOY1PRWG@bootlin.com>
+Cc: "Simon Horman" <horms@kernel.org>, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, <devicetree@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+To: "Charles Perry" <charles.perry@microchip.com>, <netdev@vger.kernel.org>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH net-next v3 3/3] net: macb: add support for Microchip
+ pic64hpsc ethernet endpoint
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260313140610.3681752-1-charles.perry@microchip.com>
+ <20260313140610.3681752-4-charles.perry@microchip.com>
+In-Reply-To: <20260313140610.3681752-4-charles.perry@microchip.com>
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,vger.kernel.org,uliege.be,gmail.com,redhat.com];
-	TAGGED_FROM(0.00)[bounces-268659-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268660-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[herbertland.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid,eh_limits.py:url]
-X-Rspamd-Queue-Id: A75872AD1FF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,bootlin.com:email,bootlin.com:url,microchip.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C437E2AD206
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 14, 2026 at 10:51:24AM -0700, Tom Herbert wrote:
-> Add a networking selftest for Extension Header limits. The
-> limits to test are in systcls:
-> 
-> 	net.ipv6.enforce_ext_hdr_order
-> 	net.ipv6.max_dst_opts_number
-> 	net.ipv6.max_hbh_opts_number
-> 	net.ipv6.max_hbh_length
-> 	net.ipv6.max_dst_opts_length
-> 
-> The basic idea of the test is to fabricate ICMPv6 Echo Request
-> packets with various combinations of Extension Headers. The packets
-> are sent to a host in another namespace. If a an ICMPv6 Echo Reply
-> is received then the packet wasn't dropped due to a limit being
-> exceeded, and if it was dropped then we assume that a limit was
-> exceeded. For each test packet we derive an expectation as to
-> whether the packet will be dropped or not. Test success depends
-> on whether our expectation is matched. i.e. if we expect a reply
-> then the test succeeds if we see a reply, and if we don't expect a
-> reply then the test succeeds if we don't see a reply.
-> 
-> The test is divided into a frontend bash script (eh_limits.sh) and a
-> backend Python script (eh_limits.py).
-> 
-> The frontend sets up two network namespaces with IPv6 addresses
-> configured on veth's. We then invoke the backend to send the
-> test packets. This first pass is done with default sysctl settings.
-> On a second pass we change the various sysctl settings and run
-> again.
-> 
-> The backend runs through the various test cases described in the
-> Make_Test_Packets function. This function calls Make_Packet for
-> a test case where arguments provide the Extension Header chain to
-> be tested. The Run_Test function loops through the various packets
-> and tests if a reply is received versus the expectation. If a test
-> case fails then an error status is returned by the backend.
-> 
-> The backend script can also be run with the "-w <pcap_file>" to
-> write the created packets to a pcap file instead of running the
-> test.
-> 
-> Signed-off-by: Tom Herbert <tom@herbertland.com>
+On Fri Mar 13, 2026 at 3:06 PM CET, Charles Perry wrote:
+> pic64hpsc doesn't have the USRIO register so MACB_CAPS_USRIO_DISABLED is
+> used.
+>
+> pic64hpsc does support PTP and has the timestamping unit so
+> MACB_CAPS_GEM_HAS_PTP is used.
+>
+> jumbo_max_len is set to 16383 (0x3FFF) as reported by the DCFG2 register
+> bits 0..13. The JML register also has a default value of 0x3FFF.
+>
+> dma_burst_length is set to 16 because that's what most other platforms
+> use and it worked for me so far. There is one other mode where bursts of
+> up to 256 are allowed but this might impact negatively other masters on
+> the NOC.  The register default value is 4 (bursts up to 4).
+>
+> Signed-off-by: Charles Perry <charles.perry@microchip.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
 > ---
->  tools/testing/selftests/net/Makefile     |   1 +
->  tools/testing/selftests/net/eh_limits.py | 349 +++++++++++++++++++++++
->  tools/testing/selftests/net/eh_limits.sh | 205 +++++++++++++
->  3 files changed, 555 insertions(+)
->  create mode 100755 tools/testing/selftests/net/eh_limits.py
->  create mode 100755 tools/testing/selftests/net/eh_limits.sh
+>  drivers/net/ethernet/cadence/macb_main.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 
-Hi Tom,
+Reviewed-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
 
-Shellcheck flags several instances of the following:
+Thanks,
 
-- https://www.shellcheck.net/wiki/SC2154 -- ns1 is referenced but not assigned.
-- https://www.shellcheck.net/wiki/SC2086 -- Double quote to prevent globbing ...
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
-In the case of SC2086 I think this can be trivially addressed by adding
-double quotes.
-
-While I think SC2154 should probably be ignored using
-
-# shellcheck disable=SC2154
-
-We're trying to make new scripts shellcheck clean, so I'd appreciate it if
-you could look into this.
-
-
-Also, pylint has also something to say about this patch.
-
-...
 
