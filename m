@@ -1,167 +1,151 @@
-Return-Path: <netdev+bounces-268608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268609-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oLhMANRauWnYAgIAu9opvQ
-	(envelope-from <netdev+bounces-268608-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:44:52 +0100
+	id eI7LLQtbuWnYAgIAu9opvQ
+	(envelope-from <netdev+bounces-268609-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:45:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 084AE2AB27C
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:44:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 631172AB2A8
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:45:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 14DF8302F230
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:41:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8EAD83085302
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9A12D6E4B;
-	Tue, 17 Mar 2026 13:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D128B2DB789;
+	Tue, 17 Mar 2026 13:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fa72ZgqZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iy0TnZX5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9DE2C11C6;
-	Tue, 17 Mar 2026 13:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78E22D592E;
+	Tue, 17 Mar 2026 13:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773754906; cv=none; b=AeMe7r8KO+2tuZUk3HoiRIbw8vUEw8Mn9cqk44p+0Esv1UifIsSxxvKQV0O4/PMgXs8WWTOqaKNOqHhkegKQaatNRZdbs3z/SvittAcmoqvUDzbdSmPwayHbgm6K5NQTlyYfRwWD+pYfChtupXprStP8rDTiwQ38TmNH+Dzusbk=
+	t=1773754971; cv=none; b=KmvzHXMr5b+ChXiV7PmTvbGDO6E6hRfF4WoTIkos76IpaKk2Oe84ZMbD49x/1IyBPS0D+0eOu8+KoOf3xflnvsPctpJIxS6pvNQz24QColWtnbMagZUxryd1rKtUu62B/87qYw3bkwB859eMaBOJ4WP8Q38XZkiqESJUSBdc3sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773754906; c=relaxed/simple;
-	bh=eitiTD1FHtSBD6EfMhAR7jk5fKmg00swNJqZWk7CXbo=;
+	s=arc-20240116; t=1773754971; c=relaxed/simple;
+	bh=cvWFM54q957EernSWzHaK9Acqjw396q6QTQo5GDsp5Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A/7AVa9JJm03g5nLYtdRQE7PWdkk14XXbiHP1ZIA3iNTS9zMlrH5ZwxazD8kz0FKLsWgoH1g2EOe3T144GpAyysSP1bccR0rlyfzskMSJF/lXsq7KAgWCWmM0GW7RjBzXqbejWoRJbtASq3mCe447RaL/QamZqSkm9rleU7otOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fa72ZgqZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7277C4CEF7;
-	Tue, 17 Mar 2026 13:41:45 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ShsouSxVeTlqZmV5yn4M8HKQaEZJ/s8m4zxE8C0Awnynqj5TO3kgHmVFhY58N1GaYx7wcyb0sXFU/tx5mRtID4AiAjJVR6JdHVHH217005vGPp310rWJdaeoPKPSfMQDsrILEbUPr32zxogHJP3cypCfV4gLqs36328SoEX12vU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iy0TnZX5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DDBEC4CEF7;
+	Tue, 17 Mar 2026 13:42:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773754906;
-	bh=eitiTD1FHtSBD6EfMhAR7jk5fKmg00swNJqZWk7CXbo=;
+	s=k20201202; t=1773754971;
+	bh=cvWFM54q957EernSWzHaK9Acqjw396q6QTQo5GDsp5Y=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Fa72ZgqZxl/KHHVKHPeg7mCKPavM+rFoBmIwUcJ/kPpYmJ/WJmopN4oiq1DL/XXl8
-	 HZgtqs/y6ZBCzG1C5jhvivFMsrwr6xlnzbyRo/9WTcoL1Obb5073HgCEA0oGkMlJXU
-	 Uw6Yq3WgbnCCwb/IjIXurnPm4gVuoRpUYEV0N9rAzuaMCSxtzyhQnsMe/Avg8KSr65
-	 JLZ6k5px9c1XsdW0Mdil3pxc376NbhgrYHaGKDrgArqHy/xeQ31X7ku8ISt7YHB+Yh
-	 sFtHAkQH/XOElsXjgPl5KQvokzFbortEkTLGWdL6bBSrsH36siCpILOWQGLtzUR1dC
-	 kR4q62TRY1xSA==
-Date: Tue, 17 Mar 2026 15:41:41 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Jiayuan Chen <jiayuan.chen@shopee.com>,
-	Jianzhou Zhao <luckd0g@163.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Mark Bloch <mbloch@nvidia.com>, Edward Srouji <edwards@nvidia.com>,
-	Or Har-Toov <ohartoov@nvidia.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Patrisious Haddad <phaddad@nvidia.com>,
-	Maher Sanalla <msanalla@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>, Kees Cook <kees@kernel.org>,
-	Jang Ingyu <ingyujang25@korea.ac.kr>,
-	Moni Shoua <monis@mellanox.com>, Doug Ledford <dledford@redhat.com>,
-	Christian Benvenuti <benve@cisco.com>,
-	Selvin Xavier <selvin.xavier@broadcom.com>,
-	Yuval Shaia <yuval.shaia@oracle.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v1] IB/core: Fix use-after-free of ipvlan phy_dev in
- ib_get_eth_speed
-Message-ID: <20260317134141.GY61385@unreal>
-References: <20260311100313.284589-1-jiayuan.chen@linux.dev>
- <20260316162909.GG61385@unreal>
- <07b0ee06-aae7-4c48-8ac6-503ee8f8ea63@linux.dev>
+	b=Iy0TnZX5T2xqw3wl38rgvtDR9JClrVeBVTwEjQZgZeUSC1mQWBqW/7QANTOB+ItEh
+	 ShMuJXNtUDliwfJuOm40uaMs7VLacYFs4/xaeXEHuP0wSrirTRQUbkPVUIy5LQqRBg
+	 5FqbbtdDB6HEelqWDfyEDYrGwjyJR0xK/vDSLyQP0VRdzNtsewmCWmBhZdxRCQKhwX
+	 UtjL/WYWVKM3oGNCuTfxvKwt4ApwDU0XE1YwK32qPu1CzE06K8OSKaNNjr+SM99ctm
+	 IwndBkfvV/zVMP64fw2nCwDX4++guZiEpwi6CnKsiGxnn9bHiy/g4fHTg6er0m7Tod
+	 qyBGCOjWy60qA==
+Date: Tue, 17 Mar 2026 13:42:42 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Douglas Anderson <dianders@chromium.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>, stable@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Daniel Scally <djrscally@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>, Frank Li <Frank.Li@nxp.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Len Brown <lenb@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	devicetree@vger.kernel.org, driver-core@lists.linux.dev,
+	imx@lists.linux.dev, linux-acpi@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] device property: Make modifications of fwnode "flags"
+ thread safe
+Message-ID: <94dcb275-4af0-4ca1-9b4a-5769bcc2c777@sirena.org.uk>
+References: <20260316154159.1.I0a4d03104ecd5103df3d76f66c8d21b1d15a2e38@changeid>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="CESacuQ0/LxRTmli"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <07b0ee06-aae7-4c48-8ac6-503ee8f8ea63@linux.dev>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+In-Reply-To: <20260316154159.1.I0a4d03104ecd5103df3d76f66c8d21b1d15a2e38@changeid>
+X-Cookie: Must be over 18.
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268608-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268609-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,163.com,ziepe.ca,nvidia.com,broadcom.com,kernel.org,korea.ac.kr,mellanox.com,redhat.com,cisco.com,oracle.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,kernel.org,vger.kernel.org,lunn.ch,linux.intel.com,gmail.com,davemloft.net,google.com,nxp.com,redhat.com,pengutronix.de,armlinux.org.uk,sang-engineering.com,lists.linux.dev,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shopee.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 084AE2AB27C
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sirena.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 631172AB2A8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 17, 2026 at 05:48:55PM +0800, Jiayuan Chen wrote:
-> 
-> On 3/17/26 12:29 AM, Leon Romanovsky wrote:
-> > On Wed, Mar 11, 2026 at 06:03:08PM +0800, Jiayuan Chen wrote:
-> > > From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> > > 
-> > > Jianzhou Zhao reported a NULL pointer dereference in
-> > > __ethtool_get_link_ksettings [1]. The root cause is a use-after-free
-> > > of ipvlan->phy_dev.
-> > > 
-> > > In ib_get_eth_speed(), ib_device_get_netdev() obtains a reference to the
-> > > ipvlan device outside of rtnl_lock(). This creates a race window: between
-> > > ib_device_get_netdev() and rtnl_lock(), the underlying phy_dev (e.g. a
-> > > dummy device) can be unregistered and freed by another thread.
-> > If ib_device_get_netdev() worked as it was supposed to work, it can't.
-> > That function grabs reference on netdev and returns or netdev with elevated
-> > reference counter which can't be freed or returns NULL.
-> > 
-> > Thanks
-> > 
-> 
-> ipvlan's phy_dev is safe in the data path — TX/RX runs in softirq
-> context with RCU protection, no lock needed per packet.
-> 
-> The issue here is in the control path. __ethtool_get_link_ksettings()
-> requires rtnl_lock() — all existing ethtool callers follow this:
-> 
-> - ioctl path: rtnl_lock() is taken first, then __dev_get_by_name()
-> looks up the dev without even holding a refcnt — relying entirely
-> on RTNL for safety. (net/ethtool/ioctl.c:3571, 3249)
-> - netlink path: dev is looked up with refcnt first, but the actual
-> ethtool ops run under rtnl_lock(). (net/ethtool/netlink.c:527-533)
-> 
-> Under RTNL, phy_dev cannot disappear because phy_dev unregistration
-> triggers NETDEV_UNREGISTER which deletes ipvlan first — all within
-> the same RTNL context. That's why no virtual netdev driver (ipvlan,
-> macvlan, bond, etc.) holds an extra refcnt on the lower dev in its
-> ethtool callbacks.
-> 
-> ib_get_eth_speed() calls __ethtool_get_link_ksettings() under
-> rtnl_lock(), but obtains the netdev before it. Moving the lookup
-> inside rtnl_lock() makes the netdev resolution and ethtool call
-> atomic w.r.t. device unregistration, consistent with how ethtool's
-> own paths work.
 
-Please reread my earlier response and explain how an ipvlan device can
-disappear immediately after a successful call to ib_device_get_netdev().
+--CESacuQ0/LxRTmli
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks
+On Mon, Mar 16, 2026 at 03:42:06PM -0700, Douglas Anderson wrote:
+> In various places in the kernel, we modify the fwnode "flags" member
+> by doing either:
+>   fwnode->flags |= SOME_FLAG;
+>   fwnode->flags &= ~SOME_FLAG;
 
-> 
-> 
-> Thanks
-> 
-> 
+Acked-by: Mark Brown <broonie@kernel.org>
+
+--CESacuQ0/LxRTmli
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmm5WlEACgkQJNaLcl1U
+h9DSgAf6Ap5hH7yRkuhE3ZUXEU9Sw0nRKEWLWHq9c0Jd+k0j/ZH4K6YAePaTKleT
+VU3Fsx4siP9rbVq9sWIZ4qtL2ChJw3LgqNNMe88HKsb5MLrcpbCzUEXe9mZHg9ke
+tucJZVfd79aIWfTHelxkhI1ZuW+JNDId0+0NrI427Jrhou3kPYT7+gJmYXuMbWik
+Pmc0B/+HNSZ5wx+ETM7Ki9+Yj+BY15QaBoNID1YqUpzKd6xrtRs/Ep414//xibo9
+92kpTPrKdt92+B4iMU/YWQvPyUelIpmWR7aJ9I823NnLKHA5yvoEy1ff5WloKA6Q
+MxtC9dhuaD1HfwqImmlLKtm0H6/ABQ==
+=PgWz
+-----END PGP SIGNATURE-----
+
+--CESacuQ0/LxRTmli--
 
