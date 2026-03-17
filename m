@@ -1,147 +1,150 @@
-Return-Path: <netdev+bounces-268710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268711-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MCJKMbqguWmiLQIAu9opvQ
-	(envelope-from <netdev+bounces-268710-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:43:06 +0100
+	id 2A6iMLqhuWmiLQIAu9opvQ
+	(envelope-from <netdev+bounces-268711-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:47:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 439A72B10D7
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:43:06 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BE392B1210
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 19:47:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59AC7306827B
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 18:41:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 199803041CA3
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 18:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919AD37C0E7;
-	Tue, 17 Mar 2026 18:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F6C3F7896;
+	Tue, 17 Mar 2026 18:47:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iK9sn039"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="jHjLNLiW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6413EFD1A
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 18:41:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C3236F400;
+	Tue, 17 Mar 2026 18:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773772897; cv=none; b=RJuAeAtIuTfIto+wTcTyeOnlU399MIXavwt3mUywY1Pw6iWb3KIfZqfjXqSrvVokRsaJPWu/ksgDKQJBACmry582hOUNkUoYQWUKyACwt3TD+RhQQJuoby41AJUhOPHvGcsJD+rFIA6FC8itt6zPqg3gm7OFfFywUC+smv0wYIA=
+	t=1773773236; cv=none; b=fVx5ksD7tpN5+kNi3eRQUSEJewph2jXZJwSsUx1Eg6VcsitddODQPD94UVgtlraL0TACdx74qKYbYspabUR+hN/X8SlWrAv9XtQAAGLRoxD97BWXieydVB0eT54FKKpGHJJ8/NbrXeBlbX9WLsQRiiaC20lM7Dg1HenOvHRb6xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773772897; c=relaxed/simple;
-	bh=uTWfqk6Ebi8CoYpNJEFKkfF7211leHYOFJR95rDk0MA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gwZQw46E61mMkfqKFs+34kNcxvOJ9FWRqmi7e5qIWrgrw+/aeS+HkoFsgdDznnzbuxRiS9fl3ggXqjLL32IkwSR46zpqub4OZTDzKfq8uVqTBdZRwXGjrlik7eIEDrgSGTxxXNxlIlX7uBcQe3hufPSD2Ld3nmOikUTHKwbByvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iK9sn039; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1773773236; c=relaxed/simple;
+	bh=Cedk0kISEt8TAES4ZFcIQMzVN5OpSY5zP/DM376NvYc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NdM8Kxpk8eodmgvlKq8YTeKYvrdDUVFbBCHS9B1yvMVM5clopab1BpSw4xk6SpR6kqcL0c+8x42hIz2iGvtqTdKGXKfhoHVuorrTdTiZ9idblBM59G54nYlVZlm2fig658yO02D36YLBKNk2D6fPyCJrTmjhMQOC8ypJSkIIgGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=jHjLNLiW; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773772891; x=1805308891;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uTWfqk6Ebi8CoYpNJEFKkfF7211leHYOFJR95rDk0MA=;
-  b=iK9sn039H2iWWCXrE+ClTptewx4T/4Ak3T/t1JvqRqbtkbR1mhNWkwS1
-   TSwfSJXsx1cC0HiMx1wWkzyzXCbHRD6mx/8dV6gCZMrbuk0Ti06IuzVEg
-   25e/8VdCp5eZEl+r6HmDnkc0ir3E5CWUQOwBQz/MTFJXzi0G7FSOTDLpc
-   o9qVqH7Mc2rB6rBZghR9TfnSefykIM7FQ4U+U2FCYWwwyt6MOzjkA8dG7
-   FBUT4PAjmNAqavUqiQm6O20W02LZmbfPyLS+5g4ZnkVnHgSftRfbQglae
-   v0ly+L8pflNpE0rJJfAHKPycies7Od/fSnkXYoOx0qRfK1RVwGdoT9VsZ
-   A==;
-X-CSE-ConnectionGUID: HzlCM/NbRfOB4j2MZsoW9A==
-X-CSE-MsgGUID: 0lPc0Bl8TOWvUk+hCCTnQQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11732"; a="74704439"
-X-IronPort-AV: E=Sophos;i="6.23,126,1770624000"; 
-   d="scan'208";a="74704439"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 11:41:31 -0700
-X-CSE-ConnectionGUID: 5A2o8ipkSdiBD/17C5EjAg==
-X-CSE-MsgGUID: n5uz3BV4TWSfpC/UfZUYgw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,126,1770624000"; 
-   d="scan'208";a="245377332"
-Received: from lkp-server01.sh.intel.com (HELO 63737dd503cb) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 17 Mar 2026 11:41:28 -0700
-Received: from kbuild by 63737dd503cb with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w2ZM5-000000001of-3clQ;
-	Tue, 17 Mar 2026 18:41:25 +0000
-Date: Wed, 18 Mar 2026 02:40:37 +0800
-From: kernel test robot <lkp@intel.com>
-To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, pabeni@redhat.com, edumazet@google.com,
-	horms@kernel.org, kuba@kernel.org,
-	John Ousterhout <ouster@cs.stanford.edu>
-Subject: Re: [PATCH net-next v17 01/14] net: homa: define user-visible API
- for Homa
-Message-ID: <202603180251.ApKBYL2x-lkp@intel.com>
-References: <20260316223228.2611-2-ouster@cs.stanford.edu>
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1773773235; x=1805309235;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Cedk0kISEt8TAES4ZFcIQMzVN5OpSY5zP/DM376NvYc=;
+  b=jHjLNLiWA0QPeGPsN5srp9e3zQyIDxV81f1ljRCaxnQ43Js26O6jDDDr
+   JJcHpTSfgVrLMCVuvb88edQ0DGthCuj72MsB700U3p0LJEbOmEa/oVi5B
+   co0f3TnxEOtGqf/BbaZYLT3HxnXhwEzW9izhUNw9oRLUQKuO7xvScPYiK
+   LI94Re6Gg5QKMbFDuoTTr14yqe/nthkp4BoryHW87FMursx0M7EoalaHx
+   73J51lclv0KC69IfZQrXoRUJT4EYeMa6Qg/N/lMekkzucpMr9g85Gcmyp
+   cr8bZ28/0syrO0emyEyvAh0WbilxeaietgS8aj//bXUXpOSUaHWuReTxH
+   g==;
+X-CSE-ConnectionGUID: wahvWo40QRmVOyIEFQPcXQ==
+X-CSE-MsgGUID: +GDTgvTcQNunFvgqpemg1A==
+X-IronPort-AV: E=Sophos;i="6.23,126,1770620400"; 
+   d="scan'208";a="222060298"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 11:47:08 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.87.151) by
+ chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Tue, 17 Mar 2026 11:46:39 -0700
+Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Tue, 17 Mar 2026 11:46:38 -0700
+From: Charles Perry <charles.perry@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: Charles Perry <charles.perry@microchip.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit
+	<hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next 0/2] Add support for PIC64-HPSC/HX MDIO controller
+Date: Tue, 17 Mar 2026 11:46:08 -0700
+Message-ID: <20260317184610.315852-1-charles.perry@microchip.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260316223228.2611-2-ouster@cs.stanford.edu>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-268711-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268710-lists,netdev=lfdr.de];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 439A72B10D7
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6BE392B1210
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi John,
+Hello,
 
-kernel test robot noticed the following build errors:
+This series adds a driver for the two MDIO controllers of PIC64-HPSC/HX.
+The hardware supports C22 and C45 but only C22 is implemented for now.
 
-[auto build test ERROR on net-next/main]
+This MDIO hardware is based on a Microsemi design supported in Linux by
+mdio-mscc-miim.c. However, The register interface is completely different
+with pic64hpsc, hence the need for a separate driver.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/John-Ousterhout/net-homa-define-user-visible-API-for-Homa/20260317-070659
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260316223228.2611-2-ouster%40cs.stanford.edu
-patch subject: [PATCH net-next v17 01/14] net: homa: define user-visible API for Homa
-config: hexagon-randconfig-r071-20260317 (https://download.01.org/0day-ci/archive/20260318/202603180251.ApKBYL2x-lkp@intel.com/config)
-compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project 4abb927bacf37f18f6359a41639a6d1b3bffffb5)
-smatch: v0.5.0-9004-gb810ac53
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260318/202603180251.ApKBYL2x-lkp@intel.com/reproduce)
+The documentation recommends an input clock of 156.25MHz and a prescaler of
+39, which yields an MDIO clock of 1.95MHz. This is the clock configuration
+I've used in my tests.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603180251.ApKBYL2x-lkp@intel.com/
+This was tested on Microchip HB1301 evalkit which has a VSC8574 and a
+VSC8541.
 
-All errors (new ones prefixed by >>):
+Thanks,
+Charles
 
-   In file included from <built-in>:1:
->> ./usr/include/linux/homa.h:11:10: fatal error: 'netinet/in.h' file not found
-      11 | #include <netinet/in.h>
-         |          ^~~~~~~~~~~~~~
-   1 error generated.
+Charles Perry (2):
+  dt-bindings: net: document Microchip PIC64-HPSC/HX MDIO controller
+  net: mdio: add a driver for PIC64-HPSC/HX MDIO controller
+
+ .../net/microchip,pic64hpsc-mdio.yaml         |  61 ++++++
+ drivers/net/mdio/Kconfig                      |   7 +
+ drivers/net/mdio/Makefile                     |   1 +
+ drivers/net/mdio/mdio-pic64hpsc.c             | 207 ++++++++++++++++++
+ 4 files changed, 276 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/microchip,pic64hpsc-mdio.yaml
+ create mode 100644 drivers/net/mdio/mdio-pic64hpsc.c
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.47.3
+
 
