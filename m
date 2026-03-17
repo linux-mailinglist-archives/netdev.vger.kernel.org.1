@@ -1,84 +1,85 @@
-Return-Path: <netdev+bounces-268540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268541-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KAdtOzAxuWn4uAEAu9opvQ
-	(envelope-from <netdev+bounces-268540-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:47:12 +0100
+	id YJkaMqgvuWkYuAEAu9opvQ
+	(envelope-from <netdev+bounces-268541-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:40:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7196F2A833C
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:47:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C1822A81A5
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:40:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2B08B3015E3D
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:40:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B49F4303E496
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB1503A6EE5;
-	Tue, 17 Mar 2026 10:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314123A6F0A;
+	Tue, 17 Mar 2026 10:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="OJ3qrIXv"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="L3Ld6vh8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32AF532FA2A
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 10:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9BAD3A4F29
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 10:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773744034; cv=none; b=LjlPfPt8H+t5xRY7wST5g50ZDLb14LYmQAk+rTlnaITEM6GR7ZSq0NId4kcLgwsoVBB4Ki9wCou9inlzRVJvNXnnJF610BvKHY5GXZLVa/DDYiPkXk9lt5yGCIvpUxUiV2f+hOHlQ4qufC2+NhKPk0phhghxJwo+8Pn94Bjq7iA=
+	t=1773744035; cv=none; b=WAbehYhUmx8UyL/3ePg2aXz8Hyi4cor9qFw+kDMIacNgMysfvGR+RvRTCMccuHDELGc1wrwev0+BHC0gnuI29rPTtFV0NSuxQ1iI1ocGS8HEXEctexvOH1P3Hy34qcr+QtXNGQr0H23z5HFMjDz29Sjj9h19vn1/cG96fYsO9ZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773744034; c=relaxed/simple;
-	bh=aTGdGKIbN78z0HccJeLIaLaLIQQWPHWa0zQSLVb6wio=;
+	s=arc-20240116; t=1773744035; c=relaxed/simple;
+	bh=rQhY7+1bOmJ74YZGAz74eZLwgNNakdU85i/zbOlXZQ8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W2uE5TbaipgPwphMrOttBewTlHWyDkK4FpZwFmRA/fU2wJjscACU/KQa9Q3AHUsfuw5pXH9RdIggRrrKWoEga1VAs86yUYbLoMnRwO7YAyikDol4qLnsJXEXskexWXme7X/taClLs0iB40QJl/HHvYcaewcKSf+aKoUqHCiZm/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=OJ3qrIXv; arc=none smtp.client-ip=209.85.221.48
+	 MIME-Version; b=gKZ8Jnq0djyTwNcJkF100YV5YuY1hveRir80me7C+Mns/I4dBosf8mcScjWkXNhMxaUE+cYT4NKUeqS6Frsr19Qpy981zezsimXZMzzCy8sp5bHyddIcFgv0zcMiEhG56+kaagpCdQsi3tesJBe/cz3el/189Nfd2A0WCcONrg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=L3Ld6vh8; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-439b9b1900bso3661816f8f.1
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 03:40:32 -0700 (PDT)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-439b7c2788dso3415349f8f.1
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 03:40:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1773744031; x=1774348831; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1773744032; x=1774348832; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=C+c1YssimIKbOeI4y9o12dVhyqLS9jie10yKUyGHwPU=;
-        b=OJ3qrIXvkpRzOJIXsVUxJtJzTLHNI/d0Y5NpuVdaa38WOgkBdANgje9//Lfb1/ZGCo
-         Ul9hlt43u43/24UBofkyIagZby+tL0yqwKomFM6LNdRlocyaW/HWCnVf7iB0acp0V1nB
-         v9+nmoSRD//dTy2Cjr4o6m6DQRQ1X3tag0fOZkV0tZB1IPQ478/IrqgzvumPSQTMI7Sl
-         rPyP14UPDOh8KEMX/BSzJ21Q7eM0gaC5Se+0iRflwUDUvJ6fNxxqslJJ3PBNbreC6wGW
-         VQdgbDZuF3N/fijX9gO7yWNUWZ8YXl3RO363eW0IjcNUKSHydo64J+AlnwtLMfkdERFt
-         KSIw==
+        bh=SUYcr2U2mfCc96RP5P5Op7nrp+GUJw5w4uHDKKcUTYY=;
+        b=L3Ld6vh8hK9M0PR37ZJzwNgfuxOgsuK4rofY/GFxvjSte+vONUY1lArxsR74bJMxdo
+         MXQpUOzs74ImnA1xoIegC8DlMG+/pldAQDhgl0xr9+AB4w2T98rMacCr+m10OgE0Grby
+         SH4hSYmbSUyovPX3WssdLXaUV/ANxrDx84nLFdINVbb6g+0W/C9yL1yeY9CHTaKfGRYu
+         TKKHivXqB8nCid7Lb5engrWcXmrdJA5ctOBF4qFKVRBdZmk6LGHTNNbYyB6ep1j+fJpd
+         vyLkgcENtdbHTlwYYI1MMT9gT0u7IV5plsUCEQ0w618EHj8L4UwUi+lYK0wZdUXBcF5/
+         Tp1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773744031; x=1774348831;
+        d=1e100.net; s=20251104; t=1773744032; x=1774348832;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=C+c1YssimIKbOeI4y9o12dVhyqLS9jie10yKUyGHwPU=;
-        b=Vk2c0C+6BuZpvzTRw/2To162XmJURbE7YFQClGXzVJ4XjKxyWvD25v77Ob+5Xw1tNJ
-         RQaZ8iDmDmWle0ObYg1tGpZN0Yz4lChQsFPkPDWD7wHgzDL5/stSmD8H9xWBt5ftlXqj
-         CuTpH+1ZW17Uqbq2zGCSUqFp5gZxdtMPaMYQRde2+0rnf3rPAbaLCbHskZcm8H+dQTZn
-         Svl0QvhQVk+qreiqqcp4063UKWC10dB2LAPjRElttCorofOUbc2Lv52xcLZY8skoyCNG
-         czSn/YbjUAGUkdvvXxFCKYrD2eZ95+Tvkhnheur44kEcx23rbjP+VFWpggaukvJ4TXYZ
-         b0Eg==
-X-Gm-Message-State: AOJu0YyYheJSB9SWEjNUyh93IpPJySAQgFHefGyu0+cpkFzAJO/a/tQD
-	l2UOFNq6TbCCQLJdxdbLxg54fq0kfcRenVLOUiYSF0FscDLKgS4FRePqnvkCCAg0uugllmjU1t2
-	gfd5FhtOkuZtVyE4hXwYEP40zhNcsLlQToNjd00vd4CvPWHUuCcfjsoFGuxJvV6gQ
-X-Gm-Gg: ATEYQzx52i2a80VJ49XVzD2IQHX9IglWlctzA3YupkBuLREPvJ5zhppnhYMCLchJVKX
-	PXS8Zkif4ZSLtSyszfOSy1nXVtOC9Y61IUPvOmW2YvvwlqW7NbZ9QtpzU8xVYx2NvaOg113cuxq
-	GLi88ye7G9uozX3OCFNrHnf8owA9YPs0x2zpTqH9+JM3FxyMBA289jcd+9TrG/WYPgg+BIHtVHy
-	WbA3vxES9wqJRZHq5DtHd5Jl5uCQ5VFY5Tt3skgAxTkuXbs2AMZsfGGOE1gnEb+l1wIV3pYKZWb
-	v2JuId2iJFezvRIBccwpKvSfnRL/KjcIoF/3eHp5YxV/mexXgx0DEM+bk1Bz6OD1FrB9jEoCyJd
-	PFK4+L9JaiSq6UJTAseXjxwUtyCXFKuuqeiUmdvYQEiKyBBVNc/37i/ex6r1Q7u/E+nR4w7u90P
-	HlCU+bXuddzmgqVqt1L8cmorEirHA1SPBRVxzVEtfiMIj1Yw==
-X-Received: by 2002:a5d:5d86:0:b0:439:b3a3:7239 with SMTP id ffacd0b85a97d-43a04d78189mr28892497f8f.5.1773744030461;
-        Tue, 17 Mar 2026 03:40:30 -0700 (PDT)
+        bh=SUYcr2U2mfCc96RP5P5Op7nrp+GUJw5w4uHDKKcUTYY=;
+        b=l9MVTGtvQYFYoVn78+9aOZjm/VqIYMmj6lvrBTL9LX86K/CQbheV1hskI2icOWM5hL
+         7yiLBG0iJevfJ2H6i3tSueENOQPhbmDp3ujQDyOwE5cSoE8bu5zkm0H9VI/i/GEuTMRD
+         SEiUomwf0aTC0WMy9r3i/7D4BGDR1nj/dc0XHxYVh9ibxqb2bLGKn9cmPrlgGRoIjnqv
+         dIrvbML3Pq2TqQhHTT8n0K0Ud2S/PvvavGMt8coRiEBUPKPV/7ViBkPzrcRxMKEgEWUe
+         mUM1onibdP6M/31e/BASBvITZYkvN0wT3a6NpKYTW4QioUiGt+QvM1ezYAGmcyBaNpEO
+         1W8A==
+X-Gm-Message-State: AOJu0Yw4TgHbsQHUDuoToJs0JBlp3Po4rDjgX23u0e3wKHfiA/ejbU2Y
+	2TjyxO3FHIVRpvd65Q0DJt3Y1IXVA840a5JPRmrA6Iukq/g+bX8B2gJ2r0XUOXzgUZ0iPTPurU4
+	vsW96D1hJ+7m7KxdgCPu5dHC3NgCNW9v3L9RcYK2Ob6t5OTb5gV1hZVPCyrgMFdLt
+X-Gm-Gg: ATEYQzyrNX/9tKmVXduagiojjdWCZZbfeRWHTqY9woDpVLu7MuDGjSKcPfbyFAGIdf2
+	LCrYaPXc7gWuLd5Wu+ic22pqSGkcQ+G+Er2x5rvVY5nhDKMYDW7b1dIIkbX8kJgfHJM0p15g3IK
+	gnWbbReNFdhBdt52P/IoAFvCGN1kqSkvgI+r+qmKO0rNt7h1dKAee8TOaS/Rt5CVe9j51bW8jAT
+	BVA6+vkC8dDRN5Sd3lXkKYNI6UPB/sN2V5A/JybUfe/YHYuhMOyw3e1W7067qop4oU9zR5OYJ3s
+	j4jbxKuOhaoNrN/WQmkG5Ik6wr3OqnhPj5wAVBFj3cFYib6MlNdmZOggj9ELjHc4XT7Ok5jwUKz
+	pPYgd01dIS/z2e1QDZA+9bfSLI3iO8lxLOWFb19e3LSCsCkROleMuijUvQTXpXJlHpVOkuaUgH1
+	xIzXZ99sYK4VnCUHKMrExtfoQmdsRIKnphqAHVlHo1A+8CmA==
+X-Received: by 2002:a05:600c:c162:b0:485:35ee:f836 with SMTP id 5b1f17b1804b1-485566c94a6mr271877395e9.2.1773744031641;
+        Tue, 17 Mar 2026 03:40:31 -0700 (PDT)
 Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:4f22:3f9:13dd:cf23])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe22529csm49948215f8f.31.2026.03.17.03.40.29
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe22529csm49948215f8f.31.2026.03.17.03.40.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 03:40:30 -0700 (PDT)
+        Tue, 17 Mar 2026 03:40:31 -0700 (PDT)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
 Cc: ralf@mandelbit.com,
+	Qingfang Deng <dqfext@gmail.com>,
 	Sabrina Dubroca <sd@queasysnail.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
@@ -86,9 +87,9 @@ Cc: ralf@mandelbit.com,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net-next 2/9] ovpn: use correct array size to parse nested attributes in ovpn_nl_key_swap_doit
-Date: Tue, 17 Mar 2026 11:40:16 +0100
-Message-ID: <20260317104023.192548-3-antonio@openvpn.net>
+Subject: [PATCH net-next 3/9] ovpn: pktid: use bitops.h API
+Date: Tue, 17 Mar 2026 11:40:17 +0100
+Message-ID: <20260317104023.192548-4-antonio@openvpn.net>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260317104023.192548-1-antonio@openvpn.net>
 References: <20260317104023.192548-1-antonio@openvpn.net>
@@ -105,62 +106,105 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
 	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268540-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[mandelbit.com,gmail.com,queasysnail.net,kernel.org,redhat.com,lunn.ch,davemloft.net,google.com,openvpn.net];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268541-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
 	DKIM_TRACE(0.00)[openvpn.net:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:email,openvpn.net:dkim,openvpn.net:email,openvpn.net:mid]
-X-Rspamd-Queue-Id: 7196F2A833C
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,openvpn.net:dkim,openvpn.net:email,openvpn.net:mid]
+X-Rspamd-Queue-Id: 4C1822A81A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Sabrina Dubroca <sd@queasysnail.net>
+From: Qingfang Deng <dqfext@gmail.com>
 
-In ovpn_nl_key_swap_doit, the attributes array used to parse the
-OVPN_A_KEYCONF uses OVPN_A_PEER_MAX instead of
-OVPN_A_KEYCONF_MAX. Note that this does not cause any bug, since
-currently OVPN_A_KEYCONF_MAX < OVPN_A_PEER_MAX.
+Use bitops.h for replay window to simplify code.
 
-The wrong constant was introduced by commit 203e2bf55990
-("ovpn: implement key add/get/del/swap via netlink")
-
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+[antonio@openvpn.net: extended commit message]
 Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 ---
- drivers/net/ovpn/netlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ovpn/pktid.c | 11 ++++-------
+ drivers/net/ovpn/pktid.h |  2 +-
+ 2 files changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
-index c7f382437630..fed0e46b32a3 100644
---- a/drivers/net/ovpn/netlink.c
-+++ b/drivers/net/ovpn/netlink.c
-@@ -1061,8 +1061,8 @@ int ovpn_nl_key_get_doit(struct sk_buff *skb, struct genl_info *info)
+diff --git a/drivers/net/ovpn/pktid.c b/drivers/net/ovpn/pktid.c
+index 2f29049897e3..f1c243b84463 100644
+--- a/drivers/net/ovpn/pktid.c
++++ b/drivers/net/ovpn/pktid.c
+@@ -65,7 +65,7 @@ int ovpn_pktid_recv(struct ovpn_pktid_recv *pr, u32 pkt_id, u32 pkt_time)
+ 	if (likely(pkt_id == pr->id + 1)) {
+ 		/* well-formed ID sequence (incremented by 1) */
+ 		pr->base = REPLAY_INDEX(pr->base, -1);
+-		pr->history[pr->base / 8] |= (1 << (pr->base % 8));
++		__set_bit(pr->base, pr->history);
+ 		if (pr->extent < REPLAY_WINDOW_SIZE)
+ 			++pr->extent;
+ 		pr->id = pkt_id;
+@@ -77,14 +77,14 @@ int ovpn_pktid_recv(struct ovpn_pktid_recv *pr, u32 pkt_id, u32 pkt_time)
+ 			unsigned int i;
  
- int ovpn_nl_key_swap_doit(struct sk_buff *skb, struct genl_info *info)
- {
-+	struct nlattr *attrs[OVPN_A_KEYCONF_MAX + 1];
- 	struct ovpn_priv *ovpn = info->user_ptr[0];
--	struct nlattr *attrs[OVPN_A_PEER_MAX + 1];
- 	struct ovpn_peer *peer;
- 	u32 peer_id;
- 	int ret;
+ 			pr->base = REPLAY_INDEX(pr->base, -delta);
+-			pr->history[pr->base / 8] |= (1 << (pr->base % 8));
++			__set_bit(pr->base, pr->history);
+ 			pr->extent += delta;
+ 			if (pr->extent > REPLAY_WINDOW_SIZE)
+ 				pr->extent = REPLAY_WINDOW_SIZE;
+ 			for (i = 1; i < delta; ++i) {
+ 				unsigned int newb = REPLAY_INDEX(pr->base, i);
+ 
+-				pr->history[newb / 8] &= ~BIT(newb % 8);
++				__clear_bit(newb, pr->history);
+ 			}
+ 		} else {
+ 			pr->base = 0;
+@@ -103,14 +103,11 @@ int ovpn_pktid_recv(struct ovpn_pktid_recv *pr, u32 pkt_id, u32 pkt_time)
+ 			if (pkt_id > pr->id_floor) {
+ 				const unsigned int ri = REPLAY_INDEX(pr->base,
+ 								     delta);
+-				u8 *p = &pr->history[ri / 8];
+-				const u8 mask = (1 << (ri % 8));
+ 
+-				if (*p & mask) {
++				if (__test_and_set_bit(ri, pr->history)) {
+ 					ret = -EINVAL;
+ 					goto out;
+ 				}
+-				*p |= mask;
+ 			} else {
+ 				ret = -EINVAL;
+ 				goto out;
+diff --git a/drivers/net/ovpn/pktid.h b/drivers/net/ovpn/pktid.h
+index 0262d026d15e..21845f353bc8 100644
+--- a/drivers/net/ovpn/pktid.h
++++ b/drivers/net/ovpn/pktid.h
+@@ -34,7 +34,7 @@ struct ovpn_pktid_xmit {
+  */
+ struct ovpn_pktid_recv {
+ 	/* "sliding window" bitmask of recent packet IDs received */
+-	u8 history[REPLAY_WINDOW_BYTES];
++	DECLARE_BITMAP(history, REPLAY_WINDOW_SIZE);
+ 	/* bit position of deque base in history */
+ 	unsigned int base;
+ 	/* extent (in bits) of deque in history */
 -- 
 2.52.0
 
