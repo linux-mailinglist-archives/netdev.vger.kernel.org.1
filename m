@@ -1,242 +1,189 @@
-Return-Path: <netdev+bounces-268626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268627-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SL84M0hluWkyDgIAu9opvQ
-	(envelope-from <netdev+bounces-268626-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:29:28 +0100
+	id wG5xBdNjuWmZDQIAu9opvQ
+	(envelope-from <netdev+bounces-268627-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:23:15 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48F392ABF21
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:29:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B25762ABC87
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 15:23:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA65B319F178
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:12:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D48FF31D11DC
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 14:15:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00183E276D;
-	Tue, 17 Mar 2026 14:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43F93EAC8F;
+	Tue, 17 Mar 2026 14:13:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RUVYvlBn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tZAEscpa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C0B3E1D0A
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 14:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773756713; cv=pass; b=JANRqebtrAsGHYa6PUpLDf3LiBBRrr7YRSnN2X0ch8oirvY+Avmjz4XTjX8biJqIr5iQqXTF3Xv9eg7Lo2pEYNq449xUqmtiycl/Dp+C8QkzDqpiIklTx0G5L8KNAFs3snrJXu2YHWMWLzn8wscCLy6P9uXBp0YPJU7cJ/wfvn8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773756713; c=relaxed/simple;
-	bh=3fqfZwXf9Aj2qCe+qsorAonMcHwZObCbVK8j7y/7180=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA18C3E3DB2
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 14:13:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773756787; cv=none; b=lqWqSwoSs1SCwsIBC4b+6zez/05cdIfwaQgC9+gomaFnnuIa5ZVMxRSohGujMCr1/atwsP/1J6lWZgcJefF09QNapwqLa42pGYqo4jaSCovVMvJSV2fgdjGhtghnJz1xQpY9Mcoy43nwjQUKetfDY2gBjQUIJ6qyw/4KhzVxRhE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773756787; c=relaxed/simple;
+	bh=9QDalKJYBUEDUJPFs8n5F17T6oCLIOfRdQADKKa+dtg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s41t+tBdC99v7SG6DmKHamkRCioa22K22wcXmcIlxcc7rZbHcUKQQQh5FJplNO4HCMVNBC6v9RhMzmKNRqzc1nz+3QBE62N90Xvc4MR65kywcHtoJgwh80YySb7F64UCG+1l1V7BwzqiPHKQc7mAHq4kKXImwFUGM2jcTfDUn8g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RUVYvlBn; arc=pass smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-660a293515fso10875322a12.1
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 07:11:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773756711; cv=none;
-        d=google.com; s=arc-20240605;
-        b=G5ItJR35gYS0uqAVPfXtR/5XUJt9i6FJ5qLSofPZb1izUEuXzEhGor/+JWoeJQZV/g
-         hKY7RfFU/DyYTh5HI+gzHrKaQlh49iOHBlGJgZwc9aDZD+p8aAPnKkkorYaNlBz+q6L4
-         AQXcA/NgizKFK3fhsnNYI3UOtLuVLZhv6Cisc0lxlzNVe4T5I4w+nfdserCkTDFrnhfc
-         pSoSRdr/4Abe+HelHXrb87M0o1lAijEhDB02RuBjUxDDDovC+DMS3blQmOa9H9y2i5J7
-         vpLTAsuK8OdLehbgbpNMDtbZupsU+DHxb2x1XDB4chgC+CcHSNcnoEkC/LIgL7CgHbqW
-         OXFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=XwxkZLM1knDAKvarBpWGnyxxYI7MVKfo3pZ8Fz/i2AU=;
-        fh=CdzYJB2WzZ4Nw2A347DAmtGkGHhQZVMwHxrMbgN4yeg=;
-        b=TC+BdKoBt+RVsfm444RXA8Eq4gEOWySaI9Ed/anX3fwiN0xoduvqw2IGeftHemzCUY
-         2zb7iEmEyg7YLzbUG4P3NgvWXB68+8G4AJC7O8PASMHiDwlw5uAi2Eeou4LNYulKIIwJ
-         O/1/Ug6PrdMzoObVOwgo+LiyQECFGQvXNu8kIqBvqH0AWOh2jJ7a7/FOdATjzl06hLT7
-         Jpm7SNFX1twdh3cCydyBgZTIBL3ux/2QDdfulNon1qPOOF8Ju06K3kNriHOiDUq4zJYb
-         Og3UUcAk+8EQHwDZP9FtOCd3bA+0srU9kzOjbe3yUr3YxESNwiLWUUpY1BP+3sTzjksV
-         6NSg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773756710; x=1774361510; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XwxkZLM1knDAKvarBpWGnyxxYI7MVKfo3pZ8Fz/i2AU=;
-        b=RUVYvlBn4b/QocABKyyhoA+N8vgbHLyH5rLJGTo7Xa6kRiW79ucnL3OY6JQjM0KNYx
-         hSjCkQ3C0IMYCXEf27a5SgKs9I6L3HI1egLZUL0J02RyWzw2RcQQ7RoQNcipZOZftCcG
-         mQSUneIhXhpBfA9QwezJ7GVFK/FXfZObVcGwslxbAvQ9y9Yyu8XxAlDyhVwt6EEp39NP
-         ON9x8VoVJAUX26O47Q8bAh5VVl0UGysIf5YjI3xDlXOWq4uGQSKvoLlZEYIjTgBBiPO4
-         Lc051AhqZH8QuiPPbOsn8ZnF+zSBwo0Mx8O2YtgI1mNJKqagq/g/DZMQhj8kQpGgB4WF
-         a1Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773756710; x=1774361510;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=XwxkZLM1knDAKvarBpWGnyxxYI7MVKfo3pZ8Fz/i2AU=;
-        b=TLEUEF+Jp4gryZmvBf4HoRvtira5kkxM1jouCdEFdCzJCCCe20dJD6XvK5hTS5q0oX
-         06kH90CrQA37NGw5PRdfZSlU/TIf0Ts+ZaBPVxgYBcarIeF5z3M8SPeqYqFs3IXZQJJR
-         Mdwam+iIC79LuGOl63ZJhvK+WZkJ1crbIfMForw9hFBkc1NvT/4orahPUh+d01mZ1/wP
-         g29wRcb7hCV3VxhGWEWuxuqwAq8iK3kcGa7w+LZJsIzMurMxw+y9CYOi93q5w0Ajdo73
-         EP7GcaMP2TIABTksPfaEPA5bfU5vvvv+nZlPonKmyirW0e6gfvflui0Ky3agQC+OwIve
-         W0bA==
-X-Forwarded-Encrypted: i=1; AJvYcCXSevv+KJNdNFO2/MsdGqwUP1nXv5oRPRbVdRwX1VAN4P8sUMGnHfWHRvBtxtBR4qDBdyal/P4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbVXtLxhiYCVLlU4XENsu+bt44F/ELLYQm+pGZhUn57zq+LUsh
-	oXV5aRUTrLafhXCGIW/umT5UNABXh8bEjPPg/8n3k0YiCAxyc2zVfryqj8uapW4jKmnVAN+wZZR
-	v4EgO4jL3uZ9QmFaWYzstv85G0LXQ7sY=
-X-Gm-Gg: ATEYQzw158AZER3XDF4+kuNnkgYMcyHZYamXmdVnN3+RVyBvSr83Nhytl/HtHUQWDkE
-	kHuhLIfhR6KynnwC5ytxqlQM4LWnted4gtFVW2opp7ybkTtBnsIww6DrdtbgUscON/8N5E2FRz2
-	xXv4d0ZH8XG4t7mT0m76HgNBmJZmDz+U1eV0XSWsbFO4SDJK9eVH3L422tsq/+TlpugRMqjmRCL
-	WMhuIclOlJeYX1GJDRfS0CUOdvvT98sPtsTYRbcef2SaqLYfgV4SFDdhaYP27pkxu7/u415FMBT
-	IcYnSQ==
-X-Received: by 2002:a17:907:3e06:b0:b93:3c03:706e with SMTP id
- a640c23a62f3a-b976543019cmr1017248366b.52.1773756710356; Tue, 17 Mar 2026
- 07:11:50 -0700 (PDT)
+	 To:Cc:Content-Type; b=qE8hUtlTn09ckTBbdjSEXFYV/AHbOXXKvpPVQQ24uryxHzQIZKFfS6zisP6roECbdk1Dn2OdUlRLOlzRvbDcIiDrHOTcuNufxX0Uj40YavQC98q5fjkK5uNHp3lbwxV7E8i6WKBSR8nN6SMf9EbE9Ih6xvryy50gyqCQWkQLYQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tZAEscpa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A119C2BCB1
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 14:13:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773756787;
+	bh=9QDalKJYBUEDUJPFs8n5F17T6oCLIOfRdQADKKa+dtg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=tZAEscpa8SCC5cIZ2JquMfgXyJ2cYbjRRZovEZ4pp9iCwMtzoyZvoUvuYiYMbRTYC
+	 SnQwovSWExy1qzNu8gKN2Re3kiqbZF6sZmkIooWlWa9EIx1ERfsbgtRs5rZB0SAIxf
+	 3lPrGMQ4Ue2TuM4ia8nL9lBYQlDl9Z6+Gmi7Vne8vrfCzyTk9J2Ck3dsbBaTLAPSfD
+	 NPCO+IQ8fm5HTfq9yr/wXF7f1MJldHxMFhyKqH3oTfoTSoTC0Dh5v2G2YRcDRDQgL5
+	 ObXNTsitNLuKk+KvWrgZ9pPDroH39BoYVIyc5TZiwHYdHQ131NS6aY+w9jvXRnJOfo
+	 pYQYSw8TEnjrw==
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-38ad26e3992so5511561fa.1
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 07:13:07 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUJpjgOsVkVWncdMDuUs3pGbsZSjmUejw7uMQ2+Rk0ZQCUkucXyVCrGv1i5gUGnWTgtSN+Des4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPTUq1pFu8mewjCpPIoykum4ARmGPjsaEkeWQK+3XWM2KcGKMI
+	e3NZTlQLH9YE8YASOs0/T2hxNcnab6zUsUqxtTaHQj/RDaJotSwOi24jbcKdC/mXifDwpElJ5Br
+	deLvJWszhc3vHYB54XIlUj3QT0p7Gf6f3IKKk/0VQDQ==
+X-Received: by 2002:a05:651c:2115:b0:37f:c5ca:a6d4 with SMTP id
+ 38308e7fff4ca-38a89666433mr58706271fa.6.1773756785569; Tue, 17 Mar 2026
+ 07:13:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260317061700.7734-1-linux.amoon@gmail.com> <c630aa45-0904-4b3c-a1f6-90b167741d27@gmail.com>
- <CANAwSgTG53wD+z8KBVs4e-n4za-f3xXZELRu6c61SV2Z+4dwMA@mail.gmail.com> <7e39eb0e-d4eb-451f-bdb2-206ddd0a0b35@gmail.com>
-In-Reply-To: <7e39eb0e-d4eb-451f-bdb2-206ddd0a0b35@gmail.com>
-From: Anand Moon <linux.amoon@gmail.com>
-Date: Tue, 17 Mar 2026 19:41:33 +0530
-X-Gm-Features: AaiRm53-QH0oR4QCrQfuE-hLHZOETyMAfQSxcB7TlPBX_DY-UE2t77iaq7hFswQ
-Message-ID: <CANAwSgR6P0nZ1=FKFdp9S97v0SvbpOF-5Ysv4p80BxBhpNGYjg@mail.gmail.com>
-Subject: Re: [PATCH next v1] r8169: Fix PHY lookup for mdiobus_get_phy() and
- improve error reporting during probe
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "maintainer:8169 10/100/1000 GIGABIT ETHERNET DRIVER" <nic_swsd@realtek.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Shawn Lin <shawn.lin@rock-chips.com>, 
-	Hans Zhang <18255117159@163.com>, Niklas Cassel <cassel@kernel.org>, 
-	"open list:8169 10/100/1000 GIGABIT ETHERNET DRIVER" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, Danilo Krummrich <dakr@kernel.org>
+References: <20260316-qcom-sa8255p-emac-v9-0-c58934e76ff2@oss.qualcomm.com> <64d282fd94be1546df75d7df5b47eacc0479797a.camel@redhat.com>
+In-Reply-To: <64d282fd94be1546df75d7df5b47eacc0479797a.camel@redhat.com>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Tue, 17 Mar 2026 15:12:53 +0100
+X-Gmail-Original-Message-ID: <CAMRc=MfNcK3MLndik1jy-yhHAph5=amnTGgn-MpXXG0Uv1ifpQ@mail.gmail.com>
+X-Gm-Features: AaiRm52mh793CgOH9S8BNXU-tBYi1I-pfEq9XQjt50faEkjR5xH42aEvJgG19dM
+Message-ID: <CAMRc=MfNcK3MLndik1jy-yhHAph5=amnTGgn-MpXXG0Uv1ifpQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 0/6] net: stmmac: qcom-ethqos: add support for
+ SCMI power domains
+To: Radu Rendec <rrendec@redhat.com>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Vinod Koul <vkoul@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Chen-Yu Tsai <wens@kernel.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, 
+	Jerome Brunet <jbrunet@baylibre.com>, Shawn Guo <shawnguo@kernel.org>, 
+	Fabio Estevam <festevam@gmail.com>, Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com, 
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>, Romain Gantois <romain.gantois@bootlin.com>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
+	Maxime Ripard <mripard@kernel.org>, Christophe Roullier <christophe.roullier@foss.st.com>, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, Drew Fustini <dfustini@tenstorrent.com>, 
+	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org, 
+	linux-mips@vger.kernel.org, imx@lists.linux.dev, 
+	linux-renesas-soc@vger.kernel.org, linux-rockchip@lists.infradead.org, 
+	sophgo@lists.linux.dev, linux-riscv@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268626-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[oss.qualcomm.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,st.com,linaro.org,baylibre.com,oss.nxp.com,nxp.com,bootlin.com,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,tenstorrent.com,lists.linux.dev,googlemail.com,bp.renesas.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linuxamoon@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,rock-chips.com,163.com,vger.kernel.org,arm.com];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-268627-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 48F392ABF21
+	RCPT_COUNT_GT_50(0.00)[51];
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: B25762ABC87
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Heiner,
-
-On Tue, 17 Mar 2026 at 15:14, Heiner Kallweit <hkallweit1@gmail.com> wrote:
->
-> On 17.03.2026 08:59, Anand Moon wrote:
-> > Hi Heiner,
-> >
-> > Thanks for your review comments.
-> >
-> > On Tue, 17 Mar 2026 at 12:21, Heiner Kallweit <hkallweit1@gmail.com> wr=
+On Mon, Mar 16, 2026 at 7:31=E2=80=AFPM Radu Rendec <rrendec@redhat.com> wr=
 ote:
-> >>
-> >> On 17.03.2026 07:16, Anand Moon wrote:
-> >>> The driver currently assumes the PHY is always at address 0. On some
-> >>> hardware or buggy BIOS implementations, the PHY may reside at a
-> >>> different address on the MDIO bus. Update r8169_mdio_register()
-> >>> to scan the bus for the first available PHY instead of hardcoding
-> >>> address 0.
-> >>
-> >> No. The PHY always shows up at (virtual) address 0, due to the
-> >> MAC register based way of accessing the internal PHY.
-> >> Do you have any concrete example of such a "hardware or buggy bios"?
-> >>
-> > Sorry about that, I didn't realize. Unfortunately, my testing shows
-> > this still doesn't
-> > fix the problem, but I still perceive. I modeled the change after some
-> > other drivers,
-> > but clearly, that approach isn't working in this case.
-> >>>
-> >>
-> >> This check is needed. It's seems your actual intention is something co=
-mpletely
-> >> different from what you state in the commit message. You try to find a=
- workaround
-> >> for the issues with request_module() from async contect, caused by the=
- referenced
-> >> change to Rockchip PCI.
-> > That makes sense, sorry for the noise.
-> >
-> > What are your thoughts on using dev_err_probe() for these registration =
-failures?
-> > I thought it might clean up the error path.
-> >
-> I'm not aware of any realistic scenario where these calls would fail (w/o=
- printing
-> an error message before). So adding an error message wouldn't hurt, but i=
-t also
-> wouldn't be beneficial enough to justify a patch.
 >
-If we enable .probe_type =3D PROBE_PREFER_ASYNCHRONOUS in pcie-dw-rockchip.=
-c,
-The r8169 module probe will fail due to the module=E2=80=99s request for
-synchronous probing.
+> On Mon, 2026-03-16 at 13:05 +0100, Bartosz Golaszewski wrote:
+> > Add support for the firmware-managed variant of the DesignWare MAC on
+> > the sa8255p platform. This series contains new DT bindings and driver
+> > changes required to support the MAC in the STMMAC driver.
+> >
+> > It also reorganizes the ethqos code quite a bit to make the introductio=
+n
+> > of power domains into the driver a bit easier on the eye.
+> >
+> > The DTS changes will go in separately.
+>
+> I'm seeing some weird behavior with this version. The probe part looks
+> good (but see below), but when I try to bring an interface up, it fails
+> with ETIMEDOUT. The relevant part of the stack trace leading to the
+> error is this:
+>
+> dwmac4_dma_reset+0x208/0x220 [stmmac]
+> stmmac_reset+0x2c/0x68 [stmmac]
+> stmmac_init_dma_engine+0x108/0x400 [stmmac]
+> stmmac_hw_setup+0x5c/0x538 [stmmac]
+> __stmmac_open+0xc8/0x2a0 [stmmac]
+> stmmac_open+0xcc/0x238 [stmmac]
+> __dev_open+0x138/0x2a8
+>
+> Now dwmac4_dma_reset() is very simple. It sets the soft reset bit in
+> the DMA_BUS_MODE register, then waits for the hardware to clear it, and
+> that never happens.
+>
+> Now, getting back to the probe part, there is one extra message
+> (compared to my previous successful test on v7), which I see at the
+> very end of the probing:
+>
+>   qcom-ethqos 23040000.ethernet: clk_csr value out of range (0xffffff00
+>   exceeds mask 0x00000f00), truncating
+>
+> This is a sa8775p ride board, so there are two stmmac devices. I only
+> see that message for the 2nd one, which is also the one I'm trying to
+> enable, and which fails.
+>
+> I realize this may or may not be related to your changes. But there is
+> no way to test on a SCMI-pd board without them. I'm not sure how
+> relevant it would be to test on the non-SCMI variant. I'm assuming the
+> DMA part should work the same way (regardless of SCMI-pd), so if I can
+> reproduce it there, and since I know it works on mainline Linux (that's
+> where I tested v7), I could bisect and see which commit in net-next
+> breaks it. If you don't have any better idea, let me know and I can
+> try. Meanwhile, I'll keep poking at v9.
+>
 
-[1] https://lore.kernel.org/all/87bc37ee-234c-4568-b72e-955c130a6838@arm.co=
-m/
+Does current net-next on its own still work? Or is the second
+interface broken even without this series?
 
-Some were in the module, but the probe failed to load the module or firmwar=
-e.
-I hope these changes will resolve the probe warning.
-
------>8-----
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c
-b/drivers/net/ethernet/realtek/r8169_main.c
-index 791277e750ba..8b7858f6dc6d 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -5790,11 +5790,11 @@ static int rtl_init_one(struct pci_dev *pdev,
-const struct pci_device_id *ent)
-
-        rc =3D r8169_mdio_register(tp);
-        if (rc)
--               return rc;
-+               return dev_err_probe(&pdev->dev, rc, "mdio register failure=
-\n");
-
-        rc =3D register_netdev(dev);
-        if (rc)
--               return rc;
-+               return dev_err_probe(&pdev->dev, rc, "register newdev
-failure\n");
-
-        if (IS_ENABLED(CONFIG_R8169_LEDS)) {
-                if (rtl_is_8125(tp))
-
-Thanks
--Anand
+Bart
 
