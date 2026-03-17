@@ -1,189 +1,127 @@
-Return-Path: <netdev+bounces-268580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268581-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WKxyJFZDuWkk+QEAu9opvQ
-	(envelope-from <netdev+bounces-268580-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:04:38 +0100
+	id iDewNWhDuWmK+QEAu9opvQ
+	(envelope-from <netdev+bounces-268581-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:04:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA15B2A973D
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:04:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C0552A9764
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:04:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D317C308860F
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:59:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A59A3055956
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D2D3B7779;
-	Tue, 17 Mar 2026 11:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5EC3BAD8C;
+	Tue, 17 Mar 2026 12:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="sBGSXHmV";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KoFhcBVO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hMpXUNEz"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345163B776A;
-	Tue, 17 Mar 2026 11:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797113B8BCB;
+	Tue, 17 Mar 2026 12:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773748742; cv=none; b=pEik2o/fWZW/GL2AfHRgLcywF27RXKYeANLFa6f1ZDuYeNrCIp/zWVG5cTl1kefd39oJHnMpvZv0DxooYLG7B/YgXbx4C3aI9Yt2qRE8Qxlitq9URyFUSKgUZ8kEe6mFpEM5zO8/7/jRMNQIs6s/aVbfJ07iASTpTU/5PX2Z/as=
+	t=1773748819; cv=none; b=dfuzwi3x8lIEtQXcLdlYOeCYGFT3Y2bSGCEKmSVNPspk9N0OZ/WQ+hZ9eWFvxf9iXOBMeZZZA8+ETz8Ob7QFepeYrXGeLq96aBFjNL4wPLxZ88uWxlRCpjmd+vXdMET2VWjaOgUoUk35FAlOeD14rvWxsVKkUl8RANeswJxzU9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773748742; c=relaxed/simple;
-	bh=WzpohQTFAg+/+5fjgYupL5nMEp8YLjnG0HBxCA/Fido=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NKmB6nUrjVLGIjA7GhjAFBhgp6ltcQqGCNbFNi+uc8CnvfysVXBO68c5GLVMFUFmhrj8OUSbrZAQLkiN47uFTeVwx3S2Tftl2EzYpnrkhKolnSxiupUJCziZykxKuCPatxJSGW1XiO27gIgd/U7JRq0Fvvoxx+DKQcwiYoPq9lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=sBGSXHmV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KoFhcBVO; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.stl.internal (Postfix) with ESMTP id A68CB1D00175;
-	Tue, 17 Mar 2026 07:58:57 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Tue, 17 Mar 2026 07:58:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1773748737; x=
-	1773835137; bh=LQKKJmXb+zrz4f+7W1idnzMcDl0vzLq+F8OkS2Y6DOc=; b=s
-	BGSXHmVDI4CGagxvI+Aqoo7MErNV32aqTztJ67/hkY/49eLmgh9irqikMUvyhSKd
-	6gmh5uc96OUkfeWNgy3NTMsIqVWaJxsO1vOz6YhUMUGK62zxxepU0D4Zxt75vTWe
-	2kpbTiSJYg9NPmxmCD3xaPPTRzaY30OS2eoPxPEz5EQY6BfpELg0HKQGFD9a2ZT/
-	+tvyZMsp9LCO+9mCAVVJ9ZCwGpBQFwINaoWUiMFhayV728yi7OQVSMFZWxNLOCCI
-	RkXIZc30LOVfmPr/w4qQN+Z4ee5+vyelKDJm/WVUJBqdKPtLNUL3ezrmMOPOb0gy
-	2AoYGXlrUKSsTtg+75tYg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1773748737; x=1773835137; bh=LQKKJmXb+zrz4f+7W1idnzMcDl0vzLq+F8O
-	kS2Y6DOc=; b=KoFhcBVOcfAMJPRVhaorXh8apoVVymXAMIWNkDwQZ+MdwTs7WmE
-	GwrJMTQZ44hKVUSw0DHXYRlc7z5ZvfFF7HdEo5S2Uc4lg1inmKqAfGt622Ez8NY8
-	wshjKtNBgcUYFhbnQLh2UVWLgKPWZdT79gNvwgclu0jK8UuOqCv+M5koNif8TV3Y
-	HSJWGjbmVXHpfxA2dTs33tjd4s5/snXNzeXZnr5yIdxpoiJZhbj9QdKU7ZdsW1da
-	zOBGjRa8ZReTxjeb/3AMSvBnw02FNceMANYpdBuVMK7JJ2k/wfRqUMaZek2ITJgy
-	ocwnf7Ud/Qhxv9XaTfYpQxtOxYGAleJurhA==
-X-ME-Sender: <xms:AEK5aYBgOAUIMneYJa2E9tIMHlWwuvco_YDmcnmEiAlNa5oGB4PIKA>
-    <xme:AEK5aZ86G_FBOs_yfE5kGGV4duJUZ2jRA7YhI9UtPjgxfP86Hriy2pACjYBcQXdk6
-    FGMhEaA97nnN0Wq6dJfGRiYwO7m19U3DAvOGWpQOPObAxYZ5ZudLXeq>
-X-ME-Received: <xmr:AEK5acrUAaDX-L7fqdcIX2uJg_tJCv6dGgtMC1KKO_50asgt8fM6-esKfgBN>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdduudelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduhedpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrd
-    gtohhmpdhrtghpthhtohepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhrtghpthhtohep
-    rghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmse
-    gurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehjihhrihesrhgvshhn
-    uhhllhhirdhushdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhg
-X-ME-Proxy: <xmx:AEK5aTGJ108I1jkgAh5qvj26DOfg8XJL7Fk5wFfh8UUZJXfovuJscQ>
-    <xmx:AEK5aQ_gFvwQxGKQFCZ9z2JXrQhXzuP2CSkX0Rw4SF-jSfnevmK10Q>
-    <xmx:AEK5aQSwcMmWJpsOjK5wPX_scMjt8TKvg5MvQLPzC-OICIjKARZjTA>
-    <xmx:AEK5aVqUedkZC0oMc44wEgQTf0pj5Fr5cDF4bYbcSNWoaa7EeJL-ag>
-    <xmx:AUK5aTn9OHBOk8MwvW468Thfg8UQ9GotY6GAcUnEeOJibWZB90tl6RXK>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 17 Mar 2026 07:58:55 -0400 (EDT)
-Date: Tue, 17 Mar 2026 12:58:54 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>, Simon Horman <horms@kernel.org>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bridge@lists.linux.dev
-Subject: Re: [PATCH net-next v3 3/5] macsec: move netdev_upper_dev_link()
- after macsec_changelink_common()
-Message-ID: <ablB_tdLxMPoYtv3@krikkit>
-References: <20260316-offload_compute-v3-0-a5d4a07d86d3@gmail.com>
- <20260316-offload_compute-v3-3-a5d4a07d86d3@gmail.com>
+	s=arc-20240116; t=1773748819; c=relaxed/simple;
+	bh=ObyeGWjZtHrymyhtE8GDuhc5g0y8cyThbPdP6d9yYY4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lu4UHuw8b0zCDrYTBYNDJvpwlmITFiujcQdbQhzQf4DmbWmXqpemFWYiTb5cLaE9MhEsZ8Wf/n8SFTXoUIq74bzcmHkQOcJJWV111ND96kbkFKbbb3MtkNvG0GI0rHYi4oIxaA+pXUMV68XzAsK8kvDYnhesG5OyImdzZ9CZE38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hMpXUNEz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 309DCC4CEF7;
+	Tue, 17 Mar 2026 12:00:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773748819;
+	bh=ObyeGWjZtHrymyhtE8GDuhc5g0y8cyThbPdP6d9yYY4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hMpXUNEzjlOBeJpEzQgy7xrveSW8A+vEoevMJ8D+6cM2PkXe9tMH6KO1nfC5fMZMu
+	 PgSrUwsnpo0tH0Ux3XTsCGNfyQsXnBqkJPcVp2rz+TY7uzOPQAXPG0I6A2EgbPCrAM
+	 lWKZ+Xqvpk31J94HVCiJrRo4Nx8s8FJsz31MbrfL2+DzxjHigT2XWzmlOT+DCTSLHW
+	 y8A9ZDgwmiSo+aeM0qQhbys5X2AxRwYKSxSZ38AlXRpxQsun6kfIdWhOKJHpbfZtSE
+	 3vtiia7MLvkdQw5X3AazwL1LMaMekEj4q29aWiyQEYOOltoMMIn2GecfkmIhKFbsfy
+	 PYpgsGyM1NUWQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C8B4A3808200;
+	Tue, 17 Mar 2026 12:00:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260316-offload_compute-v3-3-a5d4a07d86d3@gmail.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3] selftests: net: add ipv6 RA route to ECMP
+ merge
+ test
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177374881156.3585799.4575178253875930759.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Mar 2026 12:00:11 +0000
+References: <20260313124827.3945-1-fmancera@suse.de>
+In-Reply-To: <20260313124827.3945-1-fmancera@suse.de>
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, shuah@kernel.org,
+ horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-268580-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DMARC_NA(0.00)[queasysnail.net];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268581-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[queasysnail.net:dkim,queasysnail.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EA15B2A973D
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2C0552A9764
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-03-16, 12:26:11 +0800, Hangbin Liu wrote:
-> After calling netdev_change_features() in __netdev_upper_dev_link(),
-> the call stack looks like:
-> 
-> - netdev_upper_dev_link
->   - __netdev_upper_dev_link
->     - netdev_change_features
->       - notifier_call_chain
->         - rtnetlink_event
->           - rtmsg_ifinfo_event
->             - rtmsg_ifinfo_build_skb
-> 
-> In macsec, we call netdev_upper_dev_link() before
-> macsec_changelink_common(), which causes the fields of the MACsec
-> Security Entity to be uninitialized. Later, macsec_fill_info() returns
-> -EMSGSIZE and triggers WARN_ON() in rtmsg_ifinfo_build_skb.
-> 
-> Fix this by moving netdev_upper_dev_link() after
-> macsec_changelink_common(), and return 0 if secy->key_len is not
-> initialized yet.
-> 
-> Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  drivers/net/macsec.c | 23 ++++++++++++-----------
->  1 file changed, 12 insertions(+), 11 deletions(-)
+Hello:
 
-I'm not sure I'll manage to look at the rest of the series before it's
-applied, but for this patch:
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+On Fri, 13 Mar 2026 13:48:27 +0100 you wrote:
+> As commit bbf4a17ad9ff ("ipv6: Fix ECMP sibling count mismatch when
+> clearing RTF_ADDRCONF") pointed out, RA routes are not elegible for ECMP
+> merging.
+> 
+> Add a test scenario mixing RA and static routes with gateway to check
+> that they are not getting merged.
+> 
+> [...]
 
-Thanks Hangbin.
+Here is the summary with links:
+  - [net-next,v3] selftests: net: add ipv6 RA route to ECMP merge test
+    https://git.kernel.org/netdev/net-next/c/fdd973148a11
 
+You are awesome, thank you!
 -- 
-Sabrina
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
