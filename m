@@ -1,140 +1,202 @@
-Return-Path: <netdev+bounces-268492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268493-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4AYkCUgVuWmOpgEAu9opvQ
-	(envelope-from <netdev+bounces-268492-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:48:08 +0100
+	id IJezMG0WuWmOpgEAu9opvQ
+	(envelope-from <netdev+bounces-268493-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:53:01 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F4962A5E84
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:48:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E7DA2A5FB1
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 09:53:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC5373071F49
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 08:45:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 11C3030057B1
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 08:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC2E36EAAD;
-	Tue, 17 Mar 2026 08:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E6A939D6E6;
+	Tue, 17 Mar 2026 08:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mU3Axdkx"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ASZ/MVVe";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="iCClEhJU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9DB39B4BC
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 08:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF20430AAB3
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 08:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773737103; cv=none; b=gSzPOgRzuCWhEjgLiJEMzH73MkpuMMd31PX/unozQQOnDNqdh6r+XWw/MG9KTCIOPt/PK7peqGLo//YR1eqX/TsowwSERzeO0cXMOnKkCVcCI/Ec9+cHDizDlAARhoG5zWZ0jT9iIvp/e5KnHXF/ZeMx7H7IBx9kOadXkI0TLDU=
+	t=1773737498; cv=none; b=bCv56pLYR0VAWf42fKLJW1I6cEuOnAWQ10WmG/z6G3sAcYe4kJGbWiJHbJu6verh+cedA15XjjfQZaL+w4PDVdp6Zj7F5VrN3crjuVZ1dRjr8HKLStdpBhYK6pYQdUHv4xCjFIqzAws5GmXjG+wdEWg+yjBs0cA9pHNi2JRRugE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773737103; c=relaxed/simple;
-	bh=IRQR4EX62gHxndHVD5ol1tVDrK0iQUrN/1zkt/4CXKQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h92+1M0vB0tDCxAYvp+2qu6p55cFSOD4tU2w5nOZyNhDHqFM7422WF4TF8igmqiQaLr3DaoPgAvApFdmHAQKVn0j0HcpJDeIXzI6JTNpb5kIrn/FZidmYoE0h++KwnsjiUnTSmexzwJsFAbMSkiad/N9YojcxywGKbqqPQdf8D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mU3Axdkx; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773737102; x=1805273102;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=IRQR4EX62gHxndHVD5ol1tVDrK0iQUrN/1zkt/4CXKQ=;
-  b=mU3AxdkxFoCO1oxyj2vZargMjnveC9rMmn/3VrwVFal1YZKCY72mqNmd
-   /zpN+mzbSjkM98kjlEZPYnzzjojr+tVtrk/O2STXhJ2OnSdoaYjvnwd6k
-   s9zxffEMMaUDrhQ+bGMHCkA7oEWXgcWkfYdc2YIfSXCh1l3KeEYCvy4/X
-   ota9IWU/MOG92ZiUfKyC3c7vZ4QUqQEJ2AP58MCgxAI/1VmAcTECFxSEM
-   EJ8CL4mvmH6Bp/Rbfr/SoSD185DALTlDfE/enpmy3Ihcu80FFNqdqAQSG
-   tQYwJFbEs9nceMyfYk3hb4hRwjA7VG2Dxp5UsWcWF4hkRCcy7UYuPtkbk
-   Q==;
-X-CSE-ConnectionGUID: OI85LGrWQZ2Bbz9i1apYFQ==
-X-CSE-MsgGUID: tLnzrt1TRKyTAPMWHMc7BQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11731"; a="74651558"
-X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
-   d="scan'208";a="74651558"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 01:45:01 -0700
-X-CSE-ConnectionGUID: X0jYK42PQgeUEzYVlt/b6Q==
-X-CSE-MsgGUID: Zc28UOdfQgeO2Nuz+NTU+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
-   d="scan'208";a="219710027"
-Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by fmviesa008.fm.intel.com with ESMTP; 17 Mar 2026 01:45:00 -0700
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org
-Subject: [PATCH iwl-next v1] ice: add ethtool reset support to safe mode ops
-Date: Tue, 17 Mar 2026 09:44:59 +0100
-Message-ID: <20260317084459.2196606-1-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1773737498; c=relaxed/simple;
+	bh=4QgBtB8A9KYHumYiqPxwg3Mhj07QBFZK+AfRokd9Gas=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QKxsiwIIW0sXVs39N34hweZaYEncNnGx31YvnktsJu4rdYDLAZ0IkBEMYvPBaPab/gdCtFOwybSKnFITSuabe//jKhErh3scbhWTq/U1EUT3M6oWVFiYgALMRwOYOJsG37+FL70OqpJFbz7HAOxKr5zdEX0TXEtWFcnEOATS8EM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ASZ/MVVe; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=iCClEhJU; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62H5hw9R1042729
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 08:51:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	IxITSj4z8OO1NrLzEXCXkSrkOXhqxZm0zTAv5L09paM=; b=ASZ/MVVeGtJMu1Fc
+	XLhAANnTMxH1a/V03vG/LTkSxc0F4h1bFIMtAPhjCNfhnr3REamoVzaRvJ/Ifm5q
+	DWpnOtIKVZ2lztx3+oTq0s6N3eKWOBuea9uI0iDZ/3DENDJ2W4IrKaTj0qitnYsP
+	PTKVUSzhCM3E4DrZZcryCru4YuPS/gsXqVf5pYvK1u5TnwI4y6JlvXMSeP2McicD
+	+oZUlt7pYG43FnWbT6wLNcih1Qj/3DZZC3c8zJFvrpMgtwdfF/FtCG5S9fRhbnGF
+	JD5kglBhyIBwiy5g50f9b51gKOOlJnxwyhF91X4sV0+pn+xbASdGOs+h0EFSpdzf
+	YmkcHA==
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cxkuy3782-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 08:51:36 +0000 (GMT)
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8cd98d96382so621142085a.0
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 01:51:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1773737495; x=1774342295; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IxITSj4z8OO1NrLzEXCXkSrkOXhqxZm0zTAv5L09paM=;
+        b=iCClEhJUF5Dcxya/Kwlwq5RgaYQDlrMdRhjSM+zbkfkNUe8Q2NQjwIb2whshr4RLRz
+         i6uA5HNBYbSMy10DqSa+MIdei7aW41WMeE5kz6tuahZO8PY6AqxAkGURslGhd/5EeOty
+         8wGZyJ01oDHlEn11oD3IYkpIaWH6PMlUJT4OypKjFfkOtGbhZSWYr0dV7NXE793GOa7c
+         MQgjqV3WcrGq3fWPplXE9TwZHfbD9EUvL5inAKAaI2bCdyPoEpqVqrgmpz/lEfF7V02J
+         qo81rN324pLXtKJRRPN1oUggUuSlI1CDATPlxnc+khQ4xSK4a6iR1vMd5wjHk0iTTZSY
+         6p8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773737495; x=1774342295;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IxITSj4z8OO1NrLzEXCXkSrkOXhqxZm0zTAv5L09paM=;
+        b=ohiIdRiN7/rpyVox3mau7BEYhvE1Vc/hHw7cxifWlB2RtH8smax7OuDRGNlqkTwbVl
+         6mid6T1YxKmWrvU5GNNNBhN6hCa3zI02vZwxIPuVgR6VgAsmUFH7PUnJ0+wllMy+16AA
+         ZQ9t7yGOxP27WOK0akv5YoxMgqXvdFY/zBiCPYEDZ9iO/f3QYiOMGWp/XfxWetGZmBrh
+         jXHJTvQI/xXVGpsC8LZ1HKf5GcqOMvGFogrUuaDsbQFr1RHhAHu1dyk7arQqkakd3rSW
+         JwbR0DXZLM6YRI9sf/hHDPufG/Z6kgVl1VXQG8XUzCZviRObudXeograpnRPcuw5PJVd
+         gwew==
+X-Forwarded-Encrypted: i=1; AJvYcCVDr2lV75PA7f8MXwavDmnM/eW5CBFguKGMUhhihVxrgtc7OxUqsee+aYCAJtUev5rPYuYE4x8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzw6PBo34NVsKKn0azYSSR7rDSMZpNGCbNMWqi1qiTFqCx8/6Sp
+	r2MeEkW6U1bS9zIqoMkP5TUyETnBdZavZF6ncXlhY7NGZYdKhkBcIxdsd7ImxJ5HCXvXV4kGyeg
+	GHuy4nbKUVVPxXnIeow93gxcdixC9L2hsjGbbQTTCE4NxfdaNFkgLxQ9gYNc=
+X-Gm-Gg: ATEYQzzwRgRy1G4aiJsumd+f+5LOKOD/Uju3Gz0hKoR+EEPQXBjEd/dh4oGnprKc6a0
+	oYtbx8tm8px/mri/T/6AX6J6XszKzbnqYUu4lVoQjjhB8iWDQOIGWUVixWQI+zTBHC4RVBV4VvP
+	F2GeKekIEB9VLUHnGQnin9Fhj6QeW1UXhF+QZEQvLErwr/Hq75nvxFgqUBzQFsML/DQ9bemzD5S
+	jA5ciUMHeBS2b5MM9ENaT1Us94rAHsul0aaLHpCGihnAVEuoLP2Oj7M/uwPDIkQLCXApoVj9LEv
+	RmbN52i38WCiWaPsw1X/H1ILQHHIGKS0VkEhCD9aGU4TOiDlcXoc6R+bJlPs7bXkwBn7jCQiaPn
+	VgKnu6mwNdJqLFS6pTGkvcdF9UpWxguYXYlT5/G34JtYOIMK3/7wPnWlbDDSqUlbdwo0+c6tDlk
+	zzMSuKhpSC
+X-Received: by 2002:a05:620a:2915:b0:8c6:e224:d55b with SMTP id af79cd13be357-8cdb5b0a024mr1966586785a.41.1773737495237;
+        Tue, 17 Mar 2026 01:51:35 -0700 (PDT)
+X-Received: by 2002:a05:620a:2915:b0:8c6:e224:d55b with SMTP id af79cd13be357-8cdb5b0a024mr1966583785a.41.1773737494732;
+        Tue, 17 Mar 2026 01:51:34 -0700 (PDT)
+Received: from ?IPV6:2a05:6e02:1041:c10:67fb:53f6:20ba:ff45? ([2a05:6e02:1041:c10:67fb:53f6:20ba:ff45])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4856eae3322sm46732245e9.10.2026.03.17.01.51.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Mar 2026 01:51:34 -0700 (PDT)
+Message-ID: <8757aec7-8c36-446a-9a34-f0717f64202a@oss.qualcomm.com>
+Date: Tue, 17 Mar 2026 09:51:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/4] Use the QMI service IDs from the QMI header
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: konradybcio@kernel.org, andersson@kernel.org, linux-kernel@vger.kernel.org,
+        Alex Elder <elder@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Srinivas Kandagatla <srini@kernel.org>,
+        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+        Kees Cook <kees@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>, Mark Brown <broonie@kernel.org>,
+        Wesley Cheng <quic_wcheng@quicinc.com>, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
+        ath11k@lists.infradead.org, ath12k@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-sound@vger.kernel.org
+References: <20260316171419.2619620-1-daniel.lezcano@oss.qualcomm.com>
+ <20260316172251.2d57d0aa@kernel.org>
+Content-Language: en-US
+From: Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>
+In-Reply-To: <20260316172251.2d57d0aa@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=br1BxUai c=1 sm=1 tr=0 ts=69b91618 cx=c_pps
+ a=HLyN3IcIa5EE8TELMZ618Q==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22 a=rySjVtX6Rl8zv02YFYoA:9
+ a=QEXdDO2ut3YA:10 a=bTQJ7kPSJx9SKPbeHEYW:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE3MDA3NyBTYWx0ZWRfX69Qzl1d8Nocn
+ 6ufWVneIw7esVFL6rtVQ5bcUMxi5p4KAip2uKLDDoxmmppgrOMFxdR0Hnc7fi3kRUEKmHmZXTy/
+ 54ELIwfGvBKQi5xaXAfvak/uZ14FgtjQPGlWiSwVwvE1yKYq+qbWGhGPorY/JLUNHRI7/KQGF2z
+ AATCuLjYt+xF7B96Aowa8+C4F0a2RJ0Dn5Q1OE7S3LdA3xU8S9GUQ1kpx9BdNCT3Ckv3pdDZQ/I
+ f+jSpBfFgq91wT3y6UBgtT5AsptPKt5dnGHpaRWcljHVkr7ipmFW82lZ7uTJB8CiqhIs2kt7NUY
+ Kdd4Jy+5h1A12IOG2u6DZJlfBBU2ANs50P797Nv/81bQgraCywtdDd+Q8x6KIP9gS4GOV0gQziu
+ aM9JOFa6S+yi1RSsrGC9vxnbr+mz68qhMjAYrHtvEFizeiHz5faVceSXwwHsueq6KdSG6N214TV
+ tx48/M7tIeq0u1Pq5Vg==
+X-Proofpoint-ORIG-GUID: 0pz_PcCeMVk4wI5Curk9ggwH7eVRqBiZ
+X-Proofpoint-GUID: 0pz_PcCeMVk4wI5Curk9ggwH7eVRqBiZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-17_01,2026-03-16_06,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 priorityscore=1501 phishscore=0 clxscore=1015 impostorscore=0
+ suspectscore=0 lowpriorityscore=0 adultscore=0 spamscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603170077
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268492-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6F4962A5E84
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268493-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oss.qualcomm.com:dkim,oss.qualcomm.com:mid];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel.lezcano@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 6E7DA2A5FB1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+On 3/17/26 01:22, Jakub Kicinski wrote:
+> On Mon, 16 Mar 2026 18:14:10 +0100 Daniel Lezcano wrote:
+>> This series is based on the immutable branch [1] containing the QMI
+>> service id definitions along with some drivers using them.
+>>
+>> How a patch can be merged ?
+> 
+> Wait for the dependency to appear in respective trees after the merge
+> window then repost the patches individually. I'm starting to get
+> annoyed with all this cross-tree QMI/MHI noise.
 
-Wire up ice_ethtool_reset() into ice_ethtool_safe_mode_ops so that the
-.reset ethtool operation is available when the driver is operating in safe
-mode, consistent with the behaviour exposed by the full ice_ethtool_ops.
-
-Without this, a user-space call to ethtool --reset while the driver is in
-safe mode would return EOPNOTSUPP even though the underlying reset logic
-is fully implemented and works correctly.
-
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 301947d..bf90bd5 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -4917,6 +4917,7 @@ static const struct ethtool_ops ice_ethtool_safe_mode_ops = {
- 	.set_ringparam		= ice_set_ringparam,
- 	.nway_reset		= ice_nway_reset,
- 	.get_channels		= ice_get_channels,
-+	.reset			= ice_ethtool_reset,
- };
- 
- /**
--- 
-2.52.0
-
+An ack is simpler for everyone, especially when they are trivial
 
