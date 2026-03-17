@@ -1,153 +1,190 @@
-Return-Path: <netdev+bounces-268445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268446-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id JUKKJ1HiuGmZkwEAu9opvQ
-	(envelope-from <netdev+bounces-268445-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 06:10:41 +0100
+	id eEfnEqrpuGlplgEAu9opvQ
+	(envelope-from <netdev+bounces-268446-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 06:42:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10F52A3E5E
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 06:10:40 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 542642A40B8
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 06:42:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9BD95303338D
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 05:10:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2101D3010686
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 05:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80A52339847;
-	Tue, 17 Mar 2026 05:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27AE137F733;
+	Tue, 17 Mar 2026 05:41:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="A3UhdUQr";
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="A3UhdUQr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XdM7Lny4"
 X-Original-To: netdev@vger.kernel.org
-Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9651E511;
-	Tue, 17 Mar 2026 05:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB8C282F2E
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 05:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773724236; cv=none; b=dDEtAHeTV0DJnWqpv2/mGQ7OXrQOCZ0zxxg465HaO6i7K+NxS4y7AZnNlbbkBTFpnv2YqBU3GFGMHqp+zQHx2KXdjtLJygvpPxUEpc00ncbGMu7z653LiLnPW+CXlbUiP7BqFlSuMPJNc2KFn0zl4R3l6SAw3NPkRPrRgTsheRs=
+	t=1773726112; cv=none; b=Ge7heRi5ikZ/l4kjrKurVxxlGrKCW733xBim5e12t75ewnQP+Tf14vwhK0UPFgzOlOof+16mNrirZ48iDFLX1/sg4A2hhTy7TRPNjVw+CVjB7C0sOCafuHIGNoLNw7IVVZHP3jnLXv9s+BcockjlIBWGWswFM9FyFy5wjR3UHXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773724236; c=relaxed/simple;
-	bh=+0QBHxU4iNHLwQ8o9SYdy3OMq3UGOvW1+Ag5iPWHkT0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D9xnFITdu6tFSdPpEwSFJ69fw2WETXQwh4LobteH32aS5GJvqMd+rW5chr0E0PlUMaDX9+lrkBKBxfD3VXKqBvvGfUTYWpB1als7sE49uDSF9hw92KvACFZLtgigSpLffwGYzsQhtOstwBoJ49o5ov0pKQTOogNEQGi2u7nbmEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=A3UhdUQr; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=A3UhdUQr; arc=none smtp.client-ip=23.88.97.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1773724229;
-	bh=+0QBHxU4iNHLwQ8o9SYdy3OMq3UGOvW1+Ag5iPWHkT0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=A3UhdUQrE5kUMRNcpfp6vsBrR5C1VhCdwDFgGeeHm5YaQc+9SR80kR+8pPPyjMk5k
-	 hSL/IoJTN0cv9vY5eAPCy8yB72XifqpWg9WAFVV00E4S1GP3ilmi1/SIS0eXb2ovFF
-	 BoeJf5AY04HZCjq1aliAZrmbw+DIy3ukuB8pf3KNDGoZDKagO0BZ2HN3KSka0Km1vK
-	 AI3tA7FL3srmN1+AF87QZspFeuMqDb95nXmSVdvnuS4EMwI3ny9cF+syAlmeatkc4W
-	 8RIFFC+KAuRkRPJLwnOuvj++qHxaxuGNqarfS37O9U8XYLNzkgiPCRmnX9oDOVf0Ep
-	 RXAWn9zsrGZ2g==
-Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
-	id C813C3FDB2; Tue, 17 Mar 2026 05:10:29 +0000 (UTC)
-X-Spam-Level: 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1773724229;
-	bh=+0QBHxU4iNHLwQ8o9SYdy3OMq3UGOvW1+Ag5iPWHkT0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=A3UhdUQrE5kUMRNcpfp6vsBrR5C1VhCdwDFgGeeHm5YaQc+9SR80kR+8pPPyjMk5k
-	 hSL/IoJTN0cv9vY5eAPCy8yB72XifqpWg9WAFVV00E4S1GP3ilmi1/SIS0eXb2ovFF
-	 BoeJf5AY04HZCjq1aliAZrmbw+DIy3ukuB8pf3KNDGoZDKagO0BZ2HN3KSka0Km1vK
-	 AI3tA7FL3srmN1+AF87QZspFeuMqDb95nXmSVdvnuS4EMwI3ny9cF+syAlmeatkc4W
-	 8RIFFC+KAuRkRPJLwnOuvj++qHxaxuGNqarfS37O9U8XYLNzkgiPCRmnX9oDOVf0Ep
-	 RXAWn9zsrGZ2g==
-Received: from [IPV6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb] (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
-	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id F41DB3F5A6;
-	Tue, 17 Mar 2026 05:10:28 +0000 (UTC)
-Message-ID: <a0d20522-2253-4621-9060-29e61a1b1431@birger-koblitz.de>
-Date: Tue, 17 Mar 2026 06:10:28 +0100
+	s=arc-20240116; t=1773726112; c=relaxed/simple;
+	bh=bltp3WJAylvLdfOQ5q+iE7Igpst4STCCh4hr4m1hx5E=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=sBD9+nGbc4FGhGnmEJws5YnjgpEmV098UyHNl8GHY4kS6Z1K9x0IgrzyEbP7Z7vt+YBPC4RIK7QTD9oN1m4gOHix51H3+Bae0eZbHVYBx8x5oOXdBOnFrPHGcBiBESbInekFZrOxOxq3O0leDOjsd1zRobiWWeKJs7zpnAdNhsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XdM7Lny4; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b97b7e0368eso264967766b.3
+        for <netdev@vger.kernel.org>; Mon, 16 Mar 2026 22:41:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773726109; x=1774330909; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/aseV1JohbHZtQxOSTDVIyaCJRT3wIWyomxb4YwbsJs=;
+        b=XdM7Lny4kDM5mG8unAVNW/01cajvbi3iCjTsI9k25xzGVVUoaFwbKfY8MhSEh7yPu6
+         OnLqcNNBGnVF1g8soXk1NXdO3W+VVQ+QsY+zeykMfD4dyKZvshTv/kv/dykVoKv1Qv25
+         PuOscBnQffthI7f5Fd6816DUmIAhy0W279Q/WkYloqmfhgkJAAU3wNJXbYejZV+xWTqO
+         JV1U+cKePKPXs03/xAlkAMwfmSAg/1W5ri+H/2rlZmuSAtnQXXRTocch5H9wKrnGOOTF
+         lhihCQ6N30Qt5CmCpdPbvCsZjwayOq7gq7uuvVoLcaZdqaY24DaoOhDjWBjQOqcJh5DK
+         nrkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773726109; x=1774330909;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/aseV1JohbHZtQxOSTDVIyaCJRT3wIWyomxb4YwbsJs=;
+        b=JlWPdLeI7Yxg4kgRPufOxXJ+0XjGlYqvj7ZX3MTrIrdokXjVUo08fF9ERUPA2P0Y5b
+         lvirDReOiONP2RPiBaVACiU6mhWM73rWZgW+R9MHJ5Mv/C8p6xJaNw5Uy/qa27TzylKy
+         n9qOaGOXoMD71LBUf+JVmvq9jq1dxsqIDfW7afKQoe9t8WTOU88z5qMtdo8aRyB90uLG
+         895zhKDDdIOrpxYVTwA2HRML+bCBWHofHt9IdUW+5XUuyQN1oXyBQUJaFf30CVdEY0fD
+         C8AxC2F774ictU0ADzmnDqHr8X0Do5L8tntmxq97LdFLRq/in2DVlG/rDQGL8guvWaGt
+         BBEg==
+X-Forwarded-Encrypted: i=1; AJvYcCUw1nYYS7T+OEvLUNkBPBvMu8T1PlxccGH368kP4+FXDYw9ewFl2SdjVYvuay1CUgnOu9Z5+AA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSjUmvXx1Mk0nwq9Rw8wlezjvK/3rrNqg/YO8tDq0v8zFGk7mn
+	rS9COF60D544eAUpQcYiJCc32/J267uXgjOS0hUD2P7GyI3gRaNVdXXk
+X-Gm-Gg: ATEYQzwYIhxm0Hvmh2IczB73o65brekjsNopoN7QTWxktAGCz0I9TO+pJc7spqwc/xq
+	sDZuiL1YBvzvMDkDMA46b7XtS0dvpx7hpcGCzxHx6ICPijoBPxv3PJ4gZyRPNjIFevaqyKKT1mw
+	hgC3uLEZhnUsomvcdiTUlrH0NBWi3n6GmcWhdKi1X7n3J3DGX8SLhhfLjiI29VB27dSf3Qp9oZP
+	Zash90hm62L1c8KmIVxCHEFVEi2Epe22PUTl6MDvYRPNIfbBaf+xo5Y1FRPfQ9GSqzTJn6rMLzJ
+	eAJIYQnowauCXVSSOg41/FYHsWJ+GrADp1bJw1o5aqheA+QFZn/RvZ/r9J1UdipNvwBRpuzn3WU
+	opjOiYFIHybRV6s53tX2yYW3fzF/zkTBb/sTOqam6BVjugC3bIHynYnoRVhQ0LtsLPzjH54+3xD
+	e918OgXAY=
+X-Received: by 2002:a17:907:72c2:b0:b97:b20f:c5b2 with SMTP id a640c23a62f3a-b97b2100569mr440106766b.9.1773726108699;
+        Mon, 16 Mar 2026 22:41:48 -0700 (PDT)
+Received: from gmail.com ([2a09:bac1:5520::49b:49])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b976cefca43sm687527566b.46.2026.03.16.22.41.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Mar 2026 22:41:47 -0700 (PDT)
+From: Qingfang Deng <dqfext@gmail.com>
+To: linux-ppp@vger.kernel.org,
+	James Chapman <jchapman@katalix.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] l2tp: ppp: use max L2TP header size for PPP channel hdrlen
+Date: Tue, 17 Mar 2026 13:41:40 +0800
+Message-ID: <20260317054141.524879-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/9] r8152: Add support for RTL8157 SRAM access
- and ADV indirect access
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260314-rtl8157_next-v1-0-9ba77b428afd@birger-koblitz.de>
- <20260314-rtl8157_next-v1-2-9ba77b428afd@birger-koblitz.de>
- <20260316175208.3e14385e@kernel.org>
-From: Birger Koblitz <mail@birger-koblitz.de>
-Content-Language: en-US
-In-Reply-To: <20260316175208.3e14385e@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[birger-koblitz.de:+];
-	TAGGED_FROM(0.00)[bounces-268445-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[birger-koblitz.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268446-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,birger-koblitz.de:dkim,birger-koblitz.de:mid]
-X-Rspamd-Queue-Id: F10F52A3E5E
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 542642A40B8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 17/03/2026 1:52 am, Jakub Kicinski wrote:
-> On Sat, 14 Mar 2026 10:31:38 +0100 Birger Koblitz wrote:
->> Add support for the SRAM access interface of the RTL8157 and
->> the ADV indirect access interface.
-> 
-> ../drivers/net/usb/r8152.c:1757:12: warning: unused function 'rtl_bmu_clr_bits' [-Wunused-function]
->   1757 | static int rtl_bmu_clr_bits(struct r8152 *tp, u16 addr, u32 clear)
->        |            ^~~~~~~~~~~~~~~~
-> ../drivers/net/usb/r8152.c:1788:12: warning: unused function 'rtl_ip_clr_bits' [-Wunused-function]
->   1788 | static int rtl_ip_clr_bits(struct r8152 *tp, u16 addr, u32 clear)
->        |            ^~~~~~~~~~~~~~~
-> ../drivers/net/usb/r8152.c:1793:12: warning: unused function 'rtl_ip_set_bits' [-Wunused-function]
->   1793 | static int rtl_ip_set_bits(struct r8152 *tp, u16 addr, u32 set)
->        |            ^~~~~~~~~~~~~~~
-> ../drivers/net/usb/r8152.c:1810:13: warning: unused function 'sram_write_w0w1' [-Wunused-function]
->   1810 | static void sram_write_w0w1(struct r8152 *tp, u16 addr, u16 clear, u16 set)
->        |             ^~~~~~~~~~~~~~~
-> ../drivers/net/usb/r8152.c:1824:13: warning: unused function 'sram2_write_w0w1' [-Wunused-function]
->   1824 | static void sram2_write_w0w1(struct r8152 *tp, u16 addr, u16 clear, u16 set)
->        |             ^~~~~~~~~~~~~~~~
-> ../drivers/net/usb/r8152.c:9807:12: warning: unused function 'r8157_desc_init' [-Wunused-function]
->   9807 | static int r8157_desc_init(struct r8152 *tp)
->        |            ^~~~~~~~~~~~~~~
-The same argument as for the unused r8157_desc_init() function in the 
-previous part These functions support the new ADV and SRAM features of 
-the RTL8157. If e.g. the rtl_bmu_clr_bits is moved to a last part of the 
-series when the RTL8157 is actually used, this would also mean that the 
-read/write functions it uses must be moved in a ripple effect as they in 
-turn would become unused. It would make this part of the series only a 
-patch introducing register addresses without any meaning. In my opinion, 
-this makes it difficult to understand how the new features are used, and 
-would make the last part of the series huge.
+chan.hdrlen is read once at channel registration by
+ppp_register_net_channel(), and used to set the PPP net device's
+hard_header_len. It was set to PPPOL2TP_L2TP_HDR_SIZE_NOSEQ (6), which
+is 4 bytes too small if sequence numbers are later enabled via
+setsockopt(PPPOL2TP_SO_SENDSEQ), causing unnecessary skb reallocations
+on the TX path.
 
-Birger
+The setsockopt handler attempted to change netdev's hard_header_len by
+updating chan.hdrlen, but the PPP layer never re-reads it after the
+registration, so the update had no effect.
+
+To avoid the unnecessary reallocations, set chan.hdrlen to
+PPPOL2TP_L2TP_HDR_SIZE_SEQ (10) unconditionally at registration and
+remove the ineffective update in the setsockopt callback.
+
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+---
+v2: rebase to net-next and drop fixes tag
+ - https://lore.kernel.org/netdev/20260313034732.209792-1-dqfext@gmail.com/
+
+ net/l2tp/l2tp_ppp.c | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
+index ae4543d5597b..99d6582f41de 100644
+--- a/net/l2tp/l2tp_ppp.c
++++ b/net/l2tp/l2tp_ppp.c
+@@ -787,11 +787,12 @@ static int pppol2tp_connect(struct socket *sock, struct sockaddr_unsized *userva
+ 		goto out_no_ppp;
+ 	}
+ 
+-	/* The only header we need to worry about is the L2TP
+-	 * header. This size is different depending on whether
+-	 * sequence numbers are enabled for the data channel.
++	/* Reserve enough headroom for the L2TP header with sequence numbers,
++	 * which is the largest possible. This is used by the PPP layer to set
++	 * the net device's hard_header_len at registration, which must be
++	 * sufficient regardless of whether sequence numbers are enabled later.
+ 	 */
+-	po->chan.hdrlen = PPPOL2TP_L2TP_HDR_SIZE_NOSEQ;
++	po->chan.hdrlen = PPPOL2TP_L2TP_HDR_SIZE_SEQ;
+ 
+ 	po->chan.private = sk;
+ 	po->chan.ops	 = &pppol2tp_chan_ops;
+@@ -1176,12 +1177,6 @@ static int pppol2tp_session_setsockopt(struct sock *sk,
+ 			break;
+ 		}
+ 		session->send_seq = !!val;
+-		{
+-			struct pppox_sock *po = pppox_sk(sk);
+-
+-			po->chan.hdrlen = val ? PPPOL2TP_L2TP_HDR_SIZE_SEQ :
+-				PPPOL2TP_L2TP_HDR_SIZE_NOSEQ;
+-		}
+ 		l2tp_session_set_header_len(session, session->tunnel->version,
+ 					    session->tunnel->encap);
+ 		break;
+-- 
+2.43.0
+
 
