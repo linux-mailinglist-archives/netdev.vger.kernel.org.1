@@ -1,203 +1,165 @@
-Return-Path: <netdev+bounces-268532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268533-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2BAsE8IquWmVtQEAu9opvQ
-	(envelope-from <netdev+bounces-268532-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:19:46 +0100
+	id wLcaDl0ruWmVtQEAu9opvQ
+	(envelope-from <netdev+bounces-268533-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:22:21 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD10D2A7BBE
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:19:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D7D4B2A7C95
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:22:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BCDC63030E92
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:15:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C04873059A81
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09ADC39E6CD;
-	Tue, 17 Mar 2026 10:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83CF03A5E72;
+	Tue, 17 Mar 2026 10:17:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T2wV8MV2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YYbI37Ve"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09FE330D43
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 10:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D90B37107F;
+	Tue, 17 Mar 2026 10:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773742542; cv=none; b=QN1gU1MpdoQtivrHrv4t+UCG8+WcX/PfygzDYDd87XVOr66LtnHpviCi7KhoZimWyR1pQVq13XPSYhMR14CMtpqzxXNF/uD07F7cARNFx75pFX32fCvrnPDZHOy55vbCqCMOcd7x1/59Tk+3qPeWZpHdbR1MWtYgMKj2Rct5VzA=
+	t=1773742622; cv=none; b=n5Gjd6NdyL5mpGybkvNitR6HBjQQcF2c42yhSh0GctfuU71bzSlLBJuVAOny6iOiPcemAJscxNyYtnNll/Mf067f9k69yW9bqK10qWuVDIJ+WCCQiTIi32ctYwP2E3JsgOWiwv2YbsUx2CUqy604VhkVHyFHDu86KNkuC62MB3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773742542; c=relaxed/simple;
-	bh=qQsRsRo1lwM6NZ4V6oJfN2UKgfC38t0H7ex14ZKedEk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bO2QNLMLiRC+VmjiZJZplU17Ka3z3xUWe9L+hlZYQsR6W/Kaih+LvvAQTB1cqgXqFVMlKU17LIxUkYb3wsxbDd/dMdd1NMc0gi4iBidBQwE03YwSC9aYovmZJJnHXWjSjhayyp1EnGFfKoMgeKLsyE6MeryrLJQdrUTA+S/ydJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T2wV8MV2; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b9358bc9c50so690493066b.1
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 03:15:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773742540; x=1774347340; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iRfjqfC/TBsGVHqBrwzxSIT/mb5DrDQmAIZikbq0tmE=;
-        b=T2wV8MV2NyFc103MuvEJc+GKaXi1VZl8XQR9cc65Jj8cITqe2nmlhyRT/jVOTmn5ta
-         0V2lti5sbKPPHjpWy0amNJNRxPDQ1mgb5/Yi3Zrp/KS0NUj8P2g3YPjP+vCgrrLi/pV4
-         j+hApRBIGHV22TsSomHI2KVKbFOwjpnuDvfl1k8bv3BRtzjxDgICpu/bCDzUGS/nXNGr
-         IMWETVVglpOl3uNIC8s9P7cets1qXPJTSuVEpt4CZzhvcLVRttn4W9R2tGL1wXZXh5qq
-         h2mbb5+aZdfArlc710yTktryLtbRrT0611UkH4gLUAPLkEz7D6FA0AhY2SFxJlcCVhMx
-         dg7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773742540; x=1774347340;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iRfjqfC/TBsGVHqBrwzxSIT/mb5DrDQmAIZikbq0tmE=;
-        b=IXlI491MBtJVlIdK9Hmj0tDRylsFrDsOapfrQXuJ6G8Egcw60YSPCuITIPG/Lo5fqn
-         99OiAPn9eftAGYVf5PqeTwTJz15Y1hA+yeUKsGfsfX6bj8eMWYJ0hei3Tl6eAyqWBujZ
-         YJr8t2bKxWcRjvxLqG9tWz8o6/ujTkLh6BGbk122uYQ/YpZ3Irz+K71Oy9xnoY7nnZ3C
-         yMezpGR8BJrD7wx5Wl22EkViNndovHVpy5aLd7sU5CECnwNR17efVaApSAQWY0IM5QB+
-         FIjx+2ZNruiQMZXspDPXxg05gGxodhDu76k0tMJ7HdJmW9FfbtPHDmMhlwDmyvVcLsRA
-         lxuA==
-X-Forwarded-Encrypted: i=1; AJvYcCXlIx++aoiMy0z5g7Ws3/5neT/dvmg/LdWbcgY+yxL4NWeY13jL/A8xP9R8pPVIfyY0MsGHeUg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxw0InGF7SO14GwPZRJ0l4XUXmFTLPNlwR6kHvNZwnlFA76sl5o
-	q4kQzJE/hIYnwkqQ2ZsHeLVrSXMyZcJJIQNg0jETdyUgCUQHIYHNmn2R
-X-Gm-Gg: ATEYQzxZPXWYQvpGe40CIDTNXUZc0jBK1c5qsN7bSq4OIEpgHyUBW8brQHKL43m8X9y
-	axoabU7qvaFW1QtUSOiMotAnCU5/ai8pUuCfsmDzaJkFm+bYXpdGSsx9nBxcAOqTffiqxCdSo+D
-	uDsRJyUm9czaf5S/iDdKqOSNNbrkAUqQHWgYn1EP8mD7OIkbeBwKTkOi8oTifKl3JP4x/+dlxIR
-	UtziqgjrsM7xsmec1aY9+p3ZjT2nPc1EH5i0FP4ROBLzBX5/6wJeSduz6ubXIsUm5G+cH4m1xbk
-	4JOCpjs437vlHwI4MShmULz24tzeMCQEmFn8p6T5FpQLs2McZO2bhZ9qKbF3WJ8JgYpwTKaUEJI
-	WOtN4DJ12ovcYPeJfKvY+cOdnVbcD44LLX2qnk6yOn9BpyRcGNrRtieyV5BgoRdwBU4PBvQM23R
-	W/fJnYL1PSGnjXKnkzj69yvpfv8Hs6ozKYcojpKyGupYzePARJSX+2y5HFrqL4EdAwWSeid5rd9
-	yGerwVOgzRJR2vNwCZ+6C+QVkkUPsHOXdVwMZa5rQteepIvtJqrrfk=
-X-Received: by 2002:a17:907:9343:b0:b97:3bbe:e432 with SMTP id a640c23a62f3a-b97650e9a55mr945539466b.23.1773742539481;
-        Tue, 17 Mar 2026 03:15:39 -0700 (PDT)
-Received: from eric (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9781914f96sm656674666b.47.2026.03.17.03.15.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 03:15:39 -0700 (PDT)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
+	s=arc-20240116; t=1773742622; c=relaxed/simple;
+	bh=I2H5RJoMGFDqFLBEur/g+zezU/OdI5LfzcovXuA1vSY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rm299cs6U4o38mzIJnMJTgLpa1bTVUmGuM/1UAgALq5m2eBHDgyGEYjBloq5vyS4h1B9/YETXCP+v6V4pheIwOGr58fCCpR1d2ngmas7WfKVNGhUFVEksVsSufTmlcIWEzfIqDx+g6qkasvMKFOMJ8OUBRmM2cpg+PJa3W6To+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YYbI37Ve; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773742621; x=1805278621;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=I2H5RJoMGFDqFLBEur/g+zezU/OdI5LfzcovXuA1vSY=;
+  b=YYbI37Ve1DwcnLOdyc1IFDHH/M5KC4JKjl3sYpf6RV2kN6nTpaFqulLS
+   f55dgdNA/OKDZKcGDoXDlA08roYg2y5CyRGExEIrgluXw9iM+FCZXOFUp
+   oKJsvlnBEgtwofH+AjsTFspkdmERgiM7vs1plt8oBQI06cVKebs5IFKYk
+   8yrqegNf41MCQq3saMo9k36PQr/dxfm+V+6uV8Ad6s88jJetq5hcZXzlg
+   anGxg9L9JauEmrl4o2ki/PX98Bv22CJKP/GVObaLC7ENVF4bxfR/g5qJj
+   wugOuO6soUYpp0U1hZv5wljAJlfMB1nfWqQvxt1VaAwVus1OSo0FvL2dE
+   A==;
+X-CSE-ConnectionGUID: TVOe+36MSs+0zOcZq1Y3BA==
+X-CSE-MsgGUID: 0AX8aTP8TQGnMkQYmJ+S3Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11731"; a="74472222"
+X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
+   d="scan'208";a="74472222"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 03:17:01 -0700
+X-CSE-ConnectionGUID: YWwwfd8QSr+Yegj693ADXA==
+X-CSE-MsgGUID: Bjwo4+7+Q/OCfHxBHIvODg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
+   d="scan'208";a="260126206"
+Received: from abityuts-desk.ger.corp.intel.com (HELO localhost) ([10.245.245.97])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 03:16:53 -0700
+Date: Tue, 17 Mar 2026 12:16:50 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Cc: Douglas Anderson <dianders@chromium.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>, stable@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>, Daniel Scally <djrscally@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	Eric Woudstra <ericwouds@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: [PATCH v12 nf-next] netfilter: nft_flow_offload: Add DEV_PATH_MTK_WDMA to nft_dev_path_info()
-Date: Tue, 17 Mar 2026 11:15:25 +0100
-Message-ID: <20260317101525.358016-1-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	Fabio Estevam <festevam@gmail.com>, Frank Li <Frank.Li@nxp.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Len Brown <lenb@kernel.org>,
+	Mark Brown <broonie@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>, devicetree@vger.kernel.org,
+	driver-core@lists.linux.dev, imx@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-i2c@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-spi@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] device property: Make modifications of fwnode "flags"
+ thread safe
+Message-ID: <abkqEni3phP8dqqw@ashevche-desk.local>
+References: <20260316154159.1.I0a4d03104ecd5103df3d76f66c8d21b1d15a2e38@changeid>
+ <abkCPU3rxHI49N4_@shikoro>
+ <abkD-VLprcbbEbB1@ashevche-desk.local>
+ <abkF0GO01sMcOhvb@shikoro>
+ <abkLEgrZbdb03VWg@ashevche-desk.local>
+ <abkLY4AAQuFlTRC7@ashevche-desk.local>
+ <abkT_jpjIki6pvX1@shikoro>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <abkT_jpjIki6pvX1@shikoro>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,gmail.com,blackwall.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-268532-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[chromium.org,linuxfoundation.org,kernel.org,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,nxp.com,linux.intel.com,redhat.com,pengutronix.de,armlinux.org.uk,lists.linux.dev,lists.infradead.org];
+	TAGGED_FROM(0.00)[bounces-268533-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,renesas];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bridge_fastpath.sh:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,blackwall.org:email]
-X-Rspamd-Queue-Id: BD10D2A7BBE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,ashevche-desk.local:mid]
+X-Rspamd-Queue-Id: D7D4B2A7C95
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In case of using mediatek wireless, in nft_dev_fill_forward_path(), the
-forward path is filled, ending with mediatek wlan1.
+On Tue, Mar 17, 2026 at 09:42:38AM +0100, Wolfram Sang wrote:
+> 
+> > > What's the alignment for the u8 member in your SoC? 4 bytes or 8 bytes?
+> > > (I assume it's 64-bit SoC.)
+> > 
+> > FWIW, with the given change it will be still inside 64-byte data structure
+> > which most likely occupies a single cache line (before this patch and after
+> > as well).
+> 
+> I consider this directon of the discussion irrelevant. If the number is
+> (maybe? That's to be discussed!) needlessly bigger than 0, then it
+> doesn't matter how big the number is.
 
-Because DEV_PATH_MTK_WDMA is unknown inside nft_dev_path_info() it returns
-with info.indev = NULL. Then nft_dev_forward_path() returns without
-setting the direct transmit parameters.
+That's why it was written 'FWIW', so it doesn't worth :-)
 
-This results in a neighbor transmit, and direct transmit not possible.
+> Why don't you like the idea of taking the lock?
 
-So this patch adds DEV_PATH_MTK_WDMA to nft_dev_path_info() and makes
-direct transmission possible.
+Like Danilo I am also not sure what lock protects fwnode accesses.
 
-(Also needed for flow between bridged interfaces, maybe implemented
-later.)
-
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-[ Rebased; moved to nf_flow_table_path.c ]
-
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-
----
-
-Changes in v12:
- -Split from [PATCH v11 nf-next] netfilter: fastpath fixes
-
-Changes in v11: (results of testing with bridge_fastpath.sh)
-- Dropped "No ingress_vlan forward info for dsa user port" patch.
-- Added Introduce DEV_PATH_BR_VLAN_KEEP_HW, which changed from
-   applying only in the bridge-fastpath to all fastpaths. Added
-   a better explanation to the description.
-
-Changes in v10:
-- Split from patch-set: bridge-fastpath and related improvements v9
-
- net/netfilter/nf_flow_table_path.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/net/netfilter/nf_flow_table_path.c b/net/netfilter/nf_flow_table_path.c
-index 6bb9579dcc2a..f2d7822824bc 100644
---- a/net/netfilter/nf_flow_table_path.c
-+++ b/net/netfilter/nf_flow_table_path.c
-@@ -103,6 +103,7 @@ static void nft_dev_path_info(const struct net_device_path_stack *stack,
- 		switch (path->type) {
- 		case DEV_PATH_ETHERNET:
- 		case DEV_PATH_DSA:
-+		case DEV_PATH_MTK_WDMA:
- 		case DEV_PATH_VLAN:
- 		case DEV_PATH_PPPOE:
- 		case DEV_PATH_TUN:
-@@ -116,6 +117,10 @@ static void nft_dev_path_info(const struct net_device_path_stack *stack,
- 				i = stack->num_paths;
- 				break;
- 			}
-+			if (path->type == DEV_PATH_MTK_WDMA) {
-+				i = stack->num_paths;
-+				break;
-+			}
- 
- 			/* DEV_PATH_VLAN, DEV_PATH_PPPOE and DEV_PATH_TUN */
- 			if (path->type == DEV_PATH_TUN) {
 -- 
-2.53.0
+With Best Regards,
+Andy Shevchenko
+
 
 
