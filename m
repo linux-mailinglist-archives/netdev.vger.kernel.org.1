@@ -1,68 +1,53 @@
-Return-Path: <netdev+bounces-268430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268433-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wPlQGOLQuGnjjgEAu9opvQ
-	(envelope-from <netdev+bounces-268430-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 04:56:18 +0100
+	id mNdwJNbRuGnjjgEAu9opvQ
+	(envelope-from <netdev+bounces-268433-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 05:00:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C78BE2A3665
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 04:56:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10BCF2A36B0
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 05:00:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ACD0730490C1
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:51:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A9D0A3016257
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 04:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1AF357735;
-	Tue, 17 Mar 2026 03:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B30E35F8C9;
+	Tue, 17 Mar 2026 04:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PSiksLMY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-220.mail.aliyun.com (out28-220.mail.aliyun.com [115.124.28.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143CE346FC6;
-	Tue, 17 Mar 2026 03:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A49186E58;
+	Tue, 17 Mar 2026 04:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773719489; cv=none; b=MKTWx82X3G3S0WFehKdfLOhjBW9RuZslVBmP0GItkhe+uiDWJKIzUVjHjXMzUyKKIuahSsm9SKKo7kMrvVSfFshsaKQ01usacDsB0n0E4RtKkytZXm696ko5bOaMXIdgcpQ0vN9KPT/BuEtV/cmEBjPrSLcnsQUSeuaT1AAUZf0=
+	t=1773720017; cv=none; b=bsd0/fbT11ZvURBf2m0yKiiYvVID0nC/1Vv0r1cH6QPHwBUAscG1Xiq4CaiEMna6iCq2JCb6wlN7AkQvqT2OCYypoZNQU6Lq2VcBRAB65OyPBAevJRbXViaJta0ErHw5UT75eaBBP9zSv+lE/9qoJpi4I7IVYcVD96j8z1grkGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773719489; c=relaxed/simple;
-	bh=aryAhImvGAgm05FuPkQf5K4oUN3aN51Oq0fIRnV08ok=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eLqOawQ2c8CEhA40ZlUTeToKztz3X6smSyotoNCtrvQqTxGMHpgr/14ijeVyaL9uerTzcsyvfPFeOOYtwQ6gqGbfFRs2Zk/Rb8OPzv9uXKJY0b/Cn0+ooZFyaGSqOTuuqHfpmrSQ4d1xVw2T2dmZ4tefHEMMhvGXyjGt54HSPEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=115.124.28.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebula-matrix.com
-X-Alimail-AntiSpam:AC=CONTINUE;BC=0.06712908|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_alarm|0.0123586-0.0139125-0.973729;FP=14571216932773187234|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033037021130;MF=illusion.wang@nebula-matrix.com;NM=1;PH=DS;RN=20;RT=20;SR=0;TI=SMTPD_---.gtr4zsN_1773719151;
-Received: from localhost.localdomain(mailfrom:illusion.wang@nebula-matrix.com fp:SMTPD_---.gtr4zsN_1773719151 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Tue, 17 Mar 2026 11:45:52 +0800
-From: "illusion.wang" <illusion.wang@nebula-matrix.com>
-To: dimon.zhao@nebula-matrix.com,
-	illusion.wang@nebula-matrix.com,
-	alvin.wang@nebula-matrix.com,
-	sam.chen@nebula-matrix.com,
-	netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	corbet@lwn.net,
-	kuba@kernel.org,
-	linux-doc@vger.kernel.org,
-	lorenzo@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	vadim.fedorenko@linux.dev,
-	lukas.bulwahn@redhat.com,
-	edumazet@google.com,
-	enelsonmoore@gmail.com,
-	skhan@linuxfoundation.org,
-	ani.nikula@intel.com,
-	hkallweit1@gmail.com,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v8 net-next 11/11] net/nebula-matrix: add common dev start/stop operation
-Date: Tue, 17 Mar 2026 11:45:28 +0800
-Message-ID: <20260317034533.5600-12-illusion.wang@nebula-matrix.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260317034533.5600-1-illusion.wang@nebula-matrix.com>
-References: <20260317034533.5600-1-illusion.wang@nebula-matrix.com>
+	s=arc-20240116; t=1773720017; c=relaxed/simple;
+	bh=y7GywfJwPQ/nfW6GdPldGRpir6WvZPwMwOCcaYr4tdo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Y5du2JlA4iZ0YT8lXxOFqf4jHsVlppPfPnzLTDoL29A28Jfg11DfAfv4ggVk8ihiNFbBBGdEeKdhBGxKDJsXVLbJwxPWuIB1xyBSyolrjeo/A3r+/dsHLrvPq6Nu5BaAloysu6dMrmLNTFLySQasiYAhmdywLwLKdZzw2NKFfTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PSiksLMY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5668C4CEF7;
+	Tue, 17 Mar 2026 04:00:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773720016;
+	bh=y7GywfJwPQ/nfW6GdPldGRpir6WvZPwMwOCcaYr4tdo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PSiksLMYw9c9Q3z70QcJ5eOKTFq2p+HRGGXZRnabqxUZBztJvfRqTzMiKquQvNlOR
+	 kz+SvtQ/uo1fp8Q/+BZ4jNfdCO2+6Cj8u3VoivEQ0VylXpMJT4NQJxBU90juXr4gAb
+	 cehyhA9kL8FF+ExHibQ28Bj9f31nNtY99Wh3PeFvGiHd3+Zuphf7pBodNkweP9dv+z
+	 2H49JJ6rtv2R0K2lkHN2q+ubgW+8IMp21Wq8/NJjt4vyrldn+Hj6YlESsmrwnMYAmh
+	 1OwY9qwgGUKmLk3Q4LOH9633FZrTjFuaFGqJl/E0IOJ5dMB3jR5CZy6vUhN7b5JEdf
+	 3XP0Ge6ZzvAdA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9F333808200;
+	Tue, 17 Mar 2026 04:00:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,336 +55,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Subject: Re: [PATCH v3 0/2] net: usb: cdc_ncm: add ndpoffset to NDP nframes
+ bounds
+ check
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177372000954.3420008.2772975605346318437.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Mar 2026 04:00:09 +0000
+References: <20260314054640.2895026-1-tob.gaertner@me.com>
+In-Reply-To: <20260314054640.2895026-1-tob.gaertner@me.com>
+To: tobgaertner <tob.gaertner@me.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, kuba@kernel.org,
+ gregkh@linuxfoundation.org, oneukum@suse.com, bjorn@mork.no
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268430-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[nebula-matrix.com];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,lwn.net,kernel.org,vger.kernel.org,redhat.com,linux.dev,google.com,gmail.com,linuxfoundation.org,intel.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-268433-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[me.com];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.628];
-	FROM_NEQ_ENVFROM(0.00)[illusion.wang@nebula-matrix.com,netdev@vger.kernel.org];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nebula-matrix.com:email,nebula-matrix.com:mid,pci:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,illusion.wang:url]
-X-Rspamd-Queue-Id: C78BE2A3665
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 10BCF2A36B0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-start common dev: config msix map table, alloc and enable msix vectors,
-register mailbox ISR and enable mailbox irq
+Hello:
 
-Signed-off-by: illusion.wang <illusion.wang@nebula-matrix.com>
----
- .../nebula-matrix/nbl/nbl_core/nbl_dev.c      | 213 ++++++++++++++++++
- .../net/ethernet/nebula-matrix/nbl/nbl_main.c |  30 ++-
- 2 files changed, 242 insertions(+), 1 deletion(-)
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
-index e1090c56d3e1..2bff3a4d84d3 100644
---- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
-@@ -6,6 +6,17 @@
- #include <linux/pci.h>
- #include "nbl_dev.h"
- 
-+static int nbl_dev_clean_mailbox_schedule(struct nbl_dev_mgt *dev_mgt);
-+
-+/* ----------  Interrupt config  ---------- */
-+static irqreturn_t nbl_dev_clean_mailbox(int __always_unused irq, void *data)
-+{
-+	struct nbl_dev_mgt *dev_mgt = (struct nbl_dev_mgt *)data;
-+
-+	nbl_dev_clean_mailbox_schedule(dev_mgt);
-+	return IRQ_HANDLED;
-+}
-+
- static void nbl_dev_init_msix_cnt(struct nbl_dev_mgt *dev_mgt)
- {
- 	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-@@ -14,6 +25,170 @@ static void nbl_dev_init_msix_cnt(struct nbl_dev_mgt *dev_mgt)
- 	msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].num = 1;
- }
- 
-+static int nbl_dev_request_mailbox_irq(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-+	struct nbl_msix_info *msix_info = &dev_common->msix_info;
-+	struct nbl_common_info *common = dev_mgt->common;
-+	u16 local_vec_id;
-+	u32 irq_num;
-+	int err;
-+
-+	if (!msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].num)
-+		return 0;
-+
-+	local_vec_id =
-+		msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].base_vector_id;
-+	irq_num = pci_irq_vector(common->pdev, local_vec_id);
-+
-+	snprintf(dev_common->mailbox_name, sizeof(dev_common->mailbox_name),
-+		 "nbl_mailbox@pci:%s", pci_name(common->pdev));
-+	err = request_irq(irq_num, nbl_dev_clean_mailbox, 0,
-+			  dev_common->mailbox_name, dev_mgt);
-+	if (err)
-+		return err;
-+
-+	return 0;
-+}
-+
-+static void nbl_dev_free_mailbox_irq(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-+	struct nbl_msix_info *msix_info = &dev_common->msix_info;
-+	struct nbl_common_info *common = dev_mgt->common;
-+	u16 local_vec_id;
-+	u32 irq_num;
-+
-+	if (!msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].num)
-+		return;
-+
-+	local_vec_id =
-+		msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].base_vector_id;
-+	irq_num = pci_irq_vector(common->pdev, local_vec_id);
-+
-+	free_irq(irq_num, dev_mgt);
-+}
-+
-+static int nbl_dev_enable_mailbox_irq(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dispatch_ops *disp_ops = dev_mgt->disp_ops_tbl->ops;
-+	struct nbl_channel_ops *chan_ops = dev_mgt->chan_ops_tbl->ops;
-+	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-+	struct nbl_msix_info *msix_info = &dev_common->msix_info;
-+	u16 local_vec_id;
-+
-+	if (!msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].num)
-+		return 0;
-+
-+	local_vec_id =
-+		msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].base_vector_id;
-+	chan_ops->set_queue_state(dev_mgt->chan_ops_tbl->priv,
-+				  NBL_CHAN_INTERRUPT_READY,
-+				  NBL_CHAN_TYPE_MAILBOX, true);
-+
-+	return disp_ops->enable_mailbox_irq(dev_mgt->disp_ops_tbl->priv,
-+					    local_vec_id, true);
-+}
-+
-+static int nbl_dev_disable_mailbox_irq(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dispatch_ops *disp_ops = dev_mgt->disp_ops_tbl->ops;
-+	struct nbl_channel_ops *chan_ops = dev_mgt->chan_ops_tbl->ops;
-+	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-+	struct nbl_msix_info *msix_info = &dev_common->msix_info;
-+	u16 local_vec_id;
-+
-+	if (!msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].num)
-+		return 0;
-+
-+	flush_work(&dev_common->clean_mbx_task);
-+	local_vec_id =
-+		msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].base_vector_id;
-+	chan_ops->set_queue_state(dev_mgt->chan_ops_tbl->priv,
-+				  NBL_CHAN_INTERRUPT_READY,
-+				  NBL_CHAN_TYPE_MAILBOX, false);
-+
-+	return disp_ops->enable_mailbox_irq(dev_mgt->disp_ops_tbl->priv,
-+					    local_vec_id, false);
-+}
-+
-+static int nbl_dev_configure_msix_map(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dispatch_ops *disp_ops = dev_mgt->disp_ops_tbl->ops;
-+	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-+	struct nbl_msix_info *msix_info = &dev_common->msix_info;
-+	bool mask_en = msix_info->serv_info[NBL_MSIX_NET_TYPE].hw_self_mask_en;
-+	u16 msix_net_num = msix_info->serv_info[NBL_MSIX_NET_TYPE].num;
-+	u16 msix_not_net_num = 0;
-+	int err, i;
-+
-+	for (i = NBL_MSIX_NET_TYPE; i < NBL_MSIX_TYPE_MAX; i++)
-+		msix_info->serv_info[i].base_vector_id =
-+			msix_info->serv_info[i - 1].base_vector_id +
-+			msix_info->serv_info[i - 1].num;
-+
-+	for (i = NBL_MSIX_MAILBOX_TYPE; i < NBL_MSIX_TYPE_MAX; i++)
-+		msix_not_net_num += msix_info->serv_info[i].num;
-+
-+	err = disp_ops->configure_msix_map(dev_mgt->disp_ops_tbl->priv,
-+					   msix_net_num, msix_not_net_num,
-+					   mask_en);
-+
-+	return err;
-+}
-+
-+static int nbl_dev_destroy_msix_map(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dispatch_ops *disp_ops = dev_mgt->disp_ops_tbl->ops;
-+
-+	return disp_ops->destroy_msix_map(dev_mgt->disp_ops_tbl->priv);
-+}
-+
-+static int nbl_dev_alloc_msix_intr(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-+	struct nbl_msix_info *msix_info = &dev_common->msix_info;
-+	struct nbl_common_info *common = dev_mgt->common;
-+	int needed = 0;
-+	int err;
-+	int i;
-+
-+	for (i = 0; i < NBL_MSIX_TYPE_MAX; i++)
-+		needed += msix_info->serv_info[i].num;
-+
-+	err = pci_alloc_irq_vectors(common->pdev, needed, needed,
-+				    PCI_IRQ_MSIX | PCI_IRQ_AFFINITY);
-+	if (err < 0) {
-+		pr_err("pci_alloc_irq_vectors failed, err = %d.\n", err);
-+		goto enable_msix_failed;
-+	}
-+
-+	return needed;
-+
-+enable_msix_failed:
-+	return err;
-+}
-+
-+static int nbl_dev_init_interrupt_scheme(struct nbl_dev_mgt *dev_mgt)
-+{
-+	int err;
-+
-+	err = nbl_dev_alloc_msix_intr(dev_mgt);
-+	if (err < 0) {
-+		dev_err(dev_mgt->common->dev,
-+			"Failed to enable MSI-X vectors\n");
-+		return err;
-+	}
-+	return 0;
-+}
-+
-+static void nbl_dev_clear_interrupt_scheme(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_common_info *common = dev_mgt->common;
-+
-+	pci_free_irq_vectors(common->pdev);
-+}
-+
- /* ----------  Channel config  ---------- */
- static int nbl_dev_setup_chan_qinfo(struct nbl_dev_mgt *dev_mgt, u8 chan_type)
- {
-@@ -79,6 +254,14 @@ static void nbl_dev_clean_mailbox_task(struct work_struct *work)
- 				      NBL_CHAN_TYPE_MAILBOX);
- }
- 
-+static int nbl_dev_clean_mailbox_schedule(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dev_common *common_dev = dev_mgt->common_dev;
-+
-+	nbl_common_queue_work(&common_dev->clean_mbx_task);
-+	return 0;
-+}
-+
- /* ----------  Dev init process  ---------- */
- static int nbl_dev_setup_common_dev(struct nbl_adapter *adapter)
- {
-@@ -217,9 +400,39 @@ void nbl_dev_remove(struct nbl_adapter *adapter)
- /* ----------  Dev start process  ---------- */
- int nbl_dev_start(struct nbl_adapter *adapter)
- {
-+	struct nbl_dev_mgt *dev_mgt = adapter->core.dev_mgt;
-+	int ret;
-+
-+	ret = nbl_dev_configure_msix_map(dev_mgt);
-+	if (ret)
-+		goto config_msix_map_err;
-+
-+	ret = nbl_dev_init_interrupt_scheme(dev_mgt);
-+	if (ret)
-+		goto init_interrupt_scheme_err;
-+	ret = nbl_dev_request_mailbox_irq(dev_mgt);
-+	if (ret)
-+		goto mailbox_request_irq_err;
-+	ret = nbl_dev_enable_mailbox_irq(dev_mgt);
-+	if (ret)
-+		goto enable_mailbox_irq_err;
- 	return 0;
-+enable_mailbox_irq_err:
-+	nbl_dev_free_mailbox_irq(dev_mgt);
-+mailbox_request_irq_err:
-+	nbl_dev_clear_interrupt_scheme(dev_mgt);
-+init_interrupt_scheme_err:
-+	nbl_dev_destroy_msix_map(dev_mgt);
-+config_msix_map_err:
-+	return ret;
- }
- 
- void nbl_dev_stop(struct nbl_adapter *adapter)
- {
-+	struct nbl_dev_mgt *dev_mgt = adapter->core.dev_mgt;
-+
-+	nbl_dev_disable_mailbox_irq(dev_mgt);
-+	nbl_dev_free_mailbox_irq(dev_mgt);
-+	nbl_dev_clear_interrupt_scheme(dev_mgt);
-+	nbl_dev_destroy_msix_map(dev_mgt);
- }
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
-index 5d10451ae0b3..611469b1ba47 100644
---- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
-@@ -286,7 +286,35 @@ static struct pci_driver nbl_driver = {
- 	.remove = nbl_remove,
- };
- 
--module_pci_driver(nbl_driver);
-+static int __init nbl_module_init(void)
-+{
-+	int status;
-+
-+	status = nbl_common_create_wq();
-+	if (status) {
-+		pr_err("Failed to create wq, err = %d\n", status);
-+		goto wq_create_failed;
-+	}
-+	status = pci_register_driver(&nbl_driver);
-+	if (status) {
-+		pr_err("Failed to register PCI driver, err = %d\n", status);
-+		goto pci_register_driver_failed;
-+	}
-+	return 0;
-+
-+pci_register_driver_failed:
-+	nbl_common_destroy_wq();
-+wq_create_failed:
-+	return status;
-+}
-+
-+static void __exit nbl_module_exit(void)
-+{
-+	pci_unregister_driver(&nbl_driver);
-+	nbl_common_destroy_wq();
-+}
- 
-+module_init(nbl_module_init);
-+module_exit(nbl_module_exit);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Nebula Matrix Network Driver");
+On Fri, 13 Mar 2026 22:46:38 -0700 you wrote:
+> The nframes bounds check in cdc_ncm_rx_verify_ndp16() and
+> cdc_ncm_rx_verify_ndp32() does not account for ndpoffset,
+> allowing out-of-bounds reads when the NDP is placed near the
+> end of the NTB.
+> 
+> Changes since v2:
+> - Save struct_size_t() result to a temp variable to avoid
+>   awkward line wrapping (Jakub)
+> - Fix From/Signed-off-by mismatch
+> - Move "Compile-tested only" out of the Signed-off-by line
+>   into the commit message body
+> 
+> [...]
+
+Here is the summary with links:
+  - [v3,1/2] net: usb: cdc_ncm: add ndpoffset to NDP16 nframes bounds check
+    https://git.kernel.org/netdev/net/c/2aa8a4fa8d5b
+  - [v3,2/2] net: usb: cdc_ncm: add ndpoffset to NDP32 nframes bounds check
+    https://git.kernel.org/netdev/net/c/77914255155e
+
+You are awesome, thank you!
 -- 
-2.47.3
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
