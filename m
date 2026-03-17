@@ -1,165 +1,255 @@
-Return-Path: <netdev+bounces-268533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268534-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wLcaDl0ruWmVtQEAu9opvQ
-	(envelope-from <netdev+bounces-268533-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:22:21 +0100
+	id +ELRG/gquWmVtQEAu9opvQ
+	(envelope-from <netdev+bounces-268534-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:20:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7D4B2A7C95
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:22:20 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 969A42A7C05
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:20:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C04873059A81
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:17:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 17EF63010832
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 10:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83CF03A5E72;
-	Tue, 17 Mar 2026 10:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113A63A4F29;
+	Tue, 17 Mar 2026 10:17:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YYbI37Ve"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HmGVIblM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D90B37107F;
-	Tue, 17 Mar 2026 10:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E153A3E97
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 10:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773742622; cv=none; b=n5Gjd6NdyL5mpGybkvNitR6HBjQQcF2c42yhSh0GctfuU71bzSlLBJuVAOny6iOiPcemAJscxNyYtnNll/Mf067f9k69yW9bqK10qWuVDIJ+WCCQiTIi32ctYwP2E3JsgOWiwv2YbsUx2CUqy604VhkVHyFHDu86KNkuC62MB3c=
+	t=1773742651; cv=none; b=CIRuoVwr1NJ+EI/4VEwWSrlaNMr+w6PaNMQs95Juk/zYLPkD6u+hbusD3qHtxiwo6r1DPmKo7rejDNVPuAqgZEJYO8aRSNo47mkQhfrDJCBPFkDgJbL/aEVh+rzPzUbHf4lpapCFnQxqxxDRUoXeDlq13Z2K03yDrkz3r1JvmJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773742622; c=relaxed/simple;
-	bh=I2H5RJoMGFDqFLBEur/g+zezU/OdI5LfzcovXuA1vSY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rm299cs6U4o38mzIJnMJTgLpa1bTVUmGuM/1UAgALq5m2eBHDgyGEYjBloq5vyS4h1B9/YETXCP+v6V4pheIwOGr58fCCpR1d2ngmas7WfKVNGhUFVEksVsSufTmlcIWEzfIqDx+g6qkasvMKFOMJ8OUBRmM2cpg+PJa3W6To+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YYbI37Ve; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773742621; x=1805278621;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=I2H5RJoMGFDqFLBEur/g+zezU/OdI5LfzcovXuA1vSY=;
-  b=YYbI37Ve1DwcnLOdyc1IFDHH/M5KC4JKjl3sYpf6RV2kN6nTpaFqulLS
-   f55dgdNA/OKDZKcGDoXDlA08roYg2y5CyRGExEIrgluXw9iM+FCZXOFUp
-   oKJsvlnBEgtwofH+AjsTFspkdmERgiM7vs1plt8oBQI06cVKebs5IFKYk
-   8yrqegNf41MCQq3saMo9k36PQr/dxfm+V+6uV8Ad6s88jJetq5hcZXzlg
-   anGxg9L9JauEmrl4o2ki/PX98Bv22CJKP/GVObaLC7ENVF4bxfR/g5qJj
-   wugOuO6soUYpp0U1hZv5wljAJlfMB1nfWqQvxt1VaAwVus1OSo0FvL2dE
-   A==;
-X-CSE-ConnectionGUID: TVOe+36MSs+0zOcZq1Y3BA==
-X-CSE-MsgGUID: 0AX8aTP8TQGnMkQYmJ+S3Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11731"; a="74472222"
-X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
-   d="scan'208";a="74472222"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 03:17:01 -0700
-X-CSE-ConnectionGUID: YWwwfd8QSr+Yegj693ADXA==
-X-CSE-MsgGUID: Bjwo4+7+Q/OCfHxBHIvODg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,124,1770624000"; 
-   d="scan'208";a="260126206"
-Received: from abityuts-desk.ger.corp.intel.com (HELO localhost) ([10.245.245.97])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 03:16:53 -0700
-Date: Tue, 17 Mar 2026 12:16:50 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>
-Cc: Douglas Anderson <dianders@chromium.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>, stable@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>, Daniel Scally <djrscally@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1773742651; c=relaxed/simple;
+	bh=pBr7wKOt1VHnhEwSeJAROYu062K84Dc7BzVFIGRYKAY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CPuH/K1LawiRxH1S94kMR8DOgxd5PqPjBT1YtCZw4a0+yNJlb/GgKyjYCbf3tkF6JJlxD9YAdm7drCXKYABEO9vH/ia6JoinzOwrkjpDOtoFm4jKwU//tGnd0uEacJo2AG0IDx+7QkwzMbjoXAdm1nAbZkDrTj3FH2/Q9zyOD0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HmGVIblM; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6611d20c026so7979240a12.1
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 03:17:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773742648; x=1774347448; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Jj1znMuSQTPO/G2m5vicgYLbzdRn+Ba//APkQrLGbo=;
+        b=HmGVIblMnbk64xAeY8hdlnNjTj6+w7QCeGjInCAq6bYuoTmaVHa1foXv0Tis2cbSq8
+         lfMvCpc/12teQ803Zwkp/FXnT+43TueKImH9LuahdiExJ7lOAtD5cY4QiV2uiehgxiWE
+         K0jen+UZIrzakcr5TfRnv9MIS6B63wqYE1eG5zzS1m+q2owB8XCPH6mOUkY/VZipq27M
+         GPBnKN1I75YhKMZ8aOUvSFt6TZsPBWO9I2l/JH7CEUHBWryWqmAIf5QGlkzcmC5wWTE5
+         xih4ZVc4qfC9zcwtoCfJOX19AgYkHn+r2crWn5+oq64rMn4JSCeL/Ym0lCatsk8qEbTX
+         FpVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773742648; x=1774347448;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7Jj1znMuSQTPO/G2m5vicgYLbzdRn+Ba//APkQrLGbo=;
+        b=bNjgAJv0eYCj2ahFluiba5s2/tssR8sviOumCmfm96OLXcPYgnYwHvwbWqa7KfgoHv
+         0X38/7nFPcX8lY/Bp2MecDDAd/WIhpt/NNCe4/tC7TFoT0SqnANuNq/SzBNGQu7O8omd
+         yZ5d7UnRh5EQ8nDkCGc5J0yLEn03NJf0MnWvquNUZAEh6jGpJ6ok0IpEiYM4Q3wUJctF
+         RRNaPLyGrgqK12IhaS6JjlcDMgCo33QBOEBaDBtSXJA0y5vbPP1AQPTCSmmuHXxbwD2o
+         e+3HT+gSAAYZeB4kiKQkahd5oRxcCs0W4gvjJf+RbPGB7O4lIGf1HvOYATO1UWjoT6ih
+         07nA==
+X-Gm-Message-State: AOJu0YyW51OlmyKBwMk3ljHs/+X4chm2V7Vcu6v8Xp+P2GJ07sLVoU3T
+	QfAXFaUsxNhbp4FJbn/tkLLYHol/n+YU+9UNCDeH1J/ONlXtlMM32Vn+
+X-Gm-Gg: ATEYQzwGX+5T/QoiOCe6NkAs4PqIVh362e/eLLjKsPEjEHJPPAS1XotlsSttsqle65m
+	ZaYlr3dVvygAQVXsdXpTnWI8J0FPDakaEiZ9ria0Mfey4RHh11PkkBIGiMxYCphBd2ew5Sno36x
+	fsFBIa3ICMjsD41wFbt48OiKrqheNMU3N99Ypuejt9AAhF0HwtxDz/S5ePV/bfEc8QP8choskrG
+	HTQHyBElMQHntl/EwcMwn9cFPDv+87E4aqYT/s+u4weo+8iC62Bt3V99aoLgxGyRp11It/l+aHc
+	2b67mW/QveuPCmBJqq/JuTMllmUg2jY1Fo29bakHyYvVfWxtWMu/84MX2S4+dQ7Da9COaiExRTR
+	4int+HKawggI1uvHA8Rmsdfcc35hsa/6SuTYnoTs7sGhcL1IUTCnMs+KUF37JoFwUmj31B8tP5S
+	IudW4N1irhbgRS52X0EzWcYSGrlMEkherrOer15Doh8/U9yCKhe8kEqRmphZeTSB45+VoGV/X02
+	6ciPkn7RKvnYYNfhongLmigDGM6AFZCKOlWnjkyfJIICF2klwjrUtk=
+X-Received: by 2002:a05:6402:50cf:b0:663:44f0:640d with SMTP id 4fb4d7f45d1cf-663babe2665mr9318190a12.29.1773742647466;
+        Tue, 17 Mar 2026 03:17:27 -0700 (PDT)
+Received: from eric (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-66753a078c0sm318154a12.17.2026.03.17.03.17.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Mar 2026 03:17:26 -0700 (PDT)
+From: Eric Woudstra <ericwouds@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>, Frank Li <Frank.Li@nxp.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Len Brown <lenb@kernel.org>,
-	Mark Brown <broonie@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Saravana Kannan <saravanak@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>, devicetree@vger.kernel.org,
-	driver-core@lists.linux.dev, imx@lists.linux.dev,
-	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-i2c@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-spi@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] device property: Make modifications of fwnode "flags"
- thread safe
-Message-ID: <abkqEni3phP8dqqw@ashevche-desk.local>
-References: <20260316154159.1.I0a4d03104ecd5103df3d76f66c8d21b1d15a2e38@changeid>
- <abkCPU3rxHI49N4_@shikoro>
- <abkD-VLprcbbEbB1@ashevche-desk.local>
- <abkF0GO01sMcOhvb@shikoro>
- <abkLEgrZbdb03VWg@ashevche-desk.local>
- <abkLY4AAQuFlTRC7@ashevche-desk.local>
- <abkT_jpjIki6pvX1@shikoro>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>
+Cc: netdev@vger.kernel.org,
+	bridge@lists.linux.dev,
+	netfilter-devel@vger.kernel.org,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: [PATCH v12 nf-next] bridge: Introduce DEV_PATH_BR_VLAN_KEEP_HW
+Date: Tue, 17 Mar 2026 11:17:22 +0100
+Message-ID: <20260317101722.358640-1-ericwouds@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <abkT_jpjIki6pvX1@shikoro>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[chromium.org,linuxfoundation.org,kernel.org,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,nxp.com,linux.intel.com,redhat.com,pengutronix.de,armlinux.org.uk,lists.linux.dev,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-268533-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-268534-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,renesas];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,ashevche-desk.local:mid]
-X-Rspamd-Queue-Id: D7D4B2A7C95
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bridge_fastpath.sh:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 969A42A7C05
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 17, 2026 at 09:42:38AM +0100, Wolfram Sang wrote:
-> 
-> > > What's the alignment for the u8 member in your SoC? 4 bytes or 8 bytes?
-> > > (I assume it's 64-bit SoC.)
-> > 
-> > FWIW, with the given change it will be still inside 64-byte data structure
-> > which most likely occupies a single cache line (before this patch and after
-> > as well).
-> 
-> I consider this directon of the discussion irrelevant. If the number is
-> (maybe? That's to be discussed!) needlessly bigger than 0, then it
-> doesn't matter how big the number is.
+Following the path through a bridge, there are 2 situations where the
+action is to keep:
 
-That's why it was written 'FWIW', so it doesn't worth :-)
+1. Packets have the encap, and keep the tag at ingress and keep it at
+   egress. It is typical in the forward path, when a vlan-device and
+   bridge are combined.
 
-> Why don't you like the idea of taking the lock?
+2. Packets do not have the encap, are tagged at ingress and untagged
+   at egress. Can be found when only a bridge is in the forward path.
+   It is also possible in the bridged path, that maybe added later.
 
-Like Danilo I am also not sure what lock protects fwnode accesses.
+For switchdev userports that support SWITCHDEV_OBJ_ID_PORT_VLAN in
+sitaution 2, it is necessary to introduce DEV_PATH_BR_VLAN_KEEP_HW.
+The typical situation 1 is unchanged: DEV_PATH_BR_VLAN_KEEP.
 
+DEV_PATH_BR_VLAN_KEEP_HW is similar to DEV_PATH_BR_VLAN_TAG, with the
+correcponding bit in ingress_vlans set.
+
+Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+
+---
+
+Changes in v12:
+ -Split from [PATCH v11 nf-next] netfilter: fastpath fixes
+
+Changes in v11: (results of testing with bridge_fastpath.sh)
+- Dropped "No ingress_vlan forward info for dsa user port" patch.
+- Added Introduce DEV_PATH_BR_VLAN_KEEP_HW, which changed from
+   applying only in the bridge-fastpath to all fastpaths. Added
+   a better explanation to the description.
+
+Changes in v10:
+- Split from patch-set: bridge-fastpath and related improvements v9
+
+ include/linux/netdevice.h          |  1 +
+ net/bridge/br_device.c             |  1 +
+ net/bridge/br_vlan.c               | 18 +++++++++++-------
+ net/netfilter/nf_flow_table_path.c | 10 ++++++++++
+ 4 files changed, 23 insertions(+), 7 deletions(-)
+
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index d4e6e00bb90a..8a0dba788703 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -907,6 +907,7 @@ struct net_device_path {
+ 				DEV_PATH_BR_VLAN_TAG,
+ 				DEV_PATH_BR_VLAN_UNTAG,
+ 				DEV_PATH_BR_VLAN_UNTAG_HW,
++				DEV_PATH_BR_VLAN_KEEP_HW,
+ 			}		vlan_mode;
+ 			u16		vlan_id;
+ 			__be16		vlan_proto;
+diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
+index a818fdc22da9..80b75c2e229b 100644
+--- a/net/bridge/br_device.c
++++ b/net/bridge/br_device.c
+@@ -423,6 +423,7 @@ static int br_fill_forward_path(struct net_device_path_ctx *ctx,
+ 	case DEV_PATH_BR_VLAN_UNTAG:
+ 		ctx->num_vlans--;
+ 		break;
++	case DEV_PATH_BR_VLAN_KEEP_HW:
+ 	case DEV_PATH_BR_VLAN_KEEP:
+ 		break;
+ 	}
+diff --git a/net/bridge/br_vlan.c b/net/bridge/br_vlan.c
+index 636c86fa1183..a42bc75bc883 100644
+--- a/net/bridge/br_vlan.c
++++ b/net/bridge/br_vlan.c
+@@ -1494,13 +1494,17 @@ int br_vlan_fill_forward_path_mode(struct net_bridge *br,
+ 	if (!(v->flags & BRIDGE_VLAN_INFO_UNTAGGED))
+ 		return 0;
+ 
+-	if (path->bridge.vlan_mode == DEV_PATH_BR_VLAN_TAG)
+-		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_KEEP;
+-	else if (v->priv_flags & BR_VLFLAG_TAGGING_BY_SWITCHDEV)
+-		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG_HW;
+-	else
+-		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG;
+-
++	if (path->bridge.vlan_mode == DEV_PATH_BR_VLAN_TAG) {
++		if (v->priv_flags & BR_VLFLAG_TAGGING_BY_SWITCHDEV)
++			path->bridge.vlan_mode = DEV_PATH_BR_VLAN_KEEP_HW;
++		else
++			path->bridge.vlan_mode = DEV_PATH_BR_VLAN_KEEP;
++	} else {
++		if (v->priv_flags & BR_VLFLAG_TAGGING_BY_SWITCHDEV)
++			path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG_HW;
++		else
++			path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG;
++	}
+ 	return 0;
+ }
+ 
+diff --git a/net/netfilter/nf_flow_table_path.c b/net/netfilter/nf_flow_table_path.c
+index f2d7822824bc..e8e4465263e2 100644
+--- a/net/netfilter/nf_flow_table_path.c
++++ b/net/netfilter/nf_flow_table_path.c
+@@ -154,6 +154,16 @@ static void nft_dev_path_info(const struct net_device_path_stack *stack,
+ 			case DEV_PATH_BR_VLAN_UNTAG_HW:
+ 				info->ingress_vlans |= BIT(info->num_encaps - 1);
+ 				break;
++			case DEV_PATH_BR_VLAN_KEEP_HW:
++				info->ingress_vlans |= BIT(info->num_encaps);
++				if (info->num_encaps >= NF_FLOW_TABLE_ENCAP_MAX) {
++					info->indev = NULL;
++					break;
++				}
++				info->encap[info->num_encaps].id = path->bridge.vlan_id;
++				info->encap[info->num_encaps].proto = path->bridge.vlan_proto;
++				info->num_encaps++;
++				break;
+ 			case DEV_PATH_BR_VLAN_TAG:
+ 				if (info->num_encaps >= NF_FLOW_TABLE_ENCAP_MAX) {
+ 					info->indev = NULL;
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.53.0
 
 
