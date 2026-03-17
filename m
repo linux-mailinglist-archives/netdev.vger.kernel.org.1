@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-268418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268419-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qIDxEv/MuGkrjgEAu9opvQ
-	(envelope-from <netdev+bounces-268418-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 04:39:43 +0100
+	id 0Fn4BYjNuGlfjgEAu9opvQ
+	(envelope-from <netdev+bounces-268419-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 04:42:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 192D62A3444
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 04:39:43 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1690D2A3473
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 04:41:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 799DB30117CA
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:39:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 61D85301221A
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD463081D7;
-	Tue, 17 Mar 2026 03:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 223563093CB;
+	Tue, 17 Mar 2026 03:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u3/f5Xj2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GcPPwQcK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0893528314E;
-	Tue, 17 Mar 2026 03:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14AF3081D7;
+	Tue, 17 Mar 2026 03:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773718781; cv=none; b=MRWdb2ovKlAGP/EYRJGstwR2Kezt4HtPyksJ5Uy5C6ti0/eF7+oD0mriwYWHl1HO3WqOHkSQdFvxJdxdvvASJys2ZWlbh2LOmGXlS8Xje+rZKqfuo8+5WXLX8FnAdgsrUoCBLrXnuUUZbAwXQV8dXM23eRcv9ZeWoH6bJU5auVM=
+	t=1773718915; cv=none; b=epVal1dl6lVKpVH2G/ALiVz5rG4NzqEXRy2J3zOVQe62qHFqk4s3KMOwbE8E19Lmy/o1WTe96anZITcOXMJP+USMN0WB47dBGiF733ytqCGKy2a66j1ECSpCPLenMpaVCDn85u5jiLDbKDeYMuZOygYuOepyjQS8KVjaZ4L3oqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773718781; c=relaxed/simple;
-	bh=8hAg0zyKA73FfN0mgQFWxOrvxGPICMcp9p0vfIzXr0g=;
+	s=arc-20240116; t=1773718915; c=relaxed/simple;
+	bh=EFPIQGvSiWvqJ5SpNLa40uo/8NSdREio+xiR9Gfj4JU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dH+YsOuFUcBsgmvu8EV4OUX2WipYaZagyh0bkUDACVFZvlc0DiXQJDjw7AMvpDdz03hh5BiBwQsI1X7HSO4ZAOp00eJwTjRanOjlOzgRP46eaWRQ2GXKGDOVmdICCCm9cw2Vu0Zf+9JEZXj+0DeAFxK8fx7Ax3rApdUIh+btHZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u3/f5Xj2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DE3DC19421;
-	Tue, 17 Mar 2026 03:39:40 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ONNOl4qKunB8B7w7BD0xR1c6GaNAAtrK5B0FEe7etzW4RSGQ5yew5xVRyrnt9zg0whHZLX/OpcUK3eyay4ccy5YiqGw+xgcoIbAJoX+DZiGUBNlDxfG7C3KVJLBPaDf1kSKQFPQCwTmIaqKx5zT0B3a44VwtFumokNEOX7yL5eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GcPPwQcK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20D4FC19421;
+	Tue, 17 Mar 2026 03:41:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773718780;
-	bh=8hAg0zyKA73FfN0mgQFWxOrvxGPICMcp9p0vfIzXr0g=;
+	s=k20201202; t=1773718914;
+	bh=EFPIQGvSiWvqJ5SpNLa40uo/8NSdREio+xiR9Gfj4JU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u3/f5Xj26oC+Xc5dBDvC9c7X32Cu7H5EZrFwvC4Z76fUwpYtWYjD6o9eKhHiGfbaG
-	 veb4hxLWtqwa30Tyx9C+ML0M17XdES4hQ07yAtvkNM9s8EPgCfzHnKZJrZmnJb3fs/
-	 Nrnsz67vJ2WSoq6jMgx7FwzSff6Vl2tdazDYaD2ROFrm2a20RjZDmJzmd7FovxZG4Q
-	 rFuoi+1vG+kevJyJQ05+XOUzz++CD0M/KDVTpq/3e544f0xoHmcuT6df6s8nuKuwWI
-	 GmwMntQUqoP1tMyDBHzrBn2GVouHytsgkL7YOLMDvC1XsUD8odi3fFV3/lPPpEpr8R
-	 EniZ+VgqR0Fww==
-Date: Mon, 16 Mar 2026 20:39:39 -0700
+	b=GcPPwQcKlzRSnuiFkKNELL++37qfOYS091YabJMh2EBv/jB53ISEQ60abkmmsUj3f
+	 qtW9qmTG7jVgnMn5Tw4FPHJT5YyMWyzJjGfLaHhtXiAFUoRqYWxXYoWVWIefZ8jl9Z
+	 jgYfmEmQunArpfs3BGgu4MaEffZ1C2VidV/K9kncc2i0jtClG5TmLHLNEna2w1zyDi
+	 YZK8ZzZNWi3Xs+lO6S/7vF6+q5iMH7O5Ip6VmHuLCzhoTQLFISPfhBd/Q3/c1V7iQK
+	 Mg4ZiTru3t/qWAPxwL+//JI8btzNqqY9a0STScjUj5n5QT9L5b1g0P4ReFfV4IJqe1
+	 H7aYyaa2WVBQg==
+Date: Mon, 16 Mar 2026 20:41:53 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Ioana Ciornei <ioana.ciornei@nxp.com>
 Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
@@ -52,12 +52,12 @@ Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
  Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman
  <horms@kernel.org>, linux-kernel@vger.kernel.org,
  linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/3] net: dpaa2-mac: extend APIs related to
- statistics
-Message-ID: <20260316203939.7629aebf@kernel.org>
-In-Reply-To: <20260312142249.297192-2-ioana.ciornei@nxp.com>
+Subject: Re: [PATCH net-next v2 2/3] net: dpaa2-mac: retrieve MAC statistics
+ in one firmware command
+Message-ID: <20260316204153.4643cd16@kernel.org>
+In-Reply-To: <20260312142249.297192-3-ioana.ciornei@nxp.com>
 References: <20260312142249.297192-1-ioana.ciornei@nxp.com>
-	<20260312142249.297192-2-ioana.ciornei@nxp.com>
+	<20260312142249.297192-3-ioana.ciornei@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,11 +71,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268418-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268419-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
@@ -83,7 +83,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
@@ -93,36 +93,24 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 192D62A3444
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1690D2A3473
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 12 Mar 2026 16:22:47 +0200 Ioana Ciornei wrote:
-> Extend the dpmac_counter_id enum with the newly added counters which can
-> be interrogated through the MC firmware. Also add the
-> dpmac_get_statistics() API which can be used to retrieve multiple MAC
-> counters through a single firmware command.
+On Thu, 12 Mar 2026 16:22:48 +0200 Ioana Ciornei wrote:
+> +	stats->values_dma_mem = kcalloc(num_stats, sizeof(u64), GFP_KERNEL);
+> +	if (!stats->values_dma_mem)
+> +		goto err_alloc_values;
+> +
+> +	cnt_idx = stats->idx_dma_mem;
+> +	for (size_t i = 0; i < num_stats; i++)
+> +		*cnt_idx++ = cpu_to_le32((u32)(counters[i].id));
+> +
+> +	stats->idx_iova = dma_map_single(dev, stats->idx_dma_mem,
+> +					 num_stats * sizeof(u32),
+> +					 DMA_TO_DEVICE);
+> +	if (dma_mapping_error(dev, stats->idx_iova))
 
->  #ifndef __FSL_DPMAC_H
->  #define __FSL_DPMAC_H
-> @@ -170,6 +170,50 @@ int dpmac_set_link_state(struct fsl_mc_io *mc_io,
->   *			      pause frames.
->   * @DPMAC_CNT_EGR_GOOD_FRAME: counts frames transmitted without error, including
->   *			      pause frames.
-> + * @DPMAC_CNT_EGR_FRAME_64: counts transmitted 64-bytes frames, good or bad.
-> + * @DPMAC_CNT_EGR_FRAME_127: counts transmitted 65 to 127-bytes frames, good or bad.
-> + * @DPMAC_CNT_EGR_FRAME_255: counts transmitted 128 to 255-bytes frames, good or bad.
-> + * @DPMAC_CNT_EGR_FRAME_511: counts transmitted 256 to 511-bytes frames, good or bad.
-> + * @DPMAC_CNT_EGR_FRAME_1023: counts transmitted 512 to 1023-bytes frames, good or bad.
-> + * @DPMAC_CNT_EGR_FRAME_1518: counts transmitted 1024 to 1518-bytes frames, good or bad.
-
-please try to wrap netdev code at 80 chars, especially if it's just
-comments where wrapping doesn't hurt readability.
-
-> + * @DPMAC_CNT_EGR_FRAME_1519_MAX: counts transmitted 1519-bytes frames and
-> + * larger (up to max frame length specified), good or bad.
-
-Other entries in this doc prefix the continuation lines..
-
+dma_alloc_noncoherent(), maybe ?
 
