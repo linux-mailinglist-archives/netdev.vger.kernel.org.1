@@ -1,136 +1,119 @@
-Return-Path: <netdev+bounces-268402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268403-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wH6MB3XBuGkfjAEAu9opvQ
-	(envelope-from <netdev+bounces-268402-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:50:29 +0100
+	id qIk6Ea3CuGlWjAEAu9opvQ
+	(envelope-from <netdev+bounces-268403-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:55:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A42622A2EC9
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:50:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 976AB2A2F76
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:55:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D243B3015DB4
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 02:50:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6DF1300BD99
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 02:52:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB8482DA756;
-	Tue, 17 Mar 2026 02:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 643A229ACDB;
+	Tue, 17 Mar 2026 02:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X0RRJckj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQ5QO5o4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EC22BEFF5;
-	Tue, 17 Mar 2026 02:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415B6199949
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 02:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773715817; cv=none; b=iYEwfBQdzjpEhsLsBhBOBMkCsxGne0e8WHI6eXzfVZ5FFdmbj2qtalvfLbGsrGJ7DWeczjf4PYYMUEZ4Jy8ObK0m7KAFRV5iGPq/i3tSPKu6MWYYGRxliWN1BZ3rPhY1CFCgBQyfsk4g+8CPQ4+uOSwXHdo4Tm71n0kH3iuaqEA=
+	t=1773715974; cv=none; b=jyiuZlx9G9BQwWViOtnrhmEIr2O0wxFSXPCVbNMXiPirjKpBc+bWJye9QTcbXp/Qb/J1Fp03BN/ykGhP+WeyQaMNOyV6tPvZTrXLxkh4c3YUBqA7k46UNZ2b8cEWU7DEa6aS9St5J+tLjmRDNzAy7mEKSAYIMIY+2f4jfmRCJcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773715817; c=relaxed/simple;
-	bh=alVrlu101bAdsJEA+qSPzD9ZCVrbyZEFXQz+beNOU40=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cjlbbxXODCgLjp9t0GRjrqehY16NEhy/9RqHK6hhGvHlSKJwUT5gHGAJQ7GSo6FrUVU1pDbG8jSB1tfKY7GNOdfZnanAeqe43lWy3KUInH87y7xaEk5evJixcsZfISOucQMqVfTzFgGjVJHodU1VN1EjKE0FPY3nZoZ43iAChCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X0RRJckj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56502C19421;
-	Tue, 17 Mar 2026 02:50:17 +0000 (UTC)
+	s=arc-20240116; t=1773715974; c=relaxed/simple;
+	bh=5xJVlL+N9r5Z2TJrJJIutgkVQBOX/9Em1SLwmodXU7g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u3w4zRyDEfaFdvFSpfHhwBge9K2a5IL6tuJhYvpb8hbItCTUpko7kZMMOp9SYyep0qRz9yyfRIz+ekTTTziyvEz5q3Zrl0WR7WBZyHSLXV2BLySRVrJbEP4LxlyGsHjBeIy53dcdFJIUJsQV+6CJ/jjJBmTIpzVTjRagpitP+Tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQ5QO5o4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 717ACC19421;
+	Tue, 17 Mar 2026 02:52:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773715817;
-	bh=alVrlu101bAdsJEA+qSPzD9ZCVrbyZEFXQz+beNOU40=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=X0RRJckjHVmk7hzNroZO6Q0S/HDK3/wkmqNWJBQ7Q+xHVPigtLEkkwfBxM5ov60qd
-	 XNm2+qk1CnPepSC8hK8fzOhP4q0qVm4+yZeAWkI+kznI4du2AKfE2qPims6fWnbPXY
-	 DsRrtOPq653720DLUG5P5QEKOtmOjyZUMAHkuQwYSJjJLj40zhZpueVYMSFZQsiAj6
-	 WhiV38VuC71UBkTUknIMm2/BSPex9FQoBQz9/yGfgaziMwB4N4E/7bmX4+QTFUDHda
-	 GvqfSsJDWl1PYCyPt4GttfMDDBs6WQDj1Xbj89NU4AUfTeo7S++/U+eVdlXOFRWfkl
-	 uPxgMWwVyZfuQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FF953808200;
-	Tue, 17 Mar 2026 02:50:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1773715973;
+	bh=5xJVlL+N9r5Z2TJrJJIutgkVQBOX/9Em1SLwmodXU7g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jQ5QO5o4oWAEQNOXKLsgSVRz5hWmYbipbPLjKNEmq9HvR3qPWMelvjLBGXMWX72Zz
+	 I7PjsUVH/4guLxiH4fpqVc30yrErERME9z/cy3rFnqlRgEvSxb/MtrBEKT7rGJmzzH
+	 to8DL4bHAYCv9M8jb7C0Eh+osiV4j3M2Nz8H/fvgMmxH2G9LBGAGsLojAEqEfpM+qn
+	 Q8QE3mcOwRs1Bxxq5YLX4Lio9i4iQaS1jrWKq1OYokaJZAjhOpqXEHB8S2t6SjTebB
+	 IS6NUeMIytzNeyVrlhm4Uy9J2Ikee1Y6BC7dATr2PNYKaTLAGkDVxeaAliSN4fIW4A
+	 sx0jgGkDbui1A==
+Date: Mon, 16 Mar 2026 19:52:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Wen Gu <guwen@linux.alibaba.com>, Philo Lu
+ <lulie@linux.alibaba.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Dong Yibo <dong100@mucse.com>, Heiner Kallweit <hkallweit1@gmail.com>, Dust
+ Li <dust.li@linux.alibaba.com>
+Subject: Re: [PATCH net-next v33 0/8] eea: Add basic driver framework for
+ Alibaba Elastic Ethernet Adaptor
+Message-ID: <20260316195252.7fa24729@kernel.org>
+In-Reply-To: <20260317015257.79494-1-xuanzhuo@linux.alibaba.com>
+References: <20260317015257.79494-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5] net/smc: fix NULL dereference and UAF in
- smc_tcp_syn_recv_sock()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177371580978.3402731.5817717150922524333.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Mar 2026 02:50:09 +0000
-References: <20260312092909.48325-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20260312092909.48325-1-jiayuan.chen@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, jiayuan.chen@shopee.com,
- syzbot+827ae2bfb3a3529333e9@syzkaller.appspotmail.com, edumazet@google.com,
- alibuda@linux.alibaba.com, dust.li@linux.alibaba.com, sidraya@linux.ibm.com,
- wenjia@linux.ibm.com, mjambigi@linux.ibm.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268402-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-268403-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,827ae2bfb3a3529333e9];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shopee.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A42622A2EC9
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 976AB2A2F76
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 12 Mar 2026 17:29:07 +0800 you wrote:
-> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+On Tue, 17 Mar 2026 09:52:49 +0800 Xuan Zhuo wrote:
+> Add a driver framework for EEA that will be available in the future.
 > 
-> Syzkaller reported a panic in smc_tcp_syn_recv_sock() [1].
-> 
-> smc_tcp_syn_recv_sock() is called in the TCP receive path
-> (softirq) via icsk_af_ops->syn_recv_sock on the clcsock (TCP
-> listening socket). It reads sk_user_data to get the smc_sock
-> pointer. However, when the SMC listen socket is being closed
-> concurrently, smc_close_active() sets clcsock->sk_user_data
-> to NULL under sk_callback_lock, and then the smc_sock itself
-> can be freed via sock_put() in smc_release().
-> 
-> [...]
+> This driver is currently quite minimal, implementing only fundamental
+> core functionalities. Key features include: I/O queue management via
+> adminq, basic PCI-layer operations, and essential RX/TX data
+> communication capabilities. It also supports the creation,
+> initialization, and management of network devices (netdev). Furthermore,
+> the ring structures for both I/O queues and adminq have been abstracted
+> into a simple, unified, and reusable library implementation,
+> facilitating future extension and maintenance.
 
-Here is the summary with links:
-  - [net,v5] net/smc: fix NULL dereference and UAF in smc_tcp_syn_recv_sock()
-    https://git.kernel.org/netdev/net/c/6d5e4538364b
+4 minutes too early, v32 was 56 past the hour.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Jokes aside, can't you got your own LLM subscription? The mailing list
+is not a public CI. Please do not post this driver more than twice 
+a week.
 
