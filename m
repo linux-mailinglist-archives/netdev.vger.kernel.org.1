@@ -1,243 +1,191 @@
-Return-Path: <netdev+bounces-268564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268565-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AG/WNw04uWk8vgEAu9opvQ
-	(envelope-from <netdev+bounces-268564-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:16:29 +0100
+	id eEMuKtU6uWmKwAEAu9opvQ
+	(envelope-from <netdev+bounces-268565-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:28:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B35E2A8955
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:16:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE8122A8AF9
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:28:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2595A301E3C5
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:12:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D267F301BA59
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 11:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F79B371CF2;
-	Tue, 17 Mar 2026 11:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE11F3AA4F9;
+	Tue, 17 Mar 2026 11:28:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uIwuaBhM"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="suStUPmP";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IhFOkXiY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB8C3A6402
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 11:12:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486373932F0
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 11:28:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773745941; cv=none; b=nggAo7DqFBy9p3/OGhaUkLciuokRZtVcnoAUiIoaX34tM9OMegZlHM+A7L5sWiFgk3btpcevgvVb9jz64umvFQ6XdPNfaOYsW0856ECzbKO30Olo5/hUDe4M7aWbj+e7mmoqsvo9Y8ZKYK+CY1t42YtWwom5NIymSRs7yyo6RdY=
+	t=1773746898; cv=none; b=YFnwqqhNyXSRSneOoQUXW8jDrdqg4s/w/sdapgHiIB3836457QV9w2icfX9YPe02ILuhmBZtBJK+cRdVqs54f1sQ8KyWicW9tDADR7yVbWqs0WNf1FSrH7E4QcfrgUTiqCUe/lQn7A4AQFOnouiLVUFxTzBrbBBHyr1Ga+6UZz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773745941; c=relaxed/simple;
-	bh=rA/XGWBVSwV6WkEA9hC1XASwdiR0LlBbFXPZuNQANB4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o8jebCxU8r+CeSBMs+ACdwlEPcdiWcJXMt1IPDzmZckbwh0LbQjTz9GZaGk8CnqGfj1GLsf725V1zhbCZPKLuxhjHX6TOZWynvTKTR85MUiRTprF01wqBIoORHKuKJbQx7rgx84IHXgnGfTKhOBjV7jtoOHmJHeASAmLP80rOtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uIwuaBhM; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773745937;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=897jkTgnjiAFKnQbHCe/dvrTlPgcHYV1gcXdliQJBes=;
-	b=uIwuaBhMySWttAgmzgOJluxX/OLwXGXwCVlpsHuugMFdk96LYXatFzfNRkyRoE050i3u0w
-	byW/imwY4+t5oBVspYfyeT3tbvGK4+U/ScXBhGK8ijsrA2nRtMCK1N2VtZOWpVsOQdtFox
-	c4RO9e1bF8y3PTs796BxJf0o190bB04=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
-	syzbot+afbcf622635e98bf40d2@syzkaller.appspotmail.com,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Taehee Yoo <ap420073@gmail.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v1] net/ipv6: mcast: fix circular locking dependency in __ipv6_dev_mc_inc()
-Date: Tue, 17 Mar 2026 19:12:07 +0800
-Message-ID: <20260317111208.62667-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1773746898; c=relaxed/simple;
+	bh=w/dJ58IgCVpshKP6UPHntiQM4ytcAyWRbjOfkYO8NYU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pkKdmqrP1cNDit2uRGJyYCYbZeAgypXodVVZ6K9Aq9BgqeYGg7+Cn6hud3zhOpjoBDOAppdEr6SAjTXo+s8zcf1ygySOdZhLL32d/onok0vHHd/jiKIlj9xTyMdpSb4kZ15R+C5UqCg+8I+F/mnPf+6rTnexhgcVjWEbL7ZAb1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=suStUPmP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IhFOkXiY; arc=none smtp.client-ip=202.12.124.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 5E0827A01CB;
+	Tue, 17 Mar 2026 07:28:14 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-11.internal (MEProxy); Tue, 17 Mar 2026 07:28:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1773746894; x=
+	1773833294; bh=AuVMHT4ZPAVI6cSYmav71CqmTZ6hhsuQgZVYsv9wEPM=; b=s
+	uStUPmP9RWo8BaHWRDLgIt915kaK4Sw9gcWkfMoFtSiWjRxE7Qx/8DN4VAwkDF+X
+	hCshP1lOmN7I6taN/is4Ps1ZJMGVxRqQzX44cL19xyfvBeFFZuj7FpHnF2KtDZlh
+	I9vrOWpsOOdXLBQDqGDkChcXd3zYI58qRBeRE0YxS8C4W8UXN4Tc3IArwKx7eAEi
+	J9t/kCP7Ec0ANSek9wdA6j/PfOTLeQhT9STcKPqQ2Q41sjDKYk9JnxM0KZ1WxiEs
+	hIVH/aOVmaihcE0KbHf+uP0m1L4VGEO1AZgAFXoe/qWDHXqlfmK6In83PYEqz79D
+	3GTIF0sEx/ilNNQlhBkvQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1773746894; x=1773833294; bh=AuVMHT4ZPAVI6cSYmav71CqmTZ6hhsuQgZV
+	Ysv9wEPM=; b=IhFOkXiYoUEwADycWWh6OSAG6yfigIIg2q4t+PfBh5xWkbyq5N8
+	n8ElK10rlvkyhNy60aU6dNpP6lcQuS2gyFwPFXcHuad41TEptz3ZKr/aM0dtf8i6
+	E5DbS9fEIcvAzfFDBE92ElbuoKlTxcG5cGgg9T5NCg3P4eTWPuVJ2VpAzK9hBfEb
+	WHQkOfZWka/g2SgzorZW6OVIQ3DMX4SAHY0noAdDegK8/HfHimtDfT72pl2MfMfa
+	vz2AslnI6OocWppXq/X1qEpoQHUzlkfjPpNr+aRdRS6ZJr4XHuj0jQ1n4nc+Z0x3
+	bDg/NBQJXwgGKPsqF2lY0y2QejJPbpn/gEQ==
+X-ME-Sender: <xms:zTq5aTBxQRUzjOINihNgjQ73sqBc17wlDDYv_dg118fMQ1WPUI7fdg>
+    <xme:zTq5aQY4--uYV7tZdN3cU7aCNpYAGubkYayNL-9TLG9anbF_j_meL0dSZrgqWTa-R
+    z1XriCeJWRY7vQ8FFp4FRucgEF9Pkbs_sBgISDYwiPH_xRHcVdG_aY>
+X-ME-Received: <xmr:zTq5aW7R5qouh_pXJQHbj1ODW1Gqjp4Hi6whCXL8R0ge_6QeH9xcT4Nzs1ym>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdduudefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeehpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpd
+    hrtghpthhtohepmhhmihgvthhusheljeeshigrhhhoohdrtghomhdprhgtphhtthhopehn
+    vghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskh
+    gvrhhnvghlrdhorhhgpdhrtghpthhtohepjhgrshhonhesiiigvdgtgedrtghomh
+X-ME-Proxy: <xmx:zTq5aRYqeR8lbuHvMWKHw6XDeOJYeHIRi-CvnMwbaNlsJq1oOCxWTw>
+    <xmx:zTq5aVhsxFdhobRZpiubaqKYDAgtciPEYcF9ia59ITODofQ-svoifA>
+    <xmx:zTq5aS-LFQ0zpIFXK_8V1-turNSObOIG2DLJcj3bQpA2W_Ybsrc-eg>
+    <xmx:zTq5aQrFxVTA-5BVPsgFtpZyKya991MsIFg_1hsFzfKtNTA-wiKUfg>
+    <xmx:zjq5aXpskPoagc_8DbxTUvwzDJdMZypoK79oPcnBa3pdxwyP78bqcnMV>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 17 Mar 2026 07:28:13 -0400 (EDT)
+Date: Tue, 17 Mar 2026 12:28:10 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Marek Mietus <mmietus97@yahoo.com>, netdev@vger.kernel.org,
+	kuba@kernel.org, Jason@zx2c4.com
+Subject: Re: [PATCH net-next v5 00/11] net: tunnel: introduce noref xmit
+ flows for tunnels
+Message-ID: <abk6yhfnry2NzkZh@krikkit>
+References: <20260113162954.5948-1-mmietus97.ref@yahoo.com>
+ <20260113162954.5948-1-mmietus97@yahoo.com>
+ <89df6470-027b-4d86-98a1-72042ca819ed@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <89df6470-027b-4d86-98a1-72042ca819ed@redhat.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[shopee.com,syzkaller.appspotmail.com,linux.dev,davemloft.net,kernel.org,google.com,redhat.com,gmail.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-268564-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268565-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,afbcf622635e98bf40d2];
+	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[yahoo.com,vger.kernel.org,kernel.org,zx2c4.com];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email]
-X-Rspamd-Queue-Id: 4B35E2A8955
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: EE8122A8AF9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jiayuan Chen <jiayuan.chen@shopee.com>
+2026-03-17, 12:02:30 +0100, Paolo Abeni wrote:
+> On 1/13/26 5:29 PM, Marek Mietus wrote:
+> > Currently, tunnel xmit flows always take a reference on the dst_entry
+> > for each xmitted packet. These atomic operations are redundant in some
+> > flows.
+> > 
+> > This patchset introduces the infrastructure required for converting
+> > the tunnel xmit flows to noref, and converts them where possible.
+> > 
+> > These changes improve tunnel performance, since less atomic operations
+> > are used.
+> > 
+> > There are already noref optimizations in both ipv4 and ip6.
+> > (See __ip_queue_xmit, inet6_csk_xmit)
+> > This patchset implements similar optimizations in ip and udp tunnels.
+> > 
+> > Benchmarks:
+> > I used a vxlan tunnel over a pair of veth peers and measured the average
+> > throughput over multiple samples.
+> > 
+> > I ran 100 samples on a clean build, and another 100 on a patched
+> > build. Each sample ran for 120 seconds. These were my results:
+> > 
+> > clean:      71.95 mb/sec, stddev = 1.71
+> > patched:    74.92 mb/sec, stddev = 1.35
+> > 
+> > TL;DR - This patchset results in a 4% improvement in throughput for
+> > vxlan. It's safe to assume that we might see similar results when testing
+> > other tunnels.
+> 
+> IMHO this performance delta is not enough to justify this amount of
+> changes.
+> 
+> Additionally, the measured impact of removing the dst_hold/dst_release
+> does not fit with my direct experience on the same matter: it should be
+> below noise level in practice, as dst are per-cpu and and no
+> contention/false sharing is expected in a good setup.
+> 
+> I think you are observing larger impact because in the veth test
+> dst_release can happen on a remote CPU. Note that this setup (vxlan over
+> veth) is not very relevant in practice.
+> 
+> I'm sorry I'm not applying this series.
 
-syzbot reported a possible circular locking dependency:
+This is probably fine for everybody who's been following this series,
+but you answered v5 (from January) instead of v8 (posted last week).
 
-  fs_reclaim --> sk_lock-AF_INET6 --> &idev->mc_lock
-
-  CPU0                              CPU1
-  ----                              ----
-  lock(&idev->mc_lock)
-                                    lock(sk_lock-AF_INET6)
-                                    lock(&idev->mc_lock)  // blocked
-  kzalloc(GFP_KERNEL)
-    fs_reclaim
-      ...nbd I/O...
-        sk_lock-AF_INET6            // blocked -> DEADLOCK
-
-__ipv6_dev_mc_inc() does GFP_KERNEL allocation inside mc_lock via
-mca_alloc(). This can enter memory reclaim, which through nbd block
-I/O may need sk_lock-AF_INET6. But sk_lock -> mc_lock already exists
-via setsockopt -> __ipv6_sock_mc_join, so we have a deadlock.
-
-Before commit 63ed8de4be81 ("mld: add mc_lock for protecting
-per-interface mld data"), only RTNL was held during the allocation.
-The lock ordering was always RTNL -> sk_lock (the nbd path doesn't
-involve RTNL), so there was no circular dependency.
-
-Split mca_alloc() into mca_alloc() + mca_init(): mca_alloc() does the
-GFP_KERNEL allocation before mc_lock, mca_init() initializes under
-mc_lock. If the address already exists, the pre-allocated memory is
-simply freed. Also move inet6_ifmcaddr_notify() outside mc_lock since
-it also does GFP_KERNEL allocation.
-
-Fixes: 63ed8de4be81 ("mld: add mc_lock for protecting per-interface mld data")
-Reported-by: syzbot+afbcf622635e98bf40d2@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/69b7dc76.050a0220.248e02.0113.GAE@google.com/T/
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
-Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
----
- net/ipv6/mcast.c | 36 +++++++++++++++++++-----------------
- 1 file changed, 19 insertions(+), 17 deletions(-)
-
-diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-index 3330adcf26db..2dfa7ed54d17 100644
---- a/net/ipv6/mcast.c
-+++ b/net/ipv6/mcast.c
-@@ -860,18 +860,16 @@ static void ma_put(struct ifmcaddr6 *mc)
- 	}
- }
- 
--static struct ifmcaddr6 *mca_alloc(struct inet6_dev *idev,
--				   const struct in6_addr *addr,
--				   unsigned int mode)
-+static struct ifmcaddr6 *mca_alloc(void)
- {
--	struct ifmcaddr6 *mc;
-+	return kzalloc_obj(struct ifmcaddr6);
-+}
- 
-+static void mca_init(struct inet6_dev *idev, const struct in6_addr *addr,
-+		     unsigned int mode, struct ifmcaddr6 *mc)
-+{
- 	mc_assert_locked(idev);
- 
--	mc = kzalloc_obj(*mc);
--	if (!mc)
--		return NULL;
--
- 	INIT_DELAYED_WORK(&mc->mca_work, mld_mca_work);
- 
- 	mc->mca_addr = *addr;
-@@ -887,8 +885,6 @@ static struct ifmcaddr6 *mca_alloc(struct inet6_dev *idev,
- 	if (ipv6_addr_is_ll_all_nodes(&mc->mca_addr) ||
- 	    IPV6_ADDR_MC_SCOPE(&mc->mca_addr) < IPV6_ADDR_SCOPE_LINKLOCAL)
- 		mc->mca_flags |= MAF_NOREPORT;
--
--	return mc;
- }
- 
- static void inet6_ifmcaddr_notify(struct net_device *dev,
-@@ -932,6 +928,7 @@ static void inet6_ifmcaddr_notify(struct net_device *dev,
- static int __ipv6_dev_mc_inc(struct net_device *dev,
- 			     const struct in6_addr *addr, unsigned int mode)
- {
-+	struct ifmcaddr6 *mc_alloced;
- 	struct inet6_dev *idev;
- 	struct ifmcaddr6 *mc;
- 
-@@ -940,10 +937,17 @@ static int __ipv6_dev_mc_inc(struct net_device *dev,
- 	if (!idev)
- 		return -EINVAL;
- 
-+	mc_alloced = mca_alloc();
-+	if (!mc_alloced) {
-+		in6_dev_put(idev);
-+		return -ENOMEM;
-+	}
-+
- 	mutex_lock(&idev->mc_lock);
- 
- 	if (READ_ONCE(idev->dead)) {
- 		mutex_unlock(&idev->mc_lock);
-+		kfree(mc_alloced);
- 		in6_dev_put(idev);
- 		return -ENODEV;
- 	}
-@@ -953,26 +957,24 @@ static int __ipv6_dev_mc_inc(struct net_device *dev,
- 			mc->mca_users++;
- 			ip6_mc_add_src(idev, &mc->mca_addr, mode, 0, NULL, 0);
- 			mutex_unlock(&idev->mc_lock);
-+			kfree(mc_alloced);
- 			in6_dev_put(idev);
- 			return 0;
- 		}
- 	}
- 
--	mc = mca_alloc(idev, addr, mode);
--	if (!mc) {
--		mutex_unlock(&idev->mc_lock);
--		in6_dev_put(idev);
--		return -ENOMEM;
--	}
-+	mca_init(idev, addr, mode, mc_alloced);
-+	mc = mc_alloced;
- 
- 	rcu_assign_pointer(mc->next, idev->mc_list);
- 	rcu_assign_pointer(idev->mc_list, mc);
- 
- 	mld_del_delrec(idev, mc);
- 	igmp6_group_added(mc);
--	inet6_ifmcaddr_notify(dev, mc, RTM_NEWMULTICAST);
- 	mutex_unlock(&idev->mc_lock);
- 
-+	inet6_ifmcaddr_notify(dev, mc, RTM_NEWMULTICAST);
-+
- 	return 0;
- }
- 
 -- 
-2.43.0
-
+Sabrina
 
