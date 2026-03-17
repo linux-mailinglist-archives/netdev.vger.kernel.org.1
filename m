@@ -1,136 +1,186 @@
-Return-Path: <netdev+bounces-268414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268415-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OHMkJv7JuGmcjQEAu9opvQ
-	(envelope-from <netdev+bounces-268414-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 04:26:54 +0100
+	id yGLBHUbLuGkSjgEAu9opvQ
+	(envelope-from <netdev+bounces-268415-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 04:32:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A7842A32C4
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 04:26:54 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79B7C2A33B5
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 04:32:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 908C83013480
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:21:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 00B253010747
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 03:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B24872D46A1;
-	Tue, 17 Mar 2026 03:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE743043C9;
+	Tue, 17 Mar 2026 03:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QkR7dLbx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FJmOb7wW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE1B27FD51;
-	Tue, 17 Mar 2026 03:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82C52C21C0;
+	Tue, 17 Mar 2026 03:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773717710; cv=none; b=uolhGoI7zWiMrZhMCR13vkhgMNXBLc2yaq3iZ86mFSTCZ7gUrvMs+vfeC96cKIuzSNd3B3lELZHQPtfbKYr3yRpFRHifLOrJ3CRTM1PZzOEfbdm/DhqesV2xhgwtucmFPJqMxf9SlrITU8LRsNf+kJMI/Vy5H8CtWl+qekf98/s=
+	t=1773718334; cv=none; b=Xtm9hIgJeyHBfA6FWXSozz2UTERyCBmUsg4pU2KhhwG9Pvx09z2xpKS8NFX4n/qAcVfPXoYbKJ1Zz0CrFzIrlZWodZjP2S0sXWBCYBfQqnLvd/uKbCPVxrThOSk00FO5eovG7sW++p7F13o9TlBDE7LWO5T8aHsVFyzhovQUlrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773717710; c=relaxed/simple;
-	bh=2kpU1JJYKn+nMJDIDxbv+GgYoKMUunK160GUW0ypx78=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZOcMx69HWoytee1l3a53cOCE9i2fUVUUqZtDD5uGzFud8yDtHVWQcDIyqcHKY4nrph32XW7FaPaH/A8D19JXjvuRPjqyMirAvlArZDVyMnkU53pNgWFCsQPEaf8D2iaCe3zPZ94PkVD9iiOn99iayVUqZrDGo5tV+Y5SjSGV39w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QkR7dLbx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F062C19421;
-	Tue, 17 Mar 2026 03:21:48 +0000 (UTC)
+	s=arc-20240116; t=1773718334; c=relaxed/simple;
+	bh=jbHnc1XHzpFR67Gx+TBForXqU+GCHzWB+VbssfKa4/8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=kHqwmKcOcXG9YBrAd+j74LNepLpCvqu3rWHvcWVnSdlXA7H4MpmIeo0kMMGLgeN4KWSbnK72QLjBPCfzFfsCK7s5QLyJSJi3vn7nndL66HxkX/tT+NFxoTQXZU7p3u/QzAaEV1d1HGaGQfmXHu/Lwe7Mw4GHobWCClDuOX3VUtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FJmOb7wW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6404BC19421;
+	Tue, 17 Mar 2026 03:32:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773717710;
-	bh=2kpU1JJYKn+nMJDIDxbv+GgYoKMUunK160GUW0ypx78=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QkR7dLbx7a+ct3rh6FeCJn220b3UqKaggyq5g81S7cnw62UX0l7QtHtlT6WUT8nVf
-	 0P/55uZOqYzMpW1nX8TzE5zbl7eS1GKOndPmR9IZKHBFHjTKHHph3Dl3L4s//urtTh
-	 O0chTqs2zZAGdT1EQUb1upXGG64C/1ygiBwAf/qjasVWc0dFXMXQKCjOK9gpk6PUPD
-	 ta/YVxTk5siE/1FomstF9a9eomkwKr4Rv9AWXq7wbE9/W6bbCAK/WIu2AsuQtZxyIv
-	 OXguMWyKO56lKOePBow329/2cT6vdJqB/64+b9omo5dd/sXVErzbwsC+2Mj/2M77y3
-	 ZlF9paWqkmyUA==
-Date: Mon, 16 Mar 2026 20:21:47 -0700
+	s=k20201202; t=1773718334;
+	bh=jbHnc1XHzpFR67Gx+TBForXqU+GCHzWB+VbssfKa4/8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=FJmOb7wWu3D5dBt6l7CnO0N7G7zlHo5M5CDY1liqgOwv86WSL4pOkcuOmIGPL5Wxf
+	 G7p8P9O1tVTT30FBJbfC3ib6Jn3AJ9D9goA/udoBRGxGiXhS92G5rVQQRxT88vy+t/
+	 DIRagWPHhrGJwkLed2QrXL5ULEYMVoHbeZTB/vert5nHjczfFFADW0PFYZ7uuqauv3
+	 2X9MlwrZ2lCsNDfCiLKp9C9YGT9ZTqBMWXlNvR3IVWLKTsgEfKXYfca5AWrdikTwT2
+	 KXJZNWBZZMEr54Us/1Xh11F4Lr5jlxMIhHMb912+0IGFh1wo05XhyXn+mQ1SpaKW8G
+	 YT2zRXJhjMr5g==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Yixun Lan
- <dlan@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
- Torgue <alexandre.torgue@foss.st.com>, Richard Cochran
- <richardcochran@gmail.com>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti
- <alex@ghiti.fr>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Yao
- Zi <me@ziyao.cc>, Yanteng Si <siyanteng@cqsoftware.com.cn>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Lad Prabhakar
- <prabhakar.mahadev-lad.rj@bp.renesas.com>, Shangjuan Wei
- <weishangjuan@eswincomputing.com>, Chen-Yu Tsai <wens@kernel.org>, Zhi Li
- <lizhi2@eswincomputing.com>, Boon Khai Ng <boon.khai.ng@altera.com>, Maxime
- Chevallier <maxime.chevallier@bootlin.com>, Quentin Schulz
- <quentin.schulz@cherry.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>, Longbin
- Li <looong.bin@gmail.com>
-Subject: Re: [PATCH net-next v10 1/4] dt-bindings: net: Add support for
- Spacemit K3 dwmac
-Message-ID: <20260316202147.431d9aeb@kernel.org>
-In-Reply-To: <20260316010041.164360-2-inochiama@gmail.com>
-References: <20260316010041.164360-1-inochiama@gmail.com>
-	<20260316010041.164360-2-inochiama@gmail.com>
+To: rkannoth@marvell.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	chuck.lever@oracle.com,
+	jiri@resnulli.us,
+	netdev@vger.kernel.org,
+	donald.hunter@gmail.com,
+	saeedm@nvidia.com,
+	sgoutham@marvell.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	matttbe@kernel.org,
+	horms@kernel.org,
+	cjubran@nvidia.com,
+	pabeni@redhat.com,
+	shshitrit@nvidia.com
+Subject: Re: [v4,net-next,3/5] octeontx2-af: npc: cn20k: add subbank search order control
+Date: Mon, 16 Mar 2026 20:32:05 -0700
+Message-ID: <20260317033205.646930-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260312022754.2029595-4-rkannoth@marvell.com>
+References: <20260312022754.2029595-4-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268414-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,oracle.com,resnulli.us,gmail.com,nvidia.com,marvell.com,google.com,davemloft.net,redhat.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[38];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,foss.st.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,armlinux.org.uk,ziyao.cc,cqsoftware.com.cn,nxp.com,bp.renesas.com,eswincomputing.com,altera.com,bootlin.com,cherry.de,st.com,synopsys.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,st-md-mailman.stormreply.com,gentoo.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-268415-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3A7842A32C4
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 79B7C2A33B5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 16 Mar 2026 09:00:37 +0800 Inochi Amaoto wrote:
-> The GMAC IP on Spacemit K3 is almost a standard Synopsys DesignWare
-> MAC (version 5.40a) with some extra clock.
-> 
-> Add necessary compatible string for this device.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-In the previous version the AI reviewer complained that we're not
-adding the new entry to the select at the top of the file. Other
-compatibles appear in 3 places in
-Documentation/devicetree/bindings/net/snps,dwmac.yaml
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+octeontx2-af: npc: cn20k: add subbank search order control
 
-Also I asked whether we can drop the "default m"
+CN20K NPC MCAM is split into 32 subbanks that are searched in a
+predefined order during allocation. Lower-numbered subbanks have
+higher priority than higher-numbered ones. Add a runtime devlink
+parameter "srch_order" (DEVLINK_PARAM_TYPE_U32_ARRAY) to control the
+order in which subbanks are searched during MCAM allocation.
 
-Did you disagree with those comments or did you miss them?
-stmmac is a strange beast I don't really know what's going on in 
-the binding, so just double checking this is intentional.. 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+> index e854b85ced9e..348a72c4ee43 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+> @@ -3809,6 +3809,93 @@ static void npc_unlock_all_subbank(void)
+>  		mutex_unlock(&npc_priv.sb[i].lock);
+>  }
+>
+> +int npc_cn20k_search_order_set(struct rvu *rvu,
+> +			       u32 arr[MAX_NUM_SUB_BANKS], int cnt)
+> +{
+
+[ ... ]
+
+> +fail_used:
+> +	npc_unlock_all_subbank();
+> +	mutex_unlock(&mcam->lock);
+> +
+> +	return rc;
+> +}
+> +
+> +const u32 *npc_cn20k_search_order_get(bool *restricted_order, u32 *sz)
+> +{
+> +	*restricted_order = restrict_valid;
+> +	*sz = npc_priv.num_subbanks;
+> +	return subbank_srch_order;
+> +}
+           ^^^^^^^^^^^^^^^^^^^
+
+Is there a type mismatch here? The function signature declares the return
+type as 'const u32 *' but returns 'subbank_srch_order', which appears to be
+declared as 'static int *' elsewhere in the code. While the values stored
+(0-31 for subbank indices) fit within both int and u32, and sizeof(int) ==
+sizeof(u32) on all kernel-supported architectures, this conversion between
+signed and unsigned pointer types is technically incompatible.
+
+The callers rvu_af_dl_npc_srch_order_get() and
+rvu_af_dl_npc_srch_order_validate() treat the returned pointer as a u32
+array:
+
+drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c:rvu_af_dl_npc_srch_order_get()
+{
+    const u32 *order;
+    ...
+    order = npc_cn20k_search_order_get(&restricted_order, &sz);
+    ...
+    for (int i = 0; i < sz; i++)
+        ctx->val.u32arr.val[i] = order[i];
+}
+
+Should subbank_srch_order be declared as 'static u32 *' instead of 'static
+int *', or should the function return type be changed to 'const int *' to
+match the actual type?
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
+> index 004a556c7b90..b168ecfbc5c8 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
+> @@ -343,5 +343,7 @@ int npc_cn20k_defrag(struct rvu *rvu);
+
+[ ... ]
+-- 
+pw-bot: cr
 
