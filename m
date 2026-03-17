@@ -1,124 +1,167 @@
-Return-Path: <netdev+bounces-268733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268734-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YG+OCxC0uWnJMQIAu9opvQ
-	(envelope-from <netdev+bounces-268733-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 21:05:36 +0100
+	id OFA6C2y2uWnJMQIAu9opvQ
+	(envelope-from <netdev+bounces-268734-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 21:15:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A8BC2B1FAF
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 21:05:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A284B2B21B8
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 21:15:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8FA3D304B3B7
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:05:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23E3E303EC04
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 20:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E750E33FE27;
-	Tue, 17 Mar 2026 20:05:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC0B37B00F;
+	Tue, 17 Mar 2026 20:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="sGL9KQ+1"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="mNRO7niY"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983014594A;
-	Tue, 17 Mar 2026 20:05:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A2D4346771
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 20:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773777931; cv=none; b=l6AP1TNK8gb/68FYvV3Ol3EUmdPY6gBEzNoiMat5N+RfzBYL3l2aouZTy2bI8JN7CpCj5TYbPDM5eScLh7esGEfbHVLqnblzHILaaUfqfWwPIcNleWgr2B4unmfhPbP04sKwgyHML5mspO2J7waGXC4foGpaWCgT4uLEqPD8AOU=
+	t=1773778308; cv=none; b=SZz0dkWwnh1fv3LfwfJDGB6XxgjVndkHaqmvk0balGXVgdRUbMW8WkDEd7R8TYhA9Xne3jSv9JrzP7WSCYsK9lnTBlvtNfLBPUAGp7Hnt6yiKtAV81OvBA+7GSgQOyAOZipOF4wwsuNYR81Wy33Ikww1TQ6H27JoxJMcImovDy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773777931; c=relaxed/simple;
-	bh=1Z1mAp6/h90P/C/Wk/Es/v8k+aTzV6mkLEU0vlVt4aU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jokUEUnfLgDVYt7fkZvHDsYp68+LGEhzZFt9gwzn5Wbm0b/cCY/yAwTpgJKDU+vCrbTMTpZCMmdQyNq9LHTarOXL7oBZo6njFccx8UW62yce6E4USpTEx5P00cnDBv+llnAg0xhPQ/JghSOTAQ7YbH5Q4O8zYqrzj8CDxuM9mgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=sGL9KQ+1; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=w7Mp6mlzCrW5RSiQUh8DAfWT/dVaZ7BMs2xgRQ8dpm8=; b=sGL9KQ+1sKNgyRVhmNUwawGKAm
-	oa3bKuqpJ7RhE+4haJC5cVbCZcKvNT51LKyTpFA2D8R9kZOq55V02WmBuMH4aTkh9roF593m6+Olz
-	ymSd8DqA0mig77iuPJfltyuNY2qDt1YMiun2ET1zLUQDdwGMiUPklL1qF/mlXBVS4QH9QJVOLe/x4
-	Jg+CVyP91EmgJ70L5qd6f5zLww/3ca51cV+ACQgj/bHEIbmG8Mv+p5mQLPFLn1cjFEKOiD47tspwg
-	R9fXpGNIJu8RBc9MdiRG53EP3Vdw0CPA41pJimEdwgY11ne97z3rBU986mvbYHYOaZFA0+87+3Rxo
-	Q7ej5rAQ==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1w2afQ-00384f-Ta; Tue, 17 Mar 2026 20:05:27 +0000
-Date: Tue, 17 Mar 2026 13:05:23 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: linux-ppp@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, James Chapman <jchapman@katalix.com>
-Subject: Re: [PATCH net-next] ppp: require callers of ppp_dev_name() to hold
- RCU
-Message-ID: <abmyig2dVODQYTnX@gmail.com>
-References: <20260316092824.479149-1-dqfext@gmail.com>
+	s=arc-20240116; t=1773778308; c=relaxed/simple;
+	bh=rvO+4S75LTdAcT1JADZgoSDSzZpbdmjE6Tv0S8Da7jk=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=eLKDkrtPm0e+CtEqOov3jJpbmeKAadV3bSFiVJZk6dVQlxwh8pvc6ZTzd689jFwvj8WQe+QBxmsiA4bWVPqAlbrD/5AX+0DMLOUVqZNUOvWjmuC0kQ1uhzsKmdjV9DXpJcsliw3WCG+RvHzkqGVT561gNSooYoyhjYJzXqsbKBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=mNRO7niY; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 263D2A508D;
+	Tue, 17 Mar 2026 21:11:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1773778305; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=uUhASz9AHU5Mq+ZCgfV3SbGNBCbIh2iyUntKXpuOs98=;
+	b=mNRO7niYZ0OgBcWrPfQY3CcJzGWZaWW5nBthb1/GgtV20VuxZS5neQr9JnICuyMBP1+PMC
+	kTbK+LCbj1wYzsYM7ZsTgTFgTudzKFFM02nyCMNJkPdCOdV0SR7PbfeeJXi08yyY819vxF
+	QDpSsJrt65+av4PGQGMJNyQa7hi6O+EwlFQNN+6hlSmx9CJ9vDNxzfLDsG6yp36HFKQ4Zp
+	l0geX+cZzJ3nlEnR1Hc+vGIwmMifJ1aWW3qBVhaD235I95cP/q6pE6k3c7l/1ysBfwlAS+
+	+twbBBqw90ow7S6JE5QQjXqHx/nzhlCUi24wT+tCIBdfYt5fWygrLlqbRKw4IA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260316092824.479149-1-dqfext@gmail.com>
-X-Debian-User: leitao
-X-Spamd-Result: default: False [0.84 / 15.00];
+Date: Tue, 17 Mar 2026 21:11:44 +0100
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Breno Leitao <leitao@debian.org>
+Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: macb: allow MTU changes while the interface
+ is running
+In-Reply-To: <abmvax5GU9KdFBli@gmail.com>
+References: <20260316092720.39198-1-nb@tipi-net.de>
+ <abmtcI4NX_zFyAwA@gmail.com> <abmvax5GU9KdFBli@gmail.com>
+Message-ID: <467fdc9c7af32942b4d25442577b8260@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_RHS_MATCH_TO(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268733-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[debian.org];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-268734-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[debian.org:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9A8BC2B1FAF
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A284B2B21B8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 16, 2026 at 05:28:23PM +0800, Qingfang Deng wrote:
-> ppp_dev_name() holds the RCU read lock internally to protect pch->ppp.
-> However, as it returns netdev->name to the caller, the caller should
-> also hold either RCU or RTNL lock to prevent the netdev from being
-> freed.
+On 17.3.2026 20:47, Breno Leitao wrote:
+> On Tue, Mar 17, 2026 at 12:42:04PM -0700, Breno Leitao wrote:
+>> On Mon, Mar 16, 2026 at 10:27:20AM +0100, Nicolai Buchwitz wrote:
+>> > macb_change_mtu() currently returns -EBUSY if the interface is running,
+>> > requiring users to bring the interface down before changing the MTU. This
+>> > is unnecessarily restrictive.
+>> >
+>> > Instead, close and reopen the interface around the MTU change so that RX
+>> > DMA buffers are reallocated for the new MTU. This is the same approach
+>> > used by many other network drivers (e.g. igb, tg3, stmmac).
+>> >
+>> > Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+>> > ---
+>> >  drivers/net/ethernet/cadence/macb_main.c | 9 +++++++--
+>> >  1 file changed, 7 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+>> > index 5e27e0e87a55..8dd01031250d 100644
+>> > --- a/drivers/net/ethernet/cadence/macb_main.c
+>> > +++ b/drivers/net/ethernet/cadence/macb_main.c
+>> > @@ -3262,11 +3262,16 @@ static int macb_close(struct net_device *dev)
+>> >
+>> >  static int macb_change_mtu(struct net_device *dev, int new_mtu)
+>> >  {
+>> > -	if (netif_running(dev))
+>> > -		return -EBUSY;
+>> > +	bool was_running = netif_running(dev);
+>> > +
+>> > +	if (was_running)
+>> > +		macb_close(dev);
+>> >
+>> >  	WRITE_ONCE(dev->mtu, new_mtu);
+>> >
+>> > +	if (was_running)
+>> > +		return macb_open(dev);
+>> 
+>> Would you like to keep the new_mtu set, even if macb_open() fails?
 > 
-> The only two references of the function is in the L2TP driver, both of
+> Looking a bit further, I found that macb_set_ringparam() doesn't return
+> failure if macb_open() fails. Should it be fixed also?
+> 
+> Should we have something similar to your code above?
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c 
+> b/drivers/net/ethernet/cadence/macb_main.c
+> index 5bc35f651ebd2..3c43fc85af79d 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -3516,7 +3516,7 @@ static int macb_set_ringparam(struct net_device 
+> *netdev,
+>         bp->tx_ring_size = new_tx_size;
+> 
+>         if (reset)
+> -               macb_open(bp->dev);
+> +               return macb_open(bp->dev);
+> 
+>         return 0;
+>  }
 
-nit: The only two references of the function *are*...
+Makes sense. I will send a separate patch for this.
 
-> which already hold RCU. So remove the internal RCU lock and document
-> that callers must hold RCU.
-
-This symbol is also exported, but, we don't care if external drivers
-call it without holding the RCU read lock.
-
-> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
-
-Reviewed-by: Breno Leitao <leitao@debian.org>
+Cheers
+Nicolai
 
