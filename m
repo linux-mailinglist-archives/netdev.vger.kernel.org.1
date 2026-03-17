@@ -1,169 +1,176 @@
-Return-Path: <netdev+bounces-268584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268585-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GLY+LzNGuWmK+QEAu9opvQ
-	(envelope-from <netdev+bounces-268584-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:16:51 +0100
+	id QCqIK5tFuWmK+QEAu9opvQ
+	(envelope-from <netdev+bounces-268585-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:14:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 223C52A9AE2
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:16:51 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0CC82A9A35
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:14:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 34D5B30D16DE
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:09:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BBA4C301FB40
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4D043B95F5;
-	Tue, 17 Mar 2026 12:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253E63BD658;
+	Tue, 17 Mar 2026 12:14:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RKn/nB+m";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hd4L68GN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JWcxlJVG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775163B7B67
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 12:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B4C3BD630
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 12:13:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773749388; cv=none; b=oU4hq/eMn3cqJl0ZXpZbJKzahQ9Je2EbRdEXi0J16a/pd4rqgJMifk1oYWKGukTLF3z9ccScHXzOKdyUvJdOejka2DxXBX/UuSTiPNXOdV/XTqNfP0Crnvas9HrBCauBEjkD7CCMLHlo7qmPn6Y6rLCok3qW9+kvL1CtLCbvgFc=
+	t=1773749640; cv=none; b=Yu6AinBV4ZRxqNprGgHMDVs2zrbL50gEdiJ7t4QJceE1FBbb2X+M4Y5LjaIycMRS7AoumWnN8ELBWyLhYAqAVErh1mJlbgiiuCWuvkTzbmOgvtH6tQr4+m1YY2yemElhnlBfWN0Fquz2+kzE539Sz6F/kNAsSrrg89XI14T7eRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773749388; c=relaxed/simple;
-	bh=iWkKyWZAAuG0ORdfNAxtO5CUGZ+Y+pgWbF3QQdkr1AY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fn2EQPPmW9zT0CF0IsCsLiwxsloudPN31jP4VRk+IGhiH5T6/GDfpKfpvZTlEmfbZOyx+6Wok6xJYRAKFoHMxTChG01qDIHWFPQ8UM5pY4oDp5ieiin1+siQqJ3BxCh0E8NRl10fJSBg01qAPfaoEmoXaMY1Wk22ynwdcxC8PLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RKn/nB+m; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hd4L68GN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773749386;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7HW8O6rPgR7FauUXL+o5Ae/r1xKJYBrSjy0JypWWimA=;
-	b=RKn/nB+mgAkxC+KvWTZNxvVOAx1x11Tw/RfcTk12Q8ASRKTYVZpSYci02pVN22AvcjKLVw
-	tIUoOr6c17Tyb8ue4/WY/3GeOSx4Y9mT+JZIMMldWNhOyVJ679RLNbU+CmBcO4P80Z+juV
-	ahX1lIRyGiOWPi87f/Nxs7F8RrSSOIU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-33-h7WylZ3QPSep7IPkc6_Jwg-1; Tue, 17 Mar 2026 08:09:45 -0400
-X-MC-Unique: h7WylZ3QPSep7IPkc6_Jwg-1
-X-Mimecast-MFC-AGG-ID: h7WylZ3QPSep7IPkc6_Jwg_1773749384
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4852d27f473so28270775e9.1
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 05:09:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773749384; x=1774354184; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7HW8O6rPgR7FauUXL+o5Ae/r1xKJYBrSjy0JypWWimA=;
-        b=Hd4L68GNXenG9J+uQYh5mgbB8rM3KhfmzE4CME1PphOR1JyR6ZlfZOoX16aA5du/r6
-         dfBThKl1WLAoV4uoDnDIzw8UsRAY+enbTOHmX69ynrsTQTnuMJ6QhzyChQZrj81LGxJA
-         DukDHFu/mNglwnFQ/8inaj1GXSb56B9Y94LhbF5S4UjiDF2zgS6uqoRaNRsvL332qCh5
-         FY8fGHu/ZUVmsfEQB2l6qGLKD/8J0DxFmkbREXeR58LFnE6solCGH7QhZWYusxNQCYy4
-         cQpBdO5PFle0mysRqVM8moC7xAzB4doLzG0TU2gBi6EKWmDS/24Zf5DkCNJtitSGk/jr
-         +iJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773749384; x=1774354184;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7HW8O6rPgR7FauUXL+o5Ae/r1xKJYBrSjy0JypWWimA=;
-        b=bDRv0quSlTfpO8uaXIOKAWWYhSeABgKfL+LJnPlX7MxCyp4fRNGsq8KiFImASqkKgp
-         RdB4OQ56LuEi4S+NtkHPwAIlPcB7Y5S2X6SLrIr59nw+3DPHexfRnNj5x07fpTVL8VV6
-         C837u4toHNQYOAhuEWqAfUdZNQDtqN0t0V11n26h7toP6ArwTm0U8fSUa+oj/MfQNSpQ
-         7KvT9wS6M9bvIhPMw5lJgbn6jT70Ufy0Zj6Y18d15XsKQWHW09bfpJr43O2zyzB/T7Gg
-         ajyUJ6vxCPwW0xZo0ZxHc2eerFTtGQ1R9Ff5E1xIuLoQVf/WpacsHlyMOOiEaVdwIKih
-         t6VA==
-X-Forwarded-Encrypted: i=1; AJvYcCXnbkf8P+QaZw30haJn8LdndFpduijepFGGHQGc6eNd5kFQX41gn1hdxB1soEC6iNTI79G2okg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWdTotBzz/fB0wIgvtDkyXHIdbmjEUlb2UjE8NBzXRXBauOZGo
-	n0wprEgmgsPDshqX5ikOmjl0Mo7WKTxNclpWf8bKcWOP51KxV2ZldWrYWnPLuKm1DYUNdr87mbY
-	zjJEXBkIKNWuSzxPMQr0pelyQckKeJKAYWs80xfjEYs2XUUw4Z3C04nTimA==
-X-Gm-Gg: ATEYQzxoMylI2IJZ41i26h8eY4Pr2AugCfxDkAiSN87797YDYnl07nl1wzeaKGpz2yG
-	srL4Ts+Bgrd00HEbd/Cc/UDUjEUA/PqsZGA1+d8AaC6Vu3SOZYCt2iAF7aP+tchLJe2V5SFMnls
-	Y2vMoqeLiYVBxYFrWsu/QQ6d7G4RPmuuofd1YEf8opurvAmxxPmytAwvox48th1kYl4jKGNQEVF
-	Nu/I4KZ3NH2ukwXDdZkTH54qCgq6vxoPQDNY8O1MGGcdniSrL93QSr3qB4T6MANrPauF23KwG6j
-	oIDeeOMDDTP14IMjIVrlQwWkL36aw4DvrWM66D7LtDoSbmU6JGf39zPGCjDc2n1W9aRKF5R+N8Y
-	0dvjVKV3tbPr5p/3k7UTnCKxTUrNneIVCGAouGdDa7ESjwoOAyITyR14=
-X-Received: by 2002:a05:600c:4592:b0:485:3dfc:57a with SMTP id 5b1f17b1804b1-4855671044fmr284696895e9.32.1773749384146;
-        Tue, 17 Mar 2026 05:09:44 -0700 (PDT)
-X-Received: by 2002:a05:600c:4592:b0:485:3dfc:57a with SMTP id 5b1f17b1804b1-4855671044fmr284696185e9.32.1773749383627;
-        Tue, 17 Mar 2026 05:09:43 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.11.95])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48634a7ac93sm41144035e9.2.2026.03.17.05.09.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Mar 2026 05:09:43 -0700 (PDT)
-Message-ID: <27b77086-4f08-4d97-bc7a-2b5a4754a5af@redhat.com>
-Date: Tue, 17 Mar 2026 13:09:41 +0100
+	s=arc-20240116; t=1773749640; c=relaxed/simple;
+	bh=NM15rF2ixpr9zdJXA845krHa+u0TL42/fXie+kPWl1s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RQMqCdtn27wulFqKdKzHoKhehq2Ks9fr8TWF99nWgQxxeVm3ClahhGwNE80CooKY+X9fFYgJOuJmj0p3wLKAK8r5uB0RpBmolq3hLfTmKlvA742+tmL0k1vYvDL1ewHiRgzIz6VjLyg2cpKXqJHK7b/+7tIt+oTqXNEvR7CQ1aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JWcxlJVG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3291C2BCB1
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 12:13:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773749639;
+	bh=NM15rF2ixpr9zdJXA845krHa+u0TL42/fXie+kPWl1s=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=JWcxlJVGPBqhz9RXcLD6E0lS6FseglH23EQPEWTY72+jfKOks25hEGKjngVRjniQO
+	 CmQ8rspgQZn8dRpPC3r1TJVX+qcDYnBSCIvs4RCpciFsQar5ddcjh381iJyaciNuRb
+	 oovHU2pt1lKlSD/jtwDe/zD7yuZSQGbfjndbfEcWw6479ZYNzW+/9ArCALW3TXEZD8
+	 88FPC9BtITi6vjghBQsAO/gJosHfzFdwd4cltWyWvKIzx+2No79UY4ReEMFco95j3N
+	 LrUvswVkq/pmrHMDcUCg6Tn5noLn1LuBP5YnHsWw53a5O2c9cPAjYIDQ+KnV1cV3lr
+	 sLTO4YEaMZmKw==
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-899fc265126so67749936d6.1
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 05:13:59 -0700 (PDT)
+X-Gm-Message-State: AOJu0YyTY+CafM3Z+VKkpJkR7jLaP9vAMqzxvdfZk0EwGRKEDQK6Amlq
+	zQUOkdCPBXHc7mh2BrRSD7BXqVhsppaKNs5pYtnywamzW0GZhst6WcHic37n7qsJuWQ8Ga2189P
+	ETweEmZPUiUGV1YF+DttGx9x7N8gaEoA=
+X-Received: by 2002:a05:6214:5185:b0:89a:c88:1fb4 with SMTP id
+ 6a1803df08f44-89a81fe41edmr247946196d6.52.1773749638930; Tue, 17 Mar 2026
+ 05:13:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] amd-xgbe: synchronize KR training with device
- operations
-To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch, Thomas.Lendacky@amd.com,
- maxime.chevallier@bootlin.com
-References: <20260313134210.3824872-1-Raju.Rangoju@amd.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260313134210.3824872-1-Raju.Rangoju@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+References: <20260316174550.462177-1-maciej.fijalkowski@intel.com>
+ <20260316174550.462177-6-maciej.fijalkowski@intel.com> <87v7euq00g.fsf@all.your.base.are.belong.to.us>
+ <abkzhZex8RtzNLdm@boxer>
+In-Reply-To: <abkzhZex8RtzNLdm@boxer>
+From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Date: Tue, 17 Mar 2026 13:13:48 +0100
+X-Gmail-Original-Message-ID: <CAJ+HfNh7z4ixgKiAON1rLZJ4gOW0piRam05wg3-qe1n_=6y3uA@mail.gmail.com>
+X-Gm-Features: AaiRm52dLnnpovfMBmkDCVK3dZuOOfMS6DegDWG6l33XxAMg49NDsrzxOOmqdGg
+Message-ID: <CAJ+HfNh7z4ixgKiAON1rLZJ4gOW0piRam05wg3-qe1n_=6y3uA@mail.gmail.com>
+Subject: Re: [PATCH net 5/6] selftests: bpf: fix pkt grow tests
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, magnus.karlsson@intel.com, 
+	stfomichev@gmail.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	larysa.zaremba@intel.com, aleksander.lobakin@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.45 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MIXED_CHARSET(0.71)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268584-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268585-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 223C52A9AE2
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: C0CC82A9A35
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/13/26 2:42 PM, Raju Rangoju wrote:
-> @@ -2115,7 +2160,9 @@ static void xgbe_phy_perform_ratechange(struct xgbe_prv_data *pdata,
->  	XP_SET_BITS(s0, XP_DRIVER_SCRATCH_0, COMMAND, cmd);
->  	XP_SET_BITS(s0, XP_DRIVER_SCRATCH_0, SUB_COMMAND, sub_cmd);
->  
-> -	/* Issue the command */
-> +	/* Acquire mailbox lock for firmware command */
-> +	guard(mutex)(&pdata->mailbox_lock);
+On Tue, 17 Mar 2026 at 11:57, Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Tue, Mar 17, 2026 at 10:27:11AM +0100, Bj=C3=B6rn T=C3=B6pel wrote:
+> > Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
+> >
+> > > Skip tail adjust tests in xskxceiver for SKB mode as it is not very
+> > > friendly for it. multi-buffer case does not work as xdp_rxq_info that=
+ is
+> > > registered for generic XDP does not report ::frag_size. The non-mbuf
+> > > path copies packet via skb_pp_cow_data() which only accounts for
+> > > headroom, leaving us with no tailroom and causing underlying XDP prog=
+ to
+> > > drop packets therefore.
+> > >
+> > > For multi-buffer test on other modes, change the amount of bytes we u=
+se
+> > > for growth, assume worst-case scenario and take care of headroom and
+> > > tailroom.
+> > >
+> > > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> > > ---
+> > >  .../selftests/bpf/prog_tests/test_xsk.c       | 21 ++++++++++++++++-=
+--
+> > >  1 file changed, 18 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/tools/testing/selftests/bpf/prog_tests/test_xsk.c b/tool=
+s/testing/selftests/bpf/prog_tests/test_xsk.c
+> > > index 7e38ec6e656b..a496f1784b66 100644
+> > > --- a/tools/testing/selftests/bpf/prog_tests/test_xsk.c
+> > > +++ b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
+> > > @@ -2551,16 +2551,31 @@ int testapp_adjust_tail_shrink_mb(struct test=
+_spec *test)
+> > >
+> > >  int testapp_adjust_tail_grow(struct test_spec *test)
+> > >  {
+> > > +   if (test->mode =3D=3D TEST_MODE_SKB)
+> > > +           return TEST_SKIP;
+> > > +
+> > >     /* Grow by 4 bytes for testing purpose */
+> > >     return testapp_adjust_tail(test, 4, MIN_PKT_SIZE * 2);
+> > >  }
+> > >
+> > >  int testapp_adjust_tail_grow_mb(struct test_spec *test)
+> > >  {
+> > > +   u32 grow_size;
+> > > +
+> > > +   if (test->mode =3D=3D TEST_MODE_SKB)
+> > > +           return TEST_SKIP;
+> > > +
+> > > +   /* worst case scenario is when underlying setup will work on 3k
+> > > +    * buffers, let us account for it; given that we will use 6k as
+> > > +    * pkt_len, expect that it will be broken down to 2 descs each
+> > > +    * with 3k payload;
+> > > +    *
+> > > +    * 4k is truesize, 3k payload, 256 HR, 320 TR;
+> > > +    */
+> > > +   grow_size =3D XSK_UMEM__MAX_FRAME_SIZE - XSK_UMEM__LARGE_FRAME_SI=
+ZE - 256 - 320;
+> >
+> > nit: Use defines, XDP_PACKET_HEADROOM, and maybe
+> > SKB_DATA_ALIGN(sizeof(struct skb_shared_info))?
+>
+> umm right, but the latter would have to be exposed via UAPI ?
 
-Also note that Documentation/process/maintainer-netdev.rst states:
-
-
-Use of ``guard()`` is discouraged within any function longer than 20 lines,
-``scoped_guard()`` is considered more readable. Using normal lock/unlock is
-still (weakly) preferred.
-
-/P
-
+Ah, good point. Another option would be document in the comments where
+the magic numbers come from.
 
