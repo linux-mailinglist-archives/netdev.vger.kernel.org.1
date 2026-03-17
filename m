@@ -1,193 +1,175 @@
-Return-Path: <netdev+bounces-268589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268590-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eP53KgpIuWmK+QEAu9opvQ
-	(envelope-from <netdev+bounces-268589-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:24:42 +0100
+	id 8DfmGfRHuWmK+QEAu9opvQ
+	(envelope-from <netdev+bounces-268590-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:24:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0752A9CA7
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:24:41 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 850342A9C83
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 13:24:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 08E56304502E
-	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:19:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5D8DE3002B7D
+	for <lists+netdev@lfdr.de>; Tue, 17 Mar 2026 12:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ABE23BC671;
-	Tue, 17 Mar 2026 12:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8B13C13E6;
+	Tue, 17 Mar 2026 12:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BovfzstJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O3ur5lB+";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OZQqjBqF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600DE378800
-	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 12:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923EE3C13F4
+	for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 12:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773749988; cv=none; b=RzBDOWmvkaBFisN8BeJ1zXGCUcT7axqmIQSnVVjZwFKcVlZbqzZG3cLUMzsc3oHHSTdY5+tylhY1udhFDH0j3awSlsPelicckCjz7mRGa3BsKiYBLgA9sjD2SufMlMYS03PPAdZYNwBnQ2m7nHYJUJSNdo51V2KUFI7nTuVtRAo=
+	t=1773750061; cv=none; b=WA+5DHxBUzFwGXSFrz2A4iaQ+BNPjupYOIB4ZZ/KSLdIFNVGWR9H1lTYmtvYJ99k91j/M1BKLb6ncgmpMWmgs/unufGKN55lhKXdBWHtchrZCXcanR5lx64smDrSK43o4xH5OeUSZv8DrZC7wA4vNbDvsKsPE7S0BVoPCmhxg7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773749988; c=relaxed/simple;
-	bh=s4JZjSbZQmE1mwQvqkXq3G7uBc8SZUl++ECGH/8/6oQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DQ/lGMqH8cgjnktxNok9izuidOOZwCpehOkceL5Wiz3ilr996jho+pVPT8OyyOiLwZy66qhCizYoExLBH5vrDRV12eRLoasUAcXh2Iq37gdMtZrz9nuc6QeBBGifRUmvwHNe2b6J6LTvCNgPxqJoWatgjGFAEi85jWQzoodvgRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BovfzstJ; arc=none smtp.client-ip=209.85.214.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2aecc6b0861so24724655ad.2
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 05:19:47 -0700 (PDT)
+	s=arc-20240116; t=1773750061; c=relaxed/simple;
+	bh=ikYXskdjqT1oBUvXC9EURGXDDr3yzkun5zhv0pI6MFI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A047Ui3xhtT4oIebzyQWrNdXKqE8p6silm/ErvXDPaJeOa8jTAhbZxuw/lBLIEYIx/FZO0abLhdAdzdRmPuOR6pb6KEeRFKc6/P9SUur/OM667DdbJckkDH9Cvb9W9gOfAdmFgSH+J9h9YwKGauLWkrh5dqSqJFT5mYnYo/HCtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O3ur5lB+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OZQqjBqF; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773750059;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gMR0WXF/fPUdEPH+ksc6APmIhPxNqgYRRVse5Z+N3hE=;
+	b=O3ur5lB+YkK7VIWRsG+GM1pyHRiLjT+JaBfklYHUrfh2OUCcDT1IusQIX5EAWmH/Ribj9q
+	DjBp5v3K3h++9XgbiTdlztnKHS4AezXxsQQuOufv4wgvWZXIAPjghXrSYX1nTRn15hdZxg
+	edwcwFyGFLMOM73QERAXIWerCid+YTM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-463-5k9yvcZ1Ogq9ytC5MiuU1w-1; Tue, 17 Mar 2026 08:20:58 -0400
+X-MC-Unique: 5k9yvcZ1Ogq9ytC5MiuU1w-1
+X-Mimecast-MFC-AGG-ID: 5k9yvcZ1Ogq9ytC5MiuU1w_1773750057
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48534941525so82641735e9.2
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 05:20:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773749986; x=1774354786; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cCHW5LCY6u+U/vsUxJTMq8Ol7b+zVLBPKYua+ntdkdU=;
-        b=BovfzstJdxxcViSQBhPCZpXKmSQ0Qyto0b6UHuMyv+hvoNS6Sz6d4Py3klNAlA//2W
-         R1CzNskiIEAp6yoR2FTCGtp3OL+FZzlr9j3zm2oEUWd7EpVR6HRehrw1MQuRWsqV6Ap5
-         148yNGvENdYwDP0g2t2z3fuX6qqQmGURCByQGyogbw5opws49152LtPABFo/4C7FHkK2
-         jXCynqmGkJ3wLP4OTWXIS9g7SpcsWTBHwUa+4OOuMvPWcbUHENqcuJbryrXq3Ww2sjZl
-         14slzgsmwluX0t60aZvB3YGY9ptojFCVuWFxP7/saaeLmNwvm09njoJrffX97cjBZWSf
-         L1Iw==
+        d=redhat.com; s=google; t=1773750057; x=1774354857; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gMR0WXF/fPUdEPH+ksc6APmIhPxNqgYRRVse5Z+N3hE=;
+        b=OZQqjBqFji5Vx6OHxzeo0yhAqlL+ayGB6s6MF8G2T3bE2NfRKRGp93FREqnx4LA/uF
+         kaDAbt/wo3kBVEz3PO5luO1u21CQC5yCs+KX5rKG8zoWlh7fd5HRq6Bd1GH/KVOiMDQp
+         EmuKVa52BO16vi+7iH8CNB028krhZ0+VupUM2ewAqThgOLZnt/q2gCGIJEpbOLmldSjD
+         UdoPuxmlQP4Pz3tnigWwaE3EiAJZKhSVeTO6G1di6rwn6jUCpV4pPSChmuYxns3adozH
+         EqSprnl733oWvrPjKW8yLItfqyLMmu7PzUsb74MxxuBbnvVcZm+MeLhPweD9IANqYLeN
+         12DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773749986; x=1774354786;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cCHW5LCY6u+U/vsUxJTMq8Ol7b+zVLBPKYua+ntdkdU=;
-        b=F9xGKaUDa131uf8e7jDN0whhRNj0t85lwR4nf78bF3Lre01wUKDxX1oG4lNO4tTpo5
-         cRCPMOnm69epZrooBDpPPwsxYOvuMdcK3xmo8IkYE7yYlF2h/EXFdclUbCtlQ2pcrH/Q
-         RvyzDJRgBdQghhhqzVf32Nb2NaJSHsX7qd6A72YJyTSVhJcdI8DXA4wcxgTTqOChHlxp
-         jeZHHmLtScIR6b6w9I2kP6btDVUvppEh8/dImaH6zZPRucvRXEQ1ZQCOmnET/eQHs/zj
-         tWXhkL2mr2TUzkl9BlhjpdsX7lgQrkZY7XtH7yoffTVnI6uFaQ7Lc23NryImnrjCHNQE
-         lA2w==
-X-Gm-Message-State: AOJu0YxyFD4+Fnm02s6WZRL8O/Yic2NQ4RP8g5Kpojl3LDn9EiXGbui7
-	7yFV90krCxzZnxiE/QoitjSMxv0jUxDDZbQQ8c1pH5GfwDa2RaxSZc9lSiYrgxQt
-X-Gm-Gg: ATEYQzzEHwKSVGjeWAzSHO6R081bc6SoW5BmgzmLvAXu1ybZNR75sTwjGcZV5W2p3E/
-	rzMfFZaYLyErjLALN3BrLnU+RUiQCNU8ETVTIEfiRoFdl27iYUVJQbsvYAGacI8D5gzupgZpYxB
-	+38WI3eIcvIHSieLzApVjHua1AmyRlhNK/i/6IkpCocLfVbrk2xhycL8JryNTQK7yBZztZ2IVYs
-	pKP3viRzXNd4o9jE5MR9WlYhoana2972uGkwqR50KGd6SrNdgp+TtsscZbG4c2hxyJXTxOfjKgR
-	wB0hIY83VxpFlpKooBWJKv0onJIOu+pV/B+cye7IGhe4lrgtLDRJ05q3oFhpT3aKYBBbSsDlx8z
-	A6NDgRSzH3KqUrVvqGRG9+YZ6ZOchVOKBlTcyJhmhboijIl/TRAizyRlABzcliTNW1QoH8P5imv
-	Msgdh4KQMurmbLaWbg7fKNOULrWk6BPQaD9zy8wvnHeA==
-X-Received: by 2002:a17:903:41cb:b0:2ad:dd69:76a2 with SMTP id d9443c01a7336-2aecaad02edmr177427505ad.31.1773749986356;
-        Tue, 17 Mar 2026 05:19:46 -0700 (PDT)
-Received: from XP-PC-yangg9.xiaopeng.local ([98.98.122.131])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b05db37a8esm77980185ad.29.2026.03.17.05.19.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 05:19:45 -0700 (PDT)
-From: yangg9 <cohenyang511@gmail.com>
-X-Google-Original-From: yangg9 <yangg9@xiaopeng.com>
-To: netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	yangg9 <yangg9@xiaopeng.com>
-Subject: [PATCH] net: stmmac: Reorder cleanup sequence and disable IRQ earlier in reset path
-Date: Tue, 17 Mar 2026 20:19:37 +0800
-Message-ID: <20260317121937.109211-1-yangg9@xiaopeng.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20251104; t=1773750057; x=1774354857;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gMR0WXF/fPUdEPH+ksc6APmIhPxNqgYRRVse5Z+N3hE=;
+        b=Qgw9zUlp7046v8MKmdSexfXiFz6wipKO9Jk4TRL8367h/EGbdsKv5I4pKhrt8vxRzq
+         J2I5hknrIGxXmhEQYPqlcrqAnSwmPTDZRnQZJyzuiyMSdZ1SwxOHDfT8YriOmuViaY/n
+         nezuNf1zsWPa7404rgKFi4My0Nmd5QqCYUhPAEVAcgfhvGLSsQIX9cmme4s5gCDbuFl2
+         9NXRjrGMSR4JvnOeN32N8iPeBUaMZ4Lw9NwlpQBmwbsxXWbSKG4G3sxjMeV5I4f4Tcpw
+         KfmgrW5Kt5r4ICIQ+1IV4RoRU9swcqruDOhE5nkl3r3PpZwvmObf0866oiOTy4JOJCtd
+         jbQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUdIAkDycmKfIo06hHQ+MP49NbGQma0zKKsa08V5IYdij9RYxwEWKYZ8W5/E7WTI13bXy43YEA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbnZg1TAJp/rjRuFhE4NBzTpBBov9301wVfcHIS/b9cSGSIUSu
+	Br9c3kUlGC6gSfzc8jzJkYaMX32SwJ106mT04qqYXzS9R39dfI6xi0lRXwMdpQwSY5A07xv1QoV
+	PTtuJRPmsafiOZg4S1BSPQEmT7yPYcaRDlulutXSYy9E7+5vQeCNRUSX2Mg==
+X-Gm-Gg: ATEYQzxNhaU2e/+z0tR7Ys/JA+XfY4Ii8r/WuwfDkd2NTSBM3+YLTed0fxBtPd2YWlL
+	54FeGjuNBAwXKB6G0m/+ryS8bBU1de9yZxsXr5Fs/WXrF3qC3NgWp/qtRbi0R9Cb422ftmn0n3c
+	BSf78ssMhGYsMujiYY+LSgYyhNn53j4burijLnP5Ak3BXTVxMfmWJWonr2bLD5U3bvcqJQ77tOH
+	AT8YJxuSfrdGUntVSTz3RjxpSkgFP60CuyMq8RUuV8sDFqR2KoP/nWPCxdeWSDR5UlpModZG7Vg
+	zfqwnXB4FK7rd8bsCEG7CqXpeRB02pPUE6s6gKAdQ5CoqS77SYkuZY5RTdOE1uDJlYxOtMpBrua
+	+PKeYultPbUGr41E02Nv+8I9ku4ye3u176nCABPTovVJagGy13xWS8k0=
+X-Received: by 2002:a05:600c:45d5:b0:485:4535:73d with SMTP id 5b1f17b1804b1-485566cfb8amr268349995e9.2.1773750057262;
+        Tue, 17 Mar 2026 05:20:57 -0700 (PDT)
+X-Received: by 2002:a05:600c:45d5:b0:485:4535:73d with SMTP id 5b1f17b1804b1-485566cfb8amr268349235e9.2.1773750056767;
+        Tue, 17 Mar 2026 05:20:56 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.95])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4856eab15f4sm66629305e9.14.2026.03.17.05.20.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Mar 2026 05:20:56 -0700 (PDT)
+Message-ID: <d2900f79-f481-418b-986e-7b86ab20c803@redhat.com>
+Date: Tue, 17 Mar 2026 13:20:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] amd-xgbe: add robust link-down TX queue handling
+To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, andrew+netdev@lunn.ch
+References: <20260313134628.3827338-1-Raju.Rangoju@amd.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260313134628.3827338-1-Raju.Rangoju@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-268589-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cohenyang511@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268590-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,xiaopeng.com:email,xiaopeng.com:mid]
-X-Rspamd-Queue-Id: ED0752A9CA7
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 850342A9C83
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The recent changes restructure resource cleanup in __stmmac_release() to
-free IRQ lines, stop DMA, and release descriptors before stopping the PHY,
-ensuring resources are properly cleaned up in the correct order.
+On 3/13/26 2:46 PM, Raju Rangoju wrote:
+> Add comprehensive link-down handling to improve driver robustness and
+> enable fast recovery from link failures. Currently, the driver lacks
+> proper cleanup mechanisms when the physical link goes down with
+> packets in-flight, which can impact network stability and failover
+> performance.
+> 
+> This enhancement adds intelligent TX queue management during link state
+> transitions:
+> 
+> Link-down detection improvements:
+>   - Adaptive polling: 100ms intervals when carrier is up for fast
+>     link-down detection, vs 1000ms when down to conserve CPU
+>   - Enables ~100-200ms link-down response time (10x improvement)
+> 
+> Smart TX queue handling:
+>   - Immediate TX queue stop on link-down to halt new submissions
+>   - Skip futile hardware drain attempts when link is already down
+>   - Force-cleanup abandoned TX descriptors that hardware won't complete
+>   - Proper descriptor and skb resource reclamation
 
-Additionally, in stmmac_reset_subtask(), disable IRQ as early as possible
-after acquiring the STMMAC_RESETING lock to prevent spurious interrupts
-that could access device state during the DOWN transition, reducing race
-conditions between interrupt handlers and device state transitions.
+It looks like this one should be split in multiple patches, to better
+isolate each specific improvements.
 
-This improves the robustness of both the release and reset paths by
-enforcing stricter ordering guarantees on resource cleanup and interrupt
-handling.
-
-Signed-off-by: yangg9 <yangg9@xiaopeng.com>
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 21 +++++++++++--------
- 1 file changed, 12 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 124d7a00f9f0..fa06b2eb33f2 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4202,6 +4202,15 @@ static void __stmmac_release(struct net_device *dev)
- 	struct stmmac_priv *priv = netdev_priv(dev);
- 	u8 chan;
- 
-+	/* Free the IRQ lines */
-+	stmmac_free_irq(dev, REQ_IRQ_ERR_ALL, 0);
-+
-+	/* Stop TX/RX DMA and clear the descriptors */
-+	stmmac_stop_all_dma(priv);
-+
-+	/* Release and free the Rx/Tx resources */
-+	free_dma_desc_resources(priv, &priv->dma_conf);
-+
- 	/* Stop and disconnect the PHY */
- 	phylink_stop(priv->phylink);
- 
-@@ -4212,15 +4221,6 @@ static void __stmmac_release(struct net_device *dev)
- 
- 	netif_tx_disable(dev);
- 
--	/* Free the IRQ lines */
--	stmmac_free_irq(dev, REQ_IRQ_ERR_ALL, 0);
--
--	/* Stop TX/RX DMA and clear the descriptors */
--	stmmac_stop_all_dma(priv);
--
--	/* Release and free the Rx/Tx resources */
--	free_dma_desc_resources(priv, &priv->dma_conf);
--
- 	stmmac_release_ptp(priv);
- 
- 	if (stmmac_fpe_supported(priv))
-@@ -7331,6 +7331,9 @@ static void stmmac_reset_subtask(struct stmmac_priv *priv)
- 	while (test_and_set_bit(STMMAC_RESETING, &priv->state))
- 		usleep_range(1000, 2000);
- 
-+	/* Close IRQ entry as early as possible before DOWN short-circuit path. */
-+	disable_irq_nosync(priv->dev->irq);
-+
- 	set_bit(STMMAC_DOWN, &priv->state);
- 	dev_close(priv->dev);
- 	dev_open(priv->dev, NULL);
--- 
-2.43.0
+/P
 
 
