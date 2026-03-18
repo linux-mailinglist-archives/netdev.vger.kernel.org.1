@@ -1,171 +1,115 @@
-Return-Path: <netdev+bounces-268909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268910-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wKCcNM5aumnFUgIAu9opvQ
-	(envelope-from <netdev+bounces-268909-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:57:02 +0100
+	id 4NHIKmpcumnFUgIAu9opvQ
+	(envelope-from <netdev+bounces-268910-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:03:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 828F82B754B
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:57:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DD0D2B76CA
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:03:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E955E300BB97
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:57:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0B0C930848EE
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC3636BCC3;
-	Wed, 18 Mar 2026 07:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939F5375AC7;
+	Wed, 18 Mar 2026 08:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UDeGb7mH"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="dCr9CAta"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB8A36B07E;
-	Wed, 18 Mar 2026 07:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5C53750AE;
+	Wed, 18 Mar 2026 08:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773820618; cv=none; b=AvqRRWZ7hULXQuz1TH2Mrgo+gwTJWcqOIskQyKgUqWMC7kfyzZjpbfos0LNK7g6vsjHkdmU9DnqCm0KUOjgc7w4NmjSo4ANU9N/PBQdIp2mkKLlL0CdLVK33p31yt/RRn2qllHf47JukHOxuFNlnC8pcMH0TL/6OtoljD7ucHho=
+	t=1773820837; cv=none; b=XvKL8x+mHji5MjJ1s4MiHhzZxxcyYK5fpsziFbW0pdRS2FuWLjtvfx0HKIEH1r3Dekh61k49/7IUO1f1BpTRx4MA9b9KMFvKl4JDazdcfAtamycTJIbRBSHTXflMjGDBPgXAUkpKqQCxLtqlBmaXaPtjyX56EKFKOxoNL7yZ6Ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773820618; c=relaxed/simple;
-	bh=3XTTl3LEOOJSxh3bPyjhegVTZLN5AHADJeciGinB5gM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Zp/EggJV1vCs9Onvxjqrarvr8MkW5GjSNoXZIHOEmMNHH2J0Lt7LPCOPAMRSpzm3vIj6YP2eDKytRELGYmElybahxrP0eMGtpkxl2H9NGZ+NCDD6o+NjapA0Txe/BHx3zKFj1suKTLiy/1d6ONF043Da9W0xMQ5xGecSQzl/8OQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=UDeGb7mH; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Tp
-	9i1hh0AXWBiYH65D0/JDIPSB18WNuvMfE8rai68LI=; b=UDeGb7mHZTRlvxYZ5e
-	Pd5OPC6QmUlhubaXJEuwrfDq0VoFGhOXMADKqsyj96h9jTV6BDPEbDStaCQ5t3sq
-	OpctqWBYvN2CSpM3ATM/lf+MIBB413HJ0dwBqyFRjp88NRiurc6wF4QDSX9mGIjo
-	XrW0yXnWCQBkWnFFF+9w1byrg=
-Received: from pek-lpg-core5.wrs.com (unknown [])
-	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wDnt6yHWrppnayqBg--.44690S2;
-	Wed, 18 Mar 2026 15:55:52 +0800 (CST)
-From: Robert Garcia <rob_garcia@163.com>
-To: stable@vger.kernel.org,
-	Johannes Berg <johannes.berg@intel.com>
-Cc: Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna.schumaker@netapp.com>,
-	Robert Garcia <rob_garcia@163.com>,
-	"J . Bruce Fields" <bfields@fieldses.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Olga Kornievskaia <kolga@netapp.com>,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 5.15.y] SUNRPC: lock against ->sock changing during sysfs read
-Date: Wed, 18 Mar 2026 15:55:51 +0800
-Message-Id: <20260318075551.1668418-1-rob_garcia@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1773820837; c=relaxed/simple;
+	bh=NFh1/dS2yY1V5/j/8/hnXWN2hIvOcY9YkdUK+OouIP8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=U7N2NCsu+0XDvOCGnjPuNTcKwzp7pd5b2U7XXffBWQ39CB4KuZkdmgMBTYX7kvJ4PzObrvFPARDYnST9RWy5oXMGOtQ+tZhNrZtFmDt3OjZ1VF9CogCTSFjpJ8oHyBup1o2aIn27WIGSdy4r5jZNI8smzxx7A5OoKy6MV+Ifx0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=dCr9CAta; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=hixFf7wKq0QLhS/T/VMdwyyyYGbw1xeEU0sU2ZelLU4=;
+	t=1773820835; x=1775030435; b=dCr9CAtafbV/QypXAZLI8gJSBASFtHFqgOO4oghmm3V+j+b
+	CuQHbSqvex4YD7BFXuKBVKSdupoIIrW1HVPxuKVce5Bk5eUE9g4fRJ81CA9dYQL4EXn/VQBhHrQs3
+	EnX30ufDVDaXPioQ1+ZN2euT93KYzKIaGwthNpYe/ma0jah23uYGHdLoDwiVVtmJg/DxPUwo5JyO/
+	3W5KyhcLihG4wS4BFUgBSBAltlDEj0fqqLRAVTLbznyYgVvmrE5ATFM0p3+ITOoVABeAKRJOzSrn5
+	0SiNAUd1qNorLm1aNGZfWD6/x4gGGZnFAwLhuQCq3IEbRpXtd7MJrj1asX2PlQzw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1w2lpQ-00000004GGr-2qkK;
+	Wed, 18 Mar 2026 09:00:32 +0100
+Message-ID: <d30024f1a2ae07944714a1eaaa056c55bdc774b2.camel@sipsolutions.net>
+Subject: Re: [syzbot] [wireless?] WARNING in cfg80211_chandef_create
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Lachlan Hodges <lachlan.hodges@morsemicro.com>, syzbot
+	 <syzbot+d9f5fabbbcf4b377d01f@syzkaller.appspotmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Date: Wed, 18 Mar 2026 09:00:31 +0100
+In-Reply-To: <tffrshs5h76cfj3k6lelrx6lmm7qtc7hww7r554xtnhfnsw2ip@dqktqrq2k47q> (sfid-20260318_015325_570672_B8B037B9)
+References: <69b992c2.050a0220.248e02.0132.GAE@google.com>
+	 <tffrshs5h76cfj3k6lelrx6lmm7qtc7hww7r554xtnhfnsw2ip@dqktqrq2k47q>
+	 (sfid-20260318_015325_570672_B8B037B9)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnt6yHWrppnayqBg--.44690S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Kry8tryxKFW5Zr4fZr1fZwb_yoW8uw4kpF
-	yak34fG3yDKrZ7urn5Ar4v9rZxu3WfGF4UGr48C3WFyrZrKF15Jryjkay3ur18urZ5uF43
-	tF4UWF45JF1DAaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0p_ku4UUUUUU=
-X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbC5QjBLWm6WogINgAA3+
+X-malware-bazaar: not-scanned
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268909-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268910-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sipsolutions.net:dkim,sipsolutions.net:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[163.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[intel.com,hammerspace.com,netapp.com,163.com,fieldses.org,oracle.com,davemloft.net,kernel.org,vger.kernel.org];
-	DKIM_TRACE(0.00)[163.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rob_garcia@163.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 828F82B754B
+	TAGGED_RCPT(0.00)[netdev,d9f5fabbbcf4b377d01f];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 4DD0D2B76CA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: NeilBrown <neilb@suse.de>
+On Wed, 2026-03-18 at 11:53 +1100, Lachlan Hodges wrote:
+> > HEAD commit:    b84a0ebe421c Add linux-next specific files for 20260313
+>=20
+> I think this didn't have your fix already?
 
-[ Upstream commit b49ea673e119f59c71645e2f65b3ccad857c90ee ]
+Indeed, looks like that tree got cut between your and my commits, even
+though they less than eight hours apart :)
 
-->sock can be set to NULL asynchronously unless ->recv_mutex is held.
-So it is important to hold that mutex.  Otherwise a sysfs read can
-trigger an oops.
-Commit 17f09d3f619a ("SUNRPC: Check if the xprt is connected before
-handling sysfs reads") appears to attempt to fix this problem, but it
-only narrows the race window.
-
-Fixes: 17f09d3f619a ("SUNRPC: Check if the xprt is connected before handling sysfs reads")
-Fixes: a8482488a7d6 ("SUNRPC query transport's source port")
-Signed-off-by: NeilBrown <neilb@suse.de>
-Signed-off-by: Anna Schumaker <Anna.Schumaker@Netapp.com>
-Signed-off-by: Robert Garcia <rob_garcia@163.com>
----
- net/sunrpc/sysfs.c    | 5 ++++-
- net/sunrpc/xprtsock.c | 7 ++++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/net/sunrpc/sysfs.c b/net/sunrpc/sysfs.c
-index 55da1b627a7d..83ba1f2adf62 100644
---- a/net/sunrpc/sysfs.c
-+++ b/net/sunrpc/sysfs.c
-@@ -113,11 +113,14 @@ static ssize_t rpc_sysfs_xprt_srcaddr_show(struct kobject *kobj,
- 		return 0;
- 
- 	sock = container_of(xprt, struct sock_xprt, xprt);
--	if (kernel_getsockname(sock->sock, (struct sockaddr *)&saddr) < 0)
-+	mutex_lock(&sock->recv_mutex);
-+	if (sock->sock == NULL ||
-+	    kernel_getsockname(sock->sock, (struct sockaddr *)&saddr) < 0)
- 		goto out;
- 
- 	ret = sprintf(buf, "%pISc\n", &saddr);
- out:
-+	mutex_unlock(&sock->recv_mutex);
- 	xprt_put(xprt);
- 	return ret + 1;
- }
-diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-index 9e122c20fcc6..07acc6845ce2 100644
---- a/net/sunrpc/xprtsock.c
-+++ b/net/sunrpc/xprtsock.c
-@@ -1680,7 +1680,12 @@ static int xs_get_srcport(struct sock_xprt *transport)
- unsigned short get_srcport(struct rpc_xprt *xprt)
- {
- 	struct sock_xprt *sock = container_of(xprt, struct sock_xprt, xprt);
--	return xs_sock_getport(sock->sock);
-+	unsigned short ret = 0;
-+	mutex_lock(&sock->recv_mutex);
-+	if (sock->sock)
-+		ret = xs_sock_getport(sock->sock);
-+	mutex_unlock(&sock->recv_mutex);
-+	return ret;
- }
- EXPORT_SYMBOL(get_srcport);
- 
--- 
-2.34.1
-
+johannes
 
