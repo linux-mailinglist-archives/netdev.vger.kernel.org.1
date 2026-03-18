@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-269100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269101-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MFdMCavXumkXcgIAu9opvQ
-	(envelope-from <netdev+bounces-269100-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:49:47 +0100
+	id wExHBnHeumk3cwIAu9opvQ
+	(envelope-from <netdev+bounces-269101-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:18:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A08602BF9C3
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:49:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C76C2C018F
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:18:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E2823334A4D9
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:33:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E3F023482C47
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:33:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2FAE3E715C;
-	Wed, 18 Mar 2026 16:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476603F23BD;
+	Wed, 18 Mar 2026 16:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="IdhPMrk5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DLhMFO7a"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557682D640D
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 16:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D68E3E3D84
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 16:06:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773849986; cv=none; b=AIiUXVIv4+LzPOLqdu5PDXGQXuDm1WUv95vpLuNDTngf0oEGhFcrxAh7pYsYZJ6AU/p2tOl153z4Tcqpb40Kd5LN/j/gONp2aIxcRosQUrOoRE7NvaagGbnbwzvvYfoGhZySjVruALPcT1PwdcOcWuI+pNqlns+cBT6yTQ/mWEY=
+	t=1773849993; cv=none; b=a+OgD6uM1G7aixw0RsjLk/kx4SA7Tn6Gr8WQYEqdEhVyB5zxVqOUK89wsDDVt5pU0Y7CcrqElZJuV/WcHwtMGAbepb12Noh0CXcsqcFZUORoLgskGJhDI989EHFDo9l2XR/+BtnIJWtyA1cSgnMO/uc4g/VuRPG03WxPYxqcnuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773849986; c=relaxed/simple;
-	bh=o+jqL3FtSgu2LeTxHWN/vwNwSecVHZCG5W4IVkCLBUQ=;
+	s=arc-20240116; t=1773849993; c=relaxed/simple;
+	bh=WaXxlJzoVxE6tYVUqvHUyhRqjNw5hMV1gJVsjHEcv0A=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=GT+kcyoICthk+vJu3RM0ANslZL4WiQWk8B6wnmZdZTmrJX2O7keue03AZZQ7yxMwzh/t3XUMMlqqb0Q55Dz8RKwLW3IicDIbigG8Dq0gP9bzHrX+PcLRhE9MtJpLaWM/O1efD//n8DpnZ4J3wRN0NjNg4WxggpuPvZs53nnKhQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=IdhPMrk5; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=mt8+zyM0UvuyiJrW5BdUuO0aX9iz4j40wg/JjGpl1vXn6RKeB+FIuwNKK+TZZgOsO0vWunnrNbSfru88n5KmAploJeUJvK/c8khzHfaR0kxi+yrl+m74jZB55o/+JbQ9KTL+Or3MUxPIn0pCXpZXHbWHuqvM30rEsjKPEG++UPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DLhMFO7a; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -40,22 +40,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cSfNrtwIA1VaENvujV5TSp8vdQ3v1myOgrpZxvYr8gU=; b=IdhPMrk5INj5SfpEsApUO305rb
-	cbsAKeqUQ2vTpO6TekMeKYpavN4u7dJF6HZq8wImgtL0lN32U2sungw+EQq+Dg8wU8KBMMxLzJ+0g
-	jwl2JRVstQdXs1IiI0D1+DzXbDeUZ+Am0+NNqCtEkSRv2vr3y1Y9sd8IqxBzt3iU8Q8mM3YkRCI8Y
-	7Jz18Z+wfc7KYQKYS9JvZL45BHtaEetoLvrCvLl1uQ0eqttFOZwmr5SqsH9z19+dkNX4bbM4pAgB+
-	fo7wrDDqqV44E7FS43MAVG/hdJebRTg6Z6xTGk0reA9yF5TjI24ieIXQrwn2deY4gYrZrhzVi8cd3
-	NHzQVuMg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:47258 helo=rmk-PC.armlinux.org.uk)
+	bh=nRn1H2bcEQZCC/0NKqsdFFm8gqOiKPTT8gIJOFUCakM=; b=DLhMFO7aQjNEfQxA95DoaFu6GY
+	VmEiavw1VqKeX1lQYV+fCmLYs+ZZG/ML3tDPh9KEvvPblLPuFX0rqRUdENKL7g/doexBQB563TytS
+	KSTCV+kABjJw8upSd31EmzxE7qCsW9x5Z+gtsgWDkzbdz6+OxJ4CbJTm40WC/H+t0UD+pCh2xZMqz
+	xq2Xom2FViVIAQPGaUvrq48oQUc4UjjkbH2LoWi1s2D0iIdRl3S8Wgm5m79A1pY/9SHuPlBPjS9r9
+	QdwHKrdriGVaMtlArtI0ke4tCrvCQotUPv4qdpYdecK6YHLPMEImwjuSvSZXQ1psYEPrsSuEl3d5Z
+	qzbaDCoQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:47262 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1w2tPP-000000003eJ-3WVx;
-	Wed, 18 Mar 2026 16:06:11 +0000
+	id 1w2tPV-000000003ed-05G4;
+	Wed, 18 Mar 2026 16:06:17 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1w2tPP-0000000DYAX-0TKw;
-	Wed, 18 Mar 2026 16:06:11 +0000
+	id 1w2tPU-0000000DYAd-0ssk;
+	Wed, 18 Mar 2026 16:06:16 +0000
 In-Reply-To: <abrNYVfZ1Iwff2EI@shell.armlinux.org.uk>
 References: <abrNYVfZ1Iwff2EI@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -71,8 +71,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH net-next v2 maybe? 1/5] net: stmmac: move default_an_inband to
- plat_stmmacenet_data
+Subject: [PATCH net-next v2 maybe? 2/5] net: stmmac: add struct
+ stmmac_pcs_info
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,118 +82,156 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1w2tPP-0000000DYAX-0TKw@rmk-PC.armlinux.org.uk>
+Message-Id: <E1w2tPU-0000000DYAd-0ssk@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 18 Mar 2026 16:06:11 +0000
+Date: Wed, 18 Mar 2026 16:06:16 +0000
 X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269100-lists,netdev=lfdr.de,kernel];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	TAGGED_FROM(0.00)[bounces-269101-lists,netdev=lfdr.de,kernel];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid];
 	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_SPAM(0.00)[0.434];
+	NEURAL_SPAM(0.00)[0.431];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: A08602BF9C3
+X-Rspamd-Queue-Id: 7C76C2C018F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Move the default_an_inband flag from struct mdio_bus_data to struct
-plat_stmmacenet_data. This is to allow platforms that do not use the
-integrated MDIO bus to enable inband mode.
+We need to describe one more register (offset and field bitmask) to
+the PCS code. Move the existing PCS offset and interrupt enable bits
+to a new struct and pass that in to stmmac_integrated_pcs_init().
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c | 4 ++--
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +----
- include/linux/stmmac.h                            | 2 +-
- 3 files changed, 4 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c | 9 ++++++---
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c    | 8 ++++++--
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c     | 8 ++++----
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h     | 9 +++++++--
+ 4 files changed, 23 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-index f621077c30a4..7898b5075a8b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-@@ -298,7 +298,7 @@ static void tgl_get_interfaces(struct stmmac_priv *priv, void *bsp_priv,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+index 01f8353eb6ef..c851e3b88ce5 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+@@ -22,14 +22,17 @@
+ #include "stmmac_ptp.h"
+ #include "dwmac1000.h"
  
- 	if (FIELD_GET(SERDES_LINK_MODE_MASK, data) == SERDES_LINK_MODE_2G5) {
- 		dev_info(priv->device, "Link Speed Mode: 2.5Gbps\n");
--		priv->plat->mdio_bus_data->default_an_inband = false;
-+		priv->plat->default_an_inband = false;
- 		interface = PHY_INTERFACE_MODE_2500BASEX;
- 	} else {
- 		interface = PHY_INTERFACE_MODE_SGMII;
-@@ -700,7 +700,7 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
- 	if (plat->phy_interface == PHY_INTERFACE_MODE_SGMII ||
- 	    plat->phy_interface == PHY_INTERFACE_MODE_1000BASEX) {
- 		plat->mdio_bus_data->pcs_mask = BIT_U32(INTEL_MGBE_XPCS_ADDR);
--		plat->mdio_bus_data->default_an_inband = true;
-+		plat->default_an_inband = true;
- 		plat->select_pcs = intel_mgbe_select_pcs;
- 	}
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 0a933aac3f03..90af7212b8d8 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1390,7 +1390,6 @@ static int stmmac_init_phy(struct net_device *dev)
- 
- static int stmmac_phylink_setup(struct stmmac_priv *priv)
++static const struct stmmac_pcs_info dwmac1000_pcs_info = {
++	.pcs_offset = GMAC_PCS_BASE,
++	.int_mask = GMAC_INT_DISABLE_PCSLINK | GMAC_INT_DISABLE_PCSAN,
++};
++
+ static int dwmac1000_pcs_init(struct stmmac_priv *priv)
  {
--	struct stmmac_mdio_bus_data *mdio_bus_data;
- 	struct phylink_config *config;
- 	struct phylink_pcs *pcs;
- 	struct phylink *phylink;
-@@ -1415,9 +1414,7 @@ static int stmmac_phylink_setup(struct stmmac_priv *priv)
- 	priv->tx_lpi_clk_stop = priv->plat->flags &
- 				STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
+ 	if (!priv->dma_cap.pcs)
+ 		return 0;
  
--	mdio_bus_data = priv->plat->mdio_bus_data;
--	if (mdio_bus_data)
--		config->default_an_inband = mdio_bus_data->default_an_inband;
-+	config->default_an_inband = priv->plat->default_an_inband;
+-	return stmmac_integrated_pcs_init(priv, GMAC_PCS_BASE,
+-					  GMAC_INT_DISABLE_PCSLINK |
+-					  GMAC_INT_DISABLE_PCSAN);
++	return stmmac_integrated_pcs_init(priv, &dwmac1000_pcs_info);
+ }
  
- 	/* Get the PHY interface modes (at the PHY end of the link) that
- 	 * are supported by the platform.
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 72febd246bdb..565bb394b194 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -89,7 +89,6 @@ struct stmmac_mdio_bus_data {
- 	int *irqs;
- 	int probed_phy_irq;
- 	bool needs_reset;
--	bool default_an_inband;
- };
+ static void dwmac1000_core_init(struct mac_device_info *hw,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+index 4c6fed3ecbcf..ba5393beb7bb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+@@ -22,13 +22,17 @@
+ #include "dwmac4.h"
+ #include "dwmac5.h"
  
- struct stmmac_dma_cfg {
-@@ -250,6 +249,7 @@ struct plat_stmmacenet_data {
- 	struct stmmac_dma_cfg *dma_cfg;
- 	struct stmmac_safety_feature_cfg *safety_feat_cfg;
- 	int clk_csr;
-+	bool default_an_inband;
- 	bool enh_desc;
- 	bool tx_coe;
- 	bool bugged_jumbo;
++static const struct stmmac_pcs_info dwmac4_pcs_info = {
++	.pcs_offset = GMAC_PCS_BASE,
++	.int_mask = GMAC_INT_PCS_LINK | GMAC_INT_PCS_ANE,
++};
++
+ static int dwmac4_pcs_init(struct stmmac_priv *priv)
+ {
+ 	if (!priv->dma_cap.pcs)
+ 		return 0;
+ 
+-	return stmmac_integrated_pcs_init(priv, GMAC_PCS_BASE,
+-					  GMAC_INT_PCS_LINK | GMAC_INT_PCS_ANE);
++	return stmmac_integrated_pcs_init(priv, &dwmac4_pcs_info);
+ }
+ 
+ static void dwmac4_core_init(struct mac_device_info *hw,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
+index 88fa359ea716..2695e0b9ed03 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
+@@ -90,8 +90,8 @@ int stmmac_integrated_pcs_get_phy_intf_sel(struct phylink_pcs *pcs,
+ 	return -EINVAL;
+ }
+ 
+-int stmmac_integrated_pcs_init(struct stmmac_priv *priv, unsigned int offset,
+-			       u32 int_mask)
++int stmmac_integrated_pcs_init(struct stmmac_priv *priv,
++			       const struct stmmac_pcs_info *pcs_info)
+ {
+ 	struct stmmac_pcs *spcs;
+ 
+@@ -100,8 +100,8 @@ int stmmac_integrated_pcs_init(struct stmmac_priv *priv, unsigned int offset,
+ 		return -ENOMEM;
+ 
+ 	spcs->priv = priv;
+-	spcs->base = priv->ioaddr + offset;
+-	spcs->int_mask = int_mask;
++	spcs->base = priv->ioaddr + pcs_info->pcs_offset;
++	spcs->int_mask = pcs_info->int_mask;
+ 	spcs->pcs.ops = &dwmac_integrated_pcs_ops;
+ 
+ 	__set_bit(PHY_INTERFACE_MODE_SGMII, spcs->pcs.supported_interfaces);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+index 23bbd4f10bf8..f1ee473d8e3e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+@@ -27,6 +27,11 @@
+ 
+ struct stmmac_priv;
+ 
++struct stmmac_pcs_info {
++	unsigned int pcs_offset;
++	u32 int_mask;
++};
++
+ struct stmmac_pcs {
+ 	struct stmmac_priv *priv;
+ 	void __iomem *base;
+@@ -44,8 +49,8 @@ void stmmac_integrated_pcs_irq(struct stmmac_priv *priv, u32 status,
+ 			       struct stmmac_extra_stats *x);
+ int stmmac_integrated_pcs_get_phy_intf_sel(struct phylink_pcs *pcs,
+ 					   phy_interface_t interface);
+-int stmmac_integrated_pcs_init(struct stmmac_priv *priv, unsigned int offset,
+-			       u32 int_mask);
++int stmmac_integrated_pcs_init(struct stmmac_priv *priv,
++			       const struct stmmac_pcs_info *pcs_info);
+ 
+ /**
+  * dwmac_ctrl_ane - To program the AN Control Register.
 -- 
 2.47.3
 
