@@ -1,233 +1,117 @@
-Return-Path: <netdev+bounces-269212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269213-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gDngAcsyu2mEggIAu9opvQ
-	(envelope-from <netdev+bounces-269212-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:18:35 +0100
+	id 8PK+NIMzu2kVgwIAu9opvQ
+	(envelope-from <netdev+bounces-269213-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:21:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 108002C3C82
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:18:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46FDC2C3CB2
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:21:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 91E7D301FB48
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 23:18:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AD91A3028E92
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 23:21:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA8B2BEC2B;
-	Wed, 18 Mar 2026 23:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1242DB7BB;
+	Wed, 18 Mar 2026 23:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YwfeHWyU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eMnT1082"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B771C862F
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 23:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF0921018A;
+	Wed, 18 Mar 2026 23:21:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773875908; cv=none; b=TF56SvjIRV4FMDyGonXe12sNnvYoTdcQ0ZR5cYxiq9F0zO/oU/1MynTSR19bMz4SyRUAiCNYPH4GgvpeeWTamDRI+py47/DRmiDU8silZeHUzziplSh950hZnwQG2HBgwPyhhyAtSght+jAQ/2EdSaajoco2tC9R0IWDE9K+lGA=
+	t=1773876096; cv=none; b=SK620VBkGrO2AHZcKfnjN2ZWEAgNUIwnVgSTU8WUHfdIo3Z3vSfOy3Xwrgbre8PitlUGIeKNlG1HsTYfSfx9QcNfwmAHPsw45ypkZYeg/5uFiWws5JNt5/2ETcRkyYQg1kdGP87M+LUIwywUBjBEUFxBwEoMXJ8aZq+ezWLY5eU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773875908; c=relaxed/simple;
-	bh=3ldCpbjIReo95e8rkIL7Ovh12cZctQtYjWJOgbLFguw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i0FytJZ3yrBsclMa4OaraLZF79NiPEQGjXuIpqflSqhueZYiY9hJK5bSSNOk6oSiCYLY5dH1mPSlGvdQiw5JI/FlZ7O9AqDOt6WpDq0acGcXrhruEJBX2EOSnlOMJzkZyqZ3TPUju0laUHjiw7+WTq2v5s6w/ZUg3ybgBui5IgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YwfeHWyU; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-43b4121c40aso200368f8f.0
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 16:18:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773875905; x=1774480705; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ehy3LFEv1Okh2NOHU6J1PJlVKYSWvARVIndgmZ+QFx0=;
-        b=YwfeHWyUq+mJYLcLrZUWWnNl5/vcijDRLceuen61DtAlbKYrm/LCajUV/VFmonNYEL
-         U8U9zHX43OtACGldfmi4c3dsA72tdoRUTLrcFoE708q0Lwray29RrcL2m1EMux0mWr4o
-         2nrlUSaOWq98UDkUDAW0gJv1TuqkpthA7pg+Q9LiGtvjA3Hsf0sznD6uIXHvR/3Ln+tA
-         7S4TkkQJyF8BRAhtL9QhweiZzg+iJCkSIqd1T/5rKk7WGii94rUtuEF9+EmNAzxbBV8g
-         UB6Nf8pmc6ebIcgr8Ah3VIzBHlaObQGHxSUbZa+7nZb9PMteEJlcdJfOelFNtQ+C0OFx
-         HNoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773875905; x=1774480705;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ehy3LFEv1Okh2NOHU6J1PJlVKYSWvARVIndgmZ+QFx0=;
-        b=T9m2uHeoowPcfngIrXRf3vWsfSKKp46iL8x3cOmnG1eqIhEIud70gxL241boQNwJQU
-         f2VInTaMrSeSsTiyl8k1wdNQx8QWs87j2w4xb+XBDo8j2b10NAd+1elxchWWAFnqd1nr
-         0Kgql0GPys1bOer4sgobhQgnS8p0CidQW9h55OOqGiWmAa3vyjYS57E9vM5CzKVLfXEm
-         KBDtVd5z3d9GSzdIXu995qrph+mFU/qANHWYsgpHNdE8zwlVKXr5829TPehvPsAvLeyX
-         M+Tb7hR/S9ehj10+LY9In/Fv5sc15FZsMmPQJEF00FD6aitYHShBSM/QigJ9KrV5dY5x
-         A/EA==
-X-Gm-Message-State: AOJu0YxGJMz5w4T9bBYpjTNnsg1EPaD7/1bJSWLNDUmEBYg6nVT96ov9
-	JQOJ20vMZ9IY1CWI4zM4B6gLccp1U+e9bwNE4UdEpJ8LsuIM8UnvCNmt
-X-Gm-Gg: ATEYQzznMae+WWATPiD9j5zK9kyTxWkw0Il0Pr4+QHf44qFEvI0+A46YexNSDUaWOt4
-	+tV3cCnZe5W0s5YgXaYmdy0Fs/2CBZlqMldTqvfxCsE2mZnqMfk5svrfNBhTxyYddsNPqB0cbz8
-	Z9IfF2TukjyiiAURS1Xzx+i+bdjnUoP4p2ZVnlr1v792s4Uil3xWi58btjTYP/+7w3zDucLyDIE
-	b/xVDV4PFxZ9U7rAW9ysI+UTrFVgNlZ8JriNNHD8AneIBjFHx7fg3iLu3J1QOqi/CNUMyjmcMjb
-	99ISyfflFFSa1C6UyrnsZYPJRQ+G0ymsx3w9hFxVI1E3j7a4FbN5jWOcnp5D8gEYXdHlZEyavlw
-	jZCp6/W3TfOuluBW9aOBv/JM8MoyG04l98OwLcrwem0H93sW5E4xjgD2fkJgQexBHSK8oyyZuA9
-	qvq+UZtL2GDTCZ6LkZp9tNiMur7zXX4rGWqFeNcUrG2oeQjA/l8pZE9g7SgI5Vq+pnJ4hj0yN2p
-	rE6jMzRKmIK
-X-Received: by 2002:a05:6000:1a8e:b0:439:b619:33b2 with SMTP id ffacd0b85a97d-43b527c903bmr8857309f8f.43.1773875904693;
-        Wed, 18 Mar 2026 16:18:24 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b5184957bsm12325685f8f.5.2026.03.18.16.18.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 16:18:24 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: netdev@vger.kernel.org,
-	David Carlier <devnexen@gmail.com>
-Subject: [PATCH] iavf: replace strcat chain with snprintf in iavf_print_adv_rss_cfg
-Date: Wed, 18 Mar 2026 23:18:21 +0000
-Message-ID: <20260318231821.43551-1-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1773876096; c=relaxed/simple;
+	bh=uVBO9VhaLn9ofBvayUz+cvz6W0q4UhHRkPwarjKskrY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BtOlEtFEVzlnWhOh0yFjqKMrpKvHEUuH2qrONpKkH/vuH5XR/lvDzZ+kxZNAB00sj0ZvUcjpJS6Ej8ooqEH3K60OzUAuIsLbfpRwGzyJQm2P/eRf/AFAmIrnntR1JWG6uRBXtm/sDNqjGr5eF1bPLLe+Yc1jjIAGjK8m3I+Cf8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eMnT1082; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC000C19424;
+	Wed, 18 Mar 2026 23:21:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773876096;
+	bh=uVBO9VhaLn9ofBvayUz+cvz6W0q4UhHRkPwarjKskrY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eMnT1082vEwFnlN/XZf7DZL/jHxhrPN3BmrBxiAtjWwcCQHqoKqGyOWTYbsrCuFlW
+	 /0ce+Ipbn2a3jJnlY8IHNGC/UnV8HBjuNOijAE/E6LuuVZfIzD9eNexEMVZaa7HbOU
+	 qoCCV5pfJeEScuZuGL9MT4o1cmRWVbMspIsLWX3B1oz5r/f9RhQkI2vpiwor9LfSgP
+	 4R3wtYRnT2oNhWCZGDz3GUzzSZrQHxf1jAKMJd25OIMRK2NW3p8srHeo4cJfHhzrVF
+	 6omLvqeYZ0TtU/umNMNy2CKgmA+hLWWdBTxcABbsgS4PA/aWRXiG1w1Upt3ulldFlN
+	 EyCd9dnSb+sYQ==
+Date: Wed, 18 Mar 2026 16:21:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org, rbm@suse.com,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/10 net-next v3] Convert CONFIG_IPV6 to built-in and
+ remove stubs
+Message-ID: <20260318162134.5906d048@kernel.org>
+In-Reply-To: <ea482a29-b9bd-4365-b771-2bc03bebad3c@suse.de>
+References: <20260317140141.5723-1-fmancera@suse.de>
+	<20260317124904.552d57e4@kernel.org>
+	<ea482a29-b9bd-4365-b771-2bc03bebad3c@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269212-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-269213-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.983];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.739];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 108002C3C82
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 46FDC2C3CB2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The hash option string was built using memset + 11 strcat() calls,
-which is both unbounded and needlessly verbose. Use a single snprintf()
-instead. Also drop the static qualifier on the buffer since there's
-no reason for it to persist across calls, and shrink it from 300 to
-128 bytes (worst case output is ~85 bytes).
+On Wed, 18 Mar 2026 11:19:06 +0100 Fernando Fernandez Mancera wrote:
+> > NIPA flags a few failures, still:
+> > 
+> > https://netdev.bots.linux.dev/contest.html?pw-n=0&branch=net-next-2026-03-17--18-00&pw-n=0&pass=0
+> >   
+> 
+> Hi Jakub,
+> 
+> This is test is applying the series in top of bpf tree which has this 
+> commit 
+> https://github.com/kernel-patches/bpf/commit/972787479ee73006fddb5e59ab5c8e733810ff42
+> 
+> AFAICS, net-next tree do not have it yet. I do not think I can do much 
+> about it for now. Will wait until they are merged and rebase in top of it.
 
-No functional change.
-
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
- .../net/ethernet/intel/iavf/iavf_adv_rss.c    | 73 ++++++++-----------
- 1 file changed, 32 insertions(+), 41 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c b/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c
-index 4d12dfe1b481..6e1c7c39ff9d 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c
-@@ -238,7 +238,7 @@ iavf_print_adv_rss_cfg(struct iavf_adapter *adapter, struct iavf_adv_rss *rss,
- {
- 	u32 packet_hdrs = rss->packet_hdrs;
- 	u64 hash_flds = rss->hash_flds;
--	static char hash_opt[300];
-+	char hash_opt[128];
- 	const char *proto;
- 
- 	if (packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_TCP)
-@@ -252,44 +252,35 @@ iavf_print_adv_rss_cfg(struct iavf_adapter *adapter, struct iavf_adv_rss *rss,
- 	else
- 		return;
- 
--	memset(hash_opt, 0, sizeof(hash_opt));
--
--	strcat(hash_opt, proto);
--	if (packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_IPV4)
--		strcat(hash_opt, "v4 ");
--	else
--		strcat(hash_opt, "v6 ");
--
--	if (hash_flds & (IAVF_ADV_RSS_HASH_FLD_IPV4_SA |
--			 IAVF_ADV_RSS_HASH_FLD_IPV6_SA))
--		strcat(hash_opt, "IP SA,");
--	if (hash_flds & (IAVF_ADV_RSS_HASH_FLD_IPV4_DA |
--			 IAVF_ADV_RSS_HASH_FLD_IPV6_DA))
--		strcat(hash_opt, "IP DA,");
--	if (hash_flds & (IAVF_ADV_RSS_HASH_FLD_TCP_SRC_PORT |
--			 IAVF_ADV_RSS_HASH_FLD_UDP_SRC_PORT |
--			 IAVF_ADV_RSS_HASH_FLD_SCTP_SRC_PORT))
--		strcat(hash_opt, "src port,");
--	if (hash_flds & (IAVF_ADV_RSS_HASH_FLD_TCP_DST_PORT |
--			 IAVF_ADV_RSS_HASH_FLD_UDP_DST_PORT |
--			 IAVF_ADV_RSS_HASH_FLD_SCTP_DST_PORT))
--		strcat(hash_opt, "dst port,");
--	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPC_TEID)
--		strcat(hash_opt, "gtp-c,");
--	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_IP_TEID)
--		strcat(hash_opt, "gtp-u ip,");
--	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_EH_TEID)
--		strcat(hash_opt, "gtp-u ext,");
--	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_UP_TEID)
--		strcat(hash_opt, "gtp-u ul,");
--	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_DWN_TEID)
--		strcat(hash_opt, "gtp-u dl,");
--
--	if (!action)
--		action = "";
--
--	if (!result)
--		result = "";
--
--	dev_info(&adapter->pdev->dev, "%s %s %s\n", action, hash_opt, result);
-+	snprintf(hash_opt, sizeof(hash_opt), "%s%s %s%s%s%s%s%s%s%s%s",
-+		 proto,
-+		 (packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_IPV4) ?
-+			"v4" : "v6",
-+		 (hash_flds & (IAVF_ADV_RSS_HASH_FLD_IPV4_SA |
-+			       IAVF_ADV_RSS_HASH_FLD_IPV6_SA)) ?
-+			"IP SA," : "",
-+		 (hash_flds & (IAVF_ADV_RSS_HASH_FLD_IPV4_DA |
-+			       IAVF_ADV_RSS_HASH_FLD_IPV6_DA)) ?
-+			"IP DA," : "",
-+		 (hash_flds & (IAVF_ADV_RSS_HASH_FLD_TCP_SRC_PORT |
-+			       IAVF_ADV_RSS_HASH_FLD_UDP_SRC_PORT |
-+			       IAVF_ADV_RSS_HASH_FLD_SCTP_SRC_PORT)) ?
-+			"src port," : "",
-+		 (hash_flds & (IAVF_ADV_RSS_HASH_FLD_TCP_DST_PORT |
-+			       IAVF_ADV_RSS_HASH_FLD_UDP_DST_PORT |
-+			       IAVF_ADV_RSS_HASH_FLD_SCTP_DST_PORT)) ?
-+			"dst port," : "",
-+		 (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPC_TEID) ?
-+			"gtp-c," : "",
-+		 (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_IP_TEID) ?
-+			"gtp-u ip," : "",
-+		 (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_EH_TEID) ?
-+			"gtp-u ext," : "",
-+		 (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_UP_TEID) ?
-+			"gtp-u ul," : "",
-+		 (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_DWN_TEID) ?
-+			"gtp-u dl," : "");
-+
-+	dev_info(&adapter->pdev->dev, "%s %s %s\n",
-+		 action ? action : "", hash_opt, result ? result : "");
- }
--- 
-2.53.0
-
+I see, hopefully trees converge tomorrow, else we can fix it when
+merging. But the RCU warnings in forwarding can't be a BPF problem,
+right?
 
