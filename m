@@ -1,259 +1,254 @@
-Return-Path: <netdev+bounces-268997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268998-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oOPWDmKZumnnZQIAu9opvQ
-	(envelope-from <netdev+bounces-268997-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:24:02 +0100
+	id iIJhDP+aumnaZQIAu9opvQ
+	(envelope-from <netdev+bounces-268998-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:30:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D58C72BB66A
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:24:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85CEB2BB7EB
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:30:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2F43630071DD
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 12:24:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 26BA33089555
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 12:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3BF03A784E;
-	Wed, 18 Mar 2026 12:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1833B8944;
+	Wed, 18 Mar 2026 12:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="KEBs/iGe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0hy57gK"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639F239446D;
-	Wed, 18 Mar 2026 12:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B77C3AE707;
+	Wed, 18 Mar 2026 12:26:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773836639; cv=none; b=kbFiltVVjv0BcVfCDBBzTOiHFT7zLkC12b5ew3hHlc0Yo8jJvrpUlhFBFcsx+UHeGnSxy1azpX983TxEBDVxk0yfF/9zzkpmpzDU28v6BiFjnFrB3UCHeRIav+g2d6uzbVny+7AnXhMK+sk9+uo46yJUcwB66+MLBacaqnwIz98=
+	t=1773836772; cv=none; b=Z/eQlg23VfBPpk7NIGVJXAcA/M9ui+iSrNEBbR4VtmJgEXLoZUe2ci/gEl6Y2XodZFVPNwt/DXdDQrrmpEjcyBQkwfW7IPBDPXrvPT8xOH9q4L0RmrefzQTXV64g7+pWdceGBDjRVBOpgVvQRMsH85JvGRieT/xzLK+1K0S+L4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773836639; c=relaxed/simple;
-	bh=wU0skl/viLQI6V1uQIzAJMIF+9Y+DMn2UuYs0Ltd4ME=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=d6GfSMwoKnq2QqEUw2tksiYnR/QElhl+++nPyF0/eyrDV/KrggddIgzURY6s2lJ+BPjAB2qMIVu503N+0/T6dGjB9BFjTDjVGknkDu0FCRahequL0cnGF/t96R3RndeUdulk7VhoybefErOIEkEEwodxVSvlw22mMA2yOVERWdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=KEBs/iGe; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
-	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
-	bh=XjlvBEu0V6dqbEXmSCJmn1xibQQzdnbmsdur6fckXIs=; b=KEBs/iGedUxEapemWggXE3VSn+
-	wKh4v/NTGWFgSXa9ChWhU4W1ZsToJmE6LSt/R2djp5tH5q3Y1l5mo7wiNXkNSAQm8ZmnwhnUqaMgA
-	OhwWYrwyl/P3TKNjuzgoH/t2twYWxWwg62SUzVRErXRgSfVFJcJNovCCXDxGMVtTxQ3LU1xlvfPGw
-	eRLiIs6U/SZLQHZygdKc9vwAxq4r6vJB9kRkrmBdwDeAiKRsp9Cob6by/aqIztoaT8czQQfwpl/d9
-	xoG/xVxE7uVdbc8WN1Y7nSlYIJ6rTjRXf3Ak8UfUFli+9N89h1LZ6y8OThMcufOtrOuZ77iDrTiKI
-	p8OylBYQ==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1w2pwA-003ebX-V0; Wed, 18 Mar 2026 12:23:46 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Wed, 18 Mar 2026 05:22:48 -0700
-Subject: [PATCH net-next v2] bonding: remove bonding_priv.h
+	s=arc-20240116; t=1773836772; c=relaxed/simple;
+	bh=HiIrxnViFiv3CENReMPpm2EcFig1Z7enJx9zIM/ax64=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nfv4kGQBUF3o6P6lLzMCk5SLN27u+s7iQCT0CX4K7OvgTvFE4ZrguEehGAf+eIoG7uNT6D9INTUB0sjxAmB1g2l6ivYS8jZKj6NtWLGEA2qzwhzjWSOkqu44G1GuCkEpdWYXuCmvyWgpE80wYYEkOpqSuiRjkn71VMFMAQaICs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d0hy57gK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70B8EC19421;
+	Wed, 18 Mar 2026 12:26:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773836771;
+	bh=HiIrxnViFiv3CENReMPpm2EcFig1Z7enJx9zIM/ax64=;
+	h=From:To:Cc:Subject:Date:From;
+	b=d0hy57gKaCRE7/Gy685aggvfqdNH9RI0CxnHqU/JTOSOj+cecRGy+LAXdUx0hOCw8
+	 6jPfy0npEiKRXa/kvPBDPkBMkRQuXQVuoXIOhO+J58bSKfSR7ZkQ8VvQbb4BKsGf3Q
+	 wSU/mKDf+uX0keUZz8Rr6+7h7QJZVfM+vHDuQeT41YjHUizSHZekDAa9hwdKylKa/c
+	 VQvdrOqA+n56g0ltBSWXNFQEHAjBo06rsgB+vh2r31N1DVk6C7zb9q9+tmXqql+ws7
+	 ml1e94bQhiFvdyg0SUxi65FS4vncg2QY0D6k26GB5H+avw/AvZ/xN1Cmpcp1nhB1BT
+	 Ot+IXsDwYqqfQ==
+From: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org
+Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Willem de Bruijn <willemb@google.com>,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v6 0/4] ethtool: Dynamic RSS context indirection table resizing
+Date: Wed, 18 Mar 2026 13:25:57 +0100
+Message-ID: <20260318122603.264550-1-bjorn@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260318-bond_uts-v2-1-033fe0d4e903@debian.org>
-X-B4-Tracking: v=1; b=H4sIABeZumkC/2WNwQ6DIBAFf4XsWRqhFZVT/6MxjcKq2wM0gMTG+
- O+N9tjzmzezQcRAGEGzDQJmiuQdaCYLBmbu3YScLGgGspSqvArFB+/sc0mRl3U9om2swUpBweA
- dcKT1VD3AYeIO1wTdb4nL8EKTDtPBzhSTD5+zmsX5+A9kwQW/yUa1Cvu6tdXd4kC9u/gwQbfv+
- xfxyos/vQAAAA==
-X-Change-ID: 20260316-bond_uts-077fed8dce56
-To: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-team@meta.com, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-363b9
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4998; i=leitao@debian.org;
- h=from:subject:message-id; bh=wU0skl/viLQI6V1uQIzAJMIF+9Y+DMn2UuYs0Ltd4ME=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpuplN6MoAAYBhJAzC2PSK/Aw5TpUbvAUC5NjIf
- Xm6B5H68aqJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCabqZTQAKCRA1o5Of/Hh3
- bY4bD/9W5XGOYhPl6GBHpnPJSVBClSvecRC1fzOqfm627Gd88AbhKBvn3zaEvY/RIxPYl2vQjuC
- xRkjOtH1avumMkDWZeuGKzy97oBMqxIILF+sX/lOcOPShgAQLfEh6pujUKFRWF9vWPSX3C41ELQ
- rH0aGCzRe8rJ8gZm8+uvapJ6ZaVFD8/ZA/WZVZC75AX5fZjaKDalUSsN+DZZMYOJOHae9pGCo1n
- mjg3mthnXAVvKdF7LwpW3QiWd+JfW8xxOjqD+gSoZqUscor3fnfGwTtDuN7gsjRSnk/P0kygaDI
- 9XTmr8WqeiWzOTJEVLs9XrvqoPJ9Lll8GWShyTJ3lSipjPZeI8Bsga0rA0lEAqLulG/1rvGjDVn
- vlYcXSjW8XWdldySZl3/8TDduyKY7gqJvOnaBTmtZ1pZkf97ZKzbnTRg+aKftf++FO0vch2Ty5T
- bSSyhoGySQc8hhpseF5DZzvyKt9BffTn8YToSA6edIHHRTVT2Y63JeTDCHCL0XHGaCzrWDPr9Ix
- uoSaqee0doeDJbnNwPNxC5qy6e2R1u4SctfYplpt91ptU5ljZomjtpNK4EhLLpbrQebLspk5JDB
- GGRpoX/0K95lFJr9NI3p9h8UfdHn5Du0G8BOySViOe3veajS9OfB/GQpfxzCHzEdl6A0WT3r1Qr
- 92bA9JR7ruKByeg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.96 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_MIXED_CHARSET(0.63)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268997-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268998-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[debian.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[debian.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lbl.gov:email]
-X-Rspamd-Queue-Id: D58C72BB66A
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rss_drv.py:url]
+X-Rspamd-Queue-Id: 85CEB2BB7EB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-bonding_priv.h only defined DRV_NAME and DRV_DESCRIPTION, but caused
-unnecessary recompilation: it included <generated/utsrelease.h> to
-define bond_version, which is used solely in bond_procfs.c. With
-CONFIG_LOCALVERSION_AUTO=y, utsrelease.h is regenerated on every git
-commit, so any git operation triggered recompilation of bond_main.c
-which also included bonding_priv.h.
+Hi!
 
-Remove the header entirely, as suggested by Jakub, given the macros on
-this file can be integrated into the C files directly.
+Some NICs (e.g. bnxt) change their RSS indirection table size based on
+the queue count, because the hardware table is a shared resource. The
+ethtool core locks ctx->indir_size at context creation, so drivers
+have to reject channel changes when RSS contexts exist.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-Changes in v2:
-- Remove drivers/net/bonding/bonding_priv.h completly (Jakub)
-- Link to v1: https://patch.msgid.link/20260316-bond_uts-v1-1-428696ea79d5@debian.org
----
- drivers/net/bonding/bond_main.c    |  6 ++----
- drivers/net/bonding/bond_procfs.c  | 11 ++++++-----
- drivers/net/bonding/bonding_priv.h | 22 ----------------------
- 3 files changed, 8 insertions(+), 31 deletions(-)
+This series adds resize helpers and wires them up in bnxt. It also
+adds tracking of the user provided indirection table size to the
+ethtool core.
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 90b71bd530401..d93d61ce6a08d 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -93,8 +93,6 @@
- #include <net/netdev_lock.h>
- #include <net/xdp.h>
- 
--#include "bonding_priv.h"
--
- /*---------------------------- Module parameters ----------------------------*/
- 
- /* monitor all links that often (in milliseconds). <=0 disables monitoring */
-@@ -5874,7 +5872,7 @@ static int bond_ethtool_get_link_ksettings(struct net_device *bond_dev,
- static void bond_ethtool_get_drvinfo(struct net_device *bond_dev,
- 				     struct ethtool_drvinfo *drvinfo)
- {
--	strscpy(drvinfo->driver, DRV_NAME, sizeof(drvinfo->driver));
-+	strscpy(drvinfo->driver, KBUILD_MODNAME, sizeof(drvinfo->driver));
- 	snprintf(drvinfo->fw_version, sizeof(drvinfo->fw_version), "%d",
- 		 BOND_ABI_VERSION);
- }
-@@ -6654,6 +6652,6 @@ static void __exit bonding_exit(void)
- module_init(bonding_init);
- module_exit(bonding_exit);
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION(DRV_DESCRIPTION);
-+MODULE_DESCRIPTION("Ethernet Channel Bonding Driver");
- MODULE_AUTHOR("Thomas Davis, tadavis@lbl.gov and many others");
- MODULE_IMPORT_NS("NETDEV_INTERNAL");
-diff --git a/drivers/net/bonding/bond_procfs.c b/drivers/net/bonding/bond_procfs.c
-index 7edf72ec816ab..e34f803051913 100644
---- a/drivers/net/bonding/bond_procfs.c
-+++ b/drivers/net/bonding/bond_procfs.c
-@@ -1,4 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
-+#include <generated/utsrelease.h>
- #include <linux/proc_fs.h>
- #include <linux/ethtool.h>
- #include <linux/export.h>
-@@ -6,7 +7,7 @@
- #include <net/netns/generic.h>
- #include <net/bonding.h>
- 
--#include "bonding_priv.h"
-+#define bond_version "Ethernet Channel Bonding Driver: v" UTS_RELEASE "\n"
- 
- static void *bond_info_seq_start(struct seq_file *seq, loff_t *pos)
- 	__acquires(RCU)
-@@ -290,7 +291,7 @@ void bond_create_proc_entry(struct bonding *bond)
- 				bn->proc_dir, &bond_info_seq_ops, bond);
- 		if (bond->proc_entry == NULL)
- 			netdev_warn(bond_dev, "Cannot create /proc/net/%s/%s\n",
--				    DRV_NAME, bond_dev->name);
-+				    KBUILD_MODNAME, bond_dev->name);
- 		else
- 			memcpy(bond->proc_file_name, bond_dev->name, IFNAMSIZ);
- 	}
-@@ -314,10 +315,10 @@ void bond_remove_proc_entry(struct bonding *bond)
- void __net_init bond_create_proc_dir(struct bond_net *bn)
- {
- 	if (!bn->proc_dir) {
--		bn->proc_dir = proc_mkdir(DRV_NAME, bn->net->proc_net);
-+		bn->proc_dir = proc_mkdir(KBUILD_MODNAME, bn->net->proc_net);
- 		if (!bn->proc_dir)
- 			pr_warn("Warning: Cannot create /proc/net/%s\n",
--				DRV_NAME);
-+				KBUILD_MODNAME);
- 	}
- }
- 
-@@ -326,7 +327,7 @@ void __net_init bond_create_proc_dir(struct bond_net *bn)
- void __net_exit bond_destroy_proc_dir(struct bond_net *bn)
- {
- 	if (bn->proc_dir) {
--		remove_proc_entry(DRV_NAME, bn->net->proc_net);
-+		remove_proc_entry(KBUILD_MODNAME, bn->net->proc_net);
- 		bn->proc_dir = NULL;
- 	}
- }
-diff --git a/drivers/net/bonding/bonding_priv.h b/drivers/net/bonding/bonding_priv.h
-deleted file mode 100644
-index fef6288c6944f..0000000000000
---- a/drivers/net/bonding/bonding_priv.h
-+++ /dev/null
-@@ -1,22 +0,0 @@
--/* SPDX-License-Identifier: GPL-1.0+ */
--/*
-- * Bond several ethernet interfaces into a Cisco, running 'Etherchannel'.
-- *
-- * Portions are (c) Copyright 1995 Simon "Guru Aleph-Null" Janes
-- * NCM: Network and Communications Management, Inc.
-- *
-- * BUT, I'm the one who modified it for ethernet, so:
-- * (c) Copyright 1999, Thomas Davis, tadavis@lbl.gov
-- *
-- */
--
--#ifndef _BONDING_PRIV_H
--#define _BONDING_PRIV_H
--#include <generated/utsrelease.h>
--
--#define DRV_NAME	"bonding"
--#define DRV_DESCRIPTION	"Ethernet Channel Bonding Driver"
--
--#define bond_version DRV_DESCRIPTION ": v" UTS_RELEASE "\n"
--
--#endif
+Patch 1 tracks the user-provided indirection table size (user_size)
+in ctx->indir_user_size for non-default RSS contexts and in
+dev->ethtool->rss_indir_user_size for context 0. It is set when the
+indirection table is configured via netlink or ioctl, and cleared to
+zero on reset-to-default.
 
----
-base-commit: 5446b8691eb8278f10deca92048fad84ffd1e4d5
-change-id: 20260316-bond_uts-077fed8dce56
+IFF_RXFH_CONFIGURED is removed, and replaced with rss_indir_user_size.
+The flag is redundant now that user_size captures the same
+information.
 
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
+Patch 2 adds core resize helpers:
+  ethtool_rxfh_indir_can_resize() - read-only validation for context 0
+  ethtool_rxfh_indir_resize() - fold/unfold context 0 table in place
+  ethtool_rxfh_ctxs_can_resize() - validate all non-default contexts
+  ethtool_rxfh_ctxs_resize() - resize all non-default contexts,
+    with locking and RSS_NTF notifications
+
+Patch 3 uses the resize helpers in bnxt_set_channels().
+
+Patch 4 adds HW tests in rss_drv.py (devices without dynamic table
+sizing are skipped):
+  resize_periodic - fold/unfold with a non-default [3,2,1,0]
+    sub-table (user_size=4), verifying exact content preservation
+    (main + ctx)
+  resize_below_user_size_reject - periodic sub-table with user_size
+    between big and small device table sizes; verifies that shrinking
+    below user_size is rejected even when the table is periodic
+    (main + ctx)
+  resize_nonperiodic_reject - non-periodic table blocks channel
+    reduction, with an extra periodic context to exercise
+    multi-context validation (main + ctx)
+  resize_nonperiodic_no_corruption - failed resize leaves table
+    contents and channel count unchanged (main + ctx)
+
+Running the tests:
+
+  # On real hardware
+  sudo NETIF=eth0 ./rss_drv.py
+
+Changes v5 -> v6:
+
+ - rss_set_prep_indir() returns user_size (>= 0) on success instead
+   of using a u32 *user_sizep output parameter (Jakub)
+ - Removed IFF_RXFH_CONFIGURED; netif_is_rxfh_configured() now checks
+   dev->ethtool->rss_indir_user_size instead of priv_flags (Jakub)
+ - Added ethtool_rxfh_indir_clear() helper for drivers that
+   forcibly reset indirection tables. Sends ETHTOOL_MSG_RSS_NTF
+   notification. Converted bnxt and mlx5 to use it (Jakub)
+ - ethtool_rxfh_indir_can_resize()/ethtool_rxfh_indir_resize() wrap
+   the internal resize logic for context 0, reading user_size from
+   dev->ethtool->rss_indir_user_size. Removes the need for
+   netif_is_rxfh_configured() guards in drivers (Jakub)
+ - Removed netif_is_rxfh_configured() guards in bnxt_set_channels()
+   and nsim_set_channels() (Jakub)
+ - More consistent function names
+
+Changes v4 -> v5:
+
+ - Track user-provided indirection table size (user_size) as a resize
+   floor. Added indir_user_size to ethtool_rxfh_context and
+   rss_indir_user_size to ethtool_netdev_state. ethtool_rxfh_can_resize()
+   and ethtool_rxfh_resize() now take a user_size parameter and reject
+   shrinking below it. (Jakub)
+ - Propagated user_size out of rss_set_prep_indir() and stored it on
+   successful set in both netlink and ioctl paths.
+ - resize_periodic test now sends a 4-entry sub-table (user_size=4)
+   instead of replicating to full device table size
+ - Added resize_below_user_size_reject test to verify user_size floor.
+ - Removed "Open items" section - user_size tracking is now implemented.
+
+Changes v3 -> v4:
+
+ - Rebased onto net-next
+ - Added Reviewed-by: from Michael
+ - Added missing Cc: to make the pwbots happier
+
+Changes v2 -> v3:
+
+ - Changed ethtool_rxfh_can_resize() to return bool instead of int;
+   true means resize is possible, false means it is not. Inverted
+   callers accordingly. (Jakub)
+ - Added Tested-by from Pavan
+
+Changes v1 -> v2:
+
+ - Dropped netdevsim support and netdevsim selftest (Jakub)
+ - Split ethtool_rxfh_contexts_resize_all() into separate validate
+   (ethtool_rxfh_ctxs_can_resize) and apply (ethtool_rxfh_ctxs_resize)
+   so drivers can validate before closing the device (Jakub)
+ - Shortened helper names (Jakub)
+ - Replaced scoped_guard(mutex) with explicit mutex_lock/unlock
+   (Jakub)
+ - Removed defensive zero-size check, bare expressions instead of != 0
+   comparisons, ! instead of == 0 (Jakub)
+ - In bnxt, moved bnxt_check_rings() before RSS validation and
+   deferred actual resize to after bnxt_close_nic() (Jakub, Michael)
+ - Added comment that RSS table size only changes on P5 chips with
+   older firmware (Michael)
+ - Use non-default [3,2,1,0]xN pattern set via netlink to distinguish
+   correct fold from driver resetting to defaults (Jakub)
+ - Check exact indirection table pattern, not just set(indir) (Jakub)
+ - Use ksft_raises() instead of try/except/else (Jakub)
+ - Removed queue_count=8 from NetDrvEnv (Jakub)
+ - Added ksft_variants to resize_nonperiodic_reject for ctx coverage
+ - Added extra periodic context in reject test for multi-context
+   validation coverage
+ - Added resize_nonperiodic_no_corruption test
+
+
+Björn Töpel (4):
+  ethtool: Track user-provided RSS indirection table size
+  ethtool: Add RSS indirection table resize helpers
+  bnxt_en: Resize RSS contexts on channel count change
+  selftests: rss_drv: Add RSS indirection table resize tests
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   2 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  35 ++-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   2 +-
+ include/linux/ethtool.h                       |  13 +
+ include/linux/netdevice.h                     |   7 +-
+ net/ethtool/common.c                          | 175 +++++++++++++
+ net/ethtool/ioctl.c                           |   9 +-
+ net/ethtool/rss.c                             |  24 +-
+ .../selftests/drivers/net/hw/rss_drv.py       | 233 +++++++++++++++++-
+ 9 files changed, 469 insertions(+), 31 deletions(-)
+
+
+base-commit: 70729af783af1d66944918b33e5b345b500a5399
+-- 
+2.53.0
 
 
