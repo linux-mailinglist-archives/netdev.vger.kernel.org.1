@@ -1,48 +1,49 @@
-Return-Path: <netdev+bounces-269120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269121-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QAOlCKDkummdcwIAu9opvQ
-	(envelope-from <netdev+bounces-269120-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:45:04 +0100
+	id CE28BxHXummfcAIAu9opvQ
+	(envelope-from <netdev+bounces-269121-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:47:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E3B92C0850
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:45:03 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD912BF915
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:47:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8E2043156700
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:46:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E23613030503
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B893B47F4;
-	Wed, 18 Mar 2026 16:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA31E3EE1DA;
+	Wed, 18 Mar 2026 16:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PcNp68uN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GstVF2XO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4A73A874F;
-	Wed, 18 Mar 2026 16:37:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A374A3A1E73;
+	Wed, 18 Mar 2026 16:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773851871; cv=none; b=YRGyTPHk83C0p0Rq4Gv6ZRfEr5zSwCmMul7EbVvSvXTezch1iwV67Io2GJMXF7lU9WS8Ch8oxgJPWMr1tBFQUuitYLJAjPOKzveXH0WkpAUN7KyRshcutQqUXMVZI0CKhvjGx4+Sk6zQpAAHH/iEXKv3PmwnUhjrkDJdS8+OekE=
+	t=1773851876; cv=none; b=mWeanMJmV3d3tXE5wCNEOCElTA2JodXWnBEVNwBf5trEPhRkZL4S88uxvx7w/tEnVFq7WRkKfyEmdEjN+0O7avggPKYvrF7GO4GRPedMWXwb7t5ESR4Y8bXvetTDEsujpZHjlJmUWGpW/9YLGoH4mn6qBbp8xnF8jf6hE/SQqLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773851871; c=relaxed/simple;
-	bh=iqmtwLEcnL6mFlvnn9juJ9ChTC04q0eJq3YD9qrNJTI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EL3yNQpnCSaINA6Wv5Ods6f6ykNJdyPCF0YFk/kryvz0cr8oKrKfHFMv8H8rUqoo3b5FDfzoajbhINvx7pL+zEn0+3UUcdYx0ZXJHFi12MGmYaZD+vC0BxFTyV8ppUNCeJivscgikcSjBob1aLzFRNbLsgu0MTPkBEV07agvrZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PcNp68uN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E1C8C19421;
-	Wed, 18 Mar 2026 16:37:45 +0000 (UTC)
+	s=arc-20240116; t=1773851876; c=relaxed/simple;
+	bh=qXfofFT/trjhnPdhGlUBXmgmmTY9bSQeDk+832YPFio=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=M84PktO0+0doJGDFYCGj9JRMuvXre6hSuJQs2ApoLfxDQtFQS9yqsXB6FMociks8sGDMUB0gO95vL0z+nMmuDdroI3fD8PFj09rDMeKui6wLJcmrQXwQZfeidfueZ85GXGZpvYz6QUwfnL7s41dMyK136UH1VLdelg/lrRQ32zM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GstVF2XO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15412C2BC87;
+	Wed, 18 Mar 2026 16:37:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773851870;
-	bh=iqmtwLEcnL6mFlvnn9juJ9ChTC04q0eJq3YD9qrNJTI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PcNp68uNOBv5fLixIjnHiniTlT7nbV1vida+HWufRivcjOEemg/cdnlQZ3S28LjPi
-	 j+Xclfj0fxIG1UpkeaBCnCo6UaO3E3amhxQ0ljAmkY0FRBeo/1eejhlIg0s6ML2FYk
-	 j176lFp0kwIqRk5ppGbJPIIIsgG3KdHbfeTYvW/jsKkGjJxT/x3Gg6QtQlRfCRZpNT
-	 XdeszBOq+uAYHkdzzUrLODEADMMj+YEJi6+GVLHejPAu4Va5m8rkI51zxutddRnfmG
-	 rZMQokXJVXxrUynwFEGUBbog4r2FnXJu/834cMVrfnTJ2zROdK96aZdce098xnwnVX
-	 yw3vTEIdZ6XrA==
+	s=k20201202; t=1773851876;
+	bh=qXfofFT/trjhnPdhGlUBXmgmmTY9bSQeDk+832YPFio=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=GstVF2XOOimo5nwYNyngBHe+JUGCtpZjNkJn3FkMko6UgBPp1TwANQ1kauNFGpyOo
+	 O6t/yebg79VawFRxauDhMVsLQQiyip4dRUqoCV+qu6ToydlL8Y6+ne3HbWG0UgJAi/
+	 yx5rU23ylppi9hmmq2M8dVB/5eAbc/gm1QgMCeVXio4csMCFvsFvqGJDVF0OD6sj3B
+	 gTyxpMk+tSW0YiI+tShk9Qp5H52dN5CYTp3BS70DFxW01HE+ppsvFnNUL5HL68YBKt
+	 /ZhXY+O6/vQ4D9Y2u/y73HKwFb59+b/44DEcQDmQT6rlaWBZz6uPUJOOW3JTSih/MI
+	 +edr4WplBhdkA==
 From: Conor Dooley <conor@kernel.org>
 To: netdev@vger.kernel.org
 Cc: conor@kernel.org,
@@ -74,139 +75,361 @@ Cc: conor@kernel.org,
 	Abin Joseph <abin.joseph@amd.com>,
 	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>,
 	Ryan.Wanner@microchip.com
-Subject: [PATCH net-next v4 00/13] macb usrio/tsu patches
-Date: Wed, 18 Mar 2026 16:37:31 +0000
-Message-ID: <20260318-surpass-puzzle-f94b46aa8808@spud>
+Subject: [PATCH net-next v4 01/13] net: macb: rename macb_default_usrio to at91_default_usrio as not all platforms have mii mode control in usrio
+Date: Wed, 18 Mar 2026 16:37:32 +0000
+Message-ID: <20260318-proximity-playoff-d9a0c84ed6a9@spud>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260318-surpass-puzzle-f94b46aa8808@spud>
+References: <20260318-surpass-puzzle-f94b46aa8808@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3354; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=ixRxbL+6ajZ8OQT5v+uLquAllGh8dKxfO7p3wZv97z8=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJm7rpxJPpK842A178372bLM1VvsRZhFMv/9DGrwumC4e Rv7wyChjlIWBjEuBlkxRZbE230tUuv/uOxw7nkLM4eVCWQIAxenAEzk0nNGhm+NrfcPtEx5qbjw 28GNZs4SZe8mhaqKx37at3bLIl2Oy8sY/kdIOprVt5/ulWOIfSe1o/PBh79mp+KZXq1T5+DZ/+z GdEYA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10810; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=EKLjoCWb4dd6fnjRibapsUL7p5viCWSXvbtWmX4ncIU=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJm7rlyQM187R+5+cWyowNLSPyd/GE1b+uBedcdNlupPp coOLy4xd5SyMIhxMciKKbIk3u5rkVr/x2WHc89bmDmsTCBDGLg4BWAifYcZGc4e+XVp+qelbhaa fiZfP/UELlhe90jp6oYD5lkZN3OOeWQyMqyaNtWq7NcBnZIHHqvv/Y/TO+X994+565fCWRedeT+ 0BXMAAA==
 X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269120-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269121-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[30];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
+	NEURAL_HAM(-0.00)[-0.964];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[kernel.org,microchip.com,lunn.ch,davemloft.net,google.com,redhat.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,tuxon.dev,gmail.com,sifive.com,vger.kernel.org,lists.infradead.org,raspberrypi.com,linux.dev,amd.com,bootlin.com];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1E3B92C0850
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: BCD912BF915
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Conor Dooley <conor.dooley@microchip.com>
 
-Hey folks,
+Calling this structure macb_default_usrio is misleading, I believe, as
+it implies that it should be used if your platform has nothing special
+to do in usrio. Since usrio is platform dependent, the default here is
+probably for each usrio to do nothing, with the macb documentation I
+have access to prescribing no standard behaviour here. We noticed that
+this was problematic because on mpfs, a bit that macb_default_usrio
+sets to deal with the MII mode actually changes the source for the
+tsu_clk to something with how the majority of mpfs devices are actually
+configured!
 
-At the very least, it'd be good of the soc vendor folks could check
-their platforms and see if their usrio stuff actually lines up with what
-the driver currently calls "macb_default_usrio". Ours didn't and it was
-a nasty surprise.
+Rename it to at91_default_usrio, since that's where the values actually
+come from for these. I have no idea if any of the other platforms that
+use the default actually copied at91's usrio configuration or if they
+have usrio configurations where what the driver does has no impact.
 
-Ryan and I figured out that the sama7g5 stuff is not actually using the
-same usrio bits as earlier devices, so there's now more patches in this
-series to split them apart. I've not tested the split or the new
-property due to lack of hardware, but Ryan has.
+Gate touching these bits behind a capability, like the clken refclock
+usrio knob, so that platforms without the MII mode stuff can avoid
+running this code.
 
-Marking this stuff net-next, because although they're fixes I don't see
-any particular urgency, and it avoids creating some dependencies between
-cleanup items and the fixes.
+Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+---
+ drivers/net/ethernet/cadence/macb.h      |   1 +
+ drivers/net/ethernet/cadence/macb_main.c | 108 +++++++++++++----------
+ 2 files changed, 63 insertions(+), 46 deletions(-)
 
-Cheers,
-Conor.
-
-v4:
-- deprecate instead of remove existing devicetree property
-- pick up Theo's patches
-
-v3:
-- reorder patches
-- fix smatch issue reported by Simon
-- add patches reworking usrio handling of clken/refclk (and remove the
-  issue the llm reported in the process)
-- add a new devicetree property for refclk selection, replacing the
-  existing one.
-- drop the dts patch
-
-CC: Valentina.FernandezAlanis@microchip.com
-CC: Andrew Lunn <andrew+netdev@lunn.ch>
-CC: David S. Miller <davem@davemloft.net>
-CC: Eric Dumazet <edumazet@google.com>
-CC: Jakub Kicinski <kuba@kernel.org>
-CC: Paolo Abeni <pabeni@redhat.com>
-CC: Rob Herring <robh@kernel.org>
-CC: Krzysztof Kozlowski <krzk+dt@kernel.org>
-CC: Conor Dooley <conor+dt@kernel.org>
-CC: Daire McNamara <daire.mcnamara@microchip.com>
-CC: Paul Walmsley <pjw@kernel.org>
-CC: Palmer Dabbelt <palmer@dabbelt.com>
-CC: Albert Ou <aou@eecs.berkeley.edu>
-CC: Alexandre Ghiti <alex@ghiti.fr>
-CC: Nicolas Ferre <nicolas.ferre@microchip.com>
-CC: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-CC: Richard Cochran <richardcochran@gmail.com>
-CC: Samuel Holland <samuel.holland@sifive.com>
-CC: netdev@vger.kernel.org
-CC: devicetree@vger.kernel.org
-CC: linux-kernel@vger.kernel.org
-CC: linux-riscv@lists.infradead.org
-CC: Dave Stevenson <dave.stevenson@raspberrypi.com>
-CC: Sean Anderson <sean.anderson@linux.dev>
-CC: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-CC: Abin Joseph <abin.joseph@amd.com>
-CC: Théo Lebrun <theo.lebrun@bootlin.com>
-CC: Ryan.Wanner@microchip.com
-
-Conor Dooley (10):
-  net: macb: rename macb_default_usrio to at91_default_usrio as not all
-    platforms have mii mode control in usrio
-  net: macb: split USRIO_HAS_CLKEN capability in two
-  dt-bindings: net: cdns,macb: replace cdns,refclk-ext with
-    cdns,refclk-source
-  net: macb: rework usrio refclk selection code
-  net: macb: np4 doesn't need a usrio pointer
-  net: macb: add mpfs specific usrio configuration
-  net: macb: warn on pclk use as a tsu_clk fallback
-  net: macb: clean up tsu clk rate acquisition
-  dt-bindings: net: macb: add property indicating timer adjust mode
-  net: macb: timer adjust mode is not supported
-
-Théo Lebrun (3):
-  net: macb: runtime detect MACB_CAPS_USRIO_DISABLED
-  net: macb: set MACB_CAPS_USRIO_DISABLED if no usrio config is provided
-  net: macb: drop usrio pointer on EyeQ5 config
-
- .../devicetree/bindings/net/cdns,macb.yaml    |  71 +++++-
- drivers/net/ethernet/cadence/macb.h           |   8 +
- drivers/net/ethernet/cadence/macb_main.c      | 202 ++++++++++++------
- 3 files changed, 211 insertions(+), 70 deletions(-)
-
+diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+index 87414a2ddf6e3..8cb0b3778ee9e 100644
+--- a/drivers/net/ethernet/cadence/macb.h
++++ b/drivers/net/ethernet/cadence/macb.h
+@@ -779,6 +779,7 @@
+ #define MACB_CAPS_DMA_PTP			BIT(22)
+ #define MACB_CAPS_RSC				BIT(23)
+ #define MACB_CAPS_NO_LSO			BIT(24)
++#define MACB_CAPS_USRIO_HAS_MII			BIT(25)
+ 
+ /* LSO settings */
+ #define MACB_LSO_UFO_ENABLE			0x01
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 5bc35f651ebd2..778d2115f66fc 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -4613,13 +4613,15 @@ static int macb_init(struct platform_device *pdev)
+ 
+ 	if (!(bp->caps & MACB_CAPS_USRIO_DISABLED)) {
+ 		val = 0;
+-		if (phy_interface_mode_is_rgmii(bp->phy_interface))
+-			val = bp->usrio->rgmii;
+-		else if (bp->phy_interface == PHY_INTERFACE_MODE_RMII &&
+-			 (bp->caps & MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII))
+-			val = bp->usrio->rmii;
+-		else if (!(bp->caps & MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII))
+-			val = bp->usrio->mii;
++		if (bp->caps & MACB_CAPS_USRIO_HAS_MII) {
++			if (phy_interface_mode_is_rgmii(bp->phy_interface))
++				val = bp->usrio->rgmii;
++			else if (bp->phy_interface == PHY_INTERFACE_MODE_RMII &&
++				 (bp->caps & MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII))
++				val = bp->usrio->rmii;
++			else if (!(bp->caps & MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII))
++				val = bp->usrio->mii;
++		}
+ 
+ 		if (bp->caps & MACB_CAPS_USRIO_HAS_CLKEN)
+ 			val |= bp->usrio->refclk;
+@@ -4637,13 +4639,6 @@ static int macb_init(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
+-static const struct macb_usrio_config macb_default_usrio = {
+-	.mii = MACB_BIT(MII),
+-	.rmii = MACB_BIT(RMII),
+-	.rgmii = GEM_BIT(RGMII),
+-	.refclk = MACB_BIT(CLKEN),
+-};
+-
+ #if defined(CONFIG_OF)
+ /* 1518 rounded up */
+ #define AT91ETHER_MAX_RBUFF_SZ	0x600
+@@ -5218,6 +5213,13 @@ static int eyeq5_init(struct platform_device *pdev)
+ 	return ret;
+ }
+ 
++static const struct macb_usrio_config at91_default_usrio = {
++	.mii = MACB_BIT(MII),
++	.rmii = MACB_BIT(RMII),
++	.rgmii = GEM_BIT(RGMII),
++	.refclk = MACB_BIT(CLKEN),
++};
++
+ static const struct macb_usrio_config sama7g5_usrio = {
+ 	.mii = 0,
+ 	.rmii = 1,
+@@ -5228,104 +5230,114 @@ static const struct macb_usrio_config sama7g5_usrio = {
+ 
+ static const struct macb_config fu540_c000_config = {
+ 	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_JUMBO |
+-		MACB_CAPS_GEM_HAS_PTP,
++		MACB_CAPS_GEM_HAS_PTP | MACB_CAPS_USRIO_HAS_MII,
+ 	.dma_burst_length = 16,
+ 	.clk_init = fu540_c000_clk_init,
+ 	.init = fu540_c000_init,
+ 	.jumbo_max_len = 10240,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config at91sam9260_config = {
+-	.caps = MACB_CAPS_USRIO_HAS_CLKEN | MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII,
++	.caps = MACB_CAPS_USRIO_HAS_CLKEN | MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config sama5d3macb_config = {
+ 	.caps = MACB_CAPS_SG_DISABLED |
+-		MACB_CAPS_USRIO_HAS_CLKEN | MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII,
++		MACB_CAPS_USRIO_HAS_CLKEN | MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config pc302gem_config = {
+-	.caps = MACB_CAPS_SG_DISABLED | MACB_CAPS_GIGABIT_MODE_AVAILABLE,
++	.caps = MACB_CAPS_SG_DISABLED | MACB_CAPS_GIGABIT_MODE_AVAILABLE |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config sama5d2_config = {
+-	.caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII | MACB_CAPS_JUMBO,
++	.caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII | MACB_CAPS_JUMBO |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+ 	.jumbo_max_len = 10240,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config sama5d29_config = {
+-	.caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII | MACB_CAPS_GEM_HAS_PTP,
++	.caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII | MACB_CAPS_GEM_HAS_PTP |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config sama5d3_config = {
+ 	.caps = MACB_CAPS_SG_DISABLED | MACB_CAPS_GIGABIT_MODE_AVAILABLE |
+-		MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII | MACB_CAPS_JUMBO,
++		MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII | MACB_CAPS_JUMBO |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+ 	.jumbo_max_len = 10240,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config sama5d4_config = {
+-	.caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII,
++	.caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.dma_burst_length = 4,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config emac_config = {
+-	.caps = MACB_CAPS_NEEDS_RSTONUBR | MACB_CAPS_MACB_IS_EMAC,
++	.caps = MACB_CAPS_NEEDS_RSTONUBR | MACB_CAPS_MACB_IS_EMAC |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.clk_init = at91ether_clk_init,
+ 	.init = at91ether_init,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config np4_config = {
+ 	.caps = MACB_CAPS_USRIO_DISABLED,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config zynqmp_config = {
+ 	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE |
+ 		MACB_CAPS_JUMBO |
+-		MACB_CAPS_GEM_HAS_PTP | MACB_CAPS_BD_RD_PREFETCH,
++		MACB_CAPS_GEM_HAS_PTP | MACB_CAPS_BD_RD_PREFETCH |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = init_reset_optional,
+ 	.jumbo_max_len = 10240,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config zynq_config = {
+ 	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_NO_GIGABIT_HALF |
+-		MACB_CAPS_NEEDS_RSTONUBR,
++		MACB_CAPS_NEEDS_RSTONUBR |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config mpfs_config = {
+@@ -5335,7 +5347,7 @@ static const struct macb_config mpfs_config = {
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = init_reset_optional,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ 	.max_tx_length = 4040, /* Cadence Erratum 1686 */
+ 	.jumbo_max_len = 4040,
+ };
+@@ -5343,7 +5355,8 @@ static const struct macb_config mpfs_config = {
+ static const struct macb_config sama7g5_gem_config = {
+ 	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_CLK_HW_CHG |
+ 		MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII |
+-		MACB_CAPS_MIIONRGMII | MACB_CAPS_GEM_HAS_PTP,
++		MACB_CAPS_MIIONRGMII | MACB_CAPS_GEM_HAS_PTP |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+@@ -5353,7 +5366,8 @@ static const struct macb_config sama7g5_gem_config = {
+ static const struct macb_config sama7g5_emac_config = {
+ 	.caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII |
+ 		MACB_CAPS_USRIO_HAS_CLKEN | MACB_CAPS_MIIONRGMII |
+-		MACB_CAPS_GEM_HAS_PTP,
++		MACB_CAPS_GEM_HAS_PTP |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+@@ -5364,12 +5378,13 @@ static const struct macb_config versal_config = {
+ 	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_JUMBO |
+ 		MACB_CAPS_GEM_HAS_PTP | MACB_CAPS_BD_RD_PREFETCH |
+ 		MACB_CAPS_NEED_TSUCLK | MACB_CAPS_QUEUE_DISABLE |
+-		MACB_CAPS_QBV,
++		MACB_CAPS_QBV |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = init_reset_optional,
+ 	.jumbo_max_len = 10240,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config eyeq5_config = {
+@@ -5380,17 +5395,18 @@ static const struct macb_config eyeq5_config = {
+ 	.clk_init = macb_clk_init,
+ 	.init = eyeq5_init,
+ 	.jumbo_max_len = 10240,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ };
+ 
+ static const struct macb_config raspberrypi_rp1_config = {
+ 	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_CLK_HW_CHG |
+ 		MACB_CAPS_JUMBO |
+-		MACB_CAPS_GEM_HAS_PTP,
++		MACB_CAPS_GEM_HAS_PTP |
++		MACB_CAPS_USRIO_HAS_MII,
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+-	.usrio = &macb_default_usrio,
++	.usrio = &at91_default_usrio,
+ 	.jumbo_max_len = 10240,
+ };
+ 
+@@ -5431,7 +5447,7 @@ static const struct macb_config default_gem_config = {
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
+-	.usrio = &macb_default_usrio,
++	.usrio = NULL,
+ 	.jumbo_max_len = 10240,
+ };
+ 
 -- 
 2.51.0
 
