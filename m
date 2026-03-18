@@ -1,212 +1,201 @@
-Return-Path: <netdev+bounces-269182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269183-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mPZQJXcVu2k3ewIAu9opvQ
-	(envelope-from <netdev+bounces-269182-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 22:13:27 +0100
+	id qFmEBjoWu2nYewIAu9opvQ
+	(envelope-from <netdev+bounces-269183-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 22:16:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC9162C2E0B
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 22:13:26 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8592C2E81
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 22:16:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F1DD530FFF16
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 21:12:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0351F301EF36
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 21:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7FA836B054;
-	Wed, 18 Mar 2026 21:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8739346E43;
+	Wed, 18 Mar 2026 21:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gIaTSKpd"
+	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="Uh+4QSff"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794E0372EE1
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 21:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F51E2D879E
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 21:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773868322; cv=none; b=iw3fEV08qbfFzAMe4qq0cFb17OknW/B4CQUZiF1QLw874S5IGF/xGYqYlP87JX1hweKrQ3uG4Uf7pWTSskAhDF7/1BV5gcnVuVYQ4mG+0SVUcWowWszK81NaDPl4oDBSLkohbtAFedm9sS1hD7tOAZ4zlpJnbmLO4XrTtkIwljs=
+	t=1773868599; cv=none; b=sxECkjGy13vyzbQFNpd/wO1t5LPg3Ruej3+VxmaaSXYPa3SoAYhOs3+PcVPvAjDVZOZ6l6efMDtIvP9BQhYOvLYoC5Yy41A2BxF2gaTJNlXKFfALOo261B7ovMHC2v+lG4+wBbpCrbHps26VdE+qLk6vhWjNzbJIm3jw8GKMywE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773868322; c=relaxed/simple;
-	bh=Bc7FuaVfriVTlmWmJKPbflUCbTjIXZMDzHnpCnNX0fc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MGgfjf7bPeTsaLjlROlRQn0c+0Aqt5pSYeIXu5DwGb+f1grk0YM5PdBilVo2gLbuNed/GQYPa+W3jNNllfn5aJ5HCgBZ5jFdLgJKXl/jwLR60bEDk1AVO2wCwHMElChPIIg+YiJv6c56loKa48vuDNdGemPGsQ7M9YsU6qfC10M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gIaTSKpd; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5a27c021b58so327707e87.2
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 14:12:01 -0700 (PDT)
+	s=arc-20240116; t=1773868599; c=relaxed/simple;
+	bh=P//KxE6W/5Y+HAxi/f5cOXKna4n5LLIU7027UToyg34=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g1qUTZJEkXnPsr2iGo3mJ4QWWmHrlNqb7Tpo9O2aXyY9SQ8hyvg9+XRYYCQt3QmrNL0/BtjOtvhxN/JWYB5QyTmTiSj2RpvbvtUovv4HX/u1d+A8IlsTny5HCptzTcmScb13nFUUe8rq+DAymQujBAdycs7cMffOJ1WllODOaRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=Uh+4QSff; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-439b97a8a8cso196271f8f.1
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 14:16:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773868320; x=1774473120; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7uDPEFKy6/pc9tqIEzURrCbQW2EOE5IGjEosk7mUc9U=;
-        b=gIaTSKpdCy9Wh267cMGGEJP0Vv6/zXdxOdPdxXBJf7XOy5vqMCss9op0edYrVjEzLd
-         kKuK4WgSUnQscjthHB/Chqd2z3Enrqx7b60XCISsr7I37RwfteodpAHg+VUdOZ3dg6Jp
-         P7RTRn3yTZeZWxzk/3q2/F5xQhQlx47AS+EgbT5b5WIyLeeefpvDZuPnh0bFAI4xf05k
-         OafqBES7O08pevC55IOjcuX5rFo4xOSYf0Wr2O9XqYqjKmIYSsdnLgBTSod+QVCHu/ul
-         aXrhdGqYK03TwMlmwjEwMgTiCtPFrxvx2XjDJZkjdi5AJX+DSQ1+tDspWXE70YwlKWlx
-         aeGg==
+        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1773868597; x=1774473397; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6JSbsrYhFg+Au4jgvX758AnPNxCSSto/QgL2aLSvMGI=;
+        b=Uh+4QSffM1uGTLyOEOiMET9Q9ElpLzCKb4XanROgT477VE+9Z7Imhlvsbho+yNIPn/
+         edWoCR/vrz4sOfms3aCJk2GXaXp2BB7vQ0c3By8j7A+p+dBzfw3wxMpSL9kuBqByFlOa
+         jfVZeQQS+NyWj6eAT5LYWSwgsc2nPYQ3Q9oO5wjeUmCW/56DH2QmP/av+CgqUY9sFedv
+         GG74szR+s1k8eICg6667X6jFJTG42+2ACKcGpARFX7Bdo+aad+qUFXxfNubA+21WP39I
+         KVIzj7YOZ8gJ07/eygvoApUPGkQ9vOuodL9AWwguT+7Rsuhja8VWzSOIFkm0jbIpckep
+         7KRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773868320; x=1774473120;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7uDPEFKy6/pc9tqIEzURrCbQW2EOE5IGjEosk7mUc9U=;
-        b=tGXwZSwF1oS1lAMx4XdCrA0KfP9411eK78ZYK/Lsbnzzxzyn5+03VccJk538IuFLlw
-         hu+rxOh/wDMSWsmDiY+DollzWjCNofK3rFZwDq48/gTW6/eIAXVAG/yPHdA1Yvlj8l91
-         RG2qoH3iKBlNWLNZZ78H33QbXw7jq7R41uK+2+pQkggqTUrpNGwB+w06yCkWOxivaRBd
-         r1XEJnIIXUd9Psye2bjsbGHwGRbEIX+JZNKCNXxfnb6ryRxcyK4nZh0hAC4hykdLiEne
-         R+IlDF6GUguTt5q0zdm9SmCztcgEbPmAg72qoobjhP6fj2Wxov0qcFLjW+1kFA5Ea+85
-         AOHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX92rharyeKNAZR+ZNmRXUFGnReVaFhm3HISZRmzvW4V3KSmO3ktNgPDnb1DJCwXhc+vcU2NJo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKRtgKa8knBGaah6SZITgz0fGTfng3vyVB8uuiUYqGWvee95vZ
-	ZbbjEBl40PrYzxvdpKhDQEGdWEq/eRFXfhC8Mhel6ndmhUTzo8bJb2DU
-X-Gm-Gg: ATEYQzxbYvIt79eOJn2Wlt2Jz2mn5gOwi1Q1e5jnycgpS1UapEQvVv2oXMPz9JR/mGU
-	Ltsr0vJrafeAw6DSlb8bIVdaBqxbJJLedBEQVN6Yax6UiSyE8x+rpd17xkf0BNLrDzaYOFccFrr
-	2usiQav3F5v3sazuc9fJTpQnHyYokeS/CAn4rdt9eETaUthwh6oe+67QvYAdIfMXw7QZYlT/N2T
-	ObUajYvHYMYJV4mHxM/EkyoOMr0JkPRvaQLJPjPnAT1Y+dNfJxzBpwhXdAuJZCJOK7pJtF3ZBmE
-	9LUFgO3PFEkv85y5Rem3jPEIw9B478vkQk/a83I4+pckxuKvDwiGoTBTJwpE6F+IH66ILQ83nIk
-	i4VlkJoTrx522ihq/n51fTvKi0TWFc8YQwWbPOLT2s3imVgbzgZoV4boJOdtjDtIK9WhOLnvdB+
-	X+LrD3m3gtzfoZXtmYLE07rp3O1DRzUubIZvsMS8P3BG/k7I3jI1JE7iKCtIgU/x0YCfLx099NQ
-	w==
-X-Received: by 2002:a05:6512:20c9:b0:5a1:381b:fae1 with SMTP id 2adb3069b0e04-5a279588187mr1510495e87.10.1773868319381;
-        Wed, 18 Mar 2026 14:11:59 -0700 (PDT)
-Received: from T6NXCV08J99224A.lan (81-237-238-191-no600.tbcn.telia.com. [81.237.238.191])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a279c7b7a8sm798082e87.80.2026.03.18.14.11.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 14:11:57 -0700 (PDT)
-From: Oskar Ray-Frayssinet <rayfraytech@gmail.com>
-To: jdmason@kudzu.us
-Cc: dave.jiang@intel.com,
-	allenbh@gmail.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	stephen@networkplumber.org,
-	ntb@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Oskar Ray-Frayssinet <rayfraytech@gmail.com>
-Subject: [PATCH net v4] net: ntb_netdev: add SPDX tag and remove boilerplate license text
-Date: Wed, 18 Mar 2026 22:11:53 +0100
-Message-ID: <20260318211153.9460-1-rayfraytech@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20251104; t=1773868597; x=1774473397;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6JSbsrYhFg+Au4jgvX758AnPNxCSSto/QgL2aLSvMGI=;
+        b=VncMUAbFyszOlszLqtHNLcM/MHls0jePUdPf9xEo+3u1CfLbxrMlBgBfxOEv6pRCVo
+         TX7sKIaWEm6kdIKnQT0tqbGGdTp1d/S7rbxScg6EpKABuTgWqeC128bJAqPcrPmLaEzk
+         ExVu7PhtVyqbqt7qwRRTG7hgDqJCTTbAtOzMgt9mLHzg/jmBJWS78s3AUCbUAgAbuIHA
+         sMhL484LG+SlbUAy76/jxCcqiLVH8ga3lfmFTkOeH8kP+0gkpBZpSyYJxpysrjQuLR/M
+         qKELX6pYhs4Ffdsz9pvugye8f6QiahL0VjF412V1jw/UhhJpADmQYo7MparUX4PgOlSp
+         Fylw==
+X-Forwarded-Encrypted: i=1; AJvYcCWOyZyGssiZwxCs1xR5tcOJ3NWeTG1O10rDubUtqYyc+Wx7oa1wLAtNig2D+qrVpSGN+baeD/w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaEuUhJP8MwPdKEMzfAT4y+vzbezSC2dLWJNXH+ILMwQAvsuNr
+	2t9pM2DCJYA/+uRmEigxKfoU2gzrSpERDNC6yEpNEiMbOUi0oJ5UdMxgsvVGxm/jzJQ=
+X-Gm-Gg: ATEYQzz7FIPwV01c5RKeYg5Rf5/+gWR/LEdh0iJjhZ7prA7k+ne53DTKwM84FnAuby+
+	/yDz5ZMzDMdq0imXwMN1GZ/AIK32go98mUjkJsenSCT3HZdVKwid0LTMxlYEm0HSid3ONNoVhtA
+	1VsqcEvwK8Aw5TxktZI+rZe32aOUtLm1fH5j7KgjmA4Rlladu5KclsncXSQUpIoPOadN10iUCVT
+	ph0TDIB+8CpiLKaN5asB6/+9V5IDzOLh6Y9Yxw78bKONpInwympWiiOLa7rdn8ugO+sUfd+GnyC
+	aI/TUuXu/FgXx48gqeoCZehCKr21mNgGQiZ5fvTnvovHEJ1bhttBUBxHj3mwmJr0hegrkVrA1Xf
+	a2sPjejxLbCN1nrTi88Pw94njepQWCE7CTThgDRQ2ty9Si4sPhnS5b88rdtYyNLC0fp4N0I3DHe
+	QQh2lRUoHtT9xCcXXHMeu+DTPcKtWEhpJmov+Z9w3twd0VnRO6CGV67CSR8zqepjfYKnUjvbFX4
+	lnO2gwkOEVMVZw=
+X-Received: by 2002:a05:6000:608:b0:439:c69f:503a with SMTP id ffacd0b85a97d-43b527c4df0mr8143039f8f.27.1773868596733;
+        Wed, 18 Mar 2026 14:16:36 -0700 (PDT)
+Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b51892244sm11628020f8f.22.2026.03.18.14.16.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Mar 2026 14:16:36 -0700 (PDT)
+Message-ID: <6b696861-ac39-4a87-a2fa-ad47a75031c6@linbit.com>
+Date: Wed, 18 Mar 2026 22:16:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] drbd: select CONFIG_NET_HANDSHAKE
+To: Arnd Bergmann <arnd@kernel.org>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Simon Horman <horms@kernel.org>,
+ Eric Biggers <ebiggers@google.com>, drbd-dev@lists.linbit.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20260318104858.1868731-1-arnd@kernel.org>
+ <20260318104858.1868731-2-arnd@kernel.org>
+From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+Content-Language: en-US
+In-Reply-To: <20260318104858.1868731-2-arnd@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.56 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linbit-com.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[linbit.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-269183-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,gmail.com,davemloft.net,kernel.org,networkplumber.org,lists.linux.dev,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-269182-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linbit-com.20230601.gappssmtp.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rayfraytech@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.915];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[christoph.boehmwalder@linbit.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EC9162C2E0B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linbit-com.20230601.gappssmtp.com:dkim,linbit.com:mid,arndb.de:email]
+X-Rspamd-Queue-Id: AB8592C2E81
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add SPDX-License-Identifier tag to reflect the dual
-GPL-2.0-only/BSD-3-Clause license, remove the redundant
-boilerplate license text and contact information, keeping
-only the driver description.
+Am 18.03.26 um 11:48 schrieb Arnd Bergmann:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> The TLS handshake code is optional and has to be enabled for DRBD:
+> 
+> ERROR: modpost: "tls_handshake_cancel" [drivers/block/drbd/drbd_transport_tcp.ko] undefined!
+> ERROR: modpost: "tls_server_hello_x509" [drivers/block/drbd/drbd_transport_tcp.ko] undefined!
+> ERROR: modpost: "tls_client_hello_x509" [drivers/block/drbd/drbd_transport_tcp.ko] undefined!
+> ERROR: modpost: "tls_get_record_type" [drivers/block/drbd/drbd_transport_tcp.ko] undefined!
+> ERROR: modpost: "tls_alert_recv" [drivers/block/drbd/drbd_transport_tcp.ko] undefined!
+> 
+> Select the option whenever DRBD is eanbled and rework the dependency in
+> the symbol so it can be selected more easily.
+> 
+> Fixes: fa8ef6960ebd ("drbd: add TCP transport implementation")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/block/drbd/Kconfig | 1 +
+>  net/Kconfig                | 4 +---
+>  2 files changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/block/drbd/Kconfig b/drivers/block/drbd/Kconfig
+> index 29ec6ed84251..de9e232d6479 100644
+> --- a/drivers/block/drbd/Kconfig
+> +++ b/drivers/block/drbd/Kconfig
+> @@ -11,6 +11,7 @@ config BLK_DEV_DRBD
+>  	depends on PROC_FS && INET
+>  	select LRU_CACHE
+>  	select CRC32
+> +	select NET_HANDSHAKE
+>  	help
+>  
+>  	  NOTE: In order to authenticate connections you have to select
+> diff --git a/net/Kconfig b/net/Kconfig
+> index 62266eaf0e95..769880113740 100644
+> --- a/net/Kconfig
+> +++ b/net/Kconfig
+> @@ -92,9 +92,7 @@ source "drivers/dibs/Kconfig"
+>  source "net/xdp/Kconfig"
+>  
+>  config NET_HANDSHAKE
+> -	bool
+> -	depends on SUNRPC || NVME_TARGET_TCP || NVME_TCP
+> -	default y
+> +	def_bool SUNRPC || NVME_TARGET_TCP || NVME_TCP
+>  
+>  config NET_HANDSHAKE_KUNIT_TEST
+>  	tristate "KUnit tests for the handshake upcall mechanism" if !KUNIT_ALL_TESTS
 
-Signed-off-by: Oskar Ray-Frayssinet <rayfraytech@gmail.com>
-Acked-by: Dave Jiang <dave.jiang@intel.com>
----
-v4: Remove contact information as suggested by Dave Jiang,
-    keeping only the driver description
-v3: Keep driver description and contact information as
-    suggested by Dave Jiang
-v2: Also remove redundant boilerplate license text as
-    suggested by Stephen Hemminger
-v1: Add SPDX-License-Identifier tag only
+Thanks for the fix, I applied it to our drbd-next tree (which should end
+up in linux-next).
 
- drivers/net/ntb_netdev.c | 47 +---------------------------------------
- 1 file changed, 1 insertion(+), 46 deletions(-)
+I would prefer to squash these kinds of fixups to keep the history in
+our patch series clean.
+Arnd, does that work for you? How do you prefer we handle attribution?
 
-diff --git a/drivers/net/ntb_netdev.c b/drivers/net/ntb_netdev.c
-index fbeae05817e9..cf04aa5d2824 100644
---- a/drivers/net/ntb_netdev.c
-+++ b/drivers/net/ntb_netdev.c
-@@ -1,51 +1,6 @@
-+// SPDX-License-Identifier: GPL-2.0-only OR BSD-3-Clause
- /*
-- * This file is provided under a dual BSD/GPLv2 license.  When using or
-- *   redistributing this file, you may do so under either license.
-- *
-- *   GPL LICENSE SUMMARY
-- *
-- *   Copyright(c) 2012 Intel Corporation. All rights reserved.
-- *   Copyright (C) 2015 EMC Corporation. All Rights Reserved.
-- *
-- *   This program is free software; you can redistribute it and/or modify
-- *   it under the terms of version 2 of the GNU General Public License as
-- *   published by the Free Software Foundation.
-- *
-- *   BSD LICENSE
-- *
-- *   Copyright(c) 2012 Intel Corporation. All rights reserved.
-- *   Copyright (C) 2015 EMC Corporation. All Rights Reserved.
-- *
-- *   Redistribution and use in source and binary forms, with or without
-- *   modification, are permitted provided that the following conditions
-- *   are met:
-- *
-- *     * Redistributions of source code must retain the above copyright
-- *       notice, this list of conditions and the following disclaimer.
-- *     * Redistributions in binary form must reproduce the above copy
-- *       notice, this list of conditions and the following disclaimer in
-- *       the documentation and/or other materials provided with the
-- *       distribution.
-- *     * Neither the name of Intel Corporation nor the names of its
-- *       contributors may be used to endorse or promote products derived
-- *       from this software without specific prior written permission.
-- *
-- *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-- *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-- *   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-- *   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-- *   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-- *   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-- *   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-- *   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-- *   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-- *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-- *   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- *
-  * PCIe NTB Network Linux driver
-- *
-- * Contact Information:
-- * Jon Mason <jon.mason@intel.com>
-  */
- #include <linux/etherdevice.h>
- #include <linux/ethtool.h>
+Unfortunately I couldn't really find a clear precedence pattern for
+this, how is this usually handled?
+
 -- 
-2.43.0
+Christoph Böhmwalder
+LINBIT | Keeping the Digital World Running
+DRBD HA —  Disaster Recovery — Software defined Storage
 
 
