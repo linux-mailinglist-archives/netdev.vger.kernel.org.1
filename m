@@ -1,260 +1,272 @@
-Return-Path: <netdev+bounces-268884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268885-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QLD7IhVDumlTTgIAu9opvQ
-	(envelope-from <netdev+bounces-268884-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:15:49 +0100
+	id iD1oLLZGumlTTgIAu9opvQ
+	(envelope-from <netdev+bounces-268885-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:31:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 750752B63D8
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:15:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F4BD2B6658
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:31:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DF15C301BAB7
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 06:15:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C6BF23040331
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 06:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D19361DD6;
-	Wed, 18 Mar 2026 06:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE12363084;
+	Wed, 18 Mar 2026 06:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="dkkM65HB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d4X87I5d"
 X-Original-To: netdev@vger.kernel.org
-Received: from TYVP286CU001.outbound.protection.outlook.com (mail-japaneastazon11011070.outbound.protection.outlook.com [52.101.125.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0778434F462;
-	Wed, 18 Mar 2026 06:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.125.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773814545; cv=fail; b=clbNDy6CMyvZytpsoLJhH1kCqgZQcamkSJ51DKn33AiFEMTtJvNwXuYgTLdYd2LQeZhFrUOsKUaTJc0l1aIFfj6v55Un1oN6Z2F1ztjRiJj2PFVDjF7ce2QedXdBiGkPitlBlzDUeTp09pVSg4YdLQES552/wfL7t1bKkpT0ytg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773814545; c=relaxed/simple;
-	bh=lDk37z8BjtOkh7RHssIpQ/SyElNIP3lzbgiUJ3HvKTk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=f8PwEUIlLhJtApQTRG3THQccSuxmSRyDn7kip8/ZvAJgVFHoXZxyUe3ly1gMASpXA4ROFkbIxGXktj9bS6ACfV9XLeS2MhcdxB/GyMuMt65CSM9833cRTm30pqgMn+B3A0q/bWYAxvtEk5wwpJaphQ0MM3DaHCTy4s+ro9vx7UQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=dkkM65HB; arc=fail smtp.client-ip=52.101.125.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sWXrwvC5igsAzIzsD7lJc9CSj1t374DxNK1MBxkgjRKM1j93gYoEuSXuVgn141L/soMlayRmw+PA2TRHvtcmV2jJ3FIeWGa8wiPauYrR4/By2lJ1R2cV1wrRkQU8YmnY3yMuLGQwJlak/Tf2uN8dLNxmuX0/t/JwWCxcNuM1egRJYTckV5wDxJgKPUivMUj7qTHrGJfd8Bu0Yab8XheaUukyMnUpe6A2yAulD6Oz/v71zzQ8TFyb2HT3YHvMjWGz/cnfMbjiSuY4ZPsckeBK99eI5qW8AzELWj6IcNwv3JaxSCsn8qNxamaRN8HcXvA02l/fSBiXnKYdOa2fJzUGfA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lDk37z8BjtOkh7RHssIpQ/SyElNIP3lzbgiUJ3HvKTk=;
- b=SAmPK7po7hazdn0JlSt0487ucQNhU9v95AKlJv2VHAHvJuG47+lsOoHWkrGnSADc49bcEd+5xW66+DpUXApz7uPEwEUwBP7ki99WafacwhqZwA2KldH/txcrNBDmYTdmlgDefc0yAEwQKSAWBCRzIu/ovslg9kteyEeW91PqOBP5GSUTRQZ1TY61cdtfxLPpiFE5uc0ckDElooi5btfMMAk84Bl+eJT74dthsWKgcgvLUA/6gYt4QvdX5Y2ZaSlwCYRtR9nVIewSH0IlqfQ1s4cTPFGAEWKKrXlA0rm2U1gbyEK53gWu1PG2jwPpWOSu5AjMXddkThvGgQ3u/Th+wg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lDk37z8BjtOkh7RHssIpQ/SyElNIP3lzbgiUJ3HvKTk=;
- b=dkkM65HBPkRkZCIykh/O4GD/8hsK97hevnum1lNIgMoD5fm2OL4B1PJSPYiqHtuxwSbS3qAthyLL9HKJyzPhnaopxbMQP1oAvyL1S+kExP7Zx1KcOksxv51gHEbwwKf9XudXybB/82SaxGfjWGOYY+vVS5Wj1QjlqHBiNQyF5ys=
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com (2603:1096:405:20d::9)
- by TYCPR01MB11055.jpnprd01.prod.outlook.com (2603:1096:400:3a7::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Wed, 18 Mar
- 2026 06:15:41 +0000
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::655d:9c47:4499:eb3a]) by TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::655d:9c47:4499:eb3a%7]) with mapi id 15.20.9723.018; Wed, 18 Mar 2026
- 06:15:41 +0000
-From: Michael Dege <michael.dege@renesas.com>
-To: geert <geert@linux-m68k.org>
-CC: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next 06/13] net: renesas: rswitch: add forwarding
- rules for gwca
-Thread-Topic: [PATCH net-next 06/13] net: renesas: rswitch: add forwarding
- rules for gwca
-Thread-Index: AQHctfJOvmwg4AslEUKf0OXHYUUNB7Wy5pQAgADpwYA=
-Date: Wed, 18 Mar 2026 06:15:41 +0000
-Message-ID:
- <TY4PR01MB14282FBD742E25EDEDC519A2B824EA@TY4PR01MB14282.jpnprd01.prod.outlook.com>
-References: <20260317-rswitch_add_vlans-v1-0-3a57bfa0f2d1@renesas.com>
- <20260317-rswitch_add_vlans-v1-6-3a57bfa0f2d1@renesas.com>
- <CAMuHMdXKthoDYtNKimB6S8m+ukWQVMEOuLbZFkWrwqre4c1V5A@mail.gmail.com>
-In-Reply-To:
- <CAMuHMdXKthoDYtNKimB6S8m+ukWQVMEOuLbZFkWrwqre4c1V5A@mail.gmail.com>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY4PR01MB14282:EE_|TYCPR01MB11055:EE_
-x-ms-office365-filtering-correlation-id: daa25629-51f9-449e-9e9e-08de84b5c804
-x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|366016|38070700021|22082099003|18002099003|56012099003;
-x-microsoft-antispam-message-info:
- 0CZ8BNPPrTIDyMybHDWofcDsmycl5RY7727N4yklKwDh3pGDtoikG4fvdJP7hNlR+9saooOIyUQmFrwlgMDJS36IJjaXw2L2bQDDE+09YDttfBZyk7JKv9lh32ajPLr8DW8/Iorx0g1CyzEwBq6yHSixAzZMIzQU2nRRkRFEt4Hu09eEfS7vTfC9hcFvMbCk9yYjCMh4VLqKU7eh7NWrH8YvTr0nODUhHwMHm3KM143TIND4HrNTmezKObFnfJt8QcqvoCE6vhYrrDpSS/rtviMvOG5NUQE/natLshBS9POplKl7Vtfe+0/Japehvg3wjJxFE2x7Qo9L0OU77OEAGQa4spIuoeVpCEk8JXE4c2voa+JmLCE3xqtQo9pi2ZvwJlZmM6+ABwyhaWof/mfIDwS+lIt2ybheox9o6S/+3+M1vPNwoRwt30GUzQ6KRv6nBwjILvrOtW4B/Yk7DUDdBo4eVM1HapSrO3EEpX3QFYQs/wsyY3u05w9gC37IMT0PsmptXaQkg5sKjLVXpWkp628JRqCjLQsqqeBcpkM7Km6VfRCjbyO5E2JzTM5ysANfUn5wHQqw9MPBuOCLAN8dji2NKGLtVe6irwX6bz+x3+uAOAJjCukN/uMiMF3H13a5X5NblMmdg7z7eIhmhkQ99eLMFtNNC/mv/HdU3b8UtO5H+j6qtXQ9OhJtms/ow61VbcvGyyER18Kz83T+z5z8/P/7aLnHxaGixU9guNYAw3KJ9ZkzsaT0oe35ELx/1gwzREszuAQkO5fRdjZoXG/Q6fRpWiz/GU8GczNsT8+x/a8=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY4PR01MB14282.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?THNtTVIxUGZGUGFqWHliL1JRRmdPOEJJUmpNTDc1SFNXYXhGK0FoNFNqMUdM?=
- =?utf-8?B?Tnc0L3pKeWwrckhCZkhMc3o1WUVLMXdXTk9BZ3ZlVnlVbzFWam5CYng1MDVk?=
- =?utf-8?B?Zk9wT0FjQWVlUFY5N0Vha1FvMVVsc0F0VjZwZkdGYzBvdjhvYzBqTlVxSE5P?=
- =?utf-8?B?OHJJa2NsQVBSWDFQSlY4M28vRlB6SSt4Ykd3TkJCNWFkNTlJczl1YjB1MmtW?=
- =?utf-8?B?czA0RTkzdi92ajVmbGdhR0MwUkhmbWpaTGxxdVRiSUFNWjhVNE9uSlFReEo2?=
- =?utf-8?B?U0RzbG5VYzZBZG82T1BZdEdxL2phWFFiUEFXQmpyUU9ZQmxJODIxVlJqZVFE?=
- =?utf-8?B?cGJ0Z2VxelJralkraGhyMElsNkFQOXlSVys2VEpxYmE1cWI1TUdnRWdaYm54?=
- =?utf-8?B?VnloeEdOTzRLdFJ1K0FaOFpaaEN0THJHNmovZko0ZE5hYW9kTkZSV3pNVFBX?=
- =?utf-8?B?UVNMWG5uQ0FXVkNUM2Q2dUIxSmorSVdacWJvQXp1SVlPS3dNVkV3UjNpQjJU?=
- =?utf-8?B?eWFwNEhETFJ5Y0F0QkpDcDJ0b3A1V1V6SjNQM0RLbEJaZDVIQVJKU0VlSUdk?=
- =?utf-8?B?QW9mcDcvd1lyQlM1eEVwY2I0ZFBPUmhuTEFPSEdaR1RmdDZZOTFwYnRrUGQ0?=
- =?utf-8?B?MkRDN2JJeHNGVmZUTE5aR3FMZTJWN1NWRUU0SlVxYjM4VnozK2cwamRnQ2VD?=
- =?utf-8?B?QUxXN25BUloxYVFyRzhQRHg0OGVCUWk2UDk5TjB6dU9aYWNXcFBnbUhKL2ts?=
- =?utf-8?B?bUtkbit0Slk3VGxKdWVhUUxaSXROMGowN3VTSm9NNXZBQ25xaEtTcWFCRk1j?=
- =?utf-8?B?aVdhWDBVZUdmTTlSemdlVGphM1JsMG8rc0E0TVNrVE8yM3hZcHdlTERqbkhp?=
- =?utf-8?B?ZlpUT3RNZFpOcDBhN2ZOeHFqaTE0c2tTc3VYNVpLWGEwTlhYaGZ2Q25WWWVX?=
- =?utf-8?B?OFNYeTNycDQrY3M0YjJpSDlUYmlJRjUzTUhxOVl1OTdiR3ArM0RIMU96Yllj?=
- =?utf-8?B?QzZRSUw5cWg3R1VMVzBrMERVN0tBOXE2OFlkY0d3emdlclRxMjF3ckprM21i?=
- =?utf-8?B?cjBXeFhPVDdjcTEwVzZFZHNuU3R4N2FkQVZvMDRvNzl6SFNUWU81L0RvcGE5?=
- =?utf-8?B?ZHAwVmIxT21EYldYMmU1WW5KdmNSOE5jWFlPVHVRTmdvTFI3REFPREkrcmlC?=
- =?utf-8?B?Vkd0SjYzekprQ1NGdUEwZHpyOWRBa1I4cjIwMzA4TENqWERkZkRGZ0VSeDJO?=
- =?utf-8?B?RTdxeDlxdzlFcXZTaEYwNW5MVFpqc3hNSlBnbVdHZnFEVEhxeFhXa3E3L0FL?=
- =?utf-8?B?SXhyaWY1cjgzalM1eE1yS0VkVEcvZ3VWTGhpRXo0SnMvTnVQaEM0aVJsMngv?=
- =?utf-8?B?M2hYU0ZHN0lST3V6ZTB1YjdhVHJ3N1g0Q0ZpVHdJWWgzU0JIbURYRlFDSGlJ?=
- =?utf-8?B?QWpZbVBvZHdGb1JWdnVKb0VqeDlCeW5oTktTemY1QmZQWnNxMEwra0Z5eC9K?=
- =?utf-8?B?aVFmbzVjY0p0MGlMYmFDbWdYL0t2WmRqUFVUZ0wzK1dBZW1zaVQ4eG5tR1N2?=
- =?utf-8?B?SGZSa1c1RU5zYjVJZld5SEVTQkNRUis2N0VKMktBamU3b2p3ek1FNlFCdkNC?=
- =?utf-8?B?NWl2ZDJBZ0I3bFp2VEY4RTZFOEs1cWNLRE9Gc3daY0t0bXpERjdXZU5mdm5z?=
- =?utf-8?B?RjJibFczS3JMOXd1Rzg5ek5oTUJXaFJwVGtrYnBjQVpmUnA4YURZZnN2VlBj?=
- =?utf-8?B?eW1XZjdJUXRFZEhxN3hEa1VBUlgyVUtTdWIxeXpVK3pNbFdtb1pCTTJWQXBQ?=
- =?utf-8?B?enY0UGQ1TjNIK3BBOThCWEc3T1lmakVDbXNRWm9qWlQybldYYUNQVy9vWEpp?=
- =?utf-8?B?a3AzTlE1bDQ2djZ0d3lxeE5GZEdxNnBkVG5ORGVZM3RRQ2EzbXQ0RVkwRmZl?=
- =?utf-8?B?R2lBbEhUN0JKT1FVT3RkYXlxQWh3V3pWR25la2lkYTcvRUd6bGtRTzVVMDAr?=
- =?utf-8?B?YlRoOUpaa1JyVnJPQ3BrUzZCUFJpVFF3WjNCTHN5bndJcVF2OHhBN2Rndzd5?=
- =?utf-8?B?ekxnTmtZU0FlRjgwNTBDd1FmeHIvb25qU2pUd1JCcVpoTGZjM05FMjkzY3NU?=
- =?utf-8?B?cCswck1Nc2ZrdFZ0Q2VwNG1DbENkQnZvQldSTFE5OXlVRHM0clpqQVpFU2ZD?=
- =?utf-8?B?eG1WK2dhUktVSWxFSlRyMVJzKzg4WE5wcmhPV3lQVVJGSVVzdDJ5ZFc4QkRK?=
- =?utf-8?B?TlNXQjRTWlY4bTBsM3pnREVaY3ljWHFnaFN6czNZS3M4OUN1bmxTSVMwRDFR?=
- =?utf-8?B?Yy9Yd1d2bnoxL1V1OUM4M3VBbXF2WmhiZkFvSjgzVCt0RjVmMCswdz09?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B21366DD9
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 06:31:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773815473; cv=none; b=kerFkCUBgjeOt9836IaIGTFBJjYrWmtvWvHn+aoh4KzLqbrJIDsOW+hviAd/AAiSR0amXch8tDkgYOwyE25v4FIrMG1aYHCSJTL6mct2MTWxyfttp6aW8wo+ZvqTAgx5pcCka5vLCXGQO34llI1dA+VVNicUZT1mmgMfCICWcjY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773815473; c=relaxed/simple;
+	bh=F9cHhWJXb3kHOhBeKBznjA0MZ+sKCxw3//7ZAbHZqyY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q3rwev2Poj4HL+/Alxv3sDANeQiM4b3lkqcjUStRUYj4y2ih9D/xm+hW58c937uUqkBTKoFAMXTtwEUv3iNkhA7FH0+GGIQ0/Lc45krpTTBM1MDHI+7N8sk4ne5qb0VOWWGoj53tZHrbszdLogNk5gMMxrDo0lsyWWwGPQJPiw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d4X87I5d; arc=none smtp.client-ip=74.125.82.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-128d7db88b9so7960663c88.0
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 23:31:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773815471; x=1774420271; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7mjfeB+QehGWxy6pvDSqDvx3PHWjcskLwFx02+x66yE=;
+        b=d4X87I5d4oZX9BeGt42R5MOijiO2+O8lZMhZJAHzdg+hLb6CAPJLi+x5sSTclaV2rT
+         G6tUD/A+kE6oZyDorF6qWelFEdOzFF8/uODylTfharZBioAwalJ+s3GDe58rV6FtTQSC
+         edx1mQfuuNyh87f2XaPIK9OapXY0TPFAAW5M0+MKsmrsjKs07SrWiHGgRTx3qrE5qXim
+         gCErGPzHH+DGrmOQRZNfMK5wD7VmzFMPmlnyHNVt+tMiq0DLMw9H90W3w/T76uF8Y/pP
+         iP4qSSfxuNzMLtXGtH2HerhiMze2cQhS97s0Ax6mETV+Pe7SzZOlqwLEJCqaK+5Ob8jB
+         k5NA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773815471; x=1774420271;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7mjfeB+QehGWxy6pvDSqDvx3PHWjcskLwFx02+x66yE=;
+        b=U5vEvJPjmRlzSBZSTukOE6nNRv6/rsia9kHeGmm2gI4BYvF4ag/Lkm6KYqiwP6fk2C
+         KDeao8AAs+ZrZ4AEqSLJ0kTprpcQ7+j9dL2EcuDxJ6bQ7Is6yq8ijLvf7PfLh+ID0nhQ
+         4Cl4oJIvLGSv0Z6sPJrLorz5+cGdn/3xfRvQDOjYz3lW4GH3HZsOuOhHkL/wvT/ZEU3x
+         2wCN0mgAAgx4Ll093Jnl1j2NjWXvw2WyUFvZYOF7gX4GV5BOEpR1EMD3FO4ouh5Burqc
+         DBBf8jDdfysJfrtcmeX3gTz8ZkRvApOdLn0fJ6BvvPwxBWeIzRt0jNNYA55h/huRtkFh
+         uVSw==
+X-Gm-Message-State: AOJu0YztrN8wtJeklhEHA3s8R1b4hWZKnydb7/7/toluX23iJUA0CHsU
+	kFJPZDi+K0Cyp0yk5CII5Zb1rWwUzemHzXFDOqNXM1NHYshJKeI08MoQ
+X-Gm-Gg: ATEYQzwLa31U2cXHtkT1xemPCyzO0U6QNYKmq6qC+VDiAn0kskgKOX5+VCwBOuE/mzh
+	KprXmPC2lkpR0LuK/ql93njHusbMQaCns1ziR11kHs5EhL7jhCfyGuvvXlwgfZ0fnGMSjRzyAzZ
+	rkmSRuj9fg6l/fTjkwnLayUsRie2/Sm+WSPmBcM3bjI7p4lxLXFtt0+2L0Yk1jv7v1+pqkzxzxa
+	WTiJ/Vnp/lV+9zlOvPqjRNNUtST9mjFdDzpcEU+P22uNAjc4yFZjQVIfBOpK0eo1hhadFRbqNvo
+	sCEh8yhAgk1XQBxX6SZUcIqgT2NU4V7JiSB0wpp0VvqlgG/+0oz7Lx2BF/3LI/RBqp9ZBN0a7Kf
+	SGrwZf5okuUy1NiqZ9OIjpe97c6hWasI/YU1hGBGkL9eb6Wb/1BvWxkHoTgF+1MU00FoNRavesB
+	iVXSjqEM2DCYrKVN6bek4=
+X-Received: by 2002:a05:7022:51b:b0:128:d4be:7418 with SMTP id a92af1059eb24-129a714bc7bmr1050843c88.35.1773815470580;
+        Tue, 17 Mar 2026 23:31:10 -0700 (PDT)
+Received: from pek-khao-d3 ([128.224.246.2])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-129a723f9d7sm2347316c88.2.2026.03.17.23.31.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Mar 2026 23:31:09 -0700 (PDT)
+Date: Wed, 18 Mar 2026 14:31:03 +0800
+From: Kevin Hao <haokexin@gmail.com>
+To: =?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
+Cc: netdev@vger.kernel.org, Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+	Harini Katakam <harini.katakam@amd.com>, stable@vger.kernel.org
+Subject: Re: [PATCH net 2/2] net: macb: Protect access to net_device::in_ptr
+ with RCU lock
+Message-ID: <abpGpxaFECLpGMzz@pek-khao-d3>
+References: <20260315-macb-irq-v1-0-0154104cbf61@gmail.com>
+ <20260315-macb-irq-v1-2-0154104cbf61@gmail.com>
+ <DH4EHTJNY6GL.3EXTP61HNUNDD@bootlin.com>
+ <abit7VLwoy2ttEus@pek-khao-d3>
+ <DH56GCWA9O1K.1KYOVK5RL00JC@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY4PR01MB14282.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: daa25629-51f9-449e-9e9e-08de84b5c804
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Mar 2026 06:15:41.2326
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6QSF6+VNrPhuSyiTLUSqgNtQRMMzWc6V9z0sEce61sXr80HvL1NLW3FC/RvtXC5OBOD9RI+G5hrhFyVaONOG52zqpI7CA1eQQ1xFDrp1y1c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYCPR01MB11055
-X-Spamd-Result: default: False [2.44 / 15.00];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="EH2RervoWIbhLwfW"
+Content-Disposition: inline
+In-Reply-To: <DH56GCWA9O1K.1KYOVK5RL00JC@bootlin.com>
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[renesas.com,none];
-	R_DKIM_ALLOW(-0.20)[renesas.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268884-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268885-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.dege@renesas.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[renesas.com:+];
+	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,TY4PR01MB14282.jpnprd01.prod.outlook.com:mid,renesas.com:dkim,renesas.com:email,linux-m68k.org:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 750752B63D8
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 2F4BD2B6658
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-SGVsbG8gR2VlcnQsDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogR2Vl
-cnQgVXl0dGVyaG9ldmVuIDxnZWVydEBsaW51eC1tNjhrLm9yZz4NCj4gU2VudDogVHVlc2RheSwg
-TWFyY2ggMTcsIDIwMjYgNToxNSBQTQ0KPiBUbzogTWljaGFlbCBEZWdlIDxtaWNoYWVsLmRlZ2VA
-cmVuZXNhcy5jb20+DQo+IENjOiBZb3NoaWhpcm8gU2hpbW9kYSA8eW9zaGloaXJvLnNoaW1vZGEu
-dWhAcmVuZXNhcy5jb20+OyBBbmRyZXcgTHVubiA8YW5kcmV3K25ldGRldkBsdW5uLmNoPjsgRGF2
-aWQNCj4gUy4gTWlsbGVyIDxkYXZlbUBkYXZlbWxvZnQubmV0PjsgRXJpYyBEdW1hemV0IDxlZHVt
-YXpldEBnb29nbGUuY29tPjsgSmFrdWIgS2ljaW5za2kgPGt1YmFAa2VybmVsLm9yZz47DQo+IFBh
-b2xvIEFiZW5pIDxwYWJlbmlAcmVkaGF0LmNvbT47IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7IGxp
-bnV4LXJlbmVzYXMtc29jQHZnZXIua2VybmVsLm9yZzsgbGludXgtDQo+IGtlcm5lbEB2Z2VyLmtl
-cm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQQVRDSCBuZXQtbmV4dCAwNi8xM10gbmV0OiByZW5l
-c2FzOiByc3dpdGNoOiBhZGQgZm9yd2FyZGluZyBydWxlcyBmb3IgZ3djYQ0KPiANCj4gSGkgTWlj
-aGFlbCwNCj4gDQo+IE9uIFR1ZSwgMTcgTWFyIDIwMjYgYXQgMTA6NDUsIE1pY2hhZWwgRGVnZSA8
-bWljaGFlbC5kZWdlQHJlbmVzYXMuY29tPiB3cm90ZToNCj4gPiBBZGQgcnVsZXMgdG8gZm9yd2Fy
-ZCBwYWNrZXRzIGZyb20gdGhlIEV0aGVybmV0IHBvcnRzIHRvIHRoZSBDUFUgcG9ydA0KPiA+IChH
-V0NBKSB1c2luZyBMMiBmb3J3YXJkaW5nIGluc3RlYWQgb2YgcG9ydCBmb3J3YXJkaW5nLg0KPiA+
-DQo+ID4gU2lnbmVkLW9mZi1ieTogTWljaGFlbCBEZWdlIDxtaWNoYWVsLmRlZ2VAcmVuZXNhcy5j
-b20+DQo+IA0KPiBUaGFua3MgZm9yIHlvdXIgcGF0Y2ghDQo+IA0KPiA+IC0tLSBhL2RyaXZlcnMv
-bmV0L2V0aGVybmV0L3JlbmVzYXMvcnN3aXRjaF9sMi5jDQo+ID4gKysrIGIvZHJpdmVycy9uZXQv
-ZXRoZXJuZXQvcmVuZXNhcy9yc3dpdGNoX2wyLmMNCj4gPiBAQCAtOTMsMTAgKzkzLDM2IEBAIHN0
-YXRpYyB2b2lkIHJzd2l0Y2hfdXBkYXRlX2wyX2h3X2ZvcndhcmRpbmcoc3RydWN0IHJzd2l0Y2hf
-cHJpdmF0ZSAqcHJpdikNCj4gPiAgICAgICAgIH0NCj4gPiAgfQ0KPiA+DQo+ID4gK3N0YXRpYyB2
-b2lkIHJzd2l0Y2hfdXBkYXRlX2wyX2h3X2ZvcndhcmRpbmdfZ3djYShzdHJ1Y3QNCj4gPiArcnN3
-aXRjaF9wcml2YXRlICpwcml2KSB7DQo+ID4gKyAgICAgICBzdHJ1Y3QgcnN3aXRjaF9kZXZpY2Ug
-KnJkZXY7DQo+ID4gKw0KPiA+ICsgICAgICAgaWYgKHByaXYtPm9mZmxvYWRfYnJkZXYpIHsNCj4g
-PiArICAgICAgICAgICAgICAgcnN3aXRjaF9tb2RpZnkocHJpdi0+YWRkciwgRldQQzAoQUdFTlRf
-SU5ERVhfR1dDQSksDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDAsIEZXUEMw
-X01BQ1NTQSB8IEZXUEMwX01BQ0RTQSB8DQo+ID4gKyBGV1BDMF9NQUNSVURBKTsNCj4gPiArDQo+
-ID4gKyAgICAgICAgICAgICAgIHJzd2l0Y2hfZm9yX2FsbF9wb3J0cyhwcml2LCByZGV2KSB7DQo+
-ID4gKyAgICAgICAgICAgICAgICAgICAgICAgcnN3aXRjaF9tb2RpZnkocHJpdi0+YWRkciwgRldQ
-QzIocmRldi0+ZXRoYS0+aW5kZXgpLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIEZJRUxEX1BSRVAoRldQQzJfTFRXRlcsIEJJVChBR0VOVF9JTkRFWF9HV0NBKSks
-DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgMCk7DQo+ID4gKyAg
-ICAgICAgICAgICAgIH0NCj4gPiArICAgICAgIH0gZWxzZSB7DQo+ID4gKyAgICAgICAgICAgICAg
-IHJzd2l0Y2hfbW9kaWZ5KHByaXYtPmFkZHIsIEZXUEMwKEFHRU5UX0lOREVYX0dXQ0EpLA0KPiA+
-ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBGV1BDMF9NQUNTU0EgfCBGV1BDMF9NQUNE
-U0EgfCBGV1BDMF9NQUNSVURBLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAw
-KTsNCj4gPiArICAgICAgICAgICAgICAgcnN3aXRjaF9mb3JfYWxsX3BvcnRzKHByaXYsIHJkZXYp
-IHsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICByc3dpdGNoX21vZGlmeShwcml2LT5hZGRy
-LCBGV1BDMihyZGV2LT5ldGhhLT5pbmRleCksDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgMCwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBGSUVMRF9QUkVQKEZXUEMyX0xUV0ZXLCBCSVQoQUdFTlRfSU5ERVhfR1dDQSkpKTsNCj4g
-PiArICAgICAgICAgICAgICAgfQ0KPiA+ICsgICAgICAgfQ0KPiA+ICt9DQo+IA0KPiBUaGlzIGxv
-b2tzIGEgYml0IGhhcmQgdG8gcmVhZDogYXJlIHRoZSBiaXRmaWVsZCB2YWx1ZXMgaW4gdGhlIHR3
-byBicmFuY2hlcyB0aGUgc2FtZSBvciBub3Q/DQo+IA0KPiBJIGNhbWUgdXAgd2l0aCB0aGUgZm9s
-bG93aW5nLCB3aGljaCBhdm9pZHMgZHVwbGljYXRpb24gb2YgdGhlIGZpZWxkIHZhbHVlcywgYW5k
-IG9mIHRoZSBjb250cm9sIGxvZ2ljLA0KPiBidXQgSSBhbSBzdGlsbCBub3QgMTAwJSBoYXBweSB3
-aXRoIGl0Og0KPiANCj4gICAgIHUzMiBmd3BjMF9jbHIsIGZ3cGMwX3NldCwgZndwYzJfY2xyLCBm
-d3BjMl9zZXQ7DQo+IA0KPiAgICAgZndwYzBfY2xyID0gZndwYzBfc2V0ID0gRldQQzBfTUFDU1NB
-IHwgRldQQzBfTUFDRFNBIHwgRldQQzBfTUFDUlVEQTsNCj4gICAgIGZ3cGMyX2NsciA9IGZ3cGMy
-X3NldCA9IEZJRUxEX1BSRVAoRldQQzJfTFRXRlcsIEJJVChBR0VOVF9JTkRFWF9HV0NBKTsNCj4g
-ICAgIGlmIChwcml2LT5vZmZsb2FkX2JyZGV2KSB7DQo+ICAgICAgICAgICAgIGZ3cGMwX2NsciA9
-IGZ3cGMyX3NldCA9IDA7DQo+ICAgICB9IGVsc2Ugew0KPiAgICAgICAgICAgICBmd3BjMF9zZXQg
-PSBmd3BjMl9jbHIgPSAwOw0KPiAgICAgfQ0KPiANCj4gICAgIHJzd2l0Y2hfbW9kaWZ5KHByaXYt
-PmFkZHIsIEZXUEMwKEFHRU5UX0lOREVYX0dXQ0EpLCBmd3BjMF9jbHIsIGZ3cGMwX3NldCk7DQo+
-IA0KPiAgICAgcnN3aXRjaF9mb3JfYWxsX3BvcnRzKHByaXYsIHJkZXYpIHsNCj4gICAgICAgICAg
-ICAgcnN3aXRjaF9tb2RpZnkocHJpdi0+YWRkciwgRldQQzIocmRldi0+ZXRoYS0+aW5kZXgpLCBm
-d3BjMl9jbHIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZ3cGMyX3NldCk7DQo+ICAg
-ICB9DQo+IA0KPiBDYW4gdGhpcyBiZSBpbXByb3ZlZD8NCg0KVGhhbmsgeW91IHZlcnkgbXVjaCBm
-b3IgeW91ciBjb21tZW50LiBJIHdpbGwgcmV3b3JrIHRoZSBmdW5jdGlvbiBhbmQgcmUtc2VuZCBp
-dC4NCg0KQmVzdCByZWdhcmRzLA0KDQpNaWNoYWVsDQoNCj4gVGhhbmtzIQ0KPiANCj4gR3J7b2V0
-amUsZWV0aW5nfXMsDQo+IA0KPiAgICAgICAgICAgICAgICAgICAgICAgICBHZWVydA0KPiANCj4g
-LS0NCj4gR2VlcnQgVXl0dGVyaG9ldmVuIC0tIFRoZXJlJ3MgbG90cyBvZiBMaW51eCBiZXlvbmQg
-aWEzMiAtLSBnZWVydEBsaW51eC1tNjhrLm9yZw0KPiANCj4gSW4gcGVyc29uYWwgY29udmVyc2F0
-aW9ucyB3aXRoIHRlY2huaWNhbCBwZW9wbGUsIEkgY2FsbCBteXNlbGYgYSBoYWNrZXIuIEJ1dCB3
-aGVuIEknbSB0YWxraW5nIHRvDQo+IGpvdXJuYWxpc3RzIEkganVzdCBzYXkgInByb2dyYW1tZXIi
-IG9yIHNvbWV0aGluZyBsaWtlIHRoYXQuDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgLS0gTGludXMgVG9ydmFsZHMNCg0K
+
+--EH2RervoWIbhLwfW
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Mar 17, 2026 at 04:54:11PM +0100, Th=E9o Lebrun wrote:
+> On Tue Mar 17, 2026 at 2:27 AM CET, Kevin Hao wrote:
+> > On Mon, Mar 16, 2026 at 06:59:35PM +0100, Th=E9o Lebrun wrote:
+> >> On Sun Mar 15, 2026 at 12:44 PM CET, Kevin Hao wrote:
+> >> > @@ -5915,13 +5915,16 @@ static int __maybe_unused macb_suspend(struc=
+t device *dev)
+> >> > =20
+> >> >  	if (bp->wol & MACB_WOL_ENABLED) {
+> >> >  		/* Check for IP address in WOL ARP mode */
+> >> > +		rcu_read_lock();
+> >> >  		idev =3D __in_dev_get_rcu(bp->dev);
+> >> >  		if (idev)
+> >> >  			ifa =3D rcu_dereference(idev->ifa_list);
+> >> >  		if ((bp->wolopts & WAKE_ARP) && !ifa) {
+> >> >  			netdev_err(netdev, "IP address not assigned as required by WoL w=
+alk ARP\n");
+> >> > +			rcu_read_unlock();
+> >> >  			return -EOPNOTSUPP;
+> >> >  		}
+> >> > +
+> >> >  		spin_lock_irqsave(&bp->lock, flags);
+> >> > =20
+> >> >  		/* Disable Tx and Rx engines before  disabling the queues,
+> >> > @@ -5963,6 +5966,7 @@ static int __maybe_unused macb_suspend(struct =
+device *dev)
+> >> >  			tmp |=3D MACB_BFEXT(IP, be32_to_cpu(ifa->ifa_local));
+> >> >  		}
+> >> >  		spin_unlock_irqrestore(&bp->lock, flags);
+> >> > +		rcu_read_unlock();
+> >> > =20
+> >> >  		/* Change interrupt handler and
+> >> >  		 * Enable WoL IRQ on queue 0
+> >>=20
+> >> Instead of making the RCU critical section extend so much, you could
+> >> dereference ifa->ifa_local into a stack variable. In particular, it
+> >> would avoid the RCU critical section covering a spinlock critical
+> >> section.
+> >
+> > I initially considered using a local variable before submitting this, a=
+s I also
+> > believe that `ifa->ifa_local` is unlikely to be modified or freed in th=
+is
+> > context. However, I ultimately decided to protect these sections with R=
+CU for
+> > the following reasons:
+> >
+> > - It is logically more consistent to protect access to `ifa->ifa_local`=
+ with
+> >   RCU locking.
+> >
+> > - For section already under spinlock protection, adding RCU locking int=
+roduces
+> >   negligible overhead, especially in a scenario like this.
+> >
+> > That said, I do not have a strong preference for either approach. If yo=
+u prefer
+> > using a local variable to keep the RCU region shorter, I can prepare a =
+v2 with
+> > that change.
+>=20
+> I was not questioning whether this region should be protected, but
+> rather how long you made the RCU critical section. The smaller the
+> better, especially if you can remove a spinlock from it.
+>=20
+> On PREEMPT_RT kernels it could even cause trouble because spinlocks
+> become sleep-able and that is not allowed inside RCU read-side critical
+> section.
+
+I'm a bit confused by this comment. As you know, the ndo_start_xmit() callb=
+ack
+is executed in a context where the RCU lock is acquired. Many network drive=
+rs
+use spinlocks in their ndo_start_xmit() callbacks. Am I missing something o=
+bvious?
+
+>=20
+> So yes, I do insist that a tiny RCU is better; something like:
+>=20
+> static int macb_suspend(struct device *dev)
+> {
+> 	u32 ifa_local;
+>=20
+> 	// ...
+>=20
+> 	if (bp->wol & MACB_WOL_ENABLED) {
+> 		/* Check for IP address in WOL ARP mode */
+> 		rcu_read_lock();
+> 		idev =3D __in_dev_get_rcu(bp->dev);
+> 		if (idev)
+> 			ifa =3D rcu_dereference(idev->ifa_list);
+> 		if (ifa)
+> 			ifa_local =3D be32_to_cpu(ifa->ifa_local);
+> 		rcu_read_unlock();
+>=20
+> 		if ((bp->wolopts & WAKE_ARP) && !ifa) {
+> 			netdev_err(netdev, "IP address not assigned as required by WoL walk AR=
+P\n");
+> 			return -EOPNOTSUPP;
+> 		}
+>=20
+> 		// ...
+> 	}
+>=20
+> 	// ...
+> }
+
+Will reduce the scope of RCU lock in v2. Thanks, Lebrun.
+
+Thanks,
+Kevin
+
+--EH2RervoWIbhLwfW
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEHc6qFoLCZqgJD98Zk1jtMN6usXEFAmm6RqcACgkQk1jtMN6u
+sXHXvAgAlFNTSrFAIlrzgOF5y/xJOsfvyMqnJD9J8eE6UQNtUm8mkF3k0RD3HMW3
+DqUXlUnn2RYGZ7gYwG08mbHF25gc+YiBTCDeErkF2vYRpZv/P+2BqlXlhQX6afpy
+Qn9wjdPhhvb+ed4lIVd48AR/52Y4u1HwLpH1lxg903MoNRwoWSHFKfi5EMn+0J+W
+IdyYkhGCxcqaWZ1qrlpS1altwwvwS5882sOLGvW/zLk7yJLs82uznK181uxlopor
+54ijlCgQb75qvVpPojXFIxd60vELMA4MULL9vhOVhEnAlfaZPcWUTtZ+RzXuyrS2
+sGjBM6HQphSxTFUFpcjZw5dlrqJ12A==
+=AN7D
+-----END PGP SIGNATURE-----
+
+--EH2RervoWIbhLwfW--
 
