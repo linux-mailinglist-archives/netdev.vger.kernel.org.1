@@ -1,204 +1,135 @@
-Return-Path: <netdev+bounces-268981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268982-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8IqTKByKumnSXgIAu9opvQ
-	(envelope-from <netdev+bounces-268981-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 12:18:52 +0100
+	id 6OnkICSKumnSXgIAu9opvQ
+	(envelope-from <netdev+bounces-268982-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 12:19:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A9582BAB08
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 12:18:51 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85D7E2BAB17
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 12:18:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 234B3325F4D8
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:06:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4DEDE3004434
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:18:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD4A39446D;
-	Wed, 18 Mar 2026 11:05:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025C23A5E76;
+	Wed, 18 Mar 2026 11:18:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fm9ViXu7"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="AO2RpScD";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bQYbW7vy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8CA8479
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 11:05:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773831925; cv=pass; b=FerHDyx1acCxqXts5lTQ6i8nzlBYKYUCrLS0V2wS6sx6Fif97LyhhTMjs/nO2kzYD0dp9RwzOxfeAMPaboPh1ylCXAcRaYWwtHoaKNnKkOr4uSjR8NlUp3Q/2y9quFfZA6ZwAE2hCZfN7BCixytk5qFpt0WqUQvlT930wqRh+Tc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773831925; c=relaxed/simple;
-	bh=9bLFN0CG/Yj3eRltICeUp7o159ganRlK/LDV39wkSVg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pY7Nf8NT+74q946ZBEjgoevA0RBnZq2OWn9lPrs3eTEiCPHZfWFU3fBvqYajsOPEVWoq2JT6W/RZoGPBrNcvLRU6iyg/B+FnzJ48ZyerZ8f8F++tKgRvnpbaaquCGdYwhASXw/AyVWeiNUXAs5N4WIpW1HU3xhs8h31PhqpZkQ8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fm9ViXu7; arc=pass smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-79a7109f568so9399847b3.1
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 04:05:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773831923; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AnD+38fyzQ6JylYm2yWIelk+l8JcQ0jtIDxJ1KIRfJ0gOpbTSLqCY79/c5vPYwQlv+
-         hrY9Ly/DVJpsZIfxWXZmHyz8OYvKxBgDEplebs9r2pbp4Egn/wfhYY9BF+lpFRqspvtz
-         Pw/PTXVNYPnTHuFZ5fwd+2MyMXKJQ1NUlsxrl2UNjmecDePM7YgYUIgpeZxYLlXX+552
-         o9JL0tVpe6bN+hWnSHiPjxrwdQ0bRZweSRTapowh2CdxqWS8yn0XmSo2yFtZa6Inq6qn
-         DM3eDIqQzcYZKGjj8Pn0RFwXhvFJCdnf3ws/9JFQH3ZOmSGy2qTUG9M3s9T8tf3Goxkb
-         XAFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=9bLFN0CG/Yj3eRltICeUp7o159ganRlK/LDV39wkSVg=;
-        fh=gGDQVB/bTuYrgeyRVjApPl1TvUaWtHl31Lid+tFsHZk=;
-        b=D7csxTdwIUb5J/KUKba4hKI4NM1Cu5sLW4Wdo+go9+DHbU5HYhZ0cRYj0g2v31DCs4
-         f4YrwAeMMka35K4f+FEh2V2zPV3pfdLgN0NQEA3wHMM22CiYuecLwq/gViLz7YUL63+6
-         bq21KC5JUDfB5d/Brgfi2L73vPjvTSMvQ79F90x9I4HRDaS6MhlepH60sQILWnLSQYT2
-         E15dxTthu90Q4OrXnL0QILTX4+Ayrpm7EJWZE9qD2BJ0Q6u4+noATaMi4e8E+Jt6G0KH
-         sR0gmhep9RvJLkkxyOU1r8+m7b1cOA8ADy6YHVsAEuaSiRgn5gWQzr9cPFrulQ6S0Wf8
-         EF+A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773831923; x=1774436723; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9bLFN0CG/Yj3eRltICeUp7o159ganRlK/LDV39wkSVg=;
-        b=Fm9ViXu7BftrBypVTFQtbMf0eEdwDaTUfr/NStcgxMcRtCDYTAMcelj/9g/pVBlMQZ
-         Z25ucqtdiPOugxSAiglddD7uw949ncc4jlj1Uhr9C6iACbvNFukov3litb6RlW5/hewN
-         7fUR+p5BQFqOd2kjDd5osCdLnCIEI++wpfSMhVuixssPFJExhy/GvQIqqak0ulC8hsme
-         UkiKK7I9ZSgwP0Mgp7XapnKSxiJ/JckFtKdXiSVXfVCO0cwKCl2up5grGijadOo84Y/x
-         7qeAhHBugxswoWcbWLJABtSGqyjmPGxsfbJdIEYOwQKzd5Z2033AFXd9qhfY7kGnOnW8
-         wm7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773831923; x=1774436723;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9bLFN0CG/Yj3eRltICeUp7o159ganRlK/LDV39wkSVg=;
-        b=YuFIGnoqPTk56d3aJnwwxQ+nmuaVcaHA04bTNYrqmkEXYrNyvTq2zMIIwF6M2fsIpU
-         P+VULpUj8sC+gR/7x5hupwrTnTD8Z0eqsiSKeuU3qtRYISaH9VqwyXfnF17MAhq4QuEo
-         cWLcfUo19eApxjYMGkTqpch9E0VG4NrUOOJg1JAJSmO0JzUifbPfqEDPbYkcvvnP8UuB
-         Nwe70jWpz68pV5Ffjay8H/lbGFT+eZmXWKolRBCnrFz5HQrX3DEAixhxWIYnzUnNLK7r
-         6YZ42zz6w38T6JQvFVGP6PMyhvAmaS4Yh4BOx7epjp1qDE8kauVr7W7EPji8A89ATwO8
-         T/gQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVW3lNYytCC40mHeRrdohchrJXMiHZmEIgLNxeT8ZQK8wpdn+pwzCRmrkoXMStBprwTxyEmzWI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBpJ07l6uiiIwFTVHPbM84DK8WL5oYwb6QTuDQat1GOa3w8W8+
-	dzDLOwE/zrr47S69jk6Ba5MTUbOj8ctmWo4QywnzI0jBPuW9u0/HnJPC9YyV5LY6KEdSAZsWvoV
-	s9K2PKMayNd3tR2NZ6ZFgwCvVF/FFj8M2jw==
-X-Gm-Gg: ATEYQzyR+kPXKJv8pvZW+AB3LgDk36uI+Ft24MEHjps6lMI+PcYKu4foxGcs28WIx0e
-	A9RnIb4br33JIzyELszeIC6zkyQXJ/HQRneDpfOujkgkKODVpxh1dYec7mG8fnZXhNMfq6HZtpZ
-	gJpFui4y0rqL+G7KUhpjKdK6ZD65K4MI8fhPfXlgQ64zqzwYnBjy0MNtzCZVRFkd1JAFJZakiZt
-	NnfQ2nHubFk85xi59rctDtQNtIIqvC0oDK90rNKYm6IVxGEkkB2FqIg5LZ3k77pVkWbRcWN8cOK
-	AvVqlzm3
-X-Received: by 2002:a05:690c:6e87:b0:79a:4fe4:ff60 with SMTP id
- 00721157ae682-79a71be742fmr26442267b3.35.1773831923259; Wed, 18 Mar 2026
- 04:05:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8383A5E71;
+	Wed, 18 Mar 2026 11:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773832732; cv=none; b=DDDZUtNH+NfsrY996i4suk4akV7Njbs5buDTy5UjEtJYB9sp6fcbVcmq4KKKZxq1CpdmNxKNKzXsGHFLsZ4B9N1IONM1XW2OHEtfLxP9usm2HfrcPjhaU0hUSyhYNGXeX0ob+1vQbjt5Jz90YDtVqjvKRncejHxijxp+ZiAHCsQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773832732; c=relaxed/simple;
+	bh=bJe0PYpyRjHukT9qLOBVKaNIzLteT/yA64kVgxBFI00=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TBvgs3ErozLAJw4NlCdvtGJuGmcxZyRc6p++0ZfzaDdLDlCkKrcvCNfVDY/Pk/DLWpJgydA43R6TCVDmgs8P4FrLisfOzFJSTA/UT1W8++pQvMcEZbDQ8OOesgT4HxWAsorWIgX8HsaeeJD/Sv/7o9kSrr7EW7UeEPx0fc+0jjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=AO2RpScD; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=bQYbW7vy; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 18 Mar 2026 12:18:49 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1773832730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JxaCdQ0lQZu2iwO4iw6e+PL/8HdlRXgvCeHY4BHJs9E=;
+	b=AO2RpScDqME6HxDyDfxEULxFreHHNu2Ir9bQdUO8E0nV8OJNmNl/pFcc6B/QoqsVvJnkwf
+	SKvXttrKxRO3Axd+hMY7/btc4lIhcw/qllkuJvYZbcKZomkAmUdFkTSp8J9gNNieky71Ix
+	jRXTuipy2SV6+KGJNUa9DfHbKCjdzI7z47y4OM70Ajk4lT9A00MlRI0lPjs9Ugkf/AYje2
+	rWq1nqAAZgnWp5vtlbReqY7XvlhGNKONH9OYEKuu6oq+YPD2VhAlPxM/+a1LdtgdE70kQr
+	mBJFWQPsQ4v0Ox11/X17iirIVpIMBrmHB6CA712uA2obCnRo86M0Dok1jbIi/w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1773832730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JxaCdQ0lQZu2iwO4iw6e+PL/8HdlRXgvCeHY4BHJs9E=;
+	b=bQYbW7vyenNb1Uaq+9z2eUwImWSM2hgVT6+UrWJzC7T8vQRHrksoiLtjok/6FG1idaL8V0
+	6U1CAoX+zei2WJBw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Daniel Vacek <neelx@suse.com>
+Cc: edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev, netdev@vger.kernel.org,
+	spasswolf@web.de, tglx@linutronix.de
+Subject: Re: "Dead loop on virtual device" error without softirq-BKL on
+ PREEMPT_RT
+Message-ID: <20260318111849._MMol8Hr@linutronix.de>
+References: <80114792206dc00d0099f00999a209e717debb12.camel@web.de>
+ <20260217095700.SjYjM8RO@linutronix.de>
+ <4fba57892e5bd6a1afc4a36a80b40e3ecc28cac5.camel@web.de>
+ <fd609cfe186ee48e0e9a08e35764175a2516dd14.camel@web.de>
+ <2369ba83d204290dcfe157aed3f943206213b979.camel@web.de>
+ <aa02f39ec4640c9d98963f42121b76e59b58371d.camel@web.de>
+ <20260218073036.AlkNRoAP@linutronix.de>
+ <ae213d2b908e46d34856be9daec891d7210f46f7.camel@web.de>
+ <20260226172927.2Ck9wZMw@linutronix.de>
+ <20260318103009.2120920-1-neelx@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAP6Zq1i31Z0kfDST1Xcoftxja-TFaxgSjKH6jX5eY0AGdASpTw@mail.gmail.com>
- <b2868f3d-ef84-4ec0-ac37-e41029a1d385@lunn.ch> <abHV7rDryld4A-S_@shell.armlinux.org.uk>
- <CAP6Zq1hKd19aLjWBnx3pkfeGyqrudqSHd0PTxUJhn7r9BG0oSA@mail.gmail.com>
-In-Reply-To: <CAP6Zq1hKd19aLjWBnx3pkfeGyqrudqSHd0PTxUJhn7r9BG0oSA@mail.gmail.com>
-From: Tomer Maimon <tmaimon77@gmail.com>
-Date: Wed, 18 Mar 2026 13:05:12 +0200
-X-Gm-Features: AaiRm53rFOYnBTL9Juw2OemD7spdB53j5IJQJDDzLpTJbbJvHkMWYHyylnysNDw
-Message-ID: <CAP6Zq1goZnvYFGupAuyRZwE=vEvjkqn1TuJD1u0LsvCPs8By1g@mail.gmail.com>
-Subject: Re: stmmac: TX stalls with head OWN=1; requiring manual DMA kick (6.12.63)
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260318103009.2120920-1-neelx@suse.com>
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268981-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,vger.kernel.org,lists.linux.dev,web.de,linutronix.de];
+	TAGGED_FROM(0.00)[bounces-268982-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tmaimon77@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:email,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: 0A9582BAB08
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:dkim,linutronix.de:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 85D7E2BAB17
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi All,
+On 2026-03-18 11:30:09 [+0100], Daniel Vacek wrote:
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -4821,7 +4821,7 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+> >  		/* Other cpus might concurrently change txq->xmit_lock_owner
+> >  		 * to -1 or to their cpu id, but not to our id.
+> >  		 */
+> > -		if (READ_ONCE(txq->xmit_lock_owner) != cpu) {
+> > +		if (rt_mutex_owner(&txq->_xmit_lock.lock) != current) {
+> 
+> Ain't this changing the behavior for !RT case? Previously, if it was the same thread
+> which has already locked the queue (and hence the same CPU) evaluating this condition,
+> the condition was skipped, which is no longer the case with this change.
 
-Appreciate your comments on the reply that I sent a few days ago
+The above was me thinking and does not even compile for !RT. Commit
+b824c3e16c190 ("net: Provide a PREEMPT_RT specific check for
+netdev_queue::_xmit_lock") is what was merged in the end.
 
-Thanks,
-
-Tomer
-
-On Thu, 12 Mar 2026 at 16:02, Tomer Maimon <tmaimon77@gmail.com> wrote:
->
-> Hi Andrew and Russell,
->
-> On Wed, 11 Mar 2026 at 22:52, Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > On Wed, Mar 11, 2026 at 08:46:04PM +0100, Andrew Lunn wrote:
-> > > On Wed, Mar 11, 2026 at 08:34:36PM +0200, Tomer Maimon wrote:
-> > > > Hi Giuseppe,
-> > > >
-> > > > On kernel 6.12.63 (GMAC, normal 16=E2=80=91byte TX descriptors), we=
- observe
-> > > > brief TX stalls when sending small packets.
-> > >
-> > > You might want to look at Russell Kings patches from this week to
-> > > rework the descriptor handling.
-> Could you point me to Russell Kings patches?
-> > >
-> > > Also, please don't report problems on dead kernels. 6.12.76 is the
-> > > current version for the 6.12 LTS. There is a small chance your proble=
-m
-> > > has already been fixed, and you are wasting everybody's time.
-> Sorry, I mean 6.12 LTS.
-> >
-> > Yep.
-> >
-> > Not sure they'll materially affect any problem, because I try to avoid
-> > functional changes in stuff like those.
-> >
-> > What's missing from the original report is a description of the
-> > hardware. stmmac drives multiple different versions of the Synopsys
-> > IP which have significant changes between them. Which platform glue
-> > is being used, which core driver is being used (dwmac1000? dwmac4?
-> > etc.)
-> stmmac IP version is 3.73a
-> The platform is glue is "snps,dwmac" and the core driver is "dwmac1000"
-> >
-> > Also what isn't mentioned is whether this is a regression, or whether
-> > it's something that has never worked. If it's a regression, which
-> > kernel version previously worked?
-> We ran the test with kernel 5.10 LTS, and it didn't work.
-> >
-> > --
-> > RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
->
-> Thanks,
->
-> Tomer
+Sebastian
 
