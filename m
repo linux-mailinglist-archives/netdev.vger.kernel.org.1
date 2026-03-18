@@ -1,297 +1,135 @@
-Return-Path: <netdev+bounces-268837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268838-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wO7dJzj3uWkMQAIAu9opvQ
-	(envelope-from <netdev+bounces-268837-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 01:52:08 +0100
+	id mPiGFZD3uWkMQAIAu9opvQ
+	(envelope-from <netdev+bounces-268838-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 01:53:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C307E2B4B6C
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 01:52:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9EB02B4B94
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 01:53:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D8A9630579F1
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 00:52:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E55693074F3E
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 00:53:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFBB6175A91;
-	Wed, 18 Mar 2026 00:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F3C21CA0D;
+	Wed, 18 Mar 2026 00:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="d1X5SKse";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="Rwj2tfRN"
+	dkim=pass (2048-bit key) header.d=morsemicro-com.20230601.gappssmtp.com header.i=@morsemicro-com.20230601.gappssmtp.com header.b="jk52mHr/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C882A15E8B;
-	Wed, 18 Mar 2026 00:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8D41DF742
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 00:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773795124; cv=none; b=rvcPCQKt6a73Qg3efqZl/1/FsDJk32IErmqc5OgqGpwA1NXfinEj7PVuftOXWES4ymmvBalR/DGbZX00UxXwi1pCP2+E5n0VqRtDFBSArrlrKMBPspb+zjvx5Ju1YN5cnSGeMv6QDIQQ5vYGwEaNc6QjnIy0bKmAnpWH1igsB4A=
+	t=1773795204; cv=none; b=i9lTLVILeqy00q16D2Os+tlTk9iOAckiAkVFsBJT2ciMg5iprjHXp68C1lYZ/ilXpAlR2Di5G00/F9jhwSP2pudOo/uet4DUUiZR1+JIyJeO7jLlJd4pTsD8pIKcu4Wihgb/9lBkG/pXQbuSwie1uhp7QmNaReMC4XABtsDFAdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773795124; c=relaxed/simple;
-	bh=h8sf+bsOqQLKxkAFb6wfbQnnj4gyhsI3x72Ya2ekeig=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=KhYUHTQJ/A6mqbaEXYzlsIN/e+eg9ItpdQF974FDsEVWGYoSujFPbmjRkQ/U+ZNxrS7KEY/PPnXDuLBHG4W4ZCOuBXFJg8wW7XG0xqL66qIy6973b5kQ8bBOwDZP5T9QucD4CzFnbV//PEK/WkKaGgBlncD5tN9tPOsqNhZGE7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=d1X5SKse; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=Rwj2tfRN; arc=none smtp.client-ip=160.80.4.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 62I0pPM2017722;
-	Wed, 18 Mar 2026 01:51:31 +0100
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id E91AC1205C5;
-	Wed, 18 Mar 2026 01:51:20 +0100 (CET)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1773795081; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TGI60m1VO5PlpLph395BckUvAm4N1bKlvISAY04YGcY=;
-	b=d1X5SKsethoGCHAdu95xQqQLpgmCV07LLkCSt/qpao6i9AaWfc4Cd+5H9nn7vw/TyuHazW
-	JcNz8GOOm2YJAqBg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1773795081; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TGI60m1VO5PlpLph395BckUvAm4N1bKlvISAY04YGcY=;
-	b=Rwj2tfRNQiQTrXR7Fuxt/EzExCdEh4p7Q5udD4deyOL5PPNUxmqn9G1rZLqwYneQA4r/Gr
-	aaPATGvNSaTNaHJ0qNnECWmgMW0wYFioMYq4F55Y7XyaH8WG7GFSdvJdTHG5sYJJRpUTqJ
-	cnkqK2CIeqms25TJU5TBWszB1asJuTdEGLFw7T58lrlapUvZmX71XKsrFfXGc1k8esIN5j
-	6/V6cnWoVqK5Et6C+85Syt63t4BjcWgw3K29VBmOgFm76kuRP/963unxZ3ES2u0s7UWBYA
-	yEf6jf9HD3x1A8YAhyBDEaPG9Nr5anDdnnGYMMMf86orLLw2vceeAEX+lemPPg==
-Date: Wed, 18 Mar 2026 01:51:20 +0100
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: Minhong He <heminhong@kylinos.cn>
-Cc: horms@kernel.org, davem@davemloft.net, david.lebrun@uclouvain.be,
-        dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, stefano.salsano@uniroma2.it,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: Re: [PATCH net v3] ipv6: add NULL checks for idev in SRv6 paths
-Message-Id: <20260318015120.92575a78f2e39f9e4ccf76a2@uniroma2.it>
-In-Reply-To: <20260316073301.106643-1-heminhong@kylinos.cn>
-References: <20260315160159.1394504-1-horms@kernel.org>
-	<20260316073301.106643-1-heminhong@kylinos.cn>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1773795204; c=relaxed/simple;
+	bh=vKRjWMQNCxTAezrSH8HsoqRVsJfkECYcmwqxW/Aj8Ns=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=scctXMlsdBxxDFp4seVrU7isut4vpzFCPcbJL+lhxqCB0ZekUwzssFL6+W0nocO+4GZ1YU/+cg1ZauJnh3fLXrtRYEUY7PQah431Bp12G2qRz8Sk6iQX0HABNky9SlMA+CgkFmFemsUKB7lohNEMMj0+pYfcLMrCwJPnx0fPlIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=morsemicro.com; spf=pass smtp.mailfrom=morsemicro.com; dkim=pass (2048-bit key) header.d=morsemicro-com.20230601.gappssmtp.com header.i=@morsemicro-com.20230601.gappssmtp.com header.b=jk52mHr/; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=morsemicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=morsemicro.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c70bfef17a4so4231751a12.2
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 17:53:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=morsemicro-com.20230601.gappssmtp.com; s=20230601; t=1773795203; x=1774400003; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WW7jK2GQPckG+qnwmykLsFF8MdG5oTYuXZfi/B2lx0Q=;
+        b=jk52mHr/YZIhAcGTgJxwe3VZw3PbCrB6PJSgGWsdE8xNoDuTq1hVdssbgpyvJlSLa5
+         ttUrJUZdgpUg+eFn1+JSL4GqEnC07allOaVHSKLTlYVSK3SPYR9Be4oB13HsVqr+syF/
+         fMBFrfgCuc3IG8OrhjQIv72sxn9MkfJmmfQ0+Yaky8k3ng1i8hrZXUX3fQ8YGfgY6TXk
+         TVZjiqe9aN3dvz1yjyFZXkxDP0QNoN/uGbL1tjApeRXqZOMHklqigpUgwDg0WBmccdl1
+         LU08CMDHt9Vkf7HTy0rUPNhA5P9WbA0bup5Z4GjKmqsIl/10A+8SCrgf2hwlvWJ1gJg8
+         AGcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773795203; x=1774400003;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WW7jK2GQPckG+qnwmykLsFF8MdG5oTYuXZfi/B2lx0Q=;
+        b=DZuOy8LF72Ix7SWtQBZybh1KJmXt3tefz9bwxt/d/Q5FjfkD5VxzfAwXDyTky6/i3I
+         aATeXS8R6gFQ3udy2Fp8VKYvV2pT8QTpc2LTVOoZ0TS0JLmEJIos7DqPQXqhjkkAUM21
+         GIDuKIS2aNl2rXW02Id+oyUkU9p4JRZH97B4Cc/LtxlO0epCxpY4/+1tX1XBOKiw5YQr
+         v5UfiRazwvAW5RSi14Bxi3zcYeWZTvH0WvBJ9vsakqMEDahbI9W3/Zfnaoz/PgHKtb/T
+         2YOKNzG1iM07//sOM7DRo6xaEPhJ+HWqUKMqd69t7pSznsFns+Dhn/4orUUwCERbfmhz
+         QyUg==
+X-Forwarded-Encrypted: i=1; AJvYcCXrH5P+s02apAOfdm9XHySPKOf2gTRfTjY6tnwRUCxqxTF1o2p9HZlpdVbnlvhkZA1NqWJwFvI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxr9XsQxlqEfqIOY+AL9bOGVYJLV6psOv3ViSf3QSTnwy81sPTs
+	/x2fepIMZGo7e7D54X/tS3/uEeUwwCppMdwJ0xIl/1KxRKJ7ItABEvrz4KaEvb18mks=
+X-Gm-Gg: ATEYQzzjBceYWBAOgx17IPz5kzDEV2DeNWUfv4NIn9foV5diC4OqmtevpWRydw3zuKj
+	P2CYUwcMDYRnfNbVzCw2XQ6vErCoUN8DiW1W0soFGwBWVW6owk0UOD0E7xyNYiQeQQ3FuN01h3Z
+	je9bjpn6dRHE4b6bwRt8UrWNaxO1wD5D8A63Pe2KT6ORaNCvGiE4ZFLq02Bx2JEH+29lo1tln0I
+	xS5uus8R0VjAtIiCusSj76zH/ULyzPRJ6b+R3bBO7wThwcmDjebCxo95tj52nGFYmub8wDYLvgM
+	M0CyoS+/2TBtfyfAbRaVxV0QixciZYtuOfXUNJEdvcfJvaoztRLU0ubDba20jM9CROaNL1yWhEW
+	NkzDaZobUin9PwyMe611N7kwQy76n7TYl6ieoKX3N0JEdbgyOAsyB1SMMeXoRi2dem0XN3A0CE7
+	YtJ03z5hhwcAU27YGEOiXUvz3Flx6DdTQBCtU7msUsMgymenblpftG4ZTjpWmxA4IE4X5Z2ShXc
+	ZPXT/oGufFe+iZiPyTcaQ==
+X-Received: by 2002:a05:6a21:6111:b0:398:c351:aa0f with SMTP id adf61e73a8af0-39b99d92725mr1107520637.22.1773795202945;
+        Tue, 17 Mar 2026 17:53:22 -0700 (PDT)
+Received: from localhost (60-242-93-14.static.tpgi.com.au. [60.242.93.14])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c741e5694acsm730394a12.24.2026.03.17.17.53.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Mar 2026 17:53:22 -0700 (PDT)
+Date: Wed, 18 Mar 2026 11:53:19 +1100
+From: Lachlan Hodges <lachlan.hodges@morsemicro.com>
+To: syzbot <syzbot+d9f5fabbbcf4b377d01f@syzkaller.appspotmail.com>
+Cc: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [wireless?] WARNING in cfg80211_chandef_create
+Message-ID: <tffrshs5h76cfj3k6lelrx6lmm7qtc7hww7r554xtnhfnsw2ip@dqktqrq2k47q>
+References: <69b992c2.050a0220.248e02.0132.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
-X-Spamd-Result: default: False [-1.66 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <69b992c2.050a0220.248e02.0132.GAE@google.com>
+X-Spamd-Result: default: False [0.44 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[morsemicro-com.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[morsemicro.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268837-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268838-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[uniroma2.it:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[morsemicro-com.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[morsemicro-com.20230601.gappssmtp.com:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[lachlan.hodges@morsemicro.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,d9f5fabbbcf4b377d01f];
 	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,uniroma2.it:dkim,uniroma2.it:email,uniroma2.it:mid,kylinos.cn:email]
-X-Rspamd-Queue-Id: C307E2B4B6C
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: B9EB02B4B94
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 16 Mar 2026 15:33:01 +0800
-Minhong He <heminhong@kylinos.cn> wrote:
+> HEAD commit:    b84a0ebe421c Add linux-next specific files for 20260313
 
-> __in6_dev_get() can return NULL when the device has no IPv6 configuration
-> (e.g. MTU < IPV6_MIN_MTU or after NETDEV_UNREGISTER).
-> 
-> Add NULL checks for idev returned by __in6_dev_get() in both
-> seg6_hmac_validate_skb() and ipv6_srh_rcv() to prevent potential NULL
-> pointer dereferences.
-> 
-> Fixes: 1ababeba4a21 ("ipv6: implement dataplane support for rthdr type 4 (Segment Routing Header)")
-> Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
-> Signed-off-by: Minhong He <heminhong@kylinos.cn>
-> ---
+I think this didn't have your fix already?
 
-Hi Minhong,
- 
-I was able to trigger this with the MTU < IPV6_MIN_MTU scenario
-while SRv6 traffic is in flight:
-
-[ 2506.476833] ==================================================================
-[ 2506.478368] BUG: KASAN: null-ptr-deref in ipv6_rthdr_rcv+0x7c7/0x1cc0
-[ 2506.478368] Read of size 4 at addr 00000000000006a8 by task ping6/22207
-[ 2506.478368]
-[ 2506.478368] CPU: 0 UID: 0 PID: 22207 Comm: ping6 Not tainted 7.0.0-rc3-micro-vm-dev-00185-g43d222fbcdff #2176 PREEMPT(full)
-[ 2506.478368] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
-[ 2506.478368] Call Trace:
-[ 2506.478368]  <IRQ>
-[ 2506.478368]  dump_stack_lvl+0x7c/0xc0
-[ 2506.478368]  print_report+0x3f1/0x5d0
-[ 2506.478368]  ? __virt_addr_valid+0x24/0x340
-[ 2506.478368]  ? ipv6_rthdr_rcv+0x7c7/0x1cc0
-[ 2506.478368]  kasan_report+0x92/0xc0
-[ 2506.478368]  ? ipv6_rthdr_rcv+0x7c7/0x1cc0
-[ 2506.478368]  ipv6_rthdr_rcv+0x7c7/0x1cc0
-[ 2506.478368]  ? __pfx_ipv6_rthdr_rcv+0x10/0x10
-[ 2506.478368]  ? rcu_read_lock_held+0xac/0xc0
-[ 2506.478368]  ? __pfx_rcu_read_lock_held+0x10/0x10
-[ 2506.478368]  ? rcu_read_lock_held+0xac/0xc0
-[ 2506.478368]  ? __pfx_rcu_read_lock_held+0x10/0x10
-[ 2506.478368]  ? __rt6_find_exception_rcu+0x2c/0x200
-[ 2506.478368]  ? kmem_cache_free+0xd0/0x530
-[ 2506.478368]  ? icmpv6_rcv+0x4ec/0x10c0
-[ 2506.478368]  ? ip6_protocol_deliver_rcu+0x93a/0xe20
-[ 2506.478368]  ? find_held_lock+0x2d/0xa0
-[ 2506.478368]  ? ip6_pol_route+0x1e3/0x7a0
-[ 2506.478368]  ? __rcu_read_unlock+0x64/0x2f0
-[ 2506.478368]  ? ip6_pol_route+0x1ed/0x7a0
-[ 2506.478368]  ? __pfx_ip6_pol_route+0x10/0x10
-[ 2506.478368]  ? __lock_acquire+0xb7f/0x1d30
-[ 2506.478368]  ? kasan_quarantine_put+0x120/0x1c0
-[ 2506.478368]  ? find_held_lock+0x2d/0xa0
-[ 2506.478368]  ? rcu_read_lock_held+0xac/0xc0
-[ 2506.478368]  ? __pfx_rcu_read_lock_held+0x10/0x10
-[ 2506.478368]  ip6_protocol_deliver_rcu+0x93a/0xe20
-[ 2506.478368]  ? rcu_read_lock_held+0xac/0xc0
-[ 2506.478368]  ip6_input_finish+0x93/0x1a0
-[ 2506.478368]  ip6_input+0xcd/0x480
-[ 2506.478368]  ? __pfx_ip6_input+0x10/0x10
-[ 2506.478368]  ? rcu_read_lock_held+0xac/0xc0
-[ 2506.478368]  ? __pfx_rcu_read_lock_held+0x10/0x10
-[ 2506.478368]  ? find_held_lock+0x2d/0xa0
-[ 2506.478368]  ip6_rcv_finish+0x127/0x1d0
-[ 2506.478368]  ? __pfx_ip6_rcv_finish+0x10/0x10
-[ 2506.478368]  ? __pfx_ip6_input+0x10/0x10
-[ 2506.478368]  ? sock_wfree+0x229/0x460
-[ 2506.478368]  ? ip6_rcv_core.isra.19+0x5ea/0xcc0
-[ 2506.478368]  ipv6_rcv+0xb4/0x330
-[ 2506.478368]  ? __pfx_ipv6_rcv+0x10/0x10
-[ 2506.478368]  ? __lock_acquire+0xb7f/0x1d30
-[ 2506.478368]  ? __pfx_ipv6_rcv+0x10/0x10
-[ 2506.478368]  __netif_receive_skb_one_core+0xe0/0x140
-[ 2506.478368]  ? __pfx___netif_receive_skb_one_core+0x10/0x10
-[ 2506.478368]  ? process_backlog+0x281/0x940
-[ 2506.478368]  ? process_backlog+0x281/0x940
-[ 2506.478368]  process_backlog+0x2c1/0x940
-[ 2506.478368]  __napi_poll+0x57/0x3b0
-[ 2506.478368]  net_rx_action+0x33f/0x710
-[ 2506.478368]  ? __pfx_net_rx_action+0x10/0x10
-[ 2506.478368]  ? rcu_nocb_unlock_irqrestore.isra.58+0x24/0x30
-[ 2506.478368]  ? rcu_nocb_unlock_irqrestore.isra.58+0x24/0x30
-[ 2506.478368]  ? lockdep_hardirqs_on+0xcc/0x150
-[ 2506.478368]  ? rcu_do_batch+0x9e8/0xfa0
-[ 2506.478368]  ? mark_held_locks+0x48/0x80
-[ 2506.478368]  ? __pfx_rcu_do_batch+0x10/0x10
-[ 2506.478368]  ? mark_held_locks+0x48/0x80
-[ 2506.478368]  ? handle_softirqs+0xd8/0x680
-[ 2506.478368]  handle_softirqs+0xf7/0x680
-[ 2506.478368]  ? lwtunnel_output+0x9b/0x410
-[ 2506.478368]  do_softirq.part.23+0x8f/0xd0
-[ 2506.478368]  </IRQ>
-[ 2506.478368]  <TASK>
-[ 2506.478368]  __local_bh_enable_ip+0xe9/0xf0
-[ 2506.478368]  lwtunnel_output+0xa0/0x410
-[ 2506.478368]  ip6_local_out+0x15b/0x160
-[ 2506.478368]  ? __pfx_ip6_local_out+0x10/0x10
-[ 2506.478368]  ? __pfx_lwtunnel_output+0x10/0x10
-[ 2506.478368]  ? __pfx_lwtunnel_output+0x10/0x10
-[ 2506.478368]  ip6_send_skb+0x94/0x210
-[ 2506.478368]  rawv6_sendmsg+0x10de/0x1340
-[ 2506.478368]  ? down_read_non_owner+0xca/0x2f0
-[ 2506.478368]  ? __pfx_rawv6_sendmsg+0x10/0x10
-[ 2506.478368]  ? __mutex_unlock_slowpath+0x125/0x4f0
-[ 2506.478368]  ? find_held_lock+0x2d/0xa0
-[ 2506.478368]  ? __pfx_rcu_read_lock_any_held+0x10/0x10
-[ 2506.478368]  ? __lock_acquire+0xb7f/0x1d30
-[ 2506.478368]  ? n_tty_write+0x463/0x7d0
-[ 2506.478368]  ? sock_has_perm+0x96/0x190
-[ 2506.478368]  ? inet_send_prepare+0x16/0x290
-[ 2506.478368]  ? __pfx_inet_sendmsg+0x10/0x10
-[ 2506.478368]  ? __sock_sendmsg+0xd4/0xe0
-[ 2506.478368]  __sock_sendmsg+0xd4/0xe0
-[ 2506.478368]  __sys_sendto+0x18f/0x210
-[ 2506.478368]  ? __pfx___sys_sendto+0x10/0x10
-[ 2506.478368]  ? find_held_lock+0x2d/0xa0
-[ 2506.478368]  ? __might_fault+0x6f/0xb0
-[ 2506.478368]  ? __x64_sys_gettimeofday+0xe3/0x150
-[ 2506.478368]  __x64_sys_sendto+0x6f/0x80
-[ 2506.478368]  do_syscall_64+0xb3/0x5e0
-[ 2506.478368]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[ 2506.478368] RIP: 0033:0x7f23442319b7
-[ 2506.478368] Code: 64 89 02 48 c7 c0 ff ff ff ff eb b6 0f 1f 80 00 00 00 00 48 8d 05 49 5d 0c 00 41 89 ca 8b 00 85 c0 75 10 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 71 c3 41 57 4d 89 c7 41 56 41 89 ce 41 55 49
-[ 2506.478368] RSP: 002b:00007ffcde563fb8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-[ 2506.478368] RAX: ffffffffffffffda RBX: 000055bf4d595a20 RCX: 00007f23442319b7
-[ 2506.478368] RDX: 0000000000000040 RSI: 000055bf4d595a20 RDI: 0000000000000003
-[ 2506.478368] RBP: 0000000000000040 R08: 000055bf4d593940 R09: 000000000000001c
-[ 2506.478368] R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffcde5652b8
-[ 2506.478368] R13: 000055bf4d595a20 R14: 00007ffcde5640d0 R15: 000055bf4d5916a0
-[ 2506.478368]  </TASK>
-[ 2506.478368] ==================================================================
-
-
->  net/ipv6/exthdrs.c   | 4 ++++
->  net/ipv6/seg6_hmac.c | 2 ++
->  2 files changed, 6 insertions(+)
-> 
-> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-> index 5e3610a926cf..95558fd6f447 100644
-> --- a/net/ipv6/exthdrs.c
-> +++ b/net/ipv6/exthdrs.c
-> @@ -379,6 +379,10 @@ static int ipv6_srh_rcv(struct sk_buff *skb)
->  	hdr = (struct ipv6_sr_hdr *)skb_transport_header(skb);
->  
->  	idev = __in6_dev_get(skb->dev);
-> +	if (!idev) {
-> +		kfree_skb(skb);
-> +		return -1;
-> +	}
->  
->  	accept_seg6 = min(READ_ONCE(net->ipv6.devconf_all->seg6_enabled),
->  			  READ_ONCE(idev->cnf.seg6_enabled));
-> diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-> index ee6bac0160ac..e6964c6b0d38 100644
-> --- a/net/ipv6/seg6_hmac.c
-> +++ b/net/ipv6/seg6_hmac.c
-> @@ -184,6 +184,8 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
->  	int require_hmac;
->  
->  	idev = __in6_dev_get(skb->dev);
-> +	if (!idev)
-> +		return false;
->  
->  	srh = (struct ipv6_sr_hdr *)skb_transport_header(skb);
->  
-> -- 
-> 2.25.1
-> 
-
-The fixes look correct to me.
-
-Nit: as shown by the trace above, the issue is not just potential
-but actually reproducible.
-
-Reviewed-by: Andrea Mayer <andrea.mayer@uniroma2.it>
-
-Thanks,
-Andrea
+lachlan
 
