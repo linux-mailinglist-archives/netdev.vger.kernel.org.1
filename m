@@ -1,183 +1,176 @@
-Return-Path: <netdev+bounces-269110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269111-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eDv7D0rlummdcwIAu9opvQ
-	(envelope-from <netdev+bounces-269110-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:47:54 +0100
+	id uDUJJ+7WumkXcgIAu9opvQ
+	(envelope-from <netdev+bounces-269111-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:46:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37AA52C091C
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:47:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 166B82BF8D3
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:46:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4CC253077ABC
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:39:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1113630E267D
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3513F1679;
-	Wed, 18 Mar 2026 16:22:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964323A7850;
+	Wed, 18 Mar 2026 16:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="ZlLgFT2O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A9+w6dDr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-190a.mail.infomaniak.ch (smtp-190a.mail.infomaniak.ch [185.125.25.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF063A4520
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 16:22:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D36DC3F20EB
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 16:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773850972; cv=none; b=QQeGPPGjx6V3aVJILv/nqOb8KMrlgEjYx2J3skIazarhIu/sHLduuyjqnWYhEiauEgCrmvXJ6KpITc/ZRs1U9wOaD1guHb8SHiw3lmf6M/O/leJ2Bnzn2l8G4e+bLUViUY5ctGFZREXzZhx7BLY+7x2yY91jeuli052s6sf+dfA=
+	t=1773851072; cv=none; b=ZsPJ2FgUEJpxNRxnqdIJoXwaLJA/Nl5jk+jCSlHhMDymRFFENj8oki5DiYm/PY9+9x6wdO1TqOzQf6hp97K4gdic5TW3Qf8TF4mx0AYLIESfcK0T5r86qtaBRTYTw4UDjGDwvJHyJsIvl7Dz2BxVhdpM60L37vDre9VL0mCc9Cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773850972; c=relaxed/simple;
-	bh=39uYVicU566x+eNdfwpbYBT6OhThLnYXRsfYT3vtigQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TB1n7XCjdKiC3hajvobts7AxJZYeKocwxZkKGr4W1RkglNkn/JpK22nLLEGpwGxd4JT1BVdD9Yx8MPnLYXYJYQEEOes/71NNsiqdwWW/qcIUkcMF+eFWjSw+fLyU+L/RsBLpiNj8Lv+IJOJVTlyLYK0+ImFoFvoR6Vxfa2yGaV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=ZlLgFT2O; arc=none smtp.client-ip=185.125.25.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246b])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4fbYyV2GSZz8wk;
-	Wed, 18 Mar 2026 17:22:42 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1773850962;
-	bh=p3Z++XLcTQuwq7LFpOkkcdkzdVhx9nvzQHpjzM9/zmY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZlLgFT2OEncp31yadr87Y9jvKZJYUJkMrNJHqJwTsBYc/dAXGi4BeaPpglxO1be7a
-	 RrAQoHSRx1Pqjy/xKHdMdwT1hfYfQiQTLH1ocUl/3boYN5VPXvZbXyDJt5c0xOzpFD
-	 TwZzUJZAQ9G1SM+gDsF4aTSx5updh4a9vlPHF63w=
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4fbYyR36Bkzlhs;
-	Wed, 18 Mar 2026 17:22:39 +0100 (CET)
-Date: Wed, 18 Mar 2026 17:22:34 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Paul Moore <paul@paul-moore.com>
-Cc: John Johansen <john.johansen@canonical.com>, 
-	Georgia Garcia <georgia.garcia@canonical.com>, =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>, 
-	James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, 
-	Tingmao Wang <m@maowtm.org>, Justin Suess <utilityemal77@gmail.com>, 
-	linux-security-module@vger.kernel.org, Samasth Norway Ananda <samasth.norway.ananda@oracle.com>, 
-	Matthieu Buffet <matthieu@buffet.re>, Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
-	konstantin.meskhidze@huawei.com, Demi Marie Obenour <demiobenour@gmail.com>, 
-	Alyssa Ross <hi@alyssa.is>, Jann Horn <jannh@google.com>, 
-	Tahera Fahimi <fahimitahera@gmail.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v6 1/9] lsm: Add LSM hook security_unix_find
-Message-ID: <20260318.wa0eef4tei6I@digikod.net>
-References: <20260315222150.121952-2-gnoack3000@gmail.com>
- <2697b9f672967b1318630f2ffa21914f@paul-moore.com>
- <20260318.In1aekohyivu@digikod.net>
- <CAHC9VhRy2j3nYHHnyjsDf9Rk6=5DAzCSrmXgHCpo4arVnfBjRw@mail.gmail.com>
+	s=arc-20240116; t=1773851072; c=relaxed/simple;
+	bh=6C4YOpc354nfZBWHSuQ9tbTzStWV7uDznRf3O0+yqpc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bZ5YI/aqj8tS4Dke7DXSP46lYT7yYrDdKYLIeCcOMA2NSY9WY+fdRZcF7HG9+Zwp6Ps/UBqFY/YaCWF3Fe7D8muzxvhq8yH87N/zWFj6UDeviLSc6SYEa3jbwkkWYwytDY6mJFq5jGHSWArIo9SqoRPaihwpGguSVy4V/QZzbWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A9+w6dDr; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-485410a0a8aso207255e9.2
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 09:24:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773851065; x=1774455865; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BTDQkS5soYcggVEgfxDDpLcf2lsOsR+x97CoGga5L3I=;
+        b=A9+w6dDr61TGB5LaUtIRTKEVYbkhLkwuG2+UecYGH4DiK5vEpuCyj59Vmb4AxpVzg8
+         al1bbv+spyTgWeaw3ChSvHU/JXHgKNt0tKRewVBY4b17M81fytdn5tCO/3vFQci7jKEa
+         tK1Z19abNQhP3avB7YT5ZZyT6BAnotrY4p2wsmbPdcxywC2fbFnQ69HOShefoW3KIvsC
+         +DZrsxCi0aQNtW8NmgOaigiL0KOnfNXS/lRSfFk37eXsuQ4zl0d0cTPdJfXqTVpJ4YL1
+         5igJbn5nhZjp7tf2sh8CszTwapSlmg8atiltLdJRIM3KbPNGzCqS2vZ23BYc6PNsegqm
+         m03Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773851065; x=1774455865;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BTDQkS5soYcggVEgfxDDpLcf2lsOsR+x97CoGga5L3I=;
+        b=MD/AbMqgcSf6Tlig4/C1Wr5kyELTqH6Bj7mLWyUmpggPSqvno+bfNZooZe9M0uxjuu
+         bk9XHpMfQzuHXNLMfGA6eAX5YA4w1+0hvZRDDAp3cUflQDdEmY9QY6OgvAtE5B0n0Va1
+         aUgusKFyGVwBh5QPqBSH4qdA434oGi4Z2If5F+76i3rNIwhjpspK/Q4vfNTKisGMmIBO
+         UE2lT441q5a1OtZRufJksKJsZ3aAIeNixORc73M+qr6BPKZ16YliiFkC6E4lASOWfyRG
+         ObPbvLvczoOJd95wfSvjUdYGh62EU9xDR0/QKDPHvM6Fx7g3BZ9VOnlaUM4QKu+C6ePk
+         XTKg==
+X-Gm-Message-State: AOJu0Yyd6IK2qN9hS5triYMcH/MuSV/BSZu7k3JObxW93mgFrOMGX1JJ
+	5iL9gAXaYCqQaPrbXbs3Ivode+dJeFxrFwHYKo2EK9vjUgQioj48Sawq
+X-Gm-Gg: ATEYQzwA8u3BniWTlQSmzJc6dET7wZMFWNpNtykeOeLdAILhKhHkF/ctNeVJlZ1/Uz8
+	iiIWFiyd82wsLmAKzmxAdGXqtwPsQ4rb9s42nw5HQfz7Kll683iJZ4iH9ZG0NgTmYBItMeIvNWu
+	ASySgt1KbA/69JEWgYdZ5PprHg6nv3XLAO94zSA2M/iZSPFtcodc2nRt9VivXes5qf2gdXWOaVj
+	ySF1cRJzN2MRzclmMsjDkLkeggXuqRQv6TY2ImLpTh0Yxuy0bD9nKSlth0GZITo7XqDSosAJCbn
+	VQbChPysEJQZCG0j/hfwex57crzPaHnDOdpLoCRnZYPCsB50Np2VmzSeqELsMAx0OKuLnSstzp+
+	dm47Tvuj3hFhdnefKU3Uh7UtVSBlNKQpF8mx5tRYaBMPgF6hbkvCkCLbQcFBhAOchKeJ+NR4Ws6
+	4GpqDYj9/RN5gBeR/cB48J0vVHC7+WS89FnW2OX/K0N6u3EOMfilyaJVFeBOA5KUYb5lFGEf/DA
+	zZsYfRYv+cp
+X-Received: by 2002:a05:600c:4e0d:b0:480:1c69:9d36 with SMTP id 5b1f17b1804b1-486f4456f02mr63983395e9.17.1773851064495;
+        Wed, 18 Mar 2026 09:24:24 -0700 (PDT)
+Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b51892244sm9738790f8f.22.2026.03.18.09.24.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Mar 2026 09:24:23 -0700 (PDT)
+From: David Carlier <devnexen@gmail.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	davem@davemloft.net,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,
+	David Carlier <devnexen@gmail.com>
+Subject: [PATCH] bpf: use RCU-safe iteration in dev_map_redirect_multi() SKB path
+Date: Wed, 18 Mar 2026 16:24:20 +0000
+Message-ID: <20260318162420.7684-1-devnexen@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHC9VhRy2j3nYHHnyjsDf9Rk6=5DAzCSrmXgHCpo4arVnfBjRw@mail.gmail.com>
-X-Infomaniak-Routing: alpha
-X-Spamd-Result: default: False [-0.89 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.77)[subject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[digikod.net:s=20191114];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269110-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[canonical.com,gmail.com,namei.org,hallyn.com,maowtm.org,vger.kernel.org,oracle.com,buffet.re,huawei-partners.com,huawei.com,alyssa.is,google.com,linutronix.de,kernel.org,zeniv.linux.org.uk];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-269111-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[digikod.net];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[digikod.net:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[mic@digikod.net,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.966];
+	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[maowtm.org:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,digikod.net:dkim,digikod.net:email,digikod.net:mid]
-X-Rspamd-Queue-Id: 37AA52C091C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 166B82BF8D3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 18, 2026 at 10:44:26AM -0400, Paul Moore wrote:
-> On Wed, Mar 18, 2026 at 4:48 AM Mickaël Salaün <mic@digikod.net> wrote:
-> >
-> > On Tue, Mar 17, 2026 at 05:34:57PM -0400, Paul Moore wrote:
-> > > On Mar 15, 2026 =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack3000@gmail.com> wrote:
-> > > >
-> > > > Add a LSM hook security_unix_find.
-> > > >
-> > > > This hook is called to check the path of a named unix socket before a
-> > > > connection is initiated. The peer socket may be inspected as well.
-> > > >
-> > > > Why existing hooks are unsuitable:
-> > > >
-> > > > Existing socket hooks, security_unix_stream_connect(),
-> > > > security_unix_may_send(), and security_socket_connect() don't provide
-> > > > TOCTOU-free / namespace independent access to the paths of sockets.
-> > > >
-> > > > (1) We cannot resolve the path from the struct sockaddr in existing hooks.
-> > > > This requires another path lookup. A change in the path between the
-> > > > two lookups will cause a TOCTOU bug.
-> > > >
-> > > > (2) We cannot use the struct path from the listening socket, because it
-> > > > may be bound to a path in a different namespace than the caller,
-> > > > resulting in a path that cannot be referenced at policy creation time.
-> > > >
-> > > > Cc: Günther Noack <gnoack3000@gmail.com>
-> > > > Cc: Tingmao Wang <m@maowtm.org>
-> > > > Signed-off-by: Justin Suess <utilityemal77@gmail.com>
-> > > > ---
-> > > >  include/linux/lsm_hook_defs.h |  5 +++++
-> > > >  include/linux/security.h      | 11 +++++++++++
-> > > >  net/unix/af_unix.c            | 13 ++++++++++---
-> > > >  security/security.c           | 20 ++++++++++++++++++++
-> > > >  4 files changed, 46 insertions(+), 3 deletions(-)
-> > >
-> > > Some really minor nitpicky things (below), but nothing critical.
-> > > However, as we discussed, I would like to see the AppArmor folks comment
-> > > on the new hook before we merge anything as I know they have an interest
-> > > here.
-> >
-> > John, Georgia, we've been discussing this new hook for a few months now
-> > but didn't hear from you yet.  We plan to merge this patch series with
-> > the 7.1 merge window (in a few weeks), so before that I'd like to merge
-> > it in -next in a few days to get a broader coverage.  I'm pretty sure
-> > this hook will work well with AppArmor too, but could you please take
-> > look to confirm?
-> 
-> I probably wasn't as clear as I should have been, my apologies.  The
-> major reason I held back my ACK on this patch was that I wanted to
-> hear from the AA folks regarding the hook's suitability for their
-> needs.  While I don't expect they will have an issue with this hook
-> as-is, they have expressed interest in the hook, and I would just
-> assume make sure it is okay for everyone before we send it to Linus.
-> 
-> Since this is a feature addition and not a critical bug fix, I will be
-> quite upset if this is sent to Linus without review by the AA
-> developers and my ACK.
+The DEVMAP_HASH branch in dev_map_redirect_multi() uses
+hlist_for_each_entry_safe() to iterate hash buckets, but this function
+runs under RCU protection (called from xdp_do_generic_redirect_map()
+in softirq context). Concurrent writers (__dev_map_hash_update_elem,
+dev_map_hash_delete_elem) modify the list using RCU primitives
+(hlist_add_head_rcu, hlist_del_rcu).
 
-I definitely understand and that makes sense, but even if it is not a
-strict fix, please consider that this feature still fixes an important
-gap in practice (e.g. run anything outside a sandbox with the help of
-systemd; see cover letter and reported issues [1]).  I don't want to
-bypass anyone, but given the importance of this change, I don't want to
-postpone it either (except if there is a major issue of course, but I
-think the review was pretty good).  That's why we'd like to get some
-feedback sooner than later.  While waiting for AA folks feedback, would
-you still be OK for me to push it to -next to improve test and review
-coverage?
+hlist_for_each_entry_safe() performs plain pointer dereferences without
+rcu_dereference(), missing the acquire barrier needed to pair with
+writers' rcu_assign_pointer(). On weakly-ordered architectures (ARM64,
+POWER), a reader can observe a partially-constructed node. It also
+defeats CONFIG_PROVE_RCU lockdep validation and KCSAN data-race
+detection.
 
-[1] https://lore.kernel.org/all/cover.1767115163.git.m@maowtm.org/
+Replace with hlist_for_each_entry_rcu(), matching the XDP-frame path
+(dev_map_enqueue_multi) which already uses the correct macro for the
+same hash iteration.
+
+Fixes: e624d4ed4aa8 ("xdp: Extend xdp_redirect_map with broadcast support")
+Signed-off-by: David Carlier <devnexen@gmail.com>
+---
+ kernel/bpf/devmap.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+index 3d619d01088e..c8d256405c29 100644
+--- a/kernel/bpf/devmap.c
++++ b/kernel/bpf/devmap.c
+@@ -747,7 +747,6 @@ int dev_map_redirect_multi(struct net_device *dev, struct sk_buff *skb,
+ 	struct bpf_dtab_netdev *dst, *last_dst = NULL;
+ 	int excluded_devices[1+MAX_NEST_DEV];
+ 	struct hlist_head *head;
+-	struct hlist_node *next;
+ 	int num_excluded = 0;
+ 	unsigned int i;
+ 	int err;
+@@ -787,7 +786,7 @@ int dev_map_redirect_multi(struct net_device *dev, struct sk_buff *skb,
+ 	} else { /* BPF_MAP_TYPE_DEVMAP_HASH */
+ 		for (i = 0; i < dtab->n_buckets; i++) {
+ 			head = dev_map_index_hash(dtab, i);
+-			hlist_for_each_entry_safe(dst, next, head, index_hlist) {
++			hlist_for_each_entry_rcu(dst, head, index_hlist, lockdep_is_held(&dtab->index_lock)) {
+ 				if (is_ifindex_excluded(excluded_devices, num_excluded,
+ 							dst->dev->ifindex))
+ 					continue;
+-- 
+2.53.0
+
 
