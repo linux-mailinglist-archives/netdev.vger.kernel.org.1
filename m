@@ -1,112 +1,112 @@
-Return-Path: <netdev+bounces-268833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268834-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ICBmE1juuWnPPgIAu9opvQ
-	(envelope-from <netdev+bounces-268833-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 01:14:16 +0100
+	id UOxZMkbuuWnPPgIAu9opvQ
+	(envelope-from <netdev+bounces-268834-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 01:13:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC3E92B4963
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 01:14:15 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EBBD2B494B
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 01:13:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 829E930610E8
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 00:12:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C6D64302408C
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 00:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ED7E7083C;
-	Wed, 18 Mar 2026 00:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D17E97FBAC;
+	Wed, 18 Mar 2026 00:13:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cacIxvzn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QJpi8hKm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B14029CE1
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 00:12:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C128125B2
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 00:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773792728; cv=pass; b=HxdClfMftAoWpuuPZeo7hrbPu4KsCB0ymyKnCoLQs6rthLX6qe5YvwXASD6IiO32eOAUUwLxMhe7B+h5Zjtak9jQxpKXPiuWDilSUaOFGJhAR6KnXPcTpPZQEAdT24cGZoF3aJ8o78kz1p6ZauW5/e7dBVvGOxYtBdTAuWbKNM8=
+	t=1773792836; cv=pass; b=Yw0+cnSBMkTkiiOjUgQPiMm0qc3YeYfOrN/hHzVFHElllG+tsM3W5qvAR5OQjVWmj+RxTJkLjq156A7/7uwzcTXPWOghAgt4K9YKaSVlmGHw8M4JrlejXRonALo2dcm8s/Qu0Cs59vItGt5CtHEMlTt0bePK6UKQ5P4acddOeLg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773792728; c=relaxed/simple;
-	bh=knEiv//4VD9jJeec8RxNBDwCYflHSFiOuljpRQD29hc=;
+	s=arc-20240116; t=1773792836; c=relaxed/simple;
+	bh=1dlBnp6Q0uDDUW6pxd7bhUV/OtX8ZFdk+vReX36VBAs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mjn5m6s9hZfNW5oWsRRoChaVtJoxOB0iEF4ueg0SDSYmN9FIactjmZOGFLYJST0T4Tz2glevi6iIQEBs1BtJ5TD4RX/JHvK9CaAwtGl2wXj2/nUT7kXIWyXR/oqxtPiJTwmGbkw5+6FAqmFQ3h1WJIAJy8O9YdlxUvcMuniRPM0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cacIxvzn; arc=pass smtp.client-ip=74.125.224.43
+	 To:Cc:Content-Type; b=E1MmylI2MXubVRw+ssD+DETvJbURLWM2c35agva9yXpRDSPC5KYq95sugutbV3pli47gM+IIpn+06Wb4WXB27AuzXKQMcwe8Kiz3JETPZMESnCRhj5jMwQpBMT7zrxn2sCY4tTZ176g8gCsD7FGlk6497k4ObjWbSXha4bpvr1A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QJpi8hKm; arc=pass smtp.client-ip=74.125.224.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-64ad019bbd4so6603083d50.0
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 17:12:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773792725; cv=none;
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-64c9a398bc7so7125865d50.2
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 17:13:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773792834; cv=none;
         d=google.com; s=arc-20240605;
-        b=ET6g9aGHXmwj45NCKp++upBlRohYqQ0L/5SlurhyBpWgOZhQqbUnnJckMIoCLGFzsd
-         thT1XzHaGK9hTvsYy3R4deCHHTsLD/glVezaYZV15RZGW2vKrTCA7sjUb12rXIyenLOG
-         cDF3mcx4w/ERXrBlwcB5uiWnQwgCH6ioZloUwJvTRN3rJJuFjh2yPZoq/6mSNXSjac6x
-         wvXycwEOJClcSjK7y56zlOtBmus1KWc10hfbsUn7fChQZt787qVGMPYm0r0jLEeWf7Ty
-         ZA2fQraPGwyHUNv4BXbNNnBBMMeflprTBRog/DF79O3r5obVN3m6bAfv+qumj+S39jO6
-         0LUw==
+        b=jeFCBVJoWJMACi5k2J9NpMPPZ7igbsaasMBHkTTX8V1JZD/T/rYM1YmZA1kLvrklcr
+         RJQtkt2vL56/uCyUDdlKzVbvr+asEKqfgwrOOJupXa+dPyNdwmdE4U/tONpgONhdxVK6
+         Sp6ObRbajBbKNhfK4cYnjf2+F3NfKrWiipiN5N05Xu7c98veTzzk/EdWV8fzI+rmHISF
+         JElNUBMHMHBwzglnxXmJJKTNuqU0bXllzpQKUiXfMO9jeUF61LzbxyvpCQdYW1w2A5X2
+         S+X8cwE95pbP/UDoOXa0laZE84xcKGKVN+HpHHizMwe45aWKblrzTX3P2TC5sLXXV20k
+         qIJg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=xQHa29a0F9hQB3K+TT1RUsgpE1a93bcbnQ1K/3gSFjQ=;
-        fh=dEECgN0TBTdssiqHE5H4uKtW0i2WaKfRp1GriC+bAnY=;
-        b=b7I21UjUwk2jZfnQDrvP7D/7IAFR+QmYetPKRkPU6UrRzTZcxCRNLiO713rhwv0dPF
-         q826qBjGysrm9MsbPvTxnLWAD1odsV2oaLZMHlEK5cWoVbQ4a4Olydx7UxB9aAH/YuWL
-         fJKrcoI1CzE1uyryt6az7A8qwOE78Lh4S8jjNsfdMKDRWM21V51uqOsytVx6q31U5ZiV
-         1Z5vamvMSf0mDZHq8mwDIPIPwtsw8Go+DvjEpNUPOkBAiMIqAYMDfkSGkbYiosDx/wnN
-         RL9PMrMuCPQVIUi2xGRSJm77J2homyg2xJXRtAYYj+yu9uEPUyamtvh4+6QDPwevzngO
-         sPWA==;
+        bh=NH3lKMbPGzMjHktQ2S0JYx2HKd1BHzthwHWo0yjIxC8=;
+        fh=pjLsieQ+B9sa5Nziw75Pw7b1SLXBjkoch4yGLKApEnU=;
+        b=kSdydMSZTmkv8tnmlrYu7upoGjaKAFbJlxt3TlqMQtJVoIRp3CPQBKFvpnOnX6qmsW
+         5D0+zxCW+IrJGsZBO6LAfpNn3XskmVyw5Pjg4V2zP60ppjKzZlUXkQiymMc+PTJDQxzB
+         QF8Xm9btNSvacRK/wLlzIKLHnnzoEp3T5WhYGseRKxdAyYpfsnr8RqKq3vHaXTXLorHH
+         UT5wdpMiLa2GSDct/aVFINsa4L7yQ3QnYTkY1S2GmKk1Ocgi3/97TYs2Qd3u8cKEetHc
+         mg/l6g3nL/L50XTqdHEV0YIP6wJh1Ffum0+GOu0TB/X7/bG+22AUKPBzoTgjsRp0gvVF
+         uX8w==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773792725; x=1774397525; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1773792834; x=1774397634; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xQHa29a0F9hQB3K+TT1RUsgpE1a93bcbnQ1K/3gSFjQ=;
-        b=cacIxvznXQG7bp+7541HnDPzgFd84zk+LVG1V3U1bWO0/mCXkh+ExFNXX2o8HlOj1k
-         yoifAmkcEGizBeFhcMj461HFHH4stRh6HUEsa4OalKTQKQkIHjD21IgltlzDKBGSunnN
-         QivfLibwiw7hI430xMUnLu7IYMG3YTIZr24CJjO5wcJo3rZqoa6wruv/4ol09thdF+qs
-         ROp2fN4kFwCo3FEpeUOVHbk+o+qbIsSxHPV42XKC7qqEtkV0o6V1p5Z8MVA/MfNeIG2v
-         QiWSzys/uri6pHn+9/J345kVCn/7i41TJk9e3QxnMrfn6ra5dEG+JPhIQWUY0MZd5dVd
-         FWDA==
+        bh=NH3lKMbPGzMjHktQ2S0JYx2HKd1BHzthwHWo0yjIxC8=;
+        b=QJpi8hKm+xtFPNCyocAfpmRE5NDTUSUH/YPb6X52oBG3vOaTQlISEmrtmhexTkKfI5
+         B7UFQYqRYRnFtYPi6wXO2HJJI5BK7Ub2QWMgsZUWMzkFzRyzh0AauncZ8yAblQiuQd9u
+         235vzELHXXogtqIH3YTLH5nIv05+uNIPrN4BqTXpI+rEvWTXCcIo3dzDgP78ME7TZdPG
+         u0v2UoM7V6GCEpEdCTSfQ9iwAzjneDXx+vcVXkAB+cYsGpX212GDWHCckN37YvO45PVj
+         O3KLQ9Wuo+ZOdwU0g5vB2LzXJwI9vy/xwB3s8EMEi/gz5O1cGLPilwoLohlwU2KSnbL2
+         1XzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773792725; x=1774397525;
+        d=1e100.net; s=20251104; t=1773792834; x=1774397634;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=xQHa29a0F9hQB3K+TT1RUsgpE1a93bcbnQ1K/3gSFjQ=;
-        b=HVlE8ox0CWs2xOzCuCuP3dwbx0gbmZGSy8fCGYQvoDClk4If4mxhJ+yzw/FYd/iMod
-         P8ZUEZ/G93FLhpZa17Ygk8eMegmmwp3HN6buDDYjkIGv8+/SZHV1LLYD6gEB08i4imqV
-         9i/AdMMHsRsvq2BfghDhlShynApXtCFlJyjKfiZ30uMRk0o1bjr0vCioMGbVvWrJZQHX
-         aNZMdzOZ7gC6TRj6VfcBX0aAY3lNZCLhJ1LF/Sqsr4ayA9pfDVabSDE/MgvvMuiTvSNU
-         j/Qvausu2jxSkJI4QcrvA4XtapNzSCLnk69TXYvAkCMdVA61cW1PRxjOA5nffNUmnr+w
-         Rzag==
-X-Forwarded-Encrypted: i=1; AJvYcCU2h+RaYa+JjtsaS7KG9EmtqzYfNQ2sJmOhqfbrmzQyTVS0tIA73wZFYjkJCsqusfyxhToRFSA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnR/jP7jo7J9SSEXGixH/qTphuKUMvz0oITctM0iupnS5I71zZ
-	DzDUrqOYZ+bSfHUV/9NTnSStxTgclyRrqoKTzWMr5wSciSiVP+u+jWjD6LjeeH8Uc0pYdxRxZgx
-	OEt+OIr08JEp7xR9shTa5kgzKklkOa6B1e9/XTXl4
-X-Gm-Gg: ATEYQzyqFI3iDSRN+/eqkzNb25xcKhgnRHMq0g/dvvQxqLOwlJwpdy2dDhiCtzenBe5
-	f0zbkjVPR7+51JI+i7p5/L5eiorXbdJjIOCBEL6Ye80oU2O89ns2y3znI8c62MF3riS0jpcsxpO
-	vsWc9hmegu+UM/dJTyDyPFVn+7Bug6+QQq+7D3XqBpsl8tIzZSPKLEECvWt6uW3CC5HyP5V/dMh
-	o+RtJ+SGbGqJ7vprw5gfk0RwBB6WneQvfpKEU5DH4taTlAgGzmp6vmdsqiZYRvonLSTG2YMpd58
-	OF7pYEVGU/CfKxnIImcDrmifks3C4geORFQ=
-X-Received: by 2002:a53:edc1:0:b0:64c:a4ab:e4e8 with SMTP id
- 956f58d0204a3-64e91327c01mr1498946d50.20.1773792724985; Tue, 17 Mar 2026
- 17:12:04 -0700 (PDT)
+        bh=NH3lKMbPGzMjHktQ2S0JYx2HKd1BHzthwHWo0yjIxC8=;
+        b=X6ofed5RTrANFDeRxrbcgxohEwaBLlSzE2PqyxmOCBfv3TMEFSqq7WdipJ+kCCTt2J
+         dduu/3jtaMdH4Ka/qQTztkXoaUPv6u16/DPKGwXYuGfFLYjGa4bAiHgdBUj8b7YuCHm3
+         r0lDZ82wsqz9R33ENK3kDK47lO7W80RJljPuDD719oB2W5FipT4KdSIHV9CBLwLiDuZI
+         N/xXzmVlegyQfscFNvY/Nc+B9VJEE8RU2TWmzh6mI7zQnH7yDBhARk2oopr9QSEiPbDH
+         NkPSscPLO3r4ypUW0gBbpQEFeJcY3bk8qeZiGTAZscK3Nin2ujePgMUEJ/E0vQbF14bA
+         vvnA==
+X-Forwarded-Encrypted: i=1; AJvYcCV6FwQ67D4nBUYmY2gy1mx+Q0cDFkE40muyGrstmKwqGUrPhoHUxdsCMirmpq1Tnl/4DFEZ9Xo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz03zGybUP007vi6702s45HdC+zGKo13evylOueKhBHSOFPaIpE
+	rXO0j1iO6nJuI/rPyzbdXGbsa8CGz6Cm+S7mM9CPw/nOF99BOrhj4jCZkslbsN6UjMWnWnGM+Hg
+	aP5b1O2qxMqKa9U6cdUxap6cWndovPzuCKZkxOttH
+X-Gm-Gg: ATEYQzwal2hEIm48XL1OHrT1ZfuMmV8xFBudV1mijEILNkIlXdv30AgX3b0ht3VoR59
+	OvxdfiAhO3cnsvkNSMEKfMc2EdyqcvZJTlNx6n23WlCI9b41UIl/nczi2rK2iGXO3sGHtPKqGl/
+	37ifGHAqfPp2vtx5AQnBHimyKU2z05GT5jgLs3bi27RVEtYKI5GVULbIqn7Sn109CUcxgcHo0wM
+	mKx+yoKGDyRUk5ImvsgT3CfpTE0PWs8BRDAyvFwCuyWUXd3Nz6XhQRzdLmGNSA0JsGvOYJOVIhc
+	Rj7JFr7+0opfJex9Hpo7EZuo626/umGud18=
+X-Received: by 2002:a53:acdb:0:20b0:64c:9ee9:7784 with SMTP id
+ 956f58d0204a3-64e912ea4edmr1596743d50.11.1773792834005; Tue, 17 Mar 2026
+ 17:13:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260316232819.6872-1-emil.s.tantilov@intel.com> <20260316232819.6872-3-emil.s.tantilov@intel.com>
-In-Reply-To: <20260316232819.6872-3-emil.s.tantilov@intel.com>
+References: <20260316232819.6872-1-emil.s.tantilov@intel.com> <20260316232819.6872-4-emil.s.tantilov@intel.com>
+In-Reply-To: <20260316232819.6872-4-emil.s.tantilov@intel.com>
 From: Li Li <boolli@google.com>
-Date: Tue, 17 Mar 2026 17:11:52 -0700
-X-Gm-Features: AaiRm51lAT37d5orb_kuGVpaQVhsFcoQau7SuZhTPMn1qsiJkxQa_jxj52FffUI
-Message-ID: <CAODvEq7Ty-D6MPeS0r3077jXWMX0i9yp3UB7d+mnGTaQGegH-g@mail.gmail.com>
-Subject: Re: [PATCH iwl-net 2/3] idpf: set the payload size before calling the
- async handler
+Date: Tue, 17 Mar 2026 17:13:41 -0700
+X-Gm-Features: AaiRm52502HuPWZDlNe1pVsboDjRd5-YbjXG_qFrypIUllH3EkzzS3xrhNFe7OA
+Message-ID: <CAODvEq6ZDoAxzZ4scKtE7tnfe94wBwgTsckEfLzwxFo=BcLNSA@mail.gmail.com>
+Subject: Re: [PATCH iwl-net 3/3] idpf: fix PREEMPT_RT raw/bh spinlock nesting
+ for async VC handling
 To: Emil Tantilov <emil.s.tantilov@intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
 	anthony.l.nguyen@intel.com, aleksandr.loktionov@intel.com, 
@@ -121,12 +121,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268833-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268834-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -137,54 +137,137 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[boolli@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: BC3E92B4963
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 6EBBD2B494B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
+
+Thank you!
+
+Reviewed-by: Li Li <boolli@google.com>
 
 On Mon, Mar 16, 2026 at 4:28=E2=80=AFPM Emil Tantilov <emil.s.tantilov@inte=
 l.com> wrote:
 >
-> Set the payload size before forwarding the reply to the async handler.
-> Without this, xn->reply_sz will be 0 and idpf_mac_filter_async_handler()
-> will never get past the size check.
+> Restructure the ASYNC case to allow calling idpf_vc_xn_forward_reply()
+> outside of idpf_vc_xn_lock(). This avoids invalid wait context reported b=
+y
+> the kernel due to the async handler taking BH spinlock:
+>
+> [  805.726977] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [  805.726991] [ BUG: Invalid wait context ]
+> [  805.727006] 7.0.0-rc2-net-devq-031026+ #28 Tainted: G S         OE
+> [  805.727026] -----------------------------
+> [  805.727038] kworker/u261:0/572 is trying to lock:
+> [  805.727051] ff190da6a8dbb6a0 (&vport_config->mac_filter_list_lock){+..=
+.}-{3:3}, at: idpf_mac_filter_async_handler+0xe9/0x260 [idpf]
+> [  805.727099] other info that might help us debug this:
+> [  805.727111] context-{5:5}
+> [  805.727119] 3 locks held by kworker/u261:0/572:
+> [  805.727132]  #0: ff190da6db3e6148 ((wq_completion)idpf-0000:83:00.0-mb=
+x){+.+.}-{0:0}, at: process_one_work+0x4b5/0x730
+> [  805.727163]  #1: ff3c6f0a6131fe50 ((work_completion)(&(&adapter->mbx_t=
+ask)->work)){+.+.}-{0:0}, at: process_one_work+0x1e5/0x730
+> [  805.727191]  #2: ff190da765190020 (&x->wait#34){+.+.}-{2:2}, at: idpf_=
+recv_mb_msg+0xc8/0x710 [idpf]
+> [  805.727218] stack backtrace:
+> ...
+> [  805.727238] Workqueue: idpf-0000:83:00.0-mbx idpf_mbx_task [idpf]
+> [  805.727247] Call Trace:
+> [  805.727249]  <TASK>
+> [  805.727251]  dump_stack_lvl+0x77/0xb0
+> [  805.727259]  __lock_acquire+0xb3b/0x2290
+> [  805.727268]  ? __irq_work_queue_local+0x59/0x130
+> [  805.727275]  lock_acquire+0xc6/0x2f0
+> [  805.727277]  ? idpf_mac_filter_async_handler+0xe9/0x260 [idpf]
+> [  805.727284]  ? _printk+0x5b/0x80
+> [  805.727290]  _raw_spin_lock_bh+0x38/0x50
+> [  805.727298]  ? idpf_mac_filter_async_handler+0xe9/0x260 [idpf]
+> [  805.727303]  idpf_mac_filter_async_handler+0xe9/0x260 [idpf]
+> [  805.727310]  idpf_recv_mb_msg+0x1c8/0x710 [idpf]
+> [  805.727317]  process_one_work+0x226/0x730
+> [  805.727322]  worker_thread+0x19e/0x340
+> [  805.727325]  ? __pfx_worker_thread+0x10/0x10
+> [  805.727328]  kthread+0xf4/0x130
+> [  805.727333]  ? __pfx_kthread+0x10/0x10
+> [  805.727336]  ret_from_fork+0x32c/0x410
+> [  805.727345]  ? __pfx_kthread+0x10/0x10
+> [  805.727347]  ret_from_fork_asm+0x1a/0x30
+> [  805.727354]  </TASK>
 >
 > Fixes: 34c21fa894a1 ("idpf: implement virtchnl transaction manager")
+> Reported-by: Ray Zhang <sgzhang@google.com>
 > Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
 > Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 > ---
->  drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 21 +++++++------------
+>  1 file changed, 8 insertions(+), 13 deletions(-)
 >
 > diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/ne=
 t/ethernet/intel/idpf/idpf_virtchnl.c
-> index 21a6c9d22085..6b9692b30040 100644
+> index 6b9692b30040..8ceabd86e172 100644
 > --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
 > +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-> @@ -627,6 +627,10 @@ idpf_vc_xn_forward_reply(struct idpf_adapter *adapte=
+> @@ -546,32 +546,24 @@ static int
+>  idpf_vc_xn_forward_async(struct idpf_adapter *adapter, struct idpf_vc_xn=
+ *xn,
+>                          const struct idpf_ctlq_msg *ctlq_msg)
+>  {
+> -       int err =3D 0;
+> -
+>         if (ctlq_msg->cookie.mbx.chnl_opcode !=3D xn->vc_op) {
+>                 dev_err_ratelimited(&adapter->pdev->dev, "Async message o=
+pcode does not match transaction opcode (msg: %d) (xn: %d)\n",
+>                                     ctlq_msg->cookie.mbx.chnl_opcode, xn-=
+>vc_op);
+>                 xn->reply_sz =3D 0;
+> -               err =3D -EINVAL;
+> -               goto release_bufs;
+> +               return -EINVAL;
+>         }
+>
+> -       if (xn->async_handler) {
+> -               err =3D xn->async_handler(adapter, xn, ctlq_msg);
+> -               goto release_bufs;
+> -       }
+> +       if (xn->async_handler)
+> +               return xn->async_handler(adapter, xn, ctlq_msg);
+>
+>         if (ctlq_msg->cookie.mbx.chnl_retval) {
+>                 xn->reply_sz =3D 0;
+>                 dev_err_ratelimited(&adapter->pdev->dev, "Async message f=
+ailure (op %d)\n",
+>                                     ctlq_msg->cookie.mbx.chnl_opcode);
+> -               err =3D -EINVAL;
+> +               return -EINVAL;
+>         }
+>
+> -release_bufs:
+> -       idpf_vc_xn_release_bufs(xn);
+> -
+> -       return err;
+> +       return 0;
+>  }
+>
+>  /**
+> @@ -631,7 +623,10 @@ idpf_vc_xn_forward_reply(struct idpf_adapter *adapte=
 r,
->                 err =3D -ENXIO;
->                 goto out_unlock;
->         case IDPF_VC_XN_ASYNC:
-
-Optional comment: could we only set the size if ctlq_msg->data_len >
-0, in case the hw returns some invalid values?
-
-> +               /* Set reply_sz from the actual payload so that async_han=
-dler
-> +                * can evaluate the response.
-> +                */
-> +               xn->reply_sz =3D ctlq_msg->data_len;
+>                  * can evaluate the response.
+>                  */
+>                 xn->reply_sz =3D ctlq_msg->data_len;
+> +               idpf_vc_xn_unlock(xn);
 >                 err =3D idpf_vc_xn_forward_async(adapter, xn, ctlq_msg);
+> +               idpf_vc_xn_lock(xn);
+> +               idpf_vc_xn_release_bufs(xn);
 >                 idpf_vc_xn_unlock(xn);
 >                 idpf_vc_xn_push_free(adapter->vcxn_mngr, xn);
+>                 return err;
 > --
 > 2.37.3
 >
-
-Reviewed-by: Li Li <boolli@google.com>
 
