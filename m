@@ -1,252 +1,177 @@
-Return-Path: <netdev+bounces-268891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268888-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SHhnABdJumkFTwIAu9opvQ
-	(envelope-from <netdev+bounces-268891-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:41:27 +0100
+	id MCw3Ji5IumkFTwIAu9opvQ
+	(envelope-from <netdev+bounces-268888-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:37:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85BE22B6831
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:41:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 128A22B67C4
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:37:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E52703044B9A
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 06:37:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E84F33039696
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 06:37:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE85225C80E;
-	Wed, 18 Mar 2026 06:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFC0D364054;
+	Wed, 18 Mar 2026 06:37:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SEKMxOWC"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="yDKhSlRR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D02280309
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 06:37:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFB125C80E;
+	Wed, 18 Mar 2026 06:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773815864; cv=none; b=KDTB/TaWHthdWd05nD4lI358moR1dVzCnnPkefFh/FlVH4tqguO1Xn8SfdQGfYU8qLtUSoFiYPOVWUJRrDk354oErtpIUWaLza+ZzfUlMUpuzK4sSLpq747jIEl6/KDNBXr0efiMFy0BuhbDsj+MVBOGfLpDyp4mScvXTeRKgrQ=
+	t=1773815851; cv=none; b=AyYDZ7C/69Bdbb7tsyVCa5r/OQ5mrNGpAxewJ0jb8HA37pNUV8hPf6RQqMXn5W1Vn81YmMYxk9PkX/f7akehksJuv4trn5LVEFTfR1VVBodccvDcd2e2RQoJoT53o3pBEeIkRCJlKTxQSfgvjBVkPgP6NsrEw1KSgVNteevUjwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773815864; c=relaxed/simple;
-	bh=B6w9+t6iL/TOp54YhkDN8WKI5sr7szB/UfhThNsC4KY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=AtZV45JB9p14yBi8Z70azNVgG7w09SwMW1FekO07+XU+IcB09P0F4Zxqb2jPhGqMeRGmJkjuxcfPJAfTAFCylC2ld/Zb7B5Qb/YiK4p6YviLsNCtVuERbdMwmt4sZzYcG/JfKzu7oHKA8H95EBRam+72l8LNkIy+7nvkLanyR8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SEKMxOWC; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-509307e3854so5076711cf.1
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 23:37:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773815862; x=1774420662; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dZGvwuMrOAu4OGXCJyfmhbRaVBhCV3KVK8W/0vxO3GY=;
-        b=SEKMxOWCeAoc3YF13OcCGHVLNnbFiAJl53HEMRxQh9XNDPxjjurZ0La7FdI4U7uKKZ
-         pzxQsGGEBHj5iuQw+L3SDEY19ub96w66qRfYZEeHlIF83UCEkuxs/guWFSg1mUurguYB
-         HVDWKBIVQPUqXl4FehYI+BERxHmbu+4uOJFL4MJxNaq59mopVJUJoILy/dtBk1ag1edP
-         it2ZXmV3bfhcjWAI/PyXNsX6xbgv8KLnirHSx9xEFRnVyeU9jSinMgreio82ISiXossk
-         rmJyJMQHWl6MaQpHRi2N+jKcrN7ZjdFmN8NvO5ZAxgk6/PBiXH6N+w2jFPIofEVBj2oE
-         B/Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773815862; x=1774420662;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dZGvwuMrOAu4OGXCJyfmhbRaVBhCV3KVK8W/0vxO3GY=;
-        b=HSeuix6RuEdgSTs2U/smWRQ8VwCylX0egfNCwTJLS7oqZjNC7NhZN/vjTRCCwctZRp
-         4Bb3H2Ulr9Ke7bWYRxVD1Hf4Gm1ZYbSfmwdCjC2g7NQij7YG0LTIY/q7zee4vMQEiAPI
-         pS7GVprvsxraKF55l36B0qBk5ptzcxE2BsfZIXZYdqia/RcISKP0z9H+/SG6gKigd7PH
-         Ys1/aI/x7UrTyzt2VFA0yHjrWxaWW+jM2A0p7xw81UlSdu0xjPJS4lejGH8OmP4Z0bVT
-         r+i2CbDDOx5rSfT2cwzXP2Tj/Usfk+nn36LU2FyLOz9XX/nVjTyD7eumgGbZe7Fxry17
-         zB1w==
-X-Gm-Message-State: AOJu0YzQunaZi6TerQvebF4US+p4geklj0FdKuOiqDI/Wh48NV+xaB8I
-	mwCyOHrTVy//1L6q7M/WzpO0Qo4ulVOMoJgsQ3pxbYXQuyB/pVuZDQ05
-X-Gm-Gg: ATEYQzx5AN+/et6I4HaewA+WdcwwT3MtZg+znUzyBPAktL2NWxU7qjVeKoTAIW0dwHW
-	FxjrKCAtoLSi1aVV5LFJT0rLKTja3G//S4EJwUFUxD48mRRgQNlBamxjPldJGSDIqBpAd+zWT16
-	d6aCqlkWEUTOjWeUk91ZhEjbfEK6tIlfkxffW8hsTmo/XGFT6QNNFhHLGC5Hnki70U40i4zRpKJ
-	pFrlAQHWmKnXBY6BSpO9da7vCvmUhX0rLdCxC0MA6OSia54Oaulif+bHaOCcuHayviLvcoZmVgD
-	mvMRWvQO+whQpY74LvQ1scaVN8lIKjIxIqWXXSJCNM4u1tdlOUCLi9TeuVxOLkP72fQ66TtIIE9
-	4h3tjCrDKgO4iyLKuwqhkHnW0IVE8ukyqJA4M4FbEg46UhQs85zCJzrpnJVe8WMZetnsmIKvoiA
-	TYZHD2Gtes8NXDiqocSQwvNG8USo3jrOI4
-X-Received: by 2002:a05:622a:607:b0:501:4184:b59f with SMTP id d75a77b69052e-50b138674bamr30444081cf.15.1773815862249;
-        Tue, 17 Mar 2026 23:37:42 -0700 (PDT)
-Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b135b875esm15235351cf.25.2026.03.17.23.37.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 23:37:41 -0700 (PDT)
-From: Kevin Hao <haokexin@gmail.com>
-Date: Wed, 18 Mar 2026 14:36:59 +0800
-Subject: [PATCH net v2 2/2] net: macb: Protect access to net_device::ip_ptr
- with RCU lock
+	s=arc-20240116; t=1773815851; c=relaxed/simple;
+	bh=MmY12uRNDdhfGh7T/XYLMYSoZmpnUMejZkZjvuvpHRE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bmuq8w/FCI18FaWCS8/gopnMnikdTJ11bPpV1Z3O36lAwJz9RYGdIJ8G3e6uA0sEuR9vbzy5oYoBoB9pDhl9R6uEwSH3JO/rjHjHDaRQmJqciljPE1LloEEj8ZJcZ+ALaEMzTrJi4ytf0qvAlmIvNVjjIoAYUiHR2n9qjbsewrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=yDKhSlRR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6937C19421;
+	Wed, 18 Mar 2026 06:37:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1773815851;
+	bh=MmY12uRNDdhfGh7T/XYLMYSoZmpnUMejZkZjvuvpHRE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=yDKhSlRRPuRXcV2Imh7yPJa4eoRUif2NWvEvAr89riGfEopv7LrWSiSdg6kKGHYeS
+	 O9MxU+45mwTKBoSFz/D+Cb9YorEH+XmCoygXU8bq27scrEclBOk+//aEUYZKdSi3Od
+	 MEhu3AD96RBuEzd9MADNNXn/I8iLwbVoxLyoXFCo=
+Date: Wed, 18 Mar 2026 07:37:12 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Omer Zalman <omerzalman42@gmail.com>
+Cc: oliver@neukum.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/2] net: usb: cdc_ncm: prevent silent u16 truncation in
+ min_tx_pkt_store()
+Message-ID: <2026031801-skiing-decade-eccd@gregkh>
+References: <20260318040632.69531-1-omerzalman42@gmail.com>
+ <20260318040632.69531-2-omerzalman42@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260318-macb-irq-v2-2-f1179768ab24@gmail.com>
-References: <20260318-macb-irq-v2-0-f1179768ab24@gmail.com>
-In-Reply-To: <20260318-macb-irq-v2-0-f1179768ab24@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Vineeth Karumanchi <vineeth.karumanchi@amd.com>, 
- Harini Katakam <harini.katakam@amd.com>, 
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
- Kevin Hao <haokexin@gmail.com>, stable@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260318040632.69531-2-omerzalman42@gmail.com>
+X-Spamd-Result: default: False [3.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268891-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268888-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,amd.com,bootlin.com,gmail.com,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 85BE22B6831
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linuxfoundation.org:dkim]
+X-Rspamd-Queue-Id: 128A22B67C4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Access to net_device::ip_ptr and its associated members must be
-protected by an RCU lock. Since we are modifying this piece of code,
-let's also move it to execute only when WAKE_ARP is enabled.
+On Tue, Mar 17, 2026 at 11:06:32PM -0500, Omer Zalman wrote:
+> min_tx_pkt is a u16 field but the sysfs store handler accepted any
+> unsigned long and assigned it directly. Values that do not fit in 16
+> bits silently truncate: writing 65537 wraps to 1, turning a
+> "never pad" intent into "always pad".
+> 
+> ctx->tx_max can itself reach 65537 because cdc_ncm_update_rxtx_max()
+> increments the negotiated NTB size by one pad byte when it is an exact
+> multiple of the USB maxpacket size.
+> 
+> Clamp the stored value to min(tx_max, U16_MAX). Any value above tx_max
+> is already semantically equivalent to tx_max since frame lengths never
+> exceed it; the U16_MAX cap ensures the result is always representable
+> in the u16 field without wrapping.
+> 
+> Fixes: 39eb7e0e8c88 ("net: cdc_ncm: allow tuning min_tx_pkt")
+> Signed-off-by: Omer Zalman <omerzalman42@gmail.com>
+> ---
+>  drivers/net/usb/cdc_ncm.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/usb/cdc_ncm.c b/drivers/net/usb/cdc_ncm.c
+> index 6fcb4d711a64..edd69f4e1596 100644
+> --- a/drivers/net/usb/cdc_ncm.c
+> +++ b/drivers/net/usb/cdc_ncm.c
+> @@ -242,11 +242,17 @@ static ssize_t min_tx_pkt_store(struct device *d,
+>  	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
+>  	unsigned long val;
+>  
+> -	/* no need to restrict values - anything from 0 to infinity is OK */
+>  	if (kstrtoul(buf, 0, &val))
+>  		return -EINVAL;
+>  
+> -	ctx->min_tx_pkt = val;
+> +	/* Clamp to tx_max: the frame length can never exceed tx_max,
+> +	 * so any threshold above it has the same effect (padding is
+> +	 * never applied).  Also cap at U16_MAX since min_tx_pkt is
+> +	 * a u16 - without this, values like 65537 silently wrap to 1
+> +	 * and invert the intended behavior.
+> +	 */
+> +	ctx->min_tx_pkt = min_t(unsigned long, val,
+> +				min_t(u32, ctx->tx_max, U16_MAX));
+>  	return len;
+>  }
+>  
+> -- 
+> 2.39.5 (Apple Git-154)
+> 
+> 
 
-To minimize the duration of the RCU lock, a local variable is used to
-temporarily store the IP address. This change resolves the following
-RCU check warning:
-  WARNING: suspicious RCU usage
-  7.0.0-rc3-next-20260310-yocto-standard+ #122 Not tainted
-  -----------------------------
-  drivers/net/ethernet/cadence/macb_main.c:5944 suspicious rcu_dereference_check() usage!
+Hi,
 
-  other info that might help us debug this:
+This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+a patch that has triggered this response.  He used to manually respond
+to these common problems, but in order to save his sanity (he kept
+writing the same thing over and over, yet to different people), I was
+created.  Hopefully you will not take offence and will fix the problem
+in your patch and resubmit it so that it can be accepted into the Linux
+kernel tree.
 
-  rcu_scheduler_active = 2, debug_locks = 1
-  5 locks held by rtcwake/518:
-   #0: ffff000803ab1408 (sb_writers#5){.+.+}-{0:0}, at: vfs_write+0xf8/0x368
-   #1: ffff0008090bf088 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0xbc/0x1c8
-   #2: ffff00080098d588 (kn->active#70){.+.+}-{0:0}, at: kernfs_fop_write_iter+0xcc/0x1c8
-   #3: ffff800081c84888 (system_transition_mutex){+.+.}-{4:4}, at: pm_suspend+0x1ec/0x290
-   #4: ffff0008009ba0f8 (&dev->mutex){....}-{4:4}, at: device_suspend+0x118/0x4f0
+You are receiving this message because of the following common error(s)
+as indicated below:
 
-  stack backtrace:
-  CPU: 3 UID: 0 PID: 518 Comm: rtcwake Not tainted 7.0.0-rc3-next-20260310-yocto-standard+ #122 PREEMPT
-  Hardware name: ZynqMP ZCU102 Rev1.1 (DT)
-  Call trace:
-   show_stack+0x24/0x38 (C)
-   __dump_stack+0x28/0x38
-   dump_stack_lvl+0x64/0x88
-   dump_stack+0x18/0x24
-   lockdep_rcu_suspicious+0x134/0x1d8
-   macb_suspend+0xd8/0x4c0
-   device_suspend+0x218/0x4f0
-   dpm_suspend+0x244/0x3a0
-   dpm_suspend_start+0x50/0x78
-   suspend_devices_and_enter+0xec/0x560
-   pm_suspend+0x194/0x290
-   state_store+0x110/0x158
-   kobj_attr_store+0x1c/0x30
-   sysfs_kf_write+0xa8/0xd0
-   kernfs_fop_write_iter+0x11c/0x1c8
-   vfs_write+0x248/0x368
-   ksys_write+0x7c/0xf8
-   __arm64_sys_write+0x28/0x40
-   invoke_syscall+0x4c/0xe8
-   el0_svc_common+0x98/0xf0
-   do_el0_svc+0x28/0x40
-   el0_svc+0x54/0x1e0
-   el0t_64_sync_handler+0x84/0x130
-   el0t_64_sync+0x198/0x1a0
+- You have marked a patch with a "Fixes:" tag for a commit that is in an
+  older released kernel, yet you do not have a cc: stable line in the
+  signed-off-by area at all, which means that the patch will not be
+  applied to any older kernel releases.  To properly fix this, please
+  follow the documented rules in the
+  Documentation/process/stable-kernel-rules.rst file for how to resolve
+  this.
 
-Fixes: 0cb8de39a776 ("net: macb: Add ARP support to WOL")
-Signed-off-by: Kevin Hao <haokexin@gmail.com>
-Cc: stable@vger.kernel.org
----
- drivers/net/ethernet/cadence/macb_main.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+If you wish to discuss this problem further, or you have questions about
+how to resolve this issue, please feel free to respond to this email and
+Greg will reply once he has dug out from the pending patches received
+from other developers.
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 2d4304331e297accd91ab48813a9bd4722ce72dc..9856764402b17397928d0a61da61865a3b10484f 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5909,9 +5909,9 @@ static int __maybe_unused macb_suspend(struct device *dev)
- 	struct macb_queue *queue;
- 	struct in_device *idev;
- 	unsigned long flags;
-+	u32 tmp, ifa_local;
- 	unsigned int q;
- 	int err;
--	u32 tmp;
- 
- 	if (!device_may_wakeup(&bp->dev->dev))
- 		phy_exit(bp->phy);
-@@ -5920,14 +5920,21 @@ static int __maybe_unused macb_suspend(struct device *dev)
- 		return 0;
- 
- 	if (bp->wol & MACB_WOL_ENABLED) {
--		/* Check for IP address in WOL ARP mode */
--		idev = __in_dev_get_rcu(bp->dev);
--		if (idev)
--			ifa = rcu_dereference(idev->ifa_list);
--		if ((bp->wolopts & WAKE_ARP) && !ifa) {
--			netdev_err(netdev, "IP address not assigned as required by WoL walk ARP\n");
--			return -EOPNOTSUPP;
-+		if (bp->wolopts & WAKE_ARP) {
-+			/* Check for IP address in WOL ARP mode */
-+			rcu_read_lock();
-+			idev = __in_dev_get_rcu(bp->dev);
-+			if (idev)
-+				ifa = rcu_dereference(idev->ifa_list);
-+			if (!ifa) {
-+				rcu_read_unlock();
-+				netdev_err(netdev, "IP address not assigned as required by WoL walk ARP\n");
-+				return -EOPNOTSUPP;
-+			}
-+			ifa_local = be32_to_cpu(ifa->ifa_local);
-+			rcu_read_unlock();
- 		}
-+
- 		spin_lock_irqsave(&bp->lock, flags);
- 
- 		/* Disable Tx and Rx engines before  disabling the queues,
-@@ -5966,7 +5973,7 @@ static int __maybe_unused macb_suspend(struct device *dev)
- 		if (bp->wolopts & WAKE_ARP) {
- 			tmp |= MACB_BIT(ARP);
- 			/* write IP address into register */
--			tmp |= MACB_BFEXT(IP, be32_to_cpu(ifa->ifa_local));
-+			tmp |= MACB_BFEXT(IP, ifa_local);
- 		}
- 		spin_unlock_irqrestore(&bp->lock, flags);
- 
+thanks,
 
--- 
-2.53.0
-
+greg k-h's patch email bot
 
