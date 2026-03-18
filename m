@@ -1,153 +1,181 @@
-Return-Path: <netdev+bounces-268924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268925-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mP9MG3VnumnnWAIAu9opvQ
-	(envelope-from <netdev+bounces-268924-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:51:01 +0100
+	id sN/aEq5numkFWQIAu9opvQ
+	(envelope-from <netdev+bounces-268925-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:51:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 069B32B86F1
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:51:00 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 486E82B874D
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:51:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CA57630094F5
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:48:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 98619300B28F
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:51:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19AE938F25D;
-	Wed, 18 Mar 2026 08:48:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E9C3909B1;
+	Wed, 18 Mar 2026 08:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="g+f6U5iK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LPtPphYN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [83.166.143.169])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B165386459
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 08:48:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908041DD889;
+	Wed, 18 Mar 2026 08:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773823726; cv=none; b=QxAwYYbEgqAgsm7uUGzcgX9NtcNO1Tr5ym7u59vHQ+r2SJMYwqt9tIstWg9T7wXWEBAFmtlKg7zzvlz5/dwK4PB4XYHE3rJ7q3YZwCREQoYzxASaD0bsyvaZHKP+APAQyy2RJTvtbaNDHdkTF6feSA720gCC0viX86AxavxoqzI=
+	t=1773823904; cv=none; b=VltUBid9sLzwKjcoUMwM4wiNwyjWJ8hStabbcfOakEL4DidG9B+YHtC/eUe/DwUQolDN5cQfzH+45+qz6HclswElgeoLHpJHylBe6TDxL/yfVcSIbdd1lC6nco1B4bx0Zga6kk48UuxKrkmdFdhK/Qe8dUtMS47DaH8PuhgUIJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773823726; c=relaxed/simple;
-	bh=UR/nXpuCBspCXE+lzekYX2SJ7tdoA0dohclCQYpSjTI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n0gHrygllf/iMt64PHGOMa1okMmkgDfNZUXPKbF1nYs4XvbKn/jJPPB1feddfNl0+MattmnbrhmTWK2QDDJwAx4IWUoYj5+Z6fyPYUXB4O4OBxfuPz10x9Ma8lvxQ6Lr7N84VLMp6IXkbH+5Dno6ceD0VdrwkexZs/Ea/ZBuCE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=g+f6U5iK; arc=none smtp.client-ip=83.166.143.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4fbMtZ07l9z9TM;
-	Wed, 18 Mar 2026 09:48:38 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1773823717;
-	bh=CcvTuGAfaIcT/ORomhueMOe6/GJ0Q9rLnTjixizSyEA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=g+f6U5iKoqszKnih54WK93Z1lUPRYsepUOPJW/NbbgLe+3ItPLoo0koenuYZepkcn
-	 SskPVZbjz0yj8OykZEWxB2vcq+uis9rxakjxfGePXCSFGrIEbVEWHIL87d2i3pfBzl
-	 4t3AxaLMD1ctRzRmaql8oET2P3Ug5bugTO3tDnYc=
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4fbMtT6BLNz1kh;
-	Wed, 18 Mar 2026 09:48:31 +0100 (CET)
-Date: Wed, 18 Mar 2026 09:48:26 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: John Johansen <john.johansen@canonical.com>, 
-	Georgia Garcia <georgia.garcia@canonical.com>
-Cc: Paul Moore <paul@paul-moore.com>, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>, James Morris <jmorris@namei.org>, 
-	"Serge E . Hallyn" <serge@hallyn.com>, Tingmao Wang <m@maowtm.org>, 
-	Justin Suess <utilityemal77@gmail.com>, linux-security-module@vger.kernel.org, 
-	Samasth Norway Ananda <samasth.norway.ananda@oracle.com>, Matthieu Buffet <matthieu@buffet.re>, 
-	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, konstantin.meskhidze@huawei.com, 
-	Demi Marie Obenour <demiobenour@gmail.com>, Alyssa Ross <hi@alyssa.is>, Jann Horn <jannh@google.com>, 
-	Tahera Fahimi <fahimitahera@gmail.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v6 1/9] lsm: Add LSM hook security_unix_find
-Message-ID: <20260318.In1aekohyivu@digikod.net>
-References: <20260315222150.121952-2-gnoack3000@gmail.com>
- <2697b9f672967b1318630f2ffa21914f@paul-moore.com>
+	s=arc-20240116; t=1773823904; c=relaxed/simple;
+	bh=/O4uJLxBP1x0RPFjiDP/U3zIbVfq8Y+9lVJPyWWLG4I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WXzqWPmTquQx1ZrDSlaNgXk9l8cAsfSfCv4+1cKBCGlwQc0EcVN51kjolW5ovIqC/ik3rP2cxZLfuSsX9qhE2luQk0UOVb36WrPfNDhqtc9gHJ3NqhbXNI2ynyRFN/IFPx8aHgk8sbLjWGjT7YinWhSMU1xVgEhZLaBl7u7ITKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LPtPphYN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2068C19424;
+	Wed, 18 Mar 2026 08:51:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773823904;
+	bh=/O4uJLxBP1x0RPFjiDP/U3zIbVfq8Y+9lVJPyWWLG4I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LPtPphYNZVgxPl9DcybBpjPYwmbFyPPGhPwYpttQQCZbpEI6rAptOYdxTnuAuoOrP
+	 sMkxP8HFL4gLTGwerekQO+XaN7WMO3MEXPNEnJD8CRx+Vj+sZmTIk5xAsvAGx4IzpY
+	 zPeNOCSRIF/GeSfeqcHewXB0qZkfqK3OUK98PqjjZLGrk5AUkrslQGFISv/QchyXS3
+	 forXeZ5LwyV/dkqjUlEhFxHfu/uDpOAoSI0nbcdDJgqxVsjxncZwuOQe95lkKYg3Hv
+	 XBqY9ndA0vJtsxS46WSs06ndvbL0mhZRXVAh1xs7SjfiJBt7waXXQsaWPagANbQ+nw
+	 e+QVLoAPURhlw==
+Message-ID: <52854742-b458-42db-881f-bef8eac3dab5@kernel.org>
+Date: Wed, 18 Mar 2026 09:51:39 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2697b9f672967b1318630f2ffa21914f@paul-moore.com>
-X-Infomaniak-Routing: alpha
-X-Spamd-Result: default: False [-0.89 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] dt-bindings: arm: qcom: Add qcs9075-radxa-airbox-q900
+To: Mecid Urganci <mecid@mecomediagroup.de>, andersson@kernel.org,
+ konradybcio@kernel.org
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ richardcochran@gmail.com, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20260318083621.470826-1-mecid@mecomediagroup.de>
+ <20260318083621.470826-2-mecid@mecomediagroup.de>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20260318083621.470826-2-mecid@mecomediagroup.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.77)[subject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[digikod.net:s=20191114];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[paul-moore.com,gmail.com,namei.org,hallyn.com,maowtm.org,vger.kernel.org,oracle.com,buffet.re,huawei-partners.com,huawei.com,alyssa.is,google.com,linutronix.de,kernel.org,zeniv.linux.org.uk];
-	DKIM_TRACE(0.00)[digikod.net:+];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[digikod.net];
-	TAGGED_FROM(0.00)[bounces-268924-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-268925-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[mic@digikod.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 069B32B86F1
+X-Rspamd-Queue-Id: 486E82B874D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 17, 2026 at 05:34:57PM -0400, Paul Moore wrote:
-> On Mar 15, 2026 =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack3000@gmail.com> wrote:
-> > 
-> > Add a LSM hook security_unix_find.
-> > 
-> > This hook is called to check the path of a named unix socket before a
-> > connection is initiated. The peer socket may be inspected as well.
-> > 
-> > Why existing hooks are unsuitable:
-> > 
-> > Existing socket hooks, security_unix_stream_connect(),
-> > security_unix_may_send(), and security_socket_connect() don't provide
-> > TOCTOU-free / namespace independent access to the paths of sockets.
-> > 
-> > (1) We cannot resolve the path from the struct sockaddr in existing hooks.
-> > This requires another path lookup. A change in the path between the
-> > two lookups will cause a TOCTOU bug.
-> > 
-> > (2) We cannot use the struct path from the listening socket, because it
-> > may be bound to a path in a different namespace than the caller,
-> > resulting in a path that cannot be referenced at policy creation time.
-> > 
-> > Cc: Günther Noack <gnoack3000@gmail.com>
-> > Cc: Tingmao Wang <m@maowtm.org>
-> > Signed-off-by: Justin Suess <utilityemal77@gmail.com>
-> > ---
-> >  include/linux/lsm_hook_defs.h |  5 +++++
-> >  include/linux/security.h      | 11 +++++++++++
-> >  net/unix/af_unix.c            | 13 ++++++++++---
-> >  security/security.c           | 20 ++++++++++++++++++++
-> >  4 files changed, 46 insertions(+), 3 deletions(-)
-> 
-> Some really minor nitpicky things (below), but nothing critical.
-> However, as we discussed, I would like to see the AppArmor folks comment
-> on the new hook before we merge anything as I know they have an interest
-> here.
+On 18/03/2026 09:36, Mecid Urganci wrote:
+> Add device tree binding for the Radxa AirBox Q900 board based on
+> the Qualcomm QCS9075 SoC.
 
-John, Georgia, we've been discussing this new hook for a few months now
-but didn't hear from you yet.  We plan to merge this patch series with
-the 7.1 merge window (in a few weeks), so before that I'd like to merge
-it in -next in a few days to get a broader coverage.  I'm pretty sure
-this hook will work well with AppArmor too, but could you please take
-look to confirm?
+What is QCS9075? It's the first time this compatible appears and the
+only other reference is socinfo commit which told nothing.
+
+> 
+> Signed-off-by: Mecid Urganci <mecid@mecomediagroup.de>
+> ---
+>  Documentation/devicetree/bindings/arm/qcom.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/arm/qcom.yaml b/Documentation/devicetree/bindings/arm/qcom.yaml
+> index 8c3df8efaa4d..2c492f4d784a 100644
+> --- a/Documentation/devicetree/bindings/arm/qcom.yaml
+> +++ b/Documentation/devicetree/bindings/arm/qcom.yaml
+> @@ -909,6 +909,12 @@ properties:
+>                - qcom,sa8775p-ride-r3
+>            - const: qcom,sa8775p
+>  
+> +      - items:
+> +          - enum:
+> +              - radxa,airbox-q900
+> +          - const: qcom,qcs9075
+> +          - const: qcom,sa8775p
+
+Why qcs9075 is compatible with sa8775p?
+
+> +
+>        - items:
+>            - enum:
+>                - qcom,lemans-evk
+
+
+Best regards,
+Krzysztof
 
