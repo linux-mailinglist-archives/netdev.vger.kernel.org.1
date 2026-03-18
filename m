@@ -1,342 +1,384 @@
-Return-Path: <netdev+bounces-268952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268953-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mF+hNHZ4ummTWwIAu9opvQ
-	(envelope-from <netdev+bounces-268952-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:03:34 +0100
+	id eHByEw56ummTWwIAu9opvQ
+	(envelope-from <netdev+bounces-268953-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:10:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A3C72B99CC
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:03:33 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D1C72B9A7C
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:10:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A16530BD4A0
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:02:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8AB39306DAAE
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411133A874A;
-	Wed, 18 Mar 2026 10:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6515B3BA256;
+	Wed, 18 Mar 2026 10:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AZQ2IV8R"
+	dkim=pass (2048-bit key) header.d=mecomediagroup.de header.i=@mecomediagroup.de header.b="WlZkZAw9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3061E29D273;
-	Wed, 18 Mar 2026 10:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773828136; cv=fail; b=QcLaV1cJcHadR8cmseLRAGfwIWNbUOWAuQKnqejxAaCcG1A1WbcLuFvFR9g50jXS/wXt8dlnv5CqkhB4dfBGU6X8WPqtYITE9NYfDF7P3IRgYAuEco3L8VFGv04FITB7DGv9aMYLGsnWN25Z3pti+q+p8v8xuA34TfzAazdBnYI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773828136; c=relaxed/simple;
-	bh=ccYnUUo8LnhHUUrjnPJApi0WWsFHseLGrmHuMPvoNMQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=BfadzSkcJyWSNdlx3U0an9RD+jKeZiknKr/7VjMmYzKIr5SwG+x4XmRJPlSNfd3i21+Wyjerbd34DhshGthZ/IvaOmJhXevvPqAXckkviHBRsEEOhHCtLN4ew4ZIModDUUxiMqpT6/7AUncC+BgWIHpZFNsz//iMekQW6xyJZ8I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AZQ2IV8R; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773828129; x=1805364129;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ccYnUUo8LnhHUUrjnPJApi0WWsFHseLGrmHuMPvoNMQ=;
-  b=AZQ2IV8RPYETHQIxBJl+S2hkyBMii5qxDlVtPNzoPH19XegSLbyndFbG
-   XY+5K6T2YQ+6utzwVmpra3VcLg36Dgm2aVWucZi5dsorpy5MNUuGR2WDn
-   TkYMNo9LWYokGx+8G9zrZzZkOQloR3pLeGzpUOTre5BsCwx5h83jUn9Zk
-   xKFSxShONW4kidACij1PXjYk+08EiHHQFNIoHMharEbnfmM8ypANlsAPK
-   8XkzoVXeCppEnRATMoO84rEaCMwCYSSLPPGz3Rq1eCKGowht794RlduLT
-   /4LwnRbpDpW1/zA3nSAsgutdFLcsmFeaN+CF851uxF3h+fXKmrMUJyStM
-   w==;
-X-CSE-ConnectionGUID: VRkSqK3USvGwRkAQbw8rXw==
-X-CSE-MsgGUID: A8yuG0XOQwOANDrQ/4DZMA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11732"; a="92259531"
-X-IronPort-AV: E=Sophos;i="6.23,127,1770624000"; 
-   d="scan'208";a="92259531"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2026 03:02:08 -0700
-X-CSE-ConnectionGUID: GSAwOA+2Rbect30edeJ4Fw==
-X-CSE-MsgGUID: n/kKJeQcQA6RnRrS+akFdQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,127,1770624000"; 
-   d="scan'208";a="221812525"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2026 03:02:07 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 18 Mar 2026 03:02:07 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Wed, 18 Mar 2026 03:02:06 -0700
-Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.20) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 18 Mar 2026 03:02:06 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=F4Z81aIV7+P9JWEkwdEVep848eRj4xLEn2C9yDgMSyKVy+JUtNES02szjlYlYPzq1J0IxR/S1RUeXOyVdobespnZLyWCjCqgnbfi2VJpQq8A/xwrdPpJXwzVzjyRior8AKX7BXfey4Y/Xbcs/nXXQ5Z88X928EmDBpXeo0LeQQTXN8dHgW5aqB3hMfn/qq22tej3tk1syB5M7lWmJMwl8D6NhjEDW9Q3BSNX0dc2LaI7JYG/P9RsUKShFx5sQ3H1a+gaEErYlthiRiIGYZLm10+Ft9yzRm6Pn0mk1GaV0krRr4zEcEPtCejpNE/OFZxLfgcuFfYa/Rzp5Wwp7U9mQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S7dbzR7QtmACasPgBEnAgRVUYLNNPq01j+e9E9cOp18=;
- b=UQo9RFX03MrQRic+zpBuA3kz+5jApWd7/tWrgCiHcy2wolXPUKG0zVf4S2Dd/rFI1cMObGU98rpAVKHpk7npSfO3o9ja5m6CevUyR6Maw37lM6OoIx7rDnid2h/D/uXJDPc/Qe7LYgI11JPLriUrAxNNIuxCRgJM880+ue/r4sZv7VquDc1TCVurlHOsUXutquwbZt8RnMuB/Hh/fnVFBe7eoC4xT3tcnS4GQ3TkMcALnMGf3j+qY6IAOEQ80W71YSByh+aRdX4LAVU0yYVtz0zMqjKiT1tpyol3jYtErn8nrOsgtftDTP78/mzM6GaDnvAFeU61WIOo4zbcjJ1nqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by IA1PR11MB7293.namprd11.prod.outlook.com (2603:10b6:208:42a::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.9; Wed, 18 Mar
- 2026 10:02:04 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9723.006; Wed, 18 Mar 2026
- 10:02:04 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "Vecera, Ivan" <ivecera@redhat.com>, "vadim.fedorenko@linux.dev"
-	<vadim.fedorenko@linux.dev>, "kuba@kernel.org" <kuba@kernel.org>,
-	"jiri@resnulli.us" <jiri@resnulli.us>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "richardcochran@gmail.com"
-	<richardcochran@gmail.com>, "donald.hunter@gmail.com"
-	<donald.hunter@gmail.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "Kubalewski, Arkadiusz"
-	<arkadiusz.kubalewski@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "horms@kernel.org" <horms@kernel.org>,
-	"Prathosh.Satish@microchip.com" <Prathosh.Satish@microchip.com>, "Nguyen,
- Anthony L" <anthony.l.nguyen@intel.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [Intel-wired-lan] [PATCH net-next 7/8] ice: add Tx reference
- clock index handling to AN restart command
-Thread-Topic: [Intel-wired-lan] [PATCH net-next 7/8] ice: add Tx reference
- clock index handling to AN restart command
-Thread-Index: AQHctrdDZQWZrdHOOU2Eg3dsQdBx37W0DwLg
-Date: Wed, 18 Mar 2026 10:02:04 +0000
-Message-ID: <IA3PR11MB898675A56BEBCD559D2FEB4DE54EA@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260318090654.611349-1-grzegorz.nitka@intel.com>
- <20260318090654.611349-8-grzegorz.nitka@intel.com>
-In-Reply-To: <20260318090654.611349-8-grzegorz.nitka@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|IA1PR11MB7293:EE_
-x-ms-office365-filtering-correlation-id: 6edd1f45-b916-4746-b01d-08de84d567f9
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024|7053199007|56012099003|18002099003|22082099003|38070700021;
-x-microsoft-antispam-message-info: 0sNHK3YPBwU26hlqwbMGatSZIWgmRh4aUjNSAzVhQ0ZSVK3hlPMPePg8d4NLrJzil1eB2z6qAHB4kq5DgYIA+sRjgzIHniSzBL3jNxVyG2NUESAYWF9tpPc1dXGu2RlSZ5O8KKG34LT2UjkNpvdGklrmeX6jrBvo2xge1e9EdQFXFeo7Sm/uQfBJwhcicJ1UOglhtPo2Nu7iUytB88NA9DLW69sQ73V4j0qVLZW3tsNskPUEatfFuEJ4ALr6tKwYL0dm3GGjxcmu8z2Natfuy43B3vCoR0hPNX3vxBCczJiRyNQnO6dpOGs/GPk1mGtt3E+DgOyGVkNTadcYZavNz7AtS3szDUMfkyfAXjXT5MC3esuMLb8agIjQY1vZOie4lExNe1FygkQvQ5zlpKOEJ/2Xe1WMhLx//ncPSnw7QlnQZHgmhaf8cfT/dWIPXqvzC6no0XTgJF4NWQ/ygrND2d5zNWSsJM614uUEkjtJtY97LVsPGmTcbBAxZYpbvpSmGCP3O8CHfihWLBgK6vjjAuwBQ4P2Mhl2iZf1LItJaNLpdwP7rR3VkGPttcOhxCw0Lzybqjxf/De+J2TEXo4d+MNekLiktGiArOAfJcuMwM1hcfoGAtBOLPVsmHDUKUvIH9xR28YuSQdtvsQ0JExn4rficHfGcoSD/KgZIRMbF1CTE5lOlfUwXr9BU2vOVlV/87QvhvwmGClZIwbtmG4m4PTCNVgePGjpvXMvn/gX3RnBwKBJ3XgyttQJ3df7XIRCHoxOeL+uwrjjJ3l5jWUrZCRYPob/GNZjk5eUxFmihik=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(7053199007)(56012099003)(18002099003)(22082099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?eoqOIuEdixvVBoMQsdNJgg+dyqUE15+gr9KIW471TdHKCPNq6fWNUlgHEftY?=
- =?us-ascii?Q?/aYZ/TCOkahSoizidwsBQTPjMM+0mXeJkIi/tsR0AvvVR8tiz/dCJq958e3I?=
- =?us-ascii?Q?HkCexJ8iad9suSZKmq7gdhWgp9HgdVpijUHXLZQf5Z3p7GLIzjaDs0Z+feZ3?=
- =?us-ascii?Q?lzK9oIzPPwAf92lwuLgUqtjystKt86PfrEL8SnLEY6MneQiK+RcwETF5o6P/?=
- =?us-ascii?Q?nXPqcfx3FAnXc3KOANNdRxO/kuFnRn5Ms06TxBwkM3dt4d1IFDcbpJQmTkDT?=
- =?us-ascii?Q?5eeUqwYF2USNIFqChSdebFuG877umM850nxpRxmjWXjFMhUuADQuIKtmH10V?=
- =?us-ascii?Q?EOmcBXZGwXv+os/jOaiFeeBbloQzrc0tFdtrcH5qtURqK4lUGhrcoU+xrh+u?=
- =?us-ascii?Q?8RhqAb+Tp+ynb2HL/JiKc7CK0EBlAK6w+PXgbiYVcbhIQijhhwfgsjdNhwbK?=
- =?us-ascii?Q?A3For+XFAlkn0xJ+HQWfG16Hg9Yf/CkGZZErMv2woCF+I3M8FhnuZOjq/Kkf?=
- =?us-ascii?Q?WVyLeJDztZo4NHH4neI9A8g1dhSgYcPq22oxLoYoF+0TKNoCCWTHqepvdCdR?=
- =?us-ascii?Q?qfwwhN2ZRwHFZFMUvZLeu3Rq4Ulwkj2Cf7KYgqFqCzgjeAAFY4slOVnYVar6?=
- =?us-ascii?Q?fjGXM3+X6NmsyQ3PFe8nhG4zmEG+gGJtMCrdqK0rFsqiei4NeG/wsniyWTDy?=
- =?us-ascii?Q?RhsYDutPbbFvtyRfw6qz1SwttFRhmSYY+OxmkRaz/cf8HoVhLeUi5jBVzxzd?=
- =?us-ascii?Q?y5KgGS62yzcxms3KKMhbyA7rx9Ht2BrXAfS02P3sn31CIvlCEoFb19RdWT7T?=
- =?us-ascii?Q?N/LyyYN2PzNqHIIghtY+kzwAaWRe1NDDFlIfnFmmAax+bUQCkmTULEy40Z+b?=
- =?us-ascii?Q?PHRcof/570NxWuB4+gEuQF7E3DJwR0bpXKHJxRnhaIW8XbeAoFaoVppViWUP?=
- =?us-ascii?Q?e5eWz4vnmVsDvwei8DqhKc1fOLnWFWmwvi87gfWK2gocKv3E87HC1e/YyArY?=
- =?us-ascii?Q?YbWCX1S19SJ8RxGVwIxk28V9VK//msTdBUt3Mt9tT72+gqt3FSFTkl0SuGvj?=
- =?us-ascii?Q?oNVFmsrSKY+TupuSVLp82wY0q25nzck2bROIXdEVya5fbwimcVgtPd9qb6yG?=
- =?us-ascii?Q?VFTkc2+LsSOJYOv7oojfgcLYsmySa3xSnDn3hcNzoN71i1sOsmWwInvWuWDj?=
- =?us-ascii?Q?LiFPdvvbXZ62GUH17/Sp2WYKQU72UkcR6uNnphQSslx/q/qNjOKe4xEVTI4G?=
- =?us-ascii?Q?PElwEtE7WEdmxuN4YVcFBQEkQrrh45LQ6RaEANM2z8P2s8j10EDe30EQLl+Q?=
- =?us-ascii?Q?8jYDcjXkSK1uBkGZ+816fBkg6I9LntxVpQl7kH5IXSPzF0WaLHjx1l4ad/V6?=
- =?us-ascii?Q?uP5jtgqIWL08QOdv4n4DyrQWgyWmk2Hx5ptIrLxLRzk0OsOMTQdS0sSZgj+0?=
- =?us-ascii?Q?s/eUIjH7KPcV1L0cUdAAWQJbvs1BtEuPiVn99P2ICIcjeTGUEYz4vZHf0GuZ?=
- =?us-ascii?Q?0Qg8/BtYtqjTsXjPRe2GHjFB2wgFO+TSCSoSQ6LgFhWZKSjdC8qzEBZl97Mo?=
- =?us-ascii?Q?Lbwpw0DB/Dn99tIqd832yOhqmeF2gOLb/7NIQaj582RXau10OIXNsRHwtw0N?=
- =?us-ascii?Q?x9UPX+J3WxOvHsDNgFfQhPxwHvtMRDp2hO+RQRwPG8xK57T4c8pdSByzBo8Z?=
- =?us-ascii?Q?ggPfxRZvK08c7GoO6vJLP9tsiTB9cLcOIoK7Sd00zoC3Y415YXhGfBh4G09C?=
- =?us-ascii?Q?s9FLxX6QB2a2oj6jwfNPjui0S0GBTAY=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9993B3893;
+	Wed, 18 Mar 2026 10:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.166
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773828175; cv=none; b=qbIZdiVDHtuUG7s5YMRDx6wbFKjhDv3oSiuz6TXYmhCxK1RQ0APA/y9fxwJ0Wa2hj7NqLxFNa+xbKSe+RlZj0hmfA8H8WHVxlggjzsiPSjifNV6QxsXAxQ+4/o46x3gpO7Yz3OAzjw5EYl7t3rt+PW6u46RT2QJWSniZsmHZV9M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773828175; c=relaxed/simple;
+	bh=h1maZnca79zKEeBY2WSnihjzhk+DG97FDZ+EIpzcPto=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=pPqtiAKlQCbYvHVckqy/qzO0MdzeZm9pP55I9AgVQ9uIGoIyTLqPM6w4MWWEqBvLM+Ns2HnaCuAMe344VBWQBeT0WfDWrNKff9K8WiapY6JU8otrxh2Jc55sDWx50kF4cPTlNhz8biaAj8W8L3Pfkg0kJYamraAdmSlzBTFjuKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mecomediagroup.de; spf=pass smtp.mailfrom=mecomediagroup.de; dkim=pass (2048-bit key) header.d=mecomediagroup.de header.i=@mecomediagroup.de header.b=WlZkZAw9; arc=none smtp.client-ip=188.68.63.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mecomediagroup.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mecomediagroup.de
+Received: from mors-relay-8202.netcup.net (localhost [127.0.0.1])
+	by mors-relay-8202.netcup.net (Postfix) with ESMTPS id 4fbPWg4f1jz41nt;
+	Wed, 18 Mar 2026 11:02:23 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mecomediagroup.de;
+	s=key2; t=1773828143;
+	bh=h1maZnca79zKEeBY2WSnihjzhk+DG97FDZ+EIpzcPto=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WlZkZAw91fF10jBPcD5sB7Tzvw9b+B0e5kz6mGgxvpNxvZ+s72U+DL23Q63T7JoXP
+	 KAZvoy7u5Zxrme9J5TftYAoOIlzCnHzJxJ2Ifq1S7G/TvpdS0ynRMjPQBEeeCxiFsm
+	 OqcsOrAatDeAsoEyeUbIlOxYOxcdSyztimRl+lccqavsUqgzVXsLtyaYn1dQlUio3K
+	 61NCX6Vx9JE1ntOx3gIclqvtRjZT3wgxt5Ive9rPpRPZMwKOkO2RZDhy77/eE6thkh
+	 OHsKhb4AJllV7ew1cFMEeqOXhEqnNAjcU2snnS8os0sLOCsEca4rquJYiR6BdRHd5R
+	 Za7JYrSeJFMkA==
+Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-8202.netcup.net (Postfix) with ESMTPS id 4fbPWQ06Phz3ynd;
+	Wed, 18 Mar 2026 11:02:10 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
+X-Spam-Flag: NO
+X-Spam-Score: -2.898
+X-Spam-Level: 
+Received: from mxe95c.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4fbPWP0T1Cz8t42;
+	Wed, 18 Mar 2026 11:02:09 +0100 (CET)
+Received: from webmail01.netcup.net (unknown [46.38.249.153])
+	by mxe95c.netcup.net (Postfix) with ESMTPA id 8F9E080CA4;
+	Wed, 18 Mar 2026 11:02:07 +0100 (CET)
+Authentication-Results: mxe95c;
+        spf=pass (sender IP is 46.38.249.153) smtp.mailfrom=mecid@mecomediagroup.de smtp.helo=webmail01.netcup.net
+Received-SPF: pass (mxe95c: connection is authenticated)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: R/hvUsaqyDW7PLGERhMoj1/aZJTQar+3HW6+08tHDm1HCsZTnMReIVBGfSR9F00hkKXPO/wDknqGsYSJ336t3c59affS0F1Y+2KdWHtCxW7Qb9QrfcIeYeCPByHlHAKCtXLilWxIebm4S0LLFSArNRerBlXrnehZ5RQmHv8mmZPFJzv6oiW23SPnCpGtbsgmdxrFOufzGGrsWaq5RZYHLJ1hxGpt6O5VKAyEeUUYOQSTrA6vfsnU5wRtxguOxZDSi4JXQn/JkRUkIf/D3uoyk5KNOS92e4EpaZVRJbtJw5J9o1yZ0XNzd3R8LRvMBZFQjU3ijnuHeTHNLT9KXkgoCQ==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6edd1f45-b916-4746-b01d-08de84d567f9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Mar 2026 10:02:04.0464
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: joxLD/jdVOwro7UHBdhdFsbx4sIE4hEOnyiUz6hT5cbG0VOE0w4syKrvojmmlFTOmeoLomchZfUoVDNIy44J4cZHK1xRiWZXVjRpo7k7fho=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7293
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+Date: Wed, 18 Mar 2026 11:02:07 +0100
+From: mecid@mecomediagroup.de
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, richardcochran@gmail.com,
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/2] arm64: dts: qcom: Add qcs9075-radxa-airbox-q900
+In-Reply-To: <edf0eab1-845b-494c-89c0-8822f7c3156c@kernel.org>
+References: <20260318083621.470826-1-mecid@mecomediagroup.de>
+ <20260318083621.470826-3-mecid@mecomediagroup.de>
+ <edf0eab1-845b-494c-89c0-8822f7c3156c@kernel.org>
+User-Agent: Roundcube Webmail/1.4.15
+Message-ID: <6a143ac02440b2d87cb86265e814d916@mecomediagroup.de>
+X-Sender: mecid@mecomediagroup.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: <177382812792.1797080.6434826329839345598@mxe95c.netcup.net>
+X-NC-CID: jMriU/DPGFwjJRiJgd+xykErDJknHmBq0g/VcpeAqQ2nHbFIuLpJ
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[mecomediagroup.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[mecomediagroup.de:s=key2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[mecomediagroup.de:+];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268952-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,linux.dev,kernel.org,resnulli.us,intel.com,gmail.com,vger.kernel.org,lunn.ch,lists.osuosl.org,microchip.com,davemloft.net];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_FROM(0.00)[bounces-268953-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mecomediagroup.de:dkim,mecomediagroup.de:email,mecomediagroup.de:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,radxa.com:url];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 0A3C72B99CC
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mecid@mecomediagroup.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 6D1C72B9A7C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On 2026-03-18 09:56, Krzysztof Kozlowski wrote:
+> On 18/03/2026 09:36, Mecid Urganci wrote:
+>> Add device tree support for the Radxa AirBox Q900 board based on the
+>> Qualcomm QCS9075 SoC (Lemans Family).
+>> 
+>> This board features HDMI 2.0 via dp0, 2x USB 3.1 Gen 2 ports,
+>> 2x 2.5GbE Ethernet ports and onboard UFS storage.
+>> 
+>> Further information: https://radxa.com/products/fogwise/airbox-q900/
+>> 
+>> Functionality has been tested and confirmed working via an Armbian
+>> Debian Trixie build.
+>> 
+>> Signed-off-by: Mecid Urganci <mecid@mecomediagroup.de>
+>> Made-with: Cursor
+> 
+> Not a correct tag. Please read full docs about usage of LLM, because if
+> you came with wrong tag, I assume you did not read the rest of it.
+> 
+> What's more, did you review this code before posting it?
 
+Sorry for the confusion as this is my first time sending a patch 
+upstream and I tried to address what could come up with an LLM as 
+sparing partner before.
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Grzegorz Nitka
-> Sent: Wednesday, March 18, 2026 10:07 AM
-> To: netdev@vger.kernel.org
-> Cc: Vecera, Ivan <ivecera@redhat.com>; vadim.fedorenko@linux.dev;
-> kuba@kernel.org; jiri@resnulli.us; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; richardcochran@gmail.com;
-> donald.hunter@gmail.com; linux-kernel@vger.kernel.org; Kubalewski,
-> Arkadiusz <arkadiusz.kubalewski@intel.com>; andrew+netdev@lunn.ch;
-> intel-wired-lan@lists.osuosl.org; horms@kernel.org;
-> Prathosh.Satish@microchip.com; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; pabeni@redhat.com; davem@davemloft.net
-> Subject: [Intel-wired-lan] [PATCH net-next 7/8] ice: add Tx reference
-> clock index handling to AN restart command
->=20
-> Extend the Restart Auto-Negotiation (AN) AdminQ command with a new
-> parameter allowing software to specify the Tx reference clock index to
-> be used during link restart.
->=20
-> This patch:
->  - adds REFCLK field definitions to ice_aqc_restart_an
->  - updates ice_aq_set_link_restart_an() to take a new refclk parameter
->    and properly encode it into the command
->  - keeps legacy behavior by passing REFCLK_NOCHANGE where appropriate
->=20
-> This prepares the driver for configurations requiring dynamic
-> selection of the Tx reference clock as part of the AN flow.
->=20
-> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_adminq_cmd.h | 2 ++
->  drivers/net/ethernet/intel/ice/ice_common.c     | 5 ++++-
->  drivers/net/ethernet/intel/ice/ice_common.h     | 2 +-
->  drivers/net/ethernet/intel/ice/ice_lib.c        | 3 ++-
->  4 files changed, 9 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> index 859e9c66f3e7..a24a0613d887 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> @@ -1169,6 +1169,8 @@ struct ice_aqc_restart_an {
->  	u8 cmd_flags;
->  #define ICE_AQC_RESTART_AN_LINK_RESTART	BIT(1)
->  #define ICE_AQC_RESTART_AN_LINK_ENABLE	BIT(2)
-> +#define ICE_AQC_RESTART_AN_REFCLK_M	GENMASK(4, 3)
-> +#define ICE_AQC_RESTART_AN_REFCLK_NOCHANGE 0
->  	u8 reserved2[13];
->  };
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c
-> b/drivers/net/ethernet/intel/ice/ice_common.c
-> index ce11fea122d0..de88aec9137c 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -4126,12 +4126,13 @@ int ice_get_link_status(struct ice_port_info
-> *pi, bool *link_up)
->   * @pi: pointer to the port information structure
->   * @ena_link: if true: enable link, if false: disable link
->   * @cd: pointer to command details structure or NULL
-> + * @refclk: the new TX reference clock, 0 if no change
->   *
->   * Sets up the link and restarts the Auto-Negotiation over the link.
->   */
->  int
->  ice_aq_set_link_restart_an(struct ice_port_info *pi, bool ena_link,
-> -			   struct ice_sq_cd *cd)
-> +			   struct ice_sq_cd *cd,  u8 refclk)
->  {
->  	struct ice_aqc_restart_an *cmd;
->  	struct libie_aq_desc desc;
-> @@ -4147,6 +4148,8 @@ ice_aq_set_link_restart_an(struct ice_port_info
-> *pi, bool ena_link,
->  	else
->  		cmd->cmd_flags &=3D ~ICE_AQC_RESTART_AN_LINK_ENABLE;
->=20
-> +	cmd->cmd_flags |=3D FIELD_PREP(ICE_AQC_RESTART_AN_REFCLK_M,
-> refclk);
-> +
->  	return ice_aq_send_cmd(pi->hw, &desc, NULL, 0, cd);  }
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.h
-> b/drivers/net/ethernet/intel/ice/ice_common.h
-> index e700ac0dc347..9f5344212195 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.h
-> @@ -215,7 +215,7 @@ ice_cfg_phy_fec(struct ice_port_info *pi, struct
-> ice_aqc_set_phy_cfg_data *cfg,
->  		enum ice_fec_mode fec);
->  int
->  ice_aq_set_link_restart_an(struct ice_port_info *pi, bool ena_link,
-> -			   struct ice_sq_cd *cd);
-> +			   struct ice_sq_cd *cd, u8 refclk);
->  int
->  ice_aq_set_mac_cfg(struct ice_hw *hw, u16 max_frame_size, struct
-> ice_sq_cd *cd);  int diff --git
-> a/drivers/net/ethernet/intel/ice/ice_lib.c
-> b/drivers/net/ethernet/intel/ice/ice_lib.c
-> index 689c6025ea82..c2c7f186bcc7 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-> @@ -3769,7 +3769,8 @@ int ice_set_link(struct ice_vsi *vsi, bool ena)
->  	if (vsi->type !=3D ICE_VSI_PF)
->  		return -EINVAL;
->=20
-> -	status =3D ice_aq_set_link_restart_an(pi, ena, NULL);
-> +	status =3D ice_aq_set_link_restart_an(pi, ena, NULL,
-> +
-> ICE_AQC_RESTART_AN_REFCLK_NOCHANGE);
->=20
->  	/* if link is owned by manageability, FW will return
-> LIBIE_AQ_RC_EMODE.
->  	 * this is not a fatal error, so print a warning message and
-> return
-> --
-> 2.39.3
+I did review the code and tested for functionality.
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> 
+>> ---
+>>  arch/arm64/boot/dts/qcom/Makefile             |    1 +
+>>  .../dts/qcom/qcs9075-radxa-airbox-q900.dts    | 1012 
+>> +++++++++++++++++
+>>  2 files changed, 1013 insertions(+)
+>>  create mode 100644 
+>> arch/arm64/boot/dts/qcom/qcs9075-radxa-airbox-q900.dts
+>> 
+>> diff --git a/arch/arm64/boot/dts/qcom/Makefile 
+>> b/arch/arm64/boot/dts/qcom/Makefile
+>> index a4dc9e8b2d25..c8b7dd67806d 100644
+>> --- a/arch/arm64/boot/dts/qcom/Makefile
+>> +++ b/arch/arm64/boot/dts/qcom/Makefile
+>> @@ -180,6 +180,7 @@ qcs8300-ride-el2-dtbs := qcs8300-ride.dtb 
+>> monaco-el2.dtbo
+>> 
+>>  dtb-$(CONFIG_ARCH_QCOM)	+= qcs8300-ride-el2.dtb
+>>  dtb-$(CONFIG_ARCH_QCOM)	+= qcs8550-aim300-aiot.dtb
+>> +dtb-$(CONFIG_ARCH_QCOM)	+= qcs9075-radxa-airbox-q900.dtb
+>>  dtb-$(CONFIG_ARCH_QCOM)	+= qcs9100-ride.dtb
+>>  dtb-$(CONFIG_ARCH_QCOM)	+= qcs9100-ride-r3.dtb
+>> 
+>> diff --git a/arch/arm64/boot/dts/qcom/qcs9075-radxa-airbox-q900.dts 
+>> b/arch/arm64/boot/dts/qcom/qcs9075-radxa-airbox-q900.dts
+>> new file mode 100644
+>> index 000000000000..8b5202b527cb
+>> --- /dev/null
+>> +++ b/arch/arm64/boot/dts/qcom/qcs9075-radxa-airbox-q900.dts
+>> @@ -0,0 +1,1012 @@
+>> +// SPDX-License-Identifier: BSD-3-Clause
+>> +/*
+>> + * Copyright (c) 2026 Mecid Urganci
+>> + */
+>> +
+>> +/dts-v1/;
+>> +
+>> +#include <dt-bindings/gpio/gpio.h>
+>> +#include <dt-bindings/leds/common.h>
+>> +#include <dt-bindings/regulator/qcom,rpmh-regulator.h>
+>> +
+>> +#include "lemans.dtsi"
+>> +#include "lemans-pmics.dtsi"
+>> +
+>> +/ {
+>> +	model = "Radxa AIRbox Q900";
+>> +	compatible = "radxa,airbox-q900", "qcom,qcs9075", "qcom,sa8775p";
+>> +
+>> +	aliases {
+>> +		ethernet0 = &ethernet0;
+>> +		ethernet1 = &ethernet1;
+>> +		i2c15 = &i2c15;
+>> +		i2c18 = &i2c18;
+>> +		serial0 = &uart10;
+>> +		ufshc1 = &ufs_mem_hc;
+>> +	};
+>> +
+>> +	chosen {
+>> +		stdout-path = "serial0:115200n8";
+>> +	};
+>> +
+>> +	vcc_5v0_regulator: vcc-5v0-regulator {
+> 
+> Please use name for all fixed regulators which matches current format
+> recommendation: 'regulator-[0-9]v[0-9]'
+> 
+> https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/regulator/fixed-regulator.yaml
+> 
 
+Will address in V2, thank you!
+
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "vcc_5v0";
+>> +		gpio = <&pmm8654au_3_gpios 6 GPIO_ACTIVE_HIGH>;
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&vcc_5v0_en_state>;
+>> +		regulator-min-microvolt = <5000000>;
+>> +		regulator-max-microvolt = <5000000>;
+>> +		regulator-boot-on;
+>> +		enable-active-high;
+>> +		regulator-always-on;
+>> +	};
+>> +
+>> +	vcc5v0_usb30_otg_regulator: vcc5v0-usb30-otg-regulator {
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "vcc5v0_usb30_otg";
+>> +		gpio = <&pmm8654au_2_gpios 3 GPIO_ACTIVE_HIGH>;
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&vcc3v3_usb30_otg_en_state>;
+>> +		regulator-min-microvolt = <5000000>;
+>> +		regulator-max-microvolt = <5000000>;
+>> +		regulator-boot-on;
+>> +		enable-active-high;
+>> +		regulator-always-on;
+>> +	};
+>> +
+>> +	vcc5v0_usb30_regulator: vcc5v0-usb30-regulator {
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "vcc5v0_usb30";
+>> +		gpio = <&pmm8654au_2_gpios 4 GPIO_ACTIVE_HIGH>;
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&vcc3v3_usb30_en_state>;
+>> +		regulator-min-microvolt = <5000000>;
+>> +		regulator-max-microvolt = <5000000>;
+>> +		regulator-boot-on;
+>> +		enable-active-high;
+>> +		regulator-always-on;
+>> +	};
+>> +
+>> +	vcc_3v3_ssd_regulator: vcc-3p3-ssd-regulator {
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "vcc_3v3_ssd";
+>> +		gpio = <&pmm8654au_1_gpios 9 GPIO_ACTIVE_HIGH>;
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&vcc_3v3_ssd_en_state>;
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		regulator-boot-on;
+>> +		enable-active-high;
+>> +		regulator-always-on;
+>> +	};
+>> +
+>> +	vcc3v3_minipcie_regulator: vcc3v3-minipcie-regulator {
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "vcc3v3_minipcie";
+>> +		gpio = <&pmm8654au_2_gpios 10 GPIO_ACTIVE_HIGH>;
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&vcc3v3_minipcie_en_state>;
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		regulator-boot-on;
+>> +		enable-active-high;
+>> +		regulator-always-on;
+>> +	};
+>> +
+>> +	gpio_leds: gpio-leds {
+>> +		compatible = "gpio-leds";
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&status_led_state>, <&power_led_state>;
+>> +
+>> +		status-led {
+>> +			gpios = <&pmm8654au_1_gpios 11 GPIO_ACTIVE_HIGH>;
+>> +			linux,default-trigger = "heartbeat";
+>> +			function = LED_FUNCTION_STATUS;
+>> +			color = <LED_COLOR_ID_BLUE>;
+>> +		};
+>> +
+>> +		power-led {
+>> +			gpios = <&tlmm 98 GPIO_ACTIVE_HIGH>;
+>> +			linux,default-trigger = "default-on";
+>> +			function = LED_FUNCTION_POWER;
+>> +			color = <LED_COLOR_ID_GREEN>;
+>> +		};
+>> +	};
+>> +
+>> +	gpio_keys: gpio-keys {
+>> +		compatible = "gpio-keys";
+>> +
+>> +		pinctrl-0 = <&gpio_keys_default>;
+>> +		pinctrl-names = "default";
+>> +
+>> +		power-key {
+>> +			label = "Power Off";
+>> +			gpios = <&tlmm 97 GPIO_ACTIVE_LOW>;
+>> +			linux,code = <KEY_POWER>;
+>> +			wakeup-source;
+>> +			debounce-interval = <30>;
+>> +		};
+>> +	};
+>> +
+>> +	fan0: gpio-fan {
+>> +		compatible = "gpio-fan";
+>> +		gpios = <&pmm8654au_1_gpios 12 GPIO_ACTIVE_HIGH>;
+>> +		gpio-fan,speed-map = <0 0>, <5000 1>;
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&fan_en_state>;
+>> +		#cooling-cells = <2>;
+>> +	};
+>> +
+>> +	dp0-connector {
+> 
+> dp-connector
+> 
+>> +		compatible = "dp-connector";
+>> +		label = "eDP0";
+>> +		type = "full-size";
+>> +
+>> +		port {
+>> +			dp0_connector_in: endpoint {
+>> +				remote-endpoint = <&mdss0_dp0_out>;
+>> +			};
+>> +		};
+>> +	};
+>> +};
+>> +
+> 
+> ...
+> 
+>> +
+>> +	gpio_keys_default: gpio-keys-default-state {
+>> +		pins = "gpio97";
+>> +		function = "gpio";
+>> +		drive-strength = <2>;
+>> +		bias-pull-up;
+>> +	};
+>> +
+>> +	power_led_state: power-led-state {
+>> +		pins = "gpio98";
+>> +		function = "gpio";
+>> +		output-high;
+>> +		bias-pull-up;
+>> +	};
+>> +};
+>> +
+>> +/ {
+>> +	thermal-zones {
+>> +		cpu-0-0-0-thermal {
+> 
+> You should override given thermal zone by phandle/label style, not by
+> full path.
+
+Will address in V2 here too.
+
+> 
+> 
+> 
+> Best regards,
+> Krzysztof
+
+Thank you for feedback,
+Mecid Urganci
 
