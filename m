@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-269126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269127-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eNJ0CUvkummdcwIAu9opvQ
-	(envelope-from <netdev+bounces-269126-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:43:39 +0100
+	id yHc9KHraummfcgIAu9opvQ
+	(envelope-from <netdev+bounces-269127-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:01:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41DA92C07AB
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:43:38 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 113EB2BFD33
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:01:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 956B03192264
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:47:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 961F93083CF3
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 373033F99D9;
-	Wed, 18 Mar 2026 16:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A713EFD1C;
+	Wed, 18 Mar 2026 16:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pt1+/bFS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZOTU+wyk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1345736B07B;
-	Wed, 18 Mar 2026 16:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8171626B2D2;
+	Wed, 18 Mar 2026 16:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773851905; cv=none; b=fpybxaYnXzZf8gMrClQFwh5WHqUlLzmpCc34VEiDKMXYN1N2fCwQBDBvZk3Q2JAsXXvh+tsOn8clccMRygjNZE2dNtx0FghjAQ/aAVvpl5yndIyb7CC2kHgXSgnLRb7xsKm/td6h6TNhYsF149waFkDMWtFZ27i7RKYip0vr9LA=
+	t=1773851910; cv=none; b=csZl6BIpyDyBsMLL3REgXCZpinIxLynq8+1I69H8z1Us1VEHpBxiStnqV9PSN8+EaggbldGBrmJh2t27frGaFfHM8KKRjihpdF+tJIZxPEAaBVBfT04wteUcRDY0+MbQYEp2gvp91Gkreg1PjcmAqcsd6v42YPGfbIV4/PM4AuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773851905; c=relaxed/simple;
-	bh=ljysWJaHe8TEOROZCjjrq6HOXubs9dLzcABTz31qQqc=;
+	s=arc-20240116; t=1773851910; c=relaxed/simple;
+	bh=XKo6oEcfxrAO5a6uL1jOlJ673A3wAiggYrYhD1OOv/s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=knn6uLwdsP4zIABWgJj+MSWkC5ggRB+QAvRyUzEptr+lAlzsxpCWF5M06+go26pvw8NOCdCBWi4eoNLpCSa5HYyHIg6b8/JAxfL/2Lx1joOFLLejVQ5P+j4U5qEoX8i3q5qb2mjJywA13Fbv1dKsC9+E/xVXuZPRkrp0QExyEko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pt1+/bFS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72D26C2BC87;
-	Wed, 18 Mar 2026 16:38:19 +0000 (UTC)
+	 MIME-Version; b=WCZBNot8hhoz5Nle2GKYh+zLI6HHB71brwz8hNeHLvhQe4WGIlnrpJZgwwe148S7yRXsFS9Xdy1Zv8dKqGxYh+FZIAZCb04WDJlteKNSOLQGgoNW1YQawIfxYiGq5ziK1PRtuMIiikPJAtG4zjS05e1aihWBqeLsC9EaH6ozWNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZOTU+wyk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22AC3C2BCAF;
+	Wed, 18 Mar 2026 16:38:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773851904;
-	bh=ljysWJaHe8TEOROZCjjrq6HOXubs9dLzcABTz31qQqc=;
+	s=k20201202; t=1773851910;
+	bh=XKo6oEcfxrAO5a6uL1jOlJ673A3wAiggYrYhD1OOv/s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Pt1+/bFSyPfyR7EfakLUiHH7YcT8rL+LonjflK7Ac4b71qiNoQOTA66oNgr0FZqo3
-	 MZ/M69ixXjkOTSl5t7D8g5Ag5sioFfI15HaP4lZvE/+Nz2zLWm3v89mzvtheCh85M6
-	 LtR81UlxyBFXd4U49IG9NQvJa7L9gtGeZ71CA1bK8m7Sipc96Usw/ja/cI94OIJYmz
-	 9W0fmQmYm8hz3Jk+KSAMw3x7JUtN/Sfxh1nGhU0Ne05eSljL1V/TZd2qia9xhkaVN1
-	 UIIeQ+2z3Mz8+EKKHRcy66fDbwaI5DGFd/F0nQNGYVyuldnHF6YENI/HsLNzsHoo0e
-	 cMpH2O+FzCNaQ==
+	b=ZOTU+wykhR1t2yBz7HLBWylJ8vzW13aWPZ5+cme2mPJx4PzhYH8SLecjV2v0jYSMM
+	 rCnbFdysf6KC+y4tEV9Qr5vGbZHvEoaZdwRK1vzjvswF6RM/zMnBBr28UJIyZ7+EX4
+	 yqzkpIHW1E5bYHEAb4Eh4pofVFQssXnWJmAUKDyPGmSAnCU7e/cfMxjLqxFhNR9hWC
+	 0/JqErQPkkNySNiaGwV3usP08phJzQciOGuCJA4moYNO6xNeCtXN5TB7M/bBZHEUHs
+	 99gpoP7vKnuJnBErpGbXBsW6RX67vegDO8QlkpoH3QYCM53lDLo4eQhSO7bcJjEwKv
+	 mH4G1JlHs9a4g==
 From: Conor Dooley <conor@kernel.org>
 To: netdev@vger.kernel.org
 Cc: conor@kernel.org,
@@ -75,9 +75,9 @@ Cc: conor@kernel.org,
 	Abin Joseph <abin.joseph@amd.com>,
 	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>,
 	Ryan.Wanner@microchip.com
-Subject: [PATCH net-next v4 06/13] net: macb: add mpfs specific usrio configuration
-Date: Wed, 18 Mar 2026 16:37:37 +0000
-Message-ID: <20260318-reversal-void-f83a66086cf4@spud>
+Subject: [PATCH net-next v4 07/13] net: macb: warn on pclk use as a tsu_clk fallback
+Date: Wed, 18 Mar 2026 16:37:38 +0000
+Message-ID: <20260318-greeting-tipper-70bbe3e4f5d2@spud>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260318-surpass-puzzle-f94b46aa8808@spud>
 References: <20260318-surpass-puzzle-f94b46aa8808@spud>
@@ -87,7 +87,7 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2759; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=RSFyKfnVzDv/pOh5f8+B27Gurr5waqnAxeJRhx9T438=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJm7rly8U7M26a3s1VtuvrKNgdLa9laPD8oECFbtfCKn2 xzXYzmlo5SFQYyLQVZMkSXxdl+L1Po/Ljuce97CzGFlAhnCwMUpABPRTmZkeHeJ+ZTnDIfnKQEH 9e2PPVj9PUDQxs7m/4uNz86KNQX+dWX4H75j9qzrx840K04uv1F99/Da5CW+KYkyGVvn+alVNDw 7xQ4A
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3276; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=NwKelKp1tigxckCA+KrqnMxOmrCbE/r2GTIcp/cWLQA=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJm7rlw6dNsuYFtacMqq7q//1V4qRC1xWLXjl59nRwRT5 cVQD8X9HaUsDGJcDLJiiiyJt/tapNb/cdnh3PMWZg4rE8gQBi5OAZjIuShGhs1Hfp3gPfGZp1L8 9r4Xi9qTXH5mVOaUZV6Z6bdTfJfyRmNGhmnxkvsuzdzd96Rq+1n9OsEX/64UrBBcVrdFv/2o16Y nyzkB
 X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.34 / 15.00];
@@ -96,14 +96,14 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MID_RHS_NOT_FQDN(0.50)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[30];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-269126-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269127-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -114,93 +114,78 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.969];
+	NEURAL_HAM(-0.00)[-0.972];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 41DA92C07AB
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,microchip.com:email]
+X-Rspamd-Queue-Id: 113EB2BFD33
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Conor Dooley <conor.dooley@microchip.com>
 
-On mpfs the driver needs to make sure the tsu clock source is not the
-fabric, as this requires that the hardware is in Timer Adjust mode,
-which is not compatible with the linux driver trying to control the
-hardware. It is unlikely that this will be set, as the peripheral is
-reset during probe, but if the resets are not provided in devicetree
-it's probable that this bit is set incorrectly, as U-Boot's macb driver
-has the same issue with using usrio settings for at91 platforms as the
-default.
+The Candence GEM IP has a configuration parameter which determines the
+source of the clock used for the timestamp unit (if it is enabled),
+switching it between using the pclk and a dedicated input.
 
-Fixes: 8aad66aa59be5 ("net: macb: add polarfire soc reset support")
+When ptp support was added to the macb driver, a new tsu_clk was added
+to represent the dedicated input. While this is understandable, I think
+it is bug prone and that the tsu_clk should represent whatever clock is
+used for the timestamper and not just that specific input.
+
+>From a driver point of view, the benefit of taking the conceptual
+approach is avoiding misconfiguring the driver when the hardware
+supports ptp (and it is set as a capability in the relevant per-device
+structure) but no tsu_clk is provided in devicetree. At the moment, the
+timestamper will be registered and programmed with an increment that
+reflects the pclk in these cases, but will malfunction if the pclk and
+tsu_clk frequencies do not match. Obviously, this means the devicetree
+incorrectly represents the hardware, but this change in approach would
+make the driver more resilient without meaningfully impacting correctly
+described users.
+
+Out of the devices that claim MACB_CAPS_GEM_HAS_PTP the fu540, mpfs,
+sama5d2 and sama7g5-emac (but not sama7g5-gem) are at risk of having
+this problem with the in-kernel devicetrees. mpfs and sama7g5-emac
+have been confirmed to be incorrect, and sama5d2 is correct. It may be
+that the other platforms actually do use the pclk for the timestamper
+(either by supplying pclk to the tsu_clk input of the IP, or by having
+the IP block configured to use pclk instead of the tsu_clk input), but
+at least two are wrong, as they do not use pclk for the tsu_clk, so the
+driver is registering the ptp clock incorrectly.
+
+Add a warning if no tsu_clk is provided on a platform that uses the
+timerstamper, to encourage people to specifically provide a tsu_clk and
+avoid silently registering the timerstamper with the wrong clock. If the
+pclk is actually used, it can be provided as a tsu_clk for improved
+clarity in devicetrees.
+
+While this changes the meaning of the devicetree property, it is
+backwards compatible as there's no functional change for platforms that
+didn't provide a tsu_clk and the changed meaning of providing a tsu_clk
+in the devicetree does not impact platforms that already provided one as
+the decision about the tsu clock source is at IP instantiation time
+rather than at runtime, so there's no driver behaviour that needs to
+change based on the input to the IP used for the timestamping unit.
+
 Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- drivers/net/ethernet/cadence/macb.h      |  2 ++
- drivers/net/ethernet/cadence/macb_main.c | 12 ++++++++++--
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index 9cd565cb87e4c..cdb9fb2218c6f 100644
---- a/drivers/net/ethernet/cadence/macb.h
-+++ b/drivers/net/ethernet/cadence/macb.h
-@@ -781,6 +781,7 @@
- #define MACB_CAPS_NO_LSO			BIT(24)
- #define MACB_CAPS_USRIO_HAS_MII			BIT(25)
- #define MACB_CAPS_USRIO_HAS_REFCLK_SOURCE	BIT(26)
-+#define MACB_CAPS_USRIO_HAS_TSUCLK_SOURCE	BIT(27)
- 
- /* LSO settings */
- #define MACB_LSO_UFO_ENABLE			0x01
-@@ -1214,6 +1215,7 @@ struct macb_usrio_config {
- 	u32 refclk;
- 	u32 clken;
- 	u32 hdfctlen;
-+	u32 tsu_source;
- 	bool refclk_default_external;
- };
- 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 414a8fa3f99d9..b476bc9663ecd 100644
+index b476bc9663ecd..6b37598ac57cd 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -4650,6 +4650,9 @@ static int macb_init(struct platform_device *pdev)
- 				val |= bp->usrio->refclk;
- 		}
- 
-+		if (bp->caps & MACB_CAPS_USRIO_HAS_TSUCLK_SOURCE)
-+			val |= bp->usrio->tsu_source;
-+
- 		macb_or_gem_writel(bp, USRIO, val);
- 	}
- 
-@@ -5244,6 +5247,10 @@ static const struct macb_usrio_config at91_default_usrio = {
- 	.clken = MACB_BIT(CLKEN),
- };
- 
-+static const struct macb_usrio_config mpfs_usrio = {
-+	.tsu_source = 0,
-+};
-+
- static const struct macb_usrio_config sama7g5_gem_usrio = {
- 	.mii = 0,
- 	.rmii = 1,
-@@ -5376,11 +5383,12 @@ static const struct macb_config zynq_config = {
- static const struct macb_config mpfs_config = {
- 	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE |
- 		MACB_CAPS_JUMBO |
--		MACB_CAPS_GEM_HAS_PTP,
-+		MACB_CAPS_GEM_HAS_PTP |
-+		MACB_CAPS_USRIO_HAS_TSUCLK_SOURCE,
- 	.dma_burst_length = 16,
- 	.clk_init = macb_clk_init,
- 	.init = init_reset_optional,
--	.usrio = &at91_default_usrio,
-+	.usrio = &mpfs_usrio,
- 	.max_tx_length = 4040, /* Cadence Erratum 1686 */
- 	.jumbo_max_len = 4040,
- };
+@@ -3534,6 +3534,7 @@ static unsigned int gem_get_tsu_rate(struct macb *bp)
+ 	else if (!IS_ERR(bp->pclk)) {
+ 		tsu_clk = bp->pclk;
+ 		tsu_rate = clk_get_rate(tsu_clk);
++		dev_warn(&bp->pdev->dev, "devicetree missing tsu_clk, using pclk as fallback\n");
+ 	} else
+ 		return -ENOTSUPP;
+ 	return tsu_rate;
 -- 
 2.51.0
 
