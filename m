@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-269131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269132-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wHRADfXXumlZcgIAu9opvQ
-	(envelope-from <netdev+bounces-269131-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:51:01 +0100
+	id 8EmbJRXYumlacgIAu9opvQ
+	(envelope-from <netdev+bounces-269132-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:51:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D9F2BFA25
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:51:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 823872BFA5F
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:51:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 50937304F5AF
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:48:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9DB42300B5A9
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3FE3FAE15;
-	Wed, 18 Mar 2026 16:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828D03FB7E4;
+	Wed, 18 Mar 2026 16:38:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OnOzb99I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j3jcQyin"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DB1392C40;
-	Wed, 18 Mar 2026 16:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7BD3FB7D2;
+	Wed, 18 Mar 2026 16:38:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773851933; cv=none; b=BDvW2VivdMhiFJw2T7dzWgiagxtIp6G5alXIsXQ92GO5dN9TcSPXYUt5tWeeU742a6oS9uiCD2rqMbYO67S4UkktMVruEHOtY//SILWWwt8ibyhfVwiJYE9ubQPpKRmQev5faM3tngghUMkDtpJE5XcAzTfCu6LGJERVYNSqAYA=
+	t=1773851939; cv=none; b=i/MQd+ujB0v5p0MtcmIdyfku0fPvfPPsMNvHDszMDemZm1GrV0gn5y5MgL9SL2MSYfvHrYhJ8oGUmymrzjOec3sasXNVQDckoBlvVrF1p6k+Z/O1rumQPveuYqGFLabOrnHyEqmHM/MkCI+DSUNLDRLZ+eGuRvusgRaOjrHM69o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773851933; c=relaxed/simple;
-	bh=i7QiZWLKSiDuy+JWZoWlsnw6MxIl6xp8yCXQ6R5f7pk=;
+	s=arc-20240116; t=1773851939; c=relaxed/simple;
+	bh=8dYY/An492/r9LNR1y5PaEYTe8NEViY49aooNEVBQSk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PCEb9Cl79H6E/zB2yp3iLCBX/IrL2t5jkiBdhyLY+SMPrkZy0bt3gv/WFeLm87sV6LHttPKKg32A2XuRwAZCCZw1mVJQo1Tbn+yEcSdNlcEFZIKQqcwueO3y83CkX1rXju4f/0J8ZoTbnAft2o2bmX/LhIQZD8RoiW2arjoX+HE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OnOzb99I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F363BC2BCAF;
-	Wed, 18 Mar 2026 16:38:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=bWbrL8KUBaouH1JMFJALi3/9qxW7VqGS5GU7g3hMjpqiIyzXQ03jk/JbAk5hmilpWrxXiwLHnI7NbaOLNezjTOzfdQrVprMrltHuQ2dQ3rde8YIosyZGvrQfdKSP80j3ke+oXP28t2WCmFZRnDitSZEJqgdc68LbSOL0/zN3r4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j3jcQyin; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A381FC2BC87;
+	Wed, 18 Mar 2026 16:38:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773851933;
-	bh=i7QiZWLKSiDuy+JWZoWlsnw6MxIl6xp8yCXQ6R5f7pk=;
+	s=k20201202; t=1773851939;
+	bh=8dYY/An492/r9LNR1y5PaEYTe8NEViY49aooNEVBQSk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OnOzb99IJdzWRWPppb1WwQY3nqJoJLbNJyKhbBRYNPyDj33oM8Y7KNUf++z49F4tr
-	 08LHUHNmcTR34Lz24Rvg6IjBI7XmMfwWPebLtOTS/+cQUVoCqa0cuVRrA1IrzWHthQ
-	 7ijkzOPszVg/blmXINrMkRgEZ0Z/FYBsLG3Ly6IeRcrPteuFrWThhrPYcToEWoPveP
-	 cc054tjPLMUZwlfn8y/l/SD+oivRZsZCQhddLh0TFijA0XGitHIgtmC/R4BeRfOijJ
-	 KW5GsXXQQdiYj6ikQz86p38VDC2tXca1d4A1ugycXVQSEre4WR4AzGlF/Ymte6v/LA
-	 M3OpsC7l75SNg==
+	b=j3jcQyinjnnUVd8oODV26S6DW4s+A8TA+VHAhbeYtk6kGxpnNDsPeHfxlgbKugSPf
+	 bvtKhcExITElvWVPNc5nJfGgfzK6hw3jDqCIB+u+4bFBm7HpzKq6A/7Iq2HgH0FBOK
+	 AVTKnvTYzFEtIxwfltPGpmY0ijhrJUKmw12XuiPd8JM6puem5zTU25t2jOr48i8vxD
+	 wxmvhTHXwVYW54R/kcxQ8E6fuyXzYrqH2dPuQ4TsdXB2QhbNLl2buuyQfzeHYYglLV
+	 HFthY33mIIZ8bNiwif6Dla27rHBr4k+iJ47wWNXZ196Phj4ZGTezDp2wrjra7HTghL
+	 qRDD9Qz6AouLg==
 From: Conor Dooley <conor@kernel.org>
 To: netdev@vger.kernel.org
 Cc: conor@kernel.org,
@@ -75,9 +75,9 @@ Cc: conor@kernel.org,
 	Abin Joseph <abin.joseph@amd.com>,
 	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>,
 	Ryan.Wanner@microchip.com
-Subject: [PATCH net-next v4 11/13] net: macb: runtime detect MACB_CAPS_USRIO_DISABLED
-Date: Wed, 18 Mar 2026 16:37:42 +0000
-Message-ID: <20260318-fifth-getaway-2e50f7a71eed@spud>
+Subject: [PATCH net-next v4 12/13] net: macb: set MACB_CAPS_USRIO_DISABLED if no usrio config is provided
+Date: Wed, 18 Mar 2026 16:37:43 +0000
+Message-ID: <20260318-argue-pouring-3405e33e7600@spud>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260318-surpass-puzzle-f94b46aa8808@spud>
 References: <20260318-surpass-puzzle-f94b46aa8808@spud>
@@ -88,7 +88,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2022; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=Bd2gbW7fOvjC1AVjUN6Hv9MmZ1hZns7eUKZVvI7xatU=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJm7rlx+2fahvr/SaZ1sdZuHf+XuE5m/v7Rf1bf7a8I30 26No5tdRykLgxgXg6yYIkvi7b4WqfV/XHY497yFmcPKBDKEgYtTACbi18Twh3fVy7Muuh4BX9g5 u+63V0yYsFdh9dPEHP/L0pKL9tvmXGVk6LY57tLFzTlRJsX050+ry48uNj92eLdpwtaX786eDr7 6iQUA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1255; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=qqeBZ/4pnx5PRuyO5kmFQgJF981C+Tje2OakbZeONrc=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJm7rlz+LnBCtc0thu3divRVNRb7J2xnZREPubHcJ+2Th 2aAbqdyRykLgxgXg6yYIkvi7b4WqfV/XHY497yFmcPKBDKEgYtTACZybjfD/3rLzy+vJF5ovuCt kLbBNcB2X9u9Q6cPzWfeOevvXRvZ1w8YGZ7ri/Kv8dApUWldf/P4V4fqbJMtt60FJ72Ye+rTVKk dXtwA
 X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.16 / 15.00];
@@ -96,12 +96,12 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269131-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269132-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -110,68 +110,55 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
+	NEURAL_HAM(-0.00)[-0.995];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[kernel.org,microchip.com,lunn.ch,davemloft.net,google.com,redhat.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,tuxon.dev,gmail.com,sifive.com,vger.kernel.org,lists.infradead.org,raspberrypi.com,linux.dev,amd.com,bootlin.com];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,microchip.com:email]
-X-Rspamd-Queue-Id: 00D9F2BFA25
+X-Rspamd-Queue-Id: 823872BFA5F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Théo Lebrun <theo.lebrun@bootlin.com>
 
-DCFG1 (design config 1 register) carries a bit indicating whether User
-I/O feature has been enabled or not. The MACB/GEM driver has a cap flag
-indicating that HW has the feature disabled (default is enabled). Add
-the missing connection between DCFG1 bit and MACB_CAPS_USRIO_DISABLED.
+bp->usrio is copied directly from dt_conf->usrio in macb_probe().
 
-Indirect impact: avoid useless writel() on USERIO register; this is not
-an important fix because USERIO is anyway read-only when feature is
-disabled.
+If dt_conf->usrio is NULL, we do not want to land in USRIO write
+codepaths which dereference bp->usrio. Inherit automatically
+MACB_CAPS_USRIO_DISABLED to avoid those.
 
-If for some reason a compatible sets USRIO_DISABLED but DCFG1 indicates
-it is enabled, we still keep the disabled capability flag. This ensures
-we don't break "cdns,np4-macb" that sets the flag from compatible match
-data.
+This means a macb_config that wants to disable usrio can simply drop
+its .usrio field, rather than add the disabled capability explicitly.
+
+Nit: drop the dt_conf NULL check because the pointer is always valid.
 
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- drivers/net/ethernet/cadence/macb.h      | 2 ++
- drivers/net/ethernet/cadence/macb_main.c | 2 ++
- 2 files changed, 4 insertions(+)
+ drivers/net/ethernet/cadence/macb_main.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index cdb9fb2218c6f..bc025719f6008 100644
---- a/drivers/net/ethernet/cadence/macb.h
-+++ b/drivers/net/ethernet/cadence/macb.h
-@@ -518,6 +518,8 @@
- #define GEM_IRQCOR_SIZE				1
- #define GEM_DBWDEF_OFFSET			25
- #define GEM_DBWDEF_SIZE				3
-+#define GEM_USERIO_OFFSET			9
-+#define GEM_USERIO_SIZE				1
- #define GEM_NO_PCS_OFFSET			0
- #define GEM_NO_PCS_SIZE				1
- 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 3e0ab23e9b9b0..b11ef703575b0 100644
+index b11ef703575b0..1a6cdc223625f 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -4330,6 +4330,8 @@ static void macb_configure_caps(struct macb *bp,
- 			bp->caps |= MACB_CAPS_ISR_CLEAR_ON_WRITE;
- 		if (GEM_BFEXT(NO_PCS, dcfg) == 0)
- 			bp->caps |= MACB_CAPS_PCS;
-+		if (!(dcfg & GEM_BIT(USERIO)))
-+			bp->caps |= MACB_CAPS_USRIO_DISABLED;
- 		dcfg = gem_readl(bp, DCFG12);
- 		if (GEM_BFEXT(HIGH_SPEED, dcfg) == 1)
- 			bp->caps |= MACB_CAPS_HIGH_SPEED;
+@@ -4319,8 +4319,10 @@ static void macb_configure_caps(struct macb *bp,
+ {
+ 	u32 dcfg;
+ 
+-	if (dt_conf)
+-		bp->caps = dt_conf->caps;
++	bp->caps = dt_conf->caps;
++
++	if (!dt_conf->usrio)
++		bp->caps |= MACB_CAPS_USRIO_DISABLED;
+ 
+ 	if (hw_is_gem(bp->regs, bp->native_io)) {
+ 		bp->caps |= MACB_CAPS_MACB_IS_GEM;
 -- 
 2.51.0
 
