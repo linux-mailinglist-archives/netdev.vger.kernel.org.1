@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-268974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268975-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EPgfN36EumnrXQIAu9opvQ
-	(envelope-from <netdev+bounces-268974-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:54:54 +0100
+	id INRxIYuEumnrXQIAu9opvQ
+	(envelope-from <netdev+bounces-268975-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:55:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E6E82BA4A8
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:54:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF9052BA4C5
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:55:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A3E123156924
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:51:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 67690315B3C5
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989793A3835;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70973A3E87;
 	Wed, 18 Mar 2026 10:51:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A311639E6CB
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB5B39D6E9
 	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 10:51:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773831099; cv=none; b=HEOp+pYnLcaAVcmG6Sj9wEX1fgqQ5GoQY3v9ISI8czw0/edT2gfANyTPoGc1J9BPa5shCIUtz3xKVVrHogzwZ/V8J71LfBCDRfYSNsisoWBz6PJVzVkc+wCYOj6SzaRUu8zTn7nBaoXIb5LkHUzS+PTCxVCQTmRBEAs5t5TalFU=
+	t=1773831099; cv=none; b=q3gG+LDyCzaiS1WfyCT/2e6LzYyp9/lLRCzDVd8YwrPuxGIBon2cUnFBkmMXneVCJTMlWgvsKumFmT7c2F7boobVSSCkao6XRrZTm6+xfQoZjfrij3WzVUWAAqCkVM7kxyd9CHJjhv291cf9pJ0AWVHn1kOZvHjOcZocMgZp+/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773831099; c=relaxed/simple;
-	bh=thnm6PEYhA6tWFCd44xDPHzccXm1OIwwLMjKMACRj+0=;
+	bh=99MoR5B6FN0+kJyUEkYq+JZz0yxs/jel3MjgkwYNru0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ewt6xnp9qS9olc/gDr1biNJuCmr3tqVm/5Gxnetkr4VZ4uDc+Y2yfX+Gf8KRPzCDrZHg/BBBAP2MBMuQ4koeMEM5bTjU6cyreAG1byCpf8lBCmnyMLcEHBBZe6l5bUDlXHjq79n76FF5Sd0uCd/b6DAIV2E4gnC/Z9UDVeKGbZ8=
+	 MIME-Version; b=AIVgkmhRW0oesfB7FQPF+gczpZsCHjN4CrOr0EnuqrjpZVERXgaX64GHN4V9IaVZXgo6T3e73P3ZvjyYLYazXw5kqjK32Sju4Mz3fIZGfCZxWF6W4XFRhYZn7bk6zqW4+BEdY6RFkFFYunuHbjqGEks5iZv7RzWMnXUFEYRhwtQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -36,16 +36,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1w2oUn-0001WK-F0; Wed, 18 Mar 2026 11:51:25 +0100
+	id 1w2oUn-0001WM-F3; Wed, 18 Mar 2026 11:51:25 +0100
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac] helo=dude04)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1w2oUn-000tSO-06;
+	id 1w2oUn-000tSP-0E;
 	Wed, 18 Mar 2026 11:51:25 +0100
 Received: from ore by dude04 with local (Exim 4.98.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1w2oUm-00000003RIS-41UW;
+	id 1w2oUm-00000003RIc-47vz;
 	Wed, 18 Mar 2026 11:51:24 +0100
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: Rob Herring <robh@kernel.org>,
@@ -61,9 +61,9 @@ Cc: David Jander <david@protonic.nl>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH v1 2/7] ARM: dts: stm32: stm32mp15x-mecio1-io: Fix ADC sampling times
-Date: Wed, 18 Mar 2026 11:51:18 +0100
-Message-ID: <20260318105123.819807-3-o.rempel@pengutronix.de>
+Subject: [PATCH v1 3/7] ARM: dts: stm32: stm32mp15x-mecio1-io: Move divergent mecio1 ADC channels to board files
+Date: Wed, 18 Mar 2026 11:51:19 +0100
+Message-ID: <20260318105123.819807-4-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260318105123.819807-1-o.rempel@pengutronix.de>
 References: <20260318105123.819807-1-o.rempel@pengutronix.de>
@@ -83,7 +83,7 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -93,7 +93,7 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-268974-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268975-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -102,26 +102,31 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	NEURAL_HAM(-0.00)[-0.993];
 	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3E6E82BA4A8
+X-Rspamd-Queue-Id: DF9052BA4C5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: David Jander <david@protonic.nl>
 
-Increase the minimum ADC sample times for all configured channels on
-ADC1 and ADC2 to ensure measurement accuracy meets specifications.
+Move the divergent adc1 channel definitions out of the common
+mecio1-io.dtsi file and into the specific Revision 0 and Revision 1
+board files.
 
-The default 5us sample time is insufficient for the internal sampling
-capacitor to fully charge. Increase the default time to 20us to relax
-the input impedance requirements.
+The original common file contained incorrect schematic labels for the
+Revision 0 hardware (e.g., labeling ana0 as p24v_hpdcm instead of
+ain_aux0) and failed to account for physical signal routing changes
+between the board revisions.
 
-Additionally, the phint0_ain and phint1_ain channels require a much
-longer sampling period due to their specific circuit design. Increase
-their sample times to 200us. Remove stale comments regarding clock
-cycles that no longer match the updated timings.
+Retain only the strictly shared channels in the common include file. Map
+the correct channels and schematic labels directly within
+stm32mp151c-mecio1r0.dts and stm32mp153c-mecio1r1.dts.
+
+Crucially, ensure that the required 200us sample time follows the
+phint1_ain signal to its new physical location on channel 3 for the
+Revision 1 hardware.
 
 Fixes: 8267753c891c ("ARM: dts: stm32: Add MECIO1 and MECT1S board variants")
 Cc: <stable@vger.kernel.org>
@@ -129,124 +134,225 @@ Signed-off-by: David Jander <david@protonic.nl>
 Co-developed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- .../arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi | 32 +++++++++----------
- 1 file changed, 15 insertions(+), 17 deletions(-)
+ arch/arm/boot/dts/st/stm32mp151c-mecio1r0.dts | 50 +++++++++++++++++++
+ arch/arm/boot/dts/st/stm32mp153c-mecio1r1.dts | 50 +++++++++++++++++++
+ .../arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi | 50 +------------------
+ 3 files changed, 101 insertions(+), 49 deletions(-)
 
+diff --git a/arch/arm/boot/dts/st/stm32mp151c-mecio1r0.dts b/arch/arm/boot/dts/st/stm32mp151c-mecio1r0.dts
+index a5ea1431c399..4e795ad42928 100644
+--- a/arch/arm/boot/dts/st/stm32mp151c-mecio1r0.dts
++++ b/arch/arm/boot/dts/st/stm32mp151c-mecio1r0.dts
+@@ -36,6 +36,56 @@ led-1 {
+ 	};
+ };
+ 
++&adc1 {
++	channel@0 {
++		reg = <0>;
++		st,min-sample-time-ns = <20000>;
++		label = "ain_aux0";
++	};
++
++	channel@1 {
++		reg = <1>;
++		st,min-sample-time-ns = <20000>;
++		label = "ain_aux1";
++	};
++
++	channel@3 {
++		reg = <3>;
++		st,min-sample-time-ns = <20000>;
++		label = "hpdcm1_i2";
++	};
++
++	channel@5 {
++		reg = <5>;
++		st,min-sample-time-ns = <20000>;
++		label = "pout1_i";
++	};
++
++	channel@9 {
++		reg = <9>;
++		st,min-sample-time-ns = <20000>;
++		label = "pout0_i";
++	};
++
++	channel@13 {
++		reg = <13>;
++		st,min-sample-time-ns = <200000>;
++		label = "phint1_ain";
++	};
++
++	channel@15 {
++		reg = <15>;
++		st,min-sample-time-ns = <20000>;
++		label = "hpdcm0_i1";
++	};
++
++	channel@18 {
++		reg = <18>;
++		st,min-sample-time-ns = <20000>;
++		label = "hpdcm0_i2";
++	};
++};
++
+ &clk_hse {
+ 	clock-frequency = <25000000>;
+ };
+diff --git a/arch/arm/boot/dts/st/stm32mp153c-mecio1r1.dts b/arch/arm/boot/dts/st/stm32mp153c-mecio1r1.dts
+index 16b814c19350..d32816093e47 100644
+--- a/arch/arm/boot/dts/st/stm32mp153c-mecio1r1.dts
++++ b/arch/arm/boot/dts/st/stm32mp153c-mecio1r1.dts
+@@ -36,6 +36,56 @@ led-1 {
+ 	};
+ };
+ 
++&adc1 {
++	channel@0 {
++		reg = <0>;
++		st,min-sample-time-ns = <20000>;
++		label = "p24v_hpdcm";
++	};
++
++	channel@1 {
++		reg = <1>;
++		st,min-sample-time-ns = <20000>;
++		label = "p24v_stp";
++	};
++
++	channel@3 {
++		reg = <3>;
++		st,min-sample-time-ns = <200000>;
++		label = "phint1_ain";
++	};
++
++	channel@5 {
++		reg = <5>;
++		st,min-sample-time-ns = <20000>;
++		label = "hpout1_i";
++	};
++
++	channel@9 {
++		reg = <9>;
++		st,min-sample-time-ns = <20000>;
++		label = "hpout0_i";
++	};
++
++	channel@13 {
++		reg = <13>;
++		st,min-sample-time-ns = <20000>;
++		label = "hpdcm0_i2";
++	};
++
++	channel@15 {
++		reg = <15>;
++		st,min-sample-time-ns = <20000>;
++		label = "hpdcm1_i2";
++	};
++
++	channel@18 {
++		reg = <18>;
++		st,min-sample-time-ns = <20000>;
++		label = "hpdcm0_i1";
++	};
++};
++
+ &clk_hse {
+ 	clock-frequency = <24000000>;
+ };
 diff --git a/arch/arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi b/arch/arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi
-index 1ce01bac9814..1b1299770ca0 100644
+index 1b1299770ca0..f91b3d1f037b 100644
 --- a/arch/arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi
 +++ b/arch/arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi
-@@ -104,80 +104,79 @@ &adc1 {
+@@ -90,7 +90,7 @@ v5v: regulator-v5v {
+ };
  
- 	channel@0 {
- 		reg = <0>;
--		/* 16.5 ck_cycles sampling time */
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
- 		label = "p24v_stp";
- 	};
+ &adc {
+-	/* ANA0, ANA1 are dedicated pins and don't need pinctrl: only in6. */
++	/* ANA0, ANA1 are dedicated pins and don't need pinctrl. */
+ 	pinctrl-0 = <&adc12_pins_mecsbc>;
+ 	pinctrl-names = "default";
+ 	vdd-supply = <&v3v3>;
+@@ -102,78 +102,30 @@ &adc {
+ &adc1 {
+ 	status = "okay";
  
- 	channel@1 {
- 		reg = <1>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
- 		label = "p24v_hpdcm";
- 	};
- 
+-	channel@0 {
+-		reg = <0>;
+-		st,min-sample-time-ns = <20000>;
+-		label = "p24v_stp";
+-	};
+-
+-	channel@1 {
+-		reg = <1>;
+-		st,min-sample-time-ns = <20000>;
+-		label = "p24v_hpdcm";
+-	};
+-
  	channel@2 {
  		reg = <2>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
+ 		st,min-sample-time-ns = <20000>;
  		label = "ain0";
  	};
  
- 	channel@3 {
- 		reg = <3>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
- 		label = "hpdcm1_i2";
- 	};
- 
- 	channel@5 {
- 		reg = <5>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
- 		label = "hpout1_i";
- 	};
- 
+-	channel@3 {
+-		reg = <3>;
+-		st,min-sample-time-ns = <20000>;
+-		label = "hpdcm1_i2";
+-	};
+-
+-	channel@5 {
+-		reg = <5>;
+-		st,min-sample-time-ns = <20000>;
+-		label = "hpout1_i";
+-	};
+-
  	channel@6 {
  		reg = <6>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
+ 		st,min-sample-time-ns = <20000>;
  		label = "ain1";
  	};
  
- 	channel@9 {
- 		reg = <9>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
- 		label = "hpout0_i";
- 	};
- 
+-	channel@9 {
+-		reg = <9>;
+-		st,min-sample-time-ns = <20000>;
+-		label = "hpout0_i";
+-	};
+-
  	channel@10 {
  		reg = <10>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <200000>;
+ 		st,min-sample-time-ns = <200000>;
  		label = "phint0_ain";
  	};
  
- 	channel@13 {
- 		reg = <13>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <200000>;
- 		label = "phint1_ain";
- 	};
- 
- 	channel@15 {
- 		reg = <15>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
- 		label = "hpdcm0_i1";
- 	};
- 
+-	channel@13 {
+-		reg = <13>;
+-		st,min-sample-time-ns = <200000>;
+-		label = "phint1_ain";
+-	};
+-
+-	channel@15 {
+-		reg = <15>;
+-		st,min-sample-time-ns = <20000>;
+-		label = "hpdcm0_i1";
+-	};
+-
  	channel@16 {
  		reg = <16>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
+ 		st,min-sample-time-ns = <20000>;
  		label = "lsin";
  	};
  
- 	channel@18 {
- 		reg = <18>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
- 		label = "hpdcm0_i2";
- 	};
- 
+-	channel@18 {
+-		reg = <18>;
+-		st,min-sample-time-ns = <20000>;
+-		label = "hpdcm0_i2";
+-	};
+-
  	channel@19 {
  		reg = <19>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
- 		label = "hpdcm1_i1";
- 	};
- };
-@@ -187,14 +186,13 @@ &adc2 {
- 
- 	channel@2 {
- 		reg = <2>;
--		/* 16.5 ck_cycles sampling time */
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
- 		label = "ain2";
- 	};
- 
- 	channel@6 {
- 		reg = <6>;
--		st,min-sample-time-ns = <5000>;
-+		st,min-sample-time-ns = <20000>;
- 		label = "ain3";
- 	};
- };
+ 		st,min-sample-time-ns = <20000>;
 -- 
 2.47.3
 
