@@ -1,286 +1,164 @@
-Return-Path: <netdev+bounces-269144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269145-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GFwROYvhummdcwIAu9opvQ
-	(envelope-from <netdev+bounces-269144-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:31:55 +0100
+	id uNDzFEbpuml0dAIAu9opvQ
+	(envelope-from <netdev+bounces-269145-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 19:04:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 631492C0532
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:31:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C258A2C0EEF
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 19:04:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 80261304A56E
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:26:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A350C32C3389
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB182FF170;
-	Wed, 18 Mar 2026 17:26:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D22F30F7EA;
+	Wed, 18 Mar 2026 17:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W4KeVKxG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hMDJvEc9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18BB2E888A
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 17:26:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7FE3101DB;
+	Wed, 18 Mar 2026 17:35:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773854809; cv=none; b=OienZJmk+lbM1O/uXRmJf1/gk25DKiUkTWbHDI3sNUZOOee5raK3nBix5tU6/u+JFe8QCq4VwBtvb3jLtTTp8lDmPrJCzNKYrDiNwBB0Sj67Bbk+pTp+kJa6ran2AirvdC/6Xw2vygrpPQ47LruF3TLITQwhKK6/hC3WPl9aVrU=
+	t=1773855317; cv=none; b=gN2eQd7Up7VSbC3sbTTLrXrnBjbR7Q9d8nFhfrSxBhVlBjKvQkkLeAJUeeVP1RP2tbtxbTT/AkXqHZNp3fAiV3l2FdVcwO06xlc8ax6yJ7Tc75440LvAwUAWkIZf47PlUX2BedpEzgadgynBx0z+60PLD46HDu3R02QtvgFUtXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773854809; c=relaxed/simple;
-	bh=W7ybQORcMKJdkf3BWpImd7y/jVljsB/C0BVysNSKorw=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m6OfNWb499QliiHQB17LWKZVqcrtjgvvzCfpf+ucUhv8JTDbGVxraamPrd1azfhBfakoeBIb8zf4pQGvhla47IbVzWQtgGGmI1EKwnnV24DXG4DUveFfbLmUGmelSXNObpHmnKe9QK3eWveb7QaEWqkQspvR/bKNtGAKcqCfT9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W4KeVKxG; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-48540d21f7dso1046975e9.0
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 10:26:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773854806; x=1774459606; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5EKjOvd8tsoDAzL2NTfko88oUtO7N2mQq0+WyC0PbRc=;
-        b=W4KeVKxG4tII1s7aQw0Jv0GkSiKCwRZCRTCuUq2kO7Mu8krmc+aFOp8tQOAv52faVq
-         OkE0IuRipgx1KER0lATSbnNYSK5TEnct+sFnXQN1Yk92p9PRflzF3NFyDdIMr4aHXBHw
-         bbksQOD01GgOI8qCKDKW6rILlRFSjWYu30i0FU1ByNaalW9jbuW0wcGItXBE0OE+AQW0
-         EBO12oaY35MHqV4AD3hUUVREyvwmc9NFA8MoOBbTMls2EjXKtscYx4wWCDTBknNpk97A
-         WYzHftWKzZItMkrr2puesclWa51a5piysgCTEXTHZ6RSoVEp9l1QV+LFdjOJ5pdCaIIw
-         w4Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773854806; x=1774459606;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5EKjOvd8tsoDAzL2NTfko88oUtO7N2mQq0+WyC0PbRc=;
-        b=cKk9Q03+2BRpCeTYd5FUekYq3+tWosQlgAcUTxQ+HqgmTngSGY9eYDNLY2qg/x9Gti
-         PvpQNr57Nhh1AvS3U7VvtR56Wj0mq8ESEU/++rFa0r44gRuM3/KREt43ZWhbGj+wqHCi
-         DY5kRpgMFCsF6PIWaFRd1vhSpR8ORydR4SFFf/koImU+uj99fhulOZ2FvuAj+8bIwydm
-         l6jWqSLUs8nEaGGxKFhEw29MT8NqmBmVEf6SPzJEMpkVQIkxCIfUy7JArS1wvrCOdcec
-         4WpOF7Hx5ewyaBdUsMX5vXsiWp/jfEsO/ZxgtFEZwcGJ2sJ4LjdU7pMkrti39u606QZK
-         ZgiA==
-X-Forwarded-Encrypted: i=1; AJvYcCXFMlxQPTcOB3lxp5+CK0cCb76W0nHFKyXFiYbi/1p4mdLUFOjA7Ku6wQr3hevDoEs1Eq3E3oM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAQLLQjm3Ad/qggzQLuqjsUbTTSJs1Lfbawe3mfKlIsVRz4Juy
-	oDSY3TrPJxs3mZK0iYCP64dKk7tu5SHsdXdwKKpHi5S4PXEYvKeqlKbs
-X-Gm-Gg: ATEYQzxs3qCi2C9NajWoZGHXXsIIuNlfVlRNrOT4MpiXbpM4/hK+oxzNhC0vhoYVnuT
-	36bd1zv/E7QS7QF7D7x2D5YG91+npWMk720hSp7kn/ZcyOZ92O9t+Manxcy0vIUkJAj7EBmnuCo
-	+cE6juz7c5ewPMzJdN6QXraT9xPiKXH3Nbci582P/k4mqZCpFih6Zb0UE4SMQMlH3v2pccrDMYS
-	gddOaw21U8MPPxmbBco1n3UjGc5QRwL7XPcCidIvS28abKHagMaHCjPESd1Ck3L5z/TvT4ugAoV
-	ZzMj+qYOOu/WtQriLPwQCmnjsLCuPq/Va0D2Mk65yXtNGjXwLnSQAE2YjkY+vLc4HP/RMIgt6HS
-	r4CqND/gexWE/ajXQVIPprHQvT7wHrkDfNY5C2P+GRXTUBQbDVTs5zH193vyaltvScYE/1PFn58
-	jgPc4iQ+K2hiGlcGVPpr4v76RUMUu23yQDcylCIg4gtRiiN1W1YuJFwA==
-X-Received: by 2002:a05:600c:8683:b0:485:f1d1:8f3d with SMTP id 5b1f17b1804b1-486f442e6e5mr52764705e9.6.1773854805737;
-        Wed, 18 Mar 2026 10:26:45 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-88-122.ip49.fastwebnet.it. [93.34.88.122])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f4e48ad5sm113684005e9.1.2026.03.18.10.26.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 10:26:45 -0700 (PDT)
-Message-ID: <69bae055.050a0220.3719be.bf31@mx.google.com>
-X-Google-Original-Message-ID: <abrgUo4L_FqciUrn@Ansuel-XPS.>
-Date: Wed, 18 Mar 2026 18:26:42 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Conor Dooley <conor@kernel.org>
-Cc: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>, UNGLinuxDriver@microchip.com,
-	Vladimir Oltean <olteanv@gmail.com>,
+	s=arc-20240116; t=1773855317; c=relaxed/simple;
+	bh=XMV5inxjfKHIqVPnyCdwg/fTj3Azn9yJnNe7LuS48N4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ia5TPlwxOfWw/3+vkYHrpq/WjEv/A1uhMu/kDsE/8H5bd0HPS5lvKUEuRiGzXNQUJxou99LfuKRSF4p4aS9r0awwmujR+WazsO83UHa/TW6Ph/l9y0UuI72PYS1ZL9fVi0ODy7nvuQLWlLneoUJo0CpX7aN6EGVbbL5Bo0rnNE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hMDJvEc9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1D3CC19421;
+	Wed, 18 Mar 2026 17:35:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773855317;
+	bh=XMV5inxjfKHIqVPnyCdwg/fTj3Azn9yJnNe7LuS48N4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hMDJvEc9eneBZHrpi8WbIrwzhbzxDlOCCstXE7RyyPYs1c5T5VyVoa+8Ed1Trc+cE
+	 NUTYzX3iQtw4Uxx1MQd+DP+PzNulWD/x4yqfsXby20opha9QC24sWJuLZViLBolZ9w
+	 Ds7t1ra7dcWnr7kJdTfAkc1PqlOvj7YLe8sK5wGVnszwSlscl96oechPj4t4GVlEtl
+	 jdKylRXkz2hk6FYz99wmcf/zgRm6rzSQzNPhxFDiLgYbnFOyw/Vdphf3ALYh3znw/r
+	 dgH0beGYsJfLMjeLxNuGKLQhVPMFcZMgL8jA686EaCpMbfbH7ENDlvIC4ddjumHkZC
+	 S4gfrkmLe3S5g==
+Date: Wed, 18 Mar 2026 17:35:11 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Rob Herring <robh@kernel.org>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 2/8] dt-bindings: net: lan9645x: add LAN9645X
- switch bindings
-References: <20260303-dsa_lan9645x_switch_driver_base-v1-2-bff8ca1396f5@microchip.com>
- <4088b0ff-b718-4137-8518-4c9b9764d56d@lunn.ch>
- <20260303-mosaic-debate-90cf8c8bbb33@spud>
- <1db45715a3a12b76b838d20c0e5904c3222053e7.camel@microchip.com>
- <20260305-reliant-parchment-0ff685a9c78e@spud>
- <7b62ace495084794336b19a9685d6b14ea3981a0.camel@microchip.com>
- <20260306-pointless-purr-210540d4dc64@spud>
- <207c7a47e0802dd4c34ba90f2532dc2e0c3f7f05.camel@microchip.com>
- <20260318-visiting-tanning-7d1d6acff081@spud>
- <20260318-placidly-domain-3ea82d265517@spud>
+	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+	linux@ew.tq-group.com
+Subject: Re: [PATCH 3/7] dt-bindings: net: ti: k3-am654-cpsw-nuss: Add
+ ti,j722s-cpsw-nuss compatible
+Message-ID: <20260318-sustained-reshuffle-eaf180729a9c@spud>
+References: <cover.1773751309.git.nora.schiffer@ew.tq-group.com>
+ <1382fed198246f1563dea091478757aebc4e4948.1773751309.git.nora.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="g8SSq65u6iP4ZaTS"
 Content-Disposition: inline
-In-Reply-To: <20260318-placidly-domain-3ea82d265517@spud>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+In-Reply-To: <1382fed198246f1563dea091478757aebc4e4948.1773751309.git.nora.schiffer@ew.tq-group.com>
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269144-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269145-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.955];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.746];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mx.google.com:mid,0.0.0.0:email,0.0.0.1:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 631492C0532
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tq-group.com:email,tq-group.com:url]
+X-Rspamd-Queue-Id: C258A2C0EEF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 18, 2026 at 05:20:03PM +0000, Conor Dooley wrote:
-> On Wed, Mar 18, 2026 at 05:18:42PM +0000, Conor Dooley wrote:
-> > Christian,
-> > 
-> > On Wed, Mar 18, 2026 at 03:19:20PM +0100, Jens Emil Schulz Ostergaard wrote:
-> > > Hi Conor,
-> > > 
-> > > On Fri, 2026-03-06 at 15:20 +0000, Conor Dooley wrote:
-> > > > On Fri, Mar 06, 2026 at 04:08:01PM +0100, Jens Emil Schulz Ostergaard wrote:
-> > > > > On Thu, 2026-03-05 at 18:31 +0000, Conor Dooley wrote:
-> > > > > > On Thu, Mar 05, 2026 at 01:57:37PM +0100, Jens Emil Schulz Ostergaard wrote:
-> > > > > > > On Tue, 2026-03-03 at 19:04 +0000, Conor Dooley wrote:
-> > > > > > > > On Tue, Mar 03, 2026 at 03:18:45PM +0100, Andrew Lunn wrote:
-> > > > > > > > > > +        properties:
-> > > > > > > > > > +          microchip,led-drive-mode:
-> > > > > > > > > > +            $ref: /schemas/types.yaml#/definitions/uint32
-> > > > > > > > > > +            description: |
-> > > > > > > > > > +              Set the LED drive mode for the copper PHY associated with
-> > > > > > > > > > +              this port.
-> > > > > > > > > > +
-> > > > > > > > > > +                0 - LED1 and LED2 in open-drain mode
-> > > > > > > > > > +                1 - LED1 in active drive mode (can be used for single-LED
-> > > > > > > > > > +                    configurations requiring active drive)
-> > > > > > > > > > +                2 - Reserved
-> > > > > > > > > > +                3 - LED1 and LED2 in active drive mode
-> > > > > > > > > > +            minimum: 0
-> > > > > > > > > > +            maximum: 3
-> > > > > > > > > 
-> > > > > > > > > I doubt the DT Maintainers will accept that. This looks a lot like a
-> > > > > > > > > value you write into a register. How are active drive and open-drain
-> > > > > > > > > described in other DT bindings? Is there something you can reuse?
-> > > > > > > > 
-> > > > > > > > I had a quick look and I didn't see anything really that stood out to me
-> > > > > > > > that would be a drop-in replacement.
-> > > > > > > > I also tried looking in the datasheet for more information on these
-> > > > > > > > modes, but I couldn't see anything obvious. For example, there were zero
-> > > > > > > > hits for "drain" in either LAN9645xS or LAN9645xF datasheets.
-> > > > > > > > 
-> > > > > > > > That said, yea you're right about DT maintainer feelings about it.
-> > > > > > > > There's a couple things I could suggest, but I'd like to know about what
-> > > > > > > > mode 1 means for LED2 first. If there's actually nothing similar, what
-> > > > > > > > about representing each led with a child node and having open-drain be
-> > > > > > > > the default with a property in the child for active-drive?
-> > > > > > > > 
-> > > > > > > > > 
-> > > > > > > > > For 1, what happens to LED2? Not used at all?
-> > > > > > > 
-> > > > > > > In mode 1 LED2 will be open-drain. This mode only makes sense if you have
-> > > > > > > just 1 LED. With two LEDs mode 0 or mode 3 should be used.
-> > > > > > 
-> > > > > > Could we then have child nodes for each led, and have a property in each
-> > > > > > that sets the mode to either open-drain or active-drive? Or am I just
-> > > > > > inserting complexity by asking for that?
-> > > > > 
-> > > > > I think it sounds sensible, I will add this.
-> > > > 
-> > > > 
-> > > > You don't need a property for each, just make one mode the default (prob
-> > > > open-drain given it's the 0 setting, but whatever is default out of
-> > > > reset for the part) and have the property for the other mode. Just
-> > > > some bool property like "microchip,active-drive" or whatever.
-> > > 
-> > > 
-> > > Based on your feedback I went with this under port properties:
-> > > 
-> > >           leds:
-> > >             patternProperties:
-> > >               '^led@[a-f0-9]+$':
-> > >                 $ref: /schemas/leds/common.yaml#
-> > > 
-> > >                 properties:
-> > >                   reg:
-> > >                     maxItems: 1
-> > > 
-> > >                   microchip,active-drive:
-> > >                     type: boolean
-> > >                     description:
-> > >                       Set the LED output to active drive mode. The default
-> > >                       is open-drain.
-> > > 
-> > >                 required:
-> > >                   - reg
-> > > 
-> > >                 unevaluatedProperties: false
-> > > 
-> > > and then the example has
-> > > 
-> > >           port@1 {
-> > >             reg = <1>;
-> > >             phy-mode = "gmii";
-> > >             phy-handle = <&cuphy1>;
-> > > 
-> > >             leds {
-> > >               #address-cells = <1>;
-> > >               #size-cells = <0>;
-> > > 
-> > >               led@0 {
-> > >                 reg = <0>;
-> > >                 microchip,active-drive;
-> > >               };
-> > > 
-> > >               led@1 {
-> > >                 reg = <1>;
-> > >                 microchip,active-drive;
-> > >               };
-> > >             };
-> > >           }
-> > > 
-> > > However, this does not pass dt_binding_check because we pull in $ref: dsa-port.yaml,
-> > > which pulls in ethernet-controller.yaml.
-> > > 
-> > > I believe the 'unevaluatedProperties: false' on LED nodes in ethernet-controller.yaml
-> > > prevents downstream bindings from adding vendor-specific LED properties.
-> > > 
-> > > Is the right move removing unevaluatedProperties: false from the LED node in
-> > > ethernet-controller.yaml, or is there a preferred way to extend per-port LEDs?
-> > 
-> > The addition looks recent enough, should probably ask Christian why it
-> > was done this way and if removing it makes sense. Christian?
-> > 
-> 
-> Ah shit, I autopiloted into sending. Actually +CC Christian this time.
 
-Hi, give me some time to experiment... AFAIK with my limited info on DT,
+--g8SSq65u6iP4ZaTS
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-unevaluatedProperties permits to add vendor property as long as they are
-well defined. If the dt_binding_check is failing, then it's probably
-because unevaluatedProperties is finding that in the expected LED node
-there is extra stuff in the SCHEMA example.
+On Wed, Mar 18, 2026 at 03:05:25PM +0100, Nora Schiffer wrote:
+> The J722S CPSW3G is mostly identical to the AM64's, but additionally
+> supports SGMII.
+>=20
+> Signed-off-by: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+> ---
+>  Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.=
+yaml b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+> index a959c1d7e643a..9ab8237c7f79e 100644
+> --- a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+> +++ b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+> @@ -59,6 +59,7 @@ properties:
+>        - ti,j7200-cpswxg-nuss
+>        - ti,j721e-cpsw-nuss
+>        - ti,j721e-cpswxg-nuss
+> +      - ti,j722s-cpsw-nuss
 
-But give me some time to experiment with some other SCHEMA.
+For all these bindings, why is a fallback not suitable? Seems like it'd
+be possible here, since there's just a new feature. Is there some other
+programming model difference?
 
--- 
-	Ansuel
+>        - ti,j784s4-cpswxg-nuss
+> =20
+>    reg:
+> --=20
+> TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
+> Amtsgericht M=FCnchen, HRB 105018
+> Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
+> https://www.tq-group.com/
+>=20
+
+--g8SSq65u6iP4ZaTS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCabriTwAKCRB4tDGHoIJi
+0rmKAP4oA9ZLXSHHUbsFb5/219KbRXIiAAlbMACiaWPxfR6W7gEA+bHWo2zEutXo
+hbEedSyQOaJ/t3Kn1ZHU72wiR4Qnswc=
+=lTAy
+-----END PGP SIGNATURE-----
+
+--g8SSq65u6iP4ZaTS--
 
