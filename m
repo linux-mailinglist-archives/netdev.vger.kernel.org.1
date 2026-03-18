@@ -1,215 +1,262 @@
-Return-Path: <netdev+bounces-269040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269041-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gLInGZ+zumlWawIAu9opvQ
-	(envelope-from <netdev+bounces-269040-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 15:15:59 +0100
+	id aBJ4FzS0umlWawIAu9opvQ
+	(envelope-from <netdev+bounces-269041-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 15:18:28 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0679C2BCD94
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 15:15:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 000DE2BCECC
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 15:18:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E1CD8304FD49
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:11:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 05B4E3047C5C
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628533DA5DE;
-	Wed, 18 Mar 2026 14:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 181BC3DA5A7;
+	Wed, 18 Mar 2026 14:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cd36vT0o";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MMEkVcO7"
+	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="iLv8Kcr6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2A33D9DDE
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 14:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773843007; cv=none; b=pZAasnTNAHINfjwXJZGjl2Cz6YqccbFoOUer6n8VywTPc+9ZGKRpDy3EpXY7X8ASmHXPtyo6uBCWzc7AcI03psoI76Z1l+etDr7mItwV33BgFJuDAOtjUZA6VJZjuYdBebnXS4Q4g29cvdZVj2xfRxbnCIRrlb8E3Enf8UJ4hcI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773843007; c=relaxed/simple;
-	bh=sS8EMwx3yn4V1yYqUYo5FR1HNVDX1hx21r0s6HXSv3Y=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ufZm1KPrpB9MkPHzNMhwMe31zxztyip5QA6+cmFt+pTKfiGaUaUb1RNuphFM/TFOHivsXzpXMFsMm3JOtnkci3lTk2lVMp7IH4Cuwzd++GrOsSKHQZnwDolLw/Qdy33/dmHDdK2nV8inHJOwjjN2urLmYNKUrHhawHOWM1txyxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cd36vT0o; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MMEkVcO7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773843005;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U5fd1oB1XpU5lZ9zPQH4Op2uE6KrAjWmWzWTPZtcsio=;
-	b=Cd36vT0o9aWjp6PaET4XbISMplM2lrtsj0IdGvOU5tdMxCXfjXc6qH3xp+SnfBrsnzvHXD
-	B2LB+y0qmif0kXLYhq7iXZCq8ige/+UdJZX2dBjoKNk9t+X2fSozzPIazLmMPiLx1c2Vzs
-	vN1YfuDal2MaBAgKB+0zqtmQ1HHDUQg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-627-MQO7fyVKN_uTvGPYiNpC-A-1; Wed, 18 Mar 2026 10:10:03 -0400
-X-MC-Unique: MQO7fyVKN_uTvGPYiNpC-A-1
-X-Mimecast-MFC-AGG-ID: MQO7fyVKN_uTvGPYiNpC-A_1773843002
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43b3a675316so3157845f8f.0
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 07:10:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED503D9DD9
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 14:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773843217; cv=pass; b=KKyEpS9y5vIApytuAHl40yArpXCC2kwCQpnFGTsHUsu2Ligg7XGNsfOVjwFT0nYi9insmxat1lb2ncbtryFdAitPAKhnCJoJ7SgMGDKNtYjy55DCEFiFEOpsoDd2JIMKfK/jHmfVZL6Rb7wuzh8TcjBDa8ANTTwlFPc2PtQNKps=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773843217; c=relaxed/simple;
+	bh=z/89pA0UO58ZBkQTFOgdhyZuqhcSfbmElffwmdziG+Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hWNgGcNRBIoYezMRNh7reb7DLjJQzrPV6zWGFpn+AnR8I2EbrdC6Csaj9ZzhRCXyN/VCvU7qXTJeP7WjpUr3yhjaT40z7crjvdiEpuRb3Y7/8/eIYIbh3IeMJ4839+sJUeXVTkb23wM44Qwm1KQllHfHjrCYlVqgjyQmV13PETQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org; spf=pass smtp.mailfrom=bitbyteword.org; dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b=iLv8Kcr6; arc=pass smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bitbyteword.org
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-89c6a711ce9so20790146d6.0
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 07:13:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773843213; cv=none;
+        d=google.com; s=arc-20240605;
+        b=EXzhSteO6b6iqs3r5ezckdedzLM3y9ktva231plFTHFDj+ZylxqrshsMKn2AWp4qus
+         Ag5G+JJhf9nxvQk+OJOv35XI7ax/y4ucWGwsDQBEqAIID7R0DnPQ/oeZdgS9bYJl9APH
+         DwmIXkBkzy+Ljv0sStIkWiPBngW3aaNaCcCDYY+mT0U2ElAtbxB89Kzp9WuoTo/0n0X0
+         Da5ciE8bwwDZcS6t3+AgV47lBZRSvnDMdTEHBXsARNIUEqdOmHQrobY5HMDPyQB4ATVH
+         qsEWg6Bz5eYEqTCchVMsaCSuh+0EeM9eUkcSGmsW+P28jQ5k+i7+6LC2C3w6if+j/0h+
+         LSHQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=doH9jKyIV2pcWr9QqHgYapLUvNmJgzZV6s5pft4p5hM=;
+        fh=AZNUq08iRVtNS9WhTCp6w8vNbwfoPMjtVlFhKhRFYKw=;
+        b=kntyT73tEHo1Hi5xBmDrTX3dYYDBk+BWpEnSDF8xwpnnN/jNpyXwWUSeZSTvXzZ9mS
+         qi4MbEa/CYszD9zOQOdK2lcyX7s4qePlhrZYrhIM1xslacJYU6MaVdBqejBmHaa9l6Rm
+         apRhd8oJGLYp+KyCDhES29P4ZXDBHKdfhipEXH90UuJhplMwqBrLLKjRDVSOkGQGm2YP
+         yGI/LcUtdbvZrp/Ya5jxE9/aFEP4RV75Mm4KSu6MH0Z9Ses2tJybuxXJ0CdQ80+xE4DR
+         ZNMqDe/nQc+m0GJfLq7MtJmSNI3lkYWUA9/clNDtAVo/HKl4CV+xGc8j6hLKyYjQBoUL
+         awtw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773843002; x=1774447802; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=U5fd1oB1XpU5lZ9zPQH4Op2uE6KrAjWmWzWTPZtcsio=;
-        b=MMEkVcO7b00FEQvn00JTPqBj6t7qVfNuicOle60uw4YZL6IuomBHHaEMLjv3/Kh8Vk
-         IsnxaYOzO+rMBLApuSs58uZcWohVvVRVFGpmTrQ0KIVLHbE5smC25zpL2K5TexKK6xao
-         s9E/vFJP8hk2bfVEonOUs3jWAJexEOzj6JWIjBiJQXl6n5itu3/fke08JqRvnBsMNXU2
-         Z2yXbrC7QgIcoYVraX7MzNRqHWahYUGDEJqloBxYFtnZTuoNWj1lcTp/K548fOvO29eu
-         CPHIsJhWxWk/rSZZh/eq6XssORLv2fG0SiezfThyUYidGsiupisSZlFV6lU9hu95VLmn
-         ++Ew==
+        d=bitbyteword.org; s=google; t=1773843213; x=1774448013; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=doH9jKyIV2pcWr9QqHgYapLUvNmJgzZV6s5pft4p5hM=;
+        b=iLv8Kcr6ga2PE/qEE7gatlTbBuKuabs1y16ZU02HWWuD2F8/SlRbYD+MiJWlt2c2k2
+         dduToabSVGSFcR3YzXAZivojolCfyFq8mmgx+i8+nMzfCVMkvmzgOhaHyHJ+GW5PKCux
+         y4LrDFzCZ9GUaBfw7b/v/VPzts3OrrzNDJm5Orsva+cV3IuaLj8awNAPzB3LEy1AStu7
+         M3P6XzAaHLQ1uullDaiNWw/xpwfx7tRGkwpdMmNeujw02McXPZfPeKTvafM8x9Ig1crv
+         CyUXQV1PUOOqeUP+J6++WbBD6wJO0ngS50NoDJCoCVThx5tVRIS65X5U7WMQ0ChpvW8n
+         TqPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773843002; x=1774447802;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=U5fd1oB1XpU5lZ9zPQH4Op2uE6KrAjWmWzWTPZtcsio=;
-        b=SaM+E8JOwtWxJB2Gmw6u5v4Ss3yhqZc2BbpaU8TJuAzCyj+PbOHjeeIYYaW7A7iQxo
-         z2kuoeCdVuEIWjZhPlw9WUEX8AyqcMR6ZG2G4IKeDLd1TRUvL19Y55nXlhr7a2Zwt3xI
-         m76GuqBJQnwnYdAQCWXAXfVQ+Uwm7TDh9WG2ALcymorQkaZdLfs7AkpcEb80MbeAAVhm
-         78RCv+qBE8R/Ds8UO60bLFeRWBy58CQWnki9yrli+WCTXxjnpQeBRuV/wMQT4782lRlq
-         VEgPinydJDavb7RjefrlSsGbnGyOnpSqHiQcksZhHVogjQTADdNgEoRUVgm53IolTTSo
-         iUQA==
-X-Forwarded-Encrypted: i=1; AJvYcCUEK9kbNw7vTmx7MVQLaayEQbmZeQrrrDQX1AveFWwKc16aOo1FnebSn2WKonN1zLgOnvMZPqA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypMiAKNkay8ALsDuryIsbmoLNxl3XVF11QnJUtK2eNJChJsMqS
-	R4COdTkiHQAolbnhWTXFBoJtqJJVAtVzpAFmSf+8e2V7UsQ4QNnLs3da2ozPE3VaMTghHiKby6H
-	vI0Ohuzn2fumB3MVhyzF6l4+izhAjbm5tW3/U2cQCrqGfu4tl5VI97sHwLw==
-X-Gm-Gg: ATEYQzx0tcshFaiVFJNwttrgeS7XR6+6jssX8PTk5/CVW+PPPxYhuy/ffXO+fHD5jUW
-	Q2WURl3hgSLNasSDk8NGmN3HFv2Psz8diNn/zGvaYYv1sLxjaN1/JU7sngLq9QiCCg54rzxIu8z
-	Jxh2cXOW9UWJ4fLpphHKJkgOQRHN/GuMQZ5+q6oKmIXRIPf9WBv14YYdNzNrgg7Fd/yogBvTuzQ
-	Kr2Y55e5nuWurrUXAW6R22iEkOWpHXx1qjgDu6IWrB+qEMnPsp9M62puEUvBYoLZRBNOzu4ojyz
-	cVKKgWOl+gKunKcc2gwahFrz1UhAW9SDGVcizYfHz8cx7CYrRgmC73CVyQ/RINMV3GqyXu0QhT4
-	Fh3CL1K5X6U3e5Dt9fPMoyNghoccIaMpFKQPUxkfJNNWX/qRC
-X-Received: by 2002:a05:600c:c178:b0:486:de04:5906 with SMTP id 5b1f17b1804b1-486f45729d0mr62586705e9.19.1773843002247;
-        Wed, 18 Mar 2026 07:10:02 -0700 (PDT)
-X-Received: by 2002:a05:600c:c178:b0:486:de04:5906 with SMTP id 5b1f17b1804b1-486f45729d0mr62585685e9.19.1773843001645;
-        Wed, 18 Mar 2026 07:10:01 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f463c9f3sm32416535e9.3.2026.03.18.07.10.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 07:10:00 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 167115A31AF; Wed, 18 Mar 2026 15:10:00 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: hawk@kernel.org, netdev@vger.kernel.org
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, andrew+netdev@lunn.ch, horms@kernel.org,
- jhs@mojatatu.com, jiri@resnulli.us, sdf@fomichev.me,
- j.koeppeler@tu-berlin.de, mfreemon@cloudflare.com, carges@cloudflare.com
-Subject: Re: [RFC PATCH net-next 6/6] net_sched: codel: fix stale state for
- empty flows in fq_codel
-In-Reply-To: <20260318134826.1281205-7-hawk@kernel.org>
-References: <20260318134826.1281205-1-hawk@kernel.org>
- <20260318134826.1281205-7-hawk@kernel.org>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 18 Mar 2026 15:10:00 +0100
-Message-ID: <87pl51ns93.fsf@toke.dk>
+        d=1e100.net; s=20251104; t=1773843213; x=1774448013;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=doH9jKyIV2pcWr9QqHgYapLUvNmJgzZV6s5pft4p5hM=;
+        b=RTgQKVjxuXxpPk0MClx3EY706wbJ1hrQlWduQqvmiBVBa1g/ndTRO3Wn1aBeLjkcPs
+         JBtuMZZAurNAY76WMR35snCJx0IFhzhni/rl4LIQVkE0rIFmRIANPRL42g+YbvQducnI
+         ALkeo+JyoYKMGGXpMBFyzqFS4ZB6Jx9hljLvFqoVK17jcQfTIg+CtFFxhrXJfY+d+yAB
+         /rAHAZFjnpgowWwcYOBSDfi1g3zNjxKw7h4s/VnC72MNCvDAMyTIesg9BXq17iSupuow
+         iHWWdlWDH2SkikNeDrZsizg+zzZfACyZdCuhrVQhmFQ60DliwQ/9G08hieLKlK2g4VN2
+         YIgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW9EGpvn/7WogkpnTWP9FVpUchEhbutY9+fnTcowA8Ixbhj6qLRJSQofyCAj8zyRS9fCxk53is=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzK9cGaxs9wSd7NIUgk3hKfqf1KemPVYLRv39lLFgvnYzh5RmHf
+	nuvji38lKUggFA85N8wzcWqXX4NYc7ZQk3R1Yir0xzp4PC7eqTtiPtGtF2RGFG8HythEev2BJ9W
+	RCBQg+CBeEgYIBJvNsLR5gj7dq2VbKGWwEDvZg1HAcw==
+X-Gm-Gg: ATEYQzx1kr97OgpURmTW4hIcceX7BB7eTbA2BV12gFJcA6I/Gg1rpzrcOrKAc23Z4hO
+	Q1tzzmM4cVBiVUjtJ4q0iyTA8w9FzRgeu0Gq5ctePrVFdbUOOMjSlDj3zVYA2fmk1QnswBqoUhb
+	TCFwt+yCAh1K7LsFU9TavhjpZ4sN1B73yQPA2P5T0YSKJfJYy+jUj9yl933K2KdZGQr5MkGkFS3
+	URV5GafOtLsulet4vjms9oQLtfYlFtMdAb2Xoh9ALL8Q04wo7aV6m3vC7kSVq37EwFtnsMqvbdU
+	UAt4Vfw=
+X-Received: by 2002:a05:6214:2466:b0:89c:4cb3:4ea1 with SMTP id
+ 6a1803df08f44-89c6b50cda1mr53811646d6.20.1773843213183; Wed, 18 Mar 2026
+ 07:13:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20260312150523.2054552-1-vineeth@bitbyteword.org>
+ <20260312150523.2054552-5-vineeth@bitbyteword.org> <f7to6ktnjxi.fsf@redhat.com>
+ <CAO7JXPhfpUb1VM_=mwSUqHPQrLvBW=wurz_apWQkMXssPAQPJA@mail.gmail.com>
+In-Reply-To: <CAO7JXPhfpUb1VM_=mwSUqHPQrLvBW=wurz_apWQkMXssPAQPJA@mail.gmail.com>
+From: Vineeth Remanan Pillai <vineeth@bitbyteword.org>
+Date: Wed, 18 Mar 2026 10:13:22 -0400
+X-Gm-Features: AaiRm51A0epLogiUfwoUvX3H17X7FM-N_YItWsuNQqgGdOd0yFIoTXs_t_Yz52g
+Message-ID: <CAO7JXPgiM12_KcM+-Kxw2A9yC7-G1wwXCmbyVqpAcckojfRrTw@mail.gmail.com>
+Subject: Re: [PATCH 04/15] net: Use trace_invoke_##name() at guarded
+ tracepoint call sites
+To: Aaron Conole <aconole@redhat.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Peter Zijlstra <peterz@infradead.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Eelco Chaudron <echaudro@redhat.com>, 
+	Ilya Maximets <i.maximets@ovn.org>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Xin Long <lucien.xin@gmail.com>, Jon Maloy <jmaloy@redhat.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org, dev@openvswitch.org, linux-sctp@vger.kernel.org, 
+	tipc-discussion@lists.sourceforge.net, linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[bitbyteword.org:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269040-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,tu-berlin.de:email];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[bitbyteword.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269041-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[bitbyteword.org:+];
+	NEURAL_HAM(-0.00)[-0.921];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vineeth@bitbyteword.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[goodmis.org,infradead.org,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,ovn.org,vger.kernel.org,openvswitch.org,lists.sourceforge.net];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 0679C2BCD94
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,infradead.org:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,goodmis.org:email,bitbyteword.org:dkim,bitbyteword.org:email]
+X-Rspamd-Queue-Id: 000DE2BCECC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-hawk@kernel.org writes:
-
-> From: Jonas K=C3=B6ppeler <j.koeppeler@tu-berlin.de>
+On Wed, Mar 18, 2026 at 9:40=E2=80=AFAM Vineeth Remanan Pillai
+<vineeth@bitbyteword.org> wrote:
 >
-> When codel_dequeue() finds an empty queue, it resets vars->dropping
-> but does not reset vars->first_above_time.  The reference CoDel
-> algorithm (Nichols & Jacobson, ACM Queue 2012) resets both:
+> On Thu, Mar 12, 2026 at 11:31=E2=80=AFAM Aaron Conole <aconole@redhat.com=
+> wrote:
+> >
+> > "Vineeth Pillai (Google)" <vineeth@bitbyteword.org> writes:
+> >
+> > > Replace trace_foo() with the new trace_invoke_foo() at sites already
+> > > guarded by trace_foo_enabled(), avoiding a redundant
+> > > static_branch_unlikely() re-evaluation inside the tracepoint.
+> > > trace_invoke_foo() calls the tracepoint callbacks directly without
+> > > utilizing the static branch again.
+> > >
+> > > Suggested-by: Steven Rostedt <rostedt@goodmis.org>
+> > > Suggested-by: Peter Zijlstra <peterz@infradead.org>
+> > > Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
+> > > Assisted-by: Claude:claude-sonnet-4-6
+> > > ---
+> > >  net/core/dev.c             | 2 +-
+> > >  net/core/xdp.c             | 2 +-
+> > >  net/openvswitch/actions.c  | 2 +-
+> > >  net/openvswitch/datapath.c | 2 +-
+> > >  net/sctp/outqueue.c        | 2 +-
+> > >  net/tipc/node.c            | 2 +-
+> > >  6 files changed, 6 insertions(+), 6 deletions(-)
+> > >
+> > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > index 14a83f2035b93..a48fae2bbf57e 100644
+> > > --- a/net/core/dev.c
+> > > +++ b/net/core/dev.c
+> > > @@ -6444,7 +6444,7 @@ void netif_receive_skb_list(struct list_head *h=
+ead)
+> > >               return;
+> > >       if (trace_netif_receive_skb_list_entry_enabled()) {
+> > >               list_for_each_entry(skb, head, list)
+> > > -                     trace_netif_receive_skb_list_entry(skb);
+> > > +                     trace_invoke_netif_receive_skb_list_entry(skb);
+> > >       }
+> > >       netif_receive_skb_list_internal(head);
+> > >       trace_netif_receive_skb_list_exit(0);
+> > > diff --git a/net/core/xdp.c b/net/core/xdp.c
+> > > index 9890a30584ba7..53acc887c3434 100644
+> > > --- a/net/core/xdp.c
+> > > +++ b/net/core/xdp.c
+> > > @@ -362,7 +362,7 @@ int xdp_rxq_info_reg_mem_model(struct xdp_rxq_inf=
+o *xdp_rxq,
+> > >               xsk_pool_set_rxq_info(allocator, xdp_rxq);
+> > >
+> > >       if (trace_mem_connect_enabled() && xdp_alloc)
+> > > -             trace_mem_connect(xdp_alloc, xdp_rxq);
+> > > +             trace_invoke_mem_connect(xdp_alloc, xdp_rxq);
+> > >       return 0;
+> > >  }
+> > >
+> > > diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+> > > index 792ca44a461da..420eb19322e85 100644
+> > > --- a/net/openvswitch/actions.c
+> > > +++ b/net/openvswitch/actions.c
+> > > @@ -1259,7 +1259,7 @@ static int do_execute_actions(struct datapath *=
+dp, struct sk_buff *skb,
+> > >               int err =3D 0;
+> > >
+> > >               if (trace_ovs_do_execute_action_enabled())
+> > > -                     trace_ovs_do_execute_action(dp, skb, key, a, re=
+m);
+> > > +                     trace_invoke_ovs_do_execute_action(dp, skb, key=
+, a, rem);
+> >
+> > Maybe we should just remove the guard here instead of calling the
+> > invoke.  That seems better to me.  It wouldn't need to belong to this
+> > series.
+> >
+> > >               /* Actions that rightfully have to consume the skb shou=
+ld do it
+> > >                * and return directly.
+> > > diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
+> > > index e209099218b41..02451629e888e 100644
+> > > --- a/net/openvswitch/datapath.c
+> > > +++ b/net/openvswitch/datapath.c
+> > > @@ -335,7 +335,7 @@ int ovs_dp_upcall(struct datapath *dp, struct sk_=
+buff *skb,
+> > >       int err;
+> > >
+> > >       if (trace_ovs_dp_upcall_enabled())
+> > > -             trace_ovs_dp_upcall(dp, skb, key, upcall_info);
+> > > +             trace_invoke_ovs_dp_upcall(dp, skb, key, upcall_info);
+> >
+> > Same as above.  Seems OVS tracepoints are the only ones that include
+> > the guard without any real reason.
+> >
 >
->   dodeque_result codel_queue_t::dodeque(time_t now) {
->       ...
->       if (r.p =3D=3D NULL) {
->           first_above_time =3D 0;   // <-- Linux omits this
->       }
->       ...
->   }
+> Makes sense. Its simple enough that I think I will include it as a
+> separate patch in v2 and remove these changes from this patch. Thanks
+> for pointing it out.
 >
-> Note that codel_should_drop() does reset first_above_time when called
-> with a NULL skb, but codel_dequeue() returns early before ever calling
-> codel_should_drop() in the empty-queue case.  The post-drop code paths
-> do reach codel_should_drop(NULL) and correctly reset the timer, so a
-> dropped packet breaks the cycle -- but the next delivered packet
-> re-arms first_above_time and the cycle repeats.
+On a second look, I'm not sure if this was for performance reasons.
+The discussion in the io_uring patch in this series points out that
+the check made there was deliberate and for performance reasons to
+avoid 6 mov instruction in the hot path. Just wanted to double check
+if that was the case here, before I remove the check?
 
-Nice find! I think this is worth submitting as a separate fix, no?
-Probably with a fixes tag:
-
-Fixes: 76e3cc126bb2 ("codel: Controlled Delay AQM")
-
-and possibly this one as well to aid stable backports:
-
-Fixes: d068ca2ae2e6 ("codel: split into multiple files")
-
-
-> For sparse flows such as ICMP ping (one packet every 200ms-1s), the
-> first packet arms first_above_time, the flow goes empty, and the
-> second packet arrives after the interval has elapsed and gets dropped.
-> The pattern repeats, producing sustained loss on flows that are not
-> actually congested.
-
-Note that this only happens if the ping flow actually gets into a
-dropping state before emptying out. Which rarely happens in practice,
-which I'm guessing is why this was not discovered before now :)
-
-> Test: veth pair, fq_codel, BQL disabled, 30000 iptables rules in the
-> consumer namespace (NAPI-64 cycle ~14ms, well above fq_codel's 5ms
-> target), ping at 5 pps under UDP flood:
->
->   Before fix:  26% ping packet loss
->   After fix:    0% ping packet loss
->
-> Fix by resetting first_above_time to zero in the empty-queue path
-> of codel_dequeue(), matching the reference algorithm.
->
-> Fixes: 76e3cc126bb2 ("codel: Controlled Delay AQM")
-> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> Signed-off-by: Jonas K=C3=B6ppeler <j.koeppeler@tu-berlin.de>
-> Reported-by: Chris Arges <carges@cloudflare.com>
-> Tested-by: Jonas K=C3=B6ppeler <j.koeppeler@tu-berlin.de>
-
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-
+Thanks,
+Vineeth
 
