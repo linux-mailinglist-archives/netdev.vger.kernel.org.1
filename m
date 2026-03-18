@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-268968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268969-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sD0wHryCumnrXQIAu9opvQ
-	(envelope-from <netdev+bounces-268968-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:47:24 +0100
+	id 2EHkLsiCumnrXQIAu9opvQ
+	(envelope-from <netdev+bounces-268969-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:47:36 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE1142BA292
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:47:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 224FB2BA299
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:47:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60CB03083DEA
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:46:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D46AC30B4F8A
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E080739151E;
-	Wed, 18 Mar 2026 10:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF64390C96;
+	Wed, 18 Mar 2026 10:46:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="N7qBjmOa";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="10DBAmK2"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="t421XnB6";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="F7hqibrm"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593151D9346
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 10:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA523921E6
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 10:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773830765; cv=none; b=QlLMhkvgBPRbQvMBQxdz4km4/KJu3w1Z1otsw2I40SMR4368qmF/b8S60MPk8yj/QUbWz43nlB/z76tjNELyX8mhx5++vo7lIWqFLNbL2RgBn9DNefsl+qxMzJFfS98OXhIykdr07tWjcUUFOxZXxOTsuNJ0LUGVvbAvgjD0UTc=
+	t=1773830768; cv=none; b=rfM1Cwyj0ID7w6jT3AWwQjOq30KGYtWu6tpRGte8iBlCW6GMHeB5MOpkRYSZ4HSthl85iLbs8+7IHhZL3T8/FWSOuw78pYa7tvXKz71FXm7QM4f56w8qGjEd5TsUqZzpKFfp6mTuDrHWGLhkarhwKIz9/VfhRXDL63wsJjCe7Ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773830765; c=relaxed/simple;
-	bh=8q9nWnm04+gvYg8x6zxtciDoMYz/fjqJaaCpiZ0/Alc=;
+	s=arc-20240116; t=1773830768; c=relaxed/simple;
+	bh=OqFvdn6kszKpfauZAhz1e6kMGNa4Rb93kWbpKZhfO7A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H6fcmF86Gsy32be/g7Ku40EFVyGsMZ+vvRV5wFtGucESstw8IPtsm6wB3JctzzuU1XFfrLvi6n5O9769aEpiPLn4MCE+/tppvyQfApCo2ELqXd/IHoCgLmrqC/LPVnLUaXqtQ4gg02IlGZjkFVuakIZP4ln35lYNgSC9RkuIW4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=N7qBjmOa; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=10DBAmK2; arc=none smtp.client-ip=202.12.124.153
+	 MIME-Version; b=OHxkwb0IOHhTVei1uo8AUL2yYbjKhP0gBQ2toO1NVMsbk3m4XnTWN0d9X8k8/K3/83cLXdxyNKNk8nZ6neGPO36pzkic4A4NDeX1rwZrFYtfhdbCUqv6QC5DOzToaautTLJn363zYZQ5HNex1a35pfvmviPEQ+uyvNUfVh8JMSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=t421XnB6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=F7hqibrm; arc=none smtp.client-ip=202.12.124.145
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 650DC7A019F;
-	Wed, 18 Mar 2026 06:46:02 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Wed, 18 Mar 2026 06:46:02 -0400
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.stl.internal (Postfix) with ESMTP id 04FDA1D00136;
+	Wed, 18 Mar 2026 06:46:04 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Wed, 18 Mar 2026 06:46:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
 	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
 	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1773830762; x=
-	1773917162; bh=mnTVGl6Nk6lwNJKrFClBZQ1SLnqr+LvOJGzfq9VQXHk=; b=N
-	7qBjmOaqnMM7KvK/on8FEhHDWFfHuAF0Tn5FcUG97TmnvAga9x7xSwVjk5WLq3gd
-	Q+jeVkENPr9tG36yn4fbwCt+hKoGVGylUP7Ou3MQqTcvprin+w4vjdHo1EICvP9b
-	keDot4i0+PFlbtrkRP91a7vRXltWcPBFTPlr+J7KbeobJOp3L9ngsxNdmPAP9G4p
-	78aWeUH03T1Jwm4tYcprL1yGM7z5l3Hf8jLuyAl0b81sp/uWAktC+8DNghAmajwd
-	hsy2srApAXGGlFQQ8Tz+HBJnTtITeRFR2Yx6392UzOEbp2RPeiHTOryIm4GNEZQw
-	tN3xfuf6jSPKxYhWRZCfA==
+	:reply-to:subject:subject:to:to; s=fm2; t=1773830764; x=
+	1773917164; bh=GdEjspRaDvVTtf7PkfnLUq8fFsaLcc0PMZBbW/XOL84=; b=t
+	421XnB6SQabVVw2V6gnX6vCAEYf9rR9Pw/QPNfuFw+nVy2dR1rArfoV8DlK3tF+j
+	D/eLAW1TpaHHR6du6FHh1aLxPy7TZEdflvZiS8yXNq5poZ5EMIU7OyuA5xWs1ig3
+	7bxlmiPkDYlIBLjXEP10VaekdYNqz3rmJDR7UyejNT8Co2K16foALj72FVY5d7Ue
+	T2KnaXCrG/7uAw2rHTASsWnR3miIKmuFUMPz4EBFRTXz2ZPvzgDcKeCGrcIHMB7z
+	AelhfS/Fe81x6d/cNmZuMU8Y3Ddn26Y4kMuZdAtTO2gUrd4H8AGxefEXbni55hVk
+	DL5q9b8mIrdMax/ncbmsw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1773830762; x=1773917162; bh=m
-	nTVGl6Nk6lwNJKrFClBZQ1SLnqr+LvOJGzfq9VQXHk=; b=10DBAmK2V137w2geN
-	Xc0TgiHy2o6h4gNpHUGlzRPLoMLWsGlkKA8adoEG8kLUDuujfR/PkrkQfbGtDOtQ
-	NzolVBnmccOs/258MM/2gPXOmLqbTxI0MBP+g/x0+AFxHaZSDcbNqI9wiJwtO5tb
-	EG+FnF0MoV6byyrWMheqcJhfbn6Is9JrzLY//jf/EbXrE/DEPPKy119I/8OLZ73Z
-	T1ItcgWly3QArTz/3HGt6QsMUZ9tpITcmCpWUYf3psFhYpXgrZFRzRe3fvhjnlTC
-	U96MyXwuTp3Lml9gUqgWZM1BM78zWL214LyRX24TqDPea06l84wvsjIQghTUpOec
-	L9qFw==
-X-ME-Sender: <xms:aYK6aRZ0yXGt7wJVqSxId0OwDTMg6FpTb2aPbyfRpM2n57480ACv6Q>
-    <xme:aYK6afQXh6T5goMwQm4Dvpu8JFXRZ9uDV1vBILc8N9CCKz3x4CJ_uzu28cEtIgl4H
-    6A3OKhiP6u9HO4R9eRuwNwLrnIq5AJC5GazBl7p_OprlZXaQFsn7go>
-X-ME-Received: <xmr:aYK6acT9DL23CgmKQKMdLWpTWZ9PtrIpktAxjgsStw81TzG4DsYSLpfqsSZ1>
+	:x-me-sender:x-sasl-enc; s=fm1; t=1773830764; x=1773917164; bh=G
+	dEjspRaDvVTtf7PkfnLUq8fFsaLcc0PMZBbW/XOL84=; b=F7hqibrmheSp7jlAN
+	NLSjNz2LxuDCrB4OPG2j3npmOkT7zRHYh/42lxD596nLhINxR+UvOKKq03zYkSmn
+	s3emIWV+Ip/eW2pxXSmaYQlXfv1UDTK8GURU1BUV832Ct73ekQzl0/DAuG4Ifk+8
+	D96nxETros4RjOehG6QwwcWfrThRWA97ibmn/AQYk2zhg47KaQJLP4bVIyuH1yn3
+	WoOLUU1LRBCCEMTgZlQ2jW8RI8/UTfQ1AEoykqO0HJiaqtwHUs0RAOwVOzrm2FuW
+	0rbc7DPOhjod8cbOSWDkK8334N3Ay1l/921nKbPmP/JAeztrL03AgZOWYFz44gUM
+	w0AgA==
+X-ME-Sender: <xms:bIK6aXb751z87DhFLH48Vg2Sg59EtMxMO3XBY_tYgDKZrtgjWOte3w>
+    <xme:bIK6ad0MTNFSe-LU1bWV210Tm5i1LespgpbMrawZkV7me8dothF9KQSyMz6nWCwMi
+    TdCpC-Dcth-z5RkHS0Mj2nbQYaqEfOvJ5cE4xM70Ufv6kRUW2840v8>
+X-ME-Received: <xmr:bIK6aXUQKieNgEi-VxzxuAxYiG4JET9Oh78Ybo6Nwg6nqUGVCPUduOuHzCgP>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdefledvucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
@@ -75,29 +75,25 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdefledvucetufdote
     rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
     grthhtvghrnhepieeiueeiteehtdefheekhffhgeevuefhteevueeljeeijeeiveehgfeh
     udfghefgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeehpdhmohgu
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeefpdhmohgu
     vgepshhmthhpohhuthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlh
     drohhrghdprhgtphhtthhopehsugesqhhuvggrshihshhnrghilhdrnhgvthdprhgtphht
-    thhopehjohhhrghnnhgvshdrsggvrhhgsehinhhtvghlrdgtohhmpdhrtghpthhtoheplh
-    hoihgtrdhpohhulhgrihhnsehlihhnrghrohdrohhrghdprhgtphhtthhopehrhigriigr
-    nhhovhdrshdrrgesghhmrghilhdrtghomh
-X-ME-Proxy: <xmx:aYK6abRO15ioFNew34135msH4-2hFWe8HyKyKOUdvp9FvhSpQePIZw>
-    <xmx:aYK6aZ73Z19h1G4nOnQCYfmeIen8gmpuQbVJuieMzFEvaZCHcQJabA>
-    <xmx:aYK6af27YFUivUtkI9twu5j_S2PsGW917xqm9HiO965T9rc_rbfmaw>
-    <xmx:aYK6acCgikxWq-apl_h2u2-zwG6W1d_rbIb6vuo7-xw2GuDIPSn-dA>
-    <xmx:aoK6aY4QMxU1LSTObS-WhDiOapsrJXnB1UtS5Y5FOdXv5q3wWLR6zJ6D>
+    thhopehjihhrihesrhgvshhnuhhllhhirdhush
+X-ME-Proxy: <xmx:bIK6aXWjWALkTqOpRuqKBk1sRZMEIto1C41ZELKA0pimIz7jPGZcJQ>
+    <xmx:bIK6aWcy1jLE3e0HUaH0wJRg6jBwIYzSe5Biy7GV2ZRjFxY-IZ2Waw>
+    <xmx:bIK6aQWBAer6xB9Xj6N3rhfM01reQpaZBwxzFKCvz3ue1FQvjmciRA>
+    <xmx:bIK6afd2_bBQ3Zke4NtyFbLPwnzH5kgCe-B_NDntr4-lr1ybC9QXJA>
+    <xmx:bIK6aQWUBEBvXMUiDPnU2EaSa6DgDSNQYdMoJI5EiggvOddvbR0i2wwO>
 Feedback-ID: i934648bf:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 18 Mar 2026 06:46:01 -0400 (EDT)
+ 18 Mar 2026 06:46:04 -0400 (EDT)
 From: Sabrina Dubroca <sd@queasysnail.net>
 To: netdev@vger.kernel.org
 Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Subject: [PATCH net 1/2] rtnetlink: count IFLA_PARENT_DEV_{NAME,BUS_NAME} in if_nlmsg_size
-Date: Wed, 18 Mar 2026 11:45:52 +0100
-Message-ID: <c8acbb1f4f3651f50fc4f5ddee234f1ea6769588.1773829376.git.sd@queasysnail.net>
+	Jiri Pirko <jiri@resnulli.us>
+Subject: [PATCH net 2/2] rtnetlink: count IFLA_INFO_SLAVE_KIND in if_nlmsg_size
+Date: Wed, 18 Mar 2026 11:45:53 +0100
+Message-ID: <52c1bac69cbbe82cfe0da2615d6a7f3f69254bb5.1773829376.git.sd@queasysnail.net>
 X-Mailer: git-send-email 2.51.2
 In-Reply-To: <cover.1773829376.git.sd@queasysnail.net>
 References: <cover.1773829376.git.sd@queasysnail.net>
@@ -108,83 +104,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268968-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268969-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[queasysnail.net,intel.com,linaro.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:dkim,queasysnail.net:email,queasysnail.net:mid,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: CE1142BA292
+X-Rspamd-Queue-Id: 224FB2BA299
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Commit 00e77ed8e64d ("rtnetlink: add IFLA_PARENT_[DEV|DEV_BUS]_NAME")
-added those attributes to rtnl_fill_ifinfo, but forgot to extend
-if_nlmsg_size.
+rtnl_link_get_slave_info_data_size counts IFLA_INFO_SLAVE_DATA, but
+rtnl_link_slave_info_fill adds both IFLA_INFO_SLAVE_DATA and
+IFLA_INFO_SLAVE_KIND.
 
-Fixes: 00e77ed8e64d ("rtnetlink: add IFLA_PARENT_[DEV|DEV_BUS]_NAME")
+Fixes: ba7d49b1f0f8 ("rtnetlink: provide api for getting and setting slave info")
 Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 ---
- net/core/rtnetlink.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ net/core/rtnetlink.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index dad4b1054955..a116362f5f32 100644
+index a116362f5f32..cebc00d02fbb 100644
 --- a/net/core/rtnetlink.c
 +++ b/net/core/rtnetlink.c
-@@ -1267,6 +1267,21 @@ static size_t rtnl_dpll_pin_size(const struct net_device *dev)
- 	return size;
- }
+@@ -707,11 +707,14 @@ static size_t rtnl_link_get_slave_info_data_size(const struct net_device *dev)
+ 		goto out;
  
-+static size_t rtnl_dev_parent_size(const struct net_device *dev)
-+{
-+	size_t size = 0;
-+
-+	/* IFLA_PARENT_DEV_NAME */
-+	if (dev->dev.parent)
-+		size += strlen(dev_name(dev->dev.parent)) + 1;
-+
-+	/* IFLA_PARENT_DEV_BUS_NAME */
-+	if (dev->dev.parent && dev->dev.parent->bus)
-+		size += strlen(dev->dev.parent->bus->name) + 1;
-+
-+	return size;
-+}
-+
- static noinline size_t if_nlmsg_size(const struct net_device *dev,
- 				     u32 ext_filter_mask)
- {
-@@ -1328,6 +1343,7 @@ static noinline size_t if_nlmsg_size(const struct net_device *dev,
- 	       + nla_total_size(8)  /* IFLA_MAX_PACING_OFFLOAD_HORIZON */
- 	       + nla_total_size(2)  /* IFLA_HEADROOM */
- 	       + nla_total_size(2)  /* IFLA_TAILROOM */
-+	       + rtnl_dev_parent_size(dev)
- 	       + 0;
+ 	ops = master_dev->rtnl_link_ops;
+-	if (!ops || !ops->get_slave_size)
++	if (!ops)
++		goto out;
++	size += nla_total_size(strlen(ops->kind) + 1);  /* IFLA_INFO_SLAVE_KIND */
++	if (!ops->get_slave_size)
+ 		goto out;
+ 	/* IFLA_INFO_SLAVE_DATA + nested data */
+-	size = nla_total_size(sizeof(struct nlattr)) +
+-	       ops->get_slave_size(master_dev, dev);
++	size += nla_total_size(sizeof(struct nlattr)) +
++		ops->get_slave_size(master_dev, dev);
  
- 	if (!(ext_filter_mask & RTEXT_FILTER_SKIP_STATS))
+ out:
+ 	rcu_read_unlock();
 -- 
 2.51.2
 
