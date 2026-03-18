@@ -1,156 +1,128 @@
-Return-Path: <netdev+bounces-269155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269156-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WDFsHnj1ummVdQIAu9opvQ
-	(envelope-from <netdev+bounces-269155-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 19:56:56 +0100
+	id MI9ZKDz6umlwdwIAu9opvQ
+	(envelope-from <netdev+bounces-269156-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 20:17:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DCD92C1AE0
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 19:56:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A68EE2C1E8E
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 20:17:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 913F9300C0F3
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:56:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8A3D33061B64
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 19:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED343E3DAD;
-	Wed, 18 Mar 2026 18:56:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241D33EDAB7;
+	Wed, 18 Mar 2026 19:10:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="K0asMe8B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mQ/IanJ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E3C8462
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 18:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013803D648C;
+	Wed, 18 Mar 2026 19:10:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773860213; cv=none; b=mG8DHBRpW+tRyxqMf2CLpapfTETK16oTE19MnyQebrx4L6dzgZKcZ6AdstAddDylrXP7O9YQ2GbM+nGz3v2q3w+MMtzVs0UAJDEvwbnu7zONrnWIBau7xBeSPunpgc6/RejUPfJ1qNOO+ows6QU3iIsd/R/X0/R26pgE2vP9iEo=
+	t=1773861048; cv=none; b=gUnDPa0MAuSkLleaM0cWRj/kDWyZysVn/Bc6ZvoK9wB/r8j0u7M2fh9dgEJHJnZhMM4wsLgZId6ht2ngkOai8wF2uAZVxdQgmts3T7xiyXTgPHljqXiSTGcyNHG+qJwr3rK0z5iiK5+/9BKJ/20p6sZi3rGdBmc/xcvctyaOPRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773860213; c=relaxed/simple;
-	bh=sJbrEl1pTxXEXDgHJMo1Z4R5u31kmTkH6c+QX9al/rY=;
+	s=arc-20240116; t=1773861048; c=relaxed/simple;
+	bh=vF85Ld0H6v3LbIAsot0GTMPeWPK6vbEVmdTJ6kKOmOE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OLYinHRosXTGR0I8nIT/7YtcPIuY4HF5IhAZduF83z6dMvDoHikcoumLShJsxhwvzLbfd2aGqaak28s3ZAUHqHOzfwsIvHRM3xwzcNMeij2PIcpmTciQYi05w3npdrwpJeYtwdUB2EYQi2LpymK+ANgjuvb6ymoEQeE+jYwA8MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=K0asMe8B; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from x1 (122.24.31.150.dy.iij4u.or.jp [150.31.24.122])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 62IIuJEi017320
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 19 Mar 2026 03:56:20 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=PfderLH1PeQJs9EdZnKIFcadn6yQyUif1ZtSb/oqtWI=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20251215; t=1773860181; v=1;
-        b=K0asMe8Bso9Ms0gHC0knLQXE0V905i2fkm+90GcE7+0yepNdl+XmgToKCnGULFcJ
-         ng37HOG9o0RqNOvcPHe6FxthSU0ruaSbaOjTjMWc6jrup+ZIuI5+P+nyICZdi8sC
-         8uZnLzl58iIgVwVI66oBM6DRvEZrr2hhYnj5fQgAwphdIhNwZT14odCzsFkCLInS
-         oZI+yZOjHQqgoWPmT/GG44VKldi9ne0pvv5vaH7TjZZXOhAGgQhE7Wr0QL7Gz4Ov
-         XOkoPceBg7+z2T0C/ooHjZexfYMZyTVdZxMDVKuuq9eDwpI/YPqpjGg3cYxrx43k
-         V7HbXxXEhU9UckYddlT9eQ==
-Date: Thu, 19 Mar 2026 03:56:19 +0900
-From: Kohei Enju <kohei@enjuk.jp>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
-        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Jacob Keller <jacob.e.keller@intel.com>,
-        Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-        nxne.cnse.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 3/5] ice: migrate to netdev
- ops lock
-Message-ID: <abrzq5_S7p-YjqhE@x1>
-References: <20260318163505.31765-1-aleksander.lobakin@intel.com>
- <20260318163505.31765-4-aleksander.lobakin@intel.com>
- <abripOPt4oVu-Ksb@x1>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aGxP2HBN93wyFuGdlJY03NpaZrDp9aCCp/zqruLQ/3SP4Uw7LmXwatmbWvX7aNEPhVrXryhYR+qbP4VQiZvAU/tcZm4XPbtX3xH0HaoxwB9i+a84wuJ5G/QzllLLPVFOt843FW+SQZg/6B2NffS2e/YAadi9o7ORElHpZZaU7dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mQ/IanJ4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39C38C19421;
+	Wed, 18 Mar 2026 19:10:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773861047;
+	bh=vF85Ld0H6v3LbIAsot0GTMPeWPK6vbEVmdTJ6kKOmOE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mQ/IanJ4j3o4pZIhiIO5nts3zfsvyUQq9H3+Y+jpQG8mLEb3ylcLGVNC9QXb8eBnd
+	 GMZzg9ZUq/dq36gkarg89AjRYzKl99ASpFPEBx5XdZW4vmD88eXiZkCy78bxLxn9AQ
+	 i+3fXi4IycLKH7iKtpQMU78bnuHADyRkLZkF4OjmLGy2yV5dWgrf7CKLm1wBmV600C
+	 EUh/LpIQuX3AKaVvMD9OIR5z2ZAeT0IBLYNc8Ku2XMwE85azK5eKOWHL15poVlY/lG
+	 1vDlTSztWyXKYipWdtM1S7sPInO4iAz1cL5rL9XiHPdIMDgr5jClwKU35y/bMD/WnR
+	 k4rBsXSMD1Uiw==
+Date: Wed, 18 Mar 2026 12:10:37 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next] net/mlx5e: Enable mac forwarding on uplink
+ representor
+Message-ID: <abr4O7rfDoOIKHYW@sx113>
+References: <20260310104841.1862380-1-tariqt@nvidia.com>
+ <20260311203319.76d35ce0@kernel.org>
+ <abmZf3bRl2uQ69EA@sx113>
+ <20260317143653.0eaa50a1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <abripOPt4oVu-Ksb@x1>
+In-Reply-To: <20260317143653.0eaa50a1@kernel.org>
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269155-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269156-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,enjuk.jp:dkim]
-X-Rspamd-Queue-Id: 3DCD92C1AE0
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.946];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[saeed@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: A68EE2C1E8E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 03/19 02:55, Kohei Enju wrote:
-> On 03/18 17:35, Alexander Lobakin wrote:
-> > Queue management ops unconditionally enable netdev locking. The same
-> > lock is taken by default by several NAPI configuration functions,
-> > such as napi_enable() and netif_napi_set_irq().
-> > Request ops locking in advance and make sure we use the _locked
-> > counterparts of those functions to avoid deadlocks, taking the lock
-> > manually where needed (suspend/resume, queue rebuild and resets).
-> 
-> Hi Alexander,
-> After applying this patch (3/5) along with the preceding ones on top of
-> net-next, I got some WARNING splats when changing the admin state
-> (up/down) using the ip link command. [1, 2]
-> 
-> Since I haven't looked into this series in detail, I'm reporting the
-> splats anyway. 
-> I'm wondering why I haven't seen anyone report this type of issue up to
-> v3. Maybe there is something wrong with my setup or devices?
-> 
-> Device: Intel Corporation Ethernet Controller E810-XXV for SFP (rev 02)
+On 17 Mar 14:36, Jakub Kicinski wrote:
+>On Tue, 17 Mar 2026 11:12:15 -0700 Saeed Mahameed wrote:
+>> On 11 Mar 20:33, Jakub Kicinski wrote:
+>> >On Tue, 10 Mar 2026 12:48:41 +0200 Tariq Toukan wrote:
+>> >> This small patch enables mac forwarding to MPFs via uplink representor,
+>> >
+>> >"mac forwarding to MPF via uplink representor"
+>> >Can't wrap my head around this "via". Could you explain this better?
+>> >Perhaps some tool can spit out a little diagram to make the flow clear?
+>> >
+>>
+>> Mac forwarding in the sense of linux bridge mac forwarding mechanism which
+>> requires set_rx_mode ndo to be implemented.
+>>
+>> Linux-bridge --> mlx5-uplink-rep --> set_rx_mode --> set up mac in HW.
+>
+>And the actual forwarding happens in SW bridge? This is just to
+>configure the Rx filter not to discard on Rx?
 
-Ah, I think I figured out the reason. My adapter accidentally fell into
-safe mode. When the adapter is in the safe mode, netdev->queue_mgmt_ops
-== NULL and netdev->request_ops_lock == false, so
-netdev_assert_locked_or_invisible() complains about not holding the
-netdev lock.
+Yes Forwarding happens on the SW bridge, just to register the mac so it
+won't get dropped.
 
-Setting netdev->request_ops_lock = true in the safe mode path also
-worked fine for me.
-
----
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 9ef258d5ab48..3477c53316ba 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -3519,6 +3519,7 @@ static void ice_set_ops(struct ice_vsi *vsi)
-
-        if (ice_is_safe_mode(pf)) {
-                netdev->netdev_ops = &ice_netdev_safe_mode_ops;
-+               netdev->request_ops_lock = true;
-                ice_set_ethtool_safe_mode_ops(netdev);
-                return;
-        }
 
