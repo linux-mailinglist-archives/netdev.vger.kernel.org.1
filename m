@@ -1,221 +1,354 @@
-Return-Path: <netdev+bounces-269187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269188-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gC2GOggZu2nLfAIAu9opvQ
-	(envelope-from <netdev+bounces-269187-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 22:28:40 +0100
+	id QA0lJDwdu2lrfQIAu9opvQ
+	(envelope-from <netdev+bounces-269188-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 22:46:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AEA22C2F9F
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 22:28:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB3CF2C31EA
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 22:46:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1A43D30692C2
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 21:27:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AD8DC3074F34
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 21:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8441337B035;
-	Wed, 18 Mar 2026 21:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357F92D978C;
+	Wed, 18 Mar 2026 21:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S9KuRg/9";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="IhrLhGFD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V2PrFvmh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2541537B417
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 21:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8640026290
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 21:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773869277; cv=none; b=IHUb+JFGD5VcjvykqOyy6df/lTW54cYDGtyumH4oijKIYTpqKtqIIUcWUE3WvOO1ZtEDs8lcW39WJjqKCuB8/H6FUFJsThOi9+rHyr+pVFzZX7RGw70XXxjn77F8OMl6eIhqfEFBHNmequYnEpqeKToF7GYnzO/zNV/qXusL998=
+	t=1773870339; cv=none; b=hg451MfvwOHO7s9plXfag4zvAUruTvMjdDCIuTLLSo1TV/IpwP5JFVw2HP8Z9FW9mt69YVRsn6lETC7G9tMMkUws2ZkPt34ufa3xRubx5OzwwkstoiOYBA73r25+PRITy2HwZbePEyyaaQKOBxbuGl3//jK1RbMamV1THJbCgfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773869277; c=relaxed/simple;
-	bh=YgjTjzim5DQCK/B9p0xNDkAjovH4rTxfWA70MEVloLE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=B/KSLNmMb3gaXfDmu0hbcO4FTJc34/r6nOgstxmcqGqoxRMNHkYH7oNs8ekjP22IC232kmd2JxdV1o5oPP9W6CG9FcsqJREFQCuckV77J/QDtZbsPrCznD1qslwJQ0keprawA8+lTa7Te/+XLteltuJNtFpLkbJwZlIEnnQDnds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S9KuRg/9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IhrLhGFD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773869275;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jrnydhjCX2n9qZspnsidoy2e60uVHKDh295FAK0AoyI=;
-	b=S9KuRg/9iD2WnmH7mo18TbnPXMH/+K/64TpeD/JB1jo6YT2SAfhBDQqZ1yqlee4J3tMXYw
-	eAlC5F+3EnwwgR2y9FRGI9Ip9FcXJOfHGEV+r+NiARwG2VFvm5dAUU6SZzbG/IeMsMa2ED
-	0r/WpRxcFI2gAW7/t9AGER9wtvK69RE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-408-6nQGPd-4OcWXQpuZLaCmwA-1; Wed, 18 Mar 2026 17:27:53 -0400
-X-MC-Unique: 6nQGPd-4OcWXQpuZLaCmwA-1
-X-Mimecast-MFC-AGG-ID: 6nQGPd-4OcWXQpuZLaCmwA_1773869272
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-485c45885e6so6334285e9.0
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 14:27:53 -0700 (PDT)
+	s=arc-20240116; t=1773870339; c=relaxed/simple;
+	bh=xuaDy5JNN/v1YCLPqmf4PYOjfw74pr5jgZ942b8DnsU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z5/5Ap66gS3+WuHCslMM+rtdJF+2+7+k77ceZqskYkw5dN/8o8mXvjY+sH9+1PH0TgxU1PV0+gNoOFJ2cAZL6A61c6ev33EBQ62xqX8S7+EX1yyHfQ/7KR1XGKcVej5x4g4aoxJZp+To68auhYzXLR+gOnW1mgtfnwc2EeWd1wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V2PrFvmh; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-48558d6ef83so2373935e9.3
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 14:45:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773869272; x=1774474072; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jrnydhjCX2n9qZspnsidoy2e60uVHKDh295FAK0AoyI=;
-        b=IhrLhGFDGIpED6xfp0d7p0ywaVz2kkRpaFW41nxMV/qdwxrZmvtG1jvyu94eL50Kgz
-         9y/2SBW/Udz5oDcDzgmBnie3UMWLXwcIdTaVitg0549k7aHGVQ09cx+q+djPp0ICWf2/
-         0JJ+1WWRNVr0WHnQpsPSc6oGTRlAkW6Td8WH5uxMZiS1NcHv5KcX9MfhYlk6m933LWq2
-         aTsZVRhKNgZoPTtffoJ+LaJWAdHSCDisH1qp/18PfwSI6L8LOZHO1KRXj6dBpKeqslKM
-         4o2NadbY4kh4MPZHl0qafMHoIDwL2qMcJnXlf/zRWsQRlPCBdYAdgsS5Zzxmm7cQWbDW
-         h3ew==
+        d=gmail.com; s=20230601; t=1773870336; x=1774475136; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=l/OCSGc4IQBKUN7Fsj7p7NhgPnHYH2vVWCvcuLCVTDY=;
+        b=V2PrFvmhtVLtT42d611koqeZdGzCGdRTab+thjlc4smA/JR89Jl7FDO3XJG+8Ag7eL
+         fvNPZSPO3c2lVw5Pk2icpsFS1dy4KTRi8LVPlQPy1p3C92MPyyX6wrqYzrw/kfsRY3qV
+         fCnKldCWd/rz1st8MIoqSQzlNO3zNole+jj9VZmiTzB3Vz9XY/f1FbJXszFkIyWw+IUT
+         JtaOnY3aBOcpe5oC8xttOGG/Vps3C0H0/EBszznoOWKr9/7Pp237Wb0/r5TQrIaEh/At
+         jCFGk81h2WvbbTcLSlFCSm9fQtNPf5PBIQksbBhyfHhZSsxPZx7K0VbJuzkZkQFp0Gc/
+         7CkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773869272; x=1774474072;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20251104; t=1773870336; x=1774475136;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jrnydhjCX2n9qZspnsidoy2e60uVHKDh295FAK0AoyI=;
-        b=ad0KwGwLNuvz46o3zr6ftj9W+j2zTCen1gMnajvhOe9usVWuo5ydMK1HWVpdv/+1ck
-         EPVH9Dro07SzSgwtM8CfQs12CYWIWxhcZ9aqhfwQKfA2ufIoUxGYQ+gs66akPiHxxaB/
-         IAoYIV6INYpHg5/BI8l6Yx90/V+9WCpBHM2hWdvvprVtYNmlDXwKA1DSrg8eI7uOlfsv
-         XH1wP51JHCx3iWpIxOkE43/Nld+33rcOZqoMZC/Nm2hMvGcAkT/oifzF3hIZMKS3+lbx
-         OnCOM0VsyNSYi9uT3qqt/CiYQ6WapER60Qcq9rZfETmP036FwcJYy67TLD4zHlEMkxr3
-         /8aQ==
-X-Gm-Message-State: AOJu0YzkASV0pyoBUToidqWvrdp/kYWRXrIjcSeoBXqYb5GtZPRg5pDS
-	Zz7H2wKYu7HWc2DPt631Xgy9LSm+XqBqTJNXsarrIOUeUfFei4rgFY63QCl8XvX6ucorvrjjDKY
-	DI5BSAzoGN4cLRG15wMmV4IDfyulalnZIMzRwMa3X6AR8v4FyY7Pw3C6GRw==
-X-Gm-Gg: ATEYQzybdzk8FusLmVHQvTUpRlEBrNH0sF8xv0CkpAniSLWnfCm6+bmSGfFntnX+lUc
-	AhdsmnvjsnG6D5C0ZUdiMpnSCY1qIsNEA/hMYGjMW+1hNnSkbdxZz9DVFuryVetblBEQmw8qZ5F
-	zDeRS8GV47W4Uwrltgr3lMG37axS0jGAmIkmc0Qp+v/lQNdgRbMVAvhe5SbHCtrcQTP8Ir0non/
-	I1FPHTf25PkPhDzEyL76Gqh7cc+AQPaV6PaQxPXy2q+pRQ1hl5DCNO3wKp0wv14jSuAV8Zdo1SH
-	0yvGE78VKYt4n8VeJSCgxgHmxYpcEFukj/wJLAMBPB2J+W12j1XPAgVT3XS9l+b8zYBxdQmWhDF
-	tbTPwkpurfKJ2Nqfze6Kc7yOslCIHzyiLQbSxyW9g8JqcfXUgF2xGeA==
-X-Received: by 2002:a05:600c:1992:b0:486:fad0:b166 with SMTP id 5b1f17b1804b1-486fad0b2c8mr1146615e9.17.1773869272179;
-        Wed, 18 Mar 2026 14:27:52 -0700 (PDT)
-X-Received: by 2002:a05:600c:1992:b0:486:fad0:b166 with SMTP id 5b1f17b1804b1-486fad0b2c8mr1146305e9.17.1773869271694;
-        Wed, 18 Mar 2026 14:27:51 -0700 (PDT)
-Received: from localhost (net-2-39-43-132.cust.vodafonedsl.it. [2.39.43.132])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f5e1ab8esm24843235e9.35.2026.03.18.14.27.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 14:27:51 -0700 (PDT)
-From: Paolo Valerio <pvalerio@redhat.com>
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: netdev@vger.kernel.org, Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- =?utf-8?Q?Th=C3=A9o?=
- Lebrun <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next v5 4/8] net: macb: use the current queue number
- for stats
-In-Reply-To: <500d698680fb51285f78fa68b6e41875@tipi-net.de>
-References: <20260313201433.2346119-1-pvalerio@redhat.com>
- <20260313201433.2346119-5-pvalerio@redhat.com>
- <500d698680fb51285f78fa68b6e41875@tipi-net.de>
-Date: Wed, 18 Mar 2026 22:27:43 +0100
-Message-ID: <87zf443k1c.fsf@redhat.com>
+        bh=l/OCSGc4IQBKUN7Fsj7p7NhgPnHYH2vVWCvcuLCVTDY=;
+        b=ANfCOYZGacZz0AfQ3hxq2D3L8fz+vZgPDtRYeJoDCvyfTHX/fqgH61tYy6hnOBf2Xm
+         Qoar+VSqZTQqj9vi87uWk3au/Plionk9b40GsLexcoXYApU6KDL8Paq9HCZxThBJAXt7
+         t1mW2w38JsTsF+S/08rxXzibpwFCoUJerrCH+T2McSYEnClSip8MjGar6LZt8e1EVk3H
+         B/Dkzn8yxffpezGxulQFL6YuwDjpdngMcMokMdfZp2qkfFsWCajxeGqXXwDo5ohj81Dh
+         8eSQtNYYDPE34EW0A+IkCvLPExn6fkSo4b2oBoGQLzsEztWbQIwGzxmk65hKFp+EYdPw
+         grDQ==
+X-Gm-Message-State: AOJu0Yzd1xfuBD6bHuDHrrZ5hINH2ilwpN4FUH6Ok+VkUYvQd271xkiD
+	TBm7gKsVULVBSA24NTbE943sXjGTs1zv1sMiNZHZWij2baduQW6QqktLMDYOCg==
+X-Gm-Gg: ATEYQzy5DSacirRrEnj4/LsxvVdMDdCAq5qSvL0EUXNMTY32rrk1omx1t3v0D8/2SOK
+	cjvad9K+byFXK0iaTu6gRJi96F6RXQmf7RxNr49yxwUAbfnrYdG1AVkTmBjIxEVR+QENtBvc80J
+	JMep+YUbZg6Gc5EhmfZk4F0dlEOpsgBqQj/NNzuvH29JXQcooa0nCuz2kiYIbd0PMApIDo5mUwT
+	+79lWFIZPqITiYhepy5MvjP9fSsCDGgq5BF7mvXb+wS6e/+TmCNagE6SsY5NH6lYEhaIdn0GQhE
+	zawl8CF7sorjzttPj1MLG89fkqEpbSOSsqF/T5XBBbO30cLNm4HFL6MQhUW3RYcSjNJaebhI1qQ
+	bOEP7qwcGSUApiRtNQ+N58wrgAv0hXF7gvsRF36c8+9K9kkcDYXWSNtaJWCFVUnXTmbCdfLhoei
+	xM6TE8tzjkPxzbOQZDjvtn4g+EhAqDQ/Ey1wJUV8jGBoOLjiLMfZRjoH3SPRYCsgiNA0n/3kplm
+	aYS953YAZqJlvzuO0nlGWYEM1PcrPvSXdmNR5ZveQIkyAYNXFti2b7596bgOPTNkw==
+X-Received: by 2002:a05:600c:37c4:b0:485:17a7:ba0d with SMTP id 5b1f17b1804b1-486f44704famr84314985e9.32.1773870335640;
+        Wed, 18 Mar 2026 14:45:35 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f1c:5b00:eceb:1d1a:46c6:c0e5? (p200300ea8f1c5b00eceb1d1a46c6c0e5.dip0.t-ipconnect.de. [2003:ea:8f1c:5b00:eceb:1d1a:46c6:c0e5])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f8bd5f7csm20333415e9.0.2026.03.18.14.45.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Mar 2026 14:45:35 -0700 (PDT)
+Message-ID: <cd96bc5c-1087-4d13-b556-e1fd94e6322e@gmail.com>
+Date: Wed, 18 Mar 2026 22:45:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spamd-Result: default: False [-0.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 2/4] r8169: add sfp mode for RTL8116af
+To: Javen <javen_xu@realsil.com.cn>,
+ "nic_swsd@realtek.com" <nic_swsd@realtek.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20260302063215.1790-1-javen_xu@realsil.com.cn>
+ <20260302063215.1790-3-javen_xu@realsil.com.cn>
+ <d2b97f5b-6032-49fd-b80a-6fb47f3fad4c@gmail.com>
+ <98d632aecbbb4dd8ad79c24e672765b1@realsil.com.cn>
+ <fcb72518-24f7-4e16-8208-fb38441408d2@gmail.com>
+ <761cc11222bc4f4cb206629a76292c97@realsil.com.cn>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <761cc11222bc4f4cb206629a76292c97@realsil.com.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-269188-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269187-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[pvalerio@redhat.com,netdev@vger.kernel.org];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.912];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.963];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tipi-net.de:email]
-X-Rspamd-Queue-Id: 5AEA22C2F9F
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realsil.com.cn:email]
+X-Rspamd-Queue-Id: DB3CF2C31EA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Nicolai,
+On 17.03.2026 04:14, Javen wrote:
+>> On 13.03.2026 08:25, Javen wrote:
+>>>> On 02.03.2026 07:32, javen wrote:
+>>>>> From: Javen Xu <javen_xu@realsil.com.cn>
+>>>>>
+>>>>> RTL8116af is a variation of RTL8168fp. It uses SerDes instead of PHY.
+>>>>> But SerDes status will not relect to PHY. So it needs to add sfp
+>>>>> mode for quirk to help reflect SerDes status during PHY read.
+>>>>>
+>>>>
+>>>> Is there any mass market device using this chip version? As far as
+>>>> possible I'd like to avoid adding support for chip versions that
+>>>> never make it to the mass market. This just makes driver maintenance
+>> harder.
+>>>>
+>>>> The patch includes support for 100Mbps fiber mode. Is there any use
+>>>> case for such legacy modes?
+>>>>
+>>>>
+>>>>> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+>>>>> ---
+>>>>>  drivers/net/ethernet/realtek/r8169_main.c | 71
+>>>>> ++++++++++++++++++++---
+>>>>>  1 file changed, 62 insertions(+), 9 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c
+>>>>> b/drivers/net/ethernet/realtek/r8169_main.c
+>>>>> index fb2247a20c36..a5c0d3995328 100644
+>>>>> --- a/drivers/net/ethernet/realtek/r8169_main.c
+>>>>> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+>>>>> @@ -726,6 +726,12 @@ enum rtl_dash_type {
+>>>>>       RTL_DASH_25_BP,
+>>>>>  };
+>>>>>
+>>>>> +enum rtl_sfp_mode {
+>>>>> +     RTL_SFP_NONE,
+>>>>> +     RTL_SFP_8168_AF,
+>>>>> +     RTL_SFP_8127_ATF,
+>>>>> +};
+>>>>> +
+>>>>>  struct rtl8169_private {
+>>>>>       void __iomem *mmio_addr;        /* memory map physical address */
+>>>>>       struct pci_dev *pci_dev;
+>>>>> @@ -734,6 +740,7 @@ struct rtl8169_private {
+>>>>>       struct napi_struct napi;
+>>>>>       enum mac_version mac_version;
+>>>>>       enum rtl_dash_type dash_type;
+>>>>> +     enum rtl_sfp_mode sfp_mode;
+>>>>>       u32 cur_rx; /* Index into the Rx descriptor buffer of next Rx pkt. */
+>>>>>       u32 cur_tx; /* Index into the Tx descriptor buffer of next Rx pkt. */
+>>>>>       u32 dirty_tx;
+>>>>> @@ -760,7 +767,6 @@ struct rtl8169_private {
+>>>>>       unsigned supports_gmii:1;
+>>>>>       unsigned aspm_manageable:1;
+>>>>>       unsigned dash_enabled:1;
+>>>>> -     bool sfp_mode:1;
+>>>>>       dma_addr_t counters_phys_addr;
+>>>>>       struct rtl8169_counters *counters;
+>>>>>       struct rtl8169_tc_offsets tc_offset; @@ -1126,7 +1132,7 @@
+>>>>> static int r8168_phy_ocp_read(struct rtl8169_private *tp, u32 reg)
+>>>>>               return 0;
+>>>>>
+>>>>>       /* Return dummy MII_PHYSID2 in SFP mode to match SFP PHY driver
+>> */
+>>>>> -     if (tp->sfp_mode && reg == (OCP_STD_PHY_BASE + 2 * MII_PHYSID2))
+>>>>> +     if (tp->sfp_mode == RTL_SFP_8127_ATF && reg ==
+>>>> (OCP_STD_PHY_BASE
+>>>>> + + 2 * MII_PHYSID2))
+>>>>>               return PHY_ID_RTL_DUMMY_SFP & 0xffff;
+>>>>>
+>>>>>       RTL_W32(tp, GPHY_OCP, reg << 15); @@ -1270,6 +1276,34 @@
+>>>>> static int r8168g_mdio_read(struct rtl8169_private *tp, int reg)
+>>>>>       return r8168_phy_ocp_read(tp, tp->ocp_base + reg * 2);  }
+>>>>>
+>>>>> +/* The quirk reflects RTL8116af SerDes status. */ static int
+>>>>> +r8116af_mdio_read_quirk(struct rtl8169_private *tp, int reg) {
+>>>>> +     u8 phyStatus = RTL_R8(tp, PHYstatus);
+>>>>> +
+>>>>> +     if (!(phyStatus & LinkStatus))
+>>>>> +             return 0;
+>>>>> +
+>>>>> +     /* BMSR */
+>>>>> +     if (tp->ocp_base == OCP_STD_PHY_BASE && reg == MII_BMSR)
+>>>>> +             return BMSR_ANEGCOMPLETE | BMSR_LSTATUS;
+>>>>> +
+>>>>> +     /* PHYSR */
+>>>>> +     if (tp->ocp_base == 0xa430 && reg == 0x12) {
+>>>>> +             if (phyStatus & _1000bpsF)
+>>>>> +                     return 0x0028;
+>>>>> +             else if (phyStatus & _100bps)
+>>>>> +                     return 0x0018;
+>>>>
+>>>> This is a complete hack. Any means to access the SerDes directly?
+>>>
+>>> Hi, Heiner
+>>> Now we find a indirect access to serdes reg. The serdes reg is designed
+>> according to IEEE 802.3.
+>>> BIT 2 means Link Status and BIT 5 means ANEGCOMPLETE. We can access it
+>>> through read mac ocp 0xeb14, I wonder whether this indirect access can be
+>> accepted?
+>>>
+>> Based on the bit numbers this seems to be the BMSR register. Can all clause
+>> 22 registers be accessed in a similar way so that a MII bus can be implemented
+>> for accessing the SerDes?
+> 
+> We checked our chip documentation and confirmed that the SerDes register file maps
+> all clause 22 registers(e.g. WR 0xeb10<reg_addr>, RD 0xeb14. reg_addr 0x40 is for BMCR,
+> 0x41 for BMSR, 0x42 for PHYSID1, 0x43 for PHYSID2, etc.)
+> As you suggested, I wonder whether the proper approach is to implement a virtual mii_bus
+> and map the standard serdes reg in the new map.
+> 
+We'd need to know how the internal PHY and the SerDes play together.
+Whether the usual internal PHY plays any role in communication between MAC and SerDes.
+How interface modes are controlled on MAC and SerDes side, etc.
+If Realtek doesn't implement proper layering in hw, and doesn't have enough knowledge
+about mainline network driver structures, and on the other hand doesn't want to provide
+chip documentation, then the situation somewhat deadlocks.
 
-thanks for the reviews.
-
-On 16 Mar 2026 at 05:30:48 PM, Nicolai Buchwitz <nb@tipi-net.de> wrote:
-
-> On 13.3.2026 21:14, Paolo Valerio wrote:
->> gem_get_ethtool_stats calculates the size of the statistics
->> data to copy always considering maximum number of queues.
->> 
->> The patch makes sure the statistics are copied only for the
->> active queues as returned in the string set count op.
->> 
->> Signed-off-by: Paolo Valerio <pvalerio@redhat.com>
->> ---
->>  drivers/net/ethernet/cadence/macb_main.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> diff --git a/drivers/net/ethernet/cadence/macb_main.c 
->> b/drivers/net/ethernet/cadence/macb_main.c
->> index 06ad8c8ec036..fbeaa85b4a9c 100644
->> --- a/drivers/net/ethernet/cadence/macb_main.c
->> +++ b/drivers/net/ethernet/cadence/macb_main.c
->> @@ -3528,7 +3528,7 @@ static void gem_get_ethtool_stats(struct 
->> net_device *dev,
->>  	spin_lock_irq(&bp->stats_lock);
->>  	gem_update_stats(bp);
->>  	memcpy(data, &bp->ethtool_stats, sizeof(u64)
->> -			* (GEM_STATS_LEN + QUEUE_STATS_LEN * MACB_MAX_QUEUES));
->> +			* (GEM_STATS_LEN + QUEUE_STATS_LEN * bp->num_queues));
->
-> This is an out-of-bounds write, not just a cosmetic change.
-
-yes, the commit message is not perfectly phrased (and as you
-noted it lacks the Fixes tag), but this was not intended as a cosmetic
-change. I noticed the problem while adding page pool statistics to
-ethtool (later removed) and they were corrupted because of this.
-
-> gem_get_sset_count() returns GEM_STATS_LEN + QUEUE_STATS_LEN *
-> bp->num_queues, and ethtool allocates the data buffer based on that 
-> count.
-> The old memcpy with MACB_MAX_QUEUES (8) writes past the end of the
-> buffer on any GEM instance with fewer than 8 hardware queues.
->
-> KASAN confirms on RP1 (1 queue) without this patch applied:
->
->    BUG: KASAN: vmalloc-out-of-bounds in gem_get_ethtool_stats+0x50/0x78
->    Write of size 760 at addr ffffffc0822e7000 by task ethtool/922
->
-> The overflow stays within the vzalloc page slack, so the practical
-> impact is low - but it's still an out-of-bounds write that exists in
-> the current upstream code. Might be worth splitting this out as a
-> standalone fix targeting net with a Fixes: tag, and updating the commit
-> message accordingly?
->
-
-makes sense. Will do.
-
-Thanks!
-
->>  	spin_unlock_irq(&bp->stats_lock);
->>  }
->
-> Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
->
-> Thanks
-> Nicolai
+> Thanks,
+> Javen Xu
+> 
+>> In general it's hard to provide a statement w/o knowing the internal layout of
+>> the IP blocks.
+>> Can you provide any chip documentation / datasheet?
+>> For proper support of such a component chain between MAC and SFP port
+>> the driver would have to be converted to use phylink, what requires access to
+>> the involved components, incl. the SFP I2C bus.
+>>
+>>
+>>> Thanks,
+>>> Javen Xu
+>>>
+>>>>
+>>>>> +     }
+>>>>> +
+>>>>> +     return 0;
+>>>>> +}
+>>>>> +
+>>>>> +static int r8116af_mdio_read(struct rtl8169_private *tp, int reg) {
+>>>>> +     return r8168g_mdio_read(tp, reg) | r8116af_mdio_read_quirk(tp,
+>>>>> +reg); }
+>>>>> +
+>>>>>  static void mac_mcu_write(struct rtl8169_private *tp, int reg, int
+>>>>> value)  {
+>>>>>       if (reg == 0x1f) {
+>>>>> @@ -1280,6 +1314,13 @@ static void mac_mcu_write(struct
+>>>>> rtl8169_private
+>>>> *tp, int reg, int value)
+>>>>>       r8168_mac_ocp_write(tp, tp->ocp_base + reg, value);  }
+>>>>>
+>>>>> +static bool rtl_is_8116af(struct rtl8169_private *tp) {
+>>>>> +     return tp->mac_version == RTL_GIGA_MAC_VER_52 &&
+>>>>> +             (r8168_mac_ocp_read(tp, 0xdc00) & 0x0078) == 0x0030 &&
+>>>>> +             (r8168_mac_ocp_read(tp, 0xd006) & 0x00ff) == 0x0000; }
+>>>>> +
+>>>>>  static int mac_mcu_read(struct rtl8169_private *tp, int reg)  {
+>>>>>       return r8168_mac_ocp_read(tp, tp->ocp_base + reg); @@ -1386,7
+>>>>> +1427,10 @@ static int rtl_readphy(struct rtl8169_private *tp, int
+>>>>> +location)
+>>>>>       case RTL_GIGA_MAC_VER_31:
+>>>>>               return r8168dp_2_mdio_read(tp, location);
+>>>>>       case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_LAST:
+>>>>> -             return r8168g_mdio_read(tp, location);
+>>>>> +             if (tp->sfp_mode == RTL_SFP_8168_AF)
+>>>>> +                     return r8116af_mdio_read(tp, location);
+>>>>> +             else
+>>>>> +                     return r8168g_mdio_read(tp, location);
+>>>>>       default:
+>>>>>               return r8169_mdio_read(tp, location);
+>>>>>       }
+>>>>> @@ -1575,6 +1619,20 @@ static bool rtl_dash_is_enabled(struct
+>>>> rtl8169_private *tp)
+>>>>>       }
+>>>>>  }
+>>>>>
+>>>>> +static enum rtl_sfp_mode rtl_get_sfp_mode(struct rtl8169_private
+>>>>> +*tp) {
+>>>>> +     if (rtl_is_8125(tp)) {
+>>>>> +             u16 data = r8168_mac_ocp_read(tp, 0xd006);
+>>>>> +
+>>>>> +             if ((data & 0xff) == 0x07)
+>>>>> +                     return RTL_SFP_8127_ATF;
+>>>>> +     } else if (rtl_is_8116af(tp)) {
+>>>>> +             return RTL_SFP_8168_AF;
+>>>>> +     }
+>>>>> +
+>>>>> +     return RTL_SFP_NONE;
+>>>>> +}
+>>>>> +
+>>>>>  static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private
+>>>>> *tp)  {
+>>>>>       switch (tp->mac_version) {
+>>>>> @@ -5693,12 +5751,7 @@ static int rtl_init_one(struct pci_dev *pdev,
+>>>>> const
+>>>> struct pci_device_id *ent)
+>>>>>       }
+>>>>>       tp->aspm_manageable = !rc;
+>>>>>
+>>>>> -     if (rtl_is_8125(tp)) {
+>>>>> -             u16 data = r8168_mac_ocp_read(tp, 0xd006);
+>>>>> -
+>>>>> -             if ((data & 0xff) == 0x07)
+>>>>> -                     tp->sfp_mode = true;
+>>>>> -     }
+>>>>> +     tp->sfp_mode = rtl_get_sfp_mode(tp);
+>>>>>
+>>>>>       tp->dash_type = rtl_get_dash_type(tp);
+>>>>>       tp->dash_enabled = rtl_dash_is_enabled(tp);
+>>>
+> 
 
 
