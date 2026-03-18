@@ -1,197 +1,215 @@
-Return-Path: <netdev+bounces-268946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268947-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2EMtB6p3ummTWwIAu9opvQ
-	(envelope-from <netdev+bounces-268946-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:00:10 +0100
+	id +GBcBM52ummTWwIAu9opvQ
+	(envelope-from <netdev+bounces-268947-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:56:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D1DB2B992E
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:00:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E222B987A
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:56:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7029B3002B5A
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:49:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA47E30F016D
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFA593783DF;
-	Wed, 18 Mar 2026 09:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 407293B95F6;
+	Wed, 18 Mar 2026 09:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a27dd6SW";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CXQ8AVt4"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ar4+CWE7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139893A6F05
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 09:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BFF3B95EA
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 09:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773827377; cv=none; b=uywupKmuJEIdj+5PBdiDE5mbpnorVqQFzhyzzpT+RDvrcNJmTduiK/P/uT9HVlxGMeYFzgXZbI2r85+rFJSCy7jbCRuDe6sCNuKCIUI4bakAeeQ/60xUbDuJRYjlECldzq7EcCi0Zl3Z7eVUYTQNe1XCvO4otHTXAuwG3A2cXMw=
+	t=1773827466; cv=none; b=Q9tUDNTPuA02zKuzMrzmYUH0plY3B/cXx8FfdaZNcQlRwmPaJskPDUisT7E3s1fT3I8WVIZdOGGKLh8FB/vVm+3snO5nrugLTKPgWqZIGSTr64hMRVibXn3NVwBluEQkYqLC3WBet8Vc1dh3BGt4RRYizKH4F3Nd7vbLQRNNe4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773827377; c=relaxed/simple;
-	bh=cTCC7w9f8PR0d94N69YTK7ENPP3u+ePq7cM2OGA7y/I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XoN0OVJEZJriGdJXMPKAEtOhPq2pKzCKvEzZWBNieKVFvv3ASgXmLHISPFUTkt0fefZttIhJzihRdXw2g/C+/Hf8e4G3KHVw/J+OczNn3di7KG+Wogqf0vsv/1rU3JD3To/iOlg0gVhOGntCWTgJFhSrr2mG6q86XbVNRniCR68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a27dd6SW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CXQ8AVt4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773827369;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ePMb9OZqcDJWUHQOQ+oipDwj+1eLe3lTWhpodjf3fTo=;
-	b=a27dd6SWmswLr5ZEsGKCWYz5DqBDUDB6Ek9empn9dhrEe4Oh53BBdw2+p+T05GXeL5LW4i
-	bvRuwShCQeHfS5NzDaOxqiz+NLGpmakLUG8794h7SztcUk7MsBxsL9G934noEiuC+YH4Iy
-	Zrw/azJsplKVyMzKi/n8XQXyo26VIs0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-465-z3DifuHiN1aPgu5M8TuwnQ-1; Wed, 18 Mar 2026 05:49:26 -0400
-X-MC-Unique: z3DifuHiN1aPgu5M8TuwnQ-1
-X-Mimecast-MFC-AGG-ID: z3DifuHiN1aPgu5M8TuwnQ_1773827365
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-439ae2cba40so6287634f8f.1
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 02:49:26 -0700 (PDT)
+	s=arc-20240116; t=1773827466; c=relaxed/simple;
+	bh=rZ6XLqrSHLVYtGkiWq+/3mIvzZ8RhMzqjek4N8MpSH8=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=Kz3ENeZPIFRBXrB9gXrYoAD2zJ3nDXfc+b8wkP+F9hrFiN5Q0PEFCI2TV0NlL3GiFB4q5UDq+a4VAdNtr9JKzEpUbOWwliZtTrD9wAuV8FV6sIlVBjsBrjyXtqbF1HbmgyPAFN9xanMBZprW4kBHn5vGKAtziiNR1eJk5mifFrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ar4+CWE7; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-48374014a77so73422785e9.3
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 02:50:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773827365; x=1774432165; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ePMb9OZqcDJWUHQOQ+oipDwj+1eLe3lTWhpodjf3fTo=;
-        b=CXQ8AVt4DuiJqBz7apb3zNQkgIQYowd5/04nR9SfMW5SLMNFsSb5JJMtPRiRsvasaL
-         dG6G1CDuz4M6Nymxt6lGNZiLcp16y7Oli0Uu3g+apKt2KQe7UQgm34AiA3YR3tJ1C5vC
-         bkVaPREnKJ8PAbTy0A3TEvUNnyDyNNIcKXF4fxqI5FANEZ39Yy4X45ncea90ymBW6BN2
-         VW47Sqs1ozzRTp9mJsFHxZRppi0P9ILbt+7jt6t/K0MVgs0LnnbHiCrcZaoYWO8TYsX1
-         ruRucYWYR/kOVaNXTCkjAoGH6BGr7q56RT/smTm7daO/5w76KpOR7Moq8w19uIqOb0fL
-         vPmg==
+        d=suse.com; s=google; t=1773827455; x=1774432255; darn=vger.kernel.org;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rZ6XLqrSHLVYtGkiWq+/3mIvzZ8RhMzqjek4N8MpSH8=;
+        b=ar4+CWE7jmFpDlvhZEkRV98tby/YOxxwTNhJgUizrtWV7kLIAgZu/q9EunFsTeQIg6
+         v99TRDiA88bWkWI8h2Y0EZJcG6CyXdyTjrHRJhT6znP38qjl2sWl2LK2NMN+0GnGT5J+
+         /9X62r0U3fZbfSlsuf5MS2uBE+SqJ6gjtxJFMxsB7J9YVk8IPzM+/7NYZWwtZcj/PJUB
+         ewBf+eoslgCl0G5dOVwpf7OSVK5ZGDiYIzXOYai4fzU0YWiuwmCPh3lWcEr5YH8MdjkY
+         z8Gj8r+jUhgsam6JOTZ6Ud6CRYXjURDTJrjiNw1r9DF8tICLr7dinLyTowXUfuyrK86n
+         qZew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773827365; x=1774432165;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ePMb9OZqcDJWUHQOQ+oipDwj+1eLe3lTWhpodjf3fTo=;
-        b=redxe080kS0RAFhBzkJWPQL2NhZp/1MiC2Xd6TVxA4G+X8wErLCimeFFhPRLFFEPUK
-         NEcmqOagQWBXLACU86SWq3pCapAM+cOdAjQ6HP5quiBinhzFXTFWUMFmk5+UI5OjRLJI
-         ec/NHI7fYENgeebKWjTMqNaHAQM99KoP4wCqwNsq96im1rr1sTdJwhzbNfHYZzj0oZAw
-         eWjsIMexv/lsgUWiKTC0eyIu7oiw/rKnfmg7Kd0gRkof0amrOATPj7KDD9iuUVnuLOQI
-         BoU0SmgkHDZ0EzdhTqBLW1xdEesvaI59wXJ0T5y2pqwIGII+qjGG9tVgEqtQgj9gndto
-         /5nw==
-X-Forwarded-Encrypted: i=1; AJvYcCWs8hAmtMYU9b1t5XEXvFKiXviEEh1Z3ddi7833/boWqmOEE/SRlBLSbqjZMCrOcnuXrkLhQOk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytRItxNN1HtVRx0/RDTF5i5nncbZ/r/A63beC8919tUii+XrOx
-	ZYEoiaQDEry39eWJnGPhI4+xwWGwFsnW0GR4H9PwehaoDBPFZ1B9ktnzJs6i6DylxsI4fnAChyl
-	kMUAuVeDByIUGMbsqhL6hNPHPPumfDKc4HDFSk8+aM5LpOHJBTgj5UOywdg==
-X-Gm-Gg: ATEYQzyzcefKbOL8ErI+KzoBv/ZA3d5I+4W6c0zVOrM2FrTVbspyH2l9eRDBYGKM6PN
-	7zQ6OkOzZtc4uawPSDOZe3WJoI6uOPYlb5TBbZ5z0KK7vlFHCwm7C6UII3PDsWiQ4iF3sEOJRcd
-	YjJgNaNdrUHerASUeuAoxQxTdegP9/2AzJDmG6ewNgbBRhxLDx6tQBRcd76fWjkiQfryKPwdiaz
-	U5YlxNYtWeTMiPlBUiud5RA59WeKNwJOIXjBFGzOgqLYn0MiAaSZ1Py6ULTsotdZrksOBJ6IAgM
-	PNC9Gt+pZwFvacjnoyn2Nw4PZLkBhzbyIOWS/nScCkzT+4sLRBxsHzolILzsIFsvOe5DRqoMgm8
-	u1nCMm6IRxCtD4JlwXu9HlLm6zepA3/iQpAFMzEgepbFiNrSkBSKIE7g8SDg6Z7U70gJV94LXUo
-	g5
-X-Received: by 2002:a05:600c:450c:b0:486:c4f0:1a37 with SMTP id 5b1f17b1804b1-486f4457a6fmr44895315e9.24.1773827365114;
-        Wed, 18 Mar 2026 02:49:25 -0700 (PDT)
-X-Received: by 2002:a05:600c:450c:b0:486:c4f0:1a37 with SMTP id 5b1f17b1804b1-486f4457a6fmr44894965e9.24.1773827364655;
-        Wed, 18 Mar 2026 02:49:24 -0700 (PDT)
-Received: from debian (2a01cb05923c9a0070912cd5af4725fd.ipv6.abo.wanadoo.fr. [2a01:cb05:923c:9a00:7091:2cd5:af47:25fd])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f4214664sm47282025e9.4.2026.03.18.02.49.23
+        d=1e100.net; s=20251104; t=1773827455; x=1774432255;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rZ6XLqrSHLVYtGkiWq+/3mIvzZ8RhMzqjek4N8MpSH8=;
+        b=TVrZF+TIOXXpguC8paT+OzjaBvMRiZYjMiZQ/TdNGgLw5HjFghzws8t6dp7Leumal6
+         vRRh5YaGvtKSJ4GKqer8eALV+52OCsZpMsbBz6dTscobyv6UgflY9Z43mdcVRqS9sZbt
+         5Zp/mMJcokeu4a3T6YWWbpHOfR0Ms2NhYXflCYOft8c1f7R68HRJkESw7R3EqfiiEtZr
+         5eobvR3LbppLGoK+ru7UmWyokNId3T05NSkvRQaG2GWS7nuynepcIFQBotjlXqrHR/rX
+         taXoGFa07IBsZk7kC30pzNEUaCO15m5yI2OUK9Lc/pxv1BewOkf5f6WixjBxvxW96xth
+         8+fA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpZ1/9y4hymsqptocNwYLwz8LU+FPntwvS2PkbjGKCQW3yky5rJu4SmRvo1Fczpv1A6VNupFE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQ4kT62cPf0uwERoHtU/3I7msxZmd9nOoCEouNMyb7cF93Dh3p
+	bRtAgpS721nDPkeM1OO3zTaGn+JJVDdOtfIliFQCLHZyv99sW3Z51oQJqIC9gPykpfY=
+X-Gm-Gg: ATEYQzya4MGfZbKoABH3sh1nJ5TUDFLpC2HOdtlKcCyHY1fScanh5MvHh/gmL0IPCMR
+	KQ6GXHXXEmh8yYQWnqPgl74cmZdOCgAGx22xZCR7bmIwY/hGZhhYQoBWxmXifktXTb8sfhtfsek
+	u071ojnh8TqR1fKugF+OxLl5zy+WRsC5zRsg04Z/UsL8z15FS/llWNwvXT6N2DMaKXm1tBHofuj
+	OxpDHCMGz6sRHsKDySmydamDd2TgZpCmkphBSyLHtfv/xZnlypt6oko59XXehg6b1XOHdOD9AP6
+	3sL8kzb/oA0vlHUw1VK/K/d97B39yJUKf7EtMOel8sbLfYnCszJuuLzom7W5xP00mRuHynELST6
+	rU9qdgpsKft1ifEnDOoVhRTtqtK8qAGw7UXE5ahz1GAB056Djr7+HlT7WlW5ZJnUZa8Pke+jWnd
+	J5JIVwiU1lelT4xoutJ8g=
+X-Received: by 2002:a05:600c:4612:b0:485:40db:d40c with SMTP id 5b1f17b1804b1-486f442e710mr28542555e9.3.1773827454803;
+        Wed, 18 Mar 2026 02:50:54 -0700 (PDT)
+Received: from localhost ([189.99.238.44])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-79a715f8b61sm13492337b3.44.2026.03.18.02.50.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 02:49:23 -0700 (PDT)
-Date: Wed, 18 Mar 2026 10:49:21 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Martin Olivier <martin.olivier@live.fr>, netdev@vger.kernel.org,
-	linux-ppp@vger.kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
-	Paul Mackerras <paulus@ozlabs.org>
-Subject: Re: [PATCH net-next v2] ppp: add IFLA_PPP_UNIT netlink attribute
-Message-ID: <abp1Ie88QmHthYkR@debian>
-References: <PAWP192MB2411A808BB36F0086A9B00B99742A@PAWP192MB2411.EURP192.PROD.OUTLOOK.COM>
- <20260318015937.239409-1-dqfext@gmail.com>
+        Wed, 18 Mar 2026 02:50:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260318015937.239409-1-dqfext@gmail.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 18 Mar 2026 06:50:51 -0300
+Message-Id: <DH5TCPI2CFJ2.ZBO1LQWYQUCO@suse.com>
+Subject: Re: [PATCH 01/10 net-next v3] ipv6: convert CONFIG_IPV6 to built-in
+ only and clean up Kconfigs
+Cc: =?utf-8?b?UmljYXJkbyBCLiBNYXJsacOocmU=?= <rbm@suse.com>, "Krzysztof
+ Kozlowski" <krzk@kernel.org>, "Geert Uytterhoeven" <geert@linux-m68k.org>,
+ "Jason Gunthorpe" <jgg@ziepe.ca>, "Leon Romanovsky" <leon@kernel.org>,
+ "Selvin Xavier" <selvin.xavier@broadcom.com>, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Ido Schimmel" <idosch@nvidia.com>, "Petr
+ Machata" <petrm@nvidia.com>, "Simon Horman" <horms@kernel.org>, "Saurav
+ Kashyap" <skashyap@marvell.com>, "Javed Hasan" <jhasan@marvell.com>,
+ <GR-QLogic-Storage-Upstream@marvell.com>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, "Nilesh Javali" <njavali@marvell.com>,
+ "Manish Rangankar" <mrangankar@marvell.com>, "Varun Prakash"
+ <varun@chelsio.com>, "Alexander Aring" <aahringo@redhat.com>, "David
+ Teigland" <teigland@redhat.com>, "Andreas Gruenbacher"
+ <agruenba@redhat.com>, "Nikolay Aleksandrov" <razor@blackwall.org>, "David
+ Ahern" <dsahern@kernel.org>, "Pablo Neira Ayuso" <pablo@netfilter.org>,
+ "Florian Westphal" <fw@strlen.de>, "Phil Sutter" <phil@nwl.cc>, "David
+ Howells" <dhowells@redhat.com>, "Marc Dionne" <marc.dionne@auristor.com>,
+ "Marcelo Ricardo Leitner" <marcelo.leitner@gmail.com>, "Xin Long"
+ <lucien.xin@gmail.com>, "Jon Maloy" <jmaloy@redhat.com>, "Bjorn Andersson"
+ <bjorn.andersson@oss.qualcomm.com>, "Arnd Bergmann" <arnd@arndb.de>, "Shawn
+ Guo" <shawnguo@kernel.org>, "Eric Biggers" <ebiggers@kernel.org>, "Michal
+ Simek" <michal.simek@amd.com>, "Luca Weiss" <luca.weiss@fairphone.com>,
+ "Sven Peter" <sven@kernel.org>, "Lad Prabhakar"
+ <prabhakar.mahadev-lad.rj@bp.renesas.com>, "Kuninori Morimoto"
+ <kuninori.morimoto.gx@renesas.com>, "Andrew Morton"
+ <akpm@linux-foundation.org>, "Kuan-Wei Chiu" <visitorckw@gmail.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>, "Ryota Sakamoto"
+ <sakamo.ryota@gmail.com>, "Kuniyuki Iwashima" <kuniyu@google.com>, "Kir
+ Chou" <note351@hotmail.com>, "David Gow" <david@davidgow.net>, "Vikas
+ Gupta" <vikas.gupta@broadcom.com>, "Bhargava Marreddy"
+ <bhargava.marreddy@broadcom.com>, "Rajashekar Hudumula"
+ <rajashekar.hudumula@broadcom.com>, =?utf-8?q?Markus_Bl=C3=B6chl?=
+ <markus@blochl.de>, <linux-kernel@vger.kernel.org>,
+ <linux-m68k@lists.linux-m68k.org>, <linux-rdma@vger.kernel.org>,
+ <oss-drivers@corigine.com>, <linux-scsi@vger.kernel.org>,
+ <gfs2@lists.linux.dev>, <bridge@lists.linux.dev>,
+ <netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
+ <linux-afs@lists.infradead.org>, <linux-sctp@vger.kernel.org>,
+ <tipc-discussion@lists.sourceforge.net>
+To: "Krzysztof Kozlowski" <krzysztof.kozlowski@oss.qualcomm.com>, "Fernando
+ Fernandez Mancera" <fmancera@suse.de>, <netdev@vger.kernel.org>
+From: =?utf-8?b?UmljYXJkbyBCLiBNYXJsacOocmU=?= <rbm@suse.com>
+X-Mailer: aerc 0.21.0-120-g22b95d38161f
+References: <20260317140141.5723-1-fmancera@suse.de>
+ <20260317140141.5723-2-fmancera@suse.de>
+ <69dd007c-16d3-44c2-bc30-4e7f5a95addb@oss.qualcomm.com>
+In-Reply-To: <69dd007c-16d3-44c2-bc30-4e7f5a95addb@oss.qualcomm.com>
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268946-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[suse.com,kernel.org,linux-m68k.org,ziepe.ca,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,nvidia.com,marvell.com,HansenPartnership.com,oracle.com,chelsio.com,blackwall.org,netfilter.org,strlen.de,nwl.cc,auristor.com,gmail.com,oss.qualcomm.com,arndb.de,amd.com,fairphone.com,bp.renesas.com,renesas.com,linux-foundation.org,gondor.apana.org.au,hotmail.com,davidgow.net,blochl.de,vger.kernel.org,lists.linux-m68k.org,corigine.com,lists.linux.dev,lists.infradead.org,lists.sourceforge.net];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[live.fr,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,ozlabs.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268947-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gnault@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_NEQ_ENVFROM(0.00)[rbm@suse.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_GT_50(0.00)[70];
 	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[live.fr:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1D1DB2B992E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.com:dkim,suse.com:email,suse.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux-m68k.org:url]
+X-Rspamd-Queue-Id: 99E222B987A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 18, 2026 at 09:59:29AM +0800, Qingfang Deng wrote:
-> On Sat, 14 Mar 2026 02:14:29 +0100, Martin Olivier wrote:
-> > Currently, the PPP rtnetlink API allows creating a new network interface
-> > with a custom ifname, but it lacks the ability to specify a custom PPP
-> > unit id.
-> > 
-> > Setting a specific unit id is currently only possible with the
-> > PPPIOCNEWUNIT ioctl. If a user-space program also requires a custom
-> > interface name, it must create the interface first with PPPIOCNEWUNIT
-> > and then rename it.
-> > 
-> > Resolve this by introducing the IFLA_PPP_UNIT netlink attribute. This
-> > allows user-space programs to atomically request both a custom ifname
-> > and a specific PPP unit id during the RTM_NEWLINK creation process,
-> > eliminating the post-creation renaming for this use case.
-> > 
-> > Signed-off-by: Martin Olivier <martin.olivier@live.fr>
-> > ---
-> > Changes in v2:
-> > - use nl policy to set IFLA_PPP_UNIT min allowed value instead of a manual check in ppp_nl_validate()
-> > - use of nla_get_s32_default() to collect IFLA_PPP_UNIT value
-> > Link to v1: https://lore.kernel.org/netdev/PAWP192MB2411A5E7D3BE1B55E155A92F9747A@PAWP192MB2411.EURP192.PROD.OUTLOOK.COM/
-> 
-> The patch itself looks good to me, but I would like to check the
-> userspace changes too. Please create a pull request at
-> https://github.com/ppp-project/ppp/pulls
-> 
-> +Cc: Paul Mackerras, Guillaume Nault, Pali Rohár
+On Wed Mar 18, 2026 at 3:51 AM -03, Krzysztof Kozlowski wrote:
+> On 17/03/2026 15:00, Fernando Fernandez Mancera wrote:
+>> Maintaining a modular IPv6 stack offers image size savings for specific
+>> setups, this benefit is outweighed by the architectural burden it
+>> imposes on the subsystems on implementation and maintenance. Therefore,
+>> drop it.
+>>=20
+>> Change CONFIG_IPV6 from tristate to bool. Remove all Kconfig
+>> dependencies across the tree that explicitly checked for IPV6=3Dm. In
+>> addition, remove MODULE_DESCRIPTION(), MODULE_ALIAS(), MODULE_AUTHOR()
+>> and MODULE_LICENSE().
+>>=20
+>> This is also replacing module_init() by device_initcall(). It is not
+>> possible to use fs_initcall() as IPv4 does because that creates a race
+>> condition on IPv6 addrconf.
+>>=20
+>> Finally, modify the default configs from CONFIG_IPV6=3Dm to CONFIG_IPV6=
+=3Dy
+>> except for m68k as according to the bloat-o-meter the image is
+>> increasing by 330KB~ and that isn't acceptable. Instead, disable IPv6 on
+>> this architecture by default. This is aligned with m68k RAM requirements
+>> and recommendations [1].
+>>=20
+>> [1] http://www.linux-m68k.org/faq/ram.html
+>>=20
+>> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+>> Tested-by: Ricardo B. Marli=C3=A8re <rbm@suse.com>
+>
+> That's a Kconfig/defconfig only patch, so build system. You cannot test
+> it in a meaning of testing code. Building code is not testing.
 
-As far as I understand, the original ioctl API allowed setting the unit
-id for only one reason: to allow userspace to influence the name of the
-ppp device to be created.
+Should I have sent 9 emails instead of 1 to the whole series?
 
-The netlink interface on the other hand already allows to set the
-device name, without needing to play with the unit id. So what's the
-use case for setting the unit id with netlink?
-
-> Regards,
-> Qingfang
-> 
+>
+>> Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
+>
+> You removed important parts of Ack. It was not provided like that.
+>
+> Best regards,
+> Krzysztof
 
 
