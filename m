@@ -1,324 +1,173 @@
-Return-Path: <netdev+bounces-269049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269050-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cNEJI+C7ummqbQIAu9opvQ
-	(envelope-from <netdev+bounces-269049-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 15:51:12 +0100
+	id oNRvKqO9ummqbQIAu9opvQ
+	(envelope-from <netdev+bounces-269050-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 15:58:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E1BA2BD89C
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 15:51:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 517612BDAFB
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 15:58:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 470AC3026506
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:47:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5251B30832E0
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D263E0C42;
-	Wed, 18 Mar 2026 14:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6791F3DEAD0;
+	Wed, 18 Mar 2026 14:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lNEXEXFH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Szx6C34I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F703E0244;
-	Wed, 18 Mar 2026 14:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026883DFC8E;
+	Wed, 18 Mar 2026 14:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773845231; cv=none; b=m15NT7Xs9l6ueOIe2taveL9ggq+SxfT90FtPO7g/6ThLHdHzRB30F2qeWI/SOpHkHIVg/M31n5Gu4XbMVVIrFT10YYR4UcBOBD4I+RNvcymZLsVC1buuwRGkvWXyUR9TbxQljs+OClDA7as3Qw7fFuGGo9NpSA7oTGpBtirLapI=
+	t=1773845374; cv=none; b=qwcYlWhJfpRsv5BNW6mA2tEyzupHHhGZJh/nWV3xDDwP13P4bTsmQ/52gJ0yNgJWt+ufnfRC2rw1nSa21RakujGUSDODF8ljOJw5ygFwxgo4hPGtMVCNjjR9s5bp7I1HNr0hhFNW0Ztn2LniMoZ/qUJJ2XoX+EpRghl8eaAjlTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773845231; c=relaxed/simple;
-	bh=sOGhleK/nOFjGylRZPX91uK0mo+r2D9Kaglk5zGCV1M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GcIuTbDSTGG6VTb5DooQgxFEl/n6mZWaoNO8diLTGVqkdIjdnygfMaZbY7g4gjDH2INBaNswhnzUEjFxZAzUZKBnvIqRB19974hN7MCYkT1lyHWC0HZ3y1QNCnr3P3u4Hi0JLqLBoNtKEvIkOXpKPDOugDbtSo+1MtMC73TaKU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lNEXEXFH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2CE2C19421;
-	Wed, 18 Mar 2026 14:47:06 +0000 (UTC)
+	s=arc-20240116; t=1773845374; c=relaxed/simple;
+	bh=wjL9ciqdCWcL/zpYteBo9jr8z/hJJuF/zC+yQOcCUKc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jiajy6YKgRbgI14WO4Rfk8jrTlDlvanumngsTgAzCu+FuCQY8OiC9dN7vE0PcdvGRWsVzQT7jkd3rgHyYa3/6m5bpvUQHQEefiXhgUpUw4IpKFy0slNJxWnnBJci3D9OpTyxK1lP7tQZ4GvFMooOLXhTsbQjMOCB1qzXUvr+Mck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Szx6C34I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1F30C19421;
+	Wed, 18 Mar 2026 14:49:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773845231;
-	bh=sOGhleK/nOFjGylRZPX91uK0mo+r2D9Kaglk5zGCV1M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lNEXEXFHtHqqr5+jSR8/WPIZ+t95wCNVVoFyFK6S3X5ngF1Z0hz/dGpE0/8EVWyzB
-	 7mFxzM+0bUnUaAhTlEuc+9AknVBfSI9p5RHBxJWrrAvHGw/j+0E6tA3hZYfaqyW8OI
-	 3qeaNgswbe4lvpsnrdMYYgKytxx1PEPv7MSrbOGaa3g8CmFStN9NXTdAjn8hQtLhjO
-	 8VQ1bPGUgw/WxjL8g9punuvgQVYnky6+kVtBTz+q+WuZUomr0+eYyGnze5a5zLO7rs
-	 Xul8ho2Ds77F5cnV2Odc+IaNBY2ZPyljYTpCY3FqWe/wRWhVHahuEr8FNWykrSONbu
-	 lV9haUJJi9Hxg==
-From: Simon Horman <horms@kernel.org>
-To: wei.fang@nxp.com
-Cc: Simon Horman <horms@kernel.org>,
-	f.fainelli@gmail.com,
-	krzk+dt@kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	imx@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	claudiu.manoil@nxp.com,
-	xiaoning.wang@nxp.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux@armlinux.org.uk,
-	pabeni@redhat.com,
-	conor+dt@kernel.org,
-	chleroy@kernel.org,
-	edumazet@google.com,
-	frank.li@nxp.com,
-	kuba@kernel.org,
-	vladimir.oltean@nxp.com,
-	linuxppc-dev@lists.ozlabs.org,
-	robh@kernel.org,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch
-Subject: Re: [net-next,11/14] net: dsa: netc: add phylink MAC operations
-Date: Wed, 18 Mar 2026 14:46:51 +0000
-Message-ID: <20260318144651.1891670-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260316094152.1558671-12-wei.fang@nxp.com>
-References: <20260316094152.1558671-12-wei.fang@nxp.com>
+	s=k20201202; t=1773845373;
+	bh=wjL9ciqdCWcL/zpYteBo9jr8z/hJJuF/zC+yQOcCUKc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Szx6C34IHWdK/Rh2CQ60ByQ5z1LThBSbM4Ezrejp/Wv5RDkgeYBrUD8j69MulSh12
+	 fSHhxzrDJ0FkIhun/geXzhB5XtsD+SLghVpcwmd8mjfKFOfe2RWBIGtjMI/oopOqt+
+	 uUVOSYMlf2RzcEtFcRCQKGGi1EXP85u7w3u5x8b6BYn2g/DXI+a/ERstzOMHoKx+yP
+	 9++0g1ln9JNLL74gXaqgOGvONXo3IXN6EPCZ2+v1UMGz7NiAIQ4iku7NMEltPnfzI5
+	 /5+5Alykd3qF8LZJMP/rcai6adQ/IIduNv+eaEi62ZiSfdOCzg6CSGDQ99S1PvNlbd
+	 Ad8o1+fyDow+A==
+Date: Wed, 18 Mar 2026 16:49:27 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Long Li <longli@microsoft.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	KY Srinivasan <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <DECUI@microsoft.com>, Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH rdma-next 0/8] RDMA/mana_ib: Handle
+ service reset for RDMA resources
+Message-ID: <20260318144927.GB352386@unreal>
+References: <20260307014723.556523-1-longli@microsoft.com>
+ <20260307173814.GN12611@unreal>
+ <20260313165928.GH1704121@ziepe.ca>
+ <20260316200843.GK61385@unreal>
+ <SA1PR21MB66832D0A369DE7E411ACCDEDCE41A@SA1PR21MB6683.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+In-Reply-To: <SA1PR21MB66832D0A369DE7E411ACCDEDCE41A@SA1PR21MB6683.namprd21.prod.outlook.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,lists.linux.dev,nxp.com,lists.infradead.org,armlinux.org.uk,redhat.com,google.com,lists.ozlabs.org,davemloft.net,lunn.ch];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	TAGGED_FROM(0.00)[bounces-269049-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269050-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.941];
+	NEURAL_HAM(-0.00)[-0.987];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2E1BA2BD89C
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 517612BDAFB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Tue, Mar 17, 2026 at 11:43:49PM +0000, Long Li wrote:
+> > 
+> > On Fri, Mar 13, 2026 at 01:59:28PM -0300, Jason Gunthorpe wrote:
+> > > On Sat, Mar 07, 2026 at 07:38:14PM +0200, Leon Romanovsky wrote:
+> > > > On Fri, Mar 06, 2026 at 05:47:14PM -0800, Long Li wrote:
+> > > > > When the MANA hardware undergoes a service reset, the ETH
+> > > > > auxiliary device
+> > > > > (mana.eth) used by DPDK persists across the reset cycle — it is
+> > > > > not removed and re-added like RC/UD/GSI QPs. This means userspace
+> > > > > RDMA consumers such as DPDK have no way of knowing that firmware
+> > > > > handles for their PD, CQ, WQ, QP and MR resources have become stale.
+> > > >
+> > > > NAK to any of this.
+> > > >
+> > > > In case of hardware reset, mana_ib AUX device needs to be destroyed
+> > > > and recreated later.
+> > >
+> > > Yeah, that is our general model for any serious RAS event where the
+> > > driver's view of resources becomes out of sync with the HW.
+> > >
+> > > You have tear down the ib_device by removing the aux and then bring
+> > > back a new one.
+> > >
+> > > There is an IB_EVENT_DEVICE_FATAL, but the purpose of that event is to
+> > > tell userspace to close and re-open their uverbs FD.
+> > >
+> > > We don't have a model where a uverbs FD in userspace can continue to
+> > > work after the device has a catasrophic RAS event.
+> > >
+> > > There may be room to have a model where the ib device doesn't fully
+> > > unplug/replug so it retains its name and things, but that is core code
+> > > not driver stuff.
+> > 
+> > Good luck with that model. It is going to break RDMA-CM hotplug support.
+> > 
+> 
+>    I think we can preserve RDMA-CM behavior without requiring ib_device
+>    unregister/re-register.
+> 
+>    On device reset, the driver can dispatch IB_EVENT_DEVICE_FATAL (or a
+>    new reset event) through ib_dispatch_event(). RDMA-CM already handles
+>    device events — we would add a handler that iterates all rdma_cm_ids
+>    on the device and sends RDMA_CM_EVENT_DEVICE_REMOVAL to each, same
+>    as cma_process_remove() does today. The difference: cma_device stays
+>    alive, so applications can reconnect on the same device after recovery
+>    instead of waiting for a new one to appear.
+> 
+>    The motivation for keeping ib_device alive is that some RDMA consumers
+>    — DPDK and NCCL — don't use RDMA-CM at all. They use raw verbs and
+>    manage QP state themselves.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: dsa: netc: add phylink MAC operations
+RDMA-CM provides an "external QP" model where the QP is managed by the
+rdma-cm user.
 
-This commit adds phylink MAC operations to the NETC DSA switch driver,
-including support for different PHY interface modes (RGMII, RMII, MII,
-REVMII, SGMII, 2500BASE-X).
+As Jason noted, you should propose the core changes together with the
+corresponding librdmacm updates. The final result must ensure that legacy
+applications continue to function correctly with the new kernel.
 
-> diff --git a/drivers/net/dsa/netc/netc_main.c b/drivers/net/dsa/netc/netc_main.c
-> index bc7d48b99610..884ee899fc89 100644
-> --- a/drivers/net/dsa/netc/netc_main.c
-> +++ b/drivers/net/dsa/netc/netc_main.c
-
-[ ... ]
-
-> @@ -595,10 +595,221 @@ static void netc_switch_get_ip_revision(struct netc_switch *priv)
->  	priv->revision = val & IPBRR0_IP_REV;
->  }
->
-> +static void netc_phylink_get_caps(struct dsa_switch *ds, int port,
-> +				  struct phylink_config *config)
-> +{
-> +	struct netc_switch *priv = ds->priv;
-> +
-> +	priv->info->phylink_get_caps(port, config);
-> +}
-> +
-> +static void netc_port_set_mac_mode(struct netc_port *np,
-> +				   unsigned int mode,
-> +				   phy_interface_t phy_mode)
-> +{
-> +	u32 mask = PM_IF_MODE_IFMODE | PM_IF_MODE_ENA;
-> +	u32 val = 0;
-> +
-> +	switch (phy_mode) {
-> +	case PHY_INTERFACE_MODE_RGMII:
-> +	case PHY_INTERFACE_MODE_RGMII_ID:
-> +	case PHY_INTERFACE_MODE_RGMII_RXID:
-> +	case PHY_INTERFACE_MODE_RGMII_TXID:
-> +		val |= IFMODE_RGMII;
-> +		/* Enable auto-negotiation for the MAC if its
-> +		 * RGMII interface supports In-Band status.
-> +		 */
-> +		if (phylink_autoneg_inband(mode))
-> +			val |= PM_IF_MODE_ENA;
-> +		break;
-> +	case PHY_INTERFACE_MODE_RMII:
-> +		val |= IFMODE_RMII;
-> +		break;
-> +	case PHY_INTERFACE_MODE_REVMII:
-> +		val |= PM_IF_MODE_REVMII;
-> +		fallthrough;
-> +	case PHY_INTERFACE_MODE_MII:
-> +		val |= IFMODE_MII;
-> +		break;
-
-Does the mask need to include PM_IF_MODE_REVMII? Looking at
-netc_port_set_mac_mode(), the mask is set to:
-
-    u32 mask = PM_IF_MODE_IFMODE | PM_IF_MODE_ENA;
-
-which expands to GENMASK(2,0) | BIT(15) = 0x8007. When the REVMII
-case sets val |= PM_IF_MODE_REVMII (BIT(3)), this makes val = 0x9.
-
-In netc_mac_port_rmw(), there's a check:
-
-    WARN_ON((mask | val) != mask)
-
-This check would fire on every REVMII configuration since 0x800F != 0x8007.
-
-Additionally, REVMII is reachable because imx94_switch_phylink_get_caps()
-advertises PHY_INTERFACE_MODE_REVMII as supported for port 2. When
-transitioning FROM REVMII to another mode, PM_IF_MODE_REVMII (BIT(3))
-won't be cleared since it's not in the mask, leaving stale configuration.
-
-Should the mask be:
-
-    u32 mask = PM_IF_MODE_IFMODE | PM_IF_MODE_REVMII | PM_IF_MODE_ENA;
-
-> +	case PHY_INTERFACE_MODE_SGMII:
-> +	case PHY_INTERFACE_MODE_2500BASEX:
-> +		val |= IFMODE_SGMII;
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +
-> +	netc_mac_port_rmw(np, NETC_PM_IF_MODE(0), mask, val);
-> +}
-
-[ ... ]
-
-> +static void netc_port_force_set_rgmii_mac(struct netc_port *np,
-> +					  int speed, int duplex)
-> +{
-> +	u32 mask, val;
-> +
-> +	mask = PM_IF_MODE_ENA | PM_IF_MODE_SSP | PM_IF_MODE_HD |
-> +	       PM_IF_MODE_M10 | PM_IF_MODE_REVMII;
-> +
-> +	switch (speed) {
-> +	default:
-> +	case SPEED_1000:
-> +		val = FIELD_PREP(PM_IF_MODE_SSP, SSP_1G);
-> +		break;
-> +	case SPEED_100:
-> +		val = FIELD_PREP(PM_IF_MODE_SSP, SSP_100M);
-> +		break;
-> +	case SPEED_10:
-> +		val = FIELD_PREP(PM_IF_MODE_SSP, SSP_10M);
-> +		break;
-> +	}
-> +
-> +	if (duplex != DUPLEX_FULL)
-> +		val |= PM_IF_MODE_HD;
-> +
-> +	netc_mac_port_rmw(np, NETC_PM_IF_MODE(0), mask, val);
-> +}
-> +
-> +static void net_port_set_rmii_mii_mac(struct netc_port *np,
-
-This isn't a bug, but should this function be named
-netc_port_set_rmii_mii_mac() instead of net_port_set_rmii_mii_mac()?
-All other functions in this driver use the netc_ prefix
-(netc_port_set_speed, netc_port_force_set_rgmii_mac,
-netc_port_set_mac_mode, etc.).
-
-> +				      int speed, int duplex)
-> +{
-> +	u32 mask, val = 0;
-> +
-> +	mask = PM_IF_MODE_ENA | PM_IF_MODE_SSP | PM_IF_MODE_HD |
-> +	       PM_IF_MODE_M10;
-> +
-> +	if (speed == SPEED_10)
-> +		val |= PM_IF_MODE_M10;
-> +
-> +	if (duplex != DUPLEX_FULL)
-> +		val |= PM_IF_MODE_HD;
-> +
-> +	netc_mac_port_rmw(np, NETC_PM_IF_MODE(0), mask, val);
-> +}
-
-[ ... ]
-
-> +static void netc_mac_link_up(struct phylink_config *config,
-> +			     struct phy_device *phy, unsigned int mode,
-> +			     phy_interface_t interface, int speed,
-> +			     int duplex, bool tx_pause, bool rx_pause)
-> +{
-> +	struct dsa_port *dp = dsa_phylink_to_port(config);
-> +	struct netc_port *np;
-> +
-> +	np = NETC_PORT(dp->ds, dp->index);
-> +	netc_port_set_speed(np, speed);
-> +
-> +	if (phy_interface_mode_is_rgmii(interface) &&
-> +	    !phylink_autoneg_inband(mode)) {
-> +		netc_port_force_set_rgmii_mac(np, speed, duplex);
-> +	}
-> +
-> +	if (interface == PHY_INTERFACE_MODE_RMII ||
-> +	    interface == PHY_INTERFACE_MODE_REVMII ||
-> +	    interface == PHY_INTERFACE_MODE_MII) {
-> +		net_port_set_rmii_mii_mac(np, speed, duplex);
-> +	}
-> +
-> +	netc_port_set_hd_flow_control(np, duplex == DUPLEX_HALF);
-> +	netc_port_mac_rx_enable(np);
-> +}
-> +
-> +static void netc_mac_link_down(struct phylink_config *config,
-> +			       unsigned int mode,
-> +			       phy_interface_t interface)
-> +{
-> +	struct dsa_port *dp = dsa_phylink_to_port(config);
-> +
-> +	netc_port_mac_rx_graceful_stop(NETC_PORT(dp->ds, dp->index));
-> +}
-> +
-> +static const struct phylink_mac_ops netc_phylink_mac_ops = {
-> +	.mac_config		= netc_mac_config,
-> +	.mac_link_up		= netc_mac_link_up,
-> +	.mac_link_down		= netc_mac_link_down,
-> +};
-> +
->  static const struct dsa_switch_ops netc_switch_ops = {
->  	.get_tag_protocol		= netc_get_tag_protocol,
->  	.setup				= netc_setup,
->  	.teardown			= netc_teardown,
-> +	.phylink_get_caps		= netc_phylink_get_caps,
->  };
->
->  static int netc_switch_probe(struct pci_dev *pdev,
-> @@ -639,6 +850,7 @@ static int netc_switch_probe(struct pci_dev *pdev,
->  	ds->num_ports = priv->info->num_ports;
->  	ds->num_tx_queues = NETC_TC_NUM;
->  	ds->ops = &netc_switch_ops;
-> +	ds->phylink_mac_ops = &netc_phylink_mac_ops;
->  	ds->priv = priv;
->
->  	priv->ds = ds;
-
-[ ... ]
+Thanks
 
