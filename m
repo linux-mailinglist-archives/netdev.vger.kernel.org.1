@@ -1,215 +1,339 @@
-Return-Path: <netdev+bounces-268947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268948-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +GBcBM52ummTWwIAu9opvQ
-	(envelope-from <netdev+bounces-268947-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:56:30 +0100
+	id YKzCEgJ3ummTWwIAu9opvQ
+	(envelope-from <netdev+bounces-268948-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:57:22 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99E222B987A
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:56:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E91392B98A0
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:57:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA47E30F016D
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:51:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 304513058B9F
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 407293B95F6;
-	Wed, 18 Mar 2026 09:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F723B8D42;
+	Wed, 18 Mar 2026 09:53:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ar4+CWE7"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nM+sEIVm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BFF3B95EA
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 09:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06433A9D9E;
+	Wed, 18 Mar 2026 09:52:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773827466; cv=none; b=Q9tUDNTPuA02zKuzMrzmYUH0plY3B/cXx8FfdaZNcQlRwmPaJskPDUisT7E3s1fT3I8WVIZdOGGKLh8FB/vVm+3snO5nrugLTKPgWqZIGSTr64hMRVibXn3NVwBluEQkYqLC3WBet8Vc1dh3BGt4RRYizKH4F3Nd7vbLQRNNe4w=
+	t=1773827584; cv=none; b=fCopCAOsO7MWFAYtbkWkQHxf+D5LomaeunBhO3AT4Jw4RkhyuIrGwncU1bd0xO103dB8GPC2DYgB5Ir6mxBRnwJjVEudisNCWem/5xCZb/6SvjAPFkcAqhA1dJMacHnpefNI3uZdgyckaGMwv2LXAESlTiWzTzANmuSrsSSAwwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773827466; c=relaxed/simple;
-	bh=rZ6XLqrSHLVYtGkiWq+/3mIvzZ8RhMzqjek4N8MpSH8=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=Kz3ENeZPIFRBXrB9gXrYoAD2zJ3nDXfc+b8wkP+F9hrFiN5Q0PEFCI2TV0NlL3GiFB4q5UDq+a4VAdNtr9JKzEpUbOWwliZtTrD9wAuV8FV6sIlVBjsBrjyXtqbF1HbmgyPAFN9xanMBZprW4kBHn5vGKAtziiNR1eJk5mifFrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ar4+CWE7; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-48374014a77so73422785e9.3
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 02:50:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1773827455; x=1774432255; darn=vger.kernel.org;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rZ6XLqrSHLVYtGkiWq+/3mIvzZ8RhMzqjek4N8MpSH8=;
-        b=ar4+CWE7jmFpDlvhZEkRV98tby/YOxxwTNhJgUizrtWV7kLIAgZu/q9EunFsTeQIg6
-         v99TRDiA88bWkWI8h2Y0EZJcG6CyXdyTjrHRJhT6znP38qjl2sWl2LK2NMN+0GnGT5J+
-         /9X62r0U3fZbfSlsuf5MS2uBE+SqJ6gjtxJFMxsB7J9YVk8IPzM+/7NYZWwtZcj/PJUB
-         ewBf+eoslgCl0G5dOVwpf7OSVK5ZGDiYIzXOYai4fzU0YWiuwmCPh3lWcEr5YH8MdjkY
-         z8Gj8r+jUhgsam6JOTZ6Ud6CRYXjURDTJrjiNw1r9DF8tICLr7dinLyTowXUfuyrK86n
-         qZew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773827455; x=1774432255;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rZ6XLqrSHLVYtGkiWq+/3mIvzZ8RhMzqjek4N8MpSH8=;
-        b=TVrZF+TIOXXpguC8paT+OzjaBvMRiZYjMiZQ/TdNGgLw5HjFghzws8t6dp7Leumal6
-         vRRh5YaGvtKSJ4GKqer8eALV+52OCsZpMsbBz6dTscobyv6UgflY9Z43mdcVRqS9sZbt
-         5Zp/mMJcokeu4a3T6YWWbpHOfR0Ms2NhYXflCYOft8c1f7R68HRJkESw7R3EqfiiEtZr
-         5eobvR3LbppLGoK+ru7UmWyokNId3T05NSkvRQaG2GWS7nuynepcIFQBotjlXqrHR/rX
-         taXoGFa07IBsZk7kC30pzNEUaCO15m5yI2OUK9Lc/pxv1BewOkf5f6WixjBxvxW96xth
-         8+fA==
-X-Forwarded-Encrypted: i=1; AJvYcCUpZ1/9y4hymsqptocNwYLwz8LU+FPntwvS2PkbjGKCQW3yky5rJu4SmRvo1Fczpv1A6VNupFE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQ4kT62cPf0uwERoHtU/3I7msxZmd9nOoCEouNMyb7cF93Dh3p
-	bRtAgpS721nDPkeM1OO3zTaGn+JJVDdOtfIliFQCLHZyv99sW3Z51oQJqIC9gPykpfY=
-X-Gm-Gg: ATEYQzya4MGfZbKoABH3sh1nJ5TUDFLpC2HOdtlKcCyHY1fScanh5MvHh/gmL0IPCMR
-	KQ6GXHXXEmh8yYQWnqPgl74cmZdOCgAGx22xZCR7bmIwY/hGZhhYQoBWxmXifktXTb8sfhtfsek
-	u071ojnh8TqR1fKugF+OxLl5zy+WRsC5zRsg04Z/UsL8z15FS/llWNwvXT6N2DMaKXm1tBHofuj
-	OxpDHCMGz6sRHsKDySmydamDd2TgZpCmkphBSyLHtfv/xZnlypt6oko59XXehg6b1XOHdOD9AP6
-	3sL8kzb/oA0vlHUw1VK/K/d97B39yJUKf7EtMOel8sbLfYnCszJuuLzom7W5xP00mRuHynELST6
-	rU9qdgpsKft1ifEnDOoVhRTtqtK8qAGw7UXE5ahz1GAB056Djr7+HlT7WlW5ZJnUZa8Pke+jWnd
-	J5JIVwiU1lelT4xoutJ8g=
-X-Received: by 2002:a05:600c:4612:b0:485:40db:d40c with SMTP id 5b1f17b1804b1-486f442e710mr28542555e9.3.1773827454803;
-        Wed, 18 Mar 2026 02:50:54 -0700 (PDT)
-Received: from localhost ([189.99.238.44])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-79a715f8b61sm13492337b3.44.2026.03.18.02.50.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 02:50:53 -0700 (PDT)
+	s=arc-20240116; t=1773827584; c=relaxed/simple;
+	bh=2Ux1TemWLvp+sIjI92wc40eoAdpnH+THH49uRMeftWo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KFuzVmxLKAFy7NqYUhA3yjwx4ExqGNlNlfSCn3DSiHNlc/bdC+FZ7aQTr3+1XdeBQ30lJhBPsDRNE3mieaCpYr6pGj6+YzElrJ4AUvn7EMkaeEeu2YIiQYVFb8QWgSnhrBz+9khjRVoh8Mrb7fUyd5qFDyWlPA5W6EumAdTQdLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nM+sEIVm; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 539DA4E426E5;
+	Wed, 18 Mar 2026 09:52:53 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 1DFDF6004F;
+	Wed, 18 Mar 2026 09:52:53 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5646B10450753;
+	Wed, 18 Mar 2026 10:52:48 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773827572; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=o1M9oXawm4eFa6tGNX2lOJuF+q+Hyfy5yyclVec63Vg=;
+	b=nM+sEIVm649wRcqk6fF4OFfpwwcKltTHgLFbZJiPgFcxQWt0krzhS2bYy2gmw1CZM9GdeF
+	lwrwqkfhoFYa8rCJk9CSqe8tiX2eXedn+4c3O4U5zSuNGw8k7tdGSfEVMoMoN+8KQlJLZu
+	IzePprWrdMfiwkCTBpFeUOPX+UojFkybeWz3sK0J69EuivBEoQsVUv/wNHwV4H/VDp00Qy
+	kdtM2TWqXShnjwtTlbrnLFMAf7XrxxF9A3X7+viX6Z3H9MbSrVeLOOAFMG/YW2mOzAOPck
+	LtdYTty+x5OgYtXZf93vjVvk3P3NBueHfktOzKntCDkvwjy0n4X2wVkpgqg2lw==
+Message-ID: <5c9eb2e9-1727-4c01-888d-56ffee6ca54a@bootlin.com>
+Date: Wed, 18 Mar 2026 10:52:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] net: mdio: add a driver for PIC64-HPSC/HX
+ MDIO controller
+To: Charles Perry <charles.perry@microchip.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260317184610.315852-1-charles.perry@microchip.com>
+ <20260317184610.315852-3-charles.perry@microchip.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260317184610.315852-3-charles.perry@microchip.com>
 Content-Type: text/plain; charset=UTF-8
-Date: Wed, 18 Mar 2026 06:50:51 -0300
-Message-Id: <DH5TCPI2CFJ2.ZBO1LQWYQUCO@suse.com>
-Subject: Re: [PATCH 01/10 net-next v3] ipv6: convert CONFIG_IPV6 to built-in
- only and clean up Kconfigs
-Cc: =?utf-8?b?UmljYXJkbyBCLiBNYXJsacOocmU=?= <rbm@suse.com>, "Krzysztof
- Kozlowski" <krzk@kernel.org>, "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Jason Gunthorpe" <jgg@ziepe.ca>, "Leon Romanovsky" <leon@kernel.org>,
- "Selvin Xavier" <selvin.xavier@broadcom.com>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Ido Schimmel" <idosch@nvidia.com>, "Petr
- Machata" <petrm@nvidia.com>, "Simon Horman" <horms@kernel.org>, "Saurav
- Kashyap" <skashyap@marvell.com>, "Javed Hasan" <jhasan@marvell.com>,
- <GR-QLogic-Storage-Upstream@marvell.com>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, "Nilesh Javali" <njavali@marvell.com>,
- "Manish Rangankar" <mrangankar@marvell.com>, "Varun Prakash"
- <varun@chelsio.com>, "Alexander Aring" <aahringo@redhat.com>, "David
- Teigland" <teigland@redhat.com>, "Andreas Gruenbacher"
- <agruenba@redhat.com>, "Nikolay Aleksandrov" <razor@blackwall.org>, "David
- Ahern" <dsahern@kernel.org>, "Pablo Neira Ayuso" <pablo@netfilter.org>,
- "Florian Westphal" <fw@strlen.de>, "Phil Sutter" <phil@nwl.cc>, "David
- Howells" <dhowells@redhat.com>, "Marc Dionne" <marc.dionne@auristor.com>,
- "Marcelo Ricardo Leitner" <marcelo.leitner@gmail.com>, "Xin Long"
- <lucien.xin@gmail.com>, "Jon Maloy" <jmaloy@redhat.com>, "Bjorn Andersson"
- <bjorn.andersson@oss.qualcomm.com>, "Arnd Bergmann" <arnd@arndb.de>, "Shawn
- Guo" <shawnguo@kernel.org>, "Eric Biggers" <ebiggers@kernel.org>, "Michal
- Simek" <michal.simek@amd.com>, "Luca Weiss" <luca.weiss@fairphone.com>,
- "Sven Peter" <sven@kernel.org>, "Lad Prabhakar"
- <prabhakar.mahadev-lad.rj@bp.renesas.com>, "Kuninori Morimoto"
- <kuninori.morimoto.gx@renesas.com>, "Andrew Morton"
- <akpm@linux-foundation.org>, "Kuan-Wei Chiu" <visitorckw@gmail.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>, "Ryota Sakamoto"
- <sakamo.ryota@gmail.com>, "Kuniyuki Iwashima" <kuniyu@google.com>, "Kir
- Chou" <note351@hotmail.com>, "David Gow" <david@davidgow.net>, "Vikas
- Gupta" <vikas.gupta@broadcom.com>, "Bhargava Marreddy"
- <bhargava.marreddy@broadcom.com>, "Rajashekar Hudumula"
- <rajashekar.hudumula@broadcom.com>, =?utf-8?q?Markus_Bl=C3=B6chl?=
- <markus@blochl.de>, <linux-kernel@vger.kernel.org>,
- <linux-m68k@lists.linux-m68k.org>, <linux-rdma@vger.kernel.org>,
- <oss-drivers@corigine.com>, <linux-scsi@vger.kernel.org>,
- <gfs2@lists.linux.dev>, <bridge@lists.linux.dev>,
- <netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
- <linux-afs@lists.infradead.org>, <linux-sctp@vger.kernel.org>,
- <tipc-discussion@lists.sourceforge.net>
-To: "Krzysztof Kozlowski" <krzysztof.kozlowski@oss.qualcomm.com>, "Fernando
- Fernandez Mancera" <fmancera@suse.de>, <netdev@vger.kernel.org>
-From: =?utf-8?b?UmljYXJkbyBCLiBNYXJsacOocmU=?= <rbm@suse.com>
-X-Mailer: aerc 0.21.0-120-g22b95d38161f
-References: <20260317140141.5723-1-fmancera@suse.de>
- <20260317140141.5723-2-fmancera@suse.de>
- <69dd007c-16d3-44c2-bc30-4e7f5a95addb@oss.qualcomm.com>
-In-Reply-To: <69dd007c-16d3-44c2-bc30-4e7f5a95addb@oss.qualcomm.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[suse.com,kernel.org,linux-m68k.org,ziepe.ca,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,nvidia.com,marvell.com,HansenPartnership.com,oracle.com,chelsio.com,blackwall.org,netfilter.org,strlen.de,nwl.cc,auristor.com,gmail.com,oss.qualcomm.com,arndb.de,amd.com,fairphone.com,bp.renesas.com,renesas.com,linux-foundation.org,gondor.apana.org.au,hotmail.com,davidgow.net,blochl.de,vger.kernel.org,lists.linux-m68k.org,corigine.com,lists.linux.dev,lists.infradead.org,lists.sourceforge.net];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268947-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268948-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rbm@suse.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_GT_50(0.00)[70];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.com:dkim,suse.com:email,suse.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux-m68k.org:url]
-X-Rspamd-Queue-Id: 99E222B987A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:email]
+X-Rspamd-Queue-Id: E91392B98A0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed Mar 18, 2026 at 3:51 AM -03, Krzysztof Kozlowski wrote:
-> On 17/03/2026 15:00, Fernando Fernandez Mancera wrote:
->> Maintaining a modular IPv6 stack offers image size savings for specific
->> setups, this benefit is outweighed by the architectural burden it
->> imposes on the subsystems on implementation and maintenance. Therefore,
->> drop it.
->>=20
->> Change CONFIG_IPV6 from tristate to bool. Remove all Kconfig
->> dependencies across the tree that explicitly checked for IPV6=3Dm. In
->> addition, remove MODULE_DESCRIPTION(), MODULE_ALIAS(), MODULE_AUTHOR()
->> and MODULE_LICENSE().
->>=20
->> This is also replacing module_init() by device_initcall(). It is not
->> possible to use fs_initcall() as IPv4 does because that creates a race
->> condition on IPv6 addrconf.
->>=20
->> Finally, modify the default configs from CONFIG_IPV6=3Dm to CONFIG_IPV6=
-=3Dy
->> except for m68k as according to the bloat-o-meter the image is
->> increasing by 330KB~ and that isn't acceptable. Instead, disable IPv6 on
->> this architecture by default. This is aligned with m68k RAM requirements
->> and recommendations [1].
->>=20
->> [1] http://www.linux-m68k.org/faq/ram.html
->>=20
->> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
->> Tested-by: Ricardo B. Marli=C3=A8re <rbm@suse.com>
->
-> That's a Kconfig/defconfig only patch, so build system. You cannot test
-> it in a meaning of testing code. Building code is not testing.
+Hi Charles,
 
-Should I have sent 9 emails instead of 1 to the whole series?
+On 17/03/2026 19:46, Charles Perry wrote:
+> This adds an MDIO driver for PIC64-HPSC/HX. The hardware supports C22
+> and C45 but only C22 is implemented in this commit.
+> 
+> This MDIO hardware is based on a Microsemi design supported in Linux by
+> mdio-mscc-miim.c. However, The register interface is completely
+> different with pic64hpsc, hence the need for a separate driver.
+> 
+> The documentation recommends an input clock of 156.25MHz and a prescaler
+> of 39, which yields an MDIO clock of 1.95MHz.
+> 
+> The hardware supports an interrupt pin or a "TRIGGER" bit that can be
+> polled to signal transaction completion. This commit uses polling.
+> 
+> This was tested on Microchip HB1301 evalkit with a VSC8574 and a
+> VSC8541.
+> 
+> Signed-off-by: Charles Perry <charles.perry@microchip.com>
+> ---
+>  drivers/net/mdio/Kconfig          |   7 +
+>  drivers/net/mdio/Makefile         |   1 +
+>  drivers/net/mdio/mdio-pic64hpsc.c | 207 ++++++++++++++++++++++++++++++
+>  3 files changed, 215 insertions(+)
+>  create mode 100644 drivers/net/mdio/mdio-pic64hpsc.c
+> 
+> diff --git a/drivers/net/mdio/Kconfig b/drivers/net/mdio/Kconfig
+> index 44380378911b..7bdba8c3ddef 100644
+> --- a/drivers/net/mdio/Kconfig
+> +++ b/drivers/net/mdio/Kconfig
+> @@ -146,6 +146,13 @@ config MDIO_OCTEON
+>  	  buses. It is required by the Octeon and ThunderX ethernet device
+>  	  drivers on some systems.
+>  
+> +config MDIO_PIC64HPSC
+> +	tristate "PIC64-HPSC/HX MDIO interface support"
+> +	depends on HAS_IOMEM && OF_MDIO
+> +	help
+> +	  This driver supports the MDIO interface found on the PIC64-HPSC/HX
+> +	  SoCs.
+> +
+>  config MDIO_IPQ4019
+>  	tristate "Qualcomm IPQ4019 MDIO interface support"
+>  	depends on HAS_IOMEM && OF_MDIO
+> diff --git a/drivers/net/mdio/Makefile b/drivers/net/mdio/Makefile
+> index fbec636700e7..048586746026 100644
+> --- a/drivers/net/mdio/Makefile
+> +++ b/drivers/net/mdio/Makefile
+> @@ -20,6 +20,7 @@ obj-$(CONFIG_MDIO_MOXART)		+= mdio-moxart.o
+>  obj-$(CONFIG_MDIO_MSCC_MIIM)		+= mdio-mscc-miim.o
+>  obj-$(CONFIG_MDIO_MVUSB)		+= mdio-mvusb.o
+>  obj-$(CONFIG_MDIO_OCTEON)		+= mdio-octeon.o
+> +obj-$(CONFIG_MDIO_PIC64HPSC)		+= mdio-pic64hpsc.o
+>  obj-$(CONFIG_MDIO_REALTEK_RTL9300)	+= mdio-realtek-rtl9300.o
+>  obj-$(CONFIG_MDIO_REGMAP)		+= mdio-regmap.o
+>  obj-$(CONFIG_MDIO_SUN4I)		+= mdio-sun4i.o
+> diff --git a/drivers/net/mdio/mdio-pic64hpsc.c b/drivers/net/mdio/mdio-pic64hpsc.c
+> new file mode 100644
+> index 000000000000..1128b3a86804
+> --- /dev/null
+> +++ b/drivers/net/mdio/mdio-pic64hpsc.c
+> @@ -0,0 +1,207 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Microchip PIC64-HPSC/HX MDIO controller driver
+> + *
+> + * Copyright (c) 2026 Microchip Technology Inc. and its subsidiaries.
+> + */
+> +
+> +#include <linux/bitops.h>
+> +#include <linux/clk.h>
+> +#include <linux/io.h>
+> +#include <linux/iopoll.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/of_mdio.h>
+> +#include <linux/platform_device.h>
+> +
+> +#define MDIO_REG_PRESCALER     0x20
+> +#define MDIO_CFG_PRESCALE_MASK GENMASK(7, 0)
+> +
+> +#define MDIO_REG_FRAME_CFG_1 0x24
+> +#define MDIO_WDATA_MASK	     GENMASK(15, 0)
+> +
+> +#define MDIO_REG_FRAME_CFG_2	 0x28
+> +#define MDIO_TRIGGER_BIT	 BIT(31)
+> +#define MDIO_REG_DEV_ADDR_MASK	 GENMASK(20, 16)
+> +#define MDIO_PHY_PRT_ADDR_MASK	 GENMASK(8, 4)
+> +#define MDIO_OPERATION_MASK	 GENMASK(3, 2)
+> +#define MDIO_START_OF_FRAME_MASK GENMASK(1, 0)
+> +
+> +/* Possible value of MDIO_OPERATION_MASK */
+> +#define MDIO_OPERATION_WRITE BIT(0)
+> +#define MDIO_OPERATION_READ  BIT(1)
+> +
+> +#define MDIO_REG_FRAME_STATUS 0x2C
+> +#define MDIO_READOK_BIT	      BIT(24)
+> +#define MDIO_RDATA_MASK	      GENMASK(15, 0)
+> +
+> +#define MDIO_INT_I_ADDR 0x30
+> +#define MDIO_INT_I_BIT	BIT(0)
+> +
+> +#define MDIO_INT_E_ADDR 0x34
+> +#define MDIO_INT_E_BIT	BIT(0)
 
->
->> Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
->
-> You removed important parts of Ack. It was not provided like that.
->
-> Best regards,
-> Krzysztof
+Thes INT_I/E don't seem to be used, you can drop them
+
+> +
+> +struct pic64hpsc_mdio_dev {
+> +	void __iomem *regs;
+> +};
+> +
+> +static int pic64hpsc_mdio_wait_trigger(struct mii_bus *bus)
+> +{
+> +	struct pic64hpsc_mdio_dev *priv = bus->priv;
+> +	u32 val;
+> +	int ret;
+> +
+> +	/* The MDIO_TRIGGER bit returns 0 when a transaction has completed. */
+> +	ret = readl_poll_timeout(priv->regs + MDIO_REG_FRAME_CFG_2, val,
+> +				 !(val & MDIO_TRIGGER_BIT), 50, 10000);
+> +
+> +	if (ret < 0)
+> +		dev_dbg(&bus->dev, "TRIGGER bit timeout: %x\n", val);
+> +
+> +	return ret;
+> +}
+> +
+> +static int pic64hpsc_mdio_read(struct mii_bus *bus, int mii_id, int regnum)
+> +{
+> +	struct pic64hpsc_mdio_dev *priv = bus->priv;
+> +	u32 val;
+> +	int ret;
+> +
+> +	ret = pic64hpsc_mdio_wait_trigger(bus);
+> +	if (ret)
+> +		return ret;
+> +
+> +	writel(MDIO_TRIGGER_BIT | FIELD_PREP(MDIO_REG_DEV_ADDR_MASK, regnum) |
+> +		       FIELD_PREP(MDIO_PHY_PRT_ADDR_MASK, mii_id) |
+> +		       FIELD_PREP(MDIO_OPERATION_MASK, MDIO_OPERATION_READ) |
+> +		       FIELD_PREP(MDIO_START_OF_FRAME_MASK, 1),
+> +	       priv->regs + MDIO_REG_FRAME_CFG_2);
+> +
+> +	ret = pic64hpsc_mdio_wait_trigger(bus);
+> +	if (ret)
+> +		return ret;
+> +
+> +	val = readl(priv->regs + MDIO_REG_FRAME_STATUS);
+> +
+> +	/* The MDIO_READOK is a 1-bit value reflecting the inverse of the MDIO
+> +	 * bus value captured during the 2nd TA cycle. A PHY/Port should drive
+> +	 * the MDIO bus with a logic 0 on the 2nd TA cycle, however, the
+> +	 * PHY/Port could optionally drive a logic 1, to communicate a read
+> +	 * failure. This feature is optional, not defined by the 802.3 standard
+> +	 * and not supported in standard external PHYs.
+> +	 */
+> +	if (!(bus->phy_ignore_ta_mask & 1 << mii_id) &&
+> +	    !FIELD_GET(MDIO_READOK_BIT, val)) {
+> +		dev_dbg(&bus->dev, "READOK bit cleared\n");
+> +		return -EIO;
+> +	}
+> +
+> +	ret = FIELD_GET(MDIO_RDATA_MASK, val);
+> +
+> +	return ret;
+> +}
+> +
+> +static int pic64hpsc_mdio_write(struct mii_bus *bus, int mii_id, int regnum,
+> +				u16 value)
+> +{
+> +	struct pic64hpsc_mdio_dev *priv = bus->priv;
+> +	int ret;
+> +
+> +	ret = pic64hpsc_mdio_wait_trigger(bus);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	writel(FIELD_PREP(MDIO_WDATA_MASK, value),
+> +	       priv->regs + MDIO_REG_FRAME_CFG_1);
+> +
+> +	writel(MDIO_TRIGGER_BIT | FIELD_PREP(MDIO_REG_DEV_ADDR_MASK, regnum) |
+> +		       FIELD_PREP(MDIO_PHY_PRT_ADDR_MASK, mii_id) |
+> +		       FIELD_PREP(MDIO_OPERATION_MASK, MDIO_OPERATION_WRITE) |
+> +		       FIELD_PREP(MDIO_START_OF_FRAME_MASK, 1),
+> +	       priv->regs + MDIO_REG_FRAME_CFG_2);
+> +
+> +	return 0;
+> +}
+> +
+> +static int pic64hpsc_mdio_probe(struct platform_device *pdev)
+> +{
+> +	struct device_node *np = pdev->dev.of_node;
+> +	struct device *dev = &pdev->dev;
+> +	struct pic64hpsc_mdio_dev *priv;
+> +	struct mii_bus *bus;
+> +	unsigned long rate;
+> +	struct clk *clk;
+> +	u32 bus_freq;
+> +	u32 div;
+> +	int ret;
+> +
+> +	bus = devm_mdiobus_alloc_size(dev, sizeof(*priv));
+> +	if (!bus)
+> +		return -ENOMEM;
+> +
+> +	priv = bus->priv;
+> +
+> +	priv->regs = devm_platform_ioremap_resource(pdev, 0);
+> +	if (IS_ERR(priv->regs))
+> +		return PTR_ERR(priv->regs);
+> +
+> +	bus->name = KBUILD_MODNAME;
+> +	bus->read = pic64hpsc_mdio_read;
+> +	bus->write = pic64hpsc_mdio_write;
+
+Is there a plan to eventually add C45 ? if so, I'd put 'c22' somewhere
+in the names here.
+
+The rest seems OK to me, so with the extra macros removed,
+
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
 
 
