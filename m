@@ -1,181 +1,189 @@
-Return-Path: <netdev+bounces-269010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269011-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UMwMHWaiummyZwIAu9opvQ
-	(envelope-from <netdev+bounces-269010-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:02:30 +0100
+	id +CZHFzSiummyZwIAu9opvQ
+	(envelope-from <netdev+bounces-269011-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:01:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3B722BBE88
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:02:19 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AA082BBE6A
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:01:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B520030EFA06
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:00:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 84BC83003D0A
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD183D7D66;
-	Wed, 18 Mar 2026 13:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57D063D1CD4;
+	Wed, 18 Mar 2026 13:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qXJg26cf"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HUX4xEwa";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="osJyypEd";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HUX4xEwa";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="osJyypEd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1113D3D75CD
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 13:00:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75BF1339872
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 13:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773838813; cv=none; b=ZBjSjTFgyE7OLH83HjEaLQBH5/vRYCISujQTK6472ngHYwk3nqpWqgOEL3XzSIKL1URFlO+FJSIrMjshLJZXXDRr88iHB0EB64pfQ3UTYHnopwStzPVden+Ba0+Ia/FkEfHjTTwZbbiw8rMrvNVvD8L6CvyNe0pRX1pmGWfdfOU=
+	t=1773838888; cv=none; b=naFaP8gDr9LaCTnvdm3DUn6dTKUJjgkNQpWcROuflT8+y/beqjLe9F9fJIdk9QseGZpVSRyKrPoiOXbcA1mqmBUR9xIGwulkytHfJnzNVmzQMEkPdgd4yGqGCjsifkf4Hd61QTdKJ2iSGe5MB1hHoOs+w9W5BK+qOscpvKoWasU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773838813; c=relaxed/simple;
-	bh=53y5Rybl/OajfsYtPp/FlPAeGf32v6tVDyjPu7HO1qo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YkJ/KjEhv6qsYPXmAkWVySQRM2vp/FTm+D8cLCkHpqrGM5VkoYATkLrXo6AAl7d/fNvkqDka8OOFelZiwDGflaRmNrjQyXX02JsXhr6LgZzz1NWr0Q3hLTt2HdkLkV4pUeezBMc0YpJ3Si3umBMMgfk4j0oDOSW5arJmEjYEtC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qXJg26cf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 938CAC2BCB0
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 13:00:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773838812;
-	bh=53y5Rybl/OajfsYtPp/FlPAeGf32v6tVDyjPu7HO1qo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=qXJg26cfnHDUFe9/WmsMDToav67efuyh2gc8Ow3lf/1IJwzteaHe+J+e+1zlMfb9w
-	 KX3LK9H8KYL7xGoNeFt70QApITIKzwneWAN1nzTn47EHigR1i0rb/RJ53uJhSOWwYe
-	 mp9SDWqrhtdBgoTQKiWxSVwRFtasYgKVt043R5xbwVIthxEa2hG1l/nGecE0sid7FA
-	 tE35d5D+i/Ehi+tY01zCWwKMASlp9hkd0w2cAY//PUR/OnvtZsGOmd2KzptgQsDTUJ
-	 03PWgmp8K5c5pGLE5bdBq4Cojz9qtyGioacnkGhGD+xOSrFFLNif/rxPT5NUi1Zqc9
-	 9/jr4vvfxdq5Q==
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-40f1ffba6a0so4092038fac.0
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 06:00:12 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUjw0ER2NMcX+NhzzZMblENqV/4dFi1KeqHS5qtkt3Gh8b2T6E9cCyPeXDeV6m7kHZ/QrKPGFw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJcfvvYN1gKuRKN90/nWhaSCtPK3WuDyWcqZAmTepn0l1PDlq2
-	axlgt2Do4DLALnm+jlgB282At8tVVYq93rXSeM7s2Zhmm04AEhx3V9hDq07i5G69KSara9Cn2ZT
-	PyQGp1og9i9SGmuPxL7ph8Rd8v/0P48U=
-X-Received: by 2002:a05:6870:a550:b0:417:349c:dbb with SMTP id
- 586e51a60fabf-41bd418b938mr2039961fac.34.1773838811632; Wed, 18 Mar 2026
- 06:00:11 -0700 (PDT)
+	s=arc-20240116; t=1773838888; c=relaxed/simple;
+	bh=xE94S/UKSZWBIOAatc8u38/0HYLkmP0zHl4wGcx5wgI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WUOat3j8v8C+xdfYYy/uFt54dNBlLmBEFHrxWE7s77bwJf4Nj5tFVqP5lmVmy9WWESKydIatjDopHHmMyjaKzr48iTocjcWgEgcNlHopzjrKg4KQoljEvae9QU60pug1dF75WC6HXgfnlmCsx3lLF+Sf5dPzEQUWN9Qx+XGohYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HUX4xEwa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=osJyypEd; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HUX4xEwa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=osJyypEd; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id B1C115BD22;
+	Wed, 18 Mar 2026 13:01:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773838883; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hRY53vbEKD3FKKKwST2agdSjygnld5Zb67oKSGBSM4M=;
+	b=HUX4xEwa9TGo/NCuFHg8JL2ARCYl4zXTb2OUr/6PlwPjmUFfiDl9hjQAVWEuMTrmtGi8QA
+	lF+wEtSlXvaHT/RLFKxEaKY804YMbURK3Fz0CGHNaYjvGEbPcJm+i9BU/LCcucbMxqH5Am
+	9uDSCQkma0vpsTbSxpk27rKAmNGMRe8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773838883;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hRY53vbEKD3FKKKwST2agdSjygnld5Zb67oKSGBSM4M=;
+	b=osJyypEdYy3GchkWI0Dox4MKKoE+b0qc5/CzvElD/prcZLEVD4HdusZvBdIv8Sl3oMBmDp
+	q9tNUCDmMD67oMBQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773838883; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hRY53vbEKD3FKKKwST2agdSjygnld5Zb67oKSGBSM4M=;
+	b=HUX4xEwa9TGo/NCuFHg8JL2ARCYl4zXTb2OUr/6PlwPjmUFfiDl9hjQAVWEuMTrmtGi8QA
+	lF+wEtSlXvaHT/RLFKxEaKY804YMbURK3Fz0CGHNaYjvGEbPcJm+i9BU/LCcucbMxqH5Am
+	9uDSCQkma0vpsTbSxpk27rKAmNGMRe8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773838883;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hRY53vbEKD3FKKKwST2agdSjygnld5Zb67oKSGBSM4M=;
+	b=osJyypEdYy3GchkWI0Dox4MKKoE+b0qc5/CzvElD/prcZLEVD4HdusZvBdIv8Sl3oMBmDp
+	q9tNUCDmMD67oMBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 29B564273B;
+	Wed, 18 Mar 2026 13:01:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id SSZHByOiumkiBQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Wed, 18 Mar 2026 13:01:23 +0000
+Message-ID: <56c59fc8-06eb-4ec8-af3f-fc960d7c3c40@suse.de>
+Date: Wed, 18 Mar 2026 14:01:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <5113731.31r3eYUQgx@rafael.j.wysocki> <20260317164215.1766861-1-horms@kernel.org>
-In-Reply-To: <20260317164215.1766861-1-horms@kernel.org>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Wed, 18 Mar 2026 14:00:00 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0g9BinHfQDS6hUvVHdLxDPvbv7ck=m1Bqa=+C3iE+vgxw@mail.gmail.com>
-X-Gm-Features: AaiRm53NFD2R_-cERAXuUPAfz4g6VNAuEopKXOM-nBixvIxViuy0UGW1hWEzFN8
-Message-ID: <CAJZ5v0g9BinHfQDS6hUvVHdLxDPvbv7ck=m1Bqa=+C3iE+vgxw@mail.gmail.com>
-Subject: Re: [v1] net: fjes: Drop fjes_acpi_driver and rework initialization
-To: Simon Horman <horms@kernel.org>
-Cc: rafael@kernel.org, linux-acpi@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, 
-	andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org, davem@davemloft.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 04/10 net-next v3] ipv6: prepare headers for ipv6_stub
+ removal
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, =?UTF-8?Q?Ricardo_B=2E_Marli=C3=A8re?=
+ <rbm@suse.com>, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+References: <20260317140141.5723-1-fmancera@suse.de>
+ <20260317140141.5723-5-fmancera@suse.de> <20260317201236.GA3581148@shredder>
+ <f67f32ef-d619-4f61-9054-e6b6340129ad@suse.de>
+ <20260318124539.GA3693409@shredder>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260318124539.GA3693409@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.b.d.0.0.1.0.0.e.a.0.c.3.0.0.6.2.asn6.rspamd.com:query timed out];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269010-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269011-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MAILSPIKE_FAIL(0.00)[2600:3c0a:e001:db::12fc:5321:query timed out];
-	FROM_NEQ_ENVFROM(0.00)[rafael@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
+	RSPAMD_URIBL_FAIL(0.00)[suse.de:query timed out];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: C3B722BBE88
+	MAILSPIKE_FAIL(0.00)[172.232.135.74:query timed out];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4AA082BBE6A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 17, 2026 at 5:43=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
-te:
->
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
-l.html
-> ---
-> net: fjes: Drop fjes_acpi_driver and rework initialization
->
-> This commit reworks the Fujitsu Extended Socket (fjes) Network Device
-> driver initialization by removing the ACPI driver interface and
-> creating the platform device directly during module initialization.
->
-> Link: https://lore.kernel.org/all/2396510.ElGaqSPkdT@rafael.j.wysocki/ [1=
-]
->
-> > diff --git a/drivers/net/fjes/fjes_main.c b/drivers/net/fjes/fjes_main.=
-c
-> > index b63965d9a1ba..efb399eb15e0 100644
-> > --- a/drivers/net/fjes/fjes_main.c
-> > +++ b/drivers/net/fjes/fjes_main.c
->
-> [ ... ]
->
-> > @@ -1518,16 +1506,7 @@ static int __init fjes_init_module(void)
-> >               return result;
-> >       }
-> >
-> > -     result =3D acpi_bus_register_driver(&fjes_acpi_driver);
-> > -     if (result < 0)
-> > -             goto fail_acpi_driver;
-> > -
-> >       return 0;
-> > -
-> > -fail_acpi_driver:
-> > -     platform_driver_unregister(&fjes_driver);
-> > -     fjes_dbg_exit();
-> > -     return result;
-> >  }
->
-> In fjes_init_module(), if platform_driver_register() fails, does this
-> leak the platform device?
->
-> Looking at the new code, the platform device is successfully registered
-> earlier in the function:
->
->         fjes_plat_dev =3D platform_device_register_full(&pdevinfo);
->         ...
->         if (IS_ERR(fjes_plat_dev))
->                 return PTR_ERR(fjes_plat_dev);
->
->         ...
->         result =3D platform_driver_register(&fjes_driver);
->
-> But when platform_driver_register() fails, the error path only calls
-> fjes_dbg_exit() and returns:
->
->         result =3D platform_driver_register(&fjes_driver);
->         if (result < 0) {
->                 fjes_dbg_exit();
->                 return result;
->         }
->
-> Since the module init fails, fjes_exit_module() will never run, so
-> the platform_device_unregister() call there won't happen either. Should
-> the error path call platform_device_unregister(fjes_plat_dev) before
-> returning?
+On 3/18/26 1:45 PM, Ido Schimmel wrote:
+> On Wed, Mar 18, 2026 at 11:43:40AM +0100, Fernando Fernandez Mancera wrote:
+>> On 3/17/26 9:12 PM, Ido Schimmel wrote:
+>>> On Tue, Mar 17, 2026 at 03:01:00PM +0100, Fernando Fernandez Mancera wrote:
+>>>> diff --git a/include/net/ndisc.h b/include/net/ndisc.h
+>>>> index d38783a2ce57..6152401f29f1 100644
+>>>> --- a/include/net/ndisc.h
+>>>> +++ b/include/net/ndisc.h
+>>>> @@ -69,6 +69,12 @@ struct prefix_info;
+>>>>    extern struct neigh_table nd_tbl;
+>>>> +#if IS_ENABLED(CONFIG_IPV6)
+>>>> +#define ipv6_get_nd_tbl() (&nd_tbl)
+>>>> +#else
+>>>> +#define ipv6_get_nd_tbl() NULL
+>>>> +#endif
+>>>
+>>> What is the reason for converting code that is dependent on CONFIG_IPV6
+>>> to use ipv6_get_nd_tbl()?
+>>
+>> I did it mainly for consistency. If you think this isn't fine, I can move it
+>> back to &nd_tbl directly.
+> 
+> It creates a lot of unnecessary churn throughout the series, so I
+> wouldn't change code that is currently using '&nd_tbl'. I would also
+> change 'ipv6_stub->nd_tbl' to '&nd_tbl' if the code is guarded by
+> IS_ENABLED(CONFIG_IPV6), which is most users.
+> 
 
-Yes, it should.
+Fair enough. I will adjust it. Anyway, for the code not guarded by 
+IS_ENABLED(CONFIG_IPV6) and that was using ipv6_stub the 
+ipv6_get_nd_tbl() is still necessary.
 
-I'll send a v2, thanks!
+Thank you for the feedback!
+
 
