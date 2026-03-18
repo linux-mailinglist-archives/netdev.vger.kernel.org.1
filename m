@@ -1,226 +1,250 @@
-Return-Path: <netdev+bounces-269147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269148-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oHp+KoHlummdcwIAu9opvQ
-	(envelope-from <netdev+bounces-269147-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:48:49 +0100
+	id OBQJAP/tumnydAIAu9opvQ
+	(envelope-from <netdev+bounces-269148-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 19:25:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20A342C09A8
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:48:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53A2D2C135F
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 19:25:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6254D302B834
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:48:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 07D1430D16E3
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:58:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B06ED3563D7;
-	Wed, 18 Mar 2026 17:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7644D37AA7D;
+	Wed, 18 Mar 2026 17:56:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ujlpz/bS"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="vf/PIfqC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD03354ADB;
-	Wed, 18 Mar 2026 17:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8EC036164A
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 17:56:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773856093; cv=none; b=Ze+0QejGW8Fzzt7Hc2PITNkFYym9qSQ4NlZSUu4II7121C3irX6Hfqj+qXf37nFRnBYva72lwJvm8NSDQxy2wovMNlW9hLqwcWhSqefiABAjtOG5irK08k4Zt8OKJb6RyKHfY6/8eEa9W/7hWNr2vlX2lmlJsasc4yQxzku1U+w=
+	t=1773856609; cv=none; b=SKjtL3HUhdUJ8foa4Qz80UDL6DNZX6XQtpRWMtZHMdb17OldlslPmZkzzzfn40wcX/IzMpbAyG+iTcb/Mr1uSFqISsm1g3nXzkGDKkmatj8i+S5TgqmA7sRoZb4F9V0Elsgahold1EoCOL7DgMmQEP52gdtpzTZU22nr2TyrLuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773856093; c=relaxed/simple;
-	bh=pQAFIbZIhmMTLc/mYEA5XgMpFNoRH/fDy2E8vDEfznc=;
+	s=arc-20240116; t=1773856609; c=relaxed/simple;
+	bh=IXBU3YQIouf+VJdt1ZOkV9JZUbIA4wlHgmaWHjg/b/Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eGRNZgbYXJ34tQsVClRzcA4Yp5jxVFdTt6GD62/rRLp1XW6R3wAtGYfQVmNs0XZxFlujpysVk5QVcEscrvV8VhiL4kb2QkqhxCRWdlzb+BcKbQUmoE46Cco4A1bV/QGi81bMYsKSJU6SU3gYZ20A0fRSbCZ+icf2MIm0zvzy3yU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ujlpz/bS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A08B2C2BC87;
-	Wed, 18 Mar 2026 17:48:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773856093;
-	bh=pQAFIbZIhmMTLc/mYEA5XgMpFNoRH/fDy2E8vDEfznc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ujlpz/bSwy+wfDQI5dQccWTn2L8KOYRsJbmmybLyDl+peieYdfDde8nj/IpVYcEYI
-	 7ackhbtq8Yxc5Xg9TBBQH7zCyFewJSwOLR45mbnv0+OPXpUh4OHwxkaa7XoCoaxNPG
-	 JsAP82j4T9J1XuAmlzbDc4af3CvFHAY9vy2904MYg+ea+Ut4HknYizButIAZEMzqYd
-	 kw3YJ/FDX0s9DKkKTWfV+lqsWWWxm6MaWQzJ4A1veKmGU+GtOZnG7QjGCtAyCWyLSF
-	 Vldoxrq7dJmwZgVLgR9GqQMTu7nzDNKjRCjHFh3Jefdi4WplhDavc7Je0mbbClX8Ss
-	 r1rMTkjuCUsmw==
-Date: Wed, 18 Mar 2026 17:48:08 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Charles Perry <charles.perry@microchip.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: document Microchip
- PIC64-HPSC/HX MDIO controller
-Message-ID: <20260318-suspense-arming-fe118c3f15c6@spud>
-References: <20260317184610.315852-1-charles.perry@microchip.com>
- <20260317184610.315852-2-charles.perry@microchip.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BybkSno6Z0ed1FK7KfRo2cCTT8Eh43AbTjK82qaceSuCj5mI8UO+BLEKL4jPCdz9Xm2GTtOJcxPPPAhZUbgmWXYZY0XIRZf8m1Oqzkq6+/+YWQx/81H5sZyHgw4BWKnccnqJx+Y5e2PAgLob8Fz7J3YYDPtRoQAxjxfUJWmdWJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=vf/PIfqC; arc=none smtp.client-ip=49.212.198.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
+Received: from x1 (122.24.31.150.dy.iij4u.or.jp [150.31.24.122])
+	(authenticated bits=0)
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 62IHtmKq077402
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 19 Mar 2026 02:55:50 +0900 (JST)
+	(envelope-from kohei@enjuk.jp)
+DKIM-Signature: a=rsa-sha256; bh=iUa0cUAD4togZvYKxzXDBpSFVS/rOwnteKTz4jTJm+8=;
+        c=relaxed/relaxed; d=enjuk.jp;
+        h=From:Message-ID:To:Subject:Date;
+        s=rs20251215; t=1773856550; v=1;
+        b=vf/PIfqCgBa02vkmAd/4zNIX/nnJjZaA/43ZKAb+r7I05Qh6JgLI+NNqLk+XQj2W
+         0cuskUKclaTebUPaCfUg5+b0DelcmFWX2hTJHzbVH3dDxs9D4Ar49c1NkI70sVMt
+         dQo5EZoYmPtsAWOIiE9c4I69FHFRfJYUrj9gTrGPNOD184LFGRbEm+1UzwQkDsvd
+         LmXuY8fEojSUR3lz1bs2L/U/0fH0c9z0JpM3APidWvgRMDKR+IdkOKNTn9WZ1Pzc
+         TkqbfHJRM96ybw2j+nWtHiQO3gM3gYk3eKPj4E7HaAAa8KEigMktcUKijGhztafE
+         BtgZaakc4orZCYaSWGdngw==
+Date: Thu, 19 Mar 2026 02:55:48 +0900
+From: Kohei Enju <kohei@enjuk.jp>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+        nxne.cnse.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 3/5] ice: migrate to netdev
+ ops lock
+Message-ID: <abripOPt4oVu-Ksb@x1>
+References: <20260318163505.31765-1-aleksander.lobakin@intel.com>
+ <20260318163505.31765-4-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="IW4jHSdMH+tE+sFx"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260317184610.315852-2-charles.perry@microchip.com>
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+In-Reply-To: <20260318163505.31765-4-aleksander.lobakin@intel.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269147-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269148-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.901];
+	NEURAL_HAM(-0.00)[-0.987];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[enjuk.jp:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,0.0.0.0:email,devicetree.org:url,microchip.com:email]
-X-Rspamd-Queue-Id: 20A342C09A8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 53A2D2C135F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On 03/18 17:35, Alexander Lobakin wrote:
+> Queue management ops unconditionally enable netdev locking. The same
+> lock is taken by default by several NAPI configuration functions,
+> such as napi_enable() and netif_napi_set_irq().
+> Request ops locking in advance and make sure we use the _locked
+> counterparts of those functions to avoid deadlocks, taking the lock
+> manually where needed (suspend/resume, queue rebuild and resets).
 
---IW4jHSdMH+tE+sFx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Alexander,
+After applying this patch (3/5) along with the preceding ones on top of
+net-next, I got some WARNING splats when changing the admin state
+(up/down) using the ip link command. [1, 2]
 
-On Tue, Mar 17, 2026 at 11:46:09AM -0700, Charles Perry wrote:
-> This MDIO hardware is based on a Microsemi design supported in Linux by
-> mdio-mscc-miim.c. However, The register interface is completely different
-> with pic64hpsc, hence the need for separate documentation.
->=20
-> The hardware supports C22 and C45.
->=20
-> The documentation recommends an input clock of 156.25MHz and a prescaler
-> of 39, which yields an MDIO clock of 1.95MHz.
->=20
-> The hardware supports an interrupt pin to signal transaction completion
-> which is not strictly needed as the software can also poll a "TRIGGER"
-> bit for this.
->=20
-> Signed-off-by: Charles Perry <charles.perry@microchip.com>
-> ---
->  .../net/microchip,pic64hpsc-mdio.yaml         | 61 +++++++++++++++++++
->  1 file changed, 61 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/microchip,pic64=
-hpsc-mdio.yaml
->=20
-> diff --git a/Documentation/devicetree/bindings/net/microchip,pic64hpsc-md=
-io.yaml b/Documentation/devicetree/bindings/net/microchip,pic64hpsc-mdio.ya=
-ml
-> new file mode 100644
-> index 000000000000..21c76199c11b
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/microchip,pic64hpsc-mdio.yaml
-> @@ -0,0 +1,61 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/microchip,pic64hpsc-mdio.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Microchip PIC64-HPSC/HX MDIO controller
-> +
-> +maintainers:
-> +  - Charles Perry <charles.perry@microchip.com>
-> +
-> +description: |
-> +  Microchip PIC64-HPSC/HX SoCs have two MDIO bus controller. This MDIO b=
-us
-> +  controller supports C22 and C45 register access. It is named "MDIO Ini=
-tiator"
-> +  in the documentation.
-> +
-> +allOf:
-> +  - $ref: mdio.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      - const: microchip,pic64hpsc-mdio
-> +      - items:
-> +          - const: microchip,pic64hx-mdio
-> +          - const: microchip,pic64hpsc-mdio
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    maxItems: 1
-> +
-> +  clock-frequency: true
+Since I haven't looked into this series in detail, I'm reporting the
+splats anyway. 
+I'm wondering why I haven't seen anyone report this type of issue up to
+v3. Maybe there is something wrong with my setup or devices?
 
-Does this genuinely have no constraints?
+Device: Intel Corporation Ethernet Controller E810-XXV for SFP (rev 02)
 
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    bus {
-> +        #address-cells =3D <2>;
-> +        #size-cells =3D <2>;
-> +
-> +        mdio@4000C21E000 {
-> +            compatible =3D "microchip,pic64hpsc-mdio";
-> +            reg =3D <0x400 0x0C21E000 0x0 0x1000>;
-> +            #address-cells =3D <1>;
-> +            #size-cells =3D <0>;
-> +
-> +            phy0: ethernet-phy@0 {
-> +                reg =3D <0>;
-> +            };
-> +        };
-> +    };
-> --=20
-> 2.47.3
->=20
+[1] ip link set $DEV up
+  WARNING: ./include/net/netdev_lock.h:17 at netif_napi_set_irq_locked+0x393/0x4b0, CPU#0: ip/898
+  Modules linked in:
+  CPU: 0 UID: 0 PID: 898 Comm: ip Not tainted 7.0.0-rc3-00751-gf0103a010a50 #88 PREEMPT(full)
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+  RIP: 0010:netif_napi_set_irq_locked+0x393/0x4b0
+  [...]
+  Call Trace:
+   <TASK>
+   ice_vsi_set_napi_queues_locked+0x31b/0x4d0
+   ice_vsi_open+0x359/0x420
+   ice_open_internal+0x1a4/0x230
+   __dev_open+0x2e9/0x830
+   __dev_change_flags+0x411/0x610
+   netif_change_flags+0x76/0x170
+   do_setlink.isra.0+0x17e8/0x39a0
+   rtnl_newlink+0xe72/0x22a0
+   rtnetlink_rcv_msg+0x6ea/0xb40
+   netlink_rcv_skb+0x121/0x380
+   netlink_unicast+0x4aa/0x780
+   netlink_sendmsg+0x753/0xc80
+   ____sys_sendmsg+0x7a2/0x950
+   ___sys_sendmsg+0xf8/0x180
+   __sys_sendmsg+0x11f/0x1c0
+   do_syscall_64+0xf3/0x690
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  RIP: 0033:0x7f07ffabec5e
+  [...]
 
---IW4jHSdMH+tE+sFx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCabrlWAAKCRB4tDGHoIJi
-0lGMAQCFZMsheMTY8r7+nrjrKxb4dPNODqhfXUgAgD0LntsgdgD9EWcX+5BL8OPD
-NRnL08pK+yY0gvYbjGj2Z9MIy72oOgM=
-=nn8N
------END PGP SIGNATURE-----
-
---IW4jHSdMH+tE+sFx--
+[2] ip link set $DEV down
+  WARNING: ./include/net/netdev_lock.h:17 at napi_disable_locked+0x3dd/0x5e0, CPU#0: ip/921
+  Modules linked in:
+  CPU: 0 UID: 0 PID: 921 Comm: ip Tainted: G        W           7.0.0-rc3-00751-gf0103a010a50 #88 PREEMPT(full)
+  Tainted: [W]=WARN
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+  RIP: 0010:napi_disable_locked+0x3dd/0x5e0
+  [...]
+  Call Trace:
+   <TASK>
+   ice_down+0x7c3/0x1010
+   ice_vsi_close+0x26f/0x360
+   ice_stop+0xde/0x120
+   __dev_close_many+0x2a2/0x650
+   __dev_change_flags+0x237/0x610
+   netif_change_flags+0x76/0x170
+   do_setlink.isra.0+0x17e8/0x39a0
+   rtnl_newlink+0xe72/0x22a0
+   rtnetlink_rcv_msg+0x6ea/0xb40
+   netlink_rcv_skb+0x121/0x380
+   netlink_unicast+0x4aa/0x780
+   netlink_sendmsg+0x753/0xc80
+   ____sys_sendmsg+0x7a2/0x950
+   ___sys_sendmsg+0xf8/0x180
+   __sys_sendmsg+0x11f/0x1c0
+   do_syscall_64+0xf3/0x690
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  RIP: 0033:0x7fc0bb17cc5e
+  [...]
+  ------------[ cut here ]------------
+  WARNING: ./include/net/netdev_lock.h:17 at netif_napi_set_irq_locked+0x393/0x4b0, CPU#0: ip/921
+  Modules linked in:
+  CPU: 0 UID: 0 PID: 921 Comm: ip Tainted: G        W           7.0.0-rc3-00751-gf0103a010a50 #88 PREEMPT(full)
+  Tainted: [W]=WARN
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+  RIP: 0010:netif_napi_set_irq_locked+0x393/0x4b0
+  [...]
+  Call Trace:
+   <TASK>
+   ice_vsi_clear_napi_queues_locked+0xe7/0x2b0
+   ice_vsi_close+0x38/0x360
+   ice_stop+0xde/0x120
+   __dev_close_many+0x2a2/0x650
+   __dev_change_flags+0x237/0x610
+   netif_change_flags+0x76/0x170
+   do_setlink.isra.0+0x17e8/0x39a0
+   rtnl_newlink+0xe72/0x22a0
+   rtnetlink_rcv_msg+0x6ea/0xb40
+   netlink_rcv_skb+0x121/0x380
+   netlink_unicast+0x4aa/0x780
+   netlink_sendmsg+0x753/0xc80
+   ____sys_sendmsg+0x7a2/0x950
+   ___sys_sendmsg+0xf8/0x180
+   __sys_sendmsg+0x11f/0x1c0
+   do_syscall_64+0xf3/0x690
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  RIP: 0033:0x7fc0bb17cc5e
+  [...]
+  ------------[ cut here ]------------
+  WARNING: ./include/net/netdev_lock.h:17 at netif_napi_affinity_release+0x1cb/0x250, CPU#1: ip/921
+  Modules linked in:
+  CPU: 1 UID: 0 PID: 921 Comm: ip Tainted: G        W           7.0.0-rc3-00751-gf0103a010a50 #88 PREEMPT(full)
+  Tainted: [W]=WARN
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+  RIP: 0010:netif_napi_affinity_release+0x1cb/0x250
+  [...]
+  Call Trace:
+   <TASK>
+   irq_set_affinity_notifier+0x261/0x360
+   netif_napi_set_irq_locked+0x338/0x4b0
+   ice_vsi_clear_napi_queues_locked+0xe7/0x2b0
+   ice_vsi_close+0x38/0x360
+   ice_stop+0xde/0x120
+   __dev_close_many+0x2a2/0x650
+   __dev_change_flags+0x237/0x610
+   netif_change_flags+0x76/0x170
+   do_setlink.isra.0+0x17e8/0x39a0
+   rtnl_newlink+0xe72/0x22a0
+   rtnetlink_rcv_msg+0x6ea/0xb40
+   netlink_rcv_skb+0x121/0x380
+   netlink_unicast+0x4aa/0x780
+   netlink_sendmsg+0x753/0xc80
+   ____sys_sendmsg+0x7a2/0x950
+   ___sys_sendmsg+0xf8/0x180
+   __sys_sendmsg+0x11f/0x1c0
+   do_syscall_64+0xf3/0x690
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  RIP: 0033:0x7fc0bb17cc5e
+  [...]
 
