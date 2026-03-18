@@ -1,201 +1,171 @@
-Return-Path: <netdev+bounces-268908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268909-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iNUbBIJYumnFUgIAu9opvQ
-	(envelope-from <netdev+bounces-268908-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:47:14 +0100
+	id wKCcNM5aumnFUgIAu9opvQ
+	(envelope-from <netdev+bounces-268909-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:57:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9D452B7288
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:47:13 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 828F82B754B
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:57:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 054D9300C323
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:47:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E955E300BB97
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5CB36C0CC;
-	Wed, 18 Mar 2026 07:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC3636BCC3;
+	Wed, 18 Mar 2026 07:56:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F9T1rMU8"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UDeGb7mH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DA536B056
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 07:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB8A36B07E;
+	Wed, 18 Mar 2026 07:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773820029; cv=none; b=cWOsoS/7f4xE5skgKtxz5hB0qetXuXIB/NLvdwRIyKvHQMb7hbeCdPVAOgh94s/Tx6cUTlJniHBOZn0aScnvzix3blmgI9ouz2HnY9oMa5niSIPCYhx9eSw5x0rEnYSVrsXya2/PF03/THoPrBQcFNHPiBe5COxjmH1KgeporvY=
+	t=1773820618; cv=none; b=AvqRRWZ7hULXQuz1TH2Mrgo+gwTJWcqOIskQyKgUqWMC7kfyzZjpbfos0LNK7g6vsjHkdmU9DnqCm0KUOjgc7w4NmjSo4ANU9N/PBQdIp2mkKLlL0CdLVK33p31yt/RRn2qllHf47JukHOxuFNlnC8pcMH0TL/6OtoljD7ucHho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773820029; c=relaxed/simple;
-	bh=6AyM+5lJ+dSs+SjiqVmcLVaC5WWE37JafHboRqppUoA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=DctZDROsKpvVJImN8EdGK0BMxfwZH9xFyYlzn/Ti0NiTkpOcfHJ+hzGiN6mDtfcxR3pHXbciaTc3W5e0AoJ9DnZolGBcPLavA35OcX+W+o5IE3nJQL5dAbVU6tvWc6xAJydxbYUEUT//s6cmIK079R8jMhYGn6uS/5QtrgD6J4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=F9T1rMU8; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-48541edecf9so71336735e9.1
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 00:47:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1773820027; x=1774424827; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XdQh/lG6wJGknLC6Mk9SsT+zVzn0gaCcGpcDHBd/XtU=;
-        b=F9T1rMU8dGECHgIjfHimC/PRb623nkP3VWY12D2nviLt1rKJ/V0V91f7xBZoscBTzR
-         Z95BgkbgU+s3Z8FWJE72VXqz7Qg2Ot7348sH1o4g0MKLLOF9JGsiiIyZAPno6F0z2p6j
-         oikPJbJ4kRzGLWHl8+dr2OJo2ZqU0IvJqloYX8ouLGGsKhBm8fssCWYJanXiWyc9fng4
-         7e1DRuftQ/M24Khqdxbk588UEisj/6KOjAmS7Qubhczj93q9pqRXpRnZPNToYDL80Tvn
-         d01EUQBHV7W6c2o7TdEgJqybLsJia65I3OQGwyqeBd54fEQ2z+8pm6HYutSlh/Pe9rAl
-         iFcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773820027; x=1774424827;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XdQh/lG6wJGknLC6Mk9SsT+zVzn0gaCcGpcDHBd/XtU=;
-        b=LpcC5FVeHEJz8vkF4IQ24wgK0jPW1hadLF6twQGVzlOr/z6f+N9qbcpk53xAUoUyfJ
-         eic8z9LLEg7UY1J5Z2bIFBdOySbzNSiiRycHkEKcI9trIXTno8Zk32jrqLzFui1efL9n
-         l4D594Cl50IubfG08K1bk0+x12DqezqjAUcIdAiwU7ixilCIxDlaxXTUOxUyMl8FkiMl
-         0LP1fIzJGtd07fiS5Y1W/S0jMhJewhoMUBlAbei65o21p5as0l1nucOkPKG17YkiP5oK
-         gPghVQgFZsylDd11qCpYTZz3ST/2x4Ismc+BjGJKShlX45HE2G24aGbmextU7WD19D6J
-         p7ag==
-X-Forwarded-Encrypted: i=1; AJvYcCWvtjPgrhko6ha5WmEpBLKM0DTPg1UaLzSa++7yvHo3DYWbHLORehIhSyH6NbBoughoRKEwPrI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMYklaJSiiO+KcaTv4DZ8mPSxT6K3JLTD5ObOzuZ33tsehe4ad
-	qTF6nbNzyU6Rt0jIS0Qex+P+sEUUNQ63uy16yXqC3PyKiTJJt0gJNIyg2lsfXb0KkmQ=
-X-Gm-Gg: ATEYQzxwwmXZ8QTiKa6fNitum5PaFwaSoFlPAA3vIDR5GVCj7avm/5s3VaBAlzxNZID
-	6RDhIL7ZekV/w/uG/1W0/J1dPptczUge1iM/XAqU9Em9T0VsSIHIfkeO+RgheX+wXQO2YHrELEK
-	RXsghh1vNTjowT7JXcFORYk/naGvG6XA24o5SEsZj5y3t6hjUaL4bAOjUPrKBjgvxrz6egCv7/f
-	qfzSnJ6+w9gSXryuqw8n26zPd7BwqHBbxqBa2sUqmgMlQGVT1Xbw50LSubkXX+2STLaZ3nLottp
-	Z20+OFSPYf8dUYGEqCxp7WHspvIJba2GpSvKeGcFZlV1on+73m1aRWprg9yLJPuF+9tP27mzMkF
-	/54TRGJ+fnSOrVEOmBDwFRq23ooNhrouLRXJ9kKze2W5v9QfuKOZ/NFumsqvbBxOsxspqRjYRnw
-	WGBJwhe4YgT89uOD+HvRri8yAlsqK2c8ETqqhOPgE=
-X-Received: by 2002:a05:600c:c491:b0:485:3f58:d9f with SMTP id 5b1f17b1804b1-486f4465d04mr38125605e9.30.1773820026579;
-        Wed, 18 Mar 2026 00:47:06 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4856ea8fad1sm216587555e9.1.2026.03.18.00.47.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 00:47:06 -0700 (PDT)
-Date: Wed, 18 Mar 2026 10:47:03 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
-	vikas.gupta@broadcom.com,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Rahul Gupta <rahul-rg.gupta@broadcom.com>,
-	Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
-Subject: Re: [PATCH net-next v6 06/10] bng_en: add HW stats infra and
- structured ethtool ops
-Message-ID: <202603180509.nOQGZrG0-lkp@intel.com>
+	s=arc-20240116; t=1773820618; c=relaxed/simple;
+	bh=3XTTl3LEOOJSxh3bPyjhegVTZLN5AHADJeciGinB5gM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Zp/EggJV1vCs9Onvxjqrarvr8MkW5GjSNoXZIHOEmMNHH2J0Lt7LPCOPAMRSpzm3vIj6YP2eDKytRELGYmElybahxrP0eMGtpkxl2H9NGZ+NCDD6o+NjapA0Txe/BHx3zKFj1suKTLiy/1d6ONF043Da9W0xMQ5xGecSQzl/8OQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=UDeGb7mH; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Tp
+	9i1hh0AXWBiYH65D0/JDIPSB18WNuvMfE8rai68LI=; b=UDeGb7mHZTRlvxYZ5e
+	Pd5OPC6QmUlhubaXJEuwrfDq0VoFGhOXMADKqsyj96h9jTV6BDPEbDStaCQ5t3sq
+	OpctqWBYvN2CSpM3ATM/lf+MIBB413HJ0dwBqyFRjp88NRiurc6wF4QDSX9mGIjo
+	XrW0yXnWCQBkWnFFF+9w1byrg=
+Received: from pek-lpg-core5.wrs.com (unknown [])
+	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wDnt6yHWrppnayqBg--.44690S2;
+	Wed, 18 Mar 2026 15:55:52 +0800 (CST)
+From: Robert Garcia <rob_garcia@163.com>
+To: stable@vger.kernel.org,
+	Johannes Berg <johannes.berg@intel.com>
+Cc: Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Anna Schumaker <anna.schumaker@netapp.com>,
+	Robert Garcia <rob_garcia@163.com>,
+	"J . Bruce Fields" <bfields@fieldses.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Olga Kornievskaia <kolga@netapp.com>,
+	linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 5.15.y] SUNRPC: lock against ->sock changing during sysfs read
+Date: Wed, 18 Mar 2026 15:55:51 +0800
+Message-Id: <20260318075551.1668418-1-rob_garcia@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260310144044.21672-7-bhargava.marreddy@broadcom.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDnt6yHWrppnayqBg--.44690S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7Kry8tryxKFW5Zr4fZr1fZwb_yoW8uw4kpF
+	yak34fG3yDKrZ7urn5Ar4v9rZxu3WfGF4UGr48C3WFyrZrKF15Jryjkay3ur18urZ5uF43
+	tF4UWF45JF1DAaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0p_ku4UUUUUU=
+X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbC5QjBLWm6WogINgAA3+
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-268909-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268908-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[intel.com,hammerspace.com,netapp.com,163.com,fieldses.org,oracle.com,davemloft.net,kernel.org,vger.kernel.org];
+	DKIM_TRACE(0.00)[163.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rob_garcia@163.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:dkim,linaro.org:email,intel.com:email,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,01.org:url]
-X-Rspamd-Queue-Id: A9D452B7288
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 828F82B754B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Bhargava,
+From: NeilBrown <neilb@suse.de>
 
-kernel test robot noticed the following build warnings:
+[ Upstream commit b49ea673e119f59c71645e2f65b3ccad857c90ee ]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Bhargava-Marreddy/bng_en-add-per-PF-workqueue-timer-and-slow-path-task/20260310-231948
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260310144044.21672-7-bhargava.marreddy%40broadcom.com
-patch subject: [PATCH net-next v6 06/10] bng_en: add HW stats infra and structured ethtool ops
-config: arm64-randconfig-r071-20260317 (https://download.01.org/0day-ci/archive/20260318/202603180509.nOQGZrG0-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 8.5.0
-smatch: v0.5.0-9004-gb810ac53
+->sock can be set to NULL asynchronously unless ->recv_mutex is held.
+So it is important to hold that mutex.  Otherwise a sysfs read can
+trigger an oops.
+Commit 17f09d3f619a ("SUNRPC: Check if the xprt is connected before
+handling sysfs reads") appears to attempt to fix this problem, but it
+only narrows the race window.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202603180509.nOQGZrG0-lkp@intel.com/
+Fixes: 17f09d3f619a ("SUNRPC: Check if the xprt is connected before handling sysfs reads")
+Fixes: a8482488a7d6 ("SUNRPC query transport's source port")
+Signed-off-by: NeilBrown <neilb@suse.de>
+Signed-off-by: Anna Schumaker <Anna.Schumaker@Netapp.com>
+Signed-off-by: Robert Garcia <rob_garcia@163.com>
+---
+ net/sunrpc/sysfs.c    | 5 ++++-
+ net/sunrpc/xprtsock.c | 7 ++++++-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-smatch warnings:
-drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c:1598 bnge_hwrm_port_qstats_ext() warn: missing error code? 'rc'
-
-vim +/rc +1598 drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1576  	rc = bnge_hwrm_req_init(bd, req_qc, HWRM_QUEUE_PRI2COS_QCFG);
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1577  	if (rc)
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1578  		return rc;
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1579  
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1580  	req_qc->flags = cpu_to_le32(QUEUE_PRI2COS_QCFG_REQ_FLAGS_IVLAN);
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1581  
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1582  	resp_qc = bnge_hwrm_req_hold(bd, req_qc);
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1583  	rc = bnge_hwrm_req_send(bd, req_qc);
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1584  	if (!rc) {
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1585  		u8 *pri2cos;
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1586  		int i, j;
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1587  
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1588  		pri2cos = &resp_qc->pri0_cos_queue_id;
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1589  		for (i = 0; i < 8; i++) {
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1590  			u8 queue_id = pri2cos[i];
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1591  			u8 queue_idx;
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1592  
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1593  			/* Per port queue IDs start from 0, 10, 20, etc */
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1594  			queue_idx = queue_id % 10;
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1595  			if (queue_idx >= BNGE_MAX_QUEUE) {
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1596  				bn->pri2cos_valid = false;
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1597  				bnge_hwrm_req_drop(bd, req_qc);
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10 @1598  				return rc;
-
-return -EINVAL;
-
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1599  			}
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1600  			for (j = 0; j < bd->max_q; j++) {
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1601  				if (bd->q_ids[j] == queue_id)
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1602  					bn->pri2cos_idx[i] = queue_idx;
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1603  			}
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1604  		}
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1605  		bn->pri2cos_valid = true;
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1606  	}
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1607  	bnge_hwrm_req_drop(bd, req_qc);
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1608  
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1609  	return rc;
-598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1610  }
-
+diff --git a/net/sunrpc/sysfs.c b/net/sunrpc/sysfs.c
+index 55da1b627a7d..83ba1f2adf62 100644
+--- a/net/sunrpc/sysfs.c
++++ b/net/sunrpc/sysfs.c
+@@ -113,11 +113,14 @@ static ssize_t rpc_sysfs_xprt_srcaddr_show(struct kobject *kobj,
+ 		return 0;
+ 
+ 	sock = container_of(xprt, struct sock_xprt, xprt);
+-	if (kernel_getsockname(sock->sock, (struct sockaddr *)&saddr) < 0)
++	mutex_lock(&sock->recv_mutex);
++	if (sock->sock == NULL ||
++	    kernel_getsockname(sock->sock, (struct sockaddr *)&saddr) < 0)
+ 		goto out;
+ 
+ 	ret = sprintf(buf, "%pISc\n", &saddr);
+ out:
++	mutex_unlock(&sock->recv_mutex);
+ 	xprt_put(xprt);
+ 	return ret + 1;
+ }
+diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+index 9e122c20fcc6..07acc6845ce2 100644
+--- a/net/sunrpc/xprtsock.c
++++ b/net/sunrpc/xprtsock.c
+@@ -1680,7 +1680,12 @@ static int xs_get_srcport(struct sock_xprt *transport)
+ unsigned short get_srcport(struct rpc_xprt *xprt)
+ {
+ 	struct sock_xprt *sock = container_of(xprt, struct sock_xprt, xprt);
+-	return xs_sock_getport(sock->sock);
++	unsigned short ret = 0;
++	mutex_lock(&sock->recv_mutex);
++	if (sock->sock)
++		ret = xs_sock_getport(sock->sock);
++	mutex_unlock(&sock->recv_mutex);
++	return ret;
+ }
+ EXPORT_SYMBOL(get_srcport);
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
 
 
