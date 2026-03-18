@@ -1,260 +1,201 @@
-Return-Path: <netdev+bounces-268906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268908-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sGtNChpWumm8UQIAu9opvQ
-	(envelope-from <netdev+bounces-268906-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:36:58 +0100
+	id iNUbBIJYumnFUgIAu9opvQ
+	(envelope-from <netdev+bounces-268908-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:47:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C62AD2B70A8
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:36:57 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9D452B7288
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:47:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5EFEC30D3C98
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:33:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 054D9300C323
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6784036B07C;
-	Wed, 18 Mar 2026 07:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5CB36C0CC;
+	Wed, 18 Mar 2026 07:47:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ev7K8/+z"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F9T1rMU8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD07B36B06C;
-	Wed, 18 Mar 2026 07:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DA536B056
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 07:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773819222; cv=none; b=M2j5IhgT+3v8qxvhGNiQmilhRKx9FzEWlCsbp1GzImfj/wJ9Eg8dn1s5yn02qcIEAZh9IRzSHTuq/obODtTD6tvMjUgQG0nW0wsPKw+x4hexf91GFIJpUGmkB123ZCc/x/YQ77fNH7n9M9gwBVWXQxNlwk5nowNhdJW/wn/fRYs=
+	t=1773820029; cv=none; b=cWOsoS/7f4xE5skgKtxz5hB0qetXuXIB/NLvdwRIyKvHQMb7hbeCdPVAOgh94s/Tx6cUTlJniHBOZn0aScnvzix3blmgI9ouz2HnY9oMa5niSIPCYhx9eSw5x0rEnYSVrsXya2/PF03/THoPrBQcFNHPiBe5COxjmH1KgeporvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773819222; c=relaxed/simple;
-	bh=B3R+mdz9+srz/u/D7zxiXkUi1ulw4C3RXh7bRBZg6Uc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R66gun9XMhy6By+1P7a5GdLP6GLIpVfXfFzRuq96eK/iA2EfT7o4C1ac/9ej/ts2lWsyiYUvcoCn1HYtINV06cxA0IcQhj7qS4AxfV48OBcReK5TV5Fp11zaLZ0C24EMnz2hvzRFTH1HdTz5BTZjz0TCZZ59X6+/+NcPjw9aHBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ev7K8/+z; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1773819218; h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
-	bh=xJ6Ve71kZ8TR367kXQcst/+kQqNvnuMsg/aXhEMf5ZQ=;
-	b=ev7K8/+zsfum56q0zgR3lFVMbg56o4t5540bYwkTfqTgdupMw05Xf2F6DaHc8W6XZwr9zXjVZ0w4oZYcrEK0jpRtgXO4OhYsYpISGe4tM0qzQ1l338loLzpamF6O5A+yBHmn9uEaE6PPh9rX3ZKLFbTfLo+ytWtsp/eaEwbiKA8=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=35;SR=0;TI=SMTPD_---0X.DXu3Y_1773819214;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0X.DXu3Y_1773819214 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 18 Mar 2026 15:33:36 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: tglx@kernel.org,
-	tglx@linutronix.de,
-	richardcochran@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	jstultz@google.com,
-	anna-maria@linutronix.de,
-	frederic@kernel.org,
-	daniel.lezcano@kernel.org,
-	sboyd@kernel.org
-Cc: vladimir.oltean@nxp.com,
-	wei.fang@nxp.com,
-	xiaoning.wang@nxp.com,
-	jonathan.lemon@gmail.com,
-	vadim.fedorenko@linux.dev,
-	yangbo.lu@nxp.com,
-	svens@linux.ibm.com,
-	dwmw2@infradead.org,
-	nick.shi@broadcom.com,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	linux-fpga@vger.kernel.org,
-	imx@lists.linux.dev,
-	linux-s390@vger.kernel.org,
-	dust.li@linux.alibaba.com,
-	xuanzhuo@linux.alibaba.com,
-	mani@kernel.org,
-	imran.shaik@oss.qualcomm.com,
-	taniya.das@oss.qualcomm.com
-Subject: [PATCH 2/2] MAINTAINERS: update PTP maintainer entries after directory split
-Date: Wed, 18 Mar 2026 15:33:30 +0800
-Message-Id: <20260318073330.115808-3-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20260318073330.115808-1-guwen@linux.alibaba.com>
-References: <20260318073330.115808-1-guwen@linux.alibaba.com>
+	s=arc-20240116; t=1773820029; c=relaxed/simple;
+	bh=6AyM+5lJ+dSs+SjiqVmcLVaC5WWE37JafHboRqppUoA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=DctZDROsKpvVJImN8EdGK0BMxfwZH9xFyYlzn/Ti0NiTkpOcfHJ+hzGiN6mDtfcxR3pHXbciaTc3W5e0AoJ9DnZolGBcPLavA35OcX+W+o5IE3nJQL5dAbVU6tvWc6xAJydxbYUEUT//s6cmIK079R8jMhYGn6uS/5QtrgD6J4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=F9T1rMU8; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-48541edecf9so71336735e9.1
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 00:47:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1773820027; x=1774424827; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XdQh/lG6wJGknLC6Mk9SsT+zVzn0gaCcGpcDHBd/XtU=;
+        b=F9T1rMU8dGECHgIjfHimC/PRb623nkP3VWY12D2nviLt1rKJ/V0V91f7xBZoscBTzR
+         Z95BgkbgU+s3Z8FWJE72VXqz7Qg2Ot7348sH1o4g0MKLLOF9JGsiiIyZAPno6F0z2p6j
+         oikPJbJ4kRzGLWHl8+dr2OJo2ZqU0IvJqloYX8ouLGGsKhBm8fssCWYJanXiWyc9fng4
+         7e1DRuftQ/M24Khqdxbk588UEisj/6KOjAmS7Qubhczj93q9pqRXpRnZPNToYDL80Tvn
+         d01EUQBHV7W6c2o7TdEgJqybLsJia65I3OQGwyqeBd54fEQ2z+8pm6HYutSlh/Pe9rAl
+         iFcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773820027; x=1774424827;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XdQh/lG6wJGknLC6Mk9SsT+zVzn0gaCcGpcDHBd/XtU=;
+        b=LpcC5FVeHEJz8vkF4IQ24wgK0jPW1hadLF6twQGVzlOr/z6f+N9qbcpk53xAUoUyfJ
+         eic8z9LLEg7UY1J5Z2bIFBdOySbzNSiiRycHkEKcI9trIXTno8Zk32jrqLzFui1efL9n
+         l4D594Cl50IubfG08K1bk0+x12DqezqjAUcIdAiwU7ixilCIxDlaxXTUOxUyMl8FkiMl
+         0LP1fIzJGtd07fiS5Y1W/S0jMhJewhoMUBlAbei65o21p5as0l1nucOkPKG17YkiP5oK
+         gPghVQgFZsylDd11qCpYTZz3ST/2x4Ismc+BjGJKShlX45HE2G24aGbmextU7WD19D6J
+         p7ag==
+X-Forwarded-Encrypted: i=1; AJvYcCWvtjPgrhko6ha5WmEpBLKM0DTPg1UaLzSa++7yvHo3DYWbHLORehIhSyH6NbBoughoRKEwPrI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMYklaJSiiO+KcaTv4DZ8mPSxT6K3JLTD5ObOzuZ33tsehe4ad
+	qTF6nbNzyU6Rt0jIS0Qex+P+sEUUNQ63uy16yXqC3PyKiTJJt0gJNIyg2lsfXb0KkmQ=
+X-Gm-Gg: ATEYQzxwwmXZ8QTiKa6fNitum5PaFwaSoFlPAA3vIDR5GVCj7avm/5s3VaBAlzxNZID
+	6RDhIL7ZekV/w/uG/1W0/J1dPptczUge1iM/XAqU9Em9T0VsSIHIfkeO+RgheX+wXQO2YHrELEK
+	RXsghh1vNTjowT7JXcFORYk/naGvG6XA24o5SEsZj5y3t6hjUaL4bAOjUPrKBjgvxrz6egCv7/f
+	qfzSnJ6+w9gSXryuqw8n26zPd7BwqHBbxqBa2sUqmgMlQGVT1Xbw50LSubkXX+2STLaZ3nLottp
+	Z20+OFSPYf8dUYGEqCxp7WHspvIJba2GpSvKeGcFZlV1on+73m1aRWprg9yLJPuF+9tP27mzMkF
+	/54TRGJ+fnSOrVEOmBDwFRq23ooNhrouLRXJ9kKze2W5v9QfuKOZ/NFumsqvbBxOsxspqRjYRnw
+	WGBJwhe4YgT89uOD+HvRri8yAlsqK2c8ETqqhOPgE=
+X-Received: by 2002:a05:600c:c491:b0:485:3f58:d9f with SMTP id 5b1f17b1804b1-486f4465d04mr38125605e9.30.1773820026579;
+        Wed, 18 Mar 2026 00:47:06 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4856ea8fad1sm216587555e9.1.2026.03.18.00.47.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Mar 2026 00:47:06 -0700 (PDT)
+Date: Wed, 18 Mar 2026 10:47:03 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev,
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
+	vikas.gupta@broadcom.com,
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
+	Rahul Gupta <rahul-rg.gupta@broadcom.com>,
+	Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
+Subject: Re: [PATCH net-next v6 06/10] bng_en: add HW stats infra and
+ structured ethtool ops
+Message-ID: <202603180509.nOQGZrG0-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-6.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260310144044.21672-7-bhargava.marreddy@broadcom.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268906-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268908-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,linutronix.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[nxp.com,gmail.com,linux.dev,linux.ibm.com,infradead.org,broadcom.com,vger.kernel.org,lists.linux.dev,linux.alibaba.com,kernel.org,oss.qualcomm.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[35];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[guwen@linux.alibaba.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C62AD2B70A8
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:dkim,linaro.org:email,intel.com:email,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,01.org:url]
+X-Rspamd-Queue-Id: A9D452B7288
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Update MAINTAINERS to match the new drivers/ptp/ directory layout after
-splitting emulated and IEEE 1588 network-oriented drivers into
-subdirectories.
+Hi Bhargava,
 
-Adjust file patterns and per-driver entries to point to their new
-locations, and add a dedicated MAINTAINERS entry for the emulated PTP
-clock drivers.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
----
- MAINTAINERS | 38 ++++++++++++++++++++++++++------------
- 1 file changed, 26 insertions(+), 12 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Bhargava-Marreddy/bng_en-add-per-PF-workqueue-timer-and-slow-path-task/20260310-231948
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260310144044.21672-7-bhargava.marreddy%40broadcom.com
+patch subject: [PATCH net-next v6 06/10] bng_en: add HW stats infra and structured ethtool ops
+config: arm64-randconfig-r071-20260317 (https://download.01.org/0day-ci/archive/20260318/202603180509.nOQGZrG0-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 8.5.0
+smatch: v0.5.0-9004-gb810ac53
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5d477fd592db..1df4fed77284 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10250,7 +10250,7 @@ F:	Documentation/devicetree/bindings/ptp/fsl,ptp.yaml
- F:	drivers/net/ethernet/freescale/dpaa2/dpaa2-ptp*
- F:	drivers/net/ethernet/freescale/dpaa2/dprtc*
- F:	drivers/net/ethernet/freescale/enetc/enetc_ptp.c
--F:	drivers/ptp/ptp_qoriq.c
-+F:	drivers/ptp/ieee1588/ptp_qoriq.c
- F:	include/linux/fsl/ptp_qoriq.h
- 
- FREESCALE QUAD SPI DRIVER
-@@ -13129,7 +13129,7 @@ INTEL PTP DFL ToD DRIVER
- L:	linux-fpga@vger.kernel.org
- L:	netdev@vger.kernel.org
- S:	Orphan
--F:	drivers/ptp/ptp_dfl_tod.c
-+F:	drivers/ptp/ieee1588/ptp_dfl_tod.c
- 
- INTEL QUADRATURE ENCODER PERIPHERAL DRIVER
- M:	Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-@@ -18309,7 +18309,10 @@ F:	Documentation/devicetree/bindings/net/
- F:	Documentation/networking/net_cachelines/net_device.rst
- F:	drivers/connector/
- F:	drivers/net/
--F:	drivers/ptp/
-+F:	drivers/ptp/Kconfig
-+F:	drivers/ptp/Makefile
-+F:	drivers/ptp/ieee1588/
-+F:	drivers/ptp/ptp*
- F:	drivers/s390/net/
- F:	include/dt-bindings/net/
- F:	include/linux/cn_proc.h
-@@ -19092,7 +19095,7 @@ L:	imx@lists.linux.dev
- L:	netdev@vger.kernel.org
- S:	Maintained
- F:	Documentation/devicetree/bindings/ptp/nxp,ptp-netc.yaml
--F:	drivers/ptp/ptp_netc.c
-+F:	drivers/ptp/ieee1588/ptp_netc.c
- 
- NXP PF5300/PF5301/PF5302 PMIC REGULATOR DEVICE DRIVER
- M:	Woodrow Douglass <wdouglass@carnegierobotics.com>
-@@ -19802,7 +19805,7 @@ OPENCOMPUTE PTP CLOCK DRIVER
- M:	Vadim Fedorenko <vadim.fedorenko@linux.dev>
- L:	netdev@vger.kernel.org
- S:	Maintained
--F:	drivers/ptp/ptp_ocp.c
-+F:	drivers/ptp/ieee1588/ptp_ocp.c
- 
- OPENCORES I2C BUS DRIVER
- M:	Peter Korsgaard <peter@korsgaard.com>
-@@ -21238,15 +21241,26 @@ W:	http://linuxptp.sourceforge.net/
- F:	Documentation/ABI/testing/sysfs-ptp
- F:	Documentation/driver-api/ptp.rst
- F:	drivers/net/phy/dp83640*
--F:	drivers/ptp/*
-+F:	drivers/ptp/Kconfig
-+F:	drivers/ptp/Makefile
-+F:	drivers/ptp/ieee1588/
-+F:	drivers/ptp/ptp*
- F:	include/linux/ptp_cl*
- K:	(?:\b|_)ptp(?:\b|_)
- 
-+PTP EMULATED CLOCK SUPPORT
-+M:	Wen Gu <guwen@linux.alibaba.com>
-+M:	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-+L:	linux-kernel@vger.kernel.org
-+S:	Maintained
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git timers/core
-+F:	drivers/ptp/emulated/
-+
- PTP MOCKUP CLOCK SUPPORT
- M:	Vladimir Oltean <vladimir.oltean@nxp.com>
- L:	netdev@vger.kernel.org
- S:	Maintained
--F:	drivers/ptp/ptp_mock.c
-+F:	drivers/ptp/ieee1588/ptp_mock.c
- F:	include/linux/ptp_mock.h
- 
- PTP VIRTUAL CLOCK SUPPORT
-@@ -21258,10 +21272,10 @@ F:	net/ethtool/phc_vclocks.c
- 
- PTP VMCLOCK SUPPORT
- M:	David Woodhouse <dwmw2@infradead.org>
--L:	netdev@vger.kernel.org
-+L:	linux-kernel@vger.kernel.org
- S:	Maintained
- F:	Documentation/devicetree/bindings/ptp/amazon,vmclock.yaml
--F:	drivers/ptp/ptp_vmclock.c
-+F:	drivers/ptp/emulated/ptp_vmclock.c
- F:	include/uapi/linux/vmclock-abi.h
- 
- PTRACE SUPPORT
-@@ -23320,7 +23334,7 @@ S390 PTP DRIVER
- M:	Sven Schnelle <svens@linux.ibm.com>
- L:	linux-s390@vger.kernel.org
- S:	Supported
--F:	drivers/ptp/ptp_s390.c
-+F:	drivers/ptp/emulated/ptp_s390.c
- 
- S390 SCM DRIVER
- M:	Vineeth Vijayan <vneethv@linux.ibm.com>
-@@ -28216,9 +28230,9 @@ M:	Nick Shi <nick.shi@broadcom.com>
- R:	Ajay Kaher <ajay.kaher@broadcom.com>
- R:	Alexey Makhalov <alexey.makhalov@broadcom.com>
- R:	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
--L:	netdev@vger.kernel.org
-+L:	linux-kernel@vger.kernel.org
- S:	Supported
--F:	drivers/ptp/ptp_vmw.c
-+F:	drivers/ptp/emulated/ptp_vmw.c
- 
- VMWARE VMCI DRIVER
- M:	Bryan Tan <bryan-bt.tan@broadcom.com>
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202603180509.nOQGZrG0-lkp@intel.com/
+
+smatch warnings:
+drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c:1598 bnge_hwrm_port_qstats_ext() warn: missing error code? 'rc'
+
+vim +/rc +1598 drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1576  	rc = bnge_hwrm_req_init(bd, req_qc, HWRM_QUEUE_PRI2COS_QCFG);
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1577  	if (rc)
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1578  		return rc;
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1579  
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1580  	req_qc->flags = cpu_to_le32(QUEUE_PRI2COS_QCFG_REQ_FLAGS_IVLAN);
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1581  
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1582  	resp_qc = bnge_hwrm_req_hold(bd, req_qc);
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1583  	rc = bnge_hwrm_req_send(bd, req_qc);
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1584  	if (!rc) {
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1585  		u8 *pri2cos;
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1586  		int i, j;
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1587  
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1588  		pri2cos = &resp_qc->pri0_cos_queue_id;
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1589  		for (i = 0; i < 8; i++) {
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1590  			u8 queue_id = pri2cos[i];
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1591  			u8 queue_idx;
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1592  
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1593  			/* Per port queue IDs start from 0, 10, 20, etc */
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1594  			queue_idx = queue_id % 10;
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1595  			if (queue_idx >= BNGE_MAX_QUEUE) {
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1596  				bn->pri2cos_valid = false;
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1597  				bnge_hwrm_req_drop(bd, req_qc);
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10 @1598  				return rc;
+
+return -EINVAL;
+
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1599  			}
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1600  			for (j = 0; j < bd->max_q; j++) {
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1601  				if (bd->q_ids[j] == queue_id)
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1602  					bn->pri2cos_idx[i] = queue_idx;
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1603  			}
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1604  		}
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1605  		bn->pri2cos_valid = true;
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1606  	}
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1607  	bnge_hwrm_req_drop(bd, req_qc);
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1608  
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1609  	return rc;
+598cdbbcf8f4c1 Bhargava Marreddy 2026-03-10  1610  }
+
 -- 
-2.43.5
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
 
