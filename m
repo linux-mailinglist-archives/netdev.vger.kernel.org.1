@@ -1,128 +1,222 @@
-Return-Path: <netdev+bounces-269156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269158-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MI9ZKDz6umlwdwIAu9opvQ
-	(envelope-from <netdev+bounces-269156-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 20:17:16 +0100
+	id AFF2M3X5umlwdwIAu9opvQ
+	(envelope-from <netdev+bounces-269158-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 20:13:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A68EE2C1E8E
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 20:17:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DF4F2C1DDC
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 20:13:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8A3D33061B64
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 19:10:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 40A0B301225B
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 19:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241D33EDAB7;
-	Wed, 18 Mar 2026 19:10:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BAF93F0741;
+	Wed, 18 Mar 2026 19:13:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mQ/IanJ4"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="YWOC/CGg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013803D648C;
-	Wed, 18 Mar 2026 19:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A791836AB77
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 19:13:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773861048; cv=none; b=gUnDPa0MAuSkLleaM0cWRj/kDWyZysVn/Bc6ZvoK9wB/r8j0u7M2fh9dgEJHJnZhMM4wsLgZId6ht2ngkOai8wF2uAZVxdQgmts3T7xiyXTgPHljqXiSTGcyNHG+qJwr3rK0z5iiK5+/9BKJ/20p6sZi3rGdBmc/xcvctyaOPRc=
+	t=1773861219; cv=none; b=IIoz2g8df6NjUMCo1pvH7RV/vKZB/ITPFivsgbY4Ybr22aF/7kcXaOfY3dBX92OG4SG7Kz54w8fZZx27bPatjlLmgNQTsqEgwJ9jS1XkgdgUM3cz4MC5/l6db1V5r8Z4cC3lrSBn6LtDCLTL8J1oIZHN4q3dKSdivtZOUl0fQkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773861048; c=relaxed/simple;
-	bh=vF85Ld0H6v3LbIAsot0GTMPeWPK6vbEVmdTJ6kKOmOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aGxP2HBN93wyFuGdlJY03NpaZrDp9aCCp/zqruLQ/3SP4Uw7LmXwatmbWvX7aNEPhVrXryhYR+qbP4VQiZvAU/tcZm4XPbtX3xH0HaoxwB9i+a84wuJ5G/QzllLLPVFOt843FW+SQZg/6B2NffS2e/YAadi9o7ORElHpZZaU7dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mQ/IanJ4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39C38C19421;
-	Wed, 18 Mar 2026 19:10:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773861047;
-	bh=vF85Ld0H6v3LbIAsot0GTMPeWPK6vbEVmdTJ6kKOmOE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mQ/IanJ4j3o4pZIhiIO5nts3zfsvyUQq9H3+Y+jpQG8mLEb3ylcLGVNC9QXb8eBnd
-	 GMZzg9ZUq/dq36gkarg89AjRYzKl99ASpFPEBx5XdZW4vmD88eXiZkCy78bxLxn9AQ
-	 i+3fXi4IycLKH7iKtpQMU78bnuHADyRkLZkF4OjmLGy2yV5dWgrf7CKLm1wBmV600C
-	 EUh/LpIQuX3AKaVvMD9OIR5z2ZAeT0IBLYNc8Ku2XMwE85azK5eKOWHL15poVlY/lG
-	 1vDlTSztWyXKYipWdtM1S7sPInO4iAz1cL5rL9XiHPdIMDgr5jClwKU35y/bMD/WnR
-	 k4rBsXSMD1Uiw==
-Date: Wed, 18 Mar 2026 12:10:37 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [PATCH net-next] net/mlx5e: Enable mac forwarding on uplink
- representor
-Message-ID: <abr4O7rfDoOIKHYW@sx113>
-References: <20260310104841.1862380-1-tariqt@nvidia.com>
- <20260311203319.76d35ce0@kernel.org>
- <abmZf3bRl2uQ69EA@sx113>
- <20260317143653.0eaa50a1@kernel.org>
+	s=arc-20240116; t=1773861219; c=relaxed/simple;
+	bh=zq6SIIe6VBNnq2RLu2Ekgp/vfo9WjPGja2rAagsa9+U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LbcU7xPhv5IeFCeBCSgrIOY+HH6iz46HLmeoCDvmbvY8BXIVGJ82V9Jgxax4jZz7ITMBrHvVqbMDOfWU5wR2hkCAwyNzorDcP+C6n2xk7U1ijPBIIrFdLRt2SuOa5ORHwXdf1O9MSh6oqVNYYMjDJ73+eiL4cknELRgPLHsMDH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=YWOC/CGg; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2b05fd1d147so704645ad.2
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 12:13:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1773861214; x=1774466014; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OLaI6cDBCSLOI+7sce9oAExFHAqYivA42p2ESlxNWPY=;
+        b=YWOC/CGgIA8ZH8k5Dd15WlvrUcQ2evS4iMWQcOqXW6+JMhmtJKqZpPSVIx5ek1tprq
+         MYIAeISicgLtairgLecCXvoM8vEuk5QVy7cte0pQoCzIKZfxs7TfS//LkTs/CH6uQtvl
+         DV9JSR0Md0XBU0rRDBGfe0iSit7VgSvTK12x2PYFyrvKWy19GqYzteUG0X6ni3FRgUXz
+         ucLShJ/+uaZCU61sEBmimzQj/WdfoOEtmYjHUQz5U+Tk9PydXL2d31sh19Bc1DokDwz8
+         Y1P47ScoysHymYgef9+OPW/+irri3Pl10ReotQ2/r9FDxXaibYgmtqlZBUYmyQEyh20G
+         S8Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773861214; x=1774466014;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OLaI6cDBCSLOI+7sce9oAExFHAqYivA42p2ESlxNWPY=;
+        b=ARxPtLgD3OnPfdQFHeQ2cJ2Ss4o4BeAaH9QQBvOxGAj4RDG91OSAc614HoxoiXv2oA
+         7e+W0d02dKUFkz4ROaTDTMDNsiY7JGHm6nH7oZavkmDx8ccCc+ttBufHj2a6oAp5IVdB
+         TOkgQYiSQarzsVtkDlbef1uV4ghTuRypFKg2CuBHDnqNXK5IjTwSY+l5h50hao2XSPv7
+         SvK0+Tj4UpA07Kax0HDqmwWzOcdGKxL6BtpECEcpCPbogxVZv6W2JNHaNMoTjZlTcIYA
+         nr9q47E5ISAuGHDecvDYSzerPwT0pqzkYhNJcDWHfRNAluohNrtjDEqNu80219R8/Y7D
+         FHDA==
+X-Gm-Message-State: AOJu0Ywu/OlF7O5stiMgd4Dj/2o+RCtseEEj0gxVN6j8fiFITtA0e7P1
+	IFXb2eMfm3h3V+/TRD0VVqxqoZYzHAa2GI8YRnzy65fUy4cdJVv0PjKpip59KLwgm6jJIaMACNO
+	dZfGRj8Y=
+X-Gm-Gg: ATEYQzx1nKFaAZ/2V7Bm1NBnjbED7qnIddfeWB4gQ4rIIDJd87BTb9DKffnzC9E5/Kf
+	sQ+G6zBBbrZkpwmvubuFLcrUOwKjdZikrOJZgCwyjw/F2X87vNFRCsCk9xy6flSvHexLVRHUZ2G
+	fBfpNsRRu+fCuI7je9KtqVK3Q7HOdycnTh9mihWYgogOJP5IbYeINwC1D3aK3nf/Gm5YQkSLsPw
+	hYJzmWZnI3cCrGf0lyYuIIVwG5Wao8y00TC+pfwICjblly2UmATTWzRGyy8OvpkI46ErjsHdqPX
+	bpZ0GeGm2Msdna6LCKbCPXU/BkJ9ION1V/QiU6UjkA9qO3A18hWxV4WSGoXUFOIamRFQrmh76Zn
+	VrxKME4uSJeG9+8djlFv4yzx3a0YRY398oDBlwmL58ZHOpGQhNRJw71PmJUT3OuQfYxbyA1ZCX1
+	sXY0A=
+X-Received: by 2002:a17:903:b85:b0:2b0:5661:e10f with SMTP id d9443c01a7336-2b06e43f61dmr39625155ad.53.1773861214465;
+        Wed, 18 Mar 2026 12:13:34 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:6::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b06e454a8fsm33325395ad.37.2026.03.18.12.13.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Mar 2026 12:13:34 -0700 (PDT)
+From: Joe Damato <joe@dama.to>
+To: netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	linux-kernel@vger.kernel.org,
+	leon@kernel.org,
+	Joe Damato <joe@dama.to>
+Subject: [net-next v3 00/12] Add TSO map-once DMA helpers and bnxt SW USO support
+Date: Wed, 18 Mar 2026 12:13:05 -0700
+Message-ID: <20260318191325.1819881-1-joe@dama.to>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260317143653.0eaa50a1@kernel.org>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269156-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269158-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DMARC_NA(0.00)[dama.to];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.946];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[saeed@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-0.982];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: A68EE2C1E8E
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 6DF4F2C1DDC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 17 Mar 14:36, Jakub Kicinski wrote:
->On Tue, 17 Mar 2026 11:12:15 -0700 Saeed Mahameed wrote:
->> On 11 Mar 20:33, Jakub Kicinski wrote:
->> >On Tue, 10 Mar 2026 12:48:41 +0200 Tariq Toukan wrote:
->> >> This small patch enables mac forwarding to MPFs via uplink representor,
->> >
->> >"mac forwarding to MPF via uplink representor"
->> >Can't wrap my head around this "via". Could you explain this better?
->> >Perhaps some tool can spit out a little diagram to make the flow clear?
->> >
->>
->> Mac forwarding in the sense of linux bridge mac forwarding mechanism which
->> requires set_rx_mode ndo to be implemented.
->>
->> Linux-bridge --> mlx5-uplink-rep --> set_rx_mode --> set up mac in HW.
->
->And the actual forwarding happens in SW bridge? This is just to
->configure the Rx filter not to discard on Rx?
+Greetings:
 
-Yes Forwarding happens on the SW bridge, just to register the mac so it
-won't get dropped.
+This series extends net/tso to add a data structure and some helpers allowing
+drivers to DMA map headers and packet payloads a single time. The helpers can
+then be used to reference slices of shared mapping for each segment. This
+helps to avoid the cost of repeated DMA mappings, especially on systems which
+use an IOMMU. N per-packet DMA maps are replaced with a single map for the
+entire GSO skb. As of v3, the series uses the DMA IOVA API (as suggested by
+Leon [1]) and provides a fallback path when an IOMMU is not in use. The DMA
+IOVA API provides even better efficiency than the v2; see below.
+
+The added helpers are then used in bnxt to add support for software UDP
+Segmentation Offloading (SW USO) for older bnxt devices which do not have
+support for USO in hardware. Since the helpers are generic, other drivers
+can be extended similarly.
+
+The v2 showed a ~4x reduction in DMA mapping calls at the same wire packet
+rate on production traffic with a bnxt device. The v3, however, shows a larger
+reduction of about ~6x at the same wire packet rate. This is thanks to Leon's
+suggestion of using the DMA IOVA API [1].
+
+Special care is taken to make bnxt ethtool operations work correctly: the ring
+size cannot be reduced below a minimum threshold while USO is enabled and
+growing the ring automatically re-enables USO if it was previously blocked.
+
+I've extended netdevsim to have support for SW USO, but I used
+tso_build_hdr/tso_build_data in netdevsim because I couldn't figure out if
+there was a way to test the DMA helpers added by this series. If anyone has
+suggestions, let me know. I think to test the DMA helpers you probably need
+to use real hardware.
+
+I ran the added uso.py test on both netdevsim and a real bnxt and the test
+passed. I've also let this run in a production environment for ~24 hours.
+
+Thanks,
+Joe
+
+[1]: https://lore.kernel.org/netdev/20260316194419.GH61385@unreal/
+
+v3:
+  - Converted from RFC to an actul submission.
+  - Updated based on Leon's feedback to use the DMA IOVA API. See individual
+    patches for update information.
+
+RFCv2: https://lore.kernel.org/netdev/20260312223457.1999489-1-joe@dama.to/
+  - Some bugs were discovered shortly after sending: incorrect handling of the
+    shared header space and a bug in the unmap path in the TX completion.
+    Sorry about that; I was more careful this time.
+  - On that note: this rfc includes a test.
+
+RFCv1: https://lore.kernel.org/netdev/20260310212209.2263939-1-joe@dama.to/
+
+
+Joe Damato (12):
+  net: tso: Introduce tso_dma_map
+  net: tso: Add tso_dma_map helpers
+  net: bnxt: Export bnxt_xmit_get_cfa_action
+  net: bnxt: Add a helper for tx_bd_ext
+  net: bnxt: Use dma_unmap_len for TX completion unmapping
+  net: bnxt: Add TX inline buffer infrastructure
+  net: bnxt: Add boilerplate GSO code
+  net: bnxt: Implement software USO
+  net: bnxt: Add SW GSO completion and teardown support
+  net: bnxt: Dispatch to SW USO
+  net: netdevsim: Add support for SW USO
+  selftests: drv-net: Add USO test
+
+ drivers/net/ethernet/broadcom/bnxt/Makefile   |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 190 +++++++++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  33 +++
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  19 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c | 236 +++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h |  31 ++
+ drivers/net/netdevsim/netdev.c                | 100 ++++++-
+ include/linux/skbuff.h                        |  11 +
+ include/net/tso.h                             |  61 ++++
+ net/core/tso.c                                | 274 ++++++++++++++++++
+ tools/testing/selftests/drivers/net/Makefile  |   1 +
+ tools/testing/selftests/drivers/net/uso.py    |  87 ++++++
+ 12 files changed, 1005 insertions(+), 40 deletions(-)
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h
+ create mode 100755 tools/testing/selftests/drivers/net/uso.py
+
+
+base-commit: 8737d7194d6d5947c3d7d8813895b44a25b84477
+-- 
+2.52.0
 
 
