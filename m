@@ -1,77 +1,65 @@
-Return-Path: <netdev+bounces-268913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268914-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4BUTAcNdumnFUgIAu9opvQ
-	(envelope-from <netdev+bounces-268913-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:09:39 +0100
+	id qDWPGtxgumnFUgIAu9opvQ
+	(envelope-from <netdev+bounces-268914-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:22:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D63052B7903
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:09:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD8002B7D5F
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:22:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C61B7302650D
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:08:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CFA513077683
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:12:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761D13783C7;
-	Wed, 18 Mar 2026 08:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C18837187A;
+	Wed, 18 Mar 2026 08:12:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="asCFNjjn"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="C1hAtPYT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E18377022
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 08:07:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A026376462;
+	Wed, 18 Mar 2026 08:11:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773821263; cv=none; b=WE3GpbVT3Zm81PZT3EsHCyUTTHRcI3H0sL53EN5ARaYVlj/6gSPe09mG7KPx33xtbZ0ren/YBUKUFadA/fqfLvtSI98XRzO3F8b2gUBA+/P41y9bF3unVeIjYXoF5Z4qIAO/bZ2jbNQwJTEKzrlQ7QTy46IalAvSSW+AE+JgLPE=
+	t=1773821530; cv=none; b=GzOf5Z0oXH4RYnQFRu77580BrEWe9E31iU6xS3HbWHkfeh/UMkBB12RTHQ8Rxv0NVxDj++BUH74zKyO52qVJyFSTvGz35dd0xaZPspPxkYMSD6VTZSpgTrg98kYC89Tqvhvt0bwT11IrkvMptF85Z49+nQ4VLVZBjoboAiE+k28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773821263; c=relaxed/simple;
-	bh=eeZWTl75BvHWnhfVyBuJjwwR4iwIkFpT5X5IlIOY/jM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F36k6ImD+7jz85lth27FF6v4PRDJsBeq9GXUHA2n17KpMEmqIS7Ar1Rs2MkW44Av/YYxdm0A0dIveYrBpx2oFOgvzIwTxUyvwkxI2oJBRwR2I3Ewwo9UXvK1rIwFziCS8ZgMuy2/+Ecx/b+4OotJjHzYBy+3nWz4hx3XSnBClWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=asCFNjjn; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773821262; x=1805357262;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=eeZWTl75BvHWnhfVyBuJjwwR4iwIkFpT5X5IlIOY/jM=;
-  b=asCFNjjn8LZDdKqKeXIP76SQb+T0fd15zyIwLV+VUrq+fPwKQQ6FBSO+
-   cHppQG3p3rfHgCvh29gVmYexzXtwqFQbg2ZREYXQaleQBtj2G7nPzReKY
-   Qi9e2MP4Dtr/doPT2Nf9sDMZQ/PuZP2RQRVOedS4GH/zt9E0ijJv2Gy4d
-   2cGT7yqtEFY6a4RKXfkNqTklD1jvhal+jsoPnM8pHlQJN/fHbXTcFFYI6
-   46YO3pm1dL0UPIz1c8sqQqhxHdoPA9gEBfoIq94m1DZ1A+E2BbJemitAl
-   PXt1S4Ro7OVoEyCCGyNRNriy9Ru0aTOUw08YdpBwjtOveRd4BlsCcrq59
-   Q==;
-X-CSE-ConnectionGUID: rscRRlxTRIOE8MAxx1r8bw==
-X-CSE-MsgGUID: 3lHReDKIR3Woxh0FgrAaTA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11732"; a="74755246"
-X-IronPort-AV: E=Sophos;i="6.23,127,1770624000"; 
-   d="scan'208";a="74755246"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2026 01:07:42 -0700
-X-CSE-ConnectionGUID: bUW14SIoRxmGzN/ouR8bHA==
-X-CSE-MsgGUID: VfEwE6ANTIO4KeolD91YDw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,127,1770624000"; 
-   d="scan'208";a="221628552"
-Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by orviesa006.jf.intel.com with ESMTP; 18 Mar 2026 01:07:40 -0700
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org
-Subject: [PATCH net-next v1 2/2] ice: add 0x88E7 handling to SW validation paths
-Date: Wed, 18 Mar 2026 09:07:36 +0100
-Message-ID: <20260318080737.3012293-3-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260318080737.3012293-1-aleksandr.loktionov@intel.com>
-References: <20260318080737.3012293-1-aleksandr.loktionov@intel.com>
+	s=arc-20240116; t=1773821530; c=relaxed/simple;
+	bh=3XTTl3LEOOJSxh3bPyjhegVTZLN5AHADJeciGinB5gM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XMV8kgayVzdkTjcT2C0Qs2LdIg9ZDXO4JeYLcTyXpITrLTnSuKJdv+tE2p1gHaMRo+qPSw1HOfngcykGztrU8aSmDoIDnK8PtyByIYEH/grEqSeTYowFqqmRB3+j1pQU89p6Xap5ClgUqoy+yaIUDaVQPgjnl7wE6BeXMZ/2eXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=C1hAtPYT; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Tp
+	9i1hh0AXWBiYH65D0/JDIPSB18WNuvMfE8rai68LI=; b=C1hAtPYTqwIb0bgD1Y
+	kX9kPiIRJ+4wn6Ale6USUwVfub0Fh2v/KZnAFzCn2v9SDOTgao+w8N3XUcUjGW4N
+	UUDBR4lB6J9JsYLRHLD/k3mLYrDmCmZ0LOokWkF7YteO+bGuLunoSlHzoYkNYhc8
+	rYAVbqcvuXCY5yVEAZ6L8CuV8=
+Received: from pek-lpg-core5.wrs.com (unknown [])
+	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wD3NyETXrppDMWHBg--.41679S2;
+	Wed, 18 Mar 2026 16:11:00 +0800 (CST)
+From: Robert Garcia <rob_garcia@163.com>
+To: stable@vger.kernel.org,
+	NeilBrown <neilb@suse.de>
+Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Anna Schumaker <anna.schumaker@netapp.com>,
+	Robert Garcia <rob_garcia@163.com>,
+	"J . Bruce Fields" <bfields@fieldses.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Olga Kornievskaia <kolga@netapp.com>,
+	linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 5.15.y] SUNRPC: lock against ->sock changing during sysfs read
+Date: Wed, 18 Mar 2026 16:10:59 +0800
+Message-Id: <20260318081059.1864218-1-rob_garcia@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,117 +67,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3NyETXrppDMWHBg--.41679S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7Kry8tryxKFW5Zr4fZr1fZwb_yoW8uw4kpF
+	yak34fG3yDKrZ7urn5Ar4v9rZxu3WfGF4UGr48C3WFyrZrKF15Jryjkay3ur18urZ5uF43
+	tF4UWF45JF1DAaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pEoGQDUUUUU=
+X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbDARSlEWm6XhSDwgAA35
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268913-lists,netdev=lfdr.de];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268914-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: D63052B7903
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[hammerspace.com,netapp.com,163.com,fieldses.org,oracle.com,davemloft.net,kernel.org,vger.kernel.org];
+	DKIM_TRACE(0.00)[163.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rob_garcia@163.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netapp.com:email]
+X-Rspamd-Queue-Id: DD8002B7D5F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The virtchnl v2 VLAN capability handshake now includes the new
-VIRTCHNL_VLAN_ETHERTYPE_88E7 flag for IEEE 802.1ah B-TAG support.
-Wire up the corresponding software-path handling in ice so the PF
-correctly accepts and translates 0x88E7 (ETH_P_8021AH) VLAN filters
-requested by VFs.
+From: NeilBrown <neilb@suse.de>
 
-Three software-only changes, no hardware offload path affected:
+[ Upstream commit b49ea673e119f59c71645e2f65b3ccad857c90ee ]
 
- - ice_check_supported_vlan_tpid() (ice_tc_lib.c): accept ETH_P_8021AH
-   in the TC VLAN TPID validation switch so 0x88E7-tagged flower filters
-   are not rejected early.
+->sock can be set to NULL asynchronously unless ->recv_mutex is held.
+So it is important to hold that mutex.  Otherwise a sysfs read can
+trigger an oops.
+Commit 17f09d3f619a ("SUNRPC: Check if the xprt is connected before
+handling sysfs reads") appears to attempt to fix this problem, but it
+only narrows the race window.
 
- - validate_vlan() (ice_vsi_vlan_lib.c): allow ETH_P_8021AH as a valid
-   TPID when adding VLAN filters to a VSI, consistent with the other
-   accepted dot1q/dot1ad/QinQ1 TPIDs.
-
- - ice_vc_validate_vlan_tpid() / ice_vc_get_tpid() (virt/virtchnl.c):
-   bidirectional translation between ETH_P_8021AH and
-   VIRTCHNL_VLAN_ETHERTYPE_88E7 in the virtchnl VLAN v2 filter path.
-
-This does not add 0x88E7 hardware offload capability, does not change
-outer-tag programming, and does not alter any datapath.
-
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Fixes: 17f09d3f619a ("SUNRPC: Check if the xprt is connected before handling sysfs reads")
+Fixes: a8482488a7d6 ("SUNRPC query transport's source port")
+Signed-off-by: NeilBrown <neilb@suse.de>
+Signed-off-by: Anna Schumaker <Anna.Schumaker@Netapp.com>
+Signed-off-by: Robert Garcia <rob_garcia@163.com>
 ---
- drivers/net/ethernet/intel/ice/ice_tc_lib.c       | 1 +
- drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c | 3 ++-
- drivers/net/ethernet/intel/ice/virt/virtchnl.c    | 6 ++++++
- 3 files changed, 9 insertions(+), 1 deletion(-)
+ net/sunrpc/sysfs.c    | 5 ++++-
+ net/sunrpc/xprtsock.c | 7 ++++++-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-index d20357c..4560e55 100644
---- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-@@ -174,6 +174,7 @@ static u16 ice_check_supported_vlan_tpid(u16 vlan_tpid)
- 	case ETH_P_8021Q:
- 	case ETH_P_8021AD:
- 	case ETH_P_QINQ1:
-+	case ETH_P_8021AH:
- 		return vlan_tpid;
- 	default:
+diff --git a/net/sunrpc/sysfs.c b/net/sunrpc/sysfs.c
+index 55da1b627a7d..83ba1f2adf62 100644
+--- a/net/sunrpc/sysfs.c
++++ b/net/sunrpc/sysfs.c
+@@ -113,11 +113,14 @@ static ssize_t rpc_sysfs_xprt_srcaddr_show(struct kobject *kobj,
  		return 0;
-diff --git a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
-index 5498496..b67272e 100644
---- a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
-@@ -24,7 +24,8 @@ static void print_invalid_tpid(struct ice_vsi *vsi, u16 tpid)
- static bool validate_vlan(struct ice_vsi *vsi, struct ice_vlan *vlan)
- {
- 	if (vlan->tpid != ETH_P_8021Q && vlan->tpid != ETH_P_8021AD &&
--	    vlan->tpid != ETH_P_QINQ1 && (vlan->tpid || vlan->vid)) {
-+	    vlan->tpid != ETH_P_QINQ1 && vlan->tpid != ETH_P_8021AH &&
-+	    (vlan->tpid || vlan->vid)) {
- 		print_invalid_tpid(vsi, vlan->tpid);
- 		return false;
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/virt/virtchnl.c b/drivers/net/ethernet/intel/ice/virt/virtchnl.c
-index ca8018e..06d2f9b 100644
---- a/drivers/net/ethernet/intel/ice/virt/virtchnl.c
-+++ b/drivers/net/ethernet/intel/ice/virt/virtchnl.c
-@@ -1702,6 +1702,9 @@ static bool ice_vc_validate_vlan_tpid(u16 filtering_caps, u16 tpid)
- 	case ETH_P_QINQ1:
- 		vlan_ethertype = VIRTCHNL_VLAN_ETHERTYPE_9100;
- 		break;
-+	case ETH_P_8021AH:
-+		vlan_ethertype = VIRTCHNL_VLAN_ETHERTYPE_88E7;
-+		break;
- 	}
  
- 	if (!(filtering_caps & vlan_ethertype))
-@@ -2136,6 +2139,9 @@ static int ice_vc_get_tpid(u32 ethertype_setting, u16 *tpid)
- 	case VIRTCHNL_VLAN_ETHERTYPE_9100:
- 		*tpid = ETH_P_QINQ1;
- 		break;
-+	case VIRTCHNL_VLAN_ETHERTYPE_88E7:
-+		*tpid = ETH_P_8021AH;
-+		break;
- 	default:
- 		*tpid = 0;
- 		return -EINVAL;
+ 	sock = container_of(xprt, struct sock_xprt, xprt);
+-	if (kernel_getsockname(sock->sock, (struct sockaddr *)&saddr) < 0)
++	mutex_lock(&sock->recv_mutex);
++	if (sock->sock == NULL ||
++	    kernel_getsockname(sock->sock, (struct sockaddr *)&saddr) < 0)
+ 		goto out;
+ 
+ 	ret = sprintf(buf, "%pISc\n", &saddr);
+ out:
++	mutex_unlock(&sock->recv_mutex);
+ 	xprt_put(xprt);
+ 	return ret + 1;
+ }
+diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+index 9e122c20fcc6..07acc6845ce2 100644
+--- a/net/sunrpc/xprtsock.c
++++ b/net/sunrpc/xprtsock.c
+@@ -1680,7 +1680,12 @@ static int xs_get_srcport(struct sock_xprt *transport)
+ unsigned short get_srcport(struct rpc_xprt *xprt)
+ {
+ 	struct sock_xprt *sock = container_of(xprt, struct sock_xprt, xprt);
+-	return xs_sock_getport(sock->sock);
++	unsigned short ret = 0;
++	mutex_lock(&sock->recv_mutex);
++	if (sock->sock)
++		ret = xs_sock_getport(sock->sock);
++	mutex_unlock(&sock->recv_mutex);
++	return ret;
+ }
+ EXPORT_SYMBOL(get_srcport);
+ 
 -- 
-2.52.0
+2.34.1
 
 
