@@ -1,83 +1,84 @@
-Return-Path: <netdev+bounces-268889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268890-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wBj7ITtIumkFTwIAu9opvQ
-	(envelope-from <netdev+bounces-268889-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:37:47 +0100
+	id sOqHIxlJumkFTwIAu9opvQ
+	(envelope-from <netdev+bounces-268890-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:41:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F24E12B67DB
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:37:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E90452B6838
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:41:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5A9A3304C2D3
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 06:37:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B947D303FDF5
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 06:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB516367F2C;
-	Wed, 18 Mar 2026 06:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CCFC367F2C;
+	Wed, 18 Mar 2026 06:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dy4a4+qh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J7Iqb/Rp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C68C25C80E
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 06:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F134425C80E
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 06:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773815855; cv=none; b=SbfoISM7G2/ihEs9iVCVQCpPhK6hHjOKDjD30v7za7AU62PP6ec4ovWEZYfJEsNjaG1Yr2j1gucc445Q8qevGm3CLw3U+kmxeZfvo0v40xU9NKUBsz7PEPxqxFng9GwYHLaPxFWn8qG86bVfEdAm+DosteE0P4O+VHAq8birO2A=
+	t=1773815860; cv=none; b=eGIAfoZx1JiyYar3TJASVsfw4p2IxbUNpbTMR9mzy54eBZotee4NV9p8GidC19dPLNsSB8t7X9VxGt1UtNwy29Mcrh6bRwdY/kV8jSwZZEM5/6OaowiOUW1R6CjAC2MW7IxqtX3qlc8UQuvwGtZTAtoqAdWdwZnMDVtzYwkEQso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773815855; c=relaxed/simple;
-	bh=4O3QCGLvuxp8TyNV8Xtul/S4j8KUMp0uGU1+uJd2FNc=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qEbIOck+suFYvMruTjZAwh2v/iKDImvGxBtL2qqHPXML/vuaXNux2mza7sd4zY2OEkKNqw1u5aOISh1r9k1YB1PghA3xb7pTLvvhSWaxSmH1Sp7lmXMOgHsRw38mQeLK/g5MfgcjRLsiXpaUvFuHBzZVfZmcDaOt00fQDWN8S40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dy4a4+qh; arc=none smtp.client-ip=209.85.160.169
+	s=arc-20240116; t=1773815860; c=relaxed/simple;
+	bh=2tbsYy2Mku8qTrVZCtuP7abbjxmrsPE3moRK/3+c5kA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=C+1SklMOjbkY4OEs70xpgT6ajfs4/if9p/bp8cgdf1PtsmJ8OseUKLK79I4W8T9tmctdLXeWhEv+LrvTTyzTarqvEfKUJFVKJtpxiBkWN3vLCk7mxe9gYuFb9L02yQ34xzaPXYfbYA8klFIvRwJNydWkHTe838xsCdWF4CY7l3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J7Iqb/Rp; arc=none smtp.client-ip=209.85.160.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-50917e02532so78399881cf.3
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 23:37:34 -0700 (PDT)
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-5094e1d17d3so56362401cf.3
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 23:37:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773815853; x=1774420653; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TJIZ4oOL9g078MWbi96VubW95O3IIVBMwuixA0Lt16A=;
-        b=Dy4a4+qhPSLMXf5HJ/18hZxtqo+cXxTnxOs/lnFJTAZWLsozkxhHSDvzP2ig6OjvOs
-         tgWEGI8IBY2WSkvVV0bNe88oZhFTxOtwd4GkMGvwC9QmWUSahyN6UKO39BVKOnugcQjT
-         NgBqgX+2fnAZIoDOsIrk66iZVFdOXNcM6YpZo/FKMqXFXCA0U30zrexZTQykVLuXt02t
-         E+H0reQqlVxE5Iw8LZ1ruN4OGVB/cneNdAEGitfVLQjPHsyK/u2PhApOzDk63S8Nd4Vs
-         jIJ5yGdUZV0v5pdC4i/94K3I3ODi0mm3WfF/u2MxUUTi0s1S+chy5hjk9ejFvxR3eYny
-         PtZw==
+        d=gmail.com; s=20230601; t=1773815858; x=1774420658; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MHAN2RjWd47ozI2jbJBMDIBVL7XJnDdwoQ9790Qp7pI=;
+        b=J7Iqb/RprgQJLv3JHwYVvOY79oeNBBC8AHLyjpIsBPOhYPGltm8fWoB72UngtumLue
+         woNV0/8o4BK4hM0a3zxaQDuGf8u7GQvMaQULOVFz7mdFg5An261NrX5p/UcqhRO5nllB
+         A7KZWzdNbpfABrvea0asMJX9vyjSTlLrEm1+EzzsgtvN164pkR69xshWChzUVZRWC5yl
+         U5eYGX94j3+x+VaWpkeVoqrTgMYdPQvz0bnhrTznTzX3e5GB7s3oc8AcFsHHir9q7FLK
+         d8ZPfnnOGjWJ8+OQ0tEB/6FUe7BeiQjXihrKE9tHQEjbMXHsfeVi/rP+9eoW/Lvyfkbh
+         Kwjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773815853; x=1774420653;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TJIZ4oOL9g078MWbi96VubW95O3IIVBMwuixA0Lt16A=;
-        b=cgoaEFeT+SBhZSaLaRxbY3+4FRfj6iE61IpKSM3So51SZhrEHxcBrNnyQlbTXY0EYv
-         gieZN29d084gjk2K1vqTLWCs8f5e8KddBST+DOkw2tkgNFdIDJ7fk5YMj1mlQ8jHNjL4
-         ShTkrvQ8xFiKTvnmUFXAxLoFsdO157Rn4vUCMhlPYuLDhY+j7UxDKXtZyJzwNhtQSbnc
-         oqY25LG15oolJD9k1gniUBNMe3ZP1b4EqeYchdneVb6yqFEpFEFbuNmY4YM98glawJmy
-         CeIW8/GxvQEJtRWs6PSBs2WVwMgNL0ttkn3AFrrXVuqIFtzyvmeNSwcEncXZc8+jCxKA
-         MkTg==
-X-Gm-Message-State: AOJu0Yy9lHtO1yhfKNcLbv7tDXHj36jCop5LrwOS89d8Y5XmuhBoLtFp
-	L9hEbQ5jtmOGsT8WDyoFHUpxvR19MGm5Vjo37/RujKhv+Fai1a4Q2fjp
-X-Gm-Gg: ATEYQzx3FDtb2HlD8WjgXqrJ78b8Y+iy+dcF3NN/BqNMtR652mJG5TaFBmYx8SyUJb4
-	ysgS7PfRUdF6qnIrUPUAH8WAtSMclIbfuXuYzu3a2Emb4i2feMy1NQE+AYtmw79gbA48kFwhZ/W
-	kf8JbenYeG+NGQJtSSkUjbbAKweJgowB4SmtoFoV5ydJibes+NgbBQyUaKN+/VIm7ebG79RAbDQ
-	HLqtYPka7HIrv42rZMuWNjrbEE6O0Nqbf1E4HnN8EzEXN70TDUuPbeuXtfpXPx75BFS/u9LIpZv
-	5nRItad5irf+vqULoDWHTKVAEhuBirkNSu7mRznqsqyd8UqnhbbqdZtUhIkIIoiGJ6McU0nOxF2
-	xYCtIYEFl3kbL6kOMfVswWd+y6mhZBX1s8a2kqJkG6Z3Ag5emVB1KHIG67d/ywTDbPsWgyZXJNM
-	P20cmYnNc/mo3kO36eiVBx9Jx9aOWHVYxd
-X-Received: by 2002:ac8:57c3:0:b0:506:9bea:3229 with SMTP id d75a77b69052e-50b148bc32amr26455801cf.69.1773815853203;
-        Tue, 17 Mar 2026 23:37:33 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1773815858; x=1774420658;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MHAN2RjWd47ozI2jbJBMDIBVL7XJnDdwoQ9790Qp7pI=;
+        b=QA1yD26Jv79T7raQb+ZhNNzLz/IWAk93nmPSpSk90DBjC7jHlr+H5R6QyU6XDhlwVJ
+         HfnfoZCaxapJ3CmxLoH+uugTON7qY9GDIfY130AWKrnp1PQ9LXC3/+KDFCeyF9S5IBX0
+         5aK80zOoKS6wYEOiX9fo5+bN6BvKKRm8/9xlF5TdICi/K4WoGRSFXcrVcUbmpa1691i1
+         8yLVyzA2PRKeYg1uXWjJJ+c87CgpIe4Bkma67qg/l4GYYEgmUrjs+H5qHnTSiRF0dTVA
+         8FQ2AQvWWvMfmO4/lVx+Cge5iROgcyZ/sr/1tEZC6vn5GdYh7DeM5bAl5pUefSoHzpDE
+         Ow/Q==
+X-Gm-Message-State: AOJu0Yw4wiIzioXCTat66KKDYCg90+byYLmv38Dhdadek22RpPGAa72K
+	51Ae814DW5jBiFoOUbv6tzvUH2dZ0lFFSY97qUBdwQdXsFi0WtqWOi0Y
+X-Gm-Gg: ATEYQzzYYi5ZUjMLfytyVcSuq/2SEYprLcWdtjbObDdZqXCe0ZasYiR10xneawtAvHH
+	iV3AgRKnWlQ3viUojwG2qVAJkrHGzKl7G6sUMn7Rrj+5Efmz0Vi5uGxDHwA1DttUQ6VutL9Y+Yc
+	Whgb6qJZ2q+dzxeROKWSzvVu19ktFmmMlGbQGoiPguOScdUHQ0imseBmjrMihkj3RMk3deHCSyv
+	XwwwS7uqBh1vcjlEptL2wKlTHMbrv5v5SlM1ihXjOGEQbz1g79aXfIznieLwOnm148JryqwdMAJ
+	w0Dm4yVmCf1Z1SWsre42jf8/l5ejNsQyf0zUf6MMnlcw4vUs5DcDsvtgWZayl7scA016xMPhU7v
+	lqEsipl1ReTFtSa+y++z4CEz7UXdCROu/Vgj7cs0ZqbZxbpgGQQEMiv6kjMjh0oKBivN+RIs7qL
+	IOqqPztA4wVK8PqkqUwgeJtcpz/ZRJgCphGwii8cNBZqI=
+X-Received: by 2002:a05:622a:146:b0:509:2222:4202 with SMTP id d75a77b69052e-50b149046demr25233221cf.71.1773815857714;
+        Tue, 17 Mar 2026 23:37:37 -0700 (PDT)
 Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b135b875esm15235351cf.25.2026.03.17.23.37.29
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b135b875esm15235351cf.25.2026.03.17.23.37.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 23:37:32 -0700 (PDT)
+        Tue, 17 Mar 2026 23:37:37 -0700 (PDT)
 From: Kevin Hao <haokexin@gmail.com>
-Subject: [PATCH net v2 0/2] net: macb: Fix two lock warnings when WOL is
- used
-Date: Wed, 18 Mar 2026 14:36:57 +0800
-Message-Id: <20260318-macb-irq-v2-0-f1179768ab24@gmail.com>
+Date: Wed, 18 Mar 2026 14:36:58 +0800
+Subject: [PATCH net v2 1/2] net: macb: Move devm_{free,request}_irq() out
+ of spin lock area
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,10 +87,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAAlIumkC/0WMQQrDIBRErxL+uha/JiHtqvcoWagxyYcaWw3SE
- rx7RQqd3ZsZ3gHRBrIRrs0BwSaK5LcC4tSAWdW2WEZTYRBc9FwiMqeMZhReTF70oGSJngYo92e
- wM72r6g6b3WEs5Upx9+FT9Qnr9DN1f1NCxhnHrkXeGj33eFucosfZeAdjzvkLK+TWcaUAAAA=
-X-Change-ID: 20260311-macb-irq-39b8a3333bd8
+Message-Id: <20260318-macb-irq-v2-1-f1179768ab24@gmail.com>
+References: <20260318-macb-irq-v2-0-f1179768ab24@gmail.com>
+In-Reply-To: <20260318-macb-irq-v2-0-f1179768ab24@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, 
  Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
@@ -106,11 +106,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268889-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268890-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -118,7 +118,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -129,52 +129,144 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,microchip.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd.com:email,tuxon.dev:email]
-X-Rspamd-Queue-Id: F24E12B67DB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email]
+X-Rspamd-Queue-Id: E90452B6838
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+The devm_free_irq() and devm_request_irq() functions should not be
+executed in an atomic context.
 
-This patch series addresses two lock warnings that occur when using WOL as a
-wakeup source on my AMD ZynqMP board.
+During device suspend, all userspace processes and most kernel threads
+are frozen. Additionally, we flush all tx/rx status, disable all macb
+interrupts, and halt rx operations. Therefore, it is safe to split the
+region protected by bp->lock into two independent sections, allowing
+devm_free_irq() and devm_request_irq() to run in a non-atomic context.
+This modification resolves the following lockdep warning:
+  BUG: sleeping function called from invalid context at kernel/locking/mutex.c:591
+  in_atomic(): 1, irqs_disabled(): 1, non_block: 0, pid: 501, name: rtcwake
+  preempt_count: 1, expected: 0
+  RCU nest depth: 1, expected: 0
+  7 locks held by rtcwake/501:
+   #0: ffff0008038c3408 (sb_writers#5){.+.+}-{0:0}, at: vfs_write+0xf8/0x368
+   #1: ffff0008049a5e88 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0xbc/0x1c8
+   #2: ffff00080098d588 (kn->active#70){.+.+}-{0:0}, at: kernfs_fop_write_iter+0xcc/0x1c8
+   #3: ffff800081c84888 (system_transition_mutex){+.+.}-{4:4}, at: pm_suspend+0x1ec/0x290
+   #4: ffff0008009ba0f8 (&dev->mutex){....}-{4:4}, at: device_suspend+0x118/0x4f0
+   #5: ffff800081d00458 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x4/0x48
+   #6: ffff0008031fb9e0 (&bp->lock){-.-.}-{3:3}, at: macb_suspend+0x144/0x558
+  irq event stamp: 8682
+  hardirqs last  enabled at (8681): [<ffff8000813c7d7c>] _raw_spin_unlock_irqrestore+0x44/0x88
+  hardirqs last disabled at (8682): [<ffff8000813c7b58>] _raw_spin_lock_irqsave+0x38/0x98
+  softirqs last  enabled at (7322): [<ffff8000800f1b4c>] handle_softirqs+0x52c/0x588
+  softirqs last disabled at (7317): [<ffff800080010310>] __do_softirq+0x20/0x2c
+  CPU: 1 UID: 0 PID: 501 Comm: rtcwake Not tainted 7.0.0-rc3-next-20260310-yocto-standard+ #125 PREEMPT
+  Hardware name: ZynqMP ZCU102 Rev1.1 (DT)
+  Call trace:
+   show_stack+0x24/0x38 (C)
+   __dump_stack+0x28/0x38
+   dump_stack_lvl+0x64/0x88
+   dump_stack+0x18/0x24
+   __might_resched+0x200/0x218
+   __might_sleep+0x38/0x98
+   __mutex_lock_common+0x7c/0x1378
+   mutex_lock_nested+0x38/0x50
+   free_irq+0x68/0x2b0
+   devm_irq_release+0x24/0x38
+   devres_release+0x40/0x80
+   devm_free_irq+0x48/0x88
+   macb_suspend+0x298/0x558
+   device_suspend+0x218/0x4f0
+   dpm_suspend+0x244/0x3a0
+   dpm_suspend_start+0x50/0x78
+   suspend_devices_and_enter+0xec/0x560
+   pm_suspend+0x194/0x290
+   state_store+0x110/0x158
+   kobj_attr_store+0x1c/0x30
+   sysfs_kf_write+0xa8/0xd0
+   kernfs_fop_write_iter+0x11c/0x1c8
+   vfs_write+0x248/0x368
+   ksys_write+0x7c/0xf8
+   __arm64_sys_write+0x28/0x40
+   invoke_syscall+0x4c/0xe8
+   el0_svc_common+0x98/0xf0
+   do_el0_svc+0x28/0x40
+   el0_svc+0x54/0x1e0
+   el0t_64_sync_handler+0x84/0x130
+   el0t_64_sync+0x198/0x1a0
 
+Fixes: 558e35ccfe95 ("net: macb: WoL support for GEM type of Ethernet controller")
+Cc: stable@vger.kernel.org
+Reviewed-by: Théo Lebrun <theo.lebrun@bootlin.com>
+Signed-off-by: Kevin Hao <haokexin@gmail.com>
 ---
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
-Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-Cc: Harini Katakam <harini.katakam@amd.com>
-Cc: Théo Lebrun <theo.lebrun@bootlin.com>
+ drivers/net/ethernet/cadence/macb_main.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
----
-Changes in v2:
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 36ab3b7e1feabd295be35152f0b464bba6fcbe18..2d4304331e297accd91ab48813a9bd4722ce72dc 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -5968,6 +5968,7 @@ static int __maybe_unused macb_suspend(struct device *dev)
+ 			/* write IP address into register */
+ 			tmp |= MACB_BFEXT(IP, be32_to_cpu(ifa->ifa_local));
+ 		}
++		spin_unlock_irqrestore(&bp->lock, flags);
+ 
+ 		/* Change interrupt handler and
+ 		 * Enable WoL IRQ on queue 0
+@@ -5980,11 +5981,12 @@ static int __maybe_unused macb_suspend(struct device *dev)
+ 				dev_err(dev,
+ 					"Unable to request IRQ %d (error %d)\n",
+ 					bp->queues[0].irq, err);
+-				spin_unlock_irqrestore(&bp->lock, flags);
+ 				return err;
+ 			}
++			spin_lock_irqsave(&bp->lock, flags);
+ 			queue_writel(bp->queues, IER, GEM_BIT(WOL));
+ 			gem_writel(bp, WOL, tmp);
++			spin_unlock_irqrestore(&bp->lock, flags);
+ 		} else {
+ 			err = devm_request_irq(dev, bp->queues[0].irq, macb_wol_interrupt,
+ 					       IRQF_SHARED, netdev->name, bp->queues);
+@@ -5992,13 +5994,13 @@ static int __maybe_unused macb_suspend(struct device *dev)
+ 				dev_err(dev,
+ 					"Unable to request IRQ %d (error %d)\n",
+ 					bp->queues[0].irq, err);
+-				spin_unlock_irqrestore(&bp->lock, flags);
+ 				return err;
+ 			}
++			spin_lock_irqsave(&bp->lock, flags);
+ 			queue_writel(bp->queues, IER, MACB_BIT(WOL));
+ 			macb_writel(bp, WOL, tmp);
++			spin_unlock_irqrestore(&bp->lock, flags);
+ 		}
+-		spin_unlock_irqrestore(&bp->lock, flags);
+ 
+ 		enable_irq_wake(bp->queues[0].irq);
+ 	}
+@@ -6065,6 +6067,8 @@ static int __maybe_unused macb_resume(struct device *dev)
+ 		queue_readl(bp->queues, ISR);
+ 		if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
+ 			queue_writel(bp->queues, ISR, -1);
++		spin_unlock_irqrestore(&bp->lock, flags);
++
+ 		/* Replace interrupt handler on queue 0 */
+ 		devm_free_irq(dev, bp->queues[0].irq, bp->queues);
+ 		err = devm_request_irq(dev, bp->queues[0].irq, macb_interrupt,
+@@ -6073,10 +6077,8 @@ static int __maybe_unused macb_resume(struct device *dev)
+ 			dev_err(dev,
+ 				"Unable to request IRQ %d (error %d)\n",
+ 				bp->queues[0].irq, err);
+-			spin_unlock_irqrestore(&bp->lock, flags);
+ 			return err;
+ 		}
+-		spin_unlock_irqrestore(&bp->lock, flags);
+ 
+ 		disable_irq_wake(bp->queues[0].irq);
+ 
 
-- Add Reviewed-by from Théo Lebrun for patch 1
-
-- Reduce the scope of the RCU lock by using a local variable, as suggested by Théo Lebrun.
-
-- Fix minor typos in the patch 2 subject and commit log
-
-- Link to v1: https://lore.kernel.org/r/20260315-macb-irq-v1-0-0154104cbf61@gmail.com
-
----
-Kevin Hao (2):
-      net: macb: Move devm_{free,request}_irq() out of spin lock area
-      net: macb: Protect access to net_device::ip_ptr with RCU lock
-
- drivers/net/ethernet/cadence/macb_main.c | 37 ++++++++++++++++++++------------
- 1 file changed, 23 insertions(+), 14 deletions(-)
----
-base-commit: 8e5a478b6d6a5bb0a3d52147862b15e4d826af19
-change-id: 20260311-macb-irq-39b8a3333bd8
-
-Best regards,
 -- 
-Kevin Hao <haokexin@gmail.com>
+2.53.0
 
 
