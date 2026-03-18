@@ -1,272 +1,184 @@
-Return-Path: <netdev+bounces-268885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268886-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iD1oLLZGumlTTgIAu9opvQ
-	(envelope-from <netdev+bounces-268885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:31:18 +0100
+	id kBS2GF1IumkFTwIAu9opvQ
+	(envelope-from <netdev+bounces-268886-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:38:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F4BD2B6658
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:31:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B258D2B67ED
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:38:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C6BF23040331
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 06:31:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F2F943024150
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 06:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE12363084;
-	Wed, 18 Mar 2026 06:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4022134F462;
+	Wed, 18 Mar 2026 06:33:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d4X87I5d"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="1DYLI6mY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B21366DD9
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 06:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87A9322B88;
+	Wed, 18 Mar 2026 06:33:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773815473; cv=none; b=kerFkCUBgjeOt9836IaIGTFBJjYrWmtvWvHn+aoh4KzLqbrJIDsOW+hviAd/AAiSR0amXch8tDkgYOwyE25v4FIrMG1aYHCSJTL6mct2MTWxyfttp6aW8wo+ZvqTAgx5pcCka5vLCXGQO34llI1dA+VVNicUZT1mmgMfCICWcjY=
+	t=1773815617; cv=none; b=LAyZcbKfYnpj9oLC7unynpUF5eNt3aFq7O+1ve+EqTidXR7xculkWY4xhP7tcU2lUjdi004dlCrgueusD6PhIXpUgvg1apOuQ7bv/XxmjRB5ISoZ3Z7yaos0lrkG+EE0FpR0QmCJBEcUPsSBfvB3lsXDgwVe4ykMvDfhiNYPMZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773815473; c=relaxed/simple;
-	bh=F9cHhWJXb3kHOhBeKBznjA0MZ+sKCxw3//7ZAbHZqyY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q3rwev2Poj4HL+/Alxv3sDANeQiM4b3lkqcjUStRUYj4y2ih9D/xm+hW58c937uUqkBTKoFAMXTtwEUv3iNkhA7FH0+GGIQ0/Lc45krpTTBM1MDHI+7N8sk4ne5qb0VOWWGoj53tZHrbszdLogNk5gMMxrDo0lsyWWwGPQJPiw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d4X87I5d; arc=none smtp.client-ip=74.125.82.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-128d7db88b9so7960663c88.0
-        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 23:31:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773815471; x=1774420271; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7mjfeB+QehGWxy6pvDSqDvx3PHWjcskLwFx02+x66yE=;
-        b=d4X87I5d4oZX9BeGt42R5MOijiO2+O8lZMhZJAHzdg+hLb6CAPJLi+x5sSTclaV2rT
-         G6tUD/A+kE6oZyDorF6qWelFEdOzFF8/uODylTfharZBioAwalJ+s3GDe58rV6FtTQSC
-         edx1mQfuuNyh87f2XaPIK9OapXY0TPFAAW5M0+MKsmrsjKs07SrWiHGgRTx3qrE5qXim
-         gCErGPzHH+DGrmOQRZNfMK5wD7VmzFMPmlnyHNVt+tMiq0DLMw9H90W3w/T76uF8Y/pP
-         iP4qSSfxuNzMLtXGtH2HerhiMze2cQhS97s0Ax6mETV+Pe7SzZOlqwLEJCqaK+5Ob8jB
-         k5NA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773815471; x=1774420271;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7mjfeB+QehGWxy6pvDSqDvx3PHWjcskLwFx02+x66yE=;
-        b=U5vEvJPjmRlzSBZSTukOE6nNRv6/rsia9kHeGmm2gI4BYvF4ag/Lkm6KYqiwP6fk2C
-         KDeao8AAs+ZrZ4AEqSLJ0kTprpcQ7+j9dL2EcuDxJ6bQ7Is6yq8ijLvf7PfLh+ID0nhQ
-         4Cl4oJIvLGSv0Z6sPJrLorz5+cGdn/3xfRvQDOjYz3lW4GH3HZsOuOhHkL/wvT/ZEU3x
-         2wCN0mgAAgx4Ll093Jnl1j2NjWXvw2WyUFvZYOF7gX4GV5BOEpR1EMD3FO4ouh5Burqc
-         DBBf8jDdfysJfrtcmeX3gTz8ZkRvApOdLn0fJ6BvvPwxBWeIzRt0jNNYA55h/huRtkFh
-         uVSw==
-X-Gm-Message-State: AOJu0YztrN8wtJeklhEHA3s8R1b4hWZKnydb7/7/toluX23iJUA0CHsU
-	kFJPZDi+K0Cyp0yk5CII5Zb1rWwUzemHzXFDOqNXM1NHYshJKeI08MoQ
-X-Gm-Gg: ATEYQzwLa31U2cXHtkT1xemPCyzO0U6QNYKmq6qC+VDiAn0kskgKOX5+VCwBOuE/mzh
-	KprXmPC2lkpR0LuK/ql93njHusbMQaCns1ziR11kHs5EhL7jhCfyGuvvXlwgfZ0fnGMSjRzyAzZ
-	rkmSRuj9fg6l/fTjkwnLayUsRie2/Sm+WSPmBcM3bjI7p4lxLXFtt0+2L0Yk1jv7v1+pqkzxzxa
-	WTiJ/Vnp/lV+9zlOvPqjRNNUtST9mjFdDzpcEU+P22uNAjc4yFZjQVIfBOpK0eo1hhadFRbqNvo
-	sCEh8yhAgk1XQBxX6SZUcIqgT2NU4V7JiSB0wpp0VvqlgG/+0oz7Lx2BF/3LI/RBqp9ZBN0a7Kf
-	SGrwZf5okuUy1NiqZ9OIjpe97c6hWasI/YU1hGBGkL9eb6Wb/1BvWxkHoTgF+1MU00FoNRavesB
-	iVXSjqEM2DCYrKVN6bek4=
-X-Received: by 2002:a05:7022:51b:b0:128:d4be:7418 with SMTP id a92af1059eb24-129a714bc7bmr1050843c88.35.1773815470580;
-        Tue, 17 Mar 2026 23:31:10 -0700 (PDT)
-Received: from pek-khao-d3 ([128.224.246.2])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-129a723f9d7sm2347316c88.2.2026.03.17.23.31.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 23:31:09 -0700 (PDT)
-Date: Wed, 18 Mar 2026 14:31:03 +0800
-From: Kevin Hao <haokexin@gmail.com>
-To: =?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
-Cc: netdev@vger.kernel.org, Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
-	Harini Katakam <harini.katakam@amd.com>, stable@vger.kernel.org
-Subject: Re: [PATCH net 2/2] net: macb: Protect access to net_device::in_ptr
- with RCU lock
-Message-ID: <abpGpxaFECLpGMzz@pek-khao-d3>
-References: <20260315-macb-irq-v1-0-0154104cbf61@gmail.com>
- <20260315-macb-irq-v1-2-0154104cbf61@gmail.com>
- <DH4EHTJNY6GL.3EXTP61HNUNDD@bootlin.com>
- <abit7VLwoy2ttEus@pek-khao-d3>
- <DH56GCWA9O1K.1KYOVK5RL00JC@bootlin.com>
+	s=arc-20240116; t=1773815617; c=relaxed/simple;
+	bh=kBBHbXZQpWXBbi+D4f9F2PePfXUe6gQNo+1xckPTAcc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NXHOcZ739IlvyZOtJm9+foQ3KzIlx9bKyIjLH+scJMQPfrOCN8rP2AGd5tRcXEJc6jxtMt+FyxtOYYecD8UJpZZQWCx3Y6GmkX764KaPotQj7IWdzgr6WndiYNaRXtNA3TCKOB/Ni0okReMicxgjR6EPxfSqQf1Mpe/SNvvBU6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=1DYLI6mY; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1773815616; x=1805351616;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=kBBHbXZQpWXBbi+D4f9F2PePfXUe6gQNo+1xckPTAcc=;
+  b=1DYLI6mY5zmyqKwoFKqZdR7aGW3Rscwssb/xQJ7LVdHEiq25NlISDDBt
+   rkWTGHczsSV+ruYxk3Wi1dge/pXhGFqvr17ACbK9Yi3YD81avx0RdzWeS
+   r3/+BVpNFx7apPQdFccFtECa2sFbGASAu3q5O+YjxMlDsG8SpmXN5EqX5
+   8sgIXm5LnWAoCOvgJuWyz/l7AIlNlde9CUgnlZLgTuLk6y+CKRJF7ZjGw
+   mAW5Ct0EqpFAqepB+lwESbXyW/E8A3Uvp1OtDjs+lY/R6gDjXH2HpRCYV
+   LhmbMkcg+4mGkbuOOqUtGNbXQhnYG/KZcqwaw1I+734fhzv7MRQ7WihQb
+   g==;
+X-CSE-ConnectionGUID: DWBeoPGXSvWEP4D/TigK3g==
+X-CSE-MsgGUID: eQ69UpvYTTStPeCzhNrr1g==
+X-IronPort-AV: E=Sophos;i="6.23,127,1770620400"; 
+   d="scan'208";a="286209789"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2026 23:33:35 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Tue, 17 Mar 2026 23:32:54 -0700
+Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Tue, 17 Mar 2026 23:32:51 -0700
+From: Thangaraj Samynathan <thangaraj.s@microchip.com>
+To: <bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH v1 net-next] net: lan743x: fix SGMII detection on PCI1xxxx B0+ during warm reset
+Date: Wed, 18 Mar 2026 12:02:28 +0530
+Message-ID: <20260318063228.17110-1-thangaraj.s@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="EH2RervoWIbhLwfW"
-Content-Disposition: inline
-In-Reply-To: <DH56GCWA9O1K.1KYOVK5RL00JC@bootlin.com>
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268885-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thangaraj.s@microchip.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-268886-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 2F4BD2B6658
+	TO_DN_NONE(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:dkim,microchip.com:email,microchip.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B258D2B67ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+A warm reset on boards using an EEPROM-only strap configuration (where
+no MAC address is set in the image) can cause the driver to incorrectly
+revert to RGMII mode. This occurs because the ENET_CONFIG_LOAD_STARTED
+bit may not persist or behave as expected.
 
---EH2RervoWIbhLwfW
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Update pci11x1x_strap_get_status() to use revision-specific validation:
 
-On Tue, Mar 17, 2026 at 04:54:11PM +0100, Th=E9o Lebrun wrote:
-> On Tue Mar 17, 2026 at 2:27 AM CET, Kevin Hao wrote:
-> > On Mon, Mar 16, 2026 at 06:59:35PM +0100, Th=E9o Lebrun wrote:
-> >> On Sun Mar 15, 2026 at 12:44 PM CET, Kevin Hao wrote:
-> >> > @@ -5915,13 +5915,16 @@ static int __maybe_unused macb_suspend(struc=
-t device *dev)
-> >> > =20
-> >> >  	if (bp->wol & MACB_WOL_ENABLED) {
-> >> >  		/* Check for IP address in WOL ARP mode */
-> >> > +		rcu_read_lock();
-> >> >  		idev =3D __in_dev_get_rcu(bp->dev);
-> >> >  		if (idev)
-> >> >  			ifa =3D rcu_dereference(idev->ifa_list);
-> >> >  		if ((bp->wolopts & WAKE_ARP) && !ifa) {
-> >> >  			netdev_err(netdev, "IP address not assigned as required by WoL w=
-alk ARP\n");
-> >> > +			rcu_read_unlock();
-> >> >  			return -EOPNOTSUPP;
-> >> >  		}
-> >> > +
-> >> >  		spin_lock_irqsave(&bp->lock, flags);
-> >> > =20
-> >> >  		/* Disable Tx and Rx engines before  disabling the queues,
-> >> > @@ -5963,6 +5966,7 @@ static int __maybe_unused macb_suspend(struct =
-device *dev)
-> >> >  			tmp |=3D MACB_BFEXT(IP, be32_to_cpu(ifa->ifa_local));
-> >> >  		}
-> >> >  		spin_unlock_irqrestore(&bp->lock, flags);
-> >> > +		rcu_read_unlock();
-> >> > =20
-> >> >  		/* Change interrupt handler and
-> >> >  		 * Enable WoL IRQ on queue 0
-> >>=20
-> >> Instead of making the RCU critical section extend so much, you could
-> >> dereference ifa->ifa_local into a stack variable. In particular, it
-> >> would avoid the RCU critical section covering a spinlock critical
-> >> section.
-> >
-> > I initially considered using a local variable before submitting this, a=
-s I also
-> > believe that `ifa->ifa_local` is unlikely to be modified or freed in th=
-is
-> > context. However, I ultimately decided to protect these sections with R=
-CU for
-> > the following reasons:
-> >
-> > - It is logically more consistent to protect access to `ifa->ifa_local`=
- with
-> >   RCU locking.
-> >
-> > - For section already under spinlock protection, adding RCU locking int=
-roduces
-> >   negligible overhead, especially in a scenario like this.
-> >
-> > That said, I do not have a strong preference for either approach. If yo=
-u prefer
-> > using a local variable to keep the RCU region shorter, I can prepare a =
-v2 with
-> > that change.
->=20
-> I was not questioning whether this region should be protected, but
-> rather how long you made the RCU critical section. The smaller the
-> better, especially if you can remove a spinlock from it.
->=20
-> On PREEMPT_RT kernels it could even cause trouble because spinlocks
-> become sleep-able and that is not allowed inside RCU read-side critical
-> section.
+- For PCI11x1x A0: Continue using the legacy check (config load started
+  or reset protection) to validate the SGMII strap.
+- For PCI11x1x B0 and later: Use the newly available
+  STRAP_READ_USE_SGMII_EN_ bit in the upper strap register to validate
+  the lower SGMII_EN bit.
 
-I'm a bit confused by this comment. As you know, the ndo_start_xmit() callb=
-ack
-is executed in a context where the RCU lock is acquired. Many network drive=
-rs
-use spinlocks in their ndo_start_xmit() callbacks. Am I missing something o=
-bvious?
+This ensures the SGMII interface is correctly identified even after a
+warm reboot.
 
->=20
-> So yes, I do insist that a tiny RCU is better; something like:
->=20
-> static int macb_suspend(struct device *dev)
-> {
-> 	u32 ifa_local;
->=20
-> 	// ...
->=20
-> 	if (bp->wol & MACB_WOL_ENABLED) {
-> 		/* Check for IP address in WOL ARP mode */
-> 		rcu_read_lock();
-> 		idev =3D __in_dev_get_rcu(bp->dev);
-> 		if (idev)
-> 			ifa =3D rcu_dereference(idev->ifa_list);
-> 		if (ifa)
-> 			ifa_local =3D be32_to_cpu(ifa->ifa_local);
-> 		rcu_read_unlock();
->=20
-> 		if ((bp->wolopts & WAKE_ARP) && !ifa) {
-> 			netdev_err(netdev, "IP address not assigned as required by WoL walk AR=
-P\n");
-> 			return -EOPNOTSUPP;
-> 		}
->=20
-> 		// ...
-> 	}
->=20
-> 	// ...
-> }
+Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
+---
+v0 -> v1
+	* Added helpers to check if the device revision is a0
+---
+ drivers/net/ethernet/microchip/lan743x_main.c | 15 +++++++++++----
+ drivers/net/ethernet/microchip/lan743x_main.h |  1 +
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-Will reduce the scope of RCU lock in v2. Thanks, Lebrun.
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index a3845edf0e48..83b640ab9d62 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -28,6 +28,12 @@
+ 
+ #define RFE_RD_FIFO_TH_3_DWORDS	0x3
+ 
++static bool pci11x1x_is_a0(struct lan743x_adapter *adapter)
++{
++	u32 dev_rev = adapter->csr.id_rev & ID_REV_CHIP_REV_MASK_;
++	return dev_rev == ID_REV_CHIP_REV_PCI11X1X_A0_;
++}
++
+ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
+ {
+ 	u32 chip_rev;
+@@ -47,10 +53,11 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
+ 	cfg_load = lan743x_csr_read(adapter, ETH_SYS_CONFIG_LOAD_STARTED_REG);
+ 	lan743x_hs_syslock_release(adapter);
+ 	hw_cfg = lan743x_csr_read(adapter, HW_CFG);
+-
+-	if (cfg_load & GEN_SYS_LOAD_STARTED_REG_ETH_ ||
+-	    hw_cfg & HW_CFG_RST_PROTECT_) {
+-		strap = lan743x_csr_read(adapter, STRAP_READ);
++	strap = lan743x_csr_read(adapter, STRAP_READ);
++	if ((pci11x1x_is_a0(adapter) &&
++	     (cfg_load & GEN_SYS_LOAD_STARTED_REG_ETH_ ||
++	     hw_cfg & HW_CFG_RST_PROTECT_)) ||
++	     (strap & STRAP_READ_USE_SGMII_EN_)) {
+ 		if (strap & STRAP_READ_SGMII_EN_)
+ 			adapter->is_sgmii_en = true;
+ 		else
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
+index 02a28b709163..160d94a7cee6 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.h
++++ b/drivers/net/ethernet/microchip/lan743x_main.h
+@@ -27,6 +27,7 @@
+ #define ID_REV_CHIP_REV_MASK_		(0x0000FFFF)
+ #define ID_REV_CHIP_REV_A0_		(0x00000000)
+ #define ID_REV_CHIP_REV_B0_		(0x00000010)
++#define ID_REV_CHIP_REV_PCI11X1X_A0_	(0x000000A0)
+ #define ID_REV_CHIP_REV_PCI11X1X_B0_	(0x000000B0)
+ 
+ #define FPGA_REV			(0x04)
+-- 
+2.34.1
 
-Thanks,
-Kevin
-
---EH2RervoWIbhLwfW
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEHc6qFoLCZqgJD98Zk1jtMN6usXEFAmm6RqcACgkQk1jtMN6u
-sXHXvAgAlFNTSrFAIlrzgOF5y/xJOsfvyMqnJD9J8eE6UQNtUm8mkF3k0RD3HMW3
-DqUXlUnn2RYGZ7gYwG08mbHF25gc+YiBTCDeErkF2vYRpZv/P+2BqlXlhQX6afpy
-Qn9wjdPhhvb+ed4lIVd48AR/52Y4u1HwLpH1lxg903MoNRwoWSHFKfi5EMn+0J+W
-IdyYkhGCxcqaWZ1qrlpS1altwwvwS5882sOLGvW/zLk7yJLs82uznK181uxlopor
-54ijlCgQb75qvVpPojXFIxd60vELMA4MULL9vhOVhEnAlfaZPcWUTtZ+RzXuyrS2
-sGjBM6HQphSxTFUFpcjZw5dlrqJ12A==
-=AN7D
------END PGP SIGNATURE-----
-
---EH2RervoWIbhLwfW--
 
