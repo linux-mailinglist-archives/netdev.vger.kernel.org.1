@@ -1,69 +1,53 @@
-Return-Path: <netdev+bounces-268869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268870-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CHEnClIeuml8RwIAu9opvQ
-	(envelope-from <netdev+bounces-268869-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 04:38:58 +0100
+	id 0KGHAcYeuml8RwIAu9opvQ
+	(envelope-from <netdev+bounces-268870-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 04:40:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 635F02B584A
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 04:38:57 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DC3A2B58AC
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 04:40:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 498AB30209B7
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 03:38:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AC531300F10C
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 03:40:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9F433D4FD;
-	Wed, 18 Mar 2026 03:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD37335BDB;
+	Wed, 18 Mar 2026 03:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ANl/Sniw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TXIHu+hM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94FB33C52F;
-	Wed, 18 Mar 2026 03:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABC2243376;
+	Wed, 18 Mar 2026 03:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773805118; cv=none; b=fg8vNHrf/wLdPguX5ofO3kuv2inIX7OBaIRlk1TORAReZBQ5GIYVnvLKBejYs96aMF3BsKnIe8saLs1yUF2zi0RHvVU/Uyn6nIH/2gIYbijfc/8ucFuUnUI12tVPBr+CIH7au1NASOJA+h1i/B/V7hZ/Jei60JxEBpRq3XCtxco=
+	t=1773805242; cv=none; b=fHufBUEfGDaXWNp/nBYW2w7nf3B0ZzOT41ikAEDTaRRcBDiN6vEcyQH/r21CNfJApnHlJJAHZmbK6jvxUFGMoMtVecgredQzBnjK7cFnABmEpJ751X/uUSywcw1hLxHJ7S7SxE9pxyDhaSMQqHtTEYWGpFOnA6xy2GAq9ksUYTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773805118; c=relaxed/simple;
-	bh=H3+biuMDIwtvpw/lKfuWh8wcDmApjzaumWcCer1NJB8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G/JdTsYJ2ETyV0021O/Fzy3r9hUAvfw9+s4MSVRiirD3KTJoga1Y8EzHVsePdnptqxbxGJmdz/dn47AACfdRMSM6qfGoM6op7uolWD18ZOeoHXME6jsMa7//pNZXCHJBIoHomvPoycctm7LoUwgktr03QkSS3sa6ECMzn/5jnW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ANl/Sniw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B55AC19421;
-	Wed, 18 Mar 2026 03:38:38 +0000 (UTC)
+	s=arc-20240116; t=1773805242; c=relaxed/simple;
+	bh=ci1TLeG+Q5wv5yzhht4iMsaCcAqoSh8bQP++IRr5860=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=OghNdGxNLUlkBwO5cjQfnfaUUiDc5yhiUrmpNXEBlJJpb6yiJH1TFt8NCDQYcTFAy9UA4eu7YDgRfPBAtCRvyBSm1oiz7oc5o55CXrFpDOe14c9QRVx9vkqPizv26zK9kgtVosz2nMHnoPdDwTkLFAWvY2bHIuBq168/VjJ8EJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TXIHu+hM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98B69C19421;
+	Wed, 18 Mar 2026 03:40:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773805118;
-	bh=H3+biuMDIwtvpw/lKfuWh8wcDmApjzaumWcCer1NJB8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ANl/SniwL+TmA0oXVh2dwcUVAnHtGP4P66KWWgpwT0/BafG09KKJgc4HLK2X5XPmZ
-	 YTUKfI5i2R4dfZrSckaSRIdG8qAVsd3LP6y+420/Nupu77TPH/2PXNv228mltzxQtl
-	 yMGVwKt9zWH0Qdfz60yEJzWEaJJjS3a2lMyRAfT5QrapSFrCwpaZ46T4+zGN1eIRrr
-	 7W/fb9C0UDD1C5uLGWjGiW/I30np0STHnfFsbiXQczQ5bGddyQjm+9qyU/soreY7zx
-	 4Z0W89HzJaIzYyDgbUK/PMcTv/I0mDUBl2Qjgq9wsVEI6p+do9IL90a+0AN4/QTeLk
-	 T49Cbc04Cqrlw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	shuah@kernel.org,
-	willemb@google.com,
-	petrm@nvidia.com,
-	dw@davidwei.uk,
-	mst@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v4 6/6] selftests: drv-net: gro: add a test for GRO depth
-Date: Tue, 17 Mar 2026 20:38:19 -0700
-Message-ID: <20260318033819.1469350-7-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260318033819.1469350-1-kuba@kernel.org>
-References: <20260318033819.1469350-1-kuba@kernel.org>
+	s=k20201202; t=1773805242;
+	bh=ci1TLeG+Q5wv5yzhht4iMsaCcAqoSh8bQP++IRr5860=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TXIHu+hM0Lmy2qrU8gxrRdmeIqAmHvUXGdeiRO3cplllQ9CCZFrUiSsraDSRzmWkO
+	 2AigU3LiEXukj8PNRUAJjufPSJy9GmZ7lslsliwlNPIq0LAM8PW8Et6ziw4+7/cXNd
+	 TMXnvCAxjYO25M4dmPRelp0MNPNGaTLhYGeyYCcWzXm45TW9AgqXoFyq2k5WJtQuLp
+	 AsYjPdQNOf3R+penE6+IpDsACWjbETVvLuo2u+1Rw2XYXaCaauZfnMyTbwcgvJrIRg
+	 D1o3D11tWuX3hEE7DeURO5qlWQlOgVsRmJXCEDu6XB+yUeILlXGsDFoc734jbG5LWn
+	 usq2LTIj8TbPA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA0D13808200;
+	Wed, 18 Mar 2026 03:40:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,304 +55,105 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Subject: Re: [PATCH net-next v4 00/15] net: stmmac: clean up descriptor
+ handling
+ part 1
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177380523454.113469.14485009686148036566.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Mar 2026 03:40:34 +0000
+References: <abUtGH9KB03PH5Ne@shell.armlinux.org.uk>
+In-Reply-To: <abUtGH9KB03PH5Ne@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, alexandre.torgue@foss.st.com, ast@kernel.org,
+ andrew+netdev@lunn.ch, bpf@vger.kernel.org, daniel@iogearbox.net,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, hawk@kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+ pabeni@redhat.com, sdf@fomichev.me
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-268869-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-268870-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lib.py:url]
-X-Rspamd-Queue-Id: 635F02B584A
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9DC3A2B58AC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Reuse the long sequence test to max out the GRO contexts.
-Repeat for a single queue, 8 queues, and default number
-of queues but flow steering to just one.
+Hello:
 
-The SW GRO's capacity should be around 64 per queue
-(8 buckets, up to 8 skbs in a chain).
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v3:
- - rename [FAIL] to [MISS] to avoid confusing NIPA
-v2: https://lore.kernel.org/20260316224505.279672-7-kuba@kernel.org
- - move this "test" to SW, we can check SW GRO capacity too
-v1: https://lore.kernel.org/20260205220541.2992807-10-kuba@kernel.org
----
- tools/testing/selftests/drivers/net/gro.py | 201 +++++++++++++++++++--
- 1 file changed, 181 insertions(+), 20 deletions(-)
+On Sat, 14 Mar 2026 09:40:40 +0000 you wrote:
+> Hi,
+> 
+> Part 1 of cleaning up the stmmac descriptor handling. Rearrange the
+> struct stmmac_tx_info to pack better, and introduce helpers for
+> duplicated code handing the transmit and receive descriptors. Remove
+> unnecessary struct members that are only transitorily used.
+> 
+> [...]
 
-diff --git a/tools/testing/selftests/drivers/net/gro.py b/tools/testing/selftests/drivers/net/gro.py
-index 2da53686354f..70709bf670c7 100755
---- a/tools/testing/selftests/drivers/net/gro.py
-+++ b/tools/testing/selftests/drivers/net/gro.py
-@@ -35,11 +35,18 @@ coalescing behavior.
-   - large_rem: Large packet remainder handling
- """
- 
-+import glob
- import os
-+import re
- from lib.py import ksft_run, ksft_exit, ksft_pr
- from lib.py import NetDrvEpEnv, KsftXfailEx
-+from lib.py import NetdevFamily, EthtoolFamily
- from lib.py import bkg, cmd, defer, ethtool, ip
--from lib.py import ksft_variants
-+from lib.py import ksft_variants, KsftNamedVariant
-+
-+
-+# gro.c uses hardcoded DPORT=8000
-+GRO_DPORT = 8000
- 
- 
- def _resolve_dmac(cfg, ipver):
-@@ -113,6 +120,98 @@ from lib.py import ksft_variants
-         ksft_pr(eth_cmd)
- 
- 
-+def _get_queue_stats(cfg, queue_id):
-+    """Get stats for a specific Rx queue."""
-+    cfg.wait_hw_stats_settle()
-+    data = cfg.netnl.qstats_get({"ifindex": cfg.ifindex, "scope": ["queue"]},
-+                                dump=True)
-+    for q in data:
-+        if q.get('queue-type') == 'rx' and q.get('queue-id') == queue_id:
-+            return q
-+    return {}
-+
-+
-+def _setup_isolated_queue(cfg):
-+    """Set up an isolated queue for testing using ntuple filter.
-+
-+    Remove queue 1 from the default RSS context and steer test traffic to it.
-+    """
-+    test_queue = 1
-+
-+    qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
-+    if qcnt < 2:
-+        raise KsftXfailEx(f"Need at least 2 queues, have {qcnt}")
-+
-+    # Remove queue 1 from default RSS context by setting its weight to 0
-+    weights = ["1"] * qcnt
-+    weights[test_queue] = "0"
-+    ethtool(f"-X {cfg.ifname} weight " + " ".join(weights))
-+    defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    # Set up ntuple filter to steer our test traffic to the isolated queue
-+    flow  = f"flow-type tcp{cfg.addr_ipver} "
-+    flow += f"dst-ip {cfg.addr} dst-port {GRO_DPORT} action {test_queue}"
-+    output = ethtool(f"-N {cfg.ifname} {flow}").stdout
-+    ntuple_id = int(output.split()[-1])
-+    defer(ethtool, f"-N {cfg.ifname} delete {ntuple_id}")
-+
-+    return test_queue
-+
-+
-+def _setup_queue_count(cfg, num_queues):
-+    """Configure the NIC to use a specific number of queues."""
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < num_queues:
-+        raise KsftXfailEx(f"Need at least {num_queues} queues, max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+    ethtool(f"-L {cfg.ifname} combined {num_queues}")
-+
-+
-+def _run_gro_bin(cfg, test_name, protocol=None, num_flows=None,
-+                 order_check=False, verbose=False, fail=False):
-+    """Run gro binary with given test and return the process result."""
-+    if not hasattr(cfg, "bin_remote"):
-+        cfg.bin_local = cfg.net_lib_dir / "gro"
-+        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
-+
-+    if protocol is None:
-+        ipver = cfg.addr_ipver
-+        protocol = f"ipv{ipver}"
-+    else:
-+        ipver = "6" if protocol[-1] == "6" else "4"
-+
-+    dmac = _resolve_dmac(cfg, ipver)
-+
-+    base_args = [
-+        f"--{protocol}",
-+        f"--dmac {dmac}",
-+        f"--smac {cfg.remote_dev['address']}",
-+        f"--daddr {cfg.addr_v[ipver]}",
-+        f"--saddr {cfg.remote_addr_v[ipver]}",
-+        f"--test {test_name}",
-+    ]
-+    if num_flows:
-+        base_args.append(f"--num-flows {num_flows}")
-+    if order_check:
-+        base_args.append("--order-check")
-+    if verbose:
-+        base_args.append("--verbose")
-+
-+    args = " ".join(base_args)
-+
-+    rx_cmd = f"{cfg.bin_local} {args} --rx --iface {cfg.ifname}"
-+    tx_cmd = f"{cfg.bin_remote} {args} --iface {cfg.remote_ifname}"
-+
-+    with bkg(rx_cmd, ksft_ready=True, exit_wait=True, fail=fail) as rx_proc:
-+        cmd(tx_cmd, host=cfg.remote)
-+
-+    return rx_proc
-+
-+
- def _setup(cfg, mode, test_name):
-     """ Setup hardware loopback mode for GRO testing. """
- 
-@@ -233,30 +332,14 @@ from lib.py import ksft_variants
- 
-     _setup(cfg, mode, test_name)
- 
--    base_cmd_args = [
--        f"--{protocol}",
--        f"--dmac {_resolve_dmac(cfg, ipver)}",
--        f"--smac {cfg.remote_dev['address']}",
--        f"--daddr {cfg.addr_v[ipver]}",
--        f"--saddr {cfg.remote_addr_v[ipver]}",
--        f"--test {test_name}",
--        "--verbose"
--    ]
--    base_args = " ".join(base_cmd_args)
--
-     # Each test is run 6 times to deflake, because given the receive timing,
-     # not all packets that should coalesce will be considered in the same flow
-     # on every try.
-     max_retries = 6
-     for attempt in range(max_retries):
--        rx_cmd = f"{cfg.bin_local} {base_args} --rx --iface {cfg.ifname}"
--        tx_cmd = f"{cfg.bin_remote} {base_args} --iface {cfg.remote_ifname}"
--
-         fail_now = attempt >= max_retries - 1
--
--        with bkg(rx_cmd, ksft_ready=True, exit_wait=True,
--                 fail=fail_now) as rx_proc:
--            cmd(tx_cmd, host=cfg.remote)
-+        rx_proc = _run_gro_bin(cfg, test_name, protocol=protocol,
-+                               verbose=True, fail=fail_now)
- 
-         if rx_proc.ret == 0:
-             return
-@@ -270,11 +353,89 @@ from lib.py import ksft_variants
-         ksft_pr(f"Attempt {attempt + 1}/{max_retries} failed, retrying...")
- 
- 
-+def _capacity_variants():
-+    """Generate variants for capacity test: mode x queue setup."""
-+    setups = [
-+        ("isolated", _setup_isolated_queue),
-+        ("1q", lambda cfg: _setup_queue_count(cfg, 1)),
-+        ("8q", lambda cfg: _setup_queue_count(cfg, 8)),
-+    ]
-+    for mode in ["sw", "hw", "lro"]:
-+        for name, func in setups:
-+            yield KsftNamedVariant(f"{mode}_{name}", mode, func)
-+
-+
-+@ksft_variants(_capacity_variants())
-+def test_gro_capacity(cfg, mode, setup_func):
-+    """
-+    Probe GRO capacity.
-+
-+    Start with 8 flows and increase by 2x on each successful run.
-+    Retry up to 3 times on failure.
-+
-+    Variants combine mode (sw, hw, lro) with queue setup:
-+      - isolated: Use a single queue isolated from RSS
-+      - 1q: Configure NIC to use 1 queue
-+      - 8q: Configure NIC to use 8 queues
-+    """
-+    max_retries = 3
-+
-+    _setup(cfg, mode, "capacity")
-+    queue_id = setup_func(cfg)
-+
-+    num_flows = 8
-+    while True:
-+        success = False
-+        for attempt in range(max_retries):
-+            if queue_id is not None:
-+                stats_before = _get_queue_stats(cfg, queue_id)
-+
-+            rx_proc = _run_gro_bin(cfg, "capacity", num_flows=num_flows)
-+            output = rx_proc.stdout
-+
-+            if queue_id is not None:
-+                stats_after = _get_queue_stats(cfg, queue_id)
-+                qstat_pkts = (stats_after.get('rx-packets', 0) -
-+                              stats_before.get('rx-packets', 0))
-+                gro_pkts = (stats_after.get('rx-hw-gro-packets', 0) -
-+                            stats_before.get('rx-hw-gro-packets', 0))
-+                qstat_str = f" qstat={qstat_pkts} hw-gro={gro_pkts}"
-+            else:
-+                qstat_str = ""
-+
-+            # Parse and print STATS line
-+            match = re.search(
-+                r'STATS: received=(\d+) wire=(\d+) coalesced=(\d+)', output)
-+            if match:
-+                received = int(match.group(1))
-+                wire = int(match.group(2))
-+                coalesced = int(match.group(3))
-+                status = "PASS" if received == num_flows else "MISS"
-+                ksft_pr(f"flows={num_flows} attempt={attempt + 1} "
-+                        f"received={received} wire={wire} "
-+                        f"coalesced={coalesced}{qstat_str} [{status}]")
-+                if received == num_flows:
-+                    success = True
-+                    break
-+            else:
-+                ksft_pr(rx_proc)
-+                ksft_pr(f"flows={num_flows} attempt={attempt + 1}"
-+                        f"{qstat_str} [FAIL - can't parse stats]")
-+
-+        if not success:
-+            ksft_pr(f"Stopped at {num_flows} flows")
-+            break
-+
-+        num_flows *= 2
-+
-+
- def main() -> None:
-     """ Ksft boiler plate main """
- 
-     with NetDrvEpEnv(__file__) as cfg:
--        ksft_run(cases=[test], args=(cfg,))
-+        cfg.ethnl = EthtoolFamily()
-+        cfg.netnl = NetdevFamily()
-+        ksft_run(cases=[test, test_gro_capacity], args=(cfg,))
-     ksft_exit()
- 
- 
+Here is the summary with links:
+  - [net-next,v4,01/15] net: stmmac: rearrange stmmac_tx_info members to pack better
+    https://git.kernel.org/netdev/net-next/c/12b4b16c0c7e
+  - [net-next,v4,02/15] net: stmmac: helpers for filling tx_q->tx_skbuff_dma
+    https://git.kernel.org/netdev/net-next/c/a4b1590ee0f0
+  - [net-next,v4,03/15] net: stmmac: clean up stmmac_clear_rx_descriptors()
+    https://git.kernel.org/netdev/net-next/c/ee19df4d3bb7
+  - [net-next,v4,04/15] net: stmmac: add helper to get hardware receive descriptor
+    https://git.kernel.org/netdev/net-next/c/ee1b6a94ba12
+  - [net-next,v4,05/15] net: stmmac: add helper to get size of a receive descriptor
+    https://git.kernel.org/netdev/net-next/c/4f6280c450ba
+  - [net-next,v4,06/15] net: stmmac: add helper to set receive tail pointer
+    https://git.kernel.org/netdev/net-next/c/e9d0cafa9d60
+  - [net-next,v4,07/15] net: stmmac: remove rx_tail_addr
+    https://git.kernel.org/netdev/net-next/c/bea37bda7f75
+  - [net-next,v4,08/15] net: stmmac: use consistent tests for receive buffer size
+    https://git.kernel.org/netdev/net-next/c/0b3d09031437
+  - [net-next,v4,09/15] net: stmmac: add helper to set receive buffer size
+    https://git.kernel.org/netdev/net-next/c/a32734d25d87
+  - [net-next,v4,10/15] net: stmmac: simplify stmmac_set_queue_rx_buf_size()
+    https://git.kernel.org/netdev/net-next/c/337191f37748
+  - [net-next,v4,11/15] net: stmmac: add helper to get hardware transmit descriptor
+    https://git.kernel.org/netdev/net-next/c/c493261de1c4
+  - [net-next,v4,12/15] net: stmmac: add helper to get size of a transmit descriptor
+    https://git.kernel.org/netdev/net-next/c/2c3525ad09e9
+  - [net-next,v4,13/15] net: stmmac: add helper to set transmit tail pointer
+    https://git.kernel.org/netdev/net-next/c/b2fd52d90b8a
+  - [net-next,v4,14/15] net: stmmac: remove tx_tail_addr
+    https://git.kernel.org/netdev/net-next/c/0da7809235d9
+  - [net-next,v4,15/15] net: stmmac: use queue rather than ->queue_index
+    https://git.kernel.org/netdev/net-next/c/8cde3c87039b
+
+You are awesome, thank you!
 -- 
-2.53.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
