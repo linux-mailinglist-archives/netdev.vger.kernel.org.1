@@ -1,74 +1,77 @@
-Return-Path: <netdev+bounces-268911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268912-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mKYVOCRfumnFUgIAu9opvQ
-	(envelope-from <netdev+bounces-268911-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:15:32 +0100
+	id gOxeKvteumnFUgIAu9opvQ
+	(envelope-from <netdev+bounces-268912-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:14:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57FDF2B7AB6
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:15:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BBB12B7A82
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:14:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E0E883139BE0
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:08:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AF06631B74A8
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680A936C587;
-	Wed, 18 Mar 2026 08:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3936A36C0B0;
+	Wed, 18 Mar 2026 08:07:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ngq3gtGl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MI+/NFXb"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C8C366DB5
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 08:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC58136C0A0
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 08:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773821261; cv=none; b=sPSg9iMGFZUN28mS0Fe+oK02DRUGwbLTQL4kg2Q9FFC5SbRDGHh2Hk0pVwBpNISDHGL4XBKuA+TPz8DSIJzjZc7hQnKO4bts/q/SD0OJjPnk6XNMlmbhf/yWBWUgVWiOhHWIsr5jFw1dNeRJPngxFi+a68wsFDytqEEvFOf5SYc=
+	t=1773821263; cv=none; b=VkAmYHXQaapVNpAc67ML5ViuxG7F6oja5LvEMmuc7uVU99/qC+lJBLe8Ya4lw1r2ZSJLae34B88bo3T7kWFtjBW8ZqpDZG9TDceeqxaj0n8kssKPEDCT2RNkxYh3abSX45URJHpu7v/IFW4ajIabuQu1letsmKHdas68zC57yVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773821261; c=relaxed/simple;
-	bh=fdLI0Ko6mtrlnwt0ohoaLVU0GX5WeN1MsPSScgcpLXY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j55kfB4LknvIyaYr1D74I14Zto9xcc/ufO0rid2UA+iLidXnRYuzdNYXg2iCqixBS5gL0x5TcgRz6Vlxs615ByS+eU4oFyergP99fPocv6RJ49WAkt39h4W1SrhC0i/n4GvdAgPHqCX1C0Uecfd2RCSobpbMxDFeI9cflF8c9WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ngq3gtGl; arc=none smtp.client-ip=198.175.65.19
+	s=arc-20240116; t=1773821263; c=relaxed/simple;
+	bh=84LnzcZCMYp6duMUvt8hli/mHgvmoXyWC9z9VVw9BfA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BwYUqdEBFWC1aKAdIEigsxhi6dhYWavruOuVTNi2qkb7RD+8oyH4m9jmxpOicJptvoLXg3c3PP+v0uipsJ0XVE3p0Cdlxf8sdmBbOq605io8S+RJ1wR4wMpMS4Nu/9X+iiZa1HCf3q4HiNwkT3njQbs8WJ3GniPbSH59yEwY5tM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MI+/NFXb; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773821260; x=1805357260;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=fdLI0Ko6mtrlnwt0ohoaLVU0GX5WeN1MsPSScgcpLXY=;
-  b=Ngq3gtGl+20uTYROgqTJ894yBNNiYF712piSV22I+5wkdJhPXFpodkZO
-   ioqnwfbKqwOZ0QtXWYjVHvvnSF6shmAnuaDBGFLgjZEYEPYtQtXsM8ale
-   M1u5axyeyL0clnD8yaTbln3mWjXvoqf1cg/vHam0sL6oCGU5uEJVnuwmD
-   EJ8SPfxSl2E/r+1Y0nMLEeVT5igPENU3J9+Q0YY06AaKTVJFiF1rOWrSd
-   wTD570nHAG6z3awMw5Gew/lykgIgpyr3eCnS2E4y97Yobe/1dxLV0CvUz
-   tEqEqJ5JSS/mD0NFtu47A7S+ae6MsvKmiYjk1VY9OQiQn2v2fi2ops6y7
+  t=1773821261; x=1805357261;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=84LnzcZCMYp6duMUvt8hli/mHgvmoXyWC9z9VVw9BfA=;
+  b=MI+/NFXbZfUTOY0MBWmoqBqro309j80moFVkpTCkzUlSxp7opGhhLvV9
+   +kOkdgWVu1V/51zoxy62MsE8SWbzdt6+1vNblm967IwdNB5Iy446TPSIB
+   g6/Mh4NTRDd7aKcrwpDwYVzTe5joxBRV2bMoO5fzfmJEhCUI1CDdIK0SD
+   HUjTqrae6EaS8qd6+NICrz/IdFLT/o6LKiWq6UEUzWmZCC3Ovrhhr7Gnb
+   cGMhslN6NRZbHk0ZLTw9scXZxOEGPS6Q0km+H5Eu4VGwWAHdBcyi+i01R
+   5EwvTxysew0PvkffyjwZRq3DNRRM/sGuw+Qc9OtdgICLdH7+RkfChW9p6
    A==;
-X-CSE-ConnectionGUID: wKEswRqBSCu7W84e3Tc5gA==
-X-CSE-MsgGUID: ePJKJGXBSIC47HwDHl/THA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11732"; a="74755242"
+X-CSE-ConnectionGUID: jaTU0oU0T0WuNuo88Yymuw==
+X-CSE-MsgGUID: 8k8DsMRGR3Cn98r9/+uj2g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11732"; a="74755244"
 X-IronPort-AV: E=Sophos;i="6.23,127,1770624000"; 
-   d="scan'208";a="74755242"
+   d="scan'208";a="74755244"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2026 01:07:39 -0700
-X-CSE-ConnectionGUID: 2Op16dLKS82lmlB/t7murQ==
-X-CSE-MsgGUID: IcmXUWE4SkyEN7qw+RC/Mw==
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2026 01:07:41 -0700
+X-CSE-ConnectionGUID: jdC19aAIR+2gvK0MrbS1bw==
+X-CSE-MsgGUID: nV1zGSKUSb67sYXQUFbPUw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,127,1770624000"; 
-   d="scan'208";a="221628539"
+   d="scan'208";a="221628545"
 Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by orviesa006.jf.intel.com with ESMTP; 18 Mar 2026 01:07:38 -0700
+  by orviesa006.jf.intel.com with ESMTP; 18 Mar 2026 01:07:39 -0700
 From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	anthony.l.nguyen@intel.com,
 	aleksandr.loktionov@intel.com
 Cc: netdev@vger.kernel.org
-Subject: [PATCH net-next v1 0/2] virtchnl/ice: add IEEE 802.1ah (0x88E7) VLAN ethertype support
-Date: Wed, 18 Mar 2026 09:07:34 +0100
-Message-ID: <20260318080737.3012293-1-aleksandr.loktionov@intel.com>
+Subject: [PATCH net-next v1 1/2] virtchnl: add VIRTCHNL_VLAN_ETHERTYPE_88E7 support
+Date: Wed, 18 Mar 2026 09:07:35 +0100
+Message-ID: <20260318080737.3012293-2-aleksandr.loktionov@intel.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260318080737.3012293-1-aleksandr.loktionov@intel.com>
+References: <20260318080737.3012293-1-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,11 +85,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268911-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268912-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_HAS_DN(0.00)[];
@@ -99,60 +102,44 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_NONE(0.00)[];
 	RCPT_COUNT_THREE(0.00)[4];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: 57FDF2B7AB6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0BBB12B7A82
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-IEEE 802.1ah (Provider Backbone Bridging) defines the Backbone Service
-Tag (B-TAG) with ethertype 0x88E7. In environments that combine Provider
-Backbone Bridging with virtualisation, VFs may receive or transmit frames
-carrying a B-TAG and need to install matching VLAN filters on the PF.
+IEEE 802.1ah (Provider Backbone Bridging) uses ethertype 0x88E7 as the
+Backbone Service Tag (B-TAG). Some deployments stack 802.1ah on top of
+existing QinQ or single-tagged VLAN infrastructure, creating scenarios
+where a VF needs to negotiate support for the 0x88E7 ethertype with the
+PF in order to install correct VLAN filters.
 
-The existing virtchnl VLAN v2 capability handshake (via
-VIRTCHNL_OP_GET_OFFLOAD_VLAN_V2_CAPS) has dedicated bitmask entries for
-each supported ethertype (0x8100, 0x88A8, 0x9100) but lacked one for
-0x88E7, making it impossible for a VF driver to advertise or negotiate
-B-TAG support.
+Add VIRTCHNL_VLAN_ETHERTYPE_88E7 = BIT(3) to the virtchnl_vlan_support
+capability bitmask so that VF drivers can advertise and negotiate 0x88E7
+VLAN ethertype support through the existing VIRTCHNL_OP_GET_OFFLOAD_VLAN_V2_CAPS
+handshake.
 
-This series adds the missing capability flag and wires up the three
-software-path checks in the ice PF driver that guard VLAN filter
-installation:
+The new bit follows the established BIT(N) pattern of the enum and does
+not conflict with any existing flag.
 
-  Patch 1 adds VIRTCHNL_VLAN_ETHERTYPE_88E7 = BIT(3) to the shared
-  virtchnl_vlan_support enum in include/linux/avf/virtchnl.h.
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+ include/linux/avf/virtchnl.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-  Patch 2 updates ice's TC TPID validation, VSI VLAN filter validation,
-  and the bidirectional virtchnl VLAN v2 translation functions to
-  accept/translate ETH_P_8021AH (0x88E7).
-
-No hardware offload changes, no datapath modifications.
-
-Tested on E810 with an iavf VF requesting 0x88E7-tagged VLAN filters:
-  Verified that a TC flower rule matching on VLAN TPID 0x88E7 is now
-  accepted and offloaded by the driver without returning -EINVAL:
-
-    tc qdisc add dev $VF clsact
-    tc filter add dev $VF ingress protocol 802.1Q flower \
-        vlan_ethtype 0x88e7 action pass
-    # (previously: Error: Failed to offload TC filter - vlan_type was 0)
-
-  Also verified VF transparent passthrough of triple-tagged frames with
-  0x88E7 as middle and innermost tag using scapy on a back-to-back E810
-  pair (kernel 6.19.0-rc8+, FW 4.91, ICE Triple VLAN Comms DDP 1.3.88.88).
-
-Aleksandr Loktionov (2):
-  virtchnl: add VIRTCHNL_VLAN_ETHERTYPE_88E7 support
-  ice: add 0x88E7 handling to SW validation paths
-
- drivers/net/ethernet/intel/ice/ice_tc_lib.c       | 1 +
- drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c | 3 ++-
- drivers/net/ethernet/intel/ice/virt/virtchnl.c    | 6 ++++++
- include/linux/avf/virtchnl.h                      | 1 +
- 4 files changed, 10 insertions(+), 1 deletion(-)
-
+diff --git a/include/linux/avf/virtchnl.h b/include/linux/avf/virtchnl.h
+index 11bdab5..511c882 100644
+--- a/include/linux/avf/virtchnl.h
++++ b/include/linux/avf/virtchnl.h
+@@ -636,6 +636,7 @@ enum virtchnl_vlan_support {
+ 	VIRTCHNL_VLAN_ETHERTYPE_8100 =		BIT(0),
+ 	VIRTCHNL_VLAN_ETHERTYPE_88A8 =		BIT(1),
+ 	VIRTCHNL_VLAN_ETHERTYPE_9100 =		BIT(2),
++	VIRTCHNL_VLAN_ETHERTYPE_88E7 =		BIT(3),
+ 	VIRTCHNL_VLAN_TAG_LOCATION_L2TAG1 =	BIT(8),
+ 	VIRTCHNL_VLAN_TAG_LOCATION_L2TAG2 =	BIT(9),
+ 	VIRTCHNL_VLAN_TAG_LOCATION_L2TAG2_2 =	BIT(10),
 -- 
 2.52.0
 
