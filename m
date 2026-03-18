@@ -1,148 +1,159 @@
-Return-Path: <netdev+bounces-269138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269140-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qM6tMGXaummfcgIAu9opvQ
-	(envelope-from <netdev+bounces-269138-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:01:25 +0100
+	id sNUiKlvdumk3cwIAu9opvQ
+	(envelope-from <netdev+bounces-269140-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:14:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7319C2BFD24
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:01:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 238CB2C000D
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:14:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B4DA2300BB82
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:59:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EB87530D1292
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AAB62D1914;
-	Wed, 18 Mar 2026 16:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4EF33D4E4;
+	Wed, 18 Mar 2026 17:06:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="XOSgSpBz"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="pHVGGxZ6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-1909.mail.infomaniak.ch (smtp-1909.mail.infomaniak.ch [185.125.25.9])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51AB2D0C92
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 16:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9263C33F384;
+	Wed, 18 Mar 2026 17:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773853142; cv=none; b=BkCxV6IyZ4X8vipDPvrXDaSZ1BYIXQRM1Kwc4Us9C3xK6v/Tls0BAdpBc+fK4wqIyI8GWVabUKRcTbs7zsm2pRbnxP1eq1HC8Py+WchEpT/ATmSW2iHu1O6IfnshW2l/2m9z6/1JnG645pIxOyffiwpyUysbJ6n6XJd6uewQi7U=
+	t=1773853573; cv=none; b=mI2V9Ewbq7EwyyEaZS/+EGLIiITpsyLrjuny3gOkZxRXX1/LQYrosSAu2WYIKuoTdSBh5DuSPgHiP8FeskPU/H1nKpmFHXANSU4mVUzsRT+RjY1aLOOn3k4mdZpnDOKWUlloauUlrAN7mi1PLHi7vr2bjjReaMfNFEqIR4bbFAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773853142; c=relaxed/simple;
-	bh=LQCFyOUUSplp5eShsmV6I/MKXo2fwwMA86XZnghC+IU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hADKeoPpsSIKRWI2Raph3rX3FIjfbtMWMsKyGhrVeTQmJ9UXQp+yi6CUi7jxuh063okr4jLDOj9mFvhLbF0+GghGXJ+TeYngx1JQ7fkWppcgq+XJVT9xvX+Yy81jGmU23k85C2CW/84ErDOKlNrALxhsw5BiKSM/a6pG12wwc+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=XOSgSpBz; arc=none smtp.client-ip=185.125.25.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4fbZcD6FnhzdJ7;
-	Wed, 18 Mar 2026 17:51:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1773852716;
-	bh=Xzcs+HBo55vlCaVgM+QV0cRzIBJGQFhXXf13QjKsaAw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XOSgSpBz/LzVvF1/5nsaK+hbSMU+A21p7bi30+qhTS7h5u322GZ7i3sahZoIEleYj
-	 VW5s0+ERmGELFlgxlxy8X4Z9PHY9al/UriHhWO+8I+VHegPQ97uGhCPXz0aLjC6bVG
-	 tds+P12v+ibSico+I2J9Jp89rRKHtHT2fZqbou1U=
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4fbZcC4Hdrz7GX;
-	Wed, 18 Mar 2026 17:51:55 +0100 (CET)
-Date: Wed, 18 Mar 2026 17:51:51 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>
-Cc: John Johansen <john.johansen@canonical.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E . Hallyn" <serge@hallyn.com>, Tingmao Wang <m@maowtm.org>, 
-	Justin Suess <utilityemal77@gmail.com>, linux-security-module@vger.kernel.org, 
-	Samasth Norway Ananda <samasth.norway.ananda@oracle.com>, Matthieu Buffet <matthieu@buffet.re>, 
-	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, konstantin.meskhidze@huawei.com, 
-	Demi Marie Obenour <demiobenour@gmail.com>, Alyssa Ross <hi@alyssa.is>, Jann Horn <jannh@google.com>, 
-	Tahera Fahimi <fahimitahera@gmail.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v6 1/9] lsm: Add LSM hook security_unix_find
-Message-ID: <20260318.giez0eib8Ovu@digikod.net>
-References: <20260315222150.121952-1-gnoack3000@gmail.com>
- <20260315222150.121952-2-gnoack3000@gmail.com>
+	s=arc-20240116; t=1773853573; c=relaxed/simple;
+	bh=VbDdPt5V2iYDxuFM5o59Js8zGg623WZdAgM4YWkYbu8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oaRzUKJgohnE2RyyVnZt6Asv8sCsfvxLqAISg+QBv6nD2R0NjQpBTgEDZUKOdy/KEunKMa+DIYX2Fii6V3RBppdvQeov/hu2DexrDP0RjJg+K9RZ/ZQrOlfgMOQwJf2o8nfeA6PG7yp5Jf+nvwIRq/gQGVmPscKrexfjHj048+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=pHVGGxZ6; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1w2uLC-000PR0-G1; Wed, 18 Mar 2026 18:05:54 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=9PjUi89Rq5UeOAy8wYWz7JCds8tIZvlL7cDob3xI8us=; b=pHVGGxZ6bGP58yl0P/YsBDrG4z
+	wP8Z+87vN2YGOtei8ZYgbf16cLT5hBZKtTRua5ogL1iAIyGk/pPz5eW3Px2k4vDVrU3bvWHmpWwbS
+	JrFVLIMJlDfRuMaIkv0Y8E0jFiCSW9RgwWKBRmYWKw+wHjMeCGS4nkoJE9ZSfyzbmvwfbR+pxGXEW
+	dlGaTfyl1diOBd/7+OUDJYz9i0O2q0iRcHmxH3RqE/5ohXLK1Oy9Oww1OBKAVhnMAzFL5Kz8Hw/kM
+	9ROKw1LMay1klkUjVLpeWBEsEIt6QNlEJDDNb0a4JderIMjPm8hq+9dLmIz8h7Qb/HltdF24Lch+1
+	3Gu8XxuA==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1w2uLB-0008NP-6n; Wed, 18 Mar 2026 18:05:53 +0100
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1w2uL9-00D1bi-AC; Wed, 18 Mar 2026 18:05:51 +0100
+Message-ID: <c7742de5-7b68-4520-95b4-7ed5ed997c0a@rbox.co>
+Date: Wed, 18 Mar 2026 18:05:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260315222150.121952-2-gnoack3000@gmail.com>
-X-Infomaniak-Routing: alpha
-X-Spamd-Result: default: False [-0.89 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf v3 1/5] bpf, sockmap: Annotate af_unix sock::sk_state
+ data-races
+To: John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Yonghong Song <yhs@fb.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Cong Wang <cong.wang@bytedance.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260306-unix-proto-update-null-ptr-deref-v3-0-2f0c7410c523@rbox.co>
+ <20260306-unix-proto-update-null-ptr-deref-v3-1-2f0c7410c523@rbox.co>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20260306-unix-proto-update-null-ptr-deref-v3-1-2f0c7410c523@rbox.co>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.77)[subject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[digikod.net:s=20191114];
+	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
+	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269138-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269140-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[canonical.com,paul-moore.com,namei.org,hallyn.com,maowtm.org,gmail.com,vger.kernel.org,oracle.com,buffet.re,huawei-partners.com,huawei.com,alyssa.is,google.com,linutronix.de,kernel.org,zeniv.linux.org.uk];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	DMARC_NA(0.00)[digikod.net];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com,google.com,redhat.com,davemloft.net,kernel.org,fb.com,iogearbox.net,linux.dev,fomichev.me,bytedance.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[digikod.net:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[rbox.co:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[mic@digikod.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,digikod.net:dkim,digikod.net:mid,maowtm.org:email]
-X-Rspamd-Queue-Id: 7319C2BFD24
+	DBL_BLOCKED_OPENRESOLVER(0.00)[rbox.co:dkim,rbox.co:email,rbox.co:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email]
+X-Rspamd-Queue-Id: 238CB2C000D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Mar 15, 2026 at 11:21:42PM +0100, Günther Noack wrote:
-> From: Justin Suess <utilityemal77@gmail.com>
+On 3/6/26 00:30, Michal Luczaj wrote:
+> sock_map_sk_state_allowed() and sock_map_redirect_allowed() read af_unix
+> socket sk_state locklessly.
 > 
-> Add a LSM hook security_unix_find.
-
-Add an LSM hook...
-
+> Use READ_ONCE(). Note that for sock_map_redirect_allowed() change affects
+> not only af_unix, but all non-TCP sockets (UDP, af_vsock).
 > 
-> This hook is called to check the path of a named unix socket before a
-
-UNIX socket
-
-> connection is initiated. The peer socket may be inspected as well.
-> 
-> Why existing hooks are unsuitable:
-> 
-> Existing socket hooks, security_unix_stream_connect(),
-> security_unix_may_send(), and security_socket_connect() don't provide
-> TOCTOU-free / namespace independent access to the paths of sockets.
-> 
-> (1) We cannot resolve the path from the struct sockaddr in existing hooks.
-> This requires another path lookup. A change in the path between the
-> two lookups will cause a TOCTOU bug.
-> 
-> (2) We cannot use the struct path from the listening socket, because it
-> may be bound to a path in a different namespace than the caller,
-> resulting in a path that cannot be referenced at policy creation time.
-> 
-> Cc: Günther Noack <gnoack3000@gmail.com>
-> Cc: Tingmao Wang <m@maowtm.org>
-> Signed-off-by: Justin Suess <utilityemal77@gmail.com>
+> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Suggested-by: Martin KaFai Lau <martin.lau@linux.dev>
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
 > ---
->  include/linux/lsm_hook_defs.h |  5 +++++
->  include/linux/security.h      | 11 +++++++++++
->  net/unix/af_unix.c            | 13 ++++++++++---
->  security/security.c           | 20 ++++++++++++++++++++
->  4 files changed, 46 insertions(+), 3 deletions(-)
+>  net/core/sock_map.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+> index b0e96337a269..02a68be3002a 100644
+> --- a/net/core/sock_map.c
+> +++ b/net/core/sock_map.c
+
+...
+
+> @@ -543,7 +543,7 @@ static bool sock_map_sk_state_allowed(const struct sock *sk)
+>  	if (sk_is_tcp(sk))
+>  		return (1 << sk->sk_state) & (TCPF_ESTABLISHED | TCPF_LISTEN);
+>  	if (sk_is_stream_unix(sk))
+> -		return (1 << sk->sk_state) & TCPF_ESTABLISHED;
+> +		return (1 << READ_ONCE(sk->sk_state)) & TCPF_ESTABLISHED;
+>  	if (sk_is_vsock(sk) &&
+>  	    (sk->sk_type == SOCK_STREAM || sk->sk_type == SOCK_SEQPACKET))
+>  		return (1 << sk->sk_state) & TCPF_ESTABLISHED;
+> 
+
+Another reason to (conditionally) take unix_state_lock() at
+sock_map_update_elem{,_sys}(): chunk above can be dropped.
+
 
