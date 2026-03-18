@@ -1,173 +1,286 @@
-Return-Path: <netdev+bounces-269050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269052-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oNRvKqO9ummqbQIAu9opvQ
-	(envelope-from <netdev+bounces-269050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 15:58:43 +0100
+	id UEyxDI3CumkGbgIAu9opvQ
+	(envelope-from <netdev+bounces-269052-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:19:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 517612BDAFB
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 15:58:43 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39E012BE11C
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:19:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5251B30832E0
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:50:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2640730E7AD9
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6791F3DEAD0;
-	Wed, 18 Mar 2026 14:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E98E3DEAFC;
+	Wed, 18 Mar 2026 14:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Szx6C34I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fAtjlSky"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026883DFC8E;
-	Wed, 18 Mar 2026 14:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A569C3DEACF;
+	Wed, 18 Mar 2026 14:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773845374; cv=none; b=qwcYlWhJfpRsv5BNW6mA2tEyzupHHhGZJh/nWV3xDDwP13P4bTsmQ/52gJ0yNgJWt+ufnfRC2rw1nSa21RakujGUSDODF8ljOJw5ygFwxgo4hPGtMVCNjjR9s5bp7I1HNr0hhFNW0Ztn2LniMoZ/qUJJ2XoX+EpRghl8eaAjlTU=
+	t=1773845599; cv=none; b=KeZtGzjNJcVsYeS5Zv/hhlRwLmb/R9S5rn9ibkFEvxJSfMVFwKZfBpn5VgFzj36h1Lq97a0bxLlJ1BSH/4K+UTs7OS+DAOL+AMN5L8MklbDC7p1zhbUbhzHTGYSYt17XFDNycgK/muPUKt+45Lt2jJxvAZl+iY4UGrGn+COrDOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773845374; c=relaxed/simple;
-	bh=wjL9ciqdCWcL/zpYteBo9jr8z/hJJuF/zC+yQOcCUKc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jiajy6YKgRbgI14WO4Rfk8jrTlDlvanumngsTgAzCu+FuCQY8OiC9dN7vE0PcdvGRWsVzQT7jkd3rgHyYa3/6m5bpvUQHQEefiXhgUpUw4IpKFy0slNJxWnnBJci3D9OpTyxK1lP7tQZ4GvFMooOLXhTsbQjMOCB1qzXUvr+Mck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Szx6C34I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1F30C19421;
-	Wed, 18 Mar 2026 14:49:32 +0000 (UTC)
+	s=arc-20240116; t=1773845599; c=relaxed/simple;
+	bh=felRz9HjKIpiMojzCYck9P/yFifvYQCbmR4et9IJMCE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=iBYimGBsam8lvF67je/JcTUbZvnapqfcrMbp+tZtUAx9qTZS+ygzWjfzAnrg22awR0wbC7Yt0We5prFYWlEB2MKzhycwzU3s4C5XrXyELMRwwXhyV5vhmSRnhUzcD325xhgkRUZQwzAoGZgttCZNWzz1itXzS8Zg+yPKFT7+Ekk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fAtjlSky; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC5C1C19421;
+	Wed, 18 Mar 2026 14:53:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773845373;
-	bh=wjL9ciqdCWcL/zpYteBo9jr8z/hJJuF/zC+yQOcCUKc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Szx6C34IHWdK/Rh2CQ60ByQ5z1LThBSbM4Ezrejp/Wv5RDkgeYBrUD8j69MulSh12
-	 fSHhxzrDJ0FkIhun/geXzhB5XtsD+SLghVpcwmd8mjfKFOfe2RWBIGtjMI/oopOqt+
-	 uUVOSYMlf2RzcEtFcRCQKGGi1EXP85u7w3u5x8b6BYn2g/DXI+a/ERstzOMHoKx+yP
-	 9++0g1ln9JNLL74gXaqgOGvONXo3IXN6EPCZ2+v1UMGz7NiAIQ4iku7NMEltPnfzI5
-	 /5+5Alykd3qF8LZJMP/rcai6adQ/IIduNv+eaEi62ZiSfdOCzg6CSGDQ99S1PvNlbd
-	 Ad8o1+fyDow+A==
-Date: Wed, 18 Mar 2026 16:49:27 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Long Li <longli@microsoft.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	KY Srinivasan <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <DECUI@microsoft.com>, Simon Horman <horms@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH rdma-next 0/8] RDMA/mana_ib: Handle
- service reset for RDMA resources
-Message-ID: <20260318144927.GB352386@unreal>
-References: <20260307014723.556523-1-longli@microsoft.com>
- <20260307173814.GN12611@unreal>
- <20260313165928.GH1704121@ziepe.ca>
- <20260316200843.GK61385@unreal>
- <SA1PR21MB66832D0A369DE7E411ACCDEDCE41A@SA1PR21MB6683.namprd21.prod.outlook.com>
+	s=k20201202; t=1773845599;
+	bh=felRz9HjKIpiMojzCYck9P/yFifvYQCbmR4et9IJMCE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=fAtjlSkyrrMyzIBZ7N2NlRzPZBtw8remOkjH7r+8O59bkBW9qIQf+rzgbHGyeJBZK
+	 0+T4qwG8pBLnqm5DlGljHViPzqML4ExtKFxOgILq0kFmbQ4uvSAukqpPijCffZKz5k
+	 Y7SBwklP6pAK+QeUH6IaeFjQHqZO+bN3SRjdRExWC97ff3txc5AZ03kJMwY0a8UlDW
+	 Od9QgSz11fcD99EJ8ap1pH+Sv8ZBKcHDb5mms12ptgEjzCziEJPXor9Pn/4l4lV15A
+	 92QuVOu/VnAHsV+FpmWB25zl5ivwjGt0EdgLwJPp1oONsKUcmW0Oon4456rAUBshvk
+	 SdVMgMdIqIi2w==
+From: Simon Horman <horms@kernel.org>
+To: wei.fang@nxp.com
+Cc: Simon Horman <horms@kernel.org>,
+	robh@kernel.org,
+	pabeni@redhat.com,
+	claudiu.manoil@nxp.com,
+	devicetree@vger.kernel.org,
+	f.fainelli@gmail.com,
+	frank.li@nxp.com,
+	imx@lists.linux.dev,
+	krzk+dt@kernel.org,
+	linux-kernel@vger.kernel.org,
+	edumazet@google.com,
+	xiaoning.wang@nxp.com,
+	davem@davemloft.net,
+	linux@armlinux.org.uk,
+	kuba@kernel.org,
+	chleroy@kernel.org,
+	conor+dt@kernel.org,
+	andrew+netdev@lunn.ch,
+	linux-arm-kernel@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org,
+	vladimir.oltean@nxp.com,
+	netdev@vger.kernel.org
+Subject: Re: [net-next,12/14] net: dsa: netc: add more basic functions support
+Date: Wed, 18 Mar 2026 14:49:56 +0000
+Message-ID: <20260318144954.1893193-3-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260316094152.1558671-13-wei.fang@nxp.com>
+References: <20260316094152.1558671-13-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <SA1PR21MB66832D0A369DE7E411ACCDEDCE41A@SA1PR21MB6683.namprd21.prod.outlook.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269050-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,nxp.com,vger.kernel.org,gmail.com,lists.linux.dev,google.com,davemloft.net,armlinux.org.uk,lunn.ch,lists.infradead.org,lists.ozlabs.org];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TAGGED_FROM(0.00)[bounces-269052-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.987];
+	NEURAL_HAM(-0.00)[-0.949];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 517612BDAFB
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 39E012BE11C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 17, 2026 at 11:43:49PM +0000, Long Li wrote:
-> > 
-> > On Fri, Mar 13, 2026 at 01:59:28PM -0300, Jason Gunthorpe wrote:
-> > > On Sat, Mar 07, 2026 at 07:38:14PM +0200, Leon Romanovsky wrote:
-> > > > On Fri, Mar 06, 2026 at 05:47:14PM -0800, Long Li wrote:
-> > > > > When the MANA hardware undergoes a service reset, the ETH
-> > > > > auxiliary device
-> > > > > (mana.eth) used by DPDK persists across the reset cycle — it is
-> > > > > not removed and re-added like RC/UD/GSI QPs. This means userspace
-> > > > > RDMA consumers such as DPDK have no way of knowing that firmware
-> > > > > handles for their PD, CQ, WQ, QP and MR resources have become stale.
-> > > >
-> > > > NAK to any of this.
-> > > >
-> > > > In case of hardware reset, mana_ib AUX device needs to be destroyed
-> > > > and recreated later.
-> > >
-> > > Yeah, that is our general model for any serious RAS event where the
-> > > driver's view of resources becomes out of sync with the HW.
-> > >
-> > > You have tear down the ib_device by removing the aux and then bring
-> > > back a new one.
-> > >
-> > > There is an IB_EVENT_DEVICE_FATAL, but the purpose of that event is to
-> > > tell userspace to close and re-open their uverbs FD.
-> > >
-> > > We don't have a model where a uverbs FD in userspace can continue to
-> > > work after the device has a catasrophic RAS event.
-> > >
-> > > There may be room to have a model where the ib device doesn't fully
-> > > unplug/replug so it retains its name and things, but that is core code
-> > > not driver stuff.
-> > 
-> > Good luck with that model. It is going to break RDMA-CM hotplug support.
-> > 
-> 
->    I think we can preserve RDMA-CM behavior without requiring ib_device
->    unregister/re-register.
-> 
->    On device reset, the driver can dispatch IB_EVENT_DEVICE_FATAL (or a
->    new reset event) through ib_dispatch_event(). RDMA-CM already handles
->    device events — we would add a handler that iterates all rdma_cm_ids
->    on the device and sends RDMA_CM_EVENT_DEVICE_REMOVAL to each, same
->    as cma_process_remove() does today. The difference: cma_device stays
->    alive, so applications can reconnect on the same device after recovery
->    instead of waiting for a new one to appear.
-> 
->    The motivation for keeping ib_device alive is that some RDMA consumers
->    — DPDK and NCCL — don't use RDMA-CM at all. They use raw verbs and
->    manage QP state themselves.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-RDMA-CM provides an "external QP" model where the QP is managed by the
-rdma-cm user.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: dsa: netc: add more basic functions support
 
-As Jason noted, you should propose the core changes together with the
-corresponding librdmacm updates. The final result must ensure that legacy
-applications continue to function correctly with the new kernel.
+This patch expands the NETC switch driver with several foundational
+features, including FDB and MDB management, STP state handling, MTU
+configuration, port setup/teardown, and host flooding support.
+At this stage, the driver operates only in standalone port mode.
 
-Thanks
+> diff --git a/drivers/net/dsa/netc/netc_main.c b/drivers/net/dsa/netc/netc_main.c
+> index 884ee899fc89..fd952b507cbd 100644
+> --- a/drivers/net/dsa/netc/netc_main.c
+> +++ b/drivers/net/dsa/netc/netc_main.c
+
+[ ... ]
+
+> @@ -427,24 +658,57 @@ static int netc_setup(struct dsa_switch *ds)
+>  	if (err)
+>  		goto free_mdio_bus;
+>
+> +	INIT_HLIST_HEAD(&priv->fdb_list);
+> +	mutex_init(&priv->fdbt_lock);
+> +
+>  	netc_switch_fixed_config(priv);
+>
+>  	/* default setting for ports */
+>  	dsa_switch_for_each_available_port(dp, ds)
+>  		netc_port_default_config(priv->ports[dp->index]);
+>
+> +	err = netc_add_standalone_vlan_entry(priv);
+> +	if (err)
+> +		goto free_ntmp_user;
+> +
+> +	err = netc_add_standalone_fdb_bcast_entry(priv);
+> +	if (err)
+> +		goto free_ntmp_user;
+> +
+>  	return 0;
+>
+> +free_ntmp_user:
+> +	netc_free_ntmp_user(priv);
+>  free_mdio_bus:
+>  	netc_free_mdio_bus(priv);
+>
+>  	return err;
+>  }
+
+Does the error path handle the mutex properly?
+
+In netc_setup(), the mutex is initialized with mutex_init(&priv->fdbt_lock).
+If netc_add_standalone_vlan_entry() or netc_add_standalone_fdb_bcast_entry()
+fails, the error path jumps to free_ntmp_user:
+
+drivers/net/dsa/netc/netc_main.c:netc_setup() {
+	...
+	INIT_HLIST_HEAD(&priv->fdb_list);
+	mutex_init(&priv->fdbt_lock);
+	...
+	err = netc_add_standalone_vlan_entry(priv);
+	if (err)
+		goto free_ntmp_user;
+
+	err = netc_add_standalone_fdb_bcast_entry(priv);
+	if (err)
+		goto free_ntmp_user;
+
+	return 0;
+
+free_ntmp_user:
+	netc_free_ntmp_user(priv);
+free_mdio_bus:
+	netc_free_mdio_bus(priv);
+
+	return err;
+}
+
+But netc_free_ntmp_user() and netc_free_mdio_bus() don't call
+mutex_destroy(&priv->fdbt_lock) to clean up the mutex.
+
+Looking at the normal teardown path in netc_teardown(), it calls
+netc_destroy_all_lists() which properly handles both the FDB list and
+mutex cleanup:
+
+drivers/net/dsa/netc/netc_main.c:netc_destroy_all_lists() {
+	netc_destroy_fdb_list(priv);
+	mutex_destroy(&priv->fdbt_lock);
+}
+
+drivers/net/dsa/netc/netc_main.c:netc_teardown() {
+	struct netc_switch *priv = ds->priv;
+
+	netc_destroy_all_lists(priv);
+	netc_free_host_flood_rules(priv);
+	netc_free_ntmp_user(priv);
+	netc_free_mdio_bus(priv);
+}
+
+Should the error path in netc_setup() call netc_destroy_all_lists() before
+calling netc_free_ntmp_user()?
+
+> @@ -595,6 +859,261 @@ static void netc_switch_get_ip_revision(struct netc_switch *priv)
+>  	priv->revision = val & IPBRR0_IP_REV;
+>  }
+>
+> +static void netc_destroy_all_lists(struct netc_switch *priv)
+> +{
+> +	netc_destroy_fdb_list(priv);
+> +	mutex_destroy(&priv->fdbt_lock);
+> +}
+> +
+> +static void netc_free_host_flood_rules(struct netc_switch *priv)
+> +{
+> +	struct dsa_port *dp;
+> +
+> +	dsa_switch_for_each_user_port(dp, priv->ds) {
+> +		struct netc_port *np = priv->ports[dp->index];
+> +
+> +		kfree(np->host_flood);
+> +		np->host_flood = NULL;
+> +	}
+> +}
+
+[Simon says: I think this is a false positive and the clean-up
+ suggestion is not needed in tear down]
+
+Does this properly clean up the hardware state?
+
+netc_free_host_flood_rules() just frees the host_flood memory and sets
+the pointer to NULL:
+
+drivers/net/dsa/netc/netc_main.c:netc_free_host_flood_rules() {
+	struct dsa_port *dp;
+
+	dsa_switch_for_each_user_port(dp, priv->ds) {
+		struct netc_port *np = priv->ports[dp->index];
+
+		kfree(np->host_flood);
+		np->host_flood = NULL;
+	}
+}
+
+But it doesn't delete the hardware IPFT entry or disable the PIPFCR register.
+
+Compare with netc_port_remove_host_flood() which performs complete cleanup:
+
+drivers/net/dsa/netc/netc_main.c:netc_port_remove_host_flood() {
+	struct netc_switch *priv = np->switch_priv;
+
+	if (!np->host_flood)
+		return;
+
+	ntmp_ipft_delete_entry(&priv->ntmp, np->host_flood->entry_id);
+	kfree(np->host_flood);
+	np->host_flood = NULL;
+	np->uc = false;
+	np->mc = false;
+	/* Disable ingress port filter table lookup */
+	netc_port_wr(np, NETC_PIPFCR, 0);
+}
+
+In netc_teardown(), netc_free_host_flood_rules() is called before
+netc_free_ntmp_user(), so the NTMP command infrastructure is still
+operational at that point.
+
+Should netc_free_host_flood_rules() call netc_port_remove_host_flood(np)
+for each user port instead of directly calling kfree()?
 
