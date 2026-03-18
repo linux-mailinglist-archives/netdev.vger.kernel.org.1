@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-269162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269163-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QJByF/j5umlwdwIAu9opvQ
-	(envelope-from <netdev+bounces-269162-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 20:16:08 +0100
+	id mNUjIxz6umlwdwIAu9opvQ
+	(envelope-from <netdev+bounces-269163-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 20:16:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC6F22C1E6F
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 20:16:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC7182C1E77
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 20:16:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 89B9330AA172
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 19:14:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9D669310AE47
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 19:14:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630AC3F1679;
-	Wed, 18 Mar 2026 19:13:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CAE13F076D;
+	Wed, 18 Mar 2026 19:13:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="vrMNtvCw"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="NCH4DYky"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01AA33F166C
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 19:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D503F0ABD
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 19:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773861228; cv=none; b=kT93ejVT4yPKK/yeaOXAU+bK4LbBNwMs+KoA++BLNnZLA4bDS7yYGsHX2dlzdLxBgeu5aLLTTRQ36Z3obc/F7VDe+C18F0bO/WEcBvFVsL2eO73qq5OmvxejKBiHpT2xw/4ucq5c8xIZOyXCydwL2tJU9Y+gJQBxECGXWYXmY0s=
+	t=1773861229; cv=none; b=JAsq9rHVDegBOMyQ83BO0wOEx8J9T2s+Ht0oXgGnPOBH/mVcVCIkVDC8GcRCo5jxMbfxKswo8XYy37ZdCEYDLSA/3a+xyVCn4IaefDV737kP15dwKQ9vY2SmQ5Yum7Yau2SdcdKNCjBIKqz4bf7pD/JKZc50V9MxSocl5E5KtQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773861228; c=relaxed/simple;
-	bh=qLU6Qupx3PDp3jST+ZazaL48meSvYnVw5Dt9vzCSwFk=;
+	s=arc-20240116; t=1773861229; c=relaxed/simple;
+	bh=7Zu0Dz91B8pcyek/pNRIrZNMIcp1uoJ9XU9YtqJIP40=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M+HwZBi/UWwt3u1VljLhytHFWhAL2Y2nL/v7XakyRon6WWeqFiEsynK9WWOaxLh+Q/5f2GDvv+3drlq3CpLuQvIKSkchd4s1bgqtXFcHBQvUHWvKcOvL4jPb1u2b/XtHHMIIuxBa0gdoCJ9qox6xatS4fjHcRMb+zErcCTwe8fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=vrMNtvCw; arc=none smtp.client-ip=209.85.214.169
+	 MIME-Version; b=iHsPcZtL7MQ0CBKQtHAI9B0bA3bRLrHBvQUPvVt1VH8EQH1WEwiXp67Dq361UVneFWtRkJ1lTMa3ZBPyJrKSL3kfoUDqUSejuhEDO7Ssn3ZhzZJxQ5EKzl/8i/bkIaE5+7QqiUNyjN3QsABC8HLb4h/3k01P6k1HvM8uv2V5MeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=NCH4DYky; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2b062069f80so1242715ad.0
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 12:13:44 -0700 (PDT)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-82987437624so116356b3a.1
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 12:13:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1773861224; x=1774466024; darn=vger.kernel.org;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1773861226; x=1774466026; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WJyTxUd6u+yzwsu9Uzqyo58WkKimIItw6uQu3GFh36E=;
-        b=vrMNtvCwZDGjuAg0ICWh+24CTCtB3hYRe6LKdh+5QQQxQa7GMEMFFH/JOdCsNnehKE
-         BENRnQNMK6Ni1MY8PXlZ6J+4r/47HvzmmkZp9cl9q68g9/GE3/8NuXrg4XTZA7SviD7i
-         tYekp3T0eIXEYllVaUjeLGIi7Pptee1gGxI5ISnHRMuS4g8UNpIpI2UD8GvRrijpnYmM
-         lJZ/7O/d+oQcQ95SAZ6QpMwkZBWXmTZyZgDiU3cyX/ILwXyvaf9+RyL5HqVP9XGBARCF
-         +dZF6sCkcM6oleEGcmk12xRmhPuFjiCNfw1pEuUDDh4gKZoKA1jPnGvKcVTSIuptvrF1
-         5mPg==
+        bh=SXOL9iubHrTOR9uFk5hJvutezBCpUTAEEHozBYZRA8g=;
+        b=NCH4DYkyBX58Kx7hUMDoFO5B+DtXuTiIYKM2nPQ0i7jQd2ZYCBg5CborI3YA5GGHyi
+         WgxDPt6Ull5T4DUsZSb5OlO2ErFt+LDiT1frUsa+m0jKgbgPXEBMlxJd/PMYaBHzv4ub
+         Z5dETOZDB8YJs99/Y+2NWQV5WsILBBqXC/hhUBeqpHAioc1KyMMWNH7uotZvF7hoeruX
+         8MiFzOrC27E8p+uJLOmkrx82trTXnmU3caOge/uDYuPi9gk8l7icnF5X2QksoxNO/JeN
+         Y6qsobjmCeTPeBw7Gw9mfg4uPZBtcP9AUcmJL5fuQjQuWRN8tcFF+QacfgMLBE20MTVl
+         tqsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773861224; x=1774466024;
+        d=1e100.net; s=20251104; t=1773861226; x=1774466026;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=WJyTxUd6u+yzwsu9Uzqyo58WkKimIItw6uQu3GFh36E=;
-        b=cUTlhsS1WDXvD2VnTqQSY2YAFguZ4q9K1Ne19aPE30z5hOuaPh07py3wBGTfNXebhO
-         LNaIUFS2PwfWsQnP8y53q+k7ErxcrOcr8lzLcrqSYG0ECihqS/RxStKLvM82KXgzm4gE
-         fn9rNJ6/zPP/VKBIiEdmgnf7nYLYXBzdIBpSMUDHAy9vhc9RFxK/uHxn42eIRDWc29jV
-         v/h2PXj6l0NZGv/dxdGHCZ0ZUOU83RjyiwMhkYAt78Cfokw5vKvtIcroOIZ8F5dOot5C
-         n2Xr4/YAJx9Pza3tcRZF5xYhksmRD48SpLn0EsdauF5oVlc1t3+UO41nqbE5TLCZHtLI
-         GhVQ==
-X-Gm-Message-State: AOJu0YxoxzkzG95j2M5zmPgU7wWsB3gj3WIdhLgmNviNDnaD1tulZVVO
-	v0si+r8EwSZDZuziYxzx2JflAH4gHocj4s52+krUHWYs6ssZZtTx2WxWOWtrhzw8ZLFSxjqr1pS
-	gxok5neA=
-X-Gm-Gg: ATEYQzz+Ne0fzPwG7w/pK02xqX9KFO+X7LdtsOOTE0PtqYc6ftCRqpwlGAvuh3RuWkD
-	YQR/YLCOBLWm5EkXAEuuxR7xhEnCqndQz0EDBy41nuYzuh38iw+WS8OWkqp4mt/JcnhnX7YQ4MP
-	4FRKfwS3prUaD2mLup8SKjYpG9c+WMUYENzorrKEUK69zdVcJe9sQ7OUSVtTjfL4bsA+IKfloEW
-	9pkqTOW4cbYJoQsewGm6tLTNQF1exuD4oV7DOA0jOq3UcMfZWvxjXQ5jGqgH86Jj0JqVcjhSULo
-	T/L/iDi/FRDqu4ZodGknXk8Pw5lZDmz1ezRbAtd5I5LmWXVHn4LvuVlC6L62c7N5cww7xMv8bOZ
-	8cbFX0o8CSjEIjYxxsi6M7BGn91n/vfXMbuExYOgygCD0QPSle7Ok9zSewgb7nMk4cSNJgMaiit
-	p5sn79
-X-Received: by 2002:a17:903:8d0:b0:2b0:5738:9817 with SMTP id d9443c01a7336-2b06e3d2f5amr51358485ad.31.1773861223849;
-        Wed, 18 Mar 2026 12:13:43 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:73::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b0704ccc67sm29706125ad.15.2026.03.18.12.13.43
+        bh=SXOL9iubHrTOR9uFk5hJvutezBCpUTAEEHozBYZRA8g=;
+        b=CQ558AgW42jgLQ8G2QGrgC+e3NCcBix99Xl3Wr27n1G4dKZRKxTHiTalJs4HOCz4NV
+         BkeBPfOMr2bd2I96vsRJwb1QTkmW/0S+cGln6jNaKWEaTjFN30kpku48S/glDrgf4uhW
+         H3mH+Ass1yn3qn9Tofj7Wh8l084/UaJBz4xE6VDk4ZE+fuYSOxh+2umAK1K5QrFdogux
+         LXMQgMNq0kdU+yL3mFc0TbKjm7aEDg3eg9qU/zek7yz9FhTw7hxmEPHbfhJnHADARzL/
+         QDWW8oDiz1cWE3csIBXlbyCQSk1BIDAddfVDM0Nhh44h3xCitK9ePHEBKj/zkl17jduB
+         enBQ==
+X-Gm-Message-State: AOJu0YxJmfadoqx6Ec+hKaeAkBXPT/AX3TEotvK/+fWCZe2imySwLhIR
+	P4cvdT6G/xGfH72F4HnshaxVAEGmWRZe58SfSJKdMBu5H0oVAsjlcwNKmiIRvaqjv86As1KDhcF
+	PnU4n/uo=
+X-Gm-Gg: ATEYQzy1i0vF3HchY5+8ZFHWVeUZnOCDU46KvDn1fzPB3ybmDYv+fBMnOwDFzmUl+EB
+	8wYSMLWp3uNIdvJpDSuodQVV75tNINU+rSgSiXv4QEA+M6k65x/8xBfEyw2GQyaRw86LP32qOoV
+	M1TjuzTFdVJTCN856fEut1cyGlHTGLODcFJr3wP1qmSU96CpTmwixSm4xySSH0D19ENxWX2adUE
+	YheQs9qU1O3u8KxEVE6IRXF9GXiX/eYAXljjT33g5pazslAVZfGmdMSBohoFv5uZuZFooiZjlLi
+	66AfJPsplfFtIqV+sqYu0AOPvAWfbrJsHqXXBnKBXBU7QzYDBJryZjklParEbXJAG5lgee7u5bB
+	y7/a3OxWjl8ryA6C6tb2Ojfx0P9hX1bGE13Gbe2P4Qiv+/Xw1aqQtIYR0BnxndpBo472po73kAg
+	oCSGw=
+X-Received: by 2002:aa7:9d89:0:b0:829:b23b:d150 with SMTP id d2e1a72fcca58-82a7a8eb3c8mr318691b3a.20.1773861225619;
+        Wed, 18 Mar 2026 12:13:45 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:2::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82a6af06bd7sm3550133b3a.0.2026.03.18.12.13.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 12:13:43 -0700 (PDT)
+        Wed, 18 Mar 2026 12:13:45 -0700 (PDT)
 From: Joe Damato <joe@dama.to>
 To: netdev@vger.kernel.org,
 	Michael Chan <michael.chan@broadcom.com>,
@@ -89,9 +89,9 @@ Cc: horms@kernel.org,
 	linux-kernel@vger.kernel.org,
 	leon@kernel.org,
 	Joe Damato <joe@dama.to>
-Subject: [net-next v3 05/12] net: bnxt: Use dma_unmap_len for TX completion unmapping
-Date: Wed, 18 Mar 2026 12:13:10 -0700
-Message-ID: <20260318191325.1819881-6-joe@dama.to>
+Subject: [net-next v3 06/12] net: bnxt: Add TX inline buffer infrastructure
+Date: Wed, 18 Mar 2026 12:13:11 -0700
+Message-ID: <20260318191325.1819881-7-joe@dama.to>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260318191325.1819881-1-joe@dama.to>
 References: <20260318191325.1819881-1-joe@dama.to>
@@ -107,13 +107,13 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269162-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269163-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -128,158 +128,105 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	NEURAL_HAM(-0.00)[-0.987];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: BC6F22C1E6F
+X-Rspamd-Queue-Id: EC7182C1E77
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Store the DMA mapping length in each TX buffer descriptor via
-dma_unmap_len_set at submit time, and use dma_unmap_len at completion
-time.
+Add per-ring pre-allocated inline buffer fields (tx_inline_buf,
+tx_inline_dma, tx_inline_size) to bnxt_tx_ring_info and helpers to
+allocate and free them. A producer and consumer (tx_inline_prod,
+tx_inline_cons) are added to track which slot(s) of the inline buffer
+are in-use.
 
-This is a no-op for normal packets but prepares for software USO,
-where header BDs set dma_unmap_len to 0 because the header buffer
-is unmapped collectively rather than per-segment.
+The inline buffer will be used by the SW USO path for pre-allocated,
+pre-DMA-mapped per-segment header copies. In the future, this
+could be extended to support TX copybreak.
+
+Allocation helper is marked __maybe_unused in this commit because it
+will be wired in later.
 
 Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Joe Damato <joe@dama.to>
 ---
-rfcv2:
-  - Use some local variables to shortern long lines. No functional change from
-    rfcv1.
+ rfcv2:
+   - Added a producer and consumer to correctly track the in use header slots.
 
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 63 ++++++++++++++---------
- 1 file changed, 40 insertions(+), 23 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 35 +++++++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |  6 ++++
+ 2 files changed, 41 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index d12e4fcd5063..ea8081aeb5ae 100644
+index ea8081aeb5ae..8929264a54b1 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -656,6 +656,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		goto tx_free;
+@@ -3983,6 +3983,39 @@ static int bnxt_alloc_rx_rings(struct bnxt *bp)
+ 	return rc;
+ }
  
- 	dma_unmap_addr_set(tx_buf, mapping, mapping);
-+	dma_unmap_len_set(tx_buf, len, len);
- 	flags = (len << TX_BD_LEN_SHIFT) | TX_BD_TYPE_LONG_TX_BD |
- 		TX_BD_CNT(last_frag + 2);
- 
-@@ -720,6 +721,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		tx_buf = &txr->tx_buf_ring[RING_TX(bp, prod)];
- 		netmem_dma_unmap_addr_set(skb_frag_netmem(frag), tx_buf,
- 					  mapping, mapping);
-+		dma_unmap_len_set(tx_buf, len, len);
- 
- 		txbd->tx_bd_haddr = cpu_to_le64(mapping);
- 
-@@ -809,7 +811,8 @@ static bool __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 	u16 hw_cons = txr->tx_hw_cons;
- 	unsigned int tx_bytes = 0;
- 	u16 cons = txr->tx_cons;
--	skb_frag_t *frag;
-+	unsigned int dma_len;
-+	dma_addr_t dma_addr;
- 	int tx_pkts = 0;
- 	bool rc = false;
- 
-@@ -844,19 +847,27 @@ static bool __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 			goto next_tx_int;
- 		}
- 
--		dma_unmap_single(&pdev->dev, dma_unmap_addr(tx_buf, mapping),
--				 skb_headlen(skb), DMA_TO_DEVICE);
-+		if (dma_unmap_len(tx_buf, len)) {
-+			dma_addr = dma_unmap_addr(tx_buf, mapping);
-+			dma_len = dma_unmap_len(tx_buf, len);
++static void bnxt_free_tx_inline_buf(struct bnxt_tx_ring_info *txr,
++				    struct pci_dev *pdev)
++{
++	if (!txr->tx_inline_buf)
++		return;
 +
-+			dma_unmap_single(&pdev->dev, dma_addr, dma_len,
-+					 DMA_TO_DEVICE);
-+		}
++	dma_unmap_single(&pdev->dev, txr->tx_inline_dma,
++			 txr->tx_inline_size, DMA_TO_DEVICE);
++	kfree(txr->tx_inline_buf);
++	txr->tx_inline_buf = NULL;
++	txr->tx_inline_size = 0;
++}
 +
- 		last = tx_buf->nr_frags;
- 
- 		for (j = 0; j < last; j++) {
--			frag = &skb_shinfo(skb)->frags[j];
- 			cons = NEXT_TX(cons);
- 			tx_buf = &txr->tx_buf_ring[RING_TX(bp, cons)];
--			netmem_dma_unmap_page_attrs(&pdev->dev,
--						    dma_unmap_addr(tx_buf,
--								   mapping),
--						    skb_frag_size(frag),
--						    DMA_TO_DEVICE, 0);
-+			if (dma_unmap_len(tx_buf, len)) {
-+				dma_addr = dma_unmap_addr(tx_buf, mapping);
-+				dma_len = dma_unmap_len(tx_buf, len);
++static int __maybe_unused bnxt_alloc_tx_inline_buf(struct bnxt_tx_ring_info *txr,
++						   struct pci_dev *pdev,
++						   unsigned int size)
++{
++	txr->tx_inline_buf = kmalloc(size, GFP_KERNEL);
++	if (!txr->tx_inline_buf)
++		return -ENOMEM;
 +
-+				netmem_dma_unmap_page_attrs(&pdev->dev,
-+							    dma_addr, dma_len,
-+							    DMA_TO_DEVICE, 0);
-+			}
- 		}
- 		if (unlikely(is_ts_pkt)) {
- 			if (BNXT_CHIP_P5(bp)) {
-@@ -3400,6 +3411,8 @@ static void bnxt_free_one_tx_ring_skbs(struct bnxt *bp,
++	txr->tx_inline_dma = dma_map_single(&pdev->dev, txr->tx_inline_buf,
++					    size, DMA_TO_DEVICE);
++	if (dma_mapping_error(&pdev->dev, txr->tx_inline_dma)) {
++		kfree(txr->tx_inline_buf);
++		txr->tx_inline_buf = NULL;
++		return -ENOMEM;
++	}
++	txr->tx_inline_size = size;
++
++	return 0;
++}
++
+ static void bnxt_free_tx_rings(struct bnxt *bp)
  {
- 	int i, max_idx;
- 	struct pci_dev *pdev = bp->pdev;
-+	unsigned int dma_len;
-+	dma_addr_t dma_addr;
- 
- 	max_idx = bp->tx_nr_pages * TX_DESC_CNT;
- 
-@@ -3410,10 +3423,10 @@ static void bnxt_free_one_tx_ring_skbs(struct bnxt *bp,
- 
- 		if (idx  < bp->tx_nr_rings_xdp &&
- 		    tx_buf->action == XDP_REDIRECT) {
--			dma_unmap_single(&pdev->dev,
--					 dma_unmap_addr(tx_buf, mapping),
--					 dma_unmap_len(tx_buf, len),
--					 DMA_TO_DEVICE);
-+			dma_addr = dma_unmap_addr(tx_buf, mapping);
-+			dma_len = dma_unmap_len(tx_buf, len);
-+
-+			dma_unmap_single(&pdev->dev, dma_addr, dma_len, DMA_TO_DEVICE);
- 			xdp_return_frame(tx_buf->xdpf);
- 			tx_buf->action = 0;
- 			tx_buf->xdpf = NULL;
-@@ -3435,23 +3448,27 @@ static void bnxt_free_one_tx_ring_skbs(struct bnxt *bp,
- 			continue;
+ 	int i;
+@@ -4001,6 +4034,8 @@ static void bnxt_free_tx_rings(struct bnxt *bp)
+ 			txr->tx_push = NULL;
  		}
  
--		dma_unmap_single(&pdev->dev,
--				 dma_unmap_addr(tx_buf, mapping),
--				 skb_headlen(skb),
--				 DMA_TO_DEVICE);
-+		if (dma_unmap_len(tx_buf, len)) {
-+			dma_addr = dma_unmap_addr(tx_buf, mapping);
-+			dma_len = dma_unmap_len(tx_buf, len);
++		bnxt_free_tx_inline_buf(txr, pdev);
 +
-+			dma_unmap_single(&pdev->dev, dma_addr, dma_len, DMA_TO_DEVICE);
-+		}
+ 		ring = &txr->tx_ring_struct;
  
- 		last = tx_buf->nr_frags;
- 		i += 2;
- 		for (j = 0; j < last; j++, i++) {
- 			int ring_idx = i & bp->tx_ring_mask;
--			skb_frag_t *frag = &skb_shinfo(skb)->frags[j];
+ 		bnxt_free_ring(bp, &ring->ring_mem);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index a822bbb71146..d9543d6048d8 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -994,6 +994,12 @@ struct bnxt_tx_ring_info {
+ 	dma_addr_t		tx_push_mapping;
+ 	__le64			data_mapping;
  
- 			tx_buf = &txr->tx_buf_ring[ring_idx];
--			netmem_dma_unmap_page_attrs(&pdev->dev,
--						    dma_unmap_addr(tx_buf,
--								   mapping),
--						    skb_frag_size(frag),
--						    DMA_TO_DEVICE, 0);
-+			if (dma_unmap_len(tx_buf, len)) {
-+				dma_addr = dma_unmap_addr(tx_buf, mapping);
-+				dma_len = dma_unmap_len(tx_buf, len);
++	void			*tx_inline_buf;
++	dma_addr_t		tx_inline_dma;
++	unsigned int		tx_inline_size;
++	u16			tx_inline_prod;
++	u16			tx_inline_cons;
 +
-+				netmem_dma_unmap_page_attrs(&pdev->dev,
-+							    dma_addr, dma_len,
-+							    DMA_TO_DEVICE, 0);
-+			}
- 		}
- 		dev_kfree_skb(skb);
- 	}
+ #define BNXT_DEV_STATE_CLOSING	0x1
+ 	u32			dev_state;
+ 
 -- 
 2.52.0
 
