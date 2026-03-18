@@ -1,216 +1,214 @@
-Return-Path: <netdev+bounces-268972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268979-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJ4QKVSEumnrXQIAu9opvQ
-	(envelope-from <netdev+bounces-268972-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:54:12 +0100
+	id 6E8yOwSHumnSXgIAu9opvQ
+	(envelope-from <netdev+bounces-268979-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 12:05:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E0F62BA490
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:54:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 988D02BA777
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 12:05:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BAECF313AFAB
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:51:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3E14C319025E
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC3AD3A1A59;
-	Wed, 18 Mar 2026 10:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 138263BD651;
+	Wed, 18 Mar 2026 10:59:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="Y+F4gIrC"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD85C39A070
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 10:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773831098; cv=none; b=Vv6dsHC+UMs/1jz4P3ryc0hYDq/4qrKxdXiUTfUlKUidJQIDHmmouYP7r9flm3cVUiuI5ME6RSMmrZoN53sxEE1LsY6O/YiPv+zg8ZOgyrfPohW03La87C+upzzfEYxDpHNloxXlGlXxe2TOdAnOLiS20rw2Ev3qZ2ZqygyNhfU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773831098; c=relaxed/simple;
-	bh=UE8DLg0OmVNUS8QhDZnhmGITW1Sio+cYfmRHHPQL4sM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k+1vMy3Ws+L1T5lCuof/mJXJoHSDDnubRjxzV3ghiDKijr/kI1SW1m7zC1P7PuCPrDOEXUPKp32knfwcxStcBcN2uJK+JfY5j08ztC6WOUxu6H9TYCAIt5cZ/A0F/NvYAywn9TtyTJpK70VJregDaL7Sc4V/ukhIVz0l78L2kPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w2oUn-0001WP-Ey; Wed, 18 Mar 2026 11:51:25 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac] helo=dude04)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w2oUn-000tSY-0X;
-	Wed, 18 Mar 2026 11:51:25 +0100
-Received: from ore by dude04 with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w2oUn-00000003RJI-0IbV;
-	Wed, 18 Mar 2026 11:51:25 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: David Jander <david@protonic.nl>,
-	stable@vger.kernel.org,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH v1 7/7] ARM: dts: stm32: stm32mp15x-mecio1-io: Move expander gpio-line-names to board files
-Date: Wed, 18 Mar 2026 11:51:23 +0100
-Message-ID: <20260318105123.819807-8-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260318105123.819807-1-o.rempel@pengutronix.de>
-References: <20260318105123.819807-1-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E833BAD9C
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 10:58:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773831542; cv=pass; b=i01oblNpBz1itgYqY0D2V5xWLHlmiIAxunN4dI63F86qR7DcElDl+5UEx8h4cBbVcQ2ZN0ZCmr57v3q25szWQZncnk2BrtoO6QWiPBWl+3AfLC94sPOJWriKKinjZiWxidGhMhLXL9gJa6h0IJRaxGlbSXfcfZbZRYl4/OPBdJY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773831542; c=relaxed/simple;
+	bh=LVVELEXkmiKTU/p+oy+of4jebFSUmNrxF9w9nex4moo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BdZ0gO+QHRYIH9GdMkC+tSWxZ/OZTaYnzgTHpWBosYgpGF4iDsjueqvsp03B7QD+g6BVJR1qaZa77eEz2Zy21FaimEz1gQNu2ZiOwL4wdc6o04HSqMkRmWt9E/Tj2mDxDN/IqUX2z4LAS5+FdcVW7rwmZSfqJ0hq/tbbcbwbO4M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org; spf=pass smtp.mailfrom=bitbyteword.org; dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b=Y+F4gIrC; arc=pass smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bitbyteword.org
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-79a62a2bb8cso19898657b3.3
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 03:58:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773831537; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Nlti91vMcF6ckVeyoEY9R4Td+ix0bStO6beeiQ5lgLtaC/mkIMQB3p8NgmuCwrptF2
+         pJfxi7mUSaNdJDvshUBHB8g0Y4OSEBzNo2upKl5QuEIcDeBHZVkvbJyCEYX1Pl0utHn9
+         ZjrAXmPFG/bDBj/4LFGN1CCADjChKegVTj2fTmrNEcM+NDfDuKafauB2LICHRn2yeDDZ
+         oDLfmGcwERQ4QT+udYnxSJTLl27BMb7JinAoMkRkaHAG6uKuklcL8F0dmAQt/VoqJ2IQ
+         3BKhpkUElW5i2hrHW0T+/J8Vq9ZSE6dS8Gxyyq+n9MKJSQ6XSx2fyHpbpwq7yMisBQmY
+         UpJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=LVVELEXkmiKTU/p+oy+of4jebFSUmNrxF9w9nex4moo=;
+        fh=9j+BuHYejRK8xntvyqGvgj/mcH2e2vWThxx97eSSu1U=;
+        b=fJK48o8x9fLzMCEAUShxd2AxsQR+DNfb6Zh10ZegLacFLVOHSeG8LTt+nzLpEjRpS7
+         itCHItEP/g3Omj8jSZbZIkFlGpl403rq1wZka3WX03BBuoWNwuUQuZm2zwGEGVbug4Uw
+         RfOUQAfX0gVfeWyoG/QCeQnNAtVyqNey5s1XsHcEfdjes4AUjJSZrh26ItO47xRKz3Iz
+         f7gzD4u/G5K51N6T/2NICeKrxULEXk3hrmWXN92h33je2+CETI0cRa2tKxRjOp1buuqN
+         Gmb6cnOktTOXGICNA45dYRM3uYfItcffUyg/hCi4ewdooFX2ukRno1Dn5b9ESFB+3cXY
+         W+/w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bitbyteword.org; s=google; t=1773831537; x=1774436337; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LVVELEXkmiKTU/p+oy+of4jebFSUmNrxF9w9nex4moo=;
+        b=Y+F4gIrCy3AlMDM7CSYzAY8MdpN5nfDAenVYSS8jF8/QGMe0BtbaqtvpoNu4HHsdwI
+         eCHGz033wV+iu7o9yHNzl8ab1W8iVYNVNBYMUrCHRQLI9DZgf1n+KJ5WGJM874ZC8E1f
+         V8AfDwxwo6eY0vCZpRljMsNdbb7jgkZbz3BUBCDiRZdtki+wXyJ231XN2e5CQzBOtHl2
+         RNzehobgF8tA59rhsLrK604RjKLDzwzujNWXDWsClMTvJ5qFhXeMw/pwvPnR1XkeD7qu
+         tmTv/A7/XayQthiGv4k2dz99RPffdzi9GNohb9QPIB0xHVtAoLzYczErYFx/GTFFdjmi
+         QFOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773831537; x=1774436337;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LVVELEXkmiKTU/p+oy+of4jebFSUmNrxF9w9nex4moo=;
+        b=XE4P6VNviO9MX64FbHybEzDOKlO+ipaIh48L1Ncf/hOraKyGf75TRu41YtXc9B0GRa
+         H6ql+qBbmmyqq/dMpZi0YoGMP+xjX7hwkvLF1DLl5HgqYctD3MkMeScEPpXA22/5ilU4
+         wmAF+H8K/xmKBmkj1rvrLZxKa8tZgfPDJ+NN04vGvqSlpVma4jnpOwEZdb/bOlU4gdmZ
+         mjVGqsR3RVN1puhpR8hDZum9QxCTHymz0M3tJr2F5DKNJ9DHWoJhUixUB0UzI2oMBZ4y
+         vGVVgHxfQU0posOuNHbj4KXKcU2ewea5tVd7f4ZFmQpPygdADnQc4nsAq5W25gyzapkL
+         eggA==
+X-Forwarded-Encrypted: i=1; AJvYcCUIowMUf2dXlKvYJB2fBVC26NSl3piuD1YvYctkRje7Qa3Mt906PnoYyLGEC0ebBQG6funD6+c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxx5Q91GzTBvN0hcKrnDJKOsoW+75n6cBSSofAYT2gFdd8R0rc+
+	BaGytXGM5RGgAyWWijpgK5sW5jF3LibmZ8nhZ+jUSVjVCjef9iS3JSxYs/6IMmQ8SgxI7geGVVW
+	viAiB4wqi11cxrtgzpXEiGXvFO7BHbX+kvAGq1m9cdw==
+X-Gm-Gg: ATEYQzzCVN8ufKF00yZmggqt1vD0idCE3yucdu04w/zYHGhKQ/GP6BJusp/h9JjAtTl
+	YjvGEvapLrWMlZ0OwGWn4o/FPGSdY8LEBJMiqo8iuj0Ym+c+r13/fM+X1SsiXJnitlJYTA+3uYJ
+	g2g/+r6qtWRLzLK5um5XzR13cxU9SPIklwBbNSDWIfimLgtc+Kc1GEWXpyEwpKHRECj/uZgcLoE
+	ceUXafcDS9e8GYv5piALXhNJWIADSq2qrsDxb0QTwu64ArKIgnqDwBE7/7wH2TYoN44aGOKIvAQ
+	zEqxSLY=
+X-Received: by 2002:a05:690c:c50e:b0:79a:3a33:933 with SMTP id
+ 00721157ae682-79a71ad413dmr29714557b3.31.1773831537485; Wed, 18 Mar 2026
+ 03:58:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spamd-Result: default: False [1.54 / 15.00];
+References: <20260312150523.2054552-1-vineeth@bitbyteword.org>
+ <1e3c2830-765e-4271-89f7-0b6784b37597@efficios.com> <20260312112354.3dd99e36@gandalf.local.home>
+ <219d015d-076b-4c80-8f63-88569115fdad@efficios.com> <20260312114041.5193c729@gandalf.local.home>
+ <1becdbce-2c01-468a-bbab-42b5dea9fdf8@efficios.com> <CAO7JXPjnnruhM5oC6xMgnYaQ9efzYFqMCFiJLNM3HCQ+ZeCiJw@mail.gmail.com>
+ <CAEf4BzbnfyhCqp0ne=2gRnVxp-mdGmuZwDeFRyhRYH+eDcz2-w@mail.gmail.com>
+ <20260312130255.6476e560@gandalf.local.home> <CAO7JXPgHYZ9zF1HFahb2447X85YRZCQQBHB6ihOwKSDtiZi8kQ@mail.gmail.com>
+ <20260317120049.6a60fa88@gandalf.local.home> <6ca9f884-9566-4a82-9995-4c802a0bf8a0@efficios.com>
+In-Reply-To: <6ca9f884-9566-4a82-9995-4c802a0bf8a0@efficios.com>
+From: Vineeth Remanan Pillai <vineeth@bitbyteword.org>
+Date: Wed, 18 Mar 2026 06:58:46 -0400
+X-Gm-Features: AaiRm52iP799baA3h48fwfLjW02Pe87nEMlmDoXLIPKYRV2LFYQQkuww_KlSUU0
+Message-ID: <CAO7JXPgbERfc_P+aPFB1+nR5ua3mZGbhdkbxCr0TFR4Cr6Khuw@mail.gmail.com>
+Subject: Re: [PATCH 00/15] tracepoint: Avoid double static_branch evaluation
+ at guarded call sites
+To: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Andrii Nakryiko <andrii.nakryiko@gmail.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Dmitry Ilvokhin <d@ilvokhin.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	io-uring@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
+	Jon Maloy <jmaloy@redhat.com>, Aaron Conole <aconole@redhat.com>, 
+	Eelco Chaudron <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	tipc-discussion@lists.sourceforge.net, dev@openvswitch.org, 
+	Oded Gabbay <ogabbay@kernel.org>, Koby Elbaz <koby.elbaz@intel.com>, 
+	dri-devel@lists.freedesktop.org, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Viresh Kumar <viresh.kumar@linaro.org>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>, 
+	Huang Rui <ray.huang@amd.com>, Mario Limonciello <mario.limonciello@amd.com>, 
+	Len Brown <lenb@kernel.org>, Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, 
+	linux-pm@vger.kernel.org, MyungJoo Ham <myungjoo.ham@samsung.com>, 
+	Kyungmin Park <kyungmin.park@samsung.com>, Chanwoo Choi <cw00.choi@samsung.com>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, linaro-mm-sig@lists.linaro.org, 
+	Eddie James <eajames@linux.ibm.com>, Andrew Jeffery <andrew@codeconstruct.com.au>, 
+	Joel Stanley <joel@jms.id.au>, linux-fsi@lists.ozlabs.org, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Alex Deucher <alexander.deucher@amd.com>, Danilo Krummrich <dakr@kernel.org>, 
+	Matthew Brost <matthew.brost@intel.com>, Philipp Stanner <phasta@kernel.org>, 
+	Harry Wentland <harry.wentland@amd.com>, Leo Li <sunpeng.li@amd.com>, 
+	amd-gfx@lists.freedesktop.org, Jiri Kosina <jikos@kernel.org>, 
+	Benjamin Tissoires <bentiss@kernel.org>, linux-input@vger.kernel.org, 
+	Wolfram Sang <wsa+renesas@sang-engineering.com>, linux-i2c@vger.kernel.org, 
+	Mark Brown <broonie@kernel.org>, Michael Hennerich <michael.hennerich@analog.com>, 
+	=?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, linux-spi@vger.kernel.org, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, linux-scsi@vger.kernel.org, 
+	Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[bitbyteword.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[pengutronix.de];
+	TAGGED_FROM(0.00)[bounces-268979-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com,foss.st.com];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-268972-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[bitbyteword.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[goodmis.org,gmail.com,infradead.org,ilvokhin.com,kernel.org,redhat.com,kernel.dk,vger.kernel.org,davemloft.net,google.com,iogearbox.net,ovn.org,lists.sourceforge.net,openvswitch.org,intel.com,lists.freedesktop.org,linaro.org,amd.com,linux.intel.com,samsung.com,lists.linaro.org,linux.ibm.com,codeconstruct.com.au,jms.id.au,lists.ozlabs.org,ffwll.ch,sang-engineering.com,analog.com,hansenpartnership.com,oracle.com,fb.com,suse.com];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[73];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[vineeth@bitbyteword.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bitbyteword.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,renesas];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,0.0.0.21:email,protonic.nl:email,0.0.0.20:email,pengutronix.de:email,pengutronix.de:mid]
-X-Rspamd-Queue-Id: 2E0F62BA490
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,efficios.com:email,bitbyteword.org:dkim,bitbyteword.org:email]
+X-Rspamd-Queue-Id: 988D02BA777
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: David Jander <david@protonic.nl>
+On Tue, Mar 17, 2026 at 12:02=E2=80=AFPM Mathieu Desnoyers
+<mathieu.desnoyers@efficios.com> wrote:
+>
+> On 2026-03-17 12:00, Steven Rostedt wrote:
+> > On Fri, 13 Mar 2026 10:02:32 -0400
+> > Vineeth Remanan Pillai <vineeth@bitbyteword.org> wrote:
+> >
+> >>>
+> >>> Perhaps: call_trace_foo() ?
+> >>>
+> >> call_trace_foo has one collision with the tracepoint
+> >> sched_update_nr_running and a function
+> >> call_trace_sched_update_nr_running. I had considered this and later
+> >> moved to trace_invoke_foo() because of the collision. But I can rename
+> >> call_trace_sched_update_nr_running to something else if call_trace_foo
+> >> is the general consensus.
+> >
+> > OK, then lets go with: trace_call__foo()
+> >
+> > The double underscore should prevent any name collisions.
+> >
+> > Does anyone have an objections?
+> I'm OK with it.
+>
+Great thanks! I shall send a v2 with s/trace_invoke_foo/trace_call__foo/ so=
+on.
 
-Move the gpio-line-names properties for the I2C GPIO expanders (gpio0
-and gpio1) out of the common mecio1-io.dtsi file and into the specific
-board dts files.
-
-The layout originally defined in the common include file belonged to the
-mecio1r1 (Revision 1) hardware. This layout is moved 1:1 into the
-stm32mp153c-mecio1r1.dts file.
-
-The mecio1r0 (Revision 0) hardware utilizes a completely different
-pinout for these expanders. A new, accurate mapping reflecting the
-Revision 0 schematics is added to stm32mp151c-mecio1r0.dts.
-
-Fixes: 8267753c891c ("ARM: dts: stm32: Add MECIO1 and MECT1S board variants")
-Cc: stable@vger.kernel.org
-Signed-off-by: David Jander <david@protonic.nl>
-Co-developed-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- arch/arm/boot/dts/st/stm32mp151c-mecio1r0.dts  | 14 ++++++++++++++
- arch/arm/boot/dts/st/stm32mp153c-mecio1r1.dts  | 14 ++++++++++++++
- arch/arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi |  8 --------
- 3 files changed, 28 insertions(+), 8 deletions(-)
-
-diff --git a/arch/arm/boot/dts/st/stm32mp151c-mecio1r0.dts b/arch/arm/boot/dts/st/stm32mp151c-mecio1r0.dts
-index 06ab77465816..862782d20d10 100644
---- a/arch/arm/boot/dts/st/stm32mp151c-mecio1r0.dts
-+++ b/arch/arm/boot/dts/st/stm32mp151c-mecio1r0.dts
-@@ -97,6 +97,20 @@ &ethernet0 {
- 	st,eth-clk-sel;
- };
- 
-+&gpio0 {
-+	gpio-line-names = "HSIN0_BIAS", "HSIN1_BIAS", "HSIN2_BIAS", "HSIN3_BIAS",
-+			  "HSIN4_BIAS", "", "STP_VREF0_LVL", "HSIN_VREF0_LVL",
-+			  "STP0_FB_BIAS", "STP1_FB_BIAS", "STP2_FB_BIAS", "STP3_FB_BIAS",
-+			  "", "", "", "";
-+};
-+
-+&gpio1 {
-+	gpio-line-names = "HSIN5_BIAS", "HSIN6_BIAS", "HSIN7_BIAS", "HSIN8_BIAS",
-+			  "HSIN9_BIAS", "", "STP_VREF1_LVL", "HSIN_VREF1_LVL",
-+			  "STP4_FB_BIAS", "STP5_FB_BIAS", "STP6_FB_BIAS", "",
-+			  "", "", "LSIN8_BIAS", "LSIN9_BIAS";
-+};
-+
- &gpiod {
- 	gpio-line-names = "", "", "", "",
- 			  "", "", "", "",
-diff --git a/arch/arm/boot/dts/st/stm32mp153c-mecio1r1.dts b/arch/arm/boot/dts/st/stm32mp153c-mecio1r1.dts
-index 2b3989303cd1..739cc18c3d3a 100644
---- a/arch/arm/boot/dts/st/stm32mp153c-mecio1r1.dts
-+++ b/arch/arm/boot/dts/st/stm32mp153c-mecio1r1.dts
-@@ -90,6 +90,20 @@ &clk_hse {
- 	clock-frequency = <24000000>;
- };
- 
-+&gpio0 {
-+	gpio-line-names = "HSIN0_BIAS", "HSIN1_BIAS", "HSIN2_BIAS", "HSIN3_BIAS",
-+			  "", "", "HSIN_VREF0_LVL", "HSIN_VREF1_LVL",
-+			  "HSIN4_BIAS", "HSIN5_BIAS", "HSIN6_BIAS", "HSIN7_BIAS",
-+			  "", "", "", "";
-+};
-+
-+&gpio1 {
-+	gpio-line-names = "HSIN8_BIAS", "HSIN9_BIAS", "HSIN10_BIAS", "HSIN11_BIAS",
-+			  "", "", "HSIN_VREF2_LVL", "HSIN_VREF3_LVL",
-+			  "HSIN12_BIAS", "HSIN13_BIAS", "HSIN14_BIAS", "HSIN15_BIAS",
-+			  "", "", "LSIN8_BIAS", "LSIN9_BIAS";
-+};
-+
- &gpioa {
- 	gpio-line-names = "", "", "", "",
- 			  "", "", "", "",
-diff --git a/arch/arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi b/arch/arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi
-index 1808289f8193..1a4f5a523eb3 100644
---- a/arch/arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi
-+++ b/arch/arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi
-@@ -184,10 +184,6 @@ gpio0: gpio@20 {
- 		reg = <0x20>;
- 		gpio-controller;
- 		#gpio-cells = <2>;
--		gpio-line-names = "HSIN0_BIAS", "HSIN1_BIAS", "HSIN2_BIAS", "HSIN3_BIAS",
--				  "", "", "HSIN_VREF0_LVL", "HSIN_VREF1_LVL",
--				  "HSIN4_BIAS", "HSIN5_BIAS", "HSIN6_BIAS", "HSIN7_BIAS",
--				  "", "", "", "";
- 	};
- 
- 	gpio1: gpio@21 {
-@@ -195,10 +191,6 @@ gpio1: gpio@21 {
- 		reg = <0x21>;
- 		gpio-controller;
- 		#gpio-cells = <2>;
--		gpio-line-names = "HSIN8_BIAS", "HSIN9_BIAS", "HSIN10_BIAS", "HSIN11_BIAS",
--				  "", "", "HSIN_VREF2_LVL", "HSIN_VREF3_LVL",
--				  "HSIN12_BIAS", "HSIN13_BIAS", "HSIN14_BIAS", "HSIN15_BIAS",
--				  "", "", "LSIN8_BIAS", "LSIN9_BIAS";
- 	};
- };
- 
--- 
-2.47.3
-
+Thanks,
+Vineeth
 
