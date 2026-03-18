@@ -1,115 +1,159 @@
-Return-Path: <netdev+bounces-268910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268911-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4NHIKmpcumnFUgIAu9opvQ
-	(envelope-from <netdev+bounces-268910-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:03:54 +0100
+	id mKYVOCRfumnFUgIAu9opvQ
+	(envelope-from <netdev+bounces-268911-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:15:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DD0D2B76CA
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:03:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57FDF2B7AB6
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:15:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0B0C930848EE
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:00:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E0E883139BE0
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939F5375AC7;
-	Wed, 18 Mar 2026 08:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680A936C587;
+	Wed, 18 Mar 2026 08:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="dCr9CAta"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ngq3gtGl"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5C53750AE;
-	Wed, 18 Mar 2026 08:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C8C366DB5
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 08:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773820837; cv=none; b=XvKL8x+mHji5MjJ1s4MiHhzZxxcyYK5fpsziFbW0pdRS2FuWLjtvfx0HKIEH1r3Dekh61k49/7IUO1f1BpTRx4MA9b9KMFvKl4JDazdcfAtamycTJIbRBSHTXflMjGDBPgXAUkpKqQCxLtqlBmaXaPtjyX56EKFKOxoNL7yZ6Ms=
+	t=1773821261; cv=none; b=sPSg9iMGFZUN28mS0Fe+oK02DRUGwbLTQL4kg2Q9FFC5SbRDGHh2Hk0pVwBpNISDHGL4XBKuA+TPz8DSIJzjZc7hQnKO4bts/q/SD0OJjPnk6XNMlmbhf/yWBWUgVWiOhHWIsr5jFw1dNeRJPngxFi+a68wsFDytqEEvFOf5SYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773820837; c=relaxed/simple;
-	bh=NFh1/dS2yY1V5/j/8/hnXWN2hIvOcY9YkdUK+OouIP8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=U7N2NCsu+0XDvOCGnjPuNTcKwzp7pd5b2U7XXffBWQ39CB4KuZkdmgMBTYX7kvJ4PzObrvFPARDYnST9RWy5oXMGOtQ+tZhNrZtFmDt3OjZ1VF9CogCTSFjpJ8oHyBup1o2aIn27WIGSdy4r5jZNI8smzxx7A5OoKy6MV+Ifx0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=dCr9CAta; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=hixFf7wKq0QLhS/T/VMdwyyyYGbw1xeEU0sU2ZelLU4=;
-	t=1773820835; x=1775030435; b=dCr9CAtafbV/QypXAZLI8gJSBASFtHFqgOO4oghmm3V+j+b
-	CuQHbSqvex4YD7BFXuKBVKSdupoIIrW1HVPxuKVce5Bk5eUE9g4fRJ81CA9dYQL4EXn/VQBhHrQs3
-	EnX30ufDVDaXPioQ1+ZN2euT93KYzKIaGwthNpYe/ma0jah23uYGHdLoDwiVVtmJg/DxPUwo5JyO/
-	3W5KyhcLihG4wS4BFUgBSBAltlDEj0fqqLRAVTLbznyYgVvmrE5ATFM0p3+ITOoVABeAKRJOzSrn5
-	0SiNAUd1qNorLm1aNGZfWD6/x4gGGZnFAwLhuQCq3IEbRpXtd7MJrj1asX2PlQzw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1w2lpQ-00000004GGr-2qkK;
-	Wed, 18 Mar 2026 09:00:32 +0100
-Message-ID: <d30024f1a2ae07944714a1eaaa056c55bdc774b2.camel@sipsolutions.net>
-Subject: Re: [syzbot] [wireless?] WARNING in cfg80211_chandef_create
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Lachlan Hodges <lachlan.hodges@morsemicro.com>, syzbot
-	 <syzbot+d9f5fabbbcf4b377d01f@syzkaller.appspotmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Date: Wed, 18 Mar 2026 09:00:31 +0100
-In-Reply-To: <tffrshs5h76cfj3k6lelrx6lmm7qtc7hww7r554xtnhfnsw2ip@dqktqrq2k47q> (sfid-20260318_015325_570672_B8B037B9)
-References: <69b992c2.050a0220.248e02.0132.GAE@google.com>
-	 <tffrshs5h76cfj3k6lelrx6lmm7qtc7hww7r554xtnhfnsw2ip@dqktqrq2k47q>
-	 (sfid-20260318_015325_570672_B8B037B9)
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1773821261; c=relaxed/simple;
+	bh=fdLI0Ko6mtrlnwt0ohoaLVU0GX5WeN1MsPSScgcpLXY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j55kfB4LknvIyaYr1D74I14Zto9xcc/ufO0rid2UA+iLidXnRYuzdNYXg2iCqixBS5gL0x5TcgRz6Vlxs615ByS+eU4oFyergP99fPocv6RJ49WAkt39h4W1SrhC0i/n4GvdAgPHqCX1C0Uecfd2RCSobpbMxDFeI9cflF8c9WU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ngq3gtGl; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773821260; x=1805357260;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=fdLI0Ko6mtrlnwt0ohoaLVU0GX5WeN1MsPSScgcpLXY=;
+  b=Ngq3gtGl+20uTYROgqTJ894yBNNiYF712piSV22I+5wkdJhPXFpodkZO
+   ioqnwfbKqwOZ0QtXWYjVHvvnSF6shmAnuaDBGFLgjZEYEPYtQtXsM8ale
+   M1u5axyeyL0clnD8yaTbln3mWjXvoqf1cg/vHam0sL6oCGU5uEJVnuwmD
+   EJ8SPfxSl2E/r+1Y0nMLEeVT5igPENU3J9+Q0YY06AaKTVJFiF1rOWrSd
+   wTD570nHAG6z3awMw5Gew/lykgIgpyr3eCnS2E4y97Yobe/1dxLV0CvUz
+   tEqEqJ5JSS/mD0NFtu47A7S+ae6MsvKmiYjk1VY9OQiQn2v2fi2ops6y7
+   A==;
+X-CSE-ConnectionGUID: wKEswRqBSCu7W84e3Tc5gA==
+X-CSE-MsgGUID: ePJKJGXBSIC47HwDHl/THA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11732"; a="74755242"
+X-IronPort-AV: E=Sophos;i="6.23,127,1770624000"; 
+   d="scan'208";a="74755242"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2026 01:07:39 -0700
+X-CSE-ConnectionGUID: 2Op16dLKS82lmlB/t7murQ==
+X-CSE-MsgGUID: IcmXUWE4SkyEN7qw+RC/Mw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,127,1770624000"; 
+   d="scan'208";a="221628539"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by orviesa006.jf.intel.com with ESMTP; 18 Mar 2026 01:07:38 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org
+Subject: [PATCH net-next v1 0/2] virtchnl/ice: add IEEE 802.1ah (0x88E7) VLAN ethertype support
+Date: Wed, 18 Mar 2026 09:07:34 +0100
+Message-ID: <20260318080737.3012293-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
-	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-268910-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sipsolutions.net:dkim,sipsolutions.net:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[sipsolutions.net:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-268911-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,d9f5fabbbcf4b377d01f];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: 4DD0D2B76CA
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:mid]
+X-Rspamd-Queue-Id: 57FDF2B7AB6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 2026-03-18 at 11:53 +1100, Lachlan Hodges wrote:
-> > HEAD commit:    b84a0ebe421c Add linux-next specific files for 20260313
->=20
-> I think this didn't have your fix already?
+IEEE 802.1ah (Provider Backbone Bridging) defines the Backbone Service
+Tag (B-TAG) with ethertype 0x88E7. In environments that combine Provider
+Backbone Bridging with virtualisation, VFs may receive or transmit frames
+carrying a B-TAG and need to install matching VLAN filters on the PF.
 
-Indeed, looks like that tree got cut between your and my commits, even
-though they less than eight hours apart :)
+The existing virtchnl VLAN v2 capability handshake (via
+VIRTCHNL_OP_GET_OFFLOAD_VLAN_V2_CAPS) has dedicated bitmask entries for
+each supported ethertype (0x8100, 0x88A8, 0x9100) but lacked one for
+0x88E7, making it impossible for a VF driver to advertise or negotiate
+B-TAG support.
 
-johannes
+This series adds the missing capability flag and wires up the three
+software-path checks in the ice PF driver that guard VLAN filter
+installation:
+
+  Patch 1 adds VIRTCHNL_VLAN_ETHERTYPE_88E7 = BIT(3) to the shared
+  virtchnl_vlan_support enum in include/linux/avf/virtchnl.h.
+
+  Patch 2 updates ice's TC TPID validation, VSI VLAN filter validation,
+  and the bidirectional virtchnl VLAN v2 translation functions to
+  accept/translate ETH_P_8021AH (0x88E7).
+
+No hardware offload changes, no datapath modifications.
+
+Tested on E810 with an iavf VF requesting 0x88E7-tagged VLAN filters:
+  Verified that a TC flower rule matching on VLAN TPID 0x88E7 is now
+  accepted and offloaded by the driver without returning -EINVAL:
+
+    tc qdisc add dev $VF clsact
+    tc filter add dev $VF ingress protocol 802.1Q flower \
+        vlan_ethtype 0x88e7 action pass
+    # (previously: Error: Failed to offload TC filter - vlan_type was 0)
+
+  Also verified VF transparent passthrough of triple-tagged frames with
+  0x88E7 as middle and innermost tag using scapy on a back-to-back E810
+  pair (kernel 6.19.0-rc8+, FW 4.91, ICE Triple VLAN Comms DDP 1.3.88.88).
+
+Aleksandr Loktionov (2):
+  virtchnl: add VIRTCHNL_VLAN_ETHERTYPE_88E7 support
+  ice: add 0x88E7 handling to SW validation paths
+
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c       | 1 +
+ drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c | 3 ++-
+ drivers/net/ethernet/intel/ice/virt/virtchnl.c    | 6 ++++++
+ include/linux/avf/virtchnl.h                      | 1 +
+ 4 files changed, 10 insertions(+), 1 deletion(-)
+
+-- 
+2.52.0
+
 
