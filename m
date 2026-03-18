@@ -1,358 +1,221 @@
-Return-Path: <netdev+bounces-269186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269187-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uCJFIbgYu2k+fAIAu9opvQ
-	(envelope-from <netdev+bounces-269186-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 22:27:20 +0100
+	id gC2GOggZu2nLfAIAu9opvQ
+	(envelope-from <netdev+bounces-269187-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 22:28:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37C02C2F7A
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 22:27:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AEA22C2F9F
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 22:28:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A4C673035A81
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 21:27:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A43D30692C2
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 21:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7D437B3EB;
-	Wed, 18 Mar 2026 21:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8441337B035;
+	Wed, 18 Mar 2026 21:27:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="KvxF5vYJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S9KuRg/9";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="IhrLhGFD"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E31D2D1913;
-	Wed, 18 Mar 2026 21:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2541537B417
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 21:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773869237; cv=none; b=cbXMbMwCxZ4Nmh2C8UNFsXRnJS0xyu9TsBwxhQ10y9UeNX/BayJe8fUJU6PcaDobYMP/Ly6ivyxRgXG0RlwL1H8cW+I8g7mkQ0FdfZ1o6uPNk2HpidBhZVtqihJvYDf8hDWgqsy57oeEgEgcp7BzDnOKSjgVXstSWyuRfJXRn4E=
+	t=1773869277; cv=none; b=IHUb+JFGD5VcjvykqOyy6df/lTW54cYDGtyumH4oijKIYTpqKtqIIUcWUE3WvOO1ZtEDs8lcW39WJjqKCuB8/H6FUFJsThOi9+rHyr+pVFzZX7RGw70XXxjn77F8OMl6eIhqfEFBHNmequYnEpqeKToF7GYnzO/zNV/qXusL998=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773869237; c=relaxed/simple;
-	bh=dUCzhGSCyp9yBqj1ldwZzevPNGn/CjOVTpyQctiXBe4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=le3jBm4y3F+kM3kp69y2Q7QRFewx9CpfaWIlZvyI420gfuV/VsLP4OHOBFixy9FjBVRH7WD3x0xY/1SPVB07nVXLq5DChjGuNIUrf/HVGIhSajirLIzFx7Rukl26BpnAk8z+REebWXWyxIf68OLHkD17sk77c9U8RqyZRItLNrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=KvxF5vYJ; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1773869235; x=1805405235;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=dUCzhGSCyp9yBqj1ldwZzevPNGn/CjOVTpyQctiXBe4=;
-  b=KvxF5vYJT6sayWNbD5IeECEtdLj/+v3keoHxa6ATfs9Njw/KxcGyAhxW
-   P8bC0vWqpPx6uY3ISw0rLlnmTKabu23JDj0t1YbefS3g10Rye2gINZ+5j
-   fyAMdeHIlJtpeWa5yGO2KSZ0rNosCQjl9ZRd3hA71s5QFxLb7pzm4gIIo
-   kpi/DTqd503fSniV+iq6kWubi5q5jSGIRL5I9WV3EONIrflZLiMBzA850
-   vm4SbsDs1R+IyjDOH4EHvhNZyHfcRiwOtNZ/R7cgLJwY0q948bS5QRAx2
-   NYaVub5yHQQhSmLwg9nzD3HD77JesooBiqQJ/LyXPadjJ70gJlxKbtRfE
-   A==;
-X-CSE-ConnectionGUID: afo4+UZhS6qg5t7nkT5I3w==
-X-CSE-MsgGUID: XkJSx+EfT5CgJbrWpZCJGw==
-X-IronPort-AV: E=Sophos;i="6.23,128,1770620400"; 
-   d="scan'208";a="55289466"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Mar 2026 14:27:09 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Wed, 18 Mar 2026 14:25:59 -0700
-Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58 via Frontend Transport; Wed, 18 Mar 2026 14:25:57 -0700
-Date: Wed, 18 Mar 2026 14:25:55 -0700
-From: Charles Perry <charles.perry@microchip.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-CC: Charles Perry <charles.perry@microchip.com>, <netdev@vger.kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/2] net: mdio: add a driver for PIC64-HPSC/HX
- MDIO controller
-Message-ID: <absYYxpgb9Ts5qtU@bby-cbu-swbuild03.eng.microchip.com>
-References: <20260317184610.315852-1-charles.perry@microchip.com>
- <20260317184610.315852-3-charles.perry@microchip.com>
- <5c9eb2e9-1727-4c01-888d-56ffee6ca54a@bootlin.com>
+	s=arc-20240116; t=1773869277; c=relaxed/simple;
+	bh=YgjTjzim5DQCK/B9p0xNDkAjovH4rTxfWA70MEVloLE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=B/KSLNmMb3gaXfDmu0hbcO4FTJc34/r6nOgstxmcqGqoxRMNHkYH7oNs8ekjP22IC232kmd2JxdV1o5oPP9W6CG9FcsqJREFQCuckV77J/QDtZbsPrCznD1qslwJQ0keprawA8+lTa7Te/+XLteltuJNtFpLkbJwZlIEnnQDnds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S9KuRg/9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IhrLhGFD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773869275;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jrnydhjCX2n9qZspnsidoy2e60uVHKDh295FAK0AoyI=;
+	b=S9KuRg/9iD2WnmH7mo18TbnPXMH/+K/64TpeD/JB1jo6YT2SAfhBDQqZ1yqlee4J3tMXYw
+	eAlC5F+3EnwwgR2y9FRGI9Ip9FcXJOfHGEV+r+NiARwG2VFvm5dAUU6SZzbG/IeMsMa2ED
+	0r/WpRxcFI2gAW7/t9AGER9wtvK69RE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-408-6nQGPd-4OcWXQpuZLaCmwA-1; Wed, 18 Mar 2026 17:27:53 -0400
+X-MC-Unique: 6nQGPd-4OcWXQpuZLaCmwA-1
+X-Mimecast-MFC-AGG-ID: 6nQGPd-4OcWXQpuZLaCmwA_1773869272
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-485c45885e6so6334285e9.0
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 14:27:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1773869272; x=1774474072; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jrnydhjCX2n9qZspnsidoy2e60uVHKDh295FAK0AoyI=;
+        b=IhrLhGFDGIpED6xfp0d7p0ywaVz2kkRpaFW41nxMV/qdwxrZmvtG1jvyu94eL50Kgz
+         9y/2SBW/Udz5oDcDzgmBnie3UMWLXwcIdTaVitg0549k7aHGVQ09cx+q+djPp0ICWf2/
+         0JJ+1WWRNVr0WHnQpsPSc6oGTRlAkW6Td8WH5uxMZiS1NcHv5KcX9MfhYlk6m933LWq2
+         aTsZVRhKNgZoPTtffoJ+LaJWAdHSCDisH1qp/18PfwSI6L8LOZHO1KRXj6dBpKeqslKM
+         4o2NadbY4kh4MPZHl0qafMHoIDwL2qMcJnXlf/zRWsQRlPCBdYAdgsS5Zzxmm7cQWbDW
+         h3ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773869272; x=1774474072;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jrnydhjCX2n9qZspnsidoy2e60uVHKDh295FAK0AoyI=;
+        b=ad0KwGwLNuvz46o3zr6ftj9W+j2zTCen1gMnajvhOe9usVWuo5ydMK1HWVpdv/+1ck
+         EPVH9Dro07SzSgwtM8CfQs12CYWIWxhcZ9aqhfwQKfA2ufIoUxGYQ+gs66akPiHxxaB/
+         IAoYIV6INYpHg5/BI8l6Yx90/V+9WCpBHM2hWdvvprVtYNmlDXwKA1DSrg8eI7uOlfsv
+         XH1wP51JHCx3iWpIxOkE43/Nld+33rcOZqoMZC/Nm2hMvGcAkT/oifzF3hIZMKS3+lbx
+         OnCOM0VsyNSYi9uT3qqt/CiYQ6WapER60Qcq9rZfETmP036FwcJYy67TLD4zHlEMkxr3
+         /8aQ==
+X-Gm-Message-State: AOJu0YzkASV0pyoBUToidqWvrdp/kYWRXrIjcSeoBXqYb5GtZPRg5pDS
+	Zz7H2wKYu7HWc2DPt631Xgy9LSm+XqBqTJNXsarrIOUeUfFei4rgFY63QCl8XvX6ucorvrjjDKY
+	DI5BSAzoGN4cLRG15wMmV4IDfyulalnZIMzRwMa3X6AR8v4FyY7Pw3C6GRw==
+X-Gm-Gg: ATEYQzybdzk8FusLmVHQvTUpRlEBrNH0sF8xv0CkpAniSLWnfCm6+bmSGfFntnX+lUc
+	AhdsmnvjsnG6D5C0ZUdiMpnSCY1qIsNEA/hMYGjMW+1hNnSkbdxZz9DVFuryVetblBEQmw8qZ5F
+	zDeRS8GV47W4Uwrltgr3lMG37axS0jGAmIkmc0Qp+v/lQNdgRbMVAvhe5SbHCtrcQTP8Ir0non/
+	I1FPHTf25PkPhDzEyL76Gqh7cc+AQPaV6PaQxPXy2q+pRQ1hl5DCNO3wKp0wv14jSuAV8Zdo1SH
+	0yvGE78VKYt4n8VeJSCgxgHmxYpcEFukj/wJLAMBPB2J+W12j1XPAgVT3XS9l+b8zYBxdQmWhDF
+	tbTPwkpurfKJ2Nqfze6Kc7yOslCIHzyiLQbSxyW9g8JqcfXUgF2xGeA==
+X-Received: by 2002:a05:600c:1992:b0:486:fad0:b166 with SMTP id 5b1f17b1804b1-486fad0b2c8mr1146615e9.17.1773869272179;
+        Wed, 18 Mar 2026 14:27:52 -0700 (PDT)
+X-Received: by 2002:a05:600c:1992:b0:486:fad0:b166 with SMTP id 5b1f17b1804b1-486fad0b2c8mr1146305e9.17.1773869271694;
+        Wed, 18 Mar 2026 14:27:51 -0700 (PDT)
+Received: from localhost (net-2-39-43-132.cust.vodafonedsl.it. [2.39.43.132])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f5e1ab8esm24843235e9.35.2026.03.18.14.27.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Mar 2026 14:27:51 -0700 (PDT)
+From: Paolo Valerio <pvalerio@redhat.com>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: netdev@vger.kernel.org, Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ =?utf-8?Q?Th=C3=A9o?=
+ Lebrun <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH net-next v5 4/8] net: macb: use the current queue number
+ for stats
+In-Reply-To: <500d698680fb51285f78fa68b6e41875@tipi-net.de>
+References: <20260313201433.2346119-1-pvalerio@redhat.com>
+ <20260313201433.2346119-5-pvalerio@redhat.com>
+ <500d698680fb51285f78fa68b6e41875@tipi-net.de>
+Date: Wed, 18 Mar 2026 22:27:43 +0100
+Message-ID: <87zf443k1c.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <5c9eb2e9-1727-4c01-888d-56ffee6ca54a@bootlin.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
-	TAGGED_FROM(0.00)[bounces-269186-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269187-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[pvalerio@redhat.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.912];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.948];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:dkim,microchip.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email,bby-cbu-swbuild03.eng.microchip.com:mid]
-X-Rspamd-Queue-Id: F37C02C2F7A
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tipi-net.de:email]
+X-Rspamd-Queue-Id: 5AEA22C2F9F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 18, 2026 at 10:52:46AM +0100, Maxime Chevallier wrote:
-> Hi Charles,
-> 
-> On 17/03/2026 19:46, Charles Perry wrote:
-> > This adds an MDIO driver for PIC64-HPSC/HX. The hardware supports C22
-> > and C45 but only C22 is implemented in this commit.
-> > 
-> > This MDIO hardware is based on a Microsemi design supported in Linux by
-> > mdio-mscc-miim.c. However, The register interface is completely
-> > different with pic64hpsc, hence the need for a separate driver.
-> > 
-> > The documentation recommends an input clock of 156.25MHz and a prescaler
-> > of 39, which yields an MDIO clock of 1.95MHz.
-> > 
-> > The hardware supports an interrupt pin or a "TRIGGER" bit that can be
-> > polled to signal transaction completion. This commit uses polling.
-> > 
-> > This was tested on Microchip HB1301 evalkit with a VSC8574 and a
-> > VSC8541.
-> > 
-> > Signed-off-by: Charles Perry <charles.perry@microchip.com>
-> > ---
-> >  drivers/net/mdio/Kconfig          |   7 +
-> >  drivers/net/mdio/Makefile         |   1 +
-> >  drivers/net/mdio/mdio-pic64hpsc.c | 207 ++++++++++++++++++++++++++++++
-> >  3 files changed, 215 insertions(+)
-> >  create mode 100644 drivers/net/mdio/mdio-pic64hpsc.c
-> > 
-> > diff --git a/drivers/net/mdio/Kconfig b/drivers/net/mdio/Kconfig
-> > index 44380378911b..7bdba8c3ddef 100644
-> > --- a/drivers/net/mdio/Kconfig
-> > +++ b/drivers/net/mdio/Kconfig
-> > @@ -146,6 +146,13 @@ config MDIO_OCTEON
-> >  	  buses. It is required by the Octeon and ThunderX ethernet device
-> >  	  drivers on some systems.
-> >  
-> > +config MDIO_PIC64HPSC
-> > +	tristate "PIC64-HPSC/HX MDIO interface support"
-> > +	depends on HAS_IOMEM && OF_MDIO
-> > +	help
-> > +	  This driver supports the MDIO interface found on the PIC64-HPSC/HX
-> > +	  SoCs.
-> > +
-> >  config MDIO_IPQ4019
-> >  	tristate "Qualcomm IPQ4019 MDIO interface support"
-> >  	depends on HAS_IOMEM && OF_MDIO
-> > diff --git a/drivers/net/mdio/Makefile b/drivers/net/mdio/Makefile
-> > index fbec636700e7..048586746026 100644
-> > --- a/drivers/net/mdio/Makefile
-> > +++ b/drivers/net/mdio/Makefile
-> > @@ -20,6 +20,7 @@ obj-$(CONFIG_MDIO_MOXART)		+= mdio-moxart.o
-> >  obj-$(CONFIG_MDIO_MSCC_MIIM)		+= mdio-mscc-miim.o
-> >  obj-$(CONFIG_MDIO_MVUSB)		+= mdio-mvusb.o
-> >  obj-$(CONFIG_MDIO_OCTEON)		+= mdio-octeon.o
-> > +obj-$(CONFIG_MDIO_PIC64HPSC)		+= mdio-pic64hpsc.o
-> >  obj-$(CONFIG_MDIO_REALTEK_RTL9300)	+= mdio-realtek-rtl9300.o
-> >  obj-$(CONFIG_MDIO_REGMAP)		+= mdio-regmap.o
-> >  obj-$(CONFIG_MDIO_SUN4I)		+= mdio-sun4i.o
-> > diff --git a/drivers/net/mdio/mdio-pic64hpsc.c b/drivers/net/mdio/mdio-pic64hpsc.c
-> > new file mode 100644
-> > index 000000000000..1128b3a86804
-> > --- /dev/null
-> > +++ b/drivers/net/mdio/mdio-pic64hpsc.c
-> > @@ -0,0 +1,207 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/* Microchip PIC64-HPSC/HX MDIO controller driver
-> > + *
-> > + * Copyright (c) 2026 Microchip Technology Inc. and its subsidiaries.
-> > + */
-> > +
-> > +#include <linux/bitops.h>
-> > +#include <linux/clk.h>
-> > +#include <linux/io.h>
-> > +#include <linux/iopoll.h>
-> > +#include <linux/kernel.h>
-> > +#include <linux/module.h>
-> > +#include <linux/of_mdio.h>
-> > +#include <linux/platform_device.h>
-> > +
-> > +#define MDIO_REG_PRESCALER     0x20
-> > +#define MDIO_CFG_PRESCALE_MASK GENMASK(7, 0)
-> > +
-> > +#define MDIO_REG_FRAME_CFG_1 0x24
-> > +#define MDIO_WDATA_MASK	     GENMASK(15, 0)
-> > +
-> > +#define MDIO_REG_FRAME_CFG_2	 0x28
-> > +#define MDIO_TRIGGER_BIT	 BIT(31)
-> > +#define MDIO_REG_DEV_ADDR_MASK	 GENMASK(20, 16)
-> > +#define MDIO_PHY_PRT_ADDR_MASK	 GENMASK(8, 4)
-> > +#define MDIO_OPERATION_MASK	 GENMASK(3, 2)
-> > +#define MDIO_START_OF_FRAME_MASK GENMASK(1, 0)
-> > +
-> > +/* Possible value of MDIO_OPERATION_MASK */
-> > +#define MDIO_OPERATION_WRITE BIT(0)
-> > +#define MDIO_OPERATION_READ  BIT(1)
-> > +
-> > +#define MDIO_REG_FRAME_STATUS 0x2C
-> > +#define MDIO_READOK_BIT	      BIT(24)
-> > +#define MDIO_RDATA_MASK	      GENMASK(15, 0)
-> > +
-> > +#define MDIO_INT_I_ADDR 0x30
-> > +#define MDIO_INT_I_BIT	BIT(0)
-> > +
-> > +#define MDIO_INT_E_ADDR 0x34
-> > +#define MDIO_INT_E_BIT	BIT(0)
-> 
-> Thes INT_I/E don't seem to be used, you can drop them
+Hi Nicolai,
 
-Ok
+thanks for the reviews.
 
-> 
-> > +
-> > +struct pic64hpsc_mdio_dev {
-> > +	void __iomem *regs;
-> > +};
-> > +
-> > +static int pic64hpsc_mdio_wait_trigger(struct mii_bus *bus)
-> > +{
-> > +	struct pic64hpsc_mdio_dev *priv = bus->priv;
-> > +	u32 val;
-> > +	int ret;
-> > +
-> > +	/* The MDIO_TRIGGER bit returns 0 when a transaction has completed. */
-> > +	ret = readl_poll_timeout(priv->regs + MDIO_REG_FRAME_CFG_2, val,
-> > +				 !(val & MDIO_TRIGGER_BIT), 50, 10000);
-> > +
-> > +	if (ret < 0)
-> > +		dev_dbg(&bus->dev, "TRIGGER bit timeout: %x\n", val);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static int pic64hpsc_mdio_read(struct mii_bus *bus, int mii_id, int regnum)
-> > +{
-> > +	struct pic64hpsc_mdio_dev *priv = bus->priv;
-> > +	u32 val;
-> > +	int ret;
-> > +
-> > +	ret = pic64hpsc_mdio_wait_trigger(bus);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	writel(MDIO_TRIGGER_BIT | FIELD_PREP(MDIO_REG_DEV_ADDR_MASK, regnum) |
-> > +		       FIELD_PREP(MDIO_PHY_PRT_ADDR_MASK, mii_id) |
-> > +		       FIELD_PREP(MDIO_OPERATION_MASK, MDIO_OPERATION_READ) |
-> > +		       FIELD_PREP(MDIO_START_OF_FRAME_MASK, 1),
-> > +	       priv->regs + MDIO_REG_FRAME_CFG_2);
-> > +
-> > +	ret = pic64hpsc_mdio_wait_trigger(bus);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	val = readl(priv->regs + MDIO_REG_FRAME_STATUS);
-> > +
-> > +	/* The MDIO_READOK is a 1-bit value reflecting the inverse of the MDIO
-> > +	 * bus value captured during the 2nd TA cycle. A PHY/Port should drive
-> > +	 * the MDIO bus with a logic 0 on the 2nd TA cycle, however, the
-> > +	 * PHY/Port could optionally drive a logic 1, to communicate a read
-> > +	 * failure. This feature is optional, not defined by the 802.3 standard
-> > +	 * and not supported in standard external PHYs.
-> > +	 */
-> > +	if (!(bus->phy_ignore_ta_mask & 1 << mii_id) &&
-> > +	    !FIELD_GET(MDIO_READOK_BIT, val)) {
-> > +		dev_dbg(&bus->dev, "READOK bit cleared\n");
-> > +		return -EIO;
-> > +	}
-> > +
-> > +	ret = FIELD_GET(MDIO_RDATA_MASK, val);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static int pic64hpsc_mdio_write(struct mii_bus *bus, int mii_id, int regnum,
-> > +				u16 value)
-> > +{
-> > +	struct pic64hpsc_mdio_dev *priv = bus->priv;
-> > +	int ret;
-> > +
-> > +	ret = pic64hpsc_mdio_wait_trigger(bus);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	writel(FIELD_PREP(MDIO_WDATA_MASK, value),
-> > +	       priv->regs + MDIO_REG_FRAME_CFG_1);
-> > +
-> > +	writel(MDIO_TRIGGER_BIT | FIELD_PREP(MDIO_REG_DEV_ADDR_MASK, regnum) |
-> > +		       FIELD_PREP(MDIO_PHY_PRT_ADDR_MASK, mii_id) |
-> > +		       FIELD_PREP(MDIO_OPERATION_MASK, MDIO_OPERATION_WRITE) |
-> > +		       FIELD_PREP(MDIO_START_OF_FRAME_MASK, 1),
-> > +	       priv->regs + MDIO_REG_FRAME_CFG_2);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int pic64hpsc_mdio_probe(struct platform_device *pdev)
-> > +{
-> > +	struct device_node *np = pdev->dev.of_node;
-> > +	struct device *dev = &pdev->dev;
-> > +	struct pic64hpsc_mdio_dev *priv;
-> > +	struct mii_bus *bus;
-> > +	unsigned long rate;
-> > +	struct clk *clk;
-> > +	u32 bus_freq;
-> > +	u32 div;
-> > +	int ret;
-> > +
-> > +	bus = devm_mdiobus_alloc_size(dev, sizeof(*priv));
-> > +	if (!bus)
-> > +		return -ENOMEM;
-> > +
-> > +	priv = bus->priv;
-> > +
-> > +	priv->regs = devm_platform_ioremap_resource(pdev, 0);
-> > +	if (IS_ERR(priv->regs))
-> > +		return PTR_ERR(priv->regs);
-> > +
-> > +	bus->name = KBUILD_MODNAME;
-> > +	bus->read = pic64hpsc_mdio_read;
-> > +	bus->write = pic64hpsc_mdio_write;
-> 
-> Is there a plan to eventually add C45 ? if so, I'd put 'c22' somewhere
-> in the names here.
+On 16 Mar 2026 at 05:30:48 PM, Nicolai Buchwitz <nb@tipi-net.de> wrote:
 
-Yes. Ok, will do.
+> On 13.3.2026 21:14, Paolo Valerio wrote:
+>> gem_get_ethtool_stats calculates the size of the statistics
+>> data to copy always considering maximum number of queues.
+>> 
+>> The patch makes sure the statistics are copied only for the
+>> active queues as returned in the string set count op.
+>> 
+>> Signed-off-by: Paolo Valerio <pvalerio@redhat.com>
+>> ---
+>>  drivers/net/ethernet/cadence/macb_main.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> 
+>> diff --git a/drivers/net/ethernet/cadence/macb_main.c 
+>> b/drivers/net/ethernet/cadence/macb_main.c
+>> index 06ad8c8ec036..fbeaa85b4a9c 100644
+>> --- a/drivers/net/ethernet/cadence/macb_main.c
+>> +++ b/drivers/net/ethernet/cadence/macb_main.c
+>> @@ -3528,7 +3528,7 @@ static void gem_get_ethtool_stats(struct 
+>> net_device *dev,
+>>  	spin_lock_irq(&bp->stats_lock);
+>>  	gem_update_stats(bp);
+>>  	memcpy(data, &bp->ethtool_stats, sizeof(u64)
+>> -			* (GEM_STATS_LEN + QUEUE_STATS_LEN * MACB_MAX_QUEUES));
+>> +			* (GEM_STATS_LEN + QUEUE_STATS_LEN * bp->num_queues));
+>
+> This is an out-of-bounds write, not just a cosmetic change.
 
-> 
-> The rest seems OK to me, so with the extra macros removed,
-> 
-> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+yes, the commit message is not perfectly phrased (and as you
+noted it lacks the Fixes tag), but this was not intended as a cosmetic
+change. I noticed the problem while adding page pool statistics to
+ethtool (later removed) and they were corrupted because of this.
 
-Thank you Maxime,
-Charles
+> gem_get_sset_count() returns GEM_STATS_LEN + QUEUE_STATS_LEN *
+> bp->num_queues, and ethtool allocates the data buffer based on that 
+> count.
+> The old memcpy with MACB_MAX_QUEUES (8) writes past the end of the
+> buffer on any GEM instance with fewer than 8 hardware queues.
+>
+> KASAN confirms on RP1 (1 queue) without this patch applied:
+>
+>    BUG: KASAN: vmalloc-out-of-bounds in gem_get_ethtool_stats+0x50/0x78
+>    Write of size 760 at addr ffffffc0822e7000 by task ethtool/922
+>
+> The overflow stays within the vzalloc page slack, so the practical
+> impact is low - but it's still an out-of-bounds write that exists in
+> the current upstream code. Might be worth splitting this out as a
+> standalone fix targeting net with a Fixes: tag, and updating the commit
+> message accordingly?
+>
 
-> 
-> Maxime
-> 
+makes sense. Will do.
+
+Thanks!
+
+>>  	spin_unlock_irq(&bp->stats_lock);
+>>  }
+>
+> Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+>
+> Thanks
+> Nicolai
+
 
