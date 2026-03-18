@@ -1,184 +1,206 @@
-Return-Path: <netdev+bounces-269057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269058-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iAHlBJG/umkGbgIAu9opvQ
-	(envelope-from <netdev+bounces-269057-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:06:57 +0100
+	id 0No3LHzAumkGbgIAu9opvQ
+	(envelope-from <netdev+bounces-269058-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:10:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BDCD2BDD9F
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:06:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 263762BDE79
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:10:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 762B1307AFDB
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 15:00:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 91758300FB40
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 15:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3832B3DFC6E;
-	Wed, 18 Mar 2026 15:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L3+P9n0z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1EB63D7D81;
+	Wed, 18 Mar 2026 15:03:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
+Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA4463D6684
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 14:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003D536BCE7
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 15:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773846002; cv=none; b=BgTq7W4LLBiDvqEKAauhOPF8w3hvL2QiTx2NJXGBitD5mvgdzFmGQu03K3qWvxQq+Q01wPJg+qpnUN4hUrTDYGOhDed1oO8J2mC0i3vtJMUgh3W735AafwNUrnRXpM5QC2WNyh61P+6UCY5XMrguS8OPK5IlPqnhi9Q8oiWzT1I=
+	t=1773846190; cv=none; b=IjH6gXOYlt8qIDbdBfOI4W3Yid+qkvdpA57CNzSBSIcYrZsdWoDtBXmEcbWPxyrofxqJrVcpFraEu77jlgD1Q4U3XdFd8G3aU6l68cFITcX0Jk2W7jEwXjvOTYzC/TKLeh8fZsO+av9w8+F5v7nQeIYGxos1iBYjvqFEX5++mgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773846002; c=relaxed/simple;
-	bh=bEBit3v/3EaAeXPIrEhvLJqSi6H/H8xXCeELyouAkUg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cFnVfDEeHMZf9yD7+XVPKB536Ef7Qo4QX+/VklozIx7c0+fIOOt8PhCMXyoLTmZmkcIxA6+eYoGed77gmblgOR6QleH5/s/AxSCxOiBOqtedWUIGX4bx0g1dZomR00LebNGapZnU+1wOZNRCMrFHR7PRUbjjt7Rbx86hFCoNRLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L3+P9n0z; arc=none smtp.client-ip=74.125.82.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1773846190; c=relaxed/simple;
+	bh=Jiptg9yDJQrV+D8cHBp3a16G3+cX7N41SQHpo9ylaVY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aX/8zWqWzBoiQLX6yN95C3s+6WMXacTiHuD7Qu+yQNa22TbJdOIsvrEeC4K2fVLSED0NuCFxgeLew6WJUc8SzXzPp2stSHAlfRnHLfMJOL1dBzq+qX4GataEcBIQICOlaWrnseU38S3RaYe0XHnCwSfP4CdT98tet2MvGqbX5Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.82.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2b6b0500e06so8339245eec.1
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 07:59:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773845999; x=1774450799; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GnznBYtreFWiJHMzmWhLo1aMVcwsFyxP3+fWvwEHCV8=;
-        b=L3+P9n0zXI//cQ4O8pD4tXKfXA9JJZViwEaz858VcWyAtkmPOPJ1pqP2YR7Y0oZxJn
-         g4869r/W9sg9XydsDfbUKDrlgveO8J+xFVDR/w9vdh0p6Qs9vDV9LQItLKx5yPWKhR1K
-         cFcLLath8FwNc4Mlk22IJfXScbvW4ghiVIC8bn2Ii51mF3L1c5E2kUKgNrrCxIXMHRb9
-         Am7YnncgNsLNa0etUwOVxZSP4wpG+sDRmGX7p+aYo277p9qvCsa6YgpxoFv2+RQ/YJG6
-         UVWLQreP+I5Fv1Ma3x9J0YfV3oTzlI5cczqSZ4/GW9oIb7tYBTQWhtcb5A+C2vA/Wy4f
-         /cTw==
+Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-2c0ca69532cso520746eec.1
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 08:03:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773845999; x=1774450799;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GnznBYtreFWiJHMzmWhLo1aMVcwsFyxP3+fWvwEHCV8=;
-        b=qLQBE2RpBNRAQFx7VprpXIbWQ9SstH4ywFAGkGt8HGdVDnsZVR+YOVr9nYg4Edv5be
-         aFjNRcQDWmLYCRPTxzH33uRLYuShmy8MFyKK8VQiKTx88DcfTMRfOeK6xHwEPgvXO3Ep
-         h1bMh608LuxE1uwHJI5Kv6BrmoE4+QDYeNhpo2gIgHjN8zE4rdEF+NCn41/gwujHcV/Q
-         iEixcbAQ+AXzG6oewfzUZtRNyqMV/JV+jvsYGPhgg/ilil0z9GwIa3YbFCsL4t4LAFFv
-         P++pw6a6t8Mlb+VsNyWSLE9CyvF04JKUvtKLxYIEj81VQBMct2Pwrr8FvdVNaZz0xlo0
-         kUFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVS/vF82TZAAQ7frA1r3OUlw/hqrWvY4oLig08FPgLsTecwPhgsRN7sB8YdC34q0KKMFbWkM0M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwK0UjD5gtUbWZpLDffsZvjHF2N/nnAmaaHDRJ7BdqlEvb0MWbb
-	X/wbCeLip140QpoNmBd17luL1jDyhOo+aavV/rWVn5KuvHR9qcRGjch0EnpH
-X-Gm-Gg: ATEYQzz5mzG7tGzcT+Wnjo11qa1ZdNyxKqjdMDycr/sPhGM3v2U0LuBTi1dnH2KoJ7x
-	d/OuhwAZID34EsSYK6cW1y6bzoZ5k6AlC15GuFbPowUayAtABZjWkohThb+BhOIzdsr+HnSmw/M
-	DQsZZpXiPih9IbRcNPwffhyqLztn8aAz25kvek8nR3kJ1GLkryKFNLu/LKapsheO/+f63yDxBRg
-	50RODF4qc1Nambn5hqyYRSf8n0gDGceKz64b/nN+hsEDJTXHKS1Q3xqIDPu1aiqIxQrJj2YRINV
-	lS1Xbc+ANtq7MHhRMZyDmfXxqJQSCgJIHM/4+OF3cVeUx9mS/2aVxNtqBHggSexkpcgem9T7cmA
-	wwWcOV3rTyP0YDTHp0MFjlkuS55SKpUCwPso6804zD99szHUWTZrEltg4LK5/Ay0dpPu4llAERN
-	l6cGAx0gIT0ULZ88BAx5dZ65n+SscG1JapST7XaZxnvUAd/AU66mrIEabiySFbZty/YAX2lVvUD
-	EGaDJnek/T21roHKw==
-X-Received: by 2002:a05:7300:ec18:b0:2c0:c415:cfd6 with SMTP id 5a478bee46e88-2c0e50a0a8dmr1648662eec.13.1773845998562;
-        Wed, 18 Mar 2026 07:59:58 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1773846188; x=1774450988;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mel7QAaNVQ/Ezv2Sx36tyZ40BmWBA8rFfywqaIdVMQU=;
+        b=AhUpB/htydeDNWutU85qPT59z0aQACIxR7+V7xF0biF1CRLPX0ww9BBiuNZN3EiuPs
+         kpbS7Hzmu1sKYCwG2YiDfuypo+cNFYjazAXbLnGpcSQH3NKkrAn527vZuG2z9XDzCOGp
+         n7eIFLQzMqt4R31fvOrkHn+rs37fY9Du87NWnKiYO7b/CO0tx+rnux1O7XZrRf/EAPnF
+         FXrcff8QVSjm5jTownLrQ19VNzcvruWesjtJsW0NLt+fJMCP2iI/Jt8/vNLahs/aDJ2k
+         EuNMUtCyMGvHc2uYX7l7wLUSNhA2zQuNWgfIyurKxQC8BB/Q7l+aLDXZSTbnT2HE5FQV
+         g3Tg==
+X-Gm-Message-State: AOJu0YzwB3VysjAMD08ygAbbHg6y7MgJ2biQocdQjAOecm9SmCKVqDjS
+	gQpIA2XSAR0yz2WlFRciKns0M3AeLXtGXN5DcffDZMn7rDjeL7Kv5HzUkzmL
+X-Gm-Gg: ATEYQzw2urMP8KIUa3DhfMCzQuHRi30Yz0icMIXL+RBOIGJiSSOKOP7bYUg371ZcVj5
+	9Eqmt0l+eOJjcLDmviwY8GidxnUCbExOWPf/NfkAqTXUhm/r1kiPlkQbDhDTDRZ9n2UOdRkJZMZ
+	Tw5FCeco5sueNSrl1EKVrfb8IbhfoS1l7khHWPGVVrZ4+gNb2QiwgqbBs8HeUe4NT6yHbHydlRy
+	EluvlFeXnKeykX1J9K66JQEf9H6xCgFApwPqyparYFl0B0eAEVku4bUgS7xMuaCucywSxp0uIJz
+	/a4NfxF+d/FkolplfWJc4lgQ51PUhQycHbPAtVqUvultF6xUAXYPBe3dYpKtvlYRvChYcdIHMab
+	SZwMVwAGxYNW7ze+XGdLzxRCqGPRddpFfx9+q6b4JzzURkxMMvmnLWHW2NvdlVCCn7AFtCwmlpJ
+	X+gWK7aSW0osZ8qdyWoc1yVAkCm9pQvqseJTgV3NUUNDHaL02t3KOxD8wHxkZXjcjz0mQ7mi/N8
+	vd7sqpU3L+8nqCaUrOs9VPba67c
+X-Received: by 2002:a05:7300:dc91:b0:2be:88f2:3c98 with SMTP id 5a478bee46e88-2c0e46d3cd6mr1489917eec.1.1773846186396;
+        Wed, 18 Mar 2026 08:03:06 -0700 (PDT)
 Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c0e55a489bsm4388531eec.23.2026.03.18.07.59.58
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c0e55ee672sm5053621eec.28.2026.03.18.08.03.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 07:59:58 -0700 (PDT)
-Date: Wed, 18 Mar 2026 07:59:57 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>, Wei Wang <weibunny@fb.com>,
-	David Wei <dw@davidwei.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	bpf@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next 5/6] selftests: drv-net: add netkit devmem RX
- test
-Message-ID: <abq97UD7CHR7bdod@mini-arch>
-References: <20260316-scratch-bobbyeshleman-tcp-dm-netkit5-v1-0-b53c8cd72b23@meta.com>
- <20260316-scratch-bobbyeshleman-tcp-dm-netkit5-v1-5-b53c8cd72b23@meta.com>
- <abns9COj7WagFtZ8@mini-arch>
- <abn3rJGXXyDYSNzA@devvm11784.nha0.facebook.com>
+        Wed, 18 Mar 2026 08:03:06 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	skhan@linuxfoundation.org,
+	andrew+netdev@lunn.ch,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	alexanderduyck@fb.com,
+	kernel-team@meta.com,
+	johannes@sipsolutions.net,
+	sd@queasysnail.net,
+	jianbol@nvidia.com,
+	dtatulea@nvidia.com,
+	sdf@fomichev.me,
+	mohsin.bashr@gmail.com,
+	jacob.e.keller@intel.com,
+	willemb@google.com,
+	skhawaja@google.com,
+	bestswngs@gmail.com,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	leon@kernel.org
+Subject: [PATCH net-next v2 00/13] net: sleepable ndo_set_rx_mode
+Date: Wed, 18 Mar 2026 08:02:52 -0700
+Message-ID: <20260318150305.123900-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <abn3rJGXXyDYSNzA@devvm11784.nha0.facebook.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269057-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269058-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[fomichev.me];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,lunn.ch,broadcom.com,intel.com,nvidia.com,fb.com,meta.com,sipsolutions.net,queasysnail.net,fomichev.me,gmail.com,vger.kernel.org,lists.osuosl.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[sdf@fomichev.me,netdev@vger.kernel.org];
+	NEURAL_SPAM(0.00)[0.323];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stfomichev@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.929];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,meta.com:email]
-X-Rspamd-Queue-Id: 7BDCD2BDD9F
+	RCPT_COUNT_TWELVE(0.00)[35];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,fomichev.me:mid]
+X-Rspamd-Queue-Id: 263762BDE79
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 03/17, Bobby Eshleman wrote:
-> On Tue, Mar 17, 2026 at 05:08:20PM -0700, Stanislav Fomichev wrote:
-> > On 03/16, Bobby Eshleman wrote:
-> > > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > > 
-> > > Add tests for devmem RX over a netkit device with a leased queue. This
-> > > is the same as the other devmem RX test except for ncdevmem executes in
-> > > a namespace, binds to a netkit, and skips the ethtool NIC configuration
-> > > steps (relying on the test runner for that setup).
-> > > 
-> > > The RX path is setup as the following:
-> > > 
-> > >  RX Path
-> > >  -------
-> > > 
-> > >  Remote            Physical NIC          Netkit Host        Netkit Guest (netns)
-> > >    |                    |                     |                    |
-> > >    |--- TCP send ------>|                     |                    |
-> > >                         |-------------------->|                    |
-> > >                       dmabuf                  |--- BPF redirect -->|
-> > > 
-> > 
-> > Is it too messy to parametrize the existing test to run both with and
-> > without the namespaces? Feels like should be somewhat doable in python?
-> 
-> IIUC, we could have main() do something like:
-> 
-> for env [NetDrvContEnv, NetDrvEpEnv]:
->     with env as cfg:
->         [...]
->         ksft_run(tests, args=(cfg,))
-> 
-> 
-> And then the tests could call helpers that check cfg.netns to use the
-> nk_{guest,host}_ip6 addresses when true, otherwise use the regular
-> addresses?
-> 
-> It should be doable if I'm following your drift.
+This series adds a new ndo_set_rx_mode_async callback that enables
+drivers to handle address list updates in a sleepable context. The
+current ndo_set_rx_mode is called under the netif_addr_lock spinlock
+with BHs disabled, which prevents drivers from sleeping. This is
+problematic for ops-locked drivers that need to sleep.
 
-Yeah, yeah, this plus some small changes here and there (to pass your
-new -n in the netns mode for example).
+The approach:
+1. Add snapshot/reconcile infrastructure for address lists
+2. Introduce dev_rx_mode_work that takes snapshots under the lock,
+   drops the lock, calls the driver, then reconciles changes back
+3. Move promiscuity handling into the scheduled work as well
+4. Convert existing ops-locked drivers to ndo_set_rx_mode_async
+5. Add a warning for ops-locked drivers still using ndo_set_rx_mode
+6. Add a selftest exercising the team+bridge+macvlan topology that
+   triggers the addr_lock -> ops_lock ordering issue
+
+v2:
+- wifi: cfg80211: use __rtnl_unlock in nl80211_pre_doit (syzbot)
+- simplify mlx5e_sync_netdev_addr for !uc (Cosmin)
+- switch to snapshot in bnxt_cfg_rx_mode (Michael)
+- add team to net/config (Jakub)
+
+Stanislav Fomichev (13):
+  net: add address list snapshot and reconciliation infrastructure
+  wifi: cfg80211: use __rtnl_unlock in nl80211_pre_doit
+  net: introduce ndo_set_rx_mode_async and dev_rx_mode_work
+  net: move promiscuity handling into dev_rx_mode_work
+  fbnic: convert to ndo_set_rx_mode_async
+  mlx5: convert to ndo_set_rx_mode_async
+  bnxt: convert to ndo_set_rx_mode_async
+  bnxt: use snapshot in bnxt_cfg_rx_mode
+  iavf: convert to ndo_set_rx_mode_async
+  netdevsim: convert to ndo_set_rx_mode_async
+  dummy: convert to ndo_set_rx_mode_async
+  net: warn ops-locked drivers still using ndo_set_rx_mode
+  selftests: net: add team_bridge_macvlan rx_mode test
+
+ Documentation/networking/netdevices.rst       |  12 +
+ drivers/net/dummy.c                           |   6 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  53 +--
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  14 +-
+ .../net/ethernet/mellanox/mlx5/core/en/fs.h   |   5 +-
+ .../net/ethernet/mellanox/mlx5/core/en_fs.c   |  30 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  16 +-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  20 +-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |   4 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |   4 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   |   2 +-
+ drivers/net/netdevsim/netdev.c                |   8 +-
+ include/linux/netdevice.h                     |  26 ++
+ net/core/dev.c                                | 175 ++++++++--
+ net/core/dev.h                                |   1 +
+ net/core/dev_addr_lists.c                     | 110 +++++-
+ net/core/dev_addr_lists_test.c                | 321 +++++++++++++++++-
+ net/wireless/nl80211.c                        |   2 +-
+ tools/testing/selftests/net/config            |   1 +
+ tools/testing/selftests/net/rtnetlink.sh      |  44 +++
+ 20 files changed, 761 insertions(+), 93 deletions(-)
+
+-- 
+2.53.0
+
 
