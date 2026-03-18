@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-268988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268989-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qPbXGmSWumnSXgIAu9opvQ
-	(envelope-from <netdev+bounces-268988-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:11:16 +0100
+	id cK97Co6WumnSXgIAu9opvQ
+	(envelope-from <netdev+bounces-268989-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:11:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3B4D2BB43E
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:11:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A63182BB454
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:11:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AE7FE30AB5DF
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 12:10:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA2FF303C032
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 12:10:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0BA23D5254;
-	Wed, 18 Mar 2026 12:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B06FE3AEF5A;
+	Wed, 18 Mar 2026 12:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ne9X4elu"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zo+eIOeQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010017.outbound.protection.outlook.com [52.101.46.17])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010006.outbound.protection.outlook.com [52.101.61.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7B83BFE40;
-	Wed, 18 Mar 2026 12:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8A136AB76;
+	Wed, 18 Mar 2026 12:10:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.6
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773835840; cv=fail; b=BUDDVGG4JLQxW0I9MmhEyEMyzuNki8PA6QDtbW50MsTLmaOmIfHAMvpdbecQ/9+TntGNKBlm9VXgwpdze9Cr4a+xKKHYEl5/yHOel2FG+0fecIlhXSWUoZ0TqGTo3fKRxlzV42Qal6bpDaL4EYFVnOEhHHlD/kJU/HuRo7nzpr8=
+	t=1773835846; cv=fail; b=M8KMgFEUMc/IAz2CCy6/sZLUic/WnpeJi02Rbulb6Dbz4hEcmHsyHPevFWQBhn0imy0bfvIgVdVjHB6fx/Fs6Ttt2aEMWyJb/vtqVWMUdDxuFt9mF0i5I9x4Hlc/45I+mF2cc9QGPH8dg7SDI1ADDHCpu4yYE81JjmFuPWwg0Ns=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773835840; c=relaxed/simple;
-	bh=/hOq6Ly2egoiqJym1Nf9smAKv4cA/LTfsf2ehV+HC5M=;
+	s=arc-20240116; t=1773835846; c=relaxed/simple;
+	bh=5t4NKf0j+SXzgf5SCIsB//5lQpHU0Kzix4I4EDcI6hE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ReSF/xsjnKYVcxqvU6JPupxx4UI5LgdwZErf8+KvlOdF2SeuCtQsm9TKQBpacVHO09rCKmsfkyfg3BFz8AxJVESn2ZOZjQaq6JXDj0M+DCsF0Isyzp6nwtksFMUT8o6oOjoTIUpxdyo3bjbuoNv0eZcSOvYw1X1wxmTOr1IBtn0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ne9X4elu; arc=fail smtp.client-ip=52.101.46.17
+	 MIME-Version:Content-Type; b=T/D0Tdi6UwBoitri48DqDYlrGELPMWdgc0eTVpWCpouKrYimjD4ye+HmDQQInrJMxIMMoOnWXFZpkiv1/7RxZKFS5FLq3ULgrhXOHKUS3Nmkd6eLzXGGhECQPWNHU5SIzcLuHeDWrDiiWCPlbn+BwKA0zVypqKb5Elev/Np49Mw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zo+eIOeQ; arc=fail smtp.client-ip=52.101.61.6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YC1W+uU7b1QOV/luXw8Y6sqp4R1+lMG7PfIrV4pHWsQ5gzuxUXWbQze0wB5NJbMUwKFi1eGer12vXArxJPTiG25eAL0Z6x3vM3C7JbQEGj7oPscQKGeukrH5rMmMt7PGX1BoWyO2Z8AWuj2sDTGKWekeTgCaceKA0fvCshilHyoD2tbR5e7bkuNXOCP7VOwriWy+nSmFsBFkQ/IIQsBY6kwN4uKwFdHwtiKUVxmajuR1L31EvTz7CdBgXmikjnYgTWGhxcve82iX5/sX9RvJCurW2FxWH4BK9EifcAMIkHp+ovyVrS9z3rf+7SokF67JN0SVCPk0ZTyND6WIBaAXzg==
+ b=F7O6yWkDhJSZavlR4TjS45gQ8rPGsnGYKcm6QUHQ53bFuc1w3HxYJ54LsiZupR5t705tEwoq4YsfRwdHBtyb/0CO6+zvxeCi4M8zFCbMV3cyElltGyYw3pTzpgtyY/blEkGXOd0eNABVNMxsefGvaonws6/dLQw/69WB2uYyogQKNnUcFCIfGzYzurhbXEdk8qIkPPtCL+IKDaIe1icmmyUXQ7+n1l6eRV0OHFhx8mCiysCdZQniZyd6fyJz2FYLv86qTT7LJl00jUAsevN/3NJjxPzo/yJDuxaEjTECd4XLws5AQTTcxZxDcsQGvXixP84MHZc6zwuwlqBGNrmFfQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EVRD/6WJ4Y7LMIP7siLO5DA31yQ+4epO0WFal+6A3rw=;
- b=RozmgeoflwifNPiE1LfGe+3wInvSF8blqplcQMogCIglLgjWhNGPKG47xAdgBLxZHTBSxaNtlga2ZqwbVrcJEsEB0wsTWaZNnD1spq9+ZBdya3QN08/tqH5tr8btxdx86Qrz8Cm/WHWgTsxVNYwsLHXKWMG8pp0KkJCewmKhzAP1gLZdzbFZKAmCooPRE7d+6lRAXomeOjzA4UVkjNFwD9socZ251gDDrhbKhMvujd9WvvFi0QVvMkB2mhc5k3/2+RDGklnpHKStnaT5pjumf67DaHd80QwMI1rTXuonKEZPxlF2rBicYpO6/J+iAUza3B3mYTbAp0JmzetExji77A==
+ bh=VRyarCsVsCZSla8kHKhCHaGZGv7x8BLtoxROpxUPfCE=;
+ b=thn2dQehegnsD+niGYShGj1pfdwxNEarFxumdDDf3YaTHQQwljr64WpznBbVKNhNoY0zIlBHeJUeTINnWaKb/86wn2XwopX4dcqKPo1F8vRLWucUfr2bnhn+FOyyn9KmrkuDQ0l9ijdmah5BkeQEE1IWM/JzA/tDVM83NQs5IVUdF5iS/xpQ5hCYFKSJ9vfXn6FsjAvW4MSStfsZxPXQ4CJocumhgukibgDJbrThH606GDrGlxznsFH3s1Tn7I/X/bIiuibfngvBVuUksK80zoieACd113aGe3ofuQDjm1pJweJQN6U4N601YMsyroijq8fHl8s/3oiiVLVozsr8Gw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EVRD/6WJ4Y7LMIP7siLO5DA31yQ+4epO0WFal+6A3rw=;
- b=ne9X4elu9HHAQTWhZiJKS0F1L4lfFH492Pzqt5JBk/JEL8Kg6uXhFDGFEWqZyQX0N80R1/0JRJg2KncKDgTZYHhQ0b5kQuHNFr4lABSVD/Zlb6sF/GO4XI5R5bB0zuhh3xZqCD4Wl5Zu/bzbazCTTmAXQOxzADz9CdVRfxgZsfc=
-Received: from CH0PR03CA0347.namprd03.prod.outlook.com (2603:10b6:610:11a::26)
- by BY5PR12MB4132.namprd12.prod.outlook.com (2603:10b6:a03:209::22) with
+ bh=VRyarCsVsCZSla8kHKhCHaGZGv7x8BLtoxROpxUPfCE=;
+ b=zo+eIOeQabqjeZSI4hPvbDzJccub4jLGHkv93+xYAnvEPjZUOcwRY1VsUEjT1tVgQmy7YWMZ8+T215LvU+qjbvFK/sSIFWr57OAPBKF163GWSzA3AjDbK4+LV2qYdFqFdXDwovo6M5HcaEkxGikwXhSktNjdfyOUjSKhJlpVoNA=
+Received: from CH0PR03CA0448.namprd03.prod.outlook.com (2603:10b6:610:10e::11)
+ by CH3PR12MB7692.namprd12.prod.outlook.com (2603:10b6:610:145::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Wed, 18 Mar
- 2026 12:10:35 +0000
-Received: from DS3PEPF000099DC.namprd04.prod.outlook.com
- (2603:10b6:610:11a:cafe::7f) by CH0PR03CA0347.outlook.office365.com
- (2603:10b6:610:11a::26) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.8; Wed, 18 Mar
+ 2026 12:10:41 +0000
+Received: from DS3PEPF000099E0.namprd04.prod.outlook.com
+ (2603:10b6:610:10e:cafe::d7) by CH0PR03CA0448.outlook.office365.com
+ (2603:10b6:610:10e::11) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9700.27 via Frontend Transport; Wed,
- 18 Mar 2026 12:10:10 +0000
+ 18 Mar 2026 12:10:32 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -66,21 +66,21 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- DS3PEPF000099DC.mail.protection.outlook.com (10.167.17.198) with Microsoft
+ DS3PEPF000099E0.mail.protection.outlook.com (10.167.17.203) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9723.19 via Frontend Transport; Wed, 18 Mar 2026 12:10:34 +0000
+ 15.20.9723.19 via Frontend Transport; Wed, 18 Mar 2026 12:10:41 +0000
 Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 18 Mar
- 2026 07:10:32 -0500
+ 2026 07:10:38 -0500
 From: Raju Rangoju <Raju.Rangoju@amd.com>
 To: <netdev@vger.kernel.org>
 CC: <linux-kernel@vger.kernel.org>, <pabeni@redhat.com>, <kuba@kernel.org>,
 	<edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>, "Raju
  Rangoju" <Raju.Rangoju@amd.com>
-Subject: [PATCH v2 net-next 1/3] amd-xgbe: add adaptive link status polling
-Date: Wed, 18 Mar 2026 17:40:04 +0530
-Message-ID: <20260318121006.1565435-2-Raju.Rangoju@amd.com>
+Subject: [PATCH v2 net-next 2/3] amd-xgbe: optimize TX shutdown on link-down
+Date: Wed, 18 Mar 2026 17:40:05 +0530
+Message-ID: <20260318121006.1565435-3-Raju.Rangoju@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260318121006.1565435-1-Raju.Rangoju@amd.com>
 References: <20260318121006.1565435-1-Raju.Rangoju@amd.com>
@@ -90,53 +90,54 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099DC:EE_|BY5PR12MB4132:EE_
-X-MS-Office365-Filtering-Correlation-Id: 029eaf29-0abe-4b71-c0e3-08de84e75c01
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099E0:EE_|CH3PR12MB7692:EE_
+X-MS-Office365-Filtering-Correlation-Id: fbf7558e-962f-4475-5e74-08de84e75fc0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700016|22082099003|18002099003|56012099003;
+	BCL:0;ARA:13230040|1800799024|36860700016|82310400026|376014|18002099003|22082099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	9RWyrBdWGRFVd2WZjTo+7FOujdihJN9lqMy7DBsGDyEdWN4nLLf/JFdZf5Lc8XzIEtiFS8rvbtAqIJsUKKiVoT1XIqKdpUybVPJqIE2LuNDSKyT/aYiP0u+2ZXemDlsuQFbrG3WMgPwNfDVby3asxDhXQbxUp/z28GhBv4UHBKj7aOs3QpAI+HuOgc9BCUwccNbOvHE6UXKfLL/ssrnKwIw6nsixNCiPkmvMSkPoTFDuWSvcCkCh/fLvyk81myELbKAQDc5Xl6neH095h54gdxh2XunJry9ipM0E9zCh+cy5ITCBPbbhWrEKhgglCK1K15iAdj4gDYt/kySRKhgiKo1ApJboDf4g6LTMKEYEfS6YW9WOlTygH4NDBlIcVgl8IwcMcgTh/wr3t8Ghvj32kPnJIXYfHUHG8XCp29tHFL18q3U8hGquahfiFseEMTsJBQ6LekQEBMM5EOWRWGj76/m2HcIVHTYML9MO2PRwwNG9eP4sl/Lfl2FiOU9MPvr3Ezivws/Qo3ORkrrMwHeookZVZSW5fiL16ZFsFthDnXVPE53NEJUmHpWpJBv4lZ1mG6xx4O9VrQnhUyv5HeDjLKlNZbrXJOhneqCrHL5IpCjgQj+9p6zmKe7khN27Cdu8EQjToeBIMKOevKTcOMR5EH+28FnjnFdYFMIVYzS6JoK/0pDJIlz/1cgFZiRqQY6R/nC2XseraeDzfS4Qw86Pl53MgB5ae4dGQdztEqnkEayO7e0NUt3OD3qki54BFQv4HqcIg9e6RDP5bF45AlqdFw==
+	FHc2caaOwOagVLUCIqSKJUd6dA7uOrrbdGLI1J+SMirNJ8ZTe9QJ4LqMOPLgE3V0BcIEP7h+b7RmTs1BDkoSb+N7ElBWju2jvuVGfB8ywvqEWP08ZGKcTtInrTejiZY8gInsha+mAjGBVO4ub4RZPDxzjlgGFhCCPi/RBX/SauEhwjVHOTznX9e8vC4pQUMEVAQUmboD/bDhnGJkQpFQQkNjPBEFZxJSfkqTbYmX9u+nergyORxpwI/52G+zrDqn1LMYZa4TNLGZjRS9pGh4+HoidXJM4tiJ2qgfrui95QX5q6WvzvTxKczmqJPDQz5Qn/hM6nMP0whKysnNUqlXjkVhm03PO0Z5ECo60+mHbbFbB7yMe25p1wmbzZDqZ8p/UVZrVtv14bcYJYEwfh7qMTXddgmJXx7/GYH8b8WZ9QSLPsHCqBZ8Rm2nY8YiTsrn8KSpLdrVxSZICQSd4ORBd6DJ7Ce2fka2YCY/Mj9fpRzz9N0acEG45evIYrreodCn/hGu+8IbSj1ZcWfQjeAfp2OILLH1LfH8zJCzV2gtnBWn7SoGTX+1JFwyJZppp5+D77SRYOmeERuFbZVBOaOLA4PBw6zSzCgA7LfgJXs1QUs9mXBce1tN6SVI5mwb2tN56X/LSmgjFsJmyj+LANZkwoaYGIwzHnlYEyWx2KMt0ygOREeBWF70a0CUiwyYaqY5kcqye0lTy+67CcGKC5oI2vM65AFYfhkDxLuNF4GLMyr0q/CS56X/AwgcT+Wj+PH63Cyw1x84KCd1m0jObvmvoA==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700016)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(82310400026)(376014)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	qTBc6ee6TmiD3q2eTeUIPnUBK5n7GXli5gIiWeXKlbsC1szQ3ZTmmIZhnsNe3FX5ZI+hwqzIjxoK0UZC4YdkehQRkRYqGAa/BjCdcGQq0ZCy5gD6UiShd+UsSV7TJxrHTbEsQiuPR7x0mVFfQo6RDQN3EK1km44+xU45cgN5+Bmm71gtgCyvryrr+DtB8Hokitv3Gt/KhEB2XINgrs6Yeo1uFsnNjJhKZDs8dQ5tMf/LidLj7zvUbY6dMMp/KLzESA+C6l5uAIznu2WF8Efax0qwdLMwyenRFLf3N9xvxNQuKSxQTHYWJDCgm+ObK27Enf+6xyC9VRCQj/ddw1iaf8/3keHrfrfjYkIKR29vjLbhUFjgd2HUqXcjrPk5KN/sStHVFJZLuRCYS/DmmAlUvp5yT5a1p4975yvvyKFgssSenxA9oBWIdVRocB71uMBF
+	BaTzrExqAM60wXjcWa+mk+pwfMRcwgL5lR/7v7rOpV0bUzrkUEvM2A37M34zCFSnb4Z3ipL7Spvdj0blPbMDvcRV+AQrFks24r00hPHaSADpggeR1zGzg+7PtNEVEgxIjzFzOPSKhBSqSqn+erEda69CBLdcD66M43YVbiUE7WRTcVh9v1I2g5/AnEQleQ86TheRmK/NwAus251UjQSOcCFkixBj2tRSZZiI5looyV06Bg/T/HfbV1SXfyup87iI2Pd4vbqvksGlsj85mAGQXBmk/v+uhye5rLmgr5OtZp3T3/ydvrUJGUKaJtkqF+qG47oov6pt6XUsOK2Nw3PvSfucGX+pSeHSsxncG/d1SpgoD9vUGI+0LIZG+aGSNkbfNnGo46movU6YVPmnvJ+zxvWvMBkNTD5vIEz9pjCCbJe8FgUAktbOpZYll+EMA/Tx
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2026 12:10:34.8521
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2026 12:10:41.1472
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 029eaf29-0abe-4b71-c0e3-08de84e75c01
+X-MS-Exchange-CrossTenant-Network-Message-Id: fbf7558e-962f-4475-5e74-08de84e75fc0
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099DC.namprd04.prod.outlook.com
+	DS3PEPF000099E0.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4132
-X-Spamd-Result: default: False [2.34 / 15.00];
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7692
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268988-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-268989-lists,netdev=lfdr.de];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:dkim,amd.com:email,amd.com:mid];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[Raju.Rangoju@amd.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -144,85 +145,109 @@ X-Spamd-Result: default: False [2.34 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: E3B4D2BB43E
+X-Rspamd-Queue-Id: A63182BB454
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Implement adaptive link status polling to enable fast link-down detection
-while conserving CPU resources during link-down periods.
+Optimize the TX shutdown sequence when link goes down by skipping
+futile hardware wait operations and immediately stopping TX queues.
 
-Currently, the driver polls link status at a fixed 1-second interval
-regardless of link state. This creates a trade-off:
-  - Slow polling (1s): Misses rapid link state changes, causing delays
-  - Fast polling: Wastes CPU when link is stable or down
+Current behavior creates delays and resource issues during link-down:
 
-This enhancement introduces state-aware polling:
+1. xgbe_txq_prepare_tx_stop() waits up to XGBE_DMA_STOP_TIMEOUT for
+   TX queues to drain, but when link is down, hardware will never
+   complete the pending descriptors. This causes unnecessary delays
+   during interface shutdown.
 
-When carrier is UP:
-  Poll every 100ms to enable rapid link-down detection. This provides
-  ~100-200ms response time to link failures, minimizing packet loss and
-  enabling fast failover in link aggregation configurations.
+2. TX queues remain active after link-down, allowing the network stack
+   to continue queuing packets that cannot be transmitted. This leads
+   to resource buildup and complicates recovery.
 
-When carrier is DOWN:
-  Poll every 1s to conserve CPU resources. Link-up detection is less
-  time-critical since no traffic is flowing.
+This patch adds two optimizations:
 
-Performance impact:
-  - Link-down detection: 1000ms → 100-200ms (10x improvement)
-  - CPU overhead when link up: 0.1% → 1% (acceptable for active links)
-  - CPU overhead when link down: unchanged at 0.1%
+Optimization 1: Skip TX queue drain when link is down
+  In xgbe_txq_prepare_tx_stop(), detect link-down state and return
+  immediately instead of waiting for hardware. Abandoned descriptors
+  will be cleaned up by the force-cleanup mechanism (next patch).
 
-This is particularly valuable for:
-  - Link aggregation deployments requiring sub-second failover
-  - Environments with flaky links or cable issues
-  - Applications sensitive to connection recovery time
+Optimization 2: Immediate TX queue stop on link-down
+  In xgbe_phy_adjust_link(), call netif_tx_stop_all_queues() as soon
+  as link-down is detected. Also wake TX queues on link-up to resume
+  transmission.
+
+Benefits:
+  - Faster interface shutdown (no pointless timeout waits)
+  - Prevents packet queue buildup in network stack
+  - Cleaner state management during link transitions
+  - Enables orderly descriptor cleanup by NAPI poll
+
+Note: We do not call netdev_tx_reset_queue() on link-down because
+NAPI poll may still be running, which would trigger BQL assertions.
+BQL state is cleaned up naturally during descriptor reclamation.
 
 Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
 ---
- drivers/net/ethernet/amd/xgbe/xgbe-drv.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/amd/xgbe/xgbe-dev.c  |  9 +++++++++
+ drivers/net/ethernet/amd/xgbe/xgbe-mdio.c | 18 ++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-index 2f39f38fecf9..6886d3b33ffe 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-@@ -607,11 +607,33 @@ static void xgbe_service_timer(struct timer_list *t)
- 	struct xgbe_prv_data *pdata = timer_container_of(pdata, t,
- 							 service_timer);
- 	struct xgbe_channel *channel;
-+	unsigned int poll_interval;
- 	unsigned int i;
- 
- 	queue_work(pdata->dev_workqueue, &pdata->service_work);
- 
--	mod_timer(&pdata->service_timer, jiffies + HZ);
-+	/* Adaptive link status polling for fast failure detection:
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+index f1357619097e..b7bf74c6bb47 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+@@ -3186,7 +3186,16 @@ static void xgbe_txq_prepare_tx_stop(struct xgbe_prv_data *pdata,
+ 	/* The Tx engine cannot be stopped if it is actively processing
+ 	 * packets. Wait for the Tx queue to empty the Tx fifo.  Don't
+ 	 * wait forever though...
 +	 *
-+	 * - When carrier is UP: poll every 100ms for rapid link-down detection
-+	 *   Enables sub-second response to link failures, minimizing traffic
-+	 *   loss.
-+	 *
-+	 * - When carrier is DOWN: poll every 1s to conserve CPU resources
-+	 *   Link-up events are less time-critical.
-+	 *
-+	 * The 100ms active polling interval balances responsiveness with
-+	 * efficiency:
-+	 * - Provides ~100-200ms link-down detection (10x faster than 1s
-+	 *   polling)
-+	 * - Minimal CPU overhead (1% vs 0.1% with 1s polling)
-+	 * - Enables fast failover in link aggregation deployments
-+	 */
-+	if (netif_running(pdata->netdev) && netif_carrier_ok(pdata->netdev))
-+		poll_interval = msecs_to_jiffies(100);  /* 100ms when up */
-+	else
-+		poll_interval = HZ;  /* 1 second when down */
++	 * Optimization: Skip the wait when link is down. Hardware won't
++	 * complete TX processing, so waiting serves no purpose and only
++	 * delays interface shutdown. Descriptors will be reclaimed via
++	 * the force-cleanup path in tx_poll.
+ 	 */
 +
-+	mod_timer(&pdata->service_timer, jiffies + poll_interval);
++	if (!pdata->phy.link)
++		return;
++
+ 	tx_timeout = jiffies + (XGBE_DMA_STOP_TIMEOUT * HZ);
+ 	while (time_before(jiffies, tx_timeout)) {
+ 		tx_status = XGMAC_MTL_IOREAD(pdata, queue, MTL_Q_TQDR);
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c b/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
+index 7675bb98f029..fa0df6181207 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
+@@ -1047,11 +1047,29 @@ static void xgbe_phy_adjust_link(struct xgbe_prv_data *pdata)
+ 		if (pdata->phy_link != pdata->phy.link) {
+ 			new_state = 1;
+ 			pdata->phy_link = pdata->phy.link;
++
++			/* Link is coming up - wake TX queues */
++			netif_tx_wake_all_queues(pdata->netdev);
+ 		}
+ 	} else if (pdata->phy_link) {
+ 		new_state = 1;
+ 		pdata->phy_link = 0;
+ 		pdata->phy_speed = SPEED_UNKNOWN;
++
++		/* Proactive TX queue management on link-down.
++		 *
++		 * Immediately stop TX queues to enable clean link-down
++		 * handling:
++		 * - Prevents queueing packets that can't be transmitted
++		 * - Allows orderly descriptor cleanup by NAPI poll
++		 * - Enables rapid failover in link aggregation configurations
++		 *
++		 * Note: We do NOT call netdev_tx_reset_queue() here because
++		 * NAPI poll may still be running and would trigger BQL
++		 * assertion. BQL state is cleaned up naturally during
++		 * descriptor reclamation.
++		 */
++		netif_tx_stop_all_queues(pdata->netdev);
+ 	}
  
- 	if (!pdata->tx_usecs)
- 		return;
+ 	if (new_state && netif_msg_link(pdata))
 -- 
 2.34.1
 
