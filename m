@@ -1,183 +1,174 @@
-Return-Path: <netdev+bounces-268949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268950-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Jb7Kat2ummTWwIAu9opvQ
-	(envelope-from <netdev+bounces-268949-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:55:55 +0100
+	id mE+BHml3ummTWwIAu9opvQ
+	(envelope-from <netdev+bounces-268950-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:59:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EFB32B983B
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:55:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E4CA2B98E3
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:59:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 12D9B30268B2
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:54:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 05855304D670
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:57:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6823B7B77;
-	Wed, 18 Mar 2026 09:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A693ACA7B;
+	Wed, 18 Mar 2026 09:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="yNNPNxiz"
+	dkim=pass (2048-bit key) header.d=mecomediagroup.de header.i=@mecomediagroup.de header.b="aHOo9jQh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.162])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F513A6F16
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 09:53:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D293AE6F8;
+	Wed, 18 Mar 2026 09:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.162
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773827640; cv=none; b=edZQjjwRss/pvfHmI4LwGYt8KrZRW95P2+R4dSheh3uL2IGLetQ/9paZFO8r4ELj5y+i4W+RaRD1C97/gCsqlHDQl42y+xu6Rf96lOGykn/l0BZCqVnxZ7zt/o9aN3TxuKxcctl9aVWGw4bQxHn1T1Ne5o73YYa0TyRIju3wtSM=
+	t=1773827821; cv=none; b=AvLMOf84r02k40dsYnwKib/aV1adwqD7V4Ah5M0iDdvKZb46J9TL4H/FVo6/01ocl0fzUWzSVjSNKhb7IjFqlSpyGv+pvoifdgSu8wiq828xF8WjAtkKnRMNsD0oMe5G4ubmiTSA1nEAwgYrdRknpOtIN500TNRD5Nz5LMhC+BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773827640; c=relaxed/simple;
-	bh=PtzHHweeSyTewKASZ5KFtJHN+kg72UkdBKzWfqyc728=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
-	 References:In-Reply-To; b=mWePtqmo0p2xgpduyzDqIk2rNd6zeD7px6w9d/sgszGDCIjdgz2oLfnhghxNFjJxdH0/tLjIsGZGAKYRku4/tPYdrsf/85JfQsqeVzEJ5TuLReTkfOIrblV1EA1/4mM54l2RFhk5qQua1i3PCdqz8j2IqSXhZ7O89aScoq7N9Ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=yNNPNxiz; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (unknown [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id C156DC55069;
-	Wed, 18 Mar 2026 09:54:14 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 529D16004F;
-	Wed, 18 Mar 2026 09:53:40 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 07FAC10450758;
-	Wed, 18 Mar 2026 10:53:37 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773827619; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=fNFG2r8DTWr2ETzMLU5H9gpDxf7fg1r9QXDFSFaarzc=;
-	b=yNNPNxizrIFOKjE3BLWJ2prS+HhJF0heVbyAG9uzddUxPCOHjEyRVqRg5kxPgm9tngiuzJ
-	uYaIHFrWRVoZBT5pARWXX0NHo5U4brUOh/OWPLMlA0LG//QIBy/svpP0mV2VAm6TPNaL1p
-	hDUUYuw5oBxX1PPS8GEh9VHAkZkjUbMiqUq18v7zCpwya9dDR6C372ojM9OkUwuP/JX/Le
-	zBf1KnJfSKZU+GzK9cG4UkaIeLvjOTl8BUz2ulw0TQArllx6yOEELKivflvdk/bv5VEVMs
-	hWFc/mG0UveCGUAYrhyT0PrjUQVL7eA49cnjdBg26LnC8qoadvw5aP1gq6yv+A==
+	s=arc-20240116; t=1773827821; c=relaxed/simple;
+	bh=g1x0s7T64Tdy8dyNmPlIkdrD35PpU5AfYBNjl1snPJI=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=lhnDBfr1FbSU0+WiG3XVWwdgy+3rpXLruc8zPdDzqCmF6brM4aPUIRk8rdfB4jhb1cpLWqltU5E9nWVCkMGptavY5xGqypOn8MTwmIVUXjJCzL1F9XgpGRpUOSWMe+bNuV4216tKJUKbQ2OkobFIKhPDzoaVjb8rvs7pOpJpz9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mecomediagroup.de; spf=pass smtp.mailfrom=mecomediagroup.de; dkim=pass (2048-bit key) header.d=mecomediagroup.de header.i=@mecomediagroup.de header.b=aHOo9jQh; arc=none smtp.client-ip=188.68.63.162
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mecomediagroup.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mecomediagroup.de
+Received: from mors-relay-8201.netcup.net (localhost [127.0.0.1])
+	by mors-relay-8201.netcup.net (Postfix) with ESMTPS id 4fbPNM48RXz3wgp;
+	Wed, 18 Mar 2026 10:56:03 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mecomediagroup.de;
+	s=key2; t=1773827763;
+	bh=g1x0s7T64Tdy8dyNmPlIkdrD35PpU5AfYBNjl1snPJI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aHOo9jQhWdiz8XybGRys15NSycB/XmheYFOk5zTJ+OLgAkpvLnw9tF34sRXooh/Uw
+	 cX2lS/WGlA8aIM7+fJ1dz7rppvosePzA8j0q9eZSe6tAbuvRU6l++uGok7Blxz5oVF
+	 zpj6llvKl69vVXF3cfkNGoy6guVyLmsTv32hFmutvDZWUp9FGlnhAj3M0TXhtoJYlE
+	 yb4MDQiurtK52Uf7hlYeytsDCgcHUu/Dqlnub7uR7QLqytZR9Vb1WkHDuj67S39KRV
+	 el3ux3PxbZxvjb3pZYlFSLPGytLDvuioS4y2wYeo1ZDJcbIPUGGT9MEBpzbMUqAMWs
+	 RVM0P6apoYg4A==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-8201.netcup.net (Postfix) with ESMTPS id 4fbPNM3Q3Bz3wdk;
+	Wed, 18 Mar 2026 10:56:03 +0100 (CET)
+Received: from mxe95c.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4fbPNL4MVRz8svH;
+	Wed, 18 Mar 2026 10:56:02 +0100 (CET)
+Received: from webmail01.netcup.net (unknown [46.38.249.153])
+	by mxe95c.netcup.net (Postfix) with ESMTPA id AA0A080CC2;
+	Wed, 18 Mar 2026 10:56:01 +0100 (CET)
+Authentication-Results: mxe95c;
+        spf=pass (sender IP is 46.38.249.153) smtp.mailfrom=mecid@mecomediagroup.de smtp.helo=webmail01.netcup.net
+Received-SPF: pass (mxe95c: connection is authenticated)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 18 Mar 2026 10:53:37 +0100
-Message-Id: <DH5TETVK34CG.V7P9P9Z1AAKL@bootlin.com>
-Cc: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
- <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
- <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <netdev@vger.kernel.org>
-To: "Jakub Kicinski" <kuba@kernel.org>, "Nicolai Buchwitz" <nb@tipi-net.de>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next] net: macb: allow MTU changes while the
- interface is running
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260316092720.39198-1-nb@tipi-net.de>
- <DH57URLYG3TU.B4HGNJATLFMU@bootlin.com>
- <20260317152330.32998fdd@kernel.org>
- <1aae7cf5906c753c0ff5356b8e1f53e2@tipi-net.de>
- <20260317162303.4065e307@kernel.org>
-In-Reply-To: <20260317162303.4065e307@kernel.org>
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+MIME-Version: 1.0
+Date: Wed, 18 Mar 2026 10:55:57 +0100
+From: mecid@mecomediagroup.de
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, richardcochran@gmail.com,
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] dt-bindings: arm: qcom: Add qcs9075-radxa-airbox-q900
+In-Reply-To: <52854742-b458-42db-881f-bef8eac3dab5@kernel.org>
+References: <20260318083621.470826-1-mecid@mecomediagroup.de>
+ <20260318083621.470826-2-mecid@mecomediagroup.de>
+ <52854742-b458-42db-881f-bef8eac3dab5@kernel.org>
+User-Agent: Roundcube Webmail/1.4.15
+Message-ID: <50edee17750812609f7b8de795aaa221@mecomediagroup.de>
+X-Sender: mecid@mecomediagroup.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: <177382776201.1783819.6154477896774710283@mxe95c.netcup.net>
+X-NC-CID: r3DTgHUZom/cw4M5r+oxK7aUXy8FV6pZsomCBIHT3Y89aLyG8yH/
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[mecomediagroup.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[mecomediagroup.de:s=key2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[mecomediagroup.de:+];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268949-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_FROM(0.00)[bounces-268950-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux-msm.github.io:url,mecomediagroup.de:dkim,mecomediagroup.de:email,mecomediagroup.de:mid];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mecid@mecomediagroup.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,gnu.org:url,bootlin.com:dkim,bootlin.com:mid,bootlin.com:email,bootlin.com:url]
-X-Rspamd-Queue-Id: 1EFB32B983B
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 3E4CA2B98E3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed Mar 18, 2026 at 12:23 AM CET, Jakub Kicinski wrote:
-> On Tue, 17 Mar 2026 23:58:21 +0100 Nicolai Buchwitz wrote:
->> On 17.3.2026 23:23, Jakub Kicinski wrote:
->> > On Tue, 17 Mar 2026 18:00:02 +0100 Th=C3=A9o Lebrun wrote: =20
->> >> Reviewed-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com> =20
->> >=20
->> > I told you recently that open / close is not allowed.
->> > So why are you putting a rb tag on a patch which does exactly that?
->> >=20
->> > https://lore.kernel.org/all/20260306190948.44d23f8f@kernel.org/ =20
+On 2026-03-18 09:51, Krzysztof Kozlowski wrote:
+> On 18/03/2026 09:36, Mecid Urganci wrote:
+>> Add device tree binding for the Radxa AirBox Q900 board based on
+>> the Qualcomm QCS9075 SoC.
+> 
+> What is QCS9075? It's the first time this compatible appears and the
+> only other reference is socinfo commit which told nothing.
+> 
+>> 
+>> Signed-off-by: Mecid Urganci <mecid@mecomediagroup.de>
+>> ---
+>>  Documentation/devicetree/bindings/arm/qcom.yaml | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>> 
+>> diff --git a/Documentation/devicetree/bindings/arm/qcom.yaml 
+>> b/Documentation/devicetree/bindings/arm/qcom.yaml
+>> index 8c3df8efaa4d..2c492f4d784a 100644
+>> --- a/Documentation/devicetree/bindings/arm/qcom.yaml
+>> +++ b/Documentation/devicetree/bindings/arm/qcom.yaml
+>> @@ -909,6 +909,12 @@ properties:
+>>                - qcom,sa8775p-ride-r3
+>>            - const: qcom,sa8775p
+>> 
+>> +      - items:
+>> +          - enum:
+>> +              - radxa,airbox-q900
+>> +          - const: qcom,qcs9075
+>> +          - const: qcom,sa8775p
+> 
+> Why qcs9075 is compatible with sa8775p?
 
-Ah, I might have misunderstood at the time.
+Thank you for your feedback.
 
-   > allocate all necessary resources upfront then just swap them in
-   > and reconfigure HW
+Yes from public information it is the same SoC without the automotive 
+security features. Should I remove the qcs9075 reference and only keep 
+qcom,sa8775p?
 
-In .set_channels() context, does "upfront" mean
-(1) alloc all queue buffers at probe (and never dealloc) or
-(2) alloc new buffer at operation start, swap in, then dealloc?
+Here it is listed as part of lemans:
+https://linux-msm.github.io/mainline-status/soc/lemans
 
-I had understood #1. I didn't see how that applied to this series (an
-MTU change) which of course must realloc. But now it seems it was #2 as
-you pointed to fbnic as reference and that's what fbnic_set_channels()
-does.
+Best regards,
+Mecid Urganci
 
->> Just checking if I got the idea before submitting another approach.
->> Something like:
->
-> Hm, not really. Take a look at fbnic_set_ringparam()
-> You need some struct that's config + pointers to all the resources.
-> And make all allocation helpers operate on that without touching the HW.
-> Then you can just allocate a new struct, give it whatever config you
-> need, call all the alloc helpers with it. Now you have a fully
-> populated struct and haven't touched the HW yet at all. Stop HW,=20
-> swap the resources, start HW.
->
-> I did something similar for the nfp driver but that code has been
-> slightly adulterated since I left Netronome so fbnic is clearer :)
-
-Do you feel we should (1) clone the full `struct macb` as done by fbnic
-or, (2) just partially, with the few interesting fields. Something like
-`struct stmmac_dma_conf`.
-
-stmmac is not the greatest example. They have this struct that carries
-their buffers but they still "close -> update -> open" on operations
-versus the optimal "alloc -> reconfigure_hw -> free".
-
-With #2 we could use an unnamed structure field.
-https://gcc.gnu.org/onlinedocs/gcc/Unnamed-Fields.html
-See commit c4781dc3d1cf ("Kbuild: enable -fms-extensions").
-
-struct macb_buffers {
-	struct macb_queue queues[N];
-	...
-};
-
-struct macb {
-	struct macb_buffers;
-	...
-};
-
-Goal is to keep `bp->queues` & co as before, to minimise the diff.
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+> 
+>> +
+>>        - items:
+>>            - enum:
+>>                - qcom,lemans-evk
+> 
+> 
+> Best regards,
+> Krzysztof
 
