@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-269020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269018-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SA2MIxOtumlVagIAu9opvQ
-	(envelope-from <netdev+bounces-269020-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:48:03 +0100
+	id cMWfNBmsumn9aQIAu9opvQ
+	(envelope-from <netdev+bounces-269018-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:43:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 321632BC4D4
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:48:03 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D85172BC415
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 14:43:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94D4731A39D0
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:43:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 59D80301DA57
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 192C43D9057;
-	Wed, 18 Mar 2026 13:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A4F3D891C;
+	Wed, 18 Mar 2026 13:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="ZR3hDlBt"
+	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="bgePMAuZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [67.231.149.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41EC3D8917;
-	Wed, 18 Mar 2026 13:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997AD3D88FD;
+	Wed, 18 Mar 2026 13:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.149.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773841409; cv=none; b=moG2kQn5dRb2B44ZNKnMWZKUFchSOrGN26JUwZsIDqsPQLyEJUCg6I8h9VZk3z3/A2lqG9DAxuK9w/oY8Qy3R8g73Ab5ANojy070Swpa/7pJzhzZEfH06Yh2QWh3SzvzI0UPGgOt2zAyxKPPEfF/k6MvRYKV01CpzyTZf33Saj8=
+	t=1773841407; cv=none; b=b44W5Oh50yhFt4PaC2P/QYrNGGvIEiuHRhFj0b09OU/G6AHm46UFazssySySKcG2f66KG66A2h7LA7g3D9k+1UhYmYEZtwxkrLYRVQ4OGrD/mq/xNNwgEuIWqbUki+WYEWMiHUfENsRc2alTaSX+3LzJUuzSR6KbxhbRj8vrJZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773841409; c=relaxed/simple;
-	bh=+2FhGu4bv5TPwZmq8KPd4Yzg432t12XwMMlgwv2ZJpA=;
+	s=arc-20240116; t=1773841407; c=relaxed/simple;
+	bh=cc5dRZBLNOCn4flOsbPH/dDSOeD/1qpchVpf+ldVrYA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SoWvUdhXDvXuKGQIvq/qJfkHqqpUiGE1/F0JIaqYZw3LlkmTmwjGwqKXSIkMKjqgWLZu+4ovgf7Z84oomRV61iNGGXa+9W2rQ2+M+bEMtrH6AelLEEsQTvNVz7IPzsCy9R8fpbox57BCcL6/OYpjXch1nL7y5qROIgYS8/1R12Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=ZR3hDlBt; arc=none smtp.client-ip=67.231.149.131
+	 MIME-Version; b=Zu/L37VQxRG8x1RiOdIDYAd9zqK82Fo1Q3af94u3tcSxaaLS7Olnu09i2KCU+Oacj5JTpJnCOFahNBZ893PdhSzh+zy2t2f1y3JULA6OJ2Jahp4r4V8NUSW6N+nHt74gKfnuSVsbrD2wPFrtATBGq7mbdHY0G+wnb6xo69fkH1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=bgePMAuZ; arc=none smtp.client-ip=67.231.149.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
 Received: from pps.filterd (m0122332.ppops.net [127.0.0.1])
-	by mx0a-00190b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62IADinF957995;
-	Wed, 18 Mar 2026 13:42:53 GMT
+	by mx0a-00190b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62IACatS954673;
+	Wed, 18 Mar 2026 13:42:55 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=jan2016.eng; bh=ce3qw5wRH
-	2Snv48qPdphagY8RIiQ3mMLnOEfc+YtVdg=; b=ZR3hDlBtTAF0cItKGZYielcmm
-	NCIlpHFj8RVar6RUU3jRyC1miDY/GmMcX6cd0MACD+ck3PaQcI3B42JXe45Zg97z
-	vkndo+LAbblKnUGsPTTyM3SIdj8s77ReKNKiYmXeqHElR2GWUIMQTj6CbR7N4LyF
-	Q+ex0YwfZBQK+SV6ocAtaTLg7YVy9cFjeF5sw7WnSCypG/tlFLrJOOw4m2EghwMe
-	26kNQlW63cWRInQ+S9Rq16V/VhrbL5wUUqtRUypN38U86uinD5upvGBQhvfV+XLM
-	CjYPA2/w/MCCPAml+ial1uIcNZjSpDk+pej3cxlWEZR7C5GgfV17OvQRkHv+g==
-Received: from prod-mail-ppoint5 (prod-mail-ppoint5.akamai.com [184.51.33.60])
-	by mx0a-00190b01.pphosted.com (PPS) with ESMTPS id 4cw0kmrkbm-1
+	:mime-version:references:subject:to; s=jan2016.eng; bh=kg+tpQfpe
+	X+OyN2mJ/ZUcelyan+6nyXJDc/79vn9Y7Y=; b=bgePMAuZ3kD/m16lppb9ojxRp
+	jy8OiMzjxukcAhtiV5KcOBW9HpUv03R6Et7XTS8dZjOn+Bf+OnM9ukTuDwIJPepV
+	a4rofFX7o2sZH5+rD7pdI2nQFCIOjFqUqElbtW/NZDLhgFOLXxyJQ73l+xNadSvt
+	KMsHhxcw5DdGN2bfveGxrV3PVVP9niAWSaBvH1UkDZ0h8v/hno3/YRVFxdAbisNa
+	QW1hfPP0itq1ldPdU5rxRynCBh7H2oi+VYaWd4ll6WwcHk7efXTolwsAXiSp+gEg
+	ZxLW+SsgPZ3X6cZRsYvLc6zM+laXNVMX/MqH/c7n//0NeeCBCa2+tA0/hGnyQ==
+Received: from prod-mail-ppoint2 (prod-mail-ppoint2.akamai.com [184.51.33.19])
+	by mx0a-00190b01.pphosted.com (PPS) with ESMTPS id 4cw0kmrkbw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Mar 2026 13:42:52 +0000 (GMT)
-Received: from pps.filterd (prod-mail-ppoint5.akamai.com [127.0.0.1])
-	by prod-mail-ppoint5.akamai.com (8.18.1.7/8.18.1.7) with ESMTP id 62IDZ06g006365;
-	Wed, 18 Mar 2026 06:42:51 -0700
+	Wed, 18 Mar 2026 13:42:54 +0000 (GMT)
+Received: from pps.filterd (prod-mail-ppoint2.akamai.com [127.0.0.1])
+	by prod-mail-ppoint2.akamai.com (8.18.1.7/8.18.1.7) with ESMTP id 62IDYWxR011768;
+	Wed, 18 Mar 2026 09:42:53 -0400
 Received: from prod-mail-relay02.akamai.com ([172.27.118.35])
-	by prod-mail-ppoint5.akamai.com (PPS) with ESMTP id 4cw5n9fs2s-1;
-	Wed, 18 Mar 2026 06:42:51 -0700 (PDT)
+	by prod-mail-ppoint2.akamai.com (PPS) with ESMTP id 4cw30x86ey-1;
+	Wed, 18 Mar 2026 09:42:53 -0400 (EDT)
 Received: from muc-lhvdhd.munich.corp.akamai.com (muc-lhvdhd.munich.corp.akamai.com [172.29.0.147])
-	by prod-mail-relay02.akamai.com (Postfix) with ESMTP id 062F79A;
-	Wed, 18 Mar 2026 13:42:49 +0000 (UTC)
+	by prod-mail-relay02.akamai.com (Postfix) with ESMTP id 03E6B99;
+	Wed, 18 Mar 2026 13:42:51 +0000 (UTC)
 From: Nick Hudson <nhudson@akamai.com>
 To: bpf@vger.kernel.org, netdev@vger.kernel.org
 Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
@@ -71,9 +71,9 @@ Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/5] bpf: allow new DECAP flags and add guard rails
-Date: Wed, 18 Mar 2026 13:42:41 +0000
-Message-Id: <20260318134242.2725749-5-nhudson@akamai.com>
+Subject: [PATCH v2 5/5] bpf: clear decap tunnel GSO state in skb_adjust_room
+Date: Wed, 18 Mar 2026 13:42:42 +0000
+Message-Id: <20260318134242.2725749-6-nhudson@akamai.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260318134242.2725749-1-nhudson@akamai.com>
 References: <20260318134242.2725749-1-nhudson@akamai.com>
@@ -87,25 +87,24 @@ Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-03-18_01,2026-03-17_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- lowpriorityscore=0 spamscore=0 mlxscore=0 adultscore=0 phishscore=0
- suspectscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0 classifier=spam
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2603050001
- definitions=main-2603180115
-X-Proofpoint-GUID: A5toxlEtRJ0dK0Pct_l6c06thpxZpyHo
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE4MDExNiBTYWx0ZWRfX00bnBkFPMqSA
- buwAU3or0FN5PHhHoOaDPweMH9P8PxxmSIbqFnebywoz5dZCLovkRxLTJXyonmQJEa9RIBKYatV
- 82XH8k5KYj5Old4sIdEhb/Qtm3yrcysaVIB/EeALI9U+eLkQc/ai3+suHa7r+Z+MuPLi4mCYepO
- Y+BkUliF5Sqimk7BKORj0pnseXn1PkOMmigXhYlGjeI7XseHk1Xhy5JQuRsnvn3TOga9hTVAJls
- ZUKUiflJPgAs50DLtEXgLLrwedEj92r2Gda48VdY7lXLueRjdizg8c5PKyJlEwkZwxEL7qSsZTf
- zqEtmK9GHukDblM7QiyAKAzqEWqrilyztfTihbjyIT9mwsja0LttCnR0358CxPwGOPKQWG081lk
- gnTTOKZTF7hhkTRqZ4/t4BDrkNwhlIxf06kdRSusKYiuBzm5CspDxge+UZeU7BskqtxpU8NFv9m
- f4HsdPWoCUEcLEWtvOg==
-X-Proofpoint-ORIG-GUID: A5toxlEtRJ0dK0Pct_l6c06thpxZpyHo
-X-Authority-Analysis: v=2.4 cv=ZMznX37b c=1 sm=1 tr=0 ts=69baabdd cx=c_pps
- a=NpDlK6FjLPvvy7XAFEyJFw==:117 a=NpDlK6FjLPvvy7XAFEyJFw==:17
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ phishscore=0 bulkscore=0 adultscore=0 mlxscore=0 suspectscore=0 spamscore=0
+ lowpriorityscore=0 mlxlogscore=989 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2603050001 definitions=main-2603180115
+X-Proofpoint-GUID: 1ivxs-3qdDFLrB1B9t2sw9szEELcSBWm
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE4MDExNiBTYWx0ZWRfX9fI/tp/7ieSa
+ 4ZcNsyXLM0sXCp1BXSdz12LoWoOu9Y8BhvRjNL4rYtu8ON9AblZq8qyT/j3cIvvmCq5uZhMTnGN
+ PmMh9/d6QWiOI0Qbwft77sHbAOAL92InWVCCzh1/BLfTRSuuzhBJ4cRF3ajgZqeAihc+o2hMWCJ
+ RB+ivu0Oq5LUoZw8KB4I6SwjMK2ZSyxevYgekUaZ3lgMUSB6ZmrCyKP3kcxO7eo0oxOBn43AK99
+ YsMWa6FX6u8vx2k4PkI2X1jcBkQzl93YYKKMZUp0nIZHIWWMHCtMRxko/LONWasj68hVr6pqJjR
+ gZaoOxEs8o5+pVVfY+FRSeJbEyY8lp/t6uNSz9tH+BXr7UXZBIkHsQKytqWH6d8uNKjtcWz794i
+ dJKM8L3j72JKjHllg7IH11DE3c4Q1JKLFud1o5aKJYIbeas8fTjwl8Ld0kN9ELqbIwj3fO4Er8+
+ APm7+xSItkSi/1/iTCg==
+X-Proofpoint-ORIG-GUID: 1ivxs-3qdDFLrB1B9t2sw9szEELcSBWm
+X-Authority-Analysis: v=2.4 cv=ZMznX37b c=1 sm=1 tr=0 ts=69baabdf cx=c_pps
+ a=BpD+HMUBsFIkYY1OQe22Yw==:117 a=BpD+HMUBsFIkYY1OQe22Yw==:17
  a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Ifg-1AOnLHOf1gn6spyb:22
- a=4OENtXgxWbduB0e82o7S:22 a=X7Ea-ya5AAAA:8 a=AKn1LIXN5h1LY4S_jUMA:9
+ a=4OENtXgxWbduB0e82o7S:22 a=X7Ea-ya5AAAA:8 a=adxPj1HbavDh4lNgp2AA:9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-03-18_01,2026-03-17_02,2025-10-01_01
@@ -120,7 +119,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[akamai.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[akamai.com:s=jan2016.eng];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -128,7 +127,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[gmail.com,akamai.com,linux.dev,iogearbox.net,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-269020-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269018-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -137,18 +136,25 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[nhudson@akamai.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[akamai.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[akamai.com:dkim,akamai.com:email,akamai.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[akamai.com:dkim,akamai.com:email,akamai.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 321632BC4D4
+X-Rspamd-Queue-Id: D85172BC415
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add checks to require shrink-only decap, reject conflicting decap flag
-combinations, and verify removed length is sufficient for claimed header
-decapsulation.
+On shrink in bpf_skb_adjust_room(), clear tunnel-specific GSO flags
+according to the decapsulation flags:
+
+- BPF_F_ADJ_ROOM_DECAP_L4_UDP clears SKB_GSO_UDP_TUNNEL{,_CSUM}
+- BPF_F_ADJ_ROOM_DECAP_L4_GRE clears SKB_GSO_GRE{,_CSUM}
+- BPF_F_ADJ_ROOM_DECAP_IPXIP4 clears SKB_GSO_IPXIP4
+- BPF_F_ADJ_ROOM_DECAP_IPXIP6 clears SKB_GSO_IPXIP6
+
+When all tunnel-related GSO bits are cleared, also clear
+skb->encapsulation.
 
 Co-developed-by: Max Tottenham <mtottenh@akamai.com>
 Signed-off-by: Max Tottenham <mtottenh@akamai.com>
@@ -156,86 +162,51 @@ Co-developed-by: Anna Glasgall <aglasgal@akamai.com>
 Signed-off-by: Anna Glasgall <aglasgal@akamai.com>
 Signed-off-by: Nick Hudson <nhudson@akamai.com>
 ---
- net/core/filter.c | 47 +++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 37 insertions(+), 10 deletions(-)
+ net/core/filter.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 diff --git a/net/core/filter.c b/net/core/filter.c
-index 7c2871b40fe4..47aec44a9cd3 100644
+index 47aec44a9cd3..35af1199ab97 100644
 --- a/net/core/filter.c
 +++ b/net/core/filter.c
-@@ -56,6 +56,7 @@
- #include <net/sock_reuseport.h>
- #include <net/busy_poll.h>
- #include <net/tcp.h>
-+#include <net/gre.h>
- #include <net/xfrm.h>
- #include <net/udp.h>
- #include <linux/bpf_trace.h>
-@@ -3496,7 +3497,9 @@ static u32 bpf_skb_net_base_len(const struct sk_buff *skb)
- 					 BPF_F_ADJ_ROOM_ENCAP_L2( \
- 					  BPF_ADJ_ROOM_ENCAP_L2_MASK))
+@@ -3665,6 +3665,37 @@ static int bpf_skb_net_shrink(struct sk_buff *skb, u32 off, u32 len_diff,
+ 		if (!(flags & BPF_F_ADJ_ROOM_FIXED_GSO))
+ 			skb_increase_gso_size(shinfo, len_diff);
  
--#define BPF_F_ADJ_ROOM_DECAP_MASK	(BPF_F_ADJ_ROOM_DECAP_L3_MASK)
-+#define BPF_F_ADJ_ROOM_DECAP_MASK	(BPF_F_ADJ_ROOM_DECAP_L3_MASK | \
-+					 BPF_F_ADJ_ROOM_DECAP_L4_MASK | \
-+					 BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK)
- 
- #define BPF_F_ADJ_ROOM_MASK		(BPF_F_ADJ_ROOM_FIXED_GSO | \
- 					 BPF_F_ADJ_ROOM_ENCAP_MASK | \
-@@ -3743,20 +3746,44 @@ BPF_CALL_4(bpf_skb_adjust_room, struct sk_buff *, skb, s32, len_diff,
- 		return -ENOTSUPP;
- 	}
- 
--	if (flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) {
-+	if (flags & BPF_F_ADJ_ROOM_DECAP_MASK) {
-+		u32 len_decap_min = 0;
++		/* Selective GSO flag clearing based on decap type.
++		 * Only clear the flags for the tunnel layer being removed.
++		 */
++		if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_UDP) &&
++		    (shinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
++					 SKB_GSO_UDP_TUNNEL_CSUM)))
++			shinfo->gso_type &= ~(SKB_GSO_UDP_TUNNEL |
++					      SKB_GSO_UDP_TUNNEL_CSUM);
++		if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_GRE) &&
++		    (shinfo->gso_type & (SKB_GSO_GRE | SKB_GSO_GRE_CSUM)))
++			shinfo->gso_type &= ~(SKB_GSO_GRE |
++					      SKB_GSO_GRE_CSUM);
++		if ((flags & BPF_F_ADJ_ROOM_DECAP_IPXIP4) &&
++		    (shinfo->gso_type & SKB_GSO_IPXIP4))
++			shinfo->gso_type &= ~SKB_GSO_IPXIP4;
++		if ((flags & BPF_F_ADJ_ROOM_DECAP_IPXIP6) &&
++		    (shinfo->gso_type & SKB_GSO_IPXIP6))
++			shinfo->gso_type &= ~SKB_GSO_IPXIP6;
 +
- 		if (!shrink)
- 			return -EINVAL;
- 
--		switch (flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) {
--		case BPF_F_ADJ_ROOM_DECAP_L3_IPV4:
-+		/* Reject mutually exclusive decap flag pairs. */
-+		if ((flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) ==
-+		    BPF_F_ADJ_ROOM_DECAP_L3_MASK)
-+			return -EINVAL;
++		/* Clear encapsulation flag only when no tunnel GSO flags remain */
++		if (flags & BPF_F_ADJ_ROOM_DECAP_MASK) {
++			if (!(shinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
++						  SKB_GSO_UDP_TUNNEL_CSUM |
++						  SKB_GSO_GRE |
++						  SKB_GSO_GRE_CSUM |
++						  SKB_GSO_IPXIP4 |
++						  SKB_GSO_IPXIP6)))
++				if (skb->encapsulation)
++					skb->encapsulation = 0;
++		}
 +
-+		if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_MASK) ==
-+		    BPF_F_ADJ_ROOM_DECAP_L4_MASK)
-+			return -EINVAL;
-+
-+		if ((flags & BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK) ==
-+		    BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK)
-+			return -EINVAL;
-+
-+		/* Reject mutually exclusive decap tunnel type flags. */
-+		if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_MASK) &&
-+		    (flags & BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK))
-+			return -EINVAL;
-+
-+		if (flags & BPF_F_ADJ_ROOM_DECAP_L4_UDP)
-+			len_decap_min += sizeof(struct udphdr);
-+
-+		if (flags & BPF_F_ADJ_ROOM_DECAP_L4_GRE)
-+			len_decap_min += sizeof(struct gre_base_hdr);
-+
-+		if (len_diff_abs < len_decap_min)
-+			return -EINVAL;
-+
-+		if (flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV4)
- 			len_min = sizeof(struct iphdr);
--			break;
--		case BPF_F_ADJ_ROOM_DECAP_L3_IPV6:
-+
-+		if (flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
- 			len_min = sizeof(struct ipv6hdr);
--			break;
--		default:
--			return -EINVAL;
--		}
- 	}
- 
- 	len_cur = skb->len - skb_network_offset(skb);
+ 		/* Header must be checked, and gso_segs recomputed. */
+ 		shinfo->gso_type |= SKB_GSO_DODGY;
+ 		shinfo->gso_segs = 0;
 -- 
 2.34.1
 
