@@ -1,174 +1,255 @@
-Return-Path: <netdev+bounces-268950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268951-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mE+BHml3ummTWwIAu9opvQ
-	(envelope-from <netdev+bounces-268950-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:59:05 +0100
+	id eILJBMR3ummTWwIAu9opvQ
+	(envelope-from <netdev+bounces-268951-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:00:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E4CA2B98E3
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 10:59:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAF2C2B9945
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 11:00:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 05855304D670
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:57:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6DB8F3012E91
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A693ACA7B;
-	Wed, 18 Mar 2026 09:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485C93B8BC5;
+	Wed, 18 Mar 2026 09:58:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mecomediagroup.de header.i=@mecomediagroup.de header.b="aHOo9jQh"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FlZGXL6I"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.162])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D293AE6F8;
-	Wed, 18 Mar 2026 09:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.162
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C468039524D
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 09:57:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773827821; cv=none; b=AvLMOf84r02k40dsYnwKib/aV1adwqD7V4Ah5M0iDdvKZb46J9TL4H/FVo6/01ocl0fzUWzSVjSNKhb7IjFqlSpyGv+pvoifdgSu8wiq828xF8WjAtkKnRMNsD0oMe5G4ubmiTSA1nEAwgYrdRknpOtIN500TNRD5Nz5LMhC+BM=
+	t=1773827884; cv=none; b=Kw+BipbPXG3s0uZcOQCyG4siHuz2Wrth/60jLdddjiVp34Gn/2a9rh6jt0a4jT5b/VsKvJmvIqsi7ZzaLKg1LccD7FQFb5wnG8QH+uO2GZohZ7CnX5bRUGkYwEm3sW78sTtW8WwnnrJ0sSkradA/QtRsRTGW1M6QcwifX5bbijE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773827821; c=relaxed/simple;
-	bh=g1x0s7T64Tdy8dyNmPlIkdrD35PpU5AfYBNjl1snPJI=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=lhnDBfr1FbSU0+WiG3XVWwdgy+3rpXLruc8zPdDzqCmF6brM4aPUIRk8rdfB4jhb1cpLWqltU5E9nWVCkMGptavY5xGqypOn8MTwmIVUXjJCzL1F9XgpGRpUOSWMe+bNuV4216tKJUKbQ2OkobFIKhPDzoaVjb8rvs7pOpJpz9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mecomediagroup.de; spf=pass smtp.mailfrom=mecomediagroup.de; dkim=pass (2048-bit key) header.d=mecomediagroup.de header.i=@mecomediagroup.de header.b=aHOo9jQh; arc=none smtp.client-ip=188.68.63.162
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mecomediagroup.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mecomediagroup.de
-Received: from mors-relay-8201.netcup.net (localhost [127.0.0.1])
-	by mors-relay-8201.netcup.net (Postfix) with ESMTPS id 4fbPNM48RXz3wgp;
-	Wed, 18 Mar 2026 10:56:03 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mecomediagroup.de;
-	s=key2; t=1773827763;
-	bh=g1x0s7T64Tdy8dyNmPlIkdrD35PpU5AfYBNjl1snPJI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aHOo9jQhWdiz8XybGRys15NSycB/XmheYFOk5zTJ+OLgAkpvLnw9tF34sRXooh/Uw
-	 cX2lS/WGlA8aIM7+fJ1dz7rppvosePzA8j0q9eZSe6tAbuvRU6l++uGok7Blxz5oVF
-	 zpj6llvKl69vVXF3cfkNGoy6guVyLmsTv32hFmutvDZWUp9FGlnhAj3M0TXhtoJYlE
-	 yb4MDQiurtK52Uf7hlYeytsDCgcHUu/Dqlnub7uR7QLqytZR9Vb1WkHDuj67S39KRV
-	 el3ux3PxbZxvjb3pZYlFSLPGytLDvuioS4y2wYeo1ZDJcbIPUGGT9MEBpzbMUqAMWs
-	 RVM0P6apoYg4A==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-8201.netcup.net (Postfix) with ESMTPS id 4fbPNM3Q3Bz3wdk;
-	Wed, 18 Mar 2026 10:56:03 +0100 (CET)
-Received: from mxe95c.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4fbPNL4MVRz8svH;
-	Wed, 18 Mar 2026 10:56:02 +0100 (CET)
-Received: from webmail01.netcup.net (unknown [46.38.249.153])
-	by mxe95c.netcup.net (Postfix) with ESMTPA id AA0A080CC2;
-	Wed, 18 Mar 2026 10:56:01 +0100 (CET)
-Authentication-Results: mxe95c;
-        spf=pass (sender IP is 46.38.249.153) smtp.mailfrom=mecid@mecomediagroup.de smtp.helo=webmail01.netcup.net
-Received-SPF: pass (mxe95c: connection is authenticated)
+	s=arc-20240116; t=1773827884; c=relaxed/simple;
+	bh=8f61Dvd547lBCEPkiyGx+VSTIYZEcR3CAi0vMU+SH2Q=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=fKi3GvM2+0/PgQ/SRziEKWVFkAqDOvAF3Oy0+oEbdPrp0vKg73l8D9mL1SZu4ZfwkBDKBSxPrcqghPMTf9pFg7g10ueMwcrVapf3H9i53rUpz/TuBxfLUtv4emd+vSJCf3bZNPBt/uYenEheWxW1Td8Ownn999GSNSKpKCFhENE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FlZGXL6I; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id EC25F4E426DA;
+	Wed, 18 Mar 2026 09:57:54 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id BCE6C6004F;
+	Wed, 18 Mar 2026 09:57:54 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7B82C10450764;
+	Wed, 18 Mar 2026 10:57:51 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773827873; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=hQlGO5381gcN8e1TNWADijNQqR2nZ9j4a7yL3qJ2fqk=;
+	b=FlZGXL6IksWn28P6inum4kpC7pX8J7G4WqWy2FFe3ybQqoAHnO1QbVr2DRzZo2idRbPIwo
+	6UIXQ8TVvGBrnYsKH+Q9QDn+WFqqNT6pIpsm7SdFOY6bEcnSjqa8WouhXKzEN7gZiXT+H7
+	3gh4gEIJ1A2FY7BMxktp8GKmdtztFSpo1SQ1vmisDKF6FIK5Y8xx3yWRFpfXwBOZ2tclBS
+	4nfzOCmv91WFhV1AjIaQKGiTzqZz3PV9KBW+59MVLN+GXJio8USpBZTVMx6GVBvTvhXCnO
+	E8zAothQCZQi11WXua/egPCYCi/IL448BY62XogA/F4XXuAO3Js0XH7MHrCH0w==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Date: Wed, 18 Mar 2026 10:55:57 +0100
-From: mecid@mecomediagroup.de
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, richardcochran@gmail.com,
- linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] dt-bindings: arm: qcom: Add qcs9075-radxa-airbox-q900
-In-Reply-To: <52854742-b458-42db-881f-bef8eac3dab5@kernel.org>
-References: <20260318083621.470826-1-mecid@mecomediagroup.de>
- <20260318083621.470826-2-mecid@mecomediagroup.de>
- <52854742-b458-42db-881f-bef8eac3dab5@kernel.org>
-User-Agent: Roundcube Webmail/1.4.15
-Message-ID: <50edee17750812609f7b8de795aaa221@mecomediagroup.de>
-X-Sender: mecid@mecomediagroup.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: <177382776201.1783819.6154477896774710283@mxe95c.netcup.net>
-X-NC-CID: r3DTgHUZom/cw4M5r+oxK7aUXy8FV6pZsomCBIHT3Y89aLyG8yH/
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 18 Mar 2026 10:57:51 +0100
+Message-Id: <DH5TI2EOIWTC.3TJ6GASDIV232@bootlin.com>
+Subject: Re: [PATCH net v2 2/2] net: macb: Protect access to
+ net_device::ip_ptr with RCU lock
+Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Vineeth Karumanchi" <vineeth.karumanchi@amd.com>, "Harini Katakam"
+ <harini.katakam@amd.com>, =?utf-8?q?Th=C3=A9o_Lebrun?=
+ <theo.lebrun@bootlin.com>, <stable@vger.kernel.org>
+To: "Kevin Hao" <haokexin@gmail.com>, <netdev@vger.kernel.org>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260318-macb-irq-v2-0-f1179768ab24@gmail.com>
+ <20260318-macb-irq-v2-2-f1179768ab24@gmail.com>
+In-Reply-To: <20260318-macb-irq-v2-2-f1179768ab24@gmail.com>
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mecomediagroup.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[mecomediagroup.de:s=key2];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[mecomediagroup.de:+];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268950-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-268951-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux-msm.github.io:url,mecomediagroup.de:dkim,mecomediagroup.de:email,mecomediagroup.de:mid];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mecid@mecomediagroup.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 3E4CA2B98E3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,bootlin.com:email,bootlin.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EAF2C2B9945
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-03-18 09:51, Krzysztof Kozlowski wrote:
-> On 18/03/2026 09:36, Mecid Urganci wrote:
->> Add device tree binding for the Radxa AirBox Q900 board based on
->> the Qualcomm QCS9075 SoC.
-> 
-> What is QCS9075? It's the first time this compatible appears and the
-> only other reference is socinfo commit which told nothing.
-> 
->> 
->> Signed-off-by: Mecid Urganci <mecid@mecomediagroup.de>
->> ---
->>  Documentation/devicetree/bindings/arm/qcom.yaml | 6 ++++++
->>  1 file changed, 6 insertions(+)
->> 
->> diff --git a/Documentation/devicetree/bindings/arm/qcom.yaml 
->> b/Documentation/devicetree/bindings/arm/qcom.yaml
->> index 8c3df8efaa4d..2c492f4d784a 100644
->> --- a/Documentation/devicetree/bindings/arm/qcom.yaml
->> +++ b/Documentation/devicetree/bindings/arm/qcom.yaml
->> @@ -909,6 +909,12 @@ properties:
->>                - qcom,sa8775p-ride-r3
->>            - const: qcom,sa8775p
->> 
->> +      - items:
->> +          - enum:
->> +              - radxa,airbox-q900
->> +          - const: qcom,qcs9075
->> +          - const: qcom,sa8775p
-> 
-> Why qcs9075 is compatible with sa8775p?
+Hello Kevin,
 
-Thank you for your feedback.
+On Wed Mar 18, 2026 at 7:36 AM CET, Kevin Hao wrote:
+> Access to net_device::ip_ptr and its associated members must be
+> protected by an RCU lock. Since we are modifying this piece of code,
+> let's also move it to execute only when WAKE_ARP is enabled.
+>
+> To minimize the duration of the RCU lock, a local variable is used to
+> temporarily store the IP address. This change resolves the following
+> RCU check warning:
+>   WARNING: suspicious RCU usage
+>   7.0.0-rc3-next-20260310-yocto-standard+ #122 Not tainted
+>   -----------------------------
+>   drivers/net/ethernet/cadence/macb_main.c:5944 suspicious rcu_dereferenc=
+e_check() usage!
+>
+>   other info that might help us debug this:
+>
+>   rcu_scheduler_active =3D 2, debug_locks =3D 1
+>   5 locks held by rtcwake/518:
+>    #0: ffff000803ab1408 (sb_writers#5){.+.+}-{0:0}, at: vfs_write+0xf8/0x=
+368
+>    #1: ffff0008090bf088 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_=
+iter+0xbc/0x1c8
+>    #2: ffff00080098d588 (kn->active#70){.+.+}-{0:0}, at: kernfs_fop_write=
+_iter+0xcc/0x1c8
+>    #3: ffff800081c84888 (system_transition_mutex){+.+.}-{4:4}, at: pm_sus=
+pend+0x1ec/0x290
+>    #4: ffff0008009ba0f8 (&dev->mutex){....}-{4:4}, at: device_suspend+0x1=
+18/0x4f0
+>
+>   stack backtrace:
+>   CPU: 3 UID: 0 PID: 518 Comm: rtcwake Not tainted 7.0.0-rc3-next-2026031=
+0-yocto-standard+ #122 PREEMPT
+>   Hardware name: ZynqMP ZCU102 Rev1.1 (DT)
+>   Call trace:
+>    show_stack+0x24/0x38 (C)
+>    __dump_stack+0x28/0x38
+>    dump_stack_lvl+0x64/0x88
+>    dump_stack+0x18/0x24
+>    lockdep_rcu_suspicious+0x134/0x1d8
+>    macb_suspend+0xd8/0x4c0
+>    device_suspend+0x218/0x4f0
+>    dpm_suspend+0x244/0x3a0
+>    dpm_suspend_start+0x50/0x78
+>    suspend_devices_and_enter+0xec/0x560
+>    pm_suspend+0x194/0x290
+>    state_store+0x110/0x158
+>    kobj_attr_store+0x1c/0x30
+>    sysfs_kf_write+0xa8/0xd0
+>    kernfs_fop_write_iter+0x11c/0x1c8
+>    vfs_write+0x248/0x368
+>    ksys_write+0x7c/0xf8
+>    __arm64_sys_write+0x28/0x40
+>    invoke_syscall+0x4c/0xe8
+>    el0_svc_common+0x98/0xf0
+>    do_el0_svc+0x28/0x40
+>    el0_svc+0x54/0x1e0
+>    el0t_64_sync_handler+0x84/0x130
+>    el0t_64_sync+0x198/0x1a0
+>
+> Fixes: 0cb8de39a776 ("net: macb: Add ARP support to WOL")
+> Signed-off-by: Kevin Hao <haokexin@gmail.com>
+> Cc: stable@vger.kernel.org
+> ---
+>  drivers/net/ethernet/cadence/macb_main.c | 25 ++++++++++++++++---------
+>  1 file changed, 16 insertions(+), 9 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ether=
+net/cadence/macb_main.c
+> index 2d4304331e297accd91ab48813a9bd4722ce72dc..9856764402b17397928d0a61d=
+a61865a3b10484f 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -5909,9 +5909,9 @@ static int __maybe_unused macb_suspend(struct devic=
+e *dev)
+>  	struct macb_queue *queue;
+>  	struct in_device *idev;
+>  	unsigned long flags;
+> +	u32 tmp, ifa_local;
+>  	unsigned int q;
+>  	int err;
+> -	u32 tmp;
+> =20
+>  	if (!device_may_wakeup(&bp->dev->dev))
+>  		phy_exit(bp->phy);
+> @@ -5920,14 +5920,21 @@ static int __maybe_unused macb_suspend(struct dev=
+ice *dev)
+>  		return 0;
+> =20
+>  	if (bp->wol & MACB_WOL_ENABLED) {
+> -		/* Check for IP address in WOL ARP mode */
+> -		idev =3D __in_dev_get_rcu(bp->dev);
+> -		if (idev)
+> -			ifa =3D rcu_dereference(idev->ifa_list);
+> -		if ((bp->wolopts & WAKE_ARP) && !ifa) {
+> -			netdev_err(netdev, "IP address not assigned as required by WoL walk A=
+RP\n");
+> -			return -EOPNOTSUPP;
+> +		if (bp->wolopts & WAKE_ARP) {
+> +			/* Check for IP address in WOL ARP mode */
+> +			rcu_read_lock();
+> +			idev =3D __in_dev_get_rcu(bp->dev);
+> +			if (idev)
+> +				ifa =3D rcu_dereference(idev->ifa_list);
+> +			if (!ifa) {
+> +				rcu_read_unlock();
+> +				netdev_err(netdev, "IP address not assigned as required by WoL walk =
+ARP\n");
+> +				return -EOPNOTSUPP;
+> +			}
+> +			ifa_local =3D be32_to_cpu(ifa->ifa_local);
+> +			rcu_read_unlock();
+>  		}
+> +
+>  		spin_lock_irqsave(&bp->lock, flags);
+> =20
+>  		/* Disable Tx and Rx engines before  disabling the queues,
+> @@ -5966,7 +5973,7 @@ static int __maybe_unused macb_suspend(struct devic=
+e *dev)
+>  		if (bp->wolopts & WAKE_ARP) {
+>  			tmp |=3D MACB_BIT(ARP);
+>  			/* write IP address into register */
+> -			tmp |=3D MACB_BFEXT(IP, be32_to_cpu(ifa->ifa_local));
+> +			tmp |=3D MACB_BFEXT(IP, ifa_local);
+>  		}
+>  		spin_unlock_irqrestore(&bp->lock, flags);
+> =20
 
-Yes from public information it is the same SoC without the automotive 
-security features. Should I remove the qcs9075 reference and only keep 
-qcom,sa8775p?
+Even better to guard the RCU critical section inside a
+`if (bp->wolopts & WAKE_ARP)` block.
 
-Here it is listed as part of lemans:
-https://linux-msm.github.io/mainline-status/soc/lemans
+Reviewed-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
 
-Best regards,
-Mecid Urganci
+Thanks,
 
-> 
->> +
->>        - items:
->>            - enum:
->>                - qcom,lemans-evk
-> 
-> 
-> Best regards,
-> Krzysztof
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
