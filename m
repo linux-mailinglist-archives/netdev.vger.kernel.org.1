@@ -1,403 +1,160 @@
-Return-Path: <netdev+bounces-269002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269003-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8CHqEo2aumnaZQIAu9opvQ
-	(envelope-from <netdev+bounces-269002-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:29:01 +0100
+	id 0e0oE4ubummHZgIAu9opvQ
+	(envelope-from <netdev+bounces-269003-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:33:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BF4D2BB799
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:29:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C03DD2BB874
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 13:33:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 58090303631E
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 12:27:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5EE3B31B270E
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 12:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C10F3D6686;
-	Wed, 18 Mar 2026 12:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361823D5238;
+	Wed, 18 Mar 2026 12:27:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ub5/4M1E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VLgsf9gT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4C93B5304;
-	Wed, 18 Mar 2026 12:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773836792; cv=none; b=KNrm9EkgpenXWrEg0SBNJno0BNymiaekAD3UHWD3126j6EkNhj4ZzAm5h4VujTqwzA2UxiBw58P1w06h0T/P7OhcGUfQQusWvDdThh+y/xHr0i14EFFx4H1+U6Qw9/P9cs6yKy1I+ABIqNJ80VwQDlHHvUFTPrARKvKDTvPyVfg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773836792; c=relaxed/simple;
-	bh=n31d8NYjTDg4u78LNNFct5Yi6pJSfLNaOmI/4D6Nfd8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VjG+Osh1en//Q72XC4IF0GzKiRdTaFdSWLwhpPwIP8b3GjwyRRgyihl1Do719s72cQtLStw41k88lR4JcUqXm+/PxtF7kMzSyEGLOINqTTTdnB+hRXPt3NrBTy57rmzJlXX+x/2IRgcMKYVxTUH/bzTtHjQ3JETCu6t93gA8u2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ub5/4M1E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BE1BC19424;
-	Wed, 18 Mar 2026 12:26:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773836791;
-	bh=n31d8NYjTDg4u78LNNFct5Yi6pJSfLNaOmI/4D6Nfd8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ub5/4M1Ey+kvsbJSYdzQS9wC6jUY79/M91IARgDNiSlppQl8zZEwvPPV7ilv/JebF
-	 x8Mz2SDv6Kh3TbKB+EzAo4qGHak/bNH/VGczjjXJdpe2O3IwNMlUBxuufpae9mMdCB
-	 MaU3p+sxyI6g2c5fuCgoVod4SULwxrvVzBPfr+aD/KVX+0Cm1wvtIUo4jMfL8AAZQP
-	 DGC49R3SpY29j/pdeAmlb0FPyj6n9WfLIuzJRQiFZzDGCmzAvjtCtW5y7Z4SLH8Q2z
-	 Bu315PKEIog/0Un+KCIECkgwgTJfompPU/38sKiy1HJ9KKJiwup2ocj4/sIsbFpxo9
-	 l7NQhdRcL64Hw==
-From: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Willem de Bruijn <willemb@google.com>,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v6 4/4] selftests: rss_drv: Add RSS indirection table resize tests
-Date: Wed, 18 Mar 2026 13:26:01 +0100
-Message-ID: <20260318122603.264550-5-bjorn@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260318122603.264550-1-bjorn@kernel.org>
-References: <20260318122603.264550-1-bjorn@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02533AE707
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 12:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773836855; cv=pass; b=fph9ucDLk80LOUe1OQI4ASLOlzOg++nAlUG+ccGkpMjWHr7fYMW0pPBMwPLmn1xiABWI7iQ0+RTHPNuMSO+xOZXu8nm2yelC5oRCXZFIHzPKf3D8LlRQZz6XhWFMyHh90kI/LmwM3Dd8/Sp//oCIwhyodnlR2GzDGIB7dPLqXGw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773836855; c=relaxed/simple;
+	bh=57DBatuAN96wEw1hs2NPGmR/MF6/IhbrTXX5NsTXVwQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kAGSfrqqrp3y21TNhx7zXysFunygfVTwj+ilQW0RfftjFzOSjwry8aoJzOejNAI3TbCME75Oqt2on3KmyR/5PmnofirycKvrIfV4KKpiBUaS0lpE0PVkMhG8oqJl6QnoxIQMvOCLFavwNFHHhp68bWN5PKggjxxM06YX00bQNP0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VLgsf9gT; arc=pass smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7d7b685faeeso1443486a34.3
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 05:27:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773836853; cv=none;
+        d=google.com; s=arc-20240605;
+        b=HQHb2Lhxv0DDZbnPz8RUhfwjLBN99uNSbUiAH5Vo0wcGdgzQc2I9Gf/t8AnnA6XInL
+         eVf/DeYKMjlKwkbM2lTNfk5sB5MifUA8y4zcMryXG/DiimO25dJBlgDu3AgAun+Gv9R0
+         kMTYzB5I9XxpVA243Njf7RXOdqDUIjFM4mZAi/0WqqCdGbq6R3NuifG8/LpJ8GAbf3jv
+         nJlnwxZcgska4VBg+Fm03956DvNu61KZ43Bf6oKnnWOnfBZPk2Ae+ONviPBTjxkx/7Sq
+         OUwsbVL22IrHzN/TD0126tWEGaIHEnea0lskMUIqh05CTRN1F+veXZuEK+X9mWnC0Xq0
+         9Z+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=57DBatuAN96wEw1hs2NPGmR/MF6/IhbrTXX5NsTXVwQ=;
+        fh=tkM+0yxzm86pmC11XRpvWe7zG6CO38CKIGyRTRjv65Y=;
+        b=IEh9M6ShZ/ABAqzkpsDwXPTrSVDNCKp8wuM0dWKfRIo/VHmt54r1xeuBNAm8ohDxWv
+         HpUD+DuBRGOGekCPQAVhtHwq5ajJ6DHOuwbiAc0VEwsW4iXm40uBp5z1eSQNSHb2m9/s
+         yyUPsbyJLrsZiKJNh1z1ao5q3ceNtEeOoUUdknWyCRuKR3pVC3+8Dzq8A7kxhiiorkDR
+         ZE+5P+YBQFPn9XzUbQx4OogAkuXA8YILzZggDWUmTFXqhrgmbYiLn1xjpBi15U3kNT9e
+         wL0d0CmdqNkOGs2dZwSNSe3tk7QRm6SU2AxFRwNarD1onbtZ/LqYzKojY1teM0JEpB68
+         RujQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773836853; x=1774441653; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=57DBatuAN96wEw1hs2NPGmR/MF6/IhbrTXX5NsTXVwQ=;
+        b=VLgsf9gTPIazixgSHn+tH1bt/smKQvDbvn2KQGuMClCCX8bP5rht0pcPmqkZm/UoBz
+         uA/nyqu0G23bFF8foVCTA8puYumRZvIZVViWTLv9ClyG0VE/SF81rxMX4nTn5HWCWjVM
+         rYShf3VYLQKjRxK27WnTRtgNRlf17H54elG24LyA4r9PhL3WVtEb3Tw50FLsOy5buOFA
+         zWfYZ/QGG6Lwya7oD/ycxv9zW1X6Ar5h0eEuqv9cBTIG/bnIByHMpt7uMG7zDE57Wnqp
+         safG8c31RrM82MJFMIqM454aEHe9qdYZUAF8IGHfMuJQbiPYuCYPPNm6pg67sOcTxPrd
+         1qyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773836853; x=1774441653;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=57DBatuAN96wEw1hs2NPGmR/MF6/IhbrTXX5NsTXVwQ=;
+        b=bDKYqcgVdG07jLIfRLBkq3lHqMFDZY198jfk/5xd1kZeSuoG54TzIw+sBGq3ua/baw
+         dAinw4/U6NWlHIG7woUsimXdOKaAcCSgKgCECaSb2LaYzemRKqtpWEGty/9h+H5DB4sn
+         IYsulaTJqg9iE6loZdgxYV59eq/k52eJLK7yOW843pGDy7mranzmhUH91oEJ+pLvAfW5
+         PlM1np86yZUmPIG8+coRnVJSn1wxEeGtIAhTzth4dea4dJUlg/pmaXEnzX4/5oKzeE9z
+         aKsj8tdTdjPpG3zoqlnTwExQzHiy7O267B/npARGeSqDGNtAdxZIEgn2DqHBLunx/4l8
+         13HA==
+X-Forwarded-Encrypted: i=1; AJvYcCWXhz4ujMHZI+dwtdR/S8dRFoHc+33UKjXMPIBI5dRb8sWTQ9DjhqOrxYSiGt6pgn8htjY0oU4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi3xXCPyeETEXcbyfPO77ohkvEV3EhCwNWMGmVaPxuFJVZBHV2
+	8v+sSaqO8u2p3ZbP5ZHTA2rI4SrUu0VcqkMhkQ8/6wSq8DejQt8ukjjP3RaeK5xMDyxJl0HiGHb
+	WBM4rLkeB27R9bCa62D4PRlOny3Oc/m8=
+X-Gm-Gg: ATEYQzwJBk/tv9wWR4qSTl8/TxwBuE7tqJn8wxOnjvO3+BwJ0zxwBaDYE1p1RagOQEx
+	ejGjXZfjWGFHO01yq+xEFgzcuJedTO7qS3hKsoSoigO2oDvksU4BVaZa1K91F5l8fFS3tVmMwwU
+	mhdpskVdVK/Pma2XKWkq/jEAkI/c02mBMVah9exTNj5NQqIz31Fw9NW82Kc79Jj8UBP2zotZK6s
+	3FR+Wsr0V1HtyC6xzH4Jfupywb+gGiK3GgwjUcYzn4/esbPfHETc8mna1eLoUhuRvQAMRiD1AC4
+	TnE2KA==
+X-Received: by 2002:a05:6830:380d:b0:7d7:d4ee:c02d with SMTP id
+ 46e09a7af769-7d7d4eedb6emr394812a34.21.1773836852833; Wed, 18 Mar 2026
+ 05:27:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.93 / 15.00];
+References: <20260313232047.2068518-1-kuba@kernel.org> <20260317160948.5a358df0@kernel.org>
+In-Reply-To: <20260317160948.5a358df0@kernel.org>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Wed, 18 Mar 2026 12:27:21 +0000
+X-Gm-Features: AaiRm50bKgI6qFOFT8WN3AQLtiSOOJ_pGC3hgT5P-Ky2jxuc2s378FO250cJxrs
+Message-ID: <CAD4GDZw2GXOEGy=wbwDMbncwUr5o7T9W2cxRBO8SGsLsVGhnDQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] tools: ynl: rework policy access to support recursion
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org, 
+	sdf@fomichev.me, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.59)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269002-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-269003-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[donaldhunter@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rss_drv.py:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lib.py:url]
-X-Rspamd-Queue-Id: 4BF4D2BB799
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: C03DD2BB874
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add resize tests to rss_drv.py. Devices without dynamic table sizing
-are skipped via _require_dynamic_indir_size().
+On Tue, 17 Mar 2026 at 23:09, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Fri, 13 Mar 2026 16:20:47 -0700 Jakub Kicinski wrote:
+> > Donald points out that the current naive implementation using dicts
+> > breaks if policy is recursive (child nest uses policy idx already
+> > used by its parent).
+> >
+> > Lean more into the NlPolicy class. This lets us "render" the policy
+> > on demand, when user accesses it. If someone wants to do an infinite
+> > walk that's on them :) Show policy info as attributes of the class
+> > and use dict format to descend into sub-policies for extra neatness.
+>
+> Hi Donald, you promised to take a look when officially posted?
 
-resize_periodic: set a periodic 4-entry table, shrink channels to
-fold, grow back to unfold. Check the exact pattern is preserved. Has
-main and non-default context variants.
-
-resize_below_user_size_reject: send a periodic table with user_size
-between the big and small device table sizes. Verify that shrinking
-below user_size is rejected even though the table is periodic. Has
-main and non-default context variants.
-
-resize_nonperiodic_reject: set a non-periodic table (equal N), verify
-that channel reduction is rejected.
-
-resize_nonperiodic_no_corruption: verify a failed resize leaves both
-the indirection table contents and the channel count unchanged.
-
-Signed-off-by: Björn Töpel <bjorn@kernel.org>
----
- .../selftests/drivers/net/hw/rss_drv.py       | 233 +++++++++++++++++-
- 1 file changed, 229 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_drv.py b/tools/testing/selftests/drivers/net/hw/rss_drv.py
-index 2d1a33189076..bd59dace6e15 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_drv.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_drv.py
-@@ -5,9 +5,9 @@
- Driver-related behavior tests for RSS.
- """
- 
--from lib.py import ksft_run, ksft_exit, ksft_ge
--from lib.py import ksft_variants, KsftNamedVariant, KsftSkipEx
--from lib.py import defer, ethtool
-+from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ge
-+from lib.py import ksft_variants, KsftNamedVariant, KsftSkipEx, ksft_raises
-+from lib.py import defer, ethtool, CmdExitFailure
- from lib.py import EthtoolFamily, NlError
- from lib.py import NetDrvEnv
- 
-@@ -45,6 +45,18 @@ def _maybe_create_context(cfg, create_context):
-     return ctx_id
- 
- 
-+def _require_dynamic_indir_size(cfg, ch_max):
-+    """Skip if the device does not dynamically size its indirection table."""
-+    ethtool(f"-X {cfg.ifname} default")
-+    ethtool(f"-L {cfg.ifname} combined 2")
-+    small = len(_get_rss(cfg)['rss-indirection-table'])
-+    ethtool(f"-L {cfg.ifname} combined {ch_max}")
-+    large = len(_get_rss(cfg)['rss-indirection-table'])
-+
-+    if small == large:
-+        raise KsftSkipEx("Device does not dynamically size indirection table")
-+
-+
- @ksft_variants([
-     KsftNamedVariant("main", False),
-     KsftNamedVariant("ctx", True),
-@@ -76,11 +88,224 @@ def indir_size_4x(cfg, create_context):
-         _test_rss_indir_size(cfg, test_max, context=ctx_id)
- 
- 
-+@ksft_variants([
-+    KsftNamedVariant("main", False),
-+    KsftNamedVariant("ctx", True),
-+])
-+def resize_periodic(cfg, create_context):
-+    """Test that a periodic indirection table survives channel changes.
-+
-+    Set a non-default periodic table ([3, 2, 1, 0] x N) via netlink,
-+    reduce channels to trigger a fold, then increase to trigger an
-+    unfold. Using a reversed pattern (instead of [0, 1, 2, 3]) ensures
-+    the test can distinguish a correct fold from a driver that silently
-+    resets the table to defaults. Verify the exact pattern is preserved
-+    and the size tracks the channel count.
-+    """
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < 4:
-+        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+
-+    _require_dynamic_indir_size(cfg, ch_max)
-+
-+    ctx_id = _maybe_create_context(cfg, create_context)
-+
-+    # Set a non-default periodic pattern via netlink.
-+    # Send only 4 entries (user_size=4) so the kernel replicates it
-+    # to fill the device table. This allows folding down to 4 entries.
-+    rss = _get_rss(cfg, context=ctx_id)
-+    orig_size = len(rss['rss-indirection-table'])
-+    pattern = [3, 2, 1, 0]
-+    req = {'header': {'dev-index': cfg.ifindex}, 'indir': pattern}
-+    if ctx_id:
-+        req['context'] = ctx_id
-+    else:
-+        defer(ethtool, f"-X {cfg.ifname} default")
-+    cfg.ethnl.rss_set(req)
-+
-+    # Shrink — should fold
-+    ethtool(f"-L {cfg.ifname} combined 4")
-+    rss = _get_rss(cfg, context=ctx_id)
-+    indir = rss['rss-indirection-table']
-+
-+    ksft_ge(orig_size, len(indir), "Table did not shrink")
-+    ksft_eq(indir, [3, 2, 1, 0] * (len(indir) // 4),
-+            "Folded table has wrong pattern")
-+
-+    # Grow back — should unfold
-+    ethtool(f"-L {cfg.ifname} combined {ch_max}")
-+    rss = _get_rss(cfg, context=ctx_id)
-+    indir = rss['rss-indirection-table']
-+
-+    ksft_eq(len(indir), orig_size, "Table size not restored")
-+    ksft_eq(indir, [3, 2, 1, 0] * (len(indir) // 4),
-+            "Unfolded table has wrong pattern")
-+
-+
-+@ksft_variants([
-+    KsftNamedVariant("main", False),
-+    KsftNamedVariant("ctx", True),
-+])
-+def resize_below_user_size_reject(cfg, create_context):
-+    """Test that shrinking below user_size is rejected.
-+
-+    Send a table via netlink whose size (user_size) sits between
-+    the small and large device table sizes. The table is periodic,
-+    so folding would normally succeed, but the user_size floor must
-+    prevent it.
-+    """
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < 4:
-+        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+
-+    _require_dynamic_indir_size(cfg, ch_max)
-+
-+    ctx_id = _maybe_create_context(cfg, create_context)
-+
-+    # Measure the table size at max channels
-+    rss = _get_rss(cfg, context=ctx_id)
-+    big_size = len(rss['rss-indirection-table'])
-+
-+    # Measure the table size at reduced channels
-+    ethtool(f"-L {cfg.ifname} combined 4")
-+    rss = _get_rss(cfg, context=ctx_id)
-+    small_size = len(rss['rss-indirection-table'])
-+    ethtool(f"-L {cfg.ifname} combined {ch_max}")
-+
-+    if small_size >= big_size:
-+        raise KsftSkipEx("Table did not shrink at reduced channels")
-+
-+    # Find a user_size
-+    user_size = None
-+    for div in [2, 4]:
-+        candidate = big_size // div
-+        if candidate > small_size and big_size % candidate == 0:
-+            user_size = candidate
-+            break
-+    if user_size is None:
-+        raise KsftSkipEx("No suitable user_size between small and big table")
-+
-+    # Send a periodic sub-table of exactly user_size entries.
-+    # Pattern safe for 4 channels.
-+    pattern = [0, 1, 2, 3] * (user_size // 4)
-+    if len(pattern) != user_size:
-+        raise KsftSkipEx(f"user_size ({user_size}) not divisible by 4")
-+    req = {'header': {'dev-index': cfg.ifindex}, 'indir': pattern}
-+    if ctx_id:
-+        req['context'] = ctx_id
-+    else:
-+        defer(ethtool, f"-X {cfg.ifname} default")
-+    cfg.ethnl.rss_set(req)
-+
-+    # Shrink channels — table would go to small_size < user_size.
-+    # The table is periodic so folding would work, but user_size
-+    # floor must reject it.
-+    with ksft_raises(CmdExitFailure):
-+        ethtool(f"-L {cfg.ifname} combined 4")
-+
-+
-+@ksft_variants([
-+    KsftNamedVariant("main", False),
-+    KsftNamedVariant("ctx", True),
-+])
-+def resize_nonperiodic_reject(cfg, create_context):
-+    """Test that a non-periodic table blocks channel reduction.
-+
-+    Set equal weight across all queues so the table is not periodic
-+    at any smaller size, then verify channel reduction is rejected.
-+    An additional context with a periodic table is created to verify
-+    that validation catches the non-periodic one even when others
-+    are fine.
-+    """
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < 4:
-+        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+
-+    _require_dynamic_indir_size(cfg, ch_max)
-+
-+    ctx_id = _maybe_create_context(cfg, create_context)
-+    ctx_ref = f"context {ctx_id}" if ctx_id else ""
-+
-+    # Create an extra context with a periodic (foldable) table so that
-+    # the validation must iterate all contexts to find the bad one.
-+    extra_ctx = _maybe_create_context(cfg, True)
-+    ethtool(f"-X {cfg.ifname} context {extra_ctx} equal 2")
-+
-+    ethtool(f"-X {cfg.ifname} {ctx_ref} equal {ch_max}")
-+    if not create_context:
-+        defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    with ksft_raises(CmdExitFailure):
-+        ethtool(f"-L {cfg.ifname} combined 2")
-+
-+
-+@ksft_variants([
-+    KsftNamedVariant("main", False),
-+    KsftNamedVariant("ctx", True),
-+])
-+def resize_nonperiodic_no_corruption(cfg, create_context):
-+    """Test that a failed resize does not corrupt table or channel count.
-+
-+    Set a non-periodic table, attempt a channel reduction (which must
-+    fail), then verify both the indirection table contents and the
-+    channel count are unchanged.
-+    """
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < 4:
-+        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+
-+    _require_dynamic_indir_size(cfg, ch_max)
-+
-+    ctx_id = _maybe_create_context(cfg, create_context)
-+    ctx_ref = f"context {ctx_id}" if ctx_id else ""
-+
-+    ethtool(f"-X {cfg.ifname} {ctx_ref} equal {ch_max}")
-+    if not create_context:
-+        defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    rss_before = _get_rss(cfg, context=ctx_id)
-+
-+    with ksft_raises(CmdExitFailure):
-+        ethtool(f"-L {cfg.ifname} combined 2")
-+
-+    rss_after = _get_rss(cfg, context=ctx_id)
-+    ksft_eq(rss_after['rss-indirection-table'],
-+            rss_before['rss-indirection-table'],
-+            "Indirection table corrupted after failed resize")
-+
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ksft_eq(channels['combined-count'], ch_max,
-+            "Channel count changed after failed resize")
-+
-+
- def main() -> None:
-     """ Ksft boiler plate main """
-     with NetDrvEnv(__file__) as cfg:
-         cfg.ethnl = EthtoolFamily()
--        ksft_run([indir_size_4x], args=(cfg, ))
-+        ksft_run([indir_size_4x, resize_periodic,
-+                  resize_below_user_size_reject,
-+                  resize_nonperiodic_reject,
-+                  resize_nonperiodic_no_corruption], args=(cfg, ))
-     ksft_exit()
- 
- 
--- 
-2.53.0
-
+Apologies, my response was sat in drafts :-/
 
