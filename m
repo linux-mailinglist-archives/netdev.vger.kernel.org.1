@@ -1,223 +1,213 @@
-Return-Path: <netdev+bounces-269119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269120-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QAzaM6DWummfcAIAu9opvQ
-	(envelope-from <netdev+bounces-269119-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:45:20 +0100
+	id QAOlCKDkummdcwIAu9opvQ
+	(envelope-from <netdev+bounces-269120-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:45:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77AF12BF855
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:45:20 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E3B92C0850
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:45:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B0EA03015B69
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:45:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8E2043156700
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D30D33F0756;
-	Wed, 18 Mar 2026 16:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B893B47F4;
+	Wed, 18 Mar 2026 16:37:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AVxT9cy9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PcNp68uN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BD13EB815;
-	Wed, 18 Mar 2026 16:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4A73A874F;
+	Wed, 18 Mar 2026 16:37:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773851803; cv=none; b=nyx6BZi+YAs4Cn4W9eHX6UJ6v9gx65smDgIO169DZH+/zx6oB0Puc/77lmDS/o3UYCj+DbrOxBNMxzxvlmSardEhzdztJw2P42iY3ICR0xG4HXuKjQAqPCLseUTwPJhA7A6xNR4B2fbEm5PHglfO9CAJEUBmBKvu81mLryUtvww=
+	t=1773851871; cv=none; b=YRGyTPHk83C0p0Rq4Gv6ZRfEr5zSwCmMul7EbVvSvXTezch1iwV67Io2GJMXF7lU9WS8Ch8oxgJPWMr1tBFQUuitYLJAjPOKzveXH0WkpAUN7KyRshcutQqUXMVZI0CKhvjGx4+Sk6zQpAAHH/iEXKv3PmwnUhjrkDJdS8+OekE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773851803; c=relaxed/simple;
-	bh=sOhBhAiO4ncz9AORE7Sqln8Yo3y63hhhZ9bOmuNuU0Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ezd9f485UigP0as34TO25QjerzmIkhlx5tP3rWs9nySoVhZP3DygbG221zGXgaER/rku2sUBCvZ8ZQNxRB4WfKaj/Bs4zG/sHbelHeh085kjcJTV7I4b96D8SGYxOxVI6s3iBsctTm0ET2v8hjOwkZ5ycFDGntkbga4pkT4z64s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AVxT9cy9; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773851800; x=1805387800;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=sOhBhAiO4ncz9AORE7Sqln8Yo3y63hhhZ9bOmuNuU0Q=;
-  b=AVxT9cy9T1XQNIxz+vMQP4NFIk0uXSfmrsSIv6qNlFqTwUceMWVMJsA2
-   UXYckfKsWatlpUrQfZzyzIfJISQUeHitg/sxip3hfaaFLxOEXN0Z1lpHh
-   08wM9gRa2Ht6K4beD38aN8QH3fHUW5jRC4dDCjqMM9S5UtWXYn2h4jYYL
-   DeZ4KJUw9wv3jhuubVDU5qH4B4s9JQVXcsbq7grnCUiAmPDk03LdFPofG
-   wriLiAAFTvlSdWdDJ2BLj1tqg62BIMWcz++ondE8bfesY2wwSykdgH0UE
-   vKowS4A32plvAOVn26EGwvrSrrhY5wj8aZdRkaJKAzsgM+Q0NMjTuZGqD
-   Q==;
-X-CSE-ConnectionGUID: xstL7E12TF6SNp/DqeuyNQ==
-X-CSE-MsgGUID: 7h3tXwL7SguZLBFrV+YIyg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11733"; a="62479429"
-X-IronPort-AV: E=Sophos;i="6.23,127,1770624000"; 
-   d="scan'208";a="62479429"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2026 09:36:40 -0700
-X-CSE-ConnectionGUID: K4SXE6kVT9WOfwd8Gbk4eA==
-X-CSE-MsgGUID: 5Y3ixdK3TVSFIBoWm3aZZQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,127,1770624000"; 
-   d="scan'208";a="218687713"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa010.fm.intel.com with ESMTP; 18 Mar 2026 09:36:37 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	s=arc-20240116; t=1773851871; c=relaxed/simple;
+	bh=iqmtwLEcnL6mFlvnn9juJ9ChTC04q0eJq3YD9qrNJTI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EL3yNQpnCSaINA6Wv5Ods6f6ykNJdyPCF0YFk/kryvz0cr8oKrKfHFMv8H8rUqoo3b5FDfzoajbhINvx7pL+zEn0+3UUcdYx0ZXJHFi12MGmYaZD+vC0BxFTyV8ppUNCeJivscgikcSjBob1aLzFRNbLsgu0MTPkBEV07agvrZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PcNp68uN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E1C8C19421;
+	Wed, 18 Mar 2026 16:37:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773851870;
+	bh=iqmtwLEcnL6mFlvnn9juJ9ChTC04q0eJq3YD9qrNJTI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PcNp68uNOBv5fLixIjnHiniTlT7nbV1vida+HWufRivcjOEemg/cdnlQZ3S28LjPi
+	 j+Xclfj0fxIG1UpkeaBCnCo6UaO3E3amhxQ0ljAmkY0FRBeo/1eejhlIg0s6ML2FYk
+	 j176lFp0kwIqRk5ppGbJPIIIsgG3KdHbfeTYvW/jsKkGjJxT/x3Gg6QtQlRfCRZpNT
+	 XdeszBOq+uAYHkdzzUrLODEADMMj+YEJi6+GVLHejPAu4Va5m8rkI51zxutddRnfmG
+	 rZMQokXJVXxrUynwFEGUBbog4r2FnXJu/834cMVrfnTJ2zROdK96aZdce098xnwnVX
+	 yw3vTEIdZ6XrA==
+From: Conor Dooley <conor@kernel.org>
+To: netdev@vger.kernel.org
+Cc: conor@kernel.org,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Valentina.FernandezAlanis@microchip.com,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	nxne.cnse.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-next v4 5/5] ice: add support for transmitting unreadable frags
-Date: Wed, 18 Mar 2026 17:35:05 +0100
-Message-ID: <20260318163505.31765-6-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260318163505.31765-1-aleksander.lobakin@intel.com>
-References: <20260318163505.31765-1-aleksander.lobakin@intel.com>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Daire McNamara <daire.mcnamara@microchip.com>,
+	Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Samuel Holland <samuel.holland@sifive.com>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Dave Stevenson <dave.stevenson@raspberrypi.com>,
+	Sean Anderson <sean.anderson@linux.dev>,
+	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+	Abin Joseph <abin.joseph@amd.com>,
+	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>,
+	Ryan.Wanner@microchip.com
+Subject: [PATCH net-next v4 00/13] macb usrio/tsu patches
+Date: Wed, 18 Mar 2026 16:37:31 +0000
+Message-ID: <20260318-surpass-puzzle-f94b46aa8808@spud>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3354; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=ixRxbL+6ajZ8OQT5v+uLquAllGh8dKxfO7p3wZv97z8=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJm7rpxJPpK842A178372bLM1VvsRZhFMv/9DGrwumC4e Rv7wyChjlIWBjEuBlkxRZbE230tUuv/uOxw7nkLM4eVCWQIAxenAEzk0nNGhm+NrfcPtEx5qbjw 28GNZs4SZe8mhaqKx37at3bLIl2Oy8sY/kdIOprVt5/ulWOIfSe1o/PBh79mp+KZXq1T5+DZ/+z GdEYA
+X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269120-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-269119-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.973];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: 77AF12BF855
+	NEURAL_HAM(-0.00)[-0.995];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,microchip.com,lunn.ch,davemloft.net,google.com,redhat.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,tuxon.dev,gmail.com,sifive.com,vger.kernel.org,lists.infradead.org,raspberrypi.com,linux.dev,amd.com,bootlin.com];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1E3B92C0850
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Advertise netmem Tx support in ice. The only change needed is to set
-ICE_TX_BUF_FRAG conditionally, only when skb_frag_is_net_iov() is
-false. Otherwise, the Tx buffer type will be ICE_TX_BUF_EMPTY and
-the driver will skip the DMA unmapping operation.
+From: Conor Dooley <conor.dooley@microchip.com>
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c   |  1 +
- drivers/net/ethernet/intel/ice/ice_sf_eth.c |  1 +
- drivers/net/ethernet/intel/ice/ice_txrx.c   | 17 +++++++++++++----
- 3 files changed, 15 insertions(+), 4 deletions(-)
+Hey folks,
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 3ba7f49205f1..9ef258d5ab48 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -3525,6 +3525,7 @@ static void ice_set_ops(struct ice_vsi *vsi)
- 
- 	netdev->netdev_ops = &ice_netdev_ops;
- 	netdev->queue_mgmt_ops = &ice_queue_mgmt_ops;
-+	netdev->netmem_tx = true;
- 	netdev->udp_tunnel_nic_info = &pf->hw.udp_tunnel_nic;
- 	netdev->xdp_metadata_ops = &ice_xdp_md_ops;
- 	ice_set_ethtool_ops(netdev);
-diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-index bd5eeb27d3f8..f3ac5dfabc0c 100644
---- a/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-@@ -59,6 +59,7 @@ static int ice_sf_cfg_netdev(struct ice_dynamic_port *dyn_port,
- 	ether_addr_copy(netdev->perm_addr, dyn_port->hw_addr);
- 	netdev->netdev_ops = &ice_sf_netdev_ops;
- 	netdev->queue_mgmt_ops = &ice_queue_mgmt_ops;
-+	netdev->netmem_tx = true;
- 	SET_NETDEV_DEVLINK_PORT(netdev, devlink_port);
- 
- 	err = register_netdev(netdev);
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index 59b2ab09b87a..3008745c2b39 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -113,11 +113,17 @@ ice_prgm_fdir_fltr(struct ice_vsi *vsi, struct ice_fltr_desc *fdir_desc,
- static void
- ice_unmap_and_free_tx_buf(struct ice_tx_ring *ring, struct ice_tx_buf *tx_buf)
- {
--	if (tx_buf->type != ICE_TX_BUF_XDP_TX && dma_unmap_len(tx_buf, len))
-+	switch (tx_buf->type) {
-+	case ICE_TX_BUF_DUMMY:
-+	case ICE_TX_BUF_FRAG:
-+	case ICE_TX_BUF_SKB:
-+	case ICE_TX_BUF_XDP_XMIT:
- 		dma_unmap_page(ring->dev,
- 			       dma_unmap_addr(tx_buf, dma),
- 			       dma_unmap_len(tx_buf, len),
- 			       DMA_TO_DEVICE);
-+		break;
-+	}
- 
- 	switch (tx_buf->type) {
- 	case ICE_TX_BUF_DUMMY:
-@@ -337,12 +343,14 @@ static bool ice_clean_tx_irq(struct ice_tx_ring *tx_ring, int napi_budget)
- 			}
- 
- 			/* unmap any remaining paged data */
--			if (dma_unmap_len(tx_buf, len)) {
-+			if (tx_buf->type != ICE_TX_BUF_EMPTY) {
- 				dma_unmap_page(tx_ring->dev,
- 					       dma_unmap_addr(tx_buf, dma),
- 					       dma_unmap_len(tx_buf, len),
- 					       DMA_TO_DEVICE);
-+
- 				dma_unmap_len_set(tx_buf, len, 0);
-+				tx_buf->type = ICE_TX_BUF_EMPTY;
- 			}
- 		}
- 		ice_trace(clean_tx_irq_unmap_eop, tx_ring, tx_desc, tx_buf);
-@@ -1494,7 +1502,8 @@ ice_tx_map(struct ice_tx_ring *tx_ring, struct ice_tx_buf *first,
- 				       DMA_TO_DEVICE);
- 
- 		tx_buf = &tx_ring->tx_buf[i];
--		tx_buf->type = ICE_TX_BUF_FRAG;
-+		if (!skb_frag_is_net_iov(frag))
-+			tx_buf->type = ICE_TX_BUF_FRAG;
- 	}
- 
- 	/* record SW timestamp if HW timestamp is not available */
-@@ -2366,7 +2375,7 @@ void ice_clean_ctrl_tx_irq(struct ice_tx_ring *tx_ring)
- 		}
- 
- 		/* unmap the data header */
--		if (dma_unmap_len(tx_buf, len))
-+		if (tx_buf->type != ICE_TX_BUF_EMPTY)
- 			dma_unmap_single(tx_ring->dev,
- 					 dma_unmap_addr(tx_buf, dma),
- 					 dma_unmap_len(tx_buf, len),
+At the very least, it'd be good of the soc vendor folks could check
+their platforms and see if their usrio stuff actually lines up with what
+the driver currently calls "macb_default_usrio". Ours didn't and it was
+a nasty surprise.
+
+Ryan and I figured out that the sama7g5 stuff is not actually using the
+same usrio bits as earlier devices, so there's now more patches in this
+series to split them apart. I've not tested the split or the new
+property due to lack of hardware, but Ryan has.
+
+Marking this stuff net-next, because although they're fixes I don't see
+any particular urgency, and it avoids creating some dependencies between
+cleanup items and the fixes.
+
+Cheers,
+Conor.
+
+v4:
+- deprecate instead of remove existing devicetree property
+- pick up Theo's patches
+
+v3:
+- reorder patches
+- fix smatch issue reported by Simon
+- add patches reworking usrio handling of clken/refclk (and remove the
+  issue the llm reported in the process)
+- add a new devicetree property for refclk selection, replacing the
+  existing one.
+- drop the dts patch
+
+CC: Valentina.FernandezAlanis@microchip.com
+CC: Andrew Lunn <andrew+netdev@lunn.ch>
+CC: David S. Miller <davem@davemloft.net>
+CC: Eric Dumazet <edumazet@google.com>
+CC: Jakub Kicinski <kuba@kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>
+CC: Rob Herring <robh@kernel.org>
+CC: Krzysztof Kozlowski <krzk+dt@kernel.org>
+CC: Conor Dooley <conor+dt@kernel.org>
+CC: Daire McNamara <daire.mcnamara@microchip.com>
+CC: Paul Walmsley <pjw@kernel.org>
+CC: Palmer Dabbelt <palmer@dabbelt.com>
+CC: Albert Ou <aou@eecs.berkeley.edu>
+CC: Alexandre Ghiti <alex@ghiti.fr>
+CC: Nicolas Ferre <nicolas.ferre@microchip.com>
+CC: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+CC: Richard Cochran <richardcochran@gmail.com>
+CC: Samuel Holland <samuel.holland@sifive.com>
+CC: netdev@vger.kernel.org
+CC: devicetree@vger.kernel.org
+CC: linux-kernel@vger.kernel.org
+CC: linux-riscv@lists.infradead.org
+CC: Dave Stevenson <dave.stevenson@raspberrypi.com>
+CC: Sean Anderson <sean.anderson@linux.dev>
+CC: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+CC: Abin Joseph <abin.joseph@amd.com>
+CC: Théo Lebrun <theo.lebrun@bootlin.com>
+CC: Ryan.Wanner@microchip.com
+
+Conor Dooley (10):
+  net: macb: rename macb_default_usrio to at91_default_usrio as not all
+    platforms have mii mode control in usrio
+  net: macb: split USRIO_HAS_CLKEN capability in two
+  dt-bindings: net: cdns,macb: replace cdns,refclk-ext with
+    cdns,refclk-source
+  net: macb: rework usrio refclk selection code
+  net: macb: np4 doesn't need a usrio pointer
+  net: macb: add mpfs specific usrio configuration
+  net: macb: warn on pclk use as a tsu_clk fallback
+  net: macb: clean up tsu clk rate acquisition
+  dt-bindings: net: macb: add property indicating timer adjust mode
+  net: macb: timer adjust mode is not supported
+
+Théo Lebrun (3):
+  net: macb: runtime detect MACB_CAPS_USRIO_DISABLED
+  net: macb: set MACB_CAPS_USRIO_DISABLED if no usrio config is provided
+  net: macb: drop usrio pointer on EyeQ5 config
+
+ .../devicetree/bindings/net/cdns,macb.yaml    |  71 +++++-
+ drivers/net/ethernet/cadence/macb.h           |   8 +
+ drivers/net/ethernet/cadence/macb_main.c      | 202 ++++++++++++------
+ 3 files changed, 211 insertions(+), 70 deletions(-)
+
 -- 
-2.53.0
+2.51.0
 
 
