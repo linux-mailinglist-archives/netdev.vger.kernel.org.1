@@ -1,199 +1,233 @@
-Return-Path: <netdev+bounces-269211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269212-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4K80E+Ayu2mEggIAu9opvQ
-	(envelope-from <netdev+bounces-269211-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:18:56 +0100
+	id gDngAcsyu2mEggIAu9opvQ
+	(envelope-from <netdev+bounces-269212-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:18:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC3C62C3C8A
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:18:55 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 108002C3C82
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:18:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6DCF53058E03
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 23:18:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 91E7D301FB48
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 23:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3F94315F;
-	Wed, 18 Mar 2026 23:18:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA8B2BEC2B;
+	Wed, 18 Mar 2026 23:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hX6tLVTg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YwfeHWyU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB881A682E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B771C862F
 	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 23:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773875907; cv=pass; b=LI7TNwLCc4t5d1xxEeIqHy7SzeCPHQLBvyH4NJvq+2KDZVzVIz5bB/PSNRqxNPScwLPqmifg3eblKQOmb7bfioVyEILMUpK9pGvhA8ejKDDcffy1JlgxQuGaeTJVv10r9poMtk0ABrv+XL+38ruWXHCZ/02HuRm1q3rzUcvAdRA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773875907; c=relaxed/simple;
-	bh=39G6VhNjqSI8lRjTTtbDrj2wp6uAuLBcTj3h2hKU/RY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X3jzdpV4Ildn+CND7gYPXFfAwvrxvmRABdfG3bBYABRZwFoKovSY8ysqWR3jfJItUpelKy+j4VnJHg7nvyG0iQTf+s4Vpw8UUcT6gR5JBYkFdEF44JzGmbxhE4+f8YfICSPFH1Js9W1eIxir3nhOp+DNtU3dN4jRqTMZrFwRuYo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hX6tLVTg; arc=pass smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773875908; cv=none; b=TF56SvjIRV4FMDyGonXe12sNnvYoTdcQ0ZR5cYxiq9F0zO/oU/1MynTSR19bMz4SyRUAiCNYPH4GgvpeeWTamDRI+py47/DRmiDU8silZeHUzziplSh950hZnwQG2HBgwPyhhyAtSght+jAQ/2EdSaajoco2tC9R0IWDE9K+lGA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773875908; c=relaxed/simple;
+	bh=3ldCpbjIReo95e8rkIL7Ovh12cZctQtYjWJOgbLFguw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i0FytJZ3yrBsclMa4OaraLZF79NiPEQGjXuIpqflSqhueZYiY9hJK5bSSNOk6oSiCYLY5dH1mPSlGvdQiw5JI/FlZ7O9AqDOt6WpDq0acGcXrhruEJBX2EOSnlOMJzkZyqZ3TPUju0laUHjiw7+WTq2v5s6w/ZUg3ybgBui5IgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YwfeHWyU; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-48532925a4bso2061165e9.1
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-43b4121c40aso200368f8f.0
         for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 16:18:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773875905; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Raemg0mubg6D+5cIUEMw5MEmRuSs8lyDGB4Qes4ATRfvN7ot0Rv3zfrJW3/tWAFm4X
-         qddmcwLR+CkBE6ALVLrpSzH+FvvuO9ZiMRV1nfWWtHJkmyUPwA6cZ0dadMIZ+CzkkOiQ
-         Rm3m/TaXiRuhmLcZxjFSuDGl8FgbI+/gc7tu2yNpiVHzy7NnzZeVES8uvvP7n37Mtjkz
-         d2JUWkpDjvvXHjFZPk4o7VPSzxBtG0hMXnQo6MtkHtG9tZM8Zgc7eCZeofGGijpXzyuv
-         +PQEAxti+cH5mCBy4J89rgrW8g39OusVfW2hUKxmeUWnp/bVAPOCUgjKZreCG63F41U8
-         ANYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=39G6VhNjqSI8lRjTTtbDrj2wp6uAuLBcTj3h2hKU/RY=;
-        fh=kFrw86xbfGLD3UwJOzM3nx/WriDQ+uiHgxbViGy8yqs=;
-        b=XURuYb7PHja1ixTq+6d5aprVAl90kiEekQdAQAE9hU8H7ql2fs8BP0XCqUfjj2Bjzh
-         b3G965RFstm7rZSF+9NMG8LPwiOhVuteR52/mStx7973OZK9XLcU7sypc5cRa+Ew4PuP
-         ddAfFr0VSyaFRuRHJzY19bj/GOeJtVeHhs9DZ8Kx6TIAcUwqMRrSL2NPaVCXUwEf6nBA
-         ke461gMx2lZySzCMwP4d/QnETm03reH7HrMmjoUgexNyYCWtnExXb5P20pC2T4U8uSdT
-         5KquF28kdME+Jx8nJy5uMeNw0jNyBekD7Qy13dmugDIy/Tlt1qgoWNwDOapxT5dk28qS
-         0ZVQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1773875905; x=1774480705; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=39G6VhNjqSI8lRjTTtbDrj2wp6uAuLBcTj3h2hKU/RY=;
-        b=hX6tLVTgmILvVTXsh5qXHoKA+vhRFgtz3YPPL+QevAX6B0vpO7mSxzsjCH+e5g23HK
-         pNouTPqDrFz7XpdUVIQBhF0IHm1jycmFR2Hdefh/wi8Dr7rHMOEl2brtS7PXwqihZRqV
-         Smxf66d2tkz5uaWTcFYbov6uDEjWpNgjSJ/0iWWMQTGnJeR7ZN81A6ulufb7S2QNXk/P
-         KrjqRfLoT/ZqOPV3amKYerLUObCyEgbPOXL5jxtGUdJyYLVXdqrVF92HUE7JQfUnR/t9
-         sDjj/asraoKeo6yrOUmtrxeBXX/+yWlq8oR6Cng0BFB5vzTCKixqUQELjvQePTdmCf5w
-         nPFA==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ehy3LFEv1Okh2NOHU6J1PJlVKYSWvARVIndgmZ+QFx0=;
+        b=YwfeHWyUq+mJYLcLrZUWWnNl5/vcijDRLceuen61DtAlbKYrm/LCajUV/VFmonNYEL
+         U8U9zHX43OtACGldfmi4c3dsA72tdoRUTLrcFoE708q0Lwray29RrcL2m1EMux0mWr4o
+         2nrlUSaOWq98UDkUDAW0gJv1TuqkpthA7pg+Q9LiGtvjA3Hsf0sznD6uIXHvR/3Ln+tA
+         7S4TkkQJyF8BRAhtL9QhweiZzg+iJCkSIqd1T/5rKk7WGii94rUtuEF9+EmNAzxbBV8g
+         UB6Nf8pmc6ebIcgr8Ah3VIzBHlaObQGHxSUbZa+7nZb9PMteEJlcdJfOelFNtQ+C0OFx
+         HNoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1773875905; x=1774480705;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=39G6VhNjqSI8lRjTTtbDrj2wp6uAuLBcTj3h2hKU/RY=;
-        b=DozbMdLeTYa3fTTewN4+iM3JFDshOlkwZWaBpZxoyNliKuQjHdbCevdWXkI8G89aFm
-         GzyRsXiveT7OOKfACuoIRGj1hwhcwICSNL/vjMoAX+QTiJFupEggqXROKXGiG+HfjnrE
-         P3NlG3Zwj7yFJcQIWKxg5Vjvq4F3ozcXFv2zTc2RNgFtiNudhmj4qUE9haKLbWw9bnS+
-         tE4hsOiLgLAF2K7a1z5tkMiwyyDoSSKKEcRDgRJKjrqaI1PKt02rlTj8/dF0uVUizfbG
-         cMfD3iADQWBB1TlDzW9I3kHsMGtWr57S7ihnVWYWcY7Vrz8hAfqZm66Nss0RXrlN5Okq
-         ACLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXiQdluf2jjT13FVXQJPN3+oiE0LEcjbsAIoWosb0BL2RwxnJEt7uUAXRg+c1hM7FLjuGSEp4Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQLmhDv+KsHT+rY2Sd6zDnlG/iajaE8Ardfb2uNhZyBM5rrowJ
-	omLa1P6CbOiBmC0B0ocK7wr0vZTT75ew+cTHjexiTMnPdQMAksrR6SfPePVC/qzVZBn4X7gg3ib
-	POiHcKzlGOV5hqpbjLwDH9je/ZzNoMVU=
-X-Gm-Gg: ATEYQzxss3/axkvDbn8q49GsDKxIVAYtyB698gDyIIRXEvf/UGUfh2TmHvQM9J7krMR
-	uCExmrjMs5M8fFuS3XOu1FUXYD3VcFyxDtvPR93S15UtO2+DbmXrxuo1sk59Ijv8nW9wrtan72t
-	vcd1lmse5zs2KyeZzJz0uc2qdU564zJ9q/9M+7Vs1htIT1LsFlz0FzLMkWM+XIYHqfEh2XltQL8
-	xKaS1fqPbKy07H7dsoDeI2xj3/JC+HTyConTQr62L5hpdHF9ps3Sei/B5XGuspcj+0PTsjSY2ac
-	+LzvgjRtigvMtu7cTCnJ
-X-Received: by 2002:a05:600c:6995:b0:483:badb:618b with SMTP id
- 5b1f17b1804b1-486f4463574mr81919745e9.24.1773875904527; Wed, 18 Mar 2026
- 16:18:24 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ehy3LFEv1Okh2NOHU6J1PJlVKYSWvARVIndgmZ+QFx0=;
+        b=T9m2uHeoowPcfngIrXRf3vWsfSKKp46iL8x3cOmnG1eqIhEIud70gxL241boQNwJQU
+         f2VInTaMrSeSsTiyl8k1wdNQx8QWs87j2w4xb+XBDo8j2b10NAd+1elxchWWAFnqd1nr
+         0Kgql0GPys1bOer4sgobhQgnS8p0CidQW9h55OOqGiWmAa3vyjYS57E9vM5CzKVLfXEm
+         KBDtVd5z3d9GSzdIXu995qrph+mFU/qANHWYsgpHNdE8zwlVKXr5829TPehvPsAvLeyX
+         M+Tb7hR/S9ehj10+LY9In/Fv5sc15FZsMmPQJEF00FD6aitYHShBSM/QigJ9KrV5dY5x
+         A/EA==
+X-Gm-Message-State: AOJu0YxGJMz5w4T9bBYpjTNnsg1EPaD7/1bJSWLNDUmEBYg6nVT96ov9
+	JQOJ20vMZ9IY1CWI4zM4B6gLccp1U+e9bwNE4UdEpJ8LsuIM8UnvCNmt
+X-Gm-Gg: ATEYQzznMae+WWATPiD9j5zK9kyTxWkw0Il0Pr4+QHf44qFEvI0+A46YexNSDUaWOt4
+	+tV3cCnZe5W0s5YgXaYmdy0Fs/2CBZlqMldTqvfxCsE2mZnqMfk5svrfNBhTxyYddsNPqB0cbz8
+	Z9IfF2TukjyiiAURS1Xzx+i+bdjnUoP4p2ZVnlr1v792s4Uil3xWi58btjTYP/+7w3zDucLyDIE
+	b/xVDV4PFxZ9U7rAW9ysI+UTrFVgNlZ8JriNNHD8AneIBjFHx7fg3iLu3J1QOqi/CNUMyjmcMjb
+	99ISyfflFFSa1C6UyrnsZYPJRQ+G0ymsx3w9hFxVI1E3j7a4FbN5jWOcnp5D8gEYXdHlZEyavlw
+	jZCp6/W3TfOuluBW9aOBv/JM8MoyG04l98OwLcrwem0H93sW5E4xjgD2fkJgQexBHSK8oyyZuA9
+	qvq+UZtL2GDTCZ6LkZp9tNiMur7zXX4rGWqFeNcUrG2oeQjA/l8pZE9g7SgI5Vq+pnJ4hj0yN2p
+	rE6jMzRKmIK
+X-Received: by 2002:a05:6000:1a8e:b0:439:b619:33b2 with SMTP id ffacd0b85a97d-43b527c903bmr8857309f8f.43.1773875904693;
+        Wed, 18 Mar 2026 16:18:24 -0700 (PDT)
+Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b5184957bsm12325685f8f.5.2026.03.18.16.18.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Mar 2026 16:18:24 -0700 (PDT)
+From: David Carlier <devnexen@gmail.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: netdev@vger.kernel.org,
+	David Carlier <devnexen@gmail.com>
+Subject: [PATCH] iavf: replace strcat chain with snprintf in iavf_print_adv_rss_cfg
+Date: Wed, 18 Mar 2026 23:18:21 +0000
+Message-ID: <20260318231821.43551-1-devnexen@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260316021009.262358-1-CFSworks@gmail.com> <20260317202718.3a5433c4@kernel.org>
- <CAH5Ym4iaBkFsAH6e9UgHbxOEs8D6-Tcq9so0HJ24GFfmnQiUiA@mail.gmail.com> <20260318151116.665400cb@kernel.org>
-In-Reply-To: <20260318151116.665400cb@kernel.org>
-From: Sam Edwards <cfsworks@gmail.com>
-Date: Wed, 18 Mar 2026 16:18:13 -0700
-X-Gm-Features: AaiRm51YP9gogPBHIhlbloiKNsmx_tzX5wtT9H4tULOXMMRpIlakAKewKNpYF7A
-Message-ID: <CAH5Ym4jYyejXqp0NrX_Gx9ND3kyrQxZZ7zDLN2P2HioZOgybUg@mail.gmail.com>
-Subject: Re: [PATCH 0/3] stmmac crash/stall fixes when under memory pressure
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Russell King <rmk+kernel@armlinux.org.uk>, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	Baruch Siach <baruch@tkos.co.il>, Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269211-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk,bootlin.com,renesas.com,nxp.com,tkos.co.il,gmail.com,vger.kernel.org,lists.infradead.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.350];
+	TAGGED_FROM(0.00)[bounces-269212-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cfsworks@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AC3C62C3C8A
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.739];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 108002C3C82
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 18, 2026 at 3:11=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 17 Mar 2026 20:46:00 -0700 Sam Edwards wrote:
-> > > Please have a critical look at the commit messages.
-> > > They are very bloviated and not slop looking.
-> >
-> > Thank you for saying my messages aren't slop. :)
->
-> Typo, of course. Are you saying you haven't use an LLM at all to write
-> these patches or commit messages?
+The hash option string was built using memset + 11 strcat() calls,
+which is both unbounded and needlessly verbose. Use a single snprintf()
+instead. Also drop the static qualifier on the buffer since there's
+no reason for it to persist across calls, and shrink it from 300 to
+128 bytes (worst case output is ~85 bytes).
 
-That's right: My crash analysis, source code study, bug reporting, fix
-implementation, testing, commit messages, and correspondence were done
-the pre-LLM way. (Perhaps it's time for me to adopt a disclaimer a la
-xkcd.com/3126? /s)
+No functional change.
 
-> > I'll try to dial back the verbosity, though. What kind of bloviation
-> > do I have? Should I be leaving off more context, or should I focus
-> > more on preserving the same detail but using fewer words?
->
-> IDK, writing is hard. I read the commit message for patch 1 and I felt
-> like I understood less than when I started :S
+Signed-off-by: David Carlier <devnexen@gmail.com>
+---
+ .../net/ethernet/intel/iavf/iavf_adv_rss.c    | 73 ++++++++-----------
+ 1 file changed, 32 insertions(+), 41 deletions(-)
 
-Ah yeah, I get it: Sometimes with negative feedback, people don't know
-*why* something is off, only *that* it's off.
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c b/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c
+index 4d12dfe1b481..6e1c7c39ff9d 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c
+@@ -238,7 +238,7 @@ iavf_print_adv_rss_cfg(struct iavf_adapter *adapter, struct iavf_adv_rss *rss,
+ {
+ 	u32 packet_hdrs = rss->packet_hdrs;
+ 	u64 hash_flds = rss->hash_flds;
+-	static char hash_opt[300];
++	char hash_opt[128];
+ 	const char *proto;
+ 
+ 	if (packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_TCP)
+@@ -252,44 +252,35 @@ iavf_print_adv_rss_cfg(struct iavf_adapter *adapter, struct iavf_adv_rss *rss,
+ 	else
+ 		return;
+ 
+-	memset(hash_opt, 0, sizeof(hash_opt));
+-
+-	strcat(hash_opt, proto);
+-	if (packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_IPV4)
+-		strcat(hash_opt, "v4 ");
+-	else
+-		strcat(hash_opt, "v6 ");
+-
+-	if (hash_flds & (IAVF_ADV_RSS_HASH_FLD_IPV4_SA |
+-			 IAVF_ADV_RSS_HASH_FLD_IPV6_SA))
+-		strcat(hash_opt, "IP SA,");
+-	if (hash_flds & (IAVF_ADV_RSS_HASH_FLD_IPV4_DA |
+-			 IAVF_ADV_RSS_HASH_FLD_IPV6_DA))
+-		strcat(hash_opt, "IP DA,");
+-	if (hash_flds & (IAVF_ADV_RSS_HASH_FLD_TCP_SRC_PORT |
+-			 IAVF_ADV_RSS_HASH_FLD_UDP_SRC_PORT |
+-			 IAVF_ADV_RSS_HASH_FLD_SCTP_SRC_PORT))
+-		strcat(hash_opt, "src port,");
+-	if (hash_flds & (IAVF_ADV_RSS_HASH_FLD_TCP_DST_PORT |
+-			 IAVF_ADV_RSS_HASH_FLD_UDP_DST_PORT |
+-			 IAVF_ADV_RSS_HASH_FLD_SCTP_DST_PORT))
+-		strcat(hash_opt, "dst port,");
+-	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPC_TEID)
+-		strcat(hash_opt, "gtp-c,");
+-	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_IP_TEID)
+-		strcat(hash_opt, "gtp-u ip,");
+-	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_EH_TEID)
+-		strcat(hash_opt, "gtp-u ext,");
+-	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_UP_TEID)
+-		strcat(hash_opt, "gtp-u ul,");
+-	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_DWN_TEID)
+-		strcat(hash_opt, "gtp-u dl,");
+-
+-	if (!action)
+-		action = "";
+-
+-	if (!result)
+-		result = "";
+-
+-	dev_info(&adapter->pdev->dev, "%s %s %s\n", action, hash_opt, result);
++	snprintf(hash_opt, sizeof(hash_opt), "%s%s %s%s%s%s%s%s%s%s%s",
++		 proto,
++		 (packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_IPV4) ?
++			"v4" : "v6",
++		 (hash_flds & (IAVF_ADV_RSS_HASH_FLD_IPV4_SA |
++			       IAVF_ADV_RSS_HASH_FLD_IPV6_SA)) ?
++			"IP SA," : "",
++		 (hash_flds & (IAVF_ADV_RSS_HASH_FLD_IPV4_DA |
++			       IAVF_ADV_RSS_HASH_FLD_IPV6_DA)) ?
++			"IP DA," : "",
++		 (hash_flds & (IAVF_ADV_RSS_HASH_FLD_TCP_SRC_PORT |
++			       IAVF_ADV_RSS_HASH_FLD_UDP_SRC_PORT |
++			       IAVF_ADV_RSS_HASH_FLD_SCTP_SRC_PORT)) ?
++			"src port," : "",
++		 (hash_flds & (IAVF_ADV_RSS_HASH_FLD_TCP_DST_PORT |
++			       IAVF_ADV_RSS_HASH_FLD_UDP_DST_PORT |
++			       IAVF_ADV_RSS_HASH_FLD_SCTP_DST_PORT)) ?
++			"dst port," : "",
++		 (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPC_TEID) ?
++			"gtp-c," : "",
++		 (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_IP_TEID) ?
++			"gtp-u ip," : "",
++		 (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_EH_TEID) ?
++			"gtp-u ext," : "",
++		 (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_UP_TEID) ?
++			"gtp-u ul," : "",
++		 (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_DWN_TEID) ?
++			"gtp-u dl," : "");
++
++	dev_info(&adapter->pdev->dev, "%s %s %s\n",
++		 action ? action : "", hash_opt, result ? result : "");
+ }
+-- 
+2.53.0
 
-(Aside: I originally wrote the patch 1 message last month as a comment
-explaining my issue on Bugzilla, and later reused most of it when
-preparing this series. Patches 2/3 were written fresh as I was getting
-ready to hit send. Maybe I was relying on context from the Bugzilla
-thread more than I thought.)
-
-> Try to imagine you don't
-> know the code very well and think what information is crucial to
-> understanding the change.
-
-I have a bit of an edge then: I'm actually pretty new to this driver,
-and used the commit messages to document what I had to learn in the
-process.
-
-I'll try to workshop the commit messages in preparation for a series
-v2. Thank you for taking the time to speak with me about this.
-
-Best wishes,
-Sam
 
