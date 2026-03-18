@@ -1,218 +1,281 @@
-Return-Path: <netdev+bounces-268928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268929-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAvlJ+houmnnWAIAu9opvQ
-	(envelope-from <netdev+bounces-268928-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:57:12 +0100
+	id sHxkHgxpumnnWAIAu9opvQ
+	(envelope-from <netdev+bounces-268929-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:57:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22E292B88FD
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:57:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2668B2B8931
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 09:57:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5ACD6300C587
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:56:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 83CB43009B0D
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 08:57:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71E638F94E;
-	Wed, 18 Mar 2026 08:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61873988EE;
+	Wed, 18 Mar 2026 08:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Oce5n6oJ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dfoQfUed"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011067.outbound.protection.outlook.com [40.107.208.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB68285050
-	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 08:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773824212; cv=fail; b=hzx/xuVl0NU7Um3pEtkSz5UfAG9P/XxMQqR5Pa+kBRohEoeI+TaMvY0l7I1ac55qL8GEUYYRLtsXVb1n2g1NS1r/z/arXWYt7xCNIOwiq+dDqD6EoOZKLete46xkhR4DkifW0BlSr0rehOOfoZ3VxO2XCd79p1DMpsprCVZdZcM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773824212; c=relaxed/simple;
-	bh=hhCGP+elbwiFpDLMjGQ0v6kHZLI7g9lbZpFRjPg9ulw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=LBeS06Yc2rzFQD3YL5HW3AuJj5LzOb6zxbeMmWSFj7ugEV6Ss69yUWN0/O8DsuqysEKcsRiCkiLrAAwE9G4v8LFszhEy9BmLZUYASnIF3ginkhLz33Qva+uhvR6W27rCzhnF9lv3xs7K1TbFs+gboF83ZxogfQ4NEqsa+PO4VVI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Oce5n6oJ; arc=fail smtp.client-ip=40.107.208.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gyGM5OCH90HxF/TIPAx96cUZ95sj3o9YM4FNTnvIqUHarjHWphctca/yiW462yT0FqCN44r4j7N3frHehWRXXgHkZJ1+2TkQAs6lIwWzKVKrJc1x0kJeMbtLCdriUI8kbXZJ+6HTAy50d6ankZHdE6PuQOZIUuU9FIZs1Pr8Ac1w4SVERr1YSBufU9P9MbrHQSQL8PBIVHXesNMv1s0uUvCG3M3RsSQ4YT6zVsHXUg4NNRShuUf9he3INkog2VaLDPuYE+dUC670ln97NKSQE8WjVc0gfZ2uwBrInDh8hPcSShzv00/I+aaXgF/C0/nco8KtSenUyld1YaUlKzlumQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hhCGP+elbwiFpDLMjGQ0v6kHZLI7g9lbZpFRjPg9ulw=;
- b=g+OHARbUQSQg8hc3JZT73I9b+Nhegc+xB75vsRLNtOcygsB+K7b9O0EllrOyQzgdzywbUVcDcKPOe2CMxTfOOqSH1926efKif5JYlTf1jFyY1iGrmecLccpCl5kjWcBGHzJtlcwHkXBf5tFimnHsthyODVTTpNZcJAGktW7frUcJt4aO32VeOAh2seu8yRCW+fzfKG6dyyF42VEzA3wvzHlIZi7oMORccrFtfC1CN2ALHojwx5nIoxAJimnUnR1iUHYX8LBk5p6pAaQc1aqYJp7noiNPr5ZjTexdQcGaOeQTgWvOuCqc7JdIqEP6YJl8Rr4oYMN5d4LYOGQ53fmM/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hhCGP+elbwiFpDLMjGQ0v6kHZLI7g9lbZpFRjPg9ulw=;
- b=Oce5n6oJGwVqyjTKoWn9UbwNdz3D3QYUmUIJIdviNGM4y6y81cX/AitTa6tkXbRUuqdwK9PI0X3ROjJfWzBfauck/vYZVkMfyE9zvOHfzi3ZmoKTpFSJnIg+cAa8VxpdBytHQ6V7jbIU3J+Kalvcvads/QRDjb1L2uZNGIb4h70j0AaphMLde7bYufySa/dRvWwCFzS9YJY39e5vTEf1VtTjxkUUbFK/njhKzp8DCfvVjvDOhGOx7uNjVEVHfb+01JpXaGDyo78dlOi50TAcl0epPiaX/I5Nde+mWaxjBGaecC79KUHHllO/PCCQX/GR4Bi341yV9Ehx2J/LKDcd4A==
-Received: from DM6PR12MB4516.namprd12.prod.outlook.com (2603:10b6:5:2ac::20)
- by CH3PR12MB8308.namprd12.prod.outlook.com (2603:10b6:610:131::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.16; Wed, 18 Mar
- 2026 08:56:48 +0000
-Received: from DM6PR12MB4516.namprd12.prod.outlook.com
- ([fe80::ca04:6eff:be7f:5699]) by DM6PR12MB4516.namprd12.prod.outlook.com
- ([fe80::ca04:6eff:be7f:5699%6]) with mapi id 15.20.9745.007; Wed, 18 Mar 2026
- 08:56:47 +0000
-From: Danielle Ratson <danieller@nvidia.com>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"mkubecek@suse.cz" <mkubecek@suse.cz>
-CC: "alok.a.tiwarilinux@gmail.com" <alok.a.tiwarilinux@gmail.com>
-Subject: RE: [PATCH ethtool] cmis: Fix incorrect LSB field used for wavelength
- tolerance
-Thread-Topic: [PATCH ethtool] cmis: Fix incorrect LSB field used for
- wavelength tolerance
-Thread-Index: AQHctrIDn3nkG/yjxECNYGxRUNtZmbWz+0jg
-Date: Wed, 18 Mar 2026 08:56:47 +0000
-Message-ID:
- <DM6PR12MB451699CF526A71A2B2AD4619D84EA@DM6PR12MB4516.namprd12.prod.outlook.com>
-References: <20260318083401.375458-1-alok.a.tiwari@oracle.com>
-In-Reply-To: <20260318083401.375458-1-alok.a.tiwari@oracle.com>
-Accept-Language: he-IL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB4516:EE_|CH3PR12MB8308:EE_
-x-ms-office365-filtering-correlation-id: 604ab3c1-134b-4b97-80c1-08de84cc49a9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|22082099003|56012099003|18002099003|7053199007|38070700021;
-x-microsoft-antispam-message-info:
- LxAhI/XpSSspEUn+Miv6c7iwp0bcg33W0FSJIskA+F633lElR6Wdn0fSiO4VroibJupBF2wX6Wbk3d8r8GeHuffaOzQFi5JW682H5VSxktBM3L+dYZwKtEtxoiNvQ8BlWOnUqZoSqco9shoPsDgjgDJcJMyQPLQOQymWvMt0UJe2Gv5QuWhsUiBY60k5bs56xxWPWLw7usoNQAWHl23a/gnwRIRq0oRTUuCOsSuDK9atNwhzTlEb5bfyxQMczM4MFaYY4LBC4zDclrG7YIQZP2ulfJqlgjzkqT8cuje7lYSFF78uQETxomNEWQiPw6JRp3ybT5wkWK9oW5J916qZeRXlMjWspokZYvss6foqgHJVeaAE5yA75y0sdxaIBFtMtmUFI9es7CKydqAm3zb49AdFDLIVSO/cd5t3JVpA7YAyeNtLNvEwYk3H3w6eYR2YvBP7JJ32blzOOTC8k+xjo3Y8PiiAlIlOk2uA6WqQpjYcp1zGj3WSjVLpCtuTbYhglzK7ELCfUpEMkYjX3JRmFK+R5fMZtidvpUXzfYhTuoTn94tWqMM2puiugraTnmUc5p0EaOMZ5EPHbTTgsUdQx2MgNa1rGSF1zh0RPmLLJvwHV3dELVrbdhA0NKUThyDhxYMcyTByDrsWbmgIqMhzaph10bsomqMMFlc+51/dk0kx2RirasWq0dypVeyU6w8rp0jyFXNP59yYavW3Hq4pEl0pMzFpoqePKUuN5TcejhWnEe5UBR8FChcEhRtsRQa6xFaeiaZomrYohdTkrWZAYTTU5GdLpt8Rbh1+EZL+dII=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4516.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(22082099003)(56012099003)(18002099003)(7053199007)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?MThmenpaSW1PSzRxY2Y1YTQ2OUNqR3ZvcWxtUzRNdW51M2VlS1oxL1dWR2ty?=
- =?utf-8?B?WWdSZDhGU0tHNWI1dUNhV2w0YUdpUVdHNzFvbnViekZ5K1dMcXUreTBFWVhF?=
- =?utf-8?B?T1NrV1o4cmE0dmVtQ0lPSWlnVEh4WGZjM0l0eThmUlNsY1ZvOElXV1lDc0Zm?=
- =?utf-8?B?MHNBRXEzRUllNkJtdWNWelhVcFpJbnZRS1dZYVpiWERPeFY5cVc5VDIxd3o1?=
- =?utf-8?B?Z1NIMUw3clhWZVNnc1FUK3ZTUWlzRFdNQjFwbXN6Y0Q1VWlCRDJwczg0SkF6?=
- =?utf-8?B?YU80eHBhVDFUQkhKdm9wYS9VUXRwOE9uWVBQR3RXUkRSc3QrQ2R2Si81YzR6?=
- =?utf-8?B?NzQ5bkEyNjlTNklwb2NwdWFWeE52L1lRQVhtVnVCcU93Zy95bHlsdlZwV2g2?=
- =?utf-8?B?YVF2WFhYM2VYa2xyVGxPUVdic0lnZGFPTHdWT2ljamFSd3RmMmdZd0RkbGhL?=
- =?utf-8?B?b1QzTHhTamJrNkRTN1hYT09taU5hdjdkblFRZHZTWE53a3pmenJrbUJKVmxk?=
- =?utf-8?B?ekE3d2Y5aWJkKzkxdTNGQ2dsVitTWlh5S2pxOWV3bEJKZ1FmcGU4SUpyUjZv?=
- =?utf-8?B?V2RMbVdpRzk3SUxDdVgvSmF5MWdoMTJBaUNCQWs5Wms4YVZrdkFSUHdkYndV?=
- =?utf-8?B?aXZ3V3hJOEZzOWRDaHlROEFuMnhabUtDUnZqZTdUdDJMYXR4dXJkVy9EeHlB?=
- =?utf-8?B?bGplWFV5WE4yVm9CMHgrVFhvRlZHTXg1amttVWVvL0tNTzBrT3ArZkJQWkhL?=
- =?utf-8?B?REI0NXc5UWhqZ0JVNHhTNUp5UjNEOEkwNXVGeXozZFAzVFZvUlNlR1pZRHpw?=
- =?utf-8?B?dVpmS1AyRGJzWkpzYkZpVTAwclVScjFMTG9mbm9aUzZ5UTc1VmlBcjVkVWNP?=
- =?utf-8?B?SnFWU1k1M1dyQ2s4RXhJa1ZLT3E4SjVCcU1pbFdsT3diQTlLZFc0YVhsZ1BO?=
- =?utf-8?B?SkhxUTdrS1BmeWh5aUFrS0phK2NRbUthYnhIQ0VUQWJzaGVwVGt6OE9GZjJo?=
- =?utf-8?B?TWRjRWtRVzI3WjRoRFdFM1JIeXM2WmxXSzFQWHBjVmNDRFB6WEFMWDR6L29q?=
- =?utf-8?B?STVVNU5Sb2pTaFVhNms0UDgyUHo4bDBSVW9mdyswQlpCMTN3VUdiWTQzaENX?=
- =?utf-8?B?aHhlY1h6YUUwUXlrbVZiK3pGMU01aGdnbWJSVDRvZk9YYnZIb0F3YTNqOTNV?=
- =?utf-8?B?YlJROEwzcHdOYmUzZStuRXkxUkZ6Vlp1V05IWk5rbVcvN1hLa0dxVHZQV0k2?=
- =?utf-8?B?NklYRlg2YjNqaE9aNmJUdUVXb2dNb1Zhemw3cVVDZzRYcGhrQWc0cEtubDc0?=
- =?utf-8?B?NWpQb1BHbnpxM3NiOVJaVWQ3SytWcGh1b1dSbHBWN3I2YVptTmF1aitNWitR?=
- =?utf-8?B?RVhMME1nQytnYkY0UVRBNjI5d1htZUpYWk50bVhuU3ZzUmtrVkx0NVBTa1VR?=
- =?utf-8?B?aDlqeXNOWGJhbk05Z2xnWDY1SDNycFhJUGNMUHl1VWQ0dWJCRmRmVjBVbEVD?=
- =?utf-8?B?VSs3cEVwRUlPbGdaRUdRSXZqOTZDc2pOcGliVzIwUEtuOHc5eVNQWUVhdWxO?=
- =?utf-8?B?VnM3ZVFkZU1UL3NVYzlPU0RCLzFEQSttdjZ0L3ZjS3U0djJ1OU8zYUdub0JN?=
- =?utf-8?B?U3dIclkxN09hVXpYWlZRc0M1eElYSGwvUEgzQ1oyTm1BKzlzRXdIWWY3NjNm?=
- =?utf-8?B?MFVlOFB0ZjN5SXAvQXdNL3NzNjE4aHZMT3JiYmNKS2lTTVFQdjFFVW1ldHFw?=
- =?utf-8?B?YWdzcTd2bDBncmk2eXNUUUZFdXlheUszMExqNEdZOTZKaE5GQ3doM25SRm1t?=
- =?utf-8?B?OFBBUkoyNmlFcUxrLzVvWktaNmtoZms4K2dkeFpIenlLek1KQlFENUJPT2sw?=
- =?utf-8?B?MWJBbGRHRFZXZHRKWE1oWTJLbllKTXpqSlpKYlRwSUQxNDRTSkpuNVBsS3lj?=
- =?utf-8?B?VXpoMWJ3S0szU1dkTGlkRFpuTWpDWVVTRW8rTHhoQUMvZkd5UGQ2TS9hV2M5?=
- =?utf-8?B?bGQ3WjN2S2pKMUxRdi9DTi9IUzl6aWxWZ2cwb1RIaUQyNlpTZXRxc25YZGxI?=
- =?utf-8?B?UmI5NlJKR0tKWm5oT1Nzd25wUVhWVk1zdm5EN0RXaU13N0Z5Z3l6bTQrNUpO?=
- =?utf-8?B?TjhhNG5PNy9YcjBaaWt6U1ZRd2RwamJwQkRLZGxvemFZUVVhVXRJZC91a0c1?=
- =?utf-8?B?YWcvRUticnJuSXNLZkx1TXhiMndCcjNVTFpXRU84UWRQQUwwbXJtYmlvQ0RO?=
- =?utf-8?B?ZDR4NVhpZUJTenZyU2VTZXFHTmI3Y2IwSkVTM21XNmNSS0RXem1ibEhMazFN?=
- =?utf-8?Q?70YGJShGreNUcFzuKi?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A423238550C
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 08:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773824250; cv=none; b=eqkY7moKeYbtYCu6YZhYYgpReoWetCdqizBdBX6qt4m1LJ1zgIssXEWHJ6pZ8gAM5YsnzEn+5oN+AY5qi8tVdYGzHqZyDYDgYNNTASRftk8KVqDZHmzQcd3E0eFIdB+U8jUMv2eSjnJJ+tKUHKQjgEqkJ6VuiqQtX1vviQyCraU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773824250; c=relaxed/simple;
+	bh=NUWaA211MVtgOyFvRrtpZ0xN6iYxcwddItz9sEVKQiA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M0sigzQxSLtdeH8ebM0ZF2Q8ps4N2j+igjyOBZbIQbwPh3FniFz8FXlxSBCQ4p4WMocmhmBLOexa8+FnsoiUJR/KEGMxzW213emD1VK5leRS9oMHiA5/c0pMGJwJ4W7MB/r+d9HWTUWidcnpHM5Q8Nlb+feBvH0WZlKQ76tIVAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dfoQfUed; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-48628ce9ab5so22243435e9.2
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 01:57:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1773824247; x=1774429047; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:reply-to:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OudNO2OnvwTpIE96QJS7IaE3Xw3RCtNFDCoe4J2lk3A=;
+        b=dfoQfUedNNvnmlDimCSR7G1+W7Rus9ksSpMCSVrMamWPCWFYIT7R58P2hoEBa2XyIf
+         EoW3p54zCFkPH07K0Gca5PfiNWfhhf8slp3Q6IOMCsGYmwkT8yebOFK2uB8ei06lulfN
+         hfSeiuW00qU4bBXQTLBa29v3W3eDRGDTygrJ3Vm+esjPxxwbg9wVAt7JXiS5b99BtHEC
+         nnrgdhWBTQMIj2SgGq7l0YBxwTzbu8s/66Sx+OzzgVokVSCv3PLGEImxiRQYv4fojWhd
+         CIbd+TpqV4LPGrFz6F4aoRpSveJm+dXbPT/COLpwSGqp3I7btL7swU8fxdfmO0H7VAWG
+         /AiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773824247; x=1774429047;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:reply-to:user-agent
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OudNO2OnvwTpIE96QJS7IaE3Xw3RCtNFDCoe4J2lk3A=;
+        b=BT3tFE2Px90yiX+yT6rnU3F0aWl9ybX+LGahEJbiCLUhpu16rBRTGGFYk/WzvArk2S
+         VubixdVPqplmZWhR93JAJ0iZm1XR/v4OOBqLLvwOPm+QHqCGx8BS12G+BzVrEGbQ5mC+
+         ViCmRXeVnlOexD+0ev1jkG1INJ73KkA+8NZPWsX1d9yK8I7JGRug2OroIFlmmcMAYc8R
+         Bl+VgKUAHRGI8FiZzCI84EzV1Tm2EyH58Fikz+HmVd1FG2ojIqRZ4lrtc775oKx8ay/R
+         AMPSO/RZMk3tb8JqbbdRHpEXrgJSJ5NnAfda0voWq+3kvlHuCWxPTRtBqX2uThIc6s2Z
+         T56w==
+X-Forwarded-Encrypted: i=1; AJvYcCUPhwJrFo+mwJpRcKbVykpMugR+MrLmIfRSESIFhmZrydtcPpgB2gV3GXTmWr/+9tgN9WTxZw4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIXR6T6CWNPSpbC5NzPOwZ3eB94wV4lP47xg2uUuauIdepjJEo
+	9mymjYRKbHNALzHifgLKu7IZhrLZjhA5c90JMg2YmDX9edcb95aHe2Wl5PW9GrpLXDw=
+X-Gm-Gg: ATEYQzyiVN4ZymkyTN12C3ckh4eiWecWAaxZUWn3COcKdzYirjIjkXzPWfOBoGnio0G
+	7fjYGqMnsQWLyBo4bTPBnQBxAs5HbEbat2bO12zNyka57TL2TFC6LcuaY6HC0RopXu91mriUxPN
+	GvaxJgwPUlpap1rBTucli3hjO1nMGJACqA6Xcr1qvsgSjiciCvrMip12UWAGpSnIdlau3hUaBZC
+	CH8xfZY9usVQHjhSpv3G0+hmPxNxrxOVMPvT9AHz6xeCId5qoleuRj+S1gZuvQ52LnS4j8uj3Dk
+	QvObMXtQY95XelajcGxKYHA7koeiVcn1X13ZrnCQRhsgOFWEgXtkcw9JwTs+5qPmZzsWqW7e8xf
+	slPdeiKyl1yPogl5+CWKhMgC/n09TrcQvoV6jUXFtfIkQNeRFLzuWfRKVzHu0zuGsboBET6F1WR
+	0OyroHBaetwitvpDdGvCWkhq0KDshwrUFJYSIBoWh+S6Lq0lsRKjM87C0sUfIlb1+ff3H9mbSn6
+	PpS07s=
+X-Received: by 2002:a05:600c:4fc4:b0:485:3423:727d with SMTP id 5b1f17b1804b1-486f4476ce8mr38072065e9.26.1773824246935;
+        Wed, 18 Mar 2026 01:57:26 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:106d:1080:ac75:790f:ef3c:2eb0? ([2a01:e0a:106d:1080:ac75:790f:ef3c:2eb0])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4856eaffbbdsm124891015e9.15.2026.03.18.01.57.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Mar 2026 01:57:26 -0700 (PDT)
+Message-ID: <b48e092a-fcee-4065-a8ef-862245b9e2eb@linaro.org>
+Date: Wed, 18 Mar 2026 09:57:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4516.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 604ab3c1-134b-4b97-80c1-08de84cc49a9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Mar 2026 08:56:47.6875
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: sB6qkgMvAQQVrH4aE9B7UaQPwN4bd0UJIUnvl2DeZONb7NtKjo/IOgfU/wWIC5N+W6ELUOUT8l2CJT0L7gVaLw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8308
-X-Spamd-Result: default: False [2.44 / 15.00];
+User-Agent: Mozilla Thunderbird
+Reply-To: Neil Armstrong <neil.armstrong@linaro.org>
+Subject: Re: [PATCH 2/2] arm64: dts: qcom: Add qcs9075-radxa-airbox-q900
+To: Mecid Urganci <mecid@mecomediagroup.de>, andersson@kernel.org,
+ konradybcio@kernel.org
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ richardcochran@gmail.com, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20260318083621.470826-1-mecid@mecomediagroup.de>
+ <20260318083621.470826-3-mecid@mecomediagroup.de>
+From: Neil Armstrong <neil.armstrong@linaro.org>
+Content-Language: en-US, fr
+Autocrypt: addr=neil.armstrong@linaro.org; keydata=
+ xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
+ GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
+ BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
+ qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
+ 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
+ AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
+ OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
+ Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
+ YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
+ GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
+ UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
+ GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
+ yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
+ QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
+ SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
+ 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
+ Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
+ oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
+ M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
+ 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
+ KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
+ 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
+ QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
+Organization: Linaro
+In-Reply-To: <20260318083621.470826-3-mecid@mecomediagroup.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268928-lists,netdev=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-268929-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	HAS_ORG_HEADER(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	HAS_REPLYTO(0.00)[neil.armstrong@linaro.org];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danieller@nvidia.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[neil.armstrong@linaro.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5]
-X-Rspamd-Queue-Id: 22E292B88FD
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	REPLYTO_EQ_FROM(0.00)[]
+X-Rspamd-Queue-Id: 2668B2B8931
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbG9rIFRpd2FyaSA8YWxvay5h
-LnRpd2FyaUBvcmFjbGUuY29tPg0KPiBTZW50OiBXZWRuZXNkYXksIDE4IE1hcmNoIDIwMjYgMTA6
-MzQNCj4gVG86IERhbmllbGxlIFJhdHNvbiA8ZGFuaWVsbGVyQG52aWRpYS5jb20+OyBrdWJhQGtl
-cm5lbC5vcmc7DQo+IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7IG1rdWJlY2VrQHN1c2UuY3oNCj4g
-Q2M6IGFsb2suYS50aXdhcmlAb3JhY2xlLmNvbTsgYWxvay5hLnRpd2FyaWxpbnV4QGdtYWlsLmNv
-bQ0KPiBTdWJqZWN0OiBbUEFUQ0ggZXRodG9vbF0gY21pczogRml4IGluY29ycmVjdCBMU0IgZmll
-bGQgdXNlZCBmb3Igd2F2ZWxlbmd0aA0KPiB0b2xlcmFuY2UNCj4gDQo+IFRoZSB3YXZlbGVuZ3Ro
-IHRvbGVyYW5jZSBjYWxjdWxhdGlvbiBtaXN0YWtlbmx5IHVzZXMgdGhlIG5vbWluYWwgd2F2ZWxl
-bmd0aA0KPiBMU0IgZmllbGQgKENNSVNfTk9NX1dBVkVMRU5HVEhfTFNCKSBpbnN0ZWFkIG9mIHRo
-ZSBjb3JyZWN0IHRvbGVyYW5jZSBMU0INCj4gZmllbGQgKENNSVNfV0FWRUxFTkdUSF9UT0xfTFNC
-KS4gVGhpcyBjYXVzZXMgaW5jb3JyZWN0IHZhbHVlcyB0byBiZQ0KPiByZXBvcnRlZCBmb3IgdGhl
-ICJMYXNlciB3YXZlbGVuZ3RoIHRvbGVyYW5jZSIuDQo+IA0KPiBVc2UgQ01JU19OT01fV0FWRUxF
-TkdUSF9MU0IgLT4gQ01JU19XQVZFTEVOR1RIX1RPTF9MU0IuDQo+IA0KPiBGaXhlczogMzQ0OGEy
-ZjczZTc3ICgiY21pczogQWRkIEpTT04gb3V0cHV0IGhhbmRsaW5nIHRvIC0tbW9kdWxlLWluZm8g
-aW4gQ01JUw0KPiBtb2R1bGVzIikNCj4gU2lnbmVkLW9mZi1ieTogQWxvayBUaXdhcmkgPGFsb2su
-YS50aXdhcmlAb3JhY2xlLmNvbT4NCj4gLS0tDQo+ICBjbWlzLmMgfCAyICstDQo+ICAxIGZpbGUg
-Y2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRpZmYgLS1naXQg
-YS9jbWlzLmMgYi9jbWlzLmMNCj4gaW5kZXggMzA1ODE0Yy4uMzQ1Y2UxYyAxMDA2NDQNCj4gLS0t
-IGEvY21pcy5jDQo+ICsrKyBiL2NtaXMuYw0KPiBAQCAtMjc2LDcgKzI3Niw3IEBAIHN0YXRpYyB2
-b2lkIGNtaXNfc2hvd19taXRfY29tcGxpYW5jZShjb25zdCBzdHJ1Y3QNCj4gY21pc19tZW1vcnlf
-bWFwICptYXApDQo+ICAJCQkJICAgICAgICJubSIpOw0KPiAgCQltb2R1bGVfcHJpbnRfYW55X2Zs
-b2F0KCJMYXNlciB3YXZlbGVuZ3RoIHRvbGVyYW5jZSIsDQo+ICAJCQkJICAgICAgICgoKG1hcC0N
-Cj4gPnBhZ2VfMDFoW0NNSVNfV0FWRUxFTkdUSF9UT0xfTVNCXSA8PCA4KSB8DQo+IC0JCQkJICAg
-ICAgICBtYXAtDQo+ID5wYWdlXzAxaFtDTUlTX05PTV9XQVZFTEVOR1RIX0xTQl0pICogMC4wNSks
-DQo+ICsJCQkJICAgICAgICBtYXAtDQo+ID5wYWdlXzAxaFtDTUlTX1dBVkVMRU5HVEhfVE9MX0xT
-Ql0pICogMC4wNSksDQo+ICAJCQkJICAgICAgICJubSIpOw0KDQpIaSwgdGhhbmtzIGZvciBub3Rp
-Y2luZyB0aGlzIQ0KQnV0IGFjdHVhbGx5IHRoZSBvcmlnaW5hbCBjb2RlIHdhczoNCg0KcHJpbnRm
-KCJcdCUtNDFzIDogJS4zbGZubVxuIiwgIkxhc2VyIHdhdmVsZW5ndGggdG9sZXJhbmNlIiwNCiAg
-ICAgICAgICAgKCgobWFwLT5wYWdlXzAxaFtDTUlTX1dBVkVMRU5HVEhfVE9MX01TQl0gPDwgOCkg
-fA0KICAgICAgICAgICBtYXAtPnBhZ2VfMDFoW0NNSVNfV0FWRUxFTkdUSF9UT0xfTFNCXSkgKiAw
-LjAwNSkpOw0KDQpTbyBtYXliZSB1c2UgdGhlIG9yaWdpbmFsIHdheSBpbnN0ZWFkLCBhbmQgbXVs
-dGlwbHkgYnkgMC4wMDU/DQoNCj4gIAl9DQo+ICB9DQo+IC0tDQo+IDIuNTAuMQ0KDQo=
+Hi,
+
+On 3/18/26 09:36, Mecid Urganci wrote:
+> Add device tree support for the Radxa AirBox Q900 board based on the
+> Qualcomm QCS9075 SoC (Lemans Family).
+> 
+> This board features HDMI 2.0 via dp0, 2x USB 3.1 Gen 2 ports,
+> 2x 2.5GbE Ethernet ports and onboard UFS storage.
+> 
+> Further information: https://radxa.com/products/fogwise/airbox-q900/
+> 
+> Functionality has been tested and confirmed working via an Armbian
+> Debian Trixie build.
+> 
+> Signed-off-by: Mecid Urganci <mecid@mecomediagroup.de>
+> Made-with: Cursor
+> ---
+>   arch/arm64/boot/dts/qcom/Makefile             |    1 +
+>   .../dts/qcom/qcs9075-radxa-airbox-q900.dts    | 1012 +++++++++++++++++
+>   2 files changed, 1013 insertions(+)
+>   create mode 100644 arch/arm64/boot/dts/qcom/qcs9075-radxa-airbox-q900.dts
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/Makefile b/arch/arm64/boot/dts/qcom/Makefile
+> index a4dc9e8b2d25..c8b7dd67806d 100644
+> --- a/arch/arm64/boot/dts/qcom/Makefile
+> +++ b/arch/arm64/boot/dts/qcom/Makefile
+> @@ -180,6 +180,7 @@ qcs8300-ride-el2-dtbs := qcs8300-ride.dtb monaco-el2.dtbo
+>   
+>   dtb-$(CONFIG_ARCH_QCOM)	+= qcs8300-ride-el2.dtb
+>   dtb-$(CONFIG_ARCH_QCOM)	+= qcs8550-aim300-aiot.dtb
+> +dtb-$(CONFIG_ARCH_QCOM)	+= qcs9075-radxa-airbox-q900.dtb
+>   dtb-$(CONFIG_ARCH_QCOM)	+= qcs9100-ride.dtb
+>   dtb-$(CONFIG_ARCH_QCOM)	+= qcs9100-ride-r3.dtb
+>   
+> diff --git a/arch/arm64/boot/dts/qcom/qcs9075-radxa-airbox-q900.dts b/arch/arm64/boot/dts/qcom/qcs9075-radxa-airbox-q900.dts
+> new file mode 100644
+> index 000000000000..8b5202b527cb
+> --- /dev/null
+> +++ b/arch/arm64/boot/dts/qcom/qcs9075-radxa-airbox-q900.dts
+> @@ -0,0 +1,1012 @@
+> +// SPDX-License-Identifier: BSD-3-Clause
+> +/*
+> + * Copyright (c) 2026 Mecid Urganci
+> + */
+> +
+> +/dts-v1/;
+> +
+> +#include <dt-bindings/gpio/gpio.h>
+> +#include <dt-bindings/leds/common.h>
+> +#include <dt-bindings/regulator/qcom,rpmh-regulator.h>
+> +
+> +#include "lemans.dtsi"
+> +#include "lemans-pmics.dtsi"
+> +
+> +/ {
+> +	model = "Radxa AIRbox Q900";
+
+The radxa pages shows "Radxa Fogwise® AIRbox Q900", why did you drop Fogwise ?
+
+> +	compatible = "radxa,airbox-q900", "qcom,qcs9075", "qcom,sa8775p";
+> +
+
+<snip>
+
+> +
+> +	dp0-connector {
+> +		compatible = "dp-connector";
+> +		label = "eDP0";
+> +		type = "full-size";
+> +
+> +		port {
+> +			dp0_connector_in: endpoint {
+> +				remote-endpoint = <&mdss0_dp0_out>;
+> +			};
+> +		};
+
+The device has an HDMI output, and this is probably provided by a DP to HDMI IC,
+please represent it here.
+
+> +	};
+> +};
+> +
+
+<snip>
+
+> +};
+> +
+> +/ {
+> +	thermal-zones {
+> +		cpu-0-0-0-thermal {
+> +			polling-delay-passive = <1000>;
+> +			polling-delay = <5000>;
+> +
+> +			trips {
+> +				fan_on: fan-on {
+> +					temperature = <40000>;
+> +					hysteresis = <5000>;
+> +					type = "active";
+> +				};
+> +			};
+> +
+> +			cooling-maps {
+> +				map-fan {
+> +					trip = <&fan_on>;
+> +					cooling-device = <&fan0 1 1>;
+> +				};
+> +			};
+> +		};
+> +	};
+
+So the fan only cools the cpu0 ?? not the gpu ?
+
+Neil
+
+> +};
+
 
