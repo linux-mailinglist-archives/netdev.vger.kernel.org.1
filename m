@@ -1,192 +1,253 @@
-Return-Path: <netdev+bounces-269134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269136-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MJerKBrbummfcgIAu9opvQ
-	(envelope-from <netdev+bounces-269134-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:04:26 +0100
+	id kHdyK7PYumkycgIAu9opvQ
+	(envelope-from <netdev+bounces-269136-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:54:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22B7B2BFE00
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 18:04:26 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 748B12BFAF5
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 17:54:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DF5BF314B1DC
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:49:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 21524306EB3D
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 16:50:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30F930FF27;
-	Wed, 18 Mar 2026 16:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A9329B8CF;
+	Wed, 18 Mar 2026 16:43:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X8EhnC6Z"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="MGKHeso4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7390F262FE7;
-	Wed, 18 Mar 2026 16:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773852057; cv=none; b=d8fy2x5PvS6l/Ty+kYPzY9/sMet+Hx7M9BTFa+xk7f4skWZKzEOx3dwOoiSwxMWqyzrxNnVeHWzSRWk7mMMiPqmqx5z7+rtau1Tv4Opj2h65Lt4cKhHfUxYh2egcdpWyDH7sTe+kmPcoFRkYDJVlixdFyDuPxX47hfpBfHPgWro=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773852057; c=relaxed/simple;
-	bh=cCxUOeE6RighpWkLGXMN/D7fFVTQx+9Fs+jSDEJEO10=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q6wAWku5Cr1yv7YqYmnTCsvg/RBaGvA5g6x4ZW0rZmBA6uRpC5qQi3BuR4vg/t+2MwrpFs4ZJfqEnK4l04FhNGlAtoUYq6ivlb9VQd/8K/F8NJx+GTDOZURXO2zBooY9XRDUtWKCWO+RRPUIHYe71eLMUSk/OTR2+9mpgPG2ioo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X8EhnC6Z; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773852056; x=1805388056;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=cCxUOeE6RighpWkLGXMN/D7fFVTQx+9Fs+jSDEJEO10=;
-  b=X8EhnC6Zcrtd6/J7dK/pdVNJzqEzcgvYLs47Gu85XUsZyQYi5V7coX6y
-   hs2hZJb40/shX/Rplo+XZY5yO0MHfx0UMgRbyIFz4JyxzBsRMSryDm1/m
-   oNGEsPmxv7I7KdG5F+4HmquWxhkymFDJa/SN/iJMLgiJTsrg/F1A93oZA
-   R/2k0bXIZ0wAeTIauW4xEWoj86/vfkgLuXRX4ZE4U0tygnhRwN/g8nnjJ
-   Nw5mvOiqmn4SiWpKSLbnO1PiJl0BlTZAYDbcdSZgqX1WSjX1A7cxwp2Ts
-   ugJje7NGzGxFftnF7CSBRJARFfEJsKOpsUCE8NK0lu9Fk08jvhJetKa/z
-   g==;
-X-CSE-ConnectionGUID: 6sVA3qAFQ9qHhR13YhNBcg==
-X-CSE-MsgGUID: n83Wt9+1SbWfJsfblZTuog==
-X-IronPort-AV: E=McAfee;i="6800,10657,11733"; a="85614471"
-X-IronPort-AV: E=Sophos;i="6.23,127,1770624000"; 
-   d="scan'208";a="85614471"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2026 09:40:55 -0700
-X-CSE-ConnectionGUID: RXFmq2aSTdG3uPRWe1kfKQ==
-X-CSE-MsgGUID: 1E4LIznmQsGefMYE6VdjGQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,127,1770624000"; 
-   d="scan'208";a="253162885"
-Received: from pgcooper-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.240])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2026 09:40:52 -0700
-Date: Wed, 18 Mar 2026 18:40:50 +0200
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Sean Chang <seanwascoding@gmail.com>
-Cc: Chuck Lever <cel@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	David Laight <david.laight.linux@gmail.com>,
-	Anna Schumaker <anna@kernel.org>, netdev@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] sunrpc: simplify dprintk() macros and cleanup
- redundant debug guards
-Message-ID: <abrVkvbmhQsAA0rZ@ashevche-desk.local>
-References: <20260303140725.86260-1-seanwascoding@gmail.com>
- <de652c45-9492-4bb8-a173-efce703b5174@app.fastmail.com>
- <CAAb=EJViPvhD_ndONoU=OPcD_EXpA0Mh8500NJ9g9W_X0SpYRA@mail.gmail.com>
- <63721454-ffbe-4725-b2c3-843560a3d5e0@app.fastmail.com>
- <CAAb=EJVw8S9o+N2JcBQridSPeNOHQgpiFAPqeNV-X-uSxwjvqg@mail.gmail.com>
- <abljNCs_wjNELf6b@ashevche-desk.local>
- <CAAb=EJXA+SVPWLcWu1WRr-8A5Vk0k4za09+ROFqYX2eceH65XA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA7D2D640D
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 16:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773852235; cv=pass; b=l5wo5wwv7chRF3Ye6NRWPy6Gy/xjYC9Lvx9vL3jLno6EXZZs9y3sGHK020ckJhWxnC4gmr43nQt9BP6mJTQWe0yU6egKuTwEilnPfcMcTpnj6FWQgPGCYuim3NW8hpQMb77ECXwyxJFX9gdMtxAa3LFWSeE2m//yYlkRErJmKxw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773852235; c=relaxed/simple;
+	bh=zXZxPJ1K3LCBhZiouT+2oJJTTv9xMqRYKfOSsTOtYD4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cZtYFoRNRLS4tcDIt9ICoGN2Zx7oQ98guv6IGw1fsNvcrCutZuruDWcH6EcEOgsiBCI/ZNP/AxFOGLeXhVQ9W1xv8CWiy8FgcndMCv61qqkSQUsylanbaMpheIjPjuQsyR1aKBN3V4LsbIwWxps7y5iJIyc/LmN4JzT+rSAcsOg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=MGKHeso4; arc=pass smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2b04e6a989eso29025ad.3
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 09:43:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773852233; cv=none;
+        d=google.com; s=arc-20240605;
+        b=HPCNKU89SVQvBNXJI4PKE2+up1INMQmuLnX8rzWMQHa3bqQ3+ysDmilbG9ebbJ03Cg
+         7iIiwX7MGFHQX3C1ILtVQewmO0yMRqR3RUoHwy2cdSBeWF9jTFMkOkZ1HECL7VfCQ4VT
+         RAmk1Tsu64SM/VeJZ+i+jlb69iv3H1wDkwZGCXjhHsmZ9tyZPB0I3xl3x47oQguAmOMo
+         tAgm8YgpanJl7Q4enQh0bG7dHNE2eNKr/CesDVUbIYwg0Kg9ngCTTwY8mJan0/1QFPrf
+         HDlHX91cNP+v5+fGilzX8RWopz7DoBNmnmhwTLdGGnXWf98tVqq54X16+J9tw8Fb21wG
+         zP2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=PEcuY1KVmJxJTfhrnCiK85Ol/POWaIDlGkzA+uAqUrc=;
+        fh=KabuQ+jxCmlAyIDwUrccON6CILxShqNSp2Lshhvu5O8=;
+        b=ArBqCInQOlkuiRT76OATrjC3d9Z7j8ucdNIn6/NhvNuOCbGEj1rkv4IpUZubsGy+u0
+         8RjxmuMEJ/fWhwK5jE2yIQqrmIkVO3rGJ1ijkZWPFBSxSJfJ1eBTeSw3Emhz56iy8TAH
+         YhjD3Ye8e81RNBaxD+ZgRt/mp2/jdVqUNkOzUeeUuLzTSGVJYg77x9oUBJfIlseKPHk7
+         /S7zQDJ4QXq/L3R4D0LkwwVyVcdqbTQvkMxRCE9LDTMD9V3AkUFb6uRzvWKP/AWrgzxV
+         gZYrpxhAAGt4svHpLzGqiHlONRsgV1H7RR1C56kibU76kYDL0JxDdpzGMIoUoqOQ8n97
+         lreg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1773852233; x=1774457033; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PEcuY1KVmJxJTfhrnCiK85Ol/POWaIDlGkzA+uAqUrc=;
+        b=MGKHeso4Go86WhfyQXTWVzMbre9lUF5Omn2JSNl2Zc6jckdauZ6Uth9AxGK2jYQuZf
+         DiPMHwZOmk+jtgS+c1QbHRov7/nqdkzMuLdLmZNK40//FiHdnOpAnJgfZFSTBo/caq7/
+         zgVmEk7aeily+NtFAOx8ypbuQ8/0qZrHE1k+GUILQ+YAsTrNPZT87ci5fAp+gXHTk+94
+         QZmHV0BUuuk0Tqumx9bbHhlu8ihYLq92FLCrzQu3jn7C/IBNlOrSl0U1sy9QvZYwnPsM
+         P5hgALjH8aEBaAY2KI5+M4dewDvpB8pskMkmwkcqv6NwIHbixLpCVk6GQ+LMSmIRHZdT
+         t6BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773852233; x=1774457033;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PEcuY1KVmJxJTfhrnCiK85Ol/POWaIDlGkzA+uAqUrc=;
+        b=D1UbBqBL52zt4A2fQ2UhHbb3QHMFIwWmfVtIg+x2IU2iwHKO2MpGp+hKdckvDrtCCZ
+         DU5QCpX1df3KA8VjLROblGWAz55RvrmE3Rh1528BhV4ZxqMcuYz1Zwgf3l+fJxr2XJY+
+         7/bXT09iA6TJMmG7xbN85Licbe48p+oUZ+pQdYStY2w0aeXra+jrE4L/kkVQqvMKIHlb
+         9Qgz/3FgZvDkyIpRZZI2wO1coWgpJr9cdZVzpOa/BiHdMxOdws5QAbjHO/5c+CBrGlg6
+         5zLv+2olFztqGNQwwYTz+cDhdcabDoa9sV6WsJwvrtNEK4wRE61fz/Xm1NrIYBoZKEMa
+         LqQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVkbqhiqrxRbQ2iS2vyIxB5EYXy4bcVt/7AFCzq60NhNoGH3KBmnq0q8nSRkK2TynkfShl/6r0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytN8aFncI4FPjvH9i+Iuiay6BQ1I8/LiNyknYiI4hRKetK78zC
+	JvSSTk1BBnv8pYIkzybQpjRAgU4/mXWw+oqMaiP5xm6q+sOrLZYXNIVS8ACOJeTgwP2QjB53xpf
+	cM/qeRkZ3JbHuVSN3p5Fx4l2DErpbfJwX+qQ2pt9v
+X-Gm-Gg: ATEYQzzCDnyJf5cU9IF1hhY+k8l2r3+HTsaeOcvdSu79UX1cDe6tmis/Zl0qr+b//41
+	aN1g0v/Tj1mzD5hxnUa18POqmbUIjWLBRq/1rzWHwYyzF+q7JSlQgihxxCPCqq5KXvvwZ649ykE
+	OcSBIo1C2893wwh1UQzSgzKFOYNIM0OsvdpgtWD/aSj9HKtSUEu0UE0lSrNosBu5BqDI+u3H2oY
+	V+t5GnPAyNplAzJ8ZfZUM28ZgLAH4wKcKF3UbsFvY5FwZIqvUFEI4i2HFHExr6V6XiqxDnkX7zb
+	gle1GzIJp0NkWaRZ6Q==
+X-Received: by 2002:a17:903:8d0:b0:2b0:6cb5:c6c5 with SMTP id
+ d9443c01a7336-2b06e40be78mr48856105ad.49.1773852233544; Wed, 18 Mar 2026
+ 09:43:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAb=EJXA+SVPWLcWu1WRr-8A5Vk0k4za09+ROFqYX2eceH65XA@mail.gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+References: <20260315222150.121952-2-gnoack3000@gmail.com> <2697b9f672967b1318630f2ffa21914f@paul-moore.com>
+ <20260318.In1aekohyivu@digikod.net> <CAHC9VhRy2j3nYHHnyjsDf9Rk6=5DAzCSrmXgHCpo4arVnfBjRw@mail.gmail.com>
+ <20260318.wa0eef4tei6I@digikod.net>
+In-Reply-To: <20260318.wa0eef4tei6I@digikod.net>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 18 Mar 2026 12:43:41 -0400
+X-Gm-Features: AaiRm52R-QUl_6FyQWVZwfUo3fZbrNzCqZ0wswhLxEPTednSfNTcmKYhFSB11MY
+Message-ID: <CAHC9VhTkJ9s6SE2Hhg+zpg9R1-WF71e5HNJPENAc6krBCCyaRQ@mail.gmail.com>
+Subject: Re: [PATCH v6 1/9] lsm: Add LSM hook security_unix_find
+To: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>
+Cc: John Johansen <john.johansen@canonical.com>, 
+	Georgia Garcia <georgia.garcia@canonical.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>, 
+	James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, Tingmao Wang <m@maowtm.org>, 
+	Justin Suess <utilityemal77@gmail.com>, linux-security-module@vger.kernel.org, 
+	Samasth Norway Ananda <samasth.norway.ananda@oracle.com>, Matthieu Buffet <matthieu@buffet.re>, 
+	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, konstantin.meskhidze@huawei.com, 
+	Demi Marie Obenour <demiobenour@gmail.com>, Alyssa Ross <hi@alyssa.is>, Jann Horn <jannh@google.com>, 
+	Tahera Fahimi <fahimitahera@gmail.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[paul-moore.com,none];
+	R_DKIM_ALLOW(-0.20)[paul-moore.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269134-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269136-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	HAS_ORG_HEADER(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,oracle.com,gmail.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[canonical.com,gmail.com,namei.org,hallyn.com,maowtm.org,vger.kernel.org,oracle.com,buffet.re,huawei-partners.com,huawei.com,alyssa.is,google.com,linutronix.de,kernel.org,zeniv.linux.org.uk];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-0.989];
+	FROM_NEQ_ENVFROM(0.00)[paul@paul-moore.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[paul-moore.com:+];
+	NEURAL_HAM(-0.00)[-0.982];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,ashevche-desk.local:mid]
-X-Rspamd-Queue-Id: 22B7B2BFE00
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[paul-moore.com:dkim,paul-moore.com:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,maowtm.org:email,digikod.net:email]
+X-Rspamd-Queue-Id: 748B12BFAF5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 19, 2026 at 12:21:41AM +0800, Sean Chang wrote:
-> On Tue, Mar 17, 2026 at 10:20 PM Andy Shevchenko
-> <andriy.shevchenko@intel.com> wrote:
-> > > > > > Does this patch fixes also 202603110038.P6d14oxa-lkp@intel.com?
+On Wed, Mar 18, 2026 at 12:22=E2=80=AFPM Micka=C3=ABl Sala=C3=BCn <mic@digi=
+kod.net> wrote:
+> On Wed, Mar 18, 2026 at 10:44:26AM -0400, Paul Moore wrote:
+> > On Wed, Mar 18, 2026 at 4:48=E2=80=AFAM Micka=C3=ABl Sala=C3=BCn <mic@d=
+igikod.net> wrote:
+> > > On Tue, Mar 17, 2026 at 05:34:57PM -0400, Paul Moore wrote:
+> > > > On Mar 15, 2026 =3D?UTF-8?q?G=3DC3=3DBCnther=3D20Noack?=3D <gnoack3=
+000@gmail.com> wrote:
 > > > > >
-> > > > > Regarding the LKP report:
-> > > > > I have reproduced the Sparse warning (void vs int mismatch) locally.
-> > > > > To resolve this, I'll use the do-while(0) form in v3 to ensure the macro
-> > > > > always evaluates to void:
-> > > > > -# define dfprintk(fac, ...)            no_printk(__VA_ARGS__)
-> > > > > -# define dfprintk_rcu(fac, ...)        no_printk(__VA_ARGS__)
-> > > > > +# define dfprintk(fac, ...)            do { no_printk(__VA_ARGS__); } while (0)
-> > > > > +# define dfprintk_rcu(fac, ...)        do { no_printk(__VA_ARGS__); } while (0)
+> > > > > Add a LSM hook security_unix_find.
+> > > > >
+> > > > > This hook is called to check the path of a named unix socket befo=
+re a
+> > > > > connection is initiated. The peer socket may be inspected as well=
+.
+> > > > >
+> > > > > Why existing hooks are unsuitable:
+> > > > >
+> > > > > Existing socket hooks, security_unix_stream_connect(),
+> > > > > security_unix_may_send(), and security_socket_connect() don't pro=
+vide
+> > > > > TOCTOU-free / namespace independent access to the paths of socket=
+s.
+> > > > >
+> > > > > (1) We cannot resolve the path from the struct sockaddr in existi=
+ng hooks.
+> > > > > This requires another path lookup. A change in the path between t=
+he
+> > > > > two lookups will cause a TOCTOU bug.
+> > > > >
+> > > > > (2) We cannot use the struct path from the listening socket, beca=
+use it
+> > > > > may be bound to a path in a different namespace than the caller,
+> > > > > resulting in a path that cannot be referenced at policy creation =
+time.
+> > > > >
+> > > > > Cc: G=C3=BCnther Noack <gnoack3000@gmail.com>
+> > > > > Cc: Tingmao Wang <m@maowtm.org>
+> > > > > Signed-off-by: Justin Suess <utilityemal77@gmail.com>
+> > > > > ---
+> > > > >  include/linux/lsm_hook_defs.h |  5 +++++
+> > > > >  include/linux/security.h      | 11 +++++++++++
+> > > > >  net/unix/af_unix.c            | 13 ++++++++++---
+> > > > >  security/security.c           | 20 ++++++++++++++++++++
+> > > > >  4 files changed, 46 insertions(+), 3 deletions(-)
 > > > >
-> > > > Wouldn't be better to drop ({}) in nfs_error*() macros?
+> > > > Some really minor nitpicky things (below), but nothing critical.
+> > > > However, as we discussed, I would like to see the AppArmor folks co=
+mment
+> > > > on the new hook before we merge anything as I know they have an int=
+erest
+> > > > here.
 > > >
-> > > I understand that the ({}) wrapper might look redundant at first
-> > > glance. However,
-> > > even if I remove it, the return type remains an issue because no_printk() (which
-> > > dprintk() expands to) already contains its own ({}) statement expression.
-> > >
-> > > To resolve this without refactoring errorf(), which hasn't been
-> > > touched in years,
-> > > I believe modifying dfprintk() is the better path.
-> > >
-> > > One alternative is to explicitly force the return type to void like this:
-> > > ({ dprintk(fmt "\n", ##__VA_ARGS__); (void)0; })
-> > >
-> > > While this ensures the return type remains void (consistent with the
-> > > behavior before
-> > > dprintk() was redefined), it is admittedly clunky. We could wrap
-> > > (void)0 in a macro like
-> > > #define nothing_to_do ((void)0), but that adds unnecessary complexity.
-> > >
-> > > Therefore, I still prefer Option 1, as it restores the original
-> > > behavior from before the
-> > > recent commits and maintains the cleanest code structure for this subsystem.
-> > > What do you think?
+> > > John, Georgia, we've been discussing this new hook for a few months n=
+ow
+> > > but didn't hear from you yet.  We plan to merge this patch series wit=
+h
+> > > the 7.1 merge window (in a few weeks), so before that I'd like to mer=
+ge
+> > > it in -next in a few days to get a broader coverage.  I'm pretty sure
+> > > this hook will work well with AppArmor too, but could you please take
+> > > look to confirm?
 > >
-> > Personally I found the ({}) in nfs_error*() redundant and the point of those
-> > functions not being touched in years doesn't work for internal APIs. Do you
-> > know the reason why it wasn't touched? Perhaps there was nothing to do simply
-> > with that until dprintk() issue reveals some (legacy?) stuff to improve.
+> > I probably wasn't as clear as I should have been, my apologies.  The
+> > major reason I held back my ACK on this patch was that I wanted to
+> > hear from the AA folks regarding the hook's suitability for their
+> > needs.  While I don't expect they will have an issue with this hook
+> > as-is, they have expressed interest in the hook, and I would just
+> > assume make sure it is okay for everyone before we send it to Linus.
 > >
-> > I would not go with (void)0 approach, but I also think that dropping unneeded
-> > (if confirmed) expression wrapping is a good thing to do.
+> > Since this is a feature addition and not a critical bug fix, I will be
+> > quite upset if this is sent to Linus without review by the AA
+> > developers and my ACK.
+>
+> I definitely understand and that makes sense, but even if it is not a
+> strict fix, please consider that this feature still fixes an important
+> gap in practice (e.g. run anything outside a sandbox with the help of
+> systemd; see cover letter and reported issues [1]).  I don't want to
+> bypass anyone, but given the importance of this change, I don't want to
+> postpone it either (except if there is a major issue of course, but I
+> think the review was pretty good).
 
-> Thanks for your comment, how about removing the ({}) and ternary operator to
-> prevent sparse throw incompatible types. And use the do{} while(0) to prevent
-> dangling-else problem.
+I understand the desire to close the gap, but as this is a known
+limitation of the existing Landlock implementation, I don't think this
+is a MUST (in the RFC sense) for the next merge window.  It's
+definitely a want, and a *very* nice to have, but if they AA folks
+need some more time to sort things out after what has happened
+recently I think we can afford them that in this case.
 
-LGTM.
+> That's why we'd like to get some
+> feedback sooner than later.  While waiting for AA folks feedback, would
+> you still be OK for me to push it to -next to improve test and review
+> coverage?
 
-> #define nfs_errorf(fc, fmt, ...) do { \
->     if ((fc)->log.log) \
->         errorf(fc, fmt, ## __VA_ARGS__); \
->     else \
->         dprintk(fmt "\n", ## __VA_ARGS__); \
-> } while (0)
+That's fine, my comment about "sent to Linus" was deliberate.  Feel
+free to do what is appropriate to gather additional testing.
 
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+--=20
+paul-moore.com
 
