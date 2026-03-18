@@ -1,177 +1,218 @@
-Return-Path: <netdev+bounces-268888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-268892-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MCw3Ji5IumkFTwIAu9opvQ
-	(envelope-from <netdev+bounces-268888-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:37:34 +0100
+	id 4DycMvpKummWTwIAu9opvQ
+	(envelope-from <netdev+bounces-268892-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:49:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 128A22B67C4
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:37:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FFA22B68E1
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 07:49:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E84F33039696
-	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 06:37:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 92A243057E8B
+	for <lists+netdev@lfdr.de>; Wed, 18 Mar 2026 06:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFC0D364054;
-	Wed, 18 Mar 2026 06:37:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BA136894C;
+	Wed, 18 Mar 2026 06:49:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="yDKhSlRR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YbT3p7Iw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFB125C80E;
-	Wed, 18 Mar 2026 06:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5313A4A02
+	for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 06:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773815851; cv=none; b=AyYDZ7C/69Bdbb7tsyVCa5r/OQ5mrNGpAxewJ0jb8HA37pNUV8hPf6RQqMXn5W1Vn81YmMYxk9PkX/f7akehksJuv4trn5LVEFTfR1VVBodccvDcd2e2RQoJoT53o3pBEeIkRCJlKTxQSfgvjBVkPgP6NsrEw1KSgVNteevUjwo=
+	t=1773816539; cv=none; b=KWYCdddgoLI1qebk6UugwriwwvjBjCHYyYRcbTUNzLpYoC8/+2/tw8GtaSLZckXNi8pQAHRVclsdNPQebZe1K2cXrGJDgzbMYW4KHx7zr0vO+L1e4tunj/eS9fqe/pLtDz8c8hRAyQ0HjIRUFaRQxaZaDZ+EcobMxKwSTN5pmZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773815851; c=relaxed/simple;
-	bh=MmY12uRNDdhfGh7T/XYLMYSoZmpnUMejZkZjvuvpHRE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bmuq8w/FCI18FaWCS8/gopnMnikdTJ11bPpV1Z3O36lAwJz9RYGdIJ8G3e6uA0sEuR9vbzy5oYoBoB9pDhl9R6uEwSH3JO/rjHjHDaRQmJqciljPE1LloEEj8ZJcZ+ALaEMzTrJi4ytf0qvAlmIvNVjjIoAYUiHR2n9qjbsewrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=yDKhSlRR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6937C19421;
-	Wed, 18 Mar 2026 06:37:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1773815851;
-	bh=MmY12uRNDdhfGh7T/XYLMYSoZmpnUMejZkZjvuvpHRE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=yDKhSlRRPuRXcV2Imh7yPJa4eoRUif2NWvEvAr89riGfEopv7LrWSiSdg6kKGHYeS
-	 O9MxU+45mwTKBoSFz/D+Cb9YorEH+XmCoygXU8bq27scrEclBOk+//aEUYZKdSi3Od
-	 MEhu3AD96RBuEzd9MADNNXn/I8iLwbVoxLyoXFCo=
-Date: Wed, 18 Mar 2026 07:37:12 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Omer Zalman <omerzalman42@gmail.com>
-Cc: oliver@neukum.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: usb: cdc_ncm: prevent silent u16 truncation in
- min_tx_pkt_store()
-Message-ID: <2026031801-skiing-decade-eccd@gregkh>
-References: <20260318040632.69531-1-omerzalman42@gmail.com>
- <20260318040632.69531-2-omerzalman42@gmail.com>
+	s=arc-20240116; t=1773816539; c=relaxed/simple;
+	bh=Qj1QkGketFTLM6FhMiga1uXkk9E+QIhjnrMOjTAq2ZY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PazMCrC2L4/AtJlynEV1jx1eWbG9p6PEFioOSita6ZaiWDpYRLBsmruLOX5hwx++9PCSzaE63Ba9WV9b/4ctRGQ1vFr5dHr5Y0ISRpwRMgTrFSJ9P/5OP5nculu/C7JZzICrrIsjHygEo2MLN9iLMOzDjO4FuS43ZsNFPOynw/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YbT3p7Iw; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2b05761bec1so2623225ad.1
+        for <netdev@vger.kernel.org>; Tue, 17 Mar 2026 23:48:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773816537; x=1774421337; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cwVGV5+seuNEQDXpmjKxLE/WMiIEl6PzK6G5vJJXXZA=;
+        b=YbT3p7IwofRR4B71gvIvW4EYvPkkHFAZKnxd325boEmEBFUL/kF+aumEjLzU6wTeVi
+         J4wJ1MlBDsN9y0A5iwvtdSJ6WmSy1fgLfWvB1FcCA0c8hEajcFDp+KLme9ciDi1sDa9W
+         wnj86JwfQquO42V7nWuafBoYJRLPlLE19MJG+CpRN+HqUHcmgB/T5sXbp7udQ4DobENp
+         Xa/wkzsznNFEVBZm/0k3L+K7vwji1nj4hG6WTj/rGJcx2MP6k5mzBQJ72ADF+v+qddPj
+         LNIAfnrimodMiZ9rkFX+rnCICM9/mmWOs4sgDi4BOs8m1Dd4IA6kPtUJd0AnV3ZN6DcP
+         1olQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773816537; x=1774421337;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cwVGV5+seuNEQDXpmjKxLE/WMiIEl6PzK6G5vJJXXZA=;
+        b=qxGECOqrknN94QbopnZh7T9bMYe+By/pXNKwTVKAqO3bofBwpRpaz/JN5zQsEZPHsJ
+         wMOvXDzvJpFTFqhkrATDWOJcQyRiEftX85yERmHdq7L04OF7o59xRm9o95QotmxNRWF+
+         IoL3QudZhPxTZw5mRWseZz6mPO+XfUKI2IyCFrseeLvqhmOXBopulqIFdrYQZRBiyoPp
+         sjfWAeC5pNdNTvbJeMypswVTn+nZm1V6yFuYOIKDndVcgFKWL9c97uwIlXbEEq0cgfcD
+         rWj+AmeGJT9BbVRrraCUX0pta9xdtFg7b5pYTkPrGcNJEiFO1hZwThYfhpDqadk/zOL+
+         WWDw==
+X-Gm-Message-State: AOJu0YxbNZQpGUMHM//f//atHHfzodJQTKainZ/NhGGtCjgDoAAKhmBS
+	Sk6jaO1HYeq9IRHRN6+FS2vljTb1XmHF2YShmeAjTo6Z2DGLr2PDKhqq
+X-Gm-Gg: ATEYQzxxqbMM8VG7aXLGzHRmd09Dj8rjEImxLTHuqx2byxZ/yzdYq4dXW1s2svU5cKB
+	sst3OTs05mzvqMH0Gc/Trrhe3B32g9UyYbXD1Oug9ygwWzWeAOvfCRchEXEeAWjfo1Q7DBg5ZXR
+	RN06mIMUllTqNwwa+BdCS8PqABZ7u743ko3ftoSbMg/gSpiTSEN7/SKIRSt/SK7UkYLyj3BqqC0
+	/4ikSY8Eao95sL1SJ9LGndZ0tUg9aK98ZT2nM6QjtVaGu9Uab+Nz6wIO64W6lFUn2mLKRuzq8jj
+	6qLz0GddWT/cyaqIxgyVfoQ7QMUEBpyylGVD0aZK2ARQhdccJ0dIAMAZ5c4d32J49FXPWqdEUoT
+	MHXYCZ6HK+jyWSNxS1Ic9XxESQ10kP5VKnZTf7hyECcjgWuy6kgHTjHuaZR5WNN+4MPqksa9iEg
+	fcIyjv/vaeNyU+Mo7FuYTnbMToaGzdc1K/
+X-Received: by 2002:a17:903:94b:b0:2ae:5a38:96bb with SMTP id d9443c01a7336-2b06357efd3mr61873795ad.2.1773816536783;
+        Tue, 17 Mar 2026 23:48:56 -0700 (PDT)
+Received: from localhost.localdomain ([101.5.20.107])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b06e6315dcsm19262845ad.80.2026.03.17.23.48.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Mar 2026 23:48:55 -0700 (PDT)
+From: Qi Tang <tpluszz77@gmail.com>
+To: alibuda@linux.alibaba.com,
+	dust.li@linux.alibaba.com,
+	sidraya@linux.ibm.com,
+	wenjia@linux.ibm.com
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Qi Tang <tpluszz77@gmail.com>
+Subject: [PATCH net] net/smc: fix double-free of smc_spd_priv when tee() duplicates splice pipe buffer
+Date: Wed, 18 Mar 2026 14:48:47 +0800
+Message-ID: <20260318064847.23341-1-tpluszz77@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260318040632.69531-2-omerzalman42@gmail.com>
-X-Spamd-Result: default: False [3.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-268888-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-268892-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linuxfoundation.org:dkim]
-X-Rspamd-Queue-Id: 128A22B67C4
+	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4FFA22B68E1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 17, 2026 at 11:06:32PM -0500, Omer Zalman wrote:
-> min_tx_pkt is a u16 field but the sysfs store handler accepted any
-> unsigned long and assigned it directly. Values that do not fit in 16
-> bits silently truncate: writing 65537 wraps to 1, turning a
-> "never pad" intent into "always pad".
-> 
-> ctx->tx_max can itself reach 65537 because cdc_ncm_update_rxtx_max()
-> increments the negotiated NTB size by one pad byte when it is an exact
-> multiple of the USB maxpacket size.
-> 
-> Clamp the stored value to min(tx_max, U16_MAX). Any value above tx_max
-> is already semantically equivalent to tx_max since frame lengths never
-> exceed it; the U16_MAX cap ensures the result is always representable
-> in the u16 field without wrapping.
-> 
-> Fixes: 39eb7e0e8c88 ("net: cdc_ncm: allow tuning min_tx_pkt")
-> Signed-off-by: Omer Zalman <omerzalman42@gmail.com>
-> ---
->  drivers/net/usb/cdc_ncm.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/usb/cdc_ncm.c b/drivers/net/usb/cdc_ncm.c
-> index 6fcb4d711a64..edd69f4e1596 100644
-> --- a/drivers/net/usb/cdc_ncm.c
-> +++ b/drivers/net/usb/cdc_ncm.c
-> @@ -242,11 +242,17 @@ static ssize_t min_tx_pkt_store(struct device *d,
->  	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
->  	unsigned long val;
->  
-> -	/* no need to restrict values - anything from 0 to infinity is OK */
->  	if (kstrtoul(buf, 0, &val))
->  		return -EINVAL;
->  
-> -	ctx->min_tx_pkt = val;
-> +	/* Clamp to tx_max: the frame length can never exceed tx_max,
-> +	 * so any threshold above it has the same effect (padding is
-> +	 * never applied).  Also cap at U16_MAX since min_tx_pkt is
-> +	 * a u16 - without this, values like 65537 silently wrap to 1
-> +	 * and invert the intended behavior.
-> +	 */
-> +	ctx->min_tx_pkt = min_t(unsigned long, val,
-> +				min_t(u32, ctx->tx_max, U16_MAX));
->  	return len;
->  }
->  
-> -- 
-> 2.39.5 (Apple Git-154)
-> 
-> 
+smc_rx_splice() allocates one smc_spd_priv per pipe_buffer and stores
+the pointer in pipe_buffer.private.  The pipe_buf_operations for these
+buffers used .get = generic_pipe_buf_get, which only increments the page
+reference count when tee(2) duplicates a pipe buffer.  The smc_spd_priv
+pointer itself was not handled, so after tee() both the original and the
+cloned pipe_buffer share the same smc_spd_priv *.
 
-Hi,
+When both pipes are subsequently released, smc_rx_pipe_buf_release() is
+called twice against the same object:
 
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
+  1st call: kfree(priv)  sock_put(sk)  smc_rx_update_cons()  [correct]
+  2nd call: kfree(priv)  sock_put(sk)  smc_rx_update_cons()  [UAF]
 
-You are receiving this message because of the following common error(s)
-as indicated below:
+KASAN reports a slab-use-after-free in smc_rx_pipe_buf_release(), which
+then escalates to a NULL-pointer dereference and kernel panic via
+smc_rx_update_consumer() when it chases the freed priv->smc pointer:
 
-- You have marked a patch with a "Fixes:" tag for a commit that is in an
-  older released kernel, yet you do not have a cc: stable line in the
-  signed-off-by area at all, which means that the patch will not be
-  applied to any older kernel releases.  To properly fix this, please
-  follow the documented rules in the
-  Documentation/process/stable-kernel-rules.rst file for how to resolve
-  this.
+  BUG: KASAN: slab-use-after-free in smc_rx_pipe_buf_release+0x78/0x2a0
+  Read of size 8 at addr ffff888004a45740 by task smc_splice_tee_/74
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x53/0x70
+   print_report+0xce/0x650
+   kasan_report+0xc6/0x100
+   smc_rx_pipe_buf_release+0x78/0x2a0
+   free_pipe_info+0xd4/0x130
+   pipe_release+0x142/0x160
+   __fput+0x1c6/0x490
+   __x64_sys_close+0x4f/0x90
+   do_syscall_64+0xa6/0x1a0
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
 
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
+  BUG: kernel NULL pointer dereference, address: 0000000000000020
+  RIP: 0010:smc_rx_update_consumer+0x8d/0x350
+  Call Trace:
+   <TASK>
+   smc_rx_pipe_buf_release+0x121/0x2a0
+   free_pipe_info+0xd4/0x130
+   pipe_release+0x142/0x160
+   __fput+0x1c6/0x490
+   __x64_sys_close+0x4f/0x90
+   do_syscall_64+0xa6/0x1a0
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
+  Kernel panic - not syncing: Fatal exception
 
-thanks,
+Beyond the memory-safety problem, duplicating an SMC splice buffer is
+semantically questionable: smc_rx_update_cons() would advance the
+consumer cursor twice for the same data, corrupting receive-window
+accounting.  A refcount on smc_spd_priv could fix the double-free, but
+the cursor-accounting issue would still need to be addressed separately.
 
-greg k-h's patch email bot
+The .get callback is invoked by both tee(2) and splice_pipe_to_pipe()
+for partial transfers; both will now return -EFAULT.  Users who need
+to duplicate SMC socket data must use a copy-based read path.
+
+Fixes: 9014db202cb7 ("smc: add support for splice()")
+Signed-off-by: Qi Tang <tpluszz77@gmail.com>
+---
+ net/smc/smc_rx.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/net/smc/smc_rx.c b/net/smc/smc_rx.c
+index d833e36f7fd4..c1d9b923938d 100644
+--- a/net/smc/smc_rx.c
++++ b/net/smc/smc_rx.c
+@@ -135,9 +135,16 @@ static void smc_rx_pipe_buf_release(struct pipe_inode_info *pipe,
+ 	sock_put(sk);
+ }
+ 
++static bool smc_rx_pipe_buf_get(struct pipe_inode_info *pipe,
++				struct pipe_buffer *buf)
++{
++	/* smc_spd_priv in buf->private is not shareable; disallow cloning. */
++	return false;
++}
++
+ static const struct pipe_buf_operations smc_pipe_ops = {
+ 	.release = smc_rx_pipe_buf_release,
+-	.get = generic_pipe_buf_get
++	.get	 = smc_rx_pipe_buf_get,
+ };
+ 
+ static void smc_rx_spd_release(struct splice_pipe_desc *spd,
+-- 
+2.43.0
+
 
