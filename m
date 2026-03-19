@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-269252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269253-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ELnbD+BSu2lMigIAu9opvQ
-	(envelope-from <netdev+bounces-269252-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:35:28 +0100
+	id SBuLB8pRu2lMigIAu9opvQ
+	(envelope-from <netdev+bounces-269253-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:30:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB7D2C4851
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:35:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 780412C4731
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:30:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 30F6631F5689
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:30:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ED5A03035A6E
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB302D9EE8;
-	Thu, 19 Mar 2026 01:30:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083EA2DBF40;
+	Thu, 19 Mar 2026 01:30:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CcQQUNBy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGvMYcu0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E922D781B
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 01:30:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78E42DAFBD;
+	Thu, 19 Mar 2026 01:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773883816; cv=none; b=T28ScOhI5aXOB+zcSyMZ0WZD/+6lb25xf2Yg4+9FkzEtuBhPwkbgnjazub+O+qAFvCaJmpXkSsGjl3KlNSKbAFYpJwIEBAqEMHu8SlPNby9JhKeyoD2vNp+eJoSyubSWQGT/rnC+fnZjtN2+cLQd6p3R93AsNaPeTMXNGX7OqCg=
+	t=1773883820; cv=none; b=Y3+IWUHVeTZmo4rFZ/srjstjxdRotK4eaXlvEPf7IbAnPf+ffjfMLW37IHfOx1qEsBWjwBnn0ZggmouXbHdu31MxDB/gK0FDqRia0WtmsRx3oZFn63w1bIvE+iso9P9ZAiKsrZLWmjrOx2NBcWcZaC7IZ6+ZJfZ1DACPEV5MUA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773883816; c=relaxed/simple;
-	bh=Br6U2Zp74tILjMB1uCYlV5K9Skk0l/e9eGDGw0mDGJE=;
+	s=arc-20240116; t=1773883820; c=relaxed/simple;
+	bh=RfXx/GdX9I0tNkcvWvdQRskJruN1HU8dodwLwQjwUyw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uSBKT0sdprhWvgv5buk9e6kYQ9U2//xq9A+v84pfSryckCLN7BkrejSj0c6hJZKRLPVuBKv03tkCK1usqhHnL6DJoAliD0MgiwVvAzOVghIKOYotpptBVKD0o5KEMv4Kp65ImObbVtTqFqdqcE6/ksK6C1a4fLqdCfbspQ1Psk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CcQQUNBy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27357C19421;
-	Thu, 19 Mar 2026 01:30:16 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JWEPhwaqU97OTbudkFXD47jrstbdiZqALRo3qFgdJAOpE7b0kRYEDdSi0BkMIQPtSS5zafqQYUavw68iTRZU0iqWI+1XKGXhhXw/oBxAKJKBTLS5nL2BwrQ1LLlkOqn5tIuUtUqLueEtZJ3jZEue8NHnFlx7/ykZYZeLbggKDX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGvMYcu0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6692DC2BC87;
+	Thu, 19 Mar 2026 01:30:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773883816;
-	bh=Br6U2Zp74tILjMB1uCYlV5K9Skk0l/e9eGDGw0mDGJE=;
+	s=k20201202; t=1773883820;
+	bh=RfXx/GdX9I0tNkcvWvdQRskJruN1HU8dodwLwQjwUyw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CcQQUNByHfzwX+1EeIvT4m1ZZZZ9W435ShmXJPy4jPFqnt9wTBaWVfhwu3vlNxYc+
-	 BsRbKhZPHXapNtns/HCXw2BDU6SSh/PmRi48C/YqIpxEvTnoVU5coO2aPXdhbbB5IL
-	 mlHxwOg0u67xteIiGvUfgMKzHKcmQBQXdI+spO0QmNYJAhylaclWQU2rUG/CGp2lUE
-	 fJisyREpZWT91O2VnVajFllAxF3euQnWubXkDob5xMTesbyBABSzXMNPF/fZPIx00z
-	 IcnIlGDGU2kodi4fhNrzePsdQ6pquQoUbdMwclO0lYeB8EBiRgBiqcVxk/blCVcCCv
-	 291AJCw4rOBnA==
+	b=tGvMYcu0hc/YWalRxo25S/KTfY15RBJ8RVjwbniOQX1QuYmDjaZ8haCTPQLJYb0r8
+	 4+jJfyzDEfMGj89A91ZDFArxELqHG02xME9db3jzm+uH68x+XxA06kjjmZBC8FyTLg
+	 cxicHRqq5Y8D6XhpNrKMuWdRwWpn0BJTgHvgX2rfxQ6bYVcnAruMmpp+QTJfvrz8QC
+	 dYz3DkqI2hjHkuGOwSwq/HjM9dClCJIBvFaM1miHSIAtrtKeZ0FAHTg2OAbi/gpWfp
+	 WHLwrPje8scNPhTQX+7QCc5+cEgH5BPrq+IcprNUbGnlNl1nZz34SRBkPW2173O2xQ
+	 n9yFKLB5F+qeg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9EA13808200;
-	Thu, 19 Mar 2026 01:30:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DB53808200;
+	Thu, 19 Mar 2026 01:30:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,85 +55,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] udp_tunnel: fix NULL deref caused by
- udp_sock_create6
- when CONFIG_IPV6=n
+Subject: Re: [PATCH net-next] net/mlx5e: Add hds-thresh query support via
+ ethtool
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177388380728.978731.6249220360238543970.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Mar 2026 01:30:07 +0000
-References: <20260317010241.1893893-1-xmei5@asu.edu>
-In-Reply-To: <20260317010241.1893893-1-xmei5@asu.edu>
-To: Xiang Mei <xmei5@asu.edu>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, bestswngs@gmail.com
-X-Spamd-Result: default: False [-2.16 / 15.00];
+ <177388381153.978731.9539928416113084591.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Mar 2026 01:30:11 +0000
+References: <20260317104934.16124-1-tariqt@nvidia.com>
+In-Reply-To: <20260317104934.16124-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ mbloch@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
+ moshe@nvidia.com, noren@nvidia.com, cjubran@nvidia.com, dtatulea@nvidia.com
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-269253-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269252-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.989];
+	NEURAL_HAM(-0.00)[-0.977];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: ADB7D2C4851
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: 780412C4731
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 16 Mar 2026 18:02:41 -0700 you wrote:
-> When CONFIG_IPV6 is disabled, the udp_sock_create6() function returns 0
-> (success) without actually creating a socket. Callers such as
-> fou_create() then proceed to dereference the uninitialized socket
-> pointer, resulting in a NULL pointer dereference.
+On Tue, 17 Mar 2026 12:49:34 +0200 you wrote:
+> From: Nimrod Oren <noren@nvidia.com>
 > 
-> The captured NULL deref crash:
->   BUG: kernel NULL pointer dereference, address: 0000000000000018
->   RIP: 0010:fou_nl_add_doit (net/ipv4/fou_core.c:590 net/ipv4/fou_core.c:764)
->   [...]
->   Call Trace:
->     <TASK>
->     genl_family_rcv_msg_doit.constprop.0 (net/netlink/genetlink.c:1114)
->     genl_rcv_msg (net/netlink/genetlink.c:1194 net/netlink/genetlink.c:1209)
->     [...]
->     netlink_rcv_skb (net/netlink/af_netlink.c:2550)
->     genl_rcv (net/netlink/genetlink.c:1219)
->     netlink_unicast (net/netlink/af_netlink.c:1319 net/netlink/af_netlink.c:1344)
->     netlink_sendmsg (net/netlink/af_netlink.c:1894)
->     __sock_sendmsg (net/socket.c:727 (discriminator 1) net/socket.c:742 (discriminator 1))
->     __sys_sendto (./include/linux/file.h:62 (discriminator 1) ./include/linux/file.h:83 (discriminator 1) net/socket.c:2183 (discriminator 1))
->     __x64_sys_sendto (net/socket.c:2213 (discriminator 1) net/socket.c:2209 (discriminator 1) net/socket.c:2209 (discriminator 1))
->     do_syscall_64 (arch/x86/entry/syscall_64.c:63 (discriminator 1) arch/x86/entry/syscall_64.c:94 (discriminator 1))
->     entry_SYSCALL_64_after_hwframe (net/arch/x86/entry/entry_64.S:130)
+> Add support for reporting HDS (Header-Data Split) threshold via
+> ethtool. When applicable, mlx5 hardware splits packets of all sizes with
+> no configurable threshold, so report both hds-thresh and hds-thresh-max
+> as 0 (i.e. always split regardless of size).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] udp_tunnel: fix NULL deref caused by udp_sock_create6 when CONFIG_IPV6=n
-    https://git.kernel.org/netdev/net/c/b3a6df291fec
+  - [net-next] net/mlx5e: Add hds-thresh query support via ethtool
+    https://git.kernel.org/netdev/net-next/c/d347b28c492e
 
 You are awesome, thank you!
 -- 
