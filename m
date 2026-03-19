@@ -1,154 +1,132 @@
-Return-Path: <netdev+bounces-269539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269540-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2PReLgYovGkxtgIAu9opvQ
-	(envelope-from <netdev+bounces-269539-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:44:54 +0100
+	id AL4+If0nvGkxtgIAu9opvQ
+	(envelope-from <netdev+bounces-269540-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:44:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 383D42CF05C
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:44:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC2DC2CF04C
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:44:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0957E3177692
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:29:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 044DB32A0174
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:33:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C46043E959C;
-	Thu, 19 Mar 2026 16:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85683EF0DD;
+	Thu, 19 Mar 2026 16:32:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FLtO8zzh"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="xjr9l2qd";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="d8FbnP+M"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8D03ECBFA;
-	Thu, 19 Mar 2026 16:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DF93ED5B8;
+	Thu, 19 Mar 2026 16:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773937785; cv=none; b=n8v+LuIGpqB7DY/+PJkH21XBgE/HvFk+souXju4Q+SRoT3stpzoNh8va3kSyTQlG2b+XiM7LE5cDLpATXLDqAnvz32rlYTyJg4o+Of9aTqJZI6Ugqditf4kJsI4HQaqMXs+VarUWSxIk0B+Kvn8o4x5GCbpx+A12eWsYdjxoXtg=
+	t=1773937921; cv=none; b=k+2JuqGoa5q29cLfHkkj4D03irImwpIN9xRGJRJC9h5IPObR2st39+O56ZXWRSgWtW4NkHJ54egFoqB1ZjdT28QoNggqPNty+82jmpKweNhVByjSiS6cEcvwF6L30VfVdywmRqytpMzJoMOD52ZLp+22bEN3s6GPJsBPs6oOG7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773937785; c=relaxed/simple;
-	bh=cLg1mxABsqTXm6/LqWoGIcU9uDV0pgkgZMVb0/SrzUk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EgRqGI+mS8zCPqhw/0W5D1MB9JxzfqA1D0dVTUF06T+5LFc3VMH+Qk5HpNzSDsUwDXenycQgLS2UXOU4F9Jlh4+p8DAsXpPh3D1CaP0kd1CBpaOApVSZRfPIHa2MnsgE+iSp2sn3G6f/Pv75KOmMZPF/9fhvMhP7RltwN8ziua8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FLtO8zzh; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3QDjeYDJRij/oqghj/n7hihwJOYcYJc8bDcHllbXJZQ=; b=FLtO8zzhTn8/B+JQZYL3JDjF6h
-	MIQ1basL/BXn4A/E8AY7RsMGNvKjKUtKPJdaJpWAaHS8dfXv1FX+vvhcZFiLyIzZ9//5ze4Jltr/h
-	2cz+9koa7qL/V2jAqo3LPr8R19dRVfsXoy81clzZr511I1LsYFpmHNBTN+ycDpGvly2s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w3GFU-00CPic-8E; Thu, 19 Mar 2026 17:29:28 +0100
-Date: Thu, 19 Mar 2026 17:29:28 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Birger Koblitz <mail@birger-koblitz.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] r8152: Add support for 5Gbit Link Speeds
- and EEE
-Message-ID: <9efbf132-f367-487b-aa66-8a9610d91d2d@lunn.ch>
-References: <20260317-rtl8157_next-v2-0-10ea1fa488d1@birger-koblitz.de>
- <20260317-rtl8157_next-v2-1-10ea1fa488d1@birger-koblitz.de>
+	s=arc-20240116; t=1773937921; c=relaxed/simple;
+	bh=cjOJRGM5EfY+bva2MdjDHWNLLJjDVfgTZxBmEQFxoOk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LFNXQMe0e62gB8Z0ongciM5unqWxdF6jKMqC+3c1I1jOvlV4z12yJ498KfdoG3bKLcuw7tMqrmQVCokZc93j3/JiGRrLigSQY5hIkIG8Dfyy2Wn3+n/aSX7OV0CY/7Ox5ULJTA73x2hM5FbPwSGRhOiJ/tfOGMTp9aZU8CBuzrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=xjr9l2qd; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=d8FbnP+M; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1773937908;
+	bh=cjOJRGM5EfY+bva2MdjDHWNLLJjDVfgTZxBmEQFxoOk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=xjr9l2qdo03bJ8PUO2qHbojVf84pH6gFkogkx8+H7nT/MCBfAH69kecfYvnJOujsh
+	 amMZhG2gEKIgd6KMtiBW9j9Yi+7W4CbrypETaCA3DE6gUSGxAoCmJNHChCEeqK3eGZ
+	 JPZfR5UyfkKqqFJrnIHx0l6KuXFrXlkBHbQkfuyQ7xz0/PNFOexRMPXh4IXqJlqThb
+	 0B+18/6rxWDLy48FmWgGhbXIfVSTa87gLY5mL2PsnfGT40uODjOwin+tjeaM5yzi15
+	 PkvOhAGMjIyaExqZP/L6g1Fmv3PizAPWSLoVhpbaMpQFqqjV4I3eHdaQrmHbBvnP4v
+	 LyrTmGFAdRCfg==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id 44E8B3FE95; Thu, 19 Mar 2026 16:31:48 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1773937907;
+	bh=cjOJRGM5EfY+bva2MdjDHWNLLJjDVfgTZxBmEQFxoOk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=d8FbnP+MeAABtslW5aIs5lp2eKysEzl+RnbL3UuUXCug6klWQ1vK/h0YpdYJg5sB1
+	 whMhuSi6kPE7xUTcTZ7ejA5KgxxAaPRmPnIwM0mYE/WTlmJOP9cNKzaarCNxLypO3S
+	 TLkNj2qAf2ZdZnpiYRpymk97t7/a7uVDQUD3XsIEfaEVkgnafYo1U43ZJV60v2+9Bz
+	 1JIFbmdSPJz60Skfjh0UMlBiW+teClajV9Cy9r74PhjQOJU6xwhAKfFu8nKBrjFyei
+	 j2+vZizu/rkqfaAGvgzKuQPulQx3Yv1AX2aSTa5JiSKkKQzuz04XiZsWSW9Uf4NOZU
+	 NfsIMsNqBnDYg==
+Received: from [IPV6:2a00:6020:47a3:e800:1acf:2b46:72be:2ba5] (unknown [IPv6:2a00:6020:47a3:e800:1acf:2b46:72be:2ba5])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 958AA3FE49;
+	Thu, 19 Mar 2026 16:31:46 +0000 (UTC)
+Message-ID: <44ef7491-dc20-40ae-a695-2c71b5ca575d@birger-koblitz.de>
+Date: Thu, 19 Mar 2026 17:31:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260317-rtl8157_next-v2-1-10ea1fa488d1@birger-koblitz.de>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/2] r8152: Add support for the RTL8157 5Gbit
+ USB Ethernet chip
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260317-rtl8157_next-v2-0-10ea1fa488d1@birger-koblitz.de>
+ <339655b1-59e3-42d6-a460-b8424d7fd279@lunn.ch>
+From: Birger Koblitz <mail@birger-koblitz.de>
+Content-Language: en-US
+In-Reply-To: <339655b1-59e3-42d6-a460-b8424d7fd279@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[birger-koblitz.de:+];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	TAGGED_FROM(0.00)[bounces-269539-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[birger-koblitz.de];
+	TAGGED_FROM(0.00)[bounces-269540-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.976];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 383D42CF05C
+X-Rspamd-Queue-Id: DC2DC2CF04C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 17, 2026 at 07:07:14PM +0100, Birger Koblitz wrote:
-> The RTL8157 supports 5GBit Link speeds. Add support for this speed
-> in the setup and setting/getting through ethool. Also add 5GBit EEE.
-> Add functionality for setup and ethtool get/set methods.
+On 19/03/2026 16:53, Andrew Lunn wrote:
+>> This patch is on top of linux-next as the code re-uses the 2.5 Gbit EEE
+>> recently added in r8152.c.
 > 
-> Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
-> ---
->  drivers/net/usb/r8152.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 53 insertions(+), 3 deletions(-)
+> Is 'linux-next' a typo? net-next should also have the EEE code, that
+> is the patch networking code takes.
 > 
-> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-> index 3b6d4252d34c63ead8f11a120e212325a5f7d505..bab8e10e5f99afcb332e333c2739ed7509b03419 100644
-> --- a/drivers/net/usb/r8152.c
-> +++ b/drivers/net/usb/r8152.c
-> @@ -604,6 +604,7 @@ enum spd_duplex {
->  	FORCE_100M_FULL,
->  	FORCE_1000M_FULL,
->  	NWAY_2500M_FULL,
-> +	NWAY_5000M_FULL,
->  };
->  
->  /* OCP_ALDPS_CONFIG */
-> @@ -725,6 +726,7 @@ enum spd_duplex {
->  #define BP4_SUPER_ONLY		0x1578	/* RTL_VER_04 only */
->  
->  enum rtl_register_content {
-> +	_5000bps	= BIT(12),
->  	_2500bps	= BIT(10),
+> 	Andrew
+I based it on linux-next, but the r8152.c driver file which is patched here,
+is in both cases identical. The patch will work with net-next. I used
+linux-next because I had planned to submit the patch for the next
+kernel release cycle, but then was much faster than thought.
 
-Any idea what bit 11 is for? There is not normally any speed between
-2.5G and 5G.
-
-> @@ -9934,6 +9979,11 @@ static int rtl8152_probe_once(struct usb_interface *intf,
->  		} else {
->  			tp->speed = SPEED_1000;
->  		}
-> +		if (tp->support_5000full &&
-> +		    tp->udev->speed >= USB_SPEED_SUPER) {
-> +			tp->speed = SPEED_5000;
-> +			tp->advertising |= RTL_ADVERTISED_5000_FULL;
-> +		}
-
-Let me check i understand this.
-
-ethtool supported will indicate 5G, independent of the USB speed? But
-it will only advertise 5G if the USB bus is USB 3.0 or higher, which
-can do 5G. The user can however use ethtool to advertise 5G, for USB
-2.0?
-
-I suppose the question is, are there any link partners which do 2.5G
-and/or 5G, but not 1G? I guess not.
-
-       Andrew
+Birger
 
