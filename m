@@ -1,154 +1,169 @@
-Return-Path: <netdev+bounces-269300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269301-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kDKYMZN4u2lvkgIAu9opvQ
-	(envelope-from <netdev+bounces-269300-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 05:16:19 +0100
+	id qE7DIn+Ou2lmlgIAu9opvQ
+	(envelope-from <netdev+bounces-269301-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 06:49:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E6952C5DA0
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 05:16:19 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ECD82C6530
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 06:49:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 361953061611
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:15:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7067F3014A20
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 05:49:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B42A314A90;
-	Thu, 19 Mar 2026 04:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A20285CB9;
+	Thu, 19 Mar 2026 05:49:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cZE6OFPv"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="TIxlZbm2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E252E1C6B
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 04:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773893741; cv=pass; b=X+mLhMBjXwuX4NbpWb9PnpsKWKQogK5pBbFdVxJFozgB7g59asCxJ7GSm8KyWi4to5S/TjCmKL9F8zta+qPNxUFnhX+DhTF0cwBCA9JjIxbWPMnJrY4Sd4iLe00TgQV0jQV2FHuk+UQF4V7NMxe+eRCrpveTnL/rn4+r91Vm9g8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773893741; c=relaxed/simple;
-	bh=qnAsudHzHhrlLcdi9QI+7XViXfirojThS4VXlI6xXQ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iT5Zn5ui2l/gr0ylBN6QxYHixe46h71P353imLyC53SI6tIu6qL7xXJ4wYFq+SHxChxGaYEfVFGEAu1YGDWEG+4ZqtBJzAs8YLAYdY7VeRp2PRva2sJIzXccTM9WPbTNPcW4NKOxJzG1nt2xOP1ORF4GV+vHBHwnEtYyJJ0SMzM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cZE6OFPv; arc=pass smtp.client-ip=74.125.82.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-1271195d2a7so401207c88.0
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 21:15:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773893739; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Y9/+wjcnYvzIGTWonJj33hYrdxXybYO6ZA/0HAYiKuYP80H1G3+b78uLINayZY1gTR
-         cVtob8CMR/whh+yUmvWhYQ3rxYd7ECXC54kr6NNyYsYq5tED7/ttoDg/BzGMwCPPuByc
-         djXjV0OTsrYX2Ze3yIm8/znqRe2KycJPiOgtueJGd5HgbpNxX5v0twBrpqmkolC3mywB
-         TaxnwPBVegmJLaEBGREsVk+bRgC+H/9JMuLAFux9yrJVdRIft28bqx1uYIxVbfLBY6Zv
-         1OrGarRA3gU6dGR5IwmMFzFpo2O5w1l333Hk7xOwrd+yu0unD2SV0MSJz2N4H80+SZ/z
-         YsTA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qnAsudHzHhrlLcdi9QI+7XViXfirojThS4VXlI6xXQ8=;
-        fh=REktz2HlE3wSLU/QEryrWJzW+rqUO6bkV7aHyJZsBsI=;
-        b=OwlWiunrNAYm1XlBScy9OCy0+CVOyiUsBLL9NRQcm6HZha/e0FkAkfJEdeFtVZElKt
-         7XIe+R/3YgPybUk57acxLB7mdiBGTg1DvhzbJhYGNJysdsmyrwxAFtJ045c1wQ1WzFXh
-         hAxQWF86JypIISrrhi53FyVTDQjdQFO1g+mCAMYM8bOGBJCEmINn2WuU00siT1bFtmUc
-         B57ec31cAE2T0oABwLA5ohc9GQUjTwCjtYNByXL89TxMILiijB42ThoOtalG34Ec+l/2
-         hh9MTDIR8FR6g8atVVUQDyPX99jz3jGb0IEpx/H1045aZ/YNIDbPICHD90bwVYWa3K0G
-         n3Wg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773893739; x=1774498539; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qnAsudHzHhrlLcdi9QI+7XViXfirojThS4VXlI6xXQ8=;
-        b=cZE6OFPvTcevKikLCmWSKYxeqAztDxyvPriV+sRA5KsWgT0FBiCzv9aeS6gqh7MXdj
-         lBJpjL8vRau7WLp/iloNNTpnxE/mirfuadBf0B7Z1kppqYlkya0gzER/FOaJ+MrrBg7I
-         nfc8zlijVY3HKeU5bWZCnY8R+Y1CDVVUFmjQMzpkie6lLLH7ZXGbo1YxFq743YvJBitk
-         weAVExIU83oL/l0Q67viIRqZG1m7oD1+GrBYt4lNRJX2M4aspqvmQfWGRqm8KV6tgp4z
-         Osjy0DMvESQILpFWsMaltUhHhlr4y3Ysd3Np9i79raHutHmoJB1KJYGawwOMdhOFOQl1
-         +XEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773893739; x=1774498539;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qnAsudHzHhrlLcdi9QI+7XViXfirojThS4VXlI6xXQ8=;
-        b=bU/eGjNNZx3jDE5ht2+lx+WoWQ9mQBNm/G0MjEhZhcHvVAdZfRLBqTnoUeDeW+1yhH
-         JBkbP4zJRzoorHPqP03MHNFNE7mh5aK9f7UW02f3RM7BsKZNE/2lU+M6k57r0xmF5b/K
-         QYDRk+Fuf61vhsot9cfU3Nafidmo+BXnnsZ38dTpQ7Kz85wR1A/tuLQm0h3e+sl2SVRa
-         QzO+SlxYzqG/Y6IbaZuVgPKr8NdnlEBUUfw/x07/hD5eZw3/sSBjN23W/djMSJUYmpDv
-         tKxSI+UJD4nAu0LWt9ZvR8UjK8Uz5brOA1iELdurj41lV6189DUkbOS7o1zyQksdYqKR
-         qF7g==
-X-Gm-Message-State: AOJu0Yz74RCDJ2T1/tVqmHkwlqYaf4DBDYs45yDmxFMACtrCJwy2gwQf
-	azcdAQtimkZicPRjr+EykREqz0ZixGKFVAmvkCf+8YbSbysABJpXp2OtJxbhVGQAtEV/11i6vep
-	S34Wmqk77n/86Bb1dm56ymFinwXBKkikm0Wl8eAB4bujKMWtueW7Yn4ExyI4=
-X-Gm-Gg: ATEYQzxPM79TuH7RruwAdkwdA9KD2ywvg7YOUP/ynsnOoLVvHI89bpWPP70G/SBH2MG
-	l7QhATl5u1lqKTaxZAHbJ89KRfXcC8FtlGjWPVuP/lrjWx5uwqsWogG4c9F1Xu3DrKlW6ZrT5ZR
-	ni84E70F61S5nSvjeeUI8EWdR4onCaJoksVBAl2QpeMtwf+s8HaRVZhBtWY9M8UE9I8YNElWop4
-	FfPWuNHRH6HHcJl2Va8xG8IXIm+eEQD3UKE4/unG6ti7fD3MNpMHQkckxuGmTEMPzJpxRepJkH7
-	ka34Zs/gXxPS7+avOG3xcGm+ZyqQZERGdJ77cjk=
-X-Received: by 2002:a05:7022:692:b0:128:d4db:4464 with SMTP id
- a92af1059eb24-129a71602f4mr3483029c88.25.1773893738684; Wed, 18 Mar 2026
- 21:15:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F561A680A;
+	Thu, 19 Mar 2026 05:49:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773899388; cv=none; b=KKVqOcuqSbaux6ZdV64ZTHF+MdESD2RE7E7U/cJyvGlIoT9X3uEyFxyd8YsCB9D7YMB7DrPK+lmtStqcn6nWmwGVJ5/n/0NtDpk1NXLKdeE3SV+bmbVtfgQbtL67TpZBbd/XVG+c2tjI1tFyhK5TuPQxxybqkiS8PMaxxbxaWOk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773899388; c=relaxed/simple;
+	bh=2430zI9n334JkBj/TpnuTxA+jHhEUJVfLFav+xDkV6o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tAeqQtfpuILLaDv6m4oLxcTpxi7x2VWivCdr8gyNzMirfT0dZ4GDGbb40v5O4wq52SUC5kHKP3IlDgkz0njiUf6uREb53vrQ3n0ZJwosOhc9Ynx+WSyTRDvY8zKpekSQ/iUxnMyNGDm8IPmW4OFO+coFfddYRzVwS298iwvEYvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=TIxlZbm2; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1773899377; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=Tj5vFVo8hvmkvdXB4Ef9ZyPku2Xx9xcDbTU8B8mwD7o=;
+	b=TIxlZbm2XUL3W/PLwNRLkLwES1mWe3KKgJHH8G5/muP6hh6ZmVnAdyd/x6LbVeyATiaOxIcJWdjmD/Y9H5V1Kt/mm14lhjIGX/kYGTAmSTEqGQsWRXBbG1kTcnvHkOZPrLhmRmq+KF0pYUGtII1uDR4dTunor1RzcG7xe1PN97w=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R511e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037026112;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=35;SR=0;TI=SMTPD_---0X.HFnoa_1773899374;
+Received: from 30.221.130.238(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0X.HFnoa_1773899374 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 19 Mar 2026 13:49:35 +0800
+Message-ID: <1919ef7e-1cff-4f52-873a-61ffe0000728@linux.alibaba.com>
+Date: Thu, 19 Mar 2026 13:49:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <5ed5489ecdd05c43bd551804f3bd020ae349f3ca.1773849195.git.sd@queasysnail.net>
-In-Reply-To: <5ed5489ecdd05c43bd551804f3bd020ae349f3ca.1773849195.git.sd@queasysnail.net>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 18 Mar 2026 21:15:27 -0700
-X-Gm-Features: AaiRm53XDRxkSC-u1eQpLiCvBMeptee24YTqCFkNLooxbS-p3pcCSQR1B7h8e5Q
-Message-ID: <CAAVpQUAfOAkOo2tFzDkoQDF3SM-k0P0O4L25kymTsh+Fw7fanw@mail.gmail.com>
-Subject: Re: [PATCH net] rtnetlink: fix leak of SRCU struct in rtnl_link_register
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] ptp: split non-NIC PHC drivers into the
+ clock/timekeeping maintenance domain
+To: John Stultz <jstultz@google.com>
+Cc: tglx@kernel.org, tglx@linutronix.de, richardcochran@gmail.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, anna-maria@linutronix.de, frederic@kernel.org,
+ daniel.lezcano@kernel.org, sboyd@kernel.org, vladimir.oltean@nxp.com,
+ wei.fang@nxp.com, xiaoning.wang@nxp.com, jonathan.lemon@gmail.com,
+ vadim.fedorenko@linux.dev, yangbo.lu@nxp.com, svens@linux.ibm.com,
+ dwmw2@infradead.org, nick.shi@broadcom.com, ajay.kaher@broadcom.com,
+ alexey.makhalov@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+ linux-fpga@vger.kernel.org, imx@lists.linux.dev, linux-s390@vger.kernel.org,
+ dust.li@linux.alibaba.com, xuanzhuo@linux.alibaba.com, mani@kernel.org,
+ imran.shaik@oss.qualcomm.com, taniya.das@oss.qualcomm.com
+References: <20260318073330.115808-1-guwen@linux.alibaba.com>
+ <CANDhNCoFxsXdP7d6nbLTFLOrB_4GnDvhF4O6ZGyvGEVoqV4U2g@mail.gmail.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <CANDhNCoFxsXdP7d6nbLTFLOrB_4GnDvhF4O6ZGyvGEVoqV4U2g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-269301-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	TAGGED_FROM(0.00)[bounces-269300-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[35];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,linutronix.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,nxp.com,linux.dev,linux.ibm.com,infradead.org,broadcom.com,lists.linux.dev,linux.alibaba.com,oss.qualcomm.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.992];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 2E6952C5DA0
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[guwen@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-0.993];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,alibaba.com:email]
+X-Rspamd-Queue-Id: 2ECD82C6530
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 18, 2026 at 9:15=E2=80=AFAM Sabrina Dubroca <sd@queasysnail.net=
-> wrote:
->
-> Commit 6b57ff21a310 ("rtnetlink: Protect link_ops by mutex.") swapped
-> the EEXIST check with the init_srcu_struct, but didn't add cleanup of
-> the SRCU struct we just allocated in case of error.
->
-> Fixes: 6b57ff21a310 ("rtnetlink: Protect link_ops by mutex.")
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
-Thanks !
+On 2026/3/19 01:05, John Stultz wrote:
+> On Wed, Mar 18, 2026 at 12:33 AM Wen Gu <guwen@linux.alibaba.com> wrote:
+>> - Following the model used by NTP related code, this series lists tip.git
+>>    (timers/core) as the integration tree for emulated PTP clocks in the
+>>    MAINTAINERS entry. Guidance from clock/timekeeping maintainers
+>>    (Thomas Gleixner, John Stultz, Anna-Maria Behnsen, Frederic Weisbecker,
+>>    Daniel Lezcano, Stephen Boyd) on whether this is the appropriate workflow
+>>    for this class of drivers would be appreciated.
+> 
+> While I'm sure it would be good to continue to CC folks, I'm not sure
+> if the timekeeping maintainers would be the right folks for these
+> driver/ptp/ changes to flow through.
+> Thomas has been doing the heavy lifting for a long while and I'd not
+> want to put more on his shoulders.
+> 
+> Richard is listed as the maintainer for drivers/ptp/, is there any
+> reason for it not to go through him?
+> 
+> thanks
+> -john
+
+Hi John,
+
+Thanks a lot for the feedback.
+
+Richard is indeed listed as the maintainer for the PTP subsystem and
+the traditional network-oriented PHC drivers. The intention of this
+series is not to bypass that role. I would very much welcome Richard's
+thoughts on the proposed split and the appropriate workflow for these
+drivers.
+
+Historically the PTP subsystem lived under networking because the
+original PHC devices were tightly coupled with NIC hardware and the
+IEEE1588 packet timestamping pipeline.
+
+Over time, however, the PTP userspace interface (/dev/ptpX together
+with the PTP_* ioctls) has also become a widely used way to expose
+high-precision clocks to userspace. Because of the stable interface
+and the existing ecosystem (e.g. chrony, phc2sys), many platform or
+virtualization-provided clocks have started reusing the same PTP
+interface.
+
+As a result, drivers/ptp/ now contains two different classes of
+devices: traditional network-oriented PHC drivers and clocks which
+are not tied to the IEEE1588 networking pipeline.
+
+The difficulty today is that there is no very clear upstream path for
+this class of drivers: they currently live under drivers/ptp/, but
+their design and review concerns are often closer to clock/timekeeping
+topics than to networking. This series tries to find a clearer
+upstream path and review route for this class of drivers.
+
+Regarding the merge path, the suggestion about tip.git was mainly an
+attempt to identify a possible integration tree for these drivers, but
+I'm open to suggestions if there is a better workflow.
+
+Thanks again for taking a look.
+
+Wen Gu
 
