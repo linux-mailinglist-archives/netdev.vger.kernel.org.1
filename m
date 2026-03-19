@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-269458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269459-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IOx4NEUHvGkArgIAu9opvQ
-	(envelope-from <netdev+bounces-269458-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:25:09 +0100
+	id +ChkIF4HvGkArgIAu9opvQ
+	(envelope-from <netdev+bounces-269459-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:25:34 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A3692CCBC2
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:25:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41D2C2CCBFF
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:25:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ACE123076796
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:19:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8F0F3307F03F
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BCD3081D6;
-	Thu, 19 Mar 2026 14:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50A5364040;
+	Thu, 19 Mar 2026 14:19:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IoyyoVzv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R81D17Cd"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035D535C19B
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 14:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F848361645
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 14:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773929941; cv=none; b=gzkt+/0suA/kBTRSnZ6w2rytnBvs2Iu0B9/YPXF9KKL/AboCQAuvn/QSQDNuOzkKtkBzlm95Tnc+Auv51vmY9LBReBNZ5fYDXmHJJgGMhr2LX+Jt3lk8jKsU3ttBDBivLxX6ESlwWbqf49HdqlGFuuZYU8FEM5orofFeL1s7Idc=
+	t=1773929943; cv=none; b=R7zbLsbJ3wKDA8wCmlnULL4Ady7Sc/R0LD/+bqZoTQJHnJ6wp8HoRPgbCpQKhYDmG36UudkSMcCjuHDk6RPTlqA6+biv8XX08fXtKr6PlpAxgEfCjYPPA9v7zS6xZQXqv2dF5oOrfVJF+s8uW1kIiy7J3qsK8raN7VNQjd0Ok9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773929941; c=relaxed/simple;
-	bh=CZYrSzJxOTHz3y2+Yn1YrwZjKF3A8fsmk9txEkZG5Eg=;
+	s=arc-20240116; t=1773929943; c=relaxed/simple;
+	bh=Bj04iTXB7MhKSrOnlUvWs1/LZRy/U40aj1lrebnr4kE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CJfMXgKohE4cnephKU+BpNL3cz5f0vKS7XZCe2R9FGlSwB8rvu4xFmArBxZORe1pDK0+aktNmXG9IYxoGgvt0e20BVtFA8dvsQSyVL3EOXByA8QgoEXkyUfnsoSvFmOe3/m1wrXvl7xJxAYcmkoQZhCi2B0Q5aSAJgcpFSNW5ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IoyyoVzv; arc=none smtp.client-ip=209.85.216.50
+	 MIME-Version; b=pH1FCRQgbpTYQ5f7Eg17HXz8RmM7mtqJpPGt0rjJox2Pi0v4c4ymBbPnHdei8O07u1AgrHzS+7FfEADfw6uFzcsPmbul/iIWi1XUBxKzAfGwUL8EuByBrmqjRHXrqatjoQ4DvB6XBWTNxRG5FYUwgLCwgSs00xsCJj2fJbry9/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R81D17Cd; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-35bb7afdc38so673231a91.1
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 07:18:59 -0700 (PDT)
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3591cc98871so347731a91.3
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 07:19:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773929939; x=1774534739; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773929942; x=1774534742; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=capsefnRJybIkJWvu7BICDZ5yODeSG4sK/v0sJ/qwmE=;
-        b=IoyyoVzvsECxsP3yv/jixu1xEUc/cgocezdoKmVWuXp0Z5rRzv3o/JxdFV4Xq4m266
-         prQFtBludIfcXysyglZ8iVOoBZorKAtZoCRwi2Z23hljNc+Otx1X+ylZCvCjNCtqy3Fk
-         43fNNyX0gI7suCp4B/C+YwEMuApLmBnC69qjNTCBELC+2GY8l/nxUuW73Ikub1faFbEN
-         nzQOAjYlJ0Oc+XzXaVegPy3Bf7KTWMzqfuI15pgql2/lymvShhG5pBTs9vmzPwJh0EIG
-         rsghQiht5C9TziQNoIcuUk/9RAxk/h+PCgTUsFW1P8OIolNs2jjv6wRLcyTafp56uMWx
-         HfcA==
+        bh=TOf9LcnO5IRemgfOLwtBwbNVtgVrreL+MONpjgDCJOc=;
+        b=R81D17CdNHfsMNlMgTTSiDVNzGT4uUxmExPFqk3TUP6Y9NUw9Mv1LvneXLDnPsaefG
+         nh1FpnsAMLu+Oq1wqTiVQgbkdwnH/TD2afQEMBNo/qAUhz1J2gT3bcZcmUedPXBveMzU
+         MVxeZ8QYAH5G4Z+NlY/mnZK6D6xbQyYRQW9F0XTZVodLh95X7VJJP3TKh7QlUvMDvmBJ
+         5Q1VairZ1Jruodd++GeGk3A9f+XvBGe/bm5Eh+bj1uj3p9sKKZ5OLQOYjnkFeeLBSWon
+         WNBGr9wN4F6YvR2YhIVMML9R62jjECS+T+xoQ2qdqmDx8XmPVjKcwj7sGlQDwPoNuo0J
+         vxgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773929939; x=1774534739;
+        d=1e100.net; s=20251104; t=1773929942; x=1774534742;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=capsefnRJybIkJWvu7BICDZ5yODeSG4sK/v0sJ/qwmE=;
-        b=Zb+cdZZMGJYLa50Lm1mJg/nhbhYu95LoIH8zWVgYs+cXs0SrIQawvl2u6+XylMBxuB
-         b5vkFAtCRlknR8FxUq5HCkeaUnolGErVsruEjOEeLaO98wdVACw0e4P4BsYXqYc8x0j6
-         BKb5bOGzYPrBrhMkxwcGfqHL1C18XpDLUCjQzO6SN0hvZ6YCNI93y+5Ab//fjrd4OX3c
-         iZC7izdroouAGA0/c/nQZYdX8+TzG4lFUoKXnBrwt3VdQd/hvsTcHpyz8ThQqXLhr6Ho
-         PH4qX8GSC1hOnRJq3QZNbK+bUR7tONGr9fqJnrg+eZxuuNSYbI4lkA1CJZ6Lxl55X+yn
-         KXog==
-X-Gm-Message-State: AOJu0YwC91mKRf6BGCNKKLJINF6NnehyaYc1HSkGpsLHZNAMdUtvSgob
-	D4YLDlsAKOBF9QilJb9QBISsO4AkaQdr74Yqru8b4Uxlze3K2g6xPEyq1dSRcg==
-X-Gm-Gg: ATEYQzyEhowWGszNxno6YQcFDy2UdCHAWzqeahE55qk5F+YWaTkgYu6/tyxOlSCRqYc
-	4vyCK0t+30lfTjVnHwkcPAry6o05Xfsp+Iood1cXhYBXtaAlEjK8qHkWKcDT3j6YdkPL6EV95Id
-	59BN7ZL31b1ihZdzARp+R3O7o4PwzhJfjSejhPhFSuwcb580p5TjHLRPSr3DlztQRbCAtVCrI0Y
-	whJLY3vsuMIG8kXv0YZCso6w3cs7W+Nqdf1CpIov9ihoESFPZ9eAglITDqHrpmuYb+Bg7Fnxtnp
-	xq20zZgDhyC7o+TAlBXQRHCtUvbp9cfUlLkJt5JRFIm7vQfQ5opI/fxhw1r/39zBRYPEhKls9du
-	feVRJnKMX3N/abVh4XvAXBzk4OWByVkss+Ah4jC7OylfwPjgEEbNzkcqYBu1q2Cxdk7aXXP5Phs
-	72fKxuuH0Yw1OWzHH1PmiXp42WsvrLgE8HTW3pbB5OxPW0AmPeW+ytuNrjbGek21hKaMNNL5w/F
-	80xZpGouQ==
-X-Received: by 2002:a17:90b:35c2:b0:35a:3e2:7cbb with SMTP id 98e67ed59e1d1-35bb9f2bf01mr6280190a91.29.1773929939183;
-        Thu, 19 Mar 2026 07:18:59 -0700 (PDT)
+        bh=TOf9LcnO5IRemgfOLwtBwbNVtgVrreL+MONpjgDCJOc=;
+        b=f3zyNCnwAdPjBFEqCQhiQ3qe7sATOV0jHy5vWo+U6C9PKVz/4TogMsSRdRuTy4kkG0
+         74Xgkyjg/lGXLXPuoeeyWOAi8nBAsbB7X+ohBNmyS6Urc59YL6rfkhwD59cAQqTWOI2c
+         LZ36njz7pI/m8uhCQ2ajqF08qmhUf9gkoNm+4CYy/tmk4PzpHmZ2pnBOKSFNOCCIJFQA
+         lNsBxg/N/ZVm6gHo2SHmityNWIhuCPiwH6NJKztk6+e13yJ26q41iq24/35jcpPh19d0
+         dyae3Q3nY365t+E39VU7GzvXH0EUJ1Lp21Z0vQReT7KIJAYBwOt6lRyPG7jwXFZp95CA
+         mWjA==
+X-Gm-Message-State: AOJu0YzNrVZitNZJHTVkPdnU9b3FKPxwPRkWboJb4rI5mMHleGiEVaBg
+	zzBKkHdr23xpS29hSgE4VwK72tJtkU+Or9XtWctgSZQxeFqt7OdUqb21
+X-Gm-Gg: ATEYQzyo858JgJHAskVr5UfgjTZjDR4jZhAaOrMVFAXF9PEuxCImJmUc+R+gUakGQQl
+	gYL3F1uNGBhBMxGEOJYqjfYb2wQMaNwlJgkbCjS/X8u7/KXPajWGajsCdYI5TNEw06ZZE0w8i8A
+	E/zAT6nax1MW84jsuAKvGJfyfp+SGr5Lt3IcpYlXptQK3NkREJMHcT9K3aNrN/o8TY+cX+crT0v
+	2d5v4PA9+lUXoH50ltDU97TCynuvoJmNrM8TWPO1OMZNwDzW+WThByGR1fEmMU4D3lFJtuyIaBA
+	9XqhTcjjLALvNlCe5ybuth8qvjja3eHPeHjK7MytEoXCQA/pB1yb0Ny39TSadbnIfwk4O3Sw4oH
+	xjVZ+Ym5KVXys7LADlxt8v/VTHCH32VAhoEN9Z40VZ7bCasJXXBdIN1nSsSeb3C2oNcuX7j/nKF
+	UBPSKAHfTDal/6Ufph5xdQLHI0Ji0y+kxYdVOAUfebntvS8qoVePWTJ+JeIJmB/7LyuKK8+nPWm
+	HB/q4mdAQ==
+X-Received: by 2002:a17:90a:d604:b0:35a:24f3:2c88 with SMTP id 98e67ed59e1d1-35bb9e579c5mr6654313a91.8.1773929941824;
+        Thu, 19 Mar 2026 07:19:01 -0700 (PDT)
 Received: from sean-All-Series.. (1-160-226-215.dynamic-ip.hinet.net. [1.160.226.215])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35bc63286ebsm2695321a91.17.2026.03.19.07.18.56
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35bc63286ebsm2695321a91.17.2026.03.19.07.18.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2026 07:18:58 -0700 (PDT)
+        Thu, 19 Mar 2026 07:19:01 -0700 (PDT)
 From: Sean Chang <seanwascoding@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Chuck Lever <chuck.lever@oracle.com>,
@@ -86,9 +86,9 @@ Cc: netdev@vger.kernel.org,
 	linux-nfs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Sean Chang <seanwascoding@gmail.com>
-Subject: [PATCH v3 1/3] nfsd/lockd: Remove redundant debug checks
-Date: Thu, 19 Mar 2026 22:18:44 +0800
-Message-Id: <20260319141846.78222-2-seanwascoding@gmail.com>
+Subject: [PATCH v3 2/3] svcrdma: remove redundant IS_ENABLED(CONFIG_SUNRPC_DEBUG) guards
+Date: Thu, 19 Mar 2026 22:18:45 +0800
+Message-Id: <20260319141846.78222-3-seanwascoding@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260319141846.78222-1-seanwascoding@gmail.com>
 References: <20260319141846.78222-1-seanwascoding@gmail.com>
@@ -116,7 +116,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-269458-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269459-lists,netdev=lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -124,77 +124,74 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[seanwascoding@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.823];
+	NEURAL_HAM(-0.00)[-0.845];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4A3692CCBC2
+X-Rspamd-Queue-Id: 41D2C2CCBFF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Remove unnecessary IS_ENABLED(CONFIG_SUNRPC_DEBUG) guards and #ifdefs
-in nfsfh.c and svclock.c.
+Remove redundant IS_ENABLED(CONFIG_SUNRPC_DEBUG) guards in
+svc_rdma_accept(). Since dprintk() already evaluates to a no-op
+(via no_printk) when debugging is disabled, these explicit guards
+are unnecessary.
 
 Verification with .lst files under -O2 confirms that the compiler
 successfully performs "dead code elimination". Even when variables
-(like char buf[] in nfsfh.c) or static helper functions (like
-nlmdbg_cookie2a() in svclock.c) are declared without #ifdef, they are
-completely optimized out (no stack allocation, no symbol references in
-the final executable) as they are only referenced within no_printk().
+(like 'sap' in this case) are declared outside of #ifdef, they are
+completely optimized out (no stack allocation, no symbol references
+in the final executable) as they are only referenced within dprintk().
 
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Sean Chang <seanwascoding@gmail.com>
 ---
- fs/lockd/svclock.c | 7 -------
- fs/nfsd/nfsfh.c    | 8 +++-----
- 2 files changed, 3 insertions(+), 12 deletions(-)
+ net/sunrpc/xprtrdma/svc_rdma_transport.c | 25 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-diff --git a/fs/lockd/svclock.c b/fs/lockd/svclock.c
-index ee23f5802af1..9b978a087b3c 100644
---- a/fs/lockd/svclock.c
-+++ b/fs/lockd/svclock.c
-@@ -47,7 +47,6 @@ static const struct rpc_call_ops nlmsvc_grant_ops;
- static LIST_HEAD(nlm_blocked);
- static DEFINE_SPINLOCK(nlm_blocked_lock);
+diff --git a/net/sunrpc/xprtrdma/svc_rdma_transport.c b/net/sunrpc/xprtrdma/svc_rdma_transport.c
+index f2d72181a6fe..0759444bda50 100644
+--- a/net/sunrpc/xprtrdma/svc_rdma_transport.c
++++ b/net/sunrpc/xprtrdma/svc_rdma_transport.c
+@@ -413,6 +413,7 @@ static struct svc_xprt *svc_rdma_accept(struct svc_xprt *xprt)
+ 	struct rpcrdma_connect_private pmsg;
+ 	struct ib_qp_init_attr qp_attr;
+ 	struct ib_device *dev;
++	struct sockaddr *sap;
+ 	int ret = 0;
  
--#if IS_ENABLED(CONFIG_SUNRPC_DEBUG)
- static const char *nlmdbg_cookie2a(const struct nlm_cookie *cookie)
- {
- 	/*
-@@ -74,12 +73,6 @@ static const char *nlmdbg_cookie2a(const struct nlm_cookie *cookie)
- 
- 	return buf;
- }
--#else
--static inline const char *nlmdbg_cookie2a(const struct nlm_cookie *cookie)
--{
--	return "???";
--}
--#endif
- 
- /*
-  * Insert a blocked lock into the global list
-diff --git a/fs/nfsd/nfsfh.c b/fs/nfsd/nfsfh.c
-index 68b629fbaaeb..91514326d1b4 100644
---- a/fs/nfsd/nfsfh.c
-+++ b/fs/nfsd/nfsfh.c
-@@ -105,12 +105,10 @@ static __be32 nfsd_setuser_and_check_port(struct svc_rqst *rqstp,
- {
- 	/* Check if the request originated from a secure port. */
- 	if (rqstp && !nfsd_originating_port_ok(rqstp, cred, exp)) {
--		if (IS_ENABLED(CONFIG_SUNRPC_DEBUG)) {
--			char buf[RPC_MAX_ADDRBUFLEN];
-+		char buf[RPC_MAX_ADDRBUFLEN];
- 
--			dprintk("nfsd: request from insecure port %s!\n",
--			        svc_print_addr(rqstp, buf, sizeof(buf)));
--		}
-+		dprintk("nfsd: request from insecure port %s!\n",
-+			svc_print_addr(rqstp, buf, sizeof(buf)));
- 		return nfserr_perm;
+ 	listen_rdma = container_of(xprt, struct svcxprt_rdma, sc_xprt);
+@@ -559,20 +560,16 @@ static struct svc_xprt *svc_rdma_accept(struct svc_xprt *xprt)
+ 		goto errout;
  	}
+ 
+-	if (IS_ENABLED(CONFIG_SUNRPC_DEBUG)) {
+-		struct sockaddr *sap;
+-
+-		dprintk("svcrdma: new connection accepted on device %s:\n", dev->name);
+-		sap = (struct sockaddr *)&newxprt->sc_cm_id->route.addr.src_addr;
+-		dprintk("    local address   : %pIS:%u\n", sap, rpc_get_port(sap));
+-		sap = (struct sockaddr *)&newxprt->sc_cm_id->route.addr.dst_addr;
+-		dprintk("    remote address  : %pIS:%u\n", sap, rpc_get_port(sap));
+-		dprintk("    max_sge         : %d\n", newxprt->sc_max_send_sges);
+-		dprintk("    sq_depth        : %d\n", newxprt->sc_sq_depth);
+-		dprintk("    rdma_rw_ctxs    : %d\n", ctxts);
+-		dprintk("    max_requests    : %d\n", newxprt->sc_max_requests);
+-		dprintk("    ord             : %d\n", conn_param.initiator_depth);
+-	}
++	dprintk("svcrdma: new connection accepted on device %s:\n", dev->name);
++	sap = (struct sockaddr *)&newxprt->sc_cm_id->route.addr.src_addr;
++	dprintk("    local address   : %pIS:%u\n", sap, rpc_get_port(sap));
++	sap = (struct sockaddr *)&newxprt->sc_cm_id->route.addr.dst_addr;
++	dprintk("    remote address  : %pIS:%u\n", sap, rpc_get_port(sap));
++	dprintk("    max_sge         : %d\n", newxprt->sc_max_send_sges);
++	dprintk("    sq_depth        : %d\n", newxprt->sc_sq_depth);
++	dprintk("    rdma_rw_ctxs    : %d\n", ctxts);
++	dprintk("    max_requests    : %d\n", newxprt->sc_max_requests);
++	dprintk("    ord             : %d\n", conn_param.initiator_depth);
+ 
+ 	return &newxprt->sc_xprt;
  
 -- 
 2.34.1
