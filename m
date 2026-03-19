@@ -1,129 +1,141 @@
-Return-Path: <netdev+bounces-269223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269224-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wH6qAgJFu2miiAIAu9opvQ
-	(envelope-from <netdev+bounces-269223-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:36:18 +0100
+	id 2PZMKgxHu2kliQIAu9opvQ
+	(envelope-from <netdev+bounces-269224-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:45:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFA052C41F1
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:36:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 108D82C4273
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:44:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A2B9F302C336
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:36:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC425311D70E
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B109A1E832A;
-	Thu, 19 Mar 2026 00:36:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qJhLg7a4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B212023536B;
+	Thu, 19 Mar 2026 00:44:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD12A40DFC3;
-	Thu, 19 Mar 2026 00:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+Received: from mailgw2.hygon.cn (unknown [101.204.27.37])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB1A72B9B7
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 00:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.204.27.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773880572; cv=none; b=SMNCozFjxGvPRM2c5xs12Rvpb+mVtOmv0XNKQpSOmJtGv5XQKPysxAsE2lUN2RvLpFmDkLOdEhahwZE6ztKI8XsNwur4vikCdzGx/04eVo6XLDuCIq+C6o5aEBn5a7gAW6N3PXapKzQxNLxEatYntYJ7WSt3h4Aqyu/kKen+/lI=
+	t=1773881043; cv=none; b=sfAl7JcEImtB9zDqVPgiwNnq8aZBbOBpwP0rjk1eE69pUDquPrzRPsOBxwp0aVQaS+cq/61LlT9N1IE5WIEuXDhJnKqU1uRgIazkjwUJ09pUIk9w7Vz/2lIJ/1jaJIGOj+QVK3bJwsYAXuys0bMFUabcHOzLhZD5rlcTPo/PFmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773880572; c=relaxed/simple;
-	bh=GLRxmZqFR01k+/vw+eN6+g3NUOdrIhuDKe7/EHNHSTc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j4cWdaUl8vdPW1Kv471LZcpQ6XRjiUMWdL23f0/lOZteVYlDkFxvu24hEa1Se6A7JyW6r5gj1oCP+fJOZfU4Utzz8ykLQ+BQCsrVw3u3Jp1N744Np+JcPLYYLYF39cfM3wBhE29DuUP4dPl2g5inw/ESUYQ+hul+HA22xo6eif0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qJhLg7a4; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=7xpA/C5tz/CpKZahcDKyOu6poBgzBCZEd5UawYwBT+k=; b=qJhLg7a4oqGLAhUvbffrGJ40bC
-	4pzhWzD7uzYU4P5cSUlwduYA3UgjGCYzxLDzO1YVMx8fumRI6UdYXUp9/n/x5UWp+xssnYmRF4bzc
-	g5rEOw5W6ETvWGIjWSQZqVSw99aODB+6Y5Mzrst5b6Q50d7hKZ3H5QD2IlDodfaX1N5DgTT0Ndtjq
-	9iZy7tImoGtCV1npgu/Pj1LN41ql1XMT7Q2++FU83m9N/zoS0OlxQ6ffYhYI/It0EziYspthrZ2Gx
-	mvfNGK1/hPPwNW6Pdh8uYL9VpL4vna+nuXApqXLxHGdTGVI/QdtufRYevWAo2ovAK4wjF0kXOD9HR
-	/+WSwH9Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54544)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w31Mo-0000000045O-2FVc;
-	Thu, 19 Mar 2026 00:36:02 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w31Mk-000000007Z7-2Ca1;
-	Thu, 19 Mar 2026 00:35:58 +0000
-Date: Thu, 19 Mar 2026 00:35:58 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next 0/8] net: stmmac: improve PCS support
-Message-ID: <abtE7sDT75I7uPnk@shell.armlinux.org.uk>
-References: <abQC7r38QLhSeadl@shell.armlinux.org.uk>
- <abdEscs44fU4kRag@oss.qualcomm.com>
- <abdYu864OmNWiWIW@shell.armlinux.org.uk>
- <ablpxwGks9m38fhM@shell.armlinux.org.uk>
- <absjNQ2s3Z5N2Zwo@oss.qualcomm.com>
+	s=arc-20240116; t=1773881043; c=relaxed/simple;
+	bh=R0gyezNUjoeHfKtZpni3CaO3nviThjHMgM9T+bNatbk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=kvZT9fjP/3lbslsRtgADLP32tjsD7ihTiBuHIzwPPpJyyg4yHhP1JIyt4JsWwYkmSZQ5dYaSbV2A1Tm/JVXh4mDYOKq5AgZqqUJRpuLTvdgvtplx7cAhAPky8ipZjTSn7Xi6w54vZ4XFGt6mudpZkpMR5elgQaKNblAYD6xE1/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn; spf=pass smtp.mailfrom=hygon.cn; arc=none smtp.client-ip=101.204.27.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
+Received: from maildlp1.hygon.cn (unknown [127.0.0.1])
+	by mailgw2.hygon.cn (Postfix) with ESMTP id 4fbn4T3gz3z1YQpmD;
+	Thu, 19 Mar 2026 08:43:37 +0800 (CST)
+Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
+	by mailgw2.hygon.cn (Postfix) with ESMTP id 4fbn4R20Mbz1YQpmD;
+	Thu, 19 Mar 2026 08:43:35 +0800 (CST)
+Received: from cncheex05.Hygon.cn (unknown [172.23.18.115])
+	by maildlp1.hygon.cn (Postfix) with ESMTPS id 1F2895959;
+	Thu, 19 Mar 2026 08:43:28 +0800 (CST)
+Received: from cncheex04.Hygon.cn (172.23.18.114) by cncheex05.Hygon.cn
+ (172.23.18.115) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Thu, 19 Mar
+ 2026 08:43:35 +0800
+Received: from cncheex04.Hygon.cn ([fe80::1b6f:6c58:58a4:430d]) by
+ cncheex04.Hygon.cn ([fe80::1b6f:6c58:58a4:430d%10]) with mapi id
+ 15.02.1544.036; Thu, 19 Mar 2026 08:43:34 +0800
+From: Zhud <zhud@hygon.cn>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com"
+	<jasowang@redhat.com>, "xuanzhuo@linux.alibaba.com"
+	<xuanzhuo@linux.alibaba.com>, "eperezma@redhat.com" <eperezma@redhat.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "willemb@google.com"
+	<willemb@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, Jing Li
+	<lijing@hygon.cn>, Zhiwei Ying <yingzhiwei@hygon.cn>
+Subject: RE: [PATCH net v3] virtio-net: enable NETIF_F_GRO_HW only if
+ GRO-related offloads are supported
+Thread-Topic: [PATCH net v3] virtio-net: enable NETIF_F_GRO_HW only if
+ GRO-related offloads are supported
+Thread-Index: AQHctgIsDY8nIT6XukqVKwAnhqpvxrWyyXQAgACy7rA=
+Date: Thu, 19 Mar 2026 00:43:34 +0000
+Message-ID: <738926a1932e4c7a94f0ad8929b38171@hygon.cn>
+References: <20260317113433.927022-1-zhud@hygon.cn>
+ <20260317153126.61f7d3de@kernel.org>
+In-Reply-To: <20260317153126.61f7d3de@kernel.org>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <absjNQ2s3Z5N2Zwo@oss.qualcomm.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[hygon.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	TAGGED_FROM(0.00)[bounces-269223-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-269224-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	NEURAL_SPAM(0.00)[0.055];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	RCVD_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_SPAM(0.00)[0.692];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhud@hygon.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: BFA052C41F1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hygon.cn:mid]
+X-Rspamd-Queue-Id: 108D82C4273
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 19, 2026 at 03:42:05AM +0530, Mohd Ayaan Anwar wrote:
-> [    8.650486] qcom-ethqos 23040000.ethernet: clk_csr value out of range (0xffffff00 exceeds mask 0x00000f00), truncating
+> On Tue, 17 Mar 2026 19:34:33 +0800 Di Zhu wrote:
+> > In such a setup, reporting NETIF_F_GRO_HW as available for the device
+> > is too optimistic and misleading to the user.
+>=20
+> This is not a sufficient justification to make this a fix.
+> As Michael was already alluding to HW GRO usually covers fewer
+> protocols and is less effective than SW GRO. Normal config is
+> to have both enabled. Please explain if there's anything special
+> about virtio here, because I haven't heard of people disabling
+> SW GRO because HW GRO is already enabled.
 
-Please look into this first - with the MDIO bus operating at
-who-knows-what frequency, this could make reading from the PHY
-unreliable.
+"Thanks, Jakub. You're right, that was a poorly chosen example to justify t=
+his as a fix,=20
+and I see your point regarding HW GRO vs SW GRO. There isn't anything speci=
+al about
+virtio here that would necessitate disabling SW GRO in normal cases; my ini=
+tial thought=20
+was more about the potential for user confusion in specific testing scenari=
+os.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+>=20
+> I think this should continue to target net-next with no Fixes tag.
+
+I'll drop the Fixes tag and target net-next in V2. I'll also move the=20
+hw_features initialization before register_netdevice() as discussed,=20
+to ensure the driver follows the proper pattern."
+
 
