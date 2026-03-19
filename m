@@ -1,156 +1,127 @@
-Return-Path: <netdev+bounces-269573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269574-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uBKOOPYwvGnxuQIAu9opvQ
-	(envelope-from <netdev+bounces-269573-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:23:02 +0100
+	id oJ8zMs0xvGnxuQIAu9opvQ
+	(envelope-from <netdev+bounces-269574-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:26:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DCE82CFDF5
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:23:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 320182CFF55
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:26:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 11CF430D7C4E
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:17:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 64D503275F7D
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:20:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147543E024F;
-	Thu, 19 Mar 2026 17:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355123E0C60;
+	Thu, 19 Mar 2026 17:19:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="xEuAmbsW"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rL3sa67/"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB572ECD34
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 17:17:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274453242BD
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 17:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773940629; cv=none; b=AaBDcr75fvZEj6DpZzbIr8cikhS5mNFEzeaemRrOVuffkuA1ac0cxKPmSiuTL8Ciu7WrZOaRIBmk8qNyvx8W1ZgsQnFZSZc+lPTpeY6A/SoCU3yJFuPazJnLeVU50+rBGeH28VVoDtwvK7woLBBlZ8K4PZFNVxotZ8QM0nJG8ac=
+	t=1773940788; cv=none; b=VvFMiVgRN5d/7KQb1ZP5f+Z9bGD2LdeIktJJ4HO/BRNp8SgyPxxQQvS1VZCxbDiwDQufbUg7p+rXfnqjQM4MfMhXv9QgJrCayaVph0IiTXP4NLCDgkjO4lCtlAznIZlgMH2gg7NoJ12DohUzMI65QPRYOwq8LmJvKECYP55mPQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773940629; c=relaxed/simple;
-	bh=8xf9behZCkERMvn98dmjaCAFyym+EbqImKHu9YNuySk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tAE+9fHAEbLaUYUfgjBrNpHy1VI/z005/X2vZBunQN1WDsLnlOkD87NjkUJWzu5JraeMtxlmKkDOoyU0dr4dFi2q+jDoM17RTPSIEJOnxMEbdQFb02DEPbzcFWqvRKw3sH81bWc/Y/HXlEnJdK+w2tnevJvgrXkEWEHyIE49Fyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=xEuAmbsW; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from ms-a2 (122.24.31.150.dy.iij4u.or.jp [150.31.24.122])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 62JHH6xw076845
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 20 Mar 2026 02:17:06 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=t7tQWDB599mgzXVu98rsjNCBJh04E4IB3vAFUErTcSE=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20251215; t=1773940626; v=1;
-        b=xEuAmbsWx2tlWHC2vSSvQu8Dm2r5gcipiR6jl9TiDD/9u3VYgSV0WVTOyC//dcRA
-         M606VcjKCzGKSPqYbXEzE9ieGyqD7TwTEbadPcX6/Ld04jzG3tmEqbA6drzSWOoc
-         gQh8tug2E9afijTz+drxS4Qq6Ze7rIBD38E9+atcDLq/mAnhOW2MkGP2ZlLb7F6Z
-         oGAPOZgr93Im+OFpEV2QTKMWsw/htxVxmv4mgIrEiB81cJkafdJSqLFEDkeivAxh
-         CH+Q1vWIByoUruJSn4YFcvtw9Fkckl5wTOV2+mJU0wJ5PTqcqsT30qmjcAiyxPCs
-         /cjVRaFNtJmSQ8kCI/IBvA==
-From: Kohei Enju <kohei@enjuk.jp>
-To: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, kohei.enju@gmail.com,
-        Kohei Enju <kohei@enjuk.jp>
-Subject: [PATCH iwl-next v1 3/3] i40e: add support for bpf_xdp_metadata_rx_vlan_tag()
-Date: Thu, 19 Mar 2026 17:16:44 +0000
-Message-ID: <20260319171650.5815-4-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260319171650.5815-1-kohei@enjuk.jp>
-References: <20260319171650.5815-1-kohei@enjuk.jp>
+	s=arc-20240116; t=1773940788; c=relaxed/simple;
+	bh=uKS9jFUjLtOqGZ7fa7JSWw7aBNecmXVRjgnOjaJ8vnc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SdF8LZ3FEmMORnxGmgc4c+O8P8jqbh/GuxKI/zk2ti0RmFUIqqPlwmJxVfVFNPqHMiEozcQ9Q05Mz8urOseHQfnCePECvv/myCoEg3Cvml8fJkcJLGX/QyLhgif/OieAVtXaTIts4DWD2BowKoQYe6gv2LBYZYdBN+mUKxS3L4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rL3sa67/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=CMohD21ZVdc4EdTwB29TcG44o8kbx6ZodTcwxjCdXQM=; b=rL3sa67/+PvbRNxWbUVlQuI4Fb
+	S9RgMofeGIZpzQiCV+B2p2XHd2EriyLsDFzbvX9CJyzFCS+14l4JAA95KefosP36AOP86pXXifJn4
+	dsuRuMMcE/wYhFBUr08hzqYusfn4tVKStlAT5M6128VoDPhFEuOePmX6sm/dZDYPT0gs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w3H20-00CQJq-Bh; Thu, 19 Mar 2026 18:19:36 +0100
+Date: Thu, 19 Mar 2026 18:19:36 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Javen <javen_xu@realsil.com.cn>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: r8169: Discussion on implementing RSS support for r8169
+Message-ID: <bb17044d-9dff-4c81-a001-d754c42e0040@lunn.ch>
+References: <1ce3478d571f4d26a45e792c4c84c429@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1ce3478d571f4d26a45e792c4c84c429@realsil.com.cn>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,enjuk.jp];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269574-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269573-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	NEURAL_HAM(-0.00)[-0.968];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:dkim,enjuk.jp:email,enjuk.jp:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3DCE82CFDF5
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.962];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: 320182CFF55
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Introduce i40e_xdp_rx_vlan_tag() which takes the same approach as
-i40e_process_skb_fields() to extract the VLAN tag from the RX
-descriptor.
+On Thu, Mar 19, 2026 at 08:56:58AM +0000, Javen wrote:
+> Hi, Heiner
+> 
+> We are now planning to implement RSS support on r8169 driver. This will require significant changes to the existing driver architecture, so we want to discuss it with you.
+> 
+> Based on our vendor driver which can be fetched from Realtek, the key modifications will include:
+> 
+> 	1. Enable msix and updating the irq allocation mechanism
+> 	2. Support multiple rx/tx queues
+> 	3. Register multiple napi and update new interrupt mapping(isr/imr) for multi-queue
+> 	4. Implement rx msix poll and rx interrupt function
+> 	5. Implement ethtool callbacks for rss configuration
+> 
+> Should we submit the changes above separately or submit them all at once? Or do you have any other suggestions?
 
-Tested with X710 adapter using xdp_hw_metadata, and confirmed that VLAN
-tags match between bpf_xdp_metadata_rx_vlan_tag() and
-skb->vlan_proto/vlan_tci.
+You generally want lots of small patches, each with a good commit
+message, which are obviously correct. Given the limit of 15 patches in
+one series, you probably need to break it up into a number of series.
 
-Signed-off-by: Kohei Enju <kohei@enjuk.jp>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+Also, having small patches makes git bisect more useful when you
+break stuff.
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 6b7e34b16a8d..3749f32ef95a 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -13610,8 +13610,27 @@ static int i40e_xdp_rx_hash(const struct xdp_md *_ctx, u32 *hash,
- 	return 0;
- }
- 
-+static int i40e_xdp_rx_vlan_tag(const struct xdp_md *_ctx, __be16 *vlan_proto,
-+				u16 *vlan_tci)
-+{
-+	const struct i40e_xdp_buff *ctx = (const void *)_ctx;
-+	const union i40e_rx_desc *desc = ctx->desc;
-+	u64 status;
-+
-+	status = le64_to_cpu(desc->wb.qword1.status_error_len);
-+
-+	if (!(status & BIT(I40E_RX_DESC_STATUS_L2TAG1P_SHIFT)))
-+		return -ENODATA;
-+
-+	*vlan_proto = cpu_to_be16(ETH_P_8021Q);
-+	*vlan_tci = le16_to_cpu(desc->wb.qword0.lo_dword.l2tag1);
-+
-+	return 0;
-+}
-+
- static const struct xdp_metadata_ops i40e_xdp_metadata_ops = {
- 	.xmo_rx_hash		= i40e_xdp_rx_hash,
-+	.xmo_rx_vlan_tag	= i40e_xdp_rx_vlan_tag,
- };
- 
- static const struct net_device_ops i40e_netdev_ops = {
--- 
-2.51.0
-
+      Andrew
 
