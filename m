@@ -1,178 +1,133 @@
-Return-Path: <netdev+bounces-269271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269272-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qOarBgdhu2lujQIAu9opvQ
-	(envelope-from <netdev+bounces-269271-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:35:51 +0100
+	id MAx9Ny9hu2lujQIAu9opvQ
+	(envelope-from <netdev+bounces-269272-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:36:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DB372C506D
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:35:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 474B22C50A1
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:36:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E886C302606B
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:35:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D78B3059F27
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:36:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE4736C58F;
-	Thu, 19 Mar 2026 02:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A81D1386C02;
+	Thu, 19 Mar 2026 02:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="DqS7uWXm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bVStI2Um"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B20B340DAB
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 02:35:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828DF330328;
+	Thu, 19 Mar 2026 02:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773887716; cv=none; b=c7SgYDd7JIZcPeOWhIB/VQhlqnee4dOG9WdpM99Yre7uRTaRO0IMYNrSJdT3UoFEHBrNPMHeOy83+bQnS9r7yJLhwwT13IiG8r6wcXswf2ZSZSRLanHPjcRzGTkdwYz+RN8ml9kaHnR7XvlpIQKJB8QjWI8u5ygSavD3hhzTDfQ=
+	t=1773887776; cv=none; b=UfgGVh0iTvhX+MUItRJeQzI/oIR5mNskDL9u4QR3xx5ITj9sovXqGZ9q0kphkMQ4VD+OwJ/jjy7qRQKx7OPqkr5G3gSOwna+8vdLrF46fp1ZJgQ9gj42xogbXEhNhbLITWiBHiQOwvc+un/k215Ksl0yronW14jKaqmq5hdV2PA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773887716; c=relaxed/simple;
-	bh=q1m2iiyEZY8S79tebtT3rfyJX+JE/UBxPdvO6KQPnm8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VShQyl7C/S0r0Zei8A/1z2vk8KbbC1rOiMuGHY8m5oyT2wFheUn38kzzi7LlTpJCCn7zMZHjbekYIAtm3WS7364nwtUfto07wGDxm+FuY+iPmv/Skz/ZAF1Zbu0TOfN0WRQAFNPhUdZg8lbYxGEB4hIChW9A872vu12AF1DEnYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=DqS7uWXm; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 62J2Z9PN02865011, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1773887710;
-	bh=q1m2iiyEZY8S79tebtT3rfyJX+JE/UBxPdvO6KQPnm8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=DqS7uWXm3Z2zIt+4NRe+xLkPfVBP0rpXHEO1Y/pQ/mvqZ+xyNnIyw7xJVX26qsa8H
-	 QKFmuclzXEx3NtLZsA0vpKe+4wVSb1U7FC+1jCTOsnTZ0u2GIpv+yKCvqpDxuxvfo7
-	 5uw+uObdz/nl12s8yTMLO2Kco0+i7NJMzyi9kcH3N/FUbnStzzbqabgSFgyU6iYs4o
-	 U/Y5dn3BgxLZbEuFxgVlEgDvTYCYXV56cYPMeZWq5MY9ir+Xl7FUMkZtjbjmbFmK+t
-	 BfSY+uuXWDC+LNCEzRFxhtMvz/8KV6uVyrYrcPvWvLJl9dJpdvty1dbhsO2xoIdahH
-	 kYLrUl1dpRSSA==
-Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 62J2Z9PN02865011
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 19 Mar 2026 10:35:10 +0800
-Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
- RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.39; Thu, 19 Mar 2026 10:35:09 +0800
-Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
- RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Thu,
- 19 Mar 2026 10:35:09 +0800
-From: Javen <javen_xu@realsil.com.cn>
-To: Heiner Kallweit <hkallweit1@gmail.com>, Huan Zhao <ms.huan.zhao@gmail.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: r8169: RTL8125B restores default LEDSEL values on Link Up,
- preventing persistent LED configuration
-Thread-Topic: r8169: RTL8125B restores default LEDSEL values on Link Up,
- preventing persistent LED configuration
-Thread-Index: AQHctF6oK7ZLFDD22E6i3+8OA6HIObW1I4SQ
-Date: Thu, 19 Mar 2026 02:35:09 +0000
-Message-ID: <91926dc60d1145a79090a23b42a1653b@realsil.com.cn>
-References: <20260315014636.30074-1-ms.huan.zhao@gmail.com>
- <322ac707-cb11-4543-bd56-d9f7cce4b52f@gmail.com>
-In-Reply-To: <322ac707-cb11-4543-bd56-d9f7cce4b52f@gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1773887776; c=relaxed/simple;
+	bh=bdi1RhJlIvIY3nRJ/Axr7Nfhl+z7qVjPxc3jaJHOOeU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d+F2CWVohaj0/QYDTIH9x7ly6zO4sKlFYezujAtVJall05oCfQT+uLCLKMtOvYXA5quDO6++Vxh8lkZKKmbNQfojnAeSkR1gh0gcpXtp8PAa7xYDv/oghXfnCjOt2u8cuS8AZ247CSaAPOSfDN8Hz731DowTyf4QhW2+iLHRAqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bVStI2Um; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24E86C19421;
+	Thu, 19 Mar 2026 02:36:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773887776;
+	bh=bdi1RhJlIvIY3nRJ/Axr7Nfhl+z7qVjPxc3jaJHOOeU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bVStI2Umn7+FBYjYFa0IYkGcQb+0Gw3w/1EMEOXi0PCxqPJenVOw29a1jmw6IEoVR
+	 09wn0sbDQqKrK5HIicR/enLSIN2KRBQ0DkWIJlIj9xKKaXEULoNhCQv/RIsaNcD018
+	 g+gTMEBaI0BMCNsZ0VxsQ3UTZjPHxxUYDdpHdSporrU8G/obcqM3zIiy3kPXoum76b
+	 bBL6Jw3+2Vc7FYWg8kcvr4kAU+hFhQhfO+ZC+DmoRh3lNPbHSy+G+XsVgcDXT+9p9i
+	 W0j0IWxemVzmRSkmePIzTdbrNQB490ZvX/J4CjbGz8+RtMwXdbYVa6/YOB7G6vZGMI
+	 FAdAGEDsr0WEA==
+Date: Wed, 18 Mar 2026 19:36:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, dipayanroy@linux.microsoft.com,
+ yury.norov@gmail.com, kees@kernel.org, ssengar@linux.microsoft.com,
+ gargaditya@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next v3] net: mana: Expose hardware diagnostic info
+ via debugfs
+Message-ID: <20260318193614.22328bc8@kernel.org>
+In-Reply-To: <20260316112339.1208155-1-ernis@linux.microsoft.com>
+References: <20260316112339.1208155-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-2.06 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269271-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269272-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	NEURAL_HAM(-0.00)[-0.940];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	NEURAL_HAM(-0.00)[-0.988];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 0DB372C506D
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 474B22C50A1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Pk9uIDE1LjAzLjIwMjYgMDI6NDYsIEh1YW4gWmhhbyB3cm90ZToNCj4+IEhhcmR3YXJlOiBCZWVs
-aW5rIFNFUjggbWluaSBQQw0KPj4gTklDOiBSZWFsdGVrIFJUTDgxMjVCIChYSUQgMHg2NDEsIFJU
-TF9HSUdBX01BQ19WRVJfNjMsIHJldiAwNSkNCj4+IEtlcm5lbDogNi4xOS42LWFyY2gxLTENCj4+
-IERyaXZlcjogcjgxNjkgKGluLXRyZWUpDQo+PiBDT05GSUdfUjgxNjlfTEVEUz15DQo+PiBDT05G
-SUdfTEVEU19UUklHR0VSX05FVERFVj1tDQo+Pg0KPj4gUHJvYmxlbToNCj4+IFRoZSBSVEw4MTI1
-QiBjaGlwIHJlc3RvcmVzIGl0cyBMRURTRUwgcmVnaXN0ZXJzIHRvIGhhcmR3YXJlIGRlZmF1bHQN
-Cj4+IHZhbHVlcyBvbiBldmVyeSBMaW5rIFVwIGV2ZW50LiBUaGUgcjgxNjkgZHJpdmVyIGRvZXMg
-bm90IHJlYXBwbHkgdGhlDQo+PiBMRUQgY29uZmlndXJhdGlvbiBhZnRlciBMaW5rIFVwLCBtYWtp
-bmcgaXQgaW1wb3NzaWJsZSB0byBwZXJzaXN0ZW50bHkNCj4+IGNvbmZpZ3VyZSBMRURzIChlLmcu
-IGRpc2FibGUgdGhlbSkgdGhyb3VnaCB0aGUgc3RhbmRhcmQga2VybmVsIExFRA0KPnN1YnN5c3Rl
-bS4NCj4+DQo+PiBEZXRhaWxzOg0KPj4NCj4+IFRoZSBMaW5rIFVwIHBhdGggaW4gdGhlIGRyaXZl
-ciBpczoNCj4+DQo+PiAgIHI4MTY5X3BoeWxpbmtfaGFuZGxlcigpICAgICAgIFtyODE2OV9tYWlu
-LmM6NDc1N10NCj4+ICAgICAtPiBydGxfbGlua19jaGdfcGF0Y2goKSAgICAgW3I4MTY5X21haW4u
-YzoxNTk3XQ0KPj4gICAgIC0+IHJ0bF9lbmFibGVfdHhfbHBpKCkNCj4+ICAgICAtPiBwbV9yZXF1
-ZXN0X3Jlc3VtZSgpDQo+Pg0KPj4gcnRsX2xpbmtfY2hnX3BhdGNoKCkgaGFzIG5vIGhhbmRsaW5n
-IGZvciBSVExfR0lHQV9NQUNfVkVSXzYzIGFuZCBkb2VzDQo+PiBub3QgdG91Y2ggdGhlIExFRFNF
-TCByZWdpc3RlcnMuIFNpbWlsYXJseSwgcnRsX2h3X3N0YXJ0XzgxMjViKCkgYW5kDQo+PiBydGxf
-aHdfc3RhcnRfODEyNV9jb21tb24oKSwgd2hpY2ggYXJlIGNhbGxlZCBvbiBoYXJkd2FyZQ0KPj4g
-aW5pdGlhbGl6YXRpb24sIGRvIG5vdCB3cml0ZSB0byBhbnkgTEVEU0VMIHJlZ2lzdGVyIChMRURT
-RUwwPTB4MTgsDQo+PiBMRURTRUwxPTB4ODYsIExFRFNFTDI9MHg4NCwgTEVEU0VMMz0weDk2KS4N
-Cj4+DQo+PiBUaGUgb25seSBkcml2ZXIgY29kZSB0aGF0IHdyaXRlcyBMRURTRUwgcmVnaXN0ZXJz
-IGlzDQo+PiBydGw4MTI1X3NldF9sZWRfbW9kZSgpIGluIHI4MTY5X2xlZHMuYywgY2FsbGVkIGV4
-Y2x1c2l2ZWx5IGZyb20gdGhlDQo+PiBMRUQgY2xhc3NkZXYgaHdfY29udHJvbCBjYWxsYmFja3Mu
-IFRoZXJlZm9yZSwgYW55IExFRCBjb25maWd1cmF0aW9uDQo+PiBhcHBsaWVkIHZpYSBzeXNmcyBp
-cyBzaWxlbnRseSBvdmVyd3JpdHRlbiBieSB0aGUgaGFyZHdhcmUgY2hpcCdzIG93bg0KPj4gZmly
-bXdhcmUgb24gZXZlcnkgTGluayBVcCBldmVudCwgYmVmb3JlIHRoZSBkcml2ZXIgaGFzIGEgY2hh
-bmNlIHRvIHJlYXBwbHkNCj5pdC4NCj4+DQo+PiBUaGlzIHdhcyB2ZXJpZmllZCBieSBvYnNlcnZp
-bmcgdGhhdDoNCj4+IDEuIFdyaXRpbmcgMHgwMDAwIHRvIGFsbCBMRURTRUwgcmVnaXN0ZXJzICh2
-aWEgQkFSMCBNTUlPKSBiZWZvcmUgTGluayBVcA0KPj4gICAgc3VjY2Vzc2Z1bGx5IHR1cm5zIG9m
-ZiBhbGwgTEVEcy4NCj4+IDIuIEFmdGVyIExpbmsgVXAgY29tcGxldGVzLCB0aGUgTEVEU0VMIHJl
-Z2lzdGVycyByZXZlcnQgdG8gdGhlaXIgaGFyZHdhcmUNCj4+ICAgIGRlZmF1bHRzLCB0dXJuaW5n
-IHRoZSBMRURzIGJhY2sgb24uDQo+PiAzLiBXcml0aW5nIDB4MDAwMCB0byBMRURTRUwgcmVnaXN0
-ZXJzIGltbWVkaWF0ZWx5IGFmdGVyIExpbmsgVXAgKHZpYQ0KPj4gICAgTmV0d29ya01hbmFnZXIg
-ZGlzcGF0Y2hlciB0cmlnZ2VyZWQgb24gZGhjcDQtY2hhbmdlKSBzdWNjZXNzZnVsbHkNCj5rZWVw
-cw0KPj4gICAgdGhlIExFRHMgb2ZmIHBlcnNpc3RlbnRseS4NCj4+DQo+PiBPcmlnaW5hbCBMRURT
-RUwgcmVnaXN0ZXIgdmFsdWVzIChoYXJkd2FyZSBkZWZhdWx0cykgb24gdGhpcyBtYWNoaW5lOg0K
-Pj4gICBMRURTRUwwICgweDE4KSA9IDB4MDAwMiAgKExJTktfMTAwKQ0KPj4gICBMRURTRUwxICgw
-eDg2KSA9IDB4MDAyOCAgKExJTktfMjUwMCArIExJTktfMTAwMCkNCj4+ICAgTEVEU0VMMiAoMHg4
-NCkgPSAweDAyMmIgIChBQ1QgKyBMSU5LXzI1MDAgKyBMSU5LXzEwMDAgKyBMSU5LXzEwMCArDQo+
-TElOS18xMCkNCj4+ICAgTEVEU0VMMyAoMHg5NikgPSAweDAwMjAgIChMSU5LXzI1MDApDQo+Pg0K
-PlRoYW5rcyBmb3IgdGhlIHJlcG9ydC4gRm9yIHByZXBhcmF0aW9uIG9mIGEgZml4IGl0IHdvdWxk
-IGJlIGhlbHBmdWwgdG8ga25vdw0KPndoZXRoZXIgdGhpcyBiZWhhdmlvciBpcyBzcGVjaWZpYyB0
-byBSVEw4MTI1Qiwgb3Igd2hldGhlciB0aGlzIGFwcGxpZXMgdG8gYWxsDQo+Y2hpcCB2YXJpYW50
-cyBzdXBwb3J0ZWQgYnkgdGhlIGRyaXZlci4NCj5BIHJlc2V0IHRvIGRlZmF1bHRzIGFmdGVyIGEg
-ZGVlcCBwb3dlci1zYXZpbmcgc3RhdGUgSSdkIHVuZGVyc3RhbmQsIGJ1dCBhIHJlc2V0DQo+dG8g
-cG93ZXItdXAgZGVmYXVsdHMgb24gbGluay11cCBzb3VuZHMgcXVpcmt5LiBCdXQgbWF5YmUgaXQn
-cyBub3QgcG93ZXItdXANCj5kZWZhdWx0cywgYnV0IGxpbmsgc3BlZWQgc3BlY2lmaWMgZGVmYXVs
-dHMuDQo+DQo+SGF1LCBKYXZlbjogQXMgSSBkb24ndCBoYXZlIGFjY2VzcyB0byBjaGlwIGRvY3Vt
-ZW50YXRpb24sIEknZCBhcHByZWNpYXRlIGENCj5jb21tZW50IGZyb20geW91ciBzaWRlLiBUaGFu
-a3MhDQoNCk15IHBsYXRmb3JtOg0KIEhhcmR3YXJlOiBBU1VTVGVrIFo4OTAtUExVUw0KIE5JQzog
-UmVhbHRlayBSVEw4MTI1QiAoWElEIDB4NjQxLCBSVExfR0lHQV9NQUNfVkVSXzYzLCByZXYgMDQp
-DQogS2VybmVsOiA3LjAuMC0wNzAwMDByYzEtZ2VuZXJpYw0KIERyaXZlcjogcjgxNjkgKGluLXRy
-ZWUpDQoNCkkgdHJpZWQgdGhlIGZvbGxvd2luZyBzdGVwczoNCjEuIGxpbmsgdXAsIExFRHMgb24N
-CjIuIGxpbmsgZG93biwgTEVEIG9mZg0KMy4gd3JpdGluZyAweDAwMDAgdG8gbW1pbyBhZGRyZXNz
-IHRocm91Z2ggZGV2bWVtMiwgbGluayB1cCwgTEVEUyBhcmUgc3RpbGwgb2ZmDQoNCjEuIGxpbmsg
-dXAsIExFRHMgb24NCjIuIGVjaG8gMCB8IHN1ZG8gdGVlIC9zeXMvY2xhc3MvbGVkcy9lbnAxMzBz
-MC0yOjpsYW4vbGlua18xMDAwLCBMRURzIG9mZg0KMy4gbGluayBkb3duLCBsaW5rIHVwLCBMRURz
-IGFyZSBzdGlsbCBvZmYNCg0KT3JpZ2luYWwgTEVEU0VMIHJlZ2lzdGVyIHZhbHVlcyDigIvigItv
-biBteSBwYzogDQpMRURTRUwwICgweDE4KSA9IDB4MDIwMSANCkxFRFNFTDEgKDB4ODYpID0gMHgw
-MjAyIA0KTEVEU0VMMiAoMHg4NCkgPSAweDAyMDggDQpMRURTRUwzICgweDk2KSA9IDB4MDIyMA0K
-DQpJIGNhbid0IHNlZSB0aGUgcHJvYmxlbSBvbiBteSBwYy4gSSB3YW50IHRvIGtub3cgaWYgdGhl
-cmUncyBhbnl0aGluZyB3cm9uZyB3aXRoIHRoZSBzdGVwcyBJIHRvb2sgdG8gcmVwcm9kdWNlIGl0
-Lg0KDQpUaGFua3MNCg==
+On Mon, 16 Mar 2026 04:23:27 -0700 Erni Sri Satya Vennela wrote:
+> Add debugfs entries to expose hardware configuration and diagnostic
+> information that aids in debugging driver initialization and runtime
+> operations without adding noise to dmesg.
+> 
+> The debugfs directory creation and removal for each PCI device is
+> integrated into mana_gd_setup() and mana_gd_cleanup_device()
+> respectively, so that all callers (probe, remove, suspend, resume,
+> shutdown) share a single code path.
+
+Does not apply:
+
+Failed to apply patch:
+Applying: net: mana: Expose hardware diagnostic info via debugfs
+Using index info to reconstruct a base tree...
+M	drivers/net/ethernet/microsoft/mana/gdma_main.c
+Falling back to patching base and 3-way merge...
+Auto-merging drivers/net/ethernet/microsoft/mana/gdma_main.c
+CONFLICT (content): Merge conflict in drivers/net/ethernet/microsoft/mana/gdma_main.c
+Recorded preimage for 'drivers/net/ethernet/microsoft/mana/gdma_main.c'
+error: Failed to merge in the changes.
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
+Patch failed at 0001 net: mana: Expose hardware diagnostic info via debugfs
+-- 
+pw-bot: cr
 
