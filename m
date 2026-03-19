@@ -1,127 +1,140 @@
-Return-Path: <netdev+bounces-269286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269288-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UO75Ov1su2nGjwIAu9opvQ
-	(envelope-from <netdev+bounces-269286-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:26:53 +0100
+	id oDKMAGBuu2nGjwIAu9opvQ
+	(envelope-from <netdev+bounces-269288-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:32:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 457AC2C575E
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:26:53 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 142242C5859
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:32:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD09130AB5F4
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:26:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 76CE030197C0
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:31:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45408369997;
-	Thu, 19 Mar 2026 03:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13872C11C6;
+	Thu, 19 Mar 2026 03:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LDhxGOaC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cL2OWio9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2107136895C;
-	Thu, 19 Mar 2026 03:26:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD961274FE9;
+	Thu, 19 Mar 2026 03:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773890811; cv=none; b=HspWslGhj8+6pTBOkjXcix/20SjbESJP0zl5M46A69qY52/cCZE+CrgMqPlFQdYhoSmhV2nwkZES2lfqEljUQlIGxsX2oR7UXCggz8HtnOiHk0+i26jDFM08r1jxIadVrJ5KwwqvGzIf1zvJc2i28omnVvixCBkDpB6pdPsxisc=
+	t=1773891104; cv=none; b=iAtfvuRe3HThNgfAqwuzafUjE1Dt3zfp4+3uYiHgQT+7kdyeLM1lbpTvgrwcvaYUNFz44uDRZ6ofTV7z6FvEQR90mPvD/erTwBoRt3Q6BWxAYsMgWW0i+w/sEtTLvF0rOTa5Xw0eiVoG3PHK5DhgoocufDdn4FfQ4XM8PgbZeYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773890811; c=relaxed/simple;
-	bh=Rtlq0JUZpyBPhjiv3ICVwtSl7cpISD31cuAaRsBhrBE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ktmcA5TW2Czj7vCbj48QzGBGq4AidfAh2lulbHnfpwFIcjIapjEhDEGrW/kzW17zW1veR82GqQXr6BuqrGyRfLb91+JDK2k2DPilZmPZRSs55YA9UBfB82f0KlebC6eUMybs6Tw/lWEkCQyTGZe1uwrWRDoWgTkJTqDAaRXtq4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LDhxGOaC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45B2BC19421;
-	Thu, 19 Mar 2026 03:26:50 +0000 (UTC)
+	s=arc-20240116; t=1773891104; c=relaxed/simple;
+	bh=m+7yrCwC+pKYWfsgDv/RmSxQGUtkYG7HQcXYhhoK1Fc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LbfJjjB24UuLpeMzZ6F7MKpaV/aY3oe6LLQvPJ6v6n9BA5mKUTDQ8Yj5Aw5pl9MjNNqRIvkTsNBVrP4voJcL5c0pj6tJzi1G0GrR8QBViW08yjI3GycOirlmCQDZAbLtR+LGRTep9iUQ63DTVnkxR2i/X0Po8nM5ssFEQnPIFfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cL2OWio9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AA2AC2BC9E;
+	Thu, 19 Mar 2026 03:31:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773890810;
-	bh=Rtlq0JUZpyBPhjiv3ICVwtSl7cpISD31cuAaRsBhrBE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LDhxGOaCZGaL2Y59/Lzuv/FJ3JjSsKJ4ioxyP905byxA2H62pFxNrxlnWtnqPiEgd
-	 NY5cOViSrcQLRJsqmKuD7pQhGidubOth4Knxy2Jfzr3iJReAL0gJmeacKHe5dCNqq0
-	 lP3kOvH3Z3BkuWdqNQLYKeBMUOECj2atDalYcPsN4OAA54z0vVxt/3a0sKIuiFTZlj
-	 rIOQVzC8ElzqO0lUa6NGeVo9N3kAKx45XGaEGuQQUPj3Y5lvgIS1YCfji3c24kX2lt
-	 rSXmRr5rFfkqcmtB5ZS+E+PxkeGxrx4tFQziqPaHhEqzKfhy25d8SbDUzqDWvvgB8M
-	 q0oPgEj+KTbfg==
-Date: Wed, 18 Mar 2026 20:26:49 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>,
- syzbot+afbcf622635e98bf40d2@syzkaller.appspotmail.com, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Taehee Yoo <ap420073@gmail.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v1] net/ipv6: mcast: fix circular locking dependency
- in __ipv6_dev_mc_inc()
-Message-ID: <20260318202649.004d33fd@kernel.org>
-In-Reply-To: <f877e139-2da9-49d9-93bf-9b4155d687a7@linux.dev>
-References: <20260317111208.62667-1-jiayuan.chen@linux.dev>
-	<20260318181536.47ed9fd1@kernel.org>
-	<f877e139-2da9-49d9-93bf-9b4155d687a7@linux.dev>
+	s=k20201202; t=1773891104;
+	bh=m+7yrCwC+pKYWfsgDv/RmSxQGUtkYG7HQcXYhhoK1Fc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=cL2OWio9s/e8WqQqUw+A10U0mNOcSuv+0NpUIL0/w3MjH7yj3L1xiD+z1njhimWoL
+	 EFNJXtPOX0WKVydg7ozZAhJ0Bj5ypCLtdvfOXq6TDTvltF+Wz9On/Ip3orcKQaJ+EU
+	 JjTSMagtrxYn1zjRB9efoDG5xw6IrM5pPxnzCHSMcQLDdbffoPTZgwIWJ+evLfsNFO
+	 8YaoD5aNdk0Ou1dfjAgDqO1jTB2bhB5lfnyQ3BfMGJi7QOZdWBlM3LGR92POkR5Tad
+	 NdD+6Zx8A1qygq006LFuHaAGctmk7mRawSdcpvpQr7vlrGNZAXQ1PM0my8PuqkYngz
+	 nbR6l2HCmd17Q==
+From: Bjorn Andersson <andersson@kernel.org>
+To: konradybcio@kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
+Cc: richardcochran@gmail.com,
+	r.mereu@arduino.cc,
+	m.facchin@arduino.cc,
+	geert+renesas@glider.be,
+	arnd@arndb.de,
+	dmitry.baryshkov@oss.qualcomm.com,
+	ebiggers@kernel.org,
+	michal.simek@amd.com,
+	luca.weiss@fairphone.com,
+	sven@kernel.org,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	kuninori.morimoto.gx@renesas.com,
+	linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: (subset) [PATCH v2 0/7] arm64: dts: qcom: Add support for Arduino VENTUNO Q
+Date: Wed, 18 Mar 2026 22:31:19 -0500
+Message-ID: <177389107887.16612.14059777501996296925.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260313103824.2634519-1-srinivas.kandagatla@oss.qualcomm.com>
+References: <20260313103824.2634519-1-srinivas.kandagatla@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,syzkaller.appspotmail.com,davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-269286-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-269288-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.595];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,arduino.cc,glider.be,arndb.de,oss.qualcomm.com,kernel.org,amd.com,fairphone.com,bp.renesas.com,renesas.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,afbcf622635e98bf40d2];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.992];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 457AC2C575E
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 142242C5859
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 19 Mar 2026 11:04:24 +0800 Jiayuan Chen wrote:
-> >> Split mca_alloc() into mca_alloc() + mca_init(): mca_alloc() does the
-> >> GFP_KERNEL allocation before mc_lock, mca_init() initializes under
-> >> mc_lock. If the address already exists, the pre-allocated memory is
-> >> simply freed. Also move inet6_ifmcaddr_notify() outside mc_lock since
-> >> it also does GFP_KERNEL allocation.  
-> > Moving the allocation seems fine, but also having to move the
-> > notification, potentially letting the notification go out of order
-> > makes me wonder if we aren't better off adding helpers for taking this
-> > lock which also call memalloc_noio_{save,restore} ?  
-> Yeah, using memalloc_noio helpers is simpler. I checked and there
-> are about 18 places taking mc_lock, so having a common mc_lock()/mc_unlock()
-> wrapper that does the noio save/restore covers them all (if necessary).
-> 
-> The only thing that feels a bit odd is using memalloc_noio in the networking
-> subsystem. It makes sense in block/fs to protect itself from recursion.
 
-Totally agree that it feels a bit odd that we have to worry about IO,
-but unless we can figure out a way to prevent nbd sockets from getting
-here all our solutions are dealing with noio in networking code :(
-IMHO it's better to acknowledge this with the explicit memalloc_noio 
-so future developers don't break things again with a mis-placed
-allocation.
+On Fri, 13 Mar 2026 10:38:15 +0000, Srinivas Kandagatla wrote:
+> This patchset adds support for Arduino VENTUNO Q board, which is
+> announced recently [1]
+> 
+> VENTUNO Q board is based on Qualcomm Dragonwing™ IQ8 Series processor
+> along with a dedicated STM32H5 microcontroller.
+> This patchset adds support for below peripherals
+>     - USB Type‑C connector with dual‑role support
+>     - ADV7535 DSI‑to‑HDMI bridge
+>     - MAX98091 audio codec
+>     - 2.5G Ethernet PHY (HSGMII)
+>     - PCIe0 (to onboard WiFi chipset and USB bridge)
+>     - PCIe1 (to M2/nvme)
+> 
+> [...]
+
+Applied, thanks!
+
+[7/7] arm64: defconfig: Enable configs for Arduino VENTUNO Q
+      commit: 56f809222ea762f38f58e01d09aa58f0f3c4b788
+
+Best regards,
+-- 
+Bjorn Andersson <andersson@kernel.org>
 
