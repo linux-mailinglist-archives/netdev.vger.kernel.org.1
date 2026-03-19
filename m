@@ -1,143 +1,245 @@
-Return-Path: <netdev+bounces-269444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269445-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mCx/B0T5u2llqwIAu9opvQ
-	(envelope-from <netdev+bounces-269444-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:25:24 +0100
+	id 6JSzLlb5u2llqwIAu9opvQ
+	(envelope-from <netdev+bounces-269445-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:25:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 455342CBED8
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:25:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 514402CBEFD
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:25:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AF7D53042FEE
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 13:22:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C643031D5AC6
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 13:24:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0C33D3CE6;
-	Thu, 19 Mar 2026 13:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C624F3D47CF;
+	Thu, 19 Mar 2026 13:24:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rHmzbm3G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gEeQUDwl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AEDD36C58C
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 13:22:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161373D3CEB
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 13:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773926544; cv=none; b=pNpPSFlNu7+Vq/jV6r2mgYMpaYE82mMWRITTEYg3+dGDahI8tFzpb6g3eL1KJj+CuRfHTDCuuuta3Pxg/F6kRN9TmPa1RVtIw6JebZOonkXNBJZZGmN+bIY9uUlaa3cqxRbkTs0ZOGjnaA+E0F1iQxGYLc2H+2tzyckBu4C5644=
+	t=1773926683; cv=none; b=gTaFyGdkQi2Fpi/EzLGHepnI/hI/psz+hLojgpfGQRHwoEbrg9WqEc0fcaNRRex3OjDmU38ip0j6fFhTWlWNILgNdk65Umkw6AZlgRnyDkJRDfBH0D4qM8QWXn7lG42ku9t3sOU8EGrh0VrNa3hElc2WblhlGMKznC8zODNaEwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773926544; c=relaxed/simple;
-	bh=onzrOYEYgeK9puwSj7RmBF9bSxmOLmUBbpb5z+/Xdmc=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=SHGDohEGHNS1ezcn5uGFLWF5PKnEn2jaF84ozkxGfhyNButcRK4x+dQuvf3UX0p71EPScwlqxKyDDrbrLNZ9COuPlFvcuPUL0w01rNyQWPA96CAb/D4MWHbwjM7l65aK6PXiO7qcC0EDekeikSLGD+voO49ZLlWbRx4rvGdut58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rHmzbm3G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6622C2BC9E;
-	Thu, 19 Mar 2026 13:22:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773926544;
-	bh=onzrOYEYgeK9puwSj7RmBF9bSxmOLmUBbpb5z+/Xdmc=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=rHmzbm3GWZXrwS5OWFIxkRZ64fnuOCbERdmkGVj8rerxfuwovXOpH/A3wno2tbDe/
-	 Ap+CD/yB5Q9L4x0I7RDhmSYjtK2v0FH+J6q1Jze0r38GZqNiZVqDHfFr7IvCxaykpz
-	 xTjfttlqN1WRiTF/4CTuhDKj5bksn5T90jWxRUX5oVwfkRSMWQCjKRdA98u9bNh2/o
-	 eMC7PDDXhC420uyRRyDY1jkqQXyD86wud3xDFS5LXYrKbUsBtNflPSe28GnY+tZBW8
-	 amRVaauS12z4R+V0fMKASEhncu8R71dP73XON5pwiu1PqyMWSkXvoxnuWTfq9Yj1VZ
-	 1EJHz9BhPCQSQ==
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 9C1ECF40074;
-	Thu, 19 Mar 2026 09:22:22 -0400 (EDT)
-Received: from phl-imap-18 ([10.202.2.89])
-  by phl-compute-01.internal (MEProxy); Thu, 19 Mar 2026 09:22:22 -0400
-X-ME-Sender: <xms:jvi7acqR1gW8AeruRdVYm6SNmhJzXxlWlrA2UUXhhYTNUu4jcaw1Kw>
-    <xme:jvi7addiHrEW_kL40-nfMjqgqQKvigYSjFEJd8yF9d3VG2_1xdSo8uhHHkAZlG5C1
-    UjM7ZUZ3h5bTWHEgp_TS6eOTNMP1T7sQa-lhiRhY_7-9JdsoFHeYo4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdejuddvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfmfhonhhs
-    thgrnhhtihhnucfthigrsghithhsvghvfdcuoehmrhhitghonheskhgvrhhnvghlrdhorh
-    hgqeenucggtffrrghtthgvrhhnpedufeekteeugeevveeklefgudeifefhhfekkeeliefg
-    jeeugfdvveffheffudduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpehmrhhitghonhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihht
-    hidqudeigedttdduvdeifedqvddutdegjedtleeiqdhmrhhitghonheppehkvghrnhgvlh
-    drohhrgheskhgvrhhnvghlmhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvg
-    htpdhrtghpthhtoheplhhuihiirdguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthht
-    ohephhgvlhhpuggvshhksehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhg
-    vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:jvi7aXq1KC_KVjIACPQ9JqMvME1Z6EgYcQZEg4nxn-ybNrerdqn97g>
-    <xmx:jvi7acn_CE_S1-2mgi1JFf4eWguTp3EpCo4FkzEluUPY-HevtOI5Fw>
-    <xmx:jvi7aTP19-W3q0O0InWngmisXfpe2tKenDoobLUNbOMT-u5ytQpPcg>
-    <xmx:jvi7aQM9sfTZR_m8MAsTASt2cqi-Gq1QmYJBVmqhLTrfnLgSsjdBhw>
-    <xmx:jvi7aUiITzBL6UWVrraB0vDggSs1EJf5hHkWYUV_tgBXYKu4_Tf-Zyi0>
-Feedback-ID: i40364868:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 7931815C008E; Thu, 19 Mar 2026 09:22:22 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1773926683; c=relaxed/simple;
+	bh=SkpLpeOLfCj2GU76XmFx4ghYmRIZ+1PVqfByjE+H/pU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=EusselZo7rVUMbGJ/bgyFGD/Wq0iQbpC7Gas4mbf4Suca49es9tZ1XVNJU9eo7De00Pt2jP1k1l0m4lFJ2gKOMydMj3xIL8+JFYayBgR3ywnmbLbFlRU43D8PLPYkMYLDmlQ9FN5oYU56XnUPps5Dra05E2qo88hRNM7TuSR61k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gEeQUDwl; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-79495b1aaa7so5198737b3.1
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 06:24:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773926680; x=1774531480; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H9RQ6JRYqSbn2WRhZy8MD11g0JCaQRZZDGdfPYjhOb8=;
+        b=gEeQUDwleBLzngzsiQuqZFuVmGf1MLghWw7ruAE9MqnuU2rnDLZ8doLjWYGamvLQuV
+         QGwptRjAN7J+6ILObk2Vg6GOVRcz12rLbbQWorjxV8NbHYN/PIX1jhj8J6t/RhOErR/9
+         AR/QIHapdRS16PtdQ1gcmRvrHZu78sYgFk4G+lwfA2l3iK8c/mWhohzlaJCbisa3oa25
+         vPinHDo/bxAS6Id+bGBdZIfIMPpqX7zfX+idDrg0rftKyNP4joGN+35WbbfWy8fsPnCD
+         hjWQbpCnpDDNh/PysgzYfBr84zVmK4F3AtM4PcW8dxnm0HtNsW94tpckLQjB+UtaAdD8
+         TfeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773926680; x=1774531480;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=H9RQ6JRYqSbn2WRhZy8MD11g0JCaQRZZDGdfPYjhOb8=;
+        b=ovut+/JIW0efvixxZU/ljiXvogzgfj9ZWS//vltG6ObzevfCm2VkHQYqfksi/nKTV4
+         NIz7LaG7KfN+tQ4xfIqlMVVWqYUzrCVB//C9ojURe/f9Udtquzrh0lKDb0qHEqDv5BBl
+         b/JuiYdQ24uuV2HBuZNBVkPbct9aYBSm/grSO2YcYVAu7DffMFM5E1rnG6SaTNAFv0qc
+         vOyzGLdVXHXhK4uxjW/8m06WkA81oF9JsIGmEGeE2m9IOWqMK0ecGKq1qL2VvzOQG6h9
+         GIorfeEjqTQYD5q2+ZwxdqnLF9U3DiCkaiTsX1ylo5xp9PqujUN/ca1VAVDl7hPdaZR4
+         AVRA==
+X-Forwarded-Encrypted: i=1; AJvYcCUMioqRPoKrGNb9pY+0XA0qyPiXcQYcl9HsVmgmTv7e5Bm2gnSqYWcxNtgfMdFTa16ZUt7sBh0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQFt1W4ve05bEzc+O3n6IGNZJvHAOjFjRg1QbIWII/2Qbh5rxS
+	aZRfJz5TzGz0mNPXGcimOCdrcV0lYoqSDTJL369M5MX9ngV4pno1nk1e
+X-Gm-Gg: ATEYQzxwhL+bbwBYfMhwau4EGhZfSKZW2FKBU9c4bIamRTAT/T33RiI9QOcSiEl3AGh
+	ZnuT+crwruv5j7ya3AX9aA+fAVQ02fG9XK6mzM5XY2diKZ6ypRX628xaVnzVPfc1rP5/7axvDLz
+	TVfZfkfn3wTPPHB3Um8qXXjcLMMsnC4GrLKMbldqdrhl8YfdnadH+oAfgGLfEaCla1eP8w0iNGJ
+	1c/i6JIXY/BGt5ZpAq5Q4owQiYdK4qq7EMBCYeUNyLk2Todks2wpWWvDPkrd/QtqUK9fP0oJRv8
+	kU/Ih6Nj0B/Dx6UERSMEiLYbedRFYnBqJNFoCHiHiFnNZLGm/SaK6MNNFlCDuY0NInKBsUwToMB
+	2mEng1CS6Ry5r7UcHw2h0UPrY2ExYf0KDsy7TzPIBlEAYLLI65A1jTZCbnKXf4zWU0bxH4FB7Fy
+	0tRmxQeNIiSsCBTYNLxM1zJtHXFpKf2QNrTDzfPnUJDS7NC3826mD7+K3wDuxSH24NZ01F5dOuE
+	tn6ACS+TadxRT8=
+X-Received: by 2002:a05:690c:358a:b0:798:7907:5cf with SMTP id 00721157ae682-79a71ed56b6mr75059467b3.54.1773926680000;
+        Thu, 19 Mar 2026 06:24:40 -0700 (PDT)
+Received: from gmail.com (180.134.85.34.bc.googleusercontent.com. [34.85.134.180])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-79a715d6acfsm37639657b3.40.2026.03.19.06.24.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2026 06:24:39 -0700 (PDT)
+Date: Thu, 19 Mar 2026 09:24:39 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: "Hudson, Nick" <nhudson@akamai.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "Tottenham, Max" <mtottenh@akamai.com>, 
+ "Glasgall, Anna" <aglasgal@akamai.com>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Message-ID: <willemdebruijn.kernel.18a884569c72@gmail.com>
+In-Reply-To: <03A3369E-0F7B-4708-92B9-B335A6F86976@akamai.com>
+References: <20260318134242.2725749-1-nhudson@akamai.com>
+ <20260318134242.2725749-5-nhudson@akamai.com>
+ <willemdebruijn.kernel.26b750d5f8926@gmail.com>
+ <03A3369E-0F7B-4708-92B9-B335A6F86976@akamai.com>
+Subject: Re: [PATCH v2 4/5] bpf: allow new DECAP flags and add guard rails
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-ThreadId: A5V-PA_1cc6R
-Date: Thu, 19 Mar 2026 09:21:58 -0400
-From: "Konstantin Ryabitsev" <mricon@kernel.org>
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>, helpdesk@kernel.org,
- davem@davemloft.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Message-Id: <6aec1245-d290-4d81-9a98-355bc8c3ca59@app.fastmail.com>
-In-Reply-To: <20260318194822.434c0485@kernel.org>
-References: <20260312200655.1215688-1-luiz.dentz@gmail.com>
- <20260314104436.31bcf68b@kernel.org>
- <20260315-majestic-beluga-of-fragrance-cf42c6@lemur>
- <20260315132013.75ab40c5@kernel.org> <20260318194822.434c0485@kernel.org>
-Subject: Re: [GIT PULL] bluetooth 2026-03-12
-Content-Type: text/plain
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.15 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	TAGGED_FROM(0.00)[bounces-269444-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-269445-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,app.fastmail.com:mid];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[akamai.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mricon@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.815];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.245];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 455342CBED8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,akamai.com:email]
+X-Rspamd-Queue-Id: 514402CBEFD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 18, 2026, at 22:48, Jakub Kicinski wrote:
->> > It won't work retroactively, but it should find future pull requests
->> > (hopefully!)  
->> 
->> Thank you! I'll report back in a couple of days.
->
-> Since I promised - pw-bot replies to pulls seem to be working fine now
+Hudson, Nick wrote:
+> 
+> 
+> > On 18 Mar 2026, at 20:02, Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
+> > 
+> > !-------------------------------------------------------------------|
+> >  This Message Is From an External Sender
+> >  This message came from outside your organization.
+> > |-------------------------------------------------------------------!
+> > 
+> > Nick Hudson wrote:
+> >> Add checks to require shrink-only decap, reject conflicting decap flag
+> >> combinations, and verify removed length is sufficient for claimed header
+> >> decapsulation.
+> >> 
+> >> Co-developed-by: Max Tottenham <mtottenh@akamai.com>
+> >> Signed-off-by: Max Tottenham <mtottenh@akamai.com>
+> >> Co-developed-by: Anna Glasgall <aglasgal@akamai.com>
+> >> Signed-off-by: Anna Glasgall <aglasgal@akamai.com>
+> >> Signed-off-by: Nick Hudson <nhudson@akamai.com>
+> >> ---
+> >> net/core/filter.c | 47 +++++++++++++++++++++++++++++++++++++----------
+> >> 1 file changed, 37 insertions(+), 10 deletions(-)
+> >> 
+> >> diff --git a/net/core/filter.c b/net/core/filter.c
+> >> index 7c2871b40fe4..47aec44a9cd3 100644
+> >> --- a/net/core/filter.c
+> >> +++ b/net/core/filter.c
+> >> @@ -56,6 +56,7 @@
+> >> #include <net/sock_reuseport.h>
+> >> #include <net/busy_poll.h>
+> >> #include <net/tcp.h>
+> >> +#include <net/gre.h>
+> >> #include <net/xfrm.h>
+> >> #include <net/udp.h>
+> >> #include <linux/bpf_trace.h>
+> >> @@ -3496,7 +3497,9 @@ static u32 bpf_skb_net_base_len(const struct sk_buff *skb)
+> >> BPF_F_ADJ_ROOM_ENCAP_L2( \
+> >>  BPF_ADJ_ROOM_ENCAP_L2_MASK))
+> >> 
+> >> -#define BPF_F_ADJ_ROOM_DECAP_MASK (BPF_F_ADJ_ROOM_DECAP_L3_MASK)
+> >> +#define BPF_F_ADJ_ROOM_DECAP_MASK (BPF_F_ADJ_ROOM_DECAP_L3_MASK | \
+> >> + BPF_F_ADJ_ROOM_DECAP_L4_MASK | \
+> >> + BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK)
+> >> 
+> >> #define BPF_F_ADJ_ROOM_MASK (BPF_F_ADJ_ROOM_FIXED_GSO | \
+> >> BPF_F_ADJ_ROOM_ENCAP_MASK | \
+> >> @@ -3743,20 +3746,44 @@ BPF_CALL_4(bpf_skb_adjust_room, struct sk_buff *, skb, s32, len_diff,
+> >> return -ENOTSUPP;
+> >> }
+> >> 
+> >> - if (flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) {
+> >> + if (flags & BPF_F_ADJ_ROOM_DECAP_MASK) {
+> >> + u32 len_decap_min = 0;
+> >> +
+> >> if (!shrink)
+> >> return -EINVAL;
+> >> 
+> >> - switch (flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) {
+> >> - case BPF_F_ADJ_ROOM_DECAP_L3_IPV4:
+> >> + /* Reject mutually exclusive decap flag pairs. */
+> >> + if ((flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) ==
+> >> +    BPF_F_ADJ_ROOM_DECAP_L3_MASK)
+> >> + return -EINVAL;
+> >> +
+> >> + if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_MASK) ==
+> >> +    BPF_F_ADJ_ROOM_DECAP_L4_MASK)
+> >> + return -EINVAL;
+> >> +
+> >> + if ((flags & BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK) ==
+> >> +    BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK)
+> >> + return -EINVAL;
+> >> +
+> >> + /* Reject mutually exclusive decap tunnel type flags. */
+> >> + if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_MASK) &&
+> >> +    (flags & BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK))
+> >> + return -EINVAL;
+> >> +
+> >> + if (flags & BPF_F_ADJ_ROOM_DECAP_L4_UDP)
+> >> + len_decap_min += sizeof(struct udphdr);
+> >> +
+> >> + if (flags & BPF_F_ADJ_ROOM_DECAP_L4_GRE)
+> >> + len_decap_min += sizeof(struct gre_base_hdr);
+> >> +
+> >> + if (len_diff_abs < len_decap_min)
+> >> + return -EINVAL;
+> > 
+> > Should this test come after the below IP flags?
+> 
+> Should it?
+> 
+> Seems to me it can bail early without having to check the IP flags. len_decap_min vs len_min.
+> 
+> What am I missing?
 
-Great, thanks for following up. 
-
--K
+I would think it common that UDP decap also includes an L3 decap, in
+which case the len_decap_min should include both header lengths.
 
