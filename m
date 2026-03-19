@@ -1,113 +1,134 @@
-Return-Path: <netdev+bounces-269652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269653-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SE8pCO1jvGkLyAIAu9opvQ
-	(envelope-from <netdev+bounces-269652-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:00:29 +0100
+	id sC7hNd1kvGlgyAIAu9opvQ
+	(envelope-from <netdev+bounces-269653-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:04:29 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AF102D273D
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:00:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CAABB2D279B
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F0D25301D566
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:00:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B5CB1300693E
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17277363C60;
-	Thu, 19 Mar 2026 20:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84EA3603E4;
+	Thu, 19 Mar 2026 21:04:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j0X5MUR+"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="t0RoVT7S"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6573F3FE663;
-	Thu, 19 Mar 2026 20:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884EE393DDD;
+	Thu, 19 Mar 2026 21:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773953992; cv=none; b=hnG36cstA3AXHVp4HNb/p8pDjuPgn16mAQhnIfj5R85Kofbm6M3AAt5UTgGEeI5lZr9xypgCAazsG/f85J/jkVGZs7djCsCCoswLmTTTDHtJFLZ3svEill1/zq1lI5nLEUskvnqZPOZRaBbP/DwS8tqfWAfILMG/em1iZveVtKU=
+	t=1773954260; cv=none; b=j787wYJJ0s/hEEfVkxjvSWUhR02biTduxa5ncSzKuc3/D5BHPAGAzCye1qcH/RmFwn4Z5Fn9OPeHQ6S5MZAqHfRRXauDm4Zl+Fm15zl46WZkZenoaLKctenq53B+T0SI/1xbZQkb1jqOcfSKewk+3wt0EGpRqD4aBWwyowhEruY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773953992; c=relaxed/simple;
-	bh=/Gwn0J+WQ87uDIq7qhXYS8GR+vdx0N4ZYfcLIXrtOKs=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Lamm3iiPTF8m5HkRGMVj64ImTJ86kZ59xmR5YoL3SB/9JYalJZpeljRKyfl/VmQ1pS5SlNXe3hGHpiioKvR/QZQO70YYXe3CS0arovQ5rywhqi1qXtgUn+LqIr3OWOB8ShvGKcJLo3qfYzjjr9q7yMKxITlpDWPJlouJ9MfWUB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j0X5MUR+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5F35C19424;
-	Thu, 19 Mar 2026 20:59:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773953991;
-	bh=/Gwn0J+WQ87uDIq7qhXYS8GR+vdx0N4ZYfcLIXrtOKs=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=j0X5MUR+V906J25XhU98tTMggkiRf2qxZ2I/8jiJMU3AsTcj0prRLJEdX3ypBCIMT
-	 lFJftNjz3VICj859Dw0V40k0AGeQUNR9UOSbXP5f+E26Z6skuRhwMx9Z3qxv6AsItH
-	 V4PI2g88aws3g9qn6n/En0dxtFhsKhbLGGr5dMQmvwkHjSW7Kq502aVGsBk8KR498A
-	 2GkBe484WA5eDyEkBYp6Y6Q61B6IXUYbErH8zNqpUTavICtVTW/DXG/TTNrUpDwMZa
-	 bz9ElWX4B40xXZ8EDENTJRyGSNDaCM0Uz69BGrPdOwBggmpQ0LbtF8KuUyjL8OrnED
-	 g/V5bwmt2NLTg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA22039302F6;
-	Thu, 19 Mar 2026 20:59:43 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v7.0-rc5
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20260319172041.4035309-1-kuba@kernel.org>
-References: <20260319172041.4035309-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20260319172041.4035309-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-7.0-rc5
-X-PR-Tracked-Commit-Id: 7ab4a7c5d969642782b8a5b608da0dd02aa9f229
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: a1d9d8e833781c44ab688708804ce35f20f3cbbd
-Message-Id: <177395398233.1799157.12266798296140604162.pr-tracker-bot@kernel.org>
-Date: Thu, 19 Mar 2026 20:59:42 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	s=arc-20240116; t=1773954260; c=relaxed/simple;
+	bh=TSXpxfxn1C06Oh5nU3gCmTrE8hHiC5bRR/YzQOMCiGQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q729EohMSOON+rave9T8yFEXBikXmLzYAXQmHYeDgHKO0bUT/pV2yaq6CtW2mgzKK4c6WM6d6iSCYgjuLsiZLggz8EyJhiiF/28o9mMHyQA1HiKpfYccpQtc4KVLWO2hfrjIiZ0CmECj7VNfc9HNDcy30BTdTdzhJ8DKsSgkxGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=t0RoVT7S; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 4E0CD4E42721;
+	Thu, 19 Mar 2026 21:04:13 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 019ED60050;
+	Thu, 19 Mar 2026 21:04:12 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2E8FF10450AAD;
+	Thu, 19 Mar 2026 22:04:07 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773954252; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=+UkuwtudtqGZeLAsD+YVOGIQG7rB/ZI2tIrrLumZKXQ=;
+	b=t0RoVT7SUzHnPmLNghomPUxEN9iUFcrmq23TeNIl7RS49Na56t6LZyAQOzmFmxhM6Uk4NE
+	JiA+fctzt5EiDJPKdsHTvw2IWsK/9Y1GWvnM+0JrKdG4oNRl95V8YS5TeKQV2Oue3IcUgQ
+	R5TOCobm2tIuJ85P/Twky+y+keHiBUxX8Tuf/ZjU4iKiB+KqkIbkOPJzWXV4VFiEmXCO5M
+	J0OBSaJBJCMTUBhDgyneolG4U4HN6yMWajo+/Hunqsm4P5s0FEVLg+okd35OkKxHhajf8w
+	VXWEheOwoL0e4v+ZSfNQv+a3++OHr43CSC/Vjv2BdL8QE31QiB7lV5FsIE+s6g==
+Message-ID: <d34f58a4-84cd-4c5a-84d9-85bd615429b9@bootlin.com>
+Date: Thu, 19 Mar 2026 22:04:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net: page_pool: support dumping pps of a
+ specific ifindex via Netlink
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, shuah@kernel.org, matttbe@kernel.org,
+ chuck.lever@oracle.com, hawk@kernel.org, linux-kselftest@vger.kernel.org
+References: <20260319035649.2396137-1-kuba@kernel.org>
+ <2e4a7b45-8029-425e-8b86-9f3031bd081e@bootlin.com>
+ <20260319131843.65de0c2d@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260319131843.65de0c2d@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-269653-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269652-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,oracle.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pr-tracker-bot@kernel.org,netdev@vger.kernel.org];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.978];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2AF102D273D
+X-Rspamd-Queue-Id: CAABB2D279B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The pull request you sent on Thu, 19 Mar 2026 10:20:41 -0700:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-7.0-rc5
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/a1d9d8e833781c44ab688708804ce35f20f3cbbd
+On 19/03/2026 21:18, Jakub Kicinski wrote:
+> On Thu, 19 Mar 2026 20:56:46 +0100 Maxime Chevallier wrote:
+>>>  	for_each_netdev_dump(net, netdev, state->ifindex) {
+>>> +		/* Either the provided ifindex doesn't exist or done dumping */
+>>> +		if (ifindex_attr &&
+>>> +		    netdev->ifindex != nla_get_u32(ifindex_attr))
+>>> +			break;  
+>>
+>> If the passed ifindex doesn't exist, isn't netdev NULL here ?
+> 
+> The for_each will give us the next netdev after or not enter the loop
+> at all. (the selftest in patch 2 does cover this case FWIW)
 
-Thank you!
+Ah I missed the loop skipping step. I like that construct then, wish I'd
+thought of that with the ethnl phy dumpit stuff, I may take inspiration
+here as it avoids treating filtered and non-filtered dumps differently.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Sorry for the noise then,
+
+Maxime
 
