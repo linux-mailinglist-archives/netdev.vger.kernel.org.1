@@ -1,142 +1,185 @@
-Return-Path: <netdev+bounces-269364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269365-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLwnG7C7u2mtmwIAu9opvQ
-	(envelope-from <netdev+bounces-269364-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:02:40 +0100
+	id 0No3LPe6u2mtmwIAu9opvQ
+	(envelope-from <netdev+bounces-269365-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:59:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 607212C8493
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:02:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3641F2C8398
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:59:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8332308A413
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:57:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6A940302D97B
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E8336EA8C;
-	Thu, 19 Mar 2026 08:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5EE33A0E9A;
+	Thu, 19 Mar 2026 08:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="uEvIby9B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="awJ01a3u";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="dbyPfswm"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C689B1E89C
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 08:57:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE5C2C0F69
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 08:57:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773910640; cv=none; b=tTqmdR0Hi3dBY083rKe3lEkX1tc7gU8kCfU3a4zo5AHphUH+EpFsJUpsONcYTM9YR9ae9H9Q0Bq6KKAUgcxSHCmmaI7sjXhA69JuTeOBo9ogG1FwP1tUWtIZK0lvr7j8xAGw54Okexk//dNy9ifF7EK+4wJeAv/HfTZdEb38QAc=
+	t=1773910669; cv=none; b=qspvy8K7d9R1JVzM4L8HMgqa4z/cmY33GKHyYqHvT8mTk4iaXGQDqdQ9kLYA3iq439PNF0tZnFL+knfJUlT1ov/uCV+XRuICMuKiz39Kfz6hkQl5yVWvu7VhZZ/L3o8QlCvhEdJrJk/Gq3uE5mr3HVrPZhRJeDq6YKCClzdPwkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773910640; c=relaxed/simple;
-	bh=GgkHPpxm3E1ijmbyKtqj1kcTP9ncqNTEyMGgttiWZvY=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=KYQm1ugGlydqNHARxdv41f7nfYVQpYqjiQHfxGmvyrTIwZ72pQ6bzoxlnBCfYD8+WwnWsIYLJLlCAi5mxgL82+8J95TjpMFZDrSC77Hm3YdZfO64LDm1BBw9dLU01y/7kxAjGEpCq+ZddsOqe5xvwFWZd/sk73y6DACJFOOZ8wY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=uEvIby9B; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 62J8uxCH33428350, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1773910619;
-	bh=+wDgL4FYbv0KQNHEnDZQxb6blQZVZtpCUK073fjOdgI=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version;
-	b=uEvIby9ByaT4mYeYoqA6mt+MLr4jAjEX0YJnUvybpZVaO7PjwuUIngdFaifyxTBgN
-	 eHXHcG0fhBanILPY+AtQvOkVMvMINm5bqKI3QHTY6HMMNGTi2nSR1yy990NgN2xEP7
-	 WRod0xRLz8Ta9hNSiDLwUIXgMcLElJbTkYqu8oRmyYya88cTvaeEz7tggzo03N/1V+
-	 CKhJwTS40xZhy00Hynm7KsZpug1L/Uyfi8NzcpTvdiGU9SmtV2bKQ01+7ypt1AeVb+
-	 L0uhb6fw3UM6pBrDcXRrpIUMAVY9uTSnCOZXGfVmrNSuzEDiBOz+FeqJTSrO4cWMA5
-	 YSLZIwSUld6Rg==
-Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 62J8uxCH33428350
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 19 Mar 2026 16:56:59 +0800
-Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
- RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.39; Thu, 19 Mar 2026 16:56:59 +0800
-Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
- RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Thu,
- 19 Mar 2026 16:56:59 +0800
-From: Javen <javen_xu@realsil.com.cn>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "horms@kernel.org" <horms@kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: r8169: Discussion on implementing RSS support for r8169
-Thread-Topic: r8169: Discussion on implementing RSS support for r8169
-Thread-Index: Ady3flT6SLXoIWu3RPmeYPmtdnYmcQ==
-Date: Thu, 19 Mar 2026 08:56:58 +0000
-Message-ID: <1ce3478d571f4d26a45e792c4c84c429@realsil.com.cn>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1773910669; c=relaxed/simple;
+	bh=1+3D37Chte5WariihTF70sFkKmTig7m4u3ksibpfj8A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U9X7ZTb62j8htFEfw1ymsRX0Nvz4O5m3wwQOPZsHcNau35+2qaPBQggg/LkRulJeHjSltc/Alg+Oya1AwMFnXGTpxSmfIy1KOJDWsVzC2Uc3prC0g/zXKOCuym4N2Td3/bZZbYvE5nzaElc5KReXoxWcB6HMbJicT/31Wei/JhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=awJ01a3u; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=dbyPfswm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773910667;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6v/FwhAYeX6H7aDSM+UJfiH1F7An30WbQRpblD/0TJA=;
+	b=awJ01a3uIpJhGnV6VSmNECTWne/htwDU4vBTklfh0nFOqPf8wb6AjxZrZ96JcH3EfQzseR
+	J4vQhIjMKTGGRuAwEg37Ddzws9TxCeHYWf/lm8sDW40DRIonIsRJUIqb+9hgv6i4Ph937a
+	0IIOwuwo+Gww9avnIT0KdgfFq3HfxtM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-492-lgtsOOV6N9K9FABDbIP8wQ-1; Thu, 19 Mar 2026 04:57:45 -0400
+X-MC-Unique: lgtsOOV6N9K9FABDbIP8wQ-1
+X-Mimecast-MFC-AGG-ID: lgtsOOV6N9K9FABDbIP8wQ_1773910665
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4839fc4cef6so18490625e9.0
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 01:57:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1773910664; x=1774515464; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6v/FwhAYeX6H7aDSM+UJfiH1F7An30WbQRpblD/0TJA=;
+        b=dbyPfswm4vjvf1VNXz2A1wda6ajiRglQLXKygyp4+/SMRnQ6aGKfkR/MYJQQ9UQQD7
+         h/fhkNaB6gGdZdo6IckmSGwaVly4r5Hqmwijbh5unweW85BCDwChkZg21N67qQiQby3+
+         qVNfjnGV+6UvE62QPSjDWZjKK8HV+Nf2/kcoznZUQi01/ox5szBYdzWyMUhjIKGGu0UM
+         Wm9WVZ958ltYuhHg0OJ60ZaBbEjtcqUnYEik3VdMGwDqtDzA2afhL5LccxIJQu1Em9Gw
+         90abjDPEOcvkEDnbjq0VTo620mYaoizZXx7fT/wPWko9ez0uaSl4HaKGhisCYkwyjW7p
+         io8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773910664; x=1774515464;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6v/FwhAYeX6H7aDSM+UJfiH1F7An30WbQRpblD/0TJA=;
+        b=rqiLQ3XwcicK++4QkQvCK66nfO8qK58Bbrnts/ZSR6/zHiBCp7EIOZUTRrBfczQFY5
+         AvH4GHTOx0NyOX+K/YKaxqpX8flKPoN2ll5nZIXJalpEYKJzCfdF/91oNBH5cwnO+CcK
+         dHxsfRTRCUEg/DhxG6hvNdolTnLcSqsVvfVh6fT5gKHzUy3rSVyb6CGcv9bG7xYL49d9
+         1rFw4/G3wxw47AGtcL1ZofGXFP7UgbkbbH5t2JAPOaczIrQ1uJ+OJSTtci3/8m+WTcrJ
+         0ZIbc5zDHy9EN/NmpscrL6phsDelWPuLoVvvTxBn3vJrjX8aXHklUi2J767h32wEH/lA
+         XJrg==
+X-Forwarded-Encrypted: i=1; AJvYcCXJxuTg5m31trmw4knMI9yyxqtFcBAOskuTIfefpuf7IoRprDFCe0A+cTJ/+/Kw4BCVxTZUqVY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxM7wbSXrSV9qEcI9eDOTasW7VBZnqMtMfoxhk8Z7WqATh34/Re
+	JXY6Sb0D//WDnyPCQViOIrNXo+ESPSh8QO8596X3n3LnbvSn3aBG601D3m4t/yOE9hksXmIt1Xi
+	qZt/Qk7TncMg2OFp7n4j0SYZF9ZpbpxCB8xHL7Uw1uMTCdS0uJB7tY2+G5w==
+X-Gm-Gg: ATEYQzwrCkbODpugeVd2LsfCFcUJxi4lkmyagxheQZ7BAEyioCNluMDIi6J/Nwa+DoB
+	S1eCqvNk+7/6yhuV05MFL8CxtyXWWv7ztUBfZspjhyxr2XEtyeUEXMRVsgmgXEs7jmq5dGueZvM
+	pADWlsxxAVV3XQ1b04Wd8JWs5TNOctarXLU6EJMxialRD8dOT4YXsBtR8YeOdj2nwH25vfwzX6F
+	/K5lkIQBxBpX1EgFuMOERS6SA/icS95vQbbCf5XjIsh1Ddw9A5lF8OGWci3HAZ0grHNNRqCY054
+	yieo3uIemZCTN1t04SNsxU66pmv3LgJ4SBAoU3xL3EAmursJVnfbBPNhB6f3PRz1J1FQtNS7g83
+	eG1WlJlYkuXrV6RpeCdQEB6IQewTwuewzz96Mr9Z6XVxVix1+BVq2GXZZ
+X-Received: by 2002:a05:600c:4fd6:b0:485:3f58:da2 with SMTP id 5b1f17b1804b1-486f8b6ce01mr41013155e9.16.1773910664502;
+        Thu, 19 Mar 2026 01:57:44 -0700 (PDT)
+X-Received: by 2002:a05:600c:4fd6:b0:485:3f58:da2 with SMTP id 5b1f17b1804b1-486f8b6ce01mr41012815e9.16.1773910664112;
+        Thu, 19 Mar 2026 01:57:44 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.196])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f8c4aa85sm41879665e9.12.2026.03.19.01.57.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Mar 2026 01:57:43 -0700 (PDT)
+Message-ID: <fe46d64b-1b12-48b6-b663-e7d5122b7b8a@redhat.com>
+Date: Thu, 19 Mar 2026 09:57:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 2/2] net: dsa: mxl862xx: implement bridge
+ offloading
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+ Cezary Wilmanski <cezary.wilmanski@adtran.com>, Liang Xu
+ <lxu@maxlinear.com>, "Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+ Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+ Avinash Jayaraman <ajayaraman@maxlinear.com>, John Crispin <john@phrozen.org>
+References: <cover.1773591297.git.daniel@makrotopia.org>
+ <0cf66a043eff3585270785a35e821e9a44afd6b6.1773591297.git.daniel@makrotopia.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <0cf66a043eff3585270785a35e821e9a44afd6b6.1773591297.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	TAGGED_FROM(0.00)[bounces-269365-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269364-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,armlinux.org.uk,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.987];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realsil.com.cn:dkim,realsil.com.cn:mid]
-X-Rspamd-Queue-Id: 607212C8493
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3641F2C8398
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi, Heiner
+On 3/15/26 5:20 PM, Daniel Golle wrote:
+> (struct dsa_switch *ds, int port,
+> +				     struct dsa_bridge bridge,
+> +				     bool *tx_fwd_offload,
+> +				     struct netlink_ext_ack *extack)
+> +{
+> +	struct mxl862xx_priv *priv = ds->priv;
+> +	struct mxl862xx_bridge *mxlbridge;
+> +
+> +	mxlbridge = mxl862xx_find_bridge(ds, bridge);
+> +	if (!mxlbridge) {
+> +		mxlbridge = mxl862xx_allocate_bridge(ds, bridge.num);
+> +		if (IS_ERR(mxlbridge))
+> +			return PTR_ERR(mxlbridge);
+> +	}
+> +
+> +	__set_bit(port, mxlbridge->portmap);
 
-We are now planning to implement RSS support on r8169 driver. This will req=
-uire significant changes to the existing driver architecture, so we want to=
- discuss it with you.
+AFAICS mxl862xx_bridge role is to track the above portmap, which in turn
+looks like a quite generic information which could be easily tracked by
+the DSA core. I'm wondering if it would be useful to move implement
+tracking there, and remove the mxl862xx_bridge entirely.
 
-Based on our vendor driver which can be fetched from Realtek, the key modif=
-ications will include:
+/P
 
-	1. Enable msix and updating the irq allocation mechanism
-	2. Support multiple rx/tx queues
-	3. Register multiple napi and update new interrupt mapping(isr/imr) for mu=
-lti-queue
-	4. Implement rx msix poll and rx interrupt function
-	5. Implement ethtool callbacks for rss configuration
-
-Should we submit the changes above separately or submit them all at once? O=
-r do you have any other suggestions?
-
-We want to align with you on the development and submission approach.=20
-
-Best regards,
-
-Javen Xu
 
