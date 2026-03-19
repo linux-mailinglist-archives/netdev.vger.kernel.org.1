@@ -1,248 +1,220 @@
-Return-Path: <netdev+bounces-269610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269611-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OBS0Imw8vGlxvgIAu9opvQ
-	(envelope-from <netdev+bounces-269610-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:11:56 +0100
+	id 8DyWAJ88vGlxvgIAu9opvQ
+	(envelope-from <netdev+bounces-269611-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:12:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E87A2D0A14
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:11:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94FBA2D0A3B
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:12:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 264A53015D03
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:11:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8E6E1300679C
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C29397E76;
-	Thu, 19 Mar 2026 18:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B953EE1F8;
+	Thu, 19 Mar 2026 18:12:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="M48P4/Ig"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hCQ35x8b"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011044.outbound.protection.outlook.com [52.101.57.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C662A35CB89
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 18:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773943903; cv=fail; b=ZFucjZ5joOE+jdXYMAWVr1UOuwUwbNKCcVJPGLTHBxXg+p39vaKKCQFqq97ZB9+bKRyClVrbXH7suGmTjnPy1ysUD7L+V+PrlTiz7VemoyYPggaPNL+/hpz5JH4brKypZqzGWHLbWq+F6jG/zAb5AfOtd6MbGgwBeMriXHxR/zU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773943903; c=relaxed/simple;
-	bh=BqPvtgtCN9FaEZSDzga57qThX/fvMBhmrWmJzVt3trA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=QpePh0AseTD5GT5X0QuNFc8oumol802NhEpEqpdNsSJIx+laTnnQWYTdnSzN86myJckNw0b/9Pb1ems+ODsTU9onJRX4VoGPYAeyaXvfimWmAcQVF1Ibh63RJwTJxdNQULiRS1miETkcEvDqBIz+RpxatettQl7aVGfbb0VMS84=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=M48P4/Ig; arc=fail smtp.client-ip=52.101.57.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=h9haWg8BW+aVwoYHCkk29B4bMRIIo+RUX0HgKeutsY5VSUYZ5DxzizfQnvb7P4RDR7LGkRLYESWJ0H/An6LOD9QZtrLlcEH24tQQJTRUgHQIUkwhP7uUK2I6Gx5Nm2xI6uP8G3tzkch8smST+iC5Q6Q71MJ7Qsofk6c2F+uQpvtw8U73D9Le1K/W38sA7qS7W6HKLLE2tchxf7ajH3Ra6VIXxOb78EiKHr0pgMX1nlKvCoe29R4Q724Uxv7p6Axk4ET4WGCz547B297/iyYMH6vunIlGu5sVNF4Tti6r2JYjwMiawPKlUsIYB3hL3BWV8X279JXZ0iJtBjgfZDXobw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+veMhcBX3JJc1OShvvzzDXIn2K+y+fjqU6LeKa2/MVY=;
- b=HESn0TbOC1C22vy/hG32Mm9QUGCfIpSRkozCUzfcC8Bc5Qhk4gkMpKacWa15nyAPbNy09siKwBeRAHvN6CCpnfe2BEnmcJoIVyoe3FDmjGC39+IjbHbNEnbPGc4aW1ASkMQBrUOESsGqSqrsv04CZpdYu8L9aZR/uXecwPm4kAm0pnp3nWj8Vu4sqozF42zBJ6jOdtRvmfZz4iuATnDLOWUkk29PfF9O5j1zhukw9cHAHGzoDk4bdqMYDrfWcf0lywQNZVMLoMG+mMoAkAY6JGtmP5nCHsrqHJ8PVaAMh3Oj0iGoHp14xGSDDLS2a3pp5Msxs6p5Orpl6k2Xj2rLrA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+veMhcBX3JJc1OShvvzzDXIn2K+y+fjqU6LeKa2/MVY=;
- b=M48P4/Ig5BYEp+Wd1OQ9O8/Xr0b7f4f19wIhwQqu9kA3hgq5GyNDXlwDtFqB13mAPKDj00zBkl51XRigo4Gcyl7Pe9UmjhYZnmHqIA7J5giOiwQ4djI2CGERWi2mbaeRObgt3gGzSKOQMyazYG2sTVLE04p+qaFFOd2y9qvHMdg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by SA5PPFB9BA66B77.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8df) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Thu, 19 Mar
- 2026 18:11:37 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::4eda:ca5:8634:5b27]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::4eda:ca5:8634:5b27%6]) with mapi id 15.20.9745.007; Thu, 19 Mar 2026
- 18:11:37 +0000
-Message-ID: <1d62b0c4-8156-4133-97e5-6b9890c81a6c@amd.com>
-Date: Thu, 19 Mar 2026 11:11:34 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ionic: fix persistent MAC address override on PF
-To: mheib@redhat.com, netdev@vger.kernel.org
-Cc: mohamed@pensando.io, brett.creeley@amd.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, sln@onemain.com
-References: <20260317170806.35390-1-mheib@redhat.com>
-Content-Language: en-US
-From: "Creeley, Brett" <bcreeley@amd.com>
-In-Reply-To: <20260317170806.35390-1-mheib@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0202.namprd13.prod.outlook.com
- (2603:10b6:a03:2c3::27) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9962D16FF37
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 18:12:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773943965; cv=none; b=GwrcxieI/j3OCbYGNXmJsVe5AHj8lAqGSZN8J+Kz0NvkiXGG6TpY7ACVriOiEeKVdGyxt9sts/k7U7kooE4e8Ik4Nu2SVkB8PM11wEcEGAUF+fqaTe7h0t4lo7TbJt6yPjXTA1A5gSbWp+mvRcnXzdxlVUv3/3uBZOnBhSq6Sbo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773943965; c=relaxed/simple;
+	bh=cz++0EVJ9nALORMfrWKRiSgQb6xnsyXY3S2o1askMN4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BTL/TvWFdgP4mRvBklTMh0qt4+hINd2RbpCs/FdsfKNA/9xY4lIg3WyHleY5OrDTKVHmfiiKygifPq2YkQGDhTKFFSJmS3HpST+hiyk4THC8bwt+yzlwrDj8pET+UTdMf2tcjgUI8Mk3oRNTON8U90fEZwJ2cHavAQVqMeJBIQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hCQ35x8b; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-43b3d9d0695so995751f8f.0
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 11:12:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773943962; x=1774548762; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KAAT0drvlwEmUW4j2igW7dbw5rYw/CBM9N8ricd4PIc=;
+        b=hCQ35x8bIVs2a0yIi0j5e6w2oDcUufId8ahnO4KmIa3fRDCumkKpafyX0uSBlg49lu
+         RHjmkM7nzl+HGSwrPNKANNu36Upy0NEvmJJ44FmP+0un6EvglloBHIBYu3xa/18HIo8K
+         nJGYkHgadiQ1PeTTow0+UvAesItgUoTBnJ81P+1Ikf7WaRGgMbU/agupRQNufd1m5ZNI
+         19qqhedfDrTH6n8jt+Xq/HIrhbzL/5fzEsfLWTWl/xbGSML+zFC6/tXhgaeIy6kNsdCS
+         N1pJGaUwJMq9LjLBuDorjT1ds5SK6Xw+hP+UI8rJkRNv/QDfUuCK8UQvKDixjCmETPmk
+         8ZKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773943962; x=1774548762;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KAAT0drvlwEmUW4j2igW7dbw5rYw/CBM9N8ricd4PIc=;
+        b=qKQnuuMvT4omqzmSwPpcixNJw2BLWvJzsY2CUn2TNih1k6Z0L9YMsuyheryE8NfvbQ
+         MNvW8k8ryUfM0JJC/YPhMQ4R5/jG1/kwC2GEnkkr5sDEZ3cKzsjYFKpqhxhjLkFZ3Cxz
+         1+W6WdtRZc5wYp1XLJNsjfNObRcCKRlgAEpRCFkF59fJZ5FFILchs5nLJL4y6fTMUwDc
+         +Vugh8o3OA/WZl9tAtiX+L0Q7xLtxQ5TLXHiFmbmLQg/BdePtDOFSahd/r0vWIWFN21F
+         tVKi5cMOLPma36TZCgItBwbWrUnwjAxmwxngJqPSqfFfIsyN9/JAbMwqCPPC2f61F/SA
+         EWjQ==
+X-Gm-Message-State: AOJu0YycrJ1UgZCUYWPACuBqJ6vO8JADmmlxXgwcZvFfK4bfiYh9zI9Z
+	qXo4n4NW46shdO7wfinkk2DDwjEJTGCB4K4W54GhlGTg2i4t4pk7N7N4
+X-Gm-Gg: ATEYQzxrTTGZmWxuyWA8p5KqP3klQaVJBByrzyKuNVlXdssU1q1DuIZq859KO7LeaEB
+	mc1D8spNooPc/m/A+LNdLn0mKp3oLrlWA+zWN4PZByoEOnePuXMA+J631SjwAOCaZV/AoZD7n2x
+	+4n+q/ObfnhQF9RLiblnQlmkJ8lRzvngZ8kXRxIEFTayQXwefpZMiYl8RNsuO4nA+EWZnjxZ3vB
+	7dx19zAGq9xkgvU/AC5qrwkIMOjqyz3is+DpQSs6G+1xtmrJBUmK6EWo61nI6WblnokNGWcPfJv
+	+b3wxKStg2O0t7uBLiGu6jwgPI0t4vzgC9gheGLERGIkmk3EYpMKPwl8zqgIywLCFGb0t/2QgJJ
+	8371/LaxDStjWSWxvZqwVbQQyBwDxRuny0mUa18jXxddXmE0EH/cqqe+d3KfhNWz96Yw7PZJ8p2
+	ZTLcjzViV2DegGh63WIlR8vHO6w/EomoQRBJQqZkwOF0lx/+z61nA+0Beh7J4mXtOqGbIVLF2xG
+	2qXLrssEGKy
+X-Received: by 2002:a05:6000:2007:b0:439:cc67:abe9 with SMTP id ffacd0b85a97d-43b642879afmr605775f8f.27.1773943961554;
+        Thu, 19 Mar 2026 11:12:41 -0700 (PDT)
+Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b6470b243sm292657f8f.26.2026.03.19.11.12.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2026 11:12:40 -0700 (PDT)
+From: David Carlier <devnexen@gmail.com>
+To: MD Danish Anwar <danishanwar@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	David Carlier <devnexen@gmail.com>
+Subject: [PATCH net] net: ti: icssg-prueth: fix use-after-free of CPPI descriptor in RX path
+Date: Thu, 19 Mar 2026 18:12:36 +0000
+Message-ID: <20260319181236.14526-1-devnexen@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|SA5PPFB9BA66B77:EE_
-X-MS-Office365-Filtering-Correlation-Id: bd2d46e8-2aab-4717-db3f-08de85e2f5d0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|366016|18002099003|56012099003|22082099003|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	UgPDzCpXCrgKv0z0Fl1v+6qU9mfW1+gMjq4vJrNh02gj8rcV6gXDxBjr1MQGjtfIO//7g+VmM6pU7ijsE90pvoIPBcQWBifW2uLMu2dYTAdXuwKN++U/qqxadIukMsZRnoiEowQIFIHJp1rqH3idiYpUu+CbEL6+xYVmbT/o5xsznIrHw/xYcWJN/Hcy0kwNNvIKU1U4hcNP7N6Vbzmm+qsaqwxOl7FzLhzNyQz9fH9GWLEawsUilkuorWniMov2J5PQFSYv2qx628s5NTIkMpUfjt9CVQB43IUW9CYvKR3Ka+nx13iUZuciNbke7dfDwt+BrpVToAlYrFiakpc/IqdX0YBWX79rRHDo5dDjMPLFy7C1rpz7DYgeRwMDtEir9GnxqlW2DC2sSpCsIVEFfZuLU4691/27jQ6ig0x8pJOAO9lIb+Gy2tGrL3htbaPCpADbgNKLlhHWvB6eEG8W80/p8y7wr7Db4C8ENceEBJ0CeGsRWC+F5IALvvSqNwx5ZAU6hxm8aiqz9BrENK7phyZMELwxxFRXU9faluAVOQY9GHzz8S/Fohdm3inp1buwmho5vrTDh8MCfE7u3W/8N7zQsu5EEjhjik6bOaaZOUkKN3DrN1GBiOyzKqtxwFEAKx2OwpE2M1Bt72FtzXwSxpmgptNbDeeJI8nyz1eW0UQRd5/iWD+JJ8XWPETB0i5iZzmZtDX6x4nSpFFZfgQE1dFnZkKXtfM5WCz1rwsKaiw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(18002099003)(56012099003)(22082099003)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZlVMNmg1SmNtYmFwZ2YxSlB2Z2ZSL21oY1B0eUIzZ2EvdXdhYzhGQlNWQjVo?=
- =?utf-8?B?K3U2cnNjaW8yWFZNVmM5enBVUStGSnRzV3Z4d1g5cVNvbE1vK2tJcnh1YU8y?=
- =?utf-8?B?ZEtnRzhSbjk1R0szRmxCVTJ1L2JZd3ByMXpzcmZYdmZnMDJHWGxhb2FJSDdr?=
- =?utf-8?B?dWlQV1EwSEY5SENtMGs0aXE1SGRQNzNva3FSeUJNL01WNGI4UUVQdWNBSk5u?=
- =?utf-8?B?ZjlFNm1seGh6K1Bnd2FyN2VUZ2FkcEhZNkJZN3NkR0pHV2FsWk11d3hLWHBz?=
- =?utf-8?B?M01iSDYxSVZVNjIxbUprSEY5eFdxMHI2MTBhTHJFK0MzakdaWUNNUFpWQ0xz?=
- =?utf-8?B?UFlrSUZkUWZxRWlOR21Hc0V3cEhSNmVISVVQUk5vc3RXM2theEhjb1ZFSCt5?=
- =?utf-8?B?QWRNYXZTS0FQQWRrWmFPNU1wQ3NLNkNsTkt6RXV2VVVXY0FZUmpML1JiU28r?=
- =?utf-8?B?QkFtamI1bTEwMEFsT2c1TlcvVFNVUEhGblZnQ1lMdzBOdWh3ZVZDYWVJeW1a?=
- =?utf-8?B?RkhnaXlDemZBU0NVcTVPMjA3VXE4eEpTOU9VSVp6Q0x0MWN5d01GcjVJUVRJ?=
- =?utf-8?B?ay9ucDBkS1VmZlR4akNUTzl5eUNjSVRtZFpsV3lBL0krWHpoY3lHcFR5S2xM?=
- =?utf-8?B?dUhDcTZZTDI0WWlxMHV2TklTMjVzU3JTQnhneXd2Wi9YWFFUc3M5LzE0dXJK?=
- =?utf-8?B?MnlxUk9uYVorektpWFh2SlMxampMa1BDaXNqZVN1UTgvdzNLRFJ5MVBNY2RH?=
- =?utf-8?B?RGs5ZGdCN3Rta214ekVTNUE1bmxCa2RwWVpuNGxFcE54N1ZYOFpTN0w0QzlB?=
- =?utf-8?B?bW9EeG05WjYveVdXTXcyUGVhTU4vTHd5dEhPZmVyM2FnQUJOZmFSSDRtcnJr?=
- =?utf-8?B?NktjcWFneWxKZE5wRTc1dWpFdC9Zc2lwb2c4S0tKWTUwTWdpZ3loemgrd29Y?=
- =?utf-8?B?YWE4UVdpd0ZUMUJ5cFd1WWwySElFcmRkMDlobVZmdmpnUjgxVG5LRjJ6ajBp?=
- =?utf-8?B?cGRTTkI4dGlLai9qOTF0eElycFM5QlJ1SUNBOTluSHk0OGorQlI1cTlGZmo1?=
- =?utf-8?B?cXJReTd6Y1U1b3lPTjgzMlZnOWtFK3pybyt1d2pFQ0NMTTl6VG5YcXMzck1K?=
- =?utf-8?B?MEN1RFpvNmtVczhsa2ZBRzkxVlBOT2Y0Y2tQdWNVRGdjVzNZZEZ6eVhDa2dS?=
- =?utf-8?B?ZUhwMTVCbEt0RzlHWURpTFVSNjJySmVyRm1UYXdVc3BpNzZjQURpTkZYTTFU?=
- =?utf-8?B?dzN2UE1Xdlp6WS9uaTFOWE9hRjNEYkZ2VGsyLzhYZU9YVDl0V2VwME9ReHVh?=
- =?utf-8?B?NG1FbVZnb01QZHFSZkNZR203RU94WGtibitUblEramJmY1p4MFAyZFZKcWxp?=
- =?utf-8?B?WVBVYlJzdExBWGlDZFdESmNzS000ZDJBU1pyYUdCYURsdTdOZ1NFNDdZL2NK?=
- =?utf-8?B?TmdEWkN0MVJmcTd0eWNPeDVNeENLVzNEVHptR01OVGhDY25hUXJJczFTeDh2?=
- =?utf-8?B?VDE4RVZoZ3QyenpNY3piUng0THhtRXpqLzZnVHZFWUFmaDNORDQrZ2VHV1dt?=
- =?utf-8?B?YURDRThkOGpMNlphcjZMemk1V1pDYXdyR2Z0L1pET3hSTzB2SVlBVllUZk9G?=
- =?utf-8?B?eXRMVjNLRjEzK1A3RzgwMzBXQTVERldkM0ZsUm1iYlJLcFlQUy9xQ3QwWDZK?=
- =?utf-8?B?aGRMKytOUUJ3bXdZT3V4QS9KZFo2ejU0N3o0dVJyWEtNbUw5Qk5DYkNKYWFx?=
- =?utf-8?B?OXlseFNucHBjbzRvcFdYL2lFa0hoa1M3ZFdyOXo2cmM5M08xSFpXRmEvNzRU?=
- =?utf-8?B?ZHk0Nm9tRE93dXZZS2pIbGtqTE12UU16eWdlNWczakJhM2ZPQUpjUllpV3lZ?=
- =?utf-8?B?YnNKcStQZTR3WkZSMnZaOUYyS0xnR2tvYmo5ZmlWL0FnZ20xWWNxRlhFNEpE?=
- =?utf-8?B?MnQyWkY5STJ3SWxVUE1GUWM3eDU2Y3NzSW5QeXRJNi9vM3VpSVVxcG5ka0ZR?=
- =?utf-8?B?enpPMzFHNkl3RGZSWXl1QmhsSkZuemZwRUwrbDZFYUxpV1RXVG1KUWw5Wlh2?=
- =?utf-8?B?RVFxV0owNFNoNmlmYStEMnk5bmhXbmNoeFNZNDRBUE8xVnlaNndNdW9Pb2dw?=
- =?utf-8?B?dWlHSWR1ZzNhbHFHbnlmNjhocXJObTdXczRYVTMrUHQ1L1FOcEl5OFliamRl?=
- =?utf-8?B?cVFaOS9EcStZTkJTai9Xd2xGVEFMcWZ2WnZvYk9pUnYvWExMOUd0RkNJTE9C?=
- =?utf-8?B?NjFqZXcyQ3dkL1JEV1gvQmg4eFdHWWtkcG9uc21OYU1oRWppei83NU9jSFh5?=
- =?utf-8?B?aHlXSk9mcVBVTjd2Q0JHZDUvS1hWV2dmQ0V6NncwL2xTMUswSjNpdz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd2d46e8-2aab-4717-db3f-08de85e2f5d0
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2026 18:11:37.0249
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +k0UXzb5SwuqHTYrcQG59gjXO2Kxn4Ado+wiXCwHomMgI2fv2Bd778bBW87/aQWxXNJRw4xDgWug8zHXhpaWCg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPFB9BA66B77
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	TAGGED_FROM(0.00)[bounces-269610-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bcreeley@amd.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269611-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd.com:dkim,amd.com:email,amd.com:mid]
-X-Rspamd-Queue-Id: 0E87A2D0A14
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.619];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,xdp.data:url]
+X-Rspamd-Queue-Id: 94FBA2D0A3B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+cppi5_hdesc_get_psdata() returns a pointer into the CPPI descriptor.
+In both emac_rx_packet() and emac_rx_packet_zc(), the descriptor is
+freed via k3_cppi_desc_pool_free() before the psdata pointer is used
+by emac_rx_timestamp(), which dereferences psdata[0] and psdata[1].
+This constitutes a use-after-free on every received packet that goes
+through the timestamp path.
 
+Defer the descriptor free until after all accesses through the psdata
+pointer are complete. For emac_rx_packet(), this means freeing in each
+early-exit path and after emac_rx_timestamp() in the success path. For
+emac_rx_packet_zc(), move the free to the end of the loop body after
+emac_dispatch_skb_zc() (which calls emac_rx_timestamp()) has returned.
 
-On 3/17/2026 10:08 AM, mheib@redhat.com wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
->
->
-> From: Mohammad Heib <mheib@redhat.com>
->
-> The use of IONIC_CMD_LIF_SETATTR in the MAC address update path causes
-> the ionic firmware to update the LIF's identity in its persistent state.
-> Since the firmware state is maintained across host warm boots and driver
-> reloads, any MAC change on the Physical Function (PF) becomes "sticky.
->
-> This is problematic because it causes ethtool -P to report the
-> user-configured MAC as the permanent factory address, which breaks
-> system management tools that rely on a stable hardware identity.
->
-> While Virtual Functions (VFs) need this hardware-level programming to
-> properly handle MAC assignments in guest environments, the PF should
-> maintain standard transient behavior. This patch gates the
-> ionic_program_mac call using is_virtfn so that PF MAC changes remain
-> local to the netdev filters and do not overwrite the firmware's
-> permanent identity block.
->
-> Fixes: 19058be7c48c ("ionic: VF initial random MAC address if no assigned mac")
-> Signed-off-by: Mohammad Heib <mheib@redhat.com>
-> ---
->   drivers/net/ethernet/pensando/ionic/ionic_lif.c | 17 +++++++++++------
->   1 file changed, 11 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-> index 8d040e611d5a..637e635bbf03 100644
-> --- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-> +++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-> @@ -1719,13 +1719,18 @@ static int ionic_set_mac_address(struct net_device *netdev, void *sa)
->          if (ether_addr_equal(netdev->dev_addr, mac))
->                  return 0;
->
-> -       err = ionic_program_mac(lif, mac);
-> -       if (err < 0)
-> -               return err;
-> +       /* Only program macs for virtual functions to avoid losing the permanent
-> +        * Mac across warm reset/reboot.
-> +        */
-> +       if (lif->ionic->pdev->is_virtfn) {
-> +               err = ionic_program_mac(lif, mac);
-> +               if (err < 0)
-> +                       return err;
->
-> -       if (err > 0)
-> -               netdev_dbg(netdev, "%s: SET and GET ATTR Mac are not equal-due to old FW running\n",
-> -                          __func__);
-> +               if (err > 0)
-> +                       netdev_dbg(netdev, "%s: SET and GET ATTR Mac are not equal-due to old FW running\n",
-> +                                  __func__);
-> +       }
+Fixes: 46eeb90f03e0 ("net: ti: icssg-prueth: Use page_pool API for RX buffer allocation")
+Signed-off-by: David Carlier <devnexen@gmail.com>
+---
+ drivers/net/ethernet/ti/icssg/icssg_common.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-LGTM. Thanks for the fix!
-
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-
-Brett
-
->
->          err = eth_prepare_mac_addr_change(netdev, addr);
->          if (err)
-> --
-> 2.53.0
->
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+index 0a3cf2f848a5..31003962ecf7 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_common.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+@@ -962,7 +962,6 @@ static int emac_rx_packet_zc(struct prueth_emac *emac, u32 flow_id,
+ 		pkt_len -= 4;
+ 		cppi5_desc_get_tags_ids(&desc_rx->hdr, &port_id, NULL);
+ 		psdata = cppi5_hdesc_get_psdata(desc_rx);
+-		k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+ 		count++;
+ 		xsk_buff_set_size(xdp, pkt_len);
+ 		xsk_buff_dma_sync_for_cpu(xdp);
+@@ -988,6 +987,7 @@ static int emac_rx_packet_zc(struct prueth_emac *emac, u32 flow_id,
+ 			emac_dispatch_skb_zc(emac, xdp, psdata);
+ 			xsk_buff_free(xdp);
+ 		}
++		k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+ 	}
+ 
+ 	if (xdp_status & ICSSG_XDP_REDIR)
+@@ -1057,7 +1057,6 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
+ 	/* firmware adds 4 CRC bytes, strip them */
+ 	pkt_len -= 4;
+ 	cppi5_desc_get_tags_ids(&desc_rx->hdr, &port_id, NULL);
+-	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+ 
+ 	/* if allocation fails we drop the packet but push the
+ 	 * descriptor back to the ring with old page to prevent a stall
+@@ -1066,6 +1065,7 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
+ 	if (unlikely(!new_page)) {
+ 		new_page = page;
+ 		ndev->stats.rx_dropped++;
++		k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+ 		goto requeue;
+ 	}
+ 
+@@ -1077,11 +1077,14 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
+ 		*xdp_state = emac_run_xdp(emac, &xdp, &pkt_len);
+ 		if (*xdp_state == ICSSG_XDP_CONSUMED) {
+ 			page_pool_recycle_direct(pool, page);
++			k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+ 			goto requeue;
+ 		}
+ 
+-		if (*xdp_state != ICSSG_XDP_PASS)
++		if (*xdp_state != ICSSG_XDP_PASS) {
++			k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+ 			goto requeue;
++		}
+ 		headroom = xdp.data - xdp.data_hard_start;
+ 		pkt_len = xdp.data_end - xdp.data;
+ 	} else {
+@@ -1093,6 +1096,7 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
+ 	if (!skb) {
+ 		ndev->stats.rx_dropped++;
+ 		page_pool_recycle_direct(pool, page);
++		k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+ 		goto requeue;
+ 	}
+ 
+@@ -1105,6 +1109,7 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
+ 	if (emac->rx_ts_enabled)
+ 		emac_rx_timestamp(emac, skb, psdata);
+ 
++	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+ 	if (emac->prueth->is_switch_mode)
+ 		skb->offload_fwd_mark = emac->offload_fwd_mark;
+ 	skb->protocol = eth_type_trans(skb, ndev);
+-- 
+2.53.0
 
 
