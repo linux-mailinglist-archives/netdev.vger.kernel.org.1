@@ -1,157 +1,134 @@
-Return-Path: <netdev+bounces-269678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269679-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mOJbAWFzvGmZywIAu9opvQ
-	(envelope-from <netdev+bounces-269678-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:06:25 +0100
+	id xrWQHI50vGnYywIAu9opvQ
+	(envelope-from <netdev+bounces-269679-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:11:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FC8D2D2DB7
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:06:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D407A2D2E4B
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:11:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D42C630A757B
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:06:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BA02B302836B
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81003AA1B0;
-	Thu, 19 Mar 2026 22:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F46C3FF8BF;
+	Thu, 19 Mar 2026 22:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ky55Gxzk"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="mljWtymt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9312728150F;
-	Thu, 19 Mar 2026 22:06:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE43239B97D;
+	Thu, 19 Mar 2026 22:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773957981; cv=none; b=HMH/255dW37hn9+rcC/lUpB8DGw1QRBqilhrXBcqOyftAS62jWZuxiPbn/5mz3A1b3/4WrWtQ+J1YBnNl6a+MhkNTXV50nylNXIZPx2/Bm4l/gtwI3VBJ6sx59tMMfu3NJ4W3D0y+19L1MQzxjTfLs+PvN9xUhsGaCfrWHGA39o=
+	t=1773958280; cv=none; b=kWKGdaUrQ8Hk544egmcZY4G9s26dKjWsAqYriaakCFMKGybB3fQwG8FfgMmI+GEaxiepQlWMe/7tRC58MAbvaZ+QhQFXQrtMdGjl6KD2btPES3SZUySCL2rcEb5hP0bZ8V7H2agqCiToIn8QlBInZjcvrYCeSNxy4DcBtiP8lsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773957981; c=relaxed/simple;
-	bh=5dOQ4EmFm5o6Z6xX15MRA919kToNc/Is8WZhcTPbDnA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CqBmTX108JMAdHN2G5ozvLUIyBHV4nF1e1K53VA4+a04Jg0KSbd5EvvZFLKTezfwHL3HENkPdg1aCP6Wp4m1O+c2AjPvsmWIcrEc6nBgPZJ3V0qgxwHYyzMtii7j8kAliQfAxwyvgoaWo4NCO6yBhCMVZeb0AFEuigKK7uHweP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ky55Gxzk; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773957981; x=1805493981;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5dOQ4EmFm5o6Z6xX15MRA919kToNc/Is8WZhcTPbDnA=;
-  b=ky55GxzkDIq7TpqO1EcwH8odUlIZSLYvSCHaebUAaVeT9Kj3NHiQNMr0
-   1zEZZLHjC5y80AXDzvplUc+wEuh3w9Dq5MtT83vhrEfvDTYW+nHGXBFz5
-   u1FCN0pglIKEaKIozcontjvHS7kE/sDvWK6P+HDIJTSetEZ2S/6M9I/uR
-   IEIZph53up9khwUZIRs42vurXuBStS9CjfugI26b3dlffaL3x/c6kGwgm
-   bni40AVpTMH7Z+PCSrdCmn14vvovT8CzgG4DvOPAimulM9MruvbhXnvVg
-   CyhzRdG2Ijg2Sc3zyV/6llPwjW6Fjhk3ZSLd0AyDPhLW3KdAIXhUdS4z4
-   Q==;
-X-CSE-ConnectionGUID: 1kSiYqffSFGFiP+LFiaBCA==
-X-CSE-MsgGUID: Ghe8l9d4RiavZNWw4ylwcw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="86520510"
-X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="86520510"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 15:06:20 -0700
-X-CSE-ConnectionGUID: u7cK1ri5RPigX2sawiLgfA==
-X-CSE-MsgGUID: b9yMyTfiRiG38gQURNwKaw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="223073156"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 15:06:20 -0700
-Date: Thu, 19 Mar 2026 15:06:14 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: x86@kernel.org, Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v7 07/10] x86/vmscape: Use static_call() for predictor
- flush
-Message-ID: <20260319220614.tejwx7ei2ukkljsw@desk>
-References: <20260319-vmscape-bhb-v7-0-b76a777a98af@linux.intel.com>
- <20260319-vmscape-bhb-v7-7-b76a777a98af@linux.intel.com>
- <20260319205802.GJ3738786@noisy.programming.kicks-ass.net>
- <20260319213421.br6na4dulrjm6eke@desk>
- <20260319214409.GL3738786@noisy.programming.kicks-ass.net>
+	s=arc-20240116; t=1773958280; c=relaxed/simple;
+	bh=9SEPiWDtYK915dM/C6koVFsZw+XgKzFlGBbVBs7PxtM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=MzEjXS5gzZrZkZGAmcYXqg6ggZw+FTbJkmA62SBe40+IACfVIxzKTC8oU1VIJOB8SQshKX+uUpTILAG/pgvaBu8s3JW0u/AdcadaKqJ5SB+b5BVAE62eK+Up3EwaR1guPsc+EYVsGF4WUqQMGAFQRMpQEg4GnBM4GjCQJCokHds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=mljWtymt; arc=none smtp.client-ip=45.79.88.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 67A8041209
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1773958272; bh=pMssSaY3o+6SS7PX7iNNHD9bSiFr2yXyJvC2G9sajBQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=mljWtymtW29QF0H6t3+rbQc9YPQR49BsqrPMLyyFIshT5SpcYDZpbG3hfx3zEa+2B
+	 DIy1R3nrrX13dniiEpKa4qoHRqJ1xuzG4M3/7U0621Um6WLKxAoZtySyyn8s1DUWaH
+	 5VkMJLibBjFeXjJSyrg751f9M7+/rzEi/YgKDubiWlPflAh23i/07ez2O4FaVezYc/
+	 KojiIJWUbDIo1jjZoj/xSIMTbrdaPOkQsRsChjW7IWzMTjiHUdqQZcq7pLZJssTRpg
+	 4trJfpaAgh68brPeN0q7f6+68hd5F5tf+DKHib6A3f5cNInhgsXKnWSnfZGQjdonig
+	 R0LphD1pLmivQ==
+Received: from localhost (unknown [IPv6:2601:280:4600:27b::1fe])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 67A8041209;
+	Thu, 19 Mar 2026 22:11:12 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: Ralf Lici <ralf@mandelbit.com>, netdev@vger.kernel.org
+Cc: Daniel =?utf-8?Q?Gr=C3=B6ber?= <dxld@darkboxed.org>, Antonio Quartulli
+ <antonio@mandelbit.com>, Ralf Lici <ralf@mandelbit.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next 15/15] Documentation: networking: add ipxlat
+ translator guide
+In-Reply-To: <20260319151230.655687-16-ralf@mandelbit.com>
+References: <20260319151230.655687-1-ralf@mandelbit.com>
+ <20260319151230.655687-16-ralf@mandelbit.com>
+Date: Thu, 19 Mar 2026 16:11:11 -0600
+Message-ID: <87se9vh3ls.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260319214409.GL3738786@noisy.programming.kicks-ass.net>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[lwn.net,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[lwn.net:s=20201203];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269678-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[36];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,vger.kernel.org,intel.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269679-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-0.805];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[lwn.net:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim]
-X-Rspamd-Queue-Id: 9FC8D2D2DB7
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[corbet@lwn.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,trenco.lwn.net:mid,lwn.net:dkim]
+X-Rspamd-Queue-Id: D407A2D2E4B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 19, 2026 at 10:44:09PM +0100, Peter Zijlstra wrote:
-> > With _TRAMP, KVM complains:
-> > 
-> >  ERROR: modpost: "__SCK__vmscape_predictor_flush" [arch/x86/kvm/kvm.ko] undefined!
-> 
-> Ah, tricky. Yeah, this would need to be solved differenlty. Perhaps wrap
-> this in a helper and export that?
+Ralf Lici <ralf@mandelbit.com> writes:
 
-Wrapper seems to be a simpler option.
+> From: Daniel Gr=C3=B6ber <dxld@darkboxed.org>
+>
+> Add user and reviewer documentation for the ipxlat virtual netdevice in
+> Documentation/networking/ipxlat.rst.
+>
+> The document describes the datapath model, stateless IPv4/IPv6 address
+> translation rules, ICMP handling, control-plane configuration, and test
+> topology assumptions. It also records the intended runtime configuration
+> contract and current behavior limits so deployment expectations are
+> clear.
+>
+> Signed-off-by: Daniel Gr=C3=B6ber <dxld@darkboxed.org>
+> Signed-off-by: Ralf Lici <ralf@mandelbit.com>
+> ---
+>  Documentation/networking/ipxlat.rst | 190 ++++++++++++++++++++++++++++
+>  1 file changed, 190 insertions(+)
+>  create mode 100644 Documentation/networking/ipxlat.rst
 
-> Or use the below little thing and change it to
-> EXPORT_STATIC_CALL_FOR_MODULES(foo, "kvm"); or whatnot.
+You need to add this new file to Documentation/networking/index.rst or
+it won't be included in the build (and you'll get a warning).
 
-This would be nice if there are other static calls that would benefit from
-exporting to specific modules only. At this point, I don't know.
+Thanks,
+
+jon
 
