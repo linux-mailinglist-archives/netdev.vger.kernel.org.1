@@ -1,136 +1,135 @@
-Return-Path: <netdev+bounces-269474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269475-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wAWVNq4NvGkirwIAu9opvQ
-	(envelope-from <netdev+bounces-269474-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:52:30 +0100
+	id OIK0GNoNvGkirwIAu9opvQ
+	(envelope-from <netdev+bounces-269475-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:53:14 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BB502CD358
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:52:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B490C2CD394
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:53:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7133B31D0CB4
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:50:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8FA3C320EC35
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:50:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168303D47C2;
-	Thu, 19 Mar 2026 14:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B43B3DBD44;
+	Thu, 19 Mar 2026 14:50:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="suZNdFJ2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eXGKt6dx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D1F40DFD2;
-	Thu, 19 Mar 2026 14:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82823DB632;
+	Thu, 19 Mar 2026 14:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773931818; cv=none; b=nwJ7vYf9DhpXMhPNa1ASFbjJypIMNWyyK+oTd98q6Hejg11Pp6BZxqKPa7iMKf5VIYoRoXH6etYebCpjW3ZwTkD4NhOCupvaQ6xFZsKZgafEZUOjelhFnxoCoiWK0JMytoaGGOPRJdMLYHZD4mTfpwHNW/soa7MmHxHirc+ICW8=
+	t=1773931840; cv=none; b=bainVpZMvhbFcK0r2eyxy0A6IQnTbo+l3WacSHzr4oXzb9B+FgHje0OHN56QjhjtKS4S36fEDECW/A9sUi3HvVh4FLGl6kNHBC7HausZ3+aEBI8+et2oAIiST+BVg2YimhTj4Sjgb5nHPddMHG7VM0AZ/pf7kpZ/a3aqxtfpZpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773931818; c=relaxed/simple;
-	bh=DXPkNAGv8MCVHqmAHf7Sip8GWPPfcvMdeFaBt53M8fg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Hkvf1R27Hi0VNrwcX/uoE1vlubHtZHPI1bTLb1yCxlTBkBhYLFi0MdIHXN2+yMEA24UKKbG/ATRke4DjM4KoI7HC2gPAcoCJs7gCurcoluebi+Dtwkz0FBxRQIfX2wept6bnRQajbT7qR7w/9U8c8dLpus5qQLuSY8COLtPvKjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=suZNdFJ2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C423FC19424;
-	Thu, 19 Mar 2026 14:50:17 +0000 (UTC)
+	s=arc-20240116; t=1773931840; c=relaxed/simple;
+	bh=RSrXDaSoIfCD2lr/IV1qX8u7HfAhgEPYGnkvHpAEQXE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BUlZx2qqRdWEEH/ZgUfZqLoIo4iHewZFb6k0QpIuw84XkvfbPIlE3idaDgN4n8k0F4w68hRTco54xP0m3QjDmmnvsyAEETlyLRMWGNlUf+iSG5yUkeWj/KxkWqSz7URlbtLKCqkuSTgul53RjILP3bcoYTY/PVO98G7xIlmjiyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eXGKt6dx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D36BC19424;
+	Thu, 19 Mar 2026 14:50:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773931817;
-	bh=DXPkNAGv8MCVHqmAHf7Sip8GWPPfcvMdeFaBt53M8fg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=suZNdFJ2AM2tJ5JvMtZlrMLI2ysFQtaeUfJVHV3rdJ2kX21ZWnvQvApKN/LDzDGVL
-	 cdoeNwpe3j1G/a4OLbmt4vRzCPc+YF97kkjYjxYP/qxySNJoa4JkEdnQlgUu8a1ANE
-	 0oF/ePEHyX3KIR0HIpjAxOgphu6DI3SH2HVMFBPNiAKO5FTi/+03TK2vU32Hj9CRCQ
-	 6Vm7x6FzujwQAfxmUoJZFFJIn1T4DgboHFN5DS0yX3rrFGHr8bv+wvM5HMYlKROH3f
-	 +gQVIgHwDIoI+NUm0htFnygZNZp/zfEY3eXmo9rqN94TYLwtGVpHGsd/ljGhd97q+p
-	 7CcpY9Uka0xHg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DFD380692A;
-	Thu, 19 Mar 2026 14:50:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1773931839;
+	bh=RSrXDaSoIfCD2lr/IV1qX8u7HfAhgEPYGnkvHpAEQXE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eXGKt6dxaZVmGUEvYb1D3fBZR/2vc4REJ//52PYbj+0WbHmwh/s6mV4qp0O3RlTTe
+	 r9t15Yy7yhyfuz/u5uNN2/FWYIuGxRcGEOHKb94h3rNBgKaM6ibk3mhLUmVip5Cs2y
+	 ITlRVapKquRGA+LRYXggTLVKxySgxGz1yrWwjt8m4o+NtgqYkojc1ysF3nv4hVid0J
+	 s/JQyJQjYy03F4TsiTB3gMZZLEuRde9WbsmSB6IACZ1BXec/rommo6zCOGpwCb1sUV
+	 ZsQ0MpGpDb30fm1J2HskB4ZR4d5npBEdGy3Iig8tlHT1FAqddIT2/zZzkWaXTq1IpG
+	 ovTcoWUTv6ClQ==
+Date: Thu, 19 Mar 2026 07:50:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Biju Das <biju.das.jz@bp.renesas.com>
+Cc: Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, "niklas.soderlund" <niklas.soderlund@ragnatech.se>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, "magnus.damm"
+ <magnus.damm@gmail.com>, Russell King <linux@armlinux.org.uk>, Paul Barker
+ <paul@pbarker.dev>, Neil Armstrong <neil.armstrong@linaro.org>, Florian
+ Fainelli <f.fainelli@gmail.com>, Prabhakar Mahadev Lad
+ <prabhakar.mahadev-lad.rj@bp.renesas.com>, Sergei Shtylyov
+ <sergei.shtylyov@gmail.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
+ <devicetree@vger.kernel.org>, "biju.das.au" <biju.das.au@gmail.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
+Subject: Re: [PATCH net-next] dt-bindings: net: Remove redundant
+ ethernet-phy-ieee802.3-c22 fallback
+Message-ID: <20260319075037.5666c9ab@kernel.org>
+In-Reply-To: <TY3PR01MB1134654258041DDB93CF81573864FA@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+References: <20260313130623.297712-1-biju.das.jz@bp.renesas.com>
+	<20260318170503.316285a7@kernel.org>
+	<TY3PR01MB1134654258041DDB93CF81573864FA@TY3PR01MB11346.jpnprd01.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/3] netfilter: bpf: defer hook memory release until
- rcu
- readers are done
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177393180879.1521029.11143484797740188911.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Mar 2026 14:50:08 +0000
-References: <20260319093834.19933-2-fw@strlen.de>
-In-Reply-To: <20260319093834.19933-2-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- pablo@netfilter.org
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269474-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,ragnatech.se,glider.be,armlinux.org.uk,pbarker.dev,linaro.org,bp.renesas.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-269475-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.895];
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,strlen.de:email]
-X-Rspamd-Queue-Id: 3BB502CD358
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B490C2CD394
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Florian Westphal <fw@strlen.de>:
-
-On Thu, 19 Mar 2026 10:38:32 +0100 you wrote:
-> Yiming Qian reports UaF when concurrent process is dumping hooks via
-> nfnetlink_hooks:
+On Thu, 19 Mar 2026 14:38:37 +0000 Biju Das wrote:
+> > Maybe a noob question but why are you not updating all the other ones?
+> > 
+> > $ git grep --files-with-matches 'ethernet-phy-ieee802.3-c22' -- \
+> > 	Documentation/devicetree/bindings/net/ | \
+> > 	wc -l
+> > 16  
 > 
-> BUG: KASAN: slab-use-after-free in nfnl_hook_dump_one.isra.0+0xe71/0x10f0
-> Read of size 8 at addr ffff888003edbf88 by task poc/79
-> Call Trace:
->  <TASK>
->  nfnl_hook_dump_one.isra.0+0xe71/0x10f0
->  netlink_dump+0x554/0x12b0
->  nfnl_hook_get+0x176/0x230
->  [..]
+> The other files have only 'compatible = "ethernet-phy-ieee802.3-c22"'
 > 
-> [...]
+> Whereas this patch removes the fallback pattern based on
+> Rob's suggestion [1]
+> 
+> compatible = "ethernet-phy-id0022.1622",                     
+> 		 "ethernet-phy-ieee802.3-c22"; 
 
-Here is the summary with links:
-  - [net,1/3] netfilter: bpf: defer hook memory release until rcu readers are done
-    https://git.kernel.org/netdev/net/c/24f90fa3994b
-  - [net,2/3] netfilter: nf_tables: release flowtable after rcu grace period on error
-    https://git.kernel.org/netdev/net/c/d73f4b53aaae
-  - [net,3/3] nfnetlink_osf: validate individual option lengths in fingerprints
-    https://git.kernel.org/netdev/net/c/dbdfaae96096
+Got it
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> Please let me know, should I drop all 'ethernet-phy-ieee802.3-c22' compatibles? 
 
-
+No, let's wait for DT maintainers' review.
 
