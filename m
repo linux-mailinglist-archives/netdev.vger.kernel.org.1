@@ -1,129 +1,159 @@
-Return-Path: <netdev+bounces-269717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269718-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wE/qCqyIvGlk0AIAu9opvQ
-	(envelope-from <netdev+bounces-269717-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 00:37:16 +0100
+	id mFT1Dk2LvGlv0QIAu9opvQ
+	(envelope-from <netdev+bounces-269718-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 00:48:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD0E82D4376
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 00:37:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 955092D443C
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 00:48:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CE60B3275828
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:32:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F15BE302D134
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:48:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4108B406286;
-	Thu, 19 Mar 2026 23:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077E13793A9;
+	Thu, 19 Mar 2026 23:48:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CVuqtNjF"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="P9Clj6eh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f100.google.com (mail-yx1-f100.google.com [74.125.224.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2B2371884;
-	Thu, 19 Mar 2026 23:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA6C344D86
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 23:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773963094; cv=none; b=k4nUY91epDUWL1Ho7akOcAtWY33ry723bopkKXX5RaEXtKUjMtNfA5rDMkC1lXTvz7l9HHBUAUvUs8a0H/xnYGdIcsjt0IvG9ROsCcv+Y4B2CEgRCZnTF2BMgE6IjBlCXz00nori3yiHOLomnrOtBtZVpUWN/vNROANI+ME/Wrw=
+	t=1773964102; cv=none; b=h02BV7XXVHnXpA5VfEV7CHL3yLHujlcVpxvKwQMSvQp6q96bhnJ//ALy6yudhamWE97q5VabzLRRtdy0m3lOGn6BKdpvS4AuhRia0JpTTgUff1n3SzFwXsxSxwnnfHr9O0kKnrY0pCspY4F0h5tY/N9cdOh3NsGwriuMJ24aBos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773963094; c=relaxed/simple;
-	bh=2ceLYHitrpgWnbijBLEURAHrA3SxUbD0jlo2sSsj2kA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uyGyfd2SCPqR6H3F0lYiHWYmeL0z/E86ye/QyED9rU+roIGG2ShRIJpIc8zAzxgUaaFWzLo3XW1YAeCLbHl9sYL6c47APKt6DDcBx3lPE++XZ+qKaoLWE0oGCY/E/af02/3ohv7pMu/BZ0sr8TYMvgsbRBLAmFpVFwbqG8N+tYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CVuqtNjF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B8E3C19424;
-	Thu, 19 Mar 2026 23:31:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773963093;
-	bh=2ceLYHitrpgWnbijBLEURAHrA3SxUbD0jlo2sSsj2kA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CVuqtNjFaPpOozcHQ0mF58SrW1xcRvHJ1UN1gqC0BYNd+HIegbIO7XleLF+7YguxL
-	 9TDKoFqvqyOP4tDys+vTYocI/ji8rRjvUQf/Cl2rQw/e1piNSzXBezeMi8yoNlAb3o
-	 xVhaaSxLG2VFUXOPfuJ1SY+vrHcBj/MVU7riKCdMk3Viu1LX1lcinFUIUBdcy84xfM
-	 fCXd4jRrWkMJiQnxmrYGHv99ZG2qdINt+MCASHRn10VCCClzQh24dmch7hNXeUTLa6
-	 leIj0kVLiUYnU6wCckdIaclYQAnLJUvuV7IaE2aqyhXp9SdWSTcDrSGWW/herYMFD2
-	 Iq4hekz6OvrcA==
-Date: Thu, 19 Mar 2026 16:31:31 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Byungchul Park <byungchul@sk.com>
-Cc: linux-mm@kvack.org, akpm@linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
- harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, hawk@kernel.org, john.fastabend@gmail.com,
- sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com,
- pabeni@redhat.com, david@redhat.com, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
- surenb@google.com, mhocko@suse.com, horms@kernel.org, jackmanb@google.com,
- hannes@cmpxchg.org, ziy@nvidia.com, ilias.apalodimas@linaro.org,
- willy@infradead.org, brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
- usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
- almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com,
- bpf@vger.kernel.org, linux-rdma@vger.kernel.org, sfr@canb.auug.org.au,
- dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com
-Subject: Re: [PATCH v5] mm: introduce a new page type for page pool in page
- type
-Message-ID: <20260319163131.2f160a5d@kernel.org>
-In-Reply-To: <20260316223113.20097-1-byungchul@sk.com>
-References: <20260316222901.GA59948@system.software.com>
-	<20260316223113.20097-1-byungchul@sk.com>
+	s=arc-20240116; t=1773964102; c=relaxed/simple;
+	bh=Wy2OuGuM1n34KopETezS/iSBCGSlvBFMvtm1YzsAfiY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EWFb1icwqKTUAKRrvcr12FgoB6OPoXoA2TWSYnTcZKREr1kp2q7Z/6JPr7PlmLWkj9og/wrkWD/hWBQnJp5huT+wwcY9A0s9hofU2spwwCcqk/ySzIn1+0ra/nskRBzG3/4bJHUEX3y/5+myPFwojIVTmD+DZX8L2b9Y6OHrqlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=P9Clj6eh; arc=none smtp.client-ip=74.125.224.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-yx1-f100.google.com with SMTP id 956f58d0204a3-64ad9fabd08so1300809d50.2
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 16:48:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773964100; x=1774568900;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e5cmiGK1Zkwu7IrGjnCXhUrogpw/1TK847Pzk+gJ73g=;
+        b=SpkTpJksc5PAJ1CSeFgv6A87+UR8lNTk6HOZDG55bW6yvNR4V8bS2BqYtzNr9U+/Dk
+         uXqmw5qjtBhxJYeFlVF90zJ4hXUPHWRzG6xK5DAivfuVUcweiINDlu56z9OBqbo0+mEH
+         fOsre5r8cmpixi5TaNN+buCepVJvUDK0CaFnfHIghyh83FNc8t1vGWOErz2iEdkw8Ygl
+         H3BlUMARoFOrj3Iz/1fR/NrIYPZebQGrUHqAUXJ6Z6TARebt7X61RJleaD95fuy4YfLg
+         PNit8lWbloK47XdrPvPjwDRlaEc1Pa7J6qO/QLX7NRS1YLnffcDXJbz1MApz14ReSAEw
+         BvBA==
+X-Gm-Message-State: AOJu0YxyfK18S65+gXEw9J/yW3MLhc3jGTGXT6ASCfT3UMmTTIlWrziy
+	x9PpJt1ABAoKhbKaiSzVLd8wSK4CH6D+eGjhaHzrPbUOgUqHgsDQ6432txUZvQIQ/UCnkwAB6zJ
+	7SBCjI2CxyTSSa5fgKWX1ak9Enw4NhgbEaiRiS1JVq2EtPZ487EuBnAZ2K7eZ/mHDKOjatf2E1x
+	EsM7jBqwN6VT6kxgAJEzzGA5qPzONMHkX6j2lVMQf75SMPxb4LK798qYkqjjN3+EN/JATHF8jIg
+	9CxnhFq7A==
+X-Gm-Gg: ATEYQzzrC6zdjYIwRge0sSyTq2V9VBU/uy2Axf3PA6cAjDxPHU9/mHXclu3b9MMbaO2
+	fnj1qavSwLlp23jX2np/DQDVd001LLiL5FxAehei+nmXbBvbqstYEqJazLECOUwd3rB/54jAMeB
+	ASGYRkAgzIflT+VCOaRmGfT+8hvo/1Cx3afGXMGLJnnJ8GSiAzEj9juTrG+IzD1dfZ3zfIX3Gck
+	NsT4P2Jf/zRyV2Q/vnCY8NXugeZ0zfzxahB2/zuZlX2/Z3N+LsG3gQTxf9fvIX+GwNFEWARKLN/
+	rmGRyJhftpMJsYnwv9kxSunHO47s+uWOjxh3UMzFK6Xw9eNCcAVGuW48C0KaLJKSrmcKBR9CfM/
+	qr5wlp3Mkk0eKV7xLuaDhubP7XWwIfA53scYr6FqnbuIxV4bQxf7+dLE2Gx+7U5aKNSKVLgOsR/
+	1OvzHx96yQ+Xb33yY4S4BGjrVvqAfLwWvpjXOV2jHv568mU3f6elsa0hSwXA==
+X-Received: by 2002:a05:690e:4282:20b0:64e:5e22:baaa with SMTP id 956f58d0204a3-64eaa811056mr1163319d50.72.1773964100476;
+        Thu, 19 Mar 2026 16:48:20 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-102.dlp.protect.broadcom.com. [144.49.247.102])
+        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-64eabbf8ba1sm50074d50.0.2026.03.19.16.48.20
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 19 Mar 2026 16:48:20 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-2ba9a744f7dso1058388eec.0
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 16:48:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1773964099; x=1774568899; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=e5cmiGK1Zkwu7IrGjnCXhUrogpw/1TK847Pzk+gJ73g=;
+        b=P9Clj6ehWKFz/FzNfysKxccjb8ZBP85NICAviCpdwJ3gw01YuD1JBhB/+WAypuG8Cj
+         ZCFaGV8q4h9WDuFGWXR2NGezTpxVQHlScorBjqtu0JQ/iNetpYp+bUweYc/hH+yuy+a1
+         M09mLsvKKzUlo573LbcTR/+P2YZZFHdbKFOeU=
+X-Received: by 2002:a05:7022:f9a:b0:122:2f4:b251 with SMTP id a92af1059eb24-12a726cad77mr461572c88.21.1773964098972;
+        Thu, 19 Mar 2026 16:48:18 -0700 (PDT)
+X-Received: by 2002:a05:7022:f9a:b0:122:2f4:b251 with SMTP id a92af1059eb24-12a726cad77mr461552c88.21.1773964098264;
+        Thu, 19 Mar 2026 16:48:18 -0700 (PDT)
+Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c10b2d673asm1141697eec.24.2026.03.19.16.48.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2026 16:48:17 -0700 (PDT)
+From: justin.chen@broadcom.com
+To: netdev@vger.kernel.org
+Cc: bcm-kernel-feedback-list@broadcom.com,
+	horms@kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	florian.fainelli@broadcom.com,
+	Justin Chen <justin.chen@broadcom.com>
+Subject: [PATCH net v3 0/2] net: bcmasp: Fix issues during driver unbind
+Date: Thu, 19 Mar 2026 16:48:11 -0700
+Message-Id: <20260319234813.1937315-1-justin.chen@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269717-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kvack.org,linux-foundation.org,vger.kernel.org,skhynix.com,oracle.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.cz,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
-	RCPT_COUNT_TWELVE(0.00)[47];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	TAGGED_FROM(0.00)[bounces-269718-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.977];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BD0E82D4376
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.979];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 955092D443C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 17 Mar 2026 07:31:13 +0900 Byungchul Park wrote:
-> Currently, the condition 'page->pp_magic == PP_SIGNATURE' is used to
-> determine if a page belongs to a page pool.  However, with the planned
-> removal of @pp_magic, we should instead leverage the page_type in struct
-> page, such as PGTY_netpp, for this purpose.
-> 
-> Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(),
-> and __ClearPageNetpp() instead, and remove the existing APIs accessing
-> @pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
-> netmem_clear_pp_magic().
-> 
-> Plus, add @page_type to struct net_iov at the same offset as struct page
-> so as to use the page_type APIs for struct net_iov as well.  While at it,
-> reorder @type and @owner in struct net_iov to avoid a hole and
-> increasing the struct size.
+From: Justin Chen <justin.chen@broadcom.com>
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+Fix two issues when we unbind the driver. We hit a double free of the
+WoL irq and a double disable of the clk.
+
+Justin Chen (2):
+  net: bcmasp: fix double free of WoL irq
+  net: bcmasp: fix double disable of clk
+
+ drivers/net/ethernet/broadcom/asp2/bcmasp.c | 41 ++++++++++++---------
+ 1 file changed, 23 insertions(+), 18 deletions(-)
+
+-- 
+2.34.1
+
 
