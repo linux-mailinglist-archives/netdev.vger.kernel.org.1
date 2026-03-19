@@ -1,134 +1,169 @@
-Return-Path: <netdev+bounces-269679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269680-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id xrWQHI50vGnYywIAu9opvQ
-	(envelope-from <netdev+bounces-269679-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:11:26 +0100
+	id qCSUK0t3vGlWzAIAu9opvQ
+	(envelope-from <netdev+bounces-269680-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:23:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D407A2D2E4B
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:11:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 057512D2EE0
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:23:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BA02B302836B
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:11:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9EA4930075E8
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F46C3FF8BF;
-	Thu, 19 Mar 2026 22:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A7F3B8BD9;
+	Thu, 19 Mar 2026 22:23:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="mljWtymt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DuzWM1lw"
 X-Original-To: netdev@vger.kernel.org
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f73.google.com (mail-dl1-f73.google.com [74.125.82.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE43239B97D;
-	Thu, 19 Mar 2026 22:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181C83B8BDA
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 22:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773958280; cv=none; b=kWKGdaUrQ8Hk544egmcZY4G9s26dKjWsAqYriaakCFMKGybB3fQwG8FfgMmI+GEaxiepQlWMe/7tRC58MAbvaZ+QhQFXQrtMdGjl6KD2btPES3SZUySCL2rcEb5hP0bZ8V7H2agqCiToIn8QlBInZjcvrYCeSNxy4DcBtiP8lsk=
+	t=1773958984; cv=none; b=VfuFqE4/3ekJzNJfMW1hIEx3aaQHTMyEuTBrYZ5MDXZFtpR0hsEAnOHBJW8pZkjArTTg2iNcwcNWsO0WPpVaTXB2MNqdrHY59LteqzEMBzOV7d/iStLftZDeEnSAIZg5AnzXL1YB6F9F0Ru+ClNCLvMJcWBM+fKflrXk0tj7tG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773958280; c=relaxed/simple;
-	bh=9SEPiWDtYK915dM/C6koVFsZw+XgKzFlGBbVBs7PxtM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MzEjXS5gzZrZkZGAmcYXqg6ggZw+FTbJkmA62SBe40+IACfVIxzKTC8oU1VIJOB8SQshKX+uUpTILAG/pgvaBu8s3JW0u/AdcadaKqJ5SB+b5BVAE62eK+Up3EwaR1guPsc+EYVsGF4WUqQMGAFQRMpQEg4GnBM4GjCQJCokHds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=mljWtymt; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 67A8041209
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1773958272; bh=pMssSaY3o+6SS7PX7iNNHD9bSiFr2yXyJvC2G9sajBQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=mljWtymtW29QF0H6t3+rbQc9YPQR49BsqrPMLyyFIshT5SpcYDZpbG3hfx3zEa+2B
-	 DIy1R3nrrX13dniiEpKa4qoHRqJ1xuzG4M3/7U0621Um6WLKxAoZtySyyn8s1DUWaH
-	 5VkMJLibBjFeXjJSyrg751f9M7+/rzEi/YgKDubiWlPflAh23i/07ez2O4FaVezYc/
-	 KojiIJWUbDIo1jjZoj/xSIMTbrdaPOkQsRsChjW7IWzMTjiHUdqQZcq7pLZJssTRpg
-	 4trJfpaAgh68brPeN0q7f6+68hd5F5tf+DKHib6A3f5cNInhgsXKnWSnfZGQjdonig
-	 R0LphD1pLmivQ==
-Received: from localhost (unknown [IPv6:2601:280:4600:27b::1fe])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 67A8041209;
-	Thu, 19 Mar 2026 22:11:12 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: Ralf Lici <ralf@mandelbit.com>, netdev@vger.kernel.org
-Cc: Daniel =?utf-8?Q?Gr=C3=B6ber?= <dxld@darkboxed.org>, Antonio Quartulli
- <antonio@mandelbit.com>, Ralf Lici <ralf@mandelbit.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next 15/15] Documentation: networking: add ipxlat
- translator guide
-In-Reply-To: <20260319151230.655687-16-ralf@mandelbit.com>
-References: <20260319151230.655687-1-ralf@mandelbit.com>
- <20260319151230.655687-16-ralf@mandelbit.com>
-Date: Thu, 19 Mar 2026 16:11:11 -0600
-Message-ID: <87se9vh3ls.fsf@trenco.lwn.net>
+	s=arc-20240116; t=1773958984; c=relaxed/simple;
+	bh=RwjqPW3hdKbq12/VtiolNMkns2Vf6kLHBAL4x+OMV20=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fEE7Chlod3ePeAK4MSBMWVrng0yjC9Gk6ZbUr50P4c0RIaiqn7e+Xv9O1k1XRHACJEUeRrg0gwXrVTlHzLU7TuSDuWcFBpXunk46nbEcZ8r1P5sGFEn1kejT8dofIC88Ke/+ZAEO43fJIIiiH7c6oi483Y78pUkwkiG8EN9uCVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--cmllamas.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DuzWM1lw; arc=none smtp.client-ip=74.125.82.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--cmllamas.bounces.google.com
+Received: by mail-dl1-f73.google.com with SMTP id a92af1059eb24-12711ec96fbso1508804c88.0
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 15:23:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1773958981; x=1774563781; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=21CCv2QhWEuG4RWtTFKNgnyM/pUG+/d+Ba5VzMpYDr8=;
+        b=DuzWM1lwemao7q379F+lf66q0kH3M/ZpzJ9mG7f4oIYwIjhjnyqTqsVIV5F2amhbnF
+         OUBoCK4D4RTAVgCd/76YChIRW06XBfN6EicErjwTsZ2XTSzc7niIFh5KlMw+op5lmrmq
+         4bOcCasxwHyt99tG5iYzqTCCy3bT0HypQpIvOd+DBs4252yvE7maO6czTZOriWlmkeKG
+         BnSFltrqh/4l6q3wDarvlvBhhUsO+SJnZ+XVTXmEN/BnzgPV6qKUfGTPwt3SV4Iw2EHT
+         ImSklYklJ+7EvpVZMmco+IUdmTSZjD3vfAeGZqgQmLCug/n7lErtpmOfijPBwhaVqKpv
+         ZtxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773958981; x=1774563781;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=21CCv2QhWEuG4RWtTFKNgnyM/pUG+/d+Ba5VzMpYDr8=;
+        b=SWb22AzfoVeqpdgN/AcpcMw4QzN2OdU460OvlJ0YvH3Q2c61zHnTiaDvRFmu2NynhK
+         cGU7tLWiXLQ4Uft+cme0p1/sjagenf4ftG1JUDdQwx+VTOQeCCR08g6PWZNzHktFfWhr
+         3aiBzcIhkquHDLn2/FSS5yEBsVY2/xpyzcvzKoYU0LidzmnDPnDGDK6z30wAQaF1I4mz
+         DSeqDLhbBkjZg+ostUCVazedQampnEWVBIhy2hzFOw1PiPgmejuhqUVv+wV3lCanzx8E
+         HsaJ2mrPAw3O59KOSx3WwejVZTqkQpgs+aydqO+vG+GcVzLLWslRJW7XL+9R/+ajf6jq
+         y7kw==
+X-Forwarded-Encrypted: i=1; AJvYcCX+RFL6q5igw4lU+1SMXCPquwplLuEcGpoI26+YFTCVLweLblFQzMAM7Zv5ArTL6NP7+OPpZ8M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZrZCo+/g4WI2pqmwepnkmDLYBeUhhqnqPKXWS50GY1N15DZgU
+	G9uvuTDGdQt/QopMrs1gjefx4zvR446oHLIqTV3+YUpcTw1qc4fw2l6FbfmhNmXOY1YDDXKGw5J
+	PGE2Fn1Emv4rl2Q==
+X-Received: from dybsq4.prod.google.com ([2002:a05:7301:7104:b0:2c1:771:5786])
+ (user=cmllamas job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:7301:e8a:b0:2c0:dae2:9c50 with SMTP id 5a478bee46e88-2c109804a43mr536456eec.31.1773958980702;
+ Thu, 19 Mar 2026 15:23:00 -0700 (PDT)
+Date: Thu, 19 Mar 2026 22:22:43 +0000
+In-Reply-To: <20240617093620.12a9b539@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0
+References: <20240617093620.12a9b539@kernel.org>
+X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
+Message-ID: <20260319222250.2588501-1-cmllamas@google.com>
+Subject: [PATCH net v3] neighbour: add RTNL_FLAG_DUMP_SPLIT_NLM_DONE to RTM_GETNEIGH
+From: Carlos Llamas <cmllamas@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kernel-team@android.com, Terence Tritton <ttritton@google.com>, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Eric Dumazet <edumazet@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Carlos Llamas <cmllamas@google.com>, 
+	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Ido Schimmel <idosch@nvidia.com>, 
+	Petr Machata <petrm@nvidia.com>, Breno Leitao <leitao@debian.org>, 
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lwn.net,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[lwn.net:s=20201203];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-269680-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269679-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[lwn.net:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[corbet@lwn.net,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cmllamas@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.980];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,trenco.lwn.net:mid,lwn.net:dkim]
-X-Rspamd-Queue-Id: D407A2D2E4B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,neighbour_test.py:url,davemloft.net:email,android.com:url]
+X-Rspamd-Queue-Id: 057512D2EE0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Ralf Lici <ralf@mandelbit.com> writes:
+From: Maciej =C5=BBenczykowski <maze@google.com>
 
-> From: Daniel Gr=C3=B6ber <dxld@darkboxed.org>
->
-> Add user and reviewer documentation for the ipxlat virtual netdevice in
-> Documentation/networking/ipxlat.rst.
->
-> The document describes the datapath model, stateless IPv4/IPv6 address
-> translation rules, ICMP handling, control-plane configuration, and test
-> topology assumptions. It also records the intended runtime configuration
-> contract and current behavior limits so deployment expectations are
-> clear.
->
-> Signed-off-by: Daniel Gr=C3=B6ber <dxld@darkboxed.org>
-> Signed-off-by: Ralf Lici <ralf@mandelbit.com>
-> ---
->  Documentation/networking/ipxlat.rst | 190 ++++++++++++++++++++++++++++
->  1 file changed, 190 insertions(+)
->  create mode 100644 Documentation/networking/ipxlat.rst
+without this Android's net test, available at:
+  https://cs.android.com/android/platform/superproject/main/+/main:kernel/t=
+ests/net/test/
+run via:
+  /...aosp-tests.../net/test/run_net_test.sh --builder neighbour_test.py
+fails with:
+  TypeError: NLMsgHdr requires a bytes object of length 16, got 4
 
-You need to add this new file to Documentation/networking/index.rst or
-it won't be included in the build (and you'll get a warning).
+Fixes: 7e4975f7e7fb ("neighbour: fix neigh_dump_info() return value")
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: David S. Miller <davem@davemloft.net>
+Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
+Tested-by: Carlos Llamas <cmllamas@google.com>
+Signed-off-by: Carlos Llamas <cmllamas@google.com>
+---
+It seems like this fix slipped through the cracks, so I'm resending it.
 
-Thanks,
+v3: Rebased on top of mainline and fixed the conflicts as v2 from Maciej
+    no longer applied cleanly. Verified the fix works as explained un
+    the commit message. Added tested and sob tags.
 
-jon
+ net/core/neighbour.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index c56a4e7bf790..bdee4cf110bd 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -3953,7 +3953,8 @@ static const struct rtnl_msg_handler neigh_rtnl_msg_h=
+andlers[] __initconst =3D {
+ 	{.msgtype =3D RTM_NEWNEIGH, .doit =3D neigh_add},
+ 	{.msgtype =3D RTM_DELNEIGH, .doit =3D neigh_delete},
+ 	{.msgtype =3D RTM_GETNEIGH, .doit =3D neigh_get, .dumpit =3D neigh_dump_i=
+nfo,
+-	 .flags =3D RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
++	 .flags =3D RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED |
++		  RTNL_FLAG_DUMP_SPLIT_NLM_DONE},
+ 	{.msgtype =3D RTM_GETNEIGHTBL, .dumpit =3D neightbl_dump_info,
+ 	 .flags =3D RTNL_FLAG_DUMP_UNLOCKED},
+ 	{.msgtype =3D RTM_SETNEIGHTBL, .doit =3D neightbl_set,
+--=20
+2.53.0.1018.g2bb0e51243-goog
+
 
