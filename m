@@ -1,69 +1,64 @@
-Return-Path: <netdev+bounces-269293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269294-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4ASfOiN0u2mckQIAu9opvQ
-	(envelope-from <netdev+bounces-269293-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:57:23 +0100
+	id SNXiHb90u2mckQIAu9opvQ
+	(envelope-from <netdev+bounces-269294-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:59:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F8B42C5C1D
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:57:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB0F62C5C55
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:59:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 926BF30B9FAC
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:57:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5A4143020FCD
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99EDD33FE27;
-	Thu, 19 Mar 2026 03:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5396334107D;
+	Thu, 19 Mar 2026 03:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H15fmwNE"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wnu9dG0A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A7433263E;
-	Thu, 19 Mar 2026 03:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3F0329361
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 03:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773892633; cv=none; b=LOKVshtuGxXp95hxkbGdQibSQM2HQRewuLzeGkLbV3OXcGGQ4eNGDqbpRmxwIMVIxOj4MxjDTUTmCiQqCDz4JkF2Pt1rFwFa5UDtq4YmPbj1uwjy/DRRZa1TGehg+ZfNht7ng0VAsVPG9kHnNYc40FjxgOt7NzuVHr18Obxrr5w=
+	t=1773892794; cv=none; b=MRqULiEcm5AxEdrqnyf0E7NBzJrUPB6Qna69ce1Nf/whhkE6d9wF/L7Ns4FKmqCmwheDmCZBGOmJCR4HyvLxfJWENQRykVfEgQfUf3OWfVlP9K5l8v1PnAbmxSvd+u4zJ71XbYv+ZRn7OGdDWSEmltpdkhiSgPR8R0etgmYlSJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773892633; c=relaxed/simple;
-	bh=emdFY7RfW3M1nJe3blkZEZcRiajQ+G4C88lIFs82nek=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Iz8IGnDwcwn6UumMnoEk4tUyZYUZTL1sS2IOyIDCbtxMfYBMnWqVkJTn5ibCNF62dwCF6DysqsN+Iyf4WR+eHyM0DctruRUYwZYn5idQYvbsSim1KI1oPQpYYUFE89g5KaSd0ToUEqXJwiCQ7AoPC0AWkoHZSTs5p/JGtRy+JEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H15fmwNE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C07A7C2BCB1;
-	Thu, 19 Mar 2026 03:57:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773892633;
-	bh=emdFY7RfW3M1nJe3blkZEZcRiajQ+G4C88lIFs82nek=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=H15fmwNERPCgXFxOKkr5EkTkRH8gGGrKAG/mi58xlHeR1xHRQ2R4gTvGP8+N121U/
-	 ufQahNF6DyQeHsM2bSbdxzFiYKocX/LwYA2OZQmEZIoT771goD+nI+hkmcI5QN59YG
-	 e8hj25gbJWFIa2LT1+ap50zt0K4jpDgPmkkoNdF8fPar2KL8hc/dJi+mC789LChKJ3
-	 F2RWZfkMCQGC+yiPtT17s0zMn978+qH+8dyGfZJYv0JbYIAzioaZv4aN2e/UlO+qSa
-	 paAmUgvcO45OaVXc9RMgVVNfxTQ0sxrqWLMvCPRhUaUQqEYZeZZRVROZALljXsQkKY
-	 KDZGN/RkEsHyA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	donald.hunter@gmail.com,
-	shuah@kernel.org,
-	matttbe@kernel.org,
-	chuck.lever@oracle.com,
-	hawk@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 2/2] selftests: net: add tests for filtered dumps of page pool
-Date: Wed, 18 Mar 2026 20:56:48 -0700
-Message-ID: <20260319035649.2396137-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260319035649.2396137-1-kuba@kernel.org>
-References: <20260319035649.2396137-1-kuba@kernel.org>
+	s=arc-20240116; t=1773892794; c=relaxed/simple;
+	bh=oWqHbJE0RgHeconSPxGmhGmIvFeYcOmGiF+at8wQ+os=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bhxQRPo3bOl2BbMcm04CISxb0r6XqkJeD+4f8lrAVVhCUiFXxmfaD9pqjxlywVEaIZOMxAHpUel7Vlkd9CH82C991hE9hnAgznWHLVUEExfh6x8SPuCYd/p7l+6yCks5L38JIU+3z1FGRUPRjMoHXT9ycqDSr+I/j9jHFMtmyoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wnu9dG0A; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773892779;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tSIDmGv3R2Er5QnrPE+2YlUWLwJfW8e8iOpiPPtWs+w=;
+	b=wnu9dG0AkKVTGqvV86bsejYvGoYyGvBGra+rBCnTcb0DBJbwHnNqiE+7vxnS7okjJapjT6
+	nFkYagOKLlbiLZKTptkB88YM/60gQ0bwnwc9lg6kgWAfuvMfxNdHO/5IXprEOSUG5Xv4oz
+	/HL0U/z7MXmGeCqxQMCLhsz4npYZq1c=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v3] selftests: bonding: add test for stacked bond header_parse recursion
+Date: Thu, 19 Mar 2026 11:58:56 +0800
+Message-ID: <20260319035902.6106-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,191 +66,184 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,oracle.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-269293-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-269294-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.895];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.801];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4F8B42C5C1D
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid,shopee.com:email]
+X-Rspamd-Queue-Id: EB0F62C5C55
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add tests for page pool dumps of a specific ifindex.
+From: Jiayuan Chen <jiayuan.chen@shopee.com>
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Add a selftest to reproduce the infinite recursion in bond_header_parse()
+when bonds are stacked (bond1 -> bond0 -> gre). When a packet is received
+via AF_PACKET SOCK_DGRAM on the topmost bond, dev_parse_header() calls
+bond_header_parse() which used skb->dev (always the topmost bond) to get
+the bonding struct. This caused it to recurse back into itself
+indefinitely, leading to stack overflow.
+
+Before commit b7405dcf7385 ("bonding: prevent potential infinite loop
+in bond_header_parse()"), the test triggers:
+
+  ./bond_stacked_header_parse.sh
+
+  [  71.999481] BUG: MAX_LOCK_DEPTH too low!
+  [  72.000170] turning off the locking correctness validator.
+  [  72.001029] Please attach the output of /proc/lock_stat to the bug report
+  [  72.002079] depth: 48  max: 48!
+  ...
+
+After the fix, everything works fine:
+
+  ./bond_stacked_header_parse.sh
+  TEST: Stacked bond header_parse does not recurse                  [ OK ]
+
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
+Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
 ---
- tools/testing/selftests/net/nl_netdev.py | 119 ++++++++++++++++++++++-
- 1 file changed, 117 insertions(+), 2 deletions(-)
+Changes in v3:
+- Fix CONFIG_NET_IPGRE sorting order in config
 
-diff --git a/tools/testing/selftests/net/nl_netdev.py b/tools/testing/selftests/net/nl_netdev.py
-index eff55c64a012..ceb44c8e1fec 100755
---- a/tools/testing/selftests/net/nl_netdev.py
-+++ b/tools/testing/selftests/net/nl_netdev.py
-@@ -9,7 +9,7 @@ import errno
- from os import system
- from lib.py import ksft_run, ksft_exit
- from lib.py import ksft_eq, ksft_ge, ksft_ne, ksft_raises, ksft_busy_wait
--from lib.py import NetdevFamily, NetdevSimDev, NlError, ip
-+from lib.py import NetdevFamily, NetdevSimDev, NlError, defer, ip
- 
- 
- def empty_check(nf) -> None:
-@@ -255,6 +255,117 @@ from lib.py import NetdevFamily, NetdevSimDev, NlError, ip
-         nsim.dfs_write("pp_hold", "y")
- 
- 
-+def page_pool_dump_ifindex(nf) -> None:
-+    """Test page pool dump filtering by ifindex."""
-+    nsimdev1 = NetdevSimDev(queue_count=3)
-+    rm_nsim1 = defer(nsimdev1.remove)
-+    nsimdev2 = NetdevSimDev(queue_count=5)
-+    defer(nsimdev2.remove)
+Changes in v2:
+- Use tcpdump + scapy instead of custom Python script
+- Remove unnecessary modprobe and skip checks
+- Add CONFIG_NET_IPGRE to config dependencies
+
+v1: https://lore.kernel.org/netdev/20260316165946.46e9f8f7@kernel.org/T/#t
+https://lore.kernel.org/netdev/CANn89iK2EURqsjtd=OVP4awYTJHGcR-UU-V9WovpWR1Z3f03oQ@mail.gmail.com/
+---
+ .../selftests/drivers/net/bonding/Makefile    |  1 +
+ .../net/bonding/bond_stacked_header_parse.sh  | 69 +++++++++++++++++++
+ .../selftests/drivers/net/bonding/config      |  1 +
+ 3 files changed, 71 insertions(+)
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_stacked_header_parse.sh
+
+diff --git a/tools/testing/selftests/drivers/net/bonding/Makefile b/tools/testing/selftests/drivers/net/bonding/Makefile
+index 6c5c60adb5e8..9af5f84edd37 100644
+--- a/tools/testing/selftests/drivers/net/bonding/Makefile
++++ b/tools/testing/selftests/drivers/net/bonding/Makefile
+@@ -11,6 +11,7 @@ TEST_PROGS := \
+ 	bond_macvlan_ipvlan.sh \
+ 	bond_options.sh \
+ 	bond_passive_lacp.sh \
++	bond_stacked_header_parse.sh \
+ 	dev_addr_lists.sh \
+ 	mode-1-recovery-updelay.sh \
+ 	mode-2-recovery-updelay.sh \
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond_stacked_header_parse.sh b/tools/testing/selftests/drivers/net/bonding/bond_stacked_header_parse.sh
+new file mode 100755
+index 000000000000..4d0ec6e89e75
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/bonding/bond_stacked_header_parse.sh
+@@ -0,0 +1,69 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++#
++# Test that bond_header_parse() does not infinitely recurse with stacked bonds.
++#
++# When a non-Ethernet device (e.g. GRE) is enslaved to a bond that is itself
++# enslaved to another bond (bond1 -> bond0 -> gre), receiving a packet via
++# AF_PACKET SOCK_DGRAM triggers dev_parse_header() -> bond_header_parse().
++# Since parse() used skb->dev (always the topmost bond) instead of a passed-in
++# dev pointer, it would recurse back into itself indefinitely.
 +
-+    nsim1 = nsimdev1.nsims[0]
-+    nsim2 = nsimdev2.nsims[0]
++ALL_TESTS="
++	bond_test_stacked_header_parse
++"
++REQUIRE_MZ=no
++NUM_NETIFS=0
++lib_dir=$(dirname "$0")
++source "$lib_dir"/../../../net/forwarding/lib.sh
 +
-+    ip(f"link set dev {nsim1.ifname} up")
-+    ip(f"link set dev {nsim2.ifname} up")
++bond_test_stacked_header_parse()
++{
++	local devdummy="test-dummy0"
++	local devgre="test-gre0"
++	local devbond0="test-bond0"
++	local devbond1="test-bond1"
 +
-+    # Unfiltered dump should have pools from both devices
-+    all_pp = nf.page_pool_get({}, dump=True)
-+    pp1_all = [pp for pp in all_pp
-+               if pp.get("ifindex") == nsim1.ifindex]
-+    pp2_all = [pp for pp in all_pp
-+               if pp.get("ifindex") == nsim2.ifindex]
-+    ksft_ge(len(pp1_all), 1)
-+    ksft_ge(len(pp2_all), 1)
++	RET=0
 +
-+    # Filtered dump should only return pools for that device
-+    pp1_flt = nf.page_pool_get({'ifindex': nsim1.ifindex}, dump=True)
-+    ksft_eq(pp1_flt, pp1_all)
++	# Setup: dummy -> gre -> bond0 -> bond1
++	ip link add name "$devdummy" type dummy
++	ip addr add 10.0.0.1/24 dev "$devdummy"
++	ip link set "$devdummy" up
 +
-+    pp2_flt = nf.page_pool_get({'ifindex': nsim2.ifindex}, dump=True)
-+    ksft_eq(pp2_flt, pp2_all)
++	ip link add name "$devgre" type gre local 10.0.0.1
 +
-+    # Non-existent ifindex should return empty dump
-+    pp_none = nf.page_pool_get({'ifindex': 12345678}, dump=True)
-+    ksft_eq(len(pp_none), 0)
++	ip link add name "$devbond0" type bond mode active-backup
++	ip link add name "$devbond1" type bond mode active-backup
 +
-+    # Device down - no pools for that ifindex
-+    ip(f"link set dev {nsim1.ifname} down")
-+    pp1_down = nf.page_pool_get({'ifindex': nsim1.ifindex}, dump=True)
-+    ksft_eq(len(pp1_down), 0)
++	ip link set "$devgre" master "$devbond0"
++	ip link set "$devbond0" master "$devbond1"
 +
-+    # Remove device, dump by its old ifindex should return empty
-+    old_ifindex = nsim1.ifindex
-+    rm_nsim1.exec()
-+    pp1_gone = nf.page_pool_get({'ifindex': old_ifindex}, dump=True)
-+    ksft_eq(len(pp1_gone), 0)
++	ip link set "$devgre" up
++	ip link set "$devbond0" up
++	ip link set "$devbond1" up
 +
++	# tcpdump on a non-Ethernet bond uses AF_PACKET SOCK_DGRAM (cooked
++	# capture), which triggers dev_parse_header() -> bond_header_parse()
++	# on receive. With the bug, this recurses infinitely.
++	timeout 5 tcpdump -c 1 -i "$devbond1" >/dev/null 2>&1 &
++	local tcpdump_pid=$!
++	sleep 1
 +
-+def page_pool_ifindex_leak_check(nf) -> None:
-+    """Test that zombie page pools don't show up under the original ifindex."""
-+    nsimdev = NetdevSimDev()
-+    rm_nsim = defer(nsimdev.remove)
-+    nsim = nsimdev.nsims[0]
++	# Send a GRE packet to 10.0.0.1 so it arrives via gre -> bond0 -> bond1
++	python3 -c "from scapy.all import *; send(IP(src='10.0.0.2', dst='10.0.0.1')/GRE()/IP()/UDP(), verbose=0)"
++	check_err $? "failed to send GRE packet (scapy installed?)"
 +
-+    ip(f"link set dev {nsim.ifname} up")
-+    nsim.dfs_write("pp_hold", "y")
++	wait "$tcpdump_pid" 2>/dev/null
 +
-+    pp_up = nf.page_pool_get({'ifindex': nsim.ifindex}, dump=True)
-+    ksft_ge(len(pp_up), 1)
++	ip link del "$devbond1" 2>/dev/null
++	ip link del "$devbond0" 2>/dev/null
++	ip link del "$devgre" 2>/dev/null
++	ip link del "$devdummy" 2>/dev/null
 +
-+    # Remove device with leaked page - pool becomes zombie (orphaned to lo)
-+    old_ifindex = nsim.ifindex
-+    rm_nsim.exec()
++	log_test "Stacked bond header_parse does not recurse"
++}
 +
-+    # Zombie pool should NOT appear under the original device
-+    pp_down = nf.page_pool_get({'ifindex': old_ifindex}, dump=True)
-+    ksft_eq(len(pp_down), 0)
++tests_run
 +
-+    # But it should appear in an unfiltered dump (under loopback)
-+    pp_all = nf.page_pool_get({}, dump=True)
-+    orphans = [pp for pp in pp_all
-+               if "detach-time" in pp and "ifindex" not in pp]
-+    ksft_ge(len(orphans), 1)
-+
-+
-+def page_pool_stats_ifindex_check(nf) -> None:
-+    """Test page pool stats dump filtering by ifindex."""
-+    nsimdev1 = NetdevSimDev(queue_count=3)
-+    defer(nsimdev1.remove)
-+    nsimdev2 = NetdevSimDev(queue_count=5)
-+    defer(nsimdev2.remove)
-+
-+    nsim1 = nsimdev1.nsims[0]
-+    nsim2 = nsimdev2.nsims[0]
-+
-+    ip(f"link set dev {nsim1.ifname} up")
-+    ip(f"link set dev {nsim2.ifname} up")
-+
-+    # Unfiltered stats dump
-+    all_stats = nf.page_pool_stats_get({}, dump=True)
-+    s1_all = [s for s in all_stats
-+              if s.get("info", {}).get("ifindex") == nsim1.ifindex]
-+    s2_all = [s for s in all_stats
-+              if s.get("info", {}).get("ifindex") == nsim2.ifindex]
-+    ksft_ge(len(s1_all), 1)
-+    ksft_ge(len(s2_all), 1)
-+
-+    # Filtered stats dump
-+    s1_flt = nf.page_pool_stats_get({'info': {'ifindex': nsim1.ifindex}},
-+                                    dump=True)
-+    ksft_eq(s1_flt, s1_all)
-+
-+    # Non-existent ifindex should return empty
-+    s_none = nf.page_pool_stats_get({'info': {'ifindex': 12345678}}, dump=True)
-+    ksft_eq(len(s_none), 0)
-+
-+    # info.id should be rejected for stats dump
-+    with ksft_raises(NlError) as cm:
-+        nf.page_pool_stats_get({'info': {'id': s1_all[0]['info']['id']}},
-+                               dump=True)
-+    ksft_eq(cm.exception.nl_msg.error, -errno.EINVAL)
-+    ksft_eq(cm.exception.nl_msg.extack['bad-attr'], '.info.id')
-+
-+
- def main() -> None:
-     """ Ksft boiler plate main """
-     nf = NetdevFamily()
-@@ -265,7 +376,11 @@ from lib.py import NetdevFamily, NetdevSimDev, NlError, ip
-               napi_set_threaded,
-               dev_set_threaded,
-               nsim_rxq_reset_down,
--              page_pool_check],
-+              page_pool_check,
-+              page_pool_dump_ifindex,
-+              page_pool_ifindex_leak_check,
-+              page_pool_stats_ifindex_check
-+              ],
-              args=(nf, ))
-     ksft_exit()
- 
++exit "$EXIT_STATUS"
+diff --git a/tools/testing/selftests/drivers/net/bonding/config b/tools/testing/selftests/drivers/net/bonding/config
+index 991494376223..b62c70715293 100644
+--- a/tools/testing/selftests/drivers/net/bonding/config
++++ b/tools/testing/selftests/drivers/net/bonding/config
+@@ -14,6 +14,7 @@ CONFIG_NETCONSOLE=m
+ CONFIG_NETCONSOLE_DYNAMIC=y
+ CONFIG_NETCONSOLE_EXTENDED_LOG=y
+ CONFIG_NETDEVSIM=m
++CONFIG_NET_IPGRE=y
+ CONFIG_NET_SCH_INGRESS=y
+ CONFIG_NLMON=y
+ CONFIG_VETH=y
 -- 
-2.53.0
+2.43.0
 
 
