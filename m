@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-269500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269496-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6AacGiYWvGnbrwIAu9opvQ
-	(envelope-from <netdev+bounces-269500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:28:38 +0100
+	id WNTjF0YVvGnbrwIAu9opvQ
+	(envelope-from <netdev+bounces-269496-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:24:54 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E75B02CDBA9
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:28:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6F862CDAF1
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:24:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4EFF432C605E
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:20:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CEB103106D19
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37AF03E3C5D;
-	Thu, 19 Mar 2026 15:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89564258EDB;
+	Thu, 19 Mar 2026 15:18:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b="hJFg6k/E"
+	dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b="X9fxtJcq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-b-201.mailbox.org (mout-b-201.mailbox.org [195.10.208.61])
+Received: from mout-b-110.mailbox.org (mout-b-110.mailbox.org [195.10.208.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858113E556B;
-	Thu, 19 Mar 2026 15:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C095A3DEFEE;
+	Thu, 19 Mar 2026 15:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773933631; cv=none; b=muisLNLfLkgGSC1/yfE13o7sWxUWImFkbzjqLifRQBVwMZj6ukpLLGQx0Yf/NDDVMjEVaGfsjlQ2bFpFAUylfWhfpWna8vG0Y/as4QXRQp47S7ofiES2le5gbwOwh7woaravIwnJAAt2e4JdBjPH+qC1jPczxu2Gngdpug6nj8c=
+	t=1773933538; cv=none; b=BWA9HOFj914CWY+Ywpb9RjSgb/R5xIvzTr0hKKjqI6aVsvFsCHL4dXWVmtaz95/A9A6YWCuHGDlrpFU0ctPfoZX+38F5f2OhEyoVgU8z3fdwlWIBwSJv718P56nqQqFsUuhhfzFe1+S2JdCpXoDSjJEJO48aP2BLgeV0KkhKck0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773933631; c=relaxed/simple;
-	bh=HFsB2eky2Tk0cvZa+RJn225M3EBHBhiR9X02au8fvgE=;
+	s=arc-20240116; t=1773933538; c=relaxed/simple;
+	bh=p/IricehhSgBDg3JPp7uZ1Tlpjhpc28qmp7zqTB4g9k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eN/CTLTSkDNl+SL1XaL31lUnSJkBJWZB5wuKerA67rKrOjrJSsEozRVc7/v9PZZT3YZVJZQ4JlXwfTr66iecn1n6yzEsCb7h6q5yeZ31hlJbW7SEsQ+MQout+Fl7Emx+Yt1r5xXlihWZ+c6h9EV290GuMl/fBgLmARmQQdgm/Kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=hJFg6k/E; arc=none smtp.client-ip=195.10.208.61
+	 MIME-Version; b=JldgbUeRmwi8jZGb4o1u9JXatNER3gx5UkrG5Q2fCbtu5D+EMrPMB6f5Za00jsvWTYn5tZUfc0j9O7GruiQrU1e17zkzYIlpAWzurJqdoS1ERE46bkzLX6vLX6awW5P2oVM+7iRcwWVH7RK0PDEPZKaHiW/G5Y8yizUWBDwA84k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=X9fxtJcq; arc=none smtp.client-ip=195.10.208.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mandelbit.com
 Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-b-201.mailbox.org (Postfix) with ESMTPS id 4fc8NG0dZrzDs2P;
-	Thu, 19 Mar 2026 16:13:34 +0100 (CET)
+	by mout-b-110.mailbox.org (Postfix) with ESMTPS id 4fc8NM4m33zB0t7;
+	Thu, 19 Mar 2026 16:13:39 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1773933214;
+	s=MBO0001; t=1773933219;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lZmf3XMXGG3SmE3J2wOJSJ7B3hQ2E0d5WPu7AoMMTbo=;
-	b=hJFg6k/EGLrXPGrEpxuSoGOJxC3USyR+lkRouQbilasWQzkvxxIVqHc0m8Xhf+LGDo+nrJ
-	Cno4OLiZL/z47DJ5WDSAXAmmvdgy0+94kQZUOoNUgr+9EjdAx/NEMexUPiDwqIWi8SvtCS
-	vBvVxg2O9PLnOzZ+2nc8/bnNs4r23RUsaenZKJGiCT8YS1YUrb2TF9IdH/pyVjRCKiJOPX
-	UKdd342kqV8nK9tG/UAj9xPjxSYIcElK3HCLW4v07IPjLopAaONxiV0JVew+B9k7DAyFWC
-	xBxwycdt8WcmGKWS59GGtAU3aZ/WEzyvF53hZZpyqA+zqYfOC04buZjA0mSIyA==
+	bh=sMX1i4BMieIT4ri4r8wi6e4mrWEXh5MS4f00MKXKxeI=;
+	b=X9fxtJcqIBd3hDAWB5sbebpd1+OTNBnSz9INQRX8nStPA73NSRT36WjOgU8Cp6w/X0WamF
+	g9qy/oZ7EbeqRico7oD8ZDBeWR+9dj+Nfpc1e4iwSNLlIgbfuqARQozuGRtG8Bh1nU9uIv
+	t5qywwn7o/4VQpi91JRIAZvGN5xOjVhT/OdfamaV5OR5qJeu7OGRgQkxIP2pZWD6qpOr38
+	R/stHfntR6eA+Yq+KSgch+qmlIMvJALkKcqc/ER5TZ+d0sGrgxbNIaIQyZ2hPzJTWk2hIn
+	KgmaUs2qae0eaaR9xY7/EV2h/KSso4e5BUjM1ijdFQKkG3GTqdQFwilnB9ZR3g==
 Authentication-Results: outgoing_mbo_mout;
 	dkim=none;
 	spf=pass (outgoing_mbo_mout: domain of ralf@mandelbit.com designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=ralf@mandelbit.com
@@ -66,9 +66,9 @@ Cc: =?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [RFC net-next 09/15] ipxlat: emit translator-generated ICMP errors on drop
-Date: Thu, 19 Mar 2026 16:12:18 +0100
-Message-ID: <20260319151230.655687-10-ralf@mandelbit.com>
+Subject: [RFC net-next 10/15] ipxlat: add 4to6 pre-fragmentation path
+Date: Thu, 19 Mar 2026 16:12:19 +0100
+Message-ID: <20260319151230.655687-11-ralf@mandelbit.com>
 In-Reply-To: <20260319151230.655687-1-ralf@mandelbit.com>
 References: <20260319151230.655687-1-ralf@mandelbit.com>
 Precedence: bulk
@@ -88,7 +88,7 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269500-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269496-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	DMARC_NA(0.00)[mandelbit.com];
 	RCVD_TLS_LAST(0.00)[];
@@ -101,228 +101,257 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.938];
+	NEURAL_HAM(-0.00)[-0.901];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mandelbit.com:dkim,mandelbit.com:email,mandelbit.com:mid]
-X-Rspamd-Queue-Id: E75B02CDBA9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mandelbit.com:dkim,mandelbit.com:email,mandelbit.com:mid,dst.dev:url]
+X-Rspamd-Queue-Id: C6F862CDAF1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When validation or policy requires dropping a packet and generating an
-ICMP error, route that failure through explicit ICMP emission paths so
-the sender can be notified where appropriate. This commit adds
-translator-originated error generation for both directions and
-integrates it into dispatch action handling without changing normal
-forwarding behavior.
+RFC 7915 requires handling packets that would exceed the translated IPv6
+size constraints. Add a pre-fragmentation planning/action path that
+invokes kernel fragmentation helpers before translation, carries
+fragment size through skb metadata, and then reinjects fragments into
+the normal translation path.
 
 Signed-off-by: Ralf Lici <ralf@mandelbit.com>
 ---
- drivers/net/ipxlat/dispatch.c | 66 ++++++++++++++++++++++++++++++++++-
- drivers/net/ipxlat/dispatch.h |  7 ++++
- drivers/net/ipxlat/packet.c   | 25 ++++++++++---
- 3 files changed, 92 insertions(+), 6 deletions(-)
+ drivers/net/ipxlat/dispatch.c     | 99 ++++++++++++++++++++++++++++++-
+ drivers/net/ipxlat/translate_46.c | 59 +++++++++++++++++-
+ drivers/net/ipxlat/translate_46.h | 11 ++++
+ 3 files changed, 166 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ipxlat/dispatch.c b/drivers/net/ipxlat/dispatch.c
-index 133d30859f49..b8b9b930b04c 100644
+index b8b9b930b04c..b58191d4b2c9 100644
 --- a/drivers/net/ipxlat/dispatch.c
 +++ b/drivers/net/ipxlat/dispatch.c
-@@ -11,7 +11,12 @@
-  *		Ralf Lici <ralf@mandelbit.com>
-  */
+@@ -47,6 +47,16 @@ enum ipxlat_action ipxlat_translate(struct ipxlat_priv *ipxlat,
+ 		if (unlikely(ipxlat_v4_validate_skb(ipxlat, skb)))
+ 			return ipxlat_resolve_failed_action(skb);
  
-+#include <linux/icmp.h>
-+#include <linux/icmpv6.h>
-+#include <net/icmp.h>
- #include <net/ip.h>
-+#include <net/route.h>
-+#include <net/ipv6.h>
++		/* 4->6 prefrag plan stores per-skb frag_max_size
++		 * when the packet must be split before translation
++		 * (DF clear and translated size
++		 * above PMTU/threshold).
++		 */
++		if (unlikely(ipxlat_46_plan_prefrag(ipxlat, skb)))
++			return ipxlat_resolve_failed_action(skb);
++		if (unlikely(ipxlat_skb_cb(skb)->frag_max_size))
++			return IPXLAT_ACT_PRE_FRAG;
++
+ 		if (unlikely(ipxlat_46_translate(ipxlat, skb)))
+ 			return ipxlat_resolve_failed_action(skb);
  
- #include "dispatch.h"
- #include "packet.h"
-@@ -21,7 +26,8 @@
- static enum ipxlat_action
- ipxlat_resolve_failed_action(const struct sk_buff *skb)
- {
--	return IPXLAT_ACT_DROP;
-+	return ipxlat_skb_cb(skb)->emit_icmp_err ? IPXLAT_ACT_ICMP_ERR :
-+						 IPXLAT_ACT_DROP;
+@@ -120,6 +130,76 @@ void ipxlat_emit_icmp_error(struct ipxlat_priv *ipxlat, struct sk_buff *inner)
+ 	}
  }
  
- enum ipxlat_action ipxlat_translate(struct ipxlat_priv *ipxlat,
-@@ -61,6 +67,59 @@ void ipxlat_mark_icmp_drop(struct sk_buff *skb, u8 type, u8 code, u32 info)
- 	cb->icmp_err.info = info;
- }
- 
-+static void ipxlat_46_emit_icmp_err(struct ipxlat_priv *ipxlat,
-+				    struct sk_buff *inner)
++static unsigned int ipxlat_frag_dst_get_mtu(const struct dst_entry *dst)
 +{
-+	struct ipxlat_cb *cb = ipxlat_skb_cb(inner);
-+	const struct iphdr *iph = ip_hdr(inner);
-+	struct inet_skb_parm param = {};
-+
-+	/* build route metadata on demand when the packet has no dst */
-+	if (unlikely(!skb_dst(inner))) {
-+		const int reason = ip_route_input_noref(inner, iph->daddr,
-+							iph->saddr,
-+							ip4h_dscp(iph),
-+							inner->dev);
-+
-+		if (unlikely(reason)) {
-+			netdev_dbg(ipxlat->dev,
-+				   "icmp4 emit: route build failed reason=%d\n",
-+				   reason);
-+			return;
-+		}
-+	}
-+
-+	/* emit the ICMPv4 error */
-+	__icmp_send(inner, cb->icmp_err.type, cb->icmp_err.code,
-+		    htonl(cb->icmp_err.info), &param);
++	return READ_ONCE(dst->dev->mtu);
 +}
 +
-+static void ipxlat_64_emit_icmp_err(struct sk_buff *inner)
-+{
-+	struct ipxlat_cb *cb = ipxlat_skb_cb(inner);
-+	struct inet6_skb_parm param = {};
++static struct dst_ops ipxlat_frag_dst_ops = {
++	.family = AF_UNSPEC,
++	.mtu = ipxlat_frag_dst_get_mtu,
++};
 +
-+	/* emit the ICMPv6 error */
-+	icmp6_send(inner, cb->icmp_err.type, cb->icmp_err.code,
-+		   cb->icmp_err.info, NULL, &param);
++/**
++ * ipxlat_46_frag_output - reinject one fragment produced by ip_do_fragment
++ * @net: network namespace of the transmitter
++ * @sk: originating socket
++ * @skb: fragment to reinject
++ *
++ * This callback mirrors ndo_start_xmit processing but runs with
++ * pre-fragmentation disabled to prevent recursive pre-fragment loops.
++ *
++ * Return: 0 on success, negative errno on processing failure.
++ */
++static int ipxlat_46_frag_output(struct net *net, struct sock *sk,
++				 struct sk_buff *skb)
++{
++	struct ipxlat_priv *ipxlat = netdev_priv(skb->dev);
++
++	return ipxlat_process_skb(ipxlat, skb, false);
 +}
 +
-+/* emit translator-generated ICMP errors for packets rejected by RFC rules */
-+void ipxlat_emit_icmp_error(struct ipxlat_priv *ipxlat, struct sk_buff *inner)
++/**
++ * ipxlat_46_fragment_pkt - fragment oversized 4->6 input before translation
++ * @ipxlat: translator private context
++ * @skb: original packet to fragment
++ * @frag_max_size: per-fragment payload cap for ip_do_fragment
++ *
++ * Installs a temporary synthetic dst so ip_do_fragment can read MTU and then
++ * reinjects each produced fragment back into ipxlat through
++ * ipxlat_46_frag_output.
++ *
++ * Return: 0 on success, negative errno on fragmentation failure.
++ */
++static int ipxlat_46_fragment_pkt(struct ipxlat_priv *ipxlat,
++				  struct sk_buff *skb, u16 frag_max_size)
 +{
-+	switch (ntohs(inner->protocol)) {
-+	case ETH_P_IPV6:
-+		ipxlat_64_emit_icmp_err(inner);
-+		return;
-+	case ETH_P_IP:
-+		ipxlat_46_emit_icmp_err(ipxlat, inner);
-+		return;
-+	default:
-+		DEBUG_NET_WARN_ON_ONCE(1);
-+		return;
-+	}
++	const unsigned long orig_dst = skb->_skb_refdst;
++	struct rtable ipxlat_rt = {};
++	int err;
++
++	/* ip_do_fragment needs a dst object to query mtu */
++	dst_init(&ipxlat_rt.dst, &ipxlat_frag_dst_ops, NULL, DST_OBSOLETE_NONE,
++		 DST_NOCOUNT);
++
++	/* use translator netdev as mtu source for the temporary dst */
++	ipxlat_rt.dst.dev = ipxlat->dev;
++
++	/* setup the skb for fragmentation */
++	skb_dst_set_noref(skb, &ipxlat_rt.dst);
++	memset(IPCB(skb), 0, sizeof(struct inet_skb_parm));
++	IPCB(skb)->frag_max_size = frag_max_size;
++
++	/* fragment and reinject each frag in the translator */
++	err = ip_do_fragment(dev_net(ipxlat->dev), skb->sk, skb,
++			     ipxlat_46_frag_output);
++
++	/* drop original dst ref replaced by the synthetic NOREF dst */
++	refdst_drop(orig_dst);
++
++	return err;
 +}
 +
  static void ipxlat_forward_pkt(struct ipxlat_priv *ipxlat, struct sk_buff *skb)
  {
  	const unsigned int len = skb->len;
-@@ -90,6 +149,11 @@ int ipxlat_process_skb(struct ipxlat_priv *ipxlat, struct sk_buff *skb,
+@@ -141,14 +221,29 @@ int ipxlat_process_skb(struct ipxlat_priv *ipxlat, struct sk_buff *skb,
+ 	enum ipxlat_action action;
+ 	int err = -EINVAL;
+ 
+-	(void)allow_pre_frag;
+-
+ 	action = ipxlat_translate(ipxlat, skb);
+ 	switch (action) {
+ 	case IPXLAT_ACT_FWD:
  		dev_dstats_tx_add(ipxlat->dev, skb->len);
  		ipxlat_forward_pkt(ipxlat, skb);
  		return 0;
-+	case IPXLAT_ACT_ICMP_ERR:
-+		dev_dstats_tx_dropped(ipxlat->dev);
-+		ipxlat_emit_icmp_error(ipxlat, skb);
-+		consume_skb(skb);
++	case IPXLAT_ACT_PRE_FRAG:
++		/* prefrag is allowed only once to avoid unbounded loops */
++		if (unlikely(!allow_pre_frag)) {
++			err = -ELOOP;
++			goto drop_free;
++		}
++
++		/* fragment first, then reinject each fragment through
++		 * ipxlat_process_skb via ipxlat_46_frag_output
++		 */
++		err = ipxlat_46_fragment_pkt(ipxlat, skb,
++					     ipxlat_skb_cb(skb)->frag_max_size);
++		/* fragment path already consumed/freed skb */
++		skb = NULL;
++		if (unlikely(err))
++			goto drop_free;
 +		return 0;
- 	case IPXLAT_ACT_DROP:
- 		goto drop_free;
- 	default:
-diff --git a/drivers/net/ipxlat/dispatch.h b/drivers/net/ipxlat/dispatch.h
-index fa6fafea656b..73acd831b6cf 100644
---- a/drivers/net/ipxlat/dispatch.h
-+++ b/drivers/net/ipxlat/dispatch.h
-@@ -44,6 +44,13 @@ enum ipxlat_action {
-  */
- void ipxlat_mark_icmp_drop(struct sk_buff *skb, u8 type, u8 code, u32 info);
+ 	case IPXLAT_ACT_ICMP_ERR:
+ 		dev_dstats_tx_dropped(ipxlat->dev);
+ 		ipxlat_emit_icmp_error(ipxlat, skb);
+diff --git a/drivers/net/ipxlat/translate_46.c b/drivers/net/ipxlat/translate_46.c
+index aec8500db2c2..0b79ca07c771 100644
+--- a/drivers/net/ipxlat/translate_46.c
++++ b/drivers/net/ipxlat/translate_46.c
+@@ -87,6 +87,63 @@ unsigned int ipxlat_46_lookup_pmtu6(struct ipxlat_priv *ipxlat,
+ 	return mtu6;
+ }
  
 +/**
-+ * ipxlat_emit_icmp_error - emit cached translator-generated ICMP error
++ * ipxlat_46_plan_prefrag - plan pre-translation IPv4 fragmentation for 4->6
 + * @ipxlat: translator private context
-+ * @inner: offending packet used as quoted payload
++ * @skb: packet being translated
++ *
++ * Decides whether packet exceeds PMTU/LIM thresholds and, when needed, stores
++ * per-skb fragmentation cap in cb->frag_max_size for later ip_do_fragment.
++ *
++ * Return: 0 on success, negative errno on policy/validation failure.
 + */
-+void ipxlat_emit_icmp_error(struct ipxlat_priv *ipxlat, struct sk_buff *inner);
++int ipxlat_46_plan_prefrag(struct ipxlat_priv *ipxlat, struct sk_buff *skb)
++{
++	unsigned int pkt_len6, pmtu6, threshold6, frag_max_size, pkt_len4,
++		old_l3_len, new_l3_len;
++	struct ipxlat_cb *cb = ipxlat_skb_cb(skb);
++	const struct iphdr *in4 = ip_hdr(skb);
++	int l3_delta, frag_l3_delta;
++
++	if (unlikely(cb->frag_max_size)) {
++		DEBUG_NET_WARN_ON_ONCE(1);
++		cb->frag_max_size = 0;
++	}
++
++	pkt_len4 = iph_totlen(skb, in4);
++	old_l3_len = cb->l3_hdr_len;
++	new_l3_len = sizeof(struct ipv6hdr) +
++		     (ip_is_fragment(in4) ? sizeof(struct frag_hdr) : 0);
++	l3_delta = (int)new_l3_len - (int)old_l3_len;
++	pkt_len6 = pkt_len4 + l3_delta;
++
++	pmtu6 = ipxlat_46_lookup_pmtu6(ipxlat, skb, in4);
++	threshold6 = min(pmtu6, READ_ONCE(ipxlat->lowest_ipv6_mtu));
++
++	if (likely(pkt_len6 <= threshold6))
++		return 0;
++
++	/* df packets are never locally pre-fragmented */
++	if (likely(be16_to_cpu(in4->frag_off) & IP_DF)) {
++		/* Let the IPv6 forwarding path raise PTB when needed and rely
++		 * on the reverse 6->4 ICMP translation path for feedback.
++		 */
++		return 0;
++	}
++
++	/* df not set: we can fragment */
++
++	frag_l3_delta =
++		(int)(sizeof(struct ipv6hdr) + sizeof(struct frag_hdr)) -
++		(int)old_l3_len;
++	frag_max_size = threshold6 - frag_l3_delta;
++	/* store per-skb prefrag cap: ipxlat_46_fragment_pkt will copy it into
++	 * IPCB(skb)->frag_max_size before calling ip_do_fragment
++	 */
++	cb->frag_max_size = min_t(unsigned int, frag_max_size, IP_MAX_MTU);
++	return 0;
++}
 +
  /**
-  * ipxlat_translate - validate/translate one packet and return next action
+  * ipxlat_46_translate - translate one validated packet from IPv4 to IPv6
   * @ipxlat: translator private context
-diff --git a/drivers/net/ipxlat/packet.c b/drivers/net/ipxlat/packet.c
-index b37a3e55aff8..758b72bdc6f1 100644
---- a/drivers/net/ipxlat/packet.c
-+++ b/drivers/net/ipxlat/packet.c
-@@ -142,6 +142,8 @@ static int ipxlat_v4_srr_check(struct sk_buff *skb, const struct iphdr *hdr)
- 			if (unlikely(ptr > len - 3))
- 				return -EINVAL;
+@@ -182,7 +239,7 @@ int ipxlat_46_translate(struct ipxlat_priv *ipxlat, struct sk_buff *skb)
+ 		err = ipxlat_46_outer_udp(skb, &outer4);
+ 		break;
+ 	case IPPROTO_ICMP:
+-		err = ipxlat_46_icmp(ipxlat, skb);
++		err = -EPROTONOSUPPORT;
+ 		break;
+ 	default:
+ 		err = 0;
+diff --git a/drivers/net/ipxlat/translate_46.h b/drivers/net/ipxlat/translate_46.h
+index 75def10d0cad..6ba409c94185 100644
+--- a/drivers/net/ipxlat/translate_46.h
++++ b/drivers/net/ipxlat/translate_46.h
+@@ -61,6 +61,17 @@ unsigned int ipxlat_46_lookup_pmtu6(struct ipxlat_priv *ipxlat,
+ 				    const struct sk_buff *skb,
+ 				    const struct iphdr *in4);
  
-+			ipxlat_mark_icmp_drop(skb, ICMP_DEST_UNREACH,
-+					      ICMP_SR_FAILED, 0);
- 			return -EINVAL;
- 		}
- 
-@@ -272,8 +274,10 @@ static int ipxlat_v4_pull_hdrs(struct sk_buff *skb)
- 	/* RFC 7915 Section 4.1 */
- 	if (unlikely(ipxlat_v4_srr_check(skb, l3_hdr)))
- 		return -EINVAL;
--	if (unlikely(l3_hdr->ttl <= 1))
-+	if (unlikely(l3_hdr->ttl <= 1)) {
-+		ipxlat_mark_icmp_drop(skb, ICMP_TIME_EXCEEDED, ICMP_EXC_TTL, 0);
- 		return -EINVAL;
-+	}
- 
- 	/* RFC 7915 Section 1.2:
- 	 * Fragmented ICMP/ICMPv6 packets will not be translated by IP/ICMP
-@@ -390,8 +394,11 @@ int ipxlat_v4_validate_skb(struct ipxlat_priv *ipxlat, struct sk_buff *skb)
- 	 * Fragmented checksum-less IPv4 UDP is rejected because 4->6 cannot
- 	 * reliably translate it.
- 	 */
--	if (unlikely(ip_is_fragment(l3_hdr)))
-+	if (unlikely(ip_is_fragment(l3_hdr))) {
-+		ipxlat_mark_icmp_drop(skb, ICMP_DEST_UNREACH, ICMP_PKT_FILTERED,
-+				      0);
- 		return -EINVAL;
-+	}
- 
- 	/* udph->len bounds the span used to compute replacement checksum */
- 	if (unlikely(ntohs(udph->len) > skb->len - cb->l4_off))
-@@ -520,7 +527,7 @@ static int ipxlat_v6_walk_hdrs(struct sk_buff *skb, unsigned int l3_offset,
-  */
- static int ipxlat_v6_check_rh(struct sk_buff *skb)
- {
--	unsigned int rh_off;
-+	unsigned int rh_off, pointer;
- 	int flags, nexthdr;
- 
- 	rh_off = 0;
-@@ -531,6 +538,8 @@ static int ipxlat_v6_check_rh(struct sk_buff *skb)
- 	if (likely(nexthdr != NEXTHDR_ROUTING))
- 		return 0;
- 
-+	pointer = rh_off + offsetof(struct ipv6_rt_hdr, segments_left);
-+	ipxlat_mark_icmp_drop(skb, ICMPV6_PARAMPROB, ICMPV6_HDR_FIELD, pointer);
- 	return -EINVAL;
- }
- 
-@@ -550,8 +559,11 @@ static int ipxlat_v6_pull_outer_l3(struct sk_buff *skb)
- 		     !ipxlat_v6_validate_saddr(&l3_hdr->saddr)))
- 		return -EINVAL;
- 
--	if (unlikely(l3_hdr->hop_limit <= 1))
-+	if (unlikely(l3_hdr->hop_limit <= 1)) {
-+		ipxlat_mark_icmp_drop(skb, ICMPV6_TIME_EXCEED,
-+				      ICMPV6_EXC_HOPLIMIT, 0);
- 		return -EINVAL;
-+	}
- 
- 	return 0;
- }
-@@ -617,8 +629,11 @@ static int ipxlat_v6_pull_hdrs(struct sk_buff *skb)
- 	/* -EPROTONOSUPPORT means packet layout is syntactically valid but
- 	 * unsupported by our RFC 7915 path
- 	 */
--	if (unlikely(err == -EPROTONOSUPPORT))
-+	if (unlikely(err == -EPROTONOSUPPORT)) {
-+		ipxlat_mark_icmp_drop(skb, ICMPV6_DEST_UNREACH,
-+				      ICMPV6_ADM_PROHIBITED, 0);
- 		return -EINVAL;
-+	}
- 	if (unlikely(err))
- 		return err;
- 
++/**
++ * ipxlat_46_plan_prefrag - decide whether IPv4 packet must be pre-fragmented
++ * @ipxlat: translator private context
++ * @skb: packet being translated
++ *
++ * Sets cb->frag_max_size when pre-fragmentation is required.
++ *
++ * Return: 0 on success, negative errno on policy/validation failure.
++ */
++int ipxlat_46_plan_prefrag(struct ipxlat_priv *ipxlat, struct sk_buff *skb);
++
+ /**
+  * ipxlat_46_translate - translate outer packet from IPv4 to IPv6 in place
+  * @ipxlat: translator private context
 -- 
 2.53.0
 
