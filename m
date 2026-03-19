@@ -1,264 +1,313 @@
-Return-Path: <netdev+bounces-269359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269360-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EDP2Km62u2lHmwIAu9opvQ
-	(envelope-from <netdev+bounces-269359-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:40:14 +0100
+	id mJqzHp23u2lHmwIAu9opvQ
+	(envelope-from <netdev+bounces-269360-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:45:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E1952C7FB2
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:40:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2CDD2C803C
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:45:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 92C973014A31
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:40:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 424B830E160C
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5706D3A8730;
-	Thu, 19 Mar 2026 08:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4F193AD530;
+	Thu, 19 Mar 2026 08:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="YWfXyCpq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PSfiA5HU"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010042.outbound.protection.outlook.com [52.101.84.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7831A9FA4;
-	Thu, 19 Mar 2026 08:40:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773909612; cv=fail; b=QhFsdgAIWIuUl9mOP27Av1khVJjAyPfYkXSdKgNZ9V97BhoeYCM7wdbtud8/5YnUXhEJHGuV/uvB76bFiPiEQaLrxcHQ3H1gjcOm/l/vJDkMgDRIyzcmoc34QlGYgPWKW97YwMQFjs2iEM8YOdtzC1jTDtX7T8W98dHVgBIeT8U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773909612; c=relaxed/simple;
-	bh=6b17vZvX35SvsOuklByNKSX0muCRGLiBNi+HeMHjw5I=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NsHbnIJl5HoLnmTfMCxFqL7VfaMieTZaAAaDKJGn+ii8VnIkytjJ7vZf53uJ4aFnN/3HopnwReWeWWvzWoK8uNXAyznvTptgzRP/WB9+W1MGkbzotM/kqaRAYVD442yzxT0k1jNdr/MAwEB2UfQa3hWCHTNLzKpJO05BbNuf0RQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=YWfXyCpq; arc=fail smtp.client-ip=52.101.84.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lD1kpKhxGmv0jCd+TZ/VIBJB1wbdgyr17ycpISAkfSsen9fPB5PLdwwrxUdVyC1cRYuPTcB8BmvJO6STs9ECm8l1Mjs/VDlgtL8XaP00ix8tB02wlP/VzkDXNFGXZIGs7MB1MfxRQuUAy+6P/EvaMaDyZckEkzE9s1uAsKRVjq9tGGjD9OfMMxtr+LaKJIYkSu4C7JpVGFoM+ehOzuBQGAuxzZEJ/wgYBaPhqFkf5ByXKzztk4r7q1O/HwH9ZTuiS4PY0OBLOTQl2KkZ50UZCdl0/bP6ntmJY1dytt7J65b1gm3Dqh29OlbtkJ07BX2hDBHD+mjihRCV5jsd2xcwRA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=466f+Juxr/3q5/HKuRngEowaeU5zhUGv9Ey+VsIMCLo=;
- b=Tt7gvcneNN5dwQwmGGevIwZPOUlmgNJLIg4xA2pMCwZStT04sPqUmrJjxVyJEK8MZKuYY5+6BzQms7I5UeGXyQAdYz6D7dYkfBB2hM0qsyPXcdWNE3XhTg92KpIiANjV7XMY6AmdV78JpR31pBBPsH3CRlXD0tB2nuAx3GOqrueRnQQCOXPMF9pHOeJAOh7VlincL18+BJIZWkwhJzrDqCjK4E77aKDDQj7swwWOLSztoUnTl09cvJ5ue4W4Nfp0TxaVDhxfmEl7WUJkb0BjA0Of4x3iEOWlmOoS1TxzPXdwYMl+YPIpS3Hp8fZ2f2jfV/JqCiT0AE8QeFHCX5vh1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=466f+Juxr/3q5/HKuRngEowaeU5zhUGv9Ey+VsIMCLo=;
- b=YWfXyCpq1fJ4n8aRhaO+LwhI+GaoT/kMre5lvmpG1KpwktvQNZihC3mhr9xi6U3EUAiPXULprTprVQnrf+T7K6oQrrGyC2LRaF2WjhpTR7kMgxIxGCLH0noBNhcrP8fiiEpWCCC9nhYPlqHolbNJciXytFaJIOnIITtvoXPwbwsN1YSWAryU+w2Efe9+xRXfLi5Uy0BH358OshJHfBu+DTic3mkXHqdIvpT5jmhK5IUj3sPuqmVLhHsxDSUccClmjTX9+D7c25q9m2SNAiid9J7yrPRvivxpkFVgmI+5koIcpHREVF5Ngj2wViAcMWGoVQvuGaeGDyszvfsa57pdrw==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by DBBPR04MB7963.eurprd04.prod.outlook.com (2603:10a6:10:1e1::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.27; Thu, 19 Mar
- 2026 08:40:07 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::b476:c19a:24cd:3694]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::b476:c19a:24cd:3694%3]) with mapi id 15.20.9723.018; Thu, 19 Mar 2026
- 08:40:02 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Buday Csaba <Buday.Csaba@prolan.hu>
-CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
-	=?iso-8859-1?Q?Cs=F3k=E1s_Bence?= <Csokas.Bence@prolan.hu>, Frank Li
-	<frank.li@nxp.com>, Francesco Dolcini <francesco.dolcini@toradex.com>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net 1/1] net: fec: fix the PTP periodic output sysfs
- interface
-Thread-Topic: [PATCH net 1/1] net: fec: fix the PTP periodic output sysfs
- interface
-Thread-Index: AQHctu/GZE92suzIgk2+bQlhrX9NVLW1LrnggABRdQCAAAQesA==
-Date: Thu, 19 Mar 2026 08:40:02 +0000
-Message-ID:
- <PAXPR04MB8510C371616088C33A841A90884FA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References:
- <e2518c8f932fd9da6754b5ab5cc892ed58a0c1db.1773849293.git.buday.csaba@prolan.hu>
- <PAXPR04MB8510E8145481F667DD769F23884FA@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <2894050ee58d428cba909b705b7684a2@prolan.hu>
-In-Reply-To: <2894050ee58d428cba909b705b7684a2@prolan.hu>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|DBBPR04MB7963:EE_
-x-ms-office365-filtering-correlation-id: 1d99d2cc-292e-4c7b-2ecd-08de85931cb6
-x-ld-processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|7416014|376014|19092799006|366016|38070700021|18002099003|56012099003|22082099003;
-x-microsoft-antispam-message-info:
- J/bBeZZXJMuNJHjwXNHTIGPtTiQRamhRfRQJKgXAJ0fEDeupWsKhDk9RmAfpTu3pLJw7xTXmb6XFt/hWJnNHB26Ckx77XasHf1nPuxt7aCcEDW6UihLZogW41hntOa9Fa8oymMDZNUA2LcQqoRp6w8KUhFliGxrkgsHI38ix/06q3b1YZQi1PRnKqnpOQEzB2NLUveEnOOFtm6etPLCZGnZZEZOwD0KcNTjzE3LmvvLHOuFWHJtXxXqXYHi2+qe5HlagWRP2m+jekw9xcML/4quMC6SAkAfALsMmW3dUKH67/g3rxbBAjKY/WdXy7AMqFYTXQUo1ilyI0WCwQRK1QCvRAK3jmsdcfubf1BRgQLiEfMtlwBEiJ1eWDgkuKLHbjHCTiFQSupMkR5obPaORPDSa+pMRl3cAJ1Lk9tKtUWH9kC4MMsXLnV+y5qCPBUpJbnXaVw7CvP7CF8GvHM1KfU2/u5ulEuHm0yznbZ5UHiUt6/nunlCTOG4rMivqLHhVo/ZYZ6ghNHn9fPEAcYxudGFwAEHFX1+oH6oGca5jQIVjtz6/v+sVG3LxOVYNPd2IqTyx5i+fzn8XAsGo0jKtLMxuHh1qQAX0DOcsk1lxzNGPh/YA8vMvKLt7XRiX4WbrVNsbW+SUR03d/4T88eiOMumv66PqsWxvz0H2P8op1EuHAeLwqaWL86dvcLiFoFDKWmxdek8+ED1nOa71TciQ2tDkUbU9fUMXRdJqXhUdXZHXltptqnhIVbdU9WeUAn0h
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(19092799006)(366016)(38070700021)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?pXAQAlO/58tGD8CKiq5rUF+FuWsGeD8DpdcrQ8Y26/IJz+QV7wQS8bCLbG?=
- =?iso-8859-1?Q?7voq8tEAlLJNeivRyJVtCBXk9ocxnVcgW1z722I0OEaQNCwiDVXdkftBDs?=
- =?iso-8859-1?Q?J2lyK6HDlIxaHB09tDzn95EDs+/rMW43UoZC4/fUgDLDaKvbd88A3X+qOp?=
- =?iso-8859-1?Q?pcm9AuWhYu+8QavWxU2LMy/6LvbHGSPQ6HUOqC2Ucbwc4IqyIeW+lsGLwC?=
- =?iso-8859-1?Q?rhwKesXTilfedcjXtkLRDrUk03jKCxEcf4+aA9FLsSIUhW7YL2k5e2ab/M?=
- =?iso-8859-1?Q?HV9LUPAB0tePqZRLq5+yLbjtotE8Kmp1IUG9ulzg6eBXJ2S9WQXiVAmKhx?=
- =?iso-8859-1?Q?AzWANwgQDWuV7GIJRZgY7btZiL7hu47BdUEljFqqnDZH0/wAPUjU58ChwV?=
- =?iso-8859-1?Q?PPPeuJ4ROS74zVYn9xn7gJQjIG2SkcER24C+Mq8/QUDDJN58idXraJRYRz?=
- =?iso-8859-1?Q?JudxN1CvXAlo8PRr3tKOEXo2LDt0+3tHCIONCot7nMVQ051SXiIOcUUy82?=
- =?iso-8859-1?Q?G7eyXlk9kV7ghPHhPCxSoLEDtnNxVLEITf39wbnsqM/kG31i7N3hQi5P8A?=
- =?iso-8859-1?Q?VkpdROIvYrv361yFOY8EpneHr3ayB6hrqRo4/yVfyMPIfbGeRLWNggR6Px?=
- =?iso-8859-1?Q?jNblzgN+xtLnp0LVK1KYEVtbBgfafbKK6/ODRbJXTuFP8v0hrf9GhKj0+s?=
- =?iso-8859-1?Q?9OYMgtzWFjqNWnFO5v9l69f9NwQcuAeJ/G3p8oSBuqtaQ+2En2dFsBTDQS?=
- =?iso-8859-1?Q?6aCSI0nhMvGJGHpZOkmY1rcnVNrT23emLHv/3J+TVkpeeaZNtByIU6lF0T?=
- =?iso-8859-1?Q?GVADn/kvslBBkrvMGBn4K9DPYwvtrYoVNhJcUNECm8cXUErJmCajvBDDbr?=
- =?iso-8859-1?Q?DL1x7cLnwNlYtbVGp1FU3lj2/B6H8Ee4QTmVPk2f6gsnFEIAxwCRaSU3n0?=
- =?iso-8859-1?Q?Av/4fepPvudxJbdawhg3hhX6BPd5ON/7PV56rPwBD8tb7+nI/HJzQi/M0J?=
- =?iso-8859-1?Q?zYHrQt3p/C5w1P9LFAUfbgXuqAYumy3jC3DDWB5DTcCYOc7sJWZyfo0av+?=
- =?iso-8859-1?Q?DiMONQzaamrUQk5I5uimd05dq1Dg16vQ6B4rkeMlozn8c4e3Wd7rvFsat7?=
- =?iso-8859-1?Q?B9a6pQ36OJ6gR1SYeRb6+Ywnnc+SDu/CvqDDWTP8ZZe5pkgkX2szrNvrwN?=
- =?iso-8859-1?Q?DtD7MUlVbnEfalNiFLepd7l549OYy13A16dxGtyxLPXnNGK0oOKeOB3ngP?=
- =?iso-8859-1?Q?bNdUnifpFD9B7QU8gOb3vf0rBHmac3xGyPUbjcE3nsLtkXtgtvJbaGSfP5?=
- =?iso-8859-1?Q?D5JqBWzoKLQcP15UaWI4mThyaaiszqUS0Li3B0QC1poK4Jks1u/aCHtv0J?=
- =?iso-8859-1?Q?BvvUDniCVhMPlScXAqIhLa7xcbSzcDRp1B3oFLGmgsVHB73vU46Q+St2Bn?=
- =?iso-8859-1?Q?q2nQ/P8F8BJeKkZSMBk/bApBxJKgI0RQ5wm7U+4FXBLL+cREtcU2mBGFW6?=
- =?iso-8859-1?Q?EJDxniKvzbOYtbn+vxCnagIo4PkW5iQz3gSJgTAAiVsgkFahiP4pA+q7Eq?=
- =?iso-8859-1?Q?S2ORYBPij3c04VLuuI/7h55c9RNYKiilUQcB1tU02dtSZzqjfbvdoilV4P?=
- =?iso-8859-1?Q?aDcZzKezYwGjnZqPjNPvRcWd6SCVkyUEK/n70dCkMNsMd1n11wuG+uzsCU?=
- =?iso-8859-1?Q?CH9siu2ziS+aLYm5xEp9SFhys+oB5DufUvP0ii9HUi/4O4y+TUSj4F6Tsz?=
- =?iso-8859-1?Q?GMWO0Iie6hPYoHinfnMrDy7fP/4EAViNfMZyM/7qfdRPrr?=
-Content-Type: text/plain; charset="iso-8859-1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA093ACEF3
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 08:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773909904; cv=none; b=ZAEHp06H5pcPkIBQ8Uj0w9U+bxqxYLj8ul1u60mRJOXuY9IpEyB4x2KuAsq2n8K4teBSczoGtk500kdaiFUWEoyIgLTH9uIho8rknit/+srUOuAZbnOjKM/56WyZPlksbibvNC9gmWmHYoID3yZafTBpsSIvy83WSb3S6SexqZU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773909904; c=relaxed/simple;
+	bh=3GNC7qpyfUWAFD8/zUA9cu+cY1NU0svmPWQgrnshrwc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=IfIJF/ewmG13IaT0dIgtYwJ8UH7+bd2bb0rNiV5py5T5rrkZI0E//Aq52s8ulF+BGASt/uj5SJ66ah0uC8hWbBhwDteWOn1FpVuK8WsDwVjAV5yFCvh7/BZOO00QqHuDvn/5Q9yXW+u45syfSazYowmdzSh1RENh0QNSy/QG9cI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PSfiA5HU; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4852e09e23dso5022235e9.0
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 01:45:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773909899; x=1774514699; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3GNC7qpyfUWAFD8/zUA9cu+cY1NU0svmPWQgrnshrwc=;
+        b=PSfiA5HUJYJKGmaTd/WYVCP6CgOsrtqsUCrikbZdwjNzWOhz3rm/OjZRDricL6H+Id
+         Gl+ShsdLPzvFZePzw46Vrt1alhOrLO35ZqwxR63+GJwJe5yORdDXnTzrTBchL26T61QD
+         FjfOW38k6id8U0AHqUC6ik008q63p2ZDze24dCF07sReWiK4wIJPmN3b7RREuUJGOHJk
+         pdbgTrwapD7SarLvCFPjxBGRnA/xK9mF+7111G2VlSvAGuqb4ewBvIgRJqWyPp+4+uxK
+         Ltb0sd3YzjGTQQsUJeflXuK2nsiCv76oRDzbFRQ5qwZmYCQp6A+NnUuqsI22j/pUqZnR
+         /feA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773909899; x=1774514699;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3GNC7qpyfUWAFD8/zUA9cu+cY1NU0svmPWQgrnshrwc=;
+        b=FTeYu5V33SmPD4bPErGAsn6XvdjX3NgabcbrN1CvqldwwiCp9GY2DlZGyFJh1fj33m
+         FZt0mY5FP1OAwyMVcBKJT0ZXf3kHFNA5pmRjFG+fP/oIpprjSwoP7YTiGzMjB/qTF5uL
+         UTVxuEVomk7x9BS0X9K0ViJGy8zOc0MYP06NS+1ttb4gHZq3K1POoxOWuPNWXXzGa+xG
+         bjHTG7pHnJHp40GMqyV8E+mbHg+XzJranSYRGHu2+gDH56Z/KNbARp5zOKY15+IiNID+
+         V9JfARQxihSUiBEyH7lmAR0zgh4EaIgJ+UPPvdhH3HSfwtAaPJa1dvrO9t/7cnjJ6MFa
+         yTAw==
+X-Forwarded-Encrypted: i=1; AJvYcCUnBmbFsJMi1Se7izJbIwMazLfzOYoSDnBMTqU5CgchXQGyd/YZtBoG0OJdrzj7cr5qC9eTtUI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVpIBiLSfenfLcPMS7yM0O7B9QinlXut0CzULwJf7cwLYgS6iF
+	4gea44/4IXJ5dqF5ZlBibu6KGTyUgspfHgFP7TJtdsdfg4AIdLMF8tmW
+X-Gm-Gg: ATEYQzwJeXtSr7L/i4oQCWI3WBuNCgKTh3xsJzqoD+uNjfDSl/0vNMwWAAWi3Mq8Y6f
+	j51GdFrT/ZkHB2BTotUQ0o1QJUavum6VDUV/jmTSHiDblqxOwvn3nM6U+M/FlN8ZLebU3tnKi3M
+	vNpOK1KsQAKaWzffzHovkwOOSJTxnn08JRT65HO71haSmMADvj1EV3wMWPjoK9rn47Cvdh5TA8s
+	AID4Qwlvfqcy5Um4KVu3UZAh1poKPMXfshj/xZtX2Ry+MMDdABQgDdlBMc8CAKoTODcwBxgRiIN
+	vPDQmVH+qSbqrTFHhmOHl5UYwl75vAe6797l+kTfYpl4Z0xYyupdKCyljaeQdFzRspF3K85Hg8w
+	Vp6tL0WyGHrHjToy4Hzv8VC/NYU72IScs+PUWuGNXKLN8mdgn2tMeeExM+5hRWSQVqCaTaFH5pV
+	QBPwZ2XasVG2n67TTc8CX2R8Ho5ZxPN0YWzPS4p7ma3GLyxKPAAA==
+X-Received: by 2002:a05:600c:3e85:b0:483:6d4a:7e6d with SMTP id 5b1f17b1804b1-486f447008amr97772295e9.30.1773909898969;
+        Thu, 19 Mar 2026 01:44:58 -0700 (PDT)
+Received: from [192.168.100.165] ([212.230.233.13])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f8b296b3sm47004595e9.6.2026.03.19.01.44.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2026 01:44:58 -0700 (PDT)
+Message-ID: <e24a281622cedf9e8f4dc93c961813aeb7b6ce4c.camel@gmail.com>
+Subject: Re: Bug#1130336: [regression] Network failure beyond first
+ connection after 69894e5b4c5e ("netfilter: nft_connlimit: update the count
+ if add was skipped")
+From: Alejandro =?ISO-8859-1?Q?Oliv=E1n?= Alvarez
+	 <alejandro.olivan.alvarez@gmail.com>
+To: Salvatore Bonaccorso <carnil@debian.org>, Fernando Fernandez Mancera
+	 <fmancera@suse.de>, 1130336@bugs.debian.org
+Cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso
+ <pablo@netfilter.org>,  Phil Sutter	 <phil@nwl.cc>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet	 <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni	 <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, 	netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, regressions@lists.linux.dev, 
+	stable@vger.kernel.org
+Date: Thu, 19 Mar 2026 09:44:46 +0100
+In-Reply-To: <abqfSB0TUik1kRU4@eldamar.lan>
+References: <177349610461.3071718.4083978280323144323@eldamar.lan>
+	 <c72a56ab-a16c-4866-9a44-a03393f074db@suse.de>
+	 <b3cbfd15-acd1-4500-ba30-eac6f48523fb@suse.de> <abW2MAAqLnKZm3KF@strlen.de>
+	 <177322336258.4376.10097494324750307114.reportbug@Desk1.simalex.iccbroadcast.com>
+	 <4da571ab-fa1d-4ee6-b71c-24f4a28243ed@suse.de>
+	 <abqfSB0TUik1kRU4@eldamar.lan>
+Organization: alexolivan.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d99d2cc-292e-4c7b-2ecd-08de85931cb6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Mar 2026 08:40:02.0735
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jlsQcnRpH/nzvbvx7T0o2LmTAguuK90biKE8CRkgSyDWwnRUSaVVlLe00f2Ka135hNrNyywBzPRWXrXInFTh6A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7963
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-269360-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269359-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,prolan.hu,toradex.com,lists.linux.dev,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[alejandroolivanalvarez@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.911];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,bootlin.com:url,nxp.com:dkim,PAXPR04MB8510.eurprd04.prod.outlook.com:mid]
-X-Rspamd-Queue-Id: 4E1952C7FB2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:email]
+X-Rspamd-Queue-Id: D2CDD2C803C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> >> Fixes: bf8ca67e2167 ("net: fec: refactor PPS channel configuration")
-> >>
-> >> Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
-> >> ---
-> >>  drivers/net/ethernet/freescale/fec_ptp.c | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/drivers/net/ethernet/freescale/fec_ptp.c
-> >> b/drivers/net/ethernet/freescale/fec_ptp.c
-> >> index 7f6b574320716..c1af81002b8fa 100644
-> >> --- a/drivers/net/ethernet/freescale/fec_ptp.c
-> >> +++ b/drivers/net/ethernet/freescale/fec_ptp.c
-> >> @@ -534,7 +534,7 @@ static int fec_ptp_enable(struct ptp_clock_info *p=
-tp,
-> >>  		if (rq->perout.flags)
-> >>  			return -EOPNOTSUPP;
-> >>
-> >> -		if (rq->perout.index !=3D fep->pps_channel)
-> >> +		if (rq->perout.index !=3D 0)
-> >>  			return -EOPNOTSUPP;
-> >>
-> >>  		period.tv_sec =3D rq->perout.period.sec;
-> >> --
-> >> 2.39.5
-> >>
-> >
-> > I think the correct fix should update the n_per_out value like below.
-> >
-> > @@ -756,7 +756,7 @@ void fec_ptp_init(struct platform_device *pdev, int
-> irq_idx)
-> >         fep->ptp_caps.max_adj =3D 250000000;
-> >         fep->ptp_caps.n_alarm =3D 0;
-> >         fep->ptp_caps.n_ext_ts =3D 0;
-> > -       fep->ptp_caps.n_per_out =3D 1;
-> > +       fep->ptp_caps.n_per_out =3D 4;
-> >
-> > The commit 566c2d83887f ("net: fec: make PPS channel configurable") add=
-ed
-> > the property "fsl,pps-channel" to indicate which pulse channel is avail=
-able.
-> > So we should not fix the pulse output channel to 0.
-> >
+Hi folks.
+
+On Wed, 2026-03-18 at 13:49 +0100, Salvatore Bonaccorso wrote:
+> Hi Alejandro,
 >=20
-> But is it wise to expose four channels, when only one is usable by this
-> driver?
-
-It's fine to expose 4 channels, the driver can check which channel can outp=
-ut
-pulses based on fep->pps_channel. And it will return " -EOPNOTSUPP " is the
-channel specified by the command is unavailable.
-
+> On Sun, Mar 15, 2026 at 02:09:33AM +0100, Fernando Fernandez Mancera
+> wrote:
+> > On 3/14/26 8:25 PM, Florian Westphal wrote:
+> > > Fernando Fernandez Mancera <fmancera@suse.de> wrote:
+> > > > On 3/14/26 5:13 PM, Fernando Fernandez Mancera wrote:
+> > > > > Hi,
+> > > > >=20
+> > > > > On 3/14/26 3:03 PM, Salvatore Bonaccorso wrote:
+> > > > > > Control: forwarded -1
+> > > > > > https://lore.kernel.org/=C2=A0
+> > > > > > regressions/177349610461.3071718.4083978280323144323@eldama
+> > > > > > r.lan
+> > > > > > Control: tags -1 + upstream
+> > > > > >=20
+> > > > > > Hi
+> > > > > >=20
+> > > > > > In Debian, in https://bugs.debian.org/1130336, Alejandro
+> > > > > > reported that
+> > > > > > after updates including 69894e5b4c5e ("netfilter:
+> > > > > > nft_connlimit:
+> > > > > > update the count if add was skipped"), when the following
+> > > > > > rule is set
+> > > > > >=20
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iptables -A INPUT -p tcp -m
+> > > > > > connlimit --connlimit-above 111 -j
+> > > > > > REJECT --reject-with tcp-reset
+> > > > > >=20
+> > > > > > connections get stuck accordingly, it can be easily
+> > > > > > reproduced by:
+> > > > > >=20
+> > > > > > # iptables -A INPUT -p tcp -m connlimit
+> > > > > > --connlimit-above 111 -j REJECT
+> > > > > > --reject-with tcp-reset
+> > > > > > # nft list ruleset
+> > > > > > # Warning: table ip filter is managed by iptables-nft, do
+> > > > > > not touch!
+> > > > > > table ip filter {
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 chain IN=
+PUT {
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type filter hook input priority fil=
+ter;
+> > > > > > policy accept;
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ip protocol tcp xt
+> > > > > > match "connlimit" counter packets 0
+> > > > > > bytes 0 reject with tcp reset
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> > > > > > }
+> > > > > > # wget -O /dev/null
+> > > > > > https://git.kernel.org/torvalds/t/linux-7.0-
+> > > > > > rc3.tar.gz
+> > > > > > --2026-03-14 14:53:51--
+> > > > > > https://git.kernel.org/torvalds/t/linux-7.0-
+> > > > > > rc3.tar.gz
+> > > > > > Resolving git.kernel.org
+> > > > > > (git.kernel.org)... 172.105.64.184,
+> > > > > > 2a01:7e01:e001:937:0:1991:8:25
+> > > > > > Connecting to git.kernel.org
+> > > > > > (git.kernel.org)|172.105.64.184|:443...
+> > > > > > connected.
+> > > > > > HTTP request sent, awaiting response... 301 Moved
+> > > > > > Permanently
+> > > > > > Location:
+> > > > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/
+> > > > > > linux.git/snapshot/linux-7.0-rc3.tar.gz
+> > > > > > [following]
+> > > > > > --2026-03-14 14:53:51--
+> > > > > > https://git.kernel.org/pub/scm/linux/kernel/=C2=A0git/torvalds/=
+l
+> > > > > > inux.git/snapshot/linux-7.0-rc3.tar.gz
+> > > > > > Reusing existing connection to git.kernel.org:443.
+> > > > > > HTTP request sent, awaiting response... 200 OK
+> > > > > > Length: unspecified [application/x-gzip]
+> > > > > > Saving to: =E2=80=98/dev/null=E2=80=99
+> > > > > >=20
+> > > > > > /dev/null=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 [
+> > > > > > <=3D>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ] 248.03M
+> > > > > > 51.9MB/s=C2=A0=C2=A0=C2=A0 in 5.0s
+> > > > > >=20
+> > > > > > 2026-03-14 14:53:56 (49.3 MB/s) - =E2=80=98/dev/null=E2=80=99 s=
+aved
+> > > > > > [260080129]
+> > > > > >=20
+> > > > > > # wget -O /dev/null
+> > > > > > https://git.kernel.org/torvalds/t/linux-7.0-
+> > > > > > rc3.tar.gz
+> > > > > > --2026-03-14 14:53:58--
+> > > > > > https://git.kernel.org/torvalds/t/linux-7.0-
+> > > > > > rc3.tar.gz
+> > > > > > Resolving git.kernel.org
+> > > > > > (git.kernel.org)... 172.105.64.184,
+> > > > > > 2a01:7e01:e001:937:0:1991:8:25
+> > > > > > Connecting to git.kernel.org
+> > > > > > (git.kernel.org)|172.105.64.184|:443...
+> > > > > > failed: Connection timed out.
+> > > > > > Connecting to git.kernel.org
+> > > > > > (git.kernel.org)|
+> > > > > > 2a01:7e01:e001:937:0:1991:8:25|:443...
+> > > > > > failed: Network is unreachable.
+> > > > > >=20
+> > > > > > Before the 69894e5b4c5e ("netfilter: nft_connlimit: update
+> > > > > > the count
+> > > > > > if add was skipped") commit this worked.
+> > > > > >=20
+> > > > >=20
+> > > > > Thanks for the report. I have reproduced
+> > > > > this on upstream kernel. I am working on it.
+> > > > >=20
+> > > >=20
+> > > > This is what is happening:
+> > > >=20
+> > > > 1. The first connection is established and
+> > > > tracked, all good. When it finishes, it goes to
+> > > > TIME_WAIT state
+> > > > 2. The second connection is established, ct is
+> > > > confirmed since the beginning, skipping the
+> > > > tracking and calling a GC.
+> > > > 3. The previously tracked connection is cleaned
+> > > > up during GC as TIME_WAIT is considered closed.
+> > >=20
+> > > This is stupid.=C2=A0 The fix is to add --syn or use
+> > > OUTPUT.=C2=A0 Its not even clear to me what the user wants to achive
+> > > with this rule.
+> > >=20
+> >=20
+> > Yes, the ruleset shown does not make sense. Having said this, it
+> > could
+> > affect to a soft-limit scenario as the one described on the blamed
+> > commit..
 >=20
-> This patch does not affect the channel selection. That can be still made
-> through the DT. The driver uses `fep->pps_channel` everywhere else, while
-> rq->perout.index is only checked in this single line, and never used
-> anywhere else.
-
-rq->perout.index indicates which channel is used to output the pulses, See:
-https://elixir.bootlin.com/linux/v7.0-rc4/source/Documentation/ABI/testing/=
-sysfs-ptp#L130
-
-But this patch sets rq->perout.index to 0. However, the driver actually use=
-s the
-channel specified by fep->pps_channel, which is unreasonable.
-
+> Alejandro, can you describe what you would like to achieve with the
+> specific rule?=20
 >=20
-> So the question is whether userspace is supposed to reference the hardwar=
-e
-> channel number directly, or the mapping is meant to be left to the device=
-tree
-> and the driver internally.
+> Regards,
+> Salvatore
 
-Based on my understanding of the period parameters in the kernel doc. I
-believe that the user space specifies the hardware channel number directly.
+The intended use of that rule was to prevent (limit) a single host from
+establishing too many TCP connections to given host (Denial of
+Service... particularly on streaming servers).
 
->=20
-> I hope the netdev maintainers and/or Richard Cochran can clarify the
-> intended purpose of `n_per_out` and the expected channel indexing.
+I learnt about it in several IPtables guides/howtos (maaaany years
+ago!), and never was an issue on itself.
+Was it stupid? ... possibly... It 'seemed' to work, or, at least, when
+checking iptables -L -v one could see packet counter for the rule
+catching some traffic, without ever noticing it being troublesome, so,
+at the very least it 'didn't hurt', and, since DoS ever happened over
+the years...well, I tended to think it was indeed working the way I
+read it did.
 
+Certainly, I never (the authors of those guides at their time indeed)
+though about the possibility of just target the TCP syn.
+I have given a try to adding the --syn option to the rule to see the
+difference, and well, it is way less disruptive that way, but it still
+breaks things (I saw postfix queues hanging, for instance).
+
+So, I have but screwed the idea of using connlimit anymore anyways.
+Sorry for the noise. Lesson learned.
+
+Cheers!
 
