@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-269278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269279-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wClEBDVlu2lVjgIAu9opvQ
-	(envelope-from <netdev+bounces-269278-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:53:41 +0100
+	id YCyUOTNmu2lVjgIAu9opvQ
+	(envelope-from <netdev+bounces-269279-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:57:55 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0B372C52B6
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:53:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88CAF2C5374
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:57:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C218B3016885
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:53:39 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E1F1F30117C3
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:57:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379F62D7DD5;
-	Thu, 19 Mar 2026 02:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8198B3876AD;
+	Thu, 19 Mar 2026 02:57:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="es0Wqm8A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SKbB1DU3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1273A23D7CF;
-	Thu, 19 Mar 2026 02:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA013859C7;
+	Thu, 19 Mar 2026 02:57:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773888818; cv=none; b=uBHCRH+4Hy0/HiSME3wkYFkqZJx7peg0I2Td+kwbHnyQTv0N4fTt0mXrh8CE6O8vqCen34rsmIGMB876KtD7UCisv73MSAT1PS3uLBgRbh3kMsHhgYi/IxrzmIkiqXIjY+i2BIrqp62N12gbceYHcMx17+eZ02RxDKNqCxNxLzQ=
+	t=1773889070; cv=none; b=K5F9PLVqld9fRdHMIj63G7xiiT+fl9T6F5nT7BQRiu6kSwZgisuVoURp7WdWW4fxO+gFM81in4mKFDHVa9aNbYle4Zcpjc7azCPG8/W4Qq3SVDGssoUXm3GRm066R4L9/t1WSqIO5HM9m2gIVY0QWqUq4UYLZDR6WE+DtvIHjLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773888818; c=relaxed/simple;
-	bh=wxUwDuGYqbe4MKbYC5nudTap9xZa9n1gpeSSj4VQ2LY=;
+	s=arc-20240116; t=1773889070; c=relaxed/simple;
+	bh=Le2iTBYvC8iZtu6+lvmW29GWCftNxNhX5q1Y3Y+Tg48=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CiHf9CAUNfMZNUg9beIuvGDHsDh4HggCh+ycnHoel1D6aMLqMBv4PPOgJqBeso6B3f0m8+RngCQyRPhnfe576wZGRHNBoeAbMiiSComOo6pOP8ZEqUI5aDs2BNiHCKEc850LcIkYgQSLDmWdlgLBUGJk8CSuaf4t4z5936dOV9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=es0Wqm8A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1609FC19421;
-	Thu, 19 Mar 2026 02:53:37 +0000 (UTC)
+	 MIME-Version:Content-Type; b=nJZnvWIGs+pdAuf1sdP9nRe+wSfG11ec6+We4+VwQcB/BkNqrHpVnRXbJmMUeRvhqaqtB1cDIzxupFDs3g+7EfH4kbzuu9weWSuwzTR2wuxB5BtzOKm/X28lRfjb+1tV/7bca/2M63Ooq/mQzSbkQz3Zv5CW8BJIcj5bGdo6J9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SKbB1DU3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 623D2C19421;
+	Thu, 19 Mar 2026 02:57:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773888817;
-	bh=wxUwDuGYqbe4MKbYC5nudTap9xZa9n1gpeSSj4VQ2LY=;
+	s=k20201202; t=1773889070;
+	bh=Le2iTBYvC8iZtu6+lvmW29GWCftNxNhX5q1Y3Y+Tg48=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=es0Wqm8AAzb02ZvqHnoVp0SmdY3ptz54sxM0unxTl/0Nt6F38Fij+3IfDv2OH/OdS
-	 l3cSS2Z93PUBt0veMiXa5qrhu2VkFkwmFR2erEfFr8BGUK3ofWpM/wj1O2x39v+Aha
-	 tUPOcs6D8dQ9zHtvew6rG/qVCu40vLklb5AQLeH48qgBf8Vzi2qsbpmlnOrTykB7Yf
-	 prsztNeF9dqWaGoPAnpZGpQetkfHCo1hlH0fhqMDKSum3yr5WJeILm5fnGjPDNiL/g
-	 hBb9XduC99bmGtqT1mB3Mb2xRTsU5REVmHZKxqdfu4RJ4G2Jpdq6BzGx5iiVZ+voCe
-	 ++xclM1MqQDZg==
-Date: Wed, 18 Mar 2026 19:53:36 -0700
+	b=SKbB1DU3ZN8N5MNwtYCbNaaCKvThlVA3vU++49CikZIsayrvkiOfGg5suymzTCgAB
+	 hVwdJ11jxGEmyHlA1zO62fAZFVC4gcPIMNfesxEswDNeNw0KFKvsrNGwD8wfpXgqMT
+	 vYk9h18HeLGpTOssKV/lq8Iji/P747p7i7uqxs2yzwl4+zfo3arXT8XI7iGU8egJF5
+	 thjMMBGXQokgTglwMigCFQM4StG+psbuAsN5qf1gIn27fQtQAP0ljC0MxYVJyjYC1e
+	 KsiG4lPkfQJj6jKR1oVf8EXpKa0OfPROJH6OMb3Lkx0sOUOHY5sQhBHoD4uA7fgvwF
+	 pb1qBZrFH1YAg==
+Date: Wed, 18 Mar 2026 19:57:48 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Vikas Gupta <vikas.gupta@broadcom.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
- rajashekar.hudumula@broadcom.com, ajit.khaparde@broadcom.com, Bhargava
- Marreddy <bhargava.marreddy@broadcom.com>
-Subject: Re: [PATCH net-next v7 06/10] bng_en: add HW stats infra and
- structured ethtool ops
-Message-ID: <20260318195336.0406eaf0@kernel.org>
-In-Reply-To: <20260318150149.7a8c6067@kernel.org>
-References: <20260315141605.410878-1-vikas.gupta@broadcom.com>
-	<20260315141605.410878-7-vikas.gupta@broadcom.com>
-	<20260318150149.7a8c6067@kernel.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <horms@kernel.org>, <donald.hunter@gmail.com>,
+ <jiri@resnulli.us>, <chuck.lever@oracle.com>, <matttbe@kernel.org>,
+ <cjubran@nvidia.com>, <shshitrit@nvidia.com>, "Saeed Mahameed"
+ <saeedm@nvidia.com>
+Subject: Re: [PATCH v5 net-next 2/5] devlink: Implement devlink param multi
+ attribute nested data values
+Message-ID: <20260318195748.6754aafc@kernel.org>
+In-Reply-To: <20260317045623.250187-3-rkannoth@marvell.com>
+References: <20260317045623.250187-1-rkannoth@marvell.com>
+	<20260317045623.250187-3-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,42 +76,48 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269278-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269279-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,resnulli.us,oracle.com,nvidia.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.908];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.959];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A0B372C52B6
+X-Rspamd-Queue-Id: 88CAF2C5374
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 18 Mar 2026 15:01:49 -0700 Jakub Kicinski wrote:
-> On Sun, 15 Mar 2026 19:46:01 +0530 Vikas Gupta wrote:
-> > +			/* Per port queue IDs start from 0, 10, 20, etc */
-> > +			queue_idx = queue_id % 10;
-> > +			if (queue_idx >= BNGE_MAX_QUEUE) {
-> > +				bn->pri2cos_valid = false;
-> > +				bnge_hwrm_req_drop(bd, req_qc);
-> > +				return rc;
-> > +			}  
+On Tue, 17 Mar 2026 10:26:20 +0530 Ratheesh Kannoth wrote:
+> Devlink param value attribute is not defined since devlink is handling
+> the value validating and parsing internally, this allows us to implement
+> multi attribute values without breaking any policies.
 > 
-> Dan C's report looks still relevant:
+> Devlink param multi-attribute values are considered to be dynamically
+> sized arrays of u32 values, by introducing a new devlink param type
+> DEVLINK_PARAM_TYPE_U32_ARRAY, driver and user space can set a variable
+> count of u32 values into the DEVLINK_ATTR_PARAM_VALUE_DATA attribute.
 > 
-> https://lore.kernel.org/all/202603180509.nOQGZrG0-lkp@intel.com/
+> Implement get/set parsing and add to the internal value structure passed
+> to drivers.
+> 
+> This is useful for devices that need to configure a list of values for
+> a specific configuration.
 
-FWIW other than this the series LGTM
+Jiri's suggesting to use uint seems quite sensible. That way we don't
+have to add another type if anyone needs >32b in the future. Should
+be a fairly straightforward conversion. All the real types in the
+kernel s/u32/u64/ and the netlink helper and API s/u32/uint/
 
