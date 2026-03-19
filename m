@@ -1,256 +1,194 @@
-Return-Path: <netdev+bounces-269440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269441-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8ABkCunwu2nkqQIAu9opvQ
-	(envelope-from <netdev+bounces-269440-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 13:49:45 +0100
+	id cEEnIozzu2nkqQIAu9opvQ
+	(envelope-from <netdev+bounces-269441-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:01:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C038D2CB58D
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 13:49:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CED52CB977
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:00:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 10E3430090BD
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 12:49:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A9E103187562
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 12:55:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4651638E5D5;
-	Thu, 19 Mar 2026 12:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369713AD536;
+	Thu, 19 Mar 2026 12:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XfYN8Y3p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S4VDMSBB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43FA246BC6
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 12:49:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B8435949;
+	Thu, 19 Mar 2026 12:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773924581; cv=none; b=j2SwiTlAwTQxmtvsDBtJATb7WmTk3bkuXHSNuL0izl0YZI7aKEC33RjDh2SRsYkEJpOIi7FIPA/WUkq8XAs5XrNLHFGrcf0yHekfI4dp0LkGkkay2tW+qGH3/jBL0xEpmwxWKVVMtAcp7QrBrZHN6Z1Kzo61DLWweF0D4wdY5ZY=
+	t=1773924929; cv=none; b=pNJkJ2sIBBIngtJo6AFOebG5kQlN/gjX7mZ/7VNSgdMCwl6Bezj2Ud0TjYAFM6yPT8diEdPlTo5lDDPbmFEymXt0sBjPTrXY8I3MVfDG8G5q9QhxiyWg8CAQtzwsJlkfIf60gXHjexsW02uvrOu0cA10AfjvyjCSaMkkVvkuAMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773924581; c=relaxed/simple;
-	bh=oRTuRL04AZMLgCWp90IPlP1T4HpI9JgZS1fLNJ4R7qQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f0t/1ArXg/iRKlY3WCTOtyPidcSiWXhIq2a0nHkpxmzDGDFijTKffaecQIFp5U2swXihPwa6Tmm9HumquJUczWLvoHchRNlvtjYXtc+xPxIdjBHh7H49lNUkPHKV7gPW/sUuGTDLEnilEomuccNS5lU6DWoU5bmlWFSQRRo/zHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XfYN8Y3p; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773924578;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SmlJz28vEgXrMcvJHKgmmZgjPFgGnDjqpkEd65rD/S0=;
-	b=XfYN8Y3pt74aXxTDgl7xLT5ZjQfJokiIBqWTN103EYC5sLGN/0X5r8G/G/gLQ0Ly9pHCug
-	fUt2Kaji1OTamrqvtXoPV3iV6gmQkFaRxKecC6ueOLbMvV8WyDptauOzmklRM/pf6RF5Qd
-	EHF0DXXfyMmVPzG/m8BCIQJ9QAf7UR4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-529-JEL7GZ2zMhOZOPbDg8q1Rw-1; Thu,
- 19 Mar 2026 08:49:35 -0400
-X-MC-Unique: JEL7GZ2zMhOZOPbDg8q1Rw-1
-X-Mimecast-MFC-AGG-ID: JEL7GZ2zMhOZOPbDg8q1Rw_1773924574
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E243A180049D;
-	Thu, 19 Mar 2026 12:49:33 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.182])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9BB4C30001A1;
-	Thu, 19 Mar 2026 12:49:31 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: cohenyang511@gmail.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	yangg9@xiaopeng.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: net: stmmac: Reorder cleanup sequence and disable IRQ earlier in reset path
-Date: Thu, 19 Mar 2026 13:46:20 +0100
-Message-ID: <20260319124620.226576-1-pabeni@redhat.com>
-In-Reply-To: <20260317121937.109211-1-yangg9@xiaopeng.com>
-References: <20260317121937.109211-1-yangg9@xiaopeng.com>
+	s=arc-20240116; t=1773924929; c=relaxed/simple;
+	bh=9rlUs9kmzpZtY6ZtD+fUwCCJLpx09o1aGtWBG1kSIIc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H2XzJx2vNWIKCu7m4kVEt1L6P5VEvaY3zQ+T1XnQlYhH/feq3uQCKpDMSOYgINEUFz/zed9CCHFzuKnD/IfvALsIFmol0SCPXs9xj539p4vCfSkRN5fneyqVYjKnbSZap7aD0nK6AYCRx1RBBt3NihdRW6m71FZDVa5OQP5wsgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S4VDMSBB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF7ADC19424;
+	Thu, 19 Mar 2026 12:55:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773924928;
+	bh=9rlUs9kmzpZtY6ZtD+fUwCCJLpx09o1aGtWBG1kSIIc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=S4VDMSBBZnIaT/gxf5YhzmGp6m2u8ZC5i2dI2+1Zi4MfMr0Ee2p0Sbj+A33L40PvX
+	 VUKe2YlEylY/tb7/KDyV9giIvBinLHpGqIYK3t2lSG0nkWK1njMIN+YM1pDXVNU3MS
+	 oOns9Xmduu+L/F1IM9j0rzgguXJ3qsjdd5nrmIFJZgNGwTr1sCJFnIgew63sI13Hta
+	 06LvwMdUmjwYdLshhvV84YdhYqouJ0LJjo12/VSgODK71rNaLoQhb/edOJrxl52yNj
+	 RRjVwHRMG/LZ+JBQ9EMn3Dm1YAEBsrhXCEP5MOumTkBoD3AEynqhr5unsbvEHsQhIv
+	 71uYbw/YOfO7w==
+Message-ID: <90943080-7580-4491-9669-63034f4acb42@kernel.org>
+Date: Thu, 19 Mar 2026 13:55:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net] MPTCP: fix lock class name family in
+ pm_nl_create_listen_socket
+Content-Language: fr
+To: Li Xiasong <lixiasong1@huawei.com>, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
+ zhangchangzhong@huawei.com, weiyongjun1@huawei.com
+References: <20260319112159.3118874-1-lixiasong1@huawei.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260319112159.3118874-1-lixiasong1@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-269440-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269441-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[huawei.com:query timed out];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RSPAMD_EMAILBL_FAIL(0.00)[matttbe.kernel.org:query timed out];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-0.869];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C038D2CB58D
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2CED52CB977
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Hi Li,
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: stmmac: Reorder cleanup sequence and disable IRQ earlier in reset path
+On 19/03/2026 12:21, Li Xiasong wrote:
+> In mptcp_pm_nl_create_listen_socket(), use entry->addr.family
+> instead of sk->sk_family for lock class setup. The 'sk' parameter
+> is a netlink socket, not the MPTCP subflow socket being created.
+> 
+> Fixes: cee4034a3db1 ("mptcp: fix lockdep false positive in mptcp_pm_nl_create_listen_socket()")
+> Signed-off-by: Li Xiasong <lixiasong1@huawei.com>
+> ---
+>  net/mptcp/pm_kernel.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
+> index b2b9df43960e..82e59f9c6dd9 100644
+> --- a/net/mptcp/pm_kernel.c
+> +++ b/net/mptcp/pm_kernel.c
+> @@ -838,7 +838,7 @@ static struct lock_class_key mptcp_keys[2];
+>  static int mptcp_pm_nl_create_listen_socket(struct sock *sk,
+>  					    struct mptcp_pm_addr_entry *entry)
+>  {
+> -	bool is_ipv6 = sk->sk_family == AF_INET6;
+> +	bool is_ipv6 = entry->addr.family == AF_INET6;
 
-The recent changes restructure resource cleanup in __stmmac_release() to
-free IRQ lines, stop DMA, and release descriptors before stopping the PHY.
-Additionally, stmmac_reset_subtask() now disables IRQ earlier to prevent
-spurious interrupts during the DOWN transition.
+Good catch! 'sk' name is confusing, it would probably be better to pass
+"struct net *" instead. But this can be done later, that's more a
+net-next material.
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 124d7a00f9f0..fa06b2eb33f2 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -4202,6 +4202,15 @@ static void __stmmac_release(struct net_device *dev)
->  	struct stmmac_priv *priv = netdev_priv(dev);
->  	u8 chan;
->
-> +	/* Free the IRQ lines */
-> +	stmmac_free_irq(dev, REQ_IRQ_ERR_ALL, 0);
-> +
-> +	/* Stop TX/RX DMA and clear the descriptors */
-> +	stmmac_stop_all_dma(priv);
-> +
-> +	/* Release and free the Rx/Tx resources */
-> +	free_dma_desc_resources(priv, &priv->dma_conf);
-> +
->  	/* Stop and disconnect the PHY */
->  	phylink_stop(priv->phylink);
->
-> @@ -4212,15 +4221,6 @@ static void __stmmac_release(struct net_device *dev)
->
->  	netif_tx_disable(dev);
->
-> -	/* Free the IRQ lines */
-> -	stmmac_free_irq(dev, REQ_IRQ_ERR_ALL, 0);
-> -
-> -	/* Stop TX/RX DMA and clear the descriptors */
-> -	stmmac_stop_all_dma(priv);
-> -
-> -	/* Release and free the Rx/Tx resources */
-> -	free_dma_desc_resources(priv, &priv->dma_conf);
-> -
-                ^^^^
-
-Moving free_dma_desc_resources() before stmmac_disable_all_queues() looks
-problematic. Can a TX coalesce hrtimer fire after the DMA resources are
-freed?
-
-The stmmac driver has TX coalesce timers (stmmac_tx_timer) that can call
-napi_schedule(). If free_dma_desc_resources() frees tx_q->tx_skbuff_dma
-and tx_q->tx_skbuff via __free_dma_tx_desc_resources():
-
-drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:__free_dma_tx_desc_resources() {
-    ...
-    kfree(tx_q->tx_skbuff_dma);
-    tx_q->tx_skbuff_dma = NULL;
-    kfree(tx_q->tx_skbuff);
-    tx_q->tx_skbuff = NULL;
-    ...
-}
-
-But the hrtimer hasn't been cancelled yet (hrtimer_cancel is in
-stmmac_disable_all_queues), and NAPI hasn't been disabled yet, then:
-
-stmmac_tx_timer() fires
-  -> napi_schedule_prep()
-  -> __napi_schedule()
-  -> NAPI poll eventually runs
-  -> stmmac_napi_poll_tx()
-  -> stmmac_tx_clean()
-  -> accesses freed tx_q->tx_skbuff_dma[entry] and tx_q->tx_skbuff[entry]
-
-The original order disabled NAPI and cancelled hrtimers before freeing DMA
-resources. The stmmac_xdp_release() function in this same file shows the
-correct pattern:
-
-drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:stmmac_xdp_release() {
-    ...
-    stmmac_disable_all_queues(priv);
-    for (chan = 0; chan < priv->plat->tx_queues_to_use; chan++)
-        hrtimer_cancel(&priv->dma_conf.tx_queue[chan].txtimer);
-    ...
-    free_dma_desc_resources(priv, &priv->dma_conf);
-    ...
-}
+(For next time, please use 'mptcp:' prefix instead of 'MPTCP:' in the
+subject, similar to all other commits in this directory.)
 
 
->  	stmmac_release_ptp(priv);
->
->  	if (stmmac_fpe_supported(priv))
-
-[ ... ]
-
-> @@ -7331,6 +7331,9 @@ static void stmmac_reset_subtask(struct stmmac_priv *priv)
->  	while (test_and_set_bit(STMMAC_RESETING, &priv->state))
->  		usleep_range(1000, 2000);
->
-> +	/* Close IRQ entry as early as possible before DOWN short-circuit path. */
-> +	disable_irq_nosync(priv->dev->irq);
-> +
-                ^^^^
-
-disable_irq_nosync() increments the IRQ descriptor's depth counter, but
-where is the corresponding enable_irq()?
-
-The stmmac driver doesn't call enable_irq() anywhere. After dev_close()
-and dev_open() complete:
-
-stmmac_reset_subtask()
-  -> disable_irq_nosync(dev->irq)   // depth++
-  -> dev_close()
-      -> __stmmac_release()
-          -> stmmac_free_irq()
-              -> free_irq(dev->irq, dev)
-  -> dev_open()
-      -> stmmac_request_irq_single()
-          -> request_irq(dev->irq, ..., IRQF_SHARED, ...)
-
-For non-shared IRQs, this works by coincidence: free_irq's last-handler
-removal calls irq_shutdown (depth++), then request_irq's first-handler
-registration calls irq_startup which resets depth to 0.
-
-However, when dev->irq is shared with another device (IRQF_SHARED is set
-in stmmac_request_irq_single), free_irq does NOT call irq_shutdown because
-other handlers remain on desc->action. The depth stays at 1. The
-subsequent request_irq takes the shared path in __setup_irq which does NOT
-call irq_startup, leaving depth at 1.
-
-The IRQ line remains disabled after the reset completes, breaking
-interrupts for all devices on that shared line. Should enable_irq() be
-added after dev_open()?
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
->  	set_bit(STMMAC_DOWN, &priv->state);
->  	dev_close(priv->dev);
->  	dev_open(priv->dev, NULL);
+@Netdev maintainers: this patch can be applied in the 'net' tree directly.
+
+>  	int addrlen = sizeof(struct sockaddr_in);
+>  	struct sockaddr_storage addr;
+>  	struct sock *newsk, *ssk;
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
