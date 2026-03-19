@@ -1,167 +1,184 @@
-Return-Path: <netdev+bounces-269614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269615-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2G9PDlA/vGlzvwIAu9opvQ
-	(envelope-from <netdev+bounces-269614-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:24:16 +0100
+	id YNJXB1NDvGmAwAIAu9opvQ
+	(envelope-from <netdev+bounces-269615-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:41:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0FF2D0CAB
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:24:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E2B2D12A5
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:41:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 28B4730A3068
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:19:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 91F553096EF4
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72F613EDAC1;
-	Thu, 19 Mar 2026 18:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D568A30EF82;
+	Thu, 19 Mar 2026 18:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SKADsNj8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DUAa+f7l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB0432FA2A;
-	Thu, 19 Mar 2026 18:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81EFB38D685
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 18:41:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773944341; cv=none; b=kTHBItf3HV2TQMpBcYHNrcTxG9wafcTJKZw/XFcAoCRF6EF24GDnKjQaLWuiigoaXgo8FcH0UjH7mfS1GBGud1aXbVKblYibgWQOcNjvB2lQ+N4UB0d9aY/GTxkclAcqxKYX+OeEzHrKKLz1HhVBeRTxDec51CfbGUgUxmafziQ=
+	t=1773945667; cv=none; b=fMqVE/3YR5NOZak483CoI49i1USekGYBTgqVkvRIlpPinBO3PrrwcfYphxRmuGLR0junnnoBb2PhTrkZZwJTXeVgEkliNVlcnUqpFN/O7DLIXpzb0M3kNkXi8rgxM/uix1ws68KcZ/Ne3KXKKVixOZSRbSO3FtgHL7nYshaCFLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773944341; c=relaxed/simple;
-	bh=FlUARS6V5JcxJHgN8D+FNxzhQzzcnaRhP4FENq7ucS4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UMU5uDnrQKcaLNjcrw0OZOmhdnW+ca6uuE3M04R/luYvf6jTDkJUxPwvYbr4IzESYhOWVUFIoSM3ZM5PMlzs7IIq8bKwI9ce+mLhoY9j3S5yVhygPvi8vb+l+yitqL7YkuNZ9Rx2QtXhV67qYEdWdAdZCaOkhs9MqUZPWFyfLYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SKADsNj8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCBDBC19425;
-	Thu, 19 Mar 2026 18:18:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773944340;
-	bh=FlUARS6V5JcxJHgN8D+FNxzhQzzcnaRhP4FENq7ucS4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SKADsNj8KeBvKbeBV2GCOYYkG+YKLgB0ae1U+9NmcEmzkfQTDJMqHK/jBKG/0B+OH
-	 mBgRIsy6jEUk5C8l0ogq1JWGP4euzBlRiiLJbDxqDaJzQ5qhcgfovW6hzQTaKHIPlF
-	 yvn95tm5feihGxkV5fr+GN0bnvWslafAsmtNYf2f4bn+NGFE9V/cGMtl52PQ3OwwmJ
-	 QICp69hOPnt12m5d/TCOllqNcPVY22QCUfUQzGTeuziYf3OtoYz4BW9I0lmt2OPcWO
-	 Jq3paNI6BXfGkz9HkJ0v8DvkVUXB+EFSSJ26G9W26dYw2dBwWyRFlPO726MgtC9KpU
-	 VKZSOgMyU0+rw==
-Date: Thu, 19 Mar 2026 18:18:54 +0000
-From: Simon Horman <horms@kernel.org>
-To: Guangshuo Li <lgs201920130244@gmail.com>
-Cc: "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1773945667; c=relaxed/simple;
+	bh=hiOcvAOZU+Go06U22CYBuOeWPiu1hvx3VQOdDsDJoTM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VqvhGVUxPHk1KikXiC9HrjdvgfYx3O9BziehzIZQJt4mwWPAbO6ROvyu6HK65Eg1dJEOZ1AQN7+bQzGN7D8ypQebbyAndgf+7ZpyOP8TLZNaRLkwB1DeGHqNA2St1+ZZFRLA7IqTASG23Py/tsz2WLLhd6DOsLj4qAhDLEZEgYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DUAa+f7l; arc=none smtp.client-ip=209.85.210.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7d4be94eeacso1346226a34.2
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 11:41:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773945664; x=1774550464; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UkL9G5F8IWfaZsPq/S8Wu6RBCXk3sjjW1IZ7vLbDtek=;
+        b=DUAa+f7lUrgii1rf/txCsDqGBxksbLKo6kV6ocZyPcvyvEGW/8V0WQTbXmHBvwwIfI
+         wb/trbi+NvL2gb2khq8onZ195Ie4BuhLqhajJmKhcUeSHqM59mB0V31AA2XgCzWMDHCm
+         oh3TAKFtzwqY83kRH7ddptk0JaWh/oi+tzKcm4T86wtRuEFVrmKK4c8j9M8vT3MHLfX4
+         4hZsx+/3aqtm718AKzyHWoLxRaUuq0tWbqvQg3u8LyNLLBGqheHnSkuvEemQlyjuiL3z
+         +ebWQ/IXwh9m9oZSfJQ0JvPnVTbCqW085i0HIYuZLlMKlCwI0n8CX849SyC4K6n0vWkV
+         SmTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773945664; x=1774550464;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UkL9G5F8IWfaZsPq/S8Wu6RBCXk3sjjW1IZ7vLbDtek=;
+        b=UIzbyGAveM921cv/Q5SWLhOK4VpSxFiCRN5UkZq9oZWThCx5L1CKIAe0UoNivOGrfQ
+         5s6q6Bfb5IAncVARHdb10wbYgxfiiuf+yN7lwWG8B10XpmvM2m5rt6b8H7J/JWw9nu+B
+         0GChdNapcJnDrhRqkfByATPqD8tTxI57yQt9mFuX4YKpAc+pDvBQjpOH51v9deFmn4PJ
+         cWSiwQ0oFLAc/XZgHHfD0nHx0cOqVNot5H7mSYRlUMyFezHlCZY/nV7Pgz+fzeGcSBzc
+         9qNT53+9HsJHfq21rtKnPrE3nnkN0qjhpoCyfZhxiOP2hoXRu+FtuUHUpY3l/lkJzcEJ
+         DQCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUl3TneQnHy0C9W40k0HbCruglOG8A1zXVVN6M9UtsszRnPsTzX8jSZphyeXDtQ9ZuHt5bfBA0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWRXncGLTaUockKs0WRcKwDUUcTCl4CB/2Sxs+IWtTTvzVzyGb
+	OoU8NSZ/YnbOPdgLqm54aWlAgDUcPZ2jbkV056fyXKR/OWJj+DG4KVu6
+X-Gm-Gg: ATEYQzzJth7/nRHJD1zvBmz8ZL8/kp3d3XWh5XT8RVV1WuqVgCYArirVYpCThAZihj6
+	GlJlABQ5kwRXVf29HKfTPcWeW7GVld0Wyveyjcyky/1iv2+KZNfNm4cppSonFJBx/l4OF3NOc8X
+	Rj3sWwUZCjTdbf2DfFQDyVyQ0UF4y14IKbSN/CXdnGplcuM8TzQu3qmeSg2PqeGtfOhfryn24kJ
+	gkoe57aNuDd5K18GSej65LDonqnTqtzY2vQMrlI8E6RFrQiMOR+Y+Gt9LP1oeuDDFr9LABTSDar
+	aceW/dBtX46u58lFqcqd/LxagenJ+urdjpllpjdSrCw9DkFdZTvmDaTgt4E6djOpUdkg6DbeNaC
+	mQa9g8VXHKFFwO6D59GNqXmYwhjNjHAaKzCrSeYz5Ox7t9ok9V4CSaK6iZeokNMjjoaOK+Icjoi
+	aQvWC4lVRC3Spa/CupKfE2ZNYuZMyEGd05MV4p9mSihykEI1Ctju/CGg7b2ct0votgXaNokcdZO
+	kRMRh36SJQ=
+X-Received: by 2002:a05:6830:3e07:b0:7d7:e8f4:4800 with SMTP id 46e09a7af769-7d7eae7e608mr222164a34.9.1773945664407;
+        Thu, 19 Mar 2026 11:41:04 -0700 (PDT)
+Received: from celestia.turtle.lan (static-23-234-115-121.cust.tzulo.com. [23.234.115.121])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d7eadcb757sm181486a34.15.2026.03.19.11.41.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2026 11:41:04 -0700 (PDT)
+From: Sam Edwards <cfsworks@gmail.com>
+X-Google-Original-From: Sam Edwards <CFSworks@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saurabh Sengar <ssengar@linux.microsoft.com>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
-	Aditya Garg <gargaditya@linux.microsoft.com>,
-	Shiraz Saleem <shirazsaleem@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: mana: fix use-after-free in add_adev() error path
-Message-ID: <20260319181854.GS1753385@horms.kernel.org>
-References: <20260318154041.638747-1-lgs201920130244@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Russell King <rmk+kernel@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Baruch Siach <baruch@tkos.co.il>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Sam Edwards <CFSworks@gmail.com>
+Subject: [PATCH net v2 0/2] stmmac crash/stall fixes when under memory pressure
+Date: Thu, 19 Mar 2026 11:40:29 -0700
+Message-ID: <20260319184031.8596-1-CFSworks@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260318154041.638747-1-lgs201920130244@gmail.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269614-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,bootlin.com,renesas.com,nxp.com,tkos.co.il,gmail.com,vger.kernel.org,lists.infradead.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-269615-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.985];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 8E0FF2D0CAB
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cfsworks@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	NEURAL_HAM(-0.00)[-0.716];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 99E2B2D12A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 18, 2026 at 11:40:41PM +0800, Guangshuo Li wrote:
-> If auxiliary_device_add() fails, add_adev() calls
-> auxiliary_device_uninit(adev), whose release callback adev_release()
-> frees the containing struct mana_adev.
-> 
-> The current error path then falls through to init_fail and accesses
-> adev->id. Since adev is embedded in struct mana_adev, this may lead
-> to a use-after-free.
+Hi netdev,
 
-It isn't clear to me how the use-after-free manifests.
-Could you elaborate?
+This is v2 of my series containing a pair of bugfixes for the stmmac driver's
+receive pipeline. These issues occur when stmmac_rx_refill() does not (fully)
+succeed, which happens more frequently when free memory is low.
 
-> 
-> Fix it by storing the allocated auxiliary device id in a local
-> variable and using that saved id in the cleanup path after
-> auxiliary_device_uninit().
-> 
-> Fixes: a69839d4327d ("net: mana: Add support for auxiliary device")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+The first patch closes Bugzilla bug #221010 [1], where stmmac_rx() can circle
+around to a still-dirty descriptor (with a NULL buffer pointer), mistake it for
+a filled descriptor (due to OWN=0), and attempt to dereference the buffer.
 
-As a bug fix for code present in the net tree, this patch
-should be targeted at that tree like this.
+In testing that patch, I discovered a second issue: starvation of available RX
+buffers causes the NIC to stop sending interrupts; if the driver stops polling,
+it will wait indefinitely for an interrupt that will never come. (Note: the
+first patch makes this issue more prominent -- mostly because it lets the
+system survive long enough to exhibit it -- but doesn't *cause* it.) The second
+patch addresses that problem as well.
 
-Subject: [PATCH net] ...
+Both patches are minimal, appropriate for stable, and designated to `net`.
 
-And it should apply to that tree.
+Regards,
+Sam
 
-As it is the CI tries to apply this patch to the default tree, net-next.
-Which fails. So there is no further CI performed.
+[1] https://bugzilla.kernel.org/show_bug.cgi?id=221010
 
-> ---
->  drivers/net/ethernet/microsoft/mana/mana_en.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index 1ad154f9db1a..70d71594c599 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -3362,6 +3362,7 @@ static int add_adev(struct gdma_dev *gd, const char *name)
->  {
->  	struct auxiliary_device *adev;
->  	struct mana_adev *madev;
-> +	int id;
->  	int ret;
+v2:
+- Completely rewrote the commit message of patch 1, now assuming the reader is
+  generally familiar with DMA but wholly unfamiliar with the stmmac device
+  (thanks Jakub!)
+- Added missing `Fixes:` to patch 2
+- Moved patch 2's `int budget = limit;` decl per the reverse-xmas-tree rule
+- Dropped patch 3: this was a code improvement not appropriate for stable
+- Generated the series with --subject-prefix='PATCH net'
+v1: https://lore.kernel.org/netdev/20260316021009.262358-1-CFSworks@gmail.com/
 
-Please preserve reverse xmas tree order for local variables - longest line
-to shortest.
+Sam Edwards (2):
+  net: stmmac: Prevent NULL deref when RX memory exhausted
+  net: stmmac: Prevent indefinite RX stall on buffer exhaustion
 
->  
->  	madev = kzalloc(sizeof(*madev), GFP_KERNEL);
-
-...
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
 -- 
-pw-bot: changes-requested
+2.52.0
+
 
