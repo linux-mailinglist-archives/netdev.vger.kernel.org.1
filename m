@@ -1,57 +1,60 @@
-Return-Path: <netdev+bounces-269503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269489-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yKH1HXEWvGnbrwIAu9opvQ
-	(envelope-from <netdev+bounces-269503-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:29:53 +0100
+	id MFn8OBkTvGnbrwIAu9opvQ
+	(envelope-from <netdev+bounces-269489-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:15:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF56E2CDBD8
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:29:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 463782CD89D
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:15:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 149A131CE268
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:22:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 160B330AEA5A
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B57E3D7D63;
-	Thu, 19 Mar 2026 15:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194343D3481;
+	Thu, 19 Mar 2026 15:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b="Afz5ifqR"
+	dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b="p/84I8wn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-b-210.mailbox.org (mout-b-210.mailbox.org [195.10.208.40])
+Received: from mout-b-112.mailbox.org (mout-b-112.mailbox.org [195.10.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F413D3481;
-	Thu, 19 Mar 2026 15:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E103A2DBF78;
+	Thu, 19 Mar 2026 15:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773933750; cv=none; b=BXLSkawsdvPHXOQrzo5qe+FzwNLi/7081ptoWxe4+k5JerefiURxa5xIy8w1hUuiNhAIrAD0OCrIEFDw//eZLZ90rgkBRmZutcNeOniTgbLYh33gxO9xpJJdE9w+/xjGZrNgB7c2RplBOiHwQVoJ5FkExuKV7viUL+IakV2Ujcs=
+	t=1773933191; cv=none; b=qepQ1+D6xeY7euh89n1pX29RPLRff2VKVgWnjTvSuf8UV7m1VgmCiKm1vlnsZTXIRvyaNz2C+Cmz3hHUubPEeYziZBs9r7Xb4XKuALmQ7gNcHLkGgQsa48myTNvAb/iiv2yWVY6UGKDf7E8pHilHpeGz+egh9WlQ1NyIUzc2NZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773933750; c=relaxed/simple;
-	bh=iTO4e6EY6LzuRBmdnlWNtywEwzjsLcLwOY1vsh6w6X8=;
+	s=arc-20240116; t=1773933191; c=relaxed/simple;
+	bh=2NYDwy/gV7dbV10YVs0Lb78B4af4Gw0dgptem2nEozY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ndRFJARN/7DgjyNpCFvW5ou4Pcy1vcpYxBmX/5BH04qtgTx3KUrkh+vLUXjJwfAgLZds7dtoo6RB6CS7Y8h+SnRVsOgFGMK80rkUnpDeMYDH3I08IIJE++wiH6kE2jp6/LIe5KAyVWbv/tdeANQditzuUUonfnEt+iDeNrsa5lA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=Afz5ifqR; arc=none smtp.client-ip=195.10.208.40
+	 MIME-Version:Content-Type; b=I31K/OkKG4beUf0xzqHY7LHVxCU7Ri7jCTiKl79zTLBd7gXI2Br5e/RgpymwwuCZqYi5+l43qPoREPfUA5d7lOuP0hPY3sqsch1L0v5Zx4vxRqBDwl4k+/K34RFCwSiMIRqKrwIC/MDTvdiuNqRo8qEzhBKPu+c3fSaxSf8/4Lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=p/84I8wn; arc=none smtp.client-ip=195.10.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mandelbit.com
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-b-210.mailbox.org (Postfix) with ESMTPS id 4fc8MY5hxkzDqrQ;
-	Thu, 19 Mar 2026 16:12:57 +0100 (CET)
+	by mout-b-112.mailbox.org (Postfix) with ESMTPS id 4fc8Mg1NJmzDv9S;
+	Thu, 19 Mar 2026 16:13:03 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1773933177;
+	s=MBO0001; t=1773933183;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0icos2ZBtUrsLwF58QCrTkTKUVqnIISU3RcxMFUjpAk=;
-	b=Afz5ifqR/m3cvYhcAV+HV4VQFRBdnEgoxSlYhlEr/XS8DszzK3uqn6OeG3FT1rsJgWFDvJ
-	PvlHyxjyrZmf5kate0iMR0mTVI8cZOZSFjY1K3+y7pOWW+bOEBSlJ/SeJfV2f/RNNvlpGj
-	fHelUymu7cCSQ41qd2KR37p8hKj5BwTGkDRzLllSXuSTjaOcYVYPl+sQohM2dQWuROrK0f
-	HpIUAAJ+MiXtii4JI9rH08xHqbKHgDwjLeP74tnP5COxxZj8gpMMG6fP1OpmQGuIwCXZ6M
-	hh5uTD85JKWDOKOpZhgcDNA4niIreOLkdfnhH9U7YPD3i9fzTk3K978ucpxCrQ==
+	bh=SndRzQCr+0TV28vMI6neq7lH/2aOabTy4OqIGVFvHHA=;
+	b=p/84I8wnabOFnqFtdXpkV2zqcfTMlzwFVjMKv8Nxy5UQEvdcoaNwSDOTNcCX9lfqKIVMoD
+	WIjpckbaij8ZxffwcbSG/gL/fMQOMxIAtCfB8uy/ir0TP6jvJXSlVfC0RYW70Rwvhh8ded
+	ecAMacrvoX3LXpd2bE91C8u7nVGdZmzt9G1H9UoHr6daPDrnOjXgqJiw6Vr/jsxiNYsrsJ
+	XKw3a5fhHS0f/3ekIbVC4UjAQGS1GY3zlRLdpsC6GmODIMepbTFx4PmjeycKnbAtMRSnh+
+	9evkI7lXYJmoxCqg3H7SOPGCP+g+9FeaqNivThMcyG6OT0LaGBAOygiVAKOlbw==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=none;
+	spf=pass (outgoing_mbo_mout: domain of ralf@mandelbit.com designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=ralf@mandelbit.com
 From: Ralf Lici <ralf@mandelbit.com>
 To: netdev@vger.kernel.org
 Cc: =?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>,
@@ -63,9 +66,9 @@ Cc: =?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [RFC net-next 02/15] ipxlat: add RFC 6052 address conversion helpers
-Date: Thu, 19 Mar 2026 16:12:11 +0100
-Message-ID: <20260319151230.655687-3-ralf@mandelbit.com>
+Subject: [RFC net-next 03/15] ipxlat: add packet metadata control block helpers
+Date: Thu, 19 Mar 2026 16:12:12 +0100
+Message-ID: <20260319151230.655687-4-ralf@mandelbit.com>
 In-Reply-To: <20260319151230.655687-1-ralf@mandelbit.com>
 References: <20260319151230.655687-1-ralf@mandelbit.com>
 Precedence: bulk
@@ -86,7 +89,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269503-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269489-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[mandelbit.com];
@@ -94,7 +97,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.989];
+	NEURAL_HAM(-0.00)[-0.985];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[mandelbit.com:+];
@@ -102,40 +105,40 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[darkboxed.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mandelbit.com:dkim,mandelbit.com:email,mandelbit.com:mid]
-X-Rspamd-Queue-Id: CF56E2CDBD8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,darkboxed.org:email]
+X-Rspamd-Queue-Id: 463782CD89D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Introduce IPv4/IPv6 stateless address mapping helpers used by the
-translation pipeline. Add the core 4<->6 conversion routines, including
-RFC 6052 prefix embedding/extraction and the RFC 6791 fallback source
-selection logic used by ICMP translation paths.
+Add the per-skb control-block layout and shared packet helper routines
+used by translation stages introducing common metadata bookkeeping
+(offset rebasing and invariant checks) plus protocol-fragment helper
+utilities.
 
 Signed-off-by: Ralf Lici <ralf@mandelbit.com>
 ---
- drivers/net/ipxlat/Makefile  |   1 +
- drivers/net/ipxlat/address.c | 132 +++++++++++++++++++++++++++++++++++
- drivers/net/ipxlat/address.h |  59 ++++++++++++++++
- 3 files changed, 192 insertions(+)
- create mode 100644 drivers/net/ipxlat/address.c
- create mode 100644 drivers/net/ipxlat/address.h
+ drivers/net/ipxlat/Makefile |   1 +
+ drivers/net/ipxlat/packet.c |  99 +++++++++++++++++++++
+ drivers/net/ipxlat/packet.h | 166 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 266 insertions(+)
+ create mode 100644 drivers/net/ipxlat/packet.c
+ create mode 100644 drivers/net/ipxlat/packet.h
 
 diff --git a/drivers/net/ipxlat/Makefile b/drivers/net/ipxlat/Makefile
-index bd48c2700bf5..b6367dedd78e 100644
+index b6367dedd78e..90dbc0489fa2 100644
 --- a/drivers/net/ipxlat/Makefile
 +++ b/drivers/net/ipxlat/Makefile
-@@ -5,3 +5,4 @@
- obj-$(CONFIG_IPXLAT) := ipxlat.o
+@@ -6,3 +6,4 @@ obj-$(CONFIG_IPXLAT) := ipxlat.o
  
  ipxlat-objs += main.o
-+ipxlat-objs += address.o
-diff --git a/drivers/net/ipxlat/address.c b/drivers/net/ipxlat/address.c
+ ipxlat-objs += address.o
++ipxlat-objs += packet.o
+diff --git a/drivers/net/ipxlat/packet.c b/drivers/net/ipxlat/packet.c
 new file mode 100644
-index 000000000000..d1a2b7d1768f
+index 000000000000..f82c375255f3
 --- /dev/null
-+++ b/drivers/net/ipxlat/address.c
-@@ -0,0 +1,132 @@
++++ b/drivers/net/ipxlat/packet.c
+@@ -0,0 +1,99 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*  IPXLAT - Stateless IP/ICMP Translation (SIIT) virtual device driver
 + *
@@ -149,131 +152,98 @@ index 000000000000..d1a2b7d1768f
 + *		Ralf Lici <ralf@mandelbit.com>
 + */
 +
-+#include "address.h"
++#include "packet.h"
 +
-+static bool ipxlat_prefix6_contains(const struct ipv6_prefix *prefix,
-+				    const struct in6_addr *addr)
++/* Shift cached skb cb offsets by the L3 header delta after in-place rewrite.
++ *
++ * Translation may replace only the outer L3 header size (4->6 or 6->4), while
++ * cached offsets were computed before rewrite. Rebasing applies the same delta
++ * to all cached absolute offsets so they still point to the same logical
++ * fields in the modified skb.
++ *
++ * This helper only guards against underflow (< 0). Relative ordering checks
++ * are done by ipxlat_cb_offsets_valid.
++ */
++int ipxlat_cb_rebase_offsets(struct ipxlat_cb *cb, int delta)
 +{
-+	return ipv6_prefix_equal(&prefix->addr, addr, prefix->len);
-+}
++	int off;
 +
-+static __be32 ipxlat_64_extract_addr(const struct in6_addr *src,
-+				     unsigned int q1, unsigned int q2,
-+				     unsigned int q3, unsigned int q4)
-+{
-+	q1 = src->s6_addr[q1];
-+	q2 = src->s6_addr[q2];
-+	q3 = src->s6_addr[q3];
-+	q4 = src->s6_addr[q4];
-+	return htonl((q1 << 24) | (q2 << 16) | (q3 << 8) | q4);
-+}
++	off = cb->l4_off + delta;
++	if (unlikely(off < 0))
++		return -EINVAL;
++	cb->l4_off = off;
 +
-+static void ipxlat_46_embed_addr(__be32 __src, struct in6_addr *dst,
-+				 unsigned int q1, unsigned int q2,
-+				 unsigned int q3, unsigned int q4)
-+{
-+	u32 src = ntohl(__src);
++	off = cb->payload_off + delta;
++	if (unlikely(off < 0))
++		return -EINVAL;
++	cb->payload_off = off;
 +
-+	dst->s6_addr[q1] = ((src >> 24) & 0xFF);
-+	dst->s6_addr[q2] = ((src >> 16) & 0xFF);
-+	dst->s6_addr[q3] = ((src >> 8) & 0xFF);
-+	dst->s6_addr[q4] = ((src) & 0xFF);
-+}
++	if (unlikely(cb->is_icmp_err)) {
++		off = cb->inner_l3_offset + delta;
++		if (unlikely(off < 0))
++			return -EINVAL;
++		cb->inner_l3_offset = off;
 +
-+void ipxlat_46_convert_addr(const struct ipv6_prefix *xlat_prefix6,
-+			    __be32 addr4, struct in6_addr *addr6)
-+{
-+	*addr6 = xlat_prefix6->addr;
++		off = cb->inner_l4_offset + delta;
++		if (unlikely(off < 0))
++			return -EINVAL;
++		cb->inner_l4_offset = off;
 +
-+	switch (xlat_prefix6->len) {
-+	case 96:
-+		addr6->s6_addr32[3] = addr4;
-+		return;
-+	case 64:
-+		ipxlat_46_embed_addr(addr4, addr6, 9, 10, 11, 12);
-+		return;
-+	case 56:
-+		ipxlat_46_embed_addr(addr4, addr6, 7, 9, 10, 11);
-+		return;
-+	case 48:
-+		ipxlat_46_embed_addr(addr4, addr6, 6, 7, 9, 10);
-+		return;
-+	case 40:
-+		ipxlat_46_embed_addr(addr4, addr6, 5, 6, 7, 9);
-+		return;
-+	case 32:
-+		addr6->s6_addr32[1] = addr4;
-+		return;
++		if (cb->inner_fragh_off) {
++			off = cb->inner_fragh_off + delta;
++			if (unlikely(off < 0))
++				return -EINVAL;
++			cb->inner_fragh_off = off;
++		}
 +	}
-+
-+	DEBUG_NET_WARN_ON_ONCE(1);
-+}
-+
-+int ipxlat_64_convert_addrs(const struct ipv6_prefix *xlat_prefix6,
-+			    const struct ipv6hdr *hdr6, bool icmp_err,
-+			    __be32 *src, __be32 *dst)
-+{
-+	bool src_ok;
-+
-+	src_ok = ipxlat_prefix6_contains(xlat_prefix6, &hdr6->saddr);
-+	if (unlikely(!src_ok && !icmp_err))
-+		return -EINVAL;
-+	if (unlikely(!ipxlat_prefix6_contains(xlat_prefix6, &hdr6->daddr)))
-+		return -EINVAL;
-+
-+	switch (xlat_prefix6->len) {
-+	case 96:
-+		if (likely(src_ok))
-+			*src = hdr6->saddr.s6_addr32[3];
-+		*dst = hdr6->daddr.s6_addr32[3];
-+		break;
-+	case 64:
-+		if (likely(src_ok))
-+			*src = ipxlat_64_extract_addr(&hdr6->saddr, 9, 10, 11,
-+						      12);
-+		*dst = ipxlat_64_extract_addr(&hdr6->daddr, 9, 10, 11, 12);
-+		break;
-+	case 56:
-+		if (likely(src_ok))
-+			*src = ipxlat_64_extract_addr(&hdr6->saddr, 7,
-+						      9, 10, 11);
-+		*dst = ipxlat_64_extract_addr(&hdr6->daddr, 7, 9, 10, 11);
-+		break;
-+	case 48:
-+		if (likely(src_ok))
-+			*src = ipxlat_64_extract_addr(&hdr6->saddr, 6,
-+						      7, 9, 10);
-+		*dst = ipxlat_64_extract_addr(&hdr6->daddr, 6, 7, 9, 10);
-+		break;
-+	case 40:
-+		if (likely(src_ok))
-+			*src = ipxlat_64_extract_addr(&hdr6->saddr, 5, 6, 7, 9);
-+		*dst = ipxlat_64_extract_addr(&hdr6->daddr, 5, 6, 7, 9);
-+		break;
-+	case 32:
-+		if (likely(src_ok))
-+			*src = hdr6->saddr.s6_addr32[1];
-+		*dst = hdr6->daddr.s6_addr32[1];
-+		break;
-+	default:
-+		DEBUG_NET_WARN_ON_ONCE(1);
-+		return -EINVAL;
-+	}
-+
-+	/* keep 6->4 ICMP error translation functional even when the ICMPv6
-+	 * source is not xlat_prefix6-mapped (for example, stack-generated PTB)
-+	 */
-+	if (unlikely(!src_ok))
-+		*src = htonl(INADDR_DUMMY);
 +
 +	return 0;
 +}
-diff --git a/drivers/net/ipxlat/address.h b/drivers/net/ipxlat/address.h
++
++#ifdef CONFIG_DEBUG_NET
++/* Verify ordering/range relations between cached skb cb offsets.
++ *
++ * Unlike ipxlat_cb_rebase_offsets, this checks structural invariants:
++ * l4 <= payload, inner_l3 >= payload, inner_l3 <= inner_l4, and fragment
++ * header (when present) located inside inner L3 area before inner L4.
++ */
++bool ipxlat_cb_offsets_valid(const struct ipxlat_cb *cb)
++{
++	if (unlikely(cb->payload_off < cb->l4_off))
++		return false;
++
++	if (unlikely(cb->is_icmp_err)) {
++		if (unlikely(cb->inner_l3_offset < cb->payload_off))
++			return false;
++		if (unlikely(cb->inner_l4_offset < cb->inner_l3_offset))
++			return false;
++		if (unlikely(cb->inner_fragh_off &&
++			     cb->inner_fragh_off < cb->inner_l3_offset))
++			return false;
++		if (unlikely(cb->inner_fragh_off &&
++			     cb->inner_fragh_off >= cb->inner_l4_offset))
++			return false;
++	}
++
++	return true;
++}
++#endif
++
++int ipxlat_v4_validate_skb(struct ipxlat_priv *ipxl, struct sk_buff *skb)
++{
++	return -EOPNOTSUPP;
++}
++
++int ipxlat_v6_validate_skb(struct sk_buff *skb)
++{
++	return -EOPNOTSUPP;
++}
+diff --git a/drivers/net/ipxlat/packet.h b/drivers/net/ipxlat/packet.h
 new file mode 100644
-index 000000000000..4283fdddac56
+index 000000000000..f39c25987940
 --- /dev/null
-+++ b/drivers/net/ipxlat/address.h
-@@ -0,0 +1,59 @@
++++ b/drivers/net/ipxlat/packet.h
+@@ -0,0 +1,166 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*  IPXLAT - Stateless IP/ICMP Translation (SIIT) virtual device driver
 + *
@@ -287,52 +257,159 @@ index 000000000000..4283fdddac56
 + *		Ralf Lici <ralf@mandelbit.com>
 + */
 +
-+#ifndef _NET_IPXLAT_ADDRESS_H_
-+#define _NET_IPXLAT_ADDRESS_H_
++#ifndef _NET_IPXLAT_PACKET_H_
++#define _NET_IPXLAT_PACKET_H_
 +
-+#include <linux/ip.h>
-+#include <net/ipv6.h>
++#include <net/ip.h>
 +
 +#include "ipxlpriv.h"
 +
 +/**
-+ * ipxlat_46_convert_addr - translate one IPv4 address into RFC 6052 IPv6 form
-+ * @xlat_prefix6: configured RFC 6052 prefix
-+ * @addr4: IPv4 address to convert
-+ * @addr6: output IPv6 address
++ * struct ipxlat_cb - per-skb parser and control metadata stored in skb->cb
++ * @l4_off: outer L4 header offset
++ * @payload_off: outer payload offset
++ * @fragh_off: outer IPv6 Fragment Header offset, or 0 if absent
++ * @inner_l3_offset: quoted inner L3 offset for ICMP errors
++ * @inner_l4_offset: quoted inner L4 offset for ICMP errors
++ * @inner_fragh_off: quoted inner IPv6 Fragment Header offset, or 0
++ * @udp_zero_csum_len: outer UDP length used for 4->6 checksum synthesis
++ * @frag_max_size: pre-fragment payload cap for ip_do_fragment
++ * @l4_proto: outer L4 protocol (or nexthdr for IPv6)
++ * @inner_l4_proto: quoted inner L4 protocol
++ * @l3_hdr_len: outer L3 header length including extension headers
++ * @inner_l3_hdr_len: quoted inner L3 header length
++ * @is_icmp_err: packet is ICMP error and carries quoted inner packet
++ * @emit_icmp_err: datapath must emit translator-generated ICMP on drop
++ * @icmp_err: ICMP type/code/info cached for deferred emission
++ * @icmp_err.type: ICMP type to emit
++ * @icmp_err.code: ICMP code to emit
++ * @icmp_err.info: ICMP auxiliary info (e.g. pointer/MTU)
 + */
-+void ipxlat_46_convert_addr(const struct ipv6_prefix *xlat_prefix6,
-+			    __be32 addr4, struct in6_addr *addr6);
++struct ipxlat_cb {
++	u16 l4_off;
++	u16 payload_off;
++	u16 fragh_off;
++	u16 inner_l3_offset;
++	u16 inner_l4_offset;
++	u16 inner_fragh_off;
++	/* L4 span length (UDP header + payload) for outer IPv4 UDP packets
++	 * arriving with checksum 0.
++	 */
++	u16 udp_zero_csum_len;
++	u16 frag_max_size;
++	u8 l4_proto;
++	u8 inner_l4_proto;
++	u8 l3_hdr_len;
++	u8 inner_l3_hdr_len;
++	bool is_icmp_err;
++	bool emit_icmp_err;
++	struct {
++		u8 type;
++		u8 code;
++		u32 info;
++	} icmp_err;
++};
 +
 +/**
-+ * ipxlat_64_convert_addrs - translate outer IPv6 endpoints into IPv4 pair
-+ * @xlat_prefix6: configured RFC 6052 prefix
-+ * @hdr6: source IPv6 header
-+ * @icmp_err: source packet is ICMPv6 error
-+ * @src: output IPv4 source address
-+ * @dst: output IPv4 destination address
++ * ipxlat_skb_cb - return ipxlat private control block in skb->cb
++ * @skb: skb carrying ipxlat metadata
 + *
-+ * Return: 0 on success, negative errno on non-translatable addresses.
++ * Return: pointer to &struct ipxlat_cb stored in the control buffer of @skb.
 + */
-+int ipxlat_64_convert_addrs(const struct ipv6_prefix *xlat_prefix6,
-+			    const struct ipv6hdr *hdr6, bool icmp_err,
-+			    __be32 *src, __be32 *dst);
-+
-+/**
-+ * ipxlat_46_convert_addrs - translate outer IPv4 endpoints into IPv6 pair
-+ * @xlat_prefix6: configured RFC 6052 prefix
-+ * @iph4: source IPv4 header
-+ * @iph6: output IPv6 header (only saddr/daddr are updated)
-+ */
-+static inline void
-+ipxlat_46_convert_addrs(const struct ipv6_prefix *xlat_prefix6,
-+			const struct iphdr *iph4, struct ipv6hdr *iph6)
++static inline struct ipxlat_cb *ipxlat_skb_cb(const struct sk_buff *skb)
 +{
-+	ipxlat_46_convert_addr(xlat_prefix6, iph4->saddr, &iph6->saddr);
-+	ipxlat_46_convert_addr(xlat_prefix6, iph4->daddr, &iph6->daddr);
++	BUILD_BUG_ON(sizeof(struct ipxlat_cb) > sizeof(skb->cb));
++	return (struct ipxlat_cb *)(skb->cb);
 +}
 +
-+#endif /* _NET_IPXLAT_ADDRESS_H_ */
++static inline unsigned int ipxlat_skb_datagram_len(const struct sk_buff *skb)
++{
++	return skb->len - skb_transport_offset(skb);
++}
++
++static inline u8 ipxlat_get_ipv6_tclass(const struct ipv6hdr *hdr)
++{
++	return (hdr->priority << 4) | (hdr->flow_lbl[0] >> 4);
++}
++
++static inline u16 ipxlat_get_frag6_offset(const struct frag_hdr *hdr)
++{
++	return be16_to_cpu(hdr->frag_off) & 0xFFF8U;
++}
++
++static inline u16 ipxlat_get_frag4_offset(const struct iphdr *hdr)
++{
++	return (be16_to_cpu(hdr->frag_off) & IP_OFFSET) << 3;
++}
++
++static inline bool ipxlat_is_first_frag6(const struct frag_hdr *hdr)
++{
++	return hdr ? (ipxlat_get_frag6_offset(hdr) == 0) : true;
++}
++
++static inline bool ipxlat_is_first_frag4(const struct iphdr *hdr)
++{
++	return !(hdr->frag_off & htons(IP_OFFSET));
++}
++
++static inline __be16 ipxlat_build_frag6_offset(u16 frag_offset, bool mf)
++{
++	return cpu_to_be16((frag_offset & 0xFFF8U) | mf);
++}
++
++static inline __be16
++ipxlat_build_frag4_offset(bool df, bool mf, u16 frag_offset)
++{
++	return cpu_to_be16((df ? (1U << 14) : 0) | (mf ? (1U << 13) : 0) |
++			   (frag_offset >> 3));
++}
++
++/**
++ * ipxlat_cb_rebase_offsets - shift cached cb offsets after skb relayout
++ * @cb: parsed packet metadata
++ * @delta: signed byte delta applied to cached offsets
++ *
++ * Return: 0 on success, negative errno if rebased offsets would underflow.
++ */
++int ipxlat_cb_rebase_offsets(struct ipxlat_cb *cb, int delta);
++#ifdef CONFIG_DEBUG_NET
++/**
++ * ipxlat_cb_offsets_valid - validate monotonicity and bounds of cb offsets
++ * @cb: parsed packet metadata
++ *
++ * Return: true if cached offsets are internally consistent.
++ */
++bool ipxlat_cb_offsets_valid(const struct ipxlat_cb *cb);
++#else
++static inline bool ipxlat_cb_offsets_valid(const struct ipxlat_cb *cb)
++{
++	return true;
++}
++#endif
++
++/**
++ * ipxlat_v4_validate_skb - validate and summarize IPv4 packet into skb->cb
++ * @ipxlat: translator private context
++ * @skb: packet to validate
++ *
++ * Populates &struct ipxlat_cb and may mark translator-generated ICMP action on
++ * failure paths.
++ *
++ * Return: 0 on success, negative errno on validation failure.
++ */
++int ipxlat_v4_validate_skb(struct ipxlat_priv *ipxlat, struct sk_buff *skb);
++
++/**
++ * ipxlat_v6_validate_skb - validate and summarize IPv6 packet into skb->cb
++ * @skb: packet to validate
++ *
++ * Populates &struct ipxlat_cb for subsequent 6->4 translation.
++ *
++ * Return: 0 on success, negative errno on validation failure.
++ */
++int ipxlat_v6_validate_skb(struct sk_buff *skb);
++
++#endif /* _NET_IPXLAT_PACKET_H_ */
 -- 
 2.53.0
 
