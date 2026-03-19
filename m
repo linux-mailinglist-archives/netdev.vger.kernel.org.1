@@ -1,186 +1,212 @@
-Return-Path: <netdev+bounces-269390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269391-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KAmrAOvJu2leoQIAu9opvQ
-	(envelope-from <netdev+bounces-269390-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:03:23 +0100
+	id IFErGInLu2leoQIAu9opvQ
+	(envelope-from <netdev+bounces-269391-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:10:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D1CF2C9355
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:03:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7E982C945F
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:10:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 298D832851CC
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:56:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B44930107C6
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 247DD347FF4;
-	Thu, 19 Mar 2026 09:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C55A374E69;
+	Thu, 19 Mar 2026 10:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQmu/DMG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="dgoX3oZU"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599CE341055;
-	Thu, 19 Mar 2026 09:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE24366DDA
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 10:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773914184; cv=none; b=KjInnE+mA8Tapm8WzLl8MMvkIf58AMrvmX1q1teO9eZqnOTQNIX0FZrwix/C4c/vHDYvUElwvcRakrcy1cfeVhMqL3Zl8KOkzrwyMfLXtGfuv5PKCwWG1csNZWozzfBxsmllNF8KCIpFE8tmn729njwn+Eo8LdzVF7aihqOICgc=
+	t=1773914650; cv=none; b=AdOYgJEWjClzVrUxkMc6pwp+aE2HwzLfwlKDJbL4xgnF8jfepwFFBqtDkEU15NapnH0QKdLO0N8sx7IKlkYlY0t3fqZdOi6i+KIJ9ypoXUBRmK3uUUMjL3BJyos1+cnmTqnYMx2KJAfs/DEeR6cgAcTn+y5BSWimd36/bWZm9Lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773914184; c=relaxed/simple;
-	bh=2hMouKBOO7iljDh84gym0ir5SjUx+qmM6vACrsQWh1k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=iYP1obWfXnuFpXPiIMh4ShA7KutLlxnM4U53M0sIbZl6WXfb5bBbd5D1Fkfc2n2u84txCRoXen1h6BxhmJWPC7gIIkWrc4OjLHDt+BQ5QlW8mzELCKpQjf4ku1rO167X6dZJ/KSnoj7WRtGpu/GWwIkigEIm6wA+nlEoVC6ACDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=162.243.161.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from lizhi2$eswincomputing.com ( [10.11.96.26] ) by
- ajax-webmail-app1 (Coremail) ; Thu, 19 Mar 2026 17:55:31 +0800 (GMT+08:00)
-Date: Thu, 19 Mar 2026 17:55:31 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
-To: krzk+dt@kernel.org, "Conor Dooley" <conor@kernel.org>
-Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, robh@kernel.org,
-	conor+dt@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk, wens@kernel.org, pjw@kernel.org,
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr,
-	linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	ningyu@eswincomputing.com, linmin@eswincomputing.com,
-	pinkesh.vaghela@einfochips.com, pritesh.patel@einfochips.com,
-	weishangjuan@eswincomputing.com
-Subject: Re: Re: [PATCH net-next v4 1/3] dt-bindings: ethernet: eswin: add
- clock sampling control
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
- 20241203(6b039d88) Copyright (c) 2002-2026 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <20260313-stiffness-item-c451eaef970d@spud>
-References: <20260313075234.1567-1-lizhi2@eswincomputing.com>
- <20260313075351.1584-1-lizhi2@eswincomputing.com>
- <20260313-stiffness-item-c451eaef970d@spud>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1773914650; c=relaxed/simple;
+	bh=EoTZPubaOw78yUjAPouKCn9akhrYqbdnX3O6MB3/jFk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VpwJ8RJg4/luhynwhzpjX6Vp1FzPOn2E428uZh6IyVWntfpc165ISSnGiXPkZufGarXiGL9qiOZjEyNljPv+XjED3sb5f++Wx2XS1N6hFEiNtPvig4avMA0z7DT8+0+zF/qxYAIUEU1BIV7VAT5iP0KZZp4yiKVesKENa5dziJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PQmu/DMG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=dgoX3oZU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773914647;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AuL6cGxv8hO26vrrFZgV4HgLSGxYGB371+xstAsQUlA=;
+	b=PQmu/DMG4Pv3JSOBDTyalplwwhB/9EaCSyGkU2jW64rNeKSsk4HU/nQTn3/lldrc5UJj3K
+	1r+UjnsZEumlyZOkGNapeUrAp9CviGt6DQQEFUQmNFeTyh5rQo3YrcuELsok2CYKUl3CBh
+	o9mEYUBxsHnrLBKWzfZHUT4UEdUYBj8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-cXVJZUlUMEyUa6f-H37yWw-1; Thu, 19 Mar 2026 06:04:06 -0400
+X-MC-Unique: cXVJZUlUMEyUa6f-H37yWw-1
+X-Mimecast-MFC-AGG-ID: cXVJZUlUMEyUa6f-H37yWw_1773914645
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-485350666bfso4029815e9.3
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 03:04:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1773914645; x=1774519445; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AuL6cGxv8hO26vrrFZgV4HgLSGxYGB371+xstAsQUlA=;
+        b=dgoX3oZUMUfOGz3/J0u8TikuxBlRzUOvOivXO+0ZGENMYyKMdOZNtgdAUnP6DV0B61
+         aR2JjtR6tnFT+93FdhSqfnGwLOVxXH9Vk4Cu3vs7UY4vE29SNRjq+63ZNj1Bfc/a3kRq
+         vD0u53L5CfxZj0pNtuZpZr82mUQSnU/+rnaHG0MAjy9e6MRUpjSR8h+xBF7fTB0byof/
+         CnaO31kOFJVRFPqonmJYrzDUqwGVosz8R2m86N66DJc5eAtPocE0SkpHBE9CFxYvhccz
+         clKQZGbeyRTjNSMZnzMBMBmy7UJt38jGv6otm4mdQcK7WJRNm3vdZGLGN2poRUlSzziZ
+         O/ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773914645; x=1774519445;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AuL6cGxv8hO26vrrFZgV4HgLSGxYGB371+xstAsQUlA=;
+        b=ob3KdpHZvbGt6NJT2N0fdYHmdpprZ0MF245mbkFAEFMQCBw4lVr4siNfPg2lFJgX9c
+         UWoRGFEG7/nz5xrHBaINutEXW7sHdCBp8NgMFbxy3mMbBUdTsq6jQpAqYexgXbVRYS5L
+         nnsh36AIXV2lHekmVOxE0hrtMiiK2KbKIvFabPDbdUCnuqh4a7IOhdphYsF2Bi9Ogq5D
+         j0NKX2ROjXHDGe8WP7tIgFT2+FN5umVQz8W4E9E+MTBXU9AU8ayU9IJPhKpDfG14nVzh
+         Ky5riGBdKyFkINazcxgKcDmXAnlnBofHdbDEWCtZ4KRcPmaCqMxRpBXLwp6hRF6vlE/m
+         rwDg==
+X-Forwarded-Encrypted: i=1; AJvYcCUT0vb3jz0hyF+1kVGbJr4ZNxijauz4rt9aKB6NPAtBIiZDz8Z25mSacGs4T3ts8D2zoU5ad98=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxzdwig2ZUXb1V7Vw7U+WAcY4ywmqZRkWBIsXNS00oNyydBlTVq
+	U+2AE8CHz7YDFfDDE4J/KbSV0Qj6EA9FwsUnFx5U7a/gDN6+GtLzYll0wDZEBL0b8rI0vRGP1Ei
+	FaX412ChRSzJJc+GUqN0Mp5uylzxy76MuK+KM/1Wo264Wye15nxibfT5Y3A==
+X-Gm-Gg: ATEYQzwOoU0G4TNdoHq4GsAq5rXAhIUodnUM8XATPBqiiPNTAuifiZNgAjtE/36xFne
+	ppX1EdqRb4txCoEaKPNe1KijLwvMShsVvqxRe0m0V4YRVUgdVm46zUqzv6dxlpXffZKBbg/ajpJ
+	NCGnmGc2geWvwrNuPrsxDxrjGYP27OJCsab8UQeBdOczxC+Hq/2uQOpToToKW/AFTD1j7rAW/pY
+	xJRGD4hcNE4jtKjx77cyz1Kyg4CPTSH1GSiPUJvTtvu5j13HHpanr9fSRPbEHl8FVLhboiG0BL3
+	p2b/KMjCEHrhUsWbMboA99rCYQQXVHLitPmtE1psqCcZ1SwObghCvl2mjQ0dCclMVrw4RSYNHZJ
+	7hNHv0HQuSx9vdkqhykin8LXrGMVqMOuzzcdeKPgqIZKDJD3w
+X-Received: by 2002:a05:600c:3516:b0:485:3fe6:2209 with SMTP id 5b1f17b1804b1-486f4427146mr104986025e9.11.1773914645113;
+        Thu, 19 Mar 2026 03:04:05 -0700 (PDT)
+X-Received: by 2002:a05:600c:3516:b0:485:3fe6:2209 with SMTP id 5b1f17b1804b1-486f4427146mr104985395e9.11.1773914644542;
+        Thu, 19 Mar 2026 03:04:04 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f8c351f8sm52909605e9.6.2026.03.19.03.04.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2026 03:04:03 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id D72C55A3493; Thu, 19 Mar 2026 11:04:02 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ davem@davemloft.net, andrew+netdev@lunn.ch, horms@kernel.org,
+ jhs@mojatatu.com, jiri@resnulli.us, sdf@fomichev.me,
+ j.koeppeler@tu-berlin.de, mfreemon@cloudflare.com, carges@cloudflare.com,
+ kernel-team <kernel-team@cloudflare.com>
+Subject: Re: [RFC PATCH net-next 2/6] veth: implement Byte Queue Limits
+ (BQL) for latency reduction
+In-Reply-To: <cbfc927d-0b96-4788-8bf6-8a2ffa4dd9f4@kernel.org>
+References: <20260318134826.1281205-1-hawk@kernel.org>
+ <20260318134826.1281205-3-hawk@kernel.org> <87ms05nrdw.fsf@toke.dk>
+ <cbfc927d-0b96-4788-8bf6-8a2ffa4dd9f4@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 19 Mar 2026 11:04:02 +0100
+Message-ID: <87h5qcnnjh.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <4d45d39b.591c.19d05858b58.Coremail.lizhi2@eswincomputing.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:TAJkCgDHaXMTyLtpTOUJAA--.3066W
-X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/1tbiAgELDGm61AkcbQAAs7
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW3Jw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spamd-Result: default: False [1.14 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-269391-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:url,toke.dk:mid];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269390-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[eswincomputing.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	HAS_X_PRIO_THREE(0.00)[3];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	R_DKIM_NA(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com,eswincomputing.com,einfochips.com];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	NEURAL_SPAM(0.00)[0.572];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8D1CF2C9355
+	NEURAL_HAM(-0.00)[-0.962];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: D7E982C945F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-SGkgS3J6eXN6dG9mLAoKQ291bGQgeW91IHBsZWFzZSB0YWtlIGEgbG9vayBhdCBDb25vcuKAmXMg
-ZmVlZGJhY2sgb24gdGhlIGNvbXBhdGlibGUgbmFtaW5nPwoKQ29ub3IgaGFzIHJldmlld2VkIHRo
-ZSBwYXRjaCBhbmQgcHJvdmlkZWQgaGlzIEFja2VkLWJ5LCBidXQgYWxzbyBub3RlZAp0aGF0IHRo
-ZXJlIG1pZ2h0IGJlIGNvbmNlcm5zIHJlZ2FyZGluZyB0aGUgY29tcGF0aWJsZSBzdHJpbmcuCgpQ
-bGVhc2UgbGV0IG1lIGtub3cgaWYgdGhlIGN1cnJlbnQgbmFtaW5nIGlzIGFjY2VwdGFibGUsIG9y
-IGlmIGFueSBjaGFuZ2VzCmFyZSByZXF1aXJlZC4KClRoYW5rcywKWmhpIExpCgoKPiAtLS0tLeWO
-n+Wni+mCruS7ti0tLS0tCj4g5Y+R5Lu25Lq6OiAiQ29ub3IgRG9vbGV5IiA8Y29ub3JAa2VybmVs
-Lm9yZz4KPiDlj5HpgIHml7bpl7Q6MjAyNi0wMy0xNCAwMTozOTo1OCAo5pif5pyf5YWtKQo+IOaU
-tuS7tuS6ujogbGl6aGkyQGVzd2luY29tcHV0aW5nLmNvbQo+IOaKhOmAgTogZGV2aWNldHJlZUB2
-Z2VyLmtlcm5lbC5vcmcsIGFuZHJldytuZXRkZXZAbHVubi5jaCwgZGF2ZW1AZGF2ZW1sb2Z0Lm5l
-dCwgZWR1bWF6ZXRAZ29vZ2xlLmNvbSwga3ViYUBrZXJuZWwub3JnLCByb2JoQGtlcm5lbC5vcmcs
-IGtyemsrZHRAa2VybmVsLm9yZywgY29ub3IrZHRAa2VybmVsLm9yZywgbmV0ZGV2QHZnZXIua2Vy
-bmVsLm9yZywgcGFiZW5pQHJlZGhhdC5jb20sIG1jb3F1ZWxpbi5zdG0zMkBnbWFpbC5jb20sIGFs
-ZXhhbmRyZS50b3JndWVAZm9zcy5zdC5jb20sIHJtaytrZXJuZWxAYXJtbGludXgub3JnLnVrLCB3
-ZW5zQGtlcm5lbC5vcmcsIHBqd0BrZXJuZWwub3JnLCBwYWxtZXJAZGFiYmVsdC5jb20sIGFvdUBl
-ZWNzLmJlcmtlbGV5LmVkdSwgYWxleEBnaGl0aS5mciwgbGludXgtcmlzY3ZAbGlzdHMuaW5mcmFk
-ZWFkLm9yZywgbGludXgtc3RtMzJAc3QtbWQtbWFpbG1hbi5zdG9ybXJlcGx5LmNvbSwgbGludXgt
-YXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnLCBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwu
-b3JnLCBuaW5neXVAZXN3aW5jb21wdXRpbmcuY29tLCBsaW5taW5AZXN3aW5jb21wdXRpbmcuY29t
-LCBwaW5rZXNoLnZhZ2hlbGFAZWluZm9jaGlwcy5jb20sIHByaXRlc2gucGF0ZWxAZWluZm9jaGlw
-cy5jb20sIHdlaXNoYW5nanVhbkBlc3dpbmNvbXB1dGluZy5jb20KPiDkuLvpopg6IFJlOiBbUEFU
-Q0ggbmV0LW5leHQgdjQgMS8zXSBkdC1iaW5kaW5nczogZXRoZXJuZXQ6IGVzd2luOiBhZGQgY2xv
-Y2sgc2FtcGxpbmcgY29udHJvbAo+IAo+IE9uIEZyaSwgTWFyIDEzLCAyMDI2IGF0IDAzOjUzOjUx
-UE0gKzA4MDAsIGxpemhpMkBlc3dpbmNvbXB1dGluZy5jb20gd3JvdGU6Cj4gPiBGcm9tOiBaaGkg
-TGkgPGxpemhpMkBlc3dpbmNvbXB1dGluZy5jb20+Cj4gPiAKPiA+IER1ZSB0byBjaGlwIGJhY2tl
-bmQgcmVhc29ucywgdGhlcmUgaXMgYWxyZWFkeSBhbiBhcHByb3hpbWF0ZWx5IDQtNSBucwo+ID4g
-c2tldyBiZXR3ZWVuIHRoZSBSWCBjbG9jayBhbmQgZGF0YSBvZiB0aGUgZXRoMSBNQUMgY29udHJv
-bGxlciBpbnNpZGUKPiA+IHRoZSBzaWxpY29uLgo+ID4gCj4gPiBGb3IgMTAwME0sIHRoZSBSWCBj
-bG9jayBtdXN0IGJlIGludmVydGVkIHNpbmNlIGl0IGlzIG5vdCBwb3NzaWJsZSB0bwo+ID4gbWVl
-dCB0aGUgUkdNSUkgdGltaW5nIHJlcXVpcmVtZW50cyB1c2luZyBvbmx5IHJ4LWludGVybmFsLWRl
-bGF5LXBzIG9uCj4gPiB0aGUgTUFDIHRvZ2V0aGVyIHdpdGggdGhlIHN0YW5kYXJkIDIgbnMgZGVs
-YXkgb24gdGhlIFBIWS4gVGhlcmVmb3JlLAo+ID4gZXZlbiBvbiBhIHByb3Blcmx5IGRlc2lnbmVk
-IGJvYXJkLCBldGgxIHN0aWxsIHJlcXVpcmVzIFJYIGNsb2NrCj4gPiBpbnZlcnNpb24uCj4gPiAK
-PiA+IFRoaXMgYmVoYXZpb3VyIGVmZmVjdGl2ZWx5IGJyZWFrcyB0aGUgUkdNSUkgdGltaW5nIGFz
-c3VtcHRpb25zIGF0IHRoZQo+ID4gU29DIGxldmVsLgo+ID4gCj4gPiBGb3IgdGhlIFRYIHBhdGgg
-b2YgZXRoMSwgdGhlcmUgaXMgYWxzbyBhIHNrZXcgYmV0d2VlbiB0aGUgVFggY2xvY2sKPiA+IGFu
-ZCBkYXRhIG9uIHRoZSBNQUMgY29udHJvbGxlciBpbnNpZGUgdGhlIHNpbGljb24uIFRoaXMgc2tl
-dyBoYXBwZW5zCj4gPiB0byBiZSBhcHByb3hpbWF0ZWx5IDIgbnMuIFRoZXJlZm9yZSwgaXQgY2Fu
-IGJlIGNvbnNpZGVyZWQgdGhhdCB0aGUKPiA+IDIgbnMgZGVsYXkgb2YgVFggaXMgcHJvdmlkZWQg
-YnkgdGhlIE1BQywgc28gdGhlIFRYIGlzIGNvbXBsaWFudCB3aXRoCj4gPiB0aGUgUkdNSUkgc3Rh
-bmRhcmQuCj4gPiAKPiA+IEZvciAxMC8xMDAgb3BlcmF0aW9uLCB0aGUgYXBwcm94aW1hdGVseSA0
-LTUgbnMgc2tldyBpbiB0aGUgY2hpcCBkb2VzCj4gPiBub3QgYnJlYWsgdGhlIHN0YW5kYXJkLiBU
-aGUgUkdNSUkgdGltaW5nIHRhYmxlIChTZWN0aW9uIDMuMykgc3BlY2lmaWVzCj4gPiB0aGF0IGZv
-ciAxMC8xMDAgb3BlcmF0aW9uIHRoZSBtYXhpbXVtIHZhbHVlIGlzIHVuc3BlY2lmaWVkOgo+ID4g
-aHR0cHM6Ly9jb21tdW5pdHkubnhwLmNvbS9wd214eTg3NjU0L2F0dGFjaG1lbnRzL3B3bXh5ODc2
-NTQvaW14LXByb2Nlc3NvcnMvMjA2NTUvMS9SR01JSXYyXzBfZmluYWxfaHAucGRmCj4gPiAKPiA+
-IER1ZSB0byB0aGUgZXRoMSBzaWxpY29uIGJlaGF2aW9yIGRlc2NyaWJlZCBhYm92ZSwgYSBuZXcg
-Y29tcGF0aWJsZQo+ID4gc3RyaW5nICJlc3dpbixlaWM3NzAwLXFvcy1ldGgtY2xrLWludmVyc2lv
-biIgaXMgYWRkZWQgdG8gdGhlIGRldmljZQo+ID4gdHJlZS4gVGhpcyBhbGxvd3MgdGhlIGRyaXZl
-ciB0byBoYW5kbGUgdGhlIGRpZmZlcmVuY2VzIGJldHdlZW4gZXRoMQo+ID4gYW5kIGV0aDAgdGhy
-b3VnaCBkZWRpY2F0ZWQgbG9naWMuCj4gPiAKPiA+IFRoZSByeC1pbnRlcm5hbC1kZWxheS1wcyBh
-bmQgdHgtaW50ZXJuYWwtZGVsYXktcHMgcHJvcGVydGllcyBub3cgdXNlCj4gPiBtaW5pbXVtIGFu
-ZCBtYXhpbXVtIGNvbnN0cmFpbnRzIHRvIHJlZmxlY3QgdGhlIGFjdHVhbCBoYXJkd2FyZSBkZWxh
-eQo+ID4gcmFuZ2UgKDAtMjU0MCBwcykgYXBwbGllZCBpbiAyMCBwcyBzdGVwcy4gVGhpcyByZWxh
-eGVzIHRoZSBiaW5kaW5nCj4gPiB2YWxpZGF0aW9uIGNvbXBhcmVkIHRvIHRoZSBwcmV2aW91cyBl
-bnVtLWJhc2VkIGRlZmluaXRpb24gYW5kIGF2b2lkcwo+ID4gcmVncmVzc2lvbnMgZm9yIGV4aXN0
-aW5nIERUQnMgd2hpbGUga2VlcGluZyB0aGUgc2FtZSBoYXJkd2FyZSBsaW1pdHMuCj4gPiAKPiA+
-IFRyZWF0IHRoZSBSWC9UWCBpbnRlcm5hbCBkZWxheSBwcm9wZXJ0aWVzIGFzIG9wdGlvbmFsLCBi
-b2FyZC1zcGVjaWZpYwo+ID4gdHVuaW5nIGtub2JzIGFuZCByZW1vdmUgdGhlbSBmcm9tIHRoZSBl
-eGFtcGxlIHRvIGF2b2lkIGVuY291cmFnaW5nCj4gPiB0aGVpciB1c2UuCj4gPiAKPiA+IEluIGFk
-ZGl0aW9uLCB0aGUgYmluZGluZyBub3cgaW5jbHVkZXMgYWRkaXRpb25hbCBiYWNrZ3JvdW5kIGlu
-Zm9ybWF0aW9uCj4gPiBhYm91dCB0aGUgSFNQIENTUiByZWdpc3RlcnMgYWNjZXNzZWQgYnkgdGhl
-IE1BQy4gVGhlIFRYRCBhbmQgUlhEIGRlbGF5Cj4gPiBjb250cm9sIHJlZ2lzdGVycyBhcmUgaW5j
-bHVkZWQgc28gdGhlIGRyaXZlciBjYW4gZXhwbGljaXRseSBjbGVhciBhbnkKPiA+IHJlc2lkdWFs
-IGNvbmZpZ3VyYXRpb24gbGVmdCBieSB0aGUgYm9vdGxvYWRlci4KPiA+IAo+ID4gQmFja2dyb3Vu
-ZCByZWZlcmVuY2UgZm9yIHRoZSBIaWdoLVNwZWVkIFN1YnN5c3RlbSBhbmQgSFNQIENTUiBibG9j
-ayBpcwo+ID4gYXZhaWxhYmxlIGluIENoYXB0ZXIgMTAgKCJIaWdoLVNwZWVkIEludGVyZmFjZSIp
-IG9mIHRoZSBFSUM3NzAwWCBTb0MKPiA+IFRlY2huaWNhbCBSZWZlcmVuY2UgTWFudWFsLCBQYXJ0
-IDQKPiA+IChFSUM3NzAwWF9Tb0NfVGVjaG5pY2FsX1JlZmVyZW5jZV9NYW51YWxfUGFydDQucGRm
-KToKPiA+IGh0dHBzOi8vZ2l0aHViLmNvbS9lc3dpbmNvbXB1dGluZy9FSUM3NzAwWC1Tb0MtVGVj
-aG5pY2FsLVJlZmVyZW5jZS1NYW51YWwvcmVsZWFzZXMKPiA+IAo+ID4gVGhlcmUgYXJlIGN1cnJl
-bnRseSBubyBpbi10cmVlIHVzZXJzIG9mIHRoZSBFSUM3NzAwIEV0aGVybmV0IGRyaXZlciwgc28K
-PiA+IHRoZXNlIGNoYW5nZXMgYXJlIHNhZmUuCj4gPiAKPiA+IEZpeGVzOiA4ODhiZDBlY2E5M2Mg
-KCJkdC1iaW5kaW5nczogZXRoZXJuZXQ6IGVzd2luOiBEb2N1bWVudCBmb3IgRUlDNzcwMCBTb0Mi
-KQo+ID4gU2lnbmVkLW9mZi1ieTogWmhpIExpIDxsaXpoaTJAZXN3aW5jb21wdXRpbmcuY29tPgo+
-IAo+IEtyenlzenRvZiBtaWdodCBub3QgeWV0IGJlIGhhcHB5IHdpdGggdGhlIGNvbXBhdGlibGUg
-bmFtaW5nLCBidXQgZnJvbSBteQo+IHBvdjoKPiBBY2tlZC1ieTogQ29ub3IgRG9vbGV5IDxjb25v
-ci5kb29sZXlAbWljcm9jaGlwLmNvbT4K
+Jesper Dangaard Brouer <hawk@kernel.org> writes:
+
+> On 18/03/2026 15.28, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> hawk@kernel.org writes:
+>>=20
+>>> From: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>
+>>> Add BQL support to the veth driver to dynamically limit the number of
+>>> bytes queued in the ptr_ring, giving the qdisc earlier feedback to shape
+>>> traffic and reduce latency.
+>>>
+>>> The BQL charge (netdev_tx_sent_queue) is placed in veth_xmit() BEFORE
+>>> veth_forward_skb() produces the SKB into the ptr_ring. This ordering is
+>>> critical: with threaded NAPI the consumer runs on a separate CPU and can
+>>> complete the SKB (calling dql_completed) before veth_xmit() returns. If
+>>> the charge happened after the produce, the completion could race ahead
+>>> of the charge, violating dql_completed()'s invariant that completed
+>>> bytes never exceed queued bytes (BUG_ON).
+>>>
+>>> Whether an SKB was BQL-charged is tracked per-SKB using a VETH_BQL_FLAG
+>>> bit in the ptr_ring pointer (BIT(1), alongside the existing VETH_XDP_FL=
+AG
+>>> BIT(0)). The do_bql flag from veth_xmit() propagates through
+>>> veth_forward_skb() and veth_xdp_rx() into the ptr_ring entry. On the
+>>> completion side in veth_xdp_rcv(), veth_ptr_is_bql() reads the flag to
+>>> decide whether to call netdev_tx_completed_queue(). Per-SKB tracking is
+>>> necessary because the qdisc can be replaced live (e.g. noqueue->sfq or
+>>> vice versa via 'tc qdisc replace') while SKBs are already in-flight in
+>>> the ptr_ring. SKBs charged under the old qdisc must complete correctly
+>>> regardless of what qdisc is attached when the consumer runs, so each
+>>> SKB carries its own BQL-charged state rather than re-checking the peer's
+>>> qdisc at completion time.
+>>=20
+>> It's not completely obvious to me why BQL can't be active regardless of
+>> whether there's a qdisc installed or not? If there's no qdisc, shouldn't
+>> BQL auto-tune to a higher value because the queue runs empty more?
+>>=20
+>
+> When net_device don't have qdisc we hit this code path:
+>   - [0]=20
+> https://elixir.bootlin.com/linux/v7.0-rc4/source/net/core/dev.c#L4806-L48=
+52
+>   - Notice the check if(!netif_xmit_stopped(txq))
+>   - resulting in "Virtual device %s asks to queue packet!"
+>
+> We cannot unconditionally track BQL as calling netdev_tx_sent_queue()
+> can result in setting STACK_XOFF.  Resulting in above code dropping
+> packets and complaining.  (It have no qdisc to requeue store back-
+> pressured packet).
+
+Ah, right. I realised the packet would be dropped, of course, but I did
+not realise the stack would complain. That seems... odd? Why not just
+get rid of the complaint instead of having this kludge to work around
+it?
+
+-Toke
+
 
