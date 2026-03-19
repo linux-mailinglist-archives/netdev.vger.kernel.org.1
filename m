@@ -1,194 +1,178 @@
-Return-Path: <netdev+bounces-269441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269442-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cEEnIozzu2nkqQIAu9opvQ
-	(envelope-from <netdev+bounces-269441-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:01:00 +0100
+	id YM4JIvvyu2nkqQIAu9opvQ
+	(envelope-from <netdev+bounces-269442-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 13:58:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CED52CB977
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:00:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ED272CB8CB
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 13:58:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A9E103187562
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 12:55:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 612493008D58
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 12:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369713AD536;
-	Thu, 19 Mar 2026 12:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B00A3D34A6;
+	Thu, 19 Mar 2026 12:58:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S4VDMSBB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zxpv3RsH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B8435949;
-	Thu, 19 Mar 2026 12:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2243D34AB;
+	Thu, 19 Mar 2026 12:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773924929; cv=none; b=pNJkJ2sIBBIngtJo6AFOebG5kQlN/gjX7mZ/7VNSgdMCwl6Bezj2Ud0TjYAFM6yPT8diEdPlTo5lDDPbmFEymXt0sBjPTrXY8I3MVfDG8G5q9QhxiyWg8CAQtzwsJlkfIf60gXHjexsW02uvrOu0cA10AfjvyjCSaMkkVvkuAMU=
+	t=1773925113; cv=none; b=RJ2BuOrlAGAKF6QdlGiivym+YpO2+SK8nSbdawtBk3hdsEhZ/SEfidYPmFDxaDCpbnkGUbIBgp/5hSPo+xRT0sA8c3xfwWBuIBxDQeyNPYIeywpq6PJv+xDnIKx0jfq2+ea82vRu9iaIteOqZ4MKhXA6w9wljdCrWGxOViqPiLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773924929; c=relaxed/simple;
-	bh=9rlUs9kmzpZtY6ZtD+fUwCCJLpx09o1aGtWBG1kSIIc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H2XzJx2vNWIKCu7m4kVEt1L6P5VEvaY3zQ+T1XnQlYhH/feq3uQCKpDMSOYgINEUFz/zed9CCHFzuKnD/IfvALsIFmol0SCPXs9xj539p4vCfSkRN5fneyqVYjKnbSZap7aD0nK6AYCRx1RBBt3NihdRW6m71FZDVa5OQP5wsgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S4VDMSBB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF7ADC19424;
-	Thu, 19 Mar 2026 12:55:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773924928;
-	bh=9rlUs9kmzpZtY6ZtD+fUwCCJLpx09o1aGtWBG1kSIIc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=S4VDMSBBZnIaT/gxf5YhzmGp6m2u8ZC5i2dI2+1Zi4MfMr0Ee2p0Sbj+A33L40PvX
-	 VUKe2YlEylY/tb7/KDyV9giIvBinLHpGqIYK3t2lSG0nkWK1njMIN+YM1pDXVNU3MS
-	 oOns9Xmduu+L/F1IM9j0rzgguXJ3qsjdd5nrmIFJZgNGwTr1sCJFnIgew63sI13Hta
-	 06LvwMdUmjwYdLshhvV84YdhYqouJ0LJjo12/VSgODK71rNaLoQhb/edOJrxl52yNj
-	 RRjVwHRMG/LZ+JBQ9EMn3Dm1YAEBsrhXCEP5MOumTkBoD3AEynqhr5unsbvEHsQhIv
-	 71uYbw/YOfO7w==
-Message-ID: <90943080-7580-4491-9669-63034f4acb42@kernel.org>
-Date: Thu, 19 Mar 2026 13:55:23 +0100
+	s=arc-20240116; t=1773925113; c=relaxed/simple;
+	bh=cdknfVDKZfirBjvPbVt1AvVgcyHfvS3/uHlqeMpnjZg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iDyEm9T7zD1TQGs4DxiBnw8lalFUNDvDkZPgEGDer3S28s+F1MhxoIPbb3xt73XgP4fQcBEzbwUhg1+/F8zaz5dXYCFmBM7ziYWu7YhPm4vMW1VaZrZIpWGSEBCGyLrDM3oAcUgd+xZLCO9F+8LtEjYHOha4oyldGORJGhZnfeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zxpv3RsH; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Z7R0pn7ZfdsYWdr21Qctdy5ZMqO7uhqsnnOEXcHNYDI=; b=zxpv3RsH1j0RgeyxZ9QHdWZhmC
+	lFnfS4AluSgqoW0Ktrf02KNVAy4qiftcMGC3jfrsFBWzpTqaQwAJ1AW+g8chPTOCmutDfi9k7Evaz
+	KU1VJpc58NGgX2euaAZJhqiE0RxEiAteyQi7WxqXmCzkESLPGJxSWIbrWWcgCfW3TTTRkyNFQLIXB
+	EpziFXgvzqIcLeViTs1sUUW1tm4DKdlRYwgOB+5xgeUF+zg0+vO5W6gqv3y1cvRlVZYExQpTEsBVW
+	Pvzr1i6JlyzfF5+3xYYuwRhiSeImWqBxXJDeLeT40ly4HU9dvNv0LeJES9IpMlxtewEnK079koyAH
+	UKG0/sxw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45602)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w3CxC-000000004lO-0Uh7;
+	Thu, 19 Mar 2026 12:58:22 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w3Cx8-0000000088u-3p1e;
+	Thu, 19 Mar 2026 12:58:18 +0000
+Date: Thu, 19 Mar 2026 12:58:18 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Cc: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next 0/8] net: stmmac: improve PCS support
+Message-ID: <abvy6nZyjyxUXMuf@shell.armlinux.org.uk>
+References: <abQC7r38QLhSeadl@shell.armlinux.org.uk>
+ <abdEscs44fU4kRag@oss.qualcomm.com>
+ <abdYu864OmNWiWIW@shell.armlinux.org.uk>
+ <ablpxwGks9m38fhM@shell.armlinux.org.uk>
+ <absjNQ2s3Z5N2Zwo@oss.qualcomm.com>
+ <abtE7sDT75I7uPnk@shell.armlinux.org.uk>
+ <abvAuHFZzCFobO-V@shell.armlinux.org.uk>
+ <7566c66b-2dda-4b29-b59e-4e4a7e159e21@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net] MPTCP: fix lock class name family in
- pm_nl_create_listen_socket
-Content-Language: fr
-To: Li Xiasong <lixiasong1@huawei.com>, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
- zhangchangzhong@huawei.com, weiyongjun1@huawei.com
-References: <20260319112159.3118874-1-lixiasong1@huawei.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260319112159.3118874-1-lixiasong1@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7566c66b-2dda-4b29-b59e-4e4a7e159e21@oss.qualcomm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269441-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RSPAMD_URIBL_FAIL(0.00)[huawei.com:query timed out];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RSPAMD_EMAILBL_FAIL(0.00)[matttbe.kernel.org:query timed out];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-269442-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_SPAM(0.00)[0.714];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2CED52CB977
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2ED272CB8CB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Li,
-
-On 19/03/2026 12:21, Li Xiasong wrote:
-> In mptcp_pm_nl_create_listen_socket(), use entry->addr.family
-> instead of sk->sk_family for lock class setup. The 'sk' parameter
-> is a netlink socket, not the MPTCP subflow socket being created.
+On Thu, Mar 19, 2026 at 11:09:33AM +0100, Konrad Dybcio wrote:
+> On 3/19/26 10:24 AM, Russell King (Oracle) wrote:
+> > On Thu, Mar 19, 2026 at 12:35:58AM +0000, Russell King (Oracle) wrote:
+> >> On Thu, Mar 19, 2026 at 03:42:05AM +0530, Mohd Ayaan Anwar wrote:
+> >>> [    8.650486] qcom-ethqos 23040000.ethernet: clk_csr value out of range (0xffffff00 exceeds mask 0x00000f00), truncating
+> >>
+> >> Please look into this first - with the MDIO bus operating at
+> >> who-knows-what frequency, this could make reading from the PHY
+> >> unreliable.
+> > 
+> > My guess is clk_get_rate(priv->plat->stmmac_clk) is returning zero,
+> > which means we don't know the rate of the CSR clock.
+> > 
+> > From what I can see in drivers/clk/qcom/gcc-qcs404.c and
+> > drivers/clk/qcom/gcc-sdx55.c, this looks like this case - the
+> > struct clk_branch makes no mention of any clock rate, nor does it
+> > have any parent. From what I can see, neither of these drivers
+> > specify any rates for any of their clocks, which likely means that
+> > clk_get_rate() will be zero for all of them.
+> > 
+> > Sadly, when I designed the clk API, I didn't think that people would
+> > be stupid enough not to implement the API properly, more fool me.
+> > 
+> > Under the old code, we would've used STMMAC_CSR_20_35M, which means
+> > we're assuming that the CSR clock is between 20 and 35MHz, even
+> > though the value is zero. Is that the case? If it's higher than
+> > 35MHz, then you've been operating the MDIO bus out of IEEE 802.3
+> > specification, which can make PHY access unrealible.
+> > 
+> > In any case, please fix your clock drivers.
 > 
-> Fixes: cee4034a3db1 ("mptcp: fix lockdep false positive in mptcp_pm_nl_create_listen_socket()")
-> Signed-off-by: Li Xiasong <lixiasong1@huawei.com>
-> ---
->  net/mptcp/pm_kernel.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
-> index b2b9df43960e..82e59f9c6dd9 100644
-> --- a/net/mptcp/pm_kernel.c
-> +++ b/net/mptcp/pm_kernel.c
-> @@ -838,7 +838,7 @@ static struct lock_class_key mptcp_keys[2];
->  static int mptcp_pm_nl_create_listen_socket(struct sock *sk,
->  					    struct mptcp_pm_addr_entry *entry)
->  {
-> -	bool is_ipv6 = sk->sk_family == AF_INET6;
-> +	bool is_ipv6 = entry->addr.family == AF_INET6;
+> I'm not 100% sure the currently-passed AXI clock is what we want
+> there and the docs aren't super helpful.. is there a synopsys-name
+> for it? What rates would you expect it to run at?
 
-Good catch! 'sk' name is confusing, it would probably be better to pass
-"struct net *" instead. But this can be done later, that's more a
-net-next material.
+There is no easy answer to that - it depends on the bus interfaces
+and whether the CSR (register) clock is separate.
 
-(For next time, please use 'mptcp:' prefix instead of 'MPTCP:' in the
-subject, similar to all other commits in this directory.)
+The likely possible names are hclk_i (for AHB master), aclk_i (for
+AXI master), or clk_csr_i.
 
+It does state that the CSR clock should have a minimum frequency of
+25MHz to allow all statistics to be properly collected.
 
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+The rate of the CSR clock needs to be known, as selecting the divider
+for generating MDC within IEEE 802.3 specifications is rather
+fundamental. You may find something there which hints at what rate
+the dwmac's CSR clock runs at.
 
+Hope this helps.
 
-@Netdev maintainers: this patch can be applied in the 'net' tree directly.
-
->  	int addrlen = sizeof(struct sockaddr_in);
->  	struct sockaddr_storage addr;
->  	struct sock *newsk, *ssk;
-
-Cheers,
-Matt
 -- 
-Sponsored by the NGI0 Core fund.
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
