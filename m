@@ -1,123 +1,143 @@
-Return-Path: <netdev+bounces-269471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269472-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yFiHIOwKvGkArgIAu9opvQ
-	(envelope-from <netdev+bounces-269471-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:40:44 +0100
+	id 0JbMHEcLvGkArgIAu9opvQ
+	(envelope-from <netdev+bounces-269472-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:42:15 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E34072CD044
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:40:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D261D2CD0E1
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:42:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3977F3057493
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:40:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7EA14305617E
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D494F3AC0C2;
-	Thu, 19 Mar 2026 14:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E0A3BE657;
+	Thu, 19 Mar 2026 14:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f5tDCM35"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I1ajkPNZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12F4303A01;
-	Thu, 19 Mar 2026 14:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F8A3A5E92;
+	Thu, 19 Mar 2026 14:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773931233; cv=none; b=ZdaXOMt/gmOlYnJAbIP76dvp1dqFwHYNNbJ9stIqWBzmJAiWswV6A8K3zfCHE/uoTXros7bgOcd/3MXZm1yGm04OIPd+YwOfNZMZ1CpOcOiwaGEk+5eWESomHXTIAFNng4NklPoPp/DwXMq5GrFIZdWFF1tRqP0ReBLLk6Aen0o=
+	t=1773931294; cv=none; b=nQ91ihQLua84+7OZF9j5jvyyTH1KFcHJL31o8EQhvPhr3DCE9LrG+8vTsOlQWqyI3okrq/77t2Dfr5N5C+kz8/VC8Odwn1GL5bI3OTHlZIcVr35Ej0kedsADJ7/+PNTZLFKqLFLKpjHrW4t1A7vBz2kBplB3oQg9e8rPQsGKAwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773931233; c=relaxed/simple;
-	bh=entk2Kqlpy+zvek6XmeMjH+TrEK68X8rw+DbJ5/8yJ4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ANmN47w72Cy7yS/Sx3B1hLjk5g+t+hf2NPUqi5v+zFxaubNvOVUUaq+Ocn6V1EBEaUkOlnemeT9eG/gz0dw2+6GM6a1vnL03J56Asy9rjuLP3jZzaBwCblp6Hm9/37lYd2gu29JDEqOadTiV3AckipEZBWUKULTH+jZE9QJESdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f5tDCM35; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F32FC19424;
-	Thu, 19 Mar 2026 14:40:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773931233;
-	bh=entk2Kqlpy+zvek6XmeMjH+TrEK68X8rw+DbJ5/8yJ4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=f5tDCM35zZ4lPfo7RdwH7uZYWKG2w177EF/uR5f3fPdVszNE3Vnhfeuton+slNHH2
-	 VarLH/HYAtPdg0vAUI4hmJXAHiXnUzWSQSgQfsYVJ1C9BoD0CCbdcgjvbYS9ApXt0k
-	 iCX67YY/ocNTX7l/ebVWauiZjZ5tq/INaxK3tJoxjLbGYumtx75pTRoF9L8C70aM8A
-	 50n2xgV52Dn4ktm38nwGS/1e4hnlq9y0WThJ7hqyXzEWsmh2TXORASUj5FDlralGpV
-	 6vpfx4xMlSxnMEI2aWSL3lc5J0uY74NmRXvA4j/ycAlFWAqMYahWJ4fgN+pIas+AGA
-	 GbqNGsM7Fo9Og==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE5D380692A;
-	Thu, 19 Mar 2026 14:40:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1773931294; c=relaxed/simple;
+	bh=PmOkxoRXCD8OlRMEJ8MSm5qTImPX/q3XBzALcAio7yY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qQrofhkc4zTp5kFmecdwUlRtMe99JEzCZogiYwHaexTlLPZZ05NNEuLWA33hu1ks3smyT50Lsgvd99R7gsGuOwFjxgXo5NcHvlQK8ig5LJRJciEIyePQDLrPKXeM2yrBJjIiX8IaC3MHyj9yACLcluqVjjypWtNWhUETeRczTq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I1ajkPNZ; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773931292; x=1805467292;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PmOkxoRXCD8OlRMEJ8MSm5qTImPX/q3XBzALcAio7yY=;
+  b=I1ajkPNZV8A7azBkfGE/IsdHw9g2KbWnnHL4iVAbXVeDA4lGjEuMZFEa
+   Bo9NCam8h5oNJeurCScPWkKEYWJ+0cKNMpRyMOHSdLtAip0qvQTQpRGtX
+   MseVycXp26m2Yrovjt1v0ZRiiAhDO5E0duwCKe2wvo9oWpe3Mwvp5weX3
+   SdeZXF7ubeVbsEJgRfaJ0HGKPpodYCeGCpfZ5sO8fgIxtDS8SMoJ4Fnhc
+   iu6Cm0VkOkWUcqVYaGs4aE1ydh124ecNkxHq5hD0aBAIGkcAiojjqFW4i
+   fSL9donY0sBAE/Wb5mR7BIU3RXt/Pn2B62Xdjlk6SZQOdQwVpO0LgdmVd
+   A==;
+X-CSE-ConnectionGUID: v4urBkQrTm+K3OOX+epvyQ==
+X-CSE-MsgGUID: kDO5wYKsR1KA9iAZJEOhvQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="100464651"
+X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
+   d="scan'208";a="100464651"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 07:41:31 -0700
+X-CSE-ConnectionGUID: hKKQslcBTvy3f3098oNEtQ==
+X-CSE-MsgGUID: UIuO1HIeTV2nuTbKtOLE6w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
+   d="scan'208";a="222083988"
+Received: from klitkey1-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.244.120])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 07:41:29 -0700
+Date: Thu, 19 Mar 2026 16:41:26 +0200
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: Sean Chang <seanwascoding@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Chuck Lever <chuck.lever@oracle.com>,
+	David Laight <david.laight.linux@gmail.com>,
+	Anna Schumaker <anna@kernel.org>, netdev@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH v3 3/3] nfs: refactor nfs_errorf macros and remove unused
+ ones
+Message-ID: <abwLFk0L_kCZqIiK@ashevche-desk.local>
+References: <20260319141846.78222-1-seanwascoding@gmail.com>
+ <20260319141846.78222-4-seanwascoding@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] wireless-next-2026-03-19
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177393122429.1233771.4629826839858224748.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Mar 2026 14:40:24 +0000
-References: <20260319082439.79875-3-johannes@sipsolutions.net>
-In-Reply-To: <20260319082439.79875-3-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260319141846.78222-4-seanwascoding@gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-269472-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-269471-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_TO(0.00)[gmail.com];
+	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,oracle.com,gmail.com,kernel.org,vger.kernel.org,intel.com];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.982];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E34072CD044
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ashevche-desk.local:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D261D2CD0E1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This pull request was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu, 19 Mar 2026 09:22:16 +0100 you wrote:
-> Hi,
+On Thu, Mar 19, 2026 at 10:18:46PM +0800, Sean Chang wrote:
+> refactor nfs_errorf() and nfs_ferrorf() to the standard do-while(0)
+> pattern for safer macro expansion and kernel style compliance.
 > 
-> We have only a couple of things for -next right now, though I think
-> we'll have a bigger pull request soon with NAN and ranging APIs and
-> likely driver work. But I want to be able to get the cross-merge in
-> since the ranging will depend on that, so here is this for now.
-> 
-> [...]
+> additionally, remove nfs_warnf() and nfs_fwarnf() as git grep
+> confirms they have no callers in the current tree.
 
-Here is the summary with links:
-  - [GIT,PULL] wireless-next-2026-03-19
-    https://git.kernel.org/netdev/net-next/c/9ac76f3d0bb2
+...
 
-You are awesome, thank you!
+>  #define nfs_invalf(fc, fmt, ...) ((fc)->log.log ?		\
+>  	invalf(fc, fmt, ## __VA_ARGS__) :			\
+
+>  	invalf(fc, fmt, ## __VA_ARGS__) :			\
+>  	({ dfprintk(fac, fmt "\n", ## __VA_ARGS__);  -EINVAL; }))
+
+Why not all of them?
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+With Best Regards,
+Andy Shevchenko
 
 
 
