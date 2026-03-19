@@ -1,500 +1,199 @@
-Return-Path: <netdev+bounces-269577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269578-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2J3PKKYxvGnxuQIAu9opvQ
-	(envelope-from <netdev+bounces-269577-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:25:58 +0100
+	id WApeF/AyvGnxuQIAu9opvQ
+	(envelope-from <netdev+bounces-269578-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:31:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0BB2CFEF2
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:25:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B8ED2D0070
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:31:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 746043011C8A
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:25:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0C8E30048D3
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F5138AC96;
-	Thu, 19 Mar 2026 17:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rG5ccpfu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA04C3EE1F4;
+	Thu, 19 Mar 2026 17:27:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D9938A292
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 17:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E743EF0C7
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 17:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773941141; cv=none; b=rGTdTU3WO0DEdN1ToVs9iuk6eq6bt27gHygGuBBxkzeUhS30qz2KS+CZySD/9e6WgDQ8wMRHxx6JKL5XNF/lvJNHKOYiYxbw53L7TBwI0HtteLu78k26wmuRAGLSAmRfxZ4rwTP8DdyT9ct4oAZ/D2N3HKXp2Nn2G/ZCnuxDU8Q=
+	t=1773941245; cv=none; b=TQyYF+QcRQkngPl9xdVRTaHCuTcpAO/pQtHlgukPakZKIsEwt3kYqtNFrxtbW10pNgb77bTV4cBBVO2SUgPo52tdQPpKgz5QP1RbCxPIPYwmgowJrperyfgaABk2/gR5Mdssnu3ENRR5WIUTM0UneQDl6jz+rJ4q1DFMGQVP2o8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773941141; c=relaxed/simple;
-	bh=PheR7bnWRvNqOXZVWOZja4PgxItdOa1aeIc8SwrBgLg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N7u5bxlhjg3FUL7QZqhpb/aZmXaJeDKlnQsahTg26AuT+GQjXeqRquQmtxquRCsSRHecSw1rg/hY396sX6DYHc0fcpC6rpem0+whe/I31W6ceeUt0SPRwRocPGvO7jwvGyfq3QATCYIhxdzXUrKZ+7C0uinUPKQcsDJs0muP+KM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rG5ccpfu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E1C5C2BCB3
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 17:25:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773941141;
-	bh=PheR7bnWRvNqOXZVWOZja4PgxItdOa1aeIc8SwrBgLg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=rG5ccpfuTAf4aevEd1/xjUOSQOLvucc0byPCiqFCls/tUsZ78QdNSF5JLoX8N4/Ko
-	 PMxSWAS6J8QyDe7pyKEn4LZ81wgsBn7sDmsjJQZ4FLxWtZ/cxLi6rc8Az+rqw5MYSP
-	 83SP+SUI1HuTNqf5soWPtBkCbwLI7sCTBjYDAa7AppasRqe0brUv4wQEP1oP+44k9g
-	 rXuuO9WwsycTrH4uMe+5AJ7KMFhbvoggooZL2SU1W1/2CK2bqqknAzqOpEUIq3ua7e
-	 PdIinenTQLcgatE6wR0Rzwm4ejYzwi7BMqE2AjDvMf3Bxd5Qm81a3RsnDhwcfKvjVI
-	 cRV3HOsqKI5nA==
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b982a80317fso56709266b.1
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 10:25:41 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXql0Q3XPKuATc5uCtTOJOy5GqxsyH1O50Dd+4ZX58Pf5gDvBqZU+6UvvKllZWge408C2eWlGI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5BrIvkIK4ZRl0/zK0ozBB/zHJxWGQA6Tspfoipvfi4zPrNpTr
-	gQwka3JCS2rbPFU1iDFLrkuK8ujKAfL8mDQnYqNhWqvzIdl1PB0bSx7MY6KBVJjtFWfQv0XsM/A
-	SQRwdvrkAvfZLdgWT+j1LU5oP+OMKNSc=
-X-Received: by 2002:a17:907:c281:b0:b98:a49:a237 with SMTP id
- a640c23a62f3a-b982f0c0082mr14213766b.6.1773941139816; Thu, 19 Mar 2026
- 10:25:39 -0700 (PDT)
+	s=arc-20240116; t=1773941245; c=relaxed/simple;
+	bh=9wlebsp9Rx6hCwC5pys32X1sYXY103vYKbl9abZWUJI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=nllt61hX5BFhMnRfrQ1p0mdtfgXYWP/kZVQ0QfeISkNQGgCP8Fb5PAoBbiGhRutnnI7WymviepyssYvh3HfMQ9K9W36tWRV9FzrorAjQnbQbu49TGnjBRim01tnO2PgySkPrvqCoghBQPIQeaVC/7BqvIv2k/K39FGM9afNsxlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-67c12fc5411so20790225eaf.1
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 10:27:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773941240; x=1774546040;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xnfckOcAi0uA4Z6a6lmoTefw+BoX6EypFKu89xrJ1iI=;
+        b=PMkoHEWmHxYQsvPpwPWpFfTWnAl5zmXUAATJQfx8glcoq9BA+fFNIsllD872+xzW26
+         Si9UZYuy5h8Czj8QCWOnP1PIK6ieJ5fpHD+YpgU11V50KfNXQ7s+aTLEzJK/tOinhz96
+         sb9AHRR4/HTlHmvrBZFSiYvqpKy3jo/x1EQ4F8XrDFs7cDQPPBr9y2lfa+HNqE8vRdF6
+         OigujJ/KUpcDbO/V8cIk1fC1WHWSb4AZHSQ4Qv5WndG8Go66R6imXwH5wP6mZ1yaNZVN
+         T+iqH8InlO+U9avUubFJc+9dnASPjgWD3TRI6ljfTkrkVwNjO1gnNQN/Dozabo/Thfun
+         HL/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXILRSNZ1yBJURQF7Z8Jg1I6oKgF5HfVvc0S6TrLAN75yUxK4rhu7EwjEF2L9vv4e9OzA3bIZo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyloqBSd4LrDSC7DYjrQ5BuqlbSx61w+Yvq/QLTypkpfe7EIYe8
+	aWLvNt/rNEwFVpNLTtoNQgUoDFjxuYpck2JYsZA7JgikDqlkxQb7DyBuynP4mxgwwsf3gt5Y95h
+	dIpagw9OlH826mSi2YxU5PUUrRry+LhE2NcwqseMkC4x+M6oEGNtWRwGu4Bk=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260317090112.v2.1.I0a4d03104ecd5103df3d76f66c8d21b1d15a2e38@changeid>
-In-Reply-To: <20260317090112.v2.1.I0a4d03104ecd5103df3d76f66c8d21b1d15a2e38@changeid>
-From: Saravana Kannan <saravanak@kernel.org>
-Date: Thu, 19 Mar 2026 10:25:28 -0700
-X-Gmail-Original-Message-ID: <CACRMN=euZzwDpCQupzth-J1z9qWXPenmy_bu727+R-kt97zexw@mail.gmail.com>
-X-Gm-Features: AaiRm507X2Rm_esTeDGefTbMHDE2ymhPZQynsWD2e2kEHWMaRTcbSREIEVA2ZRI
-Message-ID: <CACRMN=euZzwDpCQupzth-J1z9qWXPenmy_bu727+R-kt97zexw@mail.gmail.com>
-Subject: Re: [PATCH v2] device property: Make modifications of fwnode "flags"
- thread safe
-To: Douglas Anderson <dianders@chromium.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J . Wysocki" <rafael@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, stable@vger.kernel.org, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Mark Brown <broonie@kernel.org>, 
-	Wolfram Sang <wsa+renesas@sang-engineering.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Daniel Scally <djrscally@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Fabio Estevam <festevam@gmail.com>, Frank Li <Frank.Li@nxp.com>, 
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Len Brown <lenb@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, Rob Herring <robh@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Sakari Ailus <sakari.ailus@linux.intel.com>, 
-	Saravana Kannan <saravanak@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	devicetree@vger.kernel.org, driver-core@lists.linux.dev, imx@lists.linux.dev, 
-	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-i2c@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-spi@vger.kernel.org, netdev@vger.kernel.org
+X-Received: by 2002:a4a:decc:0:b0:67c:1fa3:ae6e with SMTP id
+ 006d021491bc7-67c1fa3b0a3mr891507eaf.8.1773941239827; Thu, 19 Mar 2026
+ 10:27:19 -0700 (PDT)
+Date: Thu, 19 Mar 2026 10:27:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69bc31f7.050a0220.18f14c.004f.GAE@google.com>
+Subject: [syzbot] [netfilter?] KCSAN: data-race in hash_ipport6_add / hash_ipport6_head
+From: syzbot <syzbot+786c889f046e8b003ca6@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	pablo@netfilter.org, phil@nwl.cc, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=6b32b22d8934c136];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269577-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linuxfoundation.org,kernel.org,vger.kernel.org,linux.intel.com,sang-engineering.com,lunn.ch,gmail.com,davemloft.net,google.com,nxp.com,redhat.com,pengutronix.de,armlinux.org.uk,lists.linux.dev,lists.infradead.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[saravanak@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.904];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[chromium.org:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: 8E0BB2CFEF2
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-269578-lists,netdev=lfdr.de,786c889f046e8b003ca6];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.494];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,goo.gl:url,googlegroups.com:email,appspotmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: 9B8ED2D0070
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 17, 2026 at 9:04=E2=80=AFAM Douglas Anderson <dianders@chromium=
-.org> wrote:
->
-> In various places in the kernel, we modify the fwnode "flags" member
-> by doing either:
->   fwnode->flags |=3D SOME_FLAG;
->   fwnode->flags &=3D ~SOME_FLAG;
->
-> This type of modification is not thread-safe. If two threads are both
-> mucking with the flags at the same time then one can clobber the
-> other.
->
-> While flags are often modified while under the "fwnode_link_lock",
-> this is not universally true.
->
-> Create some accessor functions for setting, clearing, and testing the
-> FWNODE flags and move all users to these accessor functions. New
-> accessor functions use set_bit() and clear_bit(), which are
-> thread-safe.
->
-> Cc: stable@vger.kernel.org
-> Fixes: c2c724c868c4 ("driver core: Add fw_devlink_parse_fwtree()")
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> Acked-by: Mark Brown <broonie@kernel.org>
-> Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
-> Signed-off-by: Douglas Anderson <dianders@chromium.org>
-> ---
-> While this patch is not known for sure to fix any specific issues, it
-> seems possible that it could fix some rare problems. I'm currently
-> trying to track down a hard-to-reproduce heisenbug and one (currently
-> unproven) theory I had was that the fwnode flags could be getting
-> messed up like this. Even if turns out not to fix my heisenbug,
-> though, this seems like a worthwhile change to take.
+Hello,
 
-Reviewed-by: Saravana Kannan <saravanak@kernel.org>
+syzbot found the following issue on:
 
-Thanks Doug. Hope this isn't the cause of the hisenbug. If you report
-it here, I might be able to take a look at it too (no promises).
+HEAD commit:    c107785c7e8d Merge tag 'modules-7.0-rc3.fixes' of git://gi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=143b7006580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6b32b22d8934c136
+dashboard link: https://syzkaller.appspot.com/bug?extid=786c889f046e8b003ca6
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ddd71de958b3/disk-c107785c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/79e800fb32ab/vmlinux-c107785c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1b65c942dadc/bzImage-c107785c.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+786c889f046e8b003ca6@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KCSAN: data-race in hash_ipport6_add / hash_ipport6_head
+
+read-write to 0xffff88813e1d7a99 of 1 bytes by task 27445 on cpu 1:
+ hash_ipport6_add+0x876/0x1110 net/netfilter/ipset/ip_set_hash_gen.h:965
+ hash_ipport6_uadt+0x59f/0x680 net/netfilter/ipset/ip_set_hash_ipport.c:351
+ call_ad+0x231/0x640 net/netfilter/ipset/ip_set_core.c:1751
+ ip_set_ad+0x5c0/0x690 net/netfilter/ipset/ip_set_core.c:1841
+ ip_set_uadd+0x41/0x50 net/netfilter/ipset/ip_set_core.c:1864
+ nfnetlink_rcv_msg+0x509/0x5d0 net/netfilter/nfnetlink.c:302
+ netlink_rcv_skb+0x123/0x220 net/netlink/af_netlink.c:2550
+ nfnetlink_rcv+0x167/0x1720 net/netfilter/nfnetlink.c:669
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x5c0/0x690 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x5c8/0x6f0 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x5af/0x600 net/socket.c:2592
+ ___sys_sendmsg+0x195/0x1e0 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0xd4/0x160 net/socket.c:2681
+ x64_sys_call+0x194c/0x3020 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x12c/0x370 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+read to 0xffff88813e1d7a99 of 1 bytes by task 27450 on cpu 0:
+ hash_ipport6_ext_size net/netfilter/ipset/ip_set_hash_gen.h:823 [inline]
+ hash_ipport6_head+0x180/0x960 net/netfilter/ipset/ip_set_hash_gen.h:1275
+ ip_set_dump_do+0xa34/0xb00 net/netfilter/ipset/ip_set_core.c:1651
+ netlink_dump+0x455/0x8a0 net/netlink/af_netlink.c:2325
+ netlink_recvmsg+0x420/0x550 net/netlink/af_netlink.c:1976
+ sock_recvmsg_nosec net/socket.c:1078 [inline]
+ sock_recvmsg+0x139/0x160 net/socket.c:1100
+ ____sys_recvmsg+0xf5/0x280 net/socket.c:2812
+ ___sys_recvmsg+0x11f/0x3b0 net/socket.c:2854
+ __sys_recvmsg net/socket.c:2887 [inline]
+ __do_sys_recvmsg net/socket.c:2893 [inline]
+ __se_sys_recvmsg net/socket.c:2890 [inline]
+ __x64_sys_recvmsg+0xd1/0x160 net/socket.c:2890
+ x64_sys_call+0x2b1a/0x3020 arch/x86/include/generated/asm/syscalls_64.h:48
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x12c/0x370 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+value changed: 0x01 -> 0x02
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 0 UID: 0 PID: 27450 Comm: syz.3.7305 Tainted: G        W           syzkaller #0 PREEMPT(full) 
+Tainted: [W]=WARN
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
+==================================================================
 
 
--Saravana
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
->
-> Changes in v2:
-> - Add/use fwnode_assign_flag() (Andy).
->
->  drivers/base/core.c                 | 24 +++++++--------
->  drivers/bus/imx-weim.c              |  2 +-
->  drivers/i2c/i2c-core-of.c           |  2 +-
->  drivers/net/phy/mdio_bus_provider.c |  4 +--
->  drivers/of/base.c                   |  2 +-
->  drivers/of/dynamic.c                |  2 +-
->  drivers/of/platform.c               |  2 +-
->  drivers/spi/spi.c                   |  2 +-
->  include/linux/fwnode.h              | 45 +++++++++++++++++++++--------
->  9 files changed, 53 insertions(+), 32 deletions(-)
->
-> diff --git a/drivers/base/core.c b/drivers/base/core.c
-> index 791f9e444df8..f65492a4afc8 100644
-> --- a/drivers/base/core.c
-> +++ b/drivers/base/core.c
-> @@ -182,7 +182,7 @@ void fw_devlink_purge_absent_suppliers(struct fwnode_=
-handle *fwnode)
->         if (fwnode->dev)
->                 return;
->
-> -       fwnode->flags |=3D FWNODE_FLAG_NOT_DEVICE;
-> +       fwnode_set_flag(fwnode, FWNODE_FLAG_NOT_DEVICE);
->         fwnode_links_purge_consumers(fwnode);
->
->         fwnode_for_each_available_child_node(fwnode, child)
-> @@ -228,7 +228,7 @@ static void __fw_devlink_pickup_dangling_consumers(st=
-ruct fwnode_handle *fwnode,
->         if (fwnode->dev && fwnode->dev->bus)
->                 return;
->
-> -       fwnode->flags |=3D FWNODE_FLAG_NOT_DEVICE;
-> +       fwnode_set_flag(fwnode, FWNODE_FLAG_NOT_DEVICE);
->         __fwnode_links_move_consumers(fwnode, new_sup);
->
->         fwnode_for_each_available_child_node(fwnode, child)
-> @@ -1012,7 +1012,7 @@ static void device_links_missing_supplier(struct de=
-vice *dev)
->  static bool dev_is_best_effort(struct device *dev)
->  {
->         return (fw_devlink_best_effort && dev->can_match) ||
-> -               (dev->fwnode && (dev->fwnode->flags & FWNODE_FLAG_BEST_EF=
-FORT));
-> +               (dev->fwnode && (fwnode_test_flag(dev->fwnode, FWNODE_FLA=
-G_BEST_EFFORT)));
->  }
->
->  static struct fwnode_handle *fwnode_links_check_suppliers(
-> @@ -1723,11 +1723,11 @@ bool fw_devlink_is_strict(void)
->
->  static void fw_devlink_parse_fwnode(struct fwnode_handle *fwnode)
->  {
-> -       if (fwnode->flags & FWNODE_FLAG_LINKS_ADDED)
-> +       if (fwnode_test_flag(fwnode, FWNODE_FLAG_LINKS_ADDED))
->                 return;
->
->         fwnode_call_int_op(fwnode, add_links);
-> -       fwnode->flags |=3D FWNODE_FLAG_LINKS_ADDED;
-> +       fwnode_set_flag(fwnode, FWNODE_FLAG_LINKS_ADDED);
->  }
->
->  static void fw_devlink_parse_fwtree(struct fwnode_handle *fwnode)
-> @@ -1885,7 +1885,7 @@ static bool fwnode_init_without_drv(struct fwnode_h=
-andle *fwnode)
->         struct device *dev;
->         bool ret;
->
-> -       if (!(fwnode->flags & FWNODE_FLAG_INITIALIZED))
-> +       if (!(fwnode_test_flag(fwnode, FWNODE_FLAG_INITIALIZED)))
->                 return false;
->
->         dev =3D get_dev_from_fwnode(fwnode);
-> @@ -2001,10 +2001,10 @@ static bool __fw_devlink_relax_cycles(struct fwno=
-de_handle *con_handle,
->          * We aren't trying to find all cycles. Just a cycle between con =
-and
->          * sup_handle.
->          */
-> -       if (sup_handle->flags & FWNODE_FLAG_VISITED)
-> +       if (fwnode_test_flag(sup_handle, FWNODE_FLAG_VISITED))
->                 return false;
->
-> -       sup_handle->flags |=3D FWNODE_FLAG_VISITED;
-> +       fwnode_set_flag(sup_handle, FWNODE_FLAG_VISITED);
->
->         /* Termination condition. */
->         if (sup_handle =3D=3D con_handle) {
-> @@ -2074,7 +2074,7 @@ static bool __fw_devlink_relax_cycles(struct fwnode=
-_handle *con_handle,
->         }
->
->  out:
-> -       sup_handle->flags &=3D ~FWNODE_FLAG_VISITED;
-> +       fwnode_clear_flag(sup_handle, FWNODE_FLAG_VISITED);
->         put_device(sup_dev);
->         put_device(con_dev);
->         put_device(par_dev);
-> @@ -2127,7 +2127,7 @@ static int fw_devlink_create_devlink(struct device =
-*con,
->          * When such a flag is set, we can't create device links where P =
-is the
->          * supplier of C as that would delay the probe of C.
->          */
-> -       if (sup_handle->flags & FWNODE_FLAG_NEEDS_CHILD_BOUND_ON_ADD &&
-> +       if (fwnode_test_flag(sup_handle, FWNODE_FLAG_NEEDS_CHILD_BOUND_ON=
-_ADD) &&
->             fwnode_is_ancestor_of(sup_handle, con->fwnode))
->                 return -EINVAL;
->
-> @@ -2150,7 +2150,7 @@ static int fw_devlink_create_devlink(struct device =
-*con,
->         else
->                 flags =3D FW_DEVLINK_FLAGS_PERMISSIVE;
->
-> -       if (sup_handle->flags & FWNODE_FLAG_NOT_DEVICE)
-> +       if (fwnode_test_flag(sup_handle, FWNODE_FLAG_NOT_DEVICE))
->                 sup_dev =3D fwnode_get_next_parent_dev(sup_handle);
->         else
->                 sup_dev =3D get_dev_from_fwnode(sup_handle);
-> @@ -2162,7 +2162,7 @@ static int fw_devlink_create_devlink(struct device =
-*con,
->                  * supplier device indefinitely.
->                  */
->                 if (sup_dev->links.status =3D=3D DL_DEV_NO_DRIVER &&
-> -                   sup_handle->flags & FWNODE_FLAG_INITIALIZED) {
-> +                   fwnode_test_flag(sup_handle, FWNODE_FLAG_INITIALIZED)=
-) {
->                         dev_dbg(con,
->                                 "Not linking %pfwf - dev might never prob=
-e\n",
->                                 sup_handle);
-> diff --git a/drivers/bus/imx-weim.c b/drivers/bus/imx-weim.c
-> index 83d623d97f5f..f735e0462c55 100644
-> --- a/drivers/bus/imx-weim.c
-> +++ b/drivers/bus/imx-weim.c
-> @@ -332,7 +332,7 @@ static int of_weim_notify(struct notifier_block *nb, =
-unsigned long action,
->                          * fw_devlink doesn't skip adding consumers to th=
-is
->                          * device.
->                          */
-> -                       rd->dn->fwnode.flags &=3D ~FWNODE_FLAG_NOT_DEVICE=
-;
-> +                       fwnode_clear_flag(&rd->dn->fwnode, FWNODE_FLAG_NO=
-T_DEVICE);
->                         if (!of_platform_device_create(rd->dn, NULL, &pde=
-v->dev)) {
->                                 dev_err(&pdev->dev,
->                                         "Failed to create child device '%=
-pOF'\n",
-> diff --git a/drivers/i2c/i2c-core-of.c b/drivers/i2c/i2c-core-of.c
-> index eb7fb202355f..354a88d0599e 100644
-> --- a/drivers/i2c/i2c-core-of.c
-> +++ b/drivers/i2c/i2c-core-of.c
-> @@ -180,7 +180,7 @@ static int of_i2c_notify(struct notifier_block *nb, u=
-nsigned long action,
->                  * Clear the flag before adding the device so that fw_dev=
-link
->                  * doesn't skip adding consumers to this device.
->                  */
-> -               rd->dn->fwnode.flags &=3D ~FWNODE_FLAG_NOT_DEVICE;
-> +               fwnode_clear_flag(&rd->dn->fwnode, FWNODE_FLAG_NOT_DEVICE=
-);
->                 client =3D of_i2c_register_device(adap, rd->dn);
->                 if (IS_ERR(client)) {
->                         dev_err(&adap->dev, "failed to create client for =
-'%pOF'\n",
-> diff --git a/drivers/net/phy/mdio_bus_provider.c b/drivers/net/phy/mdio_b=
-us_provider.c
-> index 4b0637405740..fd691c5424ea 100644
-> --- a/drivers/net/phy/mdio_bus_provider.c
-> +++ b/drivers/net/phy/mdio_bus_provider.c
-> @@ -294,8 +294,8 @@ int __mdiobus_register(struct mii_bus *bus, struct mo=
-dule *owner)
->                 return -EINVAL;
->
->         if (bus->parent && bus->parent->of_node)
-> -               bus->parent->of_node->fwnode.flags |=3D
-> -                                       FWNODE_FLAG_NEEDS_CHILD_BOUND_ON_=
-ADD;
-> +               fwnode_set_flag(&bus->parent->of_node->fwnode,
-> +                               FWNODE_FLAG_NEEDS_CHILD_BOUND_ON_ADD);
->
->         WARN(bus->state !=3D MDIOBUS_ALLOCATED &&
->              bus->state !=3D MDIOBUS_UNREGISTERED,
-> diff --git a/drivers/of/base.c b/drivers/of/base.c
-> index 57420806c1a2..8d1972e18161 100644
-> --- a/drivers/of/base.c
-> +++ b/drivers/of/base.c
-> @@ -1915,7 +1915,7 @@ void of_alias_scan(void * (*dt_alloc)(u64 size, u64=
- align))
->                 if (name)
->                         of_stdout =3D of_find_node_opts_by_path(name, &of=
-_stdout_options);
->                 if (of_stdout)
-> -                       of_stdout->fwnode.flags |=3D FWNODE_FLAG_BEST_EFF=
-ORT;
-> +                       fwnode_set_flag(&of_stdout->fwnode, FWNODE_FLAG_B=
-EST_EFFORT);
->         }
->
->         if (!of_aliases)
-> diff --git a/drivers/of/dynamic.c b/drivers/of/dynamic.c
-> index 1a06175def37..ade288372101 100644
-> --- a/drivers/of/dynamic.c
-> +++ b/drivers/of/dynamic.c
-> @@ -225,7 +225,7 @@ static void __of_attach_node(struct device_node *np)
->         np->sibling =3D np->parent->child;
->         np->parent->child =3D np;
->         of_node_clear_flag(np, OF_DETACHED);
-> -       np->fwnode.flags |=3D FWNODE_FLAG_NOT_DEVICE;
-> +       fwnode_set_flag(&np->fwnode, FWNODE_FLAG_NOT_DEVICE);
->
->         raw_spin_unlock_irqrestore(&devtree_lock, flags);
->
-> diff --git a/drivers/of/platform.c b/drivers/of/platform.c
-> index ba591fbceb56..7eeaf8e27b5b 100644
-> --- a/drivers/of/platform.c
-> +++ b/drivers/of/platform.c
-> @@ -742,7 +742,7 @@ static int of_platform_notify(struct notifier_block *=
-nb,
->                  * Clear the flag before adding the device so that fw_dev=
-link
->                  * doesn't skip adding consumers to this device.
->                  */
-> -               rd->dn->fwnode.flags &=3D ~FWNODE_FLAG_NOT_DEVICE;
-> +               fwnode_clear_flag(&rd->dn->fwnode, FWNODE_FLAG_NOT_DEVICE=
-);
->                 /* pdev_parent may be NULL when no bus platform device */
->                 pdev_parent =3D of_find_device_by_node(parent);
->                 pdev =3D of_platform_device_create(rd->dn, NULL,
-> diff --git a/drivers/spi/spi.c b/drivers/spi/spi.c
-> index 61f7bde8c7fb..ba8098f1a88c 100644
-> --- a/drivers/spi/spi.c
-> +++ b/drivers/spi/spi.c
-> @@ -4938,7 +4938,7 @@ static int of_spi_notify(struct notifier_block *nb,=
- unsigned long action,
->                  * Clear the flag before adding the device so that fw_dev=
-link
->                  * doesn't skip adding consumers to this device.
->                  */
-> -               rd->dn->fwnode.flags &=3D ~FWNODE_FLAG_NOT_DEVICE;
-> +               fwnode_clear_flag(&rd->dn->fwnode, FWNODE_FLAG_NOT_DEVICE=
-);
->                 spi =3D of_register_spi_device(ctlr, rd->dn);
->                 put_device(&ctlr->dev);
->
-> diff --git a/include/linux/fwnode.h b/include/linux/fwnode.h
-> index 097be89487bf..c1ebcc6fd896 100644
-> --- a/include/linux/fwnode.h
-> +++ b/include/linux/fwnode.h
-> @@ -15,6 +15,7 @@
->  #define _LINUX_FWNODE_H_
->
->  #include <linux/bits.h>
-> +#include <linux/bitops.h>
->  #include <linux/err.h>
->  #include <linux/list.h>
->  #include <linux/types.h>
-> @@ -42,12 +43,12 @@ struct device;
->   *             suppliers. Only enforce ordering with suppliers that have
->   *             drivers.
->   */
-> -#define FWNODE_FLAG_LINKS_ADDED                        BIT(0)
-> -#define FWNODE_FLAG_NOT_DEVICE                 BIT(1)
-> -#define FWNODE_FLAG_INITIALIZED                        BIT(2)
-> -#define FWNODE_FLAG_NEEDS_CHILD_BOUND_ON_ADD   BIT(3)
-> -#define FWNODE_FLAG_BEST_EFFORT                        BIT(4)
-> -#define FWNODE_FLAG_VISITED                    BIT(5)
-> +#define FWNODE_FLAG_LINKS_ADDED                        0
-> +#define FWNODE_FLAG_NOT_DEVICE                 1
-> +#define FWNODE_FLAG_INITIALIZED                        2
-> +#define FWNODE_FLAG_NEEDS_CHILD_BOUND_ON_ADD   3
-> +#define FWNODE_FLAG_BEST_EFFORT                        4
-> +#define FWNODE_FLAG_VISITED                    5
->
->  struct fwnode_handle {
->         struct fwnode_handle *secondary;
-> @@ -57,7 +58,7 @@ struct fwnode_handle {
->         struct device *dev;
->         struct list_head suppliers;
->         struct list_head consumers;
-> -       u8 flags;
-> +       unsigned long flags;
->  };
->
->  /*
-> @@ -212,16 +213,36 @@ static inline void fwnode_init(struct fwnode_handle=
- *fwnode,
->         INIT_LIST_HEAD(&fwnode->suppliers);
->  }
->
-> +static inline void fwnode_set_flag(struct fwnode_handle *fwnode,
-> +                                  unsigned int bit)
-> +{
-> +       set_bit(bit, &fwnode->flags);
-> +}
-> +
-> +static inline void fwnode_clear_flag(struct fwnode_handle *fwnode,
-> +                                  unsigned int bit)
-> +{
-> +       clear_bit(bit, &fwnode->flags);
-> +}
-> +
-> +static inline void fwnode_assign_flag(struct fwnode_handle *fwnode,
-> +                                     unsigned int bit, bool value)
-> +{
-> +       assign_bit(bit, &fwnode->flags, value);
-> +}
-> +
-> +static inline bool fwnode_test_flag(struct fwnode_handle *fwnode,
-> +                                   unsigned int bit)
-> +{
-> +       return test_bit(bit, &fwnode->flags);
-> +}
-> +
->  static inline void fwnode_dev_initialized(struct fwnode_handle *fwnode,
->                                           bool initialized)
->  {
->         if (IS_ERR_OR_NULL(fwnode))
->                 return;
-> -
-> -       if (initialized)
-> -               fwnode->flags |=3D FWNODE_FLAG_INITIALIZED;
-> -       else
-> -               fwnode->flags &=3D ~FWNODE_FLAG_INITIALIZED;
-> +       fwnode_assign_flag(fwnode, FWNODE_FLAG_INITIALIZED, initialized);
->  }
->
->  int fwnode_link_add(struct fwnode_handle *con, struct fwnode_handle *sup=
-,
-> --
-> 2.53.0.851.ga537e3e6e9-goog
->
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
