@@ -1,153 +1,166 @@
-Return-Path: <netdev+bounces-269264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269265-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GIb0EsJeu2knjQIAu9opvQ
-	(envelope-from <netdev+bounces-269264-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:26:10 +0100
+	id 0PI5K7Nfu2lujQIAu9opvQ
+	(envelope-from <netdev+bounces-269265-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:30:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 731A42C4F06
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:26:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12FCE2C4FBC
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:30:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A2D8B302CE31
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:23:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 96F1E3071A58
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:26:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8273438551A;
-	Thu, 19 Mar 2026 02:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E5D3242D4;
+	Thu, 19 Mar 2026 02:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ky/0WQPw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AiPrNuUh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CAD41CEADB;
-	Thu, 19 Mar 2026 02:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDD1EED8
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 02:26:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773886993; cv=none; b=WYQ6BLTs0AajY+H9CDY/T4xL5Etj8jLWruOfeoRyMTv78ColtkTWajYs00ASljstr9FepkvSngfKD3uCs11Fcx/cyuTdxWvD4LUSd3/a+FiiejIvSzhSHNX6f1yEDpNZPvZPP7VPUWWc7Wh0vBbi6gYYzzAATVpxyreFZPwwmXA=
+	t=1773887179; cv=none; b=tTlUZO/AbmfMEULkmcM3rmiHTYEP47hAoR/nofCbSPqa7leYN+miP4raBYub/peCk8bPaOkC7O5fufMQV4XgGgGgSd8bcRPOyAs/5kS3xYgU/HqXEWk1MBcOiogaUTpA7nIPOjfyuYEX6e9x+8mvefQISdjsrXauWgTb0InRy7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773886993; c=relaxed/simple;
-	bh=J7ByNCVdyp6p7hoc/up7uJ/7AQHt9/rYYPRSEUuXvFE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PasfZbSWrNAzGAXmZiBJHificcl1CODwNPLV/A1U+CCo9a4DkNjzFGlGKImTIXX9+i523I5FdPjVc7taiU1gjhk1v2JDMxpobXs3CGx3ZIbG6BNytpK3H1c3cgwbDN4IkmT42DDBpvmOpeA4D69ofFRHDy2f+31oy5iJCXEA3VQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ky/0WQPw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FC7CC19421;
-	Thu, 19 Mar 2026 02:23:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773886993;
-	bh=J7ByNCVdyp6p7hoc/up7uJ/7AQHt9/rYYPRSEUuXvFE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ky/0WQPwpA4SLaViKimzr8eyaNp8qcqLIU/3vO6L33zkCni8dDi8dUgEmDzbjMznt
-	 5tv8LUp628AnXd0auPLh9IO/4AjKHxLHCK7p9ijFRssRTJWplsBo4AC7QVeDUl8mcH
-	 zAk/K1qJfwdyqI1JBmVYQFDs5d2WMUKWTT4MvslRnIJeHwGsbkeL40jPDaV4KxugO5
-	 Uatgxxh+FbSiSvGA5riKjysAiv0dtPMt6hqmQYg9PqEsmxGYcR+7hqEWmaGLH7tV49
-	 Zii8AhQlKySl7hTTWz0MbMGdwGc6KoBT8HSfyEK686CzQR+EBVSmsr6ju0EVGByG//
-	 kPo0beRhLeObg==
-Date: Wed, 18 Mar 2026 19:23:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-Cc: Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi
- <pavan.chebbi@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan
- <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Simon Horman <horms@kernel.org>, Shuah Khan
- <shuah@kernel.org>, netdev@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Gal Pressman <gal@nvidia.com>, Willem de
- Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v6 1/4] ethtool: Track user-provided RSS
- indirection table size
-Message-ID: <20260318192310.278ef325@kernel.org>
-In-Reply-To: <20260318122603.264550-2-bjorn@kernel.org>
-References: <20260318122603.264550-1-bjorn@kernel.org>
-	<20260318122603.264550-2-bjorn@kernel.org>
+	s=arc-20240116; t=1773887179; c=relaxed/simple;
+	bh=O3gUjVY0zXNWkfevYHmngjVR2gpGM7yW2onuOOt+JEs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iqL/whePATurhabmSyT/ZGKxkbtW9FbLCkO/PnenIY5tpnfqaOyssX1xIb+Gc5xXIdfmVc1l6SRgH8ue3SBj8R6ANfo/wpI8mgjBiSukC8PAk18e2X7HM1cUtFJ2SFeVliTjFBPJ92DYzPJvfSfulNT/Oh0P9xZ8g9ZBoPCBFG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AiPrNuUh; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6611d20c026so755215a12.1
+        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 19:26:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773887177; x=1774491977; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PLrWY93KLXjnMjbgd/SU8nHKn9Fei7qaT2S2SKHl6Cs=;
+        b=AiPrNuUh/3RRhS3MusYCVHaghObvsE9kKThd0mwJw7bC3uEi/nw6tw0njXmnBkLewF
+         6sktHsVCdqQVuECziazgJ2kCIGSv8cmrTJay4y7IlUPcw4iojeXv2u1EPTJUUzyM+M00
+         IwW82SXtAReRvP/y/1V/qYpJ0j/Ne2ZQL25opFSoeNyEylZRB1KyGLv5XWArt3tN+OTD
+         Db/ZLYc6QibG35Ct4ACSS9z+xwNqepDpMZYVaTSYOzOipC4qTmSSksA5aHxvLEvwJIxg
+         mymjrERr2v/iJTPtRKflBwBvu3U2rHMRm4b7i4DaI2nA6ENREzX5TGZvxzIdQXw5y5Qz
+         ApIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773887177; x=1774491977;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PLrWY93KLXjnMjbgd/SU8nHKn9Fei7qaT2S2SKHl6Cs=;
+        b=BLqW+10bI2mXXio6wtRpYEEeMiv7VJHbB2GdRxq8lOIsD4rIA/NW2agfpXaIuzez4A
+         8blxAJ/pzYuQiDllJdfEaYaZ+HRvAtSU7wnU6gXkVNGGVcy42yFOTP8RBpqdef0vPFf7
+         bllsG1pqy16YO3V3KrkyvL1rva1i6rp5iYiV+s1MtM80CuQuDCOUcB/7K95hhzXMvpyj
+         P0IXJqtG7h1YLTwsZF9j1Vvd+k1fweUy/SuCeDSbJCVcFEzoniNIl3U3ZoADpqdbGWq+
+         HA4jxl8oX5gZQ6OqagqtPhq390i94R7MpKU+chvJGRWdtSW2pwZQz+13L4PuafbmcGkA
+         3ubA==
+X-Forwarded-Encrypted: i=1; AJvYcCVA3UWZCu4bEjEyFV8GBTee89wl+1d19XYUFv8ueW7QIEiOKHnz1EQ11g/h5dfcon664tZt3rM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqRmW9Lrrq+117JdB6zg0LuG9QIdmgFu5OUwjPrkchx3v8LCoE
+	yVfYRibR/TgQ27DcwMl4ywD3uwWF9d0dmWescBxofoZdw4pTCZEKA2EV
+X-Gm-Gg: ATEYQzwZXqnWxq7HsicUe1DLnHGQQchvobHA7E0YHOCzwfIJamPnZy4zkCMmviU9KI6
+	p5Slc+Sz+f18rurPZJVBX62HxagHxAB2Z0/kpPw7/9gJve7+srTvWDgAorHZZ2ILnlSpteu9R5h
+	Adz47H28gX1HAmfj7WpPmameVQTe+EnKL+v4S7e/cZXK2xD+vP/CfGVxLR3ZX7zsqwP/Jz3mKfB
+	A7zlQolt+rsXWhaIo0qoLH/3xpQRW6BgdkREJi0PxYr8Opx902NrS2+TfMaq1tYUHaVcv5NvQHR
+	zVosOP36VTF7znz3jsHtHOAHzjNE1dC4OOjB7j9rgUDrZJZQpu3+QrAFZeg4irze0GjLyCOHAV5
+	k3O/96Zm6Z8OZ8tWeK1JefzoU1DY2uJgVdUamre0kQJdpntYHJs77rUxXLMiXC4TjysvD1WTfL+
+	ySU8/rsl32/7EAlQ==
+X-Received: by 2002:a17:907:9346:b0:b97:93be:3c6a with SMTP id a640c23a62f3a-b97f4a3dc76mr349115666b.36.1773887176479;
+        Wed, 18 Mar 2026 19:26:16 -0700 (PDT)
+Received: from gmail.com ([2a09:bac5:4e24:2e3c::49b:49])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b97f1681603sm354890066b.41.2026.03.18.19.26.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Mar 2026 19:26:16 -0700 (PDT)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Breno Leitao <leitao@debian.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Kees Cook <kees@kernel.org>
+Subject: [PATCH net-next] net: add netdev_from_priv() helper
+Date: Thu, 19 Mar 2026 10:26:08 +0800
+Message-ID: <20260319022608.323969-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269264-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-269265-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.985];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.846];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 731A42C4F06
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 12FCE2C4FBC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 18 Mar 2026 13:25:58 +0100 Bj=C3=B6rn T=C3=B6pel wrote:
-> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-> index e252cf20c22f..ee91f1155830 100644
-> --- a/net/ethtool/common.c
-> +++ b/net/ethtool/common.c
-> @@ -1204,6 +1204,26 @@ void ethtool_rxfh_context_lost(struct net_device *=
-dev, u32 context_id)
->  }
->  EXPORT_SYMBOL(ethtool_rxfh_context_lost);
-> =20
-> +bool netif_is_rxfh_configured(const struct net_device *dev)
-> +{
-> +	return dev->ethtool->rss_indir_user_size;
-> +}
-> +EXPORT_SYMBOL(netif_is_rxfh_configured);
-> +
-> +/**
-> + * ethtool_rxfh_indir_clear - Clear user indirection table config
-> + * @dev: network device
-> + *
-> + * Mark the default RSS context indirection table as unconfigured and
-> + * send an %ETHTOOL_MSG_RSS_NTF notification.
+Add a helper to get netdev from private data pointer, so drivers won't
+have to store redundant netdev in priv.
 
-If you're adding kdoc you should very clearly state this is function
-should only be called if the driver lost the ability to maintain the
-indirection table, usually after HW fault recovery reduced the max
-queue count.
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+---
+ include/linux/netdevice.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-> + */
-> +void ethtool_rxfh_indir_clear(struct net_device *dev)
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index ae269a2e7f4d..dba96736202a 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2764,6 +2764,17 @@ static inline void *netdev_priv(const struct net_device *dev)
+ 	return (void *)dev->priv;
+ }
+ 
++/**
++ *	netdev_from_priv - get network device from priv
++ *	@priv: network device private data
++ *
++ * Get network device from private data pointer
++ */
++static inline struct net_device *netdev_from_priv(const void *priv)
++{
++	return container_of(priv, struct net_device, priv);
++}
++
+ /* Set the sysfs physical device reference for the network logical device
+  * if set prior to registration will cause a symlink during initialization.
+  */
+-- 
+2.43.0
 
-ethtool_rxfh_indir_lost() would be a better name, it would align with=20
-ethtool_rxfh_context_lost() right above the code you're adding, right?
-
-> +{
-
-Let's add an error in here like the one we have in
-ethtool_rxfh_context_lost(), this should stop arbitrary use.
-And you can remove the local warning in bnxt if we do that.
-
-> +	dev->ethtool->rss_indir_user_size =3D 0;
-> +	ethtool_rss_notify(dev, ETHTOOL_MSG_RSS_NTF, 0);
-> +}
-> +EXPORT_SYMBOL(ethtool_rxfh_indir_clear);
-> +
->  enum ethtool_link_medium ethtool_str_to_medium(const char *str)
->  {
->  	int i;
 
