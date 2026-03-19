@@ -1,134 +1,146 @@
-Return-Path: <netdev+bounces-269248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269249-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKMnMJNQu2lMigIAu9opvQ
-	(envelope-from <netdev+bounces-269248-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:25:39 +0100
+	id GChnOrtQu2lMigIAu9opvQ
+	(envelope-from <netdev+bounces-269249-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:26:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66A512C464D
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:25:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2D5C2C466A
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:26:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1118830217C5
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:25:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A406A3004C94
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A548A2727EB;
-	Thu, 19 Mar 2026 01:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD602727EB;
+	Thu, 19 Mar 2026 01:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oRDINDio"
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="urzHkL5X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-244119.protonmail.ch (mail-244119.protonmail.ch [109.224.244.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A7D1C84A6;
-	Thu, 19 Mar 2026 01:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0BC28E0F
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 01:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773883533; cv=none; b=kdOM5WLbZfx2E9UVSdxkDI3MmkglEUYDILaNZSGvoD0JKygfmf8tazcl62fQ/zkaxayMJ8eKifC/gVGBmQSd0NeWHMPHDaUQExbUzmnrgnS8eXzmDRJfDnj5UlVYdIRLuUI4uqZKgGekBE3MhPToljPIYD7Mh3R+Hy2tWQIjMA8=
+	t=1773883572; cv=none; b=s/WiJOHWFaQtN81pRyNG5Km+UGnyUZL484uhh1Na0QEJlp5kmB11oc8cP+gbgBANOe2Dj0sNiupUT+JQWaWllq6LxDxnfeDGul6kFdYWRFouw1jx0cQHv9nbZkQzX/00YngGhOSKEendnYxeLhL4+IXVl0FOzna7yxiJ4Y+Rpag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773883533; c=relaxed/simple;
-	bh=p12nku/LYCjTC5niFkrQGpAeCi+46klPr+3XLdRv/fk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W7DnsH7X1jUcFzhhXcVwOp/70tpcfIoUSz7y2Zyckz5cvCp9aQp9a0ddslHzuQHiGqgx2f2qpQFjLQGAiVtMbd2SgLMjz3HX4rO6i7714sDSJG6iuZtojnU1VmHlRTexiYR8XiSbzRW7BJtR0vBIRfy1gsEB8zCB/O5f05pDdgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oRDINDio; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACB58C19421;
-	Thu, 19 Mar 2026 01:25:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773883533;
-	bh=p12nku/LYCjTC5niFkrQGpAeCi+46klPr+3XLdRv/fk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oRDINDioKO55UkLxu9w3M3+p80tGi4AgWcufCDBZlX2TomYaoC4mrJFQ0J1TJS8Nb
-	 NOHabxIB88BxD4QCLPNNbwQp4EJCi2F1ICpdcfWOYIa3fbIunkfjN5sAb3c5B7wbKc
-	 LiFk/k+8vrY53shygWissZhDyjLneO4VdSWMhDCV6YWCkINwjSGfNqcGL1rlN3w/hh
-	 DXtdCmTisw9cT8nBvaEsl4ie5cjX7BhgeYojkh36BnaE22wRECYe0SG847wQoikI6z
-	 bSUWo7SmyCw6+KimZGk20Vj+ipLnAciB0jXMSmMbDE31UsEDxDOz5xDMIfzPs12NV3
-	 +xqWWdBlOgMnQ==
-Date: Wed, 18 Mar 2026 18:25:31 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pin-yen Lin <treapking@google.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Taehee Yoo
- <ap420073@gmail.com>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, Willem de Bruijn
- <willemb@google.com>
-Subject: Re: [PATCH net] selftests: drv-net: ping: Wait for carrier after
- toggling offloads
-Message-ID: <20260318182531.2e8bf837@kernel.org>
-In-Reply-To: <CAHwYsirHq7PRWg-jeGz=+Yrn2Td=o3vBSXrjfPos57V0VQL6gA@mail.gmail.com>
-References: <20260318010325.2003395-1-treapking@google.com>
-	<20260318172802.46c1fef1@kernel.org>
-	<CAHwYsirHq7PRWg-jeGz=+Yrn2Td=o3vBSXrjfPos57V0VQL6gA@mail.gmail.com>
+	s=arc-20240116; t=1773883572; c=relaxed/simple;
+	bh=ez+bM0XPMd241yMUfBgOsj0aOUZktRDgV8k/4Yz9J+Y=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=F8XKsxyYDSVXhTMoJn6OKXfoMx5DVNiyOyUk1DdIvf5ZiADwRVIBREF4ujphdJS4e29fGLeoj3jzah8ELef73aGkfJV3XZBxfbpZtQ50zLNEV5Ure9+XGAkRv41dO5A4ijvd6OA97bYT8TuzQg3NokFTAQMaW1wCagVkdfMzT8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=urzHkL5X; arc=none smtp.client-ip=109.224.244.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail3; t=1773883563; x=1774142763;
+	bh=XJ8kz5dAluCxs5y+zIv8gXsvYHyGqruSUQITcq/K6mI=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=urzHkL5Xhu2HZSga1cd7cUKfGLAQpDLBM5ETRIl8f9muEoMmnozaFdU8Bf6qVc8KS
+	 EfsVwSPLafGVu+AmwcYVJdrUhlXSX7sAjmbrrxpyfoWi7zCrackuTwSDwNRa1+cyhx
+	 h53sW/qrHwrc8nfVrZkhVtYq92/S3LiA9NTUhcfxuw8Xbw887itQMGzH4zbzB5JXw3
+	 +0yRTODyaxNj8+vLjpCY/oFwjwNt5mnjqBpDf6nC/WPWQLgDqunVOhc3zI9ehxdoLV
+	 DpwBHgUteeG2hQlbOGq/TbVQOhEwW4za56DxjaYmp/fG3GO2Z+kGP+UpMDd8KXFsEV
+	 81X4j7rFkXfEA==
+Date: Thu, 19 Mar 2026 01:25:59 +0000
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+From: William Liu <will@willsroot.io>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, victor@mojatatu.com, xmei5@asu.edu, pctammela@mojatatu.com, savy@syst3mfailure.io, kuniyu@google.com, toke@toke.dk, willemdebruijnkernel@gmail.com
+Subject: Re: [PATCH net v2 5/6] net/sched: fix packet loop on netem when duplicate is on
+Message-ID: <EsDe28RrNQr1KI6OSdjyA2kOYQnj2CqzSDd3lga9Epk_wzttTU6-pIzhVrZSFdqZqWZvIU_Z83b05OwNrKMhUlyrSlNoV3YaKYY1azzHph0=@willsroot.io>
+In-Reply-To: <CAM0EoMmso3BeWwBd_6tWPhPqTiZ=4ZywNuMeWxuvgZADXd1OUw@mail.gmail.com>
+References: <20260316211052.332383-1-jhs@mojatatu.com> <20260316211052.332383-6-jhs@mojatatu.com> <20260316175705.2ef5004e@stephen-xps.local> <CAM0EoMmso3BeWwBd_6tWPhPqTiZ=4ZywNuMeWxuvgZADXd1OUw@mail.gmail.com>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: bccd3c7487583e548e5b7d08fcafb93c3622fd19
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[willsroot.io,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[willsroot.io:s=protonmail3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-269248-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-269249-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_CC(0.00)[networkplumber.org,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,mojatatu.com,asu.edu,syst3mfailure.io,toke.dk,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.941];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.982];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[will@willsroot.io,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[willsroot.io:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 66A512C464D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[willsroot.io:dkim,willsroot.io:mid,networkplumber.org:email]
+X-Rspamd-Queue-Id: F2D5C2C466A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 18 Mar 2026 17:51:11 -0700 Pin-yen Lin wrote:
-> > On Tue, 17 Mar 2026 18:01:17 -0700 Pin-yen Lin wrote:  
-> > > Toggling checksum offload (or HW-GRO via feature dependencies) can cause
-> > > certain physical interfaces to undergo a reset or a temporary link-down
-> > > state. In the ping.py test, this leads to immediate test failures if the
-> > > ping is attempted before the carrier is restored.
-> > >
-> > > This is observed when running the test with GVE driver when HW-GRO is
-> > > enabled. When checksum offload is toggled, HW-GRO is toggled as well
-> > > because of the feature dependency. This leads to an interface reset,
-> > > causing the subsequent ping to fail.
-> > >
-> > > Add a sleep period after changing these features to allow the link to
-> > > stabilize.  
-> >
-> > Sounds like the test found a legitimate problem. The configuration
-> > should not return to user space until the operation has completed.
-> > User should not have to sleep 10sec each time they touch NIC
-> > configuration.  
-> 
-> To clarify, the configuration operation itself completes before
-> returning to userspace. However, the short link-down during the
-> configuration triggers asynchronous systemd events. These userspace
-> operations affect the subsequent pings. Sorry for not making this
-> clear in the commit message.
+On Wednesday, March 18th, 2026 at 7:34 PM, Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
 
-Can we somehow avoid / suppress this systemd behavior as part of
-(your local) environment setup? Each environment will have some 
-setups steps. We assume that DAD is disabled, IPv6 addresses are 
-not flushed on ifdown, of course no firewalls.. 
+> On Mon, Mar 16, 2026 at 8:57=E2=80=AFPM Stephen Hemminger
+> <stephen@networkplumber.org> wrote:
+> >
+> > On Mon, 16 Mar 2026 17:10:51 -0400
+> > Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+> >
+> > > --- a/net/sched/sch_netem.c
+> > > +++ b/net/sched/sch_netem.c
+> > > @@ -461,7 +461,8 @@ static int netem_enqueue(struct sk_buff *skb, str=
+uct Qdisc *sch,
+> > >       skb->prev =3D NULL;
+> > >
+> > >       /* Random duplication */
+> > > -     if (q->duplicate && q->duplicate >=3D get_crandom(&q->dup_cor, =
+&q->prng))
+> > > +     if (q->duplicate && !skb->ttl &&
+> > > +         q->duplicate >=3D get_crandom(&q->dup_cor, &q->prng))
+> > >               ++count;
+> > >
+> >
+> > Would prefer that if ttl is exhausted packet was dropped.
+> > Rather than silently not duplicating.
+
+I think silently not duplicating better matches the semantics of preventing=
+ duplication of duplicates, which is the goal of the fix.
+
+> so return NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
+>=20
+> Note, this is a change of behavior, no?
+> Actually - when i was looking the first time the bug got reported in
+> my view the bigger issue is when
+> skb_clone() fails (which happens nastily when you have that repro from
+> William). Unfortunately, the surgery was too big so i gave up.
+>=20
+
+If the GFP_ATOMIC allocation is failing, we are in a serious edge case and =
+the kernel is in trouble anyways so the current approach of null checking s=
+eems reasonable enough.
+
+> cheers,
+> jamal
+>=20
+
+Best,
+Will
 
