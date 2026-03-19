@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-269490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269491-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8N23OA8TvGnbrwIAu9opvQ
-	(envelope-from <netdev+bounces-269490-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:15:27 +0100
+	id OJ9CBIsTvGnbrwIAu9opvQ
+	(envelope-from <netdev+bounces-269491-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:17:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7212CD887
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:15:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FDE12CD8E9
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:17:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D2C0E3031B2A
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:13:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D85B23219365
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8703E1D07;
-	Thu, 19 Mar 2026 15:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 144B13E315D;
+	Thu, 19 Mar 2026 15:13:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b="0LmAj+Se"
+	dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b="lay8uwxM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-b-107.mailbox.org (mout-b-107.mailbox.org [195.10.208.47])
+Received: from mout-b-112.mailbox.org (mout-b-112.mailbox.org [195.10.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FBB3DE437;
-	Thu, 19 Mar 2026 15:13:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCC93E2768;
+	Thu, 19 Mar 2026 15:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773933195; cv=none; b=KpySPH7sgfJXjdVTb33uPl+xxu9yMf0SHdVGdGk1R9q5UbgpMv6IrMr2Sn31p+arR97jIsFREUtwYOiM2G1JfQhk23xBOl6eux6vS/B5zlz1gXPHI0ViHMflhiYGzD82FaNwwXOcbPQcohsAO0fSeE7HEo1M3b1EWmpeqdanV2w=
+	t=1773933199; cv=none; b=f6hbYRNS3wZrYXkZz5aL9ULBAgHLjwV1vbOQAMExSdiXTgDQatePsNlVl6sCzhkk8jz2pTnn2mnIhNUH5KVgDYIQPC6zcFHpdk5X+kRmlxMJtWh8UihDh3uQ4Laf+D7AMtVFIMk+R0TST9LkmbEIQgKu9Acx5NWcfjoWxgjul+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773933195; c=relaxed/simple;
-	bh=D1vNkKfupMoP2d5SF28Np/g0vRw1AZ3D7zDLIYeLhq8=;
+	s=arc-20240116; t=1773933199; c=relaxed/simple;
+	bh=JwGy+BPlkGjZjKA3BTlYKwhIK/1wQWC18opsy5kgiCU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZRrX+Aklkr4lNuBM+rHm0TM2tPcRDvPvO6P1A6pc2cbE8hWT8OdAARw8nbLf5t7eP07iNWobFY2SGnz8Je5epSf5U2aPsTkTqXusEEV8ISvImuGl4a1V17yfRBMjMJoUDZIHis1p2Nts7euTF9CvgGMWFNwG3HAT/dRcze58e4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=0LmAj+Se; arc=none smtp.client-ip=195.10.208.47
+	 MIME-Version; b=kZyGy4tuUOmWCP8B1FuwetUmKeiGTcdEgFXrd/O1x7+Pi+Tpg+Lpy5ihvN5Wu2jKWJ6ZY8MtlK9QmwKnB53r4qED5eQvsYU2o1OxL8pOuFNJID0ZgLHgh1MP0I61N8n/67OWBUswEvnZWpJdHuJUCytBabm10VJFeNpuTfXhWRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=lay8uwxM; arc=none smtp.client-ip=195.10.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mandelbit.com
 Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-b-107.mailbox.org (Postfix) with ESMTPS id 4fc8Mn2m7yzDs2b;
-	Thu, 19 Mar 2026 16:13:09 +0100 (CET)
+	by mout-b-112.mailbox.org (Postfix) with ESMTPS id 4fc8Mt0rsQzDvNX;
+	Thu, 19 Mar 2026 16:13:14 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1773933189;
+	s=MBO0001; t=1773933194;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ELi3LIGFSDx2zQa6RJTz+X8P1Q4yynMqgkJVxUcqTz8=;
-	b=0LmAj+SeaWqLrSHgbG9+zW77XSC2QtpijJMiM7HKx93qGtu6efE65uDBsTuZCSfw7j/AbZ
-	TQfBpbWH6tSzNeAd7lRtru/YnNUuParoFV/caFY2i/uP/dwYB3aWUHYt821mJ3LLvYWRp0
-	eQxnKCWOVffk10fnM24JxiMT8d9gUIc20ePZduhOJGqLJLZ5uLxdo/NS+OolUi0vBghvon
-	kENFxzKSgWf0HrPnfDC+VkjGDVEQI7XU5DDTDNAvCYHjloTxS4pjoC1wt5eHe1aN/Bc4B7
-	Ypj54dAJBCATF8fqXIJ4Jq4GESr+vlg9CbzbWtg3LR5+5qqm5jKR/IVqEP27Sg==
+	bh=hNd5T3aNWF08LM/DvKx32Cly2ZAmObchJq+lKFbTppc=;
+	b=lay8uwxMQHB4PkU6Z8gyledt+NXkDLsV8oGNCOlt6DqJbiIvoe1Y7gFfy7bmO9h8B6WxPC
+	l9s02dX2P99EhHMnXbcSIIhrpQAUZAiSbWoC4NZA9Vx132BsXb4stauOoXtQ175RgKFMan
+	UscRPaX67hSa+NIJuhIJVZ25maXUMJ1kc2MqvAiGBYODKJSI+rjtPX+wO+1zLB9v5SPiBM
+	7YOZPIEWnf+jcAISQzBF/Qym5KZr6ShEpG9ckYs5LuM9xYvF4t7iREHzQS271oru8n+ere
+	HgpArXuIlUCPQmGcBh3PBpEQ7m6QfrFbZx3vH2tJSZ6xmgJCEMmNoZKoEmBHYg==
 Authentication-Results: outgoing_mbo_mout;
 	dkim=none;
 	spf=pass (outgoing_mbo_mout: domain of ralf@mandelbit.com designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=ralf@mandelbit.com
@@ -66,9 +66,9 @@ Cc: =?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [RFC net-next 04/15] ipxlat: add IPv4 packet validation path
-Date: Thu, 19 Mar 2026 16:12:13 +0100
-Message-ID: <20260319151230.655687-5-ralf@mandelbit.com>
+Subject: [RFC net-next 05/15] ipxlat: add IPv6 packet validation path
+Date: Thu, 19 Mar 2026 16:12:14 +0100
+Message-ID: <20260319151230.655687-6-ralf@mandelbit.com>
 In-Reply-To: <20260319151230.655687-1-ralf@mandelbit.com>
 References: <20260319151230.655687-1-ralf@mandelbit.com>
 Precedence: bulk
@@ -84,11 +84,11 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[mandelbit.com:s=MBO0001];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269490-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269491-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	DMARC_NA(0.00)[mandelbit.com];
 	RCVD_TLS_LAST(0.00)[];
@@ -101,293 +101,324 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.908];
+	NEURAL_HAM(-0.00)[-0.912];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7A7212CD887
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mandelbit.com:dkim,mandelbit.com:email,mandelbit.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7FDE12CD8E9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Implement IPv4 packet parsing and validation, including option
-inspection, fragment-sensitive L4 checks, and UDP checksum-zero handling
-consistent with translator constraints. The parser populates skb
-control-block metadata consumed by translation and marks RFC-driven drop
-reasons for later action handling.
+Implement IPv6 packet parsing and validation, including extension header
+traversal, fragment-header constraints, and ICMPv6 checksum handling for
+informational/error traffic. The parser fills skb control-block metadata
+for 6->4 translation and quoted-inner packet handling.
 
 Signed-off-by: Ralf Lici <ralf@mandelbit.com>
 ---
- drivers/net/ipxlat/packet.c | 312 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 310 insertions(+), 2 deletions(-)
+ drivers/net/ipxlat/packet.c | 326 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 325 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ipxlat/packet.c b/drivers/net/ipxlat/packet.c
-index f82c375255f3..0cc619dca147 100644
+index 0cc619dca147..b9a9af1b3adb 100644
 --- a/drivers/net/ipxlat/packet.c
 +++ b/drivers/net/ipxlat/packet.c
-@@ -11,6 +11,8 @@
-  *		Ralf Lici <ralf@mandelbit.com>
-  */
- 
-+#include <linux/icmp.h>
-+
- #include "packet.h"
- 
- /* Shift cached skb cb offsets by the L3 header delta after in-place rewrite.
-@@ -88,9 +90,315 @@ bool ipxlat_cb_offsets_valid(const struct ipxlat_cb *cb)
+@@ -401,7 +401,331 @@ int ipxlat_v4_validate_skb(struct ipxlat_priv *ipxlat, struct sk_buff *skb)
+ 	return 0;
  }
- #endif
  
--int ipxlat_v4_validate_skb(struct ipxlat_priv *ipxl, struct sk_buff *skb)
-+static bool ipxlat_v4_validate_addr(__be32 addr4)
- {
--	return -EOPNOTSUPP;
-+	return !(ipv4_is_zeronet(addr4) || ipv4_is_loopback(addr4) ||
-+		 ipv4_is_multicast(addr4) || ipv4_is_lbcast(addr4));
-+}
-+
-+/* RFC 7915 Section 4.1 requires ignoring IPv4 options unless an unexpired
-+ * LSRR/SSRR is present, in which case we must send ICMPv4 SR_FAILED.
-+ * We intentionally treat malformed option encoding as invalid input and
-+ * drop early instead of continuing translation.
-+ */
-+static int ipxlat_v4_srr_check(struct sk_buff *skb, const struct iphdr *hdr)
++static bool ipxlat_v6_validate_saddr(const struct in6_addr *addr6)
 +{
-+	const u8 *opt, *end;
-+	u8 type, len, ptr;
-+
-+	if (likely(hdr->ihl <= 5))
-+		return 0;
-+
-+	opt = (const u8 *)(hdr + 1);
-+	end = (const u8 *)hdr + (hdr->ihl << 2);
-+
-+	while (opt < end) {
-+		type = opt[0];
-+		if (type == IPOPT_END)
-+			return 0;
-+		if (type == IPOPT_NOOP) {
-+			opt++;
-+			continue;
-+		}
-+
-+		if (unlikely(end - opt < 2))
-+			return -EINVAL;
-+
-+		len = opt[1];
-+		if (unlikely(len < 2 || opt + len > end))
-+			return -EINVAL;
-+
-+		if (type == IPOPT_LSRR || type == IPOPT_SSRR) {
-+			if (unlikely(len < 3))
-+				return -EINVAL;
-+
-+			/* points to the beginning of the next IP addr */
-+			ptr = opt[2];
-+			if (unlikely(ptr < 4))
-+				return -EINVAL;
-+			if (unlikely(ptr > len))
-+				return 0;
-+			if (unlikely(ptr > len - 3))
-+				return -EINVAL;
-+
-+			return -EINVAL;
-+		}
-+
-+		opt += len;
-+	}
-+
-+	return 0;
++	return !(ipv6_addr_any(addr6) || ipv6_addr_loopback(addr6) ||
++		 ipv6_addr_is_multicast(addr6));
 +}
 +
-+static int ipxlat_v4_pull_l3(struct sk_buff *skb, unsigned int l3_offset,
-+			     bool inner)
-+{
-+	const struct iphdr *iph;
-+	unsigned int tot_len;
-+	int l3_len;
-+
-+	if (unlikely(!pskb_may_pull(skb, l3_offset + sizeof(*iph))))
-+		return -EINVAL;
-+
-+	iph = (const struct iphdr *)(skb->data + l3_offset);
-+	if (unlikely(iph->version != 4 || iph->ihl < 5))
-+		return -EINVAL;
-+
-+	l3_len = iph->ihl << 2;
-+	/* For inner packets use ntohs(iph->tot_len) instead of iph_totlen.
-+	 * If inner iph->tot_len is zero, iph_totlen would fall back to outer
-+	 * GSO metadata, which is unrelated to quoted inner packet length.
-+	 */
-+	tot_len = unlikely(inner) ? ntohs(iph->tot_len) : iph_totlen(skb, iph);
-+	if (unlikely(tot_len < l3_len))
-+		return -EINVAL;
-+
-+	if (unlikely(!pskb_may_pull(skb, l3_offset + l3_len)))
-+		return -EINVAL;
-+
-+	return l3_len;
-+}
-+
-+static int ipxlat_v4_pull_l4(struct sk_buff *skb, unsigned int l4_offset,
++static int ipxlat_v6_pull_l4(struct sk_buff *skb, unsigned int l4_offset,
 +			     u8 l4_proto, bool *is_icmp_err)
 +{
-+	struct icmphdr *icmp;
++	struct icmp6hdr *icmp;
 +	struct udphdr *udp;
 +	struct tcphdr *tcp;
 +
 +	*is_icmp_err = false;
 +
 +	switch (l4_proto) {
-+	case IPPROTO_TCP:
++	case NEXTHDR_TCP:
 +		if (unlikely(!pskb_may_pull(skb, l4_offset + sizeof(*tcp))))
 +			return -EINVAL;
-+
 +		tcp = (struct tcphdr *)(skb->data + l4_offset);
-+		if (unlikely(tcp->doff < 5))
-+			return -EINVAL;
-+
 +		return __tcp_hdrlen(tcp);
-+	case IPPROTO_UDP:
++	case NEXTHDR_UDP:
 +		if (unlikely(!pskb_may_pull(skb, l4_offset + sizeof(*udp))))
 +			return -EINVAL;
-+
 +		udp = (struct udphdr *)(skb->data + l4_offset);
 +		if (unlikely(ntohs(udp->len) < sizeof(*udp)))
 +			return -EINVAL;
-+
 +		return sizeof(struct udphdr);
-+	case IPPROTO_ICMP:
++	case NEXTHDR_ICMP:
 +		if (unlikely(!pskb_may_pull(skb, l4_offset + sizeof(*icmp))))
 +			return -EINVAL;
-+
-+		icmp = (struct icmphdr *)(skb->data + l4_offset);
-+		*is_icmp_err = icmp_is_err(icmp->type);
-+		return sizeof(struct icmphdr);
++		icmp = (struct icmp6hdr *)(skb->data + l4_offset);
++		*is_icmp_err = icmpv6_is_err(icmp->icmp6_type);
++		return sizeof(struct icmp6hdr);
 +	default:
 +		return 0;
 +	}
 +}
 +
-+static int ipxlat_v4_pull_icmp_inner(struct sk_buff *skb,
-+				     unsigned int inner_l3_off)
++/* Basic IPv6 header walk: parse only the packet starting at l3_offset.
++ * It does not inspect quoted inner packets carried by ICMP errors.
++ */
++static int ipxlat_v6_walk_hdrs(struct sk_buff *skb, unsigned int l3_offset,
++			       u8 *l4_proto, unsigned int *fhdr_offset,
++			       unsigned int *l4_offset, bool *has_l4)
 +{
-+	struct ipxlat_cb *cb = ipxlat_skb_cb(skb);
-+	const struct iphdr *inner_l3_hdr;
-+	unsigned int inner_l4_off;
-+	int inner_l3_len, err;
-+	bool is_icmp_err;
++	unsigned int frag_hdr_off, l4hdr_off;
++	struct frag_hdr *frag;
++	struct ipv6hdr *ip6;
++	bool first_frag;
++	int err;
 +
-+	inner_l3_len = ipxlat_v4_pull_l3(skb, inner_l3_off, true);
-+	if (unlikely(inner_l3_len < 0))
-+		return inner_l3_len;
-+	inner_l3_hdr = (const struct iphdr *)(skb->data + inner_l3_off);
++	/* cannot use default getter because this function is used both for
++	 * outer and inner packets
++	 */
++	ip6 = (struct ipv6hdr *)(skb->data + l3_offset);
 +
-+	/* accept non-first quoted fragments: only inner L3 is translatable */
-+	inner_l4_off = inner_l3_off + inner_l3_len;
-+	cb->inner_l3_offset = inner_l3_off;
-+	cb->inner_l3_hdr_len = inner_l3_len;
-+	cb->inner_l4_offset = inner_l4_off;
-+
-+	if (unlikely(!ipxlat_is_first_frag4(inner_l3_hdr)))
-+		return 0;
-+
-+	err = ipxlat_v4_pull_l4(skb, inner_l4_off, inner_l3_hdr->protocol,
-+				&is_icmp_err);
-+	if (unlikely(err < 0))
-+		return err;
-+	if (unlikely(is_icmp_err))
++	/* if present, locate Fragment Header first because it affects
++	 * whether transport headers are available
++	 */
++	frag_hdr_off = l3_offset;
++	err = ipv6_find_hdr(skb, &frag_hdr_off, NEXTHDR_FRAGMENT, NULL, NULL);
++	if (unlikely(err < 0 && err != -ENOENT))
 +		return -EINVAL;
 +
++	*has_l4 = true;
++	*fhdr_offset = 0;
++	if (unlikely(err == NEXTHDR_FRAGMENT)) {
++		if (unlikely(!pskb_may_pull(skb, frag_hdr_off + sizeof(*frag))))
++			return -EINVAL;
++		frag = (struct frag_hdr *)(skb->data + frag_hdr_off);
++
++		/* remember Fragment Header offset for downstream logic */
++		*fhdr_offset = frag_hdr_off;
++		first_frag = ipxlat_is_first_frag6(frag);
++
++		/* ipv6 forbids chaining FHs */
++		if (unlikely(frag->nexthdr == NEXTHDR_FRAGMENT))
++			return -EINVAL;
++
++		/* RFC 7915 Section 5.1.1 does not support extension headers
++		 * after FH (except NEXTHDR_NONE)
++		 */
++		if (unlikely(ipv6_ext_hdr(frag->nexthdr) &&
++			     frag->nexthdr != NEXTHDR_NONE))
++			return -EPROTONOSUPPORT;
++
++		/* non-first fragments do not carry a full transport header */
++		if (!first_frag) {
++			*l4_proto = frag->nexthdr;
++			/* first byte after FH is fragment payload,
++			 * not L4 header
++			 */
++			*l4_offset = frag_hdr_off + sizeof(struct frag_hdr);
++			*has_l4 = false;
++			return 0;
++		}
++	}
++
++	/* walk extension headers to terminal protocol and compute offsets used
++	 * by validation/translation
++	 */
++	l4hdr_off = l3_offset;
++	err = ipv6_find_hdr(skb, &l4hdr_off, -1, NULL, NULL);
++	if (unlikely(err < 0))
++		return -EINVAL;
++
++	*l4_proto = err;
++	*l4_offset = l4hdr_off;
 +	return 0;
 +}
 +
-+static int ipxlat_v4_pull_hdrs(struct sk_buff *skb)
++/* RFC 7915 Section 5.1 says a Routing Header with Segments Left != 0
++ * must not be translated. We detect it by asking ipv6_find_hdr not to
++ * skip RH, then emit ICMPv6 Parameter Problem pointing to segments_left.
++ */
++static int ipxlat_v6_check_rh(struct sk_buff *skb)
++{
++	unsigned int rh_off;
++	int flags, nexthdr;
++
++	rh_off = 0;
++	flags = IP6_FH_F_SKIP_RH;
++	nexthdr = ipv6_find_hdr(skb, &rh_off, NEXTHDR_ROUTING, NULL, &flags);
++	if (unlikely(nexthdr < 0 && nexthdr != -ENOENT))
++		return -EINVAL;
++	if (likely(nexthdr != NEXTHDR_ROUTING))
++		return 0;
++
++	return -EINVAL;
++}
++
++static int ipxlat_v6_pull_outer_l3(struct sk_buff *skb)
 +{
 +	const unsigned int l3_off = skb_network_offset(skb);
++	struct ipv6hdr *l3_hdr;
++
++	if (unlikely(!pskb_may_pull(skb, l3_off + sizeof(*l3_hdr))))
++		return -EINVAL;
++	l3_hdr = ipv6_hdr(skb);
++
++	/* translator does not support jumbograms; payload_len must match skb */
++	if (unlikely(l3_hdr->version != 6 ||
++		     skb->len != sizeof(*l3_hdr) +
++					 be16_to_cpu(l3_hdr->payload_len) ||
++		     !ipxlat_v6_validate_saddr(&l3_hdr->saddr)))
++		return -EINVAL;
++
++	if (unlikely(l3_hdr->hop_limit <= 1))
++		return -EINVAL;
++
++	return 0;
++}
++
++static int ipxlat_v6_pull_icmp_inner(struct sk_buff *skb,
++				     unsigned int outer_payload_off)
++{
++	unsigned int inner_fhdr_off, inner_l4_off;
 +	struct ipxlat_cb *cb = ipxlat_skb_cb(skb);
-+	int err, l3_len, l4_len = 0;
-+	const struct iphdr *l3_hdr;
++	struct ipv6hdr *inner_ip6;
++	bool has_l4, is_icmp_err;
++	u8 inner_l4_proto;
++	int err;
 +
-+	/* parse IPv4 header and get its full length including options */
-+	l3_len = ipxlat_v4_pull_l3(skb, l3_off, false);
-+	if (unlikely(l3_len < 0))
-+		return l3_len;
-+	l3_hdr = ip_hdr(skb);
-+
-+	if (unlikely(!ipxlat_v4_validate_addr(l3_hdr->daddr)))
++	if (unlikely(!pskb_may_pull(skb,
++				    outer_payload_off + sizeof(*inner_ip6))))
 +		return -EINVAL;
 +
-+	/* RFC 7915 Section 4.1 */
-+	if (unlikely(ipxlat_v4_srr_check(skb, l3_hdr)))
-+		return -EINVAL;
-+	if (unlikely(l3_hdr->ttl <= 1))
++	inner_ip6 = (struct ipv6hdr *)(skb->data + outer_payload_off);
++	if (unlikely(inner_ip6->version != 6))
 +		return -EINVAL;
 +
-+	/* RFC 7915 Section 1.2:
-+	 * Fragmented ICMP/ICMPv6 packets will not be translated by IP/ICMP
-+	 * translators.
-+	 */
-+	if (unlikely(l3_hdr->protocol == IPPROTO_ICMP &&
-+		     ip_is_fragment(l3_hdr)))
-+		return -EINVAL;
++	err = ipxlat_v6_walk_hdrs(skb, outer_payload_off, &inner_l4_proto,
++				  &inner_fhdr_off, &inner_l4_off, &has_l4);
++	if (unlikely(err))
++		return err;
 +
-+	cb->l3_hdr_len = l3_len;
-+	cb->l4_proto = l3_hdr->protocol;
-+	cb->l4_off = l3_off + l3_len;
-+	cb->payload_off = cb->l4_off;
-+	cb->is_icmp_err = false;
++	cb->inner_l3_offset = outer_payload_off;
++	cb->inner_l4_offset = inner_l4_off;
++	cb->inner_fragh_off = inner_fhdr_off;
++	cb->inner_l4_proto = inner_l4_proto;
 +
-+	/* only non fragmented packets or first fragments have transport hdrs */
-+	if (unlikely(!ipxlat_is_first_frag4(l3_hdr))) {
-+		if (unlikely(!ipxlat_v4_validate_addr(l3_hdr->saddr)))
-+			return -EINVAL;
-+		return 0;
-+	}
-+
-+	l4_len = ipxlat_v4_pull_l4(skb, cb->l4_off, l3_hdr->protocol,
-+				   &cb->is_icmp_err);
-+	if (unlikely(l4_len < 0))
-+		return l4_len;
-+
-+	/* RFC 7915 Section 4.1:
-+	 * Illegal IPv4 sources are accepted only for ICMPv4 error translation.
-+	 */
-+	if (unlikely(!ipxlat_v4_validate_addr(l3_hdr->saddr) &&
-+		     !cb->is_icmp_err))
-+		return -EINVAL;
-+
-+	cb->payload_off = cb->l4_off + l4_len;
-+
-+	if (unlikely(cb->is_icmp_err)) {
-+		/* validate the quoted packet in an ICMP error */
-+		err = ipxlat_v4_pull_icmp_inner(skb, cb->payload_off);
-+		if (unlikely(err))
++	if (likely(has_l4)) {
++		err = ipxlat_v6_pull_l4(skb, inner_l4_off, inner_l4_proto,
++					&is_icmp_err);
++		if (unlikely(err < 0))
 +			return err;
++		if (unlikely(is_icmp_err))
++			return -EINVAL;
 +	}
 +
 +	return 0;
 +}
 +
-+static int ipxlat_v4_validate_icmp_csum(const struct sk_buff *skb)
++static int ipxlat_v6_pull_hdrs(struct sk_buff *skb)
 +{
++	const unsigned int l3_off = skb_network_offset(skb);
++	unsigned int fragh_off, l4_off, payload_off;
++	struct ipxlat_cb *cb = ipxlat_skb_cb(skb);
++	int l3_len, l4_len, err;
++	struct frag_hdr *frag;
++	bool has_l4;
++	u8 l4_proto;
++
++	/* parse IPv6 base header and perform basic structural checks */
++	err = ipxlat_v6_pull_outer_l3(skb);
++	if (unlikely(err))
++		return err;
++
++	/* walk extension/fragment headers and locate the transport header */
++	err = ipxlat_v6_walk_hdrs(skb, l3_off, &l4_proto, &fragh_off, &l4_off,
++				  &has_l4);
++	/* -EPROTONOSUPPORT means packet layout is syntactically valid but
++	 * unsupported by our RFC 7915 path
++	 */
++	if (unlikely(err == -EPROTONOSUPPORT))
++		return -EINVAL;
++	if (unlikely(err))
++		return err;
++
++	l3_len = l4_off - l3_off;
++	payload_off = l4_off;
++
++	if (likely(has_l4)) {
++		l4_len = ipxlat_v6_pull_l4(skb, l4_off, l4_proto,
++					   &cb->is_icmp_err);
++		if (unlikely(l4_len < 0))
++			return l4_len;
++		payload_off += l4_len;
++	}
++
++	/* RFC 7915 Section 5.1 */
++	err = ipxlat_v6_check_rh(skb);
++	if (unlikely(err))
++		return err;
++
++	if (unlikely(l4_proto == NEXTHDR_ICMP)) {
++		/* A stateless translator cannot reliably translate ICMP
++		 * checksum across real IPv6 fragments, so fragmented ICMP is
++		 * dropped. A Fragment Header alone, however, is not enough to
++		 * decide: so-called atomic fragments (offset=0, M=0) carry a
++		 * Fragment Header but are not actually fragmented.
++		 */
++		if (unlikely(fragh_off)) {
++			if (unlikely(!pskb_may_pull(skb,
++						    fragh_off + sizeof(*frag))))
++				return -EINVAL;
++
++			frag = (struct frag_hdr *)(skb->data + fragh_off);
++			if (unlikely(ipxlat_get_frag6_offset(frag) ||
++				     (be16_to_cpu(frag->frag_off) & IP6_MF)))
++				return -EINVAL;
++		}
++
++		if (unlikely(cb->is_icmp_err)) {
++			/* validate the quoted packet in an ICMP error */
++			err = ipxlat_v6_pull_icmp_inner(skb, payload_off);
++			if (unlikely(err))
++				return err;
++		}
++	}
++
++	cb->l4_proto = l4_proto;
++	cb->l4_off = l4_off;
++	cb->fragh_off = fragh_off;
++	cb->payload_off = payload_off;
++	cb->l3_hdr_len = l3_len;
++
++	return 0;
++}
++
++static int ipxlat_v6_validate_icmp_csum(const struct sk_buff *skb)
++{
++	struct ipv6hdr *iph6;
++	unsigned int len;
 +	__sum16 csum;
 +
-+	/* skip when checksum is not software-owned */
 +	if (skb->ip_summed != CHECKSUM_NONE)
 +		return 0;
 +
-+	/* compute checksum over ICMP header and payload, then fold to 16-bit
-+	 * Internet checksum to validate it
-+	 */
-+	csum = csum_fold(skb_checksum(skb, skb_transport_offset(skb),
-+				      ipxlat_skb_datagram_len(skb), 0));
++	iph6 = ipv6_hdr(skb);
++	len = ipxlat_skb_datagram_len(skb);
++	csum = csum_ipv6_magic(&iph6->saddr, &iph6->daddr, len, NEXTHDR_ICMP,
++			       skb_checksum(skb, skb_transport_offset(skb), len,
++					    0));
++
 +	return unlikely(csum) ? -EINVAL : 0;
 +}
 +
 +/**
-+ * ipxlat_v4_validate_skb - validate IPv4 input and fill parser metadata in cb
-+ * @ipxlat: translator private context
++ * ipxlat_v6_validate_skb - validate IPv6 input and fill parser metadata in cb
 + * @skb: packet to validate
 + *
 + * Ensures required headers are present/consistent and stores parsed offsets
@@ -395,63 +426,37 @@ index f82c375255f3..0cc619dca147 100644
 + *
 + * Return: 0 on success, negative errno on validation failure.
 + */
-+int ipxlat_v4_validate_skb(struct ipxlat_priv *ipxlat, struct sk_buff *skb)
-+{
+ int ipxlat_v6_validate_skb(struct sk_buff *skb)
+ {
+-	return -EOPNOTSUPP;
 +	struct ipxlat_cb *cb = ipxlat_skb_cb(skb);
-+	struct iphdr *l3_hdr;
-+	struct udphdr *udph;
 +	int err;
 +
 +	if (unlikely(skb_shared(skb)))
 +		return -EINVAL;
 +
-+	err = ipxlat_v4_pull_hdrs(skb);
++	err = ipxlat_v6_pull_hdrs(skb);
 +	if (unlikely(err))
 +		return err;
 +
 +	skb_set_transport_header(skb, cb->l4_off);
 +
 +	if (unlikely(cb->is_icmp_err)) {
-+		if (unlikely(cb->l4_proto != IPPROTO_ICMP)) {
++		if (unlikely(cb->l4_proto != NEXTHDR_ICMP)) {
 +			DEBUG_NET_WARN_ON_ONCE(1);
 +			return -EINVAL;
 +		}
 +
-+		/* Translation path recomputes ICMPv6 checksum from scratch.
-+		 * Validate here so a corrupted ICMPv4 error is not converted
-+		 * into a translated packet with a valid checksum.
++		/* The translated ICMPv4 checksum is recomputed from scratch,
++		 * so reject bad ICMPv6 error checksums before conversion.
 +		 */
-+		return ipxlat_v4_validate_icmp_csum(skb);
++		err = ipxlat_v6_validate_icmp_csum(skb);
++		if (unlikely(err))
++			return err;
 +	}
-+
-+	l3_hdr = ip_hdr(skb);
-+	if (likely(cb->l4_proto != IPPROTO_UDP))
-+		return 0;
-+	if (unlikely(!ipxlat_is_first_frag4(l3_hdr)))
-+		return 0;
-+
-+	udph = udp_hdr(skb);
-+	if (likely(udph->check != 0))
-+		return 0;
-+
-+	/* We are in the path where L4 header is present (unfragmented packets
-+	 * or first fragments) and is UDP.
-+	 * Fragmented checksum-less IPv4 UDP is rejected because 4->6 cannot
-+	 * reliably translate it.
-+	 */
-+	if (unlikely(ip_is_fragment(l3_hdr)))
-+		return -EINVAL;
-+
-+	/* udph->len bounds the span used to compute replacement checksum */
-+	if (unlikely(ntohs(udph->len) > skb->len - cb->l4_off))
-+		return -EINVAL;
-+
-+	cb->udp_zero_csum_len = ntohs(udph->len);
 +
 +	return 0;
  }
- 
- int ipxlat_v6_validate_skb(struct sk_buff *skb)
 -- 
 2.53.0
 
