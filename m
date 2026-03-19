@@ -1,279 +1,293 @@
-Return-Path: <netdev+bounces-269647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269648-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8KHtBxdhvGlxxQIAu9opvQ
-	(envelope-from <netdev+bounces-269647-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:48:23 +0100
+	id 8EdHOjxivGmLxwIAu9opvQ
+	(envelope-from <netdev+bounces-269648-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:53:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A706E2D25EE
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:48:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D74E2D2656
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:53:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C021D301511B
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:48:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 07C8230292F9
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F083F9F51;
-	Thu, 19 Mar 2026 20:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E4E3F9F42;
+	Thu, 19 Mar 2026 20:53:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UyKxoM0H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TniRfkk9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C253AA1B0;
-	Thu, 19 Mar 2026 20:48:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E88C3EBF08
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 20:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773953297; cv=none; b=ibDqzgON8YSX1rlUXvXuaZ9XvsfeAiBcXAJBMotQvBRESPukxJmgSWvtxx5lEYa6aXxziDeQsujIar+uZo8JX+AoWX+/5Om9jhciNnt8UgySHIY8FaK/1YtbJrAbUjO4soJ+kDl1KBkGH7Ks2qNtOF+/n7RPKmBRS1eg0I+g9eE=
+	t=1773953594; cv=none; b=lq6F4egd9JZcZsFPXMzihGsvP2ycHbIRl9cx3vC9UrWu+TxLzTJGflZ3pAbnAhTt0b0qsFzkOh2izg2C5eqWLYCWFgL3sOkHXhvsDff3A8fSoT9Hp4aUAI4AUPk8KXeTri7ThxcPSo7uMRmv1MvK1aZU7OtvNepkz9V/uSZUuoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773953297; c=relaxed/simple;
-	bh=ZX/bTdTPJwUeA0+ahCmmyEo1Zy8BIu8jeRCyncgzauE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ujNnesvaK5vcF01yoYhmDZ2JbL7eVKA7K+MHgwD+s6C7jnnFunXu1Ma58Ysoy/ADK+k5NlP9zE60PXm4mjv84oJ8+YTZieaTuU/ac1z+PuFhYIO6+Zo5Kt7pus5d7y7poXzmAc/fh9J4ETZKDpEcxR0Kcn6Kspj4vdZOy+4XXeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UyKxoM0H; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773953295; x=1805489295;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZX/bTdTPJwUeA0+ahCmmyEo1Zy8BIu8jeRCyncgzauE=;
-  b=UyKxoM0HhNIvsERaAOmk3Wgx+rHFzHF0b3nHOSg+3whTjRxb/68SxRhh
-   D2SFZnaUyOmh43ymt+LIJY8fqrRYFppn1ysoCHv0hVceAxRDaBGN15sbr
-   HjKbPe7yJyn7Fg8HKu0t4Sv7FS7ZDcnlDlp1CAiv/KmdJavpIAVUb9xNQ
-   +Ld48NEtGanIQB7jNDD3h0YyQ9IVn4PPGG2OKLMF+pMdnmfHm0ctDRb1Y
-   ccGXQuYYyJCwCj7cXVyKTWNX5AH91VB0JkaAWfEfHKR2OwoTjYDgedhKO
-   qR0RIlgJYilLjLJpVNY3KMbbz2RXH3r4ccwukNRRkXnA3wb/PHQEZ3Vk3
-   A==;
-X-CSE-ConnectionGUID: TUTyU14CSLieYLwROSdgGg==
-X-CSE-MsgGUID: JD6G1m0bQPqhNlKuEirYTQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="100496196"
-X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
-   d="scan'208";a="100496196"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 13:48:15 -0700
-X-CSE-ConnectionGUID: efHp6hSUQE6aDXyJibgx2g==
-X-CSE-MsgGUID: pSeySoySRIWYcuhBDeFbVQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
-   d="scan'208";a="222306964"
-Received: from lkp-server02.sh.intel.com (HELO a51c2a36b9df) ([10.239.97.151])
-  by orviesa010.jf.intel.com with ESMTP; 19 Mar 2026 13:48:11 -0700
-Received: from kbuild by a51c2a36b9df with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w3KHo-000000001dt-40uo;
-	Thu, 19 Mar 2026 20:48:08 +0000
-Date: Fri, 20 Mar 2026 04:46:08 +0800
-From: kernel test robot <lkp@intel.com>
-To: hsuck <hsu.chih.kai@realtek.com>, kuba@kernel.org, davem@davemloft.net
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	nic_swsd@realtek.com, linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org, edumazet@google.com, bjorn@mork.no,
-	pabeni@redhat.com, hsuck <hsu.chih.kai@realtek.com>
-Subject: Re: [PATCH net-next 2/2] r8152: add helper functions for PHY OCP
- registers
-Message-ID: <202603200420.7kabrAGG-lkp@intel.com>
-References: <20260318123313.2313-446-nic_swsd@realtek.com>
+	s=arc-20240116; t=1773953594; c=relaxed/simple;
+	bh=1Wt2RJNSUdsclmDRyhyj3eVjEZz+1kdkT6/YVAbFK6Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L/CH/GMMPLY3BIJcqyesI4tbAce3Xbf+WpYfG+f25UZVZ16NwhCPscddVAELBbvFexWBvPdvkbSsSsOiTaTKNskPoszyqRAmy3wdXk3YOxDPGiMEq0tF6JEIoeFRkCRi9/RvErd1lxG8X4krNOlmqCiys61x+3n0gZqgBrsaGDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TniRfkk9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773953591;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pDuNk1maIwkM81h0xNfMndhfHmB77PaC4WV88nssjB0=;
+	b=TniRfkk9t0Ux+gYhkL9Elto9SyHO96w7NZh7j7C8ltdBoN5RivTXMj5LefWz9SPqqnlIEQ
+	Gxkkejj4N4SrtSyfGbgRCu56sf1xjDygAxf7bAQbgxt75yuz/7ZP5H/dxPvyex/MRWlTxV
+	HWvos7EiFDHIaQEN2LSqOBc38//2K0M=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-493-pHpjlvk4OxSbyGwG68z_pg-1; Thu,
+ 19 Mar 2026 16:53:05 -0400
+X-MC-Unique: pHpjlvk4OxSbyGwG68z_pg-1
+X-Mimecast-MFC-AGG-ID: pHpjlvk4OxSbyGwG68z_pg_1773953583
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 591CD18002C8;
+	Thu, 19 Mar 2026 20:53:03 +0000 (UTC)
+Received: from ShadowPeak.redhat.com (unknown [10.45.224.50])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 627931955F21;
+	Thu, 19 Mar 2026 20:52:59 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: ivecera@redhat.com,
+	Petr Oros <poros@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-net v4] ice: fix missing dpll notifications for SW pins
+Date: Thu, 19 Mar 2026 21:52:56 +0100
+Message-ID: <20260319205256.998876-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260318123313.2313-446-nic_swsd@realtek.com>
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269647-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269648-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.989];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,01.org:url]
-X-Rspamd-Queue-Id: A706E2D25EE
+	NEURAL_HAM(-0.00)[-0.886];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5D74E2D2656
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi hsuck,
+The SMA/U.FL pin redesign (commit 2dd5d03c77e2 ("ice: redesign dpll
+sma/u.fl pins control")) introduced software-controlled pins that wrap
+backing CGU input/output pins, but never updated the notification and
+data paths to propagate pin events to these SW wrappers.
 
-kernel test robot noticed the following build warnings:
+There are three problems:
 
-[auto build test WARNING on net-next/main]
+1) ice_dpll_notify_changes() sends dpll_pin_change_ntf() only for the
+   direct CGU input pin stored in d->active_input.  When the active
+   input changes, SW pins (SMA/U.FL) that wrap the old or new active
+   input never receive a change notification.  As a result, userspace
+   consumers such as synce4l that monitor SMA pins via dpll netlink
+   never learn when the pin state transitions (e.g. from SELECTABLE to
+   CONNECTED).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/hsuck/r8152-add-helper-functions-for-PLA-USB-OCP-registers/20260318-232634
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260318123313.2313-446-nic_swsd%40realtek.com
-patch subject: [PATCH net-next 2/2] r8152: add helper functions for PHY OCP registers
-config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20260320/202603200420.7kabrAGG-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260320/202603200420.7kabrAGG-lkp@intel.com/reproduce)
+2) ice_dpll_phase_offset_get() returns p->phase_offset for non-active
+   SW pins, but this field is never updated for SW pins.  The PPS phase
+   offset monitor updates the backing CGU input's phase_offset
+   (p->input->phase_offset), not the SW pin's own field.  As a result
+   non-active SW pins always report zero phase offset even when the
+   backing CGU input has valid PPS measurements.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603200420.7kabrAGG-lkp@intel.com/
+3) ice_dpll_pins_notify_mask() does not propagate phase offset change
+   notifications to SW pins either.  When a HW CGU pin gets a phase
+   offset change notification, the SMA/U.FL pin wrapping it is never
+   notified, so userspace consumers (ts2phc, synce4l) monitoring SW
+   pins via dpll netlink never receive phase offset updates.
 
-All warnings (new ones prefixed by >>):
+Fix all three by:
 
-   drivers/net/usb/r8152.c: In function 'r8153_init':
->> drivers/net/usb/r8152.c:6864:13: warning: variable 'data' set but not used [-Wunused-but-set-variable]
-    6864 |         u16 data;
-         |             ^~~~
-   drivers/net/usb/r8152.c: In function 'r8153b_init':
-   drivers/net/usb/r8152.c:6983:13: warning: variable 'data' set but not used [-Wunused-but-set-variable]
-    6983 |         u16 data;
-         |             ^~~~
-   drivers/net/usb/r8152.c: In function 'r8153c_init':
-   drivers/net/usb/r8152.c:7054:13: warning: variable 'data' set but not used [-Wunused-but-set-variable]
-    7054 |         u16 data;
-         |             ^~~~
+ - In ice_dpll_phase_offset_get(), return the backing CGU input's
+   phase_offset for input-direction SW pins instead of the SW pin's own
+   (always zero) field.
 
+ - Introduce ice_dpll_pin_ntf(), a thin wrapper around
+   dpll_pin_change_ntf() that also sends notifications to any
+   registered SMA/U.FL pin whose backing CGU input matches.  Replace
+   all direct dpll_pin_change_ntf() calls in the periodic notification
+   paths with ice_dpll_pin_ntf(), so SW pins are automatically notified
+   whenever their backing HW pin is.
 
-vim +/data +6864 drivers/net/usb/r8152.c
+Fixes: 2dd5d03c77e2 ("ice: redesign dpll sma/u.fl pins control")
+Signed-off-by: Petr Oros <poros@redhat.com>
+---
+v4:
+ - expanded scope to also fix phase offset reporting and phase offset
+   notifications for SW pins (problems 2 and 3 above)
+ - replaced ice_dpll_sw_pin_needs_notify() with ice_dpll_pin_ntf(),
+   a unified wrapper that covers all notification paths
+ - squashed into a single patch
+v3: https://lore.kernel.org/all/20260220140700.2910174-1-poros@redhat.com/
+ - added kdoc for ice_dpll_sw_pin_needs_notify() helper
+v2: https://lore.kernel.org/all/20260219131500.2271897-1-poros@redhat.com/
+ - extracted ice_dpll_sw_pin_needs_notify() helper for readability
+ - moved loop variable into for() scope
+v1: https://lore.kernel.org/all/20260218211414.1411163-1-poros@redhat.com/
+---
+ drivers/net/ethernet/intel/ice/ice_dpll.c | 47 +++++++++++++++++------
+ 1 file changed, 36 insertions(+), 11 deletions(-)
 
-195aae321c829d Hayes Wang       2021-04-16  6861  
-195aae321c829d Hayes Wang       2021-04-16  6862  static void r8153_init(struct r8152 *tp)
-195aae321c829d Hayes Wang       2021-04-16  6863  {
-195aae321c829d Hayes Wang       2021-04-16 @6864  	u16 data;
-195aae321c829d Hayes Wang       2021-04-16  6865  	int i;
-195aae321c829d Hayes Wang       2021-04-16  6866  
-715f67f33af45c Douglas Anderson 2023-10-20  6867  	if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-195aae321c829d Hayes Wang       2021-04-16  6868  		return;
-195aae321c829d Hayes Wang       2021-04-16  6869  
-195aae321c829d Hayes Wang       2021-04-16  6870  	r8153_u1u2en(tp, false);
-195aae321c829d Hayes Wang       2021-04-16  6871  
-195aae321c829d Hayes Wang       2021-04-16  6872  	for (i = 0; i < 500; i++) {
-195aae321c829d Hayes Wang       2021-04-16  6873  		if (ocp_read_word(tp, MCU_TYPE_PLA, PLA_BOOT_CTRL) &
-195aae321c829d Hayes Wang       2021-04-16  6874  		    AUTOLOAD_DONE)
-195aae321c829d Hayes Wang       2021-04-16  6875  			break;
-195aae321c829d Hayes Wang       2021-04-16  6876  
-195aae321c829d Hayes Wang       2021-04-16  6877  		msleep(20);
-715f67f33af45c Douglas Anderson 2023-10-20  6878  		if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-195aae321c829d Hayes Wang       2021-04-16  6879  			break;
-195aae321c829d Hayes Wang       2021-04-16  6880  	}
-195aae321c829d Hayes Wang       2021-04-16  6881  
-195aae321c829d Hayes Wang       2021-04-16  6882  	data = r8153_phy_status(tp, 0);
-195aae321c829d Hayes Wang       2021-04-16  6883  
-195aae321c829d Hayes Wang       2021-04-16  6884  	if (tp->version == RTL_VER_03 || tp->version == RTL_VER_04 ||
-195aae321c829d Hayes Wang       2021-04-16  6885  	    tp->version == RTL_VER_05)
-195aae321c829d Hayes Wang       2021-04-16  6886  		ocp_reg_write(tp, OCP_ADC_CFG, CKADSEL_L | ADC_EN | EN_EMI_L);
-195aae321c829d Hayes Wang       2021-04-16  6887  
-b520efeb0a4573 hsuck            2026-03-18  6888  	r8152_mdio_test_and_clr_bit(tp, MII_BMCR, BMCR_PDOWN);
-195aae321c829d Hayes Wang       2021-04-16  6889  
-195aae321c829d Hayes Wang       2021-04-16  6890  	data = r8153_phy_status(tp, PHY_STAT_LAN_ON);
-195aae321c829d Hayes Wang       2021-04-16  6891  
-195aae321c829d Hayes Wang       2021-04-16  6892  	r8153_u2p3en(tp, false);
-195aae321c829d Hayes Wang       2021-04-16  6893  
-195aae321c829d Hayes Wang       2021-04-16  6894  	if (tp->version == RTL_VER_04) {
-ce600d52ace5a4 hsuck            2026-03-18  6895  		ocp_word_w0w1(tp, MCU_TYPE_USB, USB_SSPHYLINK2,
-ce600d52ace5a4 hsuck            2026-03-18  6896  			      pwd_dn_scale_mask, pwd_dn_scale(96));
-ce600d52ace5a4 hsuck            2026-03-18  6897  
-ce600d52ace5a4 hsuck            2026-03-18  6898  		ocp_byte_set_bits(tp, MCU_TYPE_USB, USB_USB2PHY,
-ce600d52ace5a4 hsuck            2026-03-18  6899  				  USB2PHY_L1 | USB2PHY_SUSPEND);
-195aae321c829d Hayes Wang       2021-04-16  6900  	} else if (tp->version == RTL_VER_05) {
-ce600d52ace5a4 hsuck            2026-03-18  6901  		ocp_byte_clr_bits(tp, MCU_TYPE_PLA, PLA_DMY_REG0, ECM_ALDPS);
-195aae321c829d Hayes Wang       2021-04-16  6902  
-195aae321c829d Hayes Wang       2021-04-16  6903  		if (ocp_read_word(tp, MCU_TYPE_USB, USB_BURST_SIZE) == 0)
-ce600d52ace5a4 hsuck            2026-03-18  6904  			ocp_byte_clr_bits(tp, MCU_TYPE_USB, USB_CSR_DUMMY1,
-ce600d52ace5a4 hsuck            2026-03-18  6905  					  DYNAMIC_BURST);
-195aae321c829d Hayes Wang       2021-04-16  6906  		else
-ce600d52ace5a4 hsuck            2026-03-18  6907  			ocp_byte_set_bits(tp, MCU_TYPE_USB, USB_CSR_DUMMY1,
-ce600d52ace5a4 hsuck            2026-03-18  6908  					  DYNAMIC_BURST);
-195aae321c829d Hayes Wang       2021-04-16  6909  	} else if (tp->version == RTL_VER_06) {
-195aae321c829d Hayes Wang       2021-04-16  6910  		if (ocp_read_word(tp, MCU_TYPE_USB, USB_BURST_SIZE) == 0)
-ce600d52ace5a4 hsuck            2026-03-18  6911  			ocp_byte_clr_bits(tp, MCU_TYPE_USB, USB_CSR_DUMMY1,
-ce600d52ace5a4 hsuck            2026-03-18  6912  					  DYNAMIC_BURST);
-195aae321c829d Hayes Wang       2021-04-16  6913  		else
-ce600d52ace5a4 hsuck            2026-03-18  6914  			ocp_byte_set_bits(tp, MCU_TYPE_USB, USB_CSR_DUMMY1,
-ce600d52ace5a4 hsuck            2026-03-18  6915  					  DYNAMIC_BURST);
-195aae321c829d Hayes Wang       2021-04-16  6916  
-195aae321c829d Hayes Wang       2021-04-16  6917  		r8153_queue_wake(tp, false);
-195aae321c829d Hayes Wang       2021-04-16  6918  
-195aae321c829d Hayes Wang       2021-04-16  6919  		if (rtl8152_get_speed(tp) & LINK_STATUS)
-ce600d52ace5a4 hsuck            2026-03-18  6920  			ocp_word_set_bits(tp, MCU_TYPE_PLA, PLA_EXTRA_STATUS,
-ce600d52ace5a4 hsuck            2026-03-18  6921  					  CUR_LINK_OK | POLL_LINK_CHG);
-195aae321c829d Hayes Wang       2021-04-16  6922  		else
-ce600d52ace5a4 hsuck            2026-03-18  6923  			ocp_word_w0w1(tp, MCU_TYPE_PLA, PLA_EXTRA_STATUS,
-ce600d52ace5a4 hsuck            2026-03-18  6924  				      CUR_LINK_OK, POLL_LINK_CHG);
-195aae321c829d Hayes Wang       2021-04-16  6925  	}
-195aae321c829d Hayes Wang       2021-04-16  6926  
-ce600d52ace5a4 hsuck            2026-03-18  6927  	ocp_byte_set_bits(tp, MCU_TYPE_USB, USB_CSR_DUMMY2, EP4_FULL_FC);
-195aae321c829d Hayes Wang       2021-04-16  6928  
-ce600d52ace5a4 hsuck            2026-03-18  6929  	ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_WDT11_CTRL, TIMER11_EN);
-195aae321c829d Hayes Wang       2021-04-16  6930  
-ce600d52ace5a4 hsuck            2026-03-18  6931  	ocp_word_clr_bits(tp, MCU_TYPE_PLA, PLA_LED_FEATURE, LED_MODE_MASK);
-195aae321c829d Hayes Wang       2021-04-16  6932  
-195aae321c829d Hayes Wang       2021-04-16  6933  	if (tp->version == RTL_VER_04 && tp->udev->speed < USB_SPEED_SUPER)
-ce600d52ace5a4 hsuck            2026-03-18  6934  		ocp_byte_set_bits(tp, MCU_TYPE_USB, USB_LPM_CTRL,
-ce600d52ace5a4 hsuck            2026-03-18  6935  				  FIFO_EMPTY_1FB | ROK_EXIT_LPM |
-ce600d52ace5a4 hsuck            2026-03-18  6936  				  LPM_TIMER_500MS);
-195aae321c829d Hayes Wang       2021-04-16  6937  	else
-ce600d52ace5a4 hsuck            2026-03-18  6938  		ocp_byte_set_bits(tp, MCU_TYPE_USB, USB_LPM_CTRL,
-ce600d52ace5a4 hsuck            2026-03-18  6939  				  FIFO_EMPTY_1FB | ROK_EXIT_LPM |
-ce600d52ace5a4 hsuck            2026-03-18  6940  				  LPM_TIMER_500US);
-195aae321c829d Hayes Wang       2021-04-16  6941  
-ce600d52ace5a4 hsuck            2026-03-18  6942  	ocp_word_w0w1(tp, MCU_TYPE_USB, USB_AFE_CTRL2, SEN_VAL_MASK,
-ce600d52ace5a4 hsuck            2026-03-18  6943  		      SEN_VAL_NORMAL | SEL_RXIDLE);
-195aae321c829d Hayes Wang       2021-04-16  6944  
-195aae321c829d Hayes Wang       2021-04-16  6945  	ocp_write_word(tp, MCU_TYPE_USB, USB_CONNECT_TIMER, 0x0001);
-195aae321c829d Hayes Wang       2021-04-16  6946  
-195aae321c829d Hayes Wang       2021-04-16  6947  	r8153_power_cut_en(tp, false);
-195aae321c829d Hayes Wang       2021-04-16  6948  	rtl_runtime_suspend_enable(tp, false);
-195aae321c829d Hayes Wang       2021-04-16  6949  	r8153_mac_clk_speed_down(tp, false);
-195aae321c829d Hayes Wang       2021-04-16  6950  	r8153_u1u2en(tp, true);
-195aae321c829d Hayes Wang       2021-04-16  6951  	usb_enable_lpm(tp->udev);
-195aae321c829d Hayes Wang       2021-04-16  6952  
-ce600d52ace5a4 hsuck            2026-03-18  6953  	ocp_byte_set_bits(tp, MCU_TYPE_PLA, PLA_CONFIG6, LANWAKE_CLR_EN);
-195aae321c829d Hayes Wang       2021-04-16  6954  
-ce600d52ace5a4 hsuck            2026-03-18  6955  	ocp_byte_clr_bits(tp, MCU_TYPE_PLA, PLA_LWAKE_CTRL_REG, LANWAKE_PIN);
-195aae321c829d Hayes Wang       2021-04-16  6956  
-195aae321c829d Hayes Wang       2021-04-16  6957  	/* rx aggregation */
-ce600d52ace5a4 hsuck            2026-03-18  6958  	ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_USB_CTRL,
-ce600d52ace5a4 hsuck            2026-03-18  6959  			  RX_AGG_DISABLE | RX_ZERO_EN);
-195aae321c829d Hayes Wang       2021-04-16  6960  
-ce600d52ace5a4 hsuck            2026-03-18  6961  	if (tp->dell_tb_rx_agg_bug)
-ce600d52ace5a4 hsuck            2026-03-18  6962  		ocp_word_set_bits(tp, MCU_TYPE_USB, USB_USB_CTRL,
-ce600d52ace5a4 hsuck            2026-03-18  6963  				  RX_AGG_DISABLE);
-195aae321c829d Hayes Wang       2021-04-16  6964  
-195aae321c829d Hayes Wang       2021-04-16  6965  	rtl_tally_reset(tp);
-195aae321c829d Hayes Wang       2021-04-16  6966  
-195aae321c829d Hayes Wang       2021-04-16  6967  	switch (tp->udev->speed) {
-195aae321c829d Hayes Wang       2021-04-16  6968  	case USB_SPEED_SUPER:
-195aae321c829d Hayes Wang       2021-04-16  6969  	case USB_SPEED_SUPER_PLUS:
-195aae321c829d Hayes Wang       2021-04-16  6970  		tp->coalesce = COALESCE_SUPER;
-195aae321c829d Hayes Wang       2021-04-16  6971  		break;
-195aae321c829d Hayes Wang       2021-04-16  6972  	case USB_SPEED_HIGH:
-195aae321c829d Hayes Wang       2021-04-16  6973  		tp->coalesce = COALESCE_HIGH;
-195aae321c829d Hayes Wang       2021-04-16  6974  		break;
-195aae321c829d Hayes Wang       2021-04-16  6975  	default:
-195aae321c829d Hayes Wang       2021-04-16  6976  		tp->coalesce = COALESCE_SLOW;
-195aae321c829d Hayes Wang       2021-04-16  6977  		break;
-195aae321c829d Hayes Wang       2021-04-16  6978  	}
-195aae321c829d Hayes Wang       2021-04-16  6979  }
-195aae321c829d Hayes Wang       2021-04-16  6980  
-
+diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
+index 62f75701d65205..5cfa19da099bfc 100644
+--- a/drivers/net/ethernet/intel/ice/ice_dpll.c
++++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+@@ -1915,7 +1915,10 @@ ice_dpll_phase_offset_get(const struct dpll_pin *pin, void *pin_priv,
+ 				       d->active_input == p->input->pin))
+ 		*phase_offset = d->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
+ 	else if (d->phase_offset_monitor_period)
+-		*phase_offset = p->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
++		*phase_offset = (p->input &&
++				 p->direction == DPLL_PIN_DIRECTION_INPUT ?
++				 p->input->phase_offset :
++				 p->phase_offset) * ICE_DPLL_PHASE_OFFSET_FACTOR;
+ 	else
+ 		*phase_offset = 0;
+ 	mutex_unlock(&pf->dplls.lock);
+@@ -2609,6 +2612,27 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
+ 	return pci_get_dsn(pf->pdev);
+ }
+ 
++/**
++ * ice_dpll_pin_ntf - notify pin change including any SW pin wrappers
++ * @dplls: pointer to dplls struct
++ * @pin: the dpll_pin that changed
++ *
++ * Send a change notification for @pin and for any registered SMA/U.FL pin
++ * whose backing CGU input matches @pin.
++ */
++static void ice_dpll_pin_ntf(struct ice_dplls *dplls, struct dpll_pin *pin)
++{
++	dpll_pin_change_ntf(pin);
++	for (int i = 0; i < ICE_DPLL_PIN_SW_NUM; i++) {
++		if (dplls->sma[i].pin && dplls->sma[i].input &&
++		    dplls->sma[i].input->pin == pin)
++			dpll_pin_change_ntf(dplls->sma[i].pin);
++		if (dplls->ufl[i].pin && dplls->ufl[i].input &&
++		    dplls->ufl[i].input->pin == pin)
++			dpll_pin_change_ntf(dplls->ufl[i].pin);
++	}
++}
++
+ /**
+  * ice_dpll_notify_changes - notify dpll subsystem about changes
+  * @d: pointer do dpll
+@@ -2617,6 +2641,7 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
+  */
+ static void ice_dpll_notify_changes(struct ice_dpll *d)
+ {
++	struct ice_dplls *dplls = &d->pf->dplls;
+ 	bool pin_notified = false;
+ 
+ 	if (d->prev_dpll_state != d->dpll_state) {
+@@ -2625,17 +2650,17 @@ static void ice_dpll_notify_changes(struct ice_dpll *d)
+ 	}
+ 	if (d->prev_input != d->active_input) {
+ 		if (d->prev_input)
+-			dpll_pin_change_ntf(d->prev_input);
++			ice_dpll_pin_ntf(dplls, d->prev_input);
+ 		d->prev_input = d->active_input;
+ 		if (d->active_input) {
+-			dpll_pin_change_ntf(d->active_input);
++			ice_dpll_pin_ntf(dplls, d->active_input);
+ 			pin_notified = true;
+ 		}
+ 	}
+ 	if (d->prev_phase_offset != d->phase_offset) {
+ 		d->prev_phase_offset = d->phase_offset;
+ 		if (!pin_notified && d->active_input)
+-			dpll_pin_change_ntf(d->active_input);
++			ice_dpll_pin_ntf(dplls, d->active_input);
+ 	}
+ }
+ 
+@@ -2664,6 +2689,7 @@ static bool ice_dpll_is_pps_phase_monitor(struct ice_pf *pf)
+ 
+ /**
+  * ice_dpll_pins_notify_mask - notify dpll subsystem about bulk pin changes
++ * @dplls: pointer to dplls struct
+  * @pins: array of ice_dpll_pin pointers registered within dpll subsystem
+  * @pin_num: number of pins
+  * @phase_offset_ntf_mask: bitmask of pin indexes to notify
+@@ -2673,15 +2699,14 @@ static bool ice_dpll_is_pps_phase_monitor(struct ice_pf *pf)
+  *
+  * Context: Must be called while pf->dplls.lock is released.
+  */
+-static void ice_dpll_pins_notify_mask(struct ice_dpll_pin *pins,
++static void ice_dpll_pins_notify_mask(struct ice_dplls *dplls,
++				      struct ice_dpll_pin *pins,
+ 				      u8 pin_num,
+ 				      u32 phase_offset_ntf_mask)
+ {
+-	int i = 0;
+-
+-	for (i = 0; i < pin_num; i++)
+-		if (phase_offset_ntf_mask & (1 << i))
+-			dpll_pin_change_ntf(pins[i].pin);
++	for (int i = 0; i < pin_num; i++)
++		if (phase_offset_ntf_mask & BIT(i))
++			ice_dpll_pin_ntf(dplls, pins[i].pin);
+ }
+ 
+ /**
+@@ -2857,7 +2882,7 @@ static void ice_dpll_periodic_work(struct kthread_work *work)
+ 	ice_dpll_notify_changes(de);
+ 	ice_dpll_notify_changes(dp);
+ 	if (phase_offset_ntf)
+-		ice_dpll_pins_notify_mask(d->inputs, d->num_inputs,
++		ice_dpll_pins_notify_mask(d, d->inputs, d->num_inputs,
+ 					  phase_offset_ntf);
+ 
+ resched:
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.52.0
+
 
