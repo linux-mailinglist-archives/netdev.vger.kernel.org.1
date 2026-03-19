@@ -1,91 +1,72 @@
-Return-Path: <netdev+bounces-269611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269612-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8DyWAJ88vGlxvgIAu9opvQ
-	(envelope-from <netdev+bounces-269611-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:12:47 +0100
+	id MN/hHb8+vGn6vgIAu9opvQ
+	(envelope-from <netdev+bounces-269612-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:21:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94FBA2D0A3B
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:12:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD8CB2D0BE5
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:21:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8E6E1300679C
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:12:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D8DEF306B4E7
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B953EE1F8;
-	Thu, 19 Mar 2026 18:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C80303F54BA;
+	Thu, 19 Mar 2026 18:17:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hCQ35x8b"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XPencwRH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9962D16FF37
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 18:12:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72BC53F23D8
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 18:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773943965; cv=none; b=GwrcxieI/j3OCbYGNXmJsVe5AHj8lAqGSZN8J+Kz0NvkiXGG6TpY7ACVriOiEeKVdGyxt9sts/k7U7kooE4e8Ik4Nu2SVkB8PM11wEcEGAUF+fqaTe7h0t4lo7TbJt6yPjXTA1A5gSbWp+mvRcnXzdxlVUv3/3uBZOnBhSq6Sbo=
+	t=1773944245; cv=none; b=BS+xZX0bT5gl4L3h+AQvHfS/hHkiMgwgaANIb3CKuwLp5702rm3585q0BkOYcjd+nBPrQaVLTVm+IJtb0IgiJKZjAJl5avFQFwjOzW6yuCA9Q8/59kHwAz83xeHZJs+69U631tdllOyAhDUYHbdr3FzKC0McZ2MB2EnncclxC9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773943965; c=relaxed/simple;
-	bh=cz++0EVJ9nALORMfrWKRiSgQb6xnsyXY3S2o1askMN4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BTL/TvWFdgP4mRvBklTMh0qt4+hINd2RbpCs/FdsfKNA/9xY4lIg3WyHleY5OrDTKVHmfiiKygifPq2YkQGDhTKFFSJmS3HpST+hiyk4THC8bwt+yzlwrDj8pET+UTdMf2tcjgUI8Mk3oRNTON8U90fEZwJ2cHavAQVqMeJBIQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hCQ35x8b; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-43b3d9d0695so995751f8f.0
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 11:12:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773943962; x=1774548762; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KAAT0drvlwEmUW4j2igW7dbw5rYw/CBM9N8ricd4PIc=;
-        b=hCQ35x8bIVs2a0yIi0j5e6w2oDcUufId8ahnO4KmIa3fRDCumkKpafyX0uSBlg49lu
-         RHjmkM7nzl+HGSwrPNKANNu36Upy0NEvmJJ44FmP+0un6EvglloBHIBYu3xa/18HIo8K
-         nJGYkHgadiQ1PeTTow0+UvAesItgUoTBnJ81P+1Ikf7WaRGgMbU/agupRQNufd1m5ZNI
-         19qqhedfDrTH6n8jt+Xq/HIrhbzL/5fzEsfLWTWl/xbGSML+zFC6/tXhgaeIy6kNsdCS
-         N1pJGaUwJMq9LjLBuDorjT1ds5SK6Xw+hP+UI8rJkRNv/QDfUuCK8UQvKDixjCmETPmk
-         8ZKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773943962; x=1774548762;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KAAT0drvlwEmUW4j2igW7dbw5rYw/CBM9N8ricd4PIc=;
-        b=qKQnuuMvT4omqzmSwPpcixNJw2BLWvJzsY2CUn2TNih1k6Z0L9YMsuyheryE8NfvbQ
-         MNvW8k8ryUfM0JJC/YPhMQ4R5/jG1/kwC2GEnkkr5sDEZ3cKzsjYFKpqhxhjLkFZ3Cxz
-         1+W6WdtRZc5wYp1XLJNsjfNObRcCKRlgAEpRCFkF59fJZ5FFILchs5nLJL4y6fTMUwDc
-         +Vugh8o3OA/WZl9tAtiX+L0Q7xLtxQ5TLXHiFmbmLQg/BdePtDOFSahd/r0vWIWFN21F
-         tVKi5cMOLPma36TZCgItBwbWrUnwjAxmwxngJqPSqfFfIsyN9/JAbMwqCPPC2f61F/SA
-         EWjQ==
-X-Gm-Message-State: AOJu0YycrJ1UgZCUYWPACuBqJ6vO8JADmmlxXgwcZvFfK4bfiYh9zI9Z
-	qXo4n4NW46shdO7wfinkk2DDwjEJTGCB4K4W54GhlGTg2i4t4pk7N7N4
-X-Gm-Gg: ATEYQzxrTTGZmWxuyWA8p5KqP3klQaVJBByrzyKuNVlXdssU1q1DuIZq859KO7LeaEB
-	mc1D8spNooPc/m/A+LNdLn0mKp3oLrlWA+zWN4PZByoEOnePuXMA+J631SjwAOCaZV/AoZD7n2x
-	+4n+q/ObfnhQF9RLiblnQlmkJ8lRzvngZ8kXRxIEFTayQXwefpZMiYl8RNsuO4nA+EWZnjxZ3vB
-	7dx19zAGq9xkgvU/AC5qrwkIMOjqyz3is+DpQSs6G+1xtmrJBUmK6EWo61nI6WblnokNGWcPfJv
-	+b3wxKStg2O0t7uBLiGu6jwgPI0t4vzgC9gheGLERGIkmk3EYpMKPwl8zqgIywLCFGb0t/2QgJJ
-	8371/LaxDStjWSWxvZqwVbQQyBwDxRuny0mUa18jXxddXmE0EH/cqqe+d3KfhNWz96Yw7PZJ8p2
-	ZTLcjzViV2DegGh63WIlR8vHO6w/EomoQRBJQqZkwOF0lx/+z61nA+0Beh7J4mXtOqGbIVLF2xG
-	2qXLrssEGKy
-X-Received: by 2002:a05:6000:2007:b0:439:cc67:abe9 with SMTP id ffacd0b85a97d-43b642879afmr605775f8f.27.1773943961554;
-        Thu, 19 Mar 2026 11:12:41 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b6470b243sm292657f8f.26.2026.03.19.11.12.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2026 11:12:40 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: MD Danish Anwar <danishanwar@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	David Carlier <devnexen@gmail.com>
-Subject: [PATCH net] net: ti: icssg-prueth: fix use-after-free of CPPI descriptor in RX path
-Date: Thu, 19 Mar 2026 18:12:36 +0000
-Message-ID: <20260319181236.14526-1-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1773944245; c=relaxed/simple;
+	bh=VmoCxf/LKpudsCGR8vlmAvnLPDMFMQ+wNAJlA+M6mf0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ew7nNptFiwmSyEXD9qPCUL3mNwQrZkbwFbf32PcOz7Y823GvHIMR00Op6Q6rLCe47gbuZYqFlodkcr+nuPIg1HNMOiwrTuwoqlAywycgqxADX9WQUVwTadlofzSfId9GnSXFxQBw5XB7yFBOdZlQ2NV7JaazVdMUjV/8xBxXdbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XPencwRH; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 97B714E42677;
+	Thu, 19 Mar 2026 18:17:20 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 5D53760050;
+	Thu, 19 Mar 2026 18:17:20 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 792D110450A96;
+	Thu, 19 Mar 2026 19:17:15 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773944239; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=GhDTKiA+AQMLigmNF3JlnBZbT990XvOcqXq4KBKI+Vs=;
+	b=XPencwRHT23THIBY9L55xww8D260XMTawse+FF94oFRQo6piA73Ps13S5GSsDCW6gV+RUz
+	JLep0pmxd8U1XMwluUjvb1SZVHGfw5ENwJkyLQJZ0KJ7Ow1SXDHLTTU9aHtOxNGvHXYfBO
+	k+4YlK01s7HlQWmJOURAptAItd54RsA9tq3L5GAIyQsfSEDaLqSNqc2BdBsphV5nZvX0xa
+	8CYRzSLsPZ5QBVzZg804urnwPkTU0gJ3gEO5evGsmhBjU/YGwVJe4wrVaszNy/EHWW5MKT
+	LXCmkGWnx0FfigV0oXqYRaJLKf0G4lV/Tph1ehi3kaIZoYPp5+LH2ZwRs/davQ==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	UNGLinuxDriver@microchip.com
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	thomas.petazzoni@bootlin.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: dsa: microchip: Don't embed struct phy_device to maintain the port state
+Date: Thu, 19 Mar 2026 19:17:04 +0100
+Message-ID: <20260319181705.1576679-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,128 +74,132 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269611-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-269612-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,kernel.org,davemloft.net,google.com,redhat.com,microchip.com,gmail.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-0.619];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,xdp.data:url]
-X-Rspamd-Queue-Id: 94FBA2D0A3B
+	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AD8CB2D0BE5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-cppi5_hdesc_get_psdata() returns a pointer into the CPPI descriptor.
-In both emac_rx_packet() and emac_rx_packet_zc(), the descriptor is
-freed via k3_cppi_desc_pool_free() before the psdata pointer is used
-by emac_rx_timestamp(), which dereferences psdata[0] and psdata[1].
-This constitutes a use-after-free on every received packet that goes
-through the timestamp path.
+The KSZ9477 maintains the SGMII port's state for speed, duplex and link
+status to be able to fixup the accesses to its internal older version of
+the Designware XPCS. However, it does so by embedding a full instance of
+struct phy_device, only to use the 'speed', 'link' and 'duplex' fields.
 
-Defer the descriptor free until after all accesses through the psdata
-pointer are complete. For emac_rx_packet(), this means freeing in each
-early-exit path and after emac_rx_timestamp() in the success path. For
-emac_rx_packet_zc(), move the free to the end of the loop body after
-emac_dispatch_skb_zc() (which calls emac_rx_timestamp()) has returned.
+This is also only used for the SGMII port, it's otherwise unused for all
+other regular ports.
 
-Fixes: 46eeb90f03e0 ("net: ti: icssg-prueth: Use page_pool API for RX buffer allocation")
-Signed-off-by: David Carlier <devnexen@gmail.com>
+Replace that with simple int/bool values.
+
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/ethernet/ti/icssg/icssg_common.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ drivers/net/dsa/microchip/ksz9477.c    | 17 ++++++++---------
+ drivers/net/dsa/microchip/ksz_common.c |  2 +-
+ drivers/net/dsa/microchip/ksz_common.h |  4 +++-
+ 3 files changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-index 0a3cf2f848a5..31003962ecf7 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_common.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
-@@ -962,7 +962,6 @@ static int emac_rx_packet_zc(struct prueth_emac *emac, u32 flow_id,
- 		pkt_len -= 4;
- 		cppi5_desc_get_tags_ids(&desc_rx->hdr, &port_id, NULL);
- 		psdata = cppi5_hdesc_get_psdata(desc_rx);
--		k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
- 		count++;
- 		xsk_buff_set_size(xdp, pkt_len);
- 		xsk_buff_dma_sync_for_cpu(xdp);
-@@ -988,6 +987,7 @@ static int emac_rx_packet_zc(struct prueth_emac *emac, u32 flow_id,
- 			emac_dispatch_skb_zc(emac, xdp, psdata);
- 			xsk_buff_free(xdp);
+diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+index 5facffbb9c9a..5416016b33e0 100644
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -224,14 +224,13 @@ static int ksz9477_pcs_read(struct mii_bus *bus, int phy, int mmd, int reg)
+ 				else
+ 					duplex = DUPLEX_HALF;
+ 
+-				if (!p->phydev.link ||
+-				    p->phydev.speed != speed ||
+-				    p->phydev.duplex != duplex) {
++				if (!p->link || p->speed != speed ||
++				    p->duplex != duplex) {
+ 					u16 ctrl;
+ 
+-					p->phydev.link = 1;
+-					p->phydev.speed = speed;
+-					p->phydev.duplex = duplex;
++					p->link = true;
++					p->speed = speed;
++					p->duplex = duplex;
+ 					port_sgmii_r(dev, port, mmd, MII_BMCR,
+ 						     &ctrl);
+ 					ctrl &= BMCR_ANENABLE;
+@@ -241,10 +240,10 @@ static int ksz9477_pcs_read(struct mii_bus *bus, int phy, int mmd, int reg)
+ 						     ctrl);
+ 				}
+ 			} else {
+-				p->phydev.link = 0;
++				p->link = false;
+ 			}
+ 		} else if (reg == MII_BMSR) {
+-			p->phydev.link = !!(val & BMSR_LSTATUS);
++			p->link = !!(val & BMSR_LSTATUS);
  		}
-+		k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
  	}
  
- 	if (xdp_status & ICSSG_XDP_REDIR)
-@@ -1057,7 +1057,6 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
- 	/* firmware adds 4 CRC bytes, strip them */
- 	pkt_len -= 4;
- 	cppi5_desc_get_tags_ids(&desc_rx->hdr, &port_id, NULL);
--	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+@@ -557,7 +556,7 @@ int ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
+ 			val = 0x0700;
+ 			break;
+ 		case MII_STAT1000:
+-			if (p->phydev.speed == SPEED_1000)
++			if (p->speed == SPEED_1000)
+ 				val = 0x3800;
+ 			else
+ 				val = 0;
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index c517478cc476..144373e13bea 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -3983,7 +3983,7 @@ static void ksz9477_phylink_mac_link_up(struct phylink_config *config,
+ 	if (dev->info->internal_phy[port])
+ 		return;
  
- 	/* if allocation fails we drop the packet but push the
- 	 * descriptor back to the ring with old page to prevent a stall
-@@ -1066,6 +1065,7 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
- 	if (unlikely(!new_page)) {
- 		new_page = page;
- 		ndev->stats.rx_dropped++;
-+		k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
- 		goto requeue;
- 	}
+-	p->phydev.speed = speed;
++	p->speed = speed;
  
-@@ -1077,11 +1077,14 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
- 		*xdp_state = emac_run_xdp(emac, &xdp, &pkt_len);
- 		if (*xdp_state == ICSSG_XDP_CONSUMED) {
- 			page_pool_recycle_direct(pool, page);
-+			k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
- 			goto requeue;
- 		}
+ 	ksz_port_set_xmii_speed(dev, port, speed);
  
--		if (*xdp_state != ICSSG_XDP_PASS)
-+		if (*xdp_state != ICSSG_XDP_PASS) {
-+			k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
- 			goto requeue;
-+		}
- 		headroom = xdp.data - xdp.data_hard_start;
- 		pkt_len = xdp.data_end - xdp.data;
- 	} else {
-@@ -1093,6 +1096,7 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
- 	if (!skb) {
- 		ndev->stats.rx_dropped++;
- 		page_pool_recycle_direct(pool, page);
-+		k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
- 		goto requeue;
- 	}
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index 929aff4c55de..18f13ee9c7b6 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -129,7 +129,9 @@ struct ksz_port {
+ 	bool learning;
+ 	bool isolated;
+ 	int stp_state;
+-	struct phy_device phydev;
++	int speed;
++	int duplex;
++	bool link;
  
-@@ -1105,6 +1109,7 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
- 	if (emac->rx_ts_enabled)
- 		emac_rx_timestamp(emac, skb, psdata);
- 
-+	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
- 	if (emac->prueth->is_switch_mode)
- 		skb->offload_fwd_mark = emac->offload_fwd_mark;
- 	skb->protocol = eth_type_trans(skb, ndev);
+ 	u32 fiber:1;			/* port is fiber */
+ 	u32 force:1;
 -- 
-2.53.0
+2.49.0
 
 
