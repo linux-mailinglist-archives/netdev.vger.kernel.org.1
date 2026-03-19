@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-269524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269525-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iC/hNNQgvGnQswIAu9opvQ
-	(envelope-from <netdev+bounces-269524-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:14:12 +0100
+	id yEKdFj8gvGnQswIAu9opvQ
+	(envelope-from <netdev+bounces-269525-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:11:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 740032CE897
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:14:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B24F32CE7C6
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:11:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3622B304612A
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:05:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 75074321F508
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:05:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22E43EB816;
-	Thu, 19 Mar 2026 16:04:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D7F3EC2E4;
+	Thu, 19 Mar 2026 16:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="aKf/61Ne"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="CAxPb4dZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012028.outbound.protection.outlook.com [52.101.66.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0B93EAC83;
-	Thu, 19 Mar 2026 16:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299CA3EBF05;
+	Thu, 19 Mar 2026 16:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.28
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773936269; cv=fail; b=E6hUZ2WCaxkfEVU0Ws1yBsB0lrKtsrCBs6ZjqSbk2ruZNB7/5u2H7lwlHO1Kvc3lV+pMAB2Slpva6AS+tuOlKSltEFDzcM2BGvnlyvWGtKeoUtq7r30sGZH4KqeemKRBvSEO06Rr7WvwA3xOCuBupy2fRWWttM6UrvFDUJrqr84=
+	t=1773936271; cv=fail; b=Sbo7T9nTBx8b9ZzK65ZOI47vVCVf5m5Z1653A4Gv+zwJu+jFutv77SuBpNVi2IIMxNYbLpqFmHiJpWpBaJA0qa27LCTqc9igynep3N0K/H6xtYgqw5xNrNrzSCJCtwOvuaZates5simZUORgSLNLCNeX9JHZgGuHMcqUmXpM80s=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773936269; c=relaxed/simple;
-	bh=f8mZXdJjMm4VAdfGkbLsztIxSPFGmr8vt4q7ZIPwcxc=;
+	s=arc-20240116; t=1773936271; c=relaxed/simple;
+	bh=h54S/SxNqe4Z0XBSw6KgV2Ijqr3EWg6fF9gZ+LgYQLA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=NRi3y8EKaqpzNim8UsAzE5YjVv7rsnMv6YhmvznYrAkX6TwPOtT6bKaDnhvcXDXGkj+0pKHCePPBfnO96s+rKXHzC1IRIT9mY/4oNGhR1OZzZz3bl8D02uHWciVDU8w+0xtvIN0/fRZCE0qLkhGlbjk9U6Y8Nctmc+DTr17qLSo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=aKf/61Ne; arc=fail smtp.client-ip=52.101.66.28
+	 Content-Type:MIME-Version; b=Xy0P/CW+eX9RDnF38isATIAbhaKYcPKHTYbGNbf+ZUoXYFY+6Je8Q/eq/w5NzQTTDcrJxnklACC3Xa1naGvVdot3h0a1Ij+G7nX3mp2vS0x7OrePQzbzIWeW8zPBRv3EsKKax6Z1ruxAEZl23dIpgLdBCvAjUkTuHu3+2KPgWsc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=CAxPb4dZ; arc=fail smtp.client-ip=52.101.66.28
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qH+y+f0sBEhyMot1apwistIz1TKdPQ5LHLS50mPDZ7FX/fFVG7m/44RiJut2rX3lK36JeoU8e3FEQmNU+r6sr/+o54ju2GHCLeueovKEMla3CWt+Ls9TOH76UFe50EPNc1hSh9UxHfb6sLxFYZK4y9SMRU8JVjUvE3cmquGT/mIqZgyILEVM49v1y/tZ0Arewjf68Y9G2K0FVskB5RyJGX8dIIpB1RrRYZDRGiwn3E2Pa75N/ekE6hNl4Wvi80B3UWBaqZ+smrDY61eQGok8Fpz/zEqdCjvTRxn/bWwjVLaPjxA/aJbiFHpGYEM0M/0n163kqav6g7wXvGdSn7toDg==
+ b=GFTEghnamBXEstMAVpfTgRSW4bwbCInmShhk5eO7Kn/zZGp5EnNEH2doqzIQoIFkXcjCeE3NtCzvWliBMyFSqNv5uGq6yCHJClZtlnNmmeVvPNUYkv2yHKbW49YdLU4Jj0bZfihAq4bDJc3bwPn8vn0zx3/OhC7M49UBxj1IwrsMg+gPCj+xvgTLH7IwUpXl0Ga7kUHrN7KoJbYzf+QuH50LdXQ0Qe5CBASw9qsJjzI8dsoXBFeCwQ42wWLH9I5CaoEVmBJ9DWt79E/icu/N4h8eJ3PeqKY/DLDRpdoF/EZmKQOh/xIeR0zkAqzoVz24PMiwy6XdUyy0mqoXALDUxA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DA1a565/id/3DHc5YnZgjQcKrr0F/1Z+cZoFvp3doHQ=;
- b=sHaFTaC2FnWA0VTFHialoPDJByRO9OkXC5ZXyb4GOwgBE/ern/DN+TxGNB0dIqdw9u1+hGR6MLj4t3FSBo1YrcOO+VWyY8WThoRrs/uju0L4Uv/Zzo/Rsm11Js1Z8BSQlK7JpQ5iavonXGNiJ9YQ8xPnI3+ic2lWcDAvYLibMkgbwQtHcgSPgTI5kBiBqobjydZrHrxwVqyghDrBBDOe+OurkXxskJYhy7T1H/LCBJgceYGVzbfKuTEVOtTpDVYejEMcPvDr/z8Dfzd4E6YDKlqlq9/75+RxPPip77hazY/I+uZAUM46XPFq/aD2aUr1vklId+yHCgHWjo40hYFcig==
+ bh=kGr/+DIq4niOGiufQ3CGYBqIGYvR4fE5Hg+0+YEu5vI=;
+ b=HvUqLFBT2N9gBF/9ZL9Vb4+3D9hX+JX5f/2zAB2zgWbQ06GsSX2VPOfpewm8y5q6HX7qW4nPBAhDpDrwKu5COLCiSK+WhjXq48F9nZPqTm2/YvCZ2Zaq3vPyqeeYugRmo8cwlVPTtrS+pSPUE0a5iOw2/kgRsS2pbZk3JMQ9ZB0JXlz38w2CKO2ZZc9HEsdCzTqlWjSF0NeCwWPzguJSvZIq/ZW8S04nYoPzfxi6LoR4VbIbZhGy72l/qgCob4W+FU+0tdTuOIhdBNPQWg8VxLaCDc/ImMBhHzwUMAQEp8ilY0Zoox4Y0b97AUJIRTxJcRpGkbdxMLVPk2htIo3UzQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DA1a565/id/3DHc5YnZgjQcKrr0F/1Z+cZoFvp3doHQ=;
- b=aKf/61NeMkF4629uiVdVnFSfZtVsBdw9t5U5xUla4qwLrY+YQuJCHv4jiCpEEbsxLAK01hwDHNZN4bCfPp+Jj6BKLwhw5FNmWz8mbVU9BUBi9VViYiUVdBOtGbb0ZMIDL3mxCAokdhWiOm5GcL31+eZPjklZnXCQIQZcxOoAf3EIRFvrUJIAJu37fGb4EIHeK8JXD8wc1/Rkimu9XoRHPoon0th7/7pSJbLnj0vjNK+n7bgIXIr/PwnZNu+TJIHg9BH3XObNYEDXHXQY3hIWNKN/akrjZThycTe9xEgF2TT2Kt+57AWS5PpOzDrBlqKoWZLCJr6Fv0mzD7GdPZUeJA==
+ bh=kGr/+DIq4niOGiufQ3CGYBqIGYvR4fE5Hg+0+YEu5vI=;
+ b=CAxPb4dZtGrkkPNGSgnJvVu3HNZqcCa+EmENSKgtoz9vEG+c14lOYBDDnHho5LCDw+lSWwBdI5uFtDGeVgQ/KweuFMpVPu6kVo1x9jloRzOkArlwvYJA3cIVQeBoumUn44j6R6mUB9+eIUxA/3R7S1Y0izrkMCImhA+srWtEZnH8lR9Mkj/UsWM7z9/1l3wLiax/94Abmjx9TashAytQoHlw82TOw3SW/m64GpEswmHjpJ27dCJTMzI0kGFOL0U35V3LE7tnvnJj6poCJWr5GONapr6EVyzwq6mMhxRWO0eb5QALIgzcv+j92bNutjjAGdQVsDlSaeeXJ6BuxKnJ9A==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
  by GV4PR04MB11451.eurprd04.prod.outlook.com (2603:10a6:150:29b::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Thu, 19 Mar
- 2026 16:04:13 +0000
+ 2026 16:04:16 +0000
 Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
  ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
  ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9723.018; Thu, 19 Mar 2026
- 16:04:24 +0000
+ 16:04:26 +0000
 From: Ioana Ciornei <ioana.ciornei@nxp.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -70,16 +70,16 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	linux-kernel@vger.kernel.org,
 	petrm@nvidia.com,
 	willemb@google.com
-Subject: [PATCH net-next v3 3/9] selftests: net: extend lib.sh to parse drivers/net/net.config
-Date: Thu, 19 Mar 2026 18:04:04 +0200
-Message-Id: <20260319160410.2515105-4-ioana.ciornei@nxp.com>
+Subject: [PATCH net-next v3 4/9] selftests: net: update some helpers to use run_on
+Date: Thu, 19 Mar 2026 18:04:05 +0200
+Message-Id: <20260319160410.2515105-5-ioana.ciornei@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260319160410.2515105-1-ioana.ciornei@nxp.com>
 References: <20260319160410.2515105-1-ioana.ciornei@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: FR4P281CA0316.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:eb::16) To PAXPR04MB8253.eurprd04.prod.outlook.com
+X-ClientProxiedBy: FR4P281CA0330.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:eb::8) To PAXPR04MB8253.eurprd04.prod.outlook.com
  (2603:10a6:102:1bf::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -89,57 +89,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|GV4PR04MB11451:EE_
-X-MS-Office365-Filtering-Correlation-Id: a22c38e1-8ffe-460d-2490-08de85d1307a
+X-MS-Office365-Filtering-Correlation-Id: 1e7628d3-3960-498b-3b4a-08de85d131f5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|19092799006|1800799024|376014|7416014|18002099003|56012099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	tN4HxcfB7UVkHQWqxnFOAFYzTqhl8V95xM3cjRNkQ7PZkQhFYxS7hpm73/QKR3F3VlpoaeQf65g9xUdn43YdKFqtrMNLuQAIV7sxFgnXhtJg5GSlNKZsQid9PIY8Tn/cJF56hWGAVo5jNnIK5xK2aLFa4jA1eweUHP9wphIdMY2WJbDO3bv+konnm4i5FdXeqZqE/byHkdAgOEcARKjb3wKKiduV/PmbUmYDRKutlOsGg73F7K4jxZDEJqBl6mExHIAhZWLNNdnw0yupSv50eKEXyaGFjcW7p/mmabnTjHrdA0zHeRfdpIkTvE8QzdOJv3GLu//jezJ+YINmxd3tzrk1JlhvY4Ph4WkTxFzfmdCFlLCh/+nMN1+CoCmDG9s/pxt++VQ9Z0jvFM+lLOy/JfI4RiOzJ93CtKYb5LOuDOnLmwqsC6EIKB0huViDwPs9em9LKi8feHBQ5AlavkvkQr4HWtyT/Sp9c/PES/+NDfLQpItZGxjElf0qQgEhpiNga18qNUFQ4zcmUqZjnY2Z8JevbPF/g3wM71oY3YS2d76GwRuekCK6P0D8UMMDoW67b3w8RF34AZ/syeK8m7CJZl9PTcSrlyP/6yWGY9GINEV23zzcdHW2RNsrKedO8IScOYk+i2Mh8N9Ek09idv9PiNGMu7Y6fwBiUidmR+KQM5OS3pG03VfJ6zktJC/IKRag4+I7ggyXGN9SLnNlUewFmyk+QNrut7z5vjLg1az9b+s=
+	AJTuptRXHYXD/0uzYD46qvwADdcqjTZk45/5Q5AJIaO5zQDJql0Szon1ZYhrmv+T5n3LBGxQVJhhovmdMomvAlbXKr0om6np1X8BxfP/dsjp/WXFTjYtt0JPPMZyPGVaWeeUB7cOjVBtkiMKLurz42Inm8USF0WTeHFzu9RKUImZrC+YI3E27fEtvlqNjVhnjx8Ehkj+RtSaHrH9+cceZ+yLwZft5CjLjlMWre0GygeD5LFqis8EJ9+BB3NpQHi8tf7gYpCzKKNusgQOK/MXqy5msD5UKjrx6rF3JF6Nx4pB+jtuptbatHVAiGmYnISk8vEdBJkauVbSQuhQTwwXgBn8MD4WgtUxmLO8jRcdSB5qHSG8c5mJVyHaxiGboEWe8bHTjmxxnwbyeK9Rr0z7LPL8fKaZmZNOWLEFYVwz/FHdxECdB4C937EdyS0GN2Ir1i6Jt0F451eqUr4svFROTg7FDaGF2CW4yiP+NEWrV+M/O78mKYCT8x5Zs97SKaKHzpp8aKnG88+nJs/BySei5r+eEqH4ARzeGRFmJNa0tk6y6IJMVkkbFWCoGsmqVrpxqLMOmcgw8XCCKhqLotceFmj/bbVSKgEQ50UM73fYxvtJjyNpAW8YmBWiOnd9Q66Wt5L423IX4/+SwEV0wvnYKpodT9Vqx/VRl3FG9mShr3RnVKecXeUpZ2f2yAd4IL0J2YAUPAI7QTCZBewa9kbKgBJp5yKIXD3+wiBiF2FB1e0=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(376014)(7416014)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?w1oOv0TizDL35HNFj8F4o5PRy8BV1LGuinEbX5H8f8Q5Jcc+UKm8X3Wfx4iB?=
- =?us-ascii?Q?86MN6wGos50nrnjipLccZD/EwNpVqLDiH1SYG2R8Wt/+ZhRSsz1k/3qkUtxe?=
- =?us-ascii?Q?+xPAM76eRCq8CBBIokdPasfie3+BUcW7uEIAp2nVlkGbcs92gOzhov64KY5i?=
- =?us-ascii?Q?OKHpCcz6T/+Nt3tmVWsYLZpzA2P6TrHTfXmySEyNL1gATa1duk6UUoTNBvBd?=
- =?us-ascii?Q?Ga5YdmehRTGY0aeiDm+adsT0tlO76oKV5WyW2Su7VPlpP3YYrOtMRRkxvXYZ?=
- =?us-ascii?Q?Sxx8RZF5DOWAfs31kMI1qv1JTeHYUjFcZbX0Dq46xKH7476HTGTAWf9xeqvy?=
- =?us-ascii?Q?P8EAcbCtxcJd9s8kLcyqV+iRhqioLRv0DlJ1c4ltRZRd+rOJ+ueoJOdFnxSQ?=
- =?us-ascii?Q?oS0rI6srF7unm16eAKnwSTWHCZol1kEQIxvyu1P51S3Mb0oBQFtV6No6tNUm?=
- =?us-ascii?Q?LPqYM6lTb6o8HyiExuMvcm+L4Wv1ir2hKiTTEIu5dj0LVscQFL0zR4BBUlNw?=
- =?us-ascii?Q?/Eb89GSXrtOas2dmwhROa63KWtoLxlCxR/uCsEJRdbnOFveSRCJjkouzMCai?=
- =?us-ascii?Q?C/Lnet00KT/aqgjZ/jGnpSpO1Wx6tNZIMvCDCNtd0GhpmYwkTDx1frfyxwWF?=
- =?us-ascii?Q?+201bBUoMRr107aZkxfCrA8ZjXQ1maBPrwojss0HCxSqWzlJZEVJTonUWgQV?=
- =?us-ascii?Q?f/eMySJO3vhNIffvo9x/9/ilZViM+RyPZRgrEkEqWVjwShdeGwQiDwubH8Pm?=
- =?us-ascii?Q?28qJLTsmaky3Kn7IsoJfJosuftZbt/ni3iNV51T61HcMqKnWxIthc8Vqxlyg?=
- =?us-ascii?Q?OblcH/iiP767YekS6CDdXHvHnHyJmYZ6Frfc8rLPKhJdVDsRG4vY/wAkjxKM?=
- =?us-ascii?Q?qtODFATr0yrxmK41VLfQypalgTZd+HD/wZsj4yhktVE+PPfvhIk7bRIQihtz?=
- =?us-ascii?Q?ykUDd9STJ7OOdMOO1Kz7OyKj4buxOAFOsa/qvtcYJ7YwQ3y90vH34IjIF41+?=
- =?us-ascii?Q?8xKw0c5BWu9Yjz59Xh5kiJXffLzM/kTKPUu2KiPkdD7k6KWIZpXvIMecU/lc?=
- =?us-ascii?Q?XPE9AD5ftzp8eyELvemkQgyd8wTkaIG5gn2At7J4g4laoX8DoOwmxYsl42EM?=
- =?us-ascii?Q?MSzlnK5HDFbTA5PA4HVxRbQQ5faS4fOmM0ZRbXWj9ePgLzRgSSghXAuEbPtI?=
- =?us-ascii?Q?5owMOmai22Me3T1ibru2KBoBAkXBoqBLHfmdudqy8Wf3MBq7H+nAbYiNsJdp?=
- =?us-ascii?Q?W3S1E7/ZcQLRujGSpkpmEbIriALs38I4tHVys0Jxpzo62CC0p7bwJJ+8jOsM?=
- =?us-ascii?Q?5q4lm91gNdo7LS2cPHQyH5AZHLo6t0gLwssqwATXkCIOCYHsxuP9aREpEH6b?=
- =?us-ascii?Q?9RIHkgxPUKZV0mg4PjNOMTZL5vfEX1u7wuw8JSJdbwKcRb/Zi6Ji6v06Ela/?=
- =?us-ascii?Q?GYiJ5AwYqQAM8eGfJIKahtLyIblZoleUDgV+/7l2ufSTVT7QGiOuW1ony1Ie?=
- =?us-ascii?Q?T9eHY+1VpAGeRvTbP4sq1H/gHZPzMtp4NnS/Y4tEYGUwMJ3LhwVUJlrwt8hI?=
- =?us-ascii?Q?IuK0BFDMsSCfX7sxVUvA/ZXQxV6MMwBeOUUjY4njZVnqV0kF93YJ1zxV3DBu?=
- =?us-ascii?Q?DrqQZLrHj3V8qkWiJfNKgwLvmGqiaXMqyxykLvSspatZl1HK5K+Xuz38J7in?=
- =?us-ascii?Q?4oDjYlMYjl509yyxQ+RAc/y4bICJ54AkEGb/RPalhg+4ZVxQX2QcFMZxVQiv?=
- =?us-ascii?Q?RByufK0oTw=3D=3D?=
+	=?us-ascii?Q?zVe9mAya9J3g+9nvh5qKx9/Af9cYs8TIEpBbLRuTCrFPi7eUtpyfSQKdaLqd?=
+ =?us-ascii?Q?klm54imxeEaDKDt54DCxVuk9qZyp/jk9YqJ+OOjbl1dBjEMJKuhVvzoGSBpp?=
+ =?us-ascii?Q?1v5g/C2kKufvMeS3LnzAE6i2DoylVAs6iC3NmOyxcC4h+GbDMuzpejvAraQb?=
+ =?us-ascii?Q?zfM/jOlVfsmj36ZBas3kmTLcpSTgEWkVZv4hGS5dH6ETxzDrq1FXnPvMOcro?=
+ =?us-ascii?Q?/tVBux5NUhrdUkldMnRezGoFhKzd9HrlGiQvu6r/tT3KITk2HFNJSYqIQw2d?=
+ =?us-ascii?Q?Hg2YysHMYgHUCN3LQp/KZZ/GWgJI2Us2VDQbEsQATX5VlyvdtfkYv79lESQd?=
+ =?us-ascii?Q?gyEx+ZvucJa3ubjhWZlAprkzPCJ5VOKrdoZopAujF5r9Gcof40kSMkC9JiZM?=
+ =?us-ascii?Q?jsSxGqCdrm6C1jQ2drtQsXrhxvXGxnlbNLrzPN7nLxOfpMtrPw2teSpQuf9h?=
+ =?us-ascii?Q?6JFAy34AoRWsunFn5nmivzts7/tduJaOjga5SH/XWmyM1Q5/oQvqNqh8u76S?=
+ =?us-ascii?Q?EqFz3rZeJZtgsVbSlN/ZxVHGsx3fjzZDgjNg9k8LAHBQRLzSAGAQwU84TRDn?=
+ =?us-ascii?Q?S0aq5dgpINbPrGG5p6ZY1KkNmguU+ZGdqJVWb/C1fjuHpAomoruASlRB/APX?=
+ =?us-ascii?Q?YIEulgSjJ/xJY/aHUttpMEGPDiNlfG1pd/LPJc/GLjLYa/yLkEydPEjDMzkr?=
+ =?us-ascii?Q?gBdc6R0HH6QqAL4z9u0Ut+6To4hxDVyMpkGmT/++ARGtqf3UAAdBE7yXqvyX?=
+ =?us-ascii?Q?MWP+8QUDiy/+15B1Pbo21GbHFbTKxbqcNp8pITjUwNQcO4sWGGdK1bQ2Zrpe?=
+ =?us-ascii?Q?COcdft2bYKpCfL0HqCDFSDNHD/7hAe4ts61aEzRcX90/cu20G/bCYtetqJjl?=
+ =?us-ascii?Q?8CCsasWYPVpBfKREWNDwcI070G9DNCKPn2N3tJ4Bq8NyXxtH82L6Wi9LHyFc?=
+ =?us-ascii?Q?kl9ULNexUY4ORe5VB1HZZmeKFqjBOj04/zDfejdng0p+Ps4LKA1HmfDvah/I?=
+ =?us-ascii?Q?HFouRhkgGHjvNb4HGJOibExQg2hrrtA41X32pldqqELvsDEnCeiAINCDSqhL?=
+ =?us-ascii?Q?9cpolFCNSmgA8Cn4JlH3gcBLf6gFAVf8OsiYNmzb2hmhc69NaDyV9yemz5Wn?=
+ =?us-ascii?Q?ZI6ZelGpSE1P5jHyva7dNKJ6l7prtwi2OOu5GacG52hrlxfRry/26gGQws46?=
+ =?us-ascii?Q?BB0+kjcfXduAMKalBZVuH8O4TBpvOEO5A41mZdgepqOOwVD/Ubge4wvuDrRX?=
+ =?us-ascii?Q?vuWi8KUht5JJq2fDU6Q2xttUy72Q2sllUFmt+Y/ZagzITOrxknehlUSGVCQn?=
+ =?us-ascii?Q?7knNu4VaOqJfJjv89bysP7JDcNFPPyXurRY/M9BDk/VDOIUO4ZJDs94wgcgq?=
+ =?us-ascii?Q?3GBOPJmIGw1zHw4ee+zQIVMe+I7aVrRgm3VVxw8cqaJ8dMj7iKl14dfsy0JI?=
+ =?us-ascii?Q?4my1hjcYSULYYPJYmrixCvnODLYqM35aRuPaF166ohaeoLf9x63ZkWCcCx6v?=
+ =?us-ascii?Q?tIog59+NOeWg3su53Ha80Gm7AidE6g3sH/Zbt9J8BOb2wu/pssLRw4MMiV4t?=
+ =?us-ascii?Q?6RWZlkhKsNBgLmsD2IuGgs6hAgK586Tq+sZ25YPwWaXLvAz3ldoCeRapngRk?=
+ =?us-ascii?Q?uFtLjtDXE0q7mHY6+L9BpRL4aHc+sNlte4jq+Ip0nfI0AUjUdqzPFGNae78l?=
+ =?us-ascii?Q?mI/syItmLTgl8vYp1+qm23jFzx+ltY4ArCJNW7AmTOu1c/+06C9Gt2yLoaNq?=
+ =?us-ascii?Q?cOiROb/akQ=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a22c38e1-8ffe-460d-2490-08de85d1307a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e7628d3-3960-498b-3b4a-08de85d131f5
 X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2026 16:04:24.2990
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2026 16:04:26.7008
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kugp5gfZ4qQbB3PcxyeEufqHSBq1mnOKrow8phHqwGX91NOAKfoqNE8pWirA7KGZAQU9zjl37jYqKsPLlfEZ+Q==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 74Bwo46xo3esdrP6BYGLhNkmhKiAUO2EPb/wwN4bkQBq+iLLMacxNNu2ICgDn8bsLDuivJ8Sytzjyy7ZX7OKAA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV4PR04MB11451
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -147,17 +147,17 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-269524-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269525-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[nxp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
@@ -165,236 +165,109 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.950];
+	NEURAL_HAM(-0.00)[-0.953];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lib.sh:url,nxp.com:dkim,nxp.com:email,nxp.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 740032CE897
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:dkim,nxp.com:email,nxp.com:mid,ethtool_rmon.sh:url]
+X-Rspamd-Queue-Id: B24F32CE7C6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Extend lib.sh so that it's able to parse driver/net/net.config and
-environment variables such as NETIF, REMOTE_TYPE, LOCAL_V4 etc described
-in drivers/net/README.rst.
+Update some helpers so that they are capable to run commands on
+different targets than the local one. This patch makes the necesasy
+modification for those helpers / sections of code which are needed for
+the ethtool_rmon.sh test that will be converted in the next patches.
 
-In order to make the transition towards running with a single local
-interface smoother for the bash networking driver tests, beside sourcing
-the net.config file also translate the new env variables into the old
-style based on the NETIFS array. Since the NETIFS array only holds the
-network interface names, also add a new array - TARGETS - which keeps
-track of the target on which a specific interfaces resides - local,
-netns or accesible through an ssh command.
+For example, mac_addr_prepare() and mac_addr_restore() used when
+STABLE_MAC_ADDRS=yes need to ensure stable MAC addresses on interfaces
+located even in other namespaces. In order to do that, append the 'ip
+link' commands with a 'run_on $dev' tag.
 
-For example, a net.config which looks like below:
-
-	NETIF=eth0
-	LOCAL_V4=192.168.1.1
-	REMOTE_V4=192.168.1.2
-	REMOTE_TYPE=ssh
-	REMOTE_ARGS=root@192.168.1.2
-
-will generate the NETIFS and TARGETS arrays with the following data.
-
-	NETIFS[p1]="eth0"
-	NETIFS[p2]="eth2"
-
-	TARGETS[eth0]="local:"
-	TARGETS[eth2]="ssh:root@192.168.1.2"
-
-The above will be true if on the remote target, the interface which has
-the 192.168.1.2 address is named eth2.
-
-Since the TARGETS array is indexed by the network interface name,
-document a new restriction README.rst which states that the remote
-interface cannot have the same name as the local one.
-
-Also keep the old way of populating the NETIFS variable based on the
-command line arguments. This will be invoked in case NETIF is not
-defined.
+The same run_on is necessary also when verifying if all the interfaces
+listed in NETIFS are indeed available.
 
 Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
 ---
 Changes in v3:
-- s/TARGET/CUR_TARGET
-- this used to be patch #2/9 in v2. Swapped the two patches so that the
-  run_cmd used in this patch is defined earlier, not later.
+- added some more double quotes
 Changes in v2:
 - patch is new
 
- .../testing/selftests/drivers/net/README.rst  |   3 +
- tools/testing/selftests/net/forwarding/lib.sh | 130 ++++++++++++++++--
- 2 files changed, 124 insertions(+), 9 deletions(-)
+ tools/testing/selftests/net/forwarding/lib.sh | 17 ++++++++++-------
+ tools/testing/selftests/net/lib.sh            |  2 +-
+ 2 files changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/README.rst b/tools/testing/selftests/drivers/net/README.rst
-index c94992acf10b..8d8d9d62e763 100644
---- a/tools/testing/selftests/drivers/net/README.rst
-+++ b/tools/testing/selftests/drivers/net/README.rst
-@@ -26,6 +26,9 @@ The netdevice against which tests will be run must exist, be running
- Refer to list of :ref:`Variables` later in this file to set up running
- the tests against a real device.
- 
-+Also, make sure that if you are using a remote machine for traffic injection,
-+the local and remote interfaces have different names.
-+
- Both modes required
- ~~~~~~~~~~~~~~~~~~~
- 
 diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index cf40cb766c68..fb5aa56343e1 100644
+index fb5aa56343e1..f76de37d0caf 100644
 --- a/tools/testing/selftests/net/forwarding/lib.sh
 +++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -3,6 +3,7 @@
+@@ -530,10 +530,10 @@ mac_addr_prepare()
+ 		dev=${NETIFS[p$i]}
+ 		new_addr=$(printf "00:01:02:03:04:%02x" $i)
  
- ##############################################################################
- # Topology description. p1 looped back to p2, p3 to p4 and so on.
-+#shellcheck disable=SC2034 # SC doesn't see our uses of global variables
+-		MAC_ADDR_ORIG["$dev"]=$(ip -j link show dev $dev | jq -e '.[].address')
++		MAC_ADDR_ORIG["$dev"]=$(run_on "$dev" ip -j link show dev "$dev" | jq -e '.[].address')
+ 		# Strip quotes
+ 		MAC_ADDR_ORIG["$dev"]=${MAC_ADDR_ORIG["$dev"]//\"/}
+-		ip link set dev $dev address $new_addr
++		run_on "$dev" ip link set dev "$dev" address $new_addr
+ 	done
+ }
  
- declare -A NETIFS=(
-     [p1]=veth0
-@@ -17,6 +18,26 @@ declare -A NETIFS=(
-     [p10]=veth9
- )
+@@ -543,7 +543,7 @@ mac_addr_restore()
  
-+# Array indexed by the network interface name keeping track of the target on
-+# which the interface resides. Values will be strings of the following format -
-+# <type>:<args>.
-+# TARGETS[eth0]="local:" - meaning that the eth0 interface is accessible locally
-+# TARGETS[eth1]="netns:foo" - eth1 is in the foo netns
-+# TARGETS[eth2]="ssh:root@10.0.0.2" - eth2 is accessible through running the
-+# 'ssh root@10.0.0.2' command.
-+declare -A TARGETS=(
-+    [veth0]="local:"
-+    [veth1]="local:"
-+    [veth2]="local:"
-+    [veth3]="local:"
-+    [veth4]="local:"
-+    [veth5]="local:"
-+    [veth6]="local:"
-+    [veth7]="local:"
-+    [veth8]="local:"
-+    [veth9]="local:"
-+)
+ 	for ((i = 1; i <= NUM_NETIFS; ++i)); do
+ 		dev=${NETIFS[p$i]}
+-		ip link set dev $dev address ${MAC_ADDR_ORIG["$dev"]}
++		run_on "$dev" ip link set dev "$dev" address ${MAC_ADDR_ORIG["$dev"]}
+ 	done
+ }
+ 
+@@ -556,7 +556,9 @@ if [[ "$STABLE_MAC_ADDRS" = "yes" ]]; then
+ fi
+ 
+ for ((i = 1; i <= NUM_NETIFS; ++i)); do
+-	ip link show dev ${NETIFS[p$i]} &> /dev/null
++	int="${NETIFS[p$i]}"
 +
- # Port that does not have a cable connected.
- : "${NETIF_NO_CABLE:=eth8}"
++	run_on "$int" ip link show dev "$int" &> /dev/null
+ 	if [[ $? -ne 0 ]]; then
+ 		echo "SKIP: could not find all required interfaces"
+ 		exit $ksft_skip
+@@ -639,7 +641,7 @@ setup_wait_dev_with_timeout()
+ 	local i
  
-@@ -340,17 +361,108 @@ fi
- ##############################################################################
- # Command line options handling
+ 	for ((i = 1; i <= $max_iterations; ++i)); do
+-		ip link show dev $dev up \
++		run_on "$dev" ip link show dev "$dev" up \
+ 			| grep 'state UP' &> /dev/null
+ 		if [[ $? -ne 0 ]]; then
+ 			sleep 1
+@@ -944,9 +946,10 @@ ethtool_std_stats_get()
+ 	local src=$1; shift
  
--count=0
-+check_env() {
-+	local vars_needed=("LOCAL_V4,LOCAL_V6"
-+			   "REMOTE_V4,REMOTE_V6"
-+			   "REMOTE_TYPE"
-+			   "REMOTE_ARGS")
-+	local missing=()
-+	local choice
-+
-+	# If a choice has multiple comma separated options, at least one must
-+	# exist
-+	for choice in "${vars_needed[@]}"; do
-+		IFS=',' read -ra entries <<< "$choice"
-+
-+		local found=0
-+		for entry in "${entries[@]}"; do
-+			if [[ -n "${!entry}" ]]; then
-+				found=1
-+				break
-+			fi
-+		done
- 
--while [[ $# -gt 0 ]]; do
--	if [[ "$count" -eq "0" ]]; then
--		unset NETIFS
--		declare -A NETIFS
-+		if [[ $found -eq 0 ]]; then
-+			missing+=("$choice")
-+		fi
-+	done
-+
-+	# Make sure v4 / v6 configs are symmetric
-+	if [[ (-n "${LOCAL_V6}" && -z "${REMOTE_V6}") || \
-+	      (-z "${LOCAL_V6}" && -n "${REMOTE_V6}") ]]; then
-+		missing+=("LOCAL_V6,REMOTE_V6")
+ 	if [[ "$grp" == "pause" ]]; then
+-		ethtool -I --json -a "$dev" | jq --arg name "$name" '.[].statistics[$name]'
++		run_on "$dev" ethtool -I --json -a "$dev" | \
++			jq --arg name "$name" '.[].statistics[$name]'
+ 	else
+-		ethtool --json -S "$dev" --groups "$grp" -- --src "$src" | \
++		run_on "$dev" ethtool --json -S "$dev" --groups "$grp" -- --src "$src" | \
+ 			jq --arg grp "$grp" --arg name "$name" '.[][$grp][$name]'
  	fi
--	count=$((count + 1))
--	NETIFS[p$count]="$1"
--	shift
--done
-+
-+	if [[ (-n "${LOCAL_V4}" && -z "${REMOTE_V4}") || \
-+	      (-z "${LOCAL_V4}" && -n "${REMOTE_V4}") ]]; then
-+		missing+=("LOCAL_V4,REMOTE_V4")
-+	fi
-+
-+	if [[ ${#missing[@]} -gt 0 ]]; then
-+		echo "SKIP: Invalid environment, missing configuration: ${missing[*]}"
-+		echo "Please see tools/testing/selftests/drivers/net/README.rst"
-+		exit "$ksft_skip"
-+	fi
-+}
-+
-+get_ifname_by_ip()
-+{
-+	local ip_addr=$1; shift
-+
-+	run_cmd ip -j addr show to "$ip_addr" | jq -r '.[].ifname'
-+}
-+
-+# If there is a configuration file, source it
-+if [[ -f $net_forwarding_dir/../../drivers/net/net.config ]]; then
-+	source "$net_forwarding_dir/../../drivers/net/net.config"
-+fi
-+
-+# In case NETIF is specified, then the test expects to pass the arguments
-+# through the variables specified in drivers/net/README.rst file. If not,
-+# fallback on parsing the script arguments for interface names.
-+if [[ -v NETIF ]]; then
-+	if (( NUM_NETIFS > 2)); then
-+		echo "SKIP: NETIF defined and NUM_NETIFS is bigger than 2"
-+		exit "$ksft_skip"
-+	fi
-+
-+	check_env
-+
-+	# Populate the NETIF and TARGETS arrays automatically based on the
-+	# environment variables
-+	unset NETIFS
-+	declare -A NETIFS
-+
-+	NETIFS[p1]="$NETIF"
-+	TARGETS[$NETIF]="local:"
-+
-+	# Locate the name of the remote interface
-+	if [[ -v REMOTE_V4 ]]; then
-+		remote_netif=$(CUR_TARGET="$REMOTE_TYPE:$REMOTE_ARGS" get_ifname_by_ip "$REMOTE_V4")
-+	else
-+		remote_netif=$(CUR_TARGET="$REMOTE_TYPE:$REMOTE_ARGS" get_ifname_by_ip "$REMOTE_V6")
-+	fi
-+	if [[ ! -n "$remote_netif" ]]; then
-+		echo "SKIP: cannot find remote interface"
-+		exit "$ksft_skip"
-+	fi
-+
-+	NETIFS[p2]="$remote_netif"
-+	TARGETS[$remote_netif]="$REMOTE_TYPE:$REMOTE_ARGS"
-+else
-+	count=0
-+
-+	while [[ $# -gt 0 ]]; do
-+		if [[ "$count" -eq "0" ]]; then
-+			unset NETIFS
-+			declare -A NETIFS
-+		fi
-+		count=$((count + 1))
-+		NETIFS[p$count]="$1"
-+		TARGETS[$1]="local:"
-+		shift
-+	done
-+fi
+ }
+diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
+index f7c54d05758e..14f262a593c9 100644
+--- a/tools/testing/selftests/net/lib.sh
++++ b/tools/testing/selftests/net/lib.sh
+@@ -518,7 +518,7 @@ mac_get()
+ {
+ 	local if_name=$1
  
- ##############################################################################
- # Network interfaces configuration
+-	ip -j link show dev $if_name | jq -r '.[]["address"]'
++	run_on "$if_name" ip -j link show dev "$if_name" | jq -r '.[]["address"]'
+ }
+ 
+ kill_process()
 -- 
 2.25.1
 
