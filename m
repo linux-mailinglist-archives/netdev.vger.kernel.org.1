@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-269401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269400-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MHmeK1bVu2kCpAIAu9opvQ
-	(envelope-from <netdev+bounces-269401-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:52:06 +0100
+	id WDMSJj/Uu2k4owIAu9opvQ
+	(envelope-from <netdev+bounces-269400-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:47:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0739A2C9C65
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:52:05 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CDBD2C9B92
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:47:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC78930BE1C2
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:47:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 94BDE30229BB
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:47:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A243C4540;
-	Thu, 19 Mar 2026 10:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2BD3C5553;
+	Thu, 19 Mar 2026 10:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="NizkEOSU"
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HtvSqplF"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B06F3C3BF7;
-	Thu, 19 Mar 2026 10:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A923612FC;
+	Thu, 19 Mar 2026 10:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773917252; cv=none; b=Z7vZxc/4zk0be+1nzKK9gdLSlCbvRHjfge511Wmo61cGOuKxwUxQ4c5C4R13vOKhOlA0RsFZZvZEX2xuKccPw03F202UGrPOr9pZ/cURMVldPwwWmC0rsy9zB2ZMuUyyYDPbSHG1qouAVLi+UaS3qfNkOymdIjzPI8XhS3Tu5Hk=
+	t=1773917246; cv=none; b=RS8q2liBmaXLNr/5eDRHjyRsfgeDTwHKvxbc1ymg6k90uKRg9iwkfNWIofxtDYsNaCV5P3kAiAT4L3uNoXSV7Xb9d5ZkungSACuMbzO/M9xK4LBfPGOJrO8i9wGt6YWDAOS/rQC9UO7TISNywb8XEE06aJt/StUuegig+sGImjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773917252; c=relaxed/simple;
-	bh=/DerbCNH93nWcJFCcSyH0vcBP/3BK3w3yhhKoecJM9g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OMhMQKCGejKvzsomPK3CAaK66pyW5fg+quP20P0SW3tA/ZZLIenV81JhNfGdfnZEMhhTPJXwUuwRZyUPo5vTeyWdo9gOcfWPrZYMKQhk0hy9Nj1KEbmf5W9sOZf+ukf0t6NNQ/dE7r0hXke6ymQcsx+1IZHc8bz8oxQ5ZvyTVuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=NizkEOSU; arc=none smtp.client-ip=130.117.225.111
+	s=arc-20240116; t=1773917246; c=relaxed/simple;
+	bh=502L+b8VhHD2hfOY+Vac3X+4b9aG5ol0a3NFHml8MFI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=A11uIg3w9O7XiqPg6gFtN8K0q5vud8DtgACwTEui8XSinaXYCqSyYThBQ/nFENfTIXfXckLd5mNDnzRRxOK+5keyeAIglmvWqL1/E57IbtMY8mSE9RBOYxKO5UPjdX8m3SSSqiUz1vlIE36gZJbEBx8poQi/KJRNVvuiXB3BcCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=HtvSqplF; arc=none smtp.client-ip=130.117.225.111
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=virtuozzo.com; s=relay; h=MIME-Version:Message-ID:Date:Subject:From:
-	Content-Type; bh=z1erKPSf72XxaBH0XjMFCVpHOlYK1KeCMMQpje1nYbA=; b=NizkEOSUB33l
-	Neoe0txsjaFtnn9IUsHoJlWbnKPak8JwR6aN6OSw8VUm0kFWjXwm6e09ya+/YzU1SWajy9DKNppC+
-	eXc9zOEL7iZDggqxu1v+Wo7NeFJiWyyWApzx2cOzwhd3VP0Cnj9j7BL5qiCBcEuM18ilzOw/rm26B
-	THJjVC9xK/f7PMQNnd4LalIw2iB5kcKOCzNvziCPDFK9yeVvkQLVXtrjwOPaTf3D8EB5XG1bR3X4n
-	NRSK9CewA/vWROkIW7JJ2BA5+gzYU1s+LqeIz65N7Vj0nGhV8xBDs36Ibc8CApFCZ2XwOR/6Tv/yg
-	CgG3jdgrLKC2YgdyZFBsaw==;
+	Content-Type; bh=fyEvluQLxxf9rIozH/IQMufNdNJaWDqtGJ1Dq84TKXo=; b=HtvSqplFc5SG
+	NRMSHm5Ik8EwERo1Z7T80yMviqQ0ixLPoDBpiwD+Q/Lqe7P0atT+Zp6Lt4OFy4JJQcdkgkNfS61a3
+	K4i9JbGJfb8ysOu+2V7h6+0d484PnbH4sm2cCqOmNzOmJWbm1OiZ72cL/N3hFmoVsDiOf4gWZ6pAi
+	Csv0+xU3yPCtxrkUtQjArJZtMqh1dOwj4jozXGVFYFIyjmav9K9pr6qNW4C8bwCNK21kg7AtEQkGD
+	bnbgCTV46qQhWAePJRbxZcJPzqV30BWupNxMrJ+6c6w6q2XkO8s78ZCMbrfunh1out1wptTuSBQU5
+	yTfYO1Wb4u8WjkLfJgNhdw==;
 Received: from [130.117.225.5] (helo=dev004.aci.vzint.dev)
 	by relay.virtuozzo.com with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <aleksey.oladko@virtuozzo.com>)
-	id 1w3AdB-007bwL-2M;
-	Thu, 19 Mar 2026 11:31:25 +0100
+	id 1w3AdD-007bwN-08;
+	Thu, 19 Mar 2026 11:31:26 +0100
 Received: from dev004.aci.vzint.dev (localhost [127.0.0.1])
-	by dev004.aci.vzint.dev (8.16.1/8.16.1) with ESMTPS id 62JAVQ8q146132
+	by dev004.aci.vzint.dev (8.16.1/8.16.1) with ESMTPS id 62JAVSRh146136
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 19 Mar 2026 10:31:26 GMT
+	Thu, 19 Mar 2026 10:31:28 GMT
 Received: (from root@localhost)
-	by dev004.aci.vzint.dev (8.16.1/8.16.1/Submit) id 62JAVOZg146131;
-	Thu, 19 Mar 2026 10:31:24 GMT
+	by dev004.aci.vzint.dev (8.16.1/8.16.1/Submit) id 62JAVRcE146135;
+	Thu, 19 Mar 2026 10:31:27 GMT
 From: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
 To: "David S . Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
@@ -65,10 +66,12 @@ To: "David S . Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-kernel@vger.kernel.org, dev@openvswitch.org,
         Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-Subject: [PATCH net-next v5 0/4] selftests: net: fix false failures due to missing features and host interference
-Date: Thu, 19 Mar 2026 10:31:19 +0000
-Message-ID: <20260319103123.146112-1-aleksey.oladko@virtuozzo.com>
+Subject: [PATCH net-next v5 1/4] selftests: net: run reuseport in an isolated netns
+Date: Thu, 19 Mar 2026 10:31:20 +0000
+Message-ID: <20260319103123.146112-2-aleksey.oladko@virtuozzo.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260319103123.146112-1-aleksey.oladko@virtuozzo.com>
+References: <20260319103123.146112-1-aleksey.oladko@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,7 +85,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=relay];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -90,9 +93,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269401-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269400-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[virtuozzo.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[aleksey.oladko@virtuozzo.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -101,79 +104,143 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[in_netns.sh:url,pmtu-test.sh:url,pmtu.sh:url,virtuozzo.com:dkim,virtuozzo.com:email,virtuozzo.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0739A2C9C65
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,virtuozzo.com:dkim,virtuozzo.com:email,virtuozzo.com:mid]
+X-Rspamd-Queue-Id: 5CDBD2C9B92
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+The reuseport_* tests (bpf, bpf_cpu, bpf_numa, dualstack) currently use
+a fixed port range. This can cause intermittent test failures when the
+ports are already in use by other services:
 
-This series addresses several issues in the networking kselftests
-that cause false-positive failures depending on the host environment,
-kernel configuration, or library versions.
+  failed to bind receive socket: Address already in use
 
-The main focus of these changes is to isolate tests from the host
-environment (using namespaces) and to ensure proper fallback or
-skipping when dependencies are missing.
-
-Summary of changes:
-1. Fixes ovs-dpctl.py to return a non-zero exit code when pyroute2
-   is too old. This allows pmtu.sh to correctly fall back to ovs-vsctl
-   instead of assuming the configuration was successful.
-2-4. Move reuseport test into dedicated network namespaces. This prevents
-   failures caused by port conflicts with host processes or interference
-   from host firewall rules.
-5. Ensures io_uring is enabled via sysctl before running io_uring_zerocopy
-   test, preventing failures on systems where kernel.io_uring_disabled
-   is set.
+To avoid conflicts, run these tests in separate network namespaces using
+unshare. Each test now has its own isolated network stack, preventing
+port collisions with the host services.
 
 Signed-off-by: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+---
+ tools/testing/selftests/net/reuseport_bpf.c       | 11 +++++++++++
+ tools/testing/selftests/net/reuseport_bpf_cpu.c   | 10 ++++++++++
+ tools/testing/selftests/net/reuseport_bpf_numa.c  | 10 ++++++++++
+ tools/testing/selftests/net/reuseport_dualstack.c | 11 +++++++++++
+ 4 files changed, 42 insertions(+)
 
-Changes in v2:
-- Fixed a typo by adding the missing backslash in Makefile
-- Added a Fixes: tag to the appropriate commit as requested
-- Link to v1: https://lore.kernel.org/linux-kselftest/20260120230558.328423-1-aleksey.oladko@virtuozzo.com
-
-Changes in v3:
-- renamed pmtu.sh to pmtu-test.sh and used pmtu.sh as the name
-  of the wrapper. 
-- since the test now runs in a dedicated netns, updates the ovs
-  test case to correctly move network interfaces into the target
-  namespace.
-- Link to v2: https://lore.kernel.org/linux-kselftest/f7t1pj9v8h7.fsf@redhat.com/T/#t
-
-Changes in v4:
-- dropped the patch "selftests: net: fib_tests: skip rp_filter test if
-  cls_basic is unavailable" since the test environment is expected to
-  have all mandatory config options enabled.
-- moved isolation logic from in_netns.sh wrapper to unshare() call in
-  reuseport_ tests
-- Link to v3: https://lore.kernel.org/linux-kselftest/20260306000127.519064-1-aleksey.oladko@virtuozzo.com/T/#t
-
-Changes in v4:
-- changed patch prefix/tag from "net" to "next-next"
-- Link to v4: https://lore.kernel.org/linux-kselftest/20260309152013.565216-1-aleksey.oladko@virtuozzo.com/T/#t
-
-Aleksei Oladko (3):
-  selftests: net: run reuseport in an isolated netns
-  selftests: net: rename pmtu.sh to pmtu-test.sh
-  selftests: net: io_uring_zerocopy: enable io_uring for the test
-
-Konstantin Khorenko (1):
-  selftests: net: run pmtu.sh in netns to avoid host firewall
-    interference
-
- tools/testing/selftests/net/Makefile          |    1 +
- .../selftests/net/io_uring_zerocopy_tx.sh     |    9 +
- tools/testing/selftests/net/pmtu-test.sh      | 2492 +++++++++++++++++
- tools/testing/selftests/net/pmtu.sh           | 2492 +----------------
- tools/testing/selftests/net/reuseport_bpf.c   |   11 +
- .../testing/selftests/net/reuseport_bpf_cpu.c |   10 +
- .../selftests/net/reuseport_bpf_numa.c        |   10 +
- .../selftests/net/reuseport_dualstack.c       |   11 +
- 8 files changed, 2546 insertions(+), 2490 deletions(-)
- create mode 100755 tools/testing/selftests/net/pmtu-test.sh
-
+diff --git a/tools/testing/selftests/net/reuseport_bpf.c b/tools/testing/selftests/net/reuseport_bpf.c
+index b6634d6da3d6..12e48b97b862 100644
+--- a/tools/testing/selftests/net/reuseport_bpf.c
++++ b/tools/testing/selftests/net/reuseport_bpf.c
+@@ -23,6 +23,7 @@
+ #include <sys/socket.h>
+ #include <sys/resource.h>
+ #include <unistd.h>
++#include <sched.h>
+ 
+ #include "kselftest.h"
+ 
+@@ -455,8 +456,18 @@ static __attribute__((destructor)) void main_dtor(void)
+ 	setrlimit(RLIMIT_MEMLOCK, &rlim_old);
+ }
+ 
++static void setup_netns(void)
++{
++	if (unshare(CLONE_NEWNET))
++		error(1, errno, "failed to unshare netns");
++	if (system("ip link set lo up"))
++		error(1, 0, "failed to bring up lo interface in netns");
++}
++
+ int main(void)
+ {
++	setup_netns();
++
+ 	fprintf(stderr, "---- IPv4 UDP ----\n");
+ 	/* NOTE: UDP socket lookups traverse a different code path when there
+ 	 * are > 10 sockets in a group.  Run the bpf test through both paths.
+diff --git a/tools/testing/selftests/net/reuseport_bpf_cpu.c b/tools/testing/selftests/net/reuseport_bpf_cpu.c
+index 2d646174729f..ddfe92f6597a 100644
+--- a/tools/testing/selftests/net/reuseport_bpf_cpu.c
++++ b/tools/testing/selftests/net/reuseport_bpf_cpu.c
+@@ -228,10 +228,20 @@ static void test(int *rcv_fd, int len, int family, int proto)
+ 		close(rcv_fd[cpu]);
+ }
+ 
++static void setup_netns(void)
++{
++	if (unshare(CLONE_NEWNET))
++		error(1, errno, "failed to unshare netns");
++	if (system("ip link set lo up"))
++		error(1, 0, "failed to bring up lo interface in netns");
++}
++
+ int main(void)
+ {
+ 	int *rcv_fd, cpus;
+ 
++	setup_netns();
++
+ 	cpus = sysconf(_SC_NPROCESSORS_ONLN);
+ 	if (cpus <= 0)
+ 		error(1, errno, "failed counting cpus");
+diff --git a/tools/testing/selftests/net/reuseport_bpf_numa.c b/tools/testing/selftests/net/reuseport_bpf_numa.c
+index 2ffd957ffb15..8ec52fc5ef41 100644
+--- a/tools/testing/selftests/net/reuseport_bpf_numa.c
++++ b/tools/testing/selftests/net/reuseport_bpf_numa.c
+@@ -230,10 +230,20 @@ static void test(int *rcv_fd, int len, int family, int proto)
+ 		close(rcv_fd[node]);
+ }
+ 
++static void setup_netns(void)
++{
++	if (unshare(CLONE_NEWNET))
++		error(1, errno, "failed to unshare netns");
++	if (system("ip link set lo up"))
++		error(1, 0, "failed to bring up lo interface in netns");
++}
++
+ int main(void)
+ {
+ 	int *rcv_fd, nodes;
+ 
++	setup_netns();
++
+ 	if (numa_available() < 0)
+ 		ksft_exit_skip("no numa api support\n");
+ 
+diff --git a/tools/testing/selftests/net/reuseport_dualstack.c b/tools/testing/selftests/net/reuseport_dualstack.c
+index fb7a59ed759e..0eaf739d0c85 100644
+--- a/tools/testing/selftests/net/reuseport_dualstack.c
++++ b/tools/testing/selftests/net/reuseport_dualstack.c
+@@ -25,6 +25,7 @@
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <unistd.h>
++#include <sched.h>
+ 
+ static const int PORT = 8888;
+ 
+@@ -156,10 +157,20 @@ static void test(int *rcv_fds, int count, int proto)
+ 	close(epfd);
+ }
+ 
++static void setup_netns(void)
++{
++	if (unshare(CLONE_NEWNET))
++		error(1, errno, "failed to unshare netns");
++	if (system("ip link set lo up"))
++		error(1, 0, "failed to bring up lo interface in netns");
++}
++
+ int main(void)
+ {
+ 	int rcv_fds[32], i;
+ 
++	setup_netns();
++
+ 	fprintf(stderr, "---- UDP IPv4 created before IPv6 ----\n");
+ 	build_rcv_fd(AF_INET, SOCK_DGRAM, rcv_fds, 5);
+ 	build_rcv_fd(AF_INET6, SOCK_DGRAM, &(rcv_fds[5]), 5);
 -- 
 2.43.0
 
