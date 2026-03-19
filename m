@@ -1,203 +1,161 @@
-Return-Path: <netdev+bounces-269330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EMEIK8qmu2mUmQIAu9opvQ
-	(envelope-from <netdev+bounces-269330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:33:30 +0100
+	id 8GpGEwapu2mnmQIAu9opvQ
+	(envelope-from <netdev+bounces-269331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:43:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEB082C750D
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:33:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1F212C7699
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:43:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8F866300D0E6
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 07:33:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D813C302003D
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 07:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F2F39E176;
-	Thu, 19 Mar 2026 07:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB893A1A2D;
+	Thu, 19 Mar 2026 07:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I4jy+rzN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L6qJeTy8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E584390C8A
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 07:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE9E3A0E85;
+	Thu, 19 Mar 2026 07:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773905604; cv=none; b=iktm5sR6jxwzdsJO2R0yngkxZcfZCtXDB2U3b+OpI+Afumeh8Uw1h8nN32EZetrX1d5jEoRd6i3tulCiQ47Vl4fIVgNb0qWhQJUWKvgTZXspXQWnYsjtGOCdPm5MvM458UQ1bVerqia1oKg7OBecc5/Dyx78dcZneyvKMR11FYY=
+	t=1773906005; cv=none; b=COa+mJSpsEzadflZOd0nFq/9kkifouxHnc4E3X0aS15DNvej88XZwXpTAWMkg+WZKBcZhsDWq5pvxY0z2QW3iXx61xHt/lkwHS2FtSOwKYD7uDCtSM148+BqRdxJFIlzrBshIb06ppcxlEg5zM1b/1BWIVCQFU1NlcnP54OiyAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773905604; c=relaxed/simple;
-	bh=GYSppdIMaX/06nQtFbo2tTryX8SKqeX06P5GhztxMfM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R28Mx+86CQe6sl1OJFxh0pk1ScHP8ORt5sFqd/LTpeKfp4OizraE8RV1TVC/j0MFXg8N9ocx1WaW94zwRs+Q1CaZkqiaEzhXL5hehKTbgHlemArLt1uxugMdYStiNmp4ap5PSksQzs0pY7LKQJAWxsuHPGClGC86o2kEBEaCTZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I4jy+rzN; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-354a18c48b5so311661a91.1
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 00:33:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773905602; x=1774510402; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZLQ1MC6fP9cORHP27xWUIjVQ8sSQEHBL6tE36vI4nLE=;
-        b=I4jy+rzNBghX1ypUyWkKjJKoK+A8dGtAtS6sZ84wu/n+/oKSGo7OXZHhSGcetF7JLh
-         XxRaScyj3NYZFxFoSxJq7iuGeRzdoV2j60/J8nWjbOWRntc2AHiuHG+CTH4cgd7/a8K1
-         s+JWz2jGtSZ1HBI56SYkvqDem11cBccGl7Ui8K4DV02EhlKd/uNQ4ns6i3PXA9nzRwQS
-         VM/lNZIB+0/aKiYwSE+UpKLR3CExZckob9IT/Cb4YkaaQkDyBbBM9HOlhv84WvonrptE
-         cOiio+xiXBtgNJdpOvizbuUdF6/zNEDRcOuWuhiIOlMWyGbsDXemNLnUv7O5W6L/uKUs
-         X3gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773905602; x=1774510402;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZLQ1MC6fP9cORHP27xWUIjVQ8sSQEHBL6tE36vI4nLE=;
-        b=iW8Ao0HTVSJFGltadca3fTs9xMXkBCqGgIAjNCPSdwFoImSOAy5UAS8quqMdk469SV
-         FclQZHN2wbSG3UwgLP15VrX9jt379NCnkXw3tD4b29qnbQrXoaZ61kXSPfVBvCImyPV7
-         woQxJ3y7BkVv1Aoo3sUlLnsKoD5zAIIpZDasb6pLtShePpwkyqhEfKZlBBkZdVEeu193
-         chAmnDw8YsGgk9yAImpCjTXBoCbsDTDyx3fwIMEQtElRNvac/X9l/7t+ZmVhlp1iIq/A
-         1k7rRgTnQhUF37u13D5260r++rOsyM54I5NbnuCcEifeReIkTwDFjwjRa7pcsUPh9BIV
-         xP3A==
-X-Forwarded-Encrypted: i=1; AJvYcCWg9q8WsMCp3E1Kb7RBxXjEe8VNEA5JzX4NWB/DQIf11OYbhDQMgSSuU6zROqvxpDjO7ic1UxM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJc/q0F5UeGtKGNuvE5Tsa0qRVs2pFIQoJ06x7FycSnHhDclIz
-	RzzsHUVm33s3abbQm7kiLoA5m6gkGct74XWklsrHGehW8eQtoy5gIr2I
-X-Gm-Gg: ATEYQzzFNq5z++sPFahK4S6d0ybx4vz7Zug8T5mU5pZzeq6fABNjslc86DpQRdakiuA
-	2+UsWcbnuSIK/wvToPNsu5yJQ7AqOalEM5SB3n9J3Y7z8SYICvpQzrD46U+cEGwG+giCqMCU7ze
-	EVZ5HXr/+v9KhwhzoM9684Zbe9lgip1Qo2ZtTx/EKN1IBE5QdBFmR6hoszLCysT8DOIhDkUcqJh
-	w7gB8mOwqQnxdVW62dbovwknTt3Lz72jBN4HL4An/2nY5AXHhD53z6p+o69HpA1YZVjpTP/dvHA
-	I8Anis4dgPT/arB23AqK9/pg/eKO9WzvtkugsvgI6Ip1yNvq8F9RA/6YGL7tPSkKoujfEHOzqd2
-	t7LT+kgqapi1xAWDq3ZrBhtvO4tPAAhG7EamCiNy31SBeA83WN307Q98McA/gKghLkNBlldPxZf
-	TMwEabD137PxnGawRd+DX03ZnrDsmbRALMFQNSKFnP0g3asREx5LiOaH/NVr7QJe/IKpkZC85fL
-	1msZ15673I=
-X-Received: by 2002:a17:90a:e70d:b0:352:ba0f:fb28 with SMTP id 98e67ed59e1d1-35bb9e432f2mr5390169a91.1.1773905602343;
-        Thu, 19 Mar 2026 00:33:22 -0700 (PDT)
-Received: from SLSGDTSWING002.tail0ac356.ts.net ([129.126.109.177])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35bc6026a5asm2166870a91.8.2026.03.19.00.33.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2026 00:33:21 -0700 (PDT)
-From: bestswngs@gmail.com
-To: security@kernel.org
-Cc: edumazet@google.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	xmei5@asu.edu,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH net] nfnetlink_osf: validate individual option lengths in fingerprints
-Date: Thu, 19 Mar 2026 15:32:44 +0800
-Message-ID: <20260319073243.1176330-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1773906005; c=relaxed/simple;
+	bh=Z74b+Ki8cTKIwfzaeXDx3eFfRU4uHBqWlOReU6rQuXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mm17j7GhvuMzESRPjETw/F0GtPsFUcmVJ/SClUhO22CvEMxDu05X8Cy7kNRCIKaf3uO0rGXwO0pXrFVwQxtbLJ7D0lOYpLbYGu2krWVWefFHN9DTqgkR1iaHdXiG8eOEP9VKOY0t2fnLYEpI3dPbL/nR6p6msGewAbVnyVitRJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L6qJeTy8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E90AFC2BCAF;
+	Thu, 19 Mar 2026 07:40:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773906004;
+	bh=Z74b+Ki8cTKIwfzaeXDx3eFfRU4uHBqWlOReU6rQuXc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=L6qJeTy8jlGk5UNWYZ6/BoTiw8cC8A7kGOMxqb5QWpvcf8Ba84QWLlQzscM8dplu9
+	 nKjWoazlxcjxvaRcev0EYrsBMvxk8EOvQERevxldPQmECA7o7YXvYsoJ9bewTs0agi
+	 3fkCvYTForUN8O0fOMtF85mh5mZJLMHbXdK/5o0qyqdsyBtIZq9bZLJRxLl/FCmPi9
+	 zfORXVJgSMa6LWND73DFcL6WwXDEZ08iDaL0EWvOxEVnzM/uNXSdgzN2l1Ly0fEa1L
+	 I9pyr84eCEOBrgaCnKE2a9kT3RCGGVnDbpKOUkGFuw+DNf1OQrq7Kin6bQyjGnRQVE
+	 LC4WcGjcSYFgQ==
+Date: Thu, 19 Mar 2026 09:39:59 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Joe Damato <joe@dama.to>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, andrew+netdev@lunn.ch,
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next v3 02/12] net: tso: Add tso_dma_map helpers
+Message-ID: <20260319073959.GJ352386@unreal>
+References: <20260318191325.1819881-1-joe@dama.to>
+ <20260318191325.1819881-3-joe@dama.to>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260318191325.1819881-3-joe@dama.to>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,vger.kernel.org,asu.edu,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269331-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269330-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FROM_NO_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.948];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.925];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AEB082C750D
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dama.to:email]
+X-Rspamd-Queue-Id: A1F212C7699
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Weiming Shi <bestswngs@gmail.com>
+On Wed, Mar 18, 2026 at 12:13:07PM -0700, Joe Damato wrote:
+> Adds skb_frag_phys() to skbuff.h, returning the physical address
+> of a paged fragment's data, which is used by the tso_dma_map helpers
+> introduced in this commit described below:
+> 
+> tso_dma_map_init(): DMA-maps the linear payload region and all frags
+> upfront. Prefers the DMA IOVA API for a single contiguous mapping with
+> one IOTLB sync; falls back to per-region dma_map_phys() otherwise.
+> Returns 0 on success, cleans up partial mappings on failure.
+> 
+> tso_dma_map_cleanup(): Handles both IOVA and fallback teardown paths.
+> 
+> tso_dma_map_count(): counts how many descriptors the next N bytes of
+> payload will need. Returns 1 if IOVA is used since the mapping is
+> contiguous.
+> 
+> tso_dma_map_next(): yields the next (dma_addr, chunk_len) pair.
+> On the IOVA path, each segment is a single contiguous chunk. On the
+> fallback path, indicates when a chunk starts a new DMA mapping so the
+> driver can set dma_unmap_len on that descriptor for completion-time
+> unmapping.
+> 
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Joe Damato <joe@dama.to>
+> ---
+>  v3:
+>    - Added skb_frag_phys helper include/linux/skbuff.h.
+>    - Added tso_dma_map_use_iova() inline helper in tso.h.
+>    - Updated the helpers to use the DMA IOVA API and falls back to per-region
+>      mapping instead.
+> 
+>  include/linux/skbuff.h |  11 ++
+>  include/net/tso.h      |  21 ++++
+>  net/core/tso.c         | 274 +++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 306 insertions(+)
+> 
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index 9cc98f850f1d..d8630eb366c5 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -3758,6 +3758,17 @@ static inline void *skb_frag_address_safe(const skb_frag_t *frag)
+>  	return ptr + skb_frag_off(frag);
+>  }
+>  
+> +/**
+> + * skb_frag_phys - gets the physical address of the data in a paged fragment
+> + * @frag: the paged fragment buffer
+> + *
+> + * Returns: the physical address of the data within @frag.
+> + */
+> +static inline phys_addr_t skb_frag_phys(const skb_frag_t *frag)
+> +{
+> +	return page_to_phys(skb_frag_page(frag)) + skb_frag_off(frag);
+> +}
 
-nfnl_osf_add_callback() validates opt_num bounds and string
-NUL-termination but does not check individual option length fields.
-A zero-length option causes nf_osf_match_one() to enter the option
-matching loop even when foptsize sums to zero, which matches packets
-with no TCP options where ctx->optp is NULL:
+I skimmed through the patch and it looks generally correct to me. The one
+thing that disappointed me is this function. It's unfortunate that you
+have to implement it this way and cannot rely on phys_addr_t directly.
 
- Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN NOPTI
- KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
- RIP: 0010:nf_osf_match_one (net/netfilter/nfnetlink_osf.c:98)
- Call Trace:
-  <IRQ>
-  nf_osf_match (net/netfilter/nfnetlink_osf.c:227)
-  xt_osf_match_packet (net/netfilter/xt_osf.c:32)
-  ipt_do_table (net/ipv4/netfilter/ip_tables.c:293)
-  nf_hook_slow (net/netfilter/core.c:623)
-  ip_local_deliver (net/ipv4/ip_input.c:262)
-  ip_rcv (net/ipv4/ip_input.c:573)
-  </IRQ>
- Kernel panic - not syncing: Fatal exception in interrupt
-
-Additionally, an MSS option (kind=2) with length < 4 causes
-out-of-bounds reads when nf_osf_match_one() unconditionally accesses
-optp[2] and optp[3] for MSS value extraction.  While RFC 9293
-section 3.2 specifies that the MSS option is always exactly 4
-bytes (Kind=2, Length=4), the check uses "< 4" rather than
-"!= 4" because lengths greater than 4 do not cause memory
-safety issues -- the buffer is guaranteed to be at least
-foptsize bytes by the ctx->optsize == foptsize check.
-
-Reject fingerprints where any option has zero length, or where an MSS
-option has length less than 4, at add time rather than trusting these
-values in the packet matching hot path.
-
-Fixes: 11eeef41d5f6 ("netfilter: passive OS fingerprint xtables match")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
- net/netfilter/nfnetlink_osf.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/net/netfilter/nfnetlink_osf.c b/net/netfilter/nfnetlink_osf.c
-index 94e3eac5743a..c35b831dac5a 100644
---- a/net/netfilter/nfnetlink_osf.c
-+++ b/net/netfilter/nfnetlink_osf.c
-@@ -303,6 +303,7 @@ static int nfnl_osf_add_callback(struct sk_buff *skb,
- 	struct nf_osf_user_finger *f;
- 	struct nf_osf_finger *kf = NULL, *sf;
- 	int err = 0;
-+	int i;
-
- 	if (!capable(CAP_NET_ADMIN))
- 		return -EPERM;
-@@ -318,6 +319,13 @@ static int nfnl_osf_add_callback(struct sk_buff *skb,
- 	if (f->opt_num > ARRAY_SIZE(f->opt))
- 		return -EINVAL;
-
-+	for (i = 0; i < f->opt_num; i++) {
-+		if (!f->opt[i].length)
-+			return -EINVAL;
-+		if (f->opt[i].kind == OSFOPT_MSS && f->opt[i].length < 4)
-+			return -EINVAL;
-+	}
-+
- 	if (!memchr(f->genre, 0, MAXGENRELEN) ||
- 	    !memchr(f->subtype, 0, MAXGENRELEN) ||
- 	    !memchr(f->version, 0, MAXGENRELEN))
---
-2.43.0
+Thanks
 
