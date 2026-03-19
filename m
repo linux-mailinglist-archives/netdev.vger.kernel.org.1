@@ -1,98 +1,105 @@
-Return-Path: <netdev+bounces-269366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269367-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2GE6BAO7u2mtmwIAu9opvQ
-	(envelope-from <netdev+bounces-269366-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:59:47 +0100
+	id oOWyDam7u2mtmwIAu9opvQ
+	(envelope-from <netdev+bounces-269367-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:02:33 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABF3B2C83CE
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:59:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA83C2C848C
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:02:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A37A9301DBAC
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:59:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 44745300DF61
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201203AE19D;
-	Thu, 19 Mar 2026 08:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B54A36C0B0;
+	Thu, 19 Mar 2026 09:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TJBNTtyk";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ol5vNMNR";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TJBNTtyk";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ol5vNMNR"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="SOnVAmL3";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Usrvmur0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3643AD51E
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 08:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CCB1EE033
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 09:02:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773910782; cv=none; b=iAGvrRvDk2hbaPEyHiM6sHTkJsUvpyPnfjFWhv6la8iUJBDKXzKsnoV+rpR2Ty2XH/LhwzQWZoYRwbH2hmm3n3mVBT1B3DabX/kD3DnBZIG7KfhDdn+Xfbim/yw5Q7aXCEvwBpZ+Cj6Ia1zK2u+Jp4gscpklBgrvQaoP5S9tonw=
+	t=1773910948; cv=none; b=gGt0/HkqY7sCjbSqWNwRySMZkK6H4MMBIiAxFLftxxEY2fOqfAvNPo9EV9QM9B871OpCeLx32dfROtIz+APl+kypCB07/pszFjUwLK6slA0S+2cB3Oxt0Mq7NaKflFkBIDEHzP8XxKpjPYXn8bwOvNaDzh+SuBtT5LgmUceGG8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773910782; c=relaxed/simple;
-	bh=Rt82C6Wg6ReAVh4K5/wI762YfMgmo/jhl7/QhPfzvnI=;
+	s=arc-20240116; t=1773910948; c=relaxed/simple;
+	bh=rFYQ77mBbRdOk2Q3EJ203LJMJt4lPsFrx6TYibicFuo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AZCMSJKZdTAsIdJDA/HYUKMrJsKO2VjspVryvEa8aKUqdMIJ/Y+tU2/HNtxcb+NdCaXLIn3ggPboq8O78M8gjBZCuCL5CwoB4qOx0HGmJzwMp4Gi3PNcQv/DK3lgYzqJlGRj+HNBsWQMDwzAJJXwshDggTCnoXQ1P4IbkRFUKuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TJBNTtyk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ol5vNMNR; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TJBNTtyk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ol5vNMNR; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 431EB5BD18;
-	Thu, 19 Mar 2026 08:59:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773910778; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0gxy3NCq0KEuLqQl/Z9WEdfIwt4BdeJ10plJASQ/s1g=;
-	b=TJBNTtykKaBFMquJlpifuZb1gzWcc+BVK3DlAjUx+UBFUjo3Yur2xnqBoyfPWgy82RP4SI
-	XyY46rmUScNx/ttUEphAaydl3QyVi+IDaLFH5xpZMXfhyWBseEEHkLVwHOwzZtOND6xOl5
-	gZChHG0s+gVSsziqE5fptYmibEh1HLs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773910778;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0gxy3NCq0KEuLqQl/Z9WEdfIwt4BdeJ10plJASQ/s1g=;
-	b=ol5vNMNRB5riwtupGjeuJB00hD4wTz9z/M6jXDme5pUEVFtkpAEqKov2gPgDhWllf42cCO
-	6JvDtHKz/dqUVuBQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773910778; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0gxy3NCq0KEuLqQl/Z9WEdfIwt4BdeJ10plJASQ/s1g=;
-	b=TJBNTtykKaBFMquJlpifuZb1gzWcc+BVK3DlAjUx+UBFUjo3Yur2xnqBoyfPWgy82RP4SI
-	XyY46rmUScNx/ttUEphAaydl3QyVi+IDaLFH5xpZMXfhyWBseEEHkLVwHOwzZtOND6xOl5
-	gZChHG0s+gVSsziqE5fptYmibEh1HLs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773910778;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0gxy3NCq0KEuLqQl/Z9WEdfIwt4BdeJ10plJASQ/s1g=;
-	b=ol5vNMNRB5riwtupGjeuJB00hD4wTz9z/M6jXDme5pUEVFtkpAEqKov2gPgDhWllf42cCO
-	6JvDtHKz/dqUVuBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 278504273B;
-	Thu, 19 Mar 2026 08:59:37 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id fBp/Bvm6u2nrFwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 19 Mar 2026 08:59:37 +0000
-Message-ID: <8788e351-553f-48da-a6e6-ce082adacb8d@suse.de>
-Date: Thu, 19 Mar 2026 09:59:32 +0100
+	 In-Reply-To:Content-Type; b=db0O7hOYfBbjVH34NAbAY2GeQbJR/vEFKMxZoSs3bzlKmlzFstHjxTlytMPJ7BsHkf+gECMrFkOr0JN9PSWSC+WsyJdWD01HTgztj3TECFuTVgfDeH8JkM9IMKXgF7H8yX6wOE8y524efqZWbPKsflwKOTwHTqyCFd2xbPwD+0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SOnVAmL3; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Usrvmur0; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62J73xK13771133
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 09:02:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	2PPsdradxDFBmU6By8IXsjXvjxWS/JBBTM4uA6mDm84=; b=SOnVAmL3naEmqvxp
+	wCam5A5ffUzxVU1QmNFR4kL3wVfl9kBJLap874hNnZL/A10nu8uG3NpMfPSZKbM2
+	tOZefy7xFI7IbFBTZC3+UHFn2G+KuWnvWrGjNSSDg3WTW80omdEH/MQd8BVK1BtD
+	WD3+ZiQR7pprQ8lVhbIgczFYijPq3rCfgPvdLMQXhuJwso9ZiGB5a6cgLIBossql
+	PmQwNA2RP7CCoZ5Wnc2RXGqkpJHV3PRx4KY7bA2jduYZJnGtIsttRlXveyHJC1Qe
+	VRqtCjpEZ1tbDfn/Q/uGHLwfF0hDJSTj25jpJpD3s8rZ4EZdpIkRa8Y9XE4RYli2
+	8i55zw==
+Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com [209.85.222.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d083r93ym-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 09:02:26 +0000 (GMT)
+Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-94eb847f11cso7642096241.2
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 02:02:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1773910945; x=1774515745; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2PPsdradxDFBmU6By8IXsjXvjxWS/JBBTM4uA6mDm84=;
+        b=Usrvmur0ciM525rP5WBv/EbbkC28XEw/GrwJhejDUcrirKaj5EZymTeVwc3vA6DvJD
+         /xQUZIqR+6DVrT0/K9a8JRVY9JbLG61L0awN/FA4lQ5+E0B1qoHNoJW4cio7w7HiZt6A
+         V+8WOdaR4FmVIyezOj4VCr9hc+86Vlpz0YGjM4V1PWYWMXo4KCoNjhL5pp+ArliDAf7k
+         zM83vrb3CO9bqHQ9ov3eu+8gimOieHZkbZNcGg4k5QoIWrk9rp9l2ijPO82e5PIEbZ8p
+         /BORM4d7LL75+R5U+8m/BlJ543Xu1IOkQprykiO7KffWGo0fK6uF4SS7Hr3MKb0ITGEY
+         jvwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773910945; x=1774515745;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2PPsdradxDFBmU6By8IXsjXvjxWS/JBBTM4uA6mDm84=;
+        b=TXgRsZrNnzHMVFiRllsuSGN+wDJow/WM+PULOX7jsvybhkaz3SqcvU+8rZWW7AC7p5
+         iSKfiXQN9QROVHF8gcTjutm9Y0WdLpLIUJ4ak/fjfXtgwoBJOsB0nmLhytgpRpi9QBrh
+         7n5qamsj6PMt2RE+bkCCrbhnlrOL/XM/hoLL2+eBuSlrUk/SGQZSkeGk4OwGZtUtrERT
+         YICb+vg+S7euddMWlMHkDv7hSUZvfbMi3WWfBGKwyILJViCDr6id0L08u1XwSFCh9hED
+         NAfB8/U6/nYAeoTdUW3l+rRvnSwvtPXUlbjby/miaiexPvEBbX2Jn4J9IXXmrezoJmVR
+         t1yg==
+X-Forwarded-Encrypted: i=1; AJvYcCWSfPIwqfznVxAqvyUIJPEho9h2D2bYwTtmcYiaFQdsjbdng0GI/yNFqxRzAj+YsuXQ82hrC3s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOBtavFZbZH9cdfYJ5trieLRmi/u8POZ354A0ij/LvA+3INpaZ
+	a9DfxRjOP5+wwX8Yur2cjP0h2dBWAZX4CEhc0J1eVwer3RaRvHkfB7cGsAvWyIfIXDqMRyGcB4a
+	SSnVKZUtSaTQQ197GspkpDjs/K92vfFJQM39NRxcPm2xMuRJHIZ8ZszoZJhw=
+X-Gm-Gg: ATEYQzw0LHDazn53/vREdE6XErHeFpL03sUYtTFsqQ9JVQxaXYNdfYusz+utv6azPfB
+	3WCzfPefJg24hzYMT7/LVasEwT2Ye/Un3LL16dT9M/gwhm+GyOfw/aVhIFBRYfSw3aFUcc09Fna
+	tm9gqVRM6yI10O7H1aB57COtFeSroTiehp7C5CkVQRhDU7pTXisZQijDd8EZ/Iidgz8KiAq/O+D
+	WyJiw+3qL5Z7CAjJSTlvySVGDmMjmyL5OEzZGq91NIco/WSGiPuOQnmrqYuCv1sOFfVOInn3s90
+	TTnwZ5rQTNnsde9Oc8iwCMsgj7BerfchEHochd3YvBUmCcT/b6nrgTbSS9Ln0vs8Zz/66VjXqUB
+	hNLU2JA6i+i3MKOX4UqVNc7Bi5FFqUT44xM0Ak90+jubIorIuqrBhhlD6YUd50UhtgQrxnGOnKG
+	mOo8La/wKM
+X-Received: by 2002:a05:6102:8558:20b0:602:91f2:6afe with SMTP id ada2fe7eead31-60291f28930mr1267007137.24.1773910945449;
+        Thu, 19 Mar 2026 02:02:25 -0700 (PDT)
+X-Received: by 2002:a05:6102:8558:20b0:602:91f2:6afe with SMTP id ada2fe7eead31-60291f28930mr1266966137.24.1773910944965;
+        Thu, 19 Mar 2026 02:02:24 -0700 (PDT)
+Received: from ?IPV6:2a05:6e02:1041:c10:ae20:597c:99b8:d161? ([2a05:6e02:1041:c10:ae20:597c:99b8:d161])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f8b322d9sm48733435e9.8.2026.03.19.02.02.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Mar 2026 02:02:24 -0700 (PDT)
+Message-ID: <c26aad81-ac48-4ba1-987b-ab6c271fc095@oss.qualcomm.com>
+Date: Thu, 19 Mar 2026 10:02:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,245 +107,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Bug#1130336: [regression] Network failure beyond first connection
- after 69894e5b4c5e ("netfilter: nft_connlimit: update the count if add was
- skipped")
-To: =?UTF-8?Q?Alejandro_Oliv=C3=A1n_Alvarez?=
- <alejandro.olivan.alvarez@gmail.com>,
- Salvatore Bonaccorso <carnil@debian.org>, 1130336@bugs.debian.org
-Cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>,
- Phil Sutter <phil@nwl.cc>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- regressions@lists.linux.dev, stable@vger.kernel.org
-References: <177349610461.3071718.4083978280323144323@eldamar.lan>
- <c72a56ab-a16c-4866-9a44-a03393f074db@suse.de>
- <b3cbfd15-acd1-4500-ba30-eac6f48523fb@suse.de> <abW2MAAqLnKZm3KF@strlen.de>
- <177322336258.4376.10097494324750307114.reportbug@Desk1.simalex.iccbroadcast.com>
- <4da571ab-fa1d-4ee6-b71c-24f4a28243ed@suse.de> <abqfSB0TUik1kRU4@eldamar.lan>
- <e24a281622cedf9e8f4dc93c961813aeb7b6ce4c.camel@gmail.com>
+Subject: Re: (subset) [PATCH v1 4/8] remoteproc: qcom: Use the unified QMI
+ service ID instead of defining it locally
+To: Bjorn Andersson <andersson@kernel.org>, konradybcio@kernel.org
+Cc: linux-kernel@vger.kernel.org, Alex Elder <elder@kernel.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Jeff Johnson <jjohnson@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Srinivas Kandagatla <srini@kernel.org>,
+        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+        Kees Cook <kees@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>, Mark Brown <broonie@kernel.org>,
+        Wesley Cheng <quic_wcheng@quicinc.com>, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
+        ath11k@lists.infradead.org, ath12k@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-sound@vger.kernel.org
+References: <20260309230346.3584252-1-daniel.lezcano@oss.qualcomm.com>
+ <20260309230346.3584252-5-daniel.lezcano@oss.qualcomm.com>
+ <177362699063.8490.5627616886098038132.b4-ty@kernel.org>
 Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <e24a281622cedf9e8f4dc93c961813aeb7b6ce4c.camel@gmail.com>
+From: Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>
+In-Reply-To: <177362699063.8490.5627616886098038132.b4-ty@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.80
-X-Spam-Level: 
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: r1TRYiO1fLeq8-wCFAyU1L53D1dH4ADQ
+X-Proofpoint-ORIG-GUID: r1TRYiO1fLeq8-wCFAyU1L53D1dH4ADQ
+X-Authority-Analysis: v=2.4 cv=ApTjHe9P c=1 sm=1 tr=0 ts=69bbbba2 cx=c_pps
+ a=UbhLPJ621ZpgOD2l3yZY1w==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22 a=BdGfMZ6iCwODMfnLSHAA:9
+ a=QEXdDO2ut3YA:10 a=TOPH6uDL9cOC6tEoww4z:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE5MDA3MSBTYWx0ZWRfX2xgR6zo08+31
+ feN27laY95JFfulpTXL8EQZPiu8i6f16IQj2GzbfuvomW+TvA6atuoM6kurQaOlvfSWmbkIpsLh
+ BidauRL+WkQbEjyXHJWeoZpahpYcFyzN8x5T6LofBlpNVGfwfKWG2Lb70QsnqK3koIwAHH6/1dR
+ hw5pUAlAUmSPpZMjrLV9gJbpntoukMzMsr0vbIf1ciSUjNlBiNf9izf9JHIkdNtz2wtXZ646Ipx
+ 0JVHxJfboHzyKHoZ1mLIqkl/oHXDERwBMprCsXSQQU2xzGkFuHz2Vs4E4yMi6LbOucMFxhzEiJy
+ 8ri1QCdIchLePWOMH2SiXwqZ30bPmw3zuBeAorFNdJY+be2FrLydJzQdDIAB27uUE7scTR2I6se
+ xkaqLH3jcaMZdYW9sRs4SfLoUmUUtvnOcBjgh/eqm5HiVc+OobbUaP6hZJ2lL9tVuO/kSud1Miw
+ 1rM6f5dbHh3nHruM1Nw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-19_01,2026-03-17_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 lowpriorityscore=0 adultscore=0 malwarescore=0 suspectscore=0
+ clxscore=1015 impostorscore=0 priorityscore=1501 spamscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603190071
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269366-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,debian.org,bugs.debian.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.de:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269367-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,qualcomm.com:dkim];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel.lezcano@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.996];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,eldama:email,suse.de:dkim,suse.de:email,suse.de:mid]
-X-Rspamd-Queue-Id: ABF3B2C83CE
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: EA83C2C848C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/19/26 9:44 AM, Alejandro Oliván Alvarez wrote:
-> Hi folks.
+
+Hi,
+
+On 3/16/26 03:09, Bjorn Andersson wrote:
 > 
-> On Wed, 2026-03-18 at 13:49 +0100, Salvatore Bonaccorso wrote:
->> Hi Alejandro,
+> On Tue, 10 Mar 2026 00:03:33 +0100, Daniel Lezcano wrote:
+>> Instead of defining a local macro with a custom name for the QMI
+>> service identifier, use the one provided in qmi.h and remove the
+>> locally defined macro.
 >>
->> On Sun, Mar 15, 2026 at 02:09:33AM +0100, Fernando Fernandez Mancera
->> wrote:
->>> On 3/14/26 8:25 PM, Florian Westphal wrote:
->>>> Fernando Fernandez Mancera <fmancera@suse.de> wrote:
->>>>> On 3/14/26 5:13 PM, Fernando Fernandez Mancera wrote:
->>>>>> Hi,
->>>>>>
->>>>>> On 3/14/26 3:03 PM, Salvatore Bonaccorso wrote:
->>>>>>> Control: forwarded -1
->>>>>>> https://lore.kernel.org/
->>>>>>> regressions/177349610461.3071718.4083978280323144323@eldama
->>>>>>> r.lan
->>>>>>> Control: tags -1 + upstream
->>>>>>>
->>>>>>> Hi
->>>>>>>
->>>>>>> In Debian, in https://bugs.debian.org/1130336, Alejandro
->>>>>>> reported that
->>>>>>> after updates including 69894e5b4c5e ("netfilter:
->>>>>>> nft_connlimit:
->>>>>>> update the count if add was skipped"), when the following
->>>>>>> rule is set
->>>>>>>
->>>>>>>       iptables -A INPUT -p tcp -m
->>>>>>> connlimit --connlimit-above 111 -j
->>>>>>> REJECT --reject-with tcp-reset
->>>>>>>
->>>>>>> connections get stuck accordingly, it can be easily
->>>>>>> reproduced by:
->>>>>>>
->>>>>>> # iptables -A INPUT -p tcp -m connlimit
->>>>>>> --connlimit-above 111 -j REJECT
->>>>>>> --reject-with tcp-reset
->>>>>>> # nft list ruleset
->>>>>>> # Warning: table ip filter is managed by iptables-nft, do
->>>>>>> not touch!
->>>>>>> table ip filter {
->>>>>>>            chain INPUT {
->>>>>>>                    type filter hook input priority filter;
->>>>>>> policy accept;
->>>>>>>                    ip protocol tcp xt
->>>>>>> match "connlimit" counter packets 0
->>>>>>> bytes 0 reject with tcp reset
->>>>>>>            }
->>>>>>> }
->>>>>>> # wget -O /dev/null
->>>>>>> https://git.kernel.org/torvalds/t/linux-7.0-
->>>>>>> rc3.tar.gz
->>>>>>> --2026-03-14 14:53:51--
->>>>>>> https://git.kernel.org/torvalds/t/linux-7.0-
->>>>>>> rc3.tar.gz
->>>>>>> Resolving git.kernel.org
->>>>>>> (git.kernel.org)... 172.105.64.184,
->>>>>>> 2a01:7e01:e001:937:0:1991:8:25
->>>>>>> Connecting to git.kernel.org
->>>>>>> (git.kernel.org)|172.105.64.184|:443...
->>>>>>> connected.
->>>>>>> HTTP request sent, awaiting response... 301 Moved
->>>>>>> Permanently
->>>>>>> Location:
->>>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/
->>>>>>> linux.git/snapshot/linux-7.0-rc3.tar.gz
->>>>>>> [following]
->>>>>>> --2026-03-14 14:53:51--
->>>>>>> https://git.kernel.org/pub/scm/linux/kernel/ git/torvalds/l
->>>>>>> inux.git/snapshot/linux-7.0-rc3.tar.gz
->>>>>>> Reusing existing connection to git.kernel.org:443.
->>>>>>> HTTP request sent, awaiting response... 200 OK
->>>>>>> Length: unspecified [application/x-gzip]
->>>>>>> Saving to: ‘/dev/null’
->>>>>>>
->>>>>>> /dev/null                         [
->>>>>>> <=>                    ] 248.03M
->>>>>>> 51.9MB/s    in 5.0s
->>>>>>>
->>>>>>> 2026-03-14 14:53:56 (49.3 MB/s) - ‘/dev/null’ saved
->>>>>>> [260080129]
->>>>>>>
->>>>>>> # wget -O /dev/null
->>>>>>> https://git.kernel.org/torvalds/t/linux-7.0-
->>>>>>> rc3.tar.gz
->>>>>>> --2026-03-14 14:53:58--
->>>>>>> https://git.kernel.org/torvalds/t/linux-7.0-
->>>>>>> rc3.tar.gz
->>>>>>> Resolving git.kernel.org
->>>>>>> (git.kernel.org)... 172.105.64.184,
->>>>>>> 2a01:7e01:e001:937:0:1991:8:25
->>>>>>> Connecting to git.kernel.org
->>>>>>> (git.kernel.org)|172.105.64.184|:443...
->>>>>>> failed: Connection timed out.
->>>>>>> Connecting to git.kernel.org
->>>>>>> (git.kernel.org)|
->>>>>>> 2a01:7e01:e001:937:0:1991:8:25|:443...
->>>>>>> failed: Network is unreachable.
->>>>>>>
->>>>>>> Before the 69894e5b4c5e ("netfilter: nft_connlimit: update
->>>>>>> the count
->>>>>>> if add was skipped") commit this worked.
->>>>>>>
->>>>>>
->>>>>> Thanks for the report. I have reproduced
->>>>>> this on upstream kernel. I am working on it.
->>>>>>
->>>>>
->>>>> This is what is happening:
->>>>>
->>>>> 1. The first connection is established and
->>>>> tracked, all good. When it finishes, it goes to
->>>>> TIME_WAIT state
->>>>> 2. The second connection is established, ct is
->>>>> confirmed since the beginning, skipping the
->>>>> tracking and calling a GC.
->>>>> 3. The previously tracked connection is cleaned
->>>>> up during GC as TIME_WAIT is considered closed.
->>>>
->>>> This is stupid.  The fix is to add --syn or use
->>>> OUTPUT.  Its not even clear to me what the user wants to achive
->>>> with this rule.
->>>>
->>>
->>> Yes, the ruleset shown does not make sense. Having said this, it
->>> could
->>> affect to a soft-limit scenario as the one described on the blamed
->>> commit..
 >>
->> Alejandro, can you describe what you would like to achieve with the
->> specific rule?
->>
->> Regards,
->> Salvatore
 > 
-> The intended use of that rule was to prevent (limit) a single host from
-> establishing too many TCP connections to given host (Denial of
-> Service... particularly on streaming servers).
+> Applied, thanks!
 > 
-> I learnt about it in several IPtables guides/howtos (maaaany years
-> ago!), and never was an issue on itself.
-> Was it stupid? ... possibly... It 'seemed' to work, or, at least, when
-> checking iptables -L -v one could see packet counter for the rule
-> catching some traffic, without ever noticing it being troublesome, so,
-> at the very least it 'didn't hurt', and, since DoS ever happened over
-> the years...well, I tended to think it was indeed working the way I
-> read it did.
-> 
-> Certainly, I never (the authors of those guides at their time indeed)
-> though about the possibility of just target the TCP syn.
-> I have given a try to adding the --syn option to the rule to see the
-> difference, and well, it is way less disruptive that way, but it still
-> breaks things (I saw postfix queues hanging, for instance).
-> 
+> [4/8] remoteproc: qcom: Use the unified QMI service ID instead of defining it locally
+>        commit: 95b6c029e56e4d75e2957ce7ac795da29415865b
 
-The current problem with the ruleset is that it mixes both, incoming and 
-outgoing connections. This should probably use --syn flag so it targets 
-connections established against your host only.
-
-Anyway, I am sending a patch fixing this as it makes sense to do it IMO. 
-We just want to understand what is the real use-case and how the ruleset 
-can be improved.
-
-In addition, I would recommend you to transition to nftables because it 
-would be ideal for your use-case. With nftables it would be easy to 
-combine this with sets and probably quota expression to limit the usage.
-
-What is wrong with the current ruleset? (Even before the blammed 
-commit), if you reach the connlimit limit **ALL** TCP connections will 
-be rejected (including legit ones), I do not think that is what you want 
-to achieve.
-
-Thanks,
-Fernando.
-
-> So, I have but screwed the idea of using connlimit anymore anyways.
-> Sorry for the noise. Lesson learned.
-> 
-> Cheers!
-
+Just a head up I'm not seeing it in qcom/for-next
 
