@@ -1,183 +1,130 @@
-Return-Path: <netdev+bounces-269476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ILpvKW8NvGkArgIAu9opvQ
-	(envelope-from <netdev+bounces-269476-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:51:27 +0100
+	id QE58LBoPvGkirwIAu9opvQ
+	(envelope-from <netdev+bounces-269477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:58:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68B682CD31C
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:51:27 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B61482CD4C3
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:58:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5244E3008E32
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:51:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E7594301EA29
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:53:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07A135B62A;
-	Thu, 19 Mar 2026 14:51:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7D83D6CC7;
+	Thu, 19 Mar 2026 14:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lcl6v7Xz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rlB2m3NC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857DB2DE6FF
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 14:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773931882; cv=pass; b=nn6Hxkoy+eDUYksI+l16RLdgd3Yb6fCiyXbjdgaevlPoXtvrFz5LR2seEmrxXp/i6rTG8G8wf6S/gFtJoqwInt1h0Z0QXinD800c/2hHTelBp80RBnUfO3r9mmmo+zwzEPSv20ahIcY2hqucO1Oy+C1l03XlLdfE8UN1KgnykjQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773931882; c=relaxed/simple;
-	bh=hZ+YcdvI7pBSyjQzHPG1UsK31P4QEMl0YPmeWc1BqFw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uM4ZzZSpaayoMP+ee/7OmOw/7E4ZrHsh2rHAUnO6eWtSZzZIbGkhAuhXsusIVCnyNEnJxi07baVXKmgZty1WEncU6XtTIlusMq/eeK0w4fgoJwhMlFqU3J9rBeCvjSYQh2wCkwv3dvyIS0UroOILJEcloZV9KsFbnL2uo6L3hAk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lcl6v7Xz; arc=pass smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-509069a7a7fso576161cf.0
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 07:51:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773931880; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YL+uRdiuQIOtxip8s6Aqi3c6rSBvvQ6v/rNYlvLoqupNLd6D1gQyOVSvdiQ+hFFjae
-         notfq2HdxKJAdYcueNSTzEDVR15JbJ9D/W+iCQqIGgqpg8iTj1AaENdX0v0Z7hPowYm2
-         swVnBzP0PTbOZez86hUDDae6PZd0fbWcfJxsr4jhYIdPu+M+RIW8gV71H8yNBSZHKAN/
-         AH8qXM90Oe71Mm4xyFGOoeWwH4bepuYSgqA3S2ovmTPzCj2xN/UoqAFxHbE4lsnMUT13
-         m4iwOWHbcPcN7/vP7fd2CvaKwanOi0MnCuWzqBCo5yhdc/49ERZaTvS9snFeL8VqXW+u
-         8EWw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=6bg8hlmqM/XCpxC5ovJCSr3NN2SOzHsrvJ4dE+9xF3Q=;
-        fh=98FzPiUd0m8Hs5SQoH8zTTpf+9dZYwDJUWi9SYJPWWk=;
-        b=EE1/Vob0IZDJ+MAknN26cqae0gK7aAeiHPtM9WD0xNA50P0KpnPaDHpeEFOxNAYnra
-         o0KDbviOmPyQxl6eXsM6EHwDB6VnTBXG5/zPgoDWnARVr4HgwWm9bbbORcnjSdNZgf2F
-         SVYxC8PQ9CgFGKuRIBC6ZPzeIwCprzkHXvMyfyW7a6UQpEOCgDhZDpOGG513Lwuz/trk
-         OKSHabX13bdTXfJRB6KRZYl8tujLpyQyjCdhq8oFh9Of1LuAvAb/PUoOvincAYeFIZKA
-         fkPsr4lzy1XhRsQ6nNcvABQmRyaT35LFypS7sAoRJ43tmQFg+goA6vmLIY5lxqSivjhk
-         4FwA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773931880; x=1774536680; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6bg8hlmqM/XCpxC5ovJCSr3NN2SOzHsrvJ4dE+9xF3Q=;
-        b=Lcl6v7XzYkpoGnFZ+nuYmRytYtoJL2BCyEbuO4oraYGJzqluh2g4FjZTLUhNWWN505
-         rX0dZRLEVaRq0WRL5MvQ4GXxOt5Q+HF0KvM33ZePjOhGmocARXNW+G+TVaXrwq62Zr3E
-         EgFMoWeA1+izyK5v7M8vHadUcw7yTmHPR+Lkry+2/qmTNrzW4mWQKJSlbvHqSAjhH2Z+
-         Oz2LoaeDpbnwGzitsBc0eLVFlWbkwQNaCocbYz+YEIQrSD9+9liQ9LDHrcUdx/+cvPpH
-         qlqdKtgecbr63xsqUrMCoNtNYpRB8KYmhSdYBo2QzYOxzUnuZbJCmSt2IehI7uPEKKXR
-         N5lQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773931880; x=1774536680;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6bg8hlmqM/XCpxC5ovJCSr3NN2SOzHsrvJ4dE+9xF3Q=;
-        b=em7Yy/IOWtCGQiBtusCArcvhcfmE+fFwDyhAgclgPpE/OYfPqp4uoJuqQXFO+3BV7P
-         usJVZXxDjv4uZbnN3cp2Vaq+5jbkgrLv9tJtLlibIZbhQbu49/odGRwVgkFTSZHkjsVG
-         rISoT1YSnhy0f5vMXWrrrl8hd8W1jJ1cXyKqhQdbP11I2etp2LUsKK3vbdACDcDbIU8v
-         Xtj9f4RAag1LKn3PxIUH7axSLZi81mcd52XigkH2lJVjhNAOBYsOcRUHO28AUBiZ1SR4
-         87QMFbQaB6gaPHecPHiQvLfAFG21ymzWyKvANRFXL4LNdHD7hXSMoxNSGS1PEyVNI9aB
-         X3gw==
-X-Forwarded-Encrypted: i=1; AJvYcCXIA+NIKidbp6bn5mOxAUZ3NeIjCIcDpWesbuTdgp/Zsx4TtrCc/9yeOUb3iiyyfFMvwDw6BV4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywphbf3Pn4LDmWeOgN8jxMMb+7456fGDumq/ob+IgOeGQQfpu2w
-	d5PUwpIS4zXZ2C2YiEMzD5BOB1Rts+y2/EhFOl89F7lYZbE4A+0j1OCcPre6glzyoUcq0Wj9zzT
-	YPEQtEvPn8PX5fJ2UO3RpCpVdHEle58bkNTIrQ8UX
-X-Gm-Gg: ATEYQzw1hBq6ty+KTI6QzG0O/+L4avywdV7OE2iATk6+EGG20twxG0E1FiniLGRMEbS
-	snQ/TwgxPTN0A3t0BXsNTtF+3nnbvoX+Ia4SVsbJJzLLqxyCgW1muWysqEvp0Cxbe089JUeEx3c
-	cqlvg7Hy225zPUbXWqUKdehfQabi36cYjbgmh1ldXm4vWKGB1fbqcQGBOcw/+1EWWItZXB7oZXy
-	Tm6IsqmM5cFcTzyP3vazvoC/LnY9U+XFyd7YT3Wi+eZa0yZLpej6csKhi/R3t9k3pXtuLaz0dv9
-	YNVwr2ZuaMPyZOUj/PSRUi/M5zTFRvMOW8zTic2CvCyFen14EX9F0Qpa276YrcbbzA7cMAh9
-X-Received: by 2002:ac8:590b:0:b0:4e8:aa24:80ec with SMTP id
- d75a77b69052e-50b2558c63dmr14119311cf.14.1773931879336; Thu, 19 Mar 2026
- 07:51:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190EA3CE4B6;
+	Thu, 19 Mar 2026 14:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773932026; cv=none; b=sveQEa7UkEYdA1F1YytkvAYlOhbSnbS0T4Ruji0DzpiFpoWFWkGv8z15NAUETCaWkgwHZoh0OxlJFzcVQ5HeX3DdHXBD9/Xm3rvpAzIKyjOUotErIqCn4m0IGl3ZF6/BQnCwsTCRLmnQWAekaOYLSfTlBPsm8Vn/2MR/hIFNp8o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773932026; c=relaxed/simple;
+	bh=rGBzuTdV67vpKY5ZL0KiZjtu15TYhwh3ofg/+ry07r4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=I384Jy50K8aNUkxbX3Wu3P+YZkFaxi3GBT5fVn858hS1hvQtNkuQmoRDGjHGapni3EI3sIypSFuxuY3KoHzuHrYNENJ7HprS2VIGjxDla7VZ7sn7729jzsiEMH/625nY4VnqcpM7PuMCzZWpVBZhy2LXnIdXaBIx9gmiPYLpnqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rlB2m3NC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0318C19424;
+	Thu, 19 Mar 2026 14:53:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773932025;
+	bh=rGBzuTdV67vpKY5ZL0KiZjtu15TYhwh3ofg/+ry07r4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rlB2m3NCdVPh1g5yWDF9i5h1ZSib6iQ9EZ6taTsPfEygLzIhKAdbZR0z/uqh2JZbn
+	 1ca0skbd4EtPSspf1ovEbMwBsvdxhHYVp4lpLNmYN2nxatRTT8uuABjLbwsOQFYB5i
+	 TR5kahdN1xirGg8WtclXulBY9Ot4ScAQAlEMgAYIfe7ARQA2e4IhrjXYgbQ5DgPrH3
+	 fSa6QlhYuQoFz6ZAY2EyDKf6qNSWX6hQQOBxNlM7sbxCo4S6qRlZ7Z7Y0W9P+ojUU9
+	 q025yGx/l4KwxWVT7ZHNM24nlHpfsiasef0kph/eLKEg2Llm/Kcng+TAvHvo0Spmvs
+	 3/JUak+Ye7QRQ==
+Date: Thu, 19 Mar 2026 07:53:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Romain Gantois <romain.gantois@bootlin.com>, Daniel
+ Golle <daniel@makrotopia.org>, Dimitri Fedrau
+ <dimitri.fedrau@liebherr.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>
+Subject: Re: [PATCH net-next v7 10/10] net: ethtool: Introduce ethtool
+ command to list ports
+Message-ID: <20260319075343.0aa9fac8@kernel.org>
+In-Reply-To: <97bd2ab1-a8ff-4c0b-a328-952139f18fc8@bootlin.com>
+References: <20260309152747.702373-1-maxime.chevallier@bootlin.com>
+	<20260309152747.702373-11-maxime.chevallier@bootlin.com>
+	<20260312190705.0b3a3f78@kernel.org>
+	<97bd2ab1-a8ff-4c0b-a328-952139f18fc8@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260317065137.1533226-1-atwellwea@gmail.com> <20260317065137.1533226-2-atwellwea@gmail.com>
- <d0ab8cc8-f734-47d4-b402-9c62ae563b4a@redhat.com>
-In-Reply-To: <d0ab8cc8-f734-47d4-b402-9c62ae563b4a@redhat.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 19 Mar 2026 10:51:02 -0400
-X-Gm-Features: AaiRm51mxR33jgYOwzHgEw2muxIQjYdY0oxzeNITFosPwCcA1uPkaKfbyhmFcCc
-Message-ID: <CADVnQy=raqQ2dKwJZh2U-9=c_AEwoCS3i61oL7gUSASxBC1QVg@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] selftests: packetdrill: stop pinning rwnd in tcp_ooo_rcv_mss
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Wesley Atwell <atwellwea@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, shuah@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269476-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269477-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,davemloft.net,kernel.org,google.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ncardwell@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.983];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 68B682CD31C
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.938];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B61482CD4C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 19, 2026 at 6:22=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 3/17/26 7:51 AM, Wesley Atwell wrote:
-> > tcp_ooo_rcv_mss.pkt cares about the OOO SACK state and the resulting
-> > tcpi_rcv_mss update.
-> >
-> > Its exact advertised receive-window value is incidental to that test an=
-d
-> > can legitimately move when unrelated rwnd accounting changes adjust the
-> > ACK window.
-> >
-> > Drop the hard-coded win 81 checks and keep only the ACK/SACK shape and
-> > the tcpi_rcv_mss assertion.
->
-> I think it would be better to keep the test updated with the kernel
-> behavior. Having the pktdrill tests bundled together with the kernel
-> allows for tightly coupling.
->
-> @Neal: WDYT?
+On Thu, 19 Mar 2026 10:27:11 +0100 Maxime Chevallier wrote:
+> > GENL_REQ_ATTR_CHECK ?
+> > I guess you'll have to move it to prepare cause we don't get info 
+> > here :(  
+> 
+> Sorry for my comments coming apart on your review, I'm getting this new
+> iteration done in-between other tasks  :(
+> 
+> I can't move that check to the prepare_data() step, as we need the
+> request->port_id field to be populated at that stage for the DUMP
+> op (for each port, we set request->port_id, then we call prepare_data
+> and so on).
 
-IMHO our experience internally with packetdrill tests suggests that
-assertions about outgoing receive window values should only be made in
-a small set of tests specifically focused on receive window behavior.
-
-The motivation is mainly toil and velocity. We have over 1,000
-packetdrill test scripts internally, and hopefully most of these will
-eventually have upstream versions.  If we allow assertions about
-receive window behavior to be sprinkled among all tests, then over
-time we may end up requiring edits to hundreds of packetdrill tests
-any time the receive window behavior changes. And the receive window
-values can change frequently. We have generally tried to remove
-receive window assertions when we've discovered they were included in
-a test not focused on receive window behavior.
-
-neal
+Not sure I get what you're saying - that it doesn't work or that it
+leads to "duplicated" work? Alternative is to add info to parse_request
+args which I suspect is useful long term anyway.
 
