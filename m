@@ -1,268 +1,255 @@
-Return-Path: <netdev+bounces-269720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269722-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KEXKDnKLvGlv0QIAu9opvQ
-	(envelope-from <netdev+bounces-269720-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 00:49:06 +0100
+	id wOE7MfWMvGnz0QIAu9opvQ
+	(envelope-from <netdev+bounces-269722-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 00:55:33 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ADA42D444A
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 00:49:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 202472D4511
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 00:55:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6305330F70BA
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:48:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2A6630F6B05
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7A73CB2D8;
-	Thu, 19 Mar 2026 23:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7230C3F23DB;
+	Thu, 19 Mar 2026 23:55:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="E3cMexUP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UgFHFled"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f228.google.com (mail-pl1-f228.google.com [209.85.214.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041933AF64A
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 23:48:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7275B3F0AAB;
+	Thu, 19 Mar 2026 23:55:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773964105; cv=none; b=CyJRCmO7/bscsSXjKbiJZ0EfbHZmoQuaA2Nd2JpIoZp8jXOg46zo/p4W1/AqK42WgZ3R3W6EPTJ3kVdfPBQBx4rVEoPOgJX5YCZ9UAIed5GnIKGYenkLtp8gwUeKbsqHCEsF+blwdM+Kox4Ixm1obVcOrMSeRw5Gw0ZikTv4Ano=
+	t=1773964511; cv=none; b=D5SzV2HH440Bnl+wsgmJ6tiLd6lhcZJYkaWalfCygn/fpsJl5hkYZUb1kT9yMW2RbTLlN1phR2c51P71R1gg2KkjYTT7hbc1XBjCAw+UgnAS/1Mux8I2YofvWgD0G6l4J70UN3zcGq41SQ7ZXvKYMMzvZDwVGpWO6p31GeNtG58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773964105; c=relaxed/simple;
-	bh=/NL/n9sv+VtCk5FddD7S2TYyrYuDLTDUdWiAMV0DGbg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W+jHOv/y8rHGYRtceKWQRP4GgziUAVWdhIZVhwH3J7FtCElHXkvYRIh/cfMNA+Lw84cOSXpFM+YDUpjHbWKHGt5xwIQk7UYecCtyFmgPbMrHWWtLP53b9IPPqPo7Pj3vZ1O+yg9PIfClUff9h9+ubkaG8BS3/4bQv2fS+wiqsiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=E3cMexUP; arc=none smtp.client-ip=209.85.214.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f228.google.com with SMTP id d9443c01a7336-2b04e6a989eso9850625ad.3
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 16:48:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773964103; x=1774568903;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kRS/3sR6+9YCg84GC5MlgUh6Yk4EGVS0LYmYLlEg2qI=;
-        b=Zhk/8ReYg37JKPV5sGsCfhBE9gLgsDf0ce9cX79KqouW+J25rKTtOAFXr8ewI4IKnX
-         3z0I1f5aBn74fVUprqT3aanFpCGfpAn+lY2OYz1M7rmQ4G6nM+rByQRbwQeg6UjarwQs
-         z6YTZNPVJylXswTD1V4orFSkgYmhwouQYLkeRXmmHGNFBAuvN07WdukPMDyWRcaX0rK9
-         Hx71CkFId1tfViT0QRVa721TrX5iHQ1Fmn+BAUGwX5br+BOin7bZ68uOVCB6mUNLO9zI
-         sCEfgK2T/iXNVRsBNAkBZhAwsIwdmFf91dT2M811yYei6hwL6FmoyPY7SoKEd1fmQuhM
-         wFLw==
-X-Gm-Message-State: AOJu0YxpkG9bCTo1pDoaW+dHD/dQjuRvsVam8lb44c79SagfMvkf/pD2
-	Joa5AdfH10yYyRA4F40UiZ1gxaapQvHLxh7by51K4t2xM50sBoiZYKd7uf3XGAJSg1qLS7KiEAx
-	VYf8Al6wdM6x5BBhBYZ4aYl4zycDxr4UwCl318kaVMp1F0NI2VEyXisA6XGgu4DR1beTqKCjA+l
-	6hgHFn2MEbkMt6WW/hX9h/LS2nZe03cc7+WVWTduH709eEEl/CDSdzQLJJFNOEUSJQyrYwUW8nN
-	fKfF3HokA==
-X-Gm-Gg: ATEYQzz+sgjVJTck7jSW4E+WStwaP03902+0xebn35WoWyh8gbwvYPU3hF0UpqSkAsv
-	GU2SSaXEysj4TQHYrUbGK+rszEt8Sq+NzfTILeXmvlx9ho9ZglKf5bDE7i6DEBGZq36/TmxN6r6
-	yLCKDmTXkpEnjfjAl8MS5KGenaRucj2rHL1+7hcvAzXUn2lwvb1h8de/C55cuG93c4pWeFy7BeB
-	ZzLr4Fl+Ua04/1BjE+T8vBb1rUy+WGohnoPb0ZEjsnuIY3p5uOczcLFU9vp2ufBijV3T0CXPU6o
-	d/ZI1zjH4iQvQyQKVMU7MtBSetNvBecBoTH960DGV6wVdgWK2XcX+1XlNtnJXsx+bkZdu4Po2xG
-	sh5vww2j1pC2TjEw73wCDy2io7wPVmVG8MxCMAU5eb2N1UjCsAGxRenysSG1APa2UzIRvGl5Vy1
-	YCWBqTvkVP6RSupaYo2VpnwxkwnaHQ7+c+DXiSe5G0AZ89WdijbQ4tGB0xXg==
-X-Received: by 2002:a17:903:1904:b0:2ae:b991:a46f with SMTP id d9443c01a7336-2b0827c0a43mr8041035ad.42.1773964103292;
-        Thu, 19 Mar 2026 16:48:23 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-102.dlp.protect.broadcom.com. [144.49.247.102])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2b0835d8edesm654995ad.32.2026.03.19.16.48.22
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 19 Mar 2026 16:48:23 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dy1-f199.google.com with SMTP id 5a478bee46e88-2bdf6fe90a9so1650191eec.1
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 16:48:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1773964101; x=1774568901; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kRS/3sR6+9YCg84GC5MlgUh6Yk4EGVS0LYmYLlEg2qI=;
-        b=E3cMexUPJEvlz9nV+eyRirIkcaYliGXqrW7eWXiMvoZiqK37ojWfYULjZQByjfCO8D
-         6iDBaPkVmfNtlJc36TaKPGV/mDmcBBWoHeRWM+xl1wPUF0J57zLU3rDozivOWyREi28N
-         h7KF7MC5Rtvz488KdylxS7IPtKsvK6ZtbnRT4=
-X-Received: by 2002:a05:7300:4342:b0:2ae:5e93:b69 with SMTP id 5a478bee46e88-2c1097a59f3mr695862eec.29.1773964101361;
-        Thu, 19 Mar 2026 16:48:21 -0700 (PDT)
-X-Received: by 2002:a05:7300:4342:b0:2ae:5e93:b69 with SMTP id 5a478bee46e88-2c1097a59f3mr695843eec.29.1773964100622;
-        Thu, 19 Mar 2026 16:48:20 -0700 (PDT)
-Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c10b2d673asm1141697eec.24.2026.03.19.16.48.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2026 16:48:20 -0700 (PDT)
-From: justin.chen@broadcom.com
-To: netdev@vger.kernel.org
-Cc: bcm-kernel-feedback-list@broadcom.com,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	florian.fainelli@broadcom.com,
-	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net v3 2/2] net: bcmasp: fix double disable of clk
-Date: Thu, 19 Mar 2026 16:48:13 -0700
-Message-Id: <20260319234813.1937315-3-justin.chen@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260319234813.1937315-1-justin.chen@broadcom.com>
-References: <20260319234813.1937315-1-justin.chen@broadcom.com>
+	s=arc-20240116; t=1773964511; c=relaxed/simple;
+	bh=rfnWg8dzig0kPp2J7aT0TNOUIX/ZW/F/iLBP2iW4MKc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GUaq7cMxJy7T6Rx3m0FXXY3PNDkHVvPGMZfklC5rNME80K8649ZkwM6hpltnl1mvGcWW2/ercW/iM5RI1reUu/zIVhQne7uRSf0/wqNXSuNjPEmbI0MqK8YPTB2pTMIcBPw2dZb9nnp81Z6JgiR0fl4mTKyHY89zZ4izyBavyPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UgFHFled; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773964510; x=1805500510;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=rfnWg8dzig0kPp2J7aT0TNOUIX/ZW/F/iLBP2iW4MKc=;
+  b=UgFHFledeaNnB41Z7RNc5zBcWnIBeUtJ0+RYX7Ve/wUvRBQ51A1b6WiN
+   e74XQ7HSjW6BwFZ4FDFhpc1Bt930V+uVJ3pbMME4p0OiGyMvJb4S19a1q
+   zU9N6Z0mh02oh9w2Cywb0xN2Oa5WL1Jz3og/Gj+q6fe/8c3CTh8ubMG/p
+   ECfGloV0eeLon1jOZGtTrf5731yzUvHWQtvZWYg14u+kog8iRkFy7uWkJ
+   Yc9R2U5xqjlJpyIm0QrXykxbDDLhXfcgkj/RNwDYoQKYMZ0gLL4hxrQKC
+   j0iP/jPdLhQKyIO2IH0HMRcfSYj0tPiwQTAUn7uSaJKUmEZnLx202qY3Z
+   Q==;
+X-CSE-ConnectionGUID: dLO14oqmR56lXv9saDn+xg==
+X-CSE-MsgGUID: sOrc7xDVS5qrJ5/9O2qMpg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="62612638"
+X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
+   d="scan'208";a="62612638"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 16:55:08 -0700
+X-CSE-ConnectionGUID: GgdTcTliSWyMr7ZNBVsncA==
+X-CSE-MsgGUID: 7on148F1QvWrtQc5bixMsg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
+   d="scan'208";a="261016757"
+Received: from lkp-server02.sh.intel.com (HELO a51c2a36b9df) ([10.239.97.151])
+  by orviesa001.jf.intel.com with ESMTP; 19 Mar 2026 16:55:03 -0700
+Received: from kbuild by a51c2a36b9df with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w3NCe-000000001nL-2XpZ;
+	Thu, 19 Mar 2026 23:55:00 +0000
+Date: Fri, 20 Mar 2026 07:53:39 +0800
+From: kernel test robot <lkp@intel.com>
+To: Anand Moon <linux.amoon@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Shawn Lin <shawn.lin@rock-chips.com>,
+	Hans Zhang <18255117159@163.com>, Niklas Cassel <cassel@kernel.org>,
+	linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Anand Moon <linux.amoon@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Danilo Krummrich <dakr@kernel.org>
+Subject: Re: [PATCH next v1] r8169: Fix PHY lookup for mdiobus_get_phy() and
+ improve error reporting during probe
+Message-ID: <202603200758.vueafhDW-lkp@intel.com>
+References: <20260317061700.7734-1-linux.amoon@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260317061700.7734-1-linux.amoon@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmail.com,arm.com,kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-269722-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_FROM(0.00)[bounces-269720-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,rock-chips.com,163.com,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.976];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.940];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 9ADA42D444A
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,01.org:url]
+X-Rspamd-Queue-Id: 202472D4511
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Justin Chen <justin.chen@broadcom.com>
+Hi Anand,
 
-Switch to devm_clk_get_optional() so we can manage the clock ourselves.
-We dynamically control the clocks depending on the state of the interface
-for power savings. The default state is clock disabled, so unbinding the
-driver causes a double disable.
+kernel test robot noticed the following build warnings:
 
-Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
-Signed-off-by: Justin Chen <justin.chen@broadcom.com>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
-v3
-- Do not disable clock until probe is entirely done to avoid
-  double disable on error path.
+[auto build test WARNING on 95c541ddfb0815a0ea8477af778bb13bb075079a]
 
-v2
-- Split into two patches.
-- Add error path to disable clock if we fail during probe.
+url:    https://github.com/intel-lab-lkp/linux/commits/Anand-Moon/r8169-Fix-PHY-lookup-for-mdiobus_get_phy-and-improve-error-reporting-during-probe/20260317-183327
+base:   95c541ddfb0815a0ea8477af778bb13bb075079a
+patch link:    https://lore.kernel.org/r/20260317061700.7734-1-linux.amoon%40gmail.com
+patch subject: [PATCH next v1] r8169: Fix PHY lookup for mdiobus_get_phy() and improve error reporting during probe
+config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20260320/202603200758.vueafhDW-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260320/202603200758.vueafhDW-lkp@intel.com/reproduce)
 
- drivers/net/ethernet/broadcom/asp2/bcmasp.c | 33 ++++++++++++++-------
- 1 file changed, 23 insertions(+), 10 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603200758.vueafhDW-lkp@intel.com/
 
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-index 2034a1593db7..972474893a6b 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-@@ -1249,7 +1249,7 @@ static int bcmasp_probe(struct platform_device *pdev)
- 	if (priv->irq <= 0)
- 		return -EINVAL;
- 
--	priv->clk = devm_clk_get_optional_enabled(dev, "sw_asp");
-+	priv->clk = devm_clk_get_optional(dev, "sw_asp");
- 	if (IS_ERR(priv->clk))
- 		return dev_err_probe(dev, PTR_ERR(priv->clk),
- 				     "failed to request clock\n");
-@@ -1277,6 +1277,10 @@ static int bcmasp_probe(struct platform_device *pdev)
- 
- 	bcmasp_set_pdata(priv, pdata);
- 
-+	ret = clk_prepare_enable(priv->clk);
-+	if (ret)
-+		return dev_err_probe(dev, ret, "failed to start clock\n");
-+
- 	/* Enable all clocks to ensure successful probing */
- 	bcmasp_core_clock_set(priv, ASP_CTRL_CLOCK_CTRL_ASP_ALL_DISABLE, 0);
- 
-@@ -1288,8 +1292,10 @@ static int bcmasp_probe(struct platform_device *pdev)
- 
- 	ret = devm_request_irq(&pdev->dev, priv->irq, bcmasp_isr, 0,
- 			       pdev->name, priv);
--	if (ret)
--		return dev_err_probe(dev, ret, "failed to request ASP interrupt: %d", ret);
-+	if (ret) {
-+		dev_err(dev, "Failed to request ASP interrupt: %d", ret);
-+		goto err_clock_disable;
-+	}
- 
- 	/* Register mdio child nodes */
- 	of_platform_populate(dev->of_node, bcmasp_mdio_of_match, NULL, dev);
-@@ -1301,13 +1307,17 @@ static int bcmasp_probe(struct platform_device *pdev)
- 
- 	priv->mda_filters = devm_kcalloc(dev, priv->num_mda_filters,
- 					 sizeof(*priv->mda_filters), GFP_KERNEL);
--	if (!priv->mda_filters)
--		return -ENOMEM;
-+	if (!priv->mda_filters) {
-+		ret = -ENOMEM;
-+		goto err_clock_disable;
-+	}
- 
- 	priv->net_filters = devm_kcalloc(dev, priv->num_net_filters,
- 					 sizeof(*priv->net_filters), GFP_KERNEL);
--	if (!priv->net_filters)
--		return -ENOMEM;
-+	if (!priv->net_filters) {
-+		ret = -ENOMEM;
-+		goto err_clock_disable;
-+	}
- 
- 	bcmasp_core_init_filters(priv);
- 
-@@ -1316,7 +1326,8 @@ static int bcmasp_probe(struct platform_device *pdev)
- 	ports_node = of_find_node_by_name(dev->of_node, "ethernet-ports");
- 	if (!ports_node) {
- 		dev_warn(dev, "No ports found\n");
--		return -EINVAL;
-+		ret = -EINVAL;
-+		goto err_clock_disable;
- 	}
- 
- 	i = 0;
-@@ -1338,8 +1349,6 @@ static int bcmasp_probe(struct platform_device *pdev)
- 	 */
- 	bcmasp_core_clock_set(priv, 0, ASP_CTRL_CLOCK_CTRL_ASP_ALL_DISABLE);
- 
--	clk_disable_unprepare(priv->clk);
--
- 	/* Now do the registration of the network ports which will take care
- 	 * of managing the clock properly.
- 	 */
-@@ -1352,12 +1361,16 @@ static int bcmasp_probe(struct platform_device *pdev)
- 		count++;
- 	}
- 
-+	clk_disable_unprepare(priv->clk);
-+
- 	dev_info(dev, "Initialized %d port(s)\n", count);
- 
- 	return ret;
- 
- err_cleanup:
- 	bcmasp_remove_intfs(priv);
-+err_clock_disable:
-+	clk_disable_unprepare(priv->clk);
- 
- 	return ret;
- }
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/realtek/r8169_main.c:5467:17: warning: variable 'phydev' is used uninitialized whenever 'for' loop exits because its condition is false [-Wsometimes-uninitialized]
+    5467 |         for (addr = 0; addr < PHY_MAX_ADDR; addr++) {
+         |                        ^~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/realtek/r8169_main.c:5476:7: note: uninitialized use occurs here
+    5476 |         if (!phydev) {
+         |              ^~~~~~
+   drivers/net/ethernet/realtek/r8169_main.c:5467:17: note: remove the condition if it is always true
+    5467 |         for (addr = 0; addr < PHY_MAX_ADDR; addr++) {
+         |                        ^~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/realtek/r8169_main.c:5430:27: note: initialize the variable 'phydev' to silence this warning
+    5430 |         struct phy_device *phydev;
+         |                                  ^
+         |                                   = NULL
+   1 warning generated.
+
+
+vim +5467 drivers/net/ethernet/realtek/r8169_main.c
+
+  5425	
+  5426	static int r8169_mdio_register(struct rtl8169_private *tp)
+  5427	{
+  5428		struct pci_dev *pdev = tp->pci_dev;
+  5429		struct mii_bus *new_bus;
+  5430		struct phy_device *phydev;
+  5431		int ret, addr;
+  5432	
+  5433		/* On some boards with this chip version the BIOS is buggy and misses
+  5434		 * to reset the PHY page selector. This results in the PHY ID read
+  5435		 * accessing registers on a different page, returning a more or
+  5436		 * less random value. Fix this by resetting the page selector first.
+  5437		 */
+  5438		if (tp->mac_version == RTL_GIGA_MAC_VER_25 ||
+  5439		    tp->mac_version == RTL_GIGA_MAC_VER_26)
+  5440			r8169_mdio_write(tp, 0x1f, 0);
+  5441	
+  5442		new_bus = devm_mdiobus_alloc(&pdev->dev);
+  5443		if (!new_bus)
+  5444			return -ENOMEM;
+  5445	
+  5446		new_bus->name = "r8169";
+  5447		new_bus->priv = tp;
+  5448		new_bus->parent = &pdev->dev;
+  5449		new_bus->irq[0] = PHY_MAC_INTERRUPT;
+  5450		new_bus->phy_mask = GENMASK(31, 1);
+  5451		snprintf(new_bus->id, MII_BUS_ID_SIZE, "r8169-%x-%x",
+  5452			 pci_domain_nr(pdev->bus), pci_dev_id(pdev));
+  5453	
+  5454		new_bus->read = r8169_mdio_read_reg;
+  5455		new_bus->write = r8169_mdio_write_reg;
+  5456	
+  5457		if (tp->mac_version >= RTL_GIGA_MAC_VER_40) {
+  5458			new_bus->read_c45 = r8169_mdio_read_reg_c45;
+  5459			new_bus->write_c45 = r8169_mdio_write_reg_c45;
+  5460		}
+  5461	
+  5462		ret = devm_mdiobus_register(&pdev->dev, new_bus);
+  5463		if (ret)
+  5464			return ret;
+  5465	
+  5466		/* find the first (lowest address) PHY on the current MAC's MII bus */
+> 5467		for (addr = 0; addr < PHY_MAX_ADDR; addr++) {
+  5468			struct phy_device *tmp = mdiobus_get_phy(new_bus, addr);
+  5469	
+  5470			if (tmp) {
+  5471				phydev = tmp;
+  5472				break;
+  5473			}
+  5474		}
+  5475	
+  5476		if (!phydev) {
+  5477			dev_err(&pdev->dev, "no PHY found on bus\n");
+  5478			return -ENODEV;
+  5479		}
+  5480	
+  5481		/* Most chip versions fail with the genphy driver.
+  5482		 * Therefore ensure that the dedicated PHY driver is loaded.
+  5483		 */
+  5484		if (!phydev->drv) {
+  5485			dev_err(&pdev->dev, "no dedicated PHY driver found for PHY ID 0x%08x, maybe realtek.ko needs to be added to initramfs?\n",
+  5486				phydev->phy_id);
+  5487			return -EUNATCH;
+  5488		}
+  5489	
+  5490		tp->phydev = phydev;
+  5491		tp->phydev->mac_managed_pm = true;
+  5492		if (rtl_supports_eee(tp))
+  5493			phy_support_eee(tp->phydev);
+  5494		phy_support_asym_pause(tp->phydev);
+  5495	
+  5496		/* mimic behavior of r8125/r8126 vendor drivers */
+  5497		if (tp->mac_version == RTL_GIGA_MAC_VER_61)
+  5498			phy_disable_eee_mode(tp->phydev,
+  5499					     ETHTOOL_LINK_MODE_2500baseT_Full_BIT);
+  5500	
+  5501		/* PHY will be woken up in rtl_open() */
+  5502		phy_suspend(tp->phydev);
+  5503	
+  5504		return 0;
+  5505	}
+  5506	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
