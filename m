@@ -1,209 +1,129 @@
-Return-Path: <netdev+bounces-269254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269251-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4MLzBMpTu2lMigIAu9opvQ
-	(envelope-from <netdev+bounces-269254-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:39:22 +0100
+	id aHIVEMpSu2lMigIAu9opvQ
+	(envelope-from <netdev+bounces-269251-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:35:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1B5D2C4929
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:39:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 990FA2C4842
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 02:35:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AEAF631B2EDD
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:35:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 06BC731EC8E6
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC2F30FF21;
-	Thu, 19 Mar 2026 01:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5AA2C21F6;
+	Thu, 19 Mar 2026 01:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GMYN3DIp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I9DuGJMR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0E331AABF;
-	Thu, 19 Mar 2026 01:35:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66F12D94A7
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 01:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773884115; cv=none; b=sh2c6EFmP5Unudvahsk3vNLWtnlqgAMYcvBSseB4ex/sgMocqja+dMRZgNr0nMarlm0qKTaYYmgIOJwHiRDpBLh3VAqb7kDj09moOYYtXTuayKxPJyXXnkhR/eNljQg6KTyJeZz80ve3RwECuUG6l7M01GhgulfH8ENm+g8VdVo=
+	t=1773883815; cv=none; b=SGD636FB49QpySXy2PTtsUWYd8fhDOd2GL2aHvbBKXzYZtR4kRUY2f+T+lFQmND3CDI7vpxiSu/266bCdQ/pPri0XboeWdZHhYG47VNvFiRBl8nVBhJrpmloEsNMI1L8CTTEarzL1MMOBZ/kD0d44ZFs1Va0340kyZncdWWZWOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773884115; c=relaxed/simple;
-	bh=o2JIB0ulYpFLO2G8cREBI30pejf2WQk+5r824J/EsHk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K8JHewvRSivKW3yJASww8VUu6z+ZqWOyrxgDbtE2G90zXfEG1AML3zKlRVtffwEY+p3K3PiY2Ed4hSGTiH6WtZoo1e3OFSIzLtg6C8NxdbJNvcJcS6ZNuhEuEnjoXYpBqLbwkssx1Cz2o8etnalWq8H5Wdks0b+XfLuw44TzAKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GMYN3DIp; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773884108; x=1805420108;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=o2JIB0ulYpFLO2G8cREBI30pejf2WQk+5r824J/EsHk=;
-  b=GMYN3DIpoXA/BJQXK6+AvFJyNYwA+v2+ug1QMD1BRBd2Kt4Si5TeUVou
-   wJfrsHOVDiO8J4tTpyHh3VQOkWfr9McZYR3Lc5w+ikLD6QRuCZ7BPN+XE
-   n/q/ULB//mNzTRCFM9oSnfB+DzBXyQYFgrQjymK9Qrrclhgr5e7uSM/P3
-   L6T/oESdbKcGRfW0rGiQl5FVMHLqJYxLP+4XOySNK7pzg5jY6tZoUShru
-   WyzVegnNqyg356KqsWt5jKEsKcdDwqiZSKg0NWj8lVXBDFFm2UiQZtG9n
-   1mrmTjaHrjVYz92HYrbBiq8yNzqJ4K2snjiVzDnWX9mO6WRmgJrPPiJUX
-   w==;
-X-CSE-ConnectionGUID: VjVRThggSi2JKRh2ryxKJA==
-X-CSE-MsgGUID: 4YBh9j4LToubUijP5ht0Gw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11733"; a="85654856"
-X-IronPort-AV: E=Sophos;i="6.23,128,1770624000"; 
-   d="scan'208";a="85654856"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2026 18:35:07 -0700
-X-CSE-ConnectionGUID: GJ3uzMY6RiOAvlWDLhrMfA==
-X-CSE-MsgGUID: BeRjQjWMTnWCv8JRw8FEdw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,128,1770624000"; 
-   d="scan'208";a="218322706"
-Received: from lkp-server02.sh.intel.com (HELO a51c2a36b9df) ([10.239.97.151])
-  by fmviesa006.fm.intel.com with ESMTP; 18 Mar 2026 18:35:04 -0700
-Received: from kbuild by a51c2a36b9df with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w32Ht-000000000B3-28tK;
-	Thu, 19 Mar 2026 01:35:01 +0000
-Date: Thu, 19 Mar 2026 09:29:25 +0800
-From: kernel test robot <lkp@intel.com>
-To: Michael Dege <michael.dege@renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michael Dege <michael.dege@renesas.com>
-Subject: Re: [PATCH net-next 13/13] net: renesas: rswitch: add vlan aware
- switching
-Message-ID: <202603190927.5oLw58VC-lkp@intel.com>
-References: <20260317-rswitch_add_vlans-v1-13-3a57bfa0f2d1@renesas.com>
+	s=arc-20240116; t=1773883815; c=relaxed/simple;
+	bh=ETHx0wRa/8qbde1sXg/b9VGM6ZIwHfJeCbBqHYKm5iI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Hfa/9ggfqhbZfJwFgCk2U/V91F3WfNno85mIklmCN9+ltvi/k8jzgUWgoZs3iDl0K9B+bR4TrDSg5fxuBzO3MZNTwaJMNd5jdYowg8axgnPzLINPOappB3d7QzoXqqyaYP3QyJvymrNX8V6ABG22cO4quGWQ+gpp39mk/7+y83w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I9DuGJMR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B58ADC2BC87;
+	Thu, 19 Mar 2026 01:30:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773883814;
+	bh=ETHx0wRa/8qbde1sXg/b9VGM6ZIwHfJeCbBqHYKm5iI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=I9DuGJMRRq23bCljMCD4TJNuWIP0tP6wqjgMpeU+jvkUJMvWayEeL6wyIXhcngCKq
+	 sVwMQ+ZloW4l0aJ8CIxc+5aLlQDuEpH8FW+nyrEIJpt1f1Mp/YW7DKij83mXXQ5qN7
+	 JpOpSmFxQ9gPYAzcxlSygZFlZFVdcJxKenp8lhYlgGyEEihFE4+k8KiEFkAWu/NtqX
+	 rWdkPdpuKZLuMrGzklU6a1Xfd3XkTVUVWi+jR4BJjPjGkueH8DS8MyoI7qd8gpIPZI
+	 bx6dDHhMKYI/h00ky0Bt3MsYCN7D4kkaJre+pknjLIIbBZx8CBxOWVbHZVvulML2Nz
+	 brYoTFVKfvbKg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FEF53808200;
+	Thu, 19 Mar 2026 01:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260317-rswitch_add_vlans-v1-13-3a57bfa0f2d1@renesas.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: bonding: fix NULL deref in
+ bond_debug_rlb_hash_show
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177388380604.978731.12457938620572912783.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Mar 2026 01:30:06 +0000
+References: <20260317005034.1888794-1-xmei5@asu.edu>
+In-Reply-To: <20260317005034.1888794-1-xmei5@asu.edu>
+To: Xiang Mei <xmei5@asu.edu>
+Cc: netdev@vger.kernel.org, jv@jvosburgh.net, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ bestswngs@gmail.com
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269254-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-269251-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.960];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-0.969];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: B1B5D2C4929
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 990FA2C4842
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Michael,
+Hello:
 
-kernel test robot noticed the following build warnings:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-[auto build test WARNING on 1f318b96cc84d7c2ab792fcc0bfd42a7ca890681]
+On Mon, 16 Mar 2026 17:50:34 -0700 you wrote:
+> rlb_clear_slave intentionally keeps RLB hash-table entries on
+> the rx_hashtbl_used_head list with slave set to NULL when no
+> replacement slave is available. However, bond_debug_rlb_hash_show
+> visites client_info->slave without checking if it's NULL.
+> 
+> Other used-list iterators in bond_alb.c already handle this NULL-slave
+> state safely:
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Michael-Dege/net-renesas-rswitch-improve-port-change-mode-functions/20260318-221709
-base:   1f318b96cc84d7c2ab792fcc0bfd42a7ca890681
-patch link:    https://lore.kernel.org/r/20260317-rswitch_add_vlans-v1-13-3a57bfa0f2d1%40renesas.com
-patch subject: [PATCH net-next 13/13] net: renesas: rswitch: add vlan aware switching
-config: sparc64-allmodconfig (https://download.01.org/0day-ci/archive/20260319/202603190927.5oLw58VC-lkp@intel.com/config)
-compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project 4abb927bacf37f18f6359a41639a6d1b3bffffb5)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260319/202603190927.5oLw58VC-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net,v2] net: bonding: fix NULL deref in bond_debug_rlb_hash_show
+    https://git.kernel.org/netdev/net/c/605b52497bf8
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603190927.5oLw58VC-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/renesas/rswitch_l2.c:268:7: warning: variable 'err' is used uninitialized whenever switch case is taken [-Wsometimes-uninitialized]
-     268 |         case SWITCHDEV_ATTR_ID_BRIDGE_MC_DISABLED:
-         |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/renesas/rswitch_l2.c:275:6: note: uninitialized use occurs here
-     275 |         if (err < 0)
-         |             ^~~
-   drivers/net/ethernet/renesas/rswitch_l2.c:264:7: warning: variable 'err' is used uninitialized whenever switch case is taken [-Wsometimes-uninitialized]
-     264 |         case SWITCHDEV_ATTR_ID_BRIDGE_VLAN_FILTERING:
-         |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/renesas/rswitch_l2.c:275:6: note: uninitialized use occurs here
-     275 |         if (err < 0)
-         |             ^~~
-   drivers/net/ethernet/renesas/rswitch_l2.c:251:9: note: initialize the variable 'err' to silence this warning
-     251 |         int err;
-         |                ^
-         |                 = 0
-   2 warnings generated.
-
-
-vim +/err +268 drivers/net/ethernet/renesas/rswitch_l2.c
-
-   244	
-   245	static int rswitch_handle_port_attr_set(struct net_device *ndev,
-   246						struct notifier_block *nb,
-   247						struct switchdev_notifier_port_attr_info *info)
-   248	{
-   249		const struct switchdev_attr *attr = info->attr;
-   250		struct rswitch_private *priv;
-   251		int err;
-   252	
-   253		priv = container_of(nb, struct rswitch_private, rswitch_switchdev_blocking_nb);
-   254	
-   255		switch (attr->id) {
-   256		case SWITCHDEV_ATTR_ID_PORT_STP_STATE:
-   257			err = rswitch_port_update_stp_state(ndev, attr->u.stp_state);
-   258	
-   259			break;
-   260		case SWITCHDEV_ATTR_ID_BRIDGE_AGEING_TIME:
-   261			err = rswitch_update_ageing_time(priv, attr->u.ageing_time);
-   262	
-   263			break;
-   264		case SWITCHDEV_ATTR_ID_BRIDGE_VLAN_FILTERING:
-   265			rswitch_update_vlan_filtering(priv, attr->u.vlan_filtering);
-   266	
-   267			break;
- > 268		case SWITCHDEV_ATTR_ID_BRIDGE_MC_DISABLED:
-   269	
-   270			break;
-   271		default:
-   272			return -EOPNOTSUPP;
-   273		}
-   274	
-   275		if (err < 0)
-   276			return err;
-   277	
-   278		info->handled = true;
-   279	
-   280		return NOTIFY_DONE;
-   281	}
-   282	
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
