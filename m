@@ -1,171 +1,214 @@
-Return-Path: <netdev+bounces-269486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269487-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8FhhDw4RvGnbrwIAu9opvQ
-	(envelope-from <netdev+bounces-269486-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:06:54 +0100
+	id 8JjGLTASvGnbrwIAu9opvQ
+	(envelope-from <netdev+bounces-269487-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:11:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA5222CD658
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:06:53 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 676832CD772
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:11:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8BC95306E60F
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:03:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B70D530071D2
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:11:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61EA3E1D05;
-	Thu, 19 Mar 2026 15:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872403D5221;
+	Thu, 19 Mar 2026 15:11:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XpGopo2t"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aMU5hgi1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3793E2740
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 15:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4742D63E5;
+	Thu, 19 Mar 2026 15:11:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773932593; cv=none; b=hNy3wRD8J+lM9sZAaBy70r/lPpfxYMhy00coudLC3HxUGgavuPEj1mAFnxKfDJBExnIITPesqKjnZfMlyiVAjtlWU209ThcTHm20SoIS6x1D2VqdB3nq/qqhbAFxOrDQan2ACWIb3NpBjBiWqLIMoNAxGnujHXt/aC5hscTLHfY=
+	t=1773933099; cv=none; b=Tfwcs1NPUCGY5aMiiWSGiX1JZlybzjb++dJStKl2kerDwJmkL9e0WPe6hu37QR/ZxFWZB/gcKROCYKLPo5oE6zOREynLiXuSWlP6be9O/xDJU6XbDR7HBHvRsG7FHRjFIWRXhjwW6k7Fvw7fMCzPwPKKiWXQWijcPts0VrPASyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773932593; c=relaxed/simple;
-	bh=NIVCQHyaHr2OaZGBBDm2SzC3pgkER5yXpWy42ajxxrY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WDRxKQYNK8J1Jc5J8rLR9HZPGQg7B7+Q2IwiHN80lRh0dyoNr8baF66+q+u5/zLpIeO5ZGJgXRL5gkuIjHi8l0vLJZVvK2IaKR/IiP34O7ZmoTcR/DddSDHE7OPm/5iYIMd+V3ONSoaC780L266cBK3e9K3xh+SNgIl0USODEf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XpGopo2t; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773932591;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N9gc6LU34XsGIsUSQKLtKTEHbCdv/mbjhF40Ii9LBzY=;
-	b=XpGopo2ty8CcZNZTdsVtpQ3mD12D8kNmcZAva4YOhtq81Xpz6v8H95BzX05rZG86T9AiWY
-	uboUx7z2TdeGAjZmShrW3W/Eqzo4GNaDoaD0RMg8BtNT6E7/IMeBrLt7P7DkDqUcMVTFMO
-	kyEhuswK9bVq3notQhZkmhYj7iOjXAA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-632-_KS4rVzhP329w6oV1ucYDw-1; Thu,
- 19 Mar 2026 11:03:05 -0400
-X-MC-Unique: _KS4rVzhP329w6oV1ucYDw-1
-X-Mimecast-MFC-AGG-ID: _KS4rVzhP329w6oV1ucYDw_1773932583
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 275461800372;
-	Thu, 19 Mar 2026 15:03:03 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.45.224.65])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5897618002A6;
-	Thu, 19 Mar 2026 15:02:59 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1773933099; c=relaxed/simple;
+	bh=+SwXy12jOCXpAUmKYSQndcqp+9kRiCVGtDj8RdjYL94=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ze2jMWgyJxJA0ve4Kr6kh3q62UULvVAI/Mt33m8P3CRvwymkrg9sq13n3iQ7Vlm/SqqQfZ2Kdkp5L+AWhkl6HMuDQIAZzR2wwZcn0amlYAqcXIjLPga92JDFPjMLcM3QOftfQtyi8Fi6hBRqtZYB2RcTaS/IIuu1Ab79BKBcmHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aMU5hgi1; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9PKfHh7lpDmvXp/AacCSQ4DXliViadOMLA1Saz6vuQM=; b=aMU5hgi1JmyBFGBjGXz8h6GZ97
+	qYwyqthq0k4Ie4XVz0Hlae3+6315exn9CIHZElJ2p8VCpxl2xKmcH+w4AnFTPGKg3iTz87AwMcRSj
+	FGG3vbB6iCtpNc550JNthzmkcgwcjQFf00NEatZGff38mF4Xh/0pRCuIVpL/BPAYvRgRQkl1JBumc
+	hwNUdMIq7KTa8qejhtlF2HzWMqXc7yfq8XjQxCKEozzTiwCWPPeOYUe4b+csipMMjRAy1MM5DsY1d
+	aoL3AROYLqPzi5JhFgMHtmSIKoiNWoIer31sAiKsvXIR6kgJaEVxIxDIwYF13JTHfmuGasC2KYHJC
+	r/4lZR/A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59324)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w3F20-000000004tn-0xA2;
+	Thu, 19 Mar 2026 15:11:28 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w3F1w-000000008E5-2ekr;
+	Thu, 19 Mar 2026 15:11:24 +0000
+Date: Thu, 19 Mar 2026 15:11:24 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Cc: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Anderson Nascimento <anderson@allelesecurity.com>,
-	Jeffrey Altman <jaltman@auristor.com>,
-	Simon Horman <horms@kernel.org>,
-	stable@kernel.org
-Subject: [PATCH net 5/5] rxrpc: Fix key reference count leak from call->key
-Date: Thu, 19 Mar 2026 15:01:45 +0000
-Message-ID: <20260319150150.4189381-6-dhowells@redhat.com>
-In-Reply-To: <20260319150150.4189381-1-dhowells@redhat.com>
-References: <20260319150150.4189381-1-dhowells@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next 0/8] net: stmmac: improve PCS support
+Message-ID: <abwSHGw39FTJGNb7@shell.armlinux.org.uk>
+References: <abQC7r38QLhSeadl@shell.armlinux.org.uk>
+ <abdEscs44fU4kRag@oss.qualcomm.com>
+ <abdYu864OmNWiWIW@shell.armlinux.org.uk>
+ <ablpxwGks9m38fhM@shell.armlinux.org.uk>
+ <absjNQ2s3Z5N2Zwo@oss.qualcomm.com>
+ <abtE7sDT75I7uPnk@shell.armlinux.org.uk>
+ <abvAuHFZzCFobO-V@shell.armlinux.org.uk>
+ <7566c66b-2dda-4b29-b59e-4e4a7e159e21@oss.qualcomm.com>
+ <abvy6nZyjyxUXMuf@shell.armlinux.org.uk>
+ <bcab38a5-e7f7-47c9-ab9c-99294e095c22@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bcab38a5-e7f7-47c9-ab9c-99294e095c22@oss.qualcomm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269486-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-269487-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.980];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[auristor.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,infradead.org:email,davemloft.net:email,allelesecurity.com:email,0.0.212.49:email]
-X-Rspamd-Queue-Id: AA5222CD658
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_SPAM(0.00)[0.706];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: 676832CD772
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Anderson Nascimento <anderson@allelesecurity.com>
+On Thu, Mar 19, 2026 at 02:50:29PM +0100, Konrad Dybcio wrote:
+> On 3/19/26 1:58 PM, Russell King (Oracle) wrote:
+> > On Thu, Mar 19, 2026 at 11:09:33AM +0100, Konrad Dybcio wrote:
+> >> On 3/19/26 10:24 AM, Russell King (Oracle) wrote:
+> >>> On Thu, Mar 19, 2026 at 12:35:58AM +0000, Russell King (Oracle) wrote:
+> >>>> On Thu, Mar 19, 2026 at 03:42:05AM +0530, Mohd Ayaan Anwar wrote:
+> >>>>> [    8.650486] qcom-ethqos 23040000.ethernet: clk_csr value out of range (0xffffff00 exceeds mask 0x00000f00), truncating
+> >>>>
+> >>>> Please look into this first - with the MDIO bus operating at
+> >>>> who-knows-what frequency, this could make reading from the PHY
+> >>>> unreliable.
+> >>>
+> >>> My guess is clk_get_rate(priv->plat->stmmac_clk) is returning zero,
+> >>> which means we don't know the rate of the CSR clock.
+> >>>
+> >>> From what I can see in drivers/clk/qcom/gcc-qcs404.c and
+> >>> drivers/clk/qcom/gcc-sdx55.c, this looks like this case - the
+> >>> struct clk_branch makes no mention of any clock rate, nor does it
+> >>> have any parent. From what I can see, neither of these drivers
+> >>> specify any rates for any of their clocks, which likely means that
+> >>> clk_get_rate() will be zero for all of them.
+> >>>
+> >>> Sadly, when I designed the clk API, I didn't think that people would
+> >>> be stupid enough not to implement the API properly, more fool me.
+> >>>
+> >>> Under the old code, we would've used STMMAC_CSR_20_35M, which means
+> >>> we're assuming that the CSR clock is between 20 and 35MHz, even
+> >>> though the value is zero. Is that the case? If it's higher than
+> >>> 35MHz, then you've been operating the MDIO bus out of IEEE 802.3
+> >>> specification, which can make PHY access unrealible.
+> >>>
+> >>> In any case, please fix your clock drivers.
+> >>
+> >> I'm not 100% sure the currently-passed AXI clock is what we want
+> >> there and the docs aren't super helpful.. is there a synopsys-name
+> >> for it? What rates would you expect it to run at?
+> > 
+> > There is no easy answer to that - it depends on the bus interfaces
+> > and whether the CSR (register) clock is separate.
+> > 
+> > The likely possible names are hclk_i (for AHB master), aclk_i (for
+> > AXI master), or clk_csr_i.
+> > 
+> > It does state that the CSR clock should have a minimum frequency of
+> > 25MHz to allow all statistics to be properly collected.
+> > 
+> > The rate of the CSR clock needs to be known, as selecting the divider
+> > for generating MDC within IEEE 802.3 specifications is rather
+> > fundamental. You may find something there which hints at what rate
+> > the dwmac's CSR clock runs at.
+> 
+> If it's either AXI or AHB, in both cases their direct parent is controlled
+> by an entity external to Linux and their rates may change at runtime,
+> based on aggregated needs of the bus. They're defined as levels/corners
+> (abstract term for a hidden volt+freq combo).
+> 
+> It may be that the operating range for the EMAC removes that variability,
+> but with no concrete evidence and just anecdotal experience, that's only
+> the case for the AHB clock
 
-When creating a client call in rxrpc_alloc_client_call(), the code obtains
-a reference to the key.  This is never cleaned up and gets leaked when the
-call is destroyed.
+The important thing is that the MDC doesn't exceed the max clock
+frequency for the PHY and any other device connected to the MDIO
+bus. IEEE 802.3 specifies a max frequency of 2.5MHz (minimum period
+for MDC shall be 400 ns). Some PHYs can operate in excess of this,
+but one would need to confirm that all devices on the MDIO bus
+supports higher frequencies before using them. In the kernel, we
+generally err on the side of caution and stick to IEEE 802.3.
 
-Fix this by freeing call->key in rxrpc_destroy_call().
+There are two ways to achieve the divider value with stmmac.
 
-Before the patch, it shows the key reference counter elevated:
+1. if priv->plat->csr_clk is set to a value other than -1, this
+   configures the hardware divisor (for "normal" cores, it takes
+   STMMAC_CSR_* constants that can be found in include/linux/stmmac.h)
 
-$ cat /proc/keys | grep afs@54321
-1bffe9cd I--Q--i 8053480 4169w 3b010000  1000  1000 rxrpc     afs@54321: ka
-$
+2. otherwise, the rate of priv->plat->stmmac_clk is used as the CSR
+   clock value, which is the reference clock for the divider that
+   generates the MDC clock, and an appropriate divider is selected.
+   Given the available dividers, it works out at between 1.25MHz for
+   a CSR clock of just over 20MHz and 2.47MHz for 800MHz. (I have a
+   patch which documents the ranges for each of the STMMAC_CSR_xxx
+   values.)
 
-After the patch, the invalidated key is removed when the code exits:
+Note that the dividier constants are not the actual divider itself,
+as can be seen in include/linux/stmmac.h
 
-$ cat /proc/keys | grep afs@54321
-$
-
-Fixes: f3441d4125fc ("rxrpc: Copy client call parameters into rxrpc_call earlier")
-Signed-off-by: Anderson Nascimento <anderson@allelesecurity.com>
-Co-developed-by: David Howells <dhowells@redhat.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Eric Dumazet <edumazet@google.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
-cc: stable@kernel.org
----
- net/rxrpc/call_object.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/rxrpc/call_object.c b/net/rxrpc/call_object.c
-index 918f41d97a2f..8d874ea428ff 100644
---- a/net/rxrpc/call_object.c
-+++ b/net/rxrpc/call_object.c
-@@ -694,6 +694,7 @@ static void rxrpc_destroy_call(struct work_struct *work)
- 	rxrpc_put_bundle(call->bundle, rxrpc_bundle_put_call);
- 	rxrpc_put_peer(call->peer, rxrpc_peer_put_call);
- 	rxrpc_put_local(call->local, rxrpc_local_put_call);
-+	key_put(call->key);
- 	call_rcu(&call->rcu, rxrpc_rcu_free_call);
- }
- 
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
