@@ -1,63 +1,66 @@
-Return-Path: <netdev+bounces-269238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269240-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ELCFKGxJu2kliQIAu9opvQ
-	(envelope-from <netdev+bounces-269238-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:55:08 +0100
+	id ONOvIV1Ku2kliQIAu9opvQ
+	(envelope-from <netdev+bounces-269240-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:59:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A968C2C43C1
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:55:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F20E32C4401
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:59:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A571A3006098
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:55:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DEB72302C36E
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D969253340;
-	Thu, 19 Mar 2026 00:55:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD06255F28;
+	Thu, 19 Mar 2026 00:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fNBM+6hc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UnDrQc30"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAC621B192
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 00:55:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D30A2AD00
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 00:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773881703; cv=none; b=bW/Z8ixrNfcVMkBs2zxfYNMOjFJV7B8wO589w7oez1VVvzB2p8/iKEvGFCwd1YcAwzM3hqjxlPOqZSfKhp+17mDPmzsESdUYM17a8RgBSiZ2heKKlUWM5POE14U5Q62Ufm3P14foltQqqm2ZGfwwO6/W0Y2KzZ8EEak7PNpVvsw=
+	t=1773881938; cv=none; b=gpEcD2tVaFG0A+KQJNqNYfBqneHof3lFduX3FYm8ZGsoSvaD2UxaWdNzGMkCbDOlCR+6VhWRhC5dorLFUHafy+kG4jw/pFQYIsDY6sB4i2rXHBMo0yF7F9sPTSfQmLtne3CBocxpHU6xodl5kNkXNGjlh6sPqeO+g78AZLRemaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773881703; c=relaxed/simple;
-	bh=sExwXgMTZunZe2MKWt6bZpV4yZ18mELdStapDHpe4+8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=spE/nQbeK2MxrmcgWDM4f3GE+rUqChywQUXKz1mKYOfh02T5MdvqM3mckkjDiW4xymEoaGEwIo+2Ht+Ml9MKweroVRV2v3zwDZqMEZ1ZL/CLGuGi1ozn7UIRGXO732GupC73XFGxWNqBLlHcN4XqTtR7p7IA7iZ5t0hh5TpziBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fNBM+6hc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0A9EC19421;
-	Thu, 19 Mar 2026 00:55:02 +0000 (UTC)
+	s=arc-20240116; t=1773881938; c=relaxed/simple;
+	bh=Eosp1wr0nc9fzlCkuTGjQHGUhg6PQUMdciDYX6bg9Ps=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=edevIB1sglQtmphA6SXgcBTX0zG9rwp4+Cw7mvKsOV+rwmN8R4hvvntwcSHifpY8efE7IQDTqoobModvWSlXKIElm+t5fnvALZkXhGab1c+5yzrL9NXLh4Z4sLfTWa3OGAZDvqjICDRFT5PWVYJNylyUYhygRBZuz5riWA4rO90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UnDrQc30; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5510C19421;
+	Thu, 19 Mar 2026 00:58:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773881703;
-	bh=sExwXgMTZunZe2MKWt6bZpV4yZ18mELdStapDHpe4+8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=fNBM+6hcIx3TRzP1SjmBjU74qUfdqcWUjGg6bmAWKaR7iXqUW+n1qmMp/hsMQjIKm
-	 +MWhHYzjxnkGiAIHqRkCYer1xLJpwDzqalZylkbjSu0KHzejYoFlRfzE+UUNAvNwuK
-	 DpJFJQAJ59VkONOZ7UU6MwKnLnWFGJgrRjpdmOPBPJBSFpwodK4mpCQNhhXGN6zMjM
-	 Tv9TezKEMiYLnMSVwjNt3CVX2J0GSy1Cwj4d2tRIYSpcK5339sGd8z+Q3/lBksAubO
-	 155NFLtLiBnb2WqI2IomUJDlNfHdBCx+XgtDxwu35ejo7MNIkCK5yxlbvWpiVMCDeA
-	 9aABcA+X1DFVw==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	s=k20201202; t=1773881938;
+	bh=Eosp1wr0nc9fzlCkuTGjQHGUhg6PQUMdciDYX6bg9Ps=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=UnDrQc305r0Tc6X1ZOiolymW9SCNweQ9tA42PHGttIlGJsBFGFTr2z7ghPO0AQGcI
+	 eWmAgNq009JlR3tPNLHakcseyeezfPmrZ5lV+W3Q0ydUnEasfrkLBssMXKkDz00OrH
+	 iZBfs2XwCsTFFaGdI8M81V5GjWFSH9XTFEnEq27j6yrN/rSJBPl+7MjIxpGntH8tEC
+	 9JGBNPVeudEmDWozj4PuGnWRssQPkf6CRD9nC7LTFhjyHZRtlYy1Vy5XXuZCgleCuC
+	 57dsQdTePodvFze6RfGklLI7A2JwsterDqmodXM3EUEJOqSyoqotiN7haukJ2zaixF
+	 TzDp2m0GY2XSw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: justin.chen@broadcom.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	edumazet@google.com,
+	florian.fainelli@broadcom.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	bcm-kernel-feedback-list@broadcom.com,
+	davem@davemloft.net,
 	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>
-Subject: [PATCH net-next V2] net/mlx5e: Allow set_rx_mode on uplink representor
-Date: Wed, 18 Mar 2026 17:54:56 -0700
-Message-ID: <20260319005456.82745-1-saeed@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	horms@kernel.org
+Subject: Re: [PATCH net v2 2/2] net: bcmasp: fix double disable of clk
+Date: Wed, 18 Mar 2026 17:58:51 -0700
+Message-ID: <20260319005851.2145991-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260316180202.3371477-3-justin.chen@broadcom.com>
+References: <20260316180202.3371477-3-justin.chen@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,128 +68,148 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269238-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[saeed@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.972];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269240-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.949];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A968C2C43C1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: F20E32C4401
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-set_rx_mode handler was skipped on uplink representor, since uplink
-relies on FDB to forward all traffic to it by default, which works
-perfectly on a single PF per physical port configuration, as explicit
-mac request isn't required, but In case of multi-host and DPU
-environments, uplink can only use own mac address, as set_rx_mode
-wasn't honored in uplink rep.
-
-Since MPFs (Multi PF switch) requires PFs to request explicit mac
-forwarding, this patch enables set_rx_mode on uplink representor to
-allow PF mac programming into MPFs table in switchdev mode, allowing
-use-cases such as arbitrary mac address forwarding via linux bridge.
-
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-Reviewed-by: Mark Bloch <mbloch@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
- - Improve title and commit message -- Kuba.
-   v[1]: https://lore.kernel.org/netdev/20260310104841.1862380-1-tariqt@nvidia.com/
+net: bcmasp: fix double disable of clk
 
- drivers/net/ethernet/mellanox/mlx5/core/en_fs.c   | 10 ++++++++++
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c |  3 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c  |  2 ++
- 3 files changed, 12 insertions(+), 3 deletions(-)
+Switch to devm_clk_get_optional() so we can manage the clock ourselves.
+We dynamically control the clocks depending on the state of the interface
+for power savings. The default state is clock disabled, so unbinding the
+driver causes a double disable.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
-index 9352e2183312..d7556d611155 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
-@@ -823,8 +823,14 @@ static void mlx5e_destroy_promisc_table(struct mlx5e_flow_steering *fs)
- void mlx5e_fs_set_rx_mode_work(struct mlx5e_flow_steering *fs,
- 			       struct net_device *netdev)
- {
-+	struct mlx5e_priv *priv = netdev_priv(netdev);
- 	struct mlx5e_l2_table *ea = &fs->l2;
- 
-+	if (mlx5e_is_uplink_rep(priv)) {
-+		mlx5e_handle_netdev_addr(fs, netdev);
-+		goto update_vport_context;
-+	}
-+
- 	bool rx_mode_enable  = fs->state_destroy;
- 	bool promisc_enabled   = rx_mode_enable && (netdev->flags & IFF_PROMISC);
- 	bool allmulti_enabled  = rx_mode_enable && (netdev->flags & IFF_ALLMULTI);
-@@ -864,6 +870,7 @@ void mlx5e_fs_set_rx_mode_work(struct mlx5e_flow_steering *fs,
- 	ea->allmulti_enabled  = allmulti_enabled;
- 	ea->broadcast_enabled = broadcast_enabled;
- 
-+update_vport_context:
- 	mlx5e_vport_context_update(fs, netdev);
- }
- 
-@@ -984,6 +991,9 @@ static int mlx5e_add_l2_flow_rule(struct mlx5e_flow_steering *fs,
- 	u8 *mc_dmac;
- 	u8 *mv_dmac;
- 
-+	if (!ft)
-+		return -EINVAL;
-+
- 	spec = kvzalloc_obj(*spec);
- 	if (!spec)
- 		return -ENOMEM;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index f7009da94f0b..3eebdf402129 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -4102,9 +4102,6 @@ mlx5e_get_stats(struct net_device *dev, struct rtnl_link_stats64 *stats)
- 
- static void mlx5e_nic_set_rx_mode(struct mlx5e_priv *priv)
- {
--	if (mlx5e_is_uplink_rep(priv))
--		return; /* no rx mode for uplink rep */
--
- 	queue_work(priv->wq, &priv->set_rx_mode_work);
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-index 1db4ecb2356f..8992f0f7a870 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-@@ -1369,6 +1369,8 @@ static void mlx5e_uplink_rep_disable(struct mlx5e_priv *priv)
- 	netdev_unlock(priv->netdev);
- 	rtnl_unlock();
- 
-+	/* clean-up uplink's mpfs mac table */
-+	queue_work(priv->wq, &priv->set_rx_mode_work);
- 	mlx5e_rep_bridge_cleanup(priv);
- 	mlx5e_dcbnl_delete_app(priv);
- 	mlx5_notifier_unregister(mdev, &priv->events_nb);
+> diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+> index 2034a1593db7..dda89afb2917 100644
+> --- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+> +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+> @@ -1249,7 +1249,7 @@ static int bcmasp_probe(struct platform_device *pdev)
+>  	if (priv->irq <= 0)
+>  		return -EINVAL;
+>
+> -	priv->clk = devm_clk_get_optional_enabled(dev, "sw_asp");
+> +	priv->clk = devm_clk_get_optional(dev, "sw_asp");
+>  	if (IS_ERR(priv->clk))
+>  		return dev_err_probe(dev, PTR_ERR(priv->clk),
+>  				     "failed to request clock\n");
+> @@ -1277,6 +1277,10 @@ static int bcmasp_probe(struct platform_device *pdev)
+>
+>  	bcmasp_set_pdata(priv, pdata);
+>
+> +	ret = clk_prepare_enable(priv->clk);
+> +	if (ret)
+> +		return dev_err_probe(dev, ret, "failed to start clock\n");
+> +
+>  	/* Enable all clocks to ensure successful probing */
+>  	bcmasp_core_clock_set(priv, ASP_CTRL_CLOCK_CTRL_ASP_ALL_DISABLE, 0);
+>
+> @@ -1288,8 +1292,10 @@ static int bcmasp_probe(struct platform_device *pdev)
+>
+>  	ret = devm_request_irq(&pdev->dev, priv->irq, bcmasp_isr, 0,
+>  			       pdev->name, priv);
+> -	if (ret)
+> -		return dev_err_probe(dev, ret, "failed to request ASP interrupt: %d", ret);
+> +	if (ret) {
+> +		dev_err(dev, "Failed to request ASP interrupt: %d", ret);
+> +		goto err_clock_disable;
+> +	}
+>
+>  	/* Register mdio child nodes */
+>  	of_platform_populate(dev->of_node, bcmasp_mdio_of_match, NULL, dev);
+> @@ -1301,13 +1307,17 @@ static int bcmasp_probe(struct platform_device *pdev)
+>
+>  	priv->mda_filters = devm_kcalloc(dev, priv->num_mda_filters,
+>  					 sizeof(*priv->mda_filters), GFP_KERNEL);
+> -	if (!priv->mda_filters)
+> -		return -ENOMEM;
+> +	if (!priv->mda_filters) {
+> +		ret = -ENOMEM;
+> +		goto err_clock_disable;
+> +	}
+>
+>  	priv->net_filters = devm_kcalloc(dev, priv->num_net_filters,
+>  					 sizeof(*priv->net_filters), GFP_KERNEL);
+> -	if (!priv->net_filters)
+> -		return -ENOMEM;
+> +	if (!priv->net_filters) {
+> +		ret = -ENOMEM;
+> +		goto err_clock_disable;
+> +	}
+>
+>  	bcmasp_core_init_filters(priv);
+>
+> @@ -1316,7 +1326,8 @@ static int bcmasp_probe(struct platform_device *pdev)
+>  	ports_node = of_find_node_by_name(dev->of_node, "ethernet-ports");
+>  	if (!ports_node) {
+>  		dev_warn(dev, "No ports found\n");
+> -		return -EINVAL;
+> +		ret = -EINVAL;
+> +		goto err_clock_disable;
+>  	}
+>
+>  	i = 0;
+
+[ ... ]
+
+> @@ -1358,6 +1369,8 @@ static int bcmasp_probe(struct platform_device *pdev)
+>
+>  err_cleanup:
+>  	bcmasp_remove_intfs(priv);
+> +err_clock_disable:
+> +	clk_disable_unprepare(priv->clk);
+>                  ^^^^
+
+Does this double-disable the clock on the register_netdev() error path?
+
+Looking at bcmasp_probe(), the clock handling sequence is:
+
+    Line 1280: clk_prepare_enable(priv->clk) enables the clock
+    Line 1352: clk_disable_unprepare(priv->clk) disables it
+
+Then register_netdev() is called in a loop starting around line 1358.
+If register_netdev() fails, it jumps to err_cleanup which falls through
+to err_clock_disable and calls clk_disable_unprepare() again.
+
+Since the clock was already disabled at line 1352 before the network
+device registration loop, calling clk_disable_unprepare() a second time
+in the error path would unbalance the clock reference count.
+
+Should the err_cleanup label return directly without falling through to
+err_clock_disable, or should a separate error label be added for paths
+after the clock is already disabled?
 -- 
-2.43.0
-
+pw-bot: cr
 
