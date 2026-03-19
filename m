@@ -1,313 +1,184 @@
-Return-Path: <netdev+bounces-269360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269361-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJqzHp23u2lHmwIAu9opvQ
-	(envelope-from <netdev+bounces-269360-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:45:17 +0100
+	id GBEuF2e5u2mtmwIAu9opvQ
+	(envelope-from <netdev+bounces-269361-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:52:55 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2CDD2C803C
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:45:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE2C72C81A5
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:52:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 424B830E160C
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:45:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 95B3130D9EE2
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:51:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4F193AD530;
-	Thu, 19 Mar 2026 08:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83DA336CDFA;
+	Thu, 19 Mar 2026 08:51:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PSfiA5HU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JjCpk/Fw";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gG8+UInv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA093ACEF3
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 08:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1EE023ABBF
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 08:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773909904; cv=none; b=ZAEHp06H5pcPkIBQ8Uj0w9U+bxqxYLj8ul1u60mRJOXuY9IpEyB4x2KuAsq2n8K4teBSczoGtk500kdaiFUWEoyIgLTH9uIho8rknit/+srUOuAZbnOjKM/56WyZPlksbibvNC9gmWmHYoID3yZafTBpsSIvy83WSb3S6SexqZU=
+	t=1773910308; cv=none; b=inVARwdLk9ggyfYCtz9U2K/eBO7rMzNzPCItdzjGcYaP1KKfqA6T1IflE/TBsgkJOTRI5/5jPZrvb1rQ3wkfccwRb6s7TWgkDmdGiuwYqUObHHHnRvVIZ2IWJnQwgu/tBVqiLegAFRW10q10DJCKMqbA1q12Z6qRoSDUK8xqXno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773909904; c=relaxed/simple;
-	bh=3GNC7qpyfUWAFD8/zUA9cu+cY1NU0svmPWQgrnshrwc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IfIJF/ewmG13IaT0dIgtYwJ8UH7+bd2bb0rNiV5py5T5rrkZI0E//Aq52s8ulF+BGASt/uj5SJ66ah0uC8hWbBhwDteWOn1FpVuK8WsDwVjAV5yFCvh7/BZOO00QqHuDvn/5Q9yXW+u45syfSazYowmdzSh1RENh0QNSy/QG9cI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PSfiA5HU; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4852e09e23dso5022235e9.0
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 01:45:00 -0700 (PDT)
+	s=arc-20240116; t=1773910308; c=relaxed/simple;
+	bh=Br9BQScBUUPcCFQA0zfnTlmLUs1Wh/NSaW7PhY2lHMc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tW0iTFJB17M8wPpJw2eUvWKY8Qfoz0/5yd0uKJZpYn54ri0hL/oN2fS3FPx33xcHPr9t8WjZ8eMDF1DgbkqQkW5Wn7Dr91hsB5A5jPdnS5M/Pb+Gbyec+DwViFS4+YcRcYe69ekbI3ByZqmawGodpwEPfhXP1QBZwYJw+c+2Q1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JjCpk/Fw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gG8+UInv; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773910305;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ql+58h2xm+DbHGFLlAGGwYq66ZcmSTZUyEZ3u+sZqes=;
+	b=JjCpk/Fwp5GGzl8HryJHquDJUklSTTp0ArW8KXGKA/PouzPKrWTCZcFSdwoHFO/33d0SFo
+	N/29XEkFYAkH5Ti/S8CB8x56zqv1sfe1k24MpKqG195tpvcorrlnHHqZGT6ecsxqqRS6bc
+	E7QAS9mJyK1SH2F6fq7R6ileepUtQb8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-59-GUfKTpXnO3uIssfmbcLe2w-1; Thu, 19 Mar 2026 04:51:44 -0400
+X-MC-Unique: GUfKTpXnO3uIssfmbcLe2w-1
+X-Mimecast-MFC-AGG-ID: GUfKTpXnO3uIssfmbcLe2w_1773910303
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43b41d45be4so1315368f8f.0
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 01:51:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773909899; x=1774514699; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:organization
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3GNC7qpyfUWAFD8/zUA9cu+cY1NU0svmPWQgrnshrwc=;
-        b=PSfiA5HUJYJKGmaTd/WYVCP6CgOsrtqsUCrikbZdwjNzWOhz3rm/OjZRDricL6H+Id
-         Gl+ShsdLPzvFZePzw46Vrt1alhOrLO35ZqwxR63+GJwJe5yORdDXnTzrTBchL26T61QD
-         FjfOW38k6id8U0AHqUC6ik008q63p2ZDze24dCF07sReWiK4wIJPmN3b7RREuUJGOHJk
-         pdbgTrwapD7SarLvCFPjxBGRnA/xK9mF+7111G2VlSvAGuqb4ewBvIgRJqWyPp+4+uxK
-         Ltb0sd3YzjGTQQsUJeflXuK2nsiCv76oRDzbFRQ5qwZmYCQp6A+NnUuqsI22j/pUqZnR
-         /feA==
+        d=redhat.com; s=google; t=1773910303; x=1774515103; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ql+58h2xm+DbHGFLlAGGwYq66ZcmSTZUyEZ3u+sZqes=;
+        b=gG8+UInvNulWOHjqSGlr/AJadjGj0EIpu/BH372WSB+yS7yyTis9WorQOeA0lf9Q4U
+         N1IFixjgeGdJQZQRCgOMz5mOB678nO6cYV2mijuN36Qi+vTs4tKPTNIZvmVHdL01351s
+         ZSb+VkQwTWF6EUN0swzv7+VCMbs7rJWM0Oie7D7GQPNtJSWczpZ1lB3IqEV83Pw6RZOA
+         sBff2Cx6TB0i/a7frn1DWkvODoiuBTFSoOjVi4OHVCeqkRODJcD+Q/Sg1Ze82R6vhMC5
+         mt/q9zhUNeR/9wBgjjmEY8Rs6bdaLZE00DZNiiWPnLB/f26wGgKYdOaN4IXzBD1ygptt
+         coQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773909899; x=1774514699;
-        h=mime-version:user-agent:content-transfer-encoding:organization
-         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3GNC7qpyfUWAFD8/zUA9cu+cY1NU0svmPWQgrnshrwc=;
-        b=FTeYu5V33SmPD4bPErGAsn6XvdjX3NgabcbrN1CvqldwwiCp9GY2DlZGyFJh1fj33m
-         FZt0mY5FP1OAwyMVcBKJT0ZXf3kHFNA5pmRjFG+fP/oIpprjSwoP7YTiGzMjB/qTF5uL
-         UTVxuEVomk7x9BS0X9K0ViJGy8zOc0MYP06NS+1ttb4gHZq3K1POoxOWuPNWXXzGa+xG
-         bjHTG7pHnJHp40GMqyV8E+mbHg+XzJranSYRGHu2+gDH56Z/KNbARp5zOKY15+IiNID+
-         V9JfARQxihSUiBEyH7lmAR0zgh4EaIgJ+UPPvdhH3HSfwtAaPJa1dvrO9t/7cnjJ6MFa
-         yTAw==
-X-Forwarded-Encrypted: i=1; AJvYcCUnBmbFsJMi1Se7izJbIwMazLfzOYoSDnBMTqU5CgchXQGyd/YZtBoG0OJdrzj7cr5qC9eTtUI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVpIBiLSfenfLcPMS7yM0O7B9QinlXut0CzULwJf7cwLYgS6iF
-	4gea44/4IXJ5dqF5ZlBibu6KGTyUgspfHgFP7TJtdsdfg4AIdLMF8tmW
-X-Gm-Gg: ATEYQzwJeXtSr7L/i4oQCWI3WBuNCgKTh3xsJzqoD+uNjfDSl/0vNMwWAAWi3Mq8Y6f
-	j51GdFrT/ZkHB2BTotUQ0o1QJUavum6VDUV/jmTSHiDblqxOwvn3nM6U+M/FlN8ZLebU3tnKi3M
-	vNpOK1KsQAKaWzffzHovkwOOSJTxnn08JRT65HO71haSmMADvj1EV3wMWPjoK9rn47Cvdh5TA8s
-	AID4Qwlvfqcy5Um4KVu3UZAh1poKPMXfshj/xZtX2Ry+MMDdABQgDdlBMc8CAKoTODcwBxgRiIN
-	vPDQmVH+qSbqrTFHhmOHl5UYwl75vAe6797l+kTfYpl4Z0xYyupdKCyljaeQdFzRspF3K85Hg8w
-	Vp6tL0WyGHrHjToy4Hzv8VC/NYU72IScs+PUWuGNXKLN8mdgn2tMeeExM+5hRWSQVqCaTaFH5pV
-	QBPwZ2XasVG2n67TTc8CX2R8Ho5ZxPN0YWzPS4p7ma3GLyxKPAAA==
-X-Received: by 2002:a05:600c:3e85:b0:483:6d4a:7e6d with SMTP id 5b1f17b1804b1-486f447008amr97772295e9.30.1773909898969;
-        Thu, 19 Mar 2026 01:44:58 -0700 (PDT)
-Received: from [192.168.100.165] ([212.230.233.13])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f8b296b3sm47004595e9.6.2026.03.19.01.44.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2026 01:44:58 -0700 (PDT)
-Message-ID: <e24a281622cedf9e8f4dc93c961813aeb7b6ce4c.camel@gmail.com>
-Subject: Re: Bug#1130336: [regression] Network failure beyond first
- connection after 69894e5b4c5e ("netfilter: nft_connlimit: update the count
- if add was skipped")
-From: Alejandro =?ISO-8859-1?Q?Oliv=E1n?= Alvarez
-	 <alejandro.olivan.alvarez@gmail.com>
-To: Salvatore Bonaccorso <carnil@debian.org>, Fernando Fernandez Mancera
-	 <fmancera@suse.de>, 1130336@bugs.debian.org
-Cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso
- <pablo@netfilter.org>,  Phil Sutter	 <phil@nwl.cc>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet	 <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni	 <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, 	netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, regressions@lists.linux.dev, 
-	stable@vger.kernel.org
-Date: Thu, 19 Mar 2026 09:44:46 +0100
-In-Reply-To: <abqfSB0TUik1kRU4@eldamar.lan>
-References: <177349610461.3071718.4083978280323144323@eldamar.lan>
-	 <c72a56ab-a16c-4866-9a44-a03393f074db@suse.de>
-	 <b3cbfd15-acd1-4500-ba30-eac6f48523fb@suse.de> <abW2MAAqLnKZm3KF@strlen.de>
-	 <177322336258.4376.10097494324750307114.reportbug@Desk1.simalex.iccbroadcast.com>
-	 <4da571ab-fa1d-4ee6-b71c-24f4a28243ed@suse.de>
-	 <abqfSB0TUik1kRU4@eldamar.lan>
-Organization: alexolivan.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2-0+deb13u1 
+        d=1e100.net; s=20251104; t=1773910303; x=1774515103;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ql+58h2xm+DbHGFLlAGGwYq66ZcmSTZUyEZ3u+sZqes=;
+        b=KMrsydH053VWtN6/7jxEvHH8eK6MS7cmsH/sFynFuV1lR5XUxnXiE/HmeTZ+nUtADX
+         EqTNYqlSJolOWHjwsiHX7Y3bbszP7V5j+ZeiaRBzMC33F/uDPYHSVXAReAucCQ572MSt
+         ppbBQndSXGMFDLdNMPBZFYLUEqYjFCU/EmBtUHtX7xacWDypw5RwK3UmjsB1G0TsV97T
+         FNRyTwAxWNrcrTovc94ttpNjwEtZrQqt0nb9SkjgtBSxnNdbomRZLRfrYm1j3PFVRkNB
+         gzlUMHrkolUoQ1B/BDA2VdhHpt4DOwevcr4ysWJ2WsZrhqzPr5vc6+zOeE6Smml+eQyM
+         SEAw==
+X-Forwarded-Encrypted: i=1; AJvYcCVqCbbpHIOdvSXDHi6vHZ5CNg5lnISPPGKBTPqt7Bj6Z8I6KrMnlbNb3+5WDrH9PEgHH4XSmWQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyr7R9pwlf+eIJNE9APR2jdUZTPc5zugsJGwvcaj1PhIu743U5R
+	unPiTNypWcElpciXEaaWuDxPJm8UM6FBSIjEuVsMu6msbe7G1/bPtNHmGYwfrEC80ZF4WH60nGC
+	iXuE5nVGF7TL7cU7Na7bI5Ip1jfnPmyjVAsVn4aALk8hmgKnKOJY8h4QL3Q==
+X-Gm-Gg: ATEYQzwHYCJA/xNecmKqDKXqG96QbsE5Pix7XlzR+RisBkfLBhM64RYLPyVufuiHuSD
+	xTn9IfhhwMt+pJ6insDk1CG48FHFyL7eWy57kUzm4va2Ufp1xNvlaXUU60AIL2w6V024YSRPMju
+	HIn50xlE7jGyV2+kufe39uKn8MPdAgpgIeIWPk1KJaEkpCJES5uE0kJFx/R0+J7qH0/7YHneB2i
+	W5xQh0725zFIk5ARXKe+hfjHtlSkqECKf7mAATSh0UI0Z/fgST8MNIjJTXPm8X1ZSte/gWNMZmQ
+	K9Zfemh6VoMsTxgI8Tx6Cr7P1ZJHpFlqgkSKlF0dMvmQlbHxLH0Xk7qQ2i75liS/zKe/32jJk53
+	3HVbeRy4VlbEZpZTWuxFJdkzjYe4axcSFOL0qKTrMjDkckuuWn53eK6+I
+X-Received: by 2002:a05:6000:2a05:b0:439:c560:bb79 with SMTP id ffacd0b85a97d-43b57723491mr3125232f8f.17.1773910302942;
+        Thu, 19 Mar 2026 01:51:42 -0700 (PDT)
+X-Received: by 2002:a05:6000:2a05:b0:439:c560:bb79 with SMTP id ffacd0b85a97d-43b57723491mr3125207f8f.17.1773910302463;
+        Thu, 19 Mar 2026 01:51:42 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.196])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b51892234sm13915250f8f.24.2026.03.19.01.51.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Mar 2026 01:51:41 -0700 (PDT)
+Message-ID: <16a4ac6c-abde-4121-9032-7626640facbe@redhat.com>
+Date: Thu, 19 Mar 2026 09:51:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 2/2] net: dsa: mxl862xx: implement bridge
+ offloading
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+ Cezary Wilmanski <cezary.wilmanski@adtran.com>, Liang Xu
+ <lxu@maxlinear.com>, "Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+ Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+ Avinash Jayaraman <ajayaraman@maxlinear.com>, John Crispin <john@phrozen.org>
+References: <cover.1773591297.git.daniel@makrotopia.org>
+ <0cf66a043eff3585270785a35e821e9a44afd6b6.1773591297.git.daniel@makrotopia.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <0cf66a043eff3585270785a35e821e9a44afd6b6.1773591297.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-269360-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alejandroolivanalvarez@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	TAGGED_FROM(0.00)[bounces-269361-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,armlinux.org.uk,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:email]
-X-Rspamd-Queue-Id: D2CDD2C803C
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AE2C72C81A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi folks.
+On 3/15/26 5:20 PM, Daniel Golle wrote:
+> +static int mxl862xx_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
+> +{
+> +	struct mxl862xx_cfg param;
+> +	int ret;
+> +
+> +	ret = MXL862XX_API_READ(ds->priv, MXL862XX_COMMON_CFGGET, param);
 
-On Wed, 2026-03-18 at 13:49 +0100, Salvatore Bonaccorso wrote:
-> Hi Alejandro,
->=20
-> On Sun, Mar 15, 2026 at 02:09:33AM +0100, Fernando Fernandez Mancera
-> wrote:
-> > On 3/14/26 8:25 PM, Florian Westphal wrote:
-> > > Fernando Fernandez Mancera <fmancera@suse.de> wrote:
-> > > > On 3/14/26 5:13 PM, Fernando Fernandez Mancera wrote:
-> > > > > Hi,
-> > > > >=20
-> > > > > On 3/14/26 3:03 PM, Salvatore Bonaccorso wrote:
-> > > > > > Control: forwarded -1
-> > > > > > https://lore.kernel.org/=C2=A0
-> > > > > > regressions/177349610461.3071718.4083978280323144323@eldama
-> > > > > > r.lan
-> > > > > > Control: tags -1 + upstream
-> > > > > >=20
-> > > > > > Hi
-> > > > > >=20
-> > > > > > In Debian, in https://bugs.debian.org/1130336, Alejandro
-> > > > > > reported that
-> > > > > > after updates including 69894e5b4c5e ("netfilter:
-> > > > > > nft_connlimit:
-> > > > > > update the count if add was skipped"), when the following
-> > > > > > rule is set
-> > > > > >=20
-> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iptables -A INPUT -p tcp -m
-> > > > > > connlimit --connlimit-above 111 -j
-> > > > > > REJECT --reject-with tcp-reset
-> > > > > >=20
-> > > > > > connections get stuck accordingly, it can be easily
-> > > > > > reproduced by:
-> > > > > >=20
-> > > > > > # iptables -A INPUT -p tcp -m connlimit
-> > > > > > --connlimit-above 111 -j REJECT
-> > > > > > --reject-with tcp-reset
-> > > > > > # nft list ruleset
-> > > > > > # Warning: table ip filter is managed by iptables-nft, do
-> > > > > > not touch!
-> > > > > > table ip filter {
-> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 chain IN=
-PUT {
-> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type filter hook input priority fil=
-ter;
-> > > > > > policy accept;
-> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ip protocol tcp xt
-> > > > > > match "connlimit" counter packets 0
-> > > > > > bytes 0 reject with tcp reset
-> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> > > > > > }
-> > > > > > # wget -O /dev/null
-> > > > > > https://git.kernel.org/torvalds/t/linux-7.0-
-> > > > > > rc3.tar.gz
-> > > > > > --2026-03-14 14:53:51--
-> > > > > > https://git.kernel.org/torvalds/t/linux-7.0-
-> > > > > > rc3.tar.gz
-> > > > > > Resolving git.kernel.org
-> > > > > > (git.kernel.org)... 172.105.64.184,
-> > > > > > 2a01:7e01:e001:937:0:1991:8:25
-> > > > > > Connecting to git.kernel.org
-> > > > > > (git.kernel.org)|172.105.64.184|:443...
-> > > > > > connected.
-> > > > > > HTTP request sent, awaiting response... 301 Moved
-> > > > > > Permanently
-> > > > > > Location:
-> > > > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/
-> > > > > > linux.git/snapshot/linux-7.0-rc3.tar.gz
-> > > > > > [following]
-> > > > > > --2026-03-14 14:53:51--
-> > > > > > https://git.kernel.org/pub/scm/linux/kernel/=C2=A0git/torvalds/=
-l
-> > > > > > inux.git/snapshot/linux-7.0-rc3.tar.gz
-> > > > > > Reusing existing connection to git.kernel.org:443.
-> > > > > > HTTP request sent, awaiting response... 200 OK
-> > > > > > Length: unspecified [application/x-gzip]
-> > > > > > Saving to: =E2=80=98/dev/null=E2=80=99
-> > > > > >=20
-> > > > > > /dev/null=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 [
-> > > > > > <=3D>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ] 248.03M
-> > > > > > 51.9MB/s=C2=A0=C2=A0=C2=A0 in 5.0s
-> > > > > >=20
-> > > > > > 2026-03-14 14:53:56 (49.3 MB/s) - =E2=80=98/dev/null=E2=80=99 s=
-aved
-> > > > > > [260080129]
-> > > > > >=20
-> > > > > > # wget -O /dev/null
-> > > > > > https://git.kernel.org/torvalds/t/linux-7.0-
-> > > > > > rc3.tar.gz
-> > > > > > --2026-03-14 14:53:58--
-> > > > > > https://git.kernel.org/torvalds/t/linux-7.0-
-> > > > > > rc3.tar.gz
-> > > > > > Resolving git.kernel.org
-> > > > > > (git.kernel.org)... 172.105.64.184,
-> > > > > > 2a01:7e01:e001:937:0:1991:8:25
-> > > > > > Connecting to git.kernel.org
-> > > > > > (git.kernel.org)|172.105.64.184|:443...
-> > > > > > failed: Connection timed out.
-> > > > > > Connecting to git.kernel.org
-> > > > > > (git.kernel.org)|
-> > > > > > 2a01:7e01:e001:937:0:1991:8:25|:443...
-> > > > > > failed: Network is unreachable.
-> > > > > >=20
-> > > > > > Before the 69894e5b4c5e ("netfilter: nft_connlimit: update
-> > > > > > the count
-> > > > > > if add was skipped") commit this worked.
-> > > > > >=20
-> > > > >=20
-> > > > > Thanks for the report. I have reproduced
-> > > > > this on upstream kernel. I am working on it.
-> > > > >=20
-> > > >=20
-> > > > This is what is happening:
-> > > >=20
-> > > > 1. The first connection is established and
-> > > > tracked, all good. When it finishes, it goes to
-> > > > TIME_WAIT state
-> > > > 2. The second connection is established, ct is
-> > > > confirmed since the beginning, skipping the
-> > > > tracking and calling a GC.
-> > > > 3. The previously tracked connection is cleaned
-> > > > up during GC as TIME_WAIT is considered closed.
-> > >=20
-> > > This is stupid.=C2=A0 The fix is to add --syn or use
-> > > OUTPUT.=C2=A0 Its not even clear to me what the user wants to achive
-> > > with this rule.
-> > >=20
-> >=20
-> > Yes, the ruleset shown does not make sense. Having said this, it
-> > could
-> > affect to a soft-limit scenario as the one described on the blamed
-> > commit..
->=20
-> Alejandro, can you describe what you would like to achieve with the
-> specific rule?=20
->=20
-> Regards,
-> Salvatore
+AI review says:
 
-The intended use of that rule was to prevent (limit) a single host from
-establishing too many TCP connections to given host (Denial of
-Service... particularly on streaming servers).
+Is the param struct initialized here? Looking at MXL862XX_API_READ(), it
+expands to mxl862xx_api_wrap() which writes the contents of the data buffer
+to firmware MDIO registers before sending the GET command. This would send
+uninitialized kernel stack data to the firmware hardware.
 
-I learnt about it in several IPtables guides/howtos (maaaany years
-ago!), and never was an issue on itself.
-Was it stupid? ... possibly... It 'seemed' to work, or, at least, when
-checking iptables -L -v one could see packet counter for the rule
-catching some traffic, without ever noticing it being troublesome, so,
-at the very least it 'didn't hurt', and, since DoS ever happened over
-the years...well, I tended to think it was indeed working the way I
-read it did.
+Every other MXL862XX_API_READ() call site in the driver uses a
+zero-initialized struct. For example, in mxl862xx_setup():
 
-Certainly, I never (the authors of those guides at their time indeed)
-though about the possibility of just target the TCP syn.
-I have given a try to adding the --syn option to the rule to see the
-difference, and well, it is way less disruptive that way, but it still
-breaks things (I saw postfix queues hanging, for instance).
+	struct mxl862xx_cfg cfg = {};
+	...
+	ret = MXL862XX_API_READ(priv, MXL862XX_COMMON_CFGGET, cfg);
 
-So, I have but screwed the idea of using connlimit anymore anyways.
-Sorry for the noise. Lesson learned.
+Should param be initialized with = {} here?
 
-Cheers!
 
