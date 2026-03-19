@@ -1,143 +1,167 @@
-Return-Path: <netdev+bounces-269468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269469-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WPMbNAQKvGkArgIAu9opvQ
-	(envelope-from <netdev+bounces-269468-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:36:52 +0100
+	id 0GMMM10KvGkArgIAu9opvQ
+	(envelope-from <netdev+bounces-269469-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:38:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 317E12CCF2D
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:36:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31F6E2CCFAE
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:38:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 09399314D596
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:33:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 548C7303AF33
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 14:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484913C1408;
-	Thu, 19 Mar 2026 14:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CB337AA85;
+	Thu, 19 Mar 2026 14:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="paZkKt05"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NpRLQu8l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039A83A7589
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 14:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800D52D4B40;
+	Thu, 19 Mar 2026 14:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773930803; cv=none; b=Rl/JomUXuQ9oCZqzgmNd+lboYrHZFZxz+mSnFwc7uXxrrbdlywOoE2bSP6EY7cjpE3XMu/2K+Wt1Hf79IPxkccynyLOO0/0JU9HKspcok8aB37JIXprHHriV/WCbaLJ8Giz+B0yUUD+wg/5j2W6GdPVq3pEbvKA9BYI5MqTKPPk=
+	t=1773931054; cv=none; b=VIlxOq5A9PsWyVnHLxbFgXyPbkHYEAqbIFZqe3Q5yccd5EFPLyS+u00/s51zMgWBvhLe1W+brtN2skQg0JMy4mZUJmkFOy3lJYpEb/g0Mg2AFlXdEcLrEA7v8sDXUfD8pJmruQ8dfY2zFOfRn0DI4kQ7crjkgxFFCvaJElS87SM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773930803; c=relaxed/simple;
-	bh=CUqfhEJRi2PChR2DmP6wNUXoON4jGbn9sMb3OgUY2KA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rAf10DGhIMDBctKzAMcAHBf0dHIjv0rQ/vTa9fK1KkCbddIx3oCBgthDZxoQmcGm6VxQzS5BwN/V6kE3siTlpZQ9cJg+D9pvgWFH5FPXYSAukt5xD+syxIVcpgx6Ps5l85duaZUOKPZQDw5c9htk/XCq/vt5+QGRZMyp/+7qm3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=paZkKt05; arc=none smtp.client-ip=209.85.218.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b97b6ccf166so108237966b.2
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 07:33:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773930800; x=1774535600; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WPdU0RGKwneFH7OF6wzVXdtsY6BXzcqmiGE7v4NtV4M=;
-        b=paZkKt05xAW/0vOCDwEL8inyjFInGqUxQqcWBo7SRG14qTPNl+6tqApOK7OF9Srh1m
-         XUzVgIuKD4vVOYA2Oejl7gOLoNSpN4Q7hT/COg0nmrNy53ktrHThg/oGM4SfmHKYq9r8
-         rTscKYuDbSqMK/j4xtgQNItWjd2P1Dscc5/ELULhbdbBpuJqmucQUHnA7B4y+ABLKQg5
-         xxX6kgDxaLqz4d/VHgMcWhFPGTENLiHf1m7go4oB/QZNLQmmUNch8X/CvfnJSIdTjqGS
-         Jv4yUS330FTXcm+RSadmvcIOihdyiCUbURyFipfVnJITZ47nVKBf22RJvU43F5syVMbz
-         sI+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773930800; x=1774535600;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WPdU0RGKwneFH7OF6wzVXdtsY6BXzcqmiGE7v4NtV4M=;
-        b=K4TNSgs4STGoeDqcQu+ITJIfp5jUVm2d1yx1FvnIILpPuCZUARZaTwF28OrgS3hZsq
-         gFPAiI18kn0ar8h/FoqhM7/B2Yk6JvaeuPFHX2IEmVbI2BHUlkubGQIR5BzJwP+pDQkz
-         c+0PkUCyuhuPoESVraR5UauNepMR3XPHX4hnFGpz/2VeV94IkHlKmiTLhY+b9SL5M2QJ
-         3SZAGkot0d3kZFV3hVHQsyvnFszStytVxyDoZK/V8Ce540RCwzgX8FDC79BfO6fTl725
-         63bLkgxN/yE1fgMSGziGs5Tq80G7zv4tgtNcZylLv6YD8VfDpO0YOVmaJjGylPQDN6ws
-         /qzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWkCONEmC07hCBLkY9bB7vWRoE5BQWWPn5AQX6xojgAlYH/biqE4YTgwNmOa8AX5OwvstY949w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/Cbk4MFBnD5jtSHa1h1/ubZ9Zpr6JxJx9oQJq/yI6kT6+2rmF
-	TUM2GStfgHvtr7t/wSDifpNfU3N+FtuH4c6xwZUavDdAmmz1loI6LkQ8n8ETPzDlyKluGkhhe5i
-	XQY+xXI7Z2V8G5w4F3Q==
-X-Received: from ejcdo3.prod.google.com ([2002:a17:906:c103:b0:b97:ccc1:b250])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:906:1d01:b0:b97:b9d5:4ae4 with SMTP id a640c23a62f3a-b97f48c3840mr428088066b.20.1773930800216;
- Thu, 19 Mar 2026 07:33:20 -0700 (PDT)
-Date: Thu, 19 Mar 2026 14:33:19 +0000
-In-Reply-To: <20260319121653.2975748-5-gary@kernel.org>
+	s=arc-20240116; t=1773931054; c=relaxed/simple;
+	bh=KLDhtxsHsK8rztqKAtAqMROmIfFr0P5kwaXY6DoAmsY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cbLrG/UpC3alPPj+5IHAnqZqB+RHJwW23mC5yfK/Mukv/Uj+LbDGOPVKnm4vNyO9h9+EGE9zAqOW5mK9qOwttTXSLpP1UTBlyEiNr1PajKu68L39/IgrZGUxfj0k8Go4DUxpjcUXInW3CdB57Ov/6f9IAkQvCXeGg8SgK6vYU3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NpRLQu8l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46C01C19424;
+	Thu, 19 Mar 2026 14:37:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773931054;
+	bh=KLDhtxsHsK8rztqKAtAqMROmIfFr0P5kwaXY6DoAmsY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NpRLQu8lLh5mgVxrGIq5qNOsH7ANyRHYIRnYo1YmESCVUnnBBcCR9Mi0p/tf7XxNs
+	 D3LrNInZhWa7j6aLAOqDUqy0HseKeaXPXOASXsuDPisTzcxtZyofvkZHNUWZgfkSvJ
+	 PBh23kpF9RDHhRtqv+t4kHkCH7sOtzU4U8dPesWJWHlu66+UjWwAOwYlDz2SHhmI4S
+	 qGeKyjJhfMUqpfghEcpQ/qzz3vZFdle7At8qkf9LFCZKRxheQamD6zFkIBD8VViVi1
+	 seG/T87aAQWxehb6O3OfoFmaRSvuGiPYGphZd3+5wjxai0kBgrTp7Qe8TiKzmHQU2m
+	 YRZN1lMY069Lw==
+Date: Thu, 19 Mar 2026 14:37:27 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+	linux@ew.tq-group.com
+Subject: Re: [PATCH 3/7] dt-bindings: net: ti: k3-am654-cpsw-nuss: Add
+ ti,j722s-cpsw-nuss compatible
+Message-ID: <20260319-embroider-cloud-0f8b7ea975eb@spud>
+References: <cover.1773751309.git.nora.schiffer@ew.tq-group.com>
+ <1382fed198246f1563dea091478757aebc4e4948.1773751309.git.nora.schiffer@ew.tq-group.com>
+ <20260318-sustained-reshuffle-eaf180729a9c@spud>
+ <37396c094c7124169ca376cf6aea5350971aec54.camel@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260319121653.2975748-1-gary@kernel.org> <20260319121653.2975748-5-gary@kernel.org>
-Message-ID: <abwJL2OTFzSFdVxt@google.com>
-Subject: Re: [PATCH v3 4/4] rust: make `build_assert` module the home of
- related macros
-From: Alice Ryhl <aliceryhl@google.com>
-To: Gary Guo <gary@garyguo.net>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Yury Norov <yury.norov@gmail.com>, 
-	Will Deacon <will@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Ingo Molnar <mingo@redhat.com>, 
-	Waiman Long <longman@redhat.com>, Tamir Duberstein <tamird@kernel.org>, Yury Norov <ynorov@nvidia.com>, 
-	rust-for-linux@vger.kernel.org, nouveau@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, 
-	driver-core@lists.linux.dev, netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-X-Spamd-Result: default: False [-0.16 / 15.00];
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="xd7J1FUbMSfddi+G"
+Content-Disposition: inline
+In-Reply-To: <37396c094c7124169ca376cf6aea5350971aec54.camel@ew.tq-group.com>
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269468-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269469-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,protonmail.com,umich.edu,nvidia.com,gmail.com,ffwll.ch,collabora.com,arm.com,infradead.org,redhat.com,vger.kernel.org,lists.freedesktop.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.966];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.517];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,garyguo.net:email]
-X-Rspamd-Queue-Id: 317E12CCF2D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tq-group.com:email]
+X-Rspamd-Queue-Id: 31F6E2CCFAE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 19, 2026 at 12:16:48PM +0000, Gary Guo wrote:
-> From: Gary Guo <gary@garyguo.net>
-> 
-> Given the macro scoping rules, all macros are rendered 3 times, in the
-> module, in the top-level of kernel crate, and in the prelude.
-> 
-> Add `#[doc(no_inline)]` to the prelude so it just shows up as re-export.
-> Add `#[doc(hidden)]` to the macro definition and `#[doc(inline)]` to the
-> re-export inside `build_assert` module so the top-level items are hidden.
-> 
-> Signed-off-by: Gary Guo <gary@garyguo.net>
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+--xd7J1FUbMSfddi+G
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Mar 19, 2026 at 09:55:24AM +0100, Nora Schiffer wrote:
+> On Wed, 2026-03-18 at 17:35 +0000, Conor Dooley wrote:
+> > On Wed, Mar 18, 2026 at 03:05:25PM +0100, Nora Schiffer wrote:
+> > > The J722S CPSW3G is mostly identical to the AM64's, but additionally
+> > > supports SGMII.
+> > >=20
+> > > Signed-off-by: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+> > > ---
+> > >  Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml | 1=
+ +
+> > >  1 file changed, 1 insertion(+)
+> > >=20
+> > > diff --git a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-n=
+uss.yaml b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+> > > index a959c1d7e643a..9ab8237c7f79e 100644
+> > > --- a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+> > > @@ -59,6 +59,7 @@ properties:
+> > >        - ti,j7200-cpswxg-nuss
+> > >        - ti,j721e-cpsw-nuss
+> > >        - ti,j721e-cpswxg-nuss
+> > > +      - ti,j722s-cpsw-nuss
+> >=20
+> > For all these bindings, why is a fallback not suitable? Seems like it'd
+> > be possible here, since there's just a new feature. Is there some other
+> > programming model difference?
+>=20
+> I think a fallback makes sense, I didn't add one because other variants d=
+erived
+> from the AM64 don't have one either. I can include a fallback in v2 (for =
+all 3
+> bindings in this series).
+
+Unless someones got a good reason not to, I think you should do so.
+
+--xd7J1FUbMSfddi+G
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCabwKJwAKCRB4tDGHoIJi
+0mZPAQDOmTS3hQH1+4EWz3iVgYp6/DejsN7lwqlJyuo0AsAX4AEApNRPLGqBM0jO
+szx8cd91ntJY8h7pt4Fw5f8sH3YbFA8=
+=r2h7
+-----END PGP SIGNATURE-----
+
+--xd7J1FUbMSfddi+G--
 
