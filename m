@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-269521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269522-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNSmEREgvGnQswIAu9opvQ
-	(envelope-from <netdev+bounces-269521-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:10:57 +0100
+	id YJo3AGUhvGnQswIAu9opvQ
+	(envelope-from <netdev+bounces-269522-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:16:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 945A02CE782
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:10:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C30A2CE954
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:16:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8310832C40D5
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:04:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 195FF31F6866
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:04:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B8883E3C71;
-	Thu, 19 Mar 2026 16:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06D93E929B;
+	Thu, 19 Mar 2026 16:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="gz31hwCC"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Xh/rPwNg"
 X-Original-To: netdev@vger.kernel.org
 Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013064.outbound.protection.outlook.com [52.101.72.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8064C3DBD6B;
-	Thu, 19 Mar 2026 16:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857D83E3D86;
+	Thu, 19 Mar 2026 16:04:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.64
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773936262; cv=fail; b=hKj+YPd5nMLMikZv1R0b9fWM6ualLX6Bp6FN82lNvUGTPUi/GdPuHfPIcrNPgUM0TKMogQhzCiNt/b/XRK8i6TXYPWOs+T0e3d0/3Yqei1iGDQIu2UiVQnh19wxVUI86nOk1qrlfP5Djau4XLaZcSf7Ht+ef5VqYlARDqxELjRA=
+	t=1773936263; cv=fail; b=lWqnSuEjv/3V/ynr45TKRGxu+Qx33ArMxCdBU1dd68euyP52aWYxbOS2lrd8KDchQHDFx66ZNeHTGCdmQpH4ZH/oDfKEO5XVEHswL3rY5xK4qaH8THrh14m01cs4ULP5ktON5YcGT1xI+8G9ihmD5FR/2RNu23PiqeAE8qUCRL4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773936262; c=relaxed/simple;
-	bh=WhmhmCtHt8MdycW9yMxwmhDoa5HFAxlFfLwqO06HuYI=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=ZXISBqbqkkYM+67IKEdAJ2QMZv3M4ELxSmYIRvllIxvhOkTV+TmGucCRay/Z/TrodxlCNQ/4UjaeFMTfDt9HmkutzCGxtDG0iocoZ2QxvD6lQkgAkmyKRzm69XV7jIL0zl9jpwoKTF6AhdGSvwzjRyrNmC+xrHWwK/xzhrHDgoc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=gz31hwCC; arc=fail smtp.client-ip=52.101.72.64
+	s=arc-20240116; t=1773936263; c=relaxed/simple;
+	bh=9uLu0RGKc1rOujloirBU2FePYsRg6l0u7Db5mnLnDsE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=cY/hHVELeufpZWEsEFLyY2y6pZZIPRRPfz5wpwbPfG6iWpAw8RJeV6ZijFpw9fWRUF4qJDg3XNRgP/OE2zypZufRPYHQVyDZMcx7UaivfqXkfB/TZZPAhrOzE7fGsTDIewpBe/VWEGD7WplDLuZizjaeZyX1cQwXiSCvipAE4Vo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Xh/rPwNg; arc=fail smtp.client-ip=52.101.72.64
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VZhYWMIVZBLCSZNnLElYU6HXuvqBjFCG5OfqgyHLj77Kc84CP0XGZThVoAL3KGIhAvGPW88tNlnRPFIZy1MIe0mnN1ft0RYhOZJ3JyxMqtIfgrLoOtfE3e9DJ+dDFIEpb/ztdjegiZELLFYNBu4sKH4Rz7kmICTI/m9RAj59P5sIoBY4KQ59jVQfIULBUXqN0uwxz1cnVJ6TPf5xGjXHzKIoCIhL34AXrs/BoDktsxmPLSM22btbEhSz0tWutr7CTShGClYDQgZ+bvvCQiRFLnkv378ymz6Dki0NgetSuXiRoS16e0xMogVa3aBqGeKhl/uis09ZXiHNGJr4OUzbVg==
+ b=j8C2kjQcel37pC+ny4eIW5hzdR+OkH1lcx1RdjNhbZTlYY15bkJ5/7qL7FSFQcIjSx7pTbVIAxKV7SIh0wSYOLYF95vDtHE5WQPdP949AdNXbJ37k+UcZSl/yCwz6BQyv2hBzPkhtAuYzikl0LPO3P13pYmrT8+iXXAhhdMq7TowpHTd3x2nkoahMrNe2aTleQvEBpPo4UynLvpnyGZj9ULa5BOed7vIaZ9WVoTHrpqWNbgdVare/p/8Xl4VttMa9rkj2sFh3YvI/GCgt65TO0RSztrJqzoXWQYq1EYaAlBPmx3Ev8F5Mez/p6U4l/y8qpAVU7PBOchQhmn0S/9QXQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HI+TH4Ggitsc0ZelXTv2W+1dOFxo3esByVaLY8d5hkE=;
- b=ETqFLvVvBmC6mML8mUUeKAKClU6V7DvDGjTiBPt+sSyweyf6eqr7orxOPfOuR5o/6WPa/1qzaC/TbmbYJmtU/Ilc8Tk2mOyFF+Qwdh1kvaQWbNqGazHZhBWTYNYPP5c8CvMsKnZib5R71zfWc5r+Oq/wP25/LOidsuPBzp5PPe91FLV3k51xGWwsJppoPFfmSnaI3aXfUPl5VE1gKrPmoo3xtyPYUGMRJmmPHjAdel4Ixiod/swniWzfWLvfA8gHp0iLbQeFI37ZtjgxiX+Eplb1Oxm12o2aGpT4A8G3V6ypEK4wTBCvHj/faw+LeCkzSBj+wSB1TENQbI8WKnC5UA==
+ bh=TUJEJ3HZy5sK1yyEW0dEFrsS9PCtkAVaKHw9vYStkYU=;
+ b=Xl4nDByQxVjlDg7F8Q38PXshv4Y4vVys/84J7jpJhMdegbXT+mbqDAn0FdhPfk0zPzZIqfcMqZXZO3T3DygPLWMJpGydjGkq7SG7Gl5o0SKQqpF28j1Ve+OHdYBnadtQuN+srSCgzfknZMiDt5qCDtSqSDzodx3qkwa+iUtMEwU67JMW4/pgRZnA+0ylnHWsNiO3RFSaZeol1ZQMMy6fBX4XU/iAINHvDm0doHz80mMQa8KL9jZxLDKVSpMRsYUJ0hKToSXyGiQVQ7jXmg7GvMKNZlyUz5/Gu94wv1L7NF6CJ7Gafz6r8Cjmng7LkTDWE+fDzdOl2ABw8cdkQelAOw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HI+TH4Ggitsc0ZelXTv2W+1dOFxo3esByVaLY8d5hkE=;
- b=gz31hwCCM3e2Mi6E5fnqwon4pf1vS7mQCvaP8d+S5kuQ8E2iB29friBwYuz/5tkUFySwWopX4UInt2UASLWbZDrtlCQn4yobclo4Eb8qtapFcGGlwvzjNZi+L0odTpdVTOwhD7TiwC3n7/n9fxgRyDtcE0Ki2BUwUUFyfphnkIg65fK5CinryWvRbl6h9BeM1O3PvaAw/hjpC4TpovggChl94M/2L8CO3HImHnZuAARJCAt6ijH2YqaxjbexDQsj6F1hQNvUxL4vG1Sw6LbDjc9reY8m2FimiHs7nGGbwv4GXb9+DFVLzTvdPvWbLOXzz5he/LfILKw8AO66BuOt9A==
+ bh=TUJEJ3HZy5sK1yyEW0dEFrsS9PCtkAVaKHw9vYStkYU=;
+ b=Xh/rPwNga8gFAa27U8ca3tdxDMqmw4qetFnKsuyQnacU5/vQuFCXVr5hQ7mecuIzuaiUNj2NGqc0hucQngnfoOts95cA/SI2TmSECeRJDR2AHy3vDxaV/1s2130ZdPhXgVXOUBoSLjXATuu6z+1prvxf1IXQVsvyzTWA2KR9/LzWYThzrEZ3/LfnFF9ep4XHlp4Dnfpinh8HppNtiXyM5wwMQEIsUViPOPhUiDdpZNmxsfRsVN9nIV8lV4esHSSjf6syZpKHav1lLK7bPGQdyIugfK7dw2VsoX4wlAmUErdkDw8RgU6xXdNNXTctcYGOX7M9VgCn/cRHUekVVpLAuA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
  by AM9PR04MB7505.eurprd04.prod.outlook.com (2603:10a6:20b:285::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Thu, 19 Mar
- 2026 16:04:12 +0000
+ 2026 16:04:13 +0000
 Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
  ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
  ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9723.018; Thu, 19 Mar 2026
- 16:04:16 +0000
+ 16:04:19 +0000
 From: Ioana Ciornei <ioana.ciornei@nxp.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -69,14 +70,16 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	linux-kernel@vger.kernel.org,
 	petrm@nvidia.com,
 	willemb@google.com
-Subject: [PATCH net-next v3 0/9] selftests: drivers: bash support for remote traffic generators
-Date: Thu, 19 Mar 2026 18:04:01 +0200
-Message-Id: <20260319160410.2515105-1-ioana.ciornei@nxp.com>
+Subject: [PATCH net-next v3 1/9] selftests: forwarding: extend ethtool_std_stats_get with pause statistics
+Date: Thu, 19 Mar 2026 18:04:02 +0200
+Message-Id: <20260319160410.2515105-2-ioana.ciornei@nxp.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260319160410.2515105-1-ioana.ciornei@nxp.com>
+References: <20260319160410.2515105-1-ioana.ciornei@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: FR4P281CA0344.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:ea::7) To PAXPR04MB8253.eurprd04.prod.outlook.com
+X-ClientProxiedBy: FR4P281CA0342.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:ea::20) To PAXPR04MB8253.eurprd04.prod.outlook.com
  (2603:10a6:102:1bf::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,57 +89,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|AM9PR04MB7505:EE_
-X-MS-Office365-Filtering-Correlation-Id: 20c2ea91-41a2-4fd7-741d-08de85d12bfd
+X-MS-Office365-Filtering-Correlation-Id: edac44c0-4b4a-4c32-b9bc-08de85d12d86
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|19092799006|366016|1800799024|7416014|376014|18002099003|56012099003;
+	BCL:0;ARA:13230040|19092799006|366016|1800799024|7416014|376014|18002099003|22082099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	t+RCwtAqjMaEvR6+9VPeDsefW8Dhe9d4sjGj6+bTPuV/W/DtoX1GUkRpvlB6S6TuwoXIf5Zh91vPkqEt+fK6Lj/tj8ZdnpgKyONKrOJLAy84mo2AatkqqCQmnnMa4xS4g+FlGscj4QrnFH9TJQVrKv2euC3MvKKS8yFyp/Mdiy9xAvG5120cCT2JNa3Ci+UppJ6qA6fPfS0aEvHbgl0e4NXM+7AnIWS48LxsoL5er4DohZPQ4rNLkB03ph1XTOJeypqwBMIokrz0ZwINLWqrWaGfcLm1nqh0FmUIGlYBRgV/DET9c9N/PP+FzSKEAMtkLadTtTzpysnoOg7XXxXDU/+QUKgBDS1ejM/eMuxwB7yr9GZbeL+Q75T/XiFnUzi4Vd3OH71fzuCXwZDP7CtXBFfg1BxI95ZGljmRkZmYMyJcfWvQd72tohsllXxZZ8Xzs6FK/jwwkeYatzjbzj0wYn12xGw3JfiY32VV4FnxEbiE7YUvqHZS8DNiLrk6ldnmWdgOg8ZbtNmEkJG7M1Nm2LsqzXdpPZXxoT9VwpvDs7UNxJq6mYAsIZsDwx6cqovLeLwN0wZoMtqZIrlXAUpO5JVuZ0zu12YuSppeZcBet8EwylmW7dIP2z7PKSWtiAEZbyjNREnfS5hhzM45kat8brCL6wYx1xSs35rAqj2Ky1DdBaz+6+1Tvgmi1ZzjAURZfGftFhMszFBctQUCqIHtimW7jOzwTExlKNUck4IWZ2S4yKOFHRGYAof0WRyBaX3B
+	bkIkj+lyRJmgIRQSWaQ3F0pis+CQaGbAMvnAsVElHVuWM97p1scFkerYtkjq4lGO1J+iUeApxs0KkdFe56OZ2sSLHBvGRk2uYd0GSUlSrRKz0O96A27ioQnlgGXw9PG2pETgtRFNH1iokD9NleAQxUaLItMxQC/P4JdpsMjB/MKZw07+iqs+8FP9vt9a/oltLTLvgc7m1lEaL1J17UbRVWQH43MIuD34Z1b6ntknT5tEQJ1kc+I/zD9oYivWoZFoiLvhrtuKdDXVpEhrGiZKVtcph34a9fErGw5wCXVVPxydrRSOG/ysmBWVxkrHKvUK4T2g6Od2mJXK1NsDZvMhbUrjaHFoloxiEAszCWIB4rc9GvKfr2XJZe1AVboZpNedCnwmM0rQcsoFOcR7iayaasbvhKC67UGhfixD3w3MRwgLN/iD+SCmcX1jHX6KM6lrxZtCNvFiqsDFyW7wZVkWBwtJJsYnEtV5gOdAMnGveytktUl/17Sm/o0zUtiFM6eVwH5zU6Yc9sLlpl8J4BTFZXWHgfaLBZ8lpRe7/IBEszy6hSd2eNhINP1Es2ca6vlrExEVjzXrdkQHrjx5iJb65TBglj+J4izEFW2pDdr5dd7DO+4DAKXcBngy42z+SSb2I5NC6a/Nmj6CkuhWpE0nZx2gZ/nIpocR0gy2PDr1K9c3g7IqB1CK6h9dZ6v/3erCWjJXUAhjKyMPM0JR7KD71KCb6FENEjt+8SwYC9Utlao=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(366016)(1800799024)(7416014)(376014)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(366016)(1800799024)(7416014)(376014)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?xmFKbyzfZuC/8JSCyJ+FuAsXL0QS7lr/RiWSRImNL/RJVHoRj4eAIcpn1yvg?=
- =?us-ascii?Q?6TT/LgZh1d7sraGXiYCM9P8vDeDJzGQdRqUHrCbcG+r9T/Sh/XWabuR5++ZM?=
- =?us-ascii?Q?Gg5uaYEd+zKSkm0TIFSGEogDHz18uhEoV5kSHFQh3BCLvl/Ro+ZmA8P7oY6L?=
- =?us-ascii?Q?2fG9xcDp0sWZZK4xv/PZDMrslKqthLgwFUlkLRLzjo86EFpX+it5TxFhO8fa?=
- =?us-ascii?Q?yDJa01OwTcIOTLmQCyDVUxGJO2tbXRFWz0eXgp30VHXiEnq8dgepcYwgGqu/?=
- =?us-ascii?Q?lPJEreSJo9ACzt5xY4NRSevnrkwBC/45B6SVBWCoULpnXJB+75sr16iPj2ZZ?=
- =?us-ascii?Q?WCdahFKS6NRuHJI3Jshpea+hnV8ZabKf8q6knbmJDmPbkNVeki982U69CpM/?=
- =?us-ascii?Q?OZgCrv+pRGR3lY0zoLP+ATWnlcgL7QZY3xiWybyLwvywnsKvCUeupmEp8mLb?=
- =?us-ascii?Q?2GJ8N5liH5J7kvzRDnL0/j8W8L/opMyIzN6TUSGY93TQMm9grZBNLEjZdrKl?=
- =?us-ascii?Q?S1eOWYheq4UlXVbBZ+PalZMMf9K/jkA9KIDf6+Zh79m8+MCuu17USpHZJdpQ?=
- =?us-ascii?Q?hZ/4hGgaF/TlDb4Ce9o1EmUm5p/cl7PIn2DAyA607NEOT+rO12EHpUJEmJzm?=
- =?us-ascii?Q?KWy0sASi2NlDVmUq+vZDOa5xD4F30D4cdFnbJFt/JoSr5vGPP+r9GeVCRvO2?=
- =?us-ascii?Q?zHIMrgWoYq6qL2UWbEPAXIHj/vNjULJ1YHIT91QbJaftwSALI/oW+lNLq+zy?=
- =?us-ascii?Q?Crz3Z6D0zJposnZKzuiPUdhLIy19Bv2FRIuiR3CMMjsHGHBJHQYPS153jZl1?=
- =?us-ascii?Q?XbyJnA6zFcTVF7yjZDQS3k5rQOXmWCxTOHU3nn3mHZY44RNpZK2yhomGKpPA?=
- =?us-ascii?Q?bIcfmbcFvI8JgZMKawvKe0mn7mvQjC0nq2w42Xjt0PnFEupsaMTE2RSLN7uF?=
- =?us-ascii?Q?QTCpePYoG4iApZvS/WR+UsveyM0xvmd6H1ui4v5Yd/XQTC29RdV6lbnFLFZT?=
- =?us-ascii?Q?P6seEVyTisx5jJS6balVBI4/3EZOjiohpfbbzeWv/zjWn0FIQU9XEn17i3bw?=
- =?us-ascii?Q?mlQzOvlSQFFDmY7JY06IHQB3AQHW6Bg9Z0IDufnAD74oKTZ02zj8FraRSyW3?=
- =?us-ascii?Q?Ke1yazvfjSXw7ttgl9kp/TvPtvXlYiFXK7OZqlZxZO1qvetERNgeKHD73Ylm?=
- =?us-ascii?Q?lyFihEVDrJbCvAHngHF1Lp0wmMX0Vcf+IPJugGWSqpqp9Mlzv6s9w7yz+Z4n?=
- =?us-ascii?Q?tTnO3PJiehSl2AJJQfFbEpVLROgBSSZKYauoeP3pHFtcWPEKG4J6KHZWtHlL?=
- =?us-ascii?Q?L4pXygZFCuxWsJle7Ph92SEF0/Q0JiveiFDpQQJiwOnsb/X8NBU36IQ34g6l?=
- =?us-ascii?Q?A9wcm1KjyUNIjnNMHolfu1zqets/7scs7Yc9n0Mcmhs4wEoP2BH7nq6sl1bj?=
- =?us-ascii?Q?IIXhCBVHLzkV750SkteSKmdD/AJneotYAYMO8PKeN1i+tjPm7/qXA4VGB/S/?=
- =?us-ascii?Q?gPAHDyOqal3IeWl4k/aRuaC0k6nCLZRTflkl6NprEtk3vO3PjaqkbC59Xs/j?=
- =?us-ascii?Q?E9foPqZ7R/WaH+6aiTvC0djXzSfiU8h6Q27YRDyLhuNHbwzw/ocNiN9ejggP?=
- =?us-ascii?Q?Q251wm/qnM937nVLVRwXYg1fwdj5VbAQWBHeo9bK88bsI21um6gC3fgWDFKE?=
- =?us-ascii?Q?9M6GjjuABfb0i7rsSg8VKXOQP08dfJQP6kxQqYV/CMLQcmjIMqS7KcCGK5F7?=
- =?us-ascii?Q?YSidP84q6A=3D=3D?=
+	=?us-ascii?Q?khl+edEhceo7s26lCbDu34qtKA3QrVAQUXhRcJ+dDQPVt2Kpu43bQx2mOuPr?=
+ =?us-ascii?Q?zbh/XbxZneCBx0pZfRb5w64DVwTXV7MJ8FSgl0i1iOzrUaRjamuRxkbKrUZT?=
+ =?us-ascii?Q?Nxpq12ONshAlooGwK8YiQW7PZRV8JPmvafcVuL0fBgoDkzDl+Mja8iFsjupf?=
+ =?us-ascii?Q?1ZWi/dkPzWCVd3CEaJcRnCTzY1M/tpzFOS8rR6jWGd/07TFKf1vYQ2wEJ1yw?=
+ =?us-ascii?Q?Ef3iHHj6iNVn9SUHKgqKGpNHTw6gmYULPCCUlURK8ZFo2QNDyKYWA36b4isV?=
+ =?us-ascii?Q?221dZbZOULWnwDv1JX4njgnVU3Gn4DCl/ubQNGWvnLz5o8Y7+QvUlnW0gEN0?=
+ =?us-ascii?Q?ti3WzrAKtOFOEaxsma7rdKsqmkuMzDJJLZd71cta1/KDARK8K8wwPzyIWz9v?=
+ =?us-ascii?Q?sMEhhCqXQ6GYFi5i1HOrrm5StC+I1xNjE911TnbwZqU2Ck8h2W22I0gw50lL?=
+ =?us-ascii?Q?ON6/78z5geR3vQFd4QCcldwhBLWncJqFLxNGYHt9djzDtvtsaHA4tbu+E9XO?=
+ =?us-ascii?Q?mM+PtTgm6DNiIcLw3OXxEnB14mGmNr/xCv47VZ0D0K2Tr7ORkz9xmejKBHrK?=
+ =?us-ascii?Q?geRw+hfqEp4i+iX52ZZEWv6eth4aLLW5Hk62JUe+iG6ykKn/pvlD46Uuo+ye?=
+ =?us-ascii?Q?96dy/f8ZBTl93RD8vUJuuJdKNAHjFjNrw2er/Ai3eJLDPb2D9PaRKMv/oCb7?=
+ =?us-ascii?Q?SXQlSE/Y06j1UqgXqOrED+ErzAD+HYl2Zl7f2HExpnkVvV82iUAs4Zz5+KK9?=
+ =?us-ascii?Q?ledr+yMJOwX5hxE1TcuIQPg/rnJxnkA6BIjgSvl353JBGBYtMvV6g1sogDl6?=
+ =?us-ascii?Q?SGgJLXVmd00+lqguhwsrKm2n2SKc317gLFcmGoIFCSwV8C+QUt9pocyiqIEa?=
+ =?us-ascii?Q?d9htJow7lAJLEHQGgJxY8TOeEXrzD35+ZLPaPavFR1YBXwupGznnaIfNMhu8?=
+ =?us-ascii?Q?czWbGu8sRlLGZpAnPvblf3comtZHPb5GE33NZV9oM3VAiAJqNY8WUhduU4f0?=
+ =?us-ascii?Q?MIw+2S0Vm+mUNWrMLdXZNo5YaUleiQsuoYf6cZj1Oi9LTWDYTcnU3zFlbcfM?=
+ =?us-ascii?Q?oUtORbvjT9NeMhYFCcFNGsoexfmfPJt444EpE6tGlZG5LP3UjFqREhgZqcSp?=
+ =?us-ascii?Q?p+xZZoTfz9im3HYkXMbdkBb9ZaBYA6yaRt9FgtR32R6dtLEaA+iBl89QB1Gl?=
+ =?us-ascii?Q?Isf+tdgiIi1YpDDRLiaBcTUwn1GElXYRxOP1FasdQw1PdDfoYDVGmm3a2UMl?=
+ =?us-ascii?Q?68fMftd8dQWVYxfqlwA2fR7NgyjVI4CVy0HNsD/UNfeFWxaP/VkFdMasL0De?=
+ =?us-ascii?Q?rJKBEnBs8HkLUKxRtq1nqYFJ3kFXMEpEKvZRV/FKnri3g9ciTIRDVkI2zHRW?=
+ =?us-ascii?Q?/+7KUgxwASEOtzcoHjZgToRKsFI5iDCWZifsshTNNMJveDod6tcMN5wqHHDN?=
+ =?us-ascii?Q?vxw8Gxl4o+9BuXlSXGvbviHyFOuku7lAk8+lGY+3AT+XSeIcBQ/MkFNFNXAd?=
+ =?us-ascii?Q?gcFZKq2bDQvkvq0NpqdB/5thcMMuBjp4Pgc7KRvm6+wT5/ufaEuC1fEh0YZw?=
+ =?us-ascii?Q?2QgRUVwMWArK02/3FE7z6HsR7j9mlrf4puN+u4GEZ9Z3otXPjAzMC2dPt8xf?=
+ =?us-ascii?Q?cWCxmuu0cjolAEjOQuMtjn9Uea0u7U++eRpNqsIeLQvfkfledJixl1L84Oy8?=
+ =?us-ascii?Q?llbaeeiU6kAeAvu/UItdeLMfYnz7QhAhv6yY1l5uGqqzCDjMc9/W+kQ9D6pq?=
+ =?us-ascii?Q?n010JpOFVg=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 20c2ea91-41a2-4fd7-741d-08de85d12bfd
+X-MS-Exchange-CrossTenant-Network-Message-Id: edac44c0-4b4a-4c32-b9bc-08de85d12d86
 X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2026 16:04:16.8696
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2026 16:04:19.3299
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hsu23TRUmCTmpwF5coe589saog1LtJZywaMlrmghNsizNX1oT+3bocZLM8fg8/IENGfwa3jHdibq89eqMws0TA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: M/Tkr6c14FzwFWvr+GJ79a19S21z9y8Rw6j2WbnuCtKL2RSpeCjGsFjxsLnnKo7BxsSE5YJcxYxw+F8+W8PuoA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7505
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -150,7 +153,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-269521-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269522-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[nxp.com:+];
@@ -162,186 +165,50 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.962];
+	NEURAL_HAM(-0.00)[-0.974];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ethtool_std_stats.sh:url,lib.sh:url,run_kselftest.sh:url]
-X-Rspamd-Queue-Id: 945A02CE782
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,nxp.com:email,nxp.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9C30A2CE954
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This patch set aims to add the necessary support so that bash written
-selftests are also able to easily run with a remote traffic generator
-system, either be it in another netns or one accessible through ssh.
+Even though pause frame statistics are not exported through the same
+ethtool command, there is no point in adding another helper just for
+them. Extent the ethtool_std_stats_get() function so that we are able to
+interrogate using the same helper all the standard statistics.
 
-This patch set is a result of the discussion from v1:
-https://lore.kernel.org/all/20260303084330.340b6459@kernel.org/
-Even though the python infrastructure is already established, some
-things are easier in bash and it would be a shame to leave behind the
-bash tests that we already have. Version 1 of this patch set also had
-patches exporting standard statistics in the dpaa2 drivers. Those
-patches will be submitted separately so that they do not depend on this
-set.
+And since we are touching the else case, convert that as well to the jq
+--arg form in order to be easier to read.
 
-This support is based on the requirements described in the
-tools/testing/selftests/drivers/net/README.rst file.
-
-Mainly, the drivers/net selftests should be able to run on a interface
-specified through the NETIF env variable. On top of that, variables such
-as REMOTE_TYPE and REMOTE_ARGS define how the remote traffic generator
-can be accessed. Patch 2/9 parses these env variables and constructs the
-NETIFS array that bash tests are accustomed to. This is with the
-intention of enabling already written tests to incur minimal changes.
-
-The second patch also defines the TARGETS array which will hold the
-necessary information about the target on which a specific interface
-is located.
-
-For example, a net.config which looks like below:
-	NETIF=eth0
-	LOCAL_V4=192.168.1.1
-	REMOTE_V4=192.168.1.2
-	REMOTE_TYPE=ssh
-	REMOTE_ARGS=root@192.168.1.2
-
-will generate the NETIFS and TARGETS arrays with the following data.
-
-	NETIFS[p1]="eth0"
-	NETIFS[p2]="eth2"
-
-	TARGETS[eth0]="local:"
-	TARGETS[eth2]="ssh:root@192.168.1.2"
-
-The above will be true if on the remote target, the interface which has
-the 192.168.1.2 address is named eth2.
-
-The values held in the TARGETS array will be used by the new 'run_on'
-helper added in patch 3/9 to know how to run a specific command, on the
-local system, on another netns or by using ssh. Patch 4/9 updates some
-helpers to use run_on so that, for example, lib.sh is able to ensure
-stable MAC addresses even with the remote interface located in another
-netns.
-
-The next 4 patches, 4/9-8/9 update the ethtool_rmon.sh script so that it
-can work with the kselftest infrastructure and the new
-NETIF/REMOTE_TYPE etc way of working. Beside updating each ip link or
-ethtool command to use the run_on helper, the patches also remove any
-testing done on the remote interface.
-
-The last patch adds a new test which checks the standard counters -
-eth-ctrl, eth-mac and pause - and uses the new infrastructure put in
-place by the first patches.
-
-With this patch set, both tests can be run using a net.config file and
-run_kselftest.sh as shown below.
-
- $ make -C tools/testing/selftests/ TARGETS="drivers/net drivers/net/hw" \
- install INSTALL_PATH=/tmp/ksft-net-drv
- $ cd /tmp/ksft-net-drv/
- $ cat > ./drivers/net/net.config <<EOF
- NETIF=endpmac17
- LOCAL_V4=17.0.0.1
- REMOTE_V4=17.0.0.2
- REMOTE_TYPE=ssh
- REMOTE_ARGS=root@192.168.5.200
- EOF
-
- $ ./run_kselftest.sh -t drivers/net/hw:ethtool_rmon.sh
- TAP version 13
- 1..1
- # timeout set to 0
- # selftests: drivers/net/hw: ethtool_rmon.sh
- # TEST: rx-pkts64to64 on endpmac17                                    [ OK ]
- # TEST: rx-pkts65to127 on endpmac17                                   [ OK ]
- # TEST: rx-pkts128to255 on endpmac17                                  [ OK ]
- # TEST: rx-pkts256to511 on endpmac17                                  [ OK ]
- # TEST: rx-pkts512to1023 on endpmac17                                 [ OK ]
- # TEST: rx-pkts1024to1518 on endpmac17                                [ OK ]
- # TEST: rx-pkts1519to10240 on endpmac17                               [ OK ]
- # TEST: tx-pkts64to64 on endpmac17                                    [ OK ]
- # TEST: tx-pkts65to127 on endpmac17                                   [ OK ]
- # TEST: tx-pkts128to255 on endpmac17                                  [ OK ]
- # TEST: tx-pkts256to511 on endpmac17                                  [ OK ]
- # TEST: tx-pkts512to1023 on endpmac17                                 [ OK ]
- # TEST: tx-pkts1024to1518 on endpmac17                                [ OK ]
- # TEST: tx-pkts1519to10240 on endpmac17                               [ OK ]
- ok 1 selftests: drivers/net/hw: ethtool_rmon.sh
-
- $ ./run_kselftest.sh -t drivers/net/hw:ethtool_std_stats.sh
- TAP version 13
- 1..1
- # timeout set to 0
- # selftests: drivers/net/hw: ethtool_std_stats.sh
- # TEST: eth-ctrl-MACControlFramesTransmitted on endpmac17             [ OK ]
- # TEST: eth-ctrl-MACControlFramesReceived on endpmac17                [ OK ]
- # TEST: eth-mac-FrameCheckSequenceErrors on endpmac17                 [ OK ]
- # TEST: eth-mac-AlignmentErrors on endpmac17                          [ OK ]
- # TEST: eth-mac-FramesLostDueToIntMACXmitError on endpmac17           [ OK ]
- # TEST: eth-mac-CarrierSenseErrors on endpmac17 (not supported)       [SKIP]
- # TEST: eth-mac-FramesLostDueToIntMACRcvError on endpmac17            [ OK ]
- # TEST: eth-mac-InRangeLengthErrors on endpmac17 (not supported)      [SKIP]
- # TEST: eth-mac-OutOfRangeLengthField on endpmac17 (not supported)    [SKIP]
- # TEST: eth-mac-FrameTooLongErrors on endpmac17 (not supported)       [SKIP]
- # TEST: eth-mac-FramesAbortedDueToXSColls on endpmac17 (not supported)  [SKIP]
- # TEST: eth-mac-SingleCollisionFrames on endpmac17 (not supported)    [SKIP]
- # TEST: eth-mac-MultipleCollisionFrames on endpmac17 (not supported)  [SKIP]
- # TEST: eth-mac-FramesWithDeferredXmissions on endpmac17 (not supported)  [SKIP]
- # TEST: eth-mac-LateCollisions on endpmac17 (not supported)           [SKIP]
- # TEST: eth-mac-FramesWithExcessiveDeferral on endpmac17 (not supported)  [SKIP]
- # TEST: eth-mac-BroadcastFramesXmittedOK on endpmac17                 [ OK ]
- # TEST: eth-mac-OctetsTransmittedOK on endpmac17                      [ OK ]
- # TEST: eth-mac-BroadcastFramesReceivedOK on endpmac17                [ OK ]
- # TEST: eth-mac-OctetsReceivedOK on endpmac17                         [ OK ]
- # TEST: eth-mac-FramesTransmittedOK on endpmac17                      [ OK ]
- # TEST: eth-mac-MulticastFramesXmittedOK on endpmac17                 [ OK ]
- # TEST: eth-mac-FramesReceivedOK on endpmac17                         [ OK ]
- # TEST: eth-mac-MulticastFramesReceivedOK on endpmac17                [ OK ]
- # TEST: pause-tx_pause_frames on endpmac17                            [ OK ]
- # TEST: pause-rx_pause_frames on endpmac17                            [ OK ]
- ok 1 selftests: drivers/net/hw: ethtool_std_stats.sh # SKIP
-
+Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
+---
 Changes in v3:
-- Change the TARGET variable into CUR_TARGET
-- Always fallback on running a command locally when either TARGETS is
-  not declared or there is no entry for a specific interface
-- Swap patches 2 & 3 between them so that the run_cmd used in now patch
-  #2 is defined in patch #2
-- Add some more double quoting
-
+- none
 Changes in v2:
-- 1/9: Convert jq to the --arg usage form
-- Patches 2/9-8/9 are new in this version
-- 9/9: Use the new run_on helper
-- 9/9: No longer checking that each counter has a 1% tolerance against the
-  target. The only upper limit is UINT32_MAX.
-- 9/9: Check that both the error counters and the collision related ones are
-  zero since this is the most probable scenario (we don't expect errors
-  with the traffic that we are sending).
-- 9/9: Removed any checks performed on the remot interface counters since
-  that is being used only as a traffic generator.
+- convert jq to the --arg usage form
 
-Ioana Ciornei (9):
-  selftests: forwarding: extend ethtool_std_stats_get with pause
-    statistics
-  selftests: net: add helpers for running a command on other targets
-  selftests: net: extend lib.sh to parse drivers/net/net.config
-  selftests: net: update some helpers to use run_on
-  selftests: drivers: hw: cleanup shellcheck warnings in the rmon test
-  selftests: drivers: hw: test rmon counters only on first interface
-  selftests: drivers: hw: replace counter upper limit with UINT32_MAX in
-    rmon test
-  selftests: drivers: hw: update ethtool_rmon to work with a single
-    local interface
-  selftests: drivers: hw: add test for the ethtool standard counters
+ tools/testing/selftests/net/forwarding/lib.sh | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
- .../testing/selftests/drivers/net/README.rst  |   3 +
- .../testing/selftests/drivers/net/hw/Makefile |   1 +
- .../selftests/drivers/net/hw/ethtool_rmon.sh  |  55 +++---
- .../drivers/net/hw/ethtool_std_stats.sh       | 187 ++++++++++++++++++
- tools/testing/selftests/net/forwarding/lib.sh | 151 ++++++++++++--
- tools/testing/selftests/net/lib.sh            |  41 +++-
- 6 files changed, 394 insertions(+), 44 deletions(-)
- create mode 100755 tools/testing/selftests/drivers/net/hw/ethtool_std_stats.sh
-
+diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+index a9034f0bb58b..cf40cb766c68 100644
+--- a/tools/testing/selftests/net/forwarding/lib.sh
++++ b/tools/testing/selftests/net/forwarding/lib.sh
+@@ -831,8 +831,12 @@ ethtool_std_stats_get()
+ 	local name=$1; shift
+ 	local src=$1; shift
+ 
+-	ethtool --json -S $dev --groups $grp -- --src $src | \
+-		jq '.[]."'"$grp"'"."'$name'"'
++	if [[ "$grp" == "pause" ]]; then
++		ethtool -I --json -a "$dev" | jq --arg name "$name" '.[].statistics[$name]'
++	else
++		ethtool --json -S "$dev" --groups "$grp" -- --src "$src" | \
++			jq --arg grp "$grp" --arg name "$name" '.[][$grp][$name]'
++	fi
+ }
+ 
+ qdisc_stats_get()
 -- 
 2.25.1
 
