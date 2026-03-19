@@ -1,115 +1,76 @@
-Return-Path: <netdev+bounces-269312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269313-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uKlVJZSPu2lmlgIAu9opvQ
-	(envelope-from <netdev+bounces-269312-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 06:54:28 +0100
+	id 2ObpMwaQu2lmlgIAu9opvQ
+	(envelope-from <netdev+bounces-269313-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 06:56:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CE2A2C65D0
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 06:54:28 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6D722C6624
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 06:56:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 70C4A303A4AC
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 05:53:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B376A3010685
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 05:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27574397E99;
-	Thu, 19 Mar 2026 05:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C4D39B49F;
+	Thu, 19 Mar 2026 05:56:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FmftB85z"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="bWlOF4pc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f97.google.com (mail-yx1-f97.google.com [74.125.224.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C772E06EF
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 05:53:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F5339A078;
+	Thu, 19 Mar 2026 05:56:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773899599; cv=none; b=fTQ6uBKCyVpBetRQMzv4JFVS3x1LlH01XvO/RJlUsdjeLl/0pzFlytKWv2iWLgHf2z4OnVF0Qn5QLlHyDGODhRQu6ORubckvSKN792IAIPyc0rOshHfJixl18CJG+KYIkaraDZTgaayRJ6jXT9vaM8qHpfRFc5Cc5DRXPABMMDs=
+	t=1773899775; cv=none; b=BU0IJO1BHBBWgKoEKE3W9OxT1Icj+HSlSqFRQDy10oTJicgALEHE6oDefKuGDkBWlSVtypHlUyXYmnV55dGmI6CnKBxmpbd4iA28c+leRAMooxD83KJ9X9vY2GvhCaHKKZ+YyLKhjqbbqtPByfbWu3X+tqxGrYjDIyhhiwvpErw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773899599; c=relaxed/simple;
-	bh=GsqFZzi+npb1QMLyBt9yoLbdWZeaxHDfUeAnX4DgSs0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EGW69yq6dRngNeae15OcHzGqCOwW/5NasfmPz6NzUOEbZ7xnoK4ZypuiSOf70RnWv4sfuhKxTGf5ExqQVJgxQPuXlRhsVdMbz02Mzz00wYOM7kzYQJFLmyOFd2DI6oYNCH3d2f19ylhjL0ErfD3T0G5BpRmTjITTxggDDkdE0RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FmftB85z; arc=none smtp.client-ip=74.125.224.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yx1-f97.google.com with SMTP id 956f58d0204a3-64c31ca77b4so792269d50.2
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 22:53:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773899596; x=1774504396;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pG9zNK4k/bZPhez8UbAEtKwyOdVFNkPnmbPMLI2Lsbo=;
-        b=CHxU/oaLed3LChwBEFl4t8vGVFApKipIOmHFxQ7oGoZGc8vmIM/nhRCwAxxR1Cfx4v
-         EBp/HkxyDy1wv+q5zfHolcrPSJzc/i4opfvsXMLb+HbdTqlVtckc6FE2O7GorK8y8j9K
-         kM+NJQQhgvTlG6/PXpZgFScUoChSp/4TNVSl8agjhdJCYqNCNP5YVyI0Tsj/vzbs01PO
-         wdhURORA4n8KAkTyHTh9geanPi3MFA+NWAdizUPS9RjNUUj4sfppiDZPLA65JRQQ3jl6
-         uedsg3CYLJkEE64Bg0sEHyDwNtC3ywrwI4XRqFDW0AdOMTIcafll2LfqOu8gnoDF3zpB
-         BrbA==
-X-Gm-Message-State: AOJu0Yxw2CDlHzK5eUwBXxxY9Y431WYMsQ1e05CgD0ue5I1NP75WzDg+
-	mXw67/pzI7d/ZUgFOA5xliGu1HsnD/I8noDdx9itcp474PRrD825ypeFrL7PPtOVX4zAaSUMe5g
-	uKbZRH+MPs6DCjLRrfUfQI6IVPqvL6KvsbqWzfBVjrL85fDU3n87pWIAAmnmH0/ySv8dk6o2tFp
-	7nCka4VavPYcInj0OJFqEahtlZIn6xMCuAARDIOwhur6d9nNdMATPPbHyiwrG/iGYN+UjpDGtPE
-	DsCKRpx/Q==
-X-Gm-Gg: ATEYQzzEuMocL576rAEqHCzscDhHcZGA9dpDaJ3IIvXbuco8Pz9oCDIsomQciBE5B/Z
-	HAbcz6plSkN1kFgXsFr/mRfJUwnUH1RwsbJ+FcK+AffU/8ZzzL6s7OZ+lbloIl+IuCtYQbbsNlu
-	CkiOI8CGjhJXJMJTny3RxOw9+01WoJgUtU4MwjLb1QsDl0asp+hzIsxZ8xAxIxpTvOEKl39gi+C
-	4HFZOD3KmCPOQw8YdJ1u5JlO1dvGLMFMXznJuWChVA0s/ATqSCh3qBCGLcYQXR6zcKgYY36DBvp
-	unKRbk3kxOdutPu15p3juGCjrkVH2qpZ3urKxim7tCypO00AMtZw09E2RTHzzT14LH5t9u/YhC2
-	v67jUAmkA7upYEi6JzKbnt5NB3fW0fcO3lgFI6ci/BuZRRtqVBaxWozcLZ02CUWqHl8PD+VLDqm
-	mtycmc6ZPGVQ4JK5l4dVzsL5xXX3or+7C5a2CW1hrW7ETG7KPzgHoG+T0=
-X-Received: by 2002:a05:690e:681:b0:64c:99d7:8d1e with SMTP id 956f58d0204a3-64e912ee02emr4760102d50.3.1773899596272;
-        Wed, 18 Mar 2026 22:53:16 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-22.dlp.protect.broadcom.com. [144.49.247.22])
-        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-64e915d8d38sm396695d50.0.2026.03.18.22.53.16
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 18 Mar 2026 22:53:16 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-7965223b026so23329377b3.0
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 22:53:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1773899595; x=1774504395; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pG9zNK4k/bZPhez8UbAEtKwyOdVFNkPnmbPMLI2Lsbo=;
-        b=FmftB85zl9va3ub2zv7oxqRF6WigCZB30dfKQnqw89l/tFF0RcNobz/1PAH1Rq72VK
-         EKil8aQeoEGVntDbFtZSBR3cjoAvdHgLygSKkM8OstfaJlKByqjxudy2wYGEnSxALPL0
-         PxZOvjjp6O0WaDhFfxM4RY/3Kf12I8J35GMIw=
-X-Received: by 2002:a53:b7d2:0:b0:64c:985f:9d4e with SMTP id 956f58d0204a3-64e9157bf06mr4506992d50.41.1773899595461;
-        Wed, 18 Mar 2026 22:53:15 -0700 (PDT)
-X-Received: by 2002:a53:b7d2:0:b0:64c:985f:9d4e with SMTP id 956f58d0204a3-64e9157bf06mr4506978d50.41.1773899594962;
-        Wed, 18 Mar 2026 22:53:14 -0700 (PDT)
-Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64e91a1cd32sm2918980d50.2.2026.03.18.22.53.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 22:53:14 -0700 (PDT)
-From: Vikas Gupta <vikas.gupta@broadcom.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com,
-	rajashekar.hudumula@broadcom.com,
-	ajit.khaparde@broadcom.com,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Vikas Gupta <vikas.gupta@broadcom.com>
-Subject: [PATCH net-next v8 10/10] bng_en: add support for ethtool -S stats display
-Date: Thu, 19 Mar 2026 11:21:24 +0530
-Message-ID: <20260319055124.1350670-11-vikas.gupta@broadcom.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20260319055124.1350670-1-vikas.gupta@broadcom.com>
-References: <20260319055124.1350670-1-vikas.gupta@broadcom.com>
+	s=arc-20240116; t=1773899775; c=relaxed/simple;
+	bh=klKeIZ84+JjqMD8m3cCyxd5mWlsoZmgIQypEGjo3mso=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bkM/gipTfOkxEzTLTOukmsETmkQFx5D12TC13oipTNVgFYdnSc74VcxqcOf6l8h2UOnAmlX1gbg8oEB98vr5wWNktxkfh6HZfyQ+HZuT2bgyKWHroVzCxEwxs+oLIqgQbTXEdZgYvwO4Zi1VFjBiT0Xdg5U3R2JgMVV83K/t1uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=bWlOF4pc; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62J4wGjx080192;
+	Wed, 18 Mar 2026 22:55:42 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=GHhLPWxTXJ/Zs1+sDZnxrQE
+	jQyyxvU/F0IqOaWpaeK8=; b=bWlOF4pcONMYpobV6TNdlGOaa0EGQXJWagc6FPK
+	rTzEBrt07GfjP/gouFOOcb88lHu8p0rRZUiKh3YI6mrZFzbNFFatjZQUq4UEtA/g
+	yCiFoqfoJSnWZNi9zvgs7erRldDdDDwEfEKikVoOo6/cKFFUDz5QRhf95NcAhiBL
+	qdbeoA9SKIZMLysDvLt1eWAEw5CkogWgM1xeRvG8CwXi/w99/sdpn4noBtkGt0OE
+	Xkewj6lNEIAxGqooyTtVvKZT70UQWaVCVJii9VHMM+A5qknUgAydsTaelbiBK3yN
+	6SuD769Qf1Y0CjkKxskUL6dHuzp7/NG+aUlfY8bYXviM29g==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4cyxmh1t7y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Mar 2026 22:55:42 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 18 Mar 2026 22:55:40 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Wed, 18 Mar 2026 22:55:40 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id E344E3F7052;
+	Wed, 18 Mar 2026 22:55:35 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <donald.hunter@gmail.com>, <jiri@resnulli.us>,
+        <chuck.lever@oracle.com>, <matttbe@kernel.org>, <cjubran@nvidia.com>,
+        <shshitrit@nvidia.com>, "Ratheesh
+ Kannoth" <rkannoth@marvell.com>
+Subject: [PATCH v6 net-next 0/5] octeontx2-af: npc: Enhancements.
+Date: Thu, 19 Mar 2026 11:25:28 +0530
+Message-ID: <20260319055533.1720093-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -117,623 +78,127 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: text/plain
+X-Proofpoint-GUID: 6iBGLKmGk-PHvM0e7Q_CMHlLx7Hb6POn
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE5MDA0MyBTYWx0ZWRfX/vO3/y/LXKqz
+ wq93oZ6QALP9KNEUJNx5pvOImWOqVSUby9k5oXycABqhTStUJKRYSdUQ9fsR1mp7ZD/14dqiYtD
+ 8IvCRo9gABOxwvusMuOQf8rco59VBS+NShuU8OCHZa+LnwKikg+ZQL9m1+6uVd8ZmeOGJG5Cwf0
+ FMVHBK9E12Priwsc+2LJurFBpkRA/KafwMGZixorUBmz0y199S8YZQqh1HOmYJSXzN1PFccPbrj
+ xdh0+sYNmQ0IHlFmcyQl1ocwsA4FnWAhZfjX3/hREKus8nehxznMqFnevZ1ydcsY+XP1DkS9eHl
+ v5i3xPwV27eNcTaGvdzRyV95wjG7lYk+4SwDoVzFM3Jn4fYDyQW9CiBCZv2rll5wHS8YwoCrbbS
+ sVJYkP63DDWmzmI5jikw0yuVpUcNnB8iYlaISUF+xlbLFmRgguxFviwa7upIa9VPfBZAfMONO1H
+ gtu5DKTSTT7maAiBNJg==
+X-Authority-Analysis: v=2.4 cv=KvNAGGWN c=1 sm=1 tr=0 ts=69bb8fde cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=TtqV-g6YmW1Jfm2GSLaY:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=32TfifE4CFI_pm9Ig-oA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: 6iBGLKmGk-PHvM0e7Q_CMHlLx7Hb6POn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-19_01,2026-03-17_02,2025-10-01_01
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[marvell.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,resnulli.us,oracle.com,nvidia.com];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-269313-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269312-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vikas.gupta@broadcom.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,marvell.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.976];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 0CE2A2C65D0
+	NEURAL_HAM(-0.00)[-0.948];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: C6D722C6624
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+This series adds features in NPC HW block in the OcteonTX2 AF driver
+for better observability, configuration, and resource management.
 
-Implement the legacy ethtool statistics interface (get_sset_count,
-get_strings, get_ethtool_stats) to expose hardware counters not
-available through standard kernel stats APIs.
+Patch 1 adds debugfs enhancements for CN20K: mcam_layout now shows
+enabled/disabled state per MCAM entry; a new "dstats" entry reports hit
+counts with delta semantics; and "mismatch" lists entries that are
+enabled but not explicitly allocated.
 
-Ex:
-a) Per-queue ring stats
-     rxq0_ucast_packets: 2
-     rxq0_mcast_packets: 0
-     rxq0_bcast_packets: 15
-     rxq0_ucast_bytes: 120
-     rxq0_mcast_bytes: 0
-     rxq0_bcast_bytes: 900
-     txq0_ucast_packets: 0
-     txq0_mcast_packets: 0
-     txq0_bcast_packets: 0
-     txq0_ucast_bytes: 0
-     txq0_mcast_bytes: 0
-     txq0_bcast_bytes: 0
+Patch 2 (from Saeed) extends devlink with DEVLINK_PARAM_TYPE_U32_ARRAY
+so params can accept multiple u32 values in a single value. This is
+used by patch 3 for subbank search order.
 
-b) Per-queue TPA(LRO/GRO) stats
-     rxq4_tpa_eligible_pkt: 0
-     rxq4_tpa_eligible_bytes: 0
-     rxq4_tpa_pkt: 0
-     rxq4_tpa_bytes: 0
-     rxq4_tpa_errors: 0
-     rxq4_tpa_events: 0
+Patch 3 adds a devlink parameter "srch_order" for CN20K to control
+the order in which NPC subbanks are searched during MCAM allocation,
+allowing users to tune rule priority without firmware changes.
 
-c) Port level stats
-     rxp_good_vlan_frames: 0
-     rxp_mtu_err_frames: 0
-     rxp_tagged_frames: 0
-     rxp_double_tagged_frames: 0
-     rxp_pfc_ena_frames_pri0: 0
-     rxp_pfc_ena_frames_pri1: 0
-     rxp_pfc_ena_frames_pri2: 0
-     rxp_pfc_ena_frames_pri3: 0
-     rxp_pfc_ena_frames_pri4: 0
-     rxp_pfc_ena_frames_pri5: 0
-     rxp_pfc_ena_frames_pri6: 0
-     rxp_pfc_ena_frames_pri7: 0
-     rxp_eee_lpi_events: 0
-     rxp_eee_lpi_duration: 0
-     rxp_runt_bytes: 0
-     rxp_runt_frames: 0
-     txp_good_vlan_frames: 0
-     txp_jabber_frames: 0
-     txp_fcs_err_frames: 0
-     txp_pfc_ena_frames_pri0: 0
-     txp_pfc_ena_frames_pri1: 0
-     txp_pfc_ena_frames_pri2: 0
-     txp_pfc_ena_frames_pri3: 0
-     txp_pfc_ena_frames_pri4: 0
-     txp_pfc_ena_frames_pri5: 0
-     txp_pfc_ena_frames_pri6: 0
-     txp_pfc_ena_frames_pri7: 0
-     txp_eee_lpi_events: 0
-     txp_eee_lpi_duration: 0
-     txp_xthol_frames: 0
+Patch 4 ties default MCAM entries (broadcast, multicast, promisc, ucast)
+to NIX LF lifetime: they are allocated when a NIX LF is allocated and
+freed when it is released, improving MCAM utilization.
+NIX_LF_DONT_FREE_DFT_IDXS lets the kernel PF retain default entries
+across suspend/resume.
 
-d) Per-priority stats
-     rx_bytes_pri0: 4182650
-     rx_bytes_pri1: 4182650
-     rx_bytes_pri2: 4182650
-     rx_bytes_pri3: 4182650
-     rx_bytes_pri4: 4182650
-     rx_bytes_pri5: 4182650
-     rx_bytes_pri6: 4182650
-     rx_bytes_pri7: 4182650
+Patch 5 allows loading a custom KPU profile from the filesystem via
+a module parameter (kpu_profile=), avoiding firmware flashes for
+profile updates.
 
-Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
----
- .../net/ethernet/broadcom/bnge/bnge_ethtool.c | 481 ++++++++++++++++++
- 1 file changed, 481 insertions(+)
+Ratheesh Kannoth (4):
+  octeontx2-af: npc: cn20k: debugfs enhancements
+  octeontx2-af: npc: cn20k: Add devlink support for search order
+  octeontx2-af: npc: cn20k: dynamically allocate and free default MCAM
+    entries
+  octeontx2-af: Add support for loading custom KPU profile from
+    filesystem
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-index 2ae13f18e2d7..1a0eb987ef6f 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-@@ -31,6 +31,271 @@ static int bnge_nway_reset(struct net_device *dev)
- 	return rc;
- }
- 
-+static const char * const bnge_ring_q_stats_str[] = {
-+	"ucast_packets",
-+	"mcast_packets",
-+	"bcast_packets",
-+	"ucast_bytes",
-+	"mcast_bytes",
-+	"bcast_bytes",
-+};
-+
-+static const char * const bnge_ring_tpa2_stats_str[] = {
-+	"tpa_eligible_pkt",
-+	"tpa_eligible_bytes",
-+	"tpa_pkt",
-+	"tpa_bytes",
-+	"tpa_errors",
-+	"tpa_events",
-+};
-+
-+#define BNGE_RX_PORT_STATS_ENTRY(suffix)	\
-+	{ BNGE_RX_STATS_OFFSET(rx_##suffix), "rxp_" __stringify(suffix) }
-+
-+#define BNGE_TX_PORT_STATS_ENTRY(suffix)	\
-+	{ BNGE_TX_STATS_OFFSET(tx_##suffix), "txp_" __stringify(suffix) }
-+
-+#define BNGE_RX_STATS_EXT_ENTRY(counter)	\
-+	{ BNGE_RX_STATS_EXT_OFFSET(counter), __stringify(counter) }
-+
-+#define BNGE_TX_STATS_EXT_ENTRY(counter)	\
-+	{ BNGE_TX_STATS_EXT_OFFSET(counter), __stringify(counter) }
-+
-+#define BNGE_RX_STATS_EXT_PFC_ENTRY(n)				\
-+	BNGE_RX_STATS_EXT_ENTRY(pfc_pri##n##_rx_duration_us),	\
-+	BNGE_RX_STATS_EXT_ENTRY(pfc_pri##n##_rx_transitions)
-+
-+#define BNGE_TX_STATS_EXT_PFC_ENTRY(n)				\
-+	BNGE_TX_STATS_EXT_ENTRY(pfc_pri##n##_tx_duration_us),	\
-+	BNGE_TX_STATS_EXT_ENTRY(pfc_pri##n##_tx_transitions)
-+
-+#define BNGE_RX_STATS_EXT_PFC_ENTRIES				\
-+	BNGE_RX_STATS_EXT_PFC_ENTRY(0),				\
-+	BNGE_RX_STATS_EXT_PFC_ENTRY(1),				\
-+	BNGE_RX_STATS_EXT_PFC_ENTRY(2),				\
-+	BNGE_RX_STATS_EXT_PFC_ENTRY(3),				\
-+	BNGE_RX_STATS_EXT_PFC_ENTRY(4),				\
-+	BNGE_RX_STATS_EXT_PFC_ENTRY(5),				\
-+	BNGE_RX_STATS_EXT_PFC_ENTRY(6),				\
-+	BNGE_RX_STATS_EXT_PFC_ENTRY(7)
-+
-+#define BNGE_TX_STATS_EXT_PFC_ENTRIES				\
-+	BNGE_TX_STATS_EXT_PFC_ENTRY(0),				\
-+	BNGE_TX_STATS_EXT_PFC_ENTRY(1),				\
-+	BNGE_TX_STATS_EXT_PFC_ENTRY(2),				\
-+	BNGE_TX_STATS_EXT_PFC_ENTRY(3),				\
-+	BNGE_TX_STATS_EXT_PFC_ENTRY(4),				\
-+	BNGE_TX_STATS_EXT_PFC_ENTRY(5),				\
-+	BNGE_TX_STATS_EXT_PFC_ENTRY(6),				\
-+	BNGE_TX_STATS_EXT_PFC_ENTRY(7)
-+
-+#define BNGE_RX_STATS_EXT_COS_ENTRY(n)				\
-+	BNGE_RX_STATS_EXT_ENTRY(rx_bytes_cos##n),		\
-+	BNGE_RX_STATS_EXT_ENTRY(rx_packets_cos##n)
-+
-+#define BNGE_TX_STATS_EXT_COS_ENTRY(n)				\
-+	BNGE_TX_STATS_EXT_ENTRY(tx_bytes_cos##n),		\
-+	BNGE_TX_STATS_EXT_ENTRY(tx_packets_cos##n)
-+
-+#define BNGE_RX_STATS_EXT_COS_ENTRIES				\
-+	BNGE_RX_STATS_EXT_COS_ENTRY(0),				\
-+	BNGE_RX_STATS_EXT_COS_ENTRY(1),				\
-+	BNGE_RX_STATS_EXT_COS_ENTRY(2),				\
-+	BNGE_RX_STATS_EXT_COS_ENTRY(3),				\
-+	BNGE_RX_STATS_EXT_COS_ENTRY(4),				\
-+	BNGE_RX_STATS_EXT_COS_ENTRY(5),				\
-+	BNGE_RX_STATS_EXT_COS_ENTRY(6),				\
-+	BNGE_RX_STATS_EXT_COS_ENTRY(7)				\
-+
-+#define BNGE_TX_STATS_EXT_COS_ENTRIES				\
-+	BNGE_TX_STATS_EXT_COS_ENTRY(0),				\
-+	BNGE_TX_STATS_EXT_COS_ENTRY(1),				\
-+	BNGE_TX_STATS_EXT_COS_ENTRY(2),				\
-+	BNGE_TX_STATS_EXT_COS_ENTRY(3),				\
-+	BNGE_TX_STATS_EXT_COS_ENTRY(4),				\
-+	BNGE_TX_STATS_EXT_COS_ENTRY(5),				\
-+	BNGE_TX_STATS_EXT_COS_ENTRY(6),				\
-+	BNGE_TX_STATS_EXT_COS_ENTRY(7)				\
-+
-+#define BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(n)			\
-+	BNGE_RX_STATS_EXT_ENTRY(rx_discard_bytes_cos##n),	\
-+	BNGE_RX_STATS_EXT_ENTRY(rx_discard_packets_cos##n)
-+
-+#define BNGE_RX_STATS_EXT_DISCARD_COS_ENTRIES				\
-+	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(0),				\
-+	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(1),				\
-+	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(2),				\
-+	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(3),				\
-+	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(4),				\
-+	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(5),				\
-+	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(6),				\
-+	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(7)
-+
-+#define BNGE_RX_STATS_PRI_ENTRY(counter, n)		\
-+	{ BNGE_RX_STATS_EXT_OFFSET(counter##_cos0),	\
-+	  __stringify(counter##_pri##n) }
-+
-+#define BNGE_TX_STATS_PRI_ENTRY(counter, n)		\
-+	{ BNGE_TX_STATS_EXT_OFFSET(counter##_cos0),	\
-+	  __stringify(counter##_pri##n) }
-+
-+#define BNGE_RX_STATS_PRI_ENTRIES(counter)		\
-+	BNGE_RX_STATS_PRI_ENTRY(counter, 0),		\
-+	BNGE_RX_STATS_PRI_ENTRY(counter, 1),		\
-+	BNGE_RX_STATS_PRI_ENTRY(counter, 2),		\
-+	BNGE_RX_STATS_PRI_ENTRY(counter, 3),		\
-+	BNGE_RX_STATS_PRI_ENTRY(counter, 4),		\
-+	BNGE_RX_STATS_PRI_ENTRY(counter, 5),		\
-+	BNGE_RX_STATS_PRI_ENTRY(counter, 6),		\
-+	BNGE_RX_STATS_PRI_ENTRY(counter, 7)
-+
-+#define BNGE_TX_STATS_PRI_ENTRIES(counter)		\
-+	BNGE_TX_STATS_PRI_ENTRY(counter, 0),		\
-+	BNGE_TX_STATS_PRI_ENTRY(counter, 1),		\
-+	BNGE_TX_STATS_PRI_ENTRY(counter, 2),		\
-+	BNGE_TX_STATS_PRI_ENTRY(counter, 3),		\
-+	BNGE_TX_STATS_PRI_ENTRY(counter, 4),		\
-+	BNGE_TX_STATS_PRI_ENTRY(counter, 5),		\
-+	BNGE_TX_STATS_PRI_ENTRY(counter, 6),		\
-+	BNGE_TX_STATS_PRI_ENTRY(counter, 7)
-+
-+#define NUM_RING_Q_HW_STATS		ARRAY_SIZE(bnge_ring_q_stats_str)
-+
-+static const struct {
-+	long offset;
-+	char string[ETH_GSTRING_LEN];
-+} bnge_tx_port_stats_ext_arr[] = {
-+	BNGE_TX_STATS_EXT_COS_ENTRIES,
-+	BNGE_TX_STATS_EXT_PFC_ENTRIES,
-+};
-+
-+static const struct {
-+	long base_off;
-+	char string[ETH_GSTRING_LEN];
-+} bnge_rx_bytes_pri_arr[] = {
-+	BNGE_RX_STATS_PRI_ENTRIES(rx_bytes),
-+};
-+
-+static const struct {
-+	long base_off;
-+	char string[ETH_GSTRING_LEN];
-+} bnge_rx_pkts_pri_arr[] = {
-+	BNGE_RX_STATS_PRI_ENTRIES(rx_packets),
-+};
-+
-+static const struct {
-+	long base_off;
-+	char string[ETH_GSTRING_LEN];
-+} bnge_tx_bytes_pri_arr[] = {
-+	BNGE_TX_STATS_PRI_ENTRIES(tx_bytes),
-+};
-+
-+static const struct {
-+	long base_off;
-+	char string[ETH_GSTRING_LEN];
-+} bnge_tx_pkts_pri_arr[] = {
-+	BNGE_TX_STATS_PRI_ENTRIES(tx_packets),
-+};
-+
-+static const struct {
-+	long offset;
-+	char string[ETH_GSTRING_LEN];
-+} bnge_port_stats_arr[] = {
-+	BNGE_RX_PORT_STATS_ENTRY(good_vlan_frames),
-+	BNGE_RX_PORT_STATS_ENTRY(mtu_err_frames),
-+	BNGE_RX_PORT_STATS_ENTRY(tagged_frames),
-+	BNGE_RX_PORT_STATS_ENTRY(double_tagged_frames),
-+	BNGE_RX_PORT_STATS_ENTRY(pfc_ena_frames_pri0),
-+	BNGE_RX_PORT_STATS_ENTRY(pfc_ena_frames_pri1),
-+	BNGE_RX_PORT_STATS_ENTRY(pfc_ena_frames_pri2),
-+	BNGE_RX_PORT_STATS_ENTRY(pfc_ena_frames_pri3),
-+	BNGE_RX_PORT_STATS_ENTRY(pfc_ena_frames_pri4),
-+	BNGE_RX_PORT_STATS_ENTRY(pfc_ena_frames_pri5),
-+	BNGE_RX_PORT_STATS_ENTRY(pfc_ena_frames_pri6),
-+	BNGE_RX_PORT_STATS_ENTRY(pfc_ena_frames_pri7),
-+	BNGE_RX_PORT_STATS_ENTRY(eee_lpi_events),
-+	BNGE_RX_PORT_STATS_ENTRY(eee_lpi_duration),
-+	BNGE_RX_PORT_STATS_ENTRY(runt_bytes),
-+	BNGE_RX_PORT_STATS_ENTRY(runt_frames),
-+
-+	BNGE_TX_PORT_STATS_ENTRY(good_vlan_frames),
-+	BNGE_TX_PORT_STATS_ENTRY(jabber_frames),
-+	BNGE_TX_PORT_STATS_ENTRY(fcs_err_frames),
-+	BNGE_TX_PORT_STATS_ENTRY(pfc_ena_frames_pri0),
-+	BNGE_TX_PORT_STATS_ENTRY(pfc_ena_frames_pri1),
-+	BNGE_TX_PORT_STATS_ENTRY(pfc_ena_frames_pri2),
-+	BNGE_TX_PORT_STATS_ENTRY(pfc_ena_frames_pri3),
-+	BNGE_TX_PORT_STATS_ENTRY(pfc_ena_frames_pri4),
-+	BNGE_TX_PORT_STATS_ENTRY(pfc_ena_frames_pri5),
-+	BNGE_TX_PORT_STATS_ENTRY(pfc_ena_frames_pri6),
-+	BNGE_TX_PORT_STATS_ENTRY(pfc_ena_frames_pri7),
-+	BNGE_TX_PORT_STATS_ENTRY(eee_lpi_events),
-+	BNGE_TX_PORT_STATS_ENTRY(eee_lpi_duration),
-+	BNGE_TX_PORT_STATS_ENTRY(xthol_frames),
-+};
-+
-+static const struct {
-+	long offset;
-+	char string[ETH_GSTRING_LEN];
-+} bnge_port_stats_ext_arr[] = {
-+	BNGE_RX_STATS_EXT_ENTRY(continuous_pause_events),
-+	BNGE_RX_STATS_EXT_ENTRY(resume_pause_events),
-+	BNGE_RX_STATS_EXT_ENTRY(continuous_roce_pause_events),
-+	BNGE_RX_STATS_EXT_ENTRY(resume_roce_pause_events),
-+	BNGE_RX_STATS_EXT_COS_ENTRIES,
-+	BNGE_RX_STATS_EXT_PFC_ENTRIES,
-+	BNGE_RX_STATS_EXT_ENTRY(rx_bits),
-+	BNGE_RX_STATS_EXT_ENTRY(rx_buffer_passed_threshold),
-+	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRIES,
-+	BNGE_RX_STATS_EXT_ENTRY(rx_filter_miss),
-+};
-+
-+static int bnge_get_num_tpa_ring_stats(struct bnge_dev *bd)
-+{
-+	if (BNGE_SUPPORTS_TPA(bd))
-+		return BNGE_NUM_TPA_RING_STATS;
-+	return 0;
-+}
-+
-+#define BNGE_NUM_PORT_STATS ARRAY_SIZE(bnge_port_stats_arr)
-+#define BNGE_NUM_STATS_PRI			\
-+	(ARRAY_SIZE(bnge_rx_bytes_pri_arr) +	\
-+	 ARRAY_SIZE(bnge_rx_pkts_pri_arr) +	\
-+	 ARRAY_SIZE(bnge_tx_bytes_pri_arr) +	\
-+	 ARRAY_SIZE(bnge_tx_pkts_pri_arr))
-+
-+static int bnge_get_num_ring_stats(struct bnge_dev *bd)
-+{
-+	int rx, tx;
-+
-+	rx = NUM_RING_Q_HW_STATS + bnge_get_num_tpa_ring_stats(bd);
-+	tx = NUM_RING_Q_HW_STATS;
-+	return rx * bd->rx_nr_rings +
-+	       tx * bd->tx_nr_rings_per_tc;
-+}
-+
-+static u32 bnge_get_num_stats(struct bnge_net *bn)
-+{
-+	u32 num_stats = bnge_get_num_ring_stats(bn->bd);
-+	u32 len;
-+
-+	if (bn->flags & BNGE_FLAG_PORT_STATS)
-+		num_stats += BNGE_NUM_PORT_STATS;
-+
-+	if (bn->flags & BNGE_FLAG_PORT_STATS_EXT) {
-+		len = min_t(int, bn->fw_rx_stats_ext_size,
-+			    ARRAY_SIZE(bnge_port_stats_ext_arr));
-+		num_stats += len;
-+		len = min_t(int, bn->fw_tx_stats_ext_size,
-+			    ARRAY_SIZE(bnge_tx_port_stats_ext_arr));
-+		num_stats += len;
-+		if (bn->pri2cos_valid)
-+			num_stats += BNGE_NUM_STATS_PRI;
-+	}
-+
-+	return num_stats;
-+}
-+
- static void bnge_get_drvinfo(struct net_device *dev,
- 			     struct ethtool_drvinfo *info)
- {
-@@ -42,6 +307,219 @@ static void bnge_get_drvinfo(struct net_device *dev,
- 	strscpy(info->bus_info, pci_name(bd->pdev), sizeof(info->bus_info));
- }
- 
-+static int bnge_get_sset_count(struct net_device *dev, int sset)
-+{
-+	struct bnge_net *bn = netdev_priv(dev);
-+
-+	switch (sset) {
-+	case ETH_SS_STATS:
-+		return bnge_get_num_stats(bn);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static bool is_rx_ring(struct bnge_dev *bd, u16 ring_num)
-+{
-+	return ring_num < bd->rx_nr_rings;
-+}
-+
-+static bool is_tx_ring(struct bnge_dev *bd, u16 ring_num)
-+{
-+	u16 tx_base = 0;
-+
-+	if (!(bd->flags & BNGE_EN_SHARED_CHNL))
-+		tx_base = bd->rx_nr_rings;
-+
-+	return ring_num >= tx_base && ring_num < (tx_base + bd->tx_nr_rings);
-+}
-+
-+static void bnge_get_ethtool_stats(struct net_device *dev,
-+				   struct ethtool_stats *stats, u64 *buf)
-+{
-+	struct bnge_net *bn = netdev_priv(dev);
-+	struct bnge_dev *bd = bn->bd;
-+	u32 tpa_stats;
-+	u32 i, j = 0;
-+
-+	if (!bn->bnapi) {
-+		j += bnge_get_num_ring_stats(bd);
-+		goto skip_ring_stats;
-+	}
-+
-+	tpa_stats = bnge_get_num_tpa_ring_stats(bd);
-+	for (i = 0; i < bd->nq_nr_rings; i++) {
-+		struct bnge_napi *bnapi = bn->bnapi[i];
-+		struct bnge_nq_ring_info *nqr;
-+		u64 *sw_stats;
-+		int k;
-+
-+		nqr = &bnapi->nq_ring;
-+		sw_stats = nqr->stats.sw_stats;
-+
-+		if (is_rx_ring(bd, i)) {
-+			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_ucast_pkts);
-+			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_mcast_pkts);
-+			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_bcast_pkts);
-+			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_ucast_bytes);
-+			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_mcast_bytes);
-+			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_bcast_bytes);
-+		}
-+		if (is_tx_ring(bd, i)) {
-+			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_ucast_pkts);
-+			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_mcast_pkts);
-+			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_bcast_pkts);
-+			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_ucast_bytes);
-+			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_mcast_bytes);
-+			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_bcast_bytes);
-+		}
-+		if (!tpa_stats || !is_rx_ring(bd, i))
-+			continue;
-+
-+		k = BNGE_NUM_RX_RING_STATS + BNGE_NUM_TX_RING_STATS;
-+		for (; k < BNGE_NUM_RX_RING_STATS + BNGE_NUM_TX_RING_STATS +
-+			   tpa_stats; j++, k++)
-+			buf[j] = sw_stats[k];
-+	}
-+
-+skip_ring_stats:
-+	if (bn->flags & BNGE_FLAG_PORT_STATS) {
-+		u64 *port_stats = bn->port_stats.sw_stats;
-+
-+		for (i = 0; i < BNGE_NUM_PORT_STATS; i++, j++)
-+			buf[j] = *(port_stats + bnge_port_stats_arr[i].offset);
-+	}
-+	if (bn->flags & BNGE_FLAG_PORT_STATS_EXT) {
-+		u64 *rx_port_stats_ext = bn->rx_port_stats_ext.sw_stats;
-+		u64 *tx_port_stats_ext = bn->tx_port_stats_ext.sw_stats;
-+		u32 len;
-+
-+		len = min_t(u32, bn->fw_rx_stats_ext_size,
-+			    ARRAY_SIZE(bnge_port_stats_ext_arr));
-+		for (i = 0; i < len; i++, j++) {
-+			buf[j] = *(rx_port_stats_ext +
-+				   bnge_port_stats_ext_arr[i].offset);
-+		}
-+		len = min_t(u32, bn->fw_tx_stats_ext_size,
-+			    ARRAY_SIZE(bnge_tx_port_stats_ext_arr));
-+		for (i = 0; i < len; i++, j++) {
-+			buf[j] = *(tx_port_stats_ext +
-+				   bnge_tx_port_stats_ext_arr[i].offset);
-+		}
-+		if (bn->pri2cos_valid) {
-+			for (i = 0; i < 8; i++, j++) {
-+				long n = bnge_rx_bytes_pri_arr[i].base_off +
-+					 bn->pri2cos_idx[i];
-+
-+				buf[j] = *(rx_port_stats_ext + n);
-+			}
-+			for (i = 0; i < 8; i++, j++) {
-+				long n = bnge_rx_pkts_pri_arr[i].base_off +
-+					 bn->pri2cos_idx[i];
-+
-+				buf[j] = *(rx_port_stats_ext + n);
-+			}
-+			for (i = 0; i < 8; i++, j++) {
-+				long n = bnge_tx_bytes_pri_arr[i].base_off +
-+					 bn->pri2cos_idx[i];
-+
-+				buf[j] = *(tx_port_stats_ext + n);
-+			}
-+			for (i = 0; i < 8; i++, j++) {
-+				long n = bnge_tx_pkts_pri_arr[i].base_off +
-+					 bn->pri2cos_idx[i];
-+
-+				buf[j] = *(tx_port_stats_ext + n);
-+			}
-+		}
-+	}
-+}
-+
-+static void bnge_get_strings(struct net_device *dev, u32 stringset, u8 *buf)
-+{
-+	struct bnge_net *bn = netdev_priv(dev);
-+	struct bnge_dev *bd = bn->bd;
-+	u32 i, j, num_str;
-+	const char *str;
-+
-+	switch (stringset) {
-+	case ETH_SS_STATS:
-+		for (i = 0; i < bd->nq_nr_rings; i++) {
-+			if (is_rx_ring(bd, i))
-+				for (j = 0; j < NUM_RING_Q_HW_STATS; j++) {
-+					str = bnge_ring_q_stats_str[j];
-+					ethtool_sprintf(&buf, "rxq%d_%s", i,
-+							str);
-+				}
-+			if (is_tx_ring(bd, i))
-+				for (j = 0; j < NUM_RING_Q_HW_STATS; j++) {
-+					str = bnge_ring_q_stats_str[j];
-+					ethtool_sprintf(&buf, "txq%d_%s", i,
-+							str);
-+				}
-+			num_str = bnge_get_num_tpa_ring_stats(bd);
-+			if (!num_str || !is_rx_ring(bd, i))
-+				continue;
-+
-+			for (j = 0; j < num_str; j++) {
-+				str = bnge_ring_tpa2_stats_str[j];
-+				ethtool_sprintf(&buf, "rxq%d_%s", i, str);
-+			}
-+		}
-+
-+		if (bn->flags & BNGE_FLAG_PORT_STATS)
-+			for (i = 0; i < BNGE_NUM_PORT_STATS; i++) {
-+				str = bnge_port_stats_arr[i].string;
-+				ethtool_puts(&buf, str);
-+			}
-+
-+		if (bn->flags & BNGE_FLAG_PORT_STATS_EXT) {
-+			u32 len;
-+
-+			len = min_t(u32, bn->fw_rx_stats_ext_size,
-+				    ARRAY_SIZE(bnge_port_stats_ext_arr));
-+			for (i = 0; i < len; i++) {
-+				str = bnge_port_stats_ext_arr[i].string;
-+				ethtool_puts(&buf, str);
-+			}
-+
-+			len = min_t(u32, bn->fw_tx_stats_ext_size,
-+				    ARRAY_SIZE(bnge_tx_port_stats_ext_arr));
-+			for (i = 0; i < len; i++) {
-+				str = bnge_tx_port_stats_ext_arr[i].string;
-+				ethtool_puts(&buf, str);
-+			}
-+
-+			if (bn->pri2cos_valid) {
-+				for (i = 0; i < 8; i++) {
-+					str = bnge_rx_bytes_pri_arr[i].string;
-+					ethtool_puts(&buf, str);
-+				}
-+
-+				for (i = 0; i < 8; i++) {
-+					str = bnge_rx_pkts_pri_arr[i].string;
-+					ethtool_puts(&buf, str);
-+				}
-+
-+				for (i = 0; i < 8; i++) {
-+					str = bnge_tx_bytes_pri_arr[i].string;
-+					ethtool_puts(&buf, str);
-+				}
-+
-+				for (i = 0; i < 8; i++) {
-+					str = bnge_tx_pkts_pri_arr[i].string;
-+					ethtool_puts(&buf, str);
-+				}
-+			}
-+		}
-+		break;
-+	default:
-+		netdev_err(bd->netdev, "%s invalid request %x\n",
-+			   __func__, stringset);
-+		break;
-+	}
-+}
-+
- static void bnge_get_eth_phy_stats(struct net_device *dev,
- 				   struct ethtool_eth_phy_stats *phy_stats)
- {
-@@ -262,6 +740,9 @@ static const struct ethtool_ops bnge_ethtool_ops = {
- 	.nway_reset		= bnge_nway_reset,
- 	.get_pauseparam		= bnge_get_pauseparam,
- 	.set_pauseparam		= bnge_set_pauseparam,
-+	.get_sset_count		= bnge_get_sset_count,
-+	.get_strings		= bnge_get_strings,
-+	.get_ethtool_stats	= bnge_get_ethtool_stats,
- 	.get_eth_phy_stats	= bnge_get_eth_phy_stats,
- 	.get_eth_mac_stats	= bnge_get_eth_mac_stats,
- 	.get_eth_ctrl_stats	= bnge_get_eth_ctrl_stats,
--- 
-2.47.1
+Saeed Mahameed (1):
+  devlink: Implement devlink param multi attribute nested data values
 
+ Documentation/netlink/specs/devlink.yaml      |   4 +
+ .../marvell/octeontx2/af/cn20k/debugfs.c      | 120 +++++++-
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 192 ++++++++++---
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.h |   9 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   1 +
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |  14 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   3 +-
+ .../marvell/octeontx2/af/rvu_devlink.c        |  88 +++++-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  14 +
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 269 ++++++++++++++----
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   1 +
+ .../marvell/octeontx2/nic/otx2_pf.c          |   6 +-
+ include/net/devlink.h                         |   8 +
+ include/uapi/linux/devlink.h                 |   1 +
+ net/devlink/netlink_gen.c                     |   2 +
+ net/devlink/param.c                           |  78 +++--
+ 16 files changed, 674 insertions(+), 136 deletions(-)
+
+--
+
+v5 -> v6: Addressed Jakub,Jiri comments
+	https://lore.kernel.org/netdev/20260317045623.250187-1-rkannoth@marvell.com/
+
+v4 -> v5: Addressed Jakub comments
+	https://lore.kernel.org/netdev/20260312022754.2029595-6-rkannoth@marvell.com/
+
+v3 -> v4: Addressed Simon comments
+	https://lore.kernel.org/netdev/abDeXLpMMxp7G1v3@rkannoth-OptiPlex-7090/#t
+
+v2 -> v3: Addressed Simon comments.
+	https://lore.kernel.org/netdev/20260304043032.3661647-1-rkannoth@marvell.com/
+v1 -> v2: Addressed Jakub comments.
+	https://lore.kernel.org/netdev/20260302085803.2449828-1-rkannoth@marvell.com/#t
+
+2.43.0
 
