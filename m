@@ -1,245 +1,155 @@
-Return-Path: <netdev+bounces-269375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269376-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id INBfMkjFu2n1ngIAu9opvQ
-	(envelope-from <netdev+bounces-269375-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:43:36 +0100
+	id 8DqcBoC/u2n1ngIAu9opvQ
+	(envelope-from <netdev+bounces-269376-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:18:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4FF12C8E90
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:43:35 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE1042C87E8
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:18:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3C7373092A1E
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:17:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 427A93015DA5
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C869E3B582C;
-	Thu, 19 Mar 2026 09:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754DE3B8D42;
+	Thu, 19 Mar 2026 09:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a5LCEGft"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J5Xir0of"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342613B47D0
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 09:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A74D23B895F;
+	Thu, 19 Mar 2026 09:17:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773911810; cv=none; b=L/yzE5FUbbP++SM0+f6MTkpSShphICyVNtTsVGrvjqJK08yZG4QS8KifenXAep++pujzeD1kZlCg7deP4o0bh8Jbega9yR+uApv8zzWQr85Gi5uulpUOTz01Mae7sqgPv2XxiyOUpjkUZd4/Iq77nIQOOAkAP+BasbkgOTxMDHM=
+	t=1773911847; cv=none; b=AgLJjS80vxGBKTYGEQkLZuee40Z9iAEyQZUl6Ek3PgrRU4WQVbVd3v/KP+nDjT7zP+VFjBshnTWyasuXmhTAXK1mHOtzn+KEIHaKBMAIBSdkUzj2YWdMv89VWYWkRbNPJmWBrol7FgCX5CjCodoYKqrB0v21vVkcdmSKOtPZhiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773911810; c=relaxed/simple;
-	bh=EbYbtbxeuya+Ay51v+Jzncijx1e58TLX0Q2QWFRrQHY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xl4EFZgI9CVSVwohuyBH6obuNcW1S6F2tPM+nMYyQmXlzJ0dKEP/GW/aJ585DGubOogvmTL2TBl12EIZuxSjsN2jnnx4hBvbJlbU/SzBIPTf44TDav4GJeOE8cSONimhwtSHQwDF66OEtgL7cENIyKW2dA4LDZSxHA610k+ccng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a5LCEGft; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773911808;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Dr6Jt1lrU+MaN3MnhqKuiUasJhPBdxOQ/Vdi6dmcTD8=;
-	b=a5LCEGftGIorGcXeVnkF1rrT87ggV5FZpg4yU3eBd81IpanZWs/XhK/wLsWpmd1aqgF9dN
-	T+NaypxML5FUteyquQthjjun6VU+yujUhBMZq2NSke5k7C3etGVzsjRBaI8EJJfZ9+0nUn
-	PuYB47wOGS3Y8sTmndXPn1sZsTMnWBc=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-130-luOZ9ogTNRGee2rFD0NMVw-1; Thu,
- 19 Mar 2026 05:16:41 -0400
-X-MC-Unique: luOZ9ogTNRGee2rFD0NMVw-1
-X-Mimecast-MFC-AGG-ID: luOZ9ogTNRGee2rFD0NMVw_1773911799
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 373D91944F05;
-	Thu, 19 Mar 2026 09:16:38 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.182])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 10E9A1800351;
-	Thu, 19 Mar 2026 09:16:32 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: liuhangbin@gmail.com
-Cc: horms@kernel.org,
-	pabeni@redhat.com,
-	bridge@lists.linux.dev,
-	kuba@kernel.org,
-	idosch@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	razor@blackwall.org,
-	edumazet@google.com,
-	sd@queasysnail.net,
-	jv@jvosburgh.net,
-	andrew+netdev@lunn.ch,
-	jiri@resnulli.us,
-	sridhar.samudrala@intel.com,
-	davem@davemloft.net
-Subject: Re: [net-next,v3,2/5] net: use ndo_update_offloads to set offload features for bonding/bridge/team
-Date: Thu, 19 Mar 2026 10:16:23 +0100
-Message-ID: <20260319091623.107634-1-pabeni@redhat.com>
-In-Reply-To: <20260316-offload_compute-v3-2-a5d4a07d86d3@gmail.com>
-References: <20260316-offload_compute-v3-2-a5d4a07d86d3@gmail.com>
+	s=arc-20240116; t=1773911847; c=relaxed/simple;
+	bh=DIU/PzVumUQH6MdAZ2KxRAqnEWB7buh0Ki3HJWJvQNk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ggLhSOsgPARokTYAOXLMN20q5HspgAor1U6934RZ3Zu5tiUKws1HgIzJYah+rBYuy89Mp+GljxBSC7RdmleKjdECghEWxexTAWGtsYHk3PtZ7EABH1T8m62zbwnwb/K321rB43wWlYC88nf3ifIau41Yp0htsTgHgDmHtyvLiiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J5Xir0of; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773911846; x=1805447846;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=DIU/PzVumUQH6MdAZ2KxRAqnEWB7buh0Ki3HJWJvQNk=;
+  b=J5Xir0ofhFLV7yZcL1OMoKKPXVkYcIjWH2r8OewNyyjINvG3eXmlI9b2
+   WESU4NSH1+hhDbuAfpfjj2rqXnOHk04CzbRqr5gqyckVTUR9YMGop4cf+
+   xlTV4RHQZPreVwEnrkFlJeMGOdeimUJhbAJfl2FOTFuf7yaBTxOMp1mXI
+   uEeAZDsquaL/kutCSVZAwvXeQoKzK/A5F+rNZvWW/kcRlUmvZNKFvpg7H
+   ttt5H266GtUJkdORacWbFO1q4urwtR2io8ieDwyHv7c1HDQPyarWgeHow
+   icjUaCF8H4b8ioDl6A0YDfz2hF/4C9V9KhgbfsSGjV+z0+x0aJxsV4UWp
+   w==;
+X-CSE-ConnectionGUID: adnmLJldTHyaXSzf0SkxiQ==
+X-CSE-MsgGUID: bNGrEno3Q/eOyXWgyewhWw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11733"; a="74863216"
+X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
+   d="scan'208";a="74863216"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 02:17:25 -0700
+X-CSE-ConnectionGUID: u5dIcVMPSsylgEdsrZ54dg==
+X-CSE-MsgGUID: ojN/sDYrTkmXLdF+vh6iSg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
+   d="scan'208";a="227848554"
+Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
+  by orviesa005.jf.intel.com with ESMTP; 19 Mar 2026 02:17:18 -0700
+Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w39VE-000000004o5-13CR;
+	Thu, 19 Mar 2026 09:17:16 +0000
+Date: Thu, 19 Mar 2026 10:16:33 +0100
+From: kernel test robot <lkp@intel.com>
+To: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	skhan@linuxfoundation.org, andrew+netdev@lunn.ch,
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com,
+	alexanderduyck@fb.com, kernel-team@meta.com,
+	johannes@sipsolutions.net, sd@queasysnail.net, jianbol@nvidia.com,
+	dtatulea@nvidia.com, sdf@fomichev.me, mohsin.bashr@gmail.com,
+	jacob.e.keller@intel.com, willemb@google.com, skhawaja@google.com,
+	bestswngs@gmail.com, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH net-next v2 02/13] wifi: cfg80211: use
+ __rtnl_unlock in nl80211_pre_doit
+Message-ID: <202603191008.66uOsWyh-lkp@intel.com>
+References: <20260318150305.123900-3-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260318150305.123900-3-sdf@fomichev.me>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	FREEMAIL_CC(0.00)[lists.linux.dev,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,lunn.ch,broadcom.com,intel.com,nvidia.com,fb.com,meta.com,sipsolutions.net,queasysnail.net,fomichev.me,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-269376-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-269375-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-0.880];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.953];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D4FF12C8E90
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,01.org:url,intel.com:dkim,intel.com:email,intel.com:mid]
+X-Rspamd-Queue-Id: AE1042C87E8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Hi Stanislav,
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: use ndo_update_offloads to set offload features for bonding/bridge/team
+kernel test robot noticed the following build errors:
 
-This patch converts bonding, bridge, and team drivers to use the new
-ndo_update_offloads callback, centralizing offload feature computation
-during port add/remove operations.
+[auto build test ERROR on net-next/main]
 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index 90b71bd53040..ea6bb20f9348 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
+url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/net-add-address-list-snapshot-and-reconciliation-infrastructure/20260319-122535
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260318150305.123900-3-sdf%40fomichev.me
+patch subject: [Intel-wired-lan] [PATCH net-next v2 02/13] wifi: cfg80211: use __rtnl_unlock in nl80211_pre_doit
+config: x86_64-kexec (https://download.01.org/0day-ci/archive/20260319/202603191008.66uOsWyh-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260319/202603191008.66uOsWyh-lkp@intel.com/reproduce)
 
-[ ... ]
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603191008.66uOsWyh-lkp@intel.com/
 
-> diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-> index b7282f5c9632..affbcc6fc130 100644
-> --- a/drivers/net/team/team_core.c
-> +++ b/drivers/net/team/team_core.c
-> @@ -1247,7 +1247,6 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
->  	port->index = -1;
->  	list_add_tail_rcu(&port->list, &team->port_list);
->  	team_port_enable(team, port);
-> -	netdev_compute_master_upper_features(team->dev, true);
->  	__team_port_change_port_added(port, !!netif_oper_up(port_dev));
->  	__team_options_change_check(team);
+All errors (new ones prefixed by >>, old ones prefixed by <<):
 
-[ ... ]
+>> ERROR: modpost: "__rtnl_unlock" [net/wireless/cfg80211.ko] undefined!
 
-> diff --git a/net/bridge/br_if.c b/net/bridge/br_if.c
-> index d39571e13744..030248bc94c5 100644
-> --- a/net/bridge/br_if.c
-> +++ b/net/bridge/br_if.c
-> @@ -680,8 +680,6 @@ int br_add_if(struct net_bridge *br, struct net_device *dev,
->
->  	br_mtu_auto_adjust(br);
->
-> -	netdev_compute_master_upper_features(br->dev, false);
-> -
->  	kobject_uevent(&p->kobj, KOBJ_ADD);
->
->  	return 0;
-
-[ ... ]
-
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index bbd532aa6a1b..8bcbf7c22830 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -8923,6 +8923,9 @@ static int __netdev_upper_dev_link(struct net_device *dev,
->  	__netdev_walk_all_upper_dev(upper_dev, __netdev_update_lower_level,
->  				    priv);
->
-> +	/* re-compute all features after adding link */
-> +	netdev_change_features(upper_dev);
-> +
->  	return 0;
->
->  rollback:
-
-Could this netdev_change_features() call happen too early for team and
-bridge drivers?
-
-The call triggers __netdev_update_features(), which invokes both
-ndo_update_offloads() and ndo_fix_features(). While ndo_update_offloads()
-works with the netdev lower device list (already updated by
-__netdev_adjacent_dev_link_neighbour()), the ndo_fix_features() callbacks
-iterate driver-specific port lists.
-
-For team_port_add():
-
-drivers/net/team/team_core.c:team_port_add() {
-    ...
-    team_upper_dev_link(team, port, extack);  /* line ~1231 */
-        netdev_upper_dev_link()
-            __netdev_upper_dev_link()
-                netdev_change_features()  /* <-- triggers feature update */
-                    __netdev_update_features()
-                        ops->ndo_fix_features()  /* team_fix_features() */
-
-    list_add_tail_rcu(&port->list, &team->port_list);  /* line 1247 */
-    ...
-}
-
-team_fix_features() iterates team->port_list to compute features, but the
-new port hasn't been added to that list yet.
-
-Similarly for br_add_if():
-
-net/bridge/br_if.c:br_add_if() {
-    ...
-    netdev_master_upper_dev_link(dev, br->dev, NULL, NULL, extack);  /* line ~628 */
-        __netdev_upper_dev_link()
-            netdev_change_features()  /* <-- triggers feature update */
-                __netdev_update_features()
-                    ops->ndo_fix_features()  /* br_fix_features() */
-
-    list_add_rcu(&p->list, &br->port_list);  /* line 634 */
-    ...
-}
-
-br_fix_features() calls br_features_recompute() which iterates
-br->port_list, but the new port isn't in that list yet.
-
-If the new port lacks support for a feature the master currently has
-enabled (like NETIF_F_SG, NETIF_F_IP_CSUM, or NETIF_F_TSO), that feature
-would remain incorrectly enabled. The old code path called
-netdev_compute_master_upper_features() AFTER the port was added to the
-driver list, so the new port's capabilities were included in the feature
-computation.
-
-The bonding driver isn't affected because bond_fix_features() uses
-bond_for_each_slave(), which maps to netdev_for_each_lower_private() and
-iterates the netdev infrastructure's lower device list rather than a
-separate driver list.
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
