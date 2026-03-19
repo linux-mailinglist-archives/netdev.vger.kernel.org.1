@@ -1,152 +1,123 @@
-Return-Path: <netdev+bounces-269715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269716-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uPMDAP+CvGkyzwIAu9opvQ
-	(envelope-from <netdev+bounces-269715-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 00:13:03 +0100
+	id oLe+L+GHvGlk0AIAu9opvQ
+	(envelope-from <netdev+bounces-269716-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 00:33:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59F612D3FDF
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 00:13:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0673F2D428F
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 00:33:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 629C230E3C7B
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:12:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 85512306A808
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8A83BED01;
-	Thu, 19 Mar 2026 23:12:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703D7410D03;
+	Thu, 19 Mar 2026 23:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="reV152Po"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nLw1gwv9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680BA35C1AD
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 23:12:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B25440756B;
+	Thu, 19 Mar 2026 23:31:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773961968; cv=none; b=WPladXO4HH9OCg1Nr7UJNX3aivqlCXtsIBsOEP35zf7qUfoGR+f0yrtulxQQznPHrykI2WdFEZDIY2XuN1hYDZJMH3PR0aS3OO78eO6ynFualizTeKQ/KDPQfQfz3IcspUCNzj5Glwao1WF5qA2VtnOLMUdpKDkpuym3UmplKTA=
+	t=1773963072; cv=none; b=pdkPM/Ak2ERds36pSeBjnFcJ/Yjfrj5bnEc9D7pnWgRt1fGjrwtB5CRIe9TSxqkJI1oTCtH5s/xs4yC/QcD2i8nL8Sa3EGB1uxRfPaXdQqTC6ZcJ9XrnIvSWFtefQihiXnCuNODinqstXFVZGu2/+eymZ932Xrx+d29Txx7n7c4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773961968; c=relaxed/simple;
-	bh=m6iYYB8uKqbPiLGC/QiXT6W+LdvKK9YSo9bsmQ2vh2I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZdQyJ88VW0eKkKNcwIOFvULXmmmzuXeciVXEeh0KE7OeopZjaU6lU3A58RxrMwdBjFU3yrXDSdksBaRpih+TcloZgdi1uU2r4MCGaITD21ZaE0dPtvFd1bYBydfsQFEwBVreapSigvrMYsZJMcCfsO2stZn6NXsRW3cQU4/rXyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=reV152Po; arc=none smtp.client-ip=212.77.101.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
-Received: (wp-smtpd smtp.wp.pl 46149 invoked from network); 20 Mar 2026 00:12:41 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1773961961; bh=qfaK6l9J5wfAPUEJLhkZds3IFOFd/5cFiKFRvHIq0Cs=;
-          h=Subject:To:Cc:From;
-          b=reV152PoSCm/mRlSQK6ej2CjfufmaljTJAQJBcWg0wfXF7XnpzQDygrM2pTdMdRKP
-           dkQsO/Y/ymnNypNlm50VYnJO1V2mXX1kFmJK2vo8yDXckLo5WzzSldrmKqBi/EU2Nl
-           ob4MYa/A3DTJtl4D2x/+lPKsdEk/2AWp6KlqrhdIuY5zKjSFV5v7118vK3j0QXBaIL
-           6Eq7Irj/D7hyPZa7tKuoN/i4CnelcQxezM74DN+BX3QB/f/NEpXWmplBy6gRAjiiUL
-           twa6HC9tjyAVIzt0V/Dtff1pepGIdg+s/b/cXIeXb0nH7g1H0IVjf/d+7LhEpaK1Ou
-           FKaZ7xLP8Db5Q==
-Received: from 83.5.169.164.ipv4.supernova.orange.pl (HELO [192.168.3.203]) (olek2@wp.pl@[83.5.169.164])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
-          for <andrew@lunn.ch>; 20 Mar 2026 00:12:41 +0100
-Message-ID: <1aa4eb41-c027-4a1a-85f1-fb8846742bfa@wp.pl>
-Date: Fri, 20 Mar 2026 00:12:41 +0100
+	s=arc-20240116; t=1773963072; c=relaxed/simple;
+	bh=rdU75h+RxugSStenO8TGm97kuv724uVI0/nLR8CJmR0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Dz3xfMsGe8wDlLrdVtMJkO0YfAmlPiwyncr8jVPFPYLIfw24UgrT3nbtZ+82A3Y7l5NzNq4pCfOfWILHvnNhwMfdhS8fGTdaTY3ijb7oYTbKmCqIQwnZgbgloHDHdzk5Dar+VyVONV/lctBlj1MoAQnSq4Kip3dJkh+CwuAV2Xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nLw1gwv9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E51CC2BC9E;
+	Thu, 19 Mar 2026 23:31:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773963072;
+	bh=rdU75h+RxugSStenO8TGm97kuv724uVI0/nLR8CJmR0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nLw1gwv9tBT290w5jk0KbmKXTtHS+wFK5PEuLPVIIeE5M5dBEG03kGQsoiL87QBpH
+	 ot2ATfWWmGjXFe0NHztg+vofWw82idx6nD6xKKtqJzi1Xvn84+dPnoOWLd3zJPiABm
+	 A5YYxSl1Ph7QBu11zsoDNeHOs2f0i83XWfLYBQxFdbBor8b0yj7DGD7Z5Sjo5szxul
+	 blGBHBSyeM5GyC2VI/b8RoA4AIT3Eer4DPLX8MRKtgNeVS5AOJ5Y/l08W1Veko7ByH
+	 j/kZjzEkdu8Wy+vw1hkk/1rzqYHTjzf5AwWZbWvJ1MFf9JJyenyylMCD9HEV5rquuo
+	 yHos+ltsfNzNQ==
+Date: Thu, 19 Mar 2026 16:31:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Byungchul Park
+ <byungchul@sk.com>, linux-mm@kvack.org, akpm@linux-foundation.org,
+ netdev@vger.kernel.org, Mina Almasry <almasrymina@google.com>, Toke Hoiland
+ Jorgensen <toke@redhat.com>, linux-kernel@vger.kernel.org,
+ kernel_team@skhynix.com, harry.yoo@oracle.com, ast@kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, john.fastabend@gmail.com,
+ sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com,
+ pabeni@redhat.com, david@redhat.com, lorenzo.stoakes@oracle.com,
+ Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+ surenb@google.com, mhocko@suse.com, horms@kernel.org, jackmanb@google.com,
+ hannes@cmpxchg.org, ziy@nvidia.com, ilias.apalodimas@linaro.org,
+ willy@infradead.org, brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
+ usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
+ asml.silence@gmail.com, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com
+Subject: Re: [PATCH v5] mm: introduce a new page type for page pool in page
+ type
+Message-ID: <20260319163109.58511b70@kernel.org>
+In-Reply-To: <05c0db9b-c92f-4758-a356-e035a174b5dd@nvidia.com>
+References: <20260316222901.GA59948@system.software.com>
+	<20260316223113.20097-1-byungchul@sk.com>
+	<ebd00055-d4aa-4612-8bf3-ef0a308512f8@kernel.org>
+	<05c0db9b-c92f-4758-a356-e035a174b5dd@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] r8152: Add support for 5Gbit Link Speeds
- and EEE
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Birger Koblitz <mail@birger-koblitz.de>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260317-rtl8157_next-v2-0-10ea1fa488d1@birger-koblitz.de>
- <20260317-rtl8157_next-v2-1-10ea1fa488d1@birger-koblitz.de>
- <2bfede0e-f8d1-472d-80c4-7c3570b5921e@wp.pl>
- <876af50e-320f-4cec-97c0-a7eb438dc838@lunn.ch>
-Content-Language: pl
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-In-Reply-To: <876af50e-320f-4cec-97c0-a7eb438dc838@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-WP-MailID: 2da21c68c29a0e2045ba457eebc21ead
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000000 [ofPs]                               
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[wp.pl,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[wp.pl:s=20241105];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269715-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269716-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,sk.com,kvack.org,linux-foundation.org,vger.kernel.org,google.com,redhat.com,skhynix.com,oracle.com,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,suse.cz,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
+	RCPT_COUNT_TWELVE(0.00)[47];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.940];
+	NEURAL_HAM(-0.00)[-0.978];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olek2@wp.pl,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[wp.pl:+];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[wp.pl];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lcsc.com:url,wp.pl:dkim,wp.pl:mid]
-X-Rspamd-Queue-Id: 59F612D3FDF
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0673F2D428F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Andrew,
+On Tue, 17 Mar 2026 12:06:51 +0100 Dragos Tatulea wrote:
+> > Should we handle this more gracefully here? (release pp resources)
+> >   
+> Releasing of a leaked page_pool page could lead to many harder to track
+> side-effects further down the line. Isn't it better to simply let the
+> page in a leaked state?
 
-On 19/03/2026 23:46, Andrew Lunn wrote:
->>> @@ -604,6 +604,7 @@ enum spd_duplex {
->>>    	FORCE_100M_FULL,
->>>    	FORCE_1000M_FULL,
->>>    	NWAY_2500M_FULL,
->>> +	NWAY_5000M_FULL,
->>>    };
->>>    /* OCP_ALDPS_CONFIG */
->>> @@ -725,6 +726,7 @@ enum spd_duplex {
->>>    #define BP4_SUPER_ONLY		0x1578	/* RTL_VER_04 only */
->>>    enum rtl_register_content {
->>> +	_5000bps	= BIT(12),
->> Based on other Realtek chips, I guess that BIT(11_ corresponds to 2500 Mbps
->> over two twisted pairs. Realtek calls this 5G Lite. Similarly, there are
->> 2.5G Lite and 1G Lite, offering 1250 Mbps and 500 Mbps, respectively, over
->> two pairs of wires.
-> Oh, that is different. Normally for a -T2 link, you double the clock
-> frequency, so you keep the normal bandwidth. But you are saying it
-> does 500Base-T2, 1250Base-T2, 2500Base-T2?
-
-It works exactly like you describe. It’s described in the RTL8156B
-datasheet[1] if your interested. To be honest, I’ve never used Lite Mode.
-I think it’s disabled by default in the driver.
-
-1. https://www.lcsc.com/datasheet/C41376388.pdf
-
->
-> Can it select these modes on its own, if the link partner is another
-> Realtek device? Many 1G PHYs will detect if a pair is broken and
-> downshift to 100Mbps, which only require two working pairs. But this
-> device has the option of downshifting to 500M.
->
-> 	Andrew
-
-
-Best regards,
-Aleksander
-
++1 that'd also be my intuition.
 
