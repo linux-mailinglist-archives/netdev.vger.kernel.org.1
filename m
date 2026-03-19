@@ -1,460 +1,258 @@
-Return-Path: <netdev+bounces-269530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269531-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KObmMuMhvGnQswIAu9opvQ
-	(envelope-from <netdev+bounces-269530-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:18:43 +0100
+	id AP6mAIkivGnQswIAu9opvQ
+	(envelope-from <netdev+bounces-269531-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:21:29 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 509CD2CE9D0
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:18:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32FDD2CEAD2
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:21:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 46B4D325A4C3
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:06:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 73A0F317825A
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:09:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FEE73E92A6;
-	Thu, 19 Mar 2026 16:04:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A973EC2FF;
+	Thu, 19 Mar 2026 16:08:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="WR0WycIg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h4c589dO"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011065.outbound.protection.outlook.com [52.101.70.65])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908343EF0B3;
-	Thu, 19 Mar 2026 16:04:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D9413EC2F7
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 16:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773936290; cv=fail; b=FreK+xmaqsrsdl8tfA/BS5xYm+0pE8chAXWY+vx6/BPlQbAqfhdfKCapmn+jwVHGuuPX5pO6dALfiwMOFgwoHztgn8qRVkkwlBdvGA/2ObrZK7wd7P27mks+60wpgNaabrSFw7KCi+gJAipi2f4e3YWWrZOSUl9W5cP19TnmZkc=
+	t=1773936513; cv=fail; b=MhHkK8uekW/uQqJ+5REB3KEPu/+c46JTMqvss99HsDx3VVIxiCdETAWfQTjs4Abbvbtf4B/F5t4C66BiLIUA4Rv/KceVwS0vuIzxZBBzs1X0YAIq1njX9xB1/PTiVow3FFjJlPistt0UWHSaps4YDVS3Pycf11vhFQrsgrG8xuU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773936290; c=relaxed/simple;
-	bh=ckDwvOeLVWTaFS+fhEdJiJEutCOnatYEL/5RyMD90K0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=G7xF6aGQkfASkooOavHpVMdiSiW4zUOtnV4VQsIjlHJRjXm4/qSZ1q+bAhgAdeuCab4gJCnleUtHMNWZApbTOpwNOft/mYVQYvNkgi0Ih4R7QWWj2th9aU/g1kiinwrVT9qbuJHotAEPGlIWXqDf9Um4UlqH3DbVm9sdVTphOQg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=WR0WycIg; arc=fail smtp.client-ip=52.101.70.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1773936513; c=relaxed/simple;
+	bh=ALu28tv9gPgSNPqhGmDRE6qDBqKUTd3yl+0NhRluz5s=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XIh1aqfeCh6+7g2zfDwiPt1pp6vArte7QF1R1mPJC/xydQm0ps+DqW9MvrybC8LFgl6sDaMrq8mYkIZnOx/fIOli/tWx0nFb67xqVDF3ps9hAWAqj6TN7C7cbxBZAu8SRRapXnFAezQIcJNuIZKZk2DU6E8BjHnkZm/GbwO7qm8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h4c589dO; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773936511; x=1805472511;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ALu28tv9gPgSNPqhGmDRE6qDBqKUTd3yl+0NhRluz5s=;
+  b=h4c589dOHcdxdi/Sfzf7s72b9kzOPTa602R4bmZkYBIXm9+Q14B5PuWg
+   AZVzkJ/JbSBY+eLE67eC1ZyimFxGEA9X0OXe+xUW79mjUv0HDtTzfIc0H
+   yGxHnCEXQjqDiathQfHwhpZ3fXhTnBAxhDA8Q/SeCCOvWQnSYvN352TmN
+   uw6MUb8lk9Ps2TQ+7Ck8oREXV/OV2a0dPsenTvSXVw8lgSue7UV4NergS
+   I+gyuX9jyKHmO9JPqEsaiUhnuKlCXdjC/rjUywpkTfqMGSRVkx2eVWUF2
+   /3OnFsX1bpflaCYS7PKc+pxysxweKeRR7HoYeWKLV8/HTB931o2W+0iVj
+   g==;
+X-CSE-ConnectionGUID: 8bXg2L3eSWyqAYYyDPnSDw==
+X-CSE-MsgGUID: yob5MwToSZ2EB/Z64MgffQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="62580460"
+X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
+   d="scan'208";a="62580460"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 09:08:30 -0700
+X-CSE-ConnectionGUID: /xKzEyUJS3uZFFO3dx2MyQ==
+X-CSE-MsgGUID: N3Bp+1j/SB2joj5NXxnqrQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
+   d="scan'208";a="227122358"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 09:08:29 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 19 Mar 2026 09:08:28 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Thu, 19 Mar 2026 09:08:28 -0700
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.66)
+ by edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 19 Mar 2026 09:08:26 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=o270Q8DjfPyZ3TWUwsmkf73j8IkCL0xh2kc/WNTL5kHzcUepYZHKKowXTshbUR1J9nPifeJmRXXqgalq2GSAq4Y4liFpEeE8L+eSVfKxlnUMGoc8XbxyBYdpI226zJfBPAalcHQkrXzu5BVE6Ub8Ibuyx10QWGjgXuaQHXVeFgzu4xbx/TM0xe+XpqTYvM/z5D5CuHycs8/mejGV1y7nG4wSrX/0Y/ebr0mz+7ImQOe1SyUZVXdZKlAqOBiD/VN6W6+XYMuhdGmJKOx69p6d/o+oYMKgAZfEGGKaDPI6DzZtSbWxpaND0ZCRKAjbE/hhwY0WV+/S3xKpOZBaSTXZhQ==
+ b=Rc8csfDz41G+crqGQ8ulB1YLQth3ASdN+zbmfS/jXqTqkVnRxTeawVDyWG87EYeThzD2He9NKIU0oPRFBAOT/J4zd9fKvToOTmQP2HeMVnJqs6LVjkLEJs1aAWfqj3yJZSIqJw1wG7rB2KH9sjhoZdp+ge1X9y0mT7OZbYmqTFIaDIH1hgW1BG7ak8Ymq4uyAYBkUrvGGeYgO5lnjwq0mmLNaj+X0kzJr8Cd5gUlQFxto3DNUdpWCEB+dbiP26zsSBAY5nmnS4ovMXVNl6IsY0xQ9IvNlFu6cL4l++r5dRONpD6CgeDL7+zZzELXWIJ+GfC6ugUQ0wAwmtpZX0V0TQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kqzII8FSe2bsAUkbpCCdwg2EN+e23Ob2KjHRvZAsGzQ=;
- b=fToB/u5sZ//E99TLbD32RekExXnhbdLNrEGdsUgyYJHfE4ceAb0o0nQywg6f7wadL+eiPvT9YYdj7MYXMQvjn+ukp59o6VYCwlHn3/0AnlMNGBn60hYzc3EFvDsbjHPO82V4vXFKhSDlPV/Nfa8dv6Zy9XTpwPyPgyWwKV+LYs9iM+klHxUm5ugb1IXtj9N4m8zSR1gSLav6TXd/o4xt1KPGQqU6wlNjT28QvrcHyqfTCA80kbFNBZmF8iAQKfjt2Iq/Jm4LbBaHF+KEyse/xGDn6CZrXhXNO5NePE5S/i+fERGg+kq95f1zhrcTgG8Aj5c+RdBjAf9mFflMm3viqQ==
+ bh=tkN0nLKYXJQJI0bXY8cfUkyWjr/D0X+lNheMSJeJVQ4=;
+ b=cWJTH8TQurS4p3HbxwAiMyV6QDfgHNeYZsU4buDVpKsQITJFtzbVPFKr7Ivf/QSKt8Wv7FElg3N8c+xX5k358pqywp+qvPa5liyA0Jb2aHjKX/vavM+0ylTBW3uUHdB2Q7wSVnXC3ETlcUm9SZDJ6v2J+cZ8VVZWiOuiBxnVpRE3ObgXPD6QXxV3iu2XNhzxmCiF3y2GEybTORBifhCdITdkIQUdlAkfGzLjvwRIpEq3Lwhb5A0/ZdHUMs6o1l+gvdm/g/4Sb10oF39k6ELBOWpRmqhye8aubThwN4uAGQpbT+k8aZkrUlccgS5YnzyyQkyc05UfadBpirsJdA2q8A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kqzII8FSe2bsAUkbpCCdwg2EN+e23Ob2KjHRvZAsGzQ=;
- b=WR0WycIgweabHXDmZtJGub1oG9B41JUAJPbf2ED4x+AR4bvv+HMTQ64QQrsAOau9QDnSNjWkaYZCWFR23qkIot6HAFSAw3zRjJJ/L0e8TQUA/FKAyxhFMmqKp20ZzSyDIdqhRHeBJV4Bt4OFa/U7MgB09NX8uQrWOs77HYQ+E4oaIg8VEaA5jazUklrLaAFHTW6NqW7SZXcr2VpbkIpJ2cPm5R/xW3GbJlIFjf9ibYbfYwI3hcZEo0zGjhp+xAPc/CMnhmb8CN0ViGGQfh4mXyu5dfYoOvDg6vZOc/mQsJxdryw8aJw5/m560kJ2Tvwh+phzyaB8ktpTnxxzbx6b1A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
- by GV4PR04MB11451.eurprd04.prod.outlook.com (2603:10a6:150:29b::14) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ1PR11MB6297.namprd11.prod.outlook.com (2603:10b6:a03:458::8)
+ by SA1PR11MB6568.namprd11.prod.outlook.com (2603:10b6:806:253::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Thu, 19 Mar
- 2026 16:04:31 +0000
-Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
- ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
- ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9723.018; Thu, 19 Mar 2026
- 16:04:41 +0000
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	petrm@nvidia.com,
-	willemb@google.com
-Subject: [PATCH net-next v3 9/9] selftests: drivers: hw: add test for the ethtool standard counters
-Date: Thu, 19 Mar 2026 18:04:10 +0200
-Message-Id: <20260319160410.2515105-10-ioana.ciornei@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260319160410.2515105-1-ioana.ciornei@nxp.com>
-References: <20260319160410.2515105-1-ioana.ciornei@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FR4P281CA0235.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e9::6) To PAXPR04MB8253.eurprd04.prod.outlook.com
- (2603:10a6:102:1bf::7)
+ 2026 16:08:23 +0000
+Received: from SJ1PR11MB6297.namprd11.prod.outlook.com
+ ([fe80::6f05:5b37:2440:556e]) by SJ1PR11MB6297.namprd11.prod.outlook.com
+ ([fe80::6f05:5b37:2440:556e%5]) with mapi id 15.20.9745.007; Thu, 19 Mar 2026
+ 16:08:23 +0000
+From: "Salin, Samuel" <samuel.salin@intel.com>
+To: Simon Horman <horms@kernel.org>, "Hay, Joshua A" <joshua.a.hay@intel.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Loktionov, Aleksandr"
+	<aleksandr.loktionov@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net] idpf: clear stale cdev_info ptr
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] idpf: clear stale cdev_info
+ ptr
+Thread-Index: AQHcqqurDtow4tdyD0eOp/xVymTP/7WfsCyAgBZs+8A=
+Date: Thu, 19 Mar 2026 16:08:22 +0000
+Message-ID: <SJ1PR11MB6297C41634F3940A3166AD6B9B4FA@SJ1PR11MB6297.namprd11.prod.outlook.com>
+References: <20260303012831.662492-1-joshua.a.hay@intel.com>
+ <20260305093051.GB90938@kernel.org>
+In-Reply-To: <20260305093051.GB90938@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ1PR11MB6297:EE_|SA1PR11MB6568:EE_
+x-ms-office365-filtering-correlation-id: 91da5284-b04d-4c6f-3ea8-08de85d1bee5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021|18002099003|56012099003|22082099003;
+x-microsoft-antispam-message-info: ergxkvL2ChkInuWYqltTcEZ3iDtzCASXLNmgk61/QVa5J+9isUoli6oRrSlo2ufu+LLQ1/7nQedkV4Xn69/EVtyxedXz0gdmi/ZLGRiFhSV6TpIO0WOfYNF/xNVB938cotjmnmQDBrTgLCEu427iaMLkRjKCF4FHo0f+TO6yZu3lYzRdp9dL2lD4HQY4ndLJvq9xZvigiV1i9DCX2XuBlsPpn+2b3f4kIYXrxYfvensc8OTEPte8s/7yvjf4zNTvdRyb4SiIkdP0XrcNXfzIRPKx4NBvzRwcRl89r46bRGVrIFETNe8fhtda/AirNu8W93y5c+c/Zcj04tynaY9lAtMxNtijLIz7vEPwPCkLiCdxkoQt9ZSc9qmuz660Ri1Tzge4gNqy9RGEwyXAi+lv18uDTymSUQyR21sbc83Flok+YJIqVUAYFxsBY2N4zv5CsyXEfNJTA+EilvbZ0sDxvKZaEJVOdv1FKx3Av0ZZZnpsqoG6VWIXfOZSdkOH5of+OXuW/wR2uhPzElHKg8Dis9VDjbN0hPeFF3a/NyYjxhwdNsAOa4/RcdVmzXHR2cTfypMcY0cmnIhtYAnt5cnYRWYM/ZL8LTEuAVAd/NFAhibq5QKBgBehXi0nyCQacF5XZF4zTNQzf5MqHu1Hjooj/yteuYbC5ZVTmv9N9zsSct6Pqmaadqd79FtRJ2fbRiroSjJSW5ylTcf3KV0hEYM5H9gM2lp8kOgD3mh748KexBLluFH02ZBce5qCd3miifg4k1fqm5P/z0Cz2WZCoiufKMTpPyuv0F/j7Inaj5jKGdg=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6297.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TU5bm/vGdxb0XfxQQxJk054q2pKruW14hec0O7NfeFGCBhxjHzRtht4HLQRr?=
+ =?us-ascii?Q?wkDpRVQc+xNvoxE/9MkGMA9C0qV/b9sCosH8Kw0+262z1MkJzCpAx5eCxkzl?=
+ =?us-ascii?Q?ZmscCjSeFIX2NxU3cjCmxGmGrIT5jefSMPyS1kxJVo/UJ5YsecHWp4G1yX7q?=
+ =?us-ascii?Q?eOmSWfTRmzdXmxr0XF5PMvKbRNW2IlJJ0yoaFfUheN9U1LBWe5axGoVowORp?=
+ =?us-ascii?Q?HwkkBXnFLEk0MJAmVk0KmV+Dl/PZaD8eu6En8g0Hxlz4rKbxSNh/03KNfYQf?=
+ =?us-ascii?Q?sfF0TaKqazRiRtECHS9EdUAcgV3Gq5dTJZLNkLIFgwrnsnDDy+jLP2d2RsVN?=
+ =?us-ascii?Q?0SL/HgVH8cU2l1dNeb7oBg478JEDH67zJmwoIHl8Zg8QLcQ3omAN5TLbwcTo?=
+ =?us-ascii?Q?V+Xn5bUrtTZn10nIDt7InzbMeddT+0Hstv8HHQiJ1t/tqp1mYbqpmdLM4UDy?=
+ =?us-ascii?Q?oz6HJrwoa2ARUm31emOq52FxPdCqVpcROJvPkf2AdyU0IgD0YokIAOwjT3g+?=
+ =?us-ascii?Q?oUKf1aTjimcHatJ5YD5DTceGkd++FYdPZoDFRnaP6duVtlV9NP7ROfxQ/8C0?=
+ =?us-ascii?Q?1CdfmDG9qPsKIeBMpsfcqKonmK1LoR7dFXesYPWT0Emwby8o0qowP61r1Hfw?=
+ =?us-ascii?Q?2Ekv1femdW0rNxfHQC2QtQQrz8Uq8ThEYnTtXP5X+5IdWnn5g5jneqMClCSN?=
+ =?us-ascii?Q?edAjVUZLjgDCj8gcZoPfttGA0CmHKuurKnRKpUE81ZWpCbY34nAdv24NUBQV?=
+ =?us-ascii?Q?4Mqwje19U3266B31GvmSyVaFBFZOv3TPlxcFlMSGTA63Ecn6JB5r6pvDEV57?=
+ =?us-ascii?Q?zhAHF59ni93z36ZjLHPILibYjRHZhahXt+ykXbyQkO65OF6fUnVSPRXBvzzT?=
+ =?us-ascii?Q?0m9ot5mEYqVyAlKwH4yBNh3wMyV/EYqvPEMezPYH2EGoKbBCdMnIUTDYBNS9?=
+ =?us-ascii?Q?tiqm1ksm+sgg0GTzR9VGCtOZQNFFWwwqp5xMzEB5Hvr7z4zqkvbKH5hRxwn/?=
+ =?us-ascii?Q?ElBR4lYtN4ykUKQ9DeY13/nciEKbaVgN+BaO1J9MLSZd3N8DFlnFSerb+frG?=
+ =?us-ascii?Q?D3SyMvLlcDZobU5YqfaxhPbrv8PmleHXwiWks9NPVo9VzehYkeZy/3weCENR?=
+ =?us-ascii?Q?rEhU7rCJzh0BIRYMCFb2KKUFTiw0ub+uLwLALfiWxwbNA3oRiJEdjmnEHEsL?=
+ =?us-ascii?Q?u+L9V/EXFxf0v8lylmvFDKseJQvRhpZV675ZD7YRVzDO+QKs1HJyvYFeozYz?=
+ =?us-ascii?Q?DP6C50MOt29IvWPoqOpc4wxTMY3v4VO438/I53Nf08DRSavjTPu2HaVT4Tan?=
+ =?us-ascii?Q?PL6d728domMDiKlVN7k4TjGUCWKYLmcT2sb/4hZudlGbwxqCnGitMXJhSfFv?=
+ =?us-ascii?Q?sfU8lIbGlia1K13mmWWGfSaqLQt3+biskG/KAwH7orpPPmG3FHvgwoGOhukd?=
+ =?us-ascii?Q?NLo/JkZ4Y1dNpXQWjG7NhM3BT9ErZgbyJzz7R47LeFFPd4AIKyRR136I0VKK?=
+ =?us-ascii?Q?5vAO26leqnhzHltBEkgGlrFimtYtckdoz405+Lnhn8helLJ/sOJGAojkwaqL?=
+ =?us-ascii?Q?JBLq0srL/1jSJ49MZBq/+pJ82aJzoiJ5xJXTvpPcwm5kA/1WhynFCfJNv8Ew?=
+ =?us-ascii?Q?mQQPHJaM5e9ed95zUl6SF42sgDKE/7TwjMzlxG7l3gq69Ux0QGR7Hdwkv4G+?=
+ =?us-ascii?Q?Lc/g/vfkrH5hT77ppf78HVDeHyFZ39RsR/fcsMrzghBj63sY7bfEuWR8wSL2?=
+ =?us-ascii?Q?zkBEz7uGuw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|GV4PR04MB11451:EE_
-X-MS-Office365-Filtering-Correlation-Id: 51600856-7138-4158-1b7e-08de85d13af5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|19092799006|1800799024|376014|7416014|18002099003|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	Ns32dxiG91v6KNSZkwDd2yFiSX+khN+Tw8XUs3Z14YOh/1mruoXV+DzuNQ4B0+wr6f01AWME5vGqErO+FDMiknpis883Lnp4ux7mvAdch12J2nqalDmWS3sMFKsUmDr5cB23QFl94OLFheYKPp66xqMmxZOhL1yxLuIgEJTwofENMXOUnKFZQrc6vVH+TupmNRg510vkZX7IYXA4r1fcinn2wWGNEBLcOFE9wK+/ByJdzwyAerbBqB7F8JdMt0hk+DA7RTv1+CHCbq1+qR+SGOoabPaZOME+acVIEAlnDhD+VDhbE/UIxt161j4HiWxHPxulGo4gywkB8pDgiMm8n8IXkqTi6fjWjSLzmFmtRMSQuZzbJ7O/uHztWhPP3E3jr2zzD7F7aONpqm+0rADBlAXhmB3Fu0ZgtLny0qX3JLGa8HlBhDjKomw3/1+n3OrsJdaoW86pUCiTFSC5KY7rBL6X0oymU41dqq+N0OEks5RLST/Uenif+ZL697fQmnZZzb9eaxTjGQ9TAgeMq8SrPyfTPeR2Lt3EbA/cHFn3Vt63+/fXa9FageB8IhPXG4lg39OHG/nnxfDcxB464gNG/TetibuAQ4/YKmFqhBYb3FYOO3jeTaH+Cu23uNF/e2NmxXGDvm7/9odefnBapWNrF14GIsPEznZU8JwzkZBNkA051g3NGu7H6T0SYOHGIJDe3aQ6eoe+lyAaI+5aEU1Nqoi+RFyCezAEDDBdY/RUwFk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(376014)(7416014)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?/axlh3lPcrxNtPzhUy4cBxEnPSJoLTaxh2FQFDDWwJFoWC2RKuDQ8WEKXh9b?=
- =?us-ascii?Q?bAsD15D1+Gg/SkhDmD3GUCrzr6k9rum+QTszzJucosQvgRMMm8Q6Rf3bbb/C?=
- =?us-ascii?Q?zXzbm0TYbDVd77IgCqWNBCd7h3XgUjNXCB3kpsQX7PM5HM/oifw3jIW7Rz6j?=
- =?us-ascii?Q?tC+yvygxN1RoegJxStWYkGMcygdChzz/0gpWfOpk8fnX4Xn1WEAnoQkRvA69?=
- =?us-ascii?Q?8z9OsRH01s5OTA8EfFFBKU/OoCGdcgdJhSAOouzajLjOlFgy7S30mdpFwLKn?=
- =?us-ascii?Q?gKSNW91SasONnV5b5HCe7SpxBXol5ZyGJQqaI62WpOaFTkABuQNvdrAGZVzF?=
- =?us-ascii?Q?WJ1oe02KNjzObGAYGR9f+XfoFJ3Z8mL+sQPX6Xfm2a213/d9PPqVAWKd1LU4?=
- =?us-ascii?Q?0VuOZuzDuxyFgF1Vjsjv3tyjDp4RMSg/Zm4E/CKYx8wnFspm4pKJYDyC7fIm?=
- =?us-ascii?Q?hT1W5ALMktqA0p307hDdeLT7EDd/UQyl7tzdoAGiswj+2v3Hebjy6qXn1v9B?=
- =?us-ascii?Q?Dq/3ya7DAKsvazFJTld35GFzKcVOo9LvGuyPQzyqKWrDzNdWuww5juj3lLiN?=
- =?us-ascii?Q?lL4RQZwCyTa2klAkPifPRWMyCtG39xXSQmV9o77tAFpum5qynEt5yM+BFWfM?=
- =?us-ascii?Q?A4ZkCV4DJfIY4wwOiNe5yG6nDDcj3FPRm31tsm9BQPrc0pVV22x25E+VmTmv?=
- =?us-ascii?Q?F0zzhLqwNquiTouncVEh+PiZ8brrZ1Tz7IqtBzq25Ev8DyAh1NF+dn+GYxRX?=
- =?us-ascii?Q?iBr9b2/McusauCrfAEpdzwf6uZEPWQYELc5E8rYkJfJ1OAwt9kp8w1ngDBDp?=
- =?us-ascii?Q?zeABRafip9BUiWfh+mJtMlchq5DTLMk8IApcsDWLpxMYAEZPkYy8xmw7+Rfh?=
- =?us-ascii?Q?3cfx48iOcKaZqSpkUjNcTY9NCuSUDITKeNC6QchaeFUcVYpTTGAgAdfxsa4C?=
- =?us-ascii?Q?1dNzsfFIriP2mqCvZ9mN2tt8lSbiTJlko4EZwyWCbbsA4okPzaXw8oxDFUfB?=
- =?us-ascii?Q?pGfo2H2qOR+ymh+phZekNt7Hhh4v0RpZDJTqsGwwXskdEVjc9g1b6vTKNmDr?=
- =?us-ascii?Q?Z3t6PL5vGeUNcboKrc4+TD5MJiSuAsJdN/u7zWl4UA3WW002puO2M0Fhr192?=
- =?us-ascii?Q?G2G0gMPsx+/ovyJRoDGFq8VbOWQFIedSpO/ZTDkRIkfZiJSHoNmVs3cTh56S?=
- =?us-ascii?Q?mUaZT5DGj+/6vs6nH9+lqowI8BA9ZKxymly7Gmdk8jlHAu4C8O4pSP/EqNSa?=
- =?us-ascii?Q?6PhTkhp6xbKgtyTHJEVl7XGvf1dfCfmd5h1Wdcip5/co8tbZlpaAXcVAj5tk?=
- =?us-ascii?Q?fhXSFNKZb8er7R47h6dbxn4gGM6SmXt6tEaO2B+XHdPFYksNEl1veM4E3sog?=
- =?us-ascii?Q?pc3Kd39lZwfDeTjzD729uXqTzuwnDwHHepX7pADk10ZXW9mkK6dt/pQnTdwp?=
- =?us-ascii?Q?HqyILKPyV+xXRhFaALTluLCE4v0AfVjtloy5TZBMaM2BWv+ZaMJLKvqctXeJ?=
- =?us-ascii?Q?E4lxPX0aleLJEfwvPnFsAxch5tB9tasw90Bl9D2bDfJiaaUJyNizTcMAnb93?=
- =?us-ascii?Q?UQF1ZlFNrtoKeZ7pZXy7wY5L1SP/zj3w+VmOrKOR9Joni4UV2ysy18lI7EZf?=
- =?us-ascii?Q?fkQewhc8PEH4xm9uB8n6SSZOj9IO6q+IO+eKRF3QYwuEoDit8mUYHp+ApmV8?=
- =?us-ascii?Q?gafQDj67syNm93YQeJ24MACOKueVG4opjJE3tGzlTaHn4VDL3bLDtvMdZCZP?=
- =?us-ascii?Q?dXSdQsBr3Q=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 51600856-7138-4158-1b7e-08de85d13af5
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
+X-Exchange-RoutingPolicyChecked: pRRGFIqhASe5qnTZybwVD8MldLnUhxSXJTrgLmbTBECoGlHPlAx1spL/oHQfySZgSdrbQpD5BEuVGJcweiKdVXOMiQuyBngxJt4xwKbFYGHd261dgJ0vp1qsw/04aKXW77/q8o4JGkswjP3JKFVNv/SH6xet8h8Q/sACKlSntZLPq8V9Pfufuq8eL1bXg/SonFmyULatgXw3shy6GIpRmca6abGPwE/AgY7f4xQQ5ONsdJzNbBXiw8UF2gkg3f3mNA/+hFT31Lyex3KzthsDiqsEXNVX7EIzLHpPQxqLZQ4FY57rxcNgVyGo4370B1hQeka4/gs3FV62VOPZ4BnS+Q==
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2026 16:04:41.8435
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6297.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91da5284-b04d-4c6f-3ea8-08de85d1bee5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Mar 2026 16:08:23.0053
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /ks/QSsUNQ0j5jUnv7E+voeNAY0o3YjNbqElUA4mLpjcf1UwE+htv/qwQBIFrVH6uK3weH66yNWGyHG+CCza/w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV4PR04MB11451
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kI24uUwj+Uy8JyCuq67LmGfxwz8YbsBYIa9T3bzXi38nQuPgDhidmIkdFF6lFx9GUHysszwbCGTzu68+jvj3Xw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6568
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-269530-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-269531-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,osuosl.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.952];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[samuel.salin@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.994];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ethtool_std_stats.sh:url,nxp.com:dkim,nxp.com:email,nxp.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 509CD2CE9D0
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 32FDD2CEAD2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a new selftest - ethtool_std_stats.sh - which validates the
-eth-ctrl, eth-mac and pause standard statistics exported by an
-interface. Collision related eth-mac counters as well as the error ones
-will be checked against zero since that is the most likely correct
-scenario.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Simon Horman
+> Sent: Thursday, March 5, 2026 1:31 AM
+> To: Hay, Joshua A <joshua.a.hay@intel.com>
+> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>; Loktionov, Aleksandr
+> <aleksandr.loktionov@intel.com>
+> Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: clear stale cdev_inf=
+o ptr
+>=20
+> On Mon, Mar 02, 2026 at 05:28:31PM -0800, Joshua Hay wrote:
+> > Deinit calls idpf_idc_deinit_core_aux_device to free the cdev_info
+> > memory, but leaves the adapter->cdev_info field with a stale pointer
+> > value. This will bypass subsequent "if (!cdev_info)" checks if
+> > cdev_info is not reallocated. For example, if idc_init fails after a
+> > reset, cdev_info will already have been freed during the reset
+> > handling, but it will not have been reallocated. The next reset or
+> > rmmod will result in a crash.
+> >
+> > [  +0.000008] BUG: kernel NULL pointer dereference, address:
+> > 00000000000000d0 [  +0.000033] #PF: supervisor read access in kernel
+> > mode [  +0.000020] #PF: error_code(0x0000) - not-present page [
+> > +0.000017] PGD 2097dfa067 P4D 0 [  +0.000017] Oops: Oops: 0000 [#1]
+> > SMP NOPTI ...
+> > [  +0.000018] RIP: 0010:device_del+0x3e/0x3d0 [  +0.000010] Call
+> > Trace:
+> > [  +0.000010]  <TASK>
+> > [  +0.000012]  idpf_idc_deinit_core_aux_device+0x36/0x70 [idpf] [
+> > +0.000034]  idpf_vc_core_deinit+0x3e/0x180 [idpf] [  +0.000035]
+> > idpf_remove+0x40/0x1d0 [idpf] [  +0.000035]
+> > pci_device_remove+0x42/0xb0 [  +0.000020]
+> > device_release_driver_internal+0x19c/0x200
+> > [  +0.000024]  driver_detach+0x48/0x90 [  +0.000018]
+> > bus_remove_driver+0x6d/0x100 [  +0.000023]
+> > pci_unregister_driver+0x2e/0xb0 [  +0.000022]
+> > __do_sys_delete_module.isra.0+0x18c/0x2b0
+> > [  +0.000025]  ? kmem_cache_free+0x2c2/0x390 [  +0.000023]
+> > do_syscall_64+0x107/0x7d0 [  +0.000023]
+> > entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> >
+> > Pass the adapter struct into idpf_idc_deinit_core_aux_device instead
+> > and clear the cdev_info ptr.
+> >
+> > Fixes: f4312e6bfa2a ("idpf: implement core RDMA auxiliary dev create,
+> > init, and destroy")
+> > Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+> > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> > Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+>=20
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-The central part of this patch is the traffic_test() function which
-gathers the 'before' counter values, sends a batch of traffic and then
-interrogates again the same counters in order to determine if the delta
-is on target. The function receives an array through which the caller
-can request what counters to be interrogated and, for each of them, what
-is their target delta value.
-
-The output from this selftest looks as follows on a LX2160ARDB board:
-
- $ ./run_kselftest.sh -t drivers/net/hw:ethtool_std_stats.sh
- TAP version 13
- 1..1
- # timeout set to 0
- # selftests: drivers/net/hw: ethtool_std_stats.sh
- # TEST: eth-ctrl-MACControlFramesTransmitted on endpmac17             [ OK ]
- # TEST: eth-ctrl-MACControlFramesReceived on endpmac17                [ OK ]
- # TEST: eth-mac-FrameCheckSequenceErrors on endpmac17                 [ OK ]
- # TEST: eth-mac-AlignmentErrors on endpmac17                          [ OK ]
- # TEST: eth-mac-FramesLostDueToIntMACXmitError on endpmac17           [ OK ]
- # TEST: eth-mac-CarrierSenseErrors on endpmac17 (not supported)       [SKIP]
- # TEST: eth-mac-FramesLostDueToIntMACRcvError on endpmac17            [ OK ]
- # TEST: eth-mac-InRangeLengthErrors on endpmac17 (not supported)      [SKIP]
- # TEST: eth-mac-OutOfRangeLengthField on endpmac17 (not supported)    [SKIP]
- # TEST: eth-mac-FrameTooLongErrors on endpmac17 (not supported)       [SKIP]
- # TEST: eth-mac-FramesAbortedDueToXSColls on endpmac17 (not supported)  [SKIP]
- # TEST: eth-mac-SingleCollisionFrames on endpmac17 (not supported)    [SKIP]
- # TEST: eth-mac-MultipleCollisionFrames on endpmac17 (not supported)  [SKIP]
- # TEST: eth-mac-FramesWithDeferredXmissions on endpmac17 (not supported)  [SKIP]
- # TEST: eth-mac-LateCollisions on endpmac17 (not supported)           [SKIP]
- # TEST: eth-mac-FramesWithExcessiveDeferral on endpmac17 (not supported)  [SKIP]
- # TEST: eth-mac-BroadcastFramesXmittedOK on endpmac17                 [ OK ]
- # TEST: eth-mac-OctetsTransmittedOK on endpmac17                      [ OK ]
- # TEST: eth-mac-BroadcastFramesReceivedOK on endpmac17                [ OK ]
- # TEST: eth-mac-OctetsReceivedOK on endpmac17                         [ OK ]
- # TEST: eth-mac-FramesTransmittedOK on endpmac17                      [ OK ]
- # TEST: eth-mac-MulticastFramesXmittedOK on endpmac17                 [ OK ]
- # TEST: eth-mac-FramesReceivedOK on endpmac17                         [ OK ]
- # TEST: eth-mac-MulticastFramesReceivedOK on endpmac17                [ OK ]
- # TEST: pause-tx_pause_frames on endpmac17                            [ OK ]
- # TEST: pause-rx_pause_frames on endpmac17                            [ OK ]
- ok 1 selftests: drivers/net/hw: ethtool_std_stats.sh # SKIP
-
-Please note that not all MACs are counting the software injected pause
-frames as real Tx pause. For example, on a LS1028ARDB the selftest
-output will reflect the fact that neither the ENETC MAC, nor the Felix
-switch MAC are able to detect Tx pause frames injected by software.
-
- $ ./run_kselftest.sh -t drivers/net/hw:ethtool_std_stats.sh
- (...)
- # TEST: pause-tx_pause_frames on eno0 (software sent pause frames not detected)  [XFAIL]
- # TEST: pause-rx_pause_frames on eno0                                 [ OK ]
-
-Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
----
-Changes in v3:
-- none
-Changes in v2:
-- Use the new run_on helper
-- No longer checking that each counter has a 1% tolerance against the
-  target. The only upper limit is UINT32_MAX.
-- Check that both the error counters and the collision related ones are
-  zero since this is the most probable scenario (we don't expect errors
-  with the traffic that we are sending).
-- Removed any checks performed on the remot interface counters since
-  that is being used only as a traffic generator.
-
- .../testing/selftests/drivers/net/hw/Makefile |   1 +
- .../drivers/net/hw/ethtool_std_stats.sh       | 187 ++++++++++++++++++
- 2 files changed, 188 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/hw/ethtool_std_stats.sh
-
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index 91df028abfc0..2b185d2fa32e 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -26,6 +26,7 @@ TEST_PROGS = \
- 	ethtool_extended_state.sh \
- 	ethtool_mm.sh \
- 	ethtool_rmon.sh \
-+	ethtool_std_stats.sh \
- 	hw_stats_l3.sh \
- 	hw_stats_l3_gre.sh \
- 	iou-zcrx.py \
-diff --git a/tools/testing/selftests/drivers/net/hw/ethtool_std_stats.sh b/tools/testing/selftests/drivers/net/hw/ethtool_std_stats.sh
-new file mode 100755
-index 000000000000..b411a0c80bde
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/ethtool_std_stats.sh
-@@ -0,0 +1,187 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#shellcheck disable=SC2034 # SC does not see the global variables
-+#shellcheck disable=SC2317,SC2329 # unused functions
-+
-+ALL_TESTS="
-+	test_eth_ctrl_stats
-+	test_eth_mac_stats
-+	test_pause_stats
-+"
-+STABLE_MAC_ADDRS=yes
-+NUM_NETIFS=2
-+lib_dir=$(dirname "$0")
-+# shellcheck source=./../../../net/forwarding/lib.sh
-+source "$lib_dir"/../../../net/forwarding/lib.sh
-+
-+UINT32_MAX=$((2**32 - 1))
-+
-+traffic_test()
-+{
-+	local iface=$1; shift
-+	local neigh=$1; shift
-+	local num_tx=$1; shift
-+	local pkt_format="$1"; shift
-+	local -a counters=("$@")
-+	local int grp counter target exact_check
-+	local before after delta
-+	local num_rx=$((num_tx * 2))
-+	local xfail_message
-+	local src="aggregate"
-+	local i
-+
-+	for i in "${!counters[@]}"; do
-+		read -r int grp counter target exact_check xfail_message <<< "${counters[$i]}"
-+
-+		before[i]=$(ethtool_std_stats_get "$int" "$grp" "$counter" "$src")
-+	done
-+
-+	# shellcheck disable=SC2086 # needs split options
-+	run_on "$iface" "$MZ" "$iface" -q -c "$num_tx" $pkt_format
-+
-+	# shellcheck disable=SC2086 # needs split options
-+	run_on "$neigh" "$MZ" "$neigh" -q -c "$num_rx" $pkt_format
-+
-+	for i in "${!counters[@]}"; do
-+		read -r int grp counter target exact_check xfail_message <<< "${counters[$i]}"
-+
-+		after[i]=$(ethtool_std_stats_get "$int" "$grp" "$counter" "$src")
-+		if [[ "${after[$i]}" == "null" ]]; then
-+			log_test_skip "$grp-$counter on $int" "not supported"
-+			continue;
-+		fi
-+
-+		delta=$((after[i] - before[i]))
-+
-+		RET=0
-+		if [ "$exact_check" -ne 0 ]; then
-+			[ "$delta" -eq "$target" ]
-+		else
-+			[ "$delta" -ge "$target" ] && [ "$delta" -le "$UINT32_MAX" ]
-+		fi
-+		err="$?"
-+
-+		if [[ $err != 0  ]] && [[ -n $xfail_message ]]; then
-+			log_test_xfail "$grp-$counter on $int" "$xfail_message"
-+			continue;
-+		fi
-+		check_err "$err" "$grp-$counter is not valid on $int (expected $target, got $delta)"
-+		log_test "$grp-$counter on $int"
-+	done
-+}
-+
-+test_eth_ctrl_stats()
-+{
-+	local pkt_format="-a own -b bcast 88:08 -p 64"
-+	local num_pkts=1000
-+	local -a counters
-+
-+	counters=("$h1 eth-ctrl MACControlFramesTransmitted $num_pkts 0")
-+	traffic_test "$h1" "$h2" "$num_pkts" "$pkt_format" \
-+		"${counters[@]}"
-+
-+	counters=("$h1 eth-ctrl MACControlFramesReceived $num_pkts 0")
-+	traffic_test "$h2" "$h1" "$num_pkts" "$pkt_format" \
-+		"${counters[@]}"
-+}
-+
-+test_eth_mac_stats()
-+{
-+	local pkt_size=100
-+	local pkt_size_fcs=$((pkt_size + 4))
-+	local bcast_pkt_format="-a own -b bcast -p $pkt_size"
-+	local mcast_pkt_format="-a own -b 01:00:5E:00:00:01 -p $pkt_size"
-+	local ucast_pkt_format="-a own -b $h2_mac -p $pkt_size"
-+	local num_pkts=2000
-+	local octets=$((pkt_size_fcs * num_pkts))
-+	local -a counters error_cnt collision_cnt
-+
-+	# Error counters should be exactly zero
-+	counters=("$h1 eth-mac FrameCheckSequenceErrors 0 1"
-+		  "$h1 eth-mac AlignmentErrors 0 1"
-+		  "$h1 eth-mac FramesLostDueToIntMACXmitError 0 1"
-+		  "$h1 eth-mac CarrierSenseErrors 0 1"
-+		  "$h1 eth-mac FramesLostDueToIntMACRcvError 0 1"
-+		  "$h1 eth-mac InRangeLengthErrors 0 1"
-+		  "$h1 eth-mac OutOfRangeLengthField 0 1"
-+		  "$h1 eth-mac FrameTooLongErrors 0 1"
-+		  "$h1 eth-mac FramesAbortedDueToXSColls 0 1")
-+	traffic_test "$h1" "$h2" "$num_pkts" "$bcast_pkt_format" \
-+		"${counters[@]}"
-+
-+	# Collision related counters should also be zero
-+	counters=("$h1 eth-mac SingleCollisionFrames 0 1"
-+		  "$h1 eth-mac MultipleCollisionFrames 0 1"
-+		  "$h1 eth-mac FramesWithDeferredXmissions 0 1"
-+		  "$h1 eth-mac LateCollisions 0 1"
-+		  "$h1 eth-mac FramesWithExcessiveDeferral 0 1")
-+	traffic_test "$h1" "$h2" "$num_pkts" "$bcast_pkt_format" \
-+		"${counters[@]}"
-+
-+	counters=("$h1 eth-mac BroadcastFramesXmittedOK $num_pkts 0"
-+		  "$h1 eth-mac OctetsTransmittedOK $octets 0")
-+	traffic_test "$h1" "$h2" "$num_pkts" "$bcast_pkt_format" \
-+		"${counters[@]}"
-+
-+	counters=("$h1 eth-mac BroadcastFramesReceivedOK $num_pkts 0"
-+		  "$h1 eth-mac OctetsReceivedOK $octets 0")
-+	traffic_test "$h2" "$h1" "$num_pkts" "$bcast_pkt_format" \
-+		"${counters[@]}"
-+
-+	counters=("$h1 eth-mac FramesTransmittedOK $num_pkts 0"
-+		  "$h1 eth-mac MulticastFramesXmittedOK $num_pkts 0")
-+	traffic_test "$h1" "$h2" "$num_pkts" "$mcast_pkt_format" \
-+		"${counters[@]}"
-+
-+	counters=("$h1 eth-mac FramesReceivedOK $num_pkts 0"
-+		  "$h1 eth-mac MulticastFramesReceivedOK $num_pkts 0")
-+	traffic_test "$h2" "$h1" "$num_pkts" "$mcast_pkt_format" \
-+		"${counters[@]}"
-+}
-+
-+test_pause_stats()
-+{
-+	local pkt_format="-a own -b 01:80:c2:00:00:01 88:08:00:01:00:01"
-+	local xfail_message="software sent pause frames not detected"
-+	local num_pkts=2000
-+	local -a counters
-+	local int
-+	local i
-+
-+	# Check that there is pause frame support
-+	for ((i = 1; i <= NUM_NETIFS; ++i)); do
-+		int="${NETIFS[p$i]}"
-+		if ! run_on "$int" ethtool -I --json -a "$int" > /dev/null 2>&1; then
-+			log_test_skip "No support for pause frames, skip tests"
-+			exit
-+		fi
-+	done
-+
-+	counters=("$h1 pause tx_pause_frames $num_pkts 0 $xfail_message")
-+	traffic_test "$h1" "$h2" "$num_pkts" "$pkt_format" \
-+		"${counters[@]}"
-+
-+	counters=("$h1 pause rx_pause_frames $num_pkts 0")
-+	traffic_test "$h2" "$h1" "$num_pkts" "$pkt_format" \
-+		"${counters[@]}"
-+}
-+
-+setup_prepare()
-+{
-+	local iface
-+
-+	h1=${NETIFS[p1]}
-+	h2=${NETIFS[p2]}
-+
-+	h2_mac=$(mac_get "$h2")
-+}
-+
-+check_ethtool_counter_group_support
-+trap cleanup EXIT
-+
-+setup_prepare
-+setup_wait
-+
-+tests_run
-+
-+exit "$EXIT_STATUS"
--- 
-2.25.1
-
+Tested-by: Samuel Salin <Samuel.salin@intel.com>
 
