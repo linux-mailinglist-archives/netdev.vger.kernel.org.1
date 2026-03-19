@@ -1,223 +1,238 @@
-Return-Path: <netdev+bounces-269290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269291-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uL5hGKlvu2mjkAIAu9opvQ
-	(envelope-from <netdev+bounces-269290-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:38:17 +0100
+	id 2Ar9Grpyu2kdkQIAu9opvQ
+	(envelope-from <netdev+bounces-269291-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:51:22 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8B3F2C59B3
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:38:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C243C2C5B4E
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:51:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 66E3630D22AF
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:35:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 970A3308CBEC
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104B42D0C9C;
-	Thu, 19 Mar 2026 03:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B6630101F;
+	Thu, 19 Mar 2026 03:51:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="aLhwJ9mf"
+	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="XahrJVVD";
+	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="utA62WXU"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011062.outbound.protection.outlook.com [40.107.130.62])
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A820B1DD889;
-	Thu, 19 Mar 2026 03:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773891321; cv=fail; b=e06M69ZKjCQIEOEHAuF/mopVSr5JQkeIRYiubseYQdLEDDQKTS3NsMzbGegGL15dFD5hi6WKBuwVEaUKrXD4o7vTAEVm6PPGwk4BL3cQGYoWo0QUYxzo13C68jXsvFhdruilZNUwMVVAWQcfdxjtHMy5dSoqT0rh7/U4q0aUxg0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773891321; c=relaxed/simple;
-	bh=FF8+6fMjaQsprjBLXAxGFwfnpVlTKhxm50ku+eTDBWs=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NJPhVt+ZIUnODJUWvjR1/y97f1A2F1bav6xBZUV62riU+M8qZoTPUPR/CGwvNzb4wdsQOEI9VOS8u/Pm+Q4X8xIa6JMEH4UcprpsR067gjhuVNeFskj+bsMaGPfRXrTQrft8CoaHtFX81MLEI+PtqiF93758rRRTjbJz6Vtc5OA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=aLhwJ9mf; arc=fail smtp.client-ip=40.107.130.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f0GO6IoUi6OX5hIBpdmxenbEElLpgGsya/I3No8nGL+YCQ49kCDALyWRU/A/yLgK7D1larpCp9J7FL/HzrMt0RzxhOwLDOAdrmDAvdif4U2PzOWkuYI5BDmG0aVfIVElH4WBPn1UtrMt/y0dPlOENrL9mDYZpqINddtX3Qb4mKocs8sX9eBCbwxI1ouaZkzYDuY0F7cNKmfn8BD+ZmF9nqcSXvQu4u8QaMQW78meBTA9r6R9s60HdL8NDgDNFe0XW2qqIKvpIFWvZK0Mc38NsIVvECV1JHWFHxR1H7DICN5bDRLJ2Mh3Ghezj8SMAvHfHloIuFBjxRlHmsNfP7WR0A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rIvkSZ3zA9s62jK0sjWWLOuYXLSPx67+u08zOC73/GA=;
- b=YIbeGrQKTYEmmyXIKsPmtkrgmtSoPsxMRU7YAtIo48GgQ9f/785ZIvrAz8ZyK1qtNo13R9mSkSG2JcxJCkh8ryBISuuIpj82b5WUbkAR3hz3p98FEmOYKph/s7GIi6wZe2WhWFK73M+GIMnBEX3J2Sy6sFoRl3rVTaPtA24/EByS6L/Xyc54cWHfI1V+Mgi7R9teOfoyNGJXD0dP2rqTNj3J1IDyvwIPH/1NpfwjltKrFSxmqA+TxFVeX2nizk1vSFot81fnrY9M2DAbJKH/57b15ZXPladDY7IQsPxWfrSBxRgihcmPDqV3VXmrwWA6SUb6zoBUAhZwYle7VL6Jpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rIvkSZ3zA9s62jK0sjWWLOuYXLSPx67+u08zOC73/GA=;
- b=aLhwJ9mfowONgaFbsOmdXjmyImRrsx4WzHIdvYqpSuMv7rUWO/6b8jEOpKsAlS6YULNXjDEhmT1pH0rucTFDmUrsyT61GNFwtKg6Jrpobf3a7TRShz8PhxlTxxAJCPm73uoFOsLvcMXJ9s5BsQ5v1BAUXTif9xAMJYRHI2r3Sbkxt24GEh15ayLfu/EsoGO0kGvYxl+eRvuqx3VLp7R7Zr7pht8EwWdKxBxwrXQJFSTxF0c7HOIGJZvh2l2otoFiEK/7oDi6v/NM1cZvupz9bdCwBkeTqJdx5e2IJS1guJfTP4ZB/GzDzDOSzINJq+lCvpJpu/KbOnVGon1mTm1mmw==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by DB9PR04MB8140.eurprd04.prod.outlook.com (2603:10a6:10:249::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Thu, 19 Mar
- 2026 03:35:14 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::b476:c19a:24cd:3694]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::b476:c19a:24cd:3694%3]) with mapi id 15.20.9723.018; Thu, 19 Mar 2026
- 03:35:12 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Buday Csaba <buday.csaba@prolan.hu>, Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, =?iso-8859-1?Q?Cs=F3k=E1s=2C_Bence?=
-	<csokas.bence@prolan.hu>, Frank Li <frank.li@nxp.com>, Francesco Dolcini
-	<francesco.dolcini@toradex.com>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net 1/1] net: fec: fix the PTP periodic output sysfs
- interface
-Thread-Topic: [PATCH net 1/1] net: fec: fix the PTP periodic output sysfs
- interface
-Thread-Index: AQHctu/GZE92suzIgk2+bQlhrX9NVLW1Lrng
-Date: Thu, 19 Mar 2026 03:35:12 +0000
-Message-ID:
- <PAXPR04MB8510E8145481F667DD769F23884FA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References:
- <e2518c8f932fd9da6754b5ab5cc892ed58a0c1db.1773849293.git.buday.csaba@prolan.hu>
-In-Reply-To:
- <e2518c8f932fd9da6754b5ab5cc892ed58a0c1db.1773849293.git.buday.csaba@prolan.hu>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|DB9PR04MB8140:EE_
-x-ms-office365-filtering-correlation-id: 31618092-1e3d-4710-7ea7-08de85688719
-x-ld-processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|7416014|376014|19092799006|38070700021|18002099003|921020|22082099003|56012099003;
-x-microsoft-antispam-message-info:
- Llfm2OnOpoeIZEbUjZif/qiTix2ZXloK6RuXwjRWng3zu8EAlNS1hatA8l2EKWu3TfWc9xpvi7B+Y5LfG5wiRe42Y3z/YO5o7I/sv+US675+KlaPAd/9WdglWsXYLQPgy7DvtUWQsrmSKVVSFAtgtogZO5N/QwWF+cYQkai8kODjIXOcrew/dPGY0athmKVUm2F6c5tn6IDk3AoUfXPxen+TPdlMhEwnRSLHO2EAJmwn5rB17xbTGsyy8TGoSoBt18pKxiQpZbApElZ09KekSqxw4UWpdbpu8VItK5NPqNB/hW1TbSUF653xxekHw9ZUXRHSXQtTzkiRiVNh11l1LGPblLWMk8cwpIruol7HVAWZCJ29Lh7E+IG10ocZ6Ig4m3lmY70xgCYhfJAsChxaXsG5LHDtV4HeIseH4fVyuMQ95OYF/+UQNqaGdwCKt4EC5cyUHXczIpN8oigp36r/+OLIMwYxsVwKYRj01upT/l5TxJSHM3oAPsYOJlR3Q/HTqOYVEB1iYqKf+4bYI4O7+mIZQcMbhYOZeuV+NyUTwQF4gYM2Lz1WFfBKhnNrnxHdOq3wentTqhdqB9DB2FYKs7vWL/eszgWCHgV3UOi9xVRPLQbmqsL7OJ5+IzGCBuFPyjoB8zwLJkNEDVnZroQXt5r0eoa4Be/gfEop3G7BZxEWWYVOBuX3aSIJ8v8g4ie4O3UvTcxVaG8V8M8G+QIczmvstf6GjS6v5Dr2HVHFqI93vC9XBZUCTnEwA818O6CcUFDjLqGcqkIsv5lQpeAgwF48/59MxogasHEVev+XeF1GKRz4AlnVpzQsVzNVytTP
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(19092799006)(38070700021)(18002099003)(921020)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?vCclr0927FTIODHoVO+N25/yRpsH73WWspquuKv6iT9gdyhCv1KalUTPix?=
- =?iso-8859-1?Q?+g+PHtAJU9rrNGCLxlS9KXwy4I+ToHZIwWmHgFIhqoWcqgAQWM82SlnndE?=
- =?iso-8859-1?Q?BJYlScpb06pkYF79ItLfUpl7MkfbPOl9NF9RnGNKWtvnhKyUFnme4E5mv4?=
- =?iso-8859-1?Q?tb87umwk/oFrX2CPZMraZ3aAhaKg36WN7JJvJRZVwBhWo+HWb8dzeVpP2C?=
- =?iso-8859-1?Q?I1HQcSdgO6wbi7uYT63u9sZtRodNACUuFFa602zjOfbVJjAnnIwUJGhWJU?=
- =?iso-8859-1?Q?K+kOpwahk8145PPEHqrNV8IcchCyasgg+E9gVY2s+JRkwHFh+Y71yva9mH?=
- =?iso-8859-1?Q?HoRm09uk0x1uNboMNUA+qGLICDx5H00p+cqU1/JA7o+YHrhOwdN4QfHdpm?=
- =?iso-8859-1?Q?MMROVXTGgqhRjB4YFhkCT383Z+AMYMup7hTylKNnOAhTCEcWPvwzy8rtbB?=
- =?iso-8859-1?Q?UqCMQTQUFsdRi77HLpDV8jKWn85PdWR4/g6fUjsPf6oStGjlteVXWf3UUY?=
- =?iso-8859-1?Q?dKx4XWiEq+ahU1sbTRYVgU1dL0TG97RYaBrNQmeURBF+NmW9Gb7PEe6FHj?=
- =?iso-8859-1?Q?THOlQzXv4qRNV0ZrMoLqmMkNK8Ez4stjfEgtKuCqnj7mxf3Dnn079MgATF?=
- =?iso-8859-1?Q?nEarjvOmmYQqnbDiyFRXKtTa4yfvcmrZiMvWQ+q9QZBoCsk68H3XL8L5Te?=
- =?iso-8859-1?Q?wjA7EI5nheVbY9ADxgZvnpnZDwd6ZF/hZveMwURXelipSiIBGwrOcCCoUC?=
- =?iso-8859-1?Q?NIwrB32E8YB8ihjiox/pfCIhcMcFJOpf4gJOumyv7L1Sr+ot++2uwSZMJP?=
- =?iso-8859-1?Q?zmCBKOZCCcb5dFHCGQ98pJUiktmD3VAjIQX6yuBW0qgRnPfYMVCzYAtx4V?=
- =?iso-8859-1?Q?P4l7rJ5v+YKWQQTsiVkhdiulvUFyRnoRRg2utCAGmSalxx1e9IOQbKK2Hm?=
- =?iso-8859-1?Q?j/6GTsu6fMh/mBy4EEUtvRqkmAue/uoaL9ViPNVWoY1YRJl9RJhYUCjYF4?=
- =?iso-8859-1?Q?+uHWB1GLGjgKRZ2SEKi6Rf6AjDZ48WH6JAESqvumLB74r7B1weBbXze169?=
- =?iso-8859-1?Q?KtFMXnNRNCeQqR6tdrxqsHK/38vO+3c85R8J6oyxl1HqXV+HhmX/m8ClE6?=
- =?iso-8859-1?Q?lY+SIrFMwI7K7qcCywIsRhK0mOpBRj1SYxUHJXHcqMPE4KE8yMhdarbQyD?=
- =?iso-8859-1?Q?CmAUiWfUnU09ZGQsDLp7FDnDU/vShzscy0WT1pa+Ve2QRXFS+A63O0xTFK?=
- =?iso-8859-1?Q?IBmIw1evOmsRVTiJ8b9HutF5oyJMx106ugT4v3wIk6KuA8JqvnRPC9lgWI?=
- =?iso-8859-1?Q?glHMhh5avb0z953DgPvOwDL0BlSV/jE9bQU8TH6M1/sjs9LVg3g67vhnet?=
- =?iso-8859-1?Q?BpQuVg1FR604eo+gXk0VfzwuoNKHAaQYCGyJ07AxNIywFmUOHT8zMXSIoM?=
- =?iso-8859-1?Q?m8HoljQN95NrSfqyatJ1/iRizY7Vbr6NRLuyBVmX+fY2UNCMgTwXVKjHF8?=
- =?iso-8859-1?Q?7BMtRJhtaUCPj8izkaLEIZuBhNi+YGWQSEX9pI4YB1mDqZo8Z3eF6xTh1o?=
- =?iso-8859-1?Q?Sxd121Nile+qpT0QBxrtf09acAPL/47dXCvfkDsxJgVVMn+3+rgqjzZGYP?=
- =?iso-8859-1?Q?3LgRnCAdOvqwpTdfSdzbIHFLP2UmA3d0bgq7pCn2pT/O/dzzqEUlJ/IeQL?=
- =?iso-8859-1?Q?YSlpf3W90h/aBl/y5jB1qaDYNKDGT9OX7QYHHU7liXxc1UZeYw6oqWsq/O?=
- =?iso-8859-1?Q?7nL8QiETgIwlqS4h8Wo10JDXmeTi+WIPYky8/vFOf6Lbw2?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2E52D6407;
+	Thu, 19 Mar 2026 03:51:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773892273; cv=none; b=EV+go97FTUWRcCtT4m/9lr6YkAKdOZRLBqqsWnyYUHsGoAZjU6iT1Zpe95XTYDqhJzbEJLnnqPiDz/3hLcCpyho3uixqL+OIj41BZbo5MbiUJeRCxfDTIETtp7ea8MjA8whkyGyd83wKoOFzXYHKkfmX1Oa210rj+oE3sSx4ZlU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773892273; c=relaxed/simple;
+	bh=5ZIa+VrEFGT6s1b0n+11rNRJMPKAoeTf6ErlW04zVms=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=k1symkfDP5hVAssYtyx2MhNf1SPXyCBE/q9NhcB277BEO6jjEXOz8LPvBb2v1b/uxzFU2hj8PF5KIOvBc6TVJyfk65UNWRc8aETG4qxogZtavUiiBzNqJa6lg5Wz3auVO3GG5kyIHxU0yQGogUZPP/FHaIJNb8hd0qVj5xr2Aaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=XahrJVVD; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=utA62WXU; arc=none smtp.client-ip=160.80.4.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 62J3oKkn029244;
+	Thu, 19 Mar 2026 04:50:25 +0100
+Received: from lubuntu-18.04 (unknown [160.80.103.126])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 7F46D1205C5;
+	Thu, 19 Mar 2026 04:50:16 +0100 (CET)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1773892216; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YolXrcb2/k8M+7PX1AoAcwS/BpwizcrDlJUgtvNcKuA=;
+	b=XahrJVVDeKrgVSOvrX1atO9T5q2RCy9T3Yn+UkJh2g/gZecKvzFpBJbv9DUKttMPRIAWa+
+	RmS1BbYUsDEsNuCQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1773892216; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YolXrcb2/k8M+7PX1AoAcwS/BpwizcrDlJUgtvNcKuA=;
+	b=utA62WXUeNb7C0mqKix132Fu4TDFLyYLOFqIa02MKoB5HDotjak907RZ3Lb5gnTQNM1WZk
+	g6XVbJjCIzbUEJ2wDE+ieE+tTa+LYC/8ZX9a6TjfNVyAly+5el/pRjZnExnM6eTnuJfw/w
+	4aK/Hvckb8ZrIH2zleT6ABzJGgIx/BokavCr4AMVgptkshEM61cMcVlypP6S9GuJ3OYz/W
+	1Zlg0WlSrvSNr4t1AlcRogihj1ktYAQwbmJo5tgV34QhWKoMvDogVRP9i6pHfnQg9Vbn3X
+	Gkl+MWFQY1GKcv9gkgECPxrXkwsLynTREL8Iq193hhHV23DqH1C/Rjsr6ObVDQ==
+Date: Thu, 19 Mar 2026 04:50:16 +0100
+From: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: Justin Iurman <justin.iurman@6wind.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+        justin.iurman@gmail.com, nicolas.dichtel@6wind.com,
+        stefano.salsano@uniroma2.it, paolo.lungaroni@uniroma2.it,
+        ahabdels@cisco.com, Shuah Khan <shuah@kernel.org>,
+        linux-kselftest@vger.kernel.org,
+        Andrea Mayer <andrea.mayer@uniroma2.it>
+Subject: Re: [PATCH net-next v3 2/2] selftests: add check for seg6 tunsrc
+Message-Id: <20260319045016.df6af895b17517b8e7e9dc5c@uniroma2.it>
+In-Reply-To: <CAOY2BqxrY6je_34375P2FEGp=-TatSb3oSktWXcc-xBeMRqYVA@mail.gmail.com>
+References: <20260316162955.1253225-1-justin.iurman@6wind.com>
+	<20260316162955.1253225-3-justin.iurman@6wind.com>
+	<20260317115430.cfd3846b20c1e2314d468b5d@uniroma2.it>
+	<CAOY2BqxrY6je_34375P2FEGp=-TatSb3oSktWXcc-xBeMRqYVA@mail.gmail.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 31618092-1e3d-4710-7ea7-08de85688719
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Mar 2026 03:35:12.2513
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LZEdj0tZ08KP6fVEqtXW40nK6P4Z5TKCDtnPf9243Ejqi4KV/M0FSqmW8k//tOf8k9Y9tAxj0hIdAoZnc28I1g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8140
-X-Spamd-Result: default: False [1.34 / 15.00];
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269290-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,6wind.com,uniroma2.it,cisco.com];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[prolan.hu,nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,toradex.com,lists.linux.dev,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-269291-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[uniroma2.it:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.974];
-	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:dkim,prolan.hu:email,PAXPR04MB8510.eurprd04.prod.outlook.com:mid]
-X-Rspamd-Queue-Id: B8B3F2C59B3
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.957];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[encap.red:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,encaps.red:url,srv6_hencap_red_l3vpn_test.sh:url]
+X-Rspamd-Queue-Id: C243C2C5B4E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> Fixes: bf8ca67e2167 ("net: fec: refactor PPS channel configuration")
->=20
-> Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
-> ---
->  drivers/net/ethernet/freescale/fec_ptp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/freescale/fec_ptp.c
-> b/drivers/net/ethernet/freescale/fec_ptp.c
-> index 7f6b574320716..c1af81002b8fa 100644
-> --- a/drivers/net/ethernet/freescale/fec_ptp.c
-> +++ b/drivers/net/ethernet/freescale/fec_ptp.c
-> @@ -534,7 +534,7 @@ static int fec_ptp_enable(struct ptp_clock_info *ptp,
->  		if (rq->perout.flags)
->  			return -EOPNOTSUPP;
->=20
-> -		if (rq->perout.index !=3D fep->pps_channel)
-> +		if (rq->perout.index !=3D 0)
->  			return -EOPNOTSUPP;
->=20
->  		period.tv_sec =3D rq->perout.period.sec;
-> --
-> 2.39.5
->=20
+On Wed, 18 Mar 2026 13:29:56 +0100
+Justin Iurman <justin.iurman@6wind.com> wrote:
 
-I think the correct fix should update the n_per_out value like below.
+> On Tue, Mar 17, 2026 at 11:54 AM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
+> >
+> > On Mon, 16 Mar 2026 17:29:55 +0100
+> > Justin Iurman <justin.iurman@6wind.com> wrote:
+> >
+> > > Extend srv6_hencap_red_l3vpn_test.sh to include checks for the new
+> > > "tunsrc" feature.
+> > >
+> > > Cc: Shuah Khan <shuah@kernel.org>
+> > > Cc: linux-kselftest@vger.kernel.org
+> > > Signed-off-by: Justin Iurman <justin.iurman@6wind.com>
+> > > ---
+> > >  .../net/srv6_hencap_red_l3vpn_test.sh         | 65 ++++++++++++++-----
+> > >  1 file changed, 50 insertions(+), 15 deletions(-)
+> 
+> [snip]
+> 
+> > > -     # Direction hs-1 -> hs-2 (H.Encaps.Red)
+> > > +     # Direction hs-1 -> hs-2 (H.Encaps.Red + tunsrc)
+> > >       # - rt-2 (SRv6 End.DT46 behavior)
+> > >       #
+> > >       # Direction hs-2 -> hs-1 (H.Encaps.Red)
+> > >       #  - rt-4,rt-3 (SRv6 End behaviors)
+> > >       #  - rt-1 (SRv6 End.DT46 behavior)
+> > > -     setup_rt_policy_ipv4 2 1 "" 2 encap.red
+> > > -     setup_rt_policy_ipv4 1 2 "4 3" 1 encap.red
+> > > +     setup_rt_policy_ipv4 2 1 "" 2 encap.red true
+> > > +     setup_rt_policy_ipv4 1 2 "4 3" 1 encap.red false
+> > >
+> > >       # create an IPv6 VPN between hosts hs-3 and hs-4
+> > >       # the network path between hs-3 and hs-4 traverses several routers
+> > >       # depending on the direction of traffic.
+> > >       #
+> > > -     # Direction hs-3 -> hs-4 (H.Encaps.Red)
+> > > +     # Direction hs-3 -> hs-4 (H.Encaps.Red + tunsrc)
+> > >       # - rt-2 (SRv6 End Behavior)
+> > >       # - rt-4 (SRv6 End.DT46 behavior)
+> > >       #
+> > >       # Direction hs-4 -> hs-3 (H.Encaps.Red)
+> > >       #  - rt-1 (SRv6 End behavior)
+> > >       #  - rt-3 (SRv6 End.DT46 behavior)
+> > > -     setup_rt_policy_ipv6 4 3 "2" 4 encap.red
+> > > -     setup_rt_policy_ipv6 3 4 "1" 3 encap.red
+> > > +     setup_rt_policy_ipv6 4 3 "2" 4 encap.red true
+> > > +     setup_rt_policy_ipv6 3 4 "1" 3 encap.red false
+> > >
+> > >       # testing environment was set up successfully
+> > >       SETUP_ERR=0
+> >
+> >
+> > The paths marked "true" here were testing the encap.red baseline before
+> > this change. They need to stay exactly as they were originally.
+> > Furthermore, if tunsrc is not supported by the kernel running the test,
+> > the ip route command with tunsrc will fail during setup() (since
+> > set -e is used), and the entire script dies before any test runs.
+> 
+> I kinda disagree here: you're not supposed to run the updated
+> selftests on an old kernel or with an old iproute2 version (versions
+> are kept aligned). And I also concur with Jakub about degraded
+> environments on your last comment below.
+> 
+> > The idea here is to avoid duplicating the entire test suite, while still
+> > providing dedicated test cases for the new per-route tunsrc. A reasonable
+> > approach could be adding the tunsrc checks as new, separate test cases
+> > that run after the baseline ones, leaving the existing paths completely
+> > untouched.
+> >
+> > For example, a dedicated test_tunsrc() function could take care of the
+> > whole thing for a given path: setting up the tunsrc address, installing
+> > the route with tunsrc, verifying the behavior, cleaning up, and finally
+> > restoring the original route.
+> 
+> Well, I actually thought that this approach would be easier, and would
+> specifically avoid adding too much code or having duplication. FWIW, I
+> don't think providing dedicated test cases for the new per-route
+> tunsrc really makes sense, as it's the same behavior as without
+> "tunsrc". It doesn't impact the encap baseline by itself, since
+> nothing in the selftests depends on the outer source address. I'm open
+> to implement what you suggest, though, it's just that I'm not sure
+> it's the best way forward.
+> 
+> What I suggest as next step: I'll ship patch #1 alone, along with the
+> iproute2-next companion series, so that we don't miss the merge window
+> and have the feature in 7.1. In parallel, we keep discussing design
+> choices for the selftest and ship it as soon as we settle. Would you
+> agree with that plan?
+> 
+> Cheers,
+> Justin
+> 
 
-@@ -756,7 +756,7 @@ void fec_ptp_init(struct platform_device *pdev, int irq=
-_idx)
-        fep->ptp_caps.max_adj =3D 250000000;
-        fep->ptp_caps.n_alarm =3D 0;
-        fep->ptp_caps.n_ext_ts =3D 0;
--       fep->ptp_caps.n_per_out =3D 1;
-+       fep->ptp_caps.n_per_out =3D 4;
+Hi Justin,
 
-The commit 566c2d83887f ("net: fec: make PPS channel configurable") added
-the property "fsl,pps-channel" to indicate which pulse channel is available=
-. So
-we should not fix the pulse output channel to 0.
+IMHO, the optimal goals should be:
+1) have at least a selftest that covers the new feature;
+2) re-use *if reasonable* existing selftests;
+3) have selftests that run on a reasonable set of kernels and
+   environments, without unreasonably increasing their complexity.
 
+I'd prefer to have the selftest shipped together with the feature.
+I think we could find a reasonable way to integrate the tunsrc checks
+without overcomplicating the existing selftest.
+Let me send you an idea offline so we can evaluate it together.
+
+I certainly don't want to hold up the tunsrc feature, it's something
+I find very interesting and that I also discussed at netdev 0x19 (2025).
+
+Thanks,
+Andrea
 
