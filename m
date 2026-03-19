@@ -1,161 +1,127 @@
-Return-Path: <netdev+bounces-269287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269286-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WPE1DSBtu2nGjwIAu9opvQ
-	(envelope-from <netdev+bounces-269287-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:27:28 +0100
+	id UO75Ov1su2nGjwIAu9opvQ
+	(envelope-from <netdev+bounces-269286-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:26:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C88732C57A1
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:27:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 457AC2C575E
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 04:26:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C882D30B55DF
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:27:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD09130AB5F4
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 03:26:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D3936CE03;
-	Thu, 19 Mar 2026 03:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45408369997;
+	Thu, 19 Mar 2026 03:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FAVbR31M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LDhxGOaC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B925369997
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 03:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2107136895C;
+	Thu, 19 Mar 2026 03:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773890819; cv=none; b=FWmzp3Jonv5mhAgl23ORfi7UbO/UAuU+HrkeeR7SiKGrhY/M8v6JdTWUtIgq/liC2q7JFJtjhdpA8l5YWxHaoKDT+kD35mPjNf8IhRQ2kD/hZgMPeskddyC4cvdCZ7MO9TvOek7z/z9vq953MVFtLPC+AH7w3BXVnCLEJfrBDDY=
+	t=1773890811; cv=none; b=HspWslGhj8+6pTBOkjXcix/20SjbESJP0zl5M46A69qY52/cCZE+CrgMqPlFQdYhoSmhV2nwkZES2lfqEljUQlIGxsX2oR7UXCggz8HtnOiHk0+i26jDFM08r1jxIadVrJ5KwwqvGzIf1zvJc2i28omnVvixCBkDpB6pdPsxisc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773890819; c=relaxed/simple;
-	bh=YylRe5YxHrIFAHYA2sA8dXc43/jAqb167pOwafJJe+M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H2VnG0g18DC6YN4FcgJkbhqCjuW2WFRkOIAPlMGEPFjTO36JA2TW6Fa+yJw4eiqDGYFCL4xEJ7WGqo3Fqy0SU6u2lT8GvfFl7E4QSdbCKvCuHbCH+/tIdnudRzF4VZys59EyCS+vjcJ6Xh/46/YweUWalsxU9hVt5m8OwkAhPG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FAVbR31M; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-661cfb9f3aaso219378a12.2
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 20:26:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773890817; x=1774495617; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LJa0hR/irIUiusrwe3oMLmqKlCXFbsoEt4pwhDPj6/4=;
-        b=FAVbR31MA4oEtuvYazCe80xG5zthBPKZnp9I/vGHpXpHiUVyio1BOf0/ee4s8J19lS
-         D95pNy5Z6slUiOiZp+B5NMZS10yvw4IpcQmK7d2EMVtHaLKbgnc+Yqi8n7cYzxfNZQX9
-         BKxrcsCrEE8XzUDtI7Wf1NCV6FztOG6iwH2p5lCHH2gGt8ZgihXi0i8H0I5MqB2hhLcg
-         DfeZUAY1ec6x0+qGjMwRHX6cncdcICO61dvgOtocJZ3XRrrstrKN2E/4LzewKSqo0BF5
-         OmloqRTfUNV6kt22X9xy7GQmu6ZVHmb2ucruez4XQli9yqYHz6oGkY8BMfNXkJKU6YYG
-         UHwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773890817; x=1774495617;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LJa0hR/irIUiusrwe3oMLmqKlCXFbsoEt4pwhDPj6/4=;
-        b=CttV4MyYw7dVbZigNpHRkf2srz2O6VpsaQ4le2IPiotbAdTamQTcrHucBlDmSBWMdJ
-         DrhnZDbBhEraame7iQCIGMIlncU9rraIo3NSGX0/VaH0eJ/hvw3J9BswwCMg3SKlPYee
-         heBlNUp5qZh2dSbm5ymVhvsy+MiK2IlfVCpyXGfb8Wg/t75fS17B4PWx+NeYMqmWnDYy
-         RVv5xP8djUbyA0Pwfyb9KB4Bzgyo1dGnsLnbiQ01S8NN2G4+R8cChyBpPc46UfkkDXV1
-         8jx3Om9TR/hO5FZ3DEb9ceSu+azb6pPOKdCXIgls6lG8qC4bFkQhimdKpwuSZqqSTLB6
-         tMHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWedv6gLTTeUjEiFe5Lf24MjqxiIg943aYIFjcJJtxAnCbZB6FMI7+2GKiSbLZ5kOIRNrTUUjI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxg0dyHvoNNZrdSEswGZBPvWjN9AnsC9suYP9/hYhiuqjWMq09b
-	b14koOGNgvzWifQQyaWF+kRxVgXu8SlvA5sErfAynIrUHk9qLVlNEuvQmy2BqywJ94Q=
-X-Gm-Gg: ATEYQzwKa233q6c2tH5MAX+S/yMGDwKQkNlNkypoOTIQu5YsMuqy5qYN+SuATLuRH9a
-	yE3/y7pSgrRQlsaFAexpKGkB1maReZB9+SdW7AulhWuZmwMX3Rk0T3iQCMjaFdOvgQnPwN9ueUe
-	e2YmpFkb55n5c5dubr+Cy1TIoNtUkcUY9l/4JDwahv6qwkVI0+RwbTvpNIbRV0VfovehLNNXCpn
-	Xj8FJHd/TG4enpuY83YWUsdTXTokkdaPjbeJOstVDO48HZUDMRTxsKikAHjmSo3DlIEbZnVVxbw
-	TxwObhRIHbeAMizgQYISEFh2aS58MRLUXHm/qWwB6w0osgwvBLkbr8Vc1iGvVHXpZU5Kyyex/O9
-	iMK59uyYeYTt8y4Eob8Uai6dbUVFmZpmIMO87iXPKuvR3rFpR66OVywLA5j+KlB8kQxXgWxbKVN
-	SEfm8=
-X-Received: by 2002:a05:6402:5cd:b0:65b:edef:40b6 with SMTP id 4fb4d7f45d1cf-667b1880976mr3907686a12.6.1773890816443;
-        Wed, 18 Mar 2026 20:26:56 -0700 (PDT)
-Received: from gmail.com ([2a09:bac5:4e22:2e3c::49b:45])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-667af38d891sm3059684a12.9.2026.03.18.20.26.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 20:26:55 -0700 (PDT)
-From: Qingfang Deng <dqfext@gmail.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-Subject: [PATCH net] net: airoha: add RCU lock around dev_fill_forward_path
-Date: Thu, 19 Mar 2026 11:26:49 +0800
-Message-ID: <20260319032649.337812-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1773890811; c=relaxed/simple;
+	bh=Rtlq0JUZpyBPhjiv3ICVwtSl7cpISD31cuAaRsBhrBE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ktmcA5TW2Czj7vCbj48QzGBGq4AidfAh2lulbHnfpwFIcjIapjEhDEGrW/kzW17zW1veR82GqQXr6BuqrGyRfLb91+JDK2k2DPilZmPZRSs55YA9UBfB82f0KlebC6eUMybs6Tw/lWEkCQyTGZe1uwrWRDoWgTkJTqDAaRXtq4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LDhxGOaC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45B2BC19421;
+	Thu, 19 Mar 2026 03:26:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773890810;
+	bh=Rtlq0JUZpyBPhjiv3ICVwtSl7cpISD31cuAaRsBhrBE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LDhxGOaCZGaL2Y59/Lzuv/FJ3JjSsKJ4ioxyP905byxA2H62pFxNrxlnWtnqPiEgd
+	 NY5cOViSrcQLRJsqmKuD7pQhGidubOth4Knxy2Jfzr3iJReAL0gJmeacKHe5dCNqq0
+	 lP3kOvH3Z3BkuWdqNQLYKeBMUOECj2atDalYcPsN4OAA54z0vVxt/3a0sKIuiFTZlj
+	 rIOQVzC8ElzqO0lUa6NGeVo9N3kAKx45XGaEGuQQUPj3Y5lvgIS1YCfji3c24kX2lt
+	 rSXmRr5rFfkqcmtB5ZS+E+PxkeGxrx4tFQziqPaHhEqzKfhy25d8SbDUzqDWvvgB8M
+	 q0oPgEj+KTbfg==
+Date: Wed, 18 Mar 2026 20:26:49 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>,
+ syzbot+afbcf622635e98bf40d2@syzkaller.appspotmail.com, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Taehee Yoo <ap420073@gmail.com>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v1] net/ipv6: mcast: fix circular locking dependency
+ in __ipv6_dev_mc_inc()
+Message-ID: <20260318202649.004d33fd@kernel.org>
+In-Reply-To: <f877e139-2da9-49d9-93bf-9b4155d687a7@linux.dev>
+References: <20260317111208.62667-1-jiayuan.chen@linux.dev>
+	<20260318181536.47ed9fd1@kernel.org>
+	<f877e139-2da9-49d9-93bf-9b4155d687a7@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269287-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,syzkaller.appspotmail.com,davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-269286-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.595];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,afbcf622635e98bf40d2];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.867];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C88732C57A1
+X-Rspamd-Queue-Id: 457AC2C575E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Since 0417adf367a0 ("ppp: fix race conditions in ppp_fill_forward_path")
-dev_fill_forward_path() should be called with RCU read lock held. This
-fix was applied to net, while the Airoha flowtable commit was applied to
-net-next, so it hadn't been an issue until net was merged into net-next.
+On Thu, 19 Mar 2026 11:04:24 +0800 Jiayuan Chen wrote:
+> >> Split mca_alloc() into mca_alloc() + mca_init(): mca_alloc() does the
+> >> GFP_KERNEL allocation before mc_lock, mca_init() initializes under
+> >> mc_lock. If the address already exists, the pre-allocated memory is
+> >> simply freed. Also move inet6_ifmcaddr_notify() outside mc_lock since
+> >> it also does GFP_KERNEL allocation.  
+> > Moving the allocation seems fine, but also having to move the
+> > notification, potentially letting the notification go out of order
+> > makes me wonder if we aren't better off adding helpers for taking this
+> > lock which also call memalloc_noio_{save,restore} ?  
+> Yeah, using memalloc_noio helpers is simpler. I checked and there
+> are about 18 places taking mc_lock, so having a common mc_lock()/mc_unlock()
+> wrapper that does the noio save/restore covers them all (if necessary).
+> 
+> The only thing that feels a bit odd is using memalloc_noio in the networking
+> subsystem. It makes sense in block/fs to protect itself from recursion.
 
-Fixes: a9af709fda7e ("Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net")
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
----
- drivers/net/ethernet/airoha/airoha_ppe.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index ec5ce41dad80..02deb739a1c7 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -227,7 +227,9 @@ static int airoha_ppe_get_wdma_info(struct net_device *dev, const u8 *addr,
- 	if (!dev)
- 		return -ENODEV;
- 
-+	rcu_read_lock();
- 	err = dev_fill_forward_path(dev, addr, &stack);
-+	rcu_read_unlock();
- 	if (err)
- 		return err;
- 
--- 
-2.43.0
-
+Totally agree that it feels a bit odd that we have to worry about IO,
+but unless we can figure out a way to prevent nbd sockets from getting
+here all our solutions are dealing with noio in networking code :(
+IMHO it's better to acknowledge this with the explicit memalloc_noio 
+so future developers don't break things again with a mis-placed
+allocation.
 
