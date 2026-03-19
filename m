@@ -1,143 +1,121 @@
-Return-Path: <netdev+bounces-269628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269629-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0N9TAaRQvGkXwwIAu9opvQ
-	(envelope-from <netdev+bounces-269628-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:38:12 +0100
+	id cP+5NWFRvGkXwwIAu9opvQ
+	(envelope-from <netdev+bounces-269629-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:41:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74F902D1BA7
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:38:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 440932D1C0F
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:41:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AAF2630B266E
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:36:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BF1823008530
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:41:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E04A23AD515;
-	Thu, 19 Mar 2026 19:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE5BB3D5675;
+	Thu, 19 Mar 2026 19:41:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="q1+ZLUnf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yb9XlwQ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A173D36215A;
-	Thu, 19 Mar 2026 19:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3E9382291;
+	Thu, 19 Mar 2026 19:41:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773948991; cv=none; b=XyuSSwNvBgCWeFyNtsooYVsWuouMek/DWbc+urROe4pXtbJp8quwdYLaOvIYD6xG10k6QtbO6BAwBuXFvtd70QU5BzS1oygwyGEVsVUkHY+imZTqwGAgXCpFbdG8NDUzR3gXnnhOklqAPGYqsPPG3mpM224g/d/dj/5GYLXGL2E=
+	t=1773949276; cv=none; b=Dc7A4JoytHhQe5/q2dzA6O73fZAHWgHXdgXYyxtvE1fvkvGciCSAjZN5uhEItPXikfD7zKOyAZ9LdV+uoWLmgAlUX2q3j7eE7NG1bm447Jqpw6tbDqfN3pRI9Jf+WiOXGI5a6vJMljeFPBTi5WzN5jDmVhH18ILArMSobTtaxtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773948991; c=relaxed/simple;
-	bh=uMzgjyr4lRvewX3BgJKQHuVDUC0MB9dePa5pKDuyr4k=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EKvelhFHR+6zZ58XUbF6G+W52W1rYrAvukOneCuT1fxlmhsVN0DedpVtewsVGBc7kSqeJwuFdfJMo+0osDA+ILlnZfGIIRUep9niZHC8LHDw2QLJdIzX2YtEeImbrvjQ4aT5sbNfblBurhx3+teJzyh0lwO5qdcvR2RXQSyZGOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=q1+ZLUnf; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1773948990; x=1805484990;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uMzgjyr4lRvewX3BgJKQHuVDUC0MB9dePa5pKDuyr4k=;
-  b=q1+ZLUnfedlvNgDROktQzTr4AnzAwkw3e66HH8UZ6/Gjy/XrLBZzvvac
-   vqNhgZjwLhV64OyeD2VuQtw0y4Flg6T+9FdIByHgeIn1nX+bCdI0xn0hH
-   WeStFsPQ1I44BmtnbTBQsDx47OUiZPW1BukB5quKLVYs/PyMAKU4m9s74
-   pAMoP9MitvwVI2g4T/dXO3Ws/1TR3QHbsndbxgnVsnpn75x1vnDsqJvAS
-   RZOSlcEXVLYI7KFb+syH+30wezD0Pm9WzT8rRm6m9Mdr8SacsosWEId2U
-   3aEJnv3ptVHvGsVvo7N/eU/lg1H7jr5/pxRlCZZSpjNW1Kq+lBvbMFz5D
-   w==;
-X-CSE-ConnectionGUID: tEdg3PYiQ/y+TKzMp0uzxg==
-X-CSE-MsgGUID: Pdk0O8/vQXmaWSXSe8toeA==
-X-IronPort-AV: E=Sophos;i="6.23,129,1770620400"; 
-   d="scan'208";a="55349439"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 12:36:29 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
- chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Thu, 19 Mar 2026 12:36:18 -0700
-Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58 via Frontend Transport; Thu, 19 Mar 2026 12:36:15 -0700
-Date: Thu, 19 Mar 2026 12:36:07 -0700
-From: Charles Perry <charles.perry@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Charles Perry <charles.perry@microchip.com>, <netdev@vger.kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: document Microchip
- PIC64-HPSC/HX MDIO controller
-Message-ID: <abxQJ7XvrEVd0QOC@bby-cbu-swbuild03.eng.microchip.com>
-References: <20260317184610.315852-1-charles.perry@microchip.com>
- <20260317184610.315852-2-charles.perry@microchip.com>
- <1dec7b03-1ad1-4b7b-897a-5dc144dc18ee@lunn.ch>
+	s=arc-20240116; t=1773949276; c=relaxed/simple;
+	bh=TdlVJRwwkwahwEi8GZmgOPq7txdAgkP9t4ENRmXm/X0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mk4ofEkRlHyQJmFEAIhD/8XEZSDhFFUOfutHe25haZP/sViB6yDkR0KU1WD5wZTvNspEwcFiqUTUFl0kGUTqu1OZc/Jvz4HIodWlswBknjXCaHJuNp5T/CNZyx+I53P5EFtgdVLd8/2gcsqxGpZ+yWkK6L8a5QR7qRpU8NojjH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yb9XlwQ5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA4ABC19424;
+	Thu, 19 Mar 2026 19:41:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773949276;
+	bh=TdlVJRwwkwahwEi8GZmgOPq7txdAgkP9t4ENRmXm/X0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Yb9XlwQ5MNFqWqNL1DThNRuKpTqi6R9x3HGXLZztGXb4FgXi3fePOIJtLhLKDmrm5
+	 Kq4F6djmSPlN6Ss2IO0ZTgPkjLH/A0XXp095FYQPD5aErjCXnls2XvZunvpQeZyMQH
+	 OSDvjmSxDn3URptf3RVB+0vF0bSiG1uo6OZ5QVW56Vag/ILZy0YjmKFo9Eu5FgprgG
+	 2HN8gCqpl6YC4nZngYG9PYfxQSlIDV2maBw41Ob3sv2wvpBjg2U2Fm0cywFMe5Pqkc
+	 B5KYUaPS3k/JH7ISYp0oAFpS4NX+CLZ1AgRb7FCMzkxV8xgYNVgqRQrvmtZiiL+C9c
+	 MltmNSvx7OIrg==
+Date: Thu, 19 Mar 2026 12:41:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, ralf@mandelbit.com, Sabrina Dubroca
+ <sd@queasysnail.net>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org, horms@kernel.org
+Subject: Re: [PATCH net-next 8/9] selftests: ovpn: add test for the FW mark
+ feature
+Message-ID: <20260319124114.42f91f72@kernel.org>
+In-Reply-To: <20260317104023.192548-9-antonio@openvpn.net>
+References: <20260317104023.192548-1-antonio@openvpn.net>
+	<20260317104023.192548-9-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1dec7b03-1ad1-4b7b-897a-5dc144dc18ee@lunn.ch>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
-	TAGGED_FROM(0.00)[bounces-269628-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269629-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.952];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bby-cbu-swbuild03.eng.microchip.com:mid,microchip.com:dkim]
-X-Rspamd-Queue-Id: 74F902D1BA7
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.961];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 440932D1C0F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 19, 2026 at 05:59:36PM +0100, Andrew Lunn wrote:
-> > The hardware supports an interrupt pin to signal transaction completion
-> > which is not strictly needed as the software can also poll a "TRIGGER"
-> > bit for this.
+On Tue, 17 Mar 2026 11:40:22 +0100 Antonio Quartulli wrote:
+> From: Ralf Lici <ralf@mandelbit.com>
 > 
-> If the interrupt always exists, it is better to have it in DT. I
-> assume it will be in the SoC .dtsi file?
+> Add a selftest to verify that the FW mark socket option is correctly
+> supported and its value propagated by ovpn.
 > 
+> The test adds and removes nftables DROP rules based on the mark value,
+> and checks that the rule counter aligns with the number of lost ping
+> packets.
 
-Yes, I have that interrupt in my .dtsi.
+Hi! Now that the other fixes are in tree we can stop ignoring ovpn
+tests :) This new mark test is failing, looks like netfilter is not
+enabled. All CONFIG options you depend on which are not in defconfig
+should be listed in tools/testing/selftests/net/ovpn/config
 
-> Always requiring it makes the code simpler when somebody adds support
-> for interrupts. You don't need all the _optional_ and dealing with it
-> being missing etc.
-> 
+Our CI currently builds this config for ovpn tests:
+https://netdev.bots.linux.dev/logs/vmksft/net-extra/results/565721/config
 
-Good point, I'll add that to the required properties.
-
-Thanks,
-Charles
-
+Please add to tools/testing/selftests/net/ovpn/config
+what this test needs.
 
