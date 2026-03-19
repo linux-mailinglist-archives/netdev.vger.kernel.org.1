@@ -1,155 +1,132 @@
-Return-Path: <netdev+bounces-269645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269646-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WI65GT1dvGlxxQIAu9opvQ
-	(envelope-from <netdev+bounces-269645-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:31:57 +0100
+	id mHqCLshgvGlxxQIAu9opvQ
+	(envelope-from <netdev+bounces-269646-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:47:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06B2F2D22D6
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:31:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B6CF2D25BF
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:47:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3F9253015B6D
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:31:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1C301315D422
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7003F8DF3;
-	Thu, 19 Mar 2026 20:29:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03303F7AA1;
+	Thu, 19 Mar 2026 20:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G+OpU2qA"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="uTzvlQ8n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17CFA3F7E93;
-	Thu, 19 Mar 2026 20:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A9323ABBF
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 20:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773952148; cv=none; b=iCm9Lz5TMp2BI6+KIoCCouMm8AMyhhOYOJJlRjmXoPxdjAW0OsZZSSfQgHChI4TlrOZAiqy0Nnyw5beEgXopF3Y+qxjq5CJBMrqeS+QRm1YV94xbwuHgodAAGZq226l43c1CJpNT7OqmT31VxT7KYonsqCbeMwHvhWRgv2I0u10=
+	t=1773952717; cv=none; b=JVcjHWjOHsuQK25DhnbaHcL85RE4MO9hpDIHHTQh1fs5+AZu+fcsI8G9bT3nOrrUOjBwiJw7qmh5QXoU8NLypEl0hLtPfrOaukYXAfIyMkIs7DBmXrKtPY537aVksmK5NOzgHNo1nkgwaFQwfZXlQqhsg4h0ae7XOZQL5DWNX+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773952148; c=relaxed/simple;
-	bh=7ACvntPl68R9KORabL8FBbFxjqDNvytpN2H9zxa9d68=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gpiPtiGaB5EAfQvX59BVgQ3pdhW2hCQqhlf1N/UhQh0PcrfzPNX29qTbZUuWjQgqjSCJPb97Ji+dbNds+Z9IJChHR9yBg8gMaysuHOBkL6on/7KexVvbAKT56ZJPa4IVQImAWeegUaaJE+D77fNsFrWAPydI04MOzFMH1wDGFj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G+OpU2qA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76AD1C19424;
-	Thu, 19 Mar 2026 20:29:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773952147;
-	bh=7ACvntPl68R9KORabL8FBbFxjqDNvytpN2H9zxa9d68=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=G+OpU2qACzJ+O+97qA71hO9HQdf2jcKV40cP+bWm66ghhFOEsQp6+XZQNLuouHaAF
-	 kPfNpnXBFkC8wv2EnSBbwq76xYvTb7weya5ME+EbjIiyQs+663QDtUuAs7sxHUDgd7
-	 G8UTsznBiXhPWNFeqwTSc5ShpvyYyrPzr5KvVf9TNjSXtyH+j7Yaw1zNrml/TEjsrP
-	 ROWa42iRmyCa5hw3OrMLOOwZzigBP+cPFU26NAI1OA7OX6DKweDHcWaAaD36rF6VKL
-	 MTX2YL4Ct3TbzTTdxJLS1JPQzOyizRmRw8N1sw+IhrXojD4iMvfsp3VFQBztMOfj4E
-	 Be7NE+GqfBx+g==
-Date: Thu, 19 Mar 2026 20:29:02 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v3] selftests: bonding: add test for stacked
- bond header_parse recursion
-Message-ID: <20260319202902.GW1753385@horms.kernel.org>
-References: <20260319035902.6106-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1773952717; c=relaxed/simple;
+	bh=eCKRj0Z9NWsC2dW3DueD3z3cOeo3X5xFIoh9/uDqTtQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=axf+IoEGNinxFI64R4TAU1QsbSJRPw63h9Jvbu8crEYjGlmPdd5EOdKfei5rG2Ko5Hl5WawU1USzg5lEjT2ftlNZjDB3bS4QreJ4Dow7OQnuLiVQ1jwJU0ba3XCTFgxDjcqwVmx9A5/rMTU50iSaK+hkCoPN9KEBW5KEZ5oL1Ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=uTzvlQ8n; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=eCKRj0Z9NWsC2dW3DueD3z3cOeo3X5xFIoh9/uDqTtQ=; t=1773952716; x=1774816716; 
+	b=uTzvlQ8noJ99KvNPJRUhlCYFP9nC2QKAf9+XC0Wje1j1iCO54ALmJ3DwsE1FBFQ4x6/thGKp3nr
+	y6HkYok6/B0Gg2uB1gyjvfz40CefDPij/8ywlpAqFvLLYygmToAdzdmVZ5wsN1iL44PsIWYcRcNfj
+	c9wLuEDfgJ3KXlg36zp+IfidbuFslTEN9UJXU4D6o4YVb/Rp1iP0R+Dx/7FqxMGg3Hd50TNRpVJ+V
+	sP6cCXQEEhfg9JVn208fvQKdX4SzpQVktnKzXO2fBTd4UJftV64r0Wr1QogUYpf67/De2bbAmmygs
+	UqGQ4SZmdLMj7D33EZOXZE3HnIYznoXhNr5w==;
+Received: from mail-yx1-f48.google.com ([74.125.224.48]:52304)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1w3K8T-0006Um-QA
+	for netdev@vger.kernel.org; Thu, 19 Mar 2026 13:38:30 -0700
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-64ca6595c8aso1451086d50.0
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 13:38:29 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWHyIqyz3HO4i9ZL80IvcNH4iUNE8yYnHFgPUI4pdef5/BjJL+MsnoCcbA3zr48kFKk0pyVYHE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztOlYRoHl+jmUhJaWwjxjuEPETYqSpgfPxQMotrbdV0SCCeERz
+	eW0p/H6F1GknirkzO7qkL88iP7vUhFycF9U6IZV7w/IgUdv+TJDa+j48ZHBlLRRDXRp2gfDQaTl
+	ye+JxAGSR6WXWTKAC2Fq83WIJkzXJf9w=
+X-Received: by 2002:a53:ee62:0:b0:64c:f993:8496 with SMTP id
+ 956f58d0204a3-64eaa815bb4mr678572d50.53.1773952709124; Thu, 19 Mar 2026
+ 13:38:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260319035902.6106-1-jiayuan.chen@linux.dev>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+References: <20260316223228.2611-4-ouster@cs.stanford.edu> <20260318072022.268417-1-pabeni@redhat.com>
+In-Reply-To: <20260318072022.268417-1-pabeni@redhat.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Thu, 19 Mar 2026 13:37:53 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmy2+tQT-0T5eW3hLsz_PD7JSBejYSLTKC5Y5KDg3QuQ9A@mail.gmail.com>
+X-Gm-Features: AaiRm53TVpu3JUcsgcyKmvswG3iuYV9St4McQphAluotPb5P57ILTeUkch2ppAY
+Message-ID: <CAGXJAmy2+tQT-0T5eW3hLsz_PD7JSBejYSLTKC5Y5KDg3QuQ9A@mail.gmail.com>
+Subject: Re: [net-next,v17,03/14] net: homa: create shared Homa header files
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: horms@kernel.org, netdev@vger.kernel.org, kuba@kernel.org, 
+	edumazet@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Scan-Signature: ff384b2b9a2989b26e23b1d864f6aba2
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_REJECT(1.00)[cs.stanford.edu:s=cs2308];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[cs.stanford.edu : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269645-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269646-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[cs.stanford.edu:-];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.986];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ouster@cs.stanford.edu,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:email,bond_stacked_header_parse.sh:url,shopee.com:email]
-X-Rspamd-Queue-Id: 06B2F2D22D6
+	NEURAL_HAM(-0.00)[-0.132];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 2B6CF2D25BF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 19, 2026 at 11:58:56AM +0800, Jiayuan Chen wrote:
-> From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> 
-> Add a selftest to reproduce the infinite recursion in bond_header_parse()
-> when bonds are stacked (bond1 -> bond0 -> gre). When a packet is received
-> via AF_PACKET SOCK_DGRAM on the topmost bond, dev_parse_header() calls
-> bond_header_parse() which used skb->dev (always the topmost bond) to get
-> the bonding struct. This caused it to recurse back into itself
-> indefinitely, leading to stack overflow.
-> 
-> Before commit b7405dcf7385 ("bonding: prevent potential infinite loop
-> in bond_header_parse()"), the test triggers:
-> 
->   ./bond_stacked_header_parse.sh
-> 
->   [  71.999481] BUG: MAX_LOCK_DEPTH too low!
->   [  72.000170] turning off the locking correctness validator.
->   [  72.001029] Please attach the output of /proc/lock_stat to the bug report
->   [  72.002079] depth: 48  max: 48!
->   ...
-> 
-> After the fix, everything works fine:
-> 
->   ./bond_stacked_header_parse.sh
->   TEST: Stacked bond header_parse does not recurse                  [ OK ]
-> 
-> Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
-> ---
-> Changes in v3:
-> - Fix CONFIG_NET_IPGRE sorting order in config
-> 
-> Changes in v2:
-> - Use tcpdump + scapy instead of custom Python script
-> - Remove unnecessary modprobe and skip checks
-> - Add CONFIG_NET_IPGRE to config dependencies
-> 
-> v1: https://lore.kernel.org/netdev/20260316165946.46e9f8f7@kernel.org/T/#t
-> https://lore.kernel.org/netdev/CANn89iK2EURqsjtd=OVP4awYTJHGcR-UU-V9WovpWR1Z3f03oQ@mail.gmail.com/
-> ---
->  .../selftests/drivers/net/bonding/Makefile    |  1 +
->  .../net/bonding/bond_stacked_header_parse.sh  | 69 +++++++++++++++++++
+On Wed, Mar 18, 2026 at 12:21=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> Does the comment in homa_set_doff() accurately describe what the code
+> does? The comment says "Drop the 2 low-order bits from size" which would
+> be a right shift (size >> 2), but the code performs a left shift
+> (size << 2).
+>
+> Looking at similar usage patterns in TCP where the doff field stores
+> header length in 4-byte word units, the code appears correct - it's
+> converting a byte size to 4-byte word units by shifting left.
+>
+> The comment should probably say "Shift size left by 2 bits to store in
+> 4-byte word units" or "Multiply size by 4 and store in doff field" to
+> match what the code actually does.
 
-Please take some time to run shellcheck over bond_stacked_header_parse.sh
-and make it shellcheck clean.
-
-I suggest that can be achieved by adding the following somewhere:
-
-# shellcheck disable=SC2034,SC2329
-
--- 
-pw-bot: changes-requested
+I have rewritten the comment.
 
