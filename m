@@ -1,90 +1,81 @@
-Return-Path: <netdev+bounces-269376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269377-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8DqcBoC/u2n1ngIAu9opvQ
-	(envelope-from <netdev+bounces-269376-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:18:56 +0100
+	id SJ7cI4DBu2n1ngIAu9opvQ
+	(envelope-from <netdev+bounces-269377-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:27:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE1042C87E8
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:18:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 059902C8A40
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:27:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 427A93015DA5
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:18:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C28D63068A24
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 09:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754DE3B8D42;
-	Thu, 19 Mar 2026 09:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928D03BB9EB;
+	Thu, 19 Mar 2026 09:24:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J5Xir0of"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="V9ViYl4m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A74D23B895F;
-	Thu, 19 Mar 2026 09:17:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA023BAD96;
+	Thu, 19 Mar 2026 09:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773911847; cv=none; b=AgLJjS80vxGBKTYGEQkLZuee40Z9iAEyQZUl6Ek3PgrRU4WQVbVd3v/KP+nDjT7zP+VFjBshnTWyasuXmhTAXK1mHOtzn+KEIHaKBMAIBSdkUzj2YWdMv89VWYWkRbNPJmWBrol7FgCX5CjCodoYKqrB0v21vVkcdmSKOtPZhiw=
+	t=1773912266; cv=none; b=exeWq9z4LKtsxVS9YgwbG+21gOz4+AZhaLLatJX1H61Be5eFrt1WqRLjPCFBg6C4zXR6kRaylN0UclEs1QVF3pxTsW4ywJriQRmIc3KqNPTWKxEr5xxXv1H52N66WusS3u33wbdZCK2A8CLWF/nCb5JeSVPD5KEOmNAAqdSsN5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773911847; c=relaxed/simple;
-	bh=DIU/PzVumUQH6MdAZ2KxRAqnEWB7buh0Ki3HJWJvQNk=;
+	s=arc-20240116; t=1773912266; c=relaxed/simple;
+	bh=DS+Zt/gEv/WAbeWYllp8LUq+PkKXC3XUp1VYLwde/ro=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ggLhSOsgPARokTYAOXLMN20q5HspgAor1U6934RZ3Zu5tiUKws1HgIzJYah+rBYuy89Mp+GljxBSC7RdmleKjdECghEWxexTAWGtsYHk3PtZ7EABH1T8m62zbwnwb/K321rB43wWlYC88nf3ifIau41Yp0htsTgHgDmHtyvLiiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J5Xir0of; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773911846; x=1805447846;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=DIU/PzVumUQH6MdAZ2KxRAqnEWB7buh0Ki3HJWJvQNk=;
-  b=J5Xir0ofhFLV7yZcL1OMoKKPXVkYcIjWH2r8OewNyyjINvG3eXmlI9b2
-   WESU4NSH1+hhDbuAfpfjj2rqXnOHk04CzbRqr5gqyckVTUR9YMGop4cf+
-   xlTV4RHQZPreVwEnrkFlJeMGOdeimUJhbAJfl2FOTFuf7yaBTxOMp1mXI
-   uEeAZDsquaL/kutCSVZAwvXeQoKzK/A5F+rNZvWW/kcRlUmvZNKFvpg7H
-   ttt5H266GtUJkdORacWbFO1q4urwtR2io8ieDwyHv7c1HDQPyarWgeHow
-   icjUaCF8H4b8ioDl6A0YDfz2hF/4C9V9KhgbfsSGjV+z0+x0aJxsV4UWp
-   w==;
-X-CSE-ConnectionGUID: adnmLJldTHyaXSzf0SkxiQ==
-X-CSE-MsgGUID: bNGrEno3Q/eOyXWgyewhWw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11733"; a="74863216"
-X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
-   d="scan'208";a="74863216"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 02:17:25 -0700
-X-CSE-ConnectionGUID: u5dIcVMPSsylgEdsrZ54dg==
-X-CSE-MsgGUID: ojN/sDYrTkmXLdF+vh6iSg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
-   d="scan'208";a="227848554"
-Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
-  by orviesa005.jf.intel.com with ESMTP; 19 Mar 2026 02:17:18 -0700
-Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w39VE-000000004o5-13CR;
-	Thu, 19 Mar 2026 09:17:16 +0000
-Date: Thu, 19 Mar 2026 10:16:33 +0100
-From: kernel test robot <lkp@intel.com>
-To: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
-	skhan@linuxfoundation.org, andrew+netdev@lunn.ch,
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com,
-	alexanderduyck@fb.com, kernel-team@meta.com,
-	johannes@sipsolutions.net, sd@queasysnail.net, jianbol@nvidia.com,
-	dtatulea@nvidia.com, sdf@fomichev.me, mohsin.bashr@gmail.com,
-	jacob.e.keller@intel.com, willemb@google.com, skhawaja@google.com,
-	bestswngs@gmail.com, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH net-next v2 02/13] wifi: cfg80211: use
- __rtnl_unlock in nl80211_pre_doit
-Message-ID: <202603191008.66uOsWyh-lkp@intel.com>
-References: <20260318150305.123900-3-sdf@fomichev.me>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LmwD+tMMlPqOUkKYuXoGmUnaPgjr7W+Qjb0XqSt5G+3aygLE90iz7FEJz9/DLpTU1Qy5RbgTuskC//yAXCuLTENf8FI7zErSOrok1k685R9QZoycQYuT1WhAlWhvdzt2MPeiPE3wt02yFE7sMpgmqE+4gwz5kgCfRyZgL9g2VZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=V9ViYl4m; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=wJt/xpnM5xpQ9m6S0Jhmk7m0+jbWUyf+lp4bNeFUlMs=; b=V9ViYl4mTpgvWY0lWySwuoVuME
+	iZ0ZlE/SNmOJSdwCXiDp2aVCWvLcO1IsWqvDLQ6Waf9Jp92guN/CiUOzBfcJGexKjOu5QaUHKXihL
+	FGgxe3c6o+bZj4DjmSw24TqDDrs0sTimw0wMLZrMNx1tKAOHAljBRZWEM+GZaaJB5I7fY8LZI2cMD
+	3y1ogT3Jb38P1YFTgiu9DKxJUbyphk9YZ2swdfEXvb6n634qzw36qz9sKdiRY633fDLtyhWxeo2FJ
+	qTh27iZt3nmZp2MZXEWYM7vc91gFozf5I3rshlNjtZyvsZOPScS+6ax9DY6UVsv7RHVM5rZqu839Z
+	TM39otQg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58408)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w39bv-000000004Wg-44EL;
+	Thu, 19 Mar 2026 09:24:12 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w39bs-0000000081c-38rg;
+	Thu, 19 Mar 2026 09:24:08 +0000
+Date: Thu, 19 Mar 2026 09:24:08 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next 0/8] net: stmmac: improve PCS support
+Message-ID: <abvAuHFZzCFobO-V@shell.armlinux.org.uk>
+References: <abQC7r38QLhSeadl@shell.armlinux.org.uk>
+ <abdEscs44fU4kRag@oss.qualcomm.com>
+ <abdYu864OmNWiWIW@shell.armlinux.org.uk>
+ <ablpxwGks9m38fhM@shell.armlinux.org.uk>
+ <absjNQ2s3Z5N2Zwo@oss.qualcomm.com>
+ <abtE7sDT75I7uPnk@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,63 +84,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260318150305.123900-3-sdf@fomichev.me>
-X-Spamd-Result: default: False [0.34 / 15.00];
+In-Reply-To: <abtE7sDT75I7uPnk@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	FREEMAIL_CC(0.00)[lists.linux.dev,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,lunn.ch,broadcom.com,intel.com,nvidia.com,fb.com,meta.com,sipsolutions.net,queasysnail.net,fomichev.me,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-269376-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269377-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-0.953];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,01.org:url,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: AE1042C87E8
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_SPAM(0.00)[0.667];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 059902C8A40
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Stanislav,
+On Thu, Mar 19, 2026 at 12:35:58AM +0000, Russell King (Oracle) wrote:
+> On Thu, Mar 19, 2026 at 03:42:05AM +0530, Mohd Ayaan Anwar wrote:
+> > [    8.650486] qcom-ethqos 23040000.ethernet: clk_csr value out of range (0xffffff00 exceeds mask 0x00000f00), truncating
+> 
+> Please look into this first - with the MDIO bus operating at
+> who-knows-what frequency, this could make reading from the PHY
+> unreliable.
 
-kernel test robot noticed the following build errors:
+My guess is clk_get_rate(priv->plat->stmmac_clk) is returning zero,
+which means we don't know the rate of the CSR clock.
 
-[auto build test ERROR on net-next/main]
+From what I can see in drivers/clk/qcom/gcc-qcs404.c and
+drivers/clk/qcom/gcc-sdx55.c, this looks like this case - the
+struct clk_branch makes no mention of any clock rate, nor does it
+have any parent. From what I can see, neither of these drivers
+specify any rates for any of their clocks, which likely means that
+clk_get_rate() will be zero for all of them.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/net-add-address-list-snapshot-and-reconciliation-infrastructure/20260319-122535
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260318150305.123900-3-sdf%40fomichev.me
-patch subject: [Intel-wired-lan] [PATCH net-next v2 02/13] wifi: cfg80211: use __rtnl_unlock in nl80211_pre_doit
-config: x86_64-kexec (https://download.01.org/0day-ci/archive/20260319/202603191008.66uOsWyh-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260319/202603191008.66uOsWyh-lkp@intel.com/reproduce)
+Sadly, when I designed the clk API, I didn't think that people would
+be stupid enough not to implement the API properly, more fool me.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603191008.66uOsWyh-lkp@intel.com/
+Under the old code, we would've used STMMAC_CSR_20_35M, which means
+we're assuming that the CSR clock is between 20 and 35MHz, even
+though the value is zero. Is that the case? If it's higher than
+35MHz, then you've been operating the MDIO bus out of IEEE 802.3
+specification, which can make PHY access unrealible.
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
-
->> ERROR: modpost: "__rtnl_unlock" [net/wireless/cfg80211.ko] undefined!
+In any case, please fix your clock drivers.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
