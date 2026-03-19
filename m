@@ -1,276 +1,145 @@
-Return-Path: <netdev+bounces-269517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269519-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yMRwDMYcvGlEsQIAu9opvQ
-	(envelope-from <netdev+bounces-269517-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:56:54 +0100
+	id 8GhMGRgfvGnQswIAu9opvQ
+	(envelope-from <netdev+bounces-269519-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:06:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C15882CE1C7
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:56:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5B932CE5AF
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:06:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CA334304C7AE
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:54:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D14B8325B12F
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB8113E9587;
-	Thu, 19 Mar 2026 15:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25A13E92AC;
+	Thu, 19 Mar 2026 15:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m+8mmbCo"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="gdFgbrAo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C2133E8C63
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 15:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374503ECBED;
+	Thu, 19 Mar 2026 15:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773935671; cv=none; b=E0uVx3RJL13ZcjljFXRdKjXmYXTVdOhiT0jVKHLhQ86iti2YL3PZH1a0ych3X3QFFz6+0QF1QcuFqwEfocnRjm5qJ0YmwLgsC3pp5vchxMF0CJAIHkF5EEV4dzljZaYKHYhDlSZzuoxDhvV2nEFiobj4fkKI1xcfD53IEIF97KM=
+	t=1773935992; cv=none; b=SlLIMfhl4Q1OCazD1NXSiYh3YQlrbFpQTtvhoFYQnsS7Q7AuIoM6qchdfzJQlOHX4jRqNLFOGSKbph2U4mSapYd8jYCpk+1JCoBRvNY3U9/ZS8YIKft0fMwRQmcJvr0UwPkNlo0R8HwfrQisMHbOKUqjrcmLpG0sSQdACAhiTzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773935671; c=relaxed/simple;
-	bh=R8P+nzrGUnHar1fqbHTHhRFzTZN26dppzSbv7zUS0FA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FCjud9ocfT/br6naB37mS7NsJMqdFSDeZUCi6tlhpGGki8QWz1/rwrNoUqp3iyRVisyBDAGScnsbO8Ezt0u5b6MGodwuCiWdoct1X13h/uBDyqPxl3J3iDnHQAGbs5R9ovAn/xblwDsdSBZ4HR7f3znwW+1Mc8UOxquYtUmTS6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m+8mmbCo; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-82987437624so671063b3a.1
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 08:54:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773935670; x=1774540470; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=flkM1UPgnzZIIWUPlhpYdE/CMruOMnml9ArMjCoVGE8=;
-        b=m+8mmbCoDRXID1BSDq4Yo8bF2vMzor2WqvMm9Nw0Y2AJ63KQ206DCRziTdiW6BuDBa
-         l+3E5e+hcL9SDO6+it1cO13CRo3sa4QYguChCHGKFBQQhZMsvRiNm0vpukn293Wesyw5
-         NyhmpGeXMjIp52E4EiVka+WgbJIHq1h2wd1RegjH5L/RoZ29l8se8WoEOvKNAHhmRw1l
-         ZSVEx2JAz5+O4cjZI1sVEGiqv0IXjbsOj8VtE0s8fsH3mR1Nho6okKKHAWGpQ6rXOUfK
-         atalspuIyLhm79iWEeJCJ4L3dLxGToieE5iZjdmC+/p8rGo1NxzcAFaCVSlx+p11o04x
-         S8iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773935670; x=1774540470;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=flkM1UPgnzZIIWUPlhpYdE/CMruOMnml9ArMjCoVGE8=;
-        b=DScugCjrjbfaZpPzQjda64wUIdhdcWR3IM5xa1ZQnhXQrLMwaHHbaTXnxqM2I8VBrb
-         nexjijw+/vkBmSgioGs3AXwIQ2RrBvz3hFT/TdwJNSisAQcXtuJFuHkGeUwMwnuFUjzC
-         KdypxeXRzaUorpcw8zyb9Ppn8di0V4WJl2S6Nyv8NvzszBltvQ6jJ5eeeCtrJiNx6KhO
-         tic4oGsUUkk1RG9uEtPVjJmA9vhn3nxv0qxU9HLvdjEBw2zCxKHFmuw9c1q5aEu8HPxP
-         dFqyUw0ojHNnKqJZh+E8WCUeF9sSdLQXZzXjxK8zs/jUZAk21UKhUDF15RjeFSN0tMF7
-         C2Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCUf4dVfe0uuLAJLmlVTwVqRBvILJcAslC+I9xND/AGDyRwRJqAy5KWFdUYeH838QJh1yi8arAs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdCt5LDIubY4csw7SgFvwpqPBy7uHaRgAA0I17ASfXrX/KhjJw
-	4hmXZS0N8646fMJIwV3NKmDaD9LctN5gNYrW8d8PIu1x7HkgkQxxOnw=
-X-Gm-Gg: ATEYQzyk2XXaJbyjzzDey144ow88FY8s2tU0sLzV1x6KJNpG6SPHYg1UR6pfl4KSabz
-	SDLCMxQ8MM063q9tp8Y24WyGLkCXBdKHDeWRMBrF6igw6FvliwqQlHSLdqbsLgMqra18MtQAsBq
-	ZBB+ovX4lGrlWR/0kkZN3dOHPWM2DLawO0S0t7UzTII2b03g94BZyFeaD26qpBuuY31gWedUea0
-	ayXT/mC5oigfeAK/+Lqyz3Y2JjHszaRCD8av7ZrPLTsAr3Y0kp72htBc32ApKGrRF6NLx6YdnNX
-	8WX4AxNy+dS1+95q9183lfojelSBexpCBM97uzAJTB5M3UMQ+QvYexWNLNQfaBEttT58WriUoSK
-	ISaKcwHbhV0q/7JjaRiXXC5WcHIMA6mOGNZHGLjAsjm2qGR54WhqVo15R35suYk3g045wcXMugk
-	cHtNeZMPDEN+3HD9j0LRRCx0No6kN5kLP3snHVEn/MZkgLIQ/iVPYSBVdAHYEMFlxO0W8qIJndk
-	e6NMJDG8koxwhuo5Q==
-X-Received: by 2002:a05:6a00:a8c:b0:829:f777:dad4 with SMTP id d2e1a72fcca58-82a7a97b202mr3053986b3a.29.1773935669410;
-        Thu, 19 Mar 2026 08:54:29 -0700 (PDT)
-Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82a6bbb51d1sm7913205b3a.28.2026.03.19.08.54.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2026 08:54:29 -0700 (PDT)
-Date: Thu, 19 Mar 2026 08:54:28 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"skhan@linuxfoundation.org" <skhan@linuxfoundation.org>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"michael.chan@broadcom.com" <michael.chan@broadcom.com>,
-	"pavan.chebbi@broadcom.com" <pavan.chebbi@broadcom.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"tariqt@nvidia.com" <tariqt@nvidia.com>,
-	"mbloch@nvidia.com" <mbloch@nvidia.com>,
-	"alexanderduyck@fb.com" <alexanderduyck@fb.com>,
-	"kernel-team@meta.com" <kernel-team@meta.com>,
-	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
-	"sd@queasysnail.net" <sd@queasysnail.net>,
-	"jianbol@nvidia.com" <jianbol@nvidia.com>,
-	"dtatulea@nvidia.com" <dtatulea@nvidia.com>,
-	"mohsin.bashr@gmail.com" <mohsin.bashr@gmail.com>,
-	"Keller, Jacob E" <jacob.e.keller@intel.com>,
-	"willemb@google.com" <willemb@google.com>,
-	"skhawaja@google.com" <skhawaja@google.com>,
-	"bestswngs@gmail.com" <bestswngs@gmail.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"leon@kernel.org" <leon@kernel.org>
-Subject: Re: [Intel-wired-lan] [PATCH net-next v2 08/13] bnxt: use snapshot
- in bnxt_cfg_rx_mode
-Message-ID: <abwcNMcZHW0ThCkW@mini-arch>
-Mail-Followup-To: Stanislav Fomichev <stfomichev@gmail.com>,
-	"Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"skhan@linuxfoundation.org" <skhan@linuxfoundation.org>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"michael.chan@broadcom.com" <michael.chan@broadcom.com>,
-	"pavan.chebbi@broadcom.com" <pavan.chebbi@broadcom.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"tariqt@nvidia.com" <tariqt@nvidia.com>,
-	"mbloch@nvidia.com" <mbloch@nvidia.com>,
-	"alexanderduyck@fb.com" <alexanderduyck@fb.com>,
-	"kernel-team@meta.com" <kernel-team@meta.com>,
-	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
-	"sd@queasysnail.net" <sd@queasysnail.net>,
-	"jianbol@nvidia.com" <jianbol@nvidia.com>,
-	"dtatulea@nvidia.com" <dtatulea@nvidia.com>,
-	"mohsin.bashr@gmail.com" <mohsin.bashr@gmail.com>,
-	"Keller, Jacob E" <jacob.e.keller@intel.com>,
-	"willemb@google.com" <willemb@google.com>,
-	"skhawaja@google.com" <skhawaja@google.com>,
-	"bestswngs@gmail.com" <bestswngs@gmail.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"leon@kernel.org" <leon@kernel.org>
-References: <20260318150305.123900-1-sdf@fomichev.me>
- <20260318150305.123900-9-sdf@fomichev.me>
- <IA3PR11MB89866985981DB64EFEBDF0ACE54FA@IA3PR11MB8986.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1773935992; c=relaxed/simple;
+	bh=ZIbL8O3aZl5ul6YYE2WhB6DNFvoF5FLE6NgalzEmeKE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ovBytAcQU81Odz50wXsKZ91SOwi4wC3xT9MlRVU2QUB7ljXS8l4UfH01OfNBgBkjunItegTBATVt7ZlErzcL81ngaylqLIUO6zaTYA9MCkbbr/EsuBVHG+ghjqpPNfFKstJywR2IznmKi4dP3chm1WNp9WYdG0YyCYUCTU7QloQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=gdFgbrAo; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id AB7ADA1F50;
+	Thu, 19 Mar 2026 16:59:37 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=IIVPZ8hHZTMlGdVC1NhCotK5Ln5lWFWOjoay+zBfjxM=; b=
+	gdFgbrAoXJzIWTJ4zcwXiGK1MpldNHCafm5jGTfYjeOlXgYzrI8GB52esmqjoHG8
+	3ssWuOH1AZosk81LIUAknSneePV1rHZyjJdMGPk4wg8IXLAw+kVwQbE9nAGz20u/
+	CWzQSOrGUwdKQUuV6SJzUB38Zum8HXd/ZfJC52t8KMLQFOiG7Tn23PrCH2ZMCms5
+	7t33nsQe7H4vJixOqaNqoDr1JcavkPanf4Yx2HHkdsFMMkWYloDUGRKORQYJk5DU
+	Zv62pZm/liEbTiOPjuUmCRJunhnN6fgIXtexTqqA8p6zh5Wal9hI+kEi+dRU/EKA
+	nYVUkLsQOPer/fvJB0FKpYTbQoQ82v97dvUyAJFz636+hOe4ms4FY14JS+uFEsos
+	mCJSVMtbIIwXpK1rgXlnP2eotFvGkjHk74KhS/xmoMMhgfxkWcFMMYTHLe42tKJK
+	5DueDv8+N+BVXq8oACd4cqVKJ0L3uG6iYPYlIqBZPlStNsC6KKavmF25ctzv1Hue
+	n7aYsIDGXfwyHoxHG0DX47q/qGMvMp96OWYXsZm96WDMA99iP22HXPagCkUJDJPK
+	aHi/0VFkRvIE05nEnEjiuP1EYuomaYs+1F5c9J61G5La0NylRmoi/x+vf4IVIz01
+	TsduB3US2HBv3JqFpsF++ULb8EYQOseRNGYoLO+38xk=
+From: Buday Csaba <buday.csaba@prolan.hu>
+To: Wei Fang <wei.fang@nxp.com>, Frank Li <frank.li@nxp.com>, Shenwei Wang
+	<shenwei.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
+	<richardcochran@gmail.com>, =?UTF-8?q?Bence=20Cs=C3=B3k=C3=A1s?=
+	<bence98@sch.bme.hu>, Francesco Dolcini <francesco.dolcini@toradex.com>,
+	<imx@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: Buday Csaba <buday.csaba@prolan.hu>
+Subject: [PATCH net v2 1/1] net: fec: fix the PTP periodic output sysfs interface
+Date: Thu, 19 Mar 2026 16:59:34 +0100
+Message-ID: <7012fbf90b844083d5fa7d764ed6372fe0288157.1773928309.git.buday.csaba@prolan.hu>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <IA3PR11MB89866985981DB64EFEBDF0ACE54FA@IA3PR11MB8986.namprd11.prod.outlook.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1773935977;VERSION=8008;MC=505402051;ID=100136;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2998FD5150627D6A
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[prolan.hu,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[prolan.hu:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269517-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[fomichev.me,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,lunn.ch,broadcom.com,intel.com,nvidia.com,fb.com,meta.com,sipsolutions.net,queasysnail.net,gmail.com,lists.osuosl.org];
-	RCPT_COUNT_TWELVE(0.00)[36];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,sch.bme.hu,toradex.com,lists.linux.dev,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269519-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[prolan.hu:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[stfomichev@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.814];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[buday.csaba@prolan.hu,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.979];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C15882CE1C7
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: A5B932CE5AF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 03/19, Loktionov, Aleksandr wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> > Of Stanislav Fomichev
-> > Sent: Wednesday, March 18, 2026 4:03 PM
-> > To: netdev@vger.kernel.org
-> > Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> > pabeni@redhat.com; horms@kernel.org; corbet@lwn.net;
-> > skhan@linuxfoundation.org; andrew+netdev@lunn.ch;
-> > michael.chan@broadcom.com; pavan.chebbi@broadcom.com; Nguyen, Anthony
-> > L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
-> > <przemyslaw.kitszel@intel.com>; saeedm@nvidia.com; tariqt@nvidia.com;
-> > mbloch@nvidia.com; alexanderduyck@fb.com; kernel-team@meta.com;
-> > johannes@sipsolutions.net; sd@queasysnail.net; jianbol@nvidia.com;
-> > dtatulea@nvidia.com; sdf@fomichev.me; mohsin.bashr@gmail.com; Keller,
-> > Jacob E <jacob.e.keller@intel.com>; willemb@google.com;
-> > skhawaja@google.com; bestswngs@gmail.com; linux-doc@vger.kernel.org;
-> > linux-kernel@vger.kernel.org; intel-wired-lan@lists.osuosl.org; linux-
-> > rdma@vger.kernel.org; linux-wireless@vger.kernel.org; linux-
-> > kselftest@vger.kernel.org; leon@kernel.org
-> > Subject: [Intel-wired-lan] [PATCH net-next v2 08/13] bnxt: use
-> > snapshot in bnxt_cfg_rx_mode
-> > 
-> > With the introduction of ndo_set_rx_mode_async (as discussed in [0])
-> > we can call bnxt_cfg_rx_mode directly. Convert bnxt_cfg_rx_mode to use
-> > uc/mc snapshots and move its call in bnxt_sp_task to the section that
-> > resets BNXT_STATE_IN_SP_TASK. Switch to direct call in
-> > bnxt_set_rx_mode.
-> > 
-> > 0:
-> > https://lore.kernel.org/netdev/CACKFLi=5vj8hPqEUKDd8RTw3au5G+zRgQEqjF+
-> > 6NZnyoNm90KA@mail.gmail.com/
-> > 
-> > Cc: Michael Chan <michael.chan@broadcom.com>
-> > Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> > ---
-> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 24 ++++++++++++++--------
-> > -
-> >  1 file changed, 15 insertions(+), 9 deletions(-)
-> 
-> ...
-> 
-> > -static int bnxt_cfg_rx_mode(struct bnxt *bp)
-> > +static int bnxt_cfg_rx_mode(struct bnxt *bp, struct
-> > netdev_hw_addr_list *uc,
-> > +			    struct netdev_hw_addr_list *mc)
-> >  {
-> >  	struct net_device *dev = bp->dev;
-> >  	struct bnxt_vnic_info *vnic = &bp-
-> > >vnic_info[BNXT_VNIC_DEFAULT];
-> > @@ -13623,7 +13625,7 @@ static int bnxt_cfg_rx_mode(struct bnxt *bp)
-> >  	bool uc_update;
-> > 
-> >  	netif_addr_lock_bh(dev);
-> > -	uc_update = bnxt_uc_list_updated(bp, &dev->uc);
-> > +	uc_update = bnxt_uc_list_updated(bp, uc);
-> >  	netif_addr_unlock_bh(dev);
-> > 
-> >  	if (!uc_update)
-> > @@ -13642,7 +13644,7 @@ static int bnxt_cfg_rx_mode(struct bnxt *bp)
-> >  	if (netdev_uc_count(dev) > (BNXT_MAX_UC_ADDRS - 1)) {
-> >  		vnic->rx_mask |=
-> > CFA_L2_SET_RX_MASK_REQ_MASK_PROMISCUOUS;
-> This limit check uses the live device list, dev->uc.
-> In the new async model, the live list can differ from the snapshot.
+When the PPS channel configuration was implemented, the number of
+supported periodic outputs (`n_per_out`) was left at 1.
 
-Oh, yes, good catch! Will do s/netdev_uc_count/netdev_hw_addr_list_count(uc).
+This prohibits using channels 1..3 from the sysfs interface, since
+period_store() rejects channel numbers greater than `n_per_out`.
+
+Fix by increasing `n_per_out` to the number of channels supported
+by the hardware.
+
+Fixes: 566c2d83887f ("net: fec: make PPS channel configurable")
+Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
+---
+ drivers/net/ethernet/freescale/fec_ptp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/freescale/fec_ptp.c b/drivers/net/ethernet/freescale/fec_ptp.c
+index 4b7bad9a485d..1a7aa280e7f6 100644
+--- a/drivers/net/ethernet/freescale/fec_ptp.c
++++ b/drivers/net/ethernet/freescale/fec_ptp.c
+@@ -756,7 +756,7 @@ void fec_ptp_init(struct platform_device *pdev, int irq_idx)
+ 	fep->ptp_caps.max_adj = 250000000;
+ 	fep->ptp_caps.n_alarm = 0;
+ 	fep->ptp_caps.n_ext_ts = 0;
+-	fep->ptp_caps.n_per_out = 1;
++	fep->ptp_caps.n_per_out = 4;
+ 	fep->ptp_caps.n_pins = 0;
+ 	fep->ptp_caps.pps = 1;
+ 	fep->ptp_caps.adjfine = fec_ptp_adjfine;
+
+base-commit: 8a63baadf08453f66eb582fdb6dd234f72024723
+-- 
+2.39.5
+
+
 
