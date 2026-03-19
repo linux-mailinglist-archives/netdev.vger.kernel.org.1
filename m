@@ -1,153 +1,257 @@
-Return-Path: <netdev+bounces-269649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269650-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WOBYGaRivGmLxwIAu9opvQ
-	(envelope-from <netdev+bounces-269649-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:55:00 +0100
+	id uGQoJH9ivGmLxwIAu9opvQ
+	(envelope-from <netdev+bounces-269650-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:54:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1354F2D26B3
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:55:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F1462D267D
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:54:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D4E63125865
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:53:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B8F2C30117C0
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C536E3F87EA;
-	Thu, 19 Mar 2026 20:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED0F3EBF08;
+	Thu, 19 Mar 2026 20:54:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Stz/sQzy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i5Da/vfQ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JL2MEzcg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A493D3ACF06
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 20:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773953628; cv=pass; b=muPuIQdXW2LQ0a00O9XpNdhKn2yTliX9niQ02hOgmZTWSYbO9NQjXZ24djgieSXi18e68Ba4ZdRVkwEjPW5sbXlkyOS8qOKOTbs4QxWG9ifyLKSvOVwqI+EpSLgHCCT1Fm4ibgBBoxdfPeqbDkfmt8yP9ynlbIVNVYTM809p07A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773953628; c=relaxed/simple;
-	bh=Aa/68TobMq2WA7MnUgvvLadAtMm6UrCQIVjbgTR4Ayc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UdqyIUQB7QyJl87npcAyNAEGpZGysZaoOESBMFJOZSvArMgc/MS/hXJojyZ7iBJDDmv7xTqiAM2PpWzmXNEc41b20F6jafumrfM5W6F+xZEEGvFptEzriRugerc+aCgxnaDyGqCsTU+loNRCsfgenFLEAK4Vg3FuFmgc/n3E3lQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Stz/sQzy; arc=pass smtp.client-ip=74.125.82.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-126ea4e9694so684759c88.1
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 13:53:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773953627; cv=none;
-        d=google.com; s=arc-20240605;
-        b=g/xhuDVhXauZBD/xWHoD/SB2l900yiuJefu41BWcsIV0rXSreKxlpCHbCWNY0Iuja+
-         eDB26kr6u2+gneE78bUNYkt9pPN/CFOZMVX9CMWY9yxjz6RDfEnzaFf8D+djiXQvSNaZ
-         eVP+NAtV1pxDxaUnQ5DX4IkEisuLrqUPpuoKiP+UmsafjsL25YQO/t9INbmUpVDOX3k2
-         8OkbZadddOke9r6suazISqrxnw+E8Gzayg0/UIY4J8QE5k945JTI3qh/N/K4XjF1f5la
-         7onqELen5IQd4yUB+HHIZgfTw5x2MQyB6B1HI/0mCS+TZjj3DWaX4b0pSsnrIIrCgiAi
-         i5Aw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Aa/68TobMq2WA7MnUgvvLadAtMm6UrCQIVjbgTR4Ayc=;
-        fh=5nZgokyJ/IJeM7uNUaw2pe6wt9zOsqolU+vcKu9UYjs=;
-        b=IIl3QiE0yoAjk/J6U1x94d6T61FvEO/I2sVUJyiHOxmlDsv9z6+StrZWTrHi09pOHt
-         qmmsDUW0QANKKmFpsUpCVpc2rxaLhBzU3grwwTLTaBZQhfo/He+/cmiPWjh6etZD5UZ+
-         TB2vDrPYyelQOsG5u+6Mfa+B3KTU6lbvp/9A+v8qmd07Q0C2OoX7gue/gfh6+PiKckRo
-         IsHgQjMAspaGewK89OJIe4cE9MmQrJSVpGJbFZZ4oNrJfsH85OdqfmCuR/rhX48JmVhi
-         vzJQyIios7kgIxu0dSizuxEpbxZJcgt+Ly1ggaZpbXAhDOirbOKjgUVxBGR8woo6fp/p
-         rnQA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DBCA36215A
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 20:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773953660; cv=none; b=UBet+Nj2JIbv4AjUOttfrbLQQ8SdxEZ+kX2gFLeKUwxuLIP9s1CFR9Eh4tRE1edBoHx+XYTRIKO6JpjKqV5URNJhOeIojd0uR/z06rVnWULX+zi/dhwaOSdQjro5CwvVCvvEhw8DAd5TUnkVrqN2edoospTA2NAIlGdDt7U+Knc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773953660; c=relaxed/simple;
+	bh=OspvSUceR9D7FWErEaMeS4pbjFGXhTs0d3vC6fXFa4g=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=nuCNLyxoXKC+ZFaPVv8ZZYGg+ZjlL1QNWHA78ZhwLoSyRGIScvPxoamdHkz5OzcW1GR2BKpDML8KwXcXVWPukNsfvq9w8ThHwwYBaaFDe33GjqQ9e35PPlCxuHdGJGs0Gz9/BJ437rTW1UfD+DCFkBMA3bWyjdfJZsizcq8qfiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i5Da/vfQ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JL2MEzcg; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773953658;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OspvSUceR9D7FWErEaMeS4pbjFGXhTs0d3vC6fXFa4g=;
+	b=i5Da/vfQQUDm2uf3tcOptZL5DQrMwOU6IgvDH0Pauitz+9D5T+97ikCR2+7agzhUNtoyau
+	EkkaDSiPmBCq74PTATbRJ5RACQag8VIgjeCDthLR9G6HJm3A097LBpFAl7XGMa26eyggq5
+	H0KlMWvFZDeJgXUcqrfHAFpp7i/aLcs=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-198-m4niJ5CzNz-oOJpF28wLVw-1; Thu, 19 Mar 2026 16:54:17 -0400
+X-MC-Unique: m4niJ5CzNz-oOJpF28wLVw-1
+X-Mimecast-MFC-AGG-ID: m4niJ5CzNz-oOJpF28wLVw_1773953656
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-5090bc4823cso102283451cf.3
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 13:54:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773953627; x=1774558427; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Aa/68TobMq2WA7MnUgvvLadAtMm6UrCQIVjbgTR4Ayc=;
-        b=Stz/sQzyMZ/kJJjTPhp3BWS0U2Ya08l5PyJBuBtdcbg9sKql3eghZTlFKSmAov5LUo
-         Nd94uiNXwqPJ3Ys/ciUHsKiDxrjv3vIZacMJPSwiHoiYUYtrAvsLkpmJxUEQWJuJJZHQ
-         mhTVh3Tb7hVqD77nyclc2bjnuIa6XVGzWSc6RKP+TEPFF4718llWZTvTugY0nXAbeayh
-         HDOPTRYhCwW3rkVvhAWC/AX3XUPdbBfWcZW14AOv/KrZE5HNR4sH1LbNRbufL822Lqu8
-         6R9E+rV1BXzo8VuM8BgD5OeUt1XXnmACAwVjBZ6aWqEWhZfy9VCh1yunBnJnCAYcJlI2
-         rvcw==
+        d=redhat.com; s=google; t=1773953656; x=1774558456; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OspvSUceR9D7FWErEaMeS4pbjFGXhTs0d3vC6fXFa4g=;
+        b=JL2MEzcgSbicNblhfTU1iXOAgbqxYIHkpSmAswQ7p1tadNZEPo7Aao7dQbRQbf2Ndo
+         qamwj58PsJlLevsNlswwEbbxNSHA0CFrLEmkL3z3sGZQ1qeTDA5pdtGjmnW06Loadzec
+         /pHRRyLXi70FNGLrizMJs34rv1Za+up24KeJciqCYoNbfHJ41C5hh/5Ur5uxwxpW2KmY
+         pJSyzChg2j5Be2PehooHZhj6lAUBIxnniAdVh1aJEV3MSyvWfhOH/xRmudYCdOhnR7Ij
+         B2QRYM8fpTJjriKRV95OzN7jUxCYWkmF7FmH11Kpk5NUhMwtnwA5Z/SV4tLvzTdzfT9M
+         ZV0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773953627; x=1774558427;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Aa/68TobMq2WA7MnUgvvLadAtMm6UrCQIVjbgTR4Ayc=;
-        b=m0DJjrSwegk2F/ojjiz67rpCWO0WXNIw7V+HMbeCw/yvKGfHM8WnWTMAW2LiCrDtsP
-         /FKGAMcNs5k7HrvPvcX69DufG7tZw4y83o17MKTlCL6Q8EdkKJ4sI8H16MF+x49geEMf
-         tg8yJCMdZT2S227vfvt2udSjZurtRY9MnPle2ArdzEuyBvbiurpnds+D8roDbkrGsJm9
-         akXmNgK+joP/0bHZ5uijw14eqL/QRjf7ASpaxk81XZMLV0ZL8Oq/k+LUE3Ye3taVYZ2Q
-         AOvpUcx9PQQgCoznECB9wbWrk8gcev3y9ttD5m6wM5VYxcMC02EbZf1ltHL5aryIWS2P
-         UxpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4sCGUxe1zEdQhLkUYOia/tKuzYkyDz2Tw2PeWKORRZM6UsSsRbdEHYLdvPK5VlY7dcij6/S4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxThXsS3/3kuc1mZ3wJStt30z++ylE1GOYjKphN+jW7hpzb+9z+
-	4AV5b5lK8jGzofDPqcdls5RAgHvidvDoyJYcFumk1UMQG+HJs07EI7Hz2GkS6w8lvnZUciDOLon
-	YjxaoKnm8sbqjqi+Z780QrZiKnxQr8A4=
-X-Gm-Gg: ATEYQzxOcsmeSSasbl60HVpF9SV37G3ntPrkzT7nUH0k/9mvbWsX+fWck0ffjmyZ5xo
-	R5rKBODpGBeDLH8drO8Kkspk5TY5msgXPHPtQu/eBJ5v6ywOBtJqGJwnLcdMQZ558Gg4ZAa3vHh
-	T6BLy8rQ2kNSAD0QN/BTzZANrHj5ka4L8nznC1F4rxQbtIZU4euODsjBLX2Zy4B3dBUVUCO8tPy
-	dzKP+3B4DwD4mh1NyeGQNWHYRpx5vHQzt8fqlaeyHZ1udyBe/l3thpv7elomvjggexzvVwzo/Cn
-	WhRhj01sx5dRuX3YH35LluUzpfbye1fRuCEiO+ey
-X-Received: by 2002:a05:7022:31a:b0:12a:6fb7:87e3 with SMTP id
- a92af1059eb24-12a726cf881mr297346c88.31.1773953626588; Thu, 19 Mar 2026
- 13:53:46 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1773953656; x=1774558456;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OspvSUceR9D7FWErEaMeS4pbjFGXhTs0d3vC6fXFa4g=;
+        b=GTdve+TE7WY8YgOnzvS4Ebc6H+LUUaQGMUkPFy5TLfdqt0oPEfRKfEwNW/0ai3xcrK
+         tufhSJp8IYzxoklNO05yd+TnXw4qpvv5sI69CAeDQSyDyO5dc6VyWr485TFG+8oFXck0
+         1Tehs3F+dHkw2/3GDLLhaF3fffGVLx6lTyV78t+6PFw5Gud2FsPlWUor0SOUWUfmpKsJ
+         JjyeqZg5bbbINnyTioqg3bBqs18JrjjRfDQOKwIvzTMVMrNDhJh9h8Mg03OOO3oJgaze
+         H9HCupyTYU6pDM9Id7pxvbWLH7fBnzMqQk6lJUxO/pyV6FAqbbxmLPmbSlkLGQCWt7K9
+         inrw==
+X-Forwarded-Encrypted: i=1; AJvYcCVtewjn1VNL2yR6oIZm6feW8KDbszOjdeksZcw8zA0DP1wUTlzshoTNzosTmpZnSViuJL8fhjY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWo9FncUgJV4gwFSG3/RVHtShGzqryUxjqsNoHOqh8I/CrurQo
+	vwRR0aElzIxgydaXC7JS2++f7YxGLN3BlooKcZ12P3p8A5jAtqhPscA1jzacSQ5t52tz7eqcBkO
+	pJfPyRGTfHa8TJTHmJME5Tikenpqr+eFNczwEMFwIObeVeYngN1QqsijEvQ==
+X-Gm-Gg: ATEYQzyDBZCp3GGkpeUTRYMQCIGtZrKc8CQ+R2i+xhsXLfF8kq+dyLFtkwC0nQwOQ3Y
+	9DkI0uJ5yMS32WG+gvZQonMjOL93yWtCB+WiqMKdmoni4xmuSz62eL6p3+wuBTJ1f0Lzvu2Mi0E
+	UIzfF0qRf/FJz3YqpjvksdVAnbkO7Np/kmB2TJpHQbSHamPC0DKA++AGsZYBMg5y5fPjbrabpFf
+	mJhZrisDmla4vsvTOKr1JnRcS+X6Oqq0Tl1Kd/rlTkwpAA85YFu4VUyu4hrLZ+fbLVxLLhRKTzF
+	xMpExdqjWb/nQu6E96ZSqQwUIcnXk75CUhexiOKSw3lDBo6KNpRWY32z9F3EaMDlZO5im6M4cRs
+	IGVs7o1CnbZuaUhY2Ul9+v5bnGKtBnVb33ZsPuRC1sYM2lkKG+4/BNMNkpru8C0atoFHokv0Ri1
+	XDk68aRAfaaJKrGA==
+X-Received: by 2002:ac8:7f54:0:b0:509:4e1e:1b9a with SMTP id d75a77b69052e-50b37586c7cmr10125341cf.54.1773953656260;
+        Thu, 19 Mar 2026 13:54:16 -0700 (PDT)
+X-Received: by 2002:ac8:7f54:0:b0:509:4e1e:1b9a with SMTP id d75a77b69052e-50b37586c7cmr10124851cf.54.1773953655634;
+        Thu, 19 Mar 2026 13:54:15 -0700 (PDT)
+Received: from thinkpad-p1.localdomain (pool-174-112-193-187.cpe.net.cable.rogers.com. [174.112.193.187])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b36e350c3sm6518601cf.19.2026.03.19.13.54.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2026 13:54:15 -0700 (PDT)
+Message-ID: <cf908b20e5f6237c887f6d751be82670d7cbd7b7.camel@redhat.com>
+Subject: Re: [PATCH net-next v9 0/6] net: stmmac: qcom-ethqos: add support
+ for SCMI power domains
+From: Radu Rendec <rrendec@redhat.com>
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Bjorn
+ Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>,
+ Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski	 <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn	 <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet	
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni	
+ <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, Vinod Koul <vkoul@kernel.org>,
+ Giuseppe Cavallaro	 <peppe.cavallaro@st.com>, Chen-Yu Tsai
+ <wens@kernel.org>, Jernej Skrabec	 <jernej.skrabec@gmail.com>, Neil
+ Armstrong <neil.armstrong@linaro.org>,  Kevin Hilman
+ <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, Shawn Guo
+ <shawnguo@kernel.org>,  Fabio Estevam <festevam@gmail.com>, Jan Petrous
+ <jan.petrous@oss.nxp.com>, s32@nxp.com, Mohd Ayaan Anwar	
+ <mohd.anwar@oss.qualcomm.com>, Romain Gantois <romain.gantois@bootlin.com>,
+  Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm
+ <magnus.damm@gmail.com>, Maxime Ripard <mripard@kernel.org>,  Christophe
+ Roullier <christophe.roullier@foss.st.com>, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, 	linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, 	linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org,  Drew Fustini
+ <dfustini@tenstorrent.com>, linux-sunxi@lists.linux.dev,
+ linux-amlogic@lists.infradead.org, 	linux-mips@vger.kernel.org,
+ imx@lists.linux.dev, 	linux-renesas-soc@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, 	sophgo@lists.linux.dev,
+ linux-riscv@lists.infradead.org, Bartosz Golaszewski	
+ <bartosz.golaszewski@linaro.org>, Martin Blumenstingl	
+ <martin.blumenstingl@googlemail.com>, Krzysztof Kozlowski	
+ <krzysztof.kozlowski@oss.qualcomm.com>, Lad Prabhakar	
+ <prabhakar.mahadev-lad.rj@bp.renesas.com>, Konrad Dybcio	
+ <konrad.dybcio@oss.qualcomm.com>
+Date: Thu, 19 Mar 2026 16:54:12 -0400
+In-Reply-To: <CAMRc=MfNcK3MLndik1jy-yhHAph5=amnTGgn-MpXXG0Uv1ifpQ@mail.gmail.com>
+References: <20260316-qcom-sa8255p-emac-v9-0-c58934e76ff2@oss.qualcomm.com>
+	 <64d282fd94be1546df75d7df5b47eacc0479797a.camel@redhat.com>
+	 <CAMRc=MfNcK3MLndik1jy-yhHAph5=amnTGgn-MpXXG0Uv1ifpQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260317065137.1533226-1-atwellwea@gmail.com> <20260317065137.1533226-2-atwellwea@gmail.com>
- <d0ab8cc8-f734-47d4-b402-9c62ae563b4a@redhat.com> <CADVnQy=raqQ2dKwJZh2U-9=c_AEwoCS3i61oL7gUSASxBC1QVg@mail.gmail.com>
-In-Reply-To: <CADVnQy=raqQ2dKwJZh2U-9=c_AEwoCS3i61oL7gUSASxBC1QVg@mail.gmail.com>
-From: Wesley Atwell <atwellwea@gmail.com>
-Date: Thu, 19 Mar 2026 14:53:35 -0600
-X-Gm-Features: AaiRm53MHPLs7H-KjOdESA5PQ4FyJgygf7eKubpjzFr5N2ck-0wezWHyRIsyhlo
-Message-ID: <CAN=sVvycH50ZOQDb=xeW3iWG7cWO02yvd-wJ4NhbaUFHnqJ0Ag@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] selftests: packetdrill: stop pinning rwnd in tcp_ooo_rcv_mss
-To: Neal Cardwell <ncardwell@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
-	shuah@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-269649-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[oss.qualcomm.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,st.com,linaro.org,baylibre.com,oss.nxp.com,nxp.com,bootlin.com,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,tenstorrent.com,lists.linux.dev,googlemail.com,bp.renesas.com];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-269650-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.902];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[atwellwea@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 1354F2D26B3
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rrendec@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_GT_50(0.00)[51];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.989];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6F1462D267D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Thanks,
+On Tue, 2026-03-17 at 15:12 +0100, Bartosz Golaszewski wrote:
+> On Mon, Mar 16, 2026 at 7:31=E2=80=AFPM Radu Rendec <rrendec@redhat.com> =
+wrote:
+> >=20
+> > On Mon, 2026-03-16 at 13:05 +0100, Bartosz Golaszewski wrote:
+> > > Add support for the firmware-managed variant of the DesignWare MAC on
+> > > the sa8255p platform. This series contains new DT bindings and driver
+> > > changes required to support the MAC in the STMMAC driver.
+> > >=20
+> > > It also reorganizes the ethqos code quite a bit to make the introduct=
+ion
+> > > of power domains into the driver a bit easier on the eye.
+> > >=20
+> > > The DTS changes will go in separately.
+> >=20
+> > I'm seeing some weird behavior with this version. The probe part looks
+> > good (but see below), but when I try to bring an interface up, it fails
+> > with ETIMEDOUT. The relevant part of the stack trace leading to the
+> > error is this:
+> >=20
+> > dwmac4_dma_reset+0x208/0x220 [stmmac]
+> > stmmac_reset+0x2c/0x68 [stmmac]
+> > stmmac_init_dma_engine+0x108/0x400 [stmmac]
+> > stmmac_hw_setup+0x5c/0x538 [stmmac]
+> > __stmmac_open+0xc8/0x2a0 [stmmac]
+> > stmmac_open+0xcc/0x238 [stmmac]
+> > __dev_open+0x138/0x2a8
+> >=20
+> > Now dwmac4_dma_reset() is very simple. It sets the soft reset bit in
+> > the DMA_BUS_MODE register, then waits for the hardware to clear it, and
+> > that never happens.
+> >=20
+> > Now, getting back to the probe part, there is one extra message
+> > (compared to my previous successful test on v7), which I see at the
+> > very end of the probing:
+> >=20
+> > =C2=A0 qcom-ethqos 23040000.ethernet: clk_csr value out of range (0xfff=
+fff00
+> > =C2=A0 exceeds mask 0x00000f00), truncating
+> >=20
+> > This is a sa8775p ride board, so there are two stmmac devices. I only
+> > see that message for the 2nd one, which is also the one I'm trying to
+> > enable, and which fails.
+> >=20
+> > I realize this may or may not be related to your changes. But there is
+> > no way to test on a SCMI-pd board without them. I'm not sure how
+> > relevant it would be to test on the non-SCMI variant. I'm assuming the
+> > DMA part should work the same way (regardless of SCMI-pd), so if I can
+> > reproduce it there, and since I know it works on mainline Linux (that's
+> > where I tested v7), I could bisect and see which commit in net-next
+> > breaks it. If you don't have any better idea, let me know and I can
+> > try. Meanwhile, I'll keep poking at v9.
+> >=20
+>=20
+> Does current net-next on its own still work? Or is the second
+> interface broken even without this series?
 
-Paolo and Neal. My intent here was just to keep the test focused
-on OOO SACK state and `tcpi_rcv_mss`. I appreciate the feedback.
+I don't think there is a way to test net-next on its own (without your
+series) on a board with SCMI-pd firmware. It would require the
+qcom-ethqos driver to have direct access to the clocks, but the clocks
+would not be there.
 
-V/R,
-Wesley Atwell
+What I could test though is a board with the "other" firmware (without
+SCMI-pd). And on that board, I do *not* see the problem even with your
+series applied. In fact, I tested the exact same kernel build I had
+previously tested on the SCMI-pd board.
+
+I'm not sure what to make of that or what else I could try.
+
+FWIW, the "clk_csr value out of range" message I mentioned before is
+still there on the board where everything works, so it's probably a
+red herring.
+
+--=20
+Radu
+
 
