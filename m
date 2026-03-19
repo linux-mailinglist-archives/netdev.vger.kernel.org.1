@@ -1,181 +1,107 @@
-Return-Path: <netdev+bounces-269515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269516-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kDxjAmsevGlEsQIAu9opvQ
-	(envelope-from <netdev+bounces-269515-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:03:55 +0100
+	id sLCACrgevGkvswIAu9opvQ
+	(envelope-from <netdev+bounces-269516-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:05:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E02E62CE47A
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:03:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86EEC2CE4FA
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:05:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8703C3079E08
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:49:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8444C30DCE7A
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 15:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B589A3E51C0;
-	Thu, 19 Mar 2026 15:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A8A3E8C72;
+	Thu, 19 Mar 2026 15:53:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ecSR50Mc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="A0riGY0q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EA71459F6;
-	Thu, 19 Mar 2026 15:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53693E8C78;
+	Thu, 19 Mar 2026 15:53:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773935373; cv=none; b=h02Eob4XOGJmtMM/2ISE1ZIpRLXYKxxdc7SA9ki4qFN5brfpiZQXlcwhIoouTFiKd/svGz9qymkTmJoYeINBSCf+eqsu4hvOQYPN72GmQjYUaHfaRHzGSy69vyEaZpLMXrvlljrf7TN9hZC/OLiHk1ToBnKV34kz184IUvUo4kM=
+	t=1773935624; cv=none; b=J0GyBQasNDtKx+/mkIym4W5p8EZ0UQvf24v1RdxRCRbZSC7DuAHXt7NDWQtq6YFqyxgyJQUYc6BSXhXS5QHUq12QvRuochg88kG6WBV/I4CwA+GKZ6KR9WF94mNe/TZKkauA3aHy5IIaay8kMlYBY6Vuyjk0PqiUOuzp1b65L88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773935373; c=relaxed/simple;
-	bh=cGkr+p16Ngs8vie3raqWm7LPgNZ8uve+QEs9dd/iT7g=;
+	s=arc-20240116; t=1773935624; c=relaxed/simple;
+	bh=PyWcQUs/CwOXw1ONa3nPZtkK0b8+U9fg5fPTG1r9oWY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X4yAEA5R0AyahPRPX9nxMHRz/rutgzQVqJsKgelk5RLH7ES13hFT02ltfGTX0C2SARY8HH6Bxev7PQ+V4Hem57zTc+dJ1u2c8f3HBn2GJlNJp3ZuV0GLkpsKJeyDEefPf8CLtRtQInT7+B2t9VKV532kogMytD4mNh2VHsSeGyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ecSR50Mc; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773935372; x=1805471372;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=cGkr+p16Ngs8vie3raqWm7LPgNZ8uve+QEs9dd/iT7g=;
-  b=ecSR50Mc+7/Pfx8nNvQkjjMYdiL6ziTnRX9M+TYXWlt3XSWIU05JFyvN
-   VFywkXRh1BbUbGgDYWmfJSd/P565NqvtJmIfePfFVE1tS7/zcMF9xZjRB
-   ysANOI7E6OnUC+KqatJR/9ZnaMJg5sqFVs1GhTSe7+CYPeKXr1hi0lTjw
-   G4tD/xoaTO6q9F2o8JSLxm/8gIwEAA1KkbUEcgmArcYsCcGGD9e5yJ5Dm
-   TGzMk5lCk4ZhvwDVKKZK1mlHa7hceyv18UO1V+g9gjpMfcDNiKFZrmbIZ
-   i6KWS83xsjbmfb7GY4PwDx7p5PYJFh85XBiawPd8AxvfLH9dh5OR1K8zZ
-   A==;
-X-CSE-ConnectionGUID: QaMSATjeQvyMAgAasDyvnw==
-X-CSE-MsgGUID: eCEO59ivS3mSeQ0NOpu0vA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="86373816"
-X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
-   d="scan'208";a="86373816"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 08:49:32 -0700
-X-CSE-ConnectionGUID: WKBqTyx9T3uNo1IiDQyJiw==
-X-CSE-MsgGUID: r1ZGyPPGRs6pANxhD0qq8Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
-   d="scan'208";a="218444375"
-Received: from klitkey1-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.244.120])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 08:49:29 -0700
-Date: Thu, 19 Mar 2026 17:49:27 +0200
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Sean Chang <seanwascoding@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Chuck Lever <chuck.lever@oracle.com>,
-	David Laight <david.laight.linux@gmail.com>,
-	Anna Schumaker <anna@kernel.org>, netdev@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH v3 3/3] nfs: refactor nfs_errorf macros and remove unused
- ones
-Message-ID: <abwbB-AkHH9Syppw@ashevche-desk.local>
-References: <20260319141846.78222-1-seanwascoding@gmail.com>
- <20260319141846.78222-4-seanwascoding@gmail.com>
- <abwLFk0L_kCZqIiK@ashevche-desk.local>
- <CAAb=EJVCkn9_iO_YHMbLU1VR1OsKqTSg5Jo9jviaT3dEq0k5vQ@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ar1nZEQ4fmsZDLcE5NLb4McUcjkRuU/wWzrEmAS+tIQFNgibj1pU/LzUsZYtW7QNbHGVeuNqk0Dr0v7K4QyI4kJfz+t/NmbTWsV9DfHflwD/993OCKFKKCcMQYb2CuCu7GcEnru3pHq3erl3x3EM3cpEPC8xpKPI9btiDRjGdHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=A0riGY0q; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=J0Jn7FRpfsVh6xJoXGSk8kCSSD4azZ4tiRFyJZ/ByxM=; b=A0riGY0qWjb4UcHpG57UUNNvrj
+	HqLLQrleN75OO8WmQDfc0TXdBAg07rAJMloz0hNd8O9VsX01brW7A1YswFAgK/uNfoLCftOVirAoe
+	ORb/ma/q9Oo5eeKdgkP+ofpS7qCZr2tSXPHAG+ypqtEN5DCJLsBNDX5TacVcN9S2RDY8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w3Fgj-00CPJU-5r; Thu, 19 Mar 2026 16:53:33 +0100
+Date: Thu, 19 Mar 2026 16:53:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Birger Koblitz <mail@birger-koblitz.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 0/2] r8152: Add support for the RTL8157 5Gbit
+ USB Ethernet chip
+Message-ID: <339655b1-59e3-42d6-a460-b8424d7fd279@lunn.ch>
+References: <20260317-rtl8157_next-v2-0-10ea1fa488d1@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAb=EJVCkn9_iO_YHMbLU1VR1OsKqTSg5Jo9jviaT3dEq0k5vQ@mail.gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+In-Reply-To: <20260317-rtl8157_next-v2-0-10ea1fa488d1@birger-koblitz.de>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,oracle.com,gmail.com,kernel.org,vger.kernel.org,intel.com];
-	TAGGED_FROM(0.00)[bounces-269515-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	TAGGED_FROM(0.00)[bounces-269516-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.984];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.981];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: E02E62CE47A
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 86EEC2CE4FA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 19, 2026 at 10:59:02PM +0800, Sean Chang wrote:
-> On Thu, Mar 19, 2026 at 10:41 PM Andy Shevchenko
-> <andriy.shevchenko@intel.com> wrote:
-> > On Thu, Mar 19, 2026 at 10:18:46PM +0800, Sean Chang wrote:
+> This patch is on top of linux-next as the code re-uses the 2.5 Gbit EEE
+> recently added in r8152.c.
 
-...
+Is 'linux-next' a typo? net-next should also have the EEE code, that
+is the patch networking code takes.
 
-> > >  #define nfs_invalf(fc, fmt, ...) ((fc)->log.log ?            \
-> > >       invalf(fc, fmt, ## __VA_ARGS__) :                       \
-> >
-> > >       invalf(fc, fmt, ## __VA_ARGS__) :                       \
-> > >       ({ dfprintk(fac, fmt "\n", ## __VA_ARGS__);  -EINVAL; }))
-> >
-> > Why not all of them?
-> 
-> I initially only refactored nfs_errorf because it doesn't return a value.
-> For nfs_invalf, it will always return -EINVAL. Would you prefer me to
-> refactor it using the ({ ... }) statement expression pattern to keep the
-> return value, or is it better to leave it as is ?
-
-I don't think in this case it improves the situation. Yeah, it's unfortunate.
-
-> #define nfs_invalf(fc, fmt, ...) ({            \
->     if ((fc)->log.log)                \
->         invalf(fc, fmt, ## __VA_ARGS__);    \
-
-I believe this already has an error code inside, that's why it's only added to
-the 'else' branch.
-
->     else                        \
->         dfprintk(fac, fmt "\n", ## __VA_ARGS__);\
->     -EINVAL;                    \
-> })
-
-Okay, let's go with your original approach (ideally these all probably should
-be replaced by static inline:s).
-
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@intel.com>
-Tested-by: Andy Shevchenko <andriy.shevchenko@intel.com>
-
-Unrelated to the series, but if you want to address these:
-
-nfs/super.c:1170:49: warning: incorrect type in initializer (different address spaces)
-nfs/super.c:1170:49:    expected struct rpc_xprt *xprt1
-nfs/super.c:1170:49:    got struct rpc_xprt [noderef] __rcu *cl_xprt
-nfs/super.c:1171:49: warning: incorrect type in initializer (different address spaces)
-nfs/super.c:1171:49:    expected struct rpc_xprt *xprt2
-nfs/super.c:1171:49:    got struct rpc_xprt [noderef] __rcu *cl_xprt
-
-nfs/./nfstrace.h:1488:1: warning: dereference of noderef expression
-nfs/./nfs4trace.h:2168:1: error: too long token expansion
-nfs/./nfs4trace.h:2234:1: error: too long token expansion
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+	Andrew
 
