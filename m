@@ -1,160 +1,172 @@
-Return-Path: <netdev+bounces-269592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269594-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OA+mIUs4vGl3uwIAu9opvQ
-	(envelope-from <netdev+bounces-269592-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:54:19 +0100
+	id KAu8C3M7vGl3uwIAu9opvQ
+	(envelope-from <netdev+bounces-269594-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:07:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DA4D2D059A
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:54:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F0052D08CB
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:07:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7FB823054334
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:52:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF16A30401AF
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9B03F1659;
-	Thu, 19 Mar 2026 17:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6B4396B97;
+	Thu, 19 Mar 2026 17:55:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EIFN+mnd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nrMgkGaR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED185343D60
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 17:52:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1A22C0F81;
+	Thu, 19 Mar 2026 17:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773942759; cv=none; b=r1l0TMQ9EyUM+eoVmSRcvxzpQ9rVEUzElu9c0TfEUkST1vccfjseJRtUYPO0k9e67CAVCUAd6sLCm4jOZ8rBbtzmc6n0PdcY1hBTRzN7mp2Y/3wleKbksAVsqz/p38W01KGsrPxexzF7SK3kISNMMTHiS7NsRYKmOpOmWxuoUo4=
+	t=1773942948; cv=none; b=QENJszGkiREMzym/Or7GVa7FiNOxSSpubWC+QtXYZFWaMIl+9m4ax1cSEnAggA55N8g0hAW3boS+oBetukrgLT2/t7V3tNOjs/24YFHeIFkmyOyhcOH98V8tqazDeUfyHkebZCFe8Mb6CQW7TtshwT+zfREWQo+qNEnC6PiF6Po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773942759; c=relaxed/simple;
-	bh=c7KdzH6EkQEnIu60qLdJacRQT5STh1ryZYSTEgsyFuw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TOu3xxSjt7F40kLBOmmdMeuLLLjHXhESa2yEdmdaArlAgTvjzFaHEm6BGEW6UUTOwQVL2zINu7cKLV+TpNYAaXqHIMaFgWFlSCMPuEu/GY6BsGdFVw6glBZR1TQhJ2RpdZrDEUbKBkv5ZSyou786YqnkFyAeRl2SlV+2LocVzw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EIFN+mnd; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 31FAE4E4271F;
-	Thu, 19 Mar 2026 17:52:28 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 039B460050;
-	Thu, 19 Mar 2026 17:52:28 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4730410450941;
-	Thu, 19 Mar 2026 18:52:18 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773942746; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=8h+kJtiQNyxdX0LIfkr+wSpHBs0qYPkOOQXebt6tRfc=;
-	b=EIFN+mnd/aoBLMU4JLMfZCIFtWSfuBBGKwM3h7Ys814nOH0MXqOfw/qcEkjHeOBNFs/qfK
-	buUvvHfo1Ticbqg73nPzR9xZmHLfSdLEL0WRryiz6D6v0VFOnxlkwPIeCdxFNDWIt4RMHw
-	NSMfgjxnCXkV1hpJm53YpkASDB+QFeSggtV45rEblLi7lS3Esgr90KlWfhYoSDj83i5x/7
-	68WfkrCmQWMKN5368nQ62cFRcajj9g99HFbKMgssCzAdfVhhHJLXkdR1UHroM6xYzg0iy7
-	s9Rjla2oXAhtfpp0/hsJ1olPzWo/eoVTp/M6xULHJkhEUYJRv9IA09tho3NsQA==
-Message-ID: <e35c5cde-c631-46f4-850f-4737b1f591d9@bootlin.com>
-Date: Thu, 19 Mar 2026 18:52:17 +0100
+	s=arc-20240116; t=1773942948; c=relaxed/simple;
+	bh=DDxAOZ70XScEu44FhyuhK40fHpzL1B8BbtDWULsAoYA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HXLYDMferWlHRcA/Fg1Vc39Ls/VquS4449XpQ2jNROenEBi8KhXwEsHR5rkWzAZQ4paQB0YjnMdteRvW1i+7bgUUeaUa3oluLQqVKkApm4tCElfPbC+NyrFjzMTuhKl7HZzieeVg2rkGCGfynU/gWD4QeW/Ql1u7MCytf5WFvS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nrMgkGaR; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773942945; x=1805478945;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=DDxAOZ70XScEu44FhyuhK40fHpzL1B8BbtDWULsAoYA=;
+  b=nrMgkGaR6i0I5Z5CDkUZsJpLI/c6Z+nOEp9KcA6RXktBQQLIQ7GG0gHS
+   4XktJRDkb3xWlAC4pQmZuv2DpPxr5Bw8d12j9oVKHjsL3WN98qifooLqy
+   KR5GSvA75g8JjrJwm1GKti60VmeMS5V4xmhezi1sP8ug7hoLKoZzYEIT3
+   2bB9ba2MErNSgZShbwTxTXStd8ZHf/6IFxKapkBouTRkRFP8OKFEX32Yf
+   MlQQDR8S1NqmbhyK5tWR4BbNMNiFLVHwPu2kjjhu+JLb3MbAVNwKRXn1V
+   dLArObpiVIjj70RWYqmkn3GPqVrYw2YuXDjs4Iu9AmxtfUpjh1OKetxg6
+   w==;
+X-CSE-ConnectionGUID: zGJy64xxSYuYgcj8viQeUw==
+X-CSE-MsgGUID: vjYgfP3NQqm34PaQY3sfoA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="74038576"
+X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
+   d="scan'208";a="74038576"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 10:55:44 -0700
+X-CSE-ConnectionGUID: IinG5dz/S7GCuN4a1t/UDw==
+X-CSE-MsgGUID: 67/fu9D4TdGVXl49iU26PQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,129,1770624000"; 
+   d="scan'208";a="246058545"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by fmviesa002.fm.intel.com with ESMTP; 19 Mar 2026 10:55:41 -0700
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	magnus.karlsson@intel.com,
+	stfomichev@gmail.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	larysa.zaremba@intel.com,
+	aleksander.lobakin@intel.com,
+	bjorn@kernel.org,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: [PATCH v2 net 0/8] xsk: tailroom reservation and MTU validation
+Date: Thu, 19 Mar 2026 18:55:30 +0100
+Message-Id: <20260319175538.479139-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 10/10] net: ethtool: Introduce ethtool command
- to list ports
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, Heiner Kallweit
- <hkallweit1@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Romain Gantois <romain.gantois@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>, =?UTF-8?B?QmrDtnJuIFTDtnBl?=
- =?UTF-8?Q?l?= <bjorn@kernel.org>
-References: <20260309152747.702373-1-maxime.chevallier@bootlin.com>
- <20260309152747.702373-11-maxime.chevallier@bootlin.com>
- <20260312190705.0b3a3f78@kernel.org>
- <97bd2ab1-a8ff-4c0b-a328-952139f18fc8@bootlin.com>
- <20260319075343.0aa9fac8@kernel.org>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260319075343.0aa9fac8@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269592-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269594-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-0.997];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.967];
+	DKIM_TRACE(0.00)[intel.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:mid]
-X-Rspamd-Queue-Id: 1DA4D2D059A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:mid,intel.com:url]
+X-Rspamd-Queue-Id: 8F0052D08CB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+v1->v2:
+- remove xsk_pool_get_tailroom() definition for !CONFIG_XDP_SOCKETS
+  (Stan)
+- do not rely on pool->umem->zc when configuring tailroom (Stan, Bjorn)
+- simplify dbuff setting in ZC drivers (Bjorn)
+- use defines for {head,tail}room in tests (Bjorn)
+- return EINVAL instead of EOPNOTSUPP when mtu setting is wrong (Bjorn)
+- include vlan headers and fcs length when validating mtu (Olek)
+- tighten umem headroom validation when registering umem (Sashiko AI)
+- set XDP_USE_SG in xp_assign_dev_shared() (Sashiko AI)
+- adjust rx dropped xskxceiver test
+
+Hi,
+
+here we fix a long-standing issue regarding multi-buffer scenario in ZC
+mode - we have not been providing space at the end of the buffer where
+multi-buffer XDP works on skb_shared_info. This has been brought to our
+attention via [0].
+
+Unaligned mode does not get any specific treatment, it is user's
+responsibility to properly handle XSK addresses in queues.
+
+With two adjustments included here in this set against xskxceiver I have
+been able to pass the full test suite on ice.
+
+Thanks,
+Maciej
+
+[0]: https://community.intel.com/t5/Ethernet-Products/X710-XDP-Packet-Corruption-Issue-DRV-MODE-Zero-Copy-Multi-Buffer/m-p/1724208
 
 
-On 19/03/2026 15:53, Jakub Kicinski wrote:
-> On Thu, 19 Mar 2026 10:27:11 +0100 Maxime Chevallier wrote:
->>> GENL_REQ_ATTR_CHECK ?
->>> I guess you'll have to move it to prepare cause we don't get info 
->>> here :(  
->>
->> Sorry for my comments coming apart on your review, I'm getting this new
->> iteration done in-between other tasks  :(
->>
->> I can't move that check to the prepare_data() step, as we need the
->> request->port_id field to be populated at that stage for the DUMP
->> op (for each port, we set request->port_id, then we call prepare_data
->> and so on).
-> 
-> Not sure I get what you're saying - that it doesn't work or that it
-> leads to "duplicated" work?
+Maciej Fijalkowski (8):
+  xsk: tighten UMEM headroom validation to account for tailroom and min
+    frame
+  xsk: respect tailroom for ZC setups
+  ice: do not round up result of dbuf calculation for xsk pool
+  i40e: do not round up result of dbuff calculation for xsk pool
+  xsk: validate MTU against usable frame size on bind
+  selftests: bpf: fix pkt grow tests
+  selftests: bpf: have a separate variable for drop test
+  selftests: bpf: adjust rx_dropped xskxceiver's test to respect
+    tailroom
 
-What I mean is that it doesn't work yeah.
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |  2 ++
+ drivers/net/ethernet/intel/ice/ice_base.c     |  5 ++++
+ include/net/xdp_sock_drv.h                    | 16 +++++++++-
+ net/xdp/xdp_umem.c                            |  3 +-
+ net/xdp/xsk_buff_pool.c                       | 16 ++++++++--
+ .../selftests/bpf/prog_tests/test_xsk.c       | 29 +++++++++++++++----
+ .../selftests/bpf/progs/xsk_xdp_progs.c       |  3 +-
+ 7 files changed, 64 insertions(+), 10 deletions(-)
 
-> Alternative is to add info to parse_request
-> args which I suspect is useful long term anyway.
-
-good point, I like the idea a lot :) OK let me give this a try, I need
-to see how that looks like.
-
-Thanks for the suggestion,
-
-Maxime
-
+-- 
+2.43.0
 
 
