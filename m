@@ -1,103 +1,70 @@
-Return-Path: <netdev+bounces-269402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269404-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IOPeBAbWu2k4owIAu9opvQ
-	(envelope-from <netdev+bounces-269402-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:55:02 +0100
+	id +AboBAHYu2k6pAIAu9opvQ
+	(envelope-from <netdev+bounces-269404-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 12:03:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A10F12C9CB6
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:55:01 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 152402C9F56
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 12:03:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6CA4031B1FBA
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:50:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 52E763009820
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9563C454A;
-	Thu, 19 Mar 2026 10:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G+Kx2lPx";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VvQ8IT3A"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B59C3C345D;
+	Thu, 19 Mar 2026 11:03:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com [209.85.221.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CD73C344C
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 10:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5CC36895E
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 11:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773917409; cv=none; b=pe6MsjDSjPnJE5gbaIC6gaMbhW5x7Es5MCdVi63ZsnGmmu0su7OPAgDLcRkt6yfQPNeXqwZdkXtFqTLoES1bWR3ofh+60YxNBVZPdBNOVZIKcgJb9u8qq3f1g7V9585Z2XakTrcpNewx94nB895rVAVy9sj5oxjeOlvBoGdtWJA=
+	t=1773918196; cv=none; b=C2OmB5OELuhTCnQKnv+6SF234zU6cg3H26PL12vxIij52vJJuRGPoNzJ5vP46crCQgZNOktTE+QmROj5jPCzqtHW/MlDHRFBl15+KH6/qy4Iab4BtYdU7hSkcIUgEgt/w+B+27nbrxjntkw2KADzOT4QhmCgoIWnMmC3nwFSF4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773917409; c=relaxed/simple;
-	bh=0PnjIJb7BB31tuXTXb9O9K08P7IZqTFP8xOl5ts49z0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W6uAH5wWJoMEaDduicmt2N3zj7CYKjEGSbdlDgLhWe03A+iqdmYfEUHWBq8O4jYo3JTEIEeNVMYihPf6vP9u2FOhUQM1C06fZu65GecCh167NpWgBLhdvRD7g/XFZnN91p24Wriyv/hv/YWLzAlvSIfsbbp7vALrWUrYFg3ySZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G+Kx2lPx; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VvQ8IT3A; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773917406;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0/QrmoRE0Ec4371GT4zD9Iw4up8oNW0PlcBOJIQ423E=;
-	b=G+Kx2lPxc9Wbbn1+W9zbtvE/F26K9bWO4osEXZCIVPgZYZez2P5n8+vVOAER70/meXY2/s
-	raw97bhPHo0nMMnBaY3ergBU77IVcyq6AVGTuxw9Hwwi+LTh6Hhx/S2VPF5r8h7kYm463b
-	LCNbtEOngQg34KvjWEktqFdFqtL6dh0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-470-mJN3Jr8_OgSkonvdemd97g-1; Thu, 19 Mar 2026 06:50:05 -0400
-X-MC-Unique: mJN3Jr8_OgSkonvdemd97g-1
-X-Mimecast-MFC-AGG-ID: mJN3Jr8_OgSkonvdemd97g_1773917404
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-486fa9ea1ebso7597275e9.1
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 03:50:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773917404; x=1774522204; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0/QrmoRE0Ec4371GT4zD9Iw4up8oNW0PlcBOJIQ423E=;
-        b=VvQ8IT3Aq1s1RyVJaXQI4RrEZ7dyWGk020Baz9N+pqwNDlwipjtbf/Skmc0RUvGxmx
-         2cVR3/c654Oky2bZ8emjucih6vYPK2Ts61EnpQ8PN2U+88Cu00y143KKPROs0NT+v63A
-         V0S7mHyaknQJl2FBHXMmfz2WaZGmKu0QWxKuzSiOVAn/13ZhGIkR8GRc0wrwPQRaer6J
-         XmmwVcKjTiJZ+WtZjbWmc6dZkGqPErjV+v7Q65a+1fhjpO8goTmNWgwHNSuNaRHyh5pL
-         Dm6V728+aduL770sSAfWXqJQL4JqK/FglPJcpeZJtxKHDBfD8wG+6+mY3CzAgJER/6x9
-         Jy+Q==
+	s=arc-20240116; t=1773918196; c=relaxed/simple;
+	bh=PawUjAff15+oRA7Q1xArUU/n6HG5b2GHGK00XVwvUqs=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=CYTCHdSe5O2uRoi2iWx4a4OSpndB9EyOiEAwmismMbXJLOANbmJU3JxmRgYvwKSycgD6Nf4tWSZYjIgWItwMH28tK8Pfyt5YSNy9QyDIg2ux7/yDCmEJ0MWh082h70lW61JSVO8skKGud7dWniwcqfapCOlNeHRV42nG37rQH28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f68.google.com with SMTP id ffacd0b85a97d-43b3d9d0695so615836f8f.0
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 04:03:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773917404; x=1774522204;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0/QrmoRE0Ec4371GT4zD9Iw4up8oNW0PlcBOJIQ423E=;
-        b=SMeTBZt5L7etUrncV9+8P0TUDgNNQ2t7mYdD5BJoa4gG1RjCpa03hNWwy3cR4wawqE
-         AWhCfMcERKEN9/2jALTevrZyF+P/Bjte7VjotiiG9vgrDsRP/L3KDY1QFlfEApSHG4Mx
-         pfavFrVfbwhfn8HsyJSbxKxEUcVezUYbMqU7bK1rcMJxXO/c6U69uVZW7/9wqI9GP6D6
-         tn/7Gk+a7U19KKu5MLJREbzK+x8BDXMuxL89GT/31o74QU9Etzi2BK1T3DOVsxXFR7j1
-         HHZ1m/y2fi4LU7ywpfLRPR/kpky6jmgocD0iv8XfVvTUXY5qn7AUVhh5aCKDjtwKyswV
-         gheQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVA+Br0yiOMjFRcIq26TXcHh7SuGjQWYWUByqy08O/pFY1OXckJZ+54OhyzzKh3qYJORNxCB/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2TuU/AjKfNT6iVU/YkcIH/u0TUf2H6woUS9lCIgEnfsANpOMn
-	u8B6ETgIVDQF9eeQfyvjZdliQt0EIe/rGeV9BoP/F8eFLocZTGHl/0ml88vs2FQz2FAm2zgNeC3
-	LXS1qWaMxITruwWyGVkAtuV3+58hfHN6bmJQ08Y81IMozlimaHthk4biOhQ==
-X-Gm-Gg: ATEYQzxJkXs8cXmJUcT76mva17syymZzuOvR41oYcHoJT5E7h1RPbGYE2dxwsiUQ7ls
-	xV+9K+TNif1l3D5deSxMfx8ibCMX6b7jVGIzu2GwGLpJyArwFqh66V8/dvYdfYkTZwxJSiAjt+C
-	qmqDHHXjafrxjwclck+xXReTosmsnMd9g/R5XmvstMkquPMxtw7KsSYSQF12eMSHGNhNR66JopX
-	VSgRyptS91MUT8GQMVdls4jSZYih55r6lU2euZLth3UtUQf/3n6AjG0Q52oEFkBCtCnOspZ3Ezy
-	fhYSP5c+h2cAfyHTKGJ/gSMXExlCofLtNfnwa0iSpH4u0IYZsB65Q4hnDpGedfaNQrpVNQ+Dt1l
-	s6TQHj5IYYkxwFhqy+UXPjCzM7dey73pwWJg4NxNaAyyrTqJetuphU4ui
-X-Received: by 2002:a05:600c:1d10:b0:477:7ae0:cd6e with SMTP id 5b1f17b1804b1-486f4422046mr113298455e9.5.1773917404168;
-        Thu, 19 Mar 2026 03:50:04 -0700 (PDT)
-X-Received: by 2002:a05:600c:1d10:b0:477:7ae0:cd6e with SMTP id 5b1f17b1804b1-486f4422046mr113297875e9.5.1773917403694;
-        Thu, 19 Mar 2026 03:50:03 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.11.196])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b518a2cd3sm13432241f8f.32.2026.03.19.03.50.02
+        d=1e100.net; s=20251104; t=1773918192; x=1774522992;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UoKglMvUMd6qCbtIePCE65BAuCUK+BeoobLWHIfF0VM=;
+        b=nmuQLf4xf22BkAUkG4kAWRLFkX4UTHAPPv4gWiOXUZGSuxPCjEM1VTlMm0oC5YQH3O
+         u8HykwkVuHMfpqU4Gb3no8MiM7CERratW1EEtEOVceso2CZ8ha6Rd+IouA8kn6LoYVgJ
+         lm56FCDXQw51I7jpN4gzLNZKAtVXLK/8VsBvVJZ+iDPm4dPYUKzwlJetiDmP4Y8iywJm
+         vCpu3syYuS7fI+a70FxquWOOQZR5WZoZcOr4BWhHrXv1yslaAw+nJ7cQ6ban87eBSUIE
+         uHSj2qBRucxYWhzx41MythHkykDx18dRcfrmO6uePwBYLNPEMUm1e3iUtrFx0uPZ2uv8
+         92aw==
+X-Forwarded-Encrypted: i=1; AJvYcCVOUg68XYdau32qJrxxY0WfSyWCwomtDCwwK/T0xMkQVMvMVKOVR8yZHfMyGgBDJCm7Bcni7EU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7TbFK6WWyL1nTRG9uVdNgESOoxLkAHKSCNuNuqNcC57zsf+Ly
+	WduG9g83oX/roKd/UMveVGOn8SuxIkY4Kvh2PvWNW/tZSlMU2OXIipEM9V+QQM14LZcsBQ==
+X-Gm-Gg: ATEYQzzNZSQDr28lcrCwLHBvUCpKnWYjByKL83GkMhYL93d9cOgD4MNljpyiymWqfnM
+	fY14gu2ANED8uBW/uMCsCUY6nIbStnYl2n8f9DyaZ6SUth7r/EZXJyOs4vrW4OvQI3jrLe2ph4b
+	nVr1k1fPbaMZbvqL6vTkh2S9pmGCQGQ+AWmGsQ1tuO/JsNQNzg8vcYDhra5IEoJW126K+xLaKYH
+	KkZQomwTHSCbrCpeokYr2GudH+L6EP90CY0IX8M8tB7+/bS4zsO1+xeDkIy7wcf1EDlnZtFO95l
+	wX+qWkdDDHLKflKej3WTd/4GBv3ssdOkHbfK3KMnL0Vfcs1VlebqBBOloimIkVnAmqFs4B1vHYM
+	oAtBKrNVQ5sFzS/dYUTl7FlS6OPAqHKgnPk6MXqQQdpD1ojIs8gLoEFxeeOQWQicEYg9vI3B35F
+	WcXzXFaaCga1QwRoUnoEi9oC83KpVdFMYeKkX4/QY1lEsCOm4dtsjNyms=
+X-Received: by 2002:a05:6000:2509:b0:43b:3dcc:8b02 with SMTP id ffacd0b85a97d-43b576f09f0mr6087670f8f.1.1773918191220;
+        Thu, 19 Mar 2026 04:03:11 -0700 (PDT)
+Received: from [192.168.88.241] (89-24-32-126.nat.epc.tmcz.cz. [89.24.32.126])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b51852ab3sm15164849f8f.12.2026.03.19.04.03.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Mar 2026 03:50:03 -0700 (PDT)
-Message-ID: <f5c9a512-4779-4cc4-aed9-37ce0131b3b8@redhat.com>
-Date: Thu, 19 Mar 2026 11:50:01 +0100
+        Thu, 19 Mar 2026 04:03:10 -0700 (PDT)
+Message-ID: <130badaf-cf19-493d-8221-09d439323af8@ovn.org>
+Date: Thu, 19 Mar 2026 12:03:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,85 +72,131 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] tcp: keep scaled no-shrink window
- representable
-To: Wesley Atwell <atwellwea@gmail.com>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- horms@kernel.org, kuba@kernel.org, kuniyu@google.com, ncardwell@google.com,
- shuah@kernel.org
-References: <20260317065137.1533226-1-atwellwea@gmail.com>
- <20260317065137.1533226-3-atwellwea@gmail.com>
+Cc: i.maximets@ovn.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, tgraf@suug.ch,
+ netdev@vger.kernel.org, dev@openvswitch.org, linux-kernel@vger.kernel.org,
+ yifanwucs@gmail.com, tomapufckgml@gmail.com, tanyuan98@outlook.com,
+ bird@lzu.edu.cn
+Subject: Re: [PATCH net] openvswitch: defer tunnel netdev_put to RCU release
+To: Yang Yang <n05ec@lzu.edu.cn>, aconole@redhat.com, echaudro@redhat.com
+References: <20260319074241.3405262-1-n05ec@lzu.edu.cn>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260317065137.1533226-3-atwellwea@gmail.com>
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <20260319074241.3405262-1-n05ec@lzu.edu.cn>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269402-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[ovn.org,davemloft.net,google.com,kernel.org,redhat.com,suug.ch,vger.kernel.org,openvswitch.org,gmail.com,outlook.com,lzu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-269404-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[ovn.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A10F12C9CB6
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.828];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:email,ovn.org:email,ovn.org:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 152402C9F56
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/17/26 7:51 AM, Wesley Atwell wrote:
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index 35c3b0ab5a0cb714155d5720fe56888f71aecced..bd3a43148a87e891bc632a47ffb5b82c475e8f6f 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -3375,13 +3375,19 @@ u32 __tcp_select_window(struct sock *sk)
->  	 * scaled window will not line up with the MSS boundary anyway.
+On 3/19/26 8:42 AM, Yang Yang wrote:
+> ovs_netdev_tunnel_destroy() may run after NETDEV_UNREGISTER already
+> detached the device. Dropping the netdev reference in destroy can race
+> with concurrent readers that still observe vport->dev.
+> 
+> Do not release vport->dev in ovs_netdev_tunnel_destroy(). Instead, let
+> vport_netdev_free() drop the reference from the RCU callback, matching
+> the non-tunnel destroy path and avoiding additional synchronization
+> under RTNL.
+> 
+> Fixes: a9020fde67a6 ("openvswitch: Move tunnel destroy function to oppenvswitch module.")
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Tested-by: Ao Zhou <n05ec@lzu.edu.cn>
+> Co-developed-by: Yuan Tan <tanyuan98@outlook.com>
+> Signed-off-by: Yuan Tan <tanyuan98@outlook.com>
+> Suggested-by: Xin Liu <bird@lzu.edu.cn>
+> Signed-off-by: Yang Yang <n05ec@lzu.edu.cn>
+> ---
+> 
+>  net/openvswitch/vport-netdev.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/net/openvswitch/vport-netdev.c b/net/openvswitch/vport-netdev.c
+> index 6574f9bcdc026..44dbe8a9b0778 100644
+> --- a/net/openvswitch/vport-netdev.c
+> +++ b/net/openvswitch/vport-netdev.c
+> @@ -189,8 +189,6 @@ void ovs_netdev_tunnel_destroy(struct vport *vport)
 >  	 */
->  	if (tp->rx_opt.rcv_wscale) {
-> -		window = free_space;
-> +		u32 gran = 1U << tp->rx_opt.rcv_wscale;
+>  	if (vport->dev->reg_state == NETREG_REGISTERED)
+>  		rtnl_delete_link(vport->dev, 0, NULL);
+> -	netdev_put(vport->dev, &vport->dev_tracker);
+> -	vport->dev = NULL;
+>  	rtnl_unlock();
 >  
-> -		/* Advertise enough space so that it won't get scaled away.
-> -		 * Import case: prevent zero window announcement if
-> -		 * 1<<rcv_wscale > mss.
-> +		/* Keep tp->rcv_wnd representable in scaled units so later
-> +		 * no-shrink decisions reason about the same right edge we
-> +		 * can advertise on the wire. Preserve only a small non-zero
-> +		 * offer that would otherwise get scaled away to zero.
->  		 */
-> -		window = ALIGN(window, (1 << tp->rx_opt.rcv_wscale));
-> +		if (free_space >= gran)
-> +			window = round_down(free_space, gran);
+>  	call_rcu(&vport->rcu, vport_netdev_free);
 
-The receive window already has a similar rounding in the `free_space <
-(full_space >> 1)` case. This is basically excluding only:
+This should solve the issue indeed.  I ran OVS testsuite with
+this as well, and it works fine.  Thanks!
 
-	gran > free_space >= (full_space >> 1)
-
-which IDK if is a realistic situation, perhaps just do the scale down
-unconditionally?
-
-Also minor nit, prefer 'granularity' over 'gran'
-
-/P
-
+Reviewed-by: Ilya Maximets <i.maximets@ovn.org>
 
