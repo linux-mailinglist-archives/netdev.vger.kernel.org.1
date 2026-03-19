@@ -1,185 +1,129 @@
-Return-Path: <netdev+bounces-269220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269221-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SMG9Aco8u2lmhQIAu9opvQ
-	(envelope-from <netdev+bounces-269220-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:01:14 +0100
+	id cFwnArc9u2mphQIAu9opvQ
+	(envelope-from <netdev+bounces-269221-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:05:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 970AF2C400E
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:01:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A2E2C4060
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:05:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4FBEB302A1B9
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:01:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 381AE306B4C3
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:05:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D3E221D3D2;
-	Thu, 19 Mar 2026 00:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB9140DFB8;
+	Thu, 19 Mar 2026 00:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iHg2bRed"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GGq/5A0z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AE140DFD2
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 00:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96E140DFA3;
+	Thu, 19 Mar 2026 00:05:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773878468; cv=none; b=kRTZ7fx32unimGLqd2Q85N9jjyBcUyDAvoLRld7lUjbrLAYS/DSxmRosv1TntPYdChZANzl2BiawMsaVEv6bW9GI57JtZMiGLXuTKz7hi2nNk/nmONm9uXyRgovhr+fJuVCioKrR5HD5NKhVOILZzEhoOaOUBFOthNVqD554pEs=
+	t=1773878705; cv=none; b=qCXfM6VHi0Rzyr8i+M2zhg0DsZSm1wQOJPa6J+3vEAAZ48O4O6p/nyKejQo5PKcF5c+ar7DixOPJAFbvIXzmkQzBmkA412eOi3cB60PvoboLCnAHLmenqkThfGOe3d1deaYgRiZN+i0A5oxxfY5AyRlxlhDQ+oIYmFMJ9GvNfoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773878468; c=relaxed/simple;
-	bh=I+jFUSuAOEMjj3fbB1HA6PoT09aFr0BDiTdeapWAWjA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ntrHxUwb1+1zPC09wHctJy0DWSB4sOS6zb/1NBicFZlPBri81hPFnTOC/ifUPhRYMK4uDvDJND78nakfugWfSMVdikTHfdVhzfRhzxwfKwcKt6fPMBNOxFaP3bUnZ83ueGnEcSTJtfUHdlxZPigUlffvRqn9w7i99CmbAdv14fM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iHg2bRed; arc=none smtp.client-ip=74.125.224.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-64ca423ad53so580142d50.0
-        for <netdev@vger.kernel.org>; Wed, 18 Mar 2026 17:01:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773878466; x=1774483266; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ILbygoPcRuCSs+r8YFh5aPC+4K7iokiRrlp8YwLSZI=;
-        b=iHg2bRed8IOLUzRSEfxP8wWEwl5EK012794uh2tD7rXbk+nFRdNpdoTkyZNeOd/y0v
-         ppjF4p9DauAEMn0ap4K+X3hHcHK0IHZGXI3Qz24aleAWSzjroqyJHOOFryZIv6v1McVT
-         BNbdSmwX0DKZISvDKXiYyaPdFVcajgVxRdLQ/v3Bg3c0n/pRp9C2v++WmTURksSj/81H
-         Ns8NtMB/4OEktleS8I5mBeWOYMgLFGpIigbUM7MfNGGKKfheOl9tN02/hJpwINhTaVaG
-         0LOhEZGx0hropxZ4hzFZw0HWF4D7mmM4kX0KcaTJt2lxEkAD1VDwmaL1nVUHWSRi3vbP
-         TLmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773878466; x=1774483266;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8ILbygoPcRuCSs+r8YFh5aPC+4K7iokiRrlp8YwLSZI=;
-        b=MBcmh/Y+7HKKqQVgjjrrNwEnVcFmB2AGg7u3FuKuZ0KotzuKDaWDsN6ncgDbKBjDO9
-         AgEzbTsfJGY3aFn19JyWIuu93CCSdAWxKLSBjsx5jLcOFl8+fAQMzY3ojgubQlkdV71N
-         rYxrT+QakdhJHZJrA98Cn9QpeaiY8rbLjqOJho3THzh3zSAmW6M/7ge8yNpG4Lgz4w4g
-         lIQcx6b7hLg0T47McdXu5vX39q2lcmYfrmxczuAFRA09/+rEVD8KaqNQL1eg45uZCPM2
-         KQoPsBl20010nZP9+hXmFncuPHgwuPpxqrSfWfY7Lub3mRTDAAcb4RPjcn5num2UE7e+
-         g0RQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWzCeyOM0PKWvxgGwW4RBjAvKgHaijckXBzzTnBn07qYvQecRj1hFtJ0/SXViu2m/yX0zs8bdA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzzguf52LUp89kGw7IJkbXxXxS72rKA01xsH4jlW3dYBWc4Yidw
-	cwZYLHxSS3o5SQedgHPa10r/+PdkrUGwLYQF49X/5iny/lAahoEYymL7
-X-Gm-Gg: ATEYQzw7rV+C7JUpjr7bt1bOpmddKC1x8yyD/hnNX/E9mLBLA5KrJdBvr97f2s1yPtl
-	fm2o2k2RAMqGoqbp/bzAWH6TNxG3oCHhIZxgAG/k/m0+T0OuEBonAK9IACHTLsYrzMZBSwCh6sc
-	LPYsFuU8PXDZdNuMIcJNAyUDhBYdqgQOKj+OVd5TKGhp6ZJVWcHLbTgR09i3ZvUVll2Uel7R9Lt
-	2A9monvWHLItt7DGTgP/niJhsw0Mf29ld0od47b5i/v1f/vpT3KNmHIZlmhSFx+AzYFPbbSfmE5
-	xc6JlFHhSGbOgKTEtr7EOlHprCoT9C0TsrinQ5Kom1PyN4WWunwEtW2Tv1dJ76yxPDJEPW83Jw3
-	kwxSyZlfMMeK6DyXdPgL5VS0Gx2LTPky9MZ4Le8a/h5bFXKHm6PW9bM+oSUEV84f4egL8UvDdv0
-	cReMVXgdQCreLLMscYovfaWF0MYzPh8Jejfc9uzSbM3zGYtQ==
-X-Received: by 2002:a05:690e:1b66:b0:64a:ec39:dd64 with SMTP id 956f58d0204a3-64e915cbab7mr4173241d50.43.1773878466260;
-        Wed, 18 Mar 2026 17:01:06 -0700 (PDT)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:e::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64e91bbecf8sm2512651d50.11.2026.03.18.17.01.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 17:01:05 -0700 (PDT)
-Date: Wed, 18 Mar 2026 17:01:04 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>, Wei Wang <weibunny@fb.com>,
-	David Wei <dw@davidwei.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	bpf@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next 5/6] selftests: drv-net: add netkit devmem RX
- test
-Message-ID: <abs8wCq9PBpuDc5w@devvm11784.nha0.facebook.com>
-References: <20260316-scratch-bobbyeshleman-tcp-dm-netkit5-v1-0-b53c8cd72b23@meta.com>
- <20260316-scratch-bobbyeshleman-tcp-dm-netkit5-v1-5-b53c8cd72b23@meta.com>
- <abns9COj7WagFtZ8@mini-arch>
- <abn3rJGXXyDYSNzA@devvm11784.nha0.facebook.com>
- <abq97UD7CHR7bdod@mini-arch>
- <abrRDNi79H9ircl1@devvm11784.nha0.facebook.com>
- <20260318161010.2d7338b5@kernel.org>
+	s=arc-20240116; t=1773878705; c=relaxed/simple;
+	bh=egtIt3vs7fU1pnVciFOUD3J1cjtgi6HXR89gfgIrrgg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TZ8aBvNVliN+TqQHngL+f8SgadZpnCfirRe+lUHiM0bu6mHWohbaLaWuluogxHQ/HJrecxdSQyKEAbgUdtbcx7nTTdYeToSFwgSd/zVmkUcIua+JsjeCieKcOY/QoDj/dqKDddjhxDdU+qBvmZisMO7U2wls0e/oM2p481eXq2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GGq/5A0z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F0F7C19421;
+	Thu, 19 Mar 2026 00:05:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773878705;
+	bh=egtIt3vs7fU1pnVciFOUD3J1cjtgi6HXR89gfgIrrgg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GGq/5A0zDaU9dYAxXmEoacw3UPKpmGblIzIBvzeOzok8SezzdPpIVGXmzi03cCVAc
+	 IfO67qpeKuDk9TZEVJL7bKhH3eV8ES6Thq0D3GDzqmz1O2i31zqbv4+TBhqMEyQ4Pt
+	 JXi/nI55K19SMTtT8hQNubkU2Gyzxbg3fzcF67RM7vkLXHBR2etu2vMkeQWTWG695g
+	 /PM4USrcH9m+sJ2z74y4RsDs1Bkgf2DgCX3CJsiBvJVbthqZ7nNrahyO0g4Iuoy/5S
+	 TUI8Ka4S3I6EeVwr3d3ONWYn+u/d9uFn1g3jNsbxx7AD1rjOrHGbfDyEHMXpxL9sBj
+	 Co0dErB3Rwv8Q==
+Date: Wed, 18 Mar 2026 17:05:03 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Biju <biju.das.au@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Niklas =?UTF-8?B?U8O2ZGVybHVuZA==?=
+ <niklas.soderlund@ragnatech.se>, Geert Uytterhoeven
+ <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, Biju Das
+ <biju.das.jz@bp.renesas.com>, Russell King <linux@armlinux.org.uk>, Paul
+ Barker <paul@pbarker.dev>, Neil Armstrong <neil.armstrong@linaro.org>,
+ Florian Fainelli <f.fainelli@gmail.com>, Lad Prabhakar
+ <prabhakar.mahadev-lad.rj@bp.renesas.com>, Sergei Shtylyov
+ <sergei.shtylyov@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next] dt-bindings: net: Remove redundant
+ ethernet-phy-ieee802.3-c22 fallback
+Message-ID: <20260318170503.316285a7@kernel.org>
+In-Reply-To: <20260313130623.297712-1-biju.das.jz@bp.renesas.com>
+References: <20260313130623.297712-1-biju.das.jz@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260318161010.2d7338b5@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269220-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269221-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,ragnatech.se,glider.be,bp.renesas.com,armlinux.org.uk,pbarker.dev,linaro.org,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,lunn.ch,fomichev.me,fb.com,davidwei.uk,vger.kernel.org,meta.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.814];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 970AF2C400E
+	NEURAL_HAM(-0.00)[-0.946];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,renesas.com:email]
+X-Rspamd-Queue-Id: A2A2E2C4060
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 18, 2026 at 04:10:10PM -0700, Jakub Kicinski wrote:
-> On Wed, 18 Mar 2026 09:21:32 -0700 Bobby Eshleman wrote:
-> > > > IIUC, we could have main() do something like:
-> > > > 
-> > > > for env [NetDrvContEnv, NetDrvEpEnv]:
-> > > >     with env as cfg:
-> > > >         [...]
-> > > >         ksft_run(tests, args=(cfg,))
-> > > > 
-> > > > 
-> > > > And then the tests could call helpers that check cfg.netns to use the
-> > > > nk_{guest,host}_ip6 addresses when true, otherwise use the regular
-> > > > addresses?
-> > > > 
-> > > > It should be doable if I'm following your drift.  
-> > > 
-> > > Yeah, yeah, this plus some small changes here and there (to pass your
-> > > new -n in the netns mode for example).  
-> > 
-> > Sounds good, I'll give it a look.
+On Fri, 13 Mar 2026 13:06:21 +0000 Biju wrote:
+> From: Biju Das <biju.das.jz@bp.renesas.com>
 > 
-> I haven't actually looked but double check ksft_run can actually 
-> be called multiple times. We may have some global state :S
+> Drop the ethernet-phy-ieee802.3-c22 compatible string from ethernet PHY
+> bindings and their examples. The c22 fallback is implicitly assumed for
+> PHY ID-based compatible strings and does not need to be stated explicitly,
+> unlike c45 which requires opt-in.
+> 
+> Remove the c22 pattern from the ethernet-phy.yaml schema and update
+> examples in amlogic,g12a-mdio-mux, mscc-phy-vsc8531, renesas,ether,
+> and renesas,etheravb bindings accordingly.
 
-The result is global, but accumulates correctly.
+Maybe a noob question but why are you not updating all the other ones?
 
-But the tap output doubles:
-
-TAP version 13
-1..2
-ok 1 devmem.check_nk_rx
-ok 2 devmem.check_nk_tx
-# Totals: pass:2 ...
-TAP version 13
-1..4
-ok 1 devmem.check_rx
-ok 2 devmem.check_tx
-ok 3 devmem.check_tx_chunks
-ok 4 devmem.check_rx_hds
-# Totals: pass:4 ...
-
-Not sure what outside parsing expects yet...
+$ git grep --files-with-matches 'ethernet-phy-ieee802.3-c22' -- \
+	Documentation/devicetree/bindings/net/ | \
+	wc -l
+16
 
