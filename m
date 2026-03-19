@@ -1,172 +1,180 @@
-Return-Path: <netdev+bounces-269394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269401-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id APEmLu3Ou2mXogIAu9opvQ
-	(envelope-from <netdev+bounces-269394-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:24:45 +0100
+	id MHmeK1bVu2kCpAIAu9opvQ
+	(envelope-from <netdev+bounces-269401-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:52:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DBB02C96DC
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:24:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0739A2C9C65
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 11:52:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 36839300BCB0
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:22:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EC78930BE1C2
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 10:47:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DB6136C0C1;
-	Thu, 19 Mar 2026 10:22:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A243C4540;
+	Thu, 19 Mar 2026 10:47:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eZZ2ypJZ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="iESOMyTY"
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="NizkEOSU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B922580CF
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 10:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B06F3C3BF7;
+	Thu, 19 Mar 2026 10:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773915773; cv=none; b=K21N1+2M5KZ+N3bOGwE4mUFBtw0WDzAh8goukJDNMBSFKeuoY0AtQzkKHPb+R/XsbAbXRXVyvtYGmK8tHYMFuNqI1IopGwKEjvyITy9o4CemMRQZqTxirhIorvlIlXZolkVL4UoBroqZprjj3aSl6qjQXMxl7zchlOb6J70Ohes=
+	t=1773917252; cv=none; b=Z7vZxc/4zk0be+1nzKK9gdLSlCbvRHjfge511Wmo61cGOuKxwUxQ4c5C4R13vOKhOlA0RsFZZvZEX2xuKccPw03F202UGrPOr9pZ/cURMVldPwwWmC0rsy9zB2ZMuUyyYDPbSHG1qouAVLi+UaS3qfNkOymdIjzPI8XhS3Tu5Hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773915773; c=relaxed/simple;
-	bh=jI3T4fyaHJI7Z6XuDHJkgpVgH5BlNdf8DNKrN8B7PzA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=STLUhhoxBtmgKEup05hI/rFIIPNF6PkV4QZLPGGhK5aI9062b94SkWvm8y/4f0JdGAOtBLFO8q4Gnu2vETIQDqCu4BJ51ucQyPLU0xeTBTaLTU9dmN4JBcgp27Q16oWuu83MF4Oz9fCqV9gp+C12MPPOYibF3wBhpKNK71PLUrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eZZ2ypJZ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=iESOMyTY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773915771;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wR/FecceBEZR/0EE/23yp6rr47owa2Fbfb4UxboXmxo=;
-	b=eZZ2ypJZeZFqjSzjoyvSlyjI8lKlcAFU/xfwb98YjEtGVzsn17XtuppUWr6GYxz0UH4x9t
-	1J7VomQDk5PyKIrm5KAQVLD3iYJQSF7mktQ7+FIXQ2wXJdZcJHNw/7Sd14nSp7VfCeEGxj
-	+9GI3plT1fFhLzZlNrptABHUwgwg2Vo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-207-2vL14ep_OGSVOPY7Hf0Hyw-1; Thu, 19 Mar 2026 06:22:49 -0400
-X-MC-Unique: 2vL14ep_OGSVOPY7Hf0Hyw-1
-X-Mimecast-MFC-AGG-ID: 2vL14ep_OGSVOPY7Hf0Hyw_1773915768
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-486fb142205so4175895e9.1
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 03:22:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773915768; x=1774520568; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wR/FecceBEZR/0EE/23yp6rr47owa2Fbfb4UxboXmxo=;
-        b=iESOMyTYksoObvFcqstvFxcykWzlrXhnY2Sz5gzqsIEaZciKIBXLMF5hn061STe0xS
-         A7dmjd8GJEHWR1v2Hdz7PMOU1NDZ6LE4mgpe8+NyurKvIlDNr8Z5mHfa9wJLr4iJY/jR
-         Taj4vpBcAboVqvCMTFuJ/Tc6lj0GP5d3QBNRENGLiVTjDiBscKnH9tVYMzCkgD4eNzIo
-         8IlGVuEwGB4/5uU/L3hb8LvvD/eMC29rCI/E24vSr1P8mmuLMhd3mc0rkwyv1FbnGHLX
-         u9zgLo7W0ZyFM2/pfDf08Ytq6RtJCUrF6PUHm0QuYLtdNn5AETigPTaKfpe0+OGdOQhR
-         vynA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773915768; x=1774520568;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wR/FecceBEZR/0EE/23yp6rr47owa2Fbfb4UxboXmxo=;
-        b=lXduwpXs8NfOquHSSnJtPw4ggp0HDOVCExBne7eZs4dkNOrhcJwSYWqZsC/JUr1fA8
-         XT98/MiVt0EKjzvOlFFEsRks5KFYSFEh4LNSk2BxQlj2PnxunLU8ktJfRNYCvYBr89B/
-         CgZSEHM4Q3/Y956M9xtW3k3EXp4sq3/AiJfz3ZMcDEHw48xUrnUwBEyKky2T5PwWDqN+
-         DVGRs7fnPMmABZEvj1+9uXIGzhk32RVGpQTo5/ESG34dsoWNZonnsyjwOiGjcXtFx1H+
-         qpLA1BPubYDEx/6T1+gDirk343zTH0VZWoNHV03qxmFvx6jfBI9s1WjUPezivS2MVKmg
-         zseA==
-X-Forwarded-Encrypted: i=1; AJvYcCW4PfnkQcr7u976hHiUZtdHxHpqrizofIu2R+NttFQdT3S352KMYMPJl/3DSIfIfM7aSweeyss=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUz/2tjMaMD1IATzIrFH0XFayvB7eF/7952J8QlMbgg5WxOZgm
-	iyKVSzxI63biei8I9HFlt/VAvDuWf8J2YP/+Lvx5UUppOYsWhfLWIO9dS7LYQLA8NjuC/w61GQi
-	SWS2yKtg9hF4K4amZGyd7aRt8ydbdWmQJBvogAKkblFvxmgDsbdsT74CkUQ==
-X-Gm-Gg: ATEYQzwjmXCVkIfUoaSKEa7MdCJNYGXvk5kmYAVWo4ElggQ2CxNQ0kSIrahrI6aZ2dF
-	jgXYe4WZchGUHoKJNhgjbkwP0UtqfDsY92OWj0+uZbdKzYc2gKTKGoR4k7vbfZg09LpGQ2K2JzW
-	Y9ad+r2KqS8lCHrX95EjsUqwCxeZKt0ML57zx7qnmQwU2O3FtRWFHhHVPKb4IO+ADfpHfuxKfJD
-	yPwMtXGKGQDuIVb1XRRq+Y5UOa6/I+jhyMIpbAglnxeoSMNpkprUJddNFrCt+R78ol3tniuMivR
-	wd9leCc4gKZ/OxPOMuf96WNgIm1Zxp3oDue6k9Lne1bR7POo1/563XFKCAXtX/qdad0meFM/E3p
-	UciEnNDt6dGrqL8+afVwMHEZNkQqnapMNLzW5GxegRHT8ALCBIPlA6Bq7
-X-Received: by 2002:a05:600c:4e4a:b0:485:ae14:8192 with SMTP id 5b1f17b1804b1-486f442d3d1mr109792125e9.7.1773915768389;
-        Thu, 19 Mar 2026 03:22:48 -0700 (PDT)
-X-Received: by 2002:a05:600c:4e4a:b0:485:ae14:8192 with SMTP id 5b1f17b1804b1-486f442d3d1mr109791725e9.7.1773915767939;
-        Thu, 19 Mar 2026 03:22:47 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.11.196])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486fbea40c2sm32983445e9.5.2026.03.19.03.22.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Mar 2026 03:22:47 -0700 (PDT)
-Message-ID: <d0ab8cc8-f734-47d4-b402-9c62ae563b4a@redhat.com>
-Date: Thu, 19 Mar 2026 11:22:45 +0100
+	s=arc-20240116; t=1773917252; c=relaxed/simple;
+	bh=/DerbCNH93nWcJFCcSyH0vcBP/3BK3w3yhhKoecJM9g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OMhMQKCGejKvzsomPK3CAaK66pyW5fg+quP20P0SW3tA/ZZLIenV81JhNfGdfnZEMhhTPJXwUuwRZyUPo5vTeyWdo9gOcfWPrZYMKQhk0hy9Nj1KEbmf5W9sOZf+ukf0t6NNQ/dE7r0hXke6ymQcsx+1IZHc8bz8oxQ5ZvyTVuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=NizkEOSU; arc=none smtp.client-ip=130.117.225.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=virtuozzo.com; s=relay; h=MIME-Version:Message-ID:Date:Subject:From:
+	Content-Type; bh=z1erKPSf72XxaBH0XjMFCVpHOlYK1KeCMMQpje1nYbA=; b=NizkEOSUB33l
+	Neoe0txsjaFtnn9IUsHoJlWbnKPak8JwR6aN6OSw8VUm0kFWjXwm6e09ya+/YzU1SWajy9DKNppC+
+	eXc9zOEL7iZDggqxu1v+Wo7NeFJiWyyWApzx2cOzwhd3VP0Cnj9j7BL5qiCBcEuM18ilzOw/rm26B
+	THJjVC9xK/f7PMQNnd4LalIw2iB5kcKOCzNvziCPDFK9yeVvkQLVXtrjwOPaTf3D8EB5XG1bR3X4n
+	NRSK9CewA/vWROkIW7JJ2BA5+gzYU1s+LqeIz65N7Vj0nGhV8xBDs36Ibc8CApFCZ2XwOR/6Tv/yg
+	CgG3jdgrLKC2YgdyZFBsaw==;
+Received: from [130.117.225.5] (helo=dev004.aci.vzint.dev)
+	by relay.virtuozzo.com with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <aleksey.oladko@virtuozzo.com>)
+	id 1w3AdB-007bwL-2M;
+	Thu, 19 Mar 2026 11:31:25 +0100
+Received: from dev004.aci.vzint.dev (localhost [127.0.0.1])
+	by dev004.aci.vzint.dev (8.16.1/8.16.1) with ESMTPS id 62JAVQ8q146132
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 19 Mar 2026 10:31:26 GMT
+Received: (from root@localhost)
+	by dev004.aci.vzint.dev (8.16.1/8.16.1/Submit) id 62JAVOZg146131;
+	Thu, 19 Mar 2026 10:31:24 GMT
+From: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+To: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Shuah Khan <shuah@kernel.org>, Aaron Conole <aconole@redhat.com>,
+        Ilya Maximets <imaximet@redhat.com>,
+        Eelco Chaudron <echaudro@redhat.com>,
+        Stefano Brivio <sbrivio@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dev@openvswitch.org,
+        Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+Subject: [PATCH net-next v5 0/4] selftests: net: fix false failures due to missing features and host interference
+Date: Thu, 19 Mar 2026 10:31:19 +0000
+Message-ID: <20260319103123.146112-1-aleksey.oladko@virtuozzo.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] selftests: packetdrill: stop pinning rwnd in
- tcp_ooo_rcv_mss
-To: Wesley Atwell <atwellwea@gmail.com>, netdev@vger.kernel.org,
- ncardwell@google.com
-Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- horms@kernel.org, kuba@kernel.org, kuniyu@google.com, shuah@kernel.org
-References: <20260317065137.1533226-1-atwellwea@gmail.com>
- <20260317065137.1533226-2-atwellwea@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260317065137.1533226-2-atwellwea@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=relay];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269394-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org,google.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269401-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[virtuozzo.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[aleksey.oladko@virtuozzo.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5DBB02C96DC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[in_netns.sh:url,pmtu-test.sh:url,pmtu.sh:url,virtuozzo.com:dkim,virtuozzo.com:email,virtuozzo.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0739A2C9C65
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/17/26 7:51 AM, Wesley Atwell wrote:
-> tcp_ooo_rcv_mss.pkt cares about the OOO SACK state and the resulting
-> tcpi_rcv_mss update.
-> 
-> Its exact advertised receive-window value is incidental to that test and
-> can legitimately move when unrelated rwnd accounting changes adjust the
-> ACK window.
-> 
-> Drop the hard-coded win 81 checks and keep only the ACK/SACK shape and
-> the tcpi_rcv_mss assertion.
+Hi,
 
-I think it would be better to keep the test updated with the kernel
-behavior. Having the pktdrill tests bundled together with the kernel
-allows for tightly coupling.
+This series addresses several issues in the networking kselftests
+that cause false-positive failures depending on the host environment,
+kernel configuration, or library versions.
 
-@Neal: WDYT?
+The main focus of these changes is to isolate tests from the host
+environment (using namespaces) and to ensure proper fallback or
+skipping when dependencies are missing.
 
-/P
+Summary of changes:
+1. Fixes ovs-dpctl.py to return a non-zero exit code when pyroute2
+   is too old. This allows pmtu.sh to correctly fall back to ovs-vsctl
+   instead of assuming the configuration was successful.
+2-4. Move reuseport test into dedicated network namespaces. This prevents
+   failures caused by port conflicts with host processes or interference
+   from host firewall rules.
+5. Ensures io_uring is enabled via sysctl before running io_uring_zerocopy
+   test, preventing failures on systems where kernel.io_uring_disabled
+   is set.
+
+Signed-off-by: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+
+Changes in v2:
+- Fixed a typo by adding the missing backslash in Makefile
+- Added a Fixes: tag to the appropriate commit as requested
+- Link to v1: https://lore.kernel.org/linux-kselftest/20260120230558.328423-1-aleksey.oladko@virtuozzo.com
+
+Changes in v3:
+- renamed pmtu.sh to pmtu-test.sh and used pmtu.sh as the name
+  of the wrapper. 
+- since the test now runs in a dedicated netns, updates the ovs
+  test case to correctly move network interfaces into the target
+  namespace.
+- Link to v2: https://lore.kernel.org/linux-kselftest/f7t1pj9v8h7.fsf@redhat.com/T/#t
+
+Changes in v4:
+- dropped the patch "selftests: net: fib_tests: skip rp_filter test if
+  cls_basic is unavailable" since the test environment is expected to
+  have all mandatory config options enabled.
+- moved isolation logic from in_netns.sh wrapper to unshare() call in
+  reuseport_ tests
+- Link to v3: https://lore.kernel.org/linux-kselftest/20260306000127.519064-1-aleksey.oladko@virtuozzo.com/T/#t
+
+Changes in v4:
+- changed patch prefix/tag from "net" to "next-next"
+- Link to v4: https://lore.kernel.org/linux-kselftest/20260309152013.565216-1-aleksey.oladko@virtuozzo.com/T/#t
+
+Aleksei Oladko (3):
+  selftests: net: run reuseport in an isolated netns
+  selftests: net: rename pmtu.sh to pmtu-test.sh
+  selftests: net: io_uring_zerocopy: enable io_uring for the test
+
+Konstantin Khorenko (1):
+  selftests: net: run pmtu.sh in netns to avoid host firewall
+    interference
+
+ tools/testing/selftests/net/Makefile          |    1 +
+ .../selftests/net/io_uring_zerocopy_tx.sh     |    9 +
+ tools/testing/selftests/net/pmtu-test.sh      | 2492 +++++++++++++++++
+ tools/testing/selftests/net/pmtu.sh           | 2492 +----------------
+ tools/testing/selftests/net/reuseport_bpf.c   |   11 +
+ .../testing/selftests/net/reuseport_bpf_cpu.c |   10 +
+ .../selftests/net/reuseport_bpf_numa.c        |   10 +
+ .../selftests/net/reuseport_dualstack.c       |   11 +
+ 8 files changed, 2546 insertions(+), 2490 deletions(-)
+ create mode 100755 tools/testing/selftests/net/pmtu-test.sh
+
+-- 
+2.43.0
 
 
