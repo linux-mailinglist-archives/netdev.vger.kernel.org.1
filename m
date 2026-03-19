@@ -1,63 +1,60 @@
-Return-Path: <netdev+bounces-269629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269630-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cP+5NWFRvGkXwwIAu9opvQ
-	(envelope-from <netdev+bounces-269629-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:41:21 +0100
+	id 2D4YHCRSvGkXwwIAu9opvQ
+	(envelope-from <netdev+bounces-269630-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:44:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 440932D1C0F
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:41:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C88592D1C48
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:44:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BF1823008530
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:41:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5AC4E30610EA
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE5BB3D5675;
-	Thu, 19 Mar 2026 19:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7EC364953;
+	Thu, 19 Mar 2026 19:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yb9XlwQ5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uCZSmlkJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3E9382291;
-	Thu, 19 Mar 2026 19:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD152FFF88
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 19:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773949276; cv=none; b=Dc7A4JoytHhQe5/q2dzA6O73fZAHWgHXdgXYyxtvE1fvkvGciCSAjZN5uhEItPXikfD7zKOyAZ9LdV+uoWLmgAlUX2q3j7eE7NG1bm447Jqpw6tbDqfN3pRI9Jf+WiOXGI5a6vJMljeFPBTi5WzN5jDmVhH18ILArMSobTtaxtU=
+	t=1773949473; cv=none; b=KvCOZTEDJBtkQVWw8g8LRGN6xdR5th0MYlFp84pf/0t55D7UznL5MwiuC/+/CgLyA70ws1cF03wTyEFWVpmN2Kti/z4HZOOS2FAZ2UeoxnraV7RHR+dK6TH4WZgT1jToNqfoWebxmBDTvt0OflJIiHB5Upu/CYd4kdDQ5bCtL0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773949276; c=relaxed/simple;
-	bh=TdlVJRwwkwahwEi8GZmgOPq7txdAgkP9t4ENRmXm/X0=;
+	s=arc-20240116; t=1773949473; c=relaxed/simple;
+	bh=3ozfv6FU517Jb4qTTKM2z/pb6DduV9qQ83/ayPIuF3c=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mk4ofEkRlHyQJmFEAIhD/8XEZSDhFFUOfutHe25haZP/sViB6yDkR0KU1WD5wZTvNspEwcFiqUTUFl0kGUTqu1OZc/Jvz4HIodWlswBknjXCaHJuNp5T/CNZyx+I53P5EFtgdVLd8/2gcsqxGpZ+yWkK6L8a5QR7qRpU8NojjH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yb9XlwQ5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA4ABC19424;
-	Thu, 19 Mar 2026 19:41:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=OiGisrAc3ROMfUCCG+9KMLqO/6g5eS3bSXhQLJkiS9AklFeLLvdYNM84SXjW+NjvSprmc1OcxCGVQ52NnKdhlUdlUmmbPXUbNGqcIg3x8zMOx6ExYQcpe9zayCaMvSzKNAiI21+Q97tJL0S4EOyBr9QcGGwnGxvB3qfFNxOVp5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uCZSmlkJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 581ECC19424;
+	Thu, 19 Mar 2026 19:44:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773949276;
-	bh=TdlVJRwwkwahwEi8GZmgOPq7txdAgkP9t4ENRmXm/X0=;
+	s=k20201202; t=1773949473;
+	bh=3ozfv6FU517Jb4qTTKM2z/pb6DduV9qQ83/ayPIuF3c=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Yb9XlwQ5MNFqWqNL1DThNRuKpTqi6R9x3HGXLZztGXb4FgXi3fePOIJtLhLKDmrm5
-	 Kq4F6djmSPlN6Ss2IO0ZTgPkjLH/A0XXp095FYQPD5aErjCXnls2XvZunvpQeZyMQH
-	 OSDvjmSxDn3URptf3RVB+0vF0bSiG1uo6OZ5QVW56Vag/ILZy0YjmKFo9Eu5FgprgG
-	 2HN8gCqpl6YC4nZngYG9PYfxQSlIDV2maBw41Ob3sv2wvpBjg2U2Fm0cywFMe5Pqkc
-	 B5KYUaPS3k/JH7ISYp0oAFpS4NX+CLZ1AgRb7FCMzkxV8xgYNVgqRQrvmtZiiL+C9c
-	 MltmNSvx7OIrg==
-Date: Thu, 19 Mar 2026 12:41:14 -0700
+	b=uCZSmlkJ/8kY2P6jU+SrZO6stP1g6BHlNpCA5rvCsg/r25XgGVzawMtP/4t9w6hlF
+	 db0Cw2OrmtNKEfIWIf6wZoLzuINfF4aDU7X0kJ/AG885AwlPdAI7iJnl9MB72kGpHH
+	 RznS1OXLGx44kGSgrBb88k5Sj8CV19KeQFezVIJ47MN3CgMrYxp8c/VsyWwwj3vOtq
+	 T/1rDbbS7fsOKRfGrqlDx/Sm78myjXVB6VYOXwBeFvZtU6SqUIjewxuKcXQMNeAr39
+	 efywan9M5HW2+abh/8Ou5vbDO89WES/SzkRoVeXtF3NmH9LASUClpt65QS1IN7+kmD
+	 XXKNDmE/PgmHg==
+Date: Thu, 19 Mar 2026 12:44:32 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Antonio Quartulli <antonio@openvpn.net>
 Cc: netdev@vger.kernel.org, ralf@mandelbit.com, Sabrina Dubroca
  <sd@queasysnail.net>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
  <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org, horms@kernel.org
-Subject: Re: [PATCH net-next 8/9] selftests: ovpn: add test for the FW mark
- feature
-Message-ID: <20260319124114.42f91f72@kernel.org>
-In-Reply-To: <20260317104023.192548-9-antonio@openvpn.net>
+ Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next 0/9] pull request: ovpn 2026-03-17
+Message-ID: <20260319124432.2fda076a@kernel.org>
+In-Reply-To: <20260317104023.192548-1-antonio@openvpn.net>
 References: <20260317104023.192548-1-antonio@openvpn.net>
-	<20260317104023.192548-9-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,11 +68,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269629-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269630-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
@@ -83,39 +80,44 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.961];
+	NEURAL_HAM(-0.00)[-0.723];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: 440932D1C0F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C88592D1C48
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 17 Mar 2026 11:40:22 +0100 Antonio Quartulli wrote:
-> From: Ralf Lici <ralf@mandelbit.com>
+On Tue, 17 Mar 2026 11:40:14 +0100 Antonio Quartulli wrote:
+> This is (yet..yet..yet) another resend of the original PR meant for
+> net-next.
+> We have fixed the hitchups in the commit messages, as pointed out by the
+> AI.
 > 
-> Add a selftest to verify that the FW mark socket option is correctly
-> supported and its value propagated by ovpn.
 > 
-> The test adds and removes nftables DROP rules based on the mark value,
-> and checks that the rule counter aligns with the number of lost ping
-> packets.
+> This batch includes the following changes:
+> * use correct constant when declaring nlattr array in ovpn_nl_key_swap_doit
+> * use bitops.h API when possible
+> * send netlink notification in case of client float event
+> * implement support for asymmetric peer IDs
+> * consolidate memory allocations during crypto operations
+> * add netlink notification check in selftests
+> * add asymmetric peer IDs check in selftest
+> * add FW mark check in selftest
 
-Hi! Now that the other fixes are in tree we can stop ignoring ovpn
-tests :) This new mark test is failing, looks like netfilter is not
-enabled. All CONFIG options you depend on which are not in defconfig
-should be listed in tools/testing/selftests/net/ovpn/config
+In addition to the mark test failing always three more tests hang
+around 30% of the time on debug kernels:
 
-Our CI currently builds this config for ovpn tests:
-https://netdev.bots.linux.dev/logs/vmksft/net-extra/results/565721/config
+https://netdev.bots.linux.dev/flakes.html?tn-needle=net-ovpn&min-flip=12
 
-Please add to tools/testing/selftests/net/ovpn/config
-what this test needs.
+Please follow up with the fixes? More info how our CI builds the
+kernels etc:
+https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
 
