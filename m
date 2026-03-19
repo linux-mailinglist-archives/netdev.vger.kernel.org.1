@@ -1,129 +1,160 @@
-Return-Path: <netdev+bounces-269665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269673-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qAAwE6VsvGkPygIAu9opvQ
-	(envelope-from <netdev+bounces-269665-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:37:41 +0100
+	id KOSDC49tvGkPygIAu9opvQ
+	(envelope-from <netdev+bounces-269673-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:41:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F8BD2D2BDB
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:37:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C74862D2C30
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:41:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B5573047AE5
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:35:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5C37F30D20EF
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:39:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9EDF3EF671;
-	Thu, 19 Mar 2026 21:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB63F405AB7;
+	Thu, 19 Mar 2026 21:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="yibeny0u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com [209.85.160.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7E8221FBD
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 21:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDCE3B19DB;
+	Thu, 19 Mar 2026 21:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773956123; cv=none; b=l8Ah1N2CxOOUSce672gd0aK+kMqoAFj8kDlTACK89BLXekpn7Xo5so65xLzSVAjZ0Ht6AQjWqh1LxurvEnU5495Hh7m0Rja9cE7O1xIOQjBNv6pdQIt1LKhX1aeDlWHN+3pgu2pTkjR1irjmZAwMhhC3K0bp6TmjB3/6QRc72iQ=
+	t=1773956350; cv=none; b=JAxtaMBDZIB6k7VY0rCWQ8dcAw226hBJBl/MhuZSAn/Np9PzFxjDZ8uzoa1++l3uywNuDrqmjxvyxOIdxHtRN3ZrnMO36QDLwUhqVbRx/51ck1IGDuASrI4UgoLcwR19k1F6myAGw+p2ZWmT0FWDxYPr1wa9od5Xk9FggEZYm18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773956123; c=relaxed/simple;
-	bh=tWqVrtM0+4Vs70ubYKL4zkcuMvCEW1rftX5RnkS5hjA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=WjtlZh2jy3ZrH1aYfTQHGxaiqTCEaDNEbRpY6hZldIHmcdsu3tQ2PWJFjuHYLHWBnbLODWDq2q6mpek1K97phti01Y7URWwTwq15fGqAxjTxHjX7w5ah6/+Tg79iJ1c05sW2RwALEomzXjcma27aQLyfhKW5Pmh1F25ob6K4vDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-41c02dec5c1so7885333fac.2
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 14:35:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773956121; x=1774560921;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3kW5Cqd4AXaqbTURFAM4xTX11VPZxMsl0NOSLCzZeb8=;
-        b=B+YQklS7k/Q617wVhgtQ9SpspagQ/OiwajtnvwhxlFDXauG50zka+GWZ+tssXNCWn6
-         4+neoqdfVTewceH5woBTtzLQNMk/Dirtk5PsKIZkPHB3ql8fNnnw7Pf9kB/V+qg08hgg
-         595cOWWVOQN6cKX1EW352mtFH86BRXESECFJ+DNLuDVaz5TXhdYpvoM5drZrd8IytkTY
-         QsGPSp6PNEVUgu22n0sJYonP/A1MgtDaGtHz585lA9aKKA202YTltb1fIOoCdlYsJs8J
-         A8S6bKrxIeGXcZ7a0pRFqhnH8xgzfIDnI7DCjMCA9M3rH9/s94peKB+Fc1bIALcF9yfj
-         zQcA==
-X-Forwarded-Encrypted: i=1; AJvYcCUaZU/iAH8BXqnW9nhrUWJDgQ9jl6XzGic0VCy+LP2etGrMnm2wanua4SfdBYdALaXOXaz7ccA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8O+fKp6ZqN1JozK2slmnYRWzB3moRuu5MnM/24q3NCHeCfq6d
-	tdrrq/SzeTYoxeFRXS9aO45Qq9V/UEx21F5zoM4T8+QPTHMGHHnIpbbL5GN/a+vpT60s2qTKNr8
-	sw4up7DPUvIH3ylzoRiSYqJo2A7LlEP+mUNsOWeuUfs4Oh8MDsJIyl69e+Gw=
+	s=arc-20240116; t=1773956350; c=relaxed/simple;
+	bh=VBkAAsTwbhuITRRUENQb3hb+oY6xnELFcZfpCbzNHe8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E0ao2M3U2/iCHX+phsTWlLU2RUmC+QfSM5TpMoP2IAQF/ad4wj0fFvVUAar4YgUgqoNvYu0CoULkRoz+DvYGHosj+jOzmTZFQKbnOdYVwA1h88PriUL994dWwAZrS+xxsAFbIczONo3P/C3YfgdlRaB9SONePZWI3/5gd/Yp1yU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=yibeny0u; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1773956349; x=1805492349;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=VBkAAsTwbhuITRRUENQb3hb+oY6xnELFcZfpCbzNHe8=;
+  b=yibeny0u2TGwmSZQPrnEaaMF2d5g/ImSE03/taTqGYnqaB+uwkpgXpvs
+   mAVOoVZQKb+0CxQcfm+nBpijmcPUWJFeqDWlt5E/G0h6yky0EWkExQnTH
+   SsIDohB2dTtDXpP+Pndqj/1CptcKjlidhGCpUHtapqU2t1f+hkq6TkyaU
+   Hp+fSPoPL5Ule/6KEsECfSvf7ts2cHmX3G11lMP4l+6XCNCDaSjZ0gbEf
+   Z/yIcZRhW+/qdDmG2T89gnw1IzHmRZW8K3Lhh5eQjsKNnnaAvuMASruWh
+   BUNUpL1avLURNDZX5QF3mzX5AdG2WZnjYwutZu8bxCkte6FVO6sjqYPaH
+   w==;
+X-CSE-ConnectionGUID: 636hfaD1Q8yRWTBhR6ZOXA==
+X-CSE-MsgGUID: mghhuflPTCa1A3FeMWwUxg==
+X-IronPort-AV: E=Sophos;i="6.23,130,1770620400"; 
+   d="scan'208";a="222199135"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 14:39:03 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Thu, 19 Mar 2026 14:38:49 -0700
+Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58 via Frontend Transport; Thu, 19 Mar 2026 14:38:48 -0700
+Date: Thu, 19 Mar 2026 14:38:46 -0700
+From: Charles Perry <charles.perry@microchip.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Charles Perry <charles.perry@microchip.com>, <netdev@vger.kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/2] net: mdio: add a driver for PIC64-HPSC/HX
+ MDIO controller
+Message-ID: <abxs5isE0pAPQL9t@bby-cbu-swbuild03.eng.microchip.com>
+References: <20260317184610.315852-1-charles.perry@microchip.com>
+ <20260317184610.315852-3-charles.perry@microchip.com>
+ <6dc9a358-4140-457f-bdfb-b4fb22aaf88e@lunn.ch>
+ <abxN9aGnCYA6s13u@bby-cbu-swbuild03.eng.microchip.com>
+ <10f97968-ddb7-4a96-b08e-d4355cf82a79@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2f12:b0:67c:25b9:d366 with SMTP id
- 006d021491bc7-67c25b9db1emr31379eaf.42.1773956121616; Thu, 19 Mar 2026
- 14:35:21 -0700 (PDT)
-Date: Thu, 19 Mar 2026 14:35:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69bc6c19.050a0220.3bf4de.0000.GAE@google.com>
-Subject: [syzbot] Monthly wireguard report (Mar 2026)
-From: syzbot <syzbot+listb2717bb6410baba389f7@syzkaller.appspotmail.com>
-To: Jason@zx2c4.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-1.36 / 15.00];
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <10f97968-ddb7-4a96-b08e-d4355cf82a79@lunn.ch>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-269665-lists,netdev=lfdr.de,listb2717bb6410baba389f7];
-	RCVD_TLS_LAST(0.00)[];
-	NEURAL_SPAM(0.00)[0.031];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[microchip.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
+	TAGGED_FROM(0.00)[bounces-269673-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,googlegroups.com:email]
-X-Rspamd-Queue-Id: 9F8BD2D2BDB
+	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.954];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:dkim]
+X-Rspamd-Queue-Id: C74862D2C30
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello wireguard maintainers/developers,
+On Thu, Mar 19, 2026 at 08:53:01PM +0100, Andrew Lunn wrote:
+> > My idea is that if someone wants to use whatever is the hardware default
+> > or what was set by the bootloader, they have an option to do so. For that
+> > reason, I made the clock and the clock-frequency optional. This is
+> > something I can do without if you think it will homogenize better with new
+> > drivers.
+> > 
+> > Now I just realized that I can achieve this by just making the
+> > clock-frequency optional and not the clock.
+> 
+> It gets complicated pretty quickly, if you leave things open.
+> 
+> 802.3 sets a maximum of 2.5Mhz. When this driver takes over the
+> hardware, and there is no hint from device tree what frequency to use,
+> but the hardware is configured to 50Mhz, what should it do? Trust the
+> bootloader? Or assume the bootloader or something else has messed it
+> up? Same goes for 1KHz?
+> 
+> Is the hardware default documented in the datasheet? Does it default
+> to 2.5Mhz?
 
-This is a 31-day syzbot report for the wireguard subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireguard
+No, it defaults to something rather slow: 610 KHz (assuming the input clock
+is 156.25MHz, divides by 256)
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 3 issues are still open and 20 have already been fixed.
+> 
+> >  - mdio-airoha.c: use 2.5MHz if not specified
+> 
+> I personally would do this. This keeps you in line with 802.3. Anybody
+> wanting to do anything else then uses clock-frequency, so the
+> intention is clearly documented.
 
-Some of the still happening issues:
+Ok, sounds good, I'll use this policy.
 
-Ref Crashes Repro Title
-<1> 787     No    INFO: task hung in netdev_run_todo (4)
-                  https://syzkaller.appspot.com/bug?extid=894cca71fa925aabfdb2
-<2> 391     Yes   INFO: task hung in wg_netns_pre_exit (5)
-                  https://syzkaller.appspot.com/bug?extid=f2fbf7478a35a94c8b7c
-<3> 1       No    KCSAN: data-race in wg_expired_retransmit_handshake / wg_packet_send_queued_handshake_initiation (4)
-                  https://syzkaller.appspot.com/bug?extid=4ca9a7b9d61b76d0177c
+Thanks,
+Charles
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
