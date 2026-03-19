@@ -1,293 +1,153 @@
-Return-Path: <netdev+bounces-269648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269649-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8EdHOjxivGmLxwIAu9opvQ
-	(envelope-from <netdev+bounces-269648-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:53:16 +0100
+	id WOBYGaRivGmLxwIAu9opvQ
+	(envelope-from <netdev+bounces-269649-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:55:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D74E2D2656
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:53:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1354F2D26B3
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:55:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 07C8230292F9
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:53:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D4E63125865
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E4E3F9F42;
-	Thu, 19 Mar 2026 20:53:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C536E3F87EA;
+	Thu, 19 Mar 2026 20:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TniRfkk9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Stz/sQzy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E88C3EBF08
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 20:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773953594; cv=none; b=lq6F4egd9JZcZsFPXMzihGsvP2ycHbIRl9cx3vC9UrWu+TxLzTJGflZ3pAbnAhTt0b0qsFzkOh2izg2C5eqWLYCWFgL3sOkHXhvsDff3A8fSoT9Hp4aUAI4AUPk8KXeTri7ThxcPSo7uMRmv1MvK1aZU7OtvNepkz9V/uSZUuoU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773953594; c=relaxed/simple;
-	bh=1Wt2RJNSUdsclmDRyhyj3eVjEZz+1kdkT6/YVAbFK6Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L/CH/GMMPLY3BIJcqyesI4tbAce3Xbf+WpYfG+f25UZVZ16NwhCPscddVAELBbvFexWBvPdvkbSsSsOiTaTKNskPoszyqRAmy3wdXk3YOxDPGiMEq0tF6JEIoeFRkCRi9/RvErd1lxG8X4krNOlmqCiys61x+3n0gZqgBrsaGDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TniRfkk9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773953591;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=pDuNk1maIwkM81h0xNfMndhfHmB77PaC4WV88nssjB0=;
-	b=TniRfkk9t0Ux+gYhkL9Elto9SyHO96w7NZh7j7C8ltdBoN5RivTXMj5LefWz9SPqqnlIEQ
-	Gxkkejj4N4SrtSyfGbgRCu56sf1xjDygAxf7bAQbgxt75yuz/7ZP5H/dxPvyex/MRWlTxV
-	HWvos7EiFDHIaQEN2LSqOBc38//2K0M=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-493-pHpjlvk4OxSbyGwG68z_pg-1; Thu,
- 19 Mar 2026 16:53:05 -0400
-X-MC-Unique: pHpjlvk4OxSbyGwG68z_pg-1
-X-Mimecast-MFC-AGG-ID: pHpjlvk4OxSbyGwG68z_pg_1773953583
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 591CD18002C8;
-	Thu, 19 Mar 2026 20:53:03 +0000 (UTC)
-Received: from ShadowPeak.redhat.com (unknown [10.45.224.50])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 627931955F21;
-	Thu, 19 Mar 2026 20:52:59 +0000 (UTC)
-From: Petr Oros <poros@redhat.com>
-To: netdev@vger.kernel.org
-Cc: ivecera@redhat.com,
-	Petr Oros <poros@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-net v4] ice: fix missing dpll notifications for SW pins
-Date: Thu, 19 Mar 2026 21:52:56 +0100
-Message-ID: <20260319205256.998876-1-poros@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A493D3ACF06
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 20:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773953628; cv=pass; b=muPuIQdXW2LQ0a00O9XpNdhKn2yTliX9niQ02hOgmZTWSYbO9NQjXZ24djgieSXi18e68Ba4ZdRVkwEjPW5sbXlkyOS8qOKOTbs4QxWG9ifyLKSvOVwqI+EpSLgHCCT1Fm4ibgBBoxdfPeqbDkfmt8yP9ynlbIVNVYTM809p07A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773953628; c=relaxed/simple;
+	bh=Aa/68TobMq2WA7MnUgvvLadAtMm6UrCQIVjbgTR4Ayc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UdqyIUQB7QyJl87npcAyNAEGpZGysZaoOESBMFJOZSvArMgc/MS/hXJojyZ7iBJDDmv7xTqiAM2PpWzmXNEc41b20F6jafumrfM5W6F+xZEEGvFptEzriRugerc+aCgxnaDyGqCsTU+loNRCsfgenFLEAK4Vg3FuFmgc/n3E3lQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Stz/sQzy; arc=pass smtp.client-ip=74.125.82.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-126ea4e9694so684759c88.1
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 13:53:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773953627; cv=none;
+        d=google.com; s=arc-20240605;
+        b=g/xhuDVhXauZBD/xWHoD/SB2l900yiuJefu41BWcsIV0rXSreKxlpCHbCWNY0Iuja+
+         eDB26kr6u2+gneE78bUNYkt9pPN/CFOZMVX9CMWY9yxjz6RDfEnzaFf8D+djiXQvSNaZ
+         eVP+NAtV1pxDxaUnQ5DX4IkEisuLrqUPpuoKiP+UmsafjsL25YQO/t9INbmUpVDOX3k2
+         8OkbZadddOke9r6suazISqrxnw+E8Gzayg0/UIY4J8QE5k945JTI3qh/N/K4XjF1f5la
+         7onqELen5IQd4yUB+HHIZgfTw5x2MQyB6B1HI/0mCS+TZjj3DWaX4b0pSsnrIIrCgiAi
+         i5Aw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Aa/68TobMq2WA7MnUgvvLadAtMm6UrCQIVjbgTR4Ayc=;
+        fh=5nZgokyJ/IJeM7uNUaw2pe6wt9zOsqolU+vcKu9UYjs=;
+        b=IIl3QiE0yoAjk/J6U1x94d6T61FvEO/I2sVUJyiHOxmlDsv9z6+StrZWTrHi09pOHt
+         qmmsDUW0QANKKmFpsUpCVpc2rxaLhBzU3grwwTLTaBZQhfo/He+/cmiPWjh6etZD5UZ+
+         TB2vDrPYyelQOsG5u+6Mfa+B3KTU6lbvp/9A+v8qmd07Q0C2OoX7gue/gfh6+PiKckRo
+         IsHgQjMAspaGewK89OJIe4cE9MmQrJSVpGJbFZZ4oNrJfsH85OdqfmCuR/rhX48JmVhi
+         vzJQyIios7kgIxu0dSizuxEpbxZJcgt+Ly1ggaZpbXAhDOirbOKjgUVxBGR8woo6fp/p
+         rnQA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773953627; x=1774558427; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Aa/68TobMq2WA7MnUgvvLadAtMm6UrCQIVjbgTR4Ayc=;
+        b=Stz/sQzyMZ/kJJjTPhp3BWS0U2Ya08l5PyJBuBtdcbg9sKql3eghZTlFKSmAov5LUo
+         Nd94uiNXwqPJ3Ys/ciUHsKiDxrjv3vIZacMJPSwiHoiYUYtrAvsLkpmJxUEQWJuJJZHQ
+         mhTVh3Tb7hVqD77nyclc2bjnuIa6XVGzWSc6RKP+TEPFF4718llWZTvTugY0nXAbeayh
+         HDOPTRYhCwW3rkVvhAWC/AX3XUPdbBfWcZW14AOv/KrZE5HNR4sH1LbNRbufL822Lqu8
+         6R9E+rV1BXzo8VuM8BgD5OeUt1XXnmACAwVjBZ6aWqEWhZfy9VCh1yunBnJnCAYcJlI2
+         rvcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773953627; x=1774558427;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Aa/68TobMq2WA7MnUgvvLadAtMm6UrCQIVjbgTR4Ayc=;
+        b=m0DJjrSwegk2F/ojjiz67rpCWO0WXNIw7V+HMbeCw/yvKGfHM8WnWTMAW2LiCrDtsP
+         /FKGAMcNs5k7HrvPvcX69DufG7tZw4y83o17MKTlCL6Q8EdkKJ4sI8H16MF+x49geEMf
+         tg8yJCMdZT2S227vfvt2udSjZurtRY9MnPle2ArdzEuyBvbiurpnds+D8roDbkrGsJm9
+         akXmNgK+joP/0bHZ5uijw14eqL/QRjf7ASpaxk81XZMLV0ZL8Oq/k+LUE3Ye3taVYZ2Q
+         AOvpUcx9PQQgCoznECB9wbWrk8gcev3y9ttD5m6wM5VYxcMC02EbZf1ltHL5aryIWS2P
+         UxpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4sCGUxe1zEdQhLkUYOia/tKuzYkyDz2Tw2PeWKORRZM6UsSsRbdEHYLdvPK5VlY7dcij6/S4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxThXsS3/3kuc1mZ3wJStt30z++ylE1GOYjKphN+jW7hpzb+9z+
+	4AV5b5lK8jGzofDPqcdls5RAgHvidvDoyJYcFumk1UMQG+HJs07EI7Hz2GkS6w8lvnZUciDOLon
+	YjxaoKnm8sbqjqi+Z780QrZiKnxQr8A4=
+X-Gm-Gg: ATEYQzxOcsmeSSasbl60HVpF9SV37G3ntPrkzT7nUH0k/9mvbWsX+fWck0ffjmyZ5xo
+	R5rKBODpGBeDLH8drO8Kkspk5TY5msgXPHPtQu/eBJ5v6ywOBtJqGJwnLcdMQZ558Gg4ZAa3vHh
+	T6BLy8rQ2kNSAD0QN/BTzZANrHj5ka4L8nznC1F4rxQbtIZU4euODsjBLX2Zy4B3dBUVUCO8tPy
+	dzKP+3B4DwD4mh1NyeGQNWHYRpx5vHQzt8fqlaeyHZ1udyBe/l3thpv7elomvjggexzvVwzo/Cn
+	WhRhj01sx5dRuX3YH35LluUzpfbye1fRuCEiO+ey
+X-Received: by 2002:a05:7022:31a:b0:12a:6fb7:87e3 with SMTP id
+ a92af1059eb24-12a726cf881mr297346c88.31.1773953626588; Thu, 19 Mar 2026
+ 13:53:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+References: <20260317065137.1533226-1-atwellwea@gmail.com> <20260317065137.1533226-2-atwellwea@gmail.com>
+ <d0ab8cc8-f734-47d4-b402-9c62ae563b4a@redhat.com> <CADVnQy=raqQ2dKwJZh2U-9=c_AEwoCS3i61oL7gUSASxBC1QVg@mail.gmail.com>
+In-Reply-To: <CADVnQy=raqQ2dKwJZh2U-9=c_AEwoCS3i61oL7gUSASxBC1QVg@mail.gmail.com>
+From: Wesley Atwell <atwellwea@gmail.com>
+Date: Thu, 19 Mar 2026 14:53:35 -0600
+X-Gm-Features: AaiRm53MHPLs7H-KjOdESA5PQ4FyJgygf7eKubpjzFr5N2ck-0wezWHyRIsyhlo
+Message-ID: <CAN=sVvycH50ZOQDb=xeW3iWG7cWO02yvd-wJ4NhbaUFHnqJ0Ag@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] selftests: packetdrill: stop pinning rwnd in tcp_ooo_rcv_mss
+To: Neal Cardwell <ncardwell@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
+	shuah@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269648-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-269649-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.902];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[atwellwea@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.886];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5D74E2D2656
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 1354F2D26B3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The SMA/U.FL pin redesign (commit 2dd5d03c77e2 ("ice: redesign dpll
-sma/u.fl pins control")) introduced software-controlled pins that wrap
-backing CGU input/output pins, but never updated the notification and
-data paths to propagate pin events to these SW wrappers.
+Thanks,
 
-There are three problems:
+Paolo and Neal. My intent here was just to keep the test focused
+on OOO SACK state and `tcpi_rcv_mss`. I appreciate the feedback.
 
-1) ice_dpll_notify_changes() sends dpll_pin_change_ntf() only for the
-   direct CGU input pin stored in d->active_input.  When the active
-   input changes, SW pins (SMA/U.FL) that wrap the old or new active
-   input never receive a change notification.  As a result, userspace
-   consumers such as synce4l that monitor SMA pins via dpll netlink
-   never learn when the pin state transitions (e.g. from SELECTABLE to
-   CONNECTED).
-
-2) ice_dpll_phase_offset_get() returns p->phase_offset for non-active
-   SW pins, but this field is never updated for SW pins.  The PPS phase
-   offset monitor updates the backing CGU input's phase_offset
-   (p->input->phase_offset), not the SW pin's own field.  As a result
-   non-active SW pins always report zero phase offset even when the
-   backing CGU input has valid PPS measurements.
-
-3) ice_dpll_pins_notify_mask() does not propagate phase offset change
-   notifications to SW pins either.  When a HW CGU pin gets a phase
-   offset change notification, the SMA/U.FL pin wrapping it is never
-   notified, so userspace consumers (ts2phc, synce4l) monitoring SW
-   pins via dpll netlink never receive phase offset updates.
-
-Fix all three by:
-
- - In ice_dpll_phase_offset_get(), return the backing CGU input's
-   phase_offset for input-direction SW pins instead of the SW pin's own
-   (always zero) field.
-
- - Introduce ice_dpll_pin_ntf(), a thin wrapper around
-   dpll_pin_change_ntf() that also sends notifications to any
-   registered SMA/U.FL pin whose backing CGU input matches.  Replace
-   all direct dpll_pin_change_ntf() calls in the periodic notification
-   paths with ice_dpll_pin_ntf(), so SW pins are automatically notified
-   whenever their backing HW pin is.
-
-Fixes: 2dd5d03c77e2 ("ice: redesign dpll sma/u.fl pins control")
-Signed-off-by: Petr Oros <poros@redhat.com>
----
-v4:
- - expanded scope to also fix phase offset reporting and phase offset
-   notifications for SW pins (problems 2 and 3 above)
- - replaced ice_dpll_sw_pin_needs_notify() with ice_dpll_pin_ntf(),
-   a unified wrapper that covers all notification paths
- - squashed into a single patch
-v3: https://lore.kernel.org/all/20260220140700.2910174-1-poros@redhat.com/
- - added kdoc for ice_dpll_sw_pin_needs_notify() helper
-v2: https://lore.kernel.org/all/20260219131500.2271897-1-poros@redhat.com/
- - extracted ice_dpll_sw_pin_needs_notify() helper for readability
- - moved loop variable into for() scope
-v1: https://lore.kernel.org/all/20260218211414.1411163-1-poros@redhat.com/
----
- drivers/net/ethernet/intel/ice/ice_dpll.c | 47 +++++++++++++++++------
- 1 file changed, 36 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index 62f75701d65205..5cfa19da099bfc 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -1915,7 +1915,10 @@ ice_dpll_phase_offset_get(const struct dpll_pin *pin, void *pin_priv,
- 				       d->active_input == p->input->pin))
- 		*phase_offset = d->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
- 	else if (d->phase_offset_monitor_period)
--		*phase_offset = p->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
-+		*phase_offset = (p->input &&
-+				 p->direction == DPLL_PIN_DIRECTION_INPUT ?
-+				 p->input->phase_offset :
-+				 p->phase_offset) * ICE_DPLL_PHASE_OFFSET_FACTOR;
- 	else
- 		*phase_offset = 0;
- 	mutex_unlock(&pf->dplls.lock);
-@@ -2609,6 +2612,27 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
- 	return pci_get_dsn(pf->pdev);
- }
- 
-+/**
-+ * ice_dpll_pin_ntf - notify pin change including any SW pin wrappers
-+ * @dplls: pointer to dplls struct
-+ * @pin: the dpll_pin that changed
-+ *
-+ * Send a change notification for @pin and for any registered SMA/U.FL pin
-+ * whose backing CGU input matches @pin.
-+ */
-+static void ice_dpll_pin_ntf(struct ice_dplls *dplls, struct dpll_pin *pin)
-+{
-+	dpll_pin_change_ntf(pin);
-+	for (int i = 0; i < ICE_DPLL_PIN_SW_NUM; i++) {
-+		if (dplls->sma[i].pin && dplls->sma[i].input &&
-+		    dplls->sma[i].input->pin == pin)
-+			dpll_pin_change_ntf(dplls->sma[i].pin);
-+		if (dplls->ufl[i].pin && dplls->ufl[i].input &&
-+		    dplls->ufl[i].input->pin == pin)
-+			dpll_pin_change_ntf(dplls->ufl[i].pin);
-+	}
-+}
-+
- /**
-  * ice_dpll_notify_changes - notify dpll subsystem about changes
-  * @d: pointer do dpll
-@@ -2617,6 +2641,7 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
-  */
- static void ice_dpll_notify_changes(struct ice_dpll *d)
- {
-+	struct ice_dplls *dplls = &d->pf->dplls;
- 	bool pin_notified = false;
- 
- 	if (d->prev_dpll_state != d->dpll_state) {
-@@ -2625,17 +2650,17 @@ static void ice_dpll_notify_changes(struct ice_dpll *d)
- 	}
- 	if (d->prev_input != d->active_input) {
- 		if (d->prev_input)
--			dpll_pin_change_ntf(d->prev_input);
-+			ice_dpll_pin_ntf(dplls, d->prev_input);
- 		d->prev_input = d->active_input;
- 		if (d->active_input) {
--			dpll_pin_change_ntf(d->active_input);
-+			ice_dpll_pin_ntf(dplls, d->active_input);
- 			pin_notified = true;
- 		}
- 	}
- 	if (d->prev_phase_offset != d->phase_offset) {
- 		d->prev_phase_offset = d->phase_offset;
- 		if (!pin_notified && d->active_input)
--			dpll_pin_change_ntf(d->active_input);
-+			ice_dpll_pin_ntf(dplls, d->active_input);
- 	}
- }
- 
-@@ -2664,6 +2689,7 @@ static bool ice_dpll_is_pps_phase_monitor(struct ice_pf *pf)
- 
- /**
-  * ice_dpll_pins_notify_mask - notify dpll subsystem about bulk pin changes
-+ * @dplls: pointer to dplls struct
-  * @pins: array of ice_dpll_pin pointers registered within dpll subsystem
-  * @pin_num: number of pins
-  * @phase_offset_ntf_mask: bitmask of pin indexes to notify
-@@ -2673,15 +2699,14 @@ static bool ice_dpll_is_pps_phase_monitor(struct ice_pf *pf)
-  *
-  * Context: Must be called while pf->dplls.lock is released.
-  */
--static void ice_dpll_pins_notify_mask(struct ice_dpll_pin *pins,
-+static void ice_dpll_pins_notify_mask(struct ice_dplls *dplls,
-+				      struct ice_dpll_pin *pins,
- 				      u8 pin_num,
- 				      u32 phase_offset_ntf_mask)
- {
--	int i = 0;
--
--	for (i = 0; i < pin_num; i++)
--		if (phase_offset_ntf_mask & (1 << i))
--			dpll_pin_change_ntf(pins[i].pin);
-+	for (int i = 0; i < pin_num; i++)
-+		if (phase_offset_ntf_mask & BIT(i))
-+			ice_dpll_pin_ntf(dplls, pins[i].pin);
- }
- 
- /**
-@@ -2857,7 +2882,7 @@ static void ice_dpll_periodic_work(struct kthread_work *work)
- 	ice_dpll_notify_changes(de);
- 	ice_dpll_notify_changes(dp);
- 	if (phase_offset_ntf)
--		ice_dpll_pins_notify_mask(d->inputs, d->num_inputs,
-+		ice_dpll_pins_notify_mask(d, d->inputs, d->num_inputs,
- 					  phase_offset_ntf);
- 
- resched:
--- 
-2.52.0
-
+V/R,
+Wesley Atwell
 
