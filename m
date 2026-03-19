@@ -1,80 +1,103 @@
-Return-Path: <netdev+bounces-269677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269678-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aMowECNyvGkPywIAu9opvQ
-	(envelope-from <netdev+bounces-269677-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:01:07 +0100
+	id mOJbAWFzvGmZywIAu9opvQ
+	(envelope-from <netdev+bounces-269678-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:06:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B266B2D2D83
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:01:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FC8D2D2DB7
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 23:06:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 174B53048067
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:00:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D42C630A757B
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 22:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD8344070ED;
-	Thu, 19 Mar 2026 21:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81003AA1B0;
+	Thu, 19 Mar 2026 22:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="weV3nqI7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ky55Gxzk"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB99B402BB2;
-	Thu, 19 Mar 2026 21:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9312728150F;
+	Thu, 19 Mar 2026 22:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773957593; cv=none; b=NqQHWU7sibXBN6xAJqa/IO0PRKCASykZNgzsAdjRclXIoNIs6rwi42yf2u03yrgE2zY5OEUrqoapdUnYzwpBpXcBwNJwK40M1WYlyXUbwRkiWXP8OwnIYzFWzLpljvcL9ViD8u22T5eGueAFuEacYe6uewL1SBQjFGW9PK1m3Yw=
+	t=1773957981; cv=none; b=HMH/255dW37hn9+rcC/lUpB8DGw1QRBqilhrXBcqOyftAS62jWZuxiPbn/5mz3A1b3/4WrWtQ+J1YBnNl6a+MhkNTXV50nylNXIZPx2/Bm4l/gtwI3VBJ6sx59tMMfu3NJ4W3D0y+19L1MQzxjTfLs+PvN9xUhsGaCfrWHGA39o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773957593; c=relaxed/simple;
-	bh=ZSq1KbVoUB+K1at8AD5hG1nGBkwED9vYe5QiDWUG7Xc=;
+	s=arc-20240116; t=1773957981; c=relaxed/simple;
+	bh=5dOQ4EmFm5o6Z6xX15MRA919kToNc/Is8WZhcTPbDnA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tEprwBWsRbKI2yJzoFiqCnggV0WrgZMsHrcwdh10xKUr9BGL0IWdeHwfgQTko9t54gq5207TM77uxvse7venqyIuqLq5G5K6oyNXRRtQbqnUwP5uYPmwV6pzFxFetEDPiy6PBAE2bI0BNZ0gnG9c5MZNdXFDplVGt0kZ6se6Nl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=weV3nqI7; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=0yp23tNbPW94JMNdRGMZBEkiUIPkf8ue7dSq7oobTEQ=; b=weV3nqI7chBqru/dlHBoOpFFn3
-	xshJScE+Z/b4faKZyekCELpOCgC109DFD4+6JYL6xn/mVHHv5AQ1Q6hYtr3o8Ju7ZVH28Gk3uRa5+
-	voQiCnmMiErPZfckGZhef6YsihnyV13ZoybKYjvTG8a2NDOPgvdfeiuA7sKx6DGOVzWb14LTKnzxo
-	VHQiIyorzK6RcDnFuC7Lgr/tYhk0RZ7NfngmXG3X86idQmG+wfpLArb58r514rquGwA5KwhmUI7Li
-	UCKgfb3oDY8bKXDGd2xhZbuNZP7ns8jZJ3NUY4Tzo9FuyEhFYcMXpp1YbeCK7o0iV0dehkagz6tLl
-	rdyOkYkg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60868)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w3LP2-000000005Mx-2VQf;
-	Thu, 19 Mar 2026 21:59:40 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w3LOy-0000000008l-2rCx;
-	Thu, 19 Mar 2026 21:59:36 +0000
-Date: Thu, 19 Mar 2026 21:59:36 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Sam Edwards <cfsworks@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=CqBmTX108JMAdHN2G5ozvLUIyBHV4nF1e1K53VA4+a04Jg0KSbd5EvvZFLKTezfwHL3HENkPdg1aCP6Wp4m1O+c2AjPvsmWIcrEc6nBgPZJ3V0qgxwHYyzMtii7j8kAliQfAxwyvgoaWo4NCO6yBhCMVZeb0AFEuigKK7uHweP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ky55Gxzk; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773957981; x=1805493981;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5dOQ4EmFm5o6Z6xX15MRA919kToNc/Is8WZhcTPbDnA=;
+  b=ky55GxzkDIq7TpqO1EcwH8odUlIZSLYvSCHaebUAaVeT9Kj3NHiQNMr0
+   1zEZZLHjC5y80AXDzvplUc+wEuh3w9Dq5MtT83vhrEfvDTYW+nHGXBFz5
+   u1FCN0pglIKEaKIozcontjvHS7kE/sDvWK6P+HDIJTSetEZ2S/6M9I/uR
+   IEIZph53up9khwUZIRs42vurXuBStS9CjfugI26b3dlffaL3x/c6kGwgm
+   bni40AVpTMH7Z+PCSrdCmn14vvovT8CzgG4DvOPAimulM9MruvbhXnvVg
+   CyhzRdG2Ijg2Sc3zyV/6llPwjW6Fjhk3ZSLd0AyDPhLW3KdAIXhUdS4z4
+   Q==;
+X-CSE-ConnectionGUID: 1kSiYqffSFGFiP+LFiaBCA==
+X-CSE-MsgGUID: Ghe8l9d4RiavZNWw4ylwcw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="86520510"
+X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
+   d="scan'208";a="86520510"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 15:06:20 -0700
+X-CSE-ConnectionGUID: u7cK1ri5RPigX2sawiLgfA==
+X-CSE-MsgGUID: b9yMyTfiRiG38gQURNwKaw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
+   d="scan'208";a="223073156"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 15:06:20 -0700
+Date: Thu, 19 Mar 2026 15:06:14 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: x86@kernel.org, Nikolay Borisov <nik.borisov@suse.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	David Kaplan <david.kaplan@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Baruch Siach <baruch@tkos.co.il>,
-	Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v2 1/2] net: stmmac: Prevent NULL deref when RX
- memory exhausted
-Message-ID: <abxxyHVXp6QpPue5@shell.armlinux.org.uk>
-References: <20260319184031.8596-1-CFSworks@gmail.com>
- <20260319184031.8596-2-CFSworks@gmail.com>
+	David Laight <david.laight.linux@gmail.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v7 07/10] x86/vmscape: Use static_call() for predictor
+ flush
+Message-ID: <20260319220614.tejwx7ei2ukkljsw@desk>
+References: <20260319-vmscape-bhb-v7-0-b76a777a98af@linux.intel.com>
+ <20260319-vmscape-bhb-v7-7-b76a777a98af@linux.intel.com>
+ <20260319205802.GJ3738786@noisy.programming.kicks-ass.net>
+ <20260319213421.br6na4dulrjm6eke@desk>
+ <20260319214409.GL3738786@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,102 +106,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260319184031.8596-2-CFSworks@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+In-Reply-To: <20260319214409.GL3738786@noisy.programming.kicks-ass.net>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-269678-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[36];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269677-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,renesas.com,nxp.com,tkos.co.il,gmail.com,vger.kernel.org,lists.infradead.org];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,vger.kernel.org,intel.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	NEURAL_SPAM(0.00)[0.799];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.805];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B266B2D2D83
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim]
+X-Rspamd-Queue-Id: 9FC8D2D2DB7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 19, 2026 at 11:40:30AM -0700, Sam Edwards wrote:
-> The CPU receives frames from the MAC through conventional DMA: the CPU
-> allocates buffers for the MAC, then the MAC fills them and returns
-> ownership to the CPU. For each hardware RX queue, the CPU and MAC
-> coordinate through a shared ring array of DMA descriptors: one
-> descriptor per DMA buffer. Each descriptor includes the buffer's
-> physical address and a status flag ("OWN") indicating which side owns
-> the buffer: OWN=0 for CPU, OWN=1 for MAC. The CPU is only allowed to set
-> the flag and the MAC is only allowed to clear it, and both must move
-> through the ring in sequence: thus the ring is used for both
-> "submissions" and "completions."
+On Thu, Mar 19, 2026 at 10:44:09PM +0100, Peter Zijlstra wrote:
+> > With _TRAMP, KVM complains:
+> > 
+> >  ERROR: modpost: "__SCK__vmscape_predictor_flush" [arch/x86/kvm/kvm.ko] undefined!
 > 
-> In the stmmac driver, stmmac_rx() bookmarks its position in the ring
-> with the `cur_rx` index. The main receive loop in that function checks
-> for rx_descs[cur_rx].own=0, gives the corresponding buffer to the
-> network stack (NULLing the pointer), and increments `cur_rx` modulo the
-> ring size. After the loop exits, stmmac_rx_refill(), which bookmarks its
-> position with `dirty_rx`, allocates fresh buffers and rearms the
-> descriptors (setting OWN=1). If it fails any allocation, it simply stops
-> early (leaving OWN=0) and will retry where it left off when next called.
-> 
-> This means descriptors have a three-stage lifecycle (terms my own):
-> - `empty` (OWN=1, buffer valid)
-> - `full` (OWN=0, buffer valid and populated)
-> - `dirty` (OWN=0, buffer NULL)
-> 
-> But because stmmac_rx() only checks OWN, it confuses `full`/`dirty`. In
-> the past (see 'Fixes:'), there was a bug where the loop could cycle
-> `cur_rx` all the way back to the first descriptor it dirtied, resulting
-> in a NULL dereference when mistaken for `full`. The aforementioned
-> commit resolved that *specific* failure by capping the loop's iteration
-> limit at `dma_rx_size - 1`, but this is only a partial fix: if the
-> previous stmmac_rx_refill() didn't complete, then there are leftover
-> `dirty` descriptors that the loop might encounter without needing to
-> cycle fully around. The current code therefore panics (see 'Closes:')
-> when stmmac_rx_refill() is memory-starved long enough for `cur_rx` to
-> catch up to `dirty_rx`.
-> 
-> Fix this by further tightening the clamp from `dma_rx_size - 1` to
-> `dma_rx_size - stmmac_rx_dirty() - 1`, subtracting any remnant dirty
-> entries and limiting the loop so that `cur_rx` cannot catch back up to
-> `dirty_rx`. This carries no risk of arithmetic underflow: since the
-> maximum possible return value of stmmac_rx_dirty() is `dma_rx_size - 1`,
-> the worst the clamp can do is prevent the loop from running at all.
+> Ah, tricky. Yeah, this would need to be solved differenlty. Perhaps wrap
+> this in a helper and export that?
 
-Isn't the limit equivalent to:
+Wrapper seems to be a simpler option.
 
-	space = CIRC_SPACE(rx_q->cur_rx, rx_q->dirty_rx,
-			   priv->dma_conf.dma_rx_size);
-	limit = min_t(unsigned int, space, limit);
+> Or use the below little thing and change it to
+> EXPORT_STATIC_CALL_FOR_MODULES(foo, "kvm"); or whatnot.
 
-(Think of the "full" and "empty" cases as "space" which can be
-consumed to provide entries for the refiller to action.)
-
-I think the same applies for patch 2 - when the above returns zero
-it means we have no entries in the ring that aren't due for refill.
-
-Have you checked whether stmmac_rx_zc() also buggy in this respect?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+This would be nice if there are other static calls that would benefit from
+exporting to specific modules only. At this point, I don't know.
 
