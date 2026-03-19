@@ -1,122 +1,129 @@
-Return-Path: <netdev+bounces-269222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269223-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WLDMBxhDu2mxhwIAu9opvQ
-	(envelope-from <netdev+bounces-269222-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:28:08 +0100
+	id wH6qAgJFu2miiAIAu9opvQ
+	(envelope-from <netdev+bounces-269223-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:36:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6DDA2C419E
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:28:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFA052C41F1
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 01:36:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BA71E301E5DC
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:28:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A2B9F302C336
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 00:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BAFC1F03D9;
-	Thu, 19 Mar 2026 00:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B109A1E832A;
+	Thu, 19 Mar 2026 00:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W54R4pGT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qJhLg7a4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272FC40DFDF;
-	Thu, 19 Mar 2026 00:28:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD12A40DFC3;
+	Thu, 19 Mar 2026 00:36:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773880084; cv=none; b=eAQR+r7AH3KYgYtqtNgnrEsCOv1MNBh0rwNSmXNaU2ht61rd1TPT0hyfBzUuBAnuo4dWktQn9HoB4df6IiVcd5l+ECjZaw+cDCAAnU804+6hY0oWBnL4U54TZ5Z+ZLP3CGwVytKw0TithEbBjH73I7bD7jFpQkwCc4CN9od/2g0=
+	t=1773880572; cv=none; b=SMNCozFjxGvPRM2c5xs12Rvpb+mVtOmv0XNKQpSOmJtGv5XQKPysxAsE2lUN2RvLpFmDkLOdEhahwZE6ztKI8XsNwur4vikCdzGx/04eVo6XLDuCIq+C6o5aEBn5a7gAW6N3PXapKzQxNLxEatYntYJ7WSt3h4Aqyu/kKen+/lI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773880084; c=relaxed/simple;
-	bh=/B8NFzYa5ZF8jqU9nSokZOddilWhFqaNRouBCkCea4U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V/NjiIg8wL5HzLBIb8kI2b8K+u0MYoQiLAyRXfKBv8uqyjhb+UWxWJ4HCAQixGI0v2mKwKEvm2D8XwBcD/xQ3/nFQvuAIo3BhFmSjMpYDkrcZBLfNOrhb0iaFGlNrsVRhFxgD5AHcD4XQclLIcfuyrRGundYLgMvUyXo3vydJsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W54R4pGT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0AF1C19421;
-	Thu, 19 Mar 2026 00:28:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773880083;
-	bh=/B8NFzYa5ZF8jqU9nSokZOddilWhFqaNRouBCkCea4U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W54R4pGTywSLevE3BZFYhAgGVVj5Y5E7liMzxN2k93bjICMOx4GmhWgOg50t8ZLl1
-	 RpUae44E25HmSxjETscUQgbb9U1NrSt2XWnMIoWod2btCqT3GfuEZ1I0Xg5XcXMsTM
-	 PM4uUFguA91OHxz6z4dADA1ZZ4Hi+Pi71qgAqjUnN83KNqUK1nP/AAnVMW/w5e/kZj
-	 h9Prgv0iGt4/x/k1KMvL62KNG+okxZs3TKXm7vG8K+FPeCr6XnyWcKjlX/LXLp8zvb
-	 wMgXB/SdQuSuRDp5aTqJhZKVoxcxrdoBMojvte6JkKZataLC01Gmwn7rWC7W0iOy4G
-	 HAYT3W8gCek8A==
-Date: Wed, 18 Mar 2026 17:28:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pin-yen Lin <treapking@google.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Taehee Yoo
- <ap420073@gmail.com>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, Willem de Bruijn
- <willemb@google.com>
-Subject: Re: [PATCH net] selftests: drv-net: ping: Wait for carrier after
- toggling offloads
-Message-ID: <20260318172802.46c1fef1@kernel.org>
-In-Reply-To: <20260318010325.2003395-1-treapking@google.com>
-References: <20260318010325.2003395-1-treapking@google.com>
+	s=arc-20240116; t=1773880572; c=relaxed/simple;
+	bh=GLRxmZqFR01k+/vw+eN6+g3NUOdrIhuDKe7/EHNHSTc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j4cWdaUl8vdPW1Kv471LZcpQ6XRjiUMWdL23f0/lOZteVYlDkFxvu24hEa1Se6A7JyW6r5gj1oCP+fJOZfU4Utzz8ykLQ+BQCsrVw3u3Jp1N744Np+JcPLYYLYF39cfM3wBhE29DuUP4dPl2g5inw/ESUYQ+hul+HA22xo6eif0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qJhLg7a4; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=7xpA/C5tz/CpKZahcDKyOu6poBgzBCZEd5UawYwBT+k=; b=qJhLg7a4oqGLAhUvbffrGJ40bC
+	4pzhWzD7uzYU4P5cSUlwduYA3UgjGCYzxLDzO1YVMx8fumRI6UdYXUp9/n/x5UWp+xssnYmRF4bzc
+	g5rEOw5W6ETvWGIjWSQZqVSw99aODB+6Y5Mzrst5b6Q50d7hKZ3H5QD2IlDodfaX1N5DgTT0Ndtjq
+	9iZy7tImoGtCV1npgu/Pj1LN41ql1XMT7Q2++FU83m9N/zoS0OlxQ6ffYhYI/It0EziYspthrZ2Gx
+	mvfNGK1/hPPwNW6Pdh8uYL9VpL4vna+nuXApqXLxHGdTGVI/QdtufRYevWAo2ovAK4wjF0kXOD9HR
+	/+WSwH9Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54544)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w31Mo-0000000045O-2FVc;
+	Thu, 19 Mar 2026 00:36:02 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w31Mk-000000007Z7-2Ca1;
+	Thu, 19 Mar 2026 00:35:58 +0000
+Date: Thu, 19 Mar 2026 00:35:58 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next 0/8] net: stmmac: improve PCS support
+Message-ID: <abtE7sDT75I7uPnk@shell.armlinux.org.uk>
+References: <abQC7r38QLhSeadl@shell.armlinux.org.uk>
+ <abdEscs44fU4kRag@oss.qualcomm.com>
+ <abdYu864OmNWiWIW@shell.armlinux.org.uk>
+ <ablpxwGks9m38fhM@shell.armlinux.org.uk>
+ <absjNQ2s3Z5N2Zwo@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <absjNQ2s3Z5N2Zwo@oss.qualcomm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-269222-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	TAGGED_FROM(0.00)[bounces-269223-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.924];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_SPAM(0.00)[0.692];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ping.py:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B6DDA2C419E
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: BFA052C41F1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 17 Mar 2026 18:01:17 -0700 Pin-yen Lin wrote:
-> Toggling checksum offload (or HW-GRO via feature dependencies) can cause
-> certain physical interfaces to undergo a reset or a temporary link-down
-> state. In the ping.py test, this leads to immediate test failures if the
-> ping is attempted before the carrier is restored.
-> 
-> This is observed when running the test with GVE driver when HW-GRO is
-> enabled. When checksum offload is toggled, HW-GRO is toggled as well
-> because of the feature dependency. This leads to an interface reset,
-> causing the subsequent ping to fail.
-> 
-> Add a sleep period after changing these features to allow the link to
-> stabilize.
+On Thu, Mar 19, 2026 at 03:42:05AM +0530, Mohd Ayaan Anwar wrote:
+> [    8.650486] qcom-ethqos 23040000.ethernet: clk_csr value out of range (0xffffff00 exceeds mask 0x00000f00), truncating
 
-Sounds like the test found a legitimate problem. The configuration
-should not return to user space until the operation has completed. 
-User should not have to sleep 10sec each time they touch NIC
-configuration.
+Please look into this first - with the MDIO bus operating at
+who-knows-what frequency, this could make reading from the PHY
+unreliable.
+
 -- 
-pw-bot: reject
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
