@@ -1,192 +1,123 @@
-Return-Path: <netdev+bounces-269583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269593-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WE/rCOI4vGl3uwIAu9opvQ
-	(envelope-from <netdev+bounces-269583-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:56:50 +0100
+	id iHVxIhY7vGl3uwIAu9opvQ
+	(envelope-from <netdev+bounces-269593-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:06:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 869262D060C
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:56:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE6802D0856
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:06:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DF29F31BAC80
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:45:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A9B0330131E6
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8586F27A92E;
-	Thu, 19 Mar 2026 17:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B05396B96;
+	Thu, 19 Mar 2026 17:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aLzsGnyW"
+	dkim=pass (2048-bit key) header.d=i2labs.ca header.i=@i2labs.ca header.b="mHEZt6EG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out-13.smtp.spacemail.com (out-13.smtp.spacemail.com [63.250.43.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162C7346E72;
-	Thu, 19 Mar 2026 17:45:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685B639447C
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 17:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.250.43.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773942310; cv=none; b=Yjc6w/aHc0b8W6tOIWruJbgLUqJCgikvRz9HJq+6aLqcWv4leF+VWzij5B5dXLbKsLigOYwU0W7J+qJ8gwpczXDbZz2nb2QyfhydH5ooVvWfdogaQWMel6wlGsx1F3irag0YS1BlAaRiBAhLBF8YC8803ZZpVbhox2GDZMza6+0=
+	t=1773942904; cv=none; b=jPLhbuGqPh2XnxHkyByuCbACiMlhruAOetmGd/ZGMDm3lDm8rnZMJ1U/qX61SQsamUrCkNA4l38eT//9pjc/gAG+rbXgbkRvFbe6rnDzPGwEUiT+zkND2de3vVxPCQ0qNSCFrktersPILvf1y+Uxm97JX9lfK8w0Xv1bXQy45G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773942310; c=relaxed/simple;
-	bh=6CGzvuEPGSvPA+dPivezYFQso4zqZF1AmoyPvpSIKUo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QoQchQLOPiJL+Tw/l05v4OLl9rYBb1FD26zzbyNxQ13b2DvuQ0bAHJYwYM7n0UMvkXngpYBBiuBvXUSOR0Un9rKnw8xoLWaZy08WIASrkKs9AIkiI4Ql/8KDB5q8xlc1HEyJ8RFLTKheItNZnp4vVsR/x0H2dOMxIPjYfVtpo1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aLzsGnyW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A374C19424;
-	Thu, 19 Mar 2026 17:45:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773942309;
-	bh=6CGzvuEPGSvPA+dPivezYFQso4zqZF1AmoyPvpSIKUo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aLzsGnyWnfIxc0yii4POgMlCmyEmqsjjz5FNpgiHFKrD5PottLn2hCw7gRilC/wAg
-	 J3nA5q4HyKWtYIdGsSronhYen6j8GdjtcFIN4Sh6bsNqQ4UGiRFJba0KwsYK/ybB/R
-	 laluDYr7Y97QGZecW8uNAzneNoHcUGxOeWstN/5SHi9CrBnxz0QNXV3wr6EDGGNTbm
-	 WV23wAu1L5jKlqDm7JFl30wOWFqD15cJSL7DyqHWuJmIH72UwsxH6yRwnIlZvlJaI8
-	 IHb4g4Jp9l4C+4GsUPAkkZx3bBeiTEly3M5eNbgjNdZIE73zMWAohND94+GNYQrsOA
-	 jhCoM5mcYibNA==
-Date: Thu, 19 Mar 2026 17:45:03 +0000
-From: Simon Horman <horms@kernel.org>
-To: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, poros@redhat.com,
-	richardcochran@gmail.com, andrew+netdev@lunn.ch,
-	przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com,
-	Prathosh.Satish@microchip.com, ivecera@redhat.com, jiri@resnulli.us,
-	arkadiusz.kubalewski@intel.com, vadim.fedorenko@linux.dev,
-	donald.hunter@gmail.com, pabeni@redhat.com, kuba@kernel.org,
-	davem@davemloft.net,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH net-next 1/8] dpll: add new DPLL type for transmit clock
- (TXC) usage
-Message-ID: <20260319174503.GO1753385@horms.kernel.org>
-References: <20260318090654.611349-1-grzegorz.nitka@intel.com>
- <20260318090654.611349-2-grzegorz.nitka@intel.com>
+	s=arc-20240116; t=1773942904; c=relaxed/simple;
+	bh=cfVoYIitZHte75pCalAJPyi3bNyNpJXZTP7NUsP18jI=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=IwS33jzxOCih+49CZlvT9reHSKT1dJ9TIbo2KF1vsx4rmn/vHazQGXy82Aozxqkn2UmowNPBVIoJstv3X1d6jrAlho8yV5El9nc+C1BzvWePpVrjaKGty3EL8Z664yBcL3D22/GiXrAlyryFUtfk0xi94gI/EjYBPEk4RYKG1PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=i2labs.ca; spf=pass smtp.mailfrom=i2labs.ca; dkim=pass (2048-bit key) header.d=i2labs.ca header.i=@i2labs.ca header.b=mHEZt6EG; arc=none smtp.client-ip=63.250.43.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=i2labs.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=i2labs.ca
+Received: from [10.0.0.136] (unknown [14.179.148.118])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.spacemail.com (Postfix) with ESMTPSA id 4fcCn85HVSz8sWQ
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 17:46:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=i2labs.ca;
+	s=spacemail; t=1773942413;
+	bh=CNne2cEWWRt2To1i/YA4zmoi4I8eb4+3j9s+sDdf0iM=;
+	h=Date:To:From:Subject:From;
+	b=mHEZt6EGMRHkFs4WO8nYQJIdpkTEN1FIkayxL77O7+G5Ieb3AOrbmYYhsQTUvUffI
+	 JHr2wGnW2buolhibzYsdUsTgB/bPyI9Uh6YmfRBaCa5olWDdJTu5RZHfwaWCSppxUS
+	 k/pBg6tIZimrg2UqxBNuLbMbd11eIvvuttrLU00E6Mk3IoDZIC9hFd2S/vzFpLbJYZ
+	 Zcm18PdXEcfC31PQwdkqpgDULlDpxdL/Ze9NrP1gbQAsKE8YVQve7eECu+XHPdc6Tc
+	 uTENP5BCLt3HvycXBg9LmijDTyo/SEgEqYuwDP9KOysi/OzQa5RpyoxW6+LDPypWq0
+	 c5kHcU5+bdM0g==
+Message-ID: <350cea13-9bf1-4605-82c9-b85114fc88fd@i2labs.ca>
+Date: Fri, 20 Mar 2026 00:46:47 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260318090654.611349-2-grzegorz.nitka@intel.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: netdev@vger.kernel.org
+From: Nolan Woods <nolan@i2labs.ca>
+Subject: net: disable default loopback
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Envelope-From: nolan@i2labs.ca
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[i2labs.ca:s=spacemail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269583-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269593-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_ONE(0.00)[1];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[i2labs.ca];
+	DKIM_TRACE(0.00)[i2labs.ca:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.946];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nolan@i2labs.ca,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 869262D060C
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,i2labs.ca:dkim,i2labs.ca:mid]
+X-Rspamd-Queue-Id: AE6802D0856
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 18, 2026 at 10:06:47AM +0100, Grzegorz Nitka wrote:
-> Extend the DPLL subsystem with a new DPLL type, DPLL_TYPE_TXC,
-> representing devices that drive a transmit reference clock. Certain
-> PHYs, MACs and SerDes blocks use a dedicated TX reference clock for
-> link operation, and this clock domain is distinct from PPS- and
-> EEC-driven synchronization sources. Defining a dedicated type allows
-> user space and drivers to correctly classify and configure DPLLs
-> intended for TX clock generation.
-> 
-> The corresponding netlink specification is updated to expose "txc"
-> 
-> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> ---
->  Documentation/netlink/specs/dpll.yaml | 3 +++
->  include/uapi/linux/dpll.h             | 2 ++
->  2 files changed, 5 insertions(+)
-> 
-> diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
-> index 3dd48a32f783..2a2ee37a1fc0 100644
-> --- a/Documentation/netlink/specs/dpll.yaml
-> +++ b/Documentation/netlink/specs/dpll.yaml
-> @@ -138,6 +138,9 @@ definitions:
->        -
->          name: eec
->          doc: dpll drives the Ethernet Equipment Clock
-> +      -
-> +        name: txc
-> +        doc: dpll drives Tx reference clock
->      render-max: true
->    -
->      type: enum
-> diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
-> index de0005f28e5c..a277d08ac264 100644
-> --- a/include/uapi/linux/dpll.h
-> +++ b/include/uapi/linux/dpll.h
-> @@ -109,10 +109,12 @@ enum dpll_clock_quality_level {
->   * enum dpll_type - type of dpll, valid values for DPLL_A_TYPE attribute
->   * @DPLL_TYPE_PPS: dpll produces Pulse-Per-Second signal
->   * @DPLL_TYPE_EEC: dpll drives the Ethernet Equipment Clock
-> + * @DPLL_TYPE_TXC: dpll drives Tx reference clock signal
->   */
->  enum dpll_type {
->  	DPLL_TYPE_PPS = 1,
->  	DPLL_TYPE_EEC,
-> +	DPLL_TYPE_TXC,
->  
->  	/* private: */
->  	__DPLL_TYPE_MAX,
+Hello,
+I am building a highly constrained Linux environment where I want to 
+remove any possibility of a process communicating with other local 
+processes via the network stack. It appears that the kernel 
+automatically creates the loopback device and I can't locate any 
+configuration that might disable it. I need to be able to create 
+loopbacks in namespaces, disabling the network stack entirely isn't an 
+option. I also do not want to depend on NetFilter or any sort of packet 
+rules. I can disable the link after it is created, but that approach 
+still has the potential of the link being brought back up. SELinux might 
+be an option but is just another form of filtering rules. Ideally the 
+process wouldn't even have the option to bind to the interface.
 
-I think that the spec and source code changes are inconsistent in this
-patch.
+I found this comment that implies that there might be some sort of 
+unbreakable implicit network stack dependency on the loopback: 
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/net/core/dev.c#n13266
 
-With it applied I see:
+Can anyone elaborate on this?
 
-./tools/net/ynl/ynl-regen.sh -f && git diff
-diff --git a/drivers/dpll/dpll_nl.c b/drivers/dpll/dpll_nl.c
-index a2b22d492114..4182bdbb6dbb 100644
---- a/drivers/dpll/dpll_nl.c
-+++ b/drivers/dpll/dpll_nl.c
-@@ -34,7 +34,7 @@ const struct nla_policy dpll_reference_sync_nl_policy[DPLL_A_PIN_STATE + 1] = {
- static const struct nla_policy dpll_device_id_get_nl_policy[DPLL_A_TYPE + 1] = {
-        [DPLL_A_MODULE_NAME] = { .type = NLA_NUL_STRING, },
-        [DPLL_A_CLOCK_ID] = { .type = NLA_U64, },
--       [DPLL_A_TYPE] = NLA_POLICY_RANGE(NLA_U32, 1, 2),
-+       [DPLL_A_TYPE] = NLA_POLICY_RANGE(NLA_U32, 1, 3),
- };
+I would greatly appreciate the input anyone could provide.
 
- /* DPLL_CMD_DEVICE_GET - do */
-diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
-index a277d08ac264..8f6db5d5bf0c 100644
---- a/include/uapi/linux/dpll.h
-+++ b/include/uapi/linux/dpll.h
-@@ -109,7 +109,7 @@ enum dpll_clock_quality_level {
-  * enum dpll_type - type of dpll, valid values for DPLL_A_TYPE attribute
-  * @DPLL_TYPE_PPS: dpll produces Pulse-Per-Second signal
-  * @DPLL_TYPE_EEC: dpll drives the Ethernet Equipment Clock
-- * @DPLL_TYPE_TXC: dpll drives Tx reference clock signal
-+ * @DPLL_TYPE_TXC: dpll drives Tx reference clock
-  */
- enum dpll_type {
-        DPLL_TYPE_PPS = 1,
+Thank you for your time,
+Nolan Woods
 
--- 
-pw-bot: changes-requested
+
 
