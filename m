@@ -1,123 +1,164 @@
-Return-Path: <netdev+bounces-269630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269632-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2D4YHCRSvGkXwwIAu9opvQ
-	(envelope-from <netdev+bounces-269630-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:44:36 +0100
+	id sFWMDqhUvGkXwwIAu9opvQ
+	(envelope-from <netdev+bounces-269632-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:55:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C88592D1C48
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:44:35 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4589C2D1DB9
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:55:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5AC4E30610EA
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:44:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 59C2A300BE33
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7EC364953;
-	Thu, 19 Mar 2026 19:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B12389E0B;
+	Thu, 19 Mar 2026 19:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uCZSmlkJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f3RZ7ji8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD152FFF88
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 19:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D063032571D;
+	Thu, 19 Mar 2026 19:55:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773949473; cv=none; b=KvCOZTEDJBtkQVWw8g8LRGN6xdR5th0MYlFp84pf/0t55D7UznL5MwiuC/+/CgLyA70ws1cF03wTyEFWVpmN2Kti/z4HZOOS2FAZ2UeoxnraV7RHR+dK6TH4WZgT1jToNqfoWebxmBDTvt0OflJIiHB5Upu/CYd4kdDQ5bCtL0c=
+	t=1773950114; cv=none; b=F/IYUy7ldlx4oJ9OHVDoOvpY0QmgRM0EMB68oH+tIp4naKtQ01DaUBJbSkBpXpNXcRRlJGIsKp6esLLlMhhKg51oCaf1R8U/avwrsAo7NIxs0SqeEBiF6v+bfrxCqyQdM9C0GZjaN8xa6nEsjbMmpGviV9j+Dl1GEBRDKTn1HHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773949473; c=relaxed/simple;
-	bh=3ozfv6FU517Jb4qTTKM2z/pb6DduV9qQ83/ayPIuF3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OiGisrAc3ROMfUCCG+9KMLqO/6g5eS3bSXhQLJkiS9AklFeLLvdYNM84SXjW+NjvSprmc1OcxCGVQ52NnKdhlUdlUmmbPXUbNGqcIg3x8zMOx6ExYQcpe9zayCaMvSzKNAiI21+Q97tJL0S4EOyBr9QcGGwnGxvB3qfFNxOVp5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uCZSmlkJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 581ECC19424;
-	Thu, 19 Mar 2026 19:44:33 +0000 (UTC)
+	s=arc-20240116; t=1773950114; c=relaxed/simple;
+	bh=BKVZIah/27SLYSlA2gUiVUQcfkViEh1zQPpjbR2l7E8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AVVyEfUAVqfHGDlTnlnSHKHX6j5/AueU5SkB+AKzeOleVgSIkjGEX1qEa1kAtcZ4Ju+hXPExgkrIfZAxEMy2j/eAPffacFpiWXaahPQSzT6DJPOL4Ju5FzuBR0om8mmB1s2vd7ypPCcGltjwhRX2uo3ajcoYsAbFFWZtKjZ1ht4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f3RZ7ji8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D42EC19424;
+	Thu, 19 Mar 2026 19:55:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773949473;
-	bh=3ozfv6FU517Jb4qTTKM2z/pb6DduV9qQ83/ayPIuF3c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uCZSmlkJ/8kY2P6jU+SrZO6stP1g6BHlNpCA5rvCsg/r25XgGVzawMtP/4t9w6hlF
-	 db0Cw2OrmtNKEfIWIf6wZoLzuINfF4aDU7X0kJ/AG885AwlPdAI7iJnl9MB72kGpHH
-	 RznS1OXLGx44kGSgrBb88k5Sj8CV19KeQFezVIJ47MN3CgMrYxp8c/VsyWwwj3vOtq
-	 T/1rDbbS7fsOKRfGrqlDx/Sm78myjXVB6VYOXwBeFvZtU6SqUIjewxuKcXQMNeAr39
-	 efywan9M5HW2+abh/8Ou5vbDO89WES/SzkRoVeXtF3NmH9LASUClpt65QS1IN7+kmD
-	 XXKNDmE/PgmHg==
-Date: Thu, 19 Mar 2026 12:44:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, ralf@mandelbit.com, Sabrina Dubroca
- <sd@queasysnail.net>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next 0/9] pull request: ovpn 2026-03-17
-Message-ID: <20260319124432.2fda076a@kernel.org>
-In-Reply-To: <20260317104023.192548-1-antonio@openvpn.net>
-References: <20260317104023.192548-1-antonio@openvpn.net>
+	s=k20201202; t=1773950114;
+	bh=BKVZIah/27SLYSlA2gUiVUQcfkViEh1zQPpjbR2l7E8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f3RZ7ji8vqCdCclzDcS8bxpmooQGTTnlKkdFQgEXQg1eZhvBRCr9f4qrNJ620yjUg
+	 YXtywyDtB3wVVShkAOr430yMfXJiqfY3rfQ1InBq05TObVmEqtHm54N2IyAgiJtvOW
+	 iKPvf3mUn/pmOYLr3WRNE9a2eJQ/ySMghE5TG76mi4z5rJtyWPdlt7Egf5zN+IxS6Z
+	 xfQ7LaxJFhQw4Il7ujQAJneS9zlanA5TqyXxq2dxbOTEGDdKtnTe1CrvJgY3S/N2zu
+	 wrBmDbvn+/z5e9BiWqOALDtaQKasCXlGI8VZEuZybeyU/2gPSvL0WXjLUzh5ckvJ4r
+	 Ie4Y49eFc4y2A==
+Date: Thu, 19 Mar 2026 19:52:38 +0000
+From: Simon Horman <horms@kernel.org>
+To: Conor Dooley <conor@kernel.org>
+Cc: netdev@vger.kernel.org, Conor Dooley <conor.dooley@microchip.com>,
+	Valentina.FernandezAlanis@microchip.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Daire McNamara <daire.mcnamara@microchip.com>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Samuel Holland <samuel.holland@sifive.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Dave Stevenson <dave.stevenson@raspberrypi.com>,
+	Sean Anderson <sean.anderson@linux.dev>,
+	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+	Abin Joseph <abin.joseph@amd.com>,
+	=?utf-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>,
+	Ryan.Wanner@microchip.com
+Subject: Re: [PATCH net-next v4 00/13] macb usrio/tsu patches
+Message-ID: <20260319195238.GT1753385@horms.kernel.org>
+References: <20260318-surpass-puzzle-f94b46aa8808@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260318-surpass-puzzle-f94b46aa8808@spud>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269630-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-269632-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.723];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,tuxon.dev,gmail.com,sifive.com,lists.infradead.org,raspberrypi.com,linux.dev,amd.com,bootlin.com];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.968];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C88592D1C48
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,microchip.com:email,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: 4589C2D1DB9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 17 Mar 2026 11:40:14 +0100 Antonio Quartulli wrote:
-> This is (yet..yet..yet) another resend of the original PR meant for
-> net-next.
-> We have fixed the hitchups in the commit messages, as pointed out by the
-> AI.
+On Wed, Mar 18, 2026 at 04:37:31PM +0000, Conor Dooley wrote:
+> From: Conor Dooley <conor.dooley@microchip.com>
 > 
+> Hey folks,
 > 
-> This batch includes the following changes:
-> * use correct constant when declaring nlattr array in ovpn_nl_key_swap_doit
-> * use bitops.h API when possible
-> * send netlink notification in case of client float event
-> * implement support for asymmetric peer IDs
-> * consolidate memory allocations during crypto operations
-> * add netlink notification check in selftests
-> * add asymmetric peer IDs check in selftest
-> * add FW mark check in selftest
+> At the very least, it'd be good of the soc vendor folks could check
+> their platforms and see if their usrio stuff actually lines up with what
+> the driver currently calls "macb_default_usrio". Ours didn't and it was
+> a nasty surprise.
+> 
+> Ryan and I figured out that the sama7g5 stuff is not actually using the
+> same usrio bits as earlier devices, so there's now more patches in this
+> series to split them apart. I've not tested the split or the new
+> property due to lack of hardware, but Ryan has.
+> 
+> Marking this stuff net-next, because although they're fixes I don't see
+> any particular urgency, and it avoids creating some dependencies between
+> cleanup items and the fixes.
+> 
+> Cheers,
+> Conor.
+> 
+> v4:
+> - deprecate instead of remove existing devicetree property
+> - pick up Theo's patches
+> 
+> v3:
+> - reorder patches
+> - fix smatch issue reported by Simon
+> - add patches reworking usrio handling of clken/refclk (and remove the
+>   issue the llm reported in the process)
+> - add a new devicetree property for refclk selection, replacing the
+>   existing one.
+> - drop the dts patch
 
-In addition to the mark test failing always three more tests hang
-around 30% of the time on debug kernels:
+Hi Conor,
 
-https://netdev.bots.linux.dev/flakes.html?tn-needle=net-ovpn&min-flip=12
+Unfortunately this does not apply cleanly to net-next, which breaks our CI.
 
-Please follow up with the fixes? More info how our CI builds the
-kernels etc:
-https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+Please rebase and repost.
+
+Thanks!
+
+-- 
+pw-bot: changes-requested
 
