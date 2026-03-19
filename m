@@ -1,267 +1,160 @@
-Return-Path: <netdev+bounces-269605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269592-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qFnvCYQ6vGl3uwIAu9opvQ
-	(envelope-from <netdev+bounces-269605-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:03:48 +0100
+	id OA+mIUs4vGl3uwIAu9opvQ
+	(envelope-from <netdev+bounces-269592-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:54:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C23442D07C2
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:03:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA4D2D059A
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:54:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DE52C309E7A1
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:00:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7FB823054334
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 17:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0873F2102;
-	Thu, 19 Mar 2026 17:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9B03F1659;
+	Thu, 19 Mar 2026 17:52:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="e/rBcJMW"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EIFN+mnd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3E03947B1
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 17:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED185343D60
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 17:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773943196; cv=none; b=rKQBoXUfMRwE0SYi4rE3Ypqb7gEuFAhZlczAfFAUh70cJjoQ45uPiQJ2aVIaxyRbwdBxkNeKiswyf8hPlZUoMCtOW+5C8LIPneN2Denr07X1JRUUf5gX4KI60sgtkt4bOtY0mxJDWVQhyInFKQGPNvL8SibaPj3e0RSyXhkDRTQ=
+	t=1773942759; cv=none; b=r1l0TMQ9EyUM+eoVmSRcvxzpQ9rVEUzElu9c0TfEUkST1vccfjseJRtUYPO0k9e67CAVCUAd6sLCm4jOZ8rBbtzmc6n0PdcY1hBTRzN7mp2Y/3wleKbksAVsqz/p38W01KGsrPxexzF7SK3kISNMMTHiS7NsRYKmOpOmWxuoUo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773943196; c=relaxed/simple;
-	bh=1qiYzC4e4C5Osb7cyOfG+hx3gfnhgiG4CgnJdnnYqWk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IGeNv51qU0g5UjR+HbsJxC5B4R2j7H2m+howMgqjTho0P8VUWAB3r1ytZLeEK/ZJtO62x8ncvgDUjGbcB2z6GeD8mlv9W4Fs8CxPNxRQaTkZJm5I6peCC0V5LBE2TEXq64AXAx7CF8SyTaIFs71wFZx2G3lHZ0muMl6kRLTJRNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=e/rBcJMW; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5a27bfadca9so1335724e87.3
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 10:59:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1773943192; x=1774547992; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IwNvoAxpSBA3F4YxfMu4dubOKf0cPSpjGd1s0V+Fdds=;
-        b=e/rBcJMWUNEumGhD1/YaPe6kkWaDw4uKnPvxlquGNZL0XExY3gO7GDENbC1QycXKV1
-         jTCi/HKcM8eI0AemEJ8Eg7svtwzcWx7JrISqAR53Vg6dyJtKZWXMwJPKngm3GjeAxka+
-         Z0sZP6VRE7A7wXDqII3Sbz/QupuOdajbsh9Fc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773943192; x=1774547992;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IwNvoAxpSBA3F4YxfMu4dubOKf0cPSpjGd1s0V+Fdds=;
-        b=dOERDF/aJ0hd6lqlMwDbtVHsXyHfl4OFg3+JsyNTUQbcUwLWvCjbnnal9n4l7L9TIa
-         O4CBcWLBV5EdinHvdjCwi28i+02v9qDGm40C58xH32w8yqC0dQ9j1pnEbAFgb75Ns+tH
-         UZKKeRCzTNSB8KjJcgUVzfkBo0UJZjeMtkLMaztuDuEuH5yAIu8tkRTWGAOjExbEOHuF
-         +N1G82YkffpBzuND+eTWKeml7joAue2DCSWaoVYptOOpSA/LTpqhpsmbU4jX7v6fZ/1V
-         TqwMH2tEnX09OFKO9FJ0sRVL7exkseSp6sYFxeeUpHJOOFPZoffBpQwDN5kRglxqPh0f
-         K9cg==
-X-Forwarded-Encrypted: i=1; AJvYcCUh31xXG/mZnFINMdz9sMk5LiUmS5xkQN/THTHoF8qIX2xvc55eWqTUsiX0E+fY8K0blm9/Kz0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4F9/MLsh+YExxck5roCQdlOUxOK6hqFih4Yn6ijSDfJC26ZM8
-	K6ZbSE4tQ5Cxk9Sw/ih9r6/NkrwytppbocVb4pM/zhOMOkr7uZOv8k3GX16fkwPMaapiBYLXr+t
-	jcq4FTsfi
-X-Gm-Gg: ATEYQzyXirWs/8X6a80tQsM7ssvWcRMjj80/zG7vM62Z0+QZJXu/wIlLvOXMjuMhcfn
-	nI0wI7ypYEXyLqWTL42iycFJoBdmEXtrPEO5ma9fXMfbuNpPMmhYV3DEKJz48BwhJfgAQ9J2wtc
-	Ouj8QdCG03egbOeub5vOeTPEkBKJj1VRTWdqJkkQfJsDpIdypDqNK3zfgXiUIY6lxnZjjCKTju/
-	5L9db6qrxom8drBdERx5O0jlCQOP2krXrPhm3IwcCE/S4JOQtSYFkcDRRITMA/P++EyUfRMYbIO
-	EoBjHW/dVSL23VRR17AWDxP+y6k+uA+fZTcXwVKMyT0O9i35B6/t5IsRxR4MxiIlA050msc5a3n
-	FutvR0QgTkLxuZ/xaIG+JAWhSBUMvUEl7fFzcKRRB265+QAYmEram1qtA79P6MC9WMe44z/Wt/t
-	+gqHyKQmUbioNHqSY1bDWwYVOiLXBFQ2cexdAbE1BJsp7qPGsV5HaFRg0bqXy9zA==
-X-Received: by 2002:a05:6512:33ca:b0:5a1:8b9:6d12 with SMTP id 2adb3069b0e04-5a285b44617mr1501e87.24.1773943192399;
-        Thu, 19 Mar 2026 10:59:52 -0700 (PDT)
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com. [209.85.167.54])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a2851adeeasm51773e87.35.2026.03.19.10.59.52
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Mar 2026 10:59:52 -0700 (PDT)
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5a0fc5e2c59so1089311e87.1
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 10:59:52 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCX+c/bEFpR9+ngV1k2HwKXzUfdW7SAw0yAseUMdvFNl6uPumgaVRJ8Pn6lWB+yX3hMIihq02H8=@vger.kernel.org
-X-Received: by 2002:a05:6000:18a6:b0:439:beee:43b5 with SMTP id
- ffacd0b85a97d-43b6423d90bmr470716f8f.3.1773942745211; Thu, 19 Mar 2026
- 10:52:25 -0700 (PDT)
+	s=arc-20240116; t=1773942759; c=relaxed/simple;
+	bh=c7KdzH6EkQEnIu60qLdJacRQT5STh1ryZYSTEgsyFuw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TOu3xxSjt7F40kLBOmmdMeuLLLjHXhESa2yEdmdaArlAgTvjzFaHEm6BGEW6UUTOwQVL2zINu7cKLV+TpNYAaXqHIMaFgWFlSCMPuEu/GY6BsGdFVw6glBZR1TQhJ2RpdZrDEUbKBkv5ZSyou786YqnkFyAeRl2SlV+2LocVzw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EIFN+mnd; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 31FAE4E4271F;
+	Thu, 19 Mar 2026 17:52:28 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 039B460050;
+	Thu, 19 Mar 2026 17:52:28 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4730410450941;
+	Thu, 19 Mar 2026 18:52:18 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773942746; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=8h+kJtiQNyxdX0LIfkr+wSpHBs0qYPkOOQXebt6tRfc=;
+	b=EIFN+mnd/aoBLMU4JLMfZCIFtWSfuBBGKwM3h7Ys814nOH0MXqOfw/qcEkjHeOBNFs/qfK
+	buUvvHfo1Ticbqg73nPzR9xZmHLfSdLEL0WRryiz6D6v0VFOnxlkwPIeCdxFNDWIt4RMHw
+	NSMfgjxnCXkV1hpJm53YpkASDB+QFeSggtV45rEblLi7lS3Esgr90KlWfhYoSDj83i5x/7
+	68WfkrCmQWMKN5368nQ62cFRcajj9g99HFbKMgssCzAdfVhhHJLXkdR1UHroM6xYzg0iy7
+	s9Rjla2oXAhtfpp0/hsJ1olPzWo/eoVTp/M6xULHJkhEUYJRv9IA09tho3NsQA==
+Message-ID: <e35c5cde-c631-46f4-850f-4737b1f591d9@bootlin.com>
+Date: Thu, 19 Mar 2026 18:52:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260317090112.v2.1.I0a4d03104ecd5103df3d76f66c8d21b1d15a2e38@changeid>
- <CACRMN=euZzwDpCQupzth-J1z9qWXPenmy_bu727+R-kt97zexw@mail.gmail.com>
-In-Reply-To: <CACRMN=euZzwDpCQupzth-J1z9qWXPenmy_bu727+R-kt97zexw@mail.gmail.com>
-From: Doug Anderson <dianders@chromium.org>
-Date: Thu, 19 Mar 2026 10:52:13 -0700
-X-Gmail-Original-Message-ID: <CAD=FV=WEWMdh+SuSE-5P81g7NhV8KH_4u_FxcRdBFRTAaASqhQ@mail.gmail.com>
-X-Gm-Features: AaiRm51jE-pJGKyYKekSNJEdkSVtbmzl88hjmcc-VHWIT0EUhGVU2WYljuGhtW4
-Message-ID: <CAD=FV=WEWMdh+SuSE-5P81g7NhV8KH_4u_FxcRdBFRTAaASqhQ@mail.gmail.com>
-Subject: Re: [PATCH v2] device property: Make modifications of fwnode "flags"
- thread safe
-To: Saravana Kannan <saravanak@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J . Wysocki" <rafael@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, stable@vger.kernel.org, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Mark Brown <broonie@kernel.org>, 
-	Wolfram Sang <wsa+renesas@sang-engineering.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Daniel Scally <djrscally@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Fabio Estevam <festevam@gmail.com>, Frank Li <Frank.Li@nxp.com>, 
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Len Brown <lenb@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, Rob Herring <robh@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Sakari Ailus <sakari.ailus@linux.intel.com>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, devicetree@vger.kernel.org, 
-	driver-core@lists.linux.dev, imx@lists.linux.dev, linux-acpi@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 10/10] net: ethtool: Introduce ethtool command
+ to list ports
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, Heiner Kallweit
+ <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>, =?UTF-8?B?QmrDtnJuIFTDtnBl?=
+ =?UTF-8?Q?l?= <bjorn@kernel.org>
+References: <20260309152747.702373-1-maxime.chevallier@bootlin.com>
+ <20260309152747.702373-11-maxime.chevallier@bootlin.com>
+ <20260312190705.0b3a3f78@kernel.org>
+ <97bd2ab1-a8ff-4c0b-a328-952139f18fc8@bootlin.com>
+ <20260319075343.0aa9fac8@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260319075343.0aa9fac8@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[chromium.org,none];
-	R_DKIM_ALLOW(-0.20)[chromium.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269605-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linuxfoundation.org,kernel.org,vger.kernel.org,linux.intel.com,sang-engineering.com,lunn.ch,gmail.com,davemloft.net,google.com,nxp.com,redhat.com,pengutronix.de,armlinux.org.uk,lists.linux.dev,lists.infradead.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269592-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[chromium.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dianders@chromium.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.968];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,chromium.org:dkim,chromium.org:email]
-X-Rspamd-Queue-Id: C23442D07C2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:mid]
+X-Rspamd-Queue-Id: 1DA4D2D059A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
-
-On Thu, Mar 19, 2026 at 10:25=E2=80=AFAM Saravana Kannan <saravanak@kernel.=
-org> wrote:
->
-> On Tue, Mar 17, 2026 at 9:04=E2=80=AFAM Douglas Anderson <dianders@chromi=
-um.org> wrote:
-> >
-> > In various places in the kernel, we modify the fwnode "flags" member
-> > by doing either:
-> >   fwnode->flags |=3D SOME_FLAG;
-> >   fwnode->flags &=3D ~SOME_FLAG;
-> >
-> > This type of modification is not thread-safe. If two threads are both
-> > mucking with the flags at the same time then one can clobber the
-> > other.
-> >
-> > While flags are often modified while under the "fwnode_link_lock",
-> > this is not universally true.
-> >
-> > Create some accessor functions for setting, clearing, and testing the
-> > FWNODE flags and move all users to these accessor functions. New
-> > accessor functions use set_bit() and clear_bit(), which are
-> > thread-safe.
-> >
-> > Cc: stable@vger.kernel.org
-> > Fixes: c2c724c868c4 ("driver core: Add fw_devlink_parse_fwtree()")
-> > Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> > Acked-by: Mark Brown <broonie@kernel.org>
-> > Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
-> > Signed-off-by: Douglas Anderson <dianders@chromium.org>
-> > ---
-> > While this patch is not known for sure to fix any specific issues, it
-> > seems possible that it could fix some rare problems. I'm currently
-> > trying to track down a hard-to-reproduce heisenbug and one (currently
-> > unproven) theory I had was that the fwnode flags could be getting
-> > messed up like this. Even if turns out not to fix my heisenbug,
-> > though, this seems like a worthwhile change to take.
->
-> Reviewed-by: Saravana Kannan <saravanak@kernel.org>
-
-Thanks for the review!
 
 
-> Thanks Doug. Hope this isn't the cause of the hisenbug. If you report
-> it here, I might be able to take a look at it too (no promises).
+On 19/03/2026 15:53, Jakub Kicinski wrote:
+> On Thu, 19 Mar 2026 10:27:11 +0100 Maxime Chevallier wrote:
+>>> GENL_REQ_ATTR_CHECK ?
+>>> I guess you'll have to move it to prepare cause we don't get info 
+>>> here :(  
+>>
+>> Sorry for my comments coming apart on your review, I'm getting this new
+>> iteration done in-between other tasks  :(
+>>
+>> I can't move that check to the prepare_data() step, as we need the
+>> request->port_id field to be populated at that stage for the DUMP
+>> op (for each port, we set request->port_id, then we call prepare_data
+>> and so on).
+> 
+> Not sure I get what you're saying - that it doesn't work or that it
+> leads to "duplicated" work?
 
-I don't _think_ it fixes my bug, but I'm still not 100% sure because
-the bug can take a day or so to reproduce and it appears to only
-reproduce on official kernels built by the builder. :( This makes it
-hard to say anything for certain and also hard for me to inject extra
-debug logic.
+What I mean is that it doesn't work yeah.
 
-I did finally capture a ramdump of a device in the bad state and
-managed to inspect the state of all the fwnode and fwnode_link
-objects.
+> Alternative is to add info to parse_request
+> args which I suspect is useful long term anyway.
 
-The problem (simplified) is that I have a pinctrl device:
+good point, I like the idea a lot :) OK let me give this a try, I need
+to see how that looks like.
 
-  max77779_pinctrl {
-    pin1: pin1 {
-      ...;
-    };
-    pin2: pin2 {
-      ...;
-    };
-  };
+Thanks for the suggestion,
 
-...and then a client of the pinctrl device:
+Maxime
 
-  client1 {
-    pinctrl-0 =3D <&pin1>;
-    ...
-  };
 
-  client2 {
-    pinctrl-0 =3D <&pin2>;
-    ...
-  };
-
-At parse time, we get a link between the "client1" node and the "pin1"
-node (and "client2" and "pin2").
-
-In a normal boot (where the bug doesn't reproduce), when
-max77779_pinctrl finishes probing, all of the links to its children
-(which don't have a "dev" associated with them) get moved to point to
-"max77779_pinctrl" (__fw_devlink_pickup_dangling_consumers).
-
-When I detect the bug, the max77779_pinctrl device clearly has
-finished probing, but the client devices still point to the child
-nodes.
-
-In the debugger, I can inspect things. I can see:
-* The fwnodes for "pin1" and "pin2" clearly don't have a "dev" node.
-They also don't have "FWNODE_FLAG_NOT_DEVICE" set.
-* The fwnode for "max77779_pinctrl" clearly has a dev node (and a bus).
-* The fwnodes for "pin1" and "pin2" show zero consumers.
-* The fwnodes for "client1" and "client2" _do_ still show suppliers.
-* When I look at the fwnode_link between the clients and the pins, the
-"supplier" points to the node for the pin.
-* When I look at the fwnode_link between the clients and the pins, the
-"c_hook" is non-empty.
-* When I look at the fwnode_link between the clients and the pins, the
-"consumer" points to the node for the client.
-* When I look at the fwnode_link between the clients and the pins, the
-"s_hook" is an empty list (next =3D=3D prev).
-
-It's a bit baffling because everything looks nice and consistent with
-half the link being severed, which doesn't seem possible when looking
-at the code. The code seems to always add to a consumer list and
-supplier list at the same time and remove at the same time.
-
-I've started to run out of ideas on how it could possibly get into
-this state. If you have any, or want me to look at any other data
-structures in the ramdump let me know.
-
--Doug
 
