@@ -1,106 +1,76 @@
-Return-Path: <netdev+bounces-269617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269618-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6GsuLVlDvGmAwAIAu9opvQ
-	(envelope-from <netdev+bounces-269617-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:41:29 +0100
+	id ABWaBflDvGm4wAIAu9opvQ
+	(envelope-from <netdev+bounces-269618-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:44:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F0F22D12AC
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:41:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A15C2D1346
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 19:44:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DFE313028C31
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:41:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D2F25309A61B
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14A537FF78;
-	Thu, 19 Mar 2026 18:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E840F30EF82;
+	Thu, 19 Mar 2026 18:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e3YBlNPP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Do61sLyk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E5D3ED13F
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 18:41:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CCC18EB0
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 18:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773945674; cv=none; b=dbhq1CP7Ye3N+rthSuz33iAXOo6+k48Ss2EB48H2XtXtdF2Y/YRSFq3GWfkpOABVSS0Wcd8zPmQ/lR/2OIschf1L4PganYjvnyU5j8M+sxg1hTH2Mc5G76dVoZZXUM9n8cIfp6Rh10LuOyQ5y43KxbH7EdqgPytKpBMYRwtD9I4=
+	t=1773945690; cv=none; b=Ypcas7kUhj4oPKixfE1Fm837Od7fn26qVIoiANFfGq09Jze6g066GpHyJkIqQMq3y8LLa63p8TvIH8qghW57FyfuYi0iNMfQzlM99AoBxZaipzwMj3KHueTb0CYUGmA6EBpURqPDNI2gMkSv93/nbrKN7QZVUr7oJ2gxSZYIDcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773945674; c=relaxed/simple;
-	bh=ezG3pC99w4U2uwQ/yG5pLTV/NpoABjnTbl6EjBflYnw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BMJkrxUVz90z4Hb39kN6IH1JR2WDAseRgRQKGdeL+M50GbiWOxYOpkQlJE18eLBwzaLAaikVz9to5GrOW2rZrC/pBkq8FZfF9hAoyDa4QWQGltO0kMssmasEg9FdkuV576dbP20DTV/K/MPHWr5GI9zuHvcNm5nVj3UDCZxOHks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e3YBlNPP; arc=none smtp.client-ip=209.85.210.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7d55b97f358so837365a34.3
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 11:41:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773945670; x=1774550470; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wX6S1CdKc2mUwaozX73tCsBdgQ9rtIDSRhAEJ71WCy8=;
-        b=e3YBlNPPJhBndwM7QhT4+/pIvEfTThLD9Kaz/rhgubMYCHO0CTApNCHL5iZBhvjEax
-         ls+jMrI3ZcTgodf1ZwRhZJGu9d3A8VXSqKT8UAegFhlG7t9V/1bBQvfVTCPqiSwRLTiu
-         BpQ52b6SAhsk7jvEf8iMfZRsbZG6S8MFXHmIegtvHxOgXMVvknfRfIcRIthb3B9lyzb8
-         fEhwJwi9xjUVTtSGfX6oBOOuPIwXwAOBBq2fhy27GwAx29SLdJm7HhfMdjeasQtQmp6b
-         DpBUELMaW+feb6an/xsU/3W7Ed06XIMV5TQaA6ezebpHp+Ix4ZGztNJALnD76/rIhysZ
-         sWIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773945670; x=1774550470;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wX6S1CdKc2mUwaozX73tCsBdgQ9rtIDSRhAEJ71WCy8=;
-        b=hfxVrL32QMCZjUDL2dCPhfYgxYiqvNMUZ95GGaardq8CJ9dU/ddbZGRcQzxjknAWPm
-         KbHpXw/2cV6kpUqr9hlmp7ruCD8QdiSCA/jSRoAjlv6F93drhwca2ver+q5j0+qggzlL
-         D0ljlxZfcw5Txf0o+QOe16C7PN6yrAOXTGPvtoiLRkYDzpzBVx72CMcqB+D9Iymhxh/d
-         L0x3fbhlkXe33nXA81kvF/6oD6YZSL9pOR6fidNJxlo8eRpfQFJ5bZnUPcACetRRAeMx
-         CDhkenK9K9jRX6LnR1adC6LORO/kfkJBHoXetRCcgWGtyhlRUxBI2S6+tk1yvlzdYGGS
-         K7dA==
-X-Forwarded-Encrypted: i=1; AJvYcCWb8jhJHd6sWsE0/OEachJxIY0rZ7RBjWYbGtzoK6y0Qg7WEl1ataqyhWImoZ2emFNFVCRBnoc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0mkkNSSoCxqW3fzHXpBhbHhdQjXzF9pjAJ/8dV7hYbhp4H8sw
-	2S9A4PC006xu00g0W7DY1hlFGibAP2vpZVKLYUrCaAcdcOhnwBboUcYh
-X-Gm-Gg: ATEYQzz7O+M7ub6fwewJH2vbcpq+xlOh6ejv0yyjv5q7jn2ThHbvNnz7TwNI5DWgCI+
-	XPzuXEB+nN48pzhe4MIQuVgfgich1DRwgeXFwI4Wh2StuIiIz/+80FjI6CNrsWLSULcCthVeMJh
-	s5svWr9MMsHSAiibs8VXfKlfwkQnv7IOazzKxDkRseLJ4L0ReBBceVv5vlhFXBF2ye4WucT8Zs7
-	yNgy9Fx4zJjVMbPJMVQCh0ZX2acFLVHHds/UTzEj0+GFwnhBjyHi+vjIyrty5cIM0w1lO/peNXq
-	vUHyc8mcsDZboKush/jWGHbmRWifKcqBSDFZhMwFXeHdJQSgzkG8MDettM/dU4UqSc/RXb9M54v
-	YCvA+y51gTb6jrkX+vEQDW5gpHKET2O4z1IX64EQVlKipJAESZoDgx63uIcUEJxoHFvVgzPJYFS
-	isIMKeO/ed5fseTAIu3QU18Dn3S3hbpIytHkPmw9Dpk2lV6quTGCuNekKCR6qZXaBdeQ6bpaCB6
-	MYlRyEUCG4=
-X-Received: by 2002:a05:6830:700f:b0:7c7:6043:dd8f with SMTP id 46e09a7af769-7d7eaedc687mr238381a34.15.1773945669849;
-        Thu, 19 Mar 2026 11:41:09 -0700 (PDT)
-Received: from celestia.turtle.lan (static-23-234-115-121.cust.tzulo.com. [23.234.115.121])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d7eadcb757sm181486a34.15.2026.03.19.11.41.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2026 11:41:09 -0700 (PDT)
-From: Sam Edwards <cfsworks@gmail.com>
-X-Google-Original-From: Sam Edwards <CFSworks@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1773945690; c=relaxed/simple;
+	bh=S3RYxZBnPIH9300XbdvtlzSo24q7MLKJWIhHt0aLRdU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b0RZoCAmfi7UthKslmv6WbjPJ30OZtZerICgQe+X5+B+ATEfRKOKDCbvRXlSI0EEGBbuwkhHkR6dXYiUAcT1xpdGTODwBtv28T8M4ui7rfxQHsVnn5/p2h+4bymb++kR8rLfFbLr/uUNh0bMI6FmDSZk4kOahtgTikFHFiV1aIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Do61sLyk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773945688;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=F2o3jXF7hXDT9f0KG+mgyZzW3HnVvdN8MzMWPn4Lm0Y=;
+	b=Do61sLykWIh9SXQZzxhFNYMzP5ol0uMKJ7pGIQujc2hFpomQsfBZju+5lXD3+Kw4NCqoDn
+	TQLQ9dFGXeIiKk19K5XOuxr/+s8iKEou2zSm1NrurKsCSEZu6UyGAJu2sZ8kV38qcuA/nM
+	yeoB1gpefQI+39gPjHR9uojHmDsZilA=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-631-8PouI4f3OeCjy_dEtdITFA-1; Thu,
+ 19 Mar 2026 14:41:25 -0400
+X-MC-Unique: 8PouI4f3OeCjy_dEtdITFA-1
+X-Mimecast-MFC-AGG-ID: 8PouI4f3OeCjy_dEtdITFA_1773945683
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 45C89195609F;
+	Thu, 19 Mar 2026 18:41:22 +0000 (UTC)
+Received: from dcaratti.users.ipa.redhat.com (unknown [10.45.224.95])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BA1131953944;
+	Thu, 19 Mar 2026 18:41:18 +0000 (UTC)
+From: Davide Caratti <dcaratti@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Russell King <rmk+kernel@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Baruch Siach <baruch@tkos.co.il>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Sam Edwards <CFSworks@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v2 2/2] net: stmmac: Prevent indefinite RX stall on buffer exhaustion
-Date: Thu, 19 Mar 2026 11:40:31 -0700
-Message-ID: <20260319184031.8596-3-CFSworks@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260319184031.8596-1-CFSworks@gmail.com>
-References: <20260319184031.8596-1-CFSworks@gmail.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Victor Nogueira <victor@mojatatu.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org
+Subject: [PATCH net-next v4 0/3] netdevsim: support ETS offload
+Date: Thu, 19 Mar 2026 19:40:53 +0100
+Message-ID: <cover.1773945414.git.dcaratti@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -108,101 +78,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,bootlin.com,renesas.com,nxp.com,tkos.co.il,gmail.com,vger.kernel.org,lists.infradead.org];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-269617-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269618-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cfsworks@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[dcaratti@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	NEURAL_HAM(-0.00)[-0.803];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6F0F22D12AC
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.840];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tdc_config.py:url]
+X-Rspamd-Queue-Id: 6A15C2D1346
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The stmmac driver handles interrupts in the usual NAPI way: an interrupt
-arrives, the NAPI instance is scheduled and interrupts are masked, and
-the actual work occurs in the NAPI polling function. Once no further
-work remains, interrupts are unmasked and the NAPI instance is put to
-sleep to await a future interrupt. In the receive case, the MAC only
-sends the interrupt when a DMA operation completes; thus the driver must
-make sure a usable RX DMA descriptor exists before expecting a future
-interrupt.
+ - patch 1 moves netdevsim tc offloads to a dedicated file
+ - patch 2 enables ETS offload on netdevsim
+ - patch 3 is a tdc test for ets offload on netdevsim
 
-The main receive loop in stmmac_rx() exits under one of 3 conditions:
-1) It encounters a DMA descriptor with OWN=1, indicating that no further
-   pending data exists. The MAC will use this descriptor for the next
-   RX DMA operation, so the driver can expect a future interrupt.
-2) It exhausts the NAPI budget. In this case, the driver doesn't know
-   whether the MAC has any usable DMA descriptors. But when the driver
-   consumes its full budget, that signals NAPI to keep polling, so the
-   question is moot.
-3) It runs out of (non-dirty) descriptors in the RX ring. In this case,
-   the MAC will only have a usable descriptor if stmmac_rx_refill()
-   succeeds (at least partially).
+v2: don't use x-macro (Jakub Kicinski)
+v3: move function declaration from the bottom of netdevsim.h (Jakub Kicinski)
+v4: explicit path for ethtool in tdc_config.py (Victor Nogueira)
 
-Currently, stmmac_rx() lacks any check against scenario #3 and
-stmmac_rx_refill() failing: it will stop NAPI polling and unmask
-interrupts to await an interrupt that will never arrive, stalling the
-receive pipeline indefinitely.
+Davide Caratti (3):
+  netdevsim: move TC offload code to a dedicated file
+  netdevsim: support tc-ets offload
+  tc-testing: add a test case for ETS offload
 
-Fix this by checking if stmmac_rx_dirty() returns its maximal value,
-returning the full budget (which tells NAPI to keep polling) if so.
+ drivers/net/netdevsim/Makefile                |  2 +-
+ drivers/net/netdevsim/netdev.c                | 51 ------------
+ drivers/net/netdevsim/netdevsim.h             |  3 +
+ drivers/net/netdevsim/tc.c                    | 79 +++++++++++++++++++
+ .../tc-testing/tc-tests/qdiscs/ets.json       | 23 ++++++
+ tools/testing/selftests/tc-testing/tdc.py     |  3 +
+ .../selftests/tc-testing/tdc_config.py        |  1 +
+ 7 files changed, 110 insertions(+), 52 deletions(-)
+ create mode 100644 drivers/net/netdevsim/tc.c
 
-Fixes: 47dd7a540b8a ("net: add support for STMicroelectronics Ethernet controllers.")
-Cc: stable@vger.kernel.org
-Signed-off-by: Sam Edwards <CFSworks@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index f98b070073c0..05d3c548ce28 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -5604,6 +5604,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
- 	unsigned int desc_size;
- 	struct sk_buff *skb = NULL;
- 	struct stmmac_xdp_buff ctx;
-+	int budget = limit;
- 	int xdp_status = 0;
- 	int bufsz;
- 
-@@ -5870,6 +5871,12 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
- 	priv->xstats.rx_dropped += rx_dropped;
- 	priv->xstats.rx_errors += rx_errors;
- 
-+	/* If the RX queue is completely dirty, we can't expect a future
-+	 * interrupt; tell NAPI to keep polling.
-+	 */
-+	if (unlikely(stmmac_rx_dirty(priv, queue) == priv->dma_conf.dma_rx_size - 1))
-+		return budget;
-+
- 	return count;
- }
- 
 -- 
 2.52.0
 
