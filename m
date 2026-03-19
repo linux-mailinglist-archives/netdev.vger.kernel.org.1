@@ -1,257 +1,154 @@
-Return-Path: <netdev+bounces-269650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269651-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uGQoJH9ivGmLxwIAu9opvQ
-	(envelope-from <netdev+bounces-269650-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:54:23 +0100
+	id SCV2Jn1jvGmLxwIAu9opvQ
+	(envelope-from <netdev+bounces-269651-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:58:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F1462D267D
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:54:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DEFF2D26FA
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 21:58:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B8F2C30117C0
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:54:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9745C3016880
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 20:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED0F3EBF08;
-	Thu, 19 Mar 2026 20:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3061A3F9F5B;
+	Thu, 19 Mar 2026 20:58:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i5Da/vfQ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JL2MEzcg"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cFf520aw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DBCA36215A
-	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 20:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ABAF347BC9;
+	Thu, 19 Mar 2026 20:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773953660; cv=none; b=UBet+Nj2JIbv4AjUOttfrbLQQ8SdxEZ+kX2gFLeKUwxuLIP9s1CFR9Eh4tRE1edBoHx+XYTRIKO6JpjKqV5URNJhOeIojd0uR/z06rVnWULX+zi/dhwaOSdQjro5CwvVCvvEhw8DAd5TUnkVrqN2edoospTA2NAIlGdDt7U+Knc=
+	t=1773953912; cv=none; b=mOweINr9/EbQzOjZs37IPoXI28S/Nz99kITK3Q4SLQyQupnx2853vOXYYR0n5svfyInuqNPBQqXps+if1+L6ca3KcDRaIHILBg3dxMpRa0EZHTiwZln4wdZRgvp5CFTxUhU6z0+PtvkDbt8lsiXm5LwqtBdJGWwgLdCdAnvew1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773953660; c=relaxed/simple;
-	bh=OspvSUceR9D7FWErEaMeS4pbjFGXhTs0d3vC6fXFa4g=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nuCNLyxoXKC+ZFaPVv8ZZYGg+ZjlL1QNWHA78ZhwLoSyRGIScvPxoamdHkz5OzcW1GR2BKpDML8KwXcXVWPukNsfvq9w8ThHwwYBaaFDe33GjqQ9e35PPlCxuHdGJGs0Gz9/BJ437rTW1UfD+DCFkBMA3bWyjdfJZsizcq8qfiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i5Da/vfQ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JL2MEzcg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773953658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OspvSUceR9D7FWErEaMeS4pbjFGXhTs0d3vC6fXFa4g=;
-	b=i5Da/vfQQUDm2uf3tcOptZL5DQrMwOU6IgvDH0Pauitz+9D5T+97ikCR2+7agzhUNtoyau
-	EkkaDSiPmBCq74PTATbRJ5RACQag8VIgjeCDthLR9G6HJm3A097LBpFAl7XGMa26eyggq5
-	H0KlMWvFZDeJgXUcqrfHAFpp7i/aLcs=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-198-m4niJ5CzNz-oOJpF28wLVw-1; Thu, 19 Mar 2026 16:54:17 -0400
-X-MC-Unique: m4niJ5CzNz-oOJpF28wLVw-1
-X-Mimecast-MFC-AGG-ID: m4niJ5CzNz-oOJpF28wLVw_1773953656
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-5090bc4823cso102283451cf.3
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 13:54:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773953656; x=1774558456; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=OspvSUceR9D7FWErEaMeS4pbjFGXhTs0d3vC6fXFa4g=;
-        b=JL2MEzcgSbicNblhfTU1iXOAgbqxYIHkpSmAswQ7p1tadNZEPo7Aao7dQbRQbf2Ndo
-         qamwj58PsJlLevsNlswwEbbxNSHA0CFrLEmkL3z3sGZQ1qeTDA5pdtGjmnW06Loadzec
-         /pHRRyLXi70FNGLrizMJs34rv1Za+up24KeJciqCYoNbfHJ41C5hh/5Ur5uxwxpW2KmY
-         pJSyzChg2j5Be2PehooHZhj6lAUBIxnniAdVh1aJEV3MSyvWfhOH/xRmudYCdOhnR7Ij
-         B2QRYM8fpTJjriKRV95OzN7jUxCYWkmF7FmH11Kpk5NUhMwtnwA5Z/SV4tLvzTdzfT9M
-         ZV0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773953656; x=1774558456;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OspvSUceR9D7FWErEaMeS4pbjFGXhTs0d3vC6fXFa4g=;
-        b=GTdve+TE7WY8YgOnzvS4Ebc6H+LUUaQGMUkPFy5TLfdqt0oPEfRKfEwNW/0ai3xcrK
-         tufhSJp8IYzxoklNO05yd+TnXw4qpvv5sI69CAeDQSyDyO5dc6VyWr485TFG+8oFXck0
-         1Tehs3F+dHkw2/3GDLLhaF3fffGVLx6lTyV78t+6PFw5Gud2FsPlWUor0SOUWUfmpKsJ
-         JjyeqZg5bbbINnyTioqg3bBqs18JrjjRfDQOKwIvzTMVMrNDhJh9h8Mg03OOO3oJgaze
-         H9HCupyTYU6pDM9Id7pxvbWLH7fBnzMqQk6lJUxO/pyV6FAqbbxmLPmbSlkLGQCWt7K9
-         inrw==
-X-Forwarded-Encrypted: i=1; AJvYcCVtewjn1VNL2yR6oIZm6feW8KDbszOjdeksZcw8zA0DP1wUTlzshoTNzosTmpZnSViuJL8fhjY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWo9FncUgJV4gwFSG3/RVHtShGzqryUxjqsNoHOqh8I/CrurQo
-	vwRR0aElzIxgydaXC7JS2++f7YxGLN3BlooKcZ12P3p8A5jAtqhPscA1jzacSQ5t52tz7eqcBkO
-	pJfPyRGTfHa8TJTHmJME5Tikenpqr+eFNczwEMFwIObeVeYngN1QqsijEvQ==
-X-Gm-Gg: ATEYQzyDBZCp3GGkpeUTRYMQCIGtZrKc8CQ+R2i+xhsXLfF8kq+dyLFtkwC0nQwOQ3Y
-	9DkI0uJ5yMS32WG+gvZQonMjOL93yWtCB+WiqMKdmoni4xmuSz62eL6p3+wuBTJ1f0Lzvu2Mi0E
-	UIzfF0qRf/FJz3YqpjvksdVAnbkO7Np/kmB2TJpHQbSHamPC0DKA++AGsZYBMg5y5fPjbrabpFf
-	mJhZrisDmla4vsvTOKr1JnRcS+X6Oqq0Tl1Kd/rlTkwpAA85YFu4VUyu4hrLZ+fbLVxLLhRKTzF
-	xMpExdqjWb/nQu6E96ZSqQwUIcnXk75CUhexiOKSw3lDBo6KNpRWY32z9F3EaMDlZO5im6M4cRs
-	IGVs7o1CnbZuaUhY2Ul9+v5bnGKtBnVb33ZsPuRC1sYM2lkKG+4/BNMNkpru8C0atoFHokv0Ri1
-	XDk68aRAfaaJKrGA==
-X-Received: by 2002:ac8:7f54:0:b0:509:4e1e:1b9a with SMTP id d75a77b69052e-50b37586c7cmr10125341cf.54.1773953656260;
-        Thu, 19 Mar 2026 13:54:16 -0700 (PDT)
-X-Received: by 2002:ac8:7f54:0:b0:509:4e1e:1b9a with SMTP id d75a77b69052e-50b37586c7cmr10124851cf.54.1773953655634;
-        Thu, 19 Mar 2026 13:54:15 -0700 (PDT)
-Received: from thinkpad-p1.localdomain (pool-174-112-193-187.cpe.net.cable.rogers.com. [174.112.193.187])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b36e350c3sm6518601cf.19.2026.03.19.13.54.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2026 13:54:15 -0700 (PDT)
-Message-ID: <cf908b20e5f6237c887f6d751be82670d7cbd7b7.camel@redhat.com>
-Subject: Re: [PATCH net-next v9 0/6] net: stmmac: qcom-ethqos: add support
- for SCMI power domains
-From: Radu Rendec <rrendec@redhat.com>
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Bjorn
- Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>,
- Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski	 <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn	 <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet	
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni	
- <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
- Torgue <alexandre.torgue@foss.st.com>, Vinod Koul <vkoul@kernel.org>,
- Giuseppe Cavallaro	 <peppe.cavallaro@st.com>, Chen-Yu Tsai
- <wens@kernel.org>, Jernej Skrabec	 <jernej.skrabec@gmail.com>, Neil
- Armstrong <neil.armstrong@linaro.org>,  Kevin Hilman
- <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, Shawn Guo
- <shawnguo@kernel.org>,  Fabio Estevam <festevam@gmail.com>, Jan Petrous
- <jan.petrous@oss.nxp.com>, s32@nxp.com, Mohd Ayaan Anwar	
- <mohd.anwar@oss.qualcomm.com>, Romain Gantois <romain.gantois@bootlin.com>,
-  Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm
- <magnus.damm@gmail.com>, Maxime Ripard <mripard@kernel.org>,  Christophe
- Roullier <christophe.roullier@foss.st.com>, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, 	linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, 	linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org,  Drew Fustini
- <dfustini@tenstorrent.com>, linux-sunxi@lists.linux.dev,
- linux-amlogic@lists.infradead.org, 	linux-mips@vger.kernel.org,
- imx@lists.linux.dev, 	linux-renesas-soc@vger.kernel.org,
- linux-rockchip@lists.infradead.org, 	sophgo@lists.linux.dev,
- linux-riscv@lists.infradead.org, Bartosz Golaszewski	
- <bartosz.golaszewski@linaro.org>, Martin Blumenstingl	
- <martin.blumenstingl@googlemail.com>, Krzysztof Kozlowski	
- <krzysztof.kozlowski@oss.qualcomm.com>, Lad Prabhakar	
- <prabhakar.mahadev-lad.rj@bp.renesas.com>, Konrad Dybcio	
- <konrad.dybcio@oss.qualcomm.com>
-Date: Thu, 19 Mar 2026 16:54:12 -0400
-In-Reply-To: <CAMRc=MfNcK3MLndik1jy-yhHAph5=amnTGgn-MpXXG0Uv1ifpQ@mail.gmail.com>
-References: <20260316-qcom-sa8255p-emac-v9-0-c58934e76ff2@oss.qualcomm.com>
-	 <64d282fd94be1546df75d7df5b47eacc0479797a.camel@redhat.com>
-	 <CAMRc=MfNcK3MLndik1jy-yhHAph5=amnTGgn-MpXXG0Uv1ifpQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	s=arc-20240116; t=1773953912; c=relaxed/simple;
+	bh=iqBXral7BgXV4bBHSPIa7H+kMBPsRpoDN2FgeDnqQcQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hd0PLhrV0EYW8AZLCqAtqixGa2EwtLOZsJHFpn+8clYpwnzYqavtmIYk1yJ10NlMMrwM/xmjHXLcNQmPVkpl9QGLSIG+CkUn14QO84h+weg/sQ7Gz+zQEnJODGeiBkdjkYJ1of568QA0wnZqSWb4oCgpacnzgBP2m9a8ULWJ0QM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=cFf520aw; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=NGmSOgNeB1FXvQIqQTKt2rVV6pmaYTvcJ3vAUAdSCiE=; b=cFf520awxaoPx1Q5SlxcIAq7xt
+	zMFTIJKJa8EAX3CoWJ55y8kCHtyWYNYfA4fcs/m375os/ifexTPOHUV59O39qRiTr3aYCXdeIu3gS
+	M+lf0jguGwg2klBH04X5aa8PqwhLqWcKZF+lDHFHASDZkWNLF+0YkIWKLSlIhYGWzf121jQj8G4P0
+	K5WvInIwfHuQTF3+1/LbA5BUadpbHo4H0xCYWuiUdSMwiew0CR6nIBzIXT7QUb+R6pFRB1KWmRdF2
+	uHmMd8WhZsc0mWpLf4o+b1cL9VxoYGG5wfy34SwIS3bPuCkxYlvJ2a1uKc5zkgfz3J+OkzOA/SZXQ
+	GLk6Cd1w==;
+Received: from 2001-1c00-8d85-5700-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:5700:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1w3KRQ-00000006hEr-37ql;
+	Thu, 19 Mar 2026 20:58:04 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id D39FD3004F8; Thu, 19 Mar 2026 21:58:02 +0100 (CET)
+Date: Thu, 19 Mar 2026 21:58:02 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: x86@kernel.org, Nikolay Borisov <nik.borisov@suse.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	David Kaplan <david.kaplan@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Laight <david.laight.linux@gmail.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v7 07/10] x86/vmscape: Use static_call() for predictor
+ flush
+Message-ID: <20260319205802.GJ3738786@noisy.programming.kicks-ass.net>
+References: <20260319-vmscape-bhb-v7-0-b76a777a98af@linux.intel.com>
+ <20260319-vmscape-bhb-v7-7-b76a777a98af@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260319-vmscape-bhb-v7-7-b76a777a98af@linux.intel.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,st.com,linaro.org,baylibre.com,oss.nxp.com,nxp.com,bootlin.com,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,tenstorrent.com,lists.linux.dev,googlemail.com,bp.renesas.com];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-269650-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269651-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,vger.kernel.org,intel.com];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[36];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rrendec@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_GT_50(0.00)[51];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.989];
+	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.968];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6F1462D267D
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[noisy.programming.kicks-ass.net:mid,infradead.org:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4DEFF2D26FA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 2026-03-17 at 15:12 +0100, Bartosz Golaszewski wrote:
-> On Mon, Mar 16, 2026 at 7:31=E2=80=AFPM Radu Rendec <rrendec@redhat.com> =
-wrote:
-> >=20
-> > On Mon, 2026-03-16 at 13:05 +0100, Bartosz Golaszewski wrote:
-> > > Add support for the firmware-managed variant of the DesignWare MAC on
-> > > the sa8255p platform. This series contains new DT bindings and driver
-> > > changes required to support the MAC in the STMMAC driver.
-> > >=20
-> > > It also reorganizes the ethqos code quite a bit to make the introduct=
-ion
-> > > of power domains into the driver a bit easier on the eye.
-> > >=20
-> > > The DTS changes will go in separately.
-> >=20
-> > I'm seeing some weird behavior with this version. The probe part looks
-> > good (but see below), but when I try to bring an interface up, it fails
-> > with ETIMEDOUT. The relevant part of the stack trace leading to the
-> > error is this:
-> >=20
-> > dwmac4_dma_reset+0x208/0x220 [stmmac]
-> > stmmac_reset+0x2c/0x68 [stmmac]
-> > stmmac_init_dma_engine+0x108/0x400 [stmmac]
-> > stmmac_hw_setup+0x5c/0x538 [stmmac]
-> > __stmmac_open+0xc8/0x2a0 [stmmac]
-> > stmmac_open+0xcc/0x238 [stmmac]
-> > __dev_open+0x138/0x2a8
-> >=20
-> > Now dwmac4_dma_reset() is very simple. It sets the soft reset bit in
-> > the DMA_BUS_MODE register, then waits for the hardware to clear it, and
-> > that never happens.
-> >=20
-> > Now, getting back to the probe part, there is one extra message
-> > (compared to my previous successful test on v7), which I see at the
-> > very end of the probing:
-> >=20
-> > =C2=A0 qcom-ethqos 23040000.ethernet: clk_csr value out of range (0xfff=
-fff00
-> > =C2=A0 exceeds mask 0x00000f00), truncating
-> >=20
-> > This is a sa8775p ride board, so there are two stmmac devices. I only
-> > see that message for the 2nd one, which is also the one I'm trying to
-> > enable, and which fails.
-> >=20
-> > I realize this may or may not be related to your changes. But there is
-> > no way to test on a SCMI-pd board without them. I'm not sure how
-> > relevant it would be to test on the non-SCMI variant. I'm assuming the
-> > DMA part should work the same way (regardless of SCMI-pd), so if I can
-> > reproduce it there, and since I know it works on mainline Linux (that's
-> > where I tested v7), I could bisect and see which commit in net-next
-> > breaks it. If you don't have any better idea, let me know and I can
-> > try. Meanwhile, I'll keep poking at v9.
-> >=20
->=20
-> Does current net-next on its own still work? Or is the second
-> interface broken even without this series?
+On Thu, Mar 19, 2026 at 08:41:54AM -0700, Pawan Gupta wrote:
+> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+> index 68e2df3e3bf5..b75eda114503 100644
+> --- a/arch/x86/kernel/cpu/bugs.c
+> +++ b/arch/x86/kernel/cpu/bugs.c
+> @@ -144,6 +144,17 @@ EXPORT_SYMBOL_GPL(cpu_buf_idle_clear);
+>   */
+>  DEFINE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
+>  
+> +/*
+> + * Controls CPU Fill buffer clear before VMenter. This is a subset of
+> + * X86_FEATURE_CLEAR_CPU_BUF, and should only be enabled when KVM-only
+> + * mitigation is required.
+> + */
+> +DEFINE_STATIC_KEY_FALSE(cpu_buf_vm_clear);
+> +EXPORT_SYMBOL_GPL(cpu_buf_vm_clear);
+> +
+> +DEFINE_STATIC_CALL_NULL(vmscape_predictor_flush, write_ibpb);
+> +EXPORT_STATIC_CALL_GPL(vmscape_predictor_flush);
 
-I don't think there is a way to test net-next on its own (without your
-series) on a board with SCMI-pd firmware. It would require the
-qcom-ethqos driver to have direct access to the clocks, but the clocks
-would not be there.
+Does that want to be:
 
-What I could test though is a board with the "other" firmware (without
-SCMI-pd). And on that board, I do *not* see the problem even with your
-series applied. In fact, I tested the exact same kernel build I had
-previously tested on the SCMI-pd board.
+EXPORT_STATIC_CALL_TRAMP_GPL(vmscape_predictor_flush);
 
-I'm not sure what to make of that or what else I could try.
-
-FWIW, the "clk_csr value out of range" message I mentioned before is
-still there on the board where everything works, so it's probably a
-red herring.
-
---=20
-Radu
-
+The distinction being that if you only export the trampoline, modules
+can do the static_call() thing, but cannot do static_call_update().
 
