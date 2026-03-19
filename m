@@ -1,202 +1,203 @@
-Return-Path: <netdev+bounces-269329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269330-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kMYhHkGlu2lBmQIAu9opvQ
-	(envelope-from <netdev+bounces-269329-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:26:57 +0100
+	id EMEIK8qmu2mUmQIAu9opvQ
+	(envelope-from <netdev+bounces-269330-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:33:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBD832C7432
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:26:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEB082C750D
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 08:33:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BFEB230C5B40
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 07:25:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8F866300D0E6
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 07:33:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40B939E176;
-	Thu, 19 Mar 2026 07:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F2F39E176;
+	Thu, 19 Mar 2026 07:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="FeGMmXhl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I4jy+rzN"
 X-Original-To: netdev@vger.kernel.org
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011054.outbound.protection.outlook.com [52.101.65.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3172634E743;
-	Thu, 19 Mar 2026 07:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773905127; cv=fail; b=DAFawzAgd2N7OvC8VlEKEpN5kRG7QJG8U6x1TUKhaQIIkIYoofBuIXkZ5RUMiCDR3SXj02EfF3G67jaQsb+7gydVnLquQL7H/yqGhwQm8mPE3RBVqATIyVEpL1q+YFLrL6eMpBIm0TxKUjvnlCqGWR3IisLBsP/HrR4AMCUrkIU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773905127; c=relaxed/simple;
-	bh=1JIjsZndMRmXl4e5EmfVbJ5Bw40WtC/oJ1oJPUc9dsU=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=sdCKMWERqpVLGR/WqJdXPGgQSWCiStHBCLJ1wO26Wcx4AsnrVCXci42eKGD8ZHe/sfFByUU9KADp5dHc2xUE/q9aaJqUtN+Q7YK6nUK9/oiA30khXtsDvi/05cSDuIM1rfgwhzLM59MmdhcWRzAh7yKz4SZ97sRTPwdYOu0rfKk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=FeGMmXhl; arc=fail smtp.client-ip=52.101.65.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SxFYUjrAItUAj5oM0kmekYwSAbM9EbBMRzatv7hXGcldpnerW/XOEUkdE/ftjBanjeYl/uo65R21QeMP90DoiZmQCi9MNWnt0f/dxXbXkBVpz6X1cJRe6CQI2IEMj2ZAIl3GFtI8TxEDlIR4uVUbbvtpVit0iytX7Ao1G30ZbjnvmEA8l4fiQciCyhx8bb0kkqBmiKLCmC/atCxZFKluDrtIL2kRzzpv9QSfScr4DtlKw3E+AjjoA5KP8CGT0+Q4VSikK/ZM9pgJSjFpZBCjA2Oxp8ASecAXeBVR6rhS5cYwUrDoqog2XDtpAeQ3p8kCj7Lh1Gq3WwhU0JfvUiAHnQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mwWJWfII/HfUsn8WD5Qcd/rnYYVaml+vlEubIgQ/hGk=;
- b=qBAvbdK/kXaSQ/bQI7pfRDQvFevVcEq+xKzoGq6sKVDAOpHCKvjaqwnpZ4FFDV84MXxA65N7DmIBmm1ASUqx148Zdxh6BC6bImWGEO8c1Tb4CbnDb6GoY1h27zuMXUpJzrc4AAmQrgbQ8qxB2SKdMntyJQSNm82vZgjiTY1+MXJYgyu9z2+1jRUJDFm2oY/TsY0K+TRJbeOh3RGL3TN6JcRdyhT77BONlm3NPBtlyVkHE/qPHEN4lz40Fzrqh46zzb8udlq5LlqWYL1EvzXDbteo8pOMpR+Lq03ftLg60hMK5VTKahF9npZXsP4BqXIKC/+PXLBb0jfrtIfyND3B7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mwWJWfII/HfUsn8WD5Qcd/rnYYVaml+vlEubIgQ/hGk=;
- b=FeGMmXhlymEdZKeQDD/ht2VAwnIR3pjAsCdi2hSXf4u+kOk4pffJ5yG+SHeiVAPYMdQlQi+WZn5VFnERHAQi0Sc0j9CjfCj5cJ0wBEQpatfOPyenoADe2bLm7zq1rCBF1EaOb+p924t+Myvo8vG3WEMbTS6F9BCpcio+L01aCudbUNSsC7T/UrJTU1O8Z7FMkJspch7Wu2LRIl7YGU0XxgRETGRNEDEIgNOxBTRleI34u28UlWZj4t2C/WldxvfZdQT+Zl7ryJY78EqwXs6eMWTcZUEZ7vdk2dAAz7MlFWcyfqsyM0NxMZ/68QX1JbpuzsmHl1xsNWQqJgY9xLMBXQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by DUZPR04MB10064.eurprd04.prod.outlook.com (2603:10a6:10:4d3::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Thu, 19 Mar
- 2026 07:25:21 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::b476:c19a:24cd:3694]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::b476:c19a:24cd:3694%3]) with mapi id 15.20.9723.018; Thu, 19 Mar 2026
- 07:25:16 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E584390C8A
+	for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 07:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773905604; cv=none; b=iktm5sR6jxwzdsJO2R0yngkxZcfZCtXDB2U3b+OpI+Afumeh8Uw1h8nN32EZetrX1d5jEoRd6i3tulCiQ47Vl4fIVgNb0qWhQJUWKvgTZXspXQWnYsjtGOCdPm5MvM458UQ1bVerqia1oKg7OBecc5/Dyx78dcZneyvKMR11FYY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773905604; c=relaxed/simple;
+	bh=GYSppdIMaX/06nQtFbo2tTryX8SKqeX06P5GhztxMfM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R28Mx+86CQe6sl1OJFxh0pk1ScHP8ORt5sFqd/LTpeKfp4OizraE8RV1TVC/j0MFXg8N9ocx1WaW94zwRs+Q1CaZkqiaEzhXL5hehKTbgHlemArLt1uxugMdYStiNmp4ap5PSksQzs0pY7LKQJAWxsuHPGClGC86o2kEBEaCTZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I4jy+rzN; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-354a18c48b5so311661a91.1
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 00:33:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773905602; x=1774510402; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZLQ1MC6fP9cORHP27xWUIjVQ8sSQEHBL6tE36vI4nLE=;
+        b=I4jy+rzNBghX1ypUyWkKjJKoK+A8dGtAtS6sZ84wu/n+/oKSGo7OXZHhSGcetF7JLh
+         XxRaScyj3NYZFxFoSxJq7iuGeRzdoV2j60/J8nWjbOWRntc2AHiuHG+CTH4cgd7/a8K1
+         s+JWz2jGtSZ1HBI56SYkvqDem11cBccGl7Ui8K4DV02EhlKd/uNQ4ns6i3PXA9nzRwQS
+         VM/lNZIB+0/aKiYwSE+UpKLR3CExZckob9IT/Cb4YkaaQkDyBbBM9HOlhv84WvonrptE
+         cOiio+xiXBtgNJdpOvizbuUdF6/zNEDRcOuWuhiIOlMWyGbsDXemNLnUv7O5W6L/uKUs
+         X3gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773905602; x=1774510402;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZLQ1MC6fP9cORHP27xWUIjVQ8sSQEHBL6tE36vI4nLE=;
+        b=iW8Ao0HTVSJFGltadca3fTs9xMXkBCqGgIAjNCPSdwFoImSOAy5UAS8quqMdk469SV
+         FclQZHN2wbSG3UwgLP15VrX9jt379NCnkXw3tD4b29qnbQrXoaZ61kXSPfVBvCImyPV7
+         woQxJ3y7BkVv1Aoo3sUlLnsKoD5zAIIpZDasb6pLtShePpwkyqhEfKZlBBkZdVEeu193
+         chAmnDw8YsGgk9yAImpCjTXBoCbsDTDyx3fwIMEQtElRNvac/X9l/7t+ZmVhlp1iIq/A
+         1k7rRgTnQhUF37u13D5260r++rOsyM54I5NbnuCcEifeReIkTwDFjwjRa7pcsUPh9BIV
+         xP3A==
+X-Forwarded-Encrypted: i=1; AJvYcCWg9q8WsMCp3E1Kb7RBxXjEe8VNEA5JzX4NWB/DQIf11OYbhDQMgSSuU6zROqvxpDjO7ic1UxM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJc/q0F5UeGtKGNuvE5Tsa0qRVs2pFIQoJ06x7FycSnHhDclIz
+	RzzsHUVm33s3abbQm7kiLoA5m6gkGct74XWklsrHGehW8eQtoy5gIr2I
+X-Gm-Gg: ATEYQzzFNq5z++sPFahK4S6d0ybx4vz7Zug8T5mU5pZzeq6fABNjslc86DpQRdakiuA
+	2+UsWcbnuSIK/wvToPNsu5yJQ7AqOalEM5SB3n9J3Y7z8SYICvpQzrD46U+cEGwG+giCqMCU7ze
+	EVZ5HXr/+v9KhwhzoM9684Zbe9lgip1Qo2ZtTx/EKN1IBE5QdBFmR6hoszLCysT8DOIhDkUcqJh
+	w7gB8mOwqQnxdVW62dbovwknTt3Lz72jBN4HL4An/2nY5AXHhD53z6p+o69HpA1YZVjpTP/dvHA
+	I8Anis4dgPT/arB23AqK9/pg/eKO9WzvtkugsvgI6Ip1yNvq8F9RA/6YGL7tPSkKoujfEHOzqd2
+	t7LT+kgqapi1xAWDq3ZrBhtvO4tPAAhG7EamCiNy31SBeA83WN307Q98McA/gKghLkNBlldPxZf
+	TMwEabD137PxnGawRd+DX03ZnrDsmbRALMFQNSKFnP0g3asREx5LiOaH/NVr7QJe/IKpkZC85fL
+	1msZ15673I=
+X-Received: by 2002:a17:90a:e70d:b0:352:ba0f:fb28 with SMTP id 98e67ed59e1d1-35bb9e432f2mr5390169a91.1.1773905602343;
+        Thu, 19 Mar 2026 00:33:22 -0700 (PDT)
+Received: from SLSGDTSWING002.tail0ac356.ts.net ([129.126.109.177])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35bc6026a5asm2166870a91.8.2026.03.19.00.33.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2026 00:33:21 -0700 (PDT)
+From: bestswngs@gmail.com
+To: security@kernel.org
+Cc: edumazet@google.com,
 	davem@davemloft.net,
-	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	mkubecek@suse.cz
-Cc: netdev@vger.kernel.org,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: [PATCH net] net: enetc: fix the output issue of 'ethtool --show-ring'
-Date: Thu, 19 Mar 2026 15:27:16 +0800
-Message-Id: <20260319072716.511992-1-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MA5PR01CA0140.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:1b9::9) To PAXPR04MB8510.eurprd04.prod.outlook.com
- (2603:10a6:102:211::7)
+	xmei5@asu.edu,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH net] nfnetlink_osf: validate individual option lengths in fingerprints
+Date: Thu, 19 Mar 2026 15:32:44 +0800
+Message-ID: <20260319073243.1176330-2-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|DUZPR04MB10064:EE_
-X-MS-Office365-Filtering-Correlation-Id: d6107420-0caa-49a2-f689-08de8588aad1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|52116014|19092799006|1800799024|56012099003|18002099003|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	FnQLPKdaeqNV/wJrYx4dvU+Gdl+33lOI5p6DJTW0C3fG6fW30UmEMGDZfwOeO1t5C3pSIa1SdgybXxhLnox47wATub4ek5cnuTKvAUB+fLZ81JIvyNEqa72TMIqguqXMDKg5IKNPwUuZSBR0FLuFgpPuDAYQshVeeKOnhP8RpRdJbqpNp8o44TRsyPXrvwUwe/6sDXRluT5gyUpOaLPH56TxLssbN3D3RJ2u1m1Yiby7xV07SOY5whUDsEkMeDYo12c8JH4J5VARV3WPSFnPB/oQbzPhiFKRATqXBEw66VNJmHnzYAaV0iT03lNZbucae3uYaFkjfnpEYbmhR5tiPiZUcV3zA1ehil1Zwiz1aDCexxwJRMltClURzuems7NbuUaQ7dDK/BBE5OccZAFAmLu8MHFeAHcVpTcb6N3Wez2ovd/75Olj2QVxkspjIkg6XBDlzg3hoeS5bwes3WndHeEZtwG7NKDc97r6sfEhoIZ3v0D89ijGbMhiu96+jInu2JPLcWMHXVn9T8uwDxpflW5zChKiWa4HOwPcJx1LqnSKMSOlWzgT0fq876Ma1HBIOkBKHqKMjAiBgRk8Xu10IT2SpGaL5tIk/LR3ePE2G3l3jwmsUAcGpG6a9QTZQpLDpAUVw+CGV8i3KfUw9j9lL6p2vFnzTR+/oZffPy4HvcGch+GQC9Pe0kqZthHlkQcdGzj5J4hTr0VehvRO9FynKiHkFcQuWyyqx298WuD1SQ2LOWJOjcnG73Ls2qxLnNCC5F8JmBv+y+QQsKNng77RPy/KeTOOz3/wME0FMLtCDnI=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(52116014)(19092799006)(1800799024)(56012099003)(18002099003)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?oufV8tLMUS29B0wGghx6XJfKbxrezrqU6qsQhmhktx+GrMMdfdxUzhnXL9iV?=
- =?us-ascii?Q?eUOYZ0cAC0NH/6ozDNBTWLM3AKFRcBzHFwNt0+XsL8NaUmVVscyTeV/y5xc9?=
- =?us-ascii?Q?28H2RkufJ62IJTJ8p9AorHaJTeSqatLqtVczEV47CWuL5gzC455WgqpOY7R9?=
- =?us-ascii?Q?UPREn9VdLDikDifKThBaSC9FLECUkSI+7ACE4EQOy+iNYBhd7zlBTMJk9BGi?=
- =?us-ascii?Q?Mpa8347qyp6Y7HUXC+GvTw7IYGSzCjDEwk2eWwTiMbcRYzklwyZWMzuXHIl6?=
- =?us-ascii?Q?WOfbCDDSv2lFcoZLFVD14dOCXwdvyNioj3qI97XyYI7vmVIemapNqciMkTNB?=
- =?us-ascii?Q?HmLB5bl/O58YerDGsuIx7KG3BqcwKrflKk163Vbi5RlIhC6DdLvS5u7E0mnU?=
- =?us-ascii?Q?2zOZTdi81fnrAWGOylWALDCOTdVSgtkCRSl+D5k7SwK1xxxoIeCuntFL0I+a?=
- =?us-ascii?Q?Xe5IRxeUmYC/ZEk6q+ZyogMLqKk/O7zqaDyxJjJcJ9sPHK8UTclBt4Xv1Rz6?=
- =?us-ascii?Q?JxlAnHFai7PPGP0Bzqlx010AcDxzAzwbShy0K5HHbDigfA29D3roQQ5K0oM2?=
- =?us-ascii?Q?QWvcYzuioF56xiItltVD/j+Fl1Bq9XbCH+RyN8qtU2nDPLZ7XqaxKY1dZVXG?=
- =?us-ascii?Q?LAUvAc8m0ok/MfFfk/ty5ixZgeILv+quhaWl4Lv61GMzIGVmjnLI4mv3KIG5?=
- =?us-ascii?Q?G1zX0C9gJ8N1k9e2OquCJOu4i4P09FVN9Gu2yb6EImgy6tOlGMW6dGrEYggH?=
- =?us-ascii?Q?qkfD5njoz2zTGhlFJ2E/y+2rlb5e0TSOoCDDB6wBEugDXPM3RiqhxN0tbRfJ?=
- =?us-ascii?Q?qr79oOBalQeeN/QuMG9b5VXN8vQyMejNJV/dmRFRN3FD7UXOtv4cNTLzYFdB?=
- =?us-ascii?Q?aCv1s0Zp4xLvOLGOo3BPF6mPY4CuRNo8aURqN4DsNZ2aJmSV36A5G6DTOKB9?=
- =?us-ascii?Q?6RFzin+YgWQah1GXnrlRebquy2C4op94wXfmiaPWAZT69quPKhAOxTDBS94m?=
- =?us-ascii?Q?rWWN9j8T5B2JGgCFePiVLGTcCiq2sMLrIT1feFWz/ecrLawc50ol2zvsyk2m?=
- =?us-ascii?Q?saYzhsummV51u+e2iBatrLxtNNw9AXt7CfJJty/M6XYo3jyghNxKD62yDxGj?=
- =?us-ascii?Q?D7aaWaUlk+wIY3JqKznSr0PCJ6ahlHSLXgcSHTt5poXs2SWNKABH86Zp5HAw?=
- =?us-ascii?Q?tDkdLONhUIItnthD6XUVHhN1C/p+wf3gprmEebDbSAV65UEsSsaqq6ktWPij?=
- =?us-ascii?Q?IDKQIU4C8RIphN3Agao75K9wqp5cj5aYyvUJlqAxguUngkQw+ErZxUKjDEo+?=
- =?us-ascii?Q?VkjPvpjcDIqtX/o2Kx50aven7t95dfKvPsoqka4HTVNGVuBLa0AQ8+W1I4bc?=
- =?us-ascii?Q?KH6aY+XhcktOpySak0SmIpNlsobVdsxOTyDAM6QLjNuOT9wdnVipphPZ9zGB?=
- =?us-ascii?Q?sLxY6oKdmGDTenWxqUZtQPO3kNtrrIXAOqJtliimBuAY0gCWwl++cNsANXy7?=
- =?us-ascii?Q?JI/2zGtVQ9mD3425sNKGyJxf3vjdNLhinDQWpnIrQMakuwZdg+q9/H8JSFwE?=
- =?us-ascii?Q?Z/TWlJ54cf/ai2d37GR16CSHHDZ5ro9aU3S7cRnRgJqn5L4C/SrI9eDbkKGs?=
- =?us-ascii?Q?OQxIbV1bEJ5RsZ7NA0KLVSi7Tqy4bLdk/RZA9r/fD1nRspMFgZcf5lM/7GMw?=
- =?us-ascii?Q?5zqq7PpcGOePkzacyMFiFMhqJShUkb6lZFJAlxl4D4uS7j75?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d6107420-0caa-49a2-f689-08de8588aad1
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2026 07:25:16.4150
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4dcNDUXyISB46ObmlW+//Oqr69w0UThrTkPWU1U4Vl1hC9h4aqw7UaZa/pdjqzkxQwejszgWlufatVXS2bmLgw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB10064
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-269329-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,vger.kernel.org,asu.edu,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269330-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NO_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-0.969];
-	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.925];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:dkim,nxp.com:email,nxp.com:mid]
-X-Rspamd-Queue-Id: CBD832C7432
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AEB082C750D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Currently, enetc_get_ringparam() only provides rx_pending and tx_pending,
-but 'ethtool --show-ring' no longer displays these fields. Because the
-ringparam retrieval path has moved to the new netlink interface, where
-rings_fill_reply() emits rx_pending/tx_pending only if the corresponding
-rx_max_pending/tx_max_pending values are non-zero. So rx_max_pending and
-tx_max_pending to are added to enetc_get_ringparam() to fix the issue.
+From: Weiming Shi <bestswngs@gmail.com>
 
-Fixes: e4a1717b677c ("ethtool: provide ring sizes with RINGS_GET request")
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
+nfnl_osf_add_callback() validates opt_num bounds and string
+NUL-termination but does not check individual option length fields.
+A zero-length option causes nf_osf_match_one() to enter the option
+matching loop even when foptsize sums to zero, which matches packets
+with no TCP options where ctx->optp is NULL:
+
+ Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN NOPTI
+ KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+ RIP: 0010:nf_osf_match_one (net/netfilter/nfnetlink_osf.c:98)
+ Call Trace:
+  <IRQ>
+  nf_osf_match (net/netfilter/nfnetlink_osf.c:227)
+  xt_osf_match_packet (net/netfilter/xt_osf.c:32)
+  ipt_do_table (net/ipv4/netfilter/ip_tables.c:293)
+  nf_hook_slow (net/netfilter/core.c:623)
+  ip_local_deliver (net/ipv4/ip_input.c:262)
+  ip_rcv (net/ipv4/ip_input.c:573)
+  </IRQ>
+ Kernel panic - not syncing: Fatal exception in interrupt
+
+Additionally, an MSS option (kind=2) with length < 4 causes
+out-of-bounds reads when nf_osf_match_one() unconditionally accesses
+optp[2] and optp[3] for MSS value extraction.  While RFC 9293
+section 3.2 specifies that the MSS option is always exactly 4
+bytes (Kind=2, Length=4), the check uses "< 4" rather than
+"!= 4" because lengths greater than 4 do not cause memory
+safety issues -- the buffer is guaranteed to be at least
+foptsize bytes by the ctx->optsize == foptsize check.
+
+Reject fingerprints where any option has zero length, or where an MSS
+option has length less than 4, at add time rather than trusting these
+values in the packet matching hot path.
+
+Fixes: 11eeef41d5f6 ("netfilter: passive OS fingerprint xtables match")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 ---
- drivers/net/ethernet/freescale/enetc/enetc_ethtool.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/netfilter/nfnetlink_osf.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-index fed89d4f1e1d..0818a6e8e6db 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-@@ -813,6 +813,8 @@ static void enetc_get_ringparam(struct net_device *ndev,
- {
- 	struct enetc_ndev_priv *priv = netdev_priv(ndev);
- 
-+	ring->rx_max_pending = SZ_64K;
-+	ring->tx_max_pending = SZ_64K;
- 	ring->rx_pending = priv->rx_bd_count;
- 	ring->tx_pending = priv->tx_bd_count;
- 
--- 
-2.34.1
+diff --git a/net/netfilter/nfnetlink_osf.c b/net/netfilter/nfnetlink_osf.c
+index 94e3eac5743a..c35b831dac5a 100644
+--- a/net/netfilter/nfnetlink_osf.c
++++ b/net/netfilter/nfnetlink_osf.c
+@@ -303,6 +303,7 @@ static int nfnl_osf_add_callback(struct sk_buff *skb,
+ 	struct nf_osf_user_finger *f;
+ 	struct nf_osf_finger *kf = NULL, *sf;
+ 	int err = 0;
++	int i;
 
+ 	if (!capable(CAP_NET_ADMIN))
+ 		return -EPERM;
+@@ -318,6 +319,13 @@ static int nfnl_osf_add_callback(struct sk_buff *skb,
+ 	if (f->opt_num > ARRAY_SIZE(f->opt))
+ 		return -EINVAL;
+
++	for (i = 0; i < f->opt_num; i++) {
++		if (!f->opt[i].length)
++			return -EINVAL;
++		if (f->opt[i].kind == OSFOPT_MSS && f->opt[i].length < 4)
++			return -EINVAL;
++	}
++
+ 	if (!memchr(f->genre, 0, MAXGENRELEN) ||
+ 	    !memchr(f->subtype, 0, MAXGENRELEN) ||
+ 	    !memchr(f->version, 0, MAXGENRELEN))
+--
+2.43.0
 
