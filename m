@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-269555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269556-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gPyMFKsrvGn4twIAu9opvQ
-	(envelope-from <netdev+bounces-269555-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:00:27 +0100
+	id YLs4M5QrvGn4twIAu9opvQ
+	(envelope-from <netdev+bounces-269556-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:00:04 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A46C82CF478
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:00:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F8A32CF453
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 18:00:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 38EEC325A89D
-	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:51:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C089F32B1BD4
+	for <lists+netdev@lfdr.de>; Thu, 19 Mar 2026 16:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D1C3EB819;
-	Thu, 19 Mar 2026 16:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE0A3ED5CE;
+	Thu, 19 Mar 2026 16:51:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CPlA2Hou"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2zq92Xp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54CC33E556B;
-	Thu, 19 Mar 2026 16:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C3A3ED121;
+	Thu, 19 Mar 2026 16:51:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773939078; cv=none; b=YlLwG0DWp3CWv9zxHIoTqMs9nXFCMvzlwxGlcQt/drxsv1xnjDFAJVcEX30i3p1e3P4h8AvYagUl5LbuShbjKLSD8yJuwAczTTOQ4lZii9ACQ0LSx7JXSWxyniVhEXFalYqIOEBX1DJPIn0Vyo/sg6rUZAirSBHo3qZ9BMzbSOE=
+	t=1773939085; cv=none; b=dHSAfjERD8FlPQ8g7ZaSTAo0hHl7Vhf7BZJShWmyz1xFPHxD0h6jS6Ggkvm/7ihMyqvWx9Bf1OSGVtOF2bwZaQOUlXMtqmZYs3QQhdMPc/hKA7LTOeQuWAAfk4LOHzNHmXS1ndfOzQ9U100GEdTwNnOWvef4UBVReWM23ZvBZl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773939078; c=relaxed/simple;
-	bh=iL5eYh59l7EnTE8x2HzIToT3IPqQ1IexUOy86xguE08=;
+	s=arc-20240116; t=1773939085; c=relaxed/simple;
+	bh=qXGdfuU2IWvRMJ+ampR0qN7gIHjvWV67g9w8g1u3QRk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pPiIRQXNY2yMsA+pxAqH5snnBst2MGmcDzPtByrCB/Rgn19ON0KHwlcQXxOTy/X9iEsuVK70Kk5kFcRRXasOKrVWQKloPsK2qrhb6ieK83yCs++j4lSDKHBzS3baEUn7EyQ7Z8DBxB6nMWkRnOzdGpZ4oCz3snc3FcxNa6cLmvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CPlA2Hou; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F142DC19424;
-	Thu, 19 Mar 2026 16:51:15 +0000 (UTC)
+	 MIME-Version; b=G2G28fuXXq4VbItEkKwuGOlHYEepNFWxzWxbnMAb3h97TlQEgOymUWlQdeqygBmpf2o4W5Whtr9CUy7O/I5iOq2bR8R5z7529gFvzPWzj2u5e1c060D4UEdehpWDM1oc21RILumznhtjfmTpIxmpq12st2bhom7FqKqVF9641Ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a2zq92Xp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 757B5C19424;
+	Thu, 19 Mar 2026 16:51:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773939077;
-	bh=iL5eYh59l7EnTE8x2HzIToT3IPqQ1IexUOy86xguE08=;
+	s=k20201202; t=1773939085;
+	bh=qXGdfuU2IWvRMJ+ampR0qN7gIHjvWV67g9w8g1u3QRk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CPlA2HouK74FyFpyPK9ywdOYDvERQ6UmBtZZHpbGU0zDT3ymIfszu/h/79KHRPoN8
-	 ZqTyTVSXj8CfUiKKwUQF/dewe/ITDSnf8EusjAr0o9ucIq7YpcIgi0XZsIYYpz894x
-	 VEB37gsyN9S8LnnrkqVHR85UJEWVkN1Vjr0mAvjw4xAeEm3RveRnmzSCL0RaYO7+qc
-	 d1KJi+oPPJfYAPwaMc4hCgU1+bL5LeaNoljrsCrwdAJObwRDG26uPd5C7cN5oWAofl
-	 FlRZhqOgrWlQDSPXgcX9FpJa1Axi3GkV4DPxO0TjKZ45rNnI5tyJDnYlegwhuTWefV
-	 Qvc6F7o3bRg7A==
+	b=a2zq92XpdjBDPhhnMRlSWq4Cnq2bAos4ffZHCTCFwO/ocPaY5vRqpN3i1AJjbjb28
+	 FiKK9xe8nxMQBISYvHAYlg3+ECyi3E8O1Ta2C4IVU9ysbDxlX3BGLquPO4wOnbhFzj
+	 vRXSilz0lY9bBn8RcZIEWjqKUpIqdj2q0vggTexujBYOVZvlisAOAYtVhEE/BkYeO+
+	 iMKuQJ3w2ERpZ5iWTf0vT+bgCzsON8dKgMpJAG+kQZlEiGSJFXisF2zMrmiLu9x2UQ
+	 pqUYyDDNLbie3KbtU01d4nUMj/c1jkAgaIBcFkTU5yORMg0XspxDtESV7MDT5JCxoa
+	 rjFbHPotuHlgg==
 From: Simon Horman <horms@kernel.org>
 To: mail@birger-koblitz.de
 Cc: Simon Horman <horms@kernel.org>,
@@ -55,12 +55,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	kuba@kernel.org,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net
-Subject: Re: [PATCH net-next v2 1/2] r8152: Add support for 5Gbit Link Speeds and EEE
-Date: Thu, 19 Mar 2026 16:51:00 +0000
-Message-ID: <20260319165100.1988286-1-horms@kernel.org>
+Subject: Re: [PATCH net-next v2 2/2] r8152: Add support for the RTL8157 hardware
+Date: Thu, 19 Mar 2026 16:51:18 +0000
+Message-ID: <20260319165118.1988383-1-horms@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260317-rtl8157_next-v2-1-10ea1fa488d1@birger-koblitz.de>
-References: <20260317-rtl8157_next-v2-1-10ea1fa488d1@birger-koblitz.de>
+In-Reply-To: <20260317-rtl8157_next-v2-2-10ea1fa488d1@birger-koblitz.de>
+References: <20260317-rtl8157_next-v2-2-10ea1fa488d1@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +83,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269555-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269556-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
@@ -91,12 +91,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.950];
+	NEURAL_HAM(-0.00)[-0.965];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url]
-X-Rspamd-Queue-Id: A46C82CF478
+X-Rspamd-Queue-Id: 4F8A32CF453
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -105,130 +105,189 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-r8152: Add support for 5Gbit Link Speeds and EEE
+r8152: Add support for the RTL8157 hardware
 
-The RTL8157 supports 5GBit Link speeds. This commit adds support for this
-speed in the setup and setting/getting through ethtool, along with 5GBit
-EEE functionality for setup and ethtool get/set methods.
-
-> The RTL8157 supports 5GBit Link speeds. Add support for this speed
-> in the setup and setting/getting through ethool. Also add 5GBit EEE.
-                                          ^^^^^^
-This isn't a bug, but there's a typo: 'ethool' should be 'ethtool'.
+The RTL8157 uses a different packet descriptor format compared to the
+previous generation of chips. The commit adds support for the new format,
+SRAM and ADV access interfaces, and consolidates RTL8156/RTL8156B/RTL8157
+initialization into a single function.
 
 > diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-> index 3b6d4252d34c..bab8e10e5f99 100644
+> index bab8e10e5f99..05531ea43791 100644
 > --- a/drivers/net/usb/r8152.c
 > +++ b/drivers/net/usb/r8152.c
 
 [ ... ]
 
-> @@ -6343,15 +6356,20 @@ static int rtl8152_set_speed(struct r8152 *tp, u8 autoneg, u32 speed, u8 duplex,
->  			r8152_mdio_write(tp, MII_CTRL1000, new1);
->  	}
+> @@ -6151,15 +6562,24 @@ static void rtl8156_enable(struct r8152 *tp)
+>  	u32 ocp_data;
+>  	u16 speed;
 >
-> -	if (tp->support_2500full) {
-> +	if (tp->support_2500full || tp->support_5000full) {
->  		orig = ocp_reg_read(tp, OCP_10GBT_CTRL);
-> -		new1 = orig & ~MDIO_AN_10GBT_CTRL_ADV2_5G;
-> +		new1 = orig & ~(MDIO_AN_10GBT_CTRL_ADV2_5G | MDIO_AN_10GBT_CTRL_ADV5G);
->
->  		if (advertising & RTL_ADVERTISED_2500_FULL) {
->  			new1 |= MDIO_AN_10GBT_CTRL_ADV2_5G;
->  			tp->ups_info.speed_duplex = NWAY_2500M_FULL;
->  		}
->
-> +		if (advertising & RTL_ADVERTISED_5000_FULL) {
-> +			new1 |= MDIO_AN_10GBT_CTRL_ADV5G;
-> +			tp->ups_info.speed_duplex = NWAY_5000M_FULL;
-> +		}
+> +	if (tp->version <= RTL_VER_16)
+> +		return rtl_enable(tp);
 > +
->  		if (orig != new1)
->  			ocp_reg_write(tp, OCP_10GBT_CTRL, new1);
+>  	ocp_data = ocp_read_word(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL4);
+
+Does this early return make the code after line 6581 unreachable for all
+current versions? RTL_VER_16 has the value 17 in the enum (the highest
+defined version), so 'tp->version <= RTL_VER_16' is always true for
+VER_10, VER_11, VER_12, VER_13, VER_15, and VER_16 (all versions
+assigned to use rtl8156_enable).
+
+This skips several hardware configuration steps for existing RTL8156 and
+RTL8156B devices that the old rtl8156_enable and rtl8156b_enable functions
+performed:
+
+1. PLA_MAC_PWR_CTRL4 IDLE_SPDWN_EN configuration (speed-dependent idle
+   power management)
+2. PLA_EEE_TXTWSYS configuration for VER_10/11 (EEE TX timer values)
+3. USB_L1_CTRL L1 NYET HIRD configuration when USB speed is USB_SPEED_HIGH
+4. USB_FW_TASK FC_PATCH_TASK clear/set cycle (firmware patch task toggle)
+
+Before this patch, both rtl8156_enable (VER_10/11) and rtl8156b_enable
+(VER_12/13/15) executed all of these operations unconditionally.
+
+> @@ -6167,10 +6587,12 @@ static void rtl8156_enable(struct r8152 *tp)
+>
+>  	if (is_flow_control(speed))
+>  		ocp_data |= IDLE_SPDWN_EN;
+> +	else
+> +		ocp_data &= ~IDLE_SPDWN_EN;
+>
+>  	ocp_write_word(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL4, ocp_data);
+>
+> -	if (tp->version == RTL_VER_10 || tp->version == RTL_VER_11)
+> +	if (tp->version <= RTL_VER_11)
+>  		ocp_write_word(tp, MCU_TYPE_PLA, PLA_EEE_TXTWSYS, 0x11);
+>  	else
+>  		ocp_write_word(tp, MCU_TYPE_PLA, 0xd4d4, 0);
+> @@ -6183,12 +6605,9 @@ static void rtl8156_enable(struct r8152 *tp)
+>  	ocp_byte_clr_bits(tp, MCU_TYPE_USB, USB_L1_CTRL, L1_NYET_HIRD_MASK);
+>
+>  	if (tp->udev->speed == USB_SPEED_HIGH) {
+> -		u16 val = L1_NYET_HIRD_DEFAULT;
+> -
+>  		/* Bits [3:0] HIRD */
+> -		ocp_data = ocp_read_byte(tp, MCU_TYPE_USB, USB_L1_CTRL);
+> -		ocp_data &= ~L1_NYET_HIRD_MASK;
+> -		ocp_data |= val & L1_NYET_HIRD_MASK;
+> +		ocp_data = L1_NYET_HIRD_DEFAULT & L1_NYET_HIRD_MASK;
+> +		ocp_byte_set_bits(tp, MCU_TYPE_USB, USB_L1_CTRL, ocp_data);
+>  		ocp_write_byte(tp, MCU_TYPE_USB, USB_L1_CTRL, ocp_data);
 >  	}
-
-Does r8156_ups_flags() handle the new NWAY_5000M_FULL value?
-
-Looking at r8156_ups_flags() in drivers/net/usb/r8152.c, the function
-switches on tp->ups_info.speed_duplex:
-
-static u16 r8156_ups_flags(struct r8152 *tp)
-{
-	u16 ups_flags = 0;
-
-	if (tp->ups_info.green)
-		ups_flags |= UPS_FLAGS_EN_GREEN;
-
-	if (tp->ups_info.aldps)
-		ups_flags |= UPS_FLAGS_EN_ALDPS;
-
-	if (tp->ups_info.eee)
-		ups_flags |= UPS_FLAGS_EN_EEE;
-
-	if (tp->ups_info.flow_control)
-		ups_flags |= UPS_FLAGS_EN_FLOW_CONTROL;
-
-	if (tp->ups_info.eee_ckdiv)
-		ups_flags |= UPS_FLAGS_EN_EEE_CKDIV;
-
-	if (tp->ups_info._10m_ckdiv)
-		ups_flags |= UPS_FLAGS_EN_10M_CKDIV;
-
-	if (tp->ups_info.eee_cmod_lv)
-		ups_flags |= UPS_FLAGS_EEE_CMOD_LV_EN;
-
-	if (tp->ups_info._250m_ckdiv)
-		ups_flags |= UPS_FLAGS_250M_CKDIV;
-
-	switch (tp->ups_info.speed_duplex) {
-	case FORCE_10M_HALF:
-		ups_flags |= ups_flags_speed(0);
-		break;
-	case FORCE_10M_FULL:
-		ups_flags |= ups_flags_speed(1);
-		break;
-	case FORCE_100M_HALF:
-		ups_flags |= ups_flags_speed(2);
-		break;
-	case FORCE_100M_FULL:
-		ups_flags |= ups_flags_speed(3);
-		break;
-	case NWAY_10M_HALF:
-		ups_flags |= ups_flags_speed(4);
-		break;
-	case NWAY_10M_FULL:
-		ups_flags |= ups_flags_speed(5);
-		break;
-	case NWAY_100M_HALF:
-		ups_flags |= ups_flags_speed(6);
-		break;
-	case NWAY_100M_FULL:
-		ups_flags |= ups_flags_speed(7);
-		break;
-	case NWAY_1000M_FULL:
-		ups_flags |= ups_flags_speed(8);
-		break;
-	case NWAY_2500M_FULL:
-		ups_flags |= ups_flags_speed(9);
-		break;
-	default:
-		break;
-	}
-
-	return ups_flags;
-}
-
-When rtl8152_set_speed() sets tp->ups_info.speed_duplex = NWAY_5000M_FULL
-and r8156_ups_en(enable=true) subsequently calls r8156_ups_flags(), the
-switch falls through to the default case and no speed bits are set in the
-UPS flags word.
-
-Is the UPS power management configuration incorrect for 5Gbit link speeds
-without a case for NWAY_5000M_FULL in r8156_ups_flags()?
-
-This path is activated by the next commit in the series (58ba3b6c476d
-'r8152: Add support for the RTL8157 hardware') which sets
-support_5000full = 1.
 
 [ ... ]
+
+> @@ -8252,25 +8725,27 @@ static int r8156b_init(struct r8152 *tp)
+>  		}
+>  	}
+>
+> -	ocp_data = ocp_read_word(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3);
+> -	ocp_data &= ~PLA_MCU_SPDWN_EN;
+> -	ocp_write_word(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3, ocp_data);
+> +	if (tp->version != RTL_VER_16)
+> +		ocp_byte_clr_bits(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3, PLA_MCU_SPDWN_EN);
+
+Is ocp_byte_clr_bits() the correct function here? PLA_MCU_SPDWN_EN is
+defined as BIT(14) (0x4000), which requires 16-bit access. ocp_byte_clr_bits()
+performs an 8-bit read/modify/write via ocp_read_byte/ocp_write_byte,
+accessing only bits 0-7 of the register. Bit 14 is outside the byte range.
+
+All other call sites that manipulate PLA_MCU_SPDWN_EN in this file use
+ocp_read_word/ocp_write_word or ocp_word_clr_bits for 16-bit access:
+
+drivers/net/usb/r8152.c:rtl8156_down() {
+    ocp_data = ocp_read_word(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3);
+    ocp_data |= PLA_MCU_SPDWN_EN;
+    ocp_write_word(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3, ocp_data);
+}
+
+The old r8156_init code (and r8156b_init before consolidation) used
+ocp_read_word/ocp_write_word.
+
+This affects RTL_VER_12, RTL_VER_13, and RTL_VER_15 (RTL8156B) during
+initialization, leaving the MCU speed-down feature incorrectly enabled.
+
+[ ... ]
+
+> @@ -8147,42 +8508,33 @@ static void r8157_hw_phy_cfg(struct r8152 *tp)
+>  	rtl_phy_patch_request(tp, true, true);
+>
+>  	ret = r8153_phy_status(tp, 0);
+> +	if (ret < 0)
+> +		return;
+
+Can this error check work correctly? r8153_phy_status() is declared as
+returning u16:
+
+drivers/net/usb/r8152.c:
+static u16 r8153_phy_status(struct r8152 *tp, u16 desired)
+
+but r8157_hw_phy_cfg() stores the result in 'int ret' and checks
+'if (ret < 0)'. A u16 value assigned to int is always non-negative
+(0-65535), so the condition can never be true.
+
+drivers/net/usb/r8157_hw_phy_cfg() {
+    int ret;
+    ...
+    ret = r8153_phy_status(tp, 0);
+    if (ret < 0)  /* never true for u16 -> int */
+        return;
+    ...
+    ret = r8153_phy_status(tp, PHY_STAT_LAN_ON);
+    if (ret < 0)  /* never true for u16 -> int */
+        return;
+}
+
+The other hw_phy_cfg functions (r8156_hw_phy_cfg, r8156b_hw_phy_cfg)
+use 'u16 data' and don't attempt error handling on r8153_phy_status().
+
+If the device becomes inaccessible during r8153_phy_status(), the function
+continues to program PHY registers with potentially invalid values instead
+of returning early.
+
+[ ... ]
+
+> @@ -8191,59 +8543,180 @@ static int r8156_init(struct r8152 *tp)
+>
+>  	ocp_data = ocp_read_byte(tp, MCU_TYPE_USB, USB_MISC_1);
+>  	if (ocp_data & PCUT_STATUS) {
+
+[ ... ]
+
+> +	if (tp->version != RTL_VER_16)
+> +		ocp_byte_clr_bits(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3, PLA_MCU_SPDWN_EN);
+
+Same issue as above - is ocp_byte_clr_bits() the correct function for
+clearing BIT(14)? PLA_MCU_SPDWN_EN is 0x4000, which exceeds the 8-bit range.
+
+The bit clear operation will fail silently because the 8-bit value read by
+ocp_byte_clr_bits() cannot represent bit 14. This leaves PLA_MCU_SPDWN_EN
+set when it should be cleared for VER_10, VER_11, VER_12, VER_13, and
+VER_15.
+
+Should this be:
+    ocp_word_clr_bits(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3, PLA_MCU_SPDWN_EN);
+
+[ ... ]
+
+> @@ -9541,6 +10056,7 @@ static void rtl_ops_init(struct r8152 *tp)
+>  	case RTL_VER_12:
+>  	case RTL_VER_13:
+>  	case RTL_VER_15:
+> +		ops->init		= r8156_init;
+>  		ops->enable		= rtl8156_enable;
+>  		ops->disable		= rtl8153_disable;
+
+The ops->enable assignment changes from rtl8156b_enable to rtl8156_enable
+for RTL_VER_12/13/15 (RTL8156B). Does the new rtl8156_enable provide the
+same functionality?
+
+As noted in the earlier issue, rtl8156_enable has an early return at line
+6581 that causes it to skip the PLA_MAC_PWR_CTRL4, USB_L1_CTRL, and
+FC_PATCH_TASK configuration for all current versions. The old
+rtl8156b_enable performed these operations.
+
+This could affect power management behavior, USB link stability at high
+speed, and firmware flow-control configuration for RTL8156B devices.
 
