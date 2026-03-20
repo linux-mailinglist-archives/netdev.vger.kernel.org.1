@@ -1,153 +1,113 @@
-Return-Path: <netdev+bounces-270042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270043-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AGH3JAOevWmW/gIAu9opvQ
-	(envelope-from <netdev+bounces-270042-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 20:20:35 +0100
+	id uMlnL3qevWmW/gIAu9opvQ
+	(envelope-from <netdev+bounces-270043-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 20:22:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E91212DFD85
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 20:20:34 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C14272DFDB2
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 20:22:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8DE530214F9
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:20:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1465F3007B1A
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:22:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11829337BB5;
-	Fri, 20 Mar 2026 19:20:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C6B34B425;
+	Fri, 20 Mar 2026 19:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ti0NtSVD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="haDJhrWx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35C418871F
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 19:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14904344DB4
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 19:22:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774034433; cv=none; b=YjTk5Hdxc0VyThxVT9amdXImFfZhn+D+88Oljupj5b2+D9dABpmjYyh4mqJsk77DXp7X14DbR0VUhitR5Oc4VsPQTgag2zw0HHQJts91D+lQVQAr7czZEESXGP+npvN6NqnYnPVWECJ6NHJPQ/OWeQn6QuNNstG7DRvCCWWJtGQ=
+	t=1774034548; cv=none; b=eeRUy8458XHtQ0OwxIvcDpHFHZzJwINyAc4FdJSjgcjBT60AhFpABsuYN7ZXhIjIPjRu8LtytT3woljYBQCJvpCptDQ6vsbuGekqLmeF/odJN5fKWfpE1LnMEwpPwgcnGbWUhWf3qB1Sl2zuc71wqC85NIaLqjNcFEBp2ujNHtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774034433; c=relaxed/simple;
-	bh=OhEVl68IJXW23s3giI06+FZaV7LwoTDtzK/9RZFAhsE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qaD49AecSep9w564dzHFtRuYSA2jnkNs1jlFQtrG5wUtel6HlLzVwJumdB5TXiG8yAdAx7LztQcMzLrnSCyzuaHtSDnouvu8kx+TMldb/DiVvCwCmW29VZU5CmVy8atV3aqdbxQtQaoEUwgXg1PgIlSlwWGMZ7Jw598B9/LW1Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ti0NtSVD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 313B4C4CEF7;
-	Fri, 20 Mar 2026 19:20:31 +0000 (UTC)
+	s=arc-20240116; t=1774034548; c=relaxed/simple;
+	bh=TggM05cJ/nNvU3rSwbGrgvekmiHgnNF4O6+tt/fSZ5s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TTkft4K7R0Zyj7ICIGnbx3NkKIYrFeVEKHNPMyjn77X3bY8ih5jojZ0wbMNdBoXpi3nDcKBoE+kkw+aiuh8mlyay5Lv4fIVaAWuES3byVvpfFtRxodn2w098IkNANvEkPjP0guetqJsp/WMFSCS2vvPeQwYQ/QHVkQXIcd27ZAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=haDJhrWx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF2F2C4CEF7;
+	Fri, 20 Mar 2026 19:22:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774034432;
-	bh=OhEVl68IJXW23s3giI06+FZaV7LwoTDtzK/9RZFAhsE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ti0NtSVDUyLBzfZ+62YK5zqAfPsUiJgWDPmFm6Bh3YGi4F55eWMokv+C4kcoIGY87
-	 M3GCy5VgEVaGwYwScNb0F0N4Sx6H0GQJ44aCfgwAo/aWbjYGkgq32z4gjm+f6/DG4+
-	 cP7gykXyWr7VPiKXyBor0vCrUBsgGEPsCNsnqsQnn89xIoUhsRAy+AUAB8pb+uzCNd
-	 JuXSV81Kevn5NnyWgH434bbVgNllO0OwT8oyZUi6pgpbVF+uuAOK0Fov60PRmvHY/D
-	 /M3iRZaryh3FIYmVD4IJvpV+grZoYyK+U5d5LShNB7soT9cjlkQhVXURLOqEramwgZ
-	 1oQGfRpISOkzQ==
+	s=k20201202; t=1774034547;
+	bh=TggM05cJ/nNvU3rSwbGrgvekmiHgnNF4O6+tt/fSZ5s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=haDJhrWxjcGLKvlrrefGIqiIYgSk7UEAILzIfevI3Fed9774J0boBznB/XgeQQfb2
+	 Ka3Xl8Is5S/sNSjsIA8hX5ikL1cspdn1LjaeIbxxgPJ2Xrm5d/lIecSXhp7UgVoKvo
+	 f4Ocy+7OFyFfwNsYO/lYm1FXkiaLOZXpVC8rSc2vdykHtaBrbQb+0I9HK73kFQ/GKt
+	 9vcgtgnTFT8l02AksNupSeogtPAbZFi/4SmJJHM5PNYQceTl1WS2sB8yNrHRjjDDa7
+	 8EpOYFDd3dU6MNycIGo98a4XuiWHARCk1tUKUUCHWSu+N83A+pKcPPuk6YgzK8BP4r
+	 vIdp+tkE09G5Q==
+Date: Fri, 20 Mar 2026 19:22:24 +0000
 From: Simon Horman <horms@kernel.org>
-To: aleksandr.loktionov@intel.com
-Cc: Simon Horman <horms@kernel.org>,
-	intel-wired-lan@lists.osuosl.org,
-	paul.greenwalt@intel.com,
-	netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com
-Subject: Re: [PATCH iwl-next] ice: update ice_link_mode_str_high() with 200G
-Date: Fri, 20 Mar 2026 19:19:04 +0000
-Message-ID: <20260320191903.161126-2-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260320050552.422715-1-aleksandr.loktionov@intel.com>
-References: <20260320050552.422715-1-aleksandr.loktionov@intel.com>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org, Paul Greenwalt <paul.greenwalt@intel.com>
+Subject: Re: [PATCH] ice: fix ICE_AQ_LINK_SPEED_M for 200G
+Message-ID: <20260320192224.GA164092@horms.kernel.org>
+References: <20260320050537.422528-1-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260320050537.422528-1-aleksandr.loktionov@intel.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270042-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270043-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.995];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.970];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E91212DFD85
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C14272DFDB2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Fri, Mar 20, 2026 at 06:05:37AM +0100, Aleksandr Loktionov wrote:
+> From: Paul Greenwalt <paul.greenwalt@intel.com>
+> 
+> When setting PHY configuration during driver initialization, 200G link
+> speed is not being advertised even when the PHY is capable. This is
+> because the get PHY capabilities link speed response is being masked by
+> ICE_AQ_LINK_SPEED_M, which does not include the 200G link speed bit.
+> 
+> ICE_AQ_LINK_SPEED_200GB is defined as BIT(11), but the mask 0x7FF only
+> covers bits 0-10. Fix ICE_AQ_LINK_SPEED_M to use GENMASK(11, 0) so
+> that it covers all defined link speed bits including 200G.
+> 
+> Fixes: 24407a01e57c ("ice: Add 200G speed/phy type use")
+> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-ice: update ice_link_mode_str_high() with 200G
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-This patch adds string entries to ice_link_mode_str_high[] for 200G and
-400GBASE-FR8 PHY types to fix ice_dump_phy_type() debug output for E825C
-hardware.
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-> index ce11fea122d0..7cdd6a043d86 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -84,6 +84,17 @@ static const char * const ice_link_mode_str_high[] = {
->  	[2] = "100G_CAUI2",
->  	[3] = "100G_AUI2_AOC_ACC",
->  	[4] = "100G_AUI2",
-> +	[5] = "200G_CR4_PAM4",
-> +	[6] = "200G_SR4",
-> +	[7] = "200G_FR4",
-> +	[8] = "200G_LR4",
-> +	[9] = "200G_DR4",
-> +	[10] = "200G_KR4_PAM4",
-> +	[11] = "200G_AUI4_AOC_ACC",
-> +	[12] = "200G_AUI4",
-> +	[13] = "200G_AUI8_AOC_ACC",
-> +	[14] = "200G_AUI8",
-> +	[15] = "400GBASE_FR8",
->  };
->
->  /**
-
-Are entries [13], [14], and [15] missing their corresponding hardware
-definitions?
-
-The patch adds strings for indices 13-15, but ICE_PHY_TYPE_HIGH_MAX_INDEX
-remains defined as 12 in ice_adminq_cmd.h (line 1047), and no
-ICE_PHY_TYPE_HIGH_* bit definitions exist for these three types.
-
-Other driver code uses MAX_INDEX as a bound:
-
-drivers/net/ethernet/intel/ice/ice_common.c:ice_get_phy_type_high() {
-    for (index = 0; index <= ICE_PHY_TYPE_HIGH_MAX_INDEX; index++)
-        ...
-}
-
-This creates an inconsistency where ice_dump_phy_type() can print these
-strings via debug output, but code checking PHY types based on MAX_INDEX
-will not recognize indices 13-15.
-
-If E825C hardware truly supports these PHY types, should this patch also
-include the hardware definitions (ICE_PHY_TYPE_HIGH_200G_AUI8_AOC_ACC =
-BIT_ULL(13), etc.) and update MAX_INDEX to 15?
 
