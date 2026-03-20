@@ -1,57 +1,67 @@
-Return-Path: <netdev+bounces-269999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270000-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6CaAAhKGvWnQ+gIAu9opvQ
-	(envelope-from <netdev+bounces-269999-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:38:26 +0100
+	id sAbpGY6GvWnQ+gIAu9opvQ
+	(envelope-from <netdev+bounces-270000-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:40:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98E442DEC70
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:38:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE6BC2DED0B
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8A6153015D2E
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 17:31:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 796F6300EF8E
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 17:31:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94753BD22C;
-	Fri, 20 Mar 2026 17:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E753D16EE;
+	Fri, 20 Mar 2026 17:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="CNc1fM/7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hJEoHVow"
 X-Original-To: netdev@vger.kernel.org
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D502D2F546D;
-	Fri, 20 Mar 2026 17:31:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968623CBE6B
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 17:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774027880; cv=none; b=aCz4VSvOotDd0+HaThPw6pYxeat8mIoNboCJ5XDP1gfB4MRCxflQgiu1tM9E3K1W02rWf52goeOn2ViVaebN2XbJqmtVVVd7OwWbEESuIkcpQXx8pfistOoSVNHcurklgvqCNLw8T2IQwW5Y1z+Z0jAxcq1NO+DMo2j6kycn4+Q=
+	t=1774027913; cv=none; b=cRSHUKwIIsA4xViA8WdHk+0fYY0a6Wkrwp+bhcAura1WAp0GNSHaBipxb2hr7fSRs4SKQ499IWVG4cSkPKE4JS3plXWkf1IYUZXjzbXAw1RPw4jpDwLGYMx1AdZQctB0LFJjDDtzQFKr1mNAacpUwP6FPoo+tsiTTkB16uyvZU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774027880; c=relaxed/simple;
-	bh=bo2k1sA1g9MfPxmyHuLEb+Cso2UyA6+0aqAcl7dSUoQ=;
+	s=arc-20240116; t=1774027913; c=relaxed/simple;
+	bh=Pk6uqov4ttWsArymsYs/+SoJFy0cjkp7Yk0GCMfDwKw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=flpezVlkmXm91s8iJ0kYtNqHNPgvNbiHzCa/hEgpkK8GN/l+A6xlShiJbHQsE3dTsJQm6UFCA5m5M342lHVHJrtOImS7tS3TRbkj73dNBrJ32CEzaVKPDVPYgGCJh7PY/I0xmd+6Yi6NI4yIIycu++X162pno9cFc53CiWHd4+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=CNc1fM/7; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=S/Cpy5yvI1C33V5zY9HjG11G/6SJpybIjlU4lHq7P5g=; b=CNc1fM/7u+lEst45vo5coTKm90
-	6gdT5+WLE/BF1gvu+x/g1fr/71tkp7uT267UQ56yY/bhd6V3qbTYBW3fLi4J5qCTqWhOKNjMqCyue
-	6qnuUK9ymdXMs5vGUYVB/14TUtZaI1jPYjNZTg1DO+8oIpRWKzXRpdAbFfjTSvmDCHoP2GdjJRZ+p
-	hgmJirvka2QwUz+rAMpzvCYdbgs81zJD2RdSXIKM/mYU58+N6PwgUErOQAMk/aYEKYbBJUlJdgy8h
-	+DYHIgXqKfSyoH567yG1mlqjO9QWcwfVRxjjbUy4o1krVg7Rv0HT+M7f5kxVZKpaulEiJxsh0gfD9
-	/Ji8IBJw==;
-Received: from [179.221.50.217] (helo=[192.168.0.108])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
-	id 1w3dgT-003uXJ-7B; Fri, 20 Mar 2026 18:30:53 +0100
-Message-ID: <270a0c7b-a917-4c1a-9b21-e8dcec4dc260@igalia.com>
-Date: Fri, 20 Mar 2026 14:30:45 -0300
+	 In-Reply-To:Content-Type; b=R+a+JV5iZ/pfpnzvqFJoKb5VxfgYAtSuBMvfdLlWS7WFSaTPeux1qQ+8kH484lc55K/1CnyoLr5Z+APnz0BtJ8lHkpUAgs6MGZo6yGW5ffDeBHF0K6rg3hAGACr+xRTuxNEgAbr+Q92B4gQ+Q9cRBv/cecO3owjBKpVO4bcVt7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hJEoHVow; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774027910;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tHS9iTkHOAjp0VrijnaOqXhU9fl7ibsWvQxplTTvVVs=;
+	b=hJEoHVowSqeTnR/vIDFC2y5LtfGcY/+0ZXu36djCwIMkKnhXJbHO9jQwZDh6js5fRWi7Em
+	b/PbBzxryAQe6wd23lz7QmO0PiR5gT1BzsoEdNEsYFD/gBIlvU0LsRfO3vuJAljzN+KaeD
+	tsxzn3YSDi0UxBvD+DwPB7qWnrkdQtA=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-240-EW1hpGCaM_6ULjHL9gp4fw-1; Fri,
+ 20 Mar 2026 13:31:47 -0400
+X-MC-Unique: EW1hpGCaM_6ULjHL9gp4fw-1
+X-Mimecast-MFC-AGG-ID: EW1hpGCaM_6ULjHL9gp4fw_1774027902
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 468E419560B4;
+	Fri, 20 Mar 2026 17:31:42 +0000 (UTC)
+Received: from [10.45.226.118] (unknown [10.45.226.118])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 169A71800763;
+	Fri, 20 Mar 2026 17:31:37 +0000 (UTC)
+Message-ID: <ffa7b3a5-a381-435e-b170-24341962b6d1@redhat.com>
+Date: Fri, 20 Mar 2026 18:31:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,215 +69,223 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: KMSAN: uninit-value in eth_type_trans
-To: Marek Szyprowski <m.szyprowski@samsung.com>,
- Alexander Potapenko <glider@google.com>, Robin Murphy
- <robin.murphy@arm.com>, Christoph Hellwig <hch@infradead.org>,
- Leon Romanovsky <leonro@nvidia.com>, mhklinux@outlook.com
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
- Aleksandr Nogikh <nogikh@google.com>, kernel-dev@igalia.com
-References: <20250925223656.1894710-1-nogikh@google.com>
- <CAG_fn=U3Rjd_0zfCJE-vuU3Htbf2fRP_GYczdYjJJ1W5o30+UQ@mail.gmail.com>
- <CGME20251008084433eucas1p2d50387b4147f88edb8de400dcf0b0a82@eucas1p2.samsung.com>
- <CAG_fn=WUGta-paG1BgsGRoAR+fmuCgh3xo=R3XdzOt_-DqSdHw@mail.gmail.com>
- <0d5f2179-b89b-42b6-805d-6a50d2268eca@samsung.com>
+Subject: Re: [PATCH net-next 1/5] dpll: zl3073x: clean up esync get/set and
+ use zl3073x_out_is_ndiv()
+To: Simon Horman <horms@kernel.org>
+Cc: devicetree@vger.kernel.org, vadim.fedorenko@linux.dev, jiri@resnulli.us,
+ netdev@vger.kernel.org, pvaanane@redhat.com, arkadiusz.kubalewski@intel.com,
+ robh@kernel.org, linux-kernel@vger.kernel.org, conor+dt@kernel.org,
+ krzk+dt@kernel.org, Prathosh.Satish@microchip.com, mschmidt@redhat.com,
+ poros@redhat.com
+References: <20260319174826.7623-2-ivecera@redhat.com>
+ <20260320171725.112558-1-horms@kernel.org>
 Content-Language: en-US
-From: Helen Koike <koike@igalia.com>
-In-Reply-To: <0d5f2179-b89b-42b6-805d-6a50d2268eca@samsung.com>
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20260320171725.112558-1-horms@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.14 / 15.00];
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[igalia.com:s=20170329];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[igalia.com : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269999-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[samsung.com,google.com,arm.com,infradead.org,nvidia.com,outlook.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270000-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.205];
-	FROM_NEQ_ENVFROM(0.00)[koike@igalia.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[igalia.com:-];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[igalia.com:mid,storage.googleapis.com:url,bootlin.com:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,fireeye.com:url,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: 98E442DEC70
+	NEURAL_HAM(-0.00)[-0.993];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: BE6BC2DED0B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi all,
+Hi Simon,
 
-On 10/13/25 4:31 AM, Marek Szyprowski wrote:
-> On 08.10.2025 10:43, Alexander Potapenko wrote:
->> On Tue, Oct 7, 2025 at 8:51 AM Alexander Potapenko <glider@google.com> wrote:
->>> Folks, as far as I understand, dma_direct_sync_single_for_cpu() and
->>> dma_direct_sync_single_for_device() are the places where we send data
->>> to or from the device.
->>> Should we add KMSAN annotations to those functions to catch infoleaks
->>> and mark data from devices as initialized?
->> Something along the lines of:
->>
->> ======================================
->> diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
->> index 0d37da3d95b65..7f59de19c1c87 100644
->> --- a/kernel/dma/swiotlb.c
->> +++ b/kernel/dma/swiotlb.c
->> @@ -42,6 +42,7 @@
->>    #include <linux/string.h>
->>    #include <linux/swiotlb.h>
->>    #include <linux/types.h>
->> +#include <linux/kmsan-checks.h>
->>    #ifdef CONFIG_DMA_RESTRICTED_POOL
->>    #include <linux/of.h>
->>    #include <linux/of_fdt.h>
->> @@ -903,10 +904,13 @@ static void swiotlb_bounce(struct device *dev,
->> phys_addr_t tlb_addr, size_t size
->>
->>                           local_irq_save(flags);
->>                           page = pfn_to_page(pfn);
->> -                       if (dir == DMA_TO_DEVICE)
->> +                       if (dir == DMA_TO_DEVICE) {
->> +                               kmsan_check_highmem_page(page, offset, sz);
->>                                   memcpy_from_page(vaddr, page, offset, sz);
->> -                       else
->> +                       } else {
->> +                               kmsan_unpoison_memory(vaddr, sz);
->>                                   memcpy_to_page(page, offset, vaddr, sz);
->> +                       }
->>                           local_irq_restore(flags);
->>
->>                           size -= sz;
->> @@ -915,8 +919,10 @@ static void swiotlb_bounce(struct device *dev,
->> phys_addr_t tlb_addr, size_t size
->>                           offset = 0;
->>                   }
->>           } else if (dir == DMA_TO_DEVICE) {
->> +               kmsan_check_memory(phys_to_virt(orig_addr), size);
->>                   memcpy(vaddr, phys_to_virt(orig_addr), size);
->>           } else {
->> +               kmsan_unpoison_memory(vaddr, size);
->>                   memcpy(phys_to_virt(orig_addr), vaddr, size);
->>           }
->>    }
->> ======================================
->>
->> should be conceptually right, but according to the comment in
->> swiotlb_tbl_map_single()
->> (https://protect2.fireeye.com/v1/url?k=837a6d67-dce15478-837be628-000babdfecba-aa25926458f9fd30&q=1&e=a3963b1b-328b-4f69-8ca5-ffd6fc777dd7&u=https%3A%2F%2Felixir.bootlin.com%2Flinux%2Fv6.17.1%2Fsource%2Fkernel%2Fdma%2Fswiotlb.c%23L1431),
->> that function is deliberately copying the buffer to the device, even
->> when it is uninitialized - and KMSAN actually started reporting that
->> when I applied the above patch.
->>
->> How should we handle this case?
->> Not adding the kmsan_check_memory() calls will solve the problem, but
->> there might be real infoleaks that we won't detect.
->> We could unpoison the buffer before passing it to
->> swiotlb_tbl_map_single() to ignore just the first infoleak on the
->> buffer.
->> Alternatively, we could require callers to always initialize the
->> buffer passed to swiotlb_tbl_map_single().
+On 3/20/26 6:17 PM, Simon Horman wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
 > 
-> Well, I didn't consider swiotlb a special case so far. I did a simple
-> test with my PoC patch mentioned earlier in this thread with
-> 'swiotlb=force' kernel parameter and I didn't observe any kmsan issues,
-> but I admin that this wasn't exhaustive test.
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> ---
+> dpll: zl3073x: clean up esync get/set and use zl3073x_out_is_ndiv()
 > 
-> Best regards
+> Return -EOPNOTSUPP early in esync_get callbacks when esync is not
+> supported instead of conditionally populating the range at the end.
+> This simplifies the control flow by removing the finish label/goto
+> in the output variant and the conditional range assignment in both
+> input and output variants.
+> 
+> Replace open-coded N-div signal format switch statements with
+> zl3073x_out_is_ndiv() helper in esync_get, esync_set and
+> frequency_set callbacks.
+> 
+>> diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
+>> index a29f606318f6..79ef62d69a32 100644
+>> --- a/drivers/dpll/zl3073x/dpll.c
+>> +++ b/drivers/dpll/zl3073x/dpll.c
+>> @@ -131,6 +131,12 @@ zl3073x_dpll_input_pin_esync_get(const struct dpll_pin *dpll_pin,
+>>   	ref_id = zl3073x_input_pin_ref_get(pin->id);
+>>   	ref = zl3073x_ref_state_get(zldev, ref_id);
+>>
+>> +	if (!pin->esync_control || zl3073x_ref_freq_get(ref) == 1)
+>> +		return -EOPNOTSUPP;
+>> +
+>> +	esync->range = esync_freq_ranges;
+>> +	esync->range_num = ARRAY_SIZE(esync_freq_ranges);
+>> +
+>>   	switch (FIELD_GET(ZL_REF_SYNC_CTRL_MODE, ref->sync_ctrl)) {
+>>   	case ZL_REF_SYNC_CTRL_MODE_50_50_ESYNC_25_75:
+>>   		esync->freq = ref->esync_n_div == ZL_REF_ESYNC_DIV_1HZ ? 1 : 0;
+>> @@ -142,17 +148,6 @@ zl3073x_dpll_input_pin_esync_get(const struct dpll_pin *dpll_pin,
+>>   		break;
+>>   	}
+>>
+>> -	/* If the pin supports esync control expose its range but only
+>> -	 * if the current reference frequency is > 1 Hz.
+>> -	 */
+>> -	if (pin->esync_control && zl3073x_ref_freq_get(ref) > 1) {
+>> -		esync->range = esync_freq_ranges;
+>> -		esync->range_num = ARRAY_SIZE(esync_freq_ranges);
+>> -	} else {
+>> -		esync->range = NULL;
+>> -		esync->range_num = 0;
+>> -	}
+>> -
+>>   	return 0;
+>>   }
+> 
+> The refactoring changes the behavior when the reference frequency is 0 Hz.
+> 
+> The old code checked 'zl3073x_ref_freq_get(ref) > 1' which excluded both
+> freq==0 and freq==1 from having the esync range exposed. The new code checks
+> 'zl3073x_ref_freq_get(ref) == 1' which only excludes freq==1.
+> 
+> When freq==0 (which can happen when freq_base, freq_mult, or freq_ratio_m
+> is 0), the old code would return 0 with esync->range=NULL and
+> esync->range_num=0, while the new code returns 0 with
+> esync->range=esync_freq_ranges and esync->range_num=1.
+> 
+> The removed comment documented the original intent: "if the current reference
+> frequency is > 1 Hz". Should the new check be 'zl3073x_ref_freq_get(ref) <= 1'
+> to preserve the original behavior for 0 Hz frequencies?
+> 
+>>
+>> @@ -582,8 +577,8 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
+>>   	struct zl3073x_dpll_pin *pin = pin_priv;
+>>   	const struct zl3073x_synth *synth;
+>>   	const struct zl3073x_out *out;
+>> +	u32 synth_freq, out_freq;
+>>   	u8 clock_type, out_id;
+>> -	u32 synth_freq;
+>>
+>>   	out_id = zl3073x_output_pin_out_get(pin->id);
+>>   	out = zl3073x_out_state_get(zldev, out_id);
+>> @@ -592,17 +587,19 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
+>>   	 * for N-division is also used for the esync divider so both cannot
+>>   	 * be used.
+>>   	 */
+>> -	switch (zl3073x_out_signal_format_get(out)) {
+>> -	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV:
+>> -	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV_INV:
+>> +	if (zl3073x_out_is_ndiv(out))
+>>   		return -EOPNOTSUPP;
+>> -	default:
+>> -		break;
+>> -	}
+>>
+>>   	/* Get attached synth frequency */
+>>   	synth = zl3073x_synth_state_get(zldev, zl3073x_out_synth_get(out));
+>>   	synth_freq = zl3073x_synth_freq_get(synth);
+>> +	out_freq = synth_freq / out->div;
+>> +
+>> +	if (!pin->esync_control || out_freq == 1)
+>> +		return -EOPNOTSUPP;
+>> +
+>> +	esync->range = esync_freq_ranges;
+>> +	esync->range_num = ARRAY_SIZE(esync_freq_ranges);
+>>
+>>   	clock_type = FIELD_GET(ZL_OUTPUT_MODE_CLOCK_TYPE, out->mode);
+>>   	if (clock_type != ZL_OUTPUT_MODE_CLOCK_TYPE_ESYNC) {
+>> @@ -610,11 +607,11 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
+>>   		esync->freq = 0;
+>>   		esync->pulse = 0;
+>>
+>> -		goto finish;
+>> +		return 0;
+>>   	}
+>>
+>>   	/* Compute esync frequency */
+>> -	esync->freq = synth_freq / out->div / out->esync_n_period;
+>> +	esync->freq = out_freq / out->esync_n_period;
+>>
+>>   	/* By comparing the esync_pulse_width to the half of the pulse width
+>>   	 * the esync pulse percentage can be determined.
+>> @@ -623,18 +620,6 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
+>>   	 */
+>>   	esync->pulse = (50 * out->esync_n_width) / out->div;
+>>
+>> -finish:
+>> -	/* Set supported esync ranges if the pin supports esync control and
+>> -	 * if the output frequency is > 1 Hz.
+>> -	 */
+>> -	if (pin->esync_control && (synth_freq / out->div) > 1) {
+>> -		esync->range = esync_freq_ranges;
+>> -		esync->range_num = ARRAY_SIZE(esync_freq_ranges);
+>> -	} else {
+>> -		esync->range = NULL;
+>> -		esync->range_num = 0;
+>> -	}
+>> -
+>>   	return 0;
+>>   }
+> 
+> Similar to the input variant, this changes the behavior for 0 Hz output
+> frequencies.
+> 
+> The old code used '(synth_freq / out->div) > 1' to decide whether to expose
+> the esync range, which excluded both out_freq==0 and out_freq==1. The new
+> code uses 'out_freq == 1' for the early -EOPNOTSUPP return, only excluding
+> out_freq==1.
+> 
+> When out_freq==0 (which can happen when synth_freq is 0 or synth_freq <
+> out->div), the old code returned 0 with esync->range=NULL and
+> esync->range_num=0, while the new code returns 0 with
+> esync->range=esync_freq_ranges and esync->range_num=1.
+> 
+> The removed comment documented the intent: "if the output frequency is > 1
+> Hz". Should this also use 'out_freq <= 1' to maintain consistency with the
+> original behavior?
+> 
+> [ ... ]
+> 
 
+The frequency for both input and output pins cannot be zero... Cannot be
+set to 0 and device never returns configured frequency to be 0.
 
-I just hit this issue and found this thread. So I'm sharing below my 
-report in case it is useful (if not, please just ignore):
+I can modify the lines to be:
 
-I'm easily reproducing it when trying to reproduce another unrelated 
-issue[1] by syzbot on qemu[2] with torvalds/master branch, commit 
-0e4f8f1a3d08 .
+if (!pin->esync_control || out_freq <= 1)
+	return -EOPNOTSUPP;
 
-[1] https://syzkaller.appspot.com/bug?extid=ba80855313e6fa65717a
-[2] 
-https://github.com/google/syzkaller/blob/master/docs/reproducing_crashes.md#using-a-c-reproducer
+but it is needless - but let me know.
 
-
-To momentarily fix it (and allow me o reach my syzbot issue), I just did 
-the following:
-
-@@ -916,6 +917,12 @@ static void swiotlb_bounce(struct device *dev, 
-phys_addr_t tlb_addr, size_t size
-                 memcpy(vaddr, phys_to_virt(orig_addr), size);
-         } else {
-                 memcpy(phys_to_virt(orig_addr), vaddr, size);
-+               kmsan_unpoison_memory(phys_to_virt(orig_addr), size);
-         }
-  }
-
-Which, from the discussions here is obviously not the right solution.
-
-
-In case it helps, see below what I'm executing:
-(copy and pasted from my scripts)
-
-* Config: 
-https://syzkaller.appspot.com/text?tag=KernelConfig&x=963de479f54c6dbb
-* Disk image: 
-https://storage.googleapis.com/syzbot-assets/bef78207d3f7/disk-2d1373e4.raw.xz
-
-
-$ gcc \
-     repro.c \
-     -lpthread \
-     -static \
-     -o repro
-
-Running make olddefconfig …
-
-$ make O=/$BUILD_DIR CC=clang LD=ld.lld olddefconfig
-
-Building kernel …
-
-$ make O=$BUILD_DIR CC=clang LD=ld.lld -j$NPROC
-
-Starting QEMU with disk image …
-SSH port: 35053
-
-$ qemu-system-x86_64 \
-     -m 8G \
-     -smp 2,sockets=2,cores=1 \
-     -drive file=disk.raw,format=raw \
-     -net nic,model=e1000 \
-     -net user,host=10.0.2.10,hostfwd=tcp::10022-:22 \
-     -kernel $BUILD_DIR/arch/x86/boot/bzImage \
-     -append 'root=/dev/sda1 console=ttyS0 panic_on_warn=1 
-earlyprintk=serial net.ifnames=0 vsyscall=native numa=fake=2' \
-     -enable-kvm \
-     -nographic \
-     -snapshot \
-     -machine pc-q35-7.1 \
-     -cpu host
-
-$ scp \
-     -P 10022 \
-     repro \
-     root@127.0.0.1:/root/
-
-$ ssh -p 10022 root@127.0.0.1 'chmod +x ./repro && ./repro'
-
-
-Regards,
-Helen
+Thanks,
+Ivan
 
 
