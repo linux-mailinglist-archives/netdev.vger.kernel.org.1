@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-269788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269789-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLSrIQHWvGkk3gIAu9opvQ
-	(envelope-from <netdev+bounces-269788-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 06:07:13 +0100
+	id EBMlK7rVvGkk3gIAu9opvQ
+	(envelope-from <netdev+bounces-269789-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 06:06:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D926E2D5E80
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 06:07:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D18D2D5E4E
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 06:06:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5BA87303D70E
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 05:05:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A46E1300CCA4
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 05:05:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935142F39B5;
-	Fri, 20 Mar 2026 05:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99E8A2DCF7D;
+	Fri, 20 Mar 2026 05:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R5boiSxh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SYiYxp6o"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C68201004
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 05:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68612F49FD
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 05:05:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773983152; cv=none; b=hoKD/I1ezg6H+4Zxr1gdcB7VpOEZ/N7sB6Hh8tbKn5yQfUO+gqCnYId/yO3PsmzhchgF6ZglDeua0O6kaLHeYQ5PUXTJua/n0i/C2h/5xo02/lou0IMWl4L7ID+Mn1ou0sXAcEBMeRvGE6kYJiG+nDVfWNPjhUb4O/EYgJ5OQuw=
+	t=1773983156; cv=none; b=sL8DSF8NDTCEsWLCUCJatBU+EY9SjostTgnDHPOII53A79lUh7M4hzGTWn6y8un8q34P31WVbWEIjONKglNhS4RU/hB0UvbhHrRvZQEizk0z3RKUMW1jPPbNjO150TvWBkdiOD3EuCBEITG6YrvfczGpK5L07UXfDTA0Bfljr7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773983152; c=relaxed/simple;
-	bh=0nU37g/5iMAsd6cyW6ndANCuu/ZEAfLoUvjHbqnSUpo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Nm/PLTwOSfl1RBl1z+Fsq9sjMtoOqwKsvJgm3GkcTJPBFIuINSN/94JtfOJf4uKTEczpMHFJsZYQX+H0QhKmPSsGACqv+3sbh7ztdOHZ59LPWLNjXNncmypSYMobcL4K4MCXsSBOj9MswAlbLvUfP4fUJPxv/RRC+bpka/lAJ58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R5boiSxh; arc=none smtp.client-ip=198.175.65.16
+	s=arc-20240116; t=1773983156; c=relaxed/simple;
+	bh=J/TdUYhUCnswK/mCgN8pCjPl17WB9+oNDkEPXVBSo8Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aWOHUbc+klr/n7ShA6T+w4cdL7ZIj4SoyqaJzrXVye9/kNoRCorRtgJ3sdtM40tC1qAdGlpCW36jl7wbTDuzrADYPAOngA39nt06s3CXmaHHrDakBFhk0n+BIasRRrWeQ7zsC0yi3U3NbWuCJKMOSyUjKrOseezA0+MQmUrVmsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SYiYxp6o; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773983151; x=1805519151;
+  t=1773983155; x=1805519155;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=0nU37g/5iMAsd6cyW6ndANCuu/ZEAfLoUvjHbqnSUpo=;
-  b=R5boiSxhnvBJ2wWAVnsC3rKVCHDNJ7ArY3lIDnTLDLVV6sHvq/efqwpu
-   zTKr7iUvyyW/rA7SrUQOLAej7Z40626uVI9domKhY0jN2Awz0PemIFVXK
-   sNYR64jB4WBeBnjphI8ba0d/bBj6qfazg9Rx8UmqNo8bPvzIDFn1ADiCM
-   MZrhAikG5xWzYjtYW6i1pcP8J7nmNWmztsXKKHhkbK/MLiCwSBiLXOfBq
-   oU7hu01WVI/CVMkYZxCJbkrlRTam7MTyxTY1JA9CCLjJlXpuKZ+p/3z3M
-   20fLiwoYghJSI7ZC8QJOFF2cG+vpLyrvRpLkSHYqaxKAL+GJvtmCEM8dd
-   Q==;
-X-CSE-ConnectionGUID: KDgnXv8IQY6OjdXCpFyFvw==
-X-CSE-MsgGUID: cp/j6pz3TpeK8AZjtDkfyA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="75251817"
+  bh=J/TdUYhUCnswK/mCgN8pCjPl17WB9+oNDkEPXVBSo8Q=;
+  b=SYiYxp6oSz7f0lzQJ/9anf62Z8oqF6Zv1Thgj8/RusF/lk493x92vpQU
+   Iw+oM+Jd9VLBCngNC9K5XJ81Ae4e4dXBKLisXzsNaZ2iM+N4vcIwadV3C
+   hrEGH6waMOECu3SisBJIPlou0ac26f9FL0JrlOPqXBULKkjc2gsZxhUJo
+   wL/CJQWpC2tTy6cNevqb6Ifgv8JXUYRvr4+qseIeuZ3xPbDPmtajRGeab
+   1x9iX0o0nJsZwdJPd6wLU57CCe3psd8F/cHtFxtz9rTRaD2o1QrtuWpAg
+   kwI5KoE3j+o+MUo5suPP5L1TbElyVXlmL/Ukunh42D1T1IFIk8Gb4F3I2
+   A==;
+X-CSE-ConnectionGUID: TIPLT8nOQLaJj0SVBC34Yw==
+X-CSE-MsgGUID: H0wcTExrQja02hV7WmsYBA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="75251820"
 X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="75251817"
+   d="scan'208";a="75251820"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 22:05:51 -0700
-X-CSE-ConnectionGUID: PtRtYdMPQdqgQ98KdsNf9w==
-X-CSE-MsgGUID: 4Y/peap/T/2MqjLHlVn9Rw==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 22:05:55 -0700
+X-CSE-ConnectionGUID: 0Bonq9lmT4uKSouOENriOA==
+X-CSE-MsgGUID: LxlWx0osRNeiuEMkhq0vyw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="222399179"
+   d="scan'208";a="222399184"
 Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by orviesa010.jf.intel.com with ESMTP; 19 Mar 2026 22:05:49 -0700
+  by orviesa010.jf.intel.com with ESMTP; 19 Mar 2026 22:05:53 -0700
 From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	anthony.l.nguyen@intel.com,
 	aleksandr.loktionov@intel.com
 Cc: netdev@vger.kernel.org,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>
-Subject: [PATCH iwl-next] ice: reduce loglevel to debug for 'Can't delete DSCP' message
-Date: Fri, 20 Mar 2026 06:05:48 +0100
-Message-ID: <20260320050548.422684-1-aleksandr.loktionov@intel.com>
+	Paul Greenwalt <paul.greenwalt@intel.com>
+Subject: [PATCH iwl-next] ice: update ice_link_mode_str_high() with 200G
+Date: Fri, 20 Mar 2026 06:05:52 +0100
+Message-ID: <20260320050552.422715-1-aleksandr.loktionov@intel.com>
 X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -83,7 +83,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -91,9 +91,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269788-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269789-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCPT_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -102,38 +102,46 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-0.990];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D926E2D5E80
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
+X-Rspamd-Queue-Id: 5D18D2D5E4E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+From: Paul Greenwalt <paul.greenwalt@intel.com>
 
-Reduce netdev message "Can't delete DSCP netlink app ..." from error
-to debug level when in FW (firmware) DCB mode.
-This is not a real error and a kind of expected behavior. The device
-is fully operational and error message might be wrongly interpreted by
-the user.
+Update ice_link_mode_str_high() with string for 200G PHY types.
+Without these entries the ice_dump_phy_type() debug helper prints
+nothing for phy_type_high bits [5..15], covering all 200G and
+400GBASE-FR8 PHY types supported by E825C hardware.
 
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
 Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_dcb_nl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/ice/ice_common.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_dcb_nl.c b/drivers/net/ethernet/intel/ice/ice_dcb_nl.c
-index a10c1c8d..bb5cc0a 100644
---- a/drivers/net/ethernet/intel/ice/ice_dcb_nl.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dcb_nl.c
-@@ -872,7 +872,7 @@ static int ice_dcbnl_delapp(struct net_device *netdev, struct dcb_app *app)
- 	int ret = 0;
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index ce11fea..7cdd6a0 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -84,6 +84,17 @@ static const char * const ice_link_mode_str_high[] = {
+ 	[2] = "100G_CAUI2",
+ 	[3] = "100G_AUI2_AOC_ACC",
+ 	[4] = "100G_AUI2",
++	[5] = "200G_CR4_PAM4",
++	[6] = "200G_SR4",
++	[7] = "200G_FR4",
++	[8] = "200G_LR4",
++	[9] = "200G_DR4",
++	[10] = "200G_KR4_PAM4",
++	[11] = "200G_AUI4_AOC_ACC",
++	[12] = "200G_AUI4",
++	[13] = "200G_AUI8_AOC_ACC",
++	[14] = "200G_AUI8",
++	[15] = "400GBASE_FR8",
+ };
  
- 	if (pf->dcbx_cap & DCB_CAP_DCBX_LLD_MANAGED) {
--		netdev_err(netdev, "can't delete DSCP netlink app when FW DCB agent is active\n");
-+		netdev_dbg(netdev, "can't delete DSCP netlink app when FW DCB agent is active\n");
- 		return -EINVAL;
- 	}
- 
+ /**
 -- 
 2.52.0
 
