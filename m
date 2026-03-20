@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-269789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269790-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EBMlK7rVvGkk3gIAu9opvQ
-	(envelope-from <netdev+bounces-269789-lists+netdev=lfdr.de@vger.kernel.org>)
+	id OGmLI7rVvGkk3gIAu9opvQ
+	(envelope-from <netdev+bounces-269790-lists+netdev=lfdr.de@vger.kernel.org>)
 	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 06:06:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D18D2D5E4E
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D3FB2D5E4D
 	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 06:06:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A46E1300CCA4
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 05:05:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A5DD530066A1
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 05:06:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99E8A2DCF7D;
-	Fri, 20 Mar 2026 05:05:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5D12F546D;
+	Fri, 20 Mar 2026 05:06:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SYiYxp6o"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FSpctJRe"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68612F49FD
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 05:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF312DF6E6
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 05:05:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773983156; cv=none; b=sL8DSF8NDTCEsWLCUCJatBU+EY9SjostTgnDHPOII53A79lUh7M4hzGTWn6y8un8q34P31WVbWEIjONKglNhS4RU/hB0UvbhHrRvZQEizk0z3RKUMW1jPPbNjO150TvWBkdiOD3EuCBEITG6YrvfczGpK5L07UXfDTA0Bfljr7E=
+	t=1773983160; cv=none; b=O9QZNYQxM5/zSx9s1eWTrjvu3+Gfzk2L/YZKJUK8G0v1y8rafSaMDOKTRqpkz9deH9QCI+Xi05a9gEnJ+PNg5EoAfvuw7obPt4dFBXaDa+VuUSKKxfQnU13OPfD5Ib3YakUdagDoB/+AXvojyQvHwMO6jOWe1i+NHl2LbvOptuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773983156; c=relaxed/simple;
-	bh=J/TdUYhUCnswK/mCgN8pCjPl17WB9+oNDkEPXVBSo8Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aWOHUbc+klr/n7ShA6T+w4cdL7ZIj4SoyqaJzrXVye9/kNoRCorRtgJ3sdtM40tC1qAdGlpCW36jl7wbTDuzrADYPAOngA39nt06s3CXmaHHrDakBFhk0n+BIasRRrWeQ7zsC0yi3U3NbWuCJKMOSyUjKrOseezA0+MQmUrVmsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SYiYxp6o; arc=none smtp.client-ip=198.175.65.16
+	s=arc-20240116; t=1773983160; c=relaxed/simple;
+	bh=LxEywRrRZkpe4jxH/2u4lRCW8+puW7+zbqXpiIYZ+7k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N+xjgfJ+XoYYvLMNAuwWJ9ioT40h6cwUFPKAAx2XnAbjRUnrGZZoUst39eBAhXk4M8ocxn1+D2sjFI1Kob5SrjnEb3/A+682nYHX6n6g4qzdOsS9tGWUpiXnR4DUBD0mkNPiG5KmshACaP1wOPjZe6J8Dlj2qJzOppb2kA4d6vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FSpctJRe; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773983155; x=1805519155;
+  t=1773983159; x=1805519159;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=J/TdUYhUCnswK/mCgN8pCjPl17WB9+oNDkEPXVBSo8Q=;
-  b=SYiYxp6oSz7f0lzQJ/9anf62Z8oqF6Zv1Thgj8/RusF/lk493x92vpQU
-   Iw+oM+Jd9VLBCngNC9K5XJ81Ae4e4dXBKLisXzsNaZ2iM+N4vcIwadV3C
-   hrEGH6waMOECu3SisBJIPlou0ac26f9FL0JrlOPqXBULKkjc2gsZxhUJo
-   wL/CJQWpC2tTy6cNevqb6Ifgv8JXUYRvr4+qseIeuZ3xPbDPmtajRGeab
-   1x9iX0o0nJsZwdJPd6wLU57CCe3psd8F/cHtFxtz9rTRaD2o1QrtuWpAg
-   kwI5KoE3j+o+MUo5suPP5L1TbElyVXlmL/Ukunh42D1T1IFIk8Gb4F3I2
-   A==;
-X-CSE-ConnectionGUID: TIPLT8nOQLaJj0SVBC34Yw==
-X-CSE-MsgGUID: H0wcTExrQja02hV7WmsYBA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="75251820"
+  bh=LxEywRrRZkpe4jxH/2u4lRCW8+puW7+zbqXpiIYZ+7k=;
+  b=FSpctJReDHQGlGgG/Svkm0Uq3o+GiPG7G4/Hkp0k4PlmqrDMuHn1HbT1
+   eamUCwJugI19Y2h7M4c7Yr3intSzOBOCoahHUpvVmSgRfjtvIWPEOP/L2
+   qkYfwqgjKB7q0gFK22oCDNJXQK+1abpyXdP2C1sMpop/r5kjnKiT12zSO
+   Ge9WPHYcnttbP+IwFDNuwZLNrYL/N+E3x9WpUSnHSYoE2hu2qwm02vd3q
+   YP6GrSLfuCzubGIKv50YTX90lBbTHwEwSUWdLqTPXN0ECfYMo9Q13MHnx
+   BmAHppklNBzHeyhLLfT4b4CnDQQVbTMrjuRxGUdB03YqpF/fqr+MynUK8
+   g==;
+X-CSE-ConnectionGUID: EMXglT86RbicTe4edYbbAQ==
+X-CSE-MsgGUID: wLky7nTtRPKVzBi1cxqqJg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="75251822"
 X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="75251820"
+   d="scan'208";a="75251822"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 22:05:55 -0700
-X-CSE-ConnectionGUID: 0Bonq9lmT4uKSouOENriOA==
-X-CSE-MsgGUID: LxlWx0osRNeiuEMkhq0vyw==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 22:05:59 -0700
+X-CSE-ConnectionGUID: RJ3+qZZdRzeIErmzfNHdcQ==
+X-CSE-MsgGUID: YbQQwoUQRu+C4tpP1NTBhA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="222399184"
+   d="scan'208";a="222399193"
 Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by orviesa010.jf.intel.com with ESMTP; 19 Mar 2026 22:05:53 -0700
+  by orviesa010.jf.intel.com with ESMTP; 19 Mar 2026 22:05:57 -0700
 From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	anthony.l.nguyen@intel.com,
 	aleksandr.loktionov@intel.com
 Cc: netdev@vger.kernel.org,
-	Paul Greenwalt <paul.greenwalt@intel.com>
-Subject: [PATCH iwl-next] ice: update ice_link_mode_str_high() with 200G
-Date: Fri, 20 Mar 2026 06:05:52 +0100
-Message-ID: <20260320050552.422715-1-aleksandr.loktionov@intel.com>
+	Marcin Szycik <marcin.szycik@intel.com>,
+	Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@intel.com>
+Subject: [PATCH iwl-next] ice: use ice_fill_eth_hdr() in ice_fill_sw_rule()
+Date: Fri, 20 Mar 2026 06:05:56 +0100
+Message-ID: <20260320050556.422762-1-aleksandr.loktionov@intel.com>
 X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -83,7 +84,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -91,10 +92,10 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269789-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269790-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
 	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -102,44 +103,56 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-0.990];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: 5D18D2D5E4E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3D3FB2D5E4D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Paul Greenwalt <paul.greenwalt@intel.com>
+From: Marcin Szycik <marcin.szycik@intel.com>
 
-Update ice_link_mode_str_high() with string for 200G PHY types.
-Without these entries the ice_dump_phy_type() debug helper prints
-nothing for phy_type_high bits [5..15], covering all 200G and
-400GBASE-FR8 PHY types supported by E825C hardware.
+Use the already existing helper function to fill Ethernet header. Also
+replace sizeof with a (also existing) macro to reduce the number of
+variables.
 
-Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+Suggested-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@intel.com>
+Signed-off-by: Marcin Szycik <marcin.szycik@intel.com>
 Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_switch.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index ce11fea..7cdd6a0 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -84,6 +84,17 @@ static const char * const ice_link_mode_str_high[] = {
- 	[2] = "100G_CAUI2",
- 	[3] = "100G_AUI2_AOC_ACC",
- 	[4] = "100G_AUI2",
-+	[5] = "200G_CR4_PAM4",
-+	[6] = "200G_SR4",
-+	[7] = "200G_FR4",
-+	[8] = "200G_LR4",
-+	[9] = "200G_DR4",
-+	[10] = "200G_KR4_PAM4",
-+	[11] = "200G_AUI4_AOC_ACC",
-+	[12] = "200G_AUI4",
-+	[13] = "200G_AUI8_AOC_ACC",
-+	[14] = "200G_AUI8",
-+	[15] = "400GBASE_FR8",
- };
+diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+index bb0f990..6496534 100644
+--- a/drivers/net/ethernet/intel/ice/ice_switch.c
++++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+@@ -2612,7 +2612,6 @@ ice_fill_sw_rule(struct ice_hw *hw, struct ice_fltr_info *f_info,
+ 	u16 vlan_id = ICE_MAX_VLAN_ID + 1;
+ 	u16 vlan_tpid = ETH_P_8021Q;
+ 	void *daddr = NULL;
+-	u16 eth_hdr_sz;
+ 	u8 *eth_hdr;
+ 	u32 act = 0;
+ 	__be16 *off;
+@@ -2625,11 +2624,10 @@ ice_fill_sw_rule(struct ice_hw *hw, struct ice_fltr_info *f_info,
+ 		return;
+ 	}
+ 
+-	eth_hdr_sz = sizeof(dummy_eth_header);
+ 	eth_hdr = s_rule->hdr_data;
+ 
+ 	/* initialize the ether header with a dummy header */
+-	memcpy(eth_hdr, dummy_eth_header, eth_hdr_sz);
++	ice_fill_eth_hdr(eth_hdr);
+ 	ice_fill_sw_info(hw, f_info);
+ 
+ 	switch (f_info->fltr_act) {
+@@ -2730,7 +2728,7 @@ ice_fill_sw_rule(struct ice_hw *hw, struct ice_fltr_info *f_info,
+ 
+ 	/* Create the switch rule with the final dummy Ethernet header */
+ 	if (opc != ice_aqc_opc_update_sw_rules)
+-		s_rule->hdr_len = cpu_to_le16(eth_hdr_sz);
++		s_rule->hdr_len = cpu_to_le16(DUMMY_ETH_HDR_LEN);
+ }
  
  /**
 -- 
