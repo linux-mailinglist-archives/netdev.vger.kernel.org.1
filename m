@@ -1,402 +1,176 @@
-Return-Path: <netdev+bounces-269858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269859-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id hmzfAbAMvWkS6QIAu9opvQ
-	(envelope-from <netdev+bounces-269858-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 10:00:32 +0100
+	id EK1OEvENvWkz6QIAu9opvQ
+	(envelope-from <netdev+bounces-269859-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 10:05:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 178E62D7A64
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 10:00:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97E2C2D7BA7
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 10:05:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 25C033024BFD
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:59:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 417CB3169932
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D85337AA85;
-	Fri, 20 Mar 2026 08:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A7732ED39;
+	Fri, 20 Mar 2026 09:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z8dV2r4B"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="L8rWMyDt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59601376BFD;
-	Fri, 20 Mar 2026 08:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB1432E69A;
+	Fri, 20 Mar 2026 09:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773997130; cv=none; b=ZHM9EfLWqHWV/kS9oN3HBs62qlg0JlzGQMkWwypHAH8r3fJhSgaVzhQg3lf2E2n2Voigf9xtaIGdOMiXBDLvKwt89HHjCJuEFOPFGJCTSWUH0HCcXJ7E88OkIVdy0OySS/twhUbxOVr1RbRfmy3OLGpILZvgiwwd9HSAB2ZmYBk=
+	t=1773997261; cv=none; b=NAHSstYAukzq2gVR+M8kX+K/QAMF4BteQHbhYElTrZ0KwN8qBP0bL0rFaDsInNQpH45PoR/x0WFua1/ZjhUGHpDntV7eCLBru1kYVpdu1C3S95ycDUF5GivBEPZnm87dvYk4VXqtBMzWvSgAhf8oJEli5S5S8ukX9eC2fGoR3+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773997130; c=relaxed/simple;
-	bh=n31d8NYjTDg4u78LNNFct5Yi6pJSfLNaOmI/4D6Nfd8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MROhQWoE/B/15DjKDxObCCBjU1KZwwj1kJPkbWPGZN4EcXGb0LBgqaV7oMuNOflUcryKO/GMrN+4ESvMAHZkhopfVBus2Ek+XvhWlCRELak8LvyKmVecxtrL+W1wZ2nfkwG9URl5iZjxqIj3MR1Rioza/ipotRpF4tKIFKKt3vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z8dV2r4B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43224C4CEF7;
-	Fri, 20 Mar 2026 08:58:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773997130;
-	bh=n31d8NYjTDg4u78LNNFct5Yi6pJSfLNaOmI/4D6Nfd8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Z8dV2r4Boh1D1IuphrQlWfJnmQpdloXi1stlxvXmqkpYR6hPrWdzARWamdzUfnhKs
-	 YG+2Z08r1+zpyIVsOkQaoz9tB+tJCjk/L2fwF0daCQE63Wm4bRTFUUJsK1kNOEHNUq
-	 CYutHtVbRpiAa5c7HWiri+OeL2xK91WStI4k20NpWUBLolEH+K4AZv0aEZW85p92cK
-	 v2MV6UYacKg9MB4QZhVONNjF2KkAHU/p1tvGUsw4Zc3v4WAgwDGhFelBvyJg2VHSJC
-	 xFSPn4mnGQdT2FEOzGokyqvcNYfFUl5h+2Y79CYi3spDxkGNF/nuyZyPCQmNrqpVym
-	 m1VImU44ndqnw==
-From: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Willem de Bruijn <willemb@google.com>,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v7 4/4] selftests: rss_drv: Add RSS indirection table resize tests
-Date: Fri, 20 Mar 2026 09:58:24 +0100
-Message-ID: <20260320085826.1957255-5-bjorn@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260320085826.1957255-1-bjorn@kernel.org>
-References: <20260320085826.1957255-1-bjorn@kernel.org>
+	s=arc-20240116; t=1773997261; c=relaxed/simple;
+	bh=yWRqGYW9henWppQGr9spTjFkIAhOjEclxFIFQGNTv2I=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=txndargZjOLibgYPyFh+lCrWMsOXaCx6yFe7NroQlaBnI/2O7WkG2Ug/DAtHl6pIQvg9g2U++parA8tcqxDWlleoG1Sky3CLKwypRXnal2s68ze8ANmmQQjHbr8g7LCePSvTZ3KGqD/WGseVokx/Xbpf2Ej8MHtxB186+twDyak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=L8rWMyDt; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 6F319206B0;
+	Fri, 20 Mar 2026 10:00:57 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id tDlXtIxFloLA; Fri, 20 Mar 2026 10:00:56 +0100 (CET)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id B463A207D8;
+	Fri, 20 Mar 2026 10:00:56 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com B463A207D8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1773997256;
+	bh=Ih6XIm9zWH43Qd9VtL3P4SQdRfzxnZNZPdBnUvpieIo=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=L8rWMyDtQcDUesINgwa8XvHp4PHW1Z3dBlRjPEhi3H3XILaEoTtJcfT7EBHz23XgN
+	 ic90OYzqM1/8UpsVHx4sl84mMeS95vJ/lU+fy/vraNlDyvF54NoFEnfCw9jCW0hMJ/
+	 kOnhEcQXg9mvLyQI5oVteiQHeYEuv7x9Hvm0LgqWqYfP3qPSg+rVqZb7AU774Tr5jm
+	 ljeOSdqSRD6Cp36btVibHqGQUT/N1VUbt1g1o1oyQwBQI1x6BKEZN5SfQk5wzoldYj
+	 czXTSu/STqrKzetcmI2+A931NQi0uMHnK6N9ahhQ52663UwMCCAHHxoCQe2rbirfqq
+	 LXRMoQeUy5HDQ==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 20 Mar
+ 2026 10:00:56 +0100
+Received: (nullmailer pid 647907 invoked by uid 1000);
+	Fri, 20 Mar 2026 09:00:55 -0000
+Date: Fri, 20 Mar 2026 10:00:55 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Felix Fietkau <nbd@nbd.name>
+CC: Qingfang Deng <dqfext@gmail.com>, Pablo Neira Ayuso <pablo@netfilter.org>,
+	<netfilter-devel@vger.kernel.org>, <davem@davemloft.net>,
+	<netdev@vger.kernel.org>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <fw@strlen.de>, <horms@kernel.org>,
+	<antony.antony@secunet.com>
+Subject: Re: [PATCH net-next,RFC 0/8] netfilter: flowtable bulking
+Message-ID: <ab0Mx1DpXmz4UvRq@secunet.com>
+References: <20260317112917.4170466-1-pablo@netfilter.org>
+ <20260319061520.356946-1-dqfext@gmail.com>
+ <abvdyDVJ8OYW52fw@secunet.com>
+ <8f71af62-61c5-44f6-98d4-737034c498c6@nbd.name>
+ <abzt3maph4VFq3wd@secunet.com>
+ <eb7ba04a-b688-475c-8247-1e7e62d60ac3@nbd.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.93 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <eb7ba04a-b688-475c-8247-1e7e62d60ac3@nbd.name>
+X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MIXED_CHARSET(0.59)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269858-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[gmail.com,netfilter.org,vger.kernel.org,davemloft.net,kernel.org,redhat.com,google.com,strlen.de,secunet.com];
+	TAGGED_FROM(0.00)[bounces-269859-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,secunet.com:dkim,secunet.com:mid];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.996];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.990];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 178E62D7A64
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 97E2C2D7BA7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add resize tests to rss_drv.py. Devices without dynamic table sizing
-are skipped via _require_dynamic_indir_size().
+On Fri, Mar 20, 2026 at 09:50:31AM +0100, Felix Fietkau wrote:
+> On 20.03.26 07:49, Steffen Klassert wrote:
+> > On Thu, Mar 19, 2026 at 01:18:19PM +0100, Felix Fietkau wrote:
+> > > On 19.03.26 12:28, Steffen Klassert wrote:
+> > > > On Thu, Mar 19, 2026 at 02:15:17PM +0800, Qingfang Deng wrote:
+> > > > > Hi Pablo,
+> > > > > > > On Tue, 17 Mar 2026 12:29:09 +0100, Pablo Neira Ayuso wrote:
+> > > > > > Hi,
+> > > > > >  > Back in 2018 [1], a new fast forwarding combining the flowtable
+> > > > > and
+> > > > > > GRO/GSO was proposed, however, "GRO is specialized to optimize the
+> > > > > > non-forwarding case", so it was considered "counter-intuitive to base a
+> > > > > > fast forwarding path on top of it".
+> > > > > >  > Then, Steffen Klassert proposed the idea of adding a new engine
+> > > > > for the
+> > > > > > flowtable that operates on the skb list that is provided after the NAPI
+> > > > > > cycle. The idea is to process this skb list to create bulks grouped by
+> > > > > > the ethertype, output device, next hop and tos/dscp. Then, add a
+> > > > > > specialized xmit path that can deal with these skb bulks. Note that GRO
+> > > > > > needs to be disabled so this new forwarding engine obtains the list of
+> > > > > > skbs that resulted from the NAPI cycle.
+> > > > > > > +Cc: Felix Fietkau
+> > > > > > > How does this compare to fraglist GRO with the original
+> > > flowtable?
+> > > > > GRO can only aggregate packets of the same L4 flow. This can
+> > > > aggregate all packets the are treated  the same by the
+> > > > forwarding path. Packets need to have the same output device
+> > > > and next hop, but can be from different L3 and L4 flows.
+> > > > > Packet forwarders usually receive many different flows.
+> > > > GRO might not even kick in if there are not at least
+> > > > two packets from the same flow on a napi cycle.
+> > > 
+> > > Interesting approach! Do you think it might be possible to combine this with
+> > > GRO by bulking together GRO-combined frames from different flows?
+> > 
+> > This depends on how the GRO packets are crafted. If the packets built
+> > just by adding skb page frags, then yes. If the fraglist pointer is
+> > used to chain packets, then no (our approach uses the fraglist pointer
+> > as well). So combining these would require some changes to the GRO
+> > layer.
+> 
+> On OpenWrt we use fraglist GRO by default for both TCP and UDP.
+> Maybe the bulking code could take fraglist GRO packets and simply convert
+> them to its internal form of bulking batches.
 
-resize_periodic: set a periodic 4-entry table, shrink channels to
-fold, grow back to unfold. Check the exact pattern is preserved. Has
-main and non-default context variants.
+This is possible, but would run the bulking logic two times
+in the forwarding path.
 
-resize_below_user_size_reject: send a periodic table with user_size
-between the big and small device table sizes. Verify that shrinking
-below user_size is rejected even though the table is periodic. Has
-main and non-default context variants.
-
-resize_nonperiodic_reject: set a non-periodic table (equal N), verify
-that channel reduction is rejected.
-
-resize_nonperiodic_no_corruption: verify a failed resize leaves both
-the indirection table contents and the channel count unchanged.
-
-Signed-off-by: Björn Töpel <bjorn@kernel.org>
----
- .../selftests/drivers/net/hw/rss_drv.py       | 233 +++++++++++++++++-
- 1 file changed, 229 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_drv.py b/tools/testing/selftests/drivers/net/hw/rss_drv.py
-index 2d1a33189076..bd59dace6e15 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_drv.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_drv.py
-@@ -5,9 +5,9 @@
- Driver-related behavior tests for RSS.
- """
- 
--from lib.py import ksft_run, ksft_exit, ksft_ge
--from lib.py import ksft_variants, KsftNamedVariant, KsftSkipEx
--from lib.py import defer, ethtool
-+from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ge
-+from lib.py import ksft_variants, KsftNamedVariant, KsftSkipEx, ksft_raises
-+from lib.py import defer, ethtool, CmdExitFailure
- from lib.py import EthtoolFamily, NlError
- from lib.py import NetDrvEnv
- 
-@@ -45,6 +45,18 @@ def _maybe_create_context(cfg, create_context):
-     return ctx_id
- 
- 
-+def _require_dynamic_indir_size(cfg, ch_max):
-+    """Skip if the device does not dynamically size its indirection table."""
-+    ethtool(f"-X {cfg.ifname} default")
-+    ethtool(f"-L {cfg.ifname} combined 2")
-+    small = len(_get_rss(cfg)['rss-indirection-table'])
-+    ethtool(f"-L {cfg.ifname} combined {ch_max}")
-+    large = len(_get_rss(cfg)['rss-indirection-table'])
-+
-+    if small == large:
-+        raise KsftSkipEx("Device does not dynamically size indirection table")
-+
-+
- @ksft_variants([
-     KsftNamedVariant("main", False),
-     KsftNamedVariant("ctx", True),
-@@ -76,11 +88,224 @@ def indir_size_4x(cfg, create_context):
-         _test_rss_indir_size(cfg, test_max, context=ctx_id)
- 
- 
-+@ksft_variants([
-+    KsftNamedVariant("main", False),
-+    KsftNamedVariant("ctx", True),
-+])
-+def resize_periodic(cfg, create_context):
-+    """Test that a periodic indirection table survives channel changes.
-+
-+    Set a non-default periodic table ([3, 2, 1, 0] x N) via netlink,
-+    reduce channels to trigger a fold, then increase to trigger an
-+    unfold. Using a reversed pattern (instead of [0, 1, 2, 3]) ensures
-+    the test can distinguish a correct fold from a driver that silently
-+    resets the table to defaults. Verify the exact pattern is preserved
-+    and the size tracks the channel count.
-+    """
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < 4:
-+        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+
-+    _require_dynamic_indir_size(cfg, ch_max)
-+
-+    ctx_id = _maybe_create_context(cfg, create_context)
-+
-+    # Set a non-default periodic pattern via netlink.
-+    # Send only 4 entries (user_size=4) so the kernel replicates it
-+    # to fill the device table. This allows folding down to 4 entries.
-+    rss = _get_rss(cfg, context=ctx_id)
-+    orig_size = len(rss['rss-indirection-table'])
-+    pattern = [3, 2, 1, 0]
-+    req = {'header': {'dev-index': cfg.ifindex}, 'indir': pattern}
-+    if ctx_id:
-+        req['context'] = ctx_id
-+    else:
-+        defer(ethtool, f"-X {cfg.ifname} default")
-+    cfg.ethnl.rss_set(req)
-+
-+    # Shrink — should fold
-+    ethtool(f"-L {cfg.ifname} combined 4")
-+    rss = _get_rss(cfg, context=ctx_id)
-+    indir = rss['rss-indirection-table']
-+
-+    ksft_ge(orig_size, len(indir), "Table did not shrink")
-+    ksft_eq(indir, [3, 2, 1, 0] * (len(indir) // 4),
-+            "Folded table has wrong pattern")
-+
-+    # Grow back — should unfold
-+    ethtool(f"-L {cfg.ifname} combined {ch_max}")
-+    rss = _get_rss(cfg, context=ctx_id)
-+    indir = rss['rss-indirection-table']
-+
-+    ksft_eq(len(indir), orig_size, "Table size not restored")
-+    ksft_eq(indir, [3, 2, 1, 0] * (len(indir) // 4),
-+            "Unfolded table has wrong pattern")
-+
-+
-+@ksft_variants([
-+    KsftNamedVariant("main", False),
-+    KsftNamedVariant("ctx", True),
-+])
-+def resize_below_user_size_reject(cfg, create_context):
-+    """Test that shrinking below user_size is rejected.
-+
-+    Send a table via netlink whose size (user_size) sits between
-+    the small and large device table sizes. The table is periodic,
-+    so folding would normally succeed, but the user_size floor must
-+    prevent it.
-+    """
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < 4:
-+        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+
-+    _require_dynamic_indir_size(cfg, ch_max)
-+
-+    ctx_id = _maybe_create_context(cfg, create_context)
-+
-+    # Measure the table size at max channels
-+    rss = _get_rss(cfg, context=ctx_id)
-+    big_size = len(rss['rss-indirection-table'])
-+
-+    # Measure the table size at reduced channels
-+    ethtool(f"-L {cfg.ifname} combined 4")
-+    rss = _get_rss(cfg, context=ctx_id)
-+    small_size = len(rss['rss-indirection-table'])
-+    ethtool(f"-L {cfg.ifname} combined {ch_max}")
-+
-+    if small_size >= big_size:
-+        raise KsftSkipEx("Table did not shrink at reduced channels")
-+
-+    # Find a user_size
-+    user_size = None
-+    for div in [2, 4]:
-+        candidate = big_size // div
-+        if candidate > small_size and big_size % candidate == 0:
-+            user_size = candidate
-+            break
-+    if user_size is None:
-+        raise KsftSkipEx("No suitable user_size between small and big table")
-+
-+    # Send a periodic sub-table of exactly user_size entries.
-+    # Pattern safe for 4 channels.
-+    pattern = [0, 1, 2, 3] * (user_size // 4)
-+    if len(pattern) != user_size:
-+        raise KsftSkipEx(f"user_size ({user_size}) not divisible by 4")
-+    req = {'header': {'dev-index': cfg.ifindex}, 'indir': pattern}
-+    if ctx_id:
-+        req['context'] = ctx_id
-+    else:
-+        defer(ethtool, f"-X {cfg.ifname} default")
-+    cfg.ethnl.rss_set(req)
-+
-+    # Shrink channels — table would go to small_size < user_size.
-+    # The table is periodic so folding would work, but user_size
-+    # floor must reject it.
-+    with ksft_raises(CmdExitFailure):
-+        ethtool(f"-L {cfg.ifname} combined 4")
-+
-+
-+@ksft_variants([
-+    KsftNamedVariant("main", False),
-+    KsftNamedVariant("ctx", True),
-+])
-+def resize_nonperiodic_reject(cfg, create_context):
-+    """Test that a non-periodic table blocks channel reduction.
-+
-+    Set equal weight across all queues so the table is not periodic
-+    at any smaller size, then verify channel reduction is rejected.
-+    An additional context with a periodic table is created to verify
-+    that validation catches the non-periodic one even when others
-+    are fine.
-+    """
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < 4:
-+        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+
-+    _require_dynamic_indir_size(cfg, ch_max)
-+
-+    ctx_id = _maybe_create_context(cfg, create_context)
-+    ctx_ref = f"context {ctx_id}" if ctx_id else ""
-+
-+    # Create an extra context with a periodic (foldable) table so that
-+    # the validation must iterate all contexts to find the bad one.
-+    extra_ctx = _maybe_create_context(cfg, True)
-+    ethtool(f"-X {cfg.ifname} context {extra_ctx} equal 2")
-+
-+    ethtool(f"-X {cfg.ifname} {ctx_ref} equal {ch_max}")
-+    if not create_context:
-+        defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    with ksft_raises(CmdExitFailure):
-+        ethtool(f"-L {cfg.ifname} combined 2")
-+
-+
-+@ksft_variants([
-+    KsftNamedVariant("main", False),
-+    KsftNamedVariant("ctx", True),
-+])
-+def resize_nonperiodic_no_corruption(cfg, create_context):
-+    """Test that a failed resize does not corrupt table or channel count.
-+
-+    Set a non-periodic table, attempt a channel reduction (which must
-+    fail), then verify both the indirection table contents and the
-+    channel count are unchanged.
-+    """
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < 4:
-+        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+
-+    _require_dynamic_indir_size(cfg, ch_max)
-+
-+    ctx_id = _maybe_create_context(cfg, create_context)
-+    ctx_ref = f"context {ctx_id}" if ctx_id else ""
-+
-+    ethtool(f"-X {cfg.ifname} {ctx_ref} equal {ch_max}")
-+    if not create_context:
-+        defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    rss_before = _get_rss(cfg, context=ctx_id)
-+
-+    with ksft_raises(CmdExitFailure):
-+        ethtool(f"-L {cfg.ifname} combined 2")
-+
-+    rss_after = _get_rss(cfg, context=ctx_id)
-+    ksft_eq(rss_after['rss-indirection-table'],
-+            rss_before['rss-indirection-table'],
-+            "Indirection table corrupted after failed resize")
-+
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ksft_eq(channels['combined-count'], ch_max,
-+            "Channel count changed after failed resize")
-+
-+
- def main() -> None:
-     """ Ksft boiler plate main """
-     with NetDrvEnv(__file__) as cfg:
-         cfg.ethnl = EthtoolFamily()
--        ksft_run([indir_size_4x], args=(cfg, ))
-+        ksft_run([indir_size_4x, resize_periodic,
-+                  resize_below_user_size_reject,
-+                  resize_nonperiodic_reject,
-+                  resize_nonperiodic_no_corruption], args=(cfg, ))
-     ksft_exit()
- 
- 
--- 
-2.53.0
-
+The problem is the standard GRO. This also use the fraglist pointer if
+MAX_SKB_FRAGS is reached. Converting this back is complicated. That would
+not be a forwarding fastpath anymore.
 
