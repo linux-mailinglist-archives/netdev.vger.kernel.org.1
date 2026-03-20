@@ -1,117 +1,181 @@
-Return-Path: <netdev+bounces-270010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270011-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CBggH56NvWnY+wIAu9opvQ
-	(envelope-from <netdev+bounces-270010-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:10:38 +0100
+	id GHoqNPaOvWnY+wIAu9opvQ
+	(envelope-from <netdev+bounces-270011-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:16:22 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE5D72DF352
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:10:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD0E2DF432
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:16:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CDE3430480BC
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:04:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 797BA303A27D
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:10:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C0C30C37E;
-	Fri, 20 Mar 2026 18:04:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3B4A3DEFF2;
+	Fri, 20 Mar 2026 18:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dc0AiC8H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZMfcQs6N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5542B30595C
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 18:04:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111583DEFE0
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 18:08:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774029898; cv=none; b=gmgqL/7kq+4zKRtLbwAtSKAChlkxLEtwAyWeQwPdjRmn5VY4JcVrpIB2sJVnqDbOX0o4aDEJNI7DVijvLjWHXe/p5xfVTX5f8BlioVXKsIUXXa2vMjE6JeN/yxBFrAxoIj4e9rA8yglX1BRgFef2JAtkjj/srYIiTgnse8Oyrqo=
+	t=1774030124; cv=none; b=JUTHSxxtocidCeVsUxq8Mccs7jIJdPjKAeHQQ7UBImsHmEQLKFwRXEnrbFrRtG6QrZE4UEij2iq6zhf34CITdK0dUHfItFahEwsnCPTpGP73i0oQN8lzPiU1DZmf0v2jjiRx7eyNfT/D5xtjUSslRZ6XEosJ+dZGZ9TYxWcf0IA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774029898; c=relaxed/simple;
-	bh=MWjx9x4Xl1BkLqNJhEJUVwdMpzVxVl0W3+B/XEfda4k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r6NRdiwHHA36hkZyM2u3rN49DTBLEPfjE0GuhCylaNDzuv5kk2b81D70vU+Pqxm1uDeEYftldgb0MI3rKqKVOT6hPYnIrc7vhcG8nGfBxicX881xGB6xiKa3OwTFJUlRdScW/CMPw1Mno0fFM7OSbSvBFX1RmsAY2kj4Tq75F2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dc0AiC8H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFCA6C4CEF7;
-	Fri, 20 Mar 2026 18:04:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774029897;
-	bh=MWjx9x4Xl1BkLqNJhEJUVwdMpzVxVl0W3+B/XEfda4k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dc0AiC8HWTroundPkJREjzoBqtTidxTGkbEz+xDedXhWDrPx+RDNPXHM2KD8gmXYP
-	 KpwKXdRQsTfzAR63tQ32OonJdjglD3N9CjI0f0kYajnGzR7kYcx6YSPu9sgB8on4YR
-	 rTia+oqnQNk2Q00ZewQsImi8HfDjswi89+oGBuhAlq/Jw5q3H5333iefqkdemL3GWy
-	 gI3OYciTiYbAeIInMnOA/CbABpSZYZtbYo+jWofrouZ6jFius9a8Pes+KTxxdnIptf
-	 DmchDyYme+S4+lisudfyRW5i7gtFUvY8zjAdR0tigvgaYXtVzBmzLWPpBY+5cuiolK
-	 iQUrB6KfH10gw==
-Date: Fri, 20 Mar 2026 18:04:54 +0000
-From: Simon Horman <horms@kernel.org>
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org,
-	Katarzyna Wieczerzycka <katarzyna.wieczerzycka@intel.com>
-Subject: Re: [PATCH] ice: add missing reset of the mac header
-Message-ID: <20260320180410.GA151863@horms.kernel.org>
-References: <20260320050518.422303-1-aleksandr.loktionov@intel.com>
+	s=arc-20240116; t=1774030124; c=relaxed/simple;
+	bh=eQxUX+gzWlFkaXDdfeVXpeBJ0sPtMwm28h+c2N4MDbg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=C05Q9WRkJvVhRBgYwW2GdB2h+XXDRBtxMmz4Nq5dKHGiDEY2A/QOuljGMaXMosp9ScsKcIaZ/r+y31qQtkNECPsMjhKvm8GHL/zn9c/aLYyDQSZQqPBEc/CWd8JGom+hs0F73a2rd5n8lnA8Jq4WgW5zgID3MkGJ6BySjyEchNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZMfcQs6N; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-799001d73bdso19096497b3.0
+        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 11:08:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774030122; x=1774634922; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+HxIcwAjT3BNXjqO4kOjoOrvW9GUI+JCw0ZolV134BA=;
+        b=ZMfcQs6NCcX0MjYvyPXucuyoO6ikjNqC0HIuX2wvj3gUMK8gBnzNnkULeC+l8fe55T
+         lN5dITPvosdwlPhGqi0ePi819CWvXIOVJK8VYS9xPTA9aXj8nnzLAjJjEaMx6K8W6j6a
+         nd/IIuLZsx9s8rP2BGTHHNSSRQRhVMky32zmim9vHHSIOSUYWcoWIJYTvdFOUiauIfAB
+         tUoO6Gz5IEMNKIeQ1xgeNQA+PwwX8BGtxfh1+58MYOmRl2/oDI5m7OaUcGtmfC7GbNGI
+         v+W1JmadLQVesgjcoL7ccjDAg7McOfuI5bkRNBp4hRua8lA0oCTjzsyybTIeDdXJSb1b
+         6Wvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774030122; x=1774634922;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+HxIcwAjT3BNXjqO4kOjoOrvW9GUI+JCw0ZolV134BA=;
+        b=JL+/vwXSkyh3Uxy7zAMS2Xw6PEpgvFxHt5NXi/K+lcrZKBxIyA1QPJ0lkdz1GR0jEc
+         a0iHrOSZR0mjsx+bGDVUmUlz+JH05rKohWuzydgLwplzFOOu2dpRTmBU4R8g77vSZAPe
+         MLowomSttnFgZu+zRoASAkfdjCgbjZ7PR+bwBBUNwA0C33XUnsAiL+i3GCkdAVwqK9NX
+         +FSdjMUctwy0rW24wTGqPs0r2YX3zpG9HIPU/lJ+ZaFA9daAeOdiPZ/sUH4A5qyb1Rd5
+         KyIx0RTHB4FaZ1gyur/qKA8yVBB2yBpLcckdeINTinRcEfiQf4+QXfvBDDlM0MBesiyx
+         idwQ==
+X-Gm-Message-State: AOJu0YytdN6pqMAdcBvoOU/W1A+yM+eoMC+9vdI+YTBo3zBbVuiknvbC
+	dXUmIRs2aK0rSZM7VzTX9b0NWH4DrKsRBhRpr+QOuxs2kmXokjwlUsmX
+X-Gm-Gg: ATEYQzy/jB7fvvkfkxeGyCO1C4W+hUnCTLa63rN5kHhUotjNKlbGT+2oPXbyRLp2qEe
+	9w5wGlhzN6SMSc6eqaVrvNASvJEdWCti0uj+QORsvbGTNqB6fZsTDRtm+CwKuXsmmW51GlHxFTn
+	eykl7QOG3+yOeRAz2sqcfXfVaLQpbmKXZEZ3lTkYBYFyWHBFntFCmeOjqBA9F8pzsCMeZ++Qi3J
+	JjPixCEQ7ogILtfYI4hNutrgSbVnE+R3xC90BU3WiMITi/pXYowaEAKPDKXX1VpVbnxf6x7NwUh
+	AqvLvT13W91Tmhl2HKV9AezEYAD3hiEtH+qvxx4qw8KdtvvQHDlLil03h0raNra3aDpwaPmr/MJ
+	jz2qOH+AqKe0LwkzkOxgtcEZJYt+CEGKkmokLsrMGRt9DtD/qBcEk1YHZpOWBvpHFXFMxktWj56
+	Ts0MV8WxOOftSnd8hmL3JgiQ==
+X-Received: by 2002:a05:690c:385:b0:799:2b4c:1d49 with SMTP id 00721157ae682-79a90bc7e4amr37281837b3.36.1774030122081;
+        Fri, 20 Mar 2026 11:08:42 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:71::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-79a903a3473sm19822147b3.1.2026.03.20.11.08.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Mar 2026 11:08:41 -0700 (PDT)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Date: Fri, 20 Mar 2026 11:08:35 -0700
+Subject: [PATCH net] selftests: drv-net: add missing tc config options for
+ netkit tests
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260320050518.422303-1-aleksandr.loktionov@intel.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260320-config-fixes-for-nk-tests-v1-1-1e20ec6ddc7e@meta.com>
+X-B4-Tracking: v=1; b=H4sIACONvWkC/x3KQQrCMBAF0KsMf92BGGsDuYq40GZSB2EimSBC6
+ d0F3/rtcOkqjkw7unzUtRkynSbC+rzbJqwFmRBDXMI5Bl6bVd246leca+tsLx7iw3mZS0qPdJl
+ TqZgI7y7/hUxXmAzcjuMHBvtodHAAAAA=
+X-Change-ID: 20260320-config-fixes-for-nk-tests-64d77b7547df
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.14.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270010-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270011-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.989];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.987];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CE5D72DF352
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:email,meta.com:mid]
+X-Rspamd-Queue-Id: 3FD0E2DF432
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 06:05:18AM +0100, Aleksandr Loktionov wrote:
-> From: Katarzyna Wieczerzycka <katarzyna.wieczerzycka@intel.com>
-> 
-> By default skb->mac_header is not set, so reset prevents access to an
-> invalid pointer.
-> 
-> Call skb_reset_mac_header() before accessing the mac header from skb.
-> 
-> Signed-off-by: Katarzyna Wieczerzycka <katarzyna.wieczerzycka@intel.com>
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-Hi Katarzyna and Aleksandr,
+The NetDrvContEnv env context uses tc clsact qdiscs and BPF tc filters
+for traffic redirection, but the kernel config options are missing from
+the selftests config.
 
-I am curious:
+Without them, the tc qdisc installation trips on:
 
-Is this a bug? If so then it should probably have a fixes tag and
-a bit more of a description around how this can happen.
+  CMD: tc qdisc add dev enp1s0 clsact
+    EXIT: 2
+    STDERR: Error: Specified qdisc kind is unknown.
 
-If it is not a bug, then is this defensive? And if so, is it really necessary?
+  net.lib.py.utils.CmdExitFailure: Command failed
 
-...
+Add CONFIG_NET_CLS_ACT and CONFIG_NET_SCH_INGRESS to enable these tc
+options.
+
+Fixes: 3f74d5bb807e ("selftests/net: Add env for container based tests")
+Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+---
+ tools/testing/selftests/drivers/net/hw/config | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tools/testing/selftests/drivers/net/hw/config b/tools/testing/selftests/drivers/net/hw/config
+index 235c0a1cd21e..dd50cb8a7911 100644
+--- a/tools/testing/selftests/drivers/net/hw/config
++++ b/tools/testing/selftests/drivers/net/hw/config
+@@ -6,9 +6,11 @@ CONFIG_FUNCTION_ERROR_INJECTION=y
+ CONFIG_IO_URING=y
+ CONFIG_IPV6=y
+ CONFIG_IPV6_GRE=y
++CONFIG_NET_CLS_ACT=y
+ CONFIG_NET_CLS_BPF=y
+ CONFIG_NET_IPGRE=y
+ CONFIG_NET_IPGRE_DEMUX=y
+ CONFIG_NETKIT=y
++CONFIG_NET_SCH_INGRESS=y
+ CONFIG_UDMABUF=y
+ CONFIG_VXLAN=y
+
+---
+base-commit: edab1ca5ec6fffecbf340e26956ce73e502901d5
+change-id: 20260320-config-fixes-for-nk-tests-64d77b7547df
+
+Best regards,
+-- 
+Bobby Eshleman <bobbyeshleman@meta.com>
+
 
