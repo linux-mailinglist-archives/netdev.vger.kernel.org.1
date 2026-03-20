@@ -1,243 +1,171 @@
-Return-Path: <netdev+bounces-269797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269798-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qD2qOCLovGlS4QIAu9opvQ
-	(envelope-from <netdev+bounces-269797-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 07:24:34 +0100
+	id 2r/EGurtvGme4gIAu9opvQ
+	(envelope-from <netdev+bounces-269798-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 07:49:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0332D63AF
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 07:24:34 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 089892D653C
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 07:49:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 36D97304C105
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 06:22:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 65FA1300B9DD
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 06:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4909C30BF67;
-	Fri, 20 Mar 2026 06:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69F313563D6;
+	Fri, 20 Mar 2026 06:49:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h4EfhusW"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="wL3tdiGI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E8C28468E;
-	Fri, 20 Mar 2026 06:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918EC355F32;
+	Fri, 20 Mar 2026 06:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773987743; cv=none; b=Ltrfd4mLLWR1HiPufPZqeAv2FAMeDr/MMg4xfLS3bKCPXu72MbhIe0lh3nwo/c/5hkeXcNGM2BMWWoIas8N9+YqtSwXalQP53zucFElMVYvzQ5okr8/vCEspGIVOeuOikQGkH0n0vDzTR4txgV6D8HGv9hU3PCXuC89iGhQzI/g=
+	t=1773989350; cv=none; b=panihDYxh/vmWBFJttvqqUcVGhvBP4An4IqA8yKOdwAGgmYVBxUA6291Xi4j7IORm/hgyggShNQgtYUDLZZgd+vIzW9pz2YSraWVBpiPZVDafVaXJg8eWVkK4/Y68CX4VqLs740aC7S+XJmfUzCFqszO5ODuvCL+xw/+vQYBaLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773987743; c=relaxed/simple;
-	bh=Y8KK2D24mfTh3VP389qPc6aHnaY65d5tmzYY9bbkot0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oeK1XEF/YOkH23I9LPEOcLFzqOjP0ipmaqg1Vw1WYaly89Xuz0Q51UX/593HXVju6ac8kMlvZrkPabux8+STUcJzqT4H1aPCA1FeSO2qmKOnuVromqxvlLamLOfrx3l2RsLwQnS+ABm460pBkO1a99jOlYIod6DEkW0/7Otqjbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h4EfhusW; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773987741; x=1805523741;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Y8KK2D24mfTh3VP389qPc6aHnaY65d5tmzYY9bbkot0=;
-  b=h4EfhusWG7Xv5n5jNGAfLkHsFTHf2c7uDvDcZxTt9ny9wd/0F7vwXL3e
-   DYS5nGUaVsov7XYXMmbCw1cX9xblmbqQ5kCWhbgLcqTS5WOOfU3uMVYye
-   So2n28/S9yafKo0lpurjuDV33zF+zRpp2x2D07r7FB91g37VmBRpB55/p
-   FoaywztCp98Jwo+JEDC4zDlrl0rHPxlKwPIxurI1R6xuj0gWZJe7ZVyp1
-   h4Bnk+VSe2niCekwubKP50VwtpBOBUaOEM4acEHh50AjZnLxRcSjsczSV
-   rnpMi5XxhW2oiDDQdbt/rHtEPgSFq+vqkFQhe4TPWBijWtDfRlmDRd4Fk
-   Q==;
-X-CSE-ConnectionGUID: 6usCPMfqTsmFWAotCy6zPg==
-X-CSE-MsgGUID: 1q2oHitgQgqjwXnQ5VmalA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="77676620"
-X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="77676620"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 23:22:20 -0700
-X-CSE-ConnectionGUID: 3ZKtYmxhQTCMSaPmGSYtPw==
-X-CSE-MsgGUID: UvuJIwaHSy2DE3wUa67I/Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="218576883"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 23:22:19 -0700
-Date: Thu, 19 Mar 2026 23:22:06 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: x86@kernel.org, Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v7 07/10] x86/vmscape: Use static_call() for predictor
- flush
-Message-ID: <20260320062206.bdrnmnvho6lhmejw@desk>
-References: <20260319-vmscape-bhb-v7-0-b76a777a98af@linux.intel.com>
- <20260319-vmscape-bhb-v7-7-b76a777a98af@linux.intel.com>
- <20260319205802.GJ3738786@noisy.programming.kicks-ass.net>
- <20260319213421.br6na4dulrjm6eke@desk>
- <20260319214409.GL3738786@noisy.programming.kicks-ass.net>
+	s=arc-20240116; t=1773989350; c=relaxed/simple;
+	bh=/0GIbIMZQIRMYEZhdjs4h4IPbDXFCX/nNCbIPnzfQUI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BuEVVdg1p5W/hGA3d1xuBVRZc/WfWAJRncnQOz6fhjuN9stelXpfQ1U9x5KN7PYLmpZcjN7P2htay2pG0wJyrkQ4jJfmfry2GrzRQdbT5Uofm5ceMRdOZ8Y+ydMzWa9gFaMf3wtDxCnluQZluZYWJF41zjl8zsyvm3i4hqSSuIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=wL3tdiGI; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 009EE20851;
+	Fri, 20 Mar 2026 07:49:05 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id u_tVBpO8pBpe; Fri, 20 Mar 2026 07:49:04 +0100 (CET)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 51F4220826;
+	Fri, 20 Mar 2026 07:49:04 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 51F4220826
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1773989344;
+	bh=r5SUTevA8Yh+GfkoAHaWh+6lNEe5selD4w2ly6R8puI=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=wL3tdiGI5GWsTIHl+Mf9YB1JacAM8pT/rgklzxqomhyq6ySgqLoEt7ZmXw8oXj5JJ
+	 II2N0lV5iX9omWJFMxRNDpzK/XChG/AcmXrQp+ISl+DZF/0e7jSmh4KEa0tlq4uhWI
+	 6eXmBOT/uQuZxC0gd77s2/Zv9IZH4tnU5Kl8/sWXpbN80ZeAdnYaVGUYxKj/FY6LUo
+	 4c+ehKBOAB0xdHEc1DqO53h9sXyFQGbJ5wApFOca/Cizbm768YUIgEel6kfvS8Dqi5
+	 QH9C71UoitPrD1riCTI3StBI4axTayCOrmRvXl/w/Nr6gCgRcV83zbBIEpMEnoQNCV
+	 qhNOfoQ2fe8Pw==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 20 Mar
+ 2026 07:49:03 +0100
+Received: (nullmailer pid 580119 invoked by uid 1000);
+	Fri, 20 Mar 2026 06:49:02 -0000
+Date: Fri, 20 Mar 2026 07:49:02 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Felix Fietkau <nbd@nbd.name>
+CC: Qingfang Deng <dqfext@gmail.com>, Pablo Neira Ayuso <pablo@netfilter.org>,
+	<netfilter-devel@vger.kernel.org>, <davem@davemloft.net>,
+	<netdev@vger.kernel.org>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <fw@strlen.de>, <horms@kernel.org>,
+	<antony.antony@secunet.com>
+Subject: Re: [PATCH net-next,RFC 0/8] netfilter: flowtable bulking
+Message-ID: <abzt3maph4VFq3wd@secunet.com>
+References: <20260317112917.4170466-1-pablo@netfilter.org>
+ <20260319061520.356946-1-dqfext@gmail.com>
+ <abvdyDVJ8OYW52fw@secunet.com>
+ <8f71af62-61c5-44f6-98d4-737034c498c6@nbd.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20260319214409.GL3738786@noisy.programming.kicks-ass.net>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <8f71af62-61c5-44f6-98d4-737034c498c6@nbd.name>
+X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,vger.kernel.org,intel.com];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,netfilter.org,vger.kernel.org,davemloft.net,kernel.org,redhat.com,google.com,strlen.de,secunet.com];
+	TAGGED_FROM(0.00)[bounces-269798-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269797-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[secunet.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-0.907];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.992];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[36];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 8E0332D63AF
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 089892D653C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 19, 2026 at 10:44:09PM +0100, Peter Zijlstra wrote:
-...
-> > With _TRAMP, KVM complains:
+On Thu, Mar 19, 2026 at 01:18:19PM +0100, Felix Fietkau wrote:
+> On 19.03.26 12:28, Steffen Klassert wrote:
+> > On Thu, Mar 19, 2026 at 02:15:17PM +0800, Qingfang Deng wrote:
+> > > Hi Pablo,
+> > > 
+> > > On Tue, 17 Mar 2026 12:29:09 +0100, Pablo Neira Ayuso wrote:
+> > > > Hi,
+> > > >  > Back in 2018 [1], a new fast forwarding combining the flowtable
+> > > and
+> > > > GRO/GSO was proposed, however, "GRO is specialized to optimize the
+> > > > non-forwarding case", so it was considered "counter-intuitive to base a
+> > > > fast forwarding path on top of it".
+> > > >  > Then, Steffen Klassert proposed the idea of adding a new engine
+> > > for the
+> > > > flowtable that operates on the skb list that is provided after the NAPI
+> > > > cycle. The idea is to process this skb list to create bulks grouped by
+> > > > the ethertype, output device, next hop and tos/dscp. Then, add a
+> > > > specialized xmit path that can deal with these skb bulks. Note that GRO
+> > > > needs to be disabled so this new forwarding engine obtains the list of
+> > > > skbs that resulted from the NAPI cycle.
+> > > 
+> > > +Cc: Felix Fietkau
+> > > 
+> > > How does this compare to fraglist GRO with the original flowtable?
 > > 
-> >  ERROR: modpost: "__SCK__vmscape_predictor_flush" [arch/x86/kvm/kvm.ko] undefined!
+> > GRO can only aggregate packets of the same L4 flow. This can
+> > aggregate all packets the are treated  the same by the
+> > forwarding path. Packets need to have the same output device
+> > and next hop, but can be from different L3 and L4 flows.
+> > 
+> > Packet forwarders usually receive many different flows.
+> > GRO might not even kick in if there are not at least
+> > two packets from the same flow on a napi cycle.
 > 
-> Ah, tricky. Yeah, this would need to be solved differenlty. Perhaps wrap
-> this in a helper and export that?
+> Interesting approach! Do you think it might be possible to combine this with
+> GRO by bulking together GRO-combined frames from different flows?
 
-bool vmscape_mitigation_enabled(void)
-{
-       return unlikely(static_call_query(vmscape_predictor_flush));
-}
-EXPORT_SYMBOL_FOR_KVM(vmscape_mitigation_enabled);
+This depends on how the GRO packets are crafted. If the packets built
+just by adding skb page frags, then yes. If the fraglist pointer is
+used to chain packets, then no (our approach uses the fraglist pointer
+as well). So combining these would require some changes to the GRO
+layer.
 
-This is definitely simpler option, but adds an exported function and an
-unnecessary call to it.
+> I think it would be unfortunate if you have to choose between decent
+> forwarding throughput and decent local rx throughput.
 
-> Or use the below little thing and change it to
-> EXPORT_STATIC_CALL_FOR_MODULES(foo, "kvm"); or whatnot.
-> 
-> > Probably one option is to somehow make sure that the key can be set to
-> > __ro_after_init? I don't see a use case for modifying the static_call() after
-> > boot.
-> 
-> So we have __ro_after_init for static_branch, but we'd not done
-> it for static_call yet. It shouldn't be terribly difficult, just hasn't
-> been done. Not sure this is the moment to do so.
-> 
-> 
-> ---
-> diff --git a/include/linux/static_call.h b/include/linux/static_call.h
-> index 78a77a4ae0ea..b610afd1ed55 100644
-> --- a/include/linux/static_call.h
-> +++ b/include/linux/static_call.h
-> @@ -216,6 +216,9 @@ extern long __static_call_return0(void);
->  #define EXPORT_STATIC_CALL_GPL(name)					\
->  	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name));			\
->  	EXPORT_SYMBOL_GPL(STATIC_CALL_TRAMP(name))
-> +#define EXPORT_STATIC_CALL_FOR_MODULES(name, mods)			\
-> +	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_KEY(name), mods);		\
-> +	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_TRAMP(name), mods)
->  
->  /* Leave the key unexported, so modules can't change static call targets: */
->  #define EXPORT_STATIC_CALL_TRAMP(name)					\
-> @@ -276,6 +279,9 @@ extern long __static_call_return0(void);
->  #define EXPORT_STATIC_CALL_GPL(name)					\
->  	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name));			\
->  	EXPORT_SYMBOL_GPL(STATIC_CALL_TRAMP(name))
-> +#define EXPORT_STATIC_CALL_FOR_MODULES(name, mods)			\
-> +	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_KEY(name), mods);		\
-> +	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_TRAMP(name), mods)
->  
->  /* Leave the key unexported, so modules can't change static call targets: */
->  #define EXPORT_STATIC_CALL_TRAMP(name)					\
-> @@ -346,6 +352,8 @@ static inline int static_call_text_reserved(void *start, void *end)
->  
->  #define EXPORT_STATIC_CALL(name)	EXPORT_SYMBOL(STATIC_CALL_KEY(name))
->  #define EXPORT_STATIC_CALL_GPL(name)	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name))
-> +#define EXPORT_STATIC_CALL_FOR_MODULES(name, mods)			\
-> +	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_KEY(name), mods)
->  
->  #endif /* CONFIG_HAVE_STATIC_CALL */
-
-This plus extending it to support EXPORT_STATIC_CALL_FOR_KVM() is probably
-a better solution. Please let me know which one you prefer.
-
-diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index a568d8e6f4e8..89c4964c8560 100644
---- a/include/linux/kvm_types.h
-+++ b/include/linux/kvm_types.h
-@@ -13,6 +13,9 @@
- 	EXPORT_SYMBOL_FOR_MODULES(symbol, __stringify(KVM_SUB_MODULES))
- #define EXPORT_SYMBOL_FOR_KVM(symbol) \
- 	EXPORT_SYMBOL_FOR_MODULES(symbol, "kvm," __stringify(KVM_SUB_MODULES))
-+#define EXPORT_STATIC_CALL_FOR_KVM(symbol) \
-+	EXPORT_STATIC_CALL_FOR_MODULES(symbol ,"kvm," __stringify(KVM_SUB_MODULES))
-+
- #else
- #define EXPORT_SYMBOL_FOR_KVM_INTERNAL(symbol)
- /*
-@@ -23,6 +26,7 @@
- #ifndef EXPORT_SYMBOL_FOR_KVM
- #if IS_MODULE(CONFIG_KVM)
- #define EXPORT_SYMBOL_FOR_KVM(symbol) EXPORT_SYMBOL_FOR_MODULES(symbol, "kvm")
-+#define EXPORT_STATIC_CALL_FOR_KVM(symbol) EXPORT_STATIC_CALL_FOR_MODULES(symbol ,"kvm")
- #else
- #define EXPORT_SYMBOL_FOR_KVM(symbol)
- #endif /* IS_MODULE(CONFIG_KVM) */
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 5f102af4921f..0abdb54f7510 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -145,7 +145,7 @@ EXPORT_SYMBOL_GPL(cpu_buf_idle_clear);
- DEFINE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
- 
- DEFINE_STATIC_CALL_NULL(vmscape_predictor_flush, write_ibpb);
--EXPORT_STATIC_CALL_GPL(vmscape_predictor_flush);
-+EXPORT_STATIC_CALL_FOR_KVM(vmscape_predictor_flush);
- 
- #undef pr_fmt
- #define pr_fmt(fmt)	"mitigations: " fmt
+Would be nice if we could tune for both cases, but sometimes it
+needs a decision for which use case it should be tuned.
 
