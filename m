@@ -1,211 +1,172 @@
-Return-Path: <netdev+bounces-269753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269754-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qk53KjuovGma1wIAu9opvQ
-	(envelope-from <netdev+bounces-269753-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 02:51:55 +0100
+	id yKs7GcmqvGmk1wIAu9opvQ
+	(envelope-from <netdev+bounces-269754-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 03:02:49 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D13312D4E04
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 02:51:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C59972D4F9F
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 03:02:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 623E530329A9
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 01:51:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 11F7E31239A0
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 02:00:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3B72F1FEC;
-	Fri, 20 Mar 2026 01:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6809431B838;
+	Fri, 20 Mar 2026 02:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Hog0R7qS"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JO0uZ6ht"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4FCC2F0661
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 01:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB462C1593
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 01:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773971511; cv=none; b=p6EmXnIh7tYGMkVWJd6PeHMy9Tqg1NoUeC/eQ07PKRFaK8t/JDJ2vZfi+RanOzWUz/6DFoTwtdexnUZ5BI2TeOyDK0HCPtENnC0rNcTwLSEZsUaytEqj96Jr3l8c7/PGnikBLAeFFOTDQbkrEOwGeaMNm/9xvwGg0orWuxiJWfk=
+	t=1773972005; cv=none; b=JKKRcpWBdPVUUNNwCcZGtyM6WTFDep2LWZp7lhtMtWflNSmIUKTtiGuqx8XsQPG/KsQ9inpZGI4NzRSKsYefrl0o9TxMZqi3fzk4jiakwcUY9+5bAPsk0wK4hHadHEiDhwSLCKizlTriExRCBEurws38oiVeUEyKv6LydjqPhwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773971511; c=relaxed/simple;
-	bh=/TbWxvlmanNQoCdIIbTnj1NseyOL63aFw965iRS1XhM=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=t4cTCZjYQLuJm/MZIXrWAJv4/FaeYzYTjmc/yYKwwQzfQwWXC4kzdE7beylyktguadu5JRP/S9iMIy3IBZzx9HdxZOalcPw9597vGkcPi0GCGT3H+mCCgRsVuWWnpdNDtd/TZHQXg3ny1kjiybelB+gcE38MR6kMVL4y0FiS3Gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Hog0R7qS; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1773971502; h=Message-ID:Subject:Date:From:To;
-	bh=rQ9ztebKVRUhdVhBDDLvbYshAWFrplTl6Mh171aANhU=;
-	b=Hog0R7qSQ4p28zGtXpiKLJUs3OIMYJnetS6YNICq2aRhGrBkaJjG5q/OYcWvdxSiEeCFJjfsF5XGSP0EQzf4SARw4GznwvAz0aRGw5WpAvPpUvS9RyBmcDoqh9fc/73YrDRcsTxSZIu12bXbg/i+121mLwN/K7xODhmKcvCQmoo=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0X.JxLTH_1773971500;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X.JxLTH_1773971500 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 20 Mar 2026 09:51:41 +0800
-Message-ID: <1773971222.0876994-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net v10 1/2] virtio-net: correct hdr_len handling for VIRTIO_NET_F_GUEST_HDRLEN
-Date: Fri, 20 Mar 2026 09:47:02 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Alvaro Karsz <alvaro.karsz@solid-run.com>,
- virtualization@lists.linux.dev,
- netdev@vger.kernel.org
-References: <20260313075930.105466-1-xuanzhuo@linux.alibaba.com>
- <20260313075930.105466-2-xuanzhuo@linux.alibaba.com>
- <bc3a66a1-8c0d-4038-9b92-0fe3d10b1555@redhat.com>
-In-Reply-To: <bc3a66a1-8c0d-4038-9b92-0fe3d10b1555@redhat.com>
+	s=arc-20240116; t=1773972005; c=relaxed/simple;
+	bh=eT6xaelN5XO32ix1yQPvuSaJ0SdWh2+PvKzWtojBfcg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=e5awBGH/85ExeXj9vc21poYddR8AEAHT1hzKD+Vfd51IVwJ4MdhGKNKKu5gSR+r4/d80i1opOxpl9orLIzrd+oR9LxtsYRJeTDEmYCvmpMFxQ3HR8ff8FbPJtBTaEHhq76fM44+Zx398aFzI+VTH1XJWuF9v8tHYR4cRm/K7ats=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JO0uZ6ht; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <45cd6493-843c-470d-b686-fea770f7b60f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773971996;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cVGgvU+uzgYrpXevlS0BtmWDh9gxIX20gmyPvk1S/xo=;
+	b=JO0uZ6htQfMj/h02yqJ2CpX8ju1gn5Dk4H/Zu067H04ey9LS7bgZ2aW5YmyFE60xLIxAvp
+	ZwGXrmvaDVJmvSTL/Tfd+avGsHpgllmzXVP6okuXAT1OZmknfKroQQLTQpeYsJuri8RQOw
+	O974JbVoAsV0SrXrLiu40vG1CXS2KCE=
+Date: Thu, 19 Mar 2026 18:59:40 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+MIME-Version: 1.0
+Subject: Re: [PATCH] bpf: use RCU-safe iteration in dev_map_redirect_multi()
+ SKB path
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: David Carlier <devnexen@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, davem@davemloft.net,
+ Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ bpf <bpf@vger.kernel.org>
+References: <20260318162420.7684-1-devnexen@gmail.com>
+ <27a6be7f-8263-41ef-a9b6-3925ee59061c@linux.dev>
+Content-Language: en-US
+In-Reply-To: <27a6be7f-8263-41ef-a9b6-3925ee59061c@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,resnulli.us,solid-run.com,lists.linux.dev,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269753-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-0.835];
+	TAGGED_FROM(0.00)[bounces-269754-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.alibaba.com:dkim,linux.alibaba.com:mid,alibaba.com:email]
-X-Rspamd-Queue-Id: D13312D4E04
+	NEURAL_HAM(-0.00)[-0.996];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: C59972D4F9F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 17 Mar 2026 12:29:17 +0100, Paolo Abeni <pabeni@redhat.com> wrote:
-> On 3/13/26 8:59 AM, Xuan Zhuo wrote:
-> > The commit be50da3e9d4a ("net: virtio_net: implement exact header length
-> > guest feature") introduces support for the VIRTIO_NET_F_GUEST_HDRLEN
-> > feature in virtio-net.
-> >
-> > This feature requires virtio-net to set hdr_len to the actual header
-> > length of the packet when transmitting, the number of
-> > bytes from the start of the packet to the beginning of the
-> > transport-layer payload.
-> >
-> > However, in practice, hdr_len was being set using skb_headlen(skb),
-> > which is clearly incorrect. This commit fixes that issue.
-> >
-> > Fixes: be50da3e9d4a ("net: virtio_net: implement exact header length guest feature")
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/tun_vnet.h     |  2 +-
-> >  drivers/net/virtio_net.c   |  6 +++++-
-> >  include/linux/virtio_net.h | 33 +++++++++++++++++++++++++++++----
-> >  3 files changed, 35 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
-> > index a5f93b6c4482..fa5cab9d3e55 100644
-> > --- a/drivers/net/tun_vnet.h
-> > +++ b/drivers/net/tun_vnet.h
-> > @@ -244,7 +244,7 @@ tun_vnet_hdr_tnl_from_skb(unsigned int flags,
-> >
-> >  	if (virtio_net_hdr_tnl_from_skb(skb, tnl_hdr, has_tnl_offload,
-> >  					tun_vnet_is_little_endian(flags),
-> > -					vlan_hlen, true)) {
-> > +					vlan_hlen, true, false)) {
-> >  		struct virtio_net_hdr_v1 *hdr = &tnl_hdr->hash_hdr.hdr;
-> >  		struct skb_shared_info *sinfo = skb_shinfo(skb);
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 72d6a9c6a5a2..7106333ef904 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -3267,8 +3267,12 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
-> >  	struct virtio_net_hdr_v1_hash_tunnel *hdr;
-> >  	int num_sg;
-> >  	unsigned hdr_len = vi->hdr_len;
-> > +	bool feature_hdrlen;
-> >  	bool can_push;
-> >
-> > +	feature_hdrlen = virtio_has_feature(vi->vdev,
-> > +					    VIRTIO_NET_F_GUEST_HDRLEN);
-> > +
-> >  	pr_debug("%s: xmit %p %pM\n", vi->dev->name, skb, dest);
-> >
-> >  	/* Make sure it's safe to cast between formats */
-> > @@ -3288,7 +3292,7 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
-> >
-> >  	if (virtio_net_hdr_tnl_from_skb(skb, hdr, vi->tx_tnl,
-> >  					virtio_is_little_endian(vi->vdev), 0,
-> > -					false))
-> > +					false, feature_hdrlen))
-> >  		return -EPROTO;
-> >
-> >  	if (vi->mergeable_rx_bufs)
-> > diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-> > index 75dabb763c65..48de4a16a96a 100644
-> > --- a/include/linux/virtio_net.h
-> > +++ b/include/linux/virtio_net.h
-> > @@ -207,6 +207,22 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
-> >  	return __virtio_net_hdr_to_skb(skb, hdr, little_endian, hdr->gso_type);
-> >  }
-> >
-> > +static inline void virtio_net_set_hdrlen(const struct sk_buff *skb,
-> > +					 struct virtio_net_hdr *hdr,
-> > +					 bool little_endian)
-> > +{
-> > +	u16 hdr_len;
-> > +
-> > +	hdr_len = skb_transport_offset(skb);
-> > +
-> > +	if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
-> > +		hdr_len += sizeof(struct udphdr);
-> > +	else
-> > +		hdr_len += tcp_hdrlen(skb);
-> > +
-> > +	hdr->hdr_len = __cpu_to_virtio16(little_endian, hdr_len);
-> > +}
->
-> The series LGTM, let's wait for Jason and or Michael.
->
-> If another revision is needed, please consider factoring out a
-> __virtio_net_set_hdrlen() helper taking an additional explicit
-> transport_offset argument, to deduplicate a bit the code between patch
-> 1/2 and 2.2. Not a blocked anyway for me.
+On 3/19/26 6:37 PM, Martin KaFai Lau wrote:
+> 
+> 
+> On 3/18/26 9:24 AM, David Carlier wrote:
+>> The DEVMAP_HASH branch in dev_map_redirect_multi() uses
+>> hlist_for_each_entry_safe() to iterate hash buckets, but this function
+>> runs under RCU protection (called from xdp_do_generic_redirect_map()
+>> in softirq context). Concurrent writers (__dev_map_hash_update_elem,
+>> dev_map_hash_delete_elem) modify the list using RCU primitives
+>> (hlist_add_head_rcu, hlist_del_rcu).
+>>
+>> hlist_for_each_entry_safe() performs plain pointer dereferences without
+>> rcu_dereference(), missing the acquire barrier needed to pair with
+>> writers' rcu_assign_pointer(). On weakly-ordered architectures (ARM64,
+>> POWER), a reader can observe a partially-constructed node. It also
+>> defeats CONFIG_PROVE_RCU lockdep validation and KCSAN data-race
+>> detection.
+>>
+>> Replace with hlist_for_each_entry_rcu(), matching the XDP-frame path
+>> (dev_map_enqueue_multi) which already uses the correct macro for the
+>> same hash iteration.
+> 
+>>
+>> Fixes: e624d4ed4aa8 ("xdp: Extend xdp_redirect_map with broadcast 
+>> support")
+>> Signed-off-by: David Carlier <devnexen@gmail.com>
+>> ---
+>>   kernel/bpf/devmap.c | 3 +--
+>>   1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+>> index 3d619d01088e..c8d256405c29 100644
+>> --- a/kernel/bpf/devmap.c
+>> +++ b/kernel/bpf/devmap.c
+>> @@ -747,7 +747,6 @@ int dev_map_redirect_multi(struct net_device *dev, 
+>> struct sk_buff *skb,
+>>       struct bpf_dtab_netdev *dst, *last_dst = NULL;
+>>       int excluded_devices[1+MAX_NEST_DEV];
+>>       struct hlist_head *head;
+>> -    struct hlist_node *next;
+>>       int num_excluded = 0;
+>>       unsigned int i;
+>>       int err;
+>> @@ -787,7 +786,7 @@ int dev_map_redirect_multi(struct net_device *dev, 
+>> struct sk_buff *skb,
+>>       } else { /* BPF_MAP_TYPE_DEVMAP_HASH */
+>>           for (i = 0; i < dtab->n_buckets; i++) {
+>>               head = dev_map_index_hash(dtab, i);
+>> -            hlist_for_each_entry_safe(dst, next, head, index_hlist) {
+>> +            hlist_for_each_entry_rcu(dst, head, index_hlist, 
+>> lockdep_is_held(&dtab->index_lock)) {he 
+> 
+> Where is the dtab->index_lock acquired? dev_map_enqueue_multi() has been 
+> incorrect also. Take a look at the rcu_read_lock_bh_held() usage in the 
+> rcu_dereference_check() a few lines above.
+> 
+> pw-bot: cr
+> 
+> Please cc the bpf list and tag the target tree in the subject. imo, bpf- 
+> next instead of bpf should be fine for this.
 
-Hi, currently, a new version seems necessary. However, I do not plan to
-implement it this way. This is because we require two parameters: one for
-transport and another for TCP offset (tcp_hdrlen or inner_tcp_hdrlen). I believe
-it would be inappropriate to put the TCP offset into the parameters as well,
-since we must first determine whether the protocol is TCP before calling
-tcp_hdrlen or inner_tcp_hdrlen. Therefore, I think having two
-separate functions is clearer.
+cc bpf list.
 
-Thanks.
+> 
+>>                   if (is_ifindex_excluded(excluded_devices, num_excluded,
+>>                               dst->dev->ifindex))
+>>                       continue;
+> 
+> 
 
-
->
-> /P
->
 
