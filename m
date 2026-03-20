@@ -1,225 +1,173 @@
-Return-Path: <netdev+bounces-269894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269896-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6HCnMfIvvWmI7QIAu9opvQ
-	(envelope-from <netdev+bounces-269894-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:30:58 +0100
+	id UMIBLcswvWmI7QIAu9opvQ
+	(envelope-from <netdev+bounces-269896-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:34:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CA442D9992
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:30:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 343002D9A5E
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:34:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 259AD302D116
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:29:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8EFE8306243C
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD395372EDC;
-	Fri, 20 Mar 2026 11:29:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D73D3AA519;
+	Fri, 20 Mar 2026 11:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yvug7t3p"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="fIWL64my"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011039.outbound.protection.outlook.com [52.101.57.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93B31A6800;
-	Fri, 20 Mar 2026 11:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774006182; cv=none; b=WGxaoYJ3SQppbzh4SFbhr1q+esvpMaNTrU0lpUjqLYpaa8Gczmc+wfLVsir+pZV7LEb7tD4uANUH/OE5jczoISZBuCQJe3NC/kQaLCgUJKjmPXw0WWRpMFy5pQYSpQYJAtMyKi1d5TFQDYJivQxlM4C1M/0WfpFpaeib/HPyJMY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774006182; c=relaxed/simple;
-	bh=a/Kg539vue2ngY+OY8ZDZa5onMTW99kiRa7ZsGcZb18=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dEbjsobGmMhZ6ooKZYlwgQJyZ68aH3q08KH6zfjb4oPo7ppho5V4WwkGTQqyeIEjQ1bHCj8lvn/zWfanEinJNV2EaKeEUgY3e9kcqSDMShcd2AwHeKr98Txtk15HeiyfIkM0eqzbFtZFf5yvvKNpkNU6oP4/0kMh8LjDWxtuLx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yvug7t3p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DF6EC4CEF7;
-	Fri, 20 Mar 2026 11:29:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774006182;
-	bh=a/Kg539vue2ngY+OY8ZDZa5onMTW99kiRa7ZsGcZb18=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Yvug7t3p3Bt8+9Geiy0PuQm4AnN14FNfEoRpFirz4heoGNuimSPrY1hDvOo/m2IDj
-	 8p2yjeQpv2hgrwHzA9+qC0ljMw18niMRBfCFkORPKuLbUGF01FHhwubSkDKDmasoQM
-	 VB22LNnCrYJWoqlqkhG8aFWIyCcZysz2+O7zriBE78XX7eFVAAB5L9Z01ULUCV/H9U
-	 mLhFvEmRtu9WAEZjie03bNrn8sxqZHHX4b8qtEIJGhNxPQClTuQ9qdzJdiZKVcWqPS
-	 YiIvShkqwujditHWSGJ9kUZQZSK/HRpZPmFH6jDvWOtPIJ0a//p/TN7WajwDqWGmpx
-	 JzYx00xJHbj4Q==
-From: Simon Horman <horms@kernel.org>
-To: vikas.gupta@broadcom.com
-Cc: Simon Horman <horms@kernel.org>,
-	vsrama-krishna.nemani@broadcom.com,
-	edumazet@google.com,
-	ajit.khaparde@broadcom.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pavan.chebbi@broadcom.com,
-	rajashekar.hudumula@broadcom.com,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	michael.chan@broadcom.com,
-	bhargava.marreddy@broadcom.com,
-	andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v8 10/10] bng_en: add support for ethtool -S stats display
-Date: Fri, 20 Mar 2026 11:27:19 +0000
-Message-ID: <20260320112717.2065386-3-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260319055124.1350670-11-vikas.gupta@broadcom.com>
-References: <20260319055124.1350670-11-vikas.gupta@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C4ED3A872B;
+	Fri, 20 Mar 2026 11:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.39
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774006265; cv=fail; b=V6Y1DvY604QtlLZlHbOpqomQTYys3wbJqo9oB6BnJ9l2qxcId7UMcjth/V7S+JPqz+t47DwMGJwk0UpMmqtQ19sc0wPCSziAZ+YFduL1aLx8fhxwwVBbJzKYsBZDPqjrwyXio6hKtnIKti7c7JcrH+Tw5U3c9i1TTseJ639ilEE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774006265; c=relaxed/simple;
+	bh=rgqzaAyWhXFwC9qi6ybtOixV76U8NPzi4S0HnnhIYds=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=r6LYse2B2ZE9Uxj/LXQJc9NbTxzbw6DH0FOfItlzFVck4dBxXmXQ0Sqjcd5vA7aKzlHi5LUQcjGHhNd0FFdvXRAbcyB7udr6ZGiNO36h6V9qQ/idg70UIAKUPTGC5q9Mnqn37cjAQ4P1TAcoBqP9cpuhd+ljjm0YMS37kRBBUy8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=fIWL64my; arc=fail smtp.client-ip=52.101.57.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rRMVXPtSmC5CLK+LYFuZ6EV6cqpKGIAl6WoyX6ai1rxjxhXwH5L5uSuSuQyAdxbzbb+zqBHdBI4+/J4Q9KMDHlT3w5WIc/tv1g53IR9wYlmKm+nxU/qi8NJLNQW6qRKEhFcvL10pv6RlR23M27BPkLA/9DZZT/MHeKRBlsMc66SUDOGItxy+Hkzoh6DWzt6GO+EXepFspAU6hvMBGQ+G7bKZtzhv4r8Mk1y1+OOQNP3bSv/vek5Sl0anBtKdWGkXSs+M9a7smTUiCaf6tUdehu8xhro9vmueeHVwHNxt/PwTd/M90n8M+sbukn01FEEe2lQDUK9e78OK5KRiq89exQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rgqzaAyWhXFwC9qi6ybtOixV76U8NPzi4S0HnnhIYds=;
+ b=iu7b3ZcH6YfrZsmyFwWXg/pzaWom5GQEc2lHpTSb8fBkP+26nwviSNYGZyj5BTRCbeXRY5dqze/KgVqLP2Ta0uu//XZQfp8knGaF0AiEKUpOaFGzm+yLI/uNMoyLTh5DLx5yThG3fSe9E4plIuBLUyga4DpY7SRBJV6UX0luCgfZO2+g59afuurA/oBlLTsRdJRFz09KK7sAm9yBMteiXpW/cuT25DLGEMN7nIyhp27ohXpxjGQ1hjLEeUEdQcrhYMqpOFcGxdUYrLgq4LEw1HLQ6ZXcCkgSls2FL9eAK2ZGx0uPFUlx3E6XSC65uyBXijlfglbJQF/ieL90RI8EdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rgqzaAyWhXFwC9qi6ybtOixV76U8NPzi4S0HnnhIYds=;
+ b=fIWL64mydFHKT+2wyoNyS7VVMqzfleroAYjdqw6GAY22VjF5fLtDcOOnUkp9BqT9Xf723yUpKi4sdu3RfFnGO2XLXXuWqQhXIJMQs7foHTefHsBcBwdzE87O7+szz9wIqRfASZTLNu45sUYt2W4//O/vi1psDg/YMR4wziUhh9m8ptLqXAf2ACjyWEpSnMcTdJ0ZAMSTXrE/o9wDNbIW78rWOmzydvUwO7VXv+sy6Wlx/2gO95Svtdyqn9Vmp10r+MmCM5KU3Me9p74MYKT+w6/vfW4NOF+eGjVBA9PSFHGIxxPYg0IMnyi+nidK15SHBtnvBmjTdYfyT5ovj45GmQ==
+Received: from DS7PR03CA0227.namprd03.prod.outlook.com (2603:10b6:5:3ba::22)
+ by LV3PR12MB9235.namprd12.prod.outlook.com (2603:10b6:408:1a4::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.15; Fri, 20 Mar
+ 2026 11:30:53 +0000
+Received: from CY4PEPF0000E9D7.namprd05.prod.outlook.com
+ (2603:10b6:5:3ba:cafe::ac) by DS7PR03CA0227.outlook.office365.com
+ (2603:10b6:5:3ba::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.20 via Frontend Transport; Fri,
+ 20 Mar 2026 11:30:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000E9D7.mail.protection.outlook.com (10.167.241.70) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9723.19 via Frontend Transport; Fri, 20 Mar 2026 11:30:52 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 20 Mar
+ 2026 04:30:32 -0700
+Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 20 Mar
+ 2026 04:30:26 -0700
+References: <20260319160410.2515105-1-ioana.ciornei@nxp.com>
+ <20260319160410.2515105-6-ioana.ciornei@nxp.com>
+User-agent: mu4e 1.8.14; emacs 30.2
+From: Petr Machata <petrm@nvidia.com>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>
+CC: <netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, <linux-kernel@vger.kernel.org>, <petrm@nvidia.com>,
+	<willemb@google.com>
+Subject: Re: [PATCH net-next v3 5/9] selftests: drivers: hw: cleanup
+ shellcheck warnings in the rmon test
+Date: Fri, 20 Mar 2026 12:29:10 +0100
+In-Reply-To: <20260319160410.2515105-6-ioana.ciornei@nxp.com>
+Message-ID: <87h5qa91rn.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D7:EE_|LV3PR12MB9235:EE_
+X-MS-Office365-Filtering-Correlation-Id: 24ce717a-9e97-414a-e17a-08de867424d1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700016|376014|7416014|82310400026|1800799024|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	zn9CsWKaCEXSz3GBzNAtX0r3RuB9mFLmvl+aBGE4RhkRnHJvllwlsLKxAy4Yp88iZjI9h/qOw6e1KX6GqLsWSSFWjjXhiBQmQAH4emJu2VH8Oy04qpgi/lay65ANRJIGaYMt0NmAtDivHc9WT62qAZSLFgtq1BblvdqQxbqlAdQCYTNIBCa2gfpUMWl/kM8uiK1INlanNJpn8Fuopi6AjVfUIyApBXNlnDsqTS0BNsjy6m6Gk6s/TzWGdtvtg1DPR4uHwSbz4a2lfbQiGOAOZBAth/8esLsI9ExeNsYvB57YjCvkRc79UnVfNA+faiP1Bnwd8R86GY8GZIFrKQ0ktFms5lV2mUz3YpjD1VzojZyYVrgGgf6Z3vgB7frPmNKapdokIAP5rqwTWhnLIaH9vs40tc0HPe5gIdJv9oHVeqpACSLXl7E/s/gqVKRQbp4YKB/KzaFR/gE62DXi31srLU1XRtPjxtBLdTre1s2JGgwfL9inKC4i2EwG25lkjNTyNuy6Ne2dxdfeyKd+1jRLZ+Xzd/tz4342wlFIRjurKxqgR5iK/KCR++7Cdub3ntrOpNVQ5AiZzyao+4sDrKyi6ptcSsSjkUnjx+GTIeknd1JjX5y3k52dq5OisilHUWyN8KWVavMjNc0esTq0HMWK3ugSBYasj9WlErH4MzJul18udOw5zAr2FfGAV7AGG3O8QWNOjjfvvgWz9lbjIW6+lKfTXVvqfaXQvqdOzdEzU0PF7afJFnbkf0XbsiuK+N3bFNDQpLEzd/yJvqQngFPntQ==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(376014)(7416014)(82310400026)(1800799024)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	Jybkp9BKhSmEF3RfNzxJYBUeWm1w5DfWZViH/5SEicDQON3lindfP1qalVqMWp3Imv24dR05WFIdK91eE/4xefsr7ZewFv1wWKthJRq0vF9GlJAIwws25IwyPkFwH5L+CZfsJZ9G3v7NYxkqbjpdbnfHrysNxtHxeThLKNuDLPH1awGGGcr+htj9d6wtnQ/edPg7PWnpnvimblMonntjyP92xy2EOvq9XNDVRjuaT/fIjasDO1u8bLPBtLKNYxZbtQsd5JlbsDpxG1OieWnCbN7z2zYok8ipr6xSE/COh7hSerWAvBaE4majtomohhKR4P6L58ZanDp3zJ7jqw/fXqEE2UMTicip0NacselGYjyqn0UKYO4bJJI+aFslNcRDX1lIZcVkhkNka2HzuKOKdv9tUancT+4W3wqzA9IQDEAdzX2bIpdjQiXlLg4SdtEO
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2026 11:30:52.4127
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24ce717a-9e97-414a-e17a-08de867424d1
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9D7.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9235
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-269894-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269896-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.954];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[petrm@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.959];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 2CA442D9992
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 343002D9A5E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+Ioana Ciornei <ioana.ciornei@nxp.com> writes:
 
-Simon says: This is somewhat more subjective than the other two AI
-generated reviews I released for this patch-set. But I think it does
-at least warrant discussion.
-
----
-bng_en: add support for ethtool -S stats display
-
-This patch implements the legacy ethtool statistics interface to expose
-hardware counters through ethtool -S, including per-queue ring stats,
-TPA stats, port level stats, and per-priority stats.
-
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-> index 2ae13f18e2d7..1a0eb987ef6f 100644
-> --- a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-
-[ ... ]
-
-> @@ -42,6 +307,219 @@ static void bnge_get_drvinfo(struct net_device *dev,
->  	strscpy(info->bus_info, pci_name(bd->pdev), sizeof(info->bus_info));
->  }
+> If run on the ethtool_rmon.sh script, shellcheck generates a bunch of
+> false positive errors. Suppress those checks that generate them.
 >
-> +static int bnge_get_sset_count(struct net_device *dev, int sset)
-> +{
-> +	struct bnge_net *bn = netdev_priv(dev);
-> +
-> +	switch (sset) {
-> +	case ETH_SS_STATS:
-> +		return bnge_get_num_stats(bn);
-> +	default:
-> +		return -EOPNOTSUPP;
-> +	}
-> +}
+> Also cleanup the remaining warnings by using double quoting around the
+> used variables.
+>
+> Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
 
-[ ... ]
-
-> +static void bnge_get_ethtool_stats(struct net_device *dev,
-> +				   struct ethtool_stats *stats, u64 *buf)
-> +{
-> +	struct bnge_net *bn = netdev_priv(dev);
-> +	struct bnge_dev *bd = bn->bd;
-> +	u32 tpa_stats;
-> +	u32 i, j = 0;
-> +
-> +	if (!bn->bnapi) {
-> +		j += bnge_get_num_ring_stats(bd);
-> +		goto skip_ring_stats;
-> +	}
-> +
-> +	tpa_stats = bnge_get_num_tpa_ring_stats(bd);
-> +	for (i = 0; i < bd->nq_nr_rings; i++) {
-> +		struct bnge_napi *bnapi = bn->bnapi[i];
-> +		struct bnge_nq_ring_info *nqr;
-> +		u64 *sw_stats;
-> +		int k;
-> +
-> +		nqr = &bnapi->nq_ring;
-> +		sw_stats = nqr->stats.sw_stats;
-> +
-> +		if (is_rx_ring(bd, i)) {
-> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_ucast_pkts);
-> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_mcast_pkts);
-> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_bcast_pkts);
-> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_ucast_bytes);
-> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_mcast_bytes);
-> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_bcast_bytes);
-> +		}
-> +		if (is_tx_ring(bd, i)) {
-> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_ucast_pkts);
-> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_mcast_pkts);
-> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_bcast_pkts);
-> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_ucast_bytes);
-> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_mcast_bytes);
-> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_bcast_bytes);
-> +		}
-
-This isn't a bug, but Documentation/networking/statistics.rst flags a
-potential concern about interface duplication. The patch adds per-queue
-ring statistics (rxqN_ucast_packets, rxqN_mcast_packets,
-rxqN_bcast_packets, rxqN_ucast_bytes, rxqN_mcast_bytes, rxqN_bcast_bytes,
-and tx equivalents) to the ethtool -S interface.
-
-However, this driver already implements the standard per-queue statistics
-API via netdev_stat_ops (bnge_get_queue_stats_rx and
-bnge_get_queue_stats_tx in bnge_netdev.c). That interface exposes
-per-queue packets and bytes through netlink, which is the designated
-mechanism for per-queue counters.
-
-According to Documentation/networking/statistics.rst, per-queue stats
-should use the standard netdev_stat_ops interface rather than ethtool -S.
-The documentation states that drivers should avoid adding new counters to
-ethtool -S for values that have a standard uAPI.
-
-While the ethtool -S stats provide a ucast/mcast/bcast breakdown not
-directly available from the standard per-queue API (which aggregates to
-total packets and bytes), this still represents duplication of the
-fundamental per-queue packet and byte counters. Could these per-queue
-stats be omitted from ethtool -S, keeping only the truly hardware-specific
-stats like TPA, port-level, and priority stats that don't have a standard
-interface?
-
-[ ... ]
-
-> @@ -262,6 +740,9 @@ static const struct ethtool_ops bnge_ethtool_ops = {
->  	.nway_reset		= bnge_nway_reset,
->  	.get_pauseparam		= bnge_get_pauseparam,
->  	.set_pauseparam		= bnge_set_pauseparam,
-> +	.get_sset_count		= bnge_get_sset_count,
-> +	.get_strings		= bnge_get_strings,
-> +	.get_ethtool_stats	= bnge_get_ethtool_stats,
->  	.get_eth_phy_stats	= bnge_get_eth_phy_stats,
->  	.get_eth_mac_stats	= bnge_get_eth_mac_stats,
->  	.get_eth_ctrl_stats	= bnge_get_eth_ctrl_stats,
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
