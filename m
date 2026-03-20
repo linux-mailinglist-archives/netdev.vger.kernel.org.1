@@ -1,114 +1,140 @@
-Return-Path: <netdev+bounces-269848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269850-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OIA4CooIvWkO5gIAu9opvQ
-	(envelope-from <netdev+bounces-269848-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:42:50 +0100
+	id kBOsMq8IvWkO5gIAu9opvQ
+	(envelope-from <netdev+bounces-269850-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:43:27 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EBC52D756F
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:42:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D47D2D75B2
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:43:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BB6B63095303
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:41:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 24C4F30B78EA
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028AE374742;
-	Fri, 20 Mar 2026 08:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C1237474A;
+	Fri, 20 Mar 2026 08:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="INsX3Raa"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rcfOk2m5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D0C372B4D;
-	Fri, 20 Mar 2026 08:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78FDE35773F;
+	Fri, 20 Mar 2026 08:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773996078; cv=none; b=PnL2nQ8/iUcc3UvARC1ApG/u5yC0A9De/h4ESjCGT/UhtuTjGjW3EA2Y5cOsnqRM/aoo77L0fJj1q9UoxFl3CmyLciDbwSmNd+173UjNuAAAA1+/kkyO3ZcyEiaan2p8AVhmDvGyJJH5sbujlDDJvkOuDcjJK21cghh3dAU4NJE=
+	t=1773996127; cv=none; b=SBMuOythNeSgk2gqMOGnYN+ge+fUgpc4AU8wsK5FXHwXR08556PWC2z/vpE78xtstXZWkKOF/r+YuvjBC9Ml82Uw2cGE+Ry/zL035fWesg4QLyCvuzOB57B+V2GH4UUwGmNzVqfyOAvhp+zfZzw5VeFsEklIUBEz34/ntRtxT9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773996078; c=relaxed/simple;
-	bh=g90O7nn50XsDORolSKBsWrsdvCLSXXNC55dyYlhTatI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=uOCPMPE5K15zg3oO6+qfLxqSjbe1iyADfNbRdU86LTPFgi03gdXRUgp53+MCFsdtR8dKgwi3YIpQZaQDoR8GcTnb2pBuoztEXIGK7StK+q+Kz4W2bcs0nk3qWtfZ7joQsJbeYFbNjeH9iFUC7FlgAAMpYIZgmfFnpVAsdlMx+rU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=INsX3Raa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B11DC4CEF7;
-	Fri, 20 Mar 2026 08:41:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773996078;
-	bh=g90O7nn50XsDORolSKBsWrsdvCLSXXNC55dyYlhTatI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=INsX3Raa6UuQBdkSKJPPW5RhopKsv3LU7PGRZr50uMqaj2nHfxcWdIUvjLhtMpYpX
-	 3e/Taz5O9lc0pWNpHoNh/MZWXASooUaX8As4f/PCe8uWk22rJQ6R/L/B8TRWIpEhJU
-	 zmuOffFTB4OHEbaKzQMbxxCeiv+G0s/eTPLjEfGOIPw4ASf8C/R7xFSNBKEPnaEu7C
-	 2B9VNCvzJvlPLH8DKNuRm5clGTBqup1CVUnFag76gKdMrKoXdQJTgzVXKEDl0f6C1D
-	 z77zj14HY4ZwuN6DzrRCsNZReM64LEjTmTtMLu4e5A8uZ3ATXF65vFugt2Vopzkv+i
-	 3XJ1rPiWNcvwA==
-From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, magnus.karlsson@intel.com, stfomichev@gmail.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- larysa.zaremba@intel.com, aleksander.lobakin@intel.com, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>
-Subject: Re: [PATCH v2 net 7/8] selftests: bpf: have a separate variable for
- drop test
-In-Reply-To: <20260319175538.479139-8-maciej.fijalkowski@intel.com>
-References: <20260319175538.479139-1-maciej.fijalkowski@intel.com>
- <20260319175538.479139-8-maciej.fijalkowski@intel.com>
-Date: Fri, 20 Mar 2026 09:41:15 +0100
-Message-ID: <87ikaqopuc.fsf@all.your.base.are.belong.to.us>
+	s=arc-20240116; t=1773996127; c=relaxed/simple;
+	bh=2goOUVs+18OkdbIgm+nvew2eiVT6u5QWWwYJVbfCgLs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Va7/MY6kMQn0NK427iRYlAZZhUJOKPLVl0KnQPq0h53bmwRCyh8lCM1cm2CluoK9H7VDhEFPYflf+3pVrcUpy5VLZEO1kvGf5hCNGToxIUR+uOq6jFN9T1gwxCMOYkL+W1WFlmh6BFxVsL3Mvu5Q9pF9y9mpM2TPDvEC3U4we9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rcfOk2m5; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=5S1jC4GzKRWZlRIWjIEJX66RpWiCwNLjwF++K0MsrPk=; b=rcfOk2m5zGtNf8qVGdqfySzpmh
+	Ina0KbLvEhcXQPtstjplYuTxsXVdHbqCsRSyubjPUS1Ddpm34CqTc8cZoxGP+p33qj99Dmle+geRd
+	LW7XzrgNRUt+KiXrnqOxxIMV33ILQge2m5H6PRLQ26XZcezJcnWdJDQkQvi3wRtDpBtcAmnn9GK5t
+	qz415YBYHroEA5F2pZDJSsolrhEEJdV35kCoxEBFdPy6dp1r84wOBo/3YQ5TGnfg/Z2Gf1elhec3z
+	jsYQnP2jum3LO8ahIutsRiskvUUyW+QmWtvFPvBRn28Yb/2pjayq0MBsda32tXOEtoj5cHn6eeOYR
+	4bIH61Xw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55662)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w3VQa-000000005nM-236X;
+	Fri, 20 Mar 2026 08:41:56 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w3VQT-000000000ft-2FXE;
+	Fri, 20 Mar 2026 08:41:49 +0000
+Date: Fri, 20 Mar 2026 08:41:49 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: yangg9 <cohenyang511@gmail.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	kuba@kernel.org, yangg9@xiaopeng.com, edumazet@google.com,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, maxime.chevallier@bootlin.com,
+	vladimir.oltean@nxp.com, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: stmmac: close reset IRQ window and avoid double free
+Message-ID: <ab0ITVGxiX5w7-0k@shell.armlinux.org.uk>
+References: <20260320061955.833785-1-cohenyang511@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.60 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260320061955.833785-1-cohenyang511@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.56)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269848-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-269850-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,kernel.org,xiaopeng.com,google.com,redhat.com,gmail.com,foss.st.com,bootlin.com,nxp.com,st-md-mailman.stormreply.com,lists.infradead.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.977];
+	NEURAL_SPAM(0.00)[0.811];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[all.your.base.are.belong.to.us:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: 7EBC52D756F
+	RCPT_COUNT_TWELVE(0.00)[15];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 2D47D2D75B2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
+On Fri, Mar 20, 2026 at 02:19:55PM +0800, yangg9 wrote:
+> From: yangg9 <yangg9@xiaopeng.com>
+> 
+> During reset, stmmac_reset_subtask() used to set STMMAC_DOWN before IRQs
+> were freed in __stmmac_release(). That leaves a window where interrupts can
+> still fire after the device is marked down, which may lead to interrupt
+> storms while the interface is transitioning.
+> 
+> Move stmmac_free_irq() earlier in the reset flow, before setting
+> STMMAC_DOWN, so the reset path no longer has that interrupt window.
+> 
+> Since IRQs are now released in stmmac_reset_subtask(), guard IRQ release in
+> __stmmac_release() with STMMAC_DOWN to avoid a second free_irq() during the
+> same reset sequence.
+> 
+> This removes the interrupt-storm window in reset and prevents double IRQ
+> release.
+> 
+> Signed-off-by: yangg9 <yangg9@xiaopeng.com>
 
-> Currently two different XDP programs share a static variable for
-> different purposes (picking where to redirect on shared umem test &
-> whether to drop a packet). This can be a problem when running full test
-> suite - idx can be written by shared umem test and this value can cause
-> a false behavior within XDP drop half test.
->
-> Introduce a dedicated variable for drop half test so that these two
-> don't step on each other toes.
->
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+I want to review this, but from this afternoon I may be out of range of
+LTE signal for about 24h, and thus have no Internet access.
 
-Reviewed-by: Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org>
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
