@@ -1,66 +1,62 @@
-Return-Path: <netdev+bounces-269839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269840-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ANimCKcEvWkO5gIAu9opvQ
-	(envelope-from <netdev+bounces-269839-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:26:15 +0100
+	id wAXfAO8FvWkO5gIAu9opvQ
+	(envelope-from <netdev+bounces-269840-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:31:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1DB32D7335
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:26:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C4C72D73F0
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:31:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1A5513005582
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:26:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 71C9A308A899
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF1A371893;
-	Fri, 20 Mar 2026 08:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809CC372692;
+	Fri, 20 Mar 2026 08:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="egw1jvQl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UsjkkGcr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4786736EA89;
-	Fri, 20 Mar 2026 08:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3C4318EF6;
+	Fri, 20 Mar 2026 08:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773995173; cv=none; b=OE/z0u++wgccTm+jPGpQjNWmUCXRTcKoJ+w+AGqi7YqDikyppxWziJOe/nCmfKK3lLduZTxqDEYnxzIc/Da6UtEYl+bJruJVAaChjT0+NgozEwhRZ1V43bR38uDWcruAsA3XOBzSWXH7dto2T7CB+fzmXwmrx+ubkslZ7FgWAvc=
+	t=1773995320; cv=none; b=F5c4m9GGlR6lGdVs4xgB11fG3sTX2QnIHVpmt00vjpEXzZZ4se9fIGcJWUYOnAZ8NLzgKJglE2WFRgwolfAgVhJdcdTu8dLq3yTiboKaw4LIOJ6vhDqa9bxPM8QyMkXhb2Al9OqjCG779ztq03oyvDw08oSrX5PoZm8c4jS91wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773995173; c=relaxed/simple;
-	bh=8ornaCijKEKO4JdKdaXYK/dfmy8Tw3eR3/L5gzBWdYA=;
+	s=arc-20240116; t=1773995320; c=relaxed/simple;
+	bh=tlp4xNBxwOC67ibIvTtrwojwpUUGN3GRe2mB0LBz81U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lGNTgpRgsrt/mCV7sKmDDhaK8VWLqhaOR/h4MqqICG9bNEIyZjgrv0FxhF27Gza32lT5LSR3Rye0IuP+xPIyNnInOu5sqAcJPI58W4lufTao8whcCaApW9Re9Zi/hEBuRK1pkckADNbj9aXMbb/e4jPFepEsqNTE9odAKGTBiT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=egw1jvQl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10249C4CEF7;
-	Fri, 20 Mar 2026 08:26:10 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=fE43CmghVlr9mphtVITspS9PRmrn/NS1KN0NdyAuDm/P+sEQNmRlsAxziuq0idn9ETJ9t+evUCs0/qanJnE7LrMUDQBnGbLyarJRoXnxOkb6KeJxSVqo5gfNkxE2MsAHGMcMCVwFpPtq2N8Su38W8AZe6aAk7Q6kK6Ta3L3wZ0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UsjkkGcr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D109C4CEF7;
+	Fri, 20 Mar 2026 08:28:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773995172;
-	bh=8ornaCijKEKO4JdKdaXYK/dfmy8Tw3eR3/L5gzBWdYA=;
+	s=k20201202; t=1773995320;
+	bh=tlp4xNBxwOC67ibIvTtrwojwpUUGN3GRe2mB0LBz81U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=egw1jvQlOItmykIok0j9An448qzsB1EgHVbv2c+dreDfliXMBNWOyQvtnl3YNO7hM
-	 HshDSsjdNzpkq/zKUY4XjoG4e65WmF4hBWyKnYNCwpEEKdN0qgk9jhu3qnvzH4OFnF
-	 8dLXyAk0SS0Vdyp7PcT0X5Nj/jg6cylfXa6BnKP+92hr2sFQB5wc8reocfWCmmaTyI
-	 GvPu+R3N4PKPWV3Cs4xl3IdIlquApIp2ttnceVmBaAzldojedbxdVuOgXcqVxPR/FP
-	 9zhnDadJA8kSDr8v5+QvjmRrVvlzWZTDffxBJAlJA4bgqV91TPN9WBKua1niRD20g3
-	 5ZHdYYy/3NCdw==
-Date: Fri, 20 Mar 2026 08:26:08 +0000
+	b=UsjkkGcrXJ9SixrUoJWLGTS8JHaqLi4n9gi6Nr5g2Pv/Sja7XNKiv+boBIIM8GCxE
+	 RtLeWp2xOYV+H0vYwVl+z+KvCTjUyadmdqmNx/v9HkUJIaRpjhDk9yG62nVXHNa0Xa
+	 MiQTBoKwOpF5Ap5oivthC3meWn8sebQG4AP8vifYvi5lIggJ5EX4DiMFLlfvope7fL
+	 f2FnBuz1YurKa6OeONwgr2j9ACzkLYEmXRJ+1L7pOZdpYplPRncm8vScWj1fCTF8ND
+	 DYOpgtGi4cbz0qIWYrOsw4PCuRhQwZt+x2tT7RRFGGxnzTj7+IcjXYNKmf5ntDDuak
+	 dW1gh68lmWN5A==
+Date: Fri, 20 Mar 2026 08:28:35 +0000
 From: Simon Horman <horms@kernel.org>
-To: Allison Henderson <allison.henderson@oracle.com>
-Cc: "achender@kernel.org" <achender@kernel.org>,
-	"rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Subject: Re: [net-next,v2,2/2] selftests: rds: Add -c config option to
- rds/config.sh
-Message-ID: <20260320082608.GZ1753385@horms.kernel.org>
-References: <20260319004618.2577324-3-achender@kernel.org>
- <20260319201329.1059998-1-horms@kernel.org>
- <f0cf57ea9a139ea9af7556442304f8b70d416c16.camel@oracle.com>
+To: Birger Koblitz <mail@birger-koblitz.de>
+Cc: edumazet@google.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+	pabeni@redhat.com, kuba@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net
+Subject: Re: [PATCH net-next v2 1/2] r8152: Add support for 5Gbit Link Speeds
+ and EEE
+Message-ID: <20260320082835.GA1753385@horms.kernel.org>
+References: <20260317-rtl8157_next-v2-1-10ea1fa488d1@birger-koblitz.de>
+ <20260319165100.1988286-1-horms@kernel.org>
+ <3bdcd08a-8001-4343-b150-693b58ead886@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,49 +65,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f0cf57ea9a139ea9af7556442304f8b70d416c16.camel@oracle.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <3bdcd08a-8001-4343-b150-693b58ead886@birger-koblitz.de>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269839-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-269840-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-0.968];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B1DB32D7335
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 4C4C72D73F0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 03:05:22AM +0000, Allison Henderson wrote:
-> On Thu, 2026-03-19 at 20:13 +0000, Simon Horman wrote:
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> Alrighty, I will update the README.  Thank you!
-
-Thanks.
-
-FWIIW, I do agree the code changes here in v2 are in line with the
-discussion around v1.
+On Fri, Mar 20, 2026 at 06:29:20AM +0100, Birger Koblitz wrote:
+> Hi Simon, thanks a lot for reviewing this patch!
 
 ...
+
+> > Is the UPS power management configuration incorrect for 5Gbit link speeds
+> > without a case for NWAY_5000M_FULL in r8156_ups_flags()?
+> The out-of-tree driver also does not set any flags in USB_UPS_FLAGS in the
+> 5000M case. Maybe this is an oversight in that driver, but according to my
+> tests, the power management works. In any case, I would not be able to guess
+> the correct register value with any confidence for the NWAY_5000M_FULL case:
+> the bits are different from the speed bits in PLA_PHYSTATUS. The RTL8157
+> also has other differences in USB power management compared to previous
+> generations, such as introducing register USB_U2P3_V2_CTRL. So, to the best
+> of my knowledge, the proposed patch is correct.
+
+Thanks for the clarification.
+
+Perhaps someone can provide insight here. But in lieu of that
+I agree with your approach.
+
+> 
+> > 
+> > This path is activated by the next commit in the series (58ba3b6c476d
+> > 'r8152: Add support for the RTL8157 hardware') which sets
+> > support_5000full = 1.
+> > 
+> > [ ... ]
+> 
 
