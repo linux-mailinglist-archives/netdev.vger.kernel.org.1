@@ -1,276 +1,211 @@
-Return-Path: <netdev+bounces-269889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269890-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKpAKgEvvWmI7QIAu9opvQ
-	(envelope-from <netdev+bounces-269889-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:26:57 +0100
+	id 4NLqDKkuvWmI7QIAu9opvQ
+	(envelope-from <netdev+bounces-269890-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:25:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07EE12D9863
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:26:57 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FC272D9807
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:25:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B66EA305C8D4
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:24:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6F741301A428
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63EE83A63EB;
-	Fri, 20 Mar 2026 11:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E105372EDC;
+	Fri, 20 Mar 2026 11:25:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GNOF1+A1"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="mokOOiGM"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010012.outbound.protection.outlook.com [52.101.85.12])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010024.outbound.protection.outlook.com [52.101.84.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D2D330D25;
-	Fri, 20 Mar 2026 11:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB252E9730;
+	Fri, 20 Mar 2026 11:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.24
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774005857; cv=fail; b=ZwWLvbisUnjT2hXUXpN/dF6L3F33LeMEd6rUc7CkL74W4QupInRcf0OGMFLj3kB1BXfRSLnXAxLfWe7fPbH7kPzTEnfDKacwo9xaYsY9houpI5dyG8l0W6DcSNnpTZHz10AJ4NQplRW10SXLH02zv2+gBZSIJRx+gDKdgNmLegw=
+	t=1774005915; cv=fail; b=kewxvAoaenhMCB4MMjVy/HO3XkBvMlsUrp6wKImw2qfF7/hCYwAqxFvQ1P4fh9gjGOPOS0WQWEcg1YIp/IYQAHhkS0aFK/szPZlQFLCIwtnznZk5JKtEzaaJQ2zSIEa47NVDaqjIden5myNH7+YnU7joiudhIypvZBL+7AroFE0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774005857; c=relaxed/simple;
-	bh=7zji/UtEfCUVsvL5CzrXE61E33Z0IPKmCqRwOArsCPQ=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=ogq3Sl37Q8eGlfsnPmlHcrMVMKhx6Gngl/6pFz6UWHnSxeHyIesE5m8ZbJ/PwmTuhWVPh1MCwklQ24CtCur0eb/KZVou7tVgxkMRkHl6nBCW5RCZiXWt1P6F1vL12s52zX56Zo7B+ZNa+S1CmH/yKH7agtsD7Ti2ae7cPj0hqd8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GNOF1+A1; arc=fail smtp.client-ip=52.101.85.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1774005915; c=relaxed/simple;
+	bh=EIoS+bISZNCh7kFx0cVuY8tl/c3eoSW7mFAUI9snk3I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=X53MECXRSsLltwMXvcxwCc3+4FOrGiGoufwwfbMyWtDXQlDdNByz8tcGlS78Y3kIicgilSjbuVgiuGQ9k2/3Dkk44qxlBIjeIOqBmqMWz4JBbGWHLkEuy8iw7ONB77rd2nNphSSstrkwOqjIjJp/5caaceiMZrpLqryZ9VfWWAk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=mokOOiGM; arc=fail smtp.client-ip=52.101.84.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mOuxwAXelxsW9x/oeYA0djABJHSJ8dMnDpXWYf6nGk298gMb6QD0ur3qxM4sDtPsOf5A4xW3ptzdKz+dpI4oSq7B3HxS69noMS8OBR/1Q6aJt5a5Rc3HgHz1Egr7k1R6E57TzqjbbiNH3sK3W2XP+8U2xQ6kJJd5Eg0iaGM2PRfmocgenVXQpPq0fVT5pdCWW+e2LoKVBn2RhofZ1gl7diX22Wvcwz8Ipp4FfkEaFj00G2JWOO4zFGBAr+Ng9PHmmnOZEQDuV0c1t7/d7jqdcsg5phWCNUlzlblNmdCYmCiAIs6K4J2ApmMtPydwt6JMSK58CAuQi6PLFHIFtMMPtQ==
+ b=eIceJKGAaWmI17pY6W9FPXZPsruigORdBW+EgULqUcNEGNjv2AcMimp6FrIKchuzcK76Efr1+aRrIpN8dN1VByuIOV2kEHedmYWgIXnshbfrMadqCywB/A9YyXLaBBC8BPMV0kzdseJiF6kPC00sKym0FhYcerzWsOVK5NR8vsLUzIr069/4TW5CSXXy6D6ZsvvZ99cvvo3uVq09Q8GtUM/u5r1X1upXqE2ap8101wdrRakX65u1XGC59/IWMvLzIsprnezrSznO0eInQXb78k3gYXB7aNupW65nhaoieNEdVgwVyjPKVCmENHMQ3u9LI+fGq+oVmsKLkTX/4x3gmA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XgY0MO7v8R6PNTpevcqCYqRGU7WFP7P2AlB/Ey+ahyw=;
- b=nPDn9rFHE6QU1E6rbtuziRzTESWxfGbzj942mbwNfInRlrGJi2WGGkBs1F/n0k6/5+Cc0zTbO/sW+5ipRCH1NNyX183hSX4HUacN++PZm7NUwN2vPWUSHC52Lyoi8b8DcvNj5lHMLfvMLURPl3EYiZL8QcRKb5W+KKhEjscLNyGQLRam6ipjPea5TPV+FKco6ndKGIg3I9A9atibtQutRu15a/kgQXoZPaQs1lSTi3Y+QQEQuNXtREqD/FmY4gDdE+f4ag8WdVHmy39+nnlFO4VMR8ihmRPavw6QiXzCjdwszgOoL21gYVHWSleWgtw06CQaMv4M3RI4M4Q1Mlt51w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=ZUFZQLRPIcWlkWC2+sWo3+U0YcDZIFtL6p7FlMC1JxI=;
+ b=uj8aFuD1xPgkK/htSk9ahIqg3YCB9Clc8TlASpDrDm8WpNKuEewl3gdLjJG1dx7O4lKSWV0x1zAmDY84pLaAhumWEBqB9ggNpBvW0uMKxd/eXFmq9OKf4LWdmcb35F5jRElqbzi95EN21mkR6j5RFNl+zUls2UQTzu28pYHfCyjmFqTpVZfTyCdPBPO0DUZDBh+tQrmQ+9b92IfUbSov5g2YVrjCKb1jCyYnoGVxc2CgBP1FlDC5FhJodSoqTbL9kBgL/8uk2R4MpMqG1RoOlD7VAyFdvrCsvdQB06nHEDeFj6LSSmASqIsTXiOhMdJuzhJgobiis+Vrxk8ZYkDn/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XgY0MO7v8R6PNTpevcqCYqRGU7WFP7P2AlB/Ey+ahyw=;
- b=GNOF1+A14oGJNouo1H3IM+33vENHxqEg+n9kXIh+ySRck08WrEVDr2UTahYwCQlLmp1bChKvypENc+GFCNfCcQrVsgIOAeedPRX6CDcFIHWQZtLjx/N2yC37D3LhByxEcpE8DmVAQOnOfL0PTotr38n6UDIkhhasYVhxfXXsF3DthhHdA+G42jCyN1JUNI2FHPb2mIy4zyc4wjeBF6MT8AO9wA+u9jTT7m3fogQlp5f/4vxZjXCbCJB9xnRGleUXjP/TcPcsb+3DGHc2CIi4Pnmt51K4ur3y09YChi2kiJpdPTs8DpD7cFd0jIFuGBSw6Wl9FoFjfvDL0lPsaJRoWQ==
-Received: from CH0PR03CA0389.namprd03.prod.outlook.com (2603:10b6:610:119::28)
- by IA0PR12MB7529.namprd12.prod.outlook.com (2603:10b6:208:431::18) with
+ bh=ZUFZQLRPIcWlkWC2+sWo3+U0YcDZIFtL6p7FlMC1JxI=;
+ b=mokOOiGMeV45HVTMzqpEqUFtBWnKdfLUv4702onrGQTyO9/8fyfHHo4kGnbyWvFdKolWic5usv9mPs4O07Fh0nmgRnE/N2FQJvN68UiXHEaMIc/sGMJ7CEH96Qz5cIZTZLfd3q4kVLXQu7+ktxcZ3tIbr0iKBjxAw6xhIZl0fHDToq+WIyXVpxc6UlZGCx827fPIvXY/wc3MVPLICGcRTbnvheosL2YtRzu5IVtz0ufBoHUDmpDJMsinKY8JHWiHOWOudh9MTaFUoohxw3UyysDN7iFNvPZOPQW+LnBrxEhaFs5c1cGWzc16p12LrN/7ZcdkhfxjSI6GMSuHYxofFw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
+ by AM7PR04MB7191.eurprd04.prod.outlook.com (2603:10a6:20b:11c::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.9; Fri, 20 Mar
- 2026 11:24:11 +0000
-Received: from CH2PEPF00000149.namprd02.prod.outlook.com
- (2603:10b6:610:119:cafe::b) by CH0PR03CA0389.outlook.office365.com
- (2603:10b6:610:119::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.23 via Frontend
- Transport; Fri, 20 Mar 2026 11:24:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH2PEPF00000149.mail.protection.outlook.com (10.167.244.106) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9723.19 via Frontend Transport; Fri, 20 Mar 2026 11:24:11 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 20 Mar
- 2026 04:23:55 -0700
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 20 Mar
- 2026 04:23:49 -0700
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.27; Fri, 20 Mar
+ 2026 11:25:01 +0000
+Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
+ ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
+ ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9723.018; Fri, 20 Mar 2026
+ 11:25:11 +0000
+Date: Fri, 20 Mar 2026 13:25:07 +0200
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: Petr Machata <petrm@nvidia.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org, willemb@google.com
+Subject: Re: [PATCH net-next v3 1/9] selftests: forwarding: extend
+ ethtool_std_stats_get with pause statistics
+Message-ID: <aaezxb75dtazcjjorf6aarzcgsg6nr3nxld7dm4ptmtisdvt35@6xrsyn4cwz3t>
 References: <20260319160410.2515105-1-ioana.ciornei@nxp.com>
- <20260319160410.2515105-5-ioana.ciornei@nxp.com>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-CC: <netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, <linux-kernel@vger.kernel.org>, <petrm@nvidia.com>,
-	<willemb@google.com>
-Subject: Re: [PATCH net-next v3 4/9] selftests: net: update some helpers to
- use run_on
-Date: Fri, 20 Mar 2026 12:22:02 +0100
-In-Reply-To: <20260319160410.2515105-5-ioana.ciornei@nxp.com>
-Message-ID: <87pl4y922n.fsf@nvidia.com>
+ <20260319160410.2515105-2-ioana.ciornei@nxp.com>
+ <87tsua9276.fsf@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87tsua9276.fsf@nvidia.com>
+X-ClientProxiedBy: FR4P281CA0418.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:d0::13) To PAXPR04MB8253.eurprd04.prod.outlook.com
+ (2603:10a6:102:1bf::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000149:EE_|IA0PR12MB7529:EE_
-X-MS-Office365-Filtering-Correlation-Id: c10cead6-729b-460c-aa24-08de867335a8
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|AM7PR04MB7191:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5a6b36fe-122d-45b0-3daf-08de86735961
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|7416014|376014|1800799024|82310400026|56012099003|22082099003|18002099003;
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|19092799006|22082099003|18002099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	CzESCNNcPGhqSsJScROOLSKHhA0ubCAnqVbjQGwrG3rc3RvFP4p1HuFtU4+Hmj2Ul8m8cGUCvwsVWENFKwJLFVuvj7ZCOPnUI2yEZI6OgHshyXbYIwLMpLT9GiiCH0fmycXrMqpkMZ3R+8mDbgnfVlM9hj4UJa7Ds0WAdTYEg/PJrQ/teIc5s8Hn0KhFFc4nOn3TsYp1BGsErIelJWiBXNfOae9jGojfhBIdFatv3/0DCz/9uj2gDncgx8drxjDhTleGj+XzF67DBdrFUNuhvRguvU4tvI25B+76YWcAFk3RJ3i/F81oWMLjitm/qF00a0SEnfDpcg176no3rsAE6w9zPJCl5E6wh4V8g89w/U4uIlvbC5FZJmJmA5VYYmvgwIyUiMoUR8by7iA6HGq/Utdp4C3aKEps3L0L5UGzGgQYZhGED+hVDLQKmtYQ8FngxIltWiZ5gq8taPdy9WlgTQgIwK3zTzp8YfAphiXjTplAMm2JUQqSYBS8qPKp2Uu040eYXwpmP8IVtBms4OOmtDEcMR5dJlh8Xm08cdVwLbqqxEWqI0iU2Dhfq05FGpiYbz0AEH+wGuc31Emx/gnuy8DxVt/bbVic++Ai5CVOEa8s+rjuCdWVXpygAFb4MjThR8S/9ix4CZqdV+ktNNiIFGiBWLdbG5S/imsyD8TJ1w3rLkZhTfwnZ+Z8uGDL9w1mQuWjgdSJxXcadxINCG702ht9HmGnNY0dRmw0hrD5icEw5zdkiSE5huPUJhw+IALmUluCOzV2lbi4Kn1Bqsq4qg==
+	1CccpPaOhfiiPT6YneocxlD7a3ZHOooc6tJtcVnfIQkdJwUhnxegiBK1kffJyp62u1LB/SM+LIk6YhbrTDhM9R0xoo8smrAWsK19lxZv0+PNksQq2eNNYs2sJ1vvDgVQNFcq0rrTVV3egrrF6o8Gwe+wEh4VJxC8ovwDG+QwkorbZ+YIehQcaMaXTKwXJNSh5gq9lbx9DvR60ECgYcmkuPq9cRoovvVbpeyrw0KtVQRUtwktjUqWwCT7EjEtHHRSrmpDh8pa0hVqQl65iM7lEB0D+gjc3OCmpW5moUXWxGa6w0cJ0Y+KGswHoAgwcqb3yn14J261l5iRT/647xcJ+Lv7X2cBKxow0epqY9/rfd2STtvba5cPWzwXRXSIRhsAmcd3NZ4NrNlSA664zxGGZtcDPxfZwaQDUk9ZCf+9ayshXuwiw5nW9XtiCHC4+YS2iS8E3i8DepN9SibTesXRGlGxHFScxJrBFZNfnipSMaxeM3mDRyW36KK+sJ2ZnLuubNPUQP0rFEIKbXcHhml9sJHKUp5Vgnh/R7LJntdMiZDGTjRVet1aMA9CG+pNDTAbPgKX+/9yptpgAGRugsh1UUz2s650dJa8POVEoiZZZVi8+XrFPETScDEUNUXV0WGPxY4y1P60Kk5fBRIJWIP8Q2q2WC16juOWnepPtw+9jmCv7epUxfqAvRD3wqDFjyOZtsTOVHzdQ/Arw8uXEElgOmNuJL7UqjIZSO+1Tr0GhL8=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(7416014)(376014)(1800799024)(82310400026)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(19092799006)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	5utlEWMNn7IZXhddMNm/Bj5T+XdrpFCea0IzTfSnO01+VaoV8aMw0bVhRBGhmMTeK/8ac0nE5geT/AfenKufRAO6kbOKHUpcqzefA6af6a1ElK9aQMgSaLvM+c+Prr3rGO34l3ojwYx5Hus1hwxZCOrLFzkz/MP54HKTRVsVjNgoAh0dOkaihVzvJJzzXOXTYl7BV6Bg3PFV07eLA6RyhSjFeS6+8xGUq/PzwkdBF+MQCRuOeLxIgvySYAay9CWgpjkRHstj7MAZktiWMtrhcInu7pdKwxj5geZG6irhdkpP9fH3NM0/R706CpnK0mEmWnh0V/MCwJ66IeTJWv82DaCgZTnURCG+IvhXqliKAB8Khh1N5WkJL7J24oeqc1udh6XlfR77n3Bcsnr3PvC1kE6U0LIp93AiOGXO74y+HOJ0Hu8VEsMr8Fn474rHIu5b
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2026 11:24:11.1200
+	=?us-ascii?Q?eK50JaOskj5hqPHIGF45szZS6ITRz1bN6f3ZkUwWH89sTWRFMCcYUKTLjaQF?=
+ =?us-ascii?Q?K1sf8OG4wac4+xAZUn3Ayoe2i44AdIKDMGy03e88W9yPnBydx7dIhpD5QcTF?=
+ =?us-ascii?Q?cFrAGLJmfMsXQ4CoMGflv7LVKuIcTw6Khyir112YHIUkNQUL2k2idk3F34gl?=
+ =?us-ascii?Q?0byzSp4tOBXY7VZy3ZmHs0Ghc+zkXVw4m9gVXUJb8y5Dnn2qxgib7PxF1VJh?=
+ =?us-ascii?Q?3692YoueE5Fhr7g5GcO0SIekf/e+1Qqp0d6T46ZPuysxG8qD8XiU0gIMio02?=
+ =?us-ascii?Q?YMEOuywhSdG6Ayc2ESjPaE05rYNpJjDqVm8xQ9GesEeKhYaEeVU5c+DYyeBS?=
+ =?us-ascii?Q?LEC9Vqj4yrt4PnRgaPkclnkHAphM/qPRLFfSgskb0xIwuZWoUDG+IvpGeT9f?=
+ =?us-ascii?Q?kp/a/Ku3w0M1lxt8GaC2jfwT3vkCvW6y4RbjybUY9NCxWPGF/E48BKQelksl?=
+ =?us-ascii?Q?zqQCHgSttcbPM9gGgojovIyD6rWLJcB7I+jO7YwoWTgRgeiT4ghkJ4EXwoAA?=
+ =?us-ascii?Q?x2//JFAxGZYVq3s0LGuMDyjzl3DE2zp01zZcS04lTND/pbI9cNpCASro/r64?=
+ =?us-ascii?Q?nawHvM9RWf8qOWZPrd152ZOoY3u22LnY9huOZenzhqlNVb3QpI6tqwfXff5I?=
+ =?us-ascii?Q?IywI01QAe2i4EthhbQhriGS08SmZ9BciJDXNwgPcaInHXncILe5sa3pMtxJh?=
+ =?us-ascii?Q?gYrJg7FB+QcbifGOmttAgcAlc+gHE2c8QMSkXFBHd/yyuLKfYQHUynu32wDd?=
+ =?us-ascii?Q?Jw2UC9XN/MDQzV0D2E7TfpCP8pAg2yId1BwZIcsSyqA+W1xgrM+8fkG5LXUl?=
+ =?us-ascii?Q?8OBh/YS4aM6uUoiu5UP/phoidPO7iDxqNGy0TS5iQH49dYHVJRDMbZbfDcGl?=
+ =?us-ascii?Q?Tu0EBXCYgSREiX98wKqchS0LNFv9Ov2Cwf5cK3UQdXkE6Z30OWE6Z4bIZBtr?=
+ =?us-ascii?Q?bgGCmPP2CBzjH5hfzSjz7ekbjjoTwXuQxhNuOMiMN6TP3kL2xMCrhDFOFwJg?=
+ =?us-ascii?Q?PLj5OY/r53Yp3wunOZbhLYfLIjKqvPLR2/UnVoQSiP9bfpuD6TlEbcr5meu9?=
+ =?us-ascii?Q?Jhy73a1z40USinu1bT6CNvfoncuRa8cxgy9JP+TwHO7SCoL9JycYjmGZx9Uq?=
+ =?us-ascii?Q?9x1UPI68/ksX9EL9mGE/JyfrS9RA8m31j+8MtPQMFGg8a/dwn3uh4uEfM8yX?=
+ =?us-ascii?Q?RFoU61dF1LHRw3JXmuh07SBw/jSALh6eN/gJuFNL9p7dmvDi3ha/sKtKhZNm?=
+ =?us-ascii?Q?rIpd/L5AvjpXjl/01N48c1fXAz1gK6KayhbA3gBr7Q1DqGoMmF7uL8AuS56M?=
+ =?us-ascii?Q?Ky+OBzEoamDGOfEsjojKESaUXAyl9EDFlpPZBGP/fwVhmrVuUYBTpR18SZNz?=
+ =?us-ascii?Q?qXqr+ycxRTLXrEpqS40Cez+kuTEZZSf4ztIKc6S6HKvB/6U6TAxj5p4XiCLI?=
+ =?us-ascii?Q?RU+6y4fEYSkKdptDWnrko1hUOSwHfUpZXHYtnUYZHy5piyAthCeVX7vzqqej?=
+ =?us-ascii?Q?oYSKgAoAWrY+nCssr5zRypa3/qKNVoSN+jAX9oAO8QpPI58nltTtJVnwrqm0?=
+ =?us-ascii?Q?bPATAwW6vptphhcnmfzANUOYGy2TxCVIcQZojMtuqRR5hvgj1p1JzzPkjL5U?=
+ =?us-ascii?Q?oHbWXEfGR1bLRaqWlgWDpL96psRiWdw+fxKxUyzpCOwtvOQ58dOYQwyEcNlI?=
+ =?us-ascii?Q?5MiAPIkP+xwNhIDpWjAVF4S1Dc10rGm6rnm79sCkkJUkkMvdtSANaP40zjC9?=
+ =?us-ascii?Q?ZsYp5jC3Fg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a6b36fe-122d-45b0-3daf-08de86735961
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2026 11:25:11.6784
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c10cead6-729b-460c-aa24-08de867335a8
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000149.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7529
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oW5V4zp1sw7pnsB+IC6l9PcqWQq4mI5fhoCVBHNqEKFRIjw0GRkyxULi24X5BeOdQakN/jIlZizveh9sc+liBg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7191
 X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269889-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petrm@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269890-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.945];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.978];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 07EE12D9863
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 9FC272D9807
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Fri, Mar 20, 2026 at 12:20:01PM +0100, Petr Machata wrote:
+> 
+> Ioana Ciornei <ioana.ciornei@nxp.com> writes:
+> 
+> > Even though pause frame statistics are not exported through the same
+> > ethtool command, there is no point in adding another helper just for
+> > them. Extent the ethtool_std_stats_get() function so that we are able to
+> > interrogate using the same helper all the standard statistics.
+> >
+> > And since we are touching the else case, convert that as well to the jq
+> > --arg form in order to be easier to read.
+> >
+> > Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
+> > ---
+> > Changes in v3:
+> > - none
+> > Changes in v2:
+> > - convert jq to the --arg usage form
+> >
+> >  tools/testing/selftests/net/forwarding/lib.sh | 8 ++++++--
+> >  1 file changed, 6 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+> > index a9034f0bb58b..cf40cb766c68 100644
+> > --- a/tools/testing/selftests/net/forwarding/lib.sh
+> > +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> > @@ -831,8 +831,12 @@ ethtool_std_stats_get()
+> >  	local name=$1; shift
+> >  	local src=$1; shift
+> >  
+> > -	ethtool --json -S $dev --groups $grp -- --src $src | \
+> > -		jq '.[]."'"$grp"'"."'$name'"'
+> > +	if [[ "$grp" == "pause" ]]; then
+> > +		ethtool -I --json -a "$dev" | jq --arg name "$name" '.[].statistics[$name]'
+> 
+> I missed this overlong line. Fold it, please. The R-b applies with this change.
 
-Ioana Ciornei <ioana.ciornei@nxp.com> writes:
-
-> Update some helpers so that they are capable to run commands on
-> different targets than the local one. This patch makes the necesasy
-> modification for those helpers / sections of code which are needed for
-> the ethtool_rmon.sh test that will be converted in the next patches.
->
-> For example, mac_addr_prepare() and mac_addr_restore() used when
-> STABLE_MAC_ADDRS=yes need to ensure stable MAC addresses on interfaces
-> located even in other namespaces. In order to do that, append the 'ip
-> link' commands with a 'run_on $dev' tag.
->
-> The same run_on is necessary also when verifying if all the interfaces
-> listed in NETIFS are indeed available.
->
-> Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
-
-This looks good, but I'm unhappy with some overlong lines again :)
-
-> ---
-> Changes in v3:
-> - added some more double quotes
-> Changes in v2:
-> - patch is new
->
->  tools/testing/selftests/net/forwarding/lib.sh | 17 ++++++++++-------
->  tools/testing/selftests/net/lib.sh            |  2 +-
->  2 files changed, 11 insertions(+), 8 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> index fb5aa56343e1..f76de37d0caf 100644
-> --- a/tools/testing/selftests/net/forwarding/lib.sh
-> +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> @@ -530,10 +530,10 @@ mac_addr_prepare()
->  		dev=${NETIFS[p$i]}
->  		new_addr=$(printf "00:01:02:03:04:%02x" $i)
->  
-> -		MAC_ADDR_ORIG["$dev"]=$(ip -j link show dev $dev | jq -e '.[].address')
-> +		MAC_ADDR_ORIG["$dev"]=$(run_on "$dev" ip -j link show dev "$dev" | jq -e '.[].address')
-
-Here.
-
->  		# Strip quotes
->  		MAC_ADDR_ORIG["$dev"]=${MAC_ADDR_ORIG["$dev"]//\"/}
-> -		ip link set dev $dev address $new_addr
-> +		run_on "$dev" ip link set dev "$dev" address $new_addr
->  	done
->  }
->  
-> @@ -543,7 +543,7 @@ mac_addr_restore()
->  
->  	for ((i = 1; i <= NUM_NETIFS; ++i)); do
->  		dev=${NETIFS[p$i]}
-> -		ip link set dev $dev address ${MAC_ADDR_ORIG["$dev"]}
-> +		run_on "$dev" ip link set dev "$dev" address ${MAC_ADDR_ORIG["$dev"]}
-
-And here.
-
->  	done
->  }
->  
-> @@ -556,7 +556,9 @@ if [[ "$STABLE_MAC_ADDRS" = "yes" ]]; then
->  fi
->  
->  for ((i = 1; i <= NUM_NETIFS; ++i)); do
-> -	ip link show dev ${NETIFS[p$i]} &> /dev/null
-> +	int="${NETIFS[p$i]}"
-> +
-> +	run_on "$int" ip link show dev "$int" &> /dev/null
->  	if [[ $? -ne 0 ]]; then
->  		echo "SKIP: could not find all required interfaces"
->  		exit $ksft_skip
-> @@ -639,7 +641,7 @@ setup_wait_dev_with_timeout()
->  	local i
->  
->  	for ((i = 1; i <= $max_iterations; ++i)); do
-> -		ip link show dev $dev up \
-> +		run_on "$dev" ip link show dev "$dev" up \
->  			| grep 'state UP' &> /dev/null
->  		if [[ $? -ne 0 ]]; then
->  			sleep 1
-> @@ -944,9 +946,10 @@ ethtool_std_stats_get()
->  	local src=$1; shift
->  
->  	if [[ "$grp" == "pause" ]]; then
-> -		ethtool -I --json -a "$dev" | jq --arg name "$name" '.[].statistics[$name]'
-> +		run_on "$dev" ethtool -I --json -a "$dev" | \
-> +			jq --arg name "$name" '.[].statistics[$name]'
-
-Oh, I see, you fold it here. Um, would be better in 1/9 though :)
-
->  	else
-> -		ethtool --json -S "$dev" --groups "$grp" -- --src "$src" | \
-> +		run_on "$dev" ethtool --json -S "$dev" --groups "$grp" -- --src "$src" | \
->  			jq --arg grp "$grp" --arg name "$name" '.[][$grp][$name]'
-
-This needs to be folded as well.
-
->  	fi
->  }
-> diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
-> index f7c54d05758e..14f262a593c9 100644
-> --- a/tools/testing/selftests/net/lib.sh
-> +++ b/tools/testing/selftests/net/lib.sh
-> @@ -518,7 +518,7 @@ mac_get()
->  {
->  	local if_name=$1
->  
-> -	ip -j link show dev $if_name | jq -r '.[]["address"]'
-> +	run_on "$if_name" ip -j link show dev "$if_name" | jq -r '.[]["address"]'
->  }
->  
->  kill_process()
-
+Ok. Will fold it.
+I also realised that I should have passed --src "$src" to this ethtool
+call.
 
