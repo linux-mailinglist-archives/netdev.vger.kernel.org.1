@@ -1,241 +1,192 @@
-Return-Path: <netdev+bounces-270074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270075-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMQpCP66vWnyAwMAu9opvQ
-	(envelope-from <netdev+bounces-270074-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:24:14 +0100
+	id wOEAJnK8vWnyAwMAu9opvQ
+	(envelope-from <netdev+bounces-270075-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:30:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B64692E151B
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:24:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DDDA2E166E
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:30:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F2AEE3025254
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 21:24:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 99D8930398BF
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 21:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63CED3A7F66;
-	Fri, 20 Mar 2026 21:24:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3184D309DDB;
+	Fri, 20 Mar 2026 21:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nRw4CTbC"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="MeL+smRv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3744636E484
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 21:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774041842; cv=none; b=Df5W/+4/sBFrQ83TWnePT4xpXh2hzV12SzVqfStnr8fRjnMeWoVyV8YHlK3FPja+u3slnNx1mq8djrF4bRGJPpagI3j/Fv7la/c2sP4QIxxUxAjTcVxuoo4z1Rf81lkEMETNhdOctuEHpXHhcxRvCH7GwZKzangjmKj3jaRe6vw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774041842; c=relaxed/simple;
-	bh=ozLFzhpVI2O2/f4t79l4sqzEcVkJzPQSj+jGAVH4sPQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JBviAuqhAT+bmg5cvThmyyRlq32vR0flu9sX69HAS/JxrUpiglFGH/6mIU5meghoXWM+xyuwZiNxN2Xy7fKrF/H1ZJP6EPolZQi6pWyiedENWc4LIi34Ez99wXDS41tJEZtNBBSnW7E3bDzysusbI3+tSyxJPdcGBuItrfrHE+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nRw4CTbC; arc=none smtp.client-ip=74.125.82.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-126ea4e9694so2494441c88.1
-        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 14:23:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A229F199D8
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 21:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774042045; cv=pass; b=u4nr+wciyGNqxXmpcUwzHg9jYh9R2iS8tFuHun1F5w3H7BFKiijtOrurmj0cBfra7IlM0csJOGCI1IOxja4aKaGutRbd+G65sYKgnr4tM1h3tmfRYKxbCjXEH+gFdM1nzVEGsAUQZIizFwgM7ndgjAtnQOCVr6HjVh4Wxw9gaxQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774042045; c=relaxed/simple;
+	bh=YlnU79Hq9OwTdK3vTK96Bxt2NZXEdAi8/p58mZnRPwI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AJWibdOI2NFlDSZ4x40cfEP9/SGR7KAsJx2yygKbmUMTEcMiq7pFGDbytJXD0wgzFNW729rQWTwKbsmt77QYymDLo9QaH4Z4Ssimo3AI03aEFYHw4djZaUPzYKEfDBrIOAg+7e611rEZD5LDkBhh06bJdklYc43R8oxYPP/Wn5g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=MeL+smRv; arc=pass smtp.client-ip=209.85.221.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-56a8fdaddebso407305e0c.0
+        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 14:27:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774042042; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NU2aFlcSZGnLT4tlKnfEJzI911BGdx7rp22B9lovCTa0XH4eX6KmWiepPr/QOGEglA
+         WH5L0t2k/F0qwYuFoh+EtclJ0nwxD73CeqQCHytsIfevLljpE9jzyr8W955y6rIMSmVq
+         SAB/O/rMhBYUIWYEnqtWYgMl90asqLJyCR07gH/CrK6+4xjy8nmoa6/hZBpTEeMP03gA
+         iT3vUPwf4hPvNK9cvwAsYOC3QsVyDSA+gm8hJXawEG0ZyaN2IJjARtRwRvSzScrKq+1B
+         Cl8H05fheIKTQjYwSqcEq6M14exP5wIYvqdU7NynZTBJoHOs/ZWQZ7at+JJoZlouTm7S
+         VxUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=gfjbuzHMZlM6OP0oO61ZlxLsLnXoNPK/lO7unH+P/CA=;
+        fh=hH3zo00A9U/ftP0aQx4LywtbZtVVbYHGET7/XIpAfss=;
+        b=h4s7T3ySukVxFlF8Py7k45YYm7fhUOr16DKlNGWDbziCEU2OXL1xKlZTs/GytavhHG
+         zuZx39gNcn9lTizO/LjK5XkJwAsKu+1KN/9fhSa15NRnSHrNnLHb3sc5DZqchUpvqNQw
+         GckcP+1LTmJzUyqWgSFrDNACSTHWfgZi1QnJb1waH7dGxGN1BMqRJcqIhV0Q7WWX0keP
+         tOGIeflkId2wFj16JQZdSTTDuZTLydl0vu6Z8rdjY6Q7c846xvUY7WL1IQm0GHRZOleL
+         LV2OLuK4H5YQeE3uSvE9woAETiRKCusZJz2OdRzs6PwVq9ESYjUs0golB6LGLEdPLkR0
+         NDqA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774041837; x=1774646637; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cc7L1+/6dVTTAc1rDpaFmgif5bqTxN/xlHF2dS1giug=;
-        b=nRw4CTbCTsZveqJWZk+vOpb0upPF89+gzcVtzmiCNpiNQiMatFK3zM9pyTl5X/WCRZ
-         jsvgykq9tv2XSArjzHu6/0GFfEaIhBAj50oYrf8LtGcwwsH/XqAKrlX6lf7OHR4UI1Zc
-         xNBDBu150PCT/fvNJv18OPh3KhQ68+0PT+2SQohYPUvr3ZYZSzuY43m/CfR864EzVPXp
-         KvI31anqfBXn8PL1DXv9F+dPsUqFJomWLbZOfivTe2vsbLUQprjU4l5PDrCPOraq7miB
-         u+BFIJ+2ug1TdvMzRX+BjE/3Zh9MCvcRQ2nNqckrXMXBdgzmY42PK0iX+0spyDKdTOoj
-         hqIw==
+        d=purestorage.com; s=google2022; t=1774042042; x=1774646842; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gfjbuzHMZlM6OP0oO61ZlxLsLnXoNPK/lO7unH+P/CA=;
+        b=MeL+smRvNO+mNRBAixuf+xQoIxD/T+TDOjWoTDsVnNDiahYyTtS7DZySPbg6+2Te+i
+         QlRFuNdCKwkiYhu1Gdz/8TX40EJxNaYNw0JZGcm8mWTLy0CXU8sZ3NxWC3UOxrXsB0VE
+         RnDkhO6Ato00q4E+HK7h69g6hwy4vOevbiBmU2/kJ7T0JFk1lkxnfz4I1+RAfvI8SOb5
+         4ePmwybVedoMqIOWULfYoudiyK1/3/gnPpEZcB7KH7pXrRY45kgFcsz/zykCKSPyjTwU
+         6zCyo8ujH7GFPb6AUtW/69/55MU6pc8dpDRzJsCzu7hSofhAKJnNnFbbK0VPAVUa4seW
+         6iXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774041837; x=1774646637;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cc7L1+/6dVTTAc1rDpaFmgif5bqTxN/xlHF2dS1giug=;
-        b=i/bAGHfAHwN69pHkvCvU+KCxt+zvbasrG6FiEeOYbnzlGSyXPfScljl5M7ugavbMmA
-         U+A55kOF7vro3qIwY2MVt3uWKRNs9bBnuxs68O/GotNqY5++2m/0xb0wmrCJXLHXkxI0
-         GiP0P60lgb9/zoAp4vnBNAZAEwADEGJfkaQB4QHR6cQcyT8SBFSbGgpwiUN+Ji2MnOj9
-         M4PTKUWp6LXXRIezwLE6v8q4c0a1jPbYc0qM0dKhSRyjOedS3Q3wP/E+vrOIQv+L81qt
-         HT/yclJBw2Wk1Mo1QZXL7/berAzKDN7GyiiFUAH0pQLXD7VdiCWWoKzf7Ksv4F58gE/Y
-         u6+Q==
-X-Gm-Message-State: AOJu0Yyh8BQCSfk1p6zX3SjovazyyKJYJNh5/AsALHYFkxzuv/VunTGF
-	pnCi/MB6vvSlTMu8gG75Z6xVJfiZZLeRNjXxA2XRJ6KmX4fCc5xLnIUf
-X-Gm-Gg: ATEYQzxlzmWrgsWdicRg+e3rRVOf1zVVBAYJoWKFUWptMGv4zTaXbrBsl/Kbwdnf05R
-	FPj3Ob1JvUaywnjZslwV8xINAiRLFkIASpI999OjEBQGSHwfc65frBUXHKs75cXiqFZAo9KyUAa
-	upIFntJp0Y4FETFi31S/nM8PR5/BpQ9M0Ia8MKlaegBTtJpBENhsW/uVXQA04OqzKkZFlARdskM
-	B0HHWZqBUdCbzZmoCcc6fwyp2YxrHGejFqyoo76qzKj2dvDsv3ovz871LIZq4hrJvT6dfMKtEvE
-	SpO98eVBY0wGKQvMc7JVsvT4x+LMUU4KWq21Nkub9WOGqQ24BVSuEwcehc0WACOSmWgn1HAq2/A
-	9gp2iEwF0+PW+zJauv7BZS3hmICYVkscMJ/AbWfMweS9K2JCUgADLdZ8wJKFwnX7cfBy0MPhuRK
-	4T/lT4gOiOgLD+0N5/pDingMj3Oo7C3pQCFXM4jr42osrMoneHsq4HZITANkN1
-X-Received: by 2002:a05:7022:1601:b0:124:8d7d:2d63 with SMTP id a92af1059eb24-12a726d018dmr2186785c88.35.1774041837053;
-        Fri, 20 Mar 2026 14:23:57 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c085:21c8::140f? ([2620:10d:c090:400::5:f9c1])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12a73407854sm3732795c88.8.2026.03.20.14.23.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Mar 2026 14:23:56 -0700 (PDT)
-Message-ID: <1d708196-7b89-431f-bb17-177564196894@gmail.com>
-Date: Fri, 20 Mar 2026 14:23:54 -0700
+        d=1e100.net; s=20251104; t=1774042042; x=1774646842;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=gfjbuzHMZlM6OP0oO61ZlxLsLnXoNPK/lO7unH+P/CA=;
+        b=gLDjeYxC1f/pzvwP8K+yw/jTTFBAqTKyyxzr8539QzUA76RhZlZMlgcksTEkBFggW1
+         E8Q3MaHknPFQRGjrHa7Iv1X3prLyK9+CPGjaR9bPgp55BfkLpdaCra0ugjBOn9Fj+3ow
+         YEOx+FQ1W9l/ZsAZ8Az9ynih11/YcYvXicJOUIbMswmHYnRQv9Ang4auQWrD1w4MbFBw
+         qBRrpXhjiZ90ENlkSKONN9LKINp5ebTEUtc+Ms9fkUzvtd5sCQCrca0/bBS4THMSwDXU
+         ZInYyJCNDcuc/kbkyH9dL6RgQH5Ql9S2QHkVEWsM43OB2gJU3Oz4SRuwafHYasfi0NgU
+         WICg==
+X-Gm-Message-State: AOJu0Yyq0KsOgB3/E3hjaQQQqRHqMKVERR3HK15InQej48NI3SLmrzRY
+	ZjaUphbBGHOaHeorg4/hL2CLWcZ4nWqGpqYIjygw85vAz+p55IUEnsfzPeCLyeVs4CI+BUIRLQX
+	o0EnNwThgxsmjKpcWTn4WXN9lASef51l0gYAGuKWFUA==
+X-Gm-Gg: ATEYQzyhwJw5+Ul9EZCskgpbpgg4KWKhp9bE8yrJKEbsivGMhi9sdQ+T28EW6vGXHjo
+	gDFFe2Bc7/78u5kvD05LwBJc/NLcakfT9WQ/yHMG+O3/XJx1wIcGYdo6v5elJeDdXaTvSUKD5zq
+	+cOpQ/iGWG7x9Fs1rXSXLa7gZxwUz92T8S9HST5zVihEZoMShAGaEnfJAXV/ShkgYZi/+7Agtjk
+	khPP7DVq+DxYhAlaGNuUsIiw71Exmf0YQHuR8FjEdyQX31DG51ZWwpp3Jd5QUgeW2wJ5k8REe9D
+	S/fcan/t
+X-Received: by 2002:a05:6102:5125:b0:5ff:d192:ff2f with SMTP id
+ ada2fe7eead31-602aed0dddemr1905062137.26.1774042042429; Fri, 20 Mar 2026
+ 14:27:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/2] e1000e: add basic XDP support
-To: Matteo Croce <technoboy85@gmail.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-References: <20260320132356.63194-1-teknoraver@meta.com>
- <20260320132356.63194-2-teknoraver@meta.com>
-Content-Language: en-US
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-In-Reply-To: <20260320132356.63194-2-teknoraver@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260319213323.235559-1-rjethwani@purestorage.com>
+ <20260319213323.235559-7-rjethwani@purestorage.com> <20260320194002.GI74886@horms.kernel.org>
+In-Reply-To: <20260320194002.GI74886@horms.kernel.org>
+From: Rishikesh Jethwani <rjethwani@purestorage.com>
+Date: Fri, 20 Mar 2026 14:27:11 -0700
+X-Gm-Features: AaiRm51exJFWB2Czeg8wIK1ixReMSPA005dvh4Ayv2VcZ8HQqmKcm3NBc7V3SEw
+Message-ID: <CAKaoeS0tOCAFWjLHwDezYb9KLCEDrxaLxWUUXQXG+A9siHmN3w@mail.gmail.com>
+Subject: Re: [PATCH v8 6/6] selftests: net: add TLS hardware offload test
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com, 
+	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com, 
+	kuba@kernel.org, sd@queasysnail.net, davem@davemloft.net, pabeni@redhat.com, 
+	edumazet@google.com, leon@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270074-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-270075-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mohsinbashr@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B64692E151B
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[purestorage.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 0DDDA2E166E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Simon,
 
-> + * e1000_xdp_xmit_ring - transmit an XDP frame on the TX ring
-> + * @adapter: board private structure
-> + * @tx_ring: Tx descriptor ring
-> + * @xdpf: XDP frame to transmit
-> + *
-> + * Returns E1000_XDP_TX on success, E1000_XDP_CONSUMED on failure
-> + **/
-> +static int e1000_xdp_xmit_ring(struct e1000_adapter *adapter,
-> +			       struct e1000_ring *tx_ring,
-minor nit: alignment issue
+Good catch, I missed that. I will add tls_hw_offload to the gitignore
+file in the next version.
 
-> +		if (unlikely((staterr & E1000_RXDEXT_ERR_FRAME_ERR_MASK) &&
-> +			     !(netdev->features & NETIF_F_RXALL))) {
-> +			page_pool_put_full_page(adapter->page_pool,
-> +						buffer_info->page, true);
-> +			buffer_info->page = NULL;
-> +			goto next_desc;
-> +		}
-> +
-> +		/* adjust length to remove Ethernet CRC */
-> +		if (!(adapter->flags2 & FLAG2_CRC_STRIPPING)) {
-> +			if (netdev->features & NETIF_F_RXFCS)
-> +				total_rx_bytes -= 4;
+Regards,
+Rishi
 
-Looks like, total_rx_bytes can go negative here since it is not updated 
-after being initialized to 0. Is this expected?
-
-
-> -static inline void e1000_rx_hash(struct net_device *netdev, __le32 rss,
-> -				 struct sk_buff *skb)
-> -{
-> -	if (netdev->features & NETIF_F_RXHASH)
-> -		skb_set_hash(skb, le32_to_cpu(rss), PKT_HASH_TYPE_L3);
-> -}
-> -
-
-The function was just moved. Looks like an unrelated change?
-
-> +/**
-> + * e1000_xdp_setup - add/remove an XDP program
-> + * @netdev: network interface device structure
-> + * @bpf: XDP program setup structure
-> + **/
-> +static int e1000_xdp_setup(struct net_device *netdev, struct netdev_bpf *bpf)
-> +{
-> +	struct e1000_adapter *adapter = netdev_priv(netdev);
-> +	struct bpf_prog *prog = bpf->prog, *old_prog;
-> +	bool running = netif_running(netdev);
-> +	bool need_reset;
-> +
-> +	/* XDP is incompatible with jumbo frames */
-> +	if (prog && netdev->mtu > ETH_DATA_LEN) {
-> +		NL_SET_ERR_MSG_MOD(bpf->extack,
-> +				   "XDP is not supported with jumbo frames");
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* Validate frame fits in a single page with XDP headroom */
-> +	if (prog && netdev->mtu + VLAN_ETH_HLEN + ETH_FCS_LEN +
-> +	    XDP_PACKET_HEADROOM > PAGE_SIZE) {
-> +		NL_SET_ERR_MSG_MOD(bpf->extack,
-> +				   "Frame size too large for XDP");
-> +		return -EINVAL;
-> +	}
-> +
-> +	old_prog = xchg(&adapter->xdp_prog, prog);
-> +	need_reset = (!!prog != !!old_prog);
-> +
-> +	/* Transition between XDP and non-XDP requires ring reconfiguration */
-> +	if (need_reset && running)
-> +		e1000e_close(netdev);
-> +
-> +	if (old_prog)
-> +		bpf_prog_put(old_prog);
-> +
-> +	if (!need_reset)
-> +		return 0;
-> +
-> +	if (running)
-> +		e1000e_open(netdev);
-> +
-> +	return 0;
-> +}
-> +
-
-If I am reading it correctly, this can be problematic (maybe with very 
-small likelihood). If e1000e_open() fails here, we will still return 
-success. How about the following?
-
-if (running) {
-     int err = e1000e_open(netdev);
-
-     if (err) {
-          /* Remove the XDP program since interface is down */
-          xchg(&adapter->xdp_prog, NULL);
-
-          return err;
-     }
-}
-
+On Fri, Mar 20, 2026 at 12:40=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
+ote:
+>
+> On Thu, Mar 19, 2026 at 03:33:23PM -0600, Rishikesh Jethwani wrote:
+> > Two-node kTLS hardware offload test using NetDrvEpEnv. Tests TLS
+> > 1.2/1.3 with AES-GCM-128/256, rekey operations, and various buffer
+> > sizes.
+> >
+> > Signed-off-by: Rishikesh Jethwani <rjethwani@purestorage.com>
+> > ---
+> >  .../testing/selftests/drivers/net/hw/Makefile |   2 +
+> >  .../selftests/drivers/net/hw/tls_hw_offload.c | 902 ++++++++++++++++++
+> >  .../drivers/net/hw/tls_hw_offload.py          | 281 ++++++
+> >  3 files changed, 1185 insertions(+)
+> >  create mode 100644 tools/testing/selftests/drivers/net/hw/tls_hw_offlo=
+ad.c
+> >  create mode 100755 tools/testing/selftests/drivers/net/hw/tls_hw_offlo=
+ad.py
+> >
+> > diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/te=
+sting/selftests/drivers/net/hw/Makefile
+> > index a64140333a46..6b12b0920cae 100644
+> > --- a/tools/testing/selftests/drivers/net/hw/Makefile
+> > +++ b/tools/testing/selftests/drivers/net/hw/Makefile
+> > @@ -15,6 +15,7 @@ endif
+> >
+> >  TEST_GEN_FILES :=3D \
+> >       $(COND_GEN_FILES) \
+> > +     tls_hw_offload \
+> >  # end of TEST_GEN_FILES
+>
+> Hi Rishikesh,
+>
+> I think you need to add tls_hw_offload to
+> tools/testing/selftests/drivers/net/hw/.gitignore
+>
+> ...
 
