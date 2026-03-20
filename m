@@ -1,151 +1,199 @@
-Return-Path: <netdev+bounces-269793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269794-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GJpQBzjbvGk63wIAu9opvQ
-	(envelope-from <netdev+bounces-269793-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 06:29:28 +0100
+	id WeKbLmXhvGlu4AIAu9opvQ
+	(envelope-from <netdev+bounces-269794-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 06:55:49 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 688AA2D5F88
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 06:29:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EEBF2D60F5
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 06:55:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE72930879F8
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 05:29:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3F7403038512
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 05:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E5A2FCBF5;
-	Fri, 20 Mar 2026 05:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4E031AAB8;
+	Fri, 20 Mar 2026 05:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="b4dTk39X";
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="b4dTk39X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XsriI4QE"
 X-Original-To: netdev@vger.kernel.org
-Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F50B279DCC;
-	Fri, 20 Mar 2026 05:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773984564; cv=none; b=B/+rL+QxdJhVUHk0HFbauZbZT8TMwTM5ynzw5dDLmyoG3QgFBzve7bIejn5nH06GmOIM0Lyrv5vUPCKGxgtvGltkJP6PekhU0Kwp4BoyANjePbJDRS1dfJaXM7ioK3RxOUC9p5HAjlOL3ZhLRjBTC91sb7At9Z/906Q3I8d85Fw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773984564; c=relaxed/simple;
-	bh=5TVNEMyUV6Nyt8igSSYIMZQ785TLtaLYhsQIRWIusQs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GGwsqsa0spyV4htC6upnXV+7gs5gGcZrGmAA4fMbAFki+Dqa1jH2SUz/2wtSXzu4ugTCCKW+fk/x21D6vh0TBpLISsAL4IrnTr65OfRgQhOK8HqmCMDKAQSX+IidZ6zQtiXt0gy7pg9TuFtOzw58hk6CtkqnyunN3zvi+jgKvxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=b4dTk39X; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=b4dTk39X; arc=none smtp.client-ip=23.88.97.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1773984561;
-	bh=5TVNEMyUV6Nyt8igSSYIMZQ785TLtaLYhsQIRWIusQs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=b4dTk39XxeASjobqM5VCZZFikZZ0nNpuQsorBt627XPAZ2f238drrss32u+PD8v8+
-	 EflKBJqgCaIHw6Fz0MLbTIe55TyI7Y+VrzXNk5zEjEgJP8JvS8og3x3Ly4pR/vTsLd
-	 3eI6eOu8p561kkPQV6vckomlWDy+w1zBNXnslRKBiqoFgJSeNNIJ4XT4fff8epC2AU
-	 nAva5Eb1T6/aM+CcnuFWJc2gQHExk531mwSQkyr9arCm834ct+yw2KRqcljJmxDtBY
-	 v/DZF3RxTAy+vlLAbu+m22UrTKCt9CeO8q4fWmC3VON+Rk/pYNVbE6kFB5EewSUu1Z
-	 Cmg3IxVD/BP7A==
-Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
-	id E28F33FEE3; Fri, 20 Mar 2026 05:29:21 +0000 (UTC)
-X-Spam-Level: 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1773984561;
-	bh=5TVNEMyUV6Nyt8igSSYIMZQ785TLtaLYhsQIRWIusQs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=b4dTk39XxeASjobqM5VCZZFikZZ0nNpuQsorBt627XPAZ2f238drrss32u+PD8v8+
-	 EflKBJqgCaIHw6Fz0MLbTIe55TyI7Y+VrzXNk5zEjEgJP8JvS8og3x3Ly4pR/vTsLd
-	 3eI6eOu8p561kkPQV6vckomlWDy+w1zBNXnslRKBiqoFgJSeNNIJ4XT4fff8epC2AU
-	 nAva5Eb1T6/aM+CcnuFWJc2gQHExk531mwSQkyr9arCm834ct+yw2KRqcljJmxDtBY
-	 v/DZF3RxTAy+vlLAbu+m22UrTKCt9CeO8q4fWmC3VON+Rk/pYNVbE6kFB5EewSUu1Z
-	 Cmg3IxVD/BP7A==
-Received: from [IPV6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb] (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
-	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id E70B43F9FD;
-	Fri, 20 Mar 2026 05:29:20 +0000 (UTC)
-Message-ID: <3bdcd08a-8001-4343-b150-693b58ead886@birger-koblitz.de>
-Date: Fri, 20 Mar 2026 06:29:20 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787832F3600
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 05:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773986145; cv=pass; b=lxWQ9126S63V4U2YXn456bzh8L/e7JMEqDJIqgzfI42DJuskI3+da0zM5pWAs0l29tX8TmsWnX6yX9xmPZL1PF2mphj4iC3/9WNPpVsdKjMJhGM1JLRXwdeKfWobi4C6Ok9KIrPxNAecHZTVFOnK7LKV5OEvYwS7Bgiz7WBBU0o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773986145; c=relaxed/simple;
+	bh=oCgtRbRk9MYu+izrc0OkdjmcYDPKaoAFmclfY77q4Jo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iYuAY2G1TnVYHFp0qV+cb5bVTS4BY2GaRGbwBL99d9VZcbv8wCKdNMrPgfpQBFC871M25njbnxU4JTMePsxP3GIZIkLem79kBT7+G15iNlYQU6MkbhRKMJnlMZy2NXYNApPe91Mgrp1yh3YwkIa4lSLszIPulOBfPiUL3jdUqMs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XsriI4QE; arc=pass smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-5091ed02c54so236231cf.1
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 22:55:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773986143; cv=none;
+        d=google.com; s=arc-20240605;
+        b=bgw+jfq1jGFm+XBgWiku1YtthPVYgCVZ/0Lc91K1PjQTUXHa14ZifRzF1LmG2lWBB1
+         7SZI/THu2UjevyBSHDOrdo3HrEdPXcFEJkYC9tLOpiZAsEFeFvnNPhD0mQ7vc9ZRpmNI
+         Eo1Jx0jHEhZppbagiCuUDalJFGERVlE8BjvdxmFYSUSOF6Buh7/UG4yyH70awdPwFW9s
+         9h5JNewa1A4YNva3IUfd6iyhZNRx5iiWcpNhXMzYZ6wRizeOJI/MEj+VXG5vtfO8jFeD
+         cZrkKYx7BW3CjAA1mYeEnROa0uw52Fjc/klPApewO+hWtPJJq+bfU3hMb817GIEWu6ht
+         Qy2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3xIgPbLcoKc5TWnRnYeKBSff9C2c6gGrDbCryr89sY0=;
+        fh=tKvEXYLI2q7cUoa9NFBJbqHLT3DO1DPUh22psi/SgLE=;
+        b=frBLbW+5CAaCpIWVhiqvG4tGJExW2aWLuErZdRp9Qog/b7zo9ufd1rgyjZ7FxQ1i4e
+         Pdf75sun+F2sERuBNDjeJ1WI0N+8x9KDZegci2feJocgszIgyTha49Vl+q5DGd1QfaYt
+         fhEBL8n9m1i5RmqfE6SLP7gmP/ZotCDfs7l6gv5WDGNWphOoFrvXfmtqiBByIR0ocz8v
+         UqiXfnJsebK8sEMqt88dvxIeSxOqNXefp4cNmF1G5oGioAKMaxvLkUjilZ7U4Q7jGefp
+         sKKXWzJYxYUV1s92hfCCxYwElKLoYBE537IjHZN/KwnslfjfhpC6ygo18l9znF9+WnSX
+         cdxQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1773986143; x=1774590943; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3xIgPbLcoKc5TWnRnYeKBSff9C2c6gGrDbCryr89sY0=;
+        b=XsriI4QE1Qm9//5gYTVEFG9osnqtnpW4fm0IOP51bq891wlqNaYdaMUQJnaiXrpxyT
+         KKDj3Y7ZRYkem4NjYtHPbglrEenjbhfArNyVzbSR7fNZMd+nO0Y/N1flwDWcyEYZBZ8e
+         NJ1on0mXQ7DgHM1nX6IWscut2peitUYonBUEuhY5Blxgo7v0WtV+ttIstAIZfq3cHSij
+         vORy1mwMJaEmMNBOIQtveJcGyIwwWC8vJM0vKaYJNiR4Q/iEVUVXH1XFJ938gVJ7fx13
+         NaGYArWdMqZ2MccQ6piU7YZYp6H0sFsMO7xBR6RrnirtO6h2wTphoJfRXrNTqxNQyXqm
+         AiSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773986143; x=1774590943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3xIgPbLcoKc5TWnRnYeKBSff9C2c6gGrDbCryr89sY0=;
+        b=SA+xwmdvRPfn09hlyvGLUgbSC3271rW57CGHGEMRhi/3FGhj0neiExkGMcDRCBxxFb
+         BAVyzIMr+sS+AiWYoE51Vom6J6fSFGqApnHIsGJlsJaSQXFw82RFVSSTQJuqMciXVjye
+         6euGLBAE1nme6RSg00lEfXEYb8V3WxM+XcbLe1VYke989ZYLkkofe9GlqvAwu+mh3G+7
+         JkY7Bz51DtPdNu8DzuhHSJY5vjV0KWQ7ui2o1Mx9xrDTPuRmdDY8o+t0+dhEFbWvitbm
+         5fFMJCm3r+2Q+ovcnkklvGBgp95FP7996sUIkewYWTnaFwxSM2iF14Bn/1Vg5ZOpzhNJ
+         L8MQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXmMSB+WwAE+kfwNsAEdHQH5/dHI+TcSNyCisU9HsU0BLHebzYMywOBUYD33xZRPtUsnyTiz6I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyE33kjGpC4YiA3SbzeBfFmyf4BOOUL8lJLfbxMPnWGitMSAX6U
+	YLksWFQmyChEYB/unuTQPT501TO/q0ieY4YJpgy3QwBsjO5LEEyVNO5ng7ODZYgn3+oUo6BWaqC
+	wk7uIS2STK5SSAhhDmUxe7C9kKPTllCQYuaI7h3wH
+X-Gm-Gg: ATEYQzxWBDosck++19EnE/L4Pkk82gls7f0mkyd9cn9EwQtHXiE8fF/o96+v5t6vo6p
+	5nY8s5GdHy7GGp+Uf/3o2/4XlTzyTLyGKv37f+QTaLZLThDPBZtk1CPXuUB+V8HmJs75WcXK+wz
+	ycsQ6IUzHS42M0BGrJLea1UDiAAoz8g8DpQHihoXLRkB+ZQUmJCmBbYw8qciSniHX/HKraP5Tm2
+	HSw2yJ4zWdyqeOtTJX6FPk82gqbimTcyXC3VJMrZBfyk1TtaTjCDw/L3WXR6UrqYv6C7GkRFSzQ
+	kCG8PWaZ9ZIB5SuIUH1CTCpJcCcSw6HaRDE8C9g=
+X-Received: by 2002:ac8:7e8b:0:b0:509:21ff:cd49 with SMTP id
+ d75a77b69052e-50b371ca480mr10124371cf.4.1773986143143; Thu, 19 Mar 2026
+ 22:55:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] r8152: Add support for 5Gbit Link Speeds
- and EEE
-To: Simon Horman <horms@kernel.org>
-Cc: edumazet@google.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org, pabeni@redhat.com,
- kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net
-References: <20260317-rtl8157_next-v2-1-10ea1fa488d1@birger-koblitz.de>
- <20260319165100.1988286-1-horms@kernel.org>
-From: Birger Koblitz <mail@birger-koblitz.de>
-Content-Language: en-US
-In-Reply-To: <20260319165100.1988286-1-horms@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+References: <20240617093620.12a9b539@kernel.org> <20260319222250.2588501-1-cmllamas@google.com>
+In-Reply-To: <20260319222250.2588501-1-cmllamas@google.com>
+From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Date: Thu, 19 Mar 2026 22:55:30 -0700
+X-Gm-Features: AaiRm53p3pib_DhQUkLEwJBbWTq_jR7XozX1Ko_yN1-kj99X_qDGMJCQot-eGWk
+Message-ID: <CANP3RGc9STBO+dhOV=ghufm1Awn7=M=gK5GbQt4r4kp2WXG-cA@mail.gmail.com>
+Subject: Re: [PATCH net v3] neighbour: add RTNL_FLAG_DUMP_SPLIT_NLM_DONE to RTM_GETNEIGH
+To: Carlos Llamas <cmllamas@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, kernel-team@android.com, 
+	Terence Tritton <ttritton@google.com>, Eric Dumazet <edumazet@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
+	Breno Leitao <leitao@debian.org>, 
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[birger-koblitz.de:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[birger-koblitz.de];
-	TAGGED_FROM(0.00)[bounces-269793-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-269794-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 688AA2D5F88
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maze@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.979];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davemloft.net:email]
+X-Rspamd-Queue-Id: 0EEBF2D60F5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Simon, thanks a lot for reviewing this patch!
+This didn't really slip through; rather, the netlink parsing code in
+Android's net test is buggy and needs a rework...
 
-On 19/03/2026 5:51 pm, Simon Horman wrote:
->> The RTL8157 supports 5GBit Link speeds. Add support for this speed
->> in the setup and setting/getting through ethool. Also add 5GBit EEE.
->                                            ^^^^^^
-> This isn't a bug, but there's a typo: 'ethool' should be 'ethtool'.
-Will be fixed in v3.
-
-> When rtl8152_set_speed() sets tp->ups_info.speed_duplex = NWAY_5000M_FULL
-> and r8156_ups_en(enable=true) subsequently calls r8156_ups_flags(), the
-> switch falls through to the default case and no speed bits are set in the
-> UPS flags word.
-Yes, this analysis is correct.
-
-> 
-> Is the UPS power management configuration incorrect for 5Gbit link speeds
-> without a case for NWAY_5000M_FULL in r8156_ups_flags()?
-The out-of-tree driver also does not set any flags in USB_UPS_FLAGS in 
-the 5000M case. Maybe this is an oversight in that driver, but according 
-to my tests, the power management works. In any case, I would not be 
-able to guess the correct register value with any confidence for the 
-NWAY_5000M_FULL case: the bits are different from the speed bits in 
-PLA_PHYSTATUS. The RTL8157 also has other differences in USB power 
-management compared to previous generations, such as introducing 
-register USB_U2P3_V2_CTRL. So, to the best of my knowledge, the proposed 
-patch is correct.
-
-> 
-> This path is activated by the next commit in the series (58ba3b6c476d
-> 'r8152: Add support for the RTL8157 hardware') which sets
-> support_5000full = 1.
-> 
-> [ ... ]
-
+On Thu, Mar 19, 2026 at 3:23=E2=80=AFPM Carlos Llamas <cmllamas@google.com>=
+ wrote:
+>
+> From: Maciej =C5=BBenczykowski <maze@google.com>
+>
+> without this Android's net test, available at:
+>   https://cs.android.com/android/platform/superproject/main/+/main:kernel=
+/tests/net/test/
+> run via:
+>   /...aosp-tests.../net/test/run_net_test.sh --builder neighbour_test.py
+> fails with:
+>   TypeError: NLMsgHdr requires a bytes object of length 16, got 4
+>
+> Fixes: 7e4975f7e7fb ("neighbour: fix neigh_dump_info() return value")
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
+> Tested-by: Carlos Llamas <cmllamas@google.com>
+> Signed-off-by: Carlos Llamas <cmllamas@google.com>
+> ---
+> It seems like this fix slipped through the cracks, so I'm resending it.
+>
+> v3: Rebased on top of mainline and fixed the conflicts as v2 from Maciej
+>     no longer applied cleanly. Verified the fix works as explained un
+>     the commit message. Added tested and sob tags.
+>
+>  net/core/neighbour.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+> index c56a4e7bf790..bdee4cf110bd 100644
+> --- a/net/core/neighbour.c
+> +++ b/net/core/neighbour.c
+> @@ -3953,7 +3953,8 @@ static const struct rtnl_msg_handler neigh_rtnl_msg=
+_handlers[] __initconst =3D {
+>         {.msgtype =3D RTM_NEWNEIGH, .doit =3D neigh_add},
+>         {.msgtype =3D RTM_DELNEIGH, .doit =3D neigh_delete},
+>         {.msgtype =3D RTM_GETNEIGH, .doit =3D neigh_get, .dumpit =3D neig=
+h_dump_info,
+> -        .flags =3D RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
+> +        .flags =3D RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED |
+> +                 RTNL_FLAG_DUMP_SPLIT_NLM_DONE},
+>         {.msgtype =3D RTM_GETNEIGHTBL, .dumpit =3D neightbl_dump_info,
+>          .flags =3D RTNL_FLAG_DUMP_UNLOCKED},
+>         {.msgtype =3D RTM_SETNEIGHTBL, .doit =3D neightbl_set,
+> --
+> 2.53.0.1018.g2bb0e51243-goog
+>
 
