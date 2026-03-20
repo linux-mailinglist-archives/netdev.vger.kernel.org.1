@@ -1,322 +1,270 @@
-Return-Path: <netdev+bounces-269914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269915-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eI+THt1LvWlr8gIAu9opvQ
-	(envelope-from <netdev+bounces-269914-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 14:30:05 +0100
+	id 8PAwDDhLvWlr8gIAu9opvQ
+	(envelope-from <netdev+bounces-269915-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 14:27:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 301AE2DAFDF
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 14:30:05 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEDBC2DAF0D
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 14:27:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DE87330ADD30
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 13:24:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BA9B130219D1
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 13:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9BA3B27C5;
-	Fri, 20 Mar 2026 13:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9601E377007;
+	Fri, 20 Mar 2026 13:26:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cmn/wP1j"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kqqsFI6A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FAE346E43
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 13:24:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BBC1A6817;
+	Fri, 20 Mar 2026 13:26:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774013072; cv=none; b=VN7dBQ88sAfGj1buMQC11xf3ns468NkUltt7q+edco2JgfbBtxoIyef8yjmcvMSBRy6PStKSiUGhDvlmxh1CTdS3VY+ZUbllRB3ap0a4aTkIly3mAC13sZcpB8B3oYSQlec3E4mBiC0mzJlAUJ3fpOloYOBDo30dcAR1VetmIpY=
+	t=1774013193; cv=none; b=Bfp6c3Czb4RqjBx2LT98HvMdDLe7Y5+fq74IfuyPbQvRe7hriSGDX7En9neSsQAdPr5CyZQr3E4WM2hZ0KS9Nsu7FJhMkR0yV/waRNsDtQIHZPmu2Njve2TL+PSbkLBa+n5MVUxTh+dIaQJNF9I6pKHOgGDfH1TakbExkqe4ELQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774013072; c=relaxed/simple;
-	bh=PD9juSUsML20xVTwE8RCFOWj95oRmvJZgs05+pTq+Qk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dBMXMgIzTdINGBXz6hEbt6rnI4gBYr3AegoOKOr6hYQqApofpsdUZ/JPrf2t0ENCzK542aQI9as2IQwSUlhuv7GwHoYDmeyMiQD5IgZWKR5K3LIHRIgSIfhioEpqlaD1quadWu+bdnGYceegInFoubi8FIm/8QnTralSl9jO9uc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cmn/wP1j; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-486fe655187so10665745e9.2
-        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 06:24:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774013068; x=1774617868; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aLTuTnfwehV2L1dYdqxcXAxrjOVio+7F/VaVFTc7JYo=;
-        b=Cmn/wP1jHQs7GgyundFrM00/EXxqNZfib9Jb1SRRIE7kmcsbd/9wG3YnssN0CoFegl
-         Ea8nt6GXvErSqFHINtpMR3qUepQWlG2XAilwTgaWHKYFZOimEAy1y2hf4Rib1WyIrYUr
-         BlS4M8bOZjf/1E/nDWUN7UJj2qJg2B4jIOcjsS6WEDhQsOzXYt5+TtFX9RT/+mOI9DrM
-         2OQxEt2rtEXtBrHogUCBtOCJ1dVIiCKBEk7NGiWKdlqAkjG/0idlETfeFsGRQZXEw1er
-         7BuN87uZTJJf6UAQE6JVpoBBiJJj15X9fbvQUOfbwvVOI7YniKmy1rEYPDPrJHR247dt
-         RApg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774013068; x=1774617868;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=aLTuTnfwehV2L1dYdqxcXAxrjOVio+7F/VaVFTc7JYo=;
-        b=ClF1mmXMHQuuXyAul7uA2L8A/T+F141MfpKyj5g9pyYsJXLxsyZfMLYhSSRoOs1wA2
-         OHBjS7ErJzK/w/gBu2/sG2XkhjxlQQv8C2J+2JXBFjij3x7vr7MCp6XhCTRZbqEEGM70
-         go/2mRY9IJt//qBDfrSQFFyzqqkJzS8OJOgRRG5jsuEM3MnbRbszBOginyVtox4dabGv
-         +iI3BMXAepuRfzNcZj9tTZPOIULJeLK8B2DQ74+WGk8Ki05QmmGub99CzoTPKJsA8pk5
-         UN1xalIWudk1kaVz0kZdbNwhO5rK4ybg91KOjdUhBrzxkvV/tGaz/L+3FfBV0pYk0hjw
-         jpUQ==
-X-Gm-Message-State: AOJu0YynerwuB9qAcUkTSZY+Qg/oIYgg3BC3F4PcpGCmPddpuf80pax7
-	jVhohYbFdcbHLQ/7qVtTiBxCINuB2wPv5Caj0lmvp2IahhoDUXypTbqm
-X-Gm-Gg: ATEYQzzpAG9kBNq/PAqkjwxducCvxV7h7aiCKR7Pb6+sJ2hdzuGo3aGly1JPexxdjCb
-	kEbjiEvq1ljiJO9qnAYTZ6EEb7wt3v/L2Vm+w0EM9WxVsf+1Oy9qind3H+UCy0EZ7G5AH3sH4w7
-	ZLiIkEgXzuclsoA2wQu2ZS7vpq/WZnE5plxdq6eYPJmMhlHUmYWNjR4wFI0CgYYuXpy1T/AlwPM
-	uC2667iTBsFBicUJWw+Dnkni7J/+/pVuhRIIlu9mfMW+pkEUCgtN/RfOxBST9IfnPiVp2pEBb0Q
-	9SeMemRwze1Kixfas6BR6KvlXebXKH5KKfIYn3zZbErudfLjGF4/9p3PH9FQmbgMyGicwoDvFCK
-	hmMfD0E7TryvdTjDGXHdJLmVscSnUSUr2QwF3OAu4BO43hTSgyNfhmQ7IGjVPFXZxZaO1lcsBZG
-	bENb53ne9doYkDjtPah+4HgtasUd4ahDJsahNneTh2jDjvhey2X6gzJEH9lxMXxJXEgh4DW/SS
-X-Received: by 2002:a05:600c:1d1b:b0:485:3cf3:1010 with SMTP id 5b1f17b1804b1-486febb5fefmr49625065e9.2.1774013068226;
-        Fri, 20 Mar 2026 06:24:28 -0700 (PDT)
-Received: from turbo.teknoraver.net (net-5-95-156-124.cust.vodafonedsl.it. [5.95.156.124])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-487004e7bc4sm16427095e9.2.2026.03.20.06.24.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2026 06:24:27 -0700 (PDT)
-From: Matteo Croce <technoboy85@gmail.com>
-X-Google-Original-From: Matteo Croce <teknoraver@meta.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>
-Cc: netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 2/2] e1000e: add XDP_REDIRECT support
-Date: Fri, 20 Mar 2026 14:23:56 +0100
-Message-ID: <20260320132356.63194-3-teknoraver@meta.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260320132356.63194-1-teknoraver@meta.com>
-References: <20260320132356.63194-1-teknoraver@meta.com>
+	s=arc-20240116; t=1774013193; c=relaxed/simple;
+	bh=8Qf4O59cRCiTNM8d1DSocI7ifO6Oqsvd7RQ1vRUfjPs=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=f6Y3n+UnAxISXDT2eivNj3P0HIVtW2ZXowCOrcc8xeQTuy2/HNBt4XwVt8ifEjAQ0vUUrgZ8m9jRFY1J+8LPN+bIrJmKsKXeFST+JJ8h61Le45n/o5mEOmllW/Tkrvs0ob4KOV+pVKhbt27dtNTEuAt8vAuDyH0m6H6HEIAyjXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kqqsFI6A; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62JJwgp93617724;
+	Fri, 20 Mar 2026 13:26:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=4CZhX4
+	ltwX6/2CwWGNZOXJCSOImkdXq3DA2jYreZCnA=; b=kqqsFI6A4QThf77memBY3a
+	9udbqlS3k66eXfg2YSWJobl7VTplSBaZElJ4joGRquupkxa+NitWC4ZpgBlZzl++
+	DGfGsRLIx6xgTxDThh9i8ie8p8RltDDARLaUwBelPzQ42SLlF3lH9k8UD1Ru39+w
+	r0xsEJwYCOZ3DMiAR819HKU/+z6E36wNG5TRIImN/socHuO69Ven4k/h2sijKYr7
+	2BRQvB/USzYMe1uDy1GQLMa3yP0CXVIehPCUo6GCu6Jrl2jjkRqUBMGock5w4tbb
+	dY5857Di3qoAFMS44Zu0V4epwZ7KdvKD/kGJCm5T8W+MCCtJGgiyvKC9b/OX0y0Q
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cvybskre0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 20 Mar 2026 13:26:27 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 62KCokTi015644;
+	Fri, 20 Mar 2026 13:26:26 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cwk0nq9qg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 20 Mar 2026 13:26:26 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 62KDQMeS52887984
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 20 Mar 2026 13:26:22 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 180A42004B;
+	Fri, 20 Mar 2026 13:26:22 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DCE1E20043;
+	Fri, 20 Mar 2026 13:26:21 +0000 (GMT)
+Received: from [9.52.210.163] (unknown [9.52.210.163])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 20 Mar 2026 13:26:21 +0000 (GMT)
+Message-ID: <3764a54560d7caba6092e2a396b8dfcda1467802.camel@linux.ibm.com>
+Subject: Re: [PATCH v4 1/2] PCI: AtomicOps: Do not enable if root-port
+ capabilities are unknown
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Bjorn Helgaas <bhelgaas@google.com>, Jay Cornwall
+ <Jay.Cornwall@amd.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>
+Cc: Leon Romanovsky <leon@kernel.org>,
+        Niklas Schnelle
+ <schnelle@linux.ibm.com>,
+        Alexander Schmidt <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+        stable@vger.kernel.org
+Date: Fri, 20 Mar 2026 14:26:21 +0100
+In-Reply-To: <20260313-fix_pciatops-v4-1-93bc70a63935@linux.ibm.com>
+References: <20260313-fix_pciatops-v4-0-93bc70a63935@linux.ibm.com>
+	 <20260313-fix_pciatops-v4-1-93bc70a63935@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=MMttWcZl c=1 sm=1 tr=0 ts=69bd4b03 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=c92rfblmAAAA:8
+ a=VnNF1IyMAAAA:8 a=VwQbUJbxAAAA:8 a=bk9QdSnUxZs7UvxrWr4A:9 a=QEXdDO2ut3YA:10
+ a=GvGzcOZaWPEFPQC_NcjD:22
+X-Proofpoint-ORIG-GUID: nAiDaXskiwg1ItIqtGXSFjsP9M9i-w8i
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzIwMDEwNCBTYWx0ZWRfXyV8MTvF0ujem
+ 54N0H8apDlj3D4IgT2Vj3R+MeCM2L4FnuuyJDfjEKPn3CwvssstcUeOgxpXWj62d3XwbaWwbHjw
+ pniSkM+rtsDiX2h4c+yo0f9G0hWPoZU3qw598bz1Mn3XeaIUehQJINLDZMWvW7dt1bWfB2t2wER
+ /upDtdPkRA9YwoxQC5RHEjtoGifHYJWg9dPt5Dfgobo4WEF9uhTmIrKsoCanmZY4vioN0Iyj2NS
+ z4RxMGZZdDixyPWQqQBklYwiLytPls19QFCVioUbuZFT8sK40p9HEXcvhT8V6ZqNCtkeAV/V/KZ
+ kbLhQTWc8MU1Ee1ntsLbkufT46IzuThsHOEjt66bx5CfDoadqMWNA1zlIOkD1fbt341Q9nn4zyX
+ IZOvcPKl2TVyxSb9ebfL1oLi51dBaHtYGVN2CavGpJJNem7AKcRdIlG4IBKLPBpEavsisMp1YF8
+ XXg+y973O4U28iSmlug==
+X-Proofpoint-GUID: v--fBaIoxvjTiYJKS9agvBeiMOyBDzf0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-20_02,2026-03-19_05,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0
+ priorityscore=1501 impostorscore=0 adultscore=0 phishscore=0 clxscore=1015
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
+ definitions=main-2603200104
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-269914-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-269915-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[technoboy85@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.889];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,linux.ibm.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 301AE2DAFDF
+	FROM_NEQ_ENVFROM(0.00)[gbayer@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: BEDBC2DAF0D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add the ability to redirect packets to other devices via XDP_REDIRECT
-and to receive redirected frames from other devices via ndo_xdp_xmit.
+On Fri, 2026-03-13 at 17:49 +0100, Gerd Bayer wrote:
+> When inspecting the config space of a Connect-X physical function in an
+> s390 system after it was initialized by the mlx5_core device driver, we
+> found the function to be enabled to request AtomicOps despite the
+> system's root-complex lacking support for completing them:
+>=20
+> 1ed0:00:00.1 Ethernet controller: Mellanox Technologies MT2894 Family [Co=
+nnectX-6 Lx]
+> 	Subsystem: Mellanox Technologies Device 0002
+>   [...]
+> 	DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-
+> 		 AtomicOpsCtl: ReqEn+
+> 		 IDOReq- IDOCompl- LTR- EmergencyPowerReductionReq-
+> 		 10BitTagReq- OBFF Disabled, EETLPPrefixBlk-
+>=20
+> Turns out the device driver calls pci_enable_atomic_ops_to_root() which
+> defaulted to enable AtomicOps requests even if it had no information
+> about the root-port that the PCIe device is attached to.
+>=20
+> Change to logic of pci_enable_atomic_ops_to_root() to fully traverse the
+> PCIe tree upwards, check that the bridge devices support delivering
+> AtomicOps transactions, and finally check that there is a root-port at
+> the end that does support completing AtomicOps.
+>=20
+> Do not enable AtomicOps requests if nothing can be learned about how the
+> device is attached - e.g. if it is on an "isolated" bus, as in s390.
+>=20
+> Reported-by: Alexander Schmidt <alexs@linux.ibm.com>
+> Cc: stable@vger.kernel.org
+> Fixes: 430a23689dea ("PCI: Add pci_enable_atomic_ops_to_root()")
+> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+> ---
+>  drivers/pci/pci.c | 30 ++++++++++++++----------------
+>  1 file changed, 14 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> index 8479c2e1f74f1044416281aba11bf071ea89488a..94e90988df86b3278b1b6abbc=
+326abf9b4a4a962 100644
+> --- a/drivers/pci/pci.c
+> +++ b/drivers/pci/pci.c
+> @@ -3676,7 +3676,7 @@ void pci_acs_init(struct pci_dev *dev)
+>  int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
+>  {
+>  	struct pci_bus *bus =3D dev->bus;
+> -	struct pci_dev *bridge;
+> +	struct pci_dev *bridge =3D NULL;
+>  	u32 cap, ctl2;
+> =20
+>  	/*
+> @@ -3714,29 +3714,27 @@ int pci_enable_atomic_ops_to_root(struct pci_dev =
+*dev, u32 cap_mask)
+>  		switch (pci_pcie_type(bridge)) {
+>  		/* Ensure switch ports support AtomicOp routing */
+>  		case PCI_EXP_TYPE_UPSTREAM:
+> -		case PCI_EXP_TYPE_DOWNSTREAM:
+> -			if (!(cap & PCI_EXP_DEVCAP2_ATOMIC_ROUTE))
+> -				return -EINVAL;
+> -			break;
+> -
+> -		/* Ensure root port supports all the sizes we care about */
+> -		case PCI_EXP_TYPE_ROOT_PORT:
+> -			if ((cap & cap_mask) !=3D cap_mask)
+> -				return -EINVAL;
+> -			break;
+> -		}
+> -
+> -		/* Ensure upstream ports don't block AtomicOps on egress */
+> -		if (pci_pcie_type(bridge) =3D=3D PCI_EXP_TYPE_UPSTREAM) {
+> +			/* Upstream ports must not block AtomicOps on egress */
+>  			pcie_capability_read_dword(bridge, PCI_EXP_DEVCTL2,
+>  						   &ctl2);
+>  			if (ctl2 & PCI_EXP_DEVCTL2_ATOMIC_EGRESS_BLOCK)
+>  				return -EINVAL;
+> +			fallthrough;
+> +		/* All switch ports need to route AtomicOps */
+> +		case PCI_EXP_TYPE_DOWNSTREAM:
+> +			if (!(cap & PCI_EXP_DEVCAP2_ATOMIC_ROUTE))
+> +				return -EINVAL;
+> +			break;
+>  		}
+> -
+>  		bus =3D bus->parent;
+>  	}
+> =20
+> +	/* Finally, last bridge must be root port and support requested sizes *=
+/
+> +	if ((!bridge) ||
+> +	    (pci_pcie_type(bridge) !=3D PCI_EXP_TYPE_ROOT_PORT) ||
+> +	    ((cap & cap_mask) !=3D cap_mask))
+> +		return -EINVAL;
+> +
 
-New functionality:
-- XDP_REDIRECT case in e1000_run_xdp() using xdp_do_redirect()
-- e1000_xdp_xmit() as the ndo_xdp_xmit callback for receiving
-  redirected frames from other devices
-- xdp_do_flush() in e1000_finalize_xdp() for REDIR completions
-- xdp_features_set/clear_redirect_target() in e1000_xdp_setup()
-- NETDEV_XDP_ACT_REDIRECT and NETDEV_XDP_ACT_NDO_XMIT advertised
+Sashiko (the new review tool) annotated that this patch may regress how
+RCiEP's are treated:
+https://sashiko.dev/#/patchset/20260313-fix_pciatops-v4-0-93bc70a63935%40li=
+nux.ibm.com
 
-Assisted-by: claude-opus-4-6
-Signed-off-by: Matteo Croce <teknoraver@meta.com>
----
- drivers/net/ethernet/intel/e1000e/netdev.c | 85 +++++++++++++++++++++-
- 1 file changed, 81 insertions(+), 4 deletions(-)
+And it has a point: While AtomicOps Requests were allowed for RCiEP's
+per default - now they're forbidden per default. Turns out that the
+situation for RCiEP's on all archs is the same as for "isolated
+functions" on s390: With pure PCI config ops you cannot tell, whether
+the root-complex supports them or not.
 
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index 3ee5246f0b84..83f188f9b510 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -41,6 +41,7 @@ char e1000e_driver_name[] = "e1000e";
- #define E1000_XDP_PASS		0
- #define E1000_XDP_CONSUMED	BIT(0)
- #define E1000_XDP_TX		BIT(1)
-+#define E1000_XDP_REDIR		BIT(2)
- 
- static int debug = -1;
- module_param(debug, int, 0);
-@@ -805,6 +806,9 @@ static void e1000_finalize_xdp(struct e1000_adapter *adapter,
- {
- 	struct e1000_ring *tx_ring = adapter->tx_ring;
- 
-+	if (xdp_xmit & E1000_XDP_REDIR)
-+		xdp_do_flush();
-+
- 	if (xdp_xmit & E1000_XDP_TX) {
- 		/* Force memory writes to complete before letting h/w
- 		 * know there are new descriptors to fetch.
-@@ -823,13 +827,14 @@ static void e1000_finalize_xdp(struct e1000_adapter *adapter,
-  * @adapter: board private structure
-  * @xdp: XDP buffer containing packet data
-  *
-- * Returns E1000_XDP_PASS, E1000_XDP_TX, or E1000_XDP_CONSUMED
-+ * Returns E1000_XDP_PASS, E1000_XDP_TX, E1000_XDP_REDIR, or E1000_XDP_CONSUMED
-  **/
- static int e1000_run_xdp(struct e1000_adapter *adapter, struct xdp_buff *xdp)
- {
- 	struct bpf_prog *xdp_prog = READ_ONCE(adapter->xdp_prog);
- 	struct net_device *netdev = adapter->netdev;
- 	int result = E1000_XDP_PASS;
-+	int err;
- 	u32 act;
- 
- 	if (!xdp_prog)
-@@ -846,6 +851,12 @@ static int e1000_run_xdp(struct e1000_adapter *adapter, struct xdp_buff *xdp)
- 		if (result == E1000_XDP_CONSUMED)
- 			goto out_failure;
- 		break;
-+	case XDP_REDIRECT:
-+		err = xdp_do_redirect(netdev, xdp, xdp_prog);
-+		if (err)
-+			goto out_failure;
-+		result = E1000_XDP_REDIR;
-+		break;
- 	default:
- 		bpf_warn_invalid_xdp_action(netdev, xdp_prog, act);
- 		fallthrough;
-@@ -1040,11 +1051,11 @@ static bool e1000_clean_rx_irq_xdp(struct e1000_ring *rx_ring, int *work_done,
- 
- 			/* page consumed by skb */
- 			buffer_info->page = NULL;
--		} else if (xdp_res & E1000_XDP_TX) {
-+		} else if (xdp_res & (E1000_XDP_TX | E1000_XDP_REDIR)) {
- 			xdp_xmit |= xdp_res;
- 			total_rx_bytes += length;
- 			total_rx_packets++;
--			/* page consumed by XDP TX */
-+			/* page consumed by XDP TX/redirect */
- 			buffer_info->page = NULL;
- 		} else {
- 			/* XDP_DROP / XDP_ABORTED - recycle page */
-@@ -7811,6 +7822,11 @@ static int e1000_xdp_setup(struct net_device *netdev, struct netdev_bpf *bpf)
- 	if (!need_reset)
- 		return 0;
- 
-+	if (prog)
-+		xdp_features_set_redirect_target(netdev, true);
-+	else
-+		xdp_features_clear_redirect_target(netdev);
-+
- 	if (running)
- 		e1000e_open(netdev);
- 
-@@ -7827,6 +7843,64 @@ static int e1000_xdp(struct net_device *netdev, struct netdev_bpf *xdp)
- 	}
- }
- 
-+/**
-+ * e1000_xdp_xmit - transmit XDP frames from another device
-+ * @netdev: network interface device structure
-+ * @n: number of frames to transmit
-+ * @frames: array of XDP frame pointers
-+ * @flags: XDP transmit flags
-+ *
-+ * This is the ndo_xdp_xmit callback, called when other devices redirect
-+ * frames to this device.
-+ **/
-+static int e1000_xdp_xmit(struct net_device *netdev, int n,
-+			  struct xdp_frame **frames, u32 flags)
-+{
-+	struct e1000_adapter *adapter = netdev_priv(netdev);
-+	struct e1000_ring *tx_ring = adapter->tx_ring;
-+	struct netdev_queue *nq = netdev_get_tx_queue(netdev, 0);
-+	int cpu = smp_processor_id();
-+	int nxmit = 0;
-+	int i;
-+
-+	if (unlikely(test_bit(__E1000_DOWN, &adapter->state)))
-+		return -ENETDOWN;
-+
-+	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
-+		return -EINVAL;
-+
-+	if (!adapter->xdp_prog)
-+		return -ENXIO;
-+
-+	__netif_tx_lock(nq, cpu);
-+	txq_trans_cond_update(nq);
-+
-+	for (i = 0; i < n; i++) {
-+		int err;
-+
-+		err = e1000_xdp_xmit_ring(adapter, tx_ring, frames[i]);
-+		if (err != E1000_XDP_TX)
-+			break;
-+		nxmit++;
-+	}
-+
-+	if (unlikely(flags & XDP_XMIT_FLUSH)) {
-+		/* Force memory writes to complete before letting h/w
-+		 * know there are new descriptors to fetch.
-+		 */
-+		wmb();
-+		if (adapter->flags2 & FLAG2_PCIM2PCI_ARBITER_WA)
-+			e1000e_update_tdt_wa(tx_ring,
-+					     tx_ring->next_to_use);
-+		else
-+			writel(tx_ring->next_to_use, tx_ring->tail);
-+	}
-+
-+	__netif_tx_unlock(nq);
-+
-+	return nxmit;
-+}
-+
- static const struct net_device_ops e1000e_netdev_ops = {
- 	.ndo_open		= e1000e_open,
- 	.ndo_stop		= e1000e_close,
-@@ -7850,6 +7924,7 @@ static const struct net_device_ops e1000e_netdev_ops = {
- 	.ndo_hwtstamp_get	= e1000e_hwtstamp_get,
- 	.ndo_hwtstamp_set	= e1000e_hwtstamp_set,
- 	.ndo_bpf		= e1000_xdp,
-+	.ndo_xdp_xmit		= e1000_xdp_xmit,
- };
- 
- /**
-@@ -8060,7 +8135,9 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	netdev->max_mtu = adapter->max_hw_frame_size -
- 			  (VLAN_ETH_HLEN + ETH_FCS_LEN);
- 
--	netdev->xdp_features = NETDEV_XDP_ACT_BASIC;
-+	netdev->xdp_features = NETDEV_XDP_ACT_BASIC |
-+			       NETDEV_XDP_ACT_REDIRECT |
-+			       NETDEV_XDP_ACT_NDO_XMIT;
- 
- 	if (e1000e_enable_mng_pass_thru(&adapter->hw))
- 		adapter->flags |= FLAG_MNG_PT_ENABLED;
--- 
-2.53.0
+I'm thinking about inverting the logic here - and adding an else clause
+with an arch-specific hook to serve as discriminator.
+Thoughts anybody?
 
+>  	pcie_capability_set_word(dev, PCI_EXP_DEVCTL2,
+>  				 PCI_EXP_DEVCTL2_ATOMIC_REQ);
+>  	return 0;
+
+Thanks,
+Gerd
 
