@@ -1,173 +1,270 @@
-Return-Path: <netdev+bounces-269983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269984-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sMJeJJCAvWk4+gIAu9opvQ
-	(envelope-from <netdev+bounces-269983-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:14:56 +0100
+	id aP9mCWl+vWnH+QIAu9opvQ
+	(envelope-from <netdev+bounces-269984-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:05:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A42E2DE65D
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:14:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CBE62DE3BA
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:05:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C47D2326CE66
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 16:54:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6D6A431C903C
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 16:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBA53BA22F;
-	Fri, 20 Mar 2026 16:48:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67B03D5243;
+	Fri, 20 Mar 2026 16:50:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jNduNeQX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fSH3SzfZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0E53A7F4A
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 16:48:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774025298; cv=pass; b=WYvk2nNki3Ws71VGM9JIHP8J1tBOWLgK3uC862L/6An/KhYHEGupdAkMvPfZNqCfXeZvecP2bR8SECX6Ah7Gr7YYVqqedHcyAN7akXyfTgW99bZMQbtJ4EIInUmKqhTBqRmGr0IB97oi93JckKrLISYqgk38i79BY6x8Y/K+FQM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774025298; c=relaxed/simple;
-	bh=LXrVRQ8fQWgrceK4uzxtIg5tBruuwI4VQXrhJpNNIkk=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=YPvb4sJjLqLflDIcMyDfLv6VHlGK39ozr+bW7+L4Gk95chg6Nd++h6yVlx4g1NvchQdnmKkbDdKWrCGovU9o+OTKtjyDkePnEcXrziUxew3hyjx3FYugKP1cCMuCKb12/duGcLQS0sLb7a5ULoPbWqFsVlYaoKczRuecfG/sEx8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jNduNeQX; arc=pass smtp.client-ip=74.125.82.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-128b9b7e3edso782926c88.0
-        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 09:48:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774025296; cv=none;
-        d=google.com; s=arc-20240605;
-        b=QcFudDjUvJEY3SHqm4vJ2a18li6I3KafkznZ4zQFFraHn6hYiIOMiAhI1aMVb1YWN9
-         XfFZJu4zmMVmW07COAL9TCueQEuRg5JYPDkfZlL+q5FrElulbstvCbGIi2KCc/E63ocO
-         iC6fqDuFXJmbghR5dr73W236B8/doOiv8j+cDAPBu7DhBMTPtctFTLS6i97k7rzkqHDy
-         IL5kXJldEBLKeN0K9jMxGc4tLFc7cmDQcfMW6e7Zv3wDUPYhmm8MvLxct0JKagOQWaur
-         d9ReEv4aUTAaY2JeelcfafHNrcuHi2CWUW+U/6tSPtuty0yB5xzSzVuxEoVfo0bGl/4L
-         JvRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=pgwmZT9IHM6934vKr9WC2TNz3ns+Qdpf2Q8D3gzT5iU=;
-        fh=aDUZZ9N6NPmO6DMPx8G1ADwl9DVnQFUvUJ2oivftvxg=;
-        b=J6OcArbQhnSm51FqFMQ5bGJqdR/mep6EVdWurrXrEscFahmtgdsHS7BYjea0oSX8Ee
-         RpQPiop/XC7KIMg/IkQvmkWm9NFBMSIpxH/rp2JG/UGle0eQSm0ix/ToaGNB3VqmouVq
-         gfok6jCZnn5FgUh3WCII/ySdpNBJW5FwC1nrSSCzpQp/W/NkguCTwm2n3HqNqT9/ZF+u
-         WTtc8RQ4x0RVfKkAvpVIh4YLefRiPUas/rrxHQ8kZDSBeUk4jvwJZiIzqz2w54sEMpEr
-         BEAIzOgg79mHdB/thwKNOr8TCyibNVe6oAI9mk7SnqlSV7dvZ44/KN/1Az9ailEBUROV
-         B0BQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774025296; x=1774630096; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pgwmZT9IHM6934vKr9WC2TNz3ns+Qdpf2Q8D3gzT5iU=;
-        b=jNduNeQXPclqQRFH5cNwp6Nmrk7p4Si9TEPeajk8Id6Z8B4nDbGUMbFp9ILP8J5CS1
-         2q0t9+yI9Yv1gIuaFBk7wVWkgC/+0WsG59Y75FfGrOVz8bx840Zx5kA6qtWBsAPXiwnS
-         sp9xNtKdhhX1YIPnUxUhzQtnMr39jUf6bzPoimqFSzodPaeSFprG9JgftnxLUIpPawfq
-         Sr4sq9Suk5QKKndR5e2MHhDoZytMOwCsZZGj5LEwjWjINO2RY2frPx7DvleiFIJGjHrk
-         DSFrxuUzT73JsuPw8XyCUIa8WuNlAj9mgis5rlKki/x7qHbPb6ahDInU2JRZlsZ4OqPt
-         EGUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774025296; x=1774630096;
-        h=to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pgwmZT9IHM6934vKr9WC2TNz3ns+Qdpf2Q8D3gzT5iU=;
-        b=LCTEOwZ5jm/gnEg3plnt5i+NRf98p7PWePIwF/YcZYUKmdXSYe7yObFx285Vq367j0
-         D/3TxhtganMnBpv+Z3rBo3k5DFuXn7jZdzLuQ5upPobCnEcRb+Me9v3hFijgtWehzBPc
-         oH4mGRzxcELTJN52BIQhwqAdbpqilVoVm1NEMywUhiwLL6kc4elrT20nywQNvdygTvSb
-         IADjNy7HUdmnFLHvSILZg0SSfXDcUQHAK/HT7gII+pJrj0b7GsX32jiMDvWqnnkIhhsN
-         HolLhOqhIJPnH1juzayBZbKRebjf7Ke6Xk0nS76eGxdaH8Qe/BPlxPPt/8zs4PHG1LSw
-         sx1g==
-X-Gm-Message-State: AOJu0YzGs+HF1VgyYi5WIpU+tuqBD6/siG0y4CS/zMCRLVa3QRUTz53f
-	2LEvgjAuo1dKE/xul23QGbOxCqkmIvhxITjRH82u1oVHFMHwytO38qegm9dd8RwVK/h2lX76AkW
-	03p5QUkup7l2uIsxYn+LtCJ4A+1Pn4DmRG/PT
-X-Gm-Gg: ATEYQzzo3NSrHmX0Dr7KGgZb49iso7AqsADO7yQDWrPmZKJ3E7nIBibbx0CmwDLqPdX
-	sVnDUDzq65sn+yhYikFL1LPc6iBmknKV+LD8f/m/PIkG7POwEXMarc+TcTjopC4zRcdGlnyX4Kh
-	3wF6UyFT2eKZ+jZPzcFWZtJhLLwwM3obXonWP5ELfs5qxTlzd5OM6KPXQOd8ASzBAiy6K9PgsVU
-	YPcDvfBoNpp05A6TiGOq4psBcoSepZHLg1xWXx6aXzF0sxeZAdqOmKwgnllcafpgbMhXBdq1EtX
-	TVlbvadlInKdGRhdv/P6mlOoU7+tHz425gYEHfN4Gxt+PleGypeTLr28JRp5K+U2yJA=
-X-Received: by 2002:a05:7022:621:b0:11a:641f:ba11 with SMTP id
- a92af1059eb24-12a726e6617mr1692620c88.29.1774025296395; Fri, 20 Mar 2026
- 09:48:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B04C3D3007;
+	Fri, 20 Mar 2026 16:50:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774025436; cv=none; b=A5THuRq8A9o2dDQwpSG6uitj32oN2d5XHfiUHLDeRYqIJjI7f9oFZJN4Vg5zh27G+jb/iT/RaroYLZupOswJgBdAT5BTvkQXzSMbrA+Kt5bTJzt3hRqcJbXQb8/l4Oeqp27y73dUVIvnzbalQXOqu2xG2EO3dO9AIsOLvGwCUaM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774025436; c=relaxed/simple;
+	bh=hkB0rW6uO8fRpL0lz3lECVf9wXLltyxhKz/ZlxNgD2A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PKaVPke/hGCUzKu1FxshiUwnwsJjtq1D5OhUcJvDazqtuuyAJEfsZ6fZgJSiQ1yzMQnp7WB2ldGypRrX2SJ47BITvoMMLqVRV9YtcvbHMFBexBPyvL7/EWk7WgDJjTRcUCz2y0UFqjTIkgpLMeIqjkXMf8eysZju8rgtFhGvrDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fSH3SzfZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90B32C4CEF7;
+	Fri, 20 Mar 2026 16:50:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774025436;
+	bh=hkB0rW6uO8fRpL0lz3lECVf9wXLltyxhKz/ZlxNgD2A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=fSH3SzfZE9tQvUCnamri5gPTOfy95Cl9wINl1A0juKTDJGq9iztiq9AdCR56T+IoF
+	 Ne360SVEButt+YnkzgOTrfALTU0cNCbll7pF4AvbOdl/P9yTzyoIsTRByb3PPZ5L9a
+	 TSiTh3paEsu31vluAcsvGP9WT4EaJIupTAU6TXtC67TGmksy4ShQjuOcnw7KaTG2F0
+	 u1z9wG2HZqpl6Rsd36AhEiKQscmtXgkGvAi2PTYik+O6ZsoN2DKRKAM4q6YNUnT9Xy
+	 JhQKWbMRE2vJFP7QYaOYHXQDbfMuovZJXBcWEJKDoYDPxIjV42FETG8kIPsW/2Jvn7
+	 Tmc2PFcdD/VWw==
+From: Simon Horman <horms@kernel.org>
+To: sbhatta@marvell.com
+Cc: Simon Horman <horms@kernel.org>,
+	kuba@kernel.org,
+	gakula@marvell.com,
+	bbhushan2@marvell.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	davem@davemloft.net,
+	lcherian@marvell.com,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	sgoutham@marvell.com
+Subject: Re: [net-next PATCH v2 2/4] octeontx2-af: npa: cn20k: Add DPC support
+Date: Fri, 20 Mar 2026 16:50:17 +0000
+Message-ID: <20260320165017.96244-1-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <1773920826-16985-3-git-send-email-sbhatta@marvell.com>
+References: <1773920826-16985-3-git-send-email-sbhatta@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Patryk <pbiel7@gmail.com>
-Date: Fri, 20 Mar 2026 17:48:05 +0100
-X-Gm-Features: AaiRm50P17T-ROCPjmfVPmHzEP4Dtf8b9Vu9xUhwZQKLT3l72w-Gm4n1FS3iCzM
-Message-ID: <CA+DkFDbcAqyj2miq7Y4nDfXXMef39WWhcKwowPKBeVH8b6pZVw@mail.gmail.com>
-Subject: How to approach slow firmware loading process?
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	SUBJECT_ENDS_QUESTION(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269983-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-269984-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_ONE(0.00)[1];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pbiel7@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3A42E2DE65D
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.975];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 7CBE62DE3BA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello
-I've been working on a 10G QXGMII Ethernet PHY bring-up and stumbled
-upon a problem.
-One of the first steps in the bring-up sequence is to load the PHY's firmware.
-So the sequence is as follows:
-1) For each port (phy_device) the PHY layer calls the driver's probe
-function. In this function I check the port index number and calculate
-phy base addr. Then I connect this phydev into the phy package using
-devm_phy_package_join.
-2) Then the PHY layer calls the config_init. In the config_init I use
-phy_package_init_once to check whether the common init function has
-already been called. If not then I call the common init function that
-is responsible for broadcasting firmware to all ports of the PHY.
-And this is the place where things get problematic. The thing is that
-loading firmware takes ages... namely around 30 seconds, which results
-in the boot process waiting for config_init to complete its execution.
-The firmware size is around 300 kB. I've also done some tests using a
-vendor userspace tool that also has fw loading capability and in
-general it takes the same time.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-I'm wondering how I should approach this? I obviously don't want to
-block the boot process until the PHY's firmware is loaded. The one
-thing that comes to my mind is to submit firmware loading to workqueue
-and just return success from config_init. The problem is that in every
-other function like read_status, config_aneg and so on I will have to
-check whether or not the firmware has already been loaded and it's up
-and running. Technically that is feasible however it sounds to me like
-kind of a workaround, especially given the fact that if I decide to
-submit firmware loading to workqueue I will have to return success
-from config_init so I guess that phy layer in the kernel will assume
-that everything works fine which in fact may not be true if e.g. fw
-loading procedure fail or the phy will not bring up after the reset.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+octeontx2-af: npa: cn20k: Add DPC support
 
-How would you approach this? I will be grateful  for some suggestions.
+CN20k introduces 32 diagnostic and performance counters that are shared
+across all NPA LFs. This patch adds new mbox messages npa_dpc_alloc/free
+to allocate and map counters to LFs, and ensures LF to DPC counter
+mappings are cleared at LF free/teardown.
 
-Best regards
-Patryk
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c
+> index c963f43dc7b0..1def2504872f 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c
+
+[ ... ]
+
+> @@ -46,3 +48,117 @@ int rvu_npa_halo_hwctx_disable(struct npa_aq_enq_req *req)
+>
+>  	return 0;
+>  }
+> +
+> +int npa_cn20k_dpc_alloc(struct rvu *rvu, struct npa_cn20k_dpc_alloc_req *req,
+> +			struct npa_cn20k_dpc_alloc_rsp *rsp)
+> +{
+> +	struct rvu_hwinfo *hw = rvu->hw;
+> +	u16 pcifunc = req->hdr.pcifunc;
+> +	int cntr, lf, blkaddr, ridx;
+> +	struct rvu_block *block;
+> +	struct rvu_pfvf *pfvf;
+> +	u64 val, lfmask;
+> +
+> +	pfvf = rvu_get_pfvf(rvu, pcifunc);
+> +
+> +	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPA, 0);
+> +	if (!pfvf->npalf || blkaddr < 0)
+> +		return NPA_AF_ERR_AF_LF_INVALID;
+> +
+> +	block = &hw->block[blkaddr];
+> +	lf = rvu_get_lf(rvu, block, pcifunc, 0);
+> +	if (lf < 0)
+> +		return NPA_AF_ERR_AF_LF_INVALID;
+> +
+> +	/* allocate a new counter */
+> +	cntr = rvu_alloc_rsrc(&rvu->npa_dpc);
+                ^^^^
+
+Are rvu_alloc_rsrc() and rvu_free_rsrc() calls synchronized here?
+
+These functions use non-atomic find_first_zero_bit() + __set_bit() and
+__clear_bit() operations on the bitmap. Looking at other callers like
+rvu_mbox_handler_attach_resources() in rvu.c:
+
+int rvu_mbox_handler_attach_resources(struct rvu *rvu,
+                                      struct rsrc_attach *attach,
+                                      struct msg_rsp *rsp)
+{
+    ...
+    mutex_lock(&rvu->rsrc_lock);
+
+    for (q_cnt = 0; q_cnt < attach->npa_msixoff; q_cnt++) {
+        msix = rvu_alloc_rsrc(&pfvf->msix);
+        ...
+    }
+    mutex_unlock(&rvu->rsrc_lock);
+    ...
+}
+
+Similarly, rvu_mbox_handler_nix_bandprof_alloc() and
+rvu_mbox_handler_mcs_alloc_resources() also acquire rvu->rsrc_lock
+before calling rvu_alloc_rsrc(). rvu_mbox_handler_npc_mcam_alloc_counter()
+uses mcam->lock.
+
+Since npa_cn20k_dpc_alloc() can be invoked by the mbox handler
+rvu_mbox_handler_npa_cn20k_dpc_alloc() concurrently from different
+PF/VF workqueue items in __rvu_mbox_handler(), two threads could race:
+
+Thread 1                                 Thread 2
+npa_cn20k_dpc_alloc()                    npa_cn20k_dpc_alloc()
+  find_first_zero_bit(npa_dpc) = 0         find_first_zero_bit(npa_dpc) = 0
+  __set_bit(0, npa_dpc)                    __set_bit(0, npa_dpc)
+  return cntr = 0                          return cntr = 0
+
+Both threads get counter 0, leading to duplicate allocation. The same
+race exists in npa_cn20k_dpc_free() with rvu_free_rsrc().
+
+Should these calls be protected with mutex_lock(&rvu->rsrc_lock) similar
+to other resource allocation paths?
+
+> +	if (cntr < 0)
+> +		return cntr;
+> +	rsp->cntr_id = cntr;
+> +
+> +	/* DPC counter config */
+> +	rvu_write64(rvu, blkaddr, NPA_AF_DPCX_CFG(cntr), req->dpc_conf);
+> +
+> +	/* 0 to 63 lfs -> idx 0, 64 - 127 lfs -> idx 1 */
+> +	ridx = lf >> 6;
+> +	lfmask = BIT_ULL(ridx ? lf - NPA_DPC_LFS_PER_REG : lf);
+> +
+> +	ridx = 2 * cntr + ridx;
+> +	/* Give permission for LF access */
+> +	val = rvu_read64(rvu, blkaddr, NPA_AF_DPC_PERMITX(ridx));
+> +	val |= lfmask;
+> +	rvu_write64(rvu, blkaddr, NPA_AF_DPC_PERMITX(ridx), val);
+> +
+> +	return 0;
+> +}
+> +
+> +int rvu_mbox_handler_npa_cn20k_dpc_alloc(struct rvu *rvu,
+> +					 struct npa_cn20k_dpc_alloc_req *req,
+> +					 struct npa_cn20k_dpc_alloc_rsp *rsp)
+> +{
+> +	return npa_cn20k_dpc_alloc(rvu, req, rsp);
+> +}
+> +
+> +int npa_cn20k_dpc_free(struct rvu *rvu, struct npa_cn20k_dpc_free_req *req)
+> +{
+> +	struct rvu_hwinfo *hw = rvu->hw;
+> +	u16 pcifunc = req->hdr.pcifunc;
+> +	int cntr, lf, blkaddr, ridx;
+> +	struct rvu_block *block;
+> +	struct rvu_pfvf *pfvf;
+> +	u64 val, lfmask;
+> +
+> +	pfvf = rvu_get_pfvf(rvu, pcifunc);
+> +
+> +	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPA, 0);
+> +	if (!pfvf->npalf || blkaddr < 0)
+> +		return NPA_AF_ERR_AF_LF_INVALID;
+> +
+> +	block = &hw->block[blkaddr];
+> +	lf = rvu_get_lf(rvu, block, pcifunc, 0);
+> +	if (lf < 0)
+> +		return NPA_AF_ERR_AF_LF_INVALID;
+> +
+> +	if (req->cntr_id >= NPA_DPC_MAX)
+> +		return NPA_AF_ERR_PARAM;
+> +
+> +	/* 0 to 63 lfs -> idx 0, 64 - 127 lfs -> idx 1 */
+> +	ridx = lf >> 6;
+> +	lfmask = BIT_ULL(ridx ? lf - NPA_DPC_LFS_PER_REG : lf);
+> +	cntr = req->cntr_id;
+> +
+> +	ridx = 2 * cntr + ridx;
+> +
+> +	val = rvu_read64(rvu, blkaddr, NPA_AF_DPC_PERMITX(ridx));
+> +	/* Check if the counter is allotted to this LF */
+> +	if (!(val & lfmask))
+> +		return 0;
+> +
+> +	/* Revert permission */
+> +	val &= ~lfmask;
+> +	rvu_write64(rvu, blkaddr, NPA_AF_DPC_PERMITX(ridx), val);
+> +
+> +	/* Free this counter */
+> +	rvu_free_rsrc(&rvu->npa_dpc, req->cntr_id);
+> +
+> +	return 0;
+> +}
+
+[ ... ]
 
