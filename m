@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-269812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ADBdBGD2vGkt5AIAu9opvQ
-	(envelope-from <netdev+bounces-269812-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:25:20 +0100
+	id WF3cGG/2vGkt5AIAu9opvQ
+	(envelope-from <netdev+bounces-269813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:25:35 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 645972D6943
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:25:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC5002D694A
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:25:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A4360301AA4D
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 07:23:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A0493024CA9
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 07:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0474D35BDCE;
-	Fri, 20 Mar 2026 07:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 937D93043CF;
+	Fri, 20 Mar 2026 07:23:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iCKeS5Ae"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="co3yr5YC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF35535B63A
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 07:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416F435C19B
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 07:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773991403; cv=none; b=cLX+4bVCqWaMIUMRbihjICbKPwBS1/Vbj+mzIb7A0k1BQ6ueR0b/lZ96Jgp/2VuRAXZ1sWgQjBm259oLVp2L9CoRfBYc45otfdhJj13q7Oxar3to1tPmJie0Cfx5KXkwr805C6tJ9cR/F+h/+F77/TEorIXoLM5BO9MGc2SI2HE=
+	t=1773991405; cv=none; b=jrYaxhEFoeVPoqXJOq25m14bw2Y7ihSPTx5UclBkSST3oCKNSB0C1anud7WAj+lOXGi2Jtayfsv4j3MwFrk9yqDKhwQkRwh7Kx3Vto0kz2foblfx+k6Bl1ksSHC2pTFLTvyV4ZOnBqDfXA07/rw1E5pJKF07WZnfzeht8QtrqdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773991403; c=relaxed/simple;
-	bh=ReldcASHDrF2HHtmtAv54KTQ4ewXfdSe5rtGK3woxmc=;
+	s=arc-20240116; t=1773991405; c=relaxed/simple;
+	bh=bSDLWRxIa+f/T72QYdas/3gVxgDjjbQHKzAD0zJBbqY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HPAaDPf2LEFyVXGbrI0ktsH2bnS790hKTCRqold94KNupLHKfLeJnLBbtpUc/7NYfUMgqMtpOcLxCB9fOa8V8DdCwtEIdk1iU5yppcpnOonqcLq23XqX575T5+Hk8cOB+l4LlQ7RYvfsfaXvO6n1HHduokeuZ2etF3GsAwNjNxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iCKeS5Ae; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=fCy/H943xeJCGCnp92PS85toWTrzRcNj6h8xI5FUUH7ONygpn1ahv0nkHxlEtIkaclfkC5AeZEBqe99jXfm2UXRrghWJXLGH8SXzX68DFZ9Shj5xuHNGxU+oFnZ30E8/0bFMRjhhwespyjriaLGdoK9IhcG4voUx98lNk8pE2GQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=co3yr5YC; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c7414516609so1272565a12.3
-        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 00:23:22 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-829a9d3073bso149294b3a.2
+        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 00:23:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773991402; x=1774596202; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1773991403; x=1774596203; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+DPgy3H4jqGS0pHznUOF21SInzO8sFZVNK+gTs1qQh8=;
-        b=iCKeS5AeoJQT98phrKlFiJPz4HDiy35QdEHw5i5dluGO6qoa4F4Jet7WLt1Q7uztZf
-         ZBSl+CdbCdyiETB/bH04nGZFe0BwryPat2J+knkdDSWt6fGI2wSAtn0vEXvlJ9MNLGAq
-         G/BaCgFD2Hi5ppiJVsnSrwKFoXyLRAamVGhfHNI64AAL1yWpBEBrK58oRphc3txto5Ra
-         Xh/rgyB8LjxEqIVGeKxm8hOBkH3M5+Gno2vA7lKjQ4oAedjez4HQ6YDNveKWxeE19Q0q
-         5OTmHHk54DwNL3rmADK7Hp76fPZ2YdHKuOhkgizAvZvRBUBWQJJIecp+lklWOHzpPPBf
-         rsZA==
+        bh=yVrUr5VDInjRZ4iI7LKrLnP+c0jMXJBnbBqv2YbaKbQ=;
+        b=co3yr5YCwm9mVvMyLRXF6X1maUHm4h7bzpl4xH2CGEUAwdsNVet0t/o/dyGSmMR5B3
+         O/YXhUO1a2DjHierQpk++zHNQ1mKvJzHILoEJAvsCBDJxDobiyUV/vjPEstpDXBkvQWJ
+         hPyfqjQZ+XURls8Ir8sFciWOZc6St18KSMUnxevkysD4sCtXB49LTG9Cn0MkD8lxEPjb
+         7kZQk/0yqUpE12oJWwO3M5dBy+3kL9/8skUJVCFBTRI9rLhrTI5H9mC98b2SlPmHGOZq
+         KkBW/qgIEdRBlu4wyjm0FB/p71fu6fBrSSaKRHh42S5CU7hSEtR5hcTYW8dCWWGDbcj8
+         n9sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773991402; x=1774596202;
+        d=1e100.net; s=20251104; t=1773991403; x=1774596203;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+DPgy3H4jqGS0pHznUOF21SInzO8sFZVNK+gTs1qQh8=;
-        b=EiHUesSBr+eXckCKjX1ZbX8onwGWZSYRrqatVxRaUX8kglRpTIwJ8lTHeJ/a7TKRKR
-         UkWsRggiLLIMdpC4Ht2NYalevfOMSvV9yi8mZJAs9bZXrs/LqWMg97PMmP3FynG5xP4w
-         7NsdJEmI0gNp6+t2af8uB9mIS1HPRMnAr/TT1O7j9aUxWnv4gwHSw5KRROsR5fA1B/B3
-         2w8+p4p+SimuXzdAkwfKGLgxd3+5hJbQRa6NxOhY05K4BRP/ooxcQAyvaXJGbIn4FMYo
-         9AO8EnqO2g9uVY7NBc29Yj8RBag0Dv5HSyZxC4GLOddwhgetrFLSg884N0AWb/EAv2ER
-         kMvw==
-X-Forwarded-Encrypted: i=1; AJvYcCWP4Gi+PWyzTemhO3s1RBRbOUBM3fZIPklXnynpRRKPkbUi02BCjovE8HDQ8N74ls04sUONy2U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIkMm7TveA6Iqgk067xIg19G3pPdalA1toqZvZMTBitx01Ynd2
-	YtEhIVfiaajMTD7MeNFcCeP3++Wf2yur2QV8Lw3YN/bAV3wJNHNhhTTYvxafvLszBNd7E64YmTG
-	br1WIUQ==
-X-Received: from pgdc29.prod.google.com ([2002:a05:6a02:511d:b0:c65:e8e7:d481])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6d86:b0:398:93bb:f28a
- with SMTP id adf61e73a8af0-39bceb051f6mr1882164637.27.1773991401919; Fri, 20
- Mar 2026 00:23:21 -0700 (PDT)
-Date: Fri, 20 Mar 2026 07:22:59 +0000
+        bh=yVrUr5VDInjRZ4iI7LKrLnP+c0jMXJBnbBqv2YbaKbQ=;
+        b=XJ27DpZy5PiUlkHNTI67YmX3+SYLpe87pCFv1oZSHWCzk6ogSph3I//QpeVaO9x0HR
+         cn0YOpUwA4yfOyUGV49rkknOdH6kJHkTgrauCdcGIR+P08JTDy6O8R7SCOEeT25oYqws
+         VbBx5I8uipt4CvWpIDDL4MeJW7oNd7tm0QYlqLLhcWKifurOmDLIHmbSJLD1eyRAeUe3
+         N15HwOlVOB1+oySjXUXGZ/lwIPCLEv2iIGA+r/4hpY+su2LUGAeBCm7/uL6yIOq5YVJf
+         wOVy3VRe3Si3B0IoqclLwOqrXvXzmp6k58GZ5/AJFXKKuWfbF0b2ywMIU+1PwHzN5pKY
+         BGsg==
+X-Forwarded-Encrypted: i=1; AJvYcCVb5bGpRwA2CCnlY1rHrSPuUVD6ftt+cfe3PBNTtD/SJwy3/maVPCi5mV7ahDCWYZ2ARmTQ9WY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzRx5DIWLWo1x7N3Hm55igFzxhyP8/1d4GWwnYfTqEJkJ9/Xz5
+	IVCszCi3empTsX+IEPO+Zm6D1LU4S67PaR3SzLnPYUjIVbHwHAJdqC4RJglsWYDPuDm5fadaWud
+	aqlu7Bw==
+X-Received: from pfbde15.prod.google.com ([2002:a05:6a00:468f:b0:82a:6125:cdb])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2c95:b0:829:7187:1a80
+ with SMTP id d2e1a72fcca58-82a8c37df1amr1557237b3a.45.1773991403389; Fri, 20
+ Mar 2026 00:23:23 -0700 (PDT)
+Date: Fri, 20 Mar 2026 07:23:00 +0000
 In-Reply-To: <20260320072317.2561779-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260320072317.2561779-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.959.g497ff81fa9-goog
-Message-ID: <20260320072317.2561779-2-kuniyu@google.com>
-Subject: [PATCH v6 net 1/3] ipv6: Remove permanent routes from tb6_gc_hlist
- when all exceptions expire.
+Message-ID: <20260320072317.2561779-3-kuniyu@google.com>
+Subject: [PATCH v6 net 2/3] ipv6: Don't remove permanent routes with
+ exceptions from tb6_gc_hlist.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: David Ahern <dsahern@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -102,7 +102,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269812-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269813-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -110,73 +110,148 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.870];
+	NEURAL_HAM(-0.00)[-0.779];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 645972D6943
+X-Rspamd-Queue-Id: BC5002D694A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Commit 5eb902b8e719 ("net/ipv6: Remove expired routes with a
-separated list of routes.") introduced a per-table GC list and
-changed GC to iterate over that list instead of traversing
-the entire route table.
+The cited commit mechanically put fib6_remove_gc_list()
+just after every fib6_clean_expires() call.
 
-However, it forgot to add permanent routes to tb6_gc_hlist
-when exception routes are added.
+When a temporary route is promoted to a permanent route,
+there may already be exception routes tied to it.
 
-Commit cfe82469a00f ("ipv6: add exception routes to GC list
-in rt6_insert_exception") fixed that issue but introduced
-another one.
+If fib6_remove_gc_list() removes the route from tb6_gc_hlist,
+such exception routes will no longer be aged.
 
-Even after all exception routes expire, the permanent routes
-remain in tb6_gc_hlist, potentially negating the performance
-benefits intended by the initial change.
+Let's replace fib6_remove_gc_list() with a new helper
+fib6_may_remove_gc_list() and use fib6_age_exceptions() there.
 
-Let's count gc_args->more before and after rt6_age_exceptions()
-and remove the permanent route when the delta is 0.
+Note that net->ipv6 is only compiled when CONFIG_IPV6 is
+enabled, so fib6_{add,remove,may_remove}_gc_list() are guarded.
 
-Note that the next patch will reuse fib6_age_exceptions().
-
-Fixes: cfe82469a00f ("ipv6: add exception routes to GC list in rt6_insert_exception")
+Fixes: 5eb902b8e719 ("net/ipv6: Remove expired routes with a separated list of routes.")
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-Reviewed-by: Xin Long <lucien.xin@gmail.com>
 ---
- net/ipv6/ip6_fib.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+v6: Call fib6_age_exceptions() under RCU
+v4: s/,/;/ for fib6_gc_args initialisation
+v3: Use IS_ENABLED()
+v2: Fix build failure when CONFIG_IPV6=n (no net->ipv6 definition)
 
+squash
+---
+ include/net/ip6_fib.h | 21 ++++++++++++++++++++-
+ net/ipv6/addrconf.c   |  4 ++--
+ net/ipv6/ip6_fib.c    |  6 +++---
+ net/ipv6/route.c      |  2 +-
+ 4 files changed, 26 insertions(+), 7 deletions(-)
+
+diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+index 88b0dd4d8e09..9f8b6814a96a 100644
+--- a/include/net/ip6_fib.h
++++ b/include/net/ip6_fib.h
+@@ -507,12 +507,14 @@ void fib6_rt_update(struct net *net, struct fib6_info *rt,
+ void inet6_rt_notify(int event, struct fib6_info *rt, struct nl_info *info,
+ 		     unsigned int flags);
+ 
++void fib6_age_exceptions(struct fib6_info *rt, struct fib6_gc_args *gc_args,
++			 unsigned long now);
+ void fib6_run_gc(unsigned long expires, struct net *net, bool force);
+-
+ void fib6_gc_cleanup(void);
+ 
+ int fib6_init(void);
+ 
++#if IS_ENABLED(CONFIG_IPV6)
+ /* Add the route to the gc list if it is not already there
+  *
+  * The callers should hold f6i->fib6_table->tb6_lock.
+@@ -545,6 +547,23 @@ static inline void fib6_remove_gc_list(struct fib6_info *f6i)
+ 		hlist_del_init(&f6i->gc_link);
+ }
+ 
++static inline void fib6_may_remove_gc_list(struct net *net,
++					   struct fib6_info *f6i)
++{
++	struct fib6_gc_args gc_args;
++
++	if (hlist_unhashed(&f6i->gc_link))
++		return;
++
++	gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval);
++	gc_args.more = 0;
++
++	rcu_read_lock();
++	fib6_age_exceptions(f6i, &gc_args, jiffies);
++	rcu_read_unlock();
++}
++#endif
++
+ struct ipv6_route_iter {
+ 	struct seq_net_private p;
+ 	struct fib6_walker w;
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 0e55f139e05d..f4e23b543585 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -2862,7 +2862,7 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *opt, int len, bool sllao)
+ 					fib6_add_gc_list(rt);
+ 				} else {
+ 					fib6_clean_expires(rt);
+-					fib6_remove_gc_list(rt);
++					fib6_may_remove_gc_list(net, rt);
+ 				}
+ 
+ 				spin_unlock_bh(&table->tb6_lock);
+@@ -4840,7 +4840,7 @@ static int modify_prefix_route(struct net *net, struct inet6_ifaddr *ifp,
+ 
+ 		if (!(flags & RTF_EXPIRES)) {
+ 			fib6_clean_expires(f6i);
+-			fib6_remove_gc_list(f6i);
++			fib6_may_remove_gc_list(net, f6i);
+ 		} else {
+ 			fib6_set_expires(f6i, expires);
+ 			fib6_add_gc_list(f6i);
 diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index 9058e71241dc..fadfca49d6b1 100644
+index fadfca49d6b1..dd26657b6a4a 100644
 --- a/net/ipv6/ip6_fib.c
 +++ b/net/ipv6/ip6_fib.c
-@@ -2348,6 +2348,17 @@ static void fib6_flush_trees(struct net *net)
+@@ -1133,7 +1133,7 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
+ 					return -EEXIST;
+ 				if (!(rt->fib6_flags & RTF_EXPIRES)) {
+ 					fib6_clean_expires(iter);
+-					fib6_remove_gc_list(iter);
++					fib6_may_remove_gc_list(info->nl_net, iter);
+ 				} else {
+ 					fib6_set_expires(iter, rt->expires);
+ 					fib6_add_gc_list(iter);
+@@ -2348,8 +2348,8 @@ static void fib6_flush_trees(struct net *net)
  /*
   *	Garbage collection
   */
-+static void fib6_age_exceptions(struct fib6_info *rt, struct fib6_gc_args *gc_args,
-+				unsigned long now)
-+{
-+	bool may_expire = rt->fib6_flags & RTF_EXPIRES && rt->expires;
-+	int old_more = gc_args->more;
-+
-+	rt6_age_exceptions(rt, gc_args, now);
-+
-+	if (!may_expire && old_more == gc_args->more)
-+		fib6_remove_gc_list(rt);
-+}
- 
- static int fib6_age(struct fib6_info *rt, struct fib6_gc_args *gc_args)
+-static void fib6_age_exceptions(struct fib6_info *rt, struct fib6_gc_args *gc_args,
+-				unsigned long now)
++void fib6_age_exceptions(struct fib6_info *rt, struct fib6_gc_args *gc_args,
++			 unsigned long now)
  {
-@@ -2370,7 +2381,7 @@ static int fib6_age(struct fib6_info *rt, struct fib6_gc_args *gc_args)
- 	 *	Note, that clones are aged out
- 	 *	only if they are not in use now.
- 	 */
--	rt6_age_exceptions(rt, gc_args, now);
-+	fib6_age_exceptions(rt, gc_args, now);
+ 	bool may_expire = rt->fib6_flags & RTF_EXPIRES && rt->expires;
+ 	int old_more = gc_args->more;
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 08cd86f49bf9..cb521700cee7 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -1033,7 +1033,7 @@ int rt6_route_rcv(struct net_device *dev, u8 *opt, int len,
  
- 	return 0;
- }
+ 		if (!addrconf_finite_timeout(lifetime)) {
+ 			fib6_clean_expires(rt);
+-			fib6_remove_gc_list(rt);
++			fib6_may_remove_gc_list(net, rt);
+ 		} else {
+ 			fib6_set_expires(rt, jiffies + HZ * lifetime);
+ 			fib6_add_gc_list(rt);
 -- 
 2.53.0.959.g497ff81fa9-goog
 
