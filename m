@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-270089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270096-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sOysAUjIvWkrBgMAu9opvQ
-	(envelope-from <netdev+bounces-270089-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 23:20:56 +0100
+	id yG7ACArJvWkrBgMAu9opvQ
+	(envelope-from <netdev+bounces-270096-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 23:24:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E7C52E1B5F
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 23:20:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AAFD2E1BE7
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 23:24:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F05CA301DD8F
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:18:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 03221306DFEE
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:19:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBBB2387369;
-	Fri, 20 Mar 2026 22:18:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC9D3D412D;
+	Fri, 20 Mar 2026 22:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="myBo7FEz"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="FBelW2TH"
 X-Original-To: netdev@vger.kernel.org
 Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DA02D8DC3;
-	Fri, 20 Mar 2026 22:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9EC37474C;
+	Fri, 20 Mar 2026 22:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774045129; cv=none; b=AfY+3XC4lyT6AzddG3QTl8rFxVOpt2MRCsiTlg/3PKYuY638+J7o+V9NZkktIEFgBoLJZsJbOYSyOSW6O0xXKFV6ZXqSXpR/QD52sk0nM507ZFQf07pluXr8e3iEnSYiaKMTvjo84ic3eWmEBYhcYJZ5TCUPTLKWi2jbe5ICiYo=
+	t=1774045131; cv=none; b=MAnMHwdKL2HEqnq7np+m6D1zGtjU/cBJfRnWyU321RLllSFl6JB8DKwQUo3+ANIOWiEZ1OYbU9EVp8gJLMuvwTjJqTQCYqZYz9SJOPgszuvdZynhFUe0XDM5SWIPEEABtft281SuICD1kl/bF0DH5IGopUQzv2Wcn341EheLh/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774045129; c=relaxed/simple;
-	bh=QsXsVkDtDLUwbQXGo9PB1X7MIClUMrzSTV1jSkUiBo8=;
+	s=arc-20240116; t=1774045131; c=relaxed/simple;
+	bh=jJvknxbvekl5q1zFceo72HrdLqnOf5+Fuu9+ksBgv6o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R34iADWiZTLLYksQ/0Q0ZuaEmkuaut1mabMTP+f/K5rgL+YokUHa/RoSzBdPmCJ3g9Lb1E8dz9PhEP271JeZjuKOngjNVqvrhO6rHtrzjIIkaS+dyQsPBDcGqe4Ql8AsI5YbmhKtu3cmocYaSZ4QFEIcYgHAgRN6FPiAK8mJGCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=myBo7FEz; arc=none smtp.client-ip=213.133.104.62
+	 MIME-Version; b=JI7NXrUdzvHwC2HSBj+rn2702EphM5kL43/OjKAEyS+WGJM8ufCJbuTKWKyMsD1ieaw0sYvrVHf+kZz/t2cGleBVHrDmN1tR9dCGAsnMtv3SqO52Lq78+ahb5CyuQW+W+Xq0Q4MZPjqkj0ZB12uPit9YiOJJynbiblYU2teFLTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=FBelW2TH; arc=none smtp.client-ip=213.133.104.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -39,18 +39,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=x9m7vS01pD3CgOvMdFkqYIDyszzmILWbph86qLbyOzc=; b=myBo7FEz73j88FZnVDkW75F7ry
-	YujbpVCBPYVdSa6CgnPkL+F+zJ7y8k7+87dE49R8a+3ci6iwHA1DPmxkqMM4YYOFk8RTCOlSAhGG3
-	gBJx+Hu78rwyMkyJ9FOY4MmLRgSUW/yCGpf8Wu15omfJJc/a9bGUNcjVO9qg4J4Q0XyJmMGvAEMOA
-	bV1C9f7FAF+Ieo9fXCPGIPibgWEZ+OAQaJSs53ATDZ8w0t+zMO6W1N6OO5PE0c9sOzPjphgFy7zYa
-	FSYfoihLV1WgnP2RBBMlvB+PvF5KDt+EIcYAoI+Ul2+g/dmzC6WNvFjlWESwge3HN6qTo2t0zPAnW
-	YL+5VO4Q==;
+	bh=IPGK8UK9pamAid6KhfBOiYx6lLT/OLyJwGMHsWhe/Yc=; b=FBelW2THWzuc2PIAkIPZXi9bHi
+	tDBUYrASPyMm+0biNZqWPnc2rBHqNhODQEfY7XvowWeD6bem9jrMOK/R3VvS4SerdZZpWa2hkg8Rw
+	eHg/jRTgZ65/yT/F1umOhVyB0UvYz9JvKadvQMiSyMPK/AQMsblGX4EXAS1MS2QTPviN0l3nQZNew
+	0yWG007AwrLZrXBE+3+B7vvXI7NoT+RX/r9JgKlmrjzGl1AxEolnxeLmrqpQNB/I1T5aoLGtSj9LH
+	34P4mFXhfsG2NxsoQxOtIOioE1zbFOCe5RCPNABcBuTJY7uY2pTU/rJjjygpV0j+YZrzij7PtkIhx
+	JE59l0LA==;
 Received: from localhost ([127.0.0.1])
 	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96.2)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1w3iAp-000H13-28;
-	Fri, 20 Mar 2026 23:18:31 +0100
+	id 1w3iAq-000H1Z-2M;
+	Fri, 20 Mar 2026 23:18:32 +0100
 From: Daniel Borkmann <daniel@iogearbox.net>
 To: netdev@vger.kernel.org
 Cc: bpf@vger.kernel.org,
@@ -69,9 +69,9 @@ Cc: bpf@vger.kernel.org,
 	toke@redhat.com,
 	yangzhenze@bytedance.com,
 	wangdongdong.6@bytedance.com
-Subject: [PATCH net-next v9 13/14] netkit: Add xsk support for af_xdp applications
-Date: Fri, 20 Mar 2026 23:18:13 +0100
-Message-ID: <20260320221814.236775-14-daniel@iogearbox.net>
+Subject: [PATCH net-next v9 14/14] selftests/net: Add queue lease tests
+Date: Fri, 20 Mar 2026 23:18:14 +0100
+Message-ID: <20260320221814.236775-15-daniel@iogearbox.net>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260320221814.236775-1-daniel@iogearbox.net>
 References: <20260320221814.236775-1-daniel@iogearbox.net>
@@ -90,7 +90,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
 	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -100,7 +100,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270089-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270096-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	PRECEDENCE_BULK(0.00)[];
@@ -110,204 +110,683 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,iogearbox.net:dkim,iogearbox.net:email,iogearbox.net:mid,blackwall.org:email,davidwei.uk:email,lpc.events:url]
-X-Rspamd-Queue-Id: 6E7C52E1B5F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iogearbox.net:dkim,iogearbox.net:email,iogearbox.net:mid,davidwei.uk:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8AAFD2E1BE7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Enable support for AF_XDP applications to operate on a netkit device.
-The goal is that AF_XDP applications can natively consume AF_XDP
-from network namespaces. The use-case from Cilium side is to support
-Kubernetes KubeVirt VMs through QEMU's AF_XDP backend. KubeVirt is a
-virtual machine management add-on for Kubernetes which aims to provide
-a common ground for virtualization. KubeVirt spawns the VMs inside
-Kubernetes Pods which reside in their own network namespace just like
-regular Pods.
+From: David Wei <dw@davidwei.uk>
 
-Raw QEMU AF_XDP backend example with eth0 being a physical device with
-16 queues where netkit is bound to the last queue (for multi-queue RSS
-context can be used if supported by the driver):
+Add a selftest for netkit queue leasing, using io_uring zero copy test
+binary inside of a netns with netkit. This checks that memory providers
+can be bound against virtual queues in a netkit within a netns that are
+leasing from a physical netdev in the default netns.
 
-  # ethtool -X eth0 start 0 equal 15
-  # ethtool -X eth0 start 15 equal 1 context new
-  # ethtool --config-ntuple eth0 flow-type ether \
-            src 00:00:00:00:00:00 \
-            src-mask ff:ff:ff:ff:ff:ff \
-            dst $mac dst-mask 00:00:00:00:00:00 \
-            proto 0 proto-mask 0xffff action 15
-  [ ... setup BPF/XDP prog on eth0 to steer into shared xsk map ... ]
-  # ip netns add foo
-  # ip link add numrxqueues 2 nk type netkit single
-  # ynl --family netdev --output-json --do queue-create \
-        --json "{"ifindex": $(ifindex nk), "type": "rx", \
-                 "lease": { "ifindex": $(ifindex eth0), \
-                            "queue": { "type": "rx", "id": 15 } } }"
-  {'id': 1}
-  # ip link set nk netns foo
-  # ip netns exec foo ip link set lo up
-  # ip netns exec foo ip link set nk up
-  # ip netns exec foo qemu-system-x86_64 \
-          -kernel $kernel \
-          -drive file=${image_name},index=0,media=disk,format=raw \
-          -append "root=/dev/sda rw console=ttyS0" \
-          -cpu host \
-          -m $memory \
-          -enable-kvm \
-          -device virtio-net-pci,netdev=net0,mac=$mac \
-          -netdev af-xdp,ifname=nk,id=net0,mode=native,queues=1,start-queue=1,inhibit=on,map-path=$dir/xsks_map \
-          -nographic
-
-We have tested the above against a dual-port Nvidia ConnectX-6 (mlx5)
-100G NIC with successful network connectivity out of QEMU. An earlier
-iteration of this work was presented at LSF/MM/BPF [0] and more
-recently at LPC [1].
-
-For getting to a first starting point to connect all things with
-KubeVirt, bind mounting the xsk map from Cilium into the VM launcher
-Pod which acts as a regular Kubernetes Pod while not perfect, is not
-a big problem given its out of reach from the application sitting
-inside the VM (and some of the control plane aspects are baked in
-the launcher Pod already), so the isolation barrier is still the VM.
-Eventually the goal is to have a XDP/XSK redirect extension where
-there is no need to have the xsk map, and the BPF program can just
-derive the target xsk through the queue where traffic was received
-on.
-
-The exposure through netkit is because Cilium should not act as a
-proxy handing out xsk sockets. Existing applications expect a netdev
-from kernel side and should not need to rewrite just to implement
-against a CNI's protocol. Also, all the memory should not be accounted
-against Cilium but rather the application Pod itself which is consuming
-AF_XDP. Further, on up/downgrades we expect the data plane to being
-completely decoupled from the control plane; if Cilium would own the
-sockets that would be disruptive. Another use-case which opens up and
-is regularly asked from users would be to have DPDK applications on
-top of AF_XDP in regular Kubernetes Pods.
-
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Co-developed-by: David Wei <dw@davidwei.uk>
 Signed-off-by: David Wei <dw@davidwei.uk>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Link: https://bpfconf.ebpf.io/bpfconf2025/bpfconf2025_material/lsfmmbpf_2025_netkit_borkmann.pdf [0]
-Link: https://lpc.events/event/19/contributions/2275/ [1]
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 ---
- drivers/net/netkit.c | 77 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 76 insertions(+), 1 deletion(-)
+ .../testing/selftests/drivers/net/hw/Makefile |   1 +
+ .../drivers/net/hw/lib/py/__init__.py         |   4 +-
+ .../selftests/drivers/net/hw/nk_qlease.py     | 614 ++++++++++++++++++
+ 3 files changed, 617 insertions(+), 2 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/hw/nk_qlease.py
 
-diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
-index 018734c9897b..d7bb0ceb0db1 100644
---- a/drivers/net/netkit.c
-+++ b/drivers/net/netkit.c
-@@ -12,6 +12,7 @@
- #include <net/netdev_lock.h>
- #include <net/netdev_queues.h>
- #include <net/netdev_rx_queue.h>
-+#include <net/xdp_sock_drv.h>
- #include <net/netkit.h>
- #include <net/dst.h>
- #include <net/tcx.h>
-@@ -235,6 +236,77 @@ static void netkit_get_stats(struct net_device *dev,
- 	stats->tx_dropped = DEV_STATS_READ(dev, tx_dropped);
- }
+diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+index 3c97dac9baaa..45a2a897fec7 100644
+--- a/tools/testing/selftests/drivers/net/hw/Makefile
++++ b/tools/testing/selftests/drivers/net/hw/Makefile
+@@ -34,6 +34,7 @@ TEST_PROGS = \
+ 	loopback.sh \
+ 	nic_timestamp.py \
+ 	nk_netns.py \
++	nk_qlease.py \
+ 	pp_alloc_fail.py \
+ 	rss_api.py \
+ 	rss_ctx.py \
+diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
+index b8d9ae282390..0fd866641695 100644
+--- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
++++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
+@@ -20,7 +20,7 @@ try:
+     # Import one by one to avoid pylint false positives
+     from net.lib.py import NetNS, NetNSEnter, NetdevSimDev
+     from net.lib.py import EthtoolFamily, NetdevFamily, NetshaperFamily, \
+-        NlError, RtnlFamily, DevlinkFamily, PSPFamily
++        NlError, RtnlFamily, DevlinkFamily, PSPFamily, Netlink
+     from net.lib.py import CmdExitFailure
+     from net.lib.py import bkg, cmd, bpftool, bpftrace, defer, ethtool, \
+         fd_read_timeout, ip, rand_port, rand_ports, wait_port_listen, \
+@@ -35,7 +35,7 @@ try:
  
-+static bool netkit_xsk_supported_at_phys(const struct net_device *dev)
-+{
-+	if (!dev->netdev_ops->ndo_bpf ||
-+	    !dev->netdev_ops->ndo_xdp_xmit ||
-+	    !dev->netdev_ops->ndo_xsk_wakeup)
-+		return false;
-+	if ((dev->xdp_features & NETDEV_XDP_ACT_XSK) != NETDEV_XDP_ACT_XSK)
-+		return false;
-+	return true;
-+}
+     __all__ = ["NetNS", "NetNSEnter", "NetdevSimDev",
+                "EthtoolFamily", "NetdevFamily", "NetshaperFamily",
+-               "NlError", "RtnlFamily", "DevlinkFamily", "PSPFamily",
++               "NlError", "RtnlFamily", "DevlinkFamily", "PSPFamily", "Netlink",
+                "CmdExitFailure",
+                "bkg", "cmd", "bpftool", "bpftrace", "defer", "ethtool",
+                "fd_read_timeout", "ip", "rand_port", "rand_ports",
+diff --git a/tools/testing/selftests/drivers/net/hw/nk_qlease.py b/tools/testing/selftests/drivers/net/hw/nk_qlease.py
+new file mode 100755
+index 000000000000..6c83d326dc3d
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/hw/nk_qlease.py
+@@ -0,0 +1,614 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
 +
-+static int netkit_xsk(struct net_device *dev, struct netdev_bpf *xdp)
-+{
-+	struct netkit *nk = netkit_priv(dev);
-+	struct netdev_bpf xdp_lower;
-+	struct netdev_rx_queue *rxq;
-+	struct net_device *phys;
-+	int ret = -EBUSY;
++import errno
++import re
++import time
++import threading
++from os import path
++from lib.py import (
++    ksft_run,
++    ksft_exit,
++    ksft_eq,
++    ksft_ne,
++    ksft_in,
++    ksft_not_in,
++    ksft_true,
++    ksft_raises,
++)
++from lib.py import (
++    NetDrvContEnv,
++    NetNS,
++    NetNSEnter,
++    EthtoolFamily,
++    NetdevFamily,
++    RtnlFamily,
++    NetdevSimDev,
++)
++from lib.py import (
++    NlError,
++    Netlink,
++    bkg,
++    cmd,
++    defer,
++    ethtool,
++    ip,
++    rand_port,
++    wait_port_listen,
++)
++from lib.py import KsftSkipEx, CmdExitFailure
 +
-+	switch (xdp->command) {
-+	case XDP_SETUP_XSK_POOL:
-+		if (nk->pair == NETKIT_DEVICE_PAIR)
-+			return -EOPNOTSUPP;
-+		if (xdp->xsk.queue_id >= dev->real_num_rx_queues)
-+			return -EINVAL;
 +
-+		rxq = __netif_get_rx_queue(dev, xdp->xsk.queue_id);
-+		if (!rxq->lease)
-+			return -EOPNOTSUPP;
++def create_rss_ctx(cfg):
++    output = ethtool(
++        f"-X {cfg.ifname} context new start {cfg.src_queue} equal 1"
++    ).stdout
++    values = re.search(r"New RSS context is (\d+)", output).group(1)
++    return int(values)
 +
-+		phys = rxq->lease->dev;
-+		if (!netkit_xsk_supported_at_phys(phys))
-+			return -EOPNOTSUPP;
 +
-+		memcpy(&xdp_lower, xdp, sizeof(xdp_lower));
-+		xdp_lower.xsk.queue_id = get_netdev_rx_queue_index(rxq->lease);
-+		break;
-+	case XDP_SETUP_PROG:
-+		return -EPERM;
-+	default:
-+		return -EINVAL;
-+	}
++def set_flow_rule(cfg):
++    output = ethtool(
++        f"-N {cfg.ifname} flow-type tcp6 dst-port {cfg.port} action {cfg.src_queue}"
++    ).stdout
++    values = re.search(r"ID (\d+)", output).group(1)
++    return int(values)
 +
-+	netdev_lock(phys);
-+	if (!dev_get_min_mp_channel_count(phys))
-+		ret = phys->netdev_ops->ndo_bpf(phys, &xdp_lower);
-+	netdev_unlock(phys);
-+	return ret;
-+}
 +
-+static int netkit_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags)
-+{
-+	struct netdev_rx_queue *rxq, *rxq_lease;
-+	struct net_device *phys;
++def set_flow_rule_rss(cfg, rss_ctx_id):
++    output = ethtool(
++        f"-N {cfg.ifname} flow-type tcp6 dst-port {cfg.port} context {rss_ctx_id}"
++    ).stdout
++    values = re.search(r"ID (\d+)", output).group(1)
++    return int(values)
 +
-+	if (queue_id >= dev->real_num_rx_queues)
-+		return -EINVAL;
 +
-+	rxq = __netif_get_rx_queue(dev, queue_id);
-+	rxq_lease = READ_ONCE(rxq->lease);
-+	if (!rxq_lease)
-+		return -EOPNOTSUPP;
++def create_netkit(rxqueues):
++    rtnl = RtnlFamily()
++    rtnl.newlink(
++        {
++            "linkinfo": {
++                "kind": "netkit",
++                "data": {
++                    "mode": "l2",
++                    "policy": "forward",
++                    "peer-policy": "forward",
++                },
++            },
++            "num-rx-queues": rxqueues,
++        },
++        flags=[Netlink.NLM_F_CREATE, Netlink.NLM_F_EXCL],
++    )
 +
-+	phys = rxq_lease->dev;
-+	if (!netkit_xsk_supported_at_phys(phys))
-+		return -EOPNOTSUPP;
++    all_links = ip("-d link show", json=True)
++    nk_links = [
++        l
++        for l in all_links
++        if l.get("linkinfo", {}).get("info_kind") == "netkit"
++        and "UP" not in l.get("flags", [])
++    ]
++    nk_links.sort(key=lambda x: x["ifindex"])
++    return (
++        nk_links[1]["ifname"],
++        nk_links[1]["ifindex"],
++        nk_links[0]["ifname"],
++        nk_links[0]["ifindex"],
++    )
 +
-+	return phys->netdev_ops->ndo_xsk_wakeup(phys,
-+			get_netdev_rx_queue_index(rxq_lease), flags);
-+}
 +
- static int netkit_init(struct net_device *dev)
- {
- 	netdev_lockdep_set_classes(dev);
-@@ -255,6 +327,8 @@ static const struct net_device_ops netkit_netdev_ops = {
- 	.ndo_get_peer_dev	= netkit_peer_dev,
- 	.ndo_get_stats64	= netkit_get_stats,
- 	.ndo_uninit		= netkit_uninit,
-+	.ndo_bpf		= netkit_xsk,
-+	.ndo_xsk_wakeup		= netkit_xsk_wakeup,
- 	.ndo_features_check	= passthru_features_check,
- };
- 
-@@ -390,10 +464,11 @@ static void netkit_setup(struct net_device *dev)
- 	dev->hw_enc_features = netkit_features;
- 	dev->mpls_features = NETIF_F_HW_CSUM | NETIF_F_GSO_SOFTWARE;
- 	dev->vlan_features = dev->features & ~netkit_features_hw_vlan;
--
- 	dev->needs_free_netdev = true;
- 
- 	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
++def test_remove_phys(netns) -> None:
++    nsimdev = NetdevSimDev(port_count=1, queue_count=2)
++    defer(nsimdev.remove)
++    nsim = nsimdev.nsims[0]
++    ip(f"link set dev {nsim.ifname} up")
 +
-+	xdp_set_features_flag(dev, NETDEV_XDP_ACT_XSK);
- }
- 
- static struct net *netkit_get_link_net(const struct net_device *dev)
++    nk_host, _, nk_guest, nk_guest_idx = create_netkit(rxqueues=2)
++    defer(cmd, f"ip link del dev {nk_host}", fail=False)
++
++    ip(f"link set dev {nk_guest} netns {netns.name}")
++    ip(f"link set dev {nk_host} up")
++    ip(f"link set dev {nk_guest} up", ns=netns)
++
++    src_queue = 1
++    with NetNSEnter(str(netns)):
++        netdevnl = NetdevFamily()
++        result = netdevnl.queue_create(
++            {
++                "ifindex": nk_guest_idx,
++                "type": "rx",
++                "lease": {
++                    "ifindex": nsim.ifindex,
++                    "queue": {"id": src_queue, "type": "rx"},
++                    "netns-id": 0,
++                },
++            }
++        )
++        nk_queue_id = result["id"]
++
++    netdevnl = NetdevFamily()
++    queue_info = netdevnl.queue_get(
++        {"ifindex": nsim.ifindex, "id": src_queue, "type": "rx"}
++    )
++    ksft_in("lease", queue_info)
++    ksft_eq(queue_info["lease"]["queue"]["id"], nk_queue_id)
++
++    nsimdev.remove()
++    time.sleep(0.1)
++    ret = cmd(f"ip link show dev {nk_host}", fail=False)
++    ksft_ne(ret.ret, 0)
++
++
++def test_double_lease(netns) -> None:
++    nsimdev = NetdevSimDev(port_count=1, queue_count=2)
++    defer(nsimdev.remove)
++    nsim = nsimdev.nsims[0]
++    ip(f"link set dev {nsim.ifname} up")
++
++    nk_host, _, nk_guest, nk_guest_idx = create_netkit(rxqueues=3)
++    defer(cmd, f"ip link del dev {nk_host}")
++
++    ip(f"link set dev {nk_guest} netns {netns.name}")
++    ip(f"link set dev {nk_host} up")
++    ip(f"link set dev {nk_guest} up", ns=netns)
++
++    src_queue = 1
++    with NetNSEnter(str(netns)):
++        netdevnl = NetdevFamily()
++        netdevnl.queue_create(
++            {
++                "ifindex": nk_guest_idx,
++                "type": "rx",
++                "lease": {
++                    "ifindex": nsim.ifindex,
++                    "queue": {"id": src_queue, "type": "rx"},
++                    "netns-id": 0,
++                },
++            }
++        )
++
++        with ksft_raises(NlError) as e:
++            netdevnl.queue_create(
++                {
++                    "ifindex": nk_guest_idx,
++                    "type": "rx",
++                    "lease": {
++                        "ifindex": nsim.ifindex,
++                        "queue": {"id": src_queue, "type": "rx"},
++                        "netns-id": 0,
++                    },
++                }
++            )
++        ksft_eq(e.exception.nl_msg.error, -errno.EBUSY)
++
++
++def test_virtual_lessor(netns) -> None:
++    nk_host_a, nk_host_a_idx, nk_guest_a, nk_guest_a_idx = create_netkit(rxqueues=2)
++    defer(cmd, f"ip link del dev {nk_host_a}")
++    ip(f"link set dev {nk_host_a} up")
++    ip(f"link set dev {nk_guest_a} up")
++
++    nk_host_b, _, nk_guest_b, nk_guest_b_idx = create_netkit(rxqueues=2)
++    defer(cmd, f"ip link del dev {nk_host_b}")
++
++    ip(f"link set dev {nk_guest_b} netns {netns.name}")
++    ip(f"link set dev {nk_host_b} up")
++    ip(f"link set dev {nk_guest_b} up", ns=netns)
++
++    with NetNSEnter(str(netns)):
++        netdevnl = NetdevFamily()
++        with ksft_raises(NlError) as e:
++            netdevnl.queue_create(
++                {
++                    "ifindex": nk_guest_b_idx,
++                    "type": "rx",
++                    "lease": {
++                        "ifindex": nk_guest_a_idx,
++                        "queue": {"id": 0, "type": "rx"},
++                        "netns-id": 0,
++                    },
++                }
++            )
++        ksft_eq(e.exception.nl_msg.error, -errno.EINVAL)
++
++
++def test_phys_lessee(netns) -> None:
++    nsimdev_a = NetdevSimDev(port_count=1, queue_count=2)
++    defer(nsimdev_a.remove)
++    nsim_a = nsimdev_a.nsims[0]
++    ip(f"link set dev {nsim_a.ifname} up")
++
++    nsimdev_b = NetdevSimDev(port_count=1, queue_count=2)
++    defer(nsimdev_b.remove)
++    nsim_b = nsimdev_b.nsims[0]
++    ip(f"link set dev {nsim_b.ifname} up")
++
++    netdevnl = NetdevFamily()
++    with ksft_raises(NlError) as e:
++        netdevnl.queue_create(
++            {
++                "ifindex": nsim_a.ifindex,
++                "type": "rx",
++                "lease": {
++                    "ifindex": nsim_b.ifindex,
++                    "queue": {"id": 0, "type": "rx"},
++                },
++            }
++        )
++    ksft_eq(e.exception.nl_msg.error, -errno.EINVAL)
++
++
++def test_different_lessors(netns) -> None:
++    nsimdev_a = NetdevSimDev(port_count=1, queue_count=2)
++    defer(nsimdev_a.remove)
++    nsim_a = nsimdev_a.nsims[0]
++    ip(f"link set dev {nsim_a.ifname} up")
++
++    nsimdev_b = NetdevSimDev(port_count=1, queue_count=2)
++    defer(nsimdev_b.remove)
++    nsim_b = nsimdev_b.nsims[0]
++    ip(f"link set dev {nsim_b.ifname} up")
++
++    nk_host, _, nk_guest, nk_guest_idx = create_netkit(rxqueues=3)
++    defer(cmd, f"ip link del dev {nk_host}", fail=False)
++
++    ip(f"link set dev {nk_guest} netns {netns.name}")
++    ip(f"link set dev {nk_host} up")
++    ip(f"link set dev {nk_guest} up", ns=netns)
++
++    with NetNSEnter(str(netns)):
++        netdevnl = NetdevFamily()
++        netdevnl.queue_create(
++            {
++                "ifindex": nk_guest_idx,
++                "type": "rx",
++                "lease": {
++                    "ifindex": nsim_a.ifindex,
++                    "queue": {"id": 1, "type": "rx"},
++                    "netns-id": 0,
++                },
++            }
++        )
++
++        with ksft_raises(NlError) as e:
++            netdevnl.queue_create(
++                {
++                    "ifindex": nk_guest_idx,
++                    "type": "rx",
++                    "lease": {
++                        "ifindex": nsim_b.ifindex,
++                        "queue": {"id": 1, "type": "rx"},
++                        "netns-id": 0,
++                    },
++                }
++            )
++        ksft_eq(e.exception.nl_msg.error, -errno.EOPNOTSUPP)
++
++
++def test_queue_out_of_range(netns) -> None:
++    nsimdev = NetdevSimDev(port_count=1, queue_count=2)
++    defer(nsimdev.remove)
++    nsim = nsimdev.nsims[0]
++    ip(f"link set dev {nsim.ifname} up")
++
++    nk_host, _, nk_guest, nk_guest_idx = create_netkit(rxqueues=2)
++    defer(cmd, f"ip link del dev {nk_host}", fail=False)
++
++    ip(f"link set dev {nk_guest} netns {netns.name}")
++    ip(f"link set dev {nk_host} up")
++    ip(f"link set dev {nk_guest} up", ns=netns)
++
++    with NetNSEnter(str(netns)):
++        netdevnl = NetdevFamily()
++        with ksft_raises(NlError) as e:
++            netdevnl.queue_create(
++                {
++                    "ifindex": nk_guest_idx,
++                    "type": "rx",
++                    "lease": {
++                        "ifindex": nsim.ifindex,
++                        "queue": {"id": 2, "type": "rx"},
++                        "netns-id": 0,
++                    },
++                }
++            )
++        ksft_eq(e.exception.nl_msg.error, -errno.ERANGE)
++
++
++def test_resize_leased(netns) -> None:
++    nsimdev = NetdevSimDev(port_count=1, queue_count=2)
++    defer(nsimdev.remove)
++    nsim = nsimdev.nsims[0]
++    ip(f"link set dev {nsim.ifname} up")
++
++    nk_host, _, nk_guest, nk_guest_idx = create_netkit(rxqueues=2)
++    defer(cmd, f"ip link del dev {nk_host}", fail=False)
++
++    ip(f"link set dev {nk_guest} netns {netns.name}")
++    ip(f"link set dev {nk_host} up")
++    ip(f"link set dev {nk_guest} up", ns=netns)
++
++    with NetNSEnter(str(netns)):
++        netdevnl = NetdevFamily()
++        netdevnl.queue_create(
++            {
++                "ifindex": nk_guest_idx,
++                "type": "rx",
++                "lease": {
++                    "ifindex": nsim.ifindex,
++                    "queue": {"id": 1, "type": "rx"},
++                    "netns-id": 0,
++                },
++            }
++        )
++
++    ethnl = EthtoolFamily()
++    with ksft_raises(NlError) as e:
++        ethnl.channels_set({"header": {"dev-index": nsim.ifindex}, "combined-count": 1})
++    ksft_eq(e.exception.nl_msg.error, -errno.EINVAL)
++
++
++def test_self_lease(netns) -> None:
++    nk_host, _, nk_guest, nk_guest_idx = create_netkit(rxqueues=2)
++    defer(cmd, f"ip link del dev {nk_host}", fail=False)
++
++    netdevnl = NetdevFamily()
++    with ksft_raises(NlError) as e:
++        netdevnl.queue_create(
++            {
++                "ifindex": nk_guest_idx,
++                "type": "rx",
++                "lease": {
++                    "ifindex": nk_guest_idx,
++                    "queue": {"id": 0, "type": "rx"},
++                },
++            }
++        )
++    ksft_eq(e.exception.nl_msg.error, -errno.EINVAL)
++
++
++def test_iou_zcrx(cfg) -> None:
++    cfg.require_ipver("6")
++    ethnl = EthtoolFamily()
++
++    rings = ethnl.rings_get({"header": {"dev-index": cfg.ifindex}})
++    rx_rings = rings["rx"]
++    hds_thresh = rings.get("hds-thresh", 0)
++
++    ethnl.rings_set(
++        {
++            "header": {"dev-index": cfg.ifindex},
++            "tcp-data-split": "enabled",
++            "hds-thresh": 0,
++            "rx": 64,
++        }
++    )
++    defer(
++        ethnl.rings_set,
++        {
++            "header": {"dev-index": cfg.ifindex},
++            "tcp-data-split": "unknown",
++            "hds-thresh": hds_thresh,
++            "rx": rx_rings,
++        },
++    )
++
++    ethtool(f"-X {cfg.ifname} equal {cfg.src_queue}")
++    defer(ethtool, f"-X {cfg.ifname} default")
++
++    flow_rule_id = set_flow_rule(cfg)
++    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
++
++    rx_cmd = f"ip netns exec {cfg.netns.name} {cfg.bin_local} -s -p {cfg.port} -i {cfg._nk_guest_ifname} -q {cfg.nk_queue}"
++    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.nk_guest_ipv6} -p {cfg.port} -l 12840"
++    with bkg(rx_cmd, exit_wait=True):
++        wait_port_listen(cfg.port, proto="tcp", ns=cfg.netns)
++        cmd(tx_cmd, host=cfg.remote)
++
++
++def test_attrs(cfg) -> None:
++    cfg.require_ipver("6")
++    netdevnl = NetdevFamily()
++    queue_info = netdevnl.queue_get(
++        {"ifindex": cfg.ifindex, "id": cfg.src_queue, "type": "rx"}
++    )
++
++    ksft_eq(queue_info["id"], cfg.src_queue)
++    ksft_eq(queue_info["type"], "rx")
++    ksft_eq(queue_info["ifindex"], cfg.ifindex)
++
++    ksft_in("lease", queue_info)
++    lease = queue_info["lease"]
++    ksft_eq(lease["ifindex"], cfg.nk_guest_ifindex)
++    ksft_eq(lease["queue"]["id"], cfg.nk_queue)
++    ksft_eq(lease["queue"]["type"], "rx")
++    ksft_in("netns-id", lease)
++
++
++def test_attach_xdp_with_mp(cfg) -> None:
++    cfg.require_ipver("6")
++    ethnl = EthtoolFamily()
++
++    rings = ethnl.rings_get({"header": {"dev-index": cfg.ifindex}})
++    rx_rings = rings["rx"]
++    hds_thresh = rings.get("hds-thresh", 0)
++
++    ethnl.rings_set(
++        {
++            "header": {"dev-index": cfg.ifindex},
++            "tcp-data-split": "enabled",
++            "hds-thresh": 0,
++            "rx": 64,
++        }
++    )
++    defer(
++        ethnl.rings_set,
++        {
++            "header": {"dev-index": cfg.ifindex},
++            "tcp-data-split": "unknown",
++            "hds-thresh": hds_thresh,
++            "rx": rx_rings,
++        },
++    )
++
++    ethtool(f"-X {cfg.ifname} equal {cfg.src_queue}")
++    defer(ethtool, f"-X {cfg.ifname} default")
++
++    netdevnl = NetdevFamily()
++
++    rx_cmd = f"ip netns exec {cfg.netns.name} {cfg.bin_local} -s -p {cfg.port} -i {cfg._nk_guest_ifname} -q {cfg.nk_queue}"
++    with bkg(rx_cmd):
++        wait_port_listen(cfg.port, proto="tcp", ns=cfg.netns)
++
++        time.sleep(0.1)
++        queue_info = netdevnl.queue_get(
++            {"ifindex": cfg.ifindex, "id": cfg.src_queue, "type": "rx"}
++        )
++        ksft_in("io-uring", queue_info)
++
++        prog = cfg.net_lib_dir / "xdp_dummy.bpf.o"
++        with ksft_raises(CmdExitFailure):
++            ip(f"link set dev {cfg.ifname} xdp obj {prog} sec xdp.frags")
++
++    time.sleep(0.1)
++    queue_info = netdevnl.queue_get(
++        {"ifindex": cfg.ifindex, "id": cfg.src_queue, "type": "rx"}
++    )
++    ksft_not_in("io-uring", queue_info)
++
++
++def test_destroy(cfg) -> None:
++    cfg.require_ipver("6")
++    ethnl = EthtoolFamily()
++
++    rings = ethnl.rings_get({"header": {"dev-index": cfg.ifindex}})
++    rx_rings = rings["rx"]
++    hds_thresh = rings.get("hds-thresh", 0)
++
++    ethnl.rings_set(
++        {
++            "header": {"dev-index": cfg.ifindex},
++            "tcp-data-split": "enabled",
++            "hds-thresh": 0,
++            "rx": 64,
++        }
++    )
++    defer(
++        ethnl.rings_set,
++        {
++            "header": {"dev-index": cfg.ifindex},
++            "tcp-data-split": "unknown",
++            "hds-thresh": hds_thresh,
++            "rx": rx_rings,
++        },
++    )
++
++    ethtool(f"-X {cfg.ifname} equal {cfg.src_queue}")
++    defer(ethtool, f"-X {cfg.ifname} default")
++
++    rx_cmd = f"ip netns exec {cfg.netns.name} {cfg.bin_local} -s -p {cfg.port} -i {cfg._nk_guest_ifname} -q {cfg.nk_queue}"
++    rx_proc = cmd(rx_cmd, background=True)
++    wait_port_listen(cfg.port, proto="tcp", ns=cfg.netns)
++
++    netdevnl = NetdevFamily()
++    queue_info = netdevnl.queue_get(
++        {"ifindex": cfg.ifindex, "id": cfg.src_queue, "type": "rx"}
++    )
++    ksft_in("io-uring", queue_info)
++
++    # ip link del will wait for all refs to drop first, but iou-zcrx is holding
++    # onto a ref. Terminate iou-zcrx async via a thread after a delay.
++    kill_timer = threading.Timer(1, rx_proc.proc.terminate)
++    kill_timer.start()
++
++    ip(f"link del dev {cfg._nk_host_ifname}")
++    kill_timer.join()
++    cfg._nk_host_ifname = None
++    cfg._nk_guest_ifname = None
++
++    queue_info = netdevnl.queue_get(
++        {"ifindex": cfg.ifindex, "id": cfg.src_queue, "type": "rx"}
++    )
++    ksft_not_in("io-uring", queue_info)
++
++    cmd(f"tc filter del dev {cfg.ifname} ingress pref {cfg._bpf_prog_pref}")
++    cfg._tc_attached = False
++
++    flow_rule_id = set_flow_rule(cfg)
++    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
++
++    rx_cmd = f"{cfg.bin_local} -s -p {cfg.port} -i {cfg.ifname} -q {cfg.src_queue}"
++    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {cfg.port} -l 12840"
++    with bkg(rx_cmd, exit_wait=True):
++        wait_port_listen(cfg.port, proto="tcp")
++        cmd(tx_cmd, host=cfg.remote)
++    # Short delay since iou cleanup is async and takes a bit of time.
++    time.sleep(0.1)
++    queue_info = netdevnl.queue_get(
++        {"ifindex": cfg.ifindex, "id": cfg.src_queue, "type": "rx"}
++    )
++    ksft_not_in("io-uring", queue_info)
++
++
++def main() -> None:
++    netns = NetNS()
++    cmd("ip netns attach init 1")
++    ip("netns set init 0", ns=netns)
++    ip("link set lo up", ns=netns)
++
++    ksft_run(
++        [
++            test_remove_phys,
++            test_double_lease,
++            test_virtual_lessor,
++            test_phys_lessee,
++            test_different_lessors,
++            test_queue_out_of_range,
++            test_resize_leased,
++            test_self_lease,
++        ],
++        args=(netns,),
++    )
++
++    cmd("ip netns del init", fail=False)
++    del netns
++
++    with NetDrvContEnv(__file__, rxqueues=2) as cfg:
++        cfg.bin_local = path.abspath(
++            path.dirname(__file__) + "/../../../drivers/net/hw/iou-zcrx"
++        )
++        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
++        cfg.port = rand_port()
++
++        ethnl = EthtoolFamily()
++        channels = ethnl.channels_get({"header": {"dev-index": cfg.ifindex}})
++        channels = channels["combined-count"]
++        if channels < 2:
++            raise KsftSkipEx("Test requires NETIF with at least 2 combined channels")
++
++        cfg.src_queue = channels - 1
++
++        with NetNSEnter(str(cfg.netns)):
++            netdevnl = NetdevFamily()
++            bind_result = netdevnl.queue_create(
++                {
++                    "ifindex": cfg.nk_guest_ifindex,
++                    "type": "rx",
++                    "lease": {
++                        "ifindex": cfg.ifindex,
++                        "queue": {"id": cfg.src_queue, "type": "rx"},
++                        "netns-id": 0,
++                    },
++                }
++            )
++            cfg.nk_queue = bind_result["id"]
++
++        # test_destroy must be last because it destroys the netkit devices
++        ksft_run(
++            [test_iou_zcrx, test_attrs, test_attach_xdp_with_mp, test_destroy],
++            args=(cfg,),
++        )
++    ksft_exit()
++
++
++if __name__ == "__main__":
++    main()
 -- 
 2.43.0
 
