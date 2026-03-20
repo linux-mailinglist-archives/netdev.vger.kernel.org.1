@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-269893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269894-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uK6aCDEvvWmI7QIAu9opvQ
-	(envelope-from <netdev+bounces-269893-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:27:45 +0100
+	id 6HCnMfIvvWmI7QIAu9opvQ
+	(envelope-from <netdev+bounces-269894-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:30:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFD952D98A3
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:27:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CA442D9992
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:30:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1FD3530117DB
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:27:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 259AD302D116
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:29:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05733A7F4C;
-	Fri, 20 Mar 2026 11:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD395372EDC;
+	Fri, 20 Mar 2026 11:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nJ4oi4dd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yvug7t3p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 726F139BFF5;
-	Fri, 20 Mar 2026 11:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93B31A6800;
+	Fri, 20 Mar 2026 11:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774006031; cv=none; b=azKSaURPoY+40KLbuN7KYdZKlgGRd7KL1BDjsA7vTXhZdlqq1lY5LtkILtl4NjGriXR/Xl2jp7iCkVFgkkprvwZdXRH+YMjUGBfSBVsztZs9TRgAoZZuPdY6/Zj/WMh5QDEa+VKMG+0OCkWbuU/Tpl+mGxtofMEo+uG/5SpNBQY=
+	t=1774006182; cv=none; b=WGxaoYJ3SQppbzh4SFbhr1q+esvpMaNTrU0lpUjqLYpaa8Gczmc+wfLVsir+pZV7LEb7tD4uANUH/OE5jczoISZBuCQJe3NC/kQaLCgUJKjmPXw0WWRpMFy5pQYSpQYJAtMyKi1d5TFQDYJivQxlM4C1M/0WfpFpaeib/HPyJMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774006031; c=relaxed/simple;
-	bh=1wRF58FiDWImzLkG3HRq7nLNRkGKi0N9A0UY6bLIJWI=;
+	s=arc-20240116; t=1774006182; c=relaxed/simple;
+	bh=a/Kg539vue2ngY+OY8ZDZa5onMTW99kiRa7ZsGcZb18=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lUl9ISIl9wpQB885iEINfm0eOYzgtHtMT98Cn4PVRa9vtaz/6QbpzywwTO5uVl6shdCfZGz6t5wSFpuSPdzqyIF6GxxR+ZQJz3yKbc35GQPsA7p2Q37SRtGLLw3vWpJXjdfS0rl5/wndSFMm1DFtBvPZXxCSmJKqROUW+vScBH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nJ4oi4dd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 207D9C4CEF7;
-	Fri, 20 Mar 2026 11:27:07 +0000 (UTC)
+	 MIME-Version; b=dEbjsobGmMhZ6ooKZYlwgQJyZ68aH3q08KH6zfjb4oPo7ppho5V4WwkGTQqyeIEjQ1bHCj8lvn/zWfanEinJNV2EaKeEUgY3e9kcqSDMShcd2AwHeKr98Txtk15HeiyfIkM0eqzbFtZFf5yvvKNpkNU6oP4/0kMh8LjDWxtuLx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yvug7t3p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DF6EC4CEF7;
+	Fri, 20 Mar 2026 11:29:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774006030;
-	bh=1wRF58FiDWImzLkG3HRq7nLNRkGKi0N9A0UY6bLIJWI=;
+	s=k20201202; t=1774006182;
+	bh=a/Kg539vue2ngY+OY8ZDZa5onMTW99kiRa7ZsGcZb18=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nJ4oi4ddq+uw8egN98CvDGk2f7bJglUTdcJOacefG9E3+3ec/WAoR1ufSCC1BClKS
-	 svWEQ+lQR29bmtUXUa6bZ0JlbHZZTZj+yViHiifcT1fxuPu/Gy5YTB2YVl7XqZL5Fq
-	 s996aMxdl9lbo83CQdmej+D3XvC6iFjQV+M3cE2urRTbLTSFDYx6MLMe/pty2s4Z4x
-	 +M7tUJ/GIBFJ4TUG6GPMir1DUoAXA8GdwJ21cyxUYUdvOBBm+3039DLmneEj8v/pII
-	 AytEAYAtF58UhSiA3uAIKVz4BXo88uRguCyvBOK4hMHS1kXNANhKl7/8jOzFaMPnQV
-	 RdiGwjCKZeL2w==
+	b=Yvug7t3p3Bt8+9Geiy0PuQm4AnN14FNfEoRpFirz4heoGNuimSPrY1hDvOo/m2IDj
+	 8p2yjeQpv2hgrwHzA9+qC0ljMw18niMRBfCFkORPKuLbUGF01FHhwubSkDKDmasoQM
+	 VB22LNnCrYJWoqlqkhG8aFWIyCcZysz2+O7zriBE78XX7eFVAAB5L9Z01ULUCV/H9U
+	 mLhFvEmRtu9WAEZjie03bNrn8sxqZHHX4b8qtEIJGhNxPQClTuQ9qdzJdiZKVcWqPS
+	 YiIvShkqwujditHWSGJ9kUZQZSK/HRpZPmFH6jDvWOtPIJ0a//p/TN7WajwDqWGmpx
+	 JzYx00xJHbj4Q==
 From: Simon Horman <horms@kernel.org>
 To: vikas.gupta@broadcom.com
 Cc: Simon Horman <horms@kernel.org>,
-	andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
 	vsrama-krishna.nemani@broadcom.com,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	ajit.khaparde@broadcom.com,
-	bhargava.marreddy@broadcom.com,
-	rajashekar.hudumula@broadcom.com,
-	davem@davemloft.net,
 	edumazet@google.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v8 09/10] bng_en: implement netdev_stat_ops
-Date: Fri, 20 Mar 2026 11:27:04 +0000
-Message-ID: <20260320112704.2065290-1-horms@kernel.org>
+	ajit.khaparde@broadcom.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	pavan.chebbi@broadcom.com,
+	rajashekar.hudumula@broadcom.com,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	michael.chan@broadcom.com,
+	bhargava.marreddy@broadcom.com,
+	andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v8 10/10] bng_en: add support for ethtool -S stats display
+Date: Fri, 20 Mar 2026 11:27:19 +0000
+Message-ID: <20260320112717.2065386-3-horms@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260319055124.1350670-10-vikas.gupta@broadcom.com>
-References: <20260319055124.1350670-10-vikas.gupta@broadcom.com>
+In-Reply-To: <20260319055124.1350670-11-vikas.gupta@broadcom.com>
+References: <20260319055124.1350670-11-vikas.gupta@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,13 +79,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-269893-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269894-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -95,12 +95,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.973];
+	NEURAL_HAM(-0.00)[-0.954];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: AFD952D98A3
+X-Rspamd-Queue-Id: 2CA442D9992
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -108,161 +108,118 @@ This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+
+Simon says: This is somewhat more subjective than the other two AI
+generated reviews I released for this patch-set. But I think it does
+at least warrant discussion.
+
 ---
-bng_en: implement netdev_stat_ops
+bng_en: add support for ethtool -S stats display
 
-This patch adds netdev_stat_ops implementation to provide standardized
-per-queue statistics via the Netlink API, including hardware drop
-counters.
+This patch implements the legacy ethtool statistics interface to expose
+hardware counters through ethtool -S, including per-queue ring stats,
+TPA stats, port level stats, and per-priority stats.
 
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-> index 2513b0907693..fa732b99358e 100644
-> --- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-> @@ -3031,6 +3031,81 @@ static int bnge_close(struct net_device *dev)
->  	return 0;
->  }
->
-> +static void bnge_get_queue_stats_rx(struct net_device *dev, int i,
-> +				    struct netdev_queue_stats_rx *stats)
-> +{
-> +	struct bnge_net *bn = netdev_priv(dev);
-> +	struct bnge_nq_ring_info *nqr;
-> +	u64 *sw;
-> +
-> +	if (!bn->bnapi)
-> +		return;
-> +
-> +	nqr = &bn->bnapi[i]->nq_ring;
-                ^^^^
-
-Can this race with bnge_close_core and dereference bn->bnapi after it's
-freed? The NULL check at line 3041 doesn't prevent the race since
-bnge_close_core can free bn->bnapi between the check and dereference.
-
-Looking at the existing bnge_get_stats64, it uses rcu_read_lock() when
-accessing bn->bnapi:
-
-bnge_get_stats64() {
-    rcu_read_lock();
-    if (test_bit(BNGE_STATE_OPEN, &bd->state)) {
-        ... access bn->bnapi ...
-    }
-    rcu_read_unlock();
-}
-
-And bnge_close_core uses synchronize_rcu() to wait for readers before
-freeing:
-
-bnge_close_core() {
-    ...
-    synchronize_rcu();
-    bnge_del_napi(bn);
-        -> bnge_free_core(bn);
-            -> bn->bnapi = NULL;
-}
-
-Without RCU protection, this sequence can occur:
-
-Thread A (stats)                  Thread B (close)
-----------------                  ----------------
-if (!bn->bnapi)  [PASSES]
-                                  bnge_close_core()
-                                    bnge_free_core()
-                                      bn->bnapi = NULL
-nqr = &bn->bnapi[i]  [CRASH]
-
-Should bnge_get_queue_stats_rx acquire rcu_read_lock() and check
-test_bit(BNGE_STATE_OPEN) before accessing bn->bnapi?
-
-> +	sw = nqr->stats.sw_stats;
-> +
-> +	stats->packets = 0;
-> +	stats->packets += BNGE_GET_RING_STATS64(sw, rx_ucast_pkts);
-> +	stats->packets += BNGE_GET_RING_STATS64(sw, rx_mcast_pkts);
-> +	stats->packets += BNGE_GET_RING_STATS64(sw, rx_bcast_pkts);
-> +
-> +	stats->bytes = 0;
-> +	stats->bytes += BNGE_GET_RING_STATS64(sw, rx_ucast_bytes);
-> +	stats->bytes += BNGE_GET_RING_STATS64(sw, rx_mcast_bytes);
-> +	stats->bytes += BNGE_GET_RING_STATS64(sw, rx_bcast_bytes);
-> +
-> +	stats->hw_drop_overruns = BNGE_GET_RING_STATS64(sw, rx_discard_pkts);
-> +	stats->hw_drops = BNGE_GET_RING_STATS64(sw, rx_error_pkts) +
-> +				stats->hw_drop_overruns;
-> +}
-> +
-> +static void bnge_get_queue_stats_tx(struct net_device *dev, int i,
-> +				    struct netdev_queue_stats_tx *stats)
-> +{
-> +	struct bnge_net *bn = netdev_priv(dev);
-> +	struct bnge_napi *bnapi;
-> +	u64 *sw;
-> +
-> +	if (!bn->tx_ring)
-> +		return;
-> +
-> +	bnapi = bn->tx_ring[bn->tx_ring_map[i]].bnapi;
-                ^^^^
-
-Does this have the same race with bnge_close_core? The NULL check doesn't
-prevent bnge_close_core from freeing bn->tx_ring between the check and
-dereference.
-
-Following the same pattern as bnge_get_stats64, should this also use
-rcu_read_lock() and check BNGE_STATE_OPEN before accessing bn->tx_ring?
-
-> +	sw = bnapi->nq_ring.stats.sw_stats;
-> +
-> +	stats->packets = 0;
-> +	stats->packets += BNGE_GET_RING_STATS64(sw, tx_ucast_pkts);
-> +	stats->packets += BNGE_GET_RING_STATS64(sw, tx_mcast_pkts);
-> +	stats->packets += BNGE_GET_RING_STATS64(sw, tx_bcast_pkts);
-> +
-> +	stats->bytes = 0;
-> +	stats->bytes += BNGE_GET_RING_STATS64(sw, tx_ucast_bytes);
-> +	stats->bytes += BNGE_GET_RING_STATS64(sw, tx_mcast_bytes);
-> +	stats->bytes += BNGE_GET_RING_STATS64(sw, tx_bcast_bytes);
-> +
-> +	stats->hw_drop_errors = BNGE_GET_RING_STATS64(sw, tx_error_pkts);
-> +	stats->hw_drops = BNGE_GET_RING_STATS64(sw, tx_discard_pkts) +
-> +				stats->hw_drop_errors;
-> +}
-> +
-> +static void bnge_get_base_stats(struct net_device *dev,
-> +				struct netdev_queue_stats_rx *rx,
-> +				struct netdev_queue_stats_tx *tx)
-> +{
-> +	struct bnge_net *bn = netdev_priv(dev);
-> +
-> +	rx->packets = bn->net_stats_prev.rx_packets;
-> +	rx->bytes = bn->net_stats_prev.rx_bytes;
-       ^^^^
-
-Can this race with bnge_close_core when reading bn->net_stats_prev?
-bnge_close_core writes to bn->net_stats_prev while this function reads
-it without any locking.
-
-Looking at bnge_get_stats64, it uses rcu_read_lock() before accessing
-bn->net_stats_prev. While this won't cause a crash like the other two
-issues, it could result in torn reads on 32-bit systems where reading
-u64 is not atomic, potentially returning inconsistent statistics to
-userspace.
-
-Should bnge_get_base_stats also use rcu_read_lock() when reading
-bn->net_stats_prev?
-
-> +
-> +	tx->packets = bn->net_stats_prev.tx_packets;
-> +	tx->bytes = bn->net_stats_prev.tx_bytes;
-> +}
-> +
-> +static const struct netdev_stat_ops bnge_stat_ops = {
-> +	.get_queue_stats_rx	= bnge_get_queue_stats_rx,
-> +	.get_queue_stats_tx	= bnge_get_queue_stats_tx,
-> +	.get_base_stats		= bnge_get_base_stats,
-> +};
-> +
+> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
+> index 2ae13f18e2d7..1a0eb987ef6f 100644
+> --- a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
+> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
 
 [ ... ]
+
+> @@ -42,6 +307,219 @@ static void bnge_get_drvinfo(struct net_device *dev,
+>  	strscpy(info->bus_info, pci_name(bd->pdev), sizeof(info->bus_info));
+>  }
+>
+> +static int bnge_get_sset_count(struct net_device *dev, int sset)
+> +{
+> +	struct bnge_net *bn = netdev_priv(dev);
+> +
+> +	switch (sset) {
+> +	case ETH_SS_STATS:
+> +		return bnge_get_num_stats(bn);
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+> +}
+
+[ ... ]
+
+> +static void bnge_get_ethtool_stats(struct net_device *dev,
+> +				   struct ethtool_stats *stats, u64 *buf)
+> +{
+> +	struct bnge_net *bn = netdev_priv(dev);
+> +	struct bnge_dev *bd = bn->bd;
+> +	u32 tpa_stats;
+> +	u32 i, j = 0;
+> +
+> +	if (!bn->bnapi) {
+> +		j += bnge_get_num_ring_stats(bd);
+> +		goto skip_ring_stats;
+> +	}
+> +
+> +	tpa_stats = bnge_get_num_tpa_ring_stats(bd);
+> +	for (i = 0; i < bd->nq_nr_rings; i++) {
+> +		struct bnge_napi *bnapi = bn->bnapi[i];
+> +		struct bnge_nq_ring_info *nqr;
+> +		u64 *sw_stats;
+> +		int k;
+> +
+> +		nqr = &bnapi->nq_ring;
+> +		sw_stats = nqr->stats.sw_stats;
+> +
+> +		if (is_rx_ring(bd, i)) {
+> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_ucast_pkts);
+> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_mcast_pkts);
+> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_bcast_pkts);
+> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_ucast_bytes);
+> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_mcast_bytes);
+> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, rx_bcast_bytes);
+> +		}
+> +		if (is_tx_ring(bd, i)) {
+> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_ucast_pkts);
+> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_mcast_pkts);
+> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_bcast_pkts);
+> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_ucast_bytes);
+> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_mcast_bytes);
+> +			buf[j++] = BNGE_GET_RING_STATS64(sw_stats, tx_bcast_bytes);
+> +		}
+
+This isn't a bug, but Documentation/networking/statistics.rst flags a
+potential concern about interface duplication. The patch adds per-queue
+ring statistics (rxqN_ucast_packets, rxqN_mcast_packets,
+rxqN_bcast_packets, rxqN_ucast_bytes, rxqN_mcast_bytes, rxqN_bcast_bytes,
+and tx equivalents) to the ethtool -S interface.
+
+However, this driver already implements the standard per-queue statistics
+API via netdev_stat_ops (bnge_get_queue_stats_rx and
+bnge_get_queue_stats_tx in bnge_netdev.c). That interface exposes
+per-queue packets and bytes through netlink, which is the designated
+mechanism for per-queue counters.
+
+According to Documentation/networking/statistics.rst, per-queue stats
+should use the standard netdev_stat_ops interface rather than ethtool -S.
+The documentation states that drivers should avoid adding new counters to
+ethtool -S for values that have a standard uAPI.
+
+While the ethtool -S stats provide a ucast/mcast/bcast breakdown not
+directly available from the standard per-queue API (which aggregates to
+total packets and bytes), this still represents duplication of the
+fundamental per-queue packet and byte counters. Could these per-queue
+stats be omitted from ethtool -S, keeping only the truly hardware-specific
+stats like TPA, port-level, and priority stats that don't have a standard
+interface?
+
+[ ... ]
+
+> @@ -262,6 +740,9 @@ static const struct ethtool_ops bnge_ethtool_ops = {
+>  	.nway_reset		= bnge_nway_reset,
+>  	.get_pauseparam		= bnge_get_pauseparam,
+>  	.set_pauseparam		= bnge_set_pauseparam,
+> +	.get_sset_count		= bnge_get_sset_count,
+> +	.get_strings		= bnge_get_strings,
+> +	.get_ethtool_stats	= bnge_get_ethtool_stats,
+>  	.get_eth_phy_stats	= bnge_get_eth_phy_stats,
+>  	.get_eth_mac_stats	= bnge_get_eth_mac_stats,
+>  	.get_eth_ctrl_stats	= bnge_get_eth_ctrl_stats,
 
