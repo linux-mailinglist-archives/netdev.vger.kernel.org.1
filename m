@@ -1,176 +1,139 @@
-Return-Path: <netdev+bounces-269859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269860-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EK1OEvENvWkz6QIAu9opvQ
-	(envelope-from <netdev+bounces-269859-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 10:05:53 +0100
+	id 4L7DGogNvWkO5gIAu9opvQ
+	(envelope-from <netdev+bounces-269860-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 10:04:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97E2C2D7BA7
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 10:05:52 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11E082D7B25
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 10:04:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 417CB3169932
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:01:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 640813006B62
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A7732ED39;
-	Fri, 20 Mar 2026 09:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90C034D4F7;
+	Fri, 20 Mar 2026 09:04:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="L8rWMyDt"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RX25+PQ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB1432E69A;
-	Fri, 20 Mar 2026 09:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BE31E98E3;
+	Fri, 20 Mar 2026 09:04:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773997261; cv=none; b=NAHSstYAukzq2gVR+M8kX+K/QAMF4BteQHbhYElTrZ0KwN8qBP0bL0rFaDsInNQpH45PoR/x0WFua1/ZjhUGHpDntV7eCLBru1kYVpdu1C3S95ycDUF5GivBEPZnm87dvYk4VXqtBMzWvSgAhf8oJEli5S5S8ukX9eC2fGoR3+A=
+	t=1773997445; cv=none; b=udmEJxiMrMLJAcPd+T2Hp/8R8ORf6cSpXzOF6ZpCPFnKwdmx49u9I234I/YLEkB9KsCjw3QqhnIy2/Ag/T1Rp4oeR0IwrK7bzj5oFg2878XNh/S6UDRoQWp01AtNgrSsVUxQGOobWDAa1nlnL5ytriB+TzM51S1mE2u+M3CAZfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773997261; c=relaxed/simple;
-	bh=yWRqGYW9henWppQGr9spTjFkIAhOjEclxFIFQGNTv2I=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=txndargZjOLibgYPyFh+lCrWMsOXaCx6yFe7NroQlaBnI/2O7WkG2Ug/DAtHl6pIQvg9g2U++parA8tcqxDWlleoG1Sky3CLKwypRXnal2s68ze8ANmmQQjHbr8g7LCePSvTZ3KGqD/WGseVokx/Xbpf2Ej8MHtxB186+twDyak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=L8rWMyDt; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 6F319206B0;
-	Fri, 20 Mar 2026 10:00:57 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tDlXtIxFloLA; Fri, 20 Mar 2026 10:00:56 +0100 (CET)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id B463A207D8;
-	Fri, 20 Mar 2026 10:00:56 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com B463A207D8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1773997256;
-	bh=Ih6XIm9zWH43Qd9VtL3P4SQdRfzxnZNZPdBnUvpieIo=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=L8rWMyDtQcDUesINgwa8XvHp4PHW1Z3dBlRjPEhi3H3XILaEoTtJcfT7EBHz23XgN
-	 ic90OYzqM1/8UpsVHx4sl84mMeS95vJ/lU+fy/vraNlDyvF54NoFEnfCw9jCW0hMJ/
-	 kOnhEcQXg9mvLyQI5oVteiQHeYEuv7x9Hvm0LgqWqYfP3qPSg+rVqZb7AU774Tr5jm
-	 ljeOSdqSRD6Cp36btVibHqGQUT/N1VUbt1g1o1oyQwBQI1x6BKEZN5SfQk5wzoldYj
-	 czXTSu/STqrKzetcmI2+A931NQi0uMHnK6N9ahhQ52663UwMCCAHHxoCQe2rbirfqq
-	 LXRMoQeUy5HDQ==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 20 Mar
- 2026 10:00:56 +0100
-Received: (nullmailer pid 647907 invoked by uid 1000);
-	Fri, 20 Mar 2026 09:00:55 -0000
-Date: Fri, 20 Mar 2026 10:00:55 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Felix Fietkau <nbd@nbd.name>
-CC: Qingfang Deng <dqfext@gmail.com>, Pablo Neira Ayuso <pablo@netfilter.org>,
-	<netfilter-devel@vger.kernel.org>, <davem@davemloft.net>,
-	<netdev@vger.kernel.org>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <fw@strlen.de>, <horms@kernel.org>,
-	<antony.antony@secunet.com>
-Subject: Re: [PATCH net-next,RFC 0/8] netfilter: flowtable bulking
-Message-ID: <ab0Mx1DpXmz4UvRq@secunet.com>
-References: <20260317112917.4170466-1-pablo@netfilter.org>
- <20260319061520.356946-1-dqfext@gmail.com>
- <abvdyDVJ8OYW52fw@secunet.com>
- <8f71af62-61c5-44f6-98d4-737034c498c6@nbd.name>
- <abzt3maph4VFq3wd@secunet.com>
- <eb7ba04a-b688-475c-8247-1e7e62d60ac3@nbd.name>
+	s=arc-20240116; t=1773997445; c=relaxed/simple;
+	bh=tLRV6GWt0nIH04h46cD5fAI/puIETbeyPGCSNjkPhWM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kL7hvZbt292QRRLw7vgnsI7i26Wq/vQqFiGacL/KmriXThMJmoSwZlVyTJXbeimF2ciHGmqqSzR9X29D3xhSdLni2HV7KN5EDu0olS2skY9K1NTaDwit/VocaIhXlTX53+XpPqnZwRa5S5YteoIFFi+ktYbSRwkJGt53DDbdnJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RX25+PQ/; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=tLRV6GWt0nIH04h46cD5fAI/puIETbeyPGCSNjkPhWM=; b=RX25+PQ//oLNIUwog0UzVIbDEP
+	uQEotUlu63UWGNG7lcvdJFT2beO1gYq+/Qvr896xR5OnHaQCLVudBWoF2v6l+hrS0/RzZzRpdcccu
+	fm+eBa7b22mZBFL5XFMn2S6+/vGbJH8Q3lo1DyYzBasF+rZOv79yMWc32W1tj00eTIe9ixzYixqEb
+	A5Zz7rQV5VAIMb7pf698D6LwS4Kk864K0cRZvtlLWLhke52kWXWI3DcS0gJ2QF2r38g8/4iXZ9NNP
+	zcvek9+l0a5HnoqZlql5Ciaxl+ISS/w7OAYXgmUA5Z2CpPGv/zfSLYJiJjaGv1NUEArV+zSnPukln
+	2DyVOwwg==;
+Received: from 2001-1c00-8d85-5700-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:5700:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1w3Vld-0000000FCA7-0OpM;
+	Fri, 20 Mar 2026 09:03:41 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 37587301150; Fri, 20 Mar 2026 10:03:40 +0100 (CET)
+Date: Fri, 20 Mar 2026 10:03:40 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: x86@kernel.org, Nikolay Borisov <nik.borisov@suse.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	David Kaplan <david.kaplan@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Laight <david.laight.linux@gmail.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v7 07/10] x86/vmscape: Use static_call() for predictor
+ flush
+Message-ID: <20260320090340.GN3738786@noisy.programming.kicks-ass.net>
+References: <20260319-vmscape-bhb-v7-0-b76a777a98af@linux.intel.com>
+ <20260319-vmscape-bhb-v7-7-b76a777a98af@linux.intel.com>
+ <20260319205802.GJ3738786@noisy.programming.kicks-ass.net>
+ <20260319213421.br6na4dulrjm6eke@desk>
+ <20260319214409.GL3738786@noisy.programming.kicks-ass.net>
+ <20260320062206.bdrnmnvho6lhmejw@desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <eb7ba04a-b688-475c-8247-1e7e62d60ac3@nbd.name>
-X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260320062206.bdrnmnvho6lhmejw@desk>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,netfilter.org,vger.kernel.org,davemloft.net,kernel.org,redhat.com,google.com,strlen.de,secunet.com];
-	TAGGED_FROM(0.00)[bounces-269859-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,secunet.com:dkim,secunet.com:mid];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269860-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,vger.kernel.org,intel.com];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCPT_COUNT_TWELVE(0.00)[36];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[secunet.com:+];
+	DKIM_TRACE(0.00)[infradead.org:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.990];
+	NEURAL_HAM(-0.00)[-0.970];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 97E2C2D7BA7
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,infradead.org:dkim,noisy.programming.kicks-ass.net:mid]
+X-Rspamd-Queue-Id: 11E082D7B25
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 09:50:31AM +0100, Felix Fietkau wrote:
-> On 20.03.26 07:49, Steffen Klassert wrote:
-> > On Thu, Mar 19, 2026 at 01:18:19PM +0100, Felix Fietkau wrote:
-> > > On 19.03.26 12:28, Steffen Klassert wrote:
-> > > > On Thu, Mar 19, 2026 at 02:15:17PM +0800, Qingfang Deng wrote:
-> > > > > Hi Pablo,
-> > > > > > > On Tue, 17 Mar 2026 12:29:09 +0100, Pablo Neira Ayuso wrote:
-> > > > > > Hi,
-> > > > > >  > Back in 2018 [1], a new fast forwarding combining the flowtable
-> > > > > and
-> > > > > > GRO/GSO was proposed, however, "GRO is specialized to optimize the
-> > > > > > non-forwarding case", so it was considered "counter-intuitive to base a
-> > > > > > fast forwarding path on top of it".
-> > > > > >  > Then, Steffen Klassert proposed the idea of adding a new engine
-> > > > > for the
-> > > > > > flowtable that operates on the skb list that is provided after the NAPI
-> > > > > > cycle. The idea is to process this skb list to create bulks grouped by
-> > > > > > the ethertype, output device, next hop and tos/dscp. Then, add a
-> > > > > > specialized xmit path that can deal with these skb bulks. Note that GRO
-> > > > > > needs to be disabled so this new forwarding engine obtains the list of
-> > > > > > skbs that resulted from the NAPI cycle.
-> > > > > > > +Cc: Felix Fietkau
-> > > > > > > How does this compare to fraglist GRO with the original
-> > > flowtable?
-> > > > > GRO can only aggregate packets of the same L4 flow. This can
-> > > > aggregate all packets the are treated  the same by the
-> > > > forwarding path. Packets need to have the same output device
-> > > > and next hop, but can be from different L3 and L4 flows.
-> > > > > Packet forwarders usually receive many different flows.
-> > > > GRO might not even kick in if there are not at least
-> > > > two packets from the same flow on a napi cycle.
-> > > 
-> > > Interesting approach! Do you think it might be possible to combine this with
-> > > GRO by bulking together GRO-combined frames from different flows?
-> > 
-> > This depends on how the GRO packets are crafted. If the packets built
-> > just by adding skb page frags, then yes. If the fraglist pointer is
-> > used to chain packets, then no (our approach uses the fraglist pointer
-> > as well). So combining these would require some changes to the GRO
-> > layer.
-> 
-> On OpenWrt we use fraglist GRO by default for both TCP and UDP.
-> Maybe the bulking code could take fraglist GRO packets and simply convert
-> them to its internal form of bulking batches.
+On Thu, Mar 19, 2026 at 11:22:06PM -0700, Pawan Gupta wrote:
 
-This is possible, but would run the bulking logic two times
-in the forwarding path.
+> This plus extending it to support EXPORT_STATIC_CALL_FOR_KVM() is probably
+> a better solution. Please let me know which one you prefer.
 
-The problem is the standard GRO. This also use the fraglist pointer if
-MAX_SKB_FRAGS is reached. Converting this back is complicated. That would
-not be a forwarding fastpath anymore.
+The EXPORT twiddling will do I suppose. I'll try and not forget looking
+at doing the RO static_call thing some time.
 
