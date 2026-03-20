@@ -1,130 +1,125 @@
-Return-Path: <netdev+bounces-269852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269841-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GCX7F+0IvWkO5gIAu9opvQ
-	(envelope-from <netdev+bounces-269852-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:44:29 +0100
+	id qKwfGOoGvWkO5gIAu9opvQ
+	(envelope-from <netdev+bounces-269841-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:35:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C1E22D75F5
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:44:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA1732D746B
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 09:35:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3F4E33025114
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:43:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1309E3099167
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBBE0366067;
-	Fri, 20 Mar 2026 08:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A15435BDCF;
+	Fri, 20 Mar 2026 08:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=klassert.de header.i=@klassert.de header.b="yX0mvro0"
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="ceRg2892"
 X-Original-To: netdev@vger.kernel.org
-Received: from fs1-de.slnx.de (fs1-de.slnx.de [116.202.84.118])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C37364933;
-	Fri, 20 Mar 2026 08:43:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.202.84.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C0336492D;
+	Fri, 20 Mar 2026 08:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773996192; cv=none; b=elAOc7EwXoxz7eYGl4ET0CzkpGC7ULiWPk4QAOEo2TV991iD0aEcPuhotLPQgghBEMe38HBJt9maBd4KXWpSiSgJJCj92FLmXSoE6Kr1r+IQrRxnQDhwbxnvGzmwx42EPgwmboWN9U8AfvAhvgYvQsrgm+odEioIYjSjc95jRho=
+	t=1773995732; cv=none; b=SKXuJkTnycwiET+ktACh/MlsAINXSIGuqIK659CcxuWRRHZyl9n6iH4ie/2iBVDtACfK/TvKrQ2zbnkWqghWtZppZg6VgJZany4+d6At22brYViTIw1BsKigSfvGStibLRfveFOakRc2tCAmAJBZaeaF6yQWy15RFTGclcp4X5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773996192; c=relaxed/simple;
-	bh=vtFVL9zMHQPk9UCOHXE78wRqptwzKdlhUB9DYYixB60=;
-	h=MIME-Version:From:To:Subject:Cc:Content-Type:Message-ID:Date:
-	 Content-Type; b=RhqSkDMkRq0Mu35fVD05G24dwM4tH5Z86hJcLfovA/m3cnMb6FVb3cMH35Ixll85etlE+r6vXZH6XC05VaQJMV/GlVoQshRiHD0i4tYQg3xcryLBpQZqnRDeg/LlgS+g/CB2wAxp0Hqxo8tLugbxXfPYib0OOeCNeeayd6PrHu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=klassert.de; spf=pass smtp.mailfrom=klassert.de; dkim=pass (2048-bit key) header.d=klassert.de header.i=@klassert.de header.b=yX0mvro0; arc=none smtp.client-ip=116.202.84.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=klassert.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=klassert.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=klassert.de; s=mx-de;
-	t=1773995533; bh=vtFVL9zMHQPk9UCOHXE78wRqptwzKdlhUB9DYYixB60=;
-	h=From:To:Subject:Cc:Date:From;
-	b=yX0mvro0iEjb4MfK6s325rbCzq7H8RtRJb2Bxrlr6hQSMKfMpNSiu4PQyYC3n5Ez7
-	 /uUp2Vc+X17M9RbPujtoDEXGb7c+SFt6Ujchk7uFCsKYgwDP2cqVOtazztbQEbyP1J
-	 Kh4xsbh45wSrY6/pASuop8QNpxAtUns3IXNMPP22q1ZI4JBt4ff/C7TZbsmy5BDMM7
-	 sVlRsVmbOEXicE0+o10X0jhk313ELbtAAjsAFX+qlptZVxOmdeBMfIFrMe0sR6JdUK
-	 AFFELi8+jldrKVGL51wWRInkledFEidIIcv/ZeydZsRT1QSwl1/2lwU2yYIOgoSw7L
-	 L+jhOo46KCiuA==
-Received: from nbg3-de (nbg3-de.slnx.de [IPv6:2a01:4f8:1c1a:f020::1])
-	by fs1-de.slnx.de (Postfix) with ESMTPSA id 9108314604BC;
-	Fri, 20 Mar 2026 08:32:12 +0000 (UTC)
+	s=arc-20240116; t=1773995732; c=relaxed/simple;
+	bh=XMv6Tt2lJmwz4M90Ro4a8aZCiBxqxgqLva3JWpVU/s4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kWKGQnwyo+ps2JJ9w3aYA4sM5IZdBHFvi8Qs76ZE5Uy4WN61e9J/aAXmK6ZZtapi5ItNHHwuYjgAUSQwZ/CuR0egLn8Ad08MlI8TNL+4DEPtTS3aMs3fkLon5jTZlv6/mnQkyqT0nHpgjpUcgpVJo5BBc41pSST3nXYr19LKol4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=ceRg2892; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 62K8Yxu461191271, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1773995699; bh=cE8OGoOY9Eg2trw+bwHylmKiCJkS5C/fSUXsUfErpL0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=ceRg2892p2rmJgNskUjFM4ATCD/Fq5YkwciYcVn0xtw6cLLcISyUPqM8/qbfi6dUI
+	 GA0rtJ1ykBfkChAFJW8oRmxPDl/kJTY7Jq0UUsAg3BoSVUVjuAwkZCRB3hasZpKpvJ
+	 mg82prn+YeeN+AfwouLoUsIYAcsQqirARf1bMJOUzmaaTenTgHQ9nfV8b+cn1LLR+0
+	 G8lGos4z4RBv3JlBXeQ/qv2qvXeaBSepjHxzaSzvF3f1NDNFL0PthbLiQokFrUx0sz
+	 OcAVkidSFZ/8n0AXULuF1R7kiOlAx0IyXP+12A83EmVVh2QH5dXqKlTBii96OHeGd+
+	 JyjXJRNUE+/CQ==
+Received: from mail.realtek.com (rtkexhmbs02.realtek.com.tw[172.21.6.41])
+	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 62K8Yxu461191271
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 20 Mar 2026 16:34:59 +0800
+Received: from RTKEXHMBS06.realtek.com.tw (10.21.1.56) by
+ RTKEXHMBS02.realtek.com.tw (172.21.6.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Fri, 20 Mar 2026 16:34:57 +0800
+Received: from fc40.realtek.com.tw (172.22.241.7) by
+ RTKEXHMBS06.realtek.com.tw (10.21.1.56) with Microsoft SMTP Server id
+ 15.2.1748.10 via Frontend Transport; Fri, 20 Mar 2026 16:34:57 +0800
+From: Chih Kai Hsu <hsu.chih.kai@realtek.com>
+To: <kuba@kernel.org>, <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <nic_swsd@realtek.com>,
+        <linux-kernel@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+        <edumazet@google.com>, <bjorn@mork.no>, <pabeni@redhat.com>,
+        Chih Kai Hsu
+	<hsu.chih.kai@realtek.com>
+Subject: [PATCH net-next v2 0/2] r8152: add helper functions for PLA/USB/PHY OCP registers
+Date: Fri, 20 Mar 2026 16:34:36 +0800
+Message-ID: <20260320083438.6295-447-nic_swsd@realtek.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: <steffen-ai@klassert.de>
-To: "Qi Tang" <tpluszz77@gmail.com>
-Subject: Re: [PATCH net] xfrm: hold skb->dev across async IPv6 transport reinject
-Cc: <steffen.klassert@secunet.com>, <netdev@vger.kernel.org>, 
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, 
-	<edumazet@google.com>, <kuba@kernel.org>, 
-	<pabeni@redhat.com>, <horms@kernel.org>, 
-	<stable@vger.kernel.org>, <steffen@klassert.de>
-Content-Type: text; charset="UTF-8"
-Message-ID: <189e7f89b082031f.2492293c508f2522.8ac0d063cc181f1a@nbg3-de>
-Date: Fri, 20 Mar 2026 08:32:12 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [6.49 / 15.00];
-	MULTIPLE_UNIQUE_HEADERS(6.65)[Content-Type];
-	BROKEN_CONTENT_TYPE(1.50)[];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[klassert.de,reject];
-	R_DKIM_ALLOW(-0.20)[klassert.de:s=mx-de];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_NEQ_ENVFROM(0.00)[hsu.chih.kai@realtek.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-269841-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269852-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	GREYLIST(0.00)[pass,meta];
-	FAKE_REPLY(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen-ai@klassert.de,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.997];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[klassert.de:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[realtek.com:+];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NO_DN(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 4C1E22D75F5
-X-Rspamd-Action: add header
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.995];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EA1732D746B
+X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spam: Yes
 
-Subject: Re: [PATCH net] xfrm: hold skb->dev across async IPv6 transport reinject
-In-Reply-To: <20260320073023.21873-1-tpluszz77@gmail.com>
-To: Qi Tang <tpluszz77@gmail.com>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com, herbert@gondor.apana.org.au, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, stable@vger.kernel.org
+v2:
+For patch #2, remove variable set but not used from r8153_init(),
+r8153b_init() and r8153c_init()
 
-The fix looks correct. A few comments:
+v1:
+Add bitwise operaion functions for PLA/USB/PHY OCP registers 
+to simplify the code.
 
-1. The approach of holding a netdev reference at enqueue time and
-   releasing it after async reinject properly addresses the UAF window.
-   The ordering in xfrm_trans_reinject() is key - caching the dev
-   pointer before calling finish() avoids touching skb->cb after a
-   callback that may consume/free the skb.
+Chih Kai Hsu (2):
+  r8152: add helper functions for PLA/USB OCP registers
+  r8152: add helper functions for PHY OCP registers
 
-2. One minor note: the net tree generally prefers netdev_hold() /
-   netdev_put() for reference tracking, but dev_hold() / dev_put()
-   is functionally equivalent here.
+ drivers/net/usb/r8152.c | 1810 ++++++++++++++-------------------------
+ 1 file changed, 639 insertions(+), 1171 deletions(-)
 
-3. The BUILD_BUG_ON() in xfrm_trans_queue_net() will catch any cb
-   size overflow, so that's covered.
-
-No functional issues observed.
-
-Reviewed-by: Steffen Klassert <steffen.klassert@secunet.com>
-
-Model: openai-codex/gpt-5.3-codex
+-- 
+2.34.1
 
 
