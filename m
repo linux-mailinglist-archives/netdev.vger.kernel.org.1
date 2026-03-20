@@ -1,141 +1,135 @@
-Return-Path: <netdev+bounces-270007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270008-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GMZZMZ+JvWnQ+gIAu9opvQ
-	(envelope-from <netdev+bounces-270007-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:53:35 +0100
+	id qPDqFyyMvWnY+wIAu9opvQ
+	(envelope-from <netdev+bounces-270008-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:04:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E01D2DEF76
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:53:35 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 172932DF20A
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:04:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7EAAB303DAA5
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 17:49:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 373833085B97
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF073033C0;
-	Fri, 20 Mar 2026 17:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D0703DE457;
+	Fri, 20 Mar 2026 18:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pWQ++Bbn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JcSBAWYz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877372874F5;
-	Fri, 20 Mar 2026 17:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C7AD3DE450;
+	Fri, 20 Mar 2026 18:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774028945; cv=none; b=qzY9Nnj/87YwAvGa0ZDrQqWpsMTPfPx6O9QmbTKnTlIYVrtg+3BlqjWWOjm0I3hRmDDeaK7gVRYfjNuGFql5+EvheW5Dq0/EJb6tH0RkGqXtwrf6n3+M1hpqX15AUyKT/INbYAz7vfvwiWryhF4MnXPmv6FdyC+I1Jb2vmDpCI4=
+	t=1774029657; cv=none; b=gF3qjZ1Zebr94gvOrJa4dD426OdGxPadJOVDvwcVrgolaZNsgus+yAo5OTkvwLOCt0O/0EbREF01Rc9orD/GCnsOhJy6f+k4buA/jRSJTa3MGhTSAp8UWUvx8KDnbYUEgozgBemqsUhgN2ilZA80foiL4Cc9wyFT4QG4dC+LSvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774028945; c=relaxed/simple;
-	bh=x5coYV2m0Hrf853jK3AxLiJPMYhCiTplE5pkNnUBd3s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d80G9FZ/Dvur5jaNGJSw7LPdK0fHlS3Eqegrlsx4mPcixTzRHAppOLJb3kgKU/JO0/YLMzsxze+URTI/sEkSh9jtlOfdX14eRwWjXWIdZ0FOUhVj7fFh37Qc4ysCyHvQZCGpyv8PgQOA/dOgvC3CnJpXurd8wnQzCFeoaqNzdUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pWQ++Bbn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4789CC2BC87;
-	Fri, 20 Mar 2026 17:49:01 +0000 (UTC)
+	s=arc-20240116; t=1774029657; c=relaxed/simple;
+	bh=UblSInEiA/mfUiA8e8q0rtmtS/Sqfi8+Dh2007xpxwY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P9a9NULNI16DSzNYTgNMgLcpur9BAcZFlZQ1DaR+yycCjkUrTFJAlgqwycEEIzJvstFAzQ+7vj+1bIdDyiM5kituzBCt/6MPVBoLVC6IIXFoohXI8gUEWTGqK9/tk6/5ok/pEibwlv4g9VtscgEyt4Qa9ox6nRf9b8GBsoZxP08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JcSBAWYz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8216EC4CEF7;
+	Fri, 20 Mar 2026 18:00:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774028945;
-	bh=x5coYV2m0Hrf853jK3AxLiJPMYhCiTplE5pkNnUBd3s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pWQ++BbnJGdNK5Nxc684tR8zXPop5sbC7wcbUaQJcZwAaxn40MpVo0CpwrGGXb/Am
-	 vZSQm93CQ8talTNdSjhcYjj0kEHNyBzHzIQPGeWPatJHWnPZ/V7s8TEpxjZH1va++J
-	 TCZz5IVGrhhJtaZd3qCw8hByuO6gs0bPVESa+5eacXUd9J+e2fJnH9ZpqFvz29jlgw
-	 cFu0ZI4HUsFRcv8XF+nXoCFNLYTwffIajLtXbHumGG0COkbPKwtSSldZNtGYrNE8eh
-	 vH6nwITJIQaRTKYEHb50m4XI5Vdfnn/w/REc/HShm2WZr/Ksdi8r6Owinh4GQDS1Gu
-	 Z4Gd1uDSH3/4A==
-From: Simon Horman <horms@kernel.org>
-To: emil.s.tantilov@intel.com
-Cc: Simon Horman <horms@kernel.org>,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	willemb@google.com,
-	stable@vger.kernel.org,
-	decot@google.com,
-	bpf@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	edumazet@google.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	sdf@fomichev.me,
-	aleksandr.loktionov@intel.com,
-	aleksander.lobakin@intel.com,
-	john.fastabend@gmail.com,
-	hawk@kernel.org
-Subject: Re: [PATCH iwl-net v2] idpf: fix xdp crash in soft reset error path
-Date: Fri, 20 Mar 2026 17:48:43 +0000
-Message-ID: <20260320174843.137651-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260319224159.23885-1-emil.s.tantilov@intel.com>
-References: <20260319224159.23885-1-emil.s.tantilov@intel.com>
+	s=k20201202; t=1774029656;
+	bh=UblSInEiA/mfUiA8e8q0rtmtS/Sqfi8+Dh2007xpxwY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JcSBAWYzbwb5FwOKfwL5RuCX+bSD9AbMhCF/n4jwvVN1bWeHCpVGP/hiXMsfZbxbe
+	 fvRYC2HpUbdIGmx/5RHfXPdEN0BVguYdoM0FQefCaiuZSc0xI8vDLauW+LZD9rWd7R
+	 yKNlFjxoAUJWm5Tc7mfB4wg+IDtkslPQmhBLXalsUtk5noQFPH+6dkCsGrZS0NGW/F
+	 H/FHy+cfLtEUkanQ+aNdocE0wN1VAncZgvxqNwvlzC5XEZS5gsLrdB4it5SqCtOBfk
+	 TimVgqai6n35QuH++Ebyg6jnhb8WF8uPwEXGn15ATT7X9D0oeervL4fvTM9M+xRqcg
+	 CsUz9Bc/YnN4A==
+Date: Fri, 20 Mar 2026 11:00:56 -0700
+From: Kees Cook <kees@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Edward Cree <ecree.xilinx@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Jeff Garzik <jgarzik@redhat.com>,
+	Ben Hutchings <bhutchings@solarflare.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org,
+	linux-net-drivers@amd.com, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: Re: [PATCH] net: sfc: avoid format string warning
+Message-ID: <202603201100.210F1C73E0@keescook>
+References: <20260320151924.3474821-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260320151924.3474821-1-arnd@kernel.org>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,google.com,vger.kernel.org,intel.com,lists.osuosl.org,redhat.com,lunn.ch,davemloft.net,fomichev.me,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TAGGED_FROM(0.00)[bounces-270007-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270008-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,solarflare.com,arndb.de,amd.com,debian.org,vger.kernel.org,lists.linux.dev];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	NEURAL_HAM(-0.00)[-0.975];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kees@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.913];
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: 2E01D2DEF76
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 172932DF20A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Fri, Mar 20, 2026 at 04:19:16PM +0100, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> Three sfc drivers contain the same *_fill_test() function that takes
+> a format string argument that gets passed down to snprintf(), producing
+> a warning with clang-22:
+> 
+> drivers/net/ethernet/sfc/falcon/ethtool.c:227:60: error: diagnostic behavior may be improved by adding
+>       the 'format(printf, 7, 8)' attribute to the declaration of 'ef4_fill_test' [-Werror,-Wmissing-format-attribute]
+>   210 |                 snprintf(test_str, sizeof(test_str), test_format, test_id);
+>       |                                                                          ^
+> drivers/net/ethernet/sfc/falcon/ethtool.c:210:13: note: 'ef4_fill_test' declared here
+> 
+> Rework these to take a varargs based test_format that allows better
+> type checking and avoids this warning.
+> 
+> Fixes: 3273c2e8c66a ("[netdrvr] sfc: sfc: Add self-test support")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-idpf: fix xdp crash in soft reset error path
+Nice rework!
 
-This commit fixes a NULL pointer dereference that occurs when
-idpf_vport_open() fails during soft reset. The fix restores
-vport->xdp_prog in the error path and updates the restart check in
-idpf_xsk_pool_setup() to use IDPF_VPORT_UP instead of netif_running().
+Reviewed-by: Kees Cook <kees@kernel.org>
 
-> Fixes: 3d57b2c00f09 ("idpf: add XSk pool initialization")
-
-The Fixes: tag may not be targeting the correct commit. The primary bug
-being fixed is the NULL pointer dereference crash in idpf_xdp_setup_prog()
-that occurs when soft reset fails and vport->xdp_prog is not restored.
-
-Looking at the git history, this missing restoration was introduced in
-commit 705457e7211f ("idpf: implement XDP_SETUP_PROG in ndo_bpf for
-splitq"), where idpf_xdp_setup_prog() was first implemented. While commit
-3d57b2c00f09 introduced the secondary issue with the netif_running()
-check, the main crash fix addresses code from commit 705457e7211f.
-
-Should the Fixes: tag point to commit 705457e7211f instead?
+-- 
+Kees Cook
 
