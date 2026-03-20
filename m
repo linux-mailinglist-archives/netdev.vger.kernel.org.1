@@ -1,168 +1,128 @@
-Return-Path: <netdev+bounces-270051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270052-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6ETNHjulvWm4/wIAu9opvQ
-	(envelope-from <netdev+bounces-270051-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 20:51:23 +0100
+	id KFgnOkSmvWm4/wIAu9opvQ
+	(envelope-from <netdev+bounces-270052-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 20:55:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AB672E07FD
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 20:51:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91ED02E0914
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 20:55:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8251B315511C
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:44:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8BCE8304F5F0
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81ED7352C22;
-	Fri, 20 Mar 2026 19:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E2D353EF2;
+	Fri, 20 Mar 2026 19:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U9HVPIHV"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YD+TfJQR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F0E7282F22
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 19:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E38353EE3
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 19:45:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774035750; cv=none; b=ni62Rsb57v9bIJTw7T/UswPFWKvtpQpdRFPqL6oDXpk97FnNz0zoiyWvnbL2np4frPGdaxVt14OfWu5uzpFpv2ScOPr9tMTprgOmf/+tt72CBiI+ucMA8zqMH7NtNFNmh+okZnIk+Hp9YpXeFM2yvi7E63FcbWT2cMvlHxEPP9s=
+	t=1774035917; cv=none; b=t7JawKPL+vxsmIPvtnGe7CWmMuHP+5NtrTlWnXbyFeZbGcWNs4TgNusAvtX/0cjklG1RuxG7z7U5h8jEMbU/kHDtnXL54cGM/0gn4REEHDr4Urzaf7vK7Vwkpk1Ntr88eTqrlZuR6Xcez/pibK2RJ/heh46UuN2S8A+LQYzTxtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774035750; c=relaxed/simple;
-	bh=/lgrBaf4Lu3BSJzE5WFisPoWxzCA+1LAaAJ4lkMWWY0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LcaRBcCVq/5rn5tqb64BoMPrZs510+AaxTlvZSneDNNhWGsyCfXpmKwU6ocTqioHUaoSGDqUR4FGz9HI8+VC5aSXksN8cNVIxfEvvm4EZieojb2iXt2iqseIs/GRBfj8BjLIt4GyQd7BUNkD/YRh0Avm9XA1ML6dNUkzQMOqS9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U9HVPIHV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 597F4C4CEF7;
-	Fri, 20 Mar 2026 19:42:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774035750;
-	bh=/lgrBaf4Lu3BSJzE5WFisPoWxzCA+1LAaAJ4lkMWWY0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=U9HVPIHVL7LzsCHeLvM0C7u6qH4sU6KNGLw5qUDfnjogm4hHGaG1lH6xOGOJ8ejOz
-	 ouh3VH3tjxUtYjt0oV2zCxqJMJ3xJgXUd7yzXtrAQ4DkMr4QBX8/FplPch3stDba14
-	 jPFBzJn0X5+a9W6uIV9wgnJaV39i/xZ3MQOyGqzHyy5aBKQyd2F8lZqgZXUR3HWPOd
-	 HSbMttKB+KOsxQ7JFxNd2XUtLD4fySPrbyLv+Tjf+/hc4T0Ldrly8bCPux6DrMraLL
-	 0UNrcs42GyYoZK17feRlfBnYXPzB5B0fIxbmhaJwAA5T4fdxefFsulQHHWdLDjGixA
-	 qDzUG5okmTILA==
-From: Simon Horman <horms@kernel.org>
-To: rjethwani@purestorage.com
-Cc: Simon Horman <horms@kernel.org>,
-	edumazet@google.com,
-	kuba@kernel.org,
-	mbloch@nvidia.com,
-	john.fastabend@gmail.com,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	sd@queasysnail.net,
-	pabeni@redhat.com,
-	saeedm@nvidia.com,
-	borisp@nvidia.com,
-	tariqt@nvidia.com,
-	leon@kernel.org
-Subject: Re: [PATCH v8 5/6] tls: add hardware offload key update support
-Date: Fri, 20 Mar 2026 19:42:24 +0000
-Message-ID: <20260320194224.175550-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260319213323.235559-6-rjethwani@purestorage.com>
-References: <20260319213323.235559-6-rjethwani@purestorage.com>
+	s=arc-20240116; t=1774035917; c=relaxed/simple;
+	bh=5JNoRIZLe4Ou2jrOMB2xOmTayt+1L7Wmmb3lHWPbiaw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DNMvegg49MQO0FQyJHLkkCeNWiOSQA/ziDN8MspsV4gST3OvjQvu2EiiRe41j3N/JTKjAYKEzzvz91VhgRPpk9wlhfqyxuhlCTuyD2PfkZOoxd6vgRR+s8R+gv1UPifsPuoEmb/1oraHbtFVi6wYRBgP9vBjJoKiZ79aZ4XywQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YD+TfJQR; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id A4E744E42756;
+	Fri, 20 Mar 2026 19:45:06 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 70AD8600E0;
+	Fri, 20 Mar 2026 19:45:06 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 270C910450CC8;
+	Fri, 20 Mar 2026 20:44:59 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1774035905; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=BuJW3TBVNL5rt2a/+qn2HmhsvlFQt1It2fxtCdI3ujE=;
+	b=YD+TfJQRAhpGsUsFY1kh5fdIAAF9CqyXudXNquKWNdbwBpGhMPzoelzjG3+WgIx5XNsL7R
+	jsrKax+pF5ksGNfZTGtnPriCmgokA2WESmtTDLD5saZ86cMGE6mY0T0v0IKHJjm+oT4iC5
+	VIlyiZmCWSO5Ht7EblUn8yoZeiy/9aZTxdZXshMUwpHVNZtlqz83MSRq369qjm/GU2EaET
+	Wsibnb/r2t+MO1DwsDOTcmrRV6LYILCF6ynf3EmEAKmXw8wZGWho3hXuLdWZFJjAkP0+zQ
+	Y/UZ3xIPm1CuqpmSs0iQ7LNDzMyC1idDAB2iD7uzaaYs0J4mrGohaPPPYS9HcA==
+Message-ID: <5bfb0ca5-1618-48af-824f-07bbf7c35e9a@bootlin.com>
+Date: Fri, 20 Mar 2026 20:44:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/6] net: stmmac: cleanup stmmac_xmit()
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>
+References: <ab15_JvLGFtUH_3x@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <ab15_JvLGFtUH_3x@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,nvidia.com,gmail.com,vger.kernel.org,davemloft.net,queasysnail.net,redhat.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-270051-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270052-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: 2AB672E07FD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 91ED02E0914
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Hi Rusell,
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-tls: add hardware offload key update support
+On 20/03/2026 17:46, Russell King (Oracle) wrote:
+> This series continues on from part 2 of the descriptor cleanups, making
+> stmmac_xmit() more readable.
+> 
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 103 +++++++++++-----------
+>  1 file changed, 52 insertions(+), 51 deletions(-)
+> 
 
-Add TLS KeyUpdate (rekey) support for hardware offload connections.
-When hardware rekey fails, the connection gracefully degrades to
-software encryption/decryption while maintaining TLS_HW configuration.
-Tested on Mellanox ConnectX-6 Dx (Crypto Enabled) with multiple
-TLS 1.3 key update cycles.
+Tested the entire series on Socfpga, no regressions found, and perfs are
+the same as before so for the series,
 
-> tls: add hardware offload key update support
->
-> Add TLS KeyUpdate (rekey) support for hardware offload connections.
->
-> When hardware rekey fails, the connection gracefully degrades to
-> software encryption/decryption while maintaining TLS_HW configuration.
+Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-This commit message claims the connection "gracefully degrades to
-software encryption/decryption" when hardware rekey fails. However,
-the implementation appears inconsistent with this description.
+Maxime
 
-Looking at the actual code behavior in net/tls/tls_main.c:
-
-> @@ -711,64 +713,68 @@ static int do_tls_setsockopt_conf(struct sock *sk, sockptr_t optval,
->  	}
->
->  	if (tx) {
-[ ... ]
-> +		} else if (update && ctx->tx_conf == TLS_HW) {
-> +			/* HW rekey failed - return the actual error.
-> +			 * Cannot fall back to SW for an existing HW connection.
-> +			 */
->  			goto err_crypto_info;
-
-When hardware rekey fails on an existing TLS_HW TX connection, the code
-returns an error rather than degrading to software mode. The same pattern
-appears for RX:
-
-[ ... ]
-> +		} else if (update && ctx->rx_conf == TLS_HW) {
-> +			/* HW rekey failed - return the actual error.
-> +			 * Cannot fall back to SW for an existing HW connection.
-> +			 */
->  			goto err_crypto_info;
-
-The comments explicitly state "Cannot fall back to SW for an existing HW
-connection." This contradicts the commit message's claim of graceful
-degradation.
-
-Could the commit message be updated to accurately describe the error
-handling behavior? This inconsistency was noted by Sabrina Dubroca during
-review of v7, and remains in v8:
-https://lore.kernel.org/netdev/aZxm8hSrVMkEIc2O@krikkit/
-
-Additionally, the commit message style may be worth reviewing. Sabrina
-suggested looking through git log for net/ to match the typical commit
-message format used in the networking subsystem.
 
