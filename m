@@ -1,117 +1,117 @@
-Return-Path: <netdev+bounces-269967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269968-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Fj0NVVtvWl49wIAu9opvQ
-	(envelope-from <netdev+bounces-269967-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 16:52:53 +0100
+	id EHwQNntuvWme9wIAu9opvQ
+	(envelope-from <netdev+bounces-269968-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 16:57:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 340D52DCEB9
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 16:52:53 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842AD2DCF70
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 16:57:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4F3F4304C4A1
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 15:51:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D3C843008C3A
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 15:57:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C763B8D7F;
-	Fri, 20 Mar 2026 15:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758283BAD83;
+	Fri, 20 Mar 2026 15:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jeurXLQA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S1pOgfGH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B93F3B3887;
-	Fri, 20 Mar 2026 15:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB31E3C3447;
+	Fri, 20 Mar 2026 15:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774021889; cv=fail; b=d6b2dpIuwpmbzAv9vntValSjO6Q6c4FF/wTOmb+V7a6sOzeBNwLfsWJqK/rGwd5VrlSNu75vbg8UVvAXYRmWdw0qPFzSy23fs1pgVK6eFjJdZTTX0kVS6Ens5vpn5xw0osTZwU0kVmbriFJujvb1WubzkWbiG+beYx6fPfJmEPQ=
+	t=1774022264; cv=fail; b=MYFZeF0Z0j6h58DzfPwWj7AgBMe9fZNgYP+jEXxLrIv/buwlVwzaoJT+eJCE/+JxnL1lBi/z608JbENhPx1/Dlgs/Zmp66Gdzu5TB23eru4q3ruWv2XHv3M/mQKC63fDCZqU2ciDG53GQbwvTpDS9DoeQPV1xtQnJ/9sc7921og=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774021889; c=relaxed/simple;
-	bh=AXIsr8hqZI7tzSUvLwqnAJOX2nFLVoY9xRzTUdkbrR4=;
+	s=arc-20240116; t=1774022264; c=relaxed/simple;
+	bh=VxsDSwobM1P2hkPNe409EUTi3EtM5ImGN8bPIBlKWBE=;
 	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=PrX6V+hLQ0nUIKk3Kwpdcyzgw+4EEMG/beqxhesSy8mi+6Bq/aMeNPR+yC0odYVnLKoLptMrGM0VXDxXBeaRvWQQtwmyzYUVhUapoJhirkr8rFkV+6OInmISd2VgMltLoecTdeAl3lVk2qkhYgaejQDwdSqA0h3MDl53bUP4gWw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jeurXLQA; arc=fail smtp.client-ip=192.198.163.7
+	 Content-Disposition:In-Reply-To:MIME-Version; b=lIv1l9ZHkCwksbucSJi8trX9wlBUotINJpHNcllmMl/bO0z4auDZpl9mGYVql1i8SWJ9Th+4EqE6ylXO3Lze6nLF+iGkssTIew1pHlxpuQkIPzZb6thrwtlQF3kEmdFGzED/zmEE+wMpHduhzTf0/3ygwRwdgjlsGoEZGRB567Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S1pOgfGH; arc=fail smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774021887; x=1805557887;
+  t=1774022263; x=1805558263;
   h=date:from:to:cc:subject:message-id:references:
    content-transfer-encoding:in-reply-to:mime-version;
-  bh=AXIsr8hqZI7tzSUvLwqnAJOX2nFLVoY9xRzTUdkbrR4=;
-  b=jeurXLQAVs1HKvlA6fqSFXHb3mjJxYI3Ty1WoTgsO+sybxfFWsfZZvGA
-   sltlML+A5XsK/14WeqPP2UGHnvHsHkJESEz0rONYaaUvQTae4zP5bsb+E
-   yQKT6PAZtXAwXlIkGRRsRG5cDl6ki5rXv0CHNR5vfKckONCj+zM3x5Lo2
-   PgQPnSSnqOkCGyt2YaLf09p8XLBJ5Pj8bZNcOieR/YSwQw8YDSK+NAaXd
-   VWQwl3H7/zX6Z6SweyJheJLoXCARcF8aW9K9W/vqqr9VzgUnD3zo6v5lJ
-   3F45fXFmhIepTXOOb+l5X8hupyl6nFH1s6jG26YuaFDRDn68+TU1yiR7r
-   A==;
-X-CSE-ConnectionGUID: 4ALNg2GOTxW3ht8vj3o+1w==
-X-CSE-MsgGUID: +0YFv1OMRm6Vujq4TFVtKg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11735"; a="100563565"
+  bh=VxsDSwobM1P2hkPNe409EUTi3EtM5ImGN8bPIBlKWBE=;
+  b=S1pOgfGHPK7Ls0gG34NpChQsfJeUyDk/rav19IVPusnJRJiFtnTJgu9B
+   SMbNqveDXr6E3AUJ0UBVavITHttMzqnn1JhZT66n2eTCgcdIJDam8paWy
+   fII4felVWENS+flgZbOkqqHpD9epmeXrYe6ceUI5skORMBo25Qun7BeDG
+   ZbC4dGMwPF0UCfV/Jj+wzv9lzOxc9BnEccTljbqpRtehabji4/8ChY0O5
+   0/QX06gwmY1AC8ywGywUqjQ8RgOOYSa8s3mXnJFnErkoZQupP2/gOIM+I
+   KFtyApE5cn8VldbM22DFKcm3nhIzgPw2b5vvGl2znSHi7EbtcPAUiC6xF
+   w==;
+X-CSE-ConnectionGUID: qAOhyUA1Q2+cUOSrQVjh/A==
+X-CSE-MsgGUID: BAC25lZhSCaalUKPUM4+0w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11735"; a="92494876"
 X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="100563565"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2026 08:51:27 -0700
-X-CSE-ConnectionGUID: zrltfJxiTDiT7PSDKT6rTA==
-X-CSE-MsgGUID: r8FqTpInQ5SXa3qEYH7Djw==
+   d="scan'208";a="92494876"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2026 08:57:42 -0700
+X-CSE-ConnectionGUID: E/sdFPzHRXy4TeIpYgX4ww==
+X-CSE-MsgGUID: HT4umgjiTo6BFes8xyw+LQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="220655879"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2026 08:51:26 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+   d="scan'208";a="261227795"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2026 08:57:41 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 20 Mar 2026 08:51:26 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ 15.2.2562.37; Fri, 20 Mar 2026 08:57:41 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Fri, 20 Mar 2026 08:51:26 -0700
-Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.25) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ 15.2.2562.37 via Frontend Transport; Fri, 20 Mar 2026 08:57:41 -0700
+Received: from CH1PR05CU001.outbound.protection.outlook.com (52.101.193.30) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 20 Mar 2026 08:51:25 -0700
+ 15.2.2562.37; Fri, 20 Mar 2026 08:57:39 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lk4DT7vLNqHWP4mIXF1UJQQpaaJ3rL4OX50JCP1OyW9+IvVFcR4zrbYvj73Qh/zoXuPB+1wuiXUZtdA1mnVdpOvJvBxYTq1qpNqY/OCohYlBphySBA6dPu9Qlu2ofvs9/tpsLbN2aNE/439MSVj7scoPRGjhADJ3c0rwTCg+AJp0Nvu/wyuKd9mQveXz122AJFVC1/UGfug5bv3/SKoLH8GCBcd2ZnAE8oTQtmKXbtXCMfD6HPehZMGocrQ0+X6AWK1pgn5So0XwxkyaUsi+JsA5EpCsbIR3pXdTpW1U8khEEP21/XPfRaF0G0q1Ia1g4u/rJZTNKS8vcv+o7O3YZA==
+ b=cOd5RsErrU/BEyPC6hNedjqZdZaFNdE1G43IBv5rLfoG18UX5z9tVy9euKpS0jgINfkufjApNOQT5/Od2lOBVBNUEk75PYi+Ndi6BNa/CD+yHj9gByr9z/3XKXjnWxedMUxRbnpyz5OKldrv5yGxDTsQ0veT/hosg0hQCMpJTUCebe4FyBKqF4p5LTLKhN0uaHkd1yNtLEGhoAeP1uXj97Zo7IeVNTunUnVvV1W62lidx8UqsR3DUw+GL24nFaxmMdpOh0/yT/mKy086zB4D/3dF7gTW17cDJD9gP0G3WhdvI3GmzeuSHvNpxhbDgfR6vancWABAS1OdD5rBW7jJag==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1B9PsoROfvkoWwhC+tzP+ToyjGSeNh65u7yfu8bR8Og=;
- b=HL01LZ0+uTnNiNL+VEDTkOFQZgxyJHVggvVn4iRE14dAmXtFdLzSW4v0pdQCNJqvgXF6UXTd04ZBBanxZF8ws1XHMlCz+mmOQmNLZteuM9XeOFTEyNnRbVdjMFz0rIwrEi5VW0zHGab3Ai2VsHtBH4SEIYQIL2e9Mf3TC34phGkMHKg/eyhaZBlB1FBoVwpro6kFizxuK4rsnpKtd/kYrRqQvfrSJg1VI6mVxBomBWro+lAd76h8lIQehMDfE88lOW+r2LvouCfiY0KBBgrB3wfNGsgpmp25738Fhdf1LHXF+6fSHcYe2hby6lHneaZMZ0dDI+fxxWb1xB2UyD6nqA==
+ bh=SzztiCRvD29Ea4TtKFGMx5LLb9UR1fyoMcP5fKUvr3E=;
+ b=Ab+bi63v07CD4gY8nI/AX28vSkhWgAc1KBGDUiflaqS6qe/4AEljOaOFjSUP28gdHcQkTj+tnNfojLvB2pffdRZYLtH6cnyxxEAYJrVUdNB3Ax5th/Hj9H2PW/f4itZlz/Hm3IIP4KCCWlgR3ujPGQujwG/MCPjv199eyZhK1+GqQ2/8t9yhzMCt+1O0VnpxuD/9djQ7Q8L10G8O8140Yh9Fb6QZspZfRxOgn4sIa+Wa3N+3w1Tz9x22XAynpFlhThxvVwSAxOMdpXd1U+ZMs6hkdYT5QXs3m7JpYUDSOmA+UkXpC1lpXFJqjrHPmQkXiIEWRJO/dx7uK0H0h6rpng==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- SA1PR11MB6920.namprd11.prod.outlook.com (2603:10b6:806:2bb::9) with Microsoft
+ SA0PR11MB4672.namprd11.prod.outlook.com (2603:10b6:806:96::24) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9745.10; Fri, 20 Mar 2026 15:51:23 +0000
+ 15.20.9745.13; Fri, 20 Mar 2026 15:57:37 +0000
 Received: from DM4PR11MB6117.namprd11.prod.outlook.com
  ([fe80::d9b3:e942:2686:3cdd]) by DM4PR11MB6117.namprd11.prod.outlook.com
  ([fe80::d9b3:e942:2686:3cdd%6]) with mapi id 15.20.9745.012; Fri, 20 Mar 2026
- 15:51:22 +0000
-Date: Fri, 20 Mar 2026 16:51:16 +0100
+ 15:57:36 +0000
+Date: Fri, 20 Mar 2026 16:57:29 +0100
 From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 To: =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>
 CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
 	<magnus.karlsson@intel.com>, <stfomichev@gmail.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <horms@kernel.org>, <larysa.zaremba@intel.com>,
 	<aleksander.lobakin@intel.com>
-Subject: Re: [PATCH v2 net 5/8] xsk: validate MTU against usable frame size
- on bind
-Message-ID: <ab1s9J5yGxCbqB28@boxer>
+Subject: Re: [PATCH v2 net 3/8] ice: do not round up result of dbuf
+ calculation for xsk pool
+Message-ID: <ab1uaeVELU9FLPXJ@boxer>
 References: <20260319175538.479139-1-maciej.fijalkowski@intel.com>
- <20260319175538.479139-6-maciej.fijalkowski@intel.com>
- <87qzpeopzr.fsf@all.your.base.are.belong.to.us>
+ <20260319175538.479139-4-maciej.fijalkowski@intel.com>
+ <87y0jmoqwk.fsf@all.your.base.are.belong.to.us>
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87qzpeopzr.fsf@all.your.base.are.belong.to.us>
-X-ClientProxiedBy: VI1PR07CA0212.eurprd07.prod.outlook.com
- (2603:10a6:802:58::15) To DM4PR11MB6117.namprd11.prod.outlook.com
+In-Reply-To: <87y0jmoqwk.fsf@all.your.base.are.belong.to.us>
+X-ClientProxiedBy: VI1PR10CA0110.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:803:28::39) To DM4PR11MB6117.namprd11.prod.outlook.com
  (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -120,69 +120,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|SA1PR11MB6920:EE_
-X-MS-Office365-Filtering-Correlation-Id: 109968e5-13e4-4b44-31ca-08de86988922
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|SA0PR11MB4672:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4f6074f4-a59c-43ab-3dc6-08de869967af
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info: EB2sJYZkdk6kxHdglz/z7tRgbkstrzh4Wl0sfCm5JgKwhszXSB4gZSP/qF4me/d7RkDPSVYMo2v0eS01zyAjvxVnIOoCqYqtJcPIOxDy7lDm6KwmgxX2PsYKHHaIZHJ9Tsk1fanAIY6/P8uUNO9DrVC7wmcWWj0CBp/2kEfN2DBbdGNzwhcFSlQXGFThPh1yjnfsWtvhSIrfRxE/gdPcLFwHrprkJmj6rk7vjymwJM4mAYreTCvWR97BodltGrl34S3GpBv0B9cr2pGe80WGqD7HNY2eo31i/BmJ2HRgRFM2crAXHYFisIv7t3OBKewcyOtJnGQD0eJGlOX/YK4qZvUguNZOvVV/FxZ3Lx/XBbtY9iS4g493cAz1X1F9ngCV/d9XoLmrh0HtM6uHFatvV2kUl0dg9iPK4Ns2wctil1XF7JEMiN0FxsmyxU/hp3BE2bld3G45YGmoiDn3OOlqZTbGCHKqpmRyoBbFnTMtMm1bWpW2oNFPClMr9r9LXows/gYoAWLx8WxkS5ljsnPnEXxrZ5x1y4Bw1IbFXYJ3USyUgiCOClmKV25qI4XvpEHzrj4rDoDA15SdIm7PU0VqFT5GZ/NoL06EQAllqyoiDih6DRyVBOI71TXdUJXsOejuQTu2A96OYUzeVdLAY4oSZ45IM6daNwO+wiKDp+XddReu+NrYyDBSLabr0I43TUVWPOUqfGyJzeF4Fim+XkvZlRf9KVbcyg1MzkDoSLcEVck=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info: /L+9krLAgXkhjR7qBr1bAFUY70DTxoRq/01gY0V0Q6HLxWTNbC8ReCa5NXjeuZtkeCX772pfXOGAA+j/SdFpB9ZhuBhmw+sBQG62a+PDj3zpxPllDACIzJzvhg4gjCaxkBNg01diEtxhlmU1NQ16T6KuhgaXIiWR4D7ZODM4H+Txfsp/gfyYkwjhoU6a3+3jF6xiAYrW8vs/NX0F/NQgzRLnn3/oKqIwi1oM6A30AMo4gvesBhFBl549+k0/0GxM2uAJ7o3f77TRVTLRyOelR3MpGnIJ9Lp/3e1oH1vjswhKZROfzKwUGP8FNWyOovP5AylRXKPZCNnZkwKIHOATYllfPonYpcLYtNCFqRHZwdX5euq+nwtqNum9p+gf0lYHxp3qTDzeKY5DVD3LhlYwPWRoZrRCyPhKOcuvgVeQfMQbuWVS6YLZKUxZqq4xIZiTUFm2HMpltz+hXh+/4PUwXxroL+MSw0Q1jkSRbU1+LCGIj+pGIbox7/QfvozDD4fVjs4QO0OLj6dBictmWer/ZsFpNUK6QlRQUpevG20UXb00iqALwYV72P8UrxgDTiXUy+Gdp7WqA94GvuKMzLZt1XsJYpSYGmcTqi2UJHjKLgMkSw+rjaSiP9jN682PGTRYfauHkJepetbpbpU++BAutqWcYUqExLEkk8q/BeVb4gty3l9hoqpqhlUezY+UEZS5fcZsxCisqlR3wr0ZTYU21uGFiD2a8jI8MiZXmT32FSI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?EL91fIrYu+0o6jP3I6bx2tjRM0qQ44gD//oQpNXP4Jzfcie9d3vnIL7gsu?=
- =?iso-8859-1?Q?JmXOY7SjxGQgjKpzSDMcIWwdOOpe5hjaCazCORee+7HdkrBkvfyu1WgBS8?=
- =?iso-8859-1?Q?bCGPvTLBAmEu8blPhj6/cOvBI/69deS2AJqNyrTmMDIeB4mdVqu9KLEadK?=
- =?iso-8859-1?Q?SuwTEtWyRwzrJap8szxFfdX3wf2x0lNb7im66juNAly6k9Mzl8LtT5Tjkb?=
- =?iso-8859-1?Q?gIMNzORhiLVUqfqgYmL2n9YZuHt+5Z1w1WTVli6EAvpuJQUlD1+UeiwUGu?=
- =?iso-8859-1?Q?UHvKcHMsYrgc1vQN+VxD+vNxBkhv+GQqsWX8lsY3jKOyJr8mDtgVzJXwTu?=
- =?iso-8859-1?Q?IblLGYI5QkFa0IhziEGEJ0CFbmviuC7/m06/50HnJPA+T04Fa3N39oDSoy?=
- =?iso-8859-1?Q?3hPM5Ymp5jAbVCM498lBRP/NAejVbOBk/t9rGVe/Nv3WJldlfjVopR+jch?=
- =?iso-8859-1?Q?/6o7PGnHI3l4tV9pc27yIoA/Bsh+sElX2YWGin/j7Q09MytMcq1zi45rQ6?=
- =?iso-8859-1?Q?v2BYISOhdgwm61hirDVXurwT+E+KMJgWZsABbfsVK5sgUu/1Govv1Avgb6?=
- =?iso-8859-1?Q?ulVBk+V3wudHKhtkg5mj1QZXM81ckP6afYZmFQrR6AHu1K7qm2+fIVNvRu?=
- =?iso-8859-1?Q?3B5yGSC82b2omYGe0t3EGoVdRySrvYwvxnrZ3tHeAsY3uDTIdof+58ev/z?=
- =?iso-8859-1?Q?XoS/kLul3ctd/fAv6AE2/fg8O7CQOYgH4NawhHCuoUtlIh1XMcVpgVVN5W?=
- =?iso-8859-1?Q?DpPhtFpzfefcpP5Lmei59AcVf6rm5btwEcHLgXfvkYf1coxGOXKQjbXOxG?=
- =?iso-8859-1?Q?JFVl6RgObnjFsy7RIgW3hzvjcIor75gK9AHt+I29mrrk7NHKCD4dz9/Vhk?=
- =?iso-8859-1?Q?iokeX7T49UymgcI1p7rRAq58BxR4I82a4BVSoAn+7qRVeDL15afPfJvX+e?=
- =?iso-8859-1?Q?ctmRys4XQ7wa032TF13tdeffeBB6YnO5WIPy/JPg2U+UGh28/229s57K1K?=
- =?iso-8859-1?Q?J1/H3erKssOxO7JtELwd6iGrE0fysUinpQdv6BW3y+ZvwOS8oN8ERXMpZP?=
- =?iso-8859-1?Q?UuWUgriitun00Fs06sIMiyyzJpGGRyhA4cY8jX0IAq7vyC6ZxfkdaWljDR?=
- =?iso-8859-1?Q?vNiA34PYb1k8VxVy2JMOc0Kqv2u/3KrmKmgrVshZxUt4GIiOQ3gTsEIoRc?=
- =?iso-8859-1?Q?dH9hvLc88eHaNTNWfokn/xDHjMdr7ngkTBNgsdDSDez3bdRbtbQyledF0B?=
- =?iso-8859-1?Q?3+AeNEd46fqqJn20P8N9PZ0OSG9kKzQKJ3Ll7jScrGHusAemmt1JMDOf9A?=
- =?iso-8859-1?Q?dPL8g3W4TS4x2FfW/mL5ITIgMqDmOTlG/i2dB9Ies/5pVaKNyWYRtDIItA?=
- =?iso-8859-1?Q?yWll6sI2uEP0EJlyBVwD8sJxxuEEbSwXbjdASdeQG0CeDeK2Be1miwXFG/?=
- =?iso-8859-1?Q?gGHJewkyya3PU2lwZQz3Mzmji3Wq4rw433LHrsZvYVwiFYsWenJvxH45jt?=
- =?iso-8859-1?Q?4LyeoluzL9mltd+pUCcb7+aBtQ7uPzU8Oie7xFXg/x82hZz9Pd79zIl8F5?=
- =?iso-8859-1?Q?LEQb/Zbw1doxa43eMJcAq+QU/EMMFXiqW1m7RMJXe710mD1gmUWYLnDmgU?=
- =?iso-8859-1?Q?r9WC+U1kQ0QDsPQYsDqa+uGAAUMUfVfRqs+4PhK+G3ii7Ds+UkwMXV/PYb?=
- =?iso-8859-1?Q?vAdR6fyVkh3vmr4J1SQCq0IltHYSfcsYopCsB4y1BS3Yi6U4OgLEs/d9qL?=
- =?iso-8859-1?Q?cBMhbtZYF39nktciUfd9YEL3ivFA8YhIRHbcUghGe+aL2gvXorMNSB4tlW?=
- =?iso-8859-1?Q?1pOZp8ffMADa8qBRMvY1xJxYcEvd4ro=3D?=
-X-Exchange-RoutingPolicyChecked: thus2S28bH1/lpfu+3ojZ8G6/b1CUWn4P0sC6t/QcpewrOxTnxo1dlC99cJ4Y8xogFoIB9wVmzDorNlHSps0BI6eUjCrJ9X4zOl37kWMda2s9wnKY/vX9rsgBw9K1eR2Rc7r/IUeNlXf2wyLxx1yH107ZIyr6Tjua/hQDdptulJVjk1cSDKJ7eBPnUoobqvWfEEjbHhUQutcFXP1i/Dz5B4otF4l+oDorVO6v/QBx8cD35LTpbQW6ZOIyxxlgIgC92GDy3qTlCkijbvJgQXJGz46JkV4rm1num1Bw70FTVXkUemZCng1uDzxO5EMPFsTgZmv/r07xifn+9+qZ61txg==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 109968e5-13e4-4b44-31ca-08de86988922
+X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?MV9YYKVpY6CmMpWVeA8YKfdTKZV9ykAVsy0OhSHvyddOQAwF2WgDw35Vnz?=
+ =?iso-8859-1?Q?DqI763w+hWyKcM2W1NrDTSV5YUmeMbkVZvwJA/Q7MFEgd2o3lgY/ze5iwc?=
+ =?iso-8859-1?Q?GTxgP1j4HUnU3iphcQWQQSHIvbNEQverODJ5N4Vo0TMEqrZDBpIZBYYb1I?=
+ =?iso-8859-1?Q?mDXNmpC/+EJxb8p/PNSwTc79SAIoDl6yYGhz9c44QhwUDSpx5aiOnyE7Ol?=
+ =?iso-8859-1?Q?kbYwMU6LtZmD87qFfyDk4GPh0me/ez/eC38vtJXgE/Gfb4KdP9jcwpKcrO?=
+ =?iso-8859-1?Q?iLVMPcARQ34k+rHSGZK/37VxDxKhogwock0Yp3cfFkwN7Z6uPkfsvqtM4Q?=
+ =?iso-8859-1?Q?4cakvFpyAcQMvYqYFbeUCIk76MwQhX+NcBfH8pbj9echGlPOfFJ7SjG6m0?=
+ =?iso-8859-1?Q?HDotwiqpnAiotohswbyKD7kLacqT3UPtVJ0jUb9lqxtrJkZWaDcZP/77nL?=
+ =?iso-8859-1?Q?+Uwez439Xb3mKdA6Xk+hiufuJgnMouHI0EFFusNcDb4OcdXPHCLoHIuWkv?=
+ =?iso-8859-1?Q?gXDQSs/Z7ywVHQpfYGRWShhSEU8uS1awa8Ad6412l90/Uh98WvLH8Sh4Qk?=
+ =?iso-8859-1?Q?k6Ap/I2fD6gl11AFQPRFMbZ5ibgArueVlx75oZCHuZ6iv0FaUm4gB50SOh?=
+ =?iso-8859-1?Q?EMkcKZ8HuUNwjGQ4O2kkq3dNSkr0HeRNHkgLsUndA3MhGLdMYT5uLt6Tf5?=
+ =?iso-8859-1?Q?KYwjgRxFKIi9ssDdDooviKTPu09P8Bgcr+AYQnPBAxCFV8/gn/Jx5oKHXv?=
+ =?iso-8859-1?Q?AO37wW3tWZEOqjuNrURNFrHdsdHAp3F3SXaxreTwIB6ZHwL+K11PrBHnLC?=
+ =?iso-8859-1?Q?quKd+uhyFAAcBCONI9Au1m1YxH103/rpyin9U7f1OsR3G7VxNVImqoXMmE?=
+ =?iso-8859-1?Q?HOEyzqXYI6abRcRkCu+bDzBMqAESCdQkdIQIhzBHh8vLzVSu/dF29STqZp?=
+ =?iso-8859-1?Q?OOK2xJimZKcLWmAUEHQb03RDRQr8pC7Fn8Wx0TMZa7nhvKZZLyql8HwFVN?=
+ =?iso-8859-1?Q?U4zd6njKTZq6xc19ZrOXOZ0of82o4vEu1878hAZuDJZM1iY8R2S2vyeHgA?=
+ =?iso-8859-1?Q?/JkSTz+08Gpz72w1ni/Oca6wEEbD79FDQVtI1puQXCRz3/8dEJ/Q7DUzDi?=
+ =?iso-8859-1?Q?GUcEYJz1uLItrV81CrFQdNcK1ZbSCTgyDAhVtKYb5+RNELfv5pqVmgFXu3?=
+ =?iso-8859-1?Q?IR34VePFoofNfxxvRWo1y1KlemPjW4hg8n4/uhEUNpAu51m42jv6fN14q5?=
+ =?iso-8859-1?Q?awYNjBSKPFZUjV0mj4+dgPCfNXAvtEbNeZ8gJMMP7igMFPPrgSPsCl/nOA?=
+ =?iso-8859-1?Q?SJZwzu2fJLEbSIWmX7lkl4tqK5manNOoESrePVs81KvVY8vLkGK0VVDgKV?=
+ =?iso-8859-1?Q?8KMxQo1ue1BbIwpF6MNBLTLhU26amOdYbmihyPXbjIlCNE/gydbK7/NkCG?=
+ =?iso-8859-1?Q?Wmloy+yl2K/acCylmyzAwi4jVR/dFmKmGiCyZkiBRxqj6sVDOQbRuLbGOA?=
+ =?iso-8859-1?Q?G0dZNTV4wq3SrCCl8omn2BSoYpO1/dCR1Aw1EiatOwydNhL+KbJcN1YYTN?=
+ =?iso-8859-1?Q?dqJMDR05LlPpYzBCP4iefl2/diau19cseAvkxqVTYKMYfh2KNwK2t7i6cC?=
+ =?iso-8859-1?Q?vz2Wbk95zwkinj0NZr1tFVzKT+fADuc4A5p/t7HEoUKBQ3J4Q/1PiYm6Yc?=
+ =?iso-8859-1?Q?4ROezeqOqkAN0jVV/tGW+hxeb/ISbNzpLBB07EldUBa7CgU9mWTPq+7MRM?=
+ =?iso-8859-1?Q?JtlPA7pYfBhMzEujp6Qy8ltsRfMOGiQAAb3XJOytVREi/IJma2Ut7JSm+g?=
+ =?iso-8859-1?Q?EeADdQiT0THrtnbPLUpoB5XED9185g0=3D?=
+X-Exchange-RoutingPolicyChecked: oyiYOrnVJVtKiGm2gMXwwXoo4zNn8n3PKf1ByeV07kv6I9ScDaoN9i6BSW9clNytewaIRKYbOd7i7M2Pu+/HHwhflJez/MdqQ6AkEHlPzklFKx7+XJPLA13Ipbgi/laizrjxuEBTLmF0AwtsZZ/HrpdTyOlObt/Y+ZEkS0+GlDIGUkwiN9MIxTLqU+K7quDls6VKMws6JHwcyo86DZVtOhnQisFOd1iovMdXP9murRnbIMmtMes06/XBZJR4cs5lpvk5uAiWA3+C4k1PXy6E61tQcYdXREXnoGDJS/KAj4R+oTOocCFkpzSy66mNo6tP20tjzt+EycygcXZ031IvaQ==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f6074f4-a59c-43ab-3dc6-08de869967af
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2026 15:51:22.8444
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2026 15:57:36.6523
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lhDaKhAE0icCQzUUCdbrOuWxr3OUwpR00PS9SUlz6y+jyq/DDeOoD8R+KjtpVkxCIl+SxZwWu9DC+I8z6YQuzmeUzugwaE8xuGmpIVBP/yc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6920
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0R7gSwuRjcOi8QXZQfACaNGDvxH6ct8SoRSUdDC+WP1E5cd/vxZLJmLquwYblIkK580HsZGf+jDpDWITZdn8HqUPKrvYSU7+5PK8ZTJOCm4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4672
 X-OriginatorOrg: intel.com
 X-Spamd-Result: default: False [0.34 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-269967-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email];
+	TAGGED_FROM(0.00)[bounces-269968-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -193,182 +193,64 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.983];
+	NEURAL_HAM(-0.00)[-0.985];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 340D52DCEB9
+X-Rspamd-Queue-Id: 842AD2DCF70
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 09:38:00AM +0100, Björn Töpel wrote:
+On Fri, Mar 20, 2026 at 09:18:19AM +0100, Björn Töpel wrote:
 > Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
 > 
-> > AF_XDP bind currently accepts zero-copy pool configurations without
-> > verifying that the device MTU fits into the usable frame space provided
-> > by the UMEM chunk.
+> > When programming dbuf on rx queue context, avoid division round up as
+> > it causes to actually corrupt the tailroom for AF_XDP ZC. Below is an
+> > example based on 4k chunk size when xsk pool pointer is valid on given
+> > rx ring:
 > >
-> > This becomes a problem since we started to respect tailroom which is
-> > subtracted from chunk_size (among with headroom). 2k chunk size might
-> > not provide enough space for standard 1500 MTU, so let us catch such
-> > settings at bind time.
+> > chunk_size = 4096
+> > headroom = 256
+> > tailroom = 320
 > >
-> > This prevents creating an already-invalid setup and complements the
-> > MTU change restriction for devices with an attached XSK pool.
+> > ring->rx_buf_len = 4096 - 256 - 320 = 3520
 > >
-> > Currently xp_assign_dev_shared() is missing XDP_USE_SG being propagated
-> > to flags so set it in order to preserve mtu check that is supposed to be
-> > done only when no multi-buffer setup is in picture.
+> > rx_ctx.dbuf = DIV_ROUND_UP(3520, 128) ->
+> > 3520 / 128 = 27.5 -> round up results in 28
 > >
+> > dbuf programming unit is 128. If we give 128 * 28 = 3584. So HW will
+> > corrupt 64 bytes from tailroom. Decrement dbuf by 1 when xsk_pool is
+> > present on given ice_rx_ring.
+> >
+> > Also, restore ::rx_buf_len setting via xsk_pool_get_rx_frame_size() as
+> > of now it respects the tailroom.
+> >
+> > Fixes: 1bbc04de607b ("ice: xsk: add RX multi-buffer support")
 > > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> 
-> Fixes tag?
-
-My reasoning was that since this came up due to respecting tailroom I went
-with no fixes tag, but missing mbuf flag setting for shared umem was an
-existing bug, so we could pick something now.
-
-> 
-> This got me thinking; Nothing in the xsk core prevents MTU from being
-> changes while xsk is runing? Some drivers do! Not for this patch, but
-> maybe xsk should listen to MTU notifiers?
-
-Nice, I had exact patch locally, attaching at the bottom [0].
-However I withdrew it as this would yield a rework on xskxceiver - test
-suite actually changes MTU while keeping XSK resources alive.
-
-We can get back to this idea but I didn't want to stir up the pot too much
-in this set.
-
-> 
-> Seems like we're in a bind-time TOCTOU gap...
-> 
 > > ---
-> >  net/xdp/xsk_buff_pool.c | 16 ++++++++++++++--
-> >  1 file changed, 14 insertions(+), 2 deletions(-)
+> >  drivers/net/ethernet/intel/ice/ice_base.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
 > >
-> > diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-> > index 37b7a68b89b3..e9377b05118b 100644
-> > --- a/net/xdp/xsk_buff_pool.c
-> > +++ b/net/xdp/xsk_buff_pool.c
-> > @@ -157,6 +157,7 @@ static void xp_disable_drv_zc(struct xsk_buff_pool *pool)
-> >  int xp_assign_dev(struct xsk_buff_pool *pool,
-> >  		  struct net_device *netdev, u16 queue_id, u16 flags)
-> >  {
-> > +	bool mbuf = flags & XDP_USE_SG;
-> >  	bool force_zc, force_copy;
-> >  	struct netdev_bpf bpf;
-> >  	int err = 0;
-> > @@ -178,7 +179,7 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
-> >  	if (err)
-> >  		return err;
-> >  
-> > -	if (flags & XDP_USE_SG)
-> > +	if (mbuf)
-> >  		pool->umem->flags |= XDP_UMEM_SG_FLAG;
-> >  
-> >  	if (flags & XDP_USE_NEED_WAKEUP)
-> > @@ -200,10 +201,18 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
-> >  		goto err_unreg_pool;
-> >  	}
-> >  
-> > -	if (netdev->xdp_zc_max_segs == 1 && (flags & XDP_USE_SG)) {
-> > +	if (netdev->xdp_zc_max_segs == 1 && mbuf) {
-> >  		err = -EOPNOTSUPP;
-> >  		goto err_unreg_pool;
-> >  	}
-> > +#define ETH_PAD_LEN (ETH_HLEN + 2 * VLAN_HLEN  + ETH_FCS_LEN)
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+> > index 1667f686ff75..f9514d7bb83c 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_base.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_base.c
+> > @@ -500,6 +500,8 @@ static int ice_setup_rx_ctx(struct ice_rx_ring *ring)
+> >  	 */
+> >  	rlan_ctx.dbuf = DIV_ROUND_UP(ring->rx_buf_len,
+> >  				     BIT_ULL(ICE_RLAN_CTX_DBUF_S));
+> > +	if (ring->xsk_pool)
+> > +		rlan_ctx.dbuf--;
 > 
-> Yuk! Move this somewhere else.
+> Hmm, wont this be overly pessimistic? Smth like
 > 
-> > +	if (!mbuf) {
-> > +		if (READ_ONCE(netdev->mtu) +  ETH_PAD_LEN >
-> 
-> I think READ_ONCE sends wrong signal to readers. We're in an
-> ASSERT_RTNL() region.
+>   if (ring->xsk_pool)
+>     rlan_ctx.dbuf = ring->rx_buf_len >> ICE_RLAN_CTX_DBUF_S;
+>   // else round up?
 
-Good point!
+Ok!
 
 > 
-> > +		    xsk_pool_get_rx_frame_size(pool)) {
-> > +			err = -EINVAL;
-> > +			goto err_unreg_pool;
-> > +		}
-> > +	}
-> >  
-> >  	if (dev_get_min_mp_channel_count(netdev)) {
-> >  		err = -EBUSY;
-> > @@ -247,6 +256,9 @@ int xp_assign_dev_shared(struct xsk_buff_pool *pool, struct xdp_sock *umem_xs,
-> >  	struct xdp_umem *umem = umem_xs->umem;
-> >  
-> >  	flags = umem->zc ? XDP_ZEROCOPY : XDP_COPY;
-> > +	if (umem->flags & XDP_UMEM_SG_FLAG)
-> > +		flags |= XDP_USE_SG;
-> > +
-> >  	if (umem_xs->pool->uses_need_wakeup)
-> >  		flags |= XDP_USE_NEED_WAKEUP;
-> >  
-> > -- 
-> > 2.43.0
-
-[0]:
-Subject: [PATCH net 4/5] xsk: forbid MTU changes while an XSK pool is attached
-
-AF_XDP pool setup depends on the netdev configuration that is in effect
-at bind time.
-
-In particular, the usable frame size seen by zero-copy drivers is
-derived from the UMEM chunk layout. Changing MTU after a pool has been
-attached can invalidate that setup and leave the device and pool with
-incompatible packet geometry.
-
-Reject NETDEV_PRECHANGEMTU when an XSK pool is attached to the device.
-This keeps the policy in the AF_XDP code, avoids touching individual
-ndo_change_mtu() implementations, and stops the MTU change before the
-driver callback is reached.
-
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
----
- net/xdp/xsk.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
-
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index e6530996053b..73cbd5774031 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -1790,6 +1790,18 @@ static int xsk_mmap(struct file *file, struct socket *sock,
- 	return remap_vmalloc_range(vma, q->ring, 0);
- }
- 
-+static bool xsk_dev_has_pool(struct net_device *dev)
-+{
-+	u32 i, n;
-+
-+	n = max_t(u32, dev->real_num_rx_queues, dev->real_num_tx_queues);
-+	for (i = 0; i < n; i++)
-+		if (xsk_get_pool_from_qid(dev, i))
-+			return true;
-+
-+	return false;
-+}
-+
- static int xsk_notifier(struct notifier_block *this,
- 			unsigned long msg, void *ptr)
- {
-@@ -1798,6 +1810,11 @@ static int xsk_notifier(struct notifier_block *this,
- 	struct sock *sk;
- 
- 	switch (msg) {
-+	case NETDEV_PRECHANGEMTU:
-+		if (xsk_dev_has_pool(dev))
-+			return notifier_from_errno(-EBUSY);
-+		break;
-+
- 	case NETDEV_UNREGISTER:
- 		mutex_lock(&net->xdp.lock);
- 		sk_for_each(sk, &net->xdp.list) {
--- 
-2.43.0
-
+> 
 
