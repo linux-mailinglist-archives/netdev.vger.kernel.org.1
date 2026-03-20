@@ -1,181 +1,176 @@
-Return-Path: <netdev+bounces-270011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270012-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GHoqNPaOvWnY+wIAu9opvQ
-	(envelope-from <netdev+bounces-270011-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:16:22 +0100
+	id eFJOBVmOvWnY+wIAu9opvQ
+	(envelope-from <netdev+bounces-270012-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:13:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD0E2DF432
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:16:22 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2E2C2DF3B5
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:13:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 797BA303A27D
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:10:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 97AF0304899D
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:11:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3B4A3DEFF2;
-	Fri, 20 Mar 2026 18:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA743E51F3;
+	Fri, 20 Mar 2026 18:10:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZMfcQs6N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KZ0ZoYD6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111583DEFE0
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 18:08:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC723E4C74
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 18:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774030124; cv=none; b=JUTHSxxtocidCeVsUxq8Mccs7jIJdPjKAeHQQ7UBImsHmEQLKFwRXEnrbFrRtG6QrZE4UEij2iq6zhf34CITdK0dUHfItFahEwsnCPTpGP73i0oQN8lzPiU1DZmf0v2jjiRx7eyNfT/D5xtjUSslRZ6XEosJ+dZGZ9TYxWcf0IA=
+	t=1774030248; cv=none; b=FrlvVhaagRhrsdxe5t/boPEWO7VcfbgyEkhpf4mBcbOU66dOAEv/+BPeU5ESvFsM2mn5IqRfBfjrDx3VzUPjRQCKZS3kJZ3Q0I/c79lwIxsTK8TPuML2f7D7JymHg+v5uwnuVHyVY8pmSf6hgkSCB6OrH8Hz7bMKhQATet06G3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774030124; c=relaxed/simple;
-	bh=eQxUX+gzWlFkaXDdfeVXpeBJ0sPtMwm28h+c2N4MDbg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=C05Q9WRkJvVhRBgYwW2GdB2h+XXDRBtxMmz4Nq5dKHGiDEY2A/QOuljGMaXMosp9ScsKcIaZ/r+y31qQtkNECPsMjhKvm8GHL/zn9c/aLYyDQSZQqPBEc/CWd8JGom+hs0F73a2rd5n8lnA8Jq4WgW5zgID3MkGJ6BySjyEchNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZMfcQs6N; arc=none smtp.client-ip=209.85.128.174
+	s=arc-20240116; t=1774030248; c=relaxed/simple;
+	bh=bUiSWNCV/q5GUTFEbO+pksJYyRD9RwJfg6d89NZyVP8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ssGfrKVj+ZzeIDjdu0khtanVFKsGPuIzOyrqH/Ic2K6GK0q/adJ1M9YD2i2QxFxn8DvPZEy3RDqr+F8/pk8OM8Tnj2ZcKvjtE9+RC9DfcJsl6beWbGfu5pmWycpMzTQaHQzyD9AmhrPGanQj7b+HfbKbgF/iJHzvayTX2uNSNN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KZ0ZoYD6; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-799001d73bdso19096497b3.0
-        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 11:08:42 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-354bc7c2c46so1066509a91.0
+        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 11:10:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774030122; x=1774634922; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+HxIcwAjT3BNXjqO4kOjoOrvW9GUI+JCw0ZolV134BA=;
-        b=ZMfcQs6NCcX0MjYvyPXucuyoO6ikjNqC0HIuX2wvj3gUMK8gBnzNnkULeC+l8fe55T
-         lN5dITPvosdwlPhGqi0ePi819CWvXIOVJK8VYS9xPTA9aXj8nnzLAjJjEaMx6K8W6j6a
-         nd/IIuLZsx9s8rP2BGTHHNSSRQRhVMky32zmim9vHHSIOSUYWcoWIJYTvdFOUiauIfAB
-         tUoO6Gz5IEMNKIeQ1xgeNQA+PwwX8BGtxfh1+58MYOmRl2/oDI5m7OaUcGtmfC7GbNGI
-         v+W1JmadLQVesgjcoL7ccjDAg7McOfuI5bkRNBp4hRua8lA0oCTjzsyybTIeDdXJSb1b
-         6Wvw==
+        d=gmail.com; s=20230601; t=1774030243; x=1774635043; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nlLjQPOmeaFila1aoTGt7mA4cxCj5RPLrmoLbYLboac=;
+        b=KZ0ZoYD61cxyevsY8aNSJncPBT+8tw1VX2NXfdSFeaKpy05cnXzIfSbpg8lV1bnpnp
+         wRPTa3B5AWIaBiwRlEnmfQu2vkjlKofsZyEatzVeup8A1VpjT1EAtGeJM78PagAMhHsv
+         5+qryXzH3U+Xc9a2veZoPQph6g6csC7WxVGWcV1lFxv/H8W5Zi+3dNhnVW+bVA9051Mu
+         Cz+oKWO3bsM2h94QNl52VIl9KA1EdfZAqyLCk6cqfi2CZ2PvoDYDHyG+Vlj3eKfDmh0b
+         02YZnVW11RybGH16jnOsbv7jWAhzAVPIqs6XJfBQmHroB+LH48wU63OFe47kDbqYko/8
+         ySmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774030122; x=1774634922;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1774030243; x=1774635043;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+HxIcwAjT3BNXjqO4kOjoOrvW9GUI+JCw0ZolV134BA=;
-        b=JL+/vwXSkyh3Uxy7zAMS2Xw6PEpgvFxHt5NXi/K+lcrZKBxIyA1QPJ0lkdz1GR0jEc
-         a0iHrOSZR0mjsx+bGDVUmUlz+JH05rKohWuzydgLwplzFOOu2dpRTmBU4R8g77vSZAPe
-         MLowomSttnFgZu+zRoASAkfdjCgbjZ7PR+bwBBUNwA0C33XUnsAiL+i3GCkdAVwqK9NX
-         +FSdjMUctwy0rW24wTGqPs0r2YX3zpG9HIPU/lJ+ZaFA9daAeOdiPZ/sUH4A5qyb1Rd5
-         KyIx0RTHB4FaZ1gyur/qKA8yVBB2yBpLcckdeINTinRcEfiQf4+QXfvBDDlM0MBesiyx
-         idwQ==
-X-Gm-Message-State: AOJu0YytdN6pqMAdcBvoOU/W1A+yM+eoMC+9vdI+YTBo3zBbVuiknvbC
-	dXUmIRs2aK0rSZM7VzTX9b0NWH4DrKsRBhRpr+QOuxs2kmXokjwlUsmX
-X-Gm-Gg: ATEYQzy/jB7fvvkfkxeGyCO1C4W+hUnCTLa63rN5kHhUotjNKlbGT+2oPXbyRLp2qEe
-	9w5wGlhzN6SMSc6eqaVrvNASvJEdWCti0uj+QORsvbGTNqB6fZsTDRtm+CwKuXsmmW51GlHxFTn
-	eykl7QOG3+yOeRAz2sqcfXfVaLQpbmKXZEZ3lTkYBYFyWHBFntFCmeOjqBA9F8pzsCMeZ++Qi3J
-	JjPixCEQ7ogILtfYI4hNutrgSbVnE+R3xC90BU3WiMITi/pXYowaEAKPDKXX1VpVbnxf6x7NwUh
-	AqvLvT13W91Tmhl2HKV9AezEYAD3hiEtH+qvxx4qw8KdtvvQHDlLil03h0raNra3aDpwaPmr/MJ
-	jz2qOH+AqKe0LwkzkOxgtcEZJYt+CEGKkmokLsrMGRt9DtD/qBcEk1YHZpOWBvpHFXFMxktWj56
-	Ts0MV8WxOOftSnd8hmL3JgiQ==
-X-Received: by 2002:a05:690c:385:b0:799:2b4c:1d49 with SMTP id 00721157ae682-79a90bc7e4amr37281837b3.36.1774030122081;
-        Fri, 20 Mar 2026 11:08:42 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:71::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-79a903a3473sm19822147b3.1.2026.03.20.11.08.41
+        bh=nlLjQPOmeaFila1aoTGt7mA4cxCj5RPLrmoLbYLboac=;
+        b=ntFWOHDj2a8DtS4debdkc4rmTZ5EzyxJ4GCecHb/i1aCjc7zrXVHEpWsoZhdlukJtZ
+         pFYbI0Ut8QxUFKIAXBKJOTGj3RdBtmwIWWJYU/of1Ya/Skn48AFXWt0stlG0lGUzhl11
+         0nxoJrpwwE5yV86ePMP6CGSFeGebn/uKYexEtDO3Y87BFnlh6BE4poN7nzpDQogbSbUv
+         3MC30RGUc5HH8kJwuhXj/94t+nakNaV4x0U/9leeAjqlmpkPqI0NKmntLsj2roOVhLkP
+         A4bH6lFYZFXT1JCOvwY1rxM85slWH+fvowm7U8cQ9Sp2coAVbVkd+vj0E8xirTPLkUT+
+         pVoQ==
+X-Gm-Message-State: AOJu0YygkhM0bO+/BAA+Z+qsw/BnF090Bhc/motJNjQLCHE8dw3AfI5g
+	MjTFTUK+ExPS7l4Id58zkgHhzYz85aZxucZMXCNLC67XvyYzvTgbv+o7
+X-Gm-Gg: ATEYQzwX0dXrF3Ewlx1D4fixlndEJVFVksQA8ydn05QkCOtHi8PEPIxhtirJ08HHD+r
+	81Vrx2iGDfaLYkSy8gG9cqH/YbnYf2sfxD708XIogbhr+A/4wGAd52no9pbgSpZ0qZZZ7kLuvXR
+	+gJUsVE/oidmrfdRa/OPJj+lq+u5jYlIx+CseLI8/Rls7rCwyAG90/P2rhe2FpQ8v0NTxz2NvZt
+	1vOvkJN0lo8uUA8/zb5PtXP0gEbGzQ3wx329ttlbX4RgUvbpNn+zi03aro6oVklvR3arDEh2P6B
+	2GH1F9HcRTlKJqSODAuru03ccNDtrV443qCNp6jdqQ7MnSVXHyCPeAiHi73Pf2H/bJ0GlYYX8WK
+	D6mWz7mg8ZZoH1n6Q9XX73bnO/G/2jN4AGjdbYgtnOLRzEmyBt0iBWCsRUZ4fZe+en3H9JrOtNA
+	QKHIID+m5S7EHvdgaXn8m/3lkDWPGD3+2nR0Sj/AQZD+xpiXT45SPG830hs/tVeG0NsyFwkQgV+
+	36mfm8HZw==
+X-Received: by 2002:a17:90b:17ca:b0:35b:98d7:a67 with SMTP id 98e67ed59e1d1-35bd2d0860bmr3278434a91.31.1774030241779;
+        Fri, 20 Mar 2026 11:10:41 -0700 (PDT)
+Received: from sean-All-Series.. (1-160-226-215.dynamic-ip.hinet.net. [1.160.226.215])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35bd368837bsm959352a91.11.2026.03.20.11.10.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2026 11:08:41 -0700 (PDT)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Fri, 20 Mar 2026 11:08:35 -0700
-Subject: [PATCH net] selftests: drv-net: add missing tc config options for
- netkit tests
+        Fri, 20 Mar 2026 11:10:41 -0700 (PDT)
+From: Sean Chang <seanwascoding@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	David Laight <david.laight.linux@gmail.com>,
+	Anna Schumaker <anna@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@intel.com>
+Cc: netdev@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sean Chang <seanwascoding@gmail.com>
+Subject: [PATCH v4 0/5] sunrpc/nfs: cleanup redundant debug checks and refactor macros
+Date: Sat, 21 Mar 2026 02:09:50 +0800
+Message-Id: <20260320180955.150696-1-seanwascoding@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260320-config-fixes-for-nk-tests-v1-1-1e20ec6ddc7e@meta.com>
-X-B4-Tracking: v=1; b=H4sIACONvWkC/x3KQQrCMBAF0KsMf92BGGsDuYq40GZSB2EimSBC6
- d0F3/rtcOkqjkw7unzUtRkynSbC+rzbJqwFmRBDXMI5Bl6bVd246leca+tsLx7iw3mZS0qPdJl
- TqZgI7y7/hUxXmAzcjuMHBvtodHAAAAA=
-X-Change-ID: 20260320-config-fixes-for-nk-tests-64d77b7547df
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>
-X-Mailer: b4 0.14.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_TO(0.00)[lunn.ch,oracle.com,gmail.com,kernel.org,intel.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270011-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270012-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[seanwascoding@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.987];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.861];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:email,meta.com:mid]
-X-Rspamd-Queue-Id: 3FD0E2DF432
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B2E2C2DF3B5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Bobby Eshleman <bobbyeshleman@meta.com>
+This series cleans up redundant IS_ENABLED(CONFIG_SUNRPC_DEBUG) guards
+across sunrpc, nfsd, and lockd, as these checks are already handled
+within the dprintk macros.
 
-The NetDrvContEnv env context uses tc clsact qdiscs and BPF tc filters
-for traffic redirection, but the kernel config options are missing from
-the selftests config.
+Additionally, it refactors the nfs_errorf() macros into a safer
+do-while(0) pattern and removes unused nfs_warnf() macros to improve
+code maintainability.
 
-Without them, the tc qdisc installation trips on:
+v4:
+- Add a missing patch to include/linux/sunrpc/debug.h to ensure dprintk()
+  properly handles variable referencing via no_printk().
+- Remove obsolete __maybe_unused from fs/nfsd/export.c (revert ebae102897e7)
+  as suggested by Andy Shevchenko.
+- Add Reviewed-by and Tested-by tags from Andy Shevchenko.
 
-  CMD: tc qdisc add dev enp1s0 clsact
-    EXIT: 2
-    STDERR: Error: Specified qdisc kind is unknown.
+v3:
+- Added nfs_errorf refactoring and removed unused nfs_warnf macros.
+- Split sunrpc and nfsd changes for better clarity.
 
-  net.lib.py.utils.CmdExitFailure: Command failed
+v2:
+ - Follow reversed xmas tree order for variables in svc_rdma_transport.c
+   as requested by Andy Shevchenko.
+ - Polish commit message: use dprintk() and remove redundant file list.
+ - Correct the technical claim about dprintk() type checking.
 
-Add CONFIG_NET_CLS_ACT and CONFIG_NET_SCH_INGRESS to enable these tc
-options.
+Sean Chang (5):
+  sunrpc: Fix dprintk type mismatch using do-while(0)
+  nfsd/lockd: Remove redundant debug checks
+  svcrdma: remove redundant IS_ENABLED(CONFIG_SUNRPC_DEBUG) guards
+  nfs: refactor nfs_errorf macros and remove unused ones
+  nfsd: remove obsolete __maybe_unused from variables
 
-Fixes: 3f74d5bb807e ("selftests/net: Add env for container based tests")
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
----
- tools/testing/selftests/drivers/net/hw/config | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/lockd/svclock.c                       |  7 ------
+ fs/nfs/internal.h                        | 28 +++++++++++-------------
+ fs/nfsd/export.c                         |  2 +-
+ fs/nfsd/nfsfh.c                          |  8 +++----
+ include/linux/sunrpc/debug.h             |  8 ++-----
+ net/sunrpc/xprtrdma/svc_rdma_transport.c | 25 ++++++++++-----------
+ 6 files changed, 30 insertions(+), 48 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/config b/tools/testing/selftests/drivers/net/hw/config
-index 235c0a1cd21e..dd50cb8a7911 100644
---- a/tools/testing/selftests/drivers/net/hw/config
-+++ b/tools/testing/selftests/drivers/net/hw/config
-@@ -6,9 +6,11 @@ CONFIG_FUNCTION_ERROR_INJECTION=y
- CONFIG_IO_URING=y
- CONFIG_IPV6=y
- CONFIG_IPV6_GRE=y
-+CONFIG_NET_CLS_ACT=y
- CONFIG_NET_CLS_BPF=y
- CONFIG_NET_IPGRE=y
- CONFIG_NET_IPGRE_DEMUX=y
- CONFIG_NETKIT=y
-+CONFIG_NET_SCH_INGRESS=y
- CONFIG_UDMABUF=y
- CONFIG_VXLAN=y
-
----
-base-commit: edab1ca5ec6fffecbf340e26956ce73e502901d5
-change-id: 20260320-config-fixes-for-nk-tests-64d77b7547df
-
-Best regards,
 -- 
-Bobby Eshleman <bobbyeshleman@meta.com>
+2.34.1
 
 
