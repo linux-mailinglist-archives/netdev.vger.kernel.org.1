@@ -1,170 +1,182 @@
-Return-Path: <netdev+bounces-270022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270023-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iCQiJwuTvWnY+wIAu9opvQ
-	(envelope-from <netdev+bounces-270022-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:33:47 +0100
+	id UKkEB/aTvWnY+wIAu9opvQ
+	(envelope-from <netdev+bounces-270023-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:37:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3A6E2DF7CB
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:33:46 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A62BD2DF87F
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:37:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 75D30301DCCF
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:26:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 147D3300AB36
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:37:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617CA3DF00D;
-	Fri, 20 Mar 2026 18:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB823E715F;
+	Fri, 20 Mar 2026 18:37:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="KSgBB4xj"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="JR3mMW/3"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DE73DE43C;
-	Fri, 20 Mar 2026 18:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.98
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39502D0C62;
+	Fri, 20 Mar 2026 18:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774031189; cv=none; b=tsxCyfbcxrvIPNzJ2oawSoBqpezsiLkL32wW4nSWEjHupAj0OmLUwlOCvZ9D+AA7BuXd2BmVg7Gtqemy0LWt59hhWs/U5r5jRYmDWIPXfsdIIreNaKF0sM4n+c8gHE/oe+pLXE+NA2BoWdX+9aPOckkrS9hEierJs/WW7VBkS3E=
+	t=1774031857; cv=none; b=cYRFkIS9BCcFyyleD0jCB5/a7nCKEQg1Cx/eYjI7d5xvxMh+C0IGByNqwBf9miJRGdzfWlynYYdMGiHGH5yNqMmf1cpCKRd8KSJmK4oAtiay0dFxXJpegLdjcMDKOubiI2IUfOOHEAeLEne+n2tWFaWmvkjzC7fLaos1toP0wWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774031189; c=relaxed/simple;
-	bh=o5ItQIhCeMX6Yk+7eJ4ESB+JTMW+68A9aocn8H3JSaQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cj0RtqmHMO/qQKsTBJ/v/Bo7lG5EGQuqb4/0MfUzVvHqR36uAZ6/lm32aN0tAeRsCoC3k4OLXWFcgtlCPJUJ2rejNM4MQUGcGbYlQypvUVMgAW+/Rlv6pzypwMkMGNkCqYby/oRW98qoKyb/8SMEEa81KAyMYrVNOvk55EXGpgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=KSgBB4xj; arc=none smtp.client-ip=188.68.63.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-Received: from mors-relay-2501.netcup.net (localhost [127.0.0.1])
-	by mors-relay-2501.netcup.net (Postfix) with ESMTPS id 4fcrcB5MD3z68YL;
-	Fri, 20 Mar 2026 19:26:18 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1774031178;
-	bh=o5ItQIhCeMX6Yk+7eJ4ESB+JTMW+68A9aocn8H3JSaQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=KSgBB4xjI45yHwv14LfECFzElIA1YiwlBSeOMp53jNJSLBfnOXfuKk0SAWwe+uGSo
-	 /BDedZP5vaSlddB4CLbkVt2bA7opfc/xKZPtrtGFVFzbhJ4P1Kz4K5T/2jN011kQPU
-	 4sQQ5V+fm9DrlKrBbaWVOYI1+1eWRd7d84puCw/MURMaMLJd3C/IYCTESfVHJyN0/V
-	 PGZay0dvgqEaW4CZhYIzF9515taUI4/wtSQU2JH+JNU/KYgk0Dr1XK0oaA51b9xw5J
-	 K92QeTgaM69mgbUbbJl7TFxMykEWTvW11AK1+2TdqtNN9BMEBLjDk5I8vH7D0OM4xo
-	 4Y/TvVQxn7g/w==
-Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-2501.netcup.net (Postfix) with ESMTPS id 4fcrcB4dYYz4xS8;
-	Fri, 20 Mar 2026 19:26:18 +0100 (CET)
-X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
-X-Spam-Flag: NO
-X-Spam-Score: -2.898
-X-Spam-Level: 
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4fcrc96SLXz8sbl;
-	Fri, 20 Mar 2026 19:26:17 +0100 (CET)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 35E52635BD;
-	Fri, 20 Mar 2026 19:26:16 +0100 (CET)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <e2b7f273-905f-40b0-95bf-ac6f9beb888b@leemhuis.info>
-Date: Fri, 20 Mar 2026 19:26:12 +0100
+	s=arc-20240116; t=1774031857; c=relaxed/simple;
+	bh=ndUmG6D4N/t76wmcE/rj0yYFZUJjdZW7OKDiXnUnTKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DFrd1uUJaf/g5cZl08HPFW3KwrDkvnvCeh4UwitnHHR+r2SctRF3Ck0XM2sDxsC3sGkAY900QCPr9ig4Y9+rxRyHM7lZRO2suni2hvkdMSTurtrUSSpcYzEiTlZ546u3p9J+hsjvqfxwz8RMgBlqtG/T/QUgEd2Wqb34TmEGGWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=JR3mMW/3; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id A29FB20B710C; Fri, 20 Mar 2026 11:37:36 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A29FB20B710C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1774031856;
+	bh=8jpPXr+y+3KENB6W41376ggBj6+74FClsqh2tUuZIug=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JR3mMW/3XjE+RSv1SuWsuNxVuWjbiFNQX3JEuSEoPj0eeUVtlHh4wYrAzU05/StIp
+	 Ak32D828kLEtVhySGqhpLcmQLZkQt2EnsCYVgZyB8X11m3M2IUTqdn7j8u1XkY1GC/
+	 VaRnxXufFAuziD1myFZ6o16h1RgUN+bwAGZxXuKM=
+Date: Fri, 20 Mar 2026 11:37:36 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next, v3] net: mana: Force full-page RX buffers for
+ 4K page size on specific systems.
+Message-ID: <ab2T8LgRiDHDIUHV@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <abDo8XTu1EiQFC7T@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20260314125053.41d6221b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: bluetooth regression fix likely to miss -rc5
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: kuba@kernel.org, Linus Torvalds <torvalds@linux-foundation.org>,
- linux-bluetooth@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20260319190455.135302-1-luiz.dentz@gmail.com>
- <177396481128.1855248.1024090053580545012.git-patchwork-notify@kernel.org>
- <6411a735-d187-4848-b199-a0e2c2e0e52c@leemhuis.info>
- <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: 
- <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-PPP-Message-ID: <177403117699.3567880.6442946421288956324@mxe9fb.netcup.net>
-X-NC-CID: IOLwiIw8DiIfpdvW7TEHhfxmZo2gVPkkujN5xX25ZardnN99F40=
-X-Spamd-Result: default: False [-0.16 / 15.00];
+In-Reply-To: <20260314125053.41d6221b@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270022-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[leemhuis.info];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[leemhuis.info:+];
+	TAGGED_FROM(0.00)[bounces-270023-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[leemhuis.info:dkim,leemhuis.info:email,leemhuis.info:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	NEURAL_HAM(-0.00)[-0.929];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: F3A6E2DF7CB
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A62BD2DF87F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/20/26 19:02, Luiz Augusto von Dentz wrote:
-> On Fri, Mar 20, 2026 at 12:47 PM Thorsten Leemhuis
-> <regressions@leemhuis.info> wrote:
->> On 3/20/26 01:00, patchwork-bot+netdevbpf@kernel.org wrote:
->
->> The quoted bluetooth pull to net afaics came a tiny bit too late for
->> this week's net PR to mainline. I assume there won't be another this
->> week, as that would be unusual from a look at the history (and well, if
->> I'm wrong I'm happy!). That is kind of unfortunate, as those bluetooth
->> changes contained a fix[1] for a regression that at least three people
->> reported (and I know of at least one other person that was affected)[2].
->> A regression that is known for nearly a month now and thus already took
->> way longer than the "fix within a week, preferably before the next rc."
->> rule of thumb Linus recently mentioned[3].
+On Sat, Mar 14, 2026 at 12:50:53PM -0700, Jakub Kicinski wrote:
+> On Tue, 10 Mar 2026 21:00:49 -0700 Dipayaan Roy wrote:
+> > On certain systems configured with 4K PAGE_SIZE, utilizing page_pool
+> > fragments for RX buffers results in a significant throughput regression.
+> > Profiling reveals that this regression correlates with high overhead in the
+> > fragment allocation and reference counting paths on these specific
+> > platforms, rendering the multi-buffer-per-page strategy counterproductive.
 > 
-> Afaik, it was tagged as regression on March 1st afaik, according to
-> [2];
+> Can you say more ? We could technically take two references on the page
+> right away if MTU is small and avoid some of the cost.
 
-Well, the first report was 2026-02-22
-https://bugzilla.kernel.org/show_bug.cgi?id=221120
+There is a 15-20% shortfall in achieving line rate for MANA (180+ Gbps)
+on a particular ARM64 SKU. The issue is only specific to this processor SKU —
+not seen on other ARM64 SKUs (e.g., GB200) or x86 SKUs. Critically, the
+regression only manifests beyond 16 TCP connections, which strongly indicates
+seen when there is  high contention and traffic.
 
-I don't blame you for missing that, as it took some time to reach you
-due to the know deficits of our bugzilla setup (and looking back I could
-and should have forwarded it faster once I had noticed it) -- which is
-another reason to change something there, but that is a different topic
-(see the recent discussion on the ksummit list).
+  no. of     | rx buf backed       | rx buf backed
+ connections | with page fragments | with full page
+-------------+---------------------+---------------
+           4 |         139 Gbps    |     138 Gbps
+           8 |         140 Gbps    |     162 Gbps
+          16 |         186 Gbps    |     186 Gbps
+          32 |         136 Gbps    |     183 Gbps
+          48 |         159 Gbps    |     185 Gbps
+          64 |         165 Gbps    |     184 Gbps
+         128 |         170 Gbps    |     180 Gbps
+ 
+HW team is still working to RCA this hw behaviour.
 
-> traces were only provided on March 15th, so yeah it was fixed
-> within a week once the necessary traces were supplied.
+Regarding "We could technically take two references on the page right
+away", are you suggesting having page reference counting logic to driver
+instead of relying on page pool?
 
-Sure, and I can fully understand that you need traces to fix this and
-that not reverting the culprit helps motivating someone to provide them.
-But OTOH from Linus statement in [3] it sounds like he would have
-preferred to see this fixed faster through a revert.
+> 
+> The driver doesn't seem to set skb->truesize accordingly after this
+> change. So you're lying to the stack about how much memory each packet
+> consumes. This is a blocker for the change.
+> 
+ACK. I will send out a separate patch with fixes tag to fix the skb true
+size.
 
-I guess it's not too much of the problem that it took a bit longer from
-the report to a fix. But thx to your efforts (many thx for that) we now
-have a fix, so I'd say: let's mainline it quickly to (a) get it tested
-and (b) prevent more people from running into this, as then they might
-bisect for nothing.
+> > To mitigate this, bypass the page_pool fragment path and force a single RX
+> > packet per page allocation when all the following conditions are met:
+> >   1. The system is configured with a 4K PAGE_SIZE.
+> >   2. A processor-specific quirk is detected via SMBIOS Type 4 data.
+> 
+> I don't think we want the kernel to be in the business of carrying
+> matching on platform names and providing optimal config by default.
+> This sort of logic needs to live in user space or the hypervisor 
+> (which can then pass a single bit to the driver to enable the behavior)
+> 
+As per our internal discussion the hypervisor cannot provide the CPU
+version info(in vm as well as in bare metal offerings).
 
-Ciao, Thorsten
+On handling it from user side are you suggesting it to introduce a new
+ethtool Private Flags and have udev rules for the driver to set the private
+flag and switch to full page rx buffers? Given that the wide number of distro
+support this might be harder to maintain/backport. 
+
+Also the dmi parsing design was influenced by other net wireleass
+drivers as /wireless/ath/ath10k/core.c. If this approach is not
+acceptable for MANA driver then will have to take a alternate route
+based on the dsicussion right above it.
+
+> > This approach restores expected line-rate performance by ensuring
+> > predictable RX refill behavior on affected hardware.
+> > 
+> > There is no behavioral change for systems using larger page sizes
+> > (16K/64K), or platforms where this processor-specific quirk do not
+> > apply.
+> -- 
+> pw-bot: cr
+
+Thank you for your comments Jakub, and also pointing out the skb true
+size issue. I am sending out a separate to fix the skb true size issue.
+
+Regards
+Dipayaan Roy
+
 
