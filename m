@@ -1,190 +1,181 @@
-Return-Path: <netdev+bounces-270038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270040-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GA98ERSbvWmR/QIAu9opvQ
-	(envelope-from <netdev+bounces-270038-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 20:08:04 +0100
+	id sOXfEZKbvWmR/QIAu9opvQ
+	(envelope-from <netdev+bounces-270040-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 20:10:10 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2BA72DFB95
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 20:08:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE50F2DFC27
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 20:10:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 818193048894
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:04:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 93A873046AA1
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 19:08:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39C6303A01;
-	Fri, 20 Mar 2026 19:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35EC332ABC0;
+	Fri, 20 Mar 2026 19:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f12mF43N"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hsnPl9Pu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71C863016EE
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 19:04:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C40F31B838;
+	Fri, 20 Mar 2026 19:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774033478; cv=none; b=LaoHaXPtW+13tKQKdxRxOgGUcBEMvqitnqKL3RgUrEjuOeQgjHqT/WQm7RKFJNnX4OyvKyNUtcHQnHlLqxcrOiUwgi3dgJhmu9w1eCWsXBkYM3+LrbK5bvrt8qpvChaI3CLIZMcy5w0p9Wf6WK0uYBoonZpJW6QAo+xa9et1y2Y=
+	t=1774033730; cv=none; b=naLjJGiaoedP4TPVbb0QYCKr83Z9pPmmmdphl0Pg03YLAn09s/a4WLkXaO9xHxokQ4F3BCeFHEkNZNjM7Q6AgTFj2+ExSv6CkBx5s46AhoQNNGDtMimr777PQpRWDCz04xYC192SqfZ0dYM16fkTjdOrg3ToURXPT58NIPPVQXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774033478; c=relaxed/simple;
-	bh=y4xjiVBHeQF5JqZbrncshkWLcltuy9g0ZxsUn3RToTc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dSNKnM4fWTmHsr481yG3i/2BFBJ8F5AP7rhei2hwut5FCFBgQzU70Vhiqn3RxdD/zFJaXQm+EmcI6dsbqf5QzXX8W16ItlE+LCTlK9AJCtRnXxfcpiRaCLHS1ibxeQVz34GpWu3I2h+oA/2Mxp1ab865Lr1/nnS/BgJk6kuRBuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f12mF43N; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-43a03cb1df9so2256116f8f.1
-        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 12:04:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774033476; x=1774638276; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rU8hROsash8pjNenSuRQmTzxfx2+/q618jsTqv5sedE=;
-        b=f12mF43NfOplMF26NlyDg4yYTjXoTv3VrPZ6xJYEXxrg7SENZXSyRQ7bU1Q3PjjAAe
-         gxYKlkUJoWoAKvKMU6iHeLIQzV/SsPFlFWw2iKzfyM/QY6haPg+HMnC8ZGqDH81fkbMX
-         sdxVPwt/QkL5IMbDLdMJP+bbL0EQa0oZFE43Uw727N5cJqPGV6XZG6TkEJ33TI8jIgO/
-         ovJ42EEzjdI75D/ugCeMxu4g66KyaX3fhvxi7anAhN4q2u4r37xDhCd16BSIQgVWxzP9
-         IJZioZD7BJfVOn9LdPt+m6Sz+LnQgU4nfAS2FEVeIvkxEZPke2cd3j4wFdNOmdtIEmfT
-         7hhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774033476; x=1774638276;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rU8hROsash8pjNenSuRQmTzxfx2+/q618jsTqv5sedE=;
-        b=jF3HoTkUtPnZKhXX7EeW3PvKvCaejq6uocNqSgNZ/CSqPWOqc1AN032suvFJuykl0g
-         LVucmgwJvV3a/c/9H8VLZteTDh8f9uvxnwV2B9iSQQeOnupLI4XlIaDYaXW28pvRLzOT
-         ti87wll40MIprelNlxNH4kYjzGOowBIBqdM9ssi9JltqnZH92yTK28Y6OBJaxXSPqoaa
-         a4TO/Vk/KvNH3VkgK3buKGhhkHrI99xP21tgR+gc4Of6QQts9XX3ChFvaJ0OmrzP8v1g
-         8ALUQBQCjnd0ylUcWOmNhz5nTaFdHbz6IXR+bu35O4c2SUWJBtvM++i+EVjZpy3Kk89e
-         ZZtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVfTDYSDa6RAio7GM4kYt4H6q7a9jVbvCuGR7Wx58y/R2v/yf4vMPy7gomYuNS1VjRgaZ6bbgs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYlspwONqvNVAERY44RnW1CrQDYzbGKZ/2BhbXdzMEG89uF5d5
-	6hs6EgXhvW3Z/cdtwGrhKRcQN5nP+hCCB/fi0frMlnvLcPqQfeY0Hk5v
-X-Gm-Gg: ATEYQzyOp2V3Ae290ESBZNXyxtwLzMoeZWXqmuXHwPxe1ib/YvmQnH8FtOaeB8UPG9S
-	uP7CGJ716IAYKAP2QQxxjuAVqHkAk+dpinaMfMzKZbdSPjJ1LxgPYRcJdVYfutz0VJPZKwPCG4G
-	bgME+Y1seQsCtESXldzYwvIJvdpAdPscrbOFLvL3I5QyQrZRORXPkyv7hV3pd3YOdmD9cXPtdwt
-	K9/sfP8f4vxreV+1z6I5YCOgDPDkXuCWq3a2isA0OQIi2YnufyQhITx90fl/bTdW0CHEMta9h3r
-	trFTm5x2RxhFA03LVw2eFL4WYEsqBE17mDjfknLBkeEoFBhDBvRGgiITs36RSXj5MJwXVeJqYkj
-	PTXezNUZQ7Xu5sJNKpK+ffnZrWzAHBsus06QNm65i+cpavtzthimxNQgRVlHJJRl/rprO2Lxe3c
-	kle/spXNiKAleiZ14ijpgFRAOW5X8pqwfXU3Ne31eytSExPOc3qe7AfkjmHm8ELMkssf+QU7QTv
-	SydGjjeQ5eTWE6z4zdrTF00
-X-Received: by 2002:a05:6000:2407:b0:439:b3d2:3766 with SMTP id ffacd0b85a97d-43b6423fc13mr8053476f8f.19.1774033475555;
-        Fri, 20 Mar 2026 12:04:35 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b644bd923sm9802710f8f.12.2026.03.20.12.04.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Mar 2026 12:04:35 -0700 (PDT)
-Message-ID: <90a03d3c-def3-4e34-89a0-6e952d3b0d7a@gmail.com>
-Date: Fri, 20 Mar 2026 19:04:33 +0000
+	s=arc-20240116; t=1774033730; c=relaxed/simple;
+	bh=7WNZM6g9R3CLfh6cWhvFwVZyrccgJ4B0ROAyC9BBclU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fLhSOgWTfJswcKIgWV8U9RMwAR07ruyW+UwL9CQandMCau3ibFcwi1rsmI79j4BWlMDo6BRsVv/lZc3ACjL2kMirkg865cM1jX8C+bY2mJXnKOUQw4cQc1SLcT3yXGzzAkJ6eKEsziVB0tFEjL4AbkaokAjgQ7/IOE4IOadFtEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hsnPl9Pu; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774033729; x=1805569729;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7WNZM6g9R3CLfh6cWhvFwVZyrccgJ4B0ROAyC9BBclU=;
+  b=hsnPl9PuA4ePLELW2nWJeNM/4paj/mzgLVQBsvlULuU/q5oQ3iq4qora
+   PattH3FuLG8s5ez6rPi/oX+vUUKqLhtYXaOTEkvnnqlRfUGYikbfI8bHN
+   9Rgl25CF12t7BkS4+ckqJeiCtsKpvIRECel3Lyh1WLgZ+4BcpghHKbBft
+   IM8GSdFGWIpahpe7b3A3lgqUhOCH7XKJlR6cxDV8WFzhb85wqYN1uYjOc
+   ihv+wUEUXXiL4corzrc7ztB185GfTLe9gwY5G/O5NO8DTpTFWJz+iOfKQ
+   6/Xcp6ioyHpjS6WFjFQBvsgi2yTfGcmilzp/uwB6+nvWZZ838PjLFB7hr
+   w==;
+X-CSE-ConnectionGUID: PO9UFf0GTzGSGj6CdwbDnA==
+X-CSE-MsgGUID: svTdwtuEQtePT6opWU+CHQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11735"; a="74829512"
+X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
+   d="scan'208";a="74829512"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2026 12:08:48 -0700
+X-CSE-ConnectionGUID: rrwaT2HISvqx5APreFqssA==
+X-CSE-MsgGUID: oniAF6+OTwupmekwYzMoCw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
+   d="scan'208";a="223404640"
+Received: from lkp-server02.sh.intel.com (HELO ef9b23065726) ([10.239.97.151])
+  by orviesa008.jf.intel.com with ESMTP; 20 Mar 2026 12:08:43 -0700
+Received: from kbuild by ef9b23065726 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w3fBq-0000000006z-2ufW;
+	Fri, 20 Mar 2026 19:07:47 +0000
+Date: Sat, 21 Mar 2026 03:06:32 +0800
+From: kernel test robot <lkp@intel.com>
+To: Nora Schiffer <nora.schiffer@ew.tq-group.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+	linux@ew.tq-group.com,
+	Nora Schiffer <nora.schiffer@ew.tq-group.com>
+Subject: Re: [PATCH 6/7] net: ethernet: ti: am65-cpsw: add support for J722S
+ SoC family
+Message-ID: <202603210254.ABl6TQWc-lkp@intel.com>
+References: <4cc3dd9fab460d35215c8f97496b9ae16c5bcb22.1773751309.git.nora.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: sfc: avoid format string warning
-To: Arnd Bergmann <arnd@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Nathan Chancellor <nathan@kernel.org>, Jeff Garzik <jgarzik@redhat.com>,
- Ben Hutchings <bhutchings@solarflare.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- Brett Creeley <brett.creeley@amd.com>, Breno Leitao <leitao@debian.org>,
- Kees Cook <kees@kernel.org>, netdev@vger.kernel.org,
- linux-net-drivers@amd.com, linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-References: <20260320151924.3474821-1-arnd@kernel.org>
-Content-Language: en-GB
-From: Edward Cree <ecree.xilinx@gmail.com>
-In-Reply-To: <20260320151924.3474821-1-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4cc3dd9fab460d35215c8f97496b9ae16c5bcb22.1773751309.git.nora.schiffer@ew.tq-group.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270038-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270040-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[arndb.de,gmail.com,google.com,amd.com,debian.org,kernel.org,vger.kernel.org,lists.linux.dev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ecreexilinx@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.893];
-	TAGGED_RCPT(0.00)[netdev,lkml];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.972];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,arndb.de:email]
-X-Rspamd-Queue-Id: D2BA72DFB95
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,git-scm.com:url]
+X-Rspamd-Queue-Id: DE50F2DFC27
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 20/03/2026 15:19, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Three sfc drivers contain the same *_fill_test() function that takes
-> a format string argument that gets passed down to snprintf(), producing
-> a warning with clang-22:
-> 
-> drivers/net/ethernet/sfc/falcon/ethtool.c:227:60: error: diagnostic behavior may be improved by adding
->       the 'format(printf, 7, 8)' attribute to the declaration of 'ef4_fill_test' [-Werror,-Wmissing-format-attribute]
->   210 |                 snprintf(test_str, sizeof(test_str), test_format, test_id);
->       |                                                                          ^
-> drivers/net/ethernet/sfc/falcon/ethtool.c:210:13: note: 'ef4_fill_test' declared here
-> 
-> Rework these to take a varargs based test_format that allows better
-> type checking and avoids this warning.
-> 
-> Fixes: 3273c2e8c66a ("[netdrvr] sfc: sfc: Add self-test support")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Hi Nora,
 
-I'm not convinced this is an improvement.  The function takes *two* printf
- format strings (unit_format and test_format), and this only annotates and
- varargs-ifies one of them (and doesn't harden the unit_format, which has
- the considerably more worrying-looking "if it has a % in, assume it takes
- precisely one int argument").
-So it may make things 'look' hardened enough to satisfy the compiler
- warning, but that just hides the unsafety and might sucker future
- developers into thinking "oh, the compiler knows about the format strings
- so I don't need to check it by hand".
-I'm not sure what a proper fix would look like — possibly a rewrite adding
- a separate efx_fill_test_perq() function for the cases with a nontrivial
- unit_format, baking in the knowledge that the format is always "foo%d"
- for some constant string foo and thus we don't actually need to pass in
- an arbitrary format string.
+kernel test robot noticed the following build errors:
 
-> -static void efx_fill_test(unsigned int test_index, u8 *strings, u64 *data,
-> -			  int *test, const char *unit_format, int unit_id,
-> -			  const char *test_format, const char *test_id)
-> +static void __printf(7, 8)
-> +efx_fill_test(unsigned int test_index, u8 *strings, u64 *data,
+[auto build test ERROR on robh/for-next]
+[also build test ERROR on net-next/main net/main linus/master v7.0-rc4 next-20260319]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I don't like splitting the specifiers/return type from the function name
- like this.  It's not Linux style[1].
-(From a quick poke around the tree, there seems to be less consensus on
- where the __printf attribute goes — some put it on its own line before
- `static`, some would put it between `static` and `void`… sigh.)
+url:    https://github.com/intel-lab-lkp/linux/commits/Nora-Schiffer/dt-bindings-phy-ti-phy-j721e-wiz-Add-ti-j722s-wiz-10g-compatible/20260320-033344
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
+patch link:    https://lore.kernel.org/r/4cc3dd9fab460d35215c8f97496b9ae16c5bcb22.1773751309.git.nora.schiffer%40ew.tq-group.com
+patch subject: [PATCH 6/7] net: ethernet: ti: am65-cpsw: add support for J722S SoC family
+config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20260321/202603210254.ABl6TQWc-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260321/202603210254.ABl6TQWc-lkp@intel.com/reproduce)
 
--Ed
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603210254.ABl6TQWc-lkp@intel.com/
 
-[1]: https://lore.kernel.org/all/1054519757.161606@palladium.transmeta.com/T/#u
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/ti/am65-cpsw-nuss.c:762:9: warning: cast to smaller integer type 'enum am65_cpsw_tx_buf_type' from 'void *' [-Wvoid-pointer-to-enum-cast]
+     762 |         return (enum am65_cpsw_tx_buf_type)k3_cppi_desc_pool_desc_info(tx_chn->desc_pool,
+         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     763 |                                                                        desc_idx);
+         |                                                                        ~~~~~~~~~
+>> drivers/net/ethernet/ti/am65-cpsw-nuss.c:3470:47: error: use of undeclared identifier 'AM64_CPSW_QUIRK_CUT_THRU'
+    3470 |         .quirks = AM64_CPSW_QUIRK_DMA_RX_TDOWN_IRQ | AM64_CPSW_QUIRK_CUT_THRU,
+         |                                                      ^
+   1 warning and 1 error generated.
+
+
+vim +/AM64_CPSW_QUIRK_CUT_THRU +3470 drivers/net/ethernet/ti/am65-cpsw-nuss.c
+
+  3468	
+  3469	static const struct am65_cpsw_pdata j722s_cpswxg_pdata = {
+> 3470		.quirks = AM64_CPSW_QUIRK_DMA_RX_TDOWN_IRQ | AM64_CPSW_QUIRK_CUT_THRU,
+  3471		.ale_dev_id = "am64-cpswxg",
+  3472		.fdqring_mode = K3_RINGACC_RING_MODE_RING,
+  3473		.extra_modes = BIT(PHY_INTERFACE_MODE_SGMII),
+  3474	};
+  3475	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
