@@ -1,160 +1,394 @@
-Return-Path: <netdev+bounces-270079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270080-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2CfoNbe/vWlNBQMAu9opvQ
-	(envelope-from <netdev+bounces-270079-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:44:23 +0100
+	id OA5vBCLBvWmEBQMAu9opvQ
+	(envelope-from <netdev+bounces-270080-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:50:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 607422E1783
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:44:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C52362E17DB
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:50:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C212E3022045
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 21:44:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6AADE3016EDC
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 21:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C34C13D88E2;
-	Fri, 20 Mar 2026 21:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B4A3F1678;
+	Fri, 20 Mar 2026 21:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YKvSFQ5h"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="GIpeVn5x"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C5B3DBD67
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 21:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0FBB371891
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 21:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774043054; cv=none; b=CNw8LlD5XJGMUtavKd4kHzhbi3FKQv0yfr9Dmnci9JYTvKeW0atPEdsim3mDuko4sT9CmJ0D2IhMHZHnsczFS5KoHPe6CcbSMm5JjBT/N0cviI2FnpWGxMXCvOx8Vi/13U1xUZu8EUe3seMSWJnsopfputFHPK9fDeAOo1Pv3LY=
+	t=1774043422; cv=none; b=KHX6Fl6+lKgEYw0i9pJpC0B67ZjQQ6G66nJyWchZBta8dfhsBDtdDEt6Oqs63FzJbrgc41kZR6SPk0m2q5Zm9q6rwJnJZH1wa9gPij79o3ocJJFwRGWV1ijJdzu8PpzNqE3vRawHFRxbf8OeayGv2Cou4FLEv3v+Bn448oIIGCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774043054; c=relaxed/simple;
-	bh=P0XTqNHSYh46la0uCM92ORJAtWeJrcW1XVQ0cl+cRTg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IUXIQ2DddUC9cnPOVSaPmPyshajewGc02Ob+h+o5q4LLqG/ZpIsUFbntXLOD0L/TJfnmLXsq5f5VuCXbMvINLAmA7Gf01y6v7njBTQsPN+uaJ/I7qr6QT/6ggIHHVWYtAknoUoKI3mr/Ig/q3XZF3wydPpFq0zUqrODcw1q6AZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YKvSFQ5h; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZRVHF0u6g1TthdpokXmg97pOdWzzhaalIj5QKlQde34=; b=YKvSFQ5hVmRs76k+UVWJtzB6+y
-	0SyhAOeYKSxZFSVkmakO6DvVYtQduvtZkrgO9niH3EY4GgjhzX4b92FIid91WlYGD09b2NFPBjUCQ
-	UXFKz/Mob3DK/4dlTIdl2mJNGlSnG2rGR0ILAHqogBbdZqwDErfhrToH4HD5pb4G0PQA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w3hdT-00Ce0t-OZ; Fri, 20 Mar 2026 22:44:03 +0100
-Date: Fri, 20 Mar 2026 22:44:03 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Patryk <pbiel7@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: How to approach slow firmware loading process?
-Message-ID: <842d9c06-a45e-407e-b817-ee09ffbeb132@lunn.ch>
-References: <CA+DkFDbcAqyj2miq7Y4nDfXXMef39WWhcKwowPKBeVH8b6pZVw@mail.gmail.com>
+	s=arc-20240116; t=1774043422; c=relaxed/simple;
+	bh=pBnqRcrfQSqP04dQsfal7y3JrKjfyno+zV5OFsNFLDI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hhV9P8pgwT5nnoGb2d+1Qpnt915l91zpaCT7GM4j5wFBDFYanR2M6aEh4tXEYrynynUaOkhr35vd4leQ6RJcNSb494cdWstUAWip+Dv0sfHkN+f2CBb+yP6TdzvSnZP9CyPihkk8NpYiNaKl+4pklQmOS2MMibizqvh+SjQYevI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=GIpeVn5x; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9tnA4Ak5H3Fpwo9bB274Q7Mpam2pSNxqDfisUGxyMOI=; t=1774043418; x=1774907418; 
+	b=GIpeVn5x3g+4rj+WqKyU9vejaDlCBsosKTMNfjPKLnmSnIWHtYGxGa4sURvd4zGO7vGjWIDyzfj
+	/vTd2dy0s0XfSXm+WRR6niEW6jbMVzf9JbQFFwy3qwTUlYzxiVu98JJE6DZ3v9P2ENbI/48nSric3
+	toWk/USaC1tNODcyingwvay7Q8b9Ri5OjSPP5usT4DmtzY5xC2ueTMAEDPQCqzrx3WcDTLLLqZVCu
+	d1Jgvy7ttxYJlk14ZuWIVMD2ykUU+KI8HgMXK88EGAHJ14CjCCJ9aWHHGjGP97OgIg6puTzZcrN2T
+	QhXHDqKQYhPrw8o3DXnbP5rFqICfpYBYeefA==;
+Received: from mail-yx1-f43.google.com ([74.125.224.43]:54277)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1w3hjR-0001sz-Rl
+	for netdev@vger.kernel.org; Fri, 20 Mar 2026 14:50:18 -0700
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-64ca4dfdd88so1080872d50.0
+        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 14:50:13 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVN+rNwoPwJXEVKsIxkavkXYseeHV879sBPfoAwYtZBJcWmE6aeiCigCKAcJ1goqyEBTFoEkZw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOW21GkjMIy8VAsuzZcOLzvP/sJt0iONxyj1D86ZCOrWsShveM
+	ZVn6j7Q5RQedf8TlIFd8RP15z0R0FhYEZrDhWkuQ1Gz1uF9e234yR5Is6Zm8wIwAyFJPnQPRrlo
+	NgKD96mI45oqM8jmKPlKKyTvNYWDto54=
+X-Received: by 2002:a05:690e:4183:b0:64c:a1b9:ffa4 with SMTP id
+ 956f58d0204a3-64eaa69e0c4mr4675626d50.4.1774043413128; Fri, 20 Mar 2026
+ 14:50:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+DkFDbcAqyj2miq7Y4nDfXXMef39WWhcKwowPKBeVH8b6pZVw@mail.gmail.com>
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	SUBJECT_ENDS_QUESTION(1.00)[];
+References: <20260316223228.2611-14-ouster@cs.stanford.edu> <20260318072149.269101-1-pabeni@redhat.com>
+In-Reply-To: <20260318072149.269101-1-pabeni@redhat.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Fri, 20 Mar 2026 14:49:37 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmywmpxx8A+f0ZZ3H=NKjEVDbCZ6jXAZ1x9i3BBf8jomXA@mail.gmail.com>
+X-Gm-Features: AaiRm51Clj3wJ_E3iBMuERIcyueYQmgIs5S9u8tTp6Tq127XTp9wt44wWzLaryI
+Message-ID: <CAGXJAmywmpxx8A+f0ZZ3H=NKjEVDbCZ6jXAZ1x9i3BBf8jomXA@mail.gmail.com>
+Subject: Re: [net-next,v17,13/14] net: homa: create homa_plumbing.c
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: horms@kernel.org, netdev@vger.kernel.org, kuba@kernel.org, 
+	edumazet@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Scan-Signature: bc0ab93dd0d250805ad7d834ef2a99c7
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_REJECT(1.00)[cs.stanford.edu:s=cs2308];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[cs.stanford.edu : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270079-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[lunn.ch:?];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWO(0.00)[2];
+	TAGGED_FROM(0.00)[bounces-270080-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[cs.stanford.edu:-];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_DNSFAIL(0.00)[lunn.ch : SPF/DKIM temp error,none];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ouster@cs.stanford.edu,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.542];
-	R_DKIM_TEMPFAIL(0.00)[lunn.ch:s=20171124];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 607422E1783
+	NEURAL_HAM(-0.00)[-0.995];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url,mail.gmail.com:mid,control.id:url]
+X-Rspamd-Queue-Id: C52362E17DB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 05:48:05PM +0100, Patryk wrote:
-> Hello
-> I've been working on a 10G QXGMII Ethernet PHY bring-up and stumbled
-> upon a problem.
+On Wed, Mar 18, 2026 at 12:22=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+>
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
+l.html
+> ---
+> net: homa: create homa_plumbing.c
+>
+> homa_plumbing.c contains functions that connect Homa to the rest of
+> the Linux kernel, such as dispatch tables used by Linux and the
+> top-level functions that Linux invokes from those dispatch tables.
+>
+> > diff --git a/net/homa/homa_plumbing.c b/net/homa/homa_plumbing.c
+> > --- /dev/null
+> > +++ b/net/homa/homa_plumbing.c
+>
+> [ ... ]
+>
+> > +/**
+> > + * homa_ioc_info() - The top-level function that implements the
+> > + * HOMAIOCINFO ioctl for Homa sockets.
+> > + * @sock:  Socket for this request
+> > + * @arg:   The address in user space of the argument to ioctl, which
+> > + *          is a homa_info struct.
+> > + *
+> > + * Return:  0 on success, otherwise a negative errno. Sets hsk->error_=
+msg
+> > + *          on errors.
+> > + */
+> > +int homa_ioc_info(struct socket *sock, unsigned long arg)
+> > +{
+> > +     struct homa_sock *hsk =3D homa_sk(sock->sk);
+> > +     struct homa_rpc_info rinfo;
+> > +     struct homa_info hinfo;
+> > +     struct homa_rpc *rpc;
+> > +     int bytes_avl;
+> > +     char *dst;
+> > +
+> > +     if (unlikely(copy_from_user(&hinfo, (void __user *)arg,
+> > +                                 sizeof(hinfo)))) {
+> > +             hsk->error_msg =3D "invalid address for homa_info";
+> > +             return -EFAULT;
+> > +     }
+> > +
+> > +     if (!homa_protect_rpcs(hsk)) {
+> > +             hsk->error_msg =3D "socket has been shut down";
+> > +             return -ESHUTDOWN;
+> > +     }
+> > +     hinfo.bpool_avail_bytes =3D homa_pool_avail_bytes(hsk->buffer_poo=
+l);
+> > +     hinfo.port =3D hsk->port;
+> > +     dst =3D (char *)hinfo.rpc_info;
+> > +     bytes_avl =3D hinfo.rpc_info_length;
+> > +     hinfo.num_rpcs =3D 0;
+> > +     list_for_each_entry_rcu(rpc, &hsk->active_rpcs, active_links) {
+>                                 ^^^^
+>
+> Is rcu_read_lock() needed around this list_for_each_entry_rcu() loop?
+>
+> All three other functions that use the same homa_protect_rpcs() +
+> list_for_each_entry_rcu pattern (homa_abort_rpcs in homa_rpc.c,
+> homa_timer in homa_timer.c, and homa_abort_sock_rpcs in homa_rpc.c)
+> bracket the traversal with rcu_read_lock()/rcu_read_unlock().
+>
+> The homa_protect_rpcs() mechanism prevents RPC reaping via an atomic
+> counter, but doesn't provide RCU read-side protection.
+>
+> Without rcu_read_lock(), list_for_each_entry_rcu() triggers a lockdep
+> RCU warning, and on PREEMPT_RCU configurations the reader can be
+> preempted during traversal without the RCU subsystem knowing a reader
+> is active, breaking the RCU contract.
 
-It is a good idea to Cc: the PHY Maintainers when you have a PHY
-problem.
+Fixed (added RCU locking).
 
-Also, you were lucky that i even read this, because the subject has
-nothing in it to suggest it is PHY problem...
+>
+> > +             homa_rpc_lock(rpc);
+> > +             if (rpc->state =3D=3D RPC_DEAD) {
+> > +                     homa_rpc_unlock(rpc);
+> > +                     continue;
+> > +             }
+> > +             homa_rpc_get_info(rpc, &rinfo);
+> > +             homa_rpc_unlock(rpc);
+> > +             if (dst && bytes_avl >=3D sizeof(rinfo)) {
+> > +                     if (copy_to_user((void __user *)dst, &rinfo,
+> > +                                      sizeof(rinfo))) {
+> > +                             homa_unprotect_rpcs(hsk);
+> > +                             hsk->error_msg =3D "couldn't copy homa_rp=
+c_info to user space: invalid or read-only address?";
+> > +                             return -EFAULT;
+> > +                     }
+> > +                     dst +=3D sizeof(rinfo);
+> > +                     bytes_avl -=3D sizeof(rinfo);
+> > +             }
+> > +             hinfo.num_rpcs++;
+> > +     }
+> > +     homa_unprotect_rpcs(hsk);
+>
+> [ ... ]
+>
+> > +/**
+> > + * homa_socket() - Implements the socket(2) system call for sockets.
+> > + * @sk:    Socket on which the system call was invoked. The non-Homa
+> > + *         parts have already been initialized.
+> > + *
+> > + * Return: always 0 (success).
+> > + */
+> > +int homa_socket(struct sock *sk)
+> > +{
+> > +     struct homa_sock *hsk =3D homa_sk(sk);
+> > +     int result;
+> > +
+> > +     result =3D homa_sock_init(hsk);
+> > +     if (result !=3D 0) {
+> > +             homa_sock_shutdown(hsk);
+>                 ^^^^^^^^^^^^^^^^^^^
+>
+> Can this trigger a spinlock bug?
+>
+> When homa_sock_init() fails because homa_pool_alloc() returns
+> ERR_PTR(-ENOMEM), it returns before spin_lock_init(&hsk->lock) is
+> called in homa_sock_init().
+>
+> The error path then calls homa_sock_shutdown(hsk), whose first action
+> is homa_sock_lock(hsk) =3D spin_lock_bh(&hsk->lock) on the
+> never-initialized spinlock.
+>
+> With CONFIG_DEBUG_SPINLOCK, the lock's magic field (zero from slab
+> allocation) doesn't match SPINLOCK_MAGIC (0xdead4ead), causing
+> spin_bug() to call BUG().
+>
+> While homa_sock_shutdown() would immediately return after checking
+> !hsk->homa (NULL), the BUG() fires inside spin_lock_bh() before that
+> check is reached.
+>
+> This is reachable under memory pressure.
 
-> 2) Then the PHY layer calls the config_init. In the config_init I use
-> phy_package_init_once to check whether the common init function has
-> already been called. If not then I call the common init function that
-> is responsible for broadcasting firmware to all ports of the PHY.
-> And this is the place where things get problematic. The thing is that
-> loading firmware takes ages... namely around 30 seconds, which results
-> in the boot process waiting for config_init to complete its execution.
+Fixed (no need for additional cleanup after errors).
 
-This is not a simple problem to solve, apart from buying some FLASH
-for your PHY chip :-)
+>
+> > +             homa_sock_destroy(&hsk->sock);
+> > +     }
+> > +     return result;
+> > +}
+>
+> [ ... ]
+>
+> > +/**
+> > + * homa_getsockopt() - Implements the getsockopt system call for Homa =
+sockets.
+> > + * @sk:      Socket on which the system call was invoked.
+> > + * @level:   Selects level in the network stack to handle the request;
+> > + *           must be IPPROTO_HOMA.
+> > + * @optname: Identifies a particular setsockopt operation.
+> > + * @optval:  Address in user space where the option's value should be =
+stored.
+> > + * @optlen:  Number of bytes available at optval; will be overwritten =
+with
+> > + *           actual number of bytes stored.
+> > + * Return:   0 on success, otherwise a negative errno. Sets hsk->error=
+_msg
+> > + *           on errors.
+> > + */
+> > +int homa_getsockopt(struct sock *sk, int level, int optname,
+> > +                 char __user *optval, int __user *optlen)
+> > +{
+> > +     struct homa_sock *hsk =3D homa_sk(sk);
+> > +     struct homa_rcvbuf_args rcvbuf_args;
+> > +     int is_server;
+> > +     void *result;
+> > +     int len;
+> > +
+> > +     if (copy_from_sockptr(&len, USER_SOCKPTR(optlen), sizeof(int))) {
+> > +             hsk->error_msg =3D "invalid address for optlen argument t=
+o getsockopt";
+> > +             return -EFAULT;
+> > +     }
+> > +
+> > +     if (level !=3D IPPROTO_HOMA) {
+> > +             hsk->error_msg =3D "homa_setsockopt invoked with level no=
+t IPPROTO_HOMA";
+>                                  ^^^^^^^^^^^^^^
+>
+> This isn't a bug, but the error message says 'homa_setsockopt' instead
+> of 'homa_getsockopt'. This is a copy-paste error from homa_setsockopt().
+>
+> The error_msg field is returned to applications via the HOMAIOCINFO
+> ioctl, so users debugging socket option failures would see a misleading
+> message pointing to the wrong function.
 
-Historically, PHY devices have not needed firmware downloaded. This
-lead to assumptions being made about when a PHY is assumed to be
-usable.
+Fixed.
 
-MAC drivers typically connect to the PHY in open(), not probe(). In
-probe(), if the PHY has not registered itself yet, because it is still
-probing, i.e. downloading firmware, you could return -EPROBE_DEFER and
-get the core to try again later. In open() it is too late, you cannot
-return -EPROBE_DEFER you have to fail the open() which is not supposed
-to happen.
+>
+> > +             return -ENOPROTOOPT;
+> > +     }
+> > +     if (optname =3D=3D SO_HOMA_RCVBUF) {
+>
+> [ ... ]
+>
+> > +/**
+> > + * homa_recvmsg() - Receive a message from a Homa socket.
+> > + * @sk:          Socket on which the system call was invoked.
+> > + * @msg:         Controlling information for the receive.
+> > + * @len:         Total bytes of space available in msg->msg_iov; not u=
+sed.
+> > + * @flags:       Flags from system call; only MSG_DONTWAIT is used.
+> > + * @addr_len:    Store the length of the sender address here
+> > + * Return:       The length of the message on success, otherwise a neg=
+ative
+> > + *               errno. Sets hsk->error_msg on errors.
+> > + */
+> > +int homa_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int =
+flags,
+> > +              int *addr_len)
+> > +{
+>
+> [ ... ]
+>
+> > +     if (rpc->error) {
+> > +             hsk->error_msg =3D "RPC failed";
+> > +             result =3D rpc->error;
+> > +     } else {
+> > +             result =3D rpc->msgin.length;
+> > +     }
+> > +     result =3D rpc->error ? rpc->error : rpc->msgin.length;
+>         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>
+> This isn't a bug, but there's redundant dead-store code here.
+>
+> The if/else block assigns 'result' to either 'rpc->error' or
+> 'rpc->msgin.length', but the next line immediately overwrites 'result'
+> with the identical ternary expression.
+>
+> The two 'result =3D ...' assignments inside the if/else are dead stores
+> that are always overwritten. The if/else block's only surviving side
+> effect is setting 'hsk->error_msg =3D "RPC failed"' when rpc->error is
+> nonzero.
+>
+> This appears to be an editing mistake where either the if/else should
+> be the authoritative result assignment (and the ternary deleted), or
+> the ternary should remain and the if/else should be simplified to only
+> set error_msg (removing its result assignments).
 
-And as you pointed out, phylib assumes that as soon as
-probe()/config_init() returns, the PHY is good to go. So if you did
-return from config_init(), with the PHY still downloading firmware,
-you are going to get into a bad situation later on.
+Fixed.
 
-There are a few things you can try to speed it up.
+>
+> > +
+> > +     /* Collect result information. */
+> > +     control.id =3D rpc->id;
+>
+> [ ... ]
+>
+> > +/**
+> > + * homa_hrtimer() - This function is invoked by the hrtimer mechanism =
+to
+> > + * wake up the timer thread. Runs at IRQ level.
+> > + * @timer:   The timer that triggered; not used.
+> > + *
+> > + * Return:   Always HRTIMER_RESTART.
+> > + */
+> > +enum hrtimer_restart homa_hrtimer(struct hrtimer *timer)
+> > +{
+> > +     wake_up_process(timer_kthread);
+> > +     return HRTIMER_NORESTART;
+>         ^^^^^^^^^^^^^^^^^^^^^^
+>
+> The kernel-doc comment states 'Return: Always HRTIMER_RESTART' but the
+> function returns HRTIMER_NORESTART.
+>
+> The runtime behavior is correct (homa_timer_main re-arms the hrtimer
+> explicitly via hrtimer_start on each loop iteration, so HRTIMER_NORESTART
+> is the intended return value), but the comment contradicts the code.
+>
+> This misleads readers into believing the timer auto-restarts, when it
+> does not.
 
-Check if the MDIO bus supports running at a faster speed. A few
-drivers support the "clock-frequency" property. It should default to
-2.5Mhz. But many PHYs will works at higher speeds. Check the
-datasheet. It might be the MDIO driver you are using does not
-implement this property, and you will need to see if it can be added.
-
-I've achieved 3x speed up playing around with this.
-
-Another thing you can sometimes do is disable the preamble. An MDIO
-bus transaction starts with 32 bits of preamble. But some PHYs are
-happy without it. If you can turn it off, you send 50% less.
-
-Combine these two, and you can get a 6x speed up.
-
-Another thing to do is check the maths. One C22 MDIO transaction is 64
-bits. Assuming a 2.5Mhz clock, you can work out how long that
-takes. Look at the download protocol, is it efficient, 1 transaction
-for very 2 bytes? You can work out the theoretical time it takes.
-Then compare to what it actually takes. Because normally very few MDIO
-bus transactions are performed, the implementation is not always
-tuned. Sometimes the polling for the transaction to complete is too
-large, for example. So you might be able to make the basic write
-operation faster.
-
-       Andrew
+Fixed.
 
