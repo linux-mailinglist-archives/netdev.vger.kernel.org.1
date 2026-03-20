@@ -1,183 +1,213 @@
-Return-Path: <netdev+bounces-269947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269950-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yB9ZCothvWlF9gIAu9opvQ
-	(envelope-from <netdev+bounces-269947-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 16:02:35 +0100
+	id +PFAFupivWlh9gIAu9opvQ
+	(envelope-from <netdev+bounces-269950-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 16:08:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B93152DC3A1
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 16:02:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A79122DC56C
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 16:08:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0A14830D2767
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 14:52:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B27D23181919
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 15:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98BF3C73C6;
-	Fri, 20 Mar 2026 14:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D253C9443;
+	Fri, 20 Mar 2026 15:01:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StaLU4K7"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Pmb4yejz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D853C73C1
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 14:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC233C873A;
+	Fri, 20 Mar 2026 15:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774018226; cv=none; b=kKprQoSEyz7C3T/P3/k19AGOkNmwMoDwyrBCl6WhHVojbCD4gJkt+YEPR24SNbX1B7TgZnk795YkstuZm9pYJBLMK6BxK5VzgoGHt+VU+pc1WdLdztScpE0eW7Z/NxzJKs5Ecsou1wk4ggFSPrXBDK9HInA8fJMcLbLnWV/n1+o=
+	t=1774018909; cv=none; b=Lsl7MJhY7V2R53/Yz1puWaz1maPW2uF4wSpN27RnuBWsNu8Zj+U73VZixacstUU+IvIspfiDcm4RiNFNQpSX8bYttQ67TOVpVvWC/itP+r7KPAkQEibFABrc2qp1Id5kCu87iaVoaPhlGC71d1prGRvk2Mfjx7jxpV1O+joBbp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774018226; c=relaxed/simple;
-	bh=9r15zkBRZgwHE45GRs5lXdJzPqzlupyf2mT5NujU6Xc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tJghCFfNyH9aSTNWnPu+lV5NYU8pEJLCHM+a8hma1EJeICNvsiNqsB1oyXkw+GontJBn+mT1mUmznEduDpzmwY60GiuiqOMet7JpRNqh/Ca9UF6ET1NVbY+hI7BQB2TZNe5QyfM1pF7jB2UvR5aqGUwi2zmzBL0Rx0CYWbKkSm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StaLU4K7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA71CC19425;
-	Fri, 20 Mar 2026 14:50:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774018226;
-	bh=9r15zkBRZgwHE45GRs5lXdJzPqzlupyf2mT5NujU6Xc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=StaLU4K7CFQC4Fqr7Kx65Rk1h+jxfT+1iiTzNHdiSrtNUtd9YQafIUrgG5/PnbpoT
-	 3SzeU9b2seBxjoSTT26dq0ewhF4Hh2kCBF5bE1EwunC6SoeHpdrPksFyNphiR80Ibe
-	 jVpFbYuP6zWB6IH109kgz7CywLVSJFzm60f7IHem58QOBdM7WPQrSHi+IDhN77k9Mg
-	 KMJD1m+h0QyO+UFv39M1GITMDDFIV7TmPRylS6v+YyBKwa3YshR2FdDOuIyd/Q3COz
-	 44RxL1qcXV80wG3MiHlkMCbAjh2d1Z5jN02qv2NP0mjvZuDGeqcR1Dyn+iMnXrank9
-	 LzCP6ymn6Ny4g==
-Message-ID: <6d1b8a33-b645-4ab4-b459-36e826052e48@kernel.org>
-Date: Fri, 20 Mar 2026 15:50:21 +0100
+	s=arc-20240116; t=1774018909; c=relaxed/simple;
+	bh=jbnrcWLoBn3dGdV/EgPjDBdGByhNdGn4Lcus/kv5WsU=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=IUPNA64pIx4VUbWjAm2vhkh2VV/HIrXJ1fx4Dec/MEa7lmjngp7ZQdMNzEvz22tov7aSs7ORQ8mJ3t3AXVDYWByve4m+DwAtbGy94jDUnbgYcD10GFzhBDSiqxLbo5DUkuc1TfLr27McZHzpSR86cnMAT7Dw8v+mO3aUSA7//+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Pmb4yejz; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1774018908; x=1805554908;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=jbnrcWLoBn3dGdV/EgPjDBdGByhNdGn4Lcus/kv5WsU=;
+  b=Pmb4yejzlclhOgqFYpOFCd1OuUYvv3ImHq7WuLZkXT/re1XFcW2HtpT1
+   CJ82n5AoMbSoYQK0P0ELXAne8l9VNAR4bAMhv6+BD71++PMqbiZJH+dk3
+   r2YSLkergkAQZuywxf+/8e/DAscux10LjJ7mbuuOR88lLFzXsRj5LVzVC
+   aXTOTAsSP8+AQ4GlW3HJdgIH8+l3FKYrdcCVNHDzuYvF0D9peaOcEuUAg
+   mdshzdH0D/wPPfyEKxoDU10xG+C98Zz93Bz+j8viyIkzRPCUWYTu8yetU
+   9JL5KO+zphE80pNc1wPj4RjyQJZ/Q69v8P2ZoqbaqDxpwmhDG1JY9xCI+
+   g==;
+X-CSE-ConnectionGUID: uoQg81OiQ1aIAKaIXuNqaA==
+X-CSE-MsgGUID: qsVcPzyQSBmHUJUdcLsjWw==
+X-IronPort-AV: E=Sophos;i="6.23,130,1770620400"; 
+   d="scan'208";a="54967825"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Mar 2026 08:01:47 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Fri, 20 Mar 2026 08:01:16 -0700
+Received: from DEN-DL-M70577.microsemi.net (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Fri, 20 Mar 2026 08:01:13 -0700
+From: Daniel Machon <daniel.machon@microchip.com>
+Subject: [PATCH net-next 00/10] net: lan966x: add support for PCIe FDMA
+Date: Fri, 20 Mar 2026 16:00:56 +0100
+Message-ID: <20260320-lan966x-pci-fdma-v1-0-ef54cb9b0c4b@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next 2/6] veth: implement Byte Queue Limits (BQL)
- for latency reduction
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- netdev@vger.kernel.org
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, andrew+netdev@lunn.ch, horms@kernel.org,
- jhs@mojatatu.com, jiri@resnulli.us, sdf@fomichev.me,
- j.koeppeler@tu-berlin.de, mfreemon@cloudflare.com, carges@cloudflare.com,
- kernel-team <kernel-team@cloudflare.com>
-References: <20260318134826.1281205-1-hawk@kernel.org>
- <20260318134826.1281205-3-hawk@kernel.org> <87ms05nrdw.fsf@toke.dk>
- <cbfc927d-0b96-4788-8bf6-8a2ffa4dd9f4@kernel.org> <87h5qcnnjh.fsf@toke.dk>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <87h5qcnnjh.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAChhvWkC/x3MQQqAIBBA0avErBsoLamuEi0kxxqoKTRCiO6et
+ HyL/x+IFJgiDMUDgW6OfEhGXRYwr1YWQnbZoCplKl1r3Kz0xiQ8Z0bvdot9Q67pWqe0t5CzM5D
+ n9C9HELpQKF0wve8HPKHrymwAAAA=
+X-Change-ID: 20260313-lan966x-pci-fdma-94ed485d23fa
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>, Steen Hegelund
+	<steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Herve
+ Codina <herve.codina@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bpf@vger.kernel.org>
+X-Mailer: b4 0.14.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-269950-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269947-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,iogearbox.net,gmail.com,fomichev.me,bootlin.com,arndb.de,linuxfoundation.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	NEURAL_HAM(-0.00)[-0.995];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B93152DC3A1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A79122DC56C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+When lan966x operates as a PCIe endpoint, the driver currently uses
+register-based I/O for frame injection and extraction. This approach is
+functional but slow, topping out at around 33 Mbps on an Intel x86 host
+with a lan966x PCIe card.
 
+This series adds FDMA (Frame DMA) support for the PCIe path. When
+operating as a PCIe endpoint, the internal FDMA engine on lan966x cannot
+directly access host memory, so DMA buffers are allocated as contiguous
+coherent memory and mapped through the PCIe Address Translation Unit
+(ATU). The ATU provides outbound windows that translate internal FDMA
+addresses to PCIe bus addresses, allowing the FDMA engine to read and
+write host memory. Because the ATU requires contiguous address regions,
+page_pool and normal per-page DMA mappings cannot be used. Instead,
+frames are transferred using memcpy between the ATU-mapped buffers and
+the network stack. With this, throughput increases from ~33 Mbps to ~620
+Mbps for default MTU.
 
-On 19/03/2026 11.04, Toke Høiland-Jørgensen wrote:
-> Jesper Dangaard Brouer <hawk@kernel.org> writes:
-> 
->> On 18/03/2026 15.28, Toke Høiland-Jørgensen wrote:
->>> hawk@kernel.org writes:
->>>
->>>> From: Jesper Dangaard Brouer <hawk@kernel.org>
->>>>
->>>> Add BQL support to the veth driver to dynamically limit the number of
->>>> bytes queued in the ptr_ring, giving the qdisc earlier feedback to shape
->>>> traffic and reduce latency.
->>>>
->>>> The BQL charge (netdev_tx_sent_queue) is placed in veth_xmit() BEFORE
->>>> veth_forward_skb() produces the SKB into the ptr_ring. This ordering is
->>>> critical: with threaded NAPI the consumer runs on a separate CPU and can
->>>> complete the SKB (calling dql_completed) before veth_xmit() returns. If
->>>> the charge happened after the produce, the completion could race ahead
->>>> of the charge, violating dql_completed()'s invariant that completed
->>>> bytes never exceed queued bytes (BUG_ON).
->>>>
->>>> Whether an SKB was BQL-charged is tracked per-SKB using a VETH_BQL_FLAG
->>>> bit in the ptr_ring pointer (BIT(1), alongside the existing VETH_XDP_FLAG
->>>> BIT(0)). The do_bql flag from veth_xmit() propagates through
->>>> veth_forward_skb() and veth_xdp_rx() into the ptr_ring entry. On the
->>>> completion side in veth_xdp_rcv(), veth_ptr_is_bql() reads the flag to
->>>> decide whether to call netdev_tx_completed_queue(). Per-SKB tracking is
->>>> necessary because the qdisc can be replaced live (e.g. noqueue->sfq or
->>>> vice versa via 'tc qdisc replace') while SKBs are already in-flight in
->>>> the ptr_ring. SKBs charged under the old qdisc must complete correctly
->>>> regardless of what qdisc is attached when the consumer runs, so each
->>>> SKB carries its own BQL-charged state rather than re-checking the peer's
->>>> qdisc at completion time.
->>>
->>> It's not completely obvious to me why BQL can't be active regardless of
->>> whether there's a qdisc installed or not? If there's no qdisc, shouldn't
->>> BQL auto-tune to a higher value because the queue runs empty more?
->>>
->>
->> When net_device don't have qdisc we hit this code path:
->>    - [0]
->> https://elixir.bootlin.com/linux/v7.0-rc4/source/net/core/dev.c#L4806-L4852
->>    - Notice the check if(!netif_xmit_stopped(txq))
->>    - resulting in "Virtual device %s asks to queue packet!"
->>
->> We cannot unconditionally track BQL as calling netdev_tx_sent_queue()
->> can result in setting STACK_XOFF.  Resulting in above code dropping
->> packets and complaining.  (It have no qdisc to requeue store back-
->> pressured packet).
-> 
-> Ah, right. I realised the packet would be dropped, of course, but I did
-> not realise the stack would complain. That seems... odd? Why not just
-> get rid of the complaint instead of having this kludge to work around
-> it?
-> 
+Patches 1-2 prepare the shared FDMA library: patch 1 renames the
+contiguous dataptr helpers for clarity, and patch 2 adds PCIe ATU region
+management and coherent DMA allocation with ATU mapping.
 
-The BQL code manipulates txq (struct dql) and this requires correct
-locking. Using noqueue on veth doesn't do the correct locking.
+Patches 3-5 refactor the lan966x FDMA code to support both platform and
+PCIe paths: extracting the LLP register write into a helper, exporting
+shared functions, and introducing an ops dispatch table selected at
+probe time.
 
-In the linked[0] code you were likely fooled by this code line[1]:
-  HARD_TX_LOCK(dev, txq, cpu);
-It is actually not taking the lock, because veth is a lltx device.
-(Don't be fooled by the annotation it is for WARN_CONTEXT_ANALYSIS)
+Patch 6 adds the core PCIe FDMA implementation with RX/TX using
+contiguous ATU-mapped buffers. Patches 7 and 8 extend it with MTU
+change and XDP support respectively.
 
-For fun I actually implemented it to see what happened. And I did manage
-to crash the kernel on the DQL internal BUG_ON.  Analyzing the BUG_ON I
-realized that my scheme of charging BQL and then undo the charge (if
-ptr_ring were full) isn't correct, there is a race.  The BQL call
-netdev_tx_completed_queue() is strictly to be used by the consumer, not
-by the producer (like I did).
+Patches 9-10 update the lan966x PCI device tree overlay to extend the
+cpu register mapping to cover the ATU register space and add the FDMA
+interrupt.
 
-I'm now working on different approaches for the undo...
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Steen Hegelund <steen.hegelund@microchip.com>
+To: UNGLinuxDriver@microchip.com
+To: Alexei Starovoitov <ast@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+To: John Fastabend <john.fastabend@gmail.com>
+To: Stanislav Fomichev <sdf@fomichev.me>
+To: Herve Codina <herve.codina@bootlin.com>
+To: Arnd Bergmann <arnd@arndb.de>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: bpf@vger.kernel.org
 
---Jesper
+Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+---
+Daniel Machon (10):
+      net: microchip: fdma: rename contiguous dataptr helpers
+      net: microchip: fdma: add PCIe ATU support
+      net: lan966x: add FDMA LLP register write helper
+      net: lan966x: export FDMA helpers for reuse
+      net: lan966x: add FDMA ops dispatch for PCIe support
+      net: lan966x: add PCIe FDMA support
+      net: lan966x: add PCIe FDMA MTU change support
+      net: lan966x: add PCIe FDMA XDP support
+      misc: lan966x-pci: dts: extend cpu reg to cover PCIE DBI space
+      misc: lan966x-pci: dts: add fdma interrupt to overlay
 
-[1] https://elixir.bootlin.com/linux/v7.0-rc4/source/net/core/dev.c#L4831
-[2] 
-https://elixir.bootlin.com/linux/v7.0-rc4/source/include/linux/compiler-context-analysis.h#L166
+ drivers/misc/lan966x_pci.dtso                      |   5 +-
+ drivers/net/ethernet/microchip/fdma/Makefile       |   4 +
+ drivers/net/ethernet/microchip/fdma/fdma_api.c     |  33 ++
+ drivers/net/ethernet/microchip/fdma/fdma_api.h     |  25 +-
+ drivers/net/ethernet/microchip/fdma/fdma_pci.c     | 177 +++++++
+ drivers/net/ethernet/microchip/fdma/fdma_pci.h     |  41 ++
+ drivers/net/ethernet/microchip/lan966x/Makefile    |   4 +
+ .../net/ethernet/microchip/lan966x/lan966x_fdma.c  |  51 +-
+ .../ethernet/microchip/lan966x/lan966x_fdma_pci.c  | 551 +++++++++++++++++++++
+ .../net/ethernet/microchip/lan966x/lan966x_main.c  |  47 +-
+ .../net/ethernet/microchip/lan966x/lan966x_main.h  |  46 ++
+ .../net/ethernet/microchip/lan966x/lan966x_regs.h  |   1 +
+ .../net/ethernet/microchip/lan966x/lan966x_xdp.c   |   6 +
+ 13 files changed, 949 insertions(+), 42 deletions(-)
+---
+base-commit: 9ac76f3d0bb2940db3a9684d596b9c8f301ef315
+change-id: 20260313-lan966x-pci-fdma-94ed485d23fa
+
+Best regards,
+-- 
+Daniel Machon <daniel.machon@microchip.com>
+
 
