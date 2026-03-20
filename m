@@ -1,210 +1,214 @@
-Return-Path: <netdev+bounces-269736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269737-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oMEMAOeevGke1gIAu9opvQ
-	(envelope-from <netdev+bounces-269736-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 02:12:07 +0100
+	id SHg3CPehvGns1gIAu9opvQ
+	(envelope-from <netdev+bounces-269737-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 02:25:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC392D4981
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 02:12:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76A742D4A31
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 02:25:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D8D7C3023DA2
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 01:12:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 552753031AC2
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 01:25:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06E9E279903;
-	Fri, 20 Mar 2026 01:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mZbvpb7m"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A5B82BFC85;
+	Fri, 20 Mar 2026 01:25:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA07B2594B9
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 01:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773969122; cv=pass; b=huY25Y/RG8+0PePjOUlUAXfLUI12uHbQBkXAFzUrWF5KxT+/hkDNXXOtlV+tK53zpuE57SfsGZWFLcK7tLSzHhghrrGakvzWRHOYWrQff+aNlZjHvYv81FvNC5xkSemvSyDwESeWZ+1cm2LqzU+9JqhbfraPsAnIVI6h2Ie4/Co=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773969122; c=relaxed/simple;
-	bh=nzszZFUGC5eoe6b65OiyPCgDvur5T6niG6Xz4kQ9bFM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UuMWK5OkYrglml/F4NihIKbnN9RPK8UFd3a2zblnI7n7sQeEHwlRXaARNcaMLpIvqut2MOY1dO+cyN1eyaUWlYk6xcvXUhMpvOrEZ5OH5N/mhdAHYxOZORY7r5KFBdraqKuc8zyYbcbfdHlDPjUvQ2OdUEGF/3l5ThLoYnisY9A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mZbvpb7m; arc=pass smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D05B82BE7A7
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 01:25:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773969904; cv=none; b=VWwm3AlNclyC1QC9wsom98PvFuf7Z8bJwEFLS5WL1anXJ+S7r7wYIZDpLAYW52QzXVdlJYqRvYa/gvYJ/Kwh5ozvYMfs9CeWDkQ4D8Q0zWBu2p3UPNtQSnuEEXkexniVfX7tLkbFo5KaffvbFi64w+z+zAxCmcIgwnDWU1iYMAE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773969904; c=relaxed/simple;
+	bh=k/3MiZh6ObBA2Gh0WgqU7rsQmjvA6q6JXhNX15TphY0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B7RkQdoQo/XlH2csnYn+XGAxS40o3CYFoMr57tY+BUEp3AfI3DJ1ueI9Fvsc8F7zDYfq1YR5ur6KxAy9aMxdu/+fQmPiRi3G7MZa6SZhuE22m2m3NTxWC7r7J6se4h1s+0cduh/BGpDJb5sLF1b5aTIsRNlp9J4MiEXkU5pRxos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.82.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-485410a0a8aso622735e9.2
-        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 18:12:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773969120; cv=none;
-        d=google.com; s=arc-20240605;
-        b=cwGshAlBldgHeZh39PjMYyz7morHZgKXy0uG1wQBNR+XqkEaHHTe4t7P/i1Rkrijdk
-         ERmAmLUKlWWu2AUerrZ5HZ+GCTLeC//Ste1mci0PExO35ySArOV9KvgbySsMsxF9ZcfN
-         +7azM4Vea7Q+j9JTIiViPow0X+aZl4jX4PBQY5pdo9vh3J0553tZKOfwrAaan8bPHviv
-         N6ZwwJo/6pyAVCEPbrQMiLDul70MtIyN6ad1hMXFbtNiJyr7jj2E5M6pBl6C4YBVK5gs
-         UXL1so1IY2o6ZZ3478QjnsOLcFYW1H5907/qL6aP/ppSHY3o8DwOYGBGbp/SUg3oWgOs
-         Xy0g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ayGFwySZHs4z9NIt8eLhyZLQX64EBLltnUs8BhPc48Y=;
-        fh=tmIu7IGYS8TO8ixWWIxVZdyXdHSR3LfLK/n0WwroH8s=;
-        b=aJIbWzb5ERarM5YUePDvtq6ZZFuJvzD4ThVZ0024rCZisBpYLaqxlGyQqCFR5hUiBZ
-         +q1Uy4gobwTEc6mEwCo5Rdmj3jJ5swBCWgiWgaTiaR4tzSeLZOvvzHA6SsBobfsFmXEP
-         dut6HrtoMDrxnJ2GiBetLNBz17x4GsJpUOfF4qENboVKiT1W0joc5Jq3p9PeLe04shCW
-         36Exw/mdwZks3nWNtIjim3wcjJMpe0pm14MyYtG9XPa19T7MykEL0ctYahXR/dzatMir
-         16hvTO4qYtbF0rqfVLzbhhkS6VbSgWXcA4pIWJG9gRYM0C3jPKpBb1LY4X0QSFdxfHs4
-         MXIw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773969120; x=1774573920; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ayGFwySZHs4z9NIt8eLhyZLQX64EBLltnUs8BhPc48Y=;
-        b=mZbvpb7mnU8Ar3hRC87vmrktAG7veVIkyG3LmP5JfPA3mxwIjBOnxWg1+XpXYQ9qlM
-         MPWPFggPlOx1B09BFOttnQK6DwWqFfoPKAxIbRoB4LTj7oGemszAZRww/YR5p1+exDOo
-         O5c99FDkTAPmpwBEoX8qkC/LDoZ4LNX6OhDQSMAYzgPkPJuaJjT30r4GuEvXdRK5b58C
-         Gs9d/iFvxBcT5IziQ8O6xrc8UAwRPS2lC7UPqraDBudNVUpN31aVJ3K0u9WQBvboNRga
-         DxlenQFSunqef8zo/TAFzgSbE34zgOaMvn9wXKmebtTP8mh7v0/kFnjQwOwKWOJKCeWO
-         bU/g==
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-2c0bb213b16so2614157eec.0
+        for <netdev@vger.kernel.org>; Thu, 19 Mar 2026 18:25:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773969120; x=1774573920;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ayGFwySZHs4z9NIt8eLhyZLQX64EBLltnUs8BhPc48Y=;
-        b=sEW7Az3PdCdNZfeN6dJqjkhXboH6BQRi8dTBhkRDkABQo34gtivKBqdZVnPLA7KMMQ
-         dunoU3ZyCQGztsvkpmPniExtTyekF2Vs0mImW5B8LW6HC3mpL7K6FbKxXjLdJcbBO6AJ
-         f7dwqgL82JEFItsGrbI0CLDHvlW9LcRR5Bt/iVdUhd8Q7Uq+gJT7bFMrgfqXgHIHVb/x
-         GlkPs/xtH3W+VlrA8/PD5juxjtq/vn3rJ3BeTLRFkf6ccBwhqdzLbuwxAFo2U8s40TVp
-         a+clL5cjDFZPEmv1ygo/FIp/62if8O1Ycul3GnMwUyTS5esOTjtLf0agzJRxplDuD3cY
-         WjRg==
-X-Forwarded-Encrypted: i=1; AJvYcCXG1fqCfuftPw97Qzt0Mon3gEIcofrT+Lll+Lnsl3CLLkzLgSpsLZqdQNB62OrCLWYInIbj5+M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0YkqILDPew+NntAyr3a4rZXXNVX/dZm7VkRFW3OLK6fSdNSiY
-	tWLeWCzcMNyIAH6LSOKaIS8tQGyMUVuKmx2gyON6aNhkHa0KVGQTXtqX6JGmp0wmitZjxq0LJJN
-	0GiFp+SBHC9hadfhBRfn5Zix1hr5kO4g=
-X-Gm-Gg: ATEYQzz3bN0bpylze/ZKdWnhKpCnxyJ+HGSwqKxTJULkb/n4AyjJ+srLtLMGXEpLCLa
-	I1wViOdj+7JsnVtgTcj4fKhzGnRga9zMLHALSLClGsEoO6WT9Ce/0uAAvLr7NmTxycgeHBBFtdS
-	hrayWhArQ0F4lFbDObX+8G6wmpeCU9PEmjDH3LCak1DFejMXUnlk5X58905hE1b5fbzEm/j/X+B
-	z/2GW1kTV7Ft1YyHXwGgFSAbESoJmvv+sAvHDfV1CCGw79TMJ9fFyk34WLdWjlI8hNBI3ohJdN5
-	lwvgTVlwxHxDw8XRwDXBPegJnKrXyn6Dx7j2bNtZ
-X-Received: by 2002:a05:600c:c167:b0:486:fc94:d8f2 with SMTP id
- 5b1f17b1804b1-486fedbc066mr17394635e9.14.1773969119695; Thu, 19 Mar 2026
- 18:11:59 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1773969903; x=1774574703;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6rpuLOskCPApojyOfZj7pXXkMzfKSIlGWmqpeqvyGp0=;
+        b=MeHLY19XAKN8d4zHIvp9M965+fMfq5SO1xA+Why2WXJyMnSfhGfe+ucXUlGS6+gApC
+         XKBnJ+4828Xs0qF71SBWFrafMOtPLN9lJT8o208pgtFHAJ2OcY8uPECMB3wpV3LADFUB
+         R/QW5t/iTtn0CWu734QH8mc44DrwHKlUX/wi4UePQeLtIaAV0/7TC6n8PDzig0I6h5LK
+         M3D3GOUHV8ajrDkOqJU+P5P73Sa6gfMVADJJmbkxdI6K4NXyVZdtrMYP44stnjQOhZSL
+         tQS3z62ObvczwfqDIrPvEEO0jA+xdKp9nwhOT2j8xD8oo2efXTBZNnnYKcVzsdcL4Yey
+         06kQ==
+X-Gm-Message-State: AOJu0YyTyyuJlm6tR5ThDaqEiQSBE3saxbBTIenQ61rW1m75k5QgqqAs
+	RwGOxWNkYd6A7GfwIGOC8mETfISZgbZxwEQ6T8FJrDdpKJCmCj+gImjR5thy
+X-Gm-Gg: ATEYQzyaDFEIqe01SGP0JHWlvNpbhlBpTD9+rYiuGITR5Xiqsv8NVS9h1bEp+06fqsr
+	B3/vJeEr/5QSbDUxxy0TlXh6d8rmAWKraxI5vyfl/KzHaEKhyO+BseVUEiR1h+r6KjncMsdzth8
+	GUX7SACoYYIUDRbs92Z4TzK/ErtppJwp8LMf6iCCcYK5HDrk/2Zi2eokjRspKDH89ByfYpxafyu
+	zyEpjnzieWnssWSVYtK+CHnOITQQT4solWi+cshdPQ+2BOOMQvqohSfLs1XKdOxf00LC6oV+GO5
+	Tf034wX1ijVp/MMdRbLjqHJWYAQuEND30MeU1aSpClL2pLrPouQBvKvoiL7bM7q/Smucwi4284C
+	Ao8rh79Nu6EECGcjUD81T9vKsJmj8h9e3+UMgcvYkIUJ+epIDEdQ3JQ/ylD2PmqPFu8Li4+mTM4
+	XG/6UWtXk88hEA5+vlXxwnsDXvnayzLSDwx4xHNHxV3VKApLWSKrvm+fFwvU1v65gJmA3h5S19R
+	Msw276EyejhQfWsDA==
+X-Received: by 2002:a05:7301:9f0c:b0:2b8:4c95:365d with SMTP id 5a478bee46e88-2c1095f54afmr757541eec.10.1773969902833;
+        Thu, 19 Mar 2026 18:25:02 -0700 (PDT)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c10b35116bsm1575407eec.30.2026.03.19.18.25.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2026 18:25:02 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	skhan@linuxfoundation.org,
+	andrew+netdev@lunn.ch,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	alexanderduyck@fb.com,
+	kernel-team@meta.com,
+	johannes@sipsolutions.net,
+	sd@queasysnail.net,
+	jianbol@nvidia.com,
+	dtatulea@nvidia.com,
+	sdf@fomichev.me,
+	mohsin.bashr@gmail.com,
+	jacob.e.keller@intel.com,
+	willemb@google.com,
+	skhawaja@google.com,
+	bestswngs@gmail.com,
+	aleksandr.loktionov@intel.com,
+	kees@kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	leon@kernel.org
+Subject: [PATCH net-next v3 00/13] net: sleepable ndo_set_rx_mode
+Date: Thu, 19 Mar 2026 18:24:48 -0700
+Message-ID: <20260320012501.2033548-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260319184031.8596-1-CFSworks@gmail.com> <20260319184031.8596-2-CFSworks@gmail.com>
- <abxxyHVXp6QpPue5@shell.armlinux.org.uk>
-In-Reply-To: <abxxyHVXp6QpPue5@shell.armlinux.org.uk>
-From: Sam Edwards <cfsworks@gmail.com>
-Date: Thu, 19 Mar 2026 18:11:47 -0700
-X-Gm-Features: AaiRm50mRwjPccV1Lpd9XuZSBHTAzYDUmTRqARu72YFqm9lh9utWbuv6pvfVHYE
-Message-ID: <CAH5Ym4htit49autJb8E=eatof23YK3qomVBCsXZi2cFR6CyViQ@mail.gmail.com>
-Subject: Re: [PATCH net v2 1/2] net: stmmac: Prevent NULL deref when RX memory exhausted
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	Baruch Siach <baruch@tkos.co.il>, Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269736-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269737-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[fomichev.me];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,renesas.com,nxp.com,tkos.co.il,gmail.com,vger.kernel.org,lists.infradead.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.343];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,lunn.ch,broadcom.com,intel.com,nvidia.com,fb.com,meta.com,sipsolutions.net,queasysnail.net,fomichev.me,gmail.com,vger.kernel.org,lists.osuosl.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[sdf@fomichev.me,netdev@vger.kernel.org];
+	NEURAL_SPAM(0.00)[0.409];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cfsworks@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	R_DKIM_NA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: 6BC392D4981
+	RCPT_COUNT_TWELVE(0.00)[37];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 76A742D4A31
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 19, 2026 at 2:59=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
+This series adds a new ndo_set_rx_mode_async callback that enables
+drivers to handle address list updates in a sleepable context. The
+current ndo_set_rx_mode is called under the netif_addr_lock spinlock
+with BHs disabled, which prevents drivers from sleeping. This is
+problematic for ops-locked drivers that need to sleep.
 
-Hi Russell,
+The approach:
+1. Add snapshot/reconcile infrastructure for address lists
+2. Introduce dev_rx_mode_work that takes snapshots under the lock,
+   drops the lock, calls the driver, then reconciles changes back
+3. Move promiscuity handling into the scheduled work as well
+4. Convert existing ops-locked drivers to ndo_set_rx_mode_async
+5. Add a warning for ops-locked drivers still using ndo_set_rx_mode
+6. Add a selftest exercising the team+bridge+macvlan topology that
+   triggers the addr_lock -> ops_lock ordering issue
 
-> Isn't the limit equivalent to:
->
->         space =3D CIRC_SPACE(rx_q->cur_rx, rx_q->dirty_rx,
->                            priv->dma_conf.dma_rx_size);
->         limit =3D min_t(unsigned int, space, limit);
->
+v3:
+- module_export(__rtnl_unlock) (nipa)
+- s/netdev_uc_count/netdev_hw_addr_list_count/ in bnxt (Aleksandr)
 
-I had to think about the edge cases for a few minutes -- yes, you're
-right. However...
+v2:
+- wifi: cfg80211: use __rtnl_unlock in nl80211_pre_doit (syzbot)
+- simplify mlx5e_sync_netdev_addr for !uc (Cosmin)
+- switch to snapshot in bnxt_cfg_rx_mode (Michael)
+- add team to net/config (Jakub)
 
-> (Think of the "full" and "empty" cases as "space" which can be
-> consumed to provide entries for the refiller to action.)
+Stanislav Fomichev (13):
+  net: add address list snapshot and reconciliation infrastructure
+  wifi: cfg80211: use __rtnl_unlock in nl80211_pre_doit
+  net: introduce ndo_set_rx_mode_async and dev_rx_mode_work
+  net: move promiscuity handling into dev_rx_mode_work
+  fbnic: convert to ndo_set_rx_mode_async
+  mlx5: convert to ndo_set_rx_mode_async
+  bnxt: convert to ndo_set_rx_mode_async
+  bnxt: use snapshot in bnxt_cfg_rx_mode
+  iavf: convert to ndo_set_rx_mode_async
+  netdevsim: convert to ndo_set_rx_mode_async
+  dummy: convert to ndo_set_rx_mode_async
+  net: warn ops-locked drivers still using ndo_set_rx_mode
+  selftests: net: add team_bridge_macvlan rx_mode test
 
-...this seems like a double negative: We're looking at the ring from
-the refiller's perspective (i.e. considering "dirty" the meaningful
-state), and *then* looking at the "unused space" (i.e. "not dirty").
-If I used it, I'd at least add a comment explaining that CIRC_SPACE
-is, counterintuitively, not measuring "space."
+ Documentation/networking/netdevices.rst       |  12 +
+ drivers/net/dummy.c                           |   6 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  55 +--
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  14 +-
+ .../net/ethernet/mellanox/mlx5/core/en/fs.h   |   5 +-
+ .../net/ethernet/mellanox/mlx5/core/en_fs.c   |  30 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  16 +-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  20 +-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |   4 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |   4 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   |   2 +-
+ drivers/net/netdevsim/netdev.c                |   8 +-
+ include/linux/netdevice.h                     |  26 ++
+ net/core/dev.c                                | 176 ++++++++--
+ net/core/dev.h                                |   1 +
+ net/core/dev_addr_lists.c                     | 110 +++++-
+ net/core/dev_addr_lists_test.c                | 321 +++++++++++++++++-
+ net/core/rtnetlink.c                          |   1 +
+ net/wireless/core.c                           |   1 +
+ net/wireless/nl80211.c                        |   2 +-
+ tools/testing/selftests/net/config            |   1 +
+ tools/testing/selftests/net/rtnetlink.sh      |  44 +++
+ 22 files changed, 765 insertions(+), 94 deletions(-)
 
-After the bugs are fixed, I'll follow up with a net-next patch [1]
-that removes the `min` altogether and makes the loop check for 'dirty'
-directly, so my focus here is "minimal, obviously correct" and not
-necessarily "tidiest." Would it be acceptable if I simplify
-stmmac_rx_dirty() to use CIRC_CNT() then, instead of using
-CIRC_SPACE() now?
+-- 
+2.53.0
 
-> I think the same applies for patch 2 - when the above returns zero
-> it means we have no entries in the ring that aren't due for refill.
-
-I'm not completely satisfied with the `stmmac_rx_dirty() =3D=3D
-dma_rx_size - 1` expression either. One might argue we should keep
-trying until dirty=3D=3D0, because tolerating *any* dirtiness risks not
-having enough buffers for the next traffic burst, causing avoidable rx
-drops. But that's a discussion for patch 2. :)
-
-> Have you checked whether stmmac_rx_zc() also buggy in this respect?
-
-I skimmed it. I saw that it checks the return status of
-stmmac_rx_refill_zc() and on failure, returns the NAPI budget to keep
-polling -- which told me that the ZC author(s) at least considered
-these problems.
-
-Looking at it more thoroughly now, there are a few code smells around
-the unconditional `dirty =3D 0;`, and `dirty` being used as the "budget"
-for stmmac_rx_refill_zc() (why have a budget at all then?) so it looks
-like something's there, but it's a separate bug if so.
-
-Best,
-Sam
-
-[1] https://lore.kernel.org/netdev/20260316021009.262358-4-CFSworks@gmail.c=
-om/
 
