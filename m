@@ -1,162 +1,241 @@
-Return-Path: <netdev+bounces-270069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270074-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aOFqHku7vWnyAwMAu9opvQ
-	(envelope-from <netdev+bounces-270069-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:25:31 +0100
+	id eMQpCP66vWnyAwMAu9opvQ
+	(envelope-from <netdev+bounces-270074-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:24:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F91E2E154E
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:25:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B64692E151B
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 22:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D47B2302804F
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 21:20:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F2AEE3025254
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 21:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 273F13E2766;
-	Fri, 20 Mar 2026 21:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63CED3A7F66;
+	Fri, 20 Mar 2026 21:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="g4Zx7wA+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nRw4CTbC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9824C36AB61
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 21:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3744636E484
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 21:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774041598; cv=none; b=swXSA48NeHKeKTsXp6PnGQuBgzHz+V2X/AZFUA1SC6BIVv+wQn4K1n0BifG6zaKECsLuE7VmZ2y+hH8i3hqvEE4BoVFzt/hI68U8D3MHbAyCj1XpmKeQV4cROIyeYJmIKY0eHiEvibhCnsHH8O2YE33IEhtdvh5LGP91wzf+bts=
+	t=1774041842; cv=none; b=Df5W/+4/sBFrQ83TWnePT4xpXh2hzV12SzVqfStnr8fRjnMeWoVyV8YHlK3FPja+u3slnNx1mq8djrF4bRGJPpagI3j/Fv7la/c2sP4QIxxUxAjTcVxuoo4z1Rf81lkEMETNhdOctuEHpXHhcxRvCH7GwZKzangjmKj3jaRe6vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774041598; c=relaxed/simple;
-	bh=HZRLHEwGWpwaQuLLrSh40uPRxk7ylCvGq0hs14KucR0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lOQijLuJq7JDQaHV0+pOAkQnj5xbkmf246HLY4wgVMKe7dX69BwrdD6Gu5tU2tBD9tJsz9aM6rPVPTdHkAfdlE+nnkfiVWOhOe86dSBsU+GDtqKmyd+JGu8Ljdhi1lAtwjSUK/m4+dTolBf+HP98wy2H9ccqfGEy4mkRT6VP1eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=g4Zx7wA+; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b97bca3797dso310907466b.0
-        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 14:19:56 -0700 (PDT)
+	s=arc-20240116; t=1774041842; c=relaxed/simple;
+	bh=ozLFzhpVI2O2/f4t79l4sqzEcVkJzPQSj+jGAVH4sPQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JBviAuqhAT+bmg5cvThmyyRlq32vR0flu9sX69HAS/JxrUpiglFGH/6mIU5meghoXWM+xyuwZiNxN2Xy7fKrF/H1ZJP6EPolZQi6pWyiedENWc4LIi34Ez99wXDS41tJEZtNBBSnW7E3bDzysusbI3+tSyxJPdcGBuItrfrHE+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nRw4CTbC; arc=none smtp.client-ip=74.125.82.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-126ea4e9694so2494441c88.1
+        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 14:23:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1774041595; x=1774646395; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XCE3Sb6hrBAlOh+2FMHN/3IZlK3Hh6o5UrXz2dr3r8U=;
-        b=g4Zx7wA+SN2odLJZzsajuV6KCjfBKCntTNMoz6QpJnPX7KqDtWCoHwGlnoNxlq69Yi
-         H4K8vuFrjwQrUZ/ctICXBkoSuyCffV7bZBeiHzlTfiCWVToo8ukwEMmLiU1+qj+xZa2h
-         vwtEAq+fbmrwsXd5DF+A/AGjPVjCgi8Vlh94w=
+        d=gmail.com; s=20230601; t=1774041837; x=1774646637; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cc7L1+/6dVTTAc1rDpaFmgif5bqTxN/xlHF2dS1giug=;
+        b=nRw4CTbCTsZveqJWZk+vOpb0upPF89+gzcVtzmiCNpiNQiMatFK3zM9pyTl5X/WCRZ
+         jsvgykq9tv2XSArjzHu6/0GFfEaIhBAj50oYrf8LtGcwwsH/XqAKrlX6lf7OHR4UI1Zc
+         xNBDBu150PCT/fvNJv18OPh3KhQ68+0PT+2SQohYPUvr3ZYZSzuY43m/CfR864EzVPXp
+         KvI31anqfBXn8PL1DXv9F+dPsUqFJomWLbZOfivTe2vsbLUQprjU4l5PDrCPOraq7miB
+         u+BFIJ+2ug1TdvMzRX+BjE/3Zh9MCvcRQ2nNqckrXMXBdgzmY42PK0iX+0spyDKdTOoj
+         hqIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774041595; x=1774646395;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XCE3Sb6hrBAlOh+2FMHN/3IZlK3Hh6o5UrXz2dr3r8U=;
-        b=nyw3wM6oGc5efiIR62bsL0vWBUnd96Wl5gjoSewLtgLLyyCyp5rJaqYtOdYTl04v6F
-         jglrwsw2YyCPHSOfRlfGPyq6V2uaq08sJF2g8Ynsr9p3OCddsrFc49IF+DM686mbFNUH
-         yu5UXqqrCWQKn4a/Lpw9cgDbezoLKV9P04Z6mVcYHbM1jK/f3LaC0N4nwUdDiE8eXVgv
-         fklw3LanJ6dzbGw+wYRU0ntxx41eSDuis6k98tNPaoDnSlhkUb6Kl9Ilno2tRiOxJ1dy
-         VQvp8cN2x1fxPQr84kpPUCb3kOjdoKUPrdRsGduI1OpxcUWpsnAPMZ2oZk1xo1uprbRl
-         p9AQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW4luTQZUJsXkg88NNf4dDUmhP8eYuSy81ADBZ6I3wXyA/6ICHSRq27vUEPfCNrGz1ix5SSG1I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxczuEIm7fhNm2zSaCgYzGYekuyaeacRhTULO6sFvBojYCE6rI
-	kM3a8h8HXsbxCdas2CgZK2p4KKCJRnA4H5o5sMkFJPG2QmIP86AsQU55gNr8ZYSm4s7GGT/Cc8T
-	3ELAm2NQ=
-X-Gm-Gg: ATEYQzzmzNLgz9V+yA5Kao+AjcLDgFJ+bmbPaAUsJKSGoMtRPPHHYqWyAA9wJAayx5A
-	3Qv/dOTB7EqF1DvFzqfy2MrE0qN5Lu1LnuroJNNfXjsCc3+l4ggptMpKd5GZTM0ctaDEbPfh4V/
-	5U1Xol5sKtp7DMM2S93gOyG/G3Fmr3hXxOhlHXSfpdwlgYbehuUI2QxIhwubrehKvmrvOBZj8T2
-	J/r8ci2ULVPXAlRYzRz/WQo5MG/5naMJYEOvpKIBPJAc2Kfq8lmAk9IeDj8G6W8ctFFnbt2cvXd
-	jGTsnSLc8oB37DtPC7UVN+iXMY/rneLfX76DcQ4pQhurZeBoD9WhQIwb1Nd+uD8xlt84/+QA8yD
-	o7WV7bQWqcpMY0+60QFNeAgIA/f7bNLaUqg7huG4QdnbvWYUZ3j51K3+ATJzDhCw0FifBk7EEEh
-	Ofo5EbhW4cX8WCzI+B9XPRkaKIKmGpVSjFV9hUs6zK/vUIwLNUz3tECszs0elifBmI4uOqu6UY
-X-Received: by 2002:a17:907:cb20:b0:b98:5b2:77f7 with SMTP id a640c23a62f3a-b982f0c9208mr237816266b.12.1774041594909;
-        Fri, 20 Mar 2026 14:19:54 -0700 (PDT)
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com. [209.85.208.51])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b983e4e9b65sm87250666b.31.2026.03.20.14.19.53
-        for <netdev@vger.kernel.org>
+        d=1e100.net; s=20251104; t=1774041837; x=1774646637;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cc7L1+/6dVTTAc1rDpaFmgif5bqTxN/xlHF2dS1giug=;
+        b=i/bAGHfAHwN69pHkvCvU+KCxt+zvbasrG6FiEeOYbnzlGSyXPfScljl5M7ugavbMmA
+         U+A55kOF7vro3qIwY2MVt3uWKRNs9bBnuxs68O/GotNqY5++2m/0xb0wmrCJXLHXkxI0
+         GiP0P60lgb9/zoAp4vnBNAZAEwADEGJfkaQB4QHR6cQcyT8SBFSbGgpwiUN+Ji2MnOj9
+         M4PTKUWp6LXXRIezwLE6v8q4c0a1jPbYc0qM0dKhSRyjOedS3Q3wP/E+vrOIQv+L81qt
+         HT/yclJBw2Wk1Mo1QZXL7/berAzKDN7GyiiFUAH0pQLXD7VdiCWWoKzf7Ksv4F58gE/Y
+         u6+Q==
+X-Gm-Message-State: AOJu0Yyh8BQCSfk1p6zX3SjovazyyKJYJNh5/AsALHYFkxzuv/VunTGF
+	pnCi/MB6vvSlTMu8gG75Z6xVJfiZZLeRNjXxA2XRJ6KmX4fCc5xLnIUf
+X-Gm-Gg: ATEYQzxlzmWrgsWdicRg+e3rRVOf1zVVBAYJoWKFUWptMGv4zTaXbrBsl/Kbwdnf05R
+	FPj3Ob1JvUaywnjZslwV8xINAiRLFkIASpI999OjEBQGSHwfc65frBUXHKs75cXiqFZAo9KyUAa
+	upIFntJp0Y4FETFi31S/nM8PR5/BpQ9M0Ia8MKlaegBTtJpBENhsW/uVXQA04OqzKkZFlARdskM
+	B0HHWZqBUdCbzZmoCcc6fwyp2YxrHGejFqyoo76qzKj2dvDsv3ovz871LIZq4hrJvT6dfMKtEvE
+	SpO98eVBY0wGKQvMc7JVsvT4x+LMUU4KWq21Nkub9WOGqQ24BVSuEwcehc0WACOSmWgn1HAq2/A
+	9gp2iEwF0+PW+zJauv7BZS3hmICYVkscMJ/AbWfMweS9K2JCUgADLdZ8wJKFwnX7cfBy0MPhuRK
+	4T/lT4gOiOgLD+0N5/pDingMj3Oo7C3pQCFXM4jr42osrMoneHsq4HZITANkN1
+X-Received: by 2002:a05:7022:1601:b0:124:8d7d:2d63 with SMTP id a92af1059eb24-12a726d018dmr2186785c88.35.1774041837053;
+        Fri, 20 Mar 2026 14:23:57 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c085:21c8::140f? ([2620:10d:c090:400::5:f9c1])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12a73407854sm3732795c88.8.2026.03.20.14.23.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Mar 2026 14:19:54 -0700 (PDT)
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6634bb959a2so3796438a12.1
-        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 14:19:53 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV9Ua0JShibuqfFeB8p7DhhDVrkn7BU9gVgauTuHiWPfHASklFW00kUlB1U7l2Yk0ZMfsHAYzA=@vger.kernel.org
-X-Received: by 2002:a05:6402:3786:b0:668:8c50:284c with SMTP id
- 4fb4d7f45d1cf-668c911da49mr3212716a12.11.1774041593499; Fri, 20 Mar 2026
- 14:19:53 -0700 (PDT)
+        Fri, 20 Mar 2026 14:23:56 -0700 (PDT)
+Message-ID: <1d708196-7b89-431f-bb17-177564196894@gmail.com>
+Date: Fri, 20 Mar 2026 14:23:54 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260319190455.135302-1-luiz.dentz@gmail.com> <177396481128.1855248.1024090053580545012.git-patchwork-notify@kernel.org>
- <6411a735-d187-4848-b199-a0e2c2e0e52c@leemhuis.info> <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
- <CAHk-=wh8dnp1qT_CHG-Zz9H2=G1Q=0rF5SYv+YsEaPnVhznxWA@mail.gmail.com>
-In-Reply-To: <CAHk-=wh8dnp1qT_CHG-Zz9H2=G1Q=0rF5SYv+YsEaPnVhznxWA@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 20 Mar 2026 14:19:37 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgryF_COh9xzhGaJ-FAm471pn5uvqt-Z94+3ENPVu4w-Q@mail.gmail.com>
-X-Gm-Features: AaiRm52w5UPxNX4mH_HiyvwPIsVpHwHmqg_LpHJqM3MhIn7krj-l7qPCQ22Gurs
-Message-ID: <CAHk-=wgryF_COh9xzhGaJ-FAm471pn5uvqt-Z94+3ENPVu4w-Q@mail.gmail.com>
-Subject: Re: bluetooth regression fix likely to miss -rc5 (was: Re: [GIT PULL]
- bluetooth 2026-03-19)
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Thorsten Leemhuis <regressions@leemhuis.info>, kuba@kernel.org, 
-	linux-bluetooth@vger.kernel.org, davem@davemloft.net, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/2] e1000e: add basic XDP support
+To: Matteo Croce <technoboy85@gmail.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
+References: <20260320132356.63194-1-teknoraver@meta.com>
+ <20260320132356.63194-2-teknoraver@meta.com>
+Content-Language: en-US
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+In-Reply-To: <20260320132356.63194-2-teknoraver@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270069-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[linux-foundation.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[linux-foundation.org:+];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270074-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mohsinbashr@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux-foundation.org:dkim,linux-foundation.org:email,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 7F91E2E154E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B64692E151B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 20 Mar 2026 at 14:03, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> That hardware may admittedly often not be great, and we may all wish
-> that it didn't exist, but hey, that's the thing about reality: it's
-> often messy.
 
-Of course, the thing about "reality is often messy" is that then you
-end up with the truly conflicting situations where there are other
-complications: security issues can sometimes mean that you *really*
-can't just revert a regression fix, because while paper standards and
-artificial tests are relatively worthless (compared to a user
-regression report), a severe security problem obviously isn't...
+> + * e1000_xdp_xmit_ring - transmit an XDP frame on the TX ring
+> + * @adapter: board private structure
+> + * @tx_ring: Tx descriptor ring
+> + * @xdpf: XDP frame to transmit
+> + *
+> + * Returns E1000_XDP_TX on success, E1000_XDP_CONSUMED on failure
+> + **/
+> +static int e1000_xdp_xmit_ring(struct e1000_adapter *adapter,
+> +			       struct e1000_ring *tx_ring,
+minor nit: alignment issue
 
-Also, if the regression reports then come in late, people may have
-started relying on the new behavior, and reverting things then causes
-its own set of regressions.
+> +		if (unlikely((staterr & E1000_RXDEXT_ERR_FRAME_ERR_MASK) &&
+> +			     !(netdev->features & NETIF_F_RXALL))) {
+> +			page_pool_put_full_page(adapter->page_pool,
+> +						buffer_info->page, true);
+> +			buffer_info->page = NULL;
+> +			goto next_desc;
+> +		}
+> +
+> +		/* adjust length to remove Ethernet CRC */
+> +		if (!(adapter->flags2 & FLAG2_CRC_STRIPPING)) {
+> +			if (netdev->features & NETIF_F_RXFCS)
+> +				total_rx_bytes -= 4;
 
-But when you get a regression report quickly during the early -rc
-period, that tends to mean that it's either a really bad fix, or it's
-just a very common piece of bad hardware (or a shared bug across many
-different hw implementations - which obviously is often then due to
-some common chip or firmware implementation or whatever)
+Looks like, total_rx_bytes can go negative here since it is not updated 
+after being initialized to 0. Is this expected?
 
-               Linus
+
+> -static inline void e1000_rx_hash(struct net_device *netdev, __le32 rss,
+> -				 struct sk_buff *skb)
+> -{
+> -	if (netdev->features & NETIF_F_RXHASH)
+> -		skb_set_hash(skb, le32_to_cpu(rss), PKT_HASH_TYPE_L3);
+> -}
+> -
+
+The function was just moved. Looks like an unrelated change?
+
+> +/**
+> + * e1000_xdp_setup - add/remove an XDP program
+> + * @netdev: network interface device structure
+> + * @bpf: XDP program setup structure
+> + **/
+> +static int e1000_xdp_setup(struct net_device *netdev, struct netdev_bpf *bpf)
+> +{
+> +	struct e1000_adapter *adapter = netdev_priv(netdev);
+> +	struct bpf_prog *prog = bpf->prog, *old_prog;
+> +	bool running = netif_running(netdev);
+> +	bool need_reset;
+> +
+> +	/* XDP is incompatible with jumbo frames */
+> +	if (prog && netdev->mtu > ETH_DATA_LEN) {
+> +		NL_SET_ERR_MSG_MOD(bpf->extack,
+> +				   "XDP is not supported with jumbo frames");
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Validate frame fits in a single page with XDP headroom */
+> +	if (prog && netdev->mtu + VLAN_ETH_HLEN + ETH_FCS_LEN +
+> +	    XDP_PACKET_HEADROOM > PAGE_SIZE) {
+> +		NL_SET_ERR_MSG_MOD(bpf->extack,
+> +				   "Frame size too large for XDP");
+> +		return -EINVAL;
+> +	}
+> +
+> +	old_prog = xchg(&adapter->xdp_prog, prog);
+> +	need_reset = (!!prog != !!old_prog);
+> +
+> +	/* Transition between XDP and non-XDP requires ring reconfiguration */
+> +	if (need_reset && running)
+> +		e1000e_close(netdev);
+> +
+> +	if (old_prog)
+> +		bpf_prog_put(old_prog);
+> +
+> +	if (!need_reset)
+> +		return 0;
+> +
+> +	if (running)
+> +		e1000e_open(netdev);
+> +
+> +	return 0;
+> +}
+> +
+
+If I am reading it correctly, this can be problematic (maybe with very 
+small likelihood). If e1000e_open() fails here, we will still return 
+success. How about the following?
+
+if (running) {
+     int err = e1000e_open(netdev);
+
+     if (err) {
+          /* Remove the XDP program since interface is down */
+          xchg(&adapter->xdp_prog, NULL);
+
+          return err;
+     }
+}
+
 
