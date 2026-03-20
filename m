@@ -1,260 +1,436 @@
-Return-Path: <netdev+bounces-269876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269891-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cOWnFgAevWnG6QIAu9opvQ
-	(envelope-from <netdev+bounces-269876-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:14:24 +0100
+	id 8KdKIggvvWmI7QIAu9opvQ
+	(envelope-from <netdev+bounces-269891-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:27:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27F692D88C4
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:14:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 001B52D9878
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:27:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 88B7A3006B59
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 10:14:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BC533303388A
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32525301474;
-	Fri, 20 Mar 2026 10:14:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51FBD39A078;
+	Fri, 20 Mar 2026 11:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d6qnrD9r"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ioYMj7xQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013049.outbound.protection.outlook.com [40.93.196.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62B82D3A93
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 10:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC0C39A812;
+	Fri, 20 Mar 2026 11:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774001663; cv=fail; b=E5OcYb+kOOPnDvM09xK/MK4rly+uuir4ZGsuMRIbTN/0yR3aTsFq6yn25DvI+9l2/er7C+sqUdkGjO1yDRdaU0La5r2uQlbbAAZumv8kEreLDn+YvBloUAyxyeojhUsTXvCa5/IjSQFs2tS3sMFzIZqdSCxUN0jvMf0Y6jtcxS8=
+	t=1774006016; cv=fail; b=ADZsuZnyoq4DRVNAiookEC0KC6Ozy7MUBxkAqrTftyRWfNxY+Bxm/L45yenW57Ltd6sIqSkc36edQzjpQvtl97sO03MBSY05VcC2xPnyhZuOAlJJDuFSOvvg9oDfnWN7QMZ5UU9TggAb7wc0wwBAWZkfKGvR8kJ8PtJQTzcdlNw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774001663; c=relaxed/simple;
-	bh=z7qbI8Jj/fDVaIv/pG/9PHYU1CjA0Wr93qW/C1reZIk=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=YHDGZ19FX6T8UtXua5eYi7hYh9x7BqbIc3ozQA34gsl/GmVdXFLLLC5gWjxg3hJTf9Rll8TZAoNDNOjGnA/Z0/UvJDGgj8NKgp8lWRRgNKnn2CEHV+L9uU8a5lSHlRtiaTmHs2kPC13hC+6olp+WhKpbU//sIOC5yTBM303+lz8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d6qnrD9r; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774001661; x=1805537661;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=z7qbI8Jj/fDVaIv/pG/9PHYU1CjA0Wr93qW/C1reZIk=;
-  b=d6qnrD9rNfQfgVRDn2rTunac5l/6JHnf8oe+K+MDpJaQUZ8cogOaFdDH
-   ZVBByvmjX5Cv5QNW5upUiCrCQGnQ36mu07thQhtiSlLMVGGw0qPmW4vLF
-   Www7MwE9+0qb9Z20eY5WQkRnrjXA58kWfZpKBwU8q/5AYFmV/GfxP7vA8
-   29AXhaafjplZcxAp/r+HVP+ool+3B7W40t1exV/S5LXKn0PqaPNJ/bY0O
-   QjLpYSfI3k8h7vRZ22hIlnYTuze0asrTE2nDKcb5e14aHZUiiXSEgfih0
-   dgzcZgFi/a0WDNKxNXk/Ym/xbAR+U9lxHP/9TfEu8piyNctLtK/hN/7XN
-   g==;
-X-CSE-ConnectionGUID: FsUakh2MTdOLCgOfpcP67w==
-X-CSE-MsgGUID: uQFfO/UGSb+l8xoLILw6lg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="78988509"
-X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="78988509"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2026 03:14:20 -0700
-X-CSE-ConnectionGUID: hi85SgU4Sg+F3FBb2EZIZQ==
-X-CSE-MsgGUID: 4K9ZY9F4RU6gWHhuAJ9jdQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="222336629"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2026 03:14:20 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 20 Mar 2026 03:14:19 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Fri, 20 Mar 2026 03:14:19 -0700
-Received: from PH8PR06CU001.outbound.protection.outlook.com (40.107.209.10) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 20 Mar 2026 03:14:19 -0700
+	s=arc-20240116; t=1774006016; c=relaxed/simple;
+	bh=oALv7owQDwvB5pDdpSxeShMBkota3d1dYrJJI75NL/c=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=ABG975XQ25iNfpFWbD7badOYVvos55E7/sYpl8JvBUDn4hX+zRuoNj5yHb2C4IuMr07SS5WjIsk8XnN8gUcflBTuu1w6ODfUBMwuh4igY0+e/54VXilCSI2Gv1xe26ie4gPVqFkZpaUhksVdSVAWTlnkt6dFFS3HmnGOhsDD6b8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ioYMj7xQ; arc=fail smtp.client-ip=40.93.196.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=C+HiRtRTmEkpYeU+VikADszb+eC1GkeA4H5JO3ULyIbt0+VGAjv2+0V7ARjJq6GGWZGjRapia+gH9cCMCPe9qHHet3GTB84wloE8IcH8uDJXDbS1tqKCsPvj3IkbE6ssLxPitC6vGgF6tmdWUQvdSsvoDD22zUbYxtX7VCGZZHmun5oE62fn9C9jFr+xSpz010a1cps/Lt83Vn/YVikYeq4Bgw5Iq/yoDqaATkpMCI+381Lzucj3P9cEq1N6y0sQ0M7K7+wxLPk43jpKjyaqsV3VUr73MyFK3XFIIj99dZtT3p2mgQ0XQqaBJ+rLJw99xhnyilZ1ZKnAtsJKemXHNw==
+ b=VJAJxFLmxdiqJeOyZ1fTv80Imz9pLZ3ApC5TNidN1ij1S0GNObRuaX0xCGIxx0TQEFdx7TBx7NLqq88T/C2QJMX1ZU/c8t+s4ogeo4xXgGz1UIV+Mm9thBPps9iKfnDjXeeNM+gxXHnzmh5BQtyofpBtDJvpPdRitx1ePRN6CwbC5Rb9um8O09hTH6Yha8y30z2gPk4a2Bq5+FxTvKdUzFH4ntpzso7FGY95Eu2xJ12r1gWZTarUS/JnwW/PfA1vmoq4NRm5SfpVQgZZP06y1PHLg/o28BURS5UzpZCTSKqTkmJed5IpD4cL0HvhH0uk8oflYBtLttPvyijRyaNU2Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CWyPiZQqKmTLUAQXyBgA6T4B8tWMS9okRm6ekuLeA/k=;
- b=Fi9yReDg4DD4KHLEvrHWtPjEIUX5F3N5xt5/YKWRnu4TDqVskjwlAd/w+yknm8yf6rGrcVgsjpzrArSVmI6Ay6QNRgktmhgUsJGeh/sNOw+ThE8xTPh9kiJ+x0vRa/U3qp0IfmiEE5x6v4EXrvnBDmfSNKJchA59Q5DnM7dkZ06VEcG6eTNmUXM9Vd8+XThDCbZqwqKGv4c3IokIRQkaaHpG+3L8MHwFn6MErXoP/zzxefCKYJN95NonD2rFae22J3QHIJWQZ4b8YcUE+LQQiU/qzZAKle269C1gSWLRkXeGzbRHSIFMoozG8Jswk7yU+Yrvfrk8RqbY8eAnJeHIWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH0PR11MB8086.namprd11.prod.outlook.com (2603:10b6:610:190::8)
- by IA1PR11MB6348.namprd11.prod.outlook.com (2603:10b6:208:3af::16) with
+ bh=3E8sx0nSGdsyv21of26RhrMRF5prWrUWNT0iSLcf7LE=;
+ b=W7UEwrCED3qQBITpkntg0NmJIyW5LJ8ZqksNSRADuAatqNHwcYLVx6U1BI8CGMYG7xxRG8fCLUTX36tzw2/s0aQCvSb3LgZ0uBvLQKCyWVe3JX867lda0uN32/gAx9SAYNGVXlzdXzWd1kK+ROYn27ZBXtYLx0FryGXN3BumPSgyZIhkbui2GV6PbTmAqRUNKejxnrBwhpapeg/hT1G72n7hyKBX1tj038jOV60xwEtFJQmmnjSpESGig1GLdfqVln4rwyeHZ4ENoMqPxB0xO2njHJt9/scX8cor2RSmwKPJgn3gIi01LMBjgNCqzzPZVUxYv67u4OnVrlVQRErVIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3E8sx0nSGdsyv21of26RhrMRF5prWrUWNT0iSLcf7LE=;
+ b=ioYMj7xQN6V1UwniymSMBdfg+46rzeBtakxwqYomt5KbY9U7W0u4AJdauk7/p2QhqQLskuByOUglHoT2UpuYfv+ToJYTIUBDbACizbPRc2ZkjaxzBFJajNV3Aph7zRc5zENCyy7A0ddNKYr9A11KLfOwDWvmqIWwm69c1W2zg9wC/0vmY/rmZK6gxj0WyVdSSA5CF53bWuDRA3xWnir6+dUrzQTJ/kjrrCfklqqzSTE71znZQQlcUz7t9CWN6350IUn3Bn5HEophupIHL6GXgjf8pnVA0Ga3vFYXwoS1eXwA0oQjy/WKbp41eiCGCkhw1H9+GKA7mvkyXVCDrl3jFw==
+Received: from SJ0PR05CA0106.namprd05.prod.outlook.com (2603:10b6:a03:334::21)
+ by LV2PR12MB999098.namprd12.prod.outlook.com (2603:10b6:408:353::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.9; Fri, 20 Mar
- 2026 10:14:11 +0000
-Received: from CH0PR11MB8086.namprd11.prod.outlook.com
- ([fe80::2769:b184:69c6:6eb0]) by CH0PR11MB8086.namprd11.prod.outlook.com
- ([fe80::2769:b184:69c6:6eb0%5]) with mapi id 15.20.9745.007; Fri, 20 Mar 2026
- 10:14:11 +0000
-Message-ID: <4b1927b5-2a3c-4465-9181-2e8885afd122@intel.com>
-Date: Fri, 20 Mar 2026 11:13:15 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: call mutex_lock() before
- mutex_unlock() in ice_dcb_rebuild()
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Bart Van Assche
-	<bvanassche@acm.org>
-CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>, "Katarzyna
- Wieczerzycka" <katarzyna.wieczerzycka@intel.com>,
-	<anthony.l.nguyen@intel.com>
-References: <20260320050522.422355-1-aleksandr.loktionov@intel.com>
-Content-Language: en-US
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20260320050522.422355-1-aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DU7P195CA0030.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:10:54d::17) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.15; Fri, 20 Mar
+ 2026 11:26:45 +0000
+Received: from SJ1PEPF00001CDF.namprd05.prod.outlook.com
+ (2603:10b6:a03:334:cafe::9b) by SJ0PR05CA0106.outlook.office365.com
+ (2603:10b6:a03:334::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9700.24 via Frontend Transport; Fri,
+ 20 Mar 2026 11:26:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SJ1PEPF00001CDF.mail.protection.outlook.com (10.167.242.7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9723.19 via Frontend Transport; Fri, 20 Mar 2026 11:26:44 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 20 Mar
+ 2026 04:26:36 -0700
+Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 20 Mar
+ 2026 04:26:31 -0700
+References: <20260319160410.2515105-1-ioana.ciornei@nxp.com>
+ <20260319160410.2515105-4-ioana.ciornei@nxp.com>
+User-agent: mu4e 1.8.14; emacs 30.2
+From: Petr Machata <petrm@nvidia.com>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>
+CC: <netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, <linux-kernel@vger.kernel.org>, <petrm@nvidia.com>,
+	<willemb@google.com>
+Subject: Re: [PATCH net-next v3 3/9] selftests: net: extend lib.sh to parse
+ drivers/net/net.config
+Date: Fri, 20 Mar 2026 11:19:18 +0100
+In-Reply-To: <20260319160410.2515105-4-ioana.ciornei@nxp.com>
+Message-ID: <87ldfm91y5.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH0PR11MB8086:EE_|IA1PR11MB6348:EE_
-X-MS-Office365-Filtering-Correlation-Id: b5eed3a6-6bf4-445f-e556-08de86695326
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDF:EE_|LV2PR12MB999098:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2c07b846-f955-4f69-d776-08de86739147
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info: 21tyKi3nqRoiTatfOt0jqg2MZoKqvxzB64AiggVklAklj0vMqaMISaSZbdCgJiQZE6BdFbDQfQVCTNUl2OUcTxVK5OqVxmo18JRGIYYdcWUpgJDKvOtUYmvbkTPhFgg5Jw2rd2edE6Ew23nchCMhnADfIKlelo8+klLTVshW2ImDZnFvxueZ83HM1O2U/w0+BtKgCB79PlOscYe5Gd2rec2M30P94peJuZ8TvEtrzTLO4t6PMmia0Q3pEFLb/IIFg9s13tJOgeuV3cxyQuhy3xvq9PZN+qiZJrFEf3eMrtQCkGOZnHT0ZbtGe/sUkpCApBiHwo3OlgNRVXLU2EXnsL90thB7D5WOkt9x4KPVxhJeXfMVraeLINpNh818k/DCcRzUWcawkyX5o/8kOd9D4TqGPkcKipTr8NbyCreAe8W2B+NRSbgQcW+Jx4XqFlxqZrrZNrhIZgbISabTiDEhZTd+4ytNP6+yI5/rpHLBn5FG0oeaXXcJ7sHMNSgsFPdPwg2vJ7ODv6bMyDibOTONEeylBXPIhzs7TQEc+P0x+//Ho9HWS5upyuSpWSVOZ08hMRVDhZQ8rnBlfajclKcpl2g1iAUXmb5tIF1acLuDado1cmiC25KrqTifLC5Dx2P2V93SpXgOiBn5mPP6gkpLKrDbjis+uRRDrOPdQ6D7eznkHzPytEdQCDVYVBjlcyS3
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR11MB8086.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700016|376014|7416014|22082099003|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	4JuvHLjMUd8LtpWmt4RQ27JVTp43OmuvVdPXvSAwR3bdNJ2IlMfR5oyJQJ7XRb4Kk7rxshXGrLZSr/zxWE+egVuXeD8VDTGQRq7txf3cxGl0XGurggWcUMinx6iK4yYRy6eQpUp/oF+2HvTLQ3oQpyCf/me4Tb/p3Hu4w5YONE/h0vskan6CbkuHr6SIuyakCsHOsQJTahe5Y0c28OsNVwxUW2rPsNTpI+N4OpsJno+h12B2yN9LQkLRzVS/5lZYuatW8vSKQ049bbOU54STslStoalS7Ds2tkSt7BJuJ6ok+xcAjjtmXFQsFZEa723wgjqoicXH1KHjmQajpp1qqB5+hzvuJ0NV5F5ygR+kHbJtTSqvnyCM2NDKbJi8SClPrthooksk+UlcibG0RVUv+2ZzUOpzZ8jcrPW+4DLyqAMEdM43q4K4XcADbUpU7hLSQe5cBs7DYZciDsRSWxRZEbI8qIaba3TnvWlhNdiUMgkV+WoFd/NnPHCNxZ4jiWW4xkoTKCVOZWffJ3yOFWbe31iTARGHRdCMTgs3F4Uchr5E9ns/gVqXxcsBn0p16/qEpLtA8rbx3OqlYgfUqyi5h2nlN2kqAAYkSYoO4Zp3BlVKxFOXQgtykCdICjAiYYg62w93+Biop40ZCqO3bRnh6ecMz0LDNpaFoQLP3MrAi1BOXhFJwOJds0hpA0zU3BkmnvAgh8FTn7nQ2GVeh7wxLzgLgq//VPFqO7ennM8PQS885nhrc3v0pSJyc6ipBWDjGgXb3oYXE7viU9KFyu4QjA==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700016)(376014)(7416014)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eVZpVmZOdDRNUVN0bXpUU3hEMkRRWFJyUTZpUGpjRU5VU1ZXcmx1YTFuWldE?=
- =?utf-8?B?RFNUTzdUbE8vTmVxOWFMSzJrZHdLd2wrd3dlYlQzV3E5SGNyZzhNcGtjVTRH?=
- =?utf-8?B?ZVI2MnFpN2FsSTVvbEtCUlNKd3pIdzBSMVVrKzFSL2VRNkJON0t3YUxLYVIw?=
- =?utf-8?B?Q1p3Z2VhWmZxZDJZNmU0ZUx5UTdHd3l4ZEpIMDNOTFE4NGZCZkFIWEJDWjF0?=
- =?utf-8?B?ODdET2lxaE1JUlN5Ty9IQmJrVWhIeDBmbGtoM3ZpckwycWU2QXoybDk1WXhi?=
- =?utf-8?B?aGRTSDFMYjBxcGI2Y21GUGJEbVkvZXBjeVNVeTI0VUU0dTZoeGp0YjE0cTA5?=
- =?utf-8?B?TklRTm5NWHVDcjVnVlNNLzJCY1crdXdGUy9XL2VHc3MzWVpXSDhUOWE3NVdJ?=
- =?utf-8?B?bE5xSjNQYk80UlNmUytxcFN0TVdYaVNieWViOGhWNzBXbXNseWdtNHFGamox?=
- =?utf-8?B?Q0szOWpLaGZCRnFBcVV3QmVjVzliY1N4b2ovUlNIQ0EvVUlIaTR0eWRvcnVp?=
- =?utf-8?B?WHlnZGtIM0dTOVlNRWZzR3RqWXZyWWNZNmttajZCMkxDQnJic2plRzdUTU1W?=
- =?utf-8?B?dFFJV1d2K1Z4K1A0SWJQZGw4VHB2R3VQaVpNUEdwSFllZEI0M0Q5WHFrdVdY?=
- =?utf-8?B?SjdhTXUrbnM1QnFEN3BoODFOOVRZSkZEazJhZ3RvSThCMndqMW9tN3pqNnVo?=
- =?utf-8?B?WklkU3BScVV3T211dC9NUlpsZE9BTFpwcDBhU2hFYVhoV2hmZElOcG9xZXEy?=
- =?utf-8?B?ckxLOEo1S1J0bmQrTE4vWTdYQjdmb2o4UVQxbEVadmp1YkphNlpJWDNGZWdl?=
- =?utf-8?B?T3FVZUxrN25Uc0NrRG9oVHc3czBudVVwcFlXTjFaQVRYZm91NXBBM0JRL1Nk?=
- =?utf-8?B?UU5mTm12c1Z3ZXNONTdMMlpSQ25TczBueUxlZWlXRFBMZWJ4OU16VWFYUjlm?=
- =?utf-8?B?ZnFFbS94RkhORmNEdlh0bEcvejh0SG1IUXQ5RnAyQnVsWDBjWmJMakozY1lM?=
- =?utf-8?B?Wm9FTW1vUjVWUmtlRG1FbS9zcHA1dHB3UTZrN0Job3JvZ2pHUysrN2lFV2dT?=
- =?utf-8?B?c3kzcEpINTFGTXBOeTRBUlZrZ1M2bEpGVEFnTHVoaENSZFExMDUwelVDQUVP?=
- =?utf-8?B?TjRBVGdoZUxSSDFzMTNMd2ZPMTZGUEh1emZJcm94T3dSUnBRUVJoS1Y2Q2JQ?=
- =?utf-8?B?OW1Yd0x2djh5endRR09XREpmWXZlRWpVOWgwNmVsSWRLNUI1M3dGRHZweUpj?=
- =?utf-8?B?QzNCTGhlWCtQek9yU0M5VUZOQkRUUy85dktyeHFiVHBTd2RrUDM0RVdaamgw?=
- =?utf-8?B?WExFejNUcklPSFdYYW5UbVc1OGxoTU9DZ0pEV2h6QTI5OVJLdENhZXAwYTFQ?=
- =?utf-8?B?NUQyQ0pmdE9aRmFCYWZtemVTb0FibDA3SGhWUFhYU3FoRnBpdDFXbnN0WVpX?=
- =?utf-8?B?L0x5RW5jNmMrRVdtVGYxWnVrSGF5K2VnUUVzcStPTkJaREE1cjJ4ZG5mZ0Ro?=
- =?utf-8?B?aUJ4Q3ZZRlRmay8vQzAxeVdJSnljWTFGdGlyZ1EvRTc1YTNnZEhyMkM2T3dp?=
- =?utf-8?B?YURwc0lrNTAyTGRUU0RQWGFveXJuYUN1cmJKSnVteWF6RkYvOWRSRlQ5TjBt?=
- =?utf-8?B?MDdGR0xVTjZLWHVDM1dBdFNDLzEvV25yUEYxeGJLTjZqMkcrcjZjMlNUa2tY?=
- =?utf-8?B?UW02NEpya04yQU1yZGUxU3Rlb0VGajFhWVRDSXFHYWZoalNJODh2WUJlUUFD?=
- =?utf-8?B?Z2t5VnhNQjFHd0lHMzFGaTNlL0JKVGwrci95S1JJMGtwTDdzRW91c0JCYkNa?=
- =?utf-8?B?dVBtNHVtQ2o2MGNEQlJ6dmhBT21SNEQ1L1ZnZStNZVRPRlkxeVltUGo0ZElK?=
- =?utf-8?B?NTlXaHdGUWJGTjJLa2QvNFI5czBvZGxPaHQrOU1hZlJodFRPMEpZSzRDWDlY?=
- =?utf-8?B?WWNoSUpDOTVBNk5HZTRFdEszYmtzb29kdUxubEZOTGQ1MGs5dWFFQTdFZ3lI?=
- =?utf-8?B?R1U4S0dtck1VMHI3cUsrNzZFejRPYzZNMkRjU2V2bmZCTThyR290UEd5RWZP?=
- =?utf-8?B?SkEySm5sekNsaE1CanNSenBMU01HQ0ZHMTRhOEx1QnpwajdNbWZWeHRzYWdH?=
- =?utf-8?B?UWxvUk1RdGw3bUVLcjJ0cmNEZ3V1V0NlY0RmbUNMRTJXYkpWczFoZU9ibXlL?=
- =?utf-8?B?MGlmQUkveWxsdUw2RWdsS3MvUmlLbEh6S0d6bnllWEhodFQzb3ZVamUza0lR?=
- =?utf-8?B?R05wRjNMRk1oU1FYQm9MZDZhdStQQ0wwOVBkcFVLb1Jzei9NcTIrYi9oVUxC?=
- =?utf-8?B?eGY0dTBmbEh6c2J5N0REZEwvZ2Z0NnBFVHNqa1ZhSGRSYVFTRVNsamF5cVN2?=
- =?utf-8?Q?D3xoU00DtJ/2ygWw=3D?=
-X-Exchange-RoutingPolicyChecked: mMxOikmQ0Q57ggDID1JiuPJQSi3Cxi1Vd21UVYqSB2UOfK8nnMAPrmxLEILLoKWZ7xlSQXr9pijKjOChTrBdgiCjHvh0vuuwZHtZDoZpXTz1ZA42Ox1SCU4rOPEeqlNzxHFyDu5mIOVLcdQjkSZX4nnW6xVWIk5nj32Dwg88W5S17RkQfPOEW+aSsVWBOh0D3fYfE3wk/FcohmMKrCztwlQfkg573J8NHAP/X8bT3fz9Jf9lwZ177JiM4JLJVEwhEaf+Mg2z+WcaN8aMECcWrZASsaem7oedaYeevvMMRJltyNF/29VtY3jmSvP4j0gj2pVlBnJAb/9oKF/WWuoV8Q==
-X-MS-Exchange-CrossTenant-Network-Message-Id: b5eed3a6-6bf4-445f-e556-08de86695326
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2026 10:14:11.0422
+X-MS-Exchange-AntiSpam-MessageData-0:
+	HBorQBwVqnK5U+f7dk6WBAXdH1t4NyyYVCRu9ruR7QyHDdX9MRU9+hdlFtlHgASA01ryaClTXq4I2iy2ANZJ4uGh+BWdU7V9ICbgqBKhawEv04wqZ9C7DNrakSFjeqLFK6oCvhOxXCcZ0tC4aqHqFrNQmC8SXc/a9PEtBw5OYanEFMVXJW7+pd+ww0PRK49IW/qrDCe2s8tnHz1PgOeUEfWpCqQAK6amwA+fAngMNzPtu2KiZ44ysXhGng5fCIJa/bxsNnzUxm3ikEEkz32xbV6xAktzn7H/BFK2YBN+DQZbnjlXH2feY/1nzPvalqz/kBlAJQS1FvlN0Yzl1ZsHZrJbC4B8MLWlTNl4B/wsYJ4g9YfLyd2eYL6F2EmMR2aq4/xJ5uFXxK/woQBZdemZrFdyeomsft3rG/rJFX2CzX+GKT3nw7dsee0VdglwOPL2
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2026 11:26:44.9632
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VHBybLSQsrMf6epGD5Zd0XeKBdxEno8eW+YGjsQ8faLsH8NySzCnJIa0rw3JZbCug+GgrHSFMapqBmfY/EHVTTs7NEKETJ2muKn/8ljz68w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6348
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2c07b846-f955-4f69-d776-08de86739147
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CDF.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB999098
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269876-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269891-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[petrm@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.943];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 27F692D88C4
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 001B52D9878
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/20/26 06:05, Aleksandr Loktionov wrote:
-> From: Katarzyna Wieczerzycka <katarzyna.wieczerzycka@intel.com>
-> 
-> In ice_dcb_rebuild(), the first call to ice_query_port_ets() is checked
-> for error, and on failure jumps to the 'dcb_error' label. The error path
-> always calls mutex_unlock(&pf->tc_mutex), but at this point in the code
-> the mutex has never been locked -- mutex_lock() came after the check.
-> 
-> Releasing a mutex that was not locked is undefined behaviour and can
-> cause a deadlock or crash. Fix this by moving mutex_lock() to before
-> the error check, so that 'dcb_error' always pairs with a prior lock.
-> 
-> Fixes: 242b5e068b25 ("ice: Fix DCB rebuild after reset")
-> Signed-off-by: Katarzyna Wieczerzycka <katarzyna.wieczerzycka@intel.com>
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-NACK
+Ioana Ciornei <ioana.ciornei@nxp.com> writes:
 
-there is a better fix proposed by community, we are awaiting v2
-https://patchew.org/linux/20260223220102.2158611-1-bart.vanassche@linux.dev/20260223220102.2158611-20-bart.vanassche@linux.dev/
+> Extend lib.sh so that it's able to parse driver/net/net.config and
+> environment variables such as NETIF, REMOTE_TYPE, LOCAL_V4 etc described
+> in drivers/net/README.rst.
+>
+> In order to make the transition towards running with a single local
+> interface smoother for the bash networking driver tests, beside sourcing
+> the net.config file also translate the new env variables into the old
+> style based on the NETIFS array. Since the NETIFS array only holds the
+> network interface names, also add a new array - TARGETS - which keeps
+> track of the target on which a specific interfaces resides - local,
+> netns or accesible through an ssh command.
+>
+> For example, a net.config which looks like below:
+>
+> 	NETIF=eth0
+> 	LOCAL_V4=192.168.1.1
+> 	REMOTE_V4=192.168.1.2
+> 	REMOTE_TYPE=ssh
+> 	REMOTE_ARGS=root@192.168.1.2
+>
+> will generate the NETIFS and TARGETS arrays with the following data.
+>
+> 	NETIFS[p1]="eth0"
+> 	NETIFS[p2]="eth2"
+>
+> 	TARGETS[eth0]="local:"
+> 	TARGETS[eth2]="ssh:root@192.168.1.2"
+>
+> The above will be true if on the remote target, the interface which has
+> the 192.168.1.2 address is named eth2.
+>
+> Since the TARGETS array is indexed by the network interface name,
+> document a new restriction README.rst which states that the remote
+> interface cannot have the same name as the local one.
 
+Isn't this going to be a somewhat common scenario though?
+
+> Also keep the old way of populating the NETIFS variable based on the
+> command line arguments. This will be invoked in case NETIF is not
+> defined.
+>
+> Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
 > ---
->   drivers/net/ethernet/intel/ice/ice_dcb_lib.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-> index bd77f1c..d516734 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-> @@ -538,12 +538,11 @@ void ice_dcb_rebuild(struct ice_pf *pf)
->   	int ret;
->   
->   	ret = ice_query_port_ets(pf->hw.port_info, &buf, sizeof(buf), NULL);
+> Changes in v3:
+> - s/TARGET/CUR_TARGET
+> - this used to be patch #2/9 in v2. Swapped the two patches so that the
+>   run_cmd used in this patch is defined earlier, not later.
+> Changes in v2:
+> - patch is new
+>
+>  .../testing/selftests/drivers/net/README.rst  |   3 +
+>  tools/testing/selftests/net/forwarding/lib.sh | 130 ++++++++++++++++--
+>  2 files changed, 124 insertions(+), 9 deletions(-)
+>
+> diff --git a/tools/testing/selftests/drivers/net/README.rst b/tools/testing/selftests/drivers/net/README.rst
+> index c94992acf10b..8d8d9d62e763 100644
+> --- a/tools/testing/selftests/drivers/net/README.rst
+> +++ b/tools/testing/selftests/drivers/net/README.rst
+> @@ -26,6 +26,9 @@ The netdevice against which tests will be run must exist, be running
+>  Refer to list of :ref:`Variables` later in this file to set up running
+>  the tests against a real device.
+>  
+> +Also, make sure that if you are using a remote machine for traffic injection,
+> +the local and remote interfaces have different names.
+> +
+>  Both modes required
+>  ~~~~~~~~~~~~~~~~~~~
+>  
+> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+> index cf40cb766c68..fb5aa56343e1 100644
+> --- a/tools/testing/selftests/net/forwarding/lib.sh
+> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> @@ -3,6 +3,7 @@
+>  
+>  ##############################################################################
+>  # Topology description. p1 looped back to p2, p3 to p4 and so on.
+> +#shellcheck disable=SC2034 # SC doesn't see our uses of global variables
+>  
+>  declare -A NETIFS=(
+>      [p1]=veth0
+> @@ -17,6 +18,26 @@ declare -A NETIFS=(
+>      [p10]=veth9
+>  )
+>  
+> +# Array indexed by the network interface name keeping track of the target on
+> +# which the interface resides. Values will be strings of the following format -
+> +# <type>:<args>.
+> +# TARGETS[eth0]="local:" - meaning that the eth0 interface is accessible locally
+> +# TARGETS[eth1]="netns:foo" - eth1 is in the foo netns
+> +# TARGETS[eth2]="ssh:root@10.0.0.2" - eth2 is accessible through running the
+> +# 'ssh root@10.0.0.2' command.
+> +declare -A TARGETS=(
 
-the difference is to move mutex_lock() over ice_query_port_ets()
+This is a helper array for internal use only, not a user interface. It
+should just be declared suitably close to where it's actually
+initialized. It doesn't even need its own initialization, there's code
+down there to initialize it accordingly.
 
-> +	mutex_lock(&pf->tc_mutex);
->   	if (ret) {
->   		dev_err(dev, "Query Port ETS failed\n");
->   		goto dcb_error;
->   	}
->   
-> -	mutex_lock(&pf->tc_mutex);
-> -
->   	if (!pf->hw.port_info->qos_cfg.is_sw_lldp)
->   		ice_cfg_etsrec_defaults(pf->hw.port_info);
->   
+> +    [veth0]="local:"
+> +    [veth1]="local:"
+> +    [veth2]="local:"
+> +    [veth3]="local:"
+> +    [veth4]="local:"
+> +    [veth5]="local:"
+> +    [veth6]="local:"
+> +    [veth7]="local:"
+> +    [veth8]="local:"
+> +    [veth9]="local:"
+> +)
+> +
+>  # Port that does not have a cable connected.
+>  : "${NETIF_NO_CABLE:=eth8}"
+>  
+> @@ -340,17 +361,108 @@ fi
+>  ##############################################################################
+>  # Command line options handling
+>  
+> -count=0
+> +check_env() {
+> +	local vars_needed=("LOCAL_V4,LOCAL_V6"
+> +			   "REMOTE_V4,REMOTE_V6"
+> +			   "REMOTE_TYPE"
+> +			   "REMOTE_ARGS")
+
+Given how much hand-rolled code is needed for cross-checking local x
+remote config symmetry anyway, I wonder if this whole thing should just
+be very simply:
+
+	if [[ ! (( -n "$LOCAL_V4" && -n "$REMOTE_V4") ||
+		 ( -n "$LOCAL_V6" && -n "$REMOTE_V6" )) ]]; then
+		echo "SKIP: Invalid environment, missing or inconsistent LOCAL_V4/REMOTE_V4/LOCAL_V6/REMOTE_V6"
+                exit "$ksft_skip"
+        fi
+
+Then you still need a manual check for REMOTE_TYPE and REMOTE_ARGS, but
+that's still just three checks all told like the current code, and we
+get rid of the double nested loop that's kinda tricky to understand. It
+doesn't look like the generalization really pays off here.
+
+> +	local missing=()
+> +	local choice
+> +
+> +	# If a choice has multiple comma separated options, at least one must
+> +	# exist
+> +	for choice in "${vars_needed[@]}"; do
+> +		IFS=',' read -ra entries <<< "$choice"
+
+Entries should be declared as local.
+
+> +
+> +		local found=0
+> +		for entry in "${entries[@]}"; do
+> +			if [[ -n "${!entry}" ]]; then
+> +				found=1
+> +				break
+> +			fi
+> +		done
+>  
+> -while [[ $# -gt 0 ]]; do
+> -	if [[ "$count" -eq "0" ]]; then
+> -		unset NETIFS
+> -		declare -A NETIFS
+> +		if [[ $found -eq 0 ]]; then
+> +			missing+=("$choice")
+> +		fi
+> +	done
+> +
+> +	# Make sure v4 / v6 configs are symmetric
+> +	if [[ (-n "${LOCAL_V6}" && -z "${REMOTE_V6}") || \
+> +	      (-z "${LOCAL_V6}" && -n "${REMOTE_V6}") ]]; then
+> +		missing+=("LOCAL_V6,REMOTE_V6")
+>  	fi
+> -	count=$((count + 1))
+> -	NETIFS[p$count]="$1"
+> -	shift
+> -done
+> +
+> +	if [[ (-n "${LOCAL_V4}" && -z "${REMOTE_V4}") || \
+> +	      (-z "${LOCAL_V4}" && -n "${REMOTE_V4}") ]]; then
+> +		missing+=("LOCAL_V4,REMOTE_V4")
+> +	fi
+> +
+> +	if [[ ${#missing[@]} -gt 0 ]]; then
+> +		echo "SKIP: Invalid environment, missing configuration: ${missing[*]}"
+> +		echo "Please see tools/testing/selftests/drivers/net/README.rst"
+> +		exit "$ksft_skip"
+> +	fi
+> +}
+> +
+> +get_ifname_by_ip()
+> +{
+> +	local ip_addr=$1; shift
+> +
+> +	run_cmd ip -j addr show to "$ip_addr" | jq -r '.[].ifname'
+> +}
+> +
+> +# If there is a configuration file, source it
+> +if [[ -f $net_forwarding_dir/../../drivers/net/net.config ]]; then
+> +	source "$net_forwarding_dir/../../drivers/net/net.config"
+> +fi
+
+This is going to impact all tests though, not just those that are meant
+to work with this. If I have this file, it sets NETIF, and all my
+forwarding tests (presumably) break, because NETIFS doesn't get
+configured correctly.
+
+The requirements for driver tests are different from forwarding tests.
+In particular, interfaces do not belong to driver tests, the test can't
+bring them up or down, reassign addresses etc., merely to use them for
+traffic. (Which you know, I'm just stating it for context.) So I think
+there needs to be an opt-in variable for this stuff. Like setting
+DRIVER_TEST_CONFORMANT=yes before sourcing the library or whatever.
+
+Then NETIF ceases to be a tell and becomes an environment requirement
+for check_env to validate like the others.
+
+(Another alternative is to extract a common core from lib.sh and have
+both lib.sh and net/driver/lib.sh use that. But that's more of a change
+and I'm not even sure it's the right way to slice it.)
+
+> +# In case NETIF is specified, then the test expects to pass the arguments
+> +# through the variables specified in drivers/net/README.rst file. If not,
+> +# fallback on parsing the script arguments for interface names.
+> +if [[ -v NETIF ]]; then
+> +	if (( NUM_NETIFS > 2)); then
+> +		echo "SKIP: NETIF defined and NUM_NETIFS is bigger than 2"
+> +		exit "$ksft_skip"
+> +	fi
+> +
+> +	check_env
+> +
+> +	# Populate the NETIF and TARGETS arrays automatically based on the
+> +	# environment variables
+> +	unset NETIFS
+> +	declare -A NETIFS
+> +
+> +	NETIFS[p1]="$NETIF"
+> +	TARGETS[$NETIF]="local:"
+> +
+> +	# Locate the name of the remote interface
+> +	if [[ -v REMOTE_V4 ]]; then
+> +		remote_netif=$(CUR_TARGET="$REMOTE_TYPE:$REMOTE_ARGS" get_ifname_by_ip "$REMOTE_V4")
+> +	else
+> +		remote_netif=$(CUR_TARGET="$REMOTE_TYPE:$REMOTE_ARGS" get_ifname_by_ip "$REMOTE_V6")
+> +	fi
+> +	if [[ ! -n "$remote_netif" ]]; then
+> +		echo "SKIP: cannot find remote interface"
+> +		exit "$ksft_skip"
+> +	fi
+
+This should check that $NETIF != $remote_netif.
+
+> +	NETIFS[p2]="$remote_netif"
+> +	TARGETS[$remote_netif]="$REMOTE_TYPE:$REMOTE_ARGS"
+> +else
+> +	count=0
+> +
+> +	while [[ $# -gt 0 ]]; do
+> +		if [[ "$count" -eq "0" ]]; then
+> +			unset NETIFS
+> +			declare -A NETIFS
+> +		fi
+> +		count=$((count + 1))
+> +		NETIFS[p$count]="$1"
+> +		TARGETS[$1]="local:"
+> +		shift
+> +	done
+> +fi
+>  
+>  ##############################################################################
+>  # Network interfaces configuration
 
 
