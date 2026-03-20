@@ -1,80 +1,84 @@
-Return-Path: <netdev+bounces-269811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269812-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uCTlKU/2vGkt5AIAu9opvQ
-	(envelope-from <netdev+bounces-269811-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:25:03 +0100
+	id ADBdBGD2vGkt5AIAu9opvQ
+	(envelope-from <netdev+bounces-269812-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:25:20 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FE312D692B
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:25:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 645972D6943
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:25:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1215C300D461
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 07:23:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A4360301AA4D
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 07:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D60835B62A;
-	Fri, 20 Mar 2026 07:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0474D35BDCE;
+	Fri, 20 Mar 2026 07:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mNtryrub"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iCKeS5Ae"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256AC35A3AA
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 07:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF35535B63A
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 07:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773991402; cv=none; b=V+32Z41I2QaJ4alqqzQ7Mzp+dmpdAlgf30mwAveMjGPtROPgKaTyHR+R/aywMhhol7iXVP1GbarPsL1ZnJTaDcFAZGLyztsKzMNZ1sgdEV3qnjeOgjs0aPVNMvDDRKNN4ZUgmdtyjp34pLHjR4ycE7Ay4dHOGt28qAUgtiN/8cI=
+	t=1773991403; cv=none; b=cLX+4bVCqWaMIUMRbihjICbKPwBS1/Vbj+mzIb7A0k1BQ6ueR0b/lZ96Jgp/2VuRAXZ1sWgQjBm259oLVp2L9CoRfBYc45otfdhJj13q7Oxar3to1tPmJie0Cfx5KXkwr805C6tJ9cR/F+h/+F77/TEorIXoLM5BO9MGc2SI2HE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773991402; c=relaxed/simple;
-	bh=Wc4MiRjL/PXuQ03s5/LF0WGC9SyHSIsfCOC+jUHFcp0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gMC9thGAfscEf07Faw+ngxJO9IP2N/7YcRljP9qNXJgDUzda/0YULIBy2PSJjzEAYhLhr/GU0edlZfUJlvo29m0F4rLSyOdgquyRTq6N3Yr1VH/XyaSGX60YC/hgKjzW7HiJ2yrOx+HvOhSpS01XRU9HzokMzeo69IhE/xe+Nf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mNtryrub; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1773991403; c=relaxed/simple;
+	bh=ReldcASHDrF2HHtmtAv54KTQ4ewXfdSe5rtGK3woxmc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=HPAaDPf2LEFyVXGbrI0ktsH2bnS790hKTCRqold94KNupLHKfLeJnLBbtpUc/7NYfUMgqMtpOcLxCB9fOa8V8DdCwtEIdk1iU5yppcpnOonqcLq23XqX575T5+Hk8cOB+l4LlQ7RYvfsfaXvO6n1HHduokeuZ2etF3GsAwNjNxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iCKeS5Ae; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-82a106b687cso1009745b3a.1
-        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 00:23:20 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c7414516609so1272565a12.3
+        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 00:23:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773991400; x=1774596200; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7e7z9BPgOZI2//OlISLrUetsLlsbIgJoQN9d42Pt+vs=;
-        b=mNtryrubMpFEU/S06KiLGITbwr/aog78K2ynNLHbbR9o7gZI4fGZ01J6xk9NXY2BMc
-         khLmjlSRmuCd/clb6s4CG13WVvOZ+Nvf6J7PC1tg+Y4QMZRYBS5gWQJfDXKA/8LSoquJ
-         kPOYd+dxkEvuBHdmdB583VFqQDbErEl6wBn6XDOFDhIRS0ug3u5k0wcwMiKqLHMMOkJA
-         6ETjv0wW9dsxlk8qvSCUwMyPVfbhOiz0Mo7A4b+bloyCLYeACgMtzKEsHSwGf1xdt+vx
-         2uIsUkjUN7hKSAaNfeBNh1hvn/OMtQIsfZShJBs1AyHCMdc6r4d7vkKd8/N1Wkisdrhv
-         AF6A==
+        d=google.com; s=20251104; t=1773991402; x=1774596202; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+DPgy3H4jqGS0pHznUOF21SInzO8sFZVNK+gTs1qQh8=;
+        b=iCKeS5AeoJQT98phrKlFiJPz4HDiy35QdEHw5i5dluGO6qoa4F4Jet7WLt1Q7uztZf
+         ZBSl+CdbCdyiETB/bH04nGZFe0BwryPat2J+knkdDSWt6fGI2wSAtn0vEXvlJ9MNLGAq
+         G/BaCgFD2Hi5ppiJVsnSrwKFoXyLRAamVGhfHNI64AAL1yWpBEBrK58oRphc3txto5Ra
+         Xh/rgyB8LjxEqIVGeKxm8hOBkH3M5+Gno2vA7lKjQ4oAedjez4HQ6YDNveKWxeE19Q0q
+         5OTmHHk54DwNL3rmADK7Hp76fPZ2YdHKuOhkgizAvZvRBUBWQJJIecp+lklWOHzpPPBf
+         rsZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773991400; x=1774596200;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7e7z9BPgOZI2//OlISLrUetsLlsbIgJoQN9d42Pt+vs=;
-        b=jrHeVXt160oinD8nUOp7rHOQPnYu8QrPS+o93E4QfruHN6m+8erPa8Zk8VEgOiH+nm
-         HrdgiWyTiQnkIcN5cdAMBzxtzg4dsZokxf8cQLpR9QTrLuLbGYhvMDJpGadq7MBl+g9K
-         Ih0XygxT13CAlhNw4dACeDfmCuOCq7Mc+XzAPcbaQJ9ZgEQI4ZehWAdACB4SBHuA574w
-         5GeOsd31/HxdHRUZCIWtXU5UGrzsthWsBw/ieFYlgY3X+9+30jfci1I9EQXOLXtOGoH2
-         IpvyUt6iwE48xoGDxbPhWWJ/li9QsBQBRCUYJGHEDr3yGRYB8tr6qPxnvih1vN9giMwO
-         Kzzw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxj7IML4Vd3EjBnxFlDwYVEoIv88G3X2SsfKC6Drj3g9Lrthx4ycbzdfy58WPRKkV9Vu6faGU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxC4pc2HGJoyN/tk8RrWRmpveo5B21XF02mtZDQaKwVjwV+eWT+
-	1Gjw4reAgUCbmRxlwNI+LFIfecaElmsrPN1LE6Kn+8ZQAYYgr3wU1hUB/r/DreZEiTl9YVPWuOm
-	l+jfuGA==
-X-Received: from pfbde10.prod.google.com ([2002:a05:6a00:468a:b0:829:a298:e5f2])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1bc7:b0:829:7553:afc5
- with SMTP id d2e1a72fcca58-82a8c23301bmr1448594b3a.4.1773991400196; Fri, 20
- Mar 2026 00:23:20 -0700 (PDT)
-Date: Fri, 20 Mar 2026 07:22:58 +0000
+        d=1e100.net; s=20251104; t=1773991402; x=1774596202;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+DPgy3H4jqGS0pHznUOF21SInzO8sFZVNK+gTs1qQh8=;
+        b=EiHUesSBr+eXckCKjX1ZbX8onwGWZSYRrqatVxRaUX8kglRpTIwJ8lTHeJ/a7TKRKR
+         UkWsRggiLLIMdpC4Ht2NYalevfOMSvV9yi8mZJAs9bZXrs/LqWMg97PMmP3FynG5xP4w
+         7NsdJEmI0gNp6+t2af8uB9mIS1HPRMnAr/TT1O7j9aUxWnv4gwHSw5KRROsR5fA1B/B3
+         2w8+p4p+SimuXzdAkwfKGLgxd3+5hJbQRa6NxOhY05K4BRP/ooxcQAyvaXJGbIn4FMYo
+         9AO8EnqO2g9uVY7NBc29Yj8RBag0Dv5HSyZxC4GLOddwhgetrFLSg884N0AWb/EAv2ER
+         kMvw==
+X-Forwarded-Encrypted: i=1; AJvYcCWP4Gi+PWyzTemhO3s1RBRbOUBM3fZIPklXnynpRRKPkbUi02BCjovE8HDQ8N74ls04sUONy2U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIkMm7TveA6Iqgk067xIg19G3pPdalA1toqZvZMTBitx01Ynd2
+	YtEhIVfiaajMTD7MeNFcCeP3++Wf2yur2QV8Lw3YN/bAV3wJNHNhhTTYvxafvLszBNd7E64YmTG
+	br1WIUQ==
+X-Received: from pgdc29.prod.google.com ([2002:a05:6a02:511d:b0:c65:e8e7:d481])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6d86:b0:398:93bb:f28a
+ with SMTP id adf61e73a8af0-39bceb051f6mr1882164637.27.1773991401919; Fri, 20
+ Mar 2026 00:23:21 -0700 (PDT)
+Date: Fri, 20 Mar 2026 07:22:59 +0000
+In-Reply-To: <20260320072317.2561779-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260320072317.2561779-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.959.g497ff81fa9-goog
-Message-ID: <20260320072317.2561779-1-kuniyu@google.com>
-Subject: [PATCH v6 net 0/3] ipv6: Fix two GC issues with permanent routes.
+Message-ID: <20260320072317.2561779-2-kuniyu@google.com>
+Subject: [PATCH v6 net 1/3] ipv6: Remove permanent routes from tb6_gc_hlist
+ when all exceptions expire.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: David Ahern <dsahern@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -98,7 +102,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269811-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269812-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -106,55 +110,73 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.877];
+	NEURAL_HAM(-0.00)[-0.870];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3FE312D692B
+X-Rspamd-Queue-Id: 645972D6943
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Patch 1 fixes the unbounded growth of tb6_gc_hlist due to
-permanent routes whose exception routes have all expired.
+Commit 5eb902b8e719 ("net/ipv6: Remove expired routes with a
+separated list of routes.") introduced a per-table GC list and
+changed GC to iterate over that list instead of traversing
+the entire route table.
 
-Patch 2 fixes an issue where exception routes tied to
-permanent routes are not properly aged.
+However, it forgot to add permanent routes to tb6_gc_hlist
+when exception routes are added.
 
-Patch 3 is a selftest for the issue fixed by Patch 2.
+Commit cfe82469a00f ("ipv6: add exception routes to GC list
+in rt6_insert_exception") fixed that issue but introduced
+another one.
 
+Even after all exception routes expire, the permanent routes
+remain in tb6_gc_hlist, potentially negating the performance
+benefits intended by the initial change.
 
-Changes:
-  v6:
-    Patch 2: Call fib6_age_exceptions() under RCU
+Let's count gc_args->more before and after rt6_age_exceptions()
+and remove the permanent route when the delta is 0.
 
-  v5: https://lore.kernel.org/netdev/20260319041427.1528743-1-kuniyu@google.com/
-    Add selftest
+Note that the next patch will reuse fib6_age_exceptions().
 
-  v4: https://lore.kernel.org/netdev/20260311052954.1224278-1-kuniyu@google.com/
-    Patch 2: s/,/;/ for fib6_gc_args initialisation
+Fixes: cfe82469a00f ("ipv6: add exception routes to GC list in rt6_insert_exception")
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Reviewed-by: Xin Long <lucien.xin@gmail.com>
+---
+ net/ipv6/ip6_fib.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-  v3: https://lore.kernel.org/netdev/20260309180804.3471287-1-kuniyu@google.com/
-    Patch 2: Use IS_ENABLED()
-
-  v2: https://lore.kernel.org/netdev/20260308032304.1841198-1-kuniyu@google.com/
-    Patch 2: Fix build failure when CONFIG_IPV6=n (no net->ipv6 definition)
-
-  v1: https://lore.kernel.org/netdev/20260307024709.718395-1-kuniyu@google.com/
-
-
-Kuniyuki Iwashima (3):
-  ipv6: Remove permanent routes from tb6_gc_hlist when all exceptions
-    expire.
-  ipv6: Don't remove permanent routes with exceptions from tb6_gc_hlist.
-  selftest: net: Add GC test for temporary routes with exceptions.
-
- include/net/ip6_fib.h                    | 21 +++++++-
- net/ipv6/addrconf.c                      |  4 +-
- net/ipv6/ip6_fib.c                       | 15 +++++-
- net/ipv6/route.c                         |  2 +-
- tools/testing/selftests/net/fib_tests.sh | 61 ++++++++++++++++++++++--
- 5 files changed, 94 insertions(+), 9 deletions(-)
-
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index 9058e71241dc..fadfca49d6b1 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -2348,6 +2348,17 @@ static void fib6_flush_trees(struct net *net)
+ /*
+  *	Garbage collection
+  */
++static void fib6_age_exceptions(struct fib6_info *rt, struct fib6_gc_args *gc_args,
++				unsigned long now)
++{
++	bool may_expire = rt->fib6_flags & RTF_EXPIRES && rt->expires;
++	int old_more = gc_args->more;
++
++	rt6_age_exceptions(rt, gc_args, now);
++
++	if (!may_expire && old_more == gc_args->more)
++		fib6_remove_gc_list(rt);
++}
+ 
+ static int fib6_age(struct fib6_info *rt, struct fib6_gc_args *gc_args)
+ {
+@@ -2370,7 +2381,7 @@ static int fib6_age(struct fib6_info *rt, struct fib6_gc_args *gc_args)
+ 	 *	Note, that clones are aged out
+ 	 *	only if they are not in use now.
+ 	 */
+-	rt6_age_exceptions(rt, gc_args, now);
++	fib6_age_exceptions(rt, gc_args, now);
+ 
+ 	return 0;
+ }
 -- 
 2.53.0.959.g497ff81fa9-goog
 
