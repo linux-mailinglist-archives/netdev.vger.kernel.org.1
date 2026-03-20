@@ -1,208 +1,339 @@
-Return-Path: <netdev+bounces-269803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269804-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eOzCHsDwvGlA4wIAu9opvQ
-	(envelope-from <netdev+bounces-269803-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:01:20 +0100
+	id CJvSFqzzvGms4wIAu9opvQ
+	(envelope-from <netdev+bounces-269804-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:13:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD2F92D6647
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:01:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C47EC2D671D
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 08:13:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BAC6B306742D
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 07:01:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4DE633034A1F
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 07:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B20D1F92E;
-	Fri, 20 Mar 2026 07:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50AAA359A96;
+	Fri, 20 Mar 2026 07:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="No7KoGAV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZXShgbPN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F5E280CFC
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 07:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773990072; cv=none; b=MUEBUl1X/Rvl9UZm3AB+0xcnSTSdd1tfYkmT5JQQ+wzOclUDGe3K9Jj0sVtoQ6ue1rnaEttmswaNS9Z3FRXhlJBsJStxGun1iOBZnbDOqe5GSlUNuQavtoSCU+7J93V4LDwEkAa3VukvGtiVgvs6gqB5NzNoXFbjG2XI3ljYJ/U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773990072; c=relaxed/simple;
-	bh=3HF9wgnRG9yrpxXbSCc0igBYuNphX33rgEIqvI20pYQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XSBTVdKDb+rPSB9WYQVMUvwN4UyaMUa1cWHnhGpQqxSHj+P0XZ2XyfVm8rGOofBy/TVr6mL+d+NuxwDQ13Oi+wX/+rlXYHuGIT3FnIhcs55ZpF+ibp0e3VC68yqs8LBegFLApX3JCjvYWDzuxBHqtIaNZpz/sTgbhK78xwgfNrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=No7KoGAV; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-439b7c2788dso131787f8f.1
-        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 00:01:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773990069; x=1774594869; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TXy5aCVESxJEjgT7Xr2omfnlovii5NJdao8pF0up7LY=;
-        b=No7KoGAVpPgt/J8W5pK8ZpvRNSVpDErQbLblFhimui/3AnqkHENW8gSxo62gfrau+q
-         77t12KELp0sj3hVTp7jdxljWM3bGPnBkWdc0QTRVCgyoIfSO7vaoFnxC5kJwszd+WCQt
-         qYAotPupFoO6/Eq8xTzZ8lFEI1jd2qIMHbSPpVZxnmhAS2Rpl+JoylbD/XF1VrgmT6rV
-         +iKBDbACxz35yr3VoZANfOSFJRKK2SIZC5QumofIcT4YBGL4lidtdkBOFnSE0P30MPvy
-         UNgY00SMv/ISVAYV/A9x9fHi2CZpuPdUJqX+xgl5xwYKbs6LocJ9A5GhHeE+usPqy51j
-         Nz7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773990069; x=1774594869;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TXy5aCVESxJEjgT7Xr2omfnlovii5NJdao8pF0up7LY=;
-        b=dNOT4QS55BW/tuGlhZdAl386Zi0iSMrRrJI30AF1PlPjbStt2qs95KgDStegQRKo9E
-         usFQr5rnx5oteNFT8dTlEseu2/NwZNKLajLJ6zUufPYl9rxB6c8ROWlwoeadgpQQXlkX
-         uyFrB6tsS/Hk9uefwiowjw6rr917wF7vA7houPl4G8ibgy8CA/R8LnFDIECEeL6Ek4V3
-         dVzHgrlypHR/pPDwdlKicI/pVIyO1Sb8SNhWHkREgz9VPfrYZIcSvZjtUvkqdJmo5+7A
-         nMA+Dfme8cpxvuYDgt4bdUOOCCcZ658x0V0hg5XcqSIWUISdG22+llF6tliUusrA3PR+
-         iV2g==
-X-Forwarded-Encrypted: i=1; AJvYcCUDxalMd+uyVDj5mgacvu/De/8cr8dS1CiWiyNYwAH2lUKqwRgZ1S1ZUHgCBzfLuNF6LfwYCr8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyhP2pJhRq/JRp4TY+KDvyCnIgWdELXaIc7FhwDA/vZGQEfPJL
-	B9z6SbcJRMrEj5w0zyuzh5lKQxNv7roX7q3xoJEGeQ7oDke/8Vd9ChWo
-X-Gm-Gg: ATEYQzwbMBQzV0+V4tDMUWIl3rDUIND4q7e11LKOVm1fd8pu6O/aFqf8tK8fRhno3h7
-	AY95vDGaI5dnxUnsvtV5Rh+NlmND7gkVqcrsLUzB9lMyJO74F+r20lZgdGiT6ccB4cTaBAT/4Cf
-	iLs59DstLLJ2pBxtaK1wbtOdDTVRGw90q10dFgHVSq+OnjDnUHLb/SmU6jVQ2T5q2+i4mOfmwBs
-	n4NSOTQkVf4APEOydL+yxbjXiUPNE8HxoJcJOWZ0zs8A8f0AZGnzUihWUEJPqRRdtm8E1BDFtx0
-	i5Jh09V8XCdlBNlo6KzoksxwD3PHO+AmmA3oAzhiYv44/GqDfBpTBDzI79+uN2BOVqnZV93m0Kl
-	QBCz98johGGWkts9g37n2jPdhHfOazImF5Im3dN2HJlZ46H2fK3uYQh/HvlF5LmafMCFTvtkRdj
-	WbhYtxtI6Bfs86g/q5Bac168hthCHrcxwm1113RapsWQlPFJ7OEqbzJ0tpTgTv0TnP89rSbrlA2
-	WR/CgPTI+RPL1heWJJIKqUQ/2Uoq8oviB3xwjHX0dUCRXotwbT6e44Md2YdgyQSmg==
-X-Received: by 2002:a05:6000:184d:b0:43b:45f5:f02 with SMTP id ffacd0b85a97d-43b642429e1mr3218902f8f.6.1773990067717;
-        Fri, 20 Mar 2026 00:01:07 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f29:d400:ad48:a70e:f06d:ba53? (p200300ea8f29d400ad48a70ef06dba53.dip0.t-ipconnect.de. [2003:ea:8f29:d400:ad48:a70e:f06d:ba53])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b647120a1sm4209742f8f.30.2026.03.20.00.01.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Mar 2026 00:01:06 -0700 (PDT)
-Message-ID: <e273efe0-a66b-43c6-829b-aa158eb82fba@gmail.com>
-Date: Fri, 20 Mar 2026 08:01:05 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0DF3563F6;
+	Fri, 20 Mar 2026 07:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773990821; cv=fail; b=mj8FzB8oswsiTmEAmjC7EGqBYwmUjf2AxfVlti8ptxRHb9vc8YgBS3NMVSRbV+rEI4wdnT3CnMjV46ZW8n5zcHRsxO15oyiuj5mem/Zv5bX7N6111vFX+Vvc1iGl/02MkM5+rnOR+9WvEnX8ONttOQQpcR4Qz00tisvrWWXITrw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773990821; c=relaxed/simple;
+	bh=GGgrAvBZk8RJDuschHNoVe8XsrEz3JhmeosKPIwHD1w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=LyRwwjnpscReLvuGYyEdKWdeuSAzz/5Aq72oELSgy1RKE+WoNKtQaVTR8eR+KjCCo4TtggSqjIjK95ukuIWt6RIoIomIldMDMygskviTzWBkX0Z5m0zNjBZzU/JqA6GwDmFLpauOfIx8+o6SqFjLSvo+Pq1CDuQTANKzC2J/YR4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZXShgbPN; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773990818; x=1805526818;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=GGgrAvBZk8RJDuschHNoVe8XsrEz3JhmeosKPIwHD1w=;
+  b=ZXShgbPN1PFjhOPQSd+oAjAI6FCn/1/7GIiBerp6zQ1LHExsJVoG4ipv
+   yHI6aR5RIQOf9Ect+4Hzsx7tNKnk+rnM430V+RF27IlMODQri+iMgrqvs
+   cXAle0V2lDNVMg11bUyJoTOZdlI5BQBSD0g7IOZi5lVXX375OJgifpzq7
+   f3JWG5HIBuKUmQ1MO1Z9CfMtlxgxGlhh1nm9E9Esa/5vxsSY3bFO5xAj3
+   j3qXAqZpcg/WErQP7rjdZ8aLmqY44CgA7qK2sngZOft0IBmK/4fvq2IdB
+   hgZCzxo8bVXzhpDPwHTkQIcm4QhHzQYPz2i+c9K2ZNFd0j95FNgV3X7Vg
+   g==;
+X-CSE-ConnectionGUID: L4/SolMIR2+RWbEW34f9kg==
+X-CSE-MsgGUID: viez3wAuRLSRX4LJ/HOVCg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="100529537"
+X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
+   d="scan'208";a="100529537"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2026 00:13:37 -0700
+X-CSE-ConnectionGUID: 8iiwvLNoT76sVUVHdSGOCg==
+X-CSE-MsgGUID: E0zgf4MpTdi9S0X9/rz7Ww==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
+   d="scan'208";a="228148551"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2026 00:13:37 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 20 Mar 2026 00:13:36 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Fri, 20 Mar 2026 00:13:36 -0700
+Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.28) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 20 Mar 2026 00:13:34 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=leJfDTPm/15rDHWLIGnd5FuS0rW8bcBTNKY+wv4KMiIP1qrPZWoy+TbuAEfB5b7XgA1s6NWpy0eSnnl9DJumPu3Dr2ViYjMt+2UvzH69gL6ciCFsESKsps2HmePmpjGmq0mYUFT2XHyTaImWJhdTJayrzhCwsRP1nFAwNzBep5hZJUGyh4HJbxiHI5SlPRi3AEUhi1ZHmvNIVWRWvxwtU7Irk8xmHKrEawqdx+r3h6zm5yDLtMtbAnqRY1i5VBYnA3stZWnXyeuCJVZ1ZUkr9l2MUfI4pL/p7pG6fVq4bBdQZeRzSh6x4eaRlyKO6rzGI5aMXL7bWXv7bUFK36tbMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PsnQunviNNrWVKqfeU+fQXguaER4zZ1GkircTTykDE0=;
+ b=Z+Wed+WkU5ibEWJ9si5/LbY/bc2z7PNRsYEOsBvaxFrwJcqAThQSsZpm44sQKUyrQ1XeSNg1DjepAfMZN4jwlpNKmfoa1ErZkBVLk67qOS4yuJ3ZaIvF2K5/6kQD2rZ6RMRaz27gsfoQSkKnhH9KlRS8JgCE2QmwKRMvkAIZdp3xVaCRcSEfGHYu3wa6A/+AZJYKrrU4E98HvWoJ+y/+AAL/cgqHeFmiZWAYNf5icmV3BFxRxc0JXnM2vkEnt3jUYNzJJZ8AzteBWMZQRiNwgoIr881P8GFiEtxx2xrE4VwIZKk5OxKjNmSf0dQJQ/C3vvjAydj+saf7sjj0+Y9y4w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by DS0PR11MB8738.namprd11.prod.outlook.com (2603:10b6:8:192::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.15; Fri, 20 Mar
+ 2026 07:13:32 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9723.006; Fri, 20 Mar 2026
+ 07:13:32 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Stanislav Fomichev <sdf@fomichev.me>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "horms@kernel.org"
+	<horms@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
+	"skhan@linuxfoundation.org" <skhan@linuxfoundation.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "michael.chan@broadcom.com"
+	<michael.chan@broadcom.com>, "pavan.chebbi@broadcom.com"
+	<pavan.chebbi@broadcom.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "saeedm@nvidia.com" <saeedm@nvidia.com>,
+	"tariqt@nvidia.com" <tariqt@nvidia.com>, "mbloch@nvidia.com"
+	<mbloch@nvidia.com>, "alexanderduyck@fb.com" <alexanderduyck@fb.com>,
+	"kernel-team@meta.com" <kernel-team@meta.com>, "johannes@sipsolutions.net"
+	<johannes@sipsolutions.net>, "sd@queasysnail.net" <sd@queasysnail.net>,
+	"jianbol@nvidia.com" <jianbol@nvidia.com>, "dtatulea@nvidia.com"
+	<dtatulea@nvidia.com>, "mohsin.bashr@gmail.com" <mohsin.bashr@gmail.com>,
+	"Keller, Jacob E" <jacob.e.keller@intel.com>, "willemb@google.com"
+	<willemb@google.com>, "skhawaja@google.com" <skhawaja@google.com>,
+	"bestswngs@gmail.com" <bestswngs@gmail.com>, "kees@kernel.org"
+	<kees@kernel.org>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"leon@kernel.org" <leon@kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH net-next v3 03/13] net: introduce
+ ndo_set_rx_mode_async and dev_rx_mode_work
+Thread-Topic: [Intel-wired-lan] [PATCH net-next v3 03/13] net: introduce
+ ndo_set_rx_mode_async and dev_rx_mode_work
+Thread-Index: AQHcuAh2f0kbuGf0mU2yP7KpcECYabW3ANhA
+Date: Fri, 20 Mar 2026 07:13:32 +0000
+Message-ID: <IA3PR11MB89865C96824F6518F4A01B9CE54CA@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260320012501.2033548-1-sdf@fomichev.me>
+ <20260320012501.2033548-4-sdf@fomichev.me>
+In-Reply-To: <20260320012501.2033548-4-sdf@fomichev.me>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|DS0PR11MB8738:EE_
+x-ms-office365-filtering-correlation-id: 62157889-4b78-48c5-2c81-08de86503199
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700021|56012099003|22082099003|18002099003|7053199007;
+x-microsoft-antispam-message-info: /K80FlDeiYCNBsUqrdMoOwi80K192DKjGHCCynRtdXSRBRrOyNYNaiD8cZ8A9DDTKQLuSrsEuEtbRgMPpvLVElKQ9b1HeHkm/iz2KA9S3xg2LoBhuM1fIGyWl93eRptc88A0fGXqrSaqVUieZgpN25sMCUx2hCfkxeoyxyJl7/Kwnrgr4//AoszjWlPiiz6Vb5uY6WCyoOe9Qx1KIrDr73G6lxE3KoVBTvjgOSInKrpIC2Os0usy/YCFwaLrrygGgiqxNGH861anHTQ7LO4K81HJlK7iO6JsSzkHGU+UNXMP6bQlv5UltMC6nB6aWX3cc1ZBPWmcRlvlM9XidHbfiXJpVkzesP5b6x6E6sChiRLO8DfUX9aOPjM5c+X374Cp0eXroqiRIpasgWUXUdfhQDgB0FcfKPisr4MVLLU+ALeIq+sOGjklHz/hjVKdyYYIDBKo9EsNSBpKUoE4eQr1gxElOG/80LskW81p4+rCpHjRHdSZTF49DqxkG2MzXSOH/aX5DMzkWCDB/n2j5oVI5lfOMQ1Q/VlXLUIG0TJGzFPzR+VcX3lcqKCjK8N91bm9f1x829DLdXjjXBinKWUdi76ziePAECB5kdDuhbzKSjeMs/hDo1xAeknivBZXNW/9mDx191eKCtqFLbgSthOrhCdN+io9BBLPKfIbN0yv64zOz8IIPCVSnTzJ0hhU4gXB57CE4sg12PtLlr5kJgt3B0qZjw2RWYDk6/r2qMKXu11172cQwBRQP5QJkJx5Hb7dY1fSQhgfmvc1iaUcNI2UuB5i8kGoaCX/RoEff2ztbNw=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700021)(56012099003)(22082099003)(18002099003)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?1m0Y8lTTor4qy5n/3ysUNPb7ZsOOd1aLCg+kWq/uh5sL/wDq+GecKq17q1qh?=
+ =?us-ascii?Q?EXjEkaDy4LPua0AM0tqAv+Bf/cRZmEtDPJGw0nTUVTg5smFxgOnil5iMf84i?=
+ =?us-ascii?Q?O4tGfYuEzRoweIsag0znsGE1uktBF7JJyxgjQtPJAgHqKKmuxibw3PXbqguz?=
+ =?us-ascii?Q?Li2NQkx2rbRJdFPJzIEbSa8ZluQeXEzi2gyvCaFU9WnPB8EZjXlERbLafE0L?=
+ =?us-ascii?Q?vDeYKkT3YUaCcm3Z+48JIrJusSwqjl5HNsAOTU0x9EzgAblgKBNMn3d3WlNM?=
+ =?us-ascii?Q?3pmS33xIoeNqwcfU1ftvLcTwNeUtP6AT+G9ApZzxRgU1ValtTyf9IfeaR8k5?=
+ =?us-ascii?Q?pYfUFqxLo//HsHg5GTqyV7b4iSwffqs0BtPKzGgXFIXrsjQAtACs7kkfKoeg?=
+ =?us-ascii?Q?gSnT7xJ75KJ1zRT7kVwZns9UXQ9lilkro9vXQn+XzXlre5byFVKS9ryDgX0W?=
+ =?us-ascii?Q?mGywyHB2Jg102PnNVmJq5On9Y4O7HatEllQGf+pOhT6NDjD/RBgeo7bNQuka?=
+ =?us-ascii?Q?LqZOD90Je8gf7KUqGBf7VYcsGNLFtH/Aml84OhkkxL6a0bVGtAGpW5WkDSc8?=
+ =?us-ascii?Q?WmtjSlqK+9pUjWgdllxn6hATLhAI/LUllTK9eUJ4SqmFIiJZ4QvtVGwS1yns?=
+ =?us-ascii?Q?gcwm54DJhmro6awlI4rPEHFi4o6QS3ikbIU32gXHqMsKr+T9maA77WFfSMv7?=
+ =?us-ascii?Q?x1jkoYcspbBVcHgqx8ANJ6grJwq4lRPG6rJaoIZ2nVIy7HbHI5kITzrJ6bic?=
+ =?us-ascii?Q?1/RzClvAq+sVLbAueUxIeFdtyXkRSoFrd0vme4jo9mz0DKDmO5TbAJ21+F1o?=
+ =?us-ascii?Q?dzhE5WBxt5MhdmHu/dWubBwpz/4rCE4NrvI9h5+Ob0jVYkJ0HaTy0Mz6o/d9?=
+ =?us-ascii?Q?/qBzpwCN2V5Q5fXfPU0ROijLMej3GC3+rDWr/HBKFMeOmBF09UP8/mSpePIF?=
+ =?us-ascii?Q?xZyaGWQpqgOce0m3+I+mTzloE/Bb9BsIoFrm2P48kJnIENdT3QhI+K5GyM61?=
+ =?us-ascii?Q?1FCgWneTzZbzqLHrNCnVapJljDC/bgFCGDRsl6zYyNWTS/fNkwf7JL8ZJCbR?=
+ =?us-ascii?Q?rmv+pyuqKCWeU2e6tIqjXG5//wKVdJZQxdg5M3Ws12VjOJEu1C5J9oyYZ+Xh?=
+ =?us-ascii?Q?RwJ58PozK24vvR0IhNXAGHd3fgkssSutSogNaCBJV/3jCRPEtgePvk0Q8uys?=
+ =?us-ascii?Q?oG1q52hAeUo/hqAMkQQSzFwOAJO7CyBPUxF9Wd3ZK16hpvm9V1xJ/wMkwPKb?=
+ =?us-ascii?Q?CunxunH4WcfUuUvFh6U5rPFltYaJgaE3a7s+HWkoUTLmtX4ixVZpTvxIIVnY?=
+ =?us-ascii?Q?9juwFHhP4eZWjxEsAhvLwzVd89GI1qP8nLi3HcXaCrp4aBWTzsez97FyptvK?=
+ =?us-ascii?Q?uQQcmKLVsA7XtJcn+5n9wNLMsb+mn1EHCFGqZMBQNkC9mnxy5TiHa5AKiZ4j?=
+ =?us-ascii?Q?z62L5o7qGajJ8KycvLb2vwQCaUHeZYZTgW0yqNFoolTLamei36RRyw859DKk?=
+ =?us-ascii?Q?GdEnN6GxU3e8TGcmo7hPsxdSxMCPSW1i7X9qXq6MClYblrz1Hxi4ThqmtoxM?=
+ =?us-ascii?Q?WYgQtARWp6Iabq+P9p5RdMgQ3iNN7vsDiAqQSrTj5GhI5zPhh3nptaxu4o9j?=
+ =?us-ascii?Q?My3B3tgf3nJvYgyWHMHgJYsqbF+ANH3XzzK454DYAItOFsQmFncNTcQlLPOQ?=
+ =?us-ascii?Q?GecyBazqmZZtRCdUNdGre0FMCLPXpTo9bxWRKYMIelzFp4i1qKq8teBKY2Xa?=
+ =?us-ascii?Q?76uKCpRkoVsyGnljlGu8wJQ8+ciyc98=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: r8169: Discussion on implementing RSS support for r8169
-To: Javen <javen_xu@realsil.com.cn>
-Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <1ce3478d571f4d26a45e792c4c84c429@realsil.com.cn>
- <e063ce5f-1789-49d0-880c-e4b6a40da9e1@gmail.com>
- <86784e19c4504c3ba49a9299701a2c1f@realsil.com.cn>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <86784e19c4504c3ba49a9299701a2c1f@realsil.com.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Exchange-RoutingPolicyChecked: eVk8/qQGDQ3yw9lUtofPkdfk8cd21Yx/kLQQUlpL/E5d0X7OnGGN2MfFKI3cGTNaaTN4dDDF3UEir72j7CIIzgUg+NNmNuj2kFMN65UytC8WU7eLkIgQOSqjHo8py15KNObW18Csqaor1iecCGUEnMdxXJxp0TmoyH4txVAaQzbpLkjkvZgEFR9eqqytyCLbScqPJJJ6CEseQr2c4VrCQg+OPfunwf97C7wFlns03jMTrsBLI8qZMxxD2vfNwD6RQcZl1gKWoCjJwivBwceknaOgGJMytVuTu214fNccPqlVDYEhXzIZly3ymPOBDOmJKv7MAv3M2BRICk8TwxSKDw==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62157889-4b78-48c5-2c81-08de86503199
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Mar 2026 07:13:32.0704
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: o9EwuzPDNjrf+KnudmKhEUfOl9npP1y0mLuMS6AwxA6VyeNJ3DWMhkT54aVriBcrB3hGACM78lLUpuowggc3tsK0lIEZhxJX6vOQtxJwtMw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8738
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269803-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[36];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269804-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,lunn.ch,broadcom.com,intel.com,nvidia.com,fb.com,meta.com,sipsolutions.net,queasysnail.net,gmail.com,vger.kernel.org,lists.osuosl.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.976];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DD2F92D6647
+	NEURAL_HAM(-0.00)[-0.943];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: C47EC2D671D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 20.03.2026 04:22, Javen wrote:
->> On 19.03.2026 09:56, Javen wrote:
->>> Hi, Heiner
->>>
->>> We are now planning to implement RSS support on r8169 driver. This will
->> require significant changes to the existing driver architecture, so we want to
->> discuss it with you.
->>>
->> Thanks for the question.
->> I also once considered this, but decided against it, as I didn't see enough
->> benefit justifying the significantly increased complexity of the driver. Even
->> with a N100-based mini-pc I can easily saturate a 2.5Gbps link with the driver
->> as-is.
->> Any specific reason why you consider adding RSS support? Would be good to
->> see a performance comparison as basis for a decision on for which chip
->> versions RSS may provide a significant benefit.
->>
-> 
-> The primary beneft of adding rss here is to reduce cpu load per core.
-> 
-> Since I currently only have one RTL8111ep and one RTL8127, I'm going to do a simple test.
-> 
-> Based on my iperf test from RTL8111ep to RTL8127:
-> 	1. With rss: cpu load is distributed across 4 cores(1% ~ 2% each)
-> 	2. Without rss: cpu load is concentrated on a single core(7% ~ 8%)
-> 
-In sum it's the same, so we don't gain anything. More the opposite, we keep
-more CPU's busy and don't allow them to transition to deeper power-saving states.
 
-> If test from RTL8127 to RTL8127, especially on platforms with weaker cpu, disabling rss will easily lead to cpu overload. 
 
-I could imagine this at a rate of 10Gbps, but still would like to see some
-numbers. However, question is how realistic are use cases where a 10Gbps link
-is used (and fully utilized) on a system with a weak cpu.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Stanislav Fomichev
+> Sent: Friday, March 20, 2026 2:25 AM
+> To: netdev@vger.kernel.org
+> Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; horms@kernel.org; corbet@lwn.net;
+> skhan@linuxfoundation.org; andrew+netdev@lunn.ch;
+> michael.chan@broadcom.com; pavan.chebbi@broadcom.com; Nguyen, Anthony
+> L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; saeedm@nvidia.com; tariqt@nvidia.com;
+> mbloch@nvidia.com; alexanderduyck@fb.com; kernel-team@meta.com;
+> johannes@sipsolutions.net; sd@queasysnail.net; jianbol@nvidia.com;
+> dtatulea@nvidia.com; sdf@fomichev.me; mohsin.bashr@gmail.com; Keller,
+> Jacob E <jacob.e.keller@intel.com>; willemb@google.com;
+> skhawaja@google.com; bestswngs@gmail.com; Loktionov, Aleksandr
+> <aleksandr.loktionov@intel.com>; kees@kernel.org; linux-
+> doc@vger.kernel.org; linux-kernel@vger.kernel.org; intel-wired-
+> lan@lists.osuosl.org; linux-rdma@vger.kernel.org; linux-
+> wireless@vger.kernel.org; linux-kselftest@vger.kernel.org;
+> leon@kernel.org
+> Subject: [Intel-wired-lan] [PATCH net-next v3 03/13] net: introduce
+> ndo_set_rx_mode_async and dev_rx_mode_work
+>=20
+> Add ndo_set_rx_mode_async callback that drivers can implement instead
+> of the legacy ndo_set_rx_mode. The legacy callback runs under the
+> netif_addr_lock spinlock with BHs disabled, preventing drivers from
+> sleeping. The async variant runs from a work queue with rtnl_lock and
+> netdev_lock_ops held, in fully sleepable context.
+>=20
+> When __dev_set_rx_mode() sees ndo_set_rx_mode_async, it schedules
+> dev_rx_mode_work instead of calling the driver inline. The work
+> function takes two snapshots of each address list (uc/mc) under the
+> addr_lock, then drops the lock and calls the driver with the work
+> copies. After the driver returns, it reconciles the snapshots back to
+> the real lists under the lock.
+>=20
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+>  Documentation/networking/netdevices.rst |  8 +++
+>  include/linux/netdevice.h               | 20 ++++++
+>  net/core/dev.c                          | 95 +++++++++++++++++++++++-
+> -
+>  3 files changed, 116 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/Documentation/networking/netdevices.rst
+> b/Documentation/networking/netdevices.rst
+> index 35704d115312..dc83d78d3b27 100644
+> --- a/Documentation/networking/netdevices.rst
+> +++ b/Documentation/networking/netdevices.rst
+> @@ -289,6 +289,14 @@ struct net_device synchronization rules
+>  ndo_set_rx_mode:
+>  	Synchronization: netif_addr_lock spinlock.
+>  	Context: BHs disabled
 
-> That's the main reason we consider adding rss support for RTL8127.
-> 
-> I will show the result from RTL8127 to RTL8127 when I submit rss patch.
-> 
-Yes, please.
+...
 
-> Thanks,
-> Javen Xu
-> 
->>> Based on our vendor driver which can be fetched from Realtek, the key
->> modifications will include:
->>>
->>>       1. Enable msix and updating the irq allocation mechanism
->>>       2. Support multiple rx/tx queues
->>>       3. Register multiple napi and update new interrupt mapping(isr/imr) for
->> multi-queue
->>>       4. Implement rx msix poll and rx interrupt function
->>>       5. Implement ethtool callbacks for rss configuration
->>>
->>> Should we submit the changes above separately or submit them all at once?
->> Or do you have any other suggestions?
->>>
->> As Andrew already said, please submit the patches in smaller, reviewable,
->> chunks.
->> Best tagged as RFC.
->>
->>> We want to align with you on the development and submission approach.
->>>
->>> Best regards,
->>>
->>> Javen Xu
->>
->> Heiner
+> to
+> +device
+> + * and configure RX filtering.
+> + * @dev: device
+> + *
+> + * When the device doesn't support unicast filtering it is put in
+> +promiscuous
+> + * mode while unicast addresses are present.
+>   */
+>  void __dev_set_rx_mode(struct net_device *dev)  {
+>  	const struct net_device_ops *ops =3D dev->netdev_ops;
+>=20
+>  	/* dev_open will call this function so the list will stay sane.
+> */
+> -	if (!(dev->flags&IFF_UP))
+> +	if (!netif_up_and_present(dev))
+>  		return;
+>=20
+> -	if (!netif_device_present(dev))
+> +	if (ops->ndo_set_rx_mode_async) {
+> +		queue_work(rx_mode_wq, &dev->rx_mode_work);
+>  		return;
+This early return skips the legacy core fallback below.
+Before this patch, __dev_set_rx_mode() continued into the
+existing unicast-filter handling when the device did not
+advertise IFF_UNICAST_FLT.
+
+After this patch, any driver that implements
+ndo_set_rx_mode_async but does not set IFF_UNICAST_FLT
+will never hit that fallback path.
+
++	}
+>=20
+>  	if (!(dev->priv_flags & IFF_UNICAST_FLT)) {
+>  		/* Unicast addresses changes may only happen under the
+> rtnl, @@ -11708,6 +11772,16 @@ void netdev_run_todo(void)
+>=20
+>  	__rtnl_unlock();
+>=20
+
+...
+
+>  	open_softirq(NET_TX_SOFTIRQ, net_tx_action);
+>  	open_softirq(NET_RX_SOFTIRQ, net_rx_action);
+>=20
+> --
+> 2.53.0
 
 
