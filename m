@@ -1,161 +1,126 @@
-Return-Path: <netdev+bounces-269776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269777-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QEsPHyS+vGlz2gIAu9opvQ
-	(envelope-from <netdev+bounces-269776-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 04:25:24 +0100
+	id uFAyFd3KvGnT2wIAu9opvQ
+	(envelope-from <netdev+bounces-269777-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 05:19:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D30752D590C
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 04:25:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E04212D5BDC
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 05:19:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C46A3005790
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 03:23:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F250230B78EB
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 04:18:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFA6F1C84A0;
-	Fri, 20 Mar 2026 03:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806E12C3251;
+	Fri, 20 Mar 2026 04:18:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="LTLRhfIV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r3il3SdL"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7DD233134
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 03:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2B61A682F;
+	Fri, 20 Mar 2026 04:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773977010; cv=none; b=TnPy642GIrR6FdCvXFeF0/AsDY6SaK0hGjWPlR4ysgdKeFDfFtgYFihn872K63+h59+3R3kt67MupVg2IW7hFBA4kWO5A3VK7x0KgrkQfYSQJZif2QWlaCiNn2NIEwl1Nt582bZe60Xf+cIvr0WmTlJN3f6xRI/NGiF4aV3CMF4=
+	t=1773980316; cv=none; b=QHwCA8KBRgDkbXQQk1xKF6Oo7Zm8Z7SJoi4X5DmnAh3tpmhw/yD8WZx9au04H+/Dz7uP+ES73X7VpXxR0h2+AvasEDSjYpvPYHZZ3d9q8cg6jHYaDja4qXj8eNXthXt9qRYouoLqaE4WSa3UgH32xzauZMsRCA/5arF2KMDJQN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773977010; c=relaxed/simple;
-	bh=U43YQCKyx3qzYXh+/asv44d6JAJ+q7AfA96CcJyGrpM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rWw4QVpSUkdWI5lkcTeYsalXHtpkK6bxsCYTMaNQEkthZJR85/CHfQikLSOCO54f8RVoPWf/5+7c5O/WvFvKhGH0T81DzW9oEbYBtcwjNYiCfcqMgEsXzznDIL+ktjceoqQ/oqkEUM92GmlLW9tXcy8XVsrvEqTy7knu72bp1Cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=LTLRhfIV; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 62K3Mqs06739091, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1773976972;
-	bh=U43YQCKyx3qzYXh+/asv44d6JAJ+q7AfA96CcJyGrpM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=LTLRhfIVO3HIgSuiB2FK9IfdPBLHCEyuBK5eO4rHfeaSRtcC+DzMLXAZZXbHo5T9a
-	 CLRmUauzc1/ZRNYX8ju7PE/gMIoToV5b/9T8o5ScsQBK4Lz1WkcgeNbEJNnEInfRGN
-	 Si8xajEdw/fAnrooxUaEBjUf8lWYPeS4qbt+zdYqwH3/RDXdpgjouP3IM5vBSFXBo1
-	 MN7bMwWvEYcF4oMOJYdFdjrXiU+69ISLS+wYiZ1CT8vh7YRWZ9IbFitA0oMWjoQXM6
-	 ix7zWMUTO+99XFQLFsH0NpL3zaQnfdBlcv/kj6p7tmil7VPYNYHeSOxibNi03dK5a1
-	 i4g8uznClWKcg==
-Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 62K3Mqs06739091
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 20 Mar 2026 11:22:52 +0800
-Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
- RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.39; Fri, 20 Mar 2026 11:22:52 +0800
-Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
- RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Fri,
- 20 Mar 2026 11:22:52 +0800
-From: Javen <javen_xu@realsil.com.cn>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "horms@kernel.org" <horms@kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: r8169: Discussion on implementing RSS support for r8169
-Thread-Topic: r8169: Discussion on implementing RSS support for r8169
-Thread-Index: Ady3flT6SLXoIWu3RPmeYPmtdnYmcQAGZGOAAB+EdyA=
-Date: Fri, 20 Mar 2026 03:22:52 +0000
-Message-ID: <86784e19c4504c3ba49a9299701a2c1f@realsil.com.cn>
-References: <1ce3478d571f4d26a45e792c4c84c429@realsil.com.cn>
- <e063ce5f-1789-49d0-880c-e4b6a40da9e1@gmail.com>
-In-Reply-To: <e063ce5f-1789-49d0-880c-e4b6a40da9e1@gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1773980316; c=relaxed/simple;
+	bh=oHYQglycu+fpc+p+cwrM1FU6F7rgABHTzbnm/mL6jI0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Esx0XCvlgKHd9rxSh6sSygs0FrRbuLlYyDJC5fzeTCFwojKSzo4U4aZVQkMPvrkf366qz+iOswqg6c9pCJZ4TIpSMj/Yk8NbDBV0G7BVv7cULt8+BTtXBeIhTF8X0JLWbX/43eg/PKh/kI2qEKwUJw0tXmYg8zRolll+u3KIrno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r3il3SdL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D4EDC4CEF7;
+	Fri, 20 Mar 2026 04:18:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773980316;
+	bh=oHYQglycu+fpc+p+cwrM1FU6F7rgABHTzbnm/mL6jI0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=r3il3SdLqloNfwft8w4dxy3DSpH47WCyUScRGA4qfPHrxeUJtVN6Q3+kStE1beuqV
+	 dJljdMJTWXRcaMBPP0t6H86esok8tSdIn4PN/wdPBSEkyPIrtTjYx705t84ICbhih+
+	 YocfEuqYNOv/Sl5AkSS8tTxLVVfrsyfHv2Zr/R2vE99WiDOx8yx4/oGVFG5VdPukxm
+	 UvkBRpu1abSYZBwB6o+9QgCD0Ki1V2FwB4I6D5To17aZDmmOHr/NYiIZbzVftjfKLI
+	 dodAR/zEULdHZIlaobTMKrSwi2Igv7ZhgfFLg9uYYJQRFFLbXRtXiqjR0rei0rKrB/
+	 2CdIbPXy1WW4A==
+From: Allison Henderson <achender@kernel.org>
+To: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	rds-devel@oss.oracle.com,
+	kuba@kernel.org,
+	shuah@kernel.org,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	allison.henderson@oracle.com
+Subject: [PATCH net-next v3 0/2] selftests: rds: add config file and config.sh -c option
+Date: Thu, 19 Mar 2026 21:18:32 -0700
+Message-ID: <20260320041834.2761069-1-achender@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [0.44 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-269776-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-269777-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.968];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: D30752D590C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,config.sh:url]
+X-Rspamd-Queue-Id: E04212D5BDC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Pk9uIDE5LjAzLjIwMjYgMDk6NTYsIEphdmVuIHdyb3RlOg0KPj4gSGksIEhlaW5lcg0KPj4NCj4+
-IFdlIGFyZSBub3cgcGxhbm5pbmcgdG8gaW1wbGVtZW50IFJTUyBzdXBwb3J0IG9uIHI4MTY5IGRy
-aXZlci4gVGhpcyB3aWxsDQo+cmVxdWlyZSBzaWduaWZpY2FudCBjaGFuZ2VzIHRvIHRoZSBleGlz
-dGluZyBkcml2ZXIgYXJjaGl0ZWN0dXJlLCBzbyB3ZSB3YW50IHRvDQo+ZGlzY3VzcyBpdCB3aXRo
-IHlvdS4NCj4+DQo+VGhhbmtzIGZvciB0aGUgcXVlc3Rpb24uDQo+SSBhbHNvIG9uY2UgY29uc2lk
-ZXJlZCB0aGlzLCBidXQgZGVjaWRlZCBhZ2FpbnN0IGl0LCBhcyBJIGRpZG4ndCBzZWUgZW5vdWdo
-DQo+YmVuZWZpdCBqdXN0aWZ5aW5nIHRoZSBzaWduaWZpY2FudGx5IGluY3JlYXNlZCBjb21wbGV4
-aXR5IG9mIHRoZSBkcml2ZXIuIEV2ZW4NCj53aXRoIGEgTjEwMC1iYXNlZCBtaW5pLXBjIEkgY2Fu
-IGVhc2lseSBzYXR1cmF0ZSBhIDIuNUdicHMgbGluayB3aXRoIHRoZSBkcml2ZXINCj5hcy1pcy4N
-Cj5Bbnkgc3BlY2lmaWMgcmVhc29uIHdoeSB5b3UgY29uc2lkZXIgYWRkaW5nIFJTUyBzdXBwb3J0
-PyBXb3VsZCBiZSBnb29kIHRvDQo+c2VlIGEgcGVyZm9ybWFuY2UgY29tcGFyaXNvbiBhcyBiYXNp
-cyBmb3IgYSBkZWNpc2lvbiBvbiBmb3Igd2hpY2ggY2hpcA0KPnZlcnNpb25zIFJTUyBtYXkgcHJv
-dmlkZSBhIHNpZ25pZmljYW50IGJlbmVmaXQuDQo+DQoNClRoZSBwcmltYXJ5IGJlbmVmdCBvZiBh
-ZGRpbmcgcnNzIGhlcmUgaXMgdG8gcmVkdWNlIGNwdSBsb2FkIHBlciBjb3JlLg0KDQpTaW5jZSBJ
-IGN1cnJlbnRseSBvbmx5IGhhdmUgb25lIFJUTDgxMTFlcCBhbmQgb25lIFJUTDgxMjcsIEknbSBn
-b2luZyB0byBkbyBhIHNpbXBsZSB0ZXN0Lg0KDQpCYXNlZCBvbiBteSBpcGVyZiB0ZXN0IGZyb20g
-UlRMODExMWVwIHRvIFJUTDgxMjc6DQoJMS4gV2l0aCByc3M6IGNwdSBsb2FkIGlzIGRpc3RyaWJ1
-dGVkIGFjcm9zcyA0IGNvcmVzKDElIH4gMiUgZWFjaCkNCgkyLiBXaXRob3V0IHJzczogY3B1IGxv
-YWQgaXMgY29uY2VudHJhdGVkIG9uIGEgc2luZ2xlIGNvcmUoNyUgfiA4JSkNCg0KSWYgdGVzdCBm
-cm9tIFJUTDgxMjcgdG8gUlRMODEyNywgZXNwZWNpYWxseSBvbiBwbGF0Zm9ybXMgd2l0aCB3ZWFr
-ZXIgY3B1LCBkaXNhYmxpbmcgcnNzIHdpbGwgZWFzaWx5IGxlYWQgdG8gY3B1IG92ZXJsb2FkLiAN
-ClRoYXQncyB0aGUgbWFpbiByZWFzb24gd2UgY29uc2lkZXIgYWRkaW5nIHJzcyBzdXBwb3J0IGZv
-ciBSVEw4MTI3Lg0KDQpJIHdpbGwgc2hvdyB0aGUgcmVzdWx0IGZyb20gUlRMODEyNyB0byBSVEw4
-MTI3IHdoZW4gSSBzdWJtaXQgcnNzIHBhdGNoLg0KDQpUaGFua3MsDQpKYXZlbiBYdQ0KDQo+PiBC
-YXNlZCBvbiBvdXIgdmVuZG9yIGRyaXZlciB3aGljaCBjYW4gYmUgZmV0Y2hlZCBmcm9tIFJlYWx0
-ZWssIHRoZSBrZXkNCj5tb2RpZmljYXRpb25zIHdpbGwgaW5jbHVkZToNCj4+DQo+PiAgICAgICAx
-LiBFbmFibGUgbXNpeCBhbmQgdXBkYXRpbmcgdGhlIGlycSBhbGxvY2F0aW9uIG1lY2hhbmlzbQ0K
-Pj4gICAgICAgMi4gU3VwcG9ydCBtdWx0aXBsZSByeC90eCBxdWV1ZXMNCj4+ICAgICAgIDMuIFJl
-Z2lzdGVyIG11bHRpcGxlIG5hcGkgYW5kIHVwZGF0ZSBuZXcgaW50ZXJydXB0IG1hcHBpbmcoaXNy
-L2ltcikgZm9yDQo+bXVsdGktcXVldWUNCj4+ICAgICAgIDQuIEltcGxlbWVudCByeCBtc2l4IHBv
-bGwgYW5kIHJ4IGludGVycnVwdCBmdW5jdGlvbg0KPj4gICAgICAgNS4gSW1wbGVtZW50IGV0aHRv
-b2wgY2FsbGJhY2tzIGZvciByc3MgY29uZmlndXJhdGlvbg0KPj4NCj4+IFNob3VsZCB3ZSBzdWJt
-aXQgdGhlIGNoYW5nZXMgYWJvdmUgc2VwYXJhdGVseSBvciBzdWJtaXQgdGhlbSBhbGwgYXQgb25j
-ZT8NCj5PciBkbyB5b3UgaGF2ZSBhbnkgb3RoZXIgc3VnZ2VzdGlvbnM/DQo+Pg0KPkFzIEFuZHJl
-dyBhbHJlYWR5IHNhaWQsIHBsZWFzZSBzdWJtaXQgdGhlIHBhdGNoZXMgaW4gc21hbGxlciwgcmV2
-aWV3YWJsZSwNCj5jaHVua3MuDQo+QmVzdCB0YWdnZWQgYXMgUkZDLg0KPg0KPj4gV2Ugd2FudCB0
-byBhbGlnbiB3aXRoIHlvdSBvbiB0aGUgZGV2ZWxvcG1lbnQgYW5kIHN1Ym1pc3Npb24gYXBwcm9h
-Y2guDQo+Pg0KPj4gQmVzdCByZWdhcmRzLA0KPj4NCj4+IEphdmVuIFh1DQo+DQo+SGVpbmVyDQo=
+This series adds an RDS-specific config file for ksft CI and extends
+config.sh with a -c flag to specify an alternate config file path.
+Users can now specify the path of the config they want to update, or
+default to .config if none is specified.
+
+---                                                                                                                                                  
+Changes v2 -> v3:
+  [PATCH net-next v3 1/2] selftests: rds: add tools/testing/selftests/net/rds/config
+    - Sort CONFIG entries in tools/testing/selftests/net/rds/config
+    - Sort TEST_FILES entries alphabetically in Makefile
+  [PATCH net-next v3 2/2] selftests: rds: Add -c config option to rds/config.sh
+    - Use bash array for FLAGS to keep config.sh shellcheck clean
+
+Allison Henderson (2):
+  selftests: rds: add tools/testing/selftests/net/rds/config
+  selftests: rds: Add -c config option to rds/config.sh
+
+ tools/testing/selftests/net/rds/Makefile   |  1 +
+ tools/testing/selftests/net/rds/README.txt |  5 ++-
+ tools/testing/selftests/net/rds/config     |  5 +++
+ tools/testing/selftests/net/rds/config.sh  | 37 +++++++++++++---------
+ 4 files changed, 32 insertions(+), 16 deletions(-)
+ create mode 100644 tools/testing/selftests/net/rds/config
+
+-- 
+2.43.0
+
 
