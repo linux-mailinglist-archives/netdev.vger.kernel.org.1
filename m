@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-269989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269990-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sJ9PJA2AvWk4+gIAu9opvQ
-	(envelope-from <netdev+bounces-269989-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:12:45 +0100
+	id mItmDL2BvWk4+gIAu9opvQ
+	(envelope-from <netdev+bounces-269990-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:19:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AA112DE5ED
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:12:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A439C2DE7BD
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:19:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EEC3E3068162
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 17:02:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 75CD3305466D
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 17:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B29A3CE4AE;
-	Fri, 20 Mar 2026 17:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949B03D16EE;
+	Fri, 20 Mar 2026 17:02:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oo2MuGlK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c9Ss9s7D"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266033CD8BB;
-	Fri, 20 Mar 2026 17:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703523CCFAF;
+	Fri, 20 Mar 2026 17:02:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774026147; cv=none; b=AZ21eYGm5w4FzAQFJqYTj1r1dN7N0L3XdWv3gZpOwi/fChLY8ev2w6JYlZ7TommknxcBOq89mSsf0ggGJK1haaWRhXr3QPZsnx6VAEnLxQc78nSrv+wJpviowl59m6P1fNaFFIFxUI7gYMHJ0cFF4pz4uZU8IunAD3mNinHtzpk=
+	t=1774026171; cv=none; b=R8RbJtX3Qsqary9xuTACyiut7iSdvGKDCjoMlrPAhJBVsOyWVGfpijsnA+JK+etoJJUKPEYNV8WzpwqlRLRPkRkZD4o1IBLhCCohfc4RLO4niAKa/Cd+5PHcqultVmhcIgxmNqmNHmXqhOdkgfdM7EVOoLFG5jF3D5qSQiwvunE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774026147; c=relaxed/simple;
-	bh=OfqPN9mSDoWv8ARtiyLIw5c2e8KKvKcDWx3tLXQNcb8=;
+	s=arc-20240116; t=1774026171; c=relaxed/simple;
+	bh=qber7/y2QqBzw0f1xqmZcp2//J+ljVH5nJcRiHZcQvg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rdvoV5G3TMXumVyKIZgX8FPUUYpWGCHY0p0En9toXT9wL+TDlcKDPlVWCtvS+Jc0S+xbYAzODlKjTa2YWvloQwokcjGjrCviJ5da1w/Krau7UOKNqvp/RWxPLR7sHcZlsG3rNQBa1O8Qa3UoIJ0P5jTTGPhFE2wWxWdkjbPAamA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oo2MuGlK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5BE4C19425;
-	Fri, 20 Mar 2026 17:02:22 +0000 (UTC)
+	 MIME-Version; b=NNo4sKjUZZexUUp/1RBqzssAla4HXlMx7neUjDwsLEcV7ChksBoK5sK2N6JRlAr2XzloctMwUjpGZ3+CSOT9yrY7eLnJ8MpJ6vsUGXezIokPU1lIm7d8OsmwQDcq/TH5cw3F8pzz99+FKQCexYJwCYCniddmzDAwYMMTqkRw6Ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c9Ss9s7D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB376C4CEF7;
+	Fri, 20 Mar 2026 17:02:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774026146;
-	bh=OfqPN9mSDoWv8ARtiyLIw5c2e8KKvKcDWx3tLXQNcb8=;
+	s=k20201202; t=1774026171;
+	bh=qber7/y2QqBzw0f1xqmZcp2//J+ljVH5nJcRiHZcQvg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oo2MuGlKgAX9A2COl7NtRyYUKFVEKK0O94zMonVfXhx3EMheLWC4Pp3kYfkTnSj1I
-	 +liIuY/gm5iKc+0cpG5gzC4FJZYRE76K4WqEAJTZxVDE8kFkbCx0MmiIHcpiqcvNlE
-	 lJWHAbJTqEnS6TItjLk/hQrtSy6shBVpoG937koVZwDzX/ZJCHgqS2pv0TM+BVWDHI
-	 Nd/YxHhNcuVYBN8pXdzBd7AUCa3oGUnbCU2gW8w0gpXWF4H0fID8xp6ITvNvunrPG2
-	 7R5MRUj0vKEVbGk3Ge5gbhKBsMzuGfXOuUHi3tP8ewN9NmJjrdKM1xdf3pN2K5+SjD
-	 6JyGaud83gBHg==
+	b=c9Ss9s7D7vyLINatgZ23WhvvnKTj2Y5Y4bI7p6IBpOFgZAoZ4ssdBSE7JoBDS7s42
+	 wdFtVIW3KENkaLUtm3KuWP+hl/i1x1L2XagAWvE1QJ2efhis74AxQ/89IWjxfyIfNG
+	 5pnndZM73aOkSCuucqN5+X2Dqw8sRwE8TW6FxTvWlhC4skzHX8JqolWiSnes4m6IxV
+	 5L/sVe73G7g0hwenpMs0dfF9HTODe1C4DYP2k+Oof1VBl33IcO2wgxdmWg5Z+uOKx1
+	 ra8Sj6vYdIPnRbk9nPT2fhOcCparDwqyt0gdPMHZalvMHdUyny9x47e6Evmjyksaly
+	 W9lwfna+vInNQ==
 From: Simon Horman <horms@kernel.org>
 To: nb@tipi-net.de
 Cc: Simon Horman <horms@kernel.org>,
@@ -68,12 +68,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	pabeni@redhat.com,
 	rajashekar.hudumula@broadcom.com,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/6] net: bcmgenet: convert RX path to page_pool
-Date: Fri, 20 Mar 2026 17:02:01 +0000
-Message-ID: <20260320170201.102889-1-horms@kernel.org>
+Subject: Re: [PATCH net-next v3 4/6] net: bcmgenet: add XDP_TX support
+Date: Fri, 20 Mar 2026 17:02:33 +0000
+Message-ID: <20260320170233.102959-1-horms@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260319115402.353509-2-nb@tipi-net.de>
-References: <20260319115402.353509-2-nb@tipi-net.de>
+In-Reply-To: <20260319115402.353509-5-nb@tipi-net.de>
+References: <20260319115402.353509-5-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,14 +88,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,gmail.com,broadcom.com,iogearbox.net,arndb.de,vger.kernel.org,google.com,fomichev.me,lunn.ch,redhat.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[23];
-	TAGGED_FROM(0.00)[bounces-269989-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269990-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -105,12 +105,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.912];
+	NEURAL_HAM(-0.00)[-0.938];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:email,linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1AA112DE5ED
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: A439C2DE7BD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -119,106 +119,83 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-net: bcmgenet: convert RX path to page_pool
+net: bcmgenet: add XDP_TX support
 
-Replace the per-packet __netdev_alloc_skb() + dma_map_single() in the
-RX path with page_pool, which provides efficient page recycling and
-DMA mapping management. This is a prerequisite for XDP support (which
-requires stable page-backed buffers rather than SKB linear data).
-
-Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
-
-> diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
-> index cd7dddeb91dd..e3b9a5272406 100644
-> --- a/drivers/net/ethernet/broadcom/Kconfig
-> +++ b/drivers/net/ethernet/broadcom/Kconfig
-
-[ ... ]
+Implement XDP_TX using ring 16 (DESC_INDEX), the hardware default
+descriptor ring, dedicated to XDP TX for isolation from SKB TX queues.
+Ring 16 gets 32 BDs carved from ring 0's allocation. TX completion is
+piggybacked on RX NAPI poll since ring 16's INTRL2_1 bit collides with
+RX ring 0, similar to how bnxt, ice, and other XDP drivers handle TX
+completion within the RX poll path.
 
 > diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> index 482a31e7b72b..7410034d9bdc 100644
+> index e8f90d6b16a2..54df1694f1cd 100644
 > --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
 > +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> @@ -48,8 +48,10 @@
+>
+>  #define GENET_Q0_RX_BD_CNT	\
+>  	(TOTAL_DESC - priv->hw_params->rx_queues * priv->hw_params->rx_bds_per_q)
+> +#define GENET_Q16_TX_BD_CNT	64
+> +#define GENET_Q0_TX_BD_CNT	\
+> -	(TOTAL_DESC - priv->hw_params->tx_queues * priv->hw_params->tx_bds_per_q)
+> +	(TOTAL_DESC - priv->hw_params->tx_queues * priv->hw_params->tx_bds_per_q \
+> +	 - GENET_Q16_TX_BD_CNT)
+>
+>  #define RX_BUF_LENGTH		2048
+>  #define SKB_ALIGNMENT		32
 
 [ ... ]
 
-> @@ -2747,6 +2758,31 @@ static void bcmgenet_init_tx_ring(struct bcmgenet_priv *priv,
->  	netif_napi_add_tx(priv->dev, &ring->napi, bcmgenet_tx_poll);
->  }
->
-> +static int bcmgenet_rx_ring_create_pool(struct bcmgenet_priv *priv,
-> +					struct bcmgenet_rx_ring *ring)
-> +{
-> +	struct page_pool_params pp_params = {
-> +		.order = 0,
-> +		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
-> +		.pool_size = ring->size,
-> +		.nid = NUMA_NO_NODE,
-> +		.dev = &priv->pdev->dev,
-> +		.dma_dir = DMA_FROM_DEVICE,
-> +		.offset = GENET_XDP_HEADROOM,
-> +		.max_len = RX_BUF_LENGTH,
-> +	};
-> +
-> +	ring->page_pool = page_pool_create(&pp_params);
-> +	if (IS_ERR(ring->page_pool)) {
-> +		int err = PTR_ERR(ring->page_pool);
-> +
-> +		ring->page_pool = NULL;
-> +		return err;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  /* Initialize a RDMA ring */
->  static int bcmgenet_init_rx_ring(struct bcmgenet_priv *priv,
->  				 unsigned int index, unsigned int size,
-> @@ -2765,10 +2801,17 @@ static int bcmgenet_init_rx_ring(struct bcmgenet_priv *priv,
->  	ring->cb_ptr = start_ptr;
->  	ring->end_ptr = end_ptr - 1;
->
-> -	ret = bcmgenet_alloc_rx_buffers(priv, ring);
-> +	ret = bcmgenet_rx_ring_create_pool(priv, ring);
->  	if (ret)
->  		return ret;
->
-> +	ret = bcmgenet_alloc_rx_buffers(priv, ring);
-> +	if (ret) {
-> +		page_pool_destroy(ring->page_pool);
-> +		ring->page_pool = NULL;
-> +		return ret;
-> +	}
-> +
+> @@ -3022,14 +3158,18 @@ static int bcmgenet_rdma_disable(struct bcmgenet_priv *priv)
+>   * with queue 1 being the highest priority queue.
+>   *
+>   * Queue 0 is the default Tx queue with
+> - * GENET_Q0_TX_BD_CNT = 256 - 4 * 32 = 128 descriptors.
+> + * GENET_Q0_TX_BD_CNT = 256 - 4 * 32 - 32 = 96 descriptors.
+> + *
+> + * Ring 16 (DESC_INDEX) is used for XDP TX with
+> + * GENET_Q16_TX_BD_CNT = 32 descriptors.
+> + *
+>   * The transmit control block pool is then partitioned as follows:
+> - * - Tx queue 0 uses tx_cbs[0..127]
+> - * - Tx queue 1 uses tx_cbs[128..159]
+> - * - Tx queue 2 uses tx_cbs[160..191]
+> - * - Tx queue 3 uses tx_cbs[192..223]
+> - * - Tx queue 4 uses tx_cbs[224..255]
+> + * - Tx queue 0 uses tx_cbs[0..95]
+> + * - Tx queue 1 uses tx_cbs[96..127]
+> + * - Tx queue 2 uses tx_cbs[128..159]
+> + * - Tx queue 3 uses tx_cbs[160..191]
+> + * - Tx queue 4 uses tx_cbs[192..223]
+> + * - Tx ring 16 uses tx_cbs[224..255]
+>   */
+>  static void bcmgenet_init_tx_queues(struct net_device *dev)
+>  {
 
-Does this leak pages if bcmgenet_alloc_rx_buffers() fails partway through?
+Does the GENET_Q16_TX_BD_CNT define match the comment?
 
-If bcmgenet_alloc_rx_buffers() successfully allocates pages for the first
-k iterations but then page_pool_alloc_pages() fails on iteration k+1, the
-pages stored in cb->rx_page for iterations 0 through k-1 are never
-returned to the page pool.
+The comment and the commit message both say "Ring 16 gets 32 BDs," but
+the define at the top of the file says:
 
-When the error path calls page_pool_destroy(), the pool detects outstanding
-pages and defers cleanup, triggering periodic 'stalled pool shutdown' kernel
-warnings from page_pool_release_retry().
+#define GENET_Q16_TX_BD_CNT	64
 
-Then bcmgenet_init_dma's error path calls bcmgenet_free_rx_buffers(), which
-skips this ring entirely because ring->page_pool is NULL:
+The comment math also says "256 - 4 * 32 - 32 = 96" which expects ring
+16 to use 32 descriptors, and shows queue 0 getting 96 descriptors
+(tx_cbs[0..95]).  But with the define set to 64, queue 0 would actually
+get only 64 descriptors (tx_cbs[0..63]) instead of 96:
 
-bcmgenet_free_rx_buffers() {
-    for (q = 0; q <= priv->hw_params->rx_queues; q++) {
-        ring = &priv->rx_rings[q];
-        if (!ring->page_pool)
-            continue;
-        ...
-    }
-}
+GENET_Q0_TX_BD_CNT = TOTAL_DESC (256)
+                     - priv->hw_params->tx_queues (4) * 32
+                     - GENET_Q16_TX_BD_CNT (64)
+                   = 256 - 128 - 64
+                   = 64
 
-Should the error path iterate through the ring's cbs and call
-bcmgenet_free_rx_cb() for each one before destroying the page pool?
+and ring 16 would use tx_cbs[192..255] (64 entries) instead of
+tx_cbs[224..255] (32 entries).
 
-The old code didn't have this issue because bcmgenet_free_rx_buffers()
-iterated all rx_cbs globally without checking for a per-ring page_pool.
+All of the intermediate queue ranges in the comment would also be
+shifted by 32 entries from what's documented.
 
-[ ... ]
+Which is correct, the define or the documentation?
 
