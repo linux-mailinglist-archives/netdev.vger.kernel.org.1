@@ -1,151 +1,173 @@
-Return-Path: <netdev+bounces-269982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269983-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sO9UGih+vWnH+QIAu9opvQ
-	(envelope-from <netdev+bounces-269982-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:04:40 +0100
+	id sMJeJJCAvWk4+gIAu9opvQ
+	(envelope-from <netdev+bounces-269983-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:14:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F9A22DE377
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:04:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A42E2DE65D
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 18:14:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7DA37303FBFE
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 16:54:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C47D2326CE66
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 16:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355BA3DB65E;
-	Fri, 20 Mar 2026 16:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBA53BA22F;
+	Fri, 20 Mar 2026 16:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="X9IYAb1l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jNduNeQX"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC2973DB653
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 16:47:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774025268; cv=none; b=oR8N9HwUA6tju+SNP2MUfh1yxyF5bILQgJFE3daVAOfprtds6kAs++wwUq1dLcWRWP8qPbcAi4B/YbBbEm5PdWeBvZr/UZP2Y0wnEKOJvfqFHaENc8ScK4HL0xXwGCmXcN+Zj6KM3mvPpDubh7j4RLqdDO46cDUXJ65lwC/ns7E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774025268; c=relaxed/simple;
-	bh=ROcBd8isQpLv4XnlpTsJYgrp88IQPEBgzzGLjsD0DuQ=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=dxMpMyjYSZpKmyJxqaZ/EX2ZTsWhX3BRj91h2bz12SbeB64JgXRvf4o0my2peTpWdVBFbeIQPU2zVW+IYqKmyHAVyZowFVc2RR3c30Nr3sQSX/L9FQzbYpbMLe4u4zTF6hBhaClHYr8/NWyk7aN4v+M+naWN5OOAUazL/DOSUaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=X9IYAb1l; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=trtMh5tpUVzbQlNs5rAVXgjGUuISvp2FaLD2tKfE614=; b=X9IYAb1l3DHtrfU6q4Jf5Mccm+
-	hUl50bp/AsB7tCOcikmul3bsRgwghUIrFrI3i5H0qcqWYwfpucvfgZ2SKe9XHkvNjOIAO/kllypUp
-	W/vTcueRs3rm8XRc+h96OuPMmBthxzYQDwKYhnenb6gIxAsAzouV0ys9/6nDnkP34kwaBYtnuGH83
-	5DX1HreGTnn/E4WN9rNdKft3TiOG+7/xI8fNAEgyJWmoXCNvNbMohPiJDKteumvvEyJI5mH4mlH1x
-	ZkwOhizsLX7WzEOa3DOiNCgjzvd2yQqoGJ/k8VyzedCVnAuKs+wjlxFw/DgDbB7UjrEaSO0fRgEaq
-	5Jk3q5bg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:34184 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1w3d0d-000000006Mh-0qBS;
-	Fri, 20 Mar 2026 16:47:39 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1w3d0b-0000000DfMD-2hrD;
-	Fri, 20 Mar 2026 16:47:37 +0000
-In-Reply-To: <ab15_JvLGFtUH_3x@shell.armlinux.org.uk>
-References: <ab15_JvLGFtUH_3x@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 6/6] net: stmmac: elminate tbs_desc in stmmac_xmit()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0E53A7F4A
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 16:48:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774025298; cv=pass; b=WYvk2nNki3Ws71VGM9JIHP8J1tBOWLgK3uC862L/6An/KhYHEGupdAkMvPfZNqCfXeZvecP2bR8SECX6Ah7Gr7YYVqqedHcyAN7akXyfTgW99bZMQbtJ4EIInUmKqhTBqRmGr0IB97oi93JckKrLISYqgk38i79BY6x8Y/K+FQM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774025298; c=relaxed/simple;
+	bh=LXrVRQ8fQWgrceK4uzxtIg5tBruuwI4VQXrhJpNNIkk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=YPvb4sJjLqLflDIcMyDfLv6VHlGK39ozr+bW7+L4Gk95chg6Nd++h6yVlx4g1NvchQdnmKkbDdKWrCGovU9o+OTKtjyDkePnEcXrziUxew3hyjx3FYugKP1cCMuCKb12/duGcLQS0sLb7a5ULoPbWqFsVlYaoKczRuecfG/sEx8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jNduNeQX; arc=pass smtp.client-ip=74.125.82.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-128b9b7e3edso782926c88.0
+        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 09:48:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774025296; cv=none;
+        d=google.com; s=arc-20240605;
+        b=QcFudDjUvJEY3SHqm4vJ2a18li6I3KafkznZ4zQFFraHn6hYiIOMiAhI1aMVb1YWN9
+         XfFZJu4zmMVmW07COAL9TCueQEuRg5JYPDkfZlL+q5FrElulbstvCbGIi2KCc/E63ocO
+         iC6fqDuFXJmbghR5dr73W236B8/doOiv8j+cDAPBu7DhBMTPtctFTLS6i97k7rzkqHDy
+         IL5kXJldEBLKeN0K9jMxGc4tLFc7cmDQcfMW6e7Zv3wDUPYhmm8MvLxct0JKagOQWaur
+         d9ReEv4aUTAaY2JeelcfafHNrcuHi2CWUW+U/6tSPtuty0yB5xzSzVuxEoVfo0bGl/4L
+         JvRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=pgwmZT9IHM6934vKr9WC2TNz3ns+Qdpf2Q8D3gzT5iU=;
+        fh=aDUZZ9N6NPmO6DMPx8G1ADwl9DVnQFUvUJ2oivftvxg=;
+        b=J6OcArbQhnSm51FqFMQ5bGJqdR/mep6EVdWurrXrEscFahmtgdsHS7BYjea0oSX8Ee
+         RpQPiop/XC7KIMg/IkQvmkWm9NFBMSIpxH/rp2JG/UGle0eQSm0ix/ToaGNB3VqmouVq
+         gfok6jCZnn5FgUh3WCII/ySdpNBJW5FwC1nrSSCzpQp/W/NkguCTwm2n3HqNqT9/ZF+u
+         WTtc8RQ4x0RVfKkAvpVIh4YLefRiPUas/rrxHQ8kZDSBeUk4jvwJZiIzqz2w54sEMpEr
+         BEAIzOgg79mHdB/thwKNOr8TCyibNVe6oAI9mk7SnqlSV7dvZ44/KN/1Az9ailEBUROV
+         B0BQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774025296; x=1774630096; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pgwmZT9IHM6934vKr9WC2TNz3ns+Qdpf2Q8D3gzT5iU=;
+        b=jNduNeQXPclqQRFH5cNwp6Nmrk7p4Si9TEPeajk8Id6Z8B4nDbGUMbFp9ILP8J5CS1
+         2q0t9+yI9Yv1gIuaFBk7wVWkgC/+0WsG59Y75FfGrOVz8bx840Zx5kA6qtWBsAPXiwnS
+         sp9xNtKdhhX1YIPnUxUhzQtnMr39jUf6bzPoimqFSzodPaeSFprG9JgftnxLUIpPawfq
+         Sr4sq9Suk5QKKndR5e2MHhDoZytMOwCsZZGj5LEwjWjINO2RY2frPx7DvleiFIJGjHrk
+         DSFrxuUzT73JsuPw8XyCUIa8WuNlAj9mgis5rlKki/x7qHbPb6ahDInU2JRZlsZ4OqPt
+         EGUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774025296; x=1774630096;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pgwmZT9IHM6934vKr9WC2TNz3ns+Qdpf2Q8D3gzT5iU=;
+        b=LCTEOwZ5jm/gnEg3plnt5i+NRf98p7PWePIwF/YcZYUKmdXSYe7yObFx285Vq367j0
+         D/3TxhtganMnBpv+Z3rBo3k5DFuXn7jZdzLuQ5upPobCnEcRb+Me9v3hFijgtWehzBPc
+         oH4mGRzxcELTJN52BIQhwqAdbpqilVoVm1NEMywUhiwLL6kc4elrT20nywQNvdygTvSb
+         IADjNy7HUdmnFLHvSILZg0SSfXDcUQHAK/HT7gII+pJrj0b7GsX32jiMDvWqnnkIhhsN
+         HolLhOqhIJPnH1juzayBZbKRebjf7Ke6Xk0nS76eGxdaH8Qe/BPlxPPt/8zs4PHG1LSw
+         sx1g==
+X-Gm-Message-State: AOJu0YzGs+HF1VgyYi5WIpU+tuqBD6/siG0y4CS/zMCRLVa3QRUTz53f
+	2LEvgjAuo1dKE/xul23QGbOxCqkmIvhxITjRH82u1oVHFMHwytO38qegm9dd8RwVK/h2lX76AkW
+	03p5QUkup7l2uIsxYn+LtCJ4A+1Pn4DmRG/PT
+X-Gm-Gg: ATEYQzzo3NSrHmX0Dr7KGgZb49iso7AqsADO7yQDWrPmZKJ3E7nIBibbx0CmwDLqPdX
+	sVnDUDzq65sn+yhYikFL1LPc6iBmknKV+LD8f/m/PIkG7POwEXMarc+TcTjopC4zRcdGlnyX4Kh
+	3wF6UyFT2eKZ+jZPzcFWZtJhLLwwM3obXonWP5ELfs5qxTlzd5OM6KPXQOd8ASzBAiy6K9PgsVU
+	YPcDvfBoNpp05A6TiGOq4psBcoSepZHLg1xWXx6aXzF0sxeZAdqOmKwgnllcafpgbMhXBdq1EtX
+	TVlbvadlInKdGRhdv/P6mlOoU7+tHz425gYEHfN4Gxt+PleGypeTLr28JRp5K+U2yJA=
+X-Received: by 2002:a05:7022:621:b0:11a:641f:ba11 with SMTP id
+ a92af1059eb24-12a726e6617mr1692620c88.29.1774025296395; Fri, 20 Mar 2026
+ 09:48:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1w3d0b-0000000DfMD-2hrD@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 20 Mar 2026 16:47:37 +0000
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+From: Patryk <pbiel7@gmail.com>
+Date: Fri, 20 Mar 2026 17:48:05 +0100
+X-Gm-Features: AaiRm50P17T-ROCPjmfVPmHzEP4Dtf8b9Vu9xUhwZQKLT3l72w-Gm4n1FS3iCzM
+Message-ID: <CA+DkFDbcAqyj2miq7Y4nDfXXMef39WWhcKwowPKBeVH8b6pZVw@mail.gmail.com>
+Subject: How to approach slow firmware loading process?
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	SUBJECT_ENDS_QUESTION(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-269983-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269982-lists,netdev=lfdr.de,kernel];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_SPAM(0.00)[0.415];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_ONE(0.00)[1];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pbiel7@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.994];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 3F9A22DE377
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3A42E2DE65D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-There is no need to have a local variable for tbs_desc, we can do the
-conversion when calling stmmac_set_desc_tbs().
+Hello
+I've been working on a 10G QXGMII Ethernet PHY bring-up and stumbled
+upon a problem.
+One of the first steps in the bring-up sequence is to load the PHY's firmware.
+So the sequence is as follows:
+1) For each port (phy_device) the PHY layer calls the driver's probe
+function. In this function I check the port index number and calculate
+phy base addr. Then I connect this phydev into the phy package using
+devm_phy_package_join.
+2) Then the PHY layer calls the config_init. In the config_init I use
+phy_package_init_once to check whether the common init function has
+already been called. If not then I call the common init function that
+is responsible for broadcasting firmware to all ports of the PHY.
+And this is the place where things get problematic. The thing is that
+loading firmware takes ages... namely around 30 seconds, which results
+in the boot process waiting for config_init to complete its execution.
+The firmware size is around 300 kB. I've also done some tests using a
+vendor userspace tool that also has fw loading capability and in
+general it takes the same time.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+I'm wondering how I should approach this? I obviously don't want to
+block the boot process until the PHY's firmware is loaded. The one
+thing that comes to my mind is to submit firmware loading to workqueue
+and just return success from config_init. The problem is that in every
+other function like read_status, config_aneg and so on I will have to
+check whether or not the firmware has already been loaded and it's up
+and running. Technically that is feasible however it sounds to me like
+kind of a workaround, especially given the fact that if I decide to
+submit firmware loading to workqueue I will have to return success
+from config_init so I guess that phy layer in the kernel will assume
+that everything works fine which in fact may not be true if e.g. fw
+loading procedure fail or the phy will not bring up after the reset.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index a733249c3f9b..c01a10e982b5 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4685,7 +4685,6 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	int gso = skb_shinfo(skb)->gso_type;
- 	struct stmmac_txq_stats *txq_stats;
- 	struct dma_desc *desc, *first_desc;
--	struct dma_edesc *tbs_desc = NULL;
- 	struct stmmac_tx_queue *tx_q;
- 	int i, csum_insertion = 0;
- 	int entry, first_tx;
-@@ -4809,8 +4808,8 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (tx_q->tbs & STMMAC_TBS_EN) {
- 		struct timespec64 ts = ns_to_timespec64(skb->tstamp);
- 
--		tbs_desc = dma_desc_to_edesc(first_desc);
--		stmmac_set_desc_tbs(priv, tbs_desc, ts.tv_sec, ts.tv_nsec);
-+		stmmac_set_desc_tbs(priv, dma_desc_to_edesc(first_desc),
-+				    ts.tv_sec, ts.tv_nsec);
- 	}
- 
- 	for (i = 0; i < nfrags; i++) {
--- 
-2.47.3
+How would you approach this? I will be grateful  for some suggestions.
 
+Best regards
+Patryk
 
