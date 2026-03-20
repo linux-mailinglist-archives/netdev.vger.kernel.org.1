@@ -1,211 +1,209 @@
-Return-Path: <netdev+bounces-269890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269892-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4NLqDKkuvWmI7QIAu9opvQ
-	(envelope-from <netdev+bounces-269890-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:25:29 +0100
+	id yAR+DwsvvWmI7QIAu9opvQ
+	(envelope-from <netdev+bounces-269892-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:27:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FC272D9807
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:25:28 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0E0B2D987F
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:27:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6F741301A428
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:25:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9CB703013445
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E105372EDC;
-	Fri, 20 Mar 2026 11:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A469839A064;
+	Fri, 20 Mar 2026 11:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="mokOOiGM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hldu/2t6"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010024.outbound.protection.outlook.com [52.101.84.24])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB252E9730;
-	Fri, 20 Mar 2026 11:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.24
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774005915; cv=fail; b=kewxvAoaenhMCB4MMjVy/HO3XkBvMlsUrp6wKImw2qfF7/hCYwAqxFvQ1P4fh9gjGOPOS0WQWEcg1YIp/IYQAHhkS0aFK/szPZlQFLCIwtnznZk5JKtEzaaJQ2zSIEa47NVDaqjIden5myNH7+YnU7joiudhIypvZBL+7AroFE0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774005915; c=relaxed/simple;
-	bh=EIoS+bISZNCh7kFx0cVuY8tl/c3eoSW7mFAUI9snk3I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=X53MECXRSsLltwMXvcxwCc3+4FOrGiGoufwwfbMyWtDXQlDdNByz8tcGlS78Y3kIicgilSjbuVgiuGQ9k2/3Dkk44qxlBIjeIOqBmqMWz4JBbGWHLkEuy8iw7ONB77rd2nNphSSstrkwOqjIjJp/5caaceiMZrpLqryZ9VfWWAk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=mokOOiGM; arc=fail smtp.client-ip=52.101.84.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=eIceJKGAaWmI17pY6W9FPXZPsruigORdBW+EgULqUcNEGNjv2AcMimp6FrIKchuzcK76Efr1+aRrIpN8dN1VByuIOV2kEHedmYWgIXnshbfrMadqCywB/A9YyXLaBBC8BPMV0kzdseJiF6kPC00sKym0FhYcerzWsOVK5NR8vsLUzIr069/4TW5CSXXy6D6ZsvvZ99cvvo3uVq09Q8GtUM/u5r1X1upXqE2ap8101wdrRakX65u1XGC59/IWMvLzIsprnezrSznO0eInQXb78k3gYXB7aNupW65nhaoieNEdVgwVyjPKVCmENHMQ3u9LI+fGq+oVmsKLkTX/4x3gmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZUFZQLRPIcWlkWC2+sWo3+U0YcDZIFtL6p7FlMC1JxI=;
- b=uj8aFuD1xPgkK/htSk9ahIqg3YCB9Clc8TlASpDrDm8WpNKuEewl3gdLjJG1dx7O4lKSWV0x1zAmDY84pLaAhumWEBqB9ggNpBvW0uMKxd/eXFmq9OKf4LWdmcb35F5jRElqbzi95EN21mkR6j5RFNl+zUls2UQTzu28pYHfCyjmFqTpVZfTyCdPBPO0DUZDBh+tQrmQ+9b92IfUbSov5g2YVrjCKb1jCyYnoGVxc2CgBP1FlDC5FhJodSoqTbL9kBgL/8uk2R4MpMqG1RoOlD7VAyFdvrCsvdQB06nHEDeFj6LSSmASqIsTXiOhMdJuzhJgobiis+Vrxk8ZYkDn/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZUFZQLRPIcWlkWC2+sWo3+U0YcDZIFtL6p7FlMC1JxI=;
- b=mokOOiGMeV45HVTMzqpEqUFtBWnKdfLUv4702onrGQTyO9/8fyfHHo4kGnbyWvFdKolWic5usv9mPs4O07Fh0nmgRnE/N2FQJvN68UiXHEaMIc/sGMJ7CEH96Qz5cIZTZLfd3q4kVLXQu7+ktxcZ3tIbr0iKBjxAw6xhIZl0fHDToq+WIyXVpxc6UlZGCx827fPIvXY/wc3MVPLICGcRTbnvheosL2YtRzu5IVtz0ufBoHUDmpDJMsinKY8JHWiHOWOudh9MTaFUoohxw3UyysDN7iFNvPZOPQW+LnBrxEhaFs5c1cGWzc16p12LrN/7ZcdkhfxjSI6GMSuHYxofFw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
- by AM7PR04MB7191.eurprd04.prod.outlook.com (2603:10a6:20b:11c::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.27; Fri, 20 Mar
- 2026 11:25:01 +0000
-Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
- ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
- ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9723.018; Fri, 20 Mar 2026
- 11:25:11 +0000
-Date: Fri, 20 Mar 2026 13:25:07 +0200
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-kernel@vger.kernel.org, willemb@google.com
-Subject: Re: [PATCH net-next v3 1/9] selftests: forwarding: extend
- ethtool_std_stats_get with pause statistics
-Message-ID: <aaezxb75dtazcjjorf6aarzcgsg6nr3nxld7dm4ptmtisdvt35@6xrsyn4cwz3t>
-References: <20260319160410.2515105-1-ioana.ciornei@nxp.com>
- <20260319160410.2515105-2-ioana.ciornei@nxp.com>
- <87tsua9276.fsf@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87tsua9276.fsf@nvidia.com>
-X-ClientProxiedBy: FR4P281CA0418.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:d0::13) To PAXPR04MB8253.eurprd04.prod.outlook.com
- (2603:10a6:102:1bf::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C9A3A7F59;
+	Fri, 20 Mar 2026 11:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774006017; cv=none; b=QeEy1ytu+5a6UP6xgBzfPK/7smgTp53edPqK/ENg0lVuurrw5wrsw0o1vHS2KfdKnnorn18S2CMTCuY7mqp/QqjvfCeNr7AgV/8U2LXqYlD45l1BYQRvex0V0Vv7rl/Pf1n9EOksMAEzOWjDZ26TJACSnKeOiTE5sVFwoxgN/3s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774006017; c=relaxed/simple;
+	bh=dKHuThexIZh2EfJn752S8JnW9cnPIlvA2UWYcKs78OY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=aqZPeuAGUU8frnPBEMxcAXKYMRd3ZpgnvGKyEl6elyeUgGEcfT4DTqU2dzvf681HJ6Lu5vfMNwKsKOvIQz+/2bdFgHGkJfYvOPTld9bqJppfoRRSMn7nkyP5j2Sbo6fZCG1UuTlImRhZ9Xh1g3mznFRk8l6PKZO2AXvXcNlgFDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hldu/2t6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A305C2BCB2;
+	Fri, 20 Mar 2026 11:26:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774006017;
+	bh=dKHuThexIZh2EfJn752S8JnW9cnPIlvA2UWYcKs78OY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Hldu/2t6MG8S8vuTAfp8ByIxdeZxoRw1n7OSeLZMxAx1jXj2X0iIwydt8bFrusLzU
+	 qGHsiugeJMBAiHFZav0LBJRLoggddtAZfOUX97zCeY/ra98teDmj1bVEYm+fl0P20R
+	 KwWT2cWbWcL/ws3cMvXIdMqCZrefxRDKjHIW1CBj6hqJXobmD4Y/4j8pJwiDlBN9gG
+	 tMoFNktkQxTT25xqlcIOTsSiRbPsnBVT9cCr9GSm3nefT6LBZWMIBc564H3Ckw99Jv
+	 9/jV6B98TmOI2yuN4OY930+9PauJOU6iPGyBkXKEbV+LzeLIR/ho0Anz/Oau3yWlEa
+	 DzwhwN95q18Aw==
+From: Simon Horman <horms@kernel.org>
+To: vikas.gupta@broadcom.com
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pavan.chebbi@broadcom.com,
+	andrew+netdev@lunn.ch,
+	michael.chan@broadcom.com,
+	vsrama-krishna.nemani@broadcom.com,
+	bhargava.marreddy@broadcom.com,
+	ajit.khaparde@broadcom.com,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	rajashekar.hudumula@broadcom.com
+Subject: Re: [PATCH net-next v8 03/10] bng_en: add ethtool link settings, get_link, and nway_reset
+Date: Fri, 20 Mar 2026 11:26:30 +0000
+Message-ID: <20260320112630.2065132-1-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260319055124.1350670-4-vikas.gupta@broadcom.com>
+References: <20260319055124.1350670-4-vikas.gupta@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|AM7PR04MB7191:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a6b36fe-122d-45b0-3daf-08de86735961
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|19092799006|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	1CccpPaOhfiiPT6YneocxlD7a3ZHOooc6tJtcVnfIQkdJwUhnxegiBK1kffJyp62u1LB/SM+LIk6YhbrTDhM9R0xoo8smrAWsK19lxZv0+PNksQq2eNNYs2sJ1vvDgVQNFcq0rrTVV3egrrF6o8Gwe+wEh4VJxC8ovwDG+QwkorbZ+YIehQcaMaXTKwXJNSh5gq9lbx9DvR60ECgYcmkuPq9cRoovvVbpeyrw0KtVQRUtwktjUqWwCT7EjEtHHRSrmpDh8pa0hVqQl65iM7lEB0D+gjc3OCmpW5moUXWxGa6w0cJ0Y+KGswHoAgwcqb3yn14J261l5iRT/647xcJ+Lv7X2cBKxow0epqY9/rfd2STtvba5cPWzwXRXSIRhsAmcd3NZ4NrNlSA664zxGGZtcDPxfZwaQDUk9ZCf+9ayshXuwiw5nW9XtiCHC4+YS2iS8E3i8DepN9SibTesXRGlGxHFScxJrBFZNfnipSMaxeM3mDRyW36KK+sJ2ZnLuubNPUQP0rFEIKbXcHhml9sJHKUp5Vgnh/R7LJntdMiZDGTjRVet1aMA9CG+pNDTAbPgKX+/9yptpgAGRugsh1UUz2s650dJa8POVEoiZZZVi8+XrFPETScDEUNUXV0WGPxY4y1P60Kk5fBRIJWIP8Q2q2WC16juOWnepPtw+9jmCv7epUxfqAvRD3wqDFjyOZtsTOVHzdQ/Arw8uXEElgOmNuJL7UqjIZSO+1Tr0GhL8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(19092799006)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?eK50JaOskj5hqPHIGF45szZS6ITRz1bN6f3ZkUwWH89sTWRFMCcYUKTLjaQF?=
- =?us-ascii?Q?K1sf8OG4wac4+xAZUn3Ayoe2i44AdIKDMGy03e88W9yPnBydx7dIhpD5QcTF?=
- =?us-ascii?Q?cFrAGLJmfMsXQ4CoMGflv7LVKuIcTw6Khyir112YHIUkNQUL2k2idk3F34gl?=
- =?us-ascii?Q?0byzSp4tOBXY7VZy3ZmHs0Ghc+zkXVw4m9gVXUJb8y5Dnn2qxgib7PxF1VJh?=
- =?us-ascii?Q?3692YoueE5Fhr7g5GcO0SIekf/e+1Qqp0d6T46ZPuysxG8qD8XiU0gIMio02?=
- =?us-ascii?Q?YMEOuywhSdG6Ayc2ESjPaE05rYNpJjDqVm8xQ9GesEeKhYaEeVU5c+DYyeBS?=
- =?us-ascii?Q?LEC9Vqj4yrt4PnRgaPkclnkHAphM/qPRLFfSgskb0xIwuZWoUDG+IvpGeT9f?=
- =?us-ascii?Q?kp/a/Ku3w0M1lxt8GaC2jfwT3vkCvW6y4RbjybUY9NCxWPGF/E48BKQelksl?=
- =?us-ascii?Q?zqQCHgSttcbPM9gGgojovIyD6rWLJcB7I+jO7YwoWTgRgeiT4ghkJ4EXwoAA?=
- =?us-ascii?Q?x2//JFAxGZYVq3s0LGuMDyjzl3DE2zp01zZcS04lTND/pbI9cNpCASro/r64?=
- =?us-ascii?Q?nawHvM9RWf8qOWZPrd152ZOoY3u22LnY9huOZenzhqlNVb3QpI6tqwfXff5I?=
- =?us-ascii?Q?IywI01QAe2i4EthhbQhriGS08SmZ9BciJDXNwgPcaInHXncILe5sa3pMtxJh?=
- =?us-ascii?Q?gYrJg7FB+QcbifGOmttAgcAlc+gHE2c8QMSkXFBHd/yyuLKfYQHUynu32wDd?=
- =?us-ascii?Q?Jw2UC9XN/MDQzV0D2E7TfpCP8pAg2yId1BwZIcsSyqA+W1xgrM+8fkG5LXUl?=
- =?us-ascii?Q?8OBh/YS4aM6uUoiu5UP/phoidPO7iDxqNGy0TS5iQH49dYHVJRDMbZbfDcGl?=
- =?us-ascii?Q?Tu0EBXCYgSREiX98wKqchS0LNFv9Ov2Cwf5cK3UQdXkE6Z30OWE6Z4bIZBtr?=
- =?us-ascii?Q?bgGCmPP2CBzjH5hfzSjz7ekbjjoTwXuQxhNuOMiMN6TP3kL2xMCrhDFOFwJg?=
- =?us-ascii?Q?PLj5OY/r53Yp3wunOZbhLYfLIjKqvPLR2/UnVoQSiP9bfpuD6TlEbcr5meu9?=
- =?us-ascii?Q?Jhy73a1z40USinu1bT6CNvfoncuRa8cxgy9JP+TwHO7SCoL9JycYjmGZx9Uq?=
- =?us-ascii?Q?9x1UPI68/ksX9EL9mGE/JyfrS9RA8m31j+8MtPQMFGg8a/dwn3uh4uEfM8yX?=
- =?us-ascii?Q?RFoU61dF1LHRw3JXmuh07SBw/jSALh6eN/gJuFNL9p7dmvDi3ha/sKtKhZNm?=
- =?us-ascii?Q?rIpd/L5AvjpXjl/01N48c1fXAz1gK6KayhbA3gBr7Q1DqGoMmF7uL8AuS56M?=
- =?us-ascii?Q?Ky+OBzEoamDGOfEsjojKESaUXAyl9EDFlpPZBGP/fwVhmrVuUYBTpR18SZNz?=
- =?us-ascii?Q?qXqr+ycxRTLXrEpqS40Cez+kuTEZZSf4ztIKc6S6HKvB/6U6TAxj5p4XiCLI?=
- =?us-ascii?Q?RU+6y4fEYSkKdptDWnrko1hUOSwHfUpZXHYtnUYZHy5piyAthCeVX7vzqqej?=
- =?us-ascii?Q?oYSKgAoAWrY+nCssr5zRypa3/qKNVoSN+jAX9oAO8QpPI58nltTtJVnwrqm0?=
- =?us-ascii?Q?bPATAwW6vptphhcnmfzANUOYGy2TxCVIcQZojMtuqRR5hvgj1p1JzzPkjL5U?=
- =?us-ascii?Q?oHbWXEfGR1bLRaqWlgWDpL96psRiWdw+fxKxUyzpCOwtvOQ58dOYQwyEcNlI?=
- =?us-ascii?Q?5MiAPIkP+xwNhIDpWjAVF4S1Dc10rGm6rnm79sCkkJUkkMvdtSANaP40zjC9?=
- =?us-ascii?Q?ZsYp5jC3Fg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a6b36fe-122d-45b0-3daf-08de86735961
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2026 11:25:11.6784
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oW5V4zp1sw7pnsB+IC6l9PcqWQq4mI5fhoCVBHNqEKFRIjw0GRkyxULi24X5BeOdQakN/jIlZizveh9sc+liBg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7191
-X-Spamd-Result: default: False [1.84 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-269890-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-269892-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.978];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.967];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 9FC272D9807
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: D0E0B2D987F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 12:20:01PM +0100, Petr Machata wrote:
-> 
-> Ioana Ciornei <ioana.ciornei@nxp.com> writes:
-> 
-> > Even though pause frame statistics are not exported through the same
-> > ethtool command, there is no point in adding another helper just for
-> > them. Extent the ethtool_std_stats_get() function so that we are able to
-> > interrogate using the same helper all the standard statistics.
-> >
-> > And since we are touching the else case, convert that as well to the jq
-> > --arg form in order to be easier to read.
-> >
-> > Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
-> > ---
-> > Changes in v3:
-> > - none
-> > Changes in v2:
-> > - convert jq to the --arg usage form
-> >
-> >  tools/testing/selftests/net/forwarding/lib.sh | 8 ++++++--
-> >  1 file changed, 6 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> > index a9034f0bb58b..cf40cb766c68 100644
-> > --- a/tools/testing/selftests/net/forwarding/lib.sh
-> > +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> > @@ -831,8 +831,12 @@ ethtool_std_stats_get()
-> >  	local name=$1; shift
-> >  	local src=$1; shift
-> >  
-> > -	ethtool --json -S $dev --groups $grp -- --src $src | \
-> > -		jq '.[]."'"$grp"'"."'$name'"'
-> > +	if [[ "$grp" == "pause" ]]; then
-> > +		ethtool -I --json -a "$dev" | jq --arg name "$name" '.[].statistics[$name]'
-> 
-> I missed this overlong line. Fold it, please. The R-b applies with this change.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Ok. Will fold it.
-I also realised that I should have passed --src "$src" to this ethtool
-call.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+bng_en: add ethtool link settings, get_link, and nway_reset
+
+Add get/set_link_ksettings, get_link, and nway_reset support. Report
+supported, advertised, and link-partner speeds across NRZ, PAM4, and
+PAM4-112 signaling modes. Enable lane count reporting.
+
+> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge.h b/drivers/net/ethernet/broadcom/bnge/bnge.h
+> index 83ee4749cc70..e9b83c0c64b6 100644
+> --- a/drivers/net/ethernet/broadcom/bnge/bnge.h
+> +++ b/drivers/net/ethernet/broadcom/bnge/bnge.h
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_link.c b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
+> index e5a7b48f6a3f..03beb5593069 100644
+> --- a/drivers/net/ethernet/broadcom/bnge/bnge_link.c
+> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
+
+[ ... ]
+
+> +int bnge_set_link_ksettings(struct net_device *dev,
+> +			    const struct ethtool_link_ksettings *lk_ksettings)
+> +{
+> +	const struct ethtool_link_settings *base = &lk_ksettings->base;
+> +	struct bnge_ethtool_link_info *elink_info;
+> +	struct bnge_net *bn = netdev_priv(dev);
+> +	struct bnge_link_info *link_info;
+> +	struct bnge_dev *bd = bn->bd;
+> +	bool set_pause = false;
+> +	int rc = 0;
+> +
+> +	elink_info = &bn->eth_link_info;
+> +	link_info = &bd->link_info;
+> +
+> +	if (!BNGE_PHY_CFG_ABLE(bd))
+> +		return -EOPNOTSUPP;
+> +
+> +	if (base->autoneg == AUTONEG_ENABLE) {
+> +		bnge_set_ethtool_speeds(bn,
+> +					lk_ksettings->link_modes.advertising);
+> +		elink_info->autoneg |= BNGE_AUTONEG_SPEED;
+> +		if (!elink_info->advertising && !elink_info->advertising_pam4) {
+> +			elink_info->advertising =
+> +				link_info->support_auto_speeds;
+> +			elink_info->advertising_pam4 =
+> +				link_info->support_pam4_auto_speeds;
+> +		}
+
+When autoneg is enabled but no speeds are advertised, does this code
+correctly handle SPEEDS2 devices?
+
+On a SPEEDS2 device (bd->phy_flags & BNGE_PHY_FL_SPEEDS2), the fallback
+populates elink_info->advertising with support_auto_speeds and
+elink_info->advertising_pam4 with support_pam4_auto_speeds.
+
+However, for SPEEDS2 devices, the firmware expects speed masks encoded in
+the SPEEDS2 format (using support_auto_speeds2), not the legacy format
+(using support_auto_speeds or support_pam4_auto_speeds).
+
+Looking at how this value is used in bnge_hwrm_set_link_common() in patch v2
+(c367afb6b104):
+
+    if (bd->phy_flags & BNGE_PHY_FL_SPEEDS2) {
+        req->auto_link_speeds2_mask = elink_info->advertising;
+        ...
+    } else {
+        req->auto_link_speed_mask = elink_info->advertising;
+        req->auto_pam4_link_speed_mask = elink_info->advertising_pam4;
+    }
+
+The firmware will receive legacy NRZ speed bits in auto_link_speeds2_mask,
+which it will interpret as SPEEDS2-encoded bits, potentially negotiating the
+wrong link speed.
+
+Compare with bnge_support_speed_dropped() in the same patch series
+(c367afb6b104), which handles this case differently when support speeds
+change:
+
+    if (bd->phy_flags & BNGE_PHY_FL_SPEEDS2) {
+        link_info->advertising = link_info->support_auto_speeds2;
+        ...
+    } else {
+        link_info->advertising = link_info->support_auto_speeds;
+        link_info->advertising_pam4 = link_info->support_pam4_auto_speeds;
+    }
+
+Should bnge_set_link_ksettings() check bd->phy_flags & BNGE_PHY_FL_SPEEDS2 and
+use support_auto_speeds2 for the fallback on SPEEDS2 devices?
+
+> +		/* any change to autoneg will cause link change, therefore the
+> +		 * driver should put back the original pause setting in autoneg
+> +		 */
+> +		if (!(bd->phy_flags & BNGE_PHY_FL_NO_PAUSE))
+> +			set_pause = true;
+> +	} else {
+
+[ ... ]
 
