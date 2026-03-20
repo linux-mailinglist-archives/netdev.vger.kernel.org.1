@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-269892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269893-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yAR+DwsvvWmI7QIAu9opvQ
-	(envelope-from <netdev+bounces-269892-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:27:07 +0100
+	id uK6aCDEvvWmI7QIAu9opvQ
+	(envelope-from <netdev+bounces-269893-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:27:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0E0B2D987F
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:27:06 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD952D98A3
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 12:27:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9CB703013445
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:27:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1FD3530117DB
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 11:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A469839A064;
-	Fri, 20 Mar 2026 11:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05733A7F4C;
+	Fri, 20 Mar 2026 11:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hldu/2t6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nJ4oi4dd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C9A3A7F59;
-	Fri, 20 Mar 2026 11:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 726F139BFF5;
+	Fri, 20 Mar 2026 11:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774006017; cv=none; b=QeEy1ytu+5a6UP6xgBzfPK/7smgTp53edPqK/ENg0lVuurrw5wrsw0o1vHS2KfdKnnorn18S2CMTCuY7mqp/QqjvfCeNr7AgV/8U2LXqYlD45l1BYQRvex0V0Vv7rl/Pf1n9EOksMAEzOWjDZ26TJACSnKeOiTE5sVFwoxgN/3s=
+	t=1774006031; cv=none; b=azKSaURPoY+40KLbuN7KYdZKlgGRd7KL1BDjsA7vTXhZdlqq1lY5LtkILtl4NjGriXR/Xl2jp7iCkVFgkkprvwZdXRH+YMjUGBfSBVsztZs9TRgAoZZuPdY6/Zj/WMh5QDEa+VKMG+0OCkWbuU/Tpl+mGxtofMEo+uG/5SpNBQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774006017; c=relaxed/simple;
-	bh=dKHuThexIZh2EfJn752S8JnW9cnPIlvA2UWYcKs78OY=;
+	s=arc-20240116; t=1774006031; c=relaxed/simple;
+	bh=1wRF58FiDWImzLkG3HRq7nLNRkGKi0N9A0UY6bLIJWI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aqZPeuAGUU8frnPBEMxcAXKYMRd3ZpgnvGKyEl6elyeUgGEcfT4DTqU2dzvf681HJ6Lu5vfMNwKsKOvIQz+/2bdFgHGkJfYvOPTld9bqJppfoRRSMn7nkyP5j2Sbo6fZCG1UuTlImRhZ9Xh1g3mznFRk8l6PKZO2AXvXcNlgFDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hldu/2t6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A305C2BCB2;
-	Fri, 20 Mar 2026 11:26:53 +0000 (UTC)
+	 MIME-Version; b=lUl9ISIl9wpQB885iEINfm0eOYzgtHtMT98Cn4PVRa9vtaz/6QbpzywwTO5uVl6shdCfZGz6t5wSFpuSPdzqyIF6GxxR+ZQJz3yKbc35GQPsA7p2Q37SRtGLLw3vWpJXjdfS0rl5/wndSFMm1DFtBvPZXxCSmJKqROUW+vScBH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nJ4oi4dd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 207D9C4CEF7;
+	Fri, 20 Mar 2026 11:27:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774006017;
-	bh=dKHuThexIZh2EfJn752S8JnW9cnPIlvA2UWYcKs78OY=;
+	s=k20201202; t=1774006030;
+	bh=1wRF58FiDWImzLkG3HRq7nLNRkGKi0N9A0UY6bLIJWI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Hldu/2t6MG8S8vuTAfp8ByIxdeZxoRw1n7OSeLZMxAx1jXj2X0iIwydt8bFrusLzU
-	 qGHsiugeJMBAiHFZav0LBJRLoggddtAZfOUX97zCeY/ra98teDmj1bVEYm+fl0P20R
-	 KwWT2cWbWcL/ws3cMvXIdMqCZrefxRDKjHIW1CBj6hqJXobmD4Y/4j8pJwiDlBN9gG
-	 tMoFNktkQxTT25xqlcIOTsSiRbPsnBVT9cCr9GSm3nefT6LBZWMIBc564H3Ckw99Jv
-	 9/jV6B98TmOI2yuN4OY930+9PauJOU6iPGyBkXKEbV+LzeLIR/ho0Anz/Oau3yWlEa
-	 DzwhwN95q18Aw==
+	b=nJ4oi4ddq+uw8egN98CvDGk2f7bJglUTdcJOacefG9E3+3ec/WAoR1ufSCC1BClKS
+	 svWEQ+lQR29bmtUXUa6bZ0JlbHZZTZj+yViHiifcT1fxuPu/Gy5YTB2YVl7XqZL5Fq
+	 s996aMxdl9lbo83CQdmej+D3XvC6iFjQV+M3cE2urRTbLTSFDYx6MLMe/pty2s4Z4x
+	 +M7tUJ/GIBFJ4TUG6GPMir1DUoAXA8GdwJ21cyxUYUdvOBBm+3039DLmneEj8v/pII
+	 AytEAYAtF58UhSiA3uAIKVz4BXo88uRguCyvBOK4hMHS1kXNANhKl7/8jOzFaMPnQV
+	 RdiGwjCKZeL2w==
 From: Simon Horman <horms@kernel.org>
 To: vikas.gupta@broadcom.com
 Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pavan.chebbi@broadcom.com,
 	andrew+netdev@lunn.ch,
-	michael.chan@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com,
-	bhargava.marreddy@broadcom.com,
-	ajit.khaparde@broadcom.com,
-	pabeni@redhat.com,
-	edumazet@google.com,
+	linux-kernel@vger.kernel.org,
 	kuba@kernel.org,
+	pabeni@redhat.com,
+	vsrama-krishna.nemani@broadcom.com,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	ajit.khaparde@broadcom.com,
+	bhargava.marreddy@broadcom.com,
+	rajashekar.hudumula@broadcom.com,
 	davem@davemloft.net,
-	rajashekar.hudumula@broadcom.com
-Subject: Re: [PATCH net-next v8 03/10] bng_en: add ethtool link settings, get_link, and nway_reset
-Date: Fri, 20 Mar 2026 11:26:30 +0000
-Message-ID: <20260320112630.2065132-1-horms@kernel.org>
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v8 09/10] bng_en: implement netdev_stat_ops
+Date: Fri, 20 Mar 2026 11:27:04 +0000
+Message-ID: <20260320112704.2065290-1-horms@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260319055124.1350670-4-vikas.gupta@broadcom.com>
-References: <20260319055124.1350670-4-vikas.gupta@broadcom.com>
+In-Reply-To: <20260319055124.1350670-10-vikas.gupta@broadcom.com>
+References: <20260319055124.1350670-10-vikas.gupta@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,13 +79,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-269892-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269893-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -95,12 +95,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.967];
+	NEURAL_HAM(-0.00)[-0.973];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: D0E0B2D987F
+X-Rspamd-Queue-Id: AFD952D98A3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -109,101 +109,160 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-bng_en: add ethtool link settings, get_link, and nway_reset
+bng_en: implement netdev_stat_ops
 
-Add get/set_link_ksettings, get_link, and nway_reset support. Report
-supported, advertised, and link-partner speeds across NRZ, PAM4, and
-PAM4-112 signaling modes. Enable lane count reporting.
+This patch adds netdev_stat_ops implementation to provide standardized
+per-queue statistics via the Netlink API, including hardware drop
+counters.
 
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge.h b/drivers/net/ethernet/broadcom/bnge/bnge.h
-> index 83ee4749cc70..e9b83c0c64b6 100644
-> --- a/drivers/net/ethernet/broadcom/bnge/bnge.h
-> +++ b/drivers/net/ethernet/broadcom/bnge/bnge.h
-
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_link.c b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-> index e5a7b48f6a3f..03beb5593069 100644
-> --- a/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-
-[ ... ]
-
-> +int bnge_set_link_ksettings(struct net_device *dev,
-> +			    const struct ethtool_link_ksettings *lk_ksettings)
+> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
+> index 2513b0907693..fa732b99358e 100644
+> --- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
+> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
+> @@ -3031,6 +3031,81 @@ static int bnge_close(struct net_device *dev)
+>  	return 0;
+>  }
+>
+> +static void bnge_get_queue_stats_rx(struct net_device *dev, int i,
+> +				    struct netdev_queue_stats_rx *stats)
 > +{
-> +	const struct ethtool_link_settings *base = &lk_ksettings->base;
-> +	struct bnge_ethtool_link_info *elink_info;
 > +	struct bnge_net *bn = netdev_priv(dev);
-> +	struct bnge_link_info *link_info;
-> +	struct bnge_dev *bd = bn->bd;
-> +	bool set_pause = false;
-> +	int rc = 0;
+> +	struct bnge_nq_ring_info *nqr;
+> +	u64 *sw;
 > +
-> +	elink_info = &bn->eth_link_info;
-> +	link_info = &bd->link_info;
+> +	if (!bn->bnapi)
+> +		return;
 > +
-> +	if (!BNGE_PHY_CFG_ABLE(bd))
-> +		return -EOPNOTSUPP;
-> +
-> +	if (base->autoneg == AUTONEG_ENABLE) {
-> +		bnge_set_ethtool_speeds(bn,
-> +					lk_ksettings->link_modes.advertising);
-> +		elink_info->autoneg |= BNGE_AUTONEG_SPEED;
-> +		if (!elink_info->advertising && !elink_info->advertising_pam4) {
-> +			elink_info->advertising =
-> +				link_info->support_auto_speeds;
-> +			elink_info->advertising_pam4 =
-> +				link_info->support_pam4_auto_speeds;
-> +		}
+> +	nqr = &bn->bnapi[i]->nq_ring;
+                ^^^^
 
-When autoneg is enabled but no speeds are advertised, does this code
-correctly handle SPEEDS2 devices?
+Can this race with bnge_close_core and dereference bn->bnapi after it's
+freed? The NULL check at line 3041 doesn't prevent the race since
+bnge_close_core can free bn->bnapi between the check and dereference.
 
-On a SPEEDS2 device (bd->phy_flags & BNGE_PHY_FL_SPEEDS2), the fallback
-populates elink_info->advertising with support_auto_speeds and
-elink_info->advertising_pam4 with support_pam4_auto_speeds.
+Looking at the existing bnge_get_stats64, it uses rcu_read_lock() when
+accessing bn->bnapi:
 
-However, for SPEEDS2 devices, the firmware expects speed masks encoded in
-the SPEEDS2 format (using support_auto_speeds2), not the legacy format
-(using support_auto_speeds or support_pam4_auto_speeds).
-
-Looking at how this value is used in bnge_hwrm_set_link_common() in patch v2
-(c367afb6b104):
-
-    if (bd->phy_flags & BNGE_PHY_FL_SPEEDS2) {
-        req->auto_link_speeds2_mask = elink_info->advertising;
-        ...
-    } else {
-        req->auto_link_speed_mask = elink_info->advertising;
-        req->auto_pam4_link_speed_mask = elink_info->advertising_pam4;
+bnge_get_stats64() {
+    rcu_read_lock();
+    if (test_bit(BNGE_STATE_OPEN, &bd->state)) {
+        ... access bn->bnapi ...
     }
+    rcu_read_unlock();
+}
 
-The firmware will receive legacy NRZ speed bits in auto_link_speeds2_mask,
-which it will interpret as SPEEDS2-encoded bits, potentially negotiating the
-wrong link speed.
+And bnge_close_core uses synchronize_rcu() to wait for readers before
+freeing:
 
-Compare with bnge_support_speed_dropped() in the same patch series
-(c367afb6b104), which handles this case differently when support speeds
-change:
+bnge_close_core() {
+    ...
+    synchronize_rcu();
+    bnge_del_napi(bn);
+        -> bnge_free_core(bn);
+            -> bn->bnapi = NULL;
+}
 
-    if (bd->phy_flags & BNGE_PHY_FL_SPEEDS2) {
-        link_info->advertising = link_info->support_auto_speeds2;
-        ...
-    } else {
-        link_info->advertising = link_info->support_auto_speeds;
-        link_info->advertising_pam4 = link_info->support_pam4_auto_speeds;
-    }
+Without RCU protection, this sequence can occur:
 
-Should bnge_set_link_ksettings() check bd->phy_flags & BNGE_PHY_FL_SPEEDS2 and
-use support_auto_speeds2 for the fallback on SPEEDS2 devices?
+Thread A (stats)                  Thread B (close)
+----------------                  ----------------
+if (!bn->bnapi)  [PASSES]
+                                  bnge_close_core()
+                                    bnge_free_core()
+                                      bn->bnapi = NULL
+nqr = &bn->bnapi[i]  [CRASH]
 
-> +		/* any change to autoneg will cause link change, therefore the
-> +		 * driver should put back the original pause setting in autoneg
-> +		 */
-> +		if (!(bd->phy_flags & BNGE_PHY_FL_NO_PAUSE))
-> +			set_pause = true;
-> +	} else {
+Should bnge_get_queue_stats_rx acquire rcu_read_lock() and check
+test_bit(BNGE_STATE_OPEN) before accessing bn->bnapi?
+
+> +	sw = nqr->stats.sw_stats;
+> +
+> +	stats->packets = 0;
+> +	stats->packets += BNGE_GET_RING_STATS64(sw, rx_ucast_pkts);
+> +	stats->packets += BNGE_GET_RING_STATS64(sw, rx_mcast_pkts);
+> +	stats->packets += BNGE_GET_RING_STATS64(sw, rx_bcast_pkts);
+> +
+> +	stats->bytes = 0;
+> +	stats->bytes += BNGE_GET_RING_STATS64(sw, rx_ucast_bytes);
+> +	stats->bytes += BNGE_GET_RING_STATS64(sw, rx_mcast_bytes);
+> +	stats->bytes += BNGE_GET_RING_STATS64(sw, rx_bcast_bytes);
+> +
+> +	stats->hw_drop_overruns = BNGE_GET_RING_STATS64(sw, rx_discard_pkts);
+> +	stats->hw_drops = BNGE_GET_RING_STATS64(sw, rx_error_pkts) +
+> +				stats->hw_drop_overruns;
+> +}
+> +
+> +static void bnge_get_queue_stats_tx(struct net_device *dev, int i,
+> +				    struct netdev_queue_stats_tx *stats)
+> +{
+> +	struct bnge_net *bn = netdev_priv(dev);
+> +	struct bnge_napi *bnapi;
+> +	u64 *sw;
+> +
+> +	if (!bn->tx_ring)
+> +		return;
+> +
+> +	bnapi = bn->tx_ring[bn->tx_ring_map[i]].bnapi;
+                ^^^^
+
+Does this have the same race with bnge_close_core? The NULL check doesn't
+prevent bnge_close_core from freeing bn->tx_ring between the check and
+dereference.
+
+Following the same pattern as bnge_get_stats64, should this also use
+rcu_read_lock() and check BNGE_STATE_OPEN before accessing bn->tx_ring?
+
+> +	sw = bnapi->nq_ring.stats.sw_stats;
+> +
+> +	stats->packets = 0;
+> +	stats->packets += BNGE_GET_RING_STATS64(sw, tx_ucast_pkts);
+> +	stats->packets += BNGE_GET_RING_STATS64(sw, tx_mcast_pkts);
+> +	stats->packets += BNGE_GET_RING_STATS64(sw, tx_bcast_pkts);
+> +
+> +	stats->bytes = 0;
+> +	stats->bytes += BNGE_GET_RING_STATS64(sw, tx_ucast_bytes);
+> +	stats->bytes += BNGE_GET_RING_STATS64(sw, tx_mcast_bytes);
+> +	stats->bytes += BNGE_GET_RING_STATS64(sw, tx_bcast_bytes);
+> +
+> +	stats->hw_drop_errors = BNGE_GET_RING_STATS64(sw, tx_error_pkts);
+> +	stats->hw_drops = BNGE_GET_RING_STATS64(sw, tx_discard_pkts) +
+> +				stats->hw_drop_errors;
+> +}
+> +
+> +static void bnge_get_base_stats(struct net_device *dev,
+> +				struct netdev_queue_stats_rx *rx,
+> +				struct netdev_queue_stats_tx *tx)
+> +{
+> +	struct bnge_net *bn = netdev_priv(dev);
+> +
+> +	rx->packets = bn->net_stats_prev.rx_packets;
+> +	rx->bytes = bn->net_stats_prev.rx_bytes;
+       ^^^^
+
+Can this race with bnge_close_core when reading bn->net_stats_prev?
+bnge_close_core writes to bn->net_stats_prev while this function reads
+it without any locking.
+
+Looking at bnge_get_stats64, it uses rcu_read_lock() before accessing
+bn->net_stats_prev. While this won't cause a crash like the other two
+issues, it could result in torn reads on 32-bit systems where reading
+u64 is not atomic, potentially returning inconsistent statistics to
+userspace.
+
+Should bnge_get_base_stats also use rcu_read_lock() when reading
+bn->net_stats_prev?
+
+> +
+> +	tx->packets = bn->net_stats_prev.tx_packets;
+> +	tx->bytes = bn->net_stats_prev.tx_bytes;
+> +}
+> +
+> +static const struct netdev_stat_ops bnge_stat_ops = {
+> +	.get_queue_stats_rx	= bnge_get_queue_stats_rx,
+> +	.get_queue_stats_tx	= bnge_get_queue_stats_tx,
+> +	.get_base_stats		= bnge_get_base_stats,
+> +};
+> +
 
 [ ... ]
 
