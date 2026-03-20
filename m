@@ -1,82 +1,84 @@
-Return-Path: <netdev+bounces-269925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-269926-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eHjnIiJWvWme9AIAu9opvQ
-	(envelope-from <netdev+bounces-269925-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 15:13:54 +0100
+	id sIQgNzhWvWlr8gIAu9opvQ
+	(envelope-from <netdev+bounces-269926-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 15:14:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E490D2DBA95
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 15:13:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D3392DBAB2
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 15:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C61D307E0A5
-	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 14:09:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5CDB430D87B3
+	for <lists+netdev@lfdr.de>; Fri, 20 Mar 2026 14:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3307231327A;
-	Fri, 20 Mar 2026 14:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08533DBA0;
+	Fri, 20 Mar 2026 14:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="K3pOTnQt"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Zrubf/8o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f101.google.com (mail-lf1-f101.google.com [209.85.167.101])
+Received: from mail-ej1-f97.google.com (mail-ej1-f97.google.com [209.85.218.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E94278161
-	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 14:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BAF394795
+	for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 14:09:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774015746; cv=none; b=m3rk0Xw8DJPCAZdvV6A8pYDOcJptgN6MOB+w2TvxJDh0ZGfNh3Rnb0SpmLwaVhD5yw3lEHdl3EyXWPOaQTux9LMG3n+XneDrQIPROJEGUUHKY6jouA+eyV43JXFBSNhya6MN1o0behOGL+POqC4rm+m8L4imKHiyUX/u1dVqHRs=
+	t=1774015753; cv=none; b=MndESBq2qm6ST/ilpCMi0R7RJMkG+Z2mp9wmdim1QlAsJF1f5EP2aZeygCOvUQRtXS6px5kC6F9wOnhjS//Buo+/+WQTzYNU73+E6aJ5NRJwdJ1BpMAse5xRNqllTsG4a2dI5WV3IHSjC2bdmssmTZxqdECXcZJYes0FLT6JaTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774015746; c=relaxed/simple;
-	bh=MdkSdzcGSqrTZBp2u7kvw+iKaY7GRTDLTOFKXdYrXU0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gNXzCB1EnRKjjrJ7lAP8P+TtOpQ3MJxXmguF3pkkzfwDaUfXboqX7l7uOta3y8AGiIvN+toemoG1cbKhp165WGTJ8ETl3G1495+L6Etlaqyac9wZ/R5qf77FyEkhbq9VE8NMUnzydMg9CCazim8U6NwfxnIw+WM+t2ogEwbNCJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=K3pOTnQt; arc=none smtp.client-ip=209.85.167.101
+	s=arc-20240116; t=1774015753; c=relaxed/simple;
+	bh=/cNqJSeM0Q3K3wgO2bQXiTGod1Lubv8zRCDQINHhrUA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=kl1/tZyutiV4Vs19+E78T0PBOBLjOUKIzTpfyz62LM504cUzM8MA+w6mlSmfnpbHzQ5RV0pvo6rbdMaXshCacCkfm1A18o5u+oPNpvcgTNjaWr+r1FROsfaij5age1sYjjvUtIorvggaAKgx6fIQrPWF/8w07g/Hmily8OkTA6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=Zrubf/8o; arc=none smtp.client-ip=209.85.218.97
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-lf1-f101.google.com with SMTP id 2adb3069b0e04-5a27c329e98so908613e87.3
-        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 07:09:04 -0700 (PDT)
+Received: by mail-ej1-f97.google.com with SMTP id a640c23a62f3a-b941762394aso231496266b.1
+        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 07:09:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1774015743; x=1774620543; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6qtVrvYA32Jc8pqlKZtKj3HEjzfaJ6albknHystgmyg=;
-        b=K3pOTnQtDYzKqpTqb2gm7Rca6XIxF/mcmouJAIShbtyuPjO53vFGLsuZoK+G2UtPNu
-         pbOroSTwdvJUwVfpfkJnCamAyAbqH9G6/8PQLwWU+f9VqSVoSEN86v5iAMCf+thzes43
-         d2kEw0blZbrZIAklsTd2LdAvBXMgUcK4p76+jJpOeUayfPU+ET1WkB+KM3hPeOadifiN
-         NoEEFhlzHDqUE+GR/sm6UDHm5TmCUmGbsYOyDw3OkO6IjPip5o53eEDZE18084vQMOYU
-         eyhKyFd5T5C1KE+xMwKj0sonMYUTEOiCRr84J2UTIWp/TGl0DBdW3ioF49OxvNOEtYO8
-         DLhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774015743; x=1774620543;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=6wind.com; s=google; t=1774015750; x=1774620550; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6qtVrvYA32Jc8pqlKZtKj3HEjzfaJ6albknHystgmyg=;
-        b=lSnsrr84O9+snqOpfESUjrTyPs057ArFMTATltaPVK+L1gWmOno1Oysrj7bN1eYB6X
-         pS2FbZcEXsile8e7li7Vp3IK543iNbb+B/DArcDzqAVGDNKBeEHmuExhNeByLxWRxPHa
-         cDGLkbT5mwsd7Cn1Lwhx3FpuZAH5fCeR2oS5+NIZrNLFTsjedjyxEgFvX9iaolxX6EXJ
-         4T5mo1pLQpoI4uAOjERHyG6khzs7mx5PtVFIZr4Yj3/hKvPbCqshF82gzKWfI4WPg2fl
-         pHklBgxeVMCL1jPVqKqWaW1quIZ24ifY5A6I+hhMSZOni/7nEOFs5vHZURN/DHWkTlML
-         PozA==
-X-Gm-Message-State: AOJu0YwGB2g1DyG6CCke/0UFghqqVaw0iitBFtZy/CeJcErdyCkLZFNp
-	hyH55aIjC51fZlYsUnikXFn9YRb7PBTuBTswR0fLseuNT2TjcKqi/uV7DThAb5H/ZCEy4/A8fRQ
-	i5/ejnXpRCl3Ywdw6O62TVZl5qoPy95HUOWGr
-X-Gm-Gg: ATEYQzzIa58GhFb7fRTQfodLKczRQeI3F62Y9sUQ8pE2HoS0v02a1X9UywLQZzRXo4g
-	V9w+5OiC5ftYIZrb7He2PlrNLXPVOqWdUmtpyzJfsMBeaI0y8dRP5apNQgmG9+Lku1dLeCnA5vI
-	1g7q1z0kCj7apm+ujhmSftTBntjnVuLr0PmdSEFU3BH/FDWI9ZOv/8ZKwZR7uM/06VqPJUVxuC2
-	IwNbXMoZrWvPRX/Pqp9ckKpkx7/LXTjXJ7t7ue6imRqnzg2HRVq/03dTnsZq8zUydYkFcFU4Utb
-	h1rRyfeAnzSXLVvScOD6bGhZG1RIwjJcj06jNq6ctFe6fcYsC4NhvkhEsdW9zgCUdsiurJS3Sej
-	YNlALXzh3G/MrxptwtqnsSA1MJerTFMuMxt98G70BcuNz/qyhk4YedxYcTC8WdisPpoOTMZbsQA
+        bh=vxwjSfGeTmNaRug+A53Bg742e8//9a/sV8tmYJpjJM8=;
+        b=Zrubf/8orN2I7kixPK/wkHgSmA0v4XxvW5f/FKGY3rTrji+1dTLu9ODKE1W++4Y3kd
+         8AbdUrDI8eCNJec9ly3Jz1rBQeBnvsByORTejYlW+0VsjPGvUIhoxXc+Zmypc8cO15er
+         fpZr9Df+xzpWKMWGxaETrLFR+r6BvYQuQuWTKmHT6CdODbQ/NNJptLrfnKatTK3wWQU4
+         lzp79LbDhsLzdKICJbbYUCm/D8YurKZxqJ6xeIzTFeHQn/M6l49cvHi3lyw69ZGkPeua
+         wVMjDYmbm3cxI0hdIfOTS6paNT79UEb88qVDNmO1euRRrlsnDjwdBk7VntgeCiNYFFmc
+         1k3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774015750; x=1774620550;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vxwjSfGeTmNaRug+A53Bg742e8//9a/sV8tmYJpjJM8=;
+        b=ZRIoP2cVGp0nzwmgX4cd5bFT6Ts/vmfm1FmJChs8wN33cnW1eSF9cCKjEy17Hk9ZMn
+         8EKaE6WpRtUlVAwe0+6mGgfurVjTnesEQlI4ncF+W9+qgNy5p9rBESZQv8GQZtqyMv7n
+         ajIPyYJ1Ev8k8LHK9XqbyWyMhNesELunEsGfkK/u5Rw+Qz7qrOwt1LWGXDI8tNsPGcVa
+         Q+X8ECZQl4CbDbjoyosyntKhTTpqn8+0njfWv4+RU26xCt1AgFAgtQ/K9gzRHGm1dBXn
+         8Ol6hXKNelHkZuBr3ezQemsBQIKM6E8loZH0t5v3YdlTj9dmL1yigvA1ynE+iiipc4Wu
+         8MSQ==
+X-Gm-Message-State: AOJu0Yw8VYws4dsWS7NxZ3irULH1Xd1eMfr8xitCc4TMBQ447FETm70r
+	0XcW8H4p8U0eMuEthaVvkg5g2zZZBP5aaeYDkxEhPQzJbUmuVj0mgtX+MMKIY86aqh5eKK8USRZ
+	NUd0phXWlIT6keeKFQE/eueKQQYlpB8hP2Pmk
+X-Gm-Gg: ATEYQzyJ1wH4GJ64Aj0Qn0YkHFW2NBlOqhYvfeQ72+kfj45TjW0fa6YGwqE8j8CZ4CX
+	lpZ6GRzgkwkq2Agjl4ih+AN0tynjfx6Yd05cM1clGp98uVJI07/iZKhgS3RymzVm0sMxYpzbhtS
+	LnAueJxd18Vp5jd2iiptNSVHS+Uxe0D8UH3gOZ4/OzA1Vz7dCkU08NA8ax1wumP5QZWyZGzkILL
+	rzvA7W5IaHtdUPqWRkjR0jO/4I02XmiEsXU5So0QbaQXM4auszPl1LKnRyh08lEHUs1uNY7HXgz
+	pxVT8zy21e+bNHWmqUK+oZuQhE2u5fuBYRlPIRbQZDM2ypbK1/wb26xmB70aftoE6xLW0VGXHFP
+	jQ8ogpimNpk0Kr9LV+JrdETdCHIz7gLdWknsl+O4FChx/d6kgxcm/PqAHUjMOniqsIigBr6+3Tg
 	==
-X-Received: by 2002:a05:6512:10cc:b0:5a1:382c:3a49 with SMTP id 2adb3069b0e04-5a285b6dc60mr1382315e87.32.1774015742958;
-        Fri, 20 Mar 2026 07:09:02 -0700 (PDT)
+X-Received: by 2002:a17:907:d501:b0:b98:32c1:2465 with SMTP id a640c23a62f3a-b9832c15c05mr193867566b.48.1774015749626;
+        Fri, 20 Mar 2026 07:09:09 -0700 (PDT)
 Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id 2adb3069b0e04-5a28519f1e7sm227698e87.17.2026.03.20.07.09.02;
-        Fri, 20 Mar 2026 07:09:02 -0700 (PDT)
+        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-b98332dc66bsm17385466b.47.2026.03.20.07.09.09;
+        Fri, 20 Mar 2026 07:09:09 -0700 (PDT)
 X-Relaying-Domain: 6wind.com
 Received: from localhost (kadavar.dev.6wind.com [10.17.1.232])
-	by smtpservice.6wind.com (Postfix) with ESMTP id 7DC4C1C280;
-	Fri, 20 Mar 2026 15:09:02 +0100 (CET)
+	by smtpservice.6wind.com (Postfix) with ESMTP id 66CF21C281;
+	Fri, 20 Mar 2026 15:09:09 +0100 (CET)
 From: Justin Iurman <justin.iurman@6wind.com>
 To: netdev@vger.kernel.org
 Cc: dsahern@kernel.org,
@@ -86,10 +88,12 @@ Cc: dsahern@kernel.org,
 	nicolas.dichtel@6wind.com,
 	stefano.salsano@uniroma2.it,
 	Justin Iurman <justin.iurman@6wind.com>
-Subject: [PATCH iproute2-next v2 0/3] Add support for seg6 tunsrc
-Date: Fri, 20 Mar 2026 15:08:44 +0100
-Message-Id: <20260320140847.1730633-1-justin.iurman@6wind.com>
+Subject: [PATCH iproute2-next v2 1/3] uapi: add SEG6_IPTUNNEL_SRC
+Date: Fri, 20 Mar 2026 15:08:45 +0100
+Message-Id: <20260320140847.1730633-2-justin.iurman@6wind.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20260320140847.1730633-1-justin.iurman@6wind.com>
+References: <20260320140847.1730633-1-justin.iurman@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,7 +114,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,uniroma2.it,gmail.com,6wind.com];
-	TAGGED_FROM(0.00)[bounces-269925-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-269926-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -122,37 +126,33 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[6wind.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.864];
+	NEURAL_HAM(-0.00)[-0.928];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,6wind.com:dkim,6wind.com:mid]
-X-Rspamd-Queue-Id: E490D2DBA95
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,6wind.com:dkim,6wind.com:email,6wind.com:mid]
+X-Rspamd-Queue-Id: 4D3392DBAB2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This series adds support for the new per-route seg6 "tunsrc" parameter.
+Rebase uapi to have support for SEG6_IPTUNNEL_SRC.
 
-Example:
-
-ip -6 r a 2001:db8:1::/64 encap seg6 mode encap tunsrc 2001:db8:ab::
-    segs 2001:db8:42::1,2001:db8:ffff::2 dev eth0
-
-Justin Iurman (3):
-  uapi: add SEG6_IPTUNNEL_SRC
-  seg6: add tunsrc support in iproute_lwtunnel
-  man8: update seg6 encap documentation
-
- include/uapi/linux/seg6_iptunnel.h |  1 +
- ip/iproute_lwtunnel.c              | 31 ++++++++++++++++++++++++++++++
- man/man8/ip-route.8.in             | 13 ++++++++++++-
- 3 files changed, 44 insertions(+), 1 deletion(-)
-
+Signed-off-by: Justin Iurman <justin.iurman@6wind.com>
 ---
-v2: include uapi change
+ include/uapi/linux/seg6_iptunnel.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-v1:
-https://lore.kernel.org/netdev/20260316164907.1255510-1-justin.iurman@6wind.com/
-
+diff --git a/include/uapi/linux/seg6_iptunnel.h b/include/uapi/linux/seg6_iptunnel.h
+index e1929d21c0b6..993a7bd06775 100644
+--- a/include/uapi/linux/seg6_iptunnel.h
++++ b/include/uapi/linux/seg6_iptunnel.h
+@@ -20,6 +20,7 @@
+ enum {
+ 	SEG6_IPTUNNEL_UNSPEC,
+ 	SEG6_IPTUNNEL_SRH,
++	SEG6_IPTUNNEL_SRC,
+ 	__SEG6_IPTUNNEL_MAX,
+ };
+ #define SEG6_IPTUNNEL_MAX (__SEG6_IPTUNNEL_MAX - 1)
 -- 
 2.39.2
 
