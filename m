@@ -1,351 +1,187 @@
-Return-Path: <netdev+bounces-270240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270241-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WOJpJCTovmnIiwMAu9opvQ
-	(envelope-from <netdev+bounces-270240-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:49:08 +0100
+	id zotKGIXovmmDjAMAu9opvQ
+	(envelope-from <netdev+bounces-270241-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:50:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3C8A2E6D91
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:49:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC8742E6DA2
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:50:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CFEA9301AA5F
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 18:48:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2AECC300B05A
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 18:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76ADE2DF128;
-	Sat, 21 Mar 2026 18:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DAA2FA0C7;
+	Sat, 21 Mar 2026 18:50:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="FYn7oRDE";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="ay72O8SH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gwOAGa6f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB4A23B62C;
-	Sat, 21 Mar 2026 18:48:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774118922; cv=none; b=ahypEsJIHzVPRazRS25Yb0CHLCz0TJHLfdGaIot8ahuXyJ3x5/4KZxITT+Oh8ju3lFGZDcWxCXa3BHQDx6mcOR13VyNIf4KPio3VDiU3ozG2uFrLg1mBsit5GzCoFCBJurvroLyg+9XQslAu5czlxynxkyp2UhUus5CiioN+8q8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774118922; c=relaxed/simple;
-	bh=0KqYfsYZSrdbkM8KdcIEsgjriIC0RDC3XteXsTKk2Hw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GIfqyyxUyzK2O2gcsGczlTi1vAxI+4BmTrbkFV/553uGBV7EaIbmkxGBSi8oslN2CSFvsnUtBU7UEkrZYUCCGnI7CS3x06h/sVQQSYM05ETmrWtsZCakTfmGZkLcyjgifV+nUus21NnpAGB+XbJsdZNz7MaH53Ty5RWcR7lcUec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=FYn7oRDE; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=ay72O8SH; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4fdT3N6G5vz9tPq;
-	Sat, 21 Mar 2026 19:48:32 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1774118912;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/y1qDyLVTzAAF3kBioTqKGFvG6BxKpsgBu/bq6pJODo=;
-	b=FYn7oRDEBCwrYZkrCRWYpAJI1xuLZ6U7BfoHrfkXLZm3aRlBTw6YLG1TPKmD/C+GmT7t/t
-	kWAAdurt7tMRfM/Q6W7h/LdCrbVso0iyA/L1SbcjUi9HmvZHLHBkB2E30ohvyww0eEyVmR
-	7sFyQPlh793LiiddXEgaFGFBPNW/wU1soTGyWqAUVrZjVQv8SH+vKq3IfDAu73gX2O5wUN
-	MOIpEyc6AYAaH8pbBk1cVEiFXfqyi+JrP9R8RUO/wtuIKWPvWkElBmD7T9huXBqTJLUFjI
-	YEtVmcLOl8VC6PBCP7EKZ5h40wLpw9lqAO+drlNPBdrsn5SlID0bb4SYg3tR4g==
-From: Marek Vasut <marek.vasut@mailbox.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1774118911;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/y1qDyLVTzAAF3kBioTqKGFvG6BxKpsgBu/bq6pJODo=;
-	b=ay72O8SHxz2ggpealUy2CYNSWSPOvCWAJ8T9BLdkQnEKStakI0x4QOD3AISK5RH9DpeocC
-	BhP0e0jvrgKvZ9zP4hgBBq2yI1X8Kym/LkIAigWGyrq+Q0NiEcxhH5RuoNPyxj8j8+mrwX
-	sRCZxHOjBzKtve0V64shok34zrwrnd4CGnq5pWME3WEeEJK+4CRI+VGUKwF5ICFUCBO+kC
-	YeGxRM1bDBLNixuFLLYGYYOO7+76ffzXLLBV5wzH6kKRF910P4xag5mn+uVovw/g7ez2DG
-	2PusE3ln+SU7u4urFuVdF3/fpjcv7bnoB3SiFFozIxFoIvleQf76Yt6mrivy2Q==
-To: netdev@vger.kernel.org
-Cc: Marek Vasut <marek.vasut@mailbox.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Ivan Galkin <ivan.galkin@axis.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Michael Klein <michael@fossekall.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	devicetree@vger.kernel.org
-Subject: [net-next,PATCH v4 3/3] net: phy: realtek: Add property to enable SSC
-Date: Sat, 21 Mar 2026 19:47:43 +0100
-Message-ID: <20260321184815.148485-3-marek.vasut@mailbox.org>
-In-Reply-To: <20260321184815.148485-1-marek.vasut@mailbox.org>
-References: <20260321184815.148485-1-marek.vasut@mailbox.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778762DCF46
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 18:50:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774119041; cv=pass; b=eJHi0dRLjwkFYhsH4Gaf0u4WTIe3HutbbA/4GVU79wdLgCYpZg4F1nI0YFNOh7/d+o76lIHIOFnoRo+TK350pN/9aWi0rrBfId/1qvXQelQSwS4eqvODRlBXy4qVf2oWeTX5tbR+qQcBIx2+KM7U9OItHr9HDSF9Za6ankprG+A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774119041; c=relaxed/simple;
+	bh=+0No1nOe3K8acpsovC+eRn2fpHxV0wIVdlMJvNTeFzk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mcrzaR3/QqIKX/JJ6yRkEJwdhYhimyvpviImnlC9jt/u9tvH5QJq7GGoFGVi/KR2V4GClajCJN53iKCvHBewkVMTb0qhj86g1cnGUERgvPV5AzvNAtI8DHTTRtTPzK87jU36kwuqlZn/V4qDZpF6tfg+cqJQ6H8eTup7ncqLu48=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gwOAGa6f; arc=pass smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-64ae222d978so3183524d50.1
+        for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 11:50:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774119039; cv=none;
+        d=google.com; s=arc-20240605;
+        b=UzeUP2iTuWoTqwwLc3vUEGWgDdlSPDbWvNL9Cnlm2njWZe+bAQPioz9//WgEoTiTkE
+         NerEObdJPkMFNSScIAs5VS2fHuXeb/yHWemqJ9v4e4aQUfbAiUBUyAYDqoBgxy/UGaOB
+         COMZLc7OQ00NIJfg+1QXrm06jvyUcDnSF51V3h5j0BfU6FENYNf+z4LUsMzADXMwY0Hl
+         lcLhwn6+SW9m22XWBsRT8+M1EXV2hHIF6pcNwMKyXBIMBzpklyGwDLDJ+wOzlRhGsyoX
+         tZhynaS3B9xuiPvPhUFyV5SZmtBRV07jrkdc+NsqpOXjpn+nVyQs7Gg5AutFq4bCG7ji
+         Wq9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=9kUzADYXy/NGXQSWeaYXgTqQSK+6xS5PfeQEuXgpkVs=;
+        fh=Xc+i9978KFyI8pb9aA8ka7z6AF2drxGCAZW5UmHsnTc=;
+        b=Uk7V88QcF0dkflgcJAIwJaEbGNoCOJYuW5Dvv7S+7EQN+u7lWd8OF5ye/zKYPE7PlP
+         MnkbfJZVeZfquB/le5TkzFkVCAiSRvh2cV0ytpkiFZ8KddEQhrgx/ugIIR+m5NhutV8v
+         83SeCLRwt/Q2g+kkw3NhNf+1gPTh5ksDC51QUY3LaFPn+kIOp7oYZSz1CcZJKlFvjswZ
+         qC4fLCAm6JStIMVXS12r6kP67+QK4fWsu5kSJw2vVo4zO9/8s93hOH4yemWCLUtTN1rz
+         4uqyrulysU/RRf3Vur1NZO9vlTsHvkWa1ug2ksrvc7iK4DxxO1+3zdaC5vGZFt6fo1Zl
+         m37A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774119039; x=1774723839; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9kUzADYXy/NGXQSWeaYXgTqQSK+6xS5PfeQEuXgpkVs=;
+        b=gwOAGa6frfrfo1I1NCI2qE5kPq1Tlv+5/gAp6XUSPW315zVK6bWYjg7y6IM2aLQMgW
+         gtOEggGT/G7sZXCQaNb93t1SFxZGsqGMS2b0SDyfvhvxAtJs4kKPnO6BeFBYxUJuU+3n
+         l5iLkayGUDJrNFPLTIWxA2FIdqgkdC+a6bXyN33QhzwM/sp3xiEg8ASO5rpZqQx6mnIt
+         vhRRnyEpM5OWPES80pg9GqrAt1OzqTAhZ9vu3+0oksOj/0KczXl+S6YAw6aI3PIVwK9C
+         GL1OfhunjkP2ODJnZOBxf23o9BCRLvJagtMjj7QfFL6kardj84Fdck0hXp2ARP3+eHba
+         ahIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774119039; x=1774723839;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9kUzADYXy/NGXQSWeaYXgTqQSK+6xS5PfeQEuXgpkVs=;
+        b=HGGWQxSLIw4aILhYQoLon3W8QGodiyiIyhhq3NgE5/f4/W2TW8f+vEyymEtMRFV9kK
+         Wp5oZHt40dSf/y1mvdJGkIKmwHzPObIAmrSXIkeQLWNJ6030JAdSKJ0v8IpCveH017Uu
+         DOBsnRsr7MjrCYXSHBlUfgYOGstXuX8h3/6qNhsGzBONNldvk8GJdWv9MBWG7LzIjEmM
+         V/1yGyaE0OQzWu7cZ4OkVBTB8F8WTgx+4N0Lz/bkI9j3T3biUPKCcXfcr4/ufvyLvnnK
+         rTS0Cbp/fARofEJEQ+zH4jPcJOX8M0flrZ4b1VU/h+OoXVYdltEKCoDRCOe6CjNoiKir
+         4lVg==
+X-Forwarded-Encrypted: i=1; AJvYcCXS2qw79tdEn85VqaF8terD1dbPE4M8K+AuitzFlfawe+KWSuWvLSnGmgNrNTx/kVeaeDQQVz0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjigqAAwAcPTOsO81zGOeZrbT1nZBTFv5+rh81ZcfqrghMjhlS
+	XYY0T+2oSQoiQsmKsCfsSabJF9Crmz/KXK3/+yAnbChmv25JKQ69MJgEB+/UJR4SYPhJ4e6C76z
+	/LsnR1f0mCII4yjpbFZ3AhSWxgRerqg8=
+X-Gm-Gg: ATEYQzxBJA5IAXtPDbdtbSaNCIKclQgfEF8y/fuQtaANSNWwv0CDdJ+GZd3pqzNwKHb
+	v7b3VKhbrwjf3EKRTocadiHbkEk27Mq1XB8IGAWXn+ZyEmGjxumr6aZyQLm0CZRyCoNLssnVV1H
+	28IqCVqeReiwZA/XPeAlzKILZ+SnRdZ47r17KTmQzb5FXRbGZnPjIEEfFDM/GOZgqQEmsGVfrZd
+	TEPVdmDY+3yeQRLE4WhvRMrzpMtV+LGY7GYOXZ8EllQb39fKEDeQHD0uRpqFDiUMpuM4pP4axGC
+	MmP5i4lGi6gUNGOaKrWFrR0ZVQZlC3B7/bBJlQgmsEBqsL+S+fJ4EHq7l5n2L9dyKg6k+A==
+X-Received: by 2002:a05:690e:3cf:b0:64a:f138:3172 with SMTP id
+ 956f58d0204a3-64eaa7f1428mr5525702d50.59.1774119039521; Sat, 21 Mar 2026
+ 11:50:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-MBO-RS-ID: 5ef24e033605f00af06
-X-MBO-RS-META: zu9h4i8taxc54bc9i8ptdxeer5m79fjq
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+References: <20260319190455.135302-1-luiz.dentz@gmail.com> <177396481128.1855248.1024090053580545012.git-patchwork-notify@kernel.org>
+ <6411a735-d187-4848-b199-a0e2c2e0e52c@leemhuis.info> <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
+ <CAHk-=wh8dnp1qT_CHG-Zz9H2=G1Q=0rF5SYv+YsEaPnVhznxWA@mail.gmail.com> <CAHk-=wgryF_COh9xzhGaJ-FAm471pn5uvqt-Z94+3ENPVu4w-Q@mail.gmail.com>
+In-Reply-To: <CAHk-=wgryF_COh9xzhGaJ-FAm471pn5uvqt-Z94+3ENPVu4w-Q@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sat, 21 Mar 2026 14:50:28 -0400
+X-Gm-Features: AaiRm51cGXYHCRKZ4R7legIePMrTOfuHm9IjRv6oMxOWqE8F-4Vc5HcbG73sqko
+Message-ID: <CABBYNZ+YC43qvRQb7-KXv-EJ=s1Bhdf-Xu1xeEZVuzq96R7NTA@mail.gmail.com>
+Subject: Re: bluetooth regression fix likely to miss -rc5 (was: Re: [GIT PULL]
+ bluetooth 2026-03-19)
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Thorsten Leemhuis <regressions@leemhuis.info>, kuba@kernel.org, 
+	linux-bluetooth@vger.kernel.org, davem@davemloft.net, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[mailbox.org,davemloft.net,wp.pl,lunn.ch,kernel.org,google.com,gmail.com,axis.com,fossekall.de,redhat.com,armlinux.org.uk,nxp.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-270240-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marek.vasut@mailbox.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	TAGGED_FROM(0.00)[bounces-270241-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E3C8A2E6D91
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux-foundation.org:email,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: AC8742E6DA2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add support for spread spectrum clocking (SSC) on RTL8211F(D)(I)-CG,
-RTL8211FS(I)(-VS)-CG, RTL8211FG(I)(-VS)-CG PHYs. The implementation
-follows EMI improvement application note Rev. 1.2 for these PHYs.
+Hi Linus,
 
-The current implementation enables SSC for both RXC and SYSCLK clock
-signals. Introduce DT properties 'realtek,clkout-ssc-enable',
-'realtek,rxc-ssc-enable' and 'realtek,sysclk-ssc-enable' which control
-CLKOUT, RXC and SYSCLK SSC spread spectrum clocking enablement on these
-signals.
+On Fri, Mar 20, 2026 at 5:19=E2=80=AFPM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> On Fri, 20 Mar 2026 at 14:03, Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+> >
+> > That hardware may admittedly often not be great, and we may all wish
+> > that it didn't exist, but hey, that's the thing about reality: it's
+> > often messy.
+>
+> Of course, the thing about "reality is often messy" is that then you
+> end up with the truly conflicting situations where there are other
+> complications: security issues can sometimes mean that you *really*
+> can't just revert a regression fix, because while paper standards and
+> artificial tests are relatively worthless (compared to a user
+> regression report), a severe security problem obviously isn't...
+>
+> Also, if the regression reports then come in late, people may have
+> started relying on the new behavior, and reverting things then causes
+> its own set of regressions.
+>
+> But when you get a regression report quickly during the early -rc
+> period, that tends to mean that it's either a really bad fix, or it's
+> just a very common piece of bad hardware (or a shared bug across many
+> different hw implementations - which obviously is often then due to
+> some common chip or firmware implementation or whatever)
 
-Signed-off-by: Marek Vasut <marek.vasut@mailbox.org>
----
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: Andrew Lunn <andrew@lunn.ch>
-Cc: Conor Dooley <conor+dt@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Ivan Galkin <ivan.galkin@axis.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
-Cc: Michael Klein <michael@fossekall.de>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Rob Herring <robh@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: devicetree@vger.kernel.org
-Cc: netdev@vger.kernel.org
----
-V2: Split SSC clock control for each CLKOUT, RXC, SYSCLK signal
-V3: Update RTL8211FVD PHYCR2 comment to state this PHY has PHYCR2 register,
-    but SSC configuration is not supported due to different layout.
-V4: - Perform all SSC configuration before disabling CLKOUT
-    - Perform all SSC configuration in the same order as in the SSC appnote
-    - Rebase on current next, retest using spectrum analyzer again
----
- drivers/net/phy/realtek/realtek_main.c | 131 +++++++++++++++++++++++++
- 1 file changed, 131 insertions(+)
+While I agree specs sometimes tend to be worthless they sort of guide
+future implementations, so in the end it is not always black or white.
+Anyway, since this escalated rather quickly I think next time I'll
+just revert and work out the situation on bluetooth-next, rather than
+trying to access with the reporter and risk  delaying a fix.
 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 530b4e26d16ef..1dc64bf2ec73d 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -75,10 +75,18 @@
- 
- #define RTL8211F_PHYCR2				0x19
- #define RTL8211F_CLKOUT_EN			BIT(0)
-+#define RTL8211F_SYSCLK_SSC_EN			BIT(3)
- #define RTL8211F_PHYCR2_PHY_EEE_ENABLE		BIT(5)
-+#define RTL8211F_CLKOUT_SSC_EN			BIT(7)
- 
- #define RTL8211F_INSR				0x1d
- 
-+/* RTL8211F SSC settings */
-+#define RTL8211F_SSC_PAGE			0xc44
-+#define RTL8211F_SSC_RXC			0x13
-+#define RTL8211F_SSC_SYSCLK			0x17
-+#define RTL8211F_SSC_CLKOUT			0x19
-+
- /* RTL8211F LED configuration */
- #define RTL8211F_LEDCR_PAGE			0xd04
- #define RTL8211F_LEDCR				0x10
-@@ -212,6 +220,9 @@ MODULE_LICENSE("GPL");
- struct rtl821x_priv {
- 	bool enable_aldps;
- 	bool disable_clk_out;
-+	bool enable_clkout_ssc;
-+	bool enable_rxc_ssc;
-+	bool enable_sysclk_ssc;
- 	struct clk *clk;
- 	/* rtl8211f */
- 	u16 iner;
-@@ -275,6 +286,12 @@ static int rtl821x_probe(struct phy_device *phydev)
- 						   "realtek,aldps-enable");
- 	priv->disable_clk_out = of_property_read_bool(dev->of_node,
- 						      "realtek,clkout-disable");
-+	priv->enable_clkout_ssc = of_property_read_bool(dev->of_node,
-+							"realtek,clkout-ssc-enable");
-+	priv->enable_rxc_ssc = of_property_read_bool(dev->of_node,
-+						     "realtek,rxc-ssc-enable");
-+	priv->enable_sysclk_ssc = of_property_read_bool(dev->of_node,
-+							"realtek,sysclk-ssc-enable");
- 
- 	phydev->priv = priv;
- 
-@@ -704,6 +721,108 @@ static int rtl8211f_config_phy_eee(struct phy_device *phydev)
- 			  RTL8211F_PHYCR2_PHY_EEE_ENABLE, 0);
- }
- 
-+static int rtl8211f_config_clkout_ssc(struct phy_device *phydev)
-+{
-+	struct rtl821x_priv *priv = phydev->priv;
-+	struct device *dev = &phydev->mdio.dev;
-+	int ret;
-+
-+	/* The value is preserved if the device tree property is absent */
-+	if (!priv->enable_clkout_ssc)
-+		return 0;
-+
-+	/* RTL8211FVD has PHYCR2 register, but configuration of CLKOUT SSC
-+	 * is not currently supported by this driver due to different bit
-+	 * layout.
-+	 */
-+	if (phydev->drv->phy_id == RTL_8211FVD_PHYID)
-+		return 0;
-+
-+	/* Unnamed registers from EMI improvement parameters application note 1.2 */
-+	ret = phy_write_paged(phydev, 0xd09, 0x10, 0xcf00);
-+	if (ret < 0) {
-+		dev_err(dev, "CLKOUT SCC initialization failed: %pe\n", ERR_PTR(ret));
-+		return ret;
-+	}
-+
-+	ret = phy_write(phydev, RTL8211F_SSC_CLKOUT, 0x38c3);
-+	if (ret < 0) {
-+		dev_err(dev, "CLKOUT SCC configuration failed: %pe\n", ERR_PTR(ret));
-+		return ret;
-+	}
-+
-+	/*
-+	 * Enable CLKOUT SSC using PHYCR2 bit 7 , this step is missing from the
-+	 * EMI improvement parameters application note 1.2 section 2.3
-+	 */
-+	ret = phy_set_bits(phydev, RTL8211F_PHYCR2, RTL8211F_CLKOUT_SSC_EN);
-+	if (ret < 0) {
-+		dev_err(dev, "CLKOUT SCC enable failed: %pe\n", ERR_PTR(ret));
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int rtl8211f_config_rxc_ssc(struct phy_device *phydev)
-+{
-+	struct rtl821x_priv *priv = phydev->priv;
-+	struct device *dev = &phydev->mdio.dev;
-+	int ret;
-+
-+	/* The value is preserved if the device tree property is absent */
-+	if (!priv->enable_rxc_ssc)
-+		return 0;
-+
-+	/* RTL8211FVD has PHYCR2 register, but configuration of RXC SSC
-+	 * is not currently supported by this driver due to different bit
-+	 * layout.
-+	 */
-+	if (phydev->drv->phy_id == RTL_8211FVD_PHYID)
-+		return 0;
-+
-+	ret = phy_write_paged(phydev, RTL8211F_SSC_PAGE, RTL8211F_SSC_RXC, 0x5f00);
-+	if (ret < 0) {
-+		dev_err(dev, "RXC SCC configuration failed: %pe\n", ERR_PTR(ret));
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int rtl8211f_config_sysclk_ssc(struct phy_device *phydev)
-+{
-+	struct rtl821x_priv *priv = phydev->priv;
-+	struct device *dev = &phydev->mdio.dev;
-+	int ret;
-+
-+	/* The value is preserved if the device tree property is absent */
-+	if (!priv->enable_sysclk_ssc)
-+		return 0;
-+
-+	/* RTL8211FVD has PHYCR2 register, but configuration of SYSCLK SSC
-+	 * is not currently supported by this driver due to different bit
-+	 * layout.
-+	 */
-+	if (phydev->drv->phy_id == RTL_8211FVD_PHYID)
-+		return 0;
-+
-+	ret = phy_write_paged(phydev, RTL8211F_SSC_PAGE, RTL8211F_SSC_SYSCLK, 0x4f00);
-+	if (ret < 0) {
-+		dev_err(dev, "SYSCLK SCC configuration failed: %pe\n", ERR_PTR(ret));
-+		return ret;
-+	}
-+
-+	/* Enable SSC */
-+	ret = phy_set_bits(phydev, RTL8211F_PHYCR2, RTL8211F_SYSCLK_SSC_EN);
-+	if (ret < 0) {
-+		dev_err(dev, "SYSCLK SCC enable failed: %pe\n", ERR_PTR(ret));
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
- static int rtl8211f_config_init(struct phy_device *phydev)
- {
- 	struct device *dev = &phydev->mdio.dev;
-@@ -720,6 +839,18 @@ static int rtl8211f_config_init(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
-+	ret = rtl8211f_config_rxc_ssc(phydev);
-+	if (ret)
-+		return ret;
-+
-+	ret = rtl8211f_config_sysclk_ssc(phydev);
-+	if (ret)
-+		return ret;
-+
-+	ret = rtl8211f_config_clkout_ssc(phydev);
-+	if (ret)
-+		return ret;
-+
- 	ret = rtl8211f_config_clk_out(phydev);
- 	if (ret) {
- 		dev_err(dev, "clkout configuration failed: %pe\n",
--- 
-2.53.0
 
+--=20
+Luiz Augusto von Dentz
 
