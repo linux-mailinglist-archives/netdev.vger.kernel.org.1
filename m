@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-270229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270230-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +IWGN/S9vml4ZgMAu9opvQ
-	(envelope-from <netdev+bounces-270229-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:49:08 +0100
+	id CMO0DPW+vmmFZwMAu9opvQ
+	(envelope-from <netdev+bounces-270230-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:53:25 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60D3E2E6357
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:49:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A4A0B2E639C
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:53:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 40665301ABB1
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 15:48:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 770A330173B2
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 15:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE12393DD1;
-	Sat, 21 Mar 2026 15:48:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wzSjnSKE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCC63394469;
+	Sat, 21 Mar 2026 15:53:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92EE38F22E;
-	Sat, 21 Mar 2026 15:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A663932DB;
+	Sat, 21 Mar 2026 15:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774108120; cv=none; b=jPHQy76BDOfubK73hw6Wb2gOh2ZPaObcXRqhoAtemqV38nQ9QuWvHUjFzqLEZypTmIvtuP536uIa/8eS0j16dSaloJglBNbmorO+jh+axBHtyeFeRQqKdGPEifVQHvhRUWSDduR8t7kHAVMjwFUncx3z31V99uAh/LaXM88h7Oo=
+	t=1774108401; cv=none; b=HaKRNBmJsbr3zWjykE9NzvDEl/oyagOjJTOT3SP7sYD6Dbb118fIDaHrdZednkfU8CRG+62pePyyLcJN3OtrsdLX+1c3lYMb+xQMVCs6sk6yEnlvg08zesQ4I79n8wnZyiQAIVUkvup5FPF4bLXE1iU6KQLkEWAud3ajX7OHibM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774108120; c=relaxed/simple;
-	bh=PKcD8DnD3VLuM+Hnef06Ut+iyHkqIlgOD7TXtpVjTXI=;
+	s=arc-20240116; t=1774108401; c=relaxed/simple;
+	bh=4zGS4/JUtw122vjazkGgwRk2/SX5TUDZtxucIEAE0Cw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fauzIC8PwlAvpJOw76vJiju2SY0d79DvIs6HV6Gk+tYdEwpIqEof9pmBtak1ITDE/02W8faRbHEDZ4g5ghs4dOrVvUuRoiKuEA617Tl1X3mrpB0LAZws1cnaJOmJwCCnXRqJeIrCopnaxeXsWkW92ZCrjOfHxBX71n0t4HnzVu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wzSjnSKE; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3Fy9gUHzgMAPEEFZcrvLxRVy4kJkdP/QasYLigMTp9E=; b=wzSjnSKES2i78CHWgQKAo8KXVE
-	LcSCYCMxzge3wiJaRr7jExiPJRTJWjYSrVByWrdbDftLI3A2JwF/8TwwfVt5cnzZPkW8sFOpN7bbO
-	fXTLpcuFNg5UFpBKTF5QHPBRXi4uaiNJKJthkrQImnDtCRc+tuGxNb6uU5UdCW28iAoM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w3yYu-00Cj6o-C6; Sat, 21 Mar 2026 16:48:28 +0100
-Date: Sat, 21 Mar 2026 16:48:28 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: linux-phy@lists.infradead.org, netdev@vger.kernel.org,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Josua Mayer <josua@solid-run.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH phy-next 1/3] phy: lynx-28g: use timeouts when waiting
- for lane halt and reset
-Message-ID: <3d9b524b-bb61-4e64-a655-3fa70d8b64ef@lunn.ch>
-References: <20260321011451.1557091-1-vladimir.oltean@nxp.com>
- <20260321011451.1557091-2-vladimir.oltean@nxp.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tcH0s2dpXDgZPMMQDrLoB+zlZsnbQbL1lLexTMsDRC36qqQ3f6to3JyNC5d1aFPJDuNpvo98eRZq1JB2zdzsb0rhA7WljBB32HSIwDxuswzqtSji+PFVko+xds3w55gjxfOaxmQc3c8hdzCP2lorLbnBxEWNrN8g+YlAGISIj+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1w3ydU-0000000007O-2sLt;
+	Sat, 21 Mar 2026 15:53:12 +0000
+Date: Sat, 21 Mar 2026 15:53:09 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next 1/2] net: dsa: mxl862xx: add CRC for MDIO
+ communication
+Message-ID: <ab6-5XnC6Z3TdytJ@makrotopia.org>
+References: <cover.1774070039.git.daniel@makrotopia.org>
+ <af6911188ee6becb9100d4bf13d0820e5bf9eaca.1774070039.git.daniel@makrotopia.org>
+ <c5f29b9b-9447-488e-b8cc-e2f7e7cbf1a8@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,72 +67,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260321011451.1557091-2-vladimir.oltean@nxp.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <c5f29b9b-9447-488e-b8cc-e2f7e7cbf1a8@lunn.ch>
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270229-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	TAGGED_FROM(0.00)[bounces-270230-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
 	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:email,lunn.ch:mid,solid-run.com:email]
-X-Rspamd-Queue-Id: 60D3E2E6357
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:mid]
+X-Rspamd-Queue-Id: A4A0B2E639C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 21, 2026 at 03:14:49AM +0200, Vladimir Oltean wrote:
-> There are various circumstances in which a lane halt, or a lane reset,
-> will fail to complete. If this happens, it will hang the kernel, which
-> only implements a busy loop with no timeout.
+On Sat, Mar 21, 2026 at 04:24:06PM +0100, Andrew Lunn wrote:
+> > +/* Firmware CRC error codes (outside normal Zephyr errno range). */
+> > +#define MXL862XX_FW_CRC6_ERR		(-1024)
+> > +#define MXL862XX_FW_CRC16_ERR		(-1023)
+> > +
+> > +/* 3GPP CRC-6 lookup table (polynomial 0x6F).
+> > + * Matches the firmware's default CRC-6 implementation.
+> > + */
+> > +static const u8 mxl862xx_crc6_table[256] = {
+> > +	0x00, 0x2f, 0x31, 0x1e, 0x0d, 0x22, 0x3c, 0x13,
+> > +	0x1a, 0x35, 0x2b, 0x04, 0x17, 0x38, 0x26, 0x09,
 > 
-> The circumstances in which this will happen are all bugs in nature:
-> - if we try to power off a powered off lane
-> - if we try to power off a lane that uses a PLL locked onto the wrong
->   refclk frequency (wrong RCW, but SoC boots anyway)
+> I had a quick look around and count not find this table anywhere
+> else. Mellanox has a different CRC-6 polynomial. Until somebody else
+> needs this, i think it is O.K. here. But sometime in the future it
+> might be moved into lib/crc.
 > 
-> Actually, unbounded loops in the kernel are a bad practice, so let's use
-> read_poll_timeout() with a custom function that reads both LNaTRSTCTL
-> (lane transmit control register) and LNaRRSTCTL (lane receive control
-> register) and returns true when the request is done in both directions.
+> > +	ret = mxl862xx_crc6_verify(ctrl_enc, len_enc, &fw_result);
+> > +	if (ret < 0) {
+> > +		dev_err(&priv->mdiodev->dev,
+> > +			"CRC-6 error on response to CMD %04x\n", cmd);
+> > +		return -EIO;
+> > +	}
 > 
-> The HLT_REQ bit has to clear, whereas the RST_DONE bit has to get set.
+> This is the question, what to do when you see a checksum failure? The
+> basic assumption is MDIO is reliable. PHYs don't do any sort of
+> checksums, nor any other switches using MDIO. Why would you want
+> checksums?
 > 
-> Any time such an error happens, it is catastrophic and there is no point
-> in trying to propagate it to our callers:
-> - if lynx_28g_set_mode() -> lynx_28g_power_on() times out, we have
->   already reconfigured the lane, but returning an error would tell the
->   caller that we didn't
-> - if lynx_28g_power_off() times out, again not much for the consumer to
->   do to help get out of this situation - the phy_power_off() call is
->   probably made from a context that the consumer can't cancel, or it is
->   making it to return to a known state from a previous failure.
+> To detect the hardware is broken? If so, is returning EIO sufficient?
+> Would it not be better to admin down all the interfaces?
 > 
-> So just print an error if timeouts happen and let the driver control
-> flow continue. The entire point is just to not let the kernel freeze.
+> To allow the MDIO clock to run at a higher frequency, at the limit of
+> the bus, so you get occasionally failures? If so, should you not
+> retry? But are the commands idempotent? Can you safely retry?
 > 
-> Suggested-by: Josua Mayer <josua@solid-run.com>
-> Link: https://lore.kernel.org/lkml/d0c8bbf8-a0c5-469f-a148-de2235948c0f@solid-run.com/
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Your guesses are all correct, and your concerns are justified.
 
-    Andrew
+Let me explain the whole picture:
+The switch driver transfers many rather large data structures over
+MDIO, and lacking support for interrupts (firmware doesn't support),
+this is often even interleaved with polling 8 PHYs and at least one
+PCS. To not have things get very slow (and then even sometimes see
+-ETIMEDOUT breaking the PHY state machine if timing is unlucky), it
+is common to overclock the MDIO bus to 20 MHz instead of the 2.5 MHz
+default (the switch claims to support up to 25 MHz, but 20 Mhz is
+sufficient and conservative enough).
+
+That, combined with higher temperature of the switch IC (but still
+within the spec'ed range), can lead to bit-errors -- which, in case
+they remain unnoticed can introduce subtle (security relevant) issues
+such as bridging ports which should not be bridged or flooding to a
+port on which flooding should be disabled.
+
+At this point I just wanted to make errors visible at all.
+
+In case of the switch reporting back a CRC error for data received,
+a limited number of retries would be ok in every case.
+However, the same is not true for the opposite direction, ie. an
+error detected by the Linux host for data received from the switch:
+In case one of the *_ALLOC API calls we cannot simply repeat the
+call, and as the data was corrupted, we wouldn't even know how to
+undo the failed call. Resetting the switch and replaying the
+complete state would be the only way to avoid a firmware resource
+leak in this case.
+
+Setting all interfaces to admin-down is probably the best compromise
+in a case like this, as it would also reduce the energy consumption
+and hence heat emission of the IC (as all built-in PHYs are then down;
+that's where most of the heat comes from) and prevent damage -- I've
+only observed CRC errors with the heatsink removed and artifically
+overheating the IC...
 
