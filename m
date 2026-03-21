@@ -1,176 +1,185 @@
-Return-Path: <netdev+bounces-270244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270246-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4P04JdbxvmlxlAMAu9opvQ
-	(envelope-from <netdev+bounces-270244-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 20:30:30 +0100
+	id WFx1Aw/1vmk0mAMAu9opvQ
+	(envelope-from <netdev+bounces-270246-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 20:44:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF2D02E6FC9
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 20:30:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DFAA2E70C3
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 20:44:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EF39C300C59D
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:29:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4EB373009F39
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB8331E826;
-	Sat, 21 Mar 2026 19:29:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16643342CA9;
+	Sat, 21 Mar 2026 19:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="a4uITRpy"
+	dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b="GKUGiyLa";
+	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="WGZXpLYR"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887C4313283;
-	Sat, 21 Mar 2026 19:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6048E3314C2
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 19:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.202.193.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774121377; cv=none; b=PwNqyoXS9i7UCZoBM5s804t1QaobiKEfuSkhcvKUL8ZGQcWylgRML/muU+5K7utAcfBXNk/ilLQdRGoxpjX+BJCANvIWFvIVUNv23dg+FIhJc+oulncevi00MI+A0lJQ+e26WU4olOBcNimkDcMDsjTMSFVRLoxKST5ns14r0ag=
+	t=1774122251; cv=none; b=OHlkGzJaQZ9vfQ/Ix1Ix8Ibq+p8u9A3yMPCJF//TGDUNYUiGoW6LVZZLUchp+zVwwX/bCEpqz19g3vL5IABcGSb0QhNPfqOth+RAd+6pYeQ8hhp5fznTMAj4ZaNGoa/Zn4SjRWKAzZ/KlnEg7mModZBztx6TTGtQJnjsq8p24WY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774121377; c=relaxed/simple;
-	bh=YLxMFG/uAi8d2pEsX0+IRHpIk2S7mC4GreH4DXFFWHM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EIZ2QsqL2pe5UWHQNzaIzWd9nC0S3VCEWXzjz1u9SSpN2XYKfiOv6SpEo7KV4vHFqfBlYKiYhPpv4vETgQ0nxIzV25fETVrmWt2QqrwkiOVmRxgWYLHpwJ1/dY4TECpFEfnp4kHZNsvsqvdgFtwMSAGzEAr1IqHz3tm7pt2FtfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=a4uITRpy; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lSId2R4n5h5Caa3HQVy1kp5ItdOtiP98FOe14fx9xe0=; b=a4uITRpygSPp6wm/im4nXDeUqd
-	Luj+KRHqcrffrMPpvzE3FyD5daP06CupTPUNV/sVUPluTStanSar/zA4oMH4/GJ905Ftee7rn5bxP
-	UwN5RLF8Doepz/gov3VAdDdS1FTp1T+duBq1PH1J5TqK5TT+ZjC8R+8BX2cq+5NKOp4A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w420e-00CkBU-Bh; Sat, 21 Mar 2026 20:29:20 +0100
-Date: Sat, 21 Mar 2026 20:29:20 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Liang Xu <lxu@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next 1/2] net: dsa: mxl862xx: add CRC for MDIO
- communication
-Message-ID: <fa518f5d-8b68-459e-9d69-b8702a0b6b57@lunn.ch>
-References: <cover.1774070039.git.daniel@makrotopia.org>
- <af6911188ee6becb9100d4bf13d0820e5bf9eaca.1774070039.git.daniel@makrotopia.org>
- <c5f29b9b-9447-488e-b8cc-e2f7e7cbf1a8@lunn.ch>
- <ab6-5XnC6Z3TdytJ@makrotopia.org>
+	s=arc-20240116; t=1774122251; c=relaxed/simple;
+	bh=RhlUd5nJZtyzPTrb6142vd7/kHj3AnKxbcivtAnbRiU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RMxOnuBANmLlFRSGs/EirxN5hBuHKbiMcF1bgTEIAV4g4g7OATyWcovKz8SR+cqH116YaFE3ywR/x7Tpob+8yTomwG6h8sllH0ywN17SLoJkLPniDUZeC7KUebwds4qR3Ec/ENQubRHStEXlU1zbd1lcQ0/qj6WYVMx7Zb+a+rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com; spf=pass smtp.mailfrom=tinyisr.com; dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b=GKUGiyLa; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=WGZXpLYR; arc=none smtp.client-ip=34.202.193.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tinyisr.com
+Authentication-Results: purelymail.com; auth=pass
+DKIM-Signature: a=rsa-sha256; b=GKUGiyLaA+adTt3TkBqU6pyUp2FYdTmpg88T+qNgrFdyC2R9JhMfyHh4SPC6gH8/qwNfqZpOA04zfSVgPLrgprNpp++LiL6IXe/Nsa6lxI9HrO88TDCBOXwaHwB4HTeJ4ZDdUeDtFXqwr2f74OENHoCnhM4a9AAWennsKU61noV0FutkcCAB2xYDWEBEOmSE/ZupzfgJv2LblcgMviICFd1+l59E9oefQ8ZGHESipdUf1DHItGZBowhRwmwDj53v2UGlfOSGaOViH+73YNaD7X+w4wZlKuZSx6z7gQj3wLhGofAgk0RCOkEPSvkZjL9NBkz7/Y1d0Itv+G9qNBiWfw==; s=purelymail3; d=tinyisr.com; v=1; bh=RhlUd5nJZtyzPTrb6142vd7/kHj3AnKxbcivtAnbRiU=; h=Received:From:To:Subject:Date;
+DKIM-Signature: a=rsa-sha256; b=WGZXpLYRXdWLBU6iq+/kKo/3qG65qO7DrBgWdpNo9Zos2/V+Oo/uelwi1GKTE9qp+CMSTFkm5j5mDrjmEDrh1/q71nd/7VLi1Kv70/Ycqgqc6JJse/9PXmdte/Nc4RUtknXwaA0FwJX4Kvc/WjWJRlLVFb5YLUZnKHnTzn9O1RvchhD7xVQJz2LMF6QOAStM+NLcSsU5ynkaBKzB3ZV1s6nnWBTJZXuAHbQgPyWgz6Mknlr4gdM7gLH09T/1JVisp2DH0b8RoBuX4beBNyqN/9Lw/aW9lkLgICU2GAMiVunUs//b0sHRpMVubyAiUCBxa7DdpAY1gACzA1Lihy6eUA==; s=purelymail3; d=purelymail.com; v=1; bh=RhlUd5nJZtyzPTrb6142vd7/kHj3AnKxbcivtAnbRiU=; h=Feedback-ID:Received:From:To:Subject:Date;
+Feedback-ID: 99681:12517:null:purelymail
+X-Pm-Original-To: netdev@vger.kernel.org
+Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 958892867;
+          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+          Sat, 21 Mar 2026 19:44:07 +0000 (UTC)
+From: Joris Vaisvila <joey@tinyisr.com>
+To: netdev@vger.kernel.org
+Cc: horms@kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	olteanv@gmail.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	devicetree@vger.kernel.org,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Joris Vaisvila <joey@tinyisr.com>
+Subject: [RFC v3 0/4] net: dsa: MT7628 embedded switch initial support
+Date: Sat, 21 Mar 2026 21:43:36 +0200
+Message-ID: <20260321194340.2140783-1-joey@tinyisr.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ab6-5XnC6Z3TdytJ@makrotopia.org>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by Purelymail
+Content-Type: text/plain; charset=UTF-8
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[tinyisr.com,reject];
+	R_DKIM_ALLOW(-0.20)[tinyisr.com:s=purelymail3,purelymail.com:s=purelymail3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270244-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270246-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,davemloft.net,gmail.com,lunn.ch,vger.kernel.org,tinyisr.com];
+	DKIM_TRACE(0.00)[tinyisr.com:+,purelymail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[joey@tinyisr.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DF2D02E6FC9
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,purelymail.com:dkim,tinyisr.com:dkim,tinyisr.com:mid]
+X-Rspamd-Queue-Id: 6DFAA2E70C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> > This is the question, what to do when you see a checksum failure? The
-> > basic assumption is MDIO is reliable. PHYs don't do any sort of
-> > checksums, nor any other switches using MDIO. Why would you want
-> > checksums?
-> > 
-> > To detect the hardware is broken? If so, is returning EIO sufficient?
-> > Would it not be better to admin down all the interfaces?
-> > 
-> > To allow the MDIO clock to run at a higher frequency, at the limit of
-> > the bus, so you get occasionally failures? If so, should you not
-> > retry? But are the commands idempotent? Can you safely retry?
-> > 
-> 
-> Your guesses are all correct, and your concerns are justified.
-> 
-> Let me explain the whole picture:
-> The switch driver transfers many rather large data structures over
-> MDIO, and lacking support for interrupts (firmware doesn't support),
-> this is often even interleaved with polling 8 PHYs and at least one
-> PCS. To not have things get very slow (and then even sometimes see
-> -ETIMEDOUT breaking the PHY state machine if timing is unlucky), it
-> is common to overclock the MDIO bus to 20 MHz instead of the 2.5 MHz
-> default (the switch claims to support up to 25 MHz, but 20 Mhz is
-> sufficient and conservative enough).
-> 
-> That, combined with higher temperature of the switch IC (but still
-> within the spec'ed range), can lead to bit-errors -- which, in case
-> they remain unnoticed can introduce subtle (security relevant) issues
-> such as bridging ports which should not be bridged or flooding to a
-> port on which flooding should be disabled.
+Hi all,
 
-O.K. "Interesting" design.
+This RFC series adds initial support for the MT7628 Embedded Switch.
 
-You could solve the PHY timeout issue by claiming to support PHY
-interrupts, doing the polling in the DSA driver, and raise an
-interrupt if the conditions are met. The mv88e6xxx driver does
-something like this. It has an interrupt controller which the PHYs are
-connect to. Some designs have the switch interrupt output connected to
-a GPIO and so can do real interrupts. Some don't. Rather than have all
-the internal PHYs polled one per second by phylib, the mv88e6xxx polls
-the interrupt status register every 1/5 of a second and raises the
-interrupts instead. Bot faster, and less MDIO transfers.
+The implementation provides basic functionality required to operate the
+switch using DSA. The hardware exposes 5 internal Fast Ethernet ports
+and a Gigabit port which is internally connected to the CPU MAC.
 
-> In case of the switch reporting back a CRC error for data received,
-> a limited number of retries would be ok in every case.
-> However, the same is not true for the opposite direction, ie. an
-> error detected by the Linux host for data received from the switch:
-> In case one of the *_ALLOC API calls we cannot simply repeat the
-> call, and as the data was corrupted, we wouldn't even know how to
-> undo the failed call.
+This version aims to be functionally complete and attempts to address
+all feedback received on the previous versions.=20
 
-Seems like somebody did not think through the design. I assume the
-vendor driver does not attempt a retry?
+Tested on a MT7628NN based board.
 
-> Setting all interfaces to admin-down is probably the best compromise
-> in a case like this, as it would also reduce the energy consumption
-> and hence heat emission of the IC (as all built-in PHYs are then down;
-> that's where most of the heat comes from) and prevent damage -- I've
-> only observed CRC errors with the heatsink removed and artifically
-> overheating the IC...
+RFC:
 
-So in the normal use cases you don't expect CRC errors. That seems
-like it should driver the design. Consider any CRCs as fatal and
-shutdown.
+I would like to transition this series toward a proper PATCH submission
+as it seems that the feedback on the last RFC did not point out major
+issues. As this is my first driver submission, I would greatly appreciate
+any guidance on what should be addressed before it is appropriate to
+send this in as a PATCH.
 
-	Andrew
+Thank you for your time and review.
+
+---
+
+v3:
+=09- add DTS bindings for mediatek,mt7628-esw
+=09- update tagging driver to use htons instead of manual byte swapping
+=09- remove port 5 from config as it doesn't exist in the hardware
+=09- fix code formatting
+=09- add helper macros for configuring packed VLAN table registers
+=09- fix mac_capabilities for cpu port, replace supported_interfaces
+=09  with PHY_INTERFACE_INTERNAL to accurately reflect the hardware
+=09- update MEDIATEK_GE_SOC_PHY tristate name, fix sorting
+=09- remove unneeded PHY_PACKAGE from MEDIATEK_FE_SOC_PHY Kconfig
+=09- remove untested features from mtk-fe-soc.c phy driver
+
+v2: https://lore.kernel.org/netdev/20260314150845.653866-1-joey@tinyisr.com
+=09- Update commit messages with more relevant information
+=09- Change all references of "special" tag to "MT7628" tag
+=09- Fix coding style errors
+=09- Use dsa_xmit_port_mask instead of BIT(dp->index)
+=09- Replace phy_read/phy_write with an MDIO bus definition
+=09- Remove PHY init from switch driver
+=09- Fix undocumented writes to SGC2 and FCT0
+=09- Fix missing double-tag enable required for VLAN unaware
+=09  functionality
+=09- Fix VLAN remove logic
+=09- Update VLAN add logic to use the first unused slot
+=09- Add a dedicated phy driver for MT7628 FE PHYs
+
+v1: https://lore.kernel.org/netdev/20260228185242.800836-1-joey@tinyisr.com
+
+Joris Vaisvila (4):
+  dt-bindings: net: dsa: add MT7628 ESW
+  net: phy: mediatek: add phy driver for MT7628 built-in Fast Ethernet
+    PHYs
+  net: dsa: initial MT7628 tagging driver
+  net: dsa: initial support for MT7628 embedded switch
+
+ .../bindings/net/dsa/mediatek,mt7628-esw.yaml | 136 ++++
+ drivers/net/dsa/Kconfig                       |   7 +
+ drivers/net/dsa/Makefile                      |   1 +
+ drivers/net/dsa/mt7628.c                      | 634 ++++++++++++++++++
+ drivers/net/phy/mediatek/Kconfig              |  10 +-
+ drivers/net/phy/mediatek/Makefile             |   1 +
+ drivers/net/phy/mediatek/mtk-fe-soc.c         |  50 ++
+ include/net/dsa.h                             |   2 +
+ net/dsa/Kconfig                               |   6 +
+ net/dsa/Makefile                              |   1 +
+ net/dsa/tag_mt7628.c                          |  92 +++
+ 11 files changed, 939 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/mediatek,mt76=
+28-esw.yaml
+ create mode 100644 drivers/net/dsa/mt7628.c
+ create mode 100644 drivers/net/phy/mediatek/mtk-fe-soc.c
+ create mode 100644 net/dsa/tag_mt7628.c
+
+--=20
+2.53.0
+
 
