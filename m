@@ -1,74 +1,71 @@
-Return-Path: <netdev+bounces-270192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270193-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qHGkANhivmnDOAMAu9opvQ
-	(envelope-from <netdev+bounces-270192-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:20:24 +0100
+	id SNomBoZovmmTOwMAu9opvQ
+	(envelope-from <netdev+bounces-270193-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:44:38 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F0BD2E45A2
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:20:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FF9A2E4731
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:44:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 92E923019812
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 09:20:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF039300E715
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 09:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC4153033E8;
-	Sat, 21 Mar 2026 09:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7EC30AD15;
+	Sat, 21 Mar 2026 09:44:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nhFhsbxD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C7MPmnON"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B4227FB25;
-	Sat, 21 Mar 2026 09:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894312E63C
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 09:44:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774084819; cv=none; b=sORGB6SvylM0o+Ot3LVRw3/7to0D6C6PdplVYFgkP2p4gCIdpLn5MAG1UAvpzoa53hQE/KxvZqAs/vq7njlBGwzatJ5VqS/2ry/CnDnwWDUiv2mIblZTAryKnb6gAyrX22tg37Lrvnco3QGZ/Yk0cC23vRXc57AUQfnZ5dAJXvM=
+	t=1774086274; cv=none; b=mgF2IBTRWVqJJqgvoTU5e5LIrk+hNxt/HCcy/jz4T91aLKUntn4SZbLEYs9m0pJQcSIude4M1EMg7lVfPPqmTTliTEA2/+Ils1IpkW0E4Kik7PZw6fi6iYgaipka5svizRr+HXu04WZfGPNf+W5b97zVwl2mfvu+A7qXbcv+3I8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774084819; c=relaxed/simple;
-	bh=1suF2noxHcqWslPQuTsIbduyMZBlyXksW1NsLnOwWC0=;
+	s=arc-20240116; t=1774086274; c=relaxed/simple;
+	bh=+FyqSc/pT33KY//yXjdAJJt7KUdidRtWT5vfO6X7t40=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gux4leNy++bBoGUtkEdsze7QTGDKeLKgDusVbyu/Mq2apqXHJO7uuYOf5h6tRQTLYkKzXphb5SfgOZLFkokK3WKl0FClIOctsPHYwaLCr8v3h9xNzIZskqs4PWOc2WHZ+l3PPv9S/ITIqc3ZB84ns0cfFkcdLg31wMFIwWHcpO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nhFhsbxD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 192DFC19421;
-	Sat, 21 Mar 2026 09:20:16 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=UHieSD7/e64REbspmSjs8WjXYr4eNXLE7j12J5Iy141t2orIbM4TX83KMnd9ZsrXTTGUWBzKqPOA7xF9qXxAUZXQqFW4Q459BGRRJ3f++yBoWgQVDv5PR9OrmfyH+KN7LJvW+Ed3GMBuqjFRL+bbqtlyiRbb1niqJcmIMIcqsIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C7MPmnON; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F7FBC19421;
+	Sat, 21 Mar 2026 09:44:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774084819;
-	bh=1suF2noxHcqWslPQuTsIbduyMZBlyXksW1NsLnOwWC0=;
+	s=k20201202; t=1774086274;
+	bh=+FyqSc/pT33KY//yXjdAJJt7KUdidRtWT5vfO6X7t40=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nhFhsbxDuIXfv4D2vr/e56u7tY0TRl5+JGbKbULY7ynKGXDruf1ZyzTT04qsEmpnX
-	 nUK4r+flSwXNn4yoi+DHFugW+ac/A6dyvStfc3Q5sTVAUCmrPb0moquh2TTfBjGuIU
-	 0t9mRVbIauejWw6DZdwkhn/q/yentVmnKYj+qWe1i9OCZ3jEc412fEedEeK7j99oxC
-	 GrY0iL6wiKOicc+Qg3U3eeOitG8aCV/xroOaCOybcmY3Rbe39ZsAkPyFUc71sbez6y
-	 HXigg6X+A4vRf99ScQQV6lPNh+Mim29rZvatctc8qOuT70F009QTRyz1cvdTIbCakt
-	 Cr63Ho7/wFjdw==
-Date: Sat, 21 Mar 2026 09:20:14 +0000
+	b=C7MPmnONJGYhKLNLCg2y3r/vaAIZxMwCKMd6yxn0EDfWwdr+uWJtaJocW38EfJAOH
+	 qhNTELdffSsnTIgargdhVflFxFw04UupLpGb2xdtkax5SPmj19CQHFoZoUfXE+ZY3k
+	 LpzisNLS8QtRbkv8YJfFo01y/iwpv7fDmtfHLUY05x6j/kHRMOpZeFvvgcGF9UJou+
+	 W+tFhsZsjPrDCEgTeKcnaEw+PRG9WgdOO4hFZK7U/bQljZLoScC2Eo7NdY6PtU781E
+	 +cZMIR4bnOnOfvmo0KwJ9lcnDaxN4SUOVCKrHRvGzfPSnQtwPgKfuwoG/ihBH36iV+
+	 zaF5UMf0A1hMw==
+Date: Sat, 21 Mar 2026 09:44:29 +0000
 From: Simon Horman <horms@kernel.org>
-To: Damien Dejean <dam.dejean@gmail.com>
-Cc: andrew@lunn.ch, krzk+dt@kernel.org, robh@kernel.org, kuba@kernel.org,
-	maxime.chevallier@bootlin.com, pabeni@redhat.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, edumazet@google.com,
-	davem@davemloft.net, hkallweit1@gmail.com
-Subject: Re: [PATCH net-next v9 2/4] net: phy: realtek: add RTL8224 pair
- order support
-Message-ID: <20260321092014.GV74886@horms.kernel.org>
-References: <20260318215502.106528-1-dam.dejean@gmail.com>
- <20260318215502.106528-3-dam.dejean@gmail.com>
- <20260320082156.GX1753385@horms.kernel.org>
- <46FAC4A6-9462-45BC-B17C-B7F5F19F0ADB@gmail.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: Rework the code flow in
+ airoha_remove() and in airoha_probe() error path
+Message-ID: <20260321094429.GW74886@horms.kernel.org>
+References: <20260320-airoha-remove-rework-v1-1-adeef7e3c01f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <46FAC4A6-9462-45BC-B17C-B7F5F19F0ADB@gmail.com>
+In-Reply-To: <20260320-airoha-remove-rework-v1-1-adeef7e3c01f@kernel.org>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -78,53 +75,63 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270192-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,bootlin.com,redhat.com,vger.kernel.org,google.com,davemloft.net,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270193-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 9F0BD2E45A2
+X-Rspamd-Queue-Id: 5FF9A2E4731
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 07:17:56PM +0100, Damien Dejean wrote:
+On Fri, Mar 20, 2026 at 09:42:28AM +0100, Lorenzo Bianconi wrote:
+> As suggested by Simon in [0], rework the code flow in airoha_remove()
+> and in the airoha_probe() error path in order to rely on a more common
+> approach un-registering configured net-devices first and destroying the
+> hw resources at the end of the code.
+> Introduce airoha_qdma_cleanup routine to release QDMA resources.
 > 
-> > Le 20 mars 2026 à 09:21, Simon Horman <horms@kernel.org> a écrit :
-> > 
-> > Checkpatch warns that ENOSYS only means 'invalid syscall nr'.
-> > 
-> > Looking over the implementation of of_property_read_u32() it seems to me
-> > that -EINVAL is sufficient to detect that a property is not present. Which
-> > may be appropriate here.
+> [0] https://lore.kernel.org/netdev/20251214-airoha-fix-dev-registration-v1-1-860e027ad4c6@kernel.org/
 > 
-> I added the check on -ENOSYS because in v8 Jakub commented [1] on the fact
-> that if the kernel is built with CONFIG_OF=n, of_property_read_u32() will
-> return ENOSYS. If ENOSYS is not handled there, then the call will return an
-> error while it shouldn’t.
+> Suggested-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c | 82 ++++++++++++++++++--------------
+>  1 file changed, 47 insertions(+), 35 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
 
-Ahh, I see. I missed that in my analysis.
-Sorry about that.
+...
 
-> 
-> Damien
-> 
-> [1] https://lkml.org/lkml/2026/3/17/2464
+> @@ -3028,7 +3044,7 @@ static int airoha_probe(struct platform_device *pdev)
+>  
+>  	err = airoha_hw_init(pdev, eth);
+>  	if (err)
+> -		goto error_hw_cleanup;
+> +		return err;
+
+Hi Lorenzo,
+
+AI generated review warns that eth->napi_dev is leaked here.
+And that does seem to be the case.
+
+>  
+>  	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
+>  		airoha_qdma_start_napi(&eth->qdma[i]);
 
 ...
 
