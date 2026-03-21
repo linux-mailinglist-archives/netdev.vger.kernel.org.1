@@ -1,356 +1,137 @@
-Return-Path: <netdev+bounces-270228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270229-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UEJqClS9vml4ZgMAu9opvQ
-	(envelope-from <netdev+bounces-270228-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:46:28 +0100
+	id +IWGN/S9vml4ZgMAu9opvQ
+	(envelope-from <netdev+bounces-270229-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:49:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0CE12E62E0
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:46:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60D3E2E6357
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:49:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C74A3300D77F
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 15:46:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 40665301ABB1
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 15:48:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED7239448E;
-	Sat, 21 Mar 2026 15:46:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE12393DD1;
+	Sat, 21 Mar 2026 15:48:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lCiAtjGc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wzSjnSKE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8A140855
-	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 15:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92EE38F22E;
+	Sat, 21 Mar 2026 15:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774107985; cv=none; b=oqENIL6Dg7XCQy4p59rHkLyK1xoZQ7DG3bGIbdBx7/503U+jFqoXMEGKG4O8ww26YxiI0RTGxHCYKbpDgPXrY8Q+DEz3EJXtophkvbyGFOWYVeiolDUVzcFM/w/LVRezX4fAE66ODKYLn79w+h6XOyvogA8MBx/jB2erKEqsSg0=
+	t=1774108120; cv=none; b=jPHQy76BDOfubK73hw6Wb2gOh2ZPaObcXRqhoAtemqV38nQ9QuWvHUjFzqLEZypTmIvtuP536uIa/8eS0j16dSaloJglBNbmorO+jh+axBHtyeFeRQqKdGPEifVQHvhRUWSDduR8t7kHAVMjwFUncx3z31V99uAh/LaXM88h7Oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774107985; c=relaxed/simple;
-	bh=nnxG0eRKYNSthOuI73Ok8N/M8RHRxBwSWGKJ5034GIA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=numgudH061NK0QHMkQw/tb6f5DL94qp1D0JVWVCK7zhicx6mEkwlPH6foeS//7g4pzrrWhPgRvbki6B7GiYVwccsElScKwz6Jp5PPaJ6Fb+9AGvH3wsF6rrtxkj3svnPEuL0HvP/QOizHKx1DdTHjFzAZk+OmpP+4nsGhZ445fI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lCiAtjGc; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-66132b22182so4042868a12.2
-        for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 08:46:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774107981; x=1774712781; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nu3xcczzSYEf5dCv3Y4BzObcBQU5HeHhrYyNdqsbtPY=;
-        b=lCiAtjGc9UbqTNdiQkCNTpmvZkkauayS09yi2Jg3uZirbbJXAFUL+mKDEsi4+RziwN
-         f6pWwLF9uxJeHn18Mz/UuyrM5WyPJnmN/FDpBtVyMuQTe+L03fqRH0IdQXBX8M9vxXfw
-         gk1MNQlDD9tQ8oqTgJcUkNAE3bbePnnskcnxvxYDDiDsmeqXm8nBTG8nrJ+1UEnpsGok
-         fJeyhPcicPyryMUtPGMUuvj6OT/3Rd+TtcVDSuYnPgvywEyt+iKmga/f6RXst/7FUNy/
-         S9ohe0YEQ7FB8z/TOsgnKzr5vMlPR52URl7e0LOdRKqCw3Na25VadKxNHFq6pU+/4Y3y
-         DjaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774107981; x=1774712781;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Nu3xcczzSYEf5dCv3Y4BzObcBQU5HeHhrYyNdqsbtPY=;
-        b=bpDA2LYVbtWRx73qrAdJitoWBXSKZFZOZ2H/xcKfY+silswmmp6HfY7wQF+Gnt8oHh
-         yHCNCCVwkfC5GfxYm2swGLktG+uhpxCOhie0S4aeGJiXRW3qhKKCWqthv/9BFC2LuXU4
-         mGzzOqtrJ1W50j1lIgc7JKZm5yb1o30dvmMg001SXHA4HmSA50dXou+zHAyfNS82d6mG
-         Bu4ibDl8uF11tG8SNV4e8x6FIobu7LLMUUZv2kAmlCUhgs4JfHD4iXPBgPOL5arzM/3i
-         AiLhIngOUjNU2vg3lkav0UvmojbxDKMkshnm9YArgrs6VPTtUE8P/Ut6NFHLjJ68ZX0u
-         KmDA==
-X-Forwarded-Encrypted: i=1; AJvYcCUODo3wrrQN+1Z9ITZwTgn8WF0v+5Wz+dAyWJ4T7W1sX3gJCa6JcfzZJIEaoQsXZ+ld6ackDhg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrP91qos8/1sCBGKVusGmlcnKAbF33B3VJeUN8WWws5uUhqPwp
-	7hp47441LUPPko43KyL/j55fsiwtG5K9j+XXh2MncUjzl9+oqz3/agsY
-X-Gm-Gg: ATEYQzwzbpmLwQP/PFhrPyNd1GzclSgwgSWpFDx4FWKxaWCfdf3nfiMVAwXHCPtjULP
-	6Nt/uEqZDqFBtWofpMPcsOUIHuEdM/USUhm7rP7jO3zTY/FNYZt5yvR+hoNPHn6cFfWGm+J4p9t
-	iRtzYpumhfu3R/rB7Rr9gBZCDTOEXuh4oo5khiAeJhliBFGh0l/Paua2CSMZOBrOOILv3b6g44h
-	nBOFMWBuRFC82iiAQscT2DCdzs5wZkEcHUW/bXo81s/+lze6iW3n34VG1jy0SiMIXNUNPxLm1rH
-	j0YVjB0Z5Ca+sZ3LKenQTOfABXdkVUXLzNTTdP5FjwjJ5c3j4gDjgqclLk1UywaxqUXDGALAQj5
-	RrhbVV76Tqosp5DXqQKnv2xbXtPL9FWrH2SuR5hz3IcTZ1jT4cYy2GPIscahnTxD5Dm8N3YpW
-X-Received: by 2002:a17:906:2746:b0:b97:f9c9:af61 with SMTP id a640c23a62f3a-b982f4e922fmr375345266b.45.1774107980894;
-        Sat, 21 Mar 2026 08:46:20 -0700 (PDT)
-Received: from gmail.com ([2a09:bac1:5500::49b:47])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b983e4e9b65sm175140266b.31.2026.03.21.08.46.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Mar 2026 08:46:20 -0700 (PDT)
-From: Qingfang Deng <dqfext@gmail.com>
-To: Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Paul Mackerras <paulus@ozlabs.org>
-Subject: [PATCH net-next v2] selftests: net: add tests for PPP
-Date: Sat, 21 Mar 2026 23:46:15 +0800
-Message-ID: <20260321154616.2754-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1774108120; c=relaxed/simple;
+	bh=PKcD8DnD3VLuM+Hnef06Ut+iyHkqIlgOD7TXtpVjTXI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fauzIC8PwlAvpJOw76vJiju2SY0d79DvIs6HV6Gk+tYdEwpIqEof9pmBtak1ITDE/02W8faRbHEDZ4g5ghs4dOrVvUuRoiKuEA617Tl1X3mrpB0LAZws1cnaJOmJwCCnXRqJeIrCopnaxeXsWkW92ZCrjOfHxBX71n0t4HnzVu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wzSjnSKE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3Fy9gUHzgMAPEEFZcrvLxRVy4kJkdP/QasYLigMTp9E=; b=wzSjnSKES2i78CHWgQKAo8KXVE
+	LcSCYCMxzge3wiJaRr7jExiPJRTJWjYSrVByWrdbDftLI3A2JwF/8TwwfVt5cnzZPkW8sFOpN7bbO
+	fXTLpcuFNg5UFpBKTF5QHPBRXi4uaiNJKJthkrQImnDtCRc+tuGxNb6uU5UdCW28iAoM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w3yYu-00Cj6o-C6; Sat, 21 Mar 2026 16:48:28 +0100
+Date: Sat, 21 Mar 2026 16:48:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: linux-phy@lists.infradead.org, netdev@vger.kernel.org,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Josua Mayer <josua@solid-run.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH phy-next 1/3] phy: lynx-28g: use timeouts when waiting
+ for lane halt and reset
+Message-ID: <3d9b524b-bb61-4e64-a655-3fa70d8b64ef@lunn.ch>
+References: <20260321011451.1557091-1-vladimir.oltean@nxp.com>
+ <20260321011451.1557091-2-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260321011451.1557091-2-vladimir.oltean@nxp.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-270229-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270228-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: B0CE12E62E0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:email,lunn.ch:mid,solid-run.com:email]
+X-Rspamd-Queue-Id: 60D3E2E6357
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add ping and iperf3 tests for ppp_async.c and pppoe.c.
+On Sat, Mar 21, 2026 at 03:14:49AM +0200, Vladimir Oltean wrote:
+> There are various circumstances in which a lane halt, or a lane reset,
+> will fail to complete. If this happens, it will hang the kernel, which
+> only implements a busy loop with no timeout.
+> 
+> The circumstances in which this will happen are all bugs in nature:
+> - if we try to power off a powered off lane
+> - if we try to power off a lane that uses a PLL locked onto the wrong
+>   refclk frequency (wrong RCW, but SoC boots anyway)
+> 
+> Actually, unbounded loops in the kernel are a bad practice, so let's use
+> read_poll_timeout() with a custom function that reads both LNaTRSTCTL
+> (lane transmit control register) and LNaRRSTCTL (lane receive control
+> register) and returns true when the request is done in both directions.
+> 
+> The HLT_REQ bit has to clear, whereas the RST_DONE bit has to get set.
+> 
+> Any time such an error happens, it is catastrophic and there is no point
+> in trying to propagate it to our callers:
+> - if lynx_28g_set_mode() -> lynx_28g_power_on() times out, we have
+>   already reconfigured the lane, but returning an error would tell the
+>   caller that we didn't
+> - if lynx_28g_power_off() times out, again not much for the consumer to
+>   do to help get out of this situation - the phy_power_off() call is
+>   probably made from a context that the consumer can't cancel, or it is
+>   making it to return to a known state from a previous failure.
+> 
+> So just print an error if timeouts happen and let the driver control
+> flow continue. The entire point is just to not let the kernel freeze.
+> 
+> Suggested-by: Josua Mayer <josua@solid-run.com>
+> Link: https://lore.kernel.org/lkml/d0c8bbf8-a0c5-469f-a148-de2235948c0f@solid-run.com/
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
----
-v2: fix shellcheck and add trailing backslashes.
- - https://lore.kernel.org/netdev/20260320071755.483733-1-dqfext@gmail.com/
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
- MAINTAINERS                                   |  1 +
- tools/testing/selftests/Makefile              |  1 +
- tools/testing/selftests/net/ppp/Makefile      | 15 +++++++
- tools/testing/selftests/net/ppp/config        |  8 ++++
- tools/testing/selftests/net/ppp/ppp_async.sh  | 37 ++++++++++++++++
- tools/testing/selftests/net/ppp/ppp_common.sh | 42 +++++++++++++++++++
- .../selftests/net/ppp/pppoe-server-options    |  2 +
- tools/testing/selftests/net/ppp/pppoe.sh      | 36 ++++++++++++++++
- 8 files changed, 142 insertions(+)
- create mode 100644 tools/testing/selftests/net/ppp/Makefile
- create mode 100644 tools/testing/selftests/net/ppp/config
- create mode 100755 tools/testing/selftests/net/ppp/ppp_async.sh
- create mode 100644 tools/testing/selftests/net/ppp/ppp_common.sh
- create mode 100644 tools/testing/selftests/net/ppp/pppoe-server-options
- create mode 100755 tools/testing/selftests/net/ppp/pppoe.sh
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a09bf30a057d..d553437d5ac1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -21078,6 +21078,7 @@ PPP PROTOCOL DRIVERS AND COMPRESSORS
- L:	linux-ppp@vger.kernel.org
- S:	Orphan
- F:	drivers/net/ppp/ppp_*
-+F:	tools/testing/selftests/net/ppp/
- 
- PPS SUPPORT
- M:	Rodolfo Giometti <giometti@enneenne.com>
-diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-index 450f13ba4cca..65f84e8a0cf0 100644
---- a/tools/testing/selftests/Makefile
-+++ b/tools/testing/selftests/Makefile
-@@ -78,6 +78,7 @@ TARGETS += net/netfilter
- TARGETS += net/openvswitch
- TARGETS += net/ovpn
- TARGETS += net/packetdrill
-+TARGETS += net/ppp
- TARGETS += net/rds
- TARGETS += net/tcp_ao
- TARGETS += nolibc
-diff --git a/tools/testing/selftests/net/ppp/Makefile b/tools/testing/selftests/net/ppp/Makefile
-new file mode 100644
-index 000000000000..b39b0abadde6
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/Makefile
-@@ -0,0 +1,15 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+top_srcdir = ../../../../..
-+
-+TEST_PROGS := \
-+	ppp_async.sh \
-+	pppoe.sh \
-+# end of TEST_PROGS
-+
-+TEST_FILES := \
-+	ppp_common.sh \
-+	pppoe-server-options \
-+# end of TEST_FILES
-+
-+include ../../lib.mk
-diff --git a/tools/testing/selftests/net/ppp/config b/tools/testing/selftests/net/ppp/config
-new file mode 100644
-index 000000000000..7053aa9d8d74
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/config
-@@ -0,0 +1,8 @@
-+CONFIG_PACKET=y
-+CONFIG_PPP=m
-+CONFIG_PPP_ASYNC=m
-+CONFIG_PPP_BSDCOMP=m
-+CONFIG_PPP_DEFLATE=m
-+CONFIG_PPPOE=m
-+CONFIG_PPPOE_HASH_BITS_4=y
-+CONFIG_TTY=y
-diff --git a/tools/testing/selftests/net/ppp/ppp_async.sh b/tools/testing/selftests/net/ppp/ppp_async.sh
-new file mode 100755
-index 000000000000..5c0eb84945e8
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/ppp_async.sh
-@@ -0,0 +1,37 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+set -e
-+source ppp_common.sh
-+
-+# Temporary files for PTY symlinks
-+TTY_SERVER=$(mktemp -u /tmp/ppp_async_server.XXXXXX)
-+TTY_CLIENT=$(mktemp -u /tmp/ppp_async_client.XXXXXX)
-+
-+cleanup() {
-+	cleanup_all_ns
-+	[ -n "$SOCAT_PID" ] && kill "$SOCAT_PID" 2>/dev/null || true
-+}
-+
-+trap cleanup EXIT
-+
-+require_command socat
-+ppp_common_init
-+
-+# Create the virtual serial device
-+socat -d PTY,link="$TTY_SERVER",rawer PTY,link="$TTY_CLIENT",rawer &
-+SOCAT_PID=$!
-+
-+# Wait for symlinks to be created
-+slowwait 5 [ -L "$TTY_SERVER" ]
-+
-+# Start the PPP Server
-+ip netns exec "$NS_SERVER" pppd "$TTY_SERVER" 115200 \
-+	"$IP_SERVER":"$IP_CLIENT" \
-+	local noauth nodefaultroute debug
-+
-+# Start the PPP Client
-+ip netns exec "$NS_CLIENT" pppd "$TTY_CLIENT" 115200 \
-+	local noauth updetach nodefaultroute debug
-+
-+ppp_test_connectivity
-diff --git a/tools/testing/selftests/net/ppp/ppp_common.sh b/tools/testing/selftests/net/ppp/ppp_common.sh
-new file mode 100644
-index 000000000000..9ddfba0f9a05
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/ppp_common.sh
-@@ -0,0 +1,42 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# shellcheck disable=SC2153
-+
-+source ../lib.sh
-+
-+IP_SERVER="192.168.200.1"
-+IP_CLIENT="192.168.200.2"
-+
-+ppp_common_init() {
-+	# Package requirements
-+	require_command pppd
-+	require_command iperf3
-+
-+	# Check for root privileges
-+	if [ "$(id -u)" -ne 0 ];then
-+		echo "SKIP: Need root privileges"
-+		exit $ksft_skip
-+	fi
-+
-+	# Namespaces
-+	setup_ns NS_SERVER NS_CLIENT
-+}
-+
-+ppp_check_addr() {
-+	dev=$1
-+	addr=$2
-+	ns=$3
-+	ip -netns "$ns" -4 addr show dev "$dev" 2>/dev/null | grep -q "$addr"
-+	return $?
-+}
-+
-+ppp_test_connectivity() {
-+	slowwait 10 ppp_check_addr "ppp0" "$IP_CLIENT" "$NS_CLIENT"
-+
-+	ip netns exec "$NS_CLIENT" ping -c 3 "$IP_SERVER"
-+
-+	ip netns exec "$NS_SERVER" iperf3 -s -1 -D
-+	wait_local_port_listen "$NS_SERVER" 5201 tcp
-+
-+	ip netns exec "$NS_CLIENT" iperf3 -c "$IP_SERVER" -Z -t 2
-+}
-diff --git a/tools/testing/selftests/net/ppp/pppoe-server-options b/tools/testing/selftests/net/ppp/pppoe-server-options
-new file mode 100644
-index 000000000000..66c8c9d319e9
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/pppoe-server-options
-@@ -0,0 +1,2 @@
-+noauth
-+noipdefault
-diff --git a/tools/testing/selftests/net/ppp/pppoe.sh b/tools/testing/selftests/net/ppp/pppoe.sh
-new file mode 100755
-index 000000000000..0ebedfe3eabe
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/pppoe.sh
-@@ -0,0 +1,36 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+set -e
-+source ppp_common.sh
-+
-+VETH_SERVER="veth-server"
-+VETH_CLIENT="veth-client"
-+
-+cleanup() {
-+	cleanup_all_ns
-+}
-+
-+trap cleanup EXIT
-+
-+require_command pppoe-server
-+ppp_common_init
-+
-+# Create the veth pair
-+ip link add "$VETH_SERVER" type veth peer name "$VETH_CLIENT"
-+ip link set "$VETH_SERVER" netns "$NS_SERVER"
-+ip link set "$VETH_CLIENT" netns "$NS_CLIENT"
-+ip -netns "$NS_SERVER" link set "$VETH_SERVER" up
-+ip -netns "$NS_CLIENT" link set "$VETH_CLIENT" up
-+
-+# Start the PPP Server
-+ip netns exec "$NS_SERVER" pppoe-server -I "$VETH_SERVER" \
-+	-L "$IP_SERVER" -R "$IP_CLIENT" -N 1 -q "$(command -v pppd)" \
-+	-k -O "$(pwd)/pppoe-server-options"
-+
-+# Start the PPP Client
-+ip netns exec "$NS_CLIENT" pppd \
-+	local debug updetach noipdefault noauth nodefaultroute \
-+	plugin pppoe.so nic-"$VETH_CLIENT"
-+
-+ppp_test_connectivity
--- 
-2.43.0
-
+    Andrew
 
