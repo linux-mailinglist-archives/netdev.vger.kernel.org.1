@@ -1,64 +1,62 @@
-Return-Path: <netdev+bounces-270195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270196-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yCOUBzZtvml1PQMAu9opvQ
-	(envelope-from <netdev+bounces-270195-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 11:04:38 +0100
+	id oGbhIdBwvml1PQMAu9opvQ
+	(envelope-from <netdev+bounces-270196-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 11:20:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2153D2E4946
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 11:04:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB6052E4B29
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 11:19:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 064A93004631
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:04:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 89012302AC19
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E6C2D8370;
-	Sat, 21 Mar 2026 10:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6106229B12;
+	Sat, 21 Mar 2026 10:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LmviCYv3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A5YcbIZs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5052BDC28;
-	Sat, 21 Mar 2026 10:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8181E15E97;
+	Sat, 21 Mar 2026 10:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774087471; cv=none; b=PXC2xVXupXcqsHQFeQb+t/QFa/6rE+SgwqrSbsDxeaIOnPEuelHcXYL/Gg5nkn4G3xap1LOqT/vGI+dRc2a+XPC1sk+Tp9bqRp9yawmUl4D4G27u/G5nRSKxzEhiPQs1eheXxUnfzftbU+FOv+pcVvZdY8NV/pMJRegnqhJn02Q=
+	t=1774088371; cv=none; b=vGtkQhu1Tcr9q/xNajCeh8w8M1NfQvOsZ34IrvzA2wszfLBc4kgJspk1MvIakKjqKmqQg+PebcJnlI1Gh3ybdVUWbwnVvjGhu5w7a+92qI3lhr/+Q2yKLZo53+xYH51z7usyV1ILHZLCiApB+QEMzFNJmGnUSdK/VcE1XqNT2C0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774087471; c=relaxed/simple;
-	bh=BTLgz+KnnI4AgvbDXAdQA/3E+5q59La1tbh18XBDHWI=;
+	s=arc-20240116; t=1774088371; c=relaxed/simple;
+	bh=iD9xikylZwtdXCM4YADJdCNPZRb5mmZ451xS3Yw7ovo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tR12Wrd+5MvMdc4bV4BzzuRhfmh0v+v6Y2SgsIyt6KiGG2yn5u6qMov/m2MzpTxbuEJ9h9J0uQHO31mr+XDvTEFrDYy+Uw053oyUHPn1MTms2oIMnQWcaK4l8RcTDL7TqjpHQrYiYR6KVXPPlhurJPyQkenjfSWENdjdfZS6iII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LmviCYv3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F931C19421;
-	Sat, 21 Mar 2026 10:04:27 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=phrehG/FoAG01kyQHM8N+MGYG7ZI1le68zgytnDmGfPpcABbql0YI1Se16Zsup+eUHV0rKaT72L9ZwjAcbhURn9XXZGJEuQ9UF42TyQV3nfmbc1MEm5QBBh6K8LnLvnHD3oX3Gds/U1sl58pI3eWBRe5T4LpWXw3KuPBWe0cHK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A5YcbIZs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1753CC19421;
+	Sat, 21 Mar 2026 10:19:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774087471;
-	bh=BTLgz+KnnI4AgvbDXAdQA/3E+5q59La1tbh18XBDHWI=;
+	s=k20201202; t=1774088371;
+	bh=iD9xikylZwtdXCM4YADJdCNPZRb5mmZ451xS3Yw7ovo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LmviCYv373j/wUabQM73A49Sk142C9nkshjAa84iW2gUEH2W81b4bph9x/Dq8comx
-	 5xJRUaIlgtehawIjDAnaeLmKdZJk3Ft1+IdNafTUyZzReuvjodZxF4OnrNBK/iYmV/
-	 smcSqvWOj8oQYPlTGdEbJ0lBx7VcCDMCgjG2eAfql4UOMpreqm1behGl+gAq69zOx2
-	 Y5Wfqr2yqmBxrMLvsn34IiaIDrOLSOlavafXly4uzGPPkFdvvMS7zUt92iCurqcQs1
-	 nHnKPorCDwQLRlm7XRDGDlhmb0DoSgERwQ4J6YBAhu6mIXSyymuhKpiiPdmWwwAFor
-	 KbnAKuZg8/VQQ==
-Date: Sat, 21 Mar 2026 10:04:25 +0000
+	b=A5YcbIZsducdfLzfGWINWAWaeGHdkBH0q644fR0OypPcxW5xTrXVJftgiQyXSAJY+
+	 WS8qnseQS9gY/rgkzNrJgvNYzzoFkCOsJen9TBIytJRmlqjbAg1HUNj/T87DA0dSU4
+	 O6oO5P/+Yv/jgHTrWiLgbz5VGzRDse595oNRD8KmokLNXErBNEnj6OUXL7htGGN1oj
+	 VkFuc1rFgzXGkc8EdttRbQHH4Al3x464Za77Q4uy/D4jqkpoVa63ioNa9v/YCZYslI
+	 ZX9OIbCB16X2Q8K4p7s3lFADExWJrPcIjHg3+NjecFwZVuFFn85FD31z0w1lGTAwNu
+	 K/UZLnX0YELrA==
+Date: Sat, 21 Mar 2026 10:19:26 +0000
 From: Simon Horman <horms@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, shradhagupta@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com,
-	kotaranov@microsoft.com, yury.norov@gmail.com, kees@kernel.org,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+To: Alexander Wilhelm <alexander.wilhelm@westermo.com>
+Cc: Manivannan Sadhasivam <mani@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: mana: Use at least SZ_4K in doorbell ID
- range check
-Message-ID: <20260321100425.GX74886@horms.kernel.org>
-References: <20260320122107.1560839-1-ernis@linux.microsoft.com>
+Subject: Re: [PATCH] net: qrtr: fix handling of confirm_rx field
+Message-ID: <20260321101926.GY74886@horms.kernel.org>
+References: <20260320-qrtr-fix-confirm_rx-on-big-endian-v1-1-e1a337dc1a38@westermo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,60 +65,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260320122107.1560839-1-ernis@linux.microsoft.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <20260320-qrtr-fix-confirm_rx-on-big-endian-v1-1-e1a337dc1a38@westermo.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270195-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-270196-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 2153D2E4946
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid,westermo.com:email]
+X-Rspamd-Queue-Id: DB6052E4B29
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 05:21:01AM -0700, Erni Sri Satya Vennela wrote:
-> mana_gd_ring_doorbell() accesses doorbell offsets up to 0xFF8 + 8 = 4KB
-> within a doorbell page. When db_page_size is zero, the validation check
-> in mana_gd_register_device() reduces to:
->   db_page_off + 0 > bar0_size
-> which passes, even though mana_gd_ring_doorbell() will access
-> [db_page_off, db_page_off + 4KB) and may go beyond BAR0.
+On Fri, Mar 20, 2026 at 02:28:52PM +0100, Alexander Wilhelm wrote:
+> Convert confirm_rx to little endian when enqueueing by using cpu_to_le32(),
+> as big endian systems otherwise interpret the value incorrectly.
 > 
-> Use max(SZ_4K, db_page_size) in the range check so that a zero or
-> unexpectedly small db_page_size still results in a rejection when the
-> doorbell page would fall outside BAR0.
+> When receiving, apply le32_to_cpu(). !! ensures the result becomes 0 or 1
+> in native CPU endianness, so this conversion is not strictly required, but
+> it is kept for consistency, clarity, and future safety.
 
-Thanks Erni,
+Hi Alexander,
 
-I understand the maths here. And to that extent this change makes sense to me.
-But I am curious to know how a db_page_size of zero works. I was expecting
-some space is required there.
+It seems to me that the conversion is required if the code
+runs on a Big Endian host. What is your thinking on this?
 
 > 
-> Fixes: 89fe91c65992 ("net: mana: hardening: Validate doorbell ID from GDMA_REGISTER_DEVICE response")
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> Fixes: 5fdeb0d372ab ("net: qrtr: Implement outgoing flow control")
+> Signed-off-by: Alexander Wilhelm <alexander.wilhelm@westermo.com>
 
 ...
 
