@@ -1,172 +1,186 @@
-Return-Path: <netdev+bounces-270238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270242-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kiTqHCrlvmmciQMAu9opvQ
-	(envelope-from <netdev+bounces-270238-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:36:26 +0100
+	id EHSbJoXpvmkFjQMAu9opvQ
+	(envelope-from <netdev+bounces-270242-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:55:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 103812E6CE5
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:36:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07ABD2E6DF7
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:55:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2A9C73007483
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 18:36:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D25C9300B9ED
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 18:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87ABA33BBA7;
-	Sat, 21 Mar 2026 18:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B926F30C37E;
+	Sat, 21 Mar 2026 18:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a1x1Youb"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="B9ySxL+x";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="TEzKBDnw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B9925CC74
-	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 18:36:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774118181; cv=pass; b=PpHYayKiX2CQX6Jonn5O+PTZ+YGMkjsPOxCn/KFCWELvIpPe/HsbyMtWjWIFQrYrUf6x6+boWZ400IK+/8wSfOIVBAaPVY5rZO04Ek5mSJ2Ozx7rdyHaHZ4eMr0BJ5tfcvSSZwDAX/fB0Wvgc2+3FGKwT3ohlndRnhOKBLxgTCw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774118181; c=relaxed/simple;
-	bh=E73mJLbVj0JbkSUviEdOjxdJyafwNzdmTlBRvW6WZ14=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hzOock6r1XfMc2Z/dPacBmIpZpdgAm9b4Ylzj7yOTOm35NRQfzTZbgqU1zBYOyh3WoKbF6O1MYZEwquW2MWg1oimbDW2GeySTQJaDc+b03joK9cqGYWPAc1hA71uQ1qbvETU5j0x2LotZyuwUsbBK2s4Tfl6WEcAWW+DB9Qx58g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a1x1Youb; arc=pass smtp.client-ip=74.125.224.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-64e9f9226a7so2507010d50.2
-        for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 11:36:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774118179; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Hz4gghpRxeoM9THIoW2CGfG/qJnOkgEbYXh3Pr0IxCsbNJizy09mjbBu4gNX7vVbHE
-         sgh8Agw8fOpwR+heBbf3AD5ble5MNF5emEHY5yc+yvjldZnrUsG7Jull9CCeouWBpQuq
-         zGVHsKL3l/mSpLbSsWDkjLQCZtN3jyrPXW+1EK0PIdY3YxmJJgVvTWRR6NEMYCOPLvt3
-         LwWCcM8SjwcDGErFA/RcO5uIq0lkcYyylK3hoR27/AucdOrcgRBOljCwrK4dVay+v7xa
-         X60oB+0lhagcXZQY8pGYzddJ2IGCtIdzOlneyFGr2AB7bAx6X35ceX9iRVl4Dj9kC5U6
-         TFoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=E73mJLbVj0JbkSUviEdOjxdJyafwNzdmTlBRvW6WZ14=;
-        fh=weaC6FihwEfIliAQzy0rq1iSHJ8m3f25eXNyMD+HZwg=;
-        b=IOZz1/aN7nl/WCmArhFHNO4mdOF9T679phrk70PDx61b6OzPJcYqgJBWNn5v+9v+Jv
-         V7RK62qOV3B/DUHqotaZO1ZPMYMlEgGdEZXOUlbK9Y6QuG76eB37xSAJ0QZI/HbtjpCU
-         bMY2g5+2Y8ddNIzIcnPnbMMpPYfEzzliaYiG80O42fYShgms8cowjwsNBEsFR3G3f+An
-         jdo2vzJmUWzJrougrTPsfLzQXkBBpGKcB5H16BDIHj6F6j7fbQJ3ok1vJ6t0OUQOgEFp
-         QDgRtut4ELH2UxCz9gZsXTdgcE59N23GopHllHQbSDCbJaN+PfZp8gwopeBpsiQ/new6
-         B9LA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774118179; x=1774722979; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E73mJLbVj0JbkSUviEdOjxdJyafwNzdmTlBRvW6WZ14=;
-        b=a1x1YouboCSOvm/kS8mbf/ihOBW0gbIJuaLoU8POQYEMT9VdQIompT5NnPxpNLVm+M
-         k3R8Z+DJxv0Nw8sxuPp6Gjlka/Y4Msu86f3OejokTfKTOmkHl7ZGDUpUMZlR2Avb5PTr
-         Q0xUyAgqAhlRXYBIz5fkgCuafPXuSZjPuvEkAr6kHHT7gNQsCjY5exyGbD4a4oz8g/3a
-         FFOLy0ZSZxvbtnpmAvXffi4RjRV3SHjq8AyzN4ZQzY5WaE0hUrJvdm1EbB9zu3QXuO4G
-         8FpHIVuQshgUzAYSlGxUA6+ornAkGkFtEYlwPMNkp3KpwFdvvkw5udmjoABY86ngsrRN
-         Tw+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774118179; x=1774722979;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=E73mJLbVj0JbkSUviEdOjxdJyafwNzdmTlBRvW6WZ14=;
-        b=rRu+xLsxh6EsFgTRL2cRXR+zhB2CBkOoe7ZS4ExlHzFcbl5kuRBeFMViOdPmn85VVx
-         T/sv4No0a9kxiulw2WNCs/Lru/bEpyu8l5RMULXeiDNeoBL2T5ebgTad/fQJlEFK5EZ+
-         s5/6ZK98/bKMjcL4jl8dEO0lzspAV/tq/EKn2JEwMXbu3SlNtbxtXfEOaUyRb3Whz9k8
-         PuQlWqKWHLv7KoGP7ZE8lc2Fp4c6zZAP1FDFfT+06bqK4VwOreSvwyyy9KRmlT8H44Xi
-         5757mepyPO0QmOezhYmqAEQlLXzNq3emyncXwhb5Hg7s3w7GseCNoG8wnL5EBWt53n5m
-         w29w==
-X-Forwarded-Encrypted: i=1; AJvYcCVvxbyEWYnIbA9u1muVYNxE4LZxjdKfIn6Hhf6CKtt2wMiA51C9XIO7incXPeJ5XKiYtgxVk+4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySi8ql+zXwXtd33Ff7PXKQ2QJ3ESFfSFDcx3s7qi7PJC/5luFI
-	8hpNdKOhLcNhcGRmVwNcIfJJSqML+qkuSERkrIKWvO036VOFWeBfubUqjU2wuN9dqLd4PcJLNJR
-	DYeLLV7XGMot/UpxS1E3aglhzahX1OzE=
-X-Gm-Gg: ATEYQzxkMW+Mh6R1A2J7BXYMJV+AUW2iYbNNxBKf/r+eSuq3p4Yqo9sUhYiAvEKRXSb
-	JuUvhrVqDQmFxclE9SMNp/zS+7ppZ2Va7LJUcVhC8w2ffxMjvOBlmj9ihvH96vickjQrFGEOlaL
-	vQfylwcFsCjneNptcE2UBtNJNsgL37Xisg8oRGeBDzC+VthzYVJrpP7Qc8A9q6xB8c6SQcI5hvZ
-	rR/MW86+Umf8YHDaNjUIlZX5I2DT1H/ivKdLYdaFa9ZhfAiPov3TSo9ePo8Wgj8DA298+cRk8WC
-	VAo1PUcVL5ES/rahYF8KMCpNUMmpwVmFqJDoJ2r/ILHdrijUt+EnCMbB0GDldViVzogn/g==
-X-Received: by 2002:a05:690e:e17:b0:649:e501:21af with SMTP id
- 956f58d0204a3-64eaa6a23e8mr5995453d50.14.1774118179320; Sat, 21 Mar 2026
- 11:36:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120543016FB;
+	Sat, 21 Mar 2026 18:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774119297; cv=none; b=Bdthe+iYiq2UUWrIldpwOHGjp/Us/Vi/xauM2zVRkz9S4B0MAh9CLCso8Pfo4z587zljT5GF4PL2XPWeuY6LDDlHKrbFi1oWQxbwxX9oyb13ZNfh1UALHeEH5eySW6iIMfi3wNkggMWrQaBdloe6xau4DydJYyQfC6Cw6y4T+Ng=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774119297; c=relaxed/simple;
+	bh=lcUjA2tOXH6xrPM+MteHiFBZw46mc+U013QORqy5ogs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ef8ph9vzLbBHdx2Vxl1gwrsodPxlFtzNSDiAutDUpWcecvx4JGhsRQPYmxkFZGdGpgqdpqGQbgce41OAts9pG+MPsOC9I3zoePFylPblA2qn7XARqt0Er58FcrKyPhrXl/7bAK4Zz6BHDHXt06Lk/QONBozlIIJAT0kD+yht4Fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=B9ySxL+x; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=TEzKBDnw; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4fdT3F3BY4z9vDH;
+	Sat, 21 Mar 2026 19:48:25 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1774118905;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xaB175QEGmnw0RID6ZBF0oUHABZ4Kfsd8JaellT99Zs=;
+	b=B9ySxL+xQrypQhLjspzbMqPpdiixyaMfXFKFobJgPQGridPkTkdhk2j6d6u8DU2SvT0H1n
+	UpXbcEML83x2kiskGdJK0qHKdKxanaqU99rQYfZU19uMymIgErxBCKvMGDJDyDj9dKsbpL
+	h2TWwCbi7OixULibBmxUVXhHdzyq2dTtyvdHFv1WOJiCAgqQADbcr877IDBQqgh1btyxAZ
+	DHHlpIp6NzuuJOXeiChfaF2/0kb8KDwnlyxHHgNyTaAwk+tYNuydfM2jMWkljkigtH8a/m
+	QkM1yzqCeLy3fjtw+0s4CKdgyHzLZ71m+msHnNjVLdoB7ZbDes+aVNpnSpTmDg==
+From: Marek Vasut <marek.vasut@mailbox.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1774118903;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xaB175QEGmnw0RID6ZBF0oUHABZ4Kfsd8JaellT99Zs=;
+	b=TEzKBDnwxJmsWvVaMwHRu9vKmPkUXgBmRnWuBbnGGWhiQsA0RbNKVB7Y5Grs37+4SYQNn4
+	2BTPtVzE+SA8RbzCf2re3TCCzwvypzOvy9bT0gyk3lDTE5WNukdY/YYR+Zv0zCcbo9UwXM
+	HlELhgNBHVSeemzOYgf1p7RuTgq4zXYa/wG/39MGVpPPXijyGxirXfKgcgrwZhNU8A+ptx
+	ADdEVeOMnBTCv00vbQwmbziiMXeThxrq3Q08IQq0OmshSW5Ru6n8++AF9ULrIiVnfvH0Wd
+	BGBHTOLnlxiIV0blgQ8+z1s3vwKU49mGMlhZfk05+PfhoEl5DDpOLggt9q2H/w==
+To: netdev@vger.kernel.org
+Cc: Marek Vasut <marek.vasut@mailbox.org>,
+	"Rob Herring (Arm)" <robh@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Ivan Galkin <ivan.galkin@axis.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Michael Klein <michael@fossekall.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	devicetree@vger.kernel.org
+Subject: [net-next,PATCH v4 1/3] dt-bindings: net: realtek,rtl82xx: Keep property list sorted
+Date: Sat, 21 Mar 2026 19:47:41 +0100
+Message-ID: <20260321184815.148485-1-marek.vasut@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260319190455.135302-1-luiz.dentz@gmail.com> <177396481128.1855248.1024090053580545012.git-patchwork-notify@kernel.org>
- <6411a735-d187-4848-b199-a0e2c2e0e52c@leemhuis.info> <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
- <20260320175220.47147285@kernel.org>
-In-Reply-To: <20260320175220.47147285@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Sat, 21 Mar 2026 14:36:07 -0400
-X-Gm-Features: AaiRm50g7uMS86-n9jkJ6Q519tiQJjDz5q1yhkXXjsoHNxncFtVOJQmEad9viRw
-Message-ID: <CABBYNZ+Tk+in8tLVQ7qXQXZjVYLRt3bstvSLPHh6Y9bBb2Dg-w@mail.gmail.com>
-Subject: Re: bluetooth regression fix likely to miss -rc5 (was: Re: [GIT PULL]
- bluetooth 2026-03-19)
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Thorsten Leemhuis <regressions@leemhuis.info>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, linux-bluetooth@vger.kernel.org, 
-	davem@davemloft.net, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+Content-Transfer-Encoding: 8bit
+X-MBO-RS-META: 4tcst1quwihjhkgp4krxphrq9r4jokzq
+X-MBO-RS-ID: f76902603a2f2e71159
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270238-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[mailbox.org,kernel.org,davemloft.net,wp.pl,lunn.ch,google.com,gmail.com,axis.com,fossekall.de,redhat.com,armlinux.org.uk,nxp.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-270242-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 103812E6CE5
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marek.vasut@mailbox.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[mailbox.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 07ABD2E6DF7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jakub,
+Sort the documented properties alphabetically, no functional change.
 
-On Fri, Mar 20, 2026 at 8:52=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Fri, 20 Mar 2026 14:02:34 -0400 Luiz Augusto von Dentz wrote:
-> > Afaik, it was tagged as regression on March 1st afaik, according to
-> > [2]; traces were only provided on March 15th, so yeah it was fixed
-> > within a week once the necessary traces were supplied.
->
-> Hi Luiz, I don't really care about the complaint, just wanted to check
-> whether you know that we always send the PR on Thu (either AM or PM
-> depending on which maintainer is handling it)? If you do then nothing
-> to see here, we are all doing our best. But if it's not crystal clear
-> I should probably ping all sub-trees to remind folks.
+Acked-by: Rob Herring (Arm) <robh@kernel.org>
+Signed-off-by: Marek Vasut <marek.vasut@mailbox.org>
+---
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: Conor Dooley <conor+dt@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Ivan Galkin <ivan.galkin@axis.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+Cc: Michael Klein <michael@fossekall.de>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: devicetree@vger.kernel.org
+Cc: netdev@vger.kernel.org
+---
+V2: No change
+V3: No change
+V4: Add AB from Rob
+---
+ .../devicetree/bindings/net/realtek,rtl82xx.yaml          | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Sure thing, normally I would have send it sooner but I did want to
-make sure the regression fix was included, I will put a reminder to
-send the PR by Wednesday to make sure that git to you ahead of time.
+diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+index 2b5697bd7c5df..eafcc2f3e3d66 100644
+--- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
++++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+@@ -40,15 +40,15 @@ properties:
+ 
+   leds: true
+ 
+-  realtek,clkout-disable:
++  realtek,aldps-enable:
+     type: boolean
+     description:
+-      Disable CLKOUT clock, CLKOUT clock default is enabled after hardware reset.
++      Enable ALDPS mode, ALDPS mode default is disabled after hardware reset.
+ 
+-  realtek,aldps-enable:
++  realtek,clkout-disable:
+     type: boolean
+     description:
+-      Enable ALDPS mode, ALDPS mode default is disabled after hardware reset.
++      Disable CLKOUT clock, CLKOUT clock default is enabled after hardware reset.
+ 
+   wakeup-source:
+     type: boolean
+-- 
+2.53.0
 
---=20
-Luiz Augusto von Dentz
 
