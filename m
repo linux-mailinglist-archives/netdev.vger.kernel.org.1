@@ -1,257 +1,166 @@
-Return-Path: <netdev+bounces-270226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270227-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aEfGDCq7vmlIZAMAu9opvQ
-	(envelope-from <netdev+bounces-270226-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:37:14 +0100
+	id iLoWEMG7vmlIZAMAu9opvQ
+	(envelope-from <netdev+bounces-270227-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:39:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E29D2E6237
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:37:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D54DA2E6274
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:39:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DD771303265B
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 15:32:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C01523022F47
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 15:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7524C3002D1;
-	Sat, 21 Mar 2026 15:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEADC3932DB;
+	Sat, 21 Mar 2026 15:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jC+45geI"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="U9IiN9me"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FD22820A9
-	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 15:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774107145; cv=pass; b=gbOfEa7dIWx1DtvI1Kms12/3hQ5UZpNqsQKPmXKOhUBdSJ4GO5fvSx6YsFaur/2LaimU3+iUL+hvJ03H4jS72erA9WA9R2nb1m03SEJiPUcOQ02JV/giJ5RKtd4RX8B5Ho6yfSRLoplaf1onn7YnoDKRCuRVToQwaOUFo0ZcXFU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774107145; c=relaxed/simple;
-	bh=SEtJ6yJtIAoqvcaZ/EVkK5qmDDYjvbY8ydcE3ETLdNg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DDDCTlZAh4Ta4y7eMbBYJJksSNuxs6IXFcTz9aVEauX4xIBm6DFp0fZ6V/lmYQ99Ql1UKCW+0c5saFlPNTeD8ZYA4Rs5jOwVwtLfmxtMWYAtjrU8e7OC2anouVx8caS/FuvCQE+pcoGUJRCVxo7KWyvnnVS9841JqLYigTLfrug=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jC+45geI; arc=pass smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-668d70fabc4so2856921a12.1
-        for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 08:32:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774107142; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XDs1b4YT6SmA1grlJpPSbLccQKffHhn/eE0Flc7oAFHjHFR3JqtCeIbIuNflHs7jAA
-         nzYkTMYHHvzlAfb7xpM5G4CET2+vQri1wy2zm8V9B1p3GTejJCsCiQYbbCr2esXSUezl
-         u0V7qWgAk6zNCRHsyla6d8xEERlZKmIE0T6INC0RmsdbIK147pvtBKjwOZoJ+aAlXHw8
-         EQCIwfhqTjrKb/gkzayDtEwi4O6mz1pV0cdEjgaJCL/Ijl4SzoE5p3lZX/YwCEsUf2Yo
-         TUkfgiaSIkZYpvmAj6uDkhawrEiFc+3uvHbIZaOXCm4aKJ0sS/e8VNJz2qS3i4lhScR3
-         9mQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=6mT6fR8ELfRe+68amXgf8ZcOmPwJOUQA8AQbfdjxqMs=;
-        fh=dGbqA15CVJUBrmo3vpQQR3ofGtMi90vMT45d+fP2GAA=;
-        b=WaNUAydEJEYnVbb28Ty66CoNC4mclPubBcb15OkCK5J9pByU29OnSr0MOHOM2+oGgy
-         P5YimOmCts/m0HH6nUoiWnECA9ANJaI/Czmwt0B1s2o2A6GadGlUYIehl4G7O79NWVeY
-         Ajzp7e+4IjpmIUIio9CLUlWxSI47Iw29w5PwYiSRLbV4g6+1xAQbPBiH8WAZO8UobRMz
-         skjFEw1ZgjqROhtf3shaHRr3MHKjXvUAB7LYiOsxVyCvnJkW9HfjVDAc0UkomMTasCPX
-         wp2D4SpLlUZCqKlEW2Fsd9gLKZLT/E0rc4T4r2yAwL5pbeO7rQKpOzqvgr7dTgUw6O3A
-         2XCQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774107142; x=1774711942; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6mT6fR8ELfRe+68amXgf8ZcOmPwJOUQA8AQbfdjxqMs=;
-        b=jC+45geIiaGG0JP7wX0qGnIW33vVltjXEl5rcf5kyKalvqN7WxsMIYHzhIhrSXh4fj
-         9R4oqdzTjtuHb3stclNs1ji5Tgz+LsTRU3A8QBF3BwVKFMsHQaSBowHfUKYTvzSehFmT
-         2nQUb1BVLzbCwjyGTp+AyRdrJGQTZ/smk1J1lBes2VW62aJn9xmnhcb1UwTCGMoDVfyz
-         v0/JDF3QFRYAWenAmcCIyzdowVtL9UXImwXF5269fNbo+F+6PyUf++zQJOp0icUu03Jw
-         2Kxl/cGbZGnZZZFOlBYZwzgpw1IoAJBALO+50NufMzgd1XfjYCQv56DgORR1LvhgaqbP
-         CZow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774107142; x=1774711942;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6mT6fR8ELfRe+68amXgf8ZcOmPwJOUQA8AQbfdjxqMs=;
-        b=JDFVcyjIooQeOtxJvUTV+1ye2gtR0Vb1ESSaVzoSdOVsq71G1w/hlylM32ctPlNB+h
-         MbouGCb4BoMmU1jOjrimdlVSwYn46je3Zk57JWRZ0ht4f962ubEv2TAznD1wub+WHV+t
-         HXjsSxKvR/sPsz55817An2+fiThpSozZ4dZr2GxBCUPj5IwvRUdW1fkWY3nWJuRFM5Xm
-         MQg7XHlAN+Ol/gglYnm0CpSnBqBM+KIMEobFTclH8GypDDOQ2zY+giM8sG7HWDVjc1J8
-         L2PKZsgXTrDHsbcBx1b4xm6P0eqiTiGuvKb+gezcCkIb/ZRQHm4Y1Mb1GvGdtzJvSywv
-         z7pQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXQHx4HaQFoqtc9HyfZFetERalnetfyI5s8vX+AOl07egTmnpcOVB0xqLT8vZ/RzriCXrWCJqA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoICtg1KcbTw8R9RFlDcGIhkEvd/Y+Kxu78DdbPXKdlyOlNxDp
-	ezNKQ2B+ll3p5+SrgTilOOGK0ZarE1FV2ELGCBi2o5xMOddTsmBCHH34+LkZhonLNEENQ3fe514
-	DjT0Q1z8DwazhNIjHcKqn37TmiBF+X4I=
-X-Gm-Gg: ATEYQzw5AHGO8kRzLeic/bu3d6KdTvp9TrEvW5PGWIIQmLbswGaF8NbBdxMuFY4u9hx
-	u2DXvLy2Tu6kJTovRLP/xDgGdRrl2fSoy5LZvTxQbOJaEMcNxm+cIuhdDlmhO+24OhWAc3jmTWo
-	sMeyOc2lmSkxouTYastq+YB/w+4Yw6IbPlUs/yUtTAp32klAvljkEKzES6CxoPmFSUeKZUp0m+X
-	k50lYbixp6FG5TrHIgZzJYHxab7F4Y413uZnazKep9ST0b603UadbaeGom4u454gox4sPBAcY9b
-	kDN6ZSiTQkatX7OhXlf/BezXA08eNQT8Hp63E9uD+8N81cFxUY0=
-X-Received: by 2002:a17:907:994c:b0:b88:5158:d10e with SMTP id
- a640c23a62f3a-b982f26b087mr363258266b.21.1774107141881; Sat, 21 Mar 2026
- 08:32:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D2438F941
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 15:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774107578; cv=none; b=XwgqDKVQDZYBWELD7y9yzulMk9Dl3ETrRQ8bVfUKBwBzubW0iTcLj4q6ULuN4zF6SV8a0328iPNdqqo+X1u8nU++DsR6O7YzF5J+htvtJYo9s4HVhyRIr9q32IfYUE7/4tsVzzUx9funVQDO1akYzDed7Y9KQ/y1ax2+FiDXAyA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774107578; c=relaxed/simple;
+	bh=ChT9oRDKs+YyDuTUTLF25/5MCNlcWVivoWKUurqi3kk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KUnRIuFrl1iIhTBH7FrLGNhA0aZsOcOahVNPGP/1OifFad1qqHWcBMooVEgLeP3wFCbPSL4bd0EulOYlX5Jgp0Zx6kp3F7ZhmAkLojWQ5hwL7eJ9HWIZBw6+mVoVGxWoJQaQTME3nsaOgcHrJ7XhpmrepEDdHqskp5E2wHKmGuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=U9IiN9me; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62LF14qi1287602;
+	Sat, 21 Mar 2026 15:39:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=5si90YiB2xKvKR5rXkT0WOT00VT5M
+	MTSjC1RK06hkRI=; b=U9IiN9me7hVFyDA1jY5K8nWZOthRPQfKBjJrhYmNYRzJs
+	8T5EqKH2/DRufCMWcKYnfwijbwVsH4PZACU4osE6fh+edF0BZI8yFI0iAsn5nnea
+	DIuNECNuJ98ZAKLwKedtSx+79Pgl9oKRit0+nr6QluO8NUEBNU5rsaz+WTnc1JJ5
+	6fv6hcrdAicmeZ6ssZcblZjclBGSydyX96dprBhbmjG7vQ3lHsfLYEg501sXeq1g
+	Tap+R2awcle4Z7EU4B+BH944j271gQbYOscQLv/5FgZCYAQFv8wSQsolBTWfz9os
+	LHJjXKEG4H4bVcjprGketMzx7HZXPVZw7ngP/7LZQ==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4d1kvng881-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 21 Mar 2026 15:39:13 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 62L9KZCZ028887;
+	Sat, 21 Mar 2026 15:39:13 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4d1hs6wruu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 21 Mar 2026 15:39:13 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 62LFdCqA009538;
+	Sat, 21 Mar 2026 15:39:12 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4d1hs6wrtk-1;
+	Sat, 21 Mar 2026 15:39:12 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: danieller@nvidia.com, kuba@kernel.org, netdev@vger.kernel.org,
+        mkubecek@suse.cz
+Cc: alok.a.tiwari@oracle.com, alok.a.tiwarilinux@gmail.com
+Subject: [PATCH v2 ethtool] cmis: Fix incorrect LSB field used for wavelength tolerance
+Date: Sat, 21 Mar 2026 08:39:02 -0700
+Message-ID: <20260321153905.644959-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <willemdebruijn.kernel.c0bb5d182993@gmail.com> <20260320141459.9691-1-yss2813483011xxl@gmail.com>
- <willemdebruijn.kernel.2018fae77325e@gmail.com> <willemdebruijn.kernel.2497131610e6a@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.2497131610e6a@gmail.com>
-From: Scars <yss2813483011xxl@gmail.com>
-Date: Sat, 21 Mar 2026 23:31:55 +0800
-X-Gm-Features: AaiRm53Dgu0yuhzbUNldSEqseu1affLDsBeD5YorvmlgtNRjw6AcoHYjS3SD970
-Message-ID: <CAMa1Pe4sxiyekrMKV6w5E3SJ1sk1ZzJs7wdepx6oLKGpRsi35A@mail.gmail.com>
-Subject: Re: [PATCH net v5] net: use skb_header_pointer() only for DODGY TCPv4
- GSO skbs
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: edumazet@google.com, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, horms@kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
-	syzbot+1543a7d954d9c6d00407@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-21_05,2026-03-20_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 mlxlogscore=999
+ phishscore=0 suspectscore=0 spamscore=0 adultscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2603050001
+ definitions=main-2603210132
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzIxMDEzMSBTYWx0ZWRfX+BIPvz3KiDHt
+ 7f41ftqQQSn2FdhBPJ8AFkHC1v3Jmy91qf6G/4/0bEfLLimXJi+39SqDcId1+u5iU28SO+S90/s
+ eq4z16NStIEsqRHZs5hAsSCnK6A/9lJ6hLSWBO0rJQOJTfvOxsfXEQN7Z7t0RPGCOpC2vDjVg8X
+ hXfkfxdeRQNCM4iC26SMRE2kdDhJH1p6EHSMfltvpwb9+NlreyHmraCd33aiLGUbdW39BBUjdoo
+ 5WwdO1599zAIGAxX2aeR3tKXTVxDoj0bck0XFP4A6Nuw3wn4c4DWzPZbicgOiowYpB7KoP0Stmo
+ fidF2hvvmtDtQKR9Kt+eyaULLwN5jvJXrNnFVUYjlYoxlH2bCmTycUe/SpXkvXe5WyG42WpORbK
+ U2MfImUxzcRqgMjkh/ZZMtwy7H3CSAf5qgXMkuK5MkIsBXLgilrLZ/YUOn6vtQhWk9uKp3m9HIS
+ 94INPIfQinUCV8fkvFg==
+X-Proofpoint-GUID: yILqFSuDm7m137rGgE2Q5-CEuAe7XphB
+X-Authority-Analysis: v=2.4 cv=GrtPO01C c=1 sm=1 tr=0 ts=69bebba1 b=1 cx=c_pps
+ a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
+ a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
+ a=7Gl3-_t3PgB9XO-mQDs3:22 a=yPCof4ZbAAAA:8 a=ZJccf7p4IP6gnwPS0usA:9
+X-Proofpoint-ORIG-GUID: yILqFSuDm7m137rGgE2Q5-CEuAe7XphB
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
+	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270226-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-270227-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[oracle.com,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[oracle.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yss2813483011xxl@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,1543a7d954d9c6d00407];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 9E29D2E6237
+	FROM_NEQ_ENVFROM(0.00)[alok.a.tiwari@oracle.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_SEVEN(0.00)[9];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,oracle.com:dkim,oracle.com:email,oracle.com:mid]
+X-Rspamd-Queue-Id: D54DA2E6274
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-I instrumented packet_snd(), __virtio_net_hdr_to_skb(), and
-gso_features_check() while running the C repro.
+The wavelength tolerance calculation mistakenly uses the nominal
+wavelength LSB field (CMIS_NOM_WAVELENGTH_LSB) instead of the correct
+tolerance LSB field (CMIS_WAVELENGTH_TOL_LSB). This causes incorrect
+values to be reported for the "Laser wavelength tolerance".
 
-In repeated runs, for the same skb, I consistently observed:
-- __virtio_net_hdr_to_skb() (NEEDS_CSUM path):
-skb_transport_offset=3D88, thlen=3D20, so p_off=3D108;
-pskb_may_pull(..., 108) succeeds (headlen=3D172).
-- gso_features_check() on the resulting DODGY TCPv4 skb uses
-nhoff=3Dskb_network_offset(skb)=3D172.
+Use CMIS_NOM_WAVELENGTH_LSB -> CMIS_WAVELENGTH_TOL_LSB.
+correct 0.005 nm LSB scaling for the tolerance field (per CMIS)
 
-So the pull checks in __virtio_net_hdr_to_skb() guarantee access up to
-p_off, but do not guarantee that the
-header at nhoff is safely linear for direct iph->frag_off dereference.
+Fixes: 3448a2f73e77 ("cmis: Add JSON output handling to --module-info in CMIS modules")
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+v1 -> v2
+change 0.05 -> 0.005
+---
+ cmis.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-In this run, nhoff=3D=3Dheadlen on the observed packets (IPv4 header
-starts at the linear tail boundary). Using
-skb_header_pointer() in the DODGY branch avoids this gap.
+diff --git a/cmis.c b/cmis.c
+index 305814c..996e9eb 100644
+--- a/cmis.c
++++ b/cmis.c
+@@ -276,7 +276,7 @@ static void cmis_show_mit_compliance(const struct cmis_memory_map *map)
+ 				       "nm");
+ 		module_print_any_float("Laser wavelength tolerance",
+ 				       (((map->page_01h[CMIS_WAVELENGTH_TOL_MSB] << 8) |
+-				        map->page_01h[CMIS_NOM_WAVELENGTH_LSB]) * 0.05),
++				        map->page_01h[CMIS_WAVELENGTH_TOL_LSB]) * 0.005),
+ 				       "nm");
+ 	}
+ }
+-- 
+2.50.1
 
-I did not hit a KMSAN report in this rerun (instrumented/patched
-kernel), but the offset mismatch above was
-reproducible.
-
-Willem de Bruijn <willemdebruijn.kernel@gmail.com> =E4=BA=8E2026=E5=B9=B43=
-=E6=9C=8821=E6=97=A5=E5=91=A8=E5=85=AD 09:36=E5=86=99=E9=81=93=EF=BC=9A
->
-> Willem de Bruijn wrote:
-> > Guoyu Su wrote:
-> > > Syzbot reported a KMSAN uninit-value warning in gso_features_check()
-> > > called from netif_skb_features() [1].
-> > >
-> > > The current direct skb->len check is not sufficient for SKB_GSO_DODGY
-> > > packets. In the AF_PACKET/PACKET_VNET_HDR path, packet_snd() can buil=
-d
-> > > a DODGY GSO skb whose total length is large enough, while the IPv4
-> > > header is not fully available as initialized linear data for a direct
-> > > iph->frag_off access.
-> >
-> > The fix looks fine, but the AI review of an earlier revision brings up
-> > a good point: __virtio_net_hdr_to_skb calls pskb_may_pull in all paths
-> > to ensure the network header is fully in skb linear. What kind of packe=
-t
-> > is this that managed to escape those checks?
->
-> The packets I got out of the C repro just after virtio_net_hdr_to_skb
-> look as below.
->
-> [   76.539562] vnet_hdr: flags=3D0x75 gso_type=3D0x1 hlen=3D0x6a gso_sz=
-=3D0x416d cstart=3D0x58
-> [   76.539755] skb len=3D56584 data_len=3D56476 headroom=3D4 headlen=3D10=
-8 tailroom=3D0
-> [   76.539755] end-tail=3D208 mac=3D(4,76) mac_len=3D0 net=3D(80,12) tran=
-s=3D92
-> [   76.539755] shinfo(txflags=3D0 nr_frags=3D3 gso(size=3D16749 type=3D3 =
-segs=3D0))
-> [   76.539755] csum(0x10005c start=3D92 offset=3D16 ip_summed=3D3 complet=
-e_sw=3D0 valid=3D0 level=3D0)
-> [   76.539755] hash(0x0 sw=3D0 l4=3D0) proto=3D0x0800 pkttype=3D0 iif=3D0
-> [   76.539755] priority=3D0x0 mark=3D0x0 alloc_cpu=3D0 vlan_all=3D0x0
-> [   76.539755] encapsulation=3D0 inner(proto=3D0x0000, mac=3D0, net=3D0, =
-trans=3D0)
-> [   76.540713] dev name=3Dip6gretap0 feat=3D0x0000000e401d4869
-> [   76.540843] sk family=3D17 type=3D3 proto=3D0
->
-> Clearly fishy. They do have VIRTIO_NET_HDR_F_NEEDS_CSUM set, so we
-> know which branch they take.
->
->         skb_reset_mac_header(skb);
->
->         if (hdr->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) {
->                 u32 start =3D __virtio16_to_cpu(little_endian, hdr->csum_=
-start);
->                 u32 off =3D __virtio16_to_cpu(little_endian, hdr->csum_of=
-fset);
->                 u32 needed =3D start + max_t(u32, thlen, off + sizeof(__s=
-um16));
->
-> // start =3D=3D 88
-> // needed =3D=3D 88 + 18 =3D=3D 106
->
->                 if (!pskb_may_pull(skb, needed))
->                         return -EINVAL;
->
->                 if (!skb_partial_csum_set(skb, start, off))
->                         return -EINVAL;
->                 if (skb_transport_offset(skb) < nh_min_len)
->                         return -EINVAL;
->
->                 nh_min_len =3D skb_transport_offset(skb);
->
-> // nh_min_len =3D=3D 88
->
->                 p_off =3D nh_min_len + thlen;
->
-> // p_off =3D=3D 108
->
->                 if (!pskb_may_pull(skb, p_off))
->                         return -EINVAL;
->
-> // headlen =3D=3D 108
->
-> At the end of this headlen =3D=3D 108, so all of iphdr should be in
-> linear.
->
-> Since the syz repro requires repeat it is possible that I simply did
-> not capture the right packet, but I don't see the C program vary the
-> packet contents.
 
