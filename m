@@ -1,93 +1,100 @@
-Return-Path: <netdev+bounces-270164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270165-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OPHHMewQvmnFFwMAu9opvQ
-	(envelope-from <netdev+bounces-270164-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 04:30:52 +0100
+	id yLplHJgWvmnoGAMAu9opvQ
+	(envelope-from <netdev+bounces-270165-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 04:55:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EA062E31BA
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 04:30:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0981B2E32A8
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 04:55:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DB7BF301EBF7
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 03:30:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1FBE0301F33F
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 03:54:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229B82F260F;
-	Sat, 21 Mar 2026 03:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73E3933E367;
+	Sat, 21 Mar 2026 03:54:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Up2rsatx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jzp8YSAx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CB2BA34
-	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 03:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34DA233D6E6
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 03:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774063844; cv=none; b=fpTtVSFnJui/IjhW6VvWZd9nsMMYqzRJ5Sg/FXHr6z1EvNcnkq93LDJSoRlX0thinC3omkSr0766hZs9uc9xzbyoPhNYhXEggDcTbj6jDhyyBpDnojgayY2Pzw6wuTvGnMWu3r4CNz7yL9b9fBaZ7kBxKMgekHm0uN8KZgGsq2M=
+	t=1774065294; cv=none; b=ZE7FqePpuffnoC4738NQFSGcnAPetzNsHyhe0oYZpiECn5F8iAAS8/fyvKgxAPG9DXPdCkRn/7wBY1LkMgYLYdflQ/P/STN04xdodTf3R2i7n3GfryrIKLYK/I/ka+ZlW9CdWPYkNcD5TlIgYDOYEoRim8JZuWTJm2yDu67AqqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774063844; c=relaxed/simple;
-	bh=VreEpcz8CM8rugIkotpy01O4QxBusLIwuBT7TDffv3M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LwTy22HPsdhvirWkJ1c3URYbwgK8B1d4QN3dLCK978q7DoRHnPZcDKUWrOxecZXjGYVHYwhugzfy+wQAWFRZNCtRqQftFALj4mfkKaShN1k0cMRlwsPncHIAyMgCIkpKGQ1uMCDwuvaVhTFTraS1QvqlfRgQDgtM3VhtwI/1brk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Up2rsatx; arc=none smtp.client-ip=209.85.214.194
+	s=arc-20240116; t=1774065294; c=relaxed/simple;
+	bh=rUoQuWIfaJgdbpwwynVupr5Nrul9i/+vWIwXroY4tpI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Osr5NsR9hfDxlKy7GlLsX3yF3z1wgxouWEJVPI6ew80/pEcvpKRgVyEpFf6zBbwrHKQpP5+QHKt/vnnt3U03S5DFosgGln4DrGE/oozCOOm7QnRwZqqbRKxMfIOVwYGCZVVPFLlrlpOyMNOy8284LsORi7b3JUw3JGSuttLOPEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jzp8YSAx; arc=none smtp.client-ip=209.85.219.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-2ab46931cf1so30444575ad.0
-        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 20:30:42 -0700 (PDT)
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-899a5db525cso22775106d6.3
+        for <netdev@vger.kernel.org>; Fri, 20 Mar 2026 20:54:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774063842; x=1774668642; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1774065292; x=1774670092; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RSTnS2CNzOtgpi/5KarHxhU2fHa8t3c2ByPYxsFVFuQ=;
-        b=Up2rsatxErmKR33pWJkucAdc2eeglZQ6UbaHSw9d5LYEY2G42sZyBx5j3o0WyaBJ69
-         NRpnHH95Gvu29ahQYCdnDnPgf+n4YTg/8L6NgKFlsFRhp9EKme8BbUMKCshJhDERFme1
-         Gu6LADYRq41ZjeYK23awphM9BFnpz538tNHSAdqT6TG4NjZ/m9IGvUFisQIuzxxRGu5d
-         /TZBOBZCOQtXRPLmPqL7pBd8ieferD1N1mIBnTOdZqkCpFV8QwngM8tA+W6oJJxvxFSZ
-         2cwtPu0m+rlWgb6ZZ1f3zZ4SuxK8zcSxMEuozmmVBZSEp6N/KUUWPAkqGu706H+TdM9H
-         z76g==
+        bh=+Mkiqb+Vj/SHwdR4VTTJ+J9wlyftU60EVDvQB+SCNHc=;
+        b=Jzp8YSAxq/6cTtk+YgXxZ+iuhrYE1iZF09eipsvfOmnhujofC9bUJyjPQnqyRz/2aq
+         me57jF2+V/u875DmxZ1AnoSYzSmsZY1rQp4LG/A7x8Xgs/JiBFYru1J63I3ymCsnwI7B
+         /3s4ZCY/b13TCWE8RAtqmq5RnKa+LgAny7x5PEN97OgLKFBq7kFVVGHW5HIgImwnXr2C
+         oE13YmVntkLHKqs/T0giCClNwru5M8gC1uvYuCivMmPCzleOLt9C0dGMTUaByeiB9LIb
+         hBR8pnmZb7j4sVaYWOBHgz7kyzGWyXdMAIDXAjRGMhaYMW7fEHePb/H8xHkQDp1Km+qI
+         ub7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774063842; x=1774668642;
+        d=1e100.net; s=20251104; t=1774065292; x=1774670092;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RSTnS2CNzOtgpi/5KarHxhU2fHa8t3c2ByPYxsFVFuQ=;
-        b=Gef3oHB2NL4k720xFdlQA6LtIkcdAmSb7zk/a2GnBnUwLvhZGRPxSh0SchC8tsa+bW
-         18e2DdyzdZpob2d5tQdPpU/ckmzY0GoXWCW+rnYxRrEA4AHH/aCjROHck/CNU3bshYDT
-         BWYNgDoGmbOlD/dJrVYb14ytwCg3F3594bjXGXeIqiCOVpiNUhouvnOKufBA7gPTcM/2
-         yOA9rDASCDDxG+0CaMoiZfzoAgPwxX5++WY3cQkW1NEC73OLr5xL3SjydxOttDUhJDxC
-         XibFiH75KNWGvY+ocMcSYH12786kYlXbkHtfKiW4M3hcHJZVLADU5vtz3ZDgbwDJlp98
-         EJ1w==
-X-Forwarded-Encrypted: i=1; AJvYcCW/pvg5sEnL8Ueq6vF0MKLEdHDhAAeCGlAjYncYIxO1g3aXqMiYNDwfcz4jAUbMpVlUCHJagGU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyazv4oOWnAf09qt/6Gu0W4ql491OOqCNkbMtJJlV03YNWiBDfT
-	ZWE7m8CkDEjHGi4bxK1ZKiOj3uXrgd0U0aOwKbMEtr7gmSiYnNITD82mWyRwQr3jIh5H7p+V
-X-Gm-Gg: ATEYQzyOsJnm5UxmD2ivvP0xHnZcJPz/k2j0zKH+Zo012AIettYby33mAbWQjhsD3Ne
-	pwjUc6mbn6PFsmKTO91Iow1OQsrRemFURR8p64cE+hIyj2pvGJqp4fXTpS2jDrRKwkA+dZ6AogT
-	nREJH9v2hrufYycVDzdi8oYPeTBn+5DosFq0oNxW40W4pofIEemHi8sW32j9f+7ktf6D0tjysZG
-	ct4zzqX2b/GIeiNlVLyJ0HZGIkcD2HuqbvjOYZ+VMdZ0ZqwH7Z62AhFZP3k66/jJIk6KWCnhY/f
-	zBFVGzR881+UCnUxIgIRaKZbnHJR/N97bJ0Eb30rmPimigeLCCUgRFGtEnu81zegEBLxAxKMdx7
-	iCoEPI1s5AHdp4WbBedKInlTbP4rEhErbQIBQdLA9jzIxeiWTNuaeFsgq7Kmum2knGRUMctcEeb
-	ldssefvqJ/jKPQB7lMy6A=
-X-Received: by 2002:a17:902:c94b:b0:2ae:7edd:c86f with SMTP id d9443c01a7336-2b077127329mr83526885ad.4.1774063842162;
-        Fri, 20 Mar 2026 20:30:42 -0700 (PDT)
-Received: from fedora ([222.20.193.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b0836556desm52025255ad.47.2026.03.20.20.30.39
+        bh=+Mkiqb+Vj/SHwdR4VTTJ+J9wlyftU60EVDvQB+SCNHc=;
+        b=cayoZGX4MZG47prQ1bTnDvA8MSKWXvazyBvHpZp6z/QgUKD2coCkuTANTMl7MsP7JC
+         /TYx/3oIb2XDYNlUdZ5T9tpr9OvSpaSgH1JnekJ9T/UI2TYRWVjxs2LWmr+PnuMJXcCC
+         3nIOdHlQbQ19Rai9MhODRYD2wb3vQBZ+w3AhDTMctis1hPvJ5nk8UEekntNFDu8dgvUg
+         PbVpelcwqXJ/ZMsCNRkznNUVnuHg/I/CFgAietchSvuREG4Yp09qD3qCboMnhrs4Qtx6
+         uZpOA+HaK55iW2FW4V2j94qsAeuGEqho5RNDzo0dd0l8Te4B9U2AH52MYx+VU316HJAK
+         AedA==
+X-Gm-Message-State: AOJu0YxZL/AMD1goRR7lcT1Xv+p98JCv3NdqIQsYwBOXznQNjmGJxiFx
+	U2RmfgVNcm39/AgzjqlnWoH8QJacHmOr6u+sPNJRFpJvbJrbhbcN3NvpQHOjttoE
+X-Gm-Gg: ATEYQzwkAuI3qUE5HVG4yPFNMyw2hhEMiGfjaZmxhoDHC/tN8TTJ8ZfVoRFZijmf8Wq
+	z2aFt5pL/72oJ3Ms2zR4ASps5oEmQvId9FDJYZRCKSN9YIx+ve22F9dMzACoOH+R3N+9fI2K3L4
+	oBBoutbQvrVck9aP6fmEdU0yBhjGY7GkIms/0XzNbBs/3IHKcLLACTOIedCYnjzJC2rSGPzwAqr
+	s4oL90MPrbK1I+EhpMlWDU5P6TG212YH3pa5p7649BmGwxiz4jXwp4lK4r1WtwF7p9Um5UWMoCp
+	pxWMGEqhdF+rmAS0/2TQ0b49JrymwPqVOz92Cs8kFUmqh5JgbFE26RfATOIrQOktY3XO+q7mLQ4
+	eNvef7GBeD1Eq0X3PnxAnqYUTggRRnCYxlTlBm6USQCFvQs4PSDORWXGSqtrhty7t47t6+wASZr
+	kLHsj9K+QQn5Uj5r0MZVfqJHo/mYBJzpak6LmM2hJlEb53hqfIdJ6Ihn4GPdyfNGcvRu/qIKQU6
+	VHV
+X-Received: by 2002:a05:6214:f28:b0:899:f4bd:66e9 with SMTP id 6a1803df08f44-89c85b0e49bmr86905896d6.63.1774065291566;
+        Fri, 20 Mar 2026 20:54:51 -0700 (PDT)
+Received: from CS-396-Lab-Machine.. (c-24-12-10-127.hsd1.il.comcast.net. [24.12.10.127])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89c96cb614dsm2999406d6.22.2026.03.20.20.54.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2026 20:30:41 -0700 (PDT)
-From: Xingwang Xiang <v3rdant.xiang@gmail.com>
-To: john.fastabend@gmail.com
-Cc: kuba@kernel.org,
-	jakub@cloudflare.com,
-	sd@queasysnail.net,
+        Fri, 20 Mar 2026 20:54:51 -0700 (PDT)
+From: Tyllis Xu <livelycarpet87@gmail.com>
+X-Google-Original-From: Tyllis Xu <LivelyCarpet87@gmail.com>
+To: netdev@vger.kernel.org
+Cc: haren@linux.ibm.com,
+	ricklind@linux.ibm.com,
+	nnac123@linux.ibm.com,
+	sukadev@linux.ibm.com,
 	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	Xingwang Xiang <v3rdant.xiang@gmail.com>
-Subject: [PATCH] tls: reject attaching TLS to sockets already in sockmap
-Date: Sat, 21 Mar 2026 11:30:27 +0800
-Message-ID: <20260321033027.4044119-1-v3rdant.xiang@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	andrew+netdev@lunn.ch,
+	stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	danisjiang@gmail.com,
+	ychen@northwestern.edu,
+	Tyllis Xu <LivelyCarpet87@gmail.com>
+Subject: [PATCH] ibmvnic: fix OOB array access in ibmvnic_xmit on queue count reduction
+Date: Fri, 20 Mar 2026 22:54:39 -0500
+Message-ID: <20260321035439.900644-1-LivelyCarpet87@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,103 +102,93 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270164-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,cloudflare.com,queasysnail.net,davemloft.net,redhat.com,vger.kernel.org,gmail.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[v3rdantxiang@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[linux.ibm.com,davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,vger.kernel.org,gmail.com,northwestern.edu];
+	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-270165-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[livelycarpet87@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8EA062E31BA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0981B2E32A8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When a socket is first inserted into a sockmap with a verdict program,
-then TLS is enabled on that socket, the TLS strparser's saved_data_ready
-callback becomes sk_psock_verdict_data_ready(). This function calls
-tcp_read_skb() which drains ALL skbs from sk_receive_queue without
-updating tp->copied_seq when the BPF verdict is SK_PASS. This leaves
-tcp_inq() returning stale values, causing the TLS strparser to think
-data exists in the receive queue when it doesn't.
+When the number of TX queues is reduced (e.g., via ethtool -L), the
+Qdisc layer retains previously enqueued skbs with queue mappings from
+before the reduction. After the reset completes and tx_queues_active is
+set to true, netif_tx_start_all_queues() drains these stale skbs through
+ibmvnic_xmit(). The queue index from skb_get_queue_mapping() may exceed
+the newly allocated array bounds, causing out-of-bounds reads on
+tx_scrq[] and tx_pool[]/tso_pool[], and out-of-bounds writes on
+tx_stats_buffers[] in the function's exit path.
 
-The result is a WARN_ON_ONCE(!first) in tls_strp_load_anchor_with_queue()
-when tcp_recv_skb() returns NULL, and Use-After-Free when
-the strparser's frag_list points to skbs that have been unlinked and
-are now owned by the sockmap subsystem.
+The existing tx_queues_active guard does not help here: it is set to
+true by __ibmvnic_open() before netif_tx_start_all_queues() restarts
+queue draining, so stale skbs pass the check with an invalid queue index.
 
-While sk_psock_init() correctly checks inet_csk_has_ulp() to prevent
-inserting TLS sockets into sockmaps (blocking "forward order"), tls_init()
-does not check for an existing psock, allowing "reverse order" setup.
+Add a bounds check against num_active_tx_scrqs immediately after the
+tx_queues_active guard. Use a dedicated out_unlock label to skip the
+per-queue stats updates (which also index tx_stats_buffers[queue_num])
+when the queue index is invalid.
 
-Fix this by adding a check in tls_init() to reject sockets that already
-have a psock attached (i.e., are in a sockmap). This mirrors the
-existing guard in sk_psock_init() and ensures mutual exclusion between
-TLS and sockmap attachments regardless of the order of operations.
-
-Signed-off-by: Xingwang Xiang <v3rdant.xiang@gmail.com>
+Fixes: 4219196d1f66 ("ibmvnic: fix race between xmit and reset")
+Reported-by: Yuhao Jiang <danisjiang@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Tyllis Xu <LivelyCarpet87@gmail.com>
 ---
- net/tls/tls_main.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ drivers/net/ethernet/ibm/ibmvnic.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index fd39acf41..d4ac91c50 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -1047,6 +1047,8 @@ static void build_protos(struct proto prot[TLS_NUM_CONFIG][TLS_NUM_CONFIG],
- static int tls_init(struct sock *sk)
- {
- 	struct tls_context *ctx;
-+	struct sk_psock *psock;
+diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
+index 5a510eed335e..c939391474cb 100644
+--- a/drivers/net/ethernet/ibm/ibmvnic.c
++++ b/drivers/net/ethernet/ibm/ibmvnic.c
+@@ -2453,6 +2453,11 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 		goto out;
+ 	}
+ 
++	if (unlikely(queue_num >= adapter->num_active_tx_scrqs)) {
++		dev_kfree_skb_any(skb);
++		goto out_unlock;
++	}
 +
- 	int rc = 0;
+ 	tx_scrq = adapter->tx_scrq[queue_num];
+ 	txq = netdev_get_tx_queue(netdev, queue_num);
+ 	ind_bufp = &tx_scrq->ind_buf;
+@@ -2672,6 +2677,9 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 	adapter->tx_stats_buffers[queue_num].bytes += tx_bytes;
+ 	adapter->tx_stats_buffers[queue_num].dropped_packets += tx_dropped;
  
- 	tls_build_proto(sk);
-@@ -1056,6 +1058,20 @@ static int tls_init(struct sock *sk)
- 		return 0;
- #endif
- 
-+	/* Reject sockets that are already attached to a sockmap.
-+	 * The sockmap verdict path (sk_psock_verdict_data_ready) is
-+	 * incompatible with TLS: it drains the receive queue via
-+	 * tcp_read_skb() without updating copied_seq, causing the
-+	 * TLS strparser to operate on stale queue state.
-+	 * This mirrors the check in sk_psock_init() that rejects
-+	 * sockets with ULP (TLS) from being inserted into sockmaps.
-+	 */
-+	rcu_read_lock();
-+	psock = sk_psock(sk);
++	return ret;
++out_unlock:
 +	rcu_read_unlock();
-+	if (psock)
-+		return -EBUSY;
-+
- 	/* The TLS ulp is currently supported only for TCP sockets
- 	 * in ESTABLISHED state.
- 	 * Supporting sockets in LISTEN state will require us
+ 	return ret;
+ }
+ 
 -- 
-2.52.0
+2.43.0
 
 
