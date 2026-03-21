@@ -1,249 +1,156 @@
-Return-Path: <netdev+bounces-270207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270208-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UnkID+iRvmmBTQMAu9opvQ
-	(envelope-from <netdev+bounces-270207-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 13:41:12 +0100
+	id SNn4NTOTvmnkTQMAu9opvQ
+	(envelope-from <netdev+bounces-270208-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 13:46:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 859682E54F7
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 13:41:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 571CF2E555D
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 13:46:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EB34E300F5C9
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 12:41:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4A38730160CD
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 12:46:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CD2175A8A;
-	Sat, 21 Mar 2026 12:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834DB175A74;
+	Sat, 21 Mar 2026 12:46:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rjUxIz20"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KHacFUDY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35FF8199D8
-	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 12:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D0163CB
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 12:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774096869; cv=none; b=p/BemWuxaTWQPGbHNOqL+ZsmBEzkMPjPdrYY1zV+OEPyPZsMV+kdb/D0xTU7HW08qTRgcQzO/w00e5TEc/7Kt2fpKwa12RCG72FbZL1+W2hxKRHAStAVS4dvgRw3psIm0GRZnxVHb6h5MaHHPayaHIZ8I0pRcXjBZnuVu/Qes6A=
+	t=1774097201; cv=none; b=sdP+dc7qmhracvYhid8vFssdZ19lyihme39I4S5/9N0DpYl7Npv3kVSEW5PPDHOgM7tJ6+pKGOq78+NqhIdrP4zTBbfGBwCkRK2NR0IeutxIsq8OoY1mLD4qIl/h+QaB9qqxDKMb987GtZc6IZ0+cE/6QhBI4mq8yeqXYzcDX4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774096869; c=relaxed/simple;
-	bh=fxVoXze93TK9b7JkjLP3hYYoZwJ+sQWedrY/aS+Uubs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GFKkmSTYs9mt55BbakrqpEsTK1ylOAJOYkRsNN9L+cpvzLOGMkhW7/9iskjFS8xrDEIpbY9OG4G34iyhVq0ThJaH5XgPiV/IgcY4+WPFAaqlgmHr9bJadx6vZ9Z7lKbU1T40uNe0DjaZEPBv4R9Cc3M1V6CMK8Yrwt5LTs4dC10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rjUxIz20; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 437D2C19421;
-	Sat, 21 Mar 2026 12:41:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774096868;
-	bh=fxVoXze93TK9b7JkjLP3hYYoZwJ+sQWedrY/aS+Uubs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rjUxIz20bGymV7Rs5Wvfoj/C3PHimtOj2oswMcvSb4/xuT2XsaNg2m8Au0INjBZ0e
-	 5NM8fJbWPfZsIZzcfUwGrKHNO4D9xBdzsH5kuHJwzsUfPhN2T4Ait6dR0XKwSm/Jvl
-	 urLpexwJz9ruvDCpqst42b6CcRcbz/39Xk3KYwNbDw3TywC7YsgMqpZEXXsjGYHalR
-	 FJznFWd8EFZ2wcIzrW7+Y0a7YFd1k6y7zbIvuglzgHWH/0trij0rO5Zvdvkos+R9QO
-	 VPp8eKim71vTs8gkcR0883dGJesTBzPct5hoGDaYrEMWMMVkdN679j0AE+938q7CQN
-	 9DS9D5pstZoTQ==
-Date: Sat, 21 Mar 2026 13:41:06 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: airoha: Reset PPE cpu port configuration
- in airoha_ppe_hw_init()
-Message-ID: <ab6R4krBRy5dycb-@lore-desk>
-References: <20260317-airoha-fix-ppe-def-cpu-v1-1-338533d8e234@kernel.org>
- <20260320183127.22b360be@kernel.org>
+	s=arc-20240116; t=1774097201; c=relaxed/simple;
+	bh=fZI6befk7S1set7eQp9G7dPMBkw+HSr1A3jeOtIoX4E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N/W81VXktlAAKsMNhhspNZhjTarGw7F696YBZFkoRsHV7TzCSe7FCY60yx9YrqYdDv6a5vrq6NoqXPkDFSQbrrc+2A+15Fdo+5ZwpXtS1n3xasJvDqgRi+VL0PWhU4qAZOmhjT3Grm0XkrjlI7hvKhm6EWffaOFHw1DDmUOWA0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KHacFUDY; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c06cb8004e8so985647a12.0
+        for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 05:46:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774097200; x=1774702000; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fZI6befk7S1set7eQp9G7dPMBkw+HSr1A3jeOtIoX4E=;
+        b=KHacFUDYxfmAPNb1Ao5uNDhCbWjJQYFw1XMsQ1b8xUnOqScxP0T2z3KBvGT8I9co8s
+         1Lra1XBmaLAs1XIH6qvh2vv2JqUDUPGklO6XRt7ZIQiPO4dGaQQAHBoiXyCINkaOTOSR
+         V3tVu8JUaJv5fexXz9eXut8g8UGRvBOyIUbHVMh3LqYSyqZYLZHC4W5Kr1hrN/WgLLOR
+         c9xDX2fGWbeHAaQWCZ17HQjhR3qIMm3/kSt5dAeIjkQTOLQgnRjpwDXjZuE7/k1qQM9e
+         29sjgmRuXeiZgfe7HrqvX4qk6E+SNBkiJcakM+1wf0DT1Jdkd2Mx4smENwUkttsuj8Fg
+         DaSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774097200; x=1774702000;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fZI6befk7S1set7eQp9G7dPMBkw+HSr1A3jeOtIoX4E=;
+        b=TmR1UISU4XvsZ8iPTG7vSyuDjXszM6pN9pCV9xOA521tf0mwPGQDFDdUAwFsS9/lBO
+         VwBZQAkPWWWDgkLGc+lebR3ltuzNZ6V4bd7NkGTN+Fnq0JQU0bflZQfa00LA1u7rk5c7
+         tYJuyyq8sRDpi4xybvGYN0W8pofdJb51Ky82WhpTMY2FBhUTymuV3tyf5xqaveQEfy9I
+         Z9zhelwhNJNMUZDcO6HzFy5QlsHj81AQU0aalbQr23rtHF+JmVQXbQUt/IQL3+5dTPQA
+         i86c0n9SfTrbZYMs10600v7qrmu9BHFzFC/EPUDBbGC9nQEE4kW5DvO1h/CL+d6R6NIG
+         6QCA==
+X-Forwarded-Encrypted: i=1; AJvYcCWgoiq49rhvwECkQzDjbdtiFQdRnCfkyvBL//4MfgkceJwTtvklUAKO+tcSzHEYWyFU2BXiANY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLSjv0BMeKcloKAiU8qMXq4fgQMLKzndOwteaRJLFqkrFqNdiV
+	bIWrEKybuTRJRD2Wdl5tRhLYovgpSOaU8P7lqaT7JNxJzgeArZSHe21u
+X-Gm-Gg: ATEYQzzI94vqsbpnjrKCKd/YXX3MY66Yjw5eaHd+DJEYovnSWjdnaD78TI+lbmpuyDj
+	GsRseJQfj+C4eF9rgCWBrWhzAefZ84VPbmi+M0j1tqNatGQzJzJQTW0hOWv3ZeoUquIhgIRD+20
+	cbjQCVqWzfK1i/8E74+LQk26P2zhQQCiCg5C1hCq3eooIUFxb7Jj8JL4bG/bSJ7ghM1iPPoFC/P
+	huZwasUqJe92UK39IKMtpRgkTSFUWhKxk1RP1+7ID5CeEguyIO6wkXDjVWnSms40fB2TDUvtMPU
+	Ho0gYqRTMxHOi/j2o1/lIqgDNedadbFx7O8dj1OmAjMZ5olgnreTY5DJ3P0Q2GftX6E3ETji4ed
+	k3fZG4N8/64D++58glcCdpz7jGWdDr9WMoTtZXl/2Pw1sA52EJztZhqgEeEfyw0PSaeLbDah4ib
+	l0WdopPNWHmq2jm2kawNCxS/6D
+X-Received: by 2002:a05:6a21:998a:b0:39b:91d1:6bf3 with SMTP id adf61e73a8af0-39bcebf11e1mr5705097637.56.1774097199715;
+        Sat, 21 Mar 2026 05:46:39 -0700 (PDT)
+Received: from ubuntu.. ([152.58.130.8])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82b03aa9fc6sm4656177b3a.7.2026.03.21.05.46.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 21 Mar 2026 05:46:39 -0700 (PDT)
+From: Anas Iqbal <mohd.abd.6602@gmail.com>
+To: horms@kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	iyappan@os.amperecomputing.com,
+	keyur@os.amperecomputing.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	mohd.abd.6602@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	quan@os.amperecomputing.com
+Subject: Re: [PATCH] net: xgene: fix signedness bug in xgene_enet_get_fpsel()
+Date: Sat, 21 Mar 2026 12:45:58 +0000
+Message-ID: <20260321124618.1221-1-mohd.abd.6602@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260320162152.GA79627@horms.kernel.org>
+References: <20260320162152.GA79627@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="3sTRF6na1p3lBxUs"
-Content-Disposition: inline
-In-Reply-To: <20260320183127.22b360be@kernel.org>
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270207-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,os.amperecomputing.com,kernel.org,vger.kernel.org,gmail.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270208-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mohdabd6602@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 859682E54F7
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 571CF2E555D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Simon,
 
---3sTRF6na1p3lBxUs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks for taking a look.
 
-> On Tue, 17 Mar 2026 17:40:47 +0100 Lorenzo Bianconi wrote:
-> > @@ -155,6 +171,11 @@ static void airoha_ppe_hw_init(struct airoha_ppe *=
-ppe)
-> >  						 AIROHA_MAX_MTU) |
-> >  				      FIELD_PREP(FP1_EGRESS_MTU_MASK,
-> >  						 AIROHA_MAX_MTU));
-> > +			if (!port)
-> > +				continue;
-> > +
-> > +			airoha_ppe_set_cpu_port(port, i);
->=20
-> AI says:
->=20
-> Can this lead to a NULL pointer dereference if a port is not fully
-> initialized?
->=20
-> In airoha_probe(), all GDM ports defined in the device tree are allocated
-> and the eth->ports[] array is populated with pointers, but port->qdma is
-> left as NULL.
->=20
-> During airoha_register_gdm_devices(), the ports are registered sequential=
-ly
-> with register_netdev(). Since register_netdev() drops the rtnl_lock(),
-> userspace could react to the RTM_NEWLINK event of the first registered po=
-rt
-> and apply a tc flow offload rule.
->=20
-> This would trigger the following call chain:
->   .ndo_setup_tc() -> airoha_ppe_setup_tc_block_cb() -> airoha_ppe_offload=
-_setup()=20
->    -> airoha_ppe_hw_init()
->=20
-> If airoha_ppe_hw_init() iterates over the array, it will find the subsequ=
-ent
-> port that has been allocated but not yet registered, meaning its port->qd=
-ma
-> is still NULL. The call to airoha_ppe_set_cpu_port(port, i) will then
-> dereference the NULL port->qdma.
->=20
-> Would it be better to check if (!port || !port->qdma) before calling
-> airoha_ppe_set_cpu_port()?
+You are right — xgene_enet_is_bufpool() checks
+(id & RING_BUFNUM_MASK) >= 0x20, and
+xgene_enet_ring_bufnum() returns the same masked value.
+So the condition guarantees that the subtraction cannot
+underflow.
 
-Hi Jakub,
+This appears to be a false positive from Smatch. I missed checking all the conditions.
+Sorry for the inconvenience caused. I will drop this patch.
 
-I agree there is a race between airoha_register_gdm_devices() and
-airoha_ppe_setup_tc_block_cb(). Instead of not running
-airoha_ppe_set_cpu_port() in airoha_ppe_hw_init() for a given port and not
-configuring the hw correctly, I guess it would be better to grab
-flow_offload_mutex mutex in airoha_register_gdm_devices routine and wait for
-all devices to be properly registered before executing
-airoha_ppe_setup_tc_block_cb(). Something like:
-
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/etherne=
-t/airoha/airoha_eth.c
-index 961325da833b..f5bb917f0f6e 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2927,21 +2927,24 @@ static int airoha_alloc_gdm_port(struct airoha_eth =
-*eth,
-=20
- static int airoha_register_gdm_devices(struct airoha_eth *eth)
- {
--	int i;
-+	int i, err =3D 0;
-+
-+	mutex_lock(&flow_offload_mutex);
-=20
- 	for (i =3D 0; i < ARRAY_SIZE(eth->ports); i++) {
- 		struct airoha_gdm_port *port =3D eth->ports[i];
--		int err;
-=20
- 		if (!port)
- 			continue;
-=20
- 		err =3D register_netdev(port->dev);
- 		if (err)
--			return err;
-+			break;
- 	}
-=20
--	return 0;
-+	mutex_unlock(&flow_offload_mutex);
-+
-+	return err;
- }
-=20
- static int airoha_probe(struct platform_device *pdev)
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/etherne=
-t/airoha/airoha_eth.h
-index 7df4dbcd8861..3330ee54e20e 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -551,6 +551,8 @@ struct airoha_gdm_port {
- #define AIROHA_RXD4_PPE_CPU_REASON	GENMASK(20, 16)
- #define AIROHA_RXD4_FOE_ENTRY		GENMASK(15, 0)
-=20
-+extern struct mutex flow_offload_mutex;
-+
- struct airoha_ppe {
- 	struct airoha_ppe_dev dev;
- 	struct airoha_eth *eth;
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/etherne=
-t/airoha/airoha_ppe.c
-index 7666b1d2f4f6..96d092f7214e 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -15,7 +15,7 @@
- #include "airoha_regs.h"
- #include "airoha_eth.h"
-=20
--static DEFINE_MUTEX(flow_offload_mutex);
-+DEFINE_MUTEX(flow_offload_mutex);
- static DEFINE_SPINLOCK(ppe_lock);
-=20
- static const struct rhashtable_params airoha_flow_table_params =3D {
-
-
-What do you think?
-I noticed commit f44218cd5e6a is already applied to net-next. I will post a
-follow-up patch, agree?
+Thanks for pointing it out.
 
 Regards,
-Lorenzo
-
-> --=20
-> pw-bot: cr
-
---3sTRF6na1p3lBxUs
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCab6R4gAKCRA6cBh0uS2t
-rAo2AP0VgofFC019vKtsTfxIA2WGT+rQR//Zf0DpJyAuqtpUWAD9EsknoKEO2zlx
-9aN6ois6lbevq4CS+K7KKEGrqFIfAAs=
-=tUik
------END PGP SIGNATURE-----
-
---3sTRF6na1p3lBxUs--
+Anas
 
