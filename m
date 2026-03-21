@@ -1,135 +1,162 @@
-Return-Path: <netdev+bounces-270198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270201-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OCUNLKF0vmmZQAMAu9opvQ
-	(envelope-from <netdev+bounces-270198-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 11:36:17 +0100
+	id 2L2EA4h7vmm8QwMAu9opvQ
+	(envelope-from <netdev+bounces-270201-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 12:05:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 589812E4C48
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 11:36:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E8542E4ED3
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 12:05:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B6E073007E2B
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:36:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B46603095365
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 11:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8DF314D0D;
-	Sat, 21 Mar 2026 10:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4EBA35E956;
+	Sat, 21 Mar 2026 11:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k+CHKcvc"
+	dkim=pass (1024-bit key) header.d=smail.nju.edu.cn header.i=@smail.nju.edu.cn header.b="nj4nMsJS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7402BD11;
-	Sat, 21 Mar 2026 10:36:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC31285072;
+	Sat, 21 Mar 2026 11:00:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774089372; cv=none; b=J6mX7wy69t5sZyTXWd08qeG9qGKddMAcpTzyO0e6lPOGeNjLTuGTFERag+La8yjog9KcrMWn1+x0TjPdpSoVwOKmOjeqOrkHxkq6mHvyNkut9hbpmhqwTIF4GVmP4EMe7FhW0N3KRRwJw4MUN2z/XDNBvxXWJpaGMB6WzJbhKwI=
+	t=1774090814; cv=none; b=ZzTArVqivjwWGq5rt/+HYRMH/OwOX5jtp+fGKuyoRd8Vh89gfq6ENEWUGcFgUJTQlXXQpYYgUbFGh4ZKF64CiHNeaXeFGkoVWGKjLmpWdScplwdmQFZluZSACjR9vOdK+Wp5fp6CwKKsjUGt0tXMQ+zdfuuygIZ8KiL2vDemXVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774089372; c=relaxed/simple;
-	bh=/6eOLTSivq+etcgwBsYg5Tg2Jeg74Hgv+HHyl+MfzjA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V6OBKwRWfcAShTESWFyuEJ5Y2EzYWjTwhYSMQGG/04KuHMZ2FQY3mJTOdaCf3A0xBvKGW6p9RInvArNPuC/JeQgd2BP4GVi26+mIGhxz7ugD0y4DL7QBV+lWledomxrkGtIhCcjwv9XFZXRxYNDt3bvC7McbTv+95LuGfoAjigg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k+CHKcvc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F4DDC19421;
-	Sat, 21 Mar 2026 10:36:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774089371;
-	bh=/6eOLTSivq+etcgwBsYg5Tg2Jeg74Hgv+HHyl+MfzjA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k+CHKcvcxzfZXTvWuk0btSostGs112cEL/nkkDN4RiAwIvySyaTSS7YRsryeBytZp
-	 10g2tQXRu0OXpBta3VDu6MBlQ8Ew22DDIC3NfZ7CTERkyAQRo7HXHDFps4/JeXaJEv
-	 2sq/uoqovyZxLwpJ+R91aa/yZSMj1hieIS0/y/LTHuyDR+WhFP4OelAwex0A9Oblxc
-	 d56sQMILsSzD63KAApDx90MN9HblHBgkmlSw7Zwgc/QmwD1ljixQkTfxzqyO/VAw3H
-	 KLZEzYyO0Q/xtvjImgUVxY1MDJqVJRTQahkUm5ZF2HRhdjUHSuBqD5anUwKGk3Ob3G
-	 M5MZu5Wf6P5zg==
-Date: Sat, 21 Mar 2026 10:36:07 +0000
-From: Simon Horman <horms@kernel.org>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>, David Wei <dw@davidwei.uk>,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net] selftests: drv-net: add missing tc config options
- for netkit tests
-Message-ID: <20260321103607.GA74886@horms.kernel.org>
-References: <20260320-config-fixes-for-nk-tests-v1-1-1e20ec6ddc7e@meta.com>
+	s=arc-20240116; t=1774090814; c=relaxed/simple;
+	bh=xon1nQweq732r5eVjdzZPB8zk5bI5qxbeUMD6cnUjpI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Dra199Ff6wstrap9LM7iJPI5jdppV2123KOomGrnLvfxxi/EO5u5DOah9QHgucHnn3pgI9LtGs7G6vkJVhfH6h9clTjCJT6nX9qHJAZadumy8Qrabn71t94jTFp2/ad1n+aXt+UDG9Dh7AQrJGhmwnV8n/1V9XDW/d9SnaqDzfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn; spf=pass smtp.mailfrom=smail.nju.edu.cn; dkim=pass (1024-bit key) header.d=smail.nju.edu.cn header.i=@smail.nju.edu.cn header.b=nj4nMsJS; arc=none smtp.client-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smail.nju.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=smail.nju.edu.cn;
+	s=iohv2404; t=1774090685;
+	bh=EBO7V58A7ssXU+gGEAK7HArbYDe3Nmo4Y/R/Js/t75A=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version;
+	b=nj4nMsJSZXdqOerzyCOm3L7nAoJkeTSas4XWThfr6tv4h6pXw2lN+HV+Cp5to6cy9
+	 0OYaPGomTg8PLfqySDZVAvtDPDB9k6RelebjPZ+SjyOufLJsO2i60T1aE0GPK4X89x
+	 Oiob0aQjnNckqLkqHgss378pT3riyzyZFAPUJXV0=
+X-QQ-mid: zesmtpgz8t1774090677t17b96e5e
+X-QQ-Originating-IP: Xon+mhcmBEE+Lcwhvqo98f/FbKlKhm3fP0ir12d4KSI=
+Received: from localhost.localdomain ( [116.172.93.199])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sat, 21 Mar 2026 18:57:53 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 101290449306167147
+EX-QQ-RecipientCnt: 20
+From: Kexin Sun <kexinsun@smail.nju.edu.cn>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	sgarzare@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-hyperv@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: julia.lawall@inria.fr,
+	xutong.ma@inria.fr,
+	kexinsun@smail.nju.edu.cn,
+	yunbolyu@smu.edu.sg,
+	ratnadiraw@smu.edu.sg
+Subject: [PATCH] hv_sock: update outdated comment for renamed vsock_stream_recvmsg()
+Date: Sat, 21 Mar 2026 18:57:53 +0800
+Message-Id: <20260321105753.6751-1-kexinsun@smail.nju.edu.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260320-config-fixes-for-nk-tests-v1-1-1e20ec6ddc7e@meta.com>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:smail.nju.edu.cn:qybglogicsvrgz:qybglogicsvrgz5b-0
+X-QQ-XMAILINFO: NBkE/PP8DpFY9NRetunQVCP6iiO9/Ub4XwlB/WqgpQceHWRlJBZYHw96
+	8d5uhMllzOKAbRKGxUqm9XfA1EoEaN3AlvIR/Tk7FmwiY2g4ZBvD00QPRDHfNBYzokcs/hh
+	7Ja03GJkjoTD/DzW8nmZbfdXurR+ZtYdhvsYqsTCOOZSWCeydYjoLKngKb8VsCzLBWfyYE/
+	2vvBVN+Cwgn/AkGuvHleYj8CZpsrWttnM/I4EYv161IEj531RKxZS5LBm0xOLQiviM1C1mb
+	Q/wL4tG5u4tvX4at61lAp/ckkHfLNUB7LnvB1HF2Du9BjvcelX/t61ioUp/uV0O50CLwD4f
+	MgOwjmCi5Uoo+oTisB/SWwry9MNlNi3yo3rPGv4YbTgmtU+6EJLt3/s8iWB8+jbk0RnOjML
+	sdiOibDX6ROmVeSnllX6HAxv/lHmKAyPIbE4ADBrAbxbblLX5v5cBC+8ssyoiRe+vS3ad1S
+	frwqZkJILwt8jnYWMsJ2FulFNmj8Sk0VcfYDt2j9FGOR6UQOeHuHGt1Qw2e8zzKn7CALzEh
+	/3RyQ9si+y8UZWtR6bVuQ2VfzT6dkW0UwFvz+b1Hd88TpvINeUJh9Jn57QVSwvTYNH7vUTf
+	utuQDv/UlmqTi5mTs44DwazieuIR7fWnM+rQkJNey9COrjgQD/yhqticQbng53rZJwm5kCT
+	KWqShksqCVy/kF0Gfwi516HpZWoxtbWQDfIb9ld1OSEsxtgQfMl6gA5QmvuSQdMXx8zSzom
+	5a+Oq1bYASyCoEQFX65709thLIPTC7Hqh0eHgzRnmGPS3f5BE5dAdCPayKtJ6fMBDoyPQzN
+	gxuHGOm0l7yvaxhkFwInllLMC9b3B+obOkJqbq2As1PZlAEd2QKou3D3+2GhtrnosSeqJC9
+	sYRmmmOToSfq78S52WiVag+r+pul8b5QU23UzHPUCbjEvR3SFgRi7P9a7lhvtec3RIuEVbB
+	6Y5zkrx48F5JcN7ZtDJlNiZK5+bhySldBzc+Vh5SnoTQXz3+ZO4ek9e8wLMkS7PasZ1415P
+	t2p0jhtCLlFcrLNxT711OPaXQeucSen742QankR/VW7q/VlOTt75i9sCW3PuiI1rYR7r7N4
+	McKBCrZVcQ0803c1rEN2NI=
+X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
+X-QQ-RECHKSPAM: 0
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[smail.nju.edu.cn,reject];
+	R_DKIM_ALLOW(-0.20)[smail.nju.edu.cn:s=iohv2404];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270198-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270201-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[smail.nju.edu.cn:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FROM_NEQ_ENVFROM(0.00)[kexinsun@smail.nju.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 589812E4C48
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,smail.nju.edu.cn:dkim,smail.nju.edu.cn:mid,nju.edu.cn:email]
+X-Rspamd-Queue-Id: 7E8542E4ED3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 11:08:35AM -0700, Bobby Eshleman wrote:
-> From: Bobby Eshleman <bobbyeshleman@meta.com>
-> 
-> The NetDrvContEnv env context uses tc clsact qdiscs and BPF tc filters
-> for traffic redirection, but the kernel config options are missing from
-> the selftests config.
-> 
-> Without them, the tc qdisc installation trips on:
-> 
->   CMD: tc qdisc add dev enp1s0 clsact
->     EXIT: 2
->     STDERR: Error: Specified qdisc kind is unknown.
-> 
->   net.lib.py.utils.CmdExitFailure: Command failed
-> 
-> Add CONFIG_NET_CLS_ACT and CONFIG_NET_SCH_INGRESS to enable these tc
-> options.
-> 
-> Fixes: 3f74d5bb807e ("selftests/net: Add env for container based tests")
-> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+The function vsock_stream_recvmsg() was renamed to
+vsock_connectible_recvmsg() by commit a9e29e5511b9 ("af_vsock:
+update functions for connectible socket").  Update the comment
+accordingly.
 
-Hi Bobby,
+Assisted-by: unnamed:deepseek-v3.2 coccinelle
+Signed-off-by: Kexin Sun <kexinsun@smail.nju.edu.cn>
+---
+ net/vmw_vsock/hyperv_transport.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Unfortunately this does not apply cleanly to net.
-Which breaks CI.
-
-Please rebase and repost.
-
+diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+index 069386a74557..2b7c0b5896ed 100644
+--- a/net/vmw_vsock/hyperv_transport.c
++++ b/net/vmw_vsock/hyperv_transport.c
+@@ -196,7 +196,7 @@ static int hvs_channel_readable_payload(struct vmbus_channel *chan)
+ 
+ 	if (readable > HVS_PKT_LEN(0)) {
+ 		/* At least we have 1 byte to read. We don't need to return
+-		 * the exact readable bytes: see vsock_stream_recvmsg() ->
++		 * the exact readable bytes: see vsock_connectible_recvmsg() ->
+ 		 * vsock_stream_has_data().
+ 		 */
+ 		return 1;
 -- 
-pw-bot: cr
+2.25.1
+
 
