@@ -1,47 +1,48 @@
-Return-Path: <netdev+bounces-270246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270247-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WFx1Aw/1vmk0mAMAu9opvQ
-	(envelope-from <netdev+bounces-270246-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 20:44:15 +0100
+	id 4PHUNSP1vmk0mAMAu9opvQ
+	(envelope-from <netdev+bounces-270247-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 20:44:35 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DFAA2E70C3
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 20:44:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28F522E70D2
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 20:44:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4EB373009F39
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:44:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5D6813019FDA
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16643342CA9;
-	Sat, 21 Mar 2026 19:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB48342CA9;
+	Sat, 21 Mar 2026 19:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b="GKUGiyLa";
-	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="WGZXpLYR"
+	dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b="Et/URfdg";
+	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="fEgfIbLE"
 X-Original-To: netdev@vger.kernel.org
 Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6048E3314C2
-	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 19:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB023314C2
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 19:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.202.193.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774122251; cv=none; b=OHlkGzJaQZ9vfQ/Ix1Ix8Ibq+p8u9A3yMPCJF//TGDUNYUiGoW6LVZZLUchp+zVwwX/bCEpqz19g3vL5IABcGSb0QhNPfqOth+RAd+6pYeQ8hhp5fznTMAj4ZaNGoa/Zn4SjRWKAzZ/KlnEg7mModZBztx6TTGtQJnjsq8p24WY=
+	t=1774122255; cv=none; b=dKJ9WQgFP5B484cX8RK9wjFIkaRQa0p2s40YB9aOBHKJVwDI+l91aIUVzYht00EVeC4PzaXI93Ef1IESYGgZlQXVAaNnGnO6BGIBop4D4VJxoff93TyhHXuvkckI/fonySDlhcRhg4YnVKYWfV3CvGw2DevDG2OI3SSX+XHEr4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774122251; c=relaxed/simple;
-	bh=RhlUd5nJZtyzPTrb6142vd7/kHj3AnKxbcivtAnbRiU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RMxOnuBANmLlFRSGs/EirxN5hBuHKbiMcF1bgTEIAV4g4g7OATyWcovKz8SR+cqH116YaFE3ywR/x7Tpob+8yTomwG6h8sllH0ywN17SLoJkLPniDUZeC7KUebwds4qR3Ec/ENQubRHStEXlU1zbd1lcQ0/qj6WYVMx7Zb+a+rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com; spf=pass smtp.mailfrom=tinyisr.com; dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b=GKUGiyLa; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=WGZXpLYR; arc=none smtp.client-ip=34.202.193.197
+	s=arc-20240116; t=1774122255; c=relaxed/simple;
+	bh=zWRAcjCQ8xfhYi7+ArRyrwgND8OTbc/VDaZEGG/iICA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fxrCcFVFlAo9ynNHfwZbFL41G1fAF2JVkOdJ8LsZiqanWX44h+nppyyIZ5k8bRliNBbdN8ztvmPsr6bFhVpjF0Oik92FzY4qS0LuWGDzfaIF578LmhKs4X0KBOUmg5hNO/wzGIcDOo59pUiyuQTlvKJoSb/9b/9W5qN7/bnQc/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com; spf=pass smtp.mailfrom=tinyisr.com; dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b=Et/URfdg; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=fEgfIbLE; arc=none smtp.client-ip=34.202.193.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tinyisr.com
 Authentication-Results: purelymail.com; auth=pass
-DKIM-Signature: a=rsa-sha256; b=GKUGiyLaA+adTt3TkBqU6pyUp2FYdTmpg88T+qNgrFdyC2R9JhMfyHh4SPC6gH8/qwNfqZpOA04zfSVgPLrgprNpp++LiL6IXe/Nsa6lxI9HrO88TDCBOXwaHwB4HTeJ4ZDdUeDtFXqwr2f74OENHoCnhM4a9AAWennsKU61noV0FutkcCAB2xYDWEBEOmSE/ZupzfgJv2LblcgMviICFd1+l59E9oefQ8ZGHESipdUf1DHItGZBowhRwmwDj53v2UGlfOSGaOViH+73YNaD7X+w4wZlKuZSx6z7gQj3wLhGofAgk0RCOkEPSvkZjL9NBkz7/Y1d0Itv+G9qNBiWfw==; s=purelymail3; d=tinyisr.com; v=1; bh=RhlUd5nJZtyzPTrb6142vd7/kHj3AnKxbcivtAnbRiU=; h=Received:From:To:Subject:Date;
-DKIM-Signature: a=rsa-sha256; b=WGZXpLYRXdWLBU6iq+/kKo/3qG65qO7DrBgWdpNo9Zos2/V+Oo/uelwi1GKTE9qp+CMSTFkm5j5mDrjmEDrh1/q71nd/7VLi1Kv70/Ycqgqc6JJse/9PXmdte/Nc4RUtknXwaA0FwJX4Kvc/WjWJRlLVFb5YLUZnKHnTzn9O1RvchhD7xVQJz2LMF6QOAStM+NLcSsU5ynkaBKzB3ZV1s6nnWBTJZXuAHbQgPyWgz6Mknlr4gdM7gLH09T/1JVisp2DH0b8RoBuX4beBNyqN/9Lw/aW9lkLgICU2GAMiVunUs//b0sHRpMVubyAiUCBxa7DdpAY1gACzA1Lihy6eUA==; s=purelymail3; d=purelymail.com; v=1; bh=RhlUd5nJZtyzPTrb6142vd7/kHj3AnKxbcivtAnbRiU=; h=Feedback-ID:Received:From:To:Subject:Date;
+DKIM-Signature: a=rsa-sha256; b=Et/URfdgU9P1jFfjxZlllF8BLwTVNrliZ5MSBj9wiN7luW3rtResrkZ8ObTX6W94NaEAyeMF+pF9RHLEIQWN6TQ/99Zxn+DujMpiP4oPYiQKqRLmDmwMe9ArbCZBU2OoHX4KX5glC3GAVb47aQzopVk9TeKR1CaRkhPEMf23nX8ZJ92/IFbl8GyjVk21COKkz/PRQmC9AMJnuge8pa3ut4GFe/CyM0alE4WTUTlDerdWmnhmproZ0in6uyqDmUmleHkqzrx9n2mEu+4hHfRRMeZw6XPi5tH4xd4a90KmayG9DFuvONbEB2n/WS1hJF4wgdxZVYklm81B0GGegsqzdA==; s=purelymail3; d=tinyisr.com; v=1; bh=zWRAcjCQ8xfhYi7+ArRyrwgND8OTbc/VDaZEGG/iICA=; h=Received:From:To:Subject:Date;
+DKIM-Signature: a=rsa-sha256; b=fEgfIbLEEI9u1QQffdqnQTxGuRFwvOMJjDg+nf3lJQLOWoG3kpxLGpPOZUUdDv8PoGJcgjfwck0Ljj5fTbgCtOqu3dXGJuf05ocMONaCRpPta45tiQAdQxfJ+OlYpNEa5R6ZIep5n7gADwv8adTSt3GZQICw2lFK3BDvF3cVggsPa3GRcsaCmFNz9YktlvuSexC+jfgkhLPUPUq7CkRyveQ3MV7CFlDdNMHuU+qiZ7eWqx/Iw+5ESKzw7AA4svbjCP6gnQLTCkG7bCDsnMg94FnFN3KxvsuPT8ThuWP5ZmaG9p/XIrPVyDmm8kdVLK0ke7JRYzp+p/XT6+l2EdMe0g==; s=purelymail3; d=purelymail.com; v=1; bh=zWRAcjCQ8xfhYi7+ArRyrwgND8OTbc/VDaZEGG/iICA=; h=Feedback-ID:Received:From:To:Subject:Date;
 Feedback-ID: 99681:12517:null:purelymail
 X-Pm-Original-To: netdev@vger.kernel.org
 Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 958892867;
           (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
-          Sat, 21 Mar 2026 19:44:07 +0000 (UTC)
+          Sat, 21 Mar 2026 19:44:11 +0000 (UTC)
 From: Joris Vaisvila <joey@tinyisr.com>
 To: netdev@vger.kernel.org
 Cc: horms@kernel.org,
@@ -56,10 +57,12 @@ Cc: horms@kernel.org,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
 	Joris Vaisvila <joey@tinyisr.com>
-Subject: [RFC v3 0/4] net: dsa: MT7628 embedded switch initial support
-Date: Sat, 21 Mar 2026 21:43:36 +0200
-Message-ID: <20260321194340.2140783-1-joey@tinyisr.com>
+Subject: [RFC v3 1/4] dt-bindings: net: dsa: add MT7628 ESW
+Date: Sat, 21 Mar 2026 21:43:37 +0200
+Message-ID: <20260321194340.2140783-2-joey@tinyisr.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260321194340.2140783-1-joey@tinyisr.com>
+References: <20260321194340.2140783-1-joey@tinyisr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,7 +83,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270246-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270247-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -96,89 +99,167 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,purelymail.com:dkim,tinyisr.com:dkim,tinyisr.com:mid]
-X-Rspamd-Queue-Id: 6DFAA2E70C3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 28F522E70D2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi all,
+Add bindings for MT7628 SoC's Embedded Switch.
 
-This RFC series adds initial support for the MT7628 Embedded Switch.
-
-The implementation provides basic functionality required to operate the
-switch using DSA. The hardware exposes 5 internal Fast Ethernet ports
-and a Gigabit port which is internally connected to the CPU MAC.
-
-This version aims to be functionally complete and attempts to address
-all feedback received on the previous versions.=20
-
-Tested on a MT7628NN based board.
-
-RFC:
-
-I would like to transition this series toward a proper PATCH submission
-as it seems that the feedback on the last RFC did not point out major
-issues. As this is my first driver submission, I would greatly appreciate
-any guidance on what should be addressed before it is appropriate to
-send this in as a PATCH.
-
-Thank you for your time and review.
-
+Signed-off-by: Joris Vaisvila <joey@tinyisr.com>
 ---
-
-v3:
-=09- add DTS bindings for mediatek,mt7628-esw
-=09- update tagging driver to use htons instead of manual byte swapping
-=09- remove port 5 from config as it doesn't exist in the hardware
-=09- fix code formatting
-=09- add helper macros for configuring packed VLAN table registers
-=09- fix mac_capabilities for cpu port, replace supported_interfaces
-=09  with PHY_INTERFACE_INTERNAL to accurately reflect the hardware
-=09- update MEDIATEK_GE_SOC_PHY tristate name, fix sorting
-=09- remove unneeded PHY_PACKAGE from MEDIATEK_FE_SOC_PHY Kconfig
-=09- remove untested features from mtk-fe-soc.c phy driver
-
-v2: https://lore.kernel.org/netdev/20260314150845.653866-1-joey@tinyisr.com
-=09- Update commit messages with more relevant information
-=09- Change all references of "special" tag to "MT7628" tag
-=09- Fix coding style errors
-=09- Use dsa_xmit_port_mask instead of BIT(dp->index)
-=09- Replace phy_read/phy_write with an MDIO bus definition
-=09- Remove PHY init from switch driver
-=09- Fix undocumented writes to SGC2 and FCT0
-=09- Fix missing double-tag enable required for VLAN unaware
-=09  functionality
-=09- Fix VLAN remove logic
-=09- Update VLAN add logic to use the first unused slot
-=09- Add a dedicated phy driver for MT7628 FE PHYs
-
-v1: https://lore.kernel.org/netdev/20260228185242.800836-1-joey@tinyisr.com
-
-Joris Vaisvila (4):
-  dt-bindings: net: dsa: add MT7628 ESW
-  net: phy: mediatek: add phy driver for MT7628 built-in Fast Ethernet
-    PHYs
-  net: dsa: initial MT7628 tagging driver
-  net: dsa: initial support for MT7628 embedded switch
-
- .../bindings/net/dsa/mediatek,mt7628-esw.yaml | 136 ++++
- drivers/net/dsa/Kconfig                       |   7 +
- drivers/net/dsa/Makefile                      |   1 +
- drivers/net/dsa/mt7628.c                      | 634 ++++++++++++++++++
- drivers/net/phy/mediatek/Kconfig              |  10 +-
- drivers/net/phy/mediatek/Makefile             |   1 +
- drivers/net/phy/mediatek/mtk-fe-soc.c         |  50 ++
- include/net/dsa.h                             |   2 +
- net/dsa/Kconfig                               |   6 +
- net/dsa/Makefile                              |   1 +
- net/dsa/tag_mt7628.c                          |  92 +++
- 11 files changed, 939 insertions(+), 1 deletion(-)
+ .../bindings/net/dsa/mediatek,mt7628-esw.yaml | 136 ++++++++++++++++++
+ 1 file changed, 136 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/net/dsa/mediatek,mt76=
 28-esw.yaml
- create mode 100644 drivers/net/dsa/mt7628.c
- create mode 100644 drivers/net/phy/mediatek/mtk-fe-soc.c
- create mode 100644 net/dsa/tag_mt7628.c
 
+diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7628-esw.=
+yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7628-esw.yaml
+new file mode 100644
+index 000000000000..5955c07a1be7
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7628-esw.yaml
+@@ -0,0 +1,136 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/dsa/mediatek,mt7628-esw.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Mediatek MT7628 Embedded Ethernet Switch
++
++maintainers:
++  - Joris Vaisvila <joey@tinyisr.com>
++
++description:
++  The MT7628 SoC's built-in Ethernet Switch is a five port switch with
++  integrated 10/100 PHYs. The switch registers are directly mapped in the =
+SoC's
++  memory. The switch has an internally connected 1G CPU port and 5 user po=
+rts
++  connected to the built-in Fast Ethernet PHYs.
++
++unevaluatedProperties: false
++
++allOf:
++  - $ref: dsa.yaml#/$defs/ethernet-ports
++
++properties:
++  compatible:
++    const: mediatek,mt7628-esw
++
++  reg:
++    maxItems: 1
++    description: MMIO address of the switch
++
++  resets:
++    items:
++      - description: Phandle of system reset controller with ESW reset ind=
+ex
++      - description: Phandle of system reset controller with EPHY reset in=
+dex
++
++  reset-names:
++    items:
++      - const: esw
++      - const: ephy
++
++  mdio:
++    $ref: /schemas/net/mdio.yaml#
++    unevaluatedProperties: false
++
++required:
++  - compatible
++  - reg
++  - resets
++  - reset-names
++
++examples:
++  - |
++    switch0: switch@10110000 {
++        reg =3D <0x10110000 0x8000>;
++
++        resets =3D <&sysc 23>, <&sysc 24>;
++        reset-names =3D "esw", "ephy";
++
++        compatible =3D "mediatek,mt7628-esw";
++
++        ports {
++            #address-cells =3D <1>;
++            #size-cells =3D <0>;
++
++            port@0 {
++                reg =3D <0>;
++                label =3D "swp0";
++                phy-handle =3D <&swp0_phy>;
++                phy-mode =3D "internal";
++            };
++
++            port@1 {
++                reg =3D <1>;
++                label =3D "swp1";
++                phy-handle =3D <&swp1_phy>;
++                phy-mode =3D "internal";
++            };
++
++            port@2 {
++                reg =3D <2>;
++                label =3D "swp2";
++                phy-handle =3D <&swp2_phy>;
++                phy-mode =3D "internal";
++            };
++
++            port@3 {
++                reg =3D <3>;
++                label =3D "swp3";
++                phy-handle =3D <&swp3_phy>;
++                phy-mode =3D "internal";
++            };
++
++            port@4 {
++                reg =3D <4>;
++                label =3D "swp4";
++                phy-handle =3D <&swp4_phy>;
++                phy-mode =3D "internal";
++            };
++
++            port@6 {
++                reg =3D <6>;
++                ethernet =3D <&ethernet>;
++                phy-mode =3D "rgmii";
++
++                fixed-link {
++                    speed =3D <1000>;
++                    full-duplex;
++                };
++            };
++        };
++
++        mdio {
++            #address-cells =3D <1>;
++            #size-cells =3D <0>;
++
++            swp0_phy: swp0_phy@0 {
++                reg =3D <0>;
++            };
++
++            swp1_phy: swp1_phy@1 {
++                reg =3D <1>;
++            };
++
++            swp2_phy: swp2_phy@2 {
++                reg =3D <2>;
++            };
++
++            swp3_phy: swp3_phy@3 {
++                reg =3D <3>;
++            };
++
++            swp4_phy: swp4_phy@4 {
++                reg =3D <4>;
++            };
++        };
++    };
 --=20
 2.53.0
 
