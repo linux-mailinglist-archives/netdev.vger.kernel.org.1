@@ -1,189 +1,169 @@
-Return-Path: <netdev+bounces-270170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270171-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EI4VCwwrvmmaIAMAu9opvQ
-	(envelope-from <netdev+bounces-270170-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 06:22:20 +0100
+	id MKNEJPsuvmn3IgMAu9opvQ
+	(envelope-from <netdev+bounces-270171-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 06:39:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 852422E35D6
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 06:22:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DED672E36BF
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 06:39:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B79303039C9A
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 05:20:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B6C8E3034295
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 05:38:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CEC24A047;
-	Sat, 21 Mar 2026 05:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B803563E1;
+	Sat, 21 Mar 2026 05:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mmpsystems.pl header.i=@mmpsystems.pl header.b="uneE3rGy"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from s106b.cyber-folks.pl (s106b.cyber-folks.pl [195.78.66.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147EB15CD7E;
-	Sat, 21 Mar 2026 05:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E20175A76;
+	Sat, 21 Mar 2026 05:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.78.66.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774070422; cv=none; b=QBFGF89uU/PvxvyXylUBdqVlz8ldHZmq/iBn8ufQiWww9iSB8s2gvlNfehTzzc/dOf5JnXWUI54oBigJzuby6VI7yCUd2fjjtnVpBbDN+CTMBdhOoP4Orlpo8jtdYLnJFqtZmEPvembqLNZaoULX+8RuUAgU9qZeyZuNuBO4VbQ=
+	t=1774071531; cv=none; b=ljI4xD0ePwxYUuwl9obC7iie+3cW+5YxosgE9etsL7RerloirE1p1lCRL8jNivyYoBV+jXYNQZN2evZKMrp+rcVcBzxSdMgr+L8k1XDuFoPOaNgqE+E53T5ReKTO5lJprBIKzHvc1zcgayBq6REvHl4JQG4Q7GKAoVMZ/HdZe0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774070422; c=relaxed/simple;
-	bh=gI7VasGxTzrvMGywmJL2XSYVggKfek1+XWHb1PWaLL8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FAuo+x6EgPEMB/023dqPYz3gIQw+igycj6Luoq7gBte8ZC7R9U3d1lolk1srnOXJS5W9EwWsKs+ymrSW/5AL71vpnGkQGz8pg71sf0hZzRcu7S62VgO//VC+YgcJryBI8RgfLl5xlG3GlcH4dQ8d+cIMdmAWOqIAE0r1npfXiXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1w3okz-000000006ww-1VL8;
-	Sat, 21 Mar 2026 05:20:17 +0000
-Date: Sat, 21 Mar 2026 05:20:14 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Liang Xu <lxu@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next 2/2] net: dsa: mxl862xx: use RST_DATA to skip
- writing zero words
-Message-ID: <d27d646eb7a4cc50585821bb2b2c9ab7f6b1a75d.1774070039.git.daniel@makrotopia.org>
-References: <cover.1774070039.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1774071531; c=relaxed/simple;
+	bh=+bvTMvdty1fzgGCGx7v/YOGgwFlkD7szerZ7TPZd6jE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=paL+dAsaAeeQIxXBkd/PNzh4b+jxgRwvqGqYbLSqGABZbSLypR65+iYS/1JislJK/gsFGDsB08MRBB59fss5QpSPzgfiRWx6Aji7pzo9HZpUtkX22SSajSsg0RDwyaXipwYgIXbfmAEInex9uB5JkzZURMxLfQjyQtdNebpvM9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mmpsystems.pl; spf=pass smtp.mailfrom=mmpsystems.pl; dkim=pass (2048-bit key) header.d=mmpsystems.pl header.i=@mmpsystems.pl header.b=uneE3rGy; arc=none smtp.client-ip=195.78.66.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mmpsystems.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mmpsystems.pl
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=mmpsystems.pl; s=x; h=Cc:To:Message-Id:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Subject:Date:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cuzcUcquOIpuEvBuH4lStYzlUUTfGnCUE2b66iIEQMo=; b=uneE3rGyjHiN0M6FvRHDM1q/TE
+	nMmqUvSuwJnjGmo9uPYMHU7ssNgpGuuJ0sjpe6WYE+Di5tBQ3ToMTk/PF4+KmtGe9Y6GrPghw+HAp
+	e675zS5gQwbHU+lYJy/CkXI1RTJorF4AgdVHFeplLtY3JDMGPNq89IUYgwnTvXcH+rdWxhTGITrqH
+	dgo0XvYxm3QlPG3UyYviXW8CrJgonUfPh+MEugTtz1qek8r8O7eXa4hsytuRf9uFKSiVRinHNSbKM
+	b6Y4ES0532y4N282eMzcGuu/CJ14ndQrfJIhmG526awHyqtRbUEAcelb2m1GksFUj0UfKTterzasg
+	KtheNFIg==;
+Received: from user-5-173-16-20.play-internet.pl ([5.173.16.20] helo=localhost)
+	by s106.cyber-folks.pl with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <michal.piekos@mmpsystems.pl>)
+	id 1w3p2p-000000088Q7-0S6s;
+	Sat, 21 Mar 2026 06:38:43 +0100
+From: Michal Piekos <michal.piekos@mmpsystems.pl>
+Date: Sat, 21 Mar 2026 06:38:17 +0100
+Subject: [PATCH v2] net: stmmac: skip VLAN restore when VLAN hash ops are
+ missing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1774070039.git.daniel@makrotopia.org>
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260321-vlan-restore-error-v2-1-45cf56a5223d@mmpsystems.pl>
+X-B4-Tracking: v=1; b=H4sIAMguvmkC/32NSw6DMAxEr4K8riscPq264h4VizR1SiR+slFUh
+ Lh7Awfo8o1m3mygLIEVHtkGwjFomMYE5pKB6+z4YQzvxGByU+cFlRh7O6KwLpMwssgk6O+vwpK
+ 7+Sq3kIazsA/fU/psE3fhaK/nR6Qj/auLhISld7Ur2BBVvhmGWVddeNDr3EO77/sPF5qAm7gAA
+ AA=
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Ovidiu Panait <ovidiu.panait.rb@renesas.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ Michal Piekos <michal.piekos@mmpsystems.pl>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1774071499; l=1877;
+ i=michal.piekos@mmpsystems.pl; s=20260301; h=from:subject:message-id;
+ bh=+bvTMvdty1fzgGCGx7v/YOGgwFlkD7szerZ7TPZd6jE=;
+ b=zSrlFLj2+YAmXXjeA5B74clu6Ih6A2qDQaIcZg1MC6BKlQ4CyUZM1vm5Wa41N7pbzWysMMasq
+ tpBqMbRpWvkCo961IqT5g0j8/EWoyoPl12g+XE65SzpeMFXEXpq+Y2v
+X-Developer-Key: i=michal.piekos@mmpsystems.pl; a=ed25519;
+ pk=Aixyx03If7ZDamiKKN0lsa+0mtA+WjIuIf2ZQVYNBqg=
+X-Authenticated-Id: michal.piekos@mmpsystems.pl
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[mmpsystems.pl:s=x];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[mmpsystems.pl : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[makrotopia.org];
-	TAGGED_FROM(0.00)[bounces-270170-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270171-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,renesas.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.983];
+	FROM_NEQ_ENVFROM(0.00)[michal.piekos@mmpsystems.pl,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[mmpsystems.pl:-];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,makrotopia.org:email,makrotopia.org:mid]
-X-Rspamd-Queue-Id: 852422E35D6
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mmpsystems.pl:email,mmpsystems.pl:mid]
+X-Rspamd-Queue-Id: DED672E36BF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Issue the firmware's RST_DATA command before writing data payloads that
-contain many zero words. RST_DATA zeroes both the firmware's internal
-buffer and the MMD data registers in a single command, allowing the
-driver to skip individual MDIO writes for zero-valued words. This
-reduces bus traffic for the common case where API structs have many
-unused or default-zero fields.
+stmmac_vlan_restore() unconditionally calls stmmac_vlan_update() when
+NETIF_F_VLAN_FEATURES is set. On platforms where priv->hw->vlan (or
+->update_vlan_hash) is not provided, stmmac_update_vlan_hash() returns
+-EINVAL via stmmac_do_void_callback(), resulting in a spurious
+"Failed to restore VLANs" error even when no VLAN filtering is in use.
 
-The optimization is applied when at least 5 zero words are found in the
-payload, roughly the break-even point against the cost of the extra
-RST_DATA command round-trip.
+Check presence of VLAN HW FILTER flags before stmmac_vlan_update().
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Tested on Orange Pi Zero 3.
+
+Fixes: bd7ad51253a7 ("net: stmmac: Fix VLAN HW state restore")
+Signed-off-by: Michal Piekos <michal.piekos@mmpsystems.pl>
 ---
- drivers/net/dsa/mxl862xx/mxl862xx-host.c | 38 ++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+This patch fixes a noisy "Failed to restore VLANs" message on platforms
+where stmmac VLAN hash ops are not implemented.
+stmmac_vlan_restore() calls stmmac_vlan_update() without checking for
+VLAN hash ops presence which results in -EINVAL. 
+---
+Changes in v2:
+- Replace check for hash ops with check for HW FILTER flags
+- Link to v1: https://lore.kernel.org/r/20260314-vlan-restore-error-v1-1-4fc6c3e2115f@mmpsystems.pl
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-host.c b/drivers/net/dsa/mxl862xx/mxl862xx-host.c
-index 19ebb1dd724dd..cb129a182b0f7 100644
---- a/drivers/net/dsa/mxl862xx/mxl862xx-host.c
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx-host.c
-@@ -266,6 +266,17 @@ static int mxl862xx_get_data(struct mxl862xx_priv *priv, u16 words)
- 				  MXL862XX_MMD_REG_DATA_MAX_SIZE * sizeof(u16));
- }
- 
-+static int mxl862xx_rst_data(struct mxl862xx_priv *priv)
-+{
-+	return mxl862xx_issue_cmd(priv, MMD_API_RST_DATA, 0);
-+}
-+
-+/* Minimum number of zero words in the data payload before issuing a
-+ * RST_DATA command is worthwhile.  RST_DATA costs one full command
-+ * round-trip (~5 MDIO transactions), so the threshold must offset that.
-+ */
-+#define RST_DATA_THRESHOLD	5
-+
- static int mxl862xx_send_cmd(struct mxl862xx_priv *priv, u16 cmd, u16 size,
- 			     bool quiet)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 6827c99bde8c..cfc0ce9cec9c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -6863,7 +6863,8 @@ static int stmmac_vlan_restore(struct stmmac_priv *priv)
  {
-@@ -308,6 +319,8 @@ int mxl862xx_api_wrap(struct mxl862xx_priv *priv, u16 cmd, void *_data,
- 		      u16 size, bool read, bool quiet)
- {
- 	__le16 *data = _data;
-+	bool use_rst = false;
-+	unsigned int zeros;
- 	int ret, cmd_ret;
- 	u16 max, crc, i;
+ 	int ret;
  
-@@ -321,6 +334,24 @@ int mxl862xx_api_wrap(struct mxl862xx_priv *priv, u16 cmd, void *_data,
- 	if (ret < 0)
- 		goto out;
+-	if (!(priv->dev->features & NETIF_F_VLAN_FEATURES))
++	if (!(priv->dev->features &
++	      (NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_VLAN_STAG_FILTER)))
+ 		return 0;
  
-+	/* If the data contains enough zero words, issue RST_DATA to zero
-+	 * both the firmware buffer and MMD registers, then skip writing
-+	 * zero words individually.
-+	 */
-+	for (i = 0, zeros = 0; i < size / 2 && zeros < RST_DATA_THRESHOLD; i++)
-+		if (!data[i])
-+			zeros++;
-+
-+	if (zeros < RST_DATA_THRESHOLD && (size & 1) && !*(u8 *)&data[i])
-+		zeros++;
-+
-+	if (zeros >= RST_DATA_THRESHOLD) {
-+		ret = mxl862xx_rst_data(priv);
-+		if (ret < 0)
-+			goto out;
-+		use_rst = true;
-+	}
-+
- 	/* Compute CRC-16 over the data payload; written as an extra word
- 	 * after the data so the firmware can verify the transfer.
- 	 */
-@@ -354,6 +385,13 @@ int mxl862xx_api_wrap(struct mxl862xx_priv *priv, u16 cmd, void *_data,
- 			val = le16_to_cpu(data[i]);
- 		}
- 
-+		/* After RST_DATA, skip zero data words as the registers
-+		 * already contain zeros, but never skip the CRC at the final
-+		 * word.
-+		 */
-+		if (use_rst && i < max && val == 0)
-+			continue;
-+
- 		ret = mxl862xx_reg_write(priv,
- 					 MXL862XX_MMD_REG_DATA_FIRST + off,
- 					 val);
+ 	if (priv->hw->num_vlan)
+
+---
+base-commit: 42bddab0563fe67882b2722620a66dd98c8dbf33
+change-id: 20260314-vlan-restore-error-f8b3a1c7f50a
+
+Best regards,
 -- 
-2.53.0
+Michal Piekos <michal.piekos@mmpsystems.pl>
+
 
