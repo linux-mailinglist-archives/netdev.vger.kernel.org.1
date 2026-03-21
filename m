@@ -1,62 +1,60 @@
-Return-Path: <netdev+bounces-270196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270197-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oGbhIdBwvml1PQMAu9opvQ
-	(envelope-from <netdev+bounces-270196-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 11:20:00 +0100
+	id yJluEZtzvmmYPwMAu9opvQ
+	(envelope-from <netdev+bounces-270197-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 11:31:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB6052E4B29
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 11:19:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE72B2E4C12
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 11:31:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 89012302AC19
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:19:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2DBA8300C312
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:31:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6106229B12;
-	Sat, 21 Mar 2026 10:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41DD530C62E;
+	Sat, 21 Mar 2026 10:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A5YcbIZs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tNSzpnqC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8181E15E97;
-	Sat, 21 Mar 2026 10:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F16523A9BD
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 10:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774088371; cv=none; b=vGtkQhu1Tcr9q/xNajCeh8w8M1NfQvOsZ34IrvzA2wszfLBc4kgJspk1MvIakKjqKmqQg+PebcJnlI1Gh3ybdVUWbwnVvjGhu5w7a+92qI3lhr/+Q2yKLZo53+xYH51z7usyV1ILHZLCiApB+QEMzFNJmGnUSdK/VcE1XqNT2C0=
+	t=1774089113; cv=none; b=ZZ6esBP2T8S3VAZVUQ2f1bNHD7OsY/jtlSYZUQsJ1qnmLDdd98GAa51EtxBzXWNwHAjIVH0+XTGv7G6Pd34FBNqfkHX2nM8FnFc27/qrmUVvs1BwnKXVfDyBQQ5BkOo8uCmdA796JtRjccWU1mOIWLE3DIhrLTq+rMoz7xx5a+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774088371; c=relaxed/simple;
-	bh=iD9xikylZwtdXCM4YADJdCNPZRb5mmZ451xS3Yw7ovo=;
+	s=arc-20240116; t=1774089113; c=relaxed/simple;
+	bh=8sNKUwqX/OrIg5gaDz0kzFK6SYsk+ySYRe6i4JQPW7Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=phrehG/FoAG01kyQHM8N+MGYG7ZI1le68zgytnDmGfPpcABbql0YI1Se16Zsup+eUHV0rKaT72L9ZwjAcbhURn9XXZGJEuQ9UF42TyQV3nfmbc1MEm5QBBh6K8LnLvnHD3oX3Gds/U1sl58pI3eWBRe5T4LpWXw3KuPBWe0cHK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A5YcbIZs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1753CC19421;
-	Sat, 21 Mar 2026 10:19:28 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=A2IrON5NElZNSV6lEi2KmmhbYwXbuLcllt6iHpjSlL10R1ipuziTFOIAjFwjvtc1ostv1OFYBTJR7Rsom30ABtQ8D+jaF1UXfYGluUejWPHoRmlZlPAtYIHOKSja5gSD0iGEOM+rEdjeAxt4a5K+/73oRTRNY2Eqsj+BLoyzys4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tNSzpnqC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B6C2C19421;
+	Sat, 21 Mar 2026 10:31:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774088371;
-	bh=iD9xikylZwtdXCM4YADJdCNPZRb5mmZ451xS3Yw7ovo=;
+	s=k20201202; t=1774089112;
+	bh=8sNKUwqX/OrIg5gaDz0kzFK6SYsk+ySYRe6i4JQPW7Q=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A5YcbIZsducdfLzfGWINWAWaeGHdkBH0q644fR0OypPcxW5xTrXVJftgiQyXSAJY+
-	 WS8qnseQS9gY/rgkzNrJgvNYzzoFkCOsJen9TBIytJRmlqjbAg1HUNj/T87DA0dSU4
-	 O6oO5P/+Yv/jgHTrWiLgbz5VGzRDse595oNRD8KmokLNXErBNEnj6OUXL7htGGN1oj
-	 VkFuc1rFgzXGkc8EdttRbQHH4Al3x464Za77Q4uy/D4jqkpoVa63ioNa9v/YCZYslI
-	 ZX9OIbCB16X2Q8K4p7s3lFADExWJrPcIjHg3+NjecFwZVuFFn85FD31z0w1lGTAwNu
-	 K/UZLnX0YELrA==
-Date: Sat, 21 Mar 2026 10:19:26 +0000
+	b=tNSzpnqCFdDHTMGkVM9zj6lFCyfYjNB1CeU8GOlSl/u3B2RQKU0Pw+b9iB8DMdQh8
+	 FQXOP4kC1NoXhrFB3YcjcplfDyGGzuv7tW2ISbjbgGHYn35HaExvPeLNzMGXV2zJz8
+	 BIfMV9Khz/wB7wnPzB6Ire9m6naf++uaU4ynXN1HbjPauy9Jp48B4o6qxqg1atwuWI
+	 lj/HVzPklsX9ZYOFNLPWhomZ+SWHRt7h5nnJWHGMDdPZIQ84j9aii9XcEMHsSQstoY
+	 vS6gAQX7RO6fX3Yh0u9aznuUFXvvWjkWBMCrkJm7GjuqxRZJdWslWJI/Op94fk/p9i
+	 au8aZvKN6P6rA==
+Date: Sat, 21 Mar 2026 10:31:48 +0000
 From: Simon Horman <horms@kernel.org>
-To: Alexander Wilhelm <alexander.wilhelm@westermo.com>
-Cc: Manivannan Sadhasivam <mani@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: qrtr: fix handling of confirm_rx field
-Message-ID: <20260321101926.GY74886@horms.kernel.org>
-References: <20260320-qrtr-fix-confirm_rx-on-big-endian-v1-1-e1a337dc1a38@westermo.com>
+To: David Carlier <devnexen@gmail.com>
+Cc: MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org
+Subject: Re: [PATCH] net: ti: icssg-prueth: fix use-after-free of CPPI
+ descriptor in RX path
+Message-ID: <20260321103148.GZ74886@horms.kernel.org>
+References: <20260319181236.14526-1-devnexen@gmail.com>
+ <20260320174439.41080-1-devnexen@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,54 +63,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260320-qrtr-fix-confirm_rx-on-big-endian-v1-1-e1a337dc1a38@westermo.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260320174439.41080-1-devnexen@gmail.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-270196-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270197-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid,westermo.com:email]
-X-Rspamd-Queue-Id: DB6052E4B29
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: DE72B2E4C12
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 02:28:52PM +0100, Alexander Wilhelm wrote:
-> Convert confirm_rx to little endian when enqueueing by using cpu_to_le32(),
-> as big endian systems otherwise interpret the value incorrectly.
+On Fri, Mar 20, 2026 at 05:44:39PM +0000, David Carlier wrote:
+> cppi5_hdesc_get_psdata() returns a pointer into the CPPI descriptor.
+> In both emac_rx_packet() and emac_rx_packet_zc(), the descriptor is
+> freed via k3_cppi_desc_pool_free() before the psdata pointer is used
+> by emac_rx_timestamp(), which dereferences psdata[0] and psdata[1].
+> This constitutes a use-after-free on every received packet that goes
+> through the timestamp path.
 > 
-> When receiving, apply le32_to_cpu(). !! ensures the result becomes 0 or 1
-> in native CPU endianness, so this conversion is not strictly required, but
-> it is kept for consistency, clarity, and future safety.
-
-Hi Alexander,
-
-It seems to me that the conversion is required if the code
-runs on a Big Endian host. What is your thinking on this?
-
+> Defer the descriptor free until after all accesses through the psdata
+> pointer are complete. For emac_rx_packet(), move the free into the
+> requeue label so both early-exit and success paths free the descriptor
+> after all accesses are done. For emac_rx_packet_zc(), move the free to
+> the end of the loop body after emac_dispatch_skb_zc() (which calls
+> emac_rx_timestamp()) has returned.
 > 
-> Fixes: 5fdeb0d372ab ("net: qrtr: Implement outgoing flow control")
-> Signed-off-by: Alexander Wilhelm <alexander.wilhelm@westermo.com>
+> Fixes: 46eeb90f03e0 ("net: ti: icssg-prueth: Use page_pool API for RX buffer allocation")
+> Signed-off-by: David Carlier <devnexen@gmail.com>
 
-...
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
