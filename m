@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-270221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270220-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WII+GQypvmmJVwMAu9opvQ
-	(envelope-from <netdev+bounces-270221-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 15:19:56 +0100
+	id wL1yFNSovmmJVwMAu9opvQ
+	(envelope-from <netdev+bounces-270220-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 15:19:00 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C41C02E5C16
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 15:19:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A4B282E5C00
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 15:18:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ADC02304CA6C
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 14:15:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2556B304302F
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 14:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82ADE38C420;
-	Sat, 21 Mar 2026 14:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9632238BF92;
+	Sat, 21 Mar 2026 14:15:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kp+ztG+F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NYd7EU0c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439D4309EE9
-	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 14:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A5738C402
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 14:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774102544; cv=none; b=uHNcAPsKavU5Dtp+GsfP2XVwQHUyz/hT6FKWEXw5cg8y99jAgaOFV1WQod/3/41Me3xy+MB0xET1JPGir9qnd00TmEmdY+wZ+eOasyc7xUnFSlczBIFptR5Jma8Z3gTJ4t3wss8/GiDmQpzhwWhu3WObG9lPALrNpRutbLp07Zc=
+	t=1774102541; cv=none; b=iEM63vv7EP4Wml9dPlfe5t+nY0lxsebmSXfhzTQ+OboyxExJiiPhrFn5/iLxwDbSvdrFeRkFrEizh33wp1aeEngiYyhOy+yrAlyCWSYdoNaE+ZE6HFsy8vZktA5IxBb3Y/0tHoy3PNQSk1jAjwEpC5a3ehWCobQkjlpONjFomIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774102544; c=relaxed/simple;
-	bh=S/UgzQXA3QLqhdcPFe6v/HB9WUgH0Mn6KE3pVNm35Go=;
+	s=arc-20240116; t=1774102541; c=relaxed/simple;
+	bh=jzPZdf7Og6HeFXO/l7pOiaD9NwH4pg2nD16c3hH6gys=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dLQ/fSGr9qJtOEsKHfqgAM37IJqlfVy5qY9Lwlop2jXRdrbIyR5e0MouxZTZX1vZ1KqSV0Yw81aSS6RSsTL3TXEc9flWIRgyUV7sqxFeN502OC0nLUnEnO9y+jVybp1qAzl/Eqi5E9ePetoZpS6i4Xd2A0hLr3bTew+PxYqBg9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kp+ztG+F; arc=none smtp.client-ip=209.85.214.182
+	 MIME-Version; b=euAPwa18AnpTXLWKMQpg/iVPOoXeFUSsdaI1lLQ9fk0kO+fOTA+cYRE+gNg4xNZ9pyaj1VlPoFErwYBQYg9ak/782yOORKjR1puIqdZsuPBTtEb2fXaXLFux8TvTG7dLeWqus0OKWUwWp4q3LADFDVl/785gO/5NfefYDFD3k5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NYd7EU0c; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2a9296b3926so22200115ad.1
-        for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 07:15:38 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2b06d33e84cso18081525ad.3
+        for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 07:15:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774102538; x=1774707338; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1774102540; x=1774707340; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RrbOXEwKxG45bbWSYaSRrFiYiD3hpjnUzEitvzAGFtw=;
-        b=kp+ztG+FGkm/U2PLlnzBzA+Gg23QetfBREDEvyWPHjQVIdP7gGZfovMdR1w4gYadww
-         6GssXfbQqOOpNarqcr5dWzvU/R3U84n7D5h2SGEvY7x/M81DZL2f5xjgGX1YVpb1lIsQ
-         X3JEgvdX7V2jzHhNY3T3nwuSvGaaCo/enImymenBTQ4eBtAbewSLrJ6AQH44oSc3Avaa
-         T2XT6nxMaGDi8eG51rgswh3XSGBMrmhVsXEszzACIJioSo97tu5pypm3vQaF7+/j68Jm
-         T4krEjr5Eu3/AWOwvVrCqsT5HpxzD8/7K8b2xRL8PNZmBjo9Oa9UH3nPBLKbUmqrPjRe
-         6/Gg==
+        bh=uAJIY1DIMzupbpUoUnEua+5LFL/m08GzQPtpfspcCIA=;
+        b=NYd7EU0cfP1gufCqrBWKH/v4MgXV1XbX+CRwp1a2WHdh+LjcQrZ94YP1y4JBVVlFGh
+         Mf6JidkQekGIFXYITEZcj2H/q0BVHJKs7ysTtL102OfQLP54EGH2l8iJIn7yxnJQZTB2
+         dj9RPGmAP02c4ctaZfJUeGIIjuicHHA0NAxwly8bsJniA8ghDz6upbvPhhBJRq2q/Qg6
+         CJ5ndGdvpvt7n7UwH9qhXXfgpa53eTivUyWC2XXKcfwvEVAokmpydT+u5PzCKA1UluHZ
+         FAPkUNjyniz/YWogBvZgEjgTzZdvfhiMPyjQ2tafxGykxHWBWD+piLMsAKPi8TLme0Ze
+         FQdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774102538; x=1774707338;
+        d=1e100.net; s=20251104; t=1774102540; x=1774707340;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=RrbOXEwKxG45bbWSYaSRrFiYiD3hpjnUzEitvzAGFtw=;
-        b=Tt8/qURRrINsOTuoiMkuVZalqPp/b10GzUDV219JzRtlYULnKKfOA9aAIKkESeLHuo
-         uHTaNTGRaK64Z9yDc5PlCY+BzzSQVwfwuoCj0AWGTPse2R+O/KYbGu9Ax0ivBuYQEou7
-         DaZmYmCEL8Uis97YeijxrCszol1qbOOZUf0ISRtWcg5X/PCVdE9dvqgOoXveEJJVanPz
-         iOj24Rl/a6LC8RHd+qQGYxAKQb7DR0CUUAGgBjpJO8jf7uxCQ1KqnIq0FXSJFL6KWY14
-         /N+dhAhii8ZSnF3QJUTpT4x8k8GubtjH8gazwzknPJgzHQ1JRb5+CAzzaMFv4HWjwXQY
-         /MDA==
-X-Gm-Message-State: AOJu0YydBg/qEeZJoMB5ewk/mjuc/n44TrsWNEe134j8bOQ0yS+lngLl
-	ieYjJAbwANz4Dwz4NXFXMRPnGrjrGNvkVg2etwH/JpFAgw7w7aJSJheu
-X-Gm-Gg: ATEYQzy5KkxuA7SM/BFJYdfQwHZ78naBGp1tJzqVl0fImJg26oo5XkE6Yz41B4MW0Et
-	if/J14Ng90mUvF1RyeGbqFcZeYFEVg9gaaY/kva8nUPDE9HDULepSdgzypWxwef0gToglGho4ru
-	A4xO6x/Oqs2wZO7pJqMUSQeT+BBOGpevim8PJh3Z6fmlfsU5FGHkTb+1EoJWIxMwABlPhbYufQ6
-	DvDAy8sVWJfTa1lgJrO8Uxw5xCRXJQ926/h9SEVZaSVl8saeVGDiJxos6KTAqOlfSTAVQlvJYEF
-	7464vXv1BQvHsmXP5+hy/T0Mdhp5Ja4CmAzextuIHjzitswBhIvXMDHAXFdUut1RvcMmmCCeX36
-	5qWuQg7yRhWOFfYNfi8VQkY+FWiKOz+ZLzWqMEbwZcpJhZo6oJfO0XgQekopgxlaxRy/EeTr0Jx
-	/Y3TMFIBm5T+4/2pWQHoWAIfTW3rOgfvWOjq05vaUVxq1yW8+gnkv8wnyBMTtwrN42qa3Bw6g=
-X-Received: by 2002:a17:903:2310:b0:2ae:572a:9f19 with SMTP id d9443c01a7336-2b0826fc627mr61129765ad.21.1774102537729;
-        Sat, 21 Mar 2026 07:15:37 -0700 (PDT)
+        bh=uAJIY1DIMzupbpUoUnEua+5LFL/m08GzQPtpfspcCIA=;
+        b=R6d5W3dmiwoLEBBAtvwDS3hWb7wbQb0sTZ0aS0W991ekt3+R/IqPl6e8rcVQqWpAQp
+         iH/xWqJ+4GPC/ZcyPm45PP7GLcz6vimh6goovWLs/t9LFwrgM1dndYMfY7dkI+fbdjyA
+         EyRjmOEqdt8pYrp3fRCHrOGK7jgDQBqM2S9lkzEiXnzu2XU3Yc7+qJHmuxMe+58yKoR4
+         Oi8U2KfUXTgRSix7x/avJZT0rQ9FOs13Xl4KvLU9jIqZj41faKj0WfTMG+unH9K3sLWS
+         yUkdvu8TiMQtQ8awAso5AXFkAnNIjjKX+11/FHt5DgBcGg7uZ9b8RUnxZkccVGAofBI1
+         XgUA==
+X-Gm-Message-State: AOJu0YwCuM983ebiTV8tH+2P6sdHUEXerjOQw9lTnV0HwY5SukLI4rzA
+	42Lzy1LIEL8/XyO7ca0HFfRiSVLzPUCPIMbhwDkq0SCCer3HqSfQq3f7
+X-Gm-Gg: ATEYQzyit5vdGUQeRqI6bTYKiSI8okboqfUZ+a12tzhWTWcCd+vfjSzm9BU4+qav17y
+	UIZOwtgUofveisM0ZSPZoO0PRYQG/OcHzP8xz5+mWjSv33jNQ8N9QhBTjvzVE1JLuYnfKvrajAd
+	jH6l8iy3oLroPjkhHM1wI4m7gPZM2DZMtc199H+6Tof9XvGNYmqw1tcTOejf9YZrkvL3u8us9Sg
+	TUwe9EGHKcpSSMuQ3hjYkbtdjQTBd2HF5lfQNoxIJgKQexaZPvpxbcj+hg1XBVYQ/NydosUvt8V
+	vXlHW6DTEoiupmUDT7PKVSFwpY6Gktrvg+JNsj1/o+LhF0w/SZo1KC1qlY2LCO8yIx1OcgenH4l
+	2MuMqkLvf1WAYVQ7n/kPVyvMjf7hqhm/PQH/NedCXBQHtFxTjCUtLKdlHIanzDcs82bMYnBm0x+
+	gt9BZ+ypekFm7UUskjmaHsI3AwfRZtyZy3uqQS5nkAiqTfGBPG5H5z/GZrZwVzXXuRx5VjRdA=
+X-Received: by 2002:a17:902:db03:b0:2b0:669d:3a68 with SMTP id d9443c01a7336-2b0826f36a2mr64480885ad.19.1774102539735;
+        Sat, 21 Mar 2026 07:15:39 -0700 (PDT)
 Received: from sean-All-Series.. (1-160-226-215.dynamic-ip.hinet.net. [1.160.226.215])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b08353e94asm52680715ad.25.2026.03.21.07.15.35
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b08353e94asm52680715ad.25.2026.03.21.07.15.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Mar 2026 07:15:37 -0700 (PDT)
+        Sat, 21 Mar 2026 07:15:39 -0700 (PDT)
 From: Sean Chang <seanwascoding@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Chuck Lever <chuck.lever@oracle.com>,
@@ -84,11 +84,10 @@ To: Andrew Lunn <andrew@lunn.ch>,
 Cc: netdev@vger.kernel.org,
 	linux-nfs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Sean Chang <seanwascoding@gmail.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH v5 4/5] nfs: Refactor nfs_errorf macros and remove unused ones
-Date: Sat, 21 Mar 2026 22:15:09 +0800
-Message-Id: <20260321141510.68214-5-seanwascoding@gmail.com>
+	Sean Chang <seanwascoding@gmail.com>
+Subject: [PATCH v5 5/5] Revert "nfsd: Mark variable __maybe_unused to avoid W=1 build break"
+Date: Sat, 21 Mar 2026 22:15:10 +0800
+Message-Id: <20260321141510.68214-6-seanwascoding@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260321141510.68214-1-seanwascoding@gmail.com>
 References: <20260321141510.68214-1-seanwascoding@gmail.com>
@@ -111,12 +110,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_TO(0.00)[lunn.ch,oracle.com,gmail.com,kernel.org,intel.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,intel.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-270221-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270220-lists,netdev=lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -126,78 +125,38 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C41C02E5C16
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A4B282E5C00
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Refactor nfs_errorf() and nfs_ferrorf() to the standard do-while(0)
-pattern for safer macro expansion and kernel style compliance.
+This reverts commit ebae102897e760e9e6bc625f701dd666b2163bd1.
 
-Additionally, remove nfs_warnf() and nfs_fwarnf() as `git grep`
-confirms they have no callers in the current tree. Furthermore,
-these functions have remained unused since the introduction in
-commit ce8866f0913f ("NFS: Attach supplementary error information
-to fs_context.").
+The __maybe_unused attributes are no longer needed because dprintk()
+now uses no_printk(), which ensures variables are referenced by the
+compiler even when debugging is disabled.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202603110038.P6d14oxa-lkp@intel.com/
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@intel.com>
-Tested-by: Andy Shevchenko <andriy.shevchenko@intel.com>
 Signed-off-by: Sean Chang <seanwascoding@gmail.com>
 ---
- fs/nfs/internal.h | 28 +++++++++++++---------------
- 1 file changed, 13 insertions(+), 15 deletions(-)
+ fs/nfsd/export.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
-index 63e09dfc27a8..59ab43542390 100644
---- a/fs/nfs/internal.h
-+++ b/fs/nfs/internal.h
-@@ -161,13 +161,19 @@ enum nfs_lock_status {
- 	NFS_LOCK_NOLOCK		= 2,
- };
- 
--#define nfs_errorf(fc, fmt, ...) ((fc)->log.log ?		\
--	errorf(fc, fmt, ## __VA_ARGS__) :			\
--	({ dprintk(fmt "\n", ## __VA_ARGS__); }))
--
--#define nfs_ferrorf(fc, fac, fmt, ...) ((fc)->log.log ?		\
--	errorf(fc, fmt, ## __VA_ARGS__) :			\
--	({ dfprintk(fac, fmt "\n", ## __VA_ARGS__); }))
-+#define nfs_errorf(fc, fmt, ...) do { \
-+	if ((fc)->log.log) \
-+		errorf(fc, fmt, ## __VA_ARGS__); \
-+	else \
-+		dprintk(fmt "\n", ## __VA_ARGS__); \
-+} while (0)
-+
-+#define nfs_ferrorf(fc, fac, fmt, ...) do { \
-+	if ((fc)->log.log) \
-+		errorf(fc, fmt, ## __VA_ARGS__); \
-+	else \
-+		dfprintk(fac, fmt "\n", ## __VA_ARGS__); \
-+} while (0)
- 
- #define nfs_invalf(fc, fmt, ...) ((fc)->log.log ?		\
- 	invalf(fc, fmt, ## __VA_ARGS__) :			\
-@@ -177,14 +183,6 @@ enum nfs_lock_status {
- 	invalf(fc, fmt, ## __VA_ARGS__) :			\
- 	({ dfprintk(fac, fmt "\n", ## __VA_ARGS__);  -EINVAL; }))
- 
--#define nfs_warnf(fc, fmt, ...) ((fc)->log.log ?		\
--	warnf(fc, fmt, ## __VA_ARGS__) :			\
--	({ dprintk(fmt "\n", ## __VA_ARGS__); }))
--
--#define nfs_fwarnf(fc, fac, fmt, ...) ((fc)->log.log ?		\
--	warnf(fc, fmt, ## __VA_ARGS__) :			\
--	({ dfprintk(fac, fmt "\n", ## __VA_ARGS__); }))
--
- static inline struct nfs_fs_context *nfs_fc2context(const struct fs_context *fc)
+diff --git a/fs/nfsd/export.c b/fs/nfsd/export.c
+index 8fdbba7cad96..8116e5bcbe00 100644
+--- a/fs/nfsd/export.c
++++ b/fs/nfsd/export.c
+@@ -1025,7 +1025,7 @@ exp_rootfh(struct net *net, struct auth_domain *clp, char *name,
  {
- 	return fc->fs_private;
+ 	struct svc_export	*exp;
+ 	struct path		path;
+-	struct inode		*inode __maybe_unused;
++	struct inode		*inode;
+ 	struct svc_fh		fh;
+ 	int			err;
+ 	struct nfsd_net		*nn = net_generic(net, nfsd_net_id);
 -- 
 2.34.1
 
