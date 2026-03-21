@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-270224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270225-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sK7ZFzq5vmksYgMAu9opvQ
-	(envelope-from <netdev+bounces-270224-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:28:58 +0100
+	id gD4bOkG5vmksYgMAu9opvQ
+	(envelope-from <netdev+bounces-270225-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:29:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17CBD2E615F
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:28:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6340F2E6167
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 16:29:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6C2A1304EA84
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 15:24:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5297E30185BF
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 15:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C3D38BF76;
-	Sat, 21 Mar 2026 15:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A26391E60;
+	Sat, 21 Mar 2026 15:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rDr5L8K2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NXQjXmSw"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE8A38F25F;
-	Sat, 21 Mar 2026 15:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2B8391E41;
+	Sat, 21 Mar 2026 15:29:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774106666; cv=none; b=BBvOAP9SCOEDioLcwVUGqeZfq5wvq27avpIE+tlFuvCsCWkF0sgknqQuAjb/g7Ezqo3CxcMQaZrtq4K/Aq9Pp5WHgypFjdBe7fhNQwgOKzXCmOie/x4BadTLO5NR39Dgt1ocaPouQVxf8MVnvGywZCXti1o09BKBMIwOmnZHr/0=
+	t=1774106942; cv=none; b=MzqTadXWrdWZ8aoHNuOH23sQLq/Vvt6nB1I0lH6Ck0XJqet0DLkfMa2qj9J8HGQqGPfCqiEL65s1eqUywoHumXW/yFtMkIHuClig/yy7Bh3XXdOBoWymkrmGwcChfpWeOpLWPnOhb+0+pdUFBS5cxOW5SN0fMpnCFgXbu9jUK10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774106666; c=relaxed/simple;
-	bh=u0wcA0tPR8q/+IKF3H8Puc2o7lli+o7vG3hVYnqd9sI=;
+	s=arc-20240116; t=1774106942; c=relaxed/simple;
+	bh=4CMZtdrUkeHipUTfXOQB1nOArw6Y9HSJFvn3EVDhXyk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RVD2gk4PA8qj1XgZkwDQ2LaXrutsu5fh8eaSwf+5MXqq7Hua0sh5f+Nhqc4FQ5aqtOG74oFpH6LJf28+Q69Pc96xrFbuzbJ1xwNT5St6yEHDxzAkRylcuxM2sm9JRCaAHfSzTbSvNibLunlpjTJeyjMuL9vwREuPe1XcQJMILDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rDr5L8K2; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=pipUhBVfWpx12RhCvGrKOSAlypWVb3HOG1oIQ9sgtM9GMEhLpXX47WxmHRMeqmhVP75mB7toT/sEmJRkM3EJIefgvyf7My2FvNd26i8a2aN+3Qx18trDIt7B7CH5JlZKjejd0H/SuITthww4gRfHoI35CFWtXz9Q8XET40teOmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NXQjXmSw; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,13 +39,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1xQXnxuKnh/cYEUl1dyTeGXPR8XNOB8KEAwiWHUWmTA=; b=rDr5L8K2KLnAm6jSe+Qd2VdA1v
-	LcYT6iEfQoEn/DKdYkz0OintU+ZKi/qKmRXpFfjNaBr8K+S67q5YXJJg4C4m9Ua6S/Mpq37JNx/Cf
-	DVS3oK0edE1WMocSFhfVEf0PujNeLhlwgXhziAmTv0CdtNIo0F5XMSsrZEwwlaXmbyCQ=;
+	bh=6AP4cI1zcL0d79rvKwxclRXlEkH2NVlrTTHSANQpKdw=; b=NXQjXmSwx/TN8qJjeUwyuQbicK
+	m1Xnpl7EDZuRnQXY+ktfgXE4ykTpvgSi/MMCxvYwz5A/prZjWHF2RMG3RzaJ4C6E/YRRSbkm4co5U
+	llb+laF/WPbbZTUtXndQnpvW+eoWcQ01/fBx8pH12Sdu5mSRppR8NjgJyMs0FPX1M87I=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1w3yBK-00CiyE-Jk; Sat, 21 Mar 2026 16:24:06 +0100
-Date: Sat, 21 Mar 2026 16:24:06 +0100
+	id 1w3yFw-00CizW-4p; Sat, 21 Mar 2026 16:28:52 +0100
+Date: Sat, 21 Mar 2026 16:28:52 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Daniel Golle <daniel@makrotopia.org>
 Cc: Vladimir Oltean <olteanv@gmail.com>,
@@ -60,11 +60,11 @@ Cc: Vladimir Oltean <olteanv@gmail.com>,
 	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
 	Avinash Jayaraman <ajayaraman@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next 1/2] net: dsa: mxl862xx: add CRC for MDIO
- communication
-Message-ID: <c5f29b9b-9447-488e-b8cc-e2f7e7cbf1a8@lunn.ch>
+Subject: Re: [PATCH net-next 2/2] net: dsa: mxl862xx: use RST_DATA to skip
+ writing zero words
+Message-ID: <279eca3d-e067-4d0c-ad2d-9c989d7801ea@lunn.ch>
 References: <cover.1774070039.git.daniel@makrotopia.org>
- <af6911188ee6becb9100d4bf13d0820e5bf9eaca.1774070039.git.daniel@makrotopia.org>
+ <d27d646eb7a4cc50585821bb2b2c9ab7f6b1a75d.1774070039.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,16 +73,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <af6911188ee6becb9100d4bf13d0820e5bf9eaca.1774070039.git.daniel@makrotopia.org>
+In-Reply-To: <d27d646eb7a4cc50585821bb2b2c9ab7f6b1a75d.1774070039.git.daniel@makrotopia.org>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270224-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270225-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -97,48 +97,27 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
-X-Rspamd-Queue-Id: 17CBD2E615F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:email,lunn.ch:mid]
+X-Rspamd-Queue-Id: 6340F2E6167
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> +/* Firmware CRC error codes (outside normal Zephyr errno range). */
-> +#define MXL862XX_FW_CRC6_ERR		(-1024)
-> +#define MXL862XX_FW_CRC16_ERR		(-1023)
-> +
-> +/* 3GPP CRC-6 lookup table (polynomial 0x6F).
-> + * Matches the firmware's default CRC-6 implementation.
-> + */
-> +static const u8 mxl862xx_crc6_table[256] = {
-> +	0x00, 0x2f, 0x31, 0x1e, 0x0d, 0x22, 0x3c, 0x13,
-> +	0x1a, 0x35, 0x2b, 0x04, 0x17, 0x38, 0x26, 0x09,
+On Sat, Mar 21, 2026 at 05:20:14AM +0000, Daniel Golle wrote:
+> Issue the firmware's RST_DATA command before writing data payloads that
+> contain many zero words. RST_DATA zeroes both the firmware's internal
+> buffer and the MMD data registers in a single command, allowing the
+> driver to skip individual MDIO writes for zero-valued words. This
+> reduces bus traffic for the common case where API structs have many
+> unused or default-zero fields.
+> 
+> The optimization is applied when at least 5 zero words are found in the
+> payload, roughly the break-even point against the cost of the extra
+> RST_DATA command round-trip.
 
-I had a quick look around and count not find this table anywhere
-else. Mellanox has a different CRC-6 polynomial. Until somebody else
-needs this, i think it is O.K. here. But sometime in the future it
-might be moved into lib/crc.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-> +	ret = mxl862xx_crc6_verify(ctrl_enc, len_enc, &fw_result);
-> +	if (ret < 0) {
-> +		dev_err(&priv->mdiodev->dev,
-> +			"CRC-6 error on response to CMD %04x\n", cmd);
-> +		return -EIO;
-> +	}
-
-This is the question, what to do when you see a checksum failure? The
-basic assumption is MDIO is reliable. PHYs don't do any sort of
-checksums, nor any other switches using MDIO. Why would you want
-checksums?
-
-To detect the hardware is broken? If so, is returning EIO sufficient?
-Would it not be better to admin down all the interfaces?
-
-To allow the MDIO clock to run at a higher frequency, at the limit of
-the bus, so you get occasionally failures? If so, should you not
-retry? But are the commands idempotent? Can you safely retry?
-
-	Andrew
+    Andrew
 
