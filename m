@@ -1,368 +1,291 @@
-Return-Path: <netdev+bounces-270254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270255-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YCzWLowAv2nrogMAu9opvQ
-	(envelope-from <netdev+bounces-270254-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 21:33:16 +0100
+	id OQSxKIYGv2mcqAMAu9opvQ
+	(envelope-from <netdev+bounces-270255-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 21:58:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FEEB2E733F
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 21:33:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C64B2E740F
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 21:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4EE3E301495A
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 20:33:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CF10D3017505
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 20:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57EF2D5C8E;
-	Sat, 21 Mar 2026 20:33:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C47430EF92;
+	Sat, 21 Mar 2026 20:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eXqwUsD6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BMAs2H1E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51B829DB9A;
-	Sat, 21 Mar 2026 20:33:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774125192; cv=fail; b=SHwMK4szPEFUXzrE11/PLJ75S4pMfVYRbXSNNGWOzez8UfZuatCxpBAl/CCkZbHQSC01t04k3ANn2+nbSGjXrZn4qvaV90rz1fzK5IOqmCgmpNR+u6nx/U4fskQ2VfhDmFrGgobiHfJ4Oc7qTniMYDHweC1XTx1FygKtisPzSds=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774125192; c=relaxed/simple;
-	bh=2SlCVtpwUjGRBcJsoekWWZRVOIDC1A6UvFtNhgJeuYI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=W4XRtKI3ikVFbb9R9mNTtfAtfKjU7kg5D4/g6oyb5gX6uD2ZwYyHJgjwHTM4qnCdt8KW0YyiMBWwHyTbHbhdBhwzMy0ciaNdhpnW0GELGNRq70yJjIFEccdOIynzGomNjck7lMPw+KtnCoyCqz5buhViQH6AK/7vdZ6hlU1BG78=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eXqwUsD6; arc=fail smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774125191; x=1805661191;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=2SlCVtpwUjGRBcJsoekWWZRVOIDC1A6UvFtNhgJeuYI=;
-  b=eXqwUsD6Kst7T6OahfQNch+5hRIDR9V5qBbNGkHKmwPBgDzB1xoiHBHT
-   YPKugpkHowokLpryAuADnzHBjWrMEYOdnXk2MGuPvw6un5Khn3UI+2qJ/
-   Vz5ao4w8DidRmIaKgq7E90MPiqgRQoLytBs/3Dx89uPccD+BrUUKgX6Y1
-   nk0lKkqfzIpC0r4vHScRoHPRbUYrVd7s6hGuloolW2FCIg6dX9HsxIeXY
-   bnvdzdjg+GSp/h3LVuDaE+x7aP7YrSJqMgU/vetvqY0zOy5wi6boQ7tIR
-   rg/RxfztwCxoqcCosOsfNYxtJI2qG9aVUIscVsaEHaKr1eavfPUNaGdJz
-   g==;
-X-CSE-ConnectionGUID: gbWZ908HTxi6RqBbnfKn9g==
-X-CSE-MsgGUID: XUiPJIAjSUCZR01b/w1uSw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11736"; a="97801301"
-X-IronPort-AV: E=Sophos;i="6.23,133,1770624000"; 
-   d="scan'208";a="97801301"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2026 13:33:10 -0700
-X-CSE-ConnectionGUID: Ba+JW0yYQsGaWlWAb5XzfA==
-X-CSE-MsgGUID: 7VQxGbzLRo6RtFfAaBFBtw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,133,1770624000"; 
-   d="scan'208";a="219332316"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2026 13:33:09 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Sat, 21 Mar 2026 13:33:09 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Sat, 21 Mar 2026 13:33:09 -0700
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.68)
- by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Sat, 21 Mar 2026 13:33:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CpbhQfmjCPRwCfyHrBkBfWQetfJNQh9diUOCNDkPF4liHri01aRc2sgCQSnvKAsBuYV3PD70Q7yNajKgKZobFYmcqg/gyri+Q6TO88qMohXptxNU0dBTq+nToxOkHZCOaPoo0p0Od49UigDc8c9daE7Pe6iMHoRRJzHDMvNYA+xZyEtmlhSQLsmcBy4Lk4OCtR4TK4EBvk8uo+YyAN750Z3ATR/DYxSF4512J+IybgtyH8EhMgdKeApse7k/5aYfcwUDEW1Ki3tDXxTrcsRj0CYEEocjdmrhH23Al8cUTZYokr2HIdL6a4zCtjp7WBRwwzdHinNaUSxB6s4lOq8f0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KwH3xIcJ1yrkUne4ACmYcNFL0EbcL5pd2gACKj9hwUs=;
- b=a4Jx7nmShL1xYwfOng5uiDI1/dQlKh7pmllu4yxgvtbUbdYVAHePqB/W5QQddO4mKL5qJVAy2HTo/7sGaEGZ8rWFQMo9o0ZmM0ZI+XbKhkF6lVzmzvhG7VsiXbbIJV8CKQYEgkpbW6dz7NS6LEAVeJAGat0gNZKoyOhDir9i4ZkdCTMrgYMHXRBJu2tOZdBqxyrbAqHZ4DGrLpI6g/ZbumKbVgw1EwL9t9Kq/Rg+lhVqvhyYs4ob2m8z5MJ4i5/GF74d/5GmKVkt3W7pGYMiXFHJODuxrLwmPaffgBBskLrnaVegUZFgCjm/TPimiCisP1xfFhudKeaf4ku1MGvDKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com (2603:10b6:208:3e9::15)
- by SJ2PR11MB8452.namprd11.prod.outlook.com (2603:10b6:a03:574::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.9; Sat, 21 Mar
- 2026 20:33:05 +0000
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::a2b9:8e8:c48b:ea31]) by IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::a2b9:8e8:c48b:ea31%3]) with mapi id 15.20.9745.007; Sat, 21 Mar 2026
- 20:33:05 +0000
-From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
-To: Simon Horman <horms@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"Prathosh.Satish@microchip.com" <Prathosh.Satish@microchip.com>,
-	"jiri@resnulli.us" <jiri@resnulli.us>, "kuba@kernel.org" <kuba@kernel.org>,
-	"Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Vecera, Ivan" <ivecera@redhat.com>,
-	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"davem@davemloft.net" <davem@davemloft.net>, "Kubalewski, Arkadiusz"
-	<arkadiusz.kubalewski@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Oros, Petr" <poros@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next 5/8] ice: add TX clock (TXC) DPLL interface for
- E825 devices
-Thread-Topic: [PATCH net-next 5/8] ice: add TX clock (TXC) DPLL interface for
- E825 devices
-Thread-Index: AQHctrc0WqVoa+jYU0q5kNwmJ1rzTbW2ILUAgANVO8A=
-Date: Sat, 21 Mar 2026 20:33:05 +0000
-Message-ID: <IA1PR11MB6219FEA6AD98CA328D8C35A3924DA@IA1PR11MB6219.namprd11.prod.outlook.com>
-References: <20260318090654.611349-6-grzegorz.nitka@intel.com>
- <20260319173734.2004456-1-horms@kernel.org>
-In-Reply-To: <20260319173734.2004456-1-horms@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6219:EE_|SJ2PR11MB8452:EE_
-x-ms-office365-filtering-correlation-id: 80d3d3f7-d466-4690-639b-08de87890e58
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|56012099003|18002099003|22082099003|38070700021;
-x-microsoft-antispam-message-info: HvwHKzXP+i9HtzCIFzgkV//JEG/DBcF9/y4bdWRUQKEN0RallhEQQMTPDyt7kRm1z2+65mMpRbv4KAO29X029KlxedMPgfi5csQJ7wRU4TM9kOB41ic7i/t3VB1Fjxx941u/yFyerAFkKKkKhwGppMr1yq+EzaRS2J2sNuD8GHrtVZw/36oXR6jlcZK5eTkbYEDojif1KyDktv8ypWiLkmEZgVYTg36wBa6xrBg3cfFxX6ORCB0q3caujuJ3/rpc06d9ntpUuQgTPkoGLuOTDGG8FXlI9Jggw7pIXySCsYqYaAF7MVwipOib/8pgae2ajK6Zuy7rDiG779hHiPBRJFI2gEQT6VRh7hR+kLBLwpF/Rm2ekYtGL/W4OsgIDchKs6mUsFIgvcz3XXGGayqjSWc/gmlScusBGg59Lhjm/xzEmeMd/EN+th0nwXXXe2SlakRlsZoodEakkTD5cees0frDMAYurAyGRhphys5vFVBexG0Vd0ik/IAffuekRFnZMGQvfgRsE2XbheZl1X9p9Ls0l4uUhvOsgORJ3riMNnyc1l/AXhwHEmhFCFUitEMiOhHXExAqyAVYs7imE1vhYaRUmToS+ZVcY+oly/hdWL2TG75u2CqQXiehiVeMekHKw4oPPcP1kSDVst3Spl+ETNZh53AX+ChKeJ81xIXu8r9ichUazDb/bLEXgx0zetEUfRsvOhpJAGogUkGKYvk2SnjadRt8w6at6WPv6Ru0TeBprJx4AT/GiMbi13umoiz+
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6219.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(56012099003)(18002099003)(22082099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?FcLvonlVcAhQO8VgbZpAewA/kCz4vwk253ZamljiVHCUSwBjzSaOMg77mpdB?=
- =?us-ascii?Q?5jSvVgQE86sVxdAKVJnF4Qjew3LAbY/Z4G6lnCBAuCROdrcNEPpwiYstzd+I?=
- =?us-ascii?Q?Ic87jIHk9fAkezpOSFYy0XUYHHCPqFAj5yIKlPYfBj8w12lbQoq2woBWelpa?=
- =?us-ascii?Q?Hl/S94Hs1jJg6m8Dx9KjucZO4rSLi+2l7qCuPXrbQKOxo8iRyW0RJYzpxUGW?=
- =?us-ascii?Q?j1bxoxD9gKAJ4ZFbBFLq/nvI0vPdUTNG6UF1k9m62UrXLvdOmOZ2RWB/AMLN?=
- =?us-ascii?Q?yz+JHWOSbn8P8/LlVG9jeucy8BkYdztucLyxCjptxmmTIe1YkJ8OYEDpir8N?=
- =?us-ascii?Q?Xq+AmMOaZsp9dvedp45AiF6TO9fV+090gPTfKAOl6AY8U8+n+DHRsxj2fL3k?=
- =?us-ascii?Q?fAP6nB0LM5ZEBZA1LFV3hBthAFw0V/izi+FrtrUlHG2vcloA4iSvAX3XYtQJ?=
- =?us-ascii?Q?TfiT6Uk8CyPmgSFOOaVscbHy9aynrepnlA/6IZP3Y1sJ28XjgegH9xNWJ3Wm?=
- =?us-ascii?Q?3NUT3JReouguTaOwNOM1dBg48XwS1B6H7VnoVUQ5rRkYGG49qrKBS3BHks7i?=
- =?us-ascii?Q?EbG1y03jKtQA6P0IeGIK7nR5v1QmGpToagZbWE6AEghiXb9R6mfZpT2+qjQI?=
- =?us-ascii?Q?zEr5Z7fekydvRQpkrqU3n+4NUKFvWVBfIx8sqGTlgRigGNK+c3lfQplN4lFN?=
- =?us-ascii?Q?HoaaX90YNHYkHxuIQyhXpShsyltohNJUhy6xvYqmMfmcqdb8gz6p6YfzF+9e?=
- =?us-ascii?Q?NotCNW7vpwdmtgkPI+Kti/oxjD76Y8uxDMuErlTHmsn1foCdM6ivJ5zRXFyk?=
- =?us-ascii?Q?iyTVJiO1kSzNqK7QE6iZHyE4h6U7MnAjfb2Y5nsOZmVJCvVicOKIGqa0UKY7?=
- =?us-ascii?Q?d4zsq/USfTeSeZZoM4lcSEzNciuBIRcroqqvjW03YZYFTabweVPmS1n9nho2?=
- =?us-ascii?Q?xW6g359GqFi254slnspCeaTksB8egy2EnpyVxp8dltWFJDgHNCAs5KCFa2B+?=
- =?us-ascii?Q?49shz160CNJ8i3PeJvmAcDGO85B0T7KLtpPBBr8FZlhd+apTg8nfJpTELMrJ?=
- =?us-ascii?Q?tBP7NOApR6vSTWR/6Nnlg4EV83o+1B0b8+3iHOJvmsx5rUisByCfILmbc7zT?=
- =?us-ascii?Q?7vMkrK76sZR487wiwyvAjwuE1sAWl+VnJ0CebisFPCQLDeUpKZF/wDRhkfNT?=
- =?us-ascii?Q?4tQmbxWgGNXKhgTAte9vuz3rMsb3i6Xkn/1lcQRsEtjoAZW/8V4GxpX/8JPx?=
- =?us-ascii?Q?f5AoLgq0F7vqhwxAEIuXCrY44gtPO83Myv6dRAcdhr6yY6yfEYLlbPHgVK+3?=
- =?us-ascii?Q?uZS4XM+la5JD6GniN/NhnruMQ/u6OhtbF6c38iru6Qn3a6fiOCDcgDX0LCAd?=
- =?us-ascii?Q?yQHRXZUpy/I4r7DkTWhGmhAQJz4mrt2WhT6Za+z6V7S0izgT4dRaNSeW0ic6?=
- =?us-ascii?Q?Da6Bdh55YITJ/2JbeCUTZDeJa/FilKXUsYUzD5gapPbRWouWme3WaJy2+yhU?=
- =?us-ascii?Q?qmzfDKhJtl8/jCv+w2zA0EXNBvehzQJrNKtHLL+938cH8dSfi/lG1ZuPfbgW?=
- =?us-ascii?Q?3aYla4f1N55+53O5LJl6IvQntKvcLY1s/NkbU9wOzKowICFDBumuS68g8aoX?=
- =?us-ascii?Q?J9u9ZcrYVT9bLs6urR+ZFftm0AMidVn3xEJJOwmqbzijo92sS+/w3vQTGu8k?=
- =?us-ascii?Q?Unlyng+F2M2oxVa7Z8LALMYEjTbH+aVnRiQocA6QNAEFlqso1btPu0LnStLS?=
- =?us-ascii?Q?lCpLfH5Thw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101A030DED1
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 20:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774126722; cv=none; b=LHceEG7aYlrmaaBLqmGwf1+x5p9mfuj4IX9GdCnCGv2xKEszGRjiunM74rNe1TccbBK06d6DZLxCI553A4XqX+kgr37R4uVuK2pHsTdl0FgaCKdZwSa0zegImRnmQDuc7GZexFN3KvuJwe29t1zxXI/rUPIfIIxxjqAj0Z2YhsI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774126722; c=relaxed/simple;
+	bh=ddvJdRi8u2sMfHug0QMTVhEX8HWKCUzQz6+w4wp1whs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=SXcV4xUEvS6VOsk6BHLm9uCPf2Oak6HnCCu2u5w45prgF4e73yhGeV/D/uiOupaxi00nqxtwqkwOaRg6Ev313URFYb6FD6fU2Q8X+48IcxiJ30oYErTVxgcN+hNJ1BVM4Gk/LIL8edpWGjE6GAmiZKL86ri2gVw1ds++onCEd2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BMAs2H1E; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-79a40fb9890so15468887b3.1
+        for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 13:58:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774126720; x=1774731520; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uE6W2qhWFKGNud0bdraZVKnHfaVSheGs9LAWNbVGkWg=;
+        b=BMAs2H1EeraC3fjawDVTPEcgLK3K2HHmP9/nZ8JKyekeoS97sgGLxPHIB4SJOutZg7
+         OnMVbvemfYpRncr7sMdfq/f8r2gaGNyvgp9YTuABZQiGR6CvRLTaEhuLNvgiER3voNpa
+         gmgmUrcnma1cndgggY2686D6N4DXqv17jv6KvLH5Ts7+qewYMPGB9wiiuZDY5GcKGA06
+         bYt7wPlslHmelNxILUSH7GvpIF5pGW2YDqp9DJSnkkQuBFORXPvXGgTN17BEatVoVZuh
+         ZFExjH98br0x9FYmGQwSk83UZdW1ze8qJXsZpxTNItS1cSLJfjx+PPkFgt4eBFTqLJON
+         BwNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774126720; x=1774731520;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uE6W2qhWFKGNud0bdraZVKnHfaVSheGs9LAWNbVGkWg=;
+        b=GBDFMO0LRUtRNcS6+elmw9sT4cl9CcqJxC7Fxq6vsq31Y0b0zWMCKs0qgyEchCqqdW
+         FoiPtqT6NdA70dXhmkP/zv9eeAI4M1hU4DkVe57MWKh8E/fXBUm/rbGDw/Jd31e+q80O
+         Y2ilYEBd4VVAvUIgPM6xEBujs3KYCS6cv4+rvDJk6FHUZ6TXyCZ1JXEjSltfxYoMNLwe
+         07R/cq40c8qD2+71vXkGJQUEo2U+k4jfTWsByPAQ+r5NXHs5mPzl7dvdEpuAEcDydAaS
+         6cl2kMgJhDyIOOo5BZsL0JDwG1hadJGCgzQAQE6YnKMKgpyKbTz2nFRHzzvhBoo8pYUW
+         zFOw==
+X-Forwarded-Encrypted: i=1; AJvYcCVSfYonTgVeFMOD9WKpE0Pp3FpcgaHCFcZcYL8Q2pw76xbp+Wgy42OrrwNGUNnp+bXAIuXZ/RY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yysl639ET3h99naIsbEhgCKKJvAjkG23ybdc2YAa9DGxrfs6GIJ
+	a5x/NpssKN4j+fZoCIFirO60bTslvlGzEMsPHENnJnagIjFGOghY4qyf
+X-Gm-Gg: ATEYQzz4rt9chvU6jv0IZnjZc3c7N+iQviygYMultVVaVrMwi264njC9rHsMGAj+Liw
+	ihnm/izVD2Uc6pvjeT19OKwE/yf5MatO7iIbK/Lel87ZKV5sTMojThNU+V3l5OzfjI6rxKwQbRJ
+	beVtio2vxAcNHsIDIZyXJf+DWhWhtzkHV+vxyCkvDeVj0TkD0Ld2COYLeri52Cc8ZoOHo+tpUhY
+	9vHj3Uy6P5ITo4R0JbyDCu8dO+GcfN1sZ71gqQSBSQyj91e25f56/HAqXuwDTEbKf08lHRmyN6s
+	jF3biElK8fcryy//LHuGcEhIYPy1KOkQ+CKPkl3cEgSlWUNkPYtUpYL/AuyGqHY9hzniGWvJc7J
+	z/ImDvXMu3HWByrwpck1vsy854CfP8jhUYu2WzuLdl6XCsJesNRfzUBkYkFjkVtHtG71jSoEDnK
+	yLjJ4xMwJQbfB7iZx/wCFYsKXqGsCCmzNuu8kLm9JddfOny8GxLN9xFDHabCunow5u2XQiZwICt
+	M8R
+X-Received: by 2002:a05:690c:e68a:b0:79a:4419:71a7 with SMTP id 00721157ae682-79a90bbc964mr49850917b3.30.1774126720099;
+        Sat, 21 Mar 2026 13:58:40 -0700 (PDT)
+Received: from gmail.com (180.134.85.34.bc.googleusercontent.com. [34.85.134.180])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-79a903f4190sm34990727b3.15.2026.03.21.13.58.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 21 Mar 2026 13:58:38 -0700 (PDT)
+Date: Sat, 21 Mar 2026 16:58:38 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Scars <yss2813483011xxl@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: edumazet@google.com, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ netdev@vger.kernel.org, 
+ horms@kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ syzkaller-bugs@googlegroups.com, 
+ syzbot+1543a7d954d9c6d00407@syzkaller.appspotmail.com
+Message-ID: <willemdebruijn.kernel.5c56580eb49@gmail.com>
+In-Reply-To: <CAMa1Pe4sxiyekrMKV6w5E3SJ1sk1ZzJs7wdepx6oLKGpRsi35A@mail.gmail.com>
+References: <willemdebruijn.kernel.c0bb5d182993@gmail.com>
+ <20260320141459.9691-1-yss2813483011xxl@gmail.com>
+ <willemdebruijn.kernel.2018fae77325e@gmail.com>
+ <willemdebruijn.kernel.2497131610e6a@gmail.com>
+ <CAMa1Pe4sxiyekrMKV6w5E3SJ1sk1ZzJs7wdepx6oLKGpRsi35A@mail.gmail.com>
+Subject: Re: [PATCH net v5] net: use skb_header_pointer() only for DODGY TCPv4
+ GSO skbs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: u4nKxl0trn8NyKp5QSo5juSofUn/d+77D5zywM1C8bUnNdwOse2lVcAHipO1oc3tdyLsdMZ2QU5I40ZiGwnTJXzDON7ikgNHqtxZpiB/ypBr9r8SBY+65v2PsGo8iwW0PQdS0VdPMjWJ8ScaMMIiOrhgJ/ewr7nGYfFCb8JA/Pp/gSyQr2Lw3SezxikrOr+Kb2e3pmO5AfzPbjHceqjS2A3Gr3/Czl5C5lhoKPXVLUzcORZVxtVUokuNDlLqEX313K1eHPni+beme0NwciiQlazQpBzb6WVll/cMhwE8cdIn/b4abdMu8i1FxhvOVgoMOFfvAnYRui+4X1FpWT5K9w==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6219.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80d3d3f7-d466-4690-639b-08de87890e58
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Mar 2026 20:33:05.4075
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: DNnpr7STfOVg4rYNPA13u5MjWsTY8ktORsIPVA+iipATqEw5stQDu80wQx1KzMtyjEA6uw8ZtOaZHCcSN4jWuTOm78cd2awugppKgoPCY9U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8452
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.34 / 15.00];
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270254-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,redhat.com,microchip.com,resnulli.us,kernel.org,intel.com,gmail.com,linux.dev,lists.osuosl.org,davemloft.net];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-270255-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 1FEEB2E733F
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,1543a7d954d9c6d00407];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 0C64B2E740F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> -----Original Message-----
-> From: Simon Horman <horms@kernel.org>
-> Sent: Thursday, March 19, 2026 6:38 PM
-> To: Nitka, Grzegorz <grzegorz.nitka@intel.com>
-> Cc: Simon Horman <horms@kernel.org>; netdev@vger.kernel.org;
-> andrew+netdev@lunn.ch; pabeni@redhat.com;
-> Prathosh.Satish@microchip.com; jiri@resnulli.us; kuba@kernel.org;
-> Loktionov, Aleksandr <aleksandr.loktionov@intel.com>;
-> richardcochran@gmail.com; vadim.fedorenko@linux.dev; Nguyen, Anthony
-> L <anthony.l.nguyen@intel.com>; Vecera, Ivan <ivecera@redhat.com>;
-> donald.hunter@gmail.com; intel-wired-lan@lists.osuosl.org;
-> davem@davemloft.net; Kubalewski, Arkadiusz
-> <arkadiusz.kubalewski@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Oros, Petr <poros@redhat.com>; linux-
-> kernel@vger.kernel.org
-> Subject: Re: [PATCH net-next 5/8] ice: add TX clock (TXC) DPLL interface =
-for
-> E825 devices
->=20
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->=20
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-
-> local.html
-> ---
-> ice: add TX clock (TXC) DPLL interface for E825 devices
->=20
-> This commit introduces a TX clock DPLL instance and pins for E825-based
-> devices. The TXC domain exposes two reference pins: EXT_EREF0 (board
-> external electrical reference) and SYNCE (port-derived reference,
-> described via fwnode). A new pin type and pin ops are added to support
-> TX clock references.
->=20
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c
-> b/drivers/net/ethernet/intel/ice/ice_dpll.c
-> > index 62f75701d652..a1258f2e03a9 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
->=20
-> [ ... ]
->=20
-> > @@ -3552,6 +3686,39 @@ ice_dpll_init_fwnode_pins(struct ice_pf *pf,
-> struct ice_dpll_pin *pins,
-> >  	return ret;
-> >  }
+Scars wrote:
+> I instrumented packet_snd(), __virtio_net_hdr_to_skb(), and
+> gso_features_check() while running the C repro.
+> =
+
+> In repeated runs, for the same skb, I consistently observed:
+> - __virtio_net_hdr_to_skb() (NEEDS_CSUM path):
+> skb_transport_offset=3D88, thlen=3D20, so p_off=3D108;
+> pskb_may_pull(..., 108) =
+
+
+All the above matches the skb_dump from my previous post.
+
+> succeeds (headlen=3D172).
+
+My output shows headlen 108. Here we start to diverge.
+
+> - gso_features_check() on the resulting DODGY TCPv4 skb uses
+> nhoff=3Dskb_network_offset(skb)=3D172.
+
+And I see headroom of 4, so mac at 4, skb->network_header at 80 and
+skb->transport_header at 92. No 172.
+
+That part is key. My measurement is in packet_snd right after
+virtio_net_hdr_to_skb. Where do you see this, and can you perhaps get
+an skb_dump (NOT full_skb, as these are large, just the header
+metadata).
+
+I don't mean to delay the fix. Just, in general, a preferable fix for
+these weird user injected packets is to detect and drop as close to
+kerne entry as possible, meaning in virtio_net_hdr_to_skb, rather than
+have to make the main datapath robust against crazy packets -- which
+comes with branches and other overhead on the legitimate hot path.
+
+
+> =
+
+> So the pull checks in __virtio_net_hdr_to_skb() guarantee access up to
+> p_off, but do not guarantee that the
+> header at nhoff is safely linear for direct iph->frag_off dereference.
+> =
+
+> In this run, nhoff=3D=3Dheadlen on the observed packets (IPv4 header
+> starts at the linear tail boundary). Using
+> skb_header_pointer() in the DODGY branch avoids this gap.
+> =
+
+> I did not hit a KMSAN report in this rerun (instrumented/patched
+> kernel), but the offset mismatch above was
+> reproducible.
+> =
+
+> Willem de Bruijn <willemdebruijn.kernel@gmail.com> =E4=BA=8E2026=E5=B9=B4=
+3=E6=9C=8821=E6=97=A5=E5=91=A8=E5=85=AD 09:36=E5=86=99=E9=81=93=EF=BC=9A
 > >
-> > +static int ice_dpll_init_txclk_pins(struct ice_pf *pf, int start_idx)
-> > +{
-> > +	struct ice_dpll_pin *ref_pin =3D pf->dplls.txclks;
-> > +	struct ice_dpll *txc =3D &pf->dplls.txc;
-> > +	int ret =3D 0;
-> > +
-> > +	/* configure EXT_EREF0 pin */
-> > +	ret =3D ice_dpll_get_pins(pf, ref_pin, start_idx, 1, pf->dplls.clock_=
-id);
-> > +	if (ret)
-> > +		return ret;
-> > +	ret =3D dpll_pin_register(txc->dpll, ref_pin->pin, &ice_dpll_txclk_op=
-s,
-> > +				ref_pin);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	/* configure EXT_SYNCE pin which is based on fwnode pin */
-> > +	ref_pin++;
-> > +	ret =3D ice_dpll_init_fwnode_pin(ref_pin,
-> ice_dpll_fwnode_ext_synce);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret =3D dpll_pin_register(txc->dpll, ref_pin->pin, &ice_dpll_txclk_op=
-s,
-> > +				ref_pin);
-> > +	if (ret)
-> > +		return ret;
->=20
-> Does ice_dpll_init_txclk_pins leak the EXT_EREF0 pin on error?
->=20
-> If dpll_pin_register for the EXT_SYNCE pin fails, the function returns
-> the error without cleaning up the EXT_EREF0 pin that was already
-> successfully registered. Looking at the call chain:
->=20
-> ice_dpll_init_pins_e825() calls:
->     ice_dpll_init_txclk_pins()
->         ice_dpll_get_pins() -> acquires pin reference for EXT_EREF0
->         dpll_pin_register() -> registers EXT_EREF0 with TXC DPLL
->         ice_dpll_init_fwnode_pin() -> may fail here
->         dpll_pin_register() -> or may fail here for EXT_SYNCE
->=20
-> If either of the last two steps fail, the function returns the error
-> directly without calling dpll_pin_unregister or ice_dpll_release_pins
-> for the EXT_EREF0 pin.
->=20
-> The caller ice_dpll_init_pins_e825() also doesn't compensate - on
-> txclk init failure it only calls ice_dpll_deinit_rclk_pin() and
-> ice_dpll_deinit_fwnode_pins(), neither of which clean up txclk
-> resources.
->=20
-> Compare with ice_dpll_init_fwnode_pins() and ice_dpll_get_pins() which
-> both have proper error-path rollback using goto labels.
->=20
-> > +
-> > +	if (IS_ERR_OR_NULL(ref_pin->pin))
-> > +		dev_dbg(ice_pf_to_dev(pf),
-> > +			"Tx-clk mux pin not registered yet\n");
->=20
-> Can this cause a NULL pointer dereference?
->=20
-> The IS_ERR_OR_NULL check appears after calling dpll_pin_register with
-> ref_pin->pin. Looking at the code flow:
->=20
-> ice_dpll_init_fwnode_pin() returns 0 (success) even when
-> fwnode_dpll_pin_find() returns NULL and sets ref_pin->pin =3D NULL. This
-> is the expected case - the commit message states "The SYNCE pin is
-> registered when its fwnode becomes available" and the code prints "DPLL
-> pin for %pfwp not registered yet".
->=20
-> However, the code unconditionally calls:
->=20
->     dpll_pin_register(txc->dpll, ref_pin->pin, ...)
->=20
-> where ref_pin->pin is NULL. Looking at dpll_pin_register in
-> dpll_core.c:
->=20
->     int dpll_pin_register(struct dpll_device *dpll, struct dpll_pin *pin,=
- ...)
->     {
->         ...
->         ret =3D dpll_pin_fwnode_register(dpll, pin, &ice_dpll_txclk_ops, =
-pin_priv);
->         ...
->     }
->=20
-> which then calls code that dereferences pin->fwnode without a NULL
-> check, causing a kernel oops.
->=20
-> The IS_ERR_OR_NULL guard at line 3716 was clearly intended to protect
-> the dpll_pin_register call but was placed after it instead of before it.
->=20
-> > +
-> > +	return 0;
-> > +}
->=20
+> > Willem de Bruijn wrote:
+> > > Guoyu Su wrote:
+> > > > Syzbot reported a KMSAN uninit-value warning in gso_features_chec=
+k()
+> > > > called from netif_skb_features() [1].
+> > > >
+> > > > The current direct skb->len check is not sufficient for SKB_GSO_D=
+ODGY
+> > > > packets. In the AF_PACKET/PACKET_VNET_HDR path, packet_snd() can =
+build
+> > > > a DODGY GSO skb whose total length is large enough, while the IPv=
+4
+> > > > header is not fully available as initialized linear data for a di=
+rect
+> > > > iph->frag_off access.
+> > >
+> > > The fix looks fine, but the AI review of an earlier revision brings=
+ up
+> > > a good point: __virtio_net_hdr_to_skb calls pskb_may_pull in all pa=
+ths
+> > > to ensure the network header is fully in skb linear. What kind of p=
+acket
+> > > is this that managed to escape those checks?
+> >
+> > The packets I got out of the C repro just after virtio_net_hdr_to_skb=
 
-AI review comment is valid. To be fixed in the next iteration.
-Thanks
+> > look as below.
+> >
+> > [   76.539562] vnet_hdr: flags=3D0x75 gso_type=3D0x1 hlen=3D0x6a gso_=
+sz=3D0x416d cstart=3D0x58
+> > [   76.539755] skb len=3D56584 data_len=3D56476 headroom=3D4 headlen=3D=
+108 tailroom=3D0
+> > [   76.539755] end-tail=3D208 mac=3D(4,76) mac_len=3D0 net=3D(80,12) =
+trans=3D92
+> > [   76.539755] shinfo(txflags=3D0 nr_frags=3D3 gso(size=3D16749 type=3D=
+3 segs=3D0))
+> > [   76.539755] csum(0x10005c start=3D92 offset=3D16 ip_summed=3D3 com=
+plete_sw=3D0 valid=3D0 level=3D0)
+> > [   76.539755] hash(0x0 sw=3D0 l4=3D0) proto=3D0x0800 pkttype=3D0 iif=
+=3D0
+> > [   76.539755] priority=3D0x0 mark=3D0x0 alloc_cpu=3D0 vlan_all=3D0x0=
 
-Grzegorz
-> [ ... ]
+> > [   76.539755] encapsulation=3D0 inner(proto=3D0x0000, mac=3D0, net=3D=
+0, trans=3D0)
+> > [   76.540713] dev name=3Dip6gretap0 feat=3D0x0000000e401d4869
+> > [   76.540843] sk family=3D17 type=3D3 proto=3D0
+> >
+> > Clearly fishy. They do have VIRTIO_NET_HDR_F_NEEDS_CSUM set, so we
+> > know which branch they take.
+> >
+> >         skb_reset_mac_header(skb);
+> >
+> >         if (hdr->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) {
+> >                 u32 start =3D __virtio16_to_cpu(little_endian, hdr->c=
+sum_start);
+> >                 u32 off =3D __virtio16_to_cpu(little_endian, hdr->csu=
+m_offset);
+> >                 u32 needed =3D start + max_t(u32, thlen, off + sizeof=
+(__sum16));
+> >
+> > // start =3D=3D 88
+> > // needed =3D=3D 88 + 18 =3D=3D 106
+> >
+> >                 if (!pskb_may_pull(skb, needed))
+> >                         return -EINVAL;
+> >
+> >                 if (!skb_partial_csum_set(skb, start, off))
+> >                         return -EINVAL;
+> >                 if (skb_transport_offset(skb) < nh_min_len)
+> >                         return -EINVAL;
+> >
+> >                 nh_min_len =3D skb_transport_offset(skb);
+> >
+> > // nh_min_len =3D=3D 88
+> >
+> >                 p_off =3D nh_min_len + thlen;
+> >
+> > // p_off =3D=3D 108
+> >
+> >                 if (!pskb_may_pull(skb, p_off))
+> >                         return -EINVAL;
+> >
+> > // headlen =3D=3D 108
+> >
+> > At the end of this headlen =3D=3D 108, so all of iphdr should be in
+> > linear.
+> >
+> > Since the syz repro requires repeat it is possible that I simply did
+> > not capture the right packet, but I don't see the C program vary the
+> > packet contents.
+
+
 
