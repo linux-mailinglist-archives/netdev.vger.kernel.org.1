@@ -1,278 +1,163 @@
-Return-Path: <netdev+bounces-270185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270186-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6KWFD2ZevmnxNgMAu9opvQ
-	(envelope-from <netdev+bounces-270185-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:01:26 +0100
+	id mBG6Mo5evmnxNgMAu9opvQ
+	(envelope-from <netdev+bounces-270186-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:02:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 938172E44CE
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:01:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44DD32E44E5
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 10:02:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 21FBE300CE77
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 09:01:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 22A68301CC68
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 09:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBC6D31714F;
-	Sat, 21 Mar 2026 09:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880A63176E0;
+	Sat, 21 Mar 2026 09:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pfeIMgfQ"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="RDigaEKD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A8429B8CF;
-	Sat, 21 Mar 2026 09:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469C12DC32A
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 09:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774083673; cv=none; b=fPIA5hvUeiT8DPsDVWsT+oobqIhU1c2vPo5hXOUOwtEUitREtcfuxgLK+8L0DWYovvJQ5FnHWKx2V50mGzsJRjAlBBS5cEkTbdhXsg00j+wpXtkwSS6qyeD1Vm5h7jIk0MfmK+w/AVj9XFpdJz9Abjp5wVRTO+lUtTG4u25C/IM=
+	t=1774083724; cv=none; b=RkEw0Tc2VTaRV3PoYicqpp1GNebcSStO5VuwUqsMmwVvB8jZTsxig41VQoU6swTzWnBi0Ba/QFiq3D2+dqPvi5uYsaElgDzpDvi02cW+7Ph4jgmerm2mUZxuy11kdaFQBVz8kKx5C9p5a2yUN/mWXY6InZ/UOv6nJoZHOFK3XlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774083673; c=relaxed/simple;
-	bh=yq1YAGY2UruGSfEn5o9hxDZtsgkjliW89pvcn719i5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jvQR5/sfXebYKGUTBS8RWhf/kuMPVwyAQmH/texJcEdHBi/gwNv4rm8q+4mQgC1fl/tte33rt3ziEsCBahDmFDcrxhAAeeBzTi7FcbbV33+K8K1wgBS7lBctjpnm2gdsQmlAFYVgii0qFtXCdcZzqH4N5XkSTrgWBhMzj5Brc8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pfeIMgfQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82628C2BCB0;
-	Sat, 21 Mar 2026 09:01:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774083673;
-	bh=yq1YAGY2UruGSfEn5o9hxDZtsgkjliW89pvcn719i5Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pfeIMgfQBU6k9ErtWwulQ6xKqEEfL0Qixm2mr970aMjMh5xwayttRa1KJtq0OWTYE
-	 FvLXj5MIL3cCjOm+/qI2hf5yaU57akBP5ZB2zHGca1qQsnZR7NO72p8IU7fSU5ZKeO
-	 Crtr+d/9LxAkO3yUGf7a0EWPHE5FK94QooCSmyPRrD+5kp/aiJydeJniDhgIpQvM9/
-	 uCiA1lRjlAYz5yTq5n7gTkUn9WIH46cJoBwy9g2CZphyDjyxupZfWy4r5sty1ts4/T
-	 PD1dS+k1LKTsKvuFRrkL/Dl6VaItbfppq03XoYg43xGlPWTbD13gnSlMGRoDTtrjuX
-	 tzdfIx2jj3eoQ==
-Date: Sat, 21 Mar 2026 09:01:08 +0000
-From: Simon Horman <horms@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: devicetree@vger.kernel.org, vadim.fedorenko@linux.dev, jiri@resnulli.us,
-	netdev@vger.kernel.org, pvaanane@redhat.com,
-	arkadiusz.kubalewski@intel.com, robh@kernel.org,
-	linux-kernel@vger.kernel.org, conor+dt@kernel.org,
-	krzk+dt@kernel.org, Prathosh.Satish@microchip.com,
-	mschmidt@redhat.com, poros@redhat.com
-Subject: Re: [PATCH net-next 1/5] dpll: zl3073x: clean up esync get/set and
- use zl3073x_out_is_ndiv()
-Message-ID: <20260321090108.GP74886@horms.kernel.org>
-References: <20260319174826.7623-2-ivecera@redhat.com>
- <20260320171725.112558-1-horms@kernel.org>
- <ffa7b3a5-a381-435e-b170-24341962b6d1@redhat.com>
+	s=arc-20240116; t=1774083724; c=relaxed/simple;
+	bh=TuiqVMoOCtdMNv0Um84DH+AlpKkmPZWmjkeCcttZuok=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TwetohUPMD9omFhPjCN+tzeiD6GVr9gREClWtC10Jxrhb6hkH/e7fEL69kjV6TLkOreVwA2GIj28ztnRrmm+ORM/T2jaK95/fZPt09rFfi6hvNKKy/Gx8GKpW/CjznUsXVD70l95kL1o+Z7IFO8jIiUk5JaNK1QM0i3rZBEbCZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=RDigaEKD; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
+	Content-Type; bh=kV/JHbBAupFbHUTa8gIBV5gRynjWD9ko+gM17FAzHU4=;
+	b=RDigaEKD+8mG8f0JWaSjaT9SawJbqk9KsDj5FiTfgo5Vkyaib5/naGVz/dOkm2
+	Rii78pfnWA5ctEWlWw8BK8+7HpW7zS8Iha2TfyyH4lxmUTlIa5xeYhzUrNuz8Opn
+	V+CuvVTrkvRnbocM4wXTv7WkNfk6Kj2xf/pN/iFLpl71c=
+Received: from [10.54.29.171] (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wAHLaRXXr5pFpoyAg--.2365S2;
+	Sat, 21 Mar 2026 17:01:12 +0800 (CST)
+Message-ID: <8509360a-21b8-4d28-8999-67a82796b8b6@163.com>
+Date: Sat, 21 Mar 2026 17:01:11 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ffa7b3a5-a381-435e-b170-24341962b6d1@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] tls: reject attaching TLS to sockets already in sockmap
+To: Xingwang Xiang <v3rdant.xiang@gmail.com>
+Cc: kuba@kernel.org, jakub@cloudflare.com, sd@queasysnail.net,
+ davem@davemloft.net, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org
+References: <20260321033027.4044119-1-v3rdant.xiang@gmail.com>
+From: Jiayuan Chen <mrpre@163.com>
+In-Reply-To: <20260321033027.4044119-1-v3rdant.xiang@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAHLaRXXr5pFpoyAg--.2365S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7ArW5Ar17JF48ZFW3Kr17KFg_yoW8trWfpF
+	Z5Aa1F9F4kGFW0v3Z5AayIqr4xurs5AF4UGFyrX345Zw15urySyFyftayj9F48KrWrAryY
+	vr90gr48Z3Z8Zw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U9qXLUUUUU=
+X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbC7Bi3X2m+XlhoNwAA3S
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270185-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270186-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 938172E44CE
+	FROM_NEQ_ENVFROM(0.00)[mrpre@163.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[163.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 44DD32E44E5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 06:31:36PM +0100, Ivan Vecera wrote:
-> Hi Simon,
-> 
-> On 3/20/26 6:17 PM, Simon Horman wrote:
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> > 
-> > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> > ---
-> > dpll: zl3073x: clean up esync get/set and use zl3073x_out_is_ndiv()
-> > 
-> > Return -EOPNOTSUPP early in esync_get callbacks when esync is not
-> > supported instead of conditionally populating the range at the end.
-> > This simplifies the control flow by removing the finish label/goto
-> > in the output variant and the conditional range assignment in both
-> > input and output variants.
-> > 
-> > Replace open-coded N-div signal format switch statements with
-> > zl3073x_out_is_ndiv() helper in esync_get, esync_set and
-> > frequency_set callbacks.
-> > 
-> > > diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
-> > > index a29f606318f6..79ef62d69a32 100644
-> > > --- a/drivers/dpll/zl3073x/dpll.c
-> > > +++ b/drivers/dpll/zl3073x/dpll.c
-> > > @@ -131,6 +131,12 @@ zl3073x_dpll_input_pin_esync_get(const struct dpll_pin *dpll_pin,
-> > >   	ref_id = zl3073x_input_pin_ref_get(pin->id);
-> > >   	ref = zl3073x_ref_state_get(zldev, ref_id);
-> > > 
-> > > +	if (!pin->esync_control || zl3073x_ref_freq_get(ref) == 1)
-> > > +		return -EOPNOTSUPP;
-> > > +
-> > > +	esync->range = esync_freq_ranges;
-> > > +	esync->range_num = ARRAY_SIZE(esync_freq_ranges);
-> > > +
-> > >   	switch (FIELD_GET(ZL_REF_SYNC_CTRL_MODE, ref->sync_ctrl)) {
-> > >   	case ZL_REF_SYNC_CTRL_MODE_50_50_ESYNC_25_75:
-> > >   		esync->freq = ref->esync_n_div == ZL_REF_ESYNC_DIV_1HZ ? 1 : 0;
-> > > @@ -142,17 +148,6 @@ zl3073x_dpll_input_pin_esync_get(const struct dpll_pin *dpll_pin,
-> > >   		break;
-> > >   	}
-> > > 
-> > > -	/* If the pin supports esync control expose its range but only
-> > > -	 * if the current reference frequency is > 1 Hz.
-> > > -	 */
-> > > -	if (pin->esync_control && zl3073x_ref_freq_get(ref) > 1) {
-> > > -		esync->range = esync_freq_ranges;
-> > > -		esync->range_num = ARRAY_SIZE(esync_freq_ranges);
-> > > -	} else {
-> > > -		esync->range = NULL;
-> > > -		esync->range_num = 0;
-> > > -	}
-> > > -
-> > >   	return 0;
-> > >   }
-> > 
-> > The refactoring changes the behavior when the reference frequency is 0 Hz.
-> > 
-> > The old code checked 'zl3073x_ref_freq_get(ref) > 1' which excluded both
-> > freq==0 and freq==1 from having the esync range exposed. The new code checks
-> > 'zl3073x_ref_freq_get(ref) == 1' which only excludes freq==1.
-> > 
-> > When freq==0 (which can happen when freq_base, freq_mult, or freq_ratio_m
-> > is 0), the old code would return 0 with esync->range=NULL and
-> > esync->range_num=0, while the new code returns 0 with
-> > esync->range=esync_freq_ranges and esync->range_num=1.
-> > 
-> > The removed comment documented the original intent: "if the current reference
-> > frequency is > 1 Hz". Should the new check be 'zl3073x_ref_freq_get(ref) <= 1'
-> > to preserve the original behavior for 0 Hz frequencies?
-> > 
-> > > 
-> > > @@ -582,8 +577,8 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
-> > >   	struct zl3073x_dpll_pin *pin = pin_priv;
-> > >   	const struct zl3073x_synth *synth;
-> > >   	const struct zl3073x_out *out;
-> > > +	u32 synth_freq, out_freq;
-> > >   	u8 clock_type, out_id;
-> > > -	u32 synth_freq;
-> > > 
-> > >   	out_id = zl3073x_output_pin_out_get(pin->id);
-> > >   	out = zl3073x_out_state_get(zldev, out_id);
-> > > @@ -592,17 +587,19 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
-> > >   	 * for N-division is also used for the esync divider so both cannot
-> > >   	 * be used.
-> > >   	 */
-> > > -	switch (zl3073x_out_signal_format_get(out)) {
-> > > -	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV:
-> > > -	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV_INV:
-> > > +	if (zl3073x_out_is_ndiv(out))
-> > >   		return -EOPNOTSUPP;
-> > > -	default:
-> > > -		break;
-> > > -	}
-> > > 
-> > >   	/* Get attached synth frequency */
-> > >   	synth = zl3073x_synth_state_get(zldev, zl3073x_out_synth_get(out));
-> > >   	synth_freq = zl3073x_synth_freq_get(synth);
-> > > +	out_freq = synth_freq / out->div;
-> > > +
-> > > +	if (!pin->esync_control || out_freq == 1)
-> > > +		return -EOPNOTSUPP;
-> > > +
-> > > +	esync->range = esync_freq_ranges;
-> > > +	esync->range_num = ARRAY_SIZE(esync_freq_ranges);
-> > > 
-> > >   	clock_type = FIELD_GET(ZL_OUTPUT_MODE_CLOCK_TYPE, out->mode);
-> > >   	if (clock_type != ZL_OUTPUT_MODE_CLOCK_TYPE_ESYNC) {
-> > > @@ -610,11 +607,11 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
-> > >   		esync->freq = 0;
-> > >   		esync->pulse = 0;
-> > > 
-> > > -		goto finish;
-> > > +		return 0;
-> > >   	}
-> > > 
-> > >   	/* Compute esync frequency */
-> > > -	esync->freq = synth_freq / out->div / out->esync_n_period;
-> > > +	esync->freq = out_freq / out->esync_n_period;
-> > > 
-> > >   	/* By comparing the esync_pulse_width to the half of the pulse width
-> > >   	 * the esync pulse percentage can be determined.
-> > > @@ -623,18 +620,6 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
-> > >   	 */
-> > >   	esync->pulse = (50 * out->esync_n_width) / out->div;
-> > > 
-> > > -finish:
-> > > -	/* Set supported esync ranges if the pin supports esync control and
-> > > -	 * if the output frequency is > 1 Hz.
-> > > -	 */
-> > > -	if (pin->esync_control && (synth_freq / out->div) > 1) {
-> > > -		esync->range = esync_freq_ranges;
-> > > -		esync->range_num = ARRAY_SIZE(esync_freq_ranges);
-> > > -	} else {
-> > > -		esync->range = NULL;
-> > > -		esync->range_num = 0;
-> > > -	}
-> > > -
-> > >   	return 0;
-> > >   }
-> > 
-> > Similar to the input variant, this changes the behavior for 0 Hz output
-> > frequencies.
-> > 
-> > The old code used '(synth_freq / out->div) > 1' to decide whether to expose
-> > the esync range, which excluded both out_freq==0 and out_freq==1. The new
-> > code uses 'out_freq == 1' for the early -EOPNOTSUPP return, only excluding
-> > out_freq==1.
-> > 
-> > When out_freq==0 (which can happen when synth_freq is 0 or synth_freq <
-> > out->div), the old code returned 0 with esync->range=NULL and
-> > esync->range_num=0, while the new code returns 0 with
-> > esync->range=esync_freq_ranges and esync->range_num=1.
-> > 
-> > The removed comment documented the intent: "if the output frequency is > 1
-> > Hz". Should this also use 'out_freq <= 1' to maintain consistency with the
-> > original behavior?
-> > 
-> > [ ... ]
-> > 
-> 
-> The frequency for both input and output pins cannot be zero... Cannot be
-> set to 0 and device never returns configured frequency to be 0.
-> 
-> I can modify the lines to be:
-> 
-> if (!pin->esync_control || out_freq <= 1)
-> 	return -EOPNOTSUPP;
-> 
-> but it is needless - but let me know.
 
-Thanks Ivan,
+On 3/21/26 11:30 AM, Xingwang Xiang wrote:
+> When a socket is first inserted into a sockmap with a verdict program,
+> then TLS is enabled on that socket, the TLS strparser's saved_data_ready
+> callback becomes sk_psock_verdict_data_ready(). This function calls
+> tcp_read_skb() which drains ALL skbs from sk_receive_queue without
+> updating tp->copied_seq when the BPF verdict is SK_PASS. This leaves
+> tcp_inq() returning stale values, causing the TLS strparser to think
+> data exists in the receive queue when it doesn't.
+>
+> The result is a WARN_ON_ONCE(!first) in tls_strp_load_anchor_with_queue()
+> when tcp_recv_skb() returns NULL, and Use-After-Free when
+> the strparser's frag_list points to skbs that have been unlinked and
+> are now owned by the sockmap subsystem.
+>
+> While sk_psock_init() correctly checks inet_csk_has_ulp() to prevent
+> inserting TLS sockets into sockmaps (blocking "forward order"), tls_init()
+> does not check for an existing psock, allowing "reverse order" setup.
+>
+> Fix this by adding a check in tls_init() to reject sockets that already
+> have a psock attached (i.e., are in a sockmap). This mirrors the
 
-If it is needless then there is no need to handle it in the code.
-Sorry for not understanding that before forwarding on the AI generated review.
+
+Hi Xingwang,
+
+Thanks for the patch and the detailed analysis of the problem.
+
+However, TLS is designed to work together with sockmap — the TLS 
+send/receive paths
+(tls_sw_sendmsg, tls_sw_recvmsg) extensively use sk_psock_get() to 
+cooperate with
+sockmap for verdict and redirection. Rejecting sockets that already have 
+a psock
+would break this intended usage.
+
+Also, could you try running the sockmap_ktls selftest
+(tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c) after applying 
+your patch?
+
+I believe it will fail, since that selftest specifically exercises TLS + 
+sockmap
+combined functionality.
+
+That said, the bug you described is real and worth investigating. It 
+would be very
+helpful if you could add a reproducer for your scenario as a new test 
+case in
+sockmap_ktls.c. That would help us better understand the root cause and 
+find a
+proper fix that addresses the issue without breaking the TLS + sockmap
+integration.
+
+Also, pls use [PATCH net v?] or [PATCH bpf v?] (if you think it is 
+related to bpf/sockmap).
+
+
+Thanks,
+Jiayuan
+
+
 
