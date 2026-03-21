@@ -1,137 +1,172 @@
-Return-Path: <netdev+bounces-270237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270238-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +KdfBRbcvmnZfgMAu9opvQ
-	(envelope-from <netdev+bounces-270237-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 18:57:42 +0100
+	id kiTqHCrlvmmciQMAu9opvQ
+	(envelope-from <netdev+bounces-270238-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:36:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EBA62E6A1F
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 18:57:41 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 103812E6CE5
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 19:36:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B806E300EF88
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 17:56:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2A9C73007483
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 18:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF00D33BBCD;
-	Sat, 21 Mar 2026 17:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87ABA33BBA7;
+	Sat, 21 Mar 2026 18:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="J0zMkjbB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a1x1Youb"
 X-Original-To: netdev@vger.kernel.org
-Received: from szelinsky.de (szelinsky.de [85.214.127.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC391A6814;
-	Sat, 21 Mar 2026 17:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.127.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774115795; cv=none; b=uV/xIRVmJ6frb70i4k3afGW5ds9wgwqS32NSsf54fyFdWgmMxb/AugJwwD94GJWAMxqjNrTppZp2yx2rKWW/sBpzMBrevLtO91sAjzrzmkuGJLLjToZ8xlDQ+O+K+VFGy7ESVHuFeVdIHwHQYGkgSGAWOmPQUW/Pxoif4E3o7s0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774115795; c=relaxed/simple;
-	bh=eGd/5gQP4aOLgyBo2zFexp1yWCxsCnmks/OBoAs5zL0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dyFYnAHGGNFUjqbeeNWAPfvWQrMtJpc9XtPci1Gni14+mxcbdoLTkW1uaruDpXeJD2h/q7wMIWefTjuMW6IUCsXCKSwA+99vny0a43GT2Ut3yriOCpdlQjTrl4Ze6X/tBR20tMKF5gEDTN/fV2w6u7mFxqWgVyZxJYMg19vDIRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=J0zMkjbB; arc=none smtp.client-ip=85.214.127.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szelinsky.de
-Received: from localhost (localhost [127.0.0.1])
-	by szelinsky.de (Postfix) with ESMTP id B901AE86EBA;
-	Sat, 21 Mar 2026 18:56:25 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
-	s=mail; t=1774115785;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VYg/kHwNIcAR96l2jUMR6xh3BlsGVQTE1qtMPiN2MFg=;
-	b=J0zMkjbBIZjAUnFqrwbK+gqMmVbsAxKAxFVcGKPUi4oRjt268QC+mFXUquCYUzJKfRPPfJ
-	+D4B7gll4f0kp27GMKhWM4rEEQB3zbdXZllZJ1mDaPgiugF7r8l6ZUttPFaUjaHIj09IkZ
-	wXkPYSvNupOTeLoC2plA2mE58ibakNfv5KOL6w3fpeP58eQMh77qJKHiepmjWB/32++qWp
-	gaEp5PNrMo09TNFX0PjAFvujeT/gV7AhiHFlDVokgIh8IJQvoHLFy1cSfnSHEdCLqWzrIF
-	ECD3vhZPOg49TFVJJLbjC5QXFEc6hz/jqxvA1r6D0j94wzF8I/dVNbpzPQIPBg==
-X-Virus-Scanned: Debian amavisd-new at szelinsky.de
-Received: from szelinsky.de ([127.0.0.1])
-	by localhost (szelinsky.de [127.0.0.1]) (amavisd-new, port 10025)
-	with ESMTP id RdB47ymolZ5G; Sat, 21 Mar 2026 18:56:25 +0100 (CET)
-Received: from p14sgen5.lan (p57843ab9.dip0.t-ipconnect.de [87.132.58.185])
-	by szelinsky.de (Postfix) with ESMTPSA;
-	Sat, 21 Mar 2026 18:56:25 +0100 (CET)
-From: Carlo Szelinsky <github@szelinsky.de>
-To: andrew@lunn.ch
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	github@szelinsky.de,
-	kory.maincent@bootlin.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	o.rempel@pengutronix.de,
-	pabeni@redhat.com,
-	linux-leds@vger.kernel.org
-Subject: Re: [PATCH] net: pse-pd: add LED trigger support
-Date: Sat, 21 Mar 2026 18:55:46 +0100
-Message-ID: <20260321175546.282181-1-github@szelinsky.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <b42fb036-89da-48cd-9525-d05a065096d5@lunn.ch>
-References: <b42fb036-89da-48cd-9525-d05a065096d5@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B9925CC74
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 18:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774118181; cv=pass; b=PpHYayKiX2CQX6Jonn5O+PTZ+YGMkjsPOxCn/KFCWELvIpPe/HsbyMtWjWIFQrYrUf6x6+boWZ400IK+/8wSfOIVBAaPVY5rZO04Ek5mSJ2Ozx7rdyHaHZ4eMr0BJ5tfcvSSZwDAX/fB0Wvgc2+3FGKwT3ohlndRnhOKBLxgTCw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774118181; c=relaxed/simple;
+	bh=E73mJLbVj0JbkSUviEdOjxdJyafwNzdmTlBRvW6WZ14=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hzOock6r1XfMc2Z/dPacBmIpZpdgAm9b4Ylzj7yOTOm35NRQfzTZbgqU1zBYOyh3WoKbF6O1MYZEwquW2MWg1oimbDW2GeySTQJaDc+b03joK9cqGYWPAc1hA71uQ1qbvETU5j0x2LotZyuwUsbBK2s4Tfl6WEcAWW+DB9Qx58g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a1x1Youb; arc=pass smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-64e9f9226a7so2507010d50.2
+        for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 11:36:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774118179; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Hz4gghpRxeoM9THIoW2CGfG/qJnOkgEbYXh3Pr0IxCsbNJizy09mjbBu4gNX7vVbHE
+         sgh8Agw8fOpwR+heBbf3AD5ble5MNF5emEHY5yc+yvjldZnrUsG7Jull9CCeouWBpQuq
+         zGVHsKL3l/mSpLbSsWDkjLQCZtN3jyrPXW+1EK0PIdY3YxmJJgVvTWRR6NEMYCOPLvt3
+         LwWCcM8SjwcDGErFA/RcO5uIq0lkcYyylK3hoR27/AucdOrcgRBOljCwrK4dVay+v7xa
+         X60oB+0lhagcXZQY8pGYzddJ2IGCtIdzOlneyFGr2AB7bAx6X35ceX9iRVl4Dj9kC5U6
+         TFoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=E73mJLbVj0JbkSUviEdOjxdJyafwNzdmTlBRvW6WZ14=;
+        fh=weaC6FihwEfIliAQzy0rq1iSHJ8m3f25eXNyMD+HZwg=;
+        b=IOZz1/aN7nl/WCmArhFHNO4mdOF9T679phrk70PDx61b6OzPJcYqgJBWNn5v+9v+Jv
+         V7RK62qOV3B/DUHqotaZO1ZPMYMlEgGdEZXOUlbK9Y6QuG76eB37xSAJ0QZI/HbtjpCU
+         bMY2g5+2Y8ddNIzIcnPnbMMpPYfEzzliaYiG80O42fYShgms8cowjwsNBEsFR3G3f+An
+         jdo2vzJmUWzJrougrTPsfLzQXkBBpGKcB5H16BDIHj6F6j7fbQJ3ok1vJ6t0OUQOgEFp
+         QDgRtut4ELH2UxCz9gZsXTdgcE59N23GopHllHQbSDCbJaN+PfZp8gwopeBpsiQ/new6
+         B9LA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774118179; x=1774722979; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E73mJLbVj0JbkSUviEdOjxdJyafwNzdmTlBRvW6WZ14=;
+        b=a1x1YouboCSOvm/kS8mbf/ihOBW0gbIJuaLoU8POQYEMT9VdQIompT5NnPxpNLVm+M
+         k3R8Z+DJxv0Nw8sxuPp6Gjlka/Y4Msu86f3OejokTfKTOmkHl7ZGDUpUMZlR2Avb5PTr
+         Q0xUyAgqAhlRXYBIz5fkgCuafPXuSZjPuvEkAr6kHHT7gNQsCjY5exyGbD4a4oz8g/3a
+         FFOLy0ZSZxvbtnpmAvXffi4RjRV3SHjq8AyzN4ZQzY5WaE0hUrJvdm1EbB9zu3QXuO4G
+         8FpHIVuQshgUzAYSlGxUA6+ornAkGkFtEYlwPMNkp3KpwFdvvkw5udmjoABY86ngsrRN
+         Tw+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774118179; x=1774722979;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=E73mJLbVj0JbkSUviEdOjxdJyafwNzdmTlBRvW6WZ14=;
+        b=rRu+xLsxh6EsFgTRL2cRXR+zhB2CBkOoe7ZS4ExlHzFcbl5kuRBeFMViOdPmn85VVx
+         T/sv4No0a9kxiulw2WNCs/Lru/bEpyu8l5RMULXeiDNeoBL2T5ebgTad/fQJlEFK5EZ+
+         s5/6ZK98/bKMjcL4jl8dEO0lzspAV/tq/EKn2JEwMXbu3SlNtbxtXfEOaUyRb3Whz9k8
+         PuQlWqKWHLv7KoGP7ZE8lc2Fp4c6zZAP1FDFfT+06bqK4VwOreSvwyyy9KRmlT8H44Xi
+         5757mepyPO0QmOezhYmqAEQlLXzNq3emyncXwhb5Hg7s3w7GseCNoG8wnL5EBWt53n5m
+         w29w==
+X-Forwarded-Encrypted: i=1; AJvYcCVvxbyEWYnIbA9u1muVYNxE4LZxjdKfIn6Hhf6CKtt2wMiA51C9XIO7incXPeJ5XKiYtgxVk+4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySi8ql+zXwXtd33Ff7PXKQ2QJ3ESFfSFDcx3s7qi7PJC/5luFI
+	8hpNdKOhLcNhcGRmVwNcIfJJSqML+qkuSERkrIKWvO036VOFWeBfubUqjU2wuN9dqLd4PcJLNJR
+	DYeLLV7XGMot/UpxS1E3aglhzahX1OzE=
+X-Gm-Gg: ATEYQzxkMW+Mh6R1A2J7BXYMJV+AUW2iYbNNxBKf/r+eSuq3p4Yqo9sUhYiAvEKRXSb
+	JuUvhrVqDQmFxclE9SMNp/zS+7ppZ2Va7LJUcVhC8w2ffxMjvOBlmj9ihvH96vickjQrFGEOlaL
+	vQfylwcFsCjneNptcE2UBtNJNsgL37Xisg8oRGeBDzC+VthzYVJrpP7Qc8A9q6xB8c6SQcI5hvZ
+	rR/MW86+Umf8YHDaNjUIlZX5I2DT1H/ivKdLYdaFa9ZhfAiPov3TSo9ePo8Wgj8DA298+cRk8WC
+	VAo1PUcVL5ES/rahYF8KMCpNUMmpwVmFqJDoJ2r/ILHdrijUt+EnCMbB0GDldViVzogn/g==
+X-Received: by 2002:a05:690e:e17:b0:649:e501:21af with SMTP id
+ 956f58d0204a3-64eaa6a23e8mr5995453d50.14.1774118179320; Sat, 21 Mar 2026
+ 11:36:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
+References: <20260319190455.135302-1-luiz.dentz@gmail.com> <177396481128.1855248.1024090053580545012.git-patchwork-notify@kernel.org>
+ <6411a735-d187-4848-b199-a0e2c2e0e52c@leemhuis.info> <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
+ <20260320175220.47147285@kernel.org>
+In-Reply-To: <20260320175220.47147285@kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sat, 21 Mar 2026 14:36:07 -0400
+X-Gm-Features: AaiRm50g7uMS86-n9jkJ6Q519tiQJjDz5q1yhkXXjsoHNxncFtVOJQmEad9viRw
+Message-ID: <CABBYNZ+Tk+in8tLVQ7qXQXZjVYLRt3bstvSLPHh6Y9bBb2Dg-w@mail.gmail.com>
+Subject: Re: bluetooth regression fix likely to miss -rc5 (was: Re: [GIT PULL]
+ bluetooth 2026-03-19)
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Thorsten Leemhuis <regressions@leemhuis.info>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, linux-bluetooth@vger.kernel.org, 
+	davem@davemloft.net, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270237-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270238-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[szelinsky.de:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,szelinsky.de:dkim,szelinsky.de:mid]
-X-Rspamd-Queue-Id: 6EBA62E6A1F
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 103812E6CE5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hey Kory, Hey Oleksij,
+Hi Jakub,
 
-Thanks again for taking the time to give detailed feedback. I am not really experienced with working on the kernel, so I took some time to process and get a clear picture. I will try to implement and test it asap... My action points would be the following:
-                                                                                                                              
-1. Replace the LED specific polling with some generic devm_pse_poll_helper() that is based on the existing pse_isr() logic but in a timer instead of an IRQ - pushing events through ntf_fifo / pse_send_ntf_worker() like other IRQ-based controllers already do.
-2. Fire LED triggers from the notification path, not from a separate poll loop: LEDs react to state changes e.g. they don't drive their own polling.
-3. Fix pse_pw_d_is_sw_pw_control() - it currently requires pcdev->irq to be set in the PSE_BUDGET_EVAL_STRAT_DISABLED path, so poll-only controllers like hs104 would never enter software power control. Needs to also check for an active poll worker.
-4. Add #define for the default poll interval (e.g. 500ms) with a comment explainin why.
+On Fri, Mar 20, 2026 at 8:52=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Fri, 20 Mar 2026 14:02:34 -0400 Luiz Augusto von Dentz wrote:
+> > Afaik, it was tagged as regression on March 1st afaik, according to
+> > [2]; traces were only provided on March 15th, so yeah it was fixed
+> > within a week once the necessary traces were supplied.
+>
+> Hi Luiz, I don't really care about the complaint, just wanted to check
+> whether you know that we always send the PR on Thu (either AM or PM
+> depending on which maintainer is handling it)? If you do then nothing
+> to see here, we are all doing our best. But if it's not crystal clear
+> I should probably ping all sub-trees to remind folks.
 
-Did I understand you correctly to not waste any time?
+Sure thing, normally I would have send it sooner but I did want to
+make sure the regression fix was included, I will put a reminder to
+send the PR by Wednesday to make sure that git to you ahead of time.
 
-Unclear is for me still:
-* Poll helper design: new devm_pse_poll_helper() vs extending devm_pse_irq_helper() with IRQ=0 fallback? I suggest a separate devm_pse_poll_helper() - it keeps the IRQ and poll paths clean and symmetric, and avoids overloading devm_pse_irq_helper() with conditional logic.
-* Who decides to poll? The driver explicitly calls the poll helper, or the core auto-detects missing IRQ? I suggest the driver decides explicitly - the driver knows its hardware best, and an explicit call is easier to review and reason about than auto-detection magic.
-* DT property: rename led-poll-interval-ms to poll-interval-ms since polling is now generic? I suggest yes - the polling is no longer LED-specific, so the property name should reflect that.
-* Kory mentioned two distinct cases: (a) controller has no IRQ support at all (like the hs104), (b) controller supports IRQ but it's not wired on the board. Should both cases be handled by the same poll helper, or does (b) need different treatment? I suggest the same devm_pse_poll_helper() handles both - from the core's perspective the situation is identical: no IRQ available, need to poll. The driver just calls the poll helper instead of the IRQ helper in either case.
-
-Have a nice weekend,
-cheers.
+--=20
+Luiz Augusto von Dentz
 
