@@ -1,199 +1,236 @@
-Return-Path: <netdev+bounces-270203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270204-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QOZAFj2GvmmKSAMAu9opvQ
-	(envelope-from <netdev+bounces-270203-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 12:51:25 +0100
+	id +IoXOLKMvmkLSwMAu9opvQ
+	(envelope-from <netdev+bounces-270204-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 13:18:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 053192E50EF
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 12:51:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 431C02E5436
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 13:18:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 210C330066BC
-	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 11:51:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EBB41300CE69
+	for <lists+netdev@lfdr.de>; Sat, 21 Mar 2026 12:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3660938B14F;
-	Sat, 21 Mar 2026 11:51:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 696732DB785;
+	Sat, 21 Mar 2026 12:18:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OM3sOxiy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFuanRLu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E21258CCC
-	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 11:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF07282F09
+	for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 12:18:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774093882; cv=none; b=NgYL9sl704aK/y+uEl12ZkoYsRlfOnX/Mo4NB/IHzHM/nZ+gx7Zk1XL8uHDlh4kU/yzZMcH9DMBYkZJBXSFScn4d8cGexzo1QVkvRMfvaYz5d8NX2aGbPLaX9uSyo/lfj5mkPB8iB37onIF/3OcURV7ghdVV4hf17IwL2x9P0n4=
+	t=1774095514; cv=none; b=B+XfBmjqu206Mu+llaVD+BT4Zms8N8BtTIlYNwEVTgI9KfdE65pGUkDcbcKQDXrU4HVXjx/bXsrX0yC9Awz5RGu9NOkUy4GOwLayZx7NRyg8Zsv/jAKu10RKbXxHu53dsv2AxpvpKTqJc6h09edfOHVnPGWqWKYG2aRMUg4gwB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774093882; c=relaxed/simple;
-	bh=3eh1OT9D9BpUpvEjoVisoWRX18q+qGa+eoXu3OkBq4c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lMfdEu4JWaW2e+F5B5jHGfrBRckAbWBtF048QnwhHwui4voIiaJNISpXoarIp9IbMwUENSquse9Oy9BrFtNXq125jggzsszm8wffuA7pClbKM0PcgIEqCfWrQ05kCV/8CzTmclbXRmQ5jDJpS3AqqysF37lxMd8YGq1t5n0WFv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OM3sOxiy; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1774095514; c=relaxed/simple;
+	bh=Y75XoYqKXvJELNiUFoBpV1yJXIJ4ij7GQ1MqArWPTFI=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=smCIC+DmrXBJva/LSoUA0VVPzVMrv3C4H+arbATmzUp9trf690dKtlGu6CsfF55rlYkXMdj4rqUx2V06+7gHk1RaiyG1xc/zfSNfX8hZlhtRhR6UTC2mLRaetn4wZHvD+OajoLz8q7o8GjniLe3FT1oif8LyDuzlBoj7NBbwfCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UFuanRLu; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2ad9516a653so12582455ad.0
-        for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 04:51:20 -0700 (PDT)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4870206f73bso6590855e9.3
+        for <netdev@vger.kernel.org>; Sat, 21 Mar 2026 05:18:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774093880; x=1774698680; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oyLTWwt1nTioiwAe9v9UZu9ANFhBTLIrCwfF5jN5Q80=;
-        b=OM3sOxiydeXhfcbcK4R5UBu6OvwfBvW5k0pPwN14pREV1XlseTJihDpqgjOU3/g/ga
-         t1EC7NvIeKlHSWHOMSXEFBSpUpjV1KWB72xO76JRQPqaffXAZvvEuBzddwqb9TBUHxsj
-         EW7bmdFm6CyJDqufqFoj4141+oJA8j5vLTi9QwBvQ/u9FDAwotpp258iwOM0gdUzLAF1
-         ozol7y8Tbbi7Ktuyo0Mzlkvwk2gDisNUjDYgMH95RkAlutGqUzPaCH5LuMAISlzxzVYb
-         B9BMa7DeNTgVF7Mg/21WXEF/4mOEOQDsNYBYWgji4foOB4aGrDiRD+c268djPWYvfZiB
-         5lcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774093880; x=1774698680;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1774095511; x=1774700311; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:to:from:subject:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oyLTWwt1nTioiwAe9v9UZu9ANFhBTLIrCwfF5jN5Q80=;
-        b=RERbVoKTn/J9zSpNEz2dWRycWRIBnEvtJrgj+ai2mWGpDJQL//bPmSUQ/m8XEXHm2v
-         wsSGXQOEJuRddiDqQ/yX7VsISOxqaj8ut6OwJsSqT74PlfYzbxDUjCwJeZ03Z4RLRm2T
-         4LEpIyL4Z5Se063s6JU9C780dE1aeaishM2lRGgGBBLANG83pbRx36ATkKXceElAkmyC
-         eyUYodQxq5nWpQ3n+eHIAEuDJBnb6kN70fQ+bfbXotLOnhXcwwe1yokO7cvMU7nDPpG9
-         VFsgPbE28SvVvYsQlr5w+4r0jWNArmNnUctGzfEWc0YFzeR5JlsOJVrRbIAhgkk/gbdL
-         k8zQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUVItbEPyngxYnOvAITAlEGLyXA/IsaS6rJdUPe/avwx4NLvq6ZmjKLM7fAFkPOipMB8Qf63EU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywu0yfhceYwG/q78bD9X0gPXTTiDclGvl2fh+8SmsOzF/kZhALk
-	VMNlwd289Psvy6rFSTmCR6GAZ1PG5VLb3Na7tA/6sUcw6K07mBFH6DoO
-X-Gm-Gg: ATEYQzyT2f9+T4TD/9gVrSsuiQJJsOyPwLL2o0J/ROfs7yi1TsoeSV0kgRjUT3DfEUE
-	jzrklOH0rNCtSv8LNJO0mA5y1FPgTf6vYHasDhlkFszibbSogVQJb68M4zsyhDh8tMPThlZqksR
-	XZs+9/DlcPWIMYn8SAyPMuP9R96jZRSUVasSceqhzCr7pNk/F0ExvkTRaKoPkbr5gqzL5iF5MBV
-	wg1r3wnM4GDuNx5ynUhzNV2yyWEg8W2CVMzabRmysxyuna3zDsTLNmyicsmJWW3ly0fdwJAX1hZ
-	iH9px5bC/mJtvttaDJwOuQ/hzsWwRlh1ppU2QVzcuG/YrO2s6KKqpcnSf92vLxiNIKV7pg3+cLp
-	WcrKlzGPGdU+dQMxavgFSJrGZukdQMc4lf1HpaCf74ICkIYv3q15W0sSyGjrf8611Z0A7R9xbnj
-	bNfuWKn2qDcSUWX7/mBkBrjY2CBCRm6A8=
-X-Received: by 2002:a17:903:986:b0:2b0:5548:7d80 with SMTP id d9443c01a7336-2b08278afd1mr50197575ad.27.1774093880318;
-        Sat, 21 Mar 2026 04:51:20 -0700 (PDT)
-Received: from lgs.. ([223.80.110.53])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b083516ab1sm67487685ad.5.2026.03.21.04.51.13
+        bh=Y75XoYqKXvJELNiUFoBpV1yJXIJ4ij7GQ1MqArWPTFI=;
+        b=UFuanRLu7gNAH2E9O4fsqe9AS1Z2gO2NvDudhdxWFY7LKDzOWAAVzSN8yA1rjoa2T9
+         a2S4lObS5B8JWEEYouuCACf7tSx60bNHEi1vSW/pDJafF4QAKICUZU5gb1FjEbe5C++z
+         MVCw/hWOZzs3xSNRwjZp7O7K6tOIXJ8GNLHQp/GDaN+jylijMONRrVnV7rM2G/rqCpDB
+         /vGS2C97Gx9raJHuiOVO96qiRZafFzd1jIg/b/T+JxvDHe6jm9c3DMjAEyc+hNpwXMim
+         RmGrcxZU1x8y7WUsdoVOsUJYlFSJ4W70LTBZFewUmUyt3Cel/CHtI3PcKA8fJicJOZOr
+         0JPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774095511; x=1774700311;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y75XoYqKXvJELNiUFoBpV1yJXIJ4ij7GQ1MqArWPTFI=;
+        b=Ie1vpAX2vrjLJfXYQ8qK7FDEwTEHPGVMcwQaiKxxhd1IDvE1GxRdIdrwmuo2jxHq27
+         R89ktX5V3iMUDlpxsK/QBDnq0uFJ6Cw7TKw3wSXKfoMDnoctgKWTxL1fpQFaD3CkLv5K
+         LZKvZ2aI3gHthVRp1Twil6WOris6Oj/NsczxMnFUfTnWEzeVTGqKeQbyEnPNJOXY+Czo
+         djC4VnmAPcvvg5+o15hMN7U87P9glC+S9cny7xNiTXpwNKwuQjPmWYpuvoPAzH2Ofyxs
+         73ktsX04nTq7Azgiv2Rv5THcjVGwfa7Cc1bmIiDXWgyQwPgXMUWjLo9RNmDG/VjQhtn4
+         NbEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWlCIPyJhUAZRt9654qa1CZJX9q/gfpyCSm1I2EW475JEh2Kdqe5fuUe0KQewAx63z6nGeadAU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmACWEWvKVjGow5dKIkWsUpAKHAhp0fNDkiLG907EDe/mNrn4k
+	BAgv0efyXBsH1xzN2ryvkYxFh4d7oC24pLvHgFs4VGm2gsHw3jUx6Xmzl6AyfA==
+X-Gm-Gg: ATEYQzwAq/aJ7esvg+Ubxhw7uEULiVauSovJylqwcM0Vi1Tk0k3WpAObFh+Auz30UKV
+	A5MjP1WjePzsg3tOdgguKrvIeCOrkJfvIxWAsvfQihGS7/ujkBG9Y+yTLEBbDoENNtUbGpXcKrF
+	W+1V5Tv/sstgqzXl4Ut7/ckf4oadZ+M8G2Vh9AaW60K28kUZOnU3GO8GLK3C1ibotD6VvCIzuEL
+	hpyZpnfe2KZdJTeYNebrN0/1GcIx25mx2m4/NsBPeaDOS5PtjWpyY5pXOZLKPRm3nHdm0uMqrQE
+	nsbPLPmhEABlJInSrLcuIGW3gjZiwL1e6BBD+8kItFQKtsH+5Gfm+PIxATzkNsfcVZRvAr7ORMp
+	W4at84CXiD98A69kiO9VTWvP89uj9IoSWF/qsTaRdI4JNZChkdTr6Vh6TkXIB3U+CKh3zw8uWTH
+	8g4pt9tDVcoZHZo2u5Jt0V8mP9PaoRNbkT+LcwUQUguWwyBywAFFMkuXIrMMimTmXNivw0qO9mu
+	fEX80k=
+X-Received: by 2002:a05:600c:a55:b0:485:6bcc:87dc with SMTP id 5b1f17b1804b1-486fedc3db0mr86713255e9.14.1774095511033;
+        Sat, 21 Mar 2026 05:18:31 -0700 (PDT)
+Received: from 0.1.2.1.2.0.a.2.dynamic.cust.swisscom.net ([2a02:1210:8642:2b00:82ee:73ff:feb8:99e3])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486fe7dc4a2sm151991685e9.5.2026.03.21.05.18.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Mar 2026 04:51:19 -0700 (PDT)
-From: Guangshuo Li <lgs201920130244@gmail.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Joshua Hay <joshua.a.hay@intel.com>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Tatyana Nikolova <tatyana.e.nikolova@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Guangshuo Li <lgs201920130244@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] dpf: fix UAF and double free in idpf_plug_vport_aux_dev() error path
-Date: Sat, 21 Mar 2026 19:51:03 +0800
-Message-ID: <20260321115103.815004-1-lgs201920130244@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Sat, 21 Mar 2026 05:18:30 -0700 (PDT)
+Message-ID: <149f484b425573185a783cb6ed7a93fcb755fa78.camel@gmail.com>
+Subject: Re: [PATCH net] selftests: forwarding: local_termination: fix PTP
+ UDP cksums
+From: Alexander Sverdlin <alexander.sverdlin@gmail.com>
+To: Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Sat, 21 Mar 2026 13:19:03 +0100
+In-Reply-To: <651c3decb80023e4395ec149fd81110afa3869a1.1774067006.git.daniel@makrotopia.org>
+References: 
+	<651c3decb80023e4395ec149fd81110afa3869a1.1774067006.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-270203-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lgs201920130244@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270204-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexandersverdlin@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 053192E50EF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 431C02E5436
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-If auxiliary_device_add() fails, idpf_plug_vport_aux_dev() calls
-auxiliary_device_uninit(adev), whose release callback
-idpf_vport_adev_release() frees the containing
-struct iidc_rdma_vport_auxiliary_dev.
+Hi Daniel,
 
-The current error path then accesses adev->id and later frees iadev
-again, which may lead to a use-after-free and double free.
+On Sat, 2026-03-21 at 04:26 +0000, Daniel Golle wrote:
+> All six PTP-over-IP test frames (3x IPv4 + 3x IPv6) contain incorrect
+> UDP checksums. The stored values are the ones-complement sums of just
+> the pseudo-headers, not the complete UDP checksums over pseudo-header +
+> UDP header + payload. This is characteristic of frames captured on the
+> sender before TX checksum offload completion.
+>=20
+> For example, the IPv4 Sync and Follow-Up frames both store checksum
+> 0xa3c8 despite having different UDP payloads and port numbers - 0xa3c8
+> is their shared pseudo-header sum (same src/dst IP, same protocol and
+> UDP length).
+>=20
+> While most L2 switches forward frames without verifying transport
+> checksums, hardware that performs deep packet inspection or has PTP
+> awareness may validate UDP checksums and drop frames that fail
+> verification. This causes the 1588v2 over IPv4/IPv6 tests to fail on
+> such hardware even though L2 PTP (which has no UDP checksum) passes
+> fine.
+>=20
+> Replace all six pseudo-header partial sums with the correctly computed
+> full UDP checksums:
+>=20
+> =C2=A0 IPv4 Sync:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 0xa3c8 -> 0x9f41
+> =C2=A0 IPv4 Follow-Up:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0xa3c8 -> 0xeb8a
+> =C2=A0 IPv4 Peer Delay Req: 0xa2bc -> 0x9ab9
+> =C2=A0 IPv6 Sync:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 0x2e92 -> 0x1476
+> =C2=A0 IPv6 Follow-Up:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x2e92 -> 0xf047
+> =C2=A0 IPv6 Peer Delay Req: 0xb454 -> 0x891f
+>=20
+> Fixes: 2379795042649 ("selftests: net: local_termination: add PTP frames =
+to the mix")
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-Fix it by storing the allocated auxiliary device id in a local
-variable and avoiding direct freeing of iadev after
-auxiliary_device_uninit().
+wireshark agrees,
 
-Fixes: be91128c579c ("idpf: implement RDMA vport auxiliary dev create, init, and destroy")
-Cc: stable@vger.kernel.org
-Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
----
- drivers/net/ethernet/intel/idpf/idpf_idc.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Reviewed-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-index 6dad0593f7f2..a5e7c42a9e6c 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-@@ -59,6 +59,7 @@ static int idpf_plug_vport_aux_dev(struct iidc_rdma_core_dev_info *cdev_info,
- 	char name[IDPF_IDC_MAX_ADEV_NAME_LEN];
- 	struct auxiliary_device *adev;
- 	int ret;
-+	int adev_id;
- 
- 	iadev = kzalloc(sizeof(*iadev), GFP_KERNEL);
- 	if (!iadev)
-@@ -73,12 +74,15 @@ static int idpf_plug_vport_aux_dev(struct iidc_rdma_core_dev_info *cdev_info,
- 		pr_err("failed to allocate unique device ID for Auxiliary driver\n");
- 		goto err_ida_alloc;
- 	}
--	adev->id = ret;
-+	adev_id = ret;
-+	adev->id = adev_id;
-+
- 	adev->dev.release = idpf_vport_adev_release;
- 	adev->dev.parent = &cdev_info->pdev->dev;
- 	sprintf(name, "%04x.rdma.vdev", cdev_info->pdev->vendor);
- 	adev->name = name;
--
-+	/* iadev is owned by the auxiliary device */
-+	iadev = NULL;
- 	ret = auxiliary_device_init(adev);
- 	if (ret)
- 		goto err_aux_dev_init;
-@@ -92,7 +96,7 @@ static int idpf_plug_vport_aux_dev(struct iidc_rdma_core_dev_info *cdev_info,
- err_aux_dev_add:
- 	auxiliary_device_uninit(adev);
- err_aux_dev_init:
--	ida_free(&idpf_idc_ida, adev->id);
-+	ida_free(&idpf_idc_ida, adev_id);
- err_ida_alloc:
- 	vdev_info->adev = NULL;
- 	kfree(iadev);
--- 
-2.43.0
+> ---
+> =C2=A0.../selftests/net/forwarding/local_termination.sh=C2=A0=C2=A0=C2=A0=
+ | 12 ++++++------
+> =C2=A01 file changed, 6 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/tools/testing/selftests/net/forwarding/local_termination.sh =
+b/tools/testing/selftests/net/forwarding/local_termination.sh
+> index 9bc9d25e71368..15b1a1255a41f 100755
+> --- a/tools/testing/selftests/net/forwarding/local_termination.sh
+> +++ b/tools/testing/selftests/net/forwarding/local_termination.sh
+> @@ -57,21 +57,21 @@ PTP_1588_L2_PDELAY_REQ=3D" \
+> =C2=A0PTP_1588_IPV4_SYNC=3D" \
+> =C2=A001:00:5e:00:01:81 00:00:de:ad:be:ef 08:00 45 00 \
+> =C2=A000 48 0a 9a 40 00 01 11 cb 88 c0 00 02 01 e0 00 \
+> -01 81 01 3f 01 3f 00 34 a3 c8 00 02 00 2c 00 00 \
+> +01 81 01 3f 01 3f 00 34 9f 41 00 02 00 2c 00 00 \
+> =C2=A002 00 00 00 00 00 00 00 00 00 00 00 00 00 3e 37 \
+> =C2=A063 ff fe cf 17 0e 00 01 00 00 00 00 00 00 00 00 \
+> =C2=A000 00 00 00 00 00"
+> =C2=A0PTP_1588_IPV4_FOLLOW_UP=3D"
+> =C2=A001:00:5e:00:01:81 00:00:de:ad:be:ef 08:00 45 00 \
+> =C2=A000 48 0a 9b 40 00 01 11 cb 87 c0 00 02 01 e0 00 \
+> -01 81 01 40 01 40 00 34 a3 c8 08 02 00 2c 00 00 \
+> +01 81 01 40 01 40 00 34 eb 8a 08 02 00 2c 00 00 \
+> =C2=A000 00 00 00 00 00 00 00 00 00 00 00 00 00 3e 37 \
+> =C2=A063 ff fe cf 17 0e 00 01 00 00 02 00 00 00 66 83 \
+> =C2=A0c6 0f 1d 9a 61 87"
+> =C2=A0PTP_1588_IPV4_PDELAY_REQ=3D" \
+> =C2=A001:00:5e:00:00:6b 00:00:de:ad:be:ef 08:00 45 00 \
+> =C2=A000 52 35 a9 40 00 01 11 a1 85 c0 00 02 01 e0 00 \
+> -00 6b 01 3f 01 3f 00 3e a2 bc 02 02 00 36 00 00 \
+> +00 6b 01 3f 01 3f 00 3e 9a b9 02 02 00 36 00 00 \
+> =C2=A000 00 00 00 00 00 00 00 00 00 00 00 00 00 3e 37 \
+> =C2=A063 ff fe cf 17 0e 00 01 00 01 05 7f 00 00 00 00 \
+> =C2=A000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+> @@ -79,7 +79,7 @@ PTP_1588_IPV6_SYNC=3D" \
+> =C2=A033:33:00:00:01:81 00:00:de:ad:be:ef 86:dd 60 06 \
+> =C2=A07c 2f 00 36 11 01 20 01 0d b8 00 01 00 00 00 00 \
+> =C2=A000 00 00 00 00 01 ff 0e 00 00 00 00 00 00 00 00 \
+> -00 00 00 00 01 81 01 3f 01 3f 00 36 2e 92 00 02 \
+> +00 00 00 00 01 81 01 3f 01 3f 00 36 14 76 00 02 \
+> =C2=A000 2c 00 00 02 00 00 00 00 00 00 00 00 00 00 00 \
+> =C2=A000 00 3e 37 63 ff fe cf 17 0e 00 01 00 00 00 00 \
+> =C2=A000 00 00 00 00 00 00 00 00 00 00 00"
+> @@ -87,7 +87,7 @@ PTP_1588_IPV6_FOLLOW_UP=3D" \
+> =C2=A033:33:00:00:01:81 00:00:de:ad:be:ef 86:dd 60 0a \
+> =C2=A000 bc 00 36 11 01 20 01 0d b8 00 01 00 00 00 00 \
+> =C2=A000 00 00 00 00 01 ff 0e 00 00 00 00 00 00 00 00 \
+> -00 00 00 00 01 81 01 40 01 40 00 36 2e 92 08 02 \
+> +00 00 00 00 01 81 01 40 01 40 00 36 f0 47 08 02 \
+> =C2=A000 2c 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
+> =C2=A000 00 3e 37 63 ff fe cf 17 0e 00 01 00 00 02 00 \
+> =C2=A000 00 66 83 c6 2a 32 09 bd 74 00 00"
+> @@ -95,7 +95,7 @@ PTP_1588_IPV6_PDELAY_REQ=3D" \
+> =C2=A033:33:00:00:00:6b 00:00:de:ad:be:ef 86:dd 60 0c \
+> =C2=A05c fd 00 40 11 01 fe 80 00 00 00 00 00 00 3c 37 \
+> =C2=A063 ff fe cf 17 0e ff 02 00 00 00 00 00 00 00 00 \
+> -00 00 00 00 00 6b 01 3f 01 3f 00 40 b4 54 02 02 \
+> +00 00 00 00 00 6b 01 3f 01 3f 00 40 89 1f 02 02 \
+> =C2=A000 36 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
+> =C2=A000 00 3e 37 63 ff fe cf 17 0e 00 01 00 01 05 7f \
+> =C2=A000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
 
+--=20
+Alexander Sverdlin.
 
