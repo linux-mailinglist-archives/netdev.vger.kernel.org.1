@@ -1,176 +1,168 @@
-Return-Path: <netdev+bounces-270325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270327-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qNvSJqZRwGm3GAQAu9opvQ
-	(envelope-from <netdev+bounces-270325-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 21:31:34 +0100
+	id OMXKDy1vwGkMHwQAu9opvQ
+	(envelope-from <netdev+bounces-270327-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 23:37:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3F1A2EAB57
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 21:31:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BF452EB0B0
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 23:37:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CE45D3009995
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 20:31:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C64883007CBF
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 22:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A785368974;
-	Sun, 22 Mar 2026 20:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B76AF37E300;
+	Sun, 22 Mar 2026 22:37:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="f+SlOw/Y"
+	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="ft3da00d"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EAB23EAB2;
-	Sun, 22 Mar 2026 20:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B997128642B;
+	Sun, 22 Mar 2026 22:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774211490; cv=none; b=dHzx+gAkfpzlRvOQ4o9rdknnBAOEHSXLmanXXZ2UM9QKv/oMln14RFHNFYxNfMitPKN2rxOzT/5u7/8sW2Zf0o9SLMnILzYUFh8Wwy4WLWOrOdOOUW3qwwpiXH9CZ63qImPU8imV0Pe4ctTCj6mW+/z2VPxAZ64tOhCclBzYhUI=
+	t=1774219048; cv=none; b=Pb9vs7J9pU9FTnfq5B1Qs5qaoZzSI/4o2QLZx6nkpkqEH9DDbg8QUTOCeKatnLovbPsmQMRwJVCYqo5jPHBrowBzH6t4wkYiAhc0mgu3D7ipztrx4prZNabDB+8hvNb5RZiSGTs+ydKq2/Z/iNslZY2ohqNOBa9u9DVebY+kkq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774211490; c=relaxed/simple;
-	bh=IUa9QJoeD37qm9+5BKx5RW2zaamGwL+qcG6z/rFL3Bw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VeC70iFvfN4CG0xW01lCJ7mT5ksiL2/+nCofJkSFIUuZDB13+kemYetYos1okf326PLwCi3P47Ky3vpx4oMym0FDDsDCk8mWeMQcu3vfaUP+qYIWI7nsYFYYuTCQrazEseunbJy1BQHN82TBkv752n/I0osQ9LKqIqyo/Z6adNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=f+SlOw/Y; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1774211489; x=1805747489;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=IUa9QJoeD37qm9+5BKx5RW2zaamGwL+qcG6z/rFL3Bw=;
-  b=f+SlOw/YqtKAWTjz979uoqojbEb06yN1RV3eRkPE/6LQdEVQRT1IaRCq
-   262DdTLi2XuSlod5ceQJ7intZqlyYVFRh5uTKHbTy8u6r+ZaQdjwZo/XV
-   Pl2LEvjS3ONnVZqQZnpBUlBKsDhJeND1WhtNFn0tyaDYsoJkSgEu679n6
-   ZCtuEKkuD7E6T1TCz9AALdtVl30qaDBeG2PuztM0rjYpboIXFzl14QaMY
-   cjwIZHSK7PGrvivyKgYBLgpvMiWC+5e1VqKsuUotVJndNtTiJT/ZYquB1
-   uzJ70snh/8OkyHFfP00g9j6FVZiF42lvVEZc2nkOCXfBOkduzhdr/UpNC
-   A==;
-X-CSE-ConnectionGUID: pMzjF3TCSwOumwaJoiDn0w==
-X-CSE-MsgGUID: mnaZ3p4xTru3HVT3Nommyg==
-X-IronPort-AV: E=Sophos;i="6.23,135,1770620400"; 
-   d="scan'208";a="54282255"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2026 13:31:21 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
- chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Sun, 22 Mar 2026 13:30:51 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Sun, 22 Mar 2026 13:30:48 -0700
-Date: Sun, 22 Mar 2026 21:30:47 +0100
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Steen Hegelund
-	<steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Herve
- Codina <herve.codina@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-Subject: Re: [PATCH net-next 08/10] net: lan966x: add PCIe FDMA XDP support
-Message-ID: <20260322203047.4neqananv66unpsp@DEN-DL-M70577>
-References: <20260320-lan966x-pci-fdma-v1-0-ef54cb9b0c4b@microchip.com>
- <20260320-lan966x-pci-fdma-v1-8-ef54cb9b0c4b@microchip.com>
- <ab2f788b-7214-4aa6-bfca-b33d3ab37321@gmail.com>
+	s=arc-20240116; t=1774219048; c=relaxed/simple;
+	bh=cwKmKrBehC3eWBWOV3D0RnsdYcHGCiY95lRhCPL4k3M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rCG9ik5h1gNUukEf0qQsCwDzVlqqK1l7gQYabvgqaD1gJ8p+Wlzswpmc0PcLQ7hMw46AyBcGg7eyd204EQwdZyNWQN0bKgMU5FUTee7C77kB6xiNOkWJrvtWcdKt8fw1wRg1UUZ126UEj3GDwQDmyfvDHHKUo5QZnxO3d3fFZ5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=ft3da00d; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from [192.168.2.30] (unknown [46.253.254.168])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@datenfreihafen.org)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id E13F7C034C;
+	Sun, 22 Mar 2026 23:27:28 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+	s=2021; t=1774218449;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UiyTyEMNWezsYXPnf+/PmiVO+I71O3ORqcsuAzMGM1I=;
+	b=ft3da00d0+Jx1/+K0qK35iI/nGqO8WHdj0xhmD2eJhkfjHtv04IKhO745eY3TfhUpMDZCz
+	Zkx6zhQcUkdoWqkKBr82wzFmvf51ZDisAKGIH9nr6STTMOTrbFxLuG924X7iBshE3dgCIO
+	h4xjTmOly5Kz5wSPmHTtE+GJe0MxW32sA5niBPeDhR35CVVWYBGjQGkyT2whWyN/IjOiZq
+	sFa5ceZCkfLF057Rs+UGTpHrXh5xdlFTeeN4pg61ZeN+5H/2kULg5u33TIfHFJjLEbdFRM
+	GLHQbras/8OrxIwtgWbDVBu3KkTH8GR2njDjTdEoM5kmLDJcSDR+dmWQx/5lhg==
+Message-ID: <d71db3f0-12b0-485b-afec-ea5eeed35305@datenfreihafen.org>
+Date: Sun, 22 Mar 2026 23:27:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ab2f788b-7214-4aa6-bfca-b33d3ab37321@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ieee802154: atusb: drop redundant device reference
+To: Johan Hovold <johan@kernel.org>
+Cc: Alexander Aring <alex.aring@gmail.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260305104313.15898-1-johan@kernel.org>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Content-Language: en-US
+In-Reply-To: <20260305104313.15898-1-johan@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[datenfreihafen.org:s=2021];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270325-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-270327-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[datenfreihafen.org];
+	FREEMAIL_CC(0.00)[gmail.com,bootlin.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,iogearbox.net,gmail.com,fomichev.me,bootlin.com,arndb.de,linuxfoundation.org,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[datenfreihafen.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stefan@datenfreihafen.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F3F1A2EAB57
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[datenfreihafen.org:dkim,datenfreihafen.org:email,datenfreihafen.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9BF452EB0B0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Mohsin,
+Hello,
 
-> > +static int lan966x_xdp_pci_run(struct lan966x_port *port, void *data,
-> > +                            u32 data_len)
-> > +{
-> > +     struct bpf_prog *xdp_prog = port->xdp_prog;
-> > +     struct lan966x *lan966x = port->lan966x;
-> > +     struct xdp_buff xdp;
-> > +     u32 act;
-> > +
-> > +     xdp_init_buff(&xdp, lan966x->rx.max_mtu, &port->xdp_rxq);
-> > +
-> > +     xdp_prepare_buff(&xdp,
-> > +                      data - XDP_PACKET_HEADROOM,
-> > +                      IFH_LEN_BYTES + XDP_PACKET_HEADROOM,
-> > +                      data_len - IFH_LEN_BYTES,
-> > +                      false);
-> > +
-> > +     act = bpf_prog_run_xdp(xdp_prog, &xdp);
-> > +     switch (act) {
-> > +     case XDP_PASS:
-> > +             return FDMA_PASS;
-> > +     case XDP_TX:
-> > +             return lan966x_fdma_pci_xmit_xdpf(port, data, data_len) ?
-> > +                    FDMA_DROP : FDMA_TX;
+On 3/5/26 11:43, Johan Hovold wrote:
+> Driver core holds a reference to the USB interface and its parent USB
+> device while the interface is bound to a driver and there is no need to
+> take additional references unless the structures are needed after
+> disconnect.
 > 
-> What if the BPF program modifies packet boundaries (e.g.,
-> headroom/tailroom adjustment)? After bpf_prog_run_xdp(), xdp.data and
-> xdp.data_end may differ from the original data and data_len, but
-> lan966x_fdma_pci_xmit_xdpf() is called with the original values.
-> Wouldn't any adjustments made by the XDP program be silently lost?
->
+> Drop the redundant device reference to reduce cargo culting, make it
+> easier to spot drivers where an extra reference is needed, and reduce
+> the risk of memory leaks when drivers fail to release it.
+> 
+> Signed-off-by: Johan Hovold <johan@kernel.org>
+> ---
+>   drivers/net/ieee802154/atusb.c | 5 +----
+>   1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+> index 95a4a3cdc8a4..5f7fc4ee7a07 100644
+> --- a/drivers/net/ieee802154/atusb.c
+> +++ b/drivers/net/ieee802154/atusb.c
+> @@ -961,7 +961,7 @@ static int atusb_probe(struct usb_interface *interface,
+>   
+>   	atusb = hw->priv;
+>   	atusb->hw = hw;
+> -	atusb->usb_dev = usb_get_dev(usb_dev);
+> +	atusb->usb_dev = usb_dev;
+>   	usb_set_intfdata(interface, atusb);
+>   
+>   	atusb->shutdown = 0;
+> @@ -1055,7 +1055,6 @@ static int atusb_probe(struct usb_interface *interface,
+>   	atusb_free_urbs(atusb);
+>   	usb_kill_urb(atusb->tx_urb);
+>   	usb_free_urb(atusb->tx_urb);
+> -	usb_put_dev(usb_dev);
+>   	ieee802154_free_hw(hw);
+>   	return ret;
+>   }
+> @@ -1076,8 +1075,6 @@ static void atusb_disconnect(struct usb_interface *interface)
+>   
+>   	ieee802154_unregister_hw(atusb->hw);
+>   
+> -	usb_put_dev(atusb->usb_dev);
+> -
+>   	ieee802154_free_hw(atusb->hw);
+>   
+>   	usb_set_intfdata(interface, NULL);
 
-I think you are absolutely right. Thanks for catching this. Actually, we might
-have the same issue in the platform XDP path also.
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 
-I will fix this in v2.
+Jakub, Dave or Paolo can you folks please pick this up into net-next? I 
+waited a moment but I have nothing else for wpan-next in the queue for 
+now, so it would be silly to have a pull-request just for this.
 
-> > +     default:
-> > +             bpf_warn_invalid_xdp_action(port->dev, xdp_prog, act);
-> > +             fallthrough;
-> > +     case XDP_ABORTED:
-> > +             trace_xdp_exception(port->dev, xdp_prog, act);
-> > +             fallthrough;
-> > +     case XDP_DROP:
-> > +             return FDMA_DROP;
-> > +     }
-> > +}
-> > +
-
-/Daniel
+regards
+Stefan Schmidt
 
