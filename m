@@ -1,195 +1,176 @@
-Return-Path: <netdev+bounces-270323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270325-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNGRH45HwGk5FgQAu9opvQ
-	(envelope-from <netdev+bounces-270323-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 20:48:30 +0100
+	id qNvSJqZRwGm3GAQAu9opvQ
+	(envelope-from <netdev+bounces-270325-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 21:31:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26DB92EA8B5
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 20:48:30 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F1A2EAB57
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 21:31:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 529133009B27
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 19:48:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CE45D3009995
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 20:31:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B7637C0E5;
-	Sun, 22 Mar 2026 19:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A785368974;
+	Sun, 22 Mar 2026 20:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IJynRHho"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="f+SlOw/Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801011A6815;
-	Sun, 22 Mar 2026 19:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EAB23EAB2;
+	Sun, 22 Mar 2026 20:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774208905; cv=none; b=Ee+q1JzziceDlP/gpB7e6pJ0fvDfGYuljdv94Fnze4hqSSkzdZrcTKLaVdZpPICEFBAG/e6jY4jYXr2An2YQbf5u7ac32N2tQCSnfUCl9vlhPPrDXlaDlJcTfElBi1m1aK9b2vtp9DBbF9KXdsihpPzT3/tt+ofiOoyLl9MS6So=
+	t=1774211490; cv=none; b=dHzx+gAkfpzlRvOQ4o9rdknnBAOEHSXLmanXXZ2UM9QKv/oMln14RFHNFYxNfMitPKN2rxOzT/5u7/8sW2Zf0o9SLMnILzYUFh8Wwy4WLWOrOdOOUW3qwwpiXH9CZ63qImPU8imV0Pe4ctTCj6mW+/z2VPxAZ64tOhCclBzYhUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774208905; c=relaxed/simple;
-	bh=hsLkvAUgRxRQJzXQcQZokLRvOtZGiaYVCTbdJvhfGkM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YLXZHPC/r4ckggNcfL50oLQ+Ea0SiEXbiRWFL8DDhD/7Io3OC3pJ2q2/+Pq5GSoRB6GuL9UHlKx5GzakU0egEGMDhemPFL0ENbE6WHKMpcUNET6U1bK5AmUrkxxL9JpWxRYHHCRPmeoYjU3tXTkxTrw/0/j2uVtUT+ROWCrbCcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IJynRHho; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4414DC19424;
-	Sun, 22 Mar 2026 19:48:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774208905;
-	bh=hsLkvAUgRxRQJzXQcQZokLRvOtZGiaYVCTbdJvhfGkM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=IJynRHho/9IV0v/RSzh7fxYdgT/lyOvO3O8QsZQmVmjayvPkC4t+NWUbhTJMHWtVm
-	 IfV613+T/NebAdRZJ09PoBNevgB5muW+4n96gDcNPz9QnFtBJW8i5nGS+bKE6tmGBl
-	 iCBHEdU+88gW5SaIbvekm+ZEASVCxpyJvdr8cyxwbPx2oPmTJgu424vC6vjj/h9hDh
-	 n+su0sSp8AaHG2PU1Jw7kNOACjH8uxm0DVJpoNZG4o6eHL+CFxLoIDIWAdlASD2bMv
-	 XlSsTiPqojypo+A/U+37yGwkDfeY2yuW8pG+5IMLL/p7WLhFAs0UFU/tzig2wFY/XP
-	 U0Kt/yn9WVFFA==
-Message-ID: <eb316800-0be6-4aa7-b9f6-e2b17646d1a0@kernel.org>
-Date: Sun, 22 Mar 2026 20:48:20 +0100
+	s=arc-20240116; t=1774211490; c=relaxed/simple;
+	bh=IUa9QJoeD37qm9+5BKx5RW2zaamGwL+qcG6z/rFL3Bw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VeC70iFvfN4CG0xW01lCJ7mT5ksiL2/+nCofJkSFIUuZDB13+kemYetYos1okf326PLwCi3P47Ky3vpx4oMym0FDDsDCk8mWeMQcu3vfaUP+qYIWI7nsYFYYuTCQrazEseunbJy1BQHN82TBkv752n/I0osQ9LKqIqyo/Z6adNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=f+SlOw/Y; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1774211489; x=1805747489;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IUa9QJoeD37qm9+5BKx5RW2zaamGwL+qcG6z/rFL3Bw=;
+  b=f+SlOw/YqtKAWTjz979uoqojbEb06yN1RV3eRkPE/6LQdEVQRT1IaRCq
+   262DdTLi2XuSlod5ceQJ7intZqlyYVFRh5uTKHbTy8u6r+ZaQdjwZo/XV
+   Pl2LEvjS3ONnVZqQZnpBUlBKsDhJeND1WhtNFn0tyaDYsoJkSgEu679n6
+   ZCtuEKkuD7E6T1TCz9AALdtVl30qaDBeG2PuztM0rjYpboIXFzl14QaMY
+   cjwIZHSK7PGrvivyKgYBLgpvMiWC+5e1VqKsuUotVJndNtTiJT/ZYquB1
+   uzJ70snh/8OkyHFfP00g9j6FVZiF42lvVEZc2nkOCXfBOkduzhdr/UpNC
+   A==;
+X-CSE-ConnectionGUID: pMzjF3TCSwOumwaJoiDn0w==
+X-CSE-MsgGUID: mnaZ3p4xTru3HVT3Nommyg==
+X-IronPort-AV: E=Sophos;i="6.23,135,1770620400"; 
+   d="scan'208";a="54282255"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2026 13:31:21 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
+ chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Sun, 22 Mar 2026 13:30:51 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Sun, 22 Mar 2026 13:30:48 -0700
+Date: Sun, 22 Mar 2026 21:30:47 +0100
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>, Steen Hegelund
+	<steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Herve
+ Codina <herve.codina@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next 08/10] net: lan966x: add PCIe FDMA XDP support
+Message-ID: <20260322203047.4neqananv66unpsp@DEN-DL-M70577>
+References: <20260320-lan966x-pci-fdma-v1-0-ef54cb9b0c4b@microchip.com>
+ <20260320-lan966x-pci-fdma-v1-8-ef54cb9b0c4b@microchip.com>
+ <ab2f788b-7214-4aa6-bfca-b33d3ab37321@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH QUESTION 0/2] NFC support in Linux (and support for
- Qualcomm SDM845 devices)
-To: david@ixit.cz, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-Cc: Petr Hodina <petr.hodina@protonmail.com>,
- biemster <l.j.beemster@gmail.com>, netdev@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, oe-linux-nfc@lists.linux.dev,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- phone-devel@vger.kernel.org
-References: <20260322-oneplus-nfc-v1-0-5f22f544f0e2@ixit.cz>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20260322-oneplus-nfc-v1-0-5f22f544f0e2@ixit.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ab2f788b-7214-4aa6-bfca-b33d3ab37321@gmail.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270323-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[protonmail.com,gmail.com,vger.kernel.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270325-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,iogearbox.net,gmail.com,fomichev.me,bootlin.com,arndb.de,linuxfoundation.org,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 26DB92EA8B5
+	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F3F1A2EAB57
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 22/03/2026 15:24, David Heidelberg via B4 Relay wrote:
-> There isn't upstream driver.
-> 
-> I'm openining this as a starter. We need a NFC drivers I assume. I tried
-> quick check, but both of NFC drivers register
-> 
-> nfc: nfc_init: NFC Core ver 0.1
-> NET: Registered PF_NFC protocol family
-> 
-> but efficiently does nothing. In the See section, there are some ways
-> how to make NFC work, but rely on patched vendor libs, missing updates
-> etc.
-> 
-> 1. What hardware is present on Snapdragon 845, is there some
->    documentation? It seems that both sdm845 devices has almost identical
->    setup, thus it's NFC solution integrated? @Qualcomm
-> 
-> 2. What's the right approach to continue? Should we upstream these
->    definitions and then start developing user-space stack? @netdev (I
->    see orphaned)
+Hi Mohsin,
 
-User space stack is there already.
-
+> > +static int lan966x_xdp_pci_run(struct lan966x_port *port, void *data,
+> > +                            u32 data_len)
+> > +{
+> > +     struct bpf_prog *xdp_prog = port->xdp_prog;
+> > +     struct lan966x *lan966x = port->lan966x;
+> > +     struct xdp_buff xdp;
+> > +     u32 act;
+> > +
+> > +     xdp_init_buff(&xdp, lan966x->rx.max_mtu, &port->xdp_rxq);
+> > +
+> > +     xdp_prepare_buff(&xdp,
+> > +                      data - XDP_PACKET_HEADROOM,
+> > +                      IFH_LEN_BYTES + XDP_PACKET_HEADROOM,
+> > +                      data_len - IFH_LEN_BYTES,
+> > +                      false);
+> > +
+> > +     act = bpf_prog_run_xdp(xdp_prog, &xdp);
+> > +     switch (act) {
+> > +     case XDP_PASS:
+> > +             return FDMA_PASS;
+> > +     case XDP_TX:
+> > +             return lan966x_fdma_pci_xmit_xdpf(port, data, data_len) ?
+> > +                    FDMA_DROP : FDMA_TX;
 > 
-> Since looking at NFC mailing list (oe-linux-nfc) and seeing it's pretty
-> much dead, would be cool to revive it.
-> 
-> Also there is some effort from Arch people [1], but likely without clean
-> path to mainline.
-> 
-> Can we revieve the NFC effort? I'm offering limited maintanance (in case
-> people would send patches).
-> 
-> See:
->  - https://gitlab.com/sdm845-mainline/linux/-/merge_requests/62
->  - https://github.com/NXPNFCLinux/linux_libnfc-nci/
+> What if the BPF program modifies packet boundaries (e.g.,
+> headroom/tailroom adjustment)? After bpf_prog_run_xdp(), xdp.data and
+> xdp.data_end may differ from the original data and data_len, but
+> lan966x_fdma_pci_xmit_xdpf() is called with the original values.
+> Wouldn't any adjustments made by the XDP program be silently lost?
+>
 
-I don't know which interface libnfc-nci is using. There are multiple NFC
-stack implementations in general, but the one using kernel interface is
-neard.
+I think you are absolutely right. Thanks for catching this. Actually, we might
+have the same issue in the platform XDP path also.
 
-You will not get another stack, but taking care of Linux nfc and neard
-would be appreciated.
+I will fix this in v2.
 
-Let me release a new version for it.
+> > +     default:
+> > +             bpf_warn_invalid_xdp_action(port->dev, xdp_prog, act);
+> > +             fallthrough;
+> > +     case XDP_ABORTED:
+> > +             trace_xdp_exception(port->dev, xdp_prog, act);
+> > +             fallthrough;
+> > +     case XDP_DROP:
+> > +             return FDMA_DROP;
+> > +     }
+> > +}
+> > +
 
-Best regards,
-Krzysztof
+/Daniel
 
