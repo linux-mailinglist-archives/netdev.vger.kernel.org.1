@@ -1,139 +1,162 @@
-Return-Path: <netdev+bounces-270312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270313-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gixmGmcEwGmSDAQAu9opvQ
-	(envelope-from <netdev+bounces-270312-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 16:01:59 +0100
+	id SAxlLSsGwGm0DAQAu9opvQ
+	(envelope-from <netdev+bounces-270313-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 16:09:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1C162E9BC2
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 16:01:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B4192E9C16
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 16:09:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6F82300E3B1
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 15:01:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 26956300D6A5
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 15:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFE4F331A56;
-	Sun, 22 Mar 2026 15:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDDF367F30;
+	Sun, 22 Mar 2026 15:09:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iEN9aNnT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kgLBc8WK"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC06195811;
-	Sun, 22 Mar 2026 15:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BB335E92B
+	for <netdev@vger.kernel.org>; Sun, 22 Mar 2026 15:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774191714; cv=none; b=R8kNvk+ufaap/9Sh7BTkvCGx7SuKF8vVHKcsFf7ey6KDpPMt9+HpoSh/WwuvW4DuK62JEq97OmJP2fct3swNVYGIqn+OsjIj0eT7ThFerg39cHaQSFu/KKCBR6gFYD0NOPz8EGkyBNRwb3cdAu4M1xr+57bwz21MLklhS0e5m5k=
+	t=1774192146; cv=none; b=pDzs6KW8Mez5v5s+9K3Mcqh5aOj8BwQ47TQMyT41vnY3vmiJRqchEfrn/yy6kR4Q+dnzcTe6d4ClSGurDObXx/65ooEmEsPMjp56BRyZy+ZoX/rkW0P92IFwIc/V7ZF0JmvuxAXbdr2OCJxEK0ZjEDRzZoifOv3BHOi20uGbVnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774191714; c=relaxed/simple;
-	bh=H0tCRU4sKRGyRexS6MVvaQ7KD2nFF1rFJq52qRgvF4s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WVM42Rj+jNWmgITUTGiBCwz8GAoUYUFtGo+4BVAI/5aoU+5h8RG23IynceVtv5SnSofK1iD75EIIIEs9j1Q6hb872ogeqJwCNDOo8n8g9FF5r0JMr3Uy3n82I/Jw5X02o0xiuXv5M8FqPehb8qavWHVKwfwxNJpbdNydOtrtOGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iEN9aNnT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=EU9OnLKzYRo8qwcEvhx9hmAKyUXQqaFj2HbhTn37BzA=; b=iEN9aNnTxaAkgzRxw6XeVnYv9H
-	T9U6tXBtGDgtluftso2ufFD0kiMeHwfQ9WNUo+N3Ejh/HKCd9+xiI5xCNobRIQYhTrCdsWw65x957
-	QwlNglAGVMhnIft/PjN4QlxhulvjZuN0kdIhKURLOpwxxIXX2+1rM80mBO0t+QiOUloY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w4KJ7-00Cp8X-3E; Sun, 22 Mar 2026 16:01:37 +0100
-Date: Sun, 22 Mar 2026 16:01:37 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
-	Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Liang Xu <lxu@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v2 1/2] net: dsa: mxl862xx: add CRC for MDIO
- communication
-Message-ID: <dadf47ea-f4af-45bd-b80b-aa99dc69291c@lunn.ch>
-References: <cover.1774185953.git.daniel@makrotopia.org>
- <620453b9a150bbe5b7ea4224331cb5dc5e57263b.1774185953.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1774192146; c=relaxed/simple;
+	bh=l4bXxMicugP9DCFFTxwsGFTgQ9PHmcEkAENgLhdDM1A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BHS5rdvyn6aKFLwQtp6DyWonlqO1siLgVK64fzYx3/waJ4F5/ZsKWt5/HQjMj+ZOEu8mm1EvCQagmxQ1r39Fvz34OUYAyx4xtXr524lwRgtu4puwMSSj1ujoDyx+aYkNS2w0vM1+nNs+3byjHsM8DiWalSS6qPfjpdqfeAInpjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kgLBc8WK; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4853e1ce427so20737335e9.3
+        for <netdev@vger.kernel.org>; Sun, 22 Mar 2026 08:09:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774192142; x=1774796942; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=O1ggrJzvUM4oVrQbKmG6pIms7djFV+UdSQ9TPdyUd38=;
+        b=kgLBc8WKY88QLVH3sYydq/HFiltQ2z9OwEKl8tkiEdwhzSTJ8y44PXNr3WV/SpeWRa
+         xbZ//V63a8lgeF+WS3mRTgc9RYntZpCIOwKxLxtJNNb1r5sYrXYyqbfoRfummp9LSM5p
+         uylSyZIiPpH489DRyNiZO9H1aJRG8SUhsM8IaWfjDazSS8/kuBnHsB5HPVkgG8gKcdwC
+         SEQvL7j0wEAA0C0+pjXFGUQSJ783slqmkhZqClR9LJic+IWE3lFaAiny1l8DvzHELblk
+         m3rjKGUgVY1Vt6ydSKVG0Q0JNFoCpiXerb8btTig1p6KlAfxJQFkIZ48ns39UDQ/G/h/
+         YhYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774192142; x=1774796942;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O1ggrJzvUM4oVrQbKmG6pIms7djFV+UdSQ9TPdyUd38=;
+        b=Lg9QheS50TwjtjGdK8Wjuvx2PS3gV6WZQW3r51DwxgcnTqXqNKb50slPtsLUugBJLf
+         qS06ncZIYuIOB2BiEvwclY88Q44s+coUIRpKc+tSjvGSju7BddLi5ctrKv7ZaIXffHtz
+         CMgoWtyAf6B6/SI0M8Am7+g1I4dydEZ1SiK2sI7BCYERTjeTDuincUj4Ytc6VInXhp5W
+         ZxMGX3D9doqzFNqJLcycK+6etkDfuyp+8Clz4YbRdZg1xAR/fHvbXPld/sgVTMlDUaCF
+         TRTsRDc79+GfJcYhJi+eO/y4pGmdgeT2wvedXVAdFxknuexDWvOOqfYomwNwOtjUo5q1
+         jMgA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWesDsqh23oh/ftJ81Xxs8Gzv7LCy6pNY8bk42BTNYh3McmkJj3+j2zdGGsNcZ1g1al8aqhEo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyihpDkwqBNreqBEpI1B/751elT8nwb4P0NzRAic4h7uxMd6doG
+	FB283bq2mK+kseSAolmg84sUmtf7OBxLtSDx0g/mI0h+hLyh7wUdugs=
+X-Gm-Gg: ATEYQzy/MWN5IevxX+5JjozrdMdXO+ikY3TXbpshAWqaIKrt9WkaNVpw+/t1uHUJjnp
+	TnwE16BAWcHkeakOcIMRQsCO7WBlnTfSUC7DiQO9gQcBrpJMZNgrdSWhsTEdMgjzTSo/n8cctEx
+	0eleMC8vwynObEZLf7AemOmddBTQEp8Q5bWMUarhmF2EoJ7M/7x0Vjz5kk4w2Z62E+OYBEQs96d
+	kZco92zWuHMkKPMNPuXLaVMCjda85PWxMNLhFQWFuT5t645/yLZNv18+EEYswVHIY7xYEu9NobZ
+	MHyzLftCaF0Ug+qhtaa6ScKE0rM2RRvamL489QM8pyi55DFuOCoEoSfi/RvPA8Qu9+d8W1PAg3s
+	yVyhi5jekcTmTNrKfQrS0/GIFLn6cD7sv8Cw3MMxX3ubEPQSvnJe6DqOZxHge//tudak1WCGuLs
+	uymPqjRn/gsbeJ6LDeBuIqW0L+CSMR05cgFAy0OZskVJ8vYKUq9NeCj+uFfsihWZQ2NKzT5c0=
+X-Received: by 2002:a05:600c:1d15:b0:485:34b3:8587 with SMTP id 5b1f17b1804b1-486fedf9061mr128224755e9.10.1774192142264;
+        Sun, 22 Mar 2026 08:09:02 -0700 (PDT)
+Received: from hp-ubuntu.. ([41.249.139.113])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b6470b243sm22384811f8f.26.2026.03.22.08.09.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Mar 2026 08:09:01 -0700 (PDT)
+From: Mohammed EL Kadiri <med08elkadiri@gmail.com>
+To: ecree.xilinx@gmail.com
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-net-drivers@amd.com,
+	linux-kernel@vger.kernel.org,
+	Mohammed EL Kadiri <med08elkadiri@gmail.com>
+Subject: [PATCH net-next v2] sfc: fix spelling mistake
+Date: Sun, 22 Mar 2026 16:07:33 +0100
+Message-ID: <20260322150733.45817-1-med08elkadiri@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <620453b9a150bbe5b7ea4224331cb5dc5e57263b.1774185953.git.daniel@makrotopia.org>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
-	TAGGED_FROM(0.00)[bounces-270312-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,amd.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270313-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[med08elkadiri@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: A1C162E9BC2
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 7B4192E9C16
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Mar 22, 2026 at 01:27:20PM +0000, Daniel Golle wrote:
-> Enable the firmware's opt-in CRC validation on the MDIO/MMD command
-> interface to detect bit errors on the bus. The firmware bundles CRC-6
-> and CRC-16 under a single enable flag, so both are implemented
-> together.
-> 
-> CRC-6 protects the ctrl and len_ret command registers using a table-
-> driven 3GPP algorithm. It is applied to every command exchange
-> including SET_DATA/GET_DATA batch transfers. With CRC enabled, the
-> firmware encodes its return value as a signed 11-bit integer within
-> the CRC- protected register fields, replacing the previous 16-bit
-> interpretation.
-> 
-> CRC-16 protects the data payload using the kernel's crc16() library.
-> The driver appends a CRC-16 checksum to outgoing data and verifies the
-> firmware-appended checksum on responses. The checksum is placed at the
-> exact byte offset where the struct data ends, correctly handling
-> packed structs with odd sizes by splitting the checksum across word
-> boundaries. SET_DATA/GET_DATA sub-commands carry only CRC-6.
-> 
-> Upon detection of a CRC error on either side all conduit interfaces
-> are taken down, triggering all user ports to go down as well. This is
-> the most feasible option: CRC errors are likely caused either by
-> broken hardware, or are symptom of overheating. In either case, trying
-> to resume normal operation isn't reasonable.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Correct the spelling of 'adress' to 'address' in a comment within
+mcdi_pcol.h. This improves code readability and documentation
+consistency in the Solarflare MCDI protocol header.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Mohammed EL Kadiri <med08elkadiri@gmail.com>
+---
+v2:
+- Specify 'net-next' in the subject prefix as required by netdev CI.
+- Change 'Fix' to 'fix' in the subject line for consistency.
 
-    Andrew
+ drivers/net/ethernet/sfc/mcdi_pcol.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/sfc/mcdi_pcol.h b/drivers/net/ethernet/sfc/mcdi_pcol.h
+index b9866e389e6d..a9a7076c00e4 100644
+--- a/drivers/net/ethernet/sfc/mcdi_pcol.h
++++ b/drivers/net/ethernet/sfc/mcdi_pcol.h
+@@ -21387,7 +21387,7 @@
+ #define          MC_CMD_PRIVILEGE_MASK_IN_GRP_ALL_MULTICAST 0x200 /* enum */
+ #define          MC_CMD_PRIVILEGE_MASK_IN_GRP_PROMISCUOUS 0x400 /* enum */
+ /* enum: Allows to set the TX packets' source MAC address to any arbitrary MAC
+- * adress.
++ * address.
+  */
+ #define          MC_CMD_PRIVILEGE_MASK_IN_GRP_MAC_SPOOFING_TX 0x800
+ /* enum: Privilege that allows a Function to change the MAC address configured
+-- 
+2.43.0
+
 
