@@ -1,194 +1,123 @@
-Return-Path: <netdev+bounces-270309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270310-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0B0gAb37v2m9CQQAu9opvQ
-	(envelope-from <netdev+bounces-270309-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 15:25:01 +0100
+	id sOqYNWD/v2lpCwQAu9opvQ
+	(envelope-from <netdev+bounces-270310-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 15:40:32 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EF362E9A58
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 15:25:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 863D72E9B35
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 15:40:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 693B9301CCE7
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 14:24:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 453C93009B29
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 14:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC28364032;
-	Sun, 22 Mar 2026 14:24:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78AE936405E;
+	Sun, 22 Mar 2026 14:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hcXcmrpP"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yQjf+4KH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22510363C49;
-	Sun, 22 Mar 2026 14:24:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039521F03D2;
+	Sun, 22 Mar 2026 14:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774189462; cv=none; b=gxQf+hjGpwEs7Csn79ljM76GgoVvUkJBNLpA3tfweZdOFeARphqfC35f0FEMQ3kQvLbtrGTaEsEZQlr1nh4YuYtQva12wWb8b7IU2fqsIcesnpckxcxBl6gepNvfC/rDu7e41/wS8QfRaP4Shlg9mBiQGJ2ySIou+afjJZjRw6Q=
+	t=1774190428; cv=none; b=IKm66SWVoY25yV0uiZfjT8NmJllBsTsaJbFMVkBsHvvIgZNmY+ZmYC0iIsAoxVo7/ZSNrX8T5n1IpxFczPhryWyhSL0bRJGqwg5A9Z0mofs+scAvS3438EdvWdOPJBz8d9gpDhQUJ8nVq2gGXUXqIlbYsxnCHx0vCiCjtGvtOsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774189462; c=relaxed/simple;
-	bh=XbUqrT7qss2bjTqlhu4hDVM7HCLgTM5ifxyigq2ux68=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=VvNybMn1L31zfbw0xaveFkeDF6Czgz3t21+jFDTGZSzffOYFoLoafBsLlNNuPaODverq8nc2La8Z1cX6WIlcqwtYkBpCXpZXRBY85cKXMgYEuR+p4B+Q0E5Ev6CEBtdNmjcDqVQeAPJojsri9y2RTUMbduj+gbfiXrI3TH3cRvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hcXcmrpP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CD126C2BCB5;
-	Sun, 22 Mar 2026 14:24:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774189461;
-	bh=XbUqrT7qss2bjTqlhu4hDVM7HCLgTM5ifxyigq2ux68=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=hcXcmrpP05MSLZE7pWiVF4+knrfygILa5n2u4r+giuWYP9GnhYAtnMdarlYABw6a7
-	 lgOrj8l+01w8Vlsuyn7ZtMqm8lNRVUM1MAX0OoCJt2DNvZvT+bRNMgj2P0YQq/ssQ5
-	 mw76pdDch9ur6uHXCPhndFgxZjxgKeABhsFxH4pv/K2tiZW+Plt9x/jlpp1otU+Q2m
-	 c1xCc+E++H86dDPBHiAVKuZqtUcoONDLb4gd6UtIP6KX191cqURPCTKd/k4uwTLWgd
-	 PwdCb58sgAf+km4Etrtpu162oHBExOTiX5Hef+AZomyyydbN3GUNfMARqDfwnT2Pr8
-	 Dr+bphBKXmYIg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5606FC72C8;
-	Sun, 22 Mar 2026 14:24:21 +0000 (UTC)
-From: David Heidelberg via B4 Relay <devnull+david.ixit.cz@kernel.org>
-Date: Sun, 22 Mar 2026 15:24:20 +0100
-Subject: [PATCH QUESTION 2/2] arm64: dts: qcom: sdm845-shift-axolotl:
- Enable NFC
+	s=arc-20240116; t=1774190428; c=relaxed/simple;
+	bh=pG1GaXqXdRepwp8m5rgZzHiIIXYsp832iVl9ZhQ5OsM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jgIACPX4rVBjVUK0st1zxUrsVRvFWh0gQt3G7gVCOUxUouVcZ8pcfaZCqI8g4UFn7szRLYB3Xp74WkiPkCbJpR05AFih3thHbKAo5C7vFeBtsfvJRRHusGGEfhL+Xjnc7KZg4gfAkIDlbsgZD0JM/ofmKH5J4FiJqbn1FQ/GbOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yQjf+4KH; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9+efNICYa6Qt0cdjCzn/QXdb/0qRox6mNmwXvwb5OQk=; b=yQjf+4KHEA0wt1g7TRX5mfVL77
+	GCVvnZFYKvbFiqc2z3ViNX8K6HIMv6wIp7K98OGSNksuImFqgzrOEhTXcH0eUI/t6gngXXRhJ7+hK
+	gMuxFCnYabb3HDy+vdy/HJvqvkio3zU/XKpqh5Yp5SwKM3YQUUZK0+d15PkAZdaM1Xck=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w4JyB-00CovP-NJ; Sun, 22 Mar 2026 15:39:59 +0100
+Date: Sun, 22 Mar 2026 15:39:59 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Popov <alex.popov@linux.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Michal Kubecek <mkubecek@suse.cz>, Gal Pressman <gal@nvidia.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Greg KH <gregkh@linuxfoundation.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, security@kernel.org,
+	notify@kernel.org
+Subject: Re: [PATCH] ethtool: don't touch the parent device of a net device
+ being unregistered
+Message-ID: <3c07c51a-421b-456f-9819-9021ddd7b22e@lunn.ch>
+References: <20260322075917.254874-1-alex.popov@linux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260322-oneplus-nfc-v1-2-5f22f544f0e2@ixit.cz>
-References: <20260322-oneplus-nfc-v1-0-5f22f544f0e2@ixit.cz>
-In-Reply-To: <20260322-oneplus-nfc-v1-0-5f22f544f0e2@ixit.cz>
-To: Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: Petr Hodina <petr.hodina@protonmail.com>, 
- biemster <l.j.beemster@gmail.com>, netdev@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, oe-linux-nfc@lists.linux.dev, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- phone-devel@vger.kernel.org, David Heidelberg <david@ixit.cz>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1522; i=david@ixit.cz;
- h=from:subject:message-id;
- bh=bg/8Mn64amhNeliB/CDjN88OEUAaoSKykTAgAGciekI=;
- b=owEBbQKS/ZANAwAIAWACP8TTSSByAcsmYgBpv/uUH1GaubGxzAbpeIoZHLVihTMq2aub8E8R/
- HEKSiFPJvCJAjMEAAEIAB0WIQTXegnP7twrvVOnBHRgAj/E00kgcgUCab/7lAAKCRBgAj/E00kg
- ciRmD/4ocnaCQSjo5z+kVKbzx56vvvy5UY4RX218IPBYHq7G+VUq2b5ofKiz3WvOb5kGXEbsJoi
- AJF7U8/PLvcEvOaylm8BOlLjBM5BQ0XsTRzIRKg9emYKmTpXgDjnfGijCzAhL6FdsEVbcwjp0bL
- NUDyy9p7ZN2cjA1HZJ0T0d6TuIrgDb5vTILZQ0lgL/f57A0lfudJkVoFF0dpDbLrjdpZgRfDqF1
- FWzKNN2SkFCDKj2J8tv4lGgu4XUnLPIGVHrhtx4Z/GtazO7owFj1j+fKC5CiNifsQFcbj0eV/Np
- BZ6HLiTrr/tQ2cKt+YN6MRIhMt8YGX7kJT3wzbkeVPf57QEznZK3RRRhB1nAQw4fX1s1l+zISgQ
- CASZl+kmtMO/1k89mVvgQVBr505ApP1ildlMeOJzmUlVI1ikWviKvogH2Nck81X6RTnBFRkUG+P
- PvNwfj00GgXktjexXgH41LTlijfDc7+AZFzeOYuHpJblsicWanHo0cUp2vEq3lK6LgBlj7m9pvT
- NdSryJeqI5B0gSd7Z4ziZAotDvKaGZXcOVx7Ngrhe4sW/UAtvqOAo2+R7/BaHBYTXYzUQHe05sG
- Rsf/6jVVUs8PeQq6NILxAEFVWhouE6xRjZUlib+y4+nyaTkoKbl5Sopp7GmTrgSPpC6WqJLlJDe
- 2g7ekbKaDy4+wtw==
-X-Developer-Key: i=david@ixit.cz; a=openpgp;
- fpr=D77A09CFEEDC2BBD53A7047460023FC4D3492072
-X-Endpoint-Received: by B4 Relay for david@ixit.cz/default with auth_id=355
-X-Original-From: David Heidelberg <david@ixit.cz>
-Reply-To: david@ixit.cz
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260322075917.254874-1-alex.popov@linux.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270309-lists,netdev=lfdr.de,david.ixit.cz];
+	TAGGED_FROM(0.00)[bounces-270310-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[protonmail.com,gmail.com,vger.kernel.org,lists.linux.dev,ixit.cz];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,bootlin.com,suse.cz,nvidia.com,pengutronix.de,gmail.com,linuxfoundation.org,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	HAS_REPLYTO(0.00)[david@ixit.cz];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	DBL_PROHIBIT(0.00)[0.0.0.28:email];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ixit.cz:email,ixit.cz:replyto,ixit.cz:mid]
-X-Rspamd-Queue-Id: 9EF362E9A58
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: 863D72E9B35
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: David Heidelberg <david@ixit.cz>
+On Sun, Mar 22, 2026 at 10:59:15AM +0300, Alexander Popov wrote:
+> The ethtool operations may be performed on a net device that is currently
+> being unregistered. This is also described in the commit dde91ccfa25fd58f
+> ("ethtool: do not perform operations on net devices being unregistered").
+> Moreover, such a device may have a parent that has already been freed.
 
-Definition of the NFC.
+I don't know the device core too well, but can you explain in the
+example stack trace you gave how the parent can already be free? I
+would of expected devices are arranged in a tree, and free happens
+from the leaves towards the root? In order to do a clean shutdown, you
+might need to perform operations on the parent.
 
-Signed-off-by: David Heidelberg <david@ixit.cz>
----
- arch/arm64/boot/dts/qcom/sdm845-shift-axolotl.dts | 33 +++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+I just want to make sure this is not a broken parent device which
+should be fixed...
 
-diff --git a/arch/arm64/boot/dts/qcom/sdm845-shift-axolotl.dts b/arch/arm64/boot/dts/qcom/sdm845-shift-axolotl.dts
-index 51b041f91d3e2..bc336584c9fb9 100644
---- a/arch/arm64/boot/dts/qcom/sdm845-shift-axolotl.dts
-+++ b/arch/arm64/boot/dts/qcom/sdm845-shift-axolotl.dts
-@@ -431,6 +431,25 @@ &gpu_zap_shader {
- 	firmware-name = "qcom/sdm845/SHIFT/axolotl/a630_zap.mbn";
- };
- 
-+&i2c3 {
-+	clock-frequency = <400000>;
-+
-+	status = "okay";
-+
-+	nfc@28 {
-+		compatible = "nxp,nq310", "nxp,nxp-nci-i2c";
-+		reg = <0x28>;
-+
-+		interrupts-extended = <&tlmm 63 IRQ_TYPE_EDGE_RISING>;
-+
-+		enable-gpios = <&tlmm 12 GPIO_ACTIVE_HIGH>;
-+		firmware-gpios = <&tlmm 62 GPIO_ACTIVE_HIGH>;
-+
-+		pinctrl-0 = <&nfc_int_default &nfc_enable_default>;
-+		pinctrl-names = "default";
-+	};
-+};
-+
- &i2c5 {
- 	status = "okay";
- 
-@@ -609,6 +628,20 @@ &slpi_pas {
- &tlmm {
- 	gpio-reserved-ranges = <0 4>, <81 4>;
- 
-+	nfc_int_default: nfc-int-default-state {
-+		pins = "gpio63";
-+		function = "gpio";
-+		drive-strength = <2>;
-+		bias-pull-up;
-+	};
-+
-+	nfc_enable_default: nfc-enable-default-state {
-+		pins = "gpio12", "gpio62";
-+		function = "gpio";
-+		drive-strength = <2>;
-+		bias-pull-up;
-+	};
-+
- 	sde_dsi_active: sde-dsi-active-state {
- 		pins = "gpio6", "gpio11";
- 		function = "gpio";
-
--- 
-2.53.0
-
-
+       Andrew
 
