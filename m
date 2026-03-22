@@ -1,60 +1,70 @@
-Return-Path: <netdev+bounces-270326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270328-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CMoPD61twGm8HgQAu9opvQ
-	(envelope-from <netdev+bounces-270326-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 23:31:09 +0100
+	id yNliLY92wGkwIAQAu9opvQ
+	(envelope-from <netdev+bounces-270328-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 00:09:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D96D22EB07D
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 23:31:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A3F12EB200
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 00:09:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4A7B53003341
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 22:31:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BCD313008A7E
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 23:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 208B931F9B4;
-	Sun, 22 Mar 2026 22:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="qKeM3FFM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A3936E478;
+	Sun, 22 Mar 2026 23:09:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881792D6401;
-	Sun, 22 Mar 2026 22:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2802ED848
+	for <netdev@vger.kernel.org>; Sun, 22 Mar 2026 23:08:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774218665; cv=none; b=Fmi1wm0U5OGnKHoXZ3Qk1iHFstckT9joUu/vbN9NQbvAtcrlcyb6uUuBgFub6/0YhIFNuZd9QdJmXXDgomr6kz6cUxJMRdFcPwrUzfduuDkS2eilV7fXNqDNa+UFu0uEzdsD6X8xX8abGvr4jSp33PHxSHdz4ctYqjT0nS02L24=
+	t=1774220941; cv=none; b=sU0mcEFCn0nZnfhW8I+w1F/VE82Bo0iAfqDgfkYM5OgvO9g7WEkdjG/3Xc0MAYTL0mblw5ltMgem0LUKOwCy/QwnIppKM1qX7hizYGWrLl9IlQJeE8K/LxsFs9frFgZe0EaWwPYr7uGjHOBdeEX6mSRnlzbGclQkkGJ/Av9CWQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774218665; c=relaxed/simple;
-	bh=lYKe0OFVCOvUad8XOwgsB65LZTSeh6vt7MKgfoAxGH8=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=kvoCYN+iksGrCXoxrsQQdzQUDYH6ss627KlqSMzE4qAXvYFejbWLDgocZmHABI0Q/82jYP+ajiYZ2YSOc5GAkmnavKFGTx/J7oQ7iu9XXRQU4rJ4mKCbYAggTGTqJuisM6vgAgzuyUwHVElxKMBBH+7JnbdFVx/LEJEbWHQE1ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=qKeM3FFM; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
-Received: from [192.168.2.30] (unknown [46.253.254.168])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 9DAF6C0BDC;
-	Sun, 22 Mar 2026 23:30:58 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1774218658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DYOCuf/ly8BoZXQyzkfsTc2ynrPZJj+oggEuSvbMOTQ=;
-	b=qKeM3FFMe4IzA7tKgbFXUWAJmh3wN3aKcOKm5ouoKB4E+gv95U79hAq91jQ8u1ZobVY/+x
-	hXGKDpz4QpkRFTHgq/2ieM6GJoECEIvoKLiQa6Oedr93NfQ5REp2OMmeLe0iAvv1DDvkzq
-	cp2aUcIlsuhv+SU3EZ2EYb0AD7JJSwMLCJhWh9ErIsiu3MN22JoG3dLwd9ROmxociF7v1v
-	9XmtI6F3KogRBiyG+dIMDgKb8QtAx88+lN3/5fBH0IqRcdtqHINsv6xUveNNJM3Tbem68s
-	QUl/Jj5/a4KGO2ZHxA/mYbgCkiTwNoEx0v8i8/C4LKMIdnDRn8QpacrLSMnq3Q==
-Message-ID: <3e1d00af-de85-46e0-9d94-2e8fdd29928d@datenfreihafen.org>
-Date: Sun, 22 Mar 2026 23:30:58 +0100
+	s=arc-20240116; t=1774220941; c=relaxed/simple;
+	bh=ln1FsL8a/sjtX9+cnCkUgpaW92A41rQNplN1E9B+3HQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NYKZjod294FI3rIdcmGHSe7owntxu/dPWnM423a7QLPd9oce/+nCtLlWWBAyGY0TO9shfsH3p2ai4oufQoLKeWKyZYviNGO3D1UONGfy16DCZKosgZ1oyU8uzdEYcGEudDatiKSXWhCQ8/F5gdOA0RMxHs92oyjrKlBjJoMMomw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-439b6d9c981so2457007f8f.1
+        for <netdev@vger.kernel.org>; Sun, 22 Mar 2026 16:08:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774220938; x=1774825738;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mKjk90zLlJLtFb5uv6zbpADQTbtU71ATu76Om9DzCMA=;
+        b=X4Axa5OdUL1/Vjei90dvXXW/jOTFNmb4iEq+sgt1Jc1tT5iWXAfhql5hUKIqrqCSOS
+         IS2HvwBuSmGCzyMczGZFKjji4OXibqn4CwXv8gUA8jYSMoW1rlZV+UAyvZ3rc0jqbPiy
+         AN6l2Qv3LOau2aKJEcOvbV/6z2NwMtXLtH1z9wkS+f9QmIC2uo4PXILxVjqoVhtTNb7w
+         mqIDC+vzbVp3cNKoqa2pauqHBgsnvyOOBXNAyy0iB62nYumbEuyd0xILKj4TmqBYrUuT
+         T13niFhedjN9+NEhuiIav7PL5q1KDzPZKzgV6Gwye9d7bnHziGF0ncsHbI68zd3abJDp
+         hvDA==
+X-Forwarded-Encrypted: i=1; AJvYcCWVs0JoEHasqMtTs1fZus6WeAcIWz0gihahZwC7hyMbzoFToR8LyhGqX2MkFdEV31F/ocCpjyY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzs21nvpnXi9MIdBP75Z01TFoYhfbOa/GHOwfdoOWG44dT4AU8w
+	5nmcwXdBzhNDsZIC7m+fU3vg5ErpeWj6MhxAfKWWy35fGB4RHYaa5Hvc
+X-Gm-Gg: ATEYQzw2FPZ6jLZNb6rrZJn2wix2pl8PXWSXKkNBO/H08uF7gG81X2tWEiSWVVF71T1
+	G1Iv0pDG3GJSCzd7I9H8ITfk/Mm+FSDkZbKqOREP0fY+LQqww4hGhgDY9q7X4SwPnv4U+mjFMoz
+	jKsXLkdOu6YlI81XIIkE6YvmutfM3heUbSkdxfx3W8Sz7jgxTQZ55q/Y90ycR2bj3AY7IoyAAKj
+	JEVLrryg3sIbcYApX5DuFDx8Ja0cNHIvtFS7XJjrNYkxMlKv8AAUjPPe0viFkZ7ZQz1Du4Wxdrf
+	54WA4GpKIkdlHZnWS5DV05ByX6oG59GWHgK3e1Vyqy4cNE8tpZ++KDI2oBJyNG6FN22OiAUTQR9
+	YUFUZU2VoeYVSywvRGwSCU5ZkKvOYOmDnI5Io3u37t3HS+6hMg0TXpbeQAkfs1/he/yhJQcIlqC
+	J7qqMWBpp3expXzkE8DTQ=
+X-Received: by 2002:a05:6000:26d0:b0:43b:4312:2cbb with SMTP id ffacd0b85a97d-43b64272a9dmr17016793f8f.17.1774220937931;
+        Sun, 22 Mar 2026 16:08:57 -0700 (PDT)
+Received: from [0.0.0.0] ([94.156.174.93])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b64703c27sm25191072f8f.18.2026.03.22.16.08.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 22 Mar 2026 16:08:57 -0700 (PDT)
+Message-ID: <eff8cf89-fc3a-4aa1-bcfa-c939c9e7d853@linux.com>
+Date: Mon, 23 Mar 2026 02:08:53 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,116 +72,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ieee802154: atusb: drop redundant device reference
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-To: Johan Hovold <johan@kernel.org>
-Cc: Alexander Aring <alex.aring@gmail.com>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260305104313.15898-1-johan@kernel.org>
- <d71db3f0-12b0-485b-afec-ea5eeed35305@datenfreihafen.org>
+Reply-To: alex.popov@linux.com
+Subject: Re: [PATCH] ethtool: don't touch the parent device of a net device
+ being unregistered
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Michal Kubecek <mkubecek@suse.cz>, Gal Pressman <gal@nvidia.com>,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, Ido Schimmel <idosch@nvidia.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Greg KH
+ <gregkh@linuxfoundation.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, security@kernel.org, notify@kernel.org
+References: <20260322075917.254874-1-alex.popov@linux.com>
+ <3c07c51a-421b-456f-9819-9021ddd7b22e@lunn.ch>
 Content-Language: en-US
-In-Reply-To: <d71db3f0-12b0-485b-afec-ea5eeed35305@datenfreihafen.org>
+From: Alexander Popov <alex.popov@linux.com>
+In-Reply-To: <3c07c51a-421b-456f-9819-9021ddd7b22e@lunn.ch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[datenfreihafen.org:s=2021];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[linux.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[datenfreihafen.org];
-	FREEMAIL_CC(0.00)[gmail.com,bootlin.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-270326-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[datenfreihafen.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,bootlin.com,suse.cz,nvidia.com,pengutronix.de,gmail.com,linuxfoundation.org,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270328-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stefan@datenfreihafen.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: D96D22EB07D
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alex.popov@linux.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	MID_RHS_MATCH_FROM(0.00)[];
+	HAS_REPLYTO(0.00)[alex.popov@linux.com]
+X-Rspamd-Queue-Id: 3A3F12EB200
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello again,
-
-On 3/22/26 23:27, Stefan Schmidt wrote:
-> Hello,
+On 3/22/26 17:39, Andrew Lunn wrote:
+> On Sun, Mar 22, 2026 at 10:59:15AM +0300, Alexander Popov wrote:
+>> The ethtool operations may be performed on a net device that is currently
+>> being unregistered. This is also described in the commit dde91ccfa25fd58f
+>> ("ethtool: do not perform operations on net devices being unregistered").
+>> Moreover, such a device may have a parent that has already been freed.
 > 
-> On 3/5/26 11:43, Johan Hovold wrote:
->> Driver core holds a reference to the USB interface and its parent USB
->> device while the interface is bound to a driver and there is no need to
->> take additional references unless the structures are needed after
->> disconnect.
->>
->> Drop the redundant device reference to reduce cargo culting, make it
->> easier to spot drivers where an extra reference is needed, and reduce
->> the risk of memory leaks when drivers fail to release it.
->>
->> Signed-off-by: Johan Hovold <johan@kernel.org>
->> ---
->>   drivers/net/ieee802154/atusb.c | 5 +----
->>   1 file changed, 1 insertion(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/ 
->> atusb.c
->> index 95a4a3cdc8a4..5f7fc4ee7a07 100644
->> --- a/drivers/net/ieee802154/atusb.c
->> +++ b/drivers/net/ieee802154/atusb.c
->> @@ -961,7 +961,7 @@ static int atusb_probe(struct usb_interface 
->> *interface,
->>       atusb = hw->priv;
->>       atusb->hw = hw;
->> -    atusb->usb_dev = usb_get_dev(usb_dev);
->> +    atusb->usb_dev = usb_dev;
->>       usb_set_intfdata(interface, atusb);
->>       atusb->shutdown = 0;
->> @@ -1055,7 +1055,6 @@ static int atusb_probe(struct usb_interface 
->> *interface,
->>       atusb_free_urbs(atusb);
->>       usb_kill_urb(atusb->tx_urb);
->>       usb_free_urb(atusb->tx_urb);
->> -    usb_put_dev(usb_dev);
->>       ieee802154_free_hw(hw);
->>       return ret;
->>   }
->> @@ -1076,8 +1075,6 @@ static void atusb_disconnect(struct 
->> usb_interface *interface)
->>       ieee802154_unregister_hw(atusb->hw);
->> -    usb_put_dev(atusb->usb_dev);
->> -
->>       ieee802154_free_hw(atusb->hw);
->>       usb_set_intfdata(interface, NULL);
+> I don't know the device core too well, but can you explain in the
+> example stack trace you gave how the parent can already be free? I
+> would of expected devices are arranged in a tree, and free happens
+> from the leaves towards the root? In order to do a clean shutdown, you
+> might need to perform operations on the parent.
 > 
-> Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+> I just want to make sure this is not a broken parent device which
+> should be fixed...
 
-Given that this does not actually go through my tree an Acked-by would 
-be more appropriate here. Sorry, its late.
+Hello Andrew, let me describe the scenario that I see:
 
-Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+  - The netdev_run_todo() function handles the net devices in net_todo_list
+    in a loop and moves each of them into the NETREG_UNREGISTERED state:
+      netdev_lock(dev);
+      WRITE_ONCE(dev->reg_state, NETREG_UNREGISTERED);
+      netdev_unlock(dev);
 
+  - Then netdev_run_todo() frees these net devices in another loop.
+    On each iteration, it chooses a device for freeing:
+      dev = netdev_wait_allrefs_any(&list);
 
-> Jakub, Dave or Paolo can you folks please pick this up into net-next? I 
-> waited a moment but I have nothing else for wpan-next in the queue for 
-> now, so it would be silly to have a pull-request just for this.
-> 
+  - At the same time, the ethnl_set_features() function calls
+    ethnl_parse_header_dev_get() for the child net device.
 
-regards
-Stefan Schmidt
+  - If the race condition succeeds, ethnl_set_features() takes the reference
+    to the child net device being unregistered. That makes netdev_run_todo()
+    free the parent first.
+
+Best regards,
+Alexander
+
 
