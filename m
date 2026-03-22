@@ -1,176 +1,184 @@
-Return-Path: <netdev+bounces-270297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270298-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDf4HiN9v2mF5QMAu9opvQ
-	(envelope-from <netdev+bounces-270297-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 06:24:51 +0100
+	id QPvtA1GWv2k36gMAu9opvQ
+	(envelope-from <netdev+bounces-270298-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 08:12:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB0B2E8412
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 06:24:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6973A2E87A5
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 08:12:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C135300F5F0
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 05:24:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D89033010B8E
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 07:11:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81E4288C2D;
-	Sun, 22 Mar 2026 05:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A2136494A;
+	Sun, 22 Mar 2026 07:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=smail.nju.edu.cn header.i=@smail.nju.edu.cn header.b="B9pOQmSX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CQZovMMh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19F270808;
-	Sun, 22 Mar 2026 05:24:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856D01A6812
+	for <netdev@vger.kernel.org>; Sun, 22 Mar 2026 07:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774157078; cv=none; b=ax/wy0eL3HTnEzQhEc4v8GH5+U+Sux5o/GMp8aIvRgYqqogn6EYxP0buXM1nCH4J+e+ARNsfu+P7ds8AppvRrqbYRoNvX6N5S6TL76VLiilPBNDNQ9TKT7BfeM5waBX4KG5hoOR6ZyDz/0cNZPvCkHbXTtfvlAyHlgN48aiLVe0=
+	t=1774163503; cv=none; b=VafpYoKIe2DoK+KdVP4fgNcyWiIb8z/sJz7DIVWNzygwuDQ6xcuRJbB9U/mtBs8txP4TpM9uREF0JqCAgz4jziLlwR225wOz5IrFkoG28/r/vO05VNPZh61H8GK6ML2cUPXkA1JqHWibDLg03BKrZpzoiheXQN05mx45WlzOh1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774157078; c=relaxed/simple;
-	bh=z+jeJrg+42KvYrLm1nJvkRMFkHaDI7YWq6D1mcg/TE4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WzeTJ2AFbjyrwdCGZK/QjIIzgrFYZyS8cQp5fRukh0KnfEEOlKfYpDH64xY7MZgf6YQbBm96fIeECwttjPOSWcvTefrkM73kLoH13/cVMjLHzwWMOCCI72x5qeb+Sa5mCmiW4NJDykuyzYG+kSDctanCM3/Uy5UoGY460xBBDH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn; spf=pass smtp.mailfrom=smail.nju.edu.cn; dkim=pass (1024-bit key) header.d=smail.nju.edu.cn header.i=@smail.nju.edu.cn header.b=B9pOQmSX; arc=none smtp.client-ip=54.204.34.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smail.nju.edu.cn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=smail.nju.edu.cn;
-	s=iohv2404; t=1774157065;
-	bh=ZgmfdFihQi+4djkTzwSgq5e/cW4SyloibvW+9Xvo/tI=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=B9pOQmSXwjC81+4ZkTETCHVraVNxbdkYfgfxcniA/nDMA2bE8tqaHGNFk8u0WBdve
-	 O2e70/g3S0oN+7Wju3tHfnmF0T3R8BcxnTKxB7sMbGYr4Qfa9IHJziOi84gbVEt59i
-	 Pc9ZD9mNxTlovVja+ld60mJTwxljPqqYe6A9rjdI=
-X-QQ-mid: esmtpgz13t1774157060t316372c2
-X-QQ-Originating-IP: pigerY6xrq7Z2EVpquY2nLMIWpBzzzala9fIQkiXZ7U=
-Received: from localhost.localdomain ( [116.172.93.199])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 22 Mar 2026 13:24:17 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 6154806126000090797
-EX-QQ-RecipientCnt: 15
-From: Kexin Sun <kexinsun@smail.nju.edu.cn>
-To: edumazet@google.com,
-	ncardwell@google.com,
-	kuniyu@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: julia.lawall@inria.fr,
-	xutong.ma@inria.fr,
-	yunbolyu@smu.edu.sg,
-	ratnadiraw@smu.edu.sg,
-	Kexin Sun <kexinsun@smail.nju.edu.cn>
-Subject: [PATCH v2] tcp: update outdated comment for removed _decode_session6()
-Date: Sun, 22 Mar 2026 13:24:17 +0800
-Message-Id: <20260322052417.1216-1-kexinsun@smail.nju.edu.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260321105951.8314-1-kexinsun@smail.nju.edu.cn>
-References: <20260321105951.8314-1-kexinsun@smail.nju.edu.cn>
+	s=arc-20240116; t=1774163503; c=relaxed/simple;
+	bh=Kuu/KCtElsU7pIeBSMNLm9DwMD7pPN5VzQXIuJI7N1g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RnayWx5CtmWZGXiO6XwnvRFljka+e0jjGD75n2upVs6eL8ePlQ1TbcIZwauGVE+oOP86/Vu6nrGNt5IaRW3tAxbufl0zLCQ9FuASEPTjLJ6B6Qkj3Rp94qVHEM5RK8vjccZcSnKMVK2WfN8AQTJbDzm6OrKNqgXNvPF3YfT5CI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CQZovMMh; arc=none smtp.client-ip=74.125.82.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-2c107ef474fso3161635eec.0
+        for <netdev@vger.kernel.org>; Sun, 22 Mar 2026 00:11:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774163502; x=1774768302; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SGAsPQktqc4FZugs1UeRZbzQYPPz69mZ+0Bu64YRsnc=;
+        b=CQZovMMhMwc7n/a4Pm6jdkuItzq3bOZ0CCzMlTeB/AoBTKA32VaVWpXfiRJBIF+Sn0
+         ixTWYEOHbsmEW/XJFgaMzbc71jfNjXpj89Bwi1D3U50zWn1N4m3iKzfEokRc8LmXgJ0f
+         2Kl1LKHSvak66OlKVTJBWIoUmxlaksE3KQI5mdizLhTwR4KewkHu3BxlHAwUxm5cbqzZ
+         9xnoSmgwsccaVQmMViKdigerrpEeBiO0HNj7Vzhue/SMnnt3VCZFQUVAvj8DLA8/xXcU
+         Gc86spC5QL8AVsxtiJZJyIESbFGs1h+utOQZcnO0lQEIB/bQmH5FQtdSD9ePNVMKdl7U
+         eXxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774163502; x=1774768302;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SGAsPQktqc4FZugs1UeRZbzQYPPz69mZ+0Bu64YRsnc=;
+        b=E3w7lZJD8T0KHjeHZ/vNaUBNxQsSWgmlFGbDVz/36wHwph6vvVcM8WWj3G1eVn9L3v
+         zjGGZvLKfsBiIku7u5sSy6GgvDEkMAzbPk95y87yM3mqZSb1fEh7mRLRBRRSqOeNVOOK
+         q3y+pBPKQR+kXfecj8ZlooMqiPk0QecOMPuw01UhqKnZP6RA3AkaoNwBVkWMED9ClLlX
+         gIZirfCAIsGu79Bs4q+qlP4ra2M/FCAihnZD+cUBcQUShHzsPiobQVc8u5bDjkueH7du
+         T5/W/zrnWuqIA6Wf0MYuQ3DTdYQz582gW7saqW/DrVEtOwfxGI/kNr/VipSHHaoqc1UQ
+         AxNg==
+X-Gm-Message-State: AOJu0YzgRf6DV1PByd1NbFAY4e/MaN+fI3T37GWDeCxKppTli3lcDj8G
+	+Um7kutJtVhYsjbqZt6eBixSGzU6a3T3DKpNFk2NHnsFF9M5suTjpIj6
+X-Gm-Gg: ATEYQzwsTbhclNI71xodvyTmINzC11rZBxJtNaU210ydrcamPXjy0WByleXq7LzEN6B
+	xJsP4L4H6dH5Md8f7CkqK2LdepoiMjSyid6qFmMsIO9/4CDWi0pOqmTfTZva/XDsT6oFSQxjR1s
+	jQAYZ83DXVqblacSmis0DP7DR0OmO2ewhoRNrHtJN68v+erS+CCxc+z6K6akoCaETrWdbxaP3hy
+	E30hKzwY57Pk4lFCpaNtTCN3SkUOZvxMLE55rU0EN+QYTl2zUF/5aOZL2RMfCkYY2Rc5PasmDaT
+	D4WkiiDR+BB/A/i4Oh3T659i7bIlay7AEqd9ASntGZYREsn2ThBXWqLxTdU6IBT86zdwAj94HfF
+	1k+o4BoU8DP31o4mdRLapBA0JNEC1pSdj69MsPhMqKDoAl4GGFKhkY02eGoRTHkfJwz8ckEesOz
+	I1t0VY+SvoibqW/ZZII5u+Q56xZFMvxtZ9RoRnMC8F05K3GXiOv5pMCChZePQh
+X-Received: by 2002:a05:7022:2227:b0:128:ce44:be8f with SMTP id a92af1059eb24-12a726572c7mr4140330c88.2.1774163501581;
+        Sun, 22 Mar 2026 00:11:41 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c085:21e1::1129? ([2620:10d:c090:400::5:dc02])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c10b14bac4sm12191223eec.4.2026.03.22.00.11.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 22 Mar 2026 00:11:41 -0700 (PDT)
+Message-ID: <ab2f788b-7214-4aa6-bfca-b33d3ab37321@gmail.com>
+Date: Sun, 22 Mar 2026 00:11:39 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:smail.nju.edu.cn:qybglogicsvrgz:qybglogicsvrgz5b-0
-X-QQ-XMAILINFO: N2K7JO7TcIoE9l2k02UY3Jytfsy44gPatrcQEDT+G0L8BrWzAReZ+iRo
-	DOeV0oIiAFCkNx4AD/VFF8OBLYN+nhtdt1bZbNUn4v8HlQmMOhvEwG0/bwRQ7zMCIwmEFHI
-	dLv3hGnUZY5/81nSskwe7zKI0nQPa0hbIC+Lf2585CmVkT3zIcc2J7eTC+iUXRTHp5CQJ+C
-	3lnlclm/ok/Q4W4UnRDElabo2aE7p0GgEjXBUvwfeokSjDheydopL90cFbJS/dfDlBmuKHn
-	EyxS5o/dm7rbBLfM3YANi/3yEXoj0p7VpH3IJg7oyh3Vk9VuPoc86LVRUKgXXVd0+mYw/s+
-	sOCkwvVl1UCqGjuki5QQ+4snLvZo+q+h3eaAHk4FnQnxvheIb3X6iWaNvE5tiWB2Ids9qo+
-	HwCPhIYRSgozIJtMLfWyrc6DlES4ZcsalD48EEZJ+X8/Dh0Cv2XUStGtO4qfQAyeZQ1UiY9
-	dBdagaQPouvv/G5ups/XcNmNzIXvxj7yA7w+247eo/nEr1iV2Wd+1aljfziuvHKIRK9FCCL
-	2MmF8kVxZhk8x3xK9sSWtVrShXYk2JpF1/bK8orcTbMWA3YgSmzAYMiPKY7Jr4hiTcnaEDP
-	N5J7CzvwbczSSQUVuMZ0B9ich2VvtvaXelkCp3+GdW3Rsd0odXUrkj3nTQF7vbabai3P9TU
-	B4cOAabJVoILSsNFD6ycOYcczs7tLgQsahOrLl+fYQC5v2OTiv/oKVoQ/Va3RgCl0N8MnSy
-	IVJhpH4JSSCS+TvSe+XirWuiNtAqeFgPfdYW6tnQ5B6UvFjdVV0yZk8TyxxGTRfH5YArVql
-	JVcv+GZKHWe6AhB93/z6yUBJaz299T/JEtXJynKxs6dKwBmOvebGOtPH4cDvi8FBkyzc9m1
-	sGF7mh4yzWjQaghhSWTkYJmgmkw9DCxlBHdVCvgTc3DPBLqSIk9H5frUX3k6jp8L5jmMWjl
-	vOvAwHb8tLZflPIDhaNMw80P63PXbUxfExYVaVEiRkfs/xtU+gwsYWmLv7TqsXakcemCM8e
-	2JK4THmjLCi8zYU4vJ
-X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
-X-QQ-RECHKSPAM: 0
-X-Spamd-Result: default: False [0.04 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 08/10] net: lan966x: add PCIe FDMA XDP support
+To: Daniel Machon <daniel.machon@microchip.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ Steen Hegelund <steen.hegelund@microchip.com>, UNGLinuxDriver@microchip.com,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Herve Codina
+ <herve.codina@bootlin.com>, Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20260320-lan966x-pci-fdma-v1-0-ef54cb9b0c4b@microchip.com>
+ <20260320-lan966x-pci-fdma-v1-8-ef54cb9b0c4b@microchip.com>
+Content-Language: en-US
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+In-Reply-To: <20260320-lan966x-pci-fdma-v1-8-ef54cb9b0c4b@microchip.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270297-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-270298-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[smail.nju.edu.cn:?];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kexinsun@smail.nju.edu.cn,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,bootlin.com,arndb.de,linuxfoundation.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_SPAM(0.00)[0.542];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mohsinbashr@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DMARC_DNSFAIL(0.00)[smail.nju.edu.cn : SPF/DKIM temp error,reject];
-	R_DKIM_TEMPFAIL(0.00)[smail.nju.edu.cn:s=iohv2404];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nju.edu.cn:email,smail.nju.edu.cn:mid]
-X-Rspamd-Queue-Id: 1DB0B2E8412
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,xdp.data:url]
+X-Rspamd-Queue-Id: 6973A2E87A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The comment in tcp_v6_fill_cb() states that the memmove of
-IP6CB into TCP_SKB_CB must be done after xfrm6_policy_check()
-because _decode_session6() uses IP6CB().
 
-This ordering constraint was introduced by commit 2dc49d1680b5
-("tcp6: don't move IP6CB before xfrm6_policy_check()") and was
-valid at the time.  However, commit 7a0207094f1b ("xfrm: policy:
-replace session decode with flow dissector") replaced the
-per-family decode_session callbacks with the flow dissector,
-which parses packet headers directly without accessing IP6CB().
+> +static int lan966x_xdp_pci_run(struct lan966x_port *port, void *data,
+> +			       u32 data_len)
+> +{
+> +	struct bpf_prog *xdp_prog = port->xdp_prog;
+> +	struct lan966x *lan966x = port->lan966x;
+> +	struct xdp_buff xdp;
+> +	u32 act;
+> +
+> +	xdp_init_buff(&xdp, lan966x->rx.max_mtu, &port->xdp_rxq);
+> +
+> +	xdp_prepare_buff(&xdp,
+> +			 data - XDP_PACKET_HEADROOM,
+> +			 IFH_LEN_BYTES + XDP_PACKET_HEADROOM,
+> +			 data_len - IFH_LEN_BYTES,
+> +			 false);
+> +
+> +	act = bpf_prog_run_xdp(xdp_prog, &xdp);
+> +	switch (act) {
+> +	case XDP_PASS:
+> +		return FDMA_PASS;
+> +	case XDP_TX:
+> +		return lan966x_fdma_pci_xmit_xdpf(port, data, data_len) ?
+> +		       FDMA_DROP : FDMA_TX;
 
-Since xfrm6_policy_check() no longer reads IP6CB() anywhere in
-its call chain, the ordering constraint no longer applies.
-Simplify the comment to describe only what the memmove and
-barrier() actually do.
+What if the BPF program modifies packet boundaries (e.g., 
+headroom/tailroom adjustment)? After bpf_prog_run_xdp(), xdp.data and 
+xdp.data_end may differ from the original data and data_len, but 
+lan966x_fdma_pci_xmit_xdpf() is called with the original values. 
+Wouldn't any adjustments made by the XDP program be silently lost?
 
-Assisted-by: unnamed:deepseek-v3.2 coccinelle
-Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
-Signed-off-by: Kexin Sun <kexinsun@smail.nju.edu.cn>
----
- net/ipv6/tcp_ipv6.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index d10487b4e5bf..619b35669361 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1688,10 +1688,9 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
- static void tcp_v6_fill_cb(struct sk_buff *skb, const struct ipv6hdr *hdr,
- 			   const struct tcphdr *th)
- {
--	/* This is tricky: we move IP6CB at its correct location into
--	 * TCP_SKB_CB(). It must be done after xfrm6_policy_check(), because
--	 * _decode_session6() uses IP6CB().
--	 * barrier() makes sure compiler won't play aliasing games.
-+	/* Move IP6CB to its saved location in TCP_SKB_CB().
-+	 * barrier() makes sure compiler won't play aliasing
-+	 * games.
- 	 */
- 	memmove(&TCP_SKB_CB(skb)->header.h6, IP6CB(skb),
- 		sizeof(struct inet6_skb_parm));
--- 
-2.25.1
-
+> +	default:
+> +		bpf_warn_invalid_xdp_action(port->dev, xdp_prog, act);
+> +		fallthrough;
+> +	case XDP_ABORTED:
+> +		trace_xdp_exception(port->dev, xdp_prog, act);
+> +		fallthrough;
+> +	case XDP_DROP:
+> +		return FDMA_DROP;
+> +	}
+> +}
+> +
 
