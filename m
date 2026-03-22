@@ -1,160 +1,123 @@
-Return-Path: <netdev+bounces-270303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270304-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YFQ7JOTev2ml9wMAu9opvQ
-	(envelope-from <netdev+bounces-270303-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 13:21:56 +0100
+	id 6NcSBU7uv2m3AQQAu9opvQ
+	(envelope-from <netdev+bounces-270304-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 14:27:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E2BE2E922A
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 13:21:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A114A2E973B
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 14:27:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D780D300E395
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 12:16:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 78E1B300468D
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 13:27:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C85A2E542C;
-	Sun, 22 Mar 2026 12:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QDNvtMmr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EADFF32E6BD;
+	Sun, 22 Mar 2026 13:27:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24B519992C
-	for <netdev@vger.kernel.org>; Sun, 22 Mar 2026 12:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B0D32860F;
+	Sun, 22 Mar 2026 13:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774181808; cv=none; b=f400jWLVxzGlGuiihJyuxjbAgPntTdT0e3U/q31XuWHbC8rhvyR6m2+dArvGwCx1csFlRUMjs+voxIMbUGoEhbZx/f4YaQXIKtvvHgkSzAM4Te3ueUz8ICwBRUOkwEldJGKp06M+04RVnRWKXISmDE3yaUoj7OdLW5zzGSEFIZk=
+	t=1774186054; cv=none; b=JF1mF4psOjYUxz4VezGZf0YUnch2e1u3jfPgXbt/wNC2OwkndHvN5f1J40T6clRXBGje239x6bcO2vmKpnJT/hFf4AP7dP4HDGH/B5IiqPeTqhKb4NxYFZPv3eu9QhHvioGZUDWJwlXEr1nBet4R+j1w6XS1SffjD76Qa0EAnVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774181808; c=relaxed/simple;
-	bh=h+eXb6BWvQbevGQI/eEwbI+5Z3/xPDT5GvKIrnm07bI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WMGS/w0SY8muPK5mBLYLkiiJM2c2Y+wzYN9uEPj7B7P8EkJxELDZpWllxoZ2wJS5aXSfnkG+7XbDPf3xGRu4mut6bNfeQfeh1sfKjeYePc3aeiwLkrdDMCl46G02mk96wi0Z/TwyQTvoW1BUNDB2dOfD/5sX+0KHjgrk372fiOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QDNvtMmr; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-439b9cf8cb5so4579807f8f.0
-        for <netdev@vger.kernel.org>; Sun, 22 Mar 2026 05:16:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774181805; x=1774786605; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q7Q8r8jgdo8Jp+NqEWEM8v5GgTLMCpOYSldfF6W4qVA=;
-        b=QDNvtMmrVoe1WJMYj03AOFTLjVjjjyxbeHGFVpLDNYXDYpOW5MH9TybNbLTal+a5LX
-         owkS6/eoeBpC1fY6ivqcZg6rHshZQxH/z/AwloLfXtNYYwNmT8drt4w6562VllcP4SYF
-         B8DsClORwRoUKRC44czGMh5e2KK+h7AhnNoQsD4s7BeuHD9JyqgOjuKYYMtwGaK/NZ/T
-         5dgAUN9R0NRMvMSGkGaa870ml0NuxB9z9dlSEJBHzdTGPiSN5JB7Pla1oMJTwLcMYP78
-         V58fa5V8EGj5tcWFNKnRFNvv8HcjhVvQR/P82nZ+7t8IYjYs++f8lb1PPhnU6of6xqbM
-         2gkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774181805; x=1774786605;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q7Q8r8jgdo8Jp+NqEWEM8v5GgTLMCpOYSldfF6W4qVA=;
-        b=TXZ7OAzgKnhm7ZhaSZcA+t/Oss/9aP6rnC06S7tMF4dBz548AbwNNUHe45WGuiNmqM
-         Clu68oYBLldJl3dD9VYiKvv1CORP1kWQLMfYEuxZss4pL+m1VGzpKtVJElQth+koHiGO
-         3tF09RZ1zscHi0ZjBhXcUVaeIp1jx3rFEIDRkBWeYlVPSadFHBH5U0AmzR2zBRiGW/uu
-         XPHexL5oJH0D+0Q0dMOAx6rELROrcYQ20YICUJhQ9Tijrr6NtY4vfNIZxkEFTLZDOmJQ
-         9DU3Xq2aUruSyp/ICTDzBRpApF909CZ161/jlGm1Uhvsgix83yNXSzKLvL37awsLv0qU
-         PnMw==
-X-Forwarded-Encrypted: i=1; AJvYcCV1JzB7eAmdSZSAuqG0awuASLfexy9luA70TMH6pqMgp9UBWJoSS5LS3hy27kKHtZ/s3JxQSCM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYgQmlaewIrFJ2zRxEGoFcs57XTjaYJJhhaBq8jNlbcjmQrBiB
-	cZJ4S7NTbzczXZ8qSrPI7Vx94OFWHki7BCnQ3owhOJqdw603RX1IFhk=
-X-Gm-Gg: ATEYQzzMwdPczl3CprBvR05OUBMKqx+cD6y9y7z3b41k6shnKHFAwHTXNUBM8eKfgly
-	VuMgpbuBxbm0UfyCYKiZUABz5WnG+FxV1wKx2vathwhO5fDndxjP4aZElRoPk84Cv1pOsk3QLRl
-	zeJSIHEDwaNGVxC3n3WR3SXuyhSh1G7EpNlcCx9ANrStvqVUIn75tyXLr2akdLvl3AjPUhpZxk4
-	eK4s7H6raXosdmM3EsjHwhZzVkhf0LFVRMbcf8AaCCuVYGNMNhPIQxYGY67V+nRIlQmKw0GXHdS
-	jume1yTM5zisNGSntx5YttX5KZaZ9VsjaWYgyZlalWY+y2ZNf6+rNEjTE6WlcK2gAOIHH076d2B
-	u3QOlzDyErDE9Ds4KsVxU9SxailDtajyjUfaJiNFDzqzmZYMPgnwW8d+Ivqae/xasCgFni9xb7d
-	ZoZ9bBxKpfZE3pN5VI5w9PbrnAVHhRc3s/QJlTVH5Edy0rRtgx1jViNduZ/O3QtFxXI+iQeaQ=
-X-Received: by 2002:a05:600c:c16e:b0:485:4eaf:eb53 with SMTP id 5b1f17b1804b1-486fee0f975mr112156595e9.19.1774181805297;
-        Sun, 22 Mar 2026 05:16:45 -0700 (PDT)
-Received: from hp-ubuntu.. ([41.249.139.113])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4870504f2e4sm30072515e9.18.2026.03.22.05.16.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Mar 2026 05:16:44 -0700 (PDT)
-From: Mohammed EL Kadiri <med08elkadiri@gmail.com>
-To: ecree.xilinx@gmail.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-net-drivers@amd.com,
-	linux-kernel@vger.kernel.org,
-	Mohammed EL Kadiri <med08elkadiri@gmail.com>
-Subject: [PATCH] sfc: Fix spelling mistake
-Date: Sun, 22 Mar 2026 13:16:40 +0100
-Message-ID: <20260322121640.34113-1-med08elkadiri@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1774186054; c=relaxed/simple;
+	bh=nt//FjBXwg0cKPku85CuxvPCjBJ6K1Jp4yFVs2d2qK4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=qrTEEtFSpMMyeT0B9rtIytd6pb9A1BBvcUz7wtCHRSTjNEc9aDBR6pVO3PwG5AHRv0AayupjmpORVtikRek7hqBbOWTHQ6CRVxkrNL8s+8pgoZFqQ+85yR53YNT48HXdLF+WLYiejCFfma40LY1BKGr5MZRdcaMwLwJNYO8abw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1w4Ipn-0000000031S-3SgA;
+	Sun, 22 Mar 2026 13:27:15 +0000
+Date: Sun, 22 Mar 2026 13:27:12 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH net-next v2 0/2] net: dsa: mxl862xx: MDIO bus integrity and
+ optimization
+Message-ID: <cover.1774185953.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,amd.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-270304-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[makrotopia.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-270303-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[med08elkadiri@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1E2BE2E922A
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: A114A2E973B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In the Solarflare MCDI protocol header, the word 'address' was
-misspelled as 'adress' in a comment. Correcting this improves code
-readability and documentation consistency within the networking
-subsystem.
+The MxL862xx firmware offers opt-in CRC validation on the MDIO/MMD
+command interface to guard against bit errors on the bus.
+The driver has not used this until now.
 
-Signed-off-by: Mohammed EL Kadiri <med08elkadiri@gmail.com>
----
- drivers/net/ethernet/sfc/mcdi_pcol.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This series enables CRC protection on both the command registers (CRC-6)
+and data payloads (CRC-16), and reduces MDIO bus traffic by bulk-zeroing
+registers instead of writing zero-valued words individually.
 
-diff --git a/drivers/net/ethernet/sfc/mcdi_pcol.h b/drivers/net/ethernet/sfc/mcdi_pcol.h
-index b9866e389e6d..a9a7076c00e4 100644
---- a/drivers/net/ethernet/sfc/mcdi_pcol.h
-+++ b/drivers/net/ethernet/sfc/mcdi_pcol.h
-@@ -21387,7 +21387,7 @@
- #define          MC_CMD_PRIVILEGE_MASK_IN_GRP_ALL_MULTICAST 0x200 /* enum */
- #define          MC_CMD_PRIVILEGE_MASK_IN_GRP_PROMISCUOUS 0x400 /* enum */
- /* enum: Allows to set the TX packets' source MAC address to any arbitrary MAC
-- * adress.
-+ * address.
-  */
- #define          MC_CMD_PRIVILEGE_MASK_IN_GRP_MAC_SPOOFING_TX 0x800
- /* enum: Privilege that allows a Function to change the MAC address configured
+Changes since initial submittions:
+ * trigger worker which takes down all ports in case of a CRC error
+
+Daniel Golle (2):
+  net: dsa: mxl862xx: add CRC for MDIO communication
+  net: dsa: mxl862xx: use RST_DATA to skip writing zero words
+
+ drivers/net/dsa/mxl862xx/Kconfig         |   1 +
+ drivers/net/dsa/mxl862xx/mxl862xx-host.c | 377 +++++++++++++++++++----
+ drivers/net/dsa/mxl862xx/mxl862xx-host.h |   2 +
+ drivers/net/dsa/mxl862xx/mxl862xx.c      |  11 +
+ drivers/net/dsa/mxl862xx/mxl862xx.h      |   2 +
+ 5 files changed, 331 insertions(+), 62 deletions(-)
+
 -- 
-2.43.0
-
+2.53.0
 
