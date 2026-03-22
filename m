@@ -1,170 +1,221 @@
-Return-Path: <netdev+bounces-270301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270302-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KAYfDQ2sv2ng7QMAu9opvQ
-	(envelope-from <netdev+bounces-270301-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 09:45:01 +0100
+	id uJYBN865v2nd7wMAu9opvQ
+	(envelope-from <netdev+bounces-270302-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 10:43:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D69132E8A3E
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 09:44:59 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C3C62E8BB9
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 10:43:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF015301016A
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 08:44:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B27E8300FB60
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 09:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0731530F938;
-	Sun, 22 Mar 2026 08:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6916A3254A0;
+	Sun, 22 Mar 2026 09:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DL6qab4H"
+	dkim=pass (2048-bit key) header.d=yunyoo-cc.20200929.dkim.larksuite.com header.i=@yunyoo-cc.20200929.dkim.larksuite.com header.b="D6PGJe4g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-26.ptr.blmpb.com (va-2-26.ptr.blmpb.com [209.127.231.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CAE830EF64;
-	Sun, 22 Mar 2026 08:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C094313537
+	for <netdev@vger.kernel.org>; Sun, 22 Mar 2026 09:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.26
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774169044; cv=none; b=nPiaHjrROrPZ2xBfypHFLTBFgc5muKJ93N9oZsRlSLcwYuc5BUCq/+QqEUHLwYIp+WkLSnmV57ys41kBpnGwKahQ1QyCACzeX7GsJb4RWl5EiuKLyUdr7laP4/IR622Ev/IkZjPn9M/ttyL2X2RKKKVFNbNjJEqcJK8gSl4JgeE=
+	t=1774172605; cv=none; b=hZdfwd6mN+dQh42kLvaV21pLCBXQOuOpRs+He3Y9C4tTLAxLWXzlqxuaq1XRrthFuTE59rx/Qt6wccNCZ/mY7FNdYMN36aL9Wu7ko7/QNiIUnJnDyd3eouPGVTX56WWiQVGIDUtKDn3ozaXIMfvH8Rc2OgvrjCu6ayM+tYuBNlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774169044; c=relaxed/simple;
-	bh=SyMIigT+e2e9E37xK1DVsQ9UBFu+02X93Nc+ytohWXo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=srRCdphU6o+C4hhg2FmvBDo4c9ecl/8fkprS3USuR/HkY9yCFRO3z9MvXwpcYKp9eRyD74+rb37vmtzzH4rc9l4DuhNyWdiasE8D7CJZFr45JG4wyUeEBhTvkicAUwodMtYnMAmsficvMMw2dDV0Cyzqyrd+HaMUa1k3UB+/gqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DL6qab4H; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774169043; x=1805705043;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SyMIigT+e2e9E37xK1DVsQ9UBFu+02X93Nc+ytohWXo=;
-  b=DL6qab4HryaUUZypX9l2THFfbhWnQW9VJqGmdr9Qvcn9rx6f7f6u0jQ6
-   NX3HhYAD3vA1O39WIAZQ2xUsaGD1U9MLo1v0lJPu4sL7NmszhYZpiUWo5
-   qZPvZ3IwmB78epKcsFcwyg38303KzXECztbo+LZgf6lzxdQCCHLvGtfgc
-   9+tD7sfHDzyJIfUZP079Ku+oDEiR1FhZF5zxBMBNX05aCYhefiSDJVAyN
-   IwBVwLEqSukFjBDUyGYhlmi+4L5oPt8pOgySiVd3y0o9DGBe7qee9PnQn
-   gCLe7VCg0o7zvogyRZphltSX8lS3h6ERFgsveHkOA7QC0JgbVm5c+Xqna
-   Q==;
-X-CSE-ConnectionGUID: fLsFoH5/Q4OGebDNyp9rEQ==
-X-CSE-MsgGUID: Qa4G1aABR4GoD2F0uhlMDw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11736"; a="92579289"
-X-IronPort-AV: E=Sophos;i="6.23,134,1770624000"; 
-   d="scan'208";a="92579289"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2026 01:44:02 -0700
-X-CSE-ConnectionGUID: SGU5imfxR3G586WO9zNpHg==
-X-CSE-MsgGUID: B9BfFrloT6mtujDaTqK4yg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,134,1770624000"; 
-   d="scan'208";a="223704068"
-Received: from lkp-server02.sh.intel.com (HELO d7fefbca0d04) ([10.239.97.151])
-  by orviesa009.jf.intel.com with ESMTP; 22 Mar 2026 01:44:00 -0700
-Received: from kbuild by d7fefbca0d04 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w4EPc-000000001sX-3TgI;
-	Sun, 22 Mar 2026 08:43:56 +0000
-Date: Sun, 22 Mar 2026 16:43:44 +0800
-From: kernel test robot <lkp@intel.com>
-To: Joe Damato <joe@dama.to>, netdev@vger.kernel.org,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, horms@kernel.org,
-	linux-kernel@vger.kernel.org, leon@kernel.org,
-	Joe Damato <joe@dama.to>
-Subject: Re: [net-next v4 08/12] net: bnxt: Implement software USO
-Message-ID: <202603221823.WbZUThzj-lkp@intel.com>
-References: <20260320144141.260246-9-joe@dama.to>
+	s=arc-20240116; t=1774172605; c=relaxed/simple;
+	bh=rgztf57Wkf3uNQrwjvwiUV1pJekdLenxeGJV/P9W4g0=;
+	h=Date:From:In-Reply-To:References:Content-Type:Message-Id:To:Cc:
+	 Subject:Mime-Version; b=LKc9KDVte85D19q4fW41gUSPQ1SF4hVxEY9vNUbvD8YOvqvlOvAspIWmrBwGy+nGyqOaN+G2z8XWY2T52BqGHXp4MxAQAHo6/bs13XpiHER4gGEKS1ZAgB0JL0DdDmKa9vMjhk9WAij16dSpwuPP0gfWIVAz18HKoZE1BJ7wju8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunyoo.cc; spf=pass smtp.mailfrom=yunyoo.cc; dkim=pass (2048-bit key) header.d=yunyoo-cc.20200929.dkim.larksuite.com header.i=@yunyoo-cc.20200929.dkim.larksuite.com header.b=D6PGJe4g; arc=none smtp.client-ip=209.127.231.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunyoo.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunyoo.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=yunyoo-cc.20200929.dkim.larksuite.com; t=1774172591;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=rgztf57Wkf3uNQrwjvwiUV1pJekdLenxeGJV/P9W4g0=;
+ b=D6PGJe4g/tUMFxxd/SMZc55KcRjPK9B12GGGjRxfNqaw8NsIOXsMYHZT4GHPTvlTwNrUyH
+ qq1V3/vbXAizEGtVnWn9xQoXUl1uo/E07ut1VCp4EzG423vv/xT7Zq/xuDgEH45Dc8yPZY
+ oCxC15bY6z+j9ErG/Hlk8nayppFOlMH8yHFHOupl9VjH2A269jONDdZvfuABNnIEHSSXAE
+ QfcqVo+8kBMATtEpcD8HDC+mFb/xpna+QI7fFumGlS9OnkbA8ATw3L5m/130IqGb9z+x7Q
+ JXTrwbXhEzrCfxSssu0c2lURNP/p+9lgY8kBx58Yt985QvW9NTi7+Up7cakHOA==
+Date: Sun, 22 Mar 2026 09:43:10 +0000
+From: "ShuangYu" <shuangyu@yunyoo.cc>
+In-Reply-To: <559b04ae6ce52973c535dc47e461638b7f4c3d63.1772441455.git.mst@redhat.com>
+References: <559b04ae6ce52973c535dc47e461638b7f4c3d63.1772441455.git.mst@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <9ac0a071e79e9da8128523ddeba19085f4f8c9aa.66fca736.e866.40b1.89bb.b04390067263@larksuite.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: <linux-kernel@vger.kernel.org>, 
+	"Stefano Garzarella" <sgarzare@redhat.com>, 
+	"Stefan Hajnoczi" <stefanha@redhat.com>, 
+	"Jason Wang" <jasowang@redhat.com>, 
+	=?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>, 
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH RFC] vhost: fix vhost_get_avail_idx for a non empty ring
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260320144141.260246-9-joe@dama.to>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Mime-Version: 1.0
+X-Lms-Return-Path: <lba+169bfb9ae+d92fad+vger.kernel.org+shuangyu@yunyoo.cc>
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[yunyoo-cc.20200929.dkim.larksuite.com:s=s1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270301-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[yunyoo.cc];
+	TAGGED_FROM(0.00)[bounces-270302-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[yunyoo-cc.20200929.dkim.larksuite.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[shuangyu@yunyoo.cc,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,01.org:url]
-X-Rspamd-Queue-Id: D69132E8A3E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[yunyoo.cc:email,yunyoo-cc.20200929.dkim.larksuite.com:dkim,larksuite.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6C3C62E8BB9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Joe,
 
-kernel test robot noticed the following build warnings:
+> From: "Michael S. Tsirkin"<mst@redhat.com>
+> Date:=C2=A0 Mon, Mar 2, 2026, 16:52
+> Subject:=C2=A0 [PATCH RFC] vhost: fix vhost_get_avail_idx for a non empty=
+ ring
+> To: <linux-kernel@vger.kernel.org>
+> Cc: "ShuangYu"<shuangyu@yunyoo.cc>, "Stefano Garzarella"<sgarzare@redhat.=
+com>, "Stefan Hajnoczi"<stefanha@redhat.com>, "Jason Wang"<jasowang@redhat.=
+com>, "Eugenio P=C3=A9rez"<eperezma@redhat.com>, <kvm@vger.kernel.org>, <vi=
+rtualization@lists.linux.dev>, <netdev@vger.kernel.org>
+> vhost_get_avail_idx is supposed to report whether it has updated
+> vq->avail_idx. Instead, it returns whether all entries have been
+> consumed, which is usually the same. But not always - in
+> drivers/vhost/net.c and when mergeable buffers have been enabled, the
+> driver checks whether the combined entries are big enough to store an
+> incoming packet. If not, the driver re-enables notifications with
+> available entries still in the ring. The incorrect return value from
+> vhost_get_avail_idx propagates through vhost_enable_notify and causes
+> the host to livelock if the guest is not making progress, as vhost will
+> immediately disable notifications and retry using the available entries.
+>=C2=A0
+> The obvious fix is to make vhost_get_avail_idx do what the comment
+> says it does and report whether new entries have been added.
+>=C2=A0
+> Reported-by: ShuangYu <shuangyu@yunyoo.cc>
+> Fixes: d3bb267bbdcb ("vhost: cache avail index in vhost_enable_notify()")
+> Cc: Stefano Garzarella <sgarzare@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>=C2=A0
+> Lightly tested, posting early to simplify testing for the reporter.
+>=C2=A0
+> =C2=A0drivers/vhost/vhost.c | 11 +++++++----
+> =C2=A01 file changed, 7 insertions(+), 4 deletions(-)
+>=C2=A0
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 2f2c45d20883..db329a6f6145 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -1522,6 +1522,7 @@ static void vhost_dev_unlock_vqs(struct vhost_dev *=
+d)
+> =C2=A0static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
+> =C2=A0{
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0__virtio16 idx;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0u16 avail_idx;
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int r;
+> =C2=A0
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0r =3D vhost_get_avail(vq, idx, &vq->ava=
+il->idx);
+> @@ -1532,17 +1533,19 @@ static inline int vhost_get_avail_idx(struct vhos=
+t_virtqueue *vq)
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}
+> =C2=A0
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Check it isn't doing very strange th=
+ing with available indexes */
+> - =C2=A0 =C2=A0 =C2=A0 =C2=A0vq->avail_idx =3D vhost16_to_cpu(vq, idx);
+> - =C2=A0 =C2=A0 =C2=A0 =C2=A0if (unlikely((u16)(vq->avail_idx - vq->last_=
+avail_idx) > vq->num)) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0avail_idx =3D vhost16_to_cpu(vq, idx);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0if (unlikely((u16)(avail_idx - vq->last_avai=
+l_idx) > vq->num)) {
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vq_err(vq, =
+"Invalid available index change from %u to %u",
+> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 vq->last_avail_idx, vq->avail_idx);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 vq->last_avail_idx, avail_idx);
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return -EIN=
+VAL;
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}
+> =C2=A0
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* We're done if there is nothing new *=
+/
+> - =C2=A0 =C2=A0 =C2=A0 =C2=A0if (vq->avail_idx =3D=3D vq->last_avail_idx)
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0if (avail_idx =3D=3D vq->avail_idx)
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;
+> =C2=A0
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0vq->avail_idx =3D avail_idx;
+> +
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 * We updated vq->avail_idx so we need =
+a memory barrier between
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 * the index read above and the caller =
+reading avail ring entries.
+> --=C2=A0
+> MST
+>=C2=A0
 
-[auto build test WARNING on 9f4960b94f1a044f76da98a765d6cbd294c22c92]
+Hi,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Joe-Damato/net-tso-Introduce-tso_dma_map/20260322-071901
-base:   9f4960b94f1a044f76da98a765d6cbd294c22c92
-patch link:    https://lore.kernel.org/r/20260320144141.260246-9-joe%40dama.to
-patch subject: [net-next v4 08/12] net: bnxt: Implement software USO
-config: i386-randconfig-012-20260322 (https://download.01.org/0day-ci/archive/20260322/202603221823.WbZUThzj-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260322/202603221823.WbZUThzj-lkp@intel.com/reproduce)
+Sorry for the delay, it took me some time to build a reliable test environm=
+ent.=C2=A0
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603221823.WbZUThzj-lkp@intel.com/
+I've verified the patch on 6.18.10. With 16 concurrent TCP flows over
+virtio-net (TSO enabled, vCPU throttled to 1%, 300s duration):
 
-All warnings (new ones prefixed by >>):
+=C2=A0 Before patch (bpftrace + CPU monitor):
+=C2=A0=C2=A0=C2=A0 - vhost_discard_vq_desc: up to 3,716,272/3s
+=C2=A0=C2=A0=C2=A0 - vhost_enable_notify false positives: up to 3,716,278/3=
+s
+=C2=A0=C2=A0 =C2=A0=C2=A0 (nearly 1:1 with discard =E2=80=94 every partial =
+alloc triggers re-loop)
+=C2=A0=C2=A0=C2=A0 - vhost worker CPU: 0~99%, frequently 50-99%
+=C2=A0=C2=A0=C2=A0 - successful receives: as low as 137/3s
 
-   drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c: In function 'bnxt_sw_udp_gso_xmit':
->> drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c:43:20: warning: variable 'last_unmap_addr' set but not used [-Wunused-but-set-variable]
-      43 |         dma_addr_t last_unmap_addr = 0;
-         |                    ^~~~~~~~~~~~~~~
->> drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c:41:22: warning: variable 'last_unmap_len' set but not used [-Wunused-but-set-variable]
-      41 |         unsigned int last_unmap_len = 0;
-         |                      ^~~~~~~~~~~~~~
+=C2=A0 After patch:
+=C2=A0=C2=A0=C2=A0 - vhost_discard_vq_desc: 9~33/3s
+=C2=A0=C2=A0=C2=A0 - vhost_enable_notify false positives: 0 (all 100 sample=
+ windows)
+=C2=A0=C2=A0=C2=A0 - vhost worker CPU: 0% (all 149 sample points)
+=C2=A0=C2=A0=C2=A0 - successful receives: 873~2,667/3s
 
+The partial allocations still occur under load, but after the fix
+vhost_get_avail_idx correctly returns 0, so the worker sleeps
+instead of spinning. Thanks.
 
-vim +/last_unmap_addr +43 drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c
+Tested-by: ShuangYu <shuangyu@yunyoo.cc>
 
-    33	
-    34	netdev_tx_t bnxt_sw_udp_gso_xmit(struct bnxt *bp,
-    35					 struct bnxt_tx_ring_info *txr,
-    36					 struct netdev_queue *txq,
-    37					 struct sk_buff *skb)
-    38	{
-    39		struct bnxt_sw_tx_bd *last_unmap_buf = NULL;
-    40		unsigned int hdr_len, mss, num_segs;
-  > 41		unsigned int last_unmap_len = 0;
-    42		struct pci_dev *pdev = bp->pdev;
-  > 43		dma_addr_t last_unmap_addr = 0;
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Best regards,
+ShuangYu
 
