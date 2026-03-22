@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-270316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270317-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mh+7MQYgwGkOEAQAu9opvQ
-	(envelope-from <netdev+bounces-270316-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 17:59:50 +0100
+	id kJ+4OmIgwGkOEAQAu9opvQ
+	(envelope-from <netdev+bounces-270317-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 18:01:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 158A82EA16B
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 17:59:50 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A5F22EA175
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 18:01:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BB63D300AB15
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 16:59:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5047530094CF
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 17:01:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F4FD3644B6;
-	Sun, 22 Mar 2026 16:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86AD52D2496;
+	Sun, 22 Mar 2026 17:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RAjgy7QH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bTgV5Bo5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C391B7F4
-	for <netdev@vger.kernel.org>; Sun, 22 Mar 2026 16:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643EC3BB40
+	for <netdev@vger.kernel.org>; Sun, 22 Mar 2026 17:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774198787; cv=none; b=rG8htqcnjHN+xsEoP8OaoC+43fqltIIZTackcn8TyJ/aCOEGhly54ihi0dNCsCZFU390k9VchV0JZIBNhjFI9PioiUnIKGgtak4HPf2peWVkCIJWNsLh/YGxyEmJsqxEVTHq+AMCJ+OXaK5HSPHoMutIYhBRLorDv1mJ2GaiQ/I=
+	t=1774198880; cv=none; b=K1gvUJ3Q+SW/27BhK69EGM0BY3pflrxpR2hG/4nBdGs5eyCpiDLmOci62Cj8rv93kJEmEIIRsgOsTnkC8DS960E/IxE01k9EfhrS+kjn6yZE8bpCg5GzbQ4ZV1q0xHyNEJTjIif9SaPW6d2aycoZI+fxghiFyqNN7z6bxyhZJ3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774198787; c=relaxed/simple;
-	bh=5tJA1LqJKLLiGOEaipN+GTAcqpajMXDyK7VmQJizpPE=;
+	s=arc-20240116; t=1774198880; c=relaxed/simple;
+	bh=M5cAXrGe1hE9fdKfbItosApoVwJITeicSOyzCKrlHZI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=McNVDb33BjeqISLxMwG/v9TvZjtVbrBU5A4uuMH80ymHsFNwovdKawQ6CG+BZuMwkTnDMH6oNNzxTPKKqPUZt5VqzoVyP2LFY2z7l9UDSGK5tGhCW7dO18WtUWHTBkKXb6O+6b29m4/XphNdlfWIomKH/1JmawjnN/xY6w57RTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RAjgy7QH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DC24C19424;
-	Sun, 22 Mar 2026 16:59:46 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=S0FPHf/K6jvaqNQQuwxA9XysD6f4svhCRI5G1J2WSAxODbQDTUk9eUfNWkIdISqeoZOyvAR7f3Oysh7eco7Cip7nUfW/f1MNg/QltGPf6uZ4kPyQLhgTxVKwuWc0XD3HiZXO3hHwn4H+dhz51EUHOWDP0qLeMNN8+f4k27pfLJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bTgV5Bo5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D671EC19424;
+	Sun, 22 Mar 2026 17:01:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774198786;
-	bh=5tJA1LqJKLLiGOEaipN+GTAcqpajMXDyK7VmQJizpPE=;
+	s=k20201202; t=1774198880;
+	bh=M5cAXrGe1hE9fdKfbItosApoVwJITeicSOyzCKrlHZI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RAjgy7QHDP0zPkOp55FXXUCczcG8Qj5eKUWbcnlpQoBGhpx7ahv7iciUkDJyO1kiV
-	 LuBDx+WenphA4uvbZXE1JS0U8WRW5d4FTfgBzr7uJzD0HXbqgCCTAOmhWCJtvR/iyG
-	 XdhsXZl+qx1PrCwg+N2/Z8s9uqo2o/SgkNyDNeWtNrellhjJyI/+MKXlgxIbCUI0vr
-	 sdx66tV089Rc+lzSbwH9R9kW+5xr7D8EnYuwzILiWsTRGOEo0+QvMoIEZ0c4DhQ5gt
-	 X3psOj4DIJ5KhKxCmm48eTsROVvR2o+LJxgJtZ+ZJ9nAcU211PimgJ5qL6EcFxP9J/
-	 1/c5AtdHVSVng==
-Message-ID: <168e2cfb-1e6b-4617-a930-922d06a66e7c@kernel.org>
-Date: Sun, 22 Mar 2026 10:59:45 -0600
+	b=bTgV5Bo5SJ/kr9GOtLke/e94XLdvdtZeuLCWLs0ZkDTgmhy25TNjR0Cf26NCJbLOu
+	 B/io+Y1J5+v29g036DmdmH1fMvPIBV5DrabA3vf9AckGZkQG3qWWsWa+IxxlXRbQ3U
+	 7WC7Dzos5EsLDVOSLO/JClaAE4vuf6tZRi7CBkulN0KnEByDgMUZebMA534V0uEEb6
+	 L28/W/57+waaxPtBfgAk++FZwJBHvXG3uhT2iIpa5O61HMwcurtUoScSJ+X8S6hSZd
+	 Afe44LFdOxPINvRZVO/SFy9WPK0ALffaB8JEbGeR3mLgtD9D99LvxtRPM7VuUnuEGv
+	 Cfj21hi1YrafQ==
+Message-ID: <cdd527be-2dac-4b36-96bf-26b8fd2f8f32@kernel.org>
+Date: Sun, 22 Mar 2026 11:01:19 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,8 +53,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net 1/3] ipv6: Remove permanent routes from
- tb6_gc_hlist when all exceptions expire.
+Subject: Re: [PATCH v6 net 2/3] ipv6: Don't remove permanent routes with
+ exceptions from tb6_gc_hlist.
+Content-Language: en-US
 To: Kuniyuki Iwashima <kuniyu@google.com>,
  "David S . Miller" <davem@davemloft.net>, Eric Dumazet
  <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
@@ -63,10 +64,9 @@ Cc: Kui-Feng Lee <thinker.li@gmail.com>, Xin Long <lucien.xin@gmail.com>,
  Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
  netdev@vger.kernel.org
 References: <20260320072317.2561779-1-kuniyu@google.com>
- <20260320072317.2561779-2-kuniyu@google.com>
-Content-Language: en-US
+ <20260320072317.2561779-3-kuniyu@google.com>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20260320072317.2561779-2-kuniyu@google.com>
+In-Reply-To: <20260320072317.2561779-3-kuniyu@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -74,19 +74,19 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-270316-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270317-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
@@ -96,39 +96,42 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 158A82EA16B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6A5F22EA175
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/20/26 1:22 AM, Kuniyuki Iwashima wrote:
-> Commit 5eb902b8e719 ("net/ipv6: Remove expired routes with a
-> separated list of routes.") introduced a per-table GC list and
-> changed GC to iterate over that list instead of traversing
-> the entire route table.
+On 3/20/26 1:23 AM, Kuniyuki Iwashima wrote:
+> The cited commit mechanically put fib6_remove_gc_list()
+> just after every fib6_clean_expires() call.
 > 
-> However, it forgot to add permanent routes to tb6_gc_hlist
-> when exception routes are added.
+> When a temporary route is promoted to a permanent route,
+> there may already be exception routes tied to it.
 > 
-> Commit cfe82469a00f ("ipv6: add exception routes to GC list
-> in rt6_insert_exception") fixed that issue but introduced
-> another one.
+> If fib6_remove_gc_list() removes the route from tb6_gc_hlist,
+> such exception routes will no longer be aged.
 > 
-> Even after all exception routes expire, the permanent routes
-> remain in tb6_gc_hlist, potentially negating the performance
-> benefits intended by the initial change.
+> Let's replace fib6_remove_gc_list() with a new helper
+> fib6_may_remove_gc_list() and use fib6_age_exceptions() there.
 > 
-> Let's count gc_args->more before and after rt6_age_exceptions()
-> and remove the permanent route when the delta is 0.
+> Note that net->ipv6 is only compiled when CONFIG_IPV6 is
+> enabled, so fib6_{add,remove,may_remove}_gc_list() are guarded.
 > 
-> Note that the next patch will reuse fib6_age_exceptions().
-> 
-> Fixes: cfe82469a00f ("ipv6: add exception routes to GC list in rt6_insert_exception")
+> Fixes: 5eb902b8e719 ("net/ipv6: Remove expired routes with a separated list of routes.")
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> Reviewed-by: Xin Long <lucien.xin@gmail.com>
 > ---
->  net/ipv6/ip6_fib.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
+> v6: Call fib6_age_exceptions() under RCU
+> v4: s/,/;/ for fib6_gc_args initialisation
+> v3: Use IS_ENABLED()
+> v2: Fix build failure when CONFIG_IPV6=n (no net->ipv6 definition)
+> 
+> squash
+> ---
+>  include/net/ip6_fib.h | 21 ++++++++++++++++++++-
+>  net/ipv6/addrconf.c   |  4 ++--
+>  net/ipv6/ip6_fib.c    |  6 +++---
+>  net/ipv6/route.c      |  2 +-
+>  4 files changed, 26 insertions(+), 7 deletions(-)
 > 
 
 Reviewed-by: David Ahern <dsahern@kernel.org>
