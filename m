@@ -1,301 +1,195 @@
-Return-Path: <netdev+bounces-270324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270323-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6rKBCxZIwGlHFgQAu9opvQ
-	(envelope-from <netdev+bounces-270324-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 20:50:46 +0100
+	id UNGRH45HwGk5FgQAu9opvQ
+	(envelope-from <netdev+bounces-270323-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 20:48:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA5C52EA8CC
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 20:50:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26DB92EA8B5
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 20:48:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F9DC30097F2
-	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 19:50:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 529133009B27
+	for <lists+netdev@lfdr.de>; Sun, 22 Mar 2026 19:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC47F2C11FD;
-	Sun, 22 Mar 2026 19:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B7637C0E5;
+	Sun, 22 Mar 2026 19:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=3e8.eu header.i=@3e8.eu header.b="EyWK/CKU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IJynRHho"
 X-Original-To: netdev@vger.kernel.org
-Received: from srv5.3e8.eu (srv5.3e8.eu [94.16.113.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C53347C6;
-	Sun, 22 Mar 2026 19:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.16.113.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801011A6815;
+	Sun, 22 Mar 2026 19:48:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774209033; cv=none; b=PMujBrv55idTJ+ZB/u6XZRLT9tBZn0yvHYuYn0qT2BP0x8RJ4vdptfW3CUYiEAarKnoUWf4UcPcK52i3tk0/S4XyY3IHC/SJCwlk+L+DRrY4eUO5dt8mR8FdYUGwNHjgZXFzLDiZg2HgFKnTp5FEw4JeSvk8YV678BDpyEO9tDU=
+	t=1774208905; cv=none; b=Ee+q1JzziceDlP/gpB7e6pJ0fvDfGYuljdv94Fnze4hqSSkzdZrcTKLaVdZpPICEFBAG/e6jY4jYXr2An2YQbf5u7ac32N2tQCSnfUCl9vlhPPrDXlaDlJcTfElBi1m1aK9b2vtp9DBbF9KXdsihpPzT3/tt+ofiOoyLl9MS6So=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774209033; c=relaxed/simple;
-	bh=W9C0qlrJGp9djhtkjoUhYm6oMOMjMoqu2nZXDEg0B48=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qT1U4J9VPvN3Ojb/zbRdSWHqHSUx4TRINlYq5TWLR8Rmq/f2Ky1RW8UToE+70j1EzzBevc3ftCy/BEH5CDpAfbskPrF0A17FJRYEfcihEIQSd/O8eHCga4FRWvR6nFxpaW7ceAqXLR5giKF6Gn86+/jSAaj+nbQCZfixNCma+So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=3e8.eu; spf=pass smtp.mailfrom=3e8.eu; dkim=pass (2048-bit key) header.d=3e8.eu header.i=@3e8.eu header.b=EyWK/CKU; arc=none smtp.client-ip=94.16.113.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=3e8.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=3e8.eu
-Received: from jan-pc (p200300ed4701bfa09bcb9dcee3f7b116.dip0.t-ipconnect.de [IPv6:2003:ed:4701:bfa0:9bcb:9dce:e3f7:b116])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by srv5.3e8.eu (Postfix) with ESMTPSA id A2FFD1201AC;
-	Sun, 22 Mar 2026 20:41:23 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=3e8.eu; s=mail20211217;
-	t=1774208484;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=AV2t4ITXWHmUYda9AW/1gVAkFIdm28lD0ire5XJWbgo=;
-	b=EyWK/CKU+F052vOhlWRwyJ6+8ihIwzf+XP7W/sx5K4UXlXks6VWPTJJfN5S5/M8ALsml0y
-	Nn5yiuC8T+r528W7m4RSCsQ0PdXHXPEoPtoGspicLr4Dkbx0NMe25NnUUkwWYC087ckK7J
-	QyDcMrIDrjffTY24ip9zRBUAYujsuQnnnVR8VMdbKLwFhgcPVUvg5WeSM7Llkp0Qe9nib7
-	PaNbIiOm8GVfJg/5/S9Xl9EbCTY0c++Ss2mQOU8/9fUeEG/+cfV5ILeuzJnGuLK0TPNsmU
-	YcHqx2MSWXm+JFJoL67ypN/9xcQgpVspys4xVQ4Sr3l3mhG0v3yVionldjrjrA==
-From: Jan Hoffmann <jan@3e8.eu>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Markus Stockhausen <markus.stockhausen@gmx.de>,
-	Damien Dejean <dam.dejean@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jan Hoffmann <jan@3e8.eu>
-Subject: [PATCH net-next] net: phy: realtek: support MDI swapping for RTL8226-CG
-Date: Sun, 22 Mar 2026 20:31:12 +0100
-Message-ID: <20260322193235.990881-1-jan@3e8.eu>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1774208905; c=relaxed/simple;
+	bh=hsLkvAUgRxRQJzXQcQZokLRvOtZGiaYVCTbdJvhfGkM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YLXZHPC/r4ckggNcfL50oLQ+Ea0SiEXbiRWFL8DDhD/7Io3OC3pJ2q2/+Pq5GSoRB6GuL9UHlKx5GzakU0egEGMDhemPFL0ENbE6WHKMpcUNET6U1bK5AmUrkxxL9JpWxRYHHCRPmeoYjU3tXTkxTrw/0/j2uVtUT+ROWCrbCcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IJynRHho; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4414DC19424;
+	Sun, 22 Mar 2026 19:48:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774208905;
+	bh=hsLkvAUgRxRQJzXQcQZokLRvOtZGiaYVCTbdJvhfGkM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IJynRHho/9IV0v/RSzh7fxYdgT/lyOvO3O8QsZQmVmjayvPkC4t+NWUbhTJMHWtVm
+	 IfV613+T/NebAdRZJ09PoBNevgB5muW+4n96gDcNPz9QnFtBJW8i5nGS+bKE6tmGBl
+	 iCBHEdU+88gW5SaIbvekm+ZEASVCxpyJvdr8cyxwbPx2oPmTJgu424vC6vjj/h9hDh
+	 n+su0sSp8AaHG2PU1Jw7kNOACjH8uxm0DVJpoNZG4o6eHL+CFxLoIDIWAdlASD2bMv
+	 XlSsTiPqojypo+A/U+37yGwkDfeY2yuW8pG+5IMLL/p7WLhFAs0UFU/tzig2wFY/XP
+	 U0Kt/yn9WVFFA==
+Message-ID: <eb316800-0be6-4aa7-b9f6-e2b17646d1a0@kernel.org>
+Date: Sun, 22 Mar 2026 20:48:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.54 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH QUESTION 0/2] NFC support in Linux (and support for
+ Qualcomm SDM845 devices)
+To: david@ixit.cz, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
+Cc: Petr Hodina <petr.hodina@protonmail.com>,
+ biemster <l.j.beemster@gmail.com>, netdev@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, oe-linux-nfc@lists.linux.dev,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ phone-devel@vger.kernel.org
+References: <20260322-oneplus-nfc-v1-0-5f22f544f0e2@ixit.cz>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20260322-oneplus-nfc-v1-0-5f22f544f0e2@ixit.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-270323-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-270324-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,makrotopia.org,gmx.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[protonmail.com,gmail.com,vger.kernel.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[jan@3e8.eu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.373];
-	DMARC_DNSFAIL(0.00)[3e8.eu : query timed out];
-	DKIM_TRACE(0.00)[3e8.eu:?];
-	R_DKIM_TEMPFAIL(0.00)[3e8.eu:s=mail20211217];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CA5C52EA8CC
+X-Rspamd-Queue-Id: 26DB92EA8B5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add support for configuring swapping of MDI pairs (ABCD->DCBA) when the
-property "enet-phy-pair-order" is specified.
+On 22/03/2026 15:24, David Heidelberg via B4 Relay wrote:
+> There isn't upstream driver.
+> 
+> I'm openining this as a starter. We need a NFC drivers I assume. I tried
+> quick check, but both of NFC drivers register
+> 
+> nfc: nfc_init: NFC Core ver 0.1
+> NET: Registered PF_NFC protocol family
+> 
+> but efficiently does nothing. In the See section, there are some ways
+> how to make NFC work, but rely on patched vendor libs, missing updates
+> etc.
+> 
+> 1. What hardware is present on Snapdragon 845, is there some
+>    documentation? It seems that both sdm845 devices has almost identical
+>    setup, thus it's NFC solution integrated? @Qualcomm
+> 
+> 2. What's the right approach to continue? Should we upstream these
+>    definitions and then start developing user-space stack? @netdev (I
+>    see orphaned)
 
-Unfortunately, no documentation about this feature is available, so the
-configuration involves magic values. As it is unknown whether the
-patching step can be safely reversed, only enabling MDI swapping is
-supported.
+User space stack is there already.
 
-Some other Realtek PHYs also support similar mechanisms:
+> 
+> Since looking at NFC mailing list (oe-linux-nfc) and seeing it's pretty
+> much dead, would be cool to revive it.
+> 
+> Also there is some effort from Arch people [1], but likely without clean
+> path to mainline.
+> 
+> Can we revieve the NFC effort? I'm offering limited maintanance (in case
+> people would send patches).
+> 
+> See:
+>  - https://gitlab.com/sdm845-mainline/linux/-/merge_requests/62
+>  - https://github.com/NXPNFCLinux/linux_libnfc-nci/
 
-- RTL8221B-VB-CG allows to configure MDI swapping via the same register,
-  but does not need the additional patching step. However, it is unclear
-  whether a driver implementation for that PHY is necessary, as it is
-  known to support configuration via strapping pins (which is working
-  fine at least in Zyxel XGS1210-12 rev B1).
+I don't know which interface libnfc-nci is using. There are multiple NFC
+stack implementations in general, but the one using kernel interface is
+neard.
 
-- The patching step seems to match the one for the integrated PHYs of
-  some Realtek PCIe/USB NICs (see for example the r8152 driver).
+You will not get another stack, but taking care of Linux nfc and neard
+would be appreciated.
 
-For now, only implement this for the RTL8226-CG PHY, where it is needed
-for the switches Zyxel XGS1010-12 rev A1 and XGS1210-12 rev A1.
+Let me release a new version for it.
 
-Signed-off-by: Jan Hoffmann <jan@3e8.eu>
----
- drivers/net/phy/realtek/realtek_main.c | 142 ++++++++++++++++++++++++-
- 1 file changed, 141 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 023e47ad605b..2472f54502bd 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -1447,6 +1447,146 @@ static unsigned int rtl822x_inband_caps(struct phy_device *phydev,
- 	}
- }
- 
-+static int rtl8226_set_mdi_swap(struct phy_device *phydev, bool swap_enable)
-+{
-+	u16 val = swap_enable ? BIT(5) : 0;
-+
-+	return phy_modify_mmd(phydev, MDIO_MMD_VEND1, 0x6a21, BIT(5), val);
-+}
-+
-+static int rtl8226_patch_mdi_swap(struct phy_device *phydev)
-+{
-+	u16 values[4];
-+	int ret;
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, 0xd068);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (!(ret & BIT(1))) {
-+		/* already swapped */
-+		return 0;
-+	}
-+
-+	ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, 0xd068, 0x7, 0x1);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* swap adccal_offset */
-+
-+	for (int i = 0; i < 4; i++) {
-+		ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, 0xd068, 0x3 << 3, i << 3);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, 0xd06a);
-+		if (ret < 0)
-+			return ret;
-+
-+		values[i] = ret;
-+	}
-+
-+	for (int i = 0; i < 4; i++) {
-+		ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, 0xd068, 0x3 << 3, i << 3);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, 0xd06a, values[3 - i]);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	/* swap rg_lpf_cap_xg */
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, 0xbd5a);
-+	if (ret < 0)
-+		return ret;
-+
-+	values[0] = ret & 0x1f;
-+	values[1] = (ret >> 8) & 0x1f;
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, 0xbd5c);
-+	if (ret < 0)
-+		return ret;
-+
-+	values[2] = ret & 0x1f;
-+	values[3] = (ret >> 8) & 0x1f;
-+
-+	ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, 0xbd5a, 0x1f1f,
-+			     values[3] | (values[2] << 8));
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, 0xbd5c, 0x1f1f,
-+			     values[1] | (values[0] << 8));
-+	if (ret < 0)
-+		return ret;
-+
-+	/* swap rg_lpf_cap */
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, 0xbc18);
-+	if (ret < 0)
-+		return ret;
-+
-+	values[0] = ret & 0x1f;
-+	values[1] = (ret >> 8) & 0x1f;
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, 0xbc1a);
-+	if (ret < 0)
-+		return ret;
-+
-+	values[2] = ret & 0x1f;
-+	values[3] = (ret >> 8) & 0x1f;
-+
-+	ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, 0xbc18, 0x1f1f,
-+			     values[3] | (values[2] << 8));
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, 0xbc1a, 0x1f1f,
-+			     values[1] | (values[0] << 8));
-+	if (ret < 0)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+static int rtl8226_config_mdi_order(struct phy_device *phydev)
-+{
-+	u32 order;
-+	int ret;
-+
-+	ret = of_property_read_u32(phydev->mdio.dev.of_node, "enet-phy-pair-order", &order);
-+
-+	/* Property not present, nothing to do */
-+	if (ret == -EINVAL || ret == -ENOSYS)
-+		return 0;
-+
-+	if (ret)
-+		return ret;
-+
-+	/* Only enabling MDI swapping is supported */
-+	if (order != 1)
-+		return -EINVAL;
-+
-+	ret = rtl8226_set_mdi_swap(phydev, true);
-+	if (ret)
-+		return ret;
-+
-+	return rtl8226_patch_mdi_swap(phydev);
-+}
-+
-+static int rtl8226_config_init(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = rtl8226_config_mdi_order(phydev);
-+	if (ret)
-+		return ret;
-+
-+	return rtl822x_config_init(phydev);
-+}
-+
- static int rtl822xb_get_rate_matching(struct phy_device *phydev,
- 				      phy_interface_t iface)
- {
-@@ -2384,7 +2524,7 @@ static struct phy_driver realtek_drvs[] = {
- 		.soft_reset	= rtl822x_c45_soft_reset,
- 		.get_features	= rtl822x_c45_get_features,
- 		.config_aneg	= rtl822x_c45_config_aneg,
--		.config_init	= rtl822x_config_init,
-+		.config_init	= rtl8226_config_init,
- 		.inband_caps	= rtl822x_inband_caps,
- 		.config_inband	= rtl822x_config_inband,
- 		.read_status	= rtl822xb_c45_read_status,
--- 
-2.53.0
-
+Best regards,
+Krzysztof
 
