@@ -1,198 +1,178 @@
-Return-Path: <netdev+bounces-270794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270795-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QD/mOqvDwWkHWQQAu9opvQ
-	(envelope-from <netdev+bounces-270794-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:50:19 +0100
+	id YAjKMTHDwWkHWQQAu9opvQ
+	(envelope-from <netdev+bounces-270795-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:48:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F99C2FE874
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:50:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF9242FE809
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:48:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7C0830D9A57
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:45:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EC6AD30116AF
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFBFA3806C8;
-	Mon, 23 Mar 2026 22:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19FB6345729;
+	Mon, 23 Mar 2026 22:48:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eNt48Foh"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="vBqhYo/+";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="vN9zCqiM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732E8383C60;
-	Mon, 23 Mar 2026 22:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D3A29BDBB
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 22:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774305925; cv=none; b=G0YkJC/VUmxU07UXQqDSrHJlrJ8kNhbAgjNomp+ASHdA4IhjjKgETGJfSfLCWZmtYiJMZbUU0+xMYOHTTVFoQNarUDNPQjVbxaFAl7iBshz08LevvTLKS6EjNZBjQaP1Aw3tu/rdFh7qjyhWpv7u6ghLL+PxFG4KnH9konprRrs=
+	t=1774306091; cv=none; b=usXw7VxccbPCMOrqPCfKsNPu1/TJJ6tVpp4AJbzeZKszJEL9ABgM8CV/0AxKj6eDQMTSJxCl/9eIHHOuS6W7+9kSoIlW4xGrqS3/FDstWz1SxlQt9Y0MVuxiEmLRz+n4GYoWAcW0bXVxAbIME38/IQ2C2DbmPHXUAypi5rV/o/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774305925; c=relaxed/simple;
-	bh=/4U+DFZaun0U2N53e9WcUbM+CfTDtWxXba3EGX9WYho=;
+	s=arc-20240116; t=1774306091; c=relaxed/simple;
+	bh=RLO6AJNyX9XJAF0DBbn/Uhcvy5YavrF7k5CQc+hxjUw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W86HP/fgCMF+kQ0J8u/kfj15w1gvkgJRhWq7KMmW9FsabmwTiUSziFcah/iRtRBFKbZ1T7CBifXzw4yXCUTt27NUJovtHE121LmxkFIt2S6gUyBhOyL5ZxvAFA80PczU8UhbDC8MBJKIMi2VEsEsT+AKaFSwFMHve+xrU7VzAk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eNt48Foh; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774305924; x=1805841924;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/4U+DFZaun0U2N53e9WcUbM+CfTDtWxXba3EGX9WYho=;
-  b=eNt48FohUSxbDMUryFkoHmfE2HAlZkxUNNjgSK9bdnX3W28lJqJ2e/eH
-   Gp89JxjBauHQ9NdCoH0XUh7+u/2/7vV8kd00nMR6UrzikKOm4CBEpgGxP
-   pDh79NpnnFsMG/jwBAClhjtCLcKu8YvBB/QFmagCHr53JbCKeIhBRFT2f
-   ctSmm5cf54oU3DrNiwxqhF0J+pr4SGCDiw1LbAM2UH1w77Cgokx3qqfeS
-   V/NRs7dHtTw4tKu5cP57EbG85jyKpr0rSybQmhKwPgaYhQwz/EvooDdAG
-   hdzFSESwiSG/NMW2k1zqpPGbA4eRnyqEXm9EMIc0N8P06nEPUXR0q0VZw
-   w==;
-X-CSE-ConnectionGUID: ouUa9bfXTFmpCsr+Ue8W6Q==
-X-CSE-MsgGUID: DhGU+LwRRxO7Rm5zQMXxBQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11738"; a="86685062"
-X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="86685062"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2026 15:45:23 -0700
-X-CSE-ConnectionGUID: SwX5nIW0Tzan2DLFVEoosA==
-X-CSE-MsgGUID: ILsyuvz8T9SoqJKqlQl9Ug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="262083210"
-Received: from lkp-server01.sh.intel.com (HELO 3905d212be1b) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 23 Mar 2026 15:45:20 -0700
-Received: from kbuild by 3905d212be1b with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w4o1M-000000003LU-13Qd;
-	Mon, 23 Mar 2026 22:45:16 +0000
-Date: Tue, 24 Mar 2026 06:44:20 +0800
-From: kernel test robot <lkp@intel.com>
-To: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Simon Horman <horms@kernel.org>, apparmor@lists.ubuntu.com,
-	stable@kernel.org
-Subject: Re: [PATCH net v2 04/10] list: Move on_list_rcu() to list.h and add
- on_list() also
-Message-ID: <202603240630.eCfHPMhL-lkp@intel.com>
-References: <20260323150505.3513839-5-dhowells@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fFHzxlIo5eF+41ocbRgkb8r8ilWoXsoTPZGyxg9u/lVTTEVNkMqnxhPEIIw/rcWggvTdH6BTrQpYtQMcw4LcVrEZk/5JrN22WKnmhRaS9LO6NYaNdo2zGWy/i0SNeqFgFkd43wR6XYu3FOWd2EgS1YWZMpTAY5bSbUseVUSfCBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=vBqhYo/+; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=vN9zCqiM; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.phl.internal (Postfix) with ESMTP id 5991FEC01AD;
+	Mon, 23 Mar 2026 18:48:07 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Mon, 23 Mar 2026 18:48:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1774306087; x=
+	1774392487; bh=2yCnX6k580YaFLlM7722Ft5nCmkBkVP/WzIu2z0gYWs=; b=v
+	BqhYo/+0aQgvb3d+U9Ofn/o1NMRn5qcOEZpF9FN2UmlYRrei1O7aQwaXEo+GQY1y
+	IQmPOPb7BmZnVt4YScDKALH9J1GrDp2hELauWtjvUr56SPBcDa3878KE3JZTEjUG
+	4anvnrAVybe095RlJtsul6NDFn4FHx0kxmLY0tHSltMT0nil/pSn24bQpwzQuCo4
+	N9bvjNmSU/3HiyOybtAbyja87LWNbx9o0uBqDzObGdPYCB+ZuaWIbir4IIuX5LTz
+	AhN3cTjab6nZa1eGJYqpUeOYe2w2Pov474QouxBtFBn8DdrzIcVglsw7kMQ/fW+v
+	gCRZ7SNhZSNIEWKkxau0w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1774306087; x=1774392487; bh=2yCnX6k580YaFLlM7722Ft5nCmkBkVP/WzI
+	u2z0gYWs=; b=vN9zCqiMGxRmr0WXy7NjhkwfMAdJ7fQsuH6UCyBhKCgfUKJyGTs
+	v0SDGcgWQzFXmLyDk02Tevl2ZhB5eV0ozZNVldgTnukrNEZKRTlAwp63lZ3ZVr73
+	291pPx7pkgixkoAOPKF72rTYsoiw5VvC7ctYAauktvhIxloaDjqLcW8pJZS6ftle
+	INAMDJWmjPWI1H1lsSZS2s1J0AbUvmq/smmhxQWKQbEj6DR24YmBXeIp85yXwlV1
+	R/hD+jcu2G38UgD7krVX/2mgbq1LYv8MVFWmIfmeOhpUaDH1QZGVsdstcQ6kUOSP
+	fxXg5D3Rt0ctr/PmNYnrsQCDDpVwVaelT6w==
+X-ME-Sender: <xms:J8PBabn_Fsd-yQHRnAJU9X1KoCcndmXU6Fss97H0Ge_Va4rkBv_zkA>
+    <xme:J8PBafiFxiluk2RbvqtYmuVaD5d2Bqwaj1nak0ib9RWf15cItyX7DBeqJWVPTI-2K
+    _i_84uNfexpHETT5Ek5ljyXWG2_CAmqrOF_hh_nQHdY6FOW_hF9_qY>
+X-ME-Received: <xmr:J8PBaf2uOP4S7o4rjoaquD-lElHVeSRz7Q2K1IyH1e9jHVlWgbY_HnfwXQYO>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefudelleehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeejpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopegtvghlsehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthho
+    pehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrh
+    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhgvrhhnvghlqdhtlhhsqdhhrghnughs
+    hhgrkhgvsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheptghhuhgtkhdrlh
+    gvvhgvrhesohhrrggtlhgvrdgtohhmpdhrtghpthhtohephhgrrhgvsehsuhhsvgdruggv
+X-ME-Proxy: <xmx:J8PBaYIv4zQDRQvK7BhyOZdY_fRQF0J4rfeYfAt5RKPcGZhrKXm6OA>
+    <xmx:J8PBafxhHJ1Oin78Xh52CfMUBBiimBCaQi1akr-MrWFrGV0LiQ_khA>
+    <xmx:J8PBaWUb188BmZjoS75Fsf5ZAAPpna8br6buHBXptgNRncnNtKDgmg>
+    <xmx:J8PBafgl3CvCOmkqRWLhuNuOBZtwRlOydmLF2uTJkbCOhYa1Z2NlCA>
+    <xmx:J8PBaev7Sb85V-FVyHd8nvVrR8B9sVuTDyKDfUG8wDXentAEiR5qzVzR>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 23 Mar 2026 18:48:06 -0400 (EDT)
+Date: Mon, 23 Mar 2026 23:48:04 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Chuck Lever <cel@kernel.org>
+Cc: john.fastabend@gmail.com, Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH PATCH net-next v4 8/8] tls: Enable batch async decryption
+ in read_sock
+Message-ID: <acHDJNNqZlFIm84n@krikkit>
+References: <20260317-tls-read-sock-v4-0-ab1086ec600f@oracle.com>
+ <20260317-tls-read-sock-v4-8-ab1086ec600f@oracle.com>
+ <0cf288bb-6ab1-4f2b-8a7f-727b3e1fe0d2@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260323150505.3513839-5-dhowells@redhat.com>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+In-Reply-To: <0cf288bb-6ab1-4f2b-8a7f-727b3e1fe0d2@app.fastmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270794-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270795-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,lists.linux.dev,oracle.com,suse.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: 4F99C2FE874
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,oracle.com:email,queasysnail.net:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CF9242FE809
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi David,
+2026-03-23, 17:28:27 -0400, Chuck Lever wrote:
+> 
+> On Tue, Mar 17, 2026, at 11:04 AM, Chuck Lever wrote:
+> > From: Chuck Lever <chuck.lever@oracle.com>
+> >
+> > tls_sw_read_sock() decrypts one TLS record at a time, blocking until
+> > each AEAD operation completes before proceeding. Hardware async
+> > crypto engines depend on pipelining multiple operations to achieve
+> > full throughput, and the one-at-a-time model prevents that. Kernel
+> > consumers such as NVMe-TCP and NFSD (when using TLS) are therefore
+> > unable to benefit from hardware offload.
+> >
+> > When ctx->async_capable is true, the submit phase now loops up to
+> > TLS_READ_SOCK_BATCH (16) records.
+> 
+> It appears that async_capable is always false for TLSv1.3. Since
+> TLSv1.3 is a hard requirement for both NVMe/TCP and RPC-with-TLS,
+> patch 8/8 is moot for us. For the moment, I'm going to drop this
+> one from the series.
 
-kernel test robot noticed the following build errors:
+Then 7/8 is also not useful, and the series boils down to a few small
+improvements (tls_decrypt_async_drain, spurious wakeups, checking the
+backlog), which are not limited to read_sock. [nothing wrong with
+that, it's just a different focus from what you started with]
 
-[auto build test ERROR on net/main]
+> Once Alistair's KeyUpdate work is merged, we can revisit.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/David-Howells/rxrpc-Fix-key-quota-calculation-for-multitoken-keys/20260323-234846
-base:   net/main
-patch link:    https://lore.kernel.org/r/20260323150505.3513839-5-dhowells%40redhat.com
-patch subject: [PATCH net v2 04/10] list: Move on_list_rcu() to list.h and add on_list() also
-config: arm-randconfig-004-20260324 (https://download.01.org/0day-ci/archive/20260324/202603240630.eCfHPMhL-lkp@intel.com/config)
-compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project 054e11d1a17e5ba88bb1a8ef32fad3346e80b186)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260324/202603240630.eCfHPMhL-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603240630.eCfHPMhL-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/usb/dwc2/gadget.c:4313:13: error: conflicting types for 'on_list'
-    4313 | static bool on_list(struct dwc2_hsotg_ep *ep, struct dwc2_hsotg_req *test)
-         |             ^
-   include/linux/list.h:392:20: note: previous definition is here
-     392 | static inline bool on_list(const struct list_head *entry)
-         |                    ^
->> drivers/usb/dwc2/gadget.c:4341:22: error: too many arguments to function call, expected single argument 'entry', have 2 arguments
-    4341 |         if (!on_list(hs_ep, hs_req)) {
-         |              ~~~~~~~        ^~~~~~
-   include/linux/list.h:392:20: note: 'on_list' declared here
-     392 | static inline bool on_list(const struct list_head *entry)
-         |                    ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   2 errors generated.
-
-
-vim +/entry +4341 drivers/usb/dwc2/gadget.c
-
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4324  
-8b9bc4608eefeb drivers/usb/gadget/s3c-hsotg.c Lukasz Majewski    2012-05-04  4325  /**
-1f91b4cc03556b drivers/usb/dwc2/gadget.c      Felipe Balbi       2015-08-06  4326   * dwc2_hsotg_ep_dequeue - dequeue given endpoint
-8b9bc4608eefeb drivers/usb/gadget/s3c-hsotg.c Lukasz Majewski    2012-05-04  4327   * @ep: The endpoint to dequeue.
-8b9bc4608eefeb drivers/usb/gadget/s3c-hsotg.c Lukasz Majewski    2012-05-04  4328   * @req: The request to be removed from a queue.
-8b9bc4608eefeb drivers/usb/gadget/s3c-hsotg.c Lukasz Majewski    2012-05-04  4329   */
-1f91b4cc03556b drivers/usb/dwc2/gadget.c      Felipe Balbi       2015-08-06  4330  static int dwc2_hsotg_ep_dequeue(struct usb_ep *ep, struct usb_request *req)
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4331  {
-1f91b4cc03556b drivers/usb/dwc2/gadget.c      Felipe Balbi       2015-08-06  4332  	struct dwc2_hsotg_req *hs_req = our_req(req);
-1f91b4cc03556b drivers/usb/dwc2/gadget.c      Felipe Balbi       2015-08-06  4333  	struct dwc2_hsotg_ep *hs_ep = our_ep(ep);
-941fcce4ff6701 drivers/usb/dwc2/gadget.c      Dinh Nguyen        2014-11-11  4334  	struct dwc2_hsotg *hs = hs_ep->parent;
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4335  	unsigned long flags;
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4336  
-1e01129373f757 drivers/usb/dwc2/gadget.c      Marek Szyprowski   2014-09-09  4337  	dev_dbg(hs->dev, "ep_dequeue(%p,%p)\n", ep, req);
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4338  
-22258f4906aa87 drivers/usb/gadget/s3c-hsotg.c Lukasz Majewski    2012-06-14  4339  	spin_lock_irqsave(&hs->lock, flags);
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4340  
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02 @4341  	if (!on_list(hs_ep, hs_req)) {
-22258f4906aa87 drivers/usb/gadget/s3c-hsotg.c Lukasz Majewski    2012-06-14  4342  		spin_unlock_irqrestore(&hs->lock, flags);
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4343  		return -EINVAL;
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4344  	}
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4345  
-c524dd5f432a06 drivers/usb/dwc2/gadget.c      Mian Yousaf Kaukab 2015-09-29  4346  	/* Dequeue already started request */
-c524dd5f432a06 drivers/usb/dwc2/gadget.c      Mian Yousaf Kaukab 2015-09-29  4347  	if (req == &hs_ep->req->req)
-c524dd5f432a06 drivers/usb/dwc2/gadget.c      Mian Yousaf Kaukab 2015-09-29  4348  		dwc2_hsotg_ep_stop_xfr(hs, hs_ep);
-c524dd5f432a06 drivers/usb/dwc2/gadget.c      Mian Yousaf Kaukab 2015-09-29  4349  
-1f91b4cc03556b drivers/usb/dwc2/gadget.c      Felipe Balbi       2015-08-06  4350  	dwc2_hsotg_complete_request(hs, hs_ep, hs_req, -ECONNRESET);
-22258f4906aa87 drivers/usb/gadget/s3c-hsotg.c Lukasz Majewski    2012-06-14  4351  	spin_unlock_irqrestore(&hs->lock, flags);
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4352  
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4353  	return 0;
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4354  }
-5b7d70c6dbf2db drivers/usb/gadget/s3c-hsotg.c Ben Dooks          2009-06-02  4355  
+Are you planning to add support for async crypto with TLS1.3?
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Sabrina
 
