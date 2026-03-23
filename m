@@ -1,299 +1,188 @@
-Return-Path: <netdev+bounces-270599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270600-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MBoEL5x3wWkQTQQAu9opvQ
-	(envelope-from <netdev+bounces-270599-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 18:25:48 +0100
+	id iHscMCJqwWnVSwQAu9opvQ
+	(envelope-from <netdev+bounces-270600-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:28:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 439DF2F9E30
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 18:25:48 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8F992F8240
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:28:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 163D6333F612
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 15:52:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 02EE7302487D
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 15:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B973659F7;
-	Mon, 23 Mar 2026 15:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 403923B0ACC;
+	Mon, 23 Mar 2026 15:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JHYA9YIn";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="mWGWWEnT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k4GRK5pp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C627A25392A
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 15:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80BF388377
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 15:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774281160; cv=none; b=TzUKwwA6/qnt4UePEseIRYzDWBmW0rVpYDUiLXFuinbqCXsSKH9Hc+buflzbP9+Z/BsAbbokxXLUvHzRmAp5rWitMUFFPSaCAfDw57ddqTSZzux3LaViYlaQ7WYbW3Z7OH/l8D8xzNqdvgIPrikfqR3kjmJP5Yl6XaVrfM2xHL8=
+	t=1774281217; cv=none; b=FtB0A4Z5OevcSUPSEq/rBU5phA8SY2g+xY1xX/1fXvM6KP2vLx6tPsdr+zobb4ORneLqbEJzDduWO40Y4lBv1XXrruwS+6wSHLxjbb9P22HFMuxvp4J5ewI+oqQvGV1dwcuzzNfSsevP1xqw6pqPfTglDWnEQtTNBBtVe3dA6dI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774281160; c=relaxed/simple;
-	bh=Wwsnsa8I13/EF4kOLN75rRcu9F+2YoHsOAAnaEjJ+F4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MeNicAwdzxzNqwyZt6tCRlWfXFoGoPUf9G/u9qL961HvMj10CF5DVbVuwEJuumOZk/pwmFWuA0tvNwo4ccQzai3ikbCtEUQZUxvlWERhggSoh1nqyF3dy0NKVsvDbk9ZRLBkJbYmkxvHxLoc/JZcE1qhn1PcWhH+BNDS9d6IGgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JHYA9YIn; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=mWGWWEnT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774281157;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SRzimLRML1I9K6FsP40IwKIHIhW+1XMgF4uRnLLyEos=;
-	b=JHYA9YInZy0Gloxg6hyVkq8eUFMN++l8cdC5nOJhxjzsEayzZB6RvtMdI3iBPR7JwqA0vJ
-	4m5MloB/h8iZfkyftg6IttDbs7yldAigUTgsC2505vf/nLn4gPZAlRuqNDi2OH+xiDGbJq
-	oyPfl0euM1Ejj7byzlsmEvtL/WljvSA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-278-jYWE-FIhMVC3VMUIWCD9Lw-1; Mon, 23 Mar 2026 11:52:36 -0400
-X-MC-Unique: jYWE-FIhMVC3VMUIWCD9Lw-1
-X-Mimecast-MFC-AGG-ID: jYWE-FIhMVC3VMUIWCD9Lw_1774281155
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-486fa07f2bbso16331805e9.2
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 08:52:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774281155; x=1774885955; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=SRzimLRML1I9K6FsP40IwKIHIhW+1XMgF4uRnLLyEos=;
-        b=mWGWWEnTkNt44dS5MGYMVIM7mYUE176EwGRiirdeLO13cyVhNEi55hQSYfYbv5uVt/
-         F1ZKxeoBRQsVZLx8HXLMwBeitBmrkvencA0Nhf5PTX2/LFKDVuNQgoKcZEfFvHqSSEv2
-         QhpRey56ZVvaDoUcgqTn07KFnv2hLXCM000Z+r79K+tUvOcGGxp+nVP9/2tNi52fkzLr
-         STjXH7IIO+GRp37Jn12AaOpAzbR50wJmcM+orsUJYs1PML/PtLnhRwaYyeBMkLEWHRE0
-         NwozIoLarkl7ZwrJuzLgrzQ/hDu4DwchI/A4hWB3s9CrgBINcWAiE/S4SkQHVgKi9TsO
-         zUGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774281155; x=1774885955;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SRzimLRML1I9K6FsP40IwKIHIhW+1XMgF4uRnLLyEos=;
-        b=rUOPIB8+nLrVSnu9OiQxKladXfEIpWkZTo/q/anCyeNZWAb67kdWPc6daHu6aAAMYm
-         FW1x1nQ9pfPfbpfC2OpbhAeYwDCWa60PwgtfOjjtqqXOySFK3+lrhVcU/HrJHKa/glnS
-         f8GwGXdkOWS3ZyPJJKsJzcizmyQG/XVIIx0h6m74jGFpM/j/4OHWx4CAcoG/ED5GO4ry
-         GAgYHkxDjBlhwjSA9lur2uOSL+2skZamAN258WXOO5DLTwuIv332NC9kfV0a5Y58fmt4
-         umoAuu+z8RwabbEBKFcmBeoCcdG8mtvWGpkuGCyTcT+QUl4NlcTE+twIWFgBR0kxLBcB
-         4wBA==
-X-Forwarded-Encrypted: i=1; AJvYcCUIjvNVrtA7wiNHozx3Z8SFOHHmKGl8ufB38ThnQQ0yKxysQoCC5CMN0K51p5y2U9Mxy0SrTDU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXJEtawTmQIKH3LeSAbS2glb9aWVN/5rxCzzzTnCTtOHGJTxxd
-	18+C7nwTZCS58SRIzF04qru7dSY02bz5OZla3sqp4/C5+YJqWHdqZ3xtLo6syM9IbLqxcLM3xxB
-	bDPqVjVFOcLUp2VUhgVCKMgB5PeBHcOu18rf/5hjsqSGo2enTinDJanYgzg==
-X-Gm-Gg: ATEYQzwK5QPNQfIZwxSyhys2rojBkcaMFiWT06172tvTdPeTSzB7egSdQpumWIwgzWK
-	e/QTMIfn6C1+kiGY2AbrTb4WL+DOlu5gkx8t3ZBiIfmBnO7xUgSh1ph3S5uiUCED38H/PJCfNs1
-	WL4n4EfDQyAqHp5NfFpa8mfiQGCGEK1pNrlmTsKNWG4SqJrnBSrkccJ34RacRIrgWgqby8MenHm
-	3lRVYmFVSB1EjGotl3noQbYyl6tI+MiZMl735ihowGGsfZJHq70SjWJeojYA3f1rqhS1ZlF7PT/
-	6FbmlhqcemYRQzWULDe8xt38SCoKo2+xbxpzFHrOjhL3XTPy+8gWjr4XQweFXHkSXnHcoJ2T16K
-	eO6SBoNQbcf8rCkYd
-X-Received: by 2002:a05:600c:4705:b0:485:3a86:6392 with SMTP id 5b1f17b1804b1-486fee0d816mr174481425e9.20.1774281154660;
-        Mon, 23 Mar 2026 08:52:34 -0700 (PDT)
-X-Received: by 2002:a05:600c:4705:b0:485:3a86:6392 with SMTP id 5b1f17b1804b1-486fee0d816mr174480905e9.20.1774281154074;
-        Mon, 23 Mar 2026 08:52:34 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1525:da00:3ac2:1a22:72ff:4256])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-487017210dcsm238594505e9.10.2026.03.23.08.52.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2026 08:52:33 -0700 (PDT)
-Date: Mon, 23 Mar 2026 11:52:30 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Omar Elghoul <oelghoul@linux.ibm.com>
-Cc: vishs@meta.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	dw@davidwei.uk, edumazet@google.com, eperezma@redhat.com,
-	ilias.apalodimas@linaro.org, jasowang@redhat.com,
-	kernel-team@meta.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com, technoboy85@gmail.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH net-next v11] virtio_net: add page_pool support for
- buffer allocation
-Message-ID: <20260323114313-mutt-send-email-mst@kernel.org>
-References: <20260310183107.2822016-1-vishs@meta.com>
- <20260323150136.14452-1-oelghoul@linux.ibm.com>
+	s=arc-20240116; t=1774281217; c=relaxed/simple;
+	bh=UMrez3UixCqOwCj/V0WduuhvRKIIALsXFhXMF9WaZcE=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=XdZlVqU8qu9FA1NGLB9kechhA461dNnV0RwCW/44h/wlpDk2FuifLnLPSPkxX6+Lye/M8It5/wUjwC35EuDzNdYdAJgJR0HGmzSaUq+BhxUFsGYwZeDnT50gj17i+3ee92bN5i8evPhYZykVEP/M3zpLgN5ekkE0jEgz+qlTzCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k4GRK5pp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 460B0C4AF0B;
+	Mon, 23 Mar 2026 15:53:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774281217;
+	bh=UMrez3UixCqOwCj/V0WduuhvRKIIALsXFhXMF9WaZcE=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=k4GRK5ppw+SkFVIoekpk/5KYRtlN2c8482sazkuwVsMM1f5aJYaPtWnMqbP6pyHFw
+	 AVMg55B4RSTgh5Iu88kNFjR5xEEL8gryBe2J0o0WweBzAA6SVmHNKiKvpe/7Frv3Pl
+	 SnE4kC+7FTLQUX7NvRxjxLoAH1Jlh7TLPU1jqHbNT+INkZROtbX4QHAZhTwU4Ny0gE
+	 YrQ+bvxybaMZMMn6PcTTKtRgrLK2DyCMYvU85J1R2BvPqv/4DMxo8dy8pxLgdEdLjA
+	 sWfxmDdcNnEXoCddFcrodQqNlNlja2lqGhfV+jyXBDD0u1jP9CLgKB8AnxPQ9hYf3+
+	 Y2it8rwWK6NIA==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 3E114F40082;
+	Mon, 23 Mar 2026 11:53:36 -0400 (EDT)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Mon, 23 Mar 2026 11:53:36 -0400
+X-ME-Sender: <xms:AGLBaTIUDy74Bdg-ndT75luRvsnzhtFChZpuvk2IPaxzhkpbso6vdw>
+    <xme:AGLBaR9ZN_4LXoqN8BCOQlbypBAgQo5DuQxoXAYyjrtBNopVWbUTU1gBTK-VwZVTm
+    GRodCF63235gRJnGzkS0J2PFp_B6iH3jhpWEIC-A62I-QSUbBSHy1I>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefudeluddvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
+    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
+    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
+    hilhdrtghomhdpnhgspghrtghpthhtohepjedpmhhouggvpehsmhhtphhouhhtpdhrtghp
+    thhtohepjhhohhhnrdhfrghsthgrsggvnhgusehgmhgrihhlrdgtohhmpdhrtghpthhtoh
+    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkvghrnhgvlhdqthhlshdq
+    hhgrnhgushhhrghkvgeslhhishhtshdrlhhinhhugidruggvvhdprhgtphhtthhopegthh
+    hutghkrdhlvghvvghrsehorhgrtghlvgdrtghomhdprhgtphhtthhopehsugesqhhuvggr
+    shihshhnrghilhdrnhgvthdprhgtphhtthhopehhrghrvgesshhushgvrdguvgdprhgtph
+    htthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:AGLBaQyIkt0P_9Xg14RFc3GmuYXIuFWd7Bc-vYp5gM-cDY0T6rtgpg>
+    <xmx:AGLBaeUU_CL4ExfoLkMlDxry9bFFiqribOJJDEoGgYTr-02QFyBskA>
+    <xmx:AGLBaSP_EK3aDI7huAGpJ9cOcWgIZmng86ujxEP08PqOF-tCjbkuOQ>
+    <xmx:AGLBaQAPIxJnMo58zz3m_YfwYggQLis9WMuNVIFMLs2neGTiKpCpNA>
+    <xmx:AGLBafcg9J_gm9xmadbPVgnS8n7zR-4z0znmziy06LPpYCoQkS4d5NHn>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 15732780070; Mon, 23 Mar 2026 11:53:36 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260323150136.14452-1-oelghoul@linux.ibm.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-ThreadId: ARm2f9X8njS-
+Date: Mon, 23 Mar 2026 11:53:15 -0400
+From: "Chuck Lever" <cel@kernel.org>
+To: "Sabrina Dubroca" <sd@queasysnail.net>
+Cc: john.fastabend@gmail.com, "Jakub Kicinski" <kuba@kernel.org>,
+ netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev,
+ "Chuck Lever" <chuck.lever@oracle.com>, "Hannes Reinecke" <hare@suse.de>
+Message-Id: <72fb84f7-8d85-4a32-a3e0-f4aa77cf4de2@app.fastmail.com>
+In-Reply-To: <acFK4DWAD5h_Oc0f@krikkit>
+References: <20260317-tls-read-sock-v4-0-ab1086ec600f@oracle.com>
+ <20260317-tls-read-sock-v4-8-ab1086ec600f@oracle.com>
+ <acFK4DWAD5h_Oc0f@krikkit>
+Subject: Re: [PATCH PATCH net-next v4 8/8] tls: Enable batch async decryption in
+ read_sock
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.65 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270599-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[meta.com,lunn.ch,davemloft.net,davidwei.uk,google.com,redhat.com,linaro.org,kernel.org,vger.kernel.org,gmail.com,lists.linux.dev,linux.alibaba.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	XM_UA_NO_VERSION(0.01)[];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,lists.linux.dev,oracle.com,suse.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,app.fastmail.com:mid];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-270600-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.940];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 439DF2F9E30
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: C8F992F8240
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 23, 2026 at 11:01:31AM -0400, Omar Elghoul wrote:
-> Hi,
-> 
-> I've been testing linux-next (tags later than 03/17) and hit new issues in
-> virtio-net on s390x. I bisected the issue, and I found this patch to be the
-> first buggy commit.
-> 
-> The issue seems to only be reproducible when running in Secure Execution.
-> Tested in a KVM guest, the virtio-net performance appears greatly reduced,
-> and the dmesg output shows many instances of the following error messages.
-> 
-> Partial relevant logs
-> =====================
-> [   49.332028] macvtap0: bad gso: type: 0, size: 0, flags 1 tunnel 0 tnl csum 0
-> [   74.365668] macvtap0: bad gso: type: 2e, size: 27948, flags 0 tunnel 0 tnl csum 0
-> [  403.302168] macvtap0: bad csum: flags: 2, gso_type: 23 rx_tnl_csum 0
-> [  403.302271] macvtap0: bad csum: flags: 2, gso_type: e0 rx_tnl_csum 0
-> [  403.302279] macvtap0: bad csum: flags: 2, gso_type: e1 rx_tnl_csum 0
-> [  403.309492] macvtap0: bad csum: flags: 2, gso_type: 4c rx_tnl_csum 0
-> [  403.317029] macvtap0: bad csum: flags: 2, gso_type: e0 rx_tnl_csum 0
-> 
-> Steps to reproduce
-> ==================
-> 1. Boot a Linux guest implementing this patch under QEMU/KVM (*) with SE
->    enabled and a virtio-net-ccw device attached.
-> 2. Run dmesg. The error message is usually already present at boot time,
->    but if not, it can be reproduced by creating any network traffic.
-> 
-> (*) This patch was not tested in a non-KVM hypervisor environment.
-> 
-> I've further confirmed that reverting this patch onto its parent commit
-> resolves the issue. Please let me know if you'd like me to test a fix or if
-> you would need more information.
-> 
-> Thanks in advance.
-> 
-> Best,
-> Omar
 
-Well... I am not sure how I missed it. Obvious in hindsight:
+On Mon, Mar 23, 2026, at 10:14 AM, Sabrina Dubroca wrote:
+> 2026-03-17, 11:04:21 -0400, Chuck Lever wrote:
+>> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+>> index 5ae7e0c026e4437fe442c3a77b0a6d9623816ce1..bc500ba7ce81eb33763c37a8b73473c42dc66044 100644
+>> --- a/net/tls/tls_sw.c
+>> +++ b/net/tls/tls_sw.c
 
-static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
-                        void *buf, unsigned int len, void **ctx,
-                        unsigned int *xdp_xmit,
-                        struct virtnet_rq_stats *stats)
-{
-        struct net_device *dev = vi->dev;
-        struct sk_buff *skb;
-        u8 flags;
-                
-        if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
-                pr_debug("%s: short packet %i\n", dev->name, len);
-                DEV_STATS_INC(dev, rx_length_errors);
-                virtnet_rq_free_buf(vi, rq, buf);
-                return;
-        }
-        
-        /* About the flags below:
-         * 1. Save the flags early, as the XDP program might overwrite them.
-         * These flags ensure packets marked as VIRTIO_NET_HDR_F_DATA_VALID
-         * stay valid after XDP processing.
-         * 2. XDP doesn't work with partially checksummed packets (refer to
-         * virtnet_xdp_set()), so packets marked as
-         * VIRTIO_NET_HDR_F_NEEDS_CSUM get dropped during XDP processing.
-         */
-                
-        if (vi->mergeable_rx_bufs) {
-                flags = ((struct virtio_net_common_hdr *)buf)->hdr.flags;
-                skb = receive_mergeable(dev, vi, rq, buf, ctx, len, xdp_xmit,
-                                        stats);
-        } else if (vi->big_packets) {
-                void *p = page_address((struct page *)buf);
-                
-                flags = ((struct virtio_net_common_hdr *)p)->hdr.flags;
-                skb = receive_big(dev, vi, rq, buf, len, stats);
-        } else {
-                flags = ((struct virtio_net_common_hdr *)buf)->hdr.flags;
-                skb = receive_small(dev, vi, rq, buf, ctx, len, xdp_xmit, stats);
-        }       
+>> @@ -2373,25 +2387,61 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
+>>  	decrypted = 0;
+>>  	for (;;) {
+>>  		struct tls_decrypt_arg darg;
+>> +		int nr_async = 0;
+>>  
+>> -		/* Phase 1: Submit -- decrypt one record onto rx_list. */
+>> +		/* Phase 1: Submit -- decrypt records onto rx_list. */
+>>  		if (skb_queue_empty(&ctx->rx_list)) {
+>> -			err = tls_rx_rec_wait(sk, NULL, true, released);
+>> -			if (err <= 0)
+>> +			while (nr_async < TLS_READ_SOCK_BATCH) {
+>> +				if (nr_async == 0) {
+>> +					err = tls_rx_rec_wait(sk, NULL,
+>> +							      true,
+>> +							      released);
+>> +					if (err <= 0)
+>> +						goto read_sock_end;
+>> +				} else {
+>> +					if (!tls_strp_msg_ready(ctx)) {
+>> +						tls_strp_check_rcv_quiet(&ctx->strp);
+>> +						if (!tls_strp_msg_ready(ctx))
+>> +							break;
+>
+> This (and tls_rx_rec_wait) looks like tls_strp_check_rcv_quiet should
+> return the value of msg_ready.
+>
+> This is also not very different from tls_rx_rec_wait(nonblock=true),
+> why are you separating the nr_async>0 case and open-coding the core
+> operations from tls_rx_rec_wait()?
 
+tls_rx_rec_wait() is designed for the blocking first-record case
+with full error/shutdown handling. The batch loop needs a light-
+weight non-blocking poll with different semantics: "is another
+record already available? If not, stop." Reusing tls_rx_rec_wait()
+would require either adding more parameters to skip irrelevant
+checks, or having the caller distinguish -EAGAIN (no record) from
+real errors -- both of which would be more complex than the
+current code.
 
-So we are reading the header, before dma sync, which is within
-receive_mergeable and friends:
-
-static struct sk_buff *receive_mergeable(struct net_device *dev,
-                                         struct virtnet_info *vi,
-                                         struct receive_queue *rq,
-                                         void *buf,
-                                         void *ctx,
-                                         unsigned int len,
-                                         unsigned int *xdp_xmit,
-                                         struct virtnet_rq_stats *stats)
-{               
-        struct virtio_net_hdr_mrg_rxbuf *hdr = buf;
-        int num_buf = virtio16_to_cpu(vi->vdev, hdr->num_buffers);
-        struct page *page = virt_to_head_page(buf);
-        int offset = buf - page_address(page);
-        struct sk_buff *head_skb, *curr_skb;     
-        unsigned int truesize = mergeable_ctx_to_truesize(ctx);
-        unsigned int headroom = mergeable_ctx_to_headroom(ctx);
-                
-        head_skb = NULL;
-                
-        if (rq->use_page_pool_dma)
-                page_pool_dma_sync_for_cpu(rq->page_pool, page, offset, len);
-                
-
-
-Just as a test, the below should fix it (compiled only), but the real
-fix is more complex since we need to be careful to avoid expensive syncing
-twice.
-
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 97035b49bae7..57b4f5954bed 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -931,9 +931,19 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
- 
- static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
- {
-+	void *buf;
-+
- 	BUG_ON(!rq->page_pool);
- 
--	return virtqueue_get_buf_ctx(rq->vq, len, ctx);
-+	buf = virtqueue_get_buf_ctx(rq->vq, len, ctx);
-+	if (buf && rq->use_page_pool_dma && *len) {
-+		struct page *page = virt_to_head_page(buf);
-+		int offset = buf - page_address(page);
-+
-+		page_pool_dma_sync_for_cpu(rq->page_pool, page, offset, *len);
-+	}
-+
-+	return buf;
- }
- 
- static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
-
-
-
+My calculus was that the code duplication was a more readable
+choice than building a single complicated helper that would
+obfuscate the two flows.
 
 -- 
-MST
-
+Chuck Lever
 
