@@ -1,102 +1,75 @@
-Return-Path: <netdev+bounces-270703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270704-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uPCBNOiXwWkuUAQAu9opvQ
-	(envelope-from <netdev+bounces-270703-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:43:36 +0100
+	id QAo0LL2dwWmFUAQAu9opvQ
+	(envelope-from <netdev+bounces-270704-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:08:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73DF32FC82F
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:43:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 542E72FCE72
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:08:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8ECA83043D43
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:42:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 65F2D311DE0C
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1CA3CF048;
-	Mon, 23 Mar 2026 19:42:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0053DCDBB;
+	Mon, 23 Mar 2026 19:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mpuq/cLd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOD2+Fg/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A16A38837F
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 19:42:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C4834250E;
+	Mon, 23 Mar 2026 19:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774294925; cv=none; b=qSxNpHcLUxBBKMkvawE3jitZZxJooMbOEAevGq/YT6ekn2dvUMfw8/jfF4ClZQbcve4Sc5YGf4mLfvdwPz198dvdM3walXnsx+sSvHWOQHEkkYASmtZzduoQnJsdSrlzvzyaEBEItevZEGybBWT7zPZz0ceznc+3huhqMuVihoY=
+	t=1774295285; cv=none; b=o7sQuQmQAv1aqUIGELNcCifI466rxC9iOWjR45icFIMAxYDRDfqdd+Q6RolkXylU9N6DoshGPqO8evs07/nSE2llG4PpXeimfD+g+hcaHXAtwSS18zFRx8sotYEI5xhXHAuTJU4w28SstCrgAm8LhqJolEQU4lQInoOSgJHM62c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774294925; c=relaxed/simple;
-	bh=2SF6pvs2emzV/AhRbggyg1HdfzHcesbv4DvPDEr78n0=;
+	s=arc-20240116; t=1774295285; c=relaxed/simple;
+	bh=SHnio8tSnG8NWlOkobDBosLZL29iinvQCLbdljIlaRU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SqVCZ3c156QBOSEonxgRQ/RgNK31aD5lIgQiMVlo6FNqxOUCfDRLqKrahjFZDM7tEo/+0I6AenR1XuLxC7DPNcQyQtzepDQSc4o7Wbof8v/udJYMJ1CnaF9lOkbwWHr2TGuttVFVx0mekSe3JdIWBUIYVz1RXrlPspZ7xdroG9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mpuq/cLd; arc=none smtp.client-ip=74.125.82.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-1273349c56bso4329960c88.0
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 12:42:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774294924; x=1774899724; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YdMs/q66h1+QBJjH+XkkqQHaHRaGP3OKtdQi49odTsU=;
-        b=mpuq/cLda6pGx/tUb9lDgqEk1TmEAKbObTl2RQBeIQ7TfcopAZW6vT0jewqombymsa
-         ffggOe2XuFf6d+ef7o4qVGt+fx4IpCgBt2qkMgJOQCi+uczeYEF6rIesjdsKrEL3M5VN
-         CcYRglXwvZNqQZHopCW8GXfwLre3jBZ2qBrCP9NxR6MVZ0e4KhdAyK5d8fGJ+PYRrg10
-         D9RJFirOLY1Wh595juUGg0DnPynppjDk3nEcSuWQ+SN++zEEZoNuzRhxsDEAn9cMWXlJ
-         k5oSqN6udr9CgxHTJycW3gT0+cJeHTNiRaTAEiYb/tLjm2z6ObcvoWtWz1zkHGgHDNEl
-         zSxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774294924; x=1774899724;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YdMs/q66h1+QBJjH+XkkqQHaHRaGP3OKtdQi49odTsU=;
-        b=f0qQPfa4jpghV4aL75FDz1SsETvzk7RyAiA6u8GbXU4CW1jdQBBD9tU12TNZwf31zy
-         SUK3uZbs3Vy18hppbd61uwDwKK9mjAWugSsBN7mvwOW5C5oW5pdU7dwdXMIhrV6bjHbh
-         ucy8Hlp27E1eUKay38RtZgCJXIPMiQW+nlt09NZXP1BUrryhx8XvPelx8tO08j7JTixx
-         /4I0TJBoUSmD/Sbc0A8muZBZ1YQK5Klbt53omOHKbgHpCDvPXwqwF49/AsTwyLeZ1zip
-         iwFcU4S98iyJ4LVk1EHw36oxaM3dCl4/3LXOJgYYkA1DyEgokmGghimlkDq2Nto1A9L5
-         adLw==
-X-Forwarded-Encrypted: i=1; AJvYcCW3g2EMsGNOF1c5oZY4UnIFtWE5Ate1+ZS9hIZFKpPiL2Yw8/jwiPxZ372DlFiectT6wXEZa4Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDkLGE+U7MTukiI+r1odDLydJoIDHFiX+HgmIASbFASyWHC+Sk
-	NXpC9zLDbeMnsJyLKP2Oe5syHogv45QpoyaRKZ6etdFO/TWH8g4cUuLV
-X-Gm-Gg: ATEYQzzVtOI28j/RSHrTJ6s/HvSnhmaJQCe1VMuk1zPYEyiZmnby6/Wj5NJXx4l+W09
-	ESwhQJnHW8hlHChPyHPAPcFAcIxKaVHkmUOdlVbIXP3fd6KsTGPTncD7KvguL35tdpza9daYpvK
-	9BnWRwBDCq1cmklPdZS1uZNd8NeMm50vJUGzX7llBh++hTfUqVgoV7kVW0hG0krwt++4vkBsnj+
-	MIqmBY2XUIaX6LVtO2Uhu5uRL4AIGLBuh5AAMqFWq6vrdsScvdCC3T3zDjluTCDDHuU/HMSXncP
-	jsXH9SAjQ2kxH6hmTHi4hbp6tSp4BwcMF5UpyD9eA6Mi2juck18DHQdcFqDLFwavRjSo/uHwv+s
-	SutBrHhvrupIkhJoSiHj3YyqocqxmPHs6ri4STK9iF36sHyFIuOVp2LdiWPlu8YRdAfZVBXzEoy
-	m55u5efQMB1dDqDIVsLeXLSpM+JibmphsO4zDHbeq70IYBs69K3hYXHw0WCa3B/sJ8
-X-Received: by 2002:a05:7022:6713:b0:128:d1c9:3633 with SMTP id a92af1059eb24-12a7265f60dmr5533874c88.13.1774294923678;
-        Mon, 23 Mar 2026 12:42:03 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2ebe:8:a296:1211:5ab0:bc95])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c10b17b8f2sm18088976eec.9.2026.03.23.12.42.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2026 12:42:03 -0700 (PDT)
-Date: Mon, 23 Mar 2026 12:41:59 -0700
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, Lee Jones <lee@kernel.org>, 
-	Pavel Machek <pavel@kernel.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>, Tom Rix <trix@redhat.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-spi@vger.kernel.org, linux-leds@vger.kernel.org, 
-	linux-fpga@vger.kernel.org, driver-core@lists.linux.dev
-Subject: Re: [PATCH 04/10] regulator: of: switch to using
- class_find_device_by_fwnode()
-Message-ID: <acGWJf1AGXT1xduM@google.com>
-References: <20260322-remove-device-find-by-of-node-v1-0-b72eb22a1215@gmail.com>
- <20260322-remove-device-find-by-of-node-v1-4-b72eb22a1215@gmail.com>
- <360a8b4a-6507-417a-9fc1-c53b14868657@sirena.org.uk>
- <acGFksyx3SA0kJ5b@google.com>
- <7d46803e-b285-4e9c-8856-10100fa0ea85@sirena.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=breEaFHScbHf8zQfUjnIizU0qHR2aVrD8p+uvk7eNiauT5my7AIhilB/pe9TaTU4e0Do67upoVvo8Rfohwi6P/sZF0kmJ3UHSkzpiFn0fwtFNa2e9DhyRs0yL2q46sMIfJXkjOm7ynFQhNUN8k+xrQ3X6ZrSCo+SvR/4cYTGT5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOD2+Fg/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75D2CC4CEF7;
+	Mon, 23 Mar 2026 19:48:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774295284;
+	bh=SHnio8tSnG8NWlOkobDBosLZL29iinvQCLbdljIlaRU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fOD2+Fg/JSDS1W6G7wkG8LiPf3EEAXvjUhDOZfI4I01cbcK5pOp6nzqOXEDUvzyhy
+	 ku4Z2/OS5OjUyJNBTHbOoDX+cNSEVg+TOS4OfQ2X2rZ/NkxVr1L8AHGZV3t6Z5BKET
+	 mp8txeYxx6gDgqn7Ty1pXLQ1GkQB7Nh3DCSKhCgZYxQIsm7etRqbZL2yKU+hedFSVC
+	 W/YWFT0gmuPy9ZWjcXpKTvYbpWispuCDhMqij6+hIiGXZi9Ov5y/J1RjMkQ62hNBgC
+	 QTEMDDFbxTtl7L8UI1CXy+hRJwwgjyWU8d0vcXmRUkanMkWa0u+vYVzOreNLAzru0l
+	 thF0X8W8MoKkg==
+Date: Mon, 23 Mar 2026 14:48:03 -0500
+From: Rob Herring <robh@kernel.org>
+To: Biju <biju.das.au@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Paul Barker <paul@pbarker.dev>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Sergei Shtylyov <sergei.shtylyov@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next] dt-bindings: net: Remove redundant
+ ethernet-phy-ieee802.3-c22 fallback
+Message-ID: <20260323194803.GA1241974-robh@kernel.org>
+References: <20260313130623.297712-1-biju.das.jz@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,72 +78,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7d46803e-b285-4e9c-8856-10100fa0ea85@sirena.org.uk>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+In-Reply-To: <20260313130623.297712-1-biju.das.jz@bp.renesas.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270703-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linaro.org,gmail.com,axentia.se,armlinux.org.uk,intel.com,linuxfoundation.org,vger.kernel.org,lists.infradead.org,lists.linux.dev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[28];
+	TAGGED_FROM(0.00)[bounces-270704-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,ragnatech.se,glider.be,bp.renesas.com,armlinux.org.uk,pbarker.dev,linaro.org,vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dmitrytorokhov@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 73DF32FC82F
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 542E72FCE72
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 23, 2026 at 07:05:13PM +0000, Mark Brown wrote:
-> On Mon, Mar 23, 2026 at 11:28:27AM -0700, Dmitry Torokhov wrote:
-> > On Mon, Mar 23, 2026 at 02:00:43PM +0000, Mark Brown wrote:
+On Fri, Mar 13, 2026 at 01:06:21PM +0000, Biju wrote:
+> From: Biju Das <biju.das.jz@bp.renesas.com>
 > 
-> > > The regulator API is very deliberately specifically using the OF APIs,
-> > > not the ACPI APIs, since ACPI really doesn't want to model regulators.
+> Drop the ethernet-phy-ieee802.3-c22 compatible string from ethernet PHY
+> bindings and their examples. The c22 fallback is implicitly assumed for
+> PHY ID-based compatible strings and does not need to be stated explicitly,
+> unlike c45 which requires opt-in.
 > 
-> > For now? We also have software nodes and maybe we come up with something
-> > else in the future...
-> 
-> > I think we should use firmware-agnostic APIs as much as possible, and
-> > only use OF- or ACPI-specific ones when there is no generic equivalent.
-> > This makes the code most flexible.
-> 
-> I think this is a worrying idea for core code like this, we have
-> specific firmware bindings for specific firmware interfaces with the
-> different interfaces having very different ideas of how things should be
-> modelled.  The chances that firmware agnostic code is going to do the
-> right thing seem low, and encouraging the use of generic APIs that might
-> happen to run OK raises the risk that we'll get firmware vendors relying
-> on them and leaving us with a conceptual mishmash to sort through.
-> 
-> Software nodes are already a bit of a concern here TBH.
+> Remove the c22 pattern from the ethernet-phy.yaml schema and update
+> examples in amlogic,g12a-mdio-mux, mscc-phy-vsc8531, renesas,ether,
+> and renesas,etheravb bindings accordingly.
 
-Firmware vendors can introduce incompatible DT bindings and have them in
-their devices too and we have to deal with that... 
+This will introduce a ton of warnings in .dts files which I don't think 
+anyone wants to go fix.
 
-I think if this pushes closer ACPI and OF schemas for at least some
-subsystems closer to each other it would not be a bad thing.
+While I think it's redundant to have the c22 (or c45) fallback as it 
+isn't really useful on its own, I think we are too far down that path.
 
-Thanks.
+You need a custom 'select' in all the schemas that have a c22 
+compatible to exclude it from matching.
 
--- 
-Dmitry
+Rob
 
