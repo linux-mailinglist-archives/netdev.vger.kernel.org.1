@@ -1,118 +1,176 @@
-Return-Path: <netdev+bounces-270609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270611-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yMxFDF52wWkQTQQAu9opvQ
-	(envelope-from <netdev+bounces-270609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 18:20:30 +0100
+	id +E70AOx2wWkQTQQAu9opvQ
+	(envelope-from <netdev+bounces-270611-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 18:22:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C0C72F9BE5
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 18:20:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9467A2F9D08
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 18:22:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 01FBD301CC41
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:27:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2DD7332F2E87
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:31:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FDDC3BE64A;
-	Mon, 23 Mar 2026 16:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5A13B8BDA;
+	Mon, 23 Mar 2026 16:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFA+rLkV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lttW7s0j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530E13BE63F;
-	Mon, 23 Mar 2026 16:26:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4874C3AF672
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 16:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774283216; cv=none; b=Sp7DvINyvCs2wMfUFzYrZyQM+oTBcvHvjJViAUln21Or1xHJpTsudnLwO0DjhOORbox3yGX1E/mNBEv25AMsczyvSzZp79E66GWiTRfhNrwBFY8p7CqWshspjOfBrcQhujL/f1OzN0TB8VoQHzfMAl2aRT3E4O1nhRW+gFWvNS8=
+	t=1774283470; cv=none; b=ONRFdK0ZULFVXApjXPAtH/dv1yS3veOEoVEj0bADttOf/2tjfk6AxoAIAgiZdTtRm0YuwYXwQALJaG8aUstGmw6Aq2Z4KIqDfgzQ12uLtBGFt3uruhqTSmLtmTkCaVtmKeje0F7SqdyW/49kBOVR1W0MedsfkNPtQBpPyxqDByY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774283216; c=relaxed/simple;
-	bh=yvvnk8L0cI2hlcKK9JJuYOByfrm/Vw6Bgw9bTa2StmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J/UzXSG09/Sz7p+FJe1UnCYbw8zEv/VxLCsfIEXEOqpfRdKBdeRiZ9QdvYZntEfYA6lXDb6j2aYylUBynFS076R7M8zj3Cy0F+8Zg3LDZYTJ+ATvDB/IFCwdtfa0u0ejtXkv9VB4g0OqRGAMPnFxKeLbzoZx0NzqIY04PrWYwNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UFA+rLkV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFF8CC4CEF7;
-	Mon, 23 Mar 2026 16:26:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774283216;
-	bh=yvvnk8L0cI2hlcKK9JJuYOByfrm/Vw6Bgw9bTa2StmI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UFA+rLkVyf1DBRjVyHsPafKbt0kPko9jZSKOWidKNXiKnS/MKoiCdayFijUomdfk8
-	 aEaVGjeY4qxDaQcBAb6HRBkg3E4/V2z7VeMXqH27FdbP05xhb3qvx5Y0gyfSgk1Nnp
-	 m3gDq6RWw9ouOCrI6epPjo02pdgOxoX2kzKr/gkyYeCNvMGMM8J3uUUjGFTa9u9NBe
-	 Jz2709JhHURsIJ9gpQt6cuMIt5rXpqjq9UGawLFhhju8v1z4vq7QWU2XQfURMsEWVK
-	 dmyJH5L9zBVkFvpIMHtN9q+KXCX6PqHOm2MthPo9E0eLPXqy7Th3XWrHFImLGJ2Mdg
-	 Ok/ZhlKzCZb1g==
-Date: Mon, 23 Mar 2026 09:26:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: <netdev@vger.kernel.org>, Sabrina Dubroca <sd@queasysnail.net>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah
- Khan <shuah@kernel.org>, <linux-kselftest@vger.kernel.org>, Dragos Tatulea
- <dtatulea@nvidia.com>
-Subject: Re: [PATCH net v5 2/3] selftests: Add MACsec VLAN propagation
- traffic test
-Message-ID: <20260323092652.417b1bc8@kernel.org>
-In-Reply-To: <20260323123633.756163-3-cratiu@nvidia.com>
-References: <20260323123633.756163-1-cratiu@nvidia.com>
-	<20260323123633.756163-3-cratiu@nvidia.com>
+	s=arc-20240116; t=1774283470; c=relaxed/simple;
+	bh=KLm6b7EJSgDbO8wAQ1vgmKDFikErCUASdQ5Z4cJMfhA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eaVUfzaDJeoJKQPMtk1lnZZVJLlnPiM+Sgwe/xmhGFNmkTJ5k5fGDcQ+YvOMpJ463RbPg/JNECjyf458TNgVSMCaMikIUA0j8OkcMiX1KqLyt1hZSsJtm0kFXl3Osj1jGyU8jKtfpTkSqB6x3FNyRjceqMiAgr+rOrPmE3odudA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lttW7s0j; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-483ad568d68so6299935e9.2
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 09:31:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774283468; x=1774888268; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Snr3E4k4Xc+6SMIOwrn3jZd42/HG4jCfgy6iiScpIyM=;
+        b=lttW7s0jDhmdaK5tNG1T23W0FLQkrW7N8nrvcRYz2SQ6vpK7+qgqhaEtAvEXqc0jRg
+         V+nv+wpyRJ1s/0hMpwtLdHMbm+DRSh9kKlaYcfYFZkDTfonEziB0F+b4jwbnOTYPS8A9
+         pPaVAbVdfTr03mngzBcqciz9hWK02wtMCtH/ULj8lHqFWsQpRNprH3am/ZjXOchBdwWE
+         brsA1UwkV0RfuTJjqfHWfwvWu5h557BdIG0zU5YmFldmUO4ZMKRsbQxULDAB0CHUUshQ
+         2LXhmbo7AtPZKYDtcu5T9c7CY6c0Vz88vGACabfg2Ol7dzgC95zRt4CMsf0RQF05nLbB
+         PMYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774283468; x=1774888268;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Snr3E4k4Xc+6SMIOwrn3jZd42/HG4jCfgy6iiScpIyM=;
+        b=gsGZbREYlvS7Yyw9DN10K7+d9vHBamO/GwH2+52m5AnjodtgUk5OKEVFL9oUCTAQPb
+         hcIRq20Kl8+2n5tkyzE1fPWLBe2G9QwewuB+OMscPXGBM8dTzd/g//vhPNBAP0jQ/UYq
+         c0BbKuB0nNXc/KP1B1DAf5CDF42CTCeEiinE8P6dBpBgEkOg63ztGRXGdDxQgdmq7SeH
+         FmjW8WIKFukRyA3PXCbflszcZnjMMjEEM76GSPR6Ejf6T3q+EPEsqt2IxugK/9W+v4Hm
+         RatVwUlkItCukOXuM8p+wNhhRYnwieLupbVeIGmeuaEaMdgimLgPEcnWx0lT9okdjuTe
+         KtKw==
+X-Forwarded-Encrypted: i=1; AJvYcCVleu93zjDLGr2HCcy14Zk6U8m+fsja+9+1pICUmOXBuV51SHLcKTRT6wNMEm6plZddgY1fL1U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTu1EjhQWR4H+5R+LDYC4Ghq0Z0A0FKsJDKViZM9g/VFR83dIV
+	ajGV8Qn8WDGK/V69WKC6gjnv1cEJR1+LwNBdqZpje+EOBK07jRZbn4z3
+X-Gm-Gg: ATEYQzzi7sWcwm2WAAmWIpkAFWDRAO1xLc8suJmzkyaZbLjRny28j723L8VK5XgUWPl
+	PwBnapomJQtn1zuYw5II9iLmTXc6AJLp62aI51ceuSg6Ps63zRY2egND1wmDLHhX/E5GhHywlat
+	uPK3TTUcBqiTTNel3oYJXkk89LroOjEUAcb2NLcYvY6dOLpywhXlhT8Vy97sMh/Vcb1W+4KVg6S
+	PFRyWzIb/CWikq4GCJPKyfXUGMMnvHobNkil9YYdlbuWkDyiiB5HK3LokP4pEUcYrwPSjLqhr/q
+	jMNF7jQQf5lcp8lxu+tPvosqbXC+CSu+XbT4h9kbwbog+eSz6+Eg96g7htTk63cEVM7XJvlbDeQ
+	LiT9aglLxd+VOq+NMFkd4eBUeKTRuWXUMaDRTPploFyyNlDWzs89r7SW6TIgn569N5hfcJ01XOx
+	D9c/Vm92Ki6CTvwA0=
+X-Received: by 2002:a05:600c:c4ac:b0:485:f1d6:2b1d with SMTP id 5b1f17b1804b1-4870363da8fmr77534665e9.0.1774283467595;
+        Mon, 23 Mar 2026 09:31:07 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d50a:b400:653e:51cc:7cba:e6df])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486fe8359acsm290068055e9.12.2026.03.23.09.31.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2026 09:31:06 -0700 (PDT)
+Date: Mon, 23 Mar 2026 18:31:04 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
+	Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v6 2/4] net: dsa: add bridge member iteration
+ macro and port mask helper
+Message-ID: <20260323163104.a2d2hbs7jfgsptj3@skbuf>
+References: <cover.1774136876.git.daniel@makrotopia.org>
+ <ff936ce4ad3044102c367c55e7a455ab0020e4b7.1774136876.git.daniel@makrotopia.org>
+ <acCllYmKczZrDgv9@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <acCllYmKczZrDgv9@makrotopia.org>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-270611-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270609-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 3C0C72F9BE5
+X-Rspamd-Queue-Id: 9467A2F9D08
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 23 Mar 2026 14:36:32 +0200 Cosmin Ratiu wrote:
-> Add macsec_traffic.py using NetDrvEpEnv to verify VLAN filter
-> propagation through offloaded macsec devices via actual traffic.
-> 
-> Test creates macsec tunnels with matching SAs on both endpoints,
-> stacks VLANs on top, and verifies connectivity with ping. Covers:
-> - Offloaded macsec with VLAN (filters propagate to HW)
-> - Software macsec with VLAN (no HW filter propagation)
-> - Toggle offload on/off and verify traffic still works
-> 
-> On netdevsim this is a smoke test (stub offload, no real encryption).
-> On real hardware this validates actual VLAN filter propagation.
+On Mon, Mar 23, 2026 at 02:29:41AM +0000, Daniel Golle wrote:
+> I wasn't aware of the similar and equally named function in
+> yt921x.c[1]
 
-CONFIG_VLAN_8021Q (and possibly other things) are missing from
- tools/testing/selftests/drivers/net/config
--- 
-pw-bot: cr
+Yeah, I did request from the beginning for it to be moved to
+include/net/dsa.h, but I didn't follow through with the request (I guess
+I forgot):
+https://lore.kernel.org/netdev/20250825212357.3acgen2qezuy533y@skbuf/
 
+> Patchwork CI has loudly uncovered it and I've learned my lesson to
+> always test an all-y build when changing even the most innocent
+> looking things which technically may affect other drivers.
+
+Since all DSA drivers are all in the same folder, technically you may be
+excused if you just enable all those when working on infra, instead of
+allyesconfig.
+
+> I'll move that function as-is, in a dedicated commit, to
+> include/net/dsa.h as an inline function instead of the helper
+> suggested here.
+> 
+> A second commit will introduce the new helper macro
+> dsa_switch_for_each_bridge_member (modified to use (struct net_device
+> *) as parameter instead of (struct dsa_bridge *), and make use of it
+> in dsa_bridge_ports().
+> 
+> I'm also planning to introduce dsa_bridge_for_each_member macro in
+> addition to that which works on (struct dsa_bridge *) and uses
+> dsa_switch_for_each_bridge_member.
+
+I don't like the dsa_bridge_for_each_member() name. You are likely
+not considering cross-chip bridging, where a bridge spans multiple
+dsa_switch structures. That is also a serious reason why your
+bridge->priv design is not viable (two switches can't lay their eggs
+in the same basket without overwriting each other).
 
