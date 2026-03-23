@@ -1,216 +1,169 @@
-Return-Path: <netdev+bounces-270571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270572-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uBIMJCFpwWmoSwQAu9opvQ
-	(envelope-from <netdev+bounces-270571-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:24:01 +0100
+	id aCR0LLhqwWkVTAQAu9opvQ
+	(envelope-from <netdev+bounces-270572-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:30:48 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8D492F8030
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:24:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D2892F8364
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:30:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 35A1C32DFB62
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 14:45:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F3DF13132805
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 14:52:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9DF23BF9B;
-	Mon, 23 Mar 2026 14:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9027232470A;
+	Mon, 23 Mar 2026 14:52:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nso01hhM"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="yG4RJGH1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7417823B62C;
-	Mon, 23 Mar 2026 14:45:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B1826A08F
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 14:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774277141; cv=none; b=s+mWytInh0mNUjbNKOqnDurlnkdResFSI1pE63wU7uiqhpRz4Ui5f/O8j9k3aiJlwhEech+MVg7EqpsS37EZL/kM67a1LvEImEfbao1SUlgEgR+PsbmqBgkPlN6MTh4lJuK7YyaARnfT5B0gDCuL1S79iHD9Cdu9LiaTRtYpDMg=
+	t=1774277537; cv=none; b=l3rZXKwEwMKTLnsZ7D2PbyGZwgX0hHH+5iiZ1Dk+y40UTOPI/XG3Rz9kJS/psu5xvBPo+P9lpU91TauzhUg66NJVIjEIwxzAui7GLCYU/ZZf4r8sC/FYm7O7c7uTTTFntTk+jfYgVyU2ip/+JEmG6U+JXPAN0cbVSDMfNr8cuiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774277141; c=relaxed/simple;
-	bh=sQ++P00VzDnidaxeH3IBqWi7EiuWjZKDrQK7IYxr+KY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=neFJFbg3IzSbrcpad3g5rgtBwGeXud25G5RCNSoibAmEd17x3sfgBDeXy9e7QvI8k58jxzaSWf6yr3dO3xYsy83gDUjTia352mMxhU/WAw4VuJ7OT6h/mKQlcpeBh5TUNNOIK3zjnZC3ERaVS0gW6YgfRQaZjtjDEudsg/onf/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nso01hhM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78FF9C2BC9E;
-	Mon, 23 Mar 2026 14:45:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774277141;
-	bh=sQ++P00VzDnidaxeH3IBqWi7EiuWjZKDrQK7IYxr+KY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Nso01hhMvhdxFpAnH3DnizfuqcZ3q8T4g8K4tSUytd+pv/p41bslMUn6C762jhqoD
-	 MI914txUblaDKarNeMUtOdGxAoQ4PNYgZdnROTmeZcG0HAgiiog9xkEUHHbm7UqsI1
-	 OG2qAzE/IXdsc2d1U0/TWrH8jtUc7HgnQTMeWmTiG+uZtCYO6CjPljm0frzCbcc0PR
-	 NqflOTxQxmIl8PAwg8O37mDllvSnNMIj6o2j3n6tAPiS9QsWRmyNTjQfYb4Bbjn42e
-	 BYO5qvxoKsc2UFz04x9dhHU3mgzAm8DFjXMtZ5gKLXNSaOzCWUjkpNOWzaUMwiCx1d
-	 FMllqws+SOJqQ==
-Date: Mon, 23 Mar 2026 14:45:35 +0000
-From: Simon Horman <horms@kernel.org>
-To: Tyllis Xu <livelycarpet87@gmail.com>
-Cc: netdev@vger.kernel.org, haren@linux.ibm.com, ricklind@linux.ibm.com,
-	nnac123@linux.ibm.com, sukadev@linux.ibm.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org, danisjiang@gmail.com,
-	ychen@northwestern.edu
-Subject: Re: [PATCH] ibmvnic: fix OOB array access in ibmvnic_xmit on queue
- count reduction
-Message-ID: <20260323144535.GB85922@horms.kernel.org>
-References: <20260321035439.900644-1-LivelyCarpet87@gmail.com>
+	s=arc-20240116; t=1774277537; c=relaxed/simple;
+	bh=gEFZHcS+3f1UqHF/dEbEQNy5RrjhSuBDbPxycZkiY/8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=scdzrhWdiW1uyk6cou5Y3WphQlJKDuf8UK3Pb+Z3FFEIiEMHuCkSjjZbUfTm0Ip6GuBBa/jN85iMpvXtjjx6Nhk6V6+SN4ZlT/QR1K6g7PRChHfgR/F1ky62RDvWYh1c3cO9y1LTDeRMbpN2iMhs6Dsj1R4M+ub6GvDkicSx/IE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=yG4RJGH1; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 5F2664E427A5;
+	Mon, 23 Mar 2026 14:52:13 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2CBF75FEF6;
+	Mon, 23 Mar 2026 14:52:13 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E294610450F0F;
+	Mon, 23 Mar 2026 15:52:05 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1774277532; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=DLV+ANNlVjbThs16of3ozI8lyO1UcM7+YoV0gax8uv8=;
+	b=yG4RJGH1jGCr5yIL/Iwc2IhbDiXPLapiDF42K57oGuQpanTOeCL9cWri01MT47AeaNS1kL
+	jzCjTiD2U+xB8Cq/sL7WW0hNqvbTdi/rBc9iGTi40h4b0uUL/lvU33FleXNZ+rS9W4iEot
+	qwUREqzZd4arajGvdGEu0y1vbMZ0JhvUPcKi7mDUGrWMYhcIAwLJF/xLPXKBsg7FiqJEpg
+	2fFpVRhIUYWmZJZs/bfqZz29F8p/T7yBtdi/3rbh1RubbvvRtn0ZZf8KLJEDEMxWSGVFzy
+	Ptrq/Ott4JJJua4bKROhr8BP5MStAj8zoFb2pLN/yFWoJZCXhTxG26QUA5pb6g==
+Date: Mon, 23 Mar 2026 15:52:04 +0100
+From: Herve Codina <herve.codina@bootlin.com>
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, Steen Hegelund
+ <steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ "Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Arnd
+ Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next 00/10] net: lan966x: add support for PCIe FDMA
+Message-ID: <20260323155204.0321db13@bootlin.com>
+In-Reply-To: <20260320-lan966x-pci-fdma-v1-0-ef54cb9b0c4b@microchip.com>
+References: <20260320-lan966x-pci-fdma-v1-0-ef54cb9b0c4b@microchip.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260321035439.900644-1-LivelyCarpet87@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270571-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[vger.kernel.org,linux.ibm.com,davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,gmail.com,northwestern.edu];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,iogearbox.net,gmail.com,fomichev.me,arndb.de,linuxfoundation.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-270572-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[herve.codina@bootlin.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D8D492F8030
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2D2892F8364
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 10:54:39PM -0500, Tyllis Xu wrote:
-> When the number of TX queues is reduced (e.g., via ethtool -L), the
-> Qdisc layer retains previously enqueued skbs with queue mappings from
-> before the reduction. After the reset completes and tx_queues_active is
-> set to true, netif_tx_start_all_queues() drains these stale skbs through
-> ibmvnic_xmit(). The queue index from skb_get_queue_mapping() may exceed
-> the newly allocated array bounds, causing out-of-bounds reads on
-> tx_scrq[] and tx_pool[]/tso_pool[], and out-of-bounds writes on
-> tx_stats_buffers[] in the function's exit path.
+Hi Daniel,
+
+On Fri, 20 Mar 2026 16:00:56 +0100
+Daniel Machon <daniel.machon@microchip.com> wrote:
+
+> When lan966x operates as a PCIe endpoint, the driver currently uses
+> register-based I/O for frame injection and extraction. This approach is
+> functional but slow, topping out at around 33 Mbps on an Intel x86 host
+> with a lan966x PCIe card.
 > 
-> The existing tx_queues_active guard does not help here: it is set to
-> true by __ibmvnic_open() before netif_tx_start_all_queues() restarts
-> queue draining, so stale skbs pass the check with an invalid queue index.
+> This series adds FDMA (Frame DMA) support for the PCIe path. When
+> operating as a PCIe endpoint, the internal FDMA engine on lan966x cannot
+> directly access host memory, so DMA buffers are allocated as contiguous
+> coherent memory and mapped through the PCIe Address Translation Unit
+> (ATU). The ATU provides outbound windows that translate internal FDMA
+> addresses to PCIe bus addresses, allowing the FDMA engine to read and
+> write host memory. Because the ATU requires contiguous address regions,
+> page_pool and normal per-page DMA mappings cannot be used. Instead,
+> frames are transferred using memcpy between the ATU-mapped buffers and
+> the network stack. With this, throughput increases from ~33 Mbps to ~620
+> Mbps for default MTU.
 > 
-> Add a bounds check against num_active_tx_scrqs immediately after the
-> tx_queues_active guard. Use a dedicated out_unlock label to skip the
-> per-queue stats updates (which also index tx_stats_buffers[queue_num])
-> when the queue index is invalid.
+> Patches 1-2 prepare the shared FDMA library: patch 1 renames the
+> contiguous dataptr helpers for clarity, and patch 2 adds PCIe ATU region
+> management and coherent DMA allocation with ATU mapping.
 > 
-> Fixes: 4219196d1f66 ("ibmvnic: fix race between xmit and reset")
-> Reported-by: Yuhao Jiang <danisjiang@gmail.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Tyllis Xu <LivelyCarpet87@gmail.com>
-> ---
->  drivers/net/ethernet/ibm/ibmvnic.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> Patches 3-5 refactor the lan966x FDMA code to support both platform and
+> PCIe paths: extracting the LLP register write into a helper, exporting
+> shared functions, and introducing an ops dispatch table selected at
+> probe time.
 > 
-> diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-> index 5a510eed335e..c939391474cb 100644
-> --- a/drivers/net/ethernet/ibm/ibmvnic.c
-> +++ b/drivers/net/ethernet/ibm/ibmvnic.c
-> @@ -2453,6 +2453,11 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
->  		goto out;
->  	}
->  
-> +	if (unlikely(queue_num >= adapter->num_active_tx_scrqs)) {
-> +		dev_kfree_skb_any(skb);
-> +		goto out_unlock;
-> +	}
-> +
+> Patch 6 adds the core PCIe FDMA implementation with RX/TX using
+> contiguous ATU-mapped buffers. Patches 7 and 8 extend it with MTU
+> change and XDP support respectively.
+> 
+> Patches 9-10 update the lan966x PCI device tree overlay to extend the
+> cpu register mapping to cover the ATU register space and add the FDMA
+> interrupt.
+> 
 
-This doesn't seem quite right. Shouldn't it be as per other
-blocks in this function that drop packets. In which case
-it could re-use the existing handling in the conditional immediately above
-this hunk.
+Thanks a lot for the series taking care of DMA and ATU in PCIe variants.
 
-Also, I don't think unlikely() seems in keeping with the existing
-implementation of this function.
+I have tested the whole series on both my ARM and x86 systems.
 
-I'm suggesting something like (completely untested):
+Doing a simple wget on my x86 system, I moved from 3.8MB/s to 11.2MB/s and
+so the improvement is obvious.
 
-diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-index 5a510eed335e..67e1e62631e3 100644
---- a/drivers/net/ethernet/ibm/ibmvnic.c
-+++ b/drivers/net/ethernet/ibm/ibmvnic.c
-@@ -2457,7 +2457,8 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	txq = netdev_get_tx_queue(netdev, queue_num);
- 	ind_bufp = &tx_scrq->ind_buf;
- 
--	if (ibmvnic_xmit_workarounds(skb, netdev)) {
-+	if (ibmvnic_xmit_workarounds(skb, netdev) ||
-+	    queue_num >= adapter->num_active_tx_scrqs) {
- 		tx_dropped++;
- 		tx_send_failed++;
- 		ret = NETDEV_TX_OK;
+Tested-by: Herve Codina <herve.codina@bootlin.com>
 
-Where the next line is:
+Best regards,
+Hervé
 
-		goto out;
-
-...
-
-> @@ -2672,6 +2677,9 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
->  	adapter->tx_stats_buffers[queue_num].bytes += tx_bytes;
->  	adapter->tx_stats_buffers[queue_num].dropped_packets += tx_dropped;
->  
-> +	return ret;
-> +out_unlock:
-> +	rcu_read_unlock();
->  	return ret;
->  }
-
-My previous comment not, withstanding:
-
-The RCU read side critical section is already enormous.
-So perhaps making it slightly better doesn't make a difference.
-
-If so, can we go for this slightly flow here (completely untested).
-
-diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-index 5a510eed335e..1e1cd8c11cf9 100644
---- a/drivers/net/ethernet/ibm/ibmvnic.c
-+++ b/drivers/net/ethernet/ibm/ibmvnic.c
-@@ -2664,14 +2664,14 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
- 		netif_carrier_off(netdev);
- 	}
- out:
--	rcu_read_unlock();
- 	adapter->tx_send_failed += tx_send_failed;
- 	adapter->tx_map_failed += tx_map_failed;
- 	adapter->tx_stats_buffers[queue_num].batched_packets += tx_bpackets;
- 	adapter->tx_stats_buffers[queue_num].direct_packets += tx_dpackets;
- 	adapter->tx_stats_buffers[queue_num].bytes += tx_bytes;
- 	adapter->tx_stats_buffers[queue_num].dropped_packets += tx_dropped;
--
-+out_unlock:
-+	rcu_read_unlock();
- 	return ret;
- }
- 
-
--- 
-pw-bot: changes-requested
 
