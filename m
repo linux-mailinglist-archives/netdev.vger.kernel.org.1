@@ -1,254 +1,276 @@
-Return-Path: <netdev+bounces-270464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270471-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MPlmFUcYwWn5QQQAu9opvQ
-	(envelope-from <netdev+bounces-270464-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:39:03 +0100
+	id 0Jw1NeAXwWm5QgQAu9opvQ
+	(envelope-from <netdev+bounces-270471-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:37:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E9D62F052C
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:39:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 449142F04A9
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:37:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 710C2300C3B0
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:32:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC07E30210FF
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376D037E2E6;
-	Mon, 23 Mar 2026 10:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D14C38C414;
+	Mon, 23 Mar 2026 10:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="KH5kXMzR";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KwA12vbP"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="iGpXA1VK"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010040.outbound.protection.outlook.com [52.101.69.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EECE385507
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 10:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774261942; cv=none; b=qNXC5ZwVaUqQTJRS6wXhMi4WI+v8QKiyd9Sph2VJTZ93ocfm5aZS7pZ+U0pDciNjNPjIGwr+KgI5OpNEsmsUIiaTxKKwqC/RHSrGCQ1E+4g+c1+HyNP5b80z20XQ3TUlFSOkUOoIZJnP+8MHR1a3FnWVO+IUY8RMFWeH+q0ZtAo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774261942; c=relaxed/simple;
-	bh=Jbm3gL9m+5ehEdpaNRD6Q+tk2vD2OrCJCif7iJG7zlI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S7Xyk+nz617VImQjPUE3ljWyj8/V1YWP6D+kaytFYExxFQ5DsQtfm+PJdTCq2uRAFbPI4WOwd1GMrPyK8qKM5oUpf9U3JtohDJdVkCuUQgRgP7bQJWirjQCPBiZB7/+lYiSQRYaFioY3CorRNqjFZ743qgUmLgxCMP+5QotABzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=KH5kXMzR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KwA12vbP; arc=none smtp.client-ip=103.168.172.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailfout.phl.internal (Postfix) with ESMTP id C4286EC0128;
-	Mon, 23 Mar 2026 06:32:19 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Mon, 23 Mar 2026 06:32:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1774261939; x=
-	1774348339; bh=hJduocjrXMFZdNZhvfojWfHM8U/AGpgvy3BJBMoTKxE=; b=K
-	H5kXMzRJLCRfKUx7xm9MpURHHqr3pewIUOO+/z4FBwNYkU1njyUbv6vGG8B+OkIA
-	A00SYtxt61lmb+9eD8GdqoCaufUyD3IUiqwXHLID53sIl2RiME+kgZPb4S7GWJcc
-	ngHv5Yzxap9NMfbXO3FUHe/CkVxcW8Lv0EQ+DWVhSEuLsuxnYRVwyIPniGJLnPLb
-	i+6dW+awYUxIpMV+qCCtVyUftVYHDJzDEGo7VHG1iIifbJeWBTUU4H5AaxNcQzRI
-	qg/PzwqcF3RTwqQOQBNiaIfjQNHLrW7KAJkwz741+RbwL7JI1A1/9r8TqkkACZ/3
-	BHqYpXPjckz/y2TDEa8bw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1774261939; x=1774348339; bh=hJduocjrXMFZdNZhvfojWfHM8U/AGpgvy3B
-	JBMoTKxE=; b=KwA12vbPnobgmBTINviBQc0sZ6Gs8d2Vqf3Hg4t9diV0UP1Q0X6
-	pSQA1Feaoxuit7rw0hgA2SVwgJcEFTX1nOcq+BfkrCEHXeVJQamMyulNQt5Aw7WQ
-	V5rGtVwdX8YD5IndRMGcmab9vpeUGl4GLvAfX6oDaIEhZCHU2hPtqXj/gxFpD6Zk
-	JMYQulgN8LzhddTc5xeir02Ksx0IhMNRBGgDWkTG3/Y6cQhtW2EuZbEe07gJTaBt
-	IAD+jOcvfD1xsnw9O/mVwTcvTsQNwU6c6MpVVMLBUVFd0HFjdLCjVlJt1wU7doUP
-	cMVlWOPLujoVRpGFR7V7PEkUyPMCf5yqi9g==
-X-ME-Sender: <xms:sxbBad6-KzjXQzGArpRJEKYiXEoTkQEQELVgyABF521khGEsxh7Cag>
-    <xme:sxbBaU7WrCUy7dskj7vNRBD83XcUKN2lP9iRY3NdzGprLfOMNzjp-bbu6Ydb07aig
-    rld6SdW6y1C28h0MuFh9f65vHYSGLmaJlTfTXbqG8BBv37VIuYUZ9Vo>
-X-ME-Received: <xmr:sxbBabHhR6-mGeECY53f50Qq0sy_QETVEBB0OJPeMygSynNC8PkcilIKcauv>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefudekgeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeekpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegtvghlsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthho
-    pehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrh
-    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhgvrhhnvghlqdhtlhhsqdhhrghnughs
-    hhgrkhgvsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheptghhuhgtkhdrlh
-    gvvhgvrhesohhrrggtlhgvrdgtohhmpdhrtghpthhtoheprghlihhsthgrihhrrdhfrhgr
-    nhgtihhsseifuggtrdgtohhmpdhrtghpthhtohephhgrrhgvsehsuhhsvgdruggv
-X-ME-Proxy: <xmx:sxbBaUUcRKQHp3AJ3mhyYLWlwAL23TY2CylV68gH0YZS7dgAXVz2kw>
-    <xmx:sxbBafVXxYqtytoDDvxVGCKasEoA28FHZV-wJR6mhqQOs4qG6dw68w>
-    <xmx:sxbBaaJxnCEYpKW3yB-n0uoSWyXvgPDAmS_EpEJlGr-4_CN3ttI9mw>
-    <xmx:sxbBafDCKaJTTLHjwnUfwVNDWGcGsV4F6oPq6PT3AlxwG1R41vs_LQ>
-    <xmx:sxbBaZqjAON9OzSwlUmxNHZiJUj-BfmPDRU54vNs6hrbyN4tnSo4Y6hN>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 23 Mar 2026 06:32:19 -0400 (EDT)
-Date: Mon, 23 Mar 2026 11:32:17 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Chuck Lever <cel@kernel.org>
-Cc: john.fastabend@gmail.com, kuba@kernel.org, netdev@vger.kernel.org,
-	kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH PATCH net-next v4 5/8] tls: Suppress spurious
- saved_data_ready on all receive paths
-Message-ID: <acEWsQOtWq3B62yi@krikkit>
-References: <20260317-tls-read-sock-v4-0-ab1086ec600f@oracle.com>
- <20260317-tls-read-sock-v4-5-ab1086ec600f@oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D66F3890F8;
+	Mon, 23 Mar 2026 10:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774261990; cv=fail; b=EonF5+kd/EhGQx0O8xECpQ6eD//0IehhUeRnjnYJmT+yMu4E1lQR31lw1tA+N5pTSO8gZsrkhzzIM/VFuMefjd/g8YUvlGdKpCixYT1suFvDln0ZbgBzDQHmcA7/nWmkxr50oSaOsVEyAPOoOCnB45jFqOliTIFlUUhJrftqkok=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774261990; c=relaxed/simple;
+	bh=zZo7CgwfoY21MDlZvcus2LvaEYcdqFk9yeYODX2fTIc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ghcAJxA2F/TTV9w4VB3d2GxsoI3FzGlIVEVS6oSGyAChyget3Js0HZQXbZd4a66Hi6A9ybfm+JYfxzNrbps+IJUA/pIVx8JqNGXq2cO2S2bDq612N0IAt6mAV4kWPjuQNgrasVfFpym3fmj/0l5ENhNRPyri+Q8f1qrG8H8yZ0g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=iGpXA1VK; arc=fail smtp.client-ip=52.101.69.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XE6YSdwQqKdt6tR9bEHkuozf4nRAi02TjUyUxnSB+90MaCMKwPX1gX16rs5APvC0gwfmjNtu6Dt3dHeCJF3cbFfRH30E5A4NlF16luOtAozAl8Sylb3DVuOj+pOMEewr9ID42T5QbWGV4dWhlr19F0tmVKa2yFvdzRQyvo4I3xYzhVtIl+POAqPXbNrvb80huVXnnroI19s3xtoeKvqGgGrtdfxzoMozUSVTRF44ESRsOLh9BNlVv4yfmelVvtMBGF6IU2ycOmv0hpFqxNnjLAFKizUvI3vwwPoExsPKN0V1jFckcGMw/ZC7fWtRjOuWDhtPWAey4HEM9HwzS0ncsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=l9qEg0HWniI5H2X6ihd2hYL4/0dN0x/02N2i1UwHvfg=;
+ b=ZRnYx/0ltWZaTITGklCzRT6+Psu1sRdwGWfdG6llf+vmhjF1ef/0T8oTx9kvH/k85ct4NcIkGxStpMHxdsx+SlBSX7Jrx5XrLw0IrAyyY32Pzntr4qsJkwSR42bYswGNx2lKMBBiVHFqDsz9n1AjYx4OJEHElH745nQhnhsQX3ZkgtFcy1i7Kqr26K/QTcQsNz9IkVGWfrKCErqxyEpZbnMEjyyeddN9ZbpmZrQWPORWDOae8GAIC8NRRqyn6y/VYZKplRtBdRfULGDM6nuA5Vdfzh6878402ElL5EQ8Lw/cA7xdjq3/qIMc1mylXk/P+LcX5S8bvEn4T5I/1Ao/Xg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=l9qEg0HWniI5H2X6ihd2hYL4/0dN0x/02N2i1UwHvfg=;
+ b=iGpXA1VKaZ5q6Jg6LREQtLYlpKQg8JCo/I4Shf3u4S177EzIc5VZrHfF9Z8Nfd3kRQ7QTIy6zmFTtOAjw2IsUqnlczunMf77m0bI9QbYnDLvrMk21/2gOkWXV8smUu3Sp909LHzvYZdRCiIQknvKcw+MQZmxwqREOuHXDWJE7Fyt2QeOYosrhzI7sEeU6s4kPrrhz8i155vPpxyDV/8xg8/jZgYVXRAwtnh2tp4gH+XKuTCkUlK/ypYEyMw4J5GTes6V9L+L2L0dmA5hQ1FyCdFGUOCyfrgLcoiRk6kzamrwU+x2fT1ENcuX3g15dgtzQZXGMXF692vg7f31NF3sYw==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by GV2PR04MB12320.eurprd04.prod.outlook.com (2603:10a6:150:30a::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.25; Mon, 23 Mar
+ 2026 10:33:05 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::b476:c19a:24cd:3694]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::b476:c19a:24cd:3694%3]) with mapi id 15.20.9723.030; Mon, 23 Mar 2026
+ 10:32:36 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Russell King <linux@armlinux.org.uk>
+CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
+	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, Frank Li <frank.li@nxp.com>,
+	"chleroy@kernel.org" <chleroy@kernel.org>, "horms@kernel.org"
+	<horms@kernel.org>, "andrew@lunn.ch" <andrew@lunn.ch>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>
+Subject: RE: [PATCH v2 net-next 11/14] net: dsa: netc: add phylink MAC
+ operations
+Thread-Topic: [PATCH v2 net-next 11/14] net: dsa: netc: add phylink MAC
+ operations
+Thread-Index: AQHcuotUXzXWZtrvPkOHkUVrkHLQObW72lgAgAAO9+A=
+Date: Mon, 23 Mar 2026 10:32:36 +0000
+Message-ID:
+ <PAXPR04MB8510A24C5ECFBEEDA27892E5884BA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20260323060752.1157031-1-wei.fang@nxp.com>
+ <20260323060752.1157031-12-wei.fang@nxp.com>
+ <acEIQqI-_oyCym8O@shell.armlinux.org.uk>
+In-Reply-To: <acEIQqI-_oyCym8O@shell.armlinux.org.uk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|GV2PR04MB12320:EE_
+x-ms-office365-filtering-correlation-id: ee039572-0fce-4cf2-2b96-08de88c78072
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|7416014|19092799006|56012099003|22082099003|18002099003|38070700021;
+x-microsoft-antispam-message-info:
+ eeBUSGUJuC85qnIILEtggGEVpZWWPCDqUrAMuu8lOa7vmQUtw1oJkUQ937iDna1iAWln13EFHDi5CLVtV4HJMrYRHdg4nHPktffDbl7u8dyI8uyA+fyh95CqCDAMmfiARNqMbKG+GCMAgdA6FuhxIGYc4tYXgL+QHwMmO+mVpeN1AOObr3EsJMTzlUkEtsaltLDB0Hn7V6R3mypSHQxqlBsFsiEiyFaMCgjAM/aSLQDziUjEe0Uws1kmc+iP5YsoCBQviNNQQjt0nTRIalZ947yfK1u8M7nRysYD2ludC/dFVwoLO4HGm/wH62a82RDYAD86fxZROT61bgo6Lk6Ad46yqriWsndsf/uo0GlL6WO9Khry1zPTl1qT1mCd4qV5hmcAxUgQIBFzIVBe+LEPR9RhMP/sgRdv6YMtx16jeCpnhcLf2KT6O7T+hRlWcnidQUBiUIasnUs9nLYt6Gu8M5+zQDMsfdBNRw6r64+ctFd+pb7h3oxRQ0XQ9AVh4PsQLGK4pKezE+RPJhG23+58urq1lDX4L2oXFB8+00eFIjAy2E1PyGNRVIA4Mff+3aMgJPbCbOSPj61JQG4XYPX8zt8GrUY1iuziSH/83U2799+be1MPuU89GBD6Os2f2gVFWHNMaUvxHq9CDDuKiIykS6+xKcezFlmI8+u/jwu14TcaXPDrm18EffStuFrOfaV+/WBnSx9GzqMvDdJfsEHLfOgjq3AeFIlImibsDCemROQQsHExzScHTHWXQOc+aP/wvPD5akaVWciVNT2sn73xrtd8Ob29B2PTSqed3cA693E=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(19092799006)(56012099003)(22082099003)(18002099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?sZYWdCD8s9+mxTbzUnQGEm5b/Jgk7Lr9sVkAx8DXBBngQcQ7oPvhglNQMwHT?=
+ =?us-ascii?Q?mQRGZ7AVobAVq31inG65uBR9cPMsT08N08qCWqqFxOUjCnREoaptkG3KVzp8?=
+ =?us-ascii?Q?slUx6vIBpY1FVHR74RhGnJDFoS0C1WU5J5OoeAmFCLdY9QE6hAaCjp7eIYff?=
+ =?us-ascii?Q?vpckxfB2KxnUZ3+I8vPg/64fFzxuCw2PO5u9uFP0uwPDK2uxmN8XrbTvSc8G?=
+ =?us-ascii?Q?lO9zorzWYrJHULDermK6CwgPQ5+dzwkj8hFEopuoFPSqGERH0KnIbqG9rFtB?=
+ =?us-ascii?Q?u5QpGmUaRlnaMvJR5iCreMToWY5tvxG72GG4wV0KxgjYDJSjVN08ZFY1+wcz?=
+ =?us-ascii?Q?lCt9potm1F0rwsBxtfeFE/WrEbP/zHGbn3+xeN1uGTd7mMSChVKutHRlGbdo?=
+ =?us-ascii?Q?8EQu1J0FJqE5sHlp/4tVR80VPAVWEpfuxohAaBTHmg69bx3yUZRHUKByc6Pr?=
+ =?us-ascii?Q?BKVTmTiR90RmZEDUxyykTKVjS26UBg4cY8jPCXodvArYXLAgslBg7n77YXFe?=
+ =?us-ascii?Q?oA7RYbmYhKvcDK5c3j+2F70ukcROc3JPbNozwjKjtFTBX6AdJFpyR3pRlEje?=
+ =?us-ascii?Q?l6jacvVAk17lf8anqPVnS7LlsfIfmGhqJXsLERr5ohPtbLvR2fB21bZ3ICod?=
+ =?us-ascii?Q?Aa55JQ86mLPDlIv+ev31seNlvhPYRjhLcgnVc9n+gIWx2l6cncCfvU06uXhT?=
+ =?us-ascii?Q?wXSd67a//yAvHI4YFHrUyqfzF6SCbzAO2x3wHd6ZKfdU9dvWXQ/l2MTVHr+A?=
+ =?us-ascii?Q?LXLJ31khjcsZByZWXhKL5Asy45vILmjYCPTT80cC1pLXZFqaQf4ET7c3QCZP?=
+ =?us-ascii?Q?S3dSWn4T8jzM21C6AlBCASFEmsfw7ztJg7kBeQcY3qbyOYKqACA3uAgm1Y7i?=
+ =?us-ascii?Q?Sgmh1IsOsHxPPFYBjxZ9Y3IFgK0hh4gzDfOnQLzEFlMaRHFZkw4cAM36ja7J?=
+ =?us-ascii?Q?sT3BHGGqqs1729RWq4FLVjgFB2nSrASsjCdX/ThPeP0C2HIN1xZ/V2rbcNwv?=
+ =?us-ascii?Q?hex6V4hrMs2oBv26CEsHtZySxwLKQLggCNNN8XzOVmFVxsodlEySxuKirA+S?=
+ =?us-ascii?Q?hi4W6Pfr8Ux8FGeGFR2NClf7O0o1aPW1Z7ra6xoy3ny443IVtOw3FMqbYjMO?=
+ =?us-ascii?Q?WB/2w1I0PvLZUigrwGezW+sQ0BWyoE6L52RsqgtGCV0Ygn8jtOtOio96H3lM?=
+ =?us-ascii?Q?paOpEDL/99QZ0cih39vWwwgGA4VkX5DhybOlUrNRXA7NuUPQ+P+tQM6LYQru?=
+ =?us-ascii?Q?7R8LIDKMKIAHk51BFT9xK3XcyiG0LuTesdNpdv+PCUSOJAT+oRocIO1VlWga?=
+ =?us-ascii?Q?UbPWdmXOa++eD6qo32LI+j4wfyfwsCSX59ldI10vPgG+Jbk1m15Hi7hFmD88?=
+ =?us-ascii?Q?JmxDCrK7mVmsYdQjvI8GaPHhID7O5/RtouqOeKpDO+FwT35w6aZClR1PQ1EC?=
+ =?us-ascii?Q?B5cFNRR5Jc/aqD3qNuNS/OohpcQrimJgBm9MQEqTrmB+Np514RxyjJkOTW9O?=
+ =?us-ascii?Q?Z8AYQXgjzHKUBqF53jMF0euq1hG8VZMIFb9bwSjEAuAmw/4Q00q/QFaCA7Rm?=
+ =?us-ascii?Q?2REfODuQ1UzBGq4QHXS2VrfjVZfpwP0iRqgNEWA1JhEFZEWSeJ9GUu5PRieK?=
+ =?us-ascii?Q?wh4OUhrUI6rndoV+xtFF+82yfTRu4Jk3wgf3xXSPn42q7IBqtscCJA7m04Vw?=
+ =?us-ascii?Q?K+ysHmvI9TSzTEzzDizY/3nod9qjme6akI3PpKw7NV37nE0T?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260317-tls-read-sock-v4-5-ab1086ec600f@oracle.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ee039572-0fce-4cf2-2b96-08de88c78072
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Mar 2026 10:32:36.7528
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: d2nz3dWqBGohCPB3405cis7twHLeN90V4u0dZ8QbrKmDLUHVUeqAWfAo1v0vFg8TiSGuvi8KEUKVDUHmlTGldg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR04MB12320
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270464-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,lists.linux.dev,oracle.com,wdc.com,suse.de];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270471-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,lists.ozlabs.org,lists.infradead.org,lists.linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,queasysnail.net:dkim]
-X-Rspamd-Queue-Id: 4E9D62F052C
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,PAXPR04MB8510.eurprd04.prod.outlook.com:mid]
+X-Rspamd-Queue-Id: 449142F04A9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-03-17, 11:04:18 -0400, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
-> 
-> Each record release via tls_strp_msg_done() triggers
-> tls_strp_check_rcv(), which calls tls_rx_msg_ready() and
-> fires saved_data_ready(). During a multi-record receive,
-> the first N-1 wakeups are pure overhead: the caller is
-> already running and will pick up subsequent records on
-> the next loop iteration. The same waste occurs on the
-> recvmsg and splice_read paths.
+> On Mon, Mar 23, 2026 at 02:07:49PM +0800, Wei Fang wrote:
+> > +static void netc_port_set_mac_mode(struct netc_port *np,
+> > +				   unsigned int mode,
+> > +				   phy_interface_t phy_mode)
+> > +{
+> > +	u32 mask =3D PM_IF_MODE_IFMODE | PM_IF_MODE_REVMII |
+> PM_IF_MODE_ENA;
+> > +	u32 val =3D 0;
+> > +
+> > +	switch (phy_mode) {
+> > +	case PHY_INTERFACE_MODE_RGMII:
+> > +	case PHY_INTERFACE_MODE_RGMII_ID:
+> > +	case PHY_INTERFACE_MODE_RGMII_RXID:
+> > +	case PHY_INTERFACE_MODE_RGMII_TXID:
+> > +		val |=3D IFMODE_RGMII;
+> > +		/* Enable auto-negotiation for the MAC if its
+> > +		 * RGMII interface supports In-Band status.
+> > +		 */
+> > +		if (phylink_autoneg_inband(mode))
+> > +			val |=3D PM_IF_MODE_ENA;
+>=20
+> I would prefer newer drivers not to use phylink_autoneg_inband()
+> anymore. Note that there is no need to support RGMII inband in the
+> kernel (nor is there any proper support without a "phylink_pcs"
+> being present to provide the inband status.)
 
-nit: splice_read is less of a problem since it doesn't loop over
-records?
+Thanks for the info, I will remove it.
 
+>=20
+> > +static void netc_port_set_hd_flow_control(struct netc_port *np, bool e=
+n)
+> > +{
+> > +	if (!np->caps.half_duplex)
+> > +		return;
+> > +
+> > +	/* The HD_FCEN is used in conjunction with the PM_HD_FLOW_CTRL
+> > +	 * register, which has a default value, so currently we do not
+> > +	 * set it in the driver. The half duplex flow control works by
+> > +	 * the backpressure, and the backpressure is essentially just
+> > +	 * a long preamble transmitted on the link intended to create
+> > +	 * a collision and get the half duplex link partner to defer.
+> > +	 */
+> > +	netc_mac_port_rmw(np, NETC_PM_CMD_CFG(0),
+> PM_CMD_CFG_HD_FCEN,
+> > +			  en ? PM_CMD_CFG_HD_FCEN : 0);
+>=20
+> We don't support half duplex backpressure in the kernel. I notice
+> you always enable this whenever HD mode is negotiated, which means
+> there's no way for the user to disable it. Flow control can cause
+> problems. Ethernet relies on packet dropping for congestion
+> management.
 
-[...]
-> +void tls_strp_check_rcv_quiet(struct tls_strparser *strp)
-> +{
-> +	if (unlikely(strp->stopped) || strp->msg_ready)
-> +		return;
-> +
-> +	if (tls_strp_read_sock(strp) == -ENOMEM)
-> +		queue_work(tls_strp_wq, &strp->work);
-> +}
+Okay, make sense, I will remove it.
 
-c/p of tls_strp_check_rcv isn't nice. Add a 'bool wake_up' argument
-instead? [but see the comment about recvmsg]
+>=20
+> > +static void imx94_switch_phylink_get_caps(int port,
+> > +					  struct phylink_config *config)
+> > +{
+> > +	config->mac_capabilities =3D MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
+> > +				   MAC_1000FD;
+> > +
+> > +	switch (port) {
+> > +	case 0 ... 1:
+> > +		__set_bit(PHY_INTERFACE_MODE_SGMII,
+> > +			  config->supported_interfaces);
+> > +		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
+> > +			  config->supported_interfaces);
+> > +		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
+> > +			  config->supported_interfaces);
+> > +		config->mac_capabilities |=3D MAC_2500FD;
+> > +		fallthrough;
+> > +	case 2:
+> > +		config->mac_capabilities |=3D MAC_10 | MAC_100;
+> > +		__set_bit(PHY_INTERFACE_MODE_MII,
+> > +			  config->supported_interfaces);
+> > +		__set_bit(PHY_INTERFACE_MODE_RMII,
+> > +			  config->supported_interfaces);
+> > +		if (port =3D=3D 2)
+> > +			__set_bit(PHY_INTERFACE_MODE_REVMII,
+> > +				  config->supported_interfaces);
+>=20
+> The "case 2" above already ensures that port is 2 here.
 
+"case 0...1" uses "fallthrough" instead of "break", and port 0 and 1 do not
+support REVMII. So the check is needed.
 
->  void tls_strp_check_rcv(struct tls_strparser *strp)
->  {
->  	if (unlikely(strp->stopped) || strp->msg_ready)
-> @@ -551,6 +566,8 @@ void tls_strp_check_rcv(struct tls_strparser *strp)
->  
->  	if (tls_strp_read_sock(strp) == -ENOMEM)
->  		queue_work(tls_strp_wq, &strp->work);
-> +	else if (strp->msg_ready)
-> +		tls_rx_msg_ready(strp);
-
-Since that's now the only caller of tls_rx_msg_ready, and all that
-does is call saved_data_ready, inline it here?
-
-> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> index 07f4a3d1a6f854acc7762608cc7741b3de95c195..381a723b6cacc669e333752af34f051f296d6f52 100644
-> --- a/net/tls/tls_sw.c
-> +++ b/net/tls/tls_sw.c
-> @@ -1384,7 +1384,10 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
->  			return ret;
->  
->  		if (!skb_queue_empty(&sk->sk_receive_queue)) {
-> -			tls_strp_check_rcv(&ctx->strp);
-> +			/* tls_strp_check_rcv() is called at each receive
-> +			 * path's exit before the socket lock is released.
-> +			 */
-
-I'm not convinced this comment will make sense to someone reading the
-code outside of reviewing this series.
-
-> +			tls_strp_check_rcv_quiet(&ctx->strp);
->  			if (tls_strp_msg_ready(ctx))
->  				break;
->  		}
-> @@ -1867,9 +1870,9 @@ static int tls_record_content_type(struct msghdr *msg, struct tls_msg *tlm,
->  	return 1;
->  }
->  
-> -static void tls_rx_rec_done(struct tls_sw_context_rx *ctx)
-> +static void tls_rx_rec_release(struct tls_sw_context_rx *ctx)
->  {
-> -	tls_strp_msg_done(&ctx->strp);
-> +	tls_strp_msg_release(&ctx->strp);
->  }
->  
->  /* This function traverses the rx_list in tls receive context to copies the
-> @@ -2150,7 +2153,7 @@ int tls_sw_recvmsg(struct sock *sk,
->  		err = tls_record_content_type(msg, tls_msg(darg.skb), &control);
->  		if (err <= 0) {
->  			DEBUG_NET_WARN_ON_ONCE(darg.zc);
-> -			tls_rx_rec_done(ctx);
-> +			tls_rx_rec_release(ctx);
->  put_on_rx_list_err:
->  			__skb_queue_tail(&ctx->rx_list, darg.skb);
->  			goto recv_end;
-> @@ -2164,7 +2167,8 @@ int tls_sw_recvmsg(struct sock *sk,
->  		/* TLS 1.3 may have updated the length by more than overhead */
->  		rxm = strp_msg(darg.skb);
->  		chunk = rxm->full_len;
-> -		tls_rx_rec_done(ctx);
-> +		tls_rx_rec_release(ctx);
-> +		tls_strp_check_rcv_quiet(&ctx->strp);
-
-This one worries me: if tls_strp_check_rcv_quiet() sets msg_ready=1
-without calling saved_data_ready. If we break out of the loop after
-this, the final tls_strp_check_rcv() just before returning from
-tls_sw_recvmsg() will do:
-
-void tls_strp_check_rcv(struct tls_strparser *strp, bool wake_up)
-{
-	if (unlikely(strp->stopped) || strp->msg_ready)
-		return;
-[...]
-
-and not call saved_data_ready?
-
--- 
-Sabrina
 
