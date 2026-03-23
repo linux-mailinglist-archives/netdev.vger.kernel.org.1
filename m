@@ -1,116 +1,98 @@
-Return-Path: <netdev+bounces-270602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270604-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uPl/AIdwwWkQTQQAu9opvQ
-	(envelope-from <netdev+bounces-270602-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:55:35 +0100
+	id IHtlIgFuwWnDTAQAu9opvQ
+	(envelope-from <netdev+bounces-270604-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:44:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01B752F91C7
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:55:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 038252F8BAD
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:44:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3E05C307E7C3
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:01:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 24611324157A
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7143BA243;
-	Mon, 23 Mar 2026 16:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DADB3BF66D;
+	Mon, 23 Mar 2026 16:01:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="tCiidTFQ"
+	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="eL72NYEl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009CE3B8BCF
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 16:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E353BED40
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 16:01:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774281677; cv=none; b=EyRQ5ejvc2CWr06hxiv2sut6PSX98dsPrHepWbumHuKCSEafwWSF4wcJxnM7XgoWl+uK+jOv//pdJx8ZCjX09iPiISUtlP6kg61e28QLXglOkZg2zsbNs7twO0BnhlITHu0hP2PP/EjhEXPAyWyoRrW0GxiLviSExm+fU2LcMNA=
+	t=1774281698; cv=none; b=A2JymbU12THYPpUh8CKFHO0lnNYc0WBPxqKO1T/s8C4uirS+imnX3jip555Isq3rVwVmx5B/GHnqGVri5et+/GI8bfsqSrJq3TwyO3IeSkB1hDoauclF/kcyPE+aFsE6eWyiqvkqk1sPhCnAMOTayv9ratYmDcJKfUIrsbdS/mQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774281677; c=relaxed/simple;
-	bh=xyAGaEXQZTWs4DlMf28kBT1WbT71fLVTUKX8/OJIrfo=;
+	s=arc-20240116; t=1774281698; c=relaxed/simple;
+	bh=nRir5v+6LbzdGv9qh2mWXxT+gSGB0K8Hs1BfKYmoCMg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kW45t5hNlWhEck7SETnVBX7QRsFCS8XrW1pELB+IIvtCkoL/Ru6lzKFMYbgdELUIxFDiJrS2GI2VVb82cY5RWTUMsVwoqgykfmOe5PjWXZi7Uo13hGXSwK3ffLo+ZwPAOEbs0p8pAELjbh8lvuG368cWwhLZ9dclTTtjC1o19qE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org; spf=pass smtp.mailfrom=bitbyteword.org; dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b=tCiidTFQ; arc=none smtp.client-ip=209.85.222.177
+	 MIME-Version; b=f+Pd2MG6nSveJ1ZD9scqpdgte/B8vOEK4mXkd8K8Lv8WhQEhKsvdiFDma9l6lR1cC9gzrzGEEUgVJtTgr7UlR81TT8PJ68HUpr/C3vzCkUZh3kJ+jTACylwbpi8AvcdDomHRDj0dNzlrfpaZGFN4i1XP3oWWpi5ouoYBWO1eLzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org; spf=pass smtp.mailfrom=bitbyteword.org; dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b=eL72NYEl; arc=none smtp.client-ip=209.85.222.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bitbyteword.org
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8cfc497a604so456931485a.3
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 09:01:15 -0700 (PDT)
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-8cd7c372929so382171985a.0
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 09:01:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bitbyteword.org; s=google; t=1774281675; x=1774886475; darn=vger.kernel.org;
+        d=bitbyteword.org; s=google; t=1774281696; x=1774886496; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zzezBvlbzIGXplopQPhzXRTVv1p4U7sUNeKcBaGOoCw=;
-        b=tCiidTFQ7qgvwelsnitMx+MlaYKCt1PDy488Bos+z0M4gALZSPysD6uED5Lay1Joil
-         o8MKnT0KuetxDzQMFZnGLqUvPU+EIztk0uBmJwlI6eJIGZhPrd8lBeL+t9WHoYThcJba
-         hWIWVfuj8x7/1r98kVmYsF0rS4+20hskeiQdqClLDSdXxCr6Qoxh7KfSJVLMpL+dnoxR
-         YiEawU+vuIhGIvv5EgoxcHSsL8VgaAGmhEEWkBWclrzj7kyEou40xDqPsMG/GF4cLmJZ
-         1L5hql6AHYCMgViigflIQ1coZ80elgn5igKHIQUkz2TCZa7DGkooLhtzCi1e2BFsxuLZ
-         WbiQ==
+        bh=BV4QS+yC5xdWAGmIg+LeuXzS9pCzT00lLs26Yre9ABc=;
+        b=eL72NYElWH2iC+/O1dmlJJitOP/i4JgbyCbHwvkJIV9nicRPRbCmh3INfW9Cvc+Fss
+         ScNnJgOAjYoj6017h7+Eex+P7DBptEMHyjD3rV0T82bNfAG4FaVJ8M6egqeam5iISaoY
+         yx8Vz3luFBC8AfR4Hc/dG6xaMjTS/TFRgAkORnyNadABV2LxcKQgfM8C6AfwXl4e8Mqc
+         cZue/EyTQ2fFKC7cHvMrSKnuvY82Jk669RhdPK6yEY7yOBAPDjWXmrjigU7Ng36OYif1
+         fBSQwQ0MmidefDnfw1cxSfZ7VGJQ4bp9ok3JQPIqhkjllGoxILlhJ4Y69gEKU+2zAeaB
+         Jf6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774281675; x=1774886475;
+        d=1e100.net; s=20251104; t=1774281696; x=1774886496;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=zzezBvlbzIGXplopQPhzXRTVv1p4U7sUNeKcBaGOoCw=;
-        b=W8BVUuijfa4PixHApyWPthjrAPeWkRqI6w5bIvZKKiwVYY4Z25RJIyWx/n9DcqNVJW
-         t3t+Wwsfcl0DrpfQoyaaKvQKH5Fxd0jw3AVcXJIL0ayUw4JFLuEb1LGXEt5fcKingErj
-         d0wRWkMNKllOpRsY3poYGwCtx0iUix20Nh6VQCibQVY7r72S/QSFeMRgI1ULI3sk0wer
-         vo4ZCXOo0JsxF3qd0Ul25N/m/S7efFnJ2n1EgtkoatCO0pzO2xI3xlHa186i+pa1TPFp
-         IiFuYjtKByCp0FIpldH2PjO+3XRtR/ONkiQtgHL68g2gRZsf3Or7is15bVtiEsKLCz56
-         cbUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV7py1mafRCMudlx3Y3RpwL+Ik8yyQzN3TNPV34XKf3WtR6l26DQIp7wuOVyNQbe4jgvJhYC98=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzjn1E0dHv2aKNJBUeRoidlnJl07+xG0xyuBHu/xzgd90NIbbCQ
-	oEofl7H9GRjVCP9zzVNYAEgrp0LZS9PAkG7H0rqcfKaBtTX+d0nXG2MEK0yS5YLZ1o4=
-X-Gm-Gg: ATEYQzx4mvwZJPSSZX05P8fmy+su2gw4E5mN4gU17KqiykfoMnP2MtuqXboVcbcqfd0
-	gwVElsSPuTenQ/Ytj32kQW0wQBWB45b5KxFWyZBsCsfeZsTMR/pQIDOFty1aNdFjVyusi1iaDMu
-	i4iBybacgm7SA41FswTKzriOywaXbCBUQY2ZJyxm9QcPYTXCn77cQBf+bAsm3u22Mo/fFEeYhE4
-	BVUaOjK0L9pytyDmsMwNdcAyioqoIGmSstXVIQWfZdI/e44tdJBmZbtZuMzJmfdOQswcTtTOKbs
-	jxEfgshbdG5NJ8BhMYirCxI0TJcB2T6sGtxjny04V1qZpXoBpYwemgsVuvHmYTrv7LhIVbL0TZO
-	fBvLafXTqLQ8IlEANfUz2OtyA5E67sAbuj3SP4d60lCJ41R6H4LEx+AEzzLiWpWkB6qNoTjMiQF
-	tRYngRvXr02IEMDZ9MdRj4nm9N7IRNkVjATz77idKTUArBxbER2pxRT5971/JNcUBt9A==
-X-Received: by 2002:a05:620a:4594:b0:8cd:75df:f2fb with SMTP id af79cd13be357-8cfc80dd30cmr1961607085a.65.1774281669680;
-        Mon, 23 Mar 2026 09:01:09 -0700 (PDT)
+        bh=BV4QS+yC5xdWAGmIg+LeuXzS9pCzT00lLs26Yre9ABc=;
+        b=EtCNb7BrBhTvwHwQ20fn+oWB9oeisRt0lyKUeXK10ff1vMQP3caa2en2Do+TTxpHst
+         fL4NQaTa6doChb8bBpvCSJK6y0sTZc5jyIJ2jNntKU28Uz7Zjfj1CQYzftNObgbFUZGF
+         uBU0uBLHjhfqosjNDLk4PGzXW3otsFKKwNUbq25MFBlkuns2PL+J2aR4fMiDGVmsUuFa
+         9CuOYJgjsX3oxQ1sHYa2eQg0ChKYn78bkrSgjPxz3zGYGT9OSHBrAHFV/iW8yjiFL7B0
+         SF45SysJ7jNTtBKuNdXk/qxGWmXHoa26xhUars48nIF/ufmNYp/j9fblNgMv5dgToOvF
+         MOqw==
+X-Forwarded-Encrypted: i=1; AJvYcCUhJFYXpTLnIo+FW4j89cGAIS4zlCwKb5yx2zjzHHGZM3B6sOcBd20ksIvngbVKcCSmSLWnSSo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6ktqjrOzY7hTmVDsRr/FmnBPj+PheP5r9DxW6bN4vHiTtvuAU
+	arZHFVYApWuJYsQ2jv7ytAGCHy92KMoyykuiwzqvvu0f9woOg46WuvUWHUjhE/uF6E8=
+X-Gm-Gg: ATEYQzzCuiuNK8GdEv32pFLZg0J0tJDW0qw/Ho8mDMu4LmSOXEBPLU7wdZw0tQMpUht
+	5oLQ5DF+5LsIrWtlJ5mOsfpXAH1fCpyeWMKKp9lcJIposd6Jm5TlgkbjhZ1bJH3HFNPLkf7b4/I
+	YAOVJR3v7VsEe7mNDbh8QpUrkDCtm7chINtkB5M4QYXG93Y6W4WUNd2Hz5TrWzPPAc7jbdMDEOG
+	af41nXaqrC0yL5eCHOgXzGhYftN+DQLeKUtAaefq8i7DAFacNOWL5tekT0SNdWfaNuBgDvhg43K
+	fO4iwSX9bGC1lRQMmQEMgtfkG6KTqfngnEwzp0Py/wK5zJkiaUQaUq+q+e7WABUAzuidV+XSb3A
+	IoWCAxLORld8f7bpnDzVan5DCLnKBrPhXA5mPRryF2szmb/aO3KaTOJXv+1nPoUx3mzi5b7xpei
+	tmOtpbUJQHJWi6Fqbs/3IxJAN/dn68qDGD0bDkHGQt9u4xqQmiW3CTWC86iBOjU5SK1Q==
+X-Received: by 2002:a05:620a:4707:b0:8cf:e933:d5e8 with SMTP id af79cd13be357-8cfe933ee7dmr479191185a.44.1774281696047;
+        Mon, 23 Mar 2026 09:01:36 -0700 (PDT)
 Received: from vinmini.lan (c-73-143-21-186.hsd1.vt.comcast.net. [73.143.21.186])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cfc9088df1sm843364185a.25.2026.03.23.09.01.07
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cfc9088df1sm843364185a.25.2026.03.23.09.01.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2026 09:01:09 -0700 (PDT)
+        Mon, 23 Mar 2026 09:01:35 -0700 (PDT)
 From: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>
 To: 
 Cc: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>,
 	Steven Rostedt <rostedt@goodmis.org>,
 	Peter Zijlstra <peterz@infradead.org>,
+	Jiri Pirko <jiri@resnulli.us>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Aaron Conole <aconole@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Jon Maloy <jmaloy@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	dev@openvswitch.org,
-	linux-sctp@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
 	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH v2 04/19] net: Use trace_call__##name() at guarded tracepoint call sites
-Date: Mon, 23 Mar 2026 12:00:23 -0400
-Message-ID: <20260323160052.17528-5-vineeth@bitbyteword.org>
+Subject: [PATCH v2 16/19] net: devlink: Use trace_call__##name() at guarded tracepoint call sites
+Date: Mon, 23 Mar 2026 12:00:35 -0400
+Message-ID: <20260323160052.17528-17-vineeth@bitbyteword.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260323160052.17528-1-vineeth@bitbyteword.org>
 References: <20260323160052.17528-1-vineeth@bitbyteword.org>
@@ -121,135 +103,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[bitbyteword.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	FREEMAIL_CC(0.00)[bitbyteword.org,goodmis.org,infradead.org,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,ovn.org,vger.kernel.org,openvswitch.org,lists.sourceforge.net];
-	TAGGED_FROM(0.00)[bounces-270602-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270604-lists,netdev=lfdr.de];
 	DMARC_NA(0.00)[bitbyteword.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[bitbyteword.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[vineeth@bitbyteword.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bitbyteword.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 01B752F91C7
+X-Rspamd-Queue-Id: 038252F8BAD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Replace trace_foo() with the new trace_call__foo() at sites already
-guarded by trace_foo_enabled(), avoiding a redundant
+Replace trace_devlink_trap_report() with trace_call__devlink_trap_report()
+at a site already guarded by tracepoint_enabled(), avoiding a redundant
 static_branch_unlikely() re-evaluation inside the tracepoint.
-trace_call__foo() calls the tracepoint callbacks directly without
-utilizing the static branch again.
+trace_call__devlink_trap_report() calls the tracepoint callbacks directly
+without utilizing the static branch again.
 
 Suggested-by: Steven Rostedt <rostedt@goodmis.org>
 Suggested-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
-Assisted-by: Claude:claude-sonnet-4-6
 ---
- net/core/dev.c             | 2 +-
- net/core/xdp.c             | 2 +-
- net/openvswitch/actions.c  | 2 +-
- net/openvswitch/datapath.c | 2 +-
- net/sctp/outqueue.c        | 2 +-
- net/tipc/node.c            | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
+ net/devlink/trap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 14a83f2035b93..f7602b1892fea 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6444,7 +6444,7 @@ void netif_receive_skb_list(struct list_head *head)
- 		return;
- 	if (trace_netif_receive_skb_list_entry_enabled()) {
- 		list_for_each_entry(skb, head, list)
--			trace_netif_receive_skb_list_entry(skb);
-+			trace_call__netif_receive_skb_list_entry(skb);
- 	}
- 	netif_receive_skb_list_internal(head);
- 	trace_netif_receive_skb_list_exit(0);
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index 9890a30584ba7..3003e5c574191 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -362,7 +362,7 @@ int xdp_rxq_info_reg_mem_model(struct xdp_rxq_info *xdp_rxq,
- 		xsk_pool_set_rxq_info(allocator, xdp_rxq);
+diff --git a/net/devlink/trap.c b/net/devlink/trap.c
+index 8edb31654a68a..d54276dcd62fb 100644
+--- a/net/devlink/trap.c
++++ b/net/devlink/trap.c
+@@ -1497,7 +1497,7 @@ void devlink_trap_report(struct devlink *devlink, struct sk_buff *skb,
  
- 	if (trace_mem_connect_enabled() && xdp_alloc)
--		trace_mem_connect(xdp_alloc, xdp_rxq);
-+		trace_call__mem_connect(xdp_alloc, xdp_rxq);
- 	return 0;
+ 		devlink_trap_report_metadata_set(&metadata, trap_item,
+ 						 in_devlink_port, fa_cookie);
+-		trace_devlink_trap_report(devlink, skb, &metadata);
++		trace_call__devlink_trap_report(devlink, skb, &metadata);
+ 	}
  }
- 
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index 792ca44a461da..60823de201417 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -1259,7 +1259,7 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
- 		int err = 0;
- 
- 		if (trace_ovs_do_execute_action_enabled())
--			trace_ovs_do_execute_action(dp, skb, key, a, rem);
-+			trace_call__ovs_do_execute_action(dp, skb, key, a, rem);
- 
- 		/* Actions that rightfully have to consume the skb should do it
- 		 * and return directly.
-diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-index e209099218b41..2b9755e2e4731 100644
---- a/net/openvswitch/datapath.c
-+++ b/net/openvswitch/datapath.c
-@@ -335,7 +335,7 @@ int ovs_dp_upcall(struct datapath *dp, struct sk_buff *skb,
- 	int err;
- 
- 	if (trace_ovs_dp_upcall_enabled())
--		trace_ovs_dp_upcall(dp, skb, key, upcall_info);
-+		trace_call__ovs_dp_upcall(dp, skb, key, upcall_info);
- 
- 	if (upcall_info->portid == 0) {
- 		err = -ENOTCONN;
-diff --git a/net/sctp/outqueue.c b/net/sctp/outqueue.c
-index f6b8c13dafa4a..4025d863ffc84 100644
---- a/net/sctp/outqueue.c
-+++ b/net/sctp/outqueue.c
-@@ -1267,7 +1267,7 @@ int sctp_outq_sack(struct sctp_outq *q, struct sctp_chunk *chunk)
- 	/* SCTP path tracepoint for congestion control debugging. */
- 	if (trace_sctp_probe_path_enabled()) {
- 		list_for_each_entry(transport, transport_list, transports)
--			trace_sctp_probe_path(transport, asoc);
-+			trace_call__sctp_probe_path(transport, asoc);
- 	}
- 
- 	sack_ctsn = ntohl(sack->cum_tsn_ack);
-diff --git a/net/tipc/node.c b/net/tipc/node.c
-index af442a5ef8f3d..5745d6aa0a054 100644
---- a/net/tipc/node.c
-+++ b/net/tipc/node.c
-@@ -1943,7 +1943,7 @@ static bool tipc_node_check_state(struct tipc_node *n, struct sk_buff *skb,
- 
- 	if (trace_tipc_node_check_state_enabled()) {
- 		trace_tipc_skb_dump(skb, false, "skb for node state check");
--		trace_tipc_node_check_state(n, true, " ");
-+		trace_call__tipc_node_check_state(n, true, " ");
- 	}
- 	l = n->links[bearer_id].link;
- 	if (!l)
+ EXPORT_SYMBOL_GPL(devlink_trap_report);
 -- 
 2.53.0
 
