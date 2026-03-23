@@ -1,233 +1,174 @@
-Return-Path: <netdev+bounces-270659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270660-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cCo/MFCFwWn+TgQAu9opvQ
-	(envelope-from <netdev+bounces-270659-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:24:16 +0100
+	id EHONF12MwWlxTwQAu9opvQ
+	(envelope-from <netdev+bounces-270660-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:54:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79EFD2FB3A9
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:24:16 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C79A2FBA8F
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:54:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 79FA6300D0EB
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 18:24:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D54D53072DFC
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 18:25:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AF63AF647;
-	Mon, 23 Mar 2026 18:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD443CBE9E;
+	Mon, 23 Mar 2026 18:25:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="arfznNLk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C6BhqKuv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2DE3BF69D
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 18:24:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40663CCFBE
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 18:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774290253; cv=none; b=mkwpGdlYos4eEeW5ZIS46nocGyC2VhlWxwJFERX8S3Hn4C1Ly7+iBMQKPADeCe66qnvhA+SuQPa5JCxMMs5w5ZRGSbPfc245k9V3FlI9m16+KNBL0hksr8CTNAi5SXA+h/rEbidtQLKRib6azmxNLg0jpHyK5I0tZjY1wxc2AZo=
+	t=1774290317; cv=none; b=qutgzVX7YPXLP9O+BazHA3FWZBi1WdXuLt6XVgOjCLtNrGHAX3dYCTKGmM5YFoS25X2PSRSWGeEBv8HfEezVNjo5DecW1sYDfzh6TyV2S3mMH9IuspC6eZ12wlKpr56YU8aD8dXF7UHv1TphG9bNcNZMC6GpAxqO41VMa6DgsCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774290253; c=relaxed/simple;
-	bh=6UtWPnVfvsKBmtqMaCXhb9lkfRopD3ME5ghIo3ATN7A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R8lZqpXxFp/FAMSRdloyp1q07sw8WAYMBFtM6SgcWmdHxj+X2xAiZzN/c2gVODmnFg6b+HljUVtzvMFxuJngUyO/HS5LcEDP0RiQHAkUHEIVvr+NTd6ml9NlKm9KFKKtuBL1/EDJ3I7vJbF/JLS/vG2wJYpw/hJw8hPjInv8bAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=arfznNLk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82D9FC4CEF7;
-	Mon, 23 Mar 2026 18:24:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774290252;
-	bh=6UtWPnVfvsKBmtqMaCXhb9lkfRopD3ME5ghIo3ATN7A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=arfznNLksLiodP849hsjgHXzwF9CMZc9Sl2KFxCAxlpi9Ov8p3uhYhaQauD56VYR/
-	 1WCsTTEGDfhlvlzvkHClyR7+KZswFD55AXJCF0KvpGHN3xGm++ay2Xuu+MVow0w5I6
-	 6hm2BQtQkz6cgkyuriXuf7wqlyWQ0u4b8hJ34eogdDlGAqAtNJNI8le/sMDSA26NMA
-	 gR+6NFmHSbOJpnw3EF/Fgcj8Q3ekqsB3ymJzqEWLUjumlu1myHV6jW/U4A8/I521wo
-	 KTgbl1Y8DDxVivGNW3fUzEVxFM3PR9SomXMUhwqFL2UX9UcMv8+Kr/cK2FR5hsAZvc
-	 Zq0lCZp5Jf6dQ==
-From: Simon Horman <horms@kernel.org>
-To: weibunny.kernel@gmail.com
-Cc: Simon Horman <horms@kernel.org>,
-	edumazet@google.com,
-	willemdebruijn.kernel@gmail.com,
-	netdev@vger.kernel.org,
-	weibunny@fb.com,
-	daniel.zahka@gmail.com,
-	bobbyeshleman@meta.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	dw@davidwei.uk,
-	andrew+netdev@lunn.ch
-Subject: Re: [PATCH v7 net-next 3/5] psp: add a new netdev event for dev unregister
-Date: Mon, 23 Mar 2026 18:24:05 +0000
-Message-ID: <20260323182405.177135-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260322040704.991766-4-weibunny.kernel@gmail.com>
-References: <20260322040704.991766-4-weibunny.kernel@gmail.com>
+	s=arc-20240116; t=1774290317; c=relaxed/simple;
+	bh=n2Px9KvrBSca+8wbbFZSgIYdPNKBUj7GDb8kCwrntFc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q5Un0e3px9/UFarDWgnAwASNgSMuf8UTtD2fo6SE2K498OUhIlVscUL52LeYo4BMT/HpFKE8WKe9yESD5r99gIgd1vXusj7UCMV3lGNvAvDphlQqtASBAqx2EaS2fUTdi3nn4bZxMePtUb3Bjk3pvj1ghJCXXymuAx0wnXYSfAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C6BhqKuv; arc=none smtp.client-ip=74.125.82.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-1271195d2a7so870709c88.0
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 11:25:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774290311; x=1774895111; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0+l2i6CJ0UesVmQ48tC67wDfEsqc0p6X8zxC51ds3A4=;
+        b=C6BhqKuvTpMhqlgVXLg6kGG0gezlJsDbJftPaxV/tEZBZA6D9EC2wRDTvqtCMVxwz4
+         /8ZOvMrwAa3W5fYzMgFaX3I6Ptx0VKBRK4Lgpt8ILJokWwtxMfTBzc3/PzPXg70Oj4np
+         jpl5Jmo0t7/5kzqB3fsutAMjgJ1YqE19eixjvR7p/ri4XkpXb+LFuk8M8KLyDG6+2rqI
+         tb8Hveoxujn0S2XUx8RQ18UNQBRNT7oS0go8XLXN5G5pAoMBFsg952vDwr6+W4olLNAq
+         zg9N/rTnW/muM4oDXZA9ksnKerCiBQ8d0Y181a4ort6rAdjU48nIksLnZXq4bqI32XqA
+         3OJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774290311; x=1774895111;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0+l2i6CJ0UesVmQ48tC67wDfEsqc0p6X8zxC51ds3A4=;
+        b=NsoI/kIdMrCzCbTQKrM/zbAIJ82x8vvPoRU78oy+HBjnSXfh2h/qqzMHee3uvH6iVJ
+         bggpSYIyBk3p5OeiKEJoTYW8YUPlQGlO1wLsNxIUl+NFUf4c/237eOC70ad08Ms47+II
+         HiwXe7fP2FAh5cQMntiDZhSrhbjtwl4FWpkaBFIR5iwx6LTutq9gIkIKgMFZKkqce9i+
+         qVXkrMEzMDnsnHqPwbdI10pPHEj3dZ06niE9+gsJ4Ie7geMoJBG7TwMIH0a0upf9mLGU
+         z4J7N8tYAIY7mgF3BiqU3zXzPYkQvDMUGemEOjbYsXcWmepbKC5S1BRTTpdn9oiHXEZG
+         MD3A==
+X-Forwarded-Encrypted: i=1; AJvYcCVx48OGS8E7mJpfZ9wGkUpkamcb9oJ/uaJjHFk8XidJ1e04k4tMV9MpdKUtf/H0EJ9h1Jozm8M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzljV0gaHgQyVjTQm320NEsVHaTDEW+keC182TpDy9WtcYFIwWl
+	ViYrQ1D9ZToniMVyI6xuhnHaVaURFxQZC3iV02Sz8wWxk/ZNjRNh6v7Q
+X-Gm-Gg: ATEYQzyUNdVPoimwAAH17kiS7H6efAveCkS47PHuUiZzEVFDUDukfuW7kKlMyoB5Sua
+	IdY0sUyB72zZO2KxnUavxMtxTqZdz1npOFqSNo9JJhYKoeTxHBtVxsPDlYfKDeLb2NabSCbPXEY
+	nZUCwX6MYFYT1xZUDq+uD2YuvLIAT58wCEZnrsCakJj9AMFFltxUsTAw8hGHLAKTe8R6QraDHZm
+	gb1qhDM/jGXvdVE9jbRxY2R01wh3Gf/ggsAmFzy29gXTwuFLacJk6EL+rWBCmaJus3zUoEHpklM
+	+uw8YjtS1ROKEPQcdCKmP9qDl4SjkhrtkYd1lfe40VGHKrSkSuNSoDVS48JkInyNkpxRtIzxYHX
+	6nOYVh7hnxTiarVUXnn7ueWaaDgMV+f9cm+sad+5YvHpK70ucu9H6v0StHpE718bw0H9CnNtQ3G
+	5XbLGBpdwToGGF0XM33TruoJ/DX3wwB/+sColJQ/qK1pIzM25JfWwyoeWs+TTYBR5ZRIEFGtHNd
+	U8=
+X-Received: by 2002:a05:7023:b14:b0:128:e2a9:d97b with SMTP id a92af1059eb24-12a726dd9b5mr6179340c88.42.1774290310889;
+        Mon, 23 Mar 2026 11:25:10 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2ebe:8:a296:1211:5ab0:bc95])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c10b31bef1sm16253302eec.26.2026.03.23.11.25.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2026 11:25:10 -0700 (PDT)
+Date: Mon, 23 Mar 2026 11:25:06 -0700
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, Lee Jones <lee@kernel.org>, 
+	Pavel Machek <pavel@kernel.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>, Tom Rix <trix@redhat.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-spi@vger.kernel.org, linux-leds@vger.kernel.org, 
+	linux-fpga@vger.kernel.org, driver-core@lists.linux.dev
+Subject: Re: [PATCH 03/10] spi: switch to using class_find_device_by_fwnode()
+Message-ID: <acGEk-63oVK_fBeh@google.com>
+References: <20260322-remove-device-find-by-of-node-v1-0-b72eb22a1215@gmail.com>
+ <20260322-remove-device-find-by-of-node-v1-3-b72eb22a1215@gmail.com>
+ <098e1856-feee-4f4b-8059-85a53967f6b3@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <098e1856-feee-4f4b-8059-85a53967f6b3@sirena.org.uk>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270659-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270660-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org,fb.com,meta.com,davemloft.net,davidwei.uk,lunn.ch];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linaro.org,gmail.com,axentia.se,armlinux.org.uk,intel.com,linuxfoundation.org,vger.kernel.org,lists.infradead.org,lists.linux.dev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[28];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dmitrytorokhov@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: 79EFD2FB3A9
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6C79A2FBA8F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Mon, Mar 23, 2026 at 05:16:04PM +0000, Mark Brown wrote:
+> On Sun, Mar 22, 2026 at 06:54:21PM -0700, Dmitry Torokhov wrote:
+> > In preparation to class_find_device_by_of_node() going away switch to
+> > using class_find_device_by_fwnode().
+> 
+> >  struct spi_controller *of_find_spi_controller_by_node(struct device_node *node)
+> >  {
+> > +	struct fwnode_handle *fwnode = of_fwnode_handle(node);
+> >  	struct device *dev;
+> >  
+> > -	dev = class_find_device_by_of_node(&spi_controller_class, node);
+> > +	dev = class_find_device_by_fwnode(&spi_controller_class, fwnode);
+> >  	if (!dev && IS_ENABLED(CONFIG_SPI_SLAVE))
+> > -		dev = class_find_device_by_of_node(&spi_target_class, node);
+> > +		dev = class_find_device_by_fwnode(&spi_target_class, fwnode);
+> >  	if (!dev)
+> >  		return NULL;
+> 
+> Actually, no - this just looks weird.  We're in the middle of an OF
+> specific function but we're having to jump up to fwnode for no apparent
+> reason.  If we actually decide to get rid of the OF specific function
+> then I guess but I'm really not convinced this is an improvement in
+> isolation.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-psp: add a new netdev event for dev unregister
+Yes, I want to remove OF-specific APIs from the driver core. I also have
+drafts for bus_find_device_by_fwnode and others.
 
-This commit adds a netdev notifier to handle device unregistration events
-and clean up PSP device associations when the associated network device is
-removed.
+I can make a followup series introducing spi_find_controller_by_fwnode()
+and removing this OF-specific variant.
 
-> diff --git a/net/psp/psp.h b/net/psp/psp.h
-> index 0f9c4e4e52cb..fd7457dedd30 100644
-> --- a/net/psp/psp.h
-> +++ b/net/psp/psp.h
-> @@ -15,6 +15,7 @@ extern struct mutex psp_devs_lock;
->
->  void psp_dev_free(struct psp_dev *psd);
->  int psp_dev_check_access(struct psp_dev *psd, struct net *net, bool admin);
-> +void psp_attach_netdev_notifier(void);
->
->  void psp_nl_notify_dev(struct psp_dev *psd, u32 cmd);
->
-> diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
-> index 178b848989f1..db4593e76fa7 100644
-> --- a/net/psp/psp_main.c
-> +++ b/net/psp/psp_main.c
+Thanks.
 
-[ ... ]
-
-> +/**
-> + * psp_attach_netdev_notifier() - register netdev notifier on first use
-> + *
-> + * Register the netdevice notifier when the first device association
-> + * is created. In many installations no associations will be created and
-> + * the notifier won't be needed.
-> + *
-> + * Must be called without psd->lock held, due to lock ordering:
-> + * rtnl_lock -> psd->lock (the notifier callback runs under rtnl_lock
-> + * and takes psd->lock).
-> + */
-> +void psp_attach_netdev_notifier(void)
-> +{
-> +	if (READ_ONCE(psp_notifier_registered))
-> +		return;
-> +
-> +	mutex_lock(&psp_devs_lock);
-> +	if (!psp_notifier_registered) {
-> +		register_netdevice_notifier(&psp_netdev_notifier);
-> +		WRITE_ONCE(psp_notifier_registered, true);
-                                                             ^^^^
-
-What happens if register_netdevice_notifier() fails? The function ignores
-the return value and sets psp_notifier_registered to true anyway.
-
-register_netdevice_notifier() can fail with errors like -ENOMEM or errors
-from replaying existing device registrations. If registration fails,
-psp_notifier_registered will be permanently set to true, preventing any
-future registration attempts.
-
-This means the notifier will never be registered, so NETDEV_UNREGISTER
-events will be silently missed and PSP device associations will never be
-cleaned up on device removal.
-
-> +	}
-> +	mutex_unlock(&psp_devs_lock);
-> +}
-> +
->  static int __init psp_init(void)
->  {
->  	mutex_init(&psp_devs_lock);
-
-[ ... ]
-
-> diff --git a/net/psp/psp_nl.c b/net/psp/psp_nl.c
-> index aa60a8277829..44e00add4211 100644
-> --- a/net/psp/psp_nl.c
-> +++ b/net/psp/psp_nl.c
-> @@ -515,6 +515,13 @@ int psp_nl_dev_assoc_doit(struct sk_buff *skb, struct genl_info *info)
->
->  	psp_nl_notify_dev(psd, PSP_CMD_DEV_CHANGE_NTF);
->
-> +	/* Register netdev notifier for assoc cleanup on success.
-> +	 * Must drop psd->lock to ensure lock ordering: rtnl_lock -> psd->lock
-> +	 */
-> +	mutex_unlock(&psd->lock);
-> +	psp_attach_netdev_notifier();
-> +	mutex_lock(&psd->lock);
-> +
-
-Can dropping psd->lock here create a use-after-free window?
-
-The pre_doit callback psp_device_get_and_lock() obtains psd via xa_load()
-and holds psd->lock, but does NOT take a refcount on psd.
-
-When psd->lock is dropped here, psp_dev_unregister() can acquire both
-psp_devs_lock and psd->lock, complete teardown, and call psp_dev_put()
-which drops the refcount to 0:
-
-net/psp/psp_main.c:psp_dev_unregister() {
-    ...
-    mutex_lock(&psp_devs_lock);
-    ...
-    mutex_lock(&psd->lock);
-    ...
-    xa_erase(&psp_devs, psd->id);
-    ...
-    mutex_unlock(&psd->lock);
-    mutex_unlock(&psp_devs_lock);
-
-    psp_dev_put(psd);  // can trigger psp_dev_free()
-}
-
-This would trigger psp_dev_free() which calls mutex_destroy(&psd->lock)
-and kfree_rcu(psd, rcu).
-
-When this function then calls mutex_lock(&psd->lock), it operates on a
-destroyed mutex and logically freed memory. The post_doit callback
-psp_device_unlock() would then call mutex_unlock(&psd->lock) on the same
-destroyed mutex.
-
-Should a refcount be taken on psd before dropping the lock, or should the
-notifier registration be moved outside the doit handler?
-
->  	return psp_nl_reply_send(rsp, info);
->  }
+-- 
+Dmitry
 
