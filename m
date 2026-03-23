@@ -1,672 +1,308 @@
-Return-Path: <netdev+bounces-270497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270498-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mMX7N3QpwWmbRAQAu9opvQ
-	(envelope-from <netdev+bounces-270497-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 12:52:20 +0100
+	id SKQEMm8qwWmbRAQAu9opvQ
+	(envelope-from <netdev+bounces-270498-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 12:56:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D94052F1777
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 12:52:19 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 694CC2F17DE
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 12:56:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0D3D730152D4
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:51:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 864A23009889
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:56:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EEF939A07D;
-	Mon, 23 Mar 2026 11:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE16399359;
+	Mon, 23 Mar 2026 11:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Wmz1qQx6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G+YNDUg7"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013008.outbound.protection.outlook.com [40.107.159.8])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A1F39B951;
-	Mon, 23 Mar 2026 11:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4328397E6E;
+	Mon, 23 Mar 2026 11:56:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774266657; cv=fail; b=UohI6ujrEZ/KW5I965y7HvS+r9UUvU23iXRC26juwi7n9oqsSSC5nHu5a0tVD0igAy0ZmoF6Vm4rfoMg9cMz9ilWhsR8kwqjpNzrmARuPZN9u7D7EUEYWngJTvIvkVU/b2BqFXUjLIEIy9z1wwrz5ICS7YcCzrla45HqnbTgVg4=
+	t=1774266988; cv=fail; b=oc61pB7xUzY7Tj5F64XXC1LZvzF60fx+L6hwIAVip/tbvoaaJP+UKKlxbP6Wws43KP6HXbJJLp7kXwvPCyGyaTTiIGl2k6LZa3y/lp1k3R44s1gszVLy66D/RxbCoY730A+hrD1MUWe60S0RRgRTX8qvQogT1KXct2aVclO/N/s=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774266657; c=relaxed/simple;
-	bh=pvp6QbB3ELf0mIMfDx0Bq0CFtUB5yi9WgcRprjFCfxM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=APvqpBuybd2yaZWi3KPdgGPXwW+8Lch+cNu8ZYYjQvmaDoGs39x5XuqEELSOhLgtEZ7PU2HFFLS/nx49rulay80jqzPeISLV3AXOnpMEn6Nj5bYKCQN7VDSyyfiWp9UYOuikb3m8WkqBoEHuxmr7N48eU7E2QvR4nDFY7sKHeG4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Wmz1qQx6; arc=fail smtp.client-ip=40.107.159.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1774266988; c=relaxed/simple;
+	bh=uSrcjAAXNcoHk99wZU9+xmzf7YQ2j5rJCWbBqn3R2rM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=H14eSW+BJKDLOTi0EYrDvoxLd8WVdd/MMC+obCcc0rRuyfJ0jCJgNwFnT2kEEVIwG8Dkabo6dGbcKmx0Z2pBRHfvBuD+LK5cbavlWFaNqYbMCSpjSlmRJ97ms/ivt3Et3p2iriVeCoDGuxeipiMr9ySm3Z/xlqkPgkexTaseBjQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G+YNDUg7; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774266985; x=1805802985;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=uSrcjAAXNcoHk99wZU9+xmzf7YQ2j5rJCWbBqn3R2rM=;
+  b=G+YNDUg7bLSlQZlZg7ntt45pREY4f6WimyiefK8XgUDxPtEytLye4Iv/
+   SyqDOz18AHLvTPcdPX8vLWf1Ptk2sNV3PRlDASxNPgKUH82oOqYeL1j1V
+   QrfoyoMGHu++PgqBeP9fFevE7C9yuw7v1cPDKTK6PBsz8rSA6G9h/JbwK
+   fnoGH4LgBIaYY4vk5XtnTxpclpoOuq4xESLaj2VJrwlzNFJlWlExXg15W
+   itrF+m2J6krB20qt8PoYlkOIqWctV5VbA/0nWMGICVrjjxy3NMylJlEF7
+   mjK/6i+4V85shgl1/2q1eK4gcxwLcieXrWkyyDBTY78M0Gp+6Dr/rPbnJ
+   g==;
+X-CSE-ConnectionGUID: XQCxEcztRIy1cKiykACdvw==
+X-CSE-MsgGUID: VqOsdpzcSQ2ldTNUyL+2zQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11737"; a="97881830"
+X-IronPort-AV: E=Sophos;i="6.23,137,1770624000"; 
+   d="scan'208";a="97881830"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2026 04:56:24 -0700
+X-CSE-ConnectionGUID: nwqcOwMmRwGp134AsEryqQ==
+X-CSE-MsgGUID: SVkI97MHQYqHLcc3wcKTPw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,137,1770624000"; 
+   d="scan'208";a="223077288"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2026 04:56:24 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 23 Mar 2026 04:56:22 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 23 Mar 2026 04:56:22 -0700
+Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.42) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 23 Mar 2026 04:56:22 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=l45efW74fOBIzyQq4OQ3aUWYCM6Z2HncoylKcc9zbqAHXlPC8Q+ASCuwjsioYljInjiX074pj7GwL0LxnAHLz5/qTDHtS2L7Ew/ABQ9eiYSDVCEddc26z1/0nEv2zjcRpl8ww0n1hRDGZmWxoNl7Ti9f4Hf83kH1ikgxYFqyW+RJNQhQqgvrr9U3LRDslhEjVxMMdX4TkyxCV/38HLUqftrtDhEU1yMtRu+8U86RsGavqiMqRLSd0lGyfxNHj36a8nQHSNsCcLlBGtK8XEVKfdB66Yb4eRO8Ri27Hlc2cs6y9xnnWVyFnIeAk/15d3rnNqTfWQ8C/LwjSaMMF8ta7A==
+ b=CXL9aDZoSzgspiIhy7lEYFqQOTBZ5T1G3XfvJVzJ6V6rjzC0yMvt5uQQg3ZAdSxz6CBByzktyqJNZ70mey+oOGkWsterovwmnMrphuZEVZxw2lIT5SkPfazTAwGamOJQYdQT6fZRxmkHGddeT6tKQetU7rbpbfZCFmNc/0PuEM3q4eg4HnxFKYZIIHNAJ52d/MBe5A64A4rxu/7a9/+mDHgtC6d/bOVD9/KCkb7Hy5ffPnFKY2stpQmQksG4thczAYhVK16/LjhmPVfAqMDnDL0zPe8DHgEGPF3UHoakisu9PnvXLAuB3UUHD4vaBR+/WkSWIHwoJ1ovHtKnVNDNWw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/dPGme3Ar7tIWGonVbCdHZIrtCY6l19//dF9AhZj3p8=;
- b=umAcvVn986wVKRSfmSO8sFnGI1cPVvYJSNqQk4vnT+uMHSHWvEbo1Jbdb3F1Ph/tN4iec0QRPbXZVJin6GAy7jQ9xC8OK97YBwuQ1MTnVHyi4gfclKu3ObQmgvItl3IePcLm+take9Cy2TgvcUI+saPzDzCowuInsQ9wnclUdGPjtJn06UjzFKAdUHIjKzgExw6IEd9dVfIsm7ZarFruZDwidk8w6oNshhhZOo8/YBxvfGDuxN/TZBtaypSgm59bQb1+wxzCOZ8u8lffWFe4dMER3xhYjIWvaJyQPwla8GJZYlVR22QCGJ7MTNWeOm0+A5xzO2QazR7OzjtZ3FZiHA==
+ bh=5Uz1VQRX7z8Z311vbk4bvUcBQuE2ilzktPkAViEMf0Y=;
+ b=SYVVT7QP2fabvdjPGIBv2QVXs6zEpDv6udE54/aBni4Vr1PskBULsejmctP9NeZvVvITFRPACs5VkL3hVLIPOZGkdfoKeSWCHjkga5RaD7d0mkPY0y6n66Ca8/v1s5u2bSHdrSRjcxE9aa42v/+Rpcd5AJyeNmX7dH0XlQ58F+mpqzVG2sPfPG+yw1JUeLXqti8qWzxCU5gan5F/AX5q1lKDAEsfg1nQxHKYEWixonEYidS6+Tj1TUWoT7pbcMUVgS1iSspp5NnHZEi1B9LOQrV/un+hWcdBeGBk+fS20U5q4G7pyh2c4ofmLKYjCR6hylNRx/Zu0N8GH+BZ8lRNFg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/dPGme3Ar7tIWGonVbCdHZIrtCY6l19//dF9AhZj3p8=;
- b=Wmz1qQx6Oj5kXT9PZ79DhX5HJLR45GeJS22z1hTTSI0AbevA/o2Ryv/BKo9Lby5+pd75u1/Up2Mk5kh6fKUwbsz9AfrFpc1BOHBZeVL1yM6IDZ48e8c1FIVli+4ZolMGt1WgeyyjEvHVDJ2Pva00xfZmA226ihE/W3dWRWuWUnq8BZPg5P6MfRWGKu58kyAKPhv4D97lTNV2JkzQnXxRa9A5f2d4UTfnZTAIUZPvGn1b8R4Gur/710L1Hc85X23m/wFbKUHGf16GGDx7maP5T9LWraT15lmEYmwRaiTi+YAhTkHGYirf0Gueg9eSvnE9Y7oqfVOtdRU6mQAZx0zsMQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
- by AS5PR04MB9924.eurprd04.prod.outlook.com (2603:10a6:20b:67e::8) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by LV3PR11MB8530.namprd11.prod.outlook.com (2603:10b6:408:1b8::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.25; Mon, 23 Mar
- 2026 11:50:45 +0000
-Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
- ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
- ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9723.022; Mon, 23 Mar 2026
- 11:50:50 +0000
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5 3/3] net: dpaa2-mac: export standard statistics
-Date: Mon, 23 Mar 2026 13:50:39 +0200
-Message-Id: <20260323115039.3932600-4-ioana.ciornei@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260323115039.3932600-1-ioana.ciornei@nxp.com>
-References: <20260323115039.3932600-1-ioana.ciornei@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AS4PR10CA0009.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:5dc::12) To PAXPR04MB8253.eurprd04.prod.outlook.com
- (2603:10a6:102:1bf::7)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Mon, 23 Mar
+ 2026 11:56:18 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9745.012; Mon, 23 Mar 2026
+ 11:56:18 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Oros, Petr" <poros@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: Paul Menzel <pmenzel@molgen.mpg.de>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Eric Dumazet <edumazet@google.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net v2] iavf: fix wrong VLAN mask
+ for legacy Rx descriptors L2TAG2
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v2] iavf: fix wrong VLAN mask
+ for legacy Rx descriptors L2TAG2
+Thread-Index: AQHcuq4mc5PAVG76qkic8lInrYAQXrW8ArFQ
+Date: Mon, 23 Mar 2026 11:56:18 +0000
+Message-ID: <IA3PR11MB8986767A1329ED35121D6E62E54BA@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260323101558.1477593-1-poros@redhat.com>
+In-Reply-To: <20260323101558.1477593-1-poros@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|LV3PR11MB8530:EE_
+x-ms-office365-filtering-correlation-id: 3a2db3ea-d992-48a7-b872-08de88d33175
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700021|56012099003|18002099003|22082099003;
+x-microsoft-antispam-message-info: vFnUcEfuIC55tdie4sg0b8iczJpbkRrb0TpSKMvKIL7mywaug93nbDLRM9+ApxxEHWkllY7b93H7q7UqPMX/korkjv2H+YjNfIx6pPnBRVc2EuKiNRyyyoNGXCzvh/s54rGkB7vd6KZqlM+gN+C2P3w0zMN3/0tWiqUKgXwrVGVh3PtbDoivpMjIrS/BuVYPcH4t/T4ZbMlVzrQsm/OyHb9BKka0b5gptAWC7X6mVcv7QAKCa+xDx7e94sX/MBoyHEJsd9Dxcvs2yfqvXhfUCAZwItiK8G/Q0FKbSRlxYj2yPgWIbbLvn0ygSLCYpCtzArFcybXMQFid+G9oidRREfygdg30rq95tpjGynktdDhTwYj3EVmp8tSoNTwLGjRu1ud3RBdwmfgUt8zuB177oJHbBmL3HMOQQ+lJrU0FR7cHxeadj61eGfoOBPteFOiKtQAqXYRcgUMJ7OScQlEtXZPs2G7G6MgMERlbBbbivu1gRAd9QQPysupUt2eGFoifi9iGBHteQwMZ8MCAbGHPuaK6XgLZcXp2NW1LmjnV7hnnsyRHtVgnm7C5V7Q8S6EYHCSFP9dvwRO329ppV/5YkP/LTe1quifhEWlFfhxcwpBv9zDpOm+weORgVpOV6tvXAkW7Uh2FPMrwccrGVUE743hS0LSDCvSARoQr1veKtTZXRmcyBj+dSNkvl3CfGjtowRSlQejUiIfPiQzPDdf3mslcoitYSnI2R3Pg8uehesx4uKmhQarGbkRfFZJoRvLEVD+H+JehLpdwWkeO038MtZhurfBoYZ1aFayTy3lhNfg=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700021)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?tQ2NF1hbljqUwvKv9L/nIxAQiio4opFE08kGPa4QtabniJd0o64S1HLKfBzn?=
+ =?us-ascii?Q?Z0dfRKwDF21+nGIXCkEKDQ4QaCFQdfNwrvgKUUQkhu3n3ScYUexlgGuKKXUr?=
+ =?us-ascii?Q?Ke2bEqwedf5XCG0akpeuNhfXwM2EgAi2WKqY9UfnmjRGJlwrlEBEBJdNDAJX?=
+ =?us-ascii?Q?MlZaGJ+7lRKNClE+AaUqKaxCrihowU9gV2NmZnHPd91V88QXx+k8BzLz4rZ1?=
+ =?us-ascii?Q?oHy9u6TMRkYi966LK6zlFmz1zGrcpMvnqMKAT8DnVoi6Gw22McR8+CXC+fhC?=
+ =?us-ascii?Q?ud528ryMAtnlDHQto7bH/pWvfA6xLGY6cGuJxt5CWzVLJQThjIyJrx0mYa5v?=
+ =?us-ascii?Q?njo99s/UdFAfm7SDNzfk3PSFuGEWm6kWD+mc7FKTSO9z8Fxr6jkN0ZH341UE?=
+ =?us-ascii?Q?/hPf12zeS2ab1lpN1qB7am49smeZMYID0TfxHFoBmIwOmyI5dpW8ZTBp4zO+?=
+ =?us-ascii?Q?qP9l+1jP8ulY9ejK4B08yp8i7Qc43Wq3ytjTjfA3wcwuShIc2oyVxfNOtNhC?=
+ =?us-ascii?Q?dHkrIWqzd+tarX+iR7CodnwtF/uqUOZ8hcNIkdlWxXTtMNE1rifVuJPCxTcY?=
+ =?us-ascii?Q?fnGngQB1MTUxlGHpcW8FPokKBP6Z1TrFHbwF2J6LPpAbf3LnqXSC9M3fubGR?=
+ =?us-ascii?Q?mkCfFfXreJFKQcoF1Kjq7YTL7rjA59qtvbmYfjS5qqdA2MAxpAG7w8fI2A5b?=
+ =?us-ascii?Q?BnNvJY2fAAgbfhupGx3lzRdm/N0PUZBBogq+xkjbfHziRrmBJK4h++jBkTjS?=
+ =?us-ascii?Q?n3pZI3FafTp/8PxveUVrzc8sBXxnMq+uqbUyYu+71SHI0ru1Ja0OnazvknEA?=
+ =?us-ascii?Q?en15Ybz4JhM1MlXwonOoe9K5zLDmvq/7PKB6LgzeYHUOcHzd+KDFSBEAlJ41?=
+ =?us-ascii?Q?r5F8q7nx0K3YWs2y4X71B2bOHKbQ1qq30en1CcfS0dHvTNYWzgeao1A2TV18?=
+ =?us-ascii?Q?FpflJ5vaBaw+HJhTBU+YZmfKg7M97h4BLJYu9Xj0cgDsNJ1BvkGytCY15zLN?=
+ =?us-ascii?Q?6IsKGsaipBvrg5/fpbyw2+uIfM8C3fcXi3WoBiPCuseWVE6kGj7ArCV6ODyj?=
+ =?us-ascii?Q?09UTbCyluiEkcLvymJdqw0uKYIuAa40t0MFUvpGsFBuwyO2PutOsllbJlcP0?=
+ =?us-ascii?Q?AjHVCFdMrNeeikmUrBFKxjPurd+9CQrT0s4Tx4TCBhmq6l2lPQJN7pRwt8wv?=
+ =?us-ascii?Q?y7fxhMfrn7RY7Gtsgc0/rpfv/LiGzBPyj0BBXDNOZ356zsmidXeMfqynXc2e?=
+ =?us-ascii?Q?dEcJhEy9HEdYEDEkx7i6L2HD7bj5g11N+iQBOfKtL5QrJPUSbT4LPxy0AkoH?=
+ =?us-ascii?Q?6jNSz86Bek5lpxiRbpU8DjskvSB48dMAieHIGTdcSHevj+TXapL9Ti3M0RYb?=
+ =?us-ascii?Q?m+APc+QZ5ceHzzkL/KiBQMk7oI6TnovRPUbVw/W2y5CS/sGzmVROijS7LfRt?=
+ =?us-ascii?Q?REd7EU6H3n/hdzfpWiGV35Psqu6Xj0qBS1ulFD6mB4ehDWI3bL0aNVnoR3Xv?=
+ =?us-ascii?Q?k+Ynmxn43iWbHO4PZC6ZyBbnYGe+snxlpO+uI6/cA+OhOVWD9SEsWWbNlqW0?=
+ =?us-ascii?Q?M8959sWOH28BvMuBsNQCesJj370qqPqcFnQVTXcLCctnm/Gt7x52DoBNeZWa?=
+ =?us-ascii?Q?TYeaO8aJzcJIEl2i+Sth8oyZmF1m/lf1nGwmohl0cUfRvbsVwmdL8b6p17iH?=
+ =?us-ascii?Q?fpHlh5YQzedEDRZs9Aybz2U+Q07nGuoaAlfjERaA/C4Y8EUS/SIo/Wn8eotp?=
+ =?us-ascii?Q?xFltnW9nIhtrgrjZy7GOWMWB9Zv/N0E=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|AS5PR04MB9924:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2351bf2b-1105-4388-4a45-08de88d26e0d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|19092799006|376014|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	ofkYqgzbA4oRmUu2giZ9HNi4senPfoakTc9JrlXWgp//RLoVPyf397KXOqy8F3IQYXTYv4vyjwmIzzT1ovZjf3ED5EfNJbtoWZ2W14Etx51CbZ4G0iAhyBGm0KJDeC8zDrjL9yei+UploSnSlgKXaQeGbkWzCnFm0qM9kiHmI3G7K0VYjRm80LLmBEJ5msGy+bxAVOcJi7EIRmYL/Eb50LghgWzIxbbHSo+x5JaYcS0ns4CvqYIVP+XFmbG7Kg4ZTcSKymcgzdcMpBtjFJ0wrBvXC7OSiFjWKJ0MMscc6KY0UZdRGzfQxqlRO2Cdoq74RC7TKYEbQ27c8g1Cw7JB3nF2zX8z1snZnckOm1qvP2Fntop7F7zzROMPYope1Mdt90KpjubKBj1fcWKFklrIIhrcNJeSU3abBuARBH16cHtXjvhzz0mbaJhiG8BYomrDf+eKZeo9GrLQIjryL12AJi7+IMwqyaAV2mTXWkmejl4J5Y/RPMxguPleoRlA4o4/NY6mzDGTrKQTlztYzUzef48JEmcBV/9+Fx7AVePDVYrlJ7xpfeBpEexDBYRfw2+2ogCoAAG7hS2HBVMT/FJ/ppOpTEGrlOjrp1CU5A+tbizuotfAks99599Bq/VBam9ferTmQY3DOi0nHecrAn3TmA8HDXHght4EdC2KPBETmlQVYMR9s4Lew7S8xOXs3prdeQfFG6+vR+mUwLbuWuaFKFwY4v8MtdSWY9e9SHvSoHM=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(19092799006)(376014)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?EMITXIeIkY6l0h4jjqRcoTT8U2m8a2CWn5vPol4DE3H70K0GBgaL5Lu/iJNf?=
- =?us-ascii?Q?78RKmyiKqtgweKw+kpicmByZdVXevd3IP+QJ+ezFvxM9/waOfwA1z5KLbWY+?=
- =?us-ascii?Q?RTVctaW6B3usR1rMGf/3IBLV1QMP0vGCbSqm012HBMtLizUCj/V2Xf9kKnbG?=
- =?us-ascii?Q?n0WLfn4Tjb77Qi0rKKpnK1V+WYgUAt6RS7H6DfAK3ZzzViOJB7Jf8nCa0Mzg?=
- =?us-ascii?Q?bj/514t3xqx73ZPQKGKhLTjKubfFVZkZ+RpxgqCq915YKu6WcuKtK8FFeLwG?=
- =?us-ascii?Q?IoapRhcyybQEUxvHCyuKdb2Ba+Lpg8rZke27Mhj+Jr6K1knsx/qAZFXlS9zw?=
- =?us-ascii?Q?TEhPHChqz0fdoCxRnEyXX5KcvfosRjjP7FL9SRffYMvBP3adlWtmY///zMuz?=
- =?us-ascii?Q?RDL216bbbWNUF0OUvibZHKQ+horo8x1xQdxJ3+WK7aaOhjby/sCIl2Baokjy?=
- =?us-ascii?Q?LybWZonky1KjDqcMadhFcQ1j4LDYBlaItKo6hX+vmsXoYjjGJ+XceANMcXxL?=
- =?us-ascii?Q?iGZsw7y9sui+Ap1CNYfvNPBAssLcl1SFpktv4SQugmIDskXr6UdIZz8f05eE?=
- =?us-ascii?Q?8dDA/RZokHLPg98UuMpQrk/DqmWdtjsiY7kssowmVP6Xqc7eR89Mh7lswSnx?=
- =?us-ascii?Q?FdYaJgKbm/WDXiu2ORBHhpDR8v4xZaQ7sQTQBGkGfE4tDfXsf6JiGKMjp9BB?=
- =?us-ascii?Q?vFZy0Xi/507V7SIKnyIdI0JAKMwBwGD/dQ3RZYF9QCUhZlVPDS9+CMRXI2lS?=
- =?us-ascii?Q?RrcjGv38MDRMxU30/wZB+T+MZKI3zHzNkbPmuRmmKmUdnYT81uIFjNb6I/XH?=
- =?us-ascii?Q?eiz4sPrP5QAmQbv6vWnsjaBQ8rason2qh5/29YchjM3SnBizgXGqEKBxL+ET?=
- =?us-ascii?Q?3jpJxO1hERsKOmu2oVkHDZs/pXY1JyJLWAqns2iyfdelcJDMvwMGcN7ffLoZ?=
- =?us-ascii?Q?nyAwWy8yKuM9xTgBAcqMMjF+uWUL5P1KCnFucCAsMnWdwqTwXCn+YrHVMpIx?=
- =?us-ascii?Q?F+AbQQkU7NcFTZ9MUPYdbs3W+mQ4qdZHbiVWa2oZfaBCDfvA8L8B/WCOl1ja?=
- =?us-ascii?Q?ZvwwbxaYUzFR7lPLjxbxBfeUy9s/Xvxw2NMV4fkPUGTZ75BrZlvLTM8BJFoR?=
- =?us-ascii?Q?qf7hlUsT+Eosv6n9Zs26edg8Xlq51b+TnI2c3i6e6Dx2f2hp3fRJBdpeo48E?=
- =?us-ascii?Q?BhSRtf57IjFobNm9pKKme8a+h/HO13dG54vizbisXMfQ500/Ouu2+ln2EcQu?=
- =?us-ascii?Q?JlU3FA07YFSLclhOPfxChZWGTJGZN595OMQMnk2pXB6EbHESXpC5wcpE9Je7?=
- =?us-ascii?Q?wnfqm4fMhyLWl60bgzy9RHJhQ1TLdLA8imIdATRvRfXsZ1Ll7SzWDhmQqLKu?=
- =?us-ascii?Q?zRqLP26dOlIBSTuloWybNq4wsdwvDyVNmNIfFHdnuWgI0v+mNHChtu+pwO6H?=
- =?us-ascii?Q?oy4Ko0h76pb2KfV/62/Mxks4UrLpH55XxLh9oHh9FPxSCrMLAFDBLFcHUqXH?=
- =?us-ascii?Q?kB5YXPnA4SicIDbUSpAz5TWesJCD4gj3dwbjOJ1EL2c2sz9MZipmnAO2ViRL?=
- =?us-ascii?Q?AOdEs+YGrECE6lny2N1BBKcHZ6ji5M+7aPV7NjL7BkXpIddJzYb9r+WEOQAZ?=
- =?us-ascii?Q?FWQ6/ocqWTc9bdQYitzBjHMgfEFqbuhaWE6TAV1yrz13W3i2ncqXOx4VSNKm?=
- =?us-ascii?Q?oe9v4cvIW8kODboGmD6Sww28bMzZxWQgKbnuU5L05ug5HuGvrgCGyf+V/KJB?=
- =?us-ascii?Q?hImjB4qOSQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2351bf2b-1105-4388-4a45-08de88d26e0d
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
+X-Exchange-RoutingPolicyChecked: GdolC37oO6GXMlA7qRQ2wGqY1q/ammYqfUIUWq+n3/9gdc+qUUt39HX1e8hqN0fDKjWCJJS6lRyynGWMh+XyrpFGrDH4Bg+w2aX+nSynlfAZViWeUJZzv2o1rp9EAFawi7CT5D83dqPKTkIuyIvrjsXdX59TLPLgG0otZHHT+Lkocwn/aDJrGAORXejDsUYNgh0yuiPnO8ghud5YrMLbj4kknwOUeKcuigFF/VemSAA/yRg01ttykie85FSvwaW4JGrtlSGdpHsu/XRKJpJJkoF5lK809PF/E/QlJYhgOkeK1JASoQR8GzNUl+mpyH4OX6HQq3lMj5Slx4dfx720DA==
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2026 11:50:50.5836
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a2db3ea-d992-48a7-b872-08de88d33175
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Mar 2026 11:56:18.2375
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kmTC8LNt74DciOhaFWSO7JrX/9RNu5eMmHckEe7tY5uTMYbjx2Ojh3PAF7H7eWh8+4p0WlhHqkfhAFsQNsd9OA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR04MB9924
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 19gElGld+e7DoeQAa/nyDJJpNBzhn+9EvhZlTNvAC7x/kaTaNHc+M/d4AEOvluglku/1KsNHjcd9n1/gxNk+4NbWOya8HT77eBByVsHBFx4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8530
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-270497-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270498-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,osuosl.org:email];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,nxp.com:email,nxp.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D94052F1777
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 694CC2F17DE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Take advantage of all the newly added MAC counters available through the
-MC API and export them through the standard statistics structures -
-rmon, eth-ctrl, eth-mac and pause.
 
-A new version based feature is added into dpaa2-mac -
-DPAA2_MAC_FEATURE_STANDARD_STATS - and based on the two memory zones
-needed for gathering the MAC counters are setup for each statistics
-group.
 
-The dpmac_counter structure is extended with a new field - size_t offset
-- which is being used to instruct the dpaa2_mac_transfer_stats()
-function where exactly to store a counter value inside the standard
-statistics structure.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Petr Oros
+> Sent: Monday, March 23, 2026 11:16 AM
+> To: netdev@vger.kernel.org
+> Cc: Paul Menzel <pmenzel@molgen.mpg.de>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Eric Dumazet <edumazet@google.com>;
+> linux-kernel@vger.kernel.org; Loktionov, Aleksandr
+> <aleksandr.loktionov@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
+> Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Mateusz Polchlopek
+> <mateusz.polchlopek@intel.com>; Keller, Jacob E
+> <jacob.e.keller@intel.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+> Abeni <pabeni@redhat.com>; David S. Miller <davem@davemloft.net>;
+> intel-wired-lan@lists.osuosl.org
+> Subject: [Intel-wired-lan] [PATCH iwl-net v2] iavf: fix wrong VLAN
+> mask for legacy Rx descriptors L2TAG2
+>=20
+> The IAVF_RXD_LEGACY_L2TAG2_M mask was incorrectly defined as
+> GENMASK_ULL(63, 32), extracting 32 bits from qw2 instead of the 16-bit
+> VLAN tag. In the legacy Rx descriptor layout, the 2nd L2TAG2 (VLAN
+> tag) occupies bits 63:48 of qw2, not 63:32.
+>=20
+> The oversized mask causes FIELD_GET to return a 32-bit value where the
+> actual VLAN tag sits in bits 31:16. When this value is passed to
+> iavf_receive_skb() as a u16 parameter, it gets truncated to the lower
+> 16 bits (which contain the 1st L2TAG2, typically zero). As a result,
+> __vlan_hwaccel_put_tag() is never called and software VLAN interfaces
+> on VFs receive no traffic.
+>=20
+> This affects VFs behind ice PF (VIRTCHNL VLAN v2) when the PF
+> advertises VLAN stripping into L2TAG2_2 and legacy descriptors are
+> used.
+>=20
+> The flex descriptor path already uses the correct mask
+> (IAVF_RXD_FLEX_L2TAG2_2_M =3D GENMASK_ULL(63, 48)).
+>=20
+> Reproducer:
+>  1. Create 2 VFs on ice PF (echo 2 > sriov_numvfs)  2. Disable
+> spoofchk on both VFs  3. Move each VF into a separate network
+> namespace  4. On each VF: create VLAN interface (e.g. vlan 198),
+> assign IP,
+>     bring up
+>  5. Set rx-vlan-offload OFF on both VFs
+>  6. Ping between VLAN interfaces -> expect PASS
+>     (VLAN tag stays in packet data, kernel matches in-band)  7. Set
+> rx-vlan-offload ON on both VFs  8. Ping between VLAN interfaces ->
+> expect FAIL if bug present
+>     (HW strips VLAN tag into descriptor L2TAG2 field, wrong mask
+>     extracts bits 47:32 instead of 63:48, truncated to u16 -> zero,
+>     __vlan_hwaccel_put_tag() never called, packet delivered to parent
+>     interface, not VLAN interface)
+>=20
+> The reproducer requires legacy Rx descriptors. On modern ice + iavf
+> with full PTP support, flex descriptors are always negotiated and the
+> buggy legacy path is never reached. Flex descriptors require all of:
+>  - CONFIG_PTP_1588_CLOCK enabled
+>  - VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC granted by PF
+>  - PTP capabilities negotiated (VIRTCHNL_VF_CAP_PTP)
+>  - VIRTCHNL_1588_PTP_CAP_RX_TSTAMP supported
+>  - VIRTCHNL_RXDID_2_FLEX_SQ_NIC present in DDP profile
+>=20
+> If any condition is not met, iavf_select_rx_desc_format() falls back
+> to legacy descriptors (RXDID=3D1) and the wrong L2TAG2 mask is hit.
+>=20
+> Fixes: 2dc8e7c36d80 ("iavf: refactor iavf_clean_rx_irq to support
+> legacy and flex descriptors")
+> Signed-off-by: Petr Oros <poros@redhat.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> ---
+> v2: added reproducer steps and flex descriptor requirements to commit
+>     message (Paul)
+> ---
+>  drivers/net/ethernet/intel/iavf/iavf_type.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_type.h
+> b/drivers/net/ethernet/intel/iavf/iavf_type.h
+> index 1d8cf29cb65ac5..5bb1de1cfd33b1 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_type.h
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_type.h
+> @@ -277,7 +277,7 @@ struct iavf_rx_desc {
+>  /* L2 Tag 2 Presence */
+>  #define IAVF_RXD_LEGACY_L2TAG2P_M		BIT(0)
+>  /* Stripped S-TAG VLAN from the receive packet */
+> -#define IAVF_RXD_LEGACY_L2TAG2_M		GENMASK_ULL(63, 32)
+> +#define IAVF_RXD_LEGACY_L2TAG2_M		GENMASK_ULL(63, 48)
+>  /* Stripped S-TAG VLAN from the receive packet */
+>  #define IAVF_RXD_FLEX_L2TAG2_2_M		GENMASK_ULL(63, 48)
+>  /* The packet is a UDP tunneled packet */
+> --
+> 2.52.0
 
-The newly added support is used both in the dpaa2-eth driver as well as
-the dpaa2-switch one.
-
-Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
----
-Changes in v5:
-- use DPMAC_CNT_ING_UNDERSIZED for the rmon etherStatsUndersizePkts
-  counter
-Changes in v4:
-- add dma_sync_single_for_device before calling the MC API
-Changes in v3:
-- reduce the number of lines that have more than 80 chars
-Changes in v2:
-- none
-
- .../ethernet/freescale/dpaa2/dpaa2-ethtool.c  |  61 ++++-
- .../net/ethernet/freescale/dpaa2/dpaa2-mac.c  | 214 ++++++++++++++++++
- .../net/ethernet/freescale/dpaa2/dpaa2-mac.h  |  17 ++
- .../freescale/dpaa2/dpaa2-switch-ethtool.c    |  48 +++-
- 4 files changed, 338 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-ethtool.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-ethtool.c
-index baab4f1c908d..59f5c778df38 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-ethtool.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-ethtool.c
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
- /* Copyright 2014-2016 Freescale Semiconductor Inc.
-- * Copyright 2016-2022 NXP
-+ * Copyright 2016-2022, 2024-2026 NXP
-  */
- 
- #include <linux/net_tstamp.h>
-@@ -938,6 +938,61 @@ static void dpaa2_eth_get_channels(struct net_device *net_dev,
- 				   channels->other_count;
- }
- 
-+static void
-+dpaa2_eth_get_rmon_stats(struct net_device *net_dev,
-+			 struct ethtool_rmon_stats *rmon_stats,
-+			 const struct ethtool_rmon_hist_range **ranges)
-+{
-+	struct dpaa2_eth_priv *priv = netdev_priv(net_dev);
-+
-+	mutex_lock(&priv->mac_lock);
-+
-+	if (dpaa2_eth_has_mac(priv))
-+		dpaa2_mac_get_rmon_stats(priv->mac, rmon_stats, ranges);
-+
-+	mutex_unlock(&priv->mac_lock);
-+}
-+
-+static void dpaa2_eth_get_pause_stats(struct net_device *net_dev,
-+				      struct ethtool_pause_stats *pause_stats)
-+{
-+	struct dpaa2_eth_priv *priv = netdev_priv(net_dev);
-+
-+	mutex_lock(&priv->mac_lock);
-+
-+	if (dpaa2_eth_has_mac(priv))
-+		dpaa2_mac_get_pause_stats(priv->mac, pause_stats);
-+
-+	mutex_unlock(&priv->mac_lock);
-+}
-+
-+static void dpaa2_eth_get_ctrl_stats(struct net_device *net_dev,
-+				     struct ethtool_eth_ctrl_stats *ctrl_stats)
-+{
-+	struct dpaa2_eth_priv *priv = netdev_priv(net_dev);
-+
-+	mutex_lock(&priv->mac_lock);
-+
-+	if (dpaa2_eth_has_mac(priv))
-+		dpaa2_mac_get_ctrl_stats(priv->mac, ctrl_stats);
-+
-+	mutex_unlock(&priv->mac_lock);
-+}
-+
-+static void
-+dpaa2_eth_get_eth_mac_stats(struct net_device *net_dev,
-+			    struct ethtool_eth_mac_stats *eth_mac_stats)
-+{
-+	struct dpaa2_eth_priv *priv = netdev_priv(net_dev);
-+
-+	mutex_lock(&priv->mac_lock);
-+
-+	if (dpaa2_eth_has_mac(priv))
-+		dpaa2_mac_get_eth_mac_stats(priv->mac, eth_mac_stats);
-+
-+	mutex_unlock(&priv->mac_lock);
-+}
-+
- const struct ethtool_ops dpaa2_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_RX_USECS |
- 				     ETHTOOL_COALESCE_USE_ADAPTIVE_RX,
-@@ -962,4 +1017,8 @@ const struct ethtool_ops dpaa2_ethtool_ops = {
- 	.get_coalesce = dpaa2_eth_get_coalesce,
- 	.set_coalesce = dpaa2_eth_set_coalesce,
- 	.get_channels = dpaa2_eth_get_channels,
-+	.get_rmon_stats = dpaa2_eth_get_rmon_stats,
-+	.get_pause_stats = dpaa2_eth_get_pause_stats,
-+	.get_eth_ctrl_stats = dpaa2_eth_get_ctrl_stats,
-+	.get_eth_mac_stats = dpaa2_eth_get_eth_mac_stats,
- };
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-index 5a7fda6a2012..ad812ebf3139 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-@@ -18,20 +18,43 @@
- #define DPMAC_STATS_BUNDLE_VER_MAJOR		4
- #define DPMAC_STATS_BUNDLE_VER_MINOR		10
- 
-+#define DPMAC_STANDARD_STATS_VER_MAJOR		4
-+#define DPMAC_STANDARD_STATS_VER_MINOR		11
-+
- #define DPAA2_MAC_FEATURE_PROTOCOL_CHANGE	BIT(0)
- #define DPAA2_MAC_FEATURE_STATS_BUNDLE		BIT(1)
-+#define DPAA2_MAC_FEATURE_STANDARD_STATS	BIT(2)
- 
- struct dpmac_counter {
- 	enum dpmac_counter_id id;
-+	size_t offset;
- 	const char *name;
- };
- 
-+#define DPMAC_COUNTER(counter_id, struct_name, struct_offset)	\
-+	{							\
-+		.id = counter_id,				\
-+		.offset = offsetof(struct_name, struct_offset),	\
-+	}
-+
- #define DPMAC_UNSTRUCTURED_COUNTER(counter_id, counter_name)	\
- 	{							\
- 		.id = counter_id,				\
- 		.name = counter_name,				\
- 	}
- 
-+#define DPMAC_RMON_COUNTER(counter_id, struct_offset)		\
-+	DPMAC_COUNTER(counter_id, struct ethtool_rmon_stats, struct_offset)
-+
-+#define DPMAC_PAUSE_COUNTER(counter_id, struct_offset)		\
-+	DPMAC_COUNTER(counter_id, struct ethtool_pause_stats, struct_offset)
-+
-+#define DPMAC_CTRL_COUNTER(counter_id, struct_offset)		\
-+	DPMAC_COUNTER(counter_id, struct ethtool_eth_ctrl_stats, struct_offset)
-+
-+#define DPMAC_MAC_COUNTER(counter_id, struct_offset)		\
-+	DPMAC_COUNTER(counter_id, struct ethtool_eth_mac_stats, struct_offset)
-+
- static const struct dpmac_counter dpaa2_mac_ethtool_stats[] = {
- 	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_ALL_FRAME,  "[mac] rx all frames"),
- 	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_GOOD_FRAME,  "[mac] rx frames ok"),
-@@ -65,6 +88,60 @@ static const struct dpmac_counter dpaa2_mac_ethtool_stats[] = {
- 
- #define DPAA2_MAC_NUM_ETHTOOL_STATS	ARRAY_SIZE(dpaa2_mac_ethtool_stats)
- 
-+static const struct dpmac_counter dpaa2_mac_rmon_stats[] = {
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_64, hist[0]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_127, hist[1]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_255, hist[2]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_511, hist[3]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_1023, hist[4]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_1518, hist[5]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_1519_MAX, hist[6]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_64, hist_tx[0]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_127, hist_tx[1]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_255, hist_tx[2]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_511, hist_tx[3]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_1023, hist_tx[4]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_1518, hist_tx[5]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_1519_MAX, hist_tx[6]),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_UNDERSIZED, undersize_pkts),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_OVERSIZED, oversize_pkts),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAG, fragments),
-+	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_JABBER, jabbers),
-+};
-+
-+#define DPAA2_MAC_NUM_RMON_STATS	ARRAY_SIZE(dpaa2_mac_rmon_stats)
-+
-+static const struct dpmac_counter dpaa2_mac_pause_stats[] = {
-+	DPMAC_PAUSE_COUNTER(DPMAC_CNT_ING_VALID_PAUSE_FRAME, rx_pause_frames),
-+	DPMAC_PAUSE_COUNTER(DPMAC_CNT_EGR_VALID_PAUSE_FRAME, tx_pause_frames),
-+};
-+
-+#define DPAA2_MAC_NUM_PAUSE_STATS	ARRAY_SIZE(dpaa2_mac_pause_stats)
-+
-+static const struct dpmac_counter dpaa2_mac_eth_ctrl_stats[] = {
-+	DPMAC_CTRL_COUNTER(DPMAC_CNT_ING_CONTROL_FRAME, MACControlFramesReceived),
-+	DPMAC_CTRL_COUNTER(DPMAC_CNT_EGR_CONTROL_FRAME, MACControlFramesTransmitted),
-+};
-+
-+#define DPAA2_MAC_NUM_ETH_CTRL_STATS	ARRAY_SIZE(dpaa2_mac_eth_ctrl_stats)
-+
-+static const struct dpmac_counter dpaa2_mac_eth_mac_stats[] = {
-+	DPMAC_MAC_COUNTER(DPMAC_CNT_EGR_GOOD_FRAME, FramesTransmittedOK),
-+	DPMAC_MAC_COUNTER(DPMAC_CNT_ING_GOOD_FRAME, FramesReceivedOK),
-+	DPMAC_MAC_COUNTER(DPMAC_CNT_ING_FCS_ERR, FrameCheckSequenceErrors),
-+	DPMAC_MAC_COUNTER(DPMAC_CNT_ING_ALIGN_ERR, AlignmentErrors),
-+	DPMAC_MAC_COUNTER(DPMAC_CNT_EGR_ALL_BYTE, OctetsTransmittedOK),
-+	DPMAC_MAC_COUNTER(DPMAC_CNT_EGR_ERR_FRAME, FramesLostDueToIntMACXmitError),
-+	DPMAC_MAC_COUNTER(DPMAC_CNT_ING_ALL_BYTE, OctetsReceivedOK),
-+	DPMAC_MAC_COUNTER(DPMAC_CNT_ING_FRAME_DISCARD_NOT_TRUNC, FramesLostDueToIntMACRcvError),
-+	DPMAC_MAC_COUNTER(DPMAC_CNT_EGR_MCAST_FRAME, MulticastFramesXmittedOK),
-+	DPMAC_MAC_COUNTER(DPMAC_CNT_EGR_BCAST_FRAME, BroadcastFramesXmittedOK),
-+	DPMAC_MAC_COUNTER(DPMAC_CNT_ING_MCAST_FRAME, MulticastFramesReceivedOK),
-+	DPMAC_MAC_COUNTER(DPMAC_CNT_ING_BCAST_FRAME, BroadcastFramesReceivedOK),
-+};
-+
-+#define DPAA2_MAC_NUM_ETH_MAC_STATS	ARRAY_SIZE(dpaa2_mac_eth_mac_stats)
-+
- static void dpaa2_mac_setup_stats(struct dpaa2_mac *mac,
- 				  struct dpaa2_mac_stats *stats,
- 				  size_t num_stats,
-@@ -147,6 +224,10 @@ static void dpaa2_mac_detect_features(struct dpaa2_mac *mac)
- 	if (dpaa2_mac_cmp_ver(mac, DPMAC_STATS_BUNDLE_VER_MAJOR,
- 			      DPMAC_STATS_BUNDLE_VER_MINOR) >= 0)
- 		mac->features |= DPAA2_MAC_FEATURE_STATS_BUNDLE;
-+
-+	if (dpaa2_mac_cmp_ver(mac, DPMAC_STANDARD_STATS_VER_MAJOR,
-+			      DPMAC_STANDARD_STATS_VER_MINOR) >= 0)
-+		mac->features |= DPAA2_MAC_FEATURE_STANDARD_STATS;
- }
- 
- static int phy_mode(enum dpmac_eth_if eth_if, phy_interface_t *if_mode)
-@@ -624,6 +705,24 @@ int dpaa2_mac_open(struct dpaa2_mac *mac)
- 				      DPAA2_MAC_NUM_ETHTOOL_STATS,
- 				      dpaa2_mac_ethtool_stats);
- 
-+	if (mac->features & DPAA2_MAC_FEATURE_STANDARD_STATS) {
-+		dpaa2_mac_setup_stats(mac, &mac->rmon_stats,
-+				      DPAA2_MAC_NUM_RMON_STATS,
-+				      dpaa2_mac_rmon_stats);
-+
-+		dpaa2_mac_setup_stats(mac, &mac->pause_stats,
-+				      DPAA2_MAC_NUM_PAUSE_STATS,
-+				      dpaa2_mac_pause_stats);
-+
-+		dpaa2_mac_setup_stats(mac, &mac->eth_ctrl_stats,
-+				      DPAA2_MAC_NUM_ETH_CTRL_STATS,
-+				      dpaa2_mac_eth_ctrl_stats);
-+
-+		dpaa2_mac_setup_stats(mac, &mac->eth_mac_stats,
-+				      DPAA2_MAC_NUM_ETH_MAC_STATS,
-+				      dpaa2_mac_eth_mac_stats);
-+	}
-+
- 	return 0;
- 
- err_close_dpmac:
-@@ -639,11 +738,126 @@ void dpaa2_mac_close(struct dpaa2_mac *mac)
- 		dpaa2_mac_clear_stats(mac, &mac->ethtool_stats,
- 				      DPAA2_MAC_NUM_ETHTOOL_STATS);
- 
-+	if (mac->features & DPAA2_MAC_FEATURE_STANDARD_STATS) {
-+		dpaa2_mac_clear_stats(mac, &mac->rmon_stats,
-+				      DPAA2_MAC_NUM_RMON_STATS);
-+		dpaa2_mac_clear_stats(mac, &mac->pause_stats,
-+				      DPAA2_MAC_NUM_PAUSE_STATS);
-+		dpaa2_mac_clear_stats(mac, &mac->eth_ctrl_stats,
-+				      DPAA2_MAC_NUM_ETH_CTRL_STATS);
-+		dpaa2_mac_clear_stats(mac, &mac->eth_mac_stats,
-+				      DPAA2_MAC_NUM_ETH_MAC_STATS);
-+	}
-+
- 	dpmac_close(mac->mc_io, 0, dpmac_dev->mc_handle);
- 	if (mac->fw_node)
- 		fwnode_handle_put(mac->fw_node);
- }
- 
-+static void dpaa2_mac_transfer_stats(const struct dpmac_counter *counters,
-+				     size_t num_counters, void *s,
-+				     __le64 *cnt_values)
-+{
-+	for (size_t i = 0; i < num_counters; i++) {
-+		u64 *p = s + counters[i].offset;
-+
-+		*p = le64_to_cpu(cnt_values[i]);
-+	}
-+}
-+
-+static const struct ethtool_rmon_hist_range dpaa2_mac_rmon_ranges[] = {
-+	{   64,   64 },
-+	{   65,  127 },
-+	{  128,  255 },
-+	{  256,  511 },
-+	{  512, 1023 },
-+	{ 1024, 1518 },
-+	{ 1519, DPAA2_ETH_MFL },
-+	{},
-+};
-+
-+static void dpaa2_mac_get_standard_stats(struct dpaa2_mac *mac,
-+					 struct dpaa2_mac_stats *stats,
-+					 size_t num_cnt,
-+					 const struct dpmac_counter *counters,
-+					 void *s)
-+{
-+	struct device *dev = mac->net_dev->dev.parent;
-+	struct fsl_mc_device *dpmac_dev = mac->mc_dev;
-+	size_t values_size = num_cnt * sizeof(u64);
-+	int err;
-+
-+	if (!(mac->features & DPAA2_MAC_FEATURE_STANDARD_STATS))
-+		return;
-+
-+	if (!stats->idx_dma_mem || !stats->values_dma_mem)
-+		return;
-+
-+	dma_sync_single_for_device(dev, stats->values_iova, values_size,
-+				   DMA_FROM_DEVICE);
-+
-+	err = dpmac_get_statistics(mac->mc_io, 0, dpmac_dev->mc_handle,
-+				   stats->idx_iova, stats->values_iova,
-+				   num_cnt);
-+	if (err) {
-+		netdev_err(mac->net_dev, "%s: dpmac_get_statistics() = %d\n",
-+			   __func__, err);
-+		return;
-+	}
-+
-+	dma_sync_single_for_cpu(dev, stats->values_iova, values_size,
-+				DMA_FROM_DEVICE);
-+
-+	dpaa2_mac_transfer_stats(counters, num_cnt, s, stats->values_dma_mem);
-+}
-+
-+void dpaa2_mac_get_rmon_stats(struct dpaa2_mac *mac,
-+			      struct ethtool_rmon_stats *s,
-+			      const struct ethtool_rmon_hist_range **ranges)
-+{
-+	if (s->src != ETHTOOL_MAC_STATS_SRC_AGGREGATE)
-+		return;
-+
-+	dpaa2_mac_get_standard_stats(mac, &mac->rmon_stats,
-+				     DPAA2_MAC_NUM_RMON_STATS,
-+				     dpaa2_mac_rmon_stats, s);
-+
-+	*ranges = dpaa2_mac_rmon_ranges;
-+}
-+
-+void dpaa2_mac_get_pause_stats(struct dpaa2_mac *mac,
-+			       struct ethtool_pause_stats *s)
-+{
-+	if (s->src != ETHTOOL_MAC_STATS_SRC_AGGREGATE)
-+		return;
-+
-+	dpaa2_mac_get_standard_stats(mac, &mac->pause_stats,
-+				     DPAA2_MAC_NUM_PAUSE_STATS,
-+				     dpaa2_mac_pause_stats, s);
-+}
-+
-+void dpaa2_mac_get_ctrl_stats(struct dpaa2_mac *mac,
-+			      struct ethtool_eth_ctrl_stats *s)
-+{
-+	if (s->src != ETHTOOL_MAC_STATS_SRC_AGGREGATE)
-+		return;
-+
-+	dpaa2_mac_get_standard_stats(mac, &mac->eth_ctrl_stats,
-+				     DPAA2_MAC_NUM_ETH_CTRL_STATS,
-+				     dpaa2_mac_eth_ctrl_stats, s);
-+}
-+
-+void dpaa2_mac_get_eth_mac_stats(struct dpaa2_mac *mac,
-+				 struct ethtool_eth_mac_stats *s)
-+{
-+	if (s->src != ETHTOOL_MAC_STATS_SRC_AGGREGATE)
-+		return;
-+
-+	dpaa2_mac_get_standard_stats(mac, &mac->eth_mac_stats,
-+				     DPAA2_MAC_NUM_ETH_MAC_STATS,
-+				     dpaa2_mac_eth_mac_stats, s);
-+}
-+
- int dpaa2_mac_get_sset_count(void)
- {
- 	return DPAA2_MAC_NUM_ETHTOOL_STATS;
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.h b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.h
-index 6f4981627961..98c725f609e9 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.h
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.h
-@@ -36,6 +36,10 @@ struct dpaa2_mac {
- 	struct phy *serdes_phy;
- 
- 	struct dpaa2_mac_stats ethtool_stats;
-+	struct dpaa2_mac_stats rmon_stats;
-+	struct dpaa2_mac_stats pause_stats;
-+	struct dpaa2_mac_stats eth_ctrl_stats;
-+	struct dpaa2_mac_stats eth_mac_stats;
- };
- 
- static inline bool dpaa2_mac_is_type_phy(struct dpaa2_mac *mac)
-@@ -61,6 +65,19 @@ void dpaa2_mac_get_strings(u8 **data);
- 
- void dpaa2_mac_get_ethtool_stats(struct dpaa2_mac *mac, u64 *data);
- 
-+void dpaa2_mac_get_rmon_stats(struct dpaa2_mac *mac,
-+			      struct ethtool_rmon_stats *s,
-+			      const struct ethtool_rmon_hist_range **ranges);
-+
-+void dpaa2_mac_get_pause_stats(struct dpaa2_mac *mac,
-+			       struct ethtool_pause_stats *s);
-+
-+void dpaa2_mac_get_ctrl_stats(struct dpaa2_mac *mac,
-+			      struct ethtool_eth_ctrl_stats *s);
-+
-+void dpaa2_mac_get_eth_mac_stats(struct dpaa2_mac *mac,
-+				 struct ethtool_eth_mac_stats *s);
-+
- void dpaa2_mac_start(struct dpaa2_mac *mac);
- 
- void dpaa2_mac_stop(struct dpaa2_mac *mac);
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-ethtool.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-ethtool.c
-index a888f6e6e9b0..f5d9321c7ef9 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-ethtool.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-ethtool.c
-@@ -3,7 +3,7 @@
-  * DPAA2 Ethernet Switch ethtool support
-  *
-  * Copyright 2014-2016 Freescale Semiconductor Inc.
-- * Copyright 2017-2018 NXP
-+ * Copyright 2017-2018, 2024-2026 NXP
-  *
-  */
- 
-@@ -210,6 +210,49 @@ static void dpaa2_switch_ethtool_get_stats(struct net_device *netdev,
- 	mutex_unlock(&port_priv->mac_lock);
- }
- 
-+static void
-+dpaa2_switch_get_rmon_stats(struct net_device *netdev,
-+			    struct ethtool_rmon_stats *rmon_stats,
-+			    const struct ethtool_rmon_hist_range **ranges)
-+{
-+	struct ethsw_port_priv *port_priv = netdev_priv(netdev);
-+
-+	mutex_lock(&port_priv->mac_lock);
-+
-+	if (dpaa2_switch_port_has_mac(port_priv))
-+		dpaa2_mac_get_rmon_stats(port_priv->mac, rmon_stats, ranges);
-+
-+	mutex_unlock(&port_priv->mac_lock);
-+}
-+
-+static void
-+dpaa2_switch_get_ctrl_stats(struct net_device *net_dev,
-+			    struct ethtool_eth_ctrl_stats *ctrl_stats)
-+{
-+	struct ethsw_port_priv *port_priv = netdev_priv(net_dev);
-+
-+	mutex_lock(&port_priv->mac_lock);
-+
-+	if (dpaa2_switch_port_has_mac(port_priv))
-+		dpaa2_mac_get_ctrl_stats(port_priv->mac, ctrl_stats);
-+
-+	mutex_unlock(&port_priv->mac_lock);
-+}
-+
-+static void
-+dpaa2_switch_get_eth_mac_stats(struct net_device *net_dev,
-+			       struct ethtool_eth_mac_stats *eth_mac_stats)
-+{
-+	struct ethsw_port_priv *port_priv = netdev_priv(net_dev);
-+
-+	mutex_lock(&port_priv->mac_lock);
-+
-+	if (dpaa2_switch_port_has_mac(port_priv))
-+		dpaa2_mac_get_eth_mac_stats(port_priv->mac, eth_mac_stats);
-+
-+	mutex_unlock(&port_priv->mac_lock);
-+}
-+
- const struct ethtool_ops dpaa2_switch_port_ethtool_ops = {
- 	.get_drvinfo		= dpaa2_switch_get_drvinfo,
- 	.get_link		= ethtool_op_get_link,
-@@ -218,4 +261,7 @@ const struct ethtool_ops dpaa2_switch_port_ethtool_ops = {
- 	.get_strings		= dpaa2_switch_ethtool_get_strings,
- 	.get_ethtool_stats	= dpaa2_switch_ethtool_get_stats,
- 	.get_sset_count		= dpaa2_switch_ethtool_get_sset_count,
-+	.get_rmon_stats		= dpaa2_switch_get_rmon_stats,
-+	.get_eth_ctrl_stats	= dpaa2_switch_get_ctrl_stats,
-+	.get_eth_mac_stats	= dpaa2_switch_get_eth_mac_stats,
- };
--- 
-2.25.1
-
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
