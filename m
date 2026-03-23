@@ -1,265 +1,211 @@
-Return-Path: <netdev+bounces-270383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270384-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kGXQB8rlwGl5OQQAu9opvQ
-	(envelope-from <netdev+bounces-270383-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:03:38 +0100
+	id AMaPNo3owGl6OQQAu9opvQ
+	(envelope-from <netdev+bounces-270384-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:15:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E2B32ED42D
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:03:37 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CCE82ED60A
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:15:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2BCB230134AD
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 07:03:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C83B830058C6
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 07:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A144C3446CA;
-	Mon, 23 Mar 2026 07:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA8B35DA68;
+	Mon, 23 Mar 2026 07:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="PpQNflzo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KoFfIx3q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E01929D26E;
-	Mon, 23 Mar 2026 07:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECC7BA45
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 07:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774249383; cv=none; b=M7QIKGkYNvdiE/GqUSk6QRJRgOiKKA7sAEJm/ILFYNUpdaiMO1RkFNChvmVuvEboJdATI1GQ59LWoqGE5CHZ98076LLP/Ap2jgryUgU4WOcS/yIZES4RWZ0Yu8AH6bSB49bjjbIhoKBBTWGGXVyhtYAGeRjvHeAhow+u81irJaY=
+	t=1774250102; cv=none; b=JKsvcEDfW5JDBqSj9YxE8kvIv4RtRR39OxDuN+zYaToT/tYb3cby3HnmFJ9126WRw4VlvyHPeJluyW6CfUb7b7jpF/LXRf7GSnK0rVTNh4d76hr82YW+HqDjxT1htG/TFO2zFEYroQ0Aqo/yptfjEwVttIoizHF13FnHpmDWktA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774249383; c=relaxed/simple;
-	bh=1rSu4RQkFCyIT02LoT5ovl1VxSe1zgAJeKBBL87AEr0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uGMvIPK2wCzwGGAi77hqALBlO20IK0OKDKtmRSd1UI17Jc9eOr+4rVN4ulqtEFmEAdGutQhGXUXaAC4ArBNi+igW/orXU8km8O+2XpE73jutdegthhzfgp5NrA4tEPy83MxdZrwCdNL8MO4UTGb8Y5Kx/18SQXZqqLtG/yYLSmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=PpQNflzo; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62MNIWxT1001600;
-	Mon, 23 Mar 2026 00:02:47 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=a5oMiRRG1AfGGBtx6Ga6NFZdp
-	t35zloGraFZPulSOIU=; b=PpQNflzoqvvLG6wzGPATTFZV3VPVd5HuzdAbeiR7Q
-	t5hGTu9lUtzVrMYeoXBk2Pa6Ore71q76kTPkocFEdGmIVBqJdGPJVSEXSoEnACcW
-	lAIaQkoruUDH6OF9hfIBsmz0nqlSok4nupTp6y+fqWT4mhBbzlUrxo4otrjg5nA/
-	9s4S4kvJaKA+f7DIOgYpU7w5Iymw5g0TL0HrEJaii8MF+KUg0k+PLBfgD2Fbw46w
-	VjBNFhSFHeqLq24y3BGvi+/CPbwfFW3ULYMoeI4p4EEqoMS6UQfYAo9F0q20YeTH
-	Fb5TElGzhbs/lfj0SjspD+Td2QrpAmZ5SXTUyw4lr3+rA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4d2fk71a6f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Mar 2026 00:02:47 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 23 Mar 2026 00:02:45 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 23 Mar 2026 00:02:45 -0700
-Received: from kernel-ep2 (unknown [10.29.36.53])
-	by maili.marvell.com (Postfix) with SMTP id 8237D3F70A2;
-	Mon, 23 Mar 2026 00:02:41 -0700 (PDT)
-Date: Mon, 23 Mar 2026 12:32:40 +0530
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Eric Biggers <ebiggers@kernel.org>
-CC: <netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S .
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>, hariprasad
-	<hkelam@marvell.com>,
-        Bharat Bhushan <bbhushan2@marvell.com>,
-        Sabrina Dubroca
-	<sd@queasysnail.net>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] octeontx2-pf: macsec: Use AES library instead
- of ecb(aes) skcipher
-Message-ID: <20260323070240.GA758874@kernel-ep2>
-References: <20260321225208.64508-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1774250102; c=relaxed/simple;
+	bh=nS5YSmsfOD7aEX4hK7Fh5ZRAlwlLPFOOPgx0dMNsJRw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JJAHKLHr/6gQUcaKtD516okDjmRXl/9S4T1mULZdcxThYbEQiadynE7pqCYQtxIUCBHzmuaaY7nTXgEUf5vO9vLlCkshMLIW4GCK4KSNqzlUUpaIrP8prYqZ0GRXxPOVRD+OjMCHis5v/NGi5B1TO5ATQN6QEBwU684a3PC4i6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KoFfIx3q; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2a8720818aeso5073755ad.1
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 00:15:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774250100; x=1774854900; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hfa1gkQSswNZUNLl/QA1bWJwEj7rdftvilP6P+Ic8oA=;
+        b=KoFfIx3qlck5IzDIK0TCTM4Nfv88dlimvlOGgjFyHwILwFMjZ112Qem1AYb3NrWrbJ
+         eMSL4NbZMWIxxheDtvrWQBIHch4vAdnC/GvNy8BHDB8w0W1Vhx6VU9Aq6c158zCcKCnW
+         EAQuj+dn1I24Hbwwn3TZUog41KNNvOBVIHxxcmRFdjlrumCsUCTm+oLKqkvY4B0wFjPD
+         zb6Il7HpF9sT089GW81XuSxJRGA5VuQHUvugSiz5XED5a4uyB4SOlUlbT1A4qsmetJFc
+         CSrxCl4uIv/jzeUX2vb8iS2HfsviniODaULjHk033x+Lue2b48a+df2IrltP+XgR/zVy
+         NTJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774250100; x=1774854900;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hfa1gkQSswNZUNLl/QA1bWJwEj7rdftvilP6P+Ic8oA=;
+        b=hqDC+Id7ZjYhWOPZvlVF5LBEd6uG58+xKAoEDs+pycjTN8L357PXrqWkwCY/inagBT
+         TRtv0t6sWnt+5QMaK16JZ1Fnp6Esh1HP6j4GqgBwnnctOylfJrXzgSmed+Rw1dornd6o
+         9p1UuFsndO6YgfQrSYgBuEwicD48hN5KL2nixNhZbmTG0j5vR04XVJekh9hhoEMeE1yL
+         qjCe63VtEhdY++j37OHZiybwt0r4lzwtTvM+fB9UQypLJWtYpuS6YNDQdtgo94w9+i5V
+         2kMBhV4YPrXqDomKkPWIqbw/rtb8WlilEzstyW5L2WFAVqZdsxm2z1nceyW1G29zR5v/
+         LcZg==
+X-Forwarded-Encrypted: i=1; AJvYcCWIZi4J1zxPAubRKxO3EZ2pt5Tqc/VXY7G7NKGnjG9dB3Ean+V3zN2jg15Bz6x+pz3g39MsvTg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZ0ci5qowSjBT5ORXUM6+L72sfbX9rexqfJO2eoQueCJ6y7Rk+
+	+OCSZuwY4oqGZWNanbYAcPKi9Dv24fVKV5zkqBSq5XvZbLIny9YWFeIp
+X-Gm-Gg: ATEYQzzmBBBbAe8MZ1dUCWItNUgPuCLItuWQc1w6EouXOAXBB/PYkgeCKWatG21Om0L
+	CjCCYR4vYh99kTUSYO7Q79ua4jK2DnOSB5VO343LfAAGJCI19afHOp8gcpo9xOe3KQI3ftluwVH
+	Y+p5uc7BaZld71UVG7Q/CTyTcO/m92Y7ODy7FNhixkar0ZIVdzqsiG9GdP6Tcs+1vO0jNjbojfB
+	cNcrmMTxJ4ottt3GQ0vAvkjjxTMVvCKkMLKWnIkirVqc85qR/APTVk3XKCXadC7nIiIZQY2NbDV
+	2Hx/we7oPJuteNqU3OExO9obe6cm30ND9r1q//zZyD+TqyH6ufg5bQabryFuJuvOPd0wMZfZC8Y
+	QkeZKCNLOMW+Kl0bltKVZGbIO836cC8UUor3fJzJLfit3r/gZ95gi3gvcgEzSLAmhyHN3gUUvrW
+	lg8dHHXdekKi5KW0TY5vJq2AievuFItokL
+X-Received: by 2002:a17:903:46c4:b0:2b0:8025:efbe with SMTP id d9443c01a7336-2b0827c70b9mr63145255ad.8.1774250099832;
+        Mon, 23 Mar 2026 00:14:59 -0700 (PDT)
+Received: from localhost.localdomain ([189.1.242.96])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b0836747dcsm94690125ad.64.2026.03.23.00.14.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2026 00:14:59 -0700 (PDT)
+From: sunichi <sunyiqixm@gmail.com>
+To: aconole@redhat.com,
+	echaudro@redhat.com,
+	i.maximets@ovn.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	dev@openvswitch.org,
+	linux-kernel@vger.kernel.org,
+	sunichi <sunyiqixm@gmail.com>
+Subject: [PATCH] net/openvswitch: fix trigger-able BUG_ON after ovs_vport_cmd_fill_info
+Date: Mon, 23 Mar 2026 15:14:35 +0800
+Message-Id: <20260323071435.1945543-1-sunyiqixm@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260321225208.64508-1-ebiggers@kernel.org>
-X-Authority-Analysis: v=2.4 cv=caPfb3DM c=1 sm=1 tr=0 ts=69c0e597 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=kj9zAlcOel0A:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=VwQbUJbxAAAA:8
- a=x027Qmh1OypKTmINcz0A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzIzMDA1MiBTYWx0ZWRfX1G9qggGA8gbx
- C7yarYFYcmTo3KNUKiHfxbBBBLA05TmXGrsY/O2W0jT0D43vZyadumbifIZcHi/fAMWWXv/ikuP
- c4+U8n9XrWSz2IBnYCL4OpUVLIBPuYXN6WUWiouZCCvIC6+xCN4ocp5PQLdefgvq1iI/mCD4/ed
- rNyS1ikGzd/DZ9Tvc1tzQC8CYTcWU+L3hZWC3MuzMFvNsjXX0iF7L6OTrtg6JvtkNX/oN9Cyzv8
- H9djlABcqqw95Dck0OMLRf/iUe10us8Egt+rNe2D+mkmf8erCZo1fRRoo2dYMzYWkBL1KOowayz
- W+lB/dYnnN90oa3Kjo1TZwePUkO5IvuYMmNXJWAKzEkHtfd+PIfjAAb1muC9U+Byj82V0OMLtti
- vcaKLb/5nvLRZ2YxDuCgW2eH7jB41knGeAKvUkRNwtaiqZ265wdgWGWEqNbLyafYL4B6sLKJaoK
- 79l51ZL3t7CSvJ4YM+Q==
-X-Proofpoint-GUID: fUi-nYQCvL7XaTYZ_BbP4PPIX-u1yctZ
-X-Proofpoint-ORIG-GUID: fUi-nYQCvL7XaTYZ_BbP4PPIX-u1yctZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-23_02,2026-03-20_02,2025-10-01_01
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,openvswitch.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-270384-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270383-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:dkim];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sunyiqixm@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 9E2B32ED42D
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8CCE82ED60A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+ovs_vport_set_upcall_portids() does not validate the length of the
+user-supplied OVS_VPORT_ATTR_UPCALL_PID netlink attribute. A
+sufficiently large portid list can overflow the reply skb allocated
+with NLMSG_DEFAULT_SIZE in causing ovs_vport_cmd_fill_info()
+to return -EMSGSIZE and triggering the unconditional BUG_ON(),
+which panics the kernel on most distributions.
 
-On 2026-03-22 at 04:22:08, Eric Biggers (ebiggers@kernel.org) wrote:
-> cn10k_ecb_aes_encrypt() just encrypts a single block with AES.  That is
-> much more easily and efficiently done with the AES library than
-> crypto_skcipher.  Use the AES library instead.
-> 
-Thanks for the patch. Give me couple of days, I will test and
-ack.
+Any local user with CAP_NET_ADMIN (or an equivalent unprivileged
+namespace capability where applicable) can exploit this to perform a
+denial-of-service against the host.
 
-Sundeep
+Replace BUG_ON with WARN_ON_ONCE to prevent kernel panic.
 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->  .../net/ethernet/marvell/octeontx2/Kconfig    |  1 +
->  .../marvell/octeontx2/nic/cn10k_macsec.c      | 53 +++++--------------
->  2 files changed, 13 insertions(+), 41 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/Kconfig b/drivers/net/ethernet/marvell/octeontx2/Kconfig
-> index 35c4f5f64f58..47e549c581f0 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/Kconfig
-> +++ b/drivers/net/ethernet/marvell/octeontx2/Kconfig
-> @@ -31,10 +31,11 @@ config NDC_DIS_DYNAMIC_CACHING
->  config OCTEONTX2_PF
->  	tristate "Marvell OcteonTX2 NIC Physical Function driver"
->  	select OCTEONTX2_MBOX
->  	select NET_DEVLINK
->  	select PAGE_POOL
-> +	select CRYPTO_LIB_AES if MACSEC
->  	depends on (64BIT && COMPILE_TEST) || ARM64
->  	select DIMLIB
->  	depends on PCI
->  	depends on PTP_1588_CLOCK_OPTIONAL
->  	depends on MACSEC || !MACSEC
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-> index 4649996dc7da..2cc1bdfd9b2e 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-> @@ -2,11 +2,11 @@
->  /* Marvell MACSEC hardware offload driver
->   *
->   * Copyright (C) 2022 Marvell.
->   */
->  
-> -#include <crypto/skcipher.h>
-> +#include <crypto/aes.h>
->  #include <linux/rtnetlink.h>
->  #include <linux/bitfield.h>
->  #include "otx2_common.h"
->  
->  #define MCS_TCAM0_MAC_DA_MASK		GENMASK_ULL(47, 0)
-> @@ -44,55 +44,26 @@
->  #define MCS_TCI_C			0x04 /* changed text */
->  
->  #define CN10K_MAX_HASH_LEN		16
->  #define CN10K_MAX_SAK_LEN		32
->  
-> -static int cn10k_ecb_aes_encrypt(struct otx2_nic *pfvf, u8 *sak,
-> -				 u16 sak_len, u8 *hash)
-> +static int cn10k_ecb_aes_encrypt(struct otx2_nic *pfvf, const u8 *sak,
-> +				 u16 sak_len, u8 hash[CN10K_MAX_HASH_LEN])
->  {
-> -	u8 data[CN10K_MAX_HASH_LEN] = { 0 };
-> -	struct skcipher_request *req = NULL;
-> -	struct scatterlist sg_src, sg_dst;
-> -	struct crypto_skcipher *tfm;
-> -	DECLARE_CRYPTO_WAIT(wait);
-> -	int err;
-> -
-> -	tfm = crypto_alloc_skcipher("ecb(aes)", 0, 0);
-> -	if (IS_ERR(tfm)) {
-> -		dev_err(pfvf->dev, "failed to allocate transform for ecb-aes\n");
-> -		return PTR_ERR(tfm);
-> -	}
-> -
-> -	req = skcipher_request_alloc(tfm, GFP_KERNEL);
-> -	if (!req) {
-> -		dev_err(pfvf->dev, "failed to allocate request for skcipher\n");
-> -		err = -ENOMEM;
-> -		goto free_tfm;
-> -	}
-> +	static const u8 zeroes[CN10K_MAX_HASH_LEN];
-> +	struct aes_enckey aes;
->  
-> -	err = crypto_skcipher_setkey(tfm, sak, sak_len);
-> -	if (err) {
-> -		dev_err(pfvf->dev, "failed to set key for skcipher\n");
-> -		goto free_req;
-> +	if (aes_prepareenckey(&aes, sak, sak_len) != 0) {
-> +		dev_err(pfvf->dev, "invalid AES key length: %d\n", sak_len);
-> +		return -EINVAL;
->  	}
->  
-> -	/* build sg list */
-> -	sg_init_one(&sg_src, data, CN10K_MAX_HASH_LEN);
-> -	sg_init_one(&sg_dst, hash, CN10K_MAX_HASH_LEN);
-> -
-> -	skcipher_request_set_callback(req, 0, crypto_req_done, &wait);
-> -	skcipher_request_set_crypt(req, &sg_src, &sg_dst,
-> -				   CN10K_MAX_HASH_LEN, NULL);
-> +	static_assert(CN10K_MAX_HASH_LEN == AES_BLOCK_SIZE);
-> +	aes_encrypt(&aes, hash, zeroes);
->  
-> -	err = crypto_skcipher_encrypt(req);
-> -	err = crypto_wait_req(err, &wait);
-> -
-> -free_req:
-> -	skcipher_request_free(req);
-> -free_tfm:
-> -	crypto_free_skcipher(tfm);
-> -	return err;
-> +	memzero_explicit(&aes, sizeof(aes));
-> +	return 0;
->  }
->  
->  static struct cn10k_mcs_txsc *cn10k_mcs_get_txsc(struct cn10k_mcs_cfg *cfg,
->  						 struct macsec_secy *secy)
->  {
-> 
-> base-commit: fb78a629b4f0eb399b413f6c093a3da177b3a4eb
-> -- 
-> 2.53.0
-> 
+Signed-off-by: sunichi <sunyiqixm@gmail.com>
+---
+ net/openvswitch/datapath.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
+index e209099218b4..50c2945081a1 100644
+--- a/net/openvswitch/datapath.c
++++ b/net/openvswitch/datapath.c
+@@ -2202,7 +2202,8 @@ struct sk_buff *ovs_vport_cmd_build_info(struct vport *vport, struct net *net,
+ 
+ 	retval = ovs_vport_cmd_fill_info(vport, skb, net, portid, seq, 0, cmd,
+ 					 GFP_KERNEL);
+-	BUG_ON(retval < 0);
++	if (WARN_ON_ONCE(retval < 0))
++		return ERR_PTR(-EMSGSIZE);
+ 
+ 	return skb;
+ }
+@@ -2358,7 +2359,9 @@ static int ovs_vport_cmd_new(struct sk_buff *skb, struct genl_info *info)
+ 	else
+ 		netdev_set_rx_headroom(vport->dev, dp->max_headroom);
+ 
+-	BUG_ON(err < 0);
++	if (WARN_ON_ONCE(err < 0))
++		goto exit_unlock_free;
++
+ 	ovs_unlock();
+ 
+ 	ovs_notify(&dp_vport_genl_family, reply, info);
+@@ -2411,7 +2414,8 @@ static int ovs_vport_cmd_set(struct sk_buff *skb, struct genl_info *info)
+ 	err = ovs_vport_cmd_fill_info(vport, reply, genl_info_net(info),
+ 				      info->snd_portid, info->snd_seq, 0,
+ 				      OVS_VPORT_CMD_SET, GFP_KERNEL);
+-	BUG_ON(err < 0);
++	if (WARN_ON_ONCE(err < 0))
++		goto exit_unlock_free;
+ 
+ 	ovs_unlock();
+ 	ovs_notify(&dp_vport_genl_family, reply, info);
+@@ -2451,7 +2455,8 @@ static int ovs_vport_cmd_del(struct sk_buff *skb, struct genl_info *info)
+ 	err = ovs_vport_cmd_fill_info(vport, reply, genl_info_net(info),
+ 				      info->snd_portid, info->snd_seq, 0,
+ 				      OVS_VPORT_CMD_DEL, GFP_KERNEL);
+-	BUG_ON(err < 0);
++	if (WARN_ON_ONCE(err < 0))
++		goto exit_unlock_free;
+ 
+ 	/* the vport deletion may trigger dp headroom update */
+ 	dp = vport->dp;
+@@ -2498,7 +2503,9 @@ static int ovs_vport_cmd_get(struct sk_buff *skb, struct genl_info *info)
+ 	err = ovs_vport_cmd_fill_info(vport, reply, genl_info_net(info),
+ 				      info->snd_portid, info->snd_seq, 0,
+ 				      OVS_VPORT_CMD_GET, GFP_ATOMIC);
+-	BUG_ON(err < 0);
++	if (WARN_ON_ONCE(err < 0))
++		goto exit_unlock_free;
++
+ 	rcu_read_unlock();
+ 
+ 	return genlmsg_reply(reply, info);
+-- 
+2.34.1
+
 
