@@ -1,63 +1,65 @@
-Return-Path: <netdev+bounces-270580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270582-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2ONlFdJbwWlZSgQAu9opvQ
-	(envelope-from <netdev+bounces-270580-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:27:14 +0100
+	id QKqdHTlfwWmaSgQAu9opvQ
+	(envelope-from <netdev+bounces-270582-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:41:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD0B62F64EC
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:27:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8011D2F6BBB
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:41:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CEEEF33F73CD
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 15:08:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A73CB30BE8D0
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 15:09:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380E63B2FED;
-	Mon, 23 Mar 2026 15:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 855943B38BB;
+	Mon, 23 Mar 2026 15:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bnSoU8nr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SRwRiFOz"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1CB03B27F3
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 15:05:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC4C3B388A
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 15:05:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774278328; cv=none; b=GGUGMkFVJSufPPfk3ApTRCKY2eCyGJP+k/gdVk0hn1/ET6Q7WLlYSc9Atb2ttDmBFr03AK2rpJK4ludAV4DFwAS5kGGxV+6Gb7HKnLirqHTfS+FJUXabaYjrwZrJUEBJ+fgBFjPAZBnTEOq54tynRYsM5UVGoQmi/ZmmosC7HqI=
+	t=1774278334; cv=none; b=GdQqZz4BuT7bQXVppL1f3Y13eS7PDp0QwUwFjKknplVxEBn+hOqtuB6nPlfw1+hccw9rJ1sqq3vzng4/uXY14CKoSbuJ7b2SkPfby3NZQQMGPa7G6oGCK2Fd1zdzQg65mvp33lQMymZsL4Xzr3D+8QsyYbeuzbj+exeZ7m8zQGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774278328; c=relaxed/simple;
-	bh=pPlspyNj4n+vvkKxerUv66d87Gnnx+6OnZiz8DvMiPc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eiacSJ8hH6z0vwBJC0chmSvQX7BdYuipGT9VmgHuYqQudMNLSFT+RUH+yPUHcrvPWoacqbGUb+/yOv/uGiHsBnYoXQco5OwZy967rMmQ728Ajifl0lFzxstRbC0Qzo+EsPtOgLJRzERmkzj9AFElwYG6dHgbkhRHg+V7VIotEug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bnSoU8nr; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1774278334; c=relaxed/simple;
+	bh=lb0GZ4LjZYME6LIEZSDsoau/6K8K5XJGRSMiunj2zEc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pkmR2CIAb7Tm43MDyOhtSofcQYVtjtw0N2kJFT1B8aMHnTbMxZTacQkEKkyF3U/0/od5BVBdDoL+/FtxIk7VPljflklbC/fgvqm9S0q0I/9xZpINiDTJQTjzn6JmxT7xI3q7DDCUBYrqBYnCyGTAvFPrbzek05m/QLEhak3FIa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SRwRiFOz; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774278325;
+	s=mimecast20190719; t=1774278331;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Nk9vvWE5q4tAXOhjDvn4XjSlgx7RjlQ36W0BymAHfk0=;
-	b=bnSoU8nrwFlUxnYGpm9vPOxDbHx8n2ZS/4z+wzmrVWKHqKcMb9rStDZbhvl7gzf4AmkGpS
-	cBXcKYlPiKCi2axFhZgXM6kMaooo5Ce1b5tUiXBvZ1mK19We0PrU67BGH8hSYgazW1KQG9
-	OoZc0MqWFmC2O0IwBiEtcKNkLQSmDWE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hXfYTLAZKbXpNf47trMTcMM/l7RhE1yxWdNYJ5ar7ck=;
+	b=SRwRiFOzxT2Cm1edTsW6sMJFHsxPxs741oNqPbMewGCgDgBOkW40EnHHH8huvV18GTUUrt
+	xxbnm0KLByW3SJhxOcTnwWCAiiXfCt3jAbwIDD5ImlPnq8JLOxhmYik6grj5WVklgCnbpA
+	Blb2le9GkML9Lr228HPAo9933O92gAE=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-684-5WXzMz2rMTWHE3Bh3_Za-w-1; Mon,
- 23 Mar 2026 11:05:22 -0400
-X-MC-Unique: 5WXzMz2rMTWHE3Bh3_Za-w-1
-X-Mimecast-MFC-AGG-ID: 5WXzMz2rMTWHE3Bh3_Za-w_1774278314
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-512-AAV2VAlYOV63wbBF7DsDzQ-1; Mon,
+ 23 Mar 2026 11:05:27 -0400
+X-MC-Unique: AAV2VAlYOV63wbBF7DsDzQ-1
+X-Mimecast-MFC-AGG-ID: AAV2VAlYOV63wbBF7DsDzQ_1774278320
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 370011955D78;
-	Mon, 23 Mar 2026 15:05:14 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BB9571944EB9;
+	Mon, 23 Mar 2026 15:05:19 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.33.121])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BDC68180075B;
-	Mon, 23 Mar 2026 15:05:09 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E3DC41955F21;
+	Mon, 23 Mar 2026 15:05:15 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -67,10 +69,15 @@ Cc: David Howells <dhowells@redhat.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2 00/10] rxrpc: Miscellaneous fixes
-Date: Mon, 23 Mar 2026 15:04:51 +0000
-Message-ID: <20260323150505.3513839-1-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org,
+	Jeffrey Altman <jaltman@auristor.com>,
+	Simon Horman <horms@kernel.org>,
+	stable@kernel.org
+Subject: [PATCH net v2 01/10] rxrpc: Fix key quota calculation for multitoken keys
+Date: Mon, 23 Mar 2026 15:04:52 +0000
+Message-ID: <20260323150505.3513839-2-dhowells@redhat.com>
+In-Reply-To: <20260323150505.3513839-1-dhowells@redhat.com>
+References: <20260323150505.3513839-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,126 +85,98 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-270580-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270582-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: AD0B62F64EC
+X-Rspamd-Queue-Id: 8011D2F6BBB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Here are some fixes for rxrpc:
+In the rxrpc key preparsing, every token extracted sets the proposed quota
+value, but for multitoken keys, this will overwrite the previous proposed
+quota, losing it.
 
- (1) Fix key quota calculation.
+Fix this by adding to the proposed quota instead.
 
- (2) Fix a memory leak.
+Fixes: 8a7a3eb4ddbe ("KEYS: RxRPC: Use key preparsing")
+Closes: https://sashiko.dev/#/patchset/20260319150150.4189381-1-dhowells%40redhat.com
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Jeffrey Altman <jaltman@auristor.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+cc: stable@kernel.org
+---
+ net/rxrpc/key.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
- (3) Fix rxrpc_new_client_call_for_sendmsg() to substitute NULL for an
-     empty key.
-
-     Might want to remove this substitution entirely or handle it in
-     rxrpc_init_client_call_security() instead.
-
- (4) Not strictly a fix, but move on_list_rcu() from apparmor to list.h so
-     that (5) can use it as list_empty() is not sufficient.  Also add an
-     on_list() function.
-
- (5) Fix deletion of call->link to be RCU safe.
-
- (6) Fix missing bounds checks when parsing RxGK tickets.
-
- (7) Fix use of wrong skbuff to get challenge serial number.  Also actually
-     substitute the newer response skbuff and release the older one.
-
- (8) Fix unexpected RACK timer warning to report old mode.
-
- (9) Fix server keyring refcount leak.
-
-(10) Fix call key refcount leak.
-
-With respect to the AI review[1]:
-
- (*) The use of rcu_read_lock_held() to avoid deferring call cleanup off to
-     a worker thread needs more consideration and so is unaddressed here.
-     I don't want to defer the cleanup if I can avoid it, but I'm not sure
-     how better to do it.
-
- (*) rxrpc_put_call() shouldn't now be called in irq or softirq contexts,
-     even from a timer; __refcount_inc_not_zero() and a spinlock are used
-     in rxrpc_poke_call() to render that unnecessary.
-
-David
-
-The patches can be found here also:
-
-	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-fixes
-
-Changes
-=======
-ver #2)
-- AI review[1]:
-  - Added a patch to fix key quota calculation.
-  - Added a patch to fix a memory leak.
-  - Added a patch to use NULL instead of an empty key in rxrpc_sengmsg().
-  - Added a patch to use RCU-safe deletion on call->link.
-  - Modified the response packet selection patch to select the newer
-    response when there's an older response - and to release the older
-    response skbuff.
-- Move on_list_rcu() and add on_list().
-
-Link: https://sashiko.dev/#/patchset/20260319150150.4189381-1-dhowells%40redhat.com [1]
-
-Alok Tiwari (2):
-  rxrpc: Fix use of wrong skb when comparing queued RESP challenge
-    serial
-  rxrpc: Fix rack timer warning to report unexpected mode
-
-Anderson Nascimento (2):
-  rxrpc: Fix keyring reference count leak in rxrpc_setsockopt()
-  rxrpc: Fix key reference count leak from call->key
-
-David Howells (5):
-  rxrpc: Fix key quota calculation for multitoken keys
-  rxrpc: Fix key parsing memleak
-  rxrpc: Fix anonymous key handling
-  list: Move on_list_rcu() to list.h and add on_list() also
-  rxrpc: Fix call removal to use RCU safe deletion
-
-Oleh Konko (1):
-  rxrpc: Fix RxGK token loading to check bounds
-
- include/linux/list.h               | 26 ++++++++++++++++++++
- include/trace/events/rxrpc.h       |  1 +
- net/rxrpc/af_rxrpc.c               |  2 +-
- net/rxrpc/call_object.c            |  7 +++---
- net/rxrpc/conn_event.c             |  5 ++--
- net/rxrpc/input_rack.c             |  2 +-
- net/rxrpc/key.c                    | 38 +++++++++++++++++-------------
- net/rxrpc/sendmsg.c                |  2 +-
- security/apparmor/include/policy.h |  2 --
- 9 files changed, 59 insertions(+), 26 deletions(-)
+diff --git a/net/rxrpc/key.c b/net/rxrpc/key.c
+index 85078114b2dd..af403f0ccab5 100644
+--- a/net/rxrpc/key.c
++++ b/net/rxrpc/key.c
+@@ -72,7 +72,7 @@ static int rxrpc_preparse_xdr_rxkad(struct key_preparsed_payload *prep,
+ 		return -EKEYREJECTED;
+ 
+ 	plen = sizeof(*token) + sizeof(*token->kad) + tktlen;
+-	prep->quotalen = datalen + plen;
++	prep->quotalen += datalen + plen;
+ 
+ 	plen -= sizeof(*token);
+ 	token = kzalloc_obj(*token);
+@@ -199,7 +199,7 @@ static int rxrpc_preparse_xdr_yfs_rxgk(struct key_preparsed_payload *prep,
+ 	}
+ 
+ 	plen = sizeof(*token) + sizeof(*token->rxgk) + tktlen + keylen;
+-	prep->quotalen = datalen + plen;
++	prep->quotalen += datalen + plen;
+ 
+ 	plen -= sizeof(*token);
+ 	token = kzalloc_obj(*token);
+@@ -460,6 +460,7 @@ static int rxrpc_preparse(struct key_preparsed_payload *prep)
+ 	memcpy(&kver, prep->data, sizeof(kver));
+ 	prep->data += sizeof(kver);
+ 	prep->datalen -= sizeof(kver);
++	prep->quotalen = 0;
+ 
+ 	_debug("KEY I/F VERSION: %u", kver);
+ 
+@@ -497,7 +498,7 @@ static int rxrpc_preparse(struct key_preparsed_payload *prep)
+ 		goto error;
+ 
+ 	plen = sizeof(*token->kad) + v1->ticket_length;
+-	prep->quotalen = plen + sizeof(*token);
++	prep->quotalen += plen + sizeof(*token);
+ 
+ 	ret = -ENOMEM;
+ 	token = kzalloc_obj(*token);
 
 
