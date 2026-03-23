@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-270416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2KqaLYv7wGkwPAQAu9opvQ
-	(envelope-from <netdev+bounces-270416-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:36:27 +0100
+	id 0FHIKR79wGmiPQQAu9opvQ
+	(envelope-from <netdev+bounces-270422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:43:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F0C22EE504
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:36:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C04B2EE681
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:43:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C03513025A6B
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:35:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A2693304A16F
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:36:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4FF37FF5A;
-	Mon, 23 Mar 2026 08:35:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA80B37FF54;
+	Mon, 23 Mar 2026 08:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="E/qGczRy"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="SbddMoC6"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858BE3815FA
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 08:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89964322A
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 08:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774254909; cv=none; b=Wedt5sZGQKu5H+666vlmls4f5ctNcqtKTBjUHq/ZqOw6ecf4hdxCGwGKg8EjdjpLuL3j214CXKc+Xets+ulPX9asfUFVFHtCOVVxTTSD2Z3jleoaZGZCIBbvpvAvuV1nuXI5ZG2QqbEya+KpU8stB4ddOFINYc+De7yHlNycGx0=
+	t=1774254977; cv=none; b=nGCWv42ty5B2PR+YnAtMZ/3hmIknVHw8wdgGKA5RQSM7WpxCLwRfzKMyFkQ8Dc/mj8Vz2H1DZTbsh0CqeSuNtIiwzukvscd3OpGkXDd3g0w7VIwwPzdPy+mzQ1RNEQWbljLrfFquY7RzlNz5XOiwEAQxLArP9sbInEFrsIwA99s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774254909; c=relaxed/simple;
-	bh=1Dlt6mwXZ+iKFUGfdkFqZNOedfzL5EjaHyF8YMHIIPQ=;
+	s=arc-20240116; t=1774254977; c=relaxed/simple;
+	bh=sDQshk6lxbTnRdh8pFq8Qt4s8hsHUgnu+u/Jg6JOxq4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L64UO6yJuWTsz/xzJ9bgVRad8g4HPlAW0DQvWcZDSf54/mm/ssEloDu+exfLETe5mPO3ImFTGCugCS455d246RYob5yyS6CmsnBmXg5e2wfpLlApejdS2vQE7DQjFpx0wGgbTZf4KRTn7ijTvePP70mS1vTBZTZfQbsOW0J6FMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=E/qGczRy; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=Utx3pJp38U024fvP/Vt5nXm/LYcdgEC5XoJyl+HeO+CcD9hpeiMIHPZQUA09YXjEvErnpMm3eYmVNN+ZNTJYK+yq0PKIS0FBMxcGn5ClU9H/duBo3bgfIhyreJBeH+ER72uachLR8ZmNDqgXw0vny/jOEFm4w9VTO5/YvjyizEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=SbddMoC6; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 64CDA205ED;
-	Mon, 23 Mar 2026 09:35:04 +0100 (CET)
+	by mx1.secunet.com (Postfix) with ESMTP id B3606207C1;
+	Mon, 23 Mar 2026 09:36:14 +0100 (CET)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 864M2bVvfIma; Mon, 23 Mar 2026 09:35:03 +0100 (CET)
+ with ESMTP id WtbYe3qaCn8W; Mon, 23 Mar 2026 09:36:14 +0100 (CET)
 Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id BF53D206DF;
-	Mon, 23 Mar 2026 09:35:03 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com BF53D206DF
+	by mx1.secunet.com (Postfix) with ESMTPS id 2846E205DD;
+	Mon, 23 Mar 2026 09:36:14 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 2846E205DD
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1774254903;
-	bh=VRZwnBAwA5keyVCNYD/0ySrBiwmGBZdlXOVDxJY2Qjo=;
+	s=202301; t=1774254974;
+	bh=rbWKtFSDsm9zKKJ8zorkRYsIVj0UsHqA/OM8skBEydQ=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=E/qGczRyNHUuyRb73J7Lq0kM8FoWVBKAmqPhRQR18vSsPkm8SVsfTSgjPpv0RvV1G
-	 xWx71QsucbaLMHfr7EsG8uKdvhdtO1eAwN9FIbnAKA46dYRmk4kzzBdsiLfcsKe4Nz
-	 WRNKctz1cSTEsjTiJ6d69fEhM8Bj/J99oQK30bN0aHrwTj1AuKCpoeKJAukoi9y/vT
-	 T/bn4LwtHvALWbynLnRKhh5J+Oi9S2wvNQdF81jCcZh+GXcRNxvCB+L8OQwD9hP7CQ
-	 3vdqmVLzuwei+bpPUfIh1OH8bOYnhU41fDbFy0DBufXvALq2aow8IOk9nkNlIfOWGU
-	 leq1oGC5IG7ag==
+	b=SbddMoC6IFpMbrNYUGwpE/zWN9qAlhiomiJj+YRdrvlLKqvyPkyiqsZMm8WPskwgP
+	 tBOLoYlNLAfuPZJQLFr0ydgOHG0IJXyreus0oVrh2FJRWaNC938cuOEEiDaTUDqzCJ
+	 zOdkFjnnn11RS8JA0lSdvdKn/MONMG/qweWwr2JFIplLs12m65iHutZ+7ARyL1Zkr8
+	 Pj9BlOpn5ocqkz1qvwOUSGxCQeGrQVJ+UXzzX8ue0kaGy3kiSj9qx31r64xnRTaeH+
+	 2i3rtlr+S1u1hVw5Q4QRdxlFmQo3Q8x86JL5mQVvOKITB7sytpjMzc+ZSAnpqJ0ZpP
+	 hnbC8BUvBcsVw==
 Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 23 Mar
- 2026 09:35:03 +0100
-Received: (nullmailer pid 2741848 invoked by uid 1000);
+ 2026 09:36:13 +0100
+Received: (nullmailer pid 2741851 invoked by uid 1000);
 	Mon, 23 Mar 2026 08:34:49 -0000
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 17/20] xfrm: Fix work re-schedule after cancel in xfrm_nat_keepalive_net_fini()
-Date: Mon, 23 Mar 2026 09:33:58 +0100
-Message-ID: <20260323083440.2741292-18-steffen.klassert@secunet.com>
+Subject: [PATCH 18/20] xfrm: prevent policy_hthresh.work from racing with netns teardown
+Date: Mon, 23 Mar 2026 09:33:59 +0100
+Message-ID: <20260323083440.2741292-19-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260323083440.2741292-1-steffen.klassert@secunet.com>
 References: <20260323083440.2741292-1-steffen.klassert@secunet.com>
@@ -81,97 +81,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
+X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
  (10.32.0.171)
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270416-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270422-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[secunet.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:dkim,secunet.com:email,secunet.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,queasysnail.net:email];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,policy_hthresh.work:url,secunet.com:dkim,secunet.com:email,secunet.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 3F0C22EE504
+X-Rspamd-Queue-Id: 0C04B2EE681
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Hyunwoo Kim <imv4bel@gmail.com>
+From: Minwoo Ra <raminwo0202@gmail.com>
 
-After cancel_delayed_work_sync() is called from
-xfrm_nat_keepalive_net_fini(), xfrm_state_fini() flushes remaining
-states via __xfrm_state_delete(), which calls
-xfrm_nat_keepalive_state_updated() to re-schedule nat_keepalive_work.
+A XFRM_MSG_NEWSPDINFO request can queue the per-net work item
+policy_hthresh.work onto the system workqueue.
 
-The following is a simple race scenario:
+The queued callback, xfrm_hash_rebuild(), retrieves the enclosing
+struct net via container_of(). If the net namespace is torn down
+before that work runs, the associated struct net may already have
+been freed, and xfrm_hash_rebuild() may then dereference stale memory.
 
-           cpu0                             cpu1
+xfrm_policy_fini() already flushes policy_hash_work during teardown,
+but it does not synchronize policy_hthresh.work.
 
-cleanup_net() [Round 1]
-  ops_undo_list()
-    xfrm_net_exit()
-      xfrm_nat_keepalive_net_fini()
-        cancel_delayed_work_sync(nat_keepalive_work);
-      xfrm_state_fini()
-        xfrm_state_flush()
-          xfrm_state_delete(x)
-            __xfrm_state_delete(x)
-              xfrm_nat_keepalive_state_updated(x)
-                schedule_delayed_work(nat_keepalive_work);
-  rcu_barrier();
-  net_complete_free();
-  net_passive_dec(net);
-    llist_add(&net->defer_free_list, &defer_free_list);
+Synchronize policy_hthresh.work in xfrm_policy_fini() as well, so the
+queued work cannot outlive the net namespace teardown and access a
+freed struct net.
 
-cleanup_net() [Round 2]
-  rcu_barrier();
-  net_complete_free()
-    kmem_cache_free(net_cachep, net);
-                                     nat_keepalive_work()
-                                       // on freed net
-
-To prevent this, cancel_delayed_work_sync() is replaced with
-disable_delayed_work_sync().
-
-Fixes: f531d13bdfe3 ("xfrm: support sending NAT keepalives in ESP in UDP states")
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Fixes: 880a6fab8f6b ("xfrm: configure policy hash table thresholds by netlink")
+Signed-off-by: Minwoo Ra <raminwo0202@gmail.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_nat_keepalive.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/xfrm/xfrm_policy.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/xfrm/xfrm_nat_keepalive.c b/net/xfrm/xfrm_nat_keepalive.c
-index ebf95d48e86c..1856beee0149 100644
---- a/net/xfrm/xfrm_nat_keepalive.c
-+++ b/net/xfrm/xfrm_nat_keepalive.c
-@@ -261,7 +261,7 @@ int __net_init xfrm_nat_keepalive_net_init(struct net *net)
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index 66ac93e65264..2140ee7b102d 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -4282,6 +4282,8 @@ static void xfrm_policy_fini(struct net *net)
+ 	unsigned int sz;
+ 	int dir;
  
- int xfrm_nat_keepalive_net_fini(struct net *net)
- {
--	cancel_delayed_work_sync(&net->xfrm.nat_keepalive_work);
-+	disable_delayed_work_sync(&net->xfrm.nat_keepalive_work);
- 	return 0;
- }
- 
++	disable_work_sync(&net->xfrm.policy_hthresh.work);
++
+ 	flush_work(&net->xfrm.policy_hash_work);
+ #ifdef CONFIG_XFRM_SUB_POLICY
+ 	xfrm_policy_flush(net, XFRM_POLICY_TYPE_SUB, false);
 -- 
 2.43.0
 
