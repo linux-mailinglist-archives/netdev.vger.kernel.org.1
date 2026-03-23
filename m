@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-270635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270637-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qHeVLHSBwWl2TgQAu9opvQ
-	(envelope-from <netdev+bounces-270635-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:07:48 +0100
+	id qM7TAAmBwWl2TgQAu9opvQ
+	(envelope-from <netdev+bounces-270637-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:06:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F1A82FAE67
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:07:48 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACD692FADDD
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:06:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C7FE430CD96B
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:41:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 60E2C310709F
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD553C9EF5;
-	Mon, 23 Mar 2026 17:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A23BC3CAE9B;
+	Mon, 23 Mar 2026 17:41:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AZp4MAlf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QmTbnGaV"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6200B3C9EC4;
-	Mon, 23 Mar 2026 17:41:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754713C9EC8;
+	Mon, 23 Mar 2026 17:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774287667; cv=none; b=oLp9Y2EDJu9EzNVX32g/GvDCYlAZ9Re27dIrZSNQXJ6D75BOU510vXbKb6VS7gq3ayitgLe2ds0RjJZCO4ZoKTVb0re5sITkyhkKQvzw/zrCpn6zDzp24jLij7KBw7ZIycwOROEWEPDtloxyl7y2jT2VDITwq0wgI1W33R52eB4=
+	t=1774287672; cv=none; b=acJLEV/XUclAl5VRBJwQQMrIHqiKjzY8c6WFJb7Tej2DimGVQdWHgHrW0vNBiMUr/8Sn+W2hVkiHa3yRXmS7rcaY3kkpjCP/KZzZDPfs7pNsFcGP5/5h2ySxTn1PeXUShin7EMY7K3bn9md39BOpbrebGwMxlIMzu8E1f5jlLCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774287667; c=relaxed/simple;
-	bh=2qax7nco0SWfXRerBGGvC3VwD9pMRUIbeFvXIs1xib8=;
+	s=arc-20240116; t=1774287672; c=relaxed/simple;
+	bh=f89MZan3iUCMImpwFJMAPlV8Oa0551rEAwn3TXkL7pI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t6CNGTJr5sgfHup0GZqRHFMYisgHF3/46+OCy5WRwNRFlaWkGM+nTaH5NxRMoDDSKdh77NNEK4f1IaCY8BuP6PdG34nprJ68W87fu7MkwDKFwSp4xaX01DDZKF1sLMAZjyDNWoTOjZSW7rc3e0LO2n+yuWh4I3gTEWtMQotiMxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AZp4MAlf; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=uSQugHGh0ZrHHeGd2TF8aiPmf5qXPwgdFzITyGNue11LjLRvMHzAeS/Nw5G07cf+VZ9BTR+Vyo877P3CDOiT5D9qI/62Nx9DKDENtGOHVLZ2zd4/a81AD+2oFy+xDnDfR6ftC7uPKlVmCwmrDI2p1S38jaMYjkjS18vuWvUj/+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QmTbnGaV; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774287665; x=1805823665;
+  t=1774287666; x=1805823666;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2qax7nco0SWfXRerBGGvC3VwD9pMRUIbeFvXIs1xib8=;
-  b=AZp4MAlf6XJ511v2lCwEKr2fWS6ovGobKupRJlmhnD2Lm71g/6j1eHJT
-   /FEy/2dqT299lMQ/pvmS/yrEyLTdccbOrLFFmoQsf/twMNfMiB1nabQme
-   WCZ26IdABozv86dRJqC6PJcoaLNvyP3gjf76zX7rry1rHe76rxThstHUM
-   AaMahHen3PbdrD4aq9evO53HsrsX2fMz178MS2+l8cpq4cz921aRgfbnw
-   auky4IMHSxpuR8BnEQHLUjm5Wtww++4WKJ/KByRdqGeBfE45trPWiZWfN
-   gaitIl4qvKxjE5/kF7G6ebBunUt5IiYv5J9H22fTbV39N5QEEmcqk7rne
-   g==;
-X-CSE-ConnectionGUID: RBo6w5rkQquVwwV3Cl/F8w==
-X-CSE-MsgGUID: dC0uX8Y9Q4y7zCR0fFFH5Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11738"; a="75484633"
+  bh=f89MZan3iUCMImpwFJMAPlV8Oa0551rEAwn3TXkL7pI=;
+  b=QmTbnGaV8+2bzhkSZnD4EQ8aMEMxYJ2nDR53msKMISmC8/mUdEuYfuuo
+   rd/L9QhHeTzAPZOp8aEtsWE37sdGjQRmuEl/NpU6nMKHnyEzY5JUxZVMo
+   +5Vy8eCGZCuL7YvEX7RgQFBYP9ViJtWBoZs3PuILDFwJ8QlXF9jsgLdS9
+   v3aGi7SBcLFP25eUSecJQ6mHgKN8Cw8gSaMhWDntX7qBrbusdz4c/g+Ek
+   AO4/H+NtA7plvjprWPLYolWg5Bizclr9xrvu1yrXb2yn4oUbB5B+X0fo3
+   5T+s9FdDl+lM1V2kl4lLmeyZ7HQEZEZDtxMQB0KMWlBAAapThnbia5tMl
+   Q==;
+X-CSE-ConnectionGUID: CJetOlDZT0KnS57v74Z9wg==
+X-CSE-MsgGUID: c38d4x37ThmvdOAL0QvtuQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11738"; a="75484644"
 X-IronPort-AV: E=Sophos;i="6.23,137,1770624000"; 
-   d="scan'208";a="75484633"
+   d="scan'208";a="75484644"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2026 10:41:04 -0700
-X-CSE-ConnectionGUID: a9Wk8ZiKSr+EJlhxWq/Vwg==
-X-CSE-MsgGUID: 2MZEQth2TnSdo90n6AMEmg==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2026 10:41:05 -0700
+X-CSE-ConnectionGUID: SqoOOJ9SQWazPZr4A4rryA==
+X-CSE-MsgGUID: wBVtjHzRTz6xy0Od+kV8kw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,137,1770624000"; 
-   d="scan'208";a="228576629"
+   d="scan'208";a="228576636"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa004.jf.intel.com with ESMTP; 23 Mar 2026 10:40:58 -0700
+  by orviesa004.jf.intel.com with ESMTP; 23 Mar 2026 10:41:00 -0700
 Received: from mglak.igk.intel.com (mglak.igk.intel.com [10.237.112.146])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 4BA40312FA;
-	Mon, 23 Mar 2026 17:40:56 +0000 (GMT)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id E83ED312FB;
+	Mon, 23 Mar 2026 17:40:57 +0000 (GMT)
 From: Larysa Zaremba <larysa.zaremba@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -91,9 +91,9 @@ Cc: aleksander.lobakin@intel.com,
 	netdev@vger.kernel.org,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-next v6 02/14] libie: add PCI device initialization helpers to libie
-Date: Mon, 23 Mar 2026 18:40:33 +0100
-Message-ID: <20260323174052.5355-3-larysa.zaremba@intel.com>
+Subject: [PATCH iwl-next v6 03/14] libeth: allow to create fill queues without NAPI
+Date: Mon, 23 Mar 2026 18:40:34 +0100
+Message-ID: <20260323174052.5355-4-larysa.zaremba@intel.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20260323174052.5355-1-larysa.zaremba@intel.com>
 References: <20260323174052.5355-1-larysa.zaremba@intel.com>
@@ -110,7 +110,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -118,7 +118,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[intel.com,linux.intel.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,gmail.com,lunn.ch,vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-270635-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270637-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -130,341 +130,97 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2F1A82FAE67
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
+X-Rspamd-Queue-Id: ACD692FADDD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Phani R Burra <phani.r.burra@intel.com>
+From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
 
-Add support functions for drivers to configure PCI functionality and access
-MMIO space.
+Control queues can utilize libeth_rx fill queues, despite working outside
+of NAPI context. The only problem is standard fill queues requiring NAPI
+that provides them with the device pointer.
 
+Introduce a way to provide the device directly without using NAPI.
+
+Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Signed-off-by: Phani R Burra <phani.r.burra@intel.com>
-Co-developed-by: Victor Raj <victor.raj@intel.com>
-Signed-off-by: Victor Raj <victor.raj@intel.com>
-Co-developed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-Co-developed-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
 Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-Co-developed-by: Larysa Zaremba <larysa.zaremba@intel.com>
 Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 Tested-by: Bharath R <bharath.r@intel.com>
 Tested-by: Samuel Salin <Samuel.salin@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/libie/Kconfig  |   6 +
- drivers/net/ethernet/intel/libie/Makefile |   4 +
- drivers/net/ethernet/intel/libie/pci.c    | 208 ++++++++++++++++++++++
- include/linux/intel/libie/pci.h           |  56 ++++++
- 4 files changed, 274 insertions(+)
- create mode 100644 drivers/net/ethernet/intel/libie/pci.c
- create mode 100644 include/linux/intel/libie/pci.h
+ drivers/net/ethernet/intel/libeth/rx.c | 12 ++++++++----
+ include/net/libeth/rx.h                |  4 +++-
+ 2 files changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/libie/Kconfig b/drivers/net/ethernet/intel/libie/Kconfig
-index 70831c7e336e..500a95c944a8 100644
---- a/drivers/net/ethernet/intel/libie/Kconfig
-+++ b/drivers/net/ethernet/intel/libie/Kconfig
-@@ -23,3 +23,9 @@ config LIBIE_FWLOG
- 	  for it. Firmware logging is using admin queue interface to communicate
- 	  with the device. Debugfs is a user interface used to config logging
- 	  and dump all collected logs.
-+
-+config LIBIE_PCI
-+	tristate
-+	help
-+	  Helper functions for management of PCI resources belonging
-+	  to networking devices.
-diff --git a/drivers/net/ethernet/intel/libie/Makefile b/drivers/net/ethernet/intel/libie/Makefile
-index db57fc6780ea..a28509cb9086 100644
---- a/drivers/net/ethernet/intel/libie/Makefile
-+++ b/drivers/net/ethernet/intel/libie/Makefile
-@@ -12,3 +12,7 @@ libie_adminq-y			:= adminq.o
- obj-$(CONFIG_LIBIE_FWLOG) 	+= libie_fwlog.o
+diff --git a/drivers/net/ethernet/intel/libeth/rx.c b/drivers/net/ethernet/intel/libeth/rx.c
+index 62521a1f4ec9..0c1a565a1b3a 100644
+--- a/drivers/net/ethernet/intel/libeth/rx.c
++++ b/drivers/net/ethernet/intel/libeth/rx.c
+@@ -145,25 +145,29 @@ static bool libeth_rx_page_pool_params_zc(struct libeth_fq *fq,
+ /**
+  * libeth_rx_fq_create - create a PP with the default libeth settings
+  * @fq: buffer queue struct to fill
+- * @napi: &napi_struct covering this PP (no usage outside its poll loops)
++ * @napi_dev: &napi_struct for NAPI (data) queues, &device for others
+  *
+  * Return: %0 on success, -%errno on failure.
+  */
+-int libeth_rx_fq_create(struct libeth_fq *fq, struct napi_struct *napi)
++int libeth_rx_fq_create(struct libeth_fq *fq, void *napi_dev)
+ {
++	struct napi_struct *napi = fq->no_napi ? NULL : napi_dev;
+ 	struct page_pool_params pp = {
+ 		.flags		= PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
+ 		.order		= LIBETH_RX_PAGE_ORDER,
+ 		.pool_size	= fq->count,
+ 		.nid		= fq->nid,
+-		.dev		= napi->dev->dev.parent,
+-		.netdev		= napi->dev,
++		.dev		= napi ? napi->dev->dev.parent : napi_dev,
++		.netdev		= napi ? napi->dev : NULL,
+ 		.napi		= napi,
+ 	};
+ 	struct libeth_fqe *fqes;
+ 	struct page_pool *pool;
+ 	int ret;
  
- libie_fwlog-y			:= fwlog.o
++	if (!pp.netdev && fq->type == LIBETH_FQE_MTU)
++		return -EINVAL;
 +
-+obj-$(CONFIG_LIBIE_PCI)		+= libie_pci.o
-+
-+libie_pci-y			:= pci.o
-diff --git a/drivers/net/ethernet/intel/libie/pci.c b/drivers/net/ethernet/intel/libie/pci.c
-new file mode 100644
-index 000000000000..7276a3533b54
---- /dev/null
-+++ b/drivers/net/ethernet/intel/libie/pci.c
-@@ -0,0 +1,208 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright (C) 2025 Intel Corporation */
-+
-+#include <linux/intel/libie/pci.h>
-+
-+/**
-+ * libie_find_mmio_region - find MMIO region containing a range
-+ * @mmio_list: list that contains MMIO region info
-+ * @offset: range start offset
-+ * @size: range size
-+ * @bar_idx: BAR index containing the range to search
-+ *
-+ * Return: pointer to a MMIO region overlapping with the range in any way or
-+ *	   NULL if no such region is mapped.
-+ */
-+static struct libie_pci_mmio_region *
-+libie_find_mmio_region(const struct list_head *mmio_list,
-+		       resource_size_t offset, resource_size_t size,
-+		       int bar_idx)
-+{
-+	resource_size_t end_offset = offset + size;
-+	struct libie_pci_mmio_region *mr;
-+
-+	list_for_each_entry(mr, mmio_list, list) {
-+		resource_size_t mr_end = mr->offset + mr->size;
-+		resource_size_t mr_start = mr->offset;
-+
-+		if (mr->bar_idx != bar_idx)
-+			continue;
-+		if (offset < mr_end && end_offset > mr_start)
-+			return mr;
-+	}
-+
-+	return NULL;
-+}
-+
-+/**
-+ * __libie_pci_get_mmio_addr - get the MMIO virtual address
-+ * @mmio_info: contains list of MMIO regions
-+ * @offset: register offset to find
-+ * @num_args: number of additional arguments present
-+ *
-+ * This function finds the virtual address of a register offset by iterating
-+ * through the non-linear MMIO regions that are mapped by the driver.
-+ *
-+ * Return: valid MMIO virtual address or NULL.
-+ */
-+void __iomem *__libie_pci_get_mmio_addr(struct libie_mmio_info *mmio_info,
-+					resource_size_t offset,
-+					int num_args, ...)
-+{
-+	struct libie_pci_mmio_region *mr;
-+	int bar_idx = 0;
-+	va_list args;
-+
-+	if (num_args) {
-+		va_start(args, num_args);
-+		bar_idx = va_arg(args, int);
-+		va_end(args);
-+	}
-+
-+	list_for_each_entry(mr, &mmio_info->mmio_list, list)
-+		if (bar_idx == mr->bar_idx && offset >= mr->offset &&
-+		    offset < mr->offset + mr->size) {
-+			offset -= mr->offset;
-+
-+			return mr->addr + offset;
-+		}
-+
-+	return NULL;
-+}
-+EXPORT_SYMBOL_NS_GPL(__libie_pci_get_mmio_addr, "LIBIE_PCI");
-+
-+/**
-+ * __libie_pci_map_mmio_region - map PCI device MMIO region
-+ * @mmio_info: struct to store the mapped MMIO region
-+ * @offset: MMIO region start offset
-+ * @size: MMIO region size
-+ * @num_args: number of additional arguments present
-+ *
-+ * Return: true on success, false on memory map failure.
-+ */
-+bool __libie_pci_map_mmio_region(struct libie_mmio_info *mmio_info,
-+				 resource_size_t offset,
-+				 resource_size_t size, int num_args, ...)
-+{
-+	struct pci_dev *pdev = mmio_info->pdev;
-+	struct libie_pci_mmio_region *mr;
-+	resource_size_t pa;
-+	void __iomem *va;
-+	int bar_idx = 0;
-+	va_list args;
-+
-+	if (num_args) {
-+		va_start(args, num_args);
-+		bar_idx = va_arg(args, int);
-+		va_end(args);
-+	}
-+
-+	if (offset + size > pci_resource_len(pdev, bar_idx))
-+		return false;
-+
-+	mr = libie_find_mmio_region(&mmio_info->mmio_list, offset, size,
-+				    bar_idx);
-+	if (mr) {
-+		pci_warn(pdev,
-+			 "Mapping of BAR%u (offset=%llu, size=%llu) intersecting region (offset=%llu, size=%llu) already exists\n",
-+			 bar_idx, (unsigned long long)mr->offset,
-+			 (unsigned long long)mr->size,
-+			 (unsigned long long)offset, (unsigned long long)size);
-+		return mr->offset <= offset &&
-+		       mr->offset + mr->size >= offset + size;
-+	}
-+
-+	pa = pci_resource_start(pdev, bar_idx) + offset;
-+	va = ioremap(pa, size);
-+	if (!va) {
-+		pci_err(pdev, "Failed to map BAR%u region\n", bar_idx);
-+		return false;
-+	}
-+
-+	mr = kvzalloc_obj(*mr);
-+	if (!mr) {
-+		iounmap(va);
-+		return false;
-+	}
-+
-+	mr->addr = va;
-+	mr->offset = offset;
-+	mr->size = size;
-+	mr->bar_idx = bar_idx;
-+
-+	list_add_tail(&mr->list, &mmio_info->mmio_list);
-+
-+	return true;
-+}
-+EXPORT_SYMBOL_NS_GPL(__libie_pci_map_mmio_region, "LIBIE_PCI");
-+
-+/**
-+ * libie_pci_unmap_fltr_regs - unmap selected PCI device MMIO regions
-+ * @mmio_info: contains list of MMIO regions to unmap
-+ * @fltr: returns true, if region is to be unmapped
-+ */
-+void libie_pci_unmap_fltr_regs(struct libie_mmio_info *mmio_info,
-+			       bool (*fltr)(struct libie_mmio_info *mmio_info,
-+					    struct libie_pci_mmio_region *reg))
-+{
-+	struct libie_pci_mmio_region *mr, *tmp;
-+
-+	list_for_each_entry_safe(mr, tmp, &mmio_info->mmio_list, list) {
-+		if (!fltr(mmio_info, mr))
-+			continue;
-+		iounmap(mr->addr);
-+		list_del(&mr->list);
-+		kvfree(mr);
-+	}
-+}
-+EXPORT_SYMBOL_NS_GPL(libie_pci_unmap_fltr_regs, "LIBIE_PCI");
-+
-+/**
-+ * libie_pci_unmap_all_mmio_regions - unmap all PCI device MMIO regions
-+ * @mmio_info: contains list of MMIO regions to unmap
-+ */
-+void libie_pci_unmap_all_mmio_regions(struct libie_mmio_info *mmio_info)
-+{
-+	struct libie_pci_mmio_region *mr, *tmp;
-+
-+	list_for_each_entry_safe(mr, tmp, &mmio_info->mmio_list, list) {
-+		iounmap(mr->addr);
-+		list_del(&mr->list);
-+		kvfree(mr);
-+	}
-+}
-+EXPORT_SYMBOL_NS_GPL(libie_pci_unmap_all_mmio_regions, "LIBIE_PCI");
-+
-+/**
-+ * libie_pci_init_dev - enable and reserve PCI regions of the device
-+ * @pdev: PCI device information
-+ *
-+ * Return: %0 on success, -%errno on failure.
-+ */
-+int libie_pci_init_dev(struct pci_dev *pdev)
-+{
-+	int err;
-+
-+	err = pcim_enable_device(pdev);
-+	if (err)
-+		return err;
-+
-+	for (int bar = 0; bar < PCI_STD_NUM_BARS; bar++)
-+		if (pci_resource_flags(pdev, bar) & IORESOURCE_MEM) {
-+			err = pcim_request_region(pdev, bar, pci_name(pdev));
-+			if (err)
-+				return err;
-+		}
-+
-+	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-+	if (err)
-+		return err;
-+
-+	pci_set_master(pdev);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_NS_GPL(libie_pci_init_dev, "LIBIE_PCI");
-+
-+MODULE_DESCRIPTION("Common Ethernet PCI library");
-+MODULE_LICENSE("GPL");
-diff --git a/include/linux/intel/libie/pci.h b/include/linux/intel/libie/pci.h
-new file mode 100644
-index 000000000000..effd072c55c8
---- /dev/null
-+++ b/include/linux/intel/libie/pci.h
-@@ -0,0 +1,56 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright (C) 2025 Intel Corporation */
-+
-+#ifndef __LIBIE_PCI_H
-+#define __LIBIE_PCI_H
-+
-+#include <linux/pci.h>
-+
-+/**
-+ * struct libie_pci_mmio_region - structure for MMIO region info
-+ * @list: used to add a MMIO region to the list of MMIO regions in
-+ *	  libie_mmio_info
-+ * @addr: virtual address of MMIO region start
-+ * @offset: start offset of the MMIO region
-+ * @size: size of the MMIO region
-+ * @bar_idx: BAR index to which the MMIO region belongs to
-+ */
-+struct libie_pci_mmio_region {
-+	struct list_head	list;
-+	void __iomem		*addr;
-+	resource_size_t		offset;
-+	resource_size_t		size;
-+	u16			bar_idx;
-+};
-+
-+/**
-+ * struct libie_mmio_info - contains list of MMIO regions
-+ * @pdev: PCI device pointer
-+ * @mmio_list: list of MMIO regions
-+ */
-+struct libie_mmio_info {
-+	struct pci_dev		*pdev;
-+	struct list_head	mmio_list;
-+};
-+
-+#define libie_pci_map_mmio_region(mmio_info, offset, size, ...)	\
-+	__libie_pci_map_mmio_region(mmio_info, offset, size,		\
-+				     COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
-+
-+#define libie_pci_get_mmio_addr(mmio_info, offset, ...)		\
-+	__libie_pci_get_mmio_addr(mmio_info, offset,			\
-+				   COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
-+
-+bool __libie_pci_map_mmio_region(struct libie_mmio_info *mmio_info,
-+				 resource_size_t offset, resource_size_t size,
-+				 int num_args, ...);
-+void __iomem *__libie_pci_get_mmio_addr(struct libie_mmio_info *mmio_info,
-+					resource_size_t offset,
-+					int num_args, ...);
-+void libie_pci_unmap_all_mmio_regions(struct libie_mmio_info *mmio_info);
-+void libie_pci_unmap_fltr_regs(struct libie_mmio_info *mmio_info,
-+			       bool (*fltr)(struct libie_mmio_info *mmio_info,
-+					    struct libie_pci_mmio_region *reg));
-+int libie_pci_init_dev(struct pci_dev *pdev);
-+
-+#endif /* __LIBIE_PCI_H */
+ 	pp.dma_dir = fq->xdp ? DMA_BIDIRECTIONAL : DMA_FROM_DEVICE;
+ 
+ 	if (!fq->hsplit)
+diff --git a/include/net/libeth/rx.h b/include/net/libeth/rx.h
+index 5d991404845e..0e736846c5e8 100644
+--- a/include/net/libeth/rx.h
++++ b/include/net/libeth/rx.h
+@@ -69,6 +69,7 @@ enum libeth_fqe_type {
+  * @type: type of the buffers this queue has
+  * @hsplit: flag whether header split is enabled
+  * @xdp: flag indicating whether XDP is enabled
++ * @no_napi: the queue is not a data queue and does not have NAPI
+  * @buf_len: HW-writeable length per each buffer
+  * @nid: ID of the closest NUMA node with memory
+  */
+@@ -85,12 +86,13 @@ struct libeth_fq {
+ 	enum libeth_fqe_type	type:2;
+ 	bool			hsplit:1;
+ 	bool			xdp:1;
++	bool			no_napi:1;
+ 
+ 	u32			buf_len;
+ 	int			nid;
+ };
+ 
+-int libeth_rx_fq_create(struct libeth_fq *fq, struct napi_struct *napi);
++int libeth_rx_fq_create(struct libeth_fq *fq, void *napi_dev);
+ void libeth_rx_fq_destroy(struct libeth_fq *fq);
+ 
+ /**
 -- 
 2.47.0
 
