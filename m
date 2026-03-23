@@ -1,165 +1,126 @@
-Return-Path: <netdev+bounces-270683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270684-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IImxDvGRwWnFTwQAu9opvQ
-	(envelope-from <netdev+bounces-270683-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:18:09 +0100
+	id yKYyLDmXwWkuUAQAu9opvQ
+	(envelope-from <netdev+bounces-270684-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:40:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 360E82FC105
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:18:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0626C2FC72C
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:40:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 27FA830353DC
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:05:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9D5E43209559
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA2A31F994;
-	Mon, 23 Mar 2026 19:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF3B33123B;
+	Mon, 23 Mar 2026 19:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kZcytg0t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N31wquxu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA5931690E;
-	Mon, 23 Mar 2026 19:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193F932D0DC
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 19:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774292721; cv=none; b=rOhAL88J82WPSpA7QNAfHy9vtpDukAoEzWi8UVqfw6FECdjJwbjNlEGDn0jXdpTiVleowTTETWjDHMHg0yAOa43gkPHYIrz8uf/P61myRUM/6kwz+bYUzQANf8ZsTxBZZmysku/Axa7IG2miyzMju5Cw2XmtzMcfpu0zFIgmppI=
+	t=1774293032; cv=none; b=ZnvFKeU6TjTSlJNJbK3GCUDvhXWIbD1bDA8vs0Qqrp0SIN2M15esPnxzL5UQx1aqT6RTTRDqxF/BklTZjSX6nlPCKARqTPlIjOYFY4BvUZt9w2hCsGwRQZEtR2EAwvsjBM1xoiL3lJB3b2X+rXmqH5qvOUhY83eCsUKqjQFq460=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774292721; c=relaxed/simple;
-	bh=VK8zf88cWzLQQEyO5m2LxClsKajOayTmmbUa59w0yrU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h8KlV55ZbTcNlJxKnDFTt3jbXWMIzunXX6qszauTftX6dBNKAxna1VqCPPL/43dtQfkzruxpEBYblKZjbtEAFAZUuL3X5GqjC9euUSJ/WwBBcq9i9fNuHMs1ymsdrhEUABATySjhp+TWcS1fWTdg9vAW1moY4L/9YMowzkPiPak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kZcytg0t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 261DCC4CEF7;
-	Mon, 23 Mar 2026 19:05:15 +0000 (UTC)
+	s=arc-20240116; t=1774293032; c=relaxed/simple;
+	bh=Ggsi8u/ozWUrsjZF/5D/PvjiyCYWG8sktgFWsTalXeA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=tSawnj3/3uiS6QerXz3WQ4aMl9uMdR60ppO2HA9arQV+YTMJlgQffOsL0IClr2qzCIcZ6o1KKRQfROy9O7vIpxTnT4x9COOVhGbmYbndAHa3d0ndX8en7DDqmH+LNparRj+KzyBuHpmstRsV+yplAPvPjd7IabnN/8+mzdxzS9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N31wquxu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 665D6C4CEF7;
+	Mon, 23 Mar 2026 19:10:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774292721;
-	bh=VK8zf88cWzLQQEyO5m2LxClsKajOayTmmbUa59w0yrU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kZcytg0t/0GQnQxOzIjNa6BOMIZQHOVbOghqaGVK00RX0XYe1uH8/XttMYpntSWCG
-	 puy6uJ5WW2vwH7GfzzJRoiy47gpKbyP+CQdQz9dl86o6cZAol1ZaGhEX5qcA4FpwuN
-	 hwJW1BhZ8nHxttypO3FuZHF5xXrf1OuXUBxot6yag1KDXAckrDftbqASzv+5RDdxUr
-	 sMbTVsDeLwNAF6avDdkvfN/UPjIMiN9lrc2ltP7tuyBvG832K18N7Uc5BCU/YwVDE7
-	 VZu+b7EED40/EHuw7bN1itg+CIODNdRebwrgscWHX8dBPBEOQTEMTl0B9gJM8m5h2h
-	 ztYVhrk6TUR4w==
-Date: Mon, 23 Mar 2026 19:05:13 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Liam Girdwood <lgirdwood@gmail.com>, Lee Jones <lee@kernel.org>,
-	Pavel Machek <pavel@kernel.org>, Peter Rosin <peda@axentia.se>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
-	Tom Rix <trix@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
-	linux-spi@vger.kernel.org, linux-leds@vger.kernel.org,
-	linux-fpga@vger.kernel.org, driver-core@lists.linux.dev
-Subject: Re: [PATCH 04/10] regulator: of: switch to using
- class_find_device_by_fwnode()
-Message-ID: <7d46803e-b285-4e9c-8856-10100fa0ea85@sirena.org.uk>
-References: <20260322-remove-device-find-by-of-node-v1-0-b72eb22a1215@gmail.com>
- <20260322-remove-device-find-by-of-node-v1-4-b72eb22a1215@gmail.com>
- <360a8b4a-6507-417a-9fc1-c53b14868657@sirena.org.uk>
- <acGFksyx3SA0kJ5b@google.com>
+	s=k20201202; t=1774293031;
+	bh=Ggsi8u/ozWUrsjZF/5D/PvjiyCYWG8sktgFWsTalXeA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=N31wquxuzChNtkfxe97XGU1yqLpivv5dlQHj3//lend0sRyxR0eLrgQ/qLmrCnF1V
+	 4yDLhVf7EZpzunJhtemdsYk+XiNrygTK6OPp2ryrxS1GC46rCT8eBbw7IuFODLu7mq
+	 MaOsGRvxCYRkfUyH+k2Cg97/w46kJE+EewBlwGB+dIYGgz1gCSiGcFYw8ArYVYDasu
+	 V8bMn5GjE51/iuQd0ZT8+OuYVKckYAyqRZox6ZmxnhMWy1UkcpUHH4p0Jvkd7Fz7lN
+	 UdhtUMW4VpfaYtCUK8aZsT3uldxGUaebik5xyRUKeCyhZDC7pFc8SMVPt4yaQG/FU5
+	 SGjm67RVodApQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02E393808200;
+	Mon, 23 Mar 2026 19:10:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="EnLlSF+aDasvSOkc"
-Content-Disposition: inline
-In-Reply-To: <acGFksyx3SA0kJ5b@google.com>
-X-Cookie: This is a good time to punt work.
-X-Spamd-Result: default: False [-2.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH ethtool] Fix index calculation in RTTPT2C register dump
+ loop
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177429301954.275706.6715122288074694459.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Mar 2026 19:10:19 +0000
+References: <20260318083515.375498-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20260318083515.375498-1-alok.a.tiwari@oracle.com>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+Cc: kuba@kernel.org, netdev@vger.kernel.org, mkubecek@suse.cz,
+ alok.a.tiwarilinux@gmail.com
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270683-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-270684-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,suse.cz,gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linaro.org,gmail.com,axentia.se,armlinux.org.uk,intel.com,linuxfoundation.org,vger.kernel.org,lists.infradead.org,lists.linux.dev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,sirena.org.uk:mid]
-X-Rspamd-Queue-Id: 360E82FC105
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oracle.com:email]
+X-Rspamd-Queue-Id: 0626C2FC72C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hello:
 
---EnLlSF+aDasvSOkc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This patch was applied to ethtool/ethtool.git (master)
+by Michal Kubecek <mkubecek@suse.cz>:
 
-On Mon, Mar 23, 2026 at 11:28:27AM -0700, Dmitry Torokhov wrote:
-> On Mon, Mar 23, 2026 at 02:00:43PM +0000, Mark Brown wrote:
+On Wed, 18 Mar 2026 01:35:06 -0700 you wrote:
+> Correct regs_buff indexing in ixgbe_dump_regs for RTTPT2C loop to use
+> regs_buff[865 + i] instead of regs_buff[865]
+> 
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> ---
+>  ixgbe.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > The regulator API is very deliberately specifically using the OF APIs,
-> > not the ACPI APIs, since ACPI really doesn't want to model regulators.
+Here is the summary with links:
+  - [ethtool] Fix index calculation in RTTPT2C register dump loop
+    https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/?id=8bb78214bdd3
 
-> For now? We also have software nodes and maybe we come up with something
-> else in the future...
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> I think we should use firmware-agnostic APIs as much as possible, and
-> only use OF- or ACPI-specific ones when there is no generic equivalent.
-> This makes the code most flexible.
 
-I think this is a worrying idea for core code like this, we have
-specific firmware bindings for specific firmware interfaces with the
-different interfaces having very different ideas of how things should be
-modelled.  The chances that firmware agnostic code is going to do the
-right thing seem low, and encouraging the use of generic APIs that might
-happen to run OK raises the risk that we'll get firmware vendors relying
-on them and leaving us with a conceptual mishmash to sort through.
-
-Software nodes are already a bit of a concern here TBH.
-
---EnLlSF+aDasvSOkc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnBjugACgkQJNaLcl1U
-h9DGQQf+Mk0kzYDoB4rVGypXwOfdtMgCpkoWOzcoGOZoT5oIqbKWA2xKZp8YZ9lI
-iN3X0Fsu/fIbEOD9FNjbJZ9qDqssjwF4J5C0jMRxwk08Suh9YRn+R/3pLvzepLs5
-4P9aByiEU8BBGM3HPJ75vVTahxLy8ZqvrHJbX+/H5wlkCZVD2tdatnrnvNvjbQIo
-S9NGzwZagxQkwkuw9BJ0DoZgRqiQH6xJi9kpr9uwdIzJMunmo/9FzMye6CHCEdgW
-gWq8ynTVSPvQMbs81K7P1kKEyHMdrKW+SR9JsOb53ST2B6P9ErFaz33GFx6d6nr9
-Q2enPr6UesV/0+0xDR+N8UmiycTfHA==
-=/5RN
------END PGP SIGNATURE-----
-
---EnLlSF+aDasvSOkc--
 
