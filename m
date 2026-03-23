@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-270495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270496-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +DFHLyApwWmbRAQAu9opvQ
-	(envelope-from <netdev+bounces-270495-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 12:50:56 +0100
+	id UHEjNCgpwWmbRAQAu9opvQ
+	(envelope-from <netdev+bounces-270496-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 12:51:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64C722F1753
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 12:50:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7963A2F1761
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 12:51:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BE9CD300B472
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:50:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 538AB300D4D6
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD84739B970;
-	Mon, 23 Mar 2026 11:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6617D39BFF8;
+	Mon, 23 Mar 2026 11:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="bWrWnuO1"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Xrs5nD0z"
 X-Original-To: netdev@vger.kernel.org
 Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013008.outbound.protection.outlook.com [40.107.159.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A969C39B483;
-	Mon, 23 Mar 2026 11:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DDD39B96F;
+	Mon, 23 Mar 2026 11:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.8
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774266650; cv=fail; b=PhHO5YH+2D4XFctZ3CRxSFOaNQ/qKvMqM3IB2A17RiHfiAtulbUpZDJfoKg+pNGJZrSxvAZqUZXBDvBsB3ilnFePE+D3xuy4QUNS+fs/v8SdVDD4O/HhhzKO7lZMGWOovskYf9aR+JDlOVwPX+LqqYbqSZ8ezA6auvcWpVQhV1s=
+	t=1774266654; cv=fail; b=YpS8Hc6o3pdJgv7cIUEf8GMN/zClWvArcM2VdDvqrD7YlgsiLxoEVI9P+85JDM4mjnEHyfyVWtTXEUshRAxfiHIbvThNyHAXSV+u6Oql/JDyqmNn034OsrPigD783y5zEeKfAitOot1se17uhGWrXyS2Ifchluh1N3j+mxXjF7I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774266650; c=relaxed/simple;
-	bh=JwmWHNUG0ejIN6E47tmBB3mqKzj99+7YraQoHuOGUZA=;
+	s=arc-20240116; t=1774266654; c=relaxed/simple;
+	bh=0/1hqXoQ6pMrmkM1991wDmGKnfABCwf1mcHJSPu6mbk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TKR3LG0PcdRzJBIW3yPdB4cByjONUZib4gfNxNxwWrzPWw/GextYnupt8Z0UcjcZajGLeSwT3BEW7JMNvNOHsO60dKc+iOBpcSxz8AX4yEF2IGr4rZCwuI4CQt+rqY79akpfVzR36vQ6cY8n28/h5oFJjc6lqQnlWwMynSbbFWI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=bWrWnuO1; arc=fail smtp.client-ip=40.107.159.8
+	 Content-Type:MIME-Version; b=XOZD2nJkGoTDJIVU6r+l/miENIVX5DtBw0gD1Xc+8oHaeLukDwx2MEcgIVojXel0pedZ79EI5WH2ENhFjyYIiERVkFNxzXidThghbpregao+M5/Db2M4CBGxzdvMN0v5UMtOVCfgQnBuR92Z74ZQK8uEN0weYYnioA0hHB3dQAc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Xrs5nD0z; arc=fail smtp.client-ip=40.107.159.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oU2YvY4Mv7QCw9BPIBOI7WycjzL7Z1w8TgvHy1HDR0kWhlfgScxwu/YEcol7sjMfjnfg2e3gH54WJEJwhCEAjiwWh3zJqgzASt8WVb++OiL1fglcC3wT7z+tsxK2ZSTtEBuUcb9Tx2IYtSzuxyec/a44sSX+3WqSiU+2VfEpQ0YlMKA2TsVOFk0mZDQEempYv76AGn//eqKsizpmf0Q8zLYa5QFoZcrhKhtj/6fusg1YEP+ubgzPIh23ml4vjZc2m+Jz6QfXNEuZteWPb/pHulSJYMILHaw4I4v/pNBvuzt2pGhzK8HSCs57dw0hAqnNADkOmrKC217MKSJGjicHdQ==
+ b=WHOw+CvLUNfq+NeA2JtUI01YCHHfP3jG+nkFoPTmXY3qenK5uTCuI+imvPnXvPApIu1O98tyMB+MtaxuxlkLcuABVIpJtwtthpw8vsQmwpX3N2RVIeY6oBc2E0THHEGpJB/i93b9r0Tn4MmizreQhV+vbx/Tj0vcxJcpUTmwjGOIandswRtGJ+Ib5YDMc9qrklo0HqEKL1iRmXRfk9FPfMB1IVEIno1Hrqny1J8S7giGnQmlHNMOPzJFviZoRmpSAm9uo3MIjZxqRbwvqiI6bV+5J7/MvEEAllil1HaaGdTv3fd5yKO+EZRHXqLRSnZn039Xt3Ygand4AHp1AI9jkg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yxzdS8AH8XMFJFm93Zb8qnceoBpqQcQEr6N7cPpA7mI=;
- b=PF/4c3F4hp9cRkrg938TiG0omFsX3F8wOCW5UfNL72vsiB+wUBA+SZTLO0jhosnka9bUuDPJA3wXGLDe4KZr9iq9oYRbajGAwgQiSaRVV+wPbie8u951HcklmNqsx7x0xOPaZi5YSadqLwbuaHdGRaqn3xw2kPiVC3Ma4YeHSn6i8iLaimBWi+r35+oJGYWzt8gEVhRonu2S/11QPwKpt78pdepCEGQlpqyv1JZjIZU6aL398c2VJ1vYzMSi38Ma77duJ0DP5NSkcPPfWcSK4K9RPy2gqRb1KJMwRk9rVw5NpalfW83w3ovb1AvNKijuKfD2SsPxF5PafDGkr1hr8Q==
+ bh=ye5A91M5Yd/9W8GauM53gChZcyrPkzPAwIZMFzP+/6o=;
+ b=b82vIO02G1qYZI9wI3yTvES/f2I0BVJf5jL3lYffwYMQ2ysr0clBkclMB67DS4lfBLSqiueD36dzG8r0RzDpFz59VCIq8805nubg+POPXd1URRCYkQBLg607UTcgUCHXoJwpsWQTGeyMhHhU05TcxIItnXgKKK4EVw+vDoe7zKvSm+NqCWknVIWGWx1bmIzY9CfPeVai6SQJOUMcmopW+fqKckS9/wPW6SBH6UjZFP6t+EmJZHyRKq4ftiGiEjOPM+4qEGjpA7dNoQEZO5+KdNfjbkzjMZrYS6la3eKcLIcJNqwDWM6MlOqFOyfgtQb5ZhaevIcHwPVofHenVjPtUg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yxzdS8AH8XMFJFm93Zb8qnceoBpqQcQEr6N7cPpA7mI=;
- b=bWrWnuO1k1kQmXyzAFhdq+/tvEj9IgPh8gI7yVZtTWruKERzH/zTcr7KlniWNVNMT0i+p6zH9HuVQyg8QVLFat7+kD7LOc8MHSpkNu4P1qzFCFESJQYzrkv4Lw3a6TS1959SkhepHcryAkvb9APgRN04GDoSqgYKhLeQRQ6/H6MqAkpkd/PdVQkHzWVFtWMYEFuntZwBRU6gON8bn767HBfuaSQJUpWxxdxQKhu4UbPS/ikFd+pwK03PvZeJ4wiS4xpYUDVbrOipq8ki09sMyZqOuDKFPKQSPIyPHp7izsKPaYZaze0YOlfX1rao7aiWCjxcoQguEBoBYhKkKEPt4g==
+ bh=ye5A91M5Yd/9W8GauM53gChZcyrPkzPAwIZMFzP+/6o=;
+ b=Xrs5nD0zfv7V39UbCW7xwPcnDfvUplm4wShrjiLw82efkLbQCFCPElV7zz9bb53gyOOuRr1wTgwNJ0LFhPwXYO7Rmr1uUblv15d26WaLXvbgFmpcXpmOiJ4E7qnzSglBlGPge4tykS/zTrzt95KZ8xV3dcVgPdA6KuX+fh6kGvlktvrPpOaQvXLAmF2m99iI9zzpEmtz8pKXgWY+suwbl1sFAoOMWkHejuyIgB/1D9tTikVxbXcJsv5+fbIgMGBPZSFxco3JskL/oDXK0WAfNsE3/RWt+JaZB3XgRVpTfsizVcwyUtluvucBG8c1XCCaMrvwH3Abf0dGgc2MsLiuNw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
  by AS5PR04MB9924.eurprd04.prod.outlook.com (2603:10a6:20b:67e::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.25; Mon, 23 Mar
- 2026 11:50:40 +0000
+ 2026 11:50:43 +0000
 Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
  ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
  ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9723.022; Mon, 23 Mar 2026
- 11:50:45 +0000
+ 11:50:48 +0000
 From: Ioana Ciornei <ioana.ciornei@nxp.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -68,9 +68,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5 1/3] net: dpaa2-mac: extend APIs related to statistics
-Date: Mon, 23 Mar 2026 13:50:37 +0200
-Message-Id: <20260323115039.3932600-2-ioana.ciornei@nxp.com>
+Subject: [PATCH net-next v5 2/3] net: dpaa2-mac: retrieve MAC statistics in one firmware command
+Date: Mon, 23 Mar 2026 13:50:38 +0200
+Message-Id: <20260323115039.3932600-3-ioana.ciornei@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260323115039.3932600-1-ioana.ciornei@nxp.com>
 References: <20260323115039.3932600-1-ioana.ciornei@nxp.com>
@@ -87,57 +87,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|AS5PR04MB9924:EE_
-X-MS-Office365-Filtering-Correlation-Id: e2ecbeb9-9eca-4c52-b7b8-08de88d26aca
+X-MS-Office365-Filtering-Correlation-Id: 36fba0cd-922e-429c-6a78-08de88d26c80
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|1800799024|366016|19092799006|376014|18002099003|22082099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	CM1CspttlFgsDC5aquuedpJaf4qfrk3V5WR3dEYoPsjEBVFxXtBSGhT5eaVl9/j8vTiB9nOrie6kUvMMpZhmCLL/+80dmByxWYGLLZQeMsfFN1NueJfI1JDT1NtXOm47l3XFuXjpVofVzRm2cobu+nQRzQrVTODYuYoXHnlRDdulYHfHSkc/2jqY91F2b9x094W4WeBpYE58Jn50TzhSq2LqouLaw8GJuUwGT1RrgVFs278YYaH+MMt6RYWslu0wdQ+HVaPyn8+nxlS8qmUZPwKo8P1P0PnuL5Stnovsch49xamzAa1+hXODmGxFvmkiWNGgEi/FasNIydfjbNBHiv20xcPOKz8N8OfANt0P1aRWi6YeraS5alNRyzF0R0hFLUWFD+omkm1W/Q8belezyjkFdNZv4w0y086yyhPXvgnIrpV4tL37Ma+IW/7d6pA9ZYoFFWYfdsS9M2Ho1YTqd6mVUDQyR8G6+uxQ4s0tuMW9kWpikmT3AK38W0IoFkdmoQCeRaMTcYm84TBEOq1Oy45H6gkiSHJeLxb3/f+7zwAdHN0j013WFwZgHlxXRAstnpP8o2KEp2HcwhAPLw5GXpw9rZkKiokE2vZHw9t8Ph1PWCuBgmbzwCfI4J8vUY9jAK2Q8VMxdrUYZjejM3WnCrV1f+w6L2Ns2DbgIEEagldFrWNHEVkocerbCb2FGlND0h/SHg+OF4eCtPEMFKoTooadCQWr7jYz05lHH9ToVT4=
+	spxbnhBA6BtaU8njDrbAYoRJxN0CkFsDH1DrrLyXkDjbvlTipfc8hkPCd8v3f25BnMkN2vFi8JSRUsJxpFQu4xmgADcPlaZfEB7I+KrIpdJdpX1m10hnirf78wbmYIrj/CFXdOzRaloTv4CfPdIzayLT2H3Vimm+dGT2CmEIFhVAwNCPDEz7pE0iu4RhNgubWD9Bl3bcn9KTBxBzrlXRvs6lSCccCo6GZ8F3eIHuvZ42h3sMnnCBQPc6FNjHp/d8OEZAVTpqCELcqPGwOB769V8dp8urtURkDjmD1ijsivonb3FtrcO3Qfr0CNMxKwAvUg0Uk8HRERVQx7VRxXGEdaDzKtaBOFWrlf4rxyYtIx9XBIqms/WF6TRB2YV/wivwMIXOx9RDo6W4srIinkGZRXVNG0w1VKyL2yN0+Jmnnvcke2Y1OknYu1cgJqBBoqoW2mxbFNYfmYH7O1x0lZsWMiWp+A85hNucwib2KU7C4M392j7Rxr64H6xldkJJOIL9KP4BKx6UucwRKTQjwCuPYQHZG0NfYeWEADm796ysmD+acuL/HoXjH7v68jxbHtMnnQJ6z50n0fYVLp71SNFzp1jYqssvt1+2FTjXj9hZIwfPEYs4Nw/kMW7TQka8jES6npi3YF7oYKGwyjkcaMvJFaunduVNPuE4qUg4ulWeDAmmpOBE7QK4/8CL94XQbwKH9Eph1cYuk57+mZb4vJDkrI8xsZ9Bxbe8RAfjzsrPjHw=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(19092799006)(376014)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?5aPhI293LcPXR9rarfJS2w+FUt7ZRvI1IpGubUD8ryTi6vE/cFzVRzurk5Io?=
- =?us-ascii?Q?HBlEDCh/Ul7FqtikInNZu+ibsQmHt3ixYD5PHA1nQmZWVgNsDzmceypF8Nim?=
- =?us-ascii?Q?h8GA+ObuLzcKSL2FcuoW/XmciOrUXapKL9cVaDe2LEe8CyD+BcsRZcckRHf6?=
- =?us-ascii?Q?YmWdXJEy4kQa8nNTmz9VxOE7pVqCYvEUKnyU6Ruh9f99xctOgAV3SqVF7D5e?=
- =?us-ascii?Q?kTJD1jilndAq2KlWKN7OCTOR/XRZz267zvp/km6kMFncErSA8ocZDjusQf/U?=
- =?us-ascii?Q?cQS6cxs8j4YfuvJCmfFqFGGdQxflM000UGP65q7NUgn5PIv6d5H35MqhF6F1?=
- =?us-ascii?Q?gf7TBJEIFd60YGeemxez+jCUEsXJIADtnuY3i6y1Qm/RC3OwJ/vFhKl1Ui+0?=
- =?us-ascii?Q?rtmuZeXWs+e3JqLY6LpkvVQZuc4thmn+ePm62rC75N+gcj27Wvi2tI4gCmsO?=
- =?us-ascii?Q?t6y7hmlbcwLXsmq8Tdm3CN8+Kz/49vCGQPKk8j7RWRkNdI5xMrdlP8wbA9oz?=
- =?us-ascii?Q?3tY8JpxUtRKQv0u1gNF+WxHkNf5Qh++sRW5DISmBetSLI0slB2LpHZkxdoNQ?=
- =?us-ascii?Q?F7alKCohV89B/48AKvbQITwo8N0g+kSlPzN/X3fbZOsFfWrvREdERne/Uy+o?=
- =?us-ascii?Q?S+GzIYiseFehpn0A/Hos8/4JMvV+OoDTJ2d9kHLeUKDtUsXLSk5jqxtVG09a?=
- =?us-ascii?Q?pJZ3l4x7zTojgAB3XanVvrhIPpz37saFxeBcBO+z+0HxwZxlBqzFnmK3HYaR?=
- =?us-ascii?Q?rlwQ/nv3Kffr4MPv3bxz0KpD8PO5COMJohTzZu4SWTcKRy/vU8ek0Zk9Xgw9?=
- =?us-ascii?Q?iJMuc7Pq52iDk9LGa9EfoWwRUkRbLrAI2B6hlNO1TR9t1r2HnGB255uML6hH?=
- =?us-ascii?Q?AOXDHrRSfqhdAKepQ7altQc1Vto0liUNDYvH3et+9otPzmyxLfYgBliY/Q3t?=
- =?us-ascii?Q?6i/nt1psu3Ls+Im66hLHYR0jQRuTs/2EDsXztyLgtxgbAGQdiXZc9ln1iVsp?=
- =?us-ascii?Q?QGNXaLVy8BJdBBmtkv5bjxY2oW0W1u5+Nw7NHSIDETbNv5okOiRAtES5TvK2?=
- =?us-ascii?Q?N0Mf03LS6NmxOCjAUH3+80JXBEHaNg/S3kZBgRt2rf3ZCgtyglqTTuiE8+yn?=
- =?us-ascii?Q?XN1HdA/1sT7sWJQz8i/cxGHH5CH+pj637sip8+5dQbHo/mwleNQhIZ5+w2Ks?=
- =?us-ascii?Q?TECi5XkrrmWmd8Ffi6cAi3UBweJiV+RmyDKcQ5m/gf2ob3a+cZqyBZpF/cmK?=
- =?us-ascii?Q?XxM4/yywtlM3LZBXWvIRQf4B7we6PNgvTkoMEJ72zg92bgxEBmJUdAyv6Qz7?=
- =?us-ascii?Q?au7qJ72XXtXJP+VVqk+QQgZR4+5dt0YLPT+UewOHoHsx/SvvzbPb0FxF5v6N?=
- =?us-ascii?Q?sWoZgxNhvyFgYdljeZafuAk3Kq/Li6FcfUi57jNfzjACfjZGnbihWKLHKOa/?=
- =?us-ascii?Q?fMKX8sCtqalTy8tzAboSChbUcGl03KLCyCjVBdlmjaPmmfiK1IgRfPj69M15?=
- =?us-ascii?Q?Vo6I8RbZDXKdB6sy1Sb1BYyVhtSEmWorxCmZKXcgVxfKpENwr0rxgUg62V9R?=
- =?us-ascii?Q?uTLzqOXU1Vg5RHwGRp5LE6bqjPdCXo0kHrJOf9S2AIjuO9ZTPizEOovKH2To?=
- =?us-ascii?Q?WPHvbZEtExGPPigyl76neukfTnlpte9PZFKukWxCISXicq3pzI3kiVpnLm9m?=
- =?us-ascii?Q?4oO9Njn/G6TjKPrLzL78WYNkmnnNKegUktp8MWL0LwnI9qkA9CDfb7MtIcai?=
- =?us-ascii?Q?Rqh0gxYVaQ=3D=3D?=
+	=?us-ascii?Q?IZPbvvVkZaFIRsVOgMWGZohKQRNeuKo00NHchkAxE/OAVzBab5MiKMFOeWoh?=
+ =?us-ascii?Q?ryXc9YVDmak3ybTRyPFdHCqPYKaK9399+tgPjf4L5O90fsT62sCUPu0pg3os?=
+ =?us-ascii?Q?/7tATIBjfA/utWeWgXJpLwHcIfjAS1CyXWNmeBaVZa0k5D08QwCoqkZH8Qxe?=
+ =?us-ascii?Q?2h9NMI+fTKjJ4UdGO+1PJjmMOjWyMl2kSXpxUEq18P6567xFfrLJyFtdOr63?=
+ =?us-ascii?Q?JtSJgalH1xpJWLi3qpSrniHvkB8vFTcb9l9J6ollDYZ06LuPTEDjBnQsgbMh?=
+ =?us-ascii?Q?Ig7U/68NiKNu/4zFXaKJsc6ioEQYcVI79Vaf2jiUvr8wAu6feg6YIQYik3DC?=
+ =?us-ascii?Q?r4a2lfl9a9Z+GuGAT1JXiy60RjplWjDkSJXYtICFj6SVbWgvtI9VWCLAE7Bo?=
+ =?us-ascii?Q?AojGBDJovu2YEoIX5IZoh7Gx/YdCsYmlGjuqhAMz0AT+uf8gMz4qRiR+A9iJ?=
+ =?us-ascii?Q?owAQhGG8AJsizsH4ARMxkuXBdrGdnt4GxcDH3O55r1IR/MtaIb0/NE+Wp83S?=
+ =?us-ascii?Q?5+Tl/rn8Rir5bG9fDaAMYvTdl9rjocTBLqKPDYlhuagh3OZ+E28C94IPKQLc?=
+ =?us-ascii?Q?3xWQs5w9/kI+zIXfV4Kk+yCWXc5AVIgZuGUGSBlInubsN7BSp8DtztjeqGvI?=
+ =?us-ascii?Q?YkhOhNsQk6X/wyaqK5oNCkn3t/5vqfJ7u0fk5GYxnTgDMl2mGrg6GGoc8T5e?=
+ =?us-ascii?Q?TfI3PaNgF6EFhEju35ruFTfRGD0wWkhcXP8Mh9gq8Il6FAVJRtTwWIZr/oMq?=
+ =?us-ascii?Q?+pxdSScFQCkQCO7iy2GUpGZOweuBRVksNMRspBNvaeyOKR11R02yKHaLeb7f?=
+ =?us-ascii?Q?Kt7yld6xD14/G0JRksdLTF1eGJQZjx9abrXa3RWcc5+iDHpssmt9jEMTh+Bl?=
+ =?us-ascii?Q?DLVq8c5RfMmmar/g5+tE9ra/qJe8UTQOejDwsFjkwEkxzWWkTJphps60tffJ?=
+ =?us-ascii?Q?jhLNM0BeIwhsMTYmSCGV4CzMly04BChJK+8qCrHVZH0qVhuEcyCUATRSfIN9?=
+ =?us-ascii?Q?BLtTh5HwjUFk9TCKzdyecuwMgoQPmOTtuNpuNX6Cns5S1qyaysRfEKhoBEIL?=
+ =?us-ascii?Q?FazfoTQ9OhhHO9cRxoOCb5Cv9a4eDjVisSwaKsZqvXeV1mW89HJ+Gsmb+9re?=
+ =?us-ascii?Q?1hPhKoZazTexTFxPUHnKIdCrR1oLIoVEWrTPYlhYHzs/iOtM7D8VCdVS4sDJ?=
+ =?us-ascii?Q?UneUaGOCO0CK29m8vjll0TzeXzobtrw4b+a8XqNPrXvo0Ks4V4X6L7omDMKN?=
+ =?us-ascii?Q?e8l+amtTDsaoVaeL4Uxa5eYmxeQhIdAncAcN3qIFFNHMKPGxBZ1MScqsovge?=
+ =?us-ascii?Q?0bY7aG57uDFECmvT/3jG4v6pVNqpcknzKmy65lYUCuF2RiEoqHfxBEPn7y9s?=
+ =?us-ascii?Q?DrZ/6DW6687JYfJ2SwRlFiRS1S/gAtSG8dqH3tk4OPz5MhTZOk0ZiKKhVZ3w?=
+ =?us-ascii?Q?/Y/frIKHQm9QtR7Qf+fLrjqFaTB02bfSZ8jGfnX6NntxSEpklZEbP1NoRWu6?=
+ =?us-ascii?Q?R3ii+xL6wJ5I8kkIk+ufjIaAJXGi+4e5EgCzC0k8P/O4CUWREvnFXuvmQK3i?=
+ =?us-ascii?Q?L2GWeP92IE/VbcpVTE7XkgSby8FecsMHVBVGG6wl5W5spIuMDvmomr/CNs+J?=
+ =?us-ascii?Q?WjRFpmy8/sKjGNxVArlEYZJHbnSQl0w7zXCyc6PWmJUS+WZTAVs7+5dwxwO2?=
+ =?us-ascii?Q?nMw10//xBMuAI6UDyKQe9tWYjj/qonNPMRBXquvy9VvxUlBhD5VnVVVhLdNJ?=
+ =?us-ascii?Q?8Q7X6L1rSg=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e2ecbeb9-9eca-4c52-b7b8-08de88d26aca
+X-MS-Exchange-CrossTenant-Network-Message-Id: 36fba0cd-922e-429c-6a78-08de88d26c80
 X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2026 11:50:45.1667
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2026 11:50:48.0018
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: D0th9LAzDIl9rwgzrg1TeK9k6BpaI0VWkbsO3hCq0EmkBS1BJOp82lM69sO8PoDdEI4Xwb+8D1BuyH+N87W8aw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: i71SgPbBdsAajaWBWRWROdyjYBXm1fWra1U9KiwC8/2h0CBvlkqptgVi/mjzRjBPYIHRx5BScXWAMS8ypDNtWA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR04MB9924
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -145,17 +145,17 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-270495-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270496-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[nxp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
@@ -165,233 +165,336 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nxp.com:dkim,nxp.com:email,nxp.com:mid]
-X-Rspamd-Queue-Id: 64C722F1753
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,nxp.com:email,nxp.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7963A2F1761
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Extend the dpmac_counter_id enum with the newly added counters which can
-be interrogated through the MC firmware. Also add the
-dpmac_get_statistics() API which can be used to retrieve multiple MAC
-counters through a single firmware command.
+The latest MC firmware version added a new command to retrieve all DPMAC
+counters in a single firmware call. Use this new command, when possible,
+in dpaa2-mac as well.
+
+In order to use the dpmac_get_statistics() API, two DMA memory areas are
+used: one to transmit what counters the driver is requesting and one to
+receive the values of those counters. These memory areas are allocated
+and DMA mapped at probe time so that we don't waste time at runtime.
+
+And since we are planning to add rmon, eth-ctrl and other standard
+statistics using the same infrastructure, make the setup and cleanup
+processes as generic as possibile through the dpaa2_mac_setup_stats()
+and dpaa2_mac_clear_stats() functions.
 
 Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
 ---
 Changes in v5:
 - none
 Changes in v4:
-- none
+- fix dma_sync call and memory leak in the cleanup
 Changes in v3:
-- limit the documentation entries to 80 chars
+- use dma_alloc_noncoherent() instead of kcalloc + dma_map_single
+- reduce the number of lines that have more than 80 chars
 Changes in v2:
-- none
+- fix fallback usecase by using dpaa2_mac_ethtool_stats[i].id
+- use the __le32/__le64 types for cnt_idx, cnt_values etc
 
- .../net/ethernet/freescale/dpaa2/dpmac-cmd.h  | 11 ++-
- drivers/net/ethernet/freescale/dpaa2/dpmac.c  | 31 +++++-
- drivers/net/ethernet/freescale/dpaa2/dpmac.h  | 94 ++++++++++++++++++-
- 3 files changed, 132 insertions(+), 4 deletions(-)
+ .../net/ethernet/freescale/dpaa2/dpaa2-mac.c  | 201 ++++++++++++++----
+ .../net/ethernet/freescale/dpaa2/dpaa2-mac.h  |  10 +-
+ 2 files changed, 171 insertions(+), 40 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpmac-cmd.h b/drivers/net/ethernet/freescale/dpaa2/dpmac-cmd.h
-index e9ac2ecef3be..a864a99a0f75 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpmac-cmd.h
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpmac-cmd.h
-@@ -1,6 +1,6 @@
- /* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
- /* Copyright 2013-2016 Freescale Semiconductor Inc.
-- * Copyright 2019 NXP
-+ * Copyright 2019, 2024-2026 NXP
-  */
- #ifndef _FSL_DPMAC_CMD_H
- #define _FSL_DPMAC_CMD_H
-@@ -28,6 +28,8 @@
+diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
+index 422ce13a7c94..5a7fda6a2012 100644
+--- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
++++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+-/* Copyright 2019 NXP */
++/* Copyright 2019, 2024-2026 NXP */
  
- #define DPMAC_CMDID_SET_PROTOCOL	DPMAC_CMD(0x0c7)
+ #include <linux/acpi.h>
+ #include <linux/pcs-lynx.h>
+@@ -15,7 +15,118 @@
+ #define DPMAC_PROTOCOL_CHANGE_VER_MAJOR		4
+ #define DPMAC_PROTOCOL_CHANGE_VER_MINOR		8
  
-+#define DPMAC_CMDID_GET_STATISTICS	DPMAC_CMD(0x0c8)
++#define DPMAC_STATS_BUNDLE_VER_MAJOR		4
++#define DPMAC_STATS_BUNDLE_VER_MINOR		10
 +
- /* Macros for accessing command fields smaller than 1byte */
- #define DPMAC_MASK(field)        \
- 	GENMASK(DPMAC_##field##_SHIFT + DPMAC_##field##_SIZE - 1, \
-@@ -82,4 +84,11 @@ struct dpmac_rsp_get_api_version {
- struct dpmac_cmd_set_protocol {
- 	u8 eth_if;
- };
+ #define DPAA2_MAC_FEATURE_PROTOCOL_CHANGE	BIT(0)
++#define DPAA2_MAC_FEATURE_STATS_BUNDLE		BIT(1)
 +
-+struct dpmac_cmd_get_statistics {
-+	__le64 iova_cnt;
-+	__le64 iova_values;
-+	__le32 num_cnt;
++struct dpmac_counter {
++	enum dpmac_counter_id id;
++	const char *name;
 +};
 +
- #endif /* _FSL_DPMAC_CMD_H */
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpmac.c b/drivers/net/ethernet/freescale/dpaa2/dpmac.c
-index f440a4c3b70c..efb9864d051f 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpmac.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpmac.c
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
- /* Copyright 2013-2016 Freescale Semiconductor Inc.
-- * Copyright 2019 NXP
-+ * Copyright 2019, 2024-2026 NXP
-  */
- #include <linux/fsl/mc.h>
- #include "dpmac.h"
-@@ -235,3 +235,32 @@ int dpmac_set_protocol(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
- 
- 	return mc_send_command(mc_io, &cmd);
- }
++#define DPMAC_UNSTRUCTURED_COUNTER(counter_id, counter_name)	\
++	{							\
++		.id = counter_id,				\
++		.name = counter_name,				\
++	}
 +
-+/**
-+ * dpmac_get_statistics() - Get MAC statistics
-+ * @mc_io:       Pointer to opaque I/O object
-+ * @cmd_flags:   Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @token:       Token of DPMAC object
-+ * @iova_cnt:    IOVA containing the requested MAC counters formatted as an
-+ *               array of __le32 representing the dpmac_counter_id.
-+ * @iova_values: IOVA containing the values for all the requested counters
-+ *               formatted as an array of __le64.
-+ * @num_cnt:     Number of counters requested
-+ *
-+ * Return:       '0' on Success; Error code otherwise.
-+ */
-+int dpmac_get_statistics(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+			 u64 iova_cnt, u64 iova_values, u32 num_cnt)
++static const struct dpmac_counter dpaa2_mac_ethtool_stats[] = {
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_ALL_FRAME,  "[mac] rx all frames"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_GOOD_FRAME,  "[mac] rx frames ok"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_ERR_FRAME, "[mac] rx frame errors"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_FRAME_DISCARD, "[mac] rx frame discards"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_UCAST_FRAME, "[mac] rx u-cast"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_BCAST_FRAME, "[mac] rx b-cast"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_MCAST_FRAME, "[mac] rx m-cast"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_FRAME_64, "[mac] rx 64 bytes"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_FRAME_127, "[mac] rx 65-127 bytes"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_FRAME_255, "[mac] rx 128-255 bytes"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_FRAME_511, "[mac] rx 256-511 bytes"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_FRAME_1023, "[mac] rx 512-1023 bytes"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_FRAME_1518, "[mac] rx 1024-1518 bytes"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_FRAME_1519_MAX, "[mac] rx 1519-max bytes"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_FRAG, "[mac] rx frags"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_JABBER, "[mac] rx jabber"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_ALIGN_ERR, "[mac] rx align errors"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_OVERSIZED, "[mac] rx oversized"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_VALID_PAUSE_FRAME, "[mac] rx pause"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_ING_BYTE, "[mac] rx bytes"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_EGR_GOOD_FRAME, "[mac] tx frames ok"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_EGR_UCAST_FRAME, "[mac] tx u-cast"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_EGR_MCAST_FRAME, "[mac] tx m-cast"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_EGR_BCAST_FRAME, "[mac] tx b-cast"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_EGR_ERR_FRAME, "[mac] tx frame errors"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_EGR_UNDERSIZED, "[mac] tx undersized"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_EGR_VALID_PAUSE_FRAME, "[mac] tx b-pause"),
++	DPMAC_UNSTRUCTURED_COUNTER(DPMAC_CNT_EGR_BYTE, "[mac] tx bytes"),
++};
++
++#define DPAA2_MAC_NUM_ETHTOOL_STATS	ARRAY_SIZE(dpaa2_mac_ethtool_stats)
++
++static void dpaa2_mac_setup_stats(struct dpaa2_mac *mac,
++				  struct dpaa2_mac_stats *stats,
++				  size_t num_stats,
++				  const struct dpmac_counter *counters)
 +{
-+	struct dpmac_cmd_get_statistics *cmd_params;
-+	struct fsl_mc_command cmd = { 0 };
++	struct device *dev = mac->net_dev->dev.parent;
++	size_t size_idx, size_values;
++	__le32 *cnt_idx;
 +
-+	cmd.header = mc_encode_cmd_header(DPMAC_CMDID_GET_STATISTICS,
-+					  cmd_flags, token);
-+	cmd_params = (struct dpmac_cmd_get_statistics *)cmd.params;
-+	cmd_params->iova_cnt = cpu_to_le64(iova_cnt);
-+	cmd_params->iova_values = cpu_to_le64(iova_values);
-+	cmd_params->num_cnt = cpu_to_le32(num_cnt);
++	size_idx = num_stats * sizeof(u32);
++	stats->idx_dma_mem = dma_alloc_noncoherent(dev, size_idx,
++						   &stats->idx_iova,
++						   DMA_TO_DEVICE,
++						   GFP_KERNEL);
++	if (!stats->idx_dma_mem)
++		goto out;
 +
-+	return mc_send_command(mc_io, &cmd);
++	size_values = num_stats * sizeof(u64);
++	stats->values_dma_mem = dma_alloc_noncoherent(dev, size_values,
++						      &stats->values_iova,
++						      DMA_FROM_DEVICE,
++						      GFP_KERNEL);
++	if (!stats->values_dma_mem)
++		goto err_alloc_values;
++
++	cnt_idx = stats->idx_dma_mem;
++	for (size_t i = 0; i < num_stats; i++)
++		*cnt_idx++ = cpu_to_le32((u32)(counters[i].id));
++
++	dma_sync_single_for_device(dev, stats->idx_iova, size_idx,
++				   DMA_TO_DEVICE);
++
++	return;
++
++err_alloc_values:
++	dma_free_noncoherent(dev, num_stats * sizeof(u32), stats->idx_dma_mem,
++			     stats->idx_iova, DMA_TO_DEVICE);
++out:
++	stats->idx_dma_mem = NULL;
++	stats->values_dma_mem = NULL;
 +}
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpmac.h b/drivers/net/ethernet/freescale/dpaa2/dpmac.h
-index 17488819ef68..b5276168b869 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpmac.h
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpmac.h
-@@ -1,6 +1,6 @@
++
++static void dpaa2_mac_clear_stats(struct dpaa2_mac *mac,
++				  struct dpaa2_mac_stats *stats,
++				  size_t num_stats)
++{
++	struct device *dev = mac->net_dev->dev.parent;
++
++	if (stats->idx_dma_mem) {
++		dma_free_noncoherent(dev, num_stats * sizeof(u32),
++				     stats->idx_dma_mem,
++				     stats->idx_iova, DMA_TO_DEVICE);
++		stats->idx_dma_mem = NULL;
++	}
++
++	if (stats->values_dma_mem) {
++		dma_free_noncoherent(dev, num_stats * sizeof(u64),
++				     stats->values_dma_mem,
++				     stats->values_iova, DMA_FROM_DEVICE);
++		stats->values_dma_mem = NULL;
++	}
++}
+ 
+ static int dpaa2_mac_cmp_ver(struct dpaa2_mac *mac,
+ 			     u16 ver_major, u16 ver_minor)
+@@ -32,6 +143,10 @@ static void dpaa2_mac_detect_features(struct dpaa2_mac *mac)
+ 	if (dpaa2_mac_cmp_ver(mac, DPMAC_PROTOCOL_CHANGE_VER_MAJOR,
+ 			      DPMAC_PROTOCOL_CHANGE_VER_MINOR) >= 0)
+ 		mac->features |= DPAA2_MAC_FEATURE_PROTOCOL_CHANGE;
++
++	if (dpaa2_mac_cmp_ver(mac, DPMAC_STATS_BUNDLE_VER_MAJOR,
++			      DPMAC_STATS_BUNDLE_VER_MINOR) >= 0)
++		mac->features |= DPAA2_MAC_FEATURE_STATS_BUNDLE;
+ }
+ 
+ static int phy_mode(enum dpmac_eth_if eth_if, phy_interface_t *if_mode)
+@@ -504,6 +619,11 @@ int dpaa2_mac_open(struct dpaa2_mac *mac)
+ 	mac->fw_node = fw_node;
+ 	net_dev->dev.of_node = to_of_node(mac->fw_node);
+ 
++	if (mac->features & DPAA2_MAC_FEATURE_STATS_BUNDLE)
++		dpaa2_mac_setup_stats(mac, &mac->ethtool_stats,
++				      DPAA2_MAC_NUM_ETHTOOL_STATS,
++				      dpaa2_mac_ethtool_stats);
++
+ 	return 0;
+ 
+ err_close_dpmac:
+@@ -515,66 +635,69 @@ void dpaa2_mac_close(struct dpaa2_mac *mac)
+ {
+ 	struct fsl_mc_device *dpmac_dev = mac->mc_dev;
+ 
++	if (mac->features & DPAA2_MAC_FEATURE_STATS_BUNDLE)
++		dpaa2_mac_clear_stats(mac, &mac->ethtool_stats,
++				      DPAA2_MAC_NUM_ETHTOOL_STATS);
++
+ 	dpmac_close(mac->mc_io, 0, dpmac_dev->mc_handle);
+ 	if (mac->fw_node)
+ 		fwnode_handle_put(mac->fw_node);
+ }
+ 
+-static char dpaa2_mac_ethtool_stats[][ETH_GSTRING_LEN] = {
+-	[DPMAC_CNT_ING_ALL_FRAME]		= "[mac] rx all frames",
+-	[DPMAC_CNT_ING_GOOD_FRAME]		= "[mac] rx frames ok",
+-	[DPMAC_CNT_ING_ERR_FRAME]		= "[mac] rx frame errors",
+-	[DPMAC_CNT_ING_FRAME_DISCARD]		= "[mac] rx frame discards",
+-	[DPMAC_CNT_ING_UCAST_FRAME]		= "[mac] rx u-cast",
+-	[DPMAC_CNT_ING_BCAST_FRAME]		= "[mac] rx b-cast",
+-	[DPMAC_CNT_ING_MCAST_FRAME]		= "[mac] rx m-cast",
+-	[DPMAC_CNT_ING_FRAME_64]		= "[mac] rx 64 bytes",
+-	[DPMAC_CNT_ING_FRAME_127]		= "[mac] rx 65-127 bytes",
+-	[DPMAC_CNT_ING_FRAME_255]		= "[mac] rx 128-255 bytes",
+-	[DPMAC_CNT_ING_FRAME_511]		= "[mac] rx 256-511 bytes",
+-	[DPMAC_CNT_ING_FRAME_1023]		= "[mac] rx 512-1023 bytes",
+-	[DPMAC_CNT_ING_FRAME_1518]		= "[mac] rx 1024-1518 bytes",
+-	[DPMAC_CNT_ING_FRAME_1519_MAX]		= "[mac] rx 1519-max bytes",
+-	[DPMAC_CNT_ING_FRAG]			= "[mac] rx frags",
+-	[DPMAC_CNT_ING_JABBER]			= "[mac] rx jabber",
+-	[DPMAC_CNT_ING_ALIGN_ERR]		= "[mac] rx align errors",
+-	[DPMAC_CNT_ING_OVERSIZED]		= "[mac] rx oversized",
+-	[DPMAC_CNT_ING_VALID_PAUSE_FRAME]	= "[mac] rx pause",
+-	[DPMAC_CNT_ING_BYTE]			= "[mac] rx bytes",
+-	[DPMAC_CNT_EGR_GOOD_FRAME]		= "[mac] tx frames ok",
+-	[DPMAC_CNT_EGR_UCAST_FRAME]		= "[mac] tx u-cast",
+-	[DPMAC_CNT_EGR_MCAST_FRAME]		= "[mac] tx m-cast",
+-	[DPMAC_CNT_EGR_BCAST_FRAME]		= "[mac] tx b-cast",
+-	[DPMAC_CNT_EGR_ERR_FRAME]		= "[mac] tx frame errors",
+-	[DPMAC_CNT_EGR_UNDERSIZED]		= "[mac] tx undersized",
+-	[DPMAC_CNT_EGR_VALID_PAUSE_FRAME]	= "[mac] tx b-pause",
+-	[DPMAC_CNT_EGR_BYTE]			= "[mac] tx bytes",
+-};
+-
+-#define DPAA2_MAC_NUM_STATS	ARRAY_SIZE(dpaa2_mac_ethtool_stats)
+-
+ int dpaa2_mac_get_sset_count(void)
+ {
+-	return DPAA2_MAC_NUM_STATS;
++	return DPAA2_MAC_NUM_ETHTOOL_STATS;
+ }
+ 
+ void dpaa2_mac_get_strings(u8 **data)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < DPAA2_MAC_NUM_STATS; i++)
+-		ethtool_puts(data, dpaa2_mac_ethtool_stats[i]);
++	for (i = 0; i < DPAA2_MAC_NUM_ETHTOOL_STATS; i++)
++		ethtool_puts(data, dpaa2_mac_ethtool_stats[i].name);
+ }
+ 
+ void dpaa2_mac_get_ethtool_stats(struct dpaa2_mac *mac, u64 *data)
+ {
++	size_t values_size = DPAA2_MAC_NUM_ETHTOOL_STATS * sizeof(u64);
++	struct device *dev = mac->net_dev->dev.parent;
+ 	struct fsl_mc_device *dpmac_dev = mac->mc_dev;
++	__le64 *cnt_values;
+ 	int i, err;
+ 	u64 value;
+ 
+-	for (i = 0; i < DPAA2_MAC_NUM_STATS; i++) {
++	if (!(mac->features & DPAA2_MAC_FEATURE_STATS_BUNDLE))
++		goto fallback;
++
++	if (!mac->ethtool_stats.idx_dma_mem ||
++	    !mac->ethtool_stats.values_dma_mem)
++		goto fallback;
++
++	dma_sync_single_for_device(dev, mac->ethtool_stats.values_iova,
++				   values_size, DMA_FROM_DEVICE);
++
++	err = dpmac_get_statistics(mac->mc_io, 0, dpmac_dev->mc_handle,
++				   mac->ethtool_stats.idx_iova,
++				   mac->ethtool_stats.values_iova,
++				   DPAA2_MAC_NUM_ETHTOOL_STATS);
++	if (err)
++		goto fallback;
++
++	dma_sync_single_for_cpu(dev, mac->ethtool_stats.values_iova,
++				values_size, DMA_FROM_DEVICE);
++
++	cnt_values = mac->ethtool_stats.values_dma_mem;
++	for (i = 0; i < DPAA2_MAC_NUM_ETHTOOL_STATS; i++)
++		*(data + i) = le64_to_cpu(*cnt_values++);
++
++	return;
++
++fallback:
++
++	/* Fallback and retrieve each counter one by one */
++	for (i = 0; i < DPAA2_MAC_NUM_ETHTOOL_STATS; i++) {
+ 		err = dpmac_get_counter(mac->mc_io, 0, dpmac_dev->mc_handle,
+-					i, &value);
++					dpaa2_mac_ethtool_stats[i].id, &value);
+ 		if (err) {
+ 			netdev_err_once(mac->net_dev,
+ 					"dpmac_get_counter error %d\n", err);
+diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.h b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.h
+index 53f8d106d11e..6f4981627961 100644
+--- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.h
++++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.h
+@@ -1,5 +1,5 @@
  /* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
- /* Copyright 2013-2016 Freescale Semiconductor Inc.
-- * Copyright 2019 NXP
-+ * Copyright 2019, 2024-2026 NXP
-  */
- #ifndef __FSL_DPMAC_H
- #define __FSL_DPMAC_H
-@@ -170,6 +170,58 @@ int dpmac_set_link_state(struct fsl_mc_io *mc_io,
-  *			      pause frames.
-  * @DPMAC_CNT_EGR_GOOD_FRAME: counts frames transmitted without error, including
-  *			      pause frames.
-+ * @DPMAC_CNT_EGR_FRAME_64: counts transmitted 64-bytes frames, good or bad.
-+ * @DPMAC_CNT_EGR_FRAME_127: counts transmitted 65 to 127-bytes frames, good or
-+ *			     bad.
-+ * @DPMAC_CNT_EGR_FRAME_255: counts transmitted 128 to 255-bytes frames, good
-+ *			     or bad.
-+ * @DPMAC_CNT_EGR_FRAME_511: counts transmitted 256 to 511-bytes frames, good
-+ *			     or bad.
-+ * @DPMAC_CNT_EGR_FRAME_1023: counts transmitted 512 to 1023-bytes frames, good
-+ *			      or bad.
-+ * @DPMAC_CNT_EGR_FRAME_1518: counts transmitted 1024 to 1518-bytes frames,
-+ *			      good or bad.
-+ * @DPMAC_CNT_EGR_FRAME_1519_MAX: counts transmitted 1519-bytes frames and
-+ *				  larger (up to max frame length specified),
-+ *				  good or bad.
-+ * @DPMAC_CNT_ING_ALL_BYTE: counts bytes received in both good and bad packets
-+ * @DPMAC_CNT_ING_FCS_ERR: counts frames received with a CRC-32 error but the
-+ *			   frame is otherwise of correct length
-+ * @DPMAC_CNT_ING_VLAN_FRAME: counts the received VLAN tagged frames which are
-+ *			      valid.
-+ * @DPMAC_CNT_ING_UNDERSIZED: counts received frames which were less than 64
-+ *			      bytes long and with a good CRC.
-+ * @DPMAC_CNT_ING_CONTROL_FRAME: counts received control frames (type 0x8808)
-+ *				 but not pause frames.
-+ * @DPMAC_CNT_ING_FRAME_DISCARD_NOT_TRUNC: counts the fully dropped frames (not
-+ *					   truncated) due to internal errors of
-+ *					   the MAC client. Occurs when a
-+ *					   receive FIFO overflows.
-+ * @DPMAC_CNT_EGR_ALL_BYTE: counts transmitted bytes in both good and bad
-+ *			    packets.
-+ * @DPMAC_CNT_EGR_FCS_ERR: counts trasmitted frames with a CRC-32 error except
-+ *			   for underflows.
-+ * @DPMAC_CNT_EGR_VLAN_FRAME: counts the transmitted VLAN tagged frames which
-+ *			      are valid.
-+ * @DPMAC_CNT_EGR_ALL_FRAME: counts all trasmitted frames, good or bad.
-+ * @DPMAC_CNT_EGR_CONTROL_FRAME: counts transmitted control frames (type
-+ *				 0x8808) but not pause frames.
-+ * @DPMAC_CNT_ING_PFC0: number of PFC frames received for class 0.
-+ * @DPMAC_CNT_ING_PFC1: number of PFC frames received for class 1.
-+ * @DPMAC_CNT_ING_PFC2: number of PFC frames received for class 2.
-+ * @DPMAC_CNT_ING_PFC3: number of PFC frames received for class 3.
-+ * @DPMAC_CNT_ING_PFC4: number of PFC frames received for class 4.
-+ * @DPMAC_CNT_ING_PFC5: number of PFC frames received for class 5.
-+ * @DPMAC_CNT_ING_PFC6: number of PFC frames received for class 6.
-+ * @DPMAC_CNT_ING_PFC7: number of PFC frames received for class 7.
-+ * @DPMAC_CNT_EGR_PFC0: number of PFC frames transmitted for class 0.
-+ * @DPMAC_CNT_EGR_PFC1: number of PFC frames transmitted for class 1.
-+ * @DPMAC_CNT_EGR_PFC2: number of PFC frames transmitted for class 2.
-+ * @DPMAC_CNT_EGR_PFC3: number of PFC frames transmitted for class 3.
-+ * @DPMAC_CNT_EGR_PFC4: number of PFC frames transmitted for class 4.
-+ * @DPMAC_CNT_EGR_PFC5: number of PFC frames transmitted for class 5.
-+ * @DPMAC_CNT_EGR_PFC6: number of PFC frames transmitted for class 6.
-+ * @DPMAC_CNT_EGR_PFC7: number of PFC frames transmitted for class 7.
-  */
- enum dpmac_counter_id {
- 	DPMAC_CNT_ING_FRAME_64,
-@@ -199,7 +251,41 @@ enum dpmac_counter_id {
- 	DPMAC_CNT_EGR_UCAST_FRAME,
- 	DPMAC_CNT_EGR_ERR_FRAME,
- 	DPMAC_CNT_ING_GOOD_FRAME,
--	DPMAC_CNT_EGR_GOOD_FRAME
-+	DPMAC_CNT_EGR_GOOD_FRAME,
-+	DPMAC_CNT_EGR_FRAME_64,
-+	DPMAC_CNT_EGR_FRAME_127,
-+	DPMAC_CNT_EGR_FRAME_255,
-+	DPMAC_CNT_EGR_FRAME_511,
-+	DPMAC_CNT_EGR_FRAME_1023,
-+	DPMAC_CNT_EGR_FRAME_1518,
-+	DPMAC_CNT_EGR_FRAME_1519_MAX,
-+	DPMAC_CNT_ING_ALL_BYTE,
-+	DPMAC_CNT_ING_FCS_ERR,
-+	DPMAC_CNT_ING_VLAN_FRAME,
-+	DPMAC_CNT_ING_UNDERSIZED,
-+	DPMAC_CNT_ING_CONTROL_FRAME,
-+	DPMAC_CNT_ING_FRAME_DISCARD_NOT_TRUNC,
-+	DPMAC_CNT_EGR_ALL_BYTE,
-+	DPMAC_CNT_EGR_FCS_ERR,
-+	DPMAC_CNT_EGR_VLAN_FRAME,
-+	DPMAC_CNT_EGR_ALL_FRAME,
-+	DPMAC_CNT_EGR_CONTROL_FRAME,
-+	DPMAC_CNT_ING_PFC0,
-+	DPMAC_CNT_ING_PFC1,
-+	DPMAC_CNT_ING_PFC2,
-+	DPMAC_CNT_ING_PFC3,
-+	DPMAC_CNT_ING_PFC4,
-+	DPMAC_CNT_ING_PFC5,
-+	DPMAC_CNT_ING_PFC6,
-+	DPMAC_CNT_ING_PFC7,
-+	DPMAC_CNT_EGR_PFC0,
-+	DPMAC_CNT_EGR_PFC1,
-+	DPMAC_CNT_EGR_PFC2,
-+	DPMAC_CNT_EGR_PFC3,
-+	DPMAC_CNT_EGR_PFC4,
-+	DPMAC_CNT_EGR_PFC5,
-+	DPMAC_CNT_EGR_PFC6,
-+	DPMAC_CNT_EGR_PFC7,
+-/* Copyright 2019 NXP */
++/* Copyright 2019, 2024-2026 NXP */
+ #ifndef DPAA2_MAC_H
+ #define DPAA2_MAC_H
+ 
+@@ -11,6 +11,12 @@
+ #include "dpmac.h"
+ #include "dpmac-cmd.h"
+ 
++struct dpaa2_mac_stats {
++	__le32 *idx_dma_mem;
++	__le64 *values_dma_mem;
++	dma_addr_t idx_iova, values_iova;
++};
++
+ struct dpaa2_mac {
+ 	struct fsl_mc_device *mc_dev;
+ 	struct dpmac_link_state state;
+@@ -28,6 +34,8 @@ struct dpaa2_mac {
+ 	struct fwnode_handle *fw_node;
+ 
+ 	struct phy *serdes_phy;
++
++	struct dpaa2_mac_stats ethtool_stats;
  };
  
- int dpmac_get_counter(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-@@ -210,4 +296,8 @@ int dpmac_get_api_version(struct fsl_mc_io *mc_io, u32 cmd_flags,
- 
- int dpmac_set_protocol(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
- 		       enum dpmac_eth_if protocol);
-+
-+int dpmac_get_statistics(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+			 u64 iova_cnt, u64 iova_values, u32 num_cnt);
-+
- #endif /* __FSL_DPMAC_H */
+ static inline bool dpaa2_mac_is_type_phy(struct dpaa2_mac *mac)
 -- 
 2.25.1
 
