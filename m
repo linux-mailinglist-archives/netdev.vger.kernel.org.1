@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-270588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270589-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mHSRAgRdwWlZSgQAu9opvQ
-	(envelope-from <netdev+bounces-270588-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:32:20 +0100
+	id 8DgwH7ZuwWnmTAQAu9opvQ
+	(envelope-from <netdev+bounces-270589-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:47:50 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C0922F6702
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:32:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D02A42F8D13
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:47:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 892BA32992DC
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 15:11:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 77D9B32E378A
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 15:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E06A3B5305;
-	Mon, 23 Mar 2026 15:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23AC23BBA06;
+	Mon, 23 Mar 2026 15:06:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C0e5dmSs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aPyt2FtN"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FF325392A
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 15:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94C73BB9F6
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 15:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774278367; cv=none; b=S9gnouAxPlwXemv2oYeRyDOV8JrhO+9irjrelnmRCJ04zS8g4k+PVAF3nlwlBJYwq2p0s1I4JAae+lYZYsHZUWqN6C9pNGGE6GOlQD9SynYVTWwDKjagQG5xuogPMjJqnv4okXEo40hqVpj9VvnBobP3KHDfhzKoHdjTZdYPKpY=
+	t=1774278375; cv=none; b=J2UHoihdJ7AyG84FMbcvC6xEcDaxxTGTnyO8lV5ctaH8dJbjBvEIENHiZ/Hr58Y2GBLYdH5rKoiNx/GVDm2W20yzJVt45vaE0aNPwzDiz9Bo7hj3/6J5HHh7l9kWep4f5vZ51JVKKIHahy8oVWCbbRiLQQK/bsK7g2GBIWCQlpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774278367; c=relaxed/simple;
-	bh=wiH6DsMqrg29tzFgP11flkS65RZZkVoC9406w0ZzAqc=;
+	s=arc-20240116; t=1774278375; c=relaxed/simple;
+	bh=I3X9Xgh8JthJcC1AVR46HTecX3GW+jzHyhem1V0naug=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WiJfBWeXWBKbagg2uTOAdqbUVQl3F6aaJyXVEnbivpUqsX8BSy5kwXAt3r39RUa44sIdJ0rV5ghG3bxgitxLkDpEN+ZLSXsYiiF8MDcHDP2OqyiKgocpvi1nnPWqevdARsM0lhrFvm3KOOOef4Ta/VuWD7RCQfSIEWIXBkg1Z+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C0e5dmSs; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=HBFfdCKPF/OwPGlcxCeV+rJRwsq/of9A5OYjOm4ZbB3bpiV6APWJ3OAO9DGRFfSH0WFE8znwiRvqGBKSfdk+Dqe7eqBrcKsNX6E07zlY7gB9R1j0o9uGmJ+xpHss2KT9PhLP1xZCo4DJ62vmerBJ6+7seMQzwI0fVTr5RIxBJVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aPyt2FtN; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774278364;
+	s=mimecast20190719; t=1774278372;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=loVxfrzyxYdQdW2xqgUXj+kDQbA4pbY0Yb3C1QbXM7A=;
-	b=C0e5dmSsXpIYBSbUhtSjgvUUWJh84QbeFMLlM5s2DljjaCsImhT1OL5x+cPFH3e5t/CI1x
-	qBPJDqiybICuYdXQ4H8Gcy/2oaLxeE3anDqMojkbHeuhP6Iwto87f6M+aqi/O6OtTK9oAH
-	2lBo6MKkRcTyWTbS5JK8UuCREu5TmvQ=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=AN3SQlsqlhxFhvczjAvAzreHONU16FaElSEWYMuHbwQ=;
+	b=aPyt2FtNhyXbxuq7fSJ1W0drKrsrnvceTVJtVtGmfwP4vOdM6iVMzRHMaciH/rz+0+DP0+
+	tRuTLgACJFO95ZX2gJ+ZOA4LpttcJ+aznftrLHunYkTas9XCVl54T3cO/u60094fOI02bH
+	K1UJ9M/weMsyIaR2lMQdMGYVEa0wATQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-400-4gT5hl3-O4acj9Q4khLLaA-1; Mon,
- 23 Mar 2026 11:06:01 -0400
-X-MC-Unique: 4gT5hl3-O4acj9Q4khLLaA-1
-X-Mimecast-MFC-AGG-ID: 4gT5hl3-O4acj9Q4khLLaA_1774278358
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-297-QTMd5Q5dO7Cvo_kO7sVkXQ-1; Mon,
+ 23 Mar 2026 11:06:08 -0400
+X-MC-Unique: QTMd5Q5dO7Cvo_kO7sVkXQ-1
+X-Mimecast-MFC-AGG-ID: QTMd5Q5dO7Cvo_kO7sVkXQ_1774278364
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BFE8D195608A;
-	Mon, 23 Mar 2026 15:05:58 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2E93F18002F3;
+	Mon, 23 Mar 2026 15:06:04 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.33.121])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 21DF9300019F;
-	Mon, 23 Mar 2026 15:05:54 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5E0C91955D71;
+	Mon, 23 Mar 2026 15:06:00 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -70,13 +70,13 @@ Cc: David Howells <dhowells@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	Alok Tiwari <alok.a.tiwari@oracle.com>,
-	Simon Horman <horms@kernel.org>,
+	Anderson Nascimento <anderson@allelesecurity.com>,
 	Jeffrey Altman <jaltman@auristor.com>,
+	Simon Horman <horms@kernel.org>,
 	stable@kernel.org
-Subject: [PATCH net v2 08/10] rxrpc: Fix rack timer warning to report unexpected mode
-Date: Mon, 23 Mar 2026 15:04:59 +0000
-Message-ID: <20260323150505.3513839-9-dhowells@redhat.com>
+Subject: [PATCH net v2 09/10] rxrpc: Fix keyring reference count leak in rxrpc_setsockopt()
+Date: Mon, 23 Mar 2026 15:05:00 +0000
+Message-ID: <20260323150505.3513839-10-dhowells@redhat.com>
 In-Reply-To: <20260323150505.3513839-1-dhowells@redhat.com>
 References: <20260323150505.3513839-1-dhowells@redhat.com>
 Precedence: bulk
@@ -86,7 +86,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
@@ -97,7 +97,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270588-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270589-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
@@ -113,47 +113,72 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 5C0922F6702
+X-Rspamd-Queue-Id: D02A42F8D13
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
+From: Anderson Nascimento <anderson@allelesecurity.com>
 
-rxrpc_rack_timer_expired() clears call->rack_timer_mode to OFF before
-the switch. The default case warning therefore always prints OFF and
-doesn't identify the unexpected timer mode.
+In rxrpc_setsockopt(), the code checks 'rx->key' when handling the
+RXRPC_SECURITY_KEYRING option.  However, this appears to be a logic error.
+The code should be checking 'rx->securities' to determine if a keyring has
+already been defined for the socket.
 
-Log the saved mode value instead so the warning reports the actual
-unexpected rack timer mode.
+Currently, if a user calls setsockopt(RXRPC_SECURITY_KEYRING) multiple
+times on the same socket, the check 'if (rx->key)' fails to block
+subsequent calls because 'rx->key' has not been defined by the function.
+This results in a reference count leak on the keyring.
 
-Fixes: 7c482665931b ("rxrpc: Implement RACK/TLP to deal with transmission stalls [RFC8985]")
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+This patch changes the check to 'rx->securities' to correctly identify if
+the socket security keyring has already been configured, returning -EINVAL
+on subsequent attempts.
+
+Before the patch:
+
+It shows the keyring reference counter elevated.
+
+$ cat /proc/keys | grep AFSkeys1
+27aca8ae I--Q--- 24469721 perm 3f010000  1000  1000 keyring   AFSkeys1: empty
+$
+
+After the patch:
+
+The keyring reference counter remains stable and subsequent calls return an
+error:
+
+$ ./poc
+setsockopt: Invalid argument
+$
+
+Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
+Signed-off-by: Anderson Nascimento <anderson@allelesecurity.com>
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
 Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
 cc: Marc Dionne <marc.dionne@auristor.com>
 cc: Eric Dumazet <edumazet@google.com>
 cc: "David S. Miller" <davem@davemloft.net>
 cc: Jakub Kicinski <kuba@kernel.org>
 cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
 cc: linux-afs@lists.infradead.org
 cc: netdev@vger.kernel.org
 cc: stable@kernel.org
 ---
- net/rxrpc/input_rack.c | 2 +-
+ net/rxrpc/af_rxrpc.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/rxrpc/input_rack.c b/net/rxrpc/input_rack.c
-index 13c371261e0a..9eb109ffba56 100644
---- a/net/rxrpc/input_rack.c
-+++ b/net/rxrpc/input_rack.c
-@@ -413,6 +413,6 @@ void rxrpc_rack_timer_expired(struct rxrpc_call *call, ktime_t overran_by)
- 		break;
- 	//case RXRPC_CALL_RACKTIMER_ZEROWIN:
- 	default:
--		pr_warn("Unexpected rack timer %u", call->rack_timer_mode);
-+		pr_warn("Unexpected rack timer %u", mode);
- 	}
- }
+diff --git a/net/rxrpc/af_rxrpc.c b/net/rxrpc/af_rxrpc.c
+index 0f90272ac254..0b7ed99a3025 100644
+--- a/net/rxrpc/af_rxrpc.c
++++ b/net/rxrpc/af_rxrpc.c
+@@ -665,7 +665,7 @@ static int rxrpc_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 		case RXRPC_SECURITY_KEYRING:
+ 			ret = -EINVAL;
+-			if (rx->key)
++			if (rx->securities)
+ 				goto error;
+ 			ret = -EISCONN;
+ 			if (rx->sk.sk_state != RXRPC_UNBOUND)
 
 
