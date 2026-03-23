@@ -1,247 +1,218 @@
-Return-Path: <netdev+bounces-270473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270474-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CNbYAuoZwWn5QQQAu9opvQ
-	(envelope-from <netdev+bounces-270473-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:46:02 +0100
+	id AETDKpQawWn5QQQAu9opvQ
+	(envelope-from <netdev+bounces-270474-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:48:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44DCF2F06CB
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:46:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 295782F0773
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:48:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 56D0C303D642
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:40:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 664CA30D0763
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6C438E5F6;
-	Mon, 23 Mar 2026 10:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38C6738D6AD;
+	Mon, 23 Mar 2026 10:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g539zflo"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="gKAsyN6w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010024.outbound.protection.outlook.com [52.101.69.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCB838CFF6;
-	Mon, 23 Mar 2026 10:40:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774262413; cv=none; b=OWLfYEo7kEL9tLUdY46Jrfz/rLm7cvwGiVHrOaQyxfFlwOYiOdDe3z5uG4UF6zlAKYotO9+0vDDcFTJ+S/QWwoc3duASr/CacGriZdLEJFc69hGRAkL05eBJIIS+3GpLvdvc1Ns3hFfuW8DAeEW05jtl30IcvMJw8tYLksQ0guA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774262413; c=relaxed/simple;
-	bh=jl17xFX7FL3kILYlXWNhW78Mu/pU5NxzStolON6Tmh8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I6kRt1nln+cpNTw0S2EmNyJ0LLCw0ZgBH3gk6vCnChyhgBxCFdmRVF5TSTv52KTUCsvaNUvz9Q2CwD/qFto0XK9KFY0tyiVJKd10oGAPXacDGYGsszUYobPsVXdlKaszeSz7y/3VjGz6NujNXOUvC3wt4wXvUe+/IF2OEDkzmI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g539zflo; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774262411; x=1805798411;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=jl17xFX7FL3kILYlXWNhW78Mu/pU5NxzStolON6Tmh8=;
-  b=g539zfloFKdnLgg/NCpCk7Tt53fvi4HJyCzuhHD9SrZ6EDSn7cBKqv/C
-   CjRi0MUrp7Nj4qADCrdTTVdjvlQKjtF7H+K5qTXzvgpiN+CpuGv+XwTNG
-   dWc40htuqPoQKzY3ADl6+0nG0j6z9hhjp+kY37Sq7Ap3MICU5+6FJuckw
-   TA57HtrMtOGa7bd9N9QBd+nhnvIfaX1HqIIB5qhydsMYoKeKDD7aLhqS8
-   iM8AMvo8h+O9E3CvB6jTI05TPwdHQAEAMR0R3d4o7bjFqLKjYJf6xoE97
-   2obQoOiJlX5PTZiOGSy5H1yJ8+zm2yOPq0GhcmvNgrW/IOw1yLWYIyFFW
-   A==;
-X-CSE-ConnectionGUID: 9LopHaU2Q4+tULsHnnhR+Q==
-X-CSE-MsgGUID: 39RX7Qi9TFC7xjldJgbonw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11737"; a="75138953"
-X-IronPort-AV: E=Sophos;i="6.23,137,1770624000"; 
-   d="scan'208";a="75138953"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2026 03:40:11 -0700
-X-CSE-ConnectionGUID: IO9fLRWCQo215NjF5gWDdg==
-X-CSE-MsgGUID: VV63WbT1TuOjk7451sldHA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,137,1770624000"; 
-   d="scan'208";a="228713292"
-Received: from lkp-server01.sh.intel.com (HELO 3905d212be1b) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 23 Mar 2026 03:40:03 -0700
-Received: from kbuild by 3905d212be1b with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w4chU-000000000Mr-01qN;
-	Mon, 23 Mar 2026 10:40:00 +0000
-Date: Mon, 23 Mar 2026 18:39:49 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
-	Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Liang Xu <lxu@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v6 2/4] net: dsa: add bridge member iteration
- macro and port mask helper
-Message-ID: <202603231807.3CRfrjTg-lkp@intel.com>
-References: <ff936ce4ad3044102c367c55e7a455ab0020e4b7.1774136876.git.daniel@makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71AE36EAAE;
+	Mon, 23 Mar 2026 10:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.24
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774262436; cv=fail; b=Egc71QAfb1Xxq2JAzGzwy+r3W6S96MnSvVWU23hP6bgyiGe758uB+aWup6k4YEMMYpdnNQWOTyVMWod/uxUAE3mIg9aTQVTz94eMyvJgTTQQgpXTy4qWd2hwT6tC18ecbAAMesdYzkmR3PUbUFsRTSla7j9S40nf6c8YrrxhvEw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774262436; c=relaxed/simple;
+	bh=tU/IlxuiX6Yy1m8entUUSBbXVAumU2cnDJcbbEoB9f0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=tNqx9Ly74xbVt2VmLHIaC+la7ylq3Cy743RQR9uTsG+jM2pd2+anHEzn/foAD9ejrnE8K+/uJ8msXKpIawJ4DBMrkS+I0dvQ3NXda9+tWY8y9HLfzi8LK9zC4yREpxXu68B5bQd7GFkPNvZxvtMizVfLfoiI2MMDDaFpjogiQ+I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=gKAsyN6w; arc=fail smtp.client-ip=52.101.69.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RmV/Bs5csWyxL73ru4kbZmKgdS0ZzwQyAk0JR/UeBQMBBWR5CXe46Q2DLaRsWACjOo2FwhDfyVsRBUGFgH0RF2xUFuD+lTb7tI2/d5YezbEjWHyves1jMNaVMYvUg7UsPgHkXCUpD4SqLFEztdErLz2OYCJDpjnm0b70AYBx+8Me8+Nh98fOag1t/bbeUKSUtV2n1YKcjXKEf8pf1aq/oRk9TsjJ+7kjx2YNuXNw4ClLhEQGl2C2qDSSIi+BTist8CUuCr0Hg0nVOcNaFSMpcQFV53e8dlMYE8NN54s9dAQUvhdaeuK1NggoPwhk2XWDW7roga2X3ZjrtTD5XSW+7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tU/IlxuiX6Yy1m8entUUSBbXVAumU2cnDJcbbEoB9f0=;
+ b=UQTwNtkjk9VA7r/Lm57mwJHxAcvoG6aU5L+4MmmNUeyEALmyztxuIooGM3xALd0OcQiJE/TvpPOtq/iwCYKMJLgU5TmlNlqb0dc5qqf171it3PLgItmy/WJul/FC8TE2oMSjAOZSGyekqOVwPBMm9cJby6QjjqnDaGHizmRpmeK6j7RQUOO+glvew4mfsEs0AwB92AXWMCM8HSZvkQYrA2aAdhfywdZZho1d61O/aHzKMpKu37uN6UOmhmjJNUnqWCqJ5Az5Mv9tF1HS3ChlRVLVNsr2dgSEijxaGvhqcaysoUJBTm3YvNH4KaCAyK+VRDdE4PDtDJQQK1uTawQhng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tU/IlxuiX6Yy1m8entUUSBbXVAumU2cnDJcbbEoB9f0=;
+ b=gKAsyN6wdWjsukfRIY8l3pQDNJcrhNZ48GOVddPluZ4ttW7JwS29PT5IN/CFTcaXeAJxVfdlt9M/taIBJECMr34hKIICWzg9qP9WujxhnyV4wSrf4PlnoM3bntInjGkD7liT+md2reIXQ5wnytilFjfsY1eT4SCjdmtNj9+QthpJ4kbJK+zNRpCDPfmPWotVuCdgl8+Jr0ns//8zHrvSza/KRVsQr4Mf+7Qq8k53rVi23ZZQuprI939HkAa1iRULUefZ4QmgkJKFc03HOS6NeSbvGRwATTD8Ir99U6EaOH6cLVEpfQWhLRpJsRY6y6UlDWSX5/IPjjUMcr5fhs6Xag==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by DUZPR04MB10015.eurprd04.prod.outlook.com (2603:10a6:10:4d9::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.31; Mon, 23 Mar
+ 2026 10:40:34 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::b476:c19a:24cd:3694]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::b476:c19a:24cd:3694%3]) with mapi id 15.20.9723.030; Mon, 23 Mar 2026
+ 10:40:03 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+	<pabeni@redhat.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>, "linux@armlinux.org.uk"
+	<linux@armlinux.org.uk>, Frank Li <frank.li@nxp.com>, "horms@kernel.org"
+	<horms@kernel.org>, "saikrishnag@marvell.com" <saikrishnag@marvell.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>
+Subject: RE: [PATCH v5 net 0/3] net: enetc: safely reinitialize TX BD ring
+ when it has unsent frames
+Thread-Topic: [PATCH v5 net 0/3] net: enetc: safely reinitialize TX BD ring
+ when it has unsent frames
+Thread-Index: AQHcss4KuCbBqII4UEKPje859/m9cLW7+6pA
+Date: Mon, 23 Mar 2026 10:40:03 +0000
+Message-ID:
+ <PAXPR04MB8510310D3FEC15E163A2FCF7884BA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20260313094644.1132411-1-wei.fang@nxp.com>
+In-Reply-To: <20260313094644.1132411-1-wei.fang@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|DUZPR04MB10015:EE_
+x-ms-office365-filtering-correlation-id: 3e4284b0-0683-45c5-009a-08de88c88aab
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|19092799006|376014|7416014|38070700021|18002099003|22082099003|56012099003;
+x-microsoft-antispam-message-info:
+ S5csCEB5b8ntf6NXALguPgszipo0C8rYn0wWHfMc+I+SZkygUMLlqNPSMilEJ6KrO5LckHFTX/sf5CodVlwtU7am9TUVaKJ6xScl9nDnISif16CYwZus19OimJKPcC2od/PThN/u7muE4AzEwkq9PGvflXDArgo6YPcdtGBtrmIHdf4KN01/HIbQRKHh4DZTmz6dk41kzFadLgP7cQE+pwalZuix8yxjaYWYAxqj30OpsTCXVL1NKPPc+nuVP4iqiRd0tt5WSJzl0d32+nQFIcCNkuBYrdFm1o9VNa4gFaYcniOaPmyCFF7V+72NudHTLZQZWtKrLiKgdi8HVzAnZTSC0ROLRvwDqjydufiPXTDYK8EJzNZ2sMcm5KfhrdDk5iphLgeK3InjIJj7qYk6++KjO1bJAkctLOmDTLDjLG7xjt5DcUKaZeLHO1Hg3uajMURaLx0VlH9IqicmZEclScqRv6c0cG4tDhDABQmgnAIYOoA5ParCgX8X8xo5/YjoFgKYEWd86LugjEovhFIm1JCfzS6MR4MKq70NmWunuLR/8z8DCgXIb/lHcKMNMPnkWZcfik9Nu01pWJuuKC/DgcZXiwNqVLGo2R+ww9VkJ27IRd6yefgVTk9QdVsH2TF89QwchJ+lBigZnLx1ckiAQySGJZ3+29e1rW3XWccEaepfPFU+UDgxTlE8mE5FzXDg/zka2thREjs3HvHCdf3wmlNNxeTktZbJgiKKWlXlmOkuzvWKi+vYUOYfmjSwkGOZ0sJ8w7KsZ9oIDtVTJwE/dF1JbKoQibwdxvaXxoMhMoQ=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(19092799006)(376014)(7416014)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ehC0B6w4oxkpcUsiL5YLtYI7DDv3fMKVeXBYhaz0JEu8QesWCDtrSUHHHR5T?=
+ =?us-ascii?Q?hn10ysvobAMzmzLW+9mojiNWPih47UkPN3xbbY1tEX4R/pxDa+Ub7sRd7utO?=
+ =?us-ascii?Q?Emru1fso7efxhvoyliroJXX/nA3Ixo2lWkBuuiTUq/ZoxRFMkYWD9ZzLcV0i?=
+ =?us-ascii?Q?ZHPnsBVYVu3CBNLvdPP8aCGpgXBUBqhok8RDyEuoW16uwzFiwMVbLextnE1X?=
+ =?us-ascii?Q?7EjpWzaAGDt3JRFhrxiZiRJxIHa9henn53GIhIsjnWUzrmhEY7Hcyos6ucmU?=
+ =?us-ascii?Q?lfRmXzltE7ZNyg5Y1qKtod2kEHauLo1wMBPGouR/xTbKKNWvcOSchLPNBlVS?=
+ =?us-ascii?Q?XaaUB4a242JDqWwYMsiT+seTurARUXernoUjVxToLQDx4yoE4jEGEyKZmPCZ?=
+ =?us-ascii?Q?MWURMImcr/93fzFHMlKg8IMgRYrGTtw2Y9E/iS7b6HnM2CnyE6hxRb/ZLXFL?=
+ =?us-ascii?Q?53hMgXY5R36VE+mavc/BIp/VcxQF/4GmJAjkUJBYPCB1PqTcba9kq5oGjdSS?=
+ =?us-ascii?Q?Lyh3n+pVcgDhnOb/T0rz6MU1n3kFMM/GHxABMHJ52qQFROPC8Xc1P8+ON/Aa?=
+ =?us-ascii?Q?IRnzdjMOqYY+je3SaZ0FXTiWAD6CaxFcIrqwolz3MKkdH85NO+mA+pCftQGf?=
+ =?us-ascii?Q?82eJpoK61YwqGhZZoAd9GXA1QZSp7N0ncQrpa3UdbobhqzVYa/LUqStRh0ad?=
+ =?us-ascii?Q?uiJLUsCKAHfThCaaB4fLsqae3PaFjlF8WmD+DAk56zZcwjIvQaE2D/Axpik+?=
+ =?us-ascii?Q?JfcG/iXitszfQ3bAjelM24NxYj+9MuW/cWRtj54ymJbN8/4GnytWOIxebDlH?=
+ =?us-ascii?Q?jQPKpfnsMb569s5njKHpKJw45rqDayjZcN5klXZf2L6xzLIMm3k8k78Slbbo?=
+ =?us-ascii?Q?zGSTu+ofB1yR6Ok8aW6nSgkD5NTLiIhEGTrmHkyDsKoaAv6d0C9vtNLeIWU4?=
+ =?us-ascii?Q?KaiV0HnZh0aYIs/sHyqCGjGNA/HSZI3Nd2D3T8DGUDHHiPgj6X9NT8FCz6vg?=
+ =?us-ascii?Q?a63OMyT5K/fDnGDqjbMqS0t/pi9Fd+aLmEhvS9ckoKhvAdJLFJUkcxZHNMuW?=
+ =?us-ascii?Q?X4N4+NFbiV1Atn5Fyr120lr3cCXi0pcXJh9aT3sUD5uGcJkqH4saS4P0RNUk?=
+ =?us-ascii?Q?9kZJWit6J9Xh5nX5RRwSerJYariBSc4CExA4wiQK/F3+1PPQM0ytfqja+6qw?=
+ =?us-ascii?Q?AwDVNlZL+mzUFUcsn4gbrLHggLLN9fV5sc/zvIbj6kJXLiHdnn6ot8Zf0b1B?=
+ =?us-ascii?Q?wNSMzzSqEPOCW9pJ0qoqXF4y0UzARRSHVI2ZdBOK2eWQMrRAmLAHbx0jantO?=
+ =?us-ascii?Q?fGtRmGOxrm0XOU0x3p5YyuBYBbi+p8tNVW1/FshxZN/9utsAdG6cAcswabUE?=
+ =?us-ascii?Q?A+TfTBmBVefGfKVboDeRw7e17PZO8n547TigGnYL9cFWZm1+mzYH/WWvuxzD?=
+ =?us-ascii?Q?+Gig0EvsnoZwc3tQjCIB2KycxeICcsKBkprd8pqjAZ6xLCTJqiNRF9/dqcay?=
+ =?us-ascii?Q?IadxNssbopuKU930CGEECebEYHX1USq79cbxGx7An4hN5qKIkRV91OvsiGGh?=
+ =?us-ascii?Q?ZjGHFsNjO7+/iozA3yXqVjEBMB4JpsZig6PmWK50GB83FXllZdIQvfNK9+eJ?=
+ =?us-ascii?Q?47zPf/EXqKoM10+exfMjFq9ZZKPlrjD1JUC/ysRGUj7lGNGpyU801vH6txHE?=
+ =?us-ascii?Q?zN283hzZePfN3/yzao2ouZyzV048ltFLMRAPqyta54gynXbE?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ff936ce4ad3044102c367c55e7a455ab0020e4b7.1774136876.git.daniel@makrotopia.org>
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3e4284b0-0683-45c5-009a-08de88c88aab
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Mar 2026 10:40:03.3848
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xV//j2pSgu8jeGVeLStbKKuc2SOMBhKRPoeUfVXVuUfX85sRMwe/0rEUj4M8o4hnW1+wLJwZNdINQCnG2XRPSA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB10015
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270473-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-270474-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	URIBL_MULTI_FAIL(0.00)[PAXPR04MB8510.eurprd04.prod.outlook.com:server fail,nxp.com:server fail,sea.lore.kernel.org:server fail];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,01.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 44DCF2F06CB
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[PAXPR04MB8510.eurprd04.prod.outlook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:dkim]
+X-Rspamd-Queue-Id: 295782F0773
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Daniel,
+> Currently the driver does not reset the producer index register (PIR) and
+> consumer index register (CIR) when initializing a TX BD ring. The driver
+> only reads the PIR and CIR and initializes the software indexes. If the
+> TX BD ring is reinitialized when it still contains unsent frames, its PIR
+> and CIR will not be equal after the reinitialization. However, the BDs
+> between CIR and PIR have been freed and become invalid and this can lead
+> to a hardware malfunction, causing the TX BD ring will not work properly.
+>=20
+> Since the PIR and CIR are sofeware-configurable on ENETC v4. Therefore,
+> the driver must reset them if they are not equal when reinitializing
+> the TX BD ring.
+>=20
+> However, resetting the PIR and CIR alone is insufficient, it cannot
+> completely solve the problem. When a link-down event occurs while the TX
+> BD ring is transmitting frames, subsequent reinitialization of the TX BD
+> ring may cause it to malfunction. Because enetc4_pl_mac_link_down() only
+> clears PMa_COMMAND_CONFIG[TX_EN] to disable MAC transmit data path. It
+> doesn't set PORT[TXDIS] to 1 to flush the TX BD ring. Therefore, it is
+> not safe to reinitialize the TX BD ring at this point.
+>=20
+> To safely reinitialize the TX BD ring after a link-down event, we checked
+> with the NETC IP team, a proper Ethernet MAC graceful stop is necessary.
+> Therefore, add the Ethernet MAC graceful stop to the link-down event
+> handler enetc4_pl_mac_link_down(). Note that this patch set is not
+> applicable to ENETC v1 (LS1028A).
+>=20
+> ---
+> v5:
+> 1. Add patch 3
+> 2. Correct the typo in commit message of patch 1
+> v4 link:
+> https://lore.kernel.org/imx/20260312095415.669128-1-wei.fang@nxp.com/
 
-kernel test robot noticed the following build errors:
+Hi Jakub, Paolo,
 
-[auto build test ERROR on net-next/main]
+Can this series be applied? Or is further improvement needed?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/net-dsa-add-driver-private-pointer-to-struct-dsa_bridge/20260323-041502
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/ff936ce4ad3044102c367c55e7a455ab0020e4b7.1774136876.git.daniel%40makrotopia.org
-patch subject: [PATCH net-next v6 2/4] net: dsa: add bridge member iteration macro and port mask helper
-config: arm-randconfig-002-20260323 (https://download.01.org/0day-ci/archive/20260323/202603231807.3CRfrjTg-lkp@intel.com/config)
-compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project c911b8492374942bf4cfe35411e90a35d3837f6a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260323/202603231807.3CRfrjTg-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603231807.3CRfrjTg-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/net/dsa/yt921x.c:2158:1: error: conflicting types for 'dsa_bridge_ports'
-    2158 | dsa_bridge_ports(struct dsa_switch *ds, const struct net_device *bdev)
-         | ^
-   include/net/dsa.h:845:19: note: previous definition is here
-     845 | static inline u32 dsa_bridge_ports(struct dsa_switch *ds,
-         |                   ^
->> drivers/net/dsa/yt921x.c:2213:38: error: incompatible pointer types passing 'struct net_device *' to parameter of type 'const struct dsa_bridge *' [-Wincompatible-pointer-types]
-    2213 |                         ports_mask = dsa_bridge_ports(ds, bdev);
-         |                                                           ^~~~
-   include/net/dsa.h:846:33: note: passing argument to parameter 'bridge' here
-     846 |                                    const struct dsa_bridge *bridge)
-         |                                                             ^
-   drivers/net/dsa/yt921x.c:2285:36: error: incompatible pointer types passing 'struct net_device *' to parameter of type 'const struct dsa_bridge *' [-Wincompatible-pointer-types]
-    2285 |         ports_mask = dsa_bridge_ports(ds, bridge.dev);
-         |                                           ^~~~~~~~~~
-   include/net/dsa.h:846:33: note: passing argument to parameter 'bridge' here
-     846 |                                    const struct dsa_bridge *bridge)
-         |                                                             ^
-   3 errors generated.
-
-
-vim +/dsa_bridge_ports +2158 drivers/net/dsa/yt921x.c
-
-186623f4aa724c David Yang 2025-10-17  2156  
-186623f4aa724c David Yang 2025-10-17  2157  static u32
-186623f4aa724c David Yang 2025-10-17 @2158  dsa_bridge_ports(struct dsa_switch *ds, const struct net_device *bdev)
-186623f4aa724c David Yang 2025-10-17  2159  {
-186623f4aa724c David Yang 2025-10-17  2160  	struct dsa_port *dp;
-186623f4aa724c David Yang 2025-10-17  2161  	u32 mask = 0;
-186623f4aa724c David Yang 2025-10-17  2162  
-186623f4aa724c David Yang 2025-10-17  2163  	dsa_switch_for_each_user_port(dp, ds)
-186623f4aa724c David Yang 2025-10-17  2164  		if (dsa_port_offloads_bridge_dev(dp, bdev))
-186623f4aa724c David Yang 2025-10-17  2165  			mask |= BIT(dp->index);
-186623f4aa724c David Yang 2025-10-17  2166  
-186623f4aa724c David Yang 2025-10-17  2167  	return mask;
-186623f4aa724c David Yang 2025-10-17  2168  }
-186623f4aa724c David Yang 2025-10-17  2169  
-186623f4aa724c David Yang 2025-10-17  2170  static int
-186623f4aa724c David Yang 2025-10-17  2171  yt921x_bridge_flags(struct yt921x_priv *priv, int port,
-186623f4aa724c David Yang 2025-10-17  2172  		    struct switchdev_brport_flags flags)
-186623f4aa724c David Yang 2025-10-17  2173  {
-186623f4aa724c David Yang 2025-10-17  2174  	struct yt921x_port *pp = &priv->ports[port];
-186623f4aa724c David Yang 2025-10-17  2175  	bool do_flush;
-186623f4aa724c David Yang 2025-10-17  2176  	u32 mask;
-186623f4aa724c David Yang 2025-10-17  2177  	int res;
-186623f4aa724c David Yang 2025-10-17  2178  
-186623f4aa724c David Yang 2025-10-17  2179  	if (flags.mask & BR_LEARNING) {
-186623f4aa724c David Yang 2025-10-17  2180  		bool learning = flags.val & BR_LEARNING;
-186623f4aa724c David Yang 2025-10-17  2181  
-186623f4aa724c David Yang 2025-10-17  2182  		mask = YT921X_PORT_LEARN_DIS;
-186623f4aa724c David Yang 2025-10-17  2183  		res = yt921x_reg_toggle_bits(priv, YT921X_PORTn_LEARN(port),
-186623f4aa724c David Yang 2025-10-17  2184  					     mask, !learning);
-186623f4aa724c David Yang 2025-10-17  2185  		if (res)
-186623f4aa724c David Yang 2025-10-17  2186  			return res;
-186623f4aa724c David Yang 2025-10-17  2187  	}
-186623f4aa724c David Yang 2025-10-17  2188  
-186623f4aa724c David Yang 2025-10-17  2189  	/* BR_FLOOD, BR_MCAST_FLOOD: see the comment where ACT_UNK_ACTn_TRAP
-186623f4aa724c David Yang 2025-10-17  2190  	 * is set
-186623f4aa724c David Yang 2025-10-17  2191  	 */
-186623f4aa724c David Yang 2025-10-17  2192  
-186623f4aa724c David Yang 2025-10-17  2193  	/* BR_BCAST_FLOOD: we can filter bcast, but cannot trap them */
-186623f4aa724c David Yang 2025-10-17  2194  
-186623f4aa724c David Yang 2025-10-17  2195  	do_flush = false;
-186623f4aa724c David Yang 2025-10-17  2196  	if (flags.mask & BR_HAIRPIN_MODE) {
-186623f4aa724c David Yang 2025-10-17  2197  		pp->hairpin = flags.val & BR_HAIRPIN_MODE;
-186623f4aa724c David Yang 2025-10-17  2198  		do_flush = true;
-186623f4aa724c David Yang 2025-10-17  2199  	}
-186623f4aa724c David Yang 2025-10-17  2200  	if (flags.mask & BR_ISOLATED) {
-186623f4aa724c David Yang 2025-10-17  2201  		pp->isolated = flags.val & BR_ISOLATED;
-186623f4aa724c David Yang 2025-10-17  2202  		do_flush = true;
-186623f4aa724c David Yang 2025-10-17  2203  	}
-186623f4aa724c David Yang 2025-10-17  2204  	if (do_flush) {
-186623f4aa724c David Yang 2025-10-17  2205  		struct dsa_switch *ds = &priv->ds;
-186623f4aa724c David Yang 2025-10-17  2206  		struct dsa_port *dp = dsa_to_port(ds, port);
-186623f4aa724c David Yang 2025-10-17  2207  		struct net_device *bdev;
-186623f4aa724c David Yang 2025-10-17  2208  
-186623f4aa724c David Yang 2025-10-17  2209  		bdev = dsa_port_bridge_dev_get(dp);
-186623f4aa724c David Yang 2025-10-17  2210  		if (bdev) {
-186623f4aa724c David Yang 2025-10-17  2211  			u32 ports_mask;
-186623f4aa724c David Yang 2025-10-17  2212  
-186623f4aa724c David Yang 2025-10-17 @2213  			ports_mask = dsa_bridge_ports(ds, bdev);
-186623f4aa724c David Yang 2025-10-17  2214  			ports_mask |= priv->cpu_ports_mask;
-186623f4aa724c David Yang 2025-10-17  2215  			res = yt921x_bridge(priv, ports_mask);
-186623f4aa724c David Yang 2025-10-17  2216  			if (res)
-186623f4aa724c David Yang 2025-10-17  2217  				return res;
-186623f4aa724c David Yang 2025-10-17  2218  		}
-186623f4aa724c David Yang 2025-10-17  2219  	}
-186623f4aa724c David Yang 2025-10-17  2220  
-186623f4aa724c David Yang 2025-10-17  2221  	return 0;
-186623f4aa724c David Yang 2025-10-17  2222  }
-186623f4aa724c David Yang 2025-10-17  2223  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
