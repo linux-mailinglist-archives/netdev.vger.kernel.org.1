@@ -1,227 +1,209 @@
-Return-Path: <netdev+bounces-270713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270715-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aL1pNNiewWmFUAQAu9opvQ
-	(envelope-from <netdev+bounces-270713-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:13:12 +0100
+	id kDtOCVWdwWmFUAQAu9opvQ
+	(envelope-from <netdev+bounces-270715-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:06:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72FBF2FCFBA
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:13:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EED92FCDF5
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:06:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9F28030B1411
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:00:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A235A30CCFCA
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:02:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 300353E1224;
-	Mon, 23 Mar 2026 20:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDFA36A027;
+	Mon, 23 Mar 2026 20:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FfwJxvy3"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABE4E36C0CD;
-	Mon, 23 Mar 2026 20:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774296024; cv=none; b=C9puoTP1Ty+YSyr44Tj7blF+K/OttQ6pD7Cf7g8NfL7Bd8jc9dZRTIzEMiQjYJKEftHb+7W5tC2qGspNgmiZoUgfMSsyRHAorvEf0vHW9Km5Vjpz8VHCnu5smCHqPo4cDlPhaWqKqv9+IqplXeit6D72AsfEqZITCzaRwf7k5Q4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774296024; c=relaxed/simple;
-	bh=7U3YWQS7u2xteMc7s0vtl7nKzK9zjYBg+daZ4w0aDxw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WvAH8WhsrOCM97S7Ra/i1m0ptUs92XyE1GHaVKgHgQAFzolKnL6BGD+6lXrTWfRt8bazqJuaeCXmbqM7i0CdO4XIba8Ay5JWMsW+lfX43FO6/o/qzJwfN3W21aBlDtZyxVb+R2V7ZUw76LDtBk2Ga+n6H4Khd3Wd32Qo5FuEI/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1202)
-	id CAD2620B712D; Mon, 23 Mar 2026 13:00:22 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CAD2620B712D
-From: Long Li <longli@microsoft.com>
-To: Long Li <longli@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5 6/6] RDMA/mana_ib: Allocate interrupt contexts on EQs
-Date: Mon, 23 Mar 2026 12:59:52 -0700
-Message-ID: <20260323195952.1767304-7-longli@microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260323195952.1767304-1-longli@microsoft.com>
-References: <20260323195952.1767304-1-longli@microsoft.com>
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40FA736B04E
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 20:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774296119; cv=pass; b=PGaPBY9uiIj8/WNek5s09Q5Q3DScn7sjWn4Z5ki6C/Sxcq+dM08tpRmq/a3cPNlnizxwsYD43/K7hsMF1iNmgtNNd8Ps1lR6+4c95jxZm/ibHT6mfR2v9LMKNvO0lnXmnK5vubO2ms057Ix/pjqfj8GhtKWKP6xL6pE2zck6amQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774296119; c=relaxed/simple;
+	bh=Tlp+lJfyp95vJQs35m1dmjtFUmnMeO401FStvstIVLE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XcExQgFYwPOXoVJ/gy557bQJMS4L/owYLs8eX18dnZgpQTzXsgwd+68tKdTsuGYwDMWns8axlUL70hBPcvCRmo1IQdtUbppvgl3tK4T76p73ZqOWZVf5/zXrAFw2NQ9fzK9ge0R53ZlxVGHnmzVZCYQ52+eoztjWxFzzc+j4s2I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FfwJxvy3; arc=pass smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-38bd3bc3061so5165891fa.0
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 13:01:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774296116; cv=none;
+        d=google.com; s=arc-20240605;
+        b=AL3cn4Qd/FHpojnfSG9MKVtc9Srrs2Wx4im081+rkDXZuEfLRwf0wZQk/ZvNOu7jK5
+         g3KaxJmCLLDnAj1vXi/qhhIYSrE0F3Xmtw1KRtN0UJhyJhJ5eioim0DIsB50e7TKBnGC
+         MpcZGCUL26jqi5Ow/Xhfw1r392thNojxJDYkS9cgMAcLgCrVkUIA8bFFN4a3Sxct7/M/
+         fPvBPNuQ9yYqzgAaQEEjbJkzJxeiq0MIHV5jgU0paqw0zXPMOb5sE0bxOcnzvs7+Q0fD
+         ZNkseOrSYOcLjYZbDWJDffiWBv0OdRKoST+GR4H6PqgZfKAQ/34k0Uf9nNWU+fquMowe
+         a+Og==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=wc4FZh89TF5QoyDdncx8+R5TP1/bGV0DGvKJ7mX0G2s=;
+        fh=qTxyfbCVreCTq9HLGtBx9uEpBQpACpPNwWnMjOaWrjg=;
+        b=L+bcXO2LHuOD7FS+NGLQdp1WqPi5pqYH24y690Ut46KoG5dxiyM3/7+t9v+ovNcLbX
+         lz6kmG/4KUSHzB39t0UF7ML+1NH32BS1Ek45cZTal7IpfujYoqFh+Imct7l0Sj4D/+Eo
+         e4e2cs+iG5EF5wNj2PIy2GXQSU4BphKXK3W9d/SaDjsSU94c255WurOl8GmyzU52QEbZ
+         cImVk72KhMMkbdWfvuIVwIU7jhvZlaE0kcm8HNPTq1RyemcZu91fczNLvOlQ+BolKaAS
+         SyHBgbZrIV+GBWMJ1k/ZmIJpuWInC2lurTuKuQ7/dvRzwqNSyZFb1JtQ/JRvFIcNMgQ2
+         CQ0w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774296116; x=1774900916; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wc4FZh89TF5QoyDdncx8+R5TP1/bGV0DGvKJ7mX0G2s=;
+        b=FfwJxvy3o6ZSWo99rpdjavXxAmxrl6y1Li5eD4RweQTM3KWsaSplrQJhQ/W6lQW/lN
+         0trlHS0Jdn9xmIHFs4krURcXC3Sr1UTg7d30hv+ZVp45XinWJRcxcPh85qLo0pYbmxP2
+         RvUecojNXDUbbYxvNg0CDJF3ZRSGP5GCIolg5Xk2HmFQbvle7s+jk578jMi/pFUMsrDI
+         hMS40/B4VATfOUBr8dM1bl8S6onCPmiWyDATnShlZTG3/+OqUMPCv5HYrdZ/WNNcxCSt
+         VIRhDlove7cjpRDk0V1PPhn54Q2E4ahGw6O5oDFRa5BRxEYtmT8nEfdUvcrFaJYS/AAH
+         TOCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774296116; x=1774900916;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=wc4FZh89TF5QoyDdncx8+R5TP1/bGV0DGvKJ7mX0G2s=;
+        b=TPHTHzXlUo6a2akVGdvYBgxwGW19bqzigw3HfeW0cEym2iAWg0eZwW2+BcU1unr/cU
+         HuFd71q9EPxucUpk68TRTZte4ncI99fjs97KOERLdCL9QwbsQcBCrWPACMngkgyHDuOY
+         GJHWBGGm2LSsWzAwBV9IxCd3A3IfvCwPhL6mKCCgCKpOKxp1vMVxJ9Y1HYNwvorWgYip
+         lZRn0/7qMlpxLhINZh+3K+tlYszVw77ihQIdkIrcuwXLsMlfvQ7cVm1jEd8qqqBIYu9S
+         lNVLEkQ5OJhyBOPLJWV7WMJqzqSAAWdmQrosSHOizAEH/Dw/0UGHHuFhhr4fu8ql4VTP
+         Mn8Q==
+X-Gm-Message-State: AOJu0YwqYtrOVcLUFhEsIxhtlJ6aABHrW0a45Gk4/C2O3bm5Zf4StwF+
+	jxGBBm8Q7VdQd33QSCsMT01GPE1F1QOnBoOg6BrDViPKeOoxJi/ZQWY7Ju9kHf+HzliIiABSTuk
+	roaS9UlWUnMHGKzajL9kUH3OE+NSBye0oHuA/LsJA
+X-Gm-Gg: ATEYQzwtZqH8LJsJTa29zjz7S6ysnccNsRdecW8NQVDmvEiRA+UhrA9yo44FSlUOySj
+	xgNCQ7Sv3bUhXqKs5Ee48aC4GM37fgVoSa0vcyN7CafaIGw07zSBJ2XIQuLlOFLZKLYyWrzX5C1
+	bD1yawGDxXpIxUeKQH+NcQwBSPekv8qQp8Jy76lwAqGKBofYX9IAVR9RUh1UEPdnPbNIyT+9xdz
+	GAGt1g5wffp0IXOcZs0iVkDkgY2QriW2gYS11Lsrsc9BLYQnfbRCyX2cPgOyBwoYEfbRJhVaN1U
+	iWF+meACILop9Qvz7lyhtwFbxPZInJYrKFf3
+X-Received: by 2002:a2e:bc83:0:b0:389:e6d4:e7cb with SMTP id
+ 38308e7fff4ca-38bf96d4978mr44138121fa.22.1774296115882; Mon, 23 Mar 2026
+ 13:01:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [3.54 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
+References: <20260318192450.3400774-1-joshwash@google.com> <20260320185546.6f7e95c0@kernel.org>
+In-Reply-To: <20260320185546.6f7e95c0@kernel.org>
+From: Joshua Washington <joshwash@google.com>
+Date: Mon, 23 Mar 2026 13:01:43 -0700
+X-Gm-Features: AaiRm52ue7c-WC307Fjz_fnNrmCK4W9Lk9Y6g6yN01Wq9hoWYtCeBnkluHofDOA
+Message-ID: <CALuQH+VpVpWq6yvRSCpyOSkWBEOXsKF05=fz67J8zWB8gcbzfw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] gve: add XDP metadata support for DQ RDA
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Willem de Bruijn <willemb@google.com>, Tim Hostetler <thostet@google.com>, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	Jordan Rhee <jordanrhee@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-270713-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-270715-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,lunn.ch,davemloft.net,redhat.com,kernel.org,iogearbox.net,gmail.com,fomichev.me];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 72FBF2FCFBA
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joshwash@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8EED92FCDF5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Use the GIC functions to allocate interrupt contexts for RDMA EQs. These
-interrupt contexts may be shared with Ethernet EQs when MSI-X vectors
-are limited.
+On Fri, Mar 20, 2026 at 6:55=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 18 Mar 2026 12:24:50 -0700 Joshua Washington wrote:
+> > Commit 1b42e07af1ee ("gve: Add Rx HWTS metadata to AF_XDP ZC mode")
+> > exposes support for the XDP RX timestamping metadata operation in the D=
+Q
+> > RDA mode. While the operation works on its own, the intent was to enabl=
+e
+> > XDP metadata support for the queue format as a whole along with it.
+> > Currently bfp_xdp_adjust_meta fails because meta_valid is set to false.
+>
+> bfp -> bpf
 
-The driver now supports allocating dedicated MSI-X for each EQ. Indicate
-this capability through driver capability bits.
+Will make this change in V3.
 
-Signed-off-by: Long Li <longli@microsoft.com>
----
- drivers/infiniband/hw/mana/main.c | 33 ++++++++++++++++++++++++++-----
- include/net/mana/gdma.h           |  7 +++++--
- 2 files changed, 33 insertions(+), 7 deletions(-)
+>
+> > This change updates xdp_buff preparation to set meta_valid to true, so
+> > metadata can be fully used by XDP programs.
+> >
+> > Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> > Reviewed-by: Jordan Rhee <jordanrhee@google.com>
+> > Signed-off-by: Joshua Washington <joshwash@google.com>
+> > ---
+> >  drivers/net/ethernet/google/gve/gve_rx_dqo.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net=
+/ethernet/google/gve/gve_rx_dqo.c
+> > index 7924dce719e2..48945b4b6766 100644
+> > --- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+> > +++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+> > @@ -877,7 +877,7 @@ static int gve_rx_dqo(struct napi_struct *napi, str=
+uct gve_rx_ring *rx,
+> >                                buf_state->page_info.page_address +
+> >                                buf_state->page_info.page_offset,
+> >                                buf_state->page_info.pad,
+> > -                              buf_len, false);
+> > +                              buf_len, true);
+> >               gve_xdp.gve =3D priv;
+> >               gve_xdp.compl_desc =3D compl_desc;
+> >
+>
+> AI says:
+>
+> While this allows XDP programs to write custom metadata via
+> bpf_xdp_adjust_meta(), does the driver correctly propagate this metadata
+> to the SKB after XDP_PASS?
+>
+> https://sashiko.dev/#/patchset/20260318192450.3400774-1-joshwash%40google=
+.com
+> --
+> pw-bot: cr
 
-diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
-index d51dd0ee85f4..0b74dd093b41 100644
---- a/drivers/infiniband/hw/mana/main.c
-+++ b/drivers/infiniband/hw/mana/main.c
-@@ -787,6 +787,7 @@ int mana_ib_create_eqs(struct mana_ib_dev *mdev)
- {
- 	struct gdma_context *gc = mdev_to_gc(mdev);
- 	struct gdma_queue_spec spec = {};
-+	struct gdma_irq_context *gic;
- 	int err, i;
- 
- 	spec.type = GDMA_EQ;
-@@ -797,9 +798,15 @@ int mana_ib_create_eqs(struct mana_ib_dev *mdev)
- 	spec.eq.log2_throttle_limit = LOG2_EQ_THROTTLE;
- 	spec.eq.msix_index = 0;
- 
-+	gic = mana_gd_get_gic(gc, false, &spec.eq.msix_index);
-+	if (!gic)
-+		return -ENOMEM;
-+
- 	err = mana_gd_create_mana_eq(mdev->gdma_dev, &spec, &mdev->fatal_err_eq);
--	if (err)
-+	if (err) {
-+		mana_gd_put_gic(gc, false, 0);
- 		return err;
-+	}
- 
- 	mdev->eqs = kzalloc_objs(struct gdma_queue *,
- 				 mdev->ib_dev.num_comp_vectors);
-@@ -810,31 +817,47 @@ int mana_ib_create_eqs(struct mana_ib_dev *mdev)
- 	spec.eq.callback = NULL;
- 	for (i = 0; i < mdev->ib_dev.num_comp_vectors; i++) {
- 		spec.eq.msix_index = (i + 1) % gc->num_msix_usable;
-+
-+		gic = mana_gd_get_gic(gc, false, &spec.eq.msix_index);
-+		if (!gic) {
-+			err = -ENOMEM;
-+			goto destroy_eqs;
-+		}
-+
- 		err = mana_gd_create_mana_eq(mdev->gdma_dev, &spec, &mdev->eqs[i]);
--		if (err)
-+		if (err) {
-+			mana_gd_put_gic(gc, false, spec.eq.msix_index);
- 			goto destroy_eqs;
-+		}
- 	}
- 
- 	return 0;
- 
- destroy_eqs:
--	while (i-- > 0)
-+	while (i-- > 0) {
- 		mana_gd_destroy_queue(gc, mdev->eqs[i]);
-+		mana_gd_put_gic(gc, false, (i + 1) % gc->num_msix_usable);
-+	}
- 	kfree(mdev->eqs);
- destroy_fatal_eq:
- 	mana_gd_destroy_queue(gc, mdev->fatal_err_eq);
-+	mana_gd_put_gic(gc, false, 0);
- 	return err;
- }
- 
- void mana_ib_destroy_eqs(struct mana_ib_dev *mdev)
- {
- 	struct gdma_context *gc = mdev_to_gc(mdev);
--	int i;
-+	int i, msi;
- 
- 	mana_gd_destroy_queue(gc, mdev->fatal_err_eq);
-+	mana_gd_put_gic(gc, false, 0);
- 
--	for (i = 0; i < mdev->ib_dev.num_comp_vectors; i++)
-+	for (i = 0; i < mdev->ib_dev.num_comp_vectors; i++) {
- 		mana_gd_destroy_queue(gc, mdev->eqs[i]);
-+		msi = (i + 1) % gc->num_msix_usable;
-+		mana_gd_put_gic(gc, false, msi);
-+	}
- 
- 	kfree(mdev->eqs);
- }
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 84f85b2299b4..9faa072e779e 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -615,6 +615,7 @@ enum {
- #define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG BIT(3)
- #define GDMA_DRV_CAP_FLAG_1_GDMA_PAGES_4MB_1GB_2GB BIT(4)
- #define GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT BIT(5)
-+#define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
- 
- /* Driver can handle holes (zeros) in the device list */
- #define GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP BIT(11)
-@@ -631,7 +632,8 @@ enum {
- /* Driver detects stalled send queues and recovers them */
- #define GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY BIT(18)
- 
--#define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
-+/* Driver supports separate EQ/MSIs for each vPort */
-+#define GDMA_DRV_CAP_FLAG_1_EQ_MSI_UNSHARE_MULTI_VPORT BIT(19)
- 
- /* Driver supports linearizing the skb when num_sge exceeds hardware limit */
- #define GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE BIT(20)
-@@ -659,7 +661,8 @@ enum {
- 	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE | \
- 	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY | \
- 	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY | \
--	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY)
-+	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY | \
-+	 GDMA_DRV_CAP_FLAG_1_EQ_MSI_UNSHARE_MULTI_VPORT)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
--- 
-2.43.0
-
+Thanks for bringing this to my attention. I'll introduce a new patch
+updating the XDP_PASS paths to make use of `xdp_build_skb` kernel
+methods, which should handle metadata implicitly. Besides
+commonization, this also removes an extra copy in the XDP_PASS case
+for copy mode XDP.
 
