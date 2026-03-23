@@ -1,150 +1,395 @@
-Return-Path: <netdev+bounces-270771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270772-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0AvsHom7wWm/UwQAu9opvQ
-	(envelope-from <netdev+bounces-270771-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:15:37 +0100
+	id IE/wE667wWm/UwQAu9opvQ
+	(envelope-from <netdev+bounces-270772-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:16:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 229AE2FE272
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:15:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC22C2FE282
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:16:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ACB8F30C11FA
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:12:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7BBB53018755
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:16:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02E1382F0E;
-	Mon, 23 Mar 2026 22:12:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07DFF37648D;
+	Mon, 23 Mar 2026 22:16:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="noCTwJeM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IUOh8PDb"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7FD381B14;
-	Mon, 23 Mar 2026 22:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD263345729
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 22:16:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774303935; cv=none; b=GCerr6/vFEvXynE9FYVJVV7J5ZzRK0M4BSt80zzHc7ZkASv2DtBeO7L69L48g2JxecfnkN402m+7y/Li8hqUt5yFbCaa9yThxT0/3ok5W6PiOWZauX2+b7yhsK8KatJvVg8BArrSOIi4bBBwAQiDfRFJT3R0JXUeqhVsRuQE7hQ=
+	t=1774304169; cv=none; b=BtYprghznGbCdJbsCb+hPLhqg8BPtRMiBKAiQHUQlC2/gxJvdpth9zcdecWkZPHnay6hiXT6zbXDFEHnqrXCXV6SfoQueNRFrVbUx++ezmtYX5a6oyEx/Fk3pa8fGsjFBO7eN74CN10h6MG+2Vz5gqXGrnjoLUOCM3uZyzxY96U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774303935; c=relaxed/simple;
-	bh=3xLIvwqrrXfWdoPtAt7OK3eVmeQqeYbfqRtKss4uPX0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SsOCufXk7nXctT8FmxnEAavFvqpC2+UGwqdqX5Jz7gG0SUPxotrydXlEkjnnKqfROgx4Ui3ngSf/0kFGIfXzlsPgZaXGfEPmmqyuzEW0xbqMHWgT3xuEDDgy0UO23t7AHiqUnz35qloo93eHSRctYzgkFXtyh2S7LLaXmfz5wZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=noCTwJeM; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SI0+KwkPfwgoDdX+0jEvH5cFTJRTk67LUQ/ONMeOpow=; b=noCTwJeMau3v7UV4VnKCLpWr8W
-	hRXYUl4+OExs9pxY2TJcr2o32iliV9RSn3RC+oFjgYV3efZnpsd8Du461lFenp5kt1BIelV4DQcSa
-	W2WRCGcQidhFzFUWZuanxinEGa7W4CUzIfW5/C4vR82SiVdrk1Xqrb1bwK2BKSLS5DeA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w4nV8-00D0AX-Ki; Mon, 23 Mar 2026 23:11:58 +0100
-Date: Mon, 23 Mar 2026 23:11:58 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: Mark Brown <broonie@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Liam Girdwood <lgirdwood@gmail.com>, Lee Jones <lee@kernel.org>,
-	Pavel Machek <pavel@kernel.org>, Peter Rosin <peda@axentia.se>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
-	Tom Rix <trix@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
-	linux-spi@vger.kernel.org, linux-leds@vger.kernel.org,
-	linux-fpga@vger.kernel.org, driver-core@lists.linux.dev
-Subject: Re: [PATCH 04/10] regulator: of: switch to using
- class_find_device_by_fwnode()
-Message-ID: <09072374-65e7-4792-af7e-97d7df93f9bd@lunn.ch>
-References: <20260322-remove-device-find-by-of-node-v1-0-b72eb22a1215@gmail.com>
- <20260322-remove-device-find-by-of-node-v1-4-b72eb22a1215@gmail.com>
- <360a8b4a-6507-417a-9fc1-c53b14868657@sirena.org.uk>
- <acGFksyx3SA0kJ5b@google.com>
- <7d46803e-b285-4e9c-8856-10100fa0ea85@sirena.org.uk>
- <cf92122d-6b15-458a-bf89-189a0a6874f7@lunn.ch>
- <193e194a-498f-464f-b22c-c283c16db6c1@sirena.org.uk>
- <acGzJV3vKhuty3nd@google.com>
+	s=arc-20240116; t=1774304169; c=relaxed/simple;
+	bh=pCVjCBdGs4rhG9JmcFfyqvNqUUpVYeTeGY0ZLE09ku0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YDWxqDPnd3vlgiI7okWMO82ltgpGiT9EfRbjGsZ3nRQbJgfEHE+ZYvROVHWZZHwR4hFunCFV3eqm/QYgPGYI4hXcIX3Oos7bDXH7es3KdEhv5aKNPC6EOCj7nyv0zcE/YDBlpJ7yS9tYayRT7Oi8GEd/SAUDMFKcXtNFLSt9ZLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IUOh8PDb; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-82a07738118so1740959b3a.0
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 15:16:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774304168; x=1774908968; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9m3F51Q6kwdNP6pHh7F00fvfJerf3+vjJK3BMKjsK5E=;
+        b=IUOh8PDb+bNkqSCmHJ7l9r04kAgCvbattG3lBRTieQmeUTx9+mM4GteAePkkV02xbb
+         34frDn7sANQVUB6hVNiqiMbQ/m4KLokJNgHHSa3YCDikfp/tem+zZQ2fUT9EUtQfLvuY
+         +nvYgWjIm307KbX6XNIQ57XdSYmpvtw9NhKSZ3dZXHKKmaLQsVh0QoUkWJMw7k1N/fSl
+         FEr+B/6D6RIcPMSasLGDAyLsfXr1XpBej10kZqx7A8bSj9zVHrAluBx+DHvQXCSgYajb
+         hLQnygnGjiI1C2aNzUZn1Nn/ZTdfvvPsw+ZGdIyvMJWrQO1MroMSGwoVX4GnlO1oKG4W
+         CR0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774304168; x=1774908968;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9m3F51Q6kwdNP6pHh7F00fvfJerf3+vjJK3BMKjsK5E=;
+        b=H0hTyV/QdXKK7RenEp8xHR8qf3dDQk+IP224FZyNN1MrFVvw8XkE3BlshhPB8PJNin
+         /msci7adZr7c56ru61zAgZ8cLkm1sFo9h3vGZGCzBlXzLCFNJpzq3N42uvVelaQw7PMv
+         W1H6pmODx9v7p4tIcBfkoT+RbX990lvyyuyBbscoYM5LNvEbKFNvIStbgB9+BSMWk5WP
+         TmUgkZLnex1FOK/EN61QcOLdvU9m2dW81neMB0mzRpww7aRZ2OUb3GVhI9z1VbvU18VF
+         wCBjhRcC5m4ETkOc7bRYyQW/7eFQ/BVngcgswZ5/+3fiWjY704+gUAy5zF7xfz1ZXgcv
+         2SLw==
+X-Forwarded-Encrypted: i=1; AJvYcCWIynS5gg0wb0tAS6DhblyOqacNm3f3dxj6KkaS9X4Qw1O0/NkpQJGqE3s2pxATGLdndJuZ0ag=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxW7M2/L1APn6ZoNPDkh/Bk4HPQUM8brwlXWpE8ndiaWOunij/2
+	eJvdn0q6cjPDHqll0qWMsUYHrUYxJIWuQeWCd12lkeMUrB9uxNUZ2esh
+X-Gm-Gg: ATEYQzxP2g1URjSyUd4VBXpVb6/4UMu2LX+JznEBZIZX6dBLfWhzHb2eg3k3txCbY5G
+	3vrw/qOX+NJKtbtlXFTx8W6gflsFLt8gGdPzprjQCLPtpLrepboQh4qm0ssl3/y2y7ZFtWo7+UH
+	Wzv+1KCMMw8xEM37cCSfM45GyWU4hxSqf14fMv3Ccp4vmjYOKuP+WjNxzH0haYEQry4+G2jVgwx
+	WnUyOAsL48SLqEQmuoCNeF4symEH0cqsggMgq4cYzxZaSq+oL3jzCQzKLg9mbBTgoy1OWucJl6X
+	mdqWRSMMF6iI1j7oTycsWDiqemTunjdjhg+nrxYrFjimqJyrDdLXw9VwTaFADOe2gGmu1z8eBxg
+	9+nfqavzEIgDDwNYdj3MmWPAOFTBWLRriSuH/F5JxyDXPqO+pXBbBA0bsmSHpjSfrx1CYRAIp+a
+	rY2D2+wJdt+andQn3be0psLvM=
+X-Received: by 2002:a05:6a00:f88:b0:81f:852b:a91e with SMTP id d2e1a72fcca58-82a8c39ec60mr10913536b3a.59.1774304167832;
+        Mon, 23 Mar 2026 15:16:07 -0700 (PDT)
+Received: from localhost ([2001:19f0:8001:1b2d:5400:5ff:fefa:a95d])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82b0410a3d7sm10814295b3a.55.2026.03.23.15.16.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2026 15:16:06 -0700 (PDT)
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Yixun Lan <dlan@kernel.org>,
+	Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: Inochi Amaoto <inochiama@gmail.com>,
+	devicetree@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	spacemit@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: [PATCH v4] riscv: dts: spacemit: Add ethernet device for K3
+Date: Tue, 24 Mar 2026 06:15:51 +0800
+Message-ID: <20260323221552.79937-1-inochiama@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acGzJV3vKhuty3nd@google.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270771-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[28];
+	FREEMAIL_TO(0.00)[kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,gentoo.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,gmail.com,axentia.se,armlinux.org.uk,intel.com,linuxfoundation.org,vger.kernel.org,lists.infradead.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-270772-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 229AE2FE272
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[inochiama@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	DBL_PROHIBIT(0.00)[5.245.225.0:email];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,d4015000:email,0.0.0.1:email]
+X-Rspamd-Queue-Id: BC22C2FE282
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 23, 2026 at 02:41:03PM -0700, Dmitry Torokhov wrote:
-> On Mon, Mar 23, 2026 at 09:36:07PM +0000, Mark Brown wrote:
-> > On Mon, Mar 23, 2026 at 09:01:47PM +0100, Andrew Lunn wrote:
-> > 
-> > > How do you handle deprecated OF properties? This is a problem i've run
-> > > into before. A developer needs an ACPI binding, so they blindly
-> > > convert from of_ to device_ without engaging brain. As a result, they
-> > > bring all the deprecated OF properties we want to die into the brand
-> > > new ACPI bindings.
-> > 
-> > Honestly that one hasn't really come up much for me - not too many
-> > deprecated properties.
-> 
-> Given that we position properties as an ABI even if they are deprecated
-> we supposed to handle them forever. Newer properties usually offer
-> benefits over old ones and that is how users get moved over.
+Add all ethernet device nodes for K3 SoC.
 
-~/linux/Documentation/devicetree/bindings/net$ grep -r deprecated * | wc
-     75     361    4195
+Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+---
+Require the following patch series:
+1. Basic DT device patch
+https://lore.kernel.org/spacemit/20260304-01-dts-uart-full-v1-0-50a0aa53a245@kernel.org
+2. Ethernet driver patch
+https://lore.kernel.org/spacemit/20260316010041.164360-1-inochiama@gmail.com
 
-So networking has ~ 75 of them.
+Changed from v3:
+1. Separate the pin as RGMII pin and INT pin.
+2. Add comment for pin usage.
+3. Rename the ethernet pinctrl node to address it is RGMII node.
 
-Within the OF world, they are ABI and we need to keep them. But we
-don't want them in ACPI or any other firmware. Any code looking for
-properties needs to know what is underneath so it can decide if it
-should look for the deprecated, OF only property, or not.
+Changed from v2:
+1. keep aliases in alphabetical order.
 
-     Andrew
+Changed from v1:
+1. remove interrupt-parents property
+2. add aliases for ethernet node
+---
+ arch/riscv/boot/dts/spacemit/k3-pico-itx.dts |  24 +++++
+ arch/riscv/boot/dts/spacemit/k3-pinctrl.dtsi |  44 ++++++++
+ arch/riscv/boot/dts/spacemit/k3.dtsi         | 104 +++++++++++++++++++
+ 3 files changed, 172 insertions(+)
+ create mode 100644 arch/riscv/boot/dts/spacemit/k3-pinctrl.dtsi
+
+diff --git a/arch/riscv/boot/dts/spacemit/k3-pico-itx.dts b/arch/riscv/boot/dts/spacemit/k3-pico-itx.dts
+index b691304d4b74..b63d86b72be6 100644
+--- a/arch/riscv/boot/dts/spacemit/k3-pico-itx.dts
++++ b/arch/riscv/boot/dts/spacemit/k3-pico-itx.dts
+@@ -4,13 +4,19 @@
+  * Copyright (c) 2026 Guodong Xu <guodong@riscstar.com>
+  */
+
++#include <dt-bindings/gpio/gpio.h>
++
+ #include "k3.dtsi"
++#include "k3-pinctrl.dtsi"
+
+ / {
+ 	model = "SpacemiT K3 Pico-ITX";
+ 	compatible = "spacemit,k3-pico-itx", "spacemit,k3";
+
+ 	aliases {
++		ethernet0 = &eth0;
++		ethernet1 = &eth1;
++		ethernet2 = &eth2;
+ 		serial0 = &uart0;
+ 	};
+
+@@ -24,6 +30,24 @@ memory@100000000 {
+ 	};
+ };
+
++&eth0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&gmac0_rgmii_0_cfg>, <&gmac0_phy_0_cfg>;
++	phy-mode = "rgmii-id";
++	phy-handle = <&phy0>;
++	status = "okay";
++
++	mdio {
++		phy0: phy@1 {
++			compatible = "ethernet-phy-ieee802.3-c22";
++			reg = <1>;
++			reset-gpios = <&gpio 0 15 GPIO_ACTIVE_LOW>;
++			reset-assert-us = <10000>;
++			reset-deassert-us = <10000>;
++		};
++	};
++};
++
+ &uart0 {
+ 	status = "okay";
+ };
+diff --git a/arch/riscv/boot/dts/spacemit/k3-pinctrl.dtsi b/arch/riscv/boot/dts/spacemit/k3-pinctrl.dtsi
+new file mode 100644
+index 000000000000..e02254961764
+--- /dev/null
++++ b/arch/riscv/boot/dts/spacemit/k3-pinctrl.dtsi
+@@ -0,0 +1,44 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++/*
++ * Copyright (c) 2026 SpacemiT (Hangzhou) Technology Co. Ltd
++ */
++
++#include <dt-bindings/gpio/gpio.h>
++
++#define K3_PADCONF(pin, func) (((pin) << 16) | (func))
++
++&pinctrl {
++	gmac0_rgmii_0_cfg: gmac0-rgmii-0-cfg {
++		gmac-rgmii-0-pins {
++			pinmux = <K3_PADCONF(0, 1)>,	/* gmac0_rxdv */
++				 <K3_PADCONF(1, 1)>,	/* gmac0_rx_d0 */
++				 <K3_PADCONF(2, 1)>,	/* gmac0_rx_d1 */
++				 <K3_PADCONF(3, 1)>,	/* gmac0_rx_clk */
++				 <K3_PADCONF(4, 1)>,	/* gmac0_rx_d2 */
++				 <K3_PADCONF(5, 1)>,	/* gmac0_rx_d3 */
++				 <K3_PADCONF(6, 1)>,	/* gmac0_tx_d0 */
++				 <K3_PADCONF(7, 1)>,	/* gmac0_tx_d1 */
++				 <K3_PADCONF(8, 1)>,	/* gmac0_tx_clk */
++				 <K3_PADCONF(9, 1)>,	/* gmac0_tx_d2 */
++				 <K3_PADCONF(10, 1)>,	/* gmac0_tx_d3 */
++				 <K3_PADCONF(11, 1)>,	/* gmac0_tx_en */
++				 <K3_PADCONF(12, 1)>,	/* gmac0_mdc */
++				 <K3_PADCONF(13, 1)>;	/* gmac0_mdio */
++
++			bias-disable;
++			drive-strength = <25>;
++			power-source = <1800>;
++		};
++
++	};
++
++	gmac0_phy_0_cfg: gmac0-phy-0-cfg {
++		gmac0-3-pins {
++			pinmux = <K3_PADCONF(14, 1)>;   /* gmac0_int */
++
++			bias-disable;
++			drive-strength = <25>;
++			power-source = <1800>;
++		};
++	};
++};
+diff --git a/arch/riscv/boot/dts/spacemit/k3.dtsi b/arch/riscv/boot/dts/spacemit/k3.dtsi
+index 6cc31e94c13a..4c0cc135dc09 100644
+--- a/arch/riscv/boot/dts/spacemit/k3.dtsi
++++ b/arch/riscv/boot/dts/spacemit/k3.dtsi
+@@ -5,6 +5,7 @@
+  */
+
+ #include <dt-bindings/clock/spacemit,k3-clocks.h>
++#include <dt-bindings/reset/spacemit,k3-resets.h>
+ #include <dt-bindings/interrupt-controller/irq.h>
+
+ /dts-v1/;
+@@ -437,6 +438,109 @@ soc: soc {
+ 		dma-noncoherent;
+ 		ranges;
+
++		gmac_axi_setup: stmmac-axi-config {
++			snps,wr_osr_lmt = <0xf>;
++			snps,rd_osr_lmt = <0xf>;
++			/* max axi burst len is 256 */
++			snps,blen = <256 128 64 32 16 0 0>;
++		};
++
++		eth0: ethernet@cac80000 {
++			compatible = "spacemit,k3-dwmac", "snps,dwmac-5.40a";
++			reg = <0x0 0xcac80000 0x0 0x2000>;
++			clocks = <&syscon_apmu CLK_APMU_EMAC0_BUS>,
++				 <&syscon_apmu CLK_APMU_EMAC0_1588>,
++				 <&syscon_apmu CLK_APMU_EMAC0_RGMII_TX>;
++			clock-names = "stmmaceth", "ptp_ref", "tx";
++			interrupts = <131 IRQ_TYPE_LEVEL_HIGH>,
++				     <276 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "macirq", "eth_wake_irq";
++			resets = <&syscon_apmu RESET_APMU_EMAC0>;
++			reset-names = "stmmaceth";
++			rx-fifo-depth = <8192>;
++			tx-fifo-depth = <8192>;
++			snps,multicast-filter-bins = <64>;
++			snps,perfect-filter-entries = <32>;
++			snps,aal;
++			snps,tso;
++			snps,txpbl = <8>;
++			snps,rxpbl = <8>;
++			snps,force_sf_dma_mode;
++			snps,axi-config = <&gmac_axi_setup>;
++			spacemit,apmu = <&syscon_apmu 0x3e4 0x3e8>;
++			status = "disabled";
++
++			mdio {
++				compatible = "snps,dwmac-mdio";
++				#address-cells = <1>;
++				#size-cells = <0>;
++			};
++		};
++
++		eth1: ethernet@cac82000 {
++			compatible = "spacemit,k3-dwmac", "snps,dwmac-5.40a";
++			reg = <0x0 0xcac82000 0x0 0x2000>;
++			clocks = <&syscon_apmu CLK_APMU_EMAC1_BUS>,
++				 <&syscon_apmu CLK_APMU_EMAC1_1588>,
++				 <&syscon_apmu CLK_APMU_EMAC1_RGMII_TX>;
++			clock-names = "stmmaceth", "ptp_ref", "tx";
++			interrupts = <133 IRQ_TYPE_LEVEL_HIGH>,
++				     <277 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "macirq", "eth_wake_irq";
++			resets = <&syscon_apmu RESET_APMU_EMAC1>;
++			reset-names = "stmmaceth";
++			rx-fifo-depth = <8192>;
++			tx-fifo-depth = <8192>;
++			snps,multicast-filter-bins = <64>;
++			snps,perfect-filter-entries = <32>;
++			snps,aal;
++			snps,tso;
++			snps,txpbl = <8>;
++			snps,rxpbl = <8>;
++			snps,force_sf_dma_mode;
++			snps,axi-config = <&gmac_axi_setup>;
++			spacemit,apmu = <&syscon_apmu 0x3ec 0x3f0>;
++			status = "disabled";
++
++			mdio {
++				compatible = "snps,dwmac-mdio";
++				#address-cells = <1>;
++				#size-cells = <0>;
++			};
++		};
++
++		eth2: ethernet@cac8e000 {
++			compatible = "spacemit,k3-dwmac", "snps,dwmac-5.40a";
++			reg = <0x0 0xcac8e000 0x0 0x2000>;
++			clocks = <&syscon_apmu CLK_APMU_EMAC2_BUS>,
++				 <&syscon_apmu CLK_APMU_EMAC2_1588>,
++				 <&syscon_apmu CLK_APMU_EMAC2_RGMII_TX>;
++			clock-names = "stmmaceth", "ptp_ref", "tx";
++			interrupts = <130 IRQ_TYPE_LEVEL_HIGH>,
++				     <278 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "macirq", "eth_wake_irq";
++			resets = <&syscon_apmu RESET_APMU_EMAC2>;
++			reset-names = "stmmaceth";
++			rx-fifo-depth = <4096>;
++			tx-fifo-depth = <4096>;
++			snps,multicast-filter-bins = <64>;
++			snps,perfect-filter-entries = <32>;
++			snps,aal;
++			snps,tso;
++			snps,txpbl = <8>;
++			snps,rxpbl = <8>;
++			snps,force_sf_dma_mode;
++			snps,axi-config = <&gmac_axi_setup>;
++			spacemit,apmu = <&syscon_apmu 0x248 0x24c>;
++			status = "disabled";
++
++			mdio {
++				compatible = "snps,dwmac-mdio";
++				#address-cells = <1>;
++				#size-cells = <0>;
++			};
++		};
++
+ 		syscon_apbc: system-controller@d4015000 {
+ 			compatible = "spacemit,k3-syscon-apbc";
+ 			reg = <0x0 0xd4015000 0x0 0x1000>;
+--
+2.53.0
+
 
