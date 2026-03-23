@@ -1,241 +1,219 @@
-Return-Path: <netdev+bounces-270552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270547-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IEcxOjdEwWnpRwQAu9opvQ
-	(envelope-from <netdev+bounces-270552-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 14:46:31 +0100
+	id KATkCC8/wWlnRwQAu9opvQ
+	(envelope-from <netdev+bounces-270547-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 14:25:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A622F33F6
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 14:46:31 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AC4E2F2D99
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 14:25:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A86B13004261
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 13:38:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 53612303C276
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 13:23:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5B33A960E;
-	Mon, 23 Mar 2026 13:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052CD3AB28E;
+	Mon, 23 Mar 2026 13:22:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="St+L4OCQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k6gv3IeX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6BA5340298
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 13:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C8837C90E;
+	Mon, 23 Mar 2026 13:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774273099; cv=none; b=HHe8m20SxuBUPa9QxRlvS6oqbFwrpTT1AU+3hgNEbBEHXSnTpDT6vjvb8oqwosQvAQXTCyELREiOkQ7z1rg50oAklUqMZpKBs19VX43AbVR/2V7rkm5j6HffvwrDTEcDVjXStLlQD5MMvlHFexFcvR/S1GPGhwKT87uMbjuhZPc=
+	t=1774272163; cv=none; b=hTGbRWI7/V6i1NblonUOlbobdp22n13Q/cMhxGwh36D74O0q1i4wBJ4LcUvfD6R5BOFW0aQrUtguLCIN44+6e+76FJEzItyWLK4X3NGN7Vobin/BkyhT3LQMSKkkQsyFtyoksNiR03JaYxoboYlUZ21JGSNY79nF4dZJ9pVuTtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774273099; c=relaxed/simple;
-	bh=KW53xm4EMUmaDFLpHeXdsNCoOkBX60KScnX9/yJEVTw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U4aAOvaEDFiDDdHDDwmqF7BqWK5/iGrGhaEPSF5i22U2LQXawhQgVdsmRILdUt1Oxruc2urMTsYyRL+yAfUinvxi91gbQCAtqx34rQlW5YVcY9X1nF1vOZfG9I5+VsJUOpAYw3LKXoFW5qwYTgTXxZNpEMNuIn3mv+E7Z90yZSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=St+L4OCQ; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774273098; x=1805809098;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=KW53xm4EMUmaDFLpHeXdsNCoOkBX60KScnX9/yJEVTw=;
-  b=St+L4OCQwGiy/GpHA92eeL9Ry++cBV+Kr1c0RjE6O2fl6zljicupztio
-   /eky8xgnTRaMxs4bLVAUY6BNaen/bGh5a/LYM0gJUfSv6zPqH68CloVP1
-   foValaeFnEL6hhbt11W3CApBB4AJcE3BgOwaJL38sXmb/zghdBjyAYUUE
-   BNoVdP5whjjf7tVRJ9atWcFs+FfZw+5MdM0WHAI9DD/h7km+DL1BYm/Bl
-   TJKFaEDiEvyajZZSyMPbcUn1lw4FOpUnpD4qQ9S8bG716Tfz6uyqFnLWh
-   Wc86p56Te79etFLQ1bbB74ow8/4xMNB1LEEL1gXjuSWEB270KlqXbhRYe
-   w==;
-X-CSE-ConnectionGUID: hwkyMrn6SeuTc7QoLLDEFg==
-X-CSE-MsgGUID: YCIH2hThTz65XX+f5zKifQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11737"; a="75151813"
-X-IronPort-AV: E=Sophos;i="6.23,137,1770624000"; 
-   d="scan'208";a="75151813"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2026 06:38:18 -0700
-X-CSE-ConnectionGUID: yHgcV4CaQt2aO8f9ubyb8w==
-X-CSE-MsgGUID: l5AuL3eaS2CC5X0dXEFqLw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,137,1770624000"; 
-   d="scan'208";a="228103783"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa003.jf.intel.com with ESMTP; 23 Mar 2026 06:38:13 -0700
-Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 949452879A;
-	Mon, 23 Mar 2026 13:38:12 +0000 (GMT)
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-To: Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	Simon Horman <horms@kernel.org>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH net-next] devlink: unify devlink_shd_get_priv() into devlink_priv()
-Date: Mon, 23 Mar 2026 14:21:36 +0100
-Message-Id: <20260323132136.13191-1-przemyslaw.kitszel@intel.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1774272163; c=relaxed/simple;
+	bh=Q/XBDBJYNBjvT4Fib6BMGQRPTrjoicozUK3Bve9QYsA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s0RBwfZDLBRhLswHAe7j0a30zBoHccNc0Uftobdbzn0ndbAvA+T3G2ARsBgJL1qgZxr6CCCZG+pOTkzG0iCBZAr7FEfZ+WBM71eREZ/a02yCBdeL6opzn54YrZSf4JJeJ9NVezGjdC/qkj1IIV5BMTVet8+kYOd72fevC4wk5JA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k6gv3IeX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0A23C4CEF7;
+	Mon, 23 Mar 2026 13:22:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774272163;
+	bh=Q/XBDBJYNBjvT4Fib6BMGQRPTrjoicozUK3Bve9QYsA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k6gv3IeXrkpY2/ShKgiHHi9GyujozQPD0EN42/bEtKlPlZzrWFPCaffBKwM4FWmxH
+	 qtxjXKM8k5U6K7imqqn0Ghur2DdHhztguaPyYcKBwkpOj+gvOcYPi2RMidO2CRmhJY
+	 Q4zc2JkWhompIe+Udj2kIXlAn0URhbD/BLr2/+lOd7qzUPShGwBim7E6rbsejOdI4s
+	 gsPCKI4TofLJGQB3fUfsCXhftBsCQNrN9yuq3XGF7uMBL+QwQ9NZWU4+pYR48zoAEi
+	 kn2qru6xYghv8AMQSYaGvMCHekh6x8jPOIi+PXxOZP7nHy6LH8qeP1A3imkLYVN6ab
+	 qb6Uc0xhR2ZFg==
+Date: Mon, 23 Mar 2026 18:52:24 +0530
+From: Sumit Garg <sumit.garg@kernel.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+	linux-media@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
+	linux-remoteproc@vger.kernel.org, andersson@kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
+	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
+	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
+	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: Re: [PATCH v2 02/15] firmware: qcom: Add a generic PAS service
+Message-ID: <acE-kAi2tkPh2qie@sumit-xelite>
+References: <20260312062756.694390-1-sumit.garg@kernel.org>
+ <20260312062756.694390-3-sumit.garg@kernel.org>
+ <28d63822-f191-400a-8005-5185dd480dbb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28d63822-f191-400a-8005-5185dd480dbb@kernel.org>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270552-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270547-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[intel.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 65A622F33F6
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0AC4E2F2D99
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Unify access API to shared devlink priv data with normal devlink.
+On Mon, Mar 16, 2026 at 08:51:16AM +0100, Krzysztof Kozlowski wrote:
+> On 12/03/2026 07:27, Sumit Garg wrote:
+> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> > 
+> > Qcom platforms has the legacy of using non-standard SCM calls
+> > splintered over the various kernel drivers. These SCM calls aren't
+> > compliant with the standard SMC calling conventions which is a
+> > prerequisite to enable migration to the FF-A specifications from Arm.
+> > 
+> > OP-TEE as an alternative trusted OS to Qualcomm TEE (QTEE) can't
+> > support these non-standard SCM calls. And even for newer architectures
+> > with S-EL2 and Hafnium support, QTEE won't be able to support SCM
+> > calls either with FF-A requirements coming in. And with both OP-TEE
+> > and QTEE drivers well integrated in the TEE subsystem, it makes further
+> > sense to reuse the TEE bus client drivers infrastructure.
+> > 
+> > The added benefit of TEE bus infrastructure is that there is support
+> > for discoverable/enumerable services. With that client drivers don't
+> > have to manually invoke a special SCM call to know the service status.
+> > 
+> > So enable the generic Peripheral Authentication Service (PAS) provided
+> > by the firmware. It acts as the common layer with different TZ
+> > backends plugged in whether it's an SCM implementation or a proper
+> > TEE bus based PAS service implementation.
+> > 
+> > Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> > ---
+> >  drivers/firmware/qcom/Kconfig          |   8 +
+> >  drivers/firmware/qcom/Makefile         |   1 +
+> >  drivers/firmware/qcom/qcom_pas.c       | 298 +++++++++++++++++++++++++
+> >  drivers/firmware/qcom/qcom_pas.h       |  53 +++++
+> >  include/linux/firmware/qcom/qcom_pas.h |  41 ++++
+> >  5 files changed, 401 insertions(+)
+> >  create mode 100644 drivers/firmware/qcom/qcom_pas.c
+> >  create mode 100644 drivers/firmware/qcom/qcom_pas.h
+> >  create mode 100644 include/linux/firmware/qcom/qcom_pas.h
+> > 
+> > diff --git a/drivers/firmware/qcom/Kconfig b/drivers/firmware/qcom/Kconfig
+> > index b477d54b495a..8653639d06db 100644
+> > --- a/drivers/firmware/qcom/Kconfig
+> > +++ b/drivers/firmware/qcom/Kconfig
+> > @@ -6,6 +6,14 @@
+> >  
+> >  menu "Qualcomm firmware drivers"
+> >  
+> > +config QCOM_PAS
+> > +	tristate
+> > +	help
+> > +	  Enable the generic Peripheral Authentication Service (PAS) provided
+> > +	  by the firmware. It acts as the common layer with different TZ
+> > +	  backends plugged in whether it's an SCM implementation or a proper
+> > +	  TEE bus based PAS service implementation.
+> > +
+> >  config QCOM_SCM
+> >  	select QCOM_TZMEM
+> >  	tristate
+> > diff --git a/drivers/firmware/qcom/Makefile b/drivers/firmware/qcom/Makefile
+> > index 0be40a1abc13..dc5ab45f906a 100644
+> > --- a/drivers/firmware/qcom/Makefile
+> > +++ b/drivers/firmware/qcom/Makefile
+> > @@ -8,3 +8,4 @@ qcom-scm-objs += qcom_scm.o qcom_scm-smc.o qcom_scm-legacy.o
+> >  obj-$(CONFIG_QCOM_TZMEM)	+= qcom_tzmem.o
+> >  obj-$(CONFIG_QCOM_QSEECOM)	+= qcom_qseecom.o
+> >  obj-$(CONFIG_QCOM_QSEECOM_UEFISECAPP) += qcom_qseecom_uefisecapp.o
+> > +obj-$(CONFIG_QCOM_PAS)		+= qcom_pas.o
+> > diff --git a/drivers/firmware/qcom/qcom_pas.c b/drivers/firmware/qcom/qcom_pas.c
+> > new file mode 100644
+> > index 000000000000..beb1bae55546
+> > --- /dev/null
+> > +++ b/drivers/firmware/qcom/qcom_pas.c
+> > @@ -0,0 +1,298 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+> > + */
+> > +
+> > +#include <linux/device/devres.h>
+> > +#include <linux/firmware/qcom/qcom_pas.h>
+> > +#include <linux/kernel.h>
+> > +#include <linux/module.h>
+> > +
+> > +#include "qcom_pas.h"
+> > +
+> > +struct qcom_pas_ops *ops_ptr;
+> 
+> Same comment as before. Don't create singletons. And for sure not global
+> ones.
 
-Thanks to Jiri Piro, we now have ability to create shared devlink
-instances [1]. Introduction series have added usege of those for mlx, but
-without priv data attached to the shared devlink.
+This pattern has been carried from the PAS API contract among kernel
+clients and the SCM PAS service earlier. The clients don't hold a
+reference to the PAS data like underlying platform or TEE device etc.
+Hence the need to have a global data pointer to hold reference to the
+ops data structure registered by drivers having different lifetime of
+devices. Also, the PAS APIs can be called from very different client
+driver contexts.
 
-Current API makes it possible to access shared devlink instance's priv
-data:
+Surely, avoiding global data is always better given a better alternative
+is there. Do you have any better alternative proposal here?
 
-	void *devlink_shd_get_priv(struct devlink *devlink);
-
-but it is easy to to forget (especially during rebase from "before shared
-devlinks" era) and call:
-
-	void *devlink_priv(struct devlink *devlink);
-
-which even has the same signature, so it's hard to catch the error.
-
-New proposed API unifies both calls into one, without any increase in the
-observerd struct size. (Alternative could be to store additional pointer,
-set during devlink_alloc).
-
-Unexport the less convenient API call.
-
-[1] commit 411ad0605875 ("Merge branch 'devlink-introduce-shared-devlink-instance-for-pfs-on-same-chip'")
-[1] https://lore.kernel.org/all/20260312100407.551173-1-jiri@resnulli.us
-
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
-sorry that I have not mentioned it during [1] review, it got obvious
-for me only after working with the code
----
- net/devlink/devl_internal.h |  4 ++++
- net/devlink/core.c          |  3 +++
- net/devlink/sh_dev.c        | 11 ++++++++---
- 3 files changed, 15 insertions(+), 3 deletions(-)
-
-diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index 7dfb7cdd2d23..abbe308ee9bd 100644
---- a/net/devlink/devl_internal.h
-+++ b/net/devlink/devl_internal.h
-@@ -58,6 +58,7 @@ struct devlink {
- 	struct mutex lock;
- 	struct lock_class_key lock_key;
- 	u8 reload_failed:1;
-+	u8 is_shd:1;
- 	refcount_t refcount;
- 	struct rcu_work rwork;
- 	struct devlink_rel *rel;
-@@ -72,6 +73,9 @@ struct devlink *__devlink_alloc(const struct devlink_ops *ops, size_t priv_size,
- 				struct net *net, struct device *dev,
- 				const struct device_driver *dev_driver);
- 
-+/* Get private data from shared devlink instance */
-+void *devlink_shd_get_priv(struct devlink *devlink);
-+
- #define devl_warn(devlink, format, args...)				\
- 	do {								\
- 		if ((devlink)->dev)					\
-diff --git a/net/devlink/core.c b/net/devlink/core.c
-index eeb6a71f5f56..4c97e2e2c073 100644
---- a/net/devlink/core.c
-+++ b/net/devlink/core.c
-@@ -232,6 +232,9 @@ int devlink_rel_devlink_handle_put(struct sk_buff *msg, struct devlink *devlink,
- 
- void *devlink_priv(struct devlink *devlink)
- {
-+	if (devlink->is_shd)
-+		return devlink_shd_get_priv(devlink);
-+
- 	return &devlink->priv;
- }
- EXPORT_SYMBOL_GPL(devlink_priv);
-diff --git a/net/devlink/sh_dev.c b/net/devlink/sh_dev.c
-index 9b7456d64b57..450e3218759e 100644
---- a/net/devlink/sh_dev.c
-+++ b/net/devlink/sh_dev.c
-@@ -31,6 +31,11 @@ static struct devlink_shd *devlink_shd_lookup(const char *id)
- 	return NULL;
- }
- 
-+static struct devlink_shd *devlink_to_shd(struct devlink *devlink)
-+{
-+	return &devlink->priv;
-+}
-+
- static struct devlink_shd *devlink_shd_create(const char *id,
- 					      const struct devlink_ops *ops,
- 					      size_t priv_size,
-@@ -43,13 +48,14 @@ static struct devlink_shd *devlink_shd_create(const char *id,
- 				  &init_net, NULL, driver);
- 	if (!devlink)
- 		return NULL;
--	shd = devlink_priv(devlink);
-+	shd = devlink_to_shd(devlink);
- 
- 	shd->id = kstrdup(id, GFP_KERNEL);
- 	if (!shd->id)
- 		goto err_devlink_free;
- 	shd->priv_size = priv_size;
- 	refcount_set(&shd->refcount, 1);
-+	devlink->is_shd = 1;
- 
- 	devl_lock(devlink);
- 	devl_register(devlink);
-@@ -137,7 +143,7 @@ void devlink_shd_put(struct devlink *devlink)
- 	struct devlink_shd *shd;
- 
- 	mutex_lock(&shd_mutex);
--	shd = devlink_priv(devlink);
-+	shd = devlink_to_shd(devlink);
- 	if (refcount_dec_and_test(&shd->refcount))
- 		devlink_shd_destroy(shd);
- 	mutex_unlock(&shd_mutex);
-@@ -159,4 +165,3 @@ void *devlink_shd_get_priv(struct devlink *devlink)
- 
- 	return shd->priv;
- }
--EXPORT_SYMBOL_GPL(devlink_shd_get_priv);
--- 
-2.39.3
-
+-Sumit
 
