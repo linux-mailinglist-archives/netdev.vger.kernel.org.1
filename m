@@ -1,95 +1,50 @@
-Return-Path: <netdev+bounces-270385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270386-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QH9lK8LowGl6OQQAu9opvQ
-	(envelope-from <netdev+bounces-270385-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:16:18 +0100
+	id ECFyAqjqwGl6OQQAu9opvQ
+	(envelope-from <netdev+bounces-270386-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:24:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54A6F2ED63D
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:16:18 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE2432ED81C
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:24:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D4522300E585
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 07:15:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ED8B230046AC
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 07:24:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C822217F33;
-	Mon, 23 Mar 2026 07:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C7w7TE1V"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6164335CB81;
+	Mon, 23 Mar 2026 07:24:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C5D35DA68
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 07:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FFE35CB61;
+	Mon, 23 Mar 2026 07:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774250141; cv=none; b=WHb74rvxYzU1XKs0/jIJMEY1VVbHyalvDyqq7W+zKuX4uqtQVnR7lAZ83aae/09tIwrHEqKSRA5zc5p8UoMgPwkOCiRu+x/D/lQED+JzKaWoTakCu/sjfA8zWETkorSthwrx4tefHP2D2KCm24KcrafzMeIpAyTdfLMcnL8MvgA=
+	t=1774250656; cv=none; b=YvJoG9ajnj3Ih16tdN00KcwXpCI4ANWDc52cwhjfndE2Lkrf04q2boMc/MC4nRXuHURTXMC+aRPaY/XkcbDuhhzwOMk2hira8jOsAEqXuuWG4LhfZdH4EF1K3SneiHGmm8RHZByMhOuESoGVVYW9LC5dmISUmooVsfnOky945CY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774250141; c=relaxed/simple;
-	bh=oBZX5oNsob2YIu+H4T5mZfN/nQNZqNp8MhN/QQd4wrI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jvWqe0hfI+EnX7Ce63qIUbj9YI9EwHQBG7//+zlVhlstSCaFI4TPNAGrdZY/ZKqGQI51IUE2PfnJqhJ1UEncDbg9Htc7gM1sBXwDTGt+ayXyqCw7Gl5sY1M11NYNXaHbqk6wJTYmMq9PaDXTuwqp14YFqtHTBxbm0ZmpZXHgjTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C7w7TE1V; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2a9633ef0d6so6032275ad.0
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 00:15:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774250139; x=1774854939; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=G84ar5OFwPS1ZIDT1z7k87iUKtwKqphERZsWCCAaZV0=;
-        b=C7w7TE1VLVMVEGiI00adW9Z0T/1ZHKDQAVAV6YCpLHLzLoBTVO8rsl/+pzbgat8+3v
-         9liZfdspubV72O4cAKli/LQLFdDEtDU3u4pIRxUBlDNbw/q8k/gQRkeVk15IKyyttcb7
-         XGR7xxzyGuS4iV9SCYSX9pnsZ/UG7rzEyLeuIxBjBm9v7Ffn8/IdL2LidBbguILeO3i9
-         GUC96V/1WdyIN/kKYLOb8OOg+MYn2Ekq+5g/GdEU7dAsmcgp9NJqJii+LhP4Z9zjDtoY
-         gpOMwIIVXj004gz3RTVzKhIIQAf02CHWBVxcMFR+3BKYKIlHArvsiOCW2VB8Vtgd7c0g
-         N65g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774250139; x=1774854939;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G84ar5OFwPS1ZIDT1z7k87iUKtwKqphERZsWCCAaZV0=;
-        b=k0WeIET+5/HnHmIKWvfusQGPBwqoIJx2DnNdu9DYK2AM/VzXc5ICNQ55UmeyTALmMa
-         hQr5FbmsTMwi5R/PvLvf1gBxFWBVYhL7lFoT3TTU33MKewARikJYbbv6rhdXQv0pDzyN
-         Aw+K5dDuiXiqCUg5W9YATNV3rq+2VaJxZDHKsle+HG66UBKaZFsi35iT2Ei+XzYuGw1k
-         HJjJjPBRfYzth2FQpE1781vhlVSXa/Mqma5SUeyKqtTP9cMnIhTR/BaoKjR8iKddHH24
-         hIqnpJ69Grp9odwpVEH3PVH1jyPSgqM0dkiXPWBN20vdjg/+mJu5ZeAhUPilWOYm1nzB
-         sx8w==
-X-Forwarded-Encrypted: i=1; AJvYcCWX7fBgGQAwcU52X8/rtq7hfSdyNS1PpszlaKOICn7ItjzHxc/sDLTAhuWxT8/XiGZP9ZGhU8g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLZujj7uVPwsJJBFouP+h68/Lr0YsTnDWlGxSODeX292vkQNTc
-	RNLGbonRY/8R3CkmP/jsG5yaDit+VkmDvBmGUGbewQ6sZblq3LFki8U3
-X-Gm-Gg: ATEYQzwH5Lu0zqpdPporEXWfDXsh/47qN4JsST536sYGTmvepsFZfnMVm4U/jMvTIqu
-	mZLBa9Y2qzOYHnhmok3wLBaMJL/Mmp1DunKHQjS9b4PYBbE5H9K39eaFWIyKe+OIMfWvHizF41g
-	qLAMOT6XHb65qi5WC/wT4fA9AWTVAjaQoB2FNVCpXORxLEwkYVfEFeOx0dnSqwhdjfyMqbCV5Tq
-	jkBqO1skl5Qt5GcTd7eC7wV2TWGl1loXNtUGSl0I4BHTQJ7iiMJ9w6O3RgW2/BNrQZa6VmFuvDz
-	VYBX7qpha0kUKFKqUoX5ehWO+8MlaFKZar0MWU4x0v5jIx5XaZMePA6FrobaniYPBdP5+EupBm4
-	8Iv4FwRsC0rD4JGBAFsDrQWIxnXq0JiXIu6cSaIeIGhaebF6ThsE9LA+C8Q0pvlmk2lgMawMJxM
-	/DC8926zryZNPl9kwSj0gMzIozmHx630NP
-X-Received: by 2002:a17:902:e811:b0:2b0:4f82:74c6 with SMTP id d9443c01a7336-2b0828009d2mr73276475ad.8.1774250138885;
-        Mon, 23 Mar 2026 00:15:38 -0700 (PDT)
-Received: from localhost.localdomain ([189.1.242.96])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b08369617dsm125119955ad.71.2026.03.23.00.15.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2026 00:15:38 -0700 (PDT)
-From: sunichi <sunyiqixm@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	kuniyu@google.com,
-	gnault@redhat.com,
-	leitao@debian.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	sunichi <sunyiqixm@gmail.com>
-Subject: [PATCH] net/mpls: fix missing NULL check in mpls_valid_fib_dump_req
-Date: Mon, 23 Mar 2026 15:15:15 +0800
-Message-Id: <20260323071515.1945612-1-sunyiqixm@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1774250656; c=relaxed/simple;
+	bh=/4exprVqxuVfRqJPaNRhfYNkHOpCb6tQ85+amF0cqDE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CGTbI5emyA6WXkxM/ZoHXlh+N/b3WxxSmLDR6WLnYd+l7IE74NP4UUjRRfh8xfzuK7MxwQ4cd3gDn7OdiRko+VFd+eBrNZ5MfD3/sDI1T6MHh/bMnef8pFIP5uPXxJ9SBqAh2Z5qizR5jb4J1BJm9nWXW9m4SZNJIQtKh/oLj7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [111.196.245.197])
+	by APP-03 (Coremail) with SMTP id rQCowABnieCZ6sBp2FOGCw--.58546S2;
+	Mon, 23 Mar 2026 15:24:10 +0800 (CST)
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	tglx@kernel.org,
+	mingo@kernel.org,
+	kees@kernel.org,
+	pengpeng@iscas.ac.cn
+Subject: [PATCH] NFC: pn533: bound the UART receive buffer
+Date: Mon, 23 Mar 2026 15:24:09 +0800
+Message-ID: <20260323072409.60086-1-pengpeng@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,64 +52,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-CM-TRANSID:rQCowABnieCZ6sBp2FOGCw--.58546S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrKr17JryDtrWxWF1DJFyUGFg_yoWkArcEva
+	4kA34UJr4UGr1UKw1xtrW5ZryjyayUWF98uF10gFyfAa4jk348CFWkZF9ru345Ww4UZFnx
+	u34UGr1Ik34rujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb48FF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
+	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjuHq7UUUU
+	U==
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
+X-Spamd-Result: default: False [0.04 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,redhat.com,debian.org,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-270385-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunyiqixm@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 54A6F2ED63D
+	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_NA(0.00)[];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	TAGGED_FROM(0.00)[bounces-270386-lists,netdev=lfdr.de];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: EE2432ED81C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The attribute tb[RTA_OIF] is dereferenced without verifying if it is NULL.
-If this attribute is missing in the user netlink message, it will cause a
-NULL pointer dereference and kernel panic.
+pn532_receive_buf() appends every incoming byte to dev->recv_skb and
+only resets the buffer after pn532_uart_rx_is_frame() recognizes a
+complete frame. A continuous stream of bytes without a valid PN532 frame
+header therefore keeps growing the skb until skb_put_u8() hits the tail
+limit.
 
-Add the necessary check before using the pointer to prevent the crash.
+Drop the accumulated partial frame once the fixed receive buffer is full
+so malformed UART traffic cannot grow the skb past
+PN532_UART_SKB_BUFF_LEN.
 
-Signed-off-by: sunichi <sunyiqixm@gmail.com>
+Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
 ---
- net/mpls/af_mpls.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/nfc/pn533/uart.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-index d5417688f69e..28bbea30aae3 100644
---- a/net/mpls/af_mpls.c
-+++ b/net/mpls/af_mpls.c
-@@ -2174,6 +2174,8 @@ static int mpls_valid_fib_dump_req(struct net *net, const struct nlmsghdr *nlh,
- 		int ifindex;
+diff --git a/drivers/nfc/pn533/uart.c b/drivers/nfc/pn533/uart.c
+index 6d2f520a5bc8..1b82b7b2a5fa 100644
+--- a/drivers/nfc/pn533/uart.c
++++ b/drivers/nfc/pn533/uart.c
+@@ -211,6 +211,9 @@ static size_t pn532_receive_buf(struct serdev_device *serdev,
  
- 		if (i == RTA_OIF) {
-+			if (!tb[i])
-+				return -EINVAL;
- 			ifindex = nla_get_u32(tb[i]);
- 			filter->dev = dev_get_by_index_rcu(net, ifindex);
- 			if (!filter->dev)
+ 	timer_delete(&dev->cmd_timeout);
+ 	for (i = 0; i < count; i++) {
++		if (unlikely(!skb_tailroom(dev->recv_skb)))
++			skb_trim(dev->recv_skb, 0);
++
+ 		skb_put_u8(dev->recv_skb, *data++);
+ 		if (!pn532_uart_rx_is_frame(dev->recv_skb))
+ 			continue;
 -- 
-2.34.1
+2.50.1 (Apple Git-155)
 
 
