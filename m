@@ -1,189 +1,180 @@
-Return-Path: <netdev+bounces-270575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270576-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wKpaHLZXwWmBSQQAu9opvQ
-	(envelope-from <netdev+bounces-270575-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:09:42 +0100
+	id iLrgGG1awWnbSQQAu9opvQ
+	(envelope-from <netdev+bounces-270576-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:21:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 034532F5E1B
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:09:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CA252F62E4
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:21:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A767A3062221
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 15:03:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A36E33A2C30
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 15:05:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EF624634F;
-	Mon, 23 Mar 2026 15:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8923B38BC;
+	Mon, 23 Mar 2026 15:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KKvBgedI"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="PbwFVq1H";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KpERMpnD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4379027AC4C;
-	Mon, 23 Mar 2026 15:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06773B2FE9;
+	Mon, 23 Mar 2026 15:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774278147; cv=none; b=fzlZIqokr4ZDL9K5lUknDtt9smArZMAT/T+r27OpCs3Ox3h7c9F6Wk8cE9px98L75f6Kaw/dANzQAzQh37jkeuLmOfjROfhyjKLSEK6ERmnAu+gkRft4eMEir/UUWKIE3aYg+Jv6N50NWitIW20C0zNmelhzrANLZM+d71Gv1rY=
+	t=1774278186; cv=none; b=F72CnjNMDnwnsCoBSguf1HrSh3JqonbbLv5A1W2BC02G1QwDG7xLLrrk8ifIiiKK6kPk2P+6JNMlXBWUEd6wFkFLNerFe2xwIzkK2bgDT5fKSZdi/nBq9AIry75416GChPkbr70ZA8nfN8NG4xc4dWuUOzPj8wGLonGNS+yjATg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774278147; c=relaxed/simple;
-	bh=V+8n2djQSrAn0/iD48NW+grY2jzX6Ew6bZZOy3qArZo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pTSk1QIgRcR63qktt63IwQ0kvvk/mldHIAD41AAJugZR9sIOKkl4ywc8BskzGUFwKE34V5RI2Xtuej4bJ1U6gJQ4u4PyxA0PUnwuRqGBYdhy0XQK13nF1nqPhmdT+/yBnNE3MrpdE+bhStAhuTnEUfEZQ6cwYmWntYzDRsOHf+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KKvBgedI; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62MNU57e670670;
-	Mon, 23 Mar 2026 15:01:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=GLL1Ly
-	3OeAkM26lTyfuK59J2i4l+t5B9XXC/Bq7VyJs=; b=KKvBgedIntUMFnLe+in10/
-	ShGLogvTap51JQ+yqi0eVYJzFjLO10C9YUq0WmFwslEdPlllrjtErFvtEFChT0wa
-	ZRcG3JmkJWEbl1d33WjE+EGvvA7JxSOtWikN4Nqj5jQFRQuGkE8TTZNiUnuMXzHw
-	xAL3NeM6zs6ZJNbl9kSr9oAm5XudAk/BToX1ixNU2dE/iQjh0ZfX94+R/zTpLGPz
-	JGOzt43Sd9p6bC1FAml/1/ZlCY8yv22ZJXSiwWsyCwv3hnVmxnIPzdXUE2erWS9q
-	/M5HAjVS99cEVGC0IXcp7OzURinRW/ppiDuOTAQipjb1mbuCV15QMQDla3oeI59Q
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4d1ktuq3ee-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Mar 2026 15:01:52 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 62NCruMC026771;
-	Mon, 23 Mar 2026 15:01:51 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4d275knqtw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Mar 2026 15:01:51 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 62NF1RmQ29360808
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Mar 2026 15:01:27 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 42E6658063;
-	Mon, 23 Mar 2026 15:01:51 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 51E1C58059;
-	Mon, 23 Mar 2026 15:01:49 +0000 (GMT)
-Received: from Mac.ibm.com (unknown [9.61.247.188])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 23 Mar 2026 15:01:49 +0000 (GMT)
-From: Omar Elghoul <oelghoul@linux.ibm.com>
-To: vishs@meta.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, dw@davidwei.uk,
-        edumazet@google.com, eperezma@redhat.com, ilias.apalodimas@linaro.org,
-        jasowang@redhat.com, kernel-team@meta.com, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
-        pabeni@redhat.com, technoboy85@gmail.com,
-        virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
-        oelghoul@linux.ibm.com
-Subject: Re: [PATCH net-next v11] virtio_net: add page_pool support for buffer allocation
-Date: Mon, 23 Mar 2026 11:01:31 -0400
-Message-ID: <20260323150136.14452-1-oelghoul@linux.ibm.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260310183107.2822016-1-vishs@meta.com>
-References: <20260310183107.2822016-1-vishs@meta.com>
+	s=arc-20240116; t=1774278186; c=relaxed/simple;
+	bh=SNxjJzUyfHQgpxL3kdLhE0O7BoNK4M784+ioh0vuBqc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kiv7qiaSIE37XTluJkcIGeYC+0w1QMRhvdHp7Vav2+RjecN60bwalJNofUQ9z68TfI3mzttseBGP0gGhqLD4AKXX/AvVl1QRJrlgF1GywnzzDMxrSlxTTTON0EpuwCuBUkO3R00oSIX7JUrIG4JPyWZWai3yFO07G9DWyrygLuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=PbwFVq1H; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KpERMpnD; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 8CD657A0155;
+	Mon, 23 Mar 2026 11:03:02 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Mon, 23 Mar 2026 11:03:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1774278182; x=
+	1774364582; bh=vESA2oSpUNFHbIqfotmrsVSC4q455gUCfyI47AdUjAw=; b=P
+	bwFVq1Hy66fqP9vyav2dVyMIImak0u42gPNggfnQU+0uLchLHxaWXjSKId0gXfvd
+	uQpUGgoUxOx8zaN6epkLj+oldp2DmyMzikB1j7nVOyeY1SXLvt1tlS1ty+B06gRj
+	4sRDKWrzvLvAac3JpfuBZesWcdbufQcFKggcVFcBXm/F126oeEaZaJzjVSElyACH
+	ZQxhgw2e1SdYBpFsRWysFjkITlHxJci11Zsju+6qV6sFvUvzansSUZGXHmixnOAH
+	1PiKdFORujbBi/Da0C80oEz2KTt61BSZKmy3L/tc1grylA7D1HZ9kLj1wA7ddATN
+	YALrjgLQh3j0JoF12DVNQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1774278182; x=1774364582; bh=vESA2oSpUNFHbIqfotmrsVSC4q455gUCfyI
+	47AdUjAw=; b=KpERMpnD/knU/22KWQIaWUNj3r5esijnuBgvk/i9A9IEowcTb0s
+	TdFXZDThSa+blMO2X4oMpwToFfqbaGCMoBkxKxsF5ZSPDkozjmqouBy8o37FGhjP
+	NhRtqM4B3TXvKZ3E3oXPVIEeBr3vQI9k7ktgZEVkKfVph8QUQ4gnEeRT5k5S2VGd
+	STR+eolTrAFdO6OSaK8INJA7zXNmvpMzz0WjHiVT2cEroB/sm8fAAasf/Rf3D6pe
+	/KrxUloZU3k/cRRGAEE/9Okyv4e9BYNRlKCS/CB/RDx6BbUiiETzai5Xu60Qa3lY
+	Jm09dceue03WAxbTnwnPtlcwaMdk0IGhTrw==
+X-ME-Sender: <xms:JVbBaSEwV2onQoJAXAeEm9jq9k_HKuLNMRr4whiijx_vX5Y9OgtU8Q>
+    <xme:JVbBaWYlPsklN8_394Et3zC8eGczJJlX8Vi-89ZCHZTgrw0pr-gZt66gXEZxYLOt3
+    vS1pPzElHkZ4KJQfyyixIROF11BZZIwthXL9AFdbWfONmpcZtO5t-0>
+X-ME-Received: <xmr:JVbBaWxoNc8ekzkz1R82WUacnb4WRZDw91lmWRHBm-pYYBB326NBu1WWDEeW>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefudeltddvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedutddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheptghrrghtihhusehnvhhiughirgdrtghomh
+    dprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthht
+    ohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehlihhnuhigqd
+    hkshgvlhhfthgvshhtsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepught
+    rghtuhhlvggrsehnvhhiughirgdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnh
+    gvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghp
+    thhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvth
+    esghhoohhglhgvrdgtohhm
+X-ME-Proxy: <xmx:JVbBaYT1IPrTziuQSRKTiz8Be2TfNtkLA51R4p0SIj_IGbmp9iMaSA>
+    <xmx:JVbBaTKKDX5BiVKmKBP95erYBQCKJlE7ztutit9Ezbav9kIb_6xm6g>
+    <xmx:JVbBafXTdlqvh4z94Pi9mCUlsrnJtTzIVpYtYegJJkCXG2JMri8CWQ>
+    <xmx:JVbBaXQfXazEXX4POSOjcgoYUmLs6oaGmYjFVB1G18Di_YVCBzEqqw>
+    <xmx:JlbBaau1MN9q0L70DrX7xOgb_oEwuvopuvUsv9QuDNB_eUFBhFIdkkck>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 23 Mar 2026 11:03:01 -0400 (EDT)
+Date: Mon, 23 Mar 2026 16:02:59 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net v5 0/3] macsec: Add support for VLAN filtering in
+ offload mode
+Message-ID: <acFWIxzM-GxpAhjH@krikkit>
+References: <20260323123633.756163-1-cratiu@nvidia.com>
+ <acFODtfaa8LCKX4r@krikkit>
+ <5ae5d08d578fce1a01a548fad8552a14df8c5679.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-ORIG-GUID: YNzfoRIt1da90gDrXm5OnayrwaK83DCr
-X-Authority-Analysis: v=2.4 cv=aMr9aL9m c=1 sm=1 tr=0 ts=69c155e0 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=bD6ukYfIgYhu4hH-dYIA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzIzMDExNCBTYWx0ZWRfXx63mzxnELWk5
- Y4ei4W1R77ANzeQcp3sM/IdvojFh1xZob0caVE4n47QoppYM048+qJ2ITChKBSjII++GBT3OduH
- FgKkCoVxgd/db9ymu20dPIn9V/fyFxZfEySwE7z7hPyZR7l5xim0s4c4dVCS+N4BKVnI0PKq1tu
- Q3VQWOb3aJI8NTpl0kqw2nVIfI4hH6gS0tAJE+FsJSdcnGj/vEHnHX9NDmGpag2zyjCd9wBIjTE
- fhXgeZWkW+1b4vyW4wli182xMcnpU+FO4qTWf9OumG1AmNrAySfCqOPfmEyY59nOzJZ2u78X1Gx
- I6XRcQvrlpEGEqFM3P2lTFIVTn9VhSM4BgUrpwdcKGDc2GQzwp7UwpwdFBViTmSGMeMWni8GmZb
- /2ruwN8yuID2OV1fr4NADUTfUJFtlWYlHu235M+UQXNnadxH8kilKOKn4kO6vGzuVpUVYQbRz18
- 7oLM2n8sWdX/X/s4bvg==
-X-Proofpoint-GUID: 9gD9_WOZoQLsJS8lan0dhb2SdmUj0w89
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-23_04,2026-03-23_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 lowpriorityscore=0 adultscore=0 impostorscore=0 malwarescore=0
- suspectscore=0 phishscore=0 priorityscore=1501 bulkscore=0 clxscore=1011
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603230114
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5ae5d08d578fce1a01a548fad8552a14df8c5679.camel@nvidia.com>
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,davidwei.uk,google.com,redhat.com,linaro.org,meta.com,kernel.org,vger.kernel.org,gmail.com,lists.linux.dev,linux.alibaba.com,linux.ibm.com];
+	TAGGED_FROM(0.00)[bounces-270576-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270575-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oelghoul@linux.ibm.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 034532F5E1B
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: 0CA252F62E4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+2026-03-23, 14:42:00 +0000, Cosmin Ratiu wrote:
+> On Mon, 2026-03-23 at 15:28 +0100, Sabrina Dubroca wrote:
+> > 2026-03-23, 14:36:30 +0200, Cosmin Ratiu wrote:
+> > > V4:
+> > > - Migrated nsim-only macsec tests to Python, usable against real
+> > > hw.
+> > > - Ran these tests against both nsim and mlx5.
+> > > - Gave up on nsim patches since the tests no longer use them.
+> > 
+> > Why not? Being able to test without accessing real HW is still
+> > useful.
+> > 
+> The tests now send macsec traffic over VLANs and nsim, it's just that
+> nsim doesn't deal with VLAN filters at all and there are no stubbed
+> vlan filters in debugfs, since real hw doesn't have that interface.
 
-I've been testing linux-next (tags later than 03/17) and hit new issues in
-virtio-net on s390x. I bisected the issue, and I found this patch to be the
-first buggy commit.
+Since netdevsim doesn't deal with VLAN filters at all, the "tests
+should be written so that they can run both against ``netdevsim`` and
+a real device" bit of the docs doesn't fully apply here?
 
-The issue seems to only be reproducible when running in Secure Execution.
-Tested in a KVM guest, the virtio-net performance appears greatly reduced,
-and the dmesg output shows many instances of the following error messages.
+Anyway, I think the original tests had value, even if they're more
+limited in some ways than traffic tests. HW/driver behavior could be
+hiding problems in the stack with VLAN propagation, those simpler
+tests don't have that risk.
 
-Partial relevant logs
-=====================
-[   49.332028] macvtap0: bad gso: type: 0, size: 0, flags 1 tunnel 0 tnl csum 0
-[   74.365668] macvtap0: bad gso: type: 2e, size: 27948, flags 0 tunnel 0 tnl csum 0
-[  403.302168] macvtap0: bad csum: flags: 2, gso_type: 23 rx_tnl_csum 0
-[  403.302271] macvtap0: bad csum: flags: 2, gso_type: e0 rx_tnl_csum 0
-[  403.302279] macvtap0: bad csum: flags: 2, gso_type: e1 rx_tnl_csum 0
-[  403.309492] macvtap0: bad csum: flags: 2, gso_type: 4c rx_tnl_csum 0
-[  403.317029] macvtap0: bad csum: flags: 2, gso_type: e0 rx_tnl_csum 0
-
-Steps to reproduce
-==================
-1. Boot a Linux guest implementing this patch under QEMU/KVM (*) with SE
-   enabled and a virtio-net-ccw device attached.
-2. Run dmesg. The error message is usually already present at boot time,
-   but if not, it can be reproduced by creating any network traffic.
-
-(*) This patch was not tested in a non-KVM hypervisor environment.
-
-I've further confirmed that reverting this patch onto its parent commit
-resolves the issue. Please let me know if you'd like me to test a fix or if
-you would need more information.
-
-Thanks in advance.
-
-Best,
-Omar
+-- 
+Sabrina
 
