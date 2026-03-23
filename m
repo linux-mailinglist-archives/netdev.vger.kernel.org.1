@@ -1,187 +1,254 @@
-Return-Path: <netdev+bounces-270463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270464-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cK+dLnwXwWn5QQQAu9opvQ
-	(envelope-from <netdev+bounces-270463-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:35:40 +0100
+	id MPlmFUcYwWn5QQQAu9opvQ
+	(envelope-from <netdev+bounces-270464-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:39:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54B182F0305
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:35:40 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E9D62F052C
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:39:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1D10E30173B9
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:30:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 710C2300C3B0
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53283387347;
-	Mon, 23 Mar 2026 10:30:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376D037E2E6;
+	Mon, 23 Mar 2026 10:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MVRt3h6h"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="KH5kXMzR";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KwA12vbP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5823B37CD26
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 10:30:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EECE385507
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 10:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774261838; cv=none; b=qaCNt5NI+2VRPRmppqN8bXErIpjj9TaJnKKCAdg+v5NYBD75l+bQoShB9yzkTnzs88uuIdCjiHCT7v5licFw17JagWVKwhL4EY8LxiRRq+gL+WCqrJCECcUC+9i+7xlI0riF3+diI4f3dDIohbCoz+HqEJyimkoGcV6bS7Mx3GI=
+	t=1774261942; cv=none; b=qNXC5ZwVaUqQTJRS6wXhMi4WI+v8QKiyd9Sph2VJTZ93ocfm5aZS7pZ+U0pDciNjNPjIGwr+KgI5OpNEsmsUIiaTxKKwqC/RHSrGCQ1E+4g+c1+HyNP5b80z20XQ3TUlFSOkUOoIZJnP+8MHR1a3FnWVO+IUY8RMFWeH+q0ZtAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774261838; c=relaxed/simple;
-	bh=H3eABNn/jTQdi8bLwLy4lbiH/P+mOBKDAClVuXMh95c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rwTW3zU3pnXR3QdWZkUtUTLtrg5OLXniNJi+7h159DwUL/K1pBPTWuzG0Mq0Sb/X2k2PzW2ywFcNqNTsHK6SkFoSUv/Nz6cjteNK7MlU1UkCu3pgb/7B+x1vWxl3d5KaAExiWdWZAYbMBPXy4oyRd6sdWXVswsHT3vKe/wSlgh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MVRt3h6h; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id B52D51A2F8E;
-	Mon, 23 Mar 2026 10:30:34 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 884225FEF6;
-	Mon, 23 Mar 2026 10:30:34 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9AB47103720F2;
-	Mon, 23 Mar 2026 11:30:29 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1774261833; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=H3eABNn/jTQdi8bLwLy4lbiH/P+mOBKDAClVuXMh95c=;
-	b=MVRt3h6h0IL5ui/29e5EzJhWtTLbOysIOBHDq+tmXkVBDxf0WD9Ef6TeeGA8EHxULKEAnX
-	nLgPFm2iw5oPPJovEO/pWS8PJ7DNB4bjCPrVo5BsxRlqqSOZuqHkXm+XMFSxbKXHOFjoUw
-	e2N5I5fIPrOjlLVBPZYTJgfLI7aLcKhOpOcJqUgbdIFTogWU+m7UyPVQjc7+K7YKrNYg4w
-	omD0PV/r69F/7iRLyJO5X149d8niVbus34D1/1LPoupYeoT6AhFjdzDqItF5T/8+W4ypFy
-	BSnfA1adEbWPx0QnWTnVIYPQJQ+MhROoIpHGryFkUWQjMCXBNP/brS0tfohboA==
-Date: Mon, 23 Mar 2026 11:30:27 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Carlo Szelinsky <github@szelinsky.de>
-Cc: andrew@lunn.ch, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, o.rempel@pengutronix.de, pabeni@redhat.com,
- linux-leds@vger.kernel.org
-Subject: Re: [PATCH] net: pse-pd: add LED trigger support
-Message-ID: <20260323113027.784dfeef@kmaincent-XPS-13-7390>
-In-Reply-To: <20260321175546.282181-1-github@szelinsky.de>
-References: <b42fb036-89da-48cd-9525-d05a065096d5@lunn.ch>
-	<20260321175546.282181-1-github@szelinsky.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1774261942; c=relaxed/simple;
+	bh=Jbm3gL9m+5ehEdpaNRD6Q+tk2vD2OrCJCif7iJG7zlI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S7Xyk+nz617VImQjPUE3ljWyj8/V1YWP6D+kaytFYExxFQ5DsQtfm+PJdTCq2uRAFbPI4WOwd1GMrPyK8qKM5oUpf9U3JtohDJdVkCuUQgRgP7bQJWirjQCPBiZB7/+lYiSQRYaFioY3CorRNqjFZ743qgUmLgxCMP+5QotABzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=KH5kXMzR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KwA12vbP; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfout.phl.internal (Postfix) with ESMTP id C4286EC0128;
+	Mon, 23 Mar 2026 06:32:19 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Mon, 23 Mar 2026 06:32:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1774261939; x=
+	1774348339; bh=hJduocjrXMFZdNZhvfojWfHM8U/AGpgvy3BJBMoTKxE=; b=K
+	H5kXMzRJLCRfKUx7xm9MpURHHqr3pewIUOO+/z4FBwNYkU1njyUbv6vGG8B+OkIA
+	A00SYtxt61lmb+9eD8GdqoCaufUyD3IUiqwXHLID53sIl2RiME+kgZPb4S7GWJcc
+	ngHv5Yzxap9NMfbXO3FUHe/CkVxcW8Lv0EQ+DWVhSEuLsuxnYRVwyIPniGJLnPLb
+	i+6dW+awYUxIpMV+qCCtVyUftVYHDJzDEGo7VHG1iIifbJeWBTUU4H5AaxNcQzRI
+	qg/PzwqcF3RTwqQOQBNiaIfjQNHLrW7KAJkwz741+RbwL7JI1A1/9r8TqkkACZ/3
+	BHqYpXPjckz/y2TDEa8bw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1774261939; x=1774348339; bh=hJduocjrXMFZdNZhvfojWfHM8U/AGpgvy3B
+	JBMoTKxE=; b=KwA12vbPnobgmBTINviBQc0sZ6Gs8d2Vqf3Hg4t9diV0UP1Q0X6
+	pSQA1Feaoxuit7rw0hgA2SVwgJcEFTX1nOcq+BfkrCEHXeVJQamMyulNQt5Aw7WQ
+	V5rGtVwdX8YD5IndRMGcmab9vpeUGl4GLvAfX6oDaIEhZCHU2hPtqXj/gxFpD6Zk
+	JMYQulgN8LzhddTc5xeir02Ksx0IhMNRBGgDWkTG3/Y6cQhtW2EuZbEe07gJTaBt
+	IAD+jOcvfD1xsnw9O/mVwTcvTsQNwU6c6MpVVMLBUVFd0HFjdLCjVlJt1wU7doUP
+	cMVlWOPLujoVRpGFR7V7PEkUyPMCf5yqi9g==
+X-ME-Sender: <xms:sxbBad6-KzjXQzGArpRJEKYiXEoTkQEQELVgyABF521khGEsxh7Cag>
+    <xme:sxbBaU7WrCUy7dskj7vNRBD83XcUKN2lP9iRY3NdzGprLfOMNzjp-bbu6Ydb07aig
+    rld6SdW6y1C28h0MuFh9f65vHYSGLmaJlTfTXbqG8BBv37VIuYUZ9Vo>
+X-ME-Received: <xmr:sxbBabHhR6-mGeECY53f50Qq0sy_QETVEBB0OJPeMygSynNC8PkcilIKcauv>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefudekgeekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeekpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopegtvghlsehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthho
+    pehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrh
+    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhgvrhhnvghlqdhtlhhsqdhhrghnughs
+    hhgrkhgvsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheptghhuhgtkhdrlh
+    gvvhgvrhesohhrrggtlhgvrdgtohhmpdhrtghpthhtoheprghlihhsthgrihhrrdhfrhgr
+    nhgtihhsseifuggtrdgtohhmpdhrtghpthhtohephhgrrhgvsehsuhhsvgdruggv
+X-ME-Proxy: <xmx:sxbBaUUcRKQHp3AJ3mhyYLWlwAL23TY2CylV68gH0YZS7dgAXVz2kw>
+    <xmx:sxbBafVXxYqtytoDDvxVGCKasEoA28FHZV-wJR6mhqQOs4qG6dw68w>
+    <xmx:sxbBaaJxnCEYpKW3yB-n0uoSWyXvgPDAmS_EpEJlGr-4_CN3ttI9mw>
+    <xmx:sxbBafDCKaJTTLHjwnUfwVNDWGcGsV4F6oPq6PT3AlxwG1R41vs_LQ>
+    <xmx:sxbBaZqjAON9OzSwlUmxNHZiJUj-BfmPDRU54vNs6hrbyN4tnSo4Y6hN>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 23 Mar 2026 06:32:19 -0400 (EDT)
+Date: Mon, 23 Mar 2026 11:32:17 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Chuck Lever <cel@kernel.org>
+Cc: john.fastabend@gmail.com, kuba@kernel.org, netdev@vger.kernel.org,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH PATCH net-next v4 5/8] tls: Suppress spurious
+ saved_data_ready on all receive paths
+Message-ID: <acEWsQOtWq3B62yi@krikkit>
+References: <20260317-tls-read-sock-v4-0-ab1086ec600f@oracle.com>
+ <20260317-tls-read-sock-v4-5-ab1086ec600f@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260317-tls-read-sock-v4-5-ab1086ec600f@oracle.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-270464-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270463-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,lists.linux.dev,oracle.com,wdc.com,suse.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 54B182F0305
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,queasysnail.net:dkim]
+X-Rspamd-Queue-Id: 4E9D62F052C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello Carlo,
+2026-03-17, 11:04:18 -0400, Chuck Lever wrote:
+> From: Chuck Lever <chuck.lever@oracle.com>
+> 
+> Each record release via tls_strp_msg_done() triggers
+> tls_strp_check_rcv(), which calls tls_rx_msg_ready() and
+> fires saved_data_ready(). During a multi-record receive,
+> the first N-1 wakeups are pure overhead: the caller is
+> already running and will pick up subsequent records on
+> the next loop iteration. The same waste occurs on the
+> recvmsg and splice_read paths.
 
-On Sat, 21 Mar 2026 18:55:46 +0100
-Carlo Szelinsky <github@szelinsky.de> wrote:
+nit: splice_read is less of a problem since it doesn't loop over
+records?
 
-> Hey Kory, Hey Oleksij,
->=20
-> Thanks again for taking the time to give detailed feedback. I am not real=
-ly
-> experienced with working on the kernel, so I took some time to process and
-> get a clear picture. I will try to implement and test it asap... My action
-> points would be the following: 1. Replace the LED specific polling with s=
-ome
-> generic devm_pse_poll_helper() that is based on the existing pse_isr() lo=
-gic
-> but in a timer instead of an IRQ - pushing events through ntf_fifo /
-> pse_send_ntf_worker() like other IRQ-based controllers already do.=20
 
-Please add a patch to introduce the poll path before any LED support.
-I will test this new path with my boards with and without the IRQ configure=
-d.=20
+[...]
+> +void tls_strp_check_rcv_quiet(struct tls_strparser *strp)
+> +{
+> +	if (unlikely(strp->stopped) || strp->msg_ready)
+> +		return;
+> +
+> +	if (tls_strp_read_sock(strp) == -ENOMEM)
+> +		queue_work(tls_strp_wq, &strp->work);
+> +}
 
-> 2. Fire
-> LED triggers from the notification path, not from a separate poll loop: L=
-EDs
-> react to state changes e.g. they don't drive their own polling. 3. Fix
-> pse_pw_d_is_sw_pw_control() - it currently requires pcdev->irq to be set =
-in
-> the PSE_BUDGET_EVAL_STRAT_DISABLED path, so poll-only controllers like hs=
-104
-> would never enter software power control. Needs to also check for an acti=
-ve
-> poll worker. 4. Add #define for the default poll interval (e.g. 500ms) wi=
-th a
-> comment explainin why.
->=20
-> Did I understand you correctly to not waste any time?
+c/p of tls_strp_check_rcv isn't nice. Add a 'bool wake_up' argument
+instead? [but see the comment about recvmsg]
 
-Yes that's it.
 
-> Unclear is for me still:
-> * Poll helper design: new devm_pse_poll_helper() vs extending
-> devm_pse_irq_helper() with IRQ=3D0 fallback? I suggest a separate
-> devm_pse_poll_helper() - it keeps the IRQ and poll paths clean and symmet=
-ric,
-> and avoids overloading devm_pse_irq_helper() with conditional logic.
-> * Who decides to poll? The driver explicitly calls the poll helper, or the
-> core auto-detects missing IRQ? I suggest the driver decides explicitly - =
-the
-> driver knows its hardware best, and an explicit call is easier to review =
-and
-> reason about than auto-detection magic.
-> * DT property: rename led-poll-interval-ms to poll-interval-ms since poll=
-ing
-> is now generic? I suggest yes - the polling is no longer LED-specific, so=
- the
-> property name should reflect that.
-> * Kory mentioned two distinct cases: (a) controller has no IRQ support at=
- all
-> (like the hs104), (b) controller supports IRQ but it's not wired on the
-> board. Should both cases be handled by the same poll helper, or does (b) =
-need
-> different treatment? I suggest the same devm_pse_poll_helper() handles bo=
-th -
-> from the core's perspective the situation is identical: no IRQ available,
-> need to poll. The driver just calls the poll helper instead of the IRQ he=
-lper
-> in either case.
+>  void tls_strp_check_rcv(struct tls_strparser *strp)
+>  {
+>  	if (unlikely(strp->stopped) || strp->msg_ready)
+> @@ -551,6 +566,8 @@ void tls_strp_check_rcv(struct tls_strparser *strp)
+>  
+>  	if (tls_strp_read_sock(strp) == -ENOMEM)
+>  		queue_work(tls_strp_wq, &strp->work);
+> +	else if (strp->msg_ready)
+> +		tls_rx_msg_ready(strp);
 
-I agreed with all your points.
-Thank you!
+Since that's now the only caller of tls_rx_msg_ready, and all that
+does is call saved_data_ready, inline it here?
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> index 07f4a3d1a6f854acc7762608cc7741b3de95c195..381a723b6cacc669e333752af34f051f296d6f52 100644
+> --- a/net/tls/tls_sw.c
+> +++ b/net/tls/tls_sw.c
+> @@ -1384,7 +1384,10 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
+>  			return ret;
+>  
+>  		if (!skb_queue_empty(&sk->sk_receive_queue)) {
+> -			tls_strp_check_rcv(&ctx->strp);
+> +			/* tls_strp_check_rcv() is called at each receive
+> +			 * path's exit before the socket lock is released.
+> +			 */
+
+I'm not convinced this comment will make sense to someone reading the
+code outside of reviewing this series.
+
+> +			tls_strp_check_rcv_quiet(&ctx->strp);
+>  			if (tls_strp_msg_ready(ctx))
+>  				break;
+>  		}
+> @@ -1867,9 +1870,9 @@ static int tls_record_content_type(struct msghdr *msg, struct tls_msg *tlm,
+>  	return 1;
+>  }
+>  
+> -static void tls_rx_rec_done(struct tls_sw_context_rx *ctx)
+> +static void tls_rx_rec_release(struct tls_sw_context_rx *ctx)
+>  {
+> -	tls_strp_msg_done(&ctx->strp);
+> +	tls_strp_msg_release(&ctx->strp);
+>  }
+>  
+>  /* This function traverses the rx_list in tls receive context to copies the
+> @@ -2150,7 +2153,7 @@ int tls_sw_recvmsg(struct sock *sk,
+>  		err = tls_record_content_type(msg, tls_msg(darg.skb), &control);
+>  		if (err <= 0) {
+>  			DEBUG_NET_WARN_ON_ONCE(darg.zc);
+> -			tls_rx_rec_done(ctx);
+> +			tls_rx_rec_release(ctx);
+>  put_on_rx_list_err:
+>  			__skb_queue_tail(&ctx->rx_list, darg.skb);
+>  			goto recv_end;
+> @@ -2164,7 +2167,8 @@ int tls_sw_recvmsg(struct sock *sk,
+>  		/* TLS 1.3 may have updated the length by more than overhead */
+>  		rxm = strp_msg(darg.skb);
+>  		chunk = rxm->full_len;
+> -		tls_rx_rec_done(ctx);
+> +		tls_rx_rec_release(ctx);
+> +		tls_strp_check_rcv_quiet(&ctx->strp);
+
+This one worries me: if tls_strp_check_rcv_quiet() sets msg_ready=1
+without calling saved_data_ready. If we break out of the loop after
+this, the final tls_strp_check_rcv() just before returning from
+tls_sw_recvmsg() will do:
+
+void tls_strp_check_rcv(struct tls_strparser *strp, bool wake_up)
+{
+	if (unlikely(strp->stopped) || strp->msg_ready)
+		return;
+[...]
+
+and not call saved_data_ready?
+
+-- 
+Sabrina
 
