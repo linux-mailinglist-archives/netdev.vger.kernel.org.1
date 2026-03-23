@@ -1,170 +1,209 @@
-Return-Path: <netdev+bounces-270449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AK8CIXcPwWk7QQQAu9opvQ
-	(envelope-from <netdev+bounces-270449-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:01:27 +0100
+	id cMm9IUAUwWnkQQQAu9opvQ
+	(envelope-from <netdev+bounces-270460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:21:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B09152EF8FC
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:01:24 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 349DB2EFEC1
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:21:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B237B30541C6
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:55:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DCB6E301345E
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7596138643C;
-	Mon, 23 Mar 2026 09:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6545C38C2B0;
+	Mon, 23 Mar 2026 10:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KSobhkUH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KgcNyhNI"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000EF36DA10
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 09:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E6F38BF91
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 10:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774259742; cv=none; b=ja5slrqIVOg8p1qRyqMFhbsIAbduMbexHKWyHUKayj4LIVeCNwee7z+di+ngKXIDM0QT/BwLpPDMrsBLcx+tkTQKeDK2+qD85vz5KK0ada7IFx+Af49zMnpLv7Vxzu/K2W2goG2qetW3vqIPcqQdQW7Md+z60W2ziWwhSNJW/MY=
+	t=1774261204; cv=none; b=lS/tHBclBpS6p0zr50gLKtSlacSikfX6M1nbbeUKDrdFZ2/h8XiHgstuMYb61Pq28EjiWS/4wPQLonFUBIJQwzYwY12qVZScrfSeEB9yNKbFaki6xx97LNfrRmdH4nJP091YvsoVNguJmD2Y55kgtetEaeHiGH09czhC4egD/IA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774259742; c=relaxed/simple;
-	bh=GSqj15XOYgZ+z3rGtlQoS2JdFGH8XW37H8ENXEVYxQ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q+wbc9NWSBflJaZ0pZmM3pLUOnmrXh3iuPHjtjdbh/wokxnNKgMlY9He7Ql8WTtwaN7bn2JLVmeNIy7ZgKGUlKZapE/WgkosiCNfpbsCGgKpKxuOojlHIFcA9HeWIxBcVu29f3fokZ0H/t/8bmUdaBkFZxypvSORQHaI1WJBsCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KSobhkUH; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=lrsfFTGfYyLKxF07ePPhHcfSutGOTt7NkUKvGum/24k=; b=KSobhkUH1DcN4nToJvqyD5yAUQ
-	/YpHvXdbSzU/y6TgMZ2xtyfj7RPYzfRRFYJvfvJV8J5aiOWZgDg8+Otj13FDeCHV8cyXcj6+gVISn
-	Gp4j/vwmO0HAIkQSvho4ojB8Cgnow6dWrQ8onHswqgD55iniIYO9q8WKP/M6Pywi3EkY5I4Zv2Zlc
-	Ua/Yy8CL4gLXFmaIx4CdSXbes8YbsXVCJiC+jHf4ODYwLNia5zNHTJrLJobSaLhf1VGO+gw3NHXJU
-	BrNyURQGWUCtEdKSVuVDuWRkDoObJqSlntuD5RJHQOZuDT6VsZjm1Fu0tj4lLxOAuljroKiHj9FE6
-	tHgTrPqA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57086)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w4c0X-000000000GI-2nAx;
-	Mon, 23 Mar 2026 09:55:37 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w4c0W-000000003w9-0ocX;
-	Mon, 23 Mar 2026 09:55:36 +0000
-Date: Mon, 23 Mar 2026 09:55:36 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Cc: netdev@vger.kernel.org, imx@lists.linux.dev,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1774261204; c=relaxed/simple;
+	bh=rJcgrPWQRRkePOO40KXIXag2fQRkomt6sRhCEibc6tE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kvwkcXwAnnM9t2kqUtWGUdqKQuwnEMhkXyqSULAKKpavItYdPsS5kz4OqazeYaeNkV8AUeQy02SyhdC3b2JKUi2fjvSiUMbuS5bCM3wKl1x/rQIKpJ3wrv01PbAV9yzUzW2pel6j+Shx5INJ7UXpf/sTxE3cUTp0xeOpIgJd16w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KgcNyhNI; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-358ed696623so1232222a91.0
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 03:20:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774261202; x=1774866002; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PPISEH5msRmrdt2HTDD7YCjNoxtWOm3MOnXL7/GvkTE=;
+        b=KgcNyhNIfV05hBU+9CKnt+dPnvzPfF/k6rqaHim4eEXgB+CYnjenl4rnB8QOSlQenl
+         mIKkEpbTaikdWEUOmnz16VAZY7MlvbjZ/aj0I6TZnHdqIC0UKqG0ac57uK3ZSKFP4nqQ
+         vCMWkHrOYhU8dWIx36QEQzsHlMXbpkOnXfA3ATykbgHIeLYQk99p9xLJP5AX9nj9q/J5
+         OHwYh13ULh3PlIE4n8okJFS04KbuKr3R1xYfCkHX6dLUyeEHEbvBAo425nfC/VNBmMY2
+         sDKUTiu+At0/ano7pKEbXb9A9grBqo3SA+RFuE9LbFYybga2n3sNaBfNbtpPem3m9w4p
+         yoow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774261202; x=1774866002;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PPISEH5msRmrdt2HTDD7YCjNoxtWOm3MOnXL7/GvkTE=;
+        b=YzITsAmHufw3CuqlbXUiTNJyW2CPzig3FloOk16ZAkYeoYl18/XY0hksrJlLqJeSgT
+         VuwjotNwFItG1Py1lvBDhMiFygTiwPKRkYER+5JD7VtbIOlTS+B/FEaTYeLdjW+pLePY
+         55XMnkame0U+A/Lx+9XVEcQaKiB8OJ3DfdaXwAJyjILl3pFhZKrR6VyqUeLKllvhJerG
+         YjD+fuFToAtmFfDrJZH4+crju0nbPpTiKw7EWBQrD383g8bGASfF4x44LYufHGWru+1d
+         zAEaU4OhMVZyK3uaX8URhjatbpm5YYDTbLEMx9Bo+ZWr6iZnANCKdKqbRD/U1hYidyei
+         zoqw==
+X-Gm-Message-State: AOJu0YzrVkCenynuay9ZixelrdOBD5hQFVp0r0ob8IqxCei4RIAl/6Iq
+	Kr7/RV7DO7GiEwtQDGWnj/HItMjJ8BWasibTFUdz8/PNUeZKB8dlNyRN
+X-Gm-Gg: ATEYQzwx9iI/CVhngbD9IUD6iCHfpuJYSk9YEANc4podljIYBCvIh94jp+evVe08OfS
+	9jUDqVLIsAt0RPFklovAJnGCDAGwyL8Wbh8anTfPPMk7sdDkBEKPnsk9KuNKnGyjr3wvpHEg/LN
+	oMDG4nfYbQppSJknWGGOqwMqgOhK5YCwwSCBLfhj3vFfI5vcsW/wZvnByVrpE2k1Dy6TLs6tObv
+	/oDxmYnicguvEquOD2Rkdoqu9+pp0LXXU+F38Df0BrRMU/ymrZ7J61sJ3HT75cfoT4e6yqUYL0V
+	j5ntu0/FujhGCjyX2hCT8Fc5OEAeUnqQ4mj6x4g6KzbLxGQDhqbdzTzy3YpQoZJBcPRtwZanijQ
+	/7Vf62Xq5vftA7FLDkmQpucpwh7w5kba65XP+O/39SQBl0AlBEBTF3k1cURBOO60RiqcozvpLDq
+	DQv3z+tC/kyaV4s5Db5fqz8+0NQ7YmuEsJImi0ODVLeuWIK67wgubJRlAW2FRhj9314PiblcDiE
+	mIsyIgs7ig=
+X-Received: by 2002:a17:90b:3d48:b0:359:fecd:1cd3 with SMTP id 98e67ed59e1d1-35bd2d1cf08mr8744522a91.23.1774261202396;
+        Mon, 23 Mar 2026 03:20:02 -0700 (PDT)
+Received: from SLSGDTSWING002.tail0ac356.ts.net ([129.126.109.177])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35bd4130765sm8937856a91.16.2026.03.23.03.19.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2026 03:20:01 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Francesco Dolcini <francesco.dolcini@toradex.com>,
-	Frank Li <Frank.Li@nxp.com>, Jakub Kicinski <kuba@kernel.org>,
-	Joy Zou <joy.zou@nxp.com>,
-	Kieran Bingham <kieran.bingham@ideasonboard.com>,
-	Marco Felsch <m.felsch@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Stefan Klug <stefan.klug@ideasonboard.com>,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 1/2] net: stmmac: provide flag to disable EEE
-Message-ID: <acEOGMHfYsxv3GOk@shell.armlinux.org.uk>
-References: <20260323093933.1785583-1-laurent.pinchart@ideasonboard.com>
- <20260323093933.1785583-2-laurent.pinchart@ideasonboard.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH net v2] vxlan: fix NULL dereference in vxlan_igmp_join() and vxlan_igmp_leave()
+Date: Mon, 23 Mar 2026 17:55:47 +0800
+Message-ID: <20260323095544.3311285-4-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260323093933.1785583-2-laurent.pinchart@ideasonboard.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270449-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,lunn.ch,davemloft.net,google.com,gmail.com,toradex.com,nxp.com,kernel.org,ideasonboard.com,pengutronix.de,redhat.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[vger.kernel.org,asu.edu,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.892];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270460-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shell.armlinux.org.uk:mid,armlinux.org.uk:email,armlinux.org.uk:url,ideasonboard.com:email]
-X-Rspamd-Queue-Id: B09152EF8FC
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,asu.edu:email]
+X-Rspamd-Queue-Id: 349DB2EFEC1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 23, 2026 at 11:39:32AM +0200, Laurent Pinchart wrote:
-> From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-> 
-> Some platforms have problems when EEE is enabled, and thus need a way
-> to disable stmmac EEE support. Add a flag before the other LPI related
-> flags which tells stmmac to avoid populating the phylink LPI
-> capabilities, which causes phylink to call phy_disable_eee() for any
-> PHY that is attached to the affected phylink instance.
-> 
-> iMX8MP is an example - the lpi_intr_o signal is wired to an OR gate
-> along with the main dwmac interrupts. Since lpi_intr_o is synchronous
-> to the receive clock domain, and takes four clock cycles to clear, this
-> leads to interrupt storms as the interrupt remains asserted for some
-> time after the LPI control and status register is read.
-> 
-> This problem becomes worse when the receive clock from the PHY stops
-> when the receive path enters LPI state - which means that lpi_intr_o
-> can not deassert until the clock restarts. Since the LPI state of the
-> receive path depends on the link partner, this is out of our control.
-> We could disable RX clock stop at the PHY, but that doesn't get around
-> the slow-to-deassert lpi_intr_o mentioned in the above paragraph.
-> 
-> Previously, iMX8MP worked around this by disabling gigabit EEE, but
-> this is insufficient - the problem is also visible at 100M speeds,
-> where the receive clock is slower.
-> 
-> There is extensive discussion and investigation in the thread linked
-> below, the result of which is summarised in this commit message.
-> 
-> Reported-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-> Closes: https://lore.kernel.org/r/20251026122905.29028-1-laurent.pinchart@ideasonboard.com
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+vxlan_sock_add() tolerates IPv6 socket creation failure with
+-EAFNOSUPPORT and brings the VXLAN device up with only an IPv4
+socket, leaving vn6_sock as NULL.
 
-As you are sending this on my behalf, you need to add your s-o-b after
-mine:
+However, vxlan_igmp_join() and vxlan_igmp_leave() unconditionally
+dereference vn6_sock when handling multicast group operations for
+IPv6. When a VNI filter entry with an IPv6 multicast group is
+added via RTM_NEWTUNNEL on a collect-metadata VXLAN device where
+the IPv6 socket was not created, the NULL vn6_sock pointer is
+dereferenced, causing a kernel crash.
 
- Any further SoBs (Signed-off-by:'s) following the author's SoB are from
- people handling and transporting the patch, but were not involved in its
- development. SoB chains should reflect the **real** route a patch took
- as it was propagated to the maintainers and ultimately to Linus, with
- the first SoB entry signalling primary authorship of a single author.
+This can be triggered by booting with ipv6.disable=1, creating a
+collect-metadata VXLAN device with vnifilter, and adding a VNI
+filter entry with an IPv6 multicast group.
 
-Thanks.
+ BUG: kernel NULL pointer dereference, address: 0000000000000010
+ Oops: Oops: 0000 [#1] SMP NOPTI
+ RIP: 0010:vxlan_igmp_join (drivers/net/vxlan/vxlan_multicast.c:40)
+ Call Trace:
+  <TASK>
+  vxlan_vni_update_group (drivers/net/vxlan/vxlan_vnifilter.c:573)
+  vxlan_vnifilter_process (drivers/net/vxlan/vxlan_vnifilter.c:976)
+  rtnetlink_rcv_msg (net/core/rtnetlink.c:6986)
+  netlink_rcv_skb (net/netlink/af_netlink.c:2550)
+  rtnetlink_rcv (net/core/rtnetlink.c:7005)
+  netlink_unicast (net/netlink/af_netlink.c:1344)
+  netlink_sendmsg (net/netlink/af_netlink.c:1894)
+  ____sys_sendmsg (net/socket.c:2592)
+  ___sys_sendmsg (net/socket.c:2648)
+  __sys_sendmsg (net/socket.c:2678)
+  do_syscall_64 (arch/x86/entry/syscall_64.c:94)
+  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+  </TASK>
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Fix this by adding NULL checks for vn6_sock in both
+vxlan_igmp_join() and vxlan_igmp_leave() before dereferencing.
+Return 0 rather than an error code because all callers treat
+non-zero returns as fatal -- vxlan_vni_update_group() would
+abort a VNI add that already inserted into the hash table,
+and vxlan_multicast_join_vnigrp() would fail vxlan_open().
+Since vxlan_sock_add() already accepts -EAFNOSUPPORT as a
+non-error condition, the multicast helpers should do the same
+by simply skipping the join/leave when the socket is absent.
+
+Fixes: f9c4bb0b245c ("vxlan: vni filtering support on collect metadata device")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+---
+v2:
+ - Drop unnecessary sock4 NULL checksjjj
+---
+ drivers/net/vxlan/vxlan_multicast.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/net/vxlan/vxlan_multicast.c b/drivers/net/vxlan/vxlan_multicast.c
+index a7f2d67dc61b8..a442c9e6d1a72 100644
+--- a/drivers/net/vxlan/vxlan_multicast.c
++++ b/drivers/net/vxlan/vxlan_multicast.c
+@@ -37,6 +37,8 @@ int vxlan_igmp_join(struct vxlan_dev *vxlan, union vxlan_addr *rip,
+ 	} else {
+ 		struct vxlan_sock *sock6 = rtnl_dereference(vxlan->vn6_sock);
+
++		if (!sock6)
++			return 0;
+ 		sk = sock6->sock->sk;
+ 		lock_sock(sk);
+ 		ret = ipv6_stub->ipv6_sock_mc_join(sk, ifindex,
+@@ -71,6 +73,8 @@ int vxlan_igmp_leave(struct vxlan_dev *vxlan, union vxlan_addr *rip,
+ 	} else {
+ 		struct vxlan_sock *sock6 = rtnl_dereference(vxlan->vn6_sock);
+
++		if (!sock6)
++			return 0;
+ 		sk = sock6->sock->sk;
+ 		lock_sock(sk);
+ 		ret = ipv6_stub->ipv6_sock_mc_drop(sk, ifindex,
+--
+2.43.0
 
