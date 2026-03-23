@@ -1,138 +1,140 @@
-Return-Path: <netdev+bounces-270704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270705-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QAo0LL2dwWmFUAQAu9opvQ
-	(envelope-from <netdev+bounces-270704-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:08:29 +0100
+	id iL1sDLmZwWlNUAQAu9opvQ
+	(envelope-from <netdev+bounces-270705-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:51:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542E72FCE72
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:08:29 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1927D2FCA2A
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:51:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 65F2D311DE0C
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:48:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7478F300C6D3
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:49:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0053DCDBB;
-	Mon, 23 Mar 2026 19:48:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOD2+Fg/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02CE3DD50F;
+	Mon, 23 Mar 2026 19:49:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C4834250E;
-	Mon, 23 Mar 2026 19:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B70389E01;
+	Mon, 23 Mar 2026 19:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774295285; cv=none; b=o7sQuQmQAv1aqUIGELNcCifI466rxC9iOWjR45icFIMAxYDRDfqdd+Q6RolkXylU9N6DoshGPqO8evs07/nSE2llG4PpXeimfD+g+hcaHXAtwSS18zFRx8sotYEI5xhXHAuTJU4w28SstCrgAm8LhqJolEQU4lQInoOSgJHM62c=
+	t=1774295375; cv=none; b=Y5Q8kg2SViKUAtvBfVJ29rR9stqDiIiIL7Xqf08J/NSDKFkALcOsBNQS6SRAItx08zWIy0Fhtu4iFe2h4358+GtZFgztXqPvCGiZwlPNv7YS75tfS8X2FUAkT7cmXEkUxu0FAiWRX8aDOsVYbOz6mm3wfiaJueXm/1s+q6yH5/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774295285; c=relaxed/simple;
-	bh=SHnio8tSnG8NWlOkobDBosLZL29iinvQCLbdljIlaRU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=breEaFHScbHf8zQfUjnIizU0qHR2aVrD8p+uvk7eNiauT5my7AIhilB/pe9TaTU4e0Do67upoVvo8Rfohwi6P/sZF0kmJ3UHSkzpiFn0fwtFNa2e9DhyRs0yL2q46sMIfJXkjOm7ynFQhNUN8k+xrQ3X6ZrSCo+SvR/4cYTGT5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOD2+Fg/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75D2CC4CEF7;
-	Mon, 23 Mar 2026 19:48:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774295284;
-	bh=SHnio8tSnG8NWlOkobDBosLZL29iinvQCLbdljIlaRU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fOD2+Fg/JSDS1W6G7wkG8LiPf3EEAXvjUhDOZfI4I01cbcK5pOp6nzqOXEDUvzyhy
-	 ku4Z2/OS5OjUyJNBTHbOoDX+cNSEVg+TOS4OfQ2X2rZ/NkxVr1L8AHGZV3t6Z5BKET
-	 mp8txeYxx6gDgqn7Ty1pXLQ1GkQB7Nh3DCSKhCgZYxQIsm7etRqbZL2yKU+hedFSVC
-	 W/YWFT0gmuPy9ZWjcXpKTvYbpWispuCDhMqij6+hIiGXZi9Ov5y/J1RjMkQ62hNBgC
-	 QTEMDDFbxTtl7L8UI1CXy+hRJwwgjyWU8d0vcXmRUkanMkWa0u+vYVzOreNLAzru0l
-	 thF0X8W8MoKkg==
-Date: Mon, 23 Mar 2026 14:48:03 -0500
-From: Rob Herring <robh@kernel.org>
-To: Biju <biju.das.au@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1774295375; c=relaxed/simple;
+	bh=u4MIGR0G7gWlY1ZvVph1CrMNjP1gGdUYCJkK+C33fvA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PWWgF0257SQl1UCQqi2HzUm/xHtb0fI7l8WQ70XlmWoWPrsqyEB2DEzVJDzPDFb2uhqzXpaxZBMChZv2ETJS11hkOCIUIo2jk1ZBaG0QnVC1SSaaESOZaZk9+BL03cZzauBz8CbB5TWRQ7LlgvMfrWBL33F2Pu//8Pw88DMRfB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id 7294820B710C; Mon, 23 Mar 2026 12:49:34 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7294820B710C
+From: Long Li <longli@microsoft.com>
+To: Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Paul Barker <paul@pbarker.dev>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Sergei Shtylyov <sergei.shtylyov@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net-next] dt-bindings: net: Remove redundant
- ethernet-phy-ieee802.3-c22 fallback
-Message-ID: <20260323194803.GA1241974-robh@kernel.org>
-References: <20260313130623.297712-1-biju.das.jz@bp.renesas.com>
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] net: mana: Set default number of queues to 16
+Date: Mon, 23 Mar 2026 12:49:25 -0700
+Message-ID: <20260323194925.1766385-1-longli@microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260313130623.297712-1-biju.das.jz@bp.renesas.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [3.54 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270704-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270705-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,ragnatech.se,glider.be,bp.renesas.com,armlinux.org.uk,pbarker.dev,linaro.org,vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.985];
+	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 542E72FCE72
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1927D2FCA2A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 13, 2026 at 01:06:21PM +0000, Biju wrote:
-> From: Biju Das <biju.das.jz@bp.renesas.com>
-> 
-> Drop the ethernet-phy-ieee802.3-c22 compatible string from ethernet PHY
-> bindings and their examples. The c22 fallback is implicitly assumed for
-> PHY ID-based compatible strings and does not need to be stated explicitly,
-> unlike c45 which requires opt-in.
-> 
-> Remove the c22 pattern from the ethernet-phy.yaml schema and update
-> examples in amlogic,g12a-mdio-mux, mscc-phy-vsc8531, renesas,ether,
-> and renesas,etheravb bindings accordingly.
+Set the default number of queues per vPort to MANA_DEF_NUM_QUEUES (16),
+as 16 queues can achieve optimal throughput for typical workloads. The
+actual number of queues may be lower if it exceeds the hardware reported
+limit. Users can increase the number of queues up to max_queues via
+ethtool if needed.
 
-This will introduce a ton of warnings in .dts files which I don't think 
-anyone wants to go fix.
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+v2:
+  - Updated commit message to clarify that the actual number of queues
+    may be lower if it exceeds the hardware reported limit.
 
-While I think it's redundant to have the c22 (or c45) fallback as it 
-isn't really useful on its own, I think we are too far down that path.
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 3 ++-
+ include/net/mana/mana.h                       | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-You need a custom 'select' in all the schemas that have a c22 
-compatible to exclude it from matching.
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 49c65cc1697c..b39e8b920791 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -3357,7 +3357,8 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 	apc->ac = ac;
+ 	apc->ndev = ndev;
+ 	apc->max_queues = gc->max_num_queues;
+-	apc->num_queues = gc->max_num_queues;
++	/* Use MANA_DEF_NUM_QUEUES as default, still honoring the HW limit */
++	apc->num_queues = min(gc->max_num_queues, MANA_DEF_NUM_QUEUES);
+ 	apc->tx_queue_size = DEF_TX_BUFFERS_PER_QUEUE;
+ 	apc->rx_queue_size = DEF_RX_BUFFERS_PER_QUEUE;
+ 	apc->port_handle = INVALID_MANA_HANDLE;
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 3336688fed5e..96d21cbbdee2 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -1007,6 +1007,7 @@ struct mana_deregister_filter_resp {
+ #define STATISTICS_FLAGS_TX_ERRORS_GDMA_ERROR		0x0000000004000000
+ 
+ #define MANA_MAX_NUM_QUEUES 64
++#define MANA_DEF_NUM_QUEUES 16
+ 
+ #define MANA_SHORT_VPORT_OFFSET_MAX ((1U << 8) - 1)
+ 
+-- 
+2.43.0
 
-Rob
 
