@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-270724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270726-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OJwsJ16jwWknUQQAu9opvQ
-	(envelope-from <netdev+bounces-270724-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:32:30 +0100
+	id 6IrxHfahwWknUQQAu9opvQ
+	(envelope-from <netdev+bounces-270726-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:26:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26DF92FD4D6
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:32:30 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04FBB2FD2FF
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:26:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C33BE30620C7
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:19:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 14425307828D
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A6D3DDDCD;
-	Mon, 23 Mar 2026 20:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6133DEFE7;
+	Mon, 23 Mar 2026 20:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z+eoYf9A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fi9AWFBS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0DA3B9600
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 20:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63C23DDDB1
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 20:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774297192; cv=none; b=cZXP1EZW0Jma6ohXCajk8vq4XKvYvxmFBmpsQNlIAoSzRrBPkRmnodh6P8BvigcUNDwqVqo1hoHBOJdbkbGaEQkdY4L3mYN73BMVW0c3sCt48YYpGShz5mfFzQ//Nt/ohlKMkoeBwo7VcAGks1Nz5v6cNeCf6n+abJR0UJTod7s=
+	t=1774297194; cv=none; b=SGLvMpEJZVpG46QjqATIbjG/NWfDKZRXw5gFVllAZK//V50zfxj/RMoAQEb7OWVRprWo4ccj+7r9Y4dGwjzOtU08LgUlHIPBjbr+vpqldPGyzk7ppCmq39iS+Bz9G9+A1bfK38UA0yOfR3vrcUe9YaloT8Dfwor0RrDMZu+Guzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774297192; c=relaxed/simple;
-	bh=B/iMACF8boppVlhKT3EV3WhxAci2tfI24r1XLay4l54=;
+	s=arc-20240116; t=1774297194; c=relaxed/simple;
+	bh=jaVCjToO+gpl0Xhk9wiD6+mjNpwl6V+EE9cW4gICpe0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VLJFoNCW/gRAUsjQayAJiWtXLzOXOBVCtD55MR4rw+A5wNWADm9YXtkXbPGMAjSHAg4O9ZxiNHVLHjONXOgsDNTtiqTUT79wvEpEx44N5oMorJ0oFW81JbSXnQICbo2wkMQtXcrtHnR/W78UL3o5KPJratwkcc0iwc0n9mOSezQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z+eoYf9A; arc=none smtp.client-ip=209.85.167.42
+	 MIME-Version; b=lg8C11N5QWBXq6WL0uKuftgdYC6WtX69no4mL6SFo/OhORcipQXR0itrrxj3YEgkWheAPk7hn0ZDK2rLhqyWqqN4K+9MZRdA0acGxt2voTuu+Pk/tzGxxbttnkfpbD8JyzFCyKkZqyPN7EVSoRN06vqTVopcSvamp3iXmz9r2E4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fi9AWFBS; arc=none smtp.client-ip=209.85.208.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59e4a04f059so2842865e87.2
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 13:19:51 -0700 (PDT)
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-38a76ba6a78so30103311fa.0
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 13:19:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774297189; x=1774901989; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774297190; x=1774901990; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=y1xlgAKziwDGy7HCoeKtXi6eXYVXotOIcpLXVMuXXLU=;
-        b=Z+eoYf9AyINynE2liAc2JHbHyI5tbF01/6V/3WC7b4juBS/QB42VkYnDasQC5kZsGx
-         TbFizs1+0ckRAGZ2Wg86t9SwFHzkE5FoLS2TIOoy290MyZpQaTgz8bQBhfXff8on3HXq
-         yUQbCAYjRzo0N9bVLwCoCJn0ZHn9gTe4DOlZpUtR9bkJj83YKN/FJ5ZcOdyzb9qr3VoG
-         XJvbiRTcpOXT2XPlzCHepFJF9k9t3gfiqtodtUV5iNCmHm9k0bNtCTj1ZTB7IlUOzcDm
-         XtRbgJcecO9YUKK6eSff7HN1pE4mOxf2j6/sYrhJ8H77+6MCducHRqb1rBU2LuMqwES+
-         R9gA==
+        bh=tKcR9KDseDj3TeztQh/9bADUvUV+mYPWEL56B3A2aDE=;
+        b=fi9AWFBSX8xA2HTD7SW1FLe3Ua4YhEFQixpl2S1+0vHJnNqLTVWVDLQ/TI8X1JsD29
+         QD4evJFeOOUsjsv0yHS0rGy1sn9fUxhZjFMs8IivJiqeYkXemAO3oL42KoouoBa7rz/7
+         10qmxLb8bL9ftQeVLS9Aop+k5AU31wLDwg85g48TYYr2u51O3yxuccTlbuVv99M80CnZ
+         ZZ+9ULW1V/1yPbQgXRRGlKBgRd1iSwtRvk8LQsrsI1Pu8bLK9GPr6WDGIfOsbkx6fY/P
+         hWibIpkCawphjYzRNNcKB2iu1TMtCjGMCgUbw5LbjSdHGnLV9hOEG5yGSLcGyA8guWrh
+         q/kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774297189; x=1774901989;
+        d=1e100.net; s=20251104; t=1774297190; x=1774901990;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=y1xlgAKziwDGy7HCoeKtXi6eXYVXotOIcpLXVMuXXLU=;
-        b=rxEz3pYJUpI4UiKjYG6Dc2Y2+upRX/RaY8rzPiedbfMPDYNBEhNyhpJ6xwCWT+gBzC
-         +FJW1dwzU6cdPhsMqlic//WI48JZQ6fVOFY/iIElmJVWDL9l5ZLX3VCNfxA35LwqzIvZ
-         kO6uZ0Oi4LeT34k4Gjgqjj7byGzgyiOviOe90F01TADR1Q1lCHvmtwahkuFK19LJ9P4o
-         zdtdkvY6ptoxlwnpin4ySA6dBpg0ZplHlYzSzxoGb+fqk4aW1n0XDj+zzUcVpCSInz6k
-         0qqFB/FLvsxItm2IqmYxqZ8P/xZN1zvlTOSiKPl8txb7xJ55YSGF5VP2ltb427pP2so8
-         qj7w==
-X-Gm-Message-State: AOJu0YwTrjuAoLASCZeqhpsC4F0/wDi+HwDwJ8OyRk8XKabEGlvP9SO5
-	BE6iFudsbsCVuKqMEYayK9GW1yCKgVOqStY0qiil1zhZjK4XzsNemEz2l9BqO/kz
-X-Gm-Gg: ATEYQzy2D7PLejaXe2iIPGMSjj4C2TDdVEnvNl8Ew4yVkb/ro9NpUf7K7ayXPrTVKuN
-	yG4yFVbGHwIWa0A1mEMDJ/YlH+SGWAb1OQgek04xRZvqOZzp9d/6PERL0fsojzzignEe0VoAr5E
-	LOwCsOS9BEAs+KFhZu9nurEmIXhwidkYmvXHsOLgXHmL1waLTFgjtEPce9TldBEFKeg4TZTdbEc
-	DL73s9X50Mr1PO+wqstRBoK1n+wCXHmjkCv6VFsrFm4pclqOJpxDIsW8TQH7VlEB0g4wfotKCAG
-	hsXLqgDPptMwIQIb9zSHaamMuIpZn7ZF0Ma5bijlHzMLxB+UOq0YPVOgwwQzyfbT7pjyhopx4Eo
-	yof8VgeNH3KvKdV6q/oKyub/IyTidaiH5YUyXlSysdhg69lOBQFz/GE5lrtEQCHjZ3Zify45G0U
-	ZV4Z+l51Ml7LIxkiAlB3vlhfT50B1cOeaSj23ueOWT7Y49aY1MDI5f44SNeYHj/rKcLPncbX29V
-	TbbBYpOlFcAKfpXTw==
-X-Received: by 2002:a05:6512:39d2:b0:5a1:2e0c:86de with SMTP id 2adb3069b0e04-5a285b523d7mr5516711e87.32.1774297189065;
-        Mon, 23 Mar 2026 13:19:49 -0700 (PDT)
+        bh=tKcR9KDseDj3TeztQh/9bADUvUV+mYPWEL56B3A2aDE=;
+        b=AnWaYU8pmTV1zTDu84z6RUUsAfWsouiL9fcpYRmJc0qUMG7LFmCIqVfg3EhdQUml8M
+         qGngRM3M/9QrbyAwUhnt9E4Q6UWyKcuXEYzaVsuJHXrIIkgNF8/IOxPzkTtHjuT5XAW6
+         Jo5JPlPRFrt6qahUW1rkOIUa9gnkFsCQAHWLRWE/HUgjU5tpdJbM+B2GpbFaACJnfnmX
+         iI1c55C8yrIdtgE0lWoguLlguX0YT+6b0cvDeuDZ3QKRRsmGGaM4LDpBPWm9ULdyCCh3
+         wuAVc5oskaI+R9+HPYhyCjiwThg1Tws48duxDCp6nKDdC9RSAI9+I8mvxrGLbx67vGSC
+         O2dg==
+X-Gm-Message-State: AOJu0YwDPAjcbhJ+clkbDzQ80wHrIrW2BMiXRL9QNqXIPWSKswlfq5Q2
+	qDYkgGlgEqpOYEwAo2B38D59H6tRalqpZc6S7PyELik1Qv0VfSRm7/wAwVOtuLk+
+X-Gm-Gg: ATEYQzzuC7YQWQolSQmj/Q75WEtLyYIB9gXjlFB1/zkY2O00fTLLDRQ+CVuQy2aFBon
+	chlQqTJngboJ/mnkDyPXv76TzfGeBXs270mDbaVkUn04vOg8rP+7hkMT3GfsuaIturuYy8ORZHh
+	Ai8iEULM6V39svqcbCEQEWofeq6byZ3PLKRJr9fXRuvdAgXyssAFFtkT7Lgenbu9e5bGphlEa/S
+	R2gjFvb6K+H57S+942DQbtcmSIB6utfXZclFSuOLvpZfLnLn2b4S9+D9yiI1r30bYC+N0Mg2vLR
+	nJgRyMU43XdjsUdM2vi1ec8e3lZID4dgP5OC7tNdmzf6zhYwBjbWBcBgwCW38woTxOJD6qxm+w+
+	9dfArlB1Oo/70flAtHgQpbruJbtsHdbmNMpg0hkosaJ4+saBfNJlVcYC57kLFLn2Y7dtfxzrlrY
+	ecd9IffDXbldXsnng0V2VdRTIFDj1K0DrMEHc7uTcAS4pw4S7+Hd3Bv6VUJJX8f88X4dkACmNUh
+	VmQi0qSMmocx66FlA==
+X-Received: by 2002:a05:6512:234c:b0:5a1:3485:1c29 with SMTP id 2adb3069b0e04-5a285ae2a00mr3763339e87.6.1774297190199;
+        Mon, 23 Mar 2026 13:19:50 -0700 (PDT)
 Received: from localhost.localdomain (46-138-191-69.dynamic.spd-mgts.ru. [46.138.191.69])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a285207365sm2720623e87.42.2026.03.23.13.19.48
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a285207365sm2720623e87.42.2026.03.23.13.19.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2026 13:19:48 -0700 (PDT)
+        Mon, 23 Mar 2026 13:19:49 -0700 (PDT)
 From: Artem Lytkin <iprintercanon@gmail.com>
 To: netdev@vger.kernel.org,
 	rust-for-linux@vger.kernel.org
@@ -85,9 +85,9 @@ Cc: fujita.tomonori@gmail.com,
 	tmgross@umich.edu,
 	ojeda@kernel.org,
 	dakr@kernel.org
-Subject: [PATCH 2/4] rust: phy: add paged register access and bit manipulation helpers
-Date: Mon, 23 Mar 2026 23:19:23 +0300
-Message-ID: <20260323201925.8405-2-iprintercanon@gmail.com>
+Subject: [PATCH 3/4] rust: phy: add config_init, read_page, and write_page callbacks
+Date: Mon, 23 Mar 2026 23:19:24 +0300
+Message-ID: <20260323201925.8405-3-iprintercanon@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260323201925.8405-1-iprintercanon@gmail.com>
 References: <20260323201925.8405-1-iprintercanon@gmail.com>
@@ -105,11 +105,11 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270724-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270726-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,umich.edu,kernel.org];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -126,88 +126,159 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 26DF92FD4D6
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 04FBB2FD2FF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add Device methods for register manipulation beyond simple read/write:
+Add three new driver callbacks to the PHY abstraction:
 
-  - write_paged(): Writes a register on a specific page, completing
-    the paged access surface (read_paged already existed upstream).
-    Wraps phy_write_paged().
+  - config_init: Called to initialize the PHY after a reset. This is
+    needed by nearly all real-world PHY drivers to configure
+    vendor-specific registers (RGMII delays, LED settings, etc.).
+    config_init was previously proposed in an RFC for the Rockchip PHY
+    driver but not merged at that time. This re-introduces it in a
+    form consistent with the existing vtable infrastructure.
 
-  - modify() / modify_paged(): Atomic read-modify-write operations
-    that clear bits in mask and set bits in set. Wraps phy_modify()
-    and phy_modify_paged(). These return Result (not the old register
-    value) since the C functions return 0 on success.
+  - read_page / write_page: Required by page-based PHY chips (Realtek,
+    Marvell) for the kernel's paged register access infrastructure.
+    When these callbacks are registered, phy_read_paged(),
+    phy_write_paged(), and phy_modify_paged() use them to switch
+    register pages. Both must be implemented together.
 
-  - set_bits() / clear_bits(): Convenience wrappers around modify()
-    for the common case of setting or clearing specific bits.
-
-These helpers are heavily used by real-world PHY drivers for
-configuring vendor-specific registers without races.
+Each callback follows the established Adapter<T> pattern with
+unsafe extern "C" fn bridging to the Rust Driver trait method, and
+conditional registration in create_phy_driver() via HAS_* flags
+generated by the #[vtable] macro.
 
 Signed-off-by: Artem Lytkin <iprintercanon@gmail.com>
 ---
- rust/kernel/net/phy.rs | 43 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ rust/kernel/net/phy.rs | 83 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 83 insertions(+)
 
 diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index 646b2a78a2710..43d1ee360268b 100644
+index 43d1ee360268b..8fb34d34fe7de 100644
 --- a/rust/kernel/net/phy.rs
 +++ b/rust/kernel/net/phy.rs
-@@ -241,6 +241,49 @@ pub fn read_paged(&mut self, page: u16, regnum: u16) -> Result<u16> {
-         to_result(ret).map(|()| ret as u16)
-     }
+@@ -390,6 +390,51 @@ struct Adapter<T: Driver> {
+ }
  
-+    /// Writes a paged register.
-+    pub fn write_paged(&mut self, page: u16, regnum: u16, val: u16) -> Result {
-+        let phydev = self.0.get();
-+        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-+        // So it's just an FFI call.
-+        let ret =
-+            unsafe { bindings::phy_write_paged(phydev, page.into(), regnum.into(), val) };
-+
-+        to_result(ret)
-+    }
-+
-+    /// Performs a read-modify-write on a PHY register.
+ impl<T: Driver> Adapter<T> {
++    /// # Safety
 +    ///
-+    /// Clears the bits set in `mask` and sets the bits in `set`.
-+    pub fn modify(&mut self, regnum: u16, mask: u16, set: u16) -> Result {
-+        let phydev = self.0.get();
-+        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-+        // So it's just an FFI call.
-+        to_result(unsafe { bindings::phy_modify(phydev, regnum.into(), mask, set) })
-+    }
-+
-+    /// Performs a read-modify-write on a paged PHY register.
-+    ///
-+    /// Selects the page, performs the modify, and restores the original page.
-+    pub fn modify_paged(&mut self, page: u16, regnum: u16, mask: u16, set: u16) -> Result {
-+        let phydev = self.0.get();
-+        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-+        // So it's just an FFI call.
-+        to_result(unsafe {
-+            bindings::phy_modify_paged(phydev, page.into(), regnum.into(), mask, set)
++    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
++    unsafe extern "C" fn config_init_callback(phydev: *mut bindings::phy_device) -> c_int {
++        from_result(|| {
++            // SAFETY: The C core calls config_init with the PHY mutex held
++            // (from phy_init_hw), so the accessors on `Device` are okay to call.
++            let dev = unsafe { Device::from_raw(phydev) };
++            T::config_init(dev)?;
++            Ok(0)
 +        })
 +    }
 +
-+    /// Sets bits in a PHY register.
-+    pub fn set_bits(&mut self, regnum: u16, val: u16) -> Result {
-+        self.modify(regnum, 0, val)
++    /// # Safety
++    ///
++    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
++    unsafe extern "C" fn read_page_callback(phydev: *mut bindings::phy_device) -> c_int {
++        from_result(|| {
++            // SAFETY: This callback is called only in contexts
++            // where we hold `phy_device->lock`, so the accessors on
++            // `Device` are okay to call.
++            let dev = unsafe { Device::from_raw(phydev) };
++            let page = T::read_page(dev)?;
++            Ok(page.into())
++        })
 +    }
 +
-+    /// Clears bits in a PHY register.
-+    pub fn clear_bits(&mut self, regnum: u16, val: u16) -> Result {
-+        self.modify(regnum, val, 0)
++    /// # Safety
++    ///
++    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
++    unsafe extern "C" fn write_page_callback(
++        phydev: *mut bindings::phy_device,
++        page: c_int,
++    ) -> c_int {
++        from_result(|| {
++            // SAFETY: This callback is called only in contexts
++            // where we hold `phy_device->lock`, so the accessors on
++            // `Device` are okay to call.
++            let dev = unsafe { Device::from_raw(phydev) };
++            let page = u16::try_from(page).map_err(|_| code::EINVAL)?;
++            T::write_page(dev, page)?;
++            Ok(0)
++        })
 +    }
 +
-     /// Resolves the advertisements into PHY settings.
-     pub fn resolve_aneg_linkmode(&mut self) {
-         let phydev = self.0.get();
+     /// # Safety
+     ///
+     /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+@@ -582,6 +627,11 @@ pub const fn create_phy_driver<T: Driver>() -> DriverVTable {
+         flags: T::FLAGS,
+         phy_id: T::PHY_DEVICE_ID.id(),
+         phy_id_mask: T::PHY_DEVICE_ID.mask_as_int(),
++        config_init: if T::HAS_CONFIG_INIT {
++            Some(Adapter::<T>::config_init_callback)
++        } else {
++            None
++        },
+         soft_reset: if T::HAS_SOFT_RESET {
+             Some(Adapter::<T>::soft_reset_callback)
+         } else {
+@@ -632,6 +682,16 @@ pub const fn create_phy_driver<T: Driver>() -> DriverVTable {
+         } else {
+             None
+         },
++        read_page: if T::HAS_READ_PAGE {
++            Some(Adapter::<T>::read_page_callback)
++        } else {
++            None
++        },
++        write_page: if T::HAS_WRITE_PAGE {
++            Some(Adapter::<T>::write_page_callback)
++        } else {
++            None
++        },
+         link_change_notify: if T::HAS_LINK_CHANGE_NOTIFY {
+             Some(Adapter::<T>::link_change_notify_callback)
+         } else {
+@@ -659,6 +719,11 @@ pub trait Driver {
+     /// The default id and mask are zero.
+     const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_custom_mask(0, 0);
+ 
++    /// Called to initialize the PHY, including after a reset.
++    fn config_init(_dev: &mut Device) -> Result {
++        build_error!(VTABLE_DEFAULT_ERROR)
++    }
++
+     /// Issues a PHY software reset.
+     fn soft_reset(_dev: &mut Device) -> Result {
+         build_error!(VTABLE_DEFAULT_ERROR)
+@@ -711,6 +776,24 @@ fn write_mmd(_dev: &mut Device, _devnum: u8, _regnum: u16, _val: u16) -> Result
+         build_error!(VTABLE_DEFAULT_ERROR)
+     }
+ 
++    /// Returns the current PHY register page number.
++    ///
++    /// Must be implemented together with [`Driver::write_page`]. The kernel's
++    /// paged register access infrastructure requires both callbacks to be
++    /// present.
++    fn read_page(_dev: &mut Device) -> Result<u16> {
++        build_error!(VTABLE_DEFAULT_ERROR)
++    }
++
++    /// Sets the current PHY register page number.
++    ///
++    /// Must be implemented together with [`Driver::read_page`]. The kernel's
++    /// paged register access infrastructure requires both callbacks to be
++    /// present.
++    fn write_page(_dev: &mut Device, _page: u16) -> Result {
++        build_error!(VTABLE_DEFAULT_ERROR)
++    }
++
+     /// Callback for notification of link change.
+     fn link_change_notify(_dev: &mut Device) {}
+ }
 -- 
 2.43.0
 
