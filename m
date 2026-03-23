@@ -1,219 +1,196 @@
-Return-Path: <netdev+bounces-270441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270439-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0FM4OsYIwWmtPwQAu9opvQ
-	(envelope-from <netdev+bounces-270441-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:32:54 +0100
+	id MMudG2YJwWmtPwQAu9opvQ
+	(envelope-from <netdev+bounces-270439-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:35:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69D742EF1FF
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:32:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6DD02EF294
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:35:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 246303022955
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:31:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6E77D301FA94
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9584386C19;
-	Mon, 23 Mar 2026 09:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80A23386570;
+	Mon, 23 Mar 2026 09:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="spp/GR26"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="etqlIQfJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8288386545
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 09:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096451FE44A;
+	Mon, 23 Mar 2026 09:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774258307; cv=none; b=kh/ufau9MjLB4DS297lE21TwdliBhttgjdnhZNEVb0qbIGrZQYwM6/F9wnFH32IqoyAuqFcl2tOamd7HVX7ypS1m9nEraSRu3ypV30CMqIjPboShp3rlIFx6cq47gANAhf9gbc91tD/XYBUQtHyZMmLdqil3OdPA3uwRbR7Dqc4=
+	t=1774258258; cv=none; b=SywneGzCxJMMqvncLzjULehF842RIfyQd/rd+y+fWLBnWVID+4GX4qaGSdfHbjii2gmfKqelNBDhJQVLda6FVvbrL1vxLUdFFcaqgeua77cd29hVEdrjMP0N723iRvH+TgEv/9M0IKH1G7Td1lthhXn7WgNrw5JlIn2EqFEi7lY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774258307; c=relaxed/simple;
-	bh=FKdqYbJRCbHV8ED0taAnDFFEIfeq7RVIDgOTv57eXkE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YaKUzwVzN7aWtdq3F0EhyyBbC6hHNr8KBeMZVU1SmJxQdWw70zsoJ0pM7i0c2J6uEpU0uWF08IIYqLqkxPe892It7A3nNWXVa6obNUFPw6PUiQ/840aYeQ9SMydUSDrQJvs+vIxZtlm7ClPkXZ9OidTDUGIeSmsRb63F95benX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=spp/GR26; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 3292C3F7FE
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 09:31:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1774258298;
-	bh=yYJfPNbB792lL6QrmI4JXU+RjVxNWhivL7IyPS98fSg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version;
-	b=spp/GR26vk+ZpBVJwa+AIQMFWYj+s5JVi8+Wbhleg9u9RCsh6FiBy/6zGy3E0ZTW8
-	 E70hO47NNoZLEn4PqBhrnSBY3KYTcaimh7kMk9exTLeyj0QB1K8OcLIxIMx8TJQKtv
-	 AjuJZDKyqjIhJCeFQhIeQw0dkmFKtXBDnkjVNBD3xJSIX0EmvK6zcsNMqZKJ2Y9nKr
-	 Q6S/9/Kewog3AeBHki62hngvEYz5/M8npP5COdIw9tPtaVGfpW6dMwMRWjlLY2eTh+
-	 J8UkQseDarc8ogIQMyj++TB/SdUAPS6G/ES5kYl42mqG4iQYpf77pjw3qCcuGBAX4t
-	 f5LWwj5vuz7wK0v7ky7p6h29dhsdGlbq9EP4j2jYAjbaC0LDVkc899XRinxeP+lO8+
-	 c/wmHdyHjost+cioYZ/UPrk2O1Ud57ogG3YhmC4CL6OZGiReRqpvXA3ZB3+Kn7lMTw
-	 3SKzxmmy20aKUrNmIq3zb11nup8Y+Yii+32eJUUkE6C71ueiSCmnXfn0uMsFWPgCSL
-	 iBELyBKtF3rWuBr9SRMZuxzmL6nYaD4Bycxi6usHqf9tGB67pSo7sudzghY6nWZreZ
-	 yS5g5mv50E7gPhbiTOm19Rg7UOW+cXR7GPH0tL2R3CjUD8vMXlnt7gTO44QcpAXhYK
-	 P1rpME+LOPt8s1Bg/7Sg4zAk=
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-439cbc5fb4fso3560970f8f.0
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 02:31:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774258297; x=1774863097;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yYJfPNbB792lL6QrmI4JXU+RjVxNWhivL7IyPS98fSg=;
-        b=aHMjMeOzFumzu962ar+n8vx/bUBLFa8vunE70JmQ/EhetRiD9qOzQnSK27Wkgw4LeN
-         ge2iOkfuXwkbgjJIeurJnBPHunxgLIDGYwAidblEw2OHCyX0LoEH2oEzCzZCN6zfGfQG
-         CGI8h87CUadM9UCSFxrnOhUT9xVDzjm2aGLeiRLZTgqWQulFAFRzFdl3r8mrMU7FWDjd
-         Ke36Wb9DnaAEiCjbH/wfne2YDe0XlgXhOxiUCIBsWYg7xc+xh05FcMZwmEEMIL5m09po
-         Y0Fv29yNCp/3aev54LLb4x5wOlKvV8IqPKPd/qaE+pyuNaZMwcWXqaTKv2mRcFhB89hA
-         nuzA==
-X-Gm-Message-State: AOJu0YyOOKnVTlutDoyILeJ6NW8Q2RRuGC0/Yv3ESzkQoyp7iFVd5Ihn
-	wlDubpO80GzkjumHLtyMQWDvC8dC8IwTUMxcikT5Iw6F+eDMg0CXp10y+uv1P9cCM56pLTY7Aw8
-	RS520fDABF4Jgq0OmQll2O5LnnFemPJwBB5gWxdN3ndDvc8Oy4NBD9l6rRrmt8fi+MbFbBnmZGc
-	mGu73AHA==
-X-Gm-Gg: ATEYQzxCsgts64HyNtrdqS1+dSIAeh/BtgBOuoxY65KzjfCR8Gllp3GHLk1Hq6pBObv
-	BUk7nRK/2B+VBAgUa6gPx0Uv8Rr27tVMtM8Zeq8GV3BF/jcpfR/QuI1EY/k/kTD0LghZ5NaXq0y
-	sRjyEP1OyP5qtQHkrDGelklbguV+D26Vp5jvHAC2WhTIqWTdAweSoTKn7WRIy9dah4MRcYDJBFK
-	vLnVNtvKfTLZyryBT6JXdqXzGyr+UT112PRLd189N0WTSaR04xlqUSanNUmllFpfRrfZzca5TXz
-	0blkxWd8Ebb0lCrdzNP55sVLHJDYBTyFLdXHovpTY4oqhQlOvgYF0ecWyfza3rVzGNsXlfatRLi
-	pgwV/rAwI++ts7/dbKU0G61Joig4lMSyJ
-X-Received: by 2002:a5d:5f94:0:b0:43b:5744:13fb with SMTP id ffacd0b85a97d-43b6423489dmr18149868f8f.4.1774258297067;
-        Mon, 23 Mar 2026 02:31:37 -0700 (PDT)
-X-Received: by 2002:a5d:5f94:0:b0:43b:5744:13fb with SMTP id ffacd0b85a97d-43b6423489dmr18149810f8f.4.1774258296574;
-        Mon, 23 Mar 2026 02:31:36 -0700 (PDT)
-Received: from devstation.. ([194.120.133.116])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b6cdfdfa9sm18901032f8f.9.2026.03.23.02.31.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2026 02:31:36 -0700 (PDT)
-From: Ioana Lazea <ioana.lazea@canonical.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	stephen@networkplumber.org,
-	dsahern@gmail.com,
-	jay.vosburgh@canonical.com
-Subject: [PATCH iproute2-next 2/2] tc/htb: enable use of 64 bit burst 
-Date: Mon, 23 Mar 2026 09:29:13 +0000
-Message-ID: <20260323092918.11010-3-ioana.lazea@canonical.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260323092918.11010-1-ioana.lazea@canonical.com>
-References: <20260323092918.11010-1-ioana.lazea@canonical.com>
+	s=arc-20240116; t=1774258258; c=relaxed/simple;
+	bh=+sB9HwYJtDPm2Yh5tyrCOddW8M/7xA3pzUn3aUos3JE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZDGDe2YMBQFA4Md/1UeT1Gg1m4HDl8SE7rI2anFYWO77liysRdu4Em+SQ4ywVJtD/zSyq/EUaihQhpAg3x1yYsr/U00v3PxPEkjO8JjY2joYjpuJm3bpFcb2FENUWz46hoRUTcS5RHFr/lLWrwRCEKuMPDlIpUfWAXKH+EOh5nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=etqlIQfJ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=F3rUhqBT1KeCDZlm1nLAVKvFKDzC8SHFz9yiyugPwjo=; b=etqlIQfJSSDSaWC3g3CkplcGX+
+	Az+ECRx6Cd67IDOLKoApAzDji/xzE74lFrsxHONaOYr/6D8zl1uKVNXf+EdkRlQYLvjekUSCPPgJl
+	B6elVyuHZdADUUDQxvi7dFUr7eCVzXxl8y2zVjFz6YGCEZb/UGk5ApAGJIymWdcY2ByE5R4P2SXkH
+	Ay/gkmTp1OTxO+62vbYDEZ5Od3e1c1wGDJ+xblhu518mcW5l5nCzOv6lbc8gCjnEYU8H1l13kthWV
+	ugySbdVObDVq418ku/v3FG963j2qdsGQbxQthOMQsnw+tUTC+AWi/TwUKK55j1kpSSqv+mCKZgNAf
+	EpjKTHNA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58958)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w4bcS-000000000Cw-41vC;
+	Mon, 23 Mar 2026 09:30:45 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w4bcQ-000000003up-3Y8E;
+	Mon, 23 Mar 2026 09:30:42 +0000
+Date: Mon, 23 Mar 2026 09:30:42 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, f.fainelli@gmail.com,
+	frank.li@nxp.com, chleroy@kernel.org, horms@kernel.org,
+	andrew@lunn.ch, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org,
+	imx@lists.linux.dev
+Subject: Re: [PATCH v2 net-next 11/14] net: dsa: netc: add phylink MAC
+ operations
+Message-ID: <acEIQqI-_oyCym8O@shell.armlinux.org.uk>
+References: <20260323060752.1157031-1-wei.fang@nxp.com>
+ <20260323060752.1157031-12-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260323060752.1157031-12-wei.fang@nxp.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	SUBJECT_ENDS_SPACES(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[canonical.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[canonical.com:s=20251003];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[canonical.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[mojatatu.com,networkplumber.org,gmail.com,canonical.com];
-	TAGGED_FROM(0.00)[bounces-270441-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ioana.lazea@canonical.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-270439-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[canonical.com:dkim,canonical.com:email,canonical.com:mid]
-X-Rspamd-Queue-Id: 69D742EF1FF
+	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,lists.ozlabs.org,lists.infradead.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.964];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: D6DD02EF294
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Modify the HTB queueing discipline to allow burst sizes up to the
-limits supported by the kernel API, which may exceed 4 GB at higher rates.
+On Mon, Mar 23, 2026 at 02:07:49PM +0800, Wei Fang wrote:
+> +static void netc_port_set_mac_mode(struct netc_port *np,
+> +				   unsigned int mode,
+> +				   phy_interface_t phy_mode)
+> +{
+> +	u32 mask = PM_IF_MODE_IFMODE | PM_IF_MODE_REVMII | PM_IF_MODE_ENA;
+> +	u32 val = 0;
+> +
+> +	switch (phy_mode) {
+> +	case PHY_INTERFACE_MODE_RGMII:
+> +	case PHY_INTERFACE_MODE_RGMII_ID:
+> +	case PHY_INTERFACE_MODE_RGMII_RXID:
+> +	case PHY_INTERFACE_MODE_RGMII_TXID:
+> +		val |= IFMODE_RGMII;
+> +		/* Enable auto-negotiation for the MAC if its
+> +		 * RGMII interface supports In-Band status.
+> +		 */
+> +		if (phylink_autoneg_inband(mode))
+> +			val |= PM_IF_MODE_ENA;
 
-In the current implementation, the burst option is effectively limited
-to 4 GB due to the use of a 32-bit field while parsing the burst size.
-However, the kernel internally represents the burst in terms of time
-derived from the configured rate. As a result, at sufficiently high
-rates this time-based representation can correspond to burst sizes
-larger than 4 GB, making such bursts feasible without requiring changes
-to the kernel.
+I would prefer newer drivers not to use phylink_autoneg_inband()
+anymore. Note that there is no need to support RGMII inband in the
+kernel (nor is there any proper support without a "phylink_pcs"
+being present to provide the inband status.)
 
-This change removes the artificial 4 GB limit and allows larger burst
-sizes where supported by the kernel API.
+> +static void netc_port_set_hd_flow_control(struct netc_port *np, bool en)
+> +{
+> +	if (!np->caps.half_duplex)
+> +		return;
+> +
+> +	/* The HD_FCEN is used in conjunction with the PM_HD_FLOW_CTRL
+> +	 * register, which has a default value, so currently we do not
+> +	 * set it in the driver. The half duplex flow control works by
+> +	 * the backpressure, and the backpressure is essentially just
+> +	 * a long preamble transmitted on the link intended to create
+> +	 * a collision and get the half duplex link partner to defer.
+> +	 */
+> +	netc_mac_port_rmw(np, NETC_PM_CMD_CFG(0), PM_CMD_CFG_HD_FCEN,
+> +			  en ? PM_CMD_CFG_HD_FCEN : 0);
 
-Signed-off-by: Ioana Lazea <ioana.lazea@canonical.com>
----
- tc/q_htb.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+We don't support half duplex backpressure in the kernel. I notice
+you always enable this whenever HD mode is negotiated, which means
+there's no way for the user to disable it. Flow control can cause
+problems. Ethernet relies on packet dropping for congestion
+management.
 
-diff --git a/tc/q_htb.c b/tc/q_htb.c
-index 545152ff..a3ad4215 100644
---- a/tc/q_htb.c
-+++ b/tc/q_htb.c
-@@ -112,14 +112,14 @@ static int htb_parse_class_opt(const struct qdisc_util *qu, int argc, char **arg
- {
- 	struct tc_htb_opt opt = {};
- 	__u32 rtab[256], ctab[256];
--	unsigned buffer = 0, cbuffer = 0;
-+	unsigned cbuffer = 0;
- 	int cell_log =  -1, ccell_log = -1;
- 	unsigned int mtu = 1600; /* eth packet len */
- 	unsigned short mpu = 0;
- 	unsigned short overhead = 0;
- 	unsigned int linklayer  = LINKLAYER_ETHERNET; /* Assume ethernet */
- 	struct rtattr *tail;
--	__u64 ceil64 = 0, rate64 = 0;
-+	__u64 ceil64 = 0, rate64 = 0, buffer64 = 0;
- 	char *param;
- 
- 	while (argc > 0) {
-@@ -158,7 +158,7 @@ static int htb_parse_class_opt(const struct qdisc_util *qu, int argc, char **arg
- 			   strcmp(*argv, "maxburst") == 0) {
- 			param = *argv;
- 			NEXT_ARG();
--			if (get_size_and_cell(&buffer, &cell_log, *argv) < 0) {
-+			if (get_size64_and_cell(&buffer64, &cell_log, *argv) < 0) {
- 				explain1(param);
- 				return -1;
- 			}
-@@ -225,8 +225,8 @@ static int htb_parse_class_opt(const struct qdisc_util *qu, int argc, char **arg
- 
- 	/* compute minimal allowed burst from rate; mtu is added here to make
- 	   sure that buffer is larger than mtu and to have some safeguard space */
--	if (!buffer)
--		buffer = rate64 / get_hz() + mtu;
-+	if (!buffer64)
-+		buffer64 = rate64 / get_hz() + mtu;
- 	if (!cbuffer)
- 		cbuffer = ceil64 / get_hz() + mtu;
- 
-@@ -240,7 +240,11 @@ static int htb_parse_class_opt(const struct qdisc_util *qu, int argc, char **arg
- 		fprintf(stderr, "htb: failed to calculate rate table.\n");
- 		return -1;
- 	}
--	opt.buffer = tc_calc_xmittime(rate64, buffer);
-+	opt.buffer = tc_calc_xmittime(rate64, buffer64);
-+	if (opt.buffer == UINT_MAX) {
-+		fprintf(stderr, "htb: burst out of range\n");
-+		return -1;
-+	}
- 
- 	if (tc_calc_rtable(&opt.ceil, ctab, ccell_log, mtu, linklayer) < 0) {
- 		fprintf(stderr, "htb: failed to calculate ceil rate table.\n");
+> +static void imx94_switch_phylink_get_caps(int port,
+> +					  struct phylink_config *config)
+> +{
+> +	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
+> +				   MAC_1000FD;
+> +
+> +	switch (port) {
+> +	case 0 ... 1:
+> +		__set_bit(PHY_INTERFACE_MODE_SGMII,
+> +			  config->supported_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
+> +			  config->supported_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
+> +			  config->supported_interfaces);
+> +		config->mac_capabilities |= MAC_2500FD;
+> +		fallthrough;
+> +	case 2:
+> +		config->mac_capabilities |= MAC_10 | MAC_100;
+> +		__set_bit(PHY_INTERFACE_MODE_MII,
+> +			  config->supported_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_RMII,
+> +			  config->supported_interfaces);
+> +		if (port == 2)
+> +			__set_bit(PHY_INTERFACE_MODE_REVMII,
+> +				  config->supported_interfaces);
+
+The "case 2" above already ensures that port is 2 here.
+
 -- 
-2.43.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
