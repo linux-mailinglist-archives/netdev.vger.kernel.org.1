@@ -1,344 +1,210 @@
-Return-Path: <netdev+bounces-270459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270461-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aMCKJD8VwWn5QQQAu9opvQ
-	(envelope-from <netdev+bounces-270459-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:26:07 +0100
+	id GF5CFWEUwWnkQQQAu9opvQ
+	(envelope-from <netdev+bounces-270461-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:22:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15C452EFFF2
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:26:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FBAC2EFF04
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:22:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0C40F306DFFB
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:18:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C027E3012D18
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:21:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF25838C2B5;
-	Mon, 23 Mar 2026 10:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1B138B7A1;
+	Mon, 23 Mar 2026 10:21:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AQDte4Zd"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="bTS2dXIl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013063.outbound.protection.outlook.com [40.107.162.63])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E5838B7D6
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 10:18:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774261099; cv=none; b=DDc2tDdsL77ixq3UTbzQptDLDgNISZJzS/zJ4ASa3q/IH/9GepaJ3xOFdeOOFGbUlrUBQsDKiziVl9DZoIRSrXlKiTzlF0Uf5CX49agFiwMZkPci+xKURh0Iau5bPGWQiRw6BH0jTltlBszxeafnSNc/P18PP1LTdQWXtVaiVco=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774261099; c=relaxed/simple;
-	bh=qZcnNJnjeWofkzv2Oyg4DP08CAegl5yI3o2c9CpJVWE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jgkifD4ebQdR127aM3/Ljc1uMs8PnSnxpZchXnOURqVzWrPqYxCTrltyWy39B5VfZgO2RAr+lzsOK7cj5/4oo9BmoERDHVhX++6YTvJrR3BjHkeeg2XDE6SGtHAdQo8hBezOTl4Hd6TqA3+5kOmn/nqa4hBMG0FohH4bB4r2Zpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AQDte4Zd; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-82ae378fff8so1991268b3a.2
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 03:18:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774261096; x=1774865896; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EPbwlhrnVmSnNsmoWdfq7/dDDDS8CnPiI8sSHsNGG9s=;
-        b=AQDte4ZdZ/cSMRKQgPLwIFs84Y6mvWsci/X8TpaQgCa2B58o4Dv/puRR3HhMhrr4DN
-         sza3WfupmXsBNYhj42ItMNtEq+FYhl7AfQrHZiITPakDq97rbhlNPXiQaGBh4GcO4t6B
-         dAKuE04Nx5eQE6l17IESu6I3A7o7pYWS9aBnCFq+n6nykqYBqHS9d+KpEIzWsaec8d63
-         r9zv8UL2SFQ3GUPH2Ngvl3EgV4qvLvizpqw6RE5y/u5txSIDdnqDqj/bXq458937Zeba
-         uPqPdHO/zDk57otsRyM3yrlk0kAKmu7K5fY1sRArbQoA1sPlyQC1yKeOVMpi1KgGjgtu
-         6+yQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774261096; x=1774865896;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=EPbwlhrnVmSnNsmoWdfq7/dDDDS8CnPiI8sSHsNGG9s=;
-        b=JQfcVyrzhsSY1I+UNqrf0dtc3oveUX8C2g/cqKfW4+Ygt/hwfeTQgc48cPaTrG4bds
-         ye0U9VL1tLv+TiLohY4J4zVzbCqQtUEff3lAus+mQFCEV4UUUmOat9gh71BEWeVPq901
-         9RSObAwKVoqKoG+D4vcSEnX4WsMGU+DDT95c/EKz38UY1B2YJuykkauP18tdxwBV5S+S
-         7lJG3NC0HCDtZ49R5mOG9iiVprbh4lc6t/O5nD8pvbIGYN4u3KxGPUKG2nxUUU2Mdch2
-         7okiG4+kSF2W82V146x5bV6MU0GHN9LfCavkNLc9YSeDwgiGpONKtCqa7U3ANXHgq7ap
-         ULcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVPw6rovbVI8BY6X72IFTSqIgt8PrzpkYbg3vBqrasw59USnWVkYvhvDX1nbHON+TQa99ZzB7Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqhBgxZLLsdiprebx65TyduzzjfMPw+G55QQbjg8G3dNoV9z2a
-	uO1JyvzrryxD7z88sxp6N953mumTW3k673sJhczWgBTzG2fCBhyn98u3
-X-Gm-Gg: ATEYQzzSZ/f0JqFxtQiL5OhBmM0nvnELncYwCXNx+nZLk4O/windD5/mtDVMSH4xyW9
-	Schx73z9JJ9WUo/T/y+oe9n3JWNmt8I4CKmgV7P4HsMHXQ2tVFsgnGEafJ9ccI4KjlURDTgSe61
-	2NF7Syi+Al4OluY+ych8CXqvlBmLNMPnmeFULylsFvsBi5AGUrAPqUZl8jWWHyERWhwzUmJMzXE
-	ghnQRhGL900ALSo7bMWWeMtwm5GwbuLo7FSe3FwS5xD0ABh6n2uUkwvzBzh7cuXliNGiWOeGbGM
-	4P/EYbJcdRalnONf4LrF21vWEgleUFJ7nIIesoyT7VezcSUX2T/Ed3fNpaPWf823mDvjbLnqSyG
-	mA77MpUOX30OjSgpf7a0zsoWaV1EpmmfR2MDgkM2DipWy81/wJZZi1qdN5jEZegvXA2r/pSUcbN
-	FxUxUDFV9VZ2aVT22qn92FrP4CLOcdGwaQhn0DisQNiZoUeTp4ihdGaJPfGRA0xnojJ9B/gRnLM
-	1iCO0uXQJql
-X-Received: by 2002:a05:6a00:21d3:b0:81a:857b:f944 with SMTP id d2e1a72fcca58-82a8c2a0946mr9629170b3a.26.1774261096384;
-        Mon, 23 Mar 2026 03:18:16 -0700 (PDT)
-Received: from localhost.localdomain (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82b04220d9asm8630779b3a.60.2026.03.23.03.18.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2026 03:18:16 -0700 (PDT)
-From: Joey Lu <a0987203069@gmail.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	mcoquelin.stm32@gmail.com,
-	richardcochran@gmail.com
-Cc: alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	ychuang3@nuvoton.com,
-	schung@nuvoton.com,
-	yclu4@nuvoton.com,
-	peppe.cavallaro@st.com,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	openbmc@lists.ozlabs.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Joey Lu <a0987203069@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next v15 3/3] net: stmmac: dwmac-nuvoton: Add dwmac glue for Nuvoton MA35 family
-Date: Mon, 23 Mar 2026 18:17:56 +0800
-Message-ID: <20260323101756.81849-4-a0987203069@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260323101756.81849-1-a0987203069@gmail.com>
-References: <20260323101756.81849-1-a0987203069@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119013090C4;
+	Mon, 23 Mar 2026 10:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774261281; cv=fail; b=o0RRvrglSCkgq4Ra8TscPbKJkF8gVqNHQfUB6bIpV3JOKJrpN7a9VQ7qFbaEi3p8nmZmD3xmjlxMnSi+dRf24jN0Fc9ucUVkqWG3+1ijWz2nS5Xdx8f+um+JdIByucznHJLDQ6JYQ+hn5G8Pg1PK6XHzdkorm8R+drjfkphLAAk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774261281; c=relaxed/simple;
+	bh=R1e3lvCknhVbHpjDp3BMffih1L/aPBdvuA9jeT9Olcc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=PQsUV+RI5nSozrCMYmHsRfHPS6jOot3T6+sPkJhRKSIYEXK2+8IjsaOPTqAjE5GgWu2fYV9Qq3htlrAczzUBagIrWS4DF7DL9ed1hbMckSb6RAP/09mdNufWMG9vjc/hwV7kskkjsVDyPR/IaZtZx+ZRjDurvzM00r+DLPIsvVM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=bTS2dXIl; arc=fail smtp.client-ip=40.107.162.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VJCpdBVZg9xav4E6pYxSfXypQriOp1M9QKQEpIx19635cwNU5X67g/wN6BDdYT1gW/ukAao5idusk7GJHaZLeWFMgfzTBG/CVvTEXTMNp7UADapWufqxvu4qhbMrJg0F9U8bIce1Oab1ORKfuBPDmYOOPWpO0eBni4y+OOpByFnTgo2mHJkjZGCqqftRRCTzOCH0STrdnPZYuBqW0jsirrUfPWj4OfgQrW7oavaCHRWiSGeXxbOIYH2wpUicy3Is+MC3/wGmnf3gtdEVAtCpHMHW66cFJtWPu2nNMttupLi+Vi1mHK3d5HCciDr/lHPMuxXYVjAyBrltsyzQi/sbpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Hkeih7pufrw+pq0tKoeFUy3mK/ef0w38zDphdZtKitc=;
+ b=ypRcfI0ipb9nhA+ouEC2xy9ZWidDQkNNvMRWYtFCQVXIt/sUg+81wBW3Vrtejb9oKxYdQjqY+yglBHx/FnSU0TAmkN83E4gyrOtLPYV+niNTYyAii63WikjZSb8YXMbwqXBHRyR//IYbk73W5oqC1HBdfoRQ0Cx4gY9oksj8HaILk2OS3u7uAKxifeRPnbRILsJ877ptkJ8LeuByCmx05QDDMSP64uPLfViusY3yXwNMdpsT7LxFwtJ/deyQssUjDj4Fl7+J4WeR1PCV1kNUZZAjEeKegqkD+5fiCI+ATCefDYx8Qmp/wUPyDwVC5yh8ryvsYzozJ06BUMxiW7QGAQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Hkeih7pufrw+pq0tKoeFUy3mK/ef0w38zDphdZtKitc=;
+ b=bTS2dXIluikYWoaP2O4F7BNcr3L90CvKW2RueQHpwYbdv1KEk57h7PVd1k27K1hLECpDhfqNf2m2hM/6oTza4aihw3TylJEHPVbvVyNWLbrhaOF2sH+jRuF6Uuu8aDgM2bGEQcwD3/5DyH4TbVIgVeaTwMrobFKQM8IZ74GsY7kRMIkuFbULGube8EfhH79qv4vBDof9gT6uY+0C8ZVHzu7W2mHJ1j6hEYiqc35xmSyor/oxq1d3wqrDnVr2qoQF8msJ4og3SeB89sH/AdgZSy4uZTpE01EdIYWqWbn6TNohTSEsGf6ZwD2yrdFFmnk4JtDeNKTSJ4RTFZZbO7pY1w==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by PA2PR04MB10334.eurprd04.prod.outlook.com (2603:10a6:102:417::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.25; Mon, 23 Mar
+ 2026 10:20:55 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::b476:c19a:24cd:3694]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::b476:c19a:24cd:3694%3]) with mapi id 15.20.9723.030; Mon, 23 Mar 2026
+ 10:20:47 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Russell King <linux@armlinux.org.uk>
+CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
+	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, Frank Li <frank.li@nxp.com>,
+	"chleroy@kernel.org" <chleroy@kernel.org>, "horms@kernel.org"
+	<horms@kernel.org>, "andrew@lunn.ch" <andrew@lunn.ch>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>
+Subject: RE: [PATCH v2 net-next 13/14] net: dsa: netc: initialize buffer bool
+ table and implement flow-control
+Thread-Topic: [PATCH v2 net-next 13/14] net: dsa: netc: initialize buffer bool
+ table and implement flow-control
+Thread-Index: AQHcuote84lxYz/saUypBRN66PVRZbW7110AgAARBaA=
+Date: Mon, 23 Mar 2026 10:20:47 +0000
+Message-ID:
+ <PAXPR04MB85104288918BAA15CD739C0E884BA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20260323060752.1157031-1-wei.fang@nxp.com>
+ <20260323060752.1157031-14-wei.fang@nxp.com>
+ <acEFwqmAvWls_9Ef@shell.armlinux.org.uk>
+In-Reply-To: <acEFwqmAvWls_9Ef@shell.armlinux.org.uk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|PA2PR04MB10334:EE_
+x-ms-office365-filtering-correlation-id: 74755bbe-2e0a-4d92-a67d-08de88c5d97f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|19092799006|1800799024|366016|38070700021|22082099003|18002099003|56012099003;
+x-microsoft-antispam-message-info:
+ j6ZeeywxksAczU+//iAepxaaPpgES8RpG9m8C8UwX3fm3OP+Q69JNDOGTTF91ZJrhRRV9yZCz+e4PEKjvvxlc5sh8FwHMuVNoo+i7ETA1Om8UnorKps1+Rb1xqfh5w9DkLMFoscsRae2KgC3/rJdzPESK85d3AHAsot55duOEUpj8+vXXahM/huScKBB8LEicfSL2XHmGR5LIJHJfeym/Gle3bajDIu2R3zEVnmN4O6LJVO8F+4/JUm9AQFN9SfY5B9eTnTYdIJREHJ0oIKD+btjk9j/p+KncuxZFsx03utfhpLDOjTDEupN7lJbApIzDzGFepedGc7rwMSjId/fCgFmxNtK83HbHCRv45fYhhi0ODd1RPlUlilm0tm0gav9i9KT/Hi1/A/2Bo+A9pmTkeWpwYiC1bcVccDQ4uL5Nl84kqc111MKpgRUHxQ/pFnpl3yVEAp3neap2wAuuUn7rvxKBdEc3Av2+Smazs3prQ9bZi0GSuzIpnwF2Rk7Rnvzl8obYq4Kk0jaGqFn4mnPvYBeLEAHcOGisP5zYecjq29M81fIbk9h/e+mX0TOyyMR/yTnnMXjPV+8cfadWMU4mTwdqnYjhYGX0qK3co6dE36ASxTc+qSdJkGkytrLminSs8xVNwhgFrXa+pxMhDBw2nd9xDvHUzhUEk9Pl4vmP4ZbPwS8mXA+0+ZFiXWEPOEQ2t7pgaXKOnbieEczNXizFWiDvm+UOCtgYZP3wjleT28OY/z+jakrKByse9EAunGBBnEq7KvB3YntlRGv5c4N8US6xHPOWsRIbnVPyNf0XpE=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(19092799006)(1800799024)(366016)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?GveJNakoJK71/e4fErRtI1jcJ0vdSNEyMKN4iulKcsJcvkr/jIY8rG1Sw76Q?=
+ =?us-ascii?Q?d2394VZYkfngV0SJrpCQcmcHHSuvHtfUSfdU+gRWpcdBoVxfcoECdRhSBW+J?=
+ =?us-ascii?Q?JDOaoFrmKhDJiN5X55LwytNLHNZ6mcru4RdUfJvutx4FOarXlI5f1/kO4D23?=
+ =?us-ascii?Q?ZfsU9S/eZWYWLdnXvL6JylyyM0fbzMwE4S14vxAc6cG5GEQHbsYpMXfhykt/?=
+ =?us-ascii?Q?PaXsxteTcD6YbHjGGgmMjXpin3mAOOTbrW+a+IAKjMslLwsgLabqHUJ3QBK2?=
+ =?us-ascii?Q?XHjfspKttVxeSyYBh/j+zYCFwECukWFQbwvX5iIc8VEPjMNX0XTpn6XaMlOv?=
+ =?us-ascii?Q?ZFufuZkaN5xzMUQ4SrnNTz/0Bzap1nhTkArueJdSJtCARMmEnDE+37G2gGUP?=
+ =?us-ascii?Q?AWpOOcQVBd9iNMsIj6VByVK/7bStpDT7r3g79rtizjY/E1XmvODbhkebaa8V?=
+ =?us-ascii?Q?MY7nB46N6z+15O+a/EXuUsFw0d4Mq6caeOfGis2ZN8IIMbUuRjpYSoGN+s+T?=
+ =?us-ascii?Q?6dSg36z3Q82UABsS3TB0pMqhOvTY20YQlVe+XaCwUl3LKA8DGegJApMfikbj?=
+ =?us-ascii?Q?fhVLY8hAg4Oaw+fgeM9rF4UOCERr0ZMr69VH9Tixlgxmxh3dzLwz7v32rUqU?=
+ =?us-ascii?Q?eiMBEm+Hi7PX45okllE1lTfF5vpC+GhWxN4NPK6xSTHiFB7Wdv+pYi1oswvG?=
+ =?us-ascii?Q?9LRS9zwme6UsfbhzTa0lXWvPHmoD4oyH7jCaZ7REZK5FYjB2JX8J/uSSssui?=
+ =?us-ascii?Q?pXQu3FxA5mJdlWUOpuu8n08ZTREyKi7VOD30G36I4iwegdCnOLcltTJvcw61?=
+ =?us-ascii?Q?cEIIV8vrYqR98VO8tAgQ3YWkjDMWeRWDfzmGgomiXh0Y48nLhIigTLI1zOy1?=
+ =?us-ascii?Q?YyQKIF5xpYflDFZbl1fhalx+HY26gtzSGpHtfulmciIaxCDK+TXB+IGE+Qm5?=
+ =?us-ascii?Q?EAHJ21ZRy/MX48duRZsDKnNyGi4Qjx4LKbCa3JH5eIwp8W8jSYkZPDopeZSz?=
+ =?us-ascii?Q?k8Cgb+R0LmaH5M4vN5oTRqx4D24KPGuYkVTETRv6C5yQSrhptiE1Bk25vAjG?=
+ =?us-ascii?Q?abDKZ0vTNRHCuckeI8PD0J6EgPmYv9prkyYM3nnSK7rPpAf4wHQSQXO1tcTx?=
+ =?us-ascii?Q?DHB8JneaNwpIM8ZCLwKHvVzVjl+JUfubeIaOz81ayUVMdvF1B2NKIYiiapl1?=
+ =?us-ascii?Q?CadYkVmBT2bxNTJfHLf+PBFWdQ6yqhPM/vSuNp+dNVATlObjb0yyiczzucY9?=
+ =?us-ascii?Q?YYituDMXtAamXpffV//JvG4ErX7FXvPZaVrYQS6rlWKPY8k06gZq4uJEOZAG?=
+ =?us-ascii?Q?OCqgeE9hdz0i4umgTVXE9bnjcxdSH0pYw36l/OdHMKv3h5VaTx3usfbu+GKq?=
+ =?us-ascii?Q?hvlhZ242VaimIVu7HIfKVkaekpqAwnNjyvEkspSw8dAFvVuSLh5/w/P98Qmn?=
+ =?us-ascii?Q?W+/mjNcMh+8WfHmj77UhzVJH+mXopbsulNsk0KEx926h8A0HKXBTJUkYqkp3?=
+ =?us-ascii?Q?9LvmmFQqLvqLi11KFHTPGSg5c00HFw1qMttEvdLgRDsJ4ijlwlPIxcnRjySk?=
+ =?us-ascii?Q?iqKPvR8opqnUx8JMb4eULDfL0Jh46Z7OjtRkLNArItUE0Ea0hWegQeL6VdSp?=
+ =?us-ascii?Q?7L5SqD2V8QEO2Y6iqFMZkis2bjWliX01rj5u6Bdz9UZuybe9pGswi1DDoHxH?=
+ =?us-ascii?Q?d/1jkH+lQwqelMWFrpAaHb9RLL7ArjTrotZ5TaCuSc4Lwk0G?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74755bbe-2e0a-4d92-a67d-08de88c5d97f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Mar 2026 10:20:47.1710
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: YqphzsyvX0W24526C9yyE19rJz5zdnj80ZhTLrca1+ckO5G13ydeLeu29Izg40a0PBBuLqkBBBZGsPKyseMOOA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA2PR04MB10334
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[foss.st.com,synopsys.com,nuvoton.com,st.com,lists.infradead.org,vger.kernel.org,lists.ozlabs.org,st-md-mailman.stormreply.com,gmail.com,lunn.ch];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-270459-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270461-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,lists.ozlabs.org,lists.infradead.org,lists.linux.dev];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[a0987203069@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[nxp.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email]
-X-Rspamd-Queue-Id: 15C452EFFF2
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,PAXPR04MB8510.eurprd04.prod.outlook.com:mid]
+X-Rspamd-Queue-Id: 0FBAC2EFF04
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add support for Gigabit Ethernet on Nuvoton MA35 series using dwmac driver.
+> On Mon, Mar 23, 2026 at 02:07:51PM +0800, Wei Fang wrote:
+> > @@ -1288,7 +1411,17 @@ static void netc_mac_link_up(struct
+> phylink_config *config,
+> >  		netc_port_set_rmii_mii_mac(np, speed, duplex);
+> >  	}
+> >
+> > +	if (duplex =3D=3D DUPLEX_HALF) {
+> > +		/* As per 802.3 annex 31B, PAUSE frames are only supported
+> > +		 * when the link is configured for full duplex operation.
+> > +		 */
+> > +		tx_pause =3D false;
+> > +		rx_pause =3D false;
+> > +	}
+>=20
+> I keep seeing this totally unnecessary code in reviews of mac_link_up()
+> methods. See phylink_resolve_an_pause().
+>=20
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Joey Lu <a0987203069@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 ++
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-nuvoton.c   | 136 ++++++++++++++++++
- 3 files changed, 149 insertions(+)
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index d3a6ab7383fc..c2cb530fd0a2 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -132,6 +132,18 @@ config DWMAC_MESON
- 	  the stmmac device driver. This driver is used for Meson6,
- 	  Meson8, Meson8b and GXBB SoCs.
- 
-+config DWMAC_NUVOTON
-+	tristate "Nuvoton MA35 dwmac support"
-+	default ARCH_MA35
-+	depends on OF && (ARCH_MA35 || COMPILE_TEST)
-+	select MFD_SYSCON
-+	help
-+	  Support for Ethernet controller on Nuvoton MA35 series SoC.
-+
-+	  This selects the Nuvoton MA35 series SoC glue layer support
-+	  for the stmmac device driver. The nuvoton-dwmac driver is
-+	  used for MA35 series SoCs.
-+
- config DWMAC_QCOM_ETHQOS
- 	tristate "Qualcomm ETHQOS support"
- 	default ARCH_QCOM
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-index 945c5354eced..a1cea2f57252 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-+++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-@@ -20,6 +20,7 @@ obj-$(CONFIG_DWMAC_IPQ806X)	+= dwmac-ipq806x.o
- obj-$(CONFIG_DWMAC_LPC18XX)	+= dwmac-lpc18xx.o
- obj-$(CONFIG_DWMAC_MEDIATEK)	+= dwmac-mediatek.o
- obj-$(CONFIG_DWMAC_MESON)	+= dwmac-meson.o dwmac-meson8b.o
-+obj-$(CONFIG_DWMAC_NUVOTON)	+= dwmac-nuvoton.o
- obj-$(CONFIG_DWMAC_QCOM_ETHQOS)	+= dwmac-qcom-ethqos.o
- obj-$(CONFIG_DWMAC_RENESAS_GBETH) += dwmac-renesas-gbeth.o
- obj-$(CONFIG_DWMAC_ROCKCHIP)	+= dwmac-rk.o
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
-new file mode 100644
-index 000000000000..e2240b68ad98
---- /dev/null
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
-@@ -0,0 +1,136 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Nuvoton DWMAC specific glue layer
-+ *
-+ * Copyright (C) 2025 Nuvoton Technology Corp.
-+ *
-+ * Author: Joey Lu <a0987203069@gmail.com>
-+ */
-+
-+#include <linux/mfd/syscon.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/of.h>
-+#include <linux/of_net.h>
-+#include <linux/platform_device.h>
-+#include <linux/regmap.h>
-+#include <linux/stmmac.h>
-+
-+#include "stmmac_platform.h"
-+
-+#define NVT_REG_SYS_GMAC0MISCR  0x108
-+#define NVT_REG_SYS_GMAC1MISCR  0x10C
-+
-+#define NVT_MISCR_RMII          BIT(0)
-+
-+/* Two thousand picoseconds are evenly mapped to a 4-bit field,
-+ * resulting in each step being 2000/15 picoseconds.
-+ */
-+#define NVT_PATH_DELAY_STEP     134
-+#define NVT_TX_DELAY_MASK       GENMASK(19, 16)
-+#define NVT_RX_DELAY_MASK       GENMASK(23, 20)
-+
-+struct nvt_priv_data {
-+	struct device *dev;
-+	struct regmap *regmap;
-+	u32 macid;
-+};
-+
-+static int nvt_gmac_get_delay(struct device *dev, const char *property)
-+{
-+	u32 arg;
-+
-+	if (of_property_read_u32(dev->of_node, property, &arg))
-+		return 0;
-+
-+	if (arg > 2000)
-+		return -EINVAL;
-+
-+	if (arg == 2000)
-+		return 15;
-+
-+	return arg / NVT_PATH_DELAY_STEP;
-+}
-+
-+static int nvt_set_phy_intf_sel(void *bsp_priv, u8 phy_intf_sel)
-+{
-+	struct nvt_priv_data *priv = bsp_priv;
-+	u32 reg, val;
-+	int ret;
-+
-+	if (phy_intf_sel == PHY_INTF_SEL_RGMII) {
-+		ret = nvt_gmac_get_delay(priv->dev, "rx-internal-delay-ps");
-+		if (ret < 0)
-+			return ret;
-+		val = FIELD_PREP(NVT_RX_DELAY_MASK, ret);
-+
-+		ret = nvt_gmac_get_delay(priv->dev, "tx-internal-delay-ps");
-+		if (ret < 0)
-+			return ret;
-+		val |= FIELD_PREP(NVT_TX_DELAY_MASK, ret);
-+	} else if (phy_intf_sel == PHY_INTF_SEL_RMII) {
-+		val = NVT_MISCR_RMII;
-+	} else {
-+		return -EINVAL;
-+	}
-+
-+	reg = (priv->macid == 0) ? NVT_REG_SYS_GMAC0MISCR : NVT_REG_SYS_GMAC1MISCR;
-+	regmap_update_bits(priv->regmap, reg,
-+			   NVT_RX_DELAY_MASK | NVT_TX_DELAY_MASK | NVT_MISCR_RMII, val);
-+
-+	return 0;
-+}
-+
-+static int nvt_gmac_probe(struct platform_device *pdev)
-+{
-+	struct plat_stmmacenet_data *plat_dat;
-+	struct stmmac_resources stmmac_res;
-+	struct device *dev = &pdev->dev;
-+	struct nvt_priv_data *priv;
-+	int ret;
-+
-+	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-+	if (ret)
-+		return dev_err_probe(dev, ret, "Failed to get platform resources\n");
-+
-+	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
-+	if (IS_ERR(plat_dat))
-+		return dev_err_probe(dev, PTR_ERR(plat_dat), "Failed to get platform data\n");
-+
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return dev_err_probe(dev, -ENOMEM, "Failed to allocate private data\n");
-+
-+	priv->regmap = syscon_regmap_lookup_by_phandle_args(dev->of_node, "nuvoton,sys",
-+							    1, &priv->macid);
-+	if (IS_ERR(priv->regmap))
-+		return dev_err_probe(dev, PTR_ERR(priv->regmap), "Failed to get sys register\n");
-+
-+	if (priv->macid > 1)
-+		return dev_err_probe(dev, -EINVAL, "Invalid sys arguments\n");
-+
-+	plat_dat->bsp_priv = priv;
-+	plat_dat->set_phy_intf_sel = nvt_set_phy_intf_sel;
-+
-+	return stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
-+}
-+
-+static const struct of_device_id nvt_dwmac_match[] = {
-+	{ .compatible = "nuvoton,ma35d1-dwmac"},
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, nvt_dwmac_match);
-+
-+static struct platform_driver nvt_dwmac_driver = {
-+	.probe  = nvt_gmac_probe,
-+	.remove = stmmac_pltfr_remove,
-+	.driver = {
-+		.name           = "nuvoton-dwmac",
-+		.pm		= &stmmac_pltfr_pm_ops,
-+		.of_match_table = nvt_dwmac_match,
-+	},
-+};
-+module_platform_driver(nvt_dwmac_driver);
-+
-+MODULE_AUTHOR("Joey Lu <a0987203069@gmail.com>");
-+MODULE_DESCRIPTION("Nuvoton DWMAC specific glue layer");
-+MODULE_LICENSE("GPL");
--- 
-2.43.0
+I will remove it, thanks.
 
 
