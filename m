@@ -1,49 +1,52 @@
-Return-Path: <netdev+bounces-270386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270387-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ECFyAqjqwGl6OQQAu9opvQ
-	(envelope-from <netdev+bounces-270386-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:24:24 +0100
+	id wOzHCG3rwGl6OQQAu9opvQ
+	(envelope-from <netdev+bounces-270387-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:27:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE2432ED81C
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:24:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 801812ED95D
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:27:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id ED8B230046AC
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 07:24:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4434304E701
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 07:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6164335CB81;
-	Mon, 23 Mar 2026 07:24:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4679F35F16F;
+	Mon, 23 Mar 2026 07:24:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FFE35CB61;
-	Mon, 23 Mar 2026 07:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C553D35F17D;
+	Mon, 23 Mar 2026 07:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774250656; cv=none; b=YvJoG9ajnj3Ih16tdN00KcwXpCI4ANWDc52cwhjfndE2Lkrf04q2boMc/MC4nRXuHURTXMC+aRPaY/XkcbDuhhzwOMk2hira8jOsAEqXuuWG4LhfZdH4EF1K3SneiHGmm8RHZByMhOuESoGVVYW9LC5dmISUmooVsfnOky945CY=
+	t=1774250674; cv=none; b=QLD0sOIFFbEkKNoXeys+wrSnpTdKgMa9Oof+cZ12mVqhF3mqg9f6WAa6pOGiWxycJlbgCwWcopF7h5z/0d28fwaZBKuWabW7WHlqjXIy7K3IrWfVJa15d0pnSXMUzl6xz4/ulHu87yYKuYi7TiPLgHRzo6s3YHmxKAxfzoe2tLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774250656; c=relaxed/simple;
-	bh=/4exprVqxuVfRqJPaNRhfYNkHOpCb6tQ85+amF0cqDE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CGTbI5emyA6WXkxM/ZoHXlh+N/b3WxxSmLDR6WLnYd+l7IE74NP4UUjRRfh8xfzuK7MxwQ4cd3gDn7OdiRko+VFd+eBrNZ5MfD3/sDI1T6MHh/bMnef8pFIP5uPXxJ9SBqAh2Z5qizR5jb4J1BJm9nWXW9m4SZNJIQtKh/oLj7E=
+	s=arc-20240116; t=1774250674; c=relaxed/simple;
+	bh=PxNGi/hkPIZHlx09eUzwK1ipMisaPPu38DW+8nEgceE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WMUEu8siT44URgy5+9z26MFWpFOue1oJaqywwxdHuiLxqupjsbT6BLGuzS2dwBn0NPOlPLdvaiuJ2V5YLeBn6vxLwfEFrXrGk57XV8Ml1GVMePvLLPQq5lViO1v8k3RWYY0ZZoIt4Fb+x382jRCv8M3XXvoupRXFeL6CwkzpNOI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
 Received: from localhost.localdomain (unknown [111.196.245.197])
-	by APP-03 (Coremail) with SMTP id rQCowABnieCZ6sBp2FOGCw--.58546S2;
-	Mon, 23 Mar 2026 15:24:10 +0800 (CST)
+	by APP-03 (Coremail) with SMTP id rQCowABngdif6sBpGlSGCw--.11689S2;
+	Mon, 23 Mar 2026 15:24:15 +0800 (CST)
 From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	tglx@kernel.org,
-	mingo@kernel.org,
-	kees@kernel.org,
+To: andrew+netdev@lunn.ch
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Pavel.Zhigulin@kaspersky.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	pengpeng@iscas.ac.cn
-Subject: [PATCH] NFC: pn533: bound the UART receive buffer
-Date: Mon, 23 Mar 2026 15:24:09 +0800
-Message-ID: <20260323072409.60086-1-pengpeng@iscas.ac.cn>
+Subject: [PATCH] qede: validate TPA aggregation indices from CQEs
+Date: Mon, 23 Mar 2026 15:24:15 +0800
+Message-ID: <20260323072415.60149-1-pengpeng@iscas.ac.cn>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,81 +55,169 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowABnieCZ6sBp2FOGCw--.58546S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrKr17JryDtrWxWF1DJFyUGFg_yoWkArcEva
-	4kA34UJr4UGr1UKw1xtrW5ZryjyayUWF98uF10gFyfAa4jk348CFWkZF9ru345Ww4UZFnx
-	u34UGr1Ik34rujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb48FF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
-	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjuHq7UUUU
-	U==
+X-CM-TRANSID:rQCowABngdif6sBpGlSGCw--.11689S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxAF1Dtr4fAFWrXrW8XFy5urg_yoWrXFWkpa
+	13J3Zak397J3WxKw4rAF4Uuw15C34fGa4fWa93Ga4fAr90yr18XFWktrWYvrn5JrZ7AFW2
+	vr4Uta45C3W7GrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
+	tVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
+	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQZ2fUUU
+	UU=
 X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	R_DKIM_NA(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	TAGGED_FROM(0.00)[bounces-270386-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270387-lists,netdev=lfdr.de];
 	PRECEDENCE_BULK(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	DMARC_NA(0.00)[iscas.ac.cn];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: EE2432ED81C
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 801812ED95D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-pn532_receive_buf() appends every incoming byte to dev->recv_skb and
-only resets the buffer after pn532_uart_rx_is_frame() recognizes a
-complete frame. A continuous stream of bytes without a valid PN532 frame
-header therefore keeps growing the skb until skb_put_u8() hits the tail
-limit.
+The fast-path TPA handlers index rxq->tpa_info[] directly with the
+completion-provided tpa_agg_index field. That field is only a raw u8 in
+the CQE layout, while rxq->tpa_info has ETH_TPA_MAX_AGGS_NUM entries.
 
-Drop the accumulated partial frame once the fixed receive buffer is full
-so malformed UART traffic cannot grow the skb past
-PN532_UART_SKB_BUFF_LEN.
+Reject out-of-range indices before touching rxq->tpa_info[] and recycle
+the affected receive BDs instead of indexing past the fixed aggregation
+state array.
 
 Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
 ---
- drivers/nfc/pn533/uart.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/ethernet/qlogic/qede/qede_fp.c | 59 ++++++++++++++++++++--
+ 1 file changed, 54 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/nfc/pn533/uart.c b/drivers/nfc/pn533/uart.c
-index 6d2f520a5bc8..1b82b7b2a5fa 100644
---- a/drivers/nfc/pn533/uart.c
-+++ b/drivers/nfc/pn533/uart.c
-@@ -211,6 +211,9 @@ static size_t pn532_receive_buf(struct serdev_device *serdev,
- 
- 	timer_delete(&dev->cmd_timeout);
- 	for (i = 0; i < count; i++) {
-+		if (unlikely(!skb_tailroom(dev->recv_skb)))
-+			skb_trim(dev->recv_skb, 0);
+diff --git a/drivers/net/ethernet/qlogic/qede/qede_fp.c b/drivers/net/ethernet/qlogic/qede/qede_fp.c
+index e338bfc8b7b2..85d640de5f21 100644
+--- a/drivers/net/ethernet/qlogic/qede/qede_fp.c
++++ b/drivers/net/ethernet/qlogic/qede/qede_fp.c
+@@ -668,8 +668,18 @@ static int qede_fill_frag_skb(struct qede_dev *edev,
+ {
+ 	struct sw_rx_data *current_bd = &rxq->sw_rx_ring[rxq->sw_rx_cons &
+ 							 NUM_RX_BDS_MAX];
+-	struct qede_agg_info *tpa_info = &rxq->tpa_info[tpa_agg_index];
+-	struct sk_buff *skb = tpa_info->skb;
++	struct qede_agg_info *tpa_info;
++	struct sk_buff *skb;
 +
- 		skb_put_u8(dev->recv_skb, *data++);
- 		if (!pn532_uart_rx_is_frame(dev->recv_skb))
- 			continue;
++	if (unlikely(tpa_agg_index >= ARRAY_SIZE(rxq->tpa_info))) {
++		DP_NOTICE(edev, "TPA aggregation index %u out of range\n",
++			  tpa_agg_index);
++		qede_recycle_rx_bd_ring(rxq, 1);
++		return -EINVAL;
++	}
++
++	tpa_info = &rxq->tpa_info[tpa_agg_index];
++	skb = tpa_info->skb;
+ 
+ 	if (unlikely(tpa_info->state != QEDE_AGG_STATE_START))
+ 		goto out;
+@@ -833,10 +843,26 @@ static void qede_tpa_start(struct qede_dev *edev,
+ 			   struct qede_rx_queue *rxq,
+ 			   struct eth_fast_path_rx_tpa_start_cqe *cqe)
+ {
+-	struct qede_agg_info *tpa_info = &rxq->tpa_info[cqe->tpa_agg_index];
++	struct qede_agg_info *tpa_info;
+ 	struct sw_rx_data *sw_rx_data_cons;
++	u8 agg_index = cqe->tpa_agg_index;
++	u8 num_bds = 1;
+ 	u16 pad;
+ 
++	if (cqe->bw_ext_bd_len_list[0])
++		num_bds++;
++	if (cqe->bw_ext_bd_len_list[1])
++		num_bds++;
++
++	if (unlikely(agg_index >= ARRAY_SIZE(rxq->tpa_info))) {
++		DP_NOTICE(edev, "TPA aggregation index %u out of range\n",
++			  agg_index);
++		qede_recycle_rx_bd_ring(rxq, num_bds);
++		return;
++	}
++
++	tpa_info = &rxq->tpa_info[agg_index];
++
+ 	sw_rx_data_cons = &rxq->sw_rx_ring[rxq->sw_rx_cons & NUM_RX_BDS_MAX];
+ 	pad = cqe->placement_offset + rxq->rx_headroom;
+ 
+@@ -876,7 +902,7 @@ static void qede_tpa_start(struct qede_dev *edev,
+ 
+ cons_buf: /* We still need to handle bd_len_list to consume buffers */
+ 	if (likely(cqe->bw_ext_bd_len_list[0]))
+-		qede_fill_frag_skb(edev, rxq, cqe->tpa_agg_index,
++		qede_fill_frag_skb(edev, rxq, agg_index,
+ 				   le16_to_cpu(cqe->bw_ext_bd_len_list[0]));
+ 
+ 	if (unlikely(cqe->bw_ext_bd_len_list[1])) {
+@@ -960,9 +986,21 @@ static inline void qede_tpa_cont(struct qede_dev *edev,
+ 				 struct eth_fast_path_rx_tpa_cont_cqe *cqe)
+ {
+ 	int i;
++	u8 agg_index = cqe->tpa_agg_index;
++
++	if (unlikely(agg_index >= ARRAY_SIZE(rxq->tpa_info))) {
++		DP_NOTICE(edev, "TPA aggregation index %u out of range\n",
++			  agg_index);
++
++		for (i = 0; cqe->len_list[i] &&
++		     i < ARRAY_SIZE(cqe->len_list); i++)
++			qede_recycle_rx_bd_ring(rxq, 1);
++
++		return;
++	}
+ 
+ 	for (i = 0; cqe->len_list[i] && i < ARRAY_SIZE(cqe->len_list); i++)
+-		qede_fill_frag_skb(edev, rxq, cqe->tpa_agg_index,
++		qede_fill_frag_skb(edev, rxq, agg_index,
+ 				   le16_to_cpu(cqe->len_list[i]));
+ 
+ 	if (unlikely(i > 1))
+@@ -979,6 +1017,17 @@ static int qede_tpa_end(struct qede_dev *edev,
+ 	struct sk_buff *skb;
+ 	int i;
+ 
++	if (unlikely(cqe->tpa_agg_index >= ARRAY_SIZE(rxq->tpa_info))) {
++		DP_NOTICE(edev, "TPA aggregation index %u out of range\n",
++			  cqe->tpa_agg_index);
++
++		for (i = 0; cqe->len_list[i] &&
++		     i < ARRAY_SIZE(cqe->len_list); i++)
++			qede_recycle_rx_bd_ring(rxq, 1);
++
++		return 0;
++	}
++
+ 	tpa_info = &rxq->tpa_info[cqe->tpa_agg_index];
+ 	skb = tpa_info->skb;
+ 
 -- 
 2.50.1 (Apple Git-155)
 
