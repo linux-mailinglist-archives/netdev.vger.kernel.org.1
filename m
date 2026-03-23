@@ -1,241 +1,325 @@
-Return-Path: <netdev+bounces-270362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270363-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EP/+I0nPwGm2LQQAu9opvQ
-	(envelope-from <netdev+bounces-270362-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 06:27:37 +0100
+	id UAB2EXDYwGl0NQQAu9opvQ
+	(envelope-from <netdev+bounces-270363-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 07:06:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95A0C2ECA73
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 06:27:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B64E2ECC7F
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 07:06:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6A4DC3002D16
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 05:27:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E22EC300A76C
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 06:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15087288505;
-	Mon, 23 Mar 2026 05:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA6D2BEC2C;
+	Mon, 23 Mar 2026 06:06:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gf7Yd3lC"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="HpCBxP5T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013053.outbound.protection.outlook.com [52.101.83.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E78158535
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 05:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25D61CD2C;
+	Mon, 23 Mar 2026 06:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774243652; cv=fail; b=XOLIx+7QJLqXJDddh7UwCK8aMK6YJhpW48euxvjGO4l8YRQuRfbNBijeL+x6VLLbjysoqiMx2dQW9wYhtleYKOAXkyYJeEXrvlX0zc+nUtka41EvFao3TJpP2lQUNlr894eujxncLIKoJ8R6XZ/KcvCbGtfpCYRGcJOc1rUAuME=
+	t=1774245970; cv=fail; b=up9Nka4G5FnqN55YQZhm544OewW4mzwYXgdYqB/Oyj6/BPO1wOddPg7kamTI6QJHffJ+WmsMGUvmWBoXbifLhJswp8XE1bD0EuigAoD/3SAczMAz1sqx4G1F8BrthpaoX+LQR+EORYLVde8/EIixtztPxyTIONB+JIPSvZemiI0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774243652; c=relaxed/simple;
-	bh=LyTECMG34S/7mgoNDyeDU5LrvgRE16bq0eIeAXCoddA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=qvuKdDyrq4lerfLA6jocRzbESj6lizMHWlRQfrirZPAJWX7hRdxpbWw4rkzlZ/EkmeY1M2BQBruvAFcY5TDbxbw62S9DM8FAitObNK8BCbE2xoO3u+ZWru1FTQ3auKfsHuICfV/eIo3r6l4dT/0KSYKTK9QJ+NewynpTu4Ov7EY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gf7Yd3lC; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774243650; x=1805779650;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=LyTECMG34S/7mgoNDyeDU5LrvgRE16bq0eIeAXCoddA=;
-  b=Gf7Yd3lCcs1uPR2Z0RrGHGGN9r/a+NLgnQmPI+R/Ikmt5cB/6tGWEmg9
-   EIb+CcwhXYrDMk9nX7AZ/CnRtG35D4VPKxGt62yd4Ypyw7zyQNf8gcy1k
-   YslAf27BTHYYJTRja00qZNiU1YvA1/1SsfFc5y6K5iHvS+/Ccbeo7m9da
-   wH755I073jwwuRiyV9TGKl5OwTMTm1y3gbw2W2bUV9izYKfQCWPifouY+
-   ubEvWI22MEhygNuHW26mAEpqZvRwd8TRKPNcIiiUA+CdtDnxEur+gw2+3
-   xfsBz8bzSnJzeUPgYzAN7wVsU/YxImQfctuz7LMUdklP7inIQMtzAntev
-   w==;
-X-CSE-ConnectionGUID: tX662YZFTwqBDi/WZZGjQg==
-X-CSE-MsgGUID: cdMOOAQ+RaWi/rQh8544wg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11737"; a="100689233"
-X-IronPort-AV: E=Sophos;i="6.23,136,1770624000"; 
-   d="scan'208";a="100689233"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2026 22:27:30 -0700
-X-CSE-ConnectionGUID: bY/Nbi7aTOmwNQN/qv6IaA==
-X-CSE-MsgGUID: RypaKE1dQ9+NKkN29pFjqA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,136,1770624000"; 
-   d="scan'208";a="228842987"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2026 22:27:29 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Sun, 22 Mar 2026 22:27:28 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Sun, 22 Mar 2026 22:27:28 -0700
-Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.15) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Sun, 22 Mar 2026 22:27:28 -0700
+	s=arc-20240116; t=1774245970; c=relaxed/simple;
+	bh=OJ3NV9kMv+HDMxaipFbJHZDOEvd41Oxw2DXqQbyKsbM=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=baOncfSANOU1JvzYx0lNJiM79wUwwIVjMi2f+6TDHBbT0M+QDCOlbuTt+altANlfwjV6woK5vDaOHwDSNradtyk1rRSUG6PZJF8kWVph6Sr4bZs505KQVoERFPG8INcZxxirOQuSkYv4QvURI7e0jdKVM9gJ+PHMhVccnHi3XuE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=HpCBxP5T; arc=fail smtp.client-ip=52.101.83.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Lf6wCXzc9RPfj4bO4cN5vJgfYN0AHn4ULA4M4XQ2ub5q+exDR4Lni9Yx1SfBkTlpCb3ykQN4XkMML1UoF1QIo54MTJU8qKBs9O2fs0UY83qn5IaOBtJanjmnjDprSm0abROwpGL0kDsohf3dpEAmOP9Qo6QcZpBRMbyApWaga6NlSSbY99mANoOJOl+DjU43LV29+nypjMvUrdKauCZWOBPzwTarjRcKXmGe27IHig7ibxmjt9+Phouc9dCIAuC7t2QLLOFGCX1yjXf3OOaHBUQQdVeWxGFbFWQWKi4sT2MGqm2TzVaU8cW96iQPRcVWVC/GqaAQYauerRiNd5HqWA==
+ b=oggJnnODP7Mc2j2NnEMadeijak7U12J0mTMoLO26gKq+Ug3dfZmqa4VWUloqP3T0ELeE7Voj40Z0bKBCMJkD21HTKaNuHa7uJ+qEqMu84U5MHylaLqGjnYH1nma7QQMxT1Gq/dm7V4KF2Cl7gQiJ1hEZB9PeUYyNeUPzdVcP7JNrDooETfwy2NYZpfVSB3NUSc5NtsleJDDDtgj6H1GZuUCbVmstG6P8awPPdFcKAfMnLNU+CML3jMrEUWU2KMOAmQ/MExg605KEjkO0qJh/3cXrV6PZtWVj/23QdV47ZElQoRroib59gkj+xXd4Ni77QIaRgrKzIq22j5t+xObKzA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mYIMtXX25XbwT+M2cKvK7DEUkY+jXHqznBFZIJbJ+sY=;
- b=AT/eQQ60xk0tj/6je9iGzOdbf0v+eOO4yEdd0gWC9mx0k9JcNv8lYq5YQ9mbVb18u7lDoiGdBT+MEfAJZRaGNlWxZAssvySR5y4H/FDIbDHn3KoZOo2XKw7fqjvCqVOI8VWbLc9fkaGU960l5wZMdHsmjxWK7vnacqAQ4ux9X4RBZgZSEyXsn5A2KQrEmnZFz17mDMu/jkQuBh0tc9JwfFPtNy5WsDfcQBnHWUeDp3SkWPzkAbLNSlVrJU1qN2gR6OcIwp660RZZNbLrDb4uIrEGLfYfjIOcKvWqSj+tg5ebtwDOPIMtZCIrD2SD5cP02rtZ9rietw26QqlOhpP1TA==
+ bh=+fmi5UuSl5NkRjaxWvupDcK+tsZdlaJHTTY1oHy89dw=;
+ b=WSiVMN+hswPDckuBUIpQcDmPvXw4nfoTb+hZZccvbgx13kCJrCu+mtoUOuW356nVpUr4EDkQ1bHC5K4EqouB2DB9nFw2shVpRsJusxYqpBijJQWgoMouKhXXezMNxUrWRhvpciU9fir9ZRaGOfO8mtR775emabaxooss96bxdwjVypLdqrHZqI73gSTrTLoO2fzDePdah2ZhYcw9iINrwa/URE+O5KbO/GVUD/cKz3nah5WIc4/5I3UbFJoat48ffWEmKsAsE9T2+QTq+McWvCMrDKeCnSR++Cz/cZpqlhKBgKoOjZlhqfrH01maDtI0KN06uLiV+EkRgMAk95aTNw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
- by SN7PR11MB8263.namprd11.prod.outlook.com (2603:10b6:806:26d::19) with
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+fmi5UuSl5NkRjaxWvupDcK+tsZdlaJHTTY1oHy89dw=;
+ b=HpCBxP5T3LbAgDYpNJwkHNu+g8KqHzoeU+d7a5KPaXFQZFRu0bJ+6Ie6JRKSwX+9lWNKcEBCAQSpjb+9DVGzF31S5vP6zlMcRGmDpxteRex/SWWt3IQxInmenT7nFKnH7Uav3qGDMMxYV5WVcA2e4YU6jwLskPDu2xXsyGkk3AWt5zybFMcL27E18WZ7hut5OdmKybaf08o6WDDpDBS3DOvaoWqOSAaQPW1lcRToTiu5mVV8v796nLAb8EVhvy53ENeS73MkChMD6DzZQT0g1vit5iY/1JNiCcfs16jqN95FJS33VAjh3SSyIcuioWjudz466b/fjQcijcQo4dbM1Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8505.eurprd04.prod.outlook.com (2603:10a6:20b:40a::14)
+ by PAXPR04MB8911.eurprd04.prod.outlook.com (2603:10a6:102:20e::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Mon, 23 Mar
- 2026 05:27:26 +0000
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9745.019; Mon, 23 Mar 2026
- 05:27:26 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Jagielski, Jedrzej"
-	<jedrzej.jagielski@intel.com>, Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v3] ixgbe: fix unaligned u32
- access in ixgbe_update_flash_X550()
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v3] ixgbe: fix unaligned u32
- access in ixgbe_update_flash_X550()
-Thread-Index: AQHcnJY+zz3w/Ctk50q4kF1vX3vi1bW70J5Q
-Date: Mon, 23 Mar 2026 05:27:26 +0000
-Message-ID: <IA1PR11MB62412D2B51705B216545E65C8B4BA@IA1PR11MB6241.namprd11.prod.outlook.com>
-References: <20260213030940.1809797-1-aleksandr.loktionov@intel.com>
-In-Reply-To: <20260213030940.1809797-1-aleksandr.loktionov@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|SN7PR11MB8263:EE_
-x-ms-office365-filtering-correlation-id: 3371d49d-3046-400f-6e64-08de889cde76
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021|56012099003|22082099003|7053199007|18002099003;
-x-microsoft-antispam-message-info: KAZ0owZ04lGVoSQgcihuca5M8RPML1JD16VtQK7a07laTOnoHcAaCabjcJ3nCMwcskyOtf9dPWRfjTmkYKhBwPJ0Xzfcbws86ZJ2HCcB7jPQvrLpUbWTiMoVwCEUk60OR9MxRHlTWsXb7fk+PZu5eSbi5fHh986/0hepdbnw/PFSLLdw+PQG8+ol2IpK7rRVD+6fjptZFmKRwtXn0zTY/euB7NOOyOAT2bst9ICrvimSD4rwUXk7sSWFyHZpxz6KLTehqbYs7Dz/6fKjcoSF/nDz+395hNfxSSzT33LfbFQwHhjHx+TWOzVCGDdhz/hgc2ZdywQFYyDqs5iylVylkUcOhCz6TVMwT3okILy3dq1YRJ03naRG0tfSjLUNON6JoXL4XmEjSeSWUVNXQPLMRzrOIZSj3rDQ4OyIqv0USdn7ZYkxtlshjlbTAVyHB9snKupiykWWtckPdUpCp1jc5h67ogY6LyP2wvLFghgBTwDsRa+VnRIRKFQ65nBmmx9AMHgE6VNO/ABZMXjlHXcB2+BkqzPBm2hQi20lKpX5WHTL1wEXpDb4Axqr8dU4TJH3vITTBlgXd+XKA9c6yKe3g7N8QwZD48lB0PlrIkEzGFl90whIni9+L8PDji7yC2MEtB96TBDMYwO6+UPAvolguuZRADJGqRsuFiYTl1Gl+lim5YnSygevtQvdGcCvnU4ww5tl8UcAiTSBUgLAhVs+4xuVheu41WMVQT/I1XN9+8dGxdLku7x8RGzVsiuwQ2Wo2tMiTsftphum1AAtAu9Z5au5qaAoLpmhxxNseGbAn8c=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021)(56012099003)(22082099003)(7053199007)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?cdY4RAQ26krwKo8xLUcREXVlwt385jiD/ZSp+Jjce95zHaGkEnkOphhT+3a/?=
- =?us-ascii?Q?lI9ZIEm5p0EoT3IJQT54LYYICjWwzuT7xRnQJhJIXT00GzZ6rc5/mp8Y5K/X?=
- =?us-ascii?Q?kUx7bYNlpVfDZTC1JK6AAusUDAJfCComyS1SUoVMh+YfnPH6omLvVbzxXbus?=
- =?us-ascii?Q?QhnppAnQ8jDCCYSwMrpxdqF3SrFkYRmbwQPiuJu/ftWTYZbJ/lCodgjhlJUR?=
- =?us-ascii?Q?URfnYaLfupF0MSPPYnPfAWIweoslINdFWZXTcC2wkyuOzwF7RWqqCzqWsPE1?=
- =?us-ascii?Q?4oMcDgA9VtqhWLJ8obElkKEsBJtN/9EUXzoM1PBxGHbLV+KeDjK1LX5gGZ7h?=
- =?us-ascii?Q?5FMf8MHZmtA9TLix8b12aquGAx+szRtNZLU/AAICWkF2yq4nWxuJ7pZDtDxQ?=
- =?us-ascii?Q?rNtIBajdsQoVXb3F4cbhjq+Tqml9Ao8Uruaz8l6mdYJWOS1dzT+txGy+yXnQ?=
- =?us-ascii?Q?fChwTLLg/J9E2gygOV0v6NQxQUD56t6JNFY47UC1NcAp2axw8wW/K+gXL6Ud?=
- =?us-ascii?Q?9IG3OGcDX/N4KtxkMcK6ujbZb/4b0y4JRpWO9EayYrpz/8ZxsM+DZCw8FrcV?=
- =?us-ascii?Q?AjKAiuivfPoX4l8Ud+YWXsP/u9pW4d4DlJvDgDSt0XI0nLm5C8S7AY8kdrR1?=
- =?us-ascii?Q?OxXlO1MjA1PesJjeUH6vpl5tNAYQevB45A4+FDGuYVLF6SP4xFepjFlDq0Dv?=
- =?us-ascii?Q?vyDooiabP8djDL/fkzeamaT7z2+k7PiEAMPkAK47f4IfgRPoVIDmarFscApP?=
- =?us-ascii?Q?lZ8RWFeeXT1pXVJPxGgAfYH+ahdW3Z6n2Q/JBnrDzS2rSOzczLmS+LTGOFEp?=
- =?us-ascii?Q?8p1VedHC8XHdcVFJ/sxhDYmR4lSsWy68QzC7vis4tHftSs/7rJ/Ss7ji7pRp?=
- =?us-ascii?Q?smjBBvevvu/8Ey6Yepdo9FPQVNJ1MZfhRyzJ66ImWoykiCqCorAMk5ekwdpD?=
- =?us-ascii?Q?PWBwllYK0s5sD9hBbpkQ1ww0+BT7+ufCKkYfW9ZoawNCbMbUqCgJS1/CV0oS?=
- =?us-ascii?Q?J+/6OXA+qDvaFEwJnQLm1zxwUf3ZiJd6e8BPiDhEfJzhjT5OPPFW3v7HCPGA?=
- =?us-ascii?Q?mKwBb+6M3yPs8EUgRIwXlr5GT3dGaOMZ9fFgZN1Fdc+e+0EhAIIWnaqnzavr?=
- =?us-ascii?Q?HKBaC1tUF2pExRRnnh+w8Hahgcl7kmlHKnGw3EfQUnv87Ec7I11a2SDKLAu0?=
- =?us-ascii?Q?Zb+QxJmSGm9KHhW78Rt1QTdSGPlZugvpLt8I7yINtMeyfUPWpQJlLN00f3dA?=
- =?us-ascii?Q?CiZs2gs8nIcrYnboDYmWTFsjbKvN2g/UG6afgpolqMidg+QSS1qjy665fKJf?=
- =?us-ascii?Q?/bScFtfwlDOjms8DSNRDr60O245UkImMnRtunePBqMfZbkOtxe+k8Z5raYNS?=
- =?us-ascii?Q?b8chDgB041E1eqQyU0fRH2UirJqrC7dPjT+9b6i4JY4fqYkbYUjqqAJbq3oi?=
- =?us-ascii?Q?14l365OSHpygtvunDTAcwW9nEI8QVo2LwePtpdE9toZUtBnbl8FLjLp5xSvp?=
- =?us-ascii?Q?tQdbuZ4eDKJPEQGNJdNE1LInS7bB8jzJZZo1tbqr6jUmWtm2BWuHDLqv84FL?=
- =?us-ascii?Q?BzHWrPBtLv/QVZ1/hV4+xEKL5h7H84LYSgR+iR9fj18S+jrQ0rTyvBm7y+xq?=
- =?us-ascii?Q?uw2NnLPbhMTWuQ05aujRR5hT/oehEAj51uRrGK8gb5/AuxTNdfSKwqr1nWsY?=
- =?us-ascii?Q?3AgrV9jhqGaFfeSxzaxG6QS+p/B95AvImM4Gx4S7aeFYS/a7?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.31; Mon, 23 Mar
+ 2026 06:05:35 +0000
+Received: from AM9PR04MB8505.eurprd04.prod.outlook.com
+ ([fe80::dc5a:b0aa:4a1b:c55e]) by AM9PR04MB8505.eurprd04.prod.outlook.com
+ ([fe80::dc5a:b0aa:4a1b:c55e%6]) with mapi id 15.20.9723.030; Mon, 23 Mar 2026
+ 06:05:59 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	f.fainelli@gmail.com,
+	frank.li@nxp.com,
+	chleroy@kernel.org,
+	horms@kernel.org,
+	linux@armlinux.org.uk,
+	andrew@lunn.ch
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org,
+	imx@lists.linux.dev
+Subject: [PATCH v2 net-next 00/14] Add preliminary NETC switch support for i.MX94
+Date: Mon, 23 Mar 2026 14:07:38 +0800
+Message-Id: <20260323060752.1157031-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MAXPR01CA0099.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a00:5d::17) To AM9PR04MB8505.eurprd04.prod.outlook.com
+ (2603:10a6:20b:40a::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: g0eoLZjqm2sCpOqj5oPwDyY3GYctUG+R/vxRB5WLhTIhnsh0Nw7BvkWBWJ3PrjnolpHU6mNcqc4hpR49J3FgTMuPi394zqOWq+68wTlqkfhydgPH17I+md4NW1XpSAaO8tT19qfwMbv6Tzl/RWdkpx6XRvIMEOlqoHgJ13CQjX4mqm/OhEGo9ge5QHQk6eUQDokK+gKdZu/b4aBs2MwIqANBZulC1/K3r/hG8cWJmxIhMKCRhtD/yt1Hu6ITtawMU8wMMOCq+MLmTrVuvd0AaaVxOXGIuCdBm1A7xvTqcSz/gnvfp7xqhc3Za7pvZN4gTBpvl6Z3uXwJFCkhIdOcaA==
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8505:EE_|PAXPR04MB8911:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7eab5480-d346-440e-bef5-08de88a240b8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|19092799006|52116014|7416014|376014|921020|38350700014|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	QBtf2UB3VW3nZ4c5xx5M9PWLIPKvAPRPHbYEHGz4MptZvPL2Vx5Ilus+nYo8chjAP0mXhw7fPJ+euyX0z1SfPcT8TAFVymZ2/eS5wIRn0OjH20eybERg3SLRTNTH1NcW0t3rm5xmGoX9aORyQJLGCqZIbvzJ6+K5iAOY8cWaCiFPGp9VNXoThze87qV6EFyzcRZsVYiBLvcKaYlu6U24nkV4sDtHzGFnYHqs5F9YWspcB5LabqDWmivMTncqbHjMdytSjpt+vUR/AWS5kL0QVuyiaplgk7g9OhgrjTxf0wezaJLGkwLqnMXA2R21zp58NrLSK2+J06MD1ZysBLLOV6A4rZAOdpnvvr7BkTjFuU2f/z5wObQUWvHIYi+7Pl5Fk+uaihoMlJKAN1QNA9FIn1sLy8nqD5XZ9fE4O3pvgJBOViI9dfV+Z8Lxmdr6pDBJxG1MqXb9eAih0hQxR9MnoX3lgK1/8WVBDqswu7ZQHng36q8nZgoHEYH7JW3mvDe/BWfYilyUFpZGkpEhDnoV2BBSbQamUCeacS1RqEhpBUNae94ZEWtJPySNWZ2kRQw+ttTxTpp0YD1a4+I5FPL4pYFBb+d6MHffms+Dmh+I2w8xvTkDIn2bgr0AAv7XJkRx5NP6w+UCVy2JFC2F4RGOxnCTBzbAmAGSCfrq08hJ4GGhdPD0NYR2AXCt/JJapxwG3PLb1/y8sSzTwerCCWdBj0VMTRdhqHQK+3wYYO+W6k/Di3L5QGSOZEGEwMpwIl1+JXT6onXUm/KvWf9ilAGycQzY7hRrDfI6V9YEC3iEpxtdFaD5hRJKqMd6TQ/Gsf1l
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8505.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(19092799006)(52116014)(7416014)(376014)(921020)(38350700014)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?hgxhRrwzE/Uc0MM35XJP+SuoP0MxZpC4Jlp5pjf5veqfFu3o9R7f2zbA+s94?=
+ =?us-ascii?Q?CwmSt198uXcK6BUvqGK/AWTnaf26iFgd2JAUY38UBs+ECASoTURCJ9uXG7up?=
+ =?us-ascii?Q?jP24SI/M9AVwrzd16n+pNlchg/TegUJ7ZKnr5O2fNX/jDp4iuic4xkR+NyO7?=
+ =?us-ascii?Q?/TxqnKWP09lYrsZj2G4hjXGY8YGhLr/Fhz7KSWa6Hf1UVnNJCxAZY+XtoKMQ?=
+ =?us-ascii?Q?HAmi/5bZhLw4fwtmRaHi7Fw6pgY2he80YT9zF0fPIEdOOqdcWVVGdFQrCU0T?=
+ =?us-ascii?Q?Le1IPTVL29lrdcXM25kDoYkaKxuPOJEPXN5HXIsXxbd7SIOAWCF86GHwXgdA?=
+ =?us-ascii?Q?JVqIWmEC6D4QCUFvO7J9HKqfOIeRcW8MNvMW6+Zefxn01PlxcF3RcjwaIKZw?=
+ =?us-ascii?Q?Jn9rCwH7lR27ZOpPqrnxsuSHvxwC+wDnPXNb2jMvX+OcJ9XDFjOrJc86OKRR?=
+ =?us-ascii?Q?dSCSCMR2Nu3s6e6e2Lq7qf0hyXtwkhTtkqTkZbs/VKZesA6YXj9CnigZj8GA?=
+ =?us-ascii?Q?VGvF+SEs5l3q+oA2JFBhmwgKkZX3LjpgMj3Q5IO7m2VOOv0gI3FHV9g2ZN85?=
+ =?us-ascii?Q?gkW5Yg4bTcOo/GDI5RMLepjEN83gerSrJgtXowJZiUSf1xTmwgYKRViNWwsA?=
+ =?us-ascii?Q?r4W2xm05mvQ89Lv2qfp5DRR6tnJ8L0rHfK1CRIW+4llPQY5f3QaacmGiQbBY?=
+ =?us-ascii?Q?bVHsVcrfKxcNXOs1cJIKa1kDUgs3vFgQr+6Ur4LV4IoVOcn2U41y5HpgLqmv?=
+ =?us-ascii?Q?lkcclTgkhTrsz5v0JrtkmvrEVPsd9kPqj897zQfme3UqCYbtkw0L6o5e+WuR?=
+ =?us-ascii?Q?inVsyJf4qbS6eetIdUpilQ2rWma5UOSkUXsJpZ9CSfCF3oYBDBIwaWIsTumE?=
+ =?us-ascii?Q?h2vOBDpzrKwCHyMkjAXOibwXP0JD6+8qPLP5AfdP5FRrcSl00eBivsv0QOQt?=
+ =?us-ascii?Q?3OuLRhu33kqK9QBUOHThnfio/OsJbxONlCNvRqrgz8Dehezk4Ph3fRF4z+Ac?=
+ =?us-ascii?Q?xJGxv1kKdiWLAETjGTJIp/0vEPlWNSBPF6ramy+S4/+S4+U//4O+rwXs2DiR?=
+ =?us-ascii?Q?G7TlSas9ZxH8Q558B7Pfyetm3AVO6Vo3KmAxemdVcc0a9glhD81VTRsFERTO?=
+ =?us-ascii?Q?xqP7Y9ywIiQy3QH4kIWRAObX4rMZ41SPTQWkK59qqE9XnTBI6988NBhkzC/j?=
+ =?us-ascii?Q?R+TJsUwd7ogBqxTGPHWdGQhcNCbO6QzzYcGWIPD6usM55msOLDYZqfEEShAn?=
+ =?us-ascii?Q?5WVkWk0io49RQgSwffpWhMEjU1klKIEKP57OIny8O3JeqSMM7q29IbUheRzc?=
+ =?us-ascii?Q?oVsr7leSLltRQGhPzCSU9WTG3L7rjQ2n/HrvMc3vz9xZJ2smBICkFfqokyFD?=
+ =?us-ascii?Q?CyeZYLtHU4c+1n+OhVhcmZW5BAKYotAdLVKHlboQZKRt9+1lVjQeNhj46tFz?=
+ =?us-ascii?Q?pIUH4xXEeeiGezmloTJiI2+m3AWoNkgvgfpXGAs0kN0QgMQhwGNsE/0X3NuL?=
+ =?us-ascii?Q?rnt+x+O+cy+DIeIumErrt124+eSgcrFgOJ0FWzEoHCsCk3LTWE/G4E6A6w+i?=
+ =?us-ascii?Q?QzP/HydwLnz7XZQvQeoRL1mj+RK6+a4qIXO20QA56508nOci0mRITXiG08um?=
+ =?us-ascii?Q?0Q6HvUFUounKuxfNf8b4sJy6nCcy7HWhuNxB6uH3Lk91e1S5VEPr9tDWzVW7?=
+ =?us-ascii?Q?IcJHLZMnQALWiHUrTz9nAgEKVVAxduV+cYvz5hx44zK2ncHT?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7eab5480-d346-440e-bef5-08de88a240b8
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8505.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3371d49d-3046-400f-6e64-08de889cde76
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Mar 2026 05:27:26.0806
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2026 06:05:59.6351
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yZgM+gLJJhCo6xG0erbub7duI5T+V/KojxnkF8exRRmxJ6xrRpOo5OEfyjUrxCyVfpFEk1sOjcs2J5PoByR2ig==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB8263
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aDQnVR/b1jR30fg17LcC2uzqqzQUs62ZWuCnhJyzn57Hnf2JxYXw16xONuHOaidIH94BPXhpRk4r2uRhMlVJSA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8911
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270362-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[osuosl.org:email,intel.com:dkim,intel.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mpg.de:email];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270363-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 95A0C2ECA73
+	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9B64E2ECC7F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of A=
-leksandr Loktionov
-> Sent: 13 February 2026 08:40
-> To: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L <anthony.l.nguyen=
-@intel.com>; Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
-> Cc: netdev@vger.kernel.org; Jagielski, Jedrzej <jedrzej.jagielski@intel.c=
-om>; Paul Menzel <pmenzel@molgen.mpg.de>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v3] ixgbe: fix unaligned u32 a=
-ccess in ixgbe_update_flash_X550()
->
-> ixgbe_host_interface_command() treats its buffer as a u32 array. The loca=
-l buffer we pass in was a union of byte-sized fields, which gives it 1-byte=
- alignment on the stack. On strict-align architectures this can cause unali=
-gned 32-bit accesses.
->
-> Add a u32 member to union ixgbe_hic_hdr2 so the object is 4-byte aligned,=
- and pass the u32 member when calling ixgbe_host_interface_command().
->
-> No functional change on x86; prevents unaligned accesses on architectures=
- that enforce natural alignment.
->
-> Fixes: 49425dfc7451 ("ixgbe: Add support for x550em_a 10G MAC type")
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> ---
-> v2 -> v3 commit message line wraps
-> v1 -> v2 change title and concentrate on alignement issue
-> ---
-> drivers/net/ethernet/intel/ixgbe/ixgbe_type.h | 1 +  drivers/net/ethernet=
-/intel/ixgbe/ixgbe_x550.c | 2 +-
-> 2 files changed, 2 insertions(+), 1 deletion(-)
->
+i.MX94 NETC (v4.3) integrates 802.1Q Ethernet switch functionality, the
+switch provides advanced QoS with 8 traffic classes and a full range of
+TSN standards capabilities. It has 3 user ports and 1 CPU port, and the
+CPU port is connected to an internal ENETC through the pseduo link, so
+instead of a back-to-back MAC, the lightweight "pseudo MAC" is used at
+both ends of the pseudo link to transfer Ethernet frames. The pseudo
+link provides a zero-copy interface (no serialization delay) and lower
+power (less logic and memory).
 
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+Like most Ethernet switches, the NETC switch also supports a proprietary
+switch tag, is used to carry in-band metadata information about frames.
+This in-band metadata information can include the source port from which
+the frame was received, what was the reason why this frame got forwarded
+to the entity, and for the entity to indicate the precise destination
+port of a frame. The NETC switch tag is added to frames after the source
+MAC address. There are three types of switch tags, and each type has 1
+to 4 subtypes, more details are as follows.
+
+Forward switch tag (Type = 0): Represents forwarded frames.
+  - SubType = 0 - Normal frame processing.
+
+To_Port switch tag (Type = 1): Represents frames that are to be sent to
+a specific switch port.
+  - SubType = 0. No request to perform timestamping.
+  - SubType = 1. Request to perform one-step timestamping.
+  - SubType = 2. Request to perform two-step timestamping.
+  - SubType = 3. Request to perform both one-step timestamping and
+    two-step timestamping.
+
+To_Host switch tag (Type = 2): Represents frames redirected or copied to
+the switch management port.
+  - SubType = 0. Received frames redirected or copied to the switch
+     management port.
+  - SubType = 1. Received frames redirected or copied to the switch
+    management port with captured timestamp at the switch port where
+    the frame was received.
+  - SubType = 2. Transmit timestamp response (two-step timestamping).
+
+Currently, this patch set supports Forward tag, SubType 0 of To_Port tag
+and SubType 0 of To_Host tag. More tags will be supported in the future.
+
+In addition, the switch supports NETC Table Management Protocol (NTMP),
+some switch functionality is controlled using control messages sent to
+the hardware using BD ring interface with 32B descriptors similar to the
+packet Transmit BD ring used on ENETC. This interface is referred to as
+the command BD ring. This is used to configure functionality where the
+underlying resources may be shared between different entities or being
+too large to configure using direct registers.
+
+For this patch set, we have supported the following tables through the
+command BD ring interface.
+
+FDB Table: It contains forwarding and/or filtering information about MAC
+addresses. The FDB table is used for MAC learning lookups and MAC
+forwarding lookups.
+
+VLAN Filter Table: It contains configuration and control information for
+each VLAN configured on the switch.
+
+Buffer Pool Table: It contains buffer pool configuration and operational
+information. Each entry corresponds to a buffer pool. Currently, we use
+this table to implement flow control feature on each port.
+
+Ingress Port Filter Table: It contains a set of filters each capable of
+classifying incoming traffic using a mix of L2, L3, and L4 parsed and
+arbitrary field data. We use this table to implement host flood support
+to the switch port.
+
+The switch also supports other tables, and we will add more advanced
+features through them in the future.
+
+---
+v2:
+1. Use raw_smp_processor_id() in netc_select_cbdr() instead of
+smp_processor_id().
+2. Remove netc_port_free_mdio_bus() and netc_free_mdio_bus().
+3. Correct the mask value in netc_port_set_mac_mode()
+4. Rename net_port_set_rmii_mii_mac() to netc_port_set_rmii_mii_mac().
+5. Check the return value of ntmp_bpt_update_entry() in
+netc_switch_bpt_default_config().
+6. Add some comments to avoid false positives from AI review.
+v1 link: https://lore.kernel.org/imx/20260316094152.1558671-1-wei.fang@nxp.com/
+---
+
+Wei Fang (14):
+  dt-bindings: net: dsa: update the description of 'dsa,member' property
+  dt-bindings: net: dsa: add NETC switch
+  net: enetc: add pre-boot initialization for i.MX94 switch
+  net: enetc: add basic operations to the FDB table
+  net: enetc: add support for the "Add" operation to VLAN filter table
+  net: enetc: add support for the "Update" operation to buffer pool
+    table
+  net: enetc: add support for "Add" and "Delete" operations to IPFT
+  net: enetc: add multiple command BD rings support
+  net: dsa: add NETC switch tag support
+  net: dsa: netc: introduce NXP NETC switch driver for i.MX94
+  net: dsa: netc: add phylink MAC operations
+  net: dsa: netc: add more basic functions support
+  net: dsa: netc: initialize buffer bool table and implement
+    flow-control
+  net: dsa: netc: add support for the standardized counters
+
+ .../devicetree/bindings/net/dsa/dsa.yaml      |    6 +-
+ .../bindings/net/dsa/nxp,netc-switch.yaml     |  128 ++
+ MAINTAINERS                                   |   11 +
+ drivers/net/dsa/Kconfig                       |    3 +
+ drivers/net/dsa/Makefile                      |    1 +
+ drivers/net/dsa/netc/Kconfig                  |   14 +
+ drivers/net/dsa/netc/Makefile                 |    3 +
+ drivers/net/dsa/netc/netc_ethtool.c           |  192 ++
+ drivers/net/dsa/netc/netc_main.c              | 1561 +++++++++++++++++
+ drivers/net/dsa/netc/netc_platform.c          |   89 +
+ drivers/net/dsa/netc/netc_switch.h            |  155 ++
+ drivers/net/dsa/netc/netc_switch_hw.h         |  356 ++++
+ .../ethernet/freescale/enetc/netc_blk_ctrl.c  |  188 +-
+ drivers/net/ethernet/freescale/enetc/ntmp.c   |  391 ++++-
+ .../ethernet/freescale/enetc/ntmp_private.h   |  120 ++
+ include/linux/dsa/tag_netc.h                  |   14 +
+ include/linux/fsl/netc_global.h               |    6 +
+ include/linux/fsl/ntmp.h                      |  233 +++
+ include/net/dsa.h                             |    2 +
+ include/uapi/linux/if_ether.h                 |    1 +
+ net/dsa/Kconfig                               |   10 +
+ net/dsa/Makefile                              |    1 +
+ net/dsa/tag_netc.c                            |  180 ++
+ 23 files changed, 3638 insertions(+), 27 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml
+ create mode 100644 drivers/net/dsa/netc/Kconfig
+ create mode 100644 drivers/net/dsa/netc/Makefile
+ create mode 100644 drivers/net/dsa/netc/netc_ethtool.c
+ create mode 100644 drivers/net/dsa/netc/netc_main.c
+ create mode 100644 drivers/net/dsa/netc/netc_platform.c
+ create mode 100644 drivers/net/dsa/netc/netc_switch.h
+ create mode 100644 drivers/net/dsa/netc/netc_switch_hw.h
+ create mode 100644 include/linux/dsa/tag_netc.h
+ create mode 100644 net/dsa/tag_netc.c
+
+-- 
+2.34.1
+
 
