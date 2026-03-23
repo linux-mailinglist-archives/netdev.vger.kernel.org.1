@@ -1,392 +1,579 @@
-Return-Path: <netdev+bounces-270816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270817-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QLt+OlTSwWk9XAQAu9opvQ
-	(envelope-from <netdev+bounces-270816-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 00:52:52 +0100
+	id kCtRAmjSwWk9XAQAu9opvQ
+	(envelope-from <netdev+bounces-270817-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 00:53:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5512F2FF154
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 00:52:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CDC82FF15B
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 00:53:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D448930BFF37
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:48:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 27B3430CBE12
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88403845CD;
-	Mon, 23 Mar 2026 23:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB8A3328FA;
+	Mon, 23 Mar 2026 23:49:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r4kxlH6d"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IkL8eKYS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A90938550F
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 23:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF69A3128D7
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 23:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774309722; cv=none; b=deQMcpbLKT05j/L1knFsXle3mfpjn9i5wt+/Uu6eQcrTbu9kSQnhEW1i5nBW46wxrkzR0iIB8JWzSOnHLpBjhcPNwIt96m76NAzNW9e7LtADLZEq3Hirbgi2hcQuun7y+QK2xbYbN89adYNsyp2Zo/RJ96QiyiPR4VmQ5aMg948=
+	t=1774309764; cv=none; b=acZzzbm33BtfUCMa3DWn9Vp02BI80JGqhDn1ZjCJHUYjBeK9Fe33vuOMZylUcOOwVvV9LsedJpuZknWG2FpC/Q8Aqg7fOQ/hzp7Dgm8CAs5SR1znyT2vooeeCsPRz+hv00QWKLd8OCNhp0ig/iDMuY6HtqgEXblBtpjtOivixXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774309722; c=relaxed/simple;
-	bh=ipi/hmuzw0I0dIR12Hqh883My688JUPKmeeIE1N+G0c=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pQAJBzVZNhNEahmyl2RgKd43QaGA+mGqGTNJPydfMgCC7sqxwaYB/MECPY2OTaxD0oG4hqb9L231mUJ1XFu5V73mVdvx/XjbrR/su1Xh72ehSSOwxP+m2rpZBfys6DheeiSRgWw5WrG8qRWLUVa0PQEzZ8AcO4ZcO2hyDVHAAvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r4kxlH6d; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1774309764; c=relaxed/simple;
+	bh=er23Pv0U0Vyn0CTm9zUx5UjOl5qNxIdZ0DWkGuaGuTU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=G+XnM++UBhJONA2JhH9Gl4tMRu1IlKM9suKUcYEwmk/cnOhI1vYWLbK8NOWabdvcS6hVX+B5eC6GtUPKkZIYfTyppp4Y5hXacs822SaaeXo3NRudgqiXE2s6So9Wi0oaIU/D4D0a3/TQlVE7JAxQHkgvgPK3TG0rtf0E3G2mgB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IkL8eKYS; arc=none smtp.client-ip=209.85.219.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2b05d170cadso49317165ad.0
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 16:48:37 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-899f1c1e4d6so160712426d6.2
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 16:49:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774309717; x=1774914517; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jw/WcolBOl5E4xg9/GOqX1azVpZAcATB1CeYqZdKYX0=;
-        b=r4kxlH6dQ8gNcXqiXUYBvhU2MzB0cmwNJcJpokv7gZI7EuPl8FUR/W8Z32aNNUiSd5
-         fSN8ioWCVYNZjqU2K0ahT2hsyfjf/LfoT9zU4z/HbIPmqOkPNhZurfdXOtJqr2/TeY80
-         uLbZoYAyMLH5nTD/3LSxZ7v4MxLz/M2BC2+q3+U2r9YrzpP5y/Eym3RVrx5DdcHRBnT6
-         VCf2RAygh1kzvtuUjpfkYTYevzhInCjEsgiDXYNOCF717jLKATANV0Ux8VWvrZ79DIUY
-         cHljJmEMKCFqHH/7Rf7s88U2EY2c8YZuOTaQcIujfgVPn7YBR/vx/z9sIMxJokJxEsav
-         0gWQ==
+        d=google.com; s=20251104; t=1774309762; x=1774914562; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZSHAf5mjuY7ZNpienjxuDoRG74HBmkG56y96hvDExzs=;
+        b=IkL8eKYSRNEg1trrYzfHLtCKg3se0fjP9HBXLn52m5lCF3Z0kNmfFMlGbfBFt/7QIp
+         R8xDipNU8vFoNhDAxRjq0r7+34CwTVpPnHb1UNN+PZM//ArLYte1XRXm1jU7u7gnicH+
+         NGGd5QgWIlXT88snOgoHYTsRL3641RwXzV5b2kDQRjDhjO0VQbGPbyF6+9fxENSYE6bx
+         f7AVP1969XdqErlrkomxe1O+pcc5UGPwn3WLvm7Lu2mrwu+m/HPdlvCDcmWO4NtpvB5M
+         pARTYQ5qRSlQmpIoWp0P0ZMWRS+m2zyBuVzm9rXyulGbVJbFNN687tJ9ZAbTHe8kh6oW
+         eTOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774309717; x=1774914517;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jw/WcolBOl5E4xg9/GOqX1azVpZAcATB1CeYqZdKYX0=;
-        b=hovqaX5YczffaFabbnRZXjQiS3f600pBZu5JBWcXgs0DrdK6d2IC0lLksdh1LB0lC0
-         1KmH2ZiE/cZkxshY3S/H2HK9L1+sWIzja4K26Cp/pP3nwpyz+ok1o0V27pfmvQ+QIppA
-         8//xIu+609u0F6NVtyIg2YMYedTavCtz8q3J2AAdGL9KbGEnsqRPWdBJSVeQv0FfuYCu
-         4FPxRv6biHEfMOw3XG3Ea2Ekc5TsvYJEXo+h98SABjuJcnKOeGY0WRGACWWlGT0WFUA5
-         TyMViom4IQaQDE5qObb/8XGid2uy/YkGAv+rzdizqsK0bZ3bnF7mMwB7T4tpFZZtLp/B
-         +y3w==
-X-Gm-Message-State: AOJu0Ywap870PaR71SL+KL9BFE9zzjacVUo0aawfjOvyN91RynYLTbTH
-	tDfJzupasXAPlOsP+iq+8IBCC72eeYpYg2PpD6zesxiEUIsMZydNqpXG9YHLpoPzKrFVghHjjhC
-	df2ltvzyYggcUs5ep80Q5Shu1H2AuJdgoR2kf2Fg1dL8ZcOMFZAEvUB/rGicE5pibQtWk0aRtCM
-	NF9K7la3gZS2UKypyEflmff6EiIlF1SpdnvedOZeD+HNRIKivEchlL1OK2RbBKL9c=
-X-Received: from plgc17.prod.google.com ([2002:a17:902:d491:b0:2ae:cd48:3a6f])
- (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:dac7:b0:2b0:7224:a4f3 with SMTP id d9443c01a7336-2b0827eefc7mr135145895ad.48.1774309716791;
- Mon, 23 Mar 2026 16:48:36 -0700 (PDT)
-Date: Mon, 23 Mar 2026 23:48:29 +0000
-In-Reply-To: <20260323234829.3185051-1-hramamurthy@google.com>
+        d=1e100.net; s=20251104; t=1774309762; x=1774914562;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZSHAf5mjuY7ZNpienjxuDoRG74HBmkG56y96hvDExzs=;
+        b=C0mrCL/EULKWJgqCBCOW7byGuGvRi5RbUO0B3N+tSyz2RksrvLvODp5aJDw+nM5HYA
+         8O4Map0t9EU4sM6jl2qPQHT4ur7q88RKg131w5mbyIUyTk7SKzgWA47FHJmO08BBt8nf
+         r3oBaZDMy3YtygNL0/KghCjfE/oyYDr+KQwxKCkpTBhHDmMXBIOzx3t887/x2dZqZ1oA
+         McxBKm+mUjWfm+sKfvgX+39CMuvccwFQ5qEwBI69IwNZCfF2DJrls+IeA6mhHQ8VOATv
+         q8yHkVIHMmX5Xmm5OZoUg4dMuqMMN3IaBrnfcb8G5BiuVLN2HIZwCtRxhIJHdrf5cRXW
+         Bb2g==
+X-Forwarded-Encrypted: i=1; AJvYcCUB0isEdEOYhTsvwe6r7nGkpb/ndR9P3S3ldqSnc6ZlYmhIcBu5Qb02tS7hwYO5e/wF/Y8BNAw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoBDUwyNAeIIwYcTDMNwVilXJMiXQXf2PS6U7rWRrFvFARlnfN
+	Mn4xln32qWthRDISvXKgld6DErkrnuaFG5LB1hWkyoogi4hssfPYdVjAq07T+GXmCPuxI/SZlgD
+	LOeoAX04WQyEriw==
+X-Received: from qtbdo10.prod.google.com ([2002:a05:622a:478a:b0:509:5c69:658f])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:1e0c:b0:50b:3ff3:f4a7 with SMTP id d75a77b69052e-50b3ff3f592mr193412181cf.35.1774309761733;
+ Mon, 23 Mar 2026 16:49:21 -0700 (PDT)
+Date: Mon, 23 Mar 2026 23:49:20 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260323234829.3185051-1-hramamurthy@google.com>
 X-Mailer: git-send-email 2.53.0.983.g0bb29b3bc5-goog
-Message-ID: <20260323234829.3185051-4-hramamurthy@google.com>
-Subject: [PATCH net-next 3/3] gve: implement PTP gettimex64
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-To: netdev@vger.kernel.org
-Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	richardcochran@gmail.com, willemb@google.com, nktgrg@google.com, 
-	jfraker@google.com, ziweixiao@google.com, maolson@google.com, 
-	thostet@google.com, jordanrhee@google.com, jefrogers@google.com, 
-	alok.a.tiwari@oracle.com, linux-kernel@vger.kernel.org, 
-	Kevin Yang <yyd@google.com>, Naman Gulati <namangulati@google.com>
+Message-ID: <20260323234920.1097858-1-edumazet@google.com>
+Subject: [PATCH v4 net-next] tcp: add cwnd_event_tx_start to tcp_congestion_ops
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270816-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270817-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5512F2FF154
+X-Rspamd-Queue-Id: 5CDC82FF15B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jordan Rhee <jordanrhee@google.com>
+(tcp_congestion_ops)->cwnd_event() is called very often, with
+@event oscillating between CA_EVENT_TX_START and other values.
 
-Enable chrony and phc2sys to synchronize system clock to NIC clock.
+This is not branch prediction friendly.
 
-The system cycle counters are sampled by the device to minimize the
-uncertainty window. If the system times are sampled in the host, the
-delta between pre and post readings is 100us or more due to AQ command
-latency. The system times returned by the device have a delta of ~1us,
-which enables significantly more accurate clock synchronization.
+Provide a new cwnd_event_tx_start pointer dedicated for CA_EVENT_TX_START.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Reviewed-by: Kevin Yang <yyd@google.com>
-Reviewed-by: Naman Gulati <namangulati@google.com>
-Signed-off-by: Jordan Rhee <jordanrhee@google.com>
-Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Both BBR and CUBIC benefit from this change, since they only care
+about CA_EVENT_TX_START.
+
+No change in kernel size:
+
+$ scripts/bloat-o-meter -t vmlinux.0 vmlinux
+add/remove: 4/4 grow/shrink: 3/1 up/down: 564/-568 (-4)
+Function                                     old     new   delta
+bbr_cwnd_event_tx_start                        -     450    +450
+cubictcp_cwnd_event_tx_start                   -      70     +70
+__pfx_cubictcp_cwnd_event_tx_start             -      16     +16
+__pfx_bbr_cwnd_event_tx_start                  -      16     +16
+tcp_unregister_congestion_control             93      99      +6
+tcp_update_congestion_control                518     521      +3
+tcp_register_congestion_control              422     425      +3
+__tcp_transmit_skb                          3308    3306      -2
+__pfx_cubictcp_cwnd_event                     16       -     -16
+__pfx_bbr_cwnd_event                          16       -     -16
+cubictcp_cwnd_event                           80       -     -80
+bbr_cwnd_event                               454       -    -454
+Total: Before=25240512, After=25240508, chg -0.00%
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/ethernet/google/gve/gve_adminq.h |   4 +-
- drivers/net/ethernet/google/gve/gve_ptp.c    | 189 ++++++++++++++++++-
- 2 files changed, 184 insertions(+), 9 deletions(-)
+v4: more eBPF fixes in net/ipv4/bpf_tcp_ca.c
+v3: fix tools/testing/selftests/bpf/progs/tcp_ca_kfunc.c (Jakub)
+v2: fix tools/testing/selftests/bpf/progs/bpf_cc_cubic.c (Jakub)
+v1: https://lore.kernel.org/netdev/20260313202802.1201129-1-edumazet@google.com/
 
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/ethernet/google/gve/gve_adminq.h
-index 22a74b6aa17e..e6dcf6da9091 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.h
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.h
-@@ -411,8 +411,8 @@ static_assert(sizeof(struct gve_adminq_report_nic_ts) == 16);
+ include/net/tcp.h                             |  8 +++++
+ net/ipv4/bpf_tcp_ca.c                         |  5 +++
+ net/ipv4/tcp_bbr.c                            |  8 ++---
+ net/ipv4/tcp_cubic.c                          | 35 +++++++++----------
+ net/ipv4/tcp_dctcp.c                          | 12 +++++--
+ net/ipv4/tcp_vegas.c                          |  9 +++--
+ net/ipv4/tcp_vegas.h                          |  1 +
+ net/ipv4/tcp_veno.c                           |  8 ++++-
+ net/ipv4/tcp_yeah.c                           |  1 +
+ .../selftests/bpf/progs/bpf_cc_cubic.c        |  8 ++---
+ tools/testing/selftests/bpf/progs/bpf_cubic.c | 33 ++++++++---------
+ .../selftests/bpf/progs/tcp_ca_kfunc.c        | 16 ++++++---
+ 12 files changed, 89 insertions(+), 55 deletions(-)
+
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index f87bdacb5a6995422851e88cfb65734702c84093..39ff4cf3c810f5619a479dcd92192043374a1739 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1341,6 +1341,9 @@ struct tcp_congestion_ops {
+ 	/* call when cwnd event occurs (optional) */
+ 	void (*cwnd_event)(struct sock *sk, enum tcp_ca_event ev);
  
- struct gve_nic_ts_report {
- 	__be64 nic_timestamp; /* NIC clock in nanoseconds */
--	__be64 reserved1;
--	__be64 reserved2;
-+	__be64 pre_cycles; /* System cycle counter before NIC clock read */
-+	__be64 post_cycles; /* System cycle counter after NIC clock read */
- 	__be64 reserved3;
- 	__be64 reserved4;
- };
-diff --git a/drivers/net/ethernet/google/gve/gve_ptp.c b/drivers/net/ethernet/google/gve/gve_ptp.c
-index 140b8fbce4f4..889f0120e1dd 100644
---- a/drivers/net/ethernet/google/gve/gve_ptp.c
-+++ b/drivers/net/ethernet/google/gve/gve_ptp.c
-@@ -10,28 +10,203 @@
- /* Interval to schedule a nic timestamp calibration, 250ms. */
- #define GVE_NIC_TS_SYNC_INTERVAL_MS 250
++	/* call when CA_EVENT_TX_START cwnd event occurs (optional) */
++	void (*cwnd_event_tx_start)(struct sock *sk);
++
+ 	/* call when ack arrives (optional) */
+ 	void (*in_ack_event)(struct sock *sk, u32 flags);
  
-+/*
-+ * Stores cycle counter samples in get_cycles() units from a
-+ * sandwiched NIC clock read
-+ */
-+struct gve_sysclock_sample {
-+	/* Cycle counter from NIC before clock read */
-+	u64 nic_pre_cycles;
-+	/* Cycle counter from NIC after clock read */
-+	u64 nic_post_cycles;
-+	/* Cycle counter from host before issuing AQ command */
-+	cycles_t host_pre_cycles;
-+	/* Cycle counter from host after AQ command returns */
-+	cycles_t host_post_cycles;
-+};
-+
-+/*
-+ * Read NIC clock by issuing the AQ command. The command is subject to
-+ * rate limiting and may need to be retried. Requires nic_ts_read_lock
-+ * to be held.
-+ */
-+static int gve_adminq_read_timestamp(struct gve_priv *priv,
-+				     cycles_t *pre_cycles,
-+				     cycles_t *post_cycles)
-+{
-+	unsigned long delay_us = 1000;
-+	int retry_count = 0;
-+	int err;
-+
-+	lockdep_assert_held(&priv->nic_ts_read_lock);
-+
-+	do {
-+		*pre_cycles = get_cycles();
-+		err = gve_adminq_report_nic_ts(priv, priv->nic_ts_report_bus);
-+
-+		/* Ensure cycle counter is sampled after AdminQ cmd returns */
-+		rmb();
-+		*post_cycles = get_cycles();
-+		if (likely(err != -EAGAIN))
-+			return err;
-+
-+		fsleep(delay_us);
-+
-+		/* Exponential backoff */
-+		delay_us *= 2;
-+		retry_count++;
-+	} while (retry_count < 5);
-+
-+	return -ETIMEDOUT;
-+}
-+
- /* Read the nic timestamp from hardware via the admin queue. */
--static int gve_clock_nic_ts_read(struct gve_priv *priv, u64 *nic_raw)
-+static int gve_clock_nic_ts_read(struct gve_priv *priv, u64 *nic_raw,
-+				 struct gve_sysclock_sample *sysclock)
+@@ -1440,6 +1443,11 @@ static inline void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)
  {
-+	cycles_t host_pre_cycles, host_post_cycles;
-+	struct gve_nic_ts_report *ts_report;
- 	int err;
+ 	const struct inet_connection_sock *icsk = inet_csk(sk);
  
- 	mutex_lock(&priv->nic_ts_read_lock);
--	err = gve_adminq_report_nic_ts(priv, priv->nic_ts_report_bus);
--	if (err)
-+	err = gve_adminq_read_timestamp(priv, &host_pre_cycles,
-+					&host_post_cycles);
-+	if (err) {
-+		dev_err_ratelimited(&priv->pdev->dev,
-+				    "AdminQ timestamp read failed: %d\n", err);
- 		goto out;
++	if (event == CA_EVENT_TX_START) {
++	    if (icsk->icsk_ca_ops->cwnd_event_tx_start)
++			icsk->icsk_ca_ops->cwnd_event_tx_start(sk);
++		return;
 +	}
- 
--	*nic_raw = be64_to_cpu(priv->nic_ts_report->nic_timestamp);
-+	ts_report = priv->nic_ts_report;
-+	*nic_raw = be64_to_cpu(ts_report->nic_timestamp);
-+
-+	if (sysclock) {
-+		sysclock->nic_pre_cycles = be64_to_cpu(ts_report->pre_cycles);
-+		sysclock->nic_post_cycles = be64_to_cpu(ts_report->post_cycles);
-+		sysclock->host_pre_cycles = host_pre_cycles;
-+		sysclock->host_post_cycles = host_post_cycles;
-+	}
- 
- out:
- 	mutex_unlock(&priv->nic_ts_read_lock);
- 	return err;
+ 	if (icsk->icsk_ca_ops->cwnd_event)
+ 		icsk->icsk_ca_ops->cwnd_event(sk, event);
+ }
+diff --git a/net/ipv4/bpf_tcp_ca.c b/net/ipv4/bpf_tcp_ca.c
+index e01492234b0b349498f8e56c2f07d8bba092c00e..008edc7f6688523dc86963d90485655e9fa8374e 100644
+--- a/net/ipv4/bpf_tcp_ca.c
++++ b/net/ipv4/bpf_tcp_ca.c
+@@ -272,6 +272,10 @@ static void bpf_tcp_ca_cwnd_event(struct sock *sk, enum tcp_ca_event ev)
+ {
  }
  
-+struct gve_cycles_to_clock_callback_ctx {
-+	u64 cycles;
-+};
-+
-+static int gve_cycles_to_clock_fn(ktime_t *device_time,
-+				  struct system_counterval_t *system_counterval,
-+				  void *ctx)
++static void bpf_tcp_ca_cwnd_event_tx_start(struct sock *sk)
 +{
-+	struct gve_cycles_to_clock_callback_ctx *context = ctx;
-+
-+	*device_time = 0;
-+
-+	system_counterval->cycles = context->cycles;
-+	system_counterval->use_nsecs = false;
-+
-+	if (IS_ENABLED(CONFIG_X86))
-+		system_counterval->cs_id = CSID_X86_TSC;
-+	else if (IS_ENABLED(CONFIG_ARM64))
-+		system_counterval->cs_id = CSID_ARM_ARCH_COUNTER;
-+	else
-+		return -EOPNOTSUPP;
-+
-+	return 0;
 +}
 +
-+/*
-+ * Convert a raw cycle count (e.g. from get_cycles()) to the system clock
-+ * type specified by clockid. The system_time_snapshot must be taken before
-+ * the cycle counter is sampled.
-+ */
-+static int gve_cycles_to_timespec64(struct gve_priv *priv, clockid_t clockid,
-+				    struct system_time_snapshot *snap,
-+				    u64 cycles, struct timespec64 *ts)
-+{
-+	struct gve_cycles_to_clock_callback_ctx ctx = {0};
-+	struct system_device_crosststamp xtstamp;
-+	int err;
-+
-+	ctx.cycles = cycles;
-+	err = get_device_system_crosststamp(gve_cycles_to_clock_fn, &ctx, snap,
-+					    &xtstamp);
-+	if (err) {
-+		dev_err_ratelimited(&priv->pdev->dev,
-+				    "get_device_system_crosststamp() failed to convert %lld cycles to system time: %d\n",
-+				    cycles,
-+				    err);
-+		return err;
-+	}
-+
-+	switch (clockid) {
-+	case CLOCK_REALTIME:
-+		*ts = ktime_to_timespec64(xtstamp.sys_realtime);
-+		break;
-+	case CLOCK_MONOTONIC_RAW:
-+		*ts = ktime_to_timespec64(xtstamp.sys_monoraw);
-+		break;
-+	default:
-+		dev_err_ratelimited(&priv->pdev->dev,
-+				    "Cycle count conversion to clockid %d not supported\n",
-+				    clockid);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
- static int gve_ptp_gettimex64(struct ptp_clock_info *info,
- 			      struct timespec64 *ts,
- 			      struct ptp_system_timestamp *sts)
+ static void bpf_tcp_ca_in_ack_event(struct sock *sk, u32 flags)
  {
--	return -EOPNOTSUPP;
-+	struct gve_ptp *ptp = container_of(info, struct gve_ptp, info);
-+	struct gve_sysclock_sample sysclock = {0};
-+	struct gve_priv *priv = ptp->priv;
-+	struct system_time_snapshot snap;
-+	u64 nic_ts;
-+	int err;
-+
-+	/* Take system clock snapshot before sampling cycle counters */
-+	if (sts)
-+		ktime_get_snapshot(&snap);
-+
-+	err = gve_clock_nic_ts_read(priv, &nic_ts, &sysclock);
-+	if (err)
-+		return err;
-+
-+	if (sts) {
-+		/* Reject samples with out of order system clock values */
-+		if (!(sysclock.host_pre_cycles <= sysclock.nic_pre_cycles &&
-+		      sysclock.nic_pre_cycles  <= sysclock.nic_post_cycles &&
-+		      sysclock.nic_post_cycles <= sysclock.host_post_cycles)) {
-+			dev_err_ratelimited(&priv->pdev->dev,
-+					    "AdminQ system clock cycle counts out of order. Expecting %llu <= %llu <= %llu <= %llu\n",
-+					    sysclock.host_pre_cycles,
-+					    sysclock.nic_pre_cycles,
-+					    sysclock.nic_post_cycles,
-+					    sysclock.host_post_cycles);
-+			return -EBADMSG;
-+		}
-+
-+		err = gve_cycles_to_timespec64(priv, sts->clockid, &snap,
-+					       sysclock.nic_pre_cycles,
-+					       &sts->pre_ts);
-+		if (err)
-+			return err;
-+
-+		err = gve_cycles_to_timespec64(priv, sts->clockid, &snap,
-+					       sysclock.nic_post_cycles,
-+					       &sts->post_ts);
-+		if (err)
-+			return err;
-+	}
-+
-+	*ts = ns_to_timespec64(nic_ts);
-+
-+	return 0;
+ }
+@@ -313,6 +317,7 @@ static struct tcp_congestion_ops __bpf_ops_tcp_congestion_ops = {
+ 	.cong_avoid = bpf_tcp_ca_cong_avoid,
+ 	.set_state = bpf_tcp_ca_set_state,
+ 	.cwnd_event = bpf_tcp_ca_cwnd_event,
++	.cwnd_event_tx_start = bpf_tcp_ca_cwnd_event_tx_start,
+ 	.in_ack_event = bpf_tcp_ca_in_ack_event,
+ 	.pkts_acked = bpf_tcp_ca_pkts_acked,
+ 	.min_tso_segs = bpf_tcp_ca_min_tso_segs,
+diff --git a/net/ipv4/tcp_bbr.c b/net/ipv4/tcp_bbr.c
+index 05d52372ca8fb068530a9b3379f1ae0f9d0b362a..1ddc20a399b07054f8175b5f6459f8ae6dbf34bb 100644
+--- a/net/ipv4/tcp_bbr.c
++++ b/net/ipv4/tcp_bbr.c
+@@ -330,12 +330,12 @@ static void bbr_save_cwnd(struct sock *sk)
+ 		bbr->prior_cwnd = max(bbr->prior_cwnd, tcp_snd_cwnd(tp));
  }
  
- static int gve_ptp_settime64(struct ptp_clock_info *info,
-@@ -50,7 +225,7 @@ static long gve_ptp_do_aux_work(struct ptp_clock_info *info)
- 	if (gve_get_reset_in_progress(priv) || !gve_get_admin_queue_ok(priv))
- 		goto out;
+-__bpf_kfunc static void bbr_cwnd_event(struct sock *sk, enum tcp_ca_event event)
++__bpf_kfunc static void bbr_cwnd_event_tx_start(struct sock *sk)
+ {
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 	struct bbr *bbr = inet_csk_ca(sk);
  
--	err = gve_clock_nic_ts_read(priv, &nic_raw);
-+	err = gve_clock_nic_ts_read(priv, &nic_raw, NULL);
- 	if (err) {
- 		dev_err_ratelimited(&priv->pdev->dev, "%s read err %d\n",
- 				    __func__, err);
-@@ -132,7 +307,7 @@ int gve_init_clock(struct gve_priv *priv)
- 		goto release_ptp;
+-	if (event == CA_EVENT_TX_START && tp->app_limited) {
++	if (tp->app_limited) {
+ 		bbr->idle_restart = 1;
+ 		bbr->ack_epoch_mstamp = tp->tcp_mstamp;
+ 		bbr->ack_epoch_acked = 0;
+@@ -1149,7 +1149,7 @@ static struct tcp_congestion_ops tcp_bbr_cong_ops __read_mostly = {
+ 	.cong_control	= bbr_main,
+ 	.sndbuf_expand	= bbr_sndbuf_expand,
+ 	.undo_cwnd	= bbr_undo_cwnd,
+-	.cwnd_event	= bbr_cwnd_event,
++	.cwnd_event_tx_start	= bbr_cwnd_event_tx_start,
+ 	.ssthresh	= bbr_ssthresh,
+ 	.min_tso_segs	= bbr_min_tso_segs,
+ 	.get_info	= bbr_get_info,
+@@ -1161,7 +1161,7 @@ BTF_ID_FLAGS(func, bbr_init)
+ BTF_ID_FLAGS(func, bbr_main)
+ BTF_ID_FLAGS(func, bbr_sndbuf_expand)
+ BTF_ID_FLAGS(func, bbr_undo_cwnd)
+-BTF_ID_FLAGS(func, bbr_cwnd_event)
++BTF_ID_FLAGS(func, bbr_cwnd_event_tx_start)
+ BTF_ID_FLAGS(func, bbr_ssthresh)
+ BTF_ID_FLAGS(func, bbr_min_tso_segs)
+ BTF_ID_FLAGS(func, bbr_set_state)
+diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
+index 76c23675ae50ab50c977dc1de79a3df57db98ef6..ab78b5ae8d0e3d13a39bd1adf1e105b84f806b63 100644
+--- a/net/ipv4/tcp_cubic.c
++++ b/net/ipv4/tcp_cubic.c
+@@ -139,24 +139,21 @@ __bpf_kfunc static void cubictcp_init(struct sock *sk)
+ 		tcp_sk(sk)->snd_ssthresh = initial_ssthresh;
+ }
+ 
+-__bpf_kfunc static void cubictcp_cwnd_event(struct sock *sk, enum tcp_ca_event event)
++__bpf_kfunc static void cubictcp_cwnd_event_tx_start(struct sock *sk)
+ {
+-	if (event == CA_EVENT_TX_START) {
+-		struct bictcp *ca = inet_csk_ca(sk);
+-		u32 now = tcp_jiffies32;
+-		s32 delta;
+-
+-		delta = now - tcp_sk(sk)->lsndtime;
+-
+-		/* We were application limited (idle) for a while.
+-		 * Shift epoch_start to keep cwnd growth to cubic curve.
+-		 */
+-		if (ca->epoch_start && delta > 0) {
+-			ca->epoch_start += delta;
+-			if (after(ca->epoch_start, now))
+-				ca->epoch_start = now;
+-		}
+-		return;
++	struct bictcp *ca = inet_csk_ca(sk);
++	u32 now = tcp_jiffies32;
++	s32 delta;
++
++	delta = now - tcp_sk(sk)->lsndtime;
++
++	/* We were application limited (idle) for a while.
++	 * Shift epoch_start to keep cwnd growth to cubic curve.
++	 */
++	if (ca->epoch_start && delta > 0) {
++		ca->epoch_start += delta;
++		if (after(ca->epoch_start, now))
++			ca->epoch_start = now;
  	}
- 	mutex_init(&priv->nic_ts_read_lock);
--	err = gve_clock_nic_ts_read(priv, &nic_raw);
-+	err = gve_clock_nic_ts_read(priv, &nic_raw, NULL);
- 	if (err) {
- 		dev_err(&priv->pdev->dev, "failed to read NIC clock %d\n", err);
- 		goto release_nic_ts_report;
+ }
+ 
+@@ -481,7 +478,7 @@ static struct tcp_congestion_ops cubictcp __read_mostly = {
+ 	.cong_avoid	= cubictcp_cong_avoid,
+ 	.set_state	= cubictcp_state,
+ 	.undo_cwnd	= tcp_reno_undo_cwnd,
+-	.cwnd_event	= cubictcp_cwnd_event,
++	.cwnd_event_tx_start = cubictcp_cwnd_event_tx_start,
+ 	.pkts_acked     = cubictcp_acked,
+ 	.owner		= THIS_MODULE,
+ 	.name		= "cubic",
+@@ -492,7 +489,7 @@ BTF_ID_FLAGS(func, cubictcp_init)
+ BTF_ID_FLAGS(func, cubictcp_recalc_ssthresh)
+ BTF_ID_FLAGS(func, cubictcp_cong_avoid)
+ BTF_ID_FLAGS(func, cubictcp_state)
+-BTF_ID_FLAGS(func, cubictcp_cwnd_event)
++BTF_ID_FLAGS(func, cubictcp_cwnd_event_tx_start)
+ BTF_ID_FLAGS(func, cubictcp_acked)
+ BTF_KFUNCS_END(tcp_cubic_check_kfunc_ids)
+ 
+diff --git a/net/ipv4/tcp_dctcp.c b/net/ipv4/tcp_dctcp.c
+index 03abe0848420d7fb7b514e6ad24f4c702954ab14..96c99999e09dde9de9c337e4d6c692f517467c7b 100644
+--- a/net/ipv4/tcp_dctcp.c
++++ b/net/ipv4/tcp_dctcp.c
+@@ -203,15 +203,19 @@ __bpf_kfunc static void dctcp_cwnd_event(struct sock *sk, enum tcp_ca_event ev)
+ 		tcp_plb_update_state_upon_rto(sk, &ca->plb);
+ 		dctcp_react_to_loss(sk);
+ 		break;
+-	case CA_EVENT_TX_START:
+-		tcp_plb_check_rehash(sk, &ca->plb); /* Maybe rehash when inflight is 0 */
+-		break;
+ 	default:
+ 		/* Don't care for the rest. */
+ 		break;
+ 	}
+ }
+ 
++__bpf_kfunc static void dctcp_cwnd_event_tx_start(struct sock *sk)
++{
++	struct dctcp *ca = inet_csk_ca(sk);
++
++	tcp_plb_check_rehash(sk, &ca->plb); /* Maybe rehash when inflight is 0 */
++}
++
+ static size_t dctcp_get_info(struct sock *sk, u32 ext, int *attr,
+ 			     union tcp_cc_info *info)
+ {
+@@ -252,6 +256,7 @@ static struct tcp_congestion_ops dctcp __read_mostly = {
+ 	.init		= dctcp_init,
+ 	.in_ack_event   = dctcp_update_alpha,
+ 	.cwnd_event	= dctcp_cwnd_event,
++	.cwnd_event_tx_start = dctcp_cwnd_event_tx_start,
+ 	.ssthresh	= dctcp_ssthresh,
+ 	.cong_avoid	= tcp_reno_cong_avoid,
+ 	.undo_cwnd	= dctcp_cwnd_undo,
+@@ -275,6 +280,7 @@ BTF_KFUNCS_START(tcp_dctcp_check_kfunc_ids)
+ BTF_ID_FLAGS(func, dctcp_init)
+ BTF_ID_FLAGS(func, dctcp_update_alpha)
+ BTF_ID_FLAGS(func, dctcp_cwnd_event)
++BTF_ID_FLAGS(func, dctcp_cwnd_event_tx_start)
+ BTF_ID_FLAGS(func, dctcp_ssthresh)
+ BTF_ID_FLAGS(func, dctcp_cwnd_undo)
+ BTF_ID_FLAGS(func, dctcp_state)
+diff --git a/net/ipv4/tcp_vegas.c b/net/ipv4/tcp_vegas.c
+index 786848ad37ea8d5f9bd817666181905f3f6ec9d4..cf12fb6be079d8ccd65f297a3a90a9a5e90036e8 100644
+--- a/net/ipv4/tcp_vegas.c
++++ b/net/ipv4/tcp_vegas.c
+@@ -151,12 +151,17 @@ EXPORT_SYMBOL_GPL(tcp_vegas_state);
+  */
+ void tcp_vegas_cwnd_event(struct sock *sk, enum tcp_ca_event event)
+ {
+-	if (event == CA_EVENT_CWND_RESTART ||
+-	    event == CA_EVENT_TX_START)
++	if (event == CA_EVENT_CWND_RESTART)
+ 		tcp_vegas_init(sk);
+ }
+ EXPORT_SYMBOL_GPL(tcp_vegas_cwnd_event);
+ 
++void tcp_vegas_cwnd_event_tx_start(struct sock *sk)
++{
++	tcp_vegas_init(sk);
++}
++EXPORT_SYMBOL_GPL(tcp_vegas_cwnd_event_tx_start);
++
+ static inline u32 tcp_vegas_ssthresh(struct tcp_sock *tp)
+ {
+ 	return  min(tp->snd_ssthresh, tcp_snd_cwnd(tp));
+diff --git a/net/ipv4/tcp_vegas.h b/net/ipv4/tcp_vegas.h
+index 4f24d0e37d9c1e9d5336e8e99253e660143362c9..602af8e600c7f85603ff1a53008e1144617ea14b 100644
+--- a/net/ipv4/tcp_vegas.h
++++ b/net/ipv4/tcp_vegas.h
+@@ -20,6 +20,7 @@ void tcp_vegas_init(struct sock *sk);
+ void tcp_vegas_state(struct sock *sk, u8 ca_state);
+ void tcp_vegas_pkts_acked(struct sock *sk, const struct ack_sample *sample);
+ void tcp_vegas_cwnd_event(struct sock *sk, enum tcp_ca_event event);
++void tcp_vegas_cwnd_event_tx_start(struct sock *sk);
+ size_t tcp_vegas_get_info(struct sock *sk, u32 ext, int *attr,
+ 			  union tcp_cc_info *info);
+ 
+diff --git a/net/ipv4/tcp_veno.c b/net/ipv4/tcp_veno.c
+index 366ff6f214b2ee746cecdf10353e4624252478e0..1b2e1b947901f3ca6004aced8e6d39c131f1fb68 100644
+--- a/net/ipv4/tcp_veno.c
++++ b/net/ipv4/tcp_veno.c
+@@ -112,10 +112,15 @@ static void tcp_veno_state(struct sock *sk, u8 ca_state)
+  */
+ static void tcp_veno_cwnd_event(struct sock *sk, enum tcp_ca_event event)
+ {
+-	if (event == CA_EVENT_CWND_RESTART || event == CA_EVENT_TX_START)
++	if (event == CA_EVENT_CWND_RESTART)
+ 		tcp_veno_init(sk);
+ }
+ 
++static void tcp_veno_cwnd_event_tx_start(struct sock *sk)
++{
++	tcp_veno_init(sk);
++}
++
+ static void tcp_veno_cong_avoid(struct sock *sk, u32 ack, u32 acked)
+ {
+ 	struct tcp_sock *tp = tcp_sk(sk);
+@@ -213,6 +218,7 @@ static struct tcp_congestion_ops tcp_veno __read_mostly = {
+ 	.pkts_acked	= tcp_veno_pkts_acked,
+ 	.set_state	= tcp_veno_state,
+ 	.cwnd_event	= tcp_veno_cwnd_event,
++	.cwnd_event_tx_start = tcp_veno_cwnd_event_tx_start,
+ 
+ 	.owner		= THIS_MODULE,
+ 	.name		= "veno",
+diff --git a/net/ipv4/tcp_yeah.c b/net/ipv4/tcp_yeah.c
+index 18b07ff5d20e6c5eefe9ab54c6b8e429f01d64b9..b22b3dccd05efddfe11203578950eddecee14887 100644
+--- a/net/ipv4/tcp_yeah.c
++++ b/net/ipv4/tcp_yeah.c
+@@ -212,6 +212,7 @@ static struct tcp_congestion_ops tcp_yeah __read_mostly = {
+ 	.cong_avoid	= tcp_yeah_cong_avoid,
+ 	.set_state	= tcp_vegas_state,
+ 	.cwnd_event	= tcp_vegas_cwnd_event,
++	.cwnd_event_tx_start = tcp_vegas_cwnd_event_tx_start,
+ 	.get_info	= tcp_vegas_get_info,
+ 	.pkts_acked	= tcp_vegas_pkts_acked,
+ 
+diff --git a/tools/testing/selftests/bpf/progs/bpf_cc_cubic.c b/tools/testing/selftests/bpf/progs/bpf_cc_cubic.c
+index 9af19dfe4e80b00bc09fe40c7d6c9642cdfb4a23..bccf677b94b61226a3dd0517e0b2e64168de711f 100644
+--- a/tools/testing/selftests/bpf/progs/bpf_cc_cubic.c
++++ b/tools/testing/selftests/bpf/progs/bpf_cc_cubic.c
+@@ -23,7 +23,7 @@
+ #define TCP_REORDERING (12)
+ 
+ extern void cubictcp_init(struct sock *sk) __ksym;
+-extern void cubictcp_cwnd_event(struct sock *sk, enum tcp_ca_event event) __ksym;
++extern void cubictcp_cwnd_event_tx_start(struct sock *sk) __ksym;
+ extern __u32 cubictcp_recalc_ssthresh(struct sock *sk) __ksym;
+ extern void cubictcp_state(struct sock *sk, __u8 new_state) __ksym;
+ extern __u32 tcp_reno_undo_cwnd(struct sock *sk) __ksym;
+@@ -108,9 +108,9 @@ void BPF_PROG(bpf_cubic_init, struct sock *sk)
+ }
+ 
+ SEC("struct_ops")
+-void BPF_PROG(bpf_cubic_cwnd_event, struct sock *sk, enum tcp_ca_event event)
++void BPF_PROG(bpf_cubic_cwnd_event_tx_start, struct sock *sk)
+ {
+-	cubictcp_cwnd_event(sk, event);
++	cubictcp_cwnd_event_tx_start(sk);
+ }
+ 
+ SEC("struct_ops")
+@@ -172,7 +172,7 @@ struct tcp_congestion_ops cc_cubic = {
+ 	.cong_control	= (void *)bpf_cubic_cong_control,
+ 	.set_state	= (void *)bpf_cubic_state,
+ 	.undo_cwnd	= (void *)bpf_cubic_undo_cwnd,
+-	.cwnd_event	= (void *)bpf_cubic_cwnd_event,
++	.cwnd_event_tx_start	= (void *)bpf_cubic_cwnd_event_tx_start,
+ 	.pkts_acked     = (void *)bpf_cubic_acked,
+ 	.name		= "bpf_cc_cubic",
+ };
+diff --git a/tools/testing/selftests/bpf/progs/bpf_cubic.c b/tools/testing/selftests/bpf/progs/bpf_cubic.c
+index 46fb2b37d3a70671485af37ed700a991c0975cd2..ce18a4db813fab877aec0c73d72cc9c958312ad3 100644
+--- a/tools/testing/selftests/bpf/progs/bpf_cubic.c
++++ b/tools/testing/selftests/bpf/progs/bpf_cubic.c
+@@ -185,24 +185,21 @@ void BPF_PROG(bpf_cubic_init, struct sock *sk)
+ }
+ 
+ SEC("struct_ops")
+-void BPF_PROG(bpf_cubic_cwnd_event, struct sock *sk, enum tcp_ca_event event)
++void BPF_PROG(bpf_cubic_cwnd_event_tx_start, struct sock *sk)
+ {
+-	if (event == CA_EVENT_TX_START) {
+-		struct bpf_bictcp *ca = inet_csk_ca(sk);
+-		__u32 now = tcp_jiffies32;
+-		__s32 delta;
+-
+-		delta = now - tcp_sk(sk)->lsndtime;
+-
+-		/* We were application limited (idle) for a while.
+-		 * Shift epoch_start to keep cwnd growth to cubic curve.
+-		 */
+-		if (ca->epoch_start && delta > 0) {
+-			ca->epoch_start += delta;
+-			if (after(ca->epoch_start, now))
+-				ca->epoch_start = now;
+-		}
+-		return;
++	struct bpf_bictcp *ca = inet_csk_ca(sk);
++	__u32 now = tcp_jiffies32;
++	__s32 delta;
++
++	delta = now - tcp_sk(sk)->lsndtime;
++
++	/* We were application limited (idle) for a while.
++	 * Shift epoch_start to keep cwnd growth to cubic curve.
++	 */
++	if (ca->epoch_start && delta > 0) {
++		ca->epoch_start += delta;
++		if (after(ca->epoch_start, now))
++			ca->epoch_start = now;
+ 	}
+ }
+ 
+@@ -537,7 +534,7 @@ struct tcp_congestion_ops cubic = {
+ 	.cong_avoid	= (void *)bpf_cubic_cong_avoid,
+ 	.set_state	= (void *)bpf_cubic_state,
+ 	.undo_cwnd	= (void *)bpf_cubic_undo_cwnd,
+-	.cwnd_event	= (void *)bpf_cubic_cwnd_event,
++	.cwnd_event_tx_start	= (void *)bpf_cubic_cwnd_event_tx_start,
+ 	.pkts_acked     = (void *)bpf_cubic_acked,
+ 	.name		= "bpf_cubic",
+ };
+diff --git a/tools/testing/selftests/bpf/progs/tcp_ca_kfunc.c b/tools/testing/selftests/bpf/progs/tcp_ca_kfunc.c
+index f95862f570b73f4c86fa6d7b6a912c4b055d02fb..0a3e9d35bf6f0c4c988c741c010fb7f3405fb43c 100644
+--- a/tools/testing/selftests/bpf/progs/tcp_ca_kfunc.c
++++ b/tools/testing/selftests/bpf/progs/tcp_ca_kfunc.c
+@@ -8,7 +8,7 @@ extern void bbr_init(struct sock *sk) __ksym;
+ extern void bbr_main(struct sock *sk, u32 ack, int flag, const struct rate_sample *rs) __ksym;
+ extern u32 bbr_sndbuf_expand(struct sock *sk) __ksym;
+ extern u32 bbr_undo_cwnd(struct sock *sk) __ksym;
+-extern void bbr_cwnd_event(struct sock *sk, enum tcp_ca_event event) __ksym;
++extern void bbr_cwnd_event_tx_start(struct sock *sk) __ksym;
+ extern u32 bbr_ssthresh(struct sock *sk) __ksym;
+ extern u32 bbr_min_tso_segs(struct sock *sk) __ksym;
+ extern void bbr_set_state(struct sock *sk, u8 new_state) __ksym;
+@@ -16,6 +16,7 @@ extern void bbr_set_state(struct sock *sk, u8 new_state) __ksym;
+ extern void dctcp_init(struct sock *sk) __ksym;
+ extern void dctcp_update_alpha(struct sock *sk, u32 flags) __ksym;
+ extern void dctcp_cwnd_event(struct sock *sk, enum tcp_ca_event ev) __ksym;
++extern void dctcp_cwnd_event_tx_start(struct sock *sk) __ksym;
+ extern u32 dctcp_ssthresh(struct sock *sk) __ksym;
+ extern u32 dctcp_cwnd_undo(struct sock *sk) __ksym;
+ extern void dctcp_state(struct sock *sk, u8 new_state) __ksym;
+@@ -24,7 +25,7 @@ extern void cubictcp_init(struct sock *sk) __ksym;
+ extern u32 cubictcp_recalc_ssthresh(struct sock *sk) __ksym;
+ extern void cubictcp_cong_avoid(struct sock *sk, u32 ack, u32 acked) __ksym;
+ extern void cubictcp_state(struct sock *sk, u8 new_state) __ksym;
+-extern void cubictcp_cwnd_event(struct sock *sk, enum tcp_ca_event event) __ksym;
++extern void cubictcp_cwnd_event_tx_start(struct sock *sk) __ksym;
+ extern void cubictcp_acked(struct sock *sk, const struct ack_sample *sample) __ksym;
+ 
+ SEC("struct_ops")
+@@ -69,9 +70,15 @@ u32 BPF_PROG(undo_cwnd, struct sock *sk)
+ SEC("struct_ops")
+ void BPF_PROG(cwnd_event, struct sock *sk, enum tcp_ca_event event)
+ {
+-	bbr_cwnd_event(sk, event);
+ 	dctcp_cwnd_event(sk, event);
+-	cubictcp_cwnd_event(sk, event);
++}
++
++SEC("struct_ops")
++void BPF_PROG(cwnd_event_tx_start, struct sock *sk)
++{
++	bbr_cwnd_event_tx_start(sk);
++	dctcp_cwnd_event_tx_start(sk);
++	cubictcp_cwnd_event_tx_start(sk);
+ }
+ 
+ SEC("struct_ops")
+@@ -111,6 +118,7 @@ struct tcp_congestion_ops tcp_ca_kfunc = {
+ 	.sndbuf_expand	= (void *)sndbuf_expand,
+ 	.undo_cwnd	= (void *)undo_cwnd,
+ 	.cwnd_event	= (void *)cwnd_event,
++	.cwnd_event_tx_start = (void *)cwnd_event_tx_start,
+ 	.ssthresh	= (void *)ssthresh,
+ 	.min_tso_segs	= (void *)min_tso_segs,
+ 	.set_state	= (void *)set_state,
 -- 
-2.53.0.851.ga537e3e6e9-goog
+2.53.0.983.g0bb29b3bc5-goog
 
 
