@@ -1,166 +1,263 @@
-Return-Path: <netdev+bounces-270407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270426-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mDBlJz77wGkwPAQAu9opvQ
-	(envelope-from <netdev+bounces-270407-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:35:10 +0100
+	id gJCLLF39wGmiPQQAu9opvQ
+	(envelope-from <netdev+bounces-270426-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:44:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 181852EE4B8
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:35:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 183E12EE6A7
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:44:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 89E7E301469B
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:35:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D1707305260D
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 08:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D32F37FF6A;
-	Mon, 23 Mar 2026 08:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 976F73803C7;
+	Mon, 23 Mar 2026 08:37:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="HAJ5Lmc8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HtFgfQmB";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ztb6sEgO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250AB379991
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 08:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81AE2C187
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 08:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774254902; cv=none; b=D2ivEkvAYajlCJuKzMtWGb9caP/hj2LYVJC0nvNYBaPLpBcHfkF9KoFYLowWaEab73SjQHb4RSYhJotkZsGCEsfbfMe2PAU3lqiX5cAKxAOH/oUgC47Ozr8y7mA02cME0esO6UWwbK1TiUHfSuEZrhyagsrUvFwobkzLC9fQPXY=
+	t=1774255058; cv=none; b=azNzjV/Rzcu9PuUWzChdZgSbLaiQ/yZ9ml+nmIixgn1bSuGzVDH8afsXIGPmL+9HlWNSSVvc+/kfEuR4yRjx/WO+g1/JgB2ZkQGOAfcFsg3wg3P7DFtTonsi1e2F9oalZVxlNK+y3GiItvv1FYr9Ja/XN0djhqSaGAPXWXSG+5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774254902; c=relaxed/simple;
-	bh=3j+XZrCFIPBDHW6Yu2JsEsxSSdjtvt3Jjns1Q1JxkYQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gQrrw0mV8gQ6B5tcYcfXcaLHG4EyGXmyG8DP5uq2/qth3B6wG/Dt4ozuVJ9HHgyBl0OF3hQP2WeXihVAsT8edY9ZQqcbMcTuzUyUGxsgqU+RDVF23flXXpKepr57wLrViy1McZBQe3upJr/aHwUDzRrQu2FpOxUXPM1axOsiAzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=HAJ5Lmc8; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 40B81207BE;
-	Mon, 23 Mar 2026 09:34:57 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YcNHnYt_YkeB; Mon, 23 Mar 2026 09:34:56 +0100 (CET)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 9C566207AC;
-	Mon, 23 Mar 2026 09:34:56 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 9C566207AC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1774254896;
-	bh=N40GMO+OpI+C4m6aX++wL5AB3kryyXyFA1RbY2LB0ag=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=HAJ5Lmc8G6cyq0uoEEpxpxhJCm9OmGWHx/Ngf6Cy00v5HOzjC0V/6V4/1VWEzbwPD
-	 3RdyqRGmIkH37lz+XgX6QODqk/X9vw5Uar3RTztPGNN9lgXPZy2OVUr9md2kjoQZeT
-	 evFnEyCAKh7KsV7w4P38bpCVRVzNVcfrdXM1e8OFrToLSp0GNxH/tVuZ+Sd3tGQ9y6
-	 UTHrauyLk/tNrj2PkHefQ/hxgaYIC6svUiesUrMVdpA4oMTyNTtTc8CKZ5k/w/Hy+c
-	 jaLpCpuJR+62aC7JgvUYQHf/G+srsQQ21cIu0V/kWFGF0vresBzBcFRaZvbxBQyFdC
-	 rn9znHNaPsz1g==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 23 Mar
- 2026 09:34:56 +0100
-Received: (nullmailer pid 2741857 invoked by uid 1000);
-	Mon, 23 Mar 2026 08:34:49 -0000
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
-	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 20/20] xfrm: iptfs: only publish mode_data after clone setup
-Date: Mon, 23 Mar 2026 09:34:01 +0100
-Message-ID: <20260323083440.2741292-21-steffen.klassert@secunet.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260323083440.2741292-1-steffen.klassert@secunet.com>
-References: <20260323083440.2741292-1-steffen.klassert@secunet.com>
+	s=arc-20240116; t=1774255058; c=relaxed/simple;
+	bh=kV9qxt9z5kUBnQypg0tvwqy0X1j74YUSzCnUnCVOp0A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kAuiY1z5hTCeZsutHV//9cSiV21LXbiRChzYI3JnvSfYZzAVcPAM5UrHjbpjWAfzlIQ3FRKhMxPDmNg8MwdJv12UNcPmQAO3B9qWK31vFYQPKUlayQdJxHC6RbfTc0iXp8Sjzea+FzuP2EwPg+3TIzp5/sMehffm1GKaP5CaiEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HtFgfQmB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ztb6sEgO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774255054;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PTAb3BalGSZwPh5wtxjIj5LdP1IEByYqFV8DXSZ3Z9E=;
+	b=HtFgfQmBi0Kgsx6mBEit9386JungFE6ZnUdX/SLlXJmAOP3V98RjCVaiK8O4dZ4E4XLJH7
+	U02YTQE4xjrA29THDNXYquM/hU2l7tsVEAKya5gekoNxA7QriR6mdZAXo/FPRgH8pGSRvw
+	Av2OSUOJU+Y790tW1GqYjnvT7sIoqfw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-631-rScUrbuIPJm5xmAjiMQ0Hg-1; Mon, 23 Mar 2026 04:37:33 -0400
+X-MC-Unique: rScUrbuIPJm5xmAjiMQ0Hg-1
+X-Mimecast-MFC-AGG-ID: rScUrbuIPJm5xmAjiMQ0Hg_1774255052
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48378df3469so32370565e9.1
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 01:37:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1774255052; x=1774859852; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PTAb3BalGSZwPh5wtxjIj5LdP1IEByYqFV8DXSZ3Z9E=;
+        b=Ztb6sEgO9wZpyoAHxVPVq7AfwYtNLOjkOC1smkvVO7eMyjzMIaEvb3mV2m+OxqSnbU
+         YXJW25T+7bDWZcsbdhI4BzD54vZ7krINRRFPPEW3u8WsVxmg5VTf4pUn9KmwPsgjZ6EA
+         NQ/aVXMpx5cQ2HsU9i3WTczRrmct2p/AxiEPF7zUGLPXQOTYfNHQHJNKx9X0a6tT6/Bw
+         l0uRjpAoDjE8G+oryLpq/Y8804uj1gMYJdIl47OCUxPO3MLcHocRJCf/rUKcfmJLMvOQ
+         /B272nzZDwspSsiCy5Sgv3DSD24thMIGK7ENAOTx/Ty6z/nPyEXULrdBUXUypl6h6kJ6
+         0BTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774255052; x=1774859852;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PTAb3BalGSZwPh5wtxjIj5LdP1IEByYqFV8DXSZ3Z9E=;
+        b=rB/7kZqRC59FlXKXaR1Y9xOaK9n4EQScqcxg882OZbvL8DqfldInSk5ZIDIs8oFjER
+         IAuIXPvBWXa4RnYxQz1fMjaT1TeewUFO2LPtjMxw0z9P6OLm04n0O0ci1lz2KTMTmFGl
+         H4HyWzi4cwECE8YM0KSDc25lxLNQphtbxBPcad25wn+lMEAPCigY38rInvFPczj7FvPE
+         M3v6ZHXAMHAwSYf5QbsDY959hgEHI7gxfSxPBkk7a6/g4u6a6/nbE9kSi4TByPtTWOEZ
+         wmyN/ot8/dMhl+yITW+oL6EJOpz3s/+Be6Tcy95XeRduLIIiRqNCGPxPVB9HGPOVYgkf
+         c/Nw==
+X-Forwarded-Encrypted: i=1; AJvYcCUnVa59oY3HEXeyPH7ziCbnsx8oplJ62jnbtn2jFJ/37WF/DOX1FkWdiamHH+gfn2W4BmpjTPU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAwyHAnzQTpIiuk4RPZy3AnBRnv1A6UkD/BiqnwJt/yPK4oH8e
+	dWJwGkhSW2L+NijqIgpY8gtjsNVF7dvJEiCY3fhjy84QXZUXd0x9prrQKyQpWJgKY4BJWzEJnSZ
+	2SmQHJqcd2Ro2IlAcSBwRNeS+xB8mcDqqTBgfLpt5Xe6Db9lnP6TXcAvNww==
+X-Gm-Gg: ATEYQzwFZF4ACmXinLXCrggAvuUi83ekQD97js5dRr10UsAe+RlwhpTRJYc2aMSMXh8
+	/7C+LrqdlOWLiYz2FVeo/eZYvamupuzemP/58MXIdc3bIoZeoA6S9+L2eO3ViGijllfCf6pPTcP
+	iNWophuT7PWZKSh0Xsx2r+doFQp7jCNQPw+31VFLObiZzbRFcgJcl6zDudbvrQsTBSFTv4+yT9Y
+	qfcF/8DLYcDHalWzLrI1EQFwg1En1X7r+Lz0DxxwA+OjT7p0Gr9PTsocF/Ik3pTG1ia6HfhekZr
+	3cnlpKJjELlV6SzeyXh4fRt2YhFSIZMuWTRtz/rfBV/EVF1u0Ji8JHHEiJeZ2LSJt0vS+1HWw3j
+	q2vpBFUNpbCApbspOXjBK
+X-Received: by 2002:a05:600c:3b94:b0:486:faa8:9e4 with SMTP id 5b1f17b1804b1-486fe8ef087mr180279215e9.12.1774255051968;
+        Mon, 23 Mar 2026 01:37:31 -0700 (PDT)
+X-Received: by 2002:a05:600c:3b94:b0:486:faa8:9e4 with SMTP id 5b1f17b1804b1-486fe8ef087mr180278855e9.12.1774255051520;
+        Mon, 23 Mar 2026 01:37:31 -0700 (PDT)
+Received: from [192.168.2.83] ([46.175.183.46])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486fe879d37sm98149575e9.1.2026.03.23.01.37.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Mar 2026 01:37:30 -0700 (PDT)
+Message-ID: <c2fa7a08-b75d-49a9-8725-fc98217c2dbe@redhat.com>
+Date: Mon, 23 Mar 2026 09:37:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] iavf: fix wrong VLAN mask for
+ legacy Rx descriptors L2TAG2
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>,
+ Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+References: <20260320135326.1171433-1-poros@redhat.com>
+ <310379eb-9b99-444d-bf02-2bde3bd79374@molgen.mpg.de>
+Content-Language: en-US
+From: Petr Oros <poros@redhat.com>
+In-Reply-To: <310379eb-9b99-444d-bf02-2bde3bd79374@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
- (10.32.0.171)
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270407-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270426-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:dkim,secunet.com:email,secunet.com:mid,1g4.org:email];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 181852EE4B8
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 183E12EE6A7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Paul Moses <p@1g4.org>
 
-iptfs_clone_state() stores x->mode_data before allocating the reorder
-window. If that allocation fails, the code frees the cloned state and
-returns -ENOMEM, leaving x->mode_data pointing at freed memory.
+On 3/20/26 15:29, Paul Menzel wrote:
+> Dear Petr,
+>
+>
+> Thank you for your patch.
+>
+> Am 20.03.26 um 14:53 schrieb Petr Oros:
+>> The IAVF_RXD_LEGACY_L2TAG2_M mask was incorrectly defined as
+>> GENMASK_ULL(63, 32), extracting 32 bits from qw2 instead of the
+>> 16-bit VLAN tag. In the legacy Rx descriptor layout, the 2nd L2TAG2
+>> (VLAN tag) occupies bits 63:48 of qw2, not 63:32.
+>>
+>> The oversized mask causes FIELD_GET to return a 32-bit value where the
+>> actual VLAN tag sits in bits 31:16. When this value is passed to
+>> iavf_receive_skb() as a u16 parameter, it gets truncated to the lower
+>> 16 bits (which contain the 1st L2TAG2, typically zero). As a result,
+>> __vlan_hwaccel_put_tag() is never called and software VLAN interfaces
+>> on VFs receive no traffic.
+>>
+>> This affects VFs behind ice PF (VIRTCHNL VLAN v2) when the PF
+>> advertises VLAN stripping into L2TAG2_2 and legacy descriptors are
+>> used.
+>>
+>> The flex descriptor path already uses the correct mask
+>> (IAVF_RXD_FLEX_L2TAG2_2_M = GENMASK_ULL(63, 48)).
+>
+> Do you have a reproducer to verify the fix?
 
-The xfrm clone unwind later runs destroy_state() through x->mode_data,
-so the failed clone path tears down IPTFS state that clone_state()
-already freed.
+Yes, i have
 
-Keep the cloned IPTFS state private until all allocations succeed so
-failed clones leave x->mode_data unset. The destroy path already
-handles a NULL mode_data pointer.
+  1. Create 2 VFs on ice PF (echo 2 > sriov_numvfs)
+  2. Disable spoofchk on both VFs
+  3. Move each VF into a separate network namespace
+  4. On each VF: create VLAN interface (e.g. vlan 198), assign IP, bring up
+  5. Set rx-vlan-offload OFF on both VFs
+  6. Ping between VLAN interfaces → expect PASS
+      (VLAN tag stays in packet data, kernel matches in-band)
+  7. Set rx-vlan-offload ON on both VFs
+  8. Ping between VLAN interfaces → expect FAIL if bug present
+      (HW strips VLAN tag into descriptor L2TAG2 field,
+       wrong mask extracts bits 47:32 instead of 63:48,
+       truncated to u16 → zero, __vlan_hwaccel_put_tag() never called,
+       packet delivered to parent interface, not VLAN interface)
 
-Fixes: 6be02e3e4f37 ("xfrm: iptfs: handle reordering of received packets")
-Cc: stable@vger.kernel.org
-Signed-off-by: Paul Moses <p@1g4.org>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- net/xfrm/xfrm_iptfs.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+>
+>> Fixes: 2dc8e7c36d80 ("iavf: refactor iavf_clean_rx_irq to support 
+>> legacy and flex descriptors")
+>
+> (That first entered Linux v6.15-rc1, and Linux 6.12 and 6.18 are LTS 
+> series.)
+>
+The reproducer works but requires legacy Rx descriptors to be in use.
+On modern ice + iavf with full PTP support, flex descriptors are always
+negotiated and the buggy legacy path is never reached.
 
-diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-index 2c87290fe06c..7cd97c1dcd11 100644
---- a/net/xfrm/xfrm_iptfs.c
-+++ b/net/xfrm/xfrm_iptfs.c
-@@ -2664,9 +2664,6 @@ static int iptfs_clone_state(struct xfrm_state *x, struct xfrm_state *orig)
- 	if (!xtfs)
- 		return -ENOMEM;
- 
--	x->mode_data = xtfs;
--	xtfs->x = x;
--
- 	xtfs->ra_newskb = NULL;
- 	if (xtfs->cfg.reorder_win_size) {
- 		xtfs->w_saved = kcalloc(xtfs->cfg.reorder_win_size,
-@@ -2677,6 +2674,9 @@ static int iptfs_clone_state(struct xfrm_state *x, struct xfrm_state *orig)
- 		}
- 	}
- 
-+	x->mode_data = xtfs;
-+	xtfs->x = x;
-+
- 	return 0;
- }
- 
--- 
-2.43.0
+Flex descriptors require all of the following:
+   - CONFIG_PTP_1588_CLOCK enabled in kernel config
+   - VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC granted by PF
+   - PTP capabilities negotiated (VIRTCHNL_VF_CAP_PTP)
+   - VIRTCHNL_1588_PTP_CAP_RX_TSTAMP supported
+   - VIRTCHNL_RXDID_2_FLEX_SQ_NIC present in DDP profile
+
+If any of these conditions is not met, iavf_select_rx_desc_format()
+falls back to legacy descriptors (RXDID=1) and the wrong L2TAG2 mask is hit.
+
+In our kernel we ended up in a state where the iavf Rx path refactor was
+backported but the full PTP support chain was not. Without PTP,
+iavf_ptp_cap_supported() returns false and flex descriptors
+are never selected, exposing the bug.
+
+Regards,
+
+Petr
+
+
+>> Signed-off-by: Petr Oros <poros@redhat.com>
+>> ---
+>>   drivers/net/ethernet/intel/iavf/iavf_type.h | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/iavf/iavf_type.h 
+>> b/drivers/net/ethernet/intel/iavf/iavf_type.h
+>> index 1d8cf29cb65ac5..5bb1de1cfd33b1 100644
+>> --- a/drivers/net/ethernet/intel/iavf/iavf_type.h
+>> +++ b/drivers/net/ethernet/intel/iavf/iavf_type.h
+>> @@ -277,7 +277,7 @@ struct iavf_rx_desc {
+>>   /* L2 Tag 2 Presence */
+>>   #define IAVF_RXD_LEGACY_L2TAG2P_M        BIT(0)
+>>   /* Stripped S-TAG VLAN from the receive packet */
+>> -#define IAVF_RXD_LEGACY_L2TAG2_M        GENMASK_ULL(63, 32)
+>> +#define IAVF_RXD_LEGACY_L2TAG2_M        GENMASK_ULL(63, 48)
+>>   /* Stripped S-TAG VLAN from the receive packet */
+>>   #define IAVF_RXD_FLEX_L2TAG2_2_M        GENMASK_ULL(63, 48)
+>>   /* The packet is a UDP tunneled packet */
+>
+> Nice find.
+>
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+>
+>
+> Kind regards,
+>
+> Paul
+>
 
 
