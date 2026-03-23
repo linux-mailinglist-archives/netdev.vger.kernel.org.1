@@ -1,174 +1,143 @@
-Return-Path: <netdev+bounces-270436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270437-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oPKJEJcDwWlUPgQAu9opvQ
-	(envelope-from <netdev+bounces-270436-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:10:47 +0100
+	id 6PKHEEoFwWlUPgQAu9opvQ
+	(envelope-from <netdev+bounces-270437-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:18:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD4792EEBFB
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:10:46 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0B8D2EEDB1
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:18:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4685C3004D05
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:10:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CD65E30A04D4
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E043859F2;
-	Mon, 23 Mar 2026 09:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BACA3386573;
+	Mon, 23 Mar 2026 09:11:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652533195F5
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 09:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CCBF38655F
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 09:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774257045; cv=none; b=i256VKMWS8Mc5I16EOW2w6rBPBY2pebr7thLj4/eX4xIdfLoSxga6zBjNMjeEf7qdl31RjB0AF9ytBPIVF4QlTg5dsSsWwVuQcpk7s+voujtQzbC0HTT+5J3mmXANKIVUDk7qGfm8a7UjQHhb38Ok/5PYeRC1Gs36uLU+vvNc3U=
+	t=1774257088; cv=none; b=VAbiYLSAjaxrd48n8umPxMoG+wWs6xZlfz0qcnYfGysXRUXh1yAt8DijGwbnOmtHneBbdKKdUluiyTIUx12QUXT5JZ4r7bwtf9sTW/Q1X+FId0jRm4FfKAEpsgY5cAwKsYb3P5at4YjRPW9lxo/QBIVFxv0AqtQw6vaN3wJRD6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774257045; c=relaxed/simple;
-	bh=+2yqBgPOqWKRKy8POtbak7yqq9ptpc85S46Tl/qDWxc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Brwv45Ms3gHmrGws2t4DWlQZ0hFmQt4xcdvQFOasiH8Lylng69Lk9tEqiZcIeHmlTEqK4zabuXv7LmxYvFolTnbqNx+1i4yIFiXyoAbSzpzRzEOHvQcHMKv+aQi6nbu6wUHwwWs/txOsfC38p6OPscZesdoyi2mf3y4comsyj2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.229] (p57bd9b5e.dip0.t-ipconnect.de [87.189.155.94])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 65D034C2C37F07;
-	Mon, 23 Mar 2026 10:10:30 +0100 (CET)
-Message-ID: <447cbe7b-49b0-41dd-9a96-40a2dc40b198@molgen.mpg.de>
-Date: Mon, 23 Mar 2026 10:10:29 +0100
+	s=arc-20240116; t=1774257088; c=relaxed/simple;
+	bh=fj77qGHID4lKwG1dct2LL8Fo1sBr36LBHbO2qhPD5gQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=SmOfHpgl0BxPZJy47JtuWG4ofcVYHiczS9nGnhi5vcOtlgeF8OHPYlpYrWSPFrlqEJwT3qv6o1h0MSZfaesjRSkJ7X/mO3DteaOqCEg0hpuJq8Wctinlec4/xLLYgazJ6eWojYOhvDK8DAczaDIKpkPIOoTHXUDC+hlcQ8HTHfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-67dec1314b5so5253871eaf.2
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 02:11:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774257086; x=1774861886;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QRj71m+Ztl8dWYbmnqswmpA98jKwc37SXTwiO8A5RnU=;
+        b=Egr2hD5kAxvnrkyC6jRz5y+9+uqjvVwoOU4RIimn31uVNt8YXwBVq6CvDdEq/VFpvw
+         PGlov5bH4OqIZY/jAYWWaOfMzexW1xpCQWooy88/zSrTMb/phNANKE0QPduVBwIE4mhX
+         Nkj2Ac9d++H8BU2mScr4+Bs9Qr5psnrDqV7m1PthGe7NKD7l5GCxadHqBJPJpgsb7hqr
+         v2MtgmOm+sgSFZI8LKRhxmEbFwFLibnTlm5MX5DK3gilLpRa1QM3Cq/ng3mG5p2FCEpB
+         9BNKJOcRyxkCDgQKXAWiRk2BkDnI6j2xmCADA8hctALpqhgxK41wmTntLFJ0U4TqjQ01
+         DgPg==
+X-Forwarded-Encrypted: i=1; AJvYcCWks9xcE+YzCzsukbIAGyx5OaE1OM8JGqBsNRauNBhsN8CpC7BlhrBlxgbKFvTl+dS5LJNFKNQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznoHKTKMRBMEnrZp7nqRxSYVGBURYd3958M3sFqRnGM+7gECEg
+	1m5AVbk2+51eRdjDI3bdT/HCNL/GpY1oEpeNO6FP9CyE6qpdwTSsAAr9ma3pKdQlcROysvQlHOB
+	T66VCnSAq79TUdPkklZw0opKOW8d24WIZTvvGQ49p74s5uH6L/XtPy6DTfKU=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ice: update
- ice_link_mode_str_high() with 200G
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
- netdev@vger.kernel.org, Paul Greenwalt <paul.greenwalt@intel.com>
-References: <20260323085840.3272274-1-aleksandr.loktionov@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260323085840.3272274-1-aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Received: by 2002:a05:6820:818e:b0:661:13eb:6ce4 with SMTP id
+ 006d021491bc7-67c22eca2d4mr9304809eaf.21.1774257086459; Mon, 23 Mar 2026
+ 02:11:26 -0700 (PDT)
+Date: Mon, 23 Mar 2026 02:11:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69c103be.050a0220.3bf4de.0096.GAE@google.com>
+Subject: [syzbot] Monthly net report (Mar 2026)
+From: syzbot <syzbot+list481eec3748b6b7b5a470@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270436-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mpg.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-270437-lists,netdev=lfdr.de,list481eec3748b6b7b5a470];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
 	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mpg.de:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: DD4792EEBFB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,goo.gl:url,syzkaller.appspot.com:url,googlegroups.com:email]
+X-Rspamd-Queue-Id: A0B8D2EEDB1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Dear Aleksandr, dear Paul,
+Hello net maintainers/developers,
 
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
 
-Thank you for your patch. Some minor comments, should you resend.
+During the period, 5 new issues were detected and 12 were fixed.
+In total, 86 issues are still open and 1711 have already been fixed.
 
-Am 23.03.26 um 09:58 schrieb Aleksandr Loktionov:
-> From: Paul Greenwalt <paul.greenwalt@intel.com>
-> 
-> Update ice_link_mode_str_high() with strings for 200G PHY types.
-> Without these entries the ice_dump_phy_type() debug helper prints
-> nothing for phy_type_high bits [5..15], covering all 200G and
-> 400GBASE-FR8 PHY types supported by E825C hardware.
+Some of the still happening issues:
 
-How does the system need to be configured to get `ice_dump_phy_type()` 
-called?
+Ref  Crashes Repro Title
+<1>  8474    Yes   KMSAN: uninit-value in eth_type_trans (2)
+                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
+<2>  3481    Yes   INFO: task hung in linkwatch_event (4)
+                   https://syzkaller.appspot.com/bug?extid=2ba2d70f288cf61174e4
+<3>  2911    Yes   WARNING in rcu_check_gp_start_stall
+                   https://syzkaller.appspot.com/bug?extid=111bc509cd9740d7e4aa
+<4>  2768    Yes   INFO: task hung in synchronize_rcu (4)
+                   https://syzkaller.appspot.com/bug?extid=222aa26d0a5dbc2e84fe
+<5>  2101    Yes   KMSAN: uninit-value in bpf_prog_run_generic_xdp
+                   https://syzkaller.appspot.com/bug?extid=0e6ddb1ef80986bdfe64
+<6>  1995    Yes   INFO: task hung in del_device_store
+                   https://syzkaller.appspot.com/bug?extid=6d10ecc8a97cc10639f9
+<7>  1650    Yes   INFO: task hung in addrconf_dad_work (5)
+                   https://syzkaller.appspot.com/bug?extid=82ccd564344eeaa5427d
+<8>  1201    Yes   possible deadlock in hsr_dev_xmit (2)
+                   https://syzkaller.appspot.com/bug?extid=fbf74291c3b7e753b481
+<9>  626     Yes   INFO: rcu detected stall in tc_modify_qdisc
+                   https://syzkaller.appspot.com/bug?extid=9f78d5c664a8c33f4cce
+<10> 609     Yes   INFO: task hung in switchdev_deferred_process_work (3)
+                   https://syzkaller.appspot.com/bug?extid=d6bbe0f5705cb8a5aa2b
 
-Also, the commit message title just mentions 200G, but here you mention 
-400G too.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-> Also add the corresponding ICE_PHY_TYPE_HIGH_* bit definitions for
-> indices 13-15 (200G_AUI8_AOC_ACC, 200G_AUI8, 400GBASE_FR8) that were
-> missing from ice_adminq_cmd.h, and update ICE_PHY_TYPE_HIGH_MAX_INDEX
-> from 12 to 15.  Without these definitions ice_get_phy_type_high() would
-> stop iterating at index 12, leaving the new PHY types invisible to all
-> code that bounds-checks against MAX_INDEX.
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-Maybe this should have been a separate commit, but it’s not important.
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-> Fixes: none (new hardware support)
-> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
-> v1 -> v2 update ICE_PHY_TYPE_HIGH_MAX_INDEX
-> ---
->   drivers/net/ethernet/intel/ice/ice_adminq_cmd.h |  5 ++++-
->   drivers/net/ethernet/intel/ice/ice_common.c     | 11 +++++++++++
->   2 files changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> index 859e9c6..f64d2ef 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> @@ -1044,7 +1044,10 @@ struct ice_aqc_get_phy_caps {
->   #define ICE_PHY_TYPE_HIGH_200G_KR4_PAM4		BIT_ULL(10)
->   #define ICE_PHY_TYPE_HIGH_200G_AUI4_AOC_ACC	BIT_ULL(11)
->   #define ICE_PHY_TYPE_HIGH_200G_AUI4		BIT_ULL(12)
-> -#define ICE_PHY_TYPE_HIGH_MAX_INDEX		12
-> +#define ICE_PHY_TYPE_HIGH_200G_AUI8_AOC_ACC	BIT_ULL(13)
-> +#define ICE_PHY_TYPE_HIGH_200G_AUI8		BIT_ULL(14)
-> +#define ICE_PHY_TYPE_HIGH_400GBASE_FR8		BIT_ULL(15)
-> +#define ICE_PHY_TYPE_HIGH_MAX_INDEX		15
->   
->   struct ice_aqc_get_phy_caps_data {
->   	__le64 phy_type_low; /* Use values from ICE_PHY_TYPE_LOW_* */
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-> index 2cebe4e..c6727c5 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -84,6 +84,17 @@ static const char * const ice_link_mode_str_high[] = {
->   	[2] = "100G_CAUI2",
->   	[3] = "100G_AUI2_AOC_ACC",
->   	[4] = "100G_AUI2",
-> +	[5] = "200G_CR4_PAM4",
-> +	[6] = "200G_SR4",
-> +	[7] = "200G_FR4",
-> +	[8] = "200G_LR4",
-> +	[9] = "200G_DR4",
-> +	[10] = "200G_KR4_PAM4",
-> +	[11] = "200G_AUI4_AOC_ACC",
-> +	[12] = "200G_AUI4",
-> +	[13] = "200G_AUI8_AOC_ACC",
-> +	[14] = "200G_AUI8",
-> +	[15] = "400GBASE_FR8",
->   };
->   
->   /**
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
+You may send multiple commands in a single email message.
 
