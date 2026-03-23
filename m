@@ -1,166 +1,178 @@
-Return-Path: <netdev+bounces-270740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270741-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJ7tAjCqwWmUUQQAu9opvQ
-	(envelope-from <netdev+bounces-270740-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:01:36 +0100
+	id MMAAMqKtwWmUUQQAu9opvQ
+	(envelope-from <netdev+bounces-270741-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:16:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 773422FD846
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:01:35 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 724EE2FDA8D
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:16:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 016CF3049E09
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:58:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 26763301C142
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37A33E6387;
-	Mon, 23 Mar 2026 20:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7606933FE02;
+	Mon, 23 Mar 2026 21:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R9qUKqzj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MyFCE8Ky"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817343E5EE8
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 20:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F93B26738B
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 21:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774299536; cv=none; b=cm1N8xEnds09EArRLQSU6ZEUDT3avX4QTvNOe1t8yMEcF4xWGXLpb0AvVlJb64H4I8wO8i0QqZ20O9BZB9454Acr1tqweJ1XDckOfUDgoYYvhvcuufKxPqswb91c2wSNkN0uwUl0LxXXOaPxDAP467jIGBEx3RGC55+udjb6h30=
+	t=1774300542; cv=none; b=IABV7w4U4/HhWqmoCCULpihE/7N7TQRjv3Mfe1LmXlTz1bv1O6Sm55nfvlqCSazsuJbz/4J8ZqzG/S8AjIkq42Z8BblVJmX5TLDrHMyGQalnl+Qd4W+1uroO3pfqIoD1EJ1ixaN+4qzxgbPVkv+SDvsCwMPfT4db7bsLLjQxdyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774299536; c=relaxed/simple;
-	bh=hTVCeUQ/+8R/8c72/aofLe3983HdshwdIE0aNYh+eEU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GMuseGa//TPF/vwBoFrc0WP+Hdi63pOegOFoTrAURx2joMCIMy/an6CUp08aJYIKpvSDONbrBlZmYrVSOPQtKXx1Bb6p0FcRHRQsC7FooC43O6desOWb50X51k6V6IWAXZMN2B02nywt/lT/L4fjfs8Gp+OqDQA9TNEmBSx0XMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R9qUKqzj; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774299536; x=1805835536;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hTVCeUQ/+8R/8c72/aofLe3983HdshwdIE0aNYh+eEU=;
-  b=R9qUKqzjwLTDpb5UgC6T8UvWL+wrmJp6KHehssZdBRaeVednKjltPeeP
-   LuWH/gMZ/gqLQwGo59Uy59YQdh6wFUf4nKb1tGEnPGZwkNApp/lqZHgI0
-   Vil2zmK181AY/LpmNI8Pw0Z0IHlI8L3zXVCL0KBN/XVtxTmengrIaTOEh
-   uZ47+91mRLPNlU6XN3T0WEEW7JMlZ7azWjOHmkb5XyNCh8fUuYTaKDg4Y
-   6ETgV4ohqlX0I+ZQQwGXqUSNCjYPJ40xiwy9KmnzEIGzM0KoRVRt7qBMs
-   t+T0Oj5XWD3xLOrm+cUURVIXbrNosUtiD52qsKz2TxO1qGmpzXaxPhP3Z
-   w==;
-X-CSE-ConnectionGUID: qYJKiBdJS3mQXE4P+kScSw==
-X-CSE-MsgGUID: K3gOCyJeQzerxklvMXQv/Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11738"; a="75375532"
-X-IronPort-AV: E=Sophos;i="6.23,137,1770624000"; 
-   d="scan'208";a="75375532"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2026 13:58:50 -0700
-X-CSE-ConnectionGUID: I8sW8+XgT6eqyI8xf1dtng==
-X-CSE-MsgGUID: lkzaqeGpRMmgfQEbtqbLPQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,137,1770624000"; 
-   d="scan'208";a="224114430"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa009.jf.intel.com with ESMTP; 23 Mar 2026 13:58:50 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Joshua Hay <joshua.a.hay@intel.com>,
-	anthony.l.nguyen@intel.com,
-	boolli@google.com,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net 6/6] idpf: only assign num refillqs if allocation was successful
-Date: Mon, 23 Mar 2026 13:58:41 -0700
-Message-ID: <20260323205843.624704-7-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20260323205843.624704-1-anthony.l.nguyen@intel.com>
-References: <20260323205843.624704-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1774300542; c=relaxed/simple;
+	bh=E+01s+1EWSp0rlCHpf0q/EgMSfxcqEyde0Qk59jffh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FAh/VmDVwnLGXijN+b3NlQNf3vKU4nvDF14hs/P7XIwisoF9Usfdu30WjtQblqKAfWMqS9eN3ugvWVEwsMWtfhDDXm5S4hji/ScVnO00FdjjrAAwPiyDUskU5TdjQJfKgS2whBKKZCdClfbko7gXs7khm4/g4jgee1Fq1LE/phc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MyFCE8Ky; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4836cd6e0d4so6031645e9.3
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 14:15:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774300539; x=1774905339; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LbSGCR20NLc8Fhkr8w8sK+fxvVVcKe9jGCCUsUyT7mY=;
+        b=MyFCE8KyHQgbng3c8PHxuzHtIl8EsUCwMI9oWEh82tUGhLTBWkZ4PvLI3jzfqzqJXg
+         7BT+f5XNhDXc7VlG6pm0md01mfCOGDSuDA0QY77GTfMHXhPMLa9yuTHizd6TM0Xr1Oi2
+         69T2/PNTz1GxJkmwyiLoIz9b5fO+heUMOj/xkIows0c4jF54Vo7fWKoMtiiR1Yt4coOs
+         3W0fU/i4H8n2JrswqtrCDGObJVG+FPGrz59B1xJgExVCuLAlraGfy5yG7gTWvlE++xlC
+         N/+6znUZgFTSKe4twmaY9La5s/Ef5mSbdzt48jjVsD5XhAJy4MzU9dy+GOXVXhDGS5rF
+         JnBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774300539; x=1774905339;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LbSGCR20NLc8Fhkr8w8sK+fxvVVcKe9jGCCUsUyT7mY=;
+        b=LhwuyYDSuPALMJtmTD9oBm2HO8yGniAsgdEC08rhodpFz2e4XjSEA0NGeRy1f+8Sco
+         kgGgDhYo4jxQNaHnR+usMvIibWcWZfOtDI8Y/qBykSTnU85lAB86pBuBvSvkvLcqm0NV
+         2aMTGESEYgbi7rfMXmMSaBsvb0OVIalD4yg1ffKPjW8tAio3bJ23LALkWgsIXLn3OKWg
+         vfFUGfbHhgCMWohrna3rbXbyisPSdUn1NlAyz4KejNOMz5/O8+mEwEJ6ZD7oLMEEiWQv
+         adA10fTsD0zUPSwo20KDQ4G9KD3X3YFQOsBhzm0ZdTlSniDTZWa2RvDpmG7dKJeyJ2mm
+         2mnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXIVmHQpdm6PqzlovAlOElpn3+zU+ibSaSiZtMDHkz37DLhZ4BaqQX2Oc8k6zm0aUnqWtuEe04=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFow9+9Mel3ROOwPX6NNUrCi7oRYyS2R4SiT7ZqDZiJ+OKzsI0
+	4x0cg/ZMeS5TgyPe4SUM4DOTdJhFlLYMaJ2BX9oV65s83FCc5dgc5mn3
+X-Gm-Gg: ATEYQzxAwM8CU2QwwxVd4uvgJl77QxZZs0LkdNsaZ1KG9qmoM4KZOBlrgEUGHUYE97B
+	RGXR62o4qD2rEIQXSW/+1eS4eQTUNRhc6oH0aBcdSSOzGig+w8Mue9EOj7jojMXlEo++uLTCA9z
+	I7zkUlkm0OSQFFEwNMtUvmLPy9WzBywJ3daLlvMUlq+UoM55mDcxtJFwsEDemIy4039aqH6MxrR
+	qUWdqGvDmfKji1ugiLlQhAG3aUfsezIsNatDMEofne4vbTwhpc2Hl1KuMwDVQdneTX1XJFf1+Az
+	FXxz+OhNM70GbmLdJ8BUdFdO1tSgHGlKZuAoi5rRuRM5/8DEl+nfVCiPeNrd1hqD++/RD/yseGf
+	f8DnqCY5/qo7Ld/VbToEna7XzyydqVTACqf6RmXPjSgP0+K2P+Jq4HkxBMw81+Jp2o4NAjLGM7v
+	+zX8ZK+xJLWhiJE6eGbocJjTjTSQ==
+X-Received: by 2002:a05:600c:1f0e:b0:471:ab1:18f5 with SMTP id 5b1f17b1804b1-486fee2dcfdmr106265015e9.7.1774300539351;
+        Mon, 23 Mar 2026 14:15:39 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d50a:b400:653e:51cc:7cba:e6df])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4871102369fsm1726375e9.6.2026.03.23.14.15.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2026 14:15:38 -0700 (PDT)
+Date: Mon, 23 Mar 2026 23:15:36 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
+	Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v6 2/4] net: dsa: add bridge member iteration
+ macro and port mask helper
+Message-ID: <20260323211536.iqopuy2zxd75pfbh@skbuf>
+References: <cover.1774136876.git.daniel@makrotopia.org>
+ <ff936ce4ad3044102c367c55e7a455ab0020e4b7.1774136876.git.daniel@makrotopia.org>
+ <acCllYmKczZrDgv9@makrotopia.org>
+ <20260323163104.a2d2hbs7jfgsptj3@skbuf>
+ <acFuHka4RdmAXm73@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <acFuHka4RdmAXm73@makrotopia.org>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-270741-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-270740-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 773422FD846
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 724EE2FDA8D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Joshua Hay <joshua.a.hay@intel.com>
+On Mon, Mar 23, 2026 at 04:45:18PM +0000, Daniel Golle wrote:
+> That means the driver *does* have to track a mapping between DSA
+> bridges and hardware/firmware bridges on that specific switch somehow.
 
-As reported by AI review [1], if the refillqs allocation fails, refillqs
-will be NULL but num_refillqs will be non-zero. The release function
-will then dereference refillqs since it thinks the refillqs are present,
-resulting in a NULL ptr dereference.
+That's correct. From DSA's perspective, it's not an mxlbridge, it's just
+a bridge with at least one DSA switch port under it, which is given a
+kernel-wide identifier. The ports can hold a single reference to the
+common bridge, but the common bridge cannot hold a single back-reference
+to individual ports. And holding multiple references would severely
+complicate the implementation.
 
-Only assign the num refillqs if the allocation was successful. This will
-prevent the release function from entering the loop and accessing
-refillqs.
+Even if you don't implement accelerated cross-switch bridging, you can
+still have two mxl ports belonging to different switches that are both
+put by the user under the same bridge. And both switch driver instances
+would want to allocate a potentially different bridge ID, and surely
+maintain a different portmap, for that same bridge.
 
-[1] https://lore.kernel.org/netdev/20260227035625.2632753-1-kuba@kernel.org/
+> Or is there another existing structure in DSA I'm not aware of and
+> which could be used to implement Paolo's suggestion:
+> 
+> https://lore.kernel.org/netdev/fe46d64b-1b12-48b6-b663-e7d5122b7b8a@redhat.com/
 
-Fixes: 95af467d9a4e3 ("idpf: configure resources for RX queues")
-Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The API was intended so that you could either use the bridge.num directly,
+transform it through some linear formula or as an index into a privately
+maintained array of data structures with switch-specific meaning.
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 252259993022..f6b3b15364ff 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -1860,13 +1860,13 @@ static int idpf_rxq_group_alloc(struct idpf_vport *vport,
- 			idpf_queue_assign(HSPLIT_EN, q, hs);
- 			idpf_queue_assign(RSC_EN, q, rsc);
- 
--			bufq_set->num_refillqs = num_rxq;
- 			bufq_set->refillqs = kcalloc(num_rxq, swq_size,
- 						     GFP_KERNEL);
- 			if (!bufq_set->refillqs) {
- 				err = -ENOMEM;
- 				goto err_alloc;
- 			}
-+			bufq_set->num_refillqs = num_rxq;
- 			for (unsigned int k = 0; k < bufq_set->num_refillqs; k++) {
- 				struct idpf_sw_queue *refillq =
- 					&bufq_set->refillqs[k];
--- 
-2.47.1
+I didn't question why you maintain a parallel list of dynamically
+allocated mxlbridge structures instead of just having an array of
+MXL862XX_MAX_BRIDGES * sizeof(u16) for the bridge identifiers, plus
+maintain a separate portmap instead of walking through the DSA data
+structures, but now that Paolo brought it up: why?
 
+I see in v6 you're halfway there with the conversion, you got rid of the
+portmap and you could just use the array for the rest.
 
