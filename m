@@ -1,193 +1,166 @@
-Return-Path: <netdev+bounces-270655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270656-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cNE0B2+MwWlxTwQAu9opvQ
-	(envelope-from <netdev+bounces-270655-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:54:39 +0100
+	id cONxJnGDwWnATgQAu9opvQ
+	(envelope-from <netdev+bounces-270656-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:16:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EA062FBA9E
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:54:38 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84BD42FB1C3
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:16:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 67BEE3091D26
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 18:07:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 43A643029A90
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 18:09:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3B83CB2D0;
-	Mon, 23 Mar 2026 18:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7353BED70;
+	Mon, 23 Mar 2026 18:09:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XTQbeyg2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCKhBtcG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B78F3CA498;
-	Mon, 23 Mar 2026 18:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125BA3B8BDB
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 18:09:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774289215; cv=none; b=uJT74jIeU4zeDDRKaNXXzBX1d+i1Sxkne8EbtJVoBMSO3hyEQOnzplNyLcCG66CclUw1YouLQTEybPmlPU7jL7MwYwhCZqJ3pSTVvH6WVPPzbrECM50jasFTDUDMaF4QNJjoXpeU6GFmSiTprnQeuvPu16YHXHz5lV3hzR1rK5E=
+	t=1774289362; cv=none; b=poF2MtJ24OGFwhbyy487WwWfworFAAydL/ejZiqCttPtiJLWCjCMLPAqsODYI3re/HEz89WE/yTm8Fi4wlBciR09L3yUj6neTo/i0zdrdayLtZvcsK9VXNaW4MiYWHhNtAtzk96mGfB0BTpCEWgCfoUliHJ+8YRowAM9beDyQFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774289215; c=relaxed/simple;
-	bh=8S84h22Jw0U+zyxF/KLZ87UES0qgquWYlnLt7kNs9WM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RpFSg+PaCYzLEnH3iKuw9x69J8gfxHqCNgS7Too6qENUlYQ3oF8U3217u+KUbcdaXairDkQwWKCV48dwB0ABcDARgcfEvxN206kBf+U0UC18ySTD7BHi6rPBY9TDQEndnaBVkQt1ggBGdC6hjVB5p6dLDd4EIDC+gjnbG8dnPBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XTQbeyg2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93641C4CEF7;
-	Mon, 23 Mar 2026 18:06:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774289215;
-	bh=8S84h22Jw0U+zyxF/KLZ87UES0qgquWYlnLt7kNs9WM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XTQbeyg25tVWL2JzXKPi2b8ymSXyZX/f1HhwsZJsMRL8+wywLAwI+HZjNcv1J7mAs
-	 l1HVdSM8/WflnIBHyOiwFtzUGTsObYicusgmS6RGZbctHDEyOq7Tb3oKvvAvfsuSQ0
-	 ATtMYxOI4HIcY9FgIIFt6fR8zAPAjuXnq7/VaRTSN2LIosyq3+QzcltBE6AUcV4H6T
-	 1DtINNupNLAcpklLclRkiBCCPv40SEQc4qEk0xRleD0+GHnNK7q7k5MsNoLS1rK7WD
-	 1xofn3IYKgD6kOkCiX7e+6vtta5sHWzvb3Vku1x9zUwl/9m0ECpD0RCJKDXPX+tgR8
-	 XM/8lvkGhkOvA==
-Date: Mon, 23 Mar 2026 18:06:51 +0000
-From: Simon Horman <horms@kernel.org>
-To: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kees Cook <kees@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net/nfc: bound SENSF response copy length
-Message-ID: <20260323180651.GA164850@horms.kernel.org>
-References: <20260322031922.57949-1-pengpeng@iscas.ac.cn>
+	s=arc-20240116; t=1774289362; c=relaxed/simple;
+	bh=3YaXuT5Zo2/D6qsiT4OFYcTOpHZh3AJ/wSnHsmU9yjY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cQMxWTV5RGfiuQcDpaPd/uGo1BRd1Iv7ngXVKaZKwdhVENV1rT2BG3dApt+CMk4Nm/Q5JqEb4kmadKrkbnz5NoBA6E1W6IUiJ7FheSdzq6lwwDsNxlTo0za9yPR8TCMUZFeOvF/WqQ4ovFwzeGWxMqubvJ3HKqc8ixHV9QnoeQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TCKhBtcG; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso37476825e9.3
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 11:09:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774289359; x=1774894159; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YO72kODuEVvczmG2KdWF/y/765rWDtdAol6d5uBPwpU=;
+        b=TCKhBtcGZvZdoN/CkW2MdCQd5yPB99O2WU3Krj9zS9VRF0HFznmiI/LbB2pqUuwl/4
+         7BuzLvgPvC6MjGA0hMukvGjIXF+BLYDGki9mVzJeLE1zXPgFiBuYtSP8acPrSZ2F93Wv
+         sty8sLRZppiD67YcPls78sDTogK5XqhOAn/2OTpCVqKUUt7K8Zt72oqssSBh63Foibvr
+         we9J0tsXF96h3LbXuaA3fg3YSkxrz2+Ztv8wb/QGU51P6i2/g3nx2yKc3H9X7wzAFHQ8
+         Po986fE2NmGvHRVe2O+C0QgKhYjnk00asyu9RM3C51J+6V7YGcEtzoCmrpxjpt6BTxL7
+         WgnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774289359; x=1774894159;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YO72kODuEVvczmG2KdWF/y/765rWDtdAol6d5uBPwpU=;
+        b=kssHjsDm87sxd5jQWkNY8MLPkIFpavvXSgkwpqiuO0DlQM/TZaZOcRp5LwnAH+rTDw
+         TvtFhPmh+37nvNkI7fLj95sB+Flu2fNiXT3jjV8pyFmnsId3A1/YuBa1FLnB9s1HX0Na
+         K2pxWp/+442F5FdKrZtGbFYxlT5o1acaobydzUsG7xBQgGBB2IthPp3THysErko1VNp1
+         dg0mdUPTYuFfd+/g5zetKzVx6AIhMscqkoa62yj6p/MvigdqeHQO9XYUUF9P5FdzjMBw
+         K0+YqJqLQtP/RwjuIdDazJzIZDi2efNVep5s8AlpgA98QSdj0QTDQsJ0sqdFeFHjA+a0
+         ZhZg==
+X-Forwarded-Encrypted: i=1; AJvYcCVNoOC34YwpLU2ivcfFII4UFuztSQku21DG6SOOYtzRqtVCfeDESuPafdwGXuzD0rjcghw2YWs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOQAsPQ27T7S6NBcSic/Jefq5BJUrg/muTQA+pcFQtEIrqQp4U
+	KSAyoLLK5QkpmCgAdh2elYIv5z0sq2/6UtmmPbtI5AYEDUZ6l0n/cOed
+X-Gm-Gg: ATEYQzz3EQ0rDcmtsmKNnK6wdHxUAWfWmgoSrnIvdQ5Yfz/ySUIqP3nNf/BYPkpc/Uv
+	swjMMmyITdV9PYm66Jwos4yTpmx+rVWy/WpF/0pBBSQhRM/cQbQ/nJAupb1LIzSXM/RIkcIUY+X
+	GhE4JzWoaz2QHHEAy0es5SqpCiR2ev3Ma0JoiHyRoaWSKVJV4mDI/EXGMluXzsr29/7rtavqsms
+	rwJGdfqIFv9m7+pDrlaVX4lNU3wsb1X2318HzyS3j/um5mRkbC1C/IBgf3+9SrpYPgJTCwYqMTj
+	zcnyaqvmOoJ4jl3Y8aPNxBz4KEX/ydhNUtysCvUhsQQIMv/kJILDGctUu9W7Dz2E42hkSccOGnB
+	dYYBzQbvB27epkS8V7wSjyjMrg7PxYUi8x3pPi9xBkUoyQTx4oc+04MspyozGZfWAxg2y7MWZeM
+	yDqtySM5sdhqjzGrA6Rif19bJBu10Vxera8k5q9pkDBK/APlU=
+X-Received: by 2002:a05:600c:a085:b0:485:3ec6:e634 with SMTP id 5b1f17b1804b1-486fedcc6e7mr187658175e9.15.1774289359183;
+        Mon, 23 Mar 2026 11:09:19 -0700 (PDT)
+Received: from localhost.localdomain ([151.47.115.31])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486fe6d9896sm317479415e9.2.2026.03.23.11.09.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2026 11:09:18 -0700 (PDT)
+From: Adriano Vero <litaliano00.contact@gmail.com>
+To: michael.chan@broadcom.com
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	Adriano Vero <litaliano00.contact@gmail.com>
+Subject: [PATCH] net: broadcom: b44: Add missing dma_mapping_error in b44_start_xmit
+Date: Mon, 23 Mar 2026 19:09:13 +0100
+Message-ID: <20260323180913.188434-1-litaliano00.contact@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260322031922.57949-1-pengpeng@iscas.ac.cn>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-270655-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270656-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,vger.kernel.org,gmail.com];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[litaliano00contact@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 6EA062FBA9E
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 84BD42FB1C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Mar 22, 2026 at 11:19:22AM +0800, Pengpeng Hou wrote:
-> `digital_in_recv_sensf_res()` only checks `resp->len` against the
-> minimum frame size before copying the response into
-> `target.sensf_res`. The destination is `NFC_SENSF_RES_MAXSIZE` bytes
-> long, so an oversized SENSF response can overwrite adjacent fields in
-> the stack-local `struct nfc_target` before the result is handed to
-> `digital_target_found()`.
-> 
-> Reject frames larger than the destination buffer before copying.
-> 
+The b44 driver calls dma_map_single() in the transmit path but fails to
+check the return value for errors using dma_mapping_error(). If the DMA
+mapping fails under memory pressure, it can lead to memory corruption.
 
-Hi Pengpeng Hou,
+Add the missing check, drop the skb, and return NETDEV_TX_OK to prevent
+ring corruption.
 
-A fixes tag needs to go here (without a blank line between it
-and your Signed-off-by line).
+Signed-off-by: Adriano Vero <litaliano00.contact@gmail.com>
+---
+ drivers/net/ethernet/broadcom/b44.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-Possibly the following is appropriate
+diff --git a/drivers/net/ethernet/broadcom/b44.c b/drivers/net/ethernet/broadcom/b44.c
+index 90df02e00..280ea6dbe 100644
+--- a/drivers/net/ethernet/broadcom/b44.c
++++ b/drivers/net/ethernet/broadcom/b44.c
+@@ -964,8 +964,14 @@ static netdev_tx_t b44_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	}
+ 
+ 	mapping = dma_map_single(bp->sdev->dma_dev, skb->data, len, DMA_TO_DEVICE);
+-	if (dma_mapping_error(bp->sdev->dma_dev, mapping) || mapping + len > DMA_BIT_MASK(30)) {
+-		struct sk_buff *bounce_skb;
++    
++    if (dma_mapping_error(bp->sdev->dma_dev, mapping)) {
++        dev_kfree_skb_any(skb);
++        return NETDEV_TX_OK;
++    }
++
++    if (mapping + len > DMA_BIT_MASK(30)) {
++        struct sk_buff *bounce_skb;
+ 
+ 		/* Chip can't handle DMA to/from >1GB, use bounce buffer */
+ 		if (!dma_mapping_error(bp->sdev->dma_dev, mapping))
+-- 
+2.47.3
 
-Fixes: 8c0695e4998d ("NFC Digital: Add NFC-F technology support")
-
-> Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
-
-This patch should be targeted at the net tree, like this:
-
-Subject: [PATCH net] ...
-
-And, looking at git history, it seems that an appropriate prefix
-is "NFC: digital:"
-
-Subject: [PATCH net] NFC: digital: bound SENSF response copy length
-
-> ---
->  net/nfc/digital_technology.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/net/nfc/digital_technology.c b/net/nfc/digital_technology.c
-> index 63f1b721c71d..8147e61c224a 100644
-> --- a/net/nfc/digital_technology.c
-> +++ b/net/nfc/digital_technology.c
-> @@ -768,6 +768,11 @@ static void digital_in_recv_sensf_res(struct nfc_digital_dev *ddev, void *arg,
->  
->  	skb_pull(resp, 1);
->  
-> +	if (resp->len > NFC_SENSF_RES_MAXSIZE) {
-> +		rc = -EIO;
-> +		goto exit;
-> +	}
-> +
->  	memset(&target, 0, sizeof(struct nfc_target));
->  
->  	sensf_res = (struct digital_sensf_res *)resp->data;
-
-AI generated review at sashiko.dev says:
-
-    Does this strict bounds check drop valid NFC-F (FeliCa) SENSF_RES
-    frames that contain the Request Data (RD) field?
-
-    According to the NFC Forum Digital Protocol, a SENSF_RES frame payload
-    can include an optional 2-byte Request Data (RD) field, bringing the
-    total length of the response to 19 bytes. This matches the kernel's
-    definition of
-
-    struct digital_sensf_res which is exactly 19 bytes long:
-
-    struct digital_sensf_res {
-    	u8 cmd;
-    	u8 nfcid2[8];
-    	u8 pad0[2];
-    	u8 pad1[3];
-    	u8 mrti_check;
-    	u8 mrti_update;
-    	u8 pad2;
-    	u8 rd[2];
-    }
-
-    However, the UAPI macro NFC_SENSF_RES_MAXSIZE is defined as 18.
-
-    If a valid FeliCa SENSF_RES with RD arrives, resp->len will be 19.
-    Returning -EIO here completely drops these frames. Could we instead
-    clamp the copy length to NFC_SENSF_RES_MAXSIZE (truncating the optional
-    RD field if the UAPI buffer cannot be extended) to avoid breaking
-    functionality?
-
-Which does seem to be factually correct (please check).
-And perhaps the current code buffer overruns if RD is present (in full).
-If so it would be interesting to analyse what the effect of that is:
-is the neighbouring data unused so this works; or has it always been broken?
-
-Also, I wonder if it is possible to expand NFC_SENSF_RES_MAXSIZE to
-accomodate all of a struct nfc_target.
-
-But I am also curious to know how the skb_pull() in the code relates to:
-
-1. Using the packet data as a struct nfc_target after pulling the first byte
-2. But checking the length of packet data against
-   DIGITAL_SENSF_RES_MIN_LENGTH (17) before the call to skb_pull()
 
