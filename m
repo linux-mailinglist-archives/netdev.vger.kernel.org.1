@@ -1,152 +1,157 @@
-Return-Path: <netdev+bounces-270613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270614-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8M6IIb+BwWl2TgQAu9opvQ
-	(envelope-from <netdev+bounces-270613-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:09:03 +0100
+	id gOAmCvBzwWkQTQQAu9opvQ
+	(envelope-from <netdev+bounces-270614-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 18:10:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25C412FAEE6
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:09:03 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C582F987D
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 18:10:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 46AFC330D607
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:43:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7FA223121ACA
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61AA3C0607;
-	Mon, 23 Mar 2026 16:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A4A3C3422;
+	Mon, 23 Mar 2026 16:44:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BAlQleMo"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NyoLjvtt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B1D3B8BDA;
-	Mon, 23 Mar 2026 16:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6F93C1978
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 16:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774284204; cv=none; b=oWJcNw+ZRqHxb/ftGEq1cfH7cMPpyVp2hReB7s8+6e+pu4RSKes6/Ofmv+Wp7T1bV3nCWjZM7yyFk+MlOvP1s12SrpzB9kssqO0gS5dRsmhbhFY7+l36r53pSmtsl6lyd9jRCjAI5sta9iE7ZL6EEbk7gOKKoRqcg440GgqXYPY=
+	t=1774284263; cv=none; b=gstSlJOoKebfQQdvdfLGfx1sifHz+RYGQYqX/f95bJV+VmNZnjZvF/XyYe2b90pZA5/bN7vs+k2mbhsbV1l1m1IXvWtkRM2OOBpWeWhVaoPqwMScvnOpTmjdId6HwnGHmn9OaXERDivWaluqS4EMxZrgwLPDhCPl0xGoYssQWE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774284204; c=relaxed/simple;
-	bh=a44fNAaP9MPxuRmmu90d2vb0g4JLqJQMJqEsd/cg0mg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DDawDArciyOMAUBDW3YOHQPMgGvns41R4njzq/qnDZGlNP3diy66NpYF30Lc9ea7hwXEBijt3dE0qhZCiscQrRuWNoDK5Ru1jA6mxJop/KPbV547Z/TxCUx2VgoprD4UmZXtxxfalENaPo29cMeL0ky4JwQfcd8BTFEdKqHPFxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BAlQleMo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E3E7C4CEF7;
-	Mon, 23 Mar 2026 16:43:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774284204;
-	bh=a44fNAaP9MPxuRmmu90d2vb0g4JLqJQMJqEsd/cg0mg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BAlQleMoxMZzIGjU/JcoSl8ZTlAGa1C4pAseHPB/mCBzG1eXEsbp8F0UN/ZfGEV4i
-	 Q/xbx0sjNRajzYrH45DdF6oyWLnrJtu2qs2QuAEsXVqPgzk6cNbGj9AEnkEey7nQoB
-	 t9NX8mkGUnmH/F5WrNzczUPWNlKA0K/XDrGHID1N51SL4AUSfjiFkUfqn/cy5bgVfQ
-	 UvHdorsl7mdeaXw/JD2mFWACGpvY0hpKdOGs6v3aeC00aNNEOsd45LKb2CTz+LBbvW
-	 IO9k+Ed1403/WbaxlGT6fL/tQW/IlZLRE8TU0QnUWwpTpATDznJxxinQ93fSTQKaQ5
-	 jG7JRyVeFpVOw==
-Date: Mon, 23 Mar 2026 16:43:19 +0000
-From: Simon Horman <horms@kernel.org>
-To: Kevin Hao <haokexin@gmail.com>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sean Anderson <sean.anderson@linux.dev>, netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] net: macb: Use dev_consume_skb_any() to free TX SKBs
-Message-ID: <20260323164319.GA135222@horms.kernel.org>
-References: <20260321-macb-tx-v1-1-b383a58dd4e6@gmail.com>
+	s=arc-20240116; t=1774284263; c=relaxed/simple;
+	bh=LBK1GfTkPqN/J3ekXfWul5rM7Y0N9TEPGG3iPFdaMvc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BGtdtO5xK/Es9vMkclwk8RSvdClTeTTKF/qfXLy8J0ZyFJu+6nDPOOk+UCfkZtn3ByfEnDSSoED4Xq3LBDG8naURG5aXUIngV2Fim4RM0SAka0txaeESIuHK9wI6+ziDGMRm8r1V5aIOCbldD9jinA7TzFsv/78Ehd18Wt8NyFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NyoLjvtt; arc=none smtp.client-ip=209.85.210.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7d74dbfe84cso249264a34.1
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 09:44:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1774284259; x=1774889059; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=F+mUNq7tmfNnDvMUw7l2UsagRnrJrQ3LN33pu/ZkAt8=;
+        b=NyoLjvttGaqUi2qQdd/BWFA5gUXTdp5SiHrUL95B6IdPIzMlHXKSFtQJACLpfCbjjT
+         ezrNB7amSMh1fxXOWG1zOMGz6QC3UdI6Y2H8nMJ0vxmrdaicm3AEyDP3E5BuGHdviHg0
+         +wZ2cuN5h4ev6s6kJu75whMjQxzzzV94U/f07UAzm3ZKUJcop82jb6NImgwQaEH6OCEh
+         4wAxiOK4x4Pe5QRvQNrF2kjFqCFvQNzVPrEOD6wE/kRRv24iCOcv0Jg4KWZS2z5Ajspz
+         s/SO8nut7rCN0RF3VqvZkqF/09uUJLyLoBkhYcaGOm9zppIKwLPGYJQbMbODnC92OLhL
+         59jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774284259; x=1774889059;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=F+mUNq7tmfNnDvMUw7l2UsagRnrJrQ3LN33pu/ZkAt8=;
+        b=BNct161GKnizWyl9UgWt0zPyN4yz3wFqhst/hzEbQaYB61uyehPpp/aUkEgq3ezDjs
+         kkzvBEhO86rFGryywa+IaWxeO01NuUHrNWj9OuyLtXI77xJ5J7oxjy5vCCs2eVDY0138
+         CU5nZK7ZfLwjlgyirls6X3HVKovpSkBbWctvwplULixGJm++Q6xRNxeqUvAYQeWAna9v
+         zl/x8ikyskKyImOLi8ECoMDRI97OW03Jchr2i9bcQ0aoXkoMjh+CEF9RWUq2uV1wR8KH
+         hfmN5kEZ1PqwcTZ4/gQ8Zi4T6NbY9pjsKTygFkoGJWt0VpO4h7/E+vgI5HGfnZbvdIgM
+         5P8Q==
+X-Gm-Message-State: AOJu0Yw6Ua732I7xgTyTCGS+4wJiFB2KDc+QADCj0HCVS9u4+Ox1elbe
+	wBu/fAoKa6myx2e5MsyUpOkSlITu++dMF0fkqACk0j4S2HhchlSUDe0JcDCttZXPtOY=
+X-Gm-Gg: ATEYQzyi+r67iTfUmLj0dEZ3kwn8k80xaw8J9mUVn2rcJd+MexwDr/xw3X0E58Eu/AV
+	h1wWjKAO96ZfbL7pR8noUiYCC/1TdvsFGDp4c8ZHxMfyMQMcu/rGuZVXuYH51++EebvCLhJJtwe
+	prnSgsdV5AxvkeKbnUmYLlPioRio9ZREPiJfwNXggZEYZQCw/7KyL1747G9a3EeC5Q3Y+tRmG/P
+	RWt88gqyi+5e2aqQLnP67PObx+AZ9vovSCK6Kvrf/G5Jw9Rf87v3PXl7UOaOv/IeNfNny6yiDvQ
+	vgJHGtJL1qnT8NphSp88t6BvXZnhc+RquztyU+YPjh9qtWMOzOzLH19KUMZcDCKZ6CbHGqIPGXy
+	7tH/Lia7LxnyZb8hcRIaoYKYnxQrNJGETjhiqYIPyUpq8krEZXk30Otcx+lMM2ojsVbKt7q+Zkh
+	ssQ572DQNIHaO+KkzZ9n1oiQ+ynLyEBh2Yhku4p7sJPB1Uvu/1N6PkMkdhv2eHGBQXuN2BS8T/Y
+	wyoNDH0
+X-Received: by 2002:a05:6830:81cd:b0:7d7:f15b:bdcf with SMTP id 46e09a7af769-7d7f15bbee3mr8134708a34.28.1774284259411;
+        Mon, 23 Mar 2026 09:44:19 -0700 (PDT)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d7eabe8dfdsm10044182a34.5.2026.03.23.09.44.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Mar 2026 09:44:18 -0700 (PDT)
+Message-ID: <71c67415-497a-489a-9b98-9c85ae89a8f2@kernel.dk>
+Date: Mon, 23 Mar 2026 10:44:17 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260321-macb-tx-v1-1-b383a58dd4e6@gmail.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH io_uring-7.1 01/16] io_uring/zcrx: return back two step
+ unregistration
+To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
+Cc: netdev@vger.kernel.org, Youngmin Choi <youngminchoi94@gmail.com>
+References: <cover.1774261953.git.asml.silence@gmail.com>
+ <0ce21f0565ab4358668922a28a8a36922dfebf76.1774261953.git.asml.silence@gmail.com>
+ <1b3ad321-866a-4cb8-9810-5eae7805647d@kernel.dk>
+ <d1981803-0b3a-468a-9fe6-a751470cec26@gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <d1981803-0b3a-468a-9fe6-a751470cec26@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel-dk.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270613-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	DMARC_NA(0.00)[kernel.dk];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-270614-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel-dk.20230601.gappssmtp.com:+];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 25C412FAEE6
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: A0C582F987D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 21, 2026 at 10:04:41PM +0800, Kevin Hao wrote:
-> The napi_consume_skb() function is not intended to be called in an IRQ
-> disabled context. However, after commit 6bc8a5098bf4 ("net: macb: Fix
-> tx_ptr_lock locking"), the freeing of TX SKBs is performed with IRQs
-> disabled. To resolve the following call trace, use dev_consume_skb_any()
-> for freeing TX SKBs:
->    WARNING: kernel/softirq.c:430 at __local_bh_enable_ip+0x174/0x188, CPU#0: ksoftirqd/0/15
->    Modules linked in:
->    CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted 7.0.0-rc4-next-20260319-yocto-standard-dirty #37 PREEMPT
->    Hardware name: ZynqMP ZCU102 Rev1.1 (DT)
->    pstate: 200000c5 (nzCv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
->    pc : __local_bh_enable_ip+0x174/0x188
->    lr : local_bh_enable+0x24/0x38
->    sp : ffff800082b3bb10
->    x29: ffff800082b3bb10 x28: ffff0008031f3c00 x27: 000000000011ede0
->    x26: ffff000800a7ff00 x25: ffff800083937ce8 x24: 0000000000017a80
->    x23: ffff000803243a78 x22: 0000000000000040 x21: 0000000000000000
->    x20: ffff000800394c80 x19: 0000000000000200 x18: 0000000000000001
->    x17: 0000000000000001 x16: ffff000803240000 x15: 0000000000000000
->    x14: ffffffffffffffff x13: 0000000000000028 x12: ffff000800395650
->    x11: ffff8000821d1528 x10: ffff800081c2bc08 x9 : ffff800081c1e258
->    x8 : 0000000100000301 x7 : ffff8000810426ec x6 : 0000000000000000
->    x5 : 0000000000000001 x4 : 0000000000000001 x3 : 0000000000000000
->    x2 : 0000000000000008 x1 : 0000000000000200 x0 : ffff8000810428dc
->    Call trace:
->     __local_bh_enable_ip+0x174/0x188 (P)
->     local_bh_enable+0x24/0x38
->     skb_attempt_defer_free+0x190/0x1d8
->     napi_consume_skb+0x58/0x108
->     macb_tx_poll+0x1a4/0x558
->     __napi_poll+0x50/0x198
->     net_rx_action+0x1f4/0x3d8
->     handle_softirqs+0x16c/0x560
->     run_ksoftirqd+0x44/0x80
->     smpboot_thread_fn+0x1d8/0x338
->     kthread+0x120/0x150
->     ret_from_fork+0x10/0x20
->    irq event stamp: 29751
->    hardirqs last  enabled at (29750): [<ffff8000813be184>] _raw_spin_unlock_irqrestore+0x44/0x88
->    hardirqs last disabled at (29751): [<ffff8000813bdf60>] _raw_spin_lock_irqsave+0x38/0x98
->    softirqs last  enabled at (29150): [<ffff8000800f1aec>] handle_softirqs+0x504/0x560
->    softirqs last disabled at (29153): [<ffff8000800f2fec>] run_ksoftirqd+0x44/0x80
+On 3/23/26 10:14 AM, Pavel Begunkov wrote:
+> On 3/23/26 15:01, Jens Axboe wrote:
+>> On 3/23/26 6:43 AM, Pavel Begunkov wrote:
+>>> @@ -898,12 +933,15 @@ void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx)
+>>>               unsigned long id = 0;
+>>>                 ifq = xa_find(&ctx->zcrx_ctxs, &id, ULONG_MAX, XA_PRESENT);
+>>> -            if (ifq)
+>>> +            if (ifq) {
+>>> +                if (WARN_ON_ONCE(!is_zcrx_entry_marked(ctx, id)))
+>>> +                    break;
+>>
+>> This break is inside the scoped_guard(), does this need an ifq = NULL
+>> here? I do like scoped locking, but this seems a bit tricky...
 > 
-> Fixes: 6bc8a5098bf4 ("net: macb: Fix tx_ptr_lock locking")
-> Signed-off-by: Kevin Hao <haokexin@gmail.com>
-> Cc: stable@vger.kernel.org
+> That should work, want me to resend or would you amend it? It's a good
+> thing I was pointed at it, but I'm not too concerned about this case as
+> it's a warn once.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+I can add it and add a note. Outside of that, I think the series looks
+fine, no further comments.
+
+-- 
+Jens Axboe
 
 
