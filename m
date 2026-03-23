@@ -1,276 +1,211 @@
-Return-Path: <netdev+bounces-270471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270472-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Jw1NeAXwWm5QgQAu9opvQ
-	(envelope-from <netdev+bounces-270471-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:37:20 +0100
+	id 8GJwKPUYwWn5QQQAu9opvQ
+	(envelope-from <netdev+bounces-270472-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:41:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449142F04A9
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:37:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0B952F05F5
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 11:41:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC07E30210FF
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:33:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B0473055634
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D14C38C414;
-	Mon, 23 Mar 2026 10:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E2A38C41B;
+	Mon, 23 Mar 2026 10:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="iGpXA1VK"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="pNv5+xWY"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010040.outbound.protection.outlook.com [52.101.69.40])
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D66F3890F8;
-	Mon, 23 Mar 2026 10:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774261990; cv=fail; b=EonF5+kd/EhGQx0O8xECpQ6eD//0IehhUeRnjnYJmT+yMu4E1lQR31lw1tA+N5pTSO8gZsrkhzzIM/VFuMefjd/g8YUvlGdKpCixYT1suFvDln0ZbgBzDQHmcA7/nWmkxr50oSaOsVEyAPOoOCnB45jFqOliTIFlUUhJrftqkok=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774261990; c=relaxed/simple;
-	bh=zZo7CgwfoY21MDlZvcus2LvaEYcdqFk9yeYODX2fTIc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ghcAJxA2F/TTV9w4VB3d2GxsoI3FzGlIVEVS6oSGyAChyget3Js0HZQXbZd4a66Hi6A9ybfm+JYfxzNrbps+IJUA/pIVx8JqNGXq2cO2S2bDq612N0IAt6mAV4kWPjuQNgrasVfFpym3fmj/0l5ENhNRPyri+Q8f1qrG8H8yZ0g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=iGpXA1VK; arc=fail smtp.client-ip=52.101.69.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XE6YSdwQqKdt6tR9bEHkuozf4nRAi02TjUyUxnSB+90MaCMKwPX1gX16rs5APvC0gwfmjNtu6Dt3dHeCJF3cbFfRH30E5A4NlF16luOtAozAl8Sylb3DVuOj+pOMEewr9ID42T5QbWGV4dWhlr19F0tmVKa2yFvdzRQyvo4I3xYzhVtIl+POAqPXbNrvb80huVXnnroI19s3xtoeKvqGgGrtdfxzoMozUSVTRF44ESRsOLh9BNlVv4yfmelVvtMBGF6IU2ycOmv0hpFqxNnjLAFKizUvI3vwwPoExsPKN0V1jFckcGMw/ZC7fWtRjOuWDhtPWAey4HEM9HwzS0ncsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=l9qEg0HWniI5H2X6ihd2hYL4/0dN0x/02N2i1UwHvfg=;
- b=ZRnYx/0ltWZaTITGklCzRT6+Psu1sRdwGWfdG6llf+vmhjF1ef/0T8oTx9kvH/k85ct4NcIkGxStpMHxdsx+SlBSX7Jrx5XrLw0IrAyyY32Pzntr4qsJkwSR42bYswGNx2lKMBBiVHFqDsz9n1AjYx4OJEHElH745nQhnhsQX3ZkgtFcy1i7Kqr26K/QTcQsNz9IkVGWfrKCErqxyEpZbnMEjyyeddN9ZbpmZrQWPORWDOae8GAIC8NRRqyn6y/VYZKplRtBdRfULGDM6nuA5Vdfzh6878402ElL5EQ8Lw/cA7xdjq3/qIMc1mylXk/P+LcX5S8bvEn4T5I/1Ao/Xg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=l9qEg0HWniI5H2X6ihd2hYL4/0dN0x/02N2i1UwHvfg=;
- b=iGpXA1VKaZ5q6Jg6LREQtLYlpKQg8JCo/I4Shf3u4S177EzIc5VZrHfF9Z8Nfd3kRQ7QTIy6zmFTtOAjw2IsUqnlczunMf77m0bI9QbYnDLvrMk21/2gOkWXV8smUu3Sp909LHzvYZdRCiIQknvKcw+MQZmxwqREOuHXDWJE7Fyt2QeOYosrhzI7sEeU6s4kPrrhz8i155vPpxyDV/8xg8/jZgYVXRAwtnh2tp4gH+XKuTCkUlK/ypYEyMw4J5GTes6V9L+L2L0dmA5hQ1FyCdFGUOCyfrgLcoiRk6kzamrwU+x2fT1ENcuX3g15dgtzQZXGMXF692vg7f31NF3sYw==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by GV2PR04MB12320.eurprd04.prod.outlook.com (2603:10a6:150:30a::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.25; Mon, 23 Mar
- 2026 10:33:05 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::b476:c19a:24cd:3694]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::b476:c19a:24cd:3694%3]) with mapi id 15.20.9723.030; Mon, 23 Mar 2026
- 10:32:36 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Russell King <linux@armlinux.org.uk>
-CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
-	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
-	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, Frank Li <frank.li@nxp.com>,
-	"chleroy@kernel.org" <chleroy@kernel.org>, "horms@kernel.org"
-	<horms@kernel.org>, "andrew@lunn.ch" <andrew@lunn.ch>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
-	<imx@lists.linux.dev>
-Subject: RE: [PATCH v2 net-next 11/14] net: dsa: netc: add phylink MAC
- operations
-Thread-Topic: [PATCH v2 net-next 11/14] net: dsa: netc: add phylink MAC
- operations
-Thread-Index: AQHcuotUXzXWZtrvPkOHkUVrkHLQObW72lgAgAAO9+A=
-Date: Mon, 23 Mar 2026 10:32:36 +0000
-Message-ID:
- <PAXPR04MB8510A24C5ECFBEEDA27892E5884BA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20260323060752.1157031-1-wei.fang@nxp.com>
- <20260323060752.1157031-12-wei.fang@nxp.com>
- <acEIQqI-_oyCym8O@shell.armlinux.org.uk>
-In-Reply-To: <acEIQqI-_oyCym8O@shell.armlinux.org.uk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|GV2PR04MB12320:EE_
-x-ms-office365-filtering-correlation-id: ee039572-0fce-4cf2-2b96-08de88c78072
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|376014|7416014|19092799006|56012099003|22082099003|18002099003|38070700021;
-x-microsoft-antispam-message-info:
- eeBUSGUJuC85qnIILEtggGEVpZWWPCDqUrAMuu8lOa7vmQUtw1oJkUQ937iDna1iAWln13EFHDi5CLVtV4HJMrYRHdg4nHPktffDbl7u8dyI8uyA+fyh95CqCDAMmfiARNqMbKG+GCMAgdA6FuhxIGYc4tYXgL+QHwMmO+mVpeN1AOObr3EsJMTzlUkEtsaltLDB0Hn7V6R3mypSHQxqlBsFsiEiyFaMCgjAM/aSLQDziUjEe0Uws1kmc+iP5YsoCBQviNNQQjt0nTRIalZ947yfK1u8M7nRysYD2ludC/dFVwoLO4HGm/wH62a82RDYAD86fxZROT61bgo6Lk6Ad46yqriWsndsf/uo0GlL6WO9Khry1zPTl1qT1mCd4qV5hmcAxUgQIBFzIVBe+LEPR9RhMP/sgRdv6YMtx16jeCpnhcLf2KT6O7T+hRlWcnidQUBiUIasnUs9nLYt6Gu8M5+zQDMsfdBNRw6r64+ctFd+pb7h3oxRQ0XQ9AVh4PsQLGK4pKezE+RPJhG23+58urq1lDX4L2oXFB8+00eFIjAy2E1PyGNRVIA4Mff+3aMgJPbCbOSPj61JQG4XYPX8zt8GrUY1iuziSH/83U2799+be1MPuU89GBD6Os2f2gVFWHNMaUvxHq9CDDuKiIykS6+xKcezFlmI8+u/jwu14TcaXPDrm18EffStuFrOfaV+/WBnSx9GzqMvDdJfsEHLfOgjq3AeFIlImibsDCemROQQsHExzScHTHWXQOc+aP/wvPD5akaVWciVNT2sn73xrtd8Ob29B2PTSqed3cA693E=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(19092799006)(56012099003)(22082099003)(18002099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?sZYWdCD8s9+mxTbzUnQGEm5b/Jgk7Lr9sVkAx8DXBBngQcQ7oPvhglNQMwHT?=
- =?us-ascii?Q?mQRGZ7AVobAVq31inG65uBR9cPMsT08N08qCWqqFxOUjCnREoaptkG3KVzp8?=
- =?us-ascii?Q?slUx6vIBpY1FVHR74RhGnJDFoS0C1WU5J5OoeAmFCLdY9QE6hAaCjp7eIYff?=
- =?us-ascii?Q?vpckxfB2KxnUZ3+I8vPg/64fFzxuCw2PO5u9uFP0uwPDK2uxmN8XrbTvSc8G?=
- =?us-ascii?Q?lO9zorzWYrJHULDermK6CwgPQ5+dzwkj8hFEopuoFPSqGERH0KnIbqG9rFtB?=
- =?us-ascii?Q?u5QpGmUaRlnaMvJR5iCreMToWY5tvxG72GG4wV0KxgjYDJSjVN08ZFY1+wcz?=
- =?us-ascii?Q?lCt9potm1F0rwsBxtfeFE/WrEbP/zHGbn3+xeN1uGTd7mMSChVKutHRlGbdo?=
- =?us-ascii?Q?8EQu1J0FJqE5sHlp/4tVR80VPAVWEpfuxohAaBTHmg69bx3yUZRHUKByc6Pr?=
- =?us-ascii?Q?BKVTmTiR90RmZEDUxyykTKVjS26UBg4cY8jPCXodvArYXLAgslBg7n77YXFe?=
- =?us-ascii?Q?oA7RYbmYhKvcDK5c3j+2F70ukcROc3JPbNozwjKjtFTBX6AdJFpyR3pRlEje?=
- =?us-ascii?Q?l6jacvVAk17lf8anqPVnS7LlsfIfmGhqJXsLERr5ohPtbLvR2fB21bZ3ICod?=
- =?us-ascii?Q?Aa55JQ86mLPDlIv+ev31seNlvhPYRjhLcgnVc9n+gIWx2l6cncCfvU06uXhT?=
- =?us-ascii?Q?wXSd67a//yAvHI4YFHrUyqfzF6SCbzAO2x3wHd6ZKfdU9dvWXQ/l2MTVHr+A?=
- =?us-ascii?Q?LXLJ31khjcsZByZWXhKL5Asy45vILmjYCPTT80cC1pLXZFqaQf4ET7c3QCZP?=
- =?us-ascii?Q?S3dSWn4T8jzM21C6AlBCASFEmsfw7ztJg7kBeQcY3qbyOYKqACA3uAgm1Y7i?=
- =?us-ascii?Q?Sgmh1IsOsHxPPFYBjxZ9Y3IFgK0hh4gzDfOnQLzEFlMaRHFZkw4cAM36ja7J?=
- =?us-ascii?Q?sT3BHGGqqs1729RWq4FLVjgFB2nSrASsjCdX/ThPeP0C2HIN1xZ/V2rbcNwv?=
- =?us-ascii?Q?hex6V4hrMs2oBv26CEsHtZySxwLKQLggCNNN8XzOVmFVxsodlEySxuKirA+S?=
- =?us-ascii?Q?hi4W6Pfr8Ux8FGeGFR2NClf7O0o1aPW1Z7ra6xoy3ny443IVtOw3FMqbYjMO?=
- =?us-ascii?Q?WB/2w1I0PvLZUigrwGezW+sQ0BWyoE6L52RsqgtGCV0Ygn8jtOtOio96H3lM?=
- =?us-ascii?Q?paOpEDL/99QZ0cih39vWwwgGA4VkX5DhybOlUrNRXA7NuUPQ+P+tQM6LYQru?=
- =?us-ascii?Q?7R8LIDKMKIAHk51BFT9xK3XcyiG0LuTesdNpdv+PCUSOJAT+oRocIO1VlWga?=
- =?us-ascii?Q?UbPWdmXOa++eD6qo32LI+j4wfyfwsCSX59ldI10vPgG+Jbk1m15Hi7hFmD88?=
- =?us-ascii?Q?JmxDCrK7mVmsYdQjvI8GaPHhID7O5/RtouqOeKpDO+FwT35w6aZClR1PQ1EC?=
- =?us-ascii?Q?B5cFNRR5Jc/aqD3qNuNS/OohpcQrimJgBm9MQEqTrmB+Np514RxyjJkOTW9O?=
- =?us-ascii?Q?Z8AYQXgjzHKUBqF53jMF0euq1hG8VZMIFb9bwSjEAuAmw/4Q00q/QFaCA7Rm?=
- =?us-ascii?Q?2REfODuQ1UzBGq4QHXS2VrfjVZfpwP0iRqgNEWA1JhEFZEWSeJ9GUu5PRieK?=
- =?us-ascii?Q?wh4OUhrUI6rndoV+xtFF+82yfTRu4Jk3wgf3xXSPn42q7IBqtscCJA7m04Vw?=
- =?us-ascii?Q?K+ysHmvI9TSzTEzzDizY/3nod9qjme6akI3PpKw7NV37nE0T?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91493370D77;
+	Mon, 23 Mar 2026 10:35:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774262161; cv=none; b=LgIeqyCZ/D2Vwi4QJoMu/qoKerE3q+Nvp0v5gPXi5+Vqw830cj2yGbQgrdiGaG+cRJ2YVJamUym4LuJh+tRlK8BoMujmQ90KCPuJS+AdPpr4FM1u96JmD/vvpQIRBsRg7i4VKU9RmVHA/Wj3zByVIC1JfwVakxJJ4W0UTz/Ls4U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774262161; c=relaxed/simple;
+	bh=511WxbZ+p/sORRoJ5GoD7VW32OIKEjZsdi/60CW6C7I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V8IXENcTwDTmqzY0WmkfLILCc7pW10fZxUckxmUBzjlyZqfiPhMnhqVsfmaPmwXgWwq9SxIU1KT4WtZ40k2aLSug5sxUnfA2/scpwqPhnk1kC7PLW33+nUERJK8TyblyGODyH8NJZqX1pi7HdOiQoGg7mO2751Gc+xzdaArT3LU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=pNv5+xWY; arc=none smtp.client-ip=213.160.73.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+Received: by dvalin.narfation.org (Postfix) id 8B5BF20D1C;
+	Mon, 23 Mar 2026 10:35:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1774262150;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wB/8hmIhHIYOZcP6n7qCZqxw3BgXqSCHAqTZavDQKfs=;
+	b=pNv5+xWYOc4YBIYu3QmlifXrPhgpnzNrNnJN1SbmQ9AI+QfJhDZFGX760bxtXpQqOJB4ru
+	+eQxXSLMFUY1CYyq2b+rvd8o8A5ET9LLF0B+Yj+u4tI1V7Lnbik/OrU0VMpWgtxLWplB0K
+	flgRkfDIDiCkqGXzOnoXxiixWIDmu84=
+From: Sven Eckelmann <sven@narfation.org>
+To: Elad Yifee <eladwf@gmail.com>
+Cc: eladwf@gmail.com, daniel@makrotopia.org, Felix Fietkau <nbd@nbd.name>,
+ Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Subject:
+ Re: [PATCH net-next] net: ethernet: mtk_eth_soc: ppe: prevent ppe update for
+ non-mtk devices
+Date: Mon, 23 Mar 2026 11:35:43 +0100
+Message-ID: <4723146.LvFx2qVVIh@ripper>
+In-Reply-To: <20240623175113.24437-1-eladwf@gmail.com>
+References: <20240623175113.24437-1-eladwf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee039572-0fce-4cf2-2b96-08de88c78072
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Mar 2026 10:32:36.7528
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: d2nz3dWqBGohCPB3405cis7twHLeN90V4u0dZ8QbrKmDLUHVUeqAWfAo1v0vFg8TiSGuvi8KEUKVDUHmlTGldg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR04MB12320
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Type: multipart/signed; boundary="nextPart2405260.ElGaqSPkdT";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[narfation.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[narfation.org:s=20121];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270471-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,lists.ozlabs.org,lists.infradead.org,lists.linux.dev];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-270472-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	DKIM_TRACE(0.00)[narfation.org:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sven@narfation.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,makrotopia.org,nbd.name,mediatek.com,kernel.org,davemloft.net,google.com,redhat.com,collabora.com,vger.kernel.org,lists.infradead.org];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,PAXPR04MB8510.eurprd04.prod.outlook.com:mid]
-X-Rspamd-Queue-Id: 449142F04A9
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,narfation.org:dkim]
+X-Rspamd-Queue-Id: E0B952F05F5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> On Mon, Mar 23, 2026 at 02:07:49PM +0800, Wei Fang wrote:
-> > +static void netc_port_set_mac_mode(struct netc_port *np,
-> > +				   unsigned int mode,
-> > +				   phy_interface_t phy_mode)
-> > +{
-> > +	u32 mask =3D PM_IF_MODE_IFMODE | PM_IF_MODE_REVMII |
-> PM_IF_MODE_ENA;
-> > +	u32 val =3D 0;
-> > +
-> > +	switch (phy_mode) {
-> > +	case PHY_INTERFACE_MODE_RGMII:
-> > +	case PHY_INTERFACE_MODE_RGMII_ID:
-> > +	case PHY_INTERFACE_MODE_RGMII_RXID:
-> > +	case PHY_INTERFACE_MODE_RGMII_TXID:
-> > +		val |=3D IFMODE_RGMII;
-> > +		/* Enable auto-negotiation for the MAC if its
-> > +		 * RGMII interface supports In-Band status.
-> > +		 */
-> > +		if (phylink_autoneg_inband(mode))
-> > +			val |=3D PM_IF_MODE_ENA;
->=20
-> I would prefer newer drivers not to use phylink_autoneg_inband()
-> anymore. Note that there is no need to support RGMII inband in the
-> kernel (nor is there any proper support without a "phylink_pcs"
-> being present to provide the inband status.)
+--nextPart2405260.ElGaqSPkdT
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+To: Elad Yifee <eladwf@gmail.com>
+Date: Mon, 23 Mar 2026 11:35:43 +0100
+Message-ID: <4723146.LvFx2qVVIh@ripper>
+In-Reply-To: <20240623175113.24437-1-eladwf@gmail.com>
+References: <20240623175113.24437-1-eladwf@gmail.com>
+MIME-Version: 1.0
 
-Thanks for the info, I will remove it.
+On Sunday, 23 June 2024 19:51:09 CET Elad Yifee wrote:
+> Introduce an additional validation to ensure that the PPE index
+> is modified exclusively for mtk_eth ingress devices.
+> This primarily addresses the issue related
+> to WED operation with multiple PPEs.
+> 
+> Fixes: dee4dd10c79a ("net: ethernet: mtk_eth_soc: ppe: add support for multiple PPEs")
+> Signed-off-by: Elad Yifee <eladwf@gmail.com>
+> ---
+>  drivers/net/ethernet/mediatek/mtk_ppe_offload.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+> index f80af73d0a1b..f20bb390df3a 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+> +++ b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+> @@ -266,7 +266,7 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f,
+>  		flow_rule_match_meta(rule, &match);
+>  		if (mtk_is_netsys_v2_or_greater(eth)) {
+>  			idev = __dev_get_by_index(&init_net, match.key->ingress_ifindex);
+> -			if (idev) {
+> +			if (idev && idev->netdev_ops == eth->netdev[0]->netdev_ops) {
+>  				struct mtk_mac *mac = netdev_priv(idev);
+>  
+>  				if (WARN_ON(mac->ppe_idx >= eth->soc->ppe_num))
+> 
 
->=20
-> > +static void netc_port_set_hd_flow_control(struct netc_port *np, bool e=
-n)
-> > +{
-> > +	if (!np->caps.half_duplex)
-> > +		return;
-> > +
-> > +	/* The HD_FCEN is used in conjunction with the PM_HD_FLOW_CTRL
-> > +	 * register, which has a default value, so currently we do not
-> > +	 * set it in the driver. The half duplex flow control works by
-> > +	 * the backpressure, and the backpressure is essentially just
-> > +	 * a long preamble transmitted on the link intended to create
-> > +	 * a collision and get the half duplex link partner to defer.
-> > +	 */
-> > +	netc_mac_port_rmw(np, NETC_PM_CMD_CFG(0),
-> PM_CMD_CFG_HD_FCEN,
-> > +			  en ? PM_CMD_CFG_HD_FCEN : 0);
->=20
-> We don't support half duplex backpressure in the kernel. I notice
-> you always enable this whenever HD mode is negotiated, which means
-> there's no way for the user to disable it. Flow control can cause
-> problems. Ethernet relies on packet dropping for congestion
-> management.
+This will immediately cause a NULL-deref when gmac0 is disabled but gmac1 (or 
+gmac2) is enabled - and you try to offload a flow.
 
-Okay, make sense, I will remove it.
+You have the problem that `eth->netdev[0]` is NULL and then you try to deref 
+it to get to its netdev_ops.
 
->=20
-> > +static void imx94_switch_phylink_get_caps(int port,
-> > +					  struct phylink_config *config)
-> > +{
-> > +	config->mac_capabilities =3D MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-> > +				   MAC_1000FD;
-> > +
-> > +	switch (port) {
-> > +	case 0 ... 1:
-> > +		__set_bit(PHY_INTERFACE_MODE_SGMII,
-> > +			  config->supported_interfaces);
-> > +		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
-> > +			  config->supported_interfaces);
-> > +		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
-> > +			  config->supported_interfaces);
-> > +		config->mac_capabilities |=3D MAC_2500FD;
-> > +		fallthrough;
-> > +	case 2:
-> > +		config->mac_capabilities |=3D MAC_10 | MAC_100;
-> > +		__set_bit(PHY_INTERFACE_MODE_MII,
-> > +			  config->supported_interfaces);
-> > +		__set_bit(PHY_INTERFACE_MODE_RMII,
-> > +			  config->supported_interfaces);
-> > +		if (port =3D=3D 2)
-> > +			__set_bit(PHY_INTERFACE_MODE_REVMII,
-> > +				  config->supported_interfaces);
->=20
-> The "case 2" above already ensures that port is 2 here.
+Btw. can you describe what netdev[0] makes it so special that you need to 
+check for it and not netdev[1] or netdev[2]? With something like:
 
-"case 0...1" uses "fallthrough" instead of "break", and port 0 and 1 do not
-support REVMII. So the check is needed.
+diff --git i/drivers/net/ethernet/mediatek/mtk_ppe_offload.c w/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+index cb30108f2bf6..5f88ad7eb27a 100644
+--- i/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
++++ w/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+@@ -244,6 +244,21 @@ mtk_flow_set_output_device(struct mtk_eth *eth, struct mtk_foe_entry *foe,
+ 	return 0;
+ }
+ 
++static bool mtk_is_valid_mtk_netdev(const struct mtk_eth *eth, const struct net_device *idev)
++{
++	size_t i;
++
++	for (i = 0; i < ARRAY_SIZE(eth->netdev); i++) {
++		if (!eth->netdev[i])
++			continue;
++
++		if (idev->netdev_ops == eth->netdev[i]->netdev_ops)
++			return true;
++	}
++
++	return false;
++}
++
+ static int
+ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f,
+ 			 int ppe_index)
+@@ -270,7 +285,7 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f,
+ 		flow_rule_match_meta(rule, &match);
+ 		if (mtk_is_netsys_v2_or_greater(eth)) {
+ 			idev = __dev_get_by_index(&init_net, match.key->ingress_ifindex);
+-			if (idev && idev->netdev_ops == eth->netdev[0]->netdev_ops) {
++			if (idev && mtk_is_valid_mtk_netdev(eth, idev)) {
+ 				struct mtk_mac *mac = netdev_priv(idev);
+ 
+ 				if (WARN_ON(mac->ppe_idx >= eth->soc->ppe_num))
+
+
+Regards,
+	Sven
+--nextPart2405260.ElGaqSPkdT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCacEXfwAKCRBND3cr0xT1
+y02aAP4iDQQDf9UUbD2rqYq0CVAEhadpEw9XDmO6ZTE0YsynIQEAtuJGax+RdlgQ
+aXVXzEzKdbIM1XUrhOCcz2ivNgWaUQI=
+=b8QW
+-----END PGP SIGNATURE-----
+
+--nextPart2405260.ElGaqSPkdT--
+
+
 
 
