@@ -1,191 +1,209 @@
-Return-Path: <netdev+bounces-270699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270700-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEPqMJqVwWkTUAQAu9opvQ
-	(envelope-from <netdev+bounces-270699-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:33:46 +0100
+	id 6JjLHJabwWmFUAQAu9opvQ
+	(envelope-from <netdev+bounces-270700-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:59:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4246B2FC56D
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:33:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D54442FCBEB
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 20:59:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 838AF301F6BC
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:33:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8556F30F6284
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 19:35:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4071C3DA7D9;
-	Mon, 23 Mar 2026 19:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 434EB3DCD82;
+	Mon, 23 Mar 2026 19:35:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="J0tBP9BN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gER+PnsK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE293DA5B0
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 19:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774294422; cv=pass; b=n1B0FEGl3BXs+tmjPvXiVzxK6KTDtjXsgYHbRizYnO0gBj6MjZv84YVjzzj07vpoeCmXTMB4+vURCYep6SGxISGmvbD+e95+8cYD4iRZ0Kkj8k4ykf8AKxmEJo8TlUUBXjoLRoq08DwIqvd1bvYd5w7AuUCOqxiLCrFd4XDu2zw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774294422; c=relaxed/simple;
-	bh=SBDn3cMfN89fQCvVMptCFDYgoBA4Q8cc3p9B/aVozMY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A105E2aquBFSzES5OOLWdkDxugT3jJjPzH1ADdyXGyAIE0j2s0zGaoueWy903/oAWztJ7U00zD65zLQ0yfbyxy7HXcn6lz2So/i99dN/lPeu2x+MsshY5qPDleydqDKghxsdKXZeNcbeigoWKMypjGGAAGnyUdqKYdde9MvsHvE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=J0tBP9BN; arc=pass smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-8296dabef74so3847302b3a.1
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 12:33:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774294416; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AnEyzpCUYidBtk3na/c4M43yC11ippNHEx0M/IEQegEV8663ZHL+ksnaKAyyFKKXUR
-         HQAWURn0JfOq9AI1Qc2eqIsV7PpqJiUz5Z7hg+gWAwApH2cARi2xc92hzGcwcxGCK0KS
-         imEYLXFOVB20x5Z2WkajIBExWXbgiKm+9jKGhINaxM5HWKLzrR3obzh8X/BS4jqUioFt
-         kscklUe/mWY11HRkcHTvzQ02XxdkIIfjBTmSUpbtzwesU/Zz247gKoPoa1i/cmaunVYd
-         vi/dN3pRKRswgszm3ENtMP2b3A4UHXeJ8WMhJ5Eo8MibfiJ3SyY3QLpG0a2YG7m4P0+t
-         GtPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=jsZ0Ne9YohMirxnBGUDAnMm9ZjETUNRVwpxbQAd0PjI=;
-        fh=4hPQTJ6zwbT5WvXzPx7ld1OsCByUjuabpDnIsXMyt4s=;
-        b=eNGhvYRPe5h/YiVU85Ln3mnTq977rO/3skneABVKZGjlySPNgqzvWUMFWdWQ6QxTvd
-         ycLsIB4D7r64Ru0UOrFi/4GnMjcsb1dS4TMfJ9LuJs0sfMWz9ImQNSkFu2ES4+7FF4HH
-         qbDLzJPw5jcEs7mVO0bZ98GnkyrvLNEyltQgRtrvHyPGz1PVgwaQwIZ4nISINOHf1rvc
-         qrPArM60TimGgXMSIctp8KNXOEnBkHO77dPeQvX3QWytC/NvhVRdOh6ZT2nIBpaZtI/z
-         ZrT9Jvb5HmfbUt5JWdYhAGWE4ksrK2Tnsc+mouv/XUegTA5ZIvIMQxfgvaeEY4CRvEdP
-         LLNQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24B93C73CB
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 19:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774294541; cv=none; b=fHv0szbTnVcNxW/vyo4cBuJWH4oHNE8wf9Is13BwE2SNQABYSA/5ml/xo7spNJIQ1DV8kcC38OjXUeA+/Vd93iHkdqkUR+uMRs9CoI8qyDHvYkbTNG1W83C7bQsaNEeQkYUi4xjbj86ADLmDGx4FNmq/oHjQv1WwiRipOZJDbWQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774294541; c=relaxed/simple;
+	bh=kvZQfR6Ka8WnuKuT7mVazzZOQdLKZWJfub3aSBzO8AI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N2aRnqOJhBiLNLc3X3IQINeCgi+y1ABNX5bEiUMP9gCv7nn97pzFlXO+IqE5sq+MZmg0ZSykus8MFMNxEI6szeQHDOXmYPiO57bJqimQS6tA/V1IsyI0CrnCOCgaj4HDdRAmwlEIibu0mCpZ1PlfZw8HnQz4k8RuC7XsI+pOdvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gER+PnsK; arc=none smtp.client-ip=74.125.82.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-126ea4b77adso4712328c88.1
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 12:35:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1774294416; x=1774899216; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jsZ0Ne9YohMirxnBGUDAnMm9ZjETUNRVwpxbQAd0PjI=;
-        b=J0tBP9BNx/MYi4wLJdScevAHNH3Y8kMKPgHO9Kog26TWPtA1aATUZCfd226yjlRHhB
-         8G4dLcQCu7HX0bMfIxsmpETgVTVUlbydw7IcLc7tQzYHehyHbZArAIEBYvz35CbkNfUN
-         quap1y9MT+21FwoC7VhEz/y0l9m+7c6BUp8oI0A6XFqlL5tveHnq1JMz41rsZhbVKsh+
-         VcQfzfmMsck50v9JM8VYEaGEENl4aIpJSOehOGkYMppptf70SXGQg1cbRm1vyhCHooTG
-         IhFWAJ7kR+etnzyua3NuGISaf88tbK8/XLt0Ri0jOTbOZFvf6i+ZU1BSvV9Hxmgzy5ZE
-         CCNQ==
+        d=gmail.com; s=20251104; t=1774294535; x=1774899335; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hsALcZ16tevmJ3ng05DYY6tY5JjgfE8hJRfdYF/sgZQ=;
+        b=gER+PnsKerawqjr5zJOkKJ7vn7s58hrCHWcIoAhdjFt27DESMOLN3wTgXJhso3fpuw
+         1oIvt7jwneWdajfhCwQDqxinICvxzdiLJJ/5pAuM8lzo8lJojssSseVj/Z+yYJb5ihRg
+         inRz9ss6IPHd9r3dxgf4WL074mJb4Lm88olwtJtapzoFF22VtIJyuyr7hwvnGOHdnONy
+         tEjrM6FVCh8Dtwy/P/cERijF+kdULjB1cPZoMXGhxXfatDide14gpc/ZqCDTHyxuym8S
+         Z8C9QKkA8aT4bmERGg+MrjyS3lFoEcRuZG3AcARhSroaURJIFk3Gp4VEaPbydmm9/Djo
+         tYvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774294416; x=1774899216;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=jsZ0Ne9YohMirxnBGUDAnMm9ZjETUNRVwpxbQAd0PjI=;
-        b=TF6C2u3zym5R4K5c/PCwRqUZy8ZOq1DNK6tFYkR6Q2gN2rYlKl6A+EiNcwxIXwc6o6
-         rj9Im4O/gNSx6oPT9wLWOiW2/pWun12G4RIgurFu/5lNUT9o4WbWFoGAVTo94hSg3AJL
-         lP0iKPkCKHe6gx62Vt7ZVg6nHedblbxILBnhCPgjr2nCGok4vkAWZ9QJ87gs0neobQc5
-         1lNrIHcnu3y/BEt/c12jNbBp8N/ih6sqerInw5RTxAEyiEvg9NCsGML2IiPTd3DJ8ny9
-         nAxVWPk/NxeKRiVZ84OL2FyFu4hSTbIobI+lSv7dSj/bnDla84/W1HLknS7+Ax6Y3ren
-         27Lw==
-X-Gm-Message-State: AOJu0YwOimITu0uCO1VHf/wB8MhAl4Z8P9m+VrK5rxuuhVgKOHqnzM7T
-	7NGJEqjmCwzsE7TRGLGIqGMKandhVLsDwTdPWlyNi9scCawbjyzNot9kOGT0ZkSTBHa3ROouksQ
-	oWEIZloBKfV2JD6OaNupzUSLtfQYXa5m9u9hBQUzR
-X-Gm-Gg: ATEYQzx+tSm8JtNzB+UGo6VfWoZt5QKtLKi30ut5oqmVLUA8suqYrKC0xCXmN/APgIK
-	yCrdFOkMjBUGQDsO93xWibx5TYRQy7SW/S8XiJrbgQPc6KbPSmXt7h5LJqI+ObXCI+dZtH7fAli
-	1ie51kQZ7JDaw1rCmO/R3n5/Dw8C7BfMjBnndbi5TRRHRiiLEwwx+Lj2FKJpZmLYtiw6vqPpi9U
-	9zgYuSaCYrp8jBYl6wephFgUntmS5oFwmnShFaTiwxsmnm8SLOkRDnC/rv+HbNhdRdaGOhKjEgY
-	Fy8+PfCm5IFEdN23+JZ8uJekwg==
-X-Received: by 2002:a05:6a00:1399:b0:823:1c3e:95cf with SMTP id
- d2e1a72fcca58-82a8c234f4emr11028712b3a.18.1774294416213; Mon, 23 Mar 2026
- 12:33:36 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1774294535; x=1774899335;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hsALcZ16tevmJ3ng05DYY6tY5JjgfE8hJRfdYF/sgZQ=;
+        b=UdwZnsb9Goi/6opJY/K+VKq9A651JHJMjN23/BQGT0sC2yihesoArq73Hq3t1awu8Q
+         8683RzSCVD1MnsY5WBQIKbbTGTvYuZ0ElcRtDWaqB0SWeztvdY9iqBDCmsH1xydecxr0
+         G4u0kUmFUwYjrVHOFuHvgYZxYFbHH1UUjLOrD7e3dLnsPyX8Ot/xObkFw1lw1RVDWbeR
+         8ZP4I/gZDH6EoaESJ9DVevSpJkFKHKfy/Gk+x348d18urvqshfpKMvR2T8EcD97MBqH5
+         sgqLCpvwKXoyWBY57QINau3YP26Cgpztftfo9SoyZYZo7C5WZ6/UL1N9qAPyT3KZTk2i
+         AWUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVw5CTv5jyxb+dCNoAzxGji2BbruP6KpCsOueGZeQJUbjPmXa4Hjd5y21EwrhoU9clDZkD5B0g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfQHYHf3UYZZBH/blkNfnqD5Wwxg4D5Z+yFrc1E+f/r+YMQauU
+	wAUAJbx+xqYRrFgCOtIHLYfTAC7zy27Q77kIaYahERrtZr2EWU3X1/Bg
+X-Gm-Gg: ATEYQzxh0cqsyIByeTHmRC5ZPQx13WbRovOljFZ5bmMbGbqOIorvc6chFFi6eU1HAvQ
+	c2Ij9jwENUS3BHj/eksr9DoQpKT6Rn1gd1mL/02TFRjtdiDlQ7oAcqB6LurnZGM9OaizwlfZPql
+	khtONKdP7dsbc38Ug5gYtDiYha/ZpilqSofeR9Hhj2nOQvHabaNgJB+Mylc4ic5zq7K3I/qt+IN
+	1E18ZImgo747hQu0FswOTfzF+c+CyEUwyo5+N3U90T2KDIYkryUUIKo7lLtBkhCxSZYIa/HrMIp
+	6h31ftJvEXP1sZb9mgd820aJ+wgP3YzPFb/aHWcbuoVpi1ZPVN9qBuPZXDayXH5gkO9X7SL2KP/
+	iqloNEbgSXRCACfmpSAVHFqdlLu32w0622xQOGNXElkYlDhe9KkDplZjdp8zKanXPDNncBFz7x5
+	TEqSNO5J4f5n8IrjUHuLIZmneEbd+KK+tnen7kDvfl8k+QGWgGnfDTm78cI5skqZoJ
+X-Received: by 2002:a05:7022:6981:b0:12a:6ab7:3f9e with SMTP id a92af1059eb24-12a72671127mr5823640c88.10.1774294535335;
+        Mon, 23 Mar 2026 12:35:35 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2ebe:8:a296:1211:5ab0:bc95])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c10b17d1ddsm12967046eec.11.2026.03.23.12.35.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2026 12:35:34 -0700 (PDT)
+Date: Mon, 23 Mar 2026 12:35:30 -0700
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Mark Brown <broonie@kernel.org>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>, 
+	Peter Rosin <peda@axentia.se>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>, Tom Rix <trix@redhat.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-spi@vger.kernel.org, linux-leds@vger.kernel.org, 
+	linux-fpga@vger.kernel.org, driver-core@lists.linux.dev
+Subject: Re: [PATCH net-next 07/10] net: phy: switch to using
+ class_find_device_by_fwnode()
+Message-ID: <acGTaZcF6GwkmC03@google.com>
+References: <20260322-remove-device-find-by-of-node-v1-0-b72eb22a1215@gmail.com>
+ <20260322-remove-device-find-by-of-node-v1-7-b72eb22a1215@gmail.com>
+ <32679fc0-c388-4cd7-a030-5f5ed5abab78@lunn.ch>
+ <acDLzK8vpptTUMf1@google.com>
+ <acEBCBgMV3RrGKiU@shell.armlinux.org.uk>
+ <acGGWTmSMuc5h3Od@google.com>
+ <acGI4PI3MHML9Pce@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260316211052.332383-1-jhs@mojatatu.com> <20260316211052.332383-6-jhs@mojatatu.com>
- <20260316175705.2ef5004e@stephen-xps.local> <CAM0EoMmso3BeWwBd_6tWPhPqTiZ=4ZywNuMeWxuvgZADXd1OUw@mail.gmail.com>
-In-Reply-To: <CAM0EoMmso3BeWwBd_6tWPhPqTiZ=4ZywNuMeWxuvgZADXd1OUw@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 23 Mar 2026 15:33:25 -0400
-X-Gm-Features: AQROBzCy7gIuziKEmN4mC7CRB22ThDdH9s1im7kEWjHnmgQOUyFS7QdEbw1gIuU
-Message-ID: <CAM0EoM=o23jUcFjaHABodMZd7aimEpFeWuuNFvzFL8bh=mV6Eg@mail.gmail.com>
-Subject: Re: [PATCH net v2 5/6] net/sched: fix packet loop on netem when
- duplicate is on
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, 
-	victor@mojatatu.com, will@willsroot.io, xmei5@asu.edu, pctammela@mojatatu.com, 
-	savy@syst3mfailure.io, kuniyu@google.com, toke@toke.dk, 
-	willemdebruijnkernel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <acGI4PI3MHML9Pce@shell.armlinux.org.uk>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-270700-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270699-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,mojatatu.com,willsroot.io,asu.edu,syst3mfailure.io,toke.dk,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linaro.org,gmail.com,axentia.se,intel.com,linuxfoundation.org,vger.kernel.org,lists.infradead.org,lists.linux.dev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,networkplumber.org:email,mojatatu-com.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 4246B2FC56D
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dmitrytorokhov@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D54442FCBEB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 18, 2026 at 3:34=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> On Mon, Mar 16, 2026 at 8:57=E2=80=AFPM Stephen Hemminger
-> <stephen@networkplumber.org> wrote:
-> >
-> > On Mon, 16 Mar 2026 17:10:51 -0400
-> > Jamal Hadi Salim <jhs@mojatatu.com> wrote:
-> >
-> > > --- a/net/sched/sch_netem.c
-> > > +++ b/net/sched/sch_netem.c
-> > > @@ -461,7 +461,8 @@ static int netem_enqueue(struct sk_buff *skb, str=
-uct Qdisc *sch,
-> > >       skb->prev =3D NULL;
-> > >
-> > >       /* Random duplication */
-> > > -     if (q->duplicate && q->duplicate >=3D get_crandom(&q->dup_cor, =
-&q->prng))
-> > > +     if (q->duplicate && !skb->ttl &&
-> > > +         q->duplicate >=3D get_crandom(&q->dup_cor, &q->prng))
-> > >               ++count;
-> > >
-> >
-> > Would prefer that if ttl is exhausted packet was dropped.
-> > Rather than silently not duplicating.
->
-> so return NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
->
-> Note, this is a change of behavior, no?
-> Actually - when i was looking the first time the bug got reported in
-> my view the bigger issue is when
-> skb_clone() fails (which happens nastily when you have that repro from
-> William). Unfortunately, the surgery was too big so i gave up.
->
+On Mon, Mar 23, 2026 at 06:39:28PM +0000, Russell King (Oracle) wrote:
+> On Mon, Mar 23, 2026 at 11:33:36AM -0700, Dmitry Torokhov wrote:
+> > On Mon, Mar 23, 2026 at 08:59:52AM +0000, Russell King (Oracle) wrote:
+> > > On Sun, Mar 22, 2026 at 10:17:15PM -0700, Dmitry Torokhov wrote:
+> > > > On Mon, Mar 23, 2026 at 03:54:09AM +0100, Andrew Lunn wrote:
+> > > > > > -	d = class_find_device_by_of_node(&mdio_bus_class, mdio_bus_np);
+> > > > > > +	d = class_find_device_by_fwnode(&mdio_bus_class,
+> > > > > > +					of_fwnode_handle(mdio_bus_np));
+> > > > > 
+> > > > > When you look at this, why is it better?
+> > > > 
+> > > > I think we should move as much as possible towards firmware-agnostic
+> > > > APIs and use fwnode_handle instead of device_node or software_node or
+> > > > ACPI companion. To discourage this I think we better remove
+> > > > firmware-specific APIs where we have firmware-agnostic ones and
+> > > > eventually clean up drivers that use OF- or ACPI-specific APIs.
+> > > 
+> > > Basically, no. This is wrong.
+> > > 
+> > > It may sound like a good goal, but there's an underlying issue. This
+> > > goal assumes that the firmware description in OF and ACPI are
+> > > indentical.
+> > 
+> > If they are different then drivers will make allowance for this, like
+> > I2C core or SPI core does. But most of the modern drivers use
+> > firmware-agnostic APIs (device_property_*()).
+> 
+> What is appropriate is up to the standards bodies responsible for
+> the firmware. ACPI has a separate body, and we can't just dump
+> the structure we use for networking into ACPI. So no, you can't
+> just switch to firmware-agnostic APIs for networking.
 
-Stephen, can we leave this part for updates later? i.e lets resolve
-this and improve after....
+So I believe there is a difference between deciding:
 
-cheers,
-jamal
+1. What schema is being used on a particular system - it may be
+OF-compatible, or ACPI compatible one, and ACPI may support
+OF-compatible schemes for certain subsystems or individual devices, and
 
-> cheers,
-> jamal
+2. What is the API to access the properties.
+
+There is no harm to use device_property_read_*() universally as well as 
+not having OF-specific APIs at the driver core level. What matters is
+schema matches the system type.
+
+> 
+> For infrastructure where we lookup stuff by some kind of firmware
+> node, I have no problem with converting that to fwnode APIs,
+> because that doesn't transfer the DT description into other
+> firmwares without prior agreement of the appropriate firmware
+> standards bodies.
+> 
+> This is not "foreign territory" - ACPI in general doesn't want to
+> describe e.g. the individual components of a network card, unlike
+> DT.
+
+I think we actually broadly agree? What you are arguing against is
+saying that OF schema is guaranteed to work on ACPI systems and vice
+versa, but I am not saying that (although for some things it may). But
+still most OF schema can be handled by generic APIs (either
+device_property_read_*() or fwnode ones).
+
+Thanks.
+
+-- 
+Dmitry
 
