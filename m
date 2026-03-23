@@ -1,162 +1,194 @@
-Return-Path: <netdev+bounces-270432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270433-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uD+5OggDwWlUPgQAu9opvQ
-	(envelope-from <netdev+bounces-270432-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:08:24 +0100
+	id OI3kKB4DwWlUPgQAu9opvQ
+	(envelope-from <netdev+bounces-270433-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:08:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96B9C2EEB73
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:08:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CEC62EEB84
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 10:08:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 20F68304021D
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:00:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E6FDE3012BFA
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 09:04:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9EC3859C4;
-	Mon, 23 Mar 2026 09:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 782AD3859DA;
+	Mon, 23 Mar 2026 09:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PSwEOmg+"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Tgup8+rv"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012039.outbound.protection.outlook.com [40.107.200.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACCBB38552F;
-	Mon, 23 Mar 2026 09:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774256433; cv=none; b=q/PcRNs0pHoT3fmppIEe5RsDkkswe7U3JjwiLPtkfXcx5j/60aRqE4XwY6yBYnv832SRwYR4KHuH3xtd+DF61nxLhcMK6YUSImSSizOcQ6KuYuZrPNZt8GSUXw1BKsB005sfdzDWdFB27jX6IWxK24a06uriOvZRfgUOdECKea0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774256433; c=relaxed/simple;
-	bh=/biRsCEdq/ddELaA4pVbIjzNAeUEcCO8JGY8MM8mv/c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RSMomPZkvjiZjiSkiAd6M9CyKQKcr+PNA90HZEW+BA0AHieggF3sZTUyO/tmdxsrhKRzKxprIPZlhv2IlhOZk52XIxl6RKcvC5snpqXYfSX8AH6hw1S5OJwHZ7p8XL9CxXcJCMS2zfIrMb9C5+idWaV5VCkeZ3qVWSJF0tWLWpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PSwEOmg+; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=yMWdX5rPU/LnYnaKYFuAJpacSJjdsYtQkCNE/5cAkNw=; b=PSwEOmg+s3OczIMqw7GtGr0Fdf
-	HA30SHMempCUFsF4P+/wB4O9mxAJuHBvKfp+WopGLmcVaWKey4NeTTNgrCfcludwaigtBAvL9AKy9
-	8aKNh6qwqzU15V1EkY49I1k0ExipPVcIuFfZKT40j53SnOJOki341VbB9gviwD+1G1WYuTn+6djf4
-	Co73IutMNyyt7iaIhJWnbAdqd7wVO0CVjDKF4+CH1H2AwCYPaoHJHA4qtXmx+URFIrsxOmLraeEOx
-	uC0UiZMh9oYmRKRMHBboKtS4j73+15+KcBX3gfsOkW5zdkl6cy5Mm0u9h378R3sO1FFB3I8BtvfAa
-	4gisQ0dA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53602)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w4b8f-0000000009l-0dMz;
-	Mon, 23 Mar 2026 08:59:57 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w4b8a-000000003tW-2pe0;
-	Mon, 23 Mar 2026 08:59:52 +0000
-Date: Mon, 23 Mar 2026 08:59:52 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Mark Brown <broonie@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>, Lee Jones <lee@kernel.org>,
-	Pavel Machek <pavel@kernel.org>, Peter Rosin <peda@axentia.se>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
-	Tom Rix <trix@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
-	linux-spi@vger.kernel.org, linux-leds@vger.kernel.org,
-	linux-fpga@vger.kernel.org, driver-core@lists.linux.dev
-Subject: Re: [PATCH net-next 07/10] net: phy: switch to using
- class_find_device_by_fwnode()
-Message-ID: <acEBCBgMV3RrGKiU@shell.armlinux.org.uk>
-References: <20260322-remove-device-find-by-of-node-v1-0-b72eb22a1215@gmail.com>
- <20260322-remove-device-find-by-of-node-v1-7-b72eb22a1215@gmail.com>
- <32679fc0-c388-4cd7-a030-5f5ed5abab78@lunn.ch>
- <acDLzK8vpptTUMf1@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1074D3859E4;
+	Mon, 23 Mar 2026 09:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.39
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774256654; cv=fail; b=uDtgFLL6NerqJvEqP7V/IuTlZQljfwL929ij3fAbGSFhLEJhdeeGiPW12n/lGx4IL6HCuy6/jebr9vkyXIO7SLZb8BnxaAbbvg6TY98546QAoU8FX6GFxAKYPMs4mLmRCLlzAd0BWxvxXd5guvr3nJwreA2jhl6ZeNfXA1q1AM8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774256654; c=relaxed/simple;
+	bh=Q1haGWN0IZM7S1rs0oPgtOx0svfYhzC6pZ9oEHhvK0Y=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Iat31jvm1F1GYtTZ1Etc+P5BZOE50mf66iMqwDTT68Q6UbVE0lP1pNMkFZ6rog1lcfjgtNZ388IAEDtukJTOiYqvQ2rHKjmBM2Xl1I2hWB86sdUQSqimMAnFomhnF3F0UfRSTvB91dlZKfu2AbDG3UYjtDzCNMhUdqsPo3Qbdak=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Tgup8+rv; arc=fail smtp.client-ip=40.107.200.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oUCo1V06jceKfdG5/gGIIIS5ZivrTQBwPSE/tnCJP6taqqNzqKQyurUzbE/XZNrP+CRro3DWfxij8F53HhRZQE1J1ZNoBEqR9GMD2gYDkc44BkhKGaMShErHL+A5vN01Orl1B6QFDx9UR6Pt08tfkiuFQ+pTLoexFHllhvROApnTZwfiTAnMF7VIYUwzR2vzhP5eVeWqnMr4jM8U/hZQfAwuDRZpASBXlah01J7a9C3M/5NAPf0DvZmbFj8WtsxmY4vpsHxkM3tysb5tjMkbfMeZm2Q5Heh86172sKV4ozhXPi6Zf+MFLm+ACiEGnrazcrADskw9vh4HqNlYBNiaxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MmtHwpR9AEi48iWagFsCL9406xMrTncayuX9ueU8GT0=;
+ b=LZPf9EXKZdHxOZtg/az8ZHCpf04Fw8EiFprDsx1G9PG/48y00ZP66uR8rbtjGlYV2lMt04CTc0opYsNwHG1J4klKbT3u6AsGXJCHWA8qXeN0p5+0LoH8SYdKOY0C1xEU+CyunZTR2qlwfHRcOIppprdgPxPJrTdwIZIVjqOF8qhG2uC2l/Y5LIb8L8TyeGZlbDZcqzNEQrPXhaWQudiqJpSfpOzJ8VFDpVjpP18eUraSjXUxfUmqohQTAtTJgLuqf1cHX/3mpZc+4YZ4WJqnaqkXrljyaqva/UNtdJskzHYSp1kb2SmIMmfXYBgW1gq61Z2AGLV2bJzof/+5WqdSRQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.21.195) smtp.rcpttodomain=kernel.org smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MmtHwpR9AEi48iWagFsCL9406xMrTncayuX9ueU8GT0=;
+ b=Tgup8+rvdcckSMy5QDiNBl7ftjwllNQIo9e8Ncakn1uA1Se/9C1s2kvj9RareBs/rL35rR9VQNbt6DfJXsAr5a2YdF8W7k9u1pDTK7cNylIe0r+Zw+Jr7Y5xWKGUXBqf73qXiQ2EZUKgzckjMBtzbHv8dtu/V7/qS2sdZzt4/zA=
+Received: from PH7PR13CA0001.namprd13.prod.outlook.com (2603:10b6:510:174::7)
+ by SN7PR10MB6978.namprd10.prod.outlook.com (2603:10b6:806:34d::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.31; Mon, 23 Mar
+ 2026 09:04:09 +0000
+Received: from SN1PEPF00036F3E.namprd05.prod.outlook.com
+ (2603:10b6:510:174:cafe::f5) by PH7PR13CA0001.outlook.office365.com
+ (2603:10b6:510:174::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.31 via Frontend Transport; Mon,
+ 23 Mar 2026 09:04:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.195)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.21.195 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.21.195; helo=flwvzet201.ext.ti.com; pr=C
+Received: from flwvzet201.ext.ti.com (198.47.21.195) by
+ SN1PEPF00036F3E.mail.protection.outlook.com (10.167.248.22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9723.19 via Frontend Transport; Mon, 23 Mar 2026 09:04:08 +0000
+Received: from DFLE204.ent.ti.com (10.64.6.62) by flwvzet201.ext.ti.com
+ (10.248.192.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 23 Mar
+ 2026 04:04:02 -0500
+Received: from DFLE208.ent.ti.com (10.64.6.66) by DFLE204.ent.ti.com
+ (10.64.6.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 23 Mar
+ 2026 04:04:01 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE208.ent.ti.com
+ (10.64.6.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Mon, 23 Mar 2026 04:04:01 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62N941ni455890;
+	Mon, 23 Mar 2026 04:04:01 -0500
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 62N940PU003500;
+	Mon, 23 Mar 2026 04:04:01 -0500
+From: Meghana Malladi <m-malladi@ti.com>
+To: Vignesh Raghavendra <vigneshr@ti.com>, Nishanth Menon <nm@ti.com>
+CC: Tero Kristo <kristo@kernel.org>, Rob Herring <robh@kernel.org>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
+	<danishanwar@ti.com>, <m-malladi@ti.com>
+Subject: [PATCH net-next v4 0/2] Add ICSSG0 dual EMAC support for AM642 EVM
+Date: Mon, 23 Mar 2026 14:33:56 +0530
+Message-ID: <20260323090358.632329-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acDLzK8vpptTUMf1@google.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF00036F3E:EE_|SN7PR10MB6978:EE_
+X-MS-Office365-Filtering-Correlation-Id: c34d7b78-a35c-4233-9639-08de88bb2453
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700016|376014|1800799024|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	xYgviStVfWnrgBefkGpk96Cu7F50dD5VWw3rvOQNVCoBNS7zf2AmGI0oujjldRawhwGqIHP89CaB+Js7Yc4Dgp0l/54NC7wxE8AxYGAkJd9Qs740sEGwKyX9jOVSmhRLg89VcjE7TcwGzwtX9D4BahG91EyG+0k8Lkr1ufZaG7gBBh0VDx0lT44kNy6iq0I/WfI0f/JH3QfABEDXeBaqgWnzol1HvZP+FAb5OwJx2mwT0p7I+1UmaEVzkoJmAA9hz4N68lLusr1MsBkoFjJicDbmRF9c5sRfO4L5+TfECiBUqMbgS4zjkxWn2yJkA2WsJrRvOOACu7kG6/oa8DgslQ12BAeVsVIBCO0XUem8nlbHwJ1KnDgDakLtpcrSv8odSi/v6ciXLTcZpB/pHf+xNdgE2vHVtM4VwhPP3jG3A0qCKvBMZT3cD3ma8XbUXeAM+HV8n1vsi1exnk0qdf4GUb8PqpZEzyhjFFd1UrGMpV3leqGwxgfIB7B3976mk7uudWUtHxHajp/EIJVn642N5ZLkOKDWH8XX7r4KIpEf66CwadMxYdOXMDEjbjw0biIpEePCfC1yPdCxb/lpu7xt2qTpl2z2HXCfsYRwSs2H2XWIsgxcXIbFFtrv7cwblkFySuv8C1v4aDtqOrIFFL2IN378GzkZhpR5J2MsHJ7R/zk4UgPZFgnzxhtFI8JcNegjYVflZBSP81usa7stOa9AIKyQ3y/jZ15Hqn2pSAwFVSca+xjb77uf39CZe+9kOtwpZOh1GqNtTXd6xEhlXpHFSg==
+X-Forefront-Antispam-Report:
+	CIP:198.47.21.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet201.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(376014)(1800799024)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	akl+1le57DOn+IulNIVdoTfGYpR46VyNA9FssajtkvCYth+40Hg1wb3ZPYzppvAn+9gme5nhjK2zKm5/H8/+xuBumnj6JgKZNRNNF93yJwCyuktNmWJrNSuh5QF5/NmDf4/RJwE/CwrqDdZID4GXbl9nhBcExmjJ/9wk7K9+maFQDiYZMO/bsBNiYn3X8oU6FeZ7RYK+9HyVBa6OcLySQo9nneqjAd19wMEdLwXS3+oZCyma7beHUu4Ot7zd8ZAL35dGPh/qZZmI1q91qATQ0LFitBdy2jqwaT1HjLM1QD3pajBPIjkkltbSfjEI3WszqC5zr6uLakkpOBRXq8h7ms0DKbudy21ebx1KN2WRV4dGeBEqvkd1msN1rD4pdp5kaKo5CGMp+mJ89E9n8S8iZhfUto5XqgyE/3tZVp9dFiHag/tCbr2hHh/zUdgCQlML
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2026 09:04:08.2621
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c34d7b78-a35c-4233-9639-08de88bb2453
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.195];Helo=[flwvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF00036F3E.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR10MB6978
+X-Spamd-Result: default: False [1.34 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270432-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270433-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linaro.org,gmail.com,axentia.se,intel.com,linuxfoundation.org,vger.kernel.org,lists.infradead.org,lists.linux.dev];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.975];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 96B9C2EEB73
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ti.com:dkim,ti.com:mid];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: 1CEC62EEB84
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Mar 22, 2026 at 10:17:15PM -0700, Dmitry Torokhov wrote:
-> On Mon, Mar 23, 2026 at 03:54:09AM +0100, Andrew Lunn wrote:
-> > > -	d = class_find_device_by_of_node(&mdio_bus_class, mdio_bus_np);
-> > > +	d = class_find_device_by_fwnode(&mdio_bus_class,
-> > > +					of_fwnode_handle(mdio_bus_np));
-> > 
-> > When you look at this, why is it better?
-> 
-> I think we should move as much as possible towards firmware-agnostic
-> APIs and use fwnode_handle instead of device_node or software_node or
-> ACPI companion. To discourage this I think we better remove
-> firmware-specific APIs where we have firmware-agnostic ones and
-> eventually clean up drivers that use OF- or ACPI-specific APIs.
+This series adds device tree overlay support for enabling ICSSG0 dual EMAC
+on the AM642 EVM, along with the necessary PHY driver configuration.
 
-Basically, no. This is wrong.
+The overlay enables both ICSSG0 Ethernet interfaces (port0 and port1) in
+dual EMAC mode and can be combined with the existing ICSSG1 overlay to
+enable all four ICSSG interfaces if needed.
 
-It may sound like a good goal, but there's an underlying issue. This
-goal assumes that the firmware description in OF and ACPI are
-indentical.
+The series also enables the DP83TG720 PHY driver required for the
+DP83TG720-IND-SPE-EVM daughter card used with the ICSSG0 interface.
 
-Sure, looking up devices by fwnode handle makes sense, but looking up
-anything that is described in firmware is not suitable for this kind
-of conversion, because in doing so, you effectively "port" the DT
-bindings to ACPI, and it may not be suitable for ACPI.
+v3: https://lore.kernel.org/all/20260311053852.1034244-1-m-malladi@ti.com/
+logs: https://gist.github.com/MeghanaMalladiTI/20e9e661c3e1075694097bc02f5a3916
 
-So, please don't make wholesale changes that transfer the DT bindings
-into ACPI.
+Meghana Malladi (2):
+  arm64: dts: ti: k3-am642-evm: Add ICSSG0 overlay for dual EMAC support
+  arm64: defconfig: Enable DP83TG720 PHY driver
 
+ arch/arm64/boot/dts/ti/Makefile               |   4 +
+ .../boot/dts/ti/k3-am642-evm-icssg0.dtso      | 168 ++++++++++++++++++
+ arch/arm64/configs/defconfig                  |   1 +
+ 3 files changed, 173 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/ti/k3-am642-evm-icssg0.dtso
+
+
+base-commit: 9ac76f3d0bb2940db3a9684d596b9c8f301ef315
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
