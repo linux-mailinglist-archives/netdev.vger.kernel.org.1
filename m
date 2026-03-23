@@ -1,161 +1,121 @@
-Return-Path: <netdev+bounces-270753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270754-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IOQDJfi0wWnlUgQAu9opvQ
-	(envelope-from <netdev+bounces-270753-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:47:36 +0100
+	id wEJ9IIW1wWlyUwQAu9opvQ
+	(envelope-from <netdev+bounces-270754-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:49:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 403022FDEBD
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:47:35 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0031D2FDF02
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:49:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 629E3300FED3
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:47:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 65838304DC9F
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 21:49:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69163806D5;
-	Mon, 23 Mar 2026 21:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98EF037F729;
+	Mon, 23 Mar 2026 21:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="hVhKPX4Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AADE304BDC;
-	Mon, 23 Mar 2026 21:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913C636D9EB;
+	Mon, 23 Mar 2026 21:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774302450; cv=none; b=jlZIYiGB3CUPZMNpgHvz5jIHuw6gxs6PGDgbbKtDuvEW+oKLtmxb6oZYSXx05IIokc8ThlxN3Z21dp6Vp8yy68SBLOmLwntZ8OZnb8/s3nBFBxj3XG95fw3ybcwF6+Dg5RWNHFbQxf2ONEq75lEMKs3IScuXtg0yAIKW8ZWdJR0=
+	t=1774302582; cv=none; b=sJOk3cGU6McsBpbgsLnXfoAk/DDnnbCUGAQqYpw+47R3XGQLL+PtrKnAJ6Hlwe+LQdQF44bPKby9WDe4Q3vaIxRmFoxTQPAfA/IbhV+FjBKO11dI/unx0nNjSCyhe9sNq0pSjjRFhdCqq73OahFyn8cwGXWjnR1hjARJRXPM884=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774302450; c=relaxed/simple;
-	bh=mPI5Ov8iFnJNWxqhvU3QELhRwgMQQR5ozF0+mW1NKek=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pgfgpWQabQOeLRb56moGoqoxRi9jML6oDh91oErh0OGFawg/CkI5kwUQAdQmU5syQ7c3ZFaRpGpd9iGp4AmiAgKx1oDJcUsD5aVJz1L8Y6sMnj2IaBJLnIfubLICYFsovfKzODro60Bp/fbodhXJwVifptg+RIUGnMv7S9Ee4xM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1w4n7I-0000000021C-1Kln;
-	Mon, 23 Mar 2026 21:47:20 +0000
-Date: Mon, 23 Mar 2026 21:47:16 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
-	Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Liang Xu <lxu@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v6 2/4] net: dsa: add bridge member iteration
- macro and port mask helper
-Message-ID: <acG05C2ktiGePhQE@makrotopia.org>
-References: <cover.1774136876.git.daniel@makrotopia.org>
- <ff936ce4ad3044102c367c55e7a455ab0020e4b7.1774136876.git.daniel@makrotopia.org>
- <acCllYmKczZrDgv9@makrotopia.org>
- <20260323163104.a2d2hbs7jfgsptj3@skbuf>
- <acFuHka4RdmAXm73@makrotopia.org>
- <20260323211536.iqopuy2zxd75pfbh@skbuf>
+	s=arc-20240116; t=1774302582; c=relaxed/simple;
+	bh=F3YPmaITdEScGqQkB2M0Y0/ePglVVsPUpGdyETHCneM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=TpGQ0Zzb8dCr35okkCxsVBcvxUUhobBHrZvkU3ZeHWWKloezYCrpIkWq9czP9WfXILXWIUyAasqz9i1e8t+G+65GpXOUcP1yCorwYyu6q3GCjYJsWQByGPQy9vKOU6czDENtHFFtYozxJkVF7JfO7YyTwY4QbfiF7hfQduIyAAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=hVhKPX4Y; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1774302568;
+	bh=F3YPmaITdEScGqQkB2M0Y0/ePglVVsPUpGdyETHCneM=;
+	h=Date:Subject:To:References:Cc:From:In-Reply-To;
+	b=hVhKPX4YYJTnhXfIMdpsY+cFwL1ihBr2+VoUtyLtJaVGnQkr3eAANfkUXPzIiasDb
+	 v0HLhQhlrWLWUYjvtd/9Zb1JLEJ8oDGs46vHlEcPt0fJ6xyURAm3mDm+KlghLt84es
+	 UjeoFFCWUHMD+nknBbQ8mEff5Wy+r0hhOBrrufKY=
+Received: from [192.168.178.143] (p5dc880d2.dip0.t-ipconnect.de [93.200.128.210])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.2/8.18.2) with ESMTPSA id 62NLnQrb009858
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 23 Mar 2026 22:49:26 +0100 (CET)
+Message-ID: <c98afd05-79fa-4bd6-9f34-79fd2875544f@tu-dortmund.de>
+Date: Mon, 23 Mar 2026 22:49:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260323211536.iqopuy2zxd75pfbh@skbuf>
-X-Spamd-Result: default: False [-1.46 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 0/4] tun/tap & vhost-net: apply qdisc
+ backpressure on full ptr_ring to reduce TX drops
+To: jasowang@redhat.com
+References: <20260312130639.138988-1-simon.schippers@tu-dortmund.de>
+Content-Language: en-US
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20260312130639.138988-1-simon.schippers@tu-dortmund.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-270754-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270753-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[makrotopia.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 403022FDEBD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tu-dortmund.de:dkim,tu-dortmund.de:mid]
+X-Rspamd-Queue-Id: 0031D2FDF02
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 23, 2026 at 11:15:36PM +0200, Vladimir Oltean wrote:
-> On Mon, Mar 23, 2026 at 04:45:18PM +0000, Daniel Golle wrote:
-> > That means the driver *does* have to track a mapping between DSA
-> > bridges and hardware/firmware bridges on that specific switch somehow.
-> 
-> That's correct. From DSA's perspective, it's not an mxlbridge, it's just
-> a bridge with at least one DSA switch port under it, which is given a
-> kernel-wide identifier. The ports can hold a single reference to the
-> common bridge, but the common bridge cannot hold a single back-reference
-> to individual ports. And holding multiple references would severely
-> complicate the implementation.
-> 
-> Even if you don't implement accelerated cross-switch bridging, you can
-> still have two mxl ports belonging to different switches that are both
-> put by the user under the same bridge. And both switch driver instances
-> would want to allocate a potentially different bridge ID, and surely
-> maintain a different portmap, for that same bridge.
-> 
-> > Or is there another existing structure in DSA I'm not aware of and
-> > which could be used to implement Paolo's suggestion:
-> > 
-> > https://lore.kernel.org/netdev/fe46d64b-1b12-48b6-b663-e7d5122b7b8a@redhat.com/
-> 
-> The API was intended so that you could either use the bridge.num directly,
-> transform it through some linear formula or as an index into a privately
-> maintained array of data structures with switch-specific meaning.
-> 
-> I didn't question why you maintain a parallel list of dynamically
-> allocated mxlbridge structures instead of just having an array of
-> MXL862XX_MAX_BRIDGES * sizeof(u16) for the bridge identifiers, plus
-> maintain a separate portmap instead of walking through the DSA data
-> structures, but now that Paolo brought it up: why?
+On 3/12/26 14:06, Simon Schippers wrote:
+> This patch series deals with tun/tap & vhost-net which drop incoming
+> SKBs whenever their internal ptr_ring buffer is full. Instead, with this 
+> patch series, the associated netdev queue is stopped - but only when a
+> qdisc is attached. If no qdisc is present the existing behavior is
+> preserved. This patch series touches tun/tap and vhost-net, as they
+> share common logic and must be updated together. Modifying only one of
+> them would break the other.
 
-The firmware requires bridges to be allocated, and the bridge
-allocation firmware API returns the ID we got to use.
+Hi,
 
-Maintaing a simple array ((ds->max_num_bridges + 1) * sizeof(u16))
-to map DSA bridge num to firmware bridge ID in the driver works
-fine, of course.
+@Jason what do you think about the patchset?
 
-Regarding the request not to maintain a separate portmap for each
-bridge (which was my initial approach) but instead walk through DSA
-data:
+Thanks!
 
-My guess was the intention is to avoid duplciating data, as in: if
-there is only one copy, we can be sure it's not stale or
-out-of-sync...? But that's just my guess, only Paolo can tell his
-reasons for having requested that.
-
-> 
-> I see in v6 you're halfway there with the conversion, you got rid of the
-> portmap and you could just use the array for the rest.
-
-Ack. I'll do that and post v7.
 
