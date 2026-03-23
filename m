@@ -1,330 +1,216 @@
-Return-Path: <netdev+bounces-270337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270338-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Am4KdibwGnKJAQAu9opvQ
-	(envelope-from <netdev+bounces-270337-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 02:48:08 +0100
+	id UMxHKG+cwGnrJAQAu9opvQ
+	(envelope-from <netdev+bounces-270338-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 02:50:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DEFA2EB9D9
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 02:48:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 096B12EBA26
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 02:50:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0342A30073F9
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 01:48:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A7310300574E
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 01:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59921D7E41;
-	Mon, 23 Mar 2026 01:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF641F418F;
+	Mon, 23 Mar 2026 01:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="a6WqiUlq"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CQDEl3qQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011030.outbound.protection.outlook.com [52.101.57.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F777404E;
-	Mon, 23 Mar 2026 01:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774230484; cv=none; b=FqFQn/tAdZi8dKbCJzByssmASmxSEaFOh4GbilibB1gNnpHfIjxMGYfPbLdfqf50zGtV19ExPiJTDgOJA3HWZ+n3NWMM5gX4qqFRsaLJuDZB2UpRdIuBBjyUZdQ2hr3RIMkFFUP8MJWtYQPH6sFfRsiXO7azDXx6JwJBzHpWreY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774230484; c=relaxed/simple;
-	bh=7cKapGqG3nyMko2Gs92JELEQTkfhd086sDMSo3g0YUI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gNi2W0GS/TmCHZYhn3/eBVkgYdDsvgWZR8nIXAHueceH3JlC7yrdAifPYdph5ZtKfhYHQrc3Qtd8LSkI/U311SkGcq0H7jI9kFenca/uUbv9znAOBM2voTHAYKBOpLnSSNfrG9uxiMd9GNT/GUJftqTzGx6rGh33AvE+p31gS8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=a6WqiUlq; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62N0RuTx1048434;
-	Sun, 22 Mar 2026 18:47:41 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=qH0j0MXbXxbEiNoTOxh/Ej5UP
-	D19u/0UQZt8gFSBbLk=; b=a6WqiUlqeUPKdGptKon7WeAkpo2oV1/ejssV3UxAi
-	QHt8cOxAk53k6pUq6+LLSqiSW4AYdpj9uD+upw56A1QuCRXBzIKbMgtBqZPgAn45
-	Iaa14OmUe24wNByiHeUsxX6e+s1xlCQp60TD+IiPPTWt+/OJlKXMhvf8AkRK031Z
-	xNw6kD3/JW8IyB4Ato+czdZtGdNticNpRXbP2ZQe2htWbbTWSYYzhtXeYaHFaoC4
-	Ku7wuNiT1c65LBqPkEmYKkQxAfXRNlDVsD7wJ7TTm8QWD3D6Hqc+rcwrLZaKgjcv
-	6Y4f2ZLOTp3qL7HELN+RZ6svm/eMGG1QlQzmS9CE5p6Tg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4d1tugj4q6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 22 Mar 2026 18:47:40 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Sun, 22 Mar 2026 18:47:39 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Sun, 22 Mar 2026 18:47:39 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 28A383F70A2;
-	Sun, 22 Mar 2026 18:47:34 -0700 (PDT)
-Date: Mon, 23 Mar 2026 07:17:33 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: <shshitrit@nvidia.com>, <cjubran@nvidia.com>, <netdev@vger.kernel.org>,
-        <matttbe@kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <saeedm@nvidia.com>, <sgoutham@marvell.com>, <davem@davemloft.net>,
-        <donald.hunter@gmail.com>, <jiri@resnulli.us>,
-        <chuck.lever@oracle.com>, <linux-kernel@vger.kernel.org>,
-        <kuba@kernel.org>
-Subject: Re: [PATCH v6 net-next 5/5] octeontx2-af: npc: Support for custom
- KPU profile from filesystem
-Message-ID: <acCbtThJb-PA8tni@rkannoth-OptiPlex-7090>
-References: <20260319055533.1720093-6-rkannoth@marvell.com>
- <20260320165432.98832-1-horms@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A9E1C84BB;
+	Mon, 23 Mar 2026 01:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.30
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774230637; cv=fail; b=EVnSTzpDNeou2qKoI3MdDmIt2lVKcPR8ST9mhN0vLpw4PIYFRU60PdO97gM6BWVx1ipiZYTRwvesBdo1kfIpVx5jUutIhRLiobtgC5TPwRuCkQx6q2k+ANfwoUzjh4AWQcJrRn5qh2jf/ADl3ndgOowrCxzs/GsxuqZLWlsIlmU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774230637; c=relaxed/simple;
+	bh=6GG75t52+MLecrltviAx+t2kpk8XwsaV7VqHdaZuI2A=;
+	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
+	 In-Reply-To:MIME-Version; b=SJ0sVQobe1o/BN9lCF+NuCRMGnL0Uze2LmK76MEAaXi/Rp3kXlbSqg2sAPB5+oRcD/Cdjo07AnC38YQz/sJBVQ+qOE3MnZoD4eIbYn6gTxia2k2TmE9BCcBHq1RwCZM1fstRsx1sE27MLbURHOq+E79M/DWI8NVva4SEj4nJDm8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CQDEl3qQ; arc=fail smtp.client-ip=52.101.57.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WRvA7Uw9fR4EVRYRsMi73MnB95U+0PnQIxxw6pLSX4Q5HceqYdIWlXEa4kwVrwtSnio/FPuTAnxQkIHnAU0WcEJ9tkjHezDA0Bgzi1dUEf6acK+rflobr8Lv9VL6K+USGn6fOvQUccVMtlejS+HTo2uXtGZb/1cXnxTxKJrUDa6/cW9jWmciZh8vMjft4JhQjBPmD3Uq5lWFvVjoJjYTHCT+07YbZtaESef3Nl27/LnPsnhzdb3g00ZpKz7CH/RZDvun6afYKFQNpAJw5k6NniJk4VMurVqZRQMwQDJJDaJu/ymuUJgkQmlGloGpG5Q2Gj0he4zM2akTgORa2mDrXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6GG75t52+MLecrltviAx+t2kpk8XwsaV7VqHdaZuI2A=;
+ b=PFo1tS/YezxL77ailvr/l6vesQ2IhQq783ATFFtlaLlT9vS0Wvfi0GaVMUUBGhxfAKjDYl6eurDQVmoa0xB9qsfY4Np9L72ucBmTKRP7cHOzS3mIutX2eiimt1u2tDR8i94V7SvgV86eW6NcmfdOLLVMQZRPfZMt12q0aON2bedIWIrJo5LGkAgDL3xGFHiWoh0LaxBSlO3CsramiRn0v8A8IgNvZANO4w+y2n6I670tRTiSx26THFz/g5c2zocpSDwGQwP1ojUTAz4oKlrA4TpsgZR8N8ZnPg17/oYx35A6YFWYjaxYsicoE1RCEnI9aQCHWX9oI4pNDJ1DZhn1qQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6GG75t52+MLecrltviAx+t2kpk8XwsaV7VqHdaZuI2A=;
+ b=CQDEl3qQ7dcCL8tRNDjMMv1gi+zbxpQi1FFVTHn5NY6HFqXwd/oQ9IHMxVUgvVJG4/WN3lRG3mXePygF8k4nwphVjb+tlVmHFXlXmkVv3yI8jUZFEr/kch5paGMuoTXE3MG14ideB4/Q6jW33rq5XLpnw46FT1ZTj1t33XlLj1+Z60qOOkT++39myCGFzEk0Kc7YpWHyi0fXyTU9+iIhnZNJ6M5mFmDGkWqEdiKTQh0f6okLJTasa97qoMgqB+nbNChpP/+CeOUkNjYd0fXvMuM5mLyzxNp1vy4V/jLtEgooQ0J1EUcCagdEE8VEyVHlXmC2IilpGqpWaxPIRfAKjQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH2PR12MB3990.namprd12.prod.outlook.com (2603:10b6:610:28::18)
+ by DM4PR12MB5747.namprd12.prod.outlook.com (2603:10b6:8:5e::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Mon, 23 Mar
+ 2026 01:50:28 +0000
+Received: from CH2PR12MB3990.namprd12.prod.outlook.com
+ ([fe80::7de1:4fe5:8ead:5989]) by CH2PR12MB3990.namprd12.prod.outlook.com
+ ([fe80::7de1:4fe5:8ead:5989%6]) with mapi id 15.20.9745.007; Mon, 23 Mar 2026
+ 01:50:28 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 23 Mar 2026 10:50:24 +0900
+Message-Id: <DH9S9KS2O6DD.3PGGQ05VV2VYQ@nvidia.com>
+Cc: "Gary Guo" <gary@garyguo.net>, "FUJITA Tomonori"
+ <fujita.tomonori@gmail.com>, "Boqun Feng" <boqun.feng@gmail.com>, "Tamir
+ Duberstein" <tamird@kernel.org>, "Andreas Hindborg"
+ <a.hindborg@kernel.org>, "Miguel Ojeda" <ojeda@kernel.org>, "Boqun Feng"
+ <boqun@kernel.org>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Alice
+ Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Danilo
+ Krummrich" <dakr@kernel.org>, "Simona Vetter" <simona@ffwll.ch>, "Abdiel
+ Janulgue" <abdiel.janulgue@gmail.com>, "Daniel Almeida"
+ <daniel.almeida@collabora.com>, "Robin Murphy" <robin.murphy@arm.com>,
+ "Yury Norov" <yury.norov@gmail.com>, "Will Deacon" <will@kernel.org>,
+ "Peter Zijlstra" <peterz@infradead.org>, "Mark Rutland"
+ <mark.rutland@arm.com>, "Ingo Molnar" <mingo@redhat.com>, "Waiman Long"
+ <longman@redhat.com>, "Yury Norov" <ynorov@nvidia.com>,
+ <rust-for-linux@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
+ <dri-devel@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
+ <driver-core@lists.linux.dev>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3 4/4] rust: make `build_assert` module the home of
+ related macros
+From: "Alexandre Courbot" <acourbot@nvidia.com>
+To: "Miguel Ojeda" <miguel.ojeda.sandonis@gmail.com>
+References: <20260319121653.2975748-1-gary@kernel.org>
+ <20260319121653.2975748-5-gary@kernel.org>
+ <CANiq72kZH-AX=QQz2V+qCfVzMsUEAPan=o1E=OZOAnivj3L3HQ@mail.gmail.com>
+ <DH9RDC77E3NE.3F8BURMZ8INBX@nvidia.com>
+ <CANiq72knM0_w_eHbu1qV2Ps8KbST6KcAZRtTH9FEd_5sRMqWdQ@mail.gmail.com>
+In-Reply-To: <CANiq72knM0_w_eHbu1qV2Ps8KbST6KcAZRtTH9FEd_5sRMqWdQ@mail.gmail.com>
+X-ClientProxiedBy: OS7P301CA0021.JPNP301.PROD.OUTLOOK.COM
+ (2603:1096:604:26b::16) To CH2PR12MB3990.namprd12.prod.outlook.com
+ (2603:10b6:610:28::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260320165432.98832-1-horms@kernel.org>
-X-Proofpoint-ORIG-GUID: -mo4edJO03B_RClAKzZIVLLVujIy5O0z
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzIzMDAxMiBTYWx0ZWRfX9CRgv7fTPwDW
- kTftN4g7SbFwFd/t4Cm6M9UjsnaCi8o4Cl0JApZQOUk6DGoF9JsWsD+TnRxQEbegn9GEo4aaZnb
- vXA6BbCPuUmR05ck4z74/p1i4A6Xkf/+Ip1CaL2Dd4QDdap/cTnjKPNR12kwECLTbmfANvBUU02
- yB9aQeLSHIMBJA8cPJhWTmEjEafZDz+LAXtKd3HezKdRl6pfqOQpZrNzI8BWlRh/yfxM1g84/Si
- W8kKp9IZShJkgVc2j4nV5e+oZvKYs3JHn7ppNkKko/3OHVt9M+wiYu6wkwOSOg6rxk5oYn0J/Rd
- 7IE4Tm0ZwXKQHeeOje9Pp3BFSKp6m+zBB5PEHYEUGqipJJZtfz8fezOHIwNOXeETSiY7EgksVGv
- wOw/kSLqugxtBlXmtaV+UClTTTP01dI5HV1ACZycofmpOAgyseRxFZ1KRnXBe5aWEsDto2Ot5tf
- IKFMxtVGOqB2yphMU4g==
-X-Proofpoint-GUID: -mo4edJO03B_RClAKzZIVLLVujIy5O0z
-X-Authority-Analysis: v=2.4 cv=Pu6ergM3 c=1 sm=1 tr=0 ts=69c09bbc cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=QXcCYyLzdtTjyudCfB6f:22 a=VwQbUJbxAAAA:8
- a=_Go4_jeb2u-yDBX4-a4A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-22_07,2026-03-20_02,2025-10-01_01
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PR12MB3990:EE_|DM4PR12MB5747:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1012046c-3ebc-42b7-13d6-08de887e8f08
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|1800799024|366016|10070799003|22082099003|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	sLjZs5mm/GM0Lul3TuuMqjp0J30dzAgp9n3LdZwJzmVEpFPG1iXLGVtONGQSUnfJRUQUMnswJRSLtswiraWQw/0MyN3B7Doz8bfN5vGNvCZgr1Q4FE74XRSEEtMbUvHKzeS7BPKJGyA1enGzytI4YbxWcc/VofZ+p9I6igV1UFzKoj2H7uONdRPTCnZJBwjDziJYqn1PSP0HbybFYqBhUkBN0CQvhrIgyiziMLaU19QNSDp+xgvzNmQj/CixQPww2JnaWYf1pfAUPCsGJdqHTz3DUtJ6FkFP9QazgyFx0O2BFM+FsNcGp5vKJyuqdxYOyDNFH/AnQu4OTCX6hBSs57h0a3fgzXjYuBwJkZAlVakcT2ysf1eO80MCNNd9B4qEBsw4Jr4EF7AjLdFADRQj6+S1ltgkLRNKqmWAFjSF1cpdQ/wAtGyZtlJFSVQy2vWl+mBU2Z7dV8bisMvMSgYQXTG9e0jHncOmoMTmmgP5wKwxg4WWjnYjZ7S5KB7kcdWxerMDYgI7ohKK09QrElkldCvYtx62UClQpv9zRafRLam3okiWIiNLEJ80TpdArNZrDbXyp+6lAiSY8ZzgS0yjJ6oD8vq+MIIIYlwLWNGbpLlbTuIvUEHSbZOsiBUbUedJLF2LxMCgCKC48U1pFmiNaf6/xabBNWZPfRjJ7tEgqtmFJ3t0h87Xm3MVj8A1gBmd1yjFXJLv76rfiLb1tXwV2NWZclYc/yoigTNb9o39sQo=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB3990.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(10070799003)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?c01CK0cvdS8yTWh0VjlGZTFyZWR5MWdYSi85WXg1dGFmeHRjZ0sxbnd3SFdj?=
+ =?utf-8?B?YnphVzlrWDgwZjBUU25EbGozUVNGR3J6OUZSNUV1Zm5kSnptZi9VaHFGY1Bp?=
+ =?utf-8?B?NW9FL0F0MXpDb3JHc3N5SURXNVpiSW5MMVlYQ0dCNzJHTjZ2NnNFVktOLzJQ?=
+ =?utf-8?B?QnBKNU5MQnE5UGZVbWJCaWxOTFVtRDNXVkx3bk43Q2tIZ0FLbkt5eVFGbEE2?=
+ =?utf-8?B?eWFONHFBZ05vR2d5QXRKbW1zMFdGSmVKdDU3T1h1UTk0Y2hueldGRVdSZ1ZB?=
+ =?utf-8?B?U0FoWTBwcVhoZzh2UHRjdTRLSHlueTRiNzJ1SUo4ODV1Z0RmN0JxTVplbE5u?=
+ =?utf-8?B?VW9pd3RrL2VVdGFlQXdwcVF6NFREc2JVU2R0YXJ1S3ZQcHJJVnJaaUNqMTBD?=
+ =?utf-8?B?Ty8zU1FJc0JRdWhaMldxZTBPQkJTYUorSE9Bc1FsbDRoRHk3Tmh1WlRhazZp?=
+ =?utf-8?B?RHVGVFBLU0FOL05RR2plR3VjclJIbUpnVzJyKytjUE8vMXZubm1zVDJBL25G?=
+ =?utf-8?B?d2NJcXNBc09kSEErOGVXQ1NZaDdMTXlUcVlPdVRoa211dHpCN1RYYTh1VTFq?=
+ =?utf-8?B?V3g3SVNEOFZNYVh0Yk1QOTE5cHZ2TGcyRDJmS0svWjJrVUh6RCt5bDJ4S2d3?=
+ =?utf-8?B?bWY4eDhDczJqMjRMdDhBNEVCalU4NytvVXhxS1h0bVZaT0lzQjZmbWlGZ0NL?=
+ =?utf-8?B?Y0JtTEZkTGxFTlVpTisrMmdJRjIvM3pkeGg1MC9uTlpUMzBXSTlWaUhGaWMy?=
+ =?utf-8?B?QnlkTysyWGhZbFNVa0Y0VU42REZxVDRVNURhUHBtRWUzMWk3ekdvSkxmSXAy?=
+ =?utf-8?B?UCtsTUdsRHNTY3ZsNUg3WHhkTXE2Y2U0SDYwODY0U280eHB2ZW5oaCtPcVZv?=
+ =?utf-8?B?VVd3M25nMmZWU3ltTG9CaXFjaEdLc0ZtQlcvV0x2bVQ0Snd1Rmo5dW4wRHVH?=
+ =?utf-8?B?cjFRNTg0MHBDZlo5aWMwK2xTcEYzYkFSbWQybm9yRCtiTk1QMFRkYWpTNWlo?=
+ =?utf-8?B?d2kzc0RhMnNnVEJSS29DKzRRbDBxMjlOUzNMOGphdEJ2SFIyRFhMV25KWnYv?=
+ =?utf-8?B?VC93Z1pFODVsbmJDMVA1UWE4eXhPeHREMFhBNXZtM3RkSThPL2s0bnhuN24x?=
+ =?utf-8?B?bEtOUWlsR3Q5NFNGMyttbHBYRUdNYVVLcW4vRkJEN2FXa2QwTXE5a29xa2Fh?=
+ =?utf-8?B?YXJBY1ZLYkJzTkZ4V3RnUXptMVRYWEF1Q2FkRHFQakRlU2V3WDV6Y0pjT0py?=
+ =?utf-8?B?TllmTm5SdG8yRWsrRURYWFRVQUZSUEgxVkd6OWw3ZlQ5QVZpaTgrclFUN3hV?=
+ =?utf-8?B?QUZNczk2ZmhTWk5KSzhKRXBrZXpRdDdoV1J0allqc2NvRHpFOEpuc3NGMW5x?=
+ =?utf-8?B?Z2x4V0NCNkpuMldhQmdsc2FMRUpyU1NxSDlnSzRuYkFWNWFnSndKeDBwQ0dw?=
+ =?utf-8?B?UXd2TVpqQm9GMm1qK0xwQnNRbWdDb05LZGFzcVk4Rmk4UzNQR3JmY25mYWJD?=
+ =?utf-8?B?R1d2bS91Rk1RWWdELytCdEZFN3lwdThSY3ZESGpCMnNYTDljaGdSWGhEcThu?=
+ =?utf-8?B?MTZZTmdPWEYya1FyWXNlcldWQkZtdjFKejVraDRiT2hESWU4Y2hCaXVUclZ4?=
+ =?utf-8?B?MUdhb1Z0U2JCYXoxMDR3dWgxZW1CR2dzM1JJNlJtUys5NnJXbWhXejJ2QmtF?=
+ =?utf-8?B?bEdCdWZsbnNZNHdLYXUxS09BNWVTUnRlOC9nN1pkL09sOTVFZ1EvWmluV0xQ?=
+ =?utf-8?B?NVdsZmg5UkoxdmVGZjZTektTZGFJY3pxN3F4VTFmMEtSS0ViNFF6cDkvQ09B?=
+ =?utf-8?B?czJNaFFwd25NTFNwa1JwLzhzeTFYWUNzL0g4d3UxUDVseG9Mdlp4SEJHOVg5?=
+ =?utf-8?B?emtBYU04UHIyT1BCV2VQeFJMWDF4cG9naTBlNktsaGVENU5LOE1rYlpaVG1j?=
+ =?utf-8?B?UVBuWEJ1TzFMSTBBa1pleGhkQWRHd0lOSkRtRXZMemJobUJNYTFPS0o0aXc0?=
+ =?utf-8?B?V1d1ZWp6V2FTT1M4Tzg2aGkyL21DdDNLV3lDZENXUkNORzM0ckJ4RFpLbk9E?=
+ =?utf-8?B?SVdBeTZ6bnp6YmJldVhvaVdYSnVPUVBVWHNUeGh3bkJ1dmlxVHJYWGlIcGJh?=
+ =?utf-8?B?eEJ2dHBzaEpWaStHOVhOT3JqN3JVNWllZVZ5YlR6VU5wNnJYNUhsekgwa2px?=
+ =?utf-8?B?UkpoTmxNTEV2ZmI5dzNnZ1hpRXB6OHhKMEI5VU9YSzE1aVRmYjJ3VVRQcDJC?=
+ =?utf-8?B?VkJTTEY3U2l0R1daY1V3RFdjc0VJWEpDRzVuSytCU25yME1rWG9SZ3BhR3Rn?=
+ =?utf-8?B?UGdmWlo0Snc4QktLRnhRbVhKaWRoVDFpYXpkUFl3QjlsQmIyeGpXVDA1SzZC?=
+ =?utf-8?Q?obZb5YtrzuFgpKSjdxCxgGbtBjaF2B1K4iJi5CejuM6Q8?=
+X-MS-Exchange-AntiSpam-MessageData-1: TYOyUomDeS9Wuw==
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1012046c-3ebc-42b7-13d6-08de887e8f08
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB3990.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2026 01:50:28.2763
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FTQqhODN35gsgvuLXlqj+NUj4LMXvYdXN6K0MwZ1Bmra+iH7SqaV5AeWT0QGyaqZfb2PaKGhrWfmMGrdKFgRmg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5747
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270337-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270338-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[nvidia.com,vger.kernel.org,kernel.org,google.com,redhat.com,marvell.com,davemloft.net,gmail.com,resnulli.us,oracle.com];
+	FREEMAIL_CC(0.00)[garyguo.net,gmail.com,kernel.org,protonmail.com,google.com,umich.edu,ffwll.ch,collabora.com,arm.com,infradead.org,redhat.com,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	FROM_NEQ_ENVFROM(0.00)[acourbot@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 0DEFA2EB9D9
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 096B12EBA26
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-03-20 at 22:24:32, Simon Horman (horms@kernel.org) wrote:
+On Mon Mar 23, 2026 at 10:38 AM JST, Miguel Ojeda wrote:
+> On Mon, Mar 23, 2026 at 2:08=E2=80=AFAM Alexandre Courbot <acourbot@nvidi=
+a.com> wrote:
+>>
+>> Acked-by: Alexandre Courbot <acourbot@nvidia.com>
+>>
+>> (sorry, assumed my Reviewed-by carried an implicit ack as well)
 >
-> > @@ -665,9 +675,15 @@ void npc_cn20k_parser_profile_init(struct rvu *rvu, int blkaddr)
-> >  	num_pkinds = rvu->kpu.pkinds;
-> >  	num_pkinds = min_t(int, hw->npc_pkinds, num_pkinds);
-> >
-> > -	for (idx = 0; idx < num_pkinds; idx++)
-> > -		npc_config_kpmaction(rvu, blkaddr, &rvu->kpu.ikpu[idx],
-> > +	/* Cn20k does not support Custom profile from filesystem */
-> > +	for (idx = 0; idx < num_pkinds; idx++) {
-> > +		act = npc_get_ikpu_nth_entry(rvu, idx);
-> > +		if (!act)
-> > +			continue;
-> > +
-> > +		npc_config_kpmaction(rvu, blkaddr, act,
-> >  				     0, idx, true);
-> > +	}
+> Ah, I saw your tag for #2 and #3, but not #4 (nor #1).
 >
-> When a filesystem-loaded profile is used on cn20k (from_fs=true),
-> npc_get_ikpu_nth_entry() returns &profile->ikpu2[idx]:
->
-> drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c:npc_get_ikpu_nth_entry() {
->     struct npc_kpu_profile_adapter *profile = &rvu->kpu;
->
->     if (profile->from_fs)
->         return &profile->ikpu2[idx];
->
->     return &profile->ikpu[n];
-> }
->
-> However, ikpu2 is never allocated for the cn20k path. The allocation
-> happens inside npc_apply_custom_kpu() in the from_fs block:
->
-> drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c:npc_apply_custom_kpu() {
->     if (is_cn20k(rvu->pdev))
->         return npc_cn20k_apply_custom_kpu(rvu, profile);
->     ...
->     if (from_fs) {
->         profile->ikpu2 = devm_kcalloc(rvu->dev, 1,
->                                       sizeof(ikpu_action_entries),
->                                       GFP_KERNEL);
->         ...
->     }
-> }
->
-> But this from_fs block is never reached for cn20k because the function
-> returns early via npc_cn20k_apply_custom_kpu().
->
-> Does this code dereference a NULL-offset pointer causing a kernel crash?
->
-> The same issue appears to affect cam2 and action2 pointers which are
-> allocated in npc_alloc_kpu_cam2_n_action2() but never called for cn20k.
->
-> This was raised by Jakub Kicinski during v4 review on 2026-03-16.
-This is false positive. from_fs is never set to "true" for cn20k. In npc_load_kpu_profile(), if soc is
-cn20k, it skips "loading from filesystem" method. So npc_get_ikpu_nth_entry()
-will never return ikpu2.
+> Did I miss it/them?
 
->
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> > index 8d260bcfbf38..8d8feb7742e8 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
->
-> [ ... ]
->
-> > @@ -1730,32 +1835,89 @@ static int npc_apply_custom_kpu(struct rvu *rvu,
-> >  		return -EINVAL;
-> >  	}
-> >
-> > +	*fw_kpus = fw->kpus;
-> > +
-> > +	sfw = devm_kcalloc(rvu->dev, 1, sizeof(*sfw), GFP_KERNEL);
-> > +	if (!sfw)
-> > +		return -ENOMEM;
-> > +
-> > +	memcpy(sfw, fw, sizeof(*sfw));
-> > +
-> >  	profile->custom = 1;
-> > -	profile->name = fw->name;
-> > +	profile->name = sfw->name;
-> >  	profile->version = le64_to_cpu(fw->version);
-> > -	profile->mcam_kex_prfl.mkex = &fw->mkex;
-> > -	profile->lt_def = &fw->lt_def;
-> > +	profile->mcam_kex_prfl.mkex = &sfw->mkex;
-> > +	profile->lt_def = &sfw->lt_def;
-> > +
-> > +	/* Binary blob contains ikpu actions entries at start of data[0] */
-> > +	if (from_fs) {
-> > +		profile->ikpu2 = devm_kcalloc(rvu->dev, 1,
-> > +					      sizeof(ikpu_action_entries),
-> > +					      GFP_KERNEL);
-> > +		if (!profile->ikpu2)
-> > +			return -ENOMEM;
-> > +
-> > +		action = (struct npc_kpu_profile_action *)(fw->data + offset);
-> > +
-> > +		if (rvu->kpu_fwdata_sz < hdr_sz + sizeof(ikpu_action_entries))
-> > +			return -ENOMEM;
-> > +
-> > +		memcpy((void *)profile->ikpu2, action, sizeof(ikpu_action_entries));
-> > +		offset += sizeof(ikpu_action_entries);
-> > +	}
-> > +
-> >  	for (kpu = 0; kpu < fw->kpus; kpu++) {
-> >  		fw_kpu = (struct npc_kpu_fwdata *)(fw->data + offset);
-> > -		if (fw_kpu->entries > KPU_MAX_CST_ENT)
-> > -			dev_warn(rvu->dev,
-> > -				 "Too many custom entries on KPU%d: %d > %d\n",
-> > -				 kpu, fw_kpu->entries, KPU_MAX_CST_ENT);
-> > -		entries = min(fw_kpu->entries, KPU_MAX_CST_ENT);
-> > -		cam = (struct npc_kpu_profile_cam *)fw_kpu->data;
-> > -		offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam);
-> > +		if (!from_fs) {
-> > +			if (fw_kpu->entries > KPU_MAX_CST_ENT)
-> > +				dev_warn(rvu->dev,
-> > +					 "Too many custom entries on KPU%d: %d > %d\n",
-> > +					 kpu, fw_kpu->entries, KPU_MAX_CST_ENT);
-> > +			entries = min(fw_kpu->entries, KPU_MAX_CST_ENT);
-> > +			cam = (struct npc_kpu_profile_cam *)fw_kpu->data;
-> > +			offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam);
-> > +			action = (struct npc_kpu_profile_action *)(fw->data + offset);
-> > +			offset += fw_kpu->entries * sizeof(*action);
-> > +			if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
-> > +				dev_warn(rvu->dev,
-> > +					 "Profile size mismatch on KPU%i parsing.\n",
-> > +					 kpu + 1);
-> > +				return -EINVAL;
-> > +			}
-> > +			for (entry = 0; entry < entries; entry++) {
-> > +				profile->kpu[kpu].cam[entry] = cam[entry];
-> > +				profile->kpu[kpu].action[entry] = action[entry];
-> > +			}
-> > +			continue;
-> > +		}
-> > +		entries = fw_kpu->entries;
-> > +		dev_info(rvu->dev,
-> > +			 "Loading %u entries on KPU%d\n", entries, kpu);
-> > +
-> > +		cam2 = (struct npc_kpu_profile_cam2 *)fw_kpu->data;
-> > +		offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam2);
-> >  		action = (struct npc_kpu_profile_action *)(fw->data + offset);
-> >  		offset += fw_kpu->entries * sizeof(*action);
-> >  		if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
-> >  			dev_warn(rvu->dev,
-> > -				 "Profile size mismatch on KPU%i parsing.\n",
-> > +				 "profile size mismatch on kpu%i parsing.\n",
-> >  				 kpu + 1);
-> >  			return -EINVAL;
-> >  		}
-> > +
-> > +		profile->kpu[kpu].cam_entries2 = entries;
-> > +		profile->kpu[kpu].action_entries2 = entries;
-> > +		ret = npc_alloc_kpu_cam2_n_action2(rvu, kpu, entries);
-> > +		if (ret) {
-> > +			dev_warn(rvu->dev,
-> > +				 "profile entry allocation failed for kpu=%d for %d entries\n",
-> > +				 kpu, entries);
-> > +			return -EINVAL;
-> > +		}
-> > +
-> >  		for (entry = 0; entry < entries; entry++) {
-> > -			profile->kpu[kpu].cam[entry] = cam[entry];
-> > -			profile->kpu[kpu].action[entry] = action[entry];
-> > +			profile->kpu[kpu].cam2[entry] = cam2[entry];
-> > +			profile->kpu[kpu].action2[entry] = action[entry];
-> >  		}
-> >  	}
->
-> Could this loop overflow and hang the kernel if firmware specifies more
-> than 65535 entries?
->
-> The loop variable 'entry' is declared as int at the top of the function,
-> but in the from_fs path, 'entries' is read directly from the firmware
-> blob:
->
->     entries = fw_kpu->entries;
->
-> In the non-from_fs path, entries is capped:
->
->     entries = min(fw_kpu->entries, KPU_MAX_CST_ENT);
->
-> But in the from_fs path there is no cap on entries. If a corrupt or
-> malicious firmware file specifies fw_kpu->entries with a very large
-> value, the loop could run for an extremely long time or cause other
-> issues.
->
-> The kernel should not rely on filesystem data being well-formed.
-> Validation is needed for the from_fs case.
->
-> This was raised by Simon Horman during v3 review on 2026-03-10. The
-> author acknowledged this in v3 saying they would fix it in v5, but the
-> issue persists in the current version.
-ACK. Last AI review suggest is - either to use "int" as loop variable or do a capping
-on the value. I did modify it to "int".
+You are correct and I will have some more morning caffeine. :) I had one
+question but the patch looks good regardless, should have acked it
+preemptively.
 
