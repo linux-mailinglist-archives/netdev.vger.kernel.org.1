@@ -1,165 +1,152 @@
-Return-Path: <netdev+bounces-270604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270605-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IHtlIgFuwWnDTAQAu9opvQ
-	(envelope-from <netdev+bounces-270604-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:44:49 +0100
+	id sNFqLFprwWkVTAQAu9opvQ
+	(envelope-from <netdev+bounces-270605-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:33:30 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 038252F8BAD
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:44:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 396982F84FB
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 17:33:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 24611324157A
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:04:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 250FB32A6ADF
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 16:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DADB3BF66D;
-	Mon, 23 Mar 2026 16:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC2F73BC670;
+	Mon, 23 Mar 2026 16:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="eL72NYEl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hMScEXi5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E353BED40
-	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 16:01:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAA13BC691
+	for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 16:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774281698; cv=none; b=A2JymbU12THYPpUh8CKFHO0lnNYc0WBPxqKO1T/s8C4uirS+imnX3jip555Isq3rVwVmx5B/GHnqGVri5et+/GI8bfsqSrJq3TwyO3IeSkB1hDoauclF/kcyPE+aFsE6eWyiqvkqk1sPhCnAMOTayv9ratYmDcJKfUIrsbdS/mQ=
+	t=1774282370; cv=none; b=q8SRHwoAxm2h8dfTDSbLOmTugGDpsU9e12IsBsqcYs45zeILUDF1wjDvTpFD27ffb30r8eZ2d2gLmean7Pp3bMw+VAVXpTUBeMoP8LQJRGMMh41ykLxnWkacyvFtlAv6byeeyJvjI4Er9J1UwteWVOLuIE2MZ8yPir8a4K5ZsJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774281698; c=relaxed/simple;
-	bh=nRir5v+6LbzdGv9qh2mWXxT+gSGB0K8Hs1BfKYmoCMg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f+Pd2MG6nSveJ1ZD9scqpdgte/B8vOEK4mXkd8K8Lv8WhQEhKsvdiFDma9l6lR1cC9gzrzGEEUgVJtTgr7UlR81TT8PJ68HUpr/C3vzCkUZh3kJ+jTACylwbpi8AvcdDomHRDj0dNzlrfpaZGFN4i1XP3oWWpi5ouoYBWO1eLzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org; spf=pass smtp.mailfrom=bitbyteword.org; dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b=eL72NYEl; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bitbyteword.org
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-8cd7c372929so382171985a.0
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 09:01:37 -0700 (PDT)
+	s=arc-20240116; t=1774282370; c=relaxed/simple;
+	bh=VOFUyeohAJ07OONVhdkNQ8waaN87UYJH1sjvCbOQG3g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PrPLHmFl6xfGyFr+klBLaIx24/bTJPx1xzGJH+McubZnrCayrKZlwAueWfUl+zAmoyIvGtLJxoeKRgy5lFBiK0NNf10TNC+HAhfK4sD8r32V9hwHrzp1LDK9B+JXk6J3FAlXMX7i6AfKuRfjUdPTfBL02MVCHN+sVNN/TEjxO/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hMScEXi5; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4836cd6e0d4so5707085e9.3
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 09:12:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bitbyteword.org; s=google; t=1774281696; x=1774886496; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BV4QS+yC5xdWAGmIg+LeuXzS9pCzT00lLs26Yre9ABc=;
-        b=eL72NYElWH2iC+/O1dmlJJitOP/i4JgbyCbHwvkJIV9nicRPRbCmh3INfW9Cvc+Fss
-         ScNnJgOAjYoj6017h7+Eex+P7DBptEMHyjD3rV0T82bNfAG4FaVJ8M6egqeam5iISaoY
-         yx8Vz3luFBC8AfR4Hc/dG6xaMjTS/TFRgAkORnyNadABV2LxcKQgfM8C6AfwXl4e8Mqc
-         cZue/EyTQ2fFKC7cHvMrSKnuvY82Jk669RhdPK6yEY7yOBAPDjWXmrjigU7Ng36OYif1
-         fBSQwQ0MmidefDnfw1cxSfZ7VGJQ4bp9ok3JQPIqhkjllGoxILlhJ4Y69gEKU+2zAeaB
-         Jf6A==
+        d=gmail.com; s=20230601; t=1774282367; x=1774887167; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VOFUyeohAJ07OONVhdkNQ8waaN87UYJH1sjvCbOQG3g=;
+        b=hMScEXi5oDc/Q9cO5lVi7FeYllwzX3sPXhHM2aifh9ArFcI614Y0dSnIm92CzK4gMx
+         Gd9dZqvXvSncME7f/3KZ+RbeiWq8ehwqg5OR2iPqxHAXq2S8IFa4FfiK40wLAnuPovw2
+         Pn3MIr8bf2kwQ8hTQTgsXDiOtmxG3q7CD6t9CbrCtQYyfM9ILqCs+RcMxUKaac5Ca8hG
+         X7ce8munO36jPAGRwn27WmBrs+IF/i4TqFhCAiQmWzKy8sOGsBK2cOALrzuh5ZanbEWD
+         WLrqqztfOb3734r/pz4fLcwaT/mgtj9kwOYf30FXbjMf4yfJLzS+/m2TeP1KrsH409Ll
+         E71A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774281696; x=1774886496;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=BV4QS+yC5xdWAGmIg+LeuXzS9pCzT00lLs26Yre9ABc=;
-        b=EtCNb7BrBhTvwHwQ20fn+oWB9oeisRt0lyKUeXK10ff1vMQP3caa2en2Do+TTxpHst
-         fL4NQaTa6doChb8bBpvCSJK6y0sTZc5jyIJ2jNntKU28Uz7Zjfj1CQYzftNObgbFUZGF
-         uBU0uBLHjhfqosjNDLk4PGzXW3otsFKKwNUbq25MFBlkuns2PL+J2aR4fMiDGVmsUuFa
-         9CuOYJgjsX3oxQ1sHYa2eQg0ChKYn78bkrSgjPxz3zGYGT9OSHBrAHFV/iW8yjiFL7B0
-         SF45SysJ7jNTtBKuNdXk/qxGWmXHoa26xhUars48nIF/ufmNYp/j9fblNgMv5dgToOvF
-         MOqw==
-X-Forwarded-Encrypted: i=1; AJvYcCUhJFYXpTLnIo+FW4j89cGAIS4zlCwKb5yx2zjzHHGZM3B6sOcBd20ksIvngbVKcCSmSLWnSSo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6ktqjrOzY7hTmVDsRr/FmnBPj+PheP5r9DxW6bN4vHiTtvuAU
-	arZHFVYApWuJYsQ2jv7ytAGCHy92KMoyykuiwzqvvu0f9woOg46WuvUWHUjhE/uF6E8=
-X-Gm-Gg: ATEYQzzCuiuNK8GdEv32pFLZg0J0tJDW0qw/Ho8mDMu4LmSOXEBPLU7wdZw0tQMpUht
-	5oLQ5DF+5LsIrWtlJ5mOsfpXAH1fCpyeWMKKp9lcJIposd6Jm5TlgkbjhZ1bJH3HFNPLkf7b4/I
-	YAOVJR3v7VsEe7mNDbh8QpUrkDCtm7chINtkB5M4QYXG93Y6W4WUNd2Hz5TrWzPPAc7jbdMDEOG
-	af41nXaqrC0yL5eCHOgXzGhYftN+DQLeKUtAaefq8i7DAFacNOWL5tekT0SNdWfaNuBgDvhg43K
-	fO4iwSX9bGC1lRQMmQEMgtfkG6KTqfngnEwzp0Py/wK5zJkiaUQaUq+q+e7WABUAzuidV+XSb3A
-	IoWCAxLORld8f7bpnDzVan5DCLnKBrPhXA5mPRryF2szmb/aO3KaTOJXv+1nPoUx3mzi5b7xpei
-	tmOtpbUJQHJWi6Fqbs/3IxJAN/dn68qDGD0bDkHGQt9u4xqQmiW3CTWC86iBOjU5SK1Q==
-X-Received: by 2002:a05:620a:4707:b0:8cf:e933:d5e8 with SMTP id af79cd13be357-8cfe933ee7dmr479191185a.44.1774281696047;
-        Mon, 23 Mar 2026 09:01:36 -0700 (PDT)
-Received: from vinmini.lan (c-73-143-21-186.hsd1.vt.comcast.net. [73.143.21.186])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cfc9088df1sm843364185a.25.2026.03.23.09.01.35
+        d=1e100.net; s=20251104; t=1774282367; x=1774887167;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VOFUyeohAJ07OONVhdkNQ8waaN87UYJH1sjvCbOQG3g=;
+        b=lvwWPvWtDFxaEk+Yy5Ic1fGO1ZrJkW7rNnhZk8u0GIf328bEZyKFRwZFOJMN5G1KDZ
+         Pr4BzsFLJeBwFRdFozWayOSWne3exmqLHAsZyMs6GjSwK8jlj8tT2EzfPpULfh2xAI78
+         NtkmTCaMABDW+KG7zz45Yz2pG3HU/93H3lj8o30tMuy/UrfMgJIQdbXIhWTwK4YSBf/V
+         C6zvDPINtFge07vqhKre84918IwE9hwK3fgvLgvGwxyMBZ8tC8HzyfWNgvCh7pXF89bc
+         ghL5y4g2DjvjcrMPa0FRTf54TYrITwpfJb+t1S5wDuadTbPy9wefIZNn6cWd0Kxe99aE
+         46kA==
+X-Forwarded-Encrypted: i=1; AJvYcCWegQZ3cwGVLQ0rVc3wW0jxxbp613tGYXhSVwIQq2xyn/dvgBLKeRGTYrRBE2o/eLbbdz/6Ggc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmA500Z42/uQ9qrfE9JLaieNaxpNbuTgvyksBhTrfvrRLVBj/M
+	tXV3Go/NNMuOLdicpWRIeLxM3SeMWNKFnrV94SUgumIGtNzYSZDteu/1
+X-Gm-Gg: ATEYQzyBdqdWeLZTTiHdaUAsgFY5H6Fy35UFgbcAddWBWn9Gkgk/vex51Fi+SgS0scW
+	r9pJ/sUrHemdOYpYumqf+xjxbsYz2me6ol3pHd/yPJzlx92xcWGegPaLKoawgQvElJvnWUdIwQW
+	x4kXuoIo0nF763IDTlzhpw+I9pcZdRkp/X3296Zw6+Y7Gs+IXNj2LoBBfTRuyy6oH5PXfjH/K2j
+	cIpS+DYGMXXaezHgRk/AHj3HO4voe6TjdVQWZ7ZojyMG/RKjP9Znsxx2mlmvqScZbbMz6Mg7y/e
+	DfcVE12ybllpRim6ybp9QCFxV83n28TnB7+przdaR+ZnQtWmrIilbAm58AETCoxLkISYZ8x9bgf
+	zJIyehU7UgEHvbACO43g7WkCeTC1JDBC7s+WwzP6O+2OqF0Vm0lHC3V7nFpugja+Nmv4UbEJMyx
+	zXhdQuP896TQegWFM=
+X-Received: by 2002:a05:600c:1f86:b0:477:9c9e:ec7e with SMTP id 5b1f17b1804b1-486fee2e4efmr94768485e9.6.1774282367163;
+        Mon, 23 Mar 2026 09:12:47 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d50a:b400:653e:51cc:7cba:e6df])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486fe889652sm117964405e9.2.2026.03.23.09.12.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2026 09:01:35 -0700 (PDT)
-From: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>
-To: 
-Cc: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
+        Mon, 23 Mar 2026 09:12:46 -0700 (PDT)
+Date: Mon, 23 Mar 2026 18:12:42 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH v2 16/19] net: devlink: Use trace_call__##name() at guarded tracepoint call sites
-Date: Mon, 23 Mar 2026 12:00:35 -0400
-Message-ID: <20260323160052.17528-17-vineeth@bitbyteword.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260323160052.17528-1-vineeth@bitbyteword.org>
-References: <20260323160052.17528-1-vineeth@bitbyteword.org>
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
+	Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v6 1/4] net: dsa: add driver-private pointer to
+ struct dsa_bridge
+Message-ID: <20260323161242.52u35huiot3khq5w@skbuf>
+References: <cover.1774136876.git.daniel@makrotopia.org>
+ <4ff5b936b1f4ad31ffe132aaef798d247a8ac812.1774136876.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4ff5b936b1f4ad31ffe132aaef798d247a8ac812.1774136876.git.daniel@makrotopia.org>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bitbyteword.org:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270604-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[bitbyteword.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270605-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[bitbyteword.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vineeth@bitbyteword.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 038252F8BAD
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 396982F84FB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Replace trace_devlink_trap_report() with trace_call__devlink_trap_report()
-at a site already guarded by tracepoint_enabled(), avoiding a redundant
-static_branch_unlikely() re-evaluation inside the tracepoint.
-trace_call__devlink_trap_report() calls the tracepoint callbacks directly
-without utilizing the static branch again.
+On Sun, Mar 22, 2026 at 12:18:58AM +0000, Daniel Golle wrote:
+> When a DSA driver offloads a bridge to firmware, it typically receives a
+> firmware-assigned bridge identifier (e.g. a FID) that must be stored and
+> retrieved by subsequent operations. Without a place to store this in the
+> DSA core's bridge structure, drivers must maintain a parallel list of
+> bridge objects and search it on every join, leave, and FDB operation.
 
-Suggested-by: Steven Rostedt <rostedt@goodmis.org>
-Suggested-by: Peter Zijlstra <peterz@infradead.org>
-Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
----
- net/devlink/trap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Why list?
 
-diff --git a/net/devlink/trap.c b/net/devlink/trap.c
-index 8edb31654a68a..d54276dcd62fb 100644
---- a/net/devlink/trap.c
-+++ b/net/devlink/trap.c
-@@ -1497,7 +1497,7 @@ void devlink_trap_report(struct devlink *devlink, struct sk_buff *skb,
- 
- 		devlink_trap_report_metadata_set(&metadata, trap_item,
- 						 in_devlink_port, fa_cookie);
--		trace_devlink_trap_report(devlink, skb, &metadata);
-+		trace_call__devlink_trap_report(devlink, skb, &metadata);
- 	}
- }
- EXPORT_SYMBOL_GPL(devlink_trap_report);
--- 
-2.53.0
-
+What's wrong with a driver-level array for lookup? The bridge.num is
+guaranteed to be between 1 and ds->max_num_bridges.
 
