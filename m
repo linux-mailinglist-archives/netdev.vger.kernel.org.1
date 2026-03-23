@@ -1,114 +1,150 @@
-Return-Path: <netdev+bounces-270770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270771-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0KkSNzy7wWm/UwQAu9opvQ
-	(envelope-from <netdev+bounces-270770-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:14:20 +0100
+	id 0AvsHom7wWm/UwQAu9opvQ
+	(envelope-from <netdev+bounces-270771-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:15:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E9DF2FE235
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:14:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 229AE2FE272
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 23:15:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 774C4304DF18
-	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:11:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ACB8F30C11FA
+	for <lists+netdev@lfdr.de>; Mon, 23 Mar 2026 22:12:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1DAE381B14;
-	Mon, 23 Mar 2026 22:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02E1382F0E;
+	Mon, 23 Mar 2026 22:12:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="foxgY4sE"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="noCTwJeM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF51F330650;
-	Mon, 23 Mar 2026 22:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7FD381B14;
+	Mon, 23 Mar 2026 22:12:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774303903; cv=none; b=VQmyHo0SDI1nofoWjXUIBOg75ug7I/njzfBkgVCeckdQLrFz9LXPHBjr/eVsxYgEiOeXQNUHKW6CILnScoT1nmf7p53j4Xy5oJW1GXJUmiryuoHfsZl4HETyfYCZqs0MYDKf7HA88eOtA6DKUaNOkUoWzmKyDo3hWg41AhNJd8I=
+	t=1774303935; cv=none; b=GCerr6/vFEvXynE9FYVJVV7J5ZzRK0M4BSt80zzHc7ZkASv2DtBeO7L69L48g2JxecfnkN402m+7y/Li8hqUt5yFbCaa9yThxT0/3ok5W6PiOWZauX2+b7yhsK8KatJvVg8BArrSOIi4bBBwAQiDfRFJT3R0JXUeqhVsRuQE7hQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774303903; c=relaxed/simple;
-	bh=oi8pjN7S8In4Z2xn0fpwQqK47XTGPsQdn3qfqTF7dX8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FyKjwigx3bOgd5fpaT56HCse8Bdxff9vp/FGNCIpXz2T1GKHDETKjkPISeyk0ptGq8sSe8k4GhTO3EYYf+CZaJ6C/cgN5F6UUGqVxhMBarHdmRvg894mwboyHlalCmFSiD+bLtc6J4BnLDWZX+cD/57WZVQ9SYKqeL96ieGILG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=foxgY4sE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A59CC4CEF7;
-	Mon, 23 Mar 2026 22:11:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774303903;
-	bh=oi8pjN7S8In4Z2xn0fpwQqK47XTGPsQdn3qfqTF7dX8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=foxgY4sE9/S2TyMt81Nfyp4W+6MLwcTd2iIbfFxaZvwmPmULWriF72z1W3SWuHe+7
-	 6f2/rOwXEwLxBPayD3IvxJKXqnnX862QMt4Z7WrubScr1fBlTsMp6W6ZRTgfE6IbnK
-	 PD5B9D0jrVwnca51opvMgShf6RcTZRSGG2yEdB0988pD9lQ0BOsXsnztE4jpDF8azH
-	 PsBhXo61VswqovpBChJ2e+9au780kdn7OooL11EBPomJxnC9TWnN3OMIZm7bEMhCBd
-	 NxMs78pr7YCPfqnS/FsnF66EHfcHGEIhU/4XAilQnH7/F0/Ui+vfZazqjahzs3jbV8
-	 Tm5kjxbgM1h/A==
-Date: Mon, 23 Mar 2026 15:11:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, linux-afs@lists.infradead.org, horms@kernel.org,
- alok.a.tiwari@oracle.com, davem@davemloft.net, marc.dionne@auristor.com,
- linux-kernel@vger.kernel.org, security@1seal.org, stable@kernel.org,
- pabeni@redhat.com, anderson@allelesecurity.com, jaltman@auristor.com,
- edumazet@google.com
-Subject: Re: [PATCH net 2/5] rxrpc: Fix use of wrong skb when comparing
- queued RESP challenge serial
-Message-ID: <20260323151137.2fff6da3@kernel.org>
-In-Reply-To: <3585122.1774302668@warthog.procyon.org.uk>
-References: <20260323144541.3ef887b7@kernel.org>
-	<20260321014543.3892478-2-kuba@kernel.org>
-	<20260319150150.4189381-3-dhowells@redhat.com>
-	<1433905.1774080919@warthog.procyon.org.uk>
-	<3585122.1774302668@warthog.procyon.org.uk>
+	s=arc-20240116; t=1774303935; c=relaxed/simple;
+	bh=3xLIvwqrrXfWdoPtAt7OK3eVmeQqeYbfqRtKss4uPX0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SsOCufXk7nXctT8FmxnEAavFvqpC2+UGwqdqX5Jz7gG0SUPxotrydXlEkjnnKqfROgx4Ui3ngSf/0kFGIfXzlsPgZaXGfEPmmqyuzEW0xbqMHWgT3xuEDDgy0UO23t7AHiqUnz35qloo93eHSRctYzgkFXtyh2S7LLaXmfz5wZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=noCTwJeM; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=SI0+KwkPfwgoDdX+0jEvH5cFTJRTk67LUQ/ONMeOpow=; b=noCTwJeMau3v7UV4VnKCLpWr8W
+	hRXYUl4+OExs9pxY2TJcr2o32iliV9RSn3RC+oFjgYV3efZnpsd8Du461lFenp5kt1BIelV4DQcSa
+	W2WRCGcQidhFzFUWZuanxinEGa7W4CUzIfW5/C4vR82SiVdrk1Xqrb1bwK2BKSLS5DeA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w4nV8-00D0AX-Ki; Mon, 23 Mar 2026 23:11:58 +0100
+Date: Mon, 23 Mar 2026 23:11:58 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: Mark Brown <broonie@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Liam Girdwood <lgirdwood@gmail.com>, Lee Jones <lee@kernel.org>,
+	Pavel Machek <pavel@kernel.org>, Peter Rosin <peda@axentia.se>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
+	Tom Rix <trix@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
+	linux-spi@vger.kernel.org, linux-leds@vger.kernel.org,
+	linux-fpga@vger.kernel.org, driver-core@lists.linux.dev
+Subject: Re: [PATCH 04/10] regulator: of: switch to using
+ class_find_device_by_fwnode()
+Message-ID: <09072374-65e7-4792-af7e-97d7df93f9bd@lunn.ch>
+References: <20260322-remove-device-find-by-of-node-v1-0-b72eb22a1215@gmail.com>
+ <20260322-remove-device-find-by-of-node-v1-4-b72eb22a1215@gmail.com>
+ <360a8b4a-6507-417a-9fc1-c53b14868657@sirena.org.uk>
+ <acGFksyx3SA0kJ5b@google.com>
+ <7d46803e-b285-4e9c-8856-10100fa0ea85@sirena.org.uk>
+ <cf92122d-6b15-458a-bf89-189a0a6874f7@lunn.ch>
+ <193e194a-498f-464f-b22c-c283c16db6c1@sirena.org.uk>
+ <acGzJV3vKhuty3nd@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <acGzJV3vKhuty3nd@google.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270770-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270771-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,gmail.com,axentia.se,armlinux.org.uk,intel.com,linuxfoundation.org,vger.kernel.org,lists.infradead.org,lists.linux.dev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5E9DF2FE235
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 229AE2FE272
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 23 Mar 2026 21:51:08 +0000 David Howells wrote:
-> Btw, do you know how to credit the AI site with reporting something?  For
-> instance for syzbot gives me a Reported-by: line that carries something that
-> can be used as an email address.  There were other things in the AI report,
-> some of which I added patches for.
+On Mon, Mar 23, 2026 at 02:41:03PM -0700, Dmitry Torokhov wrote:
+> On Mon, Mar 23, 2026 at 09:36:07PM +0000, Mark Brown wrote:
+> > On Mon, Mar 23, 2026 at 09:01:47PM +0100, Andrew Lunn wrote:
+> > 
+> > > How do you handle deprecated OF properties? This is a problem i've run
+> > > into before. A developer needs an ACPI binding, so they blindly
+> > > convert from of_ to device_ without engaging brain. As a result, they
+> > > bring all the deprecated OF properties we want to die into the brand
+> > > new ACPI bindings.
+> > 
+> > Honestly that one hasn't really come up much for me - not too many
+> > deprecated properties.
+> 
+> Given that we position properties as an ABI even if they are deprecated
+> we supposed to handle them forever. Newer properties usually offer
+> benefits over old ones and that is how users get moved over.
 
-I was also wondering about that. syzbot reports are for stuff that's
-already committed. Most of the CI and AI reports are pre-commit.
-IDK if we have a way to attribute issues caught before commits go in.
-I guess AI reviews are an integral part of the process now. We don't
-have a tag for when reviewers/maintainers catch bugs in patches either.
+~/linux/Documentation/devicetree/bindings/net$ grep -r deprecated * | wc
+     75     361    4195
+
+So networking has ~ 75 of them.
+
+Within the OF world, they are ABI and we need to keep them. But we
+don't want them in ACPI or any other firmware. Any code looking for
+properties needs to know what is underneath so it can decide if it
+should look for the deprecated, OF only property, or not.
+
+     Andrew
 
