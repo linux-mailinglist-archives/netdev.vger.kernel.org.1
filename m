@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-270831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270832-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yJkmHQPgwWlhXgQAu9opvQ
-	(envelope-from <netdev+bounces-270831-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 01:51:15 +0100
+	id sOQdIEDgwWlhXgQAu9opvQ
+	(envelope-from <netdev+bounces-270832-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 01:52:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCD6930006A
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 01:51:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 170803000A5
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 01:52:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 51E1C3064F0A
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 00:50:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C151C3027952
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 00:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 854D734D4DE;
-	Tue, 24 Mar 2026 00:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A75344DA8;
+	Tue, 24 Mar 2026 00:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EA1lPRk7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QbBWjCKt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6236B34CFDC;
-	Tue, 24 Mar 2026 00:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40CD2C326F;
+	Tue, 24 Mar 2026 00:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774313420; cv=none; b=sD8pMWXg8qhJ6HznEpWctCqht0EPBYzdQRNjPorLMIRRgNQ3y0hixZzg6Jwpd1PiMHBfrkJjV4gAoRQasvhd0JUe22kdk8239hiE7eJQnlm61YJumhAmbXdlPvMia/A7SLgFJRYj/30EbmJLBnWg3E1QrUBmIfIhIGbwmcJ0Zwc=
+	t=1774313425; cv=none; b=h9m7+s3/cAyZvM8IluygmRllSMkxh6BLmEARj5TNWc5e8rgfE2nIK6rokaWiCb7Ky6DDqcjtR/RL6ShCM0bELDZoNwwQFxsu4uQO4byBmEOkQOK5WqSq3eqHX6IjhyvoM07UBE2pUk8vDNh+OXV+dOOEaH3ofplqhi1VGnNZg7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774313420; c=relaxed/simple;
-	bh=JKi37m02ysGGaDX22rah6C5f382uv4n68JZXkVg1/pw=;
+	s=arc-20240116; t=1774313425; c=relaxed/simple;
+	bh=krx1trM2EwRhUXASRjrcczPnAsg8kGAhhKVfUyBmAyc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DVzDKwpYC3UqykIsoMk3ROud3bVaYHuFMiTA1GTLXKHl/yl8n1c+ZM4H91MDJQ2MWndn6RqSCdL5v/gIz3CYQoI0mIu1bWL7alN9Jhp82FNRw5Qu9yTNH7K2EHMzER4CZsDUcvskPZw80atUkVdx5O5CbB0WsNS/MWrpOv8Oc3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EA1lPRk7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14178C2BCB3;
-	Tue, 24 Mar 2026 00:50:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=TARHGg4CTRcfu+a9aKVIBd8KpqHaV2B1Gmivnxj0o7WhNgN/NOgSoPDr3WwRKUnTr/G4ROSKLzCrIlqnYzDHPXW8l/eeVcSiaYljVMPHdrCXwcWoonACO5I7XorKw///BbcwOiBHKxEcwdHJLI85Jf8CSpa07BeLrTpMBLtpA4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QbBWjCKt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94B2FC4CEF7;
+	Tue, 24 Mar 2026 00:50:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774313420;
-	bh=JKi37m02ysGGaDX22rah6C5f382uv4n68JZXkVg1/pw=;
+	s=k20201202; t=1774313425;
+	bh=krx1trM2EwRhUXASRjrcczPnAsg8kGAhhKVfUyBmAyc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EA1lPRk7femanXt0GavT4f4tPdaMa2ueHPgOVGMETEsdhpOojt20I3hrOri+XQedb
-	 4K3UB+rQ3tDaxkHAe7Rv5nY70rL+aPqNR2IpSr82CgVpKNd3NgjAoCpyoiBx+zHhFh
-	 A7DEfb/50zGe8OdpPck6Cp8clL8q2WnVmc4ht4RZwtT5nhl3q1nti85kI7X+i6lPdm
-	 LXSBBpAsurBm/L8aQueHdae8FRc0uYQOk3tnJ4qq8SfLz8IXouTAjPIrILjofv37uF
-	 9JZNehWFeJF/ndP2kZK9XMf4c1Hqx56/dSw7egIV8ezieQKCjXFZWAiEWTjmnv44BX
-	 GVVTHo79shKdw==
+	b=QbBWjCKtwaEg+bEQnuK1+QOcjehdQI1VC/qpqULXoOSKM3RYkAPHFGn3oM0JGTC7G
+	 edJZHxH6E0va4CTWztfTzBCCHtVnOCUPNN7eRMQvgbYhncZmrw170NAzEvr5svMRYj
+	 KFWl52/53KjTXZP6j9oKEcp0aAIbKH7SA/RxMo8qadaOvI9tISxtXD53EQVg5FvCt0
+	 i/XQR4+xrTxzeQLOj9SXArud6jEQnghOptGSR74AmAcdl6ezW+ajhCxWK7TjNTXZnR
+	 quJvkGtJgBcpK3xAmv3Kxge3jvQvRJO5WLmKYB1EPKdiUqe6ICKGdBSl4ssdAqaRpT
+	 JBG40gMdQBhUQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D04F3808200;
-	Tue, 24 Mar 2026 00:50:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DDD3808200;
+	Tue, 24 Mar 2026 00:50:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,20 +55,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: airoha: add RCU lock around
- dev_fill_forward_path
+Subject: Re: [PATCH] ieee802154: atusb: drop redundant device reference
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177431340803.395707.9019086790298315376.git-patchwork-notify@kernel.org>
-Date: Tue, 24 Mar 2026 00:50:08 +0000
-References: <20260320094315.525126-1-dqfext@gmail.com>
-In-Reply-To: <20260320094315.525126-1-dqfext@gmail.com>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: lorenzo@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ <177431341353.395707.10248845346932260597.git-patchwork-notify@kernel.org>
+Date: Tue, 24 Mar 2026 00:50:13 +0000
+References: <20260305104313.15898-1-johan@kernel.org>
+In-Reply-To: <20260305104313.15898-1-johan@kernel.org>
+To: Johan Hovold <johan@kernel.org>
+Cc: stefan@datenfreihafen.org, alex.aring@gmail.com,
+ miquel.raynal@bootlin.com, andrew+netdev@lunn.ch, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pablo@netfilter.org,
- horms@kernel.org
+ linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -78,13 +77,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-270832-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[datenfreihafen.org,gmail.com,bootlin.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-270831-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
@@ -98,29 +97,30 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CCD6930006A
+X-Rspamd-Queue-Id: 170803000A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 20 Mar 2026 17:43:15 +0800 you wrote:
-> Since 0417adf367a0 ("ppp: fix race conditions in ppp_fill_forward_path")
-> dev_fill_forward_path() should be called with RCU read lock held. This
-> fix was applied to net, while the Airoha flowtable commit was applied to
-> net-next, so it hadn't been an issue until net was merged into net-next.
+On Thu,  5 Mar 2026 11:43:13 +0100 you wrote:
+> Driver core holds a reference to the USB interface and its parent USB
+> device while the interface is bound to a driver and there is no need to
+> take additional references unless the structures are needed after
+> disconnect.
 > 
-> Fixes: a8bdd935d1dd ("net: airoha: Add wlan flowtable TX offload")
-> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+> Drop the redundant device reference to reduce cargo culting, make it
+> easier to spot drivers where an extra reference is needed, and reduce
+> the risk of memory leaks when drivers fail to release it.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: airoha: add RCU lock around dev_fill_forward_path
-    https://git.kernel.org/netdev/net/c/1065913dedfd
+  - ieee802154: atusb: drop redundant device reference
+    https://git.kernel.org/netdev/net-next/c/4e9b1994a105
 
 You are awesome, thank you!
 -- 
