@@ -1,265 +1,280 @@
-Return-Path: <netdev+bounces-271323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271324-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iMYSOh0Kw2lKnwQAu9opvQ
-	(envelope-from <netdev+bounces-271323-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:03:09 +0100
+	id mIwKA4MNw2lKnwQAu9opvQ
+	(envelope-from <netdev+bounces-271324-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:17:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E091931D15A
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:03:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FE7431D3DF
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:17:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 14E22301F401
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 22:03:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 92367303CE38
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 22:13:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A93333442;
-	Tue, 24 Mar 2026 22:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B84A3C65F4;
+	Tue, 24 Mar 2026 22:13:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QFXIfA2d"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OLYPZkjo"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010030.outbound.protection.outlook.com [40.93.198.30])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD4219343E;
-	Tue, 24 Mar 2026 22:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.30
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774389784; cv=fail; b=SQNQaQD6Qpjp8zJxVQK9xILmFh6XCeiPsHoACJ5JdkujEmx5eirYF979Vw4woo7mTfjHazZ3e6jjCip2UjE91GliEYYDAUs3SMNSH06tB38QdLr0BkRaY4BrAdkOduUacO69C6P5B2Or1KvI3cPO2qBrzrTyGeR+Y9UiJcIEq+Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774389784; c=relaxed/simple;
-	bh=dRVGlqyz8pdMxRs+KPm001x6dkv5jawHoq4E5Et1EGA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=oYI1PtYmG7WxwMFt2hHi1QeoePh8EOUHMh41yWzvUfRP4UYf6ihg4MXOuZR3vk41U2/ewJh57YU7dxOG8CfuBVf9Xsz2wJ2Z10kJrL7tBZ7UwI6pVIixZsJy59nxWnhGPLhtUteizNamZV0NkCHrxrCv4ATRB003ONJYXP4dees=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QFXIfA2d; arc=fail smtp.client-ip=40.93.198.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sW0Ks6qD4ZVGPvpU32BQuNyGuKa7GQqVQbeJRIpPzQYBbwexVGQ+CiNWLRh5ZBZy7s7/pLvCiV2HJ0lD1IiQD0Ve6x6qE5+nAuEKssojjdYuef7pjKalc+szdEmuhjQP3sxjfpew26WJ/3Rg+paeTKthP6WrDzzY7nqbtiZRUwowVWiy0w4qJjX7mjUYCuQ3Z8iiUHF9uGcPKRXD80P9bacMRlJL13f3kQAVphias6srkAS4zKzYNbnhYg+cqE3KCDe+60NGPGsXGxB/wRhX8po9AgBria/ZnZoFb6oHhAKgdFBRGffz9Tw8Fg4zqGHum2Z7/mSMyK9v+H/0XPCS1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=49pnHdzsDn9LK0XpCTusidbFnmMJGfCueJjrLHSpE40=;
- b=GJqRr7b+XB/lR+MVALw5LDSdLS9c+PrK6HCG5MqCorkGc/yCQzhKj76V6fNSuJps2GZtFV70sNi+Z229gtxNefNHCStJVswVkqe3axbjnON2T883TE+6Krs8SGU/iF3YjiimALyzJh+JKYpcLtDhvvTQxvIh9aY7CFaZNmX90p09+DvCaZ6Jgah0HS2FhitPTQMPI8bkiD+ptu8617/bOEikPOMmG5u8Zqsk1GFcZC4rkIhWzL6t2BYut4YBOtGC1sdpKhtY+zA06PokTLhamYsVZINmQt/0gNXxaGDaY3+v+wDObloga6lEIaJJNxPvTxtcVxPfq2NraO+wPOIjOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=49pnHdzsDn9LK0XpCTusidbFnmMJGfCueJjrLHSpE40=;
- b=QFXIfA2dkCVw+ukHjn7J0XCOOJQNVTcMO/RACGnpB5xyG+S2QWLk00UdgzB4HIWC2p/knxDiboH0x+0o4mVnlleU6C4Z/7OuHDbkVdj4NKFNVGC0PmaL77fNFAJGszrXcv/ngt8r89LKUuQpbxe/YnqpmOnLqp/YtegMyGZFIIY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by SN7PR12MB6789.namprd12.prod.outlook.com (2603:10b6:806:26b::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Tue, 24 Mar
- 2026 22:02:59 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::9e55:f616:6a93:7a3d]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::9e55:f616:6a93:7a3d%6]) with mapi id 15.20.9745.019; Tue, 24 Mar 2026
- 22:02:59 +0000
-Message-ID: <08c760d3-f33f-46d5-a53d-3f6cd24f431a@amd.com>
-Date: Tue, 24 Mar 2026 22:02:55 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v24 09/11] sfc: obtain decoder and region if committed by
- firmware
-Content-Language: en-US
-To: Dave Jiang <dave.jiang@intel.com>, alejandro.lucero-palau@amd.com,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com
-Cc: Edward Cree <ecree.xilinx@gmail.com>
-References: <20260323113117.2352709-1-alejandro.lucero-palau@amd.com>
- <20260323113117.2352709-10-alejandro.lucero-palau@amd.com>
- <9154b54f-32f9-4963-b25c-be30c4ceb8be@intel.com>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <9154b54f-32f9-4963-b25c-be30c4ceb8be@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0381.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:18f::8) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B8231F99E;
+	Tue, 24 Mar 2026 22:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774390397; cv=none; b=b/eT9dzE5+I86oghNLDrojdpwBTIZRZl9GqmYlGlTsDxtVdo1I83cScPocxB5b6iU8PVf96glfwVvqOYQCBHyg74elOq8+tCqkFPw8wVmHZmRWseZvUuMWijhmCo6M00qLEjgpg20CL+y60OTlDkA/qCW/iEsnIYDZyVmhd/uNs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774390397; c=relaxed/simple;
+	bh=eJI0u7GU1D+LGzKAevVQeNkH32HP3Ejo+OuGGgudv7I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qjGUmj08rD5e9syer/rTyY5HDsDtJH3hWSzs1FOAl6McQp/t1OQhuF0ffpbvIo4MlEdnJ+SpYaBvzyk/bPl42hch+RsaVv3t8oGrcHyqweDzmWpck1Ts3yegIjGaaSjtRDsOZjxxcBoYVNG+V6XmDJaowt5eF70/OizXtaYPxTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OLYPZkjo; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774390395; x=1805926395;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=eJI0u7GU1D+LGzKAevVQeNkH32HP3Ejo+OuGGgudv7I=;
+  b=OLYPZkjoWPJjqSQafbJUCOK1M5al2vy6Cq4wOKBb8y75ifm59/HNX3Zy
+   lUGnWmvocl4UmYw/rNIpfxQpVw3QgoFtlpRq7okee9RAQ+YNpba/UA3Bp
+   3MuSaKzbI9vnOvkl1xFMaA8B+GZAJFTA8CyE2FR/AlHohP7NWZoxs8gqd
+   NEM2RHI9oYvcgrlUqeB+gGjzREa+X3r5GqkHITNxxMaiWov5pu7zbf6iu
+   jVKY69A0qt6KHF3JgW4QCsMtCzDIer6I5bsC9npCiRUiZTE9C6J88uyjt
+   sPcNtu8R+inyqz9BiNk6RIibKOefv0AI7d0PNZ8k7Ic4vnrrldZXRSVdk
+   Q==;
+X-CSE-ConnectionGUID: fTeMfZfaRNqfXHvhJJnxlA==
+X-CSE-MsgGUID: IJxJ2JAaQXKAQErzAydegg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="75492575"
+X-IronPort-AV: E=Sophos;i="6.23,139,1770624000"; 
+   d="scan'208";a="75492575"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 15:13:14 -0700
+X-CSE-ConnectionGUID: 0fTXYyzEStyq9ED4/4r2bQ==
+X-CSE-MsgGUID: zut23cVNTROVq5Rz2nxfPw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,139,1770624000"; 
+   d="scan'208";a="224444423"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 15:13:14 -0700
+Date: Tue, 24 Mar 2026 15:13:08 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	David Kaplan <david.kaplan@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Laight <david.laight.linux@gmail.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v8 02/10] x86/bhi: Make clear_bhb_loop() effective on
+ newer CPUs
+Message-ID: <20260324221308.7sh6afdy6r6tsf4w@desk>
+References: <20260324-vmscape-bhb-v8-0-68bb524b3ab9@linux.intel.com>
+ <20260324-vmscape-bhb-v8-2-68bb524b3ab9@linux.intel.com>
+ <20260324205930.GQacL7Mp7vwGBKX1W7@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SN7PR12MB6789:EE_
-X-MS-Office365-Filtering-Correlation-Id: c6d4cda8-674d-4034-f9bc-08de89f11ca3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|366016|921020|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	B/ZXln+DeF4x/xaXq7J5EeeC4vVuoFAsfcxWH/RzDsx/F5OezvnmK8qEJ6dIy8AcjXgcFRNXRSwcPcZfYz6lNgap/RzUeVav+BdKsBG2CsVcbZSGoGvdH+mHbtVhf08tkvcurr+TeVhsp8Ux33cMtZRsufU49yTEjMrGKXma8kNJfOdgOTrRBpb/6PCP2F8EBxRHIaJq6tajYgSvC+lF+I0DOBA/3S9+EZVWAUUdQ7xcNaDCHt1fscQ09dSf7+4N9D3u8QwaAzw66Cr2QnA3XGx0m0Vr+qaDgP+a9KqYEoOGVlluzAqBzOnGWGuZz4mgjazljJpCKSVNziP4+1T+P4Q7biFaKDrwYdQJ93FB9o6yG4ujIwe8c04tMhvAszbnY8NTzwxL9jV2L/d4Oca7iqRXI10x5WdiNJzFHdn0IZFkLXy/T3AvgGrGmdHlUkCBHL96EYWt1Rmc7c1+cWaVzeIWTGbZ5tHJup+KcD/+j7ccpmkQFfrgjGPD0Wfn2FK04eEHNxAohf2oRpczjLLyoRGQrH5uH/pbDb/pPwcGDfY0v4XIkSrJIzlfFUvojrniyxOtJpHdwR5XGtuwfp3y4MylnEBYGpKSBcNbimU/ndGUUAJquLgCb7prDwaLtrBW6aJVJiR0Uflk8bFhCQAypeWEA3+m3UrA6yAYZLF4VbKEQv0syfrIiElDPWoTAQmqTiJhfWxdJSdMRkQTeicRKHy1C0FioXzOWoRBxECL7h7xdDxYP/+K+T1HgpYvah4fQ+ELKsLS2Xg/YCoENFFmaw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(921020)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aUdPa3B1T2hlTDJIWG5obVdEVXMvYk13cTlXbTNjL3NqM3Jrb1RCYWZTdWpm?=
- =?utf-8?B?a3hGSHZHdjZ6UGpOYTB0WlRaZlRibnZsVGpJazFxWUlUKzVnZ0owaXZST1F1?=
- =?utf-8?B?TU4zYkMyenU5RG44SGs0enI3MW1ObTY2UG81cDdsQjhhT0wyN1YrTkgxcytC?=
- =?utf-8?B?S0h4WWNYV1FCR1hlRWxDcHhZUkEyOC9zbGw3Y09Td05VWmtTN3RRM1gzcEZx?=
- =?utf-8?B?MDFZWVpNK2ZkMmJTT2MwMmpzVWVZMlhvc3pMV0V5WUwxMzZ6dnAvY1VoRTNa?=
- =?utf-8?B?UkpIVElPejFaR0pDd1czMmRSQUpGZHV1K082eisyMmpNcExENkZKQkJHc3M4?=
- =?utf-8?B?bWExcFBaQVNVNlpjUlFXMU9CdVhUZDhnamp2L2ZwVXhTb0hZekdKSXNJclBz?=
- =?utf-8?B?OVRtQlpxdnh1eWg4T1Z1YTErTGc1ZC9aY1oyblNEQ3VvcFEwWm9iSzREOEI3?=
- =?utf-8?B?SVR2QWcwLzFTYkx5bUc1RlRRZm1TaXhaeGd2UmJ6aUZtM09GV1E0RGtXT2Z2?=
- =?utf-8?B?dGg4YzNBdWpZdjBSYmx5LzNYUWN0bjRuY1VWaUNjVEZHb1ZuNDJiTFFUaXJy?=
- =?utf-8?B?SzJxR1pxR2dsNW8zMDlSV2JKTHNGUGdmdjB2QnZjK2l2ZHRHVSs2Q0FHUlNn?=
- =?utf-8?B?ODZNZlA0THBlME4vS0JSQ0ZIR20xOHVHd1dxRkpTcEFDWGJuZVhDVnhta2dP?=
- =?utf-8?B?VnMrTWh1NlhZK0doRk04OEpGem9PeUR3YzBobGFGY0FOR2MvVFZOakpJWWp4?=
- =?utf-8?B?eEx1TnZQMkhwRTNKdTJ4TEd5MTF0NmJHRDhJTnlPMnd4QnNObTFxQllYSjMr?=
- =?utf-8?B?eUErTTlaSjhtTTlUckVqU3RPTmxtK0kwcFM2NVlqMFhOSWppTUdCaDRHVW1L?=
- =?utf-8?B?NXNTZFdmQldzOTJQamlNbzRlYkI5K1l0WEZNbzRNa054RUYwRk8wN0F0SEJE?=
- =?utf-8?B?VSsyN21rSStldDBBY3JkM3JlU3VGeko3cHVIQlN1NkxOUjEyek45UFhkNUlp?=
- =?utf-8?B?WXRUMm5WV3lZOW93ekNiZ1FtTW5vYXJmYXQ4VmwyV1d1MGFFL3IxR0hCcFha?=
- =?utf-8?B?N2dlcW1iS0QvdnBIQjBSdktGRkJIWEdFRVFqOTlCWmpXcDBqcW9xYUNtRUQz?=
- =?utf-8?B?L3JhR3lmcEZGQldJNmJGbHVPYit0RnJhL1dwODBVblVvV0ZyMlNkOHFWNUlx?=
- =?utf-8?B?WmpScnRwV0h6ZjZVb2hTdVdVZFIyR1N1czhpVHlHTFl1eHJmdWx1YThxSWFK?=
- =?utf-8?B?UVNWdmxyc1JCaHp1cUJRZUUyRUxRUW4yTjd6SmRja2JsWTc4dlNSYXVSV3Zy?=
- =?utf-8?B?QXZGZm5YendTVGFPYlVWaVpqOWtNR3hKNVNuL2ZTSy82eUMvR1VoUzVLdHFE?=
- =?utf-8?B?SmZnaU1iNmpYVkdyRXQxUUI5UWltSUYyc285cUNvSHYxaDhwRDZrNHVDOFE4?=
- =?utf-8?B?VGRRT1RjWW5FYmxoWEJ1ODdZeU5pdER4dmVtbCszbjRHNkNOc0lNUHYwd1Rx?=
- =?utf-8?B?SHlRWXBaT0RqVHNIUnpDcDNnMDZWR2VESUgrK2tQRmhjSnpHb01VN3U2YUNx?=
- =?utf-8?B?bEVEdEF3anRUcEF4MDMweEdmaXNJK0FrNlRTVXZ3eXNkd0gvaXpSeE80YlUy?=
- =?utf-8?B?Qi9DdEhpN3hjbkRHZ3JJNm1QSGIvWDlkeE1iYzNJa0R5U2JrYXI2d3ptdTd1?=
- =?utf-8?B?bjQzSHY2NE9PVEZLVmR2TzRHbHhoMnVJSHVpc1h0VmNtZXBlSDFXSTlOZmFP?=
- =?utf-8?B?aEJCUkdMS0F6MEdFS2syaW1uY0tvTUFvSDVTZ2JxVHVCTlJ5aDllNVQ0ZEI0?=
- =?utf-8?B?TTVTWVdlWTlva3dnVkh1WDVRWm90c25zTm0zUmNKVVlFbldGa21mT0RIeTlD?=
- =?utf-8?B?Q2V5K05lbldGOGg5S2NDVEhyRGREbmxTbnF5dlhFamRPWEhuVDQ4OWdKOWpW?=
- =?utf-8?B?WVRpKzlLdmxqNVVqbFNJYlZMNUYxNGRjb0hWN2djdWtHaHUxS1l0SThHMzhs?=
- =?utf-8?B?MjNlWGwvWEk4Vy9uNE1kcHBUU3NzcVFnTzVVUEpNS2NORjFmTHJGU2tjOHpt?=
- =?utf-8?B?SjE3cWpQL1dOQ2xDbytlTW5nNnJyclFTdlQ4NTNqS0FPT0xHZGk4SGgxalRK?=
- =?utf-8?B?WmttTXplME5ZNzcza0ZGS1JYQThVRlFDVHF3SHI2YklqV0hYTWdIdkRzbCtw?=
- =?utf-8?B?c2dhZXJUZmlsN2RCYVVxSHNwd2dnU1RzWEdLUEt1b0xFRWZVaUhGdmRXK25Y?=
- =?utf-8?B?ZnNKWnFZMFdmRXlMdC9pWVNWRUw5aDBxVFRsbjcyZFdzbnJkK0p5MFIvRXVQ?=
- =?utf-8?B?dmZxd2J6NFBtQjYrYjRhNlplaE9PVVdFRnorOWNwaGwvT0EwQmY0dz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c6d4cda8-674d-4034-f9bc-08de89f11ca3
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2026 22:02:59.6281
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gScty4QzxAAXxkkTYX8rqmaKWmdo0pfIXHJC0e+x+9yi2noaDQPnuCoe8oOKc7qRqGLgUKHFZ3t3sxLvTwjF3g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6789
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260324205930.GQacL7Mp7vwGBKX1W7@fat_crate.local>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271324-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[37];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271323-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,vger.kernel.org,intel.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alucerop@amd.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:dkim,amd.com:email,amd.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E091931D15A
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.com:email]
+X-Rspamd-Queue-Id: 9FE7431D3DF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Tue, Mar 24, 2026 at 09:59:30PM +0100, Borislav Petkov wrote:
+> On Tue, Mar 24, 2026 at 11:16:51AM -0700, Pawan Gupta wrote:
+> > As a mitigation for BHI, clear_bhb_loop() executes branches that overwrites
+> > the Branch History Buffer (BHB). On Alder Lake and newer parts this
+> > sequence is not sufficient because it doesn't clear enough entries. This
+> > was not an issue because these CPUs have a hardware control (BHI_DIS_S)
+> > that mitigates BHI in kernel.
+> > 
+> > BHI variant of VMSCAPE requires isolating branch history between guests and
+> > userspace. Note that there is no equivalent hardware control for userspace.
+> > To effectively isolate branch history on newer CPUs, clear_bhb_loop()
+> > should execute sufficient number of branches to clear a larger BHB.
+> > 
+> > Dynamically set the loop count of clear_bhb_loop() such that it is
+> > effective on newer CPUs too. Use the hardware control enumeration
+> > X86_FEATURE_BHI_CTRL to select the appropriate loop count.
+> > 
+> > Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
+> > Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
+> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> > ---
+> >  arch/x86/entry/entry_64.S   | 21 ++++++++++++++++-----
+> >  arch/x86/net/bpf_jit_comp.c |  7 -------
+> >  2 files changed, 16 insertions(+), 12 deletions(-)
+> 
+> Ok, pls tell me why this below doesn't work?
+> 
+> The additional indirection makes even the BHB loop code simpler.
+> 
+> (I didn't pay too much attention to the labels, 2: is probably weird there).
+> 
+> ---
+> 
+> diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+> index 3a180a36ca0e..95c7ed9afbbe 100644
+> --- a/arch/x86/entry/entry_64.S
+> +++ b/arch/x86/entry/entry_64.S
+> @@ -1532,11 +1532,13 @@ SYM_CODE_END(rewind_stack_and_make_dead)
+>   * Note, callers should use a speculation barrier like LFENCE immediately after
+>   * a call to this function to ensure BHB is cleared before indirect branches.
+>   */
+> -SYM_FUNC_START(clear_bhb_loop)
+> +SYM_FUNC_START(__clear_bhb_loop)
+>  	ANNOTATE_NOENDBR
+>  	push	%rbp
+> +	/* BPF caller may require %rax to be preserved */
+> +	push	%rax
+>  	mov	%rsp, %rbp
+> -	movl	$5, %ecx
+> +
+>  	ANNOTATE_INTRA_FUNCTION_CALL
+>  	call	1f
+>  	jmp	5f
+> @@ -1557,17 +1559,17 @@ SYM_FUNC_START(clear_bhb_loop)
+>  	 * but some Clang versions (e.g. 18) don't like this.
+>  	 */
+>  	.skip 32 - 18, 0xcc
+> -2:	movl	$5, %eax
+> +2:
+>  3:	jmp	4f
+>  	nop
+> -4:	sub	$1, %eax
+> +4:	sub	$1, %rsi
 
-On 3/24/26 17:38, Dave Jiang wrote:
->
-> On 3/23/26 4:31 AM, alejandro.lucero-palau@amd.com wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> Check if device HDM is already committed during firmware/BIOS
->> initialization.
->>
->> A CXL region should exist if so after memdev allocation/initialization.
->> Get HPA from region and map it.
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->> ---
->>   drivers/net/ethernet/sfc/efx_cxl.c | 24 ++++++++++++++++++++++++
->>   1 file changed, 24 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
->> index 22a7d1d95425..78f926300943 100644
->> --- a/drivers/net/ethernet/sfc/efx_cxl.c
->> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
->> @@ -19,6 +19,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->>   	struct efx_nic *efx = &probe_data->efx;
->>   	struct pci_dev *pci_dev = efx->pci_dev;
->>   	struct efx_cxl *cxl;
->> +	struct range range;
->>   	u16 dvsec;
->>   	int rc;
->>   
->> @@ -82,6 +83,24 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->>   		return PTR_ERR(cxl->cxlmd);
->>   	}
->>   
->> +	cxl->cxled = cxl_get_committed_decoder(cxl->cxlmd, &cxl->efx_region);
->> +	if (!cxl->cxled || !cxl->efx_region)
->> +		return -ENODEV;
->> +
->> +	rc = cxl_get_region_range(cxl->efx_region, &range);
->> +	if (rc) {
->> +		pci_err(pci_dev,
->> +			"CXL getting regions params from a committed decoder failed");
->> +		return rc;
->> +	}
->> +
->> +	cxl->ctpio_cxl = ioremap(range.start, range_len(&range));
->> +	if (!cxl->ctpio_cxl) {
->> +		pci_err(pci_dev, "CXL ioremap region (%pra) failed", &range);
->> +		return -ENOMEM;
->> +	}
->> +
->> +
->>   	probe_data->cxl = cxl;
->>   
->>   	return 0;
->> @@ -89,6 +108,11 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->>   
->>   void efx_cxl_exit(struct efx_probe_data *probe_data)
->>   {
->> +	if (!probe_data->cxl)
->> +		return;
->> +
->> +	iounmap(probe_data->cxl->ctpio_cxl);
->> +	cxl_unregister_region(probe_data->cxl->efx_region);
-> Would a device_put() on the region dev be sufficient here? Not sure if everything should be torn down if SFC didn't create the region to begin with and only retrieved it via cxl_get_commited_decoder()?
->
-> DJ
+%rsi needs to be loaded again with $inner_loop_count once per every
+outer loop iteration. We probably need another register to hold that.
 
+>  	jnz	3b
+> -	sub	$1, %ecx
+> +	sub	$1, %rdi
+>  	jnz	1b
+>  .Lret2:	RET
+>  5:
+> +	pop	%rax
+>  	pop	%rbp
+>  	RET
+> -SYM_FUNC_END(clear_bhb_loop)
+> -EXPORT_SYMBOL_FOR_KVM(clear_bhb_loop)
+> -STACK_FRAME_NON_STANDARD(clear_bhb_loop)
+> +SYM_FUNC_END(__clear_bhb_loop)
+> +STACK_FRAME_NON_STANDARD(__clear_bhb_loop)
+> diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+> index 70b377fcbc1c..a9f406941e11 100644
+> --- a/arch/x86/include/asm/nospec-branch.h
+> +++ b/arch/x86/include/asm/nospec-branch.h
+> @@ -390,6 +390,7 @@ extern void write_ibpb(void);
+>  
+>  #ifdef CONFIG_X86_64
+>  extern void clear_bhb_loop(void);
+> +extern void __clear_bhb_loop(unsigned int a, unsigned int b);
+>  #endif
+>  
+>  extern void (*x86_return_thunk)(void);
+> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+> index 83f51cab0b1e..c41b0548cf2a 100644
+> --- a/arch/x86/kernel/cpu/bugs.c
+> +++ b/arch/x86/kernel/cpu/bugs.c
+> @@ -3735,3 +3735,11 @@ void __warn_thunk(void)
+>  {
+>  	WARN_ONCE(1, "Unpatched return thunk in use. This should not happen!\n");
+>  }
+> +
+> +void clear_bhb_loop(void)
+> +{
+> +	if (cpu_feature_enabled(X86_FEATURE_BHI_CTRL))
+> +		__clear_bhb_loop(12, 7);
+> +	else
+> +		__clear_bhb_loop(5, 5);
+> +}
 
-I do not think so. The region will be around as current region creation 
-is "linked" to the root decoder. Only if the root decoder is removed 
-will the region release action be invoked. As I have mentioned when 
-replying Jonathan, maybe that should change.
+This is cleaner. A few things to consider are, CLEAR_BRANCH_HISTORY that
+calls clear_bhb_loop() would be calling into C code very early during the
+kernel entry. The code generated here may vary based on the compiler. Any
+indirect branch here would be security risk. This needs to be noinstr so
+that it can't be hijacked by probes and ftraces.
 
+At kernel entry, calling into C before mitigations are applied is risky.
 
-Thank you
+> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+> index 63d6c9fa5e80..e2cceabb23e8 100644
+> --- a/arch/x86/net/bpf_jit_comp.c
+> +++ b/arch/x86/net/bpf_jit_comp.c
+> @@ -1614,11 +1614,6 @@ static int emit_spectre_bhb_barrier(u8 **pprog, u8 *ip,
+>  	u8 *func;
+>  
+>  	if (cpu_feature_enabled(X86_FEATURE_CLEAR_BHB_LOOP)) {
+> -		/* The clearing sequence clobbers eax and ecx. */
+> -		EMIT1(0x50); /* push rax */
+> -		EMIT1(0x51); /* push rcx */
 
+> -		ip += 2;
+> -
+>  		func = (u8 *)clear_bhb_loop;
 
->
->>   }
->>   
->>   MODULE_IMPORT_NS("CXL");
+Although call to clear_bhb_loop() will be inserted at the end of the BPF
+program before it returns, I am not sure if it is safe to assume that
+trashing registers in the path clear_bhb_loop() -> __clear_bhb_loop() is
+okay? Especially, when we don't know what code compiler generated for
+clear_bhb_loop(). BPF experts would know better?
 
