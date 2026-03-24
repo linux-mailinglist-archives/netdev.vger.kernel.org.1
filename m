@@ -1,48 +1,49 @@
-Return-Path: <netdev+bounces-271203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271204-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QEDqIWbPwmnRmQQAu9opvQ
-	(envelope-from <netdev+bounces-271203-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:52:38 +0100
+	id 2DvtA6zOwmnRmQQAu9opvQ
+	(envelope-from <netdev+bounces-271204-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:49:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9789A31A595
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:52:37 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1EA731A4D1
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:49:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D856A3008456
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:47:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D6E7830439F0
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DCE540825B;
-	Tue, 24 Mar 2026 17:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2880D40B6CB;
+	Tue, 24 Mar 2026 17:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KXxOiYAa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOiLfKc7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B036391E55
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 17:47:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E0E40824B
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 17:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774374461; cv=none; b=aa4sqAI4Sp3+nQPSkbzfRP2P4aX68BEcCzJFVzFs9otOFkImfPt26LBFPyhwGa/s9dlHBDWRyHs7epObHcFXQj4wAQRN+vslNWkUj/7oWhLfi8qYPt9EhHoMlf9Pv6lBHGXZQPpubkziaPHcpac+nx4YMhk9kD+ZEkFx8lBAnVw=
+	t=1774374475; cv=none; b=tbuUMrpYs06cvfYxk+kS1tJFm4XWa3t5kRlAUA5FqbFwY7WSJt81xCFvIVKfoes/1AQSUuRJ4cvtFDrgFx+6ZcgGRQGT36+QBP22Y0Iv3wR0nsXR6q02NVVsS+nsR0NJfrNaC/hb03tPNmuQn+0D/WyD6FmDyTol1Ss+684gs4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774374461; c=relaxed/simple;
-	bh=A1eOoOl3KfrucHwVTHSRkOCXPdZRyO6VuVfaQ6x61iM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QtU4+dlxbjYTc4P6oBF1EHW1/DjAq1gmx7Eal68gSoBkd25Pn3VOIZBXBOw1l7wBV3KhxPRbaoeK1EJybIkgMaNL9aMQE1m5dJf7kOQGUSl2DzVIWYpWsIDKvHgbFXYnLC6ul4N45Fcn8PzXv24hhpyLrvtKQWbMtBgfPux9AmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KXxOiYAa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94560C19424;
-	Tue, 24 Mar 2026 17:47:37 +0000 (UTC)
+	s=arc-20240116; t=1774374475; c=relaxed/simple;
+	bh=CcwoNPIwzDuuQUlg2LdF8utRYm++HfK4cMy0kJw7ZBA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q76Te8tyAtrfQB1Pl8fA2Iq+cFif2tuzz8bqLQecIKIW0N/H/S/wm3w3ImjMhIZkKuSP/vte5dH0qAMhq5UA88qSb7mfKnVgIFUrZ10YeUPzePsfGoGwUmwzPopRBETRO4olgBqHzLyKydBrlyoT6aeP4K+FmYnHOa2w5TUJbeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WOiLfKc7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27FD9C2BC87;
+	Tue, 24 Mar 2026 17:47:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774374460;
-	bh=A1eOoOl3KfrucHwVTHSRkOCXPdZRyO6VuVfaQ6x61iM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=KXxOiYAalQ3xnZqcA5cFxBCpaDB8hlOU1m1IcfjFxR79ndDaZP759CoiMTIHjaJDN
-	 fhnIGSAqBBeyzEp3xYBBi/+O6Omegx+sGtngdjqwoTplp9JFmdp77KG9VG4D4QLdbH
-	 5sTnp66yFklFSsNKFg9ZqB0AiaoQ4QbdVpGBqewFT65H+LZYhc6h32vh87aHyZIKli
-	 gdwhUxIHIuoLCtfwDADtYhCz3uUwDQSZIuE2SbB/v6vki1Ijq8zLADjhjnn3QNcvvW
-	 nsMKjRWRnnPBbf3zGKDqZnL0bzvDSAzZ0wlQSh4TmIyE7DzUtOu5AgcHp/fyXDmiWZ
-	 nF2kITsXH6MaA==
+	s=k20201202; t=1774374474;
+	bh=CcwoNPIwzDuuQUlg2LdF8utRYm++HfK4cMy0kJw7ZBA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=WOiLfKc7R14yMJ2K9Vy+655ZJL8xcXk7m0Huucwirb1Wwdc5hs7tHUvVFMeVlUZlk
+	 VCcHaMvVl7HI57nbihCvdjN9r8o18Hpq51qs7zcjptalw3y8OWyISsnltx3YbHPzaf
+	 /z3x2lN7Azan0x0M8CUQVKbFDoNGKgZUIyeoZf5uPh9vFxRRUZU5YgDgUA46f5i6jF
+	 Ucgd9IuTXq05uHt3HWW+a5SZNMSrpFcwQ+7bxxzKyAqqyCM+ZEeVM+MJySR2eeA1jY
+	 RNikcTGQZ4NQetWmLFaXbjgYzlxLo2mGKf3NKSqczYAd7xeGP1z2WafwTm59LoDKRe
+	 8n5VsiFAaYj6A==
 From: hawk@kernel.org
 To: netdev@vger.kernel.org
 Cc: hawk@kernel.org,
@@ -55,14 +56,13 @@ Cc: hawk@kernel.org,
 	jhs@mojatatu.com,
 	jiri@resnulli.us,
 	j.koeppeler@tu-berlin.de,
-	kernel-team@cloudflare.com,
-	Chris Arges <chris.arges@gmail.com>,
-	Mike Freemon <mike.freemon@cloudflare.com>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-Subject: [PATCH net-next 0/5] veth: add Byte Queue Limits (BQL) support
-Date: Tue, 24 Mar 2026 18:46:58 +0100
-Message-ID: <20260324174719.1224337-1-hawk@kernel.org>
+	kernel-team@cloudflare.com
+Subject: [PATCH 0/5] veth: add Byte Queue Limits (BQL) support
+Date: Tue, 24 Mar 2026 18:46:59 +0100
+Message-ID: <20260324174719.1224337-2-hawk@kernel.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260324174719.1224337-1-hawk@kernel.org>
+References: <20260324174719.1224337-1-hawk@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,33 +73,32 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-271203-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-271204-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,mojatatu.com,resnulli.us,tu-berlin.de,cloudflare.com,gmail.com,toke.dk];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	FROM_NO_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,cloudflare.com:email,toke.dk:email]
-X-Rspamd-Queue-Id: 9789A31A595
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B1EA731A4D1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -194,10 +193,6 @@ Patch overview:
   3. veth: add tx_timeout watchdog as BQL safety net
   4. net: sched: add timeout count to NETDEV WATCHDOG message
   5. selftests: net: add veth BQL stress test
-
-Cc: Chris Arges <chris.arges@gmail.com>
-Cc: Mike Freemon <mike.freemon@cloudflare.com>
-Cc: Toke Høiland-Jørgensen <toke@toke.dk>
 
 Jesper Dangaard Brouer (5):
   net: add dev->bql flag to allow BQL sysfs for IFF_NO_QUEUE devices
