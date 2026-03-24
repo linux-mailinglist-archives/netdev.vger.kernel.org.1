@@ -1,192 +1,125 @@
-Return-Path: <netdev+bounces-271337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271338-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IHK3HxEew2mJoQQAu9opvQ
-	(envelope-from <netdev+bounces-271337-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 00:28:17 +0100
+	id zPnlC+sew2knogQAu9opvQ
+	(envelope-from <netdev+bounces-271338-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 00:31:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8466731DBDB
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 00:28:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB9931DBF6
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 00:31:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9FB8C301DA56
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:28:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B06F4301C162
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:31:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7823CAE79;
-	Tue, 24 Mar 2026 23:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WxPOYUy0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A9C3090CD;
+	Tue, 24 Mar 2026 23:31:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22C530EF68
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 23:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.179
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774394890; cv=pass; b=QPd4hpurz9RzPvdWtRoDqCCdVXP5U9OAVzQviFYnsAJuphvbO7bAp64wT4fjsQGsgTmXG7Y6N/xA5GX4bFKH+ZopKcEmMHlHQvmxhtN18raVTv/Hq6EWLulnZJit/69xGAga4LiswTUMYE5NDsNLNjsg60pn54FnKJzlTEdatkY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774394890; c=relaxed/simple;
-	bh=LT2q8PEldt87z3mrWDdYA25Zu4LLlNbQMdEbJVa3TH4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DOgHW6bmgkvPtcNjrhCroRWatfCHkaKG4wP4lPSqeTCkFg3KEw91+PRMkjRmtMDrXFg/6Jd/IofFWlfONdl95cDm7dwyLV2VsLVmrHFbvZkT1wJtSjQxgcTyUDIiarelEsg2yl1d530mRnyXuiMs/j7Qfqzfpw8PTjQ6dviFxFA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WxPOYUy0; arc=pass smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-79a40fb9890so45768297b3.1
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 16:28:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774394889; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JqvDl8lHLni4PefNoRG+L+KVU6gq7yZW8OXMgUvgAqtSyl+vcH2zWuZnN68dOT8up1
-         TWeBg9RuwhI5FS3S3WkzWjk5XuYCCesaNNobqZqQ3Y93e3gXLKjCswUWI3c+mqSd9Nkr
-         gi66a5wgOQrAnf8U/3Rh4cnGtpOj7BJ2xfpFEOXyfZHkF++2ipRS0dptyio8V8JGjBm0
-         Jcr4/faoJ2kP+bcuaVUKk3h1tatq3nkBGlrorkzIvyavy33mbHMc0TKaw5BjFSCEwOxB
-         zXw0PsvujDgfzOFPenzqok3r2HE92qnndLoiE30tvEjfabO5o9o49+ZpBgmNw6J0hViI
-         RlFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=LT2q8PEldt87z3mrWDdYA25Zu4LLlNbQMdEbJVa3TH4=;
-        fh=9iWVOoOihMUyKzXI3bdt7MxgzxKBIKSRqhVR8vyIf0k=;
-        b=cmmcl7lxFhdwNchac+iANv/PsjAcJU0UGWaBzHBLgJfF1Nu0Uhj1iU/KQQxmApczQj
-         CHC15rUNl/YzCLyjpX5QQYZ3FLL0C8otcyKbvzeBDn5JpYIpJ+RNk5kTEd79zRy0mEso
-         ptQ72UQJgQdo1zEslpxfRrrUUx1QzeDv7Uk4yJ9d1hEQvCQlKMuw0IvkaZvH0V0JzOVj
-         Kqz2NhkoeogRBhIr+5+XoDRySeH0lPkUeOFUW900jBJ9lXJXLkV1jHk5NiomAUA2XxMr
-         UV6qHAsjrwD1nDwDHrGke6+zC+gzp32w2SWKPbUkAKthimsWZb8X3GPTvEql1KgIMpKU
-         jDyQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774394889; x=1774999689; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LT2q8PEldt87z3mrWDdYA25Zu4LLlNbQMdEbJVa3TH4=;
-        b=WxPOYUy082lc2OjwB4xhShORA4QxdFRtI+x6ZZ3ALQYlmgNlgflc0CvwJfY2ZiMWCA
-         Pda4hK8u24vnWwuYI/kSIA3qc2f3oDQRS22HgD3blGmLG0pIHFYoVfGESBjQPe3EviDJ
-         sPwfWbP4SiO2fsQ6U/Ogv3TFy00c0vMW13EhAc/wWXPXDJpIYtPqlb+HdbSx1f4bHUfl
-         h4br/PwT23zhZaBPgrgnGI3cgrCDG5jTxLvakOsPIP79Re619iJvl72QjTLXflRAL+vZ
-         2pmBRjiyA6K15DNVWIazxaAlOob38Qv+Heag7N6CQz3Ku7KIsUHwQXhuXn4ybMw9fs29
-         WwwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774394889; x=1774999689;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=LT2q8PEldt87z3mrWDdYA25Zu4LLlNbQMdEbJVa3TH4=;
-        b=k9ZXenXnvmRgZABN3OvzuAdEn0RZulLxCWPJizEKPwWDWcWzSV6MAu/3Ty5revJUl+
-         H2Tt57aNj+4Kh0BZaBPejFZ3cERmrTmJyPhI1iLJhh0zQo2OizjUmn83AdFMznDqSBI1
-         BubXvPZGVMBqjBYDSlc4U093k5fCiBu+uVcNl0l33VV27qK2G5nfGsaegYYXwN/+skHE
-         nCMwlGQcMeSMOyEi0WmEsziIXX7arwsxbw9He28JQ1P2YRfKt0sXWMDxJPyJFfoMLLHQ
-         /ditV2U+p9JKfb9IH5RTgCaEuyFnx5In7cE6FLyiL4lv8mQqYVhM+raTxzbR0R+gWwZt
-         px9g==
-X-Forwarded-Encrypted: i=1; AJvYcCVzwjiDoeUEqPj+lCrwb2PMOQojatAwBa+Z3GagUrtA3menuKbHCUHda/U8vwB31mWBlvPUcK4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLGfrl5ntZw1g7ty9LApfdmpJULqEYxmgXkoKEfYZzRMk1uDl8
-	nMv+wSE6HgGbLR1NWd39Bm5zlU6w1asM5oYYP1Krow7w8eVcmz6LW8J+nrXZN+qO7L7XJ6gAV8r
-	nsPT1wLp8zgSj+ffx7qXQwz03X1rShXQ=
-X-Gm-Gg: ATEYQzysJWhdYNMlPI9f8SI2M759kyX3t33X778JPAMK8l+bLCsP8SQsUNAD2CjRG8y
-	zZfzJLlWvNS8wZZmkx6vUHzLGmvP5kejS+Q+QK4BgJ9D8lkLn3hkIJvKX48tErKLBEhSytjMerg
-	lFwcDqs+A6S1n+P8kCc/dKbQj5H18zNO5T8Pot8TmUOJA3njawrsaOfjwssg7yyalKJe5uRIqJd
-	cy39zZgSQ1Gksqdr3sMIGIzz4kPe2HP8BkHmlu5aw0T/0K6xkjALVHxaLrCkUxNnPXLowekOFXj
-	bRyQo85lMTAlYwokR+A=
-X-Received: by 2002:a05:690c:c0d3:b0:798:36:e110 with SMTP id
- 00721157ae682-79acf6f180fmr15427277b3.62.1774394888606; Tue, 24 Mar 2026
- 16:28:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE081624DF;
+	Tue, 24 Mar 2026 23:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774395110; cv=none; b=Bfr0SdUpfNOXgLir2YckfKOi71nPx2ShZDRYFs48CC0x2u1vsJK+oJ8FB1WmC9FCddrPQC31kwHiV2Xw3FkaIxe8kybwB1nub7N+vGpH61cIypLnvxtWFmGOG5CpsJU3VKaDBX2B53NCwesnHYrOwl3p8BEtgOonxZWDI6eZ3vg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774395110; c=relaxed/simple;
+	bh=FkWCAwi5D50TjF839k3QTQ8Sse/PwE7yi64JOZy7wK8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HPyJ8dgJ1HpfNezMEY6fSZdbpq8jWAYnFh3tFtUK1wupECUhXCDKxvBjFF3J/QDKPk92X59NmrdFqPms43Y5eCtW7014wke9hRI475sH47vc5A/ms3GT0Cm4pG9MEa9621tyv52bAIMiJhEWOrGbprGTeAbfrcbg3ueJ3dHU4Mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1w5BDh-000000003Fe-3wwA;
+	Tue, 24 Mar 2026 23:31:34 +0000
+Date: Tue, 24 Mar 2026 23:31:30 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
+	Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v6 2/4] net: dsa: add bridge member iteration
+ macro and port mask helper
+Message-ID: <acMe0vr5GT8ZSfI3@makrotopia.org>
+References: <cover.1774136876.git.daniel@makrotopia.org>
+ <ff936ce4ad3044102c367c55e7a455ab0020e4b7.1774136876.git.daniel@makrotopia.org>
+ <acCllYmKczZrDgv9@makrotopia.org>
+ <20260323163104.a2d2hbs7jfgsptj3@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260324204016.2089193-1-anzaki@gmail.com> <20260324204016.2089193-2-anzaki@gmail.com>
- <acMB9xSTEmwly8QK@chamomile>
-In-Reply-To: <acMB9xSTEmwly8QK@chamomile>
-From: Ahmed Zaki <anzaki@gmail.com>
-Date: Tue, 24 Mar 2026 17:27:32 -0600
-X-Gm-Features: AaiRm51IbJFq0DzIib_tS9CxsVxmnu9xjmu7KIN3YEOt6boriUdcPPCK74Wy5qM
-Message-ID: <CANczwAHFy1fp4JU4ANJ2Uf-=B2uDP0GejrWUuELz9yf0wu9H2A@mail.gmail.com>
-Subject: Re: [PATCH nf-next v2 1/2] netfilter: flowtable: update netdev stats
- with HW_OFFLOAD flows
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, andrew@lunn.ch, olteanv@gmail.com, 
-	fw@strlen.de, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, 
-	coreteam@netfilter.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260323163104.a2d2hbs7jfgsptj3@skbuf>
+X-Spamd-Result: default: False [-1.46 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271337-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,strlen.de,kernel.org,redhat.com,google.com,netfilter.org];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271338-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anzaki@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,netfilter.org:email]
-X-Rspamd-Queue-Id: 8466731DBDB
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7CB9931DBF6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 24, 2026 at 3:28=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.=
-org> wrote:
->
-> On Tue, Mar 24, 2026 at 02:40:15PM -0600, Ahmed Zaki wrote:
-> > Some drivers (notably DSA) delegate the nft flowtable HW_OFFLOAD flows
-> > to a parent driver. While the parent driver is able to report the
-> > offloaded traffic stats directly from the HW, the delegating driver
-> > does not report the stats. This fails SNMP-based monitoring tools that
-> > rely on netdev stats to report the network traffic.
-> >
-> > Add a new struct pcpu_sw_netstats "fstats" to net_device that gets
-> > allocated only if the new flag "flow_offload_via_parent" is set by the
-> > driver. The new stats are lazily allocated by the nft flow offloading
-> > code when the first flow is offloaded. The stats are updated periodical=
-ly
-> > in flow_offload_work_stats() and also once in flow_offload_work_del()
-> > before the flow is deleted. For this, flow_offload_work_del() had to
-> > be moved below flow_offload_tuple_stats().
->
-> Hm, I think v1 was a simpler approach... except that you innecesarily
-> modified a lot of callsites as Jakub pointed out. I don't see why you
-> need this new callback for netdev_ops.
->
+On Mon, Mar 23, 2026 at 06:31:04PM +0200, Vladimir Oltean wrote:
+> On Mon, Mar 23, 2026 at 02:29:41AM +0000, Daniel Golle wrote:
+> > I'm also planning to introduce dsa_bridge_for_each_member macro in
+> > addition to that which works on (struct dsa_bridge *) and uses
+> > dsa_switch_for_each_bridge_member.
+> 
+> I don't like the dsa_bridge_for_each_member() name. You are likely
+> not considering cross-chip bridging, where a bridge spans multiple
+> dsa_switch structures. That is also a serious reason why your
+> bridge->priv design is not viable (two switches can't lay their eggs
+> in the same basket without overwriting each other).
 
-No new netdev_op, but I added the new stats field (fstats) since having a
-separate field and flag guarantees that no other drivers gets broken and
-no other drivers (that already count offloaded stats) need to be touched.
+dsa_bridge_for_each_local_member() ?
 
-Looking at some drivers, tstats seems to be sometimes used by H/W drivers
-and sometimes not, which just complicates the code semantics if we also use=
- it
-for "H/W flow offloaded" stats. Some of these drivers already read H/W
-MIB registers.
-So I think there is no way around adding a new flag to not break something.
+dsa_switch_for_each_dsa_bridge_member()
+(but that's too close to dsa_switch_for_each_bridge_member imho)
 
-But more importantly, I am not sure if there is no driver that sets
-NETDEV_PCPU_STAT_TSTATS
-**and** report its own offloaded flow stats. If we re-use tsats
-for these, we will double count the offloaded traffic unless we set some
-flag so that nft does not double-count.
+I was planning to have both, dsa_switch and dsa_bridge as parameters,
+of course, limiting the scope to a single dsa_switch.
 
-Also, any driver that already counts offloaded flow traffic and uses
-NETDEV_PCPU_STAT_DSTATS will break if we use tstas (union with dstats).
 
