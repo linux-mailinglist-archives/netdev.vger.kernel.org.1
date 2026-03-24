@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-270865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270866-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAoBFtEJwmliZAQAu9opvQ
-	(envelope-from <netdev+bounces-270865-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 04:49:37 +0100
+	id SJoNFf8NwmlGZQQAu9opvQ
+	(envelope-from <netdev+bounces-270866-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 05:07:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1C11301D9E
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 04:49:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15AF3301EE0
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 05:07:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F3E9530C4DFA
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 03:46:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C194C3069D53
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 04:06:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9C73A1E9F;
-	Tue, 24 Mar 2026 03:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F481398919;
+	Tue, 24 Mar 2026 04:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="W8dBdgZZ"
+	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="PfaN31bo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from mail-m16.yeah.net (mail-m16.yeah.net [1.95.21.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CCD39F16E;
-	Tue, 24 Mar 2026 03:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C464C70818;
+	Tue, 24 Mar 2026 04:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.95.21.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774324003; cv=none; b=M/4ocim4/5PVw79XmXm8xsTnLfQGKrGUaGUEib+ejkHJ96oD1CYwjiwJWBtRwiUuzPa45Q7BiG1F3Jer8mm0A8P5rac8r+jt+8i44O6tVzTYlDdqonth+6chMQNsKIrqzz7tx8lP9zObEVUT1SoFTYRV+yj0UtfkKMJaIraQhlg=
+	t=1774325211; cv=none; b=HfCnQzbKUWURgR/QeW5CjFKsOTLZTqOBGn8otExQ3sLHdeR1M2alT8l67s/0F1WyzpOB5D4AVtPTW45vXDyAcabVKSpUESAoMb9+SD47lHceJrbq4zU5s7K9TUg/1jkK79X/+OKFqHywkVwMvtP7uUNtIAwoQdgfR4zT76I0tEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774324003; c=relaxed/simple;
-	bh=0PeVMEi1xnjHxw1FfnRAZZSarRt0/Dtbi/3bueBnvaY=;
+	s=arc-20240116; t=1774325211; c=relaxed/simple;
+	bh=BpeoYm2me6K+Dc6+M7uak6KdTN0vdOyhFUGGh1WvVVU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NWb119oBtrFidFxbbmaEJwyC/lQyQRaVbpnyahJGUBlZITNFBZfyNvfGIJIS5XMWw+ojF3bxnT04thMXBohGZTD1Ic9vriMDPExzJB6KWnOSGJRfY/fnihHq8DJn41pIpkxLydkehfmXmcj8RzFfQmGTX19snu9kGSUYyFcd4E8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=W8dBdgZZ; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1774323997; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=gfj9pH9HdFGubioadCjBnLlcB4bnm19iAov+QtWe4RQ=;
-	b=W8dBdgZZiD7sit7t3UzflEUwM7kzolxg35RLo84TqrIlkiZseML80/1dP1YdYcRjjoNKsbE4oXCw8pJAec33VGZ60HCJ+4J0CDmB9F/HTiOt7cYA3UKyhv4cIKBZjZgj1LSrIgXaaO/d53kIrXmQJy624hyWPzsbzDrJnWIF7w8=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037026112;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=35;SR=0;TI=SMTPD_---0X.d9ZI5_1774323994;
-Received: from 30.221.131.145(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0X.d9ZI5_1774323994 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 24 Mar 2026 11:46:35 +0800
-Message-ID: <025b7816-ca8e-4cea-bb84-bf324c8c3b22@linux.alibaba.com>
-Date: Tue, 24 Mar 2026 11:46:34 +0800
+	 In-Reply-To:Content-Type; b=Y4m1fklA7fsY7iGfkh9ms+/ePwRKALZJHJ4q9094+utDCdCTtSXKA5tQ7pr6EqTX/4oDZB6R95VNqJWcnD/b/nZYrjkZAspiRn/xY5cA0u5k4NppgYTkFIYTxGHhgzjaaWJimDWCofZqsfB0xd/K6feGBNfCDSlVCgpdGVjakcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=PfaN31bo; arc=none smtp.client-ip=1.95.21.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
+	Content-Type; bh=AEw0ALkfl/eEyK8p9OdBYjDi13UrriYKZIfwNtIhTxU=;
+	b=PfaN31bo6Pa+Muf/7pXaU2aOV5b101wvtrv8P8hsNKqyEWnUsEd9vbvt+nEUn0
+	12XPJkQxBohvsdBVIQxJuIptGU+7aa6BivCdb1DVx4b6uXckO29h6gZefIHtmpXy
+	f1U0KwMWlkUGP/mk+CRTnKQNnGFbXmtfoeeMP94H16Ppk=
+Received: from [7.247.167.152] (unknown [])
+	by gzsmtp2 (Coremail) with UTF8SMTPA id Ms8vCgDnP4LIDMJpyYMBAA--.3218S2;
+	Tue, 24 Mar 2026 12:02:17 +0800 (CST)
+Message-ID: <8f918b23-5877-4963-a048-5783f11f264c@yeah.net>
+Date: Tue, 24 Mar 2026 12:02:15 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,86 +52,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] MAINTAINERS: update PTP maintainer entries after
- directory split
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: tglx@kernel.org, tglx@linutronix.de, richardcochran@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- jstultz@google.com, anna-maria@linutronix.de, frederic@kernel.org,
- daniel.lezcano@kernel.org, sboyd@kernel.org, vladimir.oltean@nxp.com,
- wei.fang@nxp.com, xiaoning.wang@nxp.com, jonathan.lemon@gmail.com,
- vadim.fedorenko@linux.dev, yangbo.lu@nxp.com, svens@linux.ibm.com,
- dwmw2@infradead.org, nick.shi@broadcom.com, ajay.kaher@broadcom.com,
- alexey.makhalov@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- linux-fpga@vger.kernel.org, imx@lists.linux.dev, linux-s390@vger.kernel.org,
- dust.li@linux.alibaba.com, xuanzhuo@linux.alibaba.com, mani@kernel.org,
- imran.shaik@oss.qualcomm.com, taniya.das@oss.qualcomm.com
-References: <20260318073330.115808-1-guwen@linux.alibaba.com>
- <20260318073330.115808-3-guwen@linux.alibaba.com>
- <20260323192232.3a5205dc@kernel.org>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <20260323192232.3a5205dc@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH net v2] virtio_net: Fix UAF on dst_ops when
+ IFF_XMIT_DST_RELEASE is cleared and napi_tx is false
+To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260312025406.15641-1-xietangxin@yeah.net>
+ <20260314124017.59206dac@kernel.org>
+ <CANn89iJHp+nCcAo7tzMTfH5yW2qDsEXP_u=RzdV=DC9ZvDH9Fg@mail.gmail.com>
+ <20260314181243.177d4ab4@kernel.org>
+From: xietangxin <xietangxin@yeah.net>
+In-Reply-To: <20260314181243.177d4ab4@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-CM-TRANSID:Ms8vCgDnP4LIDMJpyYMBAA--.3218S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7CrW3tw4kKF4UXrWDAF43Wrg_yoW8Wr48pa
+	yIqF4S9F4kWrWxCan7t3WFqryjk395ua42gr1kW3sIvr45u3WF9r18Zw45WFn0kr4kXw42
+	van7Xr95KF4UAaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jIzuXUUUUU=
+X-CM-SenderInfo: x0lh3tpqj0x0o61htxgoqh3/1tbiIglAdGnCDMm4NwAA3+
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[yeah.net,none];
+	R_DKIM_ALLOW(-0.20)[yeah.net:s=s110527];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270865-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270866-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[35];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,linutronix.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,nxp.com,linux.dev,linux.ibm.com,infradead.org,broadcom.com,lists.linux.dev,linux.alibaba.com,oss.qualcomm.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[yeah.net];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[guwen@linux.alibaba.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	FROM_NEQ_ENVFROM(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[yeah.net:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,linux.alibaba.com:dkim,linux.alibaba.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B1C11301D9E
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,yeah.net:dkim,yeah.net:email,yeah.net:mid]
+X-Rspamd-Queue-Id: 15AF3301EE0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 
 
-On 2026/3/24 10:22, Jakub Kicinski wrote:
-> On Wed, 18 Mar 2026 15:33:30 +0800 Wen Gu wrote:
->> +PTP EMULATED CLOCK SUPPORT
->> +M:	Wen Gu <guwen@linux.alibaba.com>
->> +M:	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
->> +L:	linux-kernel@vger.kernel.org
->> +S:	Maintained
+On 3/15/2026 9:12 AM, Jakub Kicinski wrote:
+> On Sat, 14 Mar 2026 21:11:33 +0100 Eric Dumazet wrote:
+>>> On Thu, 12 Mar 2026 10:54:06 +0800 xietangxin wrote:  
+>>>> Fixes: f2fc6a54585a ("[NETNS][IPV6] route6 - move ip6_dst_ops inside the network namespace")
+>>>> Cc: stable@vger.kernel.org
+>>>> Signed-off-by: xietangxin <xietangxin@yeah.net>  
+>>>
+>>> The Fixes tag should be:
+>>>
+>>> Fixes: 0287587884b1 ("net: better IFF_XMIT_DST_RELEASE support")  
+>>
+>> I disagree
+>>
+>> What was the situation before this patch ?
 > 
-> I thought David W was supposed to be the main maintainer?
-> Two moderately known developers from a single vendor/company
-> is not enough to delegate this IMO.
+> My thinking process was that it's fairly unusual that the dst is kept
+> because the stack decided so. Normally its the device driver that asks
+> for dst to be kept when its xmit is called. I thought 0287587884b1 was
+> the first time when stack could make the dst decision behind device
+> driver's back. But my analysis was very shallow, could well be wrong.
+Hi Jakub and Eric,
 
+Thank you both for this deep dive.
 
-Thanks for pointing this out.
+As Eric noted, the root cause is architectural (the per-netns dst_ops),
+but virtio_net with napi_tx=N seems to be a particularly vulnerable trigger.
 
-We would also very much prefer for this area to be maintained
-by people with deeper expertise in the clock/timekeeping domain
-(such as David). The reason David was not listed in this version
-is that an earlier attempt to ask about maintainership did not
-receive a reply[1]. So we avoided adding without confirmation.
+I have verified that the TUN driver is not affected (discussed in v1 [1])
+because its lifecycle management of skbs is different.
+However, I haven't check other drivers that might also defer skb freeing.
 
-If David has no objections to being listed here, that would
-definitely be preferable from our perspective. Other suggested
-clock/timekeeping experts would also be very welcome.
+Should I wait for a consensus on a more generic fix in the network core,
+or would it be acceptable to land this targeted fix for virtio_net first
+to address the immediate UAF?
 
-[1] https://lore.kernel.org/all/78489ff1-c2fa-47dc-beb4-54e9410f7d5c@linux.alibaba.com/
+[1] https://lore.kernel.org/all/4b8a6182-da50-4edb-a34a-b75ed784f1e2@yeah.net/
+
+Best regards,
+Tangxin Xie
+
 
