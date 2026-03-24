@@ -1,150 +1,152 @@
-Return-Path: <netdev+bounces-271330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDisNSYWw2lCoAQAu9opvQ
-	(envelope-from <netdev+bounces-271330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:54:30 +0100
+	id YADpM0EXw2lCoAQAu9opvQ
+	(envelope-from <netdev+bounces-271331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:59:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D441D31D851
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:54:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3227A31D8F3
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:59:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4884E3001849
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 22:54:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E08683028024
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 22:58:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433112E5B21;
-	Tue, 24 Mar 2026 22:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C0313C73C4;
+	Tue, 24 Mar 2026 22:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="sYrRafxV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jnjEg8u6"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2B833D6C7
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 22:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356FE33C52E;
+	Tue, 24 Mar 2026 22:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774392844; cv=none; b=HdjRLajH4ItSlPlt7wTUZLsDSFSL9lTIA6h2Tm4QJB4F7bXQVPHN6h6M1GVwuFSkrxdukGeDCWqoE+FTce6Nmt5Hy0EVYiR4NINzbQzVjURQtR3JzpNdZmlJnx/4cfif4g8uauVuTQH3YesWwpAE5yzyFS82WejyYSbNOnvVtbc=
+	t=1774393080; cv=none; b=SdJ0nKnlAMoUGbdGxIHY4Ly0cCFgqhl5nnOdH077CAL4fUUhwXQVB+jEGAwnSHNg9nWUfx3yZ74mz207n1Gjze6nQhc7tg8pQhJnRbn08Xzf7OlE2r7W/yrmGyfczOh7DD7p76507YEI3ryDqjGuWVtMDP032P4Ee1v91PYackc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774392844; c=relaxed/simple;
-	bh=ZyuZ9qoGqgdh9poTQRYTQAip35PttZSzvL7YWxUZhpE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XO055mFL0UqLcRAJlU9J4nX25RWzZGnx9YjDokGmjoYA9/Kjmmh5gnvSLosP2K/vPF3EoruIvrr7HaVyje56+Xa4kUBMZGcByDB5tARvtisRu/Na+MpKq1v9ejZnCB28WzaEggh9DOO8N4Cmf4NbncFCCr+EN40JUwPd1YYjNKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=sYrRafxV; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=QxAjp1qOIQ/krE7SDbSIFLiiWtI9H9h0ogzjwCrC7VE=; b=sYrRafxVZRZJCx8MjR6c3tFoVN
-	E/imbQBgzAxnfbaudKWfjGSmQZNvLOksSofE+VJxZsKeqGd68OjCLp9uJsC5qv0ZKi2jApbnnW/0s
-	20OLoMDW4QTXG9lqdgMOXNsH7q+Ri+0zD2WsFlyMN4Hk6ZdVIGrxXVo0rjL8EgNi7NU2jo6++hBKI
-	Nh/Nb8wU7xHoqRVLIDZn4flj7HjeDWX8qIFDFv+/59UJ26/qw6h7ibOYJvgrGTxSv/mqgtFX3MvLU
-	z9X6KMlXsjjZlpjBH21iXzfOg2HaMlWUpMetjAD1VN1hUSrn8vXhYlVyxDSNplikNAR0yvMV0oYVg
-	ti7waniA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45718)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w5AdL-000000002g0-0xgk;
-	Tue, 24 Mar 2026 22:53:59 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w5AdJ-000000005Sf-0xu7;
-	Tue, 24 Mar 2026 22:53:57 +0000
-Date: Tue, 24 Mar 2026 22:53:57 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Wagner <wagner.daniel.t@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	bcm-kernel-feedback-list@broadcom.com
-Subject: Re: [PATCH net-next] net: phy: bcm84881: add BCM84891/BCM84892
- support
-Message-ID: <acMWBQ8rUm7lpr0h@shell.armlinux.org.uk>
-References: <20260324152503.1522071-2-wagner.daniel.t@gmail.com>
- <acKypS845fm_GB0o@shell.armlinux.org.uk>
- <CAMsLQxFnhPT5TLmwQS14rrgD8xmgs6ymH8Q3ee1KcSqm1XEstw@mail.gmail.com>
- <5ff11a7f-6f92-4488-8138-9f8d6210ae30@lunn.ch>
- <acLtrOrZe0G89MBy@shell.armlinux.org.uk>
- <CAMsLQxFp4hFxTbjBswM3GqX+VsT9G2Y0uP_fDhQkbzJdhbLD2A@mail.gmail.com>
+	s=arc-20240116; t=1774393080; c=relaxed/simple;
+	bh=CMhGjpHVL0E5bl2i3OV14j4oPRoXe7C71tConmD/AU8=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=j9YfUj7AYNFAop+H1Goq5SseZKTuMR6qw7Phx9jDx6YkUphpNI6ldnORXOplxZqed8qGLEbTTtRLSLv8RU9Qq2AuTDC0LEtSrFQwgpGK0QVOau56cSH/5e4iV/hpeC6QyZKtzzBSwGBA1Vsn/98ijO0mIx09gWSQJY02qYg7QkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jnjEg8u6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82B6FC19424;
+	Tue, 24 Mar 2026 22:57:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774393079;
+	bh=CMhGjpHVL0E5bl2i3OV14j4oPRoXe7C71tConmD/AU8=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=jnjEg8u6tA6GdcwIKvw8RwZAOd36Nn7Ho6WTpexn7SIqvHQ/6KqJu2mTfRZYSfOY6
+	 9W3/xDOqV1fsI6aOI3guyoybnNgwD+gPAdDFoi7DS/+YP9ED+KZEru4Gzdj47FIFTz
+	 TXZfHoOWzFClb1Z8zDhufWSVHX2m9qyO6XdiuIc5x0UTs5GkQhWOLQ13qFXJlPT/Vz
+	 tXy/Cwj/N/PKebVR/ScjPK5EFyOTlWfVF7LVmVFzx1aJsnuwylvDTNz8NA0w7g9vku
+	 zK9dHJGPbbQVDx1vES6D39bxf5YX0SRMzlwrSu5EA/oCZrw62PGH5Ysm+53iS/7ppO
+	 hPd8xJTOqWLmg==
+Date: Tue, 24 Mar 2026 17:57:58 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMsLQxFp4hFxTbjBswM3GqX+VsT9G2Y0uP_fDhQkbzJdhbLD2A@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Thierry Reding <thierry.reding@gmail.com>, 
+ "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ linux-tegra@vger.kernel.org
+To: Jon Hunter <jonathanh@nvidia.com>
+In-Reply-To: <20260324121631.771628-3-jonathanh@nvidia.com>
+References: <20260324121631.771628-1-jonathanh@nvidia.com>
+ <20260324121631.771628-3-jonathanh@nvidia.com>
+Message-Id: <177439307874.2078673.11304788250514370726.robh@kernel.org>
+Subject: Re: [PATCH V2 2/3] dt-bindings: net: Fix Tegra234 MGBE PTP clock
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271330-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,vger.kernel.org,broadcom.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	NEURAL_SPAM(0.00)[0.079];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,gmail.com,davemloft.net,vger.kernel.org,lunn.ch];
+	TAGGED_FROM(0.00)[bounces-271331-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: D441D31D851
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,devicetree.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,0.103.194.128:email]
+X-Rspamd-Queue-Id: 3227A31D8F3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 24, 2026 at 09:59:02PM +0000, Daniel Wagner wrote:
-> > Can you confirm whether bit 0 changes depending whether the PHY has
-> > link. I don't know whether that's media link or host-side link, so
-> > I suggest checking both.
-> 
-> Bit 12 does seem to track copper link state in my test:
->   [0s] 0x3107  bit12=1   carrier=1   plugged
->   [4s] 0x2107  bit12=0   carrier=0   unplugged
->   [19s] 0x3107  bit12=1   carrier=0   replugged, PHY sees it
->   [20s] 0x3107  bit12=1   carrier=1   phylib poll catches up
-> 
-> Bit 0 stayed at 1 through all of that, and through ifdown/ifup too.
-> I'm not sure what it is, but it doesn't appear to track either link
-> under the conditions I can test.
-> 
-> Bits[4:1] stayed at 3 through all of it: copper transitions, different
-> copper speeds (1G, 2.5G), ifdown/ifup, on both BCM84891 and BCM84892.
-> No USXGMII codes.
 
-I suggest this is not the same register bit allocation as on
-the bcm84881 in that case.
+On Tue, 24 Mar 2026 12:16:30 +0000, Jon Hunter wrote:
+> The PTP clock for the Tegra234 MGBE device is incorrectly named
+> 'ptp-ref' and should be 'ptp_ref'. This is causing the following
+> warning to be observed on Tegra234 platforms that use this device:
+> 
+>  ERR KERN tegra-mgbe 6800000.ethernet eth0: Invalid PTP clock rate
+>  WARNING KERN tegra-mgbe 6800000.ethernet eth0: PTP init failed
+> 
+> Although this constitutes an ABI breakage in the binding for this
+> device, PTP support has clearly never worked and so fix this now
+> so we can correct the device-tree for this device. Note that the
+> MGBE driver still supports the legacy 'ptp-ref' clock name and so
+> older/existing device-trees will still work, but given that this
+> is not the correct name, there is no point to advertise this in the
+> binding.
+> 
+> Fixes: 189c2e5c7669 ("dt-bindings: net: Add Tegra234 MGBE")
+> Signed-off-by: Jon Hunter <jonathanh@nvidia.com>
+> ---
+>  Documentation/devicetree/bindings/net/nvidia,tegra234-mgbe.yaml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
 
-Also note that phylib's poll "catches up" because the link bit in
-BMSR is intentionally sticky-down to ensure that link-down events are
-not missed - if the link was down and then comes up, it intentionally
-takes two reads to indicate link up to ensure that the link down state
-doesn't get lost.
+My bot found errors running 'make dt_binding_check' on your patch:
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nvidia,tegra234-mgbe.example.dtb: ethernet@6800000 (nvidia,tegra234-mgbe): clock-names:3: 'ptp_ref' was expected
+	from schema $id: http://devicetree.org/schemas/net/nvidia,tegra234-mgbe.yaml
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.kernel.org/project/devicetree/patch/20260324121631.771628-3-jonathanh@nvidia.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
