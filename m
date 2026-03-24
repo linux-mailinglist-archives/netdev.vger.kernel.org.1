@@ -1,201 +1,161 @@
-Return-Path: <netdev+bounces-271259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271260-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OBDALmLnwmnnnAQAu9opvQ
-	(envelope-from <netdev+bounces-271259-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:34:58 +0100
+	id QEIsECPowmnnnAQAu9opvQ
+	(envelope-from <netdev+bounces-271260-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:38:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BDEA31B942
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:34:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BE0631BA0C
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:38:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 981CE31209A7
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:23:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CE9B83006178
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 815982E2665;
-	Tue, 24 Mar 2026 19:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57305303A0A;
+	Tue, 24 Mar 2026 19:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XgTQWuyu"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="dcC2m3A9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C63F2E091E;
-	Tue, 24 Mar 2026 19:23:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70EB22DB7BD
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 19:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774380221; cv=none; b=kKhGMAEa1jZTSmIfYcqXzs0JSBl10Evd2CRO4isK3MPo2uhcUlEqXu15imyq4xei/t2J6Uee5HiPAoTEWTqdYj9X7UodJ8fWT3xEhjPo8h7CxSVqA3AAYQ9E5ITnRWgKJbbVESQrDxiGBBq6XWCshn4UU/jju79tdtD2Dt/c30E=
+	t=1774380766; cv=none; b=Uppkt8aseiPUMTJvrmXN1gvmqopBCLTQlb1xXhojJPk9gKJ8Tbz4TRzKCJsCwvFiHc+tigogZCt7qP1fqLZXbf3zWCWwoNcx0moIsQLV0vGsj7SNYGgLZi78hmM2ueMRhyY8/S+1xXbsRRVNVZimvOOoHUYJh/A9cpbHgRUjzBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774380221; c=relaxed/simple;
-	bh=M6BaYp+o6NW7QEKfWc+kQxWN0t/QRnWTE0dlOGQ3QyY=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=IMz/5W3Ne9ZIgHnJVm4nBrzS9jIWPkPxrT+Kx78EIB3P04NJhzxvGVA4Ai763Gae6YZSI/LGrQUdul5aPLyXI2Iyx5Mkd3DgMKiPh5v2zrMLu0dKjleu7cYuHqWkXmRfL1asM1V6IxWo/CTjbrXtgjRrNSVAonifTfclkk5SSBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XgTQWuyu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B381C19424;
-	Tue, 24 Mar 2026 19:23:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774380221;
-	bh=M6BaYp+o6NW7QEKfWc+kQxWN0t/QRnWTE0dlOGQ3QyY=;
-	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
-	b=XgTQWuyu9PtYdh07P2VXFwTdXiL4+5kvn45rWh57bK4R1NVFS7Me9ZZcUBfPNhWL1
-	 i3xrDU62ZroJfzS9H0dax4EJvzh4/iYYVwxBcD987HUfu/6eKLaz0E6Q7cyeqoiLFh
-	 bvhbi0rAwUIZX2l6PjU38L4haJTDx6S8gdDcDrul1g6lZMfU23EnhDbJGmrkHo1PGQ
-	 OidigxWIePAhuVfzNtssSKrV4Mm5iqndg6etYThUyykUm/gGWjOrNbg49zBhLJq9Wp
-	 SokWsXVkWMJUppJ10zbpJv7R9xZqK+fwpRhSLC+x32hMKJgm8Nzbr0bl3guwhHkSCI
-	 yW7QN4k992Frg==
-Message-ID: <12ad947e-f386-4fcc-9043-bf4f95a7db83@kernel.org>
-Date: Tue, 24 Mar 2026 20:23:33 +0100
+	s=arc-20240116; t=1774380766; c=relaxed/simple;
+	bh=w5Gh1aHtMLP0pN4YGj2boonI7PgtCSWo841DqlsRkjY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=be628/REfkv1ViaxWTU3lVcty4ndNmkQw5JpLWGZOyEHXRLhpi097IgiNdx+CSdRVVnr/hRn9QvYWoPbi6O9AwPtvfLHpJfzLOQgzrE5qDF7xqNt02fm7wK9krHCH/O6qp7+Nn+AH0a2GFmY8tV03ZQy9an1di0MU0h/Ea/lEPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=dcC2m3A9; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=akpVw8GG/D7/uN8//pJi89LeOCQWsdhfC6x7h6MTWYI=; b=dcC2m3A96EFNvYQs64zn13BAav
+	ev4U7xNSrJo2A2rwSaV1I7ASWLHM3uCOY6mQVCmQ49t4f9/grks2GAtvy1ySmd/1qKF1Jmq8XwS4w
+	JrXFvqWB8ZL67sNwHhdXiDETDfAlMGrz3RqXox80ycoafzZG4OEy3ONW4zaYKhfOsJvT6dGbET6zO
+	pgF2Q+xyA16NMeqT0VPAsixYdjxYurRKhzG0ly1FL+k1XLyeBess6bS91otPvu3XC4eoioAxCa81w
+	oc9RE/ORwl1ts93aMYMpi5vhC55SzHdZkkalIWz4EN33OowoQglbBpwYYT28ufZzseB8z6HXDVjdw
+	i69GZ9bg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60794)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w57UX-000000002Y5-1MF1;
+	Tue, 24 Mar 2026 19:32:41 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w57UV-000000005Jj-2ifC;
+	Tue, 24 Mar 2026 19:32:39 +0000
+Date: Tue, 24 Mar 2026 19:32:39 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Wagner <wagner.daniel.t@gmail.com>
+Cc: netdev@vger.kernel.org,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	bcm-kernel-feedback-list@broadcom.com
+Subject: Re: [PATCH net-next] net: phy: bcm84881: add BCM84891/BCM84892
+ support
+Message-ID: <acLm1wdDAFhjJVId@shell.armlinux.org.uk>
+References: <20260324152503.1522071-2-wagner.daniel.t@gmail.com>
+ <acKypS845fm_GB0o@shell.armlinux.org.uk>
+ <CAMsLQxFnhPT5TLmwQS14rrgD8xmgs6ymH8Q3ee1KcSqm1XEstw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-From: Matthieu Baerts <matttbe@kernel.org>
-Subject: Re: [PATCH net v2] mptcp: fix soft lockup in mptcp_recvmsg()
-To: Li Xiasong <lixiasong1@huawei.com>, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
- zhangchangzhong@huawei.com, weiyongjun1@huawei.com
-References: <20260324085131.4187473-1-lixiasong1@huawei.com>
-Content-Language: fr
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260324085131.4187473-1-lixiasong1@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMsLQxFnhPT5TLmwQS14rrgD8xmgs6ymH8Q3ee1KcSqm1XEstw@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271259-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-271260-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,broadcom.com,lunn.ch,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	NEURAL_SPAM(0.00)[0.077];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5BDEA31B942
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 8BE0631BA0C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Li,
-
-On 24/03/2026 09:51, Li Xiasong wrote:
-> syzbot reported a soft lockup in mptcp_recvmsg() [0].
+On Tue, Mar 24, 2026 at 06:54:29PM +0000, Daniel Wagner wrote:
+> Thanks both for the quick review.
 > 
-> When receiving data with MSG_PEEK | MSG_WAITALL flags, the skb is not
-> removed from the sk_receive_queue. This causes sk_wait_data() to always
-> find available data and never perform actual waiting, leading to a soft
-> lockup.
+> On Tue, Mar 24, 2026 at 3:50 PM Russell King (Oracle)
+> <linux@armlinux.org.uk> wrote:
+> > Is the PHY really using 10GBASE-R or is it using USXGMII. The two are
+> > different.
+> [...]
+> > Is there a code in the 0x4011 register which indicates if it uses
+> > USXGMII as opposed to 10GBASE-R ? Please clarify.
 > 
-> Fix this by adding a 'last' parameter to track the last peeked skb.
-> This allows sk_wait_data() to make informed waiting decisions and prevent
-> infinite loops when MSG_PEEK is used.
+> It's USXGMII with symbol replication. The MAC receives the negotiated copper
+> speed, not 10G -- phylink's mac_link_up() is called with the copper speed.
+> Link works at 100M/1G/2.5G with no rate_matching in the driver, which I think
+> wouldn't be the case for 10GBASE-R with rate adaptation.
 
-(...)
+One would expect so.
 
-> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-> index cf1852b99963..401fb2b17685 100644
-> --- a/net/mptcp/protocol.c
-> +++ b/net/mptcp/protocol.c
-> @@ -2006,7 +2006,7 @@ static void mptcp_eat_recv_skb(struct sock *sk, struct sk_buff *skb)
->  static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
->  				size_t len, int flags, int copied_total,
->  				struct scm_timestamping_internal *tss,
-> -				int *cmsg_flags)
-> +				int *cmsg_flags, struct sk_buff **last)
->  {
->  	struct mptcp_sock *msk = mptcp_sk(sk);
->  	struct sk_buff *skb, *tmp;
-> @@ -2048,6 +2048,7 @@ static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
->  		}
->  
->  		copied += count;
-> +		*last = skb;
+> On 0x4011: it reads the same value (0x3107, mode=3) at 1G and at 2.5G copper,
+> not tracking copper speed. There's no separate USXGMII encoding I can find --
+> mode=3 appears to mean "10G SerDes line rate" regardless of protocol, but
+> admittedly I don't have access to data sheets so this is inference.
 
-My bad, my recommendation to move this assignment here was not a good
-idea, because 'skb' can be freed at some points after mptcp_eat_recv_skb
-that can be called here below.
+Looking at the information I have for this register:
+bit 0 should be link bit (0 = link down, 1 = link up)
+bits 4:1 indicates the interface and speed over interface:
+	3  = 10GBASE-R
+	...
+	9, 10, 12 and 13 indicate USXGMII at various link speeds.
 
-If I'm not mistaken, when MSG_PEEK is not used, sk_wait_data() can
-always be called with NULL for the last skb, because the queue is
-supposed to be empty. If not, no need to wait for new packets, so NULL
-can be used. Is that correct?
+So, as you're seeing 3 for this field, that makes me somewhat
+suspicious whether this register is implemented the same on these
+devices.
 
-If yes, then I guess 'last' can be initialised to NULL before calling
-__mptcp_recvmsg_mskq (limit scope), and only set to 'skb' here below,
-when MSG_PEEK is not used (what you had in v1).
+Can you confirm whether bit 0 changes depending whether the PHY has
+link. I don't know whether that's media link or host-side link, so
+I suggest checking both.
 
-Would that work for you?
+Thanks.
 
-Cheers,
-Matt
 -- 
-Sponsored by the NGI0 Core fund.
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
