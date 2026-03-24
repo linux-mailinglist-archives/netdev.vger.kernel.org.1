@@ -1,148 +1,115 @@
-Return-Path: <netdev+bounces-270859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270860-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0EZvC9X+wWnqYgQAu9opvQ
-	(envelope-from <netdev+bounces-270859-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 04:02:45 +0100
+	id sPM7JUD+wWnqYgQAu9opvQ
+	(envelope-from <netdev+bounces-270860-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 04:00:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98C703016F9
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 04:02:44 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76277301673
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 04:00:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AB6FD30364C3
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 02:59:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6BA3530311BC
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 03:00:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33C0388E6A;
-	Tue, 24 Mar 2026 02:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6DB26CE2C;
+	Tue, 24 Mar 2026 03:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="vj3Xv7BZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T3YnVCG6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291DE849C;
-	Tue, 24 Mar 2026 02:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8D622689C;
+	Tue, 24 Mar 2026 03:00:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774321197; cv=none; b=gHIiOrj9XXZ66u9H/Kn8aKMtgUzofdns2Wd8IBIWVD+sUnpW9cwknb5ANcP+7gerFrAuJ0UDROEn8jDz0W4XQmKBEHgI86rFot3uAYSNV7FRORCvKvc0Yk1iKLWaL9LKSHZBxUoFid3hbWmO95IaMhTzWK9hKtar8bXMn9F3DAc=
+	t=1774321207; cv=none; b=S6ifQ/77wNb6sf5ne5EoAwwJQTA8tw0tUkNGbsuIPNNqIYbwnfS/PE5KtlDLsC7wQA36H/4ugrXcFIQ5VRx05cRhXMamhhjAqukp4jSSoCKT5iiutUmNQJw+9MclaP2rFTZb9X/RGX6KCV19rdryJwjw7GSZN2rPvj1+k+7Aq3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774321197; c=relaxed/simple;
-	bh=E5Oy3ZYpo3+Ps5TNqA1cUlIdTyftlK0p+7R4zW8Vt7Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bWzVPS3hwdjez17YxKrR5OYNpF9SAkvQiOzk3qyy22boafAqBboghYT//WERcdyQ15l999SCf5McikeTM/VNGstzZNnqY0CFGvldoLUmTTo0dUWDtA4N/8jKEq/JWkXoYUkPw4Ym4b6lwjeJnr9Bngf2Ldq3SO7CAb3up67jsHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=vj3Xv7BZ; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1774321192; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=B5wXALRpLgA30wVgjjEUsYNnGSqmUm7zNIHZ9rwo58Y=;
-	b=vj3Xv7BZJuogcydkfiH4V/ouBdiWwVK9dFVzdCzozhjIeCUox3zQeIaDqRruxbNxMUYXP4dB3khtY7ciOeF8i8ggS0iqVt50GodvDixLJcUscbwx4YXOP8mvnjBeMqDsdEEMeeHPziM04PVgVvWf1HIfQ6ukZ7p7ZWXNxTYPVVU=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037026112;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=35;SR=0;TI=SMTPD_---0X.d.Lzd_1774321188;
-Received: from 30.221.131.145(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0X.d.Lzd_1774321188 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 24 Mar 2026 10:59:50 +0800
-Message-ID: <9855724f-4543-48b5-bf60-780b5215c103@linux.alibaba.com>
-Date: Tue, 24 Mar 2026 10:59:47 +0800
+	s=arc-20240116; t=1774321207; c=relaxed/simple;
+	bh=8am/PI/eXArNj+ENpOvmq28FMAO5BOgkaX60u3UIPrM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V4VjoURIrwax4ZXT7xeTaTpjUT1JuRRVzs74QN0d2kcIKu+/5O4FdEfEZPVg2K/TABWvf4pyFzory8jhsgFF0CwHKS4/W8BAut55FaXtGhW2IaOsfGn3JYM9ka5iGVrwZnAN++QTSPday437DMDBcquOc1BgbYVlTXawrMliuS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T3YnVCG6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14C2BC4CEF7;
+	Tue, 24 Mar 2026 03:00:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774321207;
+	bh=8am/PI/eXArNj+ENpOvmq28FMAO5BOgkaX60u3UIPrM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=T3YnVCG6ZVQ4YC2tEkSes8Vavy+9W37DmWXJZ6cgVu39Pve7BAh1VMmJqItvToa1H
+	 u3E+TOaOpXfuuIHoQp1sdjq1J2zxWSzShwWuaZb6EWXjpji/lNKLcq0gDL3ykItoyZ
+	 LGDGpZOuTzuMY47s8r3BkpnqVCYJsjQmMOvWhGlj7lyN6YYnCJ4HwK7cJqgvdPdVVY
+	 dplvMSDREtrrT+1hzHyoe94cwTJLxHRqAG4fqwUWMR7eFhlW/1DvUl8fEanGw38AaW
+	 re1DP9jDSw4IphTIiV6XilDSLgCNIdlxnjd5KLc3XVzf7ah8FihiAyG6T/8JL6ZKym
+	 NNjY0ds9SbCYA==
+Date: Mon, 23 Mar 2026 20:00:06 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: ethtool: pass genl_info to the ethnl
+ parse_request operation
+Message-ID: <20260323200006.7f5aa157@kernel.org>
+In-Reply-To: <20260323095833.136266-1-maxime.chevallier@bootlin.com>
+References: <20260323095833.136266-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] ptp: split clock drivers into two subdirectories
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: tglx@kernel.org, tglx@linutronix.de, richardcochran@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- jstultz@google.com, anna-maria@linutronix.de, frederic@kernel.org,
- daniel.lezcano@kernel.org, sboyd@kernel.org, vladimir.oltean@nxp.com,
- wei.fang@nxp.com, xiaoning.wang@nxp.com, jonathan.lemon@gmail.com,
- vadim.fedorenko@linux.dev, yangbo.lu@nxp.com, svens@linux.ibm.com,
- dwmw2@infradead.org, nick.shi@broadcom.com, ajay.kaher@broadcom.com,
- alexey.makhalov@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- linux-fpga@vger.kernel.org, imx@lists.linux.dev, linux-s390@vger.kernel.org,
- dust.li@linux.alibaba.com, xuanzhuo@linux.alibaba.com, mani@kernel.org,
- imran.shaik@oss.qualcomm.com, taniya.das@oss.qualcomm.com
-References: <20260318073330.115808-1-guwen@linux.alibaba.com>
- <20260318073330.115808-2-guwen@linux.alibaba.com>
- <20260323191645.46569808@kernel.org>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <20260323191645.46569808@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270859-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[35];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,linutronix.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,nxp.com,linux.dev,linux.ibm.com,infradead.org,broadcom.com,lists.linux.dev,linux.alibaba.com,oss.qualcomm.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-270860-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[guwen@linux.alibaba.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 98C703016F9
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 76277301673
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-On 2026/3/24 10:16, Jakub Kicinski wrote:
-> On Wed, 18 Mar 2026 15:33:29 +0800 Wen Gu wrote:
->>   drivers/ptp/emulated/Kconfig                 |  61 +++++
->>   drivers/ptp/emulated/Makefile                |  11 +
->>   drivers/ptp/{ => emulated}/ptp_kvm_arm.c     |   0
->>   drivers/ptp/{ => emulated}/ptp_kvm_common.c  |   0
->>   drivers/ptp/{ => emulated}/ptp_kvm_x86.c     |   0
->>   drivers/ptp/{ => emulated}/ptp_s390.c        |   0
->>   drivers/ptp/{ => emulated}/ptp_vmclock.c     |   0
->>   drivers/ptp/{ => emulated}/ptp_vmw.c         |   0
->>   drivers/ptp/ieee1588/Kconfig                 | 179 +++++++++++++
->>   drivers/ptp/ieee1588/Makefile                |  16 ++
->>   drivers/ptp/{ => ieee1588}/ptp_clockmatrix.c |   0
->>   drivers/ptp/{ => ieee1588}/ptp_clockmatrix.h |   0
->>   drivers/ptp/{ => ieee1588}/ptp_dfl_tod.c     |   0
->>   drivers/ptp/{ => ieee1588}/ptp_dte.c         |   0
->>   drivers/ptp/{ => ieee1588}/ptp_fc3.c         |   0
->>   drivers/ptp/{ => ieee1588}/ptp_fc3.h         |   0
->>   drivers/ptp/{ => ieee1588}/ptp_idt82p33.c    |   0
->>   drivers/ptp/{ => ieee1588}/ptp_idt82p33.h    |   0
->>   drivers/ptp/{ => ieee1588}/ptp_ines.c        |   0
->>   drivers/ptp/{ => ieee1588}/ptp_mock.c        |   0
->>   drivers/ptp/{ => ieee1588}/ptp_netc.c        |   0
->>   drivers/ptp/{ => ieee1588}/ptp_ocp.c         |   0
->>   drivers/ptp/{ => ieee1588}/ptp_pch.c         |   0
->>   drivers/ptp/{ => ieee1588}/ptp_qoriq.c       |   0
->>   26 files changed, 296 insertions(+), 253 deletions(-)
+On Mon, 23 Mar 2026 10:58:32 +0100 Maxime Chevallier wrote:
+> The .parse_request() ethnl operation extracts the relevant attributes
+> from the netlink request to populate the private req_info.
 > 
-> emulated sounds good but the ieee1588 doesn't sit well with me.
-> IEEE1588 doesn't describe tickers and external signals.
-> Let's leave them in the main directory? Or call it hw even if
-> it's not 100% accurate? In MAINTAINERS you can exclude subdir
-> with X:
+> By passing genl_info as a parameter to this callback, we can use
+> the GENL_REQ_ATTR_CHECK() macro to check for missing mandatory
+> parameters.
+> 
+> This macro has the advantage of returning a better error explanation
+> through the netlink_ext_ack struct.
+> 
+> Convert the eeprom ethnl code to this macro, as it's the only command
+> yet that has mandatory request parameters.
 
-Thanks for the suggestion. Leaving the network-oriented drivers
-in the main directory and using X: in MAINTAINERS to exclude the
-emulated ones makes sense to me. The layout will be adjusted in
-the next version.
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+
+Thanks1
 
