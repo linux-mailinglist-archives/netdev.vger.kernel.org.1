@@ -1,274 +1,163 @@
-Return-Path: <netdev+bounces-271142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uEQRBqW0wmkvlAQAu9opvQ
-	(envelope-from <netdev+bounces-271142-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:58:29 +0100
+	id aC9pMX/EwmlflgQAu9opvQ
+	(envelope-from <netdev+bounces-271144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:06:07 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9693318796
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:58:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 405AA319ACA
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:06:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2F9C4302514B
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 15:51:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CF7C330BC207
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 15:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A0635FF73;
-	Tue, 24 Mar 2026 15:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D43B388397;
+	Tue, 24 Mar 2026 15:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OdI6f/H9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF0229BDB1
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 15:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761F537F733;
+	Tue, 24 Mar 2026 15:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774367514; cv=none; b=DPbF3WkKYFl9SqlERzKesuaiPQslo5EdjWfExOTQXjPO3ukX7djgJeQzK3SqMyuhraateC7xUiDRJl7FByzKCr4QC1Lv2OrtRb/UEFRHPXpqvrBP5sFrrJ4Pk5V00kYVBSvR3NW97/xxF/QkBD0NgqnGxhcKiWN51PY7GYM+VeU=
+	t=1774367546; cv=none; b=Wp1/VoCAORFveY7MN5ks2VteAtgbCPtRRJnP9rBpkxY5QgNcRuURz/ywWb7DkazmlYo4vkDibpN+GbEt4mccPAGVFfS42ah8nn26Egq3KB06Ug42wzYoM7xnCiD7h1jAMpK6twlvvqSv+bmiKtFVW0QobZjdqjBgzc7E4bxW5nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774367514; c=relaxed/simple;
-	bh=lw3SGBZnbqfBd3k4kaQ++Ias7IoeKd0LljUgi3Kt+1o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HAoXpmTfIoE9148TcoyxBuBiaSn4tKDeUbYtIkWogbe0D+qVUDu9m2yTPIB4P0/jGQifPW2jk9tFy8/9sSF3GoMYAndLC1qUoYbLoW9yn4bFXD4s/TUEGbdHPJrdrElpoGkkgU+U7r5we/6Af4pVAzPHibWqXMtMUQ7q8h5/j6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4AAE94C2C37F04;
-	Tue, 24 Mar 2026 16:51:13 +0100 (CET)
-Message-ID: <ee24874c-fa9f-4685-9ca9-dc2fbadb581f@molgen.mpg.de>
-Date: Tue, 24 Mar 2026 16:51:12 +0100
+	s=arc-20240116; t=1774367546; c=relaxed/simple;
+	bh=HyEhqdBvfa3r9tYRrYSgodtwHMxVIZ/6Kc/3pc0VDK0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C8czaNRNYq8PnkP5LBz1/K4CSQw9ZgBBUXqH8/lyioimSvBkCZ3lJkSTW5ZmG5c+aMwQyD2ZOyHyKmc6McDIRAf1xZ4XXIs+9RoUNJCqsIY+0HY1xuX1sZlWchfxw97dZLJNXqVjSjq1rO3Pe/A84e8ZRLcusvSjmYHEJEpdoLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OdI6f/H9; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774367545; x=1805903545;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HyEhqdBvfa3r9tYRrYSgodtwHMxVIZ/6Kc/3pc0VDK0=;
+  b=OdI6f/H9jEZOExpcH8b4S/+/sG/tPTHIABSWoDwNbWXMiT5Rh/0v6X6Y
+   LnQOc3zA0sRIs0rJpVq87QRr4C4J4aFAmuqkyVreEvUKtVFBbnaxgAXMb
+   bMU4Z2BpBunhLm3W0YCl6FMoZ5n2MdoQeB70Y1uXTCFAsKxKyD86AYqAO
+   8G6zeJ2Tp+IfksZprMNmxNLCLOLYSldVPCkHDDM+adATcNzJp6NNGfmBB
+   41Z4ClekuH/BKcumdW+X55ITawvi1BNASD5iwZobPWKNGPOPWU4YJsXPK
+   v2+PsnZnkAPlNoyc0WwNG3tX+qOip+s0kY0nv0RKnNHgGdxF3XMMahqVS
+   w==;
+X-CSE-ConnectionGUID: LtxnCQX+TgWaPlmjTKljQQ==
+X-CSE-MsgGUID: ULvY6SqTSIWJYuNFyctQmg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="77989926"
+X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
+   d="scan'208";a="77989926"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 08:52:24 -0700
+X-CSE-ConnectionGUID: ktOYh7fOQeW8ut6uCDpn3g==
+X-CSE-MsgGUID: 4HzScUrOR0qbSB6nEheW1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
+   d="scan'208";a="223462626"
+Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
+  by orviesa006.jf.intel.com with ESMTP; 24 Mar 2026 08:52:22 -0700
+Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w543H-000000006vF-1GXR;
+	Tue, 24 Mar 2026 15:52:19 +0000
+Date: Tue, 24 Mar 2026 16:51:45 +0100
+From: kernel test robot <lkp@intel.com>
+To: Artem Lytkin <iprintercanon@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, fujita.tomonori@gmail.com,
+	andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu,
+	ojeda@kernel.org, dakr@kernel.org
+Subject: Re: [PATCH 4/4] rust: phy: add interrupt support
+Message-ID: <202603241610.omlicT8x-lkp@intel.com>
+References: <20260323201925.8405-4-iprintercanon@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] ice: add 200G_AUI8 PHY type
- definitions and wire them up
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
- netdev@vger.kernel.org, Paul Greenwalt <paul.greenwalt@intel.com>,
- Simon Horman <horms@kernel.org>
-References: <20260324153542.674859-1-aleksandr.loktionov@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260324153542.674859-1-aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.46 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260323201925.8405-4-iprintercanon@gmail.com>
+X-Spamd-Result: default: False [9.84 / 15.00];
+	URIBL_BLACK(7.50)[rust-lang.github.io:url];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271142-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271144-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mpg.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,gmail.com,lunn.ch,umich.edu,kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	R_DKIM_ALLOW(0.00)[intel.com:s=Intel];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	GREYLIST(0.00)[pass,body];
+	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,mpg.de:email]
-X-Rspamd-Queue-Id: C9693318796
-X-Rspamd-Action: no action
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	NEURAL_SPAM(0.00)[0.694];
+	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,rust-lang.github.io:url,git-scm.com:url,01.org:url]
+X-Rspamd-Queue-Id: 405AA319ACA
+X-Rspamd-Action: add header
 X-Rspamd-Server: lfdr
+X-Spam: Yes
 
-Dear Aleksandr,
+Hi Artem,
 
+kernel test robot noticed the following build warnings:
 
-Thank you for your patch.
+[auto build test WARNING on rust/rust-next]
+[also build test WARNING on linus/master v7.0-rc5 next-20260323]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Am 24.03.26 um 16:35 schrieb Aleksandr Loktionov:
-> ice_link_mode_str_high[] lacks entries for phy_type_high bits 5-14
-> (all 200G PHY types on E825C); ice_dump_phy_type() prints nothing for
-> them when ICE_DBG_LINK is set (e.g. 'ethtool -s ethX msglvl 0x10').
-> The loop also iterates all 64 bits against a 5-entry array - undefined
-> behaviour for any matched bit beyond the end.  Add strings for bits
-> 5-14 and guard the loop with ARRAY_SIZE(), falling back to "unknown"
-> for unrecognised bits.
-> 
-> ICE_PHY_TYPE_HIGH_200G_AUI8_AOC_ACC (bit 13) and 200G_AUI8 (bit 14)
-> were absent from ice_adminq_cmd.h; ICE_PHY_TYPE_HIGH_MAX_INDEX capped
-> at 12 caused ice_update_phy_type() to skip them entirely, leaving both
-> invisible to 200G speed requests.  Add the definitions and bump
-> MAX_INDEX to 14.
-> 
-> Wire the two new types throughout the driver:
-> - ice_get_media_type(): handle all ten 200G phy_type_high values so
->    E825C ports no longer return ICE_MEDIA_UNKNOWN.  AOC_ACC interfaces
->    map to FIBER; bare AUI4/AUI8 to DA with cage, else BACKPLANE
->    (matching existing AUI2/CAUI2 logic); CR4_PAM4 to DA; SR4/FR4/LR4/
->    DR4 to FIBER; KR4_PAM4 to BACKPLANE.
-> - ice_get_link_speed_based_on_phy_type(): return ICE_AQ_LINK_SPEED_200GB
->    for both new types so ice_update_phy_type() enables them correctly.
-> - phy_type_high_lkup[13,14]: AUI8 is 8-lane 25G-per-lane; no
->    200000baseSR8/CR8 ethtool modes exist yet, so approximate with
->    SR4_Full/CR4_Full - matching AUI4 at indices 11-12.  FIXME once
->    those link modes land upstream.
-> - ICE_PHY_TYPE_HIGH_MASK_200G: add bits 13-14 for the minimum-speed
->    floor in ice_mask_min_supported_speeds().
-> 
-> Suggested-by: Paul Greenwalt <paul.greenwalt@intel.com>
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Cc: Simon Horman <horms@kernel.org>
-> Cc: Paul Menzel <pmenzel@molgen.mpg.de>
-> ---
-> v3 -> v4: add ARRAY_SIZE() OOB guard in ice_dump_phy_type(); cover all
->            ten 200G phy_type_high values in ice_get_media_type(); add FIXME
->            to lkup[13..14] for missing SR8/CR8 modes; rename subject
->            fix subject; fix debug enable example (ethtool, not modprobe);
->            add AUI8 speed mapping, lkup[13-14], MASK_200G bits 13-14,
->            and AUI8->SR4/CR4 approximation comment
-> v1 -> v2: add ICE_PHY_TYPE_HIGH_MAX_INDEX update
-> ---
->   .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  4 ++-
->   drivers/net/ethernet/intel/ice/ice_common.c   | 31 ++++++++++++++++++-
->   drivers/net/ethernet/intel/ice/ice_ethtool.c  |  4 ++-
->   drivers/net/ethernet/intel/ice/ice_ethtool.h  |  8 +++++
->   4 files changed, 44 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> index 859e9c6..efe985c 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> @@ -1044,7 +1044,9 @@ struct ice_aqc_get_phy_caps {
->   #define ICE_PHY_TYPE_HIGH_200G_KR4_PAM4		BIT_ULL(10)
->   #define ICE_PHY_TYPE_HIGH_200G_AUI4_AOC_ACC	BIT_ULL(11)
->   #define ICE_PHY_TYPE_HIGH_200G_AUI4		BIT_ULL(12)
-> -#define ICE_PHY_TYPE_HIGH_MAX_INDEX		12
-> +#define ICE_PHY_TYPE_HIGH_200G_AUI8_AOC_ACC	BIT_ULL(13)
-> +#define ICE_PHY_TYPE_HIGH_200G_AUI8		BIT_ULL(14)
-> +#define ICE_PHY_TYPE_HIGH_MAX_INDEX		14
->   
->   struct ice_aqc_get_phy_caps_data {
->   	__le64 phy_type_low; /* Use values from ICE_PHY_TYPE_LOW_* */
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-> index ce11fea..2f3a268 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -84,6 +84,16 @@ static const char * const ice_link_mode_str_high[] = {
->   	[2] = "100G_CAUI2",
->   	[3] = "100G_AUI2_AOC_ACC",
->   	[4] = "100G_AUI2",
-> +	[5] = "200G_CR4_PAM4",
-> +	[6] = "200G_SR4",
-> +	[7] = "200G_FR4",
-> +	[8] = "200G_LR4",
-> +	[9] = "200G_DR4",
-> +	[10] = "200G_KR4_PAM4",
-> +	[11] = "200G_AUI4_AOC_ACC",
-> +	[12] = "200G_AUI4",
-> +	[13] = "200G_AUI8_AOC_ACC",
-> +	[14] = "200G_AUI8",
->   };
->   
->   /**
-> @@ -107,9 +117,14 @@ ice_dump_phy_type(struct ice_hw *hw, u64 low, u64 high, const char *prefix)
->   	ice_debug(hw, ICE_DBG_PHY, "%s: phy_type_high: 0x%016llx\n", prefix, high);
->   
->   	for (u32 i = 0; i < BITS_PER_TYPE(typeof(high)); i++) {
-> -		if (high & BIT_ULL(i))
-> +		if (!(high & BIT_ULL(i)))
-> +			continue;
-> +		if (i < ARRAY_SIZE(ice_link_mode_str_high))
->   			ice_debug(hw, ICE_DBG_PHY, "%s:   bit(%d): %s\n",
->   				  prefix, i, ice_link_mode_str_high[i]);
-> +		else
-> +			ice_debug(hw, ICE_DBG_PHY, "%s:   bit(%d): unknown\n",
-> +				  prefix, i);
->   	}
->   }
->   
-> @@ -605,13 +620,25 @@ static enum ice_media_type ice_get_media_type(struct ice_port_info *pi)
->   		switch (hw_link_info->phy_type_high) {
->   		case ICE_PHY_TYPE_HIGH_100G_AUI2:
->   		case ICE_PHY_TYPE_HIGH_100G_CAUI2:
-> +		case ICE_PHY_TYPE_HIGH_200G_AUI4:
-> +		case ICE_PHY_TYPE_HIGH_200G_AUI8:
->   			if (ice_is_media_cage_present(pi))
->   				return ICE_MEDIA_DA;
->   			fallthrough;
->   		case ICE_PHY_TYPE_HIGH_100GBASE_KR2_PAM4:
-> +		case ICE_PHY_TYPE_HIGH_200G_KR4_PAM4:
->   			return ICE_MEDIA_BACKPLANE;
->   		case ICE_PHY_TYPE_HIGH_100G_CAUI2_AOC_ACC:
->   		case ICE_PHY_TYPE_HIGH_100G_AUI2_AOC_ACC:
-> +		case ICE_PHY_TYPE_HIGH_200G_AUI4_AOC_ACC:
-> +		case ICE_PHY_TYPE_HIGH_200G_AUI8_AOC_ACC:
-> +			return ICE_MEDIA_FIBER;
-> +		case ICE_PHY_TYPE_HIGH_200G_CR4_PAM4:
-> +			return ICE_MEDIA_DA;
-> +		case ICE_PHY_TYPE_HIGH_200G_SR4:
-> +		case ICE_PHY_TYPE_HIGH_200G_FR4:
-> +		case ICE_PHY_TYPE_HIGH_200G_LR4:
-> +		case ICE_PHY_TYPE_HIGH_200G_DR4:
->   			return ICE_MEDIA_FIBER;
->   		}
->   	}
-> @@ -3493,6 +3520,8 @@ u16 ice_get_link_speed_based_on_phy_type(u64 phy_type_low, u64 phy_type_high)
->   	case ICE_PHY_TYPE_HIGH_200G_KR4_PAM4:
->   	case ICE_PHY_TYPE_HIGH_200G_AUI4_AOC_ACC:
->   	case ICE_PHY_TYPE_HIGH_200G_AUI4:
-> +	case ICE_PHY_TYPE_HIGH_200G_AUI8_AOC_ACC:
-> +	case ICE_PHY_TYPE_HIGH_200G_AUI8:
->   		speed_phy_type_high = ICE_AQ_LINK_SPEED_200GB;
->   		break;
->   	default:
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> index 301947d..beb638c 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> @@ -2057,7 +2057,9 @@ ice_get_ethtool_stats(struct net_device *netdev,
->   					 ICE_PHY_TYPE_HIGH_200G_DR4 | \
->   					 ICE_PHY_TYPE_HIGH_200G_KR4_PAM4 | \
->   					 ICE_PHY_TYPE_HIGH_200G_AUI4_AOC_ACC | \
-> -					 ICE_PHY_TYPE_HIGH_200G_AUI4)
-> +					 ICE_PHY_TYPE_HIGH_200G_AUI4 | \
-> +					 ICE_PHY_TYPE_HIGH_200G_AUI8_AOC_ACC | \
-> +					 ICE_PHY_TYPE_HIGH_200G_AUI8)
->   
->   /**
->    * ice_mask_min_supported_speeds
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.h b/drivers/net/ethernet/intel/ice/ice_ethtool.h
-> index 23b2cfb..c4732a3 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.h
-> @@ -153,6 +153,14 @@ phy_type_high_lkup[] = {
->   	[10] = ICE_PHY_TYPE(200GB, 200000baseKR4_Full),
->   	[11] = ICE_PHY_TYPE(200GB, 200000baseSR4_Full),
->   	[12] = ICE_PHY_TYPE(200GB, 200000baseCR4_Full),
-> +	/* 200G_AUI8_AOC_ACC and 200G_AUI8 are 8-lane 25G-per-lane interfaces.
-> +	 * The kernel has no 200000baseSR8/CR8 modes yet; map to the closest
-> +	 * available 4-lane equivalents so ethtool reports 200G as supported.
-> +	 * FIXME: replace with 200000baseSR8_Full / 200000baseCR8_Full once
-> +	 * those ethtool link modes are defined upstream.
-> +	 */
-> +	[13] = ICE_PHY_TYPE(200GB, 200000baseSR4_Full),
-> +	[14] = ICE_PHY_TYPE(200GB, 200000baseCR4_Full),
->   };
->   
->   #endif /* !_ICE_ETHTOOL_H_ */
+url:    https://github.com/intel-lab-lkp/linux/commits/Artem-Lytkin/rust-phy-add-paged-register-access-and-bit-manipulation-helpers/20260324-155532
+base:   https://github.com/Rust-for-Linux/linux rust-next
+patch link:    https://lore.kernel.org/r/20260323201925.8405-4-iprintercanon%40gmail.com
+patch subject: [PATCH 4/4] rust: phy: add interrupt support
+config: x86_64-rhel-9.4-rust (https://download.01.org/0day-ci/archive/20260324/202603241610.omlicT8x-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260324/202603241610.omlicT8x-lkp@intel.com/reproduce)
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603241610.omlicT8x-lkp@intel.com/
 
+All warnings (new ones prefixed by >>):
 
-Kind regards,
+>> warning: unsafe function's docs are missing a `# Safety` section
+   --> rust/kernel/net/phy.rs:564:5
+   |
+   564 |     unsafe extern "C" fn config_aneg_callback(phydev: *mut bindings::phy_device) -> c_int {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#missing_safety_doc
+   = note: `-W clippy::missing-safety-doc` implied by `-W clippy::all`
+   = help: to override `-W clippy::all` add `#[allow(clippy::missing_safety_doc)]`
 
-Paul
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
