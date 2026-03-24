@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-271244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271243-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qB2GMfvcwmkqnAQAu9opvQ
-	(envelope-from <netdev+bounces-271244-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:50:35 +0100
+	id wH9eIBHewmkqnAQAu9opvQ
+	(envelope-from <netdev+bounces-271243-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:55:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C0C531B11A
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:50:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9E1031B205
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:55:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 874CB301AFE3
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:50:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 14B8F30CA34A
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9D940FD92;
-	Tue, 24 Mar 2026 18:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19AC040F8C4;
+	Tue, 24 Mar 2026 18:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="uPSRgCua"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tXADJqMj"
 X-Original-To: netdev@vger.kernel.org
 Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010064.outbound.protection.outlook.com [52.101.46.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6694040F8CF;
-	Tue, 24 Mar 2026 18:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3574407593;
+	Tue, 24 Mar 2026 18:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.64
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774378196; cv=fail; b=GvPTFnmMdSogXSfnayM4vrcdwap1O724ORKzs6eIbjik8oB7zW1sUu7IIPS6d7OgUHUf+p4EnnugLeg7gYQSvr1iwx+jYfrdH7SU3kTal1NnoMBs5xGBo0Ml8poqOACgeyXkBfvG19RD8O207IpjB7SBvHGeQ49BpNNHSV9C16Y=
+	t=1774378194; cv=fail; b=P8LbvOH1CB/DtOkLgED8DoVRC9drpbC6aHL6/YdNZ3AHy9SYz4n+VgtFMGR6ZGYZ2kIJc8GCC17pROdyOw0bQfv8qQ0sky32iUUnG7yXhPTL5gA87ZvXktCF/aDb1l6MDtChfUkTZH9+/OSkKYGdA9/ZEI2SIGPYeeZm1Zuzq5o=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774378196; c=relaxed/simple;
-	bh=yoA2L75k1TjR5Ot6GbS4b+3GRetoLkh4FPQ6M48n2VM=;
+	s=arc-20240116; t=1774378194; c=relaxed/simple;
+	bh=v+ocEoyVHuGLPqu+qAxkQDW892fcIZyVTWZTQtvq8Z0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Rf39GZFPk8VK4iAMZddIWcbJ5eH8AjFIR/3WOBmZXCIzUyAbM4EqhcE7qEuaSKQis+JinFDjs2GXe1B7LYs9NxRqivUAKVRHPnxvMasgxYoSK+JeQm+KAEmvOAXgX3OQz/g0ng2X5DUgrmRzev66XwIfp6Z1wb6LjMq7Ha06Hn0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=uPSRgCua; arc=fail smtp.client-ip=52.101.46.64
+	 Content-Type:MIME-Version; b=oRYPeEDPM2m1H/4l7drT8uWrDudEnCriaYldK+rVpmKk/A/YLR0wwUDZM287v6fPAxqMamV6p7kW6aN6+VES5sSPu2Mcq1tHfWRLdSuUQDNgL9cwsTG/7/xwPBoxxtSdBwqSUusKmwBt+FnQ/MQRp9h40Mus+kBVp7zNIAZqMrw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tXADJqMj; arc=fail smtp.client-ip=52.101.46.64
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wUwe8VmTcHMTGzyxYRiA1MD/KRsXO7hGa4uXdCdsOPQQ3REpwn6Aeco3KoLrLye3qaMQzxdhuy8yA4SEDgNJ58ZUIuPOWvEkPTGttQAnycqPltlNCWS7c1pqG+MkdzaXMDj1BwNX1iQ0ECiCh3rlJYGHDW9RJZDTMSBDPaCegLRAqpfJqGTKYi9fEnBBRaWr58LTHc8poHu2IHH95D3TZRKM8OWf4oc84VypNoqXmrKYHSwMg9rYzO1rZlVqFAuNWwj99SdgVw2wtfbBSK34RVyA1hFEfPiOhWe/aTyLmqvVTaKyJWM4eCZy5LGv3J8oNuoOBfsbefgTPmR3MAqWqg==
+ b=K0Prr5KAE5rncM50+aejTUhbvgTIWsOd6xAq8RH8hHDr2+qa+Qkkpp/D7HUVcUJPO4rdN3p1WSxq3MDjbuKmFjCXAzpv5bt4ry11CCr1ThPt+n0MNGz4PGLHi3vKddx1DEWkgZkN4qvDt4flHz/2NwpM+rA7Xn9F2+KN9FBcNr+hwab9zwV9sqy2URdkpFfWMyrpymYlnInyC63xBR5xbfnu45ZJWoRh5C1d/So+piX5sj0vWEWX850avVCyElkSI6fe0UdE2Svn7eN8nsAbfVlxwVtLw+1lu3b9HFTGQ672nOosXiCBgLvsbaBdm6gESjDs9XRUh5Ujba6Rt2qOew==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NFB+nVJO1D4CyNvSW6mpvTf0hPdsRYkxgD8QJuGB6NQ=;
- b=E/gEMl6eBD4znYXB0pcHi5l9SqNdXJMUgFIYKXIOtT31WDNf244/0lvLJY7E1JXKWOLTw3vfPw7tP0dvOjd+ALk1LBCOwc2bT9pXYrZUVIf86PZHvx+JQgyGx6hZia88AlQ7mpytw5KILaPTx8KwWs2u+0yt7xutjpYLYorMVom/AE9Yi5Ofyn4DNfqL8bXLhgW+d6j8Jz/Tls78us7w5Z2KjUTfLDM6xblkpI/SDtBKricZ6PHgBdMVcs9xzF0YbPXXsYIw0Zd6FDgNwV41X9/SoKL2+LgI2ltYCnjDxcKWFEEiTSUhcWFa7bEKbSX5cEz2PlnU50CXDHAobRUWhw==
+ bh=1bziRk3oAwbtzaxlygyg/dc4uD+31PiC3dcYC46IltA=;
+ b=EImrWnkKsO62/N3LfqJLs8OKnOLY9eCiHe9wwh4kb0J2JYX52NVODiWHl1p5CVuuNGeKiqqFPBOrEVCEPNtC8/i4uCuwme5AL7EeUZSS1WacVH+0Ch3WsOdn7G4d0sUv+bHn33Cmc+mGAUE+qaFu7ReuiEs2pGU6RxmQbN/Aezc/WRnn0CUERXTVuV4YkeopE6aFrW3uw0nsLhAPKWsZ4j1IOiHsNU5HXrtIfZrw153c3yzNwNmF9qTfxRYoIDzzSxCM2cjyiqg6KbUQdRgP8f/J/7024eNTrvpNfO2ShAPhD5UC9MfQFW9Oqszxs+e1hft9Rk/7QxAlmlUwKWGrnQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NFB+nVJO1D4CyNvSW6mpvTf0hPdsRYkxgD8QJuGB6NQ=;
- b=uPSRgCuazRX3MIZEjI4e0Yoc7x9ThmsPiQK5r8gjapLvXovE8CpVTlNcerHYIY6Q2AjLZkauRBuC1ZJV6TR31Z6mSI95Ewf0dDDGftta1dEbWWz9rfb3ML0sehgXNlTRggi5f32BxEmA1AyTCkhxz4+/jN5J4jnEINxrEjzO7cvPa8fWlXWhxULaY7yM3eMNIw5+6rjhnWiAfc7iEcT44GDba+NMSY8HDW8YwzyBQM4q36L9VfOux3ZdIALDJ0F00my1YlMPWwOPrKR5uAvKaLs6DE0LAzrhqRoX0luLgJs/rYfTrofIL3f9VTYX9aLPDSRHl6GUMCjKyi240DUBMw==
+ bh=1bziRk3oAwbtzaxlygyg/dc4uD+31PiC3dcYC46IltA=;
+ b=tXADJqMj3S58oaSaTotmqMv/JuDtkEq76wF/XSk8w1bRmkS+L94AvykfJ2rnyoJorVYMxd3Q5I4YTQ7OT/M7RRXcB4Y1yobj9IXjUwGZu/Y3u0UqU8Op3/LnBWBel4ZLV+8etnHS1xOtIj1X2fhwrm/QCPM4+TbstL9dh8/PEkk1nlMdPhHWGw8zwPOHJzcByg5eJ3CQs5BQwycxnQS8xCsDajKeESUbVpg7cCytbADwWV7/SjwddDoObZ05f6GHH9dpUTuV9mREqLKK7UgDUH3xyiWKs4cGPLCqjspIjalGfPkFRwnM7bOjf1b56ktLj6PeZxKVjNN90B8kftVZXQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from DS7PR12MB8202.namprd12.prod.outlook.com (2603:10b6:8:e1::13) by
  DS7PR12MB9526.namprd12.prod.outlook.com (2603:10b6:8:251::10) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9723.16; Tue, 24 Mar 2026 18:49:46 +0000
+ 15.20.9723.16; Tue, 24 Mar 2026 18:49:47 +0000
 Received: from DS7PR12MB8202.namprd12.prod.outlook.com
  ([fe80::38fd:4146:aea:639e]) by DS7PR12MB8202.namprd12.prod.outlook.com
  ([fe80::38fd:4146:aea:639e%6]) with mapi id 15.20.9745.019; Tue, 24 Mar 2026
@@ -77,16 +77,16 @@ Cc: bridge@lists.linux.dev,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Andy Roulin <aroulin@nvidia.com>
-Subject: [PATCH net-next 1/3] net: bridge: add stp_mode attribute for STP mode selection
-Date: Tue, 24 Mar 2026 11:49:40 -0700
-Message-ID: <20260324184942.2828691-2-aroulin@nvidia.com>
+Subject: [PATCH net-next 2/3] docs: net: bridge: document stp_mode attribute
+Date: Tue, 24 Mar 2026 11:49:41 -0700
+Message-ID: <20260324184942.2828691-3-aroulin@nvidia.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260324184942.2828691-1-aroulin@nvidia.com>
 References: <20260324184942.2828691-1-aroulin@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BY3PR05CA0032.namprd05.prod.outlook.com
- (2603:10b6:a03:39b::7) To DS7PR12MB8202.namprd12.prod.outlook.com
+X-ClientProxiedBy: SJ0PR03CA0386.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a1::31) To DS7PR12MB8202.namprd12.prod.outlook.com
  (2603:10b6:8:e1::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -96,57 +96,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DS7PR12MB8202:EE_|DS7PR12MB9526:EE_
-X-MS-Office365-Filtering-Correlation-Id: 34bf6c16-a754-4fb0-1505-08de89d61de4
+X-MS-Office365-Filtering-Correlation-Id: 1686104c-e468-4e37-484e-08de89d61ec3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|1800799024|376014|366016|18002099003|56012099003|18092099006|22082099003;
+	BCL:0;ARA:13230040|7416014|1800799024|376014|366016|18002099003|56012099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	csOiNLJznZN0KTl3hQmdrtd1fUIYgiVAeMKZmuteq0hPoQsBHu7Dy5SauOXLsPREmJwcCfKjjnPC6DUrcuY6e7ELMG9YC7O7VM4LfPUX7JZOUbzXc9zoMkQEsv/Hgfs/6EQoTEEZpkNWCJnKXoUHPZPgZQpY9Q5mwGFpMzbYDpDeHdtiGgr6oKymldPzfKhDPqEzW+QSvNxcVdwKkB0u1voTq8eV8prwzRKTtUQsT4VWyua4xZ1dTfwyhOCnIO/dz6l1oPXbSfEPbBwmytPocsbx4K8HicesHhV7A0FG5bzZs3bUrMWV2Cjx+xMEzSGwtFlE9+v2ukoa/zTwdYbgtZEnWAyTyWp9DHzG1ZHVXioivJgJg9yHQY4ADcNY1bNFDt8S80ceFQcupi0XcVBayFQXfl9pDnM47WlIIbGCv6UmkIR9fRNsKoKemjy2t/682a5+3Gdne1oci0Iii2p06yNjdKUlw0ol+JYw0Oojgc5VM9j+m5cmo+9SpHzwFTOFVWdtOMU4mjo24movsZQA3UXRLjQv8+c5kDhrc3iigFmMXLJ0ha0e+/+8L3jlJ8M2UfSXO0BxBdER86VfT4U5Z5j6cEQxoYFdVMkjOQd7dUbWXjegQrxSc0o+/s1/Pg6+ItELXsWJyWdtVE1+FRHXTKBu1ENWiiEjkcld4Q4ygB/h5q773DBefIER+SbIWK5B8xadZb+bEYBiSgm5r0ryna8cegjdgwr2/9gdTrAZ95k=
+	vH6kLTTFHJ0DqXyX2s7LDnwj8wRDcOuE0kwLmFk9VeqYCN0JWyhyaTb8EVp65pev2UJ0T0BgMCH8qfmmHQO1fw2oMAvQRhk3G1bnVdqpYNB9vstEUpvFMWGa7V4B0B6iYkbaIfJssndJGzIAPGdvVmy40rUWpFUWMmeyP8odHd05JLX5Fv01Hw9n9t+mF0c/WuIS2TPD0EhO6jWoDOWX1My317C1BVGTsFkth/dTEF/BgiK1S8YjzvGN/X/+XaihwUqfdYFheh/GGwKx40EszQTo8m7nzcJxXPs3gAYHkAEwBvgMBfP9FRGkwEzzWp9MiNAmzr3RBPzPjlWL6rw3qhVg8H1clHV9wN19atiGJuRK13uZFAvOYNyWNRYZ6YZoM8L8wv1iyLM84e9hnxMcVCEiSSeDKARg54VvJHFIO/RNp3dZwMnqk04L/kARjH1SDKRlOpLYritSx53i7yk2gfdowdXEDrU6/mzA+GN0yQUixf6tY06ZdtBvJwBEQhgR891gu56gWXc81G5HgrEJ0kT3g8j43InZYlM7aSR8dcjBZwceY9DSNChsDtlbHZ6fyvVPf/L4WD7je9SiDRIKs3PmegK4MmQfMDf6mmm18t/vevzzGQJq9omYnET3Yo2c9r+n7p3HDKeEqNnRSDFkctFiqeyaB4B2AYVrkkICjzxyHqMQpqYO8p/lDX8S5AER5SBgzXkLWTOnwfyIIup3BFr0ZeGEBekBXoAj8MtQOtY=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB8202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(18002099003)(56012099003)(18092099006)(22082099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB8202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?w8Dpe7eYHlCQS9VtDyszzEWYH1Qi91UVB65TemuXs+Ctb6kn9xsTP9cO7wjg?=
- =?us-ascii?Q?7FXQ2y1acqDc6eZED6yWMkrirAFFflQPQf64N9umh026qHGGO3FlPhuM1sk/?=
- =?us-ascii?Q?QswkUukA8IEoKKCP+94++rXblfdJQaHrFG6d7QknHAqdkS4LPx8h2C/bWdSG?=
- =?us-ascii?Q?qQSpYSoisc3sC4j3Q2nyBpdfY8qLyWIlWfWzE1BzKFGAfQ2cSqgttHGLGi3k?=
- =?us-ascii?Q?2i4tK36DD6XOFY1Yf70ndPc2fT9QI174yjOvIZ8MKHsvRGKlLxppix1hNNwu?=
- =?us-ascii?Q?A35+XUK7qxI0fwKTIcBk7UWuSbcPWB1avq0mlmOK57rhURHV/KCJLWEgvduG?=
- =?us-ascii?Q?6aP7g2npUaa7amqCR+CPbeIivwJpmhQp9WuqZvWdxva50cLBD+/Cbx/eZhyq?=
- =?us-ascii?Q?qDul01Fn7cdYu0Xk8upWv7QffUuruscBNUJJtDSooORpPm9AlJ5yrPRFREfF?=
- =?us-ascii?Q?+XngV/ciR2qxIHua4nlVe0UM29KMaHe8dgLPjrPfuxm8I+SI/wYcphUUe06Y?=
- =?us-ascii?Q?CeLD3goilf2cOk1BXGvNjSGT6OibiBWYEQcVSXP0SJueyVTgN4PcO1UJcmNN?=
- =?us-ascii?Q?hNcHdP3x+baYQKsL0k6sfakexm/FWthmnuc0DVvdVOsGV64aL+wSKe6ejzu2?=
- =?us-ascii?Q?iislQfCK9R2mkKKuCDvxuqwbs8ttve0R+I4r5RI4TT3NeNngs6+IJgVQDvUE?=
- =?us-ascii?Q?X0kZuVKnln/9cGbRf8yZE2KMC6pdti6ZY8oUbwUxBRDXlpdvGyuQDvxUFaA9?=
- =?us-ascii?Q?9LsD4qpc22fgLArz2bXGll+I8LCxchwKMFaAy2jT0tAY8tK5R+aiNLng/xo5?=
- =?us-ascii?Q?5o0u1THvpXymYuXXKtG/dh6k/B9VkbNBo9AuI7Yx0jNWGATHDFcoEsGAgXr4?=
- =?us-ascii?Q?DoleWBNwjC004q4pQcw7QCo7jrCl4lUY2ecTjp17u1ELXokORl+X4XaC5nFF?=
- =?us-ascii?Q?pPJ95WyVLt+Z5Ty8QZ+eZxpKhHqHixTMAVSNsiTQZR6H8ajo8LYlz7M6EQjQ?=
- =?us-ascii?Q?e+4u+LZDxoQwcGjg8QVmOOzQphDMAG4Z1dHldf9yL/U+eAwUUMEvTX3N6dP3?=
- =?us-ascii?Q?P3/r/Q+jz9JCRZkbqNIbail+kES787AW+4iLeAXe1r3pTl/7KXuIxHSyXnqg?=
- =?us-ascii?Q?ZtLl2c387p9BWImMf77If0hSt8K+dx/CVVnwlTGzwWiCWYT60wziMeRpR5NV?=
- =?us-ascii?Q?0RvuWuzr4y46G2KAUGBNo19aMyJ48q1IS015VD+s5oSX/fjNtvJGNoIIflrT?=
- =?us-ascii?Q?onqN70NCvlFcJeTD5aaWfA1coQqXZr0CsopIUxLeXNKl0YC3fWZ3C0kxW55B?=
- =?us-ascii?Q?UU+gMOilfHpJwY8UXyhEZBFGuHQ3Tm9+wVis+/y2rt0//Yxw+9iB9xSJsV05?=
- =?us-ascii?Q?KqoRtSOMLVDkAsXH7cIT+i1kOqz7FyRO7fgScywRglvWQvIyEHXc++lDOU9m?=
- =?us-ascii?Q?JuG3RmSur4HHE/QsaPsYMAmZ69DZCA3t3Y+GuFuPERBOAhZBCCPgbfE1FrVB?=
- =?us-ascii?Q?tOoVjbBpOIykzhxtU0KxcICM7HzyPwVZe/njf0WPXQhRiPr/TDRCBJ3QRxK4?=
- =?us-ascii?Q?oiMuIjpxaE+P2PNlXB4eEOkUajkr5rl0zW0/Rpm0PhfVfbn2jpyX8QCxPTcN?=
- =?us-ascii?Q?h6Ryc/u8X0XdOrYmuJo3KEMn+qi1rNxfyE+rEdHB2ti+BK5MasCpQYlxbz+w?=
- =?us-ascii?Q?jFpEMxzvCq/2zv1uTvfmqVUU63rQ9pkmK9FR2JWmd3aYwXv3qrnRCiNgznFX?=
- =?us-ascii?Q?7p3UmxcBiw=3D=3D?=
+	=?us-ascii?Q?7pUAE4XZvsXvwaUZRG3FDq1dEW5xsfJeEa/4Dm/XsMY6a8HF+nIUWmDN/7A9?=
+ =?us-ascii?Q?tEq9tipAFvQACWYAgNEPc2Y026ysmndOYRtPlLGEA8WXixjvKcKz69BY6itr?=
+ =?us-ascii?Q?HTuW2KDqtKzKLuk71R6LJ078NYSa54kxn7Ps5/T9ZAhbbWfGAW1oUhH5mUHC?=
+ =?us-ascii?Q?RLL6tjgjTchUvWgT+P9wkWbDwqPl9xg0Su4tTQzgX7y11THRcgQ0GxPXj1KA?=
+ =?us-ascii?Q?1RtyQrHrHatowta4XSuJcn9x+0I9lnclxr15Z52/AiXyWaVxOF0/jBfTEL8u?=
+ =?us-ascii?Q?lIUul1uM7nTjMR5KKgbeIz67yJ4JSua/jqftnkTEu662DaZrX2VXQBFJK4p8?=
+ =?us-ascii?Q?fIgjoZM62OwDzyk5pGL6pFo0v3AdYsjNnXdVi9PFkoARCCcGpZ9skDJSyj2Q?=
+ =?us-ascii?Q?LfacK9KTXFXeOTm/JpU6swBrqDKNpFZX5SbMWhhMlZoH9sBtC/ELFjyH2mFu?=
+ =?us-ascii?Q?g8fZwbfnT/O8ty1ws42Me6HEgbG8pDCPlDb5YeXTsuDZ9zoNU70ebjj3reP/?=
+ =?us-ascii?Q?dXhJ3+FZwFdr6bjU3ZhFK6rk6cWa5FJ+WZcYK4HWWLf6Ym21TNwNcBh3v8yd?=
+ =?us-ascii?Q?cm+qAT+Hmv2O5yT53lSoWoDO6hpRM7KeA1VJkwokaiLyFhYWE5Fuy7MLL5Dk?=
+ =?us-ascii?Q?GWlMrKNmI7vxyo9brYMqiKFHyicArvvJJBObbM7gvuOmuYwy5mmCu7Fwb5xi?=
+ =?us-ascii?Q?w0BydvrKqv3U5wMxk/8hWNAg3wxkeQEIHDgG+EEu6jLThEBgMAhsm5meeJUj?=
+ =?us-ascii?Q?26Ab4yaqLiWMrKd5Vh/PNZzrrQkC1MMkVRqeA1GyrSILLtZ7rOA64Dkyk3/C?=
+ =?us-ascii?Q?UCeziODYcsarMZkQGdEL+R8P7jMUgbDWkO5B8mf3p6rHuw1wWmwGbD41RNaL?=
+ =?us-ascii?Q?hrU2ffA6jaUmUngwdycs93N+z4xG69KCQlr44BTwqR6smWyDxkvnF9NmjbII?=
+ =?us-ascii?Q?jlm/O+3Tq69f0KN6P3mmwgJ5hMRpW0/ExonCjM5sdoG47Y9fwAWMO8D0plWV?=
+ =?us-ascii?Q?kBHXVf+TDzTjOikE6SmzBT5+YGH07c5tAceIFLJymZMYwRjSdsiM/pHjCLDO?=
+ =?us-ascii?Q?csTc5vd314D/sJBPLFla869MIXZXsbYXDNsA38G0bEk97MRBI22G1A74rDlp?=
+ =?us-ascii?Q?jjebGgypZ98zqe2nuGTc7CoX0w42kQN7DDVkfOVoTr/3jiiyt6Fbh9hYDcY+?=
+ =?us-ascii?Q?27I+w1NGUOKOA1H9uZZZoWrKbiJ7pD/zzfw6nudQoaaAmSuQ+mVxcNszSfwS?=
+ =?us-ascii?Q?uQ7piabutCRwyWO5ZtQLIS3zm8tLQuDeCFW+EnboREtz2G3CLyK6amNCkz+Y?=
+ =?us-ascii?Q?Z5ZGtiVDgdToxSw06609F/3MA1im9idyvKJQld/o4pGpOjVot3PUd/v2gOvO?=
+ =?us-ascii?Q?8wrpQwZMh+er9frxdq26Zy23dI+qqRmABbjz6yc4eSpf0y5TR/YV7GSfXaX3?=
+ =?us-ascii?Q?U1GCDFsaDZaH1R8CeQhvd5M/zPdumwX19NrXEuZdaRYFaN+ObUFfiEQgurJy?=
+ =?us-ascii?Q?/oIfe5XeqiPxCH9rpP/dIcB+mg47nB4YLNAjzpws7lrLypKnJfF9lHfqEWs/?=
+ =?us-ascii?Q?EYaRJM17JAu3LJkRCRDXy45oCHGKkyJtcWlWbzK3aXoA7Vz4eckJXL3b5lW1?=
+ =?us-ascii?Q?Lf7X4WNu2G56AExUSgCUzQ6HibJaWQeaew3g/uFaboViWbVD6CizK91jLO6b?=
+ =?us-ascii?Q?h/Ur5/WEZBNfItpv8CmvhShosm142rtquTE77EZE8QTV/A0arkWE9TYbfYDJ?=
+ =?us-ascii?Q?WDd17xpxxA=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 34bf6c16-a754-4fb0-1505-08de89d61de4
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1686104c-e468-4e37-484e-08de89d61ec3
 X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB8202.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2026 18:49:45.3197
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2026 18:49:46.7169
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: B4w0rxL5eeo7TDF2oN6PecQeysgtg8LL+DHluUJ+NaSr7E7NRtrfXBGSCotc35LzsomKnrowPo8PaDtEwqP/og==
+X-MS-Exchange-CrossTenant-UserPrincipalName: IhU8lJjyIKzAETuRlPFdvdFMBcWrOFKcfOw7dVr/JgtcAq7KBQd1Tj0fRuB4/6U93h53bPgG2FC/8VqqiNWNIQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB9526
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -155,7 +155,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -163,7 +163,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-271244-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271243-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -173,236 +173,56 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email,nvidia.com:mid]
-X-Rspamd-Queue-Id: 1C0C531B11A
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D9E1031B205
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The bridge-stp usermode helper is currently restricted to the initial
-network namespace, preventing userspace STP daemons (e.g. mstpd) from
-operating on bridges in other network namespaces. Since commit
-ff62198553e4 ("bridge: Only call /sbin/bridge-stp for the initial
-network namespace"), bridges in non-init namespaces silently fall back
-to kernel STP with no way to use userspace STP.
+Add documentation for the IFLA_BR_STP_MODE bridge attribute in the
+"User space STP helper" section of the bridge documentation. Reference
+the BR_STP_MODE_* values via kernel-doc and describe the use case for
+network namespace environments.
 
-Add a new bridge attribute IFLA_BR_STP_MODE that allows explicit
-per-bridge control over STP mode selection:
-
-  BR_STP_MODE_AUTO (default) - Existing behavior: invoke the
-    /sbin/bridge-stp helper in init_net only; fall back to kernel STP
-    if it fails or in non-init namespaces.
-
-  BR_STP_MODE_USER - Directly enable userspace STP (BR_USER_STP)
-    without invoking the helper. Works in any network namespace. The
-    caller is responsible for registering the bridge with the STP
-    daemon after enabling STP.
-
-  BR_STP_MODE_KERNEL - Directly enable kernel STP (BR_KERNEL_STP)
-    without invoking the helper.
-
-The mode can only be changed while STP is disabled (-EBUSY otherwise).
-IFLA_BR_STP_MODE is processed before IFLA_BR_STP_STATE in
-br_changelink(), so both can be set atomically in a single netlink
-message.
-
-This eliminates the need for call_usermodehelper() in user/kernel
-modes, addressing the security concerns discussed in the thread at
-https://lore.kernel.org/netdev/565B7F7D.80208@nod.at/ and providing
-a cleaner alternative to extending the helper into namespaces.
-
-Suggested-by: Ido Schimmel <idosch@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Assisted-by: Claude:claude-opus-4-6
 Signed-off-by: Andy Roulin <aroulin@nvidia.com>
 ---
- include/uapi/linux/if_link.h | 40 ++++++++++++++++++++++++++++++++++++
- net/bridge/br_device.c       |  1 +
- net/bridge/br_netlink.c      | 18 +++++++++++++++-
- net/bridge/br_private.h      |  1 +
- net/bridge/br_stp_if.c       | 17 ++++++++-------
- 5 files changed, 69 insertions(+), 8 deletions(-)
+ Documentation/networking/bridge.rst | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 83a96c56b8cad..87b2b671ec182 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -744,6 +744,11 @@ enum in6_addr_gen_mode {
-  * @IFLA_BR_FDB_MAX_LEARNED
-  *   Set the number of max dynamically learned FDB entries for the current
-  *   bridge.
-+ *
-+ * @IFLA_BR_STP_MODE
-+ *   Set the STP mode for the bridge, which controls how the bridge
-+ *   selects between userspace and kernel STP. The valid values are
-+ *   documented below in the ``BR_STP_MODE_*`` constants.
-  */
- enum {
- 	IFLA_BR_UNSPEC,
-@@ -796,11 +801,46 @@ enum {
- 	IFLA_BR_MCAST_QUERIER_STATE,
- 	IFLA_BR_FDB_N_LEARNED,
- 	IFLA_BR_FDB_MAX_LEARNED,
-+	IFLA_BR_STP_MODE,
- 	__IFLA_BR_MAX,
- };
+diff --git a/Documentation/networking/bridge.rst b/Documentation/networking/bridge.rst
+index ef8b73e157b26..c1e6ea52c9e59 100644
+--- a/Documentation/networking/bridge.rst
++++ b/Documentation/networking/bridge.rst
+@@ -148,6 +148,28 @@ called by the kernel when STP is enabled/disabled on a bridge
+ stp_state <0|1>``).  The kernel enables user_stp mode if that command returns
+ 0, or enables kernel_stp mode if that command returns any other value.
  
- #define IFLA_BR_MAX	(__IFLA_BR_MAX - 1)
- 
-+/**
-+ * DOC: Bridge STP mode values
-+ *
-+ * @BR_STP_MODE_AUTO
-+ *   Default. The kernel invokes the ``/sbin/bridge-stp`` helper to hand
-+ *   the bridge to a userspace STP daemon (e.g. mstpd). Only attempted in
-+ *   the initial network namespace; in other namespaces this falls back to
-+ *   kernel STP.
-+ *
-+ * @BR_STP_MODE_USER
-+ *   Directly enable userspace STP (``BR_USER_STP``) without invoking the
-+ *   ``/sbin/bridge-stp`` helper. Works in any network namespace. The
-+ *   caller is responsible for registering the bridge with the userspace
-+ *   STP daemon after enabling STP, and for deregistering it before
-+ *   disabling STP.
-+ *
-+ * @BR_STP_MODE_KERNEL
-+ *   Directly enable kernel STP (``BR_KERNEL_STP``) without invoking the
-+ *   helper.
-+ *
-+ * The mode controls how the bridge selects between userspace and kernel
-+ * STP when STP is enabled via ``IFLA_BR_STP_STATE``. It can only be
-+ * changed while STP is disabled (``IFLA_BR_STP_STATE`` == 0), returns
-+ * ``-EBUSY`` otherwise. The default value is ``BR_STP_MODE_AUTO``.
-+ */
-+enum {
-+	BR_STP_MODE_AUTO,
-+	BR_STP_MODE_USER,
-+	BR_STP_MODE_KERNEL,
-+	__BR_STP_MODE_MAX
-+};
++STP mode selection
++------------------
 +
-+#define BR_STP_MODE_MAX (__BR_STP_MODE_MAX - 1)
++The ``IFLA_BR_STP_MODE`` bridge attribute allows explicit control over how
++STP operates when enabled, bypassing the ``/sbin/bridge-stp`` helper
++entirely for the ``user`` and ``kernel`` modes.
 +
- struct ifla_bridge_id {
- 	__u8	prio[2];
- 	__u8	addr[6]; /* ETH_ALEN */
-diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
-index f7502e62dd357..a35ceae0a6f2c 100644
---- a/net/bridge/br_device.c
-+++ b/net/bridge/br_device.c
-@@ -518,6 +518,7 @@ void br_dev_setup(struct net_device *dev)
- 	ether_addr_copy(br->group_addr, eth_stp_addr);
- 
- 	br->stp_enabled = BR_NO_STP;
-+	br->stp_mode = BR_STP_MODE_AUTO;
- 	br->group_fwd_mask = BR_GROUPFWD_DEFAULT;
- 	br->group_fwd_mask_required = BR_GROUPFWD_DEFAULT;
- 
-diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
-index 0264730938f4b..4c607d5d17a49 100644
---- a/net/bridge/br_netlink.c
-+++ b/net/bridge/br_netlink.c
-@@ -1270,6 +1270,9 @@ static const struct nla_policy br_policy[IFLA_BR_MAX + 1] = {
- 		NLA_POLICY_EXACT_LEN(sizeof(struct br_boolopt_multi)),
- 	[IFLA_BR_FDB_N_LEARNED] = { .type = NLA_REJECT },
- 	[IFLA_BR_FDB_MAX_LEARNED] = { .type = NLA_U32 },
-+	[IFLA_BR_STP_MODE] = NLA_POLICY_RANGE(NLA_U32,
-+					      BR_STP_MODE_AUTO,
-+					      BR_STP_MODE_MAX),
- };
- 
- static int br_changelink(struct net_device *brdev, struct nlattr *tb[],
-@@ -1306,6 +1309,17 @@ static int br_changelink(struct net_device *brdev, struct nlattr *tb[],
- 			return err;
- 	}
- 
-+	if (data[IFLA_BR_STP_MODE]) {
-+		u32 mode = nla_get_u32(data[IFLA_BR_STP_MODE]);
++.. kernel-doc:: include/uapi/linux/if_link.h
++   :doc: Bridge STP mode values
 +
-+		if (br->stp_enabled != BR_NO_STP) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Can't change STP mode while STP is enabled");
-+			return -EBUSY;
-+		}
-+		br->stp_mode = mode;
-+	}
++The default mode is ``BR_STP_MODE_AUTO``, which preserves the traditional
++behavior of invoking the ``/sbin/bridge-stp`` helper. The ``user`` and
++``kernel`` modes are particularly useful in network namespace environments
++where the helper mechanism is not available, as ``call_usermodehelper()``
++is restricted to the initial network namespace.
 +
- 	if (data[IFLA_BR_STP_STATE]) {
- 		u32 stp_enabled = nla_get_u32(data[IFLA_BR_STP_STATE]);
- 
-@@ -1634,6 +1648,7 @@ static size_t br_get_size(const struct net_device *brdev)
- 	       nla_total_size(sizeof(u8)) +     /* IFLA_BR_NF_CALL_ARPTABLES */
- #endif
- 	       nla_total_size(sizeof(struct br_boolopt_multi)) + /* IFLA_BR_MULTI_BOOLOPT */
-+	       nla_total_size(sizeof(u32)) +    /* IFLA_BR_STP_MODE */
- 	       0;
- }
- 
-@@ -1686,7 +1701,8 @@ static int br_fill_info(struct sk_buff *skb, const struct net_device *brdev)
- 	    nla_put(skb, IFLA_BR_MULTI_BOOLOPT, sizeof(bm), &bm) ||
- 	    nla_put_u32(skb, IFLA_BR_FDB_N_LEARNED,
- 			atomic_read(&br->fdb_n_learned)) ||
--	    nla_put_u32(skb, IFLA_BR_FDB_MAX_LEARNED, br->fdb_max_learned))
-+	    nla_put_u32(skb, IFLA_BR_FDB_MAX_LEARNED, br->fdb_max_learned) ||
-+	    nla_put_u32(skb, IFLA_BR_STP_MODE, br->stp_mode))
- 		return -EMSGSIZE;
- 
- #ifdef CONFIG_BRIDGE_VLAN_FILTERING
-diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index 6dbca845e625d..e4bb9c3f28726 100644
---- a/net/bridge/br_private.h
-+++ b/net/bridge/br_private.h
-@@ -540,6 +540,7 @@ struct net_bridge {
- 		BR_KERNEL_STP,		/* old STP in kernel */
- 		BR_USER_STP,		/* new RSTP in userspace */
- 	} stp_enabled;
-+	u32				stp_mode;
- 
- 	struct net_bridge_mcast		multicast_ctx;
- 
-diff --git a/net/bridge/br_stp_if.c b/net/bridge/br_stp_if.c
-index cc4b27ff1b088..fa2271c5d84fe 100644
---- a/net/bridge/br_stp_if.c
-+++ b/net/bridge/br_stp_if.c
-@@ -149,7 +149,9 @@ static void br_stp_start(struct net_bridge *br)
- {
- 	int err = -ENOENT;
- 
--	if (net_eq(dev_net(br->dev), &init_net))
-+	/* AUTO mode: try bridge-stp helper in init_net only */
-+	if (br->stp_mode == BR_STP_MODE_AUTO &&
-+	    net_eq(dev_net(br->dev), &init_net))
- 		err = br_stp_call_user(br, "start");
- 
- 	if (err && err != -ENOENT)
-@@ -162,7 +164,7 @@ static void br_stp_start(struct net_bridge *br)
- 	else if (br->bridge_forward_delay > BR_MAX_FORWARD_DELAY)
- 		__br_set_forward_delay(br, BR_MAX_FORWARD_DELAY);
- 
--	if (!err) {
-+	if (br->stp_mode == BR_STP_MODE_USER || !err) {
- 		br->stp_enabled = BR_USER_STP;
- 		br_debug(br, "userspace STP started\n");
- 	} else {
-@@ -180,12 +182,13 @@ static void br_stp_start(struct net_bridge *br)
- 
- static void br_stp_stop(struct net_bridge *br)
- {
--	int err;
--
- 	if (br->stp_enabled == BR_USER_STP) {
--		err = br_stp_call_user(br, "stop");
--		if (err)
--			br_err(br, "failed to stop userspace STP (%d)\n", err);
-+		if (br->stp_mode == BR_STP_MODE_AUTO) {
-+			int err = br_stp_call_user(br, "stop");
++Example::
 +
-+			if (err)
-+				br_err(br, "failed to stop userspace STP (%d)\n", err);
-+		}
++  ip link set dev br0 type bridge stp_mode user stp_state 1
++
++The mode can only be changed while STP is disabled.
++
+ VLAN
+ ====
  
- 		/* To start timers on any ports left in blocking */
- 		spin_lock_bh(&br->lock);
 -- 
 2.43.0
 
