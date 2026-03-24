@@ -1,164 +1,306 @@
-Return-Path: <netdev+bounces-270925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270924-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AFAnGhhHwmnvbAQAu9opvQ
-	(envelope-from <netdev+bounces-270925-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:11:04 +0100
+	id kGzoKdBGwmnvbAQAu9opvQ
+	(envelope-from <netdev+bounces-270924-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:09:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C421304637
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:11:04 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F343045EC
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:09:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B6E543031CC8
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 08:10:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6CA5C304EF32
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 08:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA38362141;
-	Tue, 24 Mar 2026 08:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38753C141E;
+	Tue, 24 Mar 2026 08:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxK/JIue"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nd/N/cIZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90D13382C8
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 08:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB243ACEF2
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 08:08:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774339781; cv=none; b=IWfNp8rlmBBHK3ieV5AJBVFgvG9NtoVHSagVFvoIPunkXmKcmSwDPQ7OXv7h5T2MDxRRBjCbZNKow/7rQksz5S6HO9h1Hpf6RFTxDjoo+/mvxZCfVdeTmYkTda4yqdRAzlASOND/gXOc2YvGRmYYSNwAzPiP1QBe9/4r5J5fGoE=
+	t=1774339695; cv=none; b=p/vgpY13So0B6cI1UszUyzjL0nbC9GX58pkA1HgmCBpIuXufUYv0wowVHC+fMpx3GRXgiskQsxOsBlr8AK/p6xVC7mfhvYEca7poBE8Hc8gc8twi8xVEfy+7iBclb2F8d8JbHu0+ZH3KLCowtB16HTz6T18tBOfRmSUq577NHDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774339781; c=relaxed/simple;
-	bh=uUjzgoMGyXNZJ/A6a6SMtJQvn5oWJoqboZciUy0mlcM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Zwtbi1ZY6Onj8bY9DpN4AE+sjQ4cdoCjcQiGJXt9sj6NLmCWIzQ50MqlctaS54NKwZ0p8TMnrpuSeopcjLOwFqIBgYSWnJFSXUNhSpZ2/b5vbmT0EJ0kkrIWZYIj2fVoq0SMop8fc73wkFRsQlWDuqE2sBUJuJte9XPAhOUmC34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TxK/JIue; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5a2853b1f8cso864211e87.3
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 01:09:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774339773; x=1774944573; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=f7pTcS/XRpG6O2bwm88mloQEdUOQr6UIgEUkrvYwL0g=;
-        b=TxK/JIue4KeOYh0UkcAomb0+wPhv8cWzn1goWeBIxQDM0o1QtIQzGWbLX7tNqTNm4F
-         jQtAt2ZX8dI4NqoyGqt4NUwcKcmztF0z0NMvW+jzn0vez/i6ikuHsy97AKXwJTO/oqob
-         hEAauRB/tHS/+YE7OppQl/F9ImeNHc/+sZbZXHszDQljyn7pNPRCsVzV/GzOB5kz7D4B
-         GbvY/qyKjjMHgz3i5i8QU+VnvR2IlORos24YvweaRTauoCH/SeTsu+/nHjdf5fkuSegz
-         thAtVkADm2esMhdo2VeWQ5DKgL2FguXjgU2pyJEW93bDe9EW+YJLxEgLU351X2mf0v8M
-         iTsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774339773; x=1774944573;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f7pTcS/XRpG6O2bwm88mloQEdUOQr6UIgEUkrvYwL0g=;
-        b=fXGGvlfoCi1Y61ph2VNawg1eBB6cLLnUdoMV6ECsuGGLOvKQfMgUMN1MKz/8PEiasg
-         sl5gl3l/b0zQHNF02bpu9eN6NEP/jZoi0CxMysG4xJoO80lwrVCxKbQfVdRyKuGa9w2a
-         JMRxjJ1vsvxpOyR1+sEClnj2uJn32o4GLAsQrzo94t9FOjfltWCt2TySFyyJICmWxXYC
-         q+G7FXF/HNcclO4gcx4Pll0xB5Sqef/d9a5moEeoTflizXycsN2qc8+e3BvIVLR5D3rD
-         89gTYZgOr0PwV96nlJq/i1zAY0i8znbSwqq4/K7qAzXRt+BxV30CgzDHN+9B9gR5rN6j
-         8Ifw==
-X-Gm-Message-State: AOJu0YzOyb3+v0g1V0E5FLEBrjbd974yUqFXKbkrZbrwcBkjz9kAn1cG
-	Kx+sB0ZI8f0m9fAd1gADWogUNa/sm5qis1EYEtJnPJPtycq1sx69zlBxsm2Km5lW
-X-Gm-Gg: ATEYQzxGF9nhMQuGZvzkYnAhQu5CyTzd5lqjYL7TEp3fjVb2IvSCSfs3oB1PD7wyHAI
-	GoAvQus/WA624TeIFUGGQHNoX4Ssu33Z5Q5w3SilE6b4Ehn4UkNDuxfgtwhtfCL/455tT/B6ZXX
-	FMtRNtGFB2caIiYsRgqEe4mZhsn/28v/NexmMHkZkbv9y4x5MJmCVSbKQX+HZPPA59XXAMyqfbY
-	HtGV7KdO2Xfl5I45RDO93FwbCuPz2riTuZgWmvncVzqpqwdng8Kzzf9V1WyobX5KncX+vj0IheZ
-	RAPtdjBQRZgOncYrLUDNgTSYVVIzmzC3Mh0ePD+oWe5wK4LZwtZFCIi9ekP9kSgS1rXKVcJamNB
-	9a4zVgme4X9aET62YIfRSIczYpw7hQLBcDxfYDWeoghFVCXY9buNR/Pcd5GqtT8kH04yzQc6pyh
-	dshV6IvcmDK4nl4ieHfule0EC+9Q2AcxBnj67pefLjg9A0jnKGdCbnbFybRYvid9FPvL5JPkA4E
-	yv+5fCjJNcJAysOVp40Rw==
-X-Received: by 2002:a05:6512:39c4:b0:59f:6923:1cb1 with SMTP id 2adb3069b0e04-5a285ae30bfmr5768214e87.8.1774339773179;
-        Tue, 24 Mar 2026 01:09:33 -0700 (PDT)
-Received: from pop-os.. ([2a02:2121:806:2ce1:42d9:28ba:7989:a157])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a2963fa304sm394953e87.27.2026.03.24.01.09.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 01:09:32 -0700 (PDT)
-From: Nikolaos Gkarlis <nickgarlis@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Nikolaos Gkarlis <nickgarlis@gmail.com>
-Subject: [PATCH] rtnetlink: add missing netlink_ns_capable() check for peer netns
-Date: Tue, 24 Mar 2026 09:07:30 +0100
-Message-Id: <20260324080730.4051666-1-nickgarlis@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1774339695; c=relaxed/simple;
+	bh=a0Hq7JBY/yyVd5EppgclAW0QXM78t9KIM3zMxtFXKTA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qU+K+0aQQsmIdzNcWk7Jeiy+XHOX5VIGY6MuhRWIIeR/aXIAjFZoykvdSikBNOXQhdWcSwRV1YbgFpk2WOh7Bwj2YiEPYLcHw0iIt9ukCzkUFDXNqkHzskcu5lzWNKh1oFJhPtlZsyQROjB4gz089MxJp+71dVoRsTr7RZ9oSFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nd/N/cIZ; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 636661A2FC2;
+	Tue, 24 Mar 2026 08:08:01 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2D6606011D;
+	Tue, 24 Mar 2026 08:08:01 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D2415104510B0;
+	Tue, 24 Mar 2026 09:07:53 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1774339680; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=C9n9jI+Vm/d+FY8zoyyjjBY56nBV5IDRfgK7Hbw73Uo=;
+	b=nd/N/cIZqDfy+dpFekmnj0cHEJxACi2YcXLfqfIIfyGZ6ijTYqxqv0KSzHrzlDhyuLeyU5
+	DKGVqFsFAONcfd5SLXz6reDbfwJb2exQP7zyvCmcaif8HhqaTuO4SeJsageiU6zntOhLoA
+	mBgJ47+f5RduHOmLcq3nZdXqbImv5EwfnUL5rMgzws4OMrUlThkGxwVZWEAtdE+feH/lIc
+	77T91rKg8hZelp0+JZzCSrq1QpWCc9ZxH2tI7BWaS1mVWIL7UWP6JbuEksJ2qRTS1mNG3A
+	HTIPZhBNETgzgAtI9z9jGXry3wOBfZ2o7AEYhU3Gi80RKs5wtc8sW32OX/48Vg==
+Date: Tue, 24 Mar 2026 09:07:52 +0100
+From: Herve Codina <herve.codina@bootlin.com>
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, Steen Hegelund
+ <steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ "Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Arnd
+ Bergmann <arnd@arndb.de>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next 00/10] net: lan966x: add support for PCIe FDMA
+Message-ID: <20260324090752.0799acb1@bootlin.com>
+In-Reply-To: <20260323194059.jjphkep4teq5rzbc@DEN-DL-M70577.microsemi.net>
+References: <20260320-lan966x-pci-fdma-v1-0-ef54cb9b0c4b@microchip.com>
+	<20260323155204.0321db13@bootlin.com>
+	<20260323172640.2669232d@bootlin.com>
+	<20260323194059.jjphkep4teq5rzbc@DEN-DL-M70577.microsemi.net>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-270925-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,iogearbox.net,gmail.com,fomichev.me,arndb.de,linuxfoundation.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-270924-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nickgarlis@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[herve.codina@bootlin.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0C421304637
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 47F343045EC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-rtnl_newlink() lacks a CAP_NET_ADMIN capability check on the peer
-network namespace when creating paired devices (veth, vxcan,
-netkit). This allows an unprivileged user with a user namespace
-to create interfaces in arbitrary network namespaces, including
-init_net.
+Hi Daniel,
 
-Add a netlink_ns_capable() check for CAP_NET_ADMIN in the peer
-namespace before allowing device creation to proceed.
+On Mon, 23 Mar 2026 20:40:59 +0100
+Daniel Machon <daniel.machon@microchip.com> wrote:
 
-Fixes: 48327566769a ("rtnetlink: fix double call of rtnl_link_get_net_ifla()")
-Reported-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
-Signed-off-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
----
- net/core/rtnetlink.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+> Hi Hervé,
+> 
+> > Hi Daniel,
+> > 
+> > On Mon, 23 Mar 2026 15:52:04 +0100
+> > Herve Codina <herve.codina@bootlin.com> wrote:
+> >   
+> > > Hi Daniel,
+> > >
+> > > On Fri, 20 Mar 2026 16:00:56 +0100
+> > > Daniel Machon <daniel.machon@microchip.com> wrote:
+> > >  
+> > > > When lan966x operates as a PCIe endpoint, the driver currently uses
+> > > > register-based I/O for frame injection and extraction. This approach is
+> > > > functional but slow, topping out at around 33 Mbps on an Intel x86 host
+> > > > with a lan966x PCIe card.
+> > > >
+> > > > This series adds FDMA (Frame DMA) support for the PCIe path. When
+> > > > operating as a PCIe endpoint, the internal FDMA engine on lan966x cannot
+> > > > directly access host memory, so DMA buffers are allocated as contiguous
+> > > > coherent memory and mapped through the PCIe Address Translation Unit
+> > > > (ATU). The ATU provides outbound windows that translate internal FDMA
+> > > > addresses to PCIe bus addresses, allowing the FDMA engine to read and
+> > > > write host memory. Because the ATU requires contiguous address regions,
+> > > > page_pool and normal per-page DMA mappings cannot be used. Instead,
+> > > > frames are transferred using memcpy between the ATU-mapped buffers and
+> > > > the network stack. With this, throughput increases from ~33 Mbps to ~620
+> > > > Mbps for default MTU.
+> > > >
+> > > > Patches 1-2 prepare the shared FDMA library: patch 1 renames the
+> > > > contiguous dataptr helpers for clarity, and patch 2 adds PCIe ATU region
+> > > > management and coherent DMA allocation with ATU mapping.
+> > > >
+> > > > Patches 3-5 refactor the lan966x FDMA code to support both platform and
+> > > > PCIe paths: extracting the LLP register write into a helper, exporting
+> > > > shared functions, and introducing an ops dispatch table selected at
+> > > > probe time.
+> > > >
+> > > > Patch 6 adds the core PCIe FDMA implementation with RX/TX using
+> > > > contiguous ATU-mapped buffers. Patches 7 and 8 extend it with MTU
+> > > > change and XDP support respectively.
+> > > >
+> > > > Patches 9-10 update the lan966x PCI device tree overlay to extend the
+> > > > cpu register mapping to cover the ATU register space and add the FDMA
+> > > > interrupt.
+> > > >  
+> > >
+> > > Thanks a lot for the series taking care of DMA and ATU in PCIe variants.
+> > >
+> > > I have tested the whole series on both my ARM and x86 systems.
+> > >
+> > > Doing a simple wget on my x86 system, I moved from 3.8MB/s to 11.2MB/s and
+> > > so the improvement is obvious.
+> > >
+> > > Tested-by: Herve Codina <herve.codina@bootlin.com>
+> > >  
+> > 
+> > Hum, I think I found an issue.
+> > 
+> > If I remove the lan966x_pci module (modprobe -r lan966x_pci), and reload
+> > it (modprobe lan966x_pci), the board is not working.
+> > 
+> > The system performs DHCP requests. Those requests are served by my PC (observed
+> > with Wireshark) but the system doesn't see those answers. Indeed, he continues
+> > to perform DHCP requests.
+> > 
+> > Looks like the lan966x_pci module removal leaves the board in a bad state.
+> > 
+> > Without the series applied, DHCP request answers from my PC are seen by the
+> > system after any module unloading / reloading.
+> > 
+> > Do you have any ideas of what could be wrong?
+> > 
+> > Best regards,
+> > Hervé  
+> 
+> Thanks for testing this!
+> 
+> As part of my testing I did unload/load the lan966x_switch module to ensure the
+> ATU was properly reset and reconfigured, and that seemed to work fine. I must
+> admit, I did not try with the lan966x_pci module.
+> 
+> From what I hear, when you are in the bad state, TX is still working, so it's an
+> RX issue. Could be the interrupt is not firing, so the napi poll is not
+> scheduled.
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 576d5ec3bb36..f3a7d6dbd713 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -4030,8 +4030,15 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 				ret = PTR_ERR(peer_net);
- 				goto put_ops;
- 			}
--			if (peer_net)
-+			if (peer_net) {
-+				if (!netlink_ns_capable(skb, peer_net->user_ns,
-+							CAP_NET_ADMIN)) {
-+					put_net(peer_net);
-+					ret = -EPERM;
-+					goto put_ops;
-+				}
- 				rtnl_nets_add(&rtnl_nets, peer_net);
-+			}
- 		}
- 	}
- 
--- 
-2.34.1
+Yes, confirmed that the issue is on Rx path. Tx data were received by my PC.
 
+> 
+> Anyway, I will have a look at it during the week. Will let you know.
+> 
+
+Some more interesting information.
+
+I tested lan966x_pci module unloading and re-loading on my ARM system.
+
+On this system the following traces are present when I reload the lan966x_pci
+module. Those traces were not present on my x86 system.
+
+    [  104.715031] ------------[ cut here ]------------
+    [  104.719746] Unexpected error: 64, error_type: 1073741824
+    [  104.725217] WARNING: drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c:558 at lan966x_fdma_irq_handler+0xe0/0x12c [lan966x_switch], CPU#0: swapper/0/0
+    [  104.739119] Modules linked in: lan966x_pci irq_lan966x_oic reset_microchip_sparx5 pinctrl_ocelot lan966x_serdes mdio_mscc_miim lan966x_switch rtc_ds1307 marvell [last unloaded: lan966x_pci]
+    [  104.756250] CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 7.0.0-rc1-00010-gfa357f2a6a00 #565 PREEMPT 
+    [  104.765743] Hardware name: Marvell Armada 3720 Development Board DB-88F3720-DDR3 (DT)
+    [  104.773579] pstate: 600000c5 (nZCv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+    [  104.780551] pc : lan966x_fdma_irq_handler+0xe0/0x12c [lan966x_switch]
+    [  104.787046] lr : lan966x_fdma_irq_handler+0xe0/0x12c [lan966x_switch]
+    [  104.793538] sp : ffff800082a7bc00
+    [  104.796860] x29: ffff800082a7bc00 x28: ffff8000819abd00 x27: ffff800081a57757
+    [  104.804033] x26: ffff8000819a5d88 x25: 0000000000012400 x24: ffff800081a57758
+    [  104.811205] x23: 0000000000000038 x22: ffff00000f70ec00 x21: 0000000040000000
+    [  104.818376] x20: ffff00000f7a8080 x19: 0000000000000040 x18: 00000000ffffffff
+    [  104.825548] x17: ffff7fff9e7d6000 x16: ffff800082a78000 x15: ffff800102a7b837
+    [  104.832719] x14: 0000000000000000 x13: 0000000000000000 x12: 3031203a65707974
+    [  104.839891] x11: ffff8000819ca758 x10: 0000000000000018 x9 : ffff8000819ca758
+    [  104.847062] x8 : 00000000ffffefff x7 : ffff800081a22758 x6 : 00000000fffff000
+    [  104.854233] x5 : ffff00001fea1588 x4 : 0000000000000000 x3 : 0000000000000027
+    [  104.861404] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff8000819abd00
+    [  104.868576] Call trace:
+    [  104.871034]  lan966x_fdma_irq_handler+0xe0/0x12c [lan966x_switch] (P)
+    [  104.877531]  __handle_irq_event_percpu+0xa0/0x4c4
+    [  104.882261]  handle_irq_event+0x4c/0xf8
+    [  104.886117]  handle_level_irq+0xec/0x17c
+    [  104.890064]  handle_irq_desc+0x40/0x58
+    [  104.893831]  generic_handle_domain_irq+0x18/0x24
+    [  104.898467]  lan966x_oic_irq_handler_domain+0x64/0xb0 [irq_lan966x_oic]
+    [  104.905105]  lan966x_oic_irq_handler+0x34/0xb4 [irq_lan966x_oic]
+    [  104.911131]  handle_irq_desc+0x40/0x58
+    [  104.914900]  generic_handle_domain_irq+0x18/0x24
+    [  104.919536]  pci_dev_irq_handler+0x1c/0x30 [lan966x_pci]
+    [  104.924871]  __handle_irq_event_percpu+0xa0/0x4c4
+    [  104.929594]  handle_irq_event+0x4c/0xf8
+    [  104.933449]  handle_level_irq+0xec/0x17c
+    [  104.937394]  handle_irq_desc+0x40/0x58
+    [  104.941162]  generic_handle_domain_irq+0x18/0x24
+    [  104.945797]  advk_pcie_irq_handler+0x160/0x390
+    [  104.950260]  __handle_irq_event_percpu+0xa0/0x4c4
+    [  104.954983]  handle_irq_event+0x4c/0xf8
+    [  104.958839]  handle_fasteoi_irq+0x108/0x20c
+    [  104.963043]  handle_irq_desc+0x40/0x58
+    [  104.966811]  generic_handle_domain_irq+0x18/0x24
+    [  104.971447]  gic_handle_irq+0x4c/0x110
+    [  104.975214]  call_on_irq_stack+0x30/0x48
+    [  104.979156]  do_interrupt_handler+0x80/0x84
+    [  104.983360]  el1_interrupt+0x3c/0x60
+    [  104.986959]  el1h_64_irq_handler+0x18/0x24
+    [  104.991076]  el1h_64_irq+0x6c/0x70
+    [  104.994495]  default_idle_call+0x80/0x138 (P)
+    [  104.998870]  do_idle+0x220/0x290
+    [  105.002121]  cpu_startup_entry+0x34/0x3c
+    [  105.006064]  rest_init+0xf8/0x188
+    [  105.009398]  start_kernel+0x818/0x8ec
+    [  105.013085]  __primary_switched+0x88/0x90
+    [  105.017119] irq event stamp: 60740
+    [  105.020529] hardirqs last  enabled at (60739): [<ffff800080fb37bc>] default_idle_call+0x7c/0x138
+    [  105.029328] hardirqs last disabled at (60740): [<ffff800080fab5c4>] enter_from_kernel_mode+0x10/0x3c
+    [  105.038477] softirqs last  enabled at (60728): [<ffff8000800cb774>] handle_softirqs+0x624/0x63c
+    [  105.047193] softirqs last disabled at (60711): [<ffff8000800102d8>] __do_softirq+0x14/0x20
+    [  105.055471] ---[ end trace 0000000000000000 ]---
+    [  105.060274] ------------[ cut here ]------------
+    [  105.064963] Unexpected error: 64, error_type: 1073741824
+    [  105.070440] WARNING: drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c:558 at lan966x_fdma_irq_handler+0xe0/0x12c [lan966x_switch], CPU#0: swapper/0/0
+    ...
+    [  105.443891] ------------[ cut here ]------------
+    [  105.448536] Unexpected error: 64, error_type: 0
+    [  105.453235] WARNING: drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c:558 at lan966x_fdma_irq_handler+0xe0/0x12c [lan966x_switch], CPU#0: swapper/0/0
+    ...
+
+And after them my ARM system don't see the answer of a ping command
+replied by my PC (I don't use DHCP with my ARM system).
+
+I don't know why those traces are not present on my x86 (config, race
+condition, other reason) but anyway, they can help to find some clues
+about what's going on.
+
+Of course, feel free to ask me some more tests or anything else I can do
+to help on this topic.
+
+Best regards,
+Hervé
 
