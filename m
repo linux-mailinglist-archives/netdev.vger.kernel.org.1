@@ -1,495 +1,175 @@
-Return-Path: <netdev+bounces-271245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271246-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OOpaMn3ewmkqnAQAu9opvQ
-	(envelope-from <netdev+bounces-271245-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:57:01 +0100
+	id sJRJDUzdwmkqnAQAu9opvQ
+	(envelope-from <netdev+bounces-271246-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:51:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23C6B31B240
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:57:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDDD431B176
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:51:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2BECB313BFF1
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:50:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A32BF302DF4C
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:51:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3996140F8F6;
-	Tue, 24 Mar 2026 18:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24AA40F8C6;
+	Tue, 24 Mar 2026 18:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="W6B4cxOk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g3bAiTbn"
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012031.outbound.protection.outlook.com [52.101.43.31])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E33A40B6F7;
-	Tue, 24 Mar 2026 18:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.31
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774378202; cv=fail; b=mgQQ1N/jUjsM3aUj24+rPxZJ/orsqHf0IGaR8WCQS260es9B2iu1OZC/qYUBl0OxWtoQifIgdI6ulSaYrJBce7tOpuj6OwLXR1bPsvtV0+c/jjRP6jDC/i+nHwPHez68YSfikBl4yD7qYgAZzRvveeejXN8NOSXEznxFOLzwPmY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774378202; c=relaxed/simple;
-	bh=OgnlQYm4gdjlqOr7p0P+M5s61pzUzsoB0r8T+STIWZs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dxKRr6wWn2uhWlgABc8yHdHuERbbGCur6a6zvMpEinThDbPFxIazFDecAefwUOjBqeTPWyJuyS4r7wAKCQ9ufED9m1KVoZSFAl1uWgNg+uCPfjixjmMHnOFiUkZ84+xFk5L6PKA1E+seJO8JlTFDEl2THj4MPNM0UphkYXQx1yU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=W6B4cxOk; arc=fail smtp.client-ip=52.101.43.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Zq9yBpMqObRvyGOa4DgLJXaGL7fRIx4vEeAp4iFbFn+/G4qPprvpyIDMnGsEp4Xt51uEwNR8n4yy+AV3n1EgHEQoK1IkAT/xGzOUz/lzfbj3ThnsMM7jera+c8t7il6QqvS/4108zJxcg2tXFWjxAIxW+J087LQyqUsEZGmo67wsAD2auNz4nso5ACP4mp2ikS67UVgMjTv389i13vyRuEU3K71DJ1SHe8Ql/nlgP7adcs5hetrjW1jp01cfNq+9sOT/IpNYhXaPZ03aSxtBsRnmAVQIBkhggwoHJJhjxKiZr1XWszLsPJMWmFMFIu3//AfS2hNxkrnSpungtAJg3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YlbzheQ8aoWxqWaI9ZU0HhhIOVjMRsQG/CeyfMbcFwI=;
- b=YiXqts7qc/1SdC6q8NvKhPMo4Eyj2EF+VMJD3l9Z912EttHxzoQ5gTOuHaotzXh4w+1Zhal7fCupPcMb5yS6o2eSBu6VvMzxz90MIyUzgy8DXfTI0HJlZ55xIcMBfHVJ+gin19Lra0VfLBl7LmlnM8W92/hnWSOfZPLkU6ilVkVn3NpDOIPO4WDeDOVJafVHt134glWTylXyOVgFrVWCPMUTACDYTzcCjACeTuH8ShLcqkl7uk9ac0uPNdjfXU/uBXXNLVIBF5TunAJgrMbZ37ypK+muCBDuA2GLkvqmsnQ2bG9GKIGMJlp0mKWye52e4/0NVpCCEhihgUhgTbsL+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YlbzheQ8aoWxqWaI9ZU0HhhIOVjMRsQG/CeyfMbcFwI=;
- b=W6B4cxOkK/1UYVgEt7EINsy37eD1cPuEVQ0d45uggwtaO40u5ePT8e0kD0Do9Rkq/x40EW0A8/9Xm3YyTV3ieVNAYm+zkWRATHx22+3eu7sN3+mn8aY7C7lZxTZ2hLNDeqB5VS52jkFaA13ZqxbUdRL+qcuJ8D3mf7OSmroqfTHii8YVXaB0ERda8PRMVVC34dwVwt/qeOSix8dawOD6XEGVlPObk4QYyNOaaPBVIfcvjJdprk20eBwGUbPqqvHl6+lbUqLy3HmiF3rzpb/QHmXKLAWBBUwiWfyBxIyF25Wq6JOZ7sU0DoCUw1wLYzMe1+nNmwL6fxvvCxrOgRF/+g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB8202.namprd12.prod.outlook.com (2603:10b6:8:e1::13) by
- DS7PR12MB9526.namprd12.prod.outlook.com (2603:10b6:8:251::10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9723.16; Tue, 24 Mar 2026 18:49:48 +0000
-Received: from DS7PR12MB8202.namprd12.prod.outlook.com
- ([fe80::38fd:4146:aea:639e]) by DS7PR12MB8202.namprd12.prod.outlook.com
- ([fe80::38fd:4146:aea:639e%6]) with mapi id 15.20.9745.019; Tue, 24 Mar 2026
- 18:49:48 +0000
-From: Andy Roulin <aroulin@nvidia.com>
-To: netdev@vger.kernel.org
-Cc: bridge@lists.linux.dev,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>,
-	Petr Machata <petrm@nvidia.com>,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Andy Roulin <aroulin@nvidia.com>
-Subject: [PATCH net-next 3/3] selftests: net: add bridge STP mode selection test
-Date: Tue, 24 Mar 2026 11:49:42 -0700
-Message-ID: <20260324184942.2828691-4-aroulin@nvidia.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260324184942.2828691-1-aroulin@nvidia.com>
-References: <20260324184942.2828691-1-aroulin@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BY3PR10CA0019.namprd10.prod.outlook.com
- (2603:10b6:a03:255::24) To DS7PR12MB8202.namprd12.prod.outlook.com
- (2603:10b6:8:e1::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDD040B6F0
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 18:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774378287; cv=none; b=GxGB/FZguD1ngWnjfzzc+ShbYHzccekULsYS6a5AhAuhqEFHVhhuNwybfbt9y6nm9oIFg5LbAUQODEtkf8ejqoJUs1yS3evOYFt4xN55lElnGZKWyOxajP+8spIss7Tqiw64UW63neeyDTzuQHrV8XvhkW3mgwaF6aQ34dJ+Klg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774378287; c=relaxed/simple;
+	bh=JBmYqYj+ly1oO/Lbkh369Gp9ml6cCcDXXpGPuv/yl8s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cbidD/DnFt/fVzX1m3CDJUqKcdRNGWrvJFRlsxkJLLWORtO0Y73YV28PDUI0lQcDnc0+LcigDzmYhZAQGlX/mAKWmnJjuPYumAx62RxnF+NMLl+FxBz06b/ZgHoanse9PgiiimdpC0+6GHKS6lyDwoKzYz2USbnh7OOhU4ZIuL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g3bAiTbn; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4852b81c73aso38685875e9.3
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 11:51:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774378282; x=1774983082; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JBmYqYj+ly1oO/Lbkh369Gp9ml6cCcDXXpGPuv/yl8s=;
+        b=g3bAiTbn7Lp2p/Kme0nAWbH1GSV16HVsqyepLkbgGaoFBE7OOfZCUoEfZUcgEAtI6d
+         msY22XW8662KOSyt3Sfv/QOWCTQs/D20bQMV61n346RWfg581BZYfYqLkMKLn2PirCCU
+         xn896ur3rka2GmZNcCcNNlWyzTxCUOXeloFp9G0i1Z0lGg52yEiX+AE7JFavhnZjn/ES
+         9770vxjmCSoHKuIZkfjaXWElRfXp0/TK+y6JW57V9A2jP0vdOHaumIM9gHuokB0EIUdy
+         d5vmibaYR3iV6Xov0fwWQOcA5nAAhaFaIEYiUoV2USZdvxs+3xSje/EIrnBPinpnGNeN
+         B3Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774378282; x=1774983082;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JBmYqYj+ly1oO/Lbkh369Gp9ml6cCcDXXpGPuv/yl8s=;
+        b=jamxUMS+K7iJu7WEhxXRmIaLLHd+CPktk/eQJQ4gIq3+EJcufbuvYkUCUmFSatBMOH
+         J8mGG2DC7k9PnRzdIl9iModQS+Obu/jRglLX3GA+1aaLdFJ2JZBibt7xeexzLSQ6ldrM
+         niCVYivAv04Mc3Oq8JfTfsa4jC9Q4iqwjB22bj7EEck4UlkbB+7tphL0BaAoidOzyugC
+         hQhEZUcjAzvm0mPC/Gm3yEd37vdsDBh26N069cFvujRoHs/CNLoLNfL0oEr8mnKm/aRh
+         AU4Iq4dNIT4M660Y1BCmw7m+/d132j66enhUcdaC+aB72Civ/3a56JTM0IyRM9EyzFVW
+         zNnw==
+X-Forwarded-Encrypted: i=1; AJvYcCV/lYxDBGVLIubbVffWmwIwfnen0heL9WUMx0xCq3GcExO7UQQcYk2Yqg1+kqJErKIdD5iXbiM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgoE9Sk7QTQPpQnXJlFGYeF1R4Iz/xLCc4V/+vReKCLAugpQ6J
+	59QeB474azspeCbgf3RcL/4xnfjnhsbk5RyI1BQhwRGlZbMFnf5vfmCs
+X-Gm-Gg: ATEYQzwOeuL2dDwUgU9hIZqermfXpJE9yPkPp68FfycHI8ZqiAU1Gx7jq8RXcUuDTz2
+	mIcJ8aaswVAXMcwFCYxJQFZ0WDsye9ea+rDPRI6OOv0RU+Z73c2iF5l4sW/t6WNWRqrZ65tLiiB
+	T7WfzxV09weSC7X6pHAmtRvH1DnXYL5I0Nq7IDDRg11rqHIAMgDaH3Fw/WBGJhfVVPognDhcIw+
+	IuCnZT8LbHl3PzPw2jTeOk+5/kQGYWA7LJprbBHcTRMBzSg2toWAQRHBQo6cP1D3IeIxgF/X1lt
+	3/dIMPIK/DWfePacNr/kYSeB7FPl8A5RViWw0FkqwT3jcbBDPEz0uHTIYK4L7R6jPS/qVjCChgb
+	63VpT275GZxU4RHZoWuJT+ArxCOrhS9fUpvzIZ08slqCnZNMc+0G/6bw5yNxvxivLuj6LFmudQg
+	y8U9Ne7kbt7OQnGOwc98g3HNwK/5QaJjo6KHTNxtI=
+X-Received: by 2002:a05:600c:3b16:b0:485:45fb:3472 with SMTP id 5b1f17b1804b1-48715fc3a88mr12954475e9.7.1774378282409;
+        Tue, 24 Mar 2026 11:51:22 -0700 (PDT)
+Received: from localhost.localdomain ([102.164.100.74])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-487165bea11sm6528345e9.1.2026.03.24.11.51.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2026 11:51:21 -0700 (PDT)
+From: David Dull <monderasdor@gmail.com>
+To: longman@redhat.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	lvs-devel@vger.kernel.org,
+	linux-sched@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	David Dull <monderasdor@gmail.com>
+Subject: Re: [PATCH net] netfilter: nfnetlink_queue: fix entry leak in bridge verdict error path
+Date: Tue, 24 Mar 2026 20:51:09 +0200
+Message-ID: <20260324185110.1651-1-monderasdor@gmail.com>
+X-Mailer: git-send-email 2.49.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB8202:EE_|DS7PR12MB9526:EE_
-X-MS-Office365-Filtering-Correlation-Id: d7c4f628-efdc-4e39-b7ad-08de89d61faa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|1800799024|376014|366016|18002099003|56012099003|18092099006|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	xSvWrNHigy0daJP3EcnWNyNKU/NwE5h/gWgVmGUb2BQpK5QUZXeVcqqSmwWVfZFuktyfx6KVb3PVp3XCRq+notqJva0pCj8AQzhFrsGt4YBVxgbpFb/8DYxoXQrrAbQKGo7co4s19qo8k5ec6h2LuNUbnYFOcTRTVmBPQVKpqTZkC6QkKugJN6WOys4lOSldShulCGnrMLO3GKr/O2VmGAPR7Ja1vSDFkBIKljATcnhuP+OOYfgdOFY8A6sYusy6eRvEwVdoVqMkQhfFkCKDyV5bfNgHGLHbu5LSPVg6zT1SVVRfmHb6IwZX4s8GX9SUZE4zUMazy+rRJkgLePUjmwkaDca4rfPDlatW/vCuoFUzyNb5jkI/yzC1GDRMrN6pMi01o4xsldqDW8wVXzBKvWJMOynFF1Q+jkk4xRA5NCsubXJkkSSGdYEPI9oZT108essKzb6HYJucPDk8rIn0N0vGczfd9N0IbdWfAxIMzSqnLkX5BLRyy0m4ib9fK+vmH6Oddx/qBkpyMsng2GH0atsPjHXjfY69tcPkCbmYea6a2xccN08ABNOXfil5nmIYqIsSC4ezm/1GsIiGXGpHps64i+IchLnfKgkJl9/X1NKxBCd5eZg7PMbHN2IveHo00CuuoSaL/yZWu8oYT8dTzkNQCi36+rjQkMJyVuezAruXN5ErEVBgPXI8rqK2RQ3WFX3nT4Ff5bV1Ag7ApNq+fcUgMpY4vjA7rcSuaBuqjaY=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB8202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(18002099003)(56012099003)(18092099006)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?0LgLHUpfef4dBehtfXzQbm0gvfMTvAwqvjlpe94R2Q0ZtrwXKK1Pfi7iamfr?=
- =?us-ascii?Q?rzSxEA5YM06CtGwPc+FvQva1xvu7/1yPCDOyBs9obUVZF+gKRUOPR5zJKTxH?=
- =?us-ascii?Q?JqQWIdJQaUQrv8I8dz90wXXaPJPqkSHcP5Qy3O08aA9LVdjOtUQFPN8KAqfU?=
- =?us-ascii?Q?XAgtKSgc1UNGhRRiMNCBeczjcrmwEOVSK3I01i2Skt8k75LQC7LpaYuRq4rt?=
- =?us-ascii?Q?cO2eANpxp5Zlr7J43Xs3b22qDygnKdq9VtPOcZxmJjFsrjzBLP/s3KxX8/hv?=
- =?us-ascii?Q?FkqmawfYjVhEHJZvpaWp90mOtCseYno5ch67byCbuGsbol3GWFSV+9fOSvZ6?=
- =?us-ascii?Q?TV5085nPbn4BDJPLMMj9TSEDTwT8S71090NWJnfZXCSf3G5zk6spyshLgqir?=
- =?us-ascii?Q?Jg9+A+vXPldCmVCPBtpZ6gRd+d/9JVhOqTkIRlf2aru30CQyy3Qv4NsDjQiF?=
- =?us-ascii?Q?xnURDx0URQqDZL+7QNWgreFci1fvv/KyoQyy6kXcYhdzbxIHJr2UQaG1jdkn?=
- =?us-ascii?Q?cnsRguhZ/sYIlrVaw+DgMYSYb7/aAOmYT3TPKIo0zwv3F0e0VGc9mjVzZXBq?=
- =?us-ascii?Q?ZSiPF4SOQHFPmWO480fbiyNZlGs/9SenCHSc6sGVPGJrXTWMe6gKibPRdAYe?=
- =?us-ascii?Q?zeTe+mX9NMc8uGnDKtTzSrx448EFoJP9WnKiBLWhQzfjIuqbQcMWexHzoZLl?=
- =?us-ascii?Q?oBew5OQg+z052SMHI3tSrUOGX3qyudzTdaUPLAGZ4pwaXGTgY8IcVUF6caN4?=
- =?us-ascii?Q?FU/KV6A4s4cD6CtMpW4IESgSbPsiUzMjUprLuS73Jr6C+F6LP47sZyk42Udf?=
- =?us-ascii?Q?Wok5eHhTUKwcMl428NULiaNTiluDM3gN08GDVV+RqlbEk07S4wioUH0oZDtr?=
- =?us-ascii?Q?KcAyeVSNTF56PmtFLev3se5VaNE3ajTSMVnqaeriwjtG5BB/iyEAoPZOpwt3?=
- =?us-ascii?Q?H7bYO0vAHT/OsLJvyxFKjuj3PLWcNYmGx9Y5f0cdKvxvOMmpsGoqpanAKgUU?=
- =?us-ascii?Q?ADaI1uIKDm1wLGI64RhDrjmatXfPFvU/gBLRab2fMIWDBFzTi8EKG65xSEtX?=
- =?us-ascii?Q?iAAYNDk+WAoWgfYi2R/TbwKVVQUW7mFo6bYTYubc4ISb/TxkcIR7p44zV9SW?=
- =?us-ascii?Q?bRizQCfU6AS+Wd/H1CzaYkHmRVm6WXWcGqSz65u99TJJuo3+XSeKqWWFBKt6?=
- =?us-ascii?Q?3xvtMJ2xm/YCJmrglPAbIQm0944xdfcA7ylxMo6twfY+2/qactDnHQLklULO?=
- =?us-ascii?Q?JQSSfj9fIpn8xblIv5GR/aFpT+HV2R6NPFmBBZCyinq/oXGh5Kq0MvzgU4xf?=
- =?us-ascii?Q?2Q9oEikHPjHPQ+OiO56pwL0DBHkVCeYiACOcgJpTQCmJdEwpLoPq2gVVk5MW?=
- =?us-ascii?Q?eFHXKh98QVrNRPdLfUHL2tz3nrGe+V/+l5rvjOANJyepgsTajLY58Dzi9BAX?=
- =?us-ascii?Q?msu+Ekcf545meVDoN1Yq3VmEDXVIh7mNbqqCoULNbFWNifkBcPaGbWipY44Z?=
- =?us-ascii?Q?a3fXl7ziCZPPCtKAWRKRyIDShUae+4dHT5H4e+0TVVo3ZFahtkB1f99/7zdN?=
- =?us-ascii?Q?XNpLgO2gTHqbVuQb7OGtdY2kOQBNxAfvY5gWdhYKTHlEYMmwpAMX95kt5z4A?=
- =?us-ascii?Q?yfPSCiw794EeMRaYS7EiqJJ09MzswNSZOFdlNWegg/Nm2EzxD2QpFu7jPWuQ?=
- =?us-ascii?Q?UOV5uKOo2enCWVVo4kAkVpr293o3dsPUy2+g/SV3+/C3ochGvCSZKKiVokHL?=
- =?us-ascii?Q?vWTtopKXow=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d7c4f628-efdc-4e39-b7ad-08de89d61faa
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB8202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2026 18:49:48.2301
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6QGDL/9CsgFw7e8Q7ss+iutvqB7Hp7bWm/Whn9DgRNjeO9d2nn1++yXKVT9beCQxNblbTUAzdHEJnkCN7exV+w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB9526
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	FAKE_REPLY(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-271245-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271246-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aroulin@nvidia.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[monderasdor@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,nvidia.com:mid,Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bridge_stp_mode.sh:url,lib.sh:url]
-X-Rspamd-Queue-Id: 23C6B31B240
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CDDD431B176
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a selftest for the IFLA_BR_STP_MODE bridge attribute that verifies:
-
-1. stp_mode defaults to auto on new bridges
-2. stp_mode can be toggled between user, kernel, and auto
-3. Changing stp_mode while STP is active is rejected with -EBUSY
-4. stp_mode user in a network namespace yields userspace STP (stp_state=2)
-5. stp_mode kernel forces kernel STP (stp_state=1)
-6. stp_mode auto in a netns preserves traditional fallback to kernel STP
-7. stp_mode and stp_state can be set atomically in a single message
-8. stp_mode persists across STP disable/enable cycles
-
-Test 4 is the key use case: it demonstrates that userspace STP can now
-be enabled in non-init network namespaces by setting stp_mode to user
-before enabling STP.
-
-Test 7 verifies the atomic usage pattern where both attributes are set
-in a single netlink message, which is supported because br_changelink()
-processes IFLA_BR_STP_MODE before IFLA_BR_STP_STATE.
-
-The test gracefully skips if the installed iproute2 does not support
-the stp_mode attribute.
-
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Assisted-by: Claude:claude-opus-4-6
-Signed-off-by: Andy Roulin <aroulin@nvidia.com>
----
- tools/testing/selftests/net/Makefile          |   1 +
- .../testing/selftests/net/bridge_stp_mode.sh  | 261 ++++++++++++++++++
- 2 files changed, 262 insertions(+)
- create mode 100755 tools/testing/selftests/net/bridge_stp_mode.sh
-
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 6bced3ed798b0..053c7b83c76dd 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -15,6 +15,7 @@ TEST_PROGS := \
- 	big_tcp.sh \
- 	bind_bhash.sh \
- 	bpf_offload.py \
-+	bridge_stp_mode.sh \
- 	bridge_vlan_dump.sh \
- 	broadcast_ether_dst.sh \
- 	broadcast_pmtu.sh \
-diff --git a/tools/testing/selftests/net/bridge_stp_mode.sh b/tools/testing/selftests/net/bridge_stp_mode.sh
-new file mode 100755
-index 0000000000000..9c99d5b6fd667
---- /dev/null
-+++ b/tools/testing/selftests/net/bridge_stp_mode.sh
-@@ -0,0 +1,261 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# shellcheck disable=SC2034,SC2154,SC2317
-+#
-+# Test for bridge STP mode selection (IFLA_BR_STP_MODE).
-+#
-+# Verifies that:
-+# - stp_mode defaults to auto on new bridges
-+# - stp_mode can be toggled between user, kernel, and auto
-+# - stp_mode change is rejected while STP is active (-EBUSY)
-+# - stp_mode user in a netns yields userspace STP (stp_state=2)
-+# - stp_mode kernel forces kernel STP (stp_state=1)
-+# - stp_mode auto preserves traditional fallback to kernel STP
-+# - stp_mode and stp_state can be set atomically in one message
-+# - stp_mode persists across STP disable/enable cycles
-+
-+source lib.sh
-+
-+require_command jq
-+
-+ALL_TESTS="
-+	test_default_auto
-+	test_set_modes
-+	test_reject_change_while_stp_active
-+	test_user_mode_in_netns
-+	test_kernel_mode
-+	test_auto_mode
-+	test_atomic_mode_and_state
-+	test_mode_persistence
-+"
-+
-+bridge_info_get()
-+{
-+	ip -n "$NS1" -d -j link show "$1" | \
-+		jq -r ".[0].linkinfo.info_data.$2"
-+}
-+
-+check_stp_mode()
-+{
-+	local br=$1; shift
-+	local expected=$1; shift
-+	local msg=$1; shift
-+	local val
-+
-+	val=$(bridge_info_get "$br" stp_mode)
-+	[ "$val" = "$expected" ]
-+	check_err $? "$msg: expected $expected, got $val"
-+}
-+
-+check_stp_state()
-+{
-+	local br=$1; shift
-+	local expected=$1; shift
-+	local msg=$1; shift
-+	local val
-+
-+	val=$(bridge_info_get "$br" stp_state)
-+	[ "$val" = "$expected" ]
-+	check_err $? "$msg: expected $expected, got $val"
-+}
-+
-+# Create a bridge in NS1, bring it up, and defer its deletion.
-+bridge_create()
-+{
-+	ip -n "$NS1" link add "$1" type bridge
-+	ip -n "$NS1" link set "$1" up
-+	defer ip -n "$NS1" link del "$1"
-+}
-+
-+setup_prepare()
-+{
-+	setup_ns NS1
-+}
-+
-+cleanup()
-+{
-+	defer_scopes_cleanup
-+	cleanup_all_ns
-+}
-+
-+# Check that stp_mode defaults to auto when creating a bridge.
-+test_default_auto()
-+{
-+	RET=0
-+
-+	ip -n "$NS1" link add br-test type bridge
-+	defer ip -n "$NS1" link del br-test
-+
-+	check_stp_mode br-test auto "stp_mode default"
-+
-+	log_test "stp_mode defaults to auto"
-+}
-+
-+# Test setting stp_mode to user, kernel, and back to auto.
-+test_set_modes()
-+{
-+	RET=0
-+
-+	ip -n "$NS1" link add br-test type bridge
-+	defer ip -n "$NS1" link del br-test
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode user
-+	check_err $? "Failed to set stp_mode to user"
-+	check_stp_mode br-test user "after set user"
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode kernel
-+	check_err $? "Failed to set stp_mode to kernel"
-+	check_stp_mode br-test kernel "after set kernel"
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode auto
-+	check_err $? "Failed to set stp_mode to auto"
-+	check_stp_mode br-test auto "after set auto"
-+
-+	log_test "stp_mode set user/kernel/auto"
-+}
-+
-+# Verify that stp_mode cannot be changed while STP is active.
-+test_reject_change_while_stp_active()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode kernel
-+	check_err $? "Failed to set stp_mode to kernel"
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 1
-+	check_err $? "Failed to enable STP"
-+
-+	# Changing stp_mode while STP is active should fail.
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode auto 2>/dev/null
-+	check_fail $? "Changing stp_mode should fail while STP is active"
-+
-+	check_stp_mode br-test kernel "mode unchanged after rejected change"
-+
-+	# Disable STP, then change should succeed.
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 0
-+	check_err $? "Failed to disable STP"
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode auto
-+	check_err $? "Changing stp_mode should succeed after STP is disabled"
-+
-+	log_test "reject stp_mode change while STP is active"
-+}
-+
-+# Test that stp_mode user in a non-init netns yields userspace STP
-+# (stp_state == 2). This is the key use case: userspace STP without
-+# needing /sbin/bridge-stp or being in init_net.
-+test_user_mode_in_netns()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode user
-+	check_err $? "Failed to set stp_mode to user"
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 1
-+	check_err $? "Failed to enable STP"
-+
-+	check_stp_state br-test 2 "stp_state with user mode"
-+
-+	log_test "stp_mode user in netns yields userspace STP"
-+}
-+
-+# Test that stp_mode kernel forces kernel STP (stp_state == 1)
-+# regardless of whether /sbin/bridge-stp exists.
-+test_kernel_mode()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode kernel
-+	check_err $? "Failed to set stp_mode to kernel"
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 1
-+	check_err $? "Failed to enable STP"
-+
-+	check_stp_state br-test 1 "stp_state with kernel mode"
-+
-+	log_test "stp_mode kernel forces kernel STP"
-+}
-+
-+# Test that stp_mode auto preserves traditional behavior: in a netns
-+# (non-init_net), bridge-stp is not called and STP falls back to
-+# kernel mode (stp_state == 1).
-+test_auto_mode()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	# Auto mode is the default; enable STP in a netns.
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 1
-+	check_err $? "Failed to enable STP"
-+
-+	# In a netns with auto mode, bridge-stp is skipped (init_net only),
-+	# so STP should fall back to kernel mode (stp_state == 1).
-+	check_stp_state br-test 1 "stp_state with auto mode in netns"
-+
-+	log_test "stp_mode auto preserves traditional behavior"
-+}
-+
-+# Test that stp_mode and stp_state can be set in a single netlink
-+# message. This is the intended atomic usage pattern.
-+test_atomic_mode_and_state()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	# Set both stp_mode and stp_state in one command.
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode user stp_state 1
-+	check_err $? "Failed to set stp_mode user and stp_state 1 atomically"
-+
-+	check_stp_state br-test 2 "stp_state after atomic set"
-+
-+	log_test "atomic stp_mode user + stp_state 1 in single message"
-+}
-+
-+# Test that stp_mode persists across STP disable/enable cycles.
-+test_mode_persistence()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	# Set user mode and enable STP.
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode user
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 1
-+	check_err $? "Failed to enable STP with user mode"
-+
-+	# Disable STP.
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 0
-+	check_err $? "Failed to disable STP"
-+
-+	# Verify mode is still user.
-+	check_stp_mode br-test user "stp_mode after STP disable"
-+
-+	# Re-enable STP -- should use user mode again.
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 1
-+	check_err $? "Failed to re-enable STP"
-+
-+	check_stp_state br-test 2 "stp_state after re-enable"
-+
-+	log_test "stp_mode persists across STP disable/enable cycles"
-+}
-+
-+# Check iproute2 support before setting up resources.
-+if ! ip link add type bridge help 2>&1 | grep -q "stp_mode"; then
-+	echo "SKIP: iproute2 too old, missing stp_mode support"
-+	exit "$ksft_skip"
-+fi
-+
-+trap cleanup EXIT
-+
-+setup_prepare
-+tests_run
-+
-+exit "$EXIT_STATUS"
--- 
-2.43.0
-
+Hi Hyunwoo,=0D
+=0D
+I reviewed the change and the reasoning looks correct to me.=0D
+=0D
+nfqnl_recv_verdict() dequeues the entry using find_dequeue_entry(), which t=
+ransfers ownership of the nf_queue_entry to this function. After that point=
+ the function becomes responsible for either reinjecting or freeing the ent=
+ry.=0D
+=0D
+In the PF_BRIDGE path the code calls nfqa_parse_bridge() to parse the VLAN =
+attributes coming from userspace. If the attribute set is malformed (for ex=
+ample NFQA_VLAN present but NFQA_VLAN_TCI missing), nfqa_parse_bridge() ret=
+urns an error. Before this patch, the function would return immediately in =
+that situation.=0D
+=0D
+Because the entry had already been dequeued, returning directly means the n=
+f_queue_entry object and its associated sk_buff are never released. That al=
+so leaves any held references such as net_device and struct net references =
+alive. If a userspace program repeatedly sends malformed verdict messages, =
+this path could leak queue entries and eventually exhaust kernel memory.=0D
+=0D
+Your change fixes this by calling nfqnl_reinject(entry, NF_DROP) before ret=
+urning. This matches the error handling pattern used elsewhere in the file:=
+ once the entry is owned by the verdict handler, it must be reinjected or d=
+ropped so the resources are released correctly.=0D
+=0D
+So the logic now becomes:=0D
+=0D
+1. dequeue the entry=0D
+2. attempt bridge attribute parsing=0D
+3. if parsing fails, explicitly drop the packet via nfqnl_reinject()=0D
+4. return the error to the caller=0D
+=0D
+That ensures the queue entry and skb are properly handled even in the malfo=
+rmed attribute case.=0D
+=0D
+The Fixes tag also makes sense since the leak path was introduced when brid=
+ge verdict handling started using NFQA_VLAN/NFQA_L2HDR.=0D
+=0D
+Overall the change is small, consistent with the existing reinjection model=
+, and addresses a clear ownership leak in the error path.=0D
+=0D
+Reviewed by : David Dull=
 
