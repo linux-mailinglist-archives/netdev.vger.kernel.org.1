@@ -1,222 +1,232 @@
-Return-Path: <netdev+bounces-270882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270877-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oJUHCZArwml5ZwQAu9opvQ
-	(envelope-from <netdev+bounces-270882-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:13:36 +0100
+	id ONUIIXkqwml5ZwQAu9opvQ
+	(envelope-from <netdev+bounces-270877-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:08:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8436E302AA1
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:13:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C91EC3029C3
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:08:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C9DEE31583F7
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:06:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F055D3009155
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:04:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4743E3AE1BC;
-	Tue, 24 Mar 2026 06:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E1D3ACEFE;
+	Tue, 24 Mar 2026 06:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="P450m6/C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DNUZPI81"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BF63AB27F;
-	Tue, 24 Mar 2026 06:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF3E3AB27F
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 06:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774332309; cv=none; b=iNBSWbp/fpYsm6PQxV1GZZLo/r6m7tdzetJ592BrzVm57g8z8vWp2pc3g7Y0oGaMlbvflWggArv4BiZJWkUXGyLDggNdf0w9mxZPrLtFarr+Lp9NcgiOP1/FAva+DASbBLyD5/PAJv/u6/bqtamvFYsU1N7uBf8RT+Oett4eTws=
+	t=1774332267; cv=none; b=X7PlXl5iRVetHgdkEIcm+JLicOVrD8ePA9nac2Wg3orhq/xNWj/Mwu5bWvBEFaBBrUBe9Z/6MiM6ph0XJp5n/gv5Y+KjM8hT3A7Hv4Tllws44WJUfpxFzvJgxbx08Yt3+m3TwzIz3WyeyK9QD4qtEZM8mvxEqxOWTnLy5EakwI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774332309; c=relaxed/simple;
-	bh=lgAOaXwx63jlZ4NF20oAO80m0dmNmB7iY7fzgBRIj8s=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=M0eu/RSGBXnF6ruCBM5TuhEL2/LQV3B4DQMEu9u9XT+BSifiNzs8WVhTE8wLqCY4nX7zQ7WBKwS49Xz8DeQBIWjg4Yv+pbDi3q2GdmqNnNHQQzEE+loEro020TzGzMyDZsAt6vLSod6cIpyxVK495w4eSpIMN71KNmcVgQgreGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=P450m6/C; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 62O645JB0536955, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1774332245; bh=o+uAhGp4kUANfU1omeqOJ3VOe58cQQosKNTQYobN19s=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=P450m6/CUeZaD3dg/msc9e2HqJXPwaRB+F15n0DWj8ZUMUVEOkndIUHdwDO9Fo6qt
-	 7oNfgaW6075bB6EVr9CE9eR+nfujQVsvbCZK181fhsIHnjBUVbg0FeQD6f1Rnc9+sl
-	 ide502pG8PpXvBThuafr0yeBL1DZmxwlSu22PHPOOlqelwegNTm9hAeFasaw89e9DH
-	 rvmc111B1T1D2QoPljqj6QbG37LhJ8dte0OyPBHfet548dTo+7ZbHxyRIKH4K3HkaY
-	 Nlta2+20RVJjmmRfv7Nhgqf1R9+S0Ai21DMEo0Ng9QJlr9tFUuzsgEsAvYvr031MFa
-	 D+s2ifQQGbDXw==
-Received: from mail.realtek.com (rtkexhmbs02.realtek.com.tw[172.21.6.41])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 62O645JB0536955
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 24 Mar 2026 14:04:05 +0800
-Received: from RTKEXHMBS01.realtek.com.tw (172.21.6.40) by
- RTKEXHMBS02.realtek.com.tw (172.21.6.41) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Tue, 24 Mar 2026 14:04:04 +0800
-Received: from RTKEXHMBS03.realtek.com.tw (10.21.1.53) by
- RTKEXHMBS01.realtek.com.tw (172.21.6.40) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 24 Mar 2026 14:04:03 +0800
-Received: from RTKEXHMBS03.realtek.com.tw ([::1]) by
- RTKEXHMBS03.realtek.com.tw ([fe80::368f:61f6:1754:de7d%9]) with mapi id
- 15.02.1748.010; Tue, 24 Mar 2026 14:04:03 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Chih Kai Hsu <hsu.chih.kai@realtek.com>,
-        "kuba@kernel.org"
-	<kuba@kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        nic_swsd
-	<nic_swsd@realtek.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org"
-	<linux-usb@vger.kernel.org>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "bjorn@mork.no" <bjorn@mork.no>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        Chih Kai Hsu <hsu.chih.kai@realtek.com>
-Subject: RE: [PATCH net-next v3 1/2] r8152: add helper functions for PLA/USB
- OCP registers
-Thread-Topic: [PATCH net-next v3 1/2] r8152: add helper functions for PLA/USB
- OCP registers
-Thread-Index: AQHcup5a2tbaq/y5fUWL1A5/CeAKfrW9LZWA
-Date: Tue, 24 Mar 2026 06:04:03 +0000
-Message-ID: <be38bdf5c2b64629920bfe6688907992@realtek.com>
-References: <20260323082226.2601-450-nic_swsd@realtek.com>
- <20260323082226.2601-451-nic_swsd@realtek.com>
-In-Reply-To: <20260323082226.2601-451-nic_swsd@realtek.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1774332267; c=relaxed/simple;
+	bh=26i1VlGHPVJPO2ACFKcL2SsSaS2lRM1qcERjVWdSklM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aoOmugpuhbYP+vNgQDLmIQhaB99iVDUApO41q09O/1InUX+6ZnbShlpj93Uwbqon4l685GBFtAjGO43prlX7TcSu9iXC6ptzjZn3pppWoCQdyCctr/SiHfpytHdFpIW++y8OntFS80/7UYYm3mW/PlWAf1UmammJ/pH21PUMmvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DNUZPI81; arc=none smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7d744d9acbeso1396901a34.1
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 23:04:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774332263; x=1774937063; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eXxXF6JthqgVazDRt0dSHWifir8Ryp7bwwT8LqL/1Pc=;
+        b=DNUZPI814vvOqSP6oHM1c6Vdxeze9ClyuecM/lPFExXJd9zWf9rfEdsFFFJ/zEU4ti
+         woWF0QP24I+KGCXk9A/H7k7cIQ6TzceEsw2qs7hTyNQQkriIkjX5a7zugceNF7d3s3W3
+         t4hbJPxSAV1d6KO0gC4WOuk70ROmjlsAA5PL47GTT7qCS1KtKDId1C8pa+wZpJsiF71s
+         4Ih3swUYSA9hk+tIlQaCvl0ZwjWxQ0XNrPMp+3iEhHyFQp2u+Gr0vLOsP6mWVymO+5tV
+         Hjyx/l6d/vjak84Nt0nNneH8wKlZUTp58XywtNbueSd956U8tq6+X30g9Nuq2W+lXuPL
+         GQ+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774332263; x=1774937063;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eXxXF6JthqgVazDRt0dSHWifir8Ryp7bwwT8LqL/1Pc=;
+        b=cqIrL9P7Jh4pQrEiLiSujFCVcC10OrtVysJrVNfGXKTFseTBL+al2VOhpnJm6cIPgh
+         ZZIOaD4HdwX2wolfzb1JBRwiflFwKjnC5mWBxdkPo7D7SZBGEPUCBGwTrgvSCS1Ya3rY
+         U/OLLyumc5MswzKNSrQcEhMhB7OQ2N1ZcpJ+PM/0JXE7h1ZCDLPqJTc/guZxTTlTTwNv
+         zWxjeM0zl00pagFGVS11hOFAd2EFFy1l71/yEfQwQZuz+MrvOHDhhzuWSFteF2FoGRrA
+         MFuukWrRZhVAwH7ogwX0hjoS95nri+MFhpQSSivYTmI6+wLKEQUGybtwvnOq+GEWTHBj
+         vCgA==
+X-Gm-Message-State: AOJu0YyAUex4WrT/EvISc17Zy7j+uR4+dDcqJAQsW+JEUtwYexww7uNS
+	KrCMuY/EbKB6tTdLYAYluGvyeES5FptPbEi5qPwFUHToNfVaLYV3XWGdijQsg3nZ
+X-Gm-Gg: ATEYQzwzXRnKurH6M/Bm5tYpxM0gZn2tzmx426rHpDlmuOZ0HA8KfC/HWRR3BDS0HG3
+	3UOG666fC/ndFc7OCL2WUD47iXlT0kwzT/QoIVirJWIvI7AKQivL/5/r0o/mxLnRmFkIwrVDdQJ
+	DQMm9FTzc6XkoMqDvvrrtnffnb80pm6ceb/WqbDRiFwwbhcHiFu8Ho6+Ws609oLVHwc9Mpn5ENK
+	UinPKttOtxm8zCwDMRhqlOvf/+L5zh9gMh9kpxU8dNUr3Ak4Ud+GYAIbtRV9ELaHvG/dTbosLWI
+	KtpyQqLEjWaegITl6huyUO9/QkcayvChTM/ppAS4vxoBejSywAMDgqwCaJA4o4xOYlrFjyRVyyw
+	1f8mG2sv7ylgC1UGw89h/WauqnGURxNpj6fOZ3EqmPDff4KmO4dL3xLvuCCNFoD+vT+uXwgZeSd
+	6Qfoge1D/kAp+cQqcL9K7q0AWyjYeHB2xomF6/JmvA1Q83n5Dg/ZevNOH09KXG/g4ZcgNbbw+bW
+	WV/9Wz3uaJLHK9ZLXWb949X2BLyxxynJ51/OOeGsQ==
+X-Received: by 2002:a05:6830:4118:b0:7d9:ad99:9ff0 with SMTP id 46e09a7af769-7d9ad99a072mr6395542a34.30.1774332262611;
+        Mon, 23 Mar 2026 23:04:22 -0700 (PDT)
+Received: from Atwell-Laptop.. (108-212-132-20.lightspeed.irvnca.sbcglobal.net. [108.212.132.20])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d7eadcb757sm11429957a34.15.2026.03.23.23.04.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2026 23:04:22 -0700 (PDT)
+From: Wesley Atwell <atwellwea@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	gmbnomis@gmail.com,
+	Wesley Atwell <atwellwea@gmail.com>
+Subject: [PATCH net-next v2 0/3] tcp: fix scaled no-shrink rwnd quantization slack
+Date: Tue, 24 Mar 2026 00:04:07 -0600
+Message-ID: <20260324060410.1137199-1-atwellwea@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[realtek.com:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-270882-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-270877-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realtek.com:dkim,realtek.com:email,realtek.com:mid];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hayeswang@realtek.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[atwellwea@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 8436E302AA1
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C91EC3029C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Chih Kai Hsu <hsu.chih.kai@realtek.com>
-> Sent: Monday, March 23, 2026 4:22 PM
+Hi,
 
-> @@ -7166,21 +6942,17 @@ static void r8153_init(struct r8152 *tp)
->  	r8153_u1u2en(tp, true);
->  	usb_enable_lpm(tp->udev);
->=20
-> -	ocp_data =3D ocp_read_byte(tp, MCU_TYPE_PLA, PLA_CONFIG6);
-> -	ocp_data |=3D LANWAKE_CLR_EN;
-> -	ocp_write_byte(tp, MCU_TYPE_PLA, PLA_CONFIG6, ocp_data);
-> +	ocp_byte_set_bits(tp, MCU_TYPE_PLA, PLA_CONFIG6,
-> LANWAKE_CLR_EN);
->=20
-> -	ocp_data =3D ocp_read_byte(tp, MCU_TYPE_PLA, PLA_LWAKE_CTRL_REG);
-> -	ocp_data &=3D ~LANWAKE_PIN;
-> -	ocp_write_byte(tp, MCU_TYPE_PLA, PLA_LWAKE_CTRL_REG, ocp_data);
-> +	ocp_byte_clr_bits(tp, MCU_TYPE_PLA, PLA_LWAKE_CTRL_REG,
-> LANWAKE_PIN);
->=20
->  	/* rx aggregation */
-> -	ocp_data =3D ocp_read_word(tp, MCU_TYPE_USB, USB_USB_CTRL);
-> -	ocp_data &=3D ~(RX_AGG_DISABLE | RX_ZERO_EN);
-> -	if (tp->dell_tb_rx_agg_bug)
-> -		ocp_data |=3D RX_AGG_DISABLE;
-> +	ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_USB_CTRL,
-> +			  RX_AGG_DISABLE | RX_ZERO_EN);
->=20
-> -	ocp_write_word(tp, MCU_TYPE_USB, USB_USB_CTRL, ocp_data);
-> +	if (tp->dell_tb_rx_agg_bug)
-> +		ocp_word_set_bits(tp, MCU_TYPE_USB, USB_USB_CTRL,
-> +				  RX_AGG_DISABLE);
+this v2 addresses the review on the earlier quantization series.
 
-I think you could combine above, such as
+Simon was right that the original 3/3 only showed the explicit
+rcv_ssthresh-limited ALIGN-up behavior. For v2, 3/3 is replaced with an
+OOO-memory-based reproducer that first grows rcv_ssthresh with in-order
+data and then drives raw backed free_space below rcv_ssthresh without
+advancing rcv_nxt. In the instrumented old-behavior run that shaped this
+test, the critical ACK reached free_space=86190, rcv_ssthresh=86286,
+and still advertised 87040 (85 << 10). With 2/3 applied, the same ACK
+stays at 84.
 
-	if (tp->dell_tb_rx_agg_bug)
-		ocp_word_w0w1(tp, MCU_TYPE_USB, USB_USB_CTRL, RX_ZERO_EN,
-			      RX_AGG_DISABLE);
-	else
-		ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_USB_CTRL,
-				  RX_AGG_DISABLE | RX_ZERO_EN);
+That follow-up also clarified why the broader 2/3 change is required.
+A narrower variant that preserved the old rcv_ssthresh-limited ALIGN-up
+behavior was not sufficient: earlier ACKs still stored 85 in tp->rcv_wnd,
+and tcp_select_window() later preserved that extra unit because shrinking
+was disallowed. Keeping tp->rcv_wnd representable across the scaled
+no-shrink path is what lets later ACKs settle at the correct
+wire-visible edge.
 
->  	rtl_tally_reset(tp);
->=20
-> @@ -7200,7 +6972,6 @@ static void r8153_init(struct r8152 *tp)
->=20
->  static void r8153b_init(struct r8152 *tp)
->  {
-> -	u32 ocp_data;
->  	u16 data;
->  	int i;
->=20
-[...]
-> @@ -8306,48 +8028,39 @@ static void r8156b_init(struct r8152 *tp)
->=20
->  	usb_enable_lpm(tp->udev);
->=20
-> -	ocp_data =3D ocp_read_word(tp, MCU_TYPE_PLA, PLA_RCR);
-> -	ocp_data &=3D ~SLOT_EN;
-> -	ocp_write_word(tp, MCU_TYPE_PLA, PLA_RCR, ocp_data);
-> +	ocp_word_clr_bits(tp, MCU_TYPE_PLA, PLA_RCR, SLOT_EN);
->=20
-> -	ocp_data =3D ocp_read_word(tp, MCU_TYPE_PLA, PLA_CPCR);
-> -	ocp_data |=3D FLOW_CTRL_EN;
-> -	ocp_write_word(tp, MCU_TYPE_PLA, PLA_CPCR, ocp_data);
-> +	ocp_word_set_bits(tp, MCU_TYPE_PLA, PLA_CPCR, FLOW_CTRL_EN);
->=20
->  	/* enable fc timer and set timer to 600 ms. */
->  	ocp_write_word(tp, MCU_TYPE_USB, USB_FC_TIMER,
->  		       CTRL_TIMER_EN | (600 / 8));
->=20
-> -	ocp_data =3D ocp_read_word(tp, MCU_TYPE_USB, USB_FW_CTRL);
->  	if (!(ocp_read_word(tp, MCU_TYPE_PLA, PLA_POL_GPIO_CTRL) &
-> DACK_DET_EN))
-> -		ocp_data |=3D FLOW_CTRL_PATCH_2;
-> -	ocp_data &=3D ~AUTO_SPEEDUP;
-> -	ocp_write_word(tp, MCU_TYPE_USB, USB_FW_CTRL, ocp_data);
-> +		ocp_word_set_bits(tp, MCU_TYPE_USB, USB_FW_CTRL,
-> +				  FLOW_CTRL_PATCH_2);
-> +
-> +	ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_FW_CTRL, AUTO_SPEEDUP);
+Problem
+=======
 
-I think you could combine above, such as
+In the scaled no-shrink path, __tcp_select_window() rounds free_space up
+to the receive-window scale quantum:
 
-	if (!(ocp_read_word(tp, MCU_TYPE_PLA, PLA_POL_GPIO_CTRL) & DACK_DET_EN))
-		ocp_word_w0w1(tp, MCU_TYPE_USB, USB_FW_CTRL, AUTO_SPEEDUP,
-			      FLOW_CTRL_PATCH_2);
-	else
-		ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_FW_CTRL, AUTO_SPEEDUP);
+  window = ALIGN(free_space, 1 << tp->rx_opt.rcv_wscale);
 
-Best Regards,
-Hayes
+When raw backed free_space sits just below the next quantum, that can
+expose fresh sender-visible credit that is not actually backed by the
+current receive-memory state.
 
+Approach
+========
+
+This repost keeps only the part with a clear fail-before/pass-after
+story today:
+
+  - relax one unrelated packetdrill test which was pinning an
+    incidental advertised window
+  - keep tp->rcv_wnd representable in scaled units by rounding larger
+    windows down to the scale quantum
+  - preserve only the small non-zero case that would otherwise scale
+    away to zero; changing that longstanding non-zero-to-zero behavior
+    would be a separate change from the bug proven here
+  - prove the actual raw-free_space case with a packetdrill sequence
+    that reaches free_space < rcv_ssthresh without changing SO_RCVBUF
+    after the handshake
+
+Tests
+=====
+
+Local validation:
+- git diff --check
+- checkpatch on the touched diff
+- local vmksft targeted run of
+  net/packetdrill:tcp_rcv_quantization_credit.pkt passes with this
+  series applied for ipv4, ipv6, and ipv4-mapped-ipv6
+- the same packetdrill fails on HEAD without 2/3 with:
+
+    expected: win 84
+      actual: win 85
+
+Changes in v2
+=============
+
+- leave 1/3 unchanged
+- rename gran to granularity in 2/3
+- clarify in 2/3 why representable tp->rcv_wnd state is required across
+  later no-shrink transitions
+- clarify in 2/3 that the smaller longstanding non-zero case remains
+  intentionally unchanged in this series
+- replace 3/3 with the proven OOO-memory reproducer for the raw
+  free_space case
+- drop the IPv4-only restriction in 3/3 after validating the test on
+  the default packetdrill protocol set
+
+Series layout
+=============
+
+  1/3 selftests: packetdrill: stop pinning rwnd in tcp_ooo_rcv_mss
+  2/3 tcp: keep scaled no-shrink window representable
+  3/3 selftests: packetdrill: cover scaled rwnd quantization slack
+
+Thanks,
+Wesley Atwell
+
+---
+ net/ipv4/tcp_output.c                              | 16 +++++++++++-----
+ .../selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt |  8 +++++---
+ .../packetdrill/tcp_rcv_quantization_credit.pkt   | 62 ++++++++++++++++++++++
+ 3 files changed, 78 insertions(+), 8 deletions(-)
+
+-- 
+2.43.0
 
