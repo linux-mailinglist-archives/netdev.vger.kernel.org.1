@@ -1,120 +1,198 @@
-Return-Path: <netdev+bounces-270850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270852-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +PAqMnH1wWmmYQQAu9opvQ
-	(envelope-from <netdev+bounces-270850-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 03:22:41 +0100
+	id 2I1IOGb5wWlSYgQAu9opvQ
+	(envelope-from <netdev+bounces-270852-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 03:39:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C3243011D8
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 03:22:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47BEA3013F2
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 03:39:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E9656303AF02
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 02:22:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 04966304B03C
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 02:35:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D457138552C;
-	Tue, 24 Mar 2026 02:22:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFD730AAA9;
+	Tue, 24 Mar 2026 02:35:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="APvBhOZx"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UUT0PtpM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1D1386C14;
-	Tue, 24 Mar 2026 02:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB21E386C35;
+	Tue, 24 Mar 2026 02:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774318955; cv=none; b=N4PMpi8ayckPYtqRHWIV3vDTKDocnxQuPUldE2atNa4NbI4N/q73AX2zToK8Q78ETt7oOD18ILWzIgkQpVW0N9xu6qrD2m12fOSL1ZinlprF/7DKZ/G2KtR/r7qwlhPRy9prG8mJ6LmlpoPifYoASVddcJltDUg2oWBPjTwgcJc=
+	t=1774319735; cv=none; b=CEgZJFCuWhUInSN5HxGejEy3GRTA8LZmjJSI67esXS2DobqhujuEClyPSqdpzYiqJSPD8jQArzwXwooAm4Kw1MsgzyJmZKD1KTn3J43H/itO9yEPmndcxT0znfohXV54MLTc/0rI/CRbT7sJ9acuTkcHbwhP13q4R4zUbUHMVN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774318955; c=relaxed/simple;
-	bh=dhcqtiZ1+Z6bHtcY+FeNQglwKzvJjFxeELs9lZgVjGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pmct4wgYGgyXwWar+Lxji5E8AzHyDcMKBSJUkweZA0DBfeQ1K/fWjjltBfG7SPTWgz3SRDuBNGxntzhjT3bUvyN6CdXIDiKrabP56Fn734Af4PbBxZ1ARVBlHwGMkr804TI5PAWte9qJoo9F8CpmFTyzxUU39981YuCG8Wm+tV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=APvBhOZx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EB29C4CEF7;
-	Tue, 24 Mar 2026 02:22:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774318954;
-	bh=dhcqtiZ1+Z6bHtcY+FeNQglwKzvJjFxeELs9lZgVjGE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=APvBhOZxUUobsb7TolEGT+eOmL04buwmjJTsphGqTs5unlMLCcuwIOAXd5krZuHXm
-	 ZO62XznK5PKfUVE45KEi5wz+fSvDzAxl3mVlqzDivqctOCmpwWoaiJF8TFNVkCJnxY
-	 QFN5jaDM41njuipFNhcSIgGX5bSHvT4bNSLtir8ac0Ikfk/S/jc57seC3NGB24xjip
-	 Uri0WFgavXckiig/FvWvrj6SqAOiD12F/Mvs/Pfl7XWQHjGshBRBCIpdzgWZo/Ox2L
-	 KiY1INBId7N6erlT0pP3f6zyGQA37ntmmQf9wDbVvvuTwIKKJA0lQCI2VEaqsNSLjJ
-	 ul2h3c0FRoW9g==
-Date: Mon, 23 Mar 2026 19:22:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: tglx@kernel.org, tglx@linutronix.de, richardcochran@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- jstultz@google.com, anna-maria@linutronix.de, frederic@kernel.org,
- daniel.lezcano@kernel.org, sboyd@kernel.org, vladimir.oltean@nxp.com,
- wei.fang@nxp.com, xiaoning.wang@nxp.com, jonathan.lemon@gmail.com,
- vadim.fedorenko@linux.dev, yangbo.lu@nxp.com, svens@linux.ibm.com,
- dwmw2@infradead.org, nick.shi@broadcom.com, ajay.kaher@broadcom.com,
- alexey.makhalov@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- linux-fpga@vger.kernel.org, imx@lists.linux.dev,
- linux-s390@vger.kernel.org, dust.li@linux.alibaba.com,
- xuanzhuo@linux.alibaba.com, mani@kernel.org, imran.shaik@oss.qualcomm.com,
- taniya.das@oss.qualcomm.com
-Subject: Re: [PATCH 2/2] MAINTAINERS: update PTP maintainer entries after
- directory split
-Message-ID: <20260323192232.3a5205dc@kernel.org>
-In-Reply-To: <20260318073330.115808-3-guwen@linux.alibaba.com>
-References: <20260318073330.115808-1-guwen@linux.alibaba.com>
-	<20260318073330.115808-3-guwen@linux.alibaba.com>
+	s=arc-20240116; t=1774319735; c=relaxed/simple;
+	bh=d6UOTi2oJTOJsf8nOARM+VEycJjKk6B2ZgEYG+R0ACE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i/ActY+CnekexRrvAZgvjrCyAXtBsppbqARLnW5eMVn+jT2ROkqbU450KD0++E33R6ddYEJSBu4ioLROgfXy/S95TgwUKV9QY5K//CPzrX/Fcosos29hzIfDspPsy+o13bmHx79rRGE6OnkmSeboTCaB0jAWO4KtkytCkLHaF4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=UUT0PtpM; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=he
+	olnZZ/TAm2Z544mhYf3kljQ8hQo1beKRZUx0uD+PY=; b=UUT0PtpM+sAIwPxzv9
+	BhCf2G9vDubGuRoEHZUVQwfFYgUS3U6idS4rhRV15lTDmreGDAH1jTXkebRl55Kz
+	PRJ16MLIE1dGSW/T/SsyzF3BNs3nDFwsdO5/ALMWmsr0PPZLxcm9B1mEO4SliLkd
+	EfMJedZ4dupE96BQQVfcgTLMw=
+Received: from pek-lpg-core5.wrs.com (unknown [])
+	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wD31+4a+MFpBisSBA--.24406S2;
+	Tue, 24 Mar 2026 10:34:04 +0800 (CST)
+From: Robert Garcia <rob_garcia@163.com>
+To: stable@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Robert Garcia <rob_garcia@163.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 6.1.y] Bluetooth: eir: Fix possible crashes on eir_create_adv_data
+Date: Tue, 24 Mar 2026 10:34:02 +0800
+Message-Id: <20260324023402.2607704-1-rob_garcia@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD31+4a+MFpBisSBA--.24406S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxWw18ur1rAF43XF45Jry7Wrg_yoW5uF4rpF
+	Z8KF15ZrZ7Jw1UJrsFyay8Aa13Jr4UWry29rWDZFySqrn0vrZ7t34IkFySqF1ayFWqkF47
+	Z3W0qrW5urWqkw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piwID7UUUUU=
+X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbC5RwQe2nB+BzAhAAA3a
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270850-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270852-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[163.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,linutronix.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,nxp.com,linux.dev,linux.ibm.com,infradead.org,broadcom.com,lists.linux.dev,linux.alibaba.com,oss.qualcomm.com];
-	RCPT_COUNT_TWELVE(0.00)[35];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[163.com:+];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3C3243011D8
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rob_garcia@163.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[holtmann.org,163.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,cp.data:url,intel.com:email]
+X-Rspamd-Queue-Id: 47BEA3013F2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 18 Mar 2026 15:33:30 +0800 Wen Gu wrote:
-> +PTP EMULATED CLOCK SUPPORT
-> +M:	Wen Gu <guwen@linux.alibaba.com>
-> +M:	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> +L:	linux-kernel@vger.kernel.org
-> +S:	Maintained
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I thought David W was supposed to be the main maintainer?
-Two moderately known developers from a single vendor/company
-is not enough to delegate this IMO.
+[ Upstream commit 47c03902269aff377f959dc3fd94a9733aa31d6e ]
+
+eir_create_adv_data may attempt to add EIR_FLAGS and EIR_TX_POWER
+without checking if that would fit.
+
+Link: https://github.com/bluez/bluez/issues/1117#issuecomment-2958244066
+Fixes: 01ce70b0a274 ("Bluetooth: eir: Move EIR/Adv Data functions to its own file")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+[ Use pdu.data instead of pdu->data in hci_set_ext_adv_data_sync()
+ to keep context consistency. ]
+Signed-off-by: Robert Garcia <rob_garcia@163.com>
+---
+ net/bluetooth/eir.c      | 7 ++++---
+ net/bluetooth/eir.h      | 2 +-
+ net/bluetooth/hci_sync.c | 5 +++--
+ 3 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
+index 3e1713673ecc..3f72111ba651 100644
+--- a/net/bluetooth/eir.c
++++ b/net/bluetooth/eir.c
+@@ -242,7 +242,7 @@ u8 eir_create_per_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 	return ad_len;
+ }
+ 
+-u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
++u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr, u8 size)
+ {
+ 	struct adv_info *adv = NULL;
+ 	u8 ad_len = 0, flags = 0;
+@@ -286,7 +286,7 @@ u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 		/* If flags would still be empty, then there is no need to
+ 		 * include the "Flags" AD field".
+ 		 */
+-		if (flags) {
++		if (flags && (ad_len + eir_precalc_len(1) <= size)) {
+ 			ptr[0] = 0x02;
+ 			ptr[1] = EIR_FLAGS;
+ 			ptr[2] = flags;
+@@ -316,7 +316,8 @@ u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 		}
+ 
+ 		/* Provide Tx Power only if we can provide a valid value for it */
+-		if (adv_tx_power != HCI_TX_POWER_INVALID) {
++		if (adv_tx_power != HCI_TX_POWER_INVALID &&
++		    (ad_len + eir_precalc_len(1) <= size)) {
+ 			ptr[0] = 0x02;
+ 			ptr[1] = EIR_TX_POWER;
+ 			ptr[2] = (u8)adv_tx_power;
+diff --git a/net/bluetooth/eir.h b/net/bluetooth/eir.h
+index 0df19f2f4af9..4497f8fd5fef 100644
+--- a/net/bluetooth/eir.h
++++ b/net/bluetooth/eir.h
+@@ -9,7 +9,7 @@
+ 
+ void eir_create(struct hci_dev *hdev, u8 *data);
+ 
+-u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr);
++u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr, u8 size);
+ u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr);
+ u8 eir_create_per_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr);
+ 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 5ad09900f8ff..58003f2f6f36 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1248,7 +1248,8 @@ static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
+ 			return 0;
+ 	}
+ 
+-	len = eir_create_adv_data(hdev, instance, pdu.data);
++	len = eir_create_adv_data(hdev, instance, pdu.data,
++				  HCI_MAX_EXT_AD_LENGTH);
+ 
+ 	pdu.cp.length = len;
+ 	pdu.cp.handle = instance;
+@@ -1279,7 +1280,7 @@ static int hci_set_adv_data_sync(struct hci_dev *hdev, u8 instance)
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 
+-	len = eir_create_adv_data(hdev, instance, cp.data);
++	len = eir_create_adv_data(hdev, instance, cp.data, sizeof(cp.data));
+ 
+ 	/* There's nothing to do if the data hasn't changed */
+ 	if (hdev->adv_data_len == len &&
+-- 
+2.34.1
+
 
