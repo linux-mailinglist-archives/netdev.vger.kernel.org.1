@@ -1,153 +1,241 @@
-Return-Path: <netdev+bounces-271162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271161-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CIw1OyS5wmlilAQAu9opvQ
-	(envelope-from <netdev+bounces-271162-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:17:40 +0100
+	id 6EW3M8O4wmlilAQAu9opvQ
+	(envelope-from <netdev+bounces-271161-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:16:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72BEB318D96
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:17:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9374D318D0D
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:16:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B188311514A
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:10:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 90DBE30CB8C3
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:09:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B9037CD30;
-	Tue, 24 Mar 2026 16:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F183F3B27EF;
+	Tue, 24 Mar 2026 16:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BkI7d0eD"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qSiWh7yY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2819D35A388
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 16:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF4535A388
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 16:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774368613; cv=none; b=dbVRHwWbDanpZ+ICg0+wRjMZth+SSyukKq+RB1EJTs4lqxmax/6H9sI9+kSV8G/SRv20hzInKSl+v33hKt20OjAU2Hbs9osPxK3q2FCqKAJ+qpBzBdWJqz3wIRbSH5WvfTyI31rl59wRiwOu0yuJJYIzMD9PgYlBqEiFpEGwMWo=
+	t=1774368570; cv=none; b=fZqND6ah8WVUABq3zPJEeFQ9UBg3dleBsT3heJ0YVSrxJ0rC1TTXiS4UiYfvFZTmcE0FExqo2n40hJzi4/mimzBI8foi5i5LD2cnt+H7UvFnpgV+1iyng6ThpdPn6pD+a9+1Vt08LuZDumZf0X4U2iEmiQ/lqn38tMzujRpRtmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774368613; c=relaxed/simple;
-	bh=zeikdYu9v/BVJrzka5ekNp8NioT8dTG5SLu0HnqVJ8k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NrpOSx48AG/WAHQBjkLtP5kY2V5yBGwPt0y7oNWMkgpwvtDmfgsdB1sJg+J2zjktoSEdgrESmSgi8C5HyINhuKAFUCeKqgICIEfQSsrsKRre2HSe4ZCihktQFrurkyzITUO+4vCHdKsJ1i+0wBwWEo/Bs0cqySqMY/IXqu0QiDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BkI7d0eD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774368611;
+	s=arc-20240116; t=1774368570; c=relaxed/simple;
+	bh=Sz9kUo6deDneVXClMdOf2aaDC4MhNRkUAlmaVpOCVXs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eVxb9VnSVUGV0wjl8xg5UN2n5Xs+SXzNwgazLvZD8g52w9LdiG7Plklv3xdCCCzghmy4TpgUVlTq3ox8wqFtjxZ18i5PYISvomtbettK3YPnWdn55qIMRtK0GVM9RKV+uGELSnAFQS9w81YhaG0FLpNkDPg3M8koPex7JbqZfac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qSiWh7yY; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <cfaf4077-144a-4876-b6b0-8d4388362217@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774368557;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=RYilQPGgWc0WcL89jBjytDGNZY4H742DKtfN/Tn13+4=;
-	b=BkI7d0eD7qtW7ZTpwUeOogKNx/dkvmOoS2pjCq4Tme1H25irNzujxatQ8nl/7DtFzJLvmy
-	tfmNcBdEFdS6TQCIdkMDoutlyDKc+Z3YurMC/uTT/hiPc+SFeFMzwyC5xr+y7w337ELu36
-	1cPHLAQkbRiS4IS7QFujL6n3fea89Uw=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-687-Bp6EAz3COOiXDF5awm-yow-1; Tue,
- 24 Mar 2026 12:10:07 -0400
-X-MC-Unique: Bp6EAz3COOiXDF5awm-yow-1
-X-Mimecast-MFC-AGG-ID: Bp6EAz3COOiXDF5awm-yow_1774368606
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E507A1955D84;
-	Tue, 24 Mar 2026 16:10:05 +0000 (UTC)
-Received: from ibakolla-thinkpadt14gen4.tpbc.com (unknown [10.45.224.70])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1D8A730002C3;
-	Tue, 24 Mar 2026 16:10:02 +0000 (UTC)
-From: Izabela Bakollari <ibakolla@redhat.com>
-To: Edward Cree <ecree.xilinx@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-net-drivers@amd.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] sfc: add transmit timestamping support
-Date: Tue, 24 Mar 2026 17:08:21 +0100
-Message-ID: <20260324160823.151472-1-ibakolla@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q9HnuHlSuBejVcQaUC7IGTPI3zmgypr9vBTmv2lZWRQ=;
+	b=qSiWh7yYiVFnUisxmjTZTQQ0ii6l53riqvrgCbjqQKxS3pV5P2amhE0GVBoPnWQxqBpebR
+	/uozWB1BNPZ4OuxnnhyCR+mGwiyuf7/q+eHoy8TWn3nazEwyD6FKdDReqeQZhBrUihMrR4
+	8rhB0NCI9wY5hq0ndYx+9Td05Jkjd5U=
+Date: Tue, 24 Mar 2026 12:09:04 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Spamd-Result: default: False [0.84 / 15.00];
+Subject: Re: [PATCH net 2/2] net: xilinx: axienet: Fix BQL accounting for
+ multi-BD TX packets
+To: Suraj Gupta <suraj.gupta2@amd.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, michal.simek@amd.com, radhey.shyam.pandey@amd.com,
+ horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, harini.katakam@amd.com
+References: <20260324145353.1899248-1-suraj.gupta2@amd.com>
+ <20260324145353.1899248-3-suraj.gupta2@amd.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20260324145353.1899248-3-suraj.gupta2@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271161-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-271162-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ibakolla@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sean.anderson@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 72BEB318D96
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid,amd.com:email]
+X-Rspamd-Queue-Id: 9374D318D0D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Enable software TX Timestamping. The out of tree driver 
-also implements this.
+On 3/24/26 10:53, Suraj Gupta wrote:
+> When a TX packet spans multiple buffer descriptors (scatter-gather),
+> the per-BD byte count is accumulated into a local variable that resets
+> on each NAPI poll. If the BDs for a single packet complete across
+> different polls, the earlier bytes are lost and never credited to BQL.
+> This causes BQL to think bytes are permanently in-flight, eventually
+> stalling the TX queue.
+> 
+> Fix this by replacing the local accumulator with a persistent counter
+> (tx_compl_bytes) that survives across polls and is reset only after
+> updating BQL and stats.
 
-Signed-off-by: Izabela Bakollari <ibakolla@redhat.com>
----
- drivers/net/ethernet/sfc/ethtool.c | 2 ++
- drivers/net/ethernet/sfc/tx.c      | 2 ++
- 2 files changed, 4 insertions(+)
+Do we need this? Can't we just do something like
 
-diff --git a/drivers/net/ethernet/sfc/ethtool.c b/drivers/net/ethernet/sfc/ethtool.c
-index 362388754a29..c0038b942913 100644
---- a/drivers/net/ethernet/sfc/ethtool.c
-+++ b/drivers/net/ethernet/sfc/ethtool.c
-@@ -231,6 +231,8 @@ static int efx_ethtool_get_ts_info(struct net_device *net_dev,
- {
- 	struct efx_nic *efx = efx_netdev_priv(net_dev);
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index 415e9bc252527..1ea8a6592bce1 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -768,6 +768,7 @@ static int axienet_free_tx_chain(struct axienet_local *lp, u32 *sizep, int budge
+                if (cur_p->skb) {
+                        struct axienet_cb *cb = (void *)cur_p->skb->cb;
  
-+	ts_info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE;
-+
- 	efx_ptp_get_ts_info(efx, ts_info);
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/sfc/tx.c b/drivers/net/ethernet/sfc/tx.c
-index 4dff19b6ef17..ea0fc1000476 100644
---- a/drivers/net/ethernet/sfc/tx.c
-+++ b/drivers/net/ethernet/sfc/tx.c
-@@ -371,6 +371,8 @@ netdev_tx_t __efx_enqueue_skb(struct efx_tx_queue *tx_queue, struct sk_buff *skb
- 	if (!data_mapped && (efx_tx_map_data(tx_queue, skb, segments)))
- 		goto err;
++                       *sizep += skb->len;
+                        dma_unmap_sgtable(lp->dev, &cb->sgt, DMA_TO_DEVICE, 0);
+                        sg_free_table_chained(&cb->sgt, XAE_INLINE_SG_CNT);
+                        napi_consume_skb(cur_p->skb, budget);
+@@ -783,8 +784,6 @@ static int axienet_free_tx_chain(struct axienet_local *lp, u32 *sizep, int budge
+                wmb();
+                cur_p->cntrl = 0;
+                cur_p->status = 0;
+-
+-               *sizep += status & XAXIDMA_BD_STS_ACTUAL_LEN_MASK;
+        }
  
-+	skb_tx_timestamp(skb);
-+
- 	efx_tx_maybe_stop_queue(tx_queue);
- 
- 	tx_queue->xmit_pending = true;
--- 
-2.51.0
+        smp_store_release(&lp->tx_bd_ci, (ci + i) & (lp->tx_bd_num - 1));
 
+> Fixes: c900e49d58eb ("net: xilinx: axienet: Implement BQL")
+> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+> ---
+>  drivers/net/ethernet/xilinx/xilinx_axienet.h  |  3 +++
+>  .../net/ethernet/xilinx/xilinx_axienet_main.c | 20 +++++++++----------
+>  2 files changed, 13 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> index 602389843342..a4444c939451 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> @@ -509,6 +509,8 @@ struct skbuf_dma_descriptor {
+>   *		complete. Only updated at runtime by TX NAPI poll.
+>   * @tx_bd_tail:	Stores the index of the next Tx buffer descriptor in the ring
+>   *              to be populated.
+> + * @tx_compl_bytes: Accumulates TX completion length until a full packet is
+> + *              reported to the stack.
+>   * @tx_packets: TX packet count for statistics
+>   * @tx_bytes:	TX byte count for statistics
+>   * @tx_stat_sync: Synchronization object for TX stats
+> @@ -592,6 +594,7 @@ struct axienet_local {
+>  	u32 tx_bd_num;
+>  	u32 tx_bd_ci;
+>  	u32 tx_bd_tail;
+> +	u32 tx_compl_bytes;
+>  	u64_stats_t tx_packets;
+>  	u64_stats_t tx_bytes;
+>  	struct u64_stats_sync tx_stat_sync;
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> index b06e4c37ff61..95bf61986cb7 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> @@ -692,6 +692,8 @@ static void axienet_dma_stop(struct axienet_local *lp)
+>  	axienet_lock_mii(lp);
+>  	__axienet_device_reset(lp);
+>  	axienet_unlock_mii(lp);
+> +
+> +	lp->tx_compl_bytes = 0;
+>  }
+>  
+>  /**
+> @@ -770,8 +772,6 @@ static int axienet_device_reset(struct net_device *ndev)
+>   * @first_bd:	Index of first descriptor to clean up
+>   * @nr_bds:	Max number of descriptors to clean up
+>   * @force:	Whether to clean descriptors even if not complete
+> - * @sizep:	Pointer to a u32 filled with the total sum of all bytes
+> - *		in all cleaned-up descriptors. Ignored if NULL.
+>   * @budget:	NAPI budget (use 0 when not called from NAPI poll)
+>   *
+>   * Would either be called after a successful transmit operation, or after
+> @@ -780,7 +780,7 @@ static int axienet_device_reset(struct net_device *ndev)
+>   * Return: The number of packets handled.
+>   */
+>  static int axienet_free_tx_chain(struct axienet_local *lp, u32 first_bd,
+> -				 int nr_bds, bool force, u32 *sizep, int budget)
+> +				 int nr_bds, bool force, int budget)
+>  {
+>  	struct axidma_bd *cur_p;
+>  	unsigned int status;
+> @@ -819,8 +819,8 @@ static int axienet_free_tx_chain(struct axienet_local *lp, u32 first_bd,
+>  		cur_p->cntrl = 0;
+>  		cur_p->status = 0;
+>  
+> -		if (sizep)
+> -			*sizep += status & XAXIDMA_BD_STS_ACTUAL_LEN_MASK;
+> +		if (!force)
+> +			lp->tx_compl_bytes += status & XAXIDMA_BD_STS_ACTUAL_LEN_MASK;
+>  	}
+>  
+>  	if (!force) {
+> @@ -999,18 +999,18 @@ static int axienet_tx_poll(struct napi_struct *napi, int budget)
+>  {
+>  	struct axienet_local *lp = container_of(napi, struct axienet_local, napi_tx);
+>  	struct net_device *ndev = lp->ndev;
+> -	u32 size = 0;
+>  	int packets;
+>  
+>  	packets = axienet_free_tx_chain(lp, lp->tx_bd_ci, lp->tx_bd_num, false,
+> -					&size, budget);
+> +					budget);
+>  
+>  	if (packets) {
+> -		netdev_completed_queue(ndev, packets, size);
+> +		netdev_completed_queue(ndev, packets, lp->tx_compl_bytes);
+>  		u64_stats_update_begin(&lp->tx_stat_sync);
+>  		u64_stats_add(&lp->tx_packets, packets);
+> -		u64_stats_add(&lp->tx_bytes, size);
+> +		u64_stats_add(&lp->tx_bytes, lp->tx_compl_bytes);
+>  		u64_stats_update_end(&lp->tx_stat_sync);
+> +		lp->tx_compl_bytes = 0;
+>  
+>  		/* Matches barrier in axienet_start_xmit */
+>  		smp_mb();
+> @@ -1115,7 +1115,7 @@ axienet_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>  				netdev_err(ndev, "TX DMA mapping error\n");
+>  			ndev->stats.tx_dropped++;
+>  			axienet_free_tx_chain(lp, orig_tail_ptr, ii + 1,
+> -					      true, NULL, 0);
+> +					      true, 0);
+>  			dev_kfree_skb_any(skb);
+>  			return NETDEV_TX_OK;
+>  		}
 
