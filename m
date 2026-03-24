@@ -1,169 +1,143 @@
-Return-Path: <netdev+bounces-271052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271053-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id II0yKmqIwmkAegQAu9opvQ
-	(envelope-from <netdev+bounces-271052-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:49:46 +0100
+	id mDlUNJeIwmkAegQAu9opvQ
+	(envelope-from <netdev+bounces-271053-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:50:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50CD9308A12
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:49:46 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81D7D308A40
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:50:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7C8BA3021426
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:40:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F030030770A0
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7FB2C0299;
-	Tue, 24 Mar 2026 12:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1B873F7E6B;
+	Tue, 24 Mar 2026 12:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Ed3oZcZu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XX8FZp5G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24FC241665
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 12:40:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0E83F7A94;
+	Tue, 24 Mar 2026 12:44:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774356057; cv=none; b=pPWujhco8FrvFIAM2K2hGOxLWBxQs2loKcWGMS5lLsYDwV2MOQCkl/KJpz1ZaUutpMRoM/Xy0LLexjLjbTfodyz/+yEXZNrYPpopTyhDEU5lJqJZbCLbS9iUDvY/vmuCfNPa4v2dc5lBtJVHST/TYWjQJlQZw56VJ6ogBqEcMvc=
+	t=1774356299; cv=none; b=Ax8U5WsQe9Pe0KKzu1xNbJ6oCMBDLiMHFC3uSf2snYCuC5858E4jhr/ot6TidF1wxA/WA5DpLmuBvxPgAP6cjjYsP6M6tc83ERFX0R6DGeo00FrUnN+FAm8SYNC8BbGZtS2Dto0t71SG7rUstNTRp+aHGYmo3mOxDckdb7Ea7L8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774356057; c=relaxed/simple;
-	bh=mtUz9q4etv0YHVPmOccQN1oM80hPcnvw5ZO3ZQ2IGy4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TqBmGS+0bRsPeo9jriCItmMaCWAkm9m2cV3G7DhIgNsgnK9INPeMk5Se15FwyzM4AOChIZija3SHvhAEwxPnhC/cUMci4dwxJaPaJtMlbxfjH92oA/dHWPejYegn5zkXsngK0VrwtnCcnKi5Q4n9GJxZOkVLiP+GZxwg0K5hDyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Ed3oZcZu; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 0C7F5205DD;
-	Tue, 24 Mar 2026 13:40:53 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ndsuqjvj-bWZ; Tue, 24 Mar 2026 13:40:52 +0100 (CET)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 6297D20190;
-	Tue, 24 Mar 2026 13:40:52 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 6297D20190
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1774356052;
-	bh=ZwD3FsudODxrDtfXNfd0myxeAouVNP1Cnwc4Q+0F7fw=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=Ed3oZcZuJC9TnESmD5WEPlCU1Yjn+d5/fV2OZWIwLV6dnOqoyBI/avcYEQ1oyPZRz
-	 RSRX9mOjDuqFCh8XOo9efNpw2Ai0Q3bRHtKYGMaYHyWCDJ1hplhlZ1tbisE1Uk1RO9
-	 oI5eNjqb+yp4WT/hvE34cSJiEB3ByHDV2O/d4+6Eaw7DAqnV/elZ340EQ/yYQGYksB
-	 QECOfhTO3+q/+RsJyunjXvPkR0snm1E3sIOle5zeutbp3NrGi70JSRt36zlrWqtgvA
-	 tzUXIgjYMkQ/bA7/1jd0n9kxFAQDl1k9Im8k2tr7Xxa0Sx/ZMnFj2YnMqGi4nklEqY
-	 jTzCYpiHQw8Zw==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 24 Mar
- 2026 13:40:51 +0100
-Received: (nullmailer pid 3719584 invoked by uid 1000);
-	Tue, 24 Mar 2026 12:40:51 -0000
-Date: Tue, 24 Mar 2026 13:40:51 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>, David
- Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH 20/20] xfrm: iptfs: only publish mode_data after clone
- setup
-Message-ID: <acKGU5rF-yH2LI7v@secunet.com>
-References: <20260323083440.2741292-1-steffen.klassert@secunet.com>
- <20260323083440.2741292-21-steffen.klassert@secunet.com>
- <4cc9cb27-90b9-45fb-8d90-28cca9e12b96@redhat.com>
- <acJ66ndBOEs7d-1D@secunet.com>
- <75af5781-0ed2-4b05-879f-db6628af0692@redhat.com>
+	s=arc-20240116; t=1774356299; c=relaxed/simple;
+	bh=MECXmf1N7eTDqIEEtE6cjyVHRV6CSyjA2h376sZKcSQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eHN3mqFRJVfETx+bPPo1cOcLOX3aw44KPcuaNQdytIFzBqdWD6iI+0ngnnwT6XBcbBUUCHge51JrYlGbHkqZyezvNBdjNVYJVYR8zBysYeFAuQIYgdHDyB+XqvwtBSXBwjg126tmWlORYL62ItuZmqk2k2VZu2lx2NpXGvPuJis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XX8FZp5G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD92AC19424;
+	Tue, 24 Mar 2026 12:44:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774356299;
+	bh=MECXmf1N7eTDqIEEtE6cjyVHRV6CSyjA2h376sZKcSQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XX8FZp5GU6E6W7uR76IDePM795l6hyDsdm13tTnpyBYMah4ZB34htc2F3B+YiOZlE
+	 Jz77MrpT70UFBtQZJzrKm6loXrR11BKmb3THeOzilL8mndF4e+HgcN1V616yfo8DSu
+	 wq7h6tEofDIc3n86+AkLuqZgT3//JE3loMXpXRy83xAJ3k7RUgZigmADEnr7Bgvi6Y
+	 K3/B1XCCkHKHuOcMi3TdMSlJUr8+idPM4iAbvVCS7mbr8MLrSi3mzr9gLUky42NqG/
+	 0jCEzpUIHgSe2AQVFRbnfk885p7E1HfVeckKE6QIpIuifgL8bOIXKuBekl5MZhe8ag
+	 C3bRZ0ByeM8Nw==
+Message-ID: <26496470-4868-4cd0-8d10-bd8b1a3f1473@kernel.org>
+Date: Tue, 24 Mar 2026 08:44:57 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <75af5781-0ed2-4b05-879f-db6628af0692@redhat.com>
-X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Spamd-Result: default: False [-2.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH PATCH net-next v4 8/8] tls: Enable batch async decryption
+ in read_sock
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: john.fastabend@gmail.com, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev,
+ Chuck Lever <chuck.lever@oracle.com>, Hannes Reinecke <hare@suse.de>
+References: <20260317-tls-read-sock-v4-0-ab1086ec600f@oracle.com>
+ <20260317-tls-read-sock-v4-8-ab1086ec600f@oracle.com>
+ <0cf288bb-6ab1-4f2b-8a7f-727b3e1fe0d2@app.fastmail.com>
+ <acHDJNNqZlFIm84n@krikkit>
+Content-Language: en-US
+From: Chuck Lever <cel@kernel.org>
+Organization: kernel.org
+In-Reply-To: <acHDJNNqZlFIm84n@krikkit>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[1g4.org:email,secunet.com:dkim,secunet.com:email,secunet.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
-	TAGGED_FROM(0.00)[bounces-271052-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271053-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,lists.linux.dev,oracle.com,suse.de];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 50CD9308A12
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,oracle.com:email]
+X-Rspamd-Queue-Id: 81D7D308A40
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 24, 2026 at 01:35:25PM +0100, Paolo Abeni wrote:
-> On 3/24/26 12:52 PM, Steffen Klassert wrote:
-> > On Tue, Mar 24, 2026 at 12:33:15PM +0100, Paolo Abeni wrote:
-> >> On 3/23/26 9:34 AM, Steffen Klassert wrote:
-> >>> From: Paul Moses <p@1g4.org>
-> >>>
-> >>> iptfs_clone_state() stores x->mode_data before allocating the reorder
-> >>> window. If that allocation fails, the code frees the cloned state and
-> >>> returns -ENOMEM, leaving x->mode_data pointing at freed memory.
-> >>>
-> >>> The xfrm clone unwind later runs destroy_state() through x->mode_data,
-> >>> so the failed clone path tears down IPTFS state that clone_state()
-> >>> already freed.
-> >>>
-> >>> Keep the cloned IPTFS state private until all allocations succeed so
-> >>> failed clones leave x->mode_data unset. The destroy path already
-> >>> handles a NULL mode_data pointer.
-> >>>
-> >>> Fixes: 6be02e3e4f37 ("xfrm: iptfs: handle reordering of received packets")
-> >>> Cc: stable@vger.kernel.org
-> >>> Signed-off-by: Paul Moses <p@1g4.org>
-> >>> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
-> >>
-> >> While applying this series to verify the PR, I get the following error:
-> >>
-> >> Applying: xfrm: iptfs: only publish mode_data after clone setup
-> >> error: sha1 information is lacking or useless (net/xfrm/xfrm_iptfs.c).
-> >> error: could not build fake ancestor
-> >> Patch failed at 0020 xfrm: iptfs: only publish mode_data after clone setup
-> >>
-> >> The above also prevents the CI from testing the series. Steffen, could
-> >> you please have a look? Possibly a repost could be needed.
-> > 
-> > I guess this is due to a merge conflict with:
-> > 
-> > 69050f8d6d07 ("treewide: Replace kmalloc with kmalloc_obj for non-scalar types")
-> > 
-> > Repost will not help in that case. Not sure what to do
-> > here. The only thing that would fix it is a forced rebase
-> > of the ipsec tree onto the net tree.
+On 3/23/26 6:48 PM, Sabrina Dubroca wrote:
+> 2026-03-23, 17:28:27 -0400, Chuck Lever wrote:
+>>
+>> On Tue, Mar 17, 2026, at 11:04 AM, Chuck Lever wrote:
+>>> From: Chuck Lever <chuck.lever@oracle.com>
+>>>
+>>> tls_sw_read_sock() decrypts one TLS record at a time, blocking until
+>>> each AEAD operation completes before proceeding. Hardware async
+>>> crypto engines depend on pipelining multiple operations to achieve
+>>> full throughput, and the one-at-a-time model prevents that. Kernel
+>>> consumers such as NVMe-TCP and NFSD (when using TLS) are therefore
+>>> unable to benefit from hardware offload.
+>>>
+>>> When ctx->async_capable is true, the submit phase now loops up to
+>>> TLS_READ_SOCK_BATCH (16) records.
+>>
+>> It appears that async_capable is always false for TLSv1.3. Since
+>> TLSv1.3 is a hard requirement for both NVMe/TCP and RPC-with-TLS,
+>> patch 8/8 is moot for us. For the moment, I'm going to drop this
+>> one from the series.
 > 
-> Out of blatant naiveness on my side, how much of a pain would be that
-> option? If more than negligible, I guess we should avoid it.
+> Then 7/8 is also not useful, and the series boils down to a few small> improvements (tls_decrypt_async_drain, spurious wakeups, checking the
+> backlog), which are not limited to read_sock. [nothing wrong with
+> that, it's just a different focus from what you started with]
 
-It is some work on my side, but the bigger problem is for
-those who cloned my ipsec tree. They all need to do this
-forced rebase then. This will hit them by surprise then.
-So IMO, if we can avoid it, we should better not rebase.
+I think that's accurate. I can adjust the cover letter for v5.
+
+
+>> Once Alistair's KeyUpdate work is merged, we can revisit.
+> 
+> Are you planning to add support for async crypto with TLS1.3?
+async crypto would be a pre-requisite requirement for batching
+decryption for TLS v1.3. At the moment I'm not planning to add
+that support, but we should discuss it once KeyUpdate is merged.
+
+
+-- 
+Chuck Lever
 
