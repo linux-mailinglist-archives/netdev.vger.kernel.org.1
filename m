@@ -1,153 +1,135 @@
-Return-Path: <netdev+bounces-270970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270967-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iOXDLftkwmmecAQAu9opvQ
-	(envelope-from <netdev+bounces-270970-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:18:35 +0100
+	id qB/rLt9gwmmecAQAu9opvQ
+	(envelope-from <netdev+bounces-270967-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:01:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C225430658C
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:18:34 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F44A306162
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:00:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 838303036A30
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:05:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 17A273020A68
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9E43D3494;
-	Tue, 24 Mar 2026 10:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6633CEBBC;
+	Tue, 24 Mar 2026 10:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b="ahnUYhlW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WL445Hk+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-b-106.mailbox.org (mout-b-106.mailbox.org [195.10.208.46])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF7A37C0FD;
-	Tue, 24 Mar 2026 10:05:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8ED236403A;
+	Tue, 24 Mar 2026 10:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774346730; cv=none; b=hVTIZjrBq7M9Ukw5r7v7mZUwOBqHmqNxEVIRufyeQ/58fm/ZGfcChb8AmPAyk0QwKK45FK+4S2pkVdUf3Sm1kHUZX9Hlx5W07YrGczRr1KiDROKRppwavMSUJJHCGhJrMzqNajm/umAP5WBfmqo0tfsYi32kHYrnAVakcQ2OzZg=
+	t=1774346421; cv=none; b=L+By/zau0f2BRtCtme9KI3ismE2X4h6LBtnvxuGS7jd9vckKZAMJF3wyI1eGkkIAoEYWpWQNFuepX2pblSQEDKQ81p2O/WqkRz6wYoblPlR27cyWYhlJBLxS4MFB4S9hLTfIsxmjj2ggx52TXLU+r/bbfxGRHL01AbqfZU7SxoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774346730; c=relaxed/simple;
-	bh=iOk4MpBw/M31wTnsZ1RhmmaaOHkTDuosSlYoFiRnUWE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c5E3GHJUHItZ0gztyJrjbFyRT/DuPsF9KYSEJdjJWnMYHr0D5VDmFq2ZGvm6SwmVf9VG/HtLUBkbvOr80IFhmgPmczkQxqADKIrTf1zulLFqBTYkDa3/d4UhwpTQAz4q5BLcHw3DWQyDbAVNRzPKRn3h8OhhjUjVI8cE1hd7sQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=ahnUYhlW; arc=none smtp.client-ip=195.10.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mandelbit.com
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-106.mailbox.org (Postfix) with ESMTPS id 4fg55B2S4LzDsCj;
-	Tue, 24 Mar 2026 10:55:42 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1774346142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qGp6oK32+2KYSJuSOvHbkz30Wr78JyXTMl4CwcYEEr0=;
-	b=ahnUYhlWJmntdruJTCkVfX9TojiM2SLUWOWMM4qFy5I8N6+vKRbkzh6j1DyeUCE2SBEU2V
-	AF61EED7aSB35m93u1ernmXCqLL/I+DLaHyNiLJ2JYR4JJ0aig4NM/jEPAQRrIEflyj95o
-	orrk4MvcH6kM5LSZlq8oDyb2bOeIVdoGcnuVOYiFIWwItuog54JqpWyoRFpAZZSuuCkiFh
-	8KPGFQa6tYGATZMPXAT7RBAQzLqI0a+jVkf9RSb1OaqNZ3CMUxsR3Ou5x1cuJ9EAC1AA5k
-	78TJPzb9n77/ABScSikCgSO8J9m2oa16cTPgK2T+K9Rn8azg9Sh0ucApxMnHag==
-Message-ID: <a5bd6824-ef48-48f7-8c94-4a00f4aa01c2@mandelbit.com>
-Date: Tue, 24 Mar 2026 10:55:31 +0100
+	s=arc-20240116; t=1774346421; c=relaxed/simple;
+	bh=FF10bgnAr1bNVCYr6sT9/rorDBSazK3xDECdUnJhef8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qi5mlHG7oHPE7Kc1eop6jkRnUQMX2v7dH6zVKfuXPttRyk2/rBFbAjgsGWQwG7xQhYSS+9VvWA6ES4qkKIWuewBnwZmpWzpSlOCDxmScySutIu/AzV4zviXq6GLAI/DUTZM+2EB7cnYCkRWGwFcPj81GTz/zmd4+HX+6AyRqeHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WL445Hk+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42231C19424;
+	Tue, 24 Mar 2026 10:00:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774346421;
+	bh=FF10bgnAr1bNVCYr6sT9/rorDBSazK3xDECdUnJhef8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WL445Hk+7okv1+DebKCQuzhCdlzYixyKJm6GtX8Hf6wjtqLFR0Jz++ny33TgFr16y
+	 jaZenvyI+icq6iHfvd+Rpnjqvhk1683SMeHAuzcwvc/X4On09+XW5t5l8zjAHwUPfO
+	 vLl6uGb+IR2IhZ2ja2tm7UmkzSvZjzXrzVtwovGToiYMm2BrWf45GlXQBgzGqlgDG0
+	 ErQ59/5qkpdt2cqDcRJ4vgLH+z+YesaZF+SNnvHx0W3CvyYtEU+keX+UhhmHF0Sm09
+	 /G5puybyWO1aQy81euw+2/cGlOpxfs963vryzZRb6/2J2lDiQjBY9QrQa0KoIvcQKx
+	 4K0IsMrfIfPfQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CEFB3808200;
+	Tue, 24 Mar 2026 10:00:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC net-next 15/15] Documentation: networking: add ipxlat
- translator guide
-To: Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org
-Cc: =?UTF-8?Q?Daniel_Gr=C3=B6ber?= <dxld@darkboxed.org>,
- Antonio Quartulli <antonio@mandelbit.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260319151230.655687-1-ralf@mandelbit.com>
- <20260319151230.655687-16-ralf@mandelbit.com> <87se9vh3ls.fsf@trenco.lwn.net>
-Content-Language: en-US
-From: Ralf Lici <ralf@mandelbit.com>
-In-Reply-To: <87se9vh3ls.fsf@trenco.lwn.net>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Subject: Re: [PATCH v3 net-next 0/3]  amd-xgbe: TX resilience improvements for
+ link-down handling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177434640929.598311.7913943645048175777.git-patchwork-notify@kernel.org>
+Date: Tue, 24 Mar 2026 10:00:09 +0000
+References: <20260319163251.1808611-1-Raju.Rangoju@amd.com>
+In-Reply-To: <20260319163251.1808611-1-Raju.Rangoju@amd.com>
+To: Raju Rangoju <Raju.Rangoju@amd.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ andrew+netdev@lunn.ch
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[mandelbit.com:s=MBO0001];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[mandelbit.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270970-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[mandelbit.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270967-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	RSPAMD_EMAILBL_FAIL(0.00)[pabeni.redhat.com:query timed out];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mandelbit.com:dkim,mandelbit.com:email,mandelbit.com:mid,darkboxed.org:email]
-X-Rspamd-Queue-Id: C225430658C
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8F44A306162
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 3/19/26 23:11, Jonathan Corbet wrote:
-> Ralf Lici <ralf@mandelbit.com> writes:
+On Thu, 19 Mar 2026 22:02:48 +0530 you wrote:
+> This series enhances the AMD 10GbE driver's TX queue handling during
+> link-down events to improve resilience, prevent resource leaks, and
+> enable fast failover in link aggregation configurations.
 > 
->> From: Daniel Gröber <dxld@darkboxed.org>
->>
->> Add user and reviewer documentation for the ipxlat virtual netdevice in
->> Documentation/networking/ipxlat.rst.
->>
->> The document describes the datapath model, stateless IPv4/IPv6 address
->> translation rules, ICMP handling, control-plane configuration, and test
->> topology assumptions. It also records the intended runtime configuration
->> contract and current behavior limits so deployment expectations are
->> clear.
->>
->> Signed-off-by: Daniel Gröber <dxld@darkboxed.org>
->> Signed-off-by: Ralf Lici <ralf@mandelbit.com>
->> ---
->>  Documentation/networking/ipxlat.rst | 190 ++++++++++++++++++++++++++++
->>  1 file changed, 190 insertions(+)
->>  create mode 100644 Documentation/networking/ipxlat.rst
+> The three patches form a complete link-down handling solution:
 > 
-> You need to add this new file to Documentation/networking/index.rst or
-> it won't be included in the build (and you'll get a warning).
+> 1. Patch 1: Fast detection (know quickly when link goes down)
+> 2. Patch 2: Quick response (stop TX immediately, skip waits)
+> 3. Patch 3: Clean recovery (reclaim abandoned resources)
 > 
-> Thanks,
-> 
-> jon
+> [...]
 
-Hi Jon,
+Here is the summary with links:
+  - [v3,net-next,1/3] amd-xgbe: add adaptive link status polling
+    https://git.kernel.org/netdev/net-next/c/31b2d4e00260
+  - [v3,net-next,2/3] amd-xgbe: optimize TX shutdown on link-down
+    https://git.kernel.org/netdev/net-next/c/0898849ad971
+  - [v3,net-next,3/3] amd-xgbe: add TX descriptor cleanup for link-down
+    https://git.kernel.org/netdev/net-next/c/b7fb3677840d
 
-Thanks for the heads-up.
-
-I’ve fixed this for the next revision. While rechecking with 'make
-SPHINXDIRS=networking htmldocs', I also found and fixed a couple of
-'ipxlat.rst' issues reported by Sphinx.
-
-Thanks,
-
+You are awesome, thank you!
 -- 
-Ralf Lici
-Mandelbit Srl
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
