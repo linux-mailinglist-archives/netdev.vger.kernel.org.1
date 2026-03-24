@@ -1,66 +1,67 @@
-Return-Path: <netdev+bounces-271225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271226-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yBWaN0jVwmllmgQAu9opvQ
-	(envelope-from <netdev+bounces-271225-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:17:44 +0100
+	id ID/hDynVwmllmgQAu9opvQ
+	(envelope-from <netdev+bounces-271226-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:17:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6052A31A9CF
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:17:44 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4859331A9A8
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:17:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B3A4C3067B3F
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:16:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E5D14301E727
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C67737CD4F;
-	Tue, 24 Mar 2026 18:16:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7EDD38237A;
+	Tue, 24 Mar 2026 18:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T759cUhU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bXgM8zAt"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F10335959;
-	Tue, 24 Mar 2026 18:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E9F37D101;
+	Tue, 24 Mar 2026 18:16:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774376184; cv=none; b=FcM5BHpS/jnnw8vvQPv2J1OkZNdrU/1zxPM3Y1mkdAXPceHWTNPZXlsbACLXb627rfrgSFrTlwx5YZnBiytQV7ZBcAjlOUawmTsro2mflOtMvVAx+k19es3AcOmImJSD/jbnzlEEHpavWSCDtpdZjuN2hKz5a8xl1Lap6q77iWc=
+	t=1774376198; cv=none; b=tmdT3C/9zmQBC7duMqeCjNXEZ4GNsvIpI8WsltvQbeNPjqHW1dKkIePy5h6/UBnZJkwu9Ax6CcbiV4JMW1A5lacSZgIcHvhcwqP+WgBdOaJpyQbV1UJODNm6maOvKbUew+u50NtaLmIPwOPoR2uI5X5FqSSYzD/n9ykLX/DmwbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774376184; c=relaxed/simple;
-	bh=YSwyPPq79cAEvrJLfHzNNBZ3q2KGHHXXEPrPyKjt0ZU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=QssfRVk0sfc5Wj8xNL+Tt9NslQ67gA529pmyjxTYWRml+ZQJAxUgBnjRnfqrJnJqn3AV/reHzHsC6iFvcZY3RW1twO8XyYsC6s2NApNpuzd+FTS3VO1khgs13Qn6UmRmiSwH6nDFriX1WDOaL5+ir2Tai+IVkSDANUuFBGATmsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T759cUhU; arc=none smtp.client-ip=198.175.65.12
+	s=arc-20240116; t=1774376198; c=relaxed/simple;
+	bh=hpBLvfVKe2gXEk92KVwlFaLVWr1gtfKzkp/0ToQ1c6s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lqFbij9AxmGVu7AY5GP7jkpBpcaL4BoNYUd/ZuqpqHtSVcbpxbNYC7kgYRph4gClJIPgjbx5XJsDPRWOt/QKoXRhaI13jdBPE5q/uroaIQ2e2hmiYsrqQR7M5pwnbYntHKDBVrzoUDT0UwfoKj80Bepu2ZXcLECrMBhiS1xyS5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bXgM8zAt; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774376183; x=1805912183;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=YSwyPPq79cAEvrJLfHzNNBZ3q2KGHHXXEPrPyKjt0ZU=;
-  b=T759cUhURt2tXzzzvra+9sqTOWuZ7AIXFX+FOA3Gak0xKU1KxRbNMjmV
-   z5i7eDYIGIaPGwRQ9Irqxx/5lMxt8tpYxtHTQTsgk7fhIKsmu+3AHhfi2
-   W7j/5t1ZPsERsVGYzDOJzSJtEJ5x/pA2Lhq5KX9hRz+At6gOoXoIQm/+3
-   f45xKkv+x7l8WV2GEuCUNf+Nnh3SYatlr15+VJkJwNKcvJxbMgE6MX8z7
-   uvow+bzoxXJ2BzcsN5yhIjoc1cT3fSZ11xdR67BCs+zktK6K09KrL8eOb
-   7GcASehNYgJFaPtA0YY2bKXf63YJEvWu6maUqZMHxDo/px1xAu2WcDFel
-   Q==;
-X-CSE-ConnectionGUID: UUlz+JFARP6EVm2R9c+bGw==
-X-CSE-MsgGUID: 0llXFwUKSVeOssAMLi8Xsw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="86879341"
+  t=1774376197; x=1805912197;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=hpBLvfVKe2gXEk92KVwlFaLVWr1gtfKzkp/0ToQ1c6s=;
+  b=bXgM8zAtIDFIgmrGUcRxoiW3nNUfMBFgHFuZfPW8OUpQUB6MquhToITg
+   oSYVp48rpGSxworWmSkqqvhomKZdn5rrlH3rDacxBVxxxiDpm4QznsGbF
+   ghZsxl5cMwj7h3nKk2izhayD2UOKgzRVdZRov8bvsblIHaD8Vhr3nv5//
+   T4IL/h/5gNDxYPnfNuAQm/YbpdLVwUIdpTuEhYqabxvq3+CNLBsSf+msc
+   ryn4rd8IPkVPWncg8CBG/l8VGzDs/AgeXkh99sz2MYkO5CmdJp0q1SkCy
+   +gGTAEVxY8qFMFoMRfEmqsTlSPzlTRisxn4YNoVuWGrZ1nUYArxgXwfU+
+   w==;
+X-CSE-ConnectionGUID: Lxfk0Yx/SZuv/sn18eXAug==
+X-CSE-MsgGUID: r2Jb4fZERhW5Ljrz6RVg9A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="86879393"
 X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="86879341"
+   d="scan'208";a="86879393"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 11:16:22 -0700
-X-CSE-ConnectionGUID: JmAcwus9QjyvwxJlVreAwg==
-X-CSE-MsgGUID: qsSCmtJnS3i+D6YfLIgbcQ==
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 11:16:37 -0700
+X-CSE-ConnectionGUID: 12myZWtxTzeYodboi/+sXw==
+X-CSE-MsgGUID: qYXCfrdjSCqtsl1dk/Dksw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="262362728"
+   d="scan'208";a="262362803"
 Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 11:16:21 -0700
-Date: Tue, 24 Mar 2026 11:16:21 -0700
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 11:16:37 -0700
+Date: Tue, 24 Mar 2026 11:16:36 -0700
 From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 To: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
 	Nikolay Borisov <nik.borisov@suse.com>,
@@ -91,16 +92,11 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Asit Mallick <asit.k.mallick@intel.com>,
 	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
 	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: [PATCH v8 00/10] VMSCAPE optimization for BHI variant
-Message-ID: <20260324-vmscape-bhb-v8-0-68bb524b3ab9@linux.intel.com>
-X-B4-Tracking: v=1; b=H4sIAJbUwmkC/23QTU7DMBAF4KtUXuPKM/6ZmhX3QCwcj0MttUmVF
- Kuoyt1xKqANZPlGmk967yrGNOQ0iufNVQyp5DH3XQ27p42I+9C9J5m5ZoEKrfLgZDmOMZySbPa
- NZGLjvCdqsRX14zSkNl9u2utbzfs8nvvh84YXmK/fDpqFU0AqycFCqxJ4bfjlkLuPyzZ353TYx
- v4oZq3grwAK7FLAKniIDbOPOni3LugHAWkp6CpY8jqi1SZ5vS6YuwDgl4KpAgQObJLzzHFdsA8
- CLvcsVtYeyM4lg7pRal1wdwEVLAU3L+lAMVuwBGZdoB/BKf23BVWhIReIKPhdaP8L0zR9AZECC
- fQ4AgAA
-X-Change-ID: 20250916-vmscape-bhb-d7d469977f2f
+Subject: [PATCH v8 01/10] x86/bhi: x86/vmscape: Move LFENCE out of
+ clear_bhb_loop()
+Message-ID: <20260324-vmscape-bhb-v8-1-68bb524b3ab9@linux.intel.com>
 X-Mailer: b4 0.15-dev
+References: <20260324-vmscape-bhb-v8-0-68bb524b3ab9@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,23 +105,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20260324-vmscape-bhb-v8-0-68bb524b3ab9@linux.intel.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271225-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271226-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[37];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -135,160 +132,113 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,linux.intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6052A31A9CF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.com:email,linux.intel.com:mid]
+X-Rspamd-Queue-Id: 4859331A9A8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-v8:
-- Use helper in KVM to convey the mitigation status. (PeterZ/Borisov)
-- Fix the documentation for default vmscape mitigation. (BPF bot)
-- Remove the stray lines in bug.c (BPF bot).
-- Updated commit messages and comments.
-- Rebased to v7.0-rc5.
+Currently, BHB clearing sequence is followed by an LFENCE to prevent
+transient execution of subsequent indirect branches prematurely. However,
+LFENCE barrier could be unnecessary in certain cases. For example, when
+kernel is using BHI_DIS_S mitigation, and BHB clearing is only needed for
+userspace. In such cases, LFENCE is redundant because ring transitions
+would provide the necessary serialization.
 
-v7: https://lore.kernel.org/r/20260319-vmscape-bhb-v7-0-b76a777a98af@linux.intel.com
-- s/This allows/Allow/ and s/This does adds/This adds/ in patch 1/10 commit
-  message (Borislav).
-- Minimize register usage in BHB clearing seq. (David Laight)
-  - Instead of separate ecx/eax counters, use al/ah.
-  - Adjust the alignment of RET due to register size change.
-  - save/restore rax in the seq itself.
-  - Remove the save/restore of rax/rcx for BPF callers.
-- Rename clear_bhb_loop() to clear_bhb_loop_nofence() to make it
-  obvious that the LFENCE is not part of the sequence (Borislav).
-- Fix Kconfig: s/select/depends on/ HAVE_STATIC_CALL (PeterZ).
-- Rebased to v7.0-rc4.
+Below is a quick recap of BHI mitigation options:
 
-v6: https://lore.kernel.org/r/20251201-vmscape-bhb-v6-0-d610dd515714@linux.intel.com
-- Remove semicolon at the end of asm in ALTERNATIVE (Uros).
-- Fix build warning in vmscape_select_mitigation() (LKP).
-- Rebased to v6.18.
+  On Alder Lake and newer
 
-v5: https://lore.kernel.org/r/20251126-vmscape-bhb-v5-2-02d66e423b00@linux.intel.com
-- For BHI seq, limit runtime-patching to loop counts only (Dave).
-  Dropped 2 patches that moved the BHB seq to a macro.
-- Remove redundant switch cases in vmscape_select_mitigation() (Nikolay).
-- Improve commit message (Nikolay).
-- Collected tags.
+  - BHI_DIS_S: Hardware control to mitigate BHI in ring0. This has low
+	       performance overhead.
+  - Long loop: Alternatively, longer version of BHB clearing sequence
+	       can be used to mitigate BHI. It can also be used to mitigate
+	       BHI variant of VMSCAPE. This is not yet implemented in
+	       Linux.
 
-v4: https://lore.kernel.org/r/20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com
-- Move LFENCE to the callsite, out of clear_bhb_loop(). (Dave)
-- Make clear_bhb_loop() work for larger BHB. (Dave)
-  This now uses hardware enumeration to determine the BHB size to clear.
-- Use write_ibpb() instead of indirect_branch_prediction_barrier() when
-  IBPB is known to be available. (Dave)
-- Use static_call() to simplify mitigation at exit-to-userspace. (Dave)
-- Refactor vmscape_select_mitigation(). (Dave)
-- Fix vmscape=on which was wrongly behaving as AUTO. (Dave)
-- Split the patches. (Dave)
-  - Patch 1-4 prepares for making the sequence flexible for VMSCAPE use.
-  - Patch 5 trivial rename of variable.
-  - Patch 6-8 prepares for deploying BHB mitigation for VMSCAPE.
-  - Patch 9 deploys the mitigation.
-  - Patch 10-11 fixes ON Vs AUTO mode.
+  On older CPUs
 
-v3: https://lore.kernel.org/r/20251027-vmscape-bhb-v3-0-5793c2534e93@linux.intel.com
-- s/x86_pred_flush_pending/x86_predictor_flush_exit_to_user/ (Sean).
-- Removed IBPB & BHB-clear mutual exclusion at exit-to-userspace.
-- Collected tags.
+  - Short loop: Clears BHB at kernel entry and VMexit. The "Long loop" is
+		effective on older CPUs as well, but should be avoided
+		because of unnecessary overhead.
 
-v2: https://lore.kernel.org/r/20251015-vmscape-bhb-v2-0-91cbdd9c3a96@linux.intel.com
-- Added check for IBPB feature in vmscape_select_mitigation(). (David)
-- s/vmscape=auto/vmscape=on/ (David)
-- Added patch to remove LFENCE from VMSCAPE BHB-clear sequence.
-- Rebased to v6.18-rc1.
+On Alder Lake and newer CPUs, eIBRS isolates the indirect targets between
+guest and host. But when affected by the BHI variant of VMSCAPE, a guest's
+branch history may still influence indirect branches in userspace. This
+also means the big hammer IBPB could be replaced with a cheaper option that
+clears the BHB at exit-to-userspace after a VMexit.
 
-v1: https://lore.kernel.org/r/20250924-vmscape-bhb-v1-0-da51f0e1934d@linux.intel.com
+In preparation for adding the support for BHB sequence (without LFENCE) on
+newer CPUs, move the LFENCE to the caller side after clear_bhb_loop() is
+executed. Allow callers to decide whether they need the LFENCE or
+not. This adds a few extra bytes to the call sites, but it obviates
+the need for multiple variants of clear_bhb_loop().
 
-Hi All,
-
-These patches aim to improve the performance of a recent mitigation for
-VMSCAPE[1] vulnerability. This improvement is relevant for BHI variant of
-VMSCAPE that affect Alder Lake and newer processors.
-
-The current mitigation approach uses IBPB on kvm-exit-to-userspace for all
-affected range of CPUs. This is an overkill for CPUs that are only affected
-by the BHI variant. On such CPUs clearing the branch history is sufficient
-for VMSCAPE, and also more apt as the underlying issue is due to poisoned
-branch history.
-
-Below is the iPerf data for transfer between guest and host, comparing IBPB
-and BHB-clear mitigation. BHB-clear shows performance improvement over IBPB
-in most cases.
-
-Platform: Emerald Rapids
-Baseline: vmscape=off
-Target: IBPB at VMexit-to-userspace Vs the new BHB-clear at
-	VMexit-to-userspace mitigation (both compared against baseline).
-
-(pN = N parallel connections)
-
-| iPerf user-net | IBPB    | BHB Clear |
-|----------------|---------|-----------|
-| UDP 1-vCPU_p1  | -12.5%  |   1.3%    |
-| TCP 1-vCPU_p1  | -10.4%  |  -1.5%    |
-| TCP 1-vCPU_p1  | -7.5%   |  -3.0%    |
-| UDP 4-vCPU_p16 | -3.7%   |  -3.7%    |
-| TCP 4-vCPU_p4  | -2.9%   |  -1.4%    |
-| UDP 4-vCPU_p4  | -0.6%   |   0.0%    |
-| TCP 4-vCPU_p4  |  3.5%   |   0.0%    |
-
-| iPerf bridge-net | IBPB    | BHB Clear |
-|------------------|---------|-----------|
-| UDP 1-vCPU_p1    | -9.4%   |  -0.4%    |
-| TCP 1-vCPU_p1    | -3.9%   |  -0.5%    |
-| UDP 4-vCPU_p16   | -2.2%   |  -3.8%    |
-| TCP 4-vCPU_p4    | -1.0%   |  -1.0%    |
-| TCP 4-vCPU_p4    |  0.5%   |   0.5%    |
-| UDP 4-vCPU_p4    |  0.0%   |   0.9%    |
-| TCP 1-vCPU_p1    |  0.0%   |   0.9%    |
-
-| iPerf vhost-net | IBPB    | BHB Clear |
-|-----------------|---------|-----------|
-| UDP 1-vCPU_p1   | -4.3%   |   1.0%    |
-| TCP 1-vCPU_p1   | -3.8%   |  -0.5%    |
-| TCP 1-vCPU_p1   | -2.7%   |  -0.7%    |
-| UDP 4-vCPU_p16  | -0.7%   |  -2.2%    |
-| TCP 4-vCPU_p4   | -0.4%   |   0.8%    |
-| UDP 4-vCPU_p4   |  0.4%   |  -0.7%    |
-| TCP 4-vCPU_p4   |  0.0%   |   0.6%    |
-
-[1] https://comsec.ethz.ch/research/microarch/vmscape-exposing-and-exploiting-incomplete-branch-predictor-isolation-in-cloud-environments/
-
+Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
+Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
+Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 ---
-Pawan Gupta (10):
-      x86/bhi: x86/vmscape: Move LFENCE out of clear_bhb_loop()
-      x86/bhi: Make clear_bhb_loop() effective on newer CPUs
-      x86/bhi: Rename clear_bhb_loop() to clear_bhb_loop_nofence()
-      x86/vmscape: Rename x86_ibpb_exit_to_user to x86_predictor_flush_exit_to_user
-      x86/vmscape: Move mitigation selection to a switch()
-      x86/vmscape: Use write_ibpb() instead of indirect_branch_prediction_barrier()
-      x86/vmscape: Use static_call() for predictor flush
-      x86/vmscape: Deploy BHB clearing mitigation
-      x86/vmscape: Resolve conflict between attack-vectors and vmscape=force
-      x86/vmscape: Add cmdline vmscape=on to override attack vector controls
+ arch/x86/entry/entry_64.S            | 5 ++++-
+ arch/x86/include/asm/nospec-branch.h | 4 ++--
+ arch/x86/net/bpf_jit_comp.c          | 2 ++
+ 3 files changed, 8 insertions(+), 3 deletions(-)
 
- Documentation/admin-guide/hw-vuln/vmscape.rst   | 15 ++++-
- Documentation/admin-guide/kernel-parameters.txt |  6 +-
- arch/x86/Kconfig                                |  1 +
- arch/x86/entry/entry_64.S                       | 34 +++++++----
- arch/x86/include/asm/cpufeatures.h              |  2 +-
- arch/x86/include/asm/entry-common.h             |  9 ++-
- arch/x86/include/asm/nospec-branch.h            | 13 +++--
- arch/x86/include/asm/processor.h                |  1 +
- arch/x86/kernel/cpu/bugs.c                      | 76 ++++++++++++++++++++-----
- arch/x86/kvm/x86.c                              |  4 +-
- arch/x86/net/bpf_jit_comp.c                     | 11 +---
- 11 files changed, 127 insertions(+), 45 deletions(-)
----
-base-commit: c369299895a591d96745d6492d4888259b004a9e
-change-id: 20250916-vmscape-bhb-d7d469977f2f
+diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+index 42447b1e1dff..3a180a36ca0e 100644
+--- a/arch/x86/entry/entry_64.S
++++ b/arch/x86/entry/entry_64.S
+@@ -1528,6 +1528,9 @@ SYM_CODE_END(rewind_stack_and_make_dead)
+  * refactored in the future if needed. The .skips are for safety, to ensure
+  * that all RETs are in the second half of a cacheline to mitigate Indirect
+  * Target Selection, rather than taking the slowpath via its_return_thunk.
++ *
++ * Note, callers should use a speculation barrier like LFENCE immediately after
++ * a call to this function to ensure BHB is cleared before indirect branches.
+  */
+ SYM_FUNC_START(clear_bhb_loop)
+ 	ANNOTATE_NOENDBR
+@@ -1562,7 +1565,7 @@ SYM_FUNC_START(clear_bhb_loop)
+ 	sub	$1, %ecx
+ 	jnz	1b
+ .Lret2:	RET
+-5:	lfence
++5:
+ 	pop	%rbp
+ 	RET
+ SYM_FUNC_END(clear_bhb_loop)
+diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+index 4f4b5e8a1574..70b377fcbc1c 100644
+--- a/arch/x86/include/asm/nospec-branch.h
++++ b/arch/x86/include/asm/nospec-branch.h
+@@ -331,11 +331,11 @@
+ 
+ #ifdef CONFIG_X86_64
+ .macro CLEAR_BRANCH_HISTORY
+-	ALTERNATIVE "", "call clear_bhb_loop", X86_FEATURE_CLEAR_BHB_LOOP
++	ALTERNATIVE "", "call clear_bhb_loop; lfence", X86_FEATURE_CLEAR_BHB_LOOP
+ .endm
+ 
+ .macro CLEAR_BRANCH_HISTORY_VMEXIT
+-	ALTERNATIVE "", "call clear_bhb_loop", X86_FEATURE_CLEAR_BHB_VMEXIT
++	ALTERNATIVE "", "call clear_bhb_loop; lfence", X86_FEATURE_CLEAR_BHB_VMEXIT
+ .endm
+ #else
+ #define CLEAR_BRANCH_HISTORY
+diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+index e9b78040d703..63d6c9fa5e80 100644
+--- a/arch/x86/net/bpf_jit_comp.c
++++ b/arch/x86/net/bpf_jit_comp.c
+@@ -1624,6 +1624,8 @@ static int emit_spectre_bhb_barrier(u8 **pprog, u8 *ip,
+ 
+ 		if (emit_call(&prog, func, ip))
+ 			return -EINVAL;
++		/* Don't speculate past this until BHB is cleared */
++		EMIT_LFENCE();
+ 		EMIT1(0x59); /* pop rcx */
+ 		EMIT1(0x58); /* pop rax */
+ 	}
 
-Best regards,
---  
-Thanks,
-Pawan
+-- 
+2.34.1
 
 
 
