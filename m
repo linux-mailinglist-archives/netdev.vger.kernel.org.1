@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-271264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271265-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EC4ZDTrtwmkdnQQAu9opvQ
-	(envelope-from <netdev+bounces-271264-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:59:54 +0100
+	id gLKRMRXswmkdnQQAu9opvQ
+	(envelope-from <netdev+bounces-271265-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:55:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 370AB31BFCC
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:59:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EAB931BEDC
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:55:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 909BF3046F94
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:51:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B654130C5B5D
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C369231F986;
-	Tue, 24 Mar 2026 19:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D75D34676D;
+	Tue, 24 Mar 2026 19:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JotLllMm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9afyTZ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF2732F749
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 19:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6346D313E36
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 19:51:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774381889; cv=none; b=tNqv/SF56nyfVIf2owOVrKcrIFp8Sh8DFlgW8OfdomSMZTxi3eVpQ5M24O2ZTMTFSDqR55kaVtSUCgYL4NhdBfxgVqF6HP+FZYQI3iC41QqvaCQH0Zpom6grEVmNJfLUMPCy+qfpu4YVx7MILknLsEgBKx1Oa34E1ltRsqzVxbs=
+	t=1774381890; cv=none; b=K+INe+AfF61+XKtO6Q60xBGHSD/lS34tMfA/Q5UGcrrub7kPnxwLj5cC8Eqg4D2tjUDMH/sApaI1chXbnBPeUvJrwxOgPuQqPNhxSj4Q+EFv1ert7BXLw/eyYldC5W4a3eOrJHrrwvo4ByXQKhUyWHrYMePwX+Lt0W2Rq0QYUjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774381889; c=relaxed/simple;
-	bh=9IDUwuolSvIr+T1Bjwk9oOEvk4bCy/YalHCEXSfrE6s=;
+	s=arc-20240116; t=1774381890; c=relaxed/simple;
+	bh=/mm+3yEXYqfwAngxm3bZIdCKr/yBRxH8m+joF98ZsvE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iW5OWxAgVK1jqRyI8yFh2t7UGMiMnLcemMkQwu99lWSy8cfL8dCrt2+OMiwYHNfO3YFN6zo4Wwbu7TMbUtiOdPVBYpEvWwXW5i3f/Ykf3CVtCOib6uHQc7e0ZbZDyNbUkljPoVTQJGDIGeDWib7Z9xZs0THCTz2+p/xg8tJdcUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JotLllMm; arc=none smtp.client-ip=209.85.216.47
+	 MIME-Version; b=pEi6aAj2ZKoIeWDA1qQgYtzshC9crbxUbp0ppvPwTnt13qUMC1rfb1XHH7hoOBkR2+BklAn7IcIIe/257FbLltzQEgs24v0kAzmft2S+Ue5tdpgGTSNp9QRtlx7k3u23AgyhlHdAAh0QRyPTRYHeuHx+hgQKhAowuIjTEkogenM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q9afyTZ5; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-35a1f3f07ebso2119944a91.3
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 12:51:27 -0700 (PDT)
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-c741692db4cso63176a12.1
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 12:51:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774381886; x=1774986686; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774381888; x=1774986688; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MG30QuGyPhv+dp7179rJ4vpIIfTuKiZcCpiUOnwWz2A=;
-        b=JotLllMmgNW/JNzRtHe5zJRPqibN6/Baq4/q3NQDWBgR0XVc+RHGYcnRe7vEzMEcv/
-         J87knsb2J+pbsXG+0DNDDAhB3WA5qH8xFXpjko4zINRSROr26AMt33yq99McV3EjYSy7
-         kYZ+YaH5xy+LWmeKFqylLkT45+kvrm3aSY2vqn59cL6IcEhZTO4XQwirm0Kp53abok8t
-         KhGJEk+1rgAJ31M+ZQRgkO5/A2BLyGhgIdX0ABRkDU1tn7vxyEkPrcDCjRBurNc4tqBV
-         9dt7MZNrrGyk3v+F3VxgZ8UVbcnO+CN3A/miYyur9k6kiP2ch38p+Hs7rTWCv0cuU1th
-         aO0A==
+        bh=hmQnEO18bvLloeehg0qw/sXcoT8UcPeOWutrTiYEalw=;
+        b=Q9afyTZ5Emkp1lthKuOmuRhjTM5JQYEcbrLrr/LYNr3SRMCipYl+NoMqUdu2F9A732
+         7FQml6uqH4jbw+9K0pjaq+Fn2B3fypvmhPF9aC3D+Bovi8/ixdWSQbHRr/9f/zWOlC+G
+         OqMxyGOlOTqmm4yqczx4tQEtD/UqP1xkooalLUtAfxYO539NJ9XkmMyEco4jpHynIsKB
+         p0TCD0fC51bWgXuTMsEaG+3UNzU0XR0O+C122Ro58/gii//gk7IOeAYlJvaYKXoyQIwP
+         Yy8rEmvIG9KOIjzd4TsawA/PGmM7X+GwNdQJ1Yqe+l02/tzHxzGfeS+A9vshAkMv1CaQ
+         yevA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774381886; x=1774986686;
+        d=1e100.net; s=20251104; t=1774381888; x=1774986688;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=MG30QuGyPhv+dp7179rJ4vpIIfTuKiZcCpiUOnwWz2A=;
-        b=Bs2H8T8d2vbpUpeXowzLUL0kCYrol00qB8f5qKKCU7X14w+9/NDxdcgDBI5KnX+SHa
-         wcwFaYSUo96xMwak56WckKQSBJekug5kq14xTcPIbpdHdGP+TOdAw2pzwVpVFuDRzZmN
-         a6Ryrc7G40fyfMAGhnvv5QzuEC32Rgsnl6KAZuZnWZkiHO7mI7Ic/y9BMfwWp6Qm1iJU
-         u9Y0BXoGNbn8JXGt8+k9V58JCZAHkiyo1Df3kAzN2P36oiP/sCDBLdximyoV/d2T1C10
-         ciPkUhDu4366XEX1f3rqHoa//mdNereTsGAR81xjerCHBy/pr4chOLYIDEp3CFQ7GuPr
-         wC6A==
-X-Forwarded-Encrypted: i=1; AJvYcCVMKyqy84swipDXhqlKfnfwygBVWFTeS8QJABybDlpBq3RXztAX4TQXsJTiLouNLLepYXtEFiY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxD0YzzUO1s3wJAfN4wDJYaD79B4vA73s//xRxsMwQcUTd9iSu+
-	4fkjVFEyfr6CeDbkoEIsZMgwJgYebSPJbeNRvePrZC+Q9d0hLJ3eklz0
-X-Gm-Gg: ATEYQzyUA+f+eN4XqF6mvhWSEQ9c3WOgaCZ7WL2QuqQ1ticjGhQCnDK/qnSBK4RBRDP
-	CE5XDCLfxROHiVto+0VCMDZe3a58Tu4AdVs7PwgZtp7/S4tCDkU2xMOrW82iaTnzqVb0CagXHap
-	27DZ6Vmghr1nqiro/MhlUniu37BaMqwMsNxMJpjiIxgFVGMEoZvvGmN6pHAsctUF1JHAVGaq8XL
-	skEgpCFWo3sMiYyaaCiKuhD40Qqhl8pADOC75VJDGhYp1JzQYjWhpMpnGMNWMPvhbzmrRhzPs1+
-	w6+J4JY0nQP6Y55P96mACPkhNSbBhxlrFtYVtW+MUN+PYzHeh9C3l8y7HBcgieBQACUDG0RmYS6
-	TZYJxajLR2TX6Jg+K+5koqxafa+t/wd1X5RtbJCyebtkUdCqa9y4DXNjDxsnniynNKECaic8hcI
-	DyQjDyMjbqghFMTbD4GFkfNcVW
-X-Received: by 2002:a17:90b:2f83:b0:35c:d37:6024 with SMTP id 98e67ed59e1d1-35c0dc851cemr461428a91.11.1774381886397;
-        Tue, 24 Mar 2026 12:51:26 -0700 (PDT)
-Received: from localhost ([2a03:2880:7ff::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35c031403e4sm3910878a91.6.2026.03.24.12.51.25
+        bh=hmQnEO18bvLloeehg0qw/sXcoT8UcPeOWutrTiYEalw=;
+        b=NA/b43ATd/LLbsxBJZrpI1HYK0DnfChTHnpXsgJ2nQlCwBmFy2+Y5eTQnawcGKyrcR
+         KOLdqo2alIBhSH6CWx0Zdrj4R5G9h+/7NUjFLd3teE0O+zHjDv1xGHujxNYSSO3zYTM1
+         RSMmul4SpWToN7madfPAcC9CZyDa5Cm+TlaKlkL2lGe3cAkw2FQTe1PUBJeqq6tUYP6K
+         gV31s73b4fZC0LNtRetQXMNNOUceQTqrrDriU/7aDZzKZtCxpvH8WnVkc3kzIgJlNwZL
+         JxtBnPFv+XW0MlGlEpi1ez0wOTGcqqOe2+Sf7/R9m19jq/VFVnN3tfsqaoBL8//bNIx9
+         LWvg==
+X-Forwarded-Encrypted: i=1; AJvYcCV0x8wZpfA4LdbYHI7hn6xchnvFO/lBNqtgQfu0N7l2ZU4d6w5sKYx2f6EKrgPpcdODIRuEz6M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFvAXusmpJgYYToYtGSAI/O3DKJkKCqMAsHbMBqI95F9GnXeB2
+	RKyxNSegcMem5ODhUAvWQTjLEBz79zajmLoPzXA0i/ehJn6+35DGLybP
+X-Gm-Gg: ATEYQzxNMaY1T9u/G+gEuBwIXzGPGOZaXqYSgT8MSCtDmsc1d/s5av3mzKVtx9eEX/F
+	PUB3tM4lKdP+3tARjM0D1ptcLNBDzgXPpd5Wcgr6foxc3hpfubuHTGLgeQPC2+XFD1sLH3VvtsX
+	Y+MKPDYBAzo3zjdRtDLy7tP2GIwkdrjtphvOPaFnvlYW+0LV4ZaUXHtw7pvdELSSIggmA/NyRXh
+	QLF50IvNyy+ewyqgl6ujNbv92mGM9xDQQYmmoMdYQhswA/GS8xzo4jcbWj8nasKv8VGa1wedNNx
+	81pwwcZuYnOkBe3AokvdXD2fXjwIAbWRsZ28y1XDujGGYdbd3M1OVedAQtbS44fmAgBmCEZdKr1
+	SpYspqiUZyUZ9VqxXOaX12hA25mfmzehbgFF3MAvW39WnAw33OHjDtVrVYg7PwoFp90PJSVThc7
+	X649y4Y2uF7g6B/sNl6oba41i/GcqQCbv7xiS965s=
+X-Received: by 2002:a05:6a20:a123:b0:398:7796:7823 with SMTP id adf61e73a8af0-39c4abb7039mr904207637.6.1774381887655;
+        Tue, 24 Mar 2026 12:51:27 -0700 (PDT)
+Received: from localhost ([2a03:2880:7ff:5a::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82b040da3dfsm12996732b3a.45.2026.03.24.12.51.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 12:51:25 -0700 (PDT)
+        Tue, 24 Mar 2026 12:51:27 -0700 (PDT)
 From: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
 To: "David S . Miller" <davem@davemloft.net>
 Cc: Alexander Duyck <alexanderduyck@fb.com>,
@@ -92,9 +92,9 @@ Cc: Alexander Duyck <alexanderduyck@fb.com>,
 	Mina Almasry <almasrymina@google.com>,
 	netdev@vger.kernel.org,
 	kernel-team@meta.com
-Subject: [PATCH net 1/2] eth: fbnic: Account for page fragments when updating BDQ tail
-Date: Tue, 24 Mar 2026 12:51:22 -0700
-Message-ID: <20260324195123.3486219-2-dimitri.daskalakis1@gmail.com>
+Subject: [PATCH net 2/2] eth: fbnic: Fix debugfs output for BDQ's with page frags
+Date: Tue, 24 Mar 2026 12:51:23 -0700
+Message-ID: <20260324195123.3486219-3-dimitri.daskalakis1@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260324195123.3486219-1-dimitri.daskalakis1@gmail.com>
 References: <20260324195123.3486219-1-dimitri.daskalakis1@gmail.com>
@@ -110,85 +110,61 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271264-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[fb.com,kernel.org,google.com,redhat.com,lunn.ch,gmail.com,trager.us,intel.com,vger.kernel.org,meta.com];
 	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-271265-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[fb.com,kernel.org,google.com,redhat.com,lunn.ch,gmail.com,trager.us,intel.com,vger.kernel.org,meta.com];
+	MIME_TRACE(0.00)[0:+];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[dimitridaskalakis1@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 370AB31BFCC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,meta.com:email]
+X-Rspamd-Queue-Id: 3EAB931BEDC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Dimitri Daskalakis <daskald@meta.com>
 
-FBNIC supports fixed size buffers of 4K. When PAGE_SIZE > 4K, we
-fragment the page across multiple descriptors (FBNIC_BD_FRAG_COUNT).
-When refilling the BDQ, the correct number of entries are populated,
-but tail was only incremented by one. So on a system with 64K pages,
-HW would get one descriptor refilled for every 16 we populate.
+The rings size_mask represents the number of pages, so we need to
+determine the number of page frags when dumping the descriptors.
 
-Additionally, we program the ring size in the HW when enabling the BDQ.
-This was not accounting for page fragments, so on systems with 64K pages,
-the HW used 1/16th of the ring.
-
-Fixes: 0cb4c0a13723 ("eth: fbnic: Implement Rx queue alloc/start/stop/free")
+Fixes: df04373b0dab ("eth fbnic: Add debugfs hooks for tx/rx rings")
 Signed-off-by: Dimitri Daskalakis <daskald@meta.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index 9fb91d4f3971..9cd85a0d0c3a 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -927,7 +927,7 @@ static void fbnic_fill_bdq(struct fbnic_ring *bdq)
- 		/* Force DMA writes to flush before writing to tail */
- 		dma_wmb();
- 
--		writel(i, bdq->doorbell);
-+		writel(i * FBNIC_BD_FRAG_COUNT, bdq->doorbell);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c b/drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c
+index 08270db2dee8..3c4563c8f403 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c
+@@ -197,7 +197,7 @@ static int fbnic_dbg_bdq_desc_seq_show(struct seq_file *s, void *v)
+ 		return 0;
  	}
- }
  
-@@ -2564,7 +2564,7 @@ static void fbnic_enable_bdq(struct fbnic_ring *hpq, struct fbnic_ring *ppq)
- 	hpq->tail = 0;
- 	hpq->head = 0;
+-	for (i = 0; i <= ring->size_mask; i++) {
++	for (i = 0; i < (ring->size_mask + 1) * FBNIC_BD_FRAG_COUNT; i++) {
+ 		u64 bd = le64_to_cpu(ring->desc[i]);
  
--	log_size = fls(hpq->size_mask);
-+	log_size = fls(hpq->size_mask) + ilog2(FBNIC_BD_FRAG_COUNT);
- 
- 	/* Store descriptor ring address and size */
- 	fbnic_ring_wr32(hpq, FBNIC_QUEUE_BDQ_HPQ_BAL, lower_32_bits(hpq->dma));
-@@ -2576,7 +2576,7 @@ static void fbnic_enable_bdq(struct fbnic_ring *hpq, struct fbnic_ring *ppq)
- 	if (!ppq->size_mask)
- 		goto write_ctl;
- 
--	log_size = fls(ppq->size_mask);
-+	log_size = fls(ppq->size_mask) + ilog2(FBNIC_BD_FRAG_COUNT);
- 
- 	/* Add enabling of PPQ to BDQ control */
- 	bdq_ctl |= FBNIC_QUEUE_BDQ_CTL_PPQ_ENABLE;
+ 		seq_printf(s, "%04x %#04llx %#014llx\n", i,
 -- 
 2.52.0
 
