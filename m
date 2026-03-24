@@ -1,115 +1,125 @@
-Return-Path: <netdev+bounces-271251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271253-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iBPuAuTgwmmPnAQAu9opvQ
-	(envelope-from <netdev+bounces-271251-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:07:16 +0100
+	id qC6UCMLhwmmPnAQAu9opvQ
+	(envelope-from <netdev+bounces-271253-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:10:58 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACC4D31B332
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:07:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93D9131B417
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:10:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AAA983006B08
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:07:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3693E3078FA0
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C547B371D09;
-	Tue, 24 Mar 2026 19:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40843B38B5;
+	Tue, 24 Mar 2026 19:09:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQ0osLDS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZ++px7B"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33932C0F84
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 19:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0348E3B2FD9;
+	Tue, 24 Mar 2026 19:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774379233; cv=none; b=axBjBJjtgpCkc6YdQnK+cAlEcNTGy9ScMcg8b+/J8TElcBtGZLv/hE9o9c1WnMmIwWk/tu6zbgEPFdkFE1vULw5gr7Z7kgiDKXw4gcZ3E8+BPhxdmlwvMLRhlyIXA2jVhMruDqsvbaFsJpCqhDcbRM4txkf8NuwiWtVkb21aqi4=
+	t=1774379371; cv=none; b=XrKiGGA98Uw0YPCOsNGJtMAcOiIZhSdtL/lauE6GHZA9ZKg7lViWlv1R5uVLnc8oNgt+nAM8J0RLPmGSkfJ8VPqOflq2gd1Oj1yWa4IreIawhP232py4nM6TWrVoLOPIRm64glsyS0p+cpETHbnaEBGj7DNGd9mzp1VS4l4E0Lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774379233; c=relaxed/simple;
-	bh=AW1OlEhSS59XAz0xTMa+6MUUg+iZ6+WPjBax3z5pQ2M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jn7EcWKTFiFlqgwOqYzb7oEvp6szPOS/Q4JRiPkifekYzvENKpzjwWDL+h1Zit5s9Sh10OnomDPEPTBT2MOP+K3t+/XQU4zn229/2DZPcwjZhpyikmlSEASEV13ZhVd/BYozOqIxo4N7yItsxaNEoxt4KOrHZ0YVRUew+l5H+pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQ0osLDS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E27A0C19424;
-	Tue, 24 Mar 2026 19:07:12 +0000 (UTC)
+	s=arc-20240116; t=1774379371; c=relaxed/simple;
+	bh=cLvyemoKai7DTqe2H3sBJp82HfUQPEIuN1t/PEFDUqs=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=IaefGNDpxUN9munFumo78zVsaeuQPoNAwhQwUzWBaM3Dxqb7kHTpM/6SRWeHj/Ftt7yB/0Krj8aIJRrn15F7SPZBuE5BKhDHDpGucntgRYyvEbEFoFNhGY1ITdTHfqLM3JoWnhhfeOLOp7h2DGBdJadDC/yfVWOmOAEEoEnw844=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZ++px7B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D62B5C2BCB7;
+	Tue, 24 Mar 2026 19:09:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774379233;
-	bh=AW1OlEhSS59XAz0xTMa+6MUUg+iZ6+WPjBax3z5pQ2M=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=jQ0osLDS58/jZGZXdKes/JUpPFmIHJUrTMH365fnO4UsZ9RTw9HVslrWx0LAwE6Q7
-	 xAdkGe77ixS6ZD5xRrVCTPgWOXwDGpIrn0rR/eFAMkHegWiejekEMW3qJFpP4V8yvT
-	 qsVHbUy7HVXjHfWKtHIRnY7GxHbjjRLmrk1aa90XLpC0Ln1noO5OdSlg3+vljs4HbF
-	 zIT68zS2STz2xPJUxCVLVAQq/Qu4jXmhqZ3ycLh1bTY6e7rRO6QdV8JNrDF1heezph
-	 opI7YWtqPjo0kOZerfOX89Fnq9Y3Cw4IlaStTQtapB16ESStD9qBEao0SrwfrEGt6v
-	 GtFrkfthgOfnQ==
-Message-ID: <317fc769-8492-4358-81bb-e21a001a6beb@kernel.org>
-Date: Tue, 24 Mar 2026 13:07:12 -0600
+	s=k20201202; t=1774379370;
+	bh=cLvyemoKai7DTqe2H3sBJp82HfUQPEIuN1t/PEFDUqs=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=FZ++px7BhBiiCpXKxydrJ8NGgV8kq5/IL5Aq7Oj2ZjMOrldJWmMMnzk06HAR6pJgu
+	 OF3Iyq27KBFAk2botQsmkwJFqHVu85QGTOZtwdEkVDBZCXuFFPjFoh8ls8r31JWUqY
+	 NIfAzaj1UsFzqpsp07vqOMA7QNmOQg10dY/O2BqoqZgVUzXdZNHBaLZhKWuno3dVTH
+	 YnDskexGUVxjCTh2UGQ6WaBbcV+N2lGPQK4chbeIeSujWJg2TtUr/+XxC7scWxXV0l
+	 vdtwbTQr2Q/7btVhU5V+CK4mbNnzWRcOk2wt//LDXkIQ8pY9UeKBmiarC/oJcJn8r1
+	 UWmoztiU1bMnA==
+Content-Type: multipart/mixed; boundary="===============5100326488123237701=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] vrf: Use dst_dev_put() instead of using
- loopback device
-Content-Language: en-US
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, petrm@nvidia.com,
- lirongqing@baidu.com
-References: <20260324155521.525292-1-idosch@nvidia.com>
- <20260324155521.525292-3-idosch@nvidia.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20260324155521.525292-3-idosch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Message-Id: <458ec30c147d396db9a3f7a4be989d538ba8d9256b3df20cea088ade38d98cbc@mail.kernel.org>
+In-Reply-To: <20260324-vmscape-bhb-v8-10-68bb524b3ab9@linux.intel.com>
+References: <20260324-vmscape-bhb-v8-10-68bb524b3ab9@linux.intel.com>
+Subject: Re: [PATCH v8 10/10] x86/vmscape: Add cmdline vmscape=on to override attack vector controls
+From: bot+bpf-ci@kernel.org
+To: pawan.kumar.gupta@linux.intel.com,x86@kernel.org,jon@nutanix.com,nik.borisov@suse.com,hpa@zytor.com,jpoimboe@kernel.org,david.kaplan@amd.com,seanjc@google.com,bp@alien8.de,dave.hansen@linux.intel.com,peterz@infradead.org,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,kpsingh@kernel.org,jolsa@kernel.org,davem@davemloft.net,david.laight.linux@gmail.com,luto@kernel.org,tglx@kernel.org,mingo@redhat.com,dsahern@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,sdf@fomichev.me,haoluo@google.com,pbonzini@redhat.com,corbet@lwn.net
+Cc: linux-kernel@vger.kernel.org,kvm@vger.kernel.org,asit.k.mallick@intel.com,tao1.zhang@intel.com,bpf@vger.kernel.org,netdev@vger.kernel.org,linux-doc@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Tue, 24 Mar 2026 19:09:29 +0000 (UTC)
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271251-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271253-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,kernel.org,iogearbox.net,gmail.com,linux.dev,meta.com];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[linux.intel.com,kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[46];
 	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: ACC4D31B332
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 93D9131B417
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/24/26 9:55 AM, Ido Schimmel wrote:
-> Use dst_dev_put() to clean up the device referenced by the dst entry
-> instead of partially open coding it. Internally, the helper uses the
-> blackhole device instead of the loopback device.
-> 
-> Reviewed-by: Petr Machata <petrm@nvidia.com>
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->  drivers/net/vrf.c | 24 ++++--------------------
->  1 file changed, 4 insertions(+), 20 deletions(-)
-> 
+--===============5100326488123237701==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+> diff --git a/Documentation/admin-guide/hw-vuln/vmscape.rst b/Documentation/admin-guide/hw-vuln/vmscape.rst
+> --- a/Documentation/admin-guide/hw-vuln/vmscape.rst
+> +++ b/Documentation/admin-guide/hw-vuln/vmscape.rst
+> @@ -117,3 +117,7 @@
+>
+>     Choose the mitigation based on the VMSCAPE variant the CPU is affected by.
+>     (default when CONFIG_MITIGATION_VMSCAPE=y)
+> +
+> + * ``vmscape=on``:
+> +
+> +   Same as `auto`, except that it overrides attack vector controls.
+
+Should `auto` use double backticks here (``auto``) to match the rest of
+the file? All other inline code references in this document use RST
+literal markup with double backticks.
 
 
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/23506000396
+--===============5100326488123237701==--
 
