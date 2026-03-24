@@ -1,151 +1,238 @@
-Return-Path: <netdev+bounces-270881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270876-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OPz4LBwqwml5ZwQAu9opvQ
-	(envelope-from <netdev+bounces-270881-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:07:24 +0100
+	id 2KkhG94pwml5ZwQAu9opvQ
+	(envelope-from <netdev+bounces-270876-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:06:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2876C302994
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:07:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5705330296E
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:06:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4DEA03069062
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:05:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4366C3080D59
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D063B2FCB;
-	Tue, 24 Mar 2026 06:04:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DFBC3A9DAD;
+	Tue, 24 Mar 2026 06:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="V1uJJN4w"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="tzcFWWFd"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C71E3AA4F7;
-	Tue, 24 Mar 2026 06:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E7473463;
+	Tue, 24 Mar 2026 06:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774332273; cv=none; b=macCauwP7JFLUTNE0S/U1RzB+WDnuHdb5LvvKqxoRA9sjwiuazHpJ5lMNlg4Vie4kwdjAjXd0VzSpsClpJs0v8jesTKrPzukGcoNQHSuxUfcv33ySHmfyHq14IplQS1fIPypvgyvdWjmo5xb/nwf3lbp+klt967BRf6H1GVyvS8=
+	t=1774332154; cv=none; b=V6BDUKo/oaLlucNB2mT0tPoY3APDsqCxLZ5swlirn9AX3kKclxxXPLOzSg4wJxwimfjSpqqUn3l367BGfAHEBRCi4OjfboxGYzgG3xC9zR5/HuqY9E2KgUxINmiFep+AYA4fOgmr0nYKCSLUxsuNlIj4MQHA2eVr5qmEJAIhJ3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774332273; c=relaxed/simple;
-	bh=46mKEmqJ7If9n6oOQLlB27h455jj6EdxRIvtHJgTEo0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hFytGNp7KuQsyj5+pXKJseNwmrDmkPRQvCAdaToZcNZ8kw0Y6EcaJEQIGxJizX7cQTwqvt+OjWvu0Q1G9XHTgXNXjc5CNR0T+HmTPg25LAfE9PBbYEzO9IWdNwmj2FwEzfKP99liSAKd5ZI8ib9NJtCEqANa6cx7F01HPUm0Yzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=V1uJJN4w; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=IN
-	uffQ2bP82R6qrvw57oC8K0VZlNzr1HNS+Vrn9bxsA=; b=V1uJJN4wnePmsA8Q+f
-	XvG+Qb2PVZiaYk8Y+m4n3uufLbr4cxHsIhElapq8P61e9hebHfay5h8msFCkuSZt
-	12b+9wBcmFzIedwzphfLZ1nqxTWQm/MItVF634yRJlpcph/sJMhlzNLoI61zyXhR
-	7x5K0ldrVEpn23ljE8emv90SA=
-Received: from pek-lpg-core5.wrs.com (unknown [])
-	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wD3f63sKMJpJvBTBA--.36472S2;
-	Tue, 24 Mar 2026 14:02:21 +0800 (CST)
-From: Robert Garcia <rob_garcia@163.com>
-To: stable@vger.kernel.org,
-	Johannes Berg <johannes.berg@intel.com>
-Cc: Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Robert Garcia <rob_garcia@163.com>,
-	Luca Coelho <luciano.coelho@intel.com>,
-	Kalle Valo <kvalo@codeaurora.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 5.15.y] wifi: iwlwifi: read txq->read_ptr under lock
-Date: Tue, 24 Mar 2026 14:02:20 +0800
-Message-Id: <20260324060220.1192543-1-rob_garcia@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1774332154; c=relaxed/simple;
+	bh=MtAiD6nGtZdCXNIhEYglkVSg0RT41DaluimaqjEk3EQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=qnic6AmRoQjmQ+aTr8/NlOIwpl5iXDtqeHdhqPPBflNKNia/+DK6/ejbSTNlf2qIqx1KOGGk4uM12JZbIgOICKytHtPAsBZWxPzgQ0Ohb0Bybq1xkBamqoIU14Yf8NDpzCOvch+3k3vuu6TLPLNa8rgbDQfcrh2msxwX90s3hIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=tzcFWWFd; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=MojtjraalBHTyEvjeOihKABOGQ7O7vZI1JuIZljaMpg=; b=tzcFWWFdiQTe8BYOt9nt6/1kX0
+	C4ZLUAcI/cwc0pTZFXR6osQ66bE1xCIeq1xvQflmInLpdgEUJl4hnyvKwTSv2zhONoNRlxqqm3efE
+	rWx8d2oN4An3IYCNCzprzdQODm9gR/abFX+CbyxKcZE5FFRnG+bHfmp9DdysCs3O4E02Ze1YJ1Ty/
+	hQ7tcZK7YouVQQ0yG0hdhs/cIIrw9roo8gz9WzQz84lpUOZ+yOFniMbCsZMSTaazWk2eTwt2INjOr
+	xE6HdkP5Pt4kvdX2fZFttLNx6GQIFWoTqnNWiM2id4iL8LBjklLaOI7Fg47UKMd+JC+SF4GZ4ls4i
+	A0qeUXDg==;
+Received: from [115.246.246.98] (port=45793 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1w4uqS-0000000Gv6E-0lP3;
+	Tue, 24 Mar 2026 02:02:28 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 7C4051B809BF;
+	Tue, 24 Mar 2026 11:32:21 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+ by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id YR6KDvbvQtwz; Tue, 24 Mar 2026 11:32:20 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 7A65F1B81A5B;
+	Tue, 24 Mar 2026 11:32:20 +0530 (IST)
+X-Virus-Scanned: amavis at couthit.local
+Received: from zimbra.couthit.local ([127.0.0.1])
+ by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id rNZj4jPXbe6t; Tue, 24 Mar 2026 11:32:20 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 4DFD41B81AB3;
+	Tue, 24 Mar 2026 11:32:20 +0530 (IST)
+Date: Tue, 24 Mar 2026 11:32:20 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Parvathi Pudi <parvathi@couthit.com>, Kevin Hilman <khilman@baylibre.com>, 
+	nm <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, 
+	afd <afd@ti.com>, rogerq <rogerq@kernel.org>, 
+	tony <tony@atomide.com>, robh <robh@kernel.org>, 
+	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
+	richardcochran <richardcochran@gmail.com>, 
+	aaro koskinen <aaro.koskinen@iki.fi>, andreas <andreas@kemnade.info>, 
+	Andrew Lunn <andrew@lunn.ch>, 
+	linux-omap <linux-omap@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	netdev <netdev@vger.kernel.org>, danishanwar <danishanwar@ti.com>, 
+	pratheesh <pratheesh@ti.com>, j-rameshbabu <j-rameshbabu@ti.com>, 
+	praneeth <praneeth@ti.com>, srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	m-malladi <m-malladi@ti.com>, krishna <krishna@couthit.com>, 
+	mohan <mohan@couthit.com>, pmohan <pmohan@couthit.com>, 
+	basharath <basharath@couthit.com>, 
+	Murali Karicheri <m-karicheri2@ti.com>
+Message-ID: <1868242922.724201.1774332140293.JavaMail.zimbra@couthit.local>
+In-Reply-To: <ee2ec279-ee5d-4d6d-b6ff-35187e3f03e6@kernel.org>
+References: <20260307122641.738450-1-parvathi@couthit.com> <20260307122641.738450-4-parvathi@couthit.com> <7ho6ks1r4s.fsf@baylibre.com> <91797572.667989.1773662409130.JavaMail.zimbra@couthit.local> <ee2ec279-ee5d-4d6d-b6ff-35187e3f03e6@kernel.org>
+Subject: Re: [PATCH v5 3/3] arm: dts: ti: Add device tree support for
+ PRU-ICSS on AM335x
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3f63sKMJpJvBTBA--.36472S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxJry3WrW7Aw43CF1xWr1DGFg_yoW8ZF4Up3
-	sa9r4jgrs5XFsrC3y8XF4S9rnIqa1DGanIkFyF9wnIvr13Jr1S9rWF9ryUtFyUtr4SvrWY
-	vF1jyFs8GF1UZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRSD77UUUUU=
-X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbDAg5Qu2nCKO4DywAA3C
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 9.0.0_ZEXTRAS_20240927 (ZimbraWebClient - GC138 (Linux)/9.0.0_ZEXTRAS_20240927)
+Thread-Topic: Add device tree support for PRU-ICSS on AM335x
+Thread-Index: 44ydR5tKwQuKDZuPcpLEgXMqUS7xiQ==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[couthit.com:s=default];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[couthit.com : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270881-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[intel.com,163.com,codeaurora.org,davemloft.net,kernel.org,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270876-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	HAS_X_AS(0.00)[smtp@couthit.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	HAS_X_GMSV(0.00)[smtp@couthit.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[163.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ti.com:email,couthit.local:mid];
+	HAS_X_SOURCE(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[31];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rob_garcia@163.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[163.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,msgid.link:url]
-X-Rspamd-Queue-Id: 2876C302994
+	FROM_NEQ_ENVFROM(0.00)[parvathi@couthit.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[couthit.com,baylibre.com,ti.com,kernel.org,atomide.com,gmail.com,iki.fi,kemnade.info,lunn.ch,vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[couthit.com:-];
+	HAS_X_ANTIABUSE(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 5705330296E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Johannes Berg <johannes.berg@intel.com>
+Hi,
 
-[ Upstream commit c2ace6300600c634553657785dfe5ea0ed688ac2 ]
+> On 16/03/2026 13:00, Parvathi Pudi wrote:
+>> Hi,
+>> 
+>>> Parvathi Pudi <parvathi@couthit.com> writes:
+>>>
+>>>> From: Roger Quadros <rogerq@ti.com>
+>>>>
+>>>> The TI Sitara AM335x ICE-V2 consists of single PRU-ICSS instance,
+>>>> This patch adds the new device tree overlay file in-order to enable
+>>>> PRU-ICSS instance, along with makefile changes.
+>>>>
+>>>> PRU-ICSS instance consists of two PRU cores along with various
+>>>> peripherals such as the Interrupt Controller (PRU_INTC), the Industrial
+>>>> Ethernet Peripheral(IEP), the Real Time Media Independent Interface
+>>>> controller (MII_RT), and the Enhanced Capture (eCAP) event module.
+>>>>
+>>>> am33xx-l4.dtsi - Adds IEP and eCAP peripheral as child nodes
+>>>> of the PRUSS subsystem node.
+>>>>
+>>>> am335x-icev2-prueth.dtso - Adds PRU-ICSS instance node along with PRU
+>>>> eth port information and corresponding port configuration. It includes
+>>>> interrupt mapping for packet reception, HW timestamp collection, and PRU
+>>>> Ethernet ports in MII mode,
+>>>>
+>>>> GPIO configuration, boot strapping along with delay configuration for
+>>>> individual PRU Ethernet port and other required nodes.
+>>>>
+>>>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>>>> Signed-off-by: Andrew F. Davis <afd@ti.com>
+>>>> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
+>>>> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
+>>>> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+>>>
+>>> [...]
+>>>
+>>>> +/*
+>>>> + * Disable CPSW switch node and
+>>>> + * MDIO configuration to prevent
+>>>> + * conflict with PRU-ICSS
+>>>> + */
+>>>> +&mac_sw {
+>>>> +        status = "disable";
+>>>> +};
+>>>> +
+>>>> +&davinci_mdio_sw {
+>>>> +        status = "disable";
+>>>> +};
+>>>
+>>> I think you need s/disable/disabled/?  (note the trailing 'd').  Without
+>>> that, I don't think you're disabling these nodes, so I'm curious how it
+>>> is not conflicting with the PRU-ICSS.
+>>>
+>>> Kevin
+>> 
+>> Thank you for pointing out this typo.
+>> 
+>> We checked the kernel code as to why this did not create any issue in our
+>> testing.  We found that the device availability check goes through
+>> of_device_is_available(), which only treats "ok" or "okay" as enabled.
+>> Anything else is effectively treated as not enabled.
+>> 
+>> So even though "disable" isn't the usual DT value, it still prevents the
+>> node from being probed since it doesn't match "ok"/"okay".
+> 
+> 
+> The question is whether you build tested your code (so dtbs_check). And
+> if not, why?
+> 
 
-If we read txq->read_ptr without lock, we can read the same
-value twice, then obtain the lock, and reclaim from there
-to two different places, but crucially reclaim the same
-entry twice, resulting in the WARN_ONCE() a little later.
-Fix that by reading txq->read_ptr under lock.
+We did run dtbs_check as part of our internal testing workflow. However, it
+is executed within a test framework that runs multiple checks together and is
+currently trimming part of the dtbs_check output. Because of this, the schema
+validation warning for "disable" was not visible in the logs we reviewed
+and we missed catching this error. 
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Miri Korenblit <miriam.rachel.korenblit@intel.com>
-Link: https://msgid.link/20240319100755.bf4c62196504.I978a7ca56c6bd6f1bf42c15aa923ba03366a840b@changeid
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-[ Change read_ptr definition according to commit
-413be839bfca9("wifi: iwlwifi: add a validity check of queue_id in iwl_txq_reclaim"). ]
-Signed-off-by: Robert Garcia <rob_garcia@163.com>
----
- drivers/net/wireless/intel/iwlwifi/queue/tx.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+We have verified that dtbs_check does report this issue, and we will update
+our test setup to retain full dtbs_check output to avoid missing such warnings
+in the future.
 
-diff --git a/drivers/net/wireless/intel/iwlwifi/queue/tx.c b/drivers/net/wireless/intel/iwlwifi/queue/tx.c
-index cd852b95d812..d8322a40409b 100644
---- a/drivers/net/wireless/intel/iwlwifi/queue/tx.c
-+++ b/drivers/net/wireless/intel/iwlwifi/queue/tx.c
-@@ -1524,7 +1524,7 @@ void iwl_txq_reclaim(struct iwl_trans *trans, int txq_id, int ssn,
- {
- 	struct iwl_txq *txq = trans->txqs.txq[txq_id];
- 	int tfd_num = iwl_txq_get_cmd_index(txq, ssn);
--	int read_ptr = iwl_txq_get_cmd_index(txq, txq->read_ptr);
-+	int read_ptr;
- 	int last_to_free;
- 
- 	/* This function is not meant to release cmd queue*/
-@@ -1532,6 +1532,7 @@ void iwl_txq_reclaim(struct iwl_trans *trans, int txq_id, int ssn,
- 		return;
- 
- 	spin_lock_bh(&txq->lock);
-+	read_ptr = iwl_txq_get_cmd_index(txq, txq->read_ptr);
- 
- 	if (!test_bit(txq_id, trans->txqs.queue_used)) {
- 		IWL_DEBUG_TX_QUEUES(trans, "Q %d inactive - ignoring idx %d\n",
--- 
-2.34.1
+Thanks and Regards,
+Parvathi.
 
 
