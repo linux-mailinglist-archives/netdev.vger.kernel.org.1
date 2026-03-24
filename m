@@ -1,252 +1,151 @@
-Return-Path: <netdev+bounces-270886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270881-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WDCwKwkuwml5ZwQAu9opvQ
-	(envelope-from <netdev+bounces-270886-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:24:09 +0100
+	id OPz4LBwqwml5ZwQAu9opvQ
+	(envelope-from <netdev+bounces-270881-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:07:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EFC1302CF3
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:24:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2876C302994
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:07:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 502D03084DE7
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:17:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4DEA03069062
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:05:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F4B3B0AF0;
-	Tue, 24 Mar 2026 06:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D063B2FCB;
+	Tue, 24 Mar 2026 06:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="bbWzOW8f"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="V1uJJN4w"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB6923EA84;
-	Tue, 24 Mar 2026 06:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C71E3AA4F7;
+	Tue, 24 Mar 2026 06:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774333041; cv=none; b=aFiQ1w0u3g41E0EXu0fPRdStNYRG7cK3NjqbW+2KT6Xa7EAm+YVod/1qb9frfE7xZSSD/KOoWIQ01wjj4P6mzz+5NBEeLxJ0HhVmI7JpbdR83Tdz7AZ3IU1yuoFutNJpDZMCuDVb5+KUJa/sZgBGaoZB7rZFvNCxskjpq+2UdNg=
+	t=1774332273; cv=none; b=macCauwP7JFLUTNE0S/U1RzB+WDnuHdb5LvvKqxoRA9sjwiuazHpJ5lMNlg4Vie4kwdjAjXd0VzSpsClpJs0v8jesTKrPzukGcoNQHSuxUfcv33ySHmfyHq14IplQS1fIPypvgyvdWjmo5xb/nwf3lbp+klt967BRf6H1GVyvS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774333041; c=relaxed/simple;
-	bh=fkHDElAmhCE4ojupdnU3cYDhBoqE99JXsU0jtOaO4v4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=Q97hGfeiexUsBSO48LQYInwsHs4IPSczzIdX2mFzxPWEyfcgmBprS3I0nFDL9sXMzBMEPtJf1cHkPfRWaBIujCbiEvC6upOf7sGjTo+A76M56Y2mSaT+uR307P5QyR3+Kh53jp9MT6Ir7RMrPDzevBzEBWPHHLD8BDsbJMzxYHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=bbWzOW8f; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=bgjC2f3Z8bWKh44Bxq0DLNe6UoZ6k/6sVOmxVskh0Ug=; b=bbWzOW8fqqsncxs3ZFjvWvk2Mr
-	ynElpPICQzJTvfKupOWYdj531v1N2Bdm0EuG8/O4fZmAOYsYUuqzsF4L9WcMbW+m5Q6k7BhU7aw44
-	t6XO9nKCTQeWmnHO55AX3Pd+Ek9i2UecnpccRR7V/Vhh9ey7WWtctIvG/0A37xr39NB0CmZU3mnLK
-	T56ZAi06dXRSTEygt6qCyQq9GAAar9Oqe0Bon6HppTirZo/SRKr6a0B4+E5MZGd1PxAFhrySwU6M/
-	HiIebszYKcb4KXg2XJ8kjght2Lv6+xBBflarNEUCmyff0tNInsQzcX1+Mb4WiybPvzVV2pSlgLJTL
-	NWWU9Sww==;
-Received: from [115.246.246.98] (port=54461 helo=zimbra.couthit.local)
-	by server.couthit.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1w4un2-0000000GuuQ-2q9K;
-	Tue, 24 Mar 2026 01:58:57 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 8F4981B8098F;
-	Tue, 24 Mar 2026 11:28:50 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
- by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10032)
- with ESMTP id iAaFhnawhd6z; Tue, 24 Mar 2026 11:28:50 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 4D30C1B809BF;
-	Tue, 24 Mar 2026 11:28:50 +0530 (IST)
-X-Virus-Scanned: amavis at couthit.local
-Received: from zimbra.couthit.local ([127.0.0.1])
- by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10026)
- with ESMTP id l5bd7S_18K2S; Tue, 24 Mar 2026 11:28:50 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 264761B8098F;
-	Tue, 24 Mar 2026 11:28:50 +0530 (IST)
-Date: Tue, 24 Mar 2026 11:28:50 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: Kevin Hilman <khilman@baylibre.com>
-Cc: Parvathi Pudi <parvathi@couthit.com>, nm <nm@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, afd <afd@ti.com>, 
-	rogerq <rogerq@kernel.org>, tony <tony@atomide.com>, 
-	robh <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
-	conor+dt <conor+dt@kernel.org>, 
-	richardcochran <richardcochran@gmail.com>, 
-	aaro koskinen <aaro.koskinen@iki.fi>, andreas <andreas@kemnade.info>, 
-	Andrew Lunn <andrew@lunn.ch>, 
-	linux-omap <linux-omap@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	netdev <netdev@vger.kernel.org>, danishanwar <danishanwar@ti.com>, 
-	pratheesh <pratheesh@ti.com>, j-rameshbabu <j-rameshbabu@ti.com>, 
-	praneeth <praneeth@ti.com>, srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	m-malladi <m-malladi@ti.com>, krishna <krishna@couthit.com>, 
-	mohan <mohan@couthit.com>, pmohan <pmohan@couthit.com>, 
-	basharath <basharath@couthit.com>, 
-	Murali Karicheri <m-karicheri2@ti.com>
-Message-ID: <200940616.724084.1774331930110.JavaMail.zimbra@couthit.local>
-In-Reply-To: <7hcy131w36.fsf@baylibre.com>
-References: <20260307122641.738450-1-parvathi@couthit.com> <20260307122641.738450-4-parvathi@couthit.com> <7ho6ks1r4s.fsf@baylibre.com> <91797572.667989.1773662409130.JavaMail.zimbra@couthit.local> <7hcy131w36.fsf@baylibre.com>
-Subject: Re: [PATCH v5 3/3] arm: dts: ti: Add device tree support for
- PRU-ICSS on AM335x
+	s=arc-20240116; t=1774332273; c=relaxed/simple;
+	bh=46mKEmqJ7If9n6oOQLlB27h455jj6EdxRIvtHJgTEo0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hFytGNp7KuQsyj5+pXKJseNwmrDmkPRQvCAdaToZcNZ8kw0Y6EcaJEQIGxJizX7cQTwqvt+OjWvu0Q1G9XHTgXNXjc5CNR0T+HmTPg25LAfE9PBbYEzO9IWdNwmj2FwEzfKP99liSAKd5ZI8ib9NJtCEqANa6cx7F01HPUm0Yzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=V1uJJN4w; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=IN
+	uffQ2bP82R6qrvw57oC8K0VZlNzr1HNS+Vrn9bxsA=; b=V1uJJN4wnePmsA8Q+f
+	XvG+Qb2PVZiaYk8Y+m4n3uufLbr4cxHsIhElapq8P61e9hebHfay5h8msFCkuSZt
+	12b+9wBcmFzIedwzphfLZ1nqxTWQm/MItVF634yRJlpcph/sJMhlzNLoI61zyXhR
+	7x5K0ldrVEpn23ljE8emv90SA=
+Received: from pek-lpg-core5.wrs.com (unknown [])
+	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wD3f63sKMJpJvBTBA--.36472S2;
+	Tue, 24 Mar 2026 14:02:21 +0800 (CST)
+From: Robert Garcia <rob_garcia@163.com>
+To: stable@vger.kernel.org,
+	Johannes Berg <johannes.berg@intel.com>
+Cc: Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Robert Garcia <rob_garcia@163.com>,
+	Luca Coelho <luciano.coelho@intel.com>,
+	Kalle Valo <kvalo@codeaurora.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 5.15.y] wifi: iwlwifi: read txq->read_ptr under lock
+Date: Tue, 24 Mar 2026 14:02:20 +0800
+Message-Id: <20260324060220.1192543-1-rob_garcia@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Zimbra 9.0.0_ZEXTRAS_20240927 (ZimbraWebClient - GC138 (Linux)/9.0.0_ZEXTRAS_20240927)
-Thread-Topic: Add device tree support for PRU-ICSS on AM335x
-Thread-Index: S8Ccte6ObCw3Alp4fCQkM+hcJaygoQ==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[couthit.com:s=default];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3f63sKMJpJvBTBA--.36472S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJry3WrW7Aw43CF1xWr1DGFg_yoW8ZF4Up3
+	sa9r4jgrs5XFsrC3y8XF4S9rnIqa1DGanIkFyF9wnIvr13Jr1S9rWF9ryUtFyUtr4SvrWY
+	vF1jyFs8GF1UZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRSD77UUUUU=
+X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbDAg5Qu2nCKO4DywAA3C
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[couthit.com : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[couthit.com,ti.com,kernel.org,atomide.com,gmail.com,iki.fi,kemnade.info,lunn.ch,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-270881-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[intel.com,163.com,codeaurora.org,davemloft.net,kernel.org,vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,couthit.com:email,couthit.local:mid];
-	HAS_X_GMSV(0.00)[smtp@couthit.com];
 	MIME_TRACE(0.00)[0:+];
-	HAS_X_AS(0.00)[smtp@couthit.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270886-lists,netdev=lfdr.de];
-	HAS_X_SOURCE(0.00)[];
-	DKIM_TRACE(0.00)[couthit.com:-];
-	FROM_NEQ_ENVFROM(0.00)[parvathi@couthit.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[163.com];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rob_garcia@163.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
+	DKIM_TRACE(0.00)[163.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	HAS_X_ANTIABUSE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: 6EFC1302CF3
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,msgid.link:url]
+X-Rspamd-Queue-Id: 2876C302994
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+From: Johannes Berg <johannes.berg@intel.com>
 
-Hi,
+[ Upstream commit c2ace6300600c634553657785dfe5ea0ed688ac2 ]
 
-> Parvathi Pudi <parvathi@couthit.com> writes:
->=20
->> Hi,
->>
->>> Parvathi Pudi <parvathi@couthit.com> writes:
->>>=20
->>>> From: Roger Quadros <rogerq@ti.com>
->>>>
->>>> The TI Sitara AM335x ICE-V2 consists of single PRU-ICSS instance,
->>>> This patch adds the new device tree overlay file in-order to enable
->>>> PRU-ICSS instance, along with makefile changes.
->>>>
->>>> PRU-ICSS instance consists of two PRU cores along with various
->>>> peripherals such as the Interrupt Controller (PRU_INTC), the Industria=
-l
->>>> Ethernet Peripheral(IEP), the Real Time Media Independent Interface
->>>> controller (MII_RT), and the Enhanced Capture (eCAP) event module.
->>>>
->>>> am33xx-l4.dtsi - Adds IEP and eCAP peripheral as child nodes
->>>> of the PRUSS subsystem node.
->>>>
->>>> am335x-icev2-prueth.dtso - Adds PRU-ICSS instance node along with PRU
->>>> eth port information and corresponding port configuration. It includes
->>>> interrupt mapping for packet reception, HW timestamp collection, and P=
-RU
->>>> Ethernet ports in MII mode,
->>>>
->>>> GPIO configuration, boot strapping along with delay configuration for
->>>> individual PRU Ethernet port and other required nodes.
->>>>
->>>> Signed-off-by: Roger Quadros <rogerq@ti.com>
->>>> Signed-off-by: Andrew F. Davis <afd@ti.com>
->>>> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
->>>> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
->>>> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
->>>=20
->>> [...]
->>>=20
->>>> +/*
->>>> + * Disable CPSW switch node and
->>>> + * MDIO configuration to prevent
->>>> + * conflict with PRU-ICSS
->>>> + */
->>>> +&mac_sw {
->>>> +        status =3D "disable";
->>>> +};
->>>> +
->>>> +&davinci_mdio_sw {
->>>> +        status =3D "disable";
->>>> +};
->>>=20
->>> I think you need s/disable/disabled/?  (note the trailing 'd').  Withou=
-t
->>> that, I don't think you're disabling these nodes, so I'm curious how it
->>> is not conflicting with the PRU-ICSS.
->>>=20
->>> Kevin
->>
->> Thank you for pointing out this typo.
->>
->> We checked the kernel code as to why this did not create any issue in ou=
-r
->> testing.  We found that the device availability check goes through
->> of_device_is_available(), which only treats "ok" or "okay" as enabled.
->> Anything else is effectively treated as not enabled.
->>
->> So even though "disable" isn't the usual DT value, it still prevents the
->> node from being probed since it doesn't match "ok"/"okay".
->=20
-> Yes, but since your node is in an overlay, if a previous .dts[i] had set
-> this to "ok", then your overlay would not disable it, which would not be
-> expected behavior.
->=20
->> We will update the value to "disabled" in the next version, since that i=
-s
->> the standard.
+If we read txq->read_ptr without lock, we can read the same
+value twice, then obtain the lock, and reclaim from there
+to two different places, but crucially reclaim the same
+entry twice, resulting in the WARN_ONCE() a little later.
+Fix that by reading txq->read_ptr under lock.
 
-Sorry for the delayed response.
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Miri Korenblit <miriam.rachel.korenblit@intel.com>
+Link: https://msgid.link/20240319100755.bf4c62196504.I978a7ca56c6bd6f1bf42c15aa923ba03366a840b@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+[ Change read_ptr definition according to commit
+413be839bfca9("wifi: iwlwifi: add a validity check of queue_id in iwl_txq_reclaim"). ]
+Signed-off-by: Robert Garcia <rob_garcia@163.com>
+---
+ drivers/net/wireless/intel/iwlwifi/queue/tx.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-In our setup, there is no previous .dts where we set this to "ok". We are w=
-orking
-with a combined DTB (base + overlay applied). When we de-compile the final =
-DTB
-back to DTS, we do see that the status property is set to "disable" for the=
- node.
-At runtime, the kernel=E2=80=99s of_device_is_available() only treats "ok"/=
-"okay" as enabled,
-so "disable" results in the node not being probed, which is why we did not =
-observe
-any functional issue during testing.=20
+diff --git a/drivers/net/wireless/intel/iwlwifi/queue/tx.c b/drivers/net/wireless/intel/iwlwifi/queue/tx.c
+index cd852b95d812..d8322a40409b 100644
+--- a/drivers/net/wireless/intel/iwlwifi/queue/tx.c
++++ b/drivers/net/wireless/intel/iwlwifi/queue/tx.c
+@@ -1524,7 +1524,7 @@ void iwl_txq_reclaim(struct iwl_trans *trans, int txq_id, int ssn,
+ {
+ 	struct iwl_txq *txq = trans->txqs.txq[txq_id];
+ 	int tfd_num = iwl_txq_get_cmd_index(txq, ssn);
+-	int read_ptr = iwl_txq_get_cmd_index(txq, txq->read_ptr);
++	int read_ptr;
+ 	int last_to_free;
+ 
+ 	/* This function is not meant to release cmd queue*/
+@@ -1532,6 +1532,7 @@ void iwl_txq_reclaim(struct iwl_trans *trans, int txq_id, int ssn,
+ 		return;
+ 
+ 	spin_lock_bh(&txq->lock);
++	read_ptr = iwl_txq_get_cmd_index(txq, txq->read_ptr);
+ 
+ 	if (!test_bit(txq_id, trans->txqs.queue_used)) {
+ 		IWL_DEBUG_TX_QUEUES(trans, "Q %d inactive - ignoring idx %d\n",
+-- 
+2.34.1
 
-Are you referring to anything beyond the final merged DT result?
-
-Thanks and Regards,
-Parvathi.
 
