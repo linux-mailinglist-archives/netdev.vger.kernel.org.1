@@ -1,159 +1,164 @@
-Return-Path: <netdev+bounces-270962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270963-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yLL8Cl5gwmmecAQAu9opvQ
-	(envelope-from <netdev+bounces-270962-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:58:54 +0100
+	id EFAYKJtgwmmecAQAu9opvQ
+	(envelope-from <netdev+bounces-270963-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:59:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95A23306070
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:58:53 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8E9C3060C8
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:59:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BCAB6312883E
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:52:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 735703011D75
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82D33E0221;
-	Tue, 24 Mar 2026 09:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EB723D3CED;
+	Tue, 24 Mar 2026 09:53:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="U46ofiAT"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nKH70kbm"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855993DFC7D;
-	Tue, 24 Mar 2026 09:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7583237187C
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 09:53:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774345888; cv=none; b=Ujh9PTi7DV5c4z9EXp40fcobnsLLymjUSDLYE8XhMKwqhX+L4KRVmGje98W4hzqhHF0GjGocENQ1691V6qKVmZfc+vZWW1DUrBesa26tQNh9UewyemmWVT/XyzSYxU83T3FQEOpoMdjgzHNHOdrLLFF2Iu0q7t8WVlFkBcluCHE=
+	t=1774345982; cv=none; b=aTqi9w8IiF/Duvr7u3BvuC4ZlZe/dSGFwD6h5GE40YO4YG6VgouSPbqls3dhibRQQ9vmh9qALmqNBnTbm5l85MAykganU+7XSdhCPErolKah3nWy9K0D3mUPzQSNySpRgVHM7tqefUdFM80oNEuo88houK0zBUCd4P9ScihP/wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774345888; c=relaxed/simple;
-	bh=Ju8aKO9buetkPVG2aGq/PNZJ2j8APDT4HWpcPMHbRLM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pmn7s+85xcxlFAzoYCEgrbZa8W6nfAQmXMA/TLoU6jZec9T1txEs4yhgfrv4099YqfySs2NNdQw/3K9c2UDPvpnJ0R4SyVFHgKAcn+ZJLM7CS68yUvROpl/9N6Lg8yX2iEZjNkp1rGaZRfN8KhCerfW2BQ0MdVb2cxwnsxWAWf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=U46ofiAT; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qM7docOz3+I2UfqJvceRPUIWzXOJQc92AP8ly2Gule8=; b=U46ofiATHLoxKEf4Yy73zNPJ1f
-	JKHxWCjmWY3V+JggGvOa2auChkoOlNseqvnK4KxYP2+txgkdW6lKHd4EUuG0tp/qojPQGmbPd0vRo
-	mypPEA3vT+mmT1sK3ao4nshMYjiDHpdC6470aaQKI9JSDROWEFCoNL7SaQ3yEY1mX9ElqViLalKSC
-	WVJTQXtrk60btewfEUKLWCIDQTbevX+C0wjQa2hOOpfZd8cH8LxBUvEmpctJZ7LJRgG8XzI8+j6ce
-	E/IaffiqP+Wjfi8GzxZMsjTQCHyhzqkQP9cyClWU+Lw52ugeSP3yIyiSrbr+jCliAp07mqi1SsPfD
-	Z66GwNsg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56012)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w4yPv-000000001ia-04nV;
-	Tue, 24 Mar 2026 09:51:19 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w4yPt-000000004y8-2A0m;
-	Tue, 24 Mar 2026 09:51:17 +0000
-Date: Tue, 24 Mar 2026 09:51:17 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	thomas.petazzoni@bootlin.com,
-	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
-	Rohan G Thomas <rohan.g.thomas@altera.com>,
-	Mun Yew Tham <mun.yew.tham@altera.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH net-next 4/5] net: stmmac: dwmac-socfpga: get the
- phy_mode with the dedicated helper
-Message-ID: <acJelVznH_OUwn9A@shell.armlinux.org.uk>
-References: <20260324092102.687082-1-maxime.chevallier@bootlin.com>
- <20260324092102.687082-5-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1774345982; c=relaxed/simple;
+	bh=9/w78eLdcTOVlkTZthX/B07lGl9E0Qm2yYsJ0nh71l8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=omy8Hkgv86CY7bPnoAQi1DGFhrxKNzK3Nk7njkOyNhORTGkWDWgkOPPAXEgeLTDyt2n2e2TSRtca/zHrTCxyV7JM+P7qBp8TrzFOXw522AcKXBxLz0EwiKwITD3Av8bX/U6YtfEN6AUOMPJsgH01rozQHwv5zS8RX9Bge3gmUow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nKH70kbm; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 1C996C58095;
+	Tue, 24 Mar 2026 09:53:26 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id D1ACC6011D;
+	Tue, 24 Mar 2026 09:52:58 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 61B64104511C9;
+	Tue, 24 Mar 2026 10:52:53 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1774345978; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=NWbEWD1+tCLesuLGhS91X8Nzg8UFewtHcq3VcPA4VSU=;
+	b=nKH70kbmCJUD/k596dT01rQz6fmlv7t9sn+nW7YiLXERPXRm1hG5vUMmKQh1Kd2ULDX5Zc
+	4YBovspp+CF1mM0kFJgLoW6lvv5pijZGP1Dskkr9XEY/KUJjgUFshDZkwnEI2UGHarnTDX
+	Kvk8C0oY3arMXyLKspK5KPquLRhDEzOgeeeAyJlXL28ONg0GOQvOSwzXnrFyuzwEsWu5UG
+	ntyuVxGlTcuov6lv/ooOS7puL0zaPMeUyM1ic3t6rhsIBoXHUfH8IkP7JD1+VikktggkS7
+	vcDSKYD3+UIrN4xwBCjKu3V2WabmYpHohjDNQiRh81DtW8jNUkQ0B+/L2vQs7w==
+Date: Tue, 24 Mar 2026 10:52:52 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Carlo Szelinsky <github@szelinsky.de>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] net: pse-pd: add poll path and LED trigger
+ support
+Message-ID: <20260324105252.0114a7a4@kmaincent-XPS-13-7390>
+In-Reply-To: <20260323201225.1836561-1-github@szelinsky.de>
+References: <20260323201225.1836561-1-github@szelinsky.de>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260324092102.687082-5-maxime.chevallier@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270962-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,bootlin.com,altera.com,vger.kernel.org,lists.infradead.org,st-md-mailman.stormreply.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270963-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.985];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,armlinux.org.uk:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 95A23306070
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:url,szelinsky.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A8E9C3060C8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 24, 2026 at 10:20:59AM +0100, Maxime Chevallier wrote:
-> We enable/disable the sgmii_adapter in the .fix_mac_speed() ops based on
-> the phy_mode used in the plat_data. We currently get it with :
-> 
-> socfpga_dwmac
->   ->dev
->     ->drv_data
->       ->netdev
->         ->priv
-> 	  ->stmmac_priv
-> 	    ->plat
-> 	      ->phy_interface
-> 
-> where we can get it with :
-> 
-> socfpga_dwmac
->   ->plat_data
->     ->phy_interface (done by socfpga_get_plat_phymode)
-> 
-> Use that helper here.
-> 
-> Note that we are also being passed a phy_interface_t from the
-> .fix_mac_speed() callback, provided by phylink.
-> 
-> We can handle that in the future when dynamic interface selection is
-> supported. We'd need to guarantee that we have a Lynx PCS to handle it.
-> 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+On Mon, 23 Mar 2026 21:12:22 +0100
+Carlo Szelinsky <github@szelinsky.de> wrote:
 
-Nice cleanup!
+> This series adds poll-based event detection and LED trigger support
+> to the PSE core subsystem.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+I just saw it but, for next version please add net-next prefixes in your pa=
+tch
+subject, as described here:
+https://elixir.bootlin.com/linux/v6.19.3/source/Documentation/process/maint=
+ainer-netdev.rst#L64
 
-Thanks!
+> Patches 1-2 introduce the poll path independently of LED support,
+> so it can be tested in isolation on boards with and without IRQ
+> configured.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Great, I will test it when I have a bit of spare time.
+
+> Patch 3 adds LED triggers that hook into the shared event handling
+> path introduced by patch 2.
+>=20
+> Changes since v1:
+> - Split single patch into 3 separate patches
+> - Extracted pse_handle_events() and devm_pse_poll_helper() as a
+>   standalone poll path (patches 1-2), testable without LED code
+> - Added DT binding for poll-interval-ms as a separate patch
+> - Renamed led-poll-interval-ms to poll-interval-ms for generic use
+> - Fire LED triggers from the notification path rather than a
+>   separate poll loop
+>=20
+> Tested on Realtek RTL9303 with HS104 PoE chip, poll path only
+> (without IRQ configured). Verified PD connect/disconnect notifications
+> and LED trigger state changes. Testing with IRQ configured is still
+> needed to verify the refactored pse_isr() path.
+>=20
+> Link:
+> https://lore.kernel.org/all/20260314235916.2391678-1-github@szelinsky.de/
+>=20
+> Carlo Szelinsky (3):
+>   dt-bindings: net: pse-pd: add poll-interval-ms property
+>   net: pse-pd: add devm_pse_poll_helper()
+>   net: pse-pd: add LED trigger support via notification path
+>=20
+>  .../bindings/net/pse-pd/pse-controller.yaml   |   8 +
+>  drivers/net/pse-pd/pse_core.c                 | 267 ++++++++++++++++--
+>  include/linux/pse-pd/pse.h                    |  34 +++
+>  3 files changed, 278 insertions(+), 31 deletions(-)
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
