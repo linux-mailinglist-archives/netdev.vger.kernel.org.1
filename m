@@ -1,81 +1,80 @@
-Return-Path: <netdev+bounces-271042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271044-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MKo0I2aGwmkAegQAu9opvQ
-	(envelope-from <netdev+bounces-271042-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:41:10 +0100
+	id CFNOLgWGwmltegQAu9opvQ
+	(envelope-from <netdev+bounces-271044-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:39:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E31A6308734
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:41:09 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C39A3086CF
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:39:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BC35331C5762
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:34:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D0045308B3D5
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:34:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17C73FE347;
-	Tue, 24 Mar 2026 12:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBEF13FE656;
+	Tue, 24 Mar 2026 12:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="XSy5qu4K"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="g9/sGMhK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C7F23F9F56
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 12:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8803FA5EB
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 12:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774355470; cv=none; b=kYFPBXMA5vcHERDhbdEVvrpnjpWuGceldGh+s59NcVPJYQFLeuHpNjOwTM7IGTZqTjxuZyW9jrm/5aGEr3CcKKGCfOAvjnwqbZJ+ZwG8hEMEApz2dUS+bZqNTK/Ttq9Tj7ESuTWWYEF9ksL7nPgzvOAHyIm6sSfcdB3AkoWb+ZQ=
+	t=1774355482; cv=none; b=qiMi+9iNzUMdz6QDNwsImAO7vh+0396Yr+H7kDMhq2wU1BJPnetsV28Cb2soNIge28DJZ+dkC738apYKo165EbnDD6kAcbG2qSWi6ItDTA5zCUN4iu3uQQByIbEmklG9JBH1nVF8SBDv45v9IZ+xeNUiX7gPZg7n5vP2YutxoLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774355470; c=relaxed/simple;
-	bh=cNaZ16Av/pHiTgNmSUlJBQ+S1AKjelzqjrsdrMAWcQU=;
+	s=arc-20240116; t=1774355482; c=relaxed/simple;
+	bh=DN9QG712RR6lTFc1B4cCoM2R5uHblNYBTpFN1+j7etg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=esyc4FwdlkDGtgxWYssGxr14tuQpwHJhPHqIqRNl8Qo2qHpP7gHOGuTRVI2vQdGmOs9WWgd/BUKJqd99WEJb7b8PMKdePAoL/kCwNyHSkFg5h1U8s19NrOMAoqvQbbKSLfK61jzx8V0ZP36texOfBUzw/PDwZLu3sZQPw2iAv+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=XSy5qu4K; arc=none smtp.client-ip=209.85.128.48
+	 Content-Type:Content-Disposition:In-Reply-To; b=rsDoa+kg2zONbrQyN0srnqII/c5Dz1lmw8VxuxOuogPQYIUtoQhFYDgkTbOT+GlLDSRQ4QFBERISYJKtM/907vuLIm+wgTv16ixKIWgTtzwTMl26vUU5q/VryhoHoTn2FpS+Iz3u5S3/CIxItuTJR364f3tHmqiJcjxMD8/leLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=g9/sGMhK; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso44036585e9.3
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 05:31:08 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-48704db565eso30384145e9.1
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 05:31:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1774355467; x=1774960267; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1774355480; x=1774960280; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cNaZ16Av/pHiTgNmSUlJBQ+S1AKjelzqjrsdrMAWcQU=;
-        b=XSy5qu4KzRKl14Z+UdXlcYZpz0fwL9Eju2kFdlOFDtqesNvdEATHgQvi0hp+vesHd0
-         VoedIflO03vLEo0qAIzdd0Q1ZexkI7EKBfZyXN98RA7TSWjrbvRDez1SHPzIJhm7z7W4
-         Djiamsktn7SfuvMIrEM73weCzbY57uMuZmQ0mt7iNXzivWprP/VcEaPoT+VWZdfJWY8C
-         e+yck7xKVnRbbms/VERjYWOKwEUwbwrHmzo20NTZ0tFEBx74sINndNLw558U/ShnKoHm
-         23ARZFEXA7VbafPM6L0DqqAaRzIFIj9pIk1f04xLx0P4qKENtTWumNMzpZjPHF5h9ALD
-         SoHg==
+        bh=DN9QG712RR6lTFc1B4cCoM2R5uHblNYBTpFN1+j7etg=;
+        b=g9/sGMhK4PxQBq6SCuvkYj15QCLV5QnIw4wKP6O6qwYZwNDbFxFBU/oW2OgW8skjQh
+         76BKsp1T4SnWWtLX4bx5B0A5tVMmLGmQR/9meT+HdW1bSF1owSH4TGy/5ogtZtrLSKM1
+         Hvi5qPhaklLRIq/LGZeXBSWSDUP1Hl4xPBsomIEySKvC25f/FxqG6al1NzN0uNiHoevm
+         oZQ2c4K2v+xA8K8/n/fteV6QaPZwIy/FX+kPyZgVf6ercjLXRa+Ldqxrh/9UZEQxQm1G
+         4gd6Lpmi0bG441kmOWgaqXzZD0bK1FPrHcGWEc2WMtdBOgGGEFqUxeUItRIeSAvSEeFG
+         Swfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774355467; x=1774960267;
+        d=1e100.net; s=20251104; t=1774355480; x=1774960280;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cNaZ16Av/pHiTgNmSUlJBQ+S1AKjelzqjrsdrMAWcQU=;
-        b=VNgEz9sL8qrHEgp4h27gj5aWDyKGDg1A0VBoeWXQbFqleGlZtb9sQCOgFkgHpdZx+Q
-         GBRHdGWBI2jb2jQFp6Zz+JVPNAkq9e8VR7kw85zzUOgf3hDiQpX8ZdtdT07JYBtPmBG8
-         uqiN579JzNcHhu87upfjPFaavoPXWMDxFM9kl5AKOSrBt/IWtwb1Wn1aYHrTIVrVSKpn
-         vnDvG63tRYIQOrd8k0XH6p2zESzD+C07zcIzCLZMaE48qJMunLPSeBhftD+w7kCskPNX
-         JZWhu6A+mO8/GRJSNVse7fOuakCvcsz5PT7HwqhSwbZfgUOf0OQFRlfCB+EtoRn4oxci
-         40yQ==
-X-Gm-Message-State: AOJu0YxTr6W23bciXX7Pl1f1B0zE2gnjfzuNch2TzOvYZXmK0lNwPvxg
-	WX2RaWCCSq3/MojsNTxkBp8lSePMSzskriqrXpdv+Qn7cg4eHBzp/auy5Vbra4sC+xZdb0i1Bix
-	xkUoRNHo=
-X-Gm-Gg: ATEYQzw12VmlQY/urfW9e5wPpxAwVLekXCOzyK0IlV/S1jAS8YwYIIBFXQRFl5kmSQk
-	yOJ/lTvHclFV7xISU9MnhdNXcgLx71SFgccHAjHCsSEyZ88GciQf39jGRPVucn0/BHU4g+dsQhb
-	pzdjva90W3EjwK4CqcwiFik3AbjMvIqO+gHN7QRo9KM1IunI9WjO6C5nlW0yjYo2bVCZxIyabM+
-	E9GCgXdPxSFFFBTthGElViIsHH8fQfW5HQtit7yX+6KkJ/HSL98D1wA4S3h+TNLH9n+v1xdJG7w
-	ZaZ9ANtZJlbMVw6sTnodX4X7TKZhV4fzUl+ByIvVQ2+NvFVR9nFZnOsDuSn3HkjnadYDYC8dT/C
-	W/otwt/5SU8UITC1vBu0v56LypyOH4O7Lm1cq4RKcgJMWKA3VAOnSdeY0U6M6e2QgEzYOX9gc5O
-	64wOKRyiEm2dqHLyX1c8GmENDePRMvVU64L1c=
-X-Received: by 2002:a05:600c:528e:b0:485:3fc8:de9c with SMTP id 5b1f17b1804b1-486fedb2ef0mr212873175e9.12.1774355467376;
-        Tue, 24 Mar 2026 05:31:07 -0700 (PDT)
+        bh=DN9QG712RR6lTFc1B4cCoM2R5uHblNYBTpFN1+j7etg=;
+        b=DLPvq+SnmTbX/j7qOKEQvivJcZJOaq1kqTo68UOmZx7zMeiUqqBCqQVZ48WLlw/K7q
+         v0wHwbBAMxquZisQtCUHqmGoOY9pFw8yarpUVfPvDhR8tBvNJJqyuuyE42IlvK9sj9U7
+         gugYRFHjIFW0dEBXDWHnmuHatn6PrxMJ9wOrTNpWiZWAt23wa7zG5pu9uZPwyFDJIWDE
+         Q4v3DWU6VkFq9Tg4NHdy2gJrZgCxbyhMBGxDL69SdIzfywRGeRDpWZoyubc8EvLF1Nw9
+         xxMOxzoyjID6Fq/qjjiXcz9l29oAYzjJvrmIayid+ztdJBnZbeeMHR5e0K0alduIX0Kg
+         X1/g==
+X-Gm-Message-State: AOJu0YzQmF9z9VfHK4H5Kdsy4tTR3Z8aGxlIUHv6BgbvVaenfByOr3mw
+	73l/MaRQFR07yFnpr2Q8FxvHQzsNPadnwOObM2WSTHVdupIQWc1rin+59LkaYnT3FTA=
+X-Gm-Gg: ATEYQzzSf599jLue+fJ8qVnzjRrgkkeivXyvMwh9WxlGBj8PCn660b/vsiYVF2fjtUg
+	vLgUPLaOb0NXKvRy9PSTqDXgo1Yk3fko4wpiPN3fHBqQ24LofEdNEYAmDV/viyJeLqKTk4cVZyV
+	qCVy90nZ2yF7BMYLtFVPh1eS3F3/xX5+YFg1IdRAKoYvNgv4CSgwUWcibnahGpUXPZB0JjgnVTk
+	YGBwha1tJ8bLgFi7AvCNygUzOVeVxKn5jAdmkwtOcYJUuUCGqJPtrFWShQE0QSnlPGqvNRTkiWS
+	IL6Ec3Oupjnc5Atufpk/myChRCeOhnLhE9PP5Ax7x97nJlzmw3WeCEavsNS+ZjId8pwTkBYDpyQ
+	6PVH4EBZrsBWip3SJuFPgA/GERRU5ERVwp7gtDG2lpUMKwSpSOA6OWRtDrzgvoVk/nZJoEdz7Dm
+	usOOogp9nU4sUzc4qZWwQzLACZAPMMn+vHM9BLU0mzvZLIKg==
+X-Received: by 2002:a05:600c:8710:b0:485:35ba:1d81 with SMTP id 5b1f17b1804b1-486fee051camr217093495e9.21.1774355479578;
+        Tue, 24 Mar 2026 05:31:19 -0700 (PDT)
 Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48711764625sm50073125e9.14.2026.03.24.05.31.05
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-487117077cbsm45730395e9.6.2026.03.24.05.31.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 05:31:06 -0700 (PDT)
-Date: Tue, 24 Mar 2026 13:31:04 +0100
+        Tue, 24 Mar 2026 05:31:19 -0700 (PDT)
+Date: Tue, 24 Mar 2026 13:31:16 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,11 +84,11 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	vadim.fedorenko@linux.dev, donald.hunter@gmail.com, horms@kernel.org, pabeni@redhat.com, 
 	kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH v2 net-next 1/8] dpll: add new DPLL type for transmit
- clock (TXC) usage
-Message-ID: <ao4eviden4pqqxpxhnrymdv2nkb4qumewoevuf4khbhqprvv5n@7ie2fsz77t63>
+Subject: Re: [PATCH v2 net-next 2/8] dpll: allow registering FW-identified
+ pin with a different DPLL
+Message-ID: <4h6vp6vzu54okdnckxd52tg6oz3lhf3wy52xfkbluytc3gs6bn@dyu32dx4pnii>
 References: <20260321222627.1193603-1-grzegorz.nitka@intel.com>
- <20260321222627.1193603-2-grzegorz.nitka@intel.com>
+ <20260321222627.1193603-3-grzegorz.nitka@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,18 +97,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260321222627.1193603-2-grzegorz.nitka@intel.com>
+In-Reply-To: <20260321222627.1193603-3-grzegorz.nitka@intel.com>
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
 	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271042-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271044-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
@@ -126,22 +125,18 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,resnulli-us.20230601.gappssmtp.com:dkim,intel.com:email]
-X-Rspamd-Queue-Id: E31A6308734
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,resnulli-us.20230601.gappssmtp.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: 5C39A3086CF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Sat, Mar 21, 2026 at 11:26:20PM +0100, grzegorz.nitka@intel.com wrote:
->Extend the DPLL subsystem with a new DPLL type, DPLL_TYPE_TXC,
->representing devices that drive a transmit reference clock. Certain
->PHYs, MACs and SerDes blocks use a dedicated TX reference clock for
->link operation, and this clock domain is distinct from PPS- and
->EEC-driven synchronization sources. Defining a dedicated type allows
->user space and drivers to correctly classify and configure DPLLs
->intended for TX clock generation.
->
->The corresponding netlink specification is updated to expose "txc"
+Sat, Mar 21, 2026 at 11:26:21PM +0100, grzegorz.nitka@intel.com wrote:
+>Relax the (module, clock_id) equality requirement when registering a
+>pin identified by firmware (pin->fwnode). Some platforms associate a
+>FW-described pin with a DPLL instance that differs from the pin's
+>(module, clock_id) tuple. For such pins, permit registration without
+>requiring the strict match. Non-FW pins still require equality.
 >
 >Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 >Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
