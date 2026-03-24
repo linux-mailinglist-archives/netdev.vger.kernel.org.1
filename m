@@ -1,203 +1,185 @@
-Return-Path: <netdev+bounces-270953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270954-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8F7EKOhZwmnQbwQAu9opvQ
-	(envelope-from <netdev+bounces-270953-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:31:20 +0100
+	id 6E3tDq5bwmnQbwQAu9opvQ
+	(envelope-from <netdev+bounces-270954-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:38:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65E863059E1
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:31:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA43F305BA4
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:38:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 054433011078
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:22:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 040023008E1E
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF9D3DEFE6;
-	Tue, 24 Mar 2026 09:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F703DB620;
+	Tue, 24 Mar 2026 09:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VYEdNHVv"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="FfTofZ+m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766D53DD521;
-	Tue, 24 Mar 2026 09:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56570361651;
+	Tue, 24 Mar 2026 09:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774344109; cv=none; b=PHamASw+vDOIy1zFEqBZKC/n/uspIXQoZM+B3BjKp0AD+Zt9g42ZHoVbRBaqG3Lb4ssPXAY1hTdEwtPJF0DUe5a6Ao1FCeNn9RUeEtN/xB4+R5ii+/m0eI4QOsaggdQRxHtluOHwRRgUvgSJxejOfKqOYXYbgH9g1hyLaD2adR4=
+	t=1774344595; cv=none; b=nodwPc5ot4ud+aRiHmTKyXdVbzSBuZ5V4SLwoaZ7hIt3o5QqkLZ3uKc7Yj2VYnIfZrwHBVdkoYx0PlN5Dl7+56QIybf7CTj7QA5L5fE/BDOQ68pGmlIaBrP2jEm1nfsHyEBtn0E0T6djTAZB0jkE1gwaWxFSUT35jejlx/MPp7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774344109; c=relaxed/simple;
-	bh=mng/OGMm2oi7vuZLgmgl6YVSPPsyhWXT10AzJCrskxM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=okeqflKDEm8LJGIMMjdZExDEJfgOvyhSDN0KhnDp9rM8SwRxsGD+vYshN6js0TzpGdHgHPdWc83hCBhdDEgtO90sTMhxfff98PnL7n28zmg5mFqejrUhRifPwNLevlqbrqPQ7NcMCUxLteOn8AqYNBtHMlnTj+j1JUCz83jXxq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VYEdNHVv; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 53C6CC5809B;
-	Tue, 24 Mar 2026 09:22:01 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 217826011D;
-	Tue, 24 Mar 2026 09:21:34 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 572B9104511A8;
-	Tue, 24 Mar 2026 10:21:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1774344093; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=E0H4SZ3DlYEVqlzu6JJsZInSW5jEBx0hElRQGDXixpQ=;
-	b=VYEdNHVvZITYjJxp+4w6ZHknWDgFyGHrKUuXfDFyQ/1eR/CXJ2M4JdSFABSwxtSEeDjrVH
-	mIsjeTUysEzm19uEMT6hr69dbUrpmVQ6oRtJ4CO9ZNOB0R4c95R9tDbRx6H9tN0ZSCPcOP
-	/FJExyqWh+lqxlw6RRjFeVaOcvsQzXMxrG9Jb6NeD+g0TH/eOVSPWU3mTobdX4J+gQuEgT
-	6i4y85EFRH4wkXZVGQDeWDRu/RreMOVxlFvm5lpViKtR7ziRVfUoM/9zDq0X2sR4Xtwqj1
-	1sjlfyKgE7TRWz3CPcOD6X6zLPotfFPmtVX/kAWkAjzc7jBJ+u+M+XP67BYAuQ==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	thomas.petazzoni@bootlin.com,
-	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Rohan G Thomas <rohan.g.thomas@altera.com>,
-	Mun Yew Tham <mun.yew.tham@altera.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH net-next 5/5] net: stmmac: dwmac-sofcpga: Drop the struct device reference
-Date: Tue, 24 Mar 2026 10:21:00 +0100
-Message-ID: <20260324092102.687082-6-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20260324092102.687082-1-maxime.chevallier@bootlin.com>
-References: <20260324092102.687082-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1774344595; c=relaxed/simple;
+	bh=Ug9sF3oSn2KpYdTA7AWGx1f1XAlc5fn9BFkgJMZh2fc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r7YMoossJrRjiIfbiXhjYnnBhHKy/y8Mv1HdTDscCqlGSIMoPQo+421dvHP+5+IU/ObQCOkB6vRlkZze/vpkygnGRpgf5IP+J1n8eZlfD8aqTvHlypu6/QwQwmgmi68gpSgvNj1sbe2FASnRfbDAGqVNzb8rlk3rAM2AQZ+rksI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=FfTofZ+m; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=tD5Mup6XMyUcNE/D+NzQhYiDfhBKmWHOjb7rTFI2lOU=; b=FfTofZ+mINYCPyPEc/UBdnrph3
+	pzSPIEMLy8F9nxg/gVcBKDjRX/5ljAJRsGxgvSXIcEVT78nnvUeXZiYaxO2n6TAeMGdsSeXHgUoA+
+	6dfj8IgSpwx5edQYmYGT56a63CBveYLSdFb2H/Uio/Lu5pxbaLsqbjDSl1lW9Oz/vcD6dU7S80+Q0
+	7E+yQ6RAb/3u1AstmOeL5AmAeP2L6yVMD2HRACx4dT8E7KfjSNcCvOdUtUo+oH0nMopR3kKX96sPe
+	HFDcVfD9cfR3zhGHKmVUrqmEF9O86PowUdizYnUyLvwhLsTQqHrZrnLtsw7v/GOjy85G9or9oaNHV
+	+aNFmlMQ==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1w4y4c-000Kdz-1S;
+	Tue, 24 Mar 2026 10:29:18 +0100
+Received: from localhost ([127.0.0.1])
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1w4y4b-000HvV-2F;
+	Tue, 24 Mar 2026 10:29:17 +0100
+Message-ID: <166265f6-119b-4b97-80bc-68b93364bf7c@iogearbox.net>
+Date: Tue, 24 Mar 2026 10:29:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [0.84 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 14/14] selftests/net: Add queue lease tests
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, dw@davidwei.uk,
+ toke@redhat.com, yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+References: <20260320221814.236775-1-daniel@iogearbox.net>
+ <20260320221814.236775-15-daniel@iogearbox.net>
+ <20260323195542.18ea6ac7@kernel.org>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <20260323195542.18ea6ac7@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27950/Tue Mar 24 07:24:19 2026)
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_TO(0.00)[lunn.ch,kernel.org,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,armlinux.org.uk];
-	TAGGED_FROM(0.00)[bounces-270953-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270954-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,blackwall.org,redhat.com,google.com,fomichev.me,gmail.com,kernel.org,jrife.io,intel.com,davidwei.uk,bytedance.com];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 65E863059E1
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url,iogearbox.net:dkim,iogearbox.net:mid]
+X-Rspamd-Queue-Id: AA43F305BA4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-We keep a reference to our the struct device in the socfpga_dwmac priv
-structure, but now it's only ever used to produce logs in the
-.set_phy_mode() ops, that are specific to this driver.
+On 3/24/26 3:55 AM, Jakub Kicinski wrote:
+> On Fri, 20 Mar 2026 23:18:14 +0100 Daniel Borkmann wrote:
+>> Add a selftest for netkit queue leasing, using io_uring zero copy test
+>> binary inside of a netns with netkit. This checks that memory providers
+>> can be bound against virtual queues in a netkit within a netns that are
+>> leasing from a physical netdev in the default netns.
+> 
+> ruff check says:
+> 
+> tools/testing/selftests/drivers/net/hw/nk_qlease.py:16: [F401] `lib.py.ksft_true` imported but unused
+> tools/testing/selftests/drivers/net/hw/nk_qlease.py:86: [E741] Ambiguous variable name: `l`
 
-When we call that ops, we always have a ref to the struct device around,
-so let's pass it to .set_phy_mode(). We can now discard that reference
-from struct socfpga_dwmac.
+Ack, we'll fix.
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- .../net/ethernet/stmicro/stmmac/dwmac-socfpga.c   | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+> Please look thru the Google review as well:
+> https://sashiko.dev/#/patchset/20260320221814.236775-1-daniel@iogearbox.net
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-index ae40de2ed8eb..1d7f0a57d288 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-@@ -53,14 +53,14 @@
- 
- struct socfpga_dwmac;
- struct socfpga_dwmac_ops {
--	int (*set_phy_mode)(struct socfpga_dwmac *dwmac_priv);
-+	int (*set_phy_mode)(struct socfpga_dwmac *dwmac_priv,
-+			    struct device *dev);
- 	void (*setup_plat_dat)(struct socfpga_dwmac *dwmac_priv);
- };
- 
- struct socfpga_dwmac {
- 	u32	reg_offset;
- 	u32	reg_shift;
--	struct	device *dev;
- 	struct plat_stmmacenet_data *plat_dat;
- 	struct regmap *sys_mgr_base_addr;
- 	struct reset_control *stmmac_rst;
-@@ -243,7 +243,6 @@ static int socfpga_dwmac_parse_data(struct socfpga_dwmac *dwmac, struct device *
- 	dwmac->reg_offset = reg_offset;
- 	dwmac->reg_shift = reg_shift;
- 	dwmac->sys_mgr_base_addr = sys_mgr_base_addr;
--	dwmac->dev = dev;
- 	of_node_put(np_sgmii_adapter);
- 
- 	return 0;
-@@ -382,7 +381,8 @@ static int smtg_crosststamp(ktime_t *device, struct system_counterval_t *system,
- 	return 0;
- }
- 
--static int socfpga_gen5_set_phy_mode(struct socfpga_dwmac *dwmac)
-+static int socfpga_gen5_set_phy_mode(struct socfpga_dwmac *dwmac,
-+				     struct device *dev)
- {
- 	struct regmap *sys_mgr_base_addr = dwmac->sys_mgr_base_addr;
- 	phy_interface_t phymode = socfpga_get_plat_phymode(dwmac);
-@@ -391,7 +391,7 @@ static int socfpga_gen5_set_phy_mode(struct socfpga_dwmac *dwmac)
- 	u32 ctrl, val, module;
- 
- 	if (socfpga_set_phy_mode_common(phymode, &val)) {
--		dev_err(dwmac->dev, "bad phy mode %d\n", phymode);
-+		dev_err(dev, "bad phy mode %d\n", phymode);
- 		return -EINVAL;
- 	}
- 
-@@ -440,7 +440,8 @@ static int socfpga_gen5_set_phy_mode(struct socfpga_dwmac *dwmac)
- 	return 0;
- }
- 
--static int socfpga_gen10_set_phy_mode(struct socfpga_dwmac *dwmac)
-+static int socfpga_gen10_set_phy_mode(struct socfpga_dwmac *dwmac,
-+				      struct device *dev)
- {
- 	struct regmap *sys_mgr_base_addr = dwmac->sys_mgr_base_addr;
- 	phy_interface_t phymode = socfpga_get_plat_phymode(dwmac);
-@@ -552,7 +553,7 @@ static int socfpga_dwmac_init(struct device *dev, void *bsp_priv)
- {
- 	struct socfpga_dwmac *dwmac = bsp_priv;
- 
--	return dwmac->ops->set_phy_mode(dwmac);
-+	return dwmac->ops->set_phy_mode(dwmac, dev);
- }
- 
- static void socfpga_gen5_setup_plat_dat(struct socfpga_dwmac *dwmac)
--- 
-2.49.0
+Haven't seen this on patchwork, I presume to locally repro and work through the
+findings, its https://github.com/sashiko-dev/sashiko along with Gemini 3.1 Pro
+rather than Claude Opus 4.6 for review? Either way, I'll try to set up and go
+through the findings for v10.
 
+Thanks,
+Daniel
 
