@@ -1,194 +1,166 @@
-Return-Path: <netdev+bounces-271104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271105-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yMBdMi2kwmm3fQQAu9opvQ
-	(envelope-from <netdev+bounces-271104-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 15:48:13 +0100
+	id iG/2DKOkwmm3fQQAu9opvQ
+	(envelope-from <netdev+bounces-271105-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 15:50:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C02F30A70A
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 15:48:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 911A830A756
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 15:50:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA791302B3AF
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:41:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B8CA8314F0CE
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:44:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 569243264EF;
-	Tue, 24 Mar 2026 14:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7A13FE365;
+	Tue, 24 Mar 2026 14:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LDzgYb8p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FhM4G5Xa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427D01FCF41;
-	Tue, 24 Mar 2026 14:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D057C3FEB33
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 14:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774363286; cv=none; b=OET0s85WQejM2LpaCt1fjaqJ4+DFWrBKdgE/UHZN1XbjJfGKG+At68rI29UI0Q4fU66Ct6nB1e3ipmf+Fjkg1dkNeQ84qVjOuALPvSbLCD842hbN7Z14zEOCedJxV84dmJEq0cjCgDB4hQDm99JOkIBUpae3YzXR21pgHWCWzdk=
+	t=1774363457; cv=none; b=nh61wxAUwBb2ZiI8bKOILMg3wUPoLoxDLVHXWrgWsErgLHwg2OcGACipyFgRm2l/H7rbi+9z5CmBe7aMJHp0qlkN1Zfw6FgDNpUW9cIg8CHgvO2ytnxRqcqWVIXVVyNWvdwOY5vhA6o1qNr+L4RwTceLOha2F7Gl68dZTrHF6+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774363286; c=relaxed/simple;
-	bh=l75KZj5b4rmbm/g0eeywloWjYWlOWs5V8/y0ZPlQ6kk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SXHLGLcYh7XL+B1Vu2IwIoa8NYSLdq9cgeeAVlu+w/FWzttLxrLO1BaZC0fxLaoTn+TMXdoRKURux5AjriWKuvEvISj0qAQQmbb91OirR5TIPhAOlqjDMvU92ilmCnOL/GtdO3lyJN0rxQNIwrZR4Fcv+WYdDcIt32ua0B5qFGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LDzgYb8p; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774363283; x=1805899283;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=l75KZj5b4rmbm/g0eeywloWjYWlOWs5V8/y0ZPlQ6kk=;
-  b=LDzgYb8paZkzlG0pDQPCWNMyL2tqGYdI0MkoG2eFf6aL7lbUVeaBm6s3
-   Wju33f+6WWURC6XNfpMJyYP4s6ji6AZn80Kf42BnkX0M7oxhgl9kvsmo0
-   hBzaK/QI9vnmTnmvu5BhF5LDHgvFTSA4T5jFoJr6f/iagkVVgT11TN6Fo
-   r0e2cItVczkw+0NEZLKfxbRg6hsnROmu56ftC3cVozbbBIH+xLm8yI5E0
-   X0R9Fmr7dFJAnLVSXeLwFckJqPcY62n1C+BM1+Pasv2LXalXzmF8p62gn
-   02Suphg5vKYJVFrcHHHDlJSluGkdWxgwPzCQUWUqFXv+xkFP4x1mwIY88
-   Q==;
-X-CSE-ConnectionGUID: kFzSSyyMT5igSyKRg3Uvig==
-X-CSE-MsgGUID: +Z31O5FkQwWJATTxp6t4KQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="75450918"
-X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="75450918"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 07:41:22 -0700
-X-CSE-ConnectionGUID: vibDIaYYTHemfPPXCqM2YA==
-X-CSE-MsgGUID: 75cU/oM9QDeLAERDEQykqg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="247437068"
-Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
-  by fmviesa002.fm.intel.com with ESMTP; 24 Mar 2026 07:41:20 -0700
-Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w52wY-000000006u9-1PeW;
-	Tue, 24 Mar 2026 14:41:18 +0000
-Date: Tue, 24 Mar 2026 15:40:22 +0100
-From: kernel test robot <lkp@intel.com>
-To: Artem Lytkin <iprintercanon@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, fujita.tomonori@gmail.com,
-	andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu,
-	ojeda@kernel.org, dakr@kernel.org
-Subject: Re: [PATCH 2/4] rust: phy: add paged register access and bit
- manipulation helpers
-Message-ID: <202603241502.8mYbVohd-lkp@intel.com>
-References: <20260323201925.8405-2-iprintercanon@gmail.com>
+	s=arc-20240116; t=1774363457; c=relaxed/simple;
+	bh=ae3v3r2qUaqAeaArkFvjx8+4Pe69+eKurCDVIu99QmY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RBt9fVzi7jelxuJ7D8BVWaxW4G+tAdvfEV0TnFdAMspPhvXWL33kP/CqfOg1sBnt9SwYAPBR6n1YmBMdNbuL5gK/qYG3SYTvf2GljvNMI561/PZF1kuHWd6qVyvL8Fn95MIspDnNR5D+hknHAgi8z/mzY0tSfusUoEzUR4qgTss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FhM4G5Xa; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774363453;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AY2OomX3AbtADrQzR4TpX6QwVYqqT/TeFLNbjWcZfIk=;
+	b=FhM4G5XaUXjpfqNMeBUnjb4Hmuw7tyyAtQb06y7yodntmjkJxWaYJfWlAtz/Eh+Q7ZVT0j
+	d7ThzPZ3SpTsTvFh2QT5TyNQD78iHm9qceTeIjiZX2b91lhcrPYfdxMaloBqyA/q5NK/Pn
+	yP+S5GzEa4fIzxnXfL+MhwmnXca0fd0=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-515-V1H145coOTewGgl4eWMwSw-1; Tue,
+ 24 Mar 2026 10:44:10 -0400
+X-MC-Unique: V1H145coOTewGgl4eWMwSw-1
+X-Mimecast-MFC-AGG-ID: V1H145coOTewGgl4eWMwSw_1774363447
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CA6B6180060D;
+	Tue, 24 Mar 2026 14:44:06 +0000 (UTC)
+Received: from [10.43.2.199] (unknown [10.43.2.199])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C7360180075D;
+	Tue, 24 Mar 2026 14:43:57 +0000 (UTC)
+Message-ID: <95f100a5-ee80-4944-81b4-1f5edf0ca8cf@redhat.com>
+Date: Tue, 24 Mar 2026 15:43:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260323201925.8405-2-iprintercanon@gmail.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 4/8] dpll: zl3073x: allow SyncE_Ref pin state
+ change
+To: Grzegorz Nitka <grzegorz.nitka@intel.com>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ poros@redhat.com, richardcochran@gmail.com, andrew+netdev@lunn.ch,
+ przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com,
+ Prathosh.Satish@microchip.com, jiri@resnulli.us,
+ arkadiusz.kubalewski@intel.com, vadim.fedorenko@linux.dev,
+ donald.hunter@gmail.com, horms@kernel.org, pabeni@redhat.com,
+ kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+References: <20260321222627.1193603-1-grzegorz.nitka@intel.com>
+ <20260321222627.1193603-5-grzegorz.nitka@intel.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20260321222627.1193603-5-grzegorz.nitka@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lists.linux.dev,gmail.com,lunn.ch,umich.edu,kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-271105-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271104-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,git-scm.com:url]
-X-Rspamd-Queue-Id: 4C02F30A70A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 911A830A756
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Artem,
+On 3/21/26 11:26 PM, Grzegorz Nitka wrote:
+> The SyncE_Ref pin may operate as either an active or inactive reference
+> depending on board design and system configuration. Some platforms need
+> to disable the SyncE reference dynamically (e.g., when selecting a
+> different recovered clock input). The hardware supports toggling this
+> pin, therefore advertise the STATE_CAN_CHANGE capability.
+> 
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> ---
+>   drivers/dpll/zl3073x/prop.c | 9 +++++++++
+>   1 file changed, 9 insertions(+)
+> 
+> diff --git a/drivers/dpll/zl3073x/prop.c b/drivers/dpll/zl3073x/prop.c
+> index ac9d41d0f978..acd7061a741a 100644
+> --- a/drivers/dpll/zl3073x/prop.c
+> +++ b/drivers/dpll/zl3073x/prop.c
+> @@ -215,6 +215,15 @@ struct zl3073x_pin_props *zl3073x_pin_props_get(struct zl3073x_dev *zldev,
+>   
+>   		props->dpll_props.type = DPLL_PIN_TYPE_GNSS;
+>   
+> +	       /*
+> +		* The SyncE_Ref pin supports enabling/disabling dynamically.
+> +		* Some platforms may choose to expose this through firmware
+> +		* configuration later. For now, advertise this capability
+> +		* universally since the hardware allows state toggling.
+> +		*/
+> +		props->dpll_props.capabilities |=
+> +			DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE;
+> +
+>   		/* The output pin phase adjustment granularity equals half of
+>   		 * the synth frequency count.
+>   		 */
 
-kernel test robot noticed the following build errors:
+I'm wondering about the purpose of this flag, or rather the need to set
+it manually from the driver. Surely, the existence of the
+state_on_dpll_set() or state_on_pin_set() callback clearly indicates
+this capability.
 
-[auto build test ERROR on rust/rust-next]
-[also build test ERROR on linus/master v7.0-rc5 next-20260323]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Wouldn't it be simpler for the core to set it directly based on this?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Artem-Lytkin/rust-phy-add-paged-register-access-and-bit-manipulation-helpers/20260324-155532
-base:   https://github.com/Rust-for-Linux/linux rust-next
-patch link:    https://lore.kernel.org/r/20260323201925.8405-2-iprintercanon%40gmail.com
-patch subject: [PATCH 2/4] rust: phy: add paged register access and bit manipulation helpers
-config: x86_64-rhel-9.4-rust (https://download.01.org/0day-ci/archive/20260324/202603241502.8mYbVohd-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260324/202603241502.8mYbVohd-lkp@intel.com/reproduce)
+Ivan
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603241502.8mYbVohd-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   PATH=/opt/cross/clang-20/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-   INFO PATH=/opt/cross/rustc-1.88.0-bindgen-0.72.1/cargo/bin:/opt/cross/clang-20/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-   /usr/bin/timeout -k 100 12h /usr/bin/make KCFLAGS=\ -fno-crash-diagnostics\ -Wno-error=return-type\ -Wreturn-type\ -funsigned-char\ -Wundef\ -falign-functions=64 W=1 --keep-going LLVM=1 -j32 -C source O=/kbuild/obj/consumer/x86_64-rhel-9.4-rust ARCH=x86_64 SHELL=/bin/bash rustfmtcheck 
-   make: Entering directory '/kbuild/src/consumer'
-   make[1]: Entering directory '/kbuild/obj/consumer/x86_64-rhel-9.4-rust'
->> Diff in rust/kernel/net/phy.rs:246:
-            let phydev = self.0.get();
-            // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-            // So it's just an FFI call.
-   -        let ret =
-   -            unsafe { bindings::phy_write_paged(phydev, page.into(), regnum.into(), val) };
-   +        let ret = unsafe { bindings::phy_write_paged(phydev, page.into(), regnum.into(), val) };
-    
-            to_result(ret)
-        }
->> Diff in rust/kernel/net/phy.rs:246:
-            let phydev = self.0.get();
-            // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-            // So it's just an FFI call.
-   -        let ret =
-   -            unsafe { bindings::phy_write_paged(phydev, page.into(), regnum.into(), val) };
-   +        let ret = unsafe { bindings::phy_write_paged(phydev, page.into(), regnum.into(), val) };
-    
-            to_result(ret)
-        }
->> Diff in rust/kernel/net/phy.rs:246:
-            let phydev = self.0.get();
-            // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-            // So it's just an FFI call.
-   -        let ret =
-   -            unsafe { bindings::phy_write_paged(phydev, page.into(), regnum.into(), val) };
-   +        let ret = unsafe { bindings::phy_write_paged(phydev, page.into(), regnum.into(), val) };
-    
-            to_result(ret)
-        }
-   make[2]: *** [Makefile:1912: rustfmt] Error 123
-   make[2]: Target 'rustfmtcheck' not remade because of errors.
-   make[1]: Leaving directory '/kbuild/obj/consumer/x86_64-rhel-9.4-rust'
-   make[1]: *** [Makefile:248: __sub-make] Error 2
-   make[1]: Target 'rustfmtcheck' not remade because of errors.
-   make: *** [Makefile:248: __sub-make] Error 2
-   make: Target 'rustfmtcheck' not remade because of errors.
-   make: Leaving directory '/kbuild/src/consumer'
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
