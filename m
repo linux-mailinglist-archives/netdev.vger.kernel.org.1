@@ -1,241 +1,164 @@
-Return-Path: <netdev+bounces-270923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270925-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0AFHHm5MwmnvbAQAu9opvQ
-	(envelope-from <netdev+bounces-270923-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:33:50 +0100
+	id AFAnGhhHwmnvbAQAu9opvQ
+	(envelope-from <netdev+bounces-270925-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:11:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A525F304B41
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:33:49 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C421304637
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:11:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 91B4D316E847
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 08:07:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B6E543031CC8
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 08:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19BD33603ED;
-	Tue, 24 Mar 2026 08:07:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA38362141;
+	Tue, 24 Mar 2026 08:09:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ffhy3Yce"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxK/JIue"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FF6362128
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 08:07:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90D13382C8
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 08:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774339644; cv=none; b=Scn0ebSLr29CIIyszh6bGnwesq5OPp9iHTeuvZsS2dG8KwvqO+OYSIkxjMumqPf9Gby9h4+se6cznf6QMz/Ta7Oiq6fS/hJ4ARtbnoaQvrK7iPZFXgb/58WkihnE7B+6EpD527wFVBQJ/25UlWSrEBLAHhNJn3ZiyQA6GBwlmSQ=
+	t=1774339781; cv=none; b=IWfNp8rlmBBHK3ieV5AJBVFgvG9NtoVHSagVFvoIPunkXmKcmSwDPQ7OXv7h5T2MDxRRBjCbZNKow/7rQksz5S6HO9h1Hpf6RFTxDjoo+/mvxZCfVdeTmYkTda4yqdRAzlASOND/gXOc2YvGRmYYSNwAzPiP1QBe9/4r5J5fGoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774339644; c=relaxed/simple;
-	bh=ZvmDtRtwLXF4NN4xJBAcY7RYMs7JzpNX/mz4Gt1djL8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CNsU3Dbz795DwpGwIo/gXfTv+mIkNiKg/VkDswTbtdEFakCT36PWXewjM+Hb7wxBUaPY1kdfu4UQiRCR6uZyFjqfKTZRNL4D7aADAzmKBvI/tmmofCDZkW+Kafq+SgZh4TkV+gDwJzUCDPoeo7o7jgheJdnSrlzvSto0AQQjvho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ffhy3Yce; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774339628;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=F7Fbu8GvqOu3EypjsQLM9k82uQKOXpR7x4RhsQ7hJIU=;
-	b=Ffhy3Ycem3McJUcsmBWjJdd3jeQEFVP18QFrYPu92V6d07hpGd/zZAPCRs0KuDtJVljLk9
-	l4k7epMAQrMHEiDPiMewKfHqN7UVF/danxp/zgPClGMw861/6pAuBabk9iWLH/zvlTtPIA
-	TSxF/7LaMF+OoTmZ0FWrwpG0qu9BxPY=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1774339781; c=relaxed/simple;
+	bh=uUjzgoMGyXNZJ/A6a6SMtJQvn5oWJoqboZciUy0mlcM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Zwtbi1ZY6Onj8bY9DpN4AE+sjQ4cdoCjcQiGJXt9sj6NLmCWIzQ50MqlctaS54NKwZ0p8TMnrpuSeopcjLOwFqIBgYSWnJFSXUNhSpZ2/b5vbmT0EJ0kkrIWZYIj2fVoq0SMop8fc73wkFRsQlWDuqE2sBUJuJte9XPAhOUmC34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TxK/JIue; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5a2853b1f8cso864211e87.3
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 01:09:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774339773; x=1774944573; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=f7pTcS/XRpG6O2bwm88mloQEdUOQr6UIgEUkrvYwL0g=;
+        b=TxK/JIue4KeOYh0UkcAomb0+wPhv8cWzn1goWeBIxQDM0o1QtIQzGWbLX7tNqTNm4F
+         jQtAt2ZX8dI4NqoyGqt4NUwcKcmztF0z0NMvW+jzn0vez/i6ikuHsy97AKXwJTO/oqob
+         hEAauRB/tHS/+YE7OppQl/F9ImeNHc/+sZbZXHszDQljyn7pNPRCsVzV/GzOB5kz7D4B
+         GbvY/qyKjjMHgz3i5i8QU+VnvR2IlORos24YvweaRTauoCH/SeTsu+/nHjdf5fkuSegz
+         thAtVkADm2esMhdo2VeWQ5DKgL2FguXjgU2pyJEW93bDe9EW+YJLxEgLU351X2mf0v8M
+         iTsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774339773; x=1774944573;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f7pTcS/XRpG6O2bwm88mloQEdUOQr6UIgEUkrvYwL0g=;
+        b=fXGGvlfoCi1Y61ph2VNawg1eBB6cLLnUdoMV6ECsuGGLOvKQfMgUMN1MKz/8PEiasg
+         sl5gl3l/b0zQHNF02bpu9eN6NEP/jZoi0CxMysG4xJoO80lwrVCxKbQfVdRyKuGa9w2a
+         JMRxjJ1vsvxpOyR1+sEClnj2uJn32o4GLAsQrzo94t9FOjfltWCt2TySFyyJICmWxXYC
+         q+G7FXF/HNcclO4gcx4Pll0xB5Sqef/d9a5moEeoTflizXycsN2qc8+e3BvIVLR5D3rD
+         89gTYZgOr0PwV96nlJq/i1zAY0i8znbSwqq4/K7qAzXRt+BxV30CgzDHN+9B9gR5rN6j
+         8Ifw==
+X-Gm-Message-State: AOJu0YzOyb3+v0g1V0E5FLEBrjbd974yUqFXKbkrZbrwcBkjz9kAn1cG
+	Kx+sB0ZI8f0m9fAd1gADWogUNa/sm5qis1EYEtJnPJPtycq1sx69zlBxsm2Km5lW
+X-Gm-Gg: ATEYQzxGF9nhMQuGZvzkYnAhQu5CyTzd5lqjYL7TEp3fjVb2IvSCSfs3oB1PD7wyHAI
+	GoAvQus/WA624TeIFUGGQHNoX4Ssu33Z5Q5w3SilE6b4Ehn4UkNDuxfgtwhtfCL/455tT/B6ZXX
+	FMtRNtGFB2caIiYsRgqEe4mZhsn/28v/NexmMHkZkbv9y4x5MJmCVSbKQX+HZPPA59XXAMyqfbY
+	HtGV7KdO2Xfl5I45RDO93FwbCuPz2riTuZgWmvncVzqpqwdng8Kzzf9V1WyobX5KncX+vj0IheZ
+	RAPtdjBQRZgOncYrLUDNgTSYVVIzmzC3Mh0ePD+oWe5wK4LZwtZFCIi9ekP9kSgS1rXKVcJamNB
+	9a4zVgme4X9aET62YIfRSIczYpw7hQLBcDxfYDWeoghFVCXY9buNR/Pcd5GqtT8kH04yzQc6pyh
+	dshV6IvcmDK4nl4ieHfule0EC+9Q2AcxBnj67pefLjg9A0jnKGdCbnbFybRYvid9FPvL5JPkA4E
+	yv+5fCjJNcJAysOVp40Rw==
+X-Received: by 2002:a05:6512:39c4:b0:59f:6923:1cb1 with SMTP id 2adb3069b0e04-5a285ae30bfmr5768214e87.8.1774339773179;
+        Tue, 24 Mar 2026 01:09:33 -0700 (PDT)
+Received: from pop-os.. ([2a02:2121:806:2ce1:42d9:28ba:7989:a157])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a2963fa304sm394953e87.27.2026.03.24.01.09.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2026 01:09:32 -0700 (PDT)
+From: Nikolaos Gkarlis <nickgarlis@gmail.com>
 To: netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
-	syzbot+006987d1be3586e13555@syzkaller.appspotmail.com,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v1] net: qrtr: replace qrtr_tx_flow radix_tree with xarray to fix memory leak
-Date: Tue, 24 Mar 2026 16:06:44 +0800
-Message-ID: <20260324080645.290197-1-jiayuan.chen@linux.dev>
+Cc: Nikolaos Gkarlis <nickgarlis@gmail.com>
+Subject: [PATCH] rtnetlink: add missing netlink_ns_capable() check for peer netns
+Date: Tue, 24 Mar 2026 09:07:30 +0100
+Message-Id: <20260324080730.4051666-1-nickgarlis@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270923-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-270925-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[nickgarlis@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,006987d1be3586e13555];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,appspotmail.com:email,shopee.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A525F304B41
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0C421304637
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jiayuan Chen <jiayuan.chen@shopee.com>
+rtnl_newlink() lacks a CAP_NET_ADMIN capability check on the peer
+network namespace when creating paired devices (veth, vxcan,
+netkit). This allows an unprivileged user with a user namespace
+to create interfaces in arbitrary network namespaces, including
+init_net.
 
-__radix_tree_create() allocates and links intermediate nodes into the
-tree one by one. If a subsequent allocation fails, the already-linked
-nodes remain in the tree with no corresponding leaf entry. These orphaned
-internal nodes are never reclaimed because radix_tree_for_each_slot()
-only visits slots containing leaf values.
+Add a netlink_ns_capable() check for CAP_NET_ADMIN in the peer
+namespace before allowing device creation to proceed.
 
-The radix_tree API is deprecated in favor of xarray. As suggested by
-Matthew Wilcox, migrate qrtr_tx_flow from radix_tree to xarray instead
-of fixing the radix_tree itself [1]. xarray properly handles cleanup of
-internal nodes — xa_destroy() frees all internal xarray nodes when the
-qrtr_node is released, preventing the leak.
-
-[1] https://lore.kernel.org/all/20260225071623.41275-1-jiayuan.chen@linux.dev/T/
-Reported-by: syzbot+006987d1be3586e13555@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/000000000000bfba3a060bf4ffcf@google.com/T/
-Fixes: 5fdeb0d372ab ("net: qrtr: Implement outgoing flow control")
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
-Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+Fixes: 48327566769a ("rtnetlink: fix double call of rtnl_link_get_net_ifla()")
+Reported-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
+Signed-off-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
 ---
- net/qrtr/af_qrtr.c | 31 +++++++++++++------------------
- 1 file changed, 13 insertions(+), 18 deletions(-)
+ net/core/rtnetlink.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
-index 55fd2dd37588..d77e9c8212da 100644
---- a/net/qrtr/af_qrtr.c
-+++ b/net/qrtr/af_qrtr.c
-@@ -118,7 +118,7 @@ static DEFINE_XARRAY_ALLOC(qrtr_ports);
-  * @ep: endpoint
-  * @ref: reference count for node
-  * @nid: node id
-- * @qrtr_tx_flow: tree of qrtr_tx_flow, keyed by node << 32 | port
-+ * @qrtr_tx_flow: xarray of qrtr_tx_flow, keyed by node << 32 | port
-  * @qrtr_tx_lock: lock for qrtr_tx_flow inserts
-  * @rx_queue: receive queue
-  * @item: list item for broadcast list
-@@ -129,7 +129,7 @@ struct qrtr_node {
- 	struct kref ref;
- 	unsigned int nid;
- 
--	struct radix_tree_root qrtr_tx_flow;
-+	struct xarray qrtr_tx_flow;
- 	struct mutex qrtr_tx_lock; /* for qrtr_tx_flow */
- 
- 	struct sk_buff_head rx_queue;
-@@ -172,6 +172,7 @@ static void __qrtr_node_release(struct kref *kref)
- 	struct qrtr_tx_flow *flow;
- 	unsigned long flags;
- 	void __rcu **slot;
-+	unsigned long index;
- 
- 	spin_lock_irqsave(&qrtr_nodes_lock, flags);
- 	/* If the node is a bridge for other nodes, there are possibly
-@@ -189,11 +190,9 @@ static void __qrtr_node_release(struct kref *kref)
- 	skb_queue_purge(&node->rx_queue);
- 
- 	/* Free tx flow counters */
--	radix_tree_for_each_slot(slot, &node->qrtr_tx_flow, &iter, 0) {
--		flow = *slot;
--		radix_tree_iter_delete(&node->qrtr_tx_flow, &iter, slot);
-+	xa_for_each(&node->qrtr_tx_flow, index, flow)
- 		kfree(flow);
--	}
-+	xa_destroy(&node->qrtr_tx_flow);
- 	kfree(node);
- }
- 
-@@ -228,9 +227,7 @@ static void qrtr_tx_resume(struct qrtr_node *node, struct sk_buff *skb)
- 
- 	key = remote_node << 32 | remote_port;
- 
--	rcu_read_lock();
--	flow = radix_tree_lookup(&node->qrtr_tx_flow, key);
--	rcu_read_unlock();
-+	flow = xa_load(&node->qrtr_tx_flow, key);
- 	if (flow) {
- 		spin_lock(&flow->resume_tx.lock);
- 		flow->pending = 0;
-@@ -269,12 +266,13 @@ static int qrtr_tx_wait(struct qrtr_node *node, int dest_node, int dest_port,
- 		return 0;
- 
- 	mutex_lock(&node->qrtr_tx_lock);
--	flow = radix_tree_lookup(&node->qrtr_tx_flow, key);
-+	flow = xa_load(&node->qrtr_tx_flow, key);
- 	if (!flow) {
- 		flow = kzalloc_obj(*flow);
- 		if (flow) {
- 			init_waitqueue_head(&flow->resume_tx);
--			if (radix_tree_insert(&node->qrtr_tx_flow, key, flow)) {
-+			if (xa_err(xa_store(&node->qrtr_tx_flow, key, flow,
-+					    GFP_KERNEL))) {
- 				kfree(flow);
- 				flow = NULL;
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 576d5ec3bb36..f3a7d6dbd713 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -4030,8 +4030,15 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 				ret = PTR_ERR(peer_net);
+ 				goto put_ops;
  			}
-@@ -326,9 +324,7 @@ static void qrtr_tx_flow_failed(struct qrtr_node *node, int dest_node,
- 	unsigned long key = (u64)dest_node << 32 | dest_port;
- 	struct qrtr_tx_flow *flow;
+-			if (peer_net)
++			if (peer_net) {
++				if (!netlink_ns_capable(skb, peer_net->user_ns,
++							CAP_NET_ADMIN)) {
++					put_net(peer_net);
++					ret = -EPERM;
++					goto put_ops;
++				}
+ 				rtnl_nets_add(&rtnl_nets, peer_net);
++			}
+ 		}
+ 	}
  
--	rcu_read_lock();
--	flow = radix_tree_lookup(&node->qrtr_tx_flow, key);
--	rcu_read_unlock();
-+	flow = xa_load(&node->qrtr_tx_flow, key);
- 	if (flow) {
- 		spin_lock_irq(&flow->resume_tx.lock);
- 		flow->tx_failed = 1;
-@@ -599,7 +595,7 @@ int qrtr_endpoint_register(struct qrtr_endpoint *ep, unsigned int nid)
- 	node->nid = QRTR_EP_NID_AUTO;
- 	node->ep = ep;
- 
--	INIT_RADIX_TREE(&node->qrtr_tx_flow, GFP_KERNEL);
-+	xa_init(&node->qrtr_tx_flow);
- 	mutex_init(&node->qrtr_tx_lock);
- 
- 	qrtr_node_assign(node, nid);
-@@ -627,6 +623,7 @@ void qrtr_endpoint_unregister(struct qrtr_endpoint *ep)
- 	struct qrtr_tx_flow *flow;
- 	struct sk_buff *skb;
- 	unsigned long flags;
-+	unsigned long index;
- 	void __rcu **slot;
- 
- 	mutex_lock(&node->ep_lock);
-@@ -649,10 +646,8 @@ void qrtr_endpoint_unregister(struct qrtr_endpoint *ep)
- 
- 	/* Wake up any transmitters waiting for resume-tx from the node */
- 	mutex_lock(&node->qrtr_tx_lock);
--	radix_tree_for_each_slot(slot, &node->qrtr_tx_flow, &iter, 0) {
--		flow = *slot;
-+	xa_for_each(&node->qrtr_tx_flow, index, flow)
- 		wake_up_interruptible_all(&flow->resume_tx);
--	}
- 	mutex_unlock(&node->qrtr_tx_lock);
- 
- 	qrtr_node_release(node);
 -- 
-2.43.0
+2.34.1
 
 
