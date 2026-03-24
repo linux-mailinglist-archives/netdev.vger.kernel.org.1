@@ -1,217 +1,232 @@
-Return-Path: <netdev+bounces-270932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270940-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wBxxKnxPwmnvbAQAu9opvQ
-	(envelope-from <netdev+bounces-270932-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:46:52 +0100
+	id qFmbF5ZSwmnNbgQAu9opvQ
+	(envelope-from <netdev+bounces-270940-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:00:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77AEA304EF8
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:46:50 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DDB13052FD
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:00:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 17E0632C6817
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 08:28:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 09EA23034DF9
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 08:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85724374192;
-	Tue, 24 Mar 2026 08:28:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4983AEF37;
+	Tue, 24 Mar 2026 08:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="PR1mkROC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FGe0pJR1";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="baSvWBmp"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FB636BCF4;
-	Tue, 24 Mar 2026 08:28:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C678236C9CB
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 08:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774340890; cv=none; b=MfDLOPv3V+EJNMwjRCl+64hsmdVHcGdaswIyGGvAXter2arxR8te70m324t49POnlK4t1LGC617ZONJxmKTp7SF37x3rb2p9Ut1zPM/HKv2h+ev1cQWIfeeAP1weRsbNV8m/kbFhmr41pG2eTnf+ouYMV31zGjsSDBTM14Q8qc0=
+	t=1774342526; cv=none; b=mHmA/W7XKgtwugj/N+R2M/3Rg2nipd9pImQt6qN+3ozEcdeCAijBBUJZldH9k6pnGHGxN9LPydUBBHB3v6aoWtn8o86LhtwigMDydy29CZe2sdl6ZlpVFMy3WBQf4+PJhK/cZP4epI6KS/Qxvq/yRM8mdNOZEGFo3L1gIvsYu2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774340890; c=relaxed/simple;
-	bh=5OmiqRxWiKh0ez82OpMgvuHil+XNZD/gFxvFPhrYaRM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oZxmo18oNNxPAqec2U5sS6Ol3ZL7TrsAg9IdPiKok3Ji2V8BHXU3F9Zi+MZzTcZtDlUbyAvpcTZhocpuyQ6JIRtjxjSDMwo9rKDcQ/jH8oNrB0pBvZE+5jQ0A1ieQCMO52wUiC6TRdz/EgFBrguD/syOCb4NvlC0fC78BqhmIhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=PR1mkROC; arc=none smtp.client-ip=113.46.200.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=k7LVUOAVZGg1oxOaM2rw3QIxJxXLJ8+38eC7I9YTytk=;
-	b=PR1mkROCMmgFSYOIS6Zd9PHKq6UmgWPJH1lswZJQOIbpNMN9+ruKikjz9VBBIwjRZmJRu0i1Z
-	3W7Gmn4syyq9x3iRmO7ZIal+qRCWMyPxFsl1hrEiNN7IcOcgIWxopDaoESrEsA/SH6Pj3HiaCnx
-	Tu0dBKeknlL0IFiEN1t/m0c=
-Received: from mail.maildlp.com (unknown [172.19.163.104])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4fg31Z1l5Zz1T4KL;
-	Tue, 24 Mar 2026 16:22:26 +0800 (CST)
-Received: from kwepemj500018.china.huawei.com (unknown [7.202.194.48])
-	by mail.maildlp.com (Postfix) with ESMTPS id D07964056A;
-	Tue, 24 Mar 2026 16:27:55 +0800 (CST)
-Received: from huawei.com (10.50.85.128) by kwepemj500018.china.huawei.com
- (7.202.194.48) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 24 Mar
- 2026 16:27:55 +0800
-From: Li Xiasong <lixiasong1@huawei.com>
-To: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
-	<martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
-	<zhangchangzhong@huawei.com>, <weiyongjun1@huawei.com>
-Subject: [PATCH net v2] mptcp: fix soft lockup in mptcp_recvmsg()
-Date: Tue, 24 Mar 2026 16:51:31 +0800
-Message-ID: <20260324085131.4187473-1-lixiasong1@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1774342526; c=relaxed/simple;
+	bh=nnwLfeX8Xj31jdUQAow/f6SrRJgezZGWNE5WWcyyXeI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YcyScwCEdtFK2HWcjEoFSwYkXNpzru15o69rxl/WahVKXhtmjEfPqrUuEtMXEozBFd+0bNKkmrsaXkD9g+bXqnJvBnBbOmkRIWdlTKnKqO0wA6GcE9W/pJecyCHK0QXaQk/qZVam7TeHL/0unPPkRHRS0uUJPs3E0nSkwC4ULz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FGe0pJR1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=baSvWBmp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774342523;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZDbn4vfWWcZxsdXUlqagJpqSOsEI/45/fEadaMDENpk=;
+	b=FGe0pJR1E7sjRtTKSLfCbHc1zW6e05fjLBqlyUFStmMH2fwLYzROp4qRdiQfBuuH3AoNAv
+	pv8Wik0j9J171mfDIjVBKmpcx01p4j+338OiAG8ZIsR6yBgEjK4he5tprFIHWABlEkkuru
+	7Ih2qL1D5jaXChFqN3AM/2tBOtkjcb4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-655-uUIyzQPVPyqaqdJJ27tu2w-1; Tue, 24 Mar 2026 04:55:21 -0400
+X-MC-Unique: uUIyzQPVPyqaqdJJ27tu2w-1
+X-Mimecast-MFC-AGG-ID: uUIyzQPVPyqaqdJJ27tu2w_1774342521
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4852ccff333so13173435e9.2
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 01:55:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1774342520; x=1774947320; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZDbn4vfWWcZxsdXUlqagJpqSOsEI/45/fEadaMDENpk=;
+        b=baSvWBmpJ8dt5kszkOwVJfidvVC9CS1E+q0J3347tW0kPOmg/h6+eCULRvZ4x92tHG
+         h3m6Y4RMVfpw4C9MfjKpb1mxSyGgkww9evIouCDGAFCeo1Bdd0vsGPbPu4VLD/n3o1jh
+         o6a0w+FUL8ZtY1qulGQe4BZRjnLApNTxbiOgr9lvpOzXU+J/3RXjZNB49LFeegCyJ6lZ
+         cjFg44FuoAxgsdqWxhBXijp4i2ghXtRoIkTU1ETHJI64AcuRK2VSTbcTquGxJzcijm1p
+         Umx3k2IzPf/HhzVB5eP/42VLpb8dKAdyTjFNAQHJS/iC3tkxmiovXZ9MoKeRFE0TwZHM
+         l4tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774342520; x=1774947320;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZDbn4vfWWcZxsdXUlqagJpqSOsEI/45/fEadaMDENpk=;
+        b=kAvq6R2CabTe2j5/EmWR6a1EQjB1idaYA3RFvQSxcBNmlQnReVCcu+Tw8Z3upoH1zJ
+         knvF3WFfUixo1cAwfecnLVSBzdjmJfk5udCRWkkcAhZyKn05FkcA8iNe6ynTxLon15uk
+         68cWVnrgp25t5cuMVsHjNS8eY5/nWTSBYaFmrqDiciBAwfD6NDrpOIhtRmwBHofojfd2
+         qFFviQPXN02g3ZIL5/o0ijCbpikCgAjmfckzaETMEdG4z/N9A+IxCSfaYmCoUseDCySg
+         ky6tseSn7xkztSzbjowVXRrxdFRxsvNjjTJ0uCWRlrlL8XN2izrpxMCgpMdvydW7F3+Z
+         w1sg==
+X-Forwarded-Encrypted: i=1; AJvYcCUZp8QP/Tc2N7jJWL8yr9t6jtZ/LSyy7K9BG5NqUGJKD6Pp0lPNyFu0RL2+cvL0BhUIy0Kx9Zw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfgLuPUlzg8Y/oWwb3MUrqtN1PFzh2Bhjt7CYIJclo8SpD4Lv2
+	pYo4qzeqYHrQpVrSgLtiU55LN/U79pOn44/nLkeCKjzAXsIpCDG49exVOIopKXyYr+MIJX+/Xer
+	QnunhYGQNFQeKJLqL+Z/OvQ+ILeMd/X8mj0bsOj638z/TepA8gc0ISprtoQ==
+X-Gm-Gg: ATEYQzy6NTakiH0AxyIMDKOQfraFfr91Iz0uQcbSKrLh+Hm+n5++kqt40sVXFUHzaC2
+	VVm98Zzotczg4jecg64qt5Z7jSCGp9xjuAzI/EFyvY0G1cJqsNBZUyWE5FNC739iqjLHGHcvZ/X
+	MJs3ZKGbmKC08/Vx+eYpKl8TQT7QuFb3NEF9y4iPEknBFwDIoOY2Vl4HjrkU19/YHgbUPljqZnl
+	H8DGQ/1ZfWFIc40FwEjYuTu9VOt32KNQp0MBvdrO5PpF1lghgQqKbGy04VEp4irFabIXtLdpulw
+	o2Au/Lry5BJCLRWjiAW/1KNvNpONcI1IBARRsEirY8J/MqV5lQ96NAHZL861JAhuupnqVYIgG6p
+	HNwTa8i8l10WIx7AyiSK5N3Udsmv49bFHFKAhqyn7LJLEoP4WTa3d2GUU
+X-Received: by 2002:a05:600c:4e49:b0:486:f9a4:d487 with SMTP id 5b1f17b1804b1-486feb6253dmr201425995e9.0.1774342520525;
+        Tue, 24 Mar 2026 01:55:20 -0700 (PDT)
+X-Received: by 2002:a05:600c:4e49:b0:486:f9a4:d487 with SMTP id 5b1f17b1804b1-486feb6253dmr201425545e9.0.1774342519940;
+        Tue, 24 Mar 2026 01:55:19 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.153.60])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4870f7f5682sm20328145e9.3.2026.03.24.01.55.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Mar 2026 01:55:19 -0700 (PDT)
+Message-ID: <6fb603dd-7bc2-4b60-bf93-7247d05f3250@redhat.com>
+Date: Tue, 24 Mar 2026 09:55:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,v17,08/14] net: homa: create homa_rpc.h and homa_rpc.c
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: horms@kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
+ edumazet@google.com
+References: <20260316223228.2611-9-ouster@cs.stanford.edu>
+ <20260318072131.268946-1-pabeni@redhat.com>
+ <CAGXJAmy7=A+Jc+iJ6jwddWs6x0z4pOudRs31Q41m9HMZ4yTWnw@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CAGXJAmy7=A+Jc+iJ6jwddWs6x0z4pOudRs31Q41m9HMZ4yTWnw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemj500018.china.huawei.com (7.202.194.48)
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-270940-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270932-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lixiasong1@huawei.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:dkim,huawei.com:email,huawei.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 77AEA304EF8
+	RCPT_COUNT_FIVE(0.00)[5]
+X-Rspamd-Queue-Id: 0DDB13052FD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot reported a soft lockup in mptcp_recvmsg() [0].
+On 3/23/26 11:43 PM, John Ousterhout wrote:
+> On Wed, Mar 18, 2026 at 12:21 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>> This approach would allow lockless RCU lookups and faster reclamation. Paolo
+>> referenced tcp established socket lookup as an example:
+>>
+>>   "Have a look at tcp established socket lookup and the SLAB_TYPESAFE_BY_RCU
+>>    flag usage for slab-based allocations. A combo of such flag for RPC
+>>    allocation (using a dedicated kmem_cache) and RCU lookup should improve
+>>    consistently the performances, with a consolidate code layout and no
+>>    unmanageable problems with large number of objects waiting for the grace
+>>    period."
+>>
+>> The current code still uses plain kzalloc/kfree without a dedicated cache.
+>> Would it make sense to implement this optimization?
+>>
+>> Reference: https://lore.kernel.org/netdev/9209dfbb-ca3a-4fb7-a2fb-0567394f8cda@redhat.com/
+> 
+> I tried using a kmem_cache, but it made performance slightly worse:
+> average allocation time for a struct homa_rpc increased from about 380
+> cycles to about 400 cycles in my benchmarks. Since there is no
+> performance advantage to using kmem_cache I removed it.
 
-When receiving data with MSG_PEEK | MSG_WAITALL flags, the skb is not
-removed from the sk_receive_queue. This causes sk_wait_data() to always
-find available data and never perform actual waiting, leading to a soft
-lockup.
+So kzalloc/kfree is faster than kmem_cache?!? That is quite unexpected,
+possibly the kmem_cache pointer ends up on a contended cacheline?!? I
+guess it would be useful to understand the extra overhead, as kmalloc is
+basically another layer on top of kmem_cache.
 
-Fix this by adding a 'last' parameter to track the last peeked skb.
-This allows sk_wait_data() to make informed waiting decisions and prevent
-infinite loops when MSG_PEEK is used.
+> I'm surprised how long allocation takes: 400 cycles seems like a *lot*
+> if there are per-cpu caches of the right size. Presumably no
+> synchronization is needed and all the function has to do in the normal
+> case is pull the top entry off a list.
+> 
+>>
+>>> +     if (!srpc) {
+>>> +             err = -ENOMEM;
+>>> +             goto error;
+>>> +     }
+>>
+>> [ ... ]
+>>
+>>> +error:
+>>> +     homa_bucket_unlock(bucket, id);
+>>> +     if (srpc && srpc->peer)
+>>> +             homa_peer_release(srpc->peer);
+>>> +     kfree(srpc);
+>>> +     return ERR_PTR(err);
+>>> +}
+>>
+>> [ ... ]
+>>
+>> In the v6 review thread, Paolo and Eric raised concerns about SKB freeing
+>> costs and suggested optimizations. Eric noted that proper software GRO
+>> significantly reduces SKB count using napi_get_frags() and napi_reuse_skb().
+> 
+> Unfortunately napi_reuse_skb is not currently exported. My
+> understanding is that I need to wait until Homa GRO is upstreamed
+> before I can request that it be exported. Once that happens I'll be
+> happy to use napi_reuse_skb.
 
-[0]:
-watchdog: BUG: soft lockup - CPU#2 stuck for 156s! [server:1963]
-Modules linked in:
-CPU: 2 UID: 0 PID: 1963 Comm: server Not tainted 6.19.0-rc8 #61 PREEMPT(none)
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-RIP: 0010:sk_wait_data+0x15/0x190
-Code: 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 41 56 41 55 41 54 49 89 f4 55 48 89 d5 53 48 89 fb <48> 83 ec 30 65 48 8b 05 17 a4 6b 01 48 89 44 24 28 31 c0 65 48 8b
-RSP: 0018:ffffc90000603ca0 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: ffff888102bf0800 RCX: 0000000000000001
-RDX: 0000000000000000 RSI: ffffc90000603d18 RDI: ffff888102bf0800
-RBP: 0000000000000000 R08: 0000000000000002 R09: 0000000000000101
-R10: 0000000000000000 R11: 0000000000000075 R12: ffffc90000603d18
-R13: ffff888102bf0800 R14: ffff888102bf0800 R15: 0000000000000000
-FS:  00007f6e38b8c4c0(0000) GS:ffff8881b877e000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055aa7bff1680 CR3: 0000000105cbe000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- mptcp_recvmsg+0x547/0x8c0 net/mptcp/protocol.c:2329
- inet_recvmsg+0x11f/0x130 net/ipv4/af_inet.c:891
- sock_recvmsg+0x94/0xc0 net/socket.c:1100
- __sys_recvfrom+0xb2/0x130 net/socket.c:2256
- __x64_sys_recvfrom+0x1f/0x30 net/socket.c:2267
- do_syscall_64+0x59/0x2d0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x76/0x7e arch/x86/entry/entry_64.S:131
-RIP: 0033:0x7f6e386a4a1d
-Code: 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 8d 05 f1 de 2c 00 41 89 ca 8b 00 85 c0 75 20 45 31 c9 45 31 c0 b8 2d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 6b f3 c3 66 0f 1f 84 00 00 00 00 00 41 56 41
-RSP: 002b:00007ffc3c4bb078 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
-RAX: ffffffffffffffda RBX: 000000000000861e RCX: 00007f6e386a4a1d
-RDX: 00000000000003ff RSI: 00007ffc3c4bb150 RDI: 0000000000000004
-RBP: 00007ffc3c4bb570 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000103 R11: 0000000000000246 R12: 00005605dbc00be0
-R13: 00007ffc3c4bb650 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
+Ok
 
-Fixes: 612f71d7328c ("mptcp: fix possible stall on recvmsg()")
-Signed-off-by: Li Xiasong <lixiasong1@huawei.com>
----
+>> Paolo also suggested using deferred SKB freeing (skb_attempt_defer_free) to
+>> reduce the cost. While you mentioned that GRO is implemented in the full
+>> Homa but was left out of the initial patch series, would it be beneficial to
+>> include at least some of these optimizations in this initial submission?
+>>
+>> Reference: https://lore.kernel.org/netdev/9209dfbb-ca3a-4fb7-a2fb-0567394f8cda@redhat.com/
+> 
+> When I asked ChatGPT about homa_attempt_defer_free it said that it
+> only works if the skb has no dst, no destructor, and no skb_nfct. I'm
+> a bit unsure how to proceed. Is homa_attempt_defer_free only intended
+> for incoming packets? If so, then presumably there is no dst? But what
+> about the other fields? Do I need to do something to clean them up
+> before calling homa_attempt_defer_free?
+skb_attempt_defer_free() usage is intended for the RX path only.
 
-v1->v2:
-Thanks to Matthieu Baerts for the suggestion and review.
-- Move 'last' variable definition into the while loop in mptcp_recvmsg() to
-  narrow its scope.
-- In __mptcp_recvmsg_mskq(), assign 'last' right after 'copied' is updated,
-  regardless of MSG_PEEK flag.
+Incoming packets get state (dst, extensions, ct...) attached in the rx
+path before reaching the socket. You should free/release the state, if
+possible, before inserting the skb into the receive queue, so that you
+could defer free them after read.
 
-v1:
-https://lore.kernel.org/netdev/20260302052651.1466983-1-lixiasong1@huawei.com/
-
----
- net/mptcp/protocol.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index cf1852b99963..401fb2b17685 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -2006,7 +2006,7 @@ static void mptcp_eat_recv_skb(struct sock *sk, struct sk_buff *skb)
- static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
- 				size_t len, int flags, int copied_total,
- 				struct scm_timestamping_internal *tss,
--				int *cmsg_flags)
-+				int *cmsg_flags, struct sk_buff **last)
- {
- 	struct mptcp_sock *msk = mptcp_sk(sk);
- 	struct sk_buff *skb, *tmp;
-@@ -2048,6 +2048,7 @@ static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
- 		}
- 
- 		copied += count;
-+		*last = skb;
- 
- 		if (!(flags & MSG_PEEK)) {
- 			msk->bytes_consumed += count;
-@@ -2288,10 +2289,12 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 		cmsg_flags = MPTCP_CMSG_INQ;
- 
- 	while (copied < len) {
-+		struct sk_buff *last = skb_peek_tail(&sk->sk_receive_queue);
- 		int err, bytes_read;
- 
- 		bytes_read = __mptcp_recvmsg_mskq(sk, msg, len - copied, flags,
--						  copied, &tss, &cmsg_flags);
-+						  copied, &tss, &cmsg_flags,
-+						  &last);
- 		if (unlikely(bytes_read < 0)) {
- 			if (!copied)
- 				copied = bytes_read;
-@@ -2343,7 +2346,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 
- 		pr_debug("block timeout %ld\n", timeo);
- 		mptcp_cleanup_rbuf(msk, copied);
--		err = sk_wait_data(sk, &timeo, NULL);
-+		err = sk_wait_data(sk, &timeo, last);
- 		if (err < 0) {
- 			err = copied ? : err;
- 			goto out_err;
--- 
-2.34.1
+/P
 
 
