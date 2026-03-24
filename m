@@ -1,212 +1,173 @@
-Return-Path: <netdev+bounces-270874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270873-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wLpFJoohwmnHZgQAu9opvQ
-	(envelope-from <netdev+bounces-270874-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:30:50 +0100
+	id oGyOBWIhwmnHZgQAu9opvQ
+	(envelope-from <netdev+bounces-270873-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:30:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F017E302418
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:30:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF4E3023F0
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:30:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1ACB1304600B
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 05:30:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E283C3031F0C
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 05:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663952F2607;
-	Tue, 24 Mar 2026 05:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321962877DA;
+	Tue, 24 Mar 2026 05:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IwWTEQB3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iCSJx2U4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23792175A68;
-	Tue, 24 Mar 2026 05:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C271A6832
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 05:30:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774330227; cv=none; b=nsyYgyCw2NAXcTTInDi34iQ0ibhtYFkFh8cVMwLgHpCaEqZoAhT07o7/iK4mbFEGn0M4ErHzA1UhA3Gcf+wZBKXKXFryLKYPUHVWhThPjLVp4PoB92ejPpQqpOx24iigtOsuZbCsSrKtRIkmJ/yZEjrnoVz9rbn9CHDmJDCRTUg=
+	t=1774330203; cv=none; b=Scfc39wa+oOEn+/fNgykNslcAZtvHE197t0OWmraURSnphZPjDq6XSjOdqQmMUdhJGlsZXySFtv/sF9D4km9uEPlw38Hk4OgMLq6nW0WWAOjb/WpO2l3YZkZEkLjTLUHQG5XDnpNaxZ58LeTXytQs7MU4XudpuXqq2owgsQDqSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774330227; c=relaxed/simple;
-	bh=526IhjsOFPVmG2tNWNSg5v0vlx2brzpXsRolpXsjTxo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=An5CmZRstep0cxpg/2N/1a7x3tx7/s1KWQxWxDZa8G2/n2TN5dj9gJqdK8bzzV3hgYKp07Mb4Qp/3n4HewvTHvM4+SIrOr2tTSQnEhH2s/6dSgZ7ndhLK4Q+mBQO+D30BbnRyN7ztc+/vBnFMJBVMGB4vWwxcQA31uEKF7c+jNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IwWTEQB3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB708C19424;
-	Tue, 24 Mar 2026 05:30:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774330227;
-	bh=526IhjsOFPVmG2tNWNSg5v0vlx2brzpXsRolpXsjTxo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IwWTEQB3juSgzdL+5oAblN8Vg5C2TndIzXIJ+/psD+qLI87dPTnoZjI03lh86g1OB
-	 mpSx1LZMSw/DBe07y/3Zp7OwHRoXIwmNyksCLyArn6Wgy/ZHCvMbVGNpS90y0hARXP
-	 F0cEESScMmvPYn5UufI98xv5QMoRbgZrZzhD7xIu0KifQHEz3rXAPZncO9dZT6B7kz
-	 f7eteFWu1GwBo5+I9vrgiWwlDtSUwgSH1mRAXD6RYsxRwmK/CWvAd8Nwsx8c7aA7z2
-	 z6dYz7z5nVUXZFH9xdB88UIr+/EMARSpJjWMql6MVkuv6lSlxP20W2BfZ5GZOiuE6l
-	 rVsq+mtBjuYfg==
-Date: Tue, 24 Mar 2026 11:00:10 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org, 
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-media@vger.kernel.org, linux-pci@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-rockchip@lists.infradead.org, 
-	linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org, linux-sunxi@lists.linux.dev, 
-	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
-	spacemit@lists.linux.dev, UNGLinuxDriver@microchip.com, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Nitin Rawat <quic_nitirawa@quicinc.com>
-Subject: Re: [PATCH v5 phy-next 10/27] scsi: ufs: qcom: keep parallel track
- of PHY power state
-Message-ID: <ezrcjjwtg5n76w4m65l27szu5mywx66ti3xuprkfcp3x6quvbf@2rew4zrnnbt2>
-References: <20260319223241.1351137-1-vladimir.oltean@nxp.com>
- <20260319223241.1351137-11-vladimir.oltean@nxp.com>
+	s=arc-20240116; t=1774330203; c=relaxed/simple;
+	bh=xNJI8BrDJcjv7B3CyIr/xSgaScE/My8YWxbTHX0hgl4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hj2o7hDS/Oa72YqT2exBurgtA5T/puqrvBA4dASjUd+vHf1tUFoAwTWqTdhuXCYac5v1+pZyu0uSb6mic9+9OfR17Az29TN4q+zq5CtvUlgIPg8MIBPCNddJ+LfpSG2mqvKnTXxMmF/BypR7wHoslztFMx/fptrnYZASxk7bgoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iCSJx2U4; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-359f35dfef6so2012887a91.2
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 22:30:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774330200; x=1774935000; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mWQPpxJJ5vqy5RevxN77SFSwx0z5emoC9WwG+dKY3L0=;
+        b=iCSJx2U4HZsQdper25KI4WHkLKDbAz3U7F5tWdjc1f9xb56yVGsd4FYIuuGAyIr/mv
+         pHz/P5TNk0ZbJZFhZuS/YJWgF2laHydyyW1pJzWnMQ4kwBMwjOdVWk5A03JUWBo7Muys
+         nYaNgBJbAXCxthq+hHjn+dtuvY6Ojb8NjRIetdsthC1y8HfZAEUEu5zp34EryzXRcSVg
+         fsQi5tZs1ZE7Wifrhem6z+Sxt0JQR4E+67QrodjkQIhHd+AMT3bqRfN11XgWDCgoX0L8
+         ayqPjBKP8VLqb8fbZ/9X7R03bMT2iBlHKkp5xcDvfrgZ6cILbG3BxQYVHMy6PLjswzDc
+         8Uhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774330200; x=1774935000;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mWQPpxJJ5vqy5RevxN77SFSwx0z5emoC9WwG+dKY3L0=;
+        b=amr6c9Nou7xUM9d81HWe8HljeU8/CXhYb8uuFzkk01Ahiyslc3bFAXhEuTXWJUi9vF
+         3IUt1ioILcr3iEhmcvwbFm15BgyxTla4px7wf3GR4okmotqoeOerqpEoo9xInq3k4qTr
+         EUCc1z1r0URRSHPKb5y7wM5Vk6SE/Qkx/vQaj9blV3um+fDXbQduvw4lklOGEiEwh0ix
+         IjBe0DKsptgdsIzLUXIyPVoKn8TJIvY1+Ih3Xi5Es4I8dKH1VRmN+pDwMRGVxEjW+oOh
+         AlprstveWq+qp4CG8h4JYYvUMn9sF9ekC24fLk0J00gmXyk3XPPAWKBk2JdjwLx8UHCI
+         TzzA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfwg/aj/zy0QSamlW2TB/KEGVuWtY7bhf/vIp3GFRnjPOn0qnrhtT6WnfobYA3o7/83jAETbk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTMrfuOmp8Dg544bcC5heXfbyLvk434V04UR1tV535xAX5mioL
+	jF5WfmloSKv9qQBeyd3U1hTgViz2h1pO5M8hSd6LaQc/pugb2uJUjsna
+X-Gm-Gg: ATEYQzxzscAmCKxglSsJd7qD8CWFo0ndxjjNwUDd2DwDgAen6R8iJyS5AxhqUBqiO38
+	qEt2muoKJlM17AlQFfjbxdbLbijHMo/ua0oqhXpASHkoJkww+klA+c+Uypxi7ABxzq+CCfsBh/B
+	5mBArDsMFuEiPoqUkJE4fQa1XqUmThlc2yRyjl//C3mJ9/pOvHG2noS/GKhUl4Czv+o0CqqZbXZ
+	SHWvUuNwfzZ1aoPefEyEiLTrMDJFBrD73/MEphFjnA+FVilgILRuaADyaqg+tNYO6fKDFpVDJof
+	UL8XNqUwZXrnZ5IvRdQGds9sGqOPTAGMqjZ4AIKHeRZFhkkE6mvb6V5MzT/K9k0zoJHZN0RPD0r
+	8erXyuavLkLs88KiEFqIlDJIpSlfsqDeTeh63MGK/80UW7wOhjpcjwfjVLBjhdNCieJYZh0dWcI
+	el68YUW0kNFd1dzm1884RCIiA2Q8z0riPqMhZ2Eard
+X-Received: by 2002:a17:903:94f:b0:2b0:76b1:93f with SMTP id d9443c01a7336-2b082734032mr121627425ad.18.1774330200449;
+        Mon, 23 Mar 2026 22:30:00 -0700 (PDT)
+Received: from localhost.ntt.co.jp ([222.151.198.97])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b083516b96sm165458525ad.7.2026.03.23.22.29.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2026 22:30:00 -0700 (PDT)
+From: Ryohei Kinugawa <ryohei.kinugawa@gmail.com>
+To: rrameshbabu@nvidia.com,
+	saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	skhan@linuxfoundation.org
+Cc: Ryohei Kinugawa <ryohei.kinugawa@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	joe@dama.to
+Subject: [PATCH net-next v2] docs/mlx5: Fix typo subfuction
+Date: Tue, 24 Mar 2026 14:34:10 +0900
+Message-ID: <20260324053416.70166-1-ryohei.kinugawa@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260319223241.1351137-11-vladimir.oltean@nxp.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270874-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[28];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,dama.to];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mani@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270873-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,quicinc.com:email,nxp.com:email,oracle.com:email]
-X-Rspamd-Queue-Id: F017E302418
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ryoheikinugawa@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,dama.to:email]
+X-Rspamd-Queue-Id: BEF4E3023F0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 20, 2026 at 12:32:24AM +0200, Vladimir Oltean wrote:
-> As explained in the similar ufs-exynos.c change, PHY consumer drivers
-> should not look at the phy->power_count, because in the general case
-> there might also be other consumers who have called phy_power_on() too,
-> so the fact that the power_count is non-zero does not mean that we did.
-> 
-> Moreover, struct phy will become opaque soon, so the qcom UFS driver
-> will not be able to apply this pattern. Keep parallel track of the PHY
-> power state, instead of looking at a field which will become unavailable
-> (phy->power_count).
-> 
-> About treating the phy_power_off() return code: from an API perspective,
-> this should have probably returned void, otherwise consumers would be
-> stuck in a state they can't escape. The provider, phy-qcom-qmp-ufs.c,
-> does return 0 in its power_off() implementation. I consider it safe to
-> discard potential errors from phy_power_off() instead of complicating
-> the phy_powered_on logic.
-> 
+Fix two typos:
+ - 'Subfunctons' -> 'Subfunctions'
+ - 'subfuction' -> 'subfunction'
 
-You could even simplify the code by getting rid of the 'phy_powered_on' check
-altogether. There is no real need to track the PHY power state in this driver.
-It is safe to call phy_power_off() without any checks.
+Reviewed-by: Joe Damato <joe@dama.to>
+Signed-off-by: Ryohei Kinugawa <ryohei.kinugawa@gmail.com>
+---
+ .../device_drivers/ethernet/mellanox/mlx5/kconfig.rst         | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-- Mani
-
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> ---
-> Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-> Cc: Manivannan Sadhasivam <mani@kernel.org>
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-> Cc: Nitin Rawat <quic_nitirawa@quicinc.com>
-> 
-> v4->v5: patch is new
-> ---
->  drivers/ufs/host/ufs-qcom.c | 9 +++++++--
->  drivers/ufs/host/ufs-qcom.h | 1 +
->  2 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/ufs/host/ufs-qcom.c b/drivers/ufs/host/ufs-qcom.c
-> index 375fd24ba458..3b8bd9968235 100644
-> --- a/drivers/ufs/host/ufs-qcom.c
-> +++ b/drivers/ufs/host/ufs-qcom.c
-> @@ -508,9 +508,10 @@ static int ufs_qcom_power_up_sequence(struct ufs_hba *hba)
->  	if (ret)
->  		return ret;
->  
-> -	if (phy->power_count)
-> +	if (host->phy_powered_on) {
->  		phy_power_off(phy);
-> -
-> +		host->phy_powered_on = false;
-> +	}
->  
->  	/* phy initialization - calibrate the phy */
->  	ret = phy_init(phy);
-> @@ -531,6 +532,7 @@ static int ufs_qcom_power_up_sequence(struct ufs_hba *hba)
->  			__func__, ret);
->  		goto out_disable_phy;
->  	}
-> +	host->phy_powered_on = true;
->  
->  	ret = phy_calibrate(phy);
->  	if (ret) {
-> @@ -1268,6 +1270,7 @@ static int ufs_qcom_setup_clocks(struct ufs_hba *hba, bool on,
->  				dev_err(hba->dev, "phy power off failed, ret=%d\n", err);
->  				return err;
->  			}
-> +			host->phy_powered_on = false;
->  		}
->  		break;
->  	case POST_CHANGE:
-> @@ -1277,6 +1280,7 @@ static int ufs_qcom_setup_clocks(struct ufs_hba *hba, bool on,
->  				dev_err(hba->dev, "phy power on failed, ret = %d\n", err);
->  				return err;
->  			}
-> +			host->phy_powered_on = true;
->  
->  			/* enable the device ref clock for HS mode*/
->  			if (ufshcd_is_hs_mode(&hba->pwr_info))
-> @@ -1467,6 +1471,7 @@ static void ufs_qcom_exit(struct ufs_hba *hba)
->  
->  	ufs_qcom_disable_lane_clks(host);
->  	phy_power_off(host->generic_phy);
-> +	host->phy_powered_on = false;
->  	phy_exit(host->generic_phy);
->  }
->  
-> diff --git a/drivers/ufs/host/ufs-qcom.h b/drivers/ufs/host/ufs-qcom.h
-> index 1111ab34da01..72ce0687fa42 100644
-> --- a/drivers/ufs/host/ufs-qcom.h
-> +++ b/drivers/ufs/host/ufs-qcom.h
-> @@ -282,6 +282,7 @@ struct ufs_qcom_host {
->  	struct clk_bulk_data *clks;
->  	u32 num_clks;
->  	bool is_lane_clks_enabled;
-> +	bool phy_powered_on;
->  
->  	struct icc_path *icc_ddr;
->  	struct icc_path *icc_cpu;
-> -- 
-> 2.43.0
-> 
-
+diff --git a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
+index 34e911480108..b45d6871492c 100644
+--- a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
++++ b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
+@@ -114,13 +114,13 @@ Enabling the driver and kconfig options
+ **CONFIG_MLX5_SF=(y/n)**
+ 
+ |    Build support for subfunction.
+-|    Subfunctons are more light weight than PCI SRIOV VFs. Choosing this option
++|    Subfunctions are more light weight than PCI SRIOV VFs. Choosing this option
+ |    will enable support for creating subfunction devices.
+ 
+ 
+ **CONFIG_MLX5_SF_MANAGER=(y/n)**
+ 
+-|    Build support for subfuction port in the NIC. A Mellanox subfunction
++|    Build support for subfunction port in the NIC. A Mellanox subfunction
+ |    port is managed through devlink.  A subfunction supports RDMA, netdevice
+ |    and vdpa device. It is similar to a SRIOV VF but it doesn't require
+ |    SRIOV support.
 -- 
-மணிவண்ணன் சதாசிவம்
+2.47.3
+
 
