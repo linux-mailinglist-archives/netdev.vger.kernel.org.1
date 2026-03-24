@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-271229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271230-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKTBJwzWwmnmmgQAu9opvQ
-	(envelope-from <netdev+bounces-271229-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:21:00 +0100
+	id 6KxtOUHWwmnmmgQAu9opvQ
+	(envelope-from <netdev+bounces-271230-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:21:53 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2323731AB30
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:20:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 698FA31AB6E
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:21:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AD1E930D7229
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:17:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8FC4F3065F64
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CBD937CD4F;
-	Tue, 24 Mar 2026 18:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B3137DEA0;
+	Tue, 24 Mar 2026 18:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GYvRKeF8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TMy+eA9K"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E183ECA52;
-	Tue, 24 Mar 2026 18:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C11037CD4F;
+	Tue, 24 Mar 2026 18:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774376249; cv=none; b=X2RQDEeDixP5JwkPSZFm29CTgVgJ0EQpY4o3Y8Rs73wtuMbq2Z3nGwUANuj/2319SKTgd2O7oU+E/juDADC9huat19yZxC2Dj+8BzcbevO7zkbMK0dCEtrCzjcMHa3nkUQgnoD5Xsr1tOIaVSyovSyOOada3TEmjbp/wvXNORr8=
+	t=1774376265; cv=none; b=gh0Mdq/Kbr3cLZ8frmVUogJwcF41HJdhaZfw0LWu0OrGMcNHDNuHEOhyNOhoefbFvzMgYuLA2TwAS5kRPzsuiRtIpb43CHolRuCYnoDUfFU6LScsdVFKClQ3SBMziSVPW700qlAVc5FBsB1+8f2anC6jGH6K5myt88eIn2S+vZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774376249; c=relaxed/simple;
-	bh=evK27lgm02kwIDwTQjf4QkWDWZCY98He3PuUFGpodoo=;
+	s=arc-20240116; t=1774376265; c=relaxed/simple;
+	bh=iKbYaTDuUMcCWsnSDj/iaOVKUwO2Qpaue4niM52YYmE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BkdxXqGOzavTn4P7IihprVs7I8XhzHV9T3iQ+d1fA0zyUBusivxT9gE1p5vtGt8v4Wl/VmUzo7aGpbEbMUffaaxEIwMhMLXB03nyK7ktLRIegvjbxo42ifcZK/kK8uHxOg68NRocTEash3FrXngK84TfhZ5uCkWm5KRkaHzNxmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GYvRKeF8; arc=none smtp.client-ip=198.175.65.13
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lfua7nYaUG957vF20lsUN9mJfZlGRJFq15nzX5K5cHMOId6IJ7aqO1acO8fSn5n6YbRWqM4Vrvu0WmzRTAzxD0jV9Yblyeyp23av1kJsDpw98fwWudjhfCa4ASRzbf1xnWB15ZNikLLVFtkOGC/tSiIopG4A0KuP9NcSGYrJJyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TMy+eA9K; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774376247; x=1805912247;
+  t=1774376263; x=1805912263;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=evK27lgm02kwIDwTQjf4QkWDWZCY98He3PuUFGpodoo=;
-  b=GYvRKeF8BhBdNSmikDD0gkULQJu16mvc0MoPHvhlqH3iC7O49+VrOLrA
-   scX+bO4cP7v+ZIItEt5kCLZ9UMfr6FfUXkKEtHfoiawvC/URJNTxA32hk
-   K4E5N2UPJfT5F17JqXdJNpGLXf2zNZYtQYQQA6hbKjLaroogaWxxBtfZl
-   99lznJ/vvJG8UU1vKdUxoXHMYceL1tHIEGlGXY4MUBE9UKA6YGh94SJ6D
-   zc6XvemWV0z/QX4CPpPVry4jvX1OCocC7nBmHwY29U4sTBzK3TiAlujUP
-   HZC5vOBMhCAwXOYtYfOnEAY3oKoI0yytMuFQtpk9vzssWMDnIJ1AhbE9X
-   Q==;
-X-CSE-ConnectionGUID: fNI1SoVKRTG4SsGDAUx/ow==
-X-CSE-MsgGUID: KnJby++QQA+JAp5QA70ymw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="86479917"
+  bh=iKbYaTDuUMcCWsnSDj/iaOVKUwO2Qpaue4niM52YYmE=;
+  b=TMy+eA9KxcPR4IYemwOD3FadN6ClYWie+S8/uh2u0+aYEmkW4c/Bi3Gt
+   VTcnCqJ7Quwi9mNdqlisOLia4aQSNsWGjxqp+kpyMwFleNVhZIZqTm/bD
+   /RrCWgzt2MtqXmyW1jMq5JsVm9ml4BzZ+Vd65MuuQ3wGSPlue4XDWFnMZ
+   vI0MTTBY00tCSYXbQ8lCTuOCS1iEgNPojbDODbZe0O2Vz2ThF+dSOY1Qu
+   DRjG8ww+9ezqbUIFVW8IBvfzPJCzSTbcGDD5nGsucHghK806AmG/YMtzD
+   ysa8LRSLElhh5WBlsry5+5djIKagoS73YV+PjvCQNgUYAg3inlYOFdq1x
+   A==;
+X-CSE-ConnectionGUID: 31iMJ4IIQsysbWFra6uHcA==
+X-CSE-MsgGUID: VroQMhoKTGSCCWgZuVLkUg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="86479970"
 X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="86479917"
+   d="scan'208";a="86479970"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 11:17:26 -0700
-X-CSE-ConnectionGUID: Czxrg5HCTUC1nT7oOpnYoA==
-X-CSE-MsgGUID: IVWzbdVtR06oG1f9JnxJXg==
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 11:17:42 -0700
+X-CSE-ConnectionGUID: zgdaje3hSoeNZiG9eprngQ==
+X-CSE-MsgGUID: Gy+6QpTmQrSaRUz73o2pqw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="217858241"
+   d="scan'208";a="217858388"
 Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 11:17:26 -0700
-Date: Tue, 24 Mar 2026 11:17:25 -0700
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 11:17:42 -0700
+Date: Tue, 24 Mar 2026 11:17:41 -0700
 From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 To: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
 	Nikolay Borisov <nik.borisov@suse.com>,
@@ -92,9 +92,8 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Asit Mallick <asit.k.mallick@intel.com>,
 	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
 	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: [PATCH v8 04/10] x86/vmscape: Rename x86_ibpb_exit_to_user to
- x86_predictor_flush_exit_to_user
-Message-ID: <20260324-vmscape-bhb-v8-4-68bb524b3ab9@linux.intel.com>
+Subject: [PATCH v8 05/10] x86/vmscape: Move mitigation selection to a switch()
+Message-ID: <20260324-vmscape-bhb-v8-5-68bb524b3ab9@linux.intel.com>
 X-Mailer: b4 0.15-dev
 References: <20260324-vmscape-bhb-v8-0-68bb524b3ab9@linux.intel.com>
 Precedence: bulk
@@ -115,7 +114,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271229-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271230-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net];
 	RCVD_TLS_LAST(0.00)[];
@@ -132,84 +131,62 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 2323731AB30
+X-Rspamd-Queue-Id: 698FA31AB6E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-With the upcoming changes x86_ibpb_exit_to_user will also be used when BHB
-clearing sequence is used. Rename it cover both the cases.
+This ensures that all mitigation modes are explicitly handled, while
+keeping the mitigation selection for each mode together. This also prepares
+for adding BHB-clearing mitigation mode for VMSCAPE.
 
-No functional change.
-
-Suggested-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
 Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 ---
- arch/x86/include/asm/entry-common.h  | 6 +++---
- arch/x86/include/asm/nospec-branch.h | 2 +-
- arch/x86/kernel/cpu/bugs.c           | 4 ++--
- arch/x86/kvm/x86.c                   | 2 +-
- 4 files changed, 7 insertions(+), 7 deletions(-)
+ arch/x86/kernel/cpu/bugs.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/entry-common.h b/arch/x86/include/asm/entry-common.h
-index ce3eb6d5fdf9..c45858db16c9 100644
---- a/arch/x86/include/asm/entry-common.h
-+++ b/arch/x86/include/asm/entry-common.h
-@@ -94,11 +94,11 @@ static inline void arch_exit_to_user_mode_prepare(struct pt_regs *regs,
- 	 */
- 	choose_random_kstack_offset(rdtsc());
- 
--	/* Avoid unnecessary reads of 'x86_ibpb_exit_to_user' */
-+	/* Avoid unnecessary reads of 'x86_predictor_flush_exit_to_user' */
- 	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER) &&
--	    this_cpu_read(x86_ibpb_exit_to_user)) {
-+	    this_cpu_read(x86_predictor_flush_exit_to_user)) {
- 		indirect_branch_prediction_barrier();
--		this_cpu_write(x86_ibpb_exit_to_user, false);
-+		this_cpu_write(x86_predictor_flush_exit_to_user, false);
- 	}
- }
- #define arch_exit_to_user_mode_prepare arch_exit_to_user_mode_prepare
-diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-index 0f5e6ed6c9c2..0a55b1c64741 100644
---- a/arch/x86/include/asm/nospec-branch.h
-+++ b/arch/x86/include/asm/nospec-branch.h
-@@ -533,7 +533,7 @@ void alternative_msr_write(unsigned int msr, u64 val, unsigned int feature)
- 		: "memory");
- }
- 
--DECLARE_PER_CPU(bool, x86_ibpb_exit_to_user);
-+DECLARE_PER_CPU(bool, x86_predictor_flush_exit_to_user);
- 
- static inline void indirect_branch_prediction_barrier(void)
- {
 diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 83f51cab0b1e..47c020b80371 100644
+index 47c020b80371..68e2df3e3bf5 100644
 --- a/arch/x86/kernel/cpu/bugs.c
 +++ b/arch/x86/kernel/cpu/bugs.c
-@@ -65,8 +65,8 @@ EXPORT_PER_CPU_SYMBOL_GPL(x86_spec_ctrl_current);
-  * be needed to before running userspace. That IBPB will flush the branch
-  * predictor content.
-  */
--DEFINE_PER_CPU(bool, x86_ibpb_exit_to_user);
--EXPORT_PER_CPU_SYMBOL_GPL(x86_ibpb_exit_to_user);
-+DEFINE_PER_CPU(bool, x86_predictor_flush_exit_to_user);
-+EXPORT_PER_CPU_SYMBOL_GPL(x86_predictor_flush_exit_to_user);
+@@ -3084,17 +3084,33 @@ early_param("vmscape", vmscape_parse_cmdline);
  
- u64 x86_pred_cmd __ro_after_init = PRED_CMD_IBPB;
+ static void __init vmscape_select_mitigation(void)
+ {
+-	if (!boot_cpu_has_bug(X86_BUG_VMSCAPE) ||
+-	    !boot_cpu_has(X86_FEATURE_IBPB)) {
++	if (!boot_cpu_has_bug(X86_BUG_VMSCAPE)) {
+ 		vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
+ 		return;
+ 	}
  
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fd1c4a36b593..45d7cfedc507 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11464,7 +11464,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	 * may migrate to.
- 	 */
- 	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
--		this_cpu_write(x86_ibpb_exit_to_user, true);
-+		this_cpu_write(x86_predictor_flush_exit_to_user, true);
+-	if (vmscape_mitigation == VMSCAPE_MITIGATION_AUTO) {
+-		if (should_mitigate_vuln(X86_BUG_VMSCAPE))
++	if ((vmscape_mitigation == VMSCAPE_MITIGATION_AUTO) &&
++	    !should_mitigate_vuln(X86_BUG_VMSCAPE))
++		vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
++
++	switch (vmscape_mitigation) {
++	case VMSCAPE_MITIGATION_NONE:
++		break;
++
++	case VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER:
++		if (!boot_cpu_has(X86_FEATURE_IBPB))
++			vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
++		break;
++
++	case VMSCAPE_MITIGATION_AUTO:
++		if (boot_cpu_has(X86_FEATURE_IBPB))
+ 			vmscape_mitigation = VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER;
+ 		else
+ 			vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
++		break;
++
++	default:
++		break;
+ 	}
+ }
  
- 	/*
- 	 * Consume any pending interrupts, including the possible source of
 
 -- 
 2.34.1
