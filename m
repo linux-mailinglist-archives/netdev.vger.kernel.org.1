@@ -1,152 +1,212 @@
-Return-Path: <netdev+bounces-271061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271062-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SNZtLTKMwml9ewQAu9opvQ
-	(envelope-from <netdev+bounces-271061-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:05:54 +0100
+	id mJYOCWSMwmlvewQAu9opvQ
+	(envelope-from <netdev+bounces-271062-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:06:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58A0E308E48
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:05:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4D87308E73
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:06:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2890D305509C
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:55:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CAA7330E56E8
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D7B3FA5ED;
-	Tue, 24 Mar 2026 12:54:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6BF43DCD90;
+	Tue, 24 Mar 2026 12:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tlj9+vxT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MKwwQhzS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C913FA5DF;
-	Tue, 24 Mar 2026 12:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505853F7AAD
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 12:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774356845; cv=none; b=jhgmLrDiDNhGrIkTTLe+esAIlr8CZVt6zkUkiiguRWeeqjoJYtNHsDx1yuqZfpcYV7lVLM95f+UoujJJlRgs6TUCVDgOv+ErmPTP6mf6aJvNEhOwAgs+kyKggwandsodOGQ1A6KGT6UhHGLfJLAuM8cIWbA3xuFCneJOpZmEsBU=
+	t=1774357173; cv=none; b=MV8oHyO5WlCea9uBpGZlvoMe0tVJaKbqquG5FRJEbVcv41X3sAD0BzXg09UI4Zgf3OOaZNbzOaN3Hi+qM0lYAXnKZEYPNvN2aW5brPbw+PJqGrOf0xVY9L4ot2guEFYRLnEwL4iPQv4rdrEYbcfKO4agz/CyeVbr/9vwaDiAJxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774356845; c=relaxed/simple;
-	bh=1VJEnpw2CrDV2ySqSsp5pd8INZnr9epy9e6tlLxTpM4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GEOlyEW45+kh8CHyJ0l1vHpbKmf27IDposWxkvqmgmGRG8qCOl3dv2zHlG7Zh+ibsox4FlWa3W2gTuZInuT5qlAO/THtqkQUAjAS/6B42J4e+OYgrY/eRdb4umG4aVHrChZ2N8Lf825wYzn6nwy4VSPOasoLg04I3LFDgtEMD8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tlj9+vxT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74231C19424;
-	Tue, 24 Mar 2026 12:54:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774356845;
-	bh=1VJEnpw2CrDV2ySqSsp5pd8INZnr9epy9e6tlLxTpM4=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=tlj9+vxThPyvTzUEjL1L6UEDSlCrK+ewqvhGzfm20vkS5/ROTJUwNzpv0M3xhoaRI
-	 8zbHXoyCBN1+Ypoqx0DG+ZOXlx8mOE+gOOi71Mua3mHV0rk+9YH2voM9Tpa0yAWLjI
-	 wqcQ7N8807qpjEnsyXJlnJ9pcFWK4kdW7G0dVNMPub9/+UMOtZ6K/ypbzMIG6aZ019
-	 Y9xY3qjdhsa3ceWmYS45aL8hoaJL6NbBjTv9Algj4n2hU1w1FPBWs1BvrJ6uc3W7TP
-	 hmAu3rcea8/s5OLyKVRutdiLQQze37xQC3J0F06X8+aUZO7Csm2rJjuuRppNqd4Eeg
-	 dj0/EUagA6DCA==
-From: Chuck Lever <cel@kernel.org>
-Date: Tue, 24 Mar 2026 08:53:28 -0400
-Subject: [PATCH net-next v5 6/6] tls: Flush backlog before waiting for a
- new record
+	s=arc-20240116; t=1774357173; c=relaxed/simple;
+	bh=A9WppwW+5nYf74kSqIWyRbdH9mgFqE48/dceyoU2WEQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o8H7h2/qO5sDEI3n1yg6E5WGMI1Ni0VW1DHbuqJRfGq9B4fJ8RW4W5xRZFn1Chm6hB1XfDm1VVNGIc+eu0u6hNQMY4QN3QMO3jEwO1hnlglEAVkN5o1H3pkrnGpFB7NM6OgggUglSSTGHwQbmE6i3iEq/YplSBk1BH0lP4wC6Ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MKwwQhzS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774357171;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=66aXgAm8lrLIlJwDHDhuJeRhflv8crX+JxuXz8zsArI=;
+	b=MKwwQhzSC+v5eIbsnGP/vx9th/GHhlV5uLcXy8hiTwXxqvgr+0z0Udu4wBxTNWR4pcg1aX
+	9F35lrXd9cf2mzuiUGPp+FXaLzGvbKceE1jv6Fdgn/yCAwEeVM/HWoCtEQbcnqXfA6VeuM
+	YTMsogiHj8KfWqECLYJinRjyxp5p18Q=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-6-qVQpQO9YOSi99nlh1Us6Fg-1; Tue,
+ 24 Mar 2026 08:59:25 -0400
+X-MC-Unique: qVQpQO9YOSi99nlh1Us6Fg-1
+X-Mimecast-MFC-AGG-ID: qVQpQO9YOSi99nlh1Us6Fg_1774357164
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AAA6A1956096;
+	Tue, 24 Mar 2026 12:59:23 +0000 (UTC)
+Received: from [10.43.2.199] (unknown [10.43.2.199])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4B9B419560AB;
+	Tue, 24 Mar 2026 12:59:20 +0000 (UTC)
+Message-ID: <8486ce6e-ad2a-493d-b734-b40e8db9213e@redhat.com>
+Date: Tue, 24 Mar 2026 13:59:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/3] dpll: zl3073x: add hwmon support for input
+ reference frequencies
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, linux-kernel@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
+ Petr Oros <poros@redhat.com>, Simon Horman <horms@kernel.org>,
+ Guenter Roeck <linux@roeck-us.net>, Jakub Kicinski <kuba@kernel.org>
+References: <20260320105915.149068-1-ivecera@redhat.com>
+ <20260320105915.149068-4-ivecera@redhat.com>
+ <964752ec-8e6d-444a-aad0-80da3acb2dab@roeck-us.net>
+ <7dbb5130-72cf-49d2-bfac-3439deb1b2e3@redhat.com>
+ <20260323154825.1a2320c4@kernel.org>
+ <50a1671c-9901-426a-97ed-bf36400fe9a7@roeck-us.net>
+ <6f1e98b3-4b86-4b7f-8c91-d8d5721aeb25@redhat.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <6f1e98b3-4b86-4b7f-8c91-d8d5721aeb25@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260324-tls-read-sock-v5-6-5408befe5774@oracle.com>
-References: <20260324-tls-read-sock-v5-0-5408befe5774@oracle.com>
-In-Reply-To: <20260324-tls-read-sock-v5-0-5408befe5774@oracle.com>
-To: john.fastabend@gmail.com, kuba@kernel.org, sd@queasysnail.net
-Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev, 
- Chuck Lever <chuck.lever@oracle.com>, Hannes Reinecke <hare@suse.de>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1271;
- i=chuck.lever@oracle.com; h=from:subject:message-id;
- bh=Q9HeG6URrjYSsIA7gBIoeZ9jxTU+oAcN7zrguFtCKMY=;
- b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBpwolncd9Ql45GkPVNCsC1WdiPes1WgnQpkQlAG
- sJc9TZTcp2JAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCacKJZwAKCRAzarMzb2Z/
- lxtQEACdEyduQFbBz3pbOSbYTM6tZ2oXJZzbgjnTGEblywOulIt7Ha+sKxNOmeeWSyuVZrRwNd9
- i4W/XiUBugLSjuFBfXG7LV5dgTf2Eo5g2J4prUvAueF5j7GJ5Noee4fc1+s+o4SSLySMg2YGwhi
- eTxuNqFzAzcUqW8CnAz2ablzQp/9E3QqFmOkgdZ/2Y40UcgWrOoQv0m4lN3ZuqlD8nlSrHHMzc5
- APM2Blq/gkp311bJJIrWT9F/W84wus+ZfNYAIa9Q/FeWYGOtZL5+rR2zvnKSp8JK7OC4Rv9AO+3
- DZ1f761W2htzgBuuvn3WEyj3o96vdKwvc7p5FFS7KPZrTMlPkQS1Kq3gbt/IS2txNFREqS5UkR0
- mH7oW/NpcQUQauzzISzEed8l0aV3Z8CjzFf2yaeZN5WxpYyIXSM/rKtTpWiScGjaVqv2PlGcmZl
- WRFqG8F0+fcX/fo0y0DDmd3QcyzGoNr1EpMXkV67ZqxT2s2hqG3y9wOC285yEQBuZpDEPSrVyML
- oMGgwWdyy+XzvyXv3zqaO6LkUoujHAd3MqPw2Gl9dJmHuUvIjxqH1+SzJcVYY1D4netXT8KC6R8
- YSzTDdzNY/tKVmUSwBgCy5/w3+1Vfn30fiFjg7QlhIU313VzHiowJDNgy5kWFuJPUZE5ZFh6Vg4
- /VPA1PGfOwdWvTQ==
-X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
- fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271061-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-271062-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,oracle.com:email,oracle.com:mid,queasysnail.net:email]
-X-Rspamd-Queue-Id: 58A0E308E48
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B4D87308E73
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Chuck Lever <chuck.lever@oracle.com>
+Hi Paolo,
 
-While lock_sock is held, incoming TCP segments land on
-sk->sk_backlog rather than sk->sk_receive_queue.
-tls_rx_rec_wait() inspects only sk_receive_queue, so
-backlog data remains invisible. For non-blocking callers
-(read_sock, and recvmsg or splice_read with MSG_DONTWAIT)
-this causes a spurious -EAGAIN. For blocking callers it
-forces an unnecessary sleep/wakeup cycle.
+On 3/24/26 11:49 AM, Paolo Abeni wrote:
+> On 3/24/26 6:16 AM, Guenter Roeck wrote:
+>> On 3/23/26 15:48, Jakub Kicinski wrote:
+>>> On Fri, 20 Mar 2026 14:48:01 +0100 Ivan Vecera wrote:
+>>>> On 3/20/26 1:21 PM, Guenter Roeck wrote:
+>>>>> On 3/20/26 03:59, Ivan Vecera wrote:
+>>>>>> Expose measured input reference frequencies via the hwmon interface
+>>>>>> using custom sysfs attributes (freqN_input and freqN_label) since
+>>>>>> hwmon has no native frequency sensor type. The frequency values are
+>>>>>> read from the cached measurements updated by the periodic work thread.
+>>>>>>
+>>>>>> Cache the device ready state in struct zl3073x_dev so that
+>>>>>> freq_input_show() can return -ENODATA without an I2C access when
+>>>>>> the device firmware is not configured.
+>>>>>>
+>>>>>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>>>>>
+>>>>> "frequency" is not a hardware monitoring attribute. I understand that it is
+>>>>> convenient to report it as one, and that other drivers implement it as
+>>>>> well,
+>>>>> but that doesn't change that.
+>>>>>
+>>>>> I understand that the code lives outside the hardware monitoring
+>>>>> subsystem and is
+>>>>> thus not in control of its maintainers, so you can essentially do
+>>>>> whatever you want,
+>>>>> even if it is wrong. That doesn't change the fact that it is wrong.
+>>>>>
+>>>>> However, do _not_ try to add it into the official list of hardware
+>>>>> monitoring
+>>>>> attributes. I would NACK that.
+>>>>
+>>>> Understood. I recognize that frequency falls outside the strict scope of
+>>>> hardware monitoring and does not belong in the official hwmon ABI.
+>>>>
+>>>> I'm using it here as a convenient way to expose these specific driver
+>>>> metrics, but I hear you loud and clear. I will absolutely not propose
+>>>> adding frequency to the official list of hwmon attributes or
+>>>> documentation.
+>>>>
+>>>> Thank you for your time and for reviewing the patch.
+>>>
+>>> Guenter, should this be a debugfs interface, then?
+>>>
+>>
+>> There is nothing that prevents the actual (generated ?) frequency to
+>> be reported as sysfs attribute attached to the chip (spi) driver, if
+>> it is indeed of interest. If it is of interest for all dpll drivers,
+>> it could be attached to the dpll device, the chip driver could make it
+>> available via dpll_device_ops to the dpll subsystem, and the dpll
+>> subsystem could provide a common API function (such as the existing
+>> temp_get) and generate a common set of sysfs attributes for all dpll
+>> devices.
+>>
+>>> Also an hwmon noob question - isn't it better for the monitoring
+>>> interface to report frequency error / instability in this case
+>>> instead of absolute value? Or do you not know the expected freq?
+>>>
+>> In the hardware monitoring world one would have min/max attributes and
+>> one or more alarm attributes. I never heard about the idea of reporting
+>> deviations, and for typical hardware monitoring attributes it does not
+>> really make sense. What would be a "deviation" of a temperature/
+>> voltage/current/power/humidity sensor ? Such attributes typically have
+>> an operational range, and they are allowed and even expected to
+>> fluctuate within that range.
+> 
+> Ivan, my take on all the above is that using the HWmon interface here is
+> stretching it too much. I think it would be better to move debugfs
+> and/or netlink events.
 
-Flush the backlog inside tls_rx_rec_wait() before checking
-sk_receive_queue so the strparser can parse newly-arrived
-segments immediately.
+I'd rather avoid debugfs... My proposal is to expose absolute measured
+frequency attribute of dpll-pin and follow phase-offset-monitor
+functionality:
 
-Fixes: 20ffc7adf53a ("net/tls: missing received data after fast remote close")
-Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
----
- net/tls/tls_sw.c | 1 +
- 1 file changed, 1 insertion(+)
+So:
+* add real-frequency attribute to dpll pin
+* add real-frequency-monitor attribute dpll device
+* user will be able to enable/disable monitoring by enabling/disabling
+   real-frequency-monitor feature (similarly to phase-offset-monitor)
 
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 8fb2f2a93846..84c4ae0330d1 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -1372,6 +1372,7 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
- 		if (ret < 0)
- 			return ret;
- 
-+		sk_flush_backlog(sk);
- 		if (!skb_queue_empty(&sk->sk_receive_queue)) {
- 			/* Defer notification to the exit point;
- 			 * this thread will consume the record
+Thoughts?
 
--- 
-2.53.0
+Thanks,
+Ivan
 
 
