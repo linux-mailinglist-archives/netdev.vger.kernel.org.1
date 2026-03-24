@@ -1,194 +1,200 @@
-Return-Path: <netdev+bounces-271214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271215-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPu2M8HSwmmFmgQAu9opvQ
-	(envelope-from <netdev+bounces-271214-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:06:57 +0100
+	id gAnzFGDTwmmUmgQAu9opvQ
+	(envelope-from <netdev+bounces-271215-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:09:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74C8031A79F
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:06:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACBC731A85C
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:09:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A1E2F300DCFC
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:05:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BAE993015893
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:08:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515BA377ECA;
-	Tue, 24 Mar 2026 18:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A2437BE6F;
+	Tue, 24 Mar 2026 18:08:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qPy4Pqb3"
+	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="Vr26Qjxm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ixit.cz (ixit.cz [185.100.197.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B17B355F5C;
-	Tue, 24 Mar 2026 18:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7386E38236B;
+	Tue, 24 Mar 2026 18:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.100.197.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774375544; cv=none; b=qdzo7xluhRGqxG/UGiTs21SbyYvLNvQ5d2TQr7qMNJKaJION75fEeadypSbOUrT7VEtNGwFZq0Lx0Jqkeo7EEKSb0M6RXFbf/qV/C9jZCjzRBZ9ov19R5EMf/qAvjOYhMqb9HFWOJe5Q/aoGWpDVH9qqXYDQF8o9VQO7zbhnwfg=
+	t=1774375703; cv=none; b=Vp//XY4kkysBsO/fUc0ITocL8pBisYaa9PmhJL7an9ge/sY5h88bFCifJ6KaJRe9RNcA/aHObYSFosyZuwcU7q59/bWttYGPnlDHBD0K45er4wQycesgZqd3e+igscStRDERpmqY3+8h9W7QR2mWk943lIhY7hY7nVO4306NEsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774375544; c=relaxed/simple;
-	bh=AU7UC3UCuzPY9ocU9SOB0BaMWIlQGomG0q9JxYRB0/Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TUwvw46Oef0LKh53Ull8j4tuzwedh74LU+tjqtNKIg0QVybiobO6zeHkJeMdlhvPyTbeHF2ku9hO4faiX9gN1DM0KMxiUXijXg8Hg4NPUodIDCtx8KhRQxtAl+LzeLIefthFRi0tmOynYuOUNhy6D55sgJlxbqyl6zAo3/d0gtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qPy4Pqb3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A828EC19424;
-	Tue, 24 Mar 2026 18:05:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774375543;
-	bh=AU7UC3UCuzPY9ocU9SOB0BaMWIlQGomG0q9JxYRB0/Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qPy4Pqb3gM0EEDNRzsSp9FtHw3/xCNLqg3ecnTOASDJXddGQPj8QLlgFncvLNoh8B
-	 sBIIklUijyYY7Jd7lUOP7Ix7AB6VCNS+65TuTepMPFqIrqYCAQWD4vm7NGJieGT5te
-	 GLNEBo1K3xHzJuzRBur094YGhz+5kYrtCkzxROIzTzDTKxkkPdz7+mbywvsGCZNj1j
-	 xVIl1HlNGkDP55vwikSc5n7R70WLKpeUJvPEgyFHynEkTkhVo/2YZ7tJfOyB5zFllz
-	 H8UHOCRtes2s6+RE7P5QLF08QD5MstfCodorjipenSE8u7WmuY9AJGo+xUd8PrARsq
-	 TlMqDK3bVSAwA==
-From: Simon Horman <horms@kernel.org>
-To: hsu.chih.kai@realtek.com
-Cc: Simon Horman <horms@kernel.org>,
-	nic_swsd@realtek.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@mork.no,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	davem@davemloft.net
-Subject: Re: [PATCH net-next v3 1/2] r8152: add helper functions for PLA/USB OCP registers
-Date: Tue, 24 Mar 2026 18:05:32 +0000
-Message-ID: <20260324180532.261099-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260323082226.2601-451-nic_swsd@realtek.com>
-References: <20260323082226.2601-451-nic_swsd@realtek.com>
+	s=arc-20240116; t=1774375703; c=relaxed/simple;
+	bh=jTrLb7JBd4s9yu8G/lASN3XJUxmlRl263Pxu+j2BHQA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K762YMrA2Z0KrDlmQeUyjdHGrFRrL48vMc8IlUsQ43PPQWhNamJT7rSeX+vz7SXfh79pEB8igCPCSQmdoWk500X0AWFdSU18IYaZx914Te4uR35ms8drRtILiQZyClOwN8TNk8VnH5tWdSc69EdMzBUWmLXSgx608+wUxghClu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=Vr26Qjxm; arc=none smtp.client-ip=185.100.197.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
+Received: from [192.168.88.67] (static-78-44-254-34.bb.vodafone.cz [78.44.254.34])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ixit.cz (Postfix) with ESMTPSA id A7EC55341115;
+	Tue, 24 Mar 2026 19:08:16 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
+	t=1774375697;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=2hunCxtEDEfduM7cx1zjOaDE3BGKjlcSpQbHSNZsZZk=;
+	b=Vr26Qjxms3OzcG42KINOV2KdZA+42HPOryXdZ4i1k41HWxy6p8ufPMUwm7qAzSFZ692tlD
+	jK5O11jSqH5sD5Li4qabgk1VJQFnr9r2WbaQMZlepVrajJxPkDa8FNekibIxoJbe+Hy5ow
+	3jnGe0xitJvXaiIz9OQ2PZ2QvXAUJr0=
+Message-ID: <041766dd-422e-40e1-9e5d-c220580871f5@ixit.cz>
+Date: Tue, 24 Mar 2026 19:08:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: sdm845-shift-axolotl: Enable NFC
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Konrad Dybcio <konradybcio@kernel.org>,
+ Alexander Martinz <amartinz@shift.eco>
+Cc: Petr Hodina <petr.hodina@protonmail.com>,
+ biemster <l.j.beemster@gmail.com>, netdev@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, Rob Herring <robh@kernel.org>,
+ oe-linux-nfc@lists.linux.dev, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+ linux-kernel@vger.kernel.org, phone-devel@vger.kernel.org,
+ Bjorn Andersson <andersson@kernel.org>
+References: <20260324-oneplus-nfc-v2-0-3eef052c9bc6@ixit.cz>
+ <20260324-oneplus-nfc-v2-2-3eef052c9bc6@ixit.cz>
+ <9d9ec994-c954-445d-97b2-772614d66f35@oss.qualcomm.com>
+Content-Language: en-US
+From: David Heidelberg <david@ixit.cz>
+Autocrypt: addr=david@ixit.cz; keydata=
+ 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
+In-Reply-To: <9d9ec994-c954-445d-97b2-772614d66f35@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
+	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-271215-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271214-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[protonmail.com,gmail.com,vger.kernel.org,kernel.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ixit.cz:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: 74C8031A79F
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,codeberg.org:url]
+X-Rspamd-Queue-Id: ACBC731A85C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-r8152: add helper functions for PLA/USB OCP registers
 
-This commit introduces new helper functions (ocp_dword_w0w1,
-ocp_word_w0w1, ocp_byte_w0w1, and their _clr_bits/_set_bits variants)
-to simplify bitwise operations on PLA/USB OCP registers throughout the
-r8152 driver.
+On 24/03/2026 14:12, Konrad Dybcio wrote:
+> On 3/24/26 12:20 AM, David Heidelberg via B4 Relay wrote:
+>> From: David Heidelberg <david@ixit.cz>
+>>
+>> Definition of the NFC.
+> 
+> "meh" commit message
+> 
+> [...]
+> 
+>> +	nfc_enable_default: nfc-enable-default-state {
+>> +		pins = "gpio12", "gpio62";
+>> +		function = "gpio";
+>> +		drive-strength = <2>;
+>> +		bias-pull-up;
+> 
+> Are you sure about pulling up an active-high pin?
 
-> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-> index 3b6d4252d34c..ba6dc4dbfd80 100644
-> --- a/drivers/net/usb/r8152.c
-> +++ b/drivers/net/usb/r8152.c
+I'm not sure, but downstream does it (and "works for me"). Maybe Alexander would 
+know more details here.
 
-[ ... ]
+David
 
-> @@ -3875,35 +3873,30 @@ static void r8153c_ups_en(struct r8152 *tp, bool enable)
->
->  static void r8156_ups_en(struct r8152 *tp, bool enable)
->  {
-> -	u32 ocp_data = ocp_read_byte(tp, MCU_TYPE_USB, USB_POWER_CUT);
-> -
->  	if (enable) {
->  		r8156_ups_flags(tp);
->
-> -		ocp_data |= UPS_EN | USP_PREWAKE | PHASE2_EN;
-> -		ocp_write_byte(tp, MCU_TYPE_USB, USB_POWER_CUT, ocp_data);
-> +		ocp_byte_set_bits(tp, MCU_TYPE_USB, USB_POWER_CUT,
-> +				  UPS_EN | USP_PREWAKE | PHASE2_EN);
->
-> -		ocp_data = ocp_read_byte(tp, MCU_TYPE_USB, USB_MISC_2);
-> -		ocp_data |= UPS_FORCE_PWR_DOWN;
-> -		ocp_write_byte(tp, MCU_TYPE_USB, USB_MISC_2, ocp_data);
-> +		ocp_byte_set_bits(tp, MCU_TYPE_USB, USB_MISC_2,
-> +				  UPS_FORCE_PWR_DOWN);
->
->  		switch (tp->version) {
->  		case RTL_VER_13:
->  		case RTL_VER_15:
-> -			ocp_data = ocp_read_word(tp, MCU_TYPE_USB, USB_UPHY_XTAL);
-> -			ocp_data &= ~OOBS_POLLING;
-> -			ocp_write_byte(tp, MCU_TYPE_USB, USB_UPHY_XTAL, ocp_data);
-> +			ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_UPHY_XTAL,
-> +					  OOBS_POLLING);
-                              ^^^^
+> 
+> FWIW TLMM subnodes are best sorted by pin index (although the file
+> currently doesn't really do that) as per dts coding style
 
-Does this actually change the hardware behavior for RTL_VER_13 and
-RTL_VER_15?
+I assume when I group the -pins into -state it doesn't apply anymore? As I don't 
+feel having pins relevant to one device / subsystem all over the place is extra 
+clean.
 
-The old code read a 16-bit word with ocp_read_word() to get
-OOBS_POLLING (BIT(8)), then cleared BIT(8) in the local variable, but
-wrote it back using ocp_write_byte(). Since ocp_write_byte() masks the
-data with 0xff, the write operation would only touch the low 8 bits and
-never actually clear BIT(8) in the hardware register. This made the old
-code effectively a no-op for clearing OOBS_POLLING.
+David
 
-The new code uses ocp_word_clr_bits() which calls ocp_word_w0w1(), and
-that performs a proper 16-bit read-modify-write cycle with
-ocp_write_word(). This means BIT(8) will now actually be cleared in the
-hardware.
+P.S. before v3 code is here
+https://codeberg.org/sdm845/linux/commits/branch/b4/oneplus-nfc
 
-While this looks like it fixes a latent bug where OOBS_POLLING was never
-being cleared, the commit message describes this as pure refactoring to
-simplify the code with no mention of a behavioral change.
+> 
+> Konrad
 
-Can you confirm whether this behavioral change is intentional? Should
-the commit message document that OOBS_POLLING will now actually be
-cleared for RTL_VER_13/15 devices during UPS enable, when it was not
-being cleared before?
+-- 
+David Heidelberg
 
->  			break;
->  		default:
->  			break;
->  		}
->  	} else {
-> -		ocp_data &= ~(UPS_EN | USP_PREWAKE);
-> -		ocp_write_byte(tp, MCU_TYPE_USB, USB_POWER_CUT, ocp_data);
-> +		ocp_byte_clr_bits(tp, MCU_TYPE_USB, USB_POWER_CUT,
-> +				  UPS_EN | USP_PREWAKE);
->
-> -		ocp_data = ocp_read_byte(tp, MCU_TYPE_USB, USB_MISC_2);
-> -		ocp_data &= ~UPS_FORCE_PWR_DOWN;
-> -		ocp_write_byte(tp, MCU_TYPE_USB, USB_MISC_2, ocp_data);
-> +		ocp_byte_clr_bits(tp, MCU_TYPE_USB, USB_MISC_2,
-> +				  UPS_FORCE_PWR_DOWN);
->
->  		if (ocp_read_word(tp, MCU_TYPE_USB, USB_MISC_0) & PCUT_STATUS) {
->  			tp->rtl_ops.hw_phy_cfg(tp);
 
