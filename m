@@ -1,137 +1,142 @@
-Return-Path: <netdev+bounces-271138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271139-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WEN8BlOzwmmRkwQAu9opvQ
-	(envelope-from <netdev+bounces-271138-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:52:51 +0100
+	id wCtxNLK1wmlolAQAu9opvQ
+	(envelope-from <netdev+bounces-271139-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:02:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8957F318685
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:52:50 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB22D318945
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:02:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AF824304AA33
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 15:46:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 46D6730489A5
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 15:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7A933B96B;
-	Tue, 24 Mar 2026 15:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F28B35FF73;
+	Tue, 24 Mar 2026 15:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="eXw+jp8P";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="eXw+jp8P"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.hostedemail.com (smtprelay0014.hostedemail.com [216.40.44.14])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB8E23D7E6;
-	Tue, 24 Mar 2026 15:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E0929ACC6;
+	Tue, 24 Mar 2026 15:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774367173; cv=none; b=PgGP4kF9Lb4KzZRxOgm9L2Cr7rpNl6B/DzaxCpRWLhxC+Ayp1TCRJku19a1jXHQ+iW4vb3kRF+NkWk8JWc/SIrOB7o1PyLszWUwclHHFyo74JAAMSVJhEjmOx0nfGJCzxCF/9OpbT9ztiniGWPQ8YIakSLdRjBoYiiXpPPPcqFY=
+	t=1774367383; cv=none; b=ALMnWfgjcgVmAgzZeYblir+iI0D1G7a2igew2PV9tYok6BLJSjr7LZq1RHlND68FAizu7mDwhSrqnIMl0+hke8D+E6DnbykxQIfwtzjhw3AYZZkMYVmvfb2t8pPS73EG1c26wRLxHVKZ5Dlx64qZmvzU93K8Bk3yR5CMrSmRcQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774367173; c=relaxed/simple;
-	bh=pLt1XqU3RZcuHwA0yFwsdkAZPuickPwzxs96gflSBRI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PKIh1kIbfoyFTXqxeZxZMlXOy6840g9+tH61TaySp891JZd+ZAE//cj5vIO3y3GTt+VeUp/0/Q6HYKI4wgKWe5Aj+0TxfIBVcF2wksaxj+OkcY9yoddqGmvV0QySz8XDLMoCL5NybTkERZGYOieVhV6n7fO+LeWfYiHHuUO35OQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf12.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay09.hostedemail.com (Postfix) with ESMTP id AEFD388B35;
-	Tue, 24 Mar 2026 15:36:54 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf12.hostedemail.com (Postfix) with ESMTPA id F093718;
-	Tue, 24 Mar 2026 15:36:48 +0000 (UTC)
-Date: Tue, 24 Mar 2026 11:37:31 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Aaron Conole <aconole@redhat.com>
-Cc: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>, Peter Zijlstra
- <peterz@infradead.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Eelco
- Chaudron <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>, Marcelo
- Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long
- <lucien.xin@gmail.com>, Jon Maloy <jmaloy@redhat.com>, Willem de Bruijn
- <willemb@google.com>, Samiullah Khawaja <skhawaja@google.com>, Hangbin Liu
- <liuhangbin@gmail.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- dev@openvswitch.org, linux-sctp@vger.kernel.org,
- tipc-discussion@lists.sourceforge.net, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 04/19] net: Use trace_call__##name() at guarded
- tracepoint call sites
-Message-ID: <20260324113731.5252724e@gandalf.local.home>
-In-Reply-To: <f7ttsu58con.fsf@redhat.com>
-References: <20260323160052.17528-1-vineeth@bitbyteword.org>
-	<20260323160052.17528-5-vineeth@bitbyteword.org>
-	<f7ttsu58con.fsf@redhat.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1774367383; c=relaxed/simple;
+	bh=JXPhSN25PkvSyYgqUfWTv4KsCeLH7f+Wz4ZSNFpRWIY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kwIqLb27AbOhcS7esQmJdLaRanlhYSAt14sVDA5AHd4utRyuEqMsFEs0K4qnYmkVVmIIK6lkLiihv45EvZFkY4epAWhziPzahmurtrN+meoIccsqLxTItQScAxOczNHMNfphuAeBKl3rANe8SoanNXfrZY6ulaUQRLEjvAfa+8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=eXw+jp8P; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=eXw+jp8P; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1774367373;
+	bh=JXPhSN25PkvSyYgqUfWTv4KsCeLH7f+Wz4ZSNFpRWIY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eXw+jp8P0GWbOiyk8wiuhOvl99Cw7IATLJHoYqZBeXA68/OW9syhxzugUF0oGMwm7
+	 LIKUExhUoCMN96AP+aiTGio8hG5oDzDl4eHLk6hL37SWQjtRLsNnx1zszjYTuMHUkM
+	 u7+lfnPuGJIAQJwlNhWQj2TWn4oEtde4EEm/lAiXCaLSqX8ySILzEG6v4AVJCNOw4t
+	 4YwjzJRe2bFg/GfirwXKpC0plN74miN4n8Nhd+7gH0HHs/zBVmVeQv6RiignUqWOJH
+	 kZNJxbwT/l1ZO5EEU5djZSy4ACgiVdD9yLCaPyh+dmXCSs27+Chcjht/oiFwyzMD8G
+	 t+7HZz/Xa425A==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id E3E7440065; Tue, 24 Mar 2026 15:49:33 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1774367373;
+	bh=JXPhSN25PkvSyYgqUfWTv4KsCeLH7f+Wz4ZSNFpRWIY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eXw+jp8P0GWbOiyk8wiuhOvl99Cw7IATLJHoYqZBeXA68/OW9syhxzugUF0oGMwm7
+	 LIKUExhUoCMN96AP+aiTGio8hG5oDzDl4eHLk6hL37SWQjtRLsNnx1zszjYTuMHUkM
+	 u7+lfnPuGJIAQJwlNhWQj2TWn4oEtde4EEm/lAiXCaLSqX8ySILzEG6v4AVJCNOw4t
+	 4YwjzJRe2bFg/GfirwXKpC0plN74miN4n8Nhd+7gH0HHs/zBVmVeQv6RiignUqWOJH
+	 kZNJxbwT/l1ZO5EEU5djZSy4ACgiVdD9yLCaPyh+dmXCSs27+Chcjht/oiFwyzMD8G
+	 t+7HZz/Xa425A==
+Received: from [IPV6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb] (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 001823FFF2;
+	Tue, 24 Mar 2026 15:49:32 +0000 (UTC)
+Message-ID: <3e0b86c2-0120-4c09-9c18-f5f53576070d@birger-koblitz.de>
+Date: Tue, 24 Mar 2026 16:49:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,v3,1/2] r8152: Add support for 5Gbit Link Speeds and
+ EEE
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, kuba@kernel.org
+References: <20260320-rtl8157_next-v3-1-1aefeca7fda7@birger-koblitz.de>
+ <20260324105523.385444-1-pabeni@redhat.com>
+From: Birger Koblitz <mail@birger-koblitz.de>
+Content-Language: en-US
+In-Reply-To: <20260324105523.385444-1-pabeni@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Stat-Signature: 44qkot3uem9ayugoztbi5z8yeb6k7s7e
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX1+tQiMn63Ec6IOmabtDBFhjzQTi5TFzBjc=
-X-HE-Tag: 1774366608-75188
-X-HE-Meta: U2FsdGVkX19yuAlxy+EoRVjDrCnH7N5nKRqw/zEwwZC+0iz33Moky87HDcPHBdq7orWI1a5ex/4oOWmHKzFtnBCa+C49FaCGuGESvPmS6eZ+Yg7FW1CDh9GufeoAF7RG0MbJliPUtZnyFah7YBt3MUz8wzRb2slkVWkSdCnPR98osAg1Dv5cNHz+fvo4Rm/FeeyTXJhB3GR7WbPLLUpI27359JqfgGUZpS6mj02gpifyicIXkpQVM1FuCpTPvqu/QS4xU2T3ACQ+LE1YXEEaVkE/QVSk6ud7Bb4rOwYHU5U1cj60+lJz0HkA+QyxmF7zwiw8RbAoZJnkx7LY4I2JZY1LfL8PA3eumh07N3g04fE54z1+OipVfc+XHoobFK4GirBxqASTnUh57Y58A2OK8lhis1Y0GhcDtr3yfvdQzlAyMDeZBI6ofWRESVa6tnikL9TyMHTKDgVoCEHjprrt1Vu5o02xrlYKbo3y1RDFl/c4uV/O65kHRdh7Q5AaVYoZ/RLifpTQl1w=
-X-Spamd-Result: default: False [0.14 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[goodmis.org : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-271138-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[birger-koblitz.de:+];
+	TAGGED_FROM(0.00)[bounces-271139-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[birger-koblitz.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[bitbyteword.org,infradead.org,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,ovn.org,vger.kernel.org,openvswitch.org,lists.sourceforge.net];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rostedt@goodmis.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,gandalf.local.home:mid,bitbyteword.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,goodmis.org:email]
-X-Rspamd-Queue-Id: 8957F318685
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lkml.org:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,birger-koblitz.de:dkim,birger-koblitz.de:mid]
+X-Rspamd-Queue-Id: AB22D318945
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 24 Mar 2026 11:33:28 -0400
-Aaron Conole <aconole@redhat.com> wrote:
+Hi Paolo,
 
-> "Vineeth Pillai (Google)" <vineeth@bitbyteword.org> writes:
+thanks for reviewing the patch.
+On 24/03/2026 11:55 am, Paolo Abeni wrote:
 > 
-> > Replace trace_foo() with the new trace_call__foo() at sites already
-> > guarded by trace_foo_enabled(), avoiding a redundant
-> > static_branch_unlikely() re-evaluation inside the tracepoint.
-> > trace_call__foo() calls the tracepoint callbacks directly without
-> > utilizing the static branch again.
-> >
-> > Suggested-by: Steven Rostedt <rostedt@goodmis.org>
-> > Suggested-by: Peter Zijlstra <peterz@infradead.org>
-> > Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
-> > Assisted-by: Claude:claude-sonnet-4-6
-> > ---  
+> The new NWAY_5000M_FULL falls through to 'default: break;', which means
+> ups_flags_speed() is never called. This results in incorrect UPS flags
+> (speed bits = 0) being written to the USB_UPS_FLAGS hardware register via
+> ocp_write_dword().
 > 
-> As noted before, I think we can just eliminate the guard in the
-> openvswitch module (and that would probably be a more understandable
-> fix) rather than replacing the call-in.
+> When the device enters UPS power saving mode at 5000M link speed, will the
+> hardware receive correct speed information?
+> 
+> The follow-up commit defca1127dd51 ('r8152: Add support for the RTL8157
+> hardware') enables support_5000full for RTL_VER_16 but also does not add a
+> NWAY_5000M_FULL case to r8156_ups_flags().
+> 
 
-That should probably be a separate patch, as it actually changes the
-code beyond the purpose of this patch.
+The exact same point was raised before:
+https://lkml.org/lkml/2026/3/19/1765
+it was answered by me here: https://lkml.org/lkml/2026/3/20/242 and
+the answer was accepted here: https://lkml.org/lkml/2026/3/20/464
 
-Removing the guard first, and then have a patch like this to modify the
-rest.
+B.
 
--- Steve
 
