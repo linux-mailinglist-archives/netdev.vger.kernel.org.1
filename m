@@ -1,352 +1,210 @@
-Return-Path: <netdev+bounces-270867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270868-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EBnQOLcOwmlGZQQAu9opvQ
-	(envelope-from <netdev+bounces-270867-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 05:10:31 +0100
+	id gcHfG9kSwmm9ZQQAu9opvQ
+	(envelope-from <netdev+bounces-270868-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 05:28:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59329301F3F
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 05:10:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E5A302044
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 05:28:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 29E5F303748A
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 04:10:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B3AD305A417
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 04:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E88F3A1E89;
-	Tue, 24 Mar 2026 04:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76EBD24BBF4;
+	Tue, 24 Mar 2026 04:28:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Dnc43cwc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RYtuWiNL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA95239E7F;
-	Tue, 24 Mar 2026 04:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774325429; cv=none; b=gzp2GeMMgbtOieQsdn0Io8IuHnz4EwFMv04daJ31rbc05pam9LTt7KrT+G1jqyL7yNQMhQWSRZyoXO6haqEm510BZCoLN3PMT4u/hVw25fud3zT7AeaaknENYTPNWtn2jc3fw+nGqAL1HDMprVZH4HVjz8MR6e6pjYNaHj3L6jI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774325429; c=relaxed/simple;
-	bh=B0GwGVcmsa+4F8559MXfhmcZ7FN93zkHNu6ud7GZUfc=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TvNF8T3QC8dM3UZAQwQDLu7xNs6yFBWRhp4mpYv2Se6Nr/GfZquz/y96LqKGz/wgQRwKxW0WMdvnhaSDwyp1iXZ76Qvaws2D/9J9Nf6Bf5cDsFQOZOvTTVb8ySa38qYTlOVAmQmM3LE2Y5IQlKolcJUNj8O5qabBJK4Z5LEPKTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Dnc43cwc; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62NHYIU62011175;
-	Mon, 23 Mar 2026 21:10:05 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=3kpfVh3K8SXRgSYPaWKxbT7mt
-	jkU983DIWcnGdbqLTs=; b=Dnc43cwcbAvGg+EXH2CJ31zWh9i8QBN/Rnwo1koc0
-	Bifxot7C/RrnPF5mCFYllbgZ9t+W96vVSpwO0T1oa+JHID2jsqzXYox9GWJkb8vA
-	v35986r1ZtxEFMoC+hMu4w6nkKweS0G1C6mIk2jHGMGF8yN685YlhD4+ulxlvmhZ
-	AvaTQ37v8dqdQDRA3hrLdcWnujk5XORKU4fwi2/Zd1RaZXEpJEEZB4UZ/y0vUsY5
-	DVF8qv/ztN0GKeSBJNWCElLfAB8BQJ6x8VlOaodalMTZGBBQ4bqCHgxwsg9vhrlE
-	q+obgev/du3rhQNlIBjwciz6lJRITdVGOBM3+NUaAITWg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4d2c3646xu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Mar 2026 21:10:04 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 23 Mar 2026 21:10:04 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 23 Mar 2026 21:10:04 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id F02EC5B6922;
-	Mon, 23 Mar 2026 21:09:59 -0700 (PDT)
-Date: Tue, 24 Mar 2026 09:39:58 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: <shshitrit@nvidia.com>, <cjubran@nvidia.com>, <netdev@vger.kernel.org>,
-        <matttbe@kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <saeedm@nvidia.com>, <sgoutham@marvell.com>, <davem@davemloft.net>,
-        <donald.hunter@gmail.com>, <jiri@resnulli.us>,
-        <chuck.lever@oracle.com>, <linux-kernel@vger.kernel.org>,
-        <kuba@kernel.org>
-Subject: Re: [PATCH v6 net-next 5/5] octeontx2-af: npc: Support for custom
- KPU profile from filesystem
-Message-ID: <acIOloT6IX4RmEeZ@rkannoth-OptiPlex-7090>
-References: <20260319055533.1720093-6-rkannoth@marvell.com>
- <20260320165432.98832-1-horms@kernel.org>
- <acCbtThJb-PA8tni@rkannoth-OptiPlex-7090>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A40F242D60
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 04:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774326485; cv=pass; b=aXmJnX4KoWwgrE672eVqoydcvKmyoOUYFo7udPvJAdzm0PDvWtT5HCik0Klf7FInwhUKR3z2cdb31sWLaEQ2PeCFJlKs+96eKg/aSi3FdVUP3cdvLFthOboBrU9vdOCHgjgaSjWAVpEkM+bvDFqpABhkdsjcv1cBhNj0k+zNXtI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774326485; c=relaxed/simple;
+	bh=svClQVwTYvLN+679sWWYhBctw/RFEPMWANDN/6NPjuU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jfzJhGJKbs5hoCtO002QKgwCdeEkLiymmlvQqA+m0T6fbXWa03glUR86KRvK7+fkXhCPAbgkjJCpd4U/anDR4YsJYlBUw/j8usEnh+MRuR4+FchpIweXynN9+3oXy9Nf/OjgHE1ptCARiYxmShzb7yJ8Ctt0BI/btCenmpqTXoU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RYtuWiNL; arc=pass smtp.client-ip=209.85.208.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-669efe709feso1509619a12.0
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 21:28:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774326482; cv=none;
+        d=google.com; s=arc-20240605;
+        b=BhQeyrNXvHhu54SXGdZOpQNgBC2G9drR5ClN1sOnKnFqW400+Mdx/HINxZLDZ/UmDV
+         XiM5pwOY06hbpK80S17IEMV39P1ppmEipavZWPSNc8FOQ2Dfia6dqdeNUySysQ51Z3Ra
+         TJy+cp3KzrRyaUCJFKBXawXs/Sn3JB286IPcYyRzSZcarl1jhjoE6814+IfJNAqxmiKc
+         0xbFXL4Hx32wVdj7eL+EpuDwCBoaSV5lCP5FAVA/mKGmFgzWZY+9PdcRdv4ka/1C/0/Y
+         skZU0iaAhFYbFoA7mHqTeT4JUaE1Df+jtyb7vo2EXDpG5YpFxjTf5zyB7SjHf75w+eHW
+         bU/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=svClQVwTYvLN+679sWWYhBctw/RFEPMWANDN/6NPjuU=;
+        fh=Sg1BNzItZdOS/Bj4Mxx8OE02M/iFBEmO4/GIagCs3pI=;
+        b=fyk2Weeph7Ki714i+D/OjaM4qSgBBvxm8IlQKn00t2B7gAWyrQwrnvE47pB8LYX6n4
+         NEgYYMTFaTwGKSKIS07UEt+FyZ+kgN74HlNOmALWr/79j1KvUC4fL44EE6mUnWvU1ggu
+         FEijZSSTBcWvurkQW/wczV+6qvG5SSn+X6y2kz26h/BWp9tfPWKLamjnXt2e87WdyGqt
+         lfsLn1harC2FoofWZDLMyzTcEtB3vrK5sPULNiE5duum4Dl2MxRhuiesteP+X8jO0OkR
+         4lKGh86aF5y+wBgSG76AtJsY+CDpegWh2rfVg2jGFUQesSf1R6oJQoedSAZbsd2fMaSE
+         /98g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774326482; x=1774931282; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=svClQVwTYvLN+679sWWYhBctw/RFEPMWANDN/6NPjuU=;
+        b=RYtuWiNLJx8R2b+1RiJZYf2azakQdqAi1ykYm0/hZWwIs0++0rHOLlrJKs1SRXw4Zc
+         Qs7r4hxOykxbFtU39S+D6Az9RneGmw+ZOxuZmdUXftQkeZjWpkY9OCoR9ZEmgCZGwOzI
+         +prX6Jpp+qhOBEgtlIOeA+aUMh+mrwwZ0bew5vf2Qskt5H6TuxsJm/BYkFbhlbv70XwO
+         t58pflR/BffgkEgTylXgwE213zVR7ZuLyq417/WcCspXWVNLjmEIzjamC2lUuV0kWL5K
+         XAz/XGdgil5SIxl2LAlX1GC4Fa4jCHk/S+ha8N0jSsepbSLuW6M4KQnSoDXhwXOgYAHg
+         Z9dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774326482; x=1774931282;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=svClQVwTYvLN+679sWWYhBctw/RFEPMWANDN/6NPjuU=;
+        b=OoxgSwsPH8XtE2iaeZUOH9tXHNc/lpO2cOvlHb3G1Dy9AvS4Djs4vEi0Best/89z/c
+         n9vRmC1gTcHWb5md9NxGqEt6S6lMqgAfZJHwt+rb8tQUpJcTyBHYssThpBL8jbr4cCK3
+         rqFW0xtL8UaSEZTyNjBU/zJN5zetwGKDEHXOQmF+yKnMQhjpCJg/6Ok/YJkjJgrh1vjV
+         QS3mYcfCotuoLX73bJV5ybpVRzEEn43Wikk64UMSuCQd7/8EkMnFwftCHAfyLyUfZvPs
+         ROz0B9bBIDnp7iQrHTIt4afyY+hKM8NM6aQGVD0Kwu8kh5PQQA2FGjtK3IPRZBHpxwqJ
+         BR5g==
+X-Forwarded-Encrypted: i=1; AJvYcCXzLntNg1dJOdXBnmwR7Bh3CJE1zSaden29PoA8cx2Mt9HUsy5ITrDaPnagZ3YbX6A+/W5XPuE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCoeFTiHqS8ZHDx2cjTW4M7qaupVtCcaSn6vUUL2kgV1EltjjT
+	sPIdnkQgSNfNZ+4bB7jMjhIo6AgaJKIEgNC14n8zuTJt7WnmX2TdNWrrf97qqUypucojrNFpUmj
+	kSYDqDWpvEZMHmnDuq9jQXgrDD0YrcD8=
+X-Gm-Gg: ATEYQzwHJky/okCRUjaUR/fU/R//OKaYrmMaCbbnCq893GI4JCAQt4W30RTH+wBZqka
+	LN14jmYviQil0bV1SyfiDfxEW7hRgTBL3xJSOgr6W+F0pkkEDNogxWexDg/I7spe6MrdGFVomAr
+	2lttoINZjYMG3jzJRJ5t41j7Km+xYg0QbFy/GYf9nGead/w0KJMp9/DK3eY3+PRtPptFzbjvi1J
+	HzoJByCnVB5YUXkqidV0jKD8Ed80BjKequYPaVLtVB8EgPtGFjVfZYRvUAuhLCzFnwTYWtICu6d
+	0NrchZ5G9jxz6apN50fL+958TYm6W6qNapvW1cE=
+X-Received: by 2002:a05:6402:270a:b0:66a:3419:248a with SMTP id
+ 4fb4d7f45d1cf-66a34192961mr1158702a12.13.1774326482054; Mon, 23 Mar 2026
+ 21:28:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <acCbtThJb-PA8tni@rkannoth-OptiPlex-7090>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzI0MDAzMiBTYWx0ZWRfX6yzmKF/YH3vk
- Kwz3jI9FvD3HeZn7RRWxFxbLQGxxi3w4axCaYi2tiMG5bEgsdWvkXF+s7bnWSFYpivTaveZBL1/
- qppeBenbY0MUVXE7JCjoQGhTnKgGNcx4DGvIgUYYxb4Ww5SqzoDYPlaZJEYv/6OMmYg/h3iqTX3
- 32Si6FOPKZ7QGrU/qwHuMR7g8A57GEx1p51GgxRdXzeT5QgvmTIt6/Y5P55lXZUyVmxd0M+TVi2
- PV3zjBZNDpqYI8520sbyFUM60DEqxhWtLPEU0ufkNYnbuJmt6ULzlu6kYSx8bsunzEQqw9sLMzz
- LNKUhgfSsAG3NfTBS85fJbeQGeyQDgaB+a3aYzrPkadmy7OqEfVIQU7ZXl3/7+9MrUXj80KSB+0
- Jbh4Bp+mlocy853KEyefliH60YnYSpTUbXS1fOwesQ3LuKkA5wjP57nhLjSYBnAzXKalGL2hSho
- aserY+26/VCBnTcEc3w==
-X-Proofpoint-ORIG-GUID: 9V-ZSLMg00T3qkjS354seKgsYW6Kparm
-X-Proofpoint-GUID: 9V-ZSLMg00T3qkjS354seKgsYW6Kparm
-X-Authority-Analysis: v=2.4 cv=SItPlevH c=1 sm=1 tr=0 ts=69c20e9c cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=qit2iCtTFQkLgVSMPQTB:22 a=9R54UkLUAAAA:8
- a=M5GUcnROAAAA:8 a=VwQbUJbxAAAA:8 a=S-9KcCoszCjkqHTTb5UA:9 a=CjuIK1q_8ugA:10
- a=YTcpBFlVQWkNscrzJ_Dz:22 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-24_01,2026-03-23_02,2025-10-01_01
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+References: <20260225010853.15916-1-ericterminal@gmail.com>
+ <20260225033840.33000-1-ericterminal@gmail.com> <aaRbWCeu-wNdWGzB@horms.kernel.org>
+ <CAKNPVZA2sFv7k=wyf5iBGyOUQcHkAdpVLVNjuqr+7XBXDKxNbg@mail.gmail.com>
+In-Reply-To: <CAKNPVZA2sFv7k=wyf5iBGyOUQcHkAdpVLVNjuqr+7XBXDKxNbg@mail.gmail.com>
+From: Eric_Terminal <ericterminal@gmail.com>
+Date: Tue, 24 Mar 2026 12:27:50 +0800
+X-Gm-Features: AQROBzBgTmKHaA7x9bBR6YuiaU8Gh2HBa_zkliE59q0Q7S-SffyKp90n7TFmYBI
+Message-ID: <CAKNPVZAtH59NRqDscaBPgFYhxOB=KzTY=Y+FA9WBkDo_um33tQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] net: replace deprecated simple_strto* parsers with kstrto*
+To: Simon Horman <horms@kernel.org>
+Cc: Dominique Martinet <asmadeus@codewreck.org>, Eric Van Hensbergen <ericvh@kernel.org>, 
+	Latchesar Ionkov <lucho@ionkov.net>, "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	v9fs@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Nikolay Aleksandrov <razor@blackwall.org>, bridge@lists.linux.dev, 
+	Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270867-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[nvidia.com,vger.kernel.org,kernel.org,google.com,redhat.com,marvell.com,davemloft.net,gmail.com,resnulli.us,oracle.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,marvell.com:dkim,marvell.com:email,linux.dev:url];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-270868-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 59329301F3F
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ericterminal@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 92E5A302044
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-03-23 at 07:17:33, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> On 2026-03-20 at 22:24:32, Simon Horman (horms@kernel.org) wrote:
-> >
-> > > @@ -665,9 +675,15 @@ void npc_cn20k_parser_profile_init(struct rvu *rvu, int blkaddr)
-> > >  	num_pkinds = rvu->kpu.pkinds;
-> > >  	num_pkinds = min_t(int, hw->npc_pkinds, num_pkinds);
-> > >
-> > > -	for (idx = 0; idx < num_pkinds; idx++)
-> > > -		npc_config_kpmaction(rvu, blkaddr, &rvu->kpu.ikpu[idx],
-> > > +	/* Cn20k does not support Custom profile from filesystem */
-> > > +	for (idx = 0; idx < num_pkinds; idx++) {
-> > > +		act = npc_get_ikpu_nth_entry(rvu, idx);
-> > > +		if (!act)
-> > > +			continue;
-> > > +
-> > > +		npc_config_kpmaction(rvu, blkaddr, act,
-> > >  				     0, idx, true);
-> > > +	}
-> >
-> > When a filesystem-loaded profile is used on cn20k (from_fs=true),
-> > npc_get_ikpu_nth_entry() returns &profile->ikpu2[idx]:
-> >
-> > drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c:npc_get_ikpu_nth_entry() {
-> >     struct npc_kpu_profile_adapter *profile = &rvu->kpu;
-> >
-> >     if (profile->from_fs)
-> >         return &profile->ikpu2[idx];
-> >
-> >     return &profile->ikpu[n];
-> > }
-> >
-> > However, ikpu2 is never allocated for the cn20k path. The allocation
-> > happens inside npc_apply_custom_kpu() in the from_fs block:
-> >
-> > drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c:npc_apply_custom_kpu() {
-> >     if (is_cn20k(rvu->pdev))
-> >         return npc_cn20k_apply_custom_kpu(rvu, profile);
-> >     ...
-> >     if (from_fs) {
-> >         profile->ikpu2 = devm_kcalloc(rvu->dev, 1,
-> >                                       sizeof(ikpu_action_entries),
-> >                                       GFP_KERNEL);
-> >         ...
-> >     }
-> > }
-> >
-> > But this from_fs block is never reached for cn20k because the function
-> > returns early via npc_cn20k_apply_custom_kpu().
-> >
-> > Does this code dereference a NULL-offset pointer causing a kernel crash?
-> >
-> > The same issue appears to affect cam2 and action2 pointers which are
-> > allocated in npc_alloc_kpu_cam2_n_action2() but never called for cn20k.
-> >
-> > This was raised by Jakub Kicinski during v4 review on 2026-03-16.
-> This is false positive. from_fs is never set to "true" for cn20k. In npc_load_kpu_profile(), if soc is
-> cn20k, it skips "loading from filesystem" method. So npc_get_ikpu_nth_entry()
-> will never return ikpu2.
+Hi Simon and maintainers,
+
+Just a gentle ping on this patch series.
+
+Following up on my previous email regarding the testing methodology
+(using virtme-ng, verifying the Oops fix in Patch 1, and confirming
+the strictness of strsep + kstrtouint).
+
+Does the provided testing information address the concerns? Please let
+me know if there's anything else I should clarify, or if a v3 is
+needed to move this forward.
+
+Thanks,
+Yufan
+
+On Wed, Mar 4, 2026 at 11:28=E2=80=AFPM Eric_Terminal <ericterminal@gmail.c=
+om> wrote:
 >
+> On Sun, Mar 1, 2026 at 11:29=E2=80=AFPM Simon Horman <horms@kernel.org> w=
+rote:
+> > Hi,
 > >
-> > > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> > > index 8d260bcfbf38..8d8feb7742e8 100644
-> > > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> > > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+> > Thanks for your patches.
 > >
-> > [ ... ]
+> > I would like to understand what testing has been performed on these pat=
+ches.
 > >
-> > > @@ -1730,32 +1835,89 @@ static int npc_apply_custom_kpu(struct rvu *rvu,
-> > >  		return -EINVAL;
-> > >  	}
-> > >
-> > > +	*fw_kpus = fw->kpus;
-> > > +
-> > > +	sfw = devm_kcalloc(rvu->dev, 1, sizeof(*sfw), GFP_KERNEL);
-> > > +	if (!sfw)
-> > > +		return -ENOMEM;
-> > > +
-> > > +	memcpy(sfw, fw, sizeof(*sfw));
-> > > +
-> > >  	profile->custom = 1;
-> > > -	profile->name = fw->name;
-> > > +	profile->name = sfw->name;
-> > >  	profile->version = le64_to_cpu(fw->version);
-> > > -	profile->mcam_kex_prfl.mkex = &fw->mkex;
-> > > -	profile->lt_def = &fw->lt_def;
-> > > +	profile->mcam_kex_prfl.mkex = &sfw->mkex;
-> > > +	profile->lt_def = &sfw->lt_def;
-> > > +
-> > > +	/* Binary blob contains ikpu actions entries at start of data[0] */
-> > > +	if (from_fs) {
-> > > +		profile->ikpu2 = devm_kcalloc(rvu->dev, 1,
-> > > +					      sizeof(ikpu_action_entries),
-> > > +					      GFP_KERNEL);
-> > > +		if (!profile->ikpu2)
-> > > +			return -ENOMEM;
-> > > +
-> > > +		action = (struct npc_kpu_profile_action *)(fw->data + offset);
-> > > +
-> > > +		if (rvu->kpu_fwdata_sz < hdr_sz + sizeof(ikpu_action_entries))
-> > > +			return -ENOMEM;
-> > > +
-> > > +		memcpy((void *)profile->ikpu2, action, sizeof(ikpu_action_entries));
-> > > +		offset += sizeof(ikpu_action_entries);
-> > > +	}
-> > > +
-> > >  	for (kpu = 0; kpu < fw->kpus; kpu++) {
-> > >  		fw_kpu = (struct npc_kpu_fwdata *)(fw->data + offset);
-> > > -		if (fw_kpu->entries > KPU_MAX_CST_ENT)
-> > > -			dev_warn(rvu->dev,
-> > > -				 "Too many custom entries on KPU%d: %d > %d\n",
-> > > -				 kpu, fw_kpu->entries, KPU_MAX_CST_ENT);
-> > > -		entries = min(fw_kpu->entries, KPU_MAX_CST_ENT);
-> > > -		cam = (struct npc_kpu_profile_cam *)fw_kpu->data;
-> > > -		offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam);
-> > > +		if (!from_fs) {
-> > > +			if (fw_kpu->entries > KPU_MAX_CST_ENT)
-> > > +				dev_warn(rvu->dev,
-> > > +					 "Too many custom entries on KPU%d: %d > %d\n",
-> > > +					 kpu, fw_kpu->entries, KPU_MAX_CST_ENT);
-> > > +			entries = min(fw_kpu->entries, KPU_MAX_CST_ENT);
-> > > +			cam = (struct npc_kpu_profile_cam *)fw_kpu->data;
-> > > +			offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam);
-> > > +			action = (struct npc_kpu_profile_action *)(fw->data + offset);
-> > > +			offset += fw_kpu->entries * sizeof(*action);
-> > > +			if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
-> > > +				dev_warn(rvu->dev,
-> > > +					 "Profile size mismatch on KPU%i parsing.\n",
-> > > +					 kpu + 1);
-> > > +				return -EINVAL;
-> > > +			}
-> > > +			for (entry = 0; entry < entries; entry++) {
-> > > +				profile->kpu[kpu].cam[entry] = cam[entry];
-> > > +				profile->kpu[kpu].action[entry] = action[entry];
-> > > +			}
-> > > +			continue;
-> > > +		}
-> > > +		entries = fw_kpu->entries;
-> > > +		dev_info(rvu->dev,
-> > > +			 "Loading %u entries on KPU%d\n", entries, kpu);
-> > > +
-> > > +		cam2 = (struct npc_kpu_profile_cam2 *)fw_kpu->data;
-> > > +		offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam2);
-> > >  		action = (struct npc_kpu_profile_action *)(fw->data + offset);
-> > >  		offset += fw_kpu->entries * sizeof(*action);
-> > >  		if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
-> > >  			dev_warn(rvu->dev,
-> > > -				 "Profile size mismatch on KPU%i parsing.\n",
-> > > +				 "profile size mismatch on kpu%i parsing.\n",
-> > >  				 kpu + 1);
-> > >  			return -EINVAL;
-> > >  		}
-> > > +
-> > > +		profile->kpu[kpu].cam_entries2 = entries;
-> > > +		profile->kpu[kpu].action_entries2 = entries;
-> > > +		ret = npc_alloc_kpu_cam2_n_action2(rvu, kpu, entries);
-> > > +		if (ret) {
-> > > +			dev_warn(rvu->dev,
-> > > +				 "profile entry allocation failed for kpu=%d for %d entries\n",
-> > > +				 kpu, entries);
-> > > +			return -EINVAL;
-> > > +		}
-> > > +
-> > >  		for (entry = 0; entry < entries; entry++) {
-> > > -			profile->kpu[kpu].cam[entry] = cam[entry];
-> > > -			profile->kpu[kpu].action[entry] = action[entry];
-> > > +			profile->kpu[kpu].cam2[entry] = cam2[entry];
-> > > +			profile->kpu[kpu].action2[entry] = action[entry];
-> > >  		}
-> > >  	}
+> > With the possible exception of patch 3/4, I feel that unless they
+> > are motivated as bug fixes, these changes are too complex to accept
+> > without testing. Although the opinions of the relevant maintainers
+> > may differ.
 > >
-> > Could this loop overflow and hang the kernel if firmware specifies more
-> > than 65535 entries?
-> >
-> > The loop variable 'entry' is declared as int at the top of the function,
-> > but in the from_fs path, 'entries' is read directly from the firmware
-> > blob:
-> >
-> >     entries = fw_kpu->entries;
-> >
-> > In the non-from_fs path, entries is capped:
-> >
-> >     entries = min(fw_kpu->entries, KPU_MAX_CST_ENT);
-> >
-> > But in the from_fs path there is no cap on entries. If a corrupt or
-> > malicious firmware file specifies fw_kpu->entries with a very large
-> > value, the loop could run for an extremely long time or cause other
-> > issues.
-> >
-> > The kernel should not rely on filesystem data being well-formed.
-> > Validation is needed for the from_fs case.
-> >
-> > This was raised by Simon Horman during v3 review on 2026-03-10. The
-> > author acknowledged this in v3 saying they would fix it in v5, but the
-> > issue persists in the current version.
-> ACK. Last AI review suggest is - either to use "int" as loop variable or do a capping
-> on the value. I did modify it to "int".
-
-Hi Simon,
-
-I noticed that this concern has been raised again even after adding "CAPPING"
-https://netdev-ai.bots.linux.dev/ai-review.html?id=c0bd3eea-bbc4-46ae-86da-c295d1100233
-
-"If a corrupt or malicious firmware file in /lib/firmware/kpu specifies fw_kpu->entries with a very
-large value that doesn't exceed rvu->hw->npc_kpu_entries, the loop could run for an extremely long time."
-
-I would like to clarify that the following line in the code effectively caps the value of entries,
-even in cases where the value read from the filesystem may be corrupted:
-
-entries = min(fw_kpu->entries, rvu->hw->npc_kpu_entries);
-
-Here, rvu->hw->npc_kpu_entries is derived from hardware registers and represents the
-maximum limit supported by the hardware.
-
-Please let me know if you see any gaps in this reasoning or if further safeguards are required.
+> > And as for 3/4, I lean towards falling into the policy regarding
+> > clean-ups not being generally accepted unless it is part of other work.
+>
+> Hi,
+>
+> Thanks for the feedback. I've verified the series using virtme-ng and
+> a userspace mock harness (for the 9p tokenizing logic).
+>
+> Regarding Patch 1: This is primarily a stability fix. I've tested the
+> error paths by forcing init failures on a non-Xen system; dmesg
+> confirms the new sentinel-based cleanup (NULL-ing intf/data and
+> checking INVALID_GRANT_REF) correctly prevents double-frees and Oops
+> during teardown.
+>
+> Regarding the "complexity" in Patch 2: The strsep + kstrtouint
+> approach was chosen for strictness. I've verified it handles cases
+> like "1,,2" (empty tokens) and "1abc" (malformed input) correctly. The
+> latter is now rejected with -EINVAL, whereas simple_strto* would have
+> silently accepted partial values.
+>
+> The same applies to Patches 3 and 4. The migration to kstrto* ensures
+> that sysfs/procfs interfaces now properly validate the entire input
+> string.
+>
+> P.S. I used a translation tool for the message above, so please excuse
+> any awkward wording.
+>
+> Thanks,
 
