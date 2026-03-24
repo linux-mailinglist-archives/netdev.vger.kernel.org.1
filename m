@@ -1,327 +1,187 @@
-Return-Path: <netdev+bounces-271186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271187-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAzXER3CwmmjlQQAu9opvQ
-	(envelope-from <netdev+bounces-271186-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:55:57 +0100
+	id 6EP5L2XCwmmjlQQAu9opvQ
+	(envelope-from <netdev+bounces-271187-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:57:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E13723197C0
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:55:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A56D53197FF
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:57:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 716A5302E32A
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:54:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 999323053BBC
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:55:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DCE3D7D77;
-	Tue, 24 Mar 2026 16:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 494D03EF0BA;
+	Tue, 24 Mar 2026 16:55:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aTiI3B0t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/kJTgvU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F49E38F92A;
-	Tue, 24 Mar 2026 16:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261413DCDB0
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 16:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774371268; cv=none; b=tOqplr+9IWiR5PwQFOZaLW2Sr76MYO6f3WTa80C7qknvTUc2e4kcp81VqS9v8eCiSK56YYE/r1Ul7GwSO+M5/hNhDPO4bt+eDlKvOH9NWTA09hHCEn7pcGE9wgheIsCXIKA+gUhe2VxJcJsHUHRW/axUcKzR3iNLtLYUsUGz94U=
+	t=1774371325; cv=none; b=H+EepRlcyAcZ82DyVqR2hXO6CAW2otW8urThFqcKdlizkQigenRIEpIMyzF6bz4inotPHUL2JiSug0z+qYLaCE/wQ1fXK6C6SyLeQR2+xpnGIt1IbzbzvEs3nkLUee6zDugWRGFvTa1FOA2xMFUyRSu0c5/5P/t77lU8b4Eiqlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774371268; c=relaxed/simple;
-	bh=6XwTfsRWoS93cnxOuZ3FgxopYlNBweflJgztMgNywtw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r285Ml2UmlwOmyGKoaycXIObA044009SOxX5IVw7oV4F02HfXkAcvFZkJtoI2HopKBCVmD4g2T/nscm7crbD2O+4RMNbXl0BZ/s1unyi9qy1NkzeHhnFom0LJgB/dmRQmbuQqrJw4EKaQ4sKxQoCJPFWf3y6TX48ZtIyCtbGxSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aTiI3B0t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D065C19424;
-	Tue, 24 Mar 2026 16:54:23 +0000 (UTC)
+	s=arc-20240116; t=1774371325; c=relaxed/simple;
+	bh=5r1QnMw+vkFTIcuRXJoKO+7ZYkPN9lBP+lg9RoD/6+Q=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ThiG/WRZ9WaV79Vp71Heag9txvHAzOrITcvsQ/Pg9jZ5rrAUm+1kUAH+aTVSI5Gxmx3zCZLCKs+N1rRRtSw8GEAExgSC5G1dtMHcJqZGH0oo/hl1NCGoqaLri7Aq8XDkimIIbHzlQM1cIvkMGe2uBnhKP5FUL/funz8iOHRln44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/kJTgvU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C1F9C19424;
+	Tue, 24 Mar 2026 16:55:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774371268;
-	bh=6XwTfsRWoS93cnxOuZ3FgxopYlNBweflJgztMgNywtw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aTiI3B0tekb0ODeo1RRtl5msPPkbfMkXmTJ3L5ORFH0Itzy3wlIM6tAAVk5QydB4B
-	 KaEOgbhfEsTubYPztwrfV8TY2GzNK2kaGJhKFBK8P9ajQPv6TPESIT5cEiYhpX4vMs
-	 xJSTkDI/eiuQOmX5b4SLYwqM2m2DXtgflsXglqPxTRwxXHmGiNDdeORax6MiiZBbvQ
-	 QfwBicuahSCqk0hOc/D7Gzvq83/OgDVE9irHbTzKBnK/mW9buEG3HVRovKQC+Nzn+F
-	 2pk4cJMey8KfztKJEuaqv8pziQvEaBid24S6q+oZU+7Rptxc7EbtGiaLNQ7t0sjOw3
-	 PpfVdS4/xXupw==
-From: Simon Horman <horms@kernel.org>
-To: wei.fang@nxp.com
-Cc: Simon Horman <horms@kernel.org>,
-	devicetree@vger.kernel.org,
-	robh@kernel.org,
-	andrew@lunn.ch,
-	vladimir.oltean@nxp.com,
-	frank.li@nxp.com,
-	pabeni@redhat.com,
-	conor+dt@kernel.org,
-	xiaoning.wang@nxp.com,
-	davem@davemloft.net,
-	krzk+dt@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	imx@lists.linux.dev,
-	kuba@kernel.org,
-	edumazet@google.com,
-	linux-kernel@vger.kernel.org,
-	linux@armlinux.org.uk,
-	andrew+netdev@lunn.ch,
-	f.fainelli@gmail.com,
-	claudiu.manoil@nxp.com,
-	netdev@vger.kernel.org,
-	chleroy@kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v2 net-next 09/14] net: dsa: add NETC switch tag support
-Date: Tue, 24 Mar 2026 16:54:15 +0000
-Message-ID: <20260324165415.243214-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260323060752.1157031-10-wei.fang@nxp.com>
-References: <20260323060752.1157031-10-wei.fang@nxp.com>
+	s=k20201202; t=1774371324;
+	bh=5r1QnMw+vkFTIcuRXJoKO+7ZYkPN9lBP+lg9RoD/6+Q=;
+	h=From:Date:Subject:To:Cc:From;
+	b=D/kJTgvUz5mozx+5jbyi1MlCtHBa4WEuewqhAmz9RmsYoxATT+Kbn+6fsG5HBSdzd
+	 0rdqiRd/JBd5bH64ACfjWJ3Z1KvsqRXUTfnDUo9wrBQWvZDeNg22/aQdqFf4zmCrMu
+	 H8EZvPuM3Y4NnwnRh1yl6gOtO1XiUez5reaFcAXdXfpTTsIxXVvv0eC4tgDEmGRRt/
+	 ikFb7MjHJsltALhzwuL021lajda81fyZlvkRx8uGF27zymG7IOeHwFIHL5g0iuyzIy
+	 Bt5X90OaSMZYYoKvFD7HZ/ieWG/uW1L9CT5h4ejBpfVD3+mLrHRlVwLBEPO1Qx1OAO
+	 NH2gy30SJpFxQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Tue, 24 Mar 2026 17:54:45 +0100
+Subject: [PATCH net-next] net: airoha: Grab flow_offload_mutex running
+ airoha_register_gdm_devices()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260324-airoha-regiser-race-fix-v1-1-6014df55886b@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MQQqAMAzAviI9W9imTvEr4mFot/Wi0oEIw79bP
+ CaQVCgkTAXmpoLQzYXPQ8G2DWw5HImQd2VwxnnTOYuB5cwBhRJrihI2wsgPRpqGPnq7j96A1pe
+ Q6v+8rO/7Abp+PClpAAAA
+X-Change-ID: 20260321-airoha-regiser-race-fix-fe854f61d760
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lunn.ch,nxp.com,redhat.com,davemloft.net,lists.infradead.org,lists.linux.dev,google.com,armlinux.org.uk,gmail.com,lists.ozlabs.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-271186-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271187-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: E13723197C0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A56D53197FF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Netfilter flowtable can theoretically try offload flower rules as soon
+as a net-device is registered while not all the other ones are
+registered/initialized, triggering a possible NULL pointer dereferencing
+of qdma pointer in airoha_ppe_set_cpu_port routine. In order to avoid any
+possible race, grab the flow_offload_mutex running
+airoha_register_gdm_devices().
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
-net: dsa: add NETC switch tag support
+ drivers/net/ethernet/airoha/airoha_eth.c | 15 +++++++++++----
+ drivers/net/ethernet/airoha/airoha_eth.h |  2 ++
+ drivers/net/ethernet/airoha/airoha_ppe.c |  2 +-
+ 3 files changed, 14 insertions(+), 5 deletions(-)
 
-This commit introduces support for the NXP NETC switch tag protocol,
-a proprietary header used by NETC switches. The tag supports three
-types (Forward, To_Port, and To_Host) with variable length (6-14 bytes).
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 82e53c60f561f6314fbf201ba8bc8711e40edc68..c1476032f78cbac95c9813bbeae6bec2c9c0a685 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -2943,21 +2943,28 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
+ 
+ static int airoha_register_gdm_devices(struct airoha_eth *eth)
+ {
+-	int i;
++	int i, err = 0;
++
++	/* Netfilter flowtable can try offload flower rules while not all
++	 * the net-devices are registered/initialized. Grab flow_offload_mutex
++	 * to avoid any possible race.
++	 */
++	mutex_lock(&flow_offload_mutex);
+ 
+ 	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
+ 		struct airoha_gdm_port *port = eth->ports[i];
+-		int err;
+ 
+ 		if (!port)
+ 			continue;
+ 
+ 		err = register_netdev(port->dev);
+ 		if (err)
+-			return err;
++			break;
+ 	}
+ 
+-	return 0;
++	mutex_unlock(&flow_offload_mutex);
++
++	return err;
+ }
+ 
+ static int airoha_probe(struct platform_device *pdev)
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index 7df4dbcd8861856c54c2a38bc89c69180ac2f6dc..9d97a54dbfdf9107a10bdb09cf144e5cf1ac9bdb 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -548,6 +548,8 @@ struct airoha_gdm_port {
+ 	struct metadata_dst *dsa_meta[AIROHA_MAX_DSA_PORTS];
+ };
+ 
++extern struct mutex flow_offload_mutex;
++
+ #define AIROHA_RXD4_PPE_CPU_REASON	GENMASK(20, 16)
+ #define AIROHA_RXD4_FOE_ENTRY		GENMASK(15, 0)
+ 
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index 7666b1d2f4f6ea758683181ab90d6fffb7bcd19d..96d092f7214ee3e80843a14528df66cabf79bc58 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -15,7 +15,7 @@
+ #include "airoha_regs.h"
+ #include "airoha_eth.h"
+ 
+-static DEFINE_MUTEX(flow_offload_mutex);
++DEFINE_MUTEX(flow_offload_mutex);
+ static DEFINE_SPINLOCK(ppe_lock);
+ 
+ static const struct rhashtable_params airoha_flow_table_params = {
 
-> diff --git a/include/linux/dsa/tag_netc.h b/include/linux/dsa/tag_netc.h
-> new file mode 100644
-> index 000000000000..fe964722e5b0
-> --- /dev/null
-> +++ b/include/linux/dsa/tag_netc.h
-> @@ -0,0 +1,14 @@
-> +/* SPDX-License-Identifier: GPL-2.0
-> + *
-> + * Copyright 2025-2026 NXP
-> + */
-> +
-> +#ifndef __NET_DSA_TAG_NETC_H
-> +#define __NET_DSA_TAG_NETC_H
-> +
-> +#include <linux/skbuff.h>
-> +#include <net/dsa.h>
-> +
-> +#define NETC_TAG_MAX_LEN			14
-> +
-> +#endif
+---
+base-commit: b1c803d5c8167026791abfaed96fd3e6a1fcd750
+change-id: 20260321-airoha-regiser-race-fix-fe854f61d760
 
-[ ... ]
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-> diff --git a/net/dsa/tag_netc.c b/net/dsa/tag_netc.c
-> new file mode 100644
-> index 000000000000..15b0dd5c5408
-> --- /dev/null
-> +++ b/net/dsa/tag_netc.c
-
-[ ... ]
-
-> @@ -0,0 +1,180 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright 2025-2026 NXP
-> + */
-> +
-> +#include <linux/dsa/tag_netc.h>
-> +
-> +#include "tag.h"
-> +
-> +#define NETC_NAME			"nxp_netc"
-> +
-> +/* Forward NXP switch tag */
-> +#define NETC_TAG_FORWARD		0
-> +
-> +/* To_Port NXP switch tag */
-> +#define NETC_TAG_TO_PORT		1
-> +/* SubType0: No request to perform timestamping */
-> +#define NETC_TAG_TP_SUBTYPE0		0
-> +
-> +/* To_Host NXP switch tag */
-> +#define NETC_TAG_TO_HOST		2
-> +/* SubType0: frames redirected or copied to CPU port */
-> +#define NETC_TAG_TH_SUBTYPE0		0
-> +/* SubType1: frames redirected or copied to CPU port with timestamp */
-> +#define NETC_TAG_TH_SUBTYPE1		1
-> +/* SubType2: Transmit timestamp response (two-step timestamping) */
-> +#define NETC_TAG_TH_SUBTYPE2		2
-> +
-> +/* NETC switch tag lengths */
-> +#define NETC_TAG_FORWARD_LEN		6
-> +#define NETC_TAG_TP_SUBTYPE0_LEN	6
-> +#define NETC_TAG_TH_SUBTYPE0_LEN	6
-> +#define NETC_TAG_TH_SUBTYPE1_LEN	14
-> +#define NETC_TAG_TH_SUBTYPE2_LEN	14
-> +#define NETC_TAG_CMN_LEN		5
-> +
-> +#define NETC_TAG_SUBTYPE		GENMASK(3, 0)
-> +#define NETC_TAG_TYPE			GENMASK(7, 4)
-> +#define NETC_TAG_QV			BIT(0)
-> +#define NETC_TAG_IPV			GENMASK(4, 2)
-> +#define NETC_TAG_SWITCH			GENMASK(2, 0)
-> +#define NETC_TAG_PORT			GENMASK(7, 3)
-> +
-> +struct netc_tag_cmn {
-> +	__be16 tpid;
-> +	u8 type;
-> +	u8 qos;
-> +	u8 switch_port;
-> +} __packed;
-
-[ ... ]
-
-> +static int netc_get_rx_tag_len(int rx_type)
-> +{
-> +	int type = FIELD_GET(NETC_TAG_TYPE, rx_type);
-> +
-> +	if (type == NETC_TAG_TO_HOST) {
-> +		u8 subtype = rx_type & NETC_TAG_SUBTYPE;
-> +
-> +		if (subtype == NETC_TAG_TH_SUBTYPE1)
-> +			return NETC_TAG_TH_SUBTYPE1_LEN;
-> +		else if (subtype == NETC_TAG_TH_SUBTYPE2)
-> +			return NETC_TAG_TH_SUBTYPE2_LEN;
-> +		else
-> +			return NETC_TAG_TH_SUBTYPE0_LEN;
-> +	}
-> +
-> +	return NETC_TAG_FORWARD_LEN;
-> +}
-> +
-> +static struct sk_buff *netc_rcv(struct sk_buff *skb,
-> +				struct net_device *ndev)
-> +{
-> +	struct netc_tag_cmn *tag_cmn = dsa_etype_header_pos_rx(skb);
-> +	int tag_len = netc_get_rx_tag_len(tag_cmn->type);
-                                             ^^^^^^^^^^^^
-
-Is the tag header guaranteed to be in the linear region of the skb?
-Looking at other EtherType-based DSA tag drivers (tag_ar9331, tag_lan9303,
-tag_dsa, tag_edsa, tag_a5psw, tag_brcm_legacy, tag_mxl-gsw1xx,
-tag_gswip, and tag_mtk), they all call pskb_may_pull() before accessing
-tag data to ensure the header is linearized.
-
-For example, tag_ar9331.c:
-
-static struct sk_buff *ar9331_tag_rcv(struct sk_buff *skb,
-                                      struct net_device *ndev)
-{
-    if (unlikely(!pskb_may_pull(skb, AR9331_HDR_LEN)))
-        return NULL;
-    ...
-}
-
-Similarly, tag_lan9303.c:
-
-static struct sk_buff *lan9303_rcv(struct sk_buff *skb,
-                                   struct net_device *ndev)
-{
-    if (unlikely(!pskb_may_pull(skb, LAN9303_TAG_LEN)))
-        return NULL;
-    ...
-}
-
-Without this check, netc_rcv() accesses tag_cmn->type, tag_cmn->tpid,
-tag_cmn->qos, and tag_cmn->switch_port before verifying these bytes are
-linearized. The struct netc_tag_cmn is 5 bytes, with 3 bytes at
-skb->data through skb->data+2 that may not be guaranteed to be in the
-linear region.
-
-Additionally, netc_get_rx_tag_len() can return up to 14 bytes
-(NETC_TAG_TH_SUBTYPE1_LEN or NETC_TAG_TH_SUBTYPE2_LEN), and this value
-is passed directly to skb_pull_rcsum():
-
-> +	int tag_len = netc_get_rx_tag_len(tag_cmn->type);
-> +	int sw_id, port;
-> +
-> +	if (ntohs(tag_cmn->tpid) != ETH_P_NXP_NETC) {
-> +		dev_warn_ratelimited(&ndev->dev, "Unknown TPID 0x%04x\n",
-> +				     ntohs(tag_cmn->tpid));
-> +
-> +		return NULL;
-> +	}
-> +
-> +	if (tag_cmn->qos & NETC_TAG_QV)
-> +		skb->priority = FIELD_GET(NETC_TAG_IPV, tag_cmn->qos);
-> +
-> +	sw_id = NETC_TAG_SWITCH & tag_cmn->switch_port;
-> +	/* ENETC VEPA switch ID (0) is not supported yet */
-> +	if (!sw_id) {
-> +		dev_warn_ratelimited(&ndev->dev,
-> +				     "VEPA switch ID is not supported yet\n");
-> +
-> +		return NULL;
-> +	}
-> +
-> +	port = FIELD_GET(NETC_TAG_PORT, tag_cmn->switch_port);
-> +	skb->dev = dsa_conduit_find_user(ndev, sw_id, port);
-> +	if (!skb->dev)
-> +		return NULL;
-> +
-> +	if (tag_cmn->type == NETC_TAG_FORWARD)
-> +		dsa_default_offload_fwd_mark(skb);
-> +
-> +	/* Remove Switch tag from the frame */
-> +	skb_pull_rcsum(skb, tag_len);
-                     ^^^^^^^^^^^^^^^^^^
-
-The skb_pull_rcsum() function contains BUG_ON(len > skb->len). If a
-truncated or malformed packet arrives with fewer than tag_len bytes
-remaining, the kernel will panic rather than gracefully handling the
-error.
-
-Should a check like this be added at the beginning of netc_rcv():
-
-if (unlikely(!pskb_may_pull(skb, NETC_TAG_MAX_LEN - 2)))
-    return NULL;
-
-The -2 would account for the EtherType bytes already consumed by
-eth_type_trans().
-
-> +	dsa_strip_etype_header(skb, tag_len);
-> +
-> +	return skb;
-> +}
-
-[ ... ]
 
