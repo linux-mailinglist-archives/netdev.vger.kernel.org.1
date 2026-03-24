@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-270877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270878-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ONUIIXkqwml5ZwQAu9opvQ
-	(envelope-from <netdev+bounces-270877-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:08:57 +0100
+	id YNv3NaEqwml5ZwQAu9opvQ
+	(envelope-from <netdev+bounces-270878-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:09:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C91EC3029C3
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:08:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AE643029E1
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:09:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F055D3009155
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:04:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2741930E2674
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E1D3ACEFE;
-	Tue, 24 Mar 2026 06:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70153AEF24;
+	Tue, 24 Mar 2026 06:04:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DNUZPI81"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T5ka94dG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF3E3AB27F
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 06:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BFFF3AB28F
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 06:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774332267; cv=none; b=X7PlXl5iRVetHgdkEIcm+JLicOVrD8ePA9nac2Wg3orhq/xNWj/Mwu5bWvBEFaBBrUBe9Z/6MiM6ph0XJp5n/gv5Y+KjM8hT3A7Hv4Tllws44WJUfpxFzvJgxbx08Yt3+m3TwzIz3WyeyK9QD4qtEZM8mvxEqxOWTnLy5EakwI8=
+	t=1774332269; cv=none; b=bSEUastx2/lmY9eV2u2qmRHGuXBfqvQdgEmXG4BfjDNUO68M1gsoUvpE+A30IjOmoYHrgJC8LaM334+sM0EnjLQTdS/RTxCR1noKcBgr9BdVnza4mERcFm1D26pWm+aFDhYrCmFC1VLeK58pTMzUvNhZlSeB0byBnWVwNIQGp6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774332267; c=relaxed/simple;
-	bh=26i1VlGHPVJPO2ACFKcL2SsSaS2lRM1qcERjVWdSklM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aoOmugpuhbYP+vNgQDLmIQhaB99iVDUApO41q09O/1InUX+6ZnbShlpj93Uwbqon4l685GBFtAjGO43prlX7TcSu9iXC6ptzjZn3pppWoCQdyCctr/SiHfpytHdFpIW++y8OntFS80/7UYYm3mW/PlWAf1UmammJ/pH21PUMmvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DNUZPI81; arc=none smtp.client-ip=209.85.210.47
+	s=arc-20240116; t=1774332269; c=relaxed/simple;
+	bh=2LpObmm0KAIiKn6ecbNp9DXCoG8E4+h39lkWKLmCI2k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Xsll5PRQY5Cxw7gIYK//WMDLr77Qm4pxN1anLpbF+HCNc//40/A4Q9pQVOj7DzncyA8FU7YYVgB1MPdRauUkDYs2N6A5JVVHKcKjoql/K3wm/efgDmwqgrL6PygM2i7D3J9RhtSZPZrcDs+fzbUGPdSqyBddUhzDr2a4y/jF9+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T5ka94dG; arc=none smtp.client-ip=209.85.210.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7d744d9acbeso1396901a34.1
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 23:04:23 -0700 (PDT)
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7d8b2703f37so791149a34.1
+        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 23:04:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774332263; x=1774937063; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eXxXF6JthqgVazDRt0dSHWifir8Ryp7bwwT8LqL/1Pc=;
-        b=DNUZPI814vvOqSP6oHM1c6Vdxeze9ClyuecM/lPFExXJd9zWf9rfEdsFFFJ/zEU4ti
-         woWF0QP24I+KGCXk9A/H7k7cIQ6TzceEsw2qs7hTyNQQkriIkjX5a7zugceNF7d3s3W3
-         t4hbJPxSAV1d6KO0gC4WOuk70ROmjlsAA5PL47GTT7qCS1KtKDId1C8pa+wZpJsiF71s
-         4Ih3swUYSA9hk+tIlQaCvl0ZwjWxQ0XNrPMp+3iEhHyFQp2u+Gr0vLOsP6mWVymO+5tV
-         Hjyx/l6d/vjak84Nt0nNneH8wKlZUTp58XywtNbueSd956U8tq6+X30g9Nuq2W+lXuPL
-         GQ+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774332263; x=1774937063;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1774332264; x=1774937064; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eXxXF6JthqgVazDRt0dSHWifir8Ryp7bwwT8LqL/1Pc=;
-        b=cqIrL9P7Jh4pQrEiLiSujFCVcC10OrtVysJrVNfGXKTFseTBL+al2VOhpnJm6cIPgh
-         ZZIOaD4HdwX2wolfzb1JBRwiflFwKjnC5mWBxdkPo7D7SZBGEPUCBGwTrgvSCS1Ya3rY
-         U/OLLyumc5MswzKNSrQcEhMhB7OQ2N1ZcpJ+PM/0JXE7h1ZCDLPqJTc/guZxTTlTTwNv
-         zWxjeM0zl00pagFGVS11hOFAd2EFFy1l71/yEfQwQZuz+MrvOHDhhzuWSFteF2FoGRrA
-         MFuukWrRZhVAwH7ogwX0hjoS95nri+MFhpQSSivYTmI6+wLKEQUGybtwvnOq+GEWTHBj
-         vCgA==
-X-Gm-Message-State: AOJu0YyAUex4WrT/EvISc17Zy7j+uR4+dDcqJAQsW+JEUtwYexww7uNS
-	KrCMuY/EbKB6tTdLYAYluGvyeES5FptPbEi5qPwFUHToNfVaLYV3XWGdijQsg3nZ
-X-Gm-Gg: ATEYQzwzXRnKurH6M/Bm5tYpxM0gZn2tzmx426rHpDlmuOZ0HA8KfC/HWRR3BDS0HG3
-	3UOG666fC/ndFc7OCL2WUD47iXlT0kwzT/QoIVirJWIvI7AKQivL/5/r0o/mxLnRmFkIwrVDdQJ
-	DQMm9FTzc6XkoMqDvvrrtnffnb80pm6ceb/WqbDRiFwwbhcHiFu8Ho6+Ws609oLVHwc9Mpn5ENK
-	UinPKttOtxm8zCwDMRhqlOvf/+L5zh9gMh9kpxU8dNUr3Ak4Ud+GYAIbtRV9ELaHvG/dTbosLWI
-	KtpyQqLEjWaegITl6huyUO9/QkcayvChTM/ppAS4vxoBejSywAMDgqwCaJA4o4xOYlrFjyRVyyw
-	1f8mG2sv7ylgC1UGw89h/WauqnGURxNpj6fOZ3EqmPDff4KmO4dL3xLvuCCNFoD+vT+uXwgZeSd
-	6Qfoge1D/kAp+cQqcL9K7q0AWyjYeHB2xomF6/JmvA1Q83n5Dg/ZevNOH09KXG/g4ZcgNbbw+bW
-	WV/9Wz3uaJLHK9ZLXWb949X2BLyxxynJ51/OOeGsQ==
-X-Received: by 2002:a05:6830:4118:b0:7d9:ad99:9ff0 with SMTP id 46e09a7af769-7d9ad99a072mr6395542a34.30.1774332262611;
-        Mon, 23 Mar 2026 23:04:22 -0700 (PDT)
+        bh=N/zbf91aM6LypdywPhicgkAJndZ/EFSfnS9FO2u56Vg=;
+        b=T5ka94dGtnA4sHjcmIg2RoVWZniyqrGQE/AcDSKyAUwHdMapHi0QAhEPRkEawqCE58
+         zGzHJcxah8raueTT28DsWPKT/Y0f9UnjQmsowXx/FnrteSjlGKAWiGDbgUlJJuzUdy5A
+         BUQlNbPSMK76wHhR+QaK/7Z/TCnyAj4bK5pXruSPiJW8nVVOAU/gc9Ksg6qUIJLgoBdz
+         U8+Y5tX8Pau6LQyafT0fMiLll4Fs8R/hIhePNdlvaXHnqmNv0Lqg+n6jMUsQrlLpFJy9
+         1jc239h9jAnTikeEKUfXHsOWQaibOQciBCrhHAwVhvu+7uFcj4Q/arZnvV6gIAFzoqHS
+         W9ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774332264; x=1774937064;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=N/zbf91aM6LypdywPhicgkAJndZ/EFSfnS9FO2u56Vg=;
+        b=pIx+kryH3eU8tMDL7iaX7hMHqX6bIgeu09YgyJooLUyj5qN/FMRLrHPgQnG3YqBeVP
+         Qe8CcPQ+8dTHPDC9M+BrV3FbvREhTjZsYatLlaybndotOPD+tdRZ3Jh6xyV4fHoRGf1k
+         BeeOPYQxhBmh8gJPirgzA7luBcAywGHm11qU+CfOO1UrjZMVXXw8lciNY5Q8fhxj2pKz
+         ZnviWFGyjPBJXWUGHzU6jiMQrfmUNVZck7C5SHsgsp/2t8HasmezY7q8W505jBLcQMdK
+         +4/AjNA92UtP+7x7zG45GihddzK0LuiUS4XfoG89xiLGRJIN1ULpAhsuq6wG3+NED4f0
+         9UkA==
+X-Gm-Message-State: AOJu0YzSAswzN6WBDcLVG2EVOoD2P/BHpNuMiTT6C2bYppQDQOWSQ29s
+	52JwGWcw/Bqsb67sYh4JnhQVfVYTA7OuZckxWrC9NQFL2K9MwqMZu37q7gJf/+0l
+X-Gm-Gg: ATEYQzycn6JKyLU7U545XiOL9sw+yrD3BGJvHYTCwp0VahEq4dSMcOV4Di1K9eZAbzJ
+	IdmSXEBj94Ba9wVgi8T7vwSCYSrQuNqmEWTtY/jhX71mZe131WObe/tOmwFDkmewvHCY6lvcjF8
+	FQZSwqVw4t5hW8sbaUrRHhSIVyxa1g096w5G7VR8cgIehlqvgEboCg6VzZoPI2UeAVYt+IzqrX6
+	d3wneugpq0Oyx3UVDx7O1IaCxCjGzi8lOMx96m02ppdANHG0ZeXx33st7ssoez1kWXh72TGY8rM
+	/bMSflGNXf7Dt+R28q2lFaVGoYKpjt67lUWZ+tfCrHGrCPTw8LSb/5h+o/Vucmjl0Tvy+22/UZi
+	rfy+6fabrvqZ7+1Yiy/cZ4UtW6YgqyHwrhdv5HEb9esSyiI3qeVd4q2GliBW8y3P1B3maa8zJVH
+	sqmdMDlmKf2pZ5XZYAqrrykGG/SZBDY7cXRd6fyvE0SGvZSqazvWKl/qJ8+wwzWDuPmplV6BG6O
+	r8Xvj2zHLI+Ma7sjvGwxfbrfcdvZ6nSj/aFSrOhjQ==
+X-Received: by 2002:a05:6830:81cd:b0:7d7:f15b:e399 with SMTP id 46e09a7af769-7d7f15be572mr9244399a34.16.1774332264220;
+        Mon, 23 Mar 2026 23:04:24 -0700 (PDT)
 Received: from Atwell-Laptop.. (108-212-132-20.lightspeed.irvnca.sbcglobal.net. [108.212.132.20])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d7eadcb757sm11429957a34.15.2026.03.23.23.04.21
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d7eadcb757sm11429957a34.15.2026.03.23.23.04.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2026 23:04:22 -0700 (PDT)
+        Mon, 23 Mar 2026 23:04:23 -0700 (PDT)
 From: Wesley Atwell <atwellwea@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linux-kselftest@vger.kernel.org,
@@ -89,10 +91,12 @@ Cc: linux-kselftest@vger.kernel.org,
 	shuah@kernel.org,
 	gmbnomis@gmail.com,
 	Wesley Atwell <atwellwea@gmail.com>
-Subject: [PATCH net-next v2 0/3] tcp: fix scaled no-shrink rwnd quantization slack
-Date: Tue, 24 Mar 2026 00:04:07 -0600
-Message-ID: <20260324060410.1137199-1-atwellwea@gmail.com>
+Subject: [PATCH net-next v2 1/3] selftests: packetdrill: stop pinning rwnd in tcp_ooo_rcv_mss
+Date: Tue, 24 Mar 2026 00:04:08 -0600
+Message-ID: <20260324060410.1137199-2-atwellwea@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260324060410.1137199-1-atwellwea@gmail.com>
+References: <20260324060410.1137199-1-atwellwea@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -112,7 +116,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-270877-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270878-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
@@ -129,104 +133,46 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C91EC3029C3
+X-Rspamd-Queue-Id: 7AE643029E1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+tcp_ooo_rcv_mss.pkt cares about the OOO SACK state and the resulting
+tcpi_rcv_mss update.
 
-this v2 addresses the review on the earlier quantization series.
+Its exact advertised receive-window value is incidental to that test and
+can legitimately move when unrelated rwnd accounting changes adjust the
+ACK window.
 
-Simon was right that the original 3/3 only showed the explicit
-rcv_ssthresh-limited ALIGN-up behavior. For v2, 3/3 is replaced with an
-OOO-memory-based reproducer that first grows rcv_ssthresh with in-order
-data and then drives raw backed free_space below rcv_ssthresh without
-advancing rcv_nxt. In the instrumented old-behavior run that shaped this
-test, the critical ACK reached free_space=86190, rcv_ssthresh=86286,
-and still advertised 87040 (85 << 10). With 2/3 applied, the same ACK
-stays at 84.
+Drop the hard-coded win 81 checks and keep only the ACK/SACK shape and
+the tcpi_rcv_mss assertion.
 
-That follow-up also clarified why the broader 2/3 change is required.
-A narrower variant that preserved the old rcv_ssthresh-limited ALIGN-up
-behavior was not sufficient: earlier ACKs still stored 85 in tp->rcv_wnd,
-and tcp_select_window() later preserved that extra unit because shrinking
-was disallowed. Keeping tp->rcv_wnd representable across the scaled
-no-shrink path is what lets later ACKs settle at the correct
-wire-visible edge.
-
-Problem
-=======
-
-In the scaled no-shrink path, __tcp_select_window() rounds free_space up
-to the receive-window scale quantum:
-
-  window = ALIGN(free_space, 1 << tp->rx_opt.rcv_wscale);
-
-When raw backed free_space sits just below the next quantum, that can
-expose fresh sender-visible credit that is not actually backed by the
-current receive-memory state.
-
-Approach
-========
-
-This repost keeps only the part with a clear fail-before/pass-after
-story today:
-
-  - relax one unrelated packetdrill test which was pinning an
-    incidental advertised window
-  - keep tp->rcv_wnd representable in scaled units by rounding larger
-    windows down to the scale quantum
-  - preserve only the small non-zero case that would otherwise scale
-    away to zero; changing that longstanding non-zero-to-zero behavior
-    would be a separate change from the bug proven here
-  - prove the actual raw-free_space case with a packetdrill sequence
-    that reaches free_space < rcv_ssthresh without changing SO_RCVBUF
-    after the handshake
-
-Tests
-=====
-
-Local validation:
-- git diff --check
-- checkpatch on the touched diff
-- local vmksft targeted run of
-  net/packetdrill:tcp_rcv_quantization_credit.pkt passes with this
-  series applied for ipv4, ipv6, and ipv4-mapped-ipv6
-- the same packetdrill fails on HEAD without 2/3 with:
-
-    expected: win 84
-      actual: win 85
-
-Changes in v2
-=============
-
-- leave 1/3 unchanged
-- rename gran to granularity in 2/3
-- clarify in 2/3 why representable tp->rcv_wnd state is required across
-  later no-shrink transitions
-- clarify in 2/3 that the smaller longstanding non-zero case remains
-  intentionally unchanged in this series
-- replace 3/3 with the proven OOO-memory reproducer for the raw
-  free_space case
-- drop the IPv4-only restriction in 3/3 after validating the test on
-  the default packetdrill protocol set
-
-Series layout
-=============
-
-  1/3 selftests: packetdrill: stop pinning rwnd in tcp_ooo_rcv_mss
-  2/3 tcp: keep scaled no-shrink window representable
-  3/3 selftests: packetdrill: cover scaled rwnd quantization slack
-
-Thanks,
-Wesley Atwell
-
+Signed-off-by: Wesley Atwell <atwellwea@gmail.com>
 ---
- net/ipv4/tcp_output.c                              | 16 +++++++++++-----
- .../selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt |  8 +++++---
- .../packetdrill/tcp_rcv_quantization_credit.pkt   | 62 ++++++++++++++++++++++
- 3 files changed, 78 insertions(+), 8 deletions(-)
+ tools/testing/selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
+diff --git a/tools/testing/selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt b/tools/testing/selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt
+index 7e6bc5fb0c8d..0b19de9f9307 100644
+--- a/tools/testing/selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt
++++ b/tools/testing/selftests/net/packetdrill/tcp_ooo_rcv_mss.pkt
+@@ -17,11 +17,13 @@ sysctl -q net.ipv4.tcp_rmem="4096 131072 $((32*1024*1024))"`
+    +0 accept(3, ..., ...) = 4
+ 
+    +0 < . 2001:11001(9000) ack 1 win 257
+-   +0 > . 1:1(0) ack 1 win 81 <nop,nop,sack 2001:11001>
++// This test cares about the OOO SACK state and the resulting tcpi_rcv_mss.
++// Keep the ACK/SACK shape exact, but do not pin the precise advertised
++// receive window here because unrelated rwnd accounting changes can adjust it.
++   +0 > . 1:1(0) ack 1 <nop,nop,sack 2001:11001>
+ 
+ // check that ooo packet properly updates tcpi_rcv_mss
+    +0 %{ assert tcpi_rcv_mss == 1000, tcpi_rcv_mss }%
+ 
+    +0 < . 11001:21001(10000) ack 1 win 257
+-   +0 > . 1:1(0) ack 1 win 81 <nop,nop,sack 2001:21001>
+-
++   +0 > . 1:1(0) ack 1 <nop,nop,sack 2001:21001>
 -- 
 2.43.0
 
