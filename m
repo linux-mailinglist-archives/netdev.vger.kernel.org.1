@@ -1,212 +1,440 @@
-Return-Path: <netdev+bounces-271219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271220-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wOGWDZXUwmllmgQAu9opvQ
-	(envelope-from <netdev+bounces-271219-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:14:45 +0100
+	id UFJ6FQ3VwmllmgQAu9opvQ
+	(envelope-from <netdev+bounces-271220-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:16:45 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90A0531A94E
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:14:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE66F31A99A
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:16:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6882E30AE935
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:13:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 34BC13108223
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4229438C2D7;
-	Tue, 24 Mar 2026 18:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E388A394476;
+	Tue, 24 Mar 2026 18:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RquFiSa7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VRYmzj1s"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7875438911A
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 18:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9A639657B
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 18:13:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774375984; cv=none; b=FehGaOS9wIgphSf+Doqn+3/g8xhrAtvX1u1+zqYCk0wEiMRs3+lC01x1hia7yVdsRaL+aEJK2ERqIOGdJouu8ii21wmMfr0tonDezLs9N7+g+s+Jshi9JnljKZi9yyRaW1GZDZfnXv/JwrwmjbzGYeMm3CfPZp+/lGgA5k2umCk=
+	t=1774375990; cv=none; b=nPrz2XV1trN2VdgPUWOQj3guHmmAKaOGBIYIZ+nU8ioL8r+v9qKHiE+fUxUWpgOvEwLCCm3VoUp74ROx/TIhizs2TX3+4WfkwsAmEqbu20cA8CDJXWn4bBvN/OWVrnE1nwm/u8Io/Ks1WDJrf9387YxRVcMq1M9AzSAmV/d17fM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774375984; c=relaxed/simple;
-	bh=gogaLhmzjeMdjLJmR+30oDMpSwBI3O0me8wxujtONII=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s7sVW9AbJS0i3deXjuuuDLr/YL6GiihfYHkhenPjgfKxbBMkAX+47Ank1Kt50d5cgnMWShnWRjythwsoz18WUlAflh2d1g2FmVcdlXBD7j+P17QahwjVo9+wUmMBzv05d7R0L43tSxnpN8mGdchw0CfitolBREqondQokKBT/YE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RquFiSa7; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f0f271ae-4d4c-4d52-8670-a14204da437d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774375979;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8EL19L491G0HDzBug1MJZdxH8m2EyauqFp/7/0yep3s=;
-	b=RquFiSa7RT6UeyDrcOpgmOP1WKmiWsvPKwAFC/NzhjDdh2G1Uu/vhQdNPPLoK2QVh2UucP
-	zpwgBRt4QD7rRrvSxGcLZvBSdNQVa55knxoS+8r4Izh+iXDjno4ZdVTZHHp46oFGM1jLny
-	DlDoDV8hOCqWKOJw36uoYuysdUHBz0o=
-Date: Tue, 24 Mar 2026 11:12:50 -0700
+	s=arc-20240116; t=1774375990; c=relaxed/simple;
+	bh=RaOCjkBVzDFIT96zgHw60AZ1L9GePiOM4NsDXpfCOO0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HqeVT36BTpCPzRpx3z9cwUZrpL2Xp+VXPYS/KBs67sqG9C29DRTefLwL4K+ajTK0vTtmnckxXkfFZq7G6Xsc79bxwGJD7Hn6LzbcXpgeiFjSDDtL0W8/WQWwCS8kCEXWw+rkoOh1T4Pm0mIpf/iaa5tLpjeVw2E1/9klTfTylgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VRYmzj1s; arc=none smtp.client-ip=74.125.82.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-126ea4e9694so10710244c88.1
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 11:13:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774375987; x=1774980787; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/nbVlsaioYKF4sVSgiEokAiqvKpmQsI/mQ3o3FZFtp4=;
+        b=VRYmzj1sFIJ7JAUgmbyEsGMPr9TDnUengve0DEWsUgDa1T7JqeGZj2gCz2rhpGzgRx
+         A5raWUXSGR2UGlWw09rp8XAdkqukVNuUdPN/tz7kbF+deUkvPksYgkfq2AbMX87tXRB5
+         ckgbWL+u/mT3/fE9HGi6Avugz0+2+QTxpO/eu2o+il6PHfFSPBLrO3MhPMGtVW0hoLcH
+         4fhCzeNfdHsM7Z5aqkI6C9LnahE+uqE45aWLr++MXo2a+3Yu50bC+q9DTeqgvBOwmPSn
+         7ZMT9mtPyRRpJzL+h5+UHablUy+8d1tJoo5fmd4QN7MjrxI9fzlMKuk8xU2I0ySNNh6H
+         cRCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774375987; x=1774980787;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/nbVlsaioYKF4sVSgiEokAiqvKpmQsI/mQ3o3FZFtp4=;
+        b=R4j/FKmvip00WCrljKsLiztjNdumdR8UcMkNv0RXpj1hBRYAGT4OHTL321zVQJWPPT
+         +rLMwIJgwMv5Wft5LI0rz2rE57Wysa7WOP+HOKBsKiZygnfpu2zFbm1byrz4IrF4i1yH
+         9WlV7+L3TLhi2deRXQMeBvxJ158XLXKN2npxeF52PC0K7ZT/TwUllLKYKgORbDbrXBcS
+         ThTQPIs33/Q/jzal0pAIjanTqlnN2QtI6VymK+ivuT3Mnu2egaaPe9oxF/Om4565hTkl
+         gVxQJA/q8oN3sJxp9RQ82aOSFPkNrd3+u6hH2G8Kh/vVvFPT7Okn7KW7rzlvGQaf5Qzc
+         mNRA==
+X-Forwarded-Encrypted: i=1; AJvYcCV1lhUd2F46ZPbnsBnb/Zh03x769UmaT+3NEmcpQNRruOfDYilJKNBGpPSfUsy4jLyvOZrKJUk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVyVY+wJpSYTmvGPRQ9ndTLj/EBlQFYs81SHupBmblLFmWOtoy
+	VghDTtqJT4lfAl3JquePPqzgtAhn0W4gegcHZkknAcJRK/CcX5j2zY8=
+X-Gm-Gg: ATEYQzzv/a1kxPxCnUH/EQE8l0Qg2Gq4LTdnq84nyHPjkFfDS5ZKGFjNYEVTwfPSqO0
+	x7TzJCUTymadd+WSMRSATNTw6FXb9mnHEuuwPsmUiMswoTluBI/zDm8JBn7BCOGxCojjPAD7Dqy
+	oyfXgQXMqBfSOHtOEHzipidoRKS6Nay4myS4MDpfVDprSvU4/07dedAgEkX2lNwVr8cEkT40vt6
+	4bVvEncAb1D3HFgtXe/qUNrKoPohX65iaLsStFm4IpVHyO7nvZpXkmyFuCoHbdq1Cdyj3uEA7Z/
+	VNGDve9hTefNvyscfnDqYfrkva/1qrVYbY+x16RgVdYJWukkrci3pxSQ3vC9nxRGMpCwersnk5K
+	qWuoZWv8pPAkVPyrOUMf7g8LzQaaCMzjUS6mT2xhH/jjkKQ6HcEVvMz0ydn/IpaKX9kakPWZDoV
+	B+wZc4agcRseAYcQjdP2FyTGr+12kfkkEJz7ezqmCIX0+16dxusyqcnAHDeSBklK04S1bBGFeXW
+	KYydE5OjuPdLF6R1g==
+X-Received: by 2002:a05:7022:69a:b0:11b:f056:a1b3 with SMTP id a92af1059eb24-12a96e5d9eamr272090c88.11.1774375986837;
+        Tue, 24 Mar 2026 11:13:06 -0700 (PDT)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12a7330d1c5sm11223913c88.0.2026.03.24.11.13.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2026 11:13:05 -0700 (PDT)
+Date: Tue, 24 Mar 2026 11:13:04 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	horms@kernel.org, corbet@lwn.net, skhan@linuxfoundation.org,
+	andrew+netdev@lunn.ch, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, saeedm@nvidia.com, tariqt@nvidia.com,
+	mbloch@nvidia.com, alexanderduyck@fb.com, kernel-team@meta.com,
+	johannes@sipsolutions.net, sd@queasysnail.net, jianbol@nvidia.com,
+	dtatulea@nvidia.com, mohsin.bashr@gmail.com,
+	jacob.e.keller@intel.com, willemb@google.com, skhawaja@google.com,
+	bestswngs@gmail.com, aleksandr.loktionov@intel.com, kees@kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	leon@kernel.org
+Subject: Re: [PATCH net-next v3 03/13] net: introduce ndo_set_rx_mode_async
+ and dev_rx_mode_work
+Message-ID: <acLUMN1BYkIVyOk8@mini-arch>
+Mail-Followup-To: Stanislav Fomichev <stfomichev@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	horms@kernel.org, corbet@lwn.net, skhan@linuxfoundation.org,
+	andrew+netdev@lunn.ch, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, saeedm@nvidia.com, tariqt@nvidia.com,
+	mbloch@nvidia.com, alexanderduyck@fb.com, kernel-team@meta.com,
+	johannes@sipsolutions.net, sd@queasysnail.net, jianbol@nvidia.com,
+	dtatulea@nvidia.com, mohsin.bashr@gmail.com,
+	jacob.e.keller@intel.com, willemb@google.com, skhawaja@google.com,
+	bestswngs@gmail.com, aleksandr.loktionov@intel.com, kees@kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	leon@kernel.org
+References: <20260320012501.2033548-1-sdf@fomichev.me>
+ <20260320012501.2033548-4-sdf@fomichev.me>
+ <20260323162003.0d155055@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 3/5] bpf: add helper masks for ADJ_ROOM flags and encap
- validation
-To: Nick Hudson <nhudson@akamai.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Max Tottenham <mtottenh@akamai.com>, Anna Glasgall <aglasgal@akamai.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260318134242.2725749-1-nhudson@akamai.com>
- <20260318134242.2725749-4-nhudson@akamai.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20260318134242.2725749-4-nhudson@akamai.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260323162003.0d155055@kernel.org>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271219-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,akamai.com,kernel.org,iogearbox.net,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-271220-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	FREEMAIL_CC(0.00)[fomichev.me,vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,lwn.net,linuxfoundation.org,lunn.ch,broadcom.com,intel.com,nvidia.com,fb.com,meta.com,sipsolutions.net,queasysnail.net,gmail.com,lists.osuosl.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[stfomichev@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,akamai.com:email,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: 90A0531A94E
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AE66F31A99A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/18/26 6:42 AM, Nick Hudson wrote:
-> Introduce helper masks for bpf_skb_adjust_room() flags to simplify
-> validation logic:
+On 03/23, Jakub Kicinski wrote:
+> On Thu, 19 Mar 2026 18:24:51 -0700 Stanislav Fomichev wrote:
+> > diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
+> > index 35704d115312..dc83d78d3b27 100644
+> > --- a/Documentation/networking/netdevices.rst
+> > +++ b/Documentation/networking/netdevices.rst
+> > @@ -289,6 +289,14 @@ struct net_device synchronization rules
+> >  ndo_set_rx_mode:
+> >  	Synchronization: netif_addr_lock spinlock.
+> >  	Context: BHs disabled
+> > +	Notes: Deprecated in favor of sleepable ndo_set_rx_mode_async.
+> > 
+> > +ndo_set_rx_mode_async:
+> > +	Synchronization: rtnl_lock() semaphore. In addition, netdev instance
+> > +	lock if the driver implements queue management or shaper API.
+> > +	Context: process (from a work queue)
+> > +	Notes: Sleepable version of ndo_set_rx_mode. Receives snapshots
 > 
-> - BPF_F_ADJ_ROOM_DECAP_L4_MASK
-> - BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK
-> - BPF_F_ADJ_ROOM_ENCAP_MASK
-> - BPF_F_ADJ_ROOM_DECAP_MASK
+> It's probably just my weirdness but I find creating adjectives out 
+> of random nouns by adding "-able" to be in poor taste. "sleepable"
+> took root in certain three letter subsystems but I hope it won't
+> in netdev.
 > 
-> Add flag validation to bpf_skb_net_grow() to reject invalid encap
-> flags early. Refactor existing validation checks in bpf_skb_net_shrink()
-> and bpf_skb_adjust_room() to use the new masks (no behavior change).
+> Please use your words:
 > 
-> Co-developed-by: Max Tottenham <mtottenh@akamai.com>
-> Signed-off-by: Max Tottenham <mtottenh@akamai.com>
-> Co-developed-by: Anna Glasgall <aglasgal@akamai.com>
-> Signed-off-by: Anna Glasgall <aglasgal@akamai.com>
-> Signed-off-by: Nick Hudson <nhudson@akamai.com>
-> ---
->   net/core/filter.c | 31 +++++++++++++++++++++++--------
->   1 file changed, 23 insertions(+), 8 deletions(-)
+> 	Notes: Async version of ndo_set_rx_mode which runs in process
+> 	context. Receives snapshots f the unicast and multicast address lists.
+
+SG, will do!
+ 
+> > +	of the unicast and multicast address lists.
+> >  
+> >  ndo_setup_tc:
+> >  	``TC_SETUP_BLOCK`` and ``TC_SETUP_FT`` are running under NFT locks
+> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > index 469b7cdb3237..b05bdd67b807 100644
+> > --- a/include/linux/netdevice.h
+> > +++ b/include/linux/netdevice.h
+> > @@ -1117,6 +1117,16 @@ struct netdev_net_notifier {
+> >   *	This function is called device changes address list filtering.
+> >   *	If driver handles unicast address filtering, it should set
+> >   *	IFF_UNICAST_FLT in its priv_flags.
+> > + *	Cannot sleep, called with netif_addr_lock_bh held.
+> > + *	Deprecated in favor of sleepable ndo_set_rx_mode_async.
+> > + *
+> > + * void (*ndo_set_rx_mode_async)(struct net_device *dev,
+> > + *				 struct netdev_hw_addr_list *uc,
+> > + *				 struct netdev_hw_addr_list *mc);
+> > + *	Sleepable version of ndo_set_rx_mode. Called from a work queue
+> > + *	with rtnl_lock and netdev_lock_ops(dev) held. The uc/mc parameters
+> > + *	are snapshots of the address lists - iterate with
+> > + *	netdev_hw_addr_list_for_each(ha, uc).
+> >   *
+> >   * int (*ndo_set_mac_address)(struct net_device *dev, void *addr);
+> >   *	This function  is called when the Media Access Control address
+> > @@ -1437,6 +1447,9 @@ struct net_device_ops {
+> >  	void			(*ndo_change_rx_flags)(struct net_device *dev,
+> >  						       int flags);
+> >  	void			(*ndo_set_rx_mode)(struct net_device *dev);
+> > +	void			(*ndo_set_rx_mode_async)(struct net_device *dev,
+> > +							 struct netdev_hw_addr_list *uc,
+> > +							 struct netdev_hw_addr_list *mc);
+> >  	int			(*ndo_set_mac_address)(struct net_device *dev,
+> >  						       void *addr);
+> >  	int			(*ndo_validate_addr)(struct net_device *dev);
+> > @@ -1903,6 +1916,7 @@ enum netdev_reg_state {
+> >   *				has been enabled due to the need to listen to
+> >   *				additional unicast addresses in a device that
+> >   *				does not implement ndo_set_rx_mode()
+> > + *	@rx_mode_work:		Work queue entry for ndo_set_rx_mode_async()
+> >   *	@uc:			unicast mac addresses
+> >   *	@mc:			multicast mac addresses
+> >   *	@dev_addrs:		list of device hw addresses
+> > @@ -2293,6 +2307,7 @@ struct net_device {
+> >  	unsigned int		promiscuity;
+> >  	unsigned int		allmulti;
+> >  	bool			uc_promisc;
+> > +	struct work_struct	rx_mode_work;
+> >  #ifdef CONFIG_LOCKDEP
+> >  	unsigned char		nested_level;
+> >  #endif
+> > @@ -4661,6 +4676,11 @@ static inline bool netif_device_present(const struct net_device *dev)
+> >  	return test_bit(__LINK_STATE_PRESENT, &dev->state);
+> >  }
+> >  
+> > +static inline bool netif_up_and_present(const struct net_device *dev)
+> > +{
+> > +	return (dev->flags & IFF_UP) && netif_device_present(dev);
 > 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 0d5d5a17acb2..7c2871b40fe4 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -3483,14 +3483,25 @@ static u32 bpf_skb_net_base_len(const struct sk_buff *skb)
->   #define BPF_F_ADJ_ROOM_DECAP_L3_MASK	(BPF_F_ADJ_ROOM_DECAP_L3_IPV4 | \
->   					 BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
->   
-> -#define BPF_F_ADJ_ROOM_MASK		(BPF_F_ADJ_ROOM_FIXED_GSO | \
-> -					 BPF_F_ADJ_ROOM_ENCAP_L3_MASK | \
-> +#define BPF_F_ADJ_ROOM_DECAP_L4_MASK	(BPF_F_ADJ_ROOM_DECAP_L4_UDP | \
-> +					 BPF_F_ADJ_ROOM_DECAP_L4_GRE)
-> +
-> +#define BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK	(BPF_F_ADJ_ROOM_DECAP_IPXIP4 | \
-> +					 BPF_F_ADJ_ROOM_DECAP_IPXIP6)
-> +
-> +#define BPF_F_ADJ_ROOM_ENCAP_MASK	(BPF_F_ADJ_ROOM_ENCAP_L3_MASK | \
->   					 BPF_F_ADJ_ROOM_ENCAP_L4_GRE | \
->   					 BPF_F_ADJ_ROOM_ENCAP_L4_UDP | \
->   					 BPF_F_ADJ_ROOM_ENCAP_L2_ETH | \
->   					 BPF_F_ADJ_ROOM_ENCAP_L2( \
-> -					  BPF_ADJ_ROOM_ENCAP_L2_MASK) | \
-> -					 BPF_F_ADJ_ROOM_DECAP_L3_MASK)
-> +					  BPF_ADJ_ROOM_ENCAP_L2_MASK))
-> +
-> +#define BPF_F_ADJ_ROOM_DECAP_MASK	(BPF_F_ADJ_ROOM_DECAP_L3_MASK)
-> +
-> +#define BPF_F_ADJ_ROOM_MASK		(BPF_F_ADJ_ROOM_FIXED_GSO | \
-> +					 BPF_F_ADJ_ROOM_ENCAP_MASK | \
-> +					 BPF_F_ADJ_ROOM_DECAP_MASK | \
-> +					 BPF_F_ADJ_ROOM_NO_CSUM_RESET)
+> Is this really worth a dedicated helper? What are you trying to express
+> here semantically?
 
-The patch does two things: refactoring of existing macros 
-(BPF_F_ADJ_ROOM_ENCAP_MASK, BPF_F_ADJ_ROOM_DECAP_MASK) and new additions 
-(BPF_F_ADJ_ROOM_DECAP_L4_MASK, BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK) that 
-depend on the new flags from the UAPI changes in patch 2.
+I mostly added it to avoid repeating the same present & UP check. Will
+undo.
 
-The refactoring does not depend on the new UAPI flags and could be a 
-separate patch placed earlier in the series. That way a reviewer can 
-verify it is a no-op without the new flag additions getting in
-the way. The (BPF_F_ADJ_ROOM_DECAP_L4_MASK, 
-BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK) can be introduced together in patch 4 
-when it is first used.
+> > +
+> >  void netif_device_detach(struct net_device *dev);
+> >  
+> >  void netif_device_attach(struct net_device *dev);
+> > diff --git a/net/core/dev.c b/net/core/dev.c
+> > index 200d44883fc1..fedc423306fc 100644
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -2381,6 +2381,8 @@ static void netstamp_clear(struct work_struct *work)
+> >  static DECLARE_WORK(netstamp_work, netstamp_clear);
+> >  #endif
+> >  
+> > +static struct workqueue_struct *rx_mode_wq;
+> > +
+> >  void net_enable_timestamp(void)
+> >  {
+> >  #ifdef CONFIG_JUMP_LABEL
+> > @@ -9669,22 +9671,84 @@ int netif_set_allmulti(struct net_device *dev, int inc, bool notify)
+> >  	return 0;
+> >  }
+> >  
+> > -/*
+> > - *	Upload unicast and multicast address lists to device and
+> > - *	configure RX filtering. When the device doesn't support unicast
+> > - *	filtering it is put in promiscuous mode while unicast addresses
+> > - *	are present.
+> > +static void dev_rx_mode_work(struct work_struct *work)
+> > +{
+> > +	struct net_device *dev = container_of(work, struct net_device,
+> > +					      rx_mode_work);
+> > +	struct netdev_hw_addr_list uc_snap, mc_snap, uc_ref, mc_ref;
+> > +	const struct net_device_ops *ops = dev->netdev_ops;
+> > +	int err;
+> > +
+> > +	__hw_addr_init(&uc_snap);
+> > +	__hw_addr_init(&mc_snap);
+> > +	__hw_addr_init(&uc_ref);
+> > +	__hw_addr_init(&mc_ref);
+> > +
+> > +	rtnl_lock();
+> > +	netdev_lock_ops(dev);
+> > +
+> > +	if (!netif_up_and_present(dev))
+> > +		goto out;
+> > +
+> > +	if (ops->ndo_set_rx_mode_async) {
+> 
+> How did we get here if we don't have this op?
+> Are you planning to plumb more code thru this work in the future?
+> If yes the whole rx_mode handling should be in a dedicated helper
+> rather than indenting most of the function.
 
->   
->   static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
->   			    u64 flags)
-> @@ -3502,6 +3513,11 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
->   	unsigned int gso_type = SKB_GSO_DODGY;
->   	int ret;
->   
-> +	if (unlikely(flags & ~(BPF_F_ADJ_ROOM_ENCAP_MASK |
-> +			       BPF_F_ADJ_ROOM_NO_CSUM_RESET |
-> +			       BPF_F_ADJ_ROOM_FIXED_GSO)))
+I do expand this, yes, in the subsequent patches. With promisc
+handling (ndo_change_rx_flags) and ndo_set_rx_mode fallback. Let me try
+to see if I can add some helper+struct to manage a set of snapshots
+to make it a bit more clear.
 
-Under which case this new check will be hit?
+> > +		netif_addr_lock_bh(dev);
+> > +
+> > +		err = __hw_addr_list_snapshot(&uc_snap, &dev->uc,
+> > +					      dev->addr_len);
+> > +		if (!err)
+> > +			err = __hw_addr_list_snapshot(&uc_ref, &dev->uc,
+> > +						      dev->addr_len);
+> > +		if (!err)
+> > +			err = __hw_addr_list_snapshot(&mc_snap, &dev->mc,
+> > +						      dev->addr_len);
+> > +		if (!err)
+> > +			err = __hw_addr_list_snapshot(&mc_ref, &dev->mc,
+> > +						      dev->addr_len);
+> 
+> This doesn't get slow with a few thousands of addresses?
 
-> +		return -EINVAL;
-> +
->   	if (skb_is_gso(skb) && !skb_is_gso_tcp(skb)) {
->   		/* udp gso_size delineates datagrams, only allow if fixed */
->   		if (!(skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4) ||
-> @@ -3611,8 +3627,8 @@ static int bpf_skb_net_shrink(struct sk_buff *skb, u32 off, u32 len_diff,
->   {
->   	int ret;
->   
-> -	if (unlikely(flags & ~(BPF_F_ADJ_ROOM_FIXED_GSO |
-> -			       BPF_F_ADJ_ROOM_DECAP_L3_MASK |
-> +	if (unlikely(flags & ~(BPF_F_ADJ_ROOM_DECAP_MASK |
-> +			       BPF_F_ADJ_ROOM_FIXED_GSO |
->   			       BPF_F_ADJ_ROOM_NO_CSUM_RESET)))
->   		return -EINVAL;
->   
-> @@ -3708,8 +3724,7 @@ BPF_CALL_4(bpf_skb_adjust_room, struct sk_buff *, skb, s32, len_diff,
->   	u32 off;
->   	int ret;
->   
-> -	if (unlikely(flags & ~(BPF_F_ADJ_ROOM_MASK |
-> -			       BPF_F_ADJ_ROOM_NO_CSUM_RESET)))
-> +	if (unlikely(flags & ~BPF_F_ADJ_ROOM_MASK))
->   		return -EINVAL;
->   	if (unlikely(len_diff_abs > 0xfffU))
->   		return -EFAULT;
+I can add kunit benchmark and attach the output? Although not sure where
+to go from that. The alternative to this is allocating an array of entries.
+I started with that initially but __hw_addr_sync_dev wants to kfree the
+individual entries and I decided not to have a separate helpers to
+manage the snapshots.
 
+> > +		netif_addr_unlock_bh(dev);
+> > +
+> > +		if (err) {
+> > +			netdev_WARN(dev, "failed to sync uc/mc addresses\n");
+> > +			__hw_addr_flush(&uc_snap);
+> > +			__hw_addr_flush(&uc_ref);
+> > +			__hw_addr_flush(&mc_snap);
+> > +			goto out;
+> > +		}
+> > +
+> > +		ops->ndo_set_rx_mode_async(dev, &uc_snap, &mc_snap);
+> > +
+> > +		netif_addr_lock_bh(dev);
+> > +		__hw_addr_list_reconcile(&dev->uc, &uc_snap,
+> > +					 &uc_ref, dev->addr_len);
+> > +		__hw_addr_list_reconcile(&dev->mc, &mc_snap,
+> > +					 &mc_ref, dev->addr_len);
+> > +		netif_addr_unlock_bh(dev);
+> > +	}
+> > +
+> > +out:
+> > +	netdev_unlock_ops(dev);
+> > +	rtnl_unlock();
+> > +}
+> > +
+> > +/**
+> > + * __dev_set_rx_mode() - upload unicast and multicast address lists to device
+> > + * and configure RX filtering.
+> > + * @dev: device
+> > + *
+> > + * When the device doesn't support unicast filtering it is put in promiscuous
+> > + * mode while unicast addresses are present.
+> >   */
+> >  void __dev_set_rx_mode(struct net_device *dev)
+> >  {
+> >  	const struct net_device_ops *ops = dev->netdev_ops;
+> >  
+> >  	/* dev_open will call this function so the list will stay sane. */
+> > -	if (!(dev->flags&IFF_UP))
+> > +	if (!netif_up_and_present(dev))
+> >  		return;
+> >  
+> > -	if (!netif_device_present(dev))
+> > +	if (ops->ndo_set_rx_mode_async) {
+> > +		queue_work(rx_mode_wq, &dev->rx_mode_work);
+> >  		return;
+> > +	}
+> >  
+> >  	if (!(dev->priv_flags & IFF_UNICAST_FLT)) {
+> >  		/* Unicast addresses changes may only happen under the rtnl,
+> > @@ -11708,6 +11772,16 @@ void netdev_run_todo(void)
+> >  
+> >  	__rtnl_unlock();
+> >  
+> > +	/* Make sure all pending rx_mode work completes before returning.
+> > +	 *
+> > +	 * rx_mode_wq may be NULL during early boot:
+> > +	 * core_initcall(netlink_proto_init) vs subsys_initcall(net_dev_init).
+> > +	 *
+> > +	 * Check current_work() to avoid flushing from the wq.
+> > +	 */
+> > +	if (rx_mode_wq && !current_work())
+> > +		flush_workqueue(rx_mode_wq);
+> 
+> Can we give the work a reference on the netdev (at init time) and
+> cancel + release it here instead of flushing / waiting?
+
+Not sure why cancel+release, maybe you're thinking about the unregister
+path? This is rtnl_unlock -> netdev_run_todo -> __rtnl_unlock + some
+extras.
+
+And the flush is here to plumb the addresses to the real devices
+before we return to the callers. Mostly because of the following
+things we have in the tests:
+
+# TEST: team cleanup mode lacp                                        [FAIL]
+#       macvlan unicast address not found on a slave
+
+Can you explain a bit more on the suggestion?
+
+> >  	/* Wait for rcu callbacks to finish before next phase */
+> >  	if (!list_empty(&list))
+> >  		rcu_barrier();
+> > @@ -12099,6 +12173,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+> >  #endif
+> >  
+> >  	mutex_init(&dev->lock);
+> > +	INIT_WORK(&dev->rx_mode_work, dev_rx_mode_work);
+> >  
+> >  	dev->priv_flags = IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM;
+> >  	setup(dev);
+> > @@ -12203,6 +12278,8 @@ void free_netdev(struct net_device *dev)
+> >  
+> >  	kfree(rcu_dereference_protected(dev->ingress_queue, 1));
+> >  
+> > +	cancel_work_sync(&dev->rx_mode_work);
+> 
+> Should never happen so maybe wrap it in a WARN ?
+
+Or maybe just flush_workqueue here as well? To signal the intent that we
+are mostly waiting for the wq entry to be unused to be able to kfree it?
 
