@@ -1,204 +1,175 @@
-Return-Path: <netdev+bounces-271166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271167-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gKt/DvG8wmlflQQAu9opvQ
-	(envelope-from <netdev+bounces-271166-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:33:53 +0100
+	id OCLzJXK8wmlilAQAu9opvQ
+	(envelope-from <netdev+bounces-271167-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:31:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 350B6319135
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:33:52 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DAB43190C6
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:31:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EA63C30529C6
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:19:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 14406303322E
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76BEF3D3CF9;
-	Tue, 24 Mar 2026 16:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DCA282F04;
+	Tue, 24 Mar 2026 16:21:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UvWNF0wg";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rUmU6YOm"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="l/AQqzJu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25486282F04
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 16:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116153890F2;
+	Tue, 24 Mar 2026 16:21:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774369141; cv=none; b=hsaWUfNDbhQgHLhQcsZudUAi42/Hc+0t4gFWXw1zgsCRicwzJQHsYx6EKDItnxRVENauMqQpqebNfiDRGjm1tEcJEX+mXw+AsbTngm7uQPhcCRBNlRoM9M2A31jaH7HBLrs36rVQk9o1T9kedaPnPagm4NYf0o2GqSK6WDIIVfA=
+	t=1774369264; cv=none; b=Y3e/a3UBccJESRTtkw6o4JWrDiNA2akRm9h/n7JA1XYh1uW8VYz/WewfCqA3UW+mM5zxK3LNdi9FIBDpgTc73mYhPQQ8dOBHUVrOBfztsZP6p3yaKijaK6qHC8MBxb97anFeqSuXYjQ39mXySgOgAkZwbFw2dnA2gsUzx5sLxRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774369141; c=relaxed/simple;
-	bh=j2vmMAgZBEIHOIcyw/exgvoqxhaoAAncNtLEhyVK7V8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Z1naIY26aTR95VLyIfddJ+EUQjZGl5115z+NmPO8U3O9K0ch+FafTeiclzI5gGXpopqm3NsIM6mmDiO4o5njCVsjsLM96FE5QHdBWyiWAt2fTR2Ut17D2Q2EYeVeJ0Srp87echpBg6bgz/ysFSVRTRm+80tuvtzUk33ApqelgJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UvWNF0wg; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rUmU6YOm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774369139;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0pLGEONAHfojUOfaOSp5cChM4XB6HpkP9CDLtETY2Zg=;
-	b=UvWNF0wgSnxfP19DhIuC8JjD76fiIkslCDX4/NMpmxQjVX4QBESwrbJJDbBDYIjiZM21/w
-	HtU27K8qMP0CfUO4RM7dbJrJaBEvfkSSEvjugzhh2QF09LhIyK8Aw8gQGls1GFxookIIMX
-	HlEicRAq+l6D/vQK/CpMRxgdEeGD4ew=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-7-2IYQzY20OySdedpTlCGzuw-1; Tue, 24 Mar 2026 12:18:57 -0400
-X-MC-Unique: 2IYQzY20OySdedpTlCGzuw-1
-X-Mimecast-MFC-AGG-ID: 2IYQzY20OySdedpTlCGzuw_1774369137
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-439bcec86dfso4569654f8f.3
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 09:18:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774369137; x=1774973937; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0pLGEONAHfojUOfaOSp5cChM4XB6HpkP9CDLtETY2Zg=;
-        b=rUmU6YOm3ZCZMZ7EHRgBKorXwzUWJWZyvVQK2SXrCg0xIYrY28uBtwIT4j0wrCZOIq
-         /GRGXn/UnVt5NfO3Mls1U1Ekx/w0M6seRDG+T4BTaurcKpQlnit7qfYnVBmmmmiJ6RDx
-         MFq8Rh+CQUgHb/CBoM0XKX1WtJo/4MZjkruQBBwW65VjtlhrhwOyaFhbmpF91R7iY3oW
-         SKcdCmb1T4EuAjfw0iq/pDCufgTmGFYA0Hx9fSo3VWjTx53FjxVCmuw3J/lwqQSp47kj
-         RtLHSvMECkQfCmVy8+D6FFworxn8+EsTstLaureeD9XjKhLU+/Ij1ugvz1QzeJyRAscF
-         h+IA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774369137; x=1774973937;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0pLGEONAHfojUOfaOSp5cChM4XB6HpkP9CDLtETY2Zg=;
-        b=Qryn9wHJ8ccHQmbp7G4LeJzmkRYQ+yMNAjyqsHptzry+F4awIMJ9b0xyqXlsxqmn4+
-         3/cGdN/sDY8Pb0HkPc3ItRpZwCU1ulYNWmt8hJD2xiwulYFgLHeQ4pSh98MvrZgn6upK
-         24sXTjnWok0cLSIKQrc6Un1RXrHaxuFYRCYHmov9AR11cGT/Z+Yj0QlggqgdXRLosHTY
-         S9F3EvEL+qSiOJ8NwmFVrkvSUQf+9p4bTSCm+hw8uNwniaQXjFte/R1GRrXx4g3N5Taz
-         c4/52OuBmX15HadRyRBucrXnjJ0to6BULsfM3YYGNWkC5Q99pVnfWMpn1HXhc2806JlV
-         XDhg==
-X-Forwarded-Encrypted: i=1; AJvYcCXdGkptH3zGAiwrkXJQmMb0yasllEGxzTydeIn12t9TR50mBG5BIj1deEPD3zc68oYBb8RfrKk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yznl8tk530/7NktS9OSZzNdjys3T8r55iUbJb5xdhvNvF3OhFDX
-	FrBN7JwiIs4tcwqDzPUxbCnRA+Y6tnZygPhF0Osrdb9sHdwj0mFiCl/yD37/zn5WmuCR//c8415
-	LdSqwzMrNLucwM7ZWtfzB+IF9fodBmGLpAvrPS23jZaOZGkTIXUjzdR+gZg==
-X-Gm-Gg: ATEYQzzaa9Kk8lU1HILMzVtdq3pf7OxpX0QEoquj8/VHjxz67KYpFLElxnSh8vWI6em
-	q6volcmsUlUeh+++eaOloAH/9Wbx6GUB5rg68l3wbma6VVhmq64m+z/j9T6dUbXbIx15+1Q6udi
-	xjxGSr2K4EhXAKitm83XboX44/YLEAe8IDXK3hUZCPTN0VElqOCcNGNhFsmyzlPe8OOpPwl8pUj
-	UO0ljthv7BQDuVjeNZjMOWAzye6pCQ+birmWyp3O4J5ImHLusoEnSRoNd/Mj88yvEkwdSdwtmGS
-	MuiImfYn2TqlWXIYnGLTICYY6RqdJbCZNtOqBTIi6kasOnMniEFurcQX05dzZd7PEYqpJoKr+Fb
-	rkCIRpqZ8HHHTG6Yc5EFeo0SPSqYC3pxFYMkCUIU0KdZqHmts
-X-Received: by 2002:a05:6000:2509:b0:43b:4920:56bb with SMTP id ffacd0b85a97d-43b88a0cfc1mr107791f8f.52.1774369136503;
-        Tue, 24 Mar 2026 09:18:56 -0700 (PDT)
-X-Received: by 2002:a05:6000:2509:b0:43b:4920:56bb with SMTP id ffacd0b85a97d-43b88a0cfc1mr107724f8f.52.1774369135946;
-        Tue, 24 Mar 2026 09:18:55 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b64717e97sm41173985f8f.35.2026.03.24.09.18.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 09:18:55 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 24AE35A470F; Tue, 24 Mar 2026 17:18:54 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Leon Hwang <leon.hwang@linux.dev>, bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, Andrii
- Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong
- Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard
- Brouer <hawk@kernel.org>, Leon Hwang <leon.hwang@linux.dev>, Lorenzo
- Bianconi <lorenzo@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
- kernel-patches-bot@fb.com
-Subject: Re: [PATCH bpf-next 1/3] bpf: Disallow freplace on XDP with
- mismatched xdp_has_frags values
-In-Reply-To: <20260324150444.68166-2-leon.hwang@linux.dev>
-References: <20260324150444.68166-1-leon.hwang@linux.dev>
- <20260324150444.68166-2-leon.hwang@linux.dev>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 24 Mar 2026 17:18:54 +0100
-Message-ID: <87ecl9mc9d.fsf@toke.dk>
+	s=arc-20240116; t=1774369264; c=relaxed/simple;
+	bh=1O4qlTr0SZKJaL1c+pjsoKfOTJVqPzxut455oCKmmWc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nWoV3TJAlbL0/t653AlGJtw75cb261gdIpJjmxRzPHoAtHAjZaNPQ3eWFQoqW6PTlzmoFGaGeMG3O1+2GpB+6H6rDV7ZNg8sDI+6BRe8TsHu/voyjkwo0uLOyr3vL2AU0Rn3Nr0Xy2yYon8JVxqTuNFS/C7reLikqWLZqBpbJvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=l/AQqzJu; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 854E420B710C; Tue, 24 Mar 2026 09:20:56 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 854E420B710C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1774369256;
+	bh=sohZqkUXjRVYyy6RCji9EibAC1u4YLkQoigRfQpN3Z0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=l/AQqzJuyoNafCLsypCDl3YfsmQOMNmJRndylNsqSqs+siVCETgTXFxecayOuCxd1
+	 2ox7yuCLtD8RPlU6OnDt0xGbGGecYMPw1dVziKJnN4ZrjsIMmfd/w+PTO4dVemik0w
+	 iW/jYqV1Zvm/1lJQBXJLQqe1dot1jJ8Gsf7atTYU=
+Date: Tue, 24 Mar 2026 09:20:56 -0700
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, shirazsaleem@microsoft.com,
+	dipayanroy@linux.microsoft.com, yury.norov@gmail.com,
+	kees@kernel.org, ssengar@linux.microsoft.com,
+	gargaditya@linux.microsoft.com, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next v4] net: mana: Expose hardware diagnostic info
+ via debugfs
+Message-ID: <acK56AlPfVW8cDPe@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260319070926.1459515-1-ernis@linux.microsoft.com>
+ <20260323174444.2717da3d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spamd-Result: default: False [0.37 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260323174444.2717da3d@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.53)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,google.com,davemloft.net,vger.kernel.org,fb.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-271166-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-271167-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:email,toke.dk:mid];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 350B6319135
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
+X-Rspamd-Queue-Id: 9DAB43190C6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Leon Hwang <leon.hwang@linux.dev> writes:
+On Mon, Mar 23, 2026 at 05:44:44PM -0700, Jakub Kicinski wrote:
+> On Thu, 19 Mar 2026 00:09:13 -0700 Erni Sri Satya Vennela wrote:
+> > Add debugfs entries to expose hardware configuration and diagnostic
+> > information that aids in debugging driver initialization and runtime
+> > operations without adding noise to dmesg.
+> > 
+> > The debugfs directory creation and removal for each PCI device is
+> > integrated into mana_gd_setup() and mana_gd_cleanup_device()
+> > respectively, so that all callers (probe, remove, suspend, resume,
+> > shutdown) share a single code path.
+> > 
+> > Device-level entries (under /sys/kernel/debug/mana/<slot>/):
+> >   - num_msix_usable, max_num_queues: Max resources from hardware
+> >   - gdma_protocol_ver, pf_cap_flags1: VF version negotiation results
+> >   - num_vports, bm_hostmode: Device configuration
+> > 
+> > Per-vPort entries (under /sys/kernel/debug/mana/<slot>/vportN/):
+> >   - port_handle: Hardware vPort handle
+> >   - max_sq, max_rq: Max queues from vPort config
+> >   - indir_table_sz: Indirection table size
+> >   - steer_rx, steer_rss, steer_update_tab, steer_cqe_coalescing:
+> >     Last applied steering configuration parameters
+> 
+> AI says:
+> 
+> > @@ -1918,15 +1930,23 @@ static int mana_gd_setup(struct pci_dev *pdev)
+> >  	struct gdma_context *gc = pci_get_drvdata(pdev);
+> >  	int err;
+> >  
+> > +	if (gc->is_pf)
+> > +		gc->mana_pci_debugfs = debugfs_create_dir("0", mana_debugfs_root);
+> > +	else
+> > +		gc->mana_pci_debugfs = debugfs_create_dir(pci_slot_name(pdev->slot),
+> > +							  mana_debugfs_root);
+> 
+> If pdev->slot is NULL (which can happen for VFs in environments like generic
+> VFIO passthrough or nested KVM), will pci_slot_name(pdev->slot) cause a
+> NULL pointer dereference?
+> 
+> Also, could this naming scheme cause name collisions? If multiple PFs are
+> present, they would all try to use "0". Similarly, VFs across different
+> PCI domains or buses might share the same physical slot identifier, leading
+> to -EEXIST errors. Would it be safer to use the unique PCI BDF via
+> pci_name(pdev) instead?
+Yes. that is a better way to handle it. I will use pci_name. We can
+remove if-else and use only one for both the cases.
+> 
+> > @@ -3141,6 +3149,24 @@ static int mana_init_port(struct net_device *ndev)
+> >  	eth_hw_addr_set(ndev, apc->mac_addr);
+> >  	sprintf(vport, "vport%d", port_idx);
+> >  	apc->mana_port_debugfs = debugfs_create_dir(vport, gc->mana_pci_debugfs);
+> > +
+> > +	debugfs_create_u64("port_handle", 0400, apc->mana_port_debugfs,
+> > +			   &apc->port_handle);
+> 
+> When operations like changing the MTU or setting an XDP program trigger a
+> detach/attach cycle, mana_detach() invokes mana_cleanup_port_context(),
+> which recursively removes the apc->mana_port_debugfs directory.
+> During re-attachment, mana_attach() calls mana_init_port(), which
+> recreates the directory and the new files added in this patch. However, the
+> pre-existing current_speed file (created in mana_probe_port()) is not
+> recreated here.
+> 
+> Does this cause the current_speed file to be permanently lost after a
+> detach/attach cycle? Should the creation of current_speed be moved to
+> mana_init_port() so it survives the cycle?
+Yes that is correct.
 
-> xdp_has_frags was introduced by the commit
-> c2f2cdbeffda ("bpf: introduce BPF_F_XDP_HAS_FRAGS flag in prog_flags loading the ebpf program").
->
-> The commit f45d5b6ce2e8 ("bpf: generalise tail call map compatibility check")
-> was to ensure backwards compatibility against tail calls. However, it
-> missed that XDP progs can be extended by freplace progs, which could break
-> the backwards compatibility, e.g. xdp_has_frags=true freplace progs are
-> allowed to attach to xdp_has_frags=false XDP progs.
->
-> To avoid breaking the backwards compatibility via freplace, disallow
-> freplace on XDP programs with different xdp_has_frags values.
-
-The problem you describe is not actually a problem, though? A
-frags-aware program can run on a non-frags interface just fine.
-
-You're messing with long-standing behaviour (since 5.18!) to solve a
-non-existent problem. In a way that completely breaks the frags handling
-in libxdp[0]:
-
-    Running tests from ./test-libxdp.sh
-     [test_link_so]                PASS
-     [test_link_a]                 PASS
-     [test_old_dispatcher]         PASS
-     [test_xdp_devbound]           PASS
-     [test_xdp_frags]              FAIL
-          Kernel supports XDP programs with frags
-          check_load_frags:	FAILED
-          check_load_nofrags_success:	PASSED
-          check_load_nofrags_fail:	PASSED
-          check_load_frags_multi:	FAILED
-          check_load_mix_big:	FAILED
-          check_load_mix_small:	FAILED
-          Test test_xdp_frags exited with return code: 1
-
-
-Please don't do that.
-
--Toke
-
-[0] Run 'make test' here: https://github.com/xdp-project/xdp-tools
-
+Since these issues are pre-existing and not introduced from my patch.
+I'll plan to send them as different patch with fixes tag.
+> -- 
+> pw-bot: cr
 
