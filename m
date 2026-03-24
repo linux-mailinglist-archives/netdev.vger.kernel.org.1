@@ -1,174 +1,153 @@
-Return-Path: <netdev+bounces-270966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270970-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yHSaIwRiwmmecAQAu9opvQ
-	(envelope-from <netdev+bounces-270966-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:05:56 +0100
+	id iOXDLftkwmmecAQAu9opvQ
+	(envelope-from <netdev+bounces-270970-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:18:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FD2A3062E0
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:05:55 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C225430658C
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:18:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 111F730379C2
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 09:55:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 838303036A30
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 10:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D9F3DDDC1;
-	Tue, 24 Mar 2026 09:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9E43D3494;
+	Tue, 24 Mar 2026 10:05:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="SxwmUWHi";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="syeEvkFr";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="SxwmUWHi";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="syeEvkFr"
+	dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b="ahnUYhlW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-106.mailbox.org (mout-b-106.mailbox.org [195.10.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958363DCD88
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 09:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF7A37C0FD;
+	Tue, 24 Mar 2026 10:05:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774346134; cv=none; b=TU+Ky3NAyQWSBtGATxZozN3wW5LygAOI59p2TAgv/jhi8gwuoB3grEBeq9ANq7IZMmWTNllPJ0OMaYCljDb6z/2T6dNfFFfeJ1nkqEi33MgCEJZTfZdlC3xSYhm2aBv3Gbli4V6pouV5DVIRi3loCgjzK2t7MYN/0KteJolPaio=
+	t=1774346730; cv=none; b=hVTIZjrBq7M9Ukw5r7v7mZUwOBqHmqNxEVIRufyeQ/58fm/ZGfcChb8AmPAyk0QwKK45FK+4S2pkVdUf3Sm1kHUZX9Hlx5W07YrGczRr1KiDROKRppwavMSUJJHCGhJrMzqNajm/umAP5WBfmqo0tfsYi32kHYrnAVakcQ2OzZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774346134; c=relaxed/simple;
-	bh=kQXSrqH+bBHyZU8Ikga3QmufCvLi6niQGDxpCGfL+3o=;
+	s=arc-20240116; t=1774346730; c=relaxed/simple;
+	bh=iOk4MpBw/M31wTnsZ1RhmmaaOHkTDuosSlYoFiRnUWE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HJpDGJtvo8ol9Quoz0rJujLahJ40JhlwNZ7GSJLhQbMNdL2/KY5XPWKFJd/Xo5dwJtuOS+JgICqK/Fu9LHe3oQOMMzxtf8fpVBpzejQ+vkZFOAeoitpzh9jfosxpjQsEsV/PaxskEOxIjk8IwYz9QetfCSjOe/tmMzV8IlymoNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=SxwmUWHi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=syeEvkFr; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=SxwmUWHi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=syeEvkFr; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	 In-Reply-To:Content-Type; b=c5E3GHJUHItZ0gztyJrjbFyRT/DuPsF9KYSEJdjJWnMYHr0D5VDmFq2ZGvm6SwmVf9VG/HtLUBkbvOr80IFhmgPmczkQxqADKIrTf1zulLFqBTYkDa3/d4UhwpTQAz4q5BLcHw3DWQyDbAVNRzPKRn3h8OhhjUjVI8cE1hd7sQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=ahnUYhlW; arc=none smtp.client-ip=195.10.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mandelbit.com
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B965D5BCC1;
-	Tue, 24 Mar 2026 09:55:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1774346130; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	by mout-b-106.mailbox.org (Postfix) with ESMTPS id 4fg55B2S4LzDsCj;
+	Tue, 24 Mar 2026 10:55:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
+	s=MBO0001; t=1774346142;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VI3RmIUNecDumCgUvYIUS8Oe2HB5G8HAfqwqqKdnkiQ=;
-	b=SxwmUWHiFIemAPlF+oRiBFnJe+AXQp9/6icj/bRaV4SLehFhB2ipHkQBmiC/zTVJZjOjU0
-	EDntxw0h0Von9GJAbfM8YUEvzclQta9Id02u7E6yldgubXN73dQrDdJOJEq1a+kWEot9wy
-	2ZJIpyp0O3LgN9ZtsSRfKmQA/ZlxyCc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1774346130;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VI3RmIUNecDumCgUvYIUS8Oe2HB5G8HAfqwqqKdnkiQ=;
-	b=syeEvkFr6rwPEOFGGZd35V/arJSKlQGdF/T+VsIw0c42v1hD1v235e2ZVyg0IN98DgdIYO
-	ckH0nAgRfpL20ZBg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=SxwmUWHi;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=syeEvkFr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1774346130; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VI3RmIUNecDumCgUvYIUS8Oe2HB5G8HAfqwqqKdnkiQ=;
-	b=SxwmUWHiFIemAPlF+oRiBFnJe+AXQp9/6icj/bRaV4SLehFhB2ipHkQBmiC/zTVJZjOjU0
-	EDntxw0h0Von9GJAbfM8YUEvzclQta9Id02u7E6yldgubXN73dQrDdJOJEq1a+kWEot9wy
-	2ZJIpyp0O3LgN9ZtsSRfKmQA/ZlxyCc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1774346130;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VI3RmIUNecDumCgUvYIUS8Oe2HB5G8HAfqwqqKdnkiQ=;
-	b=syeEvkFr6rwPEOFGGZd35V/arJSKlQGdF/T+VsIw0c42v1hD1v235e2ZVyg0IN98DgdIYO
-	ckH0nAgRfpL20ZBg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5516443D95;
-	Tue, 24 Mar 2026 09:55:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id hNXhEZJfwmm3QQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Tue, 24 Mar 2026 09:55:30 +0000
-Message-ID: <08247bfa-b67b-4c66-aa09-71ebdbca0df0@suse.de>
-Date: Tue, 24 Mar 2026 10:55:21 +0100
+	bh=qGp6oK32+2KYSJuSOvHbkz30Wr78JyXTMl4CwcYEEr0=;
+	b=ahnUYhlWJmntdruJTCkVfX9TojiM2SLUWOWMM4qFy5I8N6+vKRbkzh6j1DyeUCE2SBEU2V
+	AF61EED7aSB35m93u1ernmXCqLL/I+DLaHyNiLJ2JYR4JJ0aig4NM/jEPAQRrIEflyj95o
+	orrk4MvcH6kM5LSZlq8oDyb2bOeIVdoGcnuVOYiFIWwItuog54JqpWyoRFpAZZSuuCkiFh
+	8KPGFQa6tYGATZMPXAT7RBAQzLqI0a+jVkf9RSb1OaqNZ3CMUxsR3Ou5x1cuJ9EAC1AA5k
+	78TJPzb9n77/ABScSikCgSO8J9m2oa16cTPgK2T+K9Rn8azg9Sh0ucApxMnHag==
+Message-ID: <a5bd6824-ef48-48f7-8c94-4a00f4aa01c2@mandelbit.com>
+Date: Tue, 24 Mar 2026 10:55:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next] bpf: test_run: Remove ipv6_bpf_stub usage
-To: Martin KaFai Lau <martin.lau@linux.dev>, bpf@vger.kernel.org
-Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
- 'Andrii Nakryiko ' <andrii@kernel.org>,
- 'Daniel Borkmann ' <daniel@iogearbox.net>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>
-References: <20260323225250.1623542-1-martin.lau@linux.dev>
+Subject: Re: [RFC net-next 15/15] Documentation: networking: add ipxlat
+ translator guide
+To: Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org
+Cc: =?UTF-8?Q?Daniel_Gr=C3=B6ber?= <dxld@darkboxed.org>,
+ Antonio Quartulli <antonio@mandelbit.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260319151230.655687-1-ralf@mandelbit.com>
+ <20260319151230.655687-16-ralf@mandelbit.com> <87se9vh3ls.fsf@trenco.lwn.net>
 Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260323225250.1623542-1-martin.lau@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.16 / 15.00];
+From: Ralf Lici <ralf@mandelbit.com>
+In-Reply-To: <87se9vh3ls.fsf@trenco.lwn.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[mandelbit.com:s=MBO0001];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[mandelbit.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270966-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270970-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mandelbit.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8FD2A3062E0
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mandelbit.com:dkim,mandelbit.com:email,mandelbit.com:mid,darkboxed.org:email]
+X-Rspamd-Queue-Id: C225430658C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/23/26 11:52 PM, Martin KaFai Lau wrote:
-> From: Martin KaFai Lau <martin.lau@kernel.org>
-> 
-> bpf_prog_test_run_skb() uses net->ipv6.ip6_null_entry for
-> BPF_PROG_TYPE_LWT_XMIT test runs.
-> 
-> It currently checks ipv6_bpf_stub before using ip6_null_entry.
-> ipv6_bpf_stub will be removed by the CONFIG_IPV6=m support removal
-> series posted at [1], so switch this check to ipv6_mod_enabled()
-> instead.
-> 
-> This change depends on that series [1]. Without it, CONFIG_IPV6=m is
-> still possible, and net->ipv6.ip6_null_entry remains NULL until
-> the IPv6 module is loaded.
-> 
-> [1] https://lore.kernel.org/netdev/20260320185649.5411-1-fmancera@suse.de/
-> 
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Fernando Fernandez Mancera <fmancera@suse.de>
-> Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
-> ---
 
-LGTM!
 
-Reviewed-by: Fernando Fernandez Mancera <fmancera@suse.de>
+On 3/19/26 23:11, Jonathan Corbet wrote:
+> Ralf Lici <ralf@mandelbit.com> writes:
+> 
+>> From: Daniel Gröber <dxld@darkboxed.org>
+>>
+>> Add user and reviewer documentation for the ipxlat virtual netdevice in
+>> Documentation/networking/ipxlat.rst.
+>>
+>> The document describes the datapath model, stateless IPv4/IPv6 address
+>> translation rules, ICMP handling, control-plane configuration, and test
+>> topology assumptions. It also records the intended runtime configuration
+>> contract and current behavior limits so deployment expectations are
+>> clear.
+>>
+>> Signed-off-by: Daniel Gröber <dxld@darkboxed.org>
+>> Signed-off-by: Ralf Lici <ralf@mandelbit.com>
+>> ---
+>>  Documentation/networking/ipxlat.rst | 190 ++++++++++++++++++++++++++++
+>>  1 file changed, 190 insertions(+)
+>>  create mode 100644 Documentation/networking/ipxlat.rst
+> 
+> You need to add this new file to Documentation/networking/index.rst or
+> it won't be included in the build (and you'll get a warning).
+> 
+> Thanks,
+> 
+> jon
+
+Hi Jon,
+
+Thanks for the heads-up.
+
+I’ve fixed this for the next revision. While rechecking with 'make
+SPHINXDIRS=networking htmldocs', I also found and fixed a couple of
+'ipxlat.rst' issues reported by Sphinx.
+
+Thanks,
+
+-- 
+Ralf Lici
+Mandelbit Srl
+
 
