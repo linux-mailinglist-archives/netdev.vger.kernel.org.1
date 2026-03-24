@@ -1,410 +1,263 @@
-Return-Path: <netdev+bounces-270825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270826-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2CgbKuDcwWnxXQQAu9opvQ
-	(envelope-from <netdev+bounces-270825-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 01:37:52 +0100
+	id WDtZE6DdwWnxXQQAu9opvQ
+	(envelope-from <netdev+bounces-270826-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 01:41:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2235E2FFC38
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 01:37:51 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38B0D2FFD61
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 01:41:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 89D523024440
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 00:34:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C37B9301615F
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 00:39:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C4A33B6F9;
-	Tue, 24 Mar 2026 00:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B67630AAA9;
+	Tue, 24 Mar 2026 00:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjTf+Ms9";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DrNSQsUj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rvbZtirt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D8F1A681A
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 00:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774312487; cv=pass; b=OzhpZ45uHDDJEeJEpPtAtEqa7+XapInOW2B6TaC2C/uDJsXdwo/l6O9ZYf4OH4qy39msFXJKknzSelAyXe2oZLX8VAjwaW1j4kMb5Zvdru6JttkpvkHLicPaoavyMbi5AutSfht3dQ1nBhsAtqEwzn8At3/nNwcQpLImYm93Zj8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774312487; c=relaxed/simple;
-	bh=NmX6aq1AjJs12Yq+PWPzbIZnkkSYYGFdr1l5n18R484=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lnLXVSNClH3arHpGxxyVSv6QesMhlVt/wNOTU4iThps7CExIdEcZC/7ks0rs5NJnbSP4aPG9ZMWArPD+MTXqHsWHZisQYL1rcNadK2ekTtWHgqHT5Q7GyJF9ftRfD1wCG1VDLCSOcWrlpCWbc7EWlgQvBUy8D8clO7dwMZKOxQA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cjTf+Ms9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DrNSQsUj; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774312484;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=saGQT6VbC9RUqD0YOp9yO8+1VRHnufK9WLW/Cpl18Rg=;
-	b=cjTf+Ms9DNQVzc8WNXlhJ5bNIGklxwJIQE4odXiXNHt6v7Cfq7hgIii2juWOpoQjWY0woY
-	4qEPkRA7oVdahUaXPeiAUh8nCxxIZ0VhdVNErqRhfrpMdryTFSaObGVGsBb9AO0uLFtws0
-	WHSo8H8zExNm/7KCmOU8dK4wBaoPTgQ=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-497-p4UYPE3MOeuZScvCEud0UA-1; Mon, 23 Mar 2026 20:34:42 -0400
-X-MC-Unique: p4UYPE3MOeuZScvCEud0UA-1
-X-Mimecast-MFC-AGG-ID: p4UYPE3MOeuZScvCEud0UA_1774312481
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2b061868724so5497805ad.1
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 17:34:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774312481; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DQrcGRxa2Ok+o3gddNNVjQ5BOS5r3YK+C/g1L0pPDeQDii045DOyMKqR3Ul8rEo677
-         EXOLkIBAJekftURvhDlruClLdr/O2h/VBvrzvxf9opsePaFvvXD5JZHkuM0/cYgTs6vm
-         7cNXRgDAnBlNz7iUlyzp4wS3BrJ6JjEdzLDLz/u4BNlpcp2Ydk1ag36rZGfR8TdtTTLw
-         SlkO+Kzv4TkKR+UylxKwNccJF9HLCqNswoOIUXZzCnoBZHi/a286WJZv9Z/OvNKwGHcN
-         4LFreylRv/Fwg01DcqxDDbDIb5En225WwSsKfBTJp7oVdQn7MULzOAWHCX1w5XH48q3A
-         o+/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=saGQT6VbC9RUqD0YOp9yO8+1VRHnufK9WLW/Cpl18Rg=;
-        fh=pDgX31h2hBwcnse4RFCaMlHNThCiuWYRF/DzhJO2aCQ=;
-        b=E4LuQb8Y+g9uZC24hKwx7jKxsSr9AW/O0qOFF1pBAWGWStsMz0xyRfbouJM/qVpORo
-         tOEIbuwNal3x9oxBs1k2CJ4IWW60OfasWok/J+aFhm/HCcaw80TlkSVc+zyh3y9FkeEc
-         WlCC3smuxp5oKjZdpfiJYveRPmrHV7Eh1kfupym1GGz2V4d1BwAwuI5//rRtFg4O2Q4A
-         iYCPGdVva0MwP2azIMM/VXUwpaKa32MtzsuhHX+6yX8prA4OFRr8GWl7dj85a6XBYRoW
-         w5KbEFbA9gU0Og+ncj3tq5cCXaKHFpzXXuEcEcYLyZ/9j0P0WklZC5QP3qbnM5dNOs0O
-         VEwQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774312481; x=1774917281; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=saGQT6VbC9RUqD0YOp9yO8+1VRHnufK9WLW/Cpl18Rg=;
-        b=DrNSQsUjIgj127OfK5LhRPhFAr2xw7XFfmRt+y3+TTbb6bRpWhYd08bFSxbUeeWNv6
-         mzaxuJw4s0NKBvX5UV6DRXxnpglrCpOKq4oSyKB+RFHh6B4iU8FPAPnkny1muZpN0jbt
-         1VGSJmz/s6xJGYUGCOeyuqTgVH2LtrM762UJCx26g3OQyQu2thTxrHXAUon07p+AvnWA
-         BJAbykCFhzhWlGyTnisvIg2JYVxXe0dkZQo4w1LIo0Q63BTYJMMZM8HXwt6ypCyf+77P
-         bV7gL2BQ6v1jXtzxns8IPsZJe+K6AuGoK5bFk0a+KNUrCAzgoti3dxCHn67UZCN7RJhy
-         GMEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774312481; x=1774917281;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=saGQT6VbC9RUqD0YOp9yO8+1VRHnufK9WLW/Cpl18Rg=;
-        b=NRiPOd/WRfITQi+CHwWhxAjz/rMqzRPekPJXZVeMeoclCV/Gr2NAIuE3FF5NBo77+b
-         LgfcwKMBuXUgWHZMXN34HPNbNb1DU8NjFqC5dMLCqgTxNPL+2eUug3jXFw3EwYe4/adc
-         lNXIK55IjQ2M3iCxfxQL7SHy6d3xRUWT37Krkak+LQtVD4otjUz+0dBG3oANdLtbAqMY
-         nsACroD0iHvPGCFWsBhOfl5YbjsSQPz4/JKYu7luVMm7hdjX07+a369mCGOzBLmZYXiz
-         UyfpPPla+Bea4PxytyFUIy4N6T8Z9zB4kTJuKH9NFU2YrnRNbhGWXuGUyOcw8Eo/wZp/
-         BF8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVCl/ySc10xASWmKQsAAcBN704kPzI88GJ9mANOT4ZWwY9pk1zcEwg8juspGcWAQxDloX9Yqyo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwehTjVatmyFJfkwPo7RXn1geS8CTxn+kQHW/7A4eqUZRorxjYY
-	I7OonFMQrr0P9YkkuhoplR3oD0JYUWDAYMYBS6waaRXeI0lSzTg+okjhQ662IBQueG3cetet/Py
-	Zf9Yt0daUOyz5mWPaxeciWY9Yfao9TGleKtN4uRtv/cwe4Y2rEpXS8p0WQjpIiXWF+rLZvhLJMp
-	3QrINS0gQvVNaOKTlPHnIvUrF10J2cRWA7
-X-Gm-Gg: ATEYQzySoWVToI7otWAQ+mpPawEp9vOfYjJjs/XH2yELPKWY4tzIbAyIRCV30qL9Qbf
-	ot+/euiepbG/RDjJlJ9znqQ3pmpqqmfHpG7S995SU2fswlDnIsFRhqPPG0RsH4oIwH+WPAZUEK/
-	hAcwaZYlXGYGor6B+ObFerXj5e4kySNNOH+KZi4EacVRoTA16j1xcH7dE++oy6ULCOR1iRUSqEs
-	HAE
-X-Received: by 2002:a17:902:d4c5:b0:2ad:dfb8:8ed3 with SMTP id d9443c01a7336-2b0826d7570mr125521055ad.8.1774312481449;
-        Mon, 23 Mar 2026 17:34:41 -0700 (PDT)
-X-Received: by 2002:a17:902:d4c5:b0:2ad:dfb8:8ed3 with SMTP id
- d9443c01a7336-2b0826d7570mr125520745ad.8.1774312481005; Mon, 23 Mar 2026
- 17:34:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E912524BBF0;
+	Tue, 24 Mar 2026 00:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774312797; cv=none; b=Asl7rq1gcebyae15zha1ZJi0Mm5bqPToKyE0SfnCtKUUeDA9o3dFXtoTJo82co+1mVH9LgL2PIWj8MHxSdcxGF5zrRRQLgm2hXh/bRqIB2EdZXZaPI41+CPqOfbOs/4YkMglyh4gf5nxtZlwu2WZDGIGC4MS+zhqrcYNC676CvQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774312797; c=relaxed/simple;
+	bh=QjDO1u3tuu+DLUdsm+IoGRajW5P/NFNjR0ZmLm0KHdM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Jt/ltbFg4qLA6qaF0wYNtGYCwq/LwX2TkumY/xeRLotg6gM8sR2YtZWdeMTAJZYtMc8hCP11+XiQWGgSSXhSOiW5m4VBJPE4sRu7SPJRScKCT2iHGALpfSHjn20tMZuLmmaWzG3RZH36MtbQD5pUx11pBKMhBkUFerQVXoRSvkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rvbZtirt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F2CEC4CEF7;
+	Tue, 24 Mar 2026 00:39:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774312796;
+	bh=QjDO1u3tuu+DLUdsm+IoGRajW5P/NFNjR0ZmLm0KHdM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rvbZtirtWQcmgmdy0Gi61uqKYp5ygwRGU5IhMcYHSjn9Z/BMtIM9Fw6tNWFdb7un8
+	 r1uCd/E637Y8y2gDEoJCf2FpcIT7xnLg13kjNZZIYTeSd0Z7TzEqrKok7z6bIDAETn
+	 k3c687wTm/zZ7gZ5szV5krgXG5e1NovrkA45bBpkyRw60rmP5w0Y0Mq6lkMfUgRNdW
+	 9abpHVuRuknCPwXs1tpBEMkKAVHeNYdnuxpefASgPht+OaFFymn3Y23ZIqWKAL6hGc
+	 ouRP62NxrLGanHvAuWYKrRLNycqCmLOFqS492ZBjYi7vlmyKFHof2m10q33EfUQSq/
+	 BJXWmKG6vKEBA==
+Date: Mon, 23 Mar 2026 17:39:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+ <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+ <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe
+ Shemesh <moshe@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next 3/3] net/mlx5e: Speed up channel creation by
+ initializing MKEY entries via UMR WQE
+Message-ID: <20260323173955.39c8c902@kernel.org>
+In-Reply-To: <20260319074338.24265-4-tariqt@nvidia.com>
+References: <20260319074338.24265-1-tariqt@nvidia.com>
+	<20260319074338.24265-4-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260310183107.2822016-1-vishs@meta.com> <20260323150136.14452-1-oelghoul@linux.ibm.com>
- <20260323114313-mutt-send-email-mst@kernel.org> <20260323122728-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20260323122728-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 24 Mar 2026 08:34:29 +0800
-X-Gm-Features: AaiRm52xN2lo_tVFI0DDvUo4ivVlfAirVP3edMWUgEftkLvUyxZ5RHdMesVost0
-Message-ID: <CACGkMEtUcdwhDYSZPfzc4noSFjgvS7exS0rYcCSscoMiMPvrHA@mail.gmail.com>
-Subject: Re: [PATCH net-next v11] virtio_net: add page_pool support for buffer allocation
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Omar Elghoul <oelghoul@linux.ibm.com>, vishs@meta.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, dw@davidwei.uk, edumazet@google.com, eperezma@redhat.com, 
-	ilias.apalodimas@linaro.org, kernel-team@meta.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	technoboy85@gmail.com, virtualization@lists.linux.dev, 
-	xuanzhuo@linux.alibaba.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-270825-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-270826-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[linux.ibm.com,meta.com,lunn.ch,davemloft.net,davidwei.uk,google.com,redhat.com,linaro.org,kernel.org,vger.kernel.org,gmail.com,lists.linux.dev,linux.alibaba.com];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jasowang@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2235E2FFC38
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 38B0D2FFD61
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 24, 2026 at 12:58=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com=
-> wrote:
->
-> On Mon, Mar 23, 2026 at 11:52:34AM -0400, Michael S. Tsirkin wrote:
-> > On Mon, Mar 23, 2026 at 11:01:31AM -0400, Omar Elghoul wrote:
-> > > Hi,
-> > >
-> > > I've been testing linux-next (tags later than 03/17) and hit new issu=
-es in
-> > > virtio-net on s390x. I bisected the issue, and I found this patch to =
-be the
-> > > first buggy commit.
-> > >
-> > > The issue seems to only be reproducible when running in Secure Execut=
-ion.
-> > > Tested in a KVM guest, the virtio-net performance appears greatly red=
-uced,
-> > > and the dmesg output shows many instances of the following error mess=
-ages.
-> > >
-> > > Partial relevant logs
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > [   49.332028] macvtap0: bad gso: type: 0, size: 0, flags 1 tunnel 0 =
-tnl csum 0
-> > > [   74.365668] macvtap0: bad gso: type: 2e, size: 27948, flags 0 tunn=
-el 0 tnl csum 0
-> > > [  403.302168] macvtap0: bad csum: flags: 2, gso_type: 23 rx_tnl_csum=
- 0
-> > > [  403.302271] macvtap0: bad csum: flags: 2, gso_type: e0 rx_tnl_csum=
- 0
-> > > [  403.302279] macvtap0: bad csum: flags: 2, gso_type: e1 rx_tnl_csum=
- 0
-> > > [  403.309492] macvtap0: bad csum: flags: 2, gso_type: 4c rx_tnl_csum=
- 0
-> > > [  403.317029] macvtap0: bad csum: flags: 2, gso_type: e0 rx_tnl_csum=
- 0
-> > >
-> > > Steps to reproduce
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > 1. Boot a Linux guest implementing this patch under QEMU/KVM (*) with=
- SE
-> > >    enabled and a virtio-net-ccw device attached.
-> > > 2. Run dmesg. The error message is usually already present at boot ti=
-me,
-> > >    but if not, it can be reproduced by creating any network traffic.
-> > >
-> > > (*) This patch was not tested in a non-KVM hypervisor environment.
-> > >
-> > > I've further confirmed that reverting this patch onto its parent comm=
-it
-> > > resolves the issue. Please let me know if you'd like me to test a fix=
- or if
-> > > you would need more information.
-> > >
-> > > Thanks in advance.
-> > >
-> > > Best,
-> > > Omar
-> >
-> > Well... I am not sure how I missed it. Obvious in hindsight:
-> >
-> > static void receive_buf(struct virtnet_info *vi, struct receive_queue *=
-rq,
-> >                         void *buf, unsigned int len, void **ctx,
-> >                         unsigned int *xdp_xmit,
-> >                         struct virtnet_rq_stats *stats)
-> > {
-> >         struct net_device *dev =3D vi->dev;
-> >         struct sk_buff *skb;
-> >         u8 flags;
-> >
-> >         if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
-> >                 pr_debug("%s: short packet %i\n", dev->name, len);
-> >                 DEV_STATS_INC(dev, rx_length_errors);
-> >                 virtnet_rq_free_buf(vi, rq, buf);
-> >                 return;
-> >         }
-> >
-> >         /* About the flags below:
-> >          * 1. Save the flags early, as the XDP program might overwrite =
-them.
-> >          * These flags ensure packets marked as VIRTIO_NET_HDR_F_DATA_V=
-ALID
-> >          * stay valid after XDP processing.
-> >          * 2. XDP doesn't work with partially checksummed packets (refe=
-r to
-> >          * virtnet_xdp_set()), so packets marked as
-> >          * VIRTIO_NET_HDR_F_NEEDS_CSUM get dropped during XDP processin=
-g.
-> >          */
-> >
-> >         if (vi->mergeable_rx_bufs) {
-> >                 flags =3D ((struct virtio_net_common_hdr *)buf)->hdr.fl=
-ags;
-> >                 skb =3D receive_mergeable(dev, vi, rq, buf, ctx, len, x=
-dp_xmit,
-> >                                         stats);
-> >         } else if (vi->big_packets) {
-> >                 void *p =3D page_address((struct page *)buf);
-> >
-> >                 flags =3D ((struct virtio_net_common_hdr *)p)->hdr.flag=
-s;
-> >                 skb =3D receive_big(dev, vi, rq, buf, len, stats);
-> >         } else {
-> >                 flags =3D ((struct virtio_net_common_hdr *)buf)->hdr.fl=
-ags;
-> >                 skb =3D receive_small(dev, vi, rq, buf, ctx, len, xdp_x=
-mit, stats);
-> >         }
-> >
-> >
-> > So we are reading the header, before dma sync, which is within
-> > receive_mergeable and friends:
-> >
-> > static struct sk_buff *receive_mergeable(struct net_device *dev,
-> >                                          struct virtnet_info *vi,
-> >                                          struct receive_queue *rq,
-> >                                          void *buf,
-> >                                          void *ctx,
-> >                                          unsigned int len,
-> >                                          unsigned int *xdp_xmit,
-> >                                          struct virtnet_rq_stats *stats=
-)
-> > {
-> >         struct virtio_net_hdr_mrg_rxbuf *hdr =3D buf;
-> >         int num_buf =3D virtio16_to_cpu(vi->vdev, hdr->num_buffers);
-> >         struct page *page =3D virt_to_head_page(buf);
-> >         int offset =3D buf - page_address(page);
-> >         struct sk_buff *head_skb, *curr_skb;
-> >         unsigned int truesize =3D mergeable_ctx_to_truesize(ctx);
-> >         unsigned int headroom =3D mergeable_ctx_to_headroom(ctx);
-> >
-> >         head_skb =3D NULL;
-> >
-> >         if (rq->use_page_pool_dma)
-> >                 page_pool_dma_sync_for_cpu(rq->page_pool, page, offset,=
- len);
-> >
-> >
-> >
-> > Just as a test, the below should fix it (compiled only), but the real
-> > fix is more complex since we need to be careful to avoid expensive sync=
-ing
-> > twice.
-> >
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 97035b49bae7..57b4f5954bed 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -931,9 +931,19 @@ static struct sk_buff *page_to_skb(struct virtnet_=
-info *vi,
-> >
-> >  static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, vo=
-id **ctx)
-> >  {
-> > +     void *buf;
-> > +
-> >       BUG_ON(!rq->page_pool);
-> >
-> > -     return virtqueue_get_buf_ctx(rq->vq, len, ctx);
-> > +     buf =3D virtqueue_get_buf_ctx(rq->vq, len, ctx);
-> > +     if (buf && rq->use_page_pool_dma && *len) {
-> > +             struct page *page =3D virt_to_head_page(buf);
-> > +             int offset =3D buf - page_address(page);
-> > +
-> > +             page_pool_dma_sync_for_cpu(rq->page_pool, page, offset, *=
-len);
-> > +     }
-> > +
-> > +     return buf;
-> >  }
-> >
-> >  static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
-> >
-> >
-> >
-> >
-> > --
-> > MST
->
-> or maybe like this:
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 97035b49bae7..835f52651006 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -1956,13 +1956,6 @@ static struct sk_buff *receive_small(struct net_de=
-vice *dev,
->          */
->         buf -=3D VIRTNET_RX_PAD + xdp_headroom;
->
-> -       if (rq->use_page_pool_dma) {
-> -               int offset =3D buf - page_address(page) +
-> -                            VIRTNET_RX_PAD + xdp_headroom;
-> -
-> -               page_pool_dma_sync_for_cpu(rq->page_pool, page, offset, l=
-en);
-> -       }
-> -
->         len -=3D vi->hdr_len;
->         u64_stats_add(&stats->bytes, len);
->
-> @@ -2398,9 +2391,6 @@ static struct sk_buff *receive_mergeable(struct net=
-_device *dev,
->
->         head_skb =3D NULL;
->
-> -       if (rq->use_page_pool_dma)
-> -               page_pool_dma_sync_for_cpu(rq->page_pool, page, offset, l=
-en);
-> -
->         u64_stats_add(&stats->bytes, len - vi->hdr_len);
->
->         if (check_mergeable_len(dev, ctx, len))
-> @@ -2563,6 +2553,13 @@ static void receive_buf(struct virtnet_info *vi, s=
-truct receive_queue *rq,
->                 return;
->         }
->
-> +       if (rq->use_page_pool_dma) {
-> +               struct page *page =3D virt_to_head_page(buf);
-> +               int offset =3D buf - page_address(page);
+On Thu, 19 Mar 2026 09:43:38 +0200 Tariq Toukan wrote:
+> Initializing all UMR MKEY entries as part of the CREATE_MKEY firmware
+> command is relatively slow. Since this operation is performed per RQ,
+> the cumulative latency becomes significant with a large number of
+> queues.
+> 
+> Move the entries initialization out of the CREATE_MKEY command and
+> perform it in the fast path by posting an appropriate UMR WQE on the
+> ICOSQ.
+> 
+> The UMR WQE is prepared and written to the ICOSQ before activation,
+> making it safe without additional locking, as it does not race with NOP
+> postings or early NAPI refills.
+> 
+> Performance results:
+> Setup: 248 channels, MTU 9000, RX/TX ring size 8K.
+
+AI says:
+
+> @@ -397,57 +396,61 @@ static u8 mlx5e_mpwrq_access_mode(enum mlx5e_mpwrq_umr_mode umr_mode)
+> +static int mlx5e_rq_umr_mkey_data_alloc(struct mlx5e_rq *rq, u32 npages,
+> +					struct mlx5_wqe_data_seg *dseg)
+> +{
+> +	dma_addr_t data_addr;
+> +	int data_sz;
+> +	void *data;
+>  
+> -	octwords = mlx5e_mpwrq_umr_octowords(npages, umr_mode);
+> +	data_sz = mlx5e_mpwrq_umr_octowords(npages, rq->mpwqe.umr_mode) *
+> +		MLX5_OCTWORD;
+> +	rq->mpwqe_sp.init_data.p_unaligned =
+> +		kzalloc(data_sz + MLX5_UMR_ALIGN - 1, GFP_KERNEL);
+Is this allocation safe for large setups?
+For setups with large ring sizes like 8K WQEs in OVERSIZED mode, the data size
+can reach 256KB to 1MB. Requesting physically contiguous high-order allocations
+across many channels during interface bring-up might fail on memory-fragmented
+systems.
+Should this continue to fall back to vmalloc like the previous kvzalloc code
+did?
+
+> @@ -455,48 +458,152 @@ static int mlx5e_create_umr_mkey(struct mlx5_core_dev *mdev,
+> +static int mlx5e_rq_umr_mkey_data_init(struct mlx5e_rq *rq, u32 npages)
+> +{
+> +	struct mlx5_wqe_ctrl_seg      *cseg;
+> +	struct mlx5_wqe_umr_ctrl_seg *ucseg;
+> +	struct mlx5e_icosq *sq = rq->icosq;
+> +	struct mlx5e_umr_wqe *umr_wqe;
+> +	u16 pi, num_wqebbs, octowords;
+> +	u8 ds_cnt;
+> +	int err;
 > +
-> +               page_pool_dma_sync_for_cpu(rq->page_pool, page, offset, l=
-en);
-> +       }
+> +	/* + 1 for the data segment */
+> +	ds_cnt = 1 + DIV_ROUND_UP(offsetof(struct mlx5e_umr_wqe, dseg),
+> +				  MLX5_SEND_WQE_DS);
+> +	num_wqebbs = DIV_ROUND_UP(ds_cnt, MLX5_SEND_WQEBB_NUM_DS);
+> +	pi = mlx5e_icosq_get_next_pi(sq, num_wqebbs);
+> +	umr_wqe = mlx5_wq_cyc_get_wqe(&sq->wq, pi);
+> +	memset(umr_wqe, 0, num_wqebbs * MLX5_SEND_WQE_BB);
 > +
->         /* About the flags below:
->          * 1. Save the flags early, as the XDP program might overwrite th=
-em.
->          * These flags ensure packets marked as VIRTIO_NET_HDR_F_DATA_VAL=
-ID
->
+> +	cseg = &umr_wqe->hdr.ctrl;
+> +	ucseg = &umr_wqe->hdr.uctrl;
+> +
+> +	cseg->opmod_idx_opcode =
+> +		cpu_to_be32((sq->pc << MLX5_WQE_CTRL_WQE_INDEX_SHIFT) |
+> +			    MLX5_OPCODE_UMR);
+> +	cseg->qpn_ds = cpu_to_be32((sq->sqn << MLX5_WQE_CTRL_QPN_SHIFT) |
+> +				   ds_cnt);
+> +	cseg->umr_mkey = rq->mpwqe_sp.umr_mkey_be;
+> +
+> +	octowords = mlx5e_mpwrq_umr_octowords(npages, rq->mpwqe.umr_mode);
+> +	ucseg->xlt_octowords = cpu_to_be16(octowords);
+> +	ucseg->mkey_mask = cpu_to_be64(MLX5_MKEY_MASK_FREE);
+> +
+> +	err = mlx5e_rq_umr_mkey_data_alloc(rq, npages, umr_wqe->dseg);
+> +	if (err)
+> +		return err;
+> +
+> +	mlx5e_rq_umr_mkey_data_fill(rq, npages);
 
-This looks better.
+Could this sequence violate DMA coherency rules?
+The buffer is mapped to the device with dma_map_single inside
+mlx5e_rq_umr_mkey_data_alloc, but then mlx5e_rq_umr_mkey_data_fill writes the
+MKEY translation data into the buffer.
+On architectures without hardware cache coherency, the CPU writes might
+remain in the cache, causing the NIC to read stale memory instead of the
+actual MKEY data.
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+> +
+> +	sq->db.wqe_info[pi] = (struct mlx5e_icosq_wqe_info) {
+> +		.wqe_type   = MLX5E_ICOSQ_WQE_UMR_RX_INIT,
+> +		.num_wqebbs = num_wqebbs,
+> +		.umr.rq     = rq,
+> +	};
+> +
+> +	sq->pc += num_wqebbs;
+> +
+> +	sq->doorbell_cseg = cseg;
 
-Thanks
+Can this leave a stale pointer in sq->doorbell_cseg?
+If a NOP WQE is later pushed to the ICOSQ but fails to clear this pointer, and
+a subsequent allocation error occurs during the first iteration of
+mlx5e_post_rx_mpwqes, the error path might use this stale doorbell_cseg.
+Modifying an already-executed WQE could desynchronize the queue and stall the
+ICOSQ.
 
+> @@ -505,7 +612,6 @@ static int mlx5e_create_umr_mkey(struct mlx5_core_dev *mdev,
+>  
+>  static int mlx5e_create_rq_umr_mkey(struct mlx5_core_dev *mdev, struct mlx5e_rq *rq)
+>  {
+> -	u32 xsk_chunk_size = rq->xsk_pool ? rq->xsk_pool->chunk_size : 0;
+>  	u32 wq_size = mlx5_wq_ll_get_size(&rq->mpwqe.wq);
+>  	u32 num_entries, max_num_entries;
+>  	u32 umr_mkey;
+> @@ -522,9 +628,16 @@ static int mlx5e_create_rq_umr_mkey(struct mlx5_core_dev *mdev, struct mlx5e_rq
+>  			      max_num_entries);
+>  
+>  	err = mlx5e_create_umr_mkey(mdev, num_entries, rq->mpwqe.page_shift,
+> -				    &umr_mkey, rq->wqe_overflow.addr,
+> -				    rq->mpwqe.umr_mode, xsk_chunk_size);
+> +				    &umr_mkey, rq->mpwqe.umr_mode);
+> +	if (err)
+> +		return err;
+> +
+>  	rq->mpwqe_sp.umr_mkey_be = cpu_to_be32(umr_mkey);
+> +
+> +	err = mlx5e_rq_umr_mkey_data_init(rq, num_entries);
+> +	if (err)
+> +		mlx5_core_destroy_mkey(mdev, umr_mkey);
+> +
+>  	return err;
+>  }
+
+Does this code leak the initialization data and DMA mapping if a failure
+happens later during queue creation?
+If mlx5e_create_rq_umr_mkey completes successfully, but the broader
+mlx5e_alloc_rq fails on a subsequent step like page pool creation, the teardown
+seems to miss calling mlx5e_rq_umr_mkey_data_free for the newly allocated
+buffer.
+
+> @@ -1275,8 +1389,11 @@ int mlx5e_wait_for_min_rx_wqes(struct mlx5e_rq *rq, int wait_time)
+>  	u16 min_wqes = mlx5_min_rx_wqes(rq->wq_type, mlx5e_rqwq_get_size(rq));
+>  
+>  	do {
+> -		if (mlx5e_rqwq_get_cur_sz(rq) >= min_wqes)
+> +		if (mlx5e_rqwq_get_cur_sz(rq) >= min_wqes) {
+> +			/* memory usage completed, can be freed already */
+> +			mlx5e_rq_umr_mkey_data_free(rq);
+>  			return 0;
+> +		}
+>  
+>  		msleep(20);
+>  	} while (time_before(jiffies, exp_time));
+
+Does this prematurely free the initialization buffer?
+The condition checking that cur_sz is greater than min_wqes tracks the CPU's
+NAPI thread pushing RX WQEs to the RQ, but it does not appear to guarantee that
+the hardware has actually finished executing the asynchronous
+MLX5E_ICOSQ_WQE_UMR_RX_INIT WQE on the ICOSQ.
+If unmapped and freed while the NIC DMA engine is still fetching the data,
+could this result in a DMA use-after-free and potential IOMMU faults?
 
