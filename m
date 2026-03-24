@@ -1,425 +1,268 @@
-Return-Path: <netdev+bounces-270906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270907-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aNdzASRBwmmCagQAu9opvQ
-	(envelope-from <netdev+bounces-270906-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 08:45:40 +0100
+	id OI/3CcpDwmmCagQAu9opvQ
+	(envelope-from <netdev+bounces-270907-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 08:56:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A8413041F7
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 08:45:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91F493043F3
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 08:56:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3B8D43039C80
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:38:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4305F308BD02
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 07:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F127833D6EE;
-	Tue, 24 Mar 2026 07:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j6OXRmbl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B2233F5B2;
+	Tue, 24 Mar 2026 07:43:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A012459ED
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 07:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD4B2BD5B4;
+	Tue, 24 Mar 2026 07:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.76.78.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774337882; cv=none; b=u0va7pZaF7+q1XMaJebLMbFSHCZM7DF/lAjvyH/3iTiMhbSPAm41P8aFqGDWQm9D9XGkEEzvj2kGLFzXGpLoHzq0L7AqNOCkubcUgYc0OVpsnQzKfc47VwCCnzYjBGOUKJBJl7MxPWdcRzrVqHk777pMQ6Hd+n0np1knQbvDhDM=
+	t=1774338190; cv=none; b=Xx9I4rVoLAMmfMbWRar96YLlCrmQ4/hUdji/jHI16EgEjRnLkMO+0QnREqFpESFfPAzJq+7OkYwjmNTflw5PCbMdoQhghCXexXIOZgN8OPDyV6KZgZNgImbiY+nXcLlxpeV4d1GLA/F78NmJKPJO+3+HCR1jkYU/+7CW8U4T2dU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774337882; c=relaxed/simple;
-	bh=LAxve2E723xcInPxFfOLjYpn/zETcYmFrZ0F4Ktispw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sa9M8DLY8Ia7HCkWA+KpfMPE5e32LTakB/pf/Fe9OD/W9ruKERCbQQRm7Ibtmv/BkzOIfsILolLVfpHmZMk+VexPCtrjSd2yrCilEel6l9RJE/JWQIySHbGGSjnBcu5k6t6I+Py3DOTT83jjtJUb26IcUwuQrDRzgw4jy3MZOdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j6OXRmbl; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-5093787e2fdso214740491cf.2
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 00:37:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774337872; x=1774942672; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=IB6zNT730Q19QwQ1KMTzIfdYI7dQ5nb7NkdxT4Gv9fA=;
-        b=j6OXRmbljos/4BUMIj/GC32kW5djP7XN+Zm9EBngqKhn0bEJzEVoFrPg8HUfI4PaPG
-         Vw/42Gxic/O1YSzfEuQBENJSuaEkI/1KH+o4dux0fzjrHgEb8igElaL+lPSlIYuYe3p9
-         pZbO+tW4k6jCthTI3N1Q/T7tGIZtLwaBoFpmst1zuWUv/nVbcVcMq3QnIJ7MuhJmj7eD
-         Ghw3oifnUN3baYFTxuD9oPRfx2E8qYMFNS5LH/vGxviD09yAYj0RQh6WIfhGPCFv75eS
-         iL3VfnOo7Hc21cOIpkGPtk4Gsq77o/yHBvAffF6JNlJr9H4U4Ohxb7meSec8/EmoeIt1
-         /lcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774337872; x=1774942672;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IB6zNT730Q19QwQ1KMTzIfdYI7dQ5nb7NkdxT4Gv9fA=;
-        b=hDfeQ6kSPtgYrHpZx5Z0BHoCh0e/XdINInF73TTN91Ho4mnmm4HRieEmP9lmYFVdDi
-         zy++ys5wi7IX2SIP18N/IOOy9/qlfGxvIVuWZmHPJLaLNmq2Z6hGh+t0u3j5jqolOwKY
-         tc+TkDhS2qo5MnhB4PBitjev7eJzasWkQ04Nk3KjEJyw7k8w5q+iGA55wuOI26WrjOmK
-         JMe0nBGnAjkFAfgrGgVm3U+SAK1mHSGUcBAQQY48VyJNe/oPN+TX12tk6QQEx/ISr//i
-         5jYmRloQU4wgSpsMUFWbU7o+kycIASdqHL+W57GVG5TcBLsGWu4Tih+ZAU0zAdhTu8h1
-         x0fA==
-X-Forwarded-Encrypted: i=1; AJvYcCURG2jMzRBM1UOxS3YPt8F+EsAf8NsZhk5jVo3jt3ut1EvAAvWG6v25eEGY49FdyUmtSUyBKjk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywu9VA5YgwTwyRr5yf7hs2nPdxEP6RBomjgc7Kxgh/w7ndxQArN
-	bwALMr7lctzXwTC445CXrwokPm86+EuAbVDZJqSdrfjEet6F06rAyrCJMOE66dVM7E2xMYlo5zp
-	sVwUWw54GGkOKBA==
-X-Received: from qtw1.prod.google.com ([2002:ac8:5701:0:b0:509:14e4:44ee])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:1149:b0:50b:5183:f74e with SMTP id d75a77b69052e-50b5183fc8fmr136480671cf.31.1774337872103;
- Tue, 24 Mar 2026 00:37:52 -0700 (PDT)
-Date: Tue, 24 Mar 2026 07:37:50 +0000
+	s=arc-20240116; t=1774338190; c=relaxed/simple;
+	bh=6I0fq2DfArLCi7Bo+pLVR5r7sorOirHZmXosL9wD4+c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=tpTkQ/gTUq8lMhAnii+cssISUtWazfKqWYSbayZWsvpBUG/0WulZbwIPuqLlsw5HsSDvON1SEVSTTeuDcxGzbWOBVQZjD+a5AsROsoLr4sXuY8fGyeaPqIhZ5/r3Alq9OUzeJrKtK3JFAORsakrrq8Dwmtg/k8b0kx0bGzCWcQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=13.76.78.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from lizhi2$eswincomputing.com ( [10.11.96.26] ) by
+ ajax-webmail-app1 (Coremail) ; Tue, 24 Mar 2026 15:42:31 +0800 (GMT+08:00)
+Date: Tue, 24 Mar 2026 15:42:31 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
+To: krzk+dt@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, rmk+kernel@armlinux.org.uk,
+	mcoquelin.stm32@gmail.com, robh@kernel.org, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+	alexandre.torgue@foss.st.com, devicetree@vger.kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org, conor+dt@kernel.org,
+	linux-riscv@lists.infradead.org, alex@ghiti.fr,
+	aou@eecs.berkeley.edu, palmer@dabbelt.com, pjw@kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	maxime.chevallier@bootlin.com, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com,
+	linux-kernel@vger.kernel.org, pritesh.patel@einfochips.com,
+	weishangjuan@eswincomputing.com, horms@kernel.org,
+	"Conor Dooley" <conor.dooley@microchip.com>
+Subject: Re: [PATCH net-next v5 1/3] dt-bindings: ethernet: eswin: add clock
+ sampling control
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
+ 20241203(6b039d88) Copyright (c) 2002-2026 www.mailtech.cn
+ mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
+In-Reply-To: <20260324073137.396-1-lizhi2@eswincomputing.com>
+References: <20260324073017.376-1-lizhi2@eswincomputing.com>
+ <20260324073137.396-1-lizhi2@eswincomputing.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.983.g0bb29b3bc5-goog
-Message-ID: <20260324073750.1500328-1-edumazet@google.com>
-Subject: [PATCH net-next] net/dst: improve dst_ops refcounting with per-dst bit
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, xietangxin <xietangxin@yeah.net>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
+MIME-Version: 1.0
+Message-ID: <a904f82.5cd9.19d1ecb935c.Coremail.lizhi2@eswincomputing.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:TAJkCgDHaXNnQMJpPjwLAA--.3417W
+X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/1tbiAQEQDGnBaxUzxAABs8
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWkCw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,yeah.net];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270906-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-270907-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[eswincomputing.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	HAS_X_PRIO_THREE(0.00)[3];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	R_DKIM_NA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,yeah.net:email]
-X-Rspamd-Queue-Id: 5A8413041F7
+	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lists.infradead.org,armlinux.org.uk,gmail.com,kernel.org,google.com,davemloft.net,lunn.ch,foss.st.com,vger.kernel.org,redhat.com,ghiti.fr,eecs.berkeley.edu,dabbelt.com,st-md-mailman.stormreply.com,bootlin.com,eswincomputing.com,einfochips.com,microchip.com];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	NEURAL_SPAM(0.00)[0.514];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 91F493043F3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Before a netns is destroyed, we make sure that all its dst_entries
-have been removed, or went through dst_dev_put().
-
-Problem:
-
-dst that went through dst_dev_put() might call dst_release() way after
-the netns has been dismantled/freed.
-
-IPv6 keeps its ip6_dst_ops embedded in struct netns_ipv6.
-
-This means dst_count_dec() might be called with a dst->ops pointing
-to freed memory.
-
-Similarly dst->ops->kmem_cachep can cause UAF.
-
-In this patch, I added a dst_count_dec() call from dst_dev_put(),
-and I added an atomic bit to make sure the dst_ops refcount is released
-at most once.
-
-Then when dst_dev_put() is called, switch dst->ops to the 'template'
-object, so that dst->ops points back to static memory.
-
-We might later add more READ_ONCE(dst->ops) to avoid hypothetical load-tearing.
-
-Or we could move the counters into a separate structure, so that dst->ops
-is never changed.
-
-DEBUG_NET_WARN_ON_ONCE(dst_entries_get_slow(dst) > 0) is added to
-dst_entries_destroy() to warn if a dst_ops is destroyed while still
-having active dst_entry references.
-
-DEBUG_NET_WARN_ON_ONCE(dst->dst_ops_refcounted) is added to dst_destroy()
-to warn if a dst_entry is being freed but its dst_ops_refcounted bit
-is still set, indicating a potential refcount leak.
-
-Note: IFF_XMIT_DST_RELEASE was added as a performance improvement, not
-specifically to fix this bug.
-
-We can still audit drivers to make sure they call skb_dst_drop()
-before holding an skb for arbitrary amount of time.
-
-Fixes: f2fc6a54585a ("[NETNS][IPV6] route6 - move ip6_dst_ops inside the network namespace")
-Closes: https://lore.kernel.org/netdev/20260312024902.15627-1-xietangxin@yeah.net/
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: xietangxin <xietangxin@yeah.net>
----
- include/net/dst.h         |  1 +
- include/net/dst_ops.h     |  3 +++
- net/bridge/br_nf_core.c   |  1 +
- net/core/dst.c            | 31 +++++++++++++++++++++----------
- net/core/pktgen.c         |  1 +
- net/ipv4/route.c          |  2 ++
- net/ipv4/xfrm4_policy.c   |  1 +
- net/ipv6/route.c          |  2 ++
- net/ipv6/xfrm6_policy.c   |  1 +
- net/openvswitch/actions.c |  1 +
- net/sched/sch_frag.c      |  1 +
- 11 files changed, 35 insertions(+), 10 deletions(-)
-
-diff --git a/include/net/dst.h b/include/net/dst.h
-index 307073eae7f83456aa80dfa8686f839b302ca004..793f38452bf49a57bf2ed9d875efa831be360ed2 100644
---- a/include/net/dst.h
-+++ b/include/net/dst.h
-@@ -95,6 +95,7 @@ struct dst_entry {
- #ifdef CONFIG_64BIT
- 	struct lwtunnel_state   *lwtstate;
- #endif
-+	unsigned long		dst_ops_refcounted; /* Use one (atomic) bit */
- };
- 
- struct dst_metrics {
-diff --git a/include/net/dst_ops.h b/include/net/dst_ops.h
-index 3a9001a042a5c392a79cfc59af528ef410a28668..dc4ab11c3eed022cf346e38301e2d66eee7ed44a 100644
---- a/include/net/dst_ops.h
-+++ b/include/net/dst_ops.h
-@@ -4,6 +4,7 @@
- #include <linux/types.h>
- #include <linux/percpu_counter.h>
- #include <linux/cache.h>
-+#include <net/net_debug.h>
- 
- struct dst_entry;
- struct kmem_cachep;
-@@ -39,6 +40,7 @@ struct dst_ops {
- 						 const void *daddr);
- 
- 	struct kmem_cache	*kmem_cachep;
-+	struct dst_ops		*template;
- 
- 	struct percpu_counter	pcpuc_entries ____cacheline_aligned_in_smp;
- };
-@@ -67,6 +69,7 @@ static inline int dst_entries_init(struct dst_ops *dst)
- 
- static inline void dst_entries_destroy(struct dst_ops *dst)
- {
-+	DEBUG_NET_WARN_ON_ONCE(dst_entries_get_slow(dst) > 0);
- 	percpu_counter_destroy(&dst->pcpuc_entries);
- }
- 
-diff --git a/net/bridge/br_nf_core.c b/net/bridge/br_nf_core.c
-index a8c67035e23c00cc689801c89fcc444f96c5650c..fc6548475ac3b626fa022eae29418588ddf16d76 100644
---- a/net/bridge/br_nf_core.c
-+++ b/net/bridge/br_nf_core.c
-@@ -56,6 +56,7 @@ static struct dst_ops fake_dst_ops = {
- 	.cow_metrics	= fake_cow_metrics,
- 	.neigh_lookup	= fake_neigh_lookup,
- 	.mtu		= fake_mtu,
-+	.template	= &fake_dst_ops,
- };
- 
- /*
-diff --git a/net/core/dst.c b/net/core/dst.c
-index 092861133023c819000be59931ac365ac1651a1f..d1efd3e7c44e3885f00a687f0de4d7865d145174 100644
---- a/net/core/dst.c
-+++ b/net/core/dst.c
-@@ -72,8 +72,11 @@ void dst_init(struct dst_entry *dst, struct dst_ops *ops,
- 	dst->__use = 0;
- 	dst->lastuse = jiffies;
- 	dst->flags = flags;
--	if (!(flags & DST_NOCOUNT))
-+	dst->dst_ops_refcounted = 0;
-+	if (!(flags & DST_NOCOUNT)) {
-+		dst->dst_ops_refcounted = 1;
- 		dst_entries_add(ops, 1);
-+	}
- }
- EXPORT_SYMBOL(dst_init);
- 
-@@ -100,6 +103,7 @@ EXPORT_SYMBOL(dst_alloc);
- static void dst_destroy(struct dst_entry *dst)
- {
- 	struct dst_entry *child = NULL;
-+	const struct dst_ops *ops;
- 
- 	smp_rmb();
- 
-@@ -110,16 +114,18 @@ static void dst_destroy(struct dst_entry *dst)
- 		child = xdst->child;
- 	}
- #endif
--	if (dst->ops->destroy)
--		dst->ops->destroy(dst);
-+	ops = READ_ONCE(dst->ops);
-+	if (ops->destroy)
-+		ops->destroy(dst);
- 	netdev_put(dst->dev, &dst->dev_tracker);
- 
- 	lwtstate_put(dst->lwtstate);
- 
-+	DEBUG_NET_WARN_ON_ONCE(dst->dst_ops_refcounted);
- 	if (dst->flags & DST_METADATA)
- 		metadata_dst_free((struct metadata_dst *)dst);
- 	else
--		kmem_cache_free(dst->ops->kmem_cachep, dst);
-+		kmem_cache_free(ops->kmem_cachep, dst);
- 
- 	dst = child;
- 	if (dst)
-@@ -133,6 +139,14 @@ static void dst_destroy_rcu(struct rcu_head *head)
- 	dst_destroy(dst);
- }
- 
-+static void dst_count_dec(struct dst_entry *dst)
-+{
-+	struct dst_ops *ops = READ_ONCE(dst->ops);
-+
-+	if (cmpxchg(&dst->dst_ops_refcounted, 1, 0) == 1)
-+		dst_entries_add(ops, -1);
-+}
-+
- /* Operations to mark dst as DEAD and clean up the net device referenced
-  * by dst:
-  * 1. put the dst under blackhole interface and discard all tx/rx packets
-@@ -146,9 +160,11 @@ void dst_dev_put(struct dst_entry *dst)
- {
- 	struct net_device *dev = dst->dev;
- 
-+	dst_count_dec(dst);
- 	WRITE_ONCE(dst->obsolete, DST_OBSOLETE_DEAD);
- 	if (dst->ops->ifdown)
- 		dst->ops->ifdown(dst, dev);
-+	WRITE_ONCE(dst->ops, dst->ops->template);
- 	WRITE_ONCE(dst->input, dst_discard);
- 	WRITE_ONCE(dst->output, dst_discard_out);
- 	rcu_assign_pointer(dst->dev_rcu, blackhole_netdev);
-@@ -157,12 +173,6 @@ void dst_dev_put(struct dst_entry *dst)
- }
- EXPORT_SYMBOL(dst_dev_put);
- 
--static void dst_count_dec(struct dst_entry *dst)
--{
--	if (!(dst->flags & DST_NOCOUNT))
--		dst_entries_add(dst->ops, -1);
--}
--
- void dst_release(struct dst_entry *dst)
- {
- 	if (dst && rcuref_put(&dst->__rcuref)) {
-@@ -276,6 +286,7 @@ static struct dst_ops dst_blackhole_ops = {
- 	.update_pmtu	= dst_blackhole_update_pmtu,
- 	.redirect	= dst_blackhole_redirect,
- 	.mtu		= dst_blackhole_mtu,
-+	.template	= &dst_blackhole_ops,
- };
- 
- static void __metadata_dst_init(struct metadata_dst *md_dst,
-diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-index 8e185b318288530fd2e1111feb343d25b30b4817..a21bb8a8f2752ba6d057c3b206eadcb76d1a1ea4 100644
---- a/net/core/pktgen.c
-+++ b/net/core/pktgen.c
-@@ -3894,6 +3894,7 @@ static int pktgen_add_device(struct pktgen_thread *t, const char *ifname)
- 	 * performance under such circumstance.
- 	 */
- 	pkt_dev->dstops.family = AF_INET;
-+	pkt_dev->dstops.template = &pkt_dev->dstops;
- 	pkt_dev->xdst.u.dst.dev = pkt_dev->odev;
- 	dst_init_metrics(&pkt_dev->xdst.u.dst, pktgen_dst_metrics, false);
- 	pkt_dev->xdst.child = &pkt_dev->xdst.u.dst;
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 463236e0dc2d5f2ffefbdd8677c2baa14930ab57..31c5cc26188523427a72dd5ebdbbb33ecb8c127c 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -165,6 +165,7 @@ static struct dst_ops ipv4_dst_ops = {
- 	.local_out =		__ip_local_out,
- 	.neigh_lookup =		ipv4_neigh_lookup,
- 	.confirm_neigh =	ipv4_confirm_neigh,
-+	.template =		&ipv4_dst_ops,
- };
- 
- #define ECN_OR_COST(class)	TC_PRIO_##class
-@@ -2887,6 +2888,7 @@ static struct dst_ops ipv4_dst_blackhole_ops = {
- 	.update_pmtu		= dst_blackhole_update_pmtu,
- 	.redirect		= dst_blackhole_redirect,
- 	.mtu			= dst_blackhole_mtu,
-+	.template		= &ipv4_dst_blackhole_ops,
- };
- 
- struct dst_entry *ipv4_blackhole_route(struct net *net, struct dst_entry *dst_orig)
-diff --git a/net/ipv4/xfrm4_policy.c b/net/ipv4/xfrm4_policy.c
-index 58faf1ddd2b151e4569bb6351029718dac37521b..d20849dcfc29a75809222e4a6308c42aa541e003 100644
---- a/net/ipv4/xfrm4_policy.c
-+++ b/net/ipv4/xfrm4_policy.c
-@@ -130,6 +130,7 @@ static struct dst_ops xfrm4_dst_ops_template = {
- 	.ifdown =		xfrm_dst_ifdown,
- 	.local_out =		__ip_local_out,
- 	.gc_thresh =		32768,
-+	.template = 		&xfrm4_dst_ops_template,
- };
- 
- static const struct xfrm_policy_afinfo xfrm4_policy_afinfo = {
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 08cd86f49bf96383e3c37dbe1e662b42859afe90..658c0f742e458a5573dffdb905834911d72373fb 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -263,6 +263,7 @@ static struct dst_ops ip6_dst_ops_template = {
- 	.local_out		=	__ip6_local_out,
- 	.neigh_lookup		=	ip6_dst_neigh_lookup,
- 	.confirm_neigh		=	ip6_confirm_neigh,
-+	.template		=	&ip6_dst_ops_template,
- };
- 
- static struct dst_ops ip6_dst_blackhole_ops = {
-@@ -275,6 +276,7 @@ static struct dst_ops ip6_dst_blackhole_ops = {
- 	.update_pmtu		= dst_blackhole_update_pmtu,
- 	.redirect		= dst_blackhole_redirect,
- 	.mtu			= dst_blackhole_mtu,
-+	.template		= &ip6_dst_blackhole_ops,
- };
- 
- static const u32 ip6_template_metrics[RTAX_MAX] = {
-diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
-index 125ea9a5b8a082052380b7fd7ed7123f5247d7cc..caabc6de4a7f1376482c229648e26c15b9bf00c4 100644
---- a/net/ipv6/xfrm6_policy.c
-+++ b/net/ipv6/xfrm6_policy.c
-@@ -165,6 +165,7 @@ static struct dst_ops xfrm6_dst_ops_template = {
- 	.ifdown =		xfrm6_dst_ifdown,
- 	.local_out =		__ip6_local_out,
- 	.gc_thresh =		32768,
-+	.template =		&xfrm6_dst_ops_template,
- };
- 
- static const struct xfrm_policy_afinfo xfrm6_policy_afinfo = {
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index 792ca44a461da0bb98d49bfe9f233214fb57a61e..0cf26afaa5cf9533aa946566f672627c12881d20 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -731,6 +731,7 @@ ovs_dst_get_mtu(const struct dst_entry *dst)
- static struct dst_ops ovs_dst_ops = {
- 	.family = AF_UNSPEC,
- 	.mtu = ovs_dst_get_mtu,
-+	.template = &ovs_dst_ops,
- };
- 
- /* prepare_frag() is called once per (larger-than-MTU) frame; its inverse is
-diff --git a/net/sched/sch_frag.c b/net/sched/sch_frag.c
-index d1d87dce7f3f72e33e3c8ec0c0eb35bdd9b5c9f1..f8e1071ca1fd229d43c9208f00e2bbbd3ab4a4a1 100644
---- a/net/sched/sch_frag.c
-+++ b/net/sched/sch_frag.c
-@@ -83,6 +83,7 @@ sch_frag_dst_get_mtu(const struct dst_entry *dst)
- static struct dst_ops sch_frag_dst_ops = {
- 	.family = AF_UNSPEC,
- 	.mtu = sch_frag_dst_get_mtu,
-+	.template = &sch_frag_dst_ops,
- };
- 
- static int sch_fragment(struct net *net, struct sk_buff *skb,
--- 
-2.53.0.983.g0bb29b3bc5-goog
-
+SGkgS3J6eXN6dG9mLAoKVGhpcyB2ZXJzaW9uIGtlZXBzIHRoZSBjb21wYXRpYmxlIG5hbWluZyBm
+cm9tIHY0LiBEbyB5b3UgaGF2ZSBhbnkKY29tbWVudHMgb3Igc3VnZ2VzdGlvbnMgb24gdGhlIGNv
+bXBhdGlibGUgb3IgYmluZGluZz8KClRoYW5rcywKWmhpIExpCgoKPiAtLS0tLeWOn+Wni+mCruS7
+ti0tLS0tCj4g5Y+R5Lu25Lq6OiBsaXpoaTJAZXN3aW5jb21wdXRpbmcuY29tCj4g5Y+R6YCB5pe2
+6Ze0OjIwMjYtMDMtMjQgMTU6MzE6MzYgKOaYn+acn+S6jCkKPiDmlLbku7bkuro6IGRldmljZXRy
+ZWVAdmdlci5rZXJuZWwub3JnLCBhbmRyZXcrbmV0ZGV2QGx1bm4uY2gsIGRhdmVtQGRhdmVtbG9m
+dC5uZXQsIGVkdW1hemV0QGdvb2dsZS5jb20sIGt1YmFAa2VybmVsLm9yZywgcm9iaEBrZXJuZWwu
+b3JnLCBrcnprK2R0QGtlcm5lbC5vcmcsIGNvbm9yK2R0QGtlcm5lbC5vcmcsIG5ldGRldkB2Z2Vy
+Lmtlcm5lbC5vcmcsIHBhYmVuaUByZWRoYXQuY29tLCBtY29xdWVsaW4uc3RtMzJAZ21haWwuY29t
+LCBhbGV4YW5kcmUudG9yZ3VlQGZvc3Muc3QuY29tLCBybWsra2VybmVsQGFybWxpbnV4Lm9yZy51
+aywgcGp3QGtlcm5lbC5vcmcsIHBhbG1lckBkYWJiZWx0LmNvbSwgYW91QGVlY3MuYmVya2VsZXku
+ZWR1LCBhbGV4QGdoaXRpLmZyLCBsaW51eC1yaXNjdkBsaXN0cy5pbmZyYWRlYWQub3JnLCBsaW51
+eC1zdG0zMkBzdC1tZC1tYWlsbWFuLnN0b3JtcmVwbHkuY29tLCBsaW51eC1hcm0ta2VybmVsQGxp
+c3RzLmluZnJhZGVhZC5vcmcsIGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcsIG1heGltZS5j
+aGV2YWxsaWVyQGJvb3RsaW4uY29tCj4g5oqE6YCBOiBuaW5neXVAZXN3aW5jb21wdXRpbmcuY29t
+LCBsaW5taW5AZXN3aW5jb21wdXRpbmcuY29tLCBwaW5rZXNoLnZhZ2hlbGFAZWluZm9jaGlwcy5j
+b20sIHByaXRlc2gucGF0ZWxAZWluZm9jaGlwcy5jb20sIHdlaXNoYW5nanVhbkBlc3dpbmNvbXB1
+dGluZy5jb20sIGhvcm1zQGtlcm5lbC5vcmcsICJaaGkgTGkiIDxsaXpoaTJAZXN3aW5jb21wdXRp
+bmcuY29tPiwgIkNvbm9yIERvb2xleSIgPGNvbm9yLmRvb2xleUBtaWNyb2NoaXAuY29tPgo+IOS4
+u+mimDogW1BBVENIIG5ldC1uZXh0IHY1IDEvM10gZHQtYmluZGluZ3M6IGV0aGVybmV0OiBlc3dp
+bjogYWRkIGNsb2NrIHNhbXBsaW5nIGNvbnRyb2wKPiAKPiBGcm9tOiBaaGkgTGkgPGxpemhpMkBl
+c3dpbmNvbXB1dGluZy5jb20+Cj4gCj4gRHVlIHRvIGNoaXAgYmFja2VuZCByZWFzb25zLCB0aGVy
+ZSBpcyBhbHJlYWR5IGFuIGFwcHJveGltYXRlbHkgNC01IG5zCj4gc2tldyBiZXR3ZWVuIHRoZSBS
+WCBjbG9jayBhbmQgZGF0YSBvZiB0aGUgZXRoMSBNQUMgY29udHJvbGxlciBpbnNpZGUKPiB0aGUg
+c2lsaWNvbi4KPiAKPiBGb3IgMTAwME0sIHRoZSBSWCBjbG9jayBtdXN0IGJlIGludmVydGVkIHNp
+bmNlIGl0IGlzIG5vdCBwb3NzaWJsZSB0bwo+IG1lZXQgdGhlIFJHTUlJIHRpbWluZyByZXF1aXJl
+bWVudHMgdXNpbmcgb25seSByeC1pbnRlcm5hbC1kZWxheS1wcyBvbgo+IHRoZSBNQUMgdG9nZXRo
+ZXIgd2l0aCB0aGUgc3RhbmRhcmQgMiBucyBkZWxheSBvbiB0aGUgUEhZLiBUaGVyZWZvcmUsCj4g
+ZXZlbiBvbiBhIHByb3Blcmx5IGRlc2lnbmVkIGJvYXJkLCBldGgxIHN0aWxsIHJlcXVpcmVzIFJY
+IGNsb2NrCj4gaW52ZXJzaW9uLgo+IAo+IFRoaXMgYmVoYXZpb3VyIGVmZmVjdGl2ZWx5IGJyZWFr
+cyB0aGUgUkdNSUkgdGltaW5nIGFzc3VtcHRpb25zIGF0IHRoZQo+IFNvQyBsZXZlbC4KPiAKPiBG
+b3IgdGhlIFRYIHBhdGggb2YgZXRoMSwgdGhlcmUgaXMgYWxzbyBhIHNrZXcgYmV0d2VlbiB0aGUg
+VFggY2xvY2sKPiBhbmQgZGF0YSBvbiB0aGUgTUFDIGNvbnRyb2xsZXIgaW5zaWRlIHRoZSBzaWxp
+Y29uLiBUaGlzIHNrZXcgaGFwcGVucwo+IHRvIGJlIGFwcHJveGltYXRlbHkgMiBucy4gVGhlcmVm
+b3JlLCBpdCBjYW4gYmUgY29uc2lkZXJlZCB0aGF0IHRoZQo+IDIgbnMgZGVsYXkgb2YgVFggaXMg
+cHJvdmlkZWQgYnkgdGhlIE1BQywgc28gdGhlIFRYIGlzIGNvbXBsaWFudCB3aXRoCj4gdGhlIFJH
+TUlJIHN0YW5kYXJkLgo+IAo+IEZvciAxMC8xMDAgb3BlcmF0aW9uLCB0aGUgYXBwcm94aW1hdGVs
+eSA0LTUgbnMgc2tldyBpbiB0aGUgY2hpcCBkb2VzCj4gbm90IGJyZWFrIHRoZSBzdGFuZGFyZC4g
+VGhlIFJHTUlJIHRpbWluZyB0YWJsZSAoU2VjdGlvbiAzLjMpIHNwZWNpZmllcwo+IHRoYXQgZm9y
+IDEwLzEwMCBvcGVyYXRpb24gdGhlIG1heGltdW0gdmFsdWUgaXMgdW5zcGVjaWZpZWQ6Cj4gaHR0
+cHM6Ly9jb21tdW5pdHkubnhwLmNvbS9wd214eTg3NjU0L2F0dGFjaG1lbnRzL3B3bXh5ODc2NTQv
+aW14LXByb2Nlc3NvcnMvMjA2NTUvMS9SR01JSXYyXzBfZmluYWxfaHAucGRmCj4gCj4gRHVlIHRv
+IHRoZSBldGgxIHNpbGljb24gYmVoYXZpb3IgZGVzY3JpYmVkIGFib3ZlLCBhIG5ldyBjb21wYXRp
+YmxlCj4gc3RyaW5nICJlc3dpbixlaWM3NzAwLXFvcy1ldGgtY2xrLWludmVyc2lvbiIgaXMgYWRk
+ZWQgdG8gdGhlIGRldmljZQo+IHRyZWUuIFRoaXMgYWxsb3dzIHRoZSBkcml2ZXIgdG8gaGFuZGxl
+IHRoZSBkaWZmZXJlbmNlcyBiZXR3ZWVuIGV0aDEKPiBhbmQgZXRoMCB0aHJvdWdoIGRlZGljYXRl
+ZCBsb2dpYy4KPiAKPiBUaGUgcngtaW50ZXJuYWwtZGVsYXktcHMgYW5kIHR4LWludGVybmFsLWRl
+bGF5LXBzIHByb3BlcnRpZXMgbm93IHVzZQo+IG1pbmltdW0gYW5kIG1heGltdW0gY29uc3RyYWlu
+dHMgdG8gcmVmbGVjdCB0aGUgYWN0dWFsIGhhcmR3YXJlIGRlbGF5Cj4gcmFuZ2UgKDAtMjU0MCBw
+cykgYXBwbGllZCBpbiAyMCBwcyBzdGVwcy4gVGhpcyByZWxheGVzIHRoZSBiaW5kaW5nCj4gdmFs
+aWRhdGlvbiBjb21wYXJlZCB0byB0aGUgcHJldmlvdXMgZW51bS1iYXNlZCBkZWZpbml0aW9uIGFu
+ZCBhdm9pZHMKPiByZWdyZXNzaW9ucyBmb3IgZXhpc3RpbmcgRFRCcyB3aGlsZSBrZWVwaW5nIHRo
+ZSBzYW1lIGhhcmR3YXJlIGxpbWl0cy4KPiAKPiBUcmVhdCB0aGUgUlgvVFggaW50ZXJuYWwgZGVs
+YXkgcHJvcGVydGllcyBhcyBvcHRpb25hbCwgYm9hcmQtc3BlY2lmaWMKPiB0dW5pbmcga25vYnMg
+YW5kIHJlbW92ZSB0aGVtIGZyb20gdGhlIGV4YW1wbGUgdG8gYXZvaWQgZW5jb3VyYWdpbmcKPiB0
+aGVpciB1c2UuCj4gCj4gSW4gYWRkaXRpb24sIHRoZSBiaW5kaW5nIG5vdyBpbmNsdWRlcyBhZGRp
+dGlvbmFsIGJhY2tncm91bmQgaW5mb3JtYXRpb24KPiBhYm91dCB0aGUgSFNQIENTUiByZWdpc3Rl
+cnMgYWNjZXNzZWQgYnkgdGhlIE1BQy4gVGhlIFRYRCBhbmQgUlhEIGRlbGF5Cj4gY29udHJvbCBy
+ZWdpc3RlcnMgYXJlIGluY2x1ZGVkIHNvIHRoZSBkcml2ZXIgY2FuIGV4cGxpY2l0bHkgY2xlYXIg
+YW55Cj4gcmVzaWR1YWwgY29uZmlndXJhdGlvbiBsZWZ0IGJ5IHRoZSBib290bG9hZGVyLgo+IAo+
+IEJhY2tncm91bmQgcmVmZXJlbmNlIGZvciB0aGUgSGlnaC1TcGVlZCBTdWJzeXN0ZW0gYW5kIEhT
+UCBDU1IgYmxvY2sgaXMKPiBhdmFpbGFibGUgaW4gQ2hhcHRlciAxMCAoIkhpZ2gtU3BlZWQgSW50
+ZXJmYWNlIikgb2YgdGhlIEVJQzc3MDBYIFNvQwo+IFRlY2huaWNhbCBSZWZlcmVuY2UgTWFudWFs
+LCBQYXJ0IDQKPiAoRUlDNzcwMFhfU29DX1RlY2huaWNhbF9SZWZlcmVuY2VfTWFudWFsX1BhcnQ0
+LnBkZik6Cj4gaHR0cHM6Ly9naXRodWIuY29tL2Vzd2luY29tcHV0aW5nL0VJQzc3MDBYLVNvQy1U
+ZWNobmljYWwtUmVmZXJlbmNlLU1hbnVhbC9yZWxlYXNlcwo+IAo+IFRoZXJlIGFyZSBjdXJyZW50
+bHkgbm8gaW4tdHJlZSB1c2VycyBvZiB0aGUgRUlDNzcwMCBFdGhlcm5ldCBkcml2ZXIsIHNvCj4g
+dGhlc2UgY2hhbmdlcyBhcmUgc2FmZS4KPiAKPiBGaXhlczogODg4YmQwZWNhOTNjICgiZHQtYmlu
+ZGluZ3M6IGV0aGVybmV0OiBlc3dpbjogRG9jdW1lbnQgZm9yIEVJQzc3MDAgU29DIikKPiBTaWdu
+ZWQtb2ZmLWJ5OiBaaGkgTGkgPGxpemhpMkBlc3dpbmNvbXB1dGluZy5jb20+Cj4gQWNrZWQtYnk6
+IENvbm9yIERvb2xleSA8Y29ub3IuZG9vbGV5QG1pY3JvY2hpcC5jb20+Cj4gLS0tCj4gIC4uLi9i
+aW5kaW5ncy9uZXQvZXN3aW4sZWljNzcwMC1ldGgueWFtbCAgICAgICB8IDY5ICsrKysrKysrKysr
+KysrKy0tLS0KPiAgMSBmaWxlIGNoYW5nZWQsIDU1IGluc2VydGlvbnMoKyksIDE0IGRlbGV0aW9u
+cygtKQo+IAo+IGRpZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3Mv
+bmV0L2Vzd2luLGVpYzc3MDAtZXRoLnlhbWwgYi9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmlu
+ZGluZ3MvbmV0L2Vzd2luLGVpYzc3MDAtZXRoLnlhbWwKPiBpbmRleCA5MWU4Y2QxZGI2N2IuLjBi
+Mjc3MTlmZWI3ZCAxMDA2NDQKPiAtLS0gYS9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGlu
+Z3MvbmV0L2Vzd2luLGVpYzc3MDAtZXRoLnlhbWwKPiArKysgYi9Eb2N1bWVudGF0aW9uL2Rldmlj
+ZXRyZWUvYmluZGluZ3MvbmV0L2Vzd2luLGVpYzc3MDAtZXRoLnlhbWwKPiBAQCAtMjAsNiArMjAs
+NyBAQCBzZWxlY3Q6Cj4gICAgICAgIGNvbnRhaW5zOgo+ICAgICAgICAgIGVudW06Cj4gICAgICAg
+ICAgICAtIGVzd2luLGVpYzc3MDAtcW9zLWV0aAo+ICsgICAgICAgICAgLSBlc3dpbixlaWM3NzAw
+LXFvcy1ldGgtY2xrLWludmVyc2lvbgo+ICAgIHJlcXVpcmVkOgo+ICAgICAgLSBjb21wYXRpYmxl
+Cj4gIAo+IEBAIC0yOSw3ICszMCw5IEBAIGFsbE9mOgo+ICBwcm9wZXJ0aWVzOgo+ICAgIGNvbXBh
+dGlibGU6Cj4gICAgICBpdGVtczoKPiAtICAgICAgLSBjb25zdDogZXN3aW4sZWljNzcwMC1xb3Mt
+ZXRoCj4gKyAgICAgIC0gZW51bToKPiArICAgICAgICAgIC0gZXN3aW4sZWljNzcwMC1xb3MtZXRo
+Cj4gKyAgICAgICAgICAtIGVzd2luLGVpYzc3MDAtcW9zLWV0aC1jbGstaW52ZXJzaW9uCj4gICAg
+ICAgIC0gY29uc3Q6IHNucHMsZHdtYWMtNS4yMAo+ICAKPiAgICByZWc6Cj4gQEAgLTYzLDE2ICs2
+NiwyOSBAQCBwcm9wZXJ0aWVzOgo+ICAgICAgICAtIGNvbnN0OiBzdG1tYWNldGgKPiAgCj4gICAg
+cngtaW50ZXJuYWwtZGVsYXktcHM6Cj4gLSAgICBlbnVtOiBbMCwgMjAwLCA2MDAsIDEyMDAsIDE2
+MDAsIDE4MDAsIDIwMDAsIDIyMDAsIDI0MDBdCj4gKyAgICBtaW5pbXVtOiAwCj4gKyAgICBtYXhp
+bXVtOiAyNTQwCj4gKyAgICBtdWx0aXBsZU9mOiAyMAo+ICAKPiAgICB0eC1pbnRlcm5hbC1kZWxh
+eS1wczoKPiAtICAgIGVudW06IFswLCAyMDAsIDYwMCwgMTIwMCwgMTYwMCwgMTgwMCwgMjAwMCwg
+MjIwMCwgMjQwMF0KPiArICAgIG1pbmltdW06IDAKPiArICAgIG1heGltdW06IDI1NDAKPiArICAg
+IG11bHRpcGxlT2Y6IDIwCj4gIAo+ICAgIGVzd2luLGhzcC1zcC1jc3I6Cj4gICAgICBkZXNjcmlw
+dGlvbjoKPiAgICAgICAgSFNQIENTUiBpcyB0byBjb250cm9sIGFuZCBnZXQgc3RhdHVzIG9mIGRp
+ZmZlcmVudCBoaWdoLXNwZWVkIHBlcmlwaGVyYWxzCj4gICAgICAgIChzdWNoIGFzIEV0aGVybmV0
+LCBVU0IsIFNBVEEsIGV0Yy4pIHZpYSByZWdpc3Rlciwgd2hpY2ggY2FuIHR1bmUKPiAgICAgICAg
+Ym9hcmQtbGV2ZWwncyBwYXJhbWV0ZXJzIG9mIFBIWSwgZXRjLgo+ICsKPiArICAgICAgQWRkaXRp
+b25hbCBiYWNrZ3JvdW5kIGluZm9ybWF0aW9uIGFib3V0IHRoZSBIaWdoLVNwZWVkIFN1YnN5c3Rl
+bQo+ICsgICAgICBhbmQgdGhlIEhTUCBDU1IgYmxvY2sgaXMgYXZhaWxhYmxlIGluIENoYXB0ZXIg
+MTAgKCJIaWdoLVNwZWVkIEludGVyZmFjZSIpCj4gKyAgICAgIG9mIHRoZSBFSUM3NzAwWCBTb0Mg
+VGVjaG5pY2FsIFJlZmVyZW5jZSBNYW51YWwsIFBhcnQgNAo+ICsgICAgICAoRUlDNzcwMFhfU29D
+X1RlY2huaWNhbF9SZWZlcmVuY2VfTWFudWFsX1BhcnQ0LnBkZikuIFRoZSBtYW51YWwgaXMKPiAr
+ICAgICAgcHVibGljbHkgYXZhaWxhYmxlIGF0Cj4gKyAgICAgIGh0dHBzOi8vZ2l0aHViLmNvbS9l
+c3dpbmNvbXB1dGluZy9FSUM3NzAwWC1Tb0MtVGVjaG5pY2FsLVJlZmVyZW5jZS1NYW51YWwvcmVs
+ZWFzZXMKPiArCj4gKyAgICAgIFRoaXMgcmVmZXJlbmNlIGlzIHByb3ZpZGVkIGZvciBiYWNrZ3Jv
+dW5kIGluZm9ybWF0aW9uIG9ubHkuCj4gICAgICAkcmVmOiAvc2NoZW1hcy90eXBlcy55YW1sIy9k
+ZWZpbml0aW9ucy9waGFuZGxlLWFycmF5Cj4gICAgICBpdGVtczoKPiAgICAgICAgLSBpdGVtczoK
+PiBAQCAtODIsNiArOTgsOCBAQCBwcm9wZXJ0aWVzOgo+ICAgICAgICAgICAgLSBkZXNjcmlwdGlv
+bjogT2Zmc2V0IG9mIEFYSSBjbG9jayBjb250cm9sbGVyIExvdy1Qb3dlciByZXF1ZXN0Cj4gICAg
+ICAgICAgICAgICAgICAgICAgICAgICByZWdpc3Rlcgo+ICAgICAgICAgICAgLSBkZXNjcmlwdGlv
+bjogT2Zmc2V0IG9mIHJlZ2lzdGVyIGNvbnRyb2xsaW5nIFRYL1JYIGNsb2NrIGRlbGF5Cj4gKyAg
+ICAgICAgICAtIGRlc2NyaXB0aW9uOiBPZmZzZXQgb2YgcmVnaXN0ZXIgY29udHJvbGxpbmcgVFhE
+IGRlbGF5Cj4gKyAgICAgICAgICAtIGRlc2NyaXB0aW9uOiBPZmZzZXQgb2YgcmVnaXN0ZXIgY29u
+dHJvbGxpbmcgUlhEIGRlbGF5Cj4gIAo+ICByZXF1aXJlZDoKPiAgICAtIGNvbXBhdGlibGUKPiBA
+QCAtOTMsOCArMTExLDYgQEAgcmVxdWlyZWQ6Cj4gICAgLSBwaHktbW9kZQo+ICAgIC0gcmVzZXRz
+Cj4gICAgLSByZXNldC1uYW1lcwo+IC0gIC0gcngtaW50ZXJuYWwtZGVsYXktcHMKPiAtICAtIHR4
+LWludGVybmFsLWRlbGF5LXBzCj4gICAgLSBlc3dpbixoc3Atc3AtY3NyCj4gIAo+ICB1bmV2YWx1
+YXRlZFByb3BlcnRpZXM6IGZhbHNlCj4gQEAgLTEwNCwyNCArMTIwLDQ5IEBAIGV4YW1wbGVzOgo+
+ICAgICAgZXRoZXJuZXRANTA0MDAwMDAgewo+ICAgICAgICAgIGNvbXBhdGlibGUgPSAiZXN3aW4s
+ZWljNzcwMC1xb3MtZXRoIiwgInNucHMsZHdtYWMtNS4yMCI7Cj4gICAgICAgICAgcmVnID0gPDB4
+NTA0MDAwMDAgMHgxMDAwMD47Cj4gKyAgICAgICAgaW50ZXJydXB0LXBhcmVudCA9IDwmcGxpYz47
+Cj4gKyAgICAgICAgaW50ZXJydXB0cyA9IDw2MT47Cj4gKyAgICAgICAgaW50ZXJydXB0LW5hbWVz
+ID0gIm1hY2lycSI7Cj4gICAgICAgICAgY2xvY2tzID0gPCZkMF9jbG9jayAxODY+LCA8JmQwX2Ns
+b2NrIDE3MT4sIDwmZDBfY2xvY2sgNDA+LAo+ICAgICAgICAgICAgICAgICAgPCZkMF9jbG9jayAx
+OTM+Owo+ICAgICAgICAgIGNsb2NrLW5hbWVzID0gImF4aSIsICJjZmciLCAic3RtbWFjZXRoIiwg
+InR4IjsKPiArICAgICAgICByZXNldHMgPSA8JnJlc2V0IDk1PjsKPiArICAgICAgICByZXNldC1u
+YW1lcyA9ICJzdG1tYWNldGgiOwo+ICsgICAgICAgIGVzd2luLGhzcC1zcC1jc3IgPSA8JmhzcF9z
+cF9jc3IgMHgxMDAgMHgxMDggMHgxMTggMHgxMTQgMHgxMWM+Owo+ICsgICAgICAgIHBoeS1oYW5k
+bGUgPSA8JmdtYWMwX3BoeTA+Owo+ICsgICAgICAgIHBoeS1tb2RlID0gInJnbWlpLWlkIjsKPiAr
+ICAgICAgICBzbnBzLGFhbDsKPiArICAgICAgICBzbnBzLGZpeGVkLWJ1cnN0Owo+ICsgICAgICAg
+IHNucHMsdHNvOwo+ICsgICAgICAgIHNucHMsYXhpLWNvbmZpZyA9IDwmc3RtbWFjX2F4aV9zZXR1
+cF9nbWFjMD47Cj4gKwo+ICsgICAgICAgIHN0bW1hY19heGlfc2V0dXBfZ21hYzA6IHN0bW1hYy1h
+eGktY29uZmlnIHsKPiArICAgICAgICAgICAgc25wcyxibGVuID0gPDAgMCAwIDAgMTYgOCA0PjsK
+PiArICAgICAgICAgICAgc25wcyxyZF9vc3JfbG10ID0gPDI+Owo+ICsgICAgICAgICAgICBzbnBz
+LHdyX29zcl9sbXQgPSA8Mj47Cj4gKyAgICAgICAgfTsKPiArICAgIH07Cj4gKwo+ICsgICAgZXRo
+ZXJuZXRANTA0MTAwMDAgewo+ICsgICAgICAgIGNvbXBhdGlibGUgPSAiZXN3aW4sZWljNzcwMC1x
+b3MtZXRoLWNsay1pbnZlcnNpb24iLCAic25wcyxkd21hYy01LjIwIjsKPiArICAgICAgICByZWcg
+PSA8MHg1MDQxMDAwMCAweDEwMDAwPjsKPiAgICAgICAgICBpbnRlcnJ1cHQtcGFyZW50ID0gPCZw
+bGljPjsKPiAtICAgICAgICBpbnRlcnJ1cHRzID0gPDYxPjsKPiArICAgICAgICBpbnRlcnJ1cHRz
+ID0gPDcwPjsKPiAgICAgICAgICBpbnRlcnJ1cHQtbmFtZXMgPSAibWFjaXJxIjsKPiAtICAgICAg
+ICBwaHktbW9kZSA9ICJyZ21paS1pZCI7Cj4gLSAgICAgICAgcGh5LWhhbmRsZSA9IDwmcGh5MD47
+Cj4gLSAgICAgICAgcmVzZXRzID0gPCZyZXNldCA5NT47Cj4gKyAgICAgICAgY2xvY2tzID0gPCZk
+MF9jbG9jayAxODY+LCA8JmQwX2Nsb2NrIDE3MT4sIDwmZDBfY2xvY2sgNDA+LAo+ICsgICAgICAg
+ICAgICAgICAgPCZkMF9jbG9jayAxOTQ+Owo+ICsgICAgICAgIGNsb2NrLW5hbWVzID0gImF4aSIs
+ICJjZmciLCAic3RtbWFjZXRoIiwgInR4IjsKPiArICAgICAgICByZXNldHMgPSA8JnJlc2V0IDk0
+PjsKPiAgICAgICAgICByZXNldC1uYW1lcyA9ICJzdG1tYWNldGgiOwo+IC0gICAgICAgIHJ4LWlu
+dGVybmFsLWRlbGF5LXBzID0gPDIwMD47Cj4gLSAgICAgICAgdHgtaW50ZXJuYWwtZGVsYXktcHMg
+PSA8MjAwPjsKPiAtICAgICAgICBlc3dpbixoc3Atc3AtY3NyID0gPCZoc3Bfc3BfY3NyIDB4MTAw
+IDB4MTA4IDB4MTE4PjsKPiAtICAgICAgICBzbnBzLGF4aS1jb25maWcgPSA8JnN0bW1hY19heGlf
+c2V0dXA+Owo+ICsgICAgICAgIGVzd2luLGhzcC1zcC1jc3IgPSA8JmhzcF9zcF9jc3IgMHgyMDAg
+MHgyMDggMHgyMTggMHgyMTQgMHgyMWM+Owo+ICsgICAgICAgIHBoeS1oYW5kbGUgPSA8JmdtYWMx
+X3BoeTA+Owo+ICsgICAgICAgIHBoeS1tb2RlID0gInJnbWlpLWlkIjsKPiAgICAgICAgICBzbnBz
+LGFhbDsKPiAgICAgICAgICBzbnBzLGZpeGVkLWJ1cnN0Owo+ICAgICAgICAgIHNucHMsdHNvOwo+
+IC0gICAgICAgIHN0bW1hY19heGlfc2V0dXA6IHN0bW1hYy1heGktY29uZmlnIHsKPiArICAgICAg
+ICBzbnBzLGF4aS1jb25maWcgPSA8JnN0bW1hY19heGlfc2V0dXBfZ21hYzE+Owo+ICsKPiArICAg
+ICAgICBzdG1tYWNfYXhpX3NldHVwX2dtYWMxOiBzdG1tYWMtYXhpLWNvbmZpZyB7Cj4gICAgICAg
+ICAgICAgIHNucHMsYmxlbiA9IDwwIDAgMCAwIDE2IDggND47Cj4gICAgICAgICAgICAgIHNucHMs
+cmRfb3NyX2xtdCA9IDwyPjsKPiAgICAgICAgICAgICAgc25wcyx3cl9vc3JfbG10ID0gPDI+Owo+
+IC0tIAo+IDIuMjUuMQo=
 
