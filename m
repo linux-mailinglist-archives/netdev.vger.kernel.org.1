@@ -1,156 +1,213 @@
-Return-Path: <netdev+bounces-271013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271014-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4FjgGP98wmnqdAQAu9opvQ
-	(envelope-from <netdev+bounces-271013-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:01:03 +0100
+	id WEVEMjV+wmnqdAQAu9opvQ
+	(envelope-from <netdev+bounces-271014-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:06:13 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33971307CE4
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:01:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79819307DD7
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:06:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3718D30BC535
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:52:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2C04E30495BF
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76D42853EE;
-	Tue, 24 Mar 2026 11:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="XDn73kVm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6C83EFD06;
+	Tue, 24 Mar 2026 12:01:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFA3366046
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 11:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF473EFD04
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 12:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774353143; cv=none; b=lM5V00wNvm8FaajVxG+mzpABcPxp42G5Ux5d6+f3CPNKnwq+okzm8jzAfEt+mn9s9rzhrKJ5mwHMvv/yS0Z8jpHszee1YFWDPOSEuWR6cznumZCQjMj17jm7cEYItjWwIFgTVaLRe75N13/f2XXiL0Td7cCcN1sQu1Qq/4lhFBs=
+	t=1774353674; cv=none; b=TosUoaMa++aOCfupIlV4UBqG7Ob5lIKXWpcNuH+Doch9oiomEjpC6rAIxXVtlqms0uer3DMr/eqonELwRAPpox7m/TCwAu4UHL9INTkXksBXtpHB/0psuVRx2HV7Q2Dccco9U5gL8a0FjqF1HMutSvlNgC5EbbggruqJMwKCVUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774353143; c=relaxed/simple;
-	bh=NbViYVTxKKNajtW8MFRsXnuoZK4QJbFIThyCP7LqdWo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H9Vz3v1U6v+WySR+1/qj8afp/2bP9Yat1UQQtV+uKNJWOfHE4egBLA0h5puPhqYY4p9TIvVMB5f2ys95R1rZuvMlIw5eXThNlLR+QlpjssSSGwHKpOgROnIUp/XdyNAefHO2sPqXbDuD2fjp/H/Xx7F3H9JZtY0aZSpx2H79fT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=XDn73kVm; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 704FC201A1;
-	Tue, 24 Mar 2026 12:52:12 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gsr2lnLHMyne; Tue, 24 Mar 2026 12:52:11 +0100 (CET)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id CBC5020189;
-	Tue, 24 Mar 2026 12:52:11 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com CBC5020189
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1774353131;
-	bh=suHzHdfdSBFAI2CS1x47XLFogXEneDddsJ8T5tsfTlo=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=XDn73kVmwL/QuzWj36NX6sw+q+GdXlR5ONsQW+gBy3bNluvT8TR57U0SsYvJrfLXv
-	 8qvoTvH7cklOGh7+LZBsb/O7gDy2YmgH7sT+7rq/wOfSZFgcAtN05Hk2JTMx4nunlf
-	 P2UJZqyrYBJ0dCoY/cSCMRwLt1r52Pi2Qeqe9JyX1iHr4Yz/kbcOgDO64hmfMrQaTH
-	 PYvGVAOFQRKmS6Y9S2qrKZX9vUPaYMZVD07WJoPOs2Ze+tu61e94Sto6JZF7hlT63X
-	 nNrD8sSJX8mwA94Zp/bZ4/j2w720/jye+TymWZ9fbvWHnX30CozTqnjupuj4gQGmUP
-	 hQ2mhfttnDBJg==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 24 Mar
- 2026 12:52:11 +0100
-Received: (nullmailer pid 3694266 invoked by uid 1000);
-	Tue, 24 Mar 2026 11:52:10 -0000
-Date: Tue, 24 Mar 2026 12:52:10 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>, David
- Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH 20/20] xfrm: iptfs: only publish mode_data after clone
- setup
-Message-ID: <acJ66ndBOEs7d-1D@secunet.com>
-References: <20260323083440.2741292-1-steffen.klassert@secunet.com>
- <20260323083440.2741292-21-steffen.klassert@secunet.com>
- <4cc9cb27-90b9-45fb-8d90-28cca9e12b96@redhat.com>
+	s=arc-20240116; t=1774353674; c=relaxed/simple;
+	bh=ucshPHi/r6Ln9OLLUw1Xo9w6h7n35ATOisdL48zSMRY=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=YGqid23DFHdo8tCbfrxfANxLFWkSW+5rN0X69ew2MKdMEGkIzBG73PQ3abYACTtuZ/xBegcdX9Xe9idIBPpW1EqXquCZ+YgeElwA4v7s1KCtPyLvPECcYBq7G3tS6TvtbAeUrBT4RWHdlOUAEb/2KODllJHXwcyPd3NacorbE/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-486fba7ce4cso11261095e9.3
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 05:01:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774353668; x=1774958468;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QRiyCKNjPgWGQoAyu/uLCQ+qyHakA6Q0r54A9iXZ9WA=;
+        b=UH44S1QjecJS6mpAUGMo16hMkF9ck6RhYZWNMPfrr3oU0xf45QNNgyaVzCwy5TijfC
+         nIWHukeo65z6TVhbV6yX5g7ygzg+jOG8LIcLBM2W6svjZ3iiOktefY08j08MSk+yYlON
+         R8DmD/A/mBECn1YrPshmueVAZQsYEULABD5L8VnQqqO6e5QvzEFKnd08/RnerL7y2SOd
+         EeF++AeGxJ+k9OvWCAUtYlvxgZWZSw9fRMy75of1HA2oMJoehFfPkr2E8iqXly7EaxKL
+         DqAyejEVMXiQONUOwNTA6dUcm0BBG4QhxGikTuXnFANoN4Zdh/Fbvza650LpUNVrE3zi
+         VQhg==
+X-Forwarded-Encrypted: i=1; AJvYcCX/u6pq28uaHS3AUAHoCeoIrRYpOVUvFpPssqVLAEA3dzB2KRBJUxGc2m/TFduyZKWdDHtIywo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzs6c0LOmUIT+h5FsDXw3Odf2WxBF5Yjq+LvLliC5h39ffhFrCe
+	DQ0ulhpU7GKpfEj9h54i1Mh1GHBH3IEKarNrkfTev/+i7U3j+57wSTP1
+X-Gm-Gg: ATEYQzycQowcln43oqX27RlJBuDFDMVW3t/+Xddr6LoYMYoH/76kxy8Af9ExayAxDs3
+	o1PX4AmZDpJ0CjDCd1erEbPpQrmhUKV9YM69OF8UTM3FfdSHsqdw9xcmTxDCcmKLaTL5sLzGRlP
+	Inneny7lH5IKglkoeFJudpGoBq2FufAHQyEKeDU3sKplxTVWtOG0Q436uT0zpjZbQOqmSpt+1/6
+	w0kVP3vLwAp8E0+w5KppAxfbRSCq41wsDKeL9fRMDrVafyM/pvjfvHbnRl0EQRiNq7c3nHK9Lqz
+	GarhFw3eEiVe3S2pj0POisd1Ex8Tz50eRt/dDsuGUeO7HNuYC3sKQwiskmuwXYWv3qXoy0sBGU+
+	SGJlk/HAbBRUpn5kmcKGNyJEm5+YH+n0cypjCHG7hTTsS/KdDXNnkmeoS9rsr2UlALo5JaHAxZj
+	gvadGcsdYVNHjRjO6hRNR61hINMjWorXGoQOCLVa1rOJ06xL4ng5zVlZY=
+X-Received: by 2002:a05:600c:8710:b0:486:d76c:fa21 with SMTP id 5b1f17b1804b1-486fee051a3mr221689965e9.12.1774353667662;
+        Tue, 24 Mar 2026 05:01:07 -0700 (PDT)
+Received: from [192.168.88.241] (89-24-32-126.nat.epc.tmcz.cz. [89.24.32.126])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48711022f37sm31213445e9.9.2026.03.24.05.01.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Mar 2026 05:01:07 -0700 (PDT)
+Message-ID: <3813e7fb-e234-42ec-b05c-7bcb609de3ba@ovn.org>
+Date: Tue, 24 Mar 2026 13:01:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <4cc9cb27-90b9-45fb-8d90-28cca9e12b96@redhat.com>
-X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Spamd-Result: default: False [-2.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, dev@openvswitch.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net/openvswitch: fix trigger-able BUG_ON after
+ ovs_vport_cmd_fill_info
+To: sunichi <sunyiqixm@gmail.com>, aconole@redhat.com, echaudro@redhat.com
+References: <20260323071435.1945543-1-sunyiqixm@gmail.com>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <20260323071435.1945543-1-sunyiqixm@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271013-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271014-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[ovn.org];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 33971307CE4
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,redhat.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 79819307DD7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 24, 2026 at 12:33:15PM +0100, Paolo Abeni wrote:
-> On 3/23/26 9:34 AM, Steffen Klassert wrote:
-> > From: Paul Moses <p@1g4.org>
-> > 
-> > iptfs_clone_state() stores x->mode_data before allocating the reorder
-> > window. If that allocation fails, the code frees the cloned state and
-> > returns -ENOMEM, leaving x->mode_data pointing at freed memory.
-> > 
-> > The xfrm clone unwind later runs destroy_state() through x->mode_data,
-> > so the failed clone path tears down IPTFS state that clone_state()
-> > already freed.
-> > 
-> > Keep the cloned IPTFS state private until all allocations succeed so
-> > failed clones leave x->mode_data unset. The destroy path already
-> > handles a NULL mode_data pointer.
-> > 
-> > Fixes: 6be02e3e4f37 ("xfrm: iptfs: handle reordering of received packets")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Paul Moses <p@1g4.org>
-> > Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+On 3/23/26 8:14 AM, sunichi wrote:
+> ovs_vport_set_upcall_portids() does not validate the length of the
+> user-supplied OVS_VPORT_ATTR_UPCALL_PID netlink attribute. A
+> sufficiently large portid list can overflow the reply skb allocated
+> with NLMSG_DEFAULT_SIZE in causing ovs_vport_cmd_fill_info()
+> to return -EMSGSIZE and triggering the unconditional BUG_ON(),
+> which panics the kernel on most distributions.
 > 
-> While applying this series to verify the PR, I get the following error:
+> Any local user with CAP_NET_ADMIN (or an equivalent unprivileged
+> namespace capability where applicable) can exploit this to perform a
+> denial-of-service against the host.
 > 
-> Applying: xfrm: iptfs: only publish mode_data after clone setup
-> error: sha1 information is lacking or useless (net/xfrm/xfrm_iptfs.c).
-> error: could not build fake ancestor
-> Patch failed at 0020 xfrm: iptfs: only publish mode_data after clone setup
+> Replace BUG_ON with WARN_ON_ONCE to prevent kernel panic.
 > 
-> The above also prevents the CI from testing the series. Steffen, could
-> you please have a look? Possibly a repost could be needed.
+> Signed-off-by: sunichi <sunyiqixm@gmail.com>
+> ---
+>  net/openvswitch/datapath.c | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
+> index e209099218b4..50c2945081a1 100644
+> --- a/net/openvswitch/datapath.c
+> +++ b/net/openvswitch/datapath.c
+> @@ -2202,7 +2202,8 @@ struct sk_buff *ovs_vport_cmd_build_info(struct vport *vport, struct net *net,
+>  
+>  	retval = ovs_vport_cmd_fill_info(vport, skb, net, portid, seq, 0, cmd,
+>  					 GFP_KERNEL);
+> -	BUG_ON(retval < 0);
+> +	if (WARN_ON_ONCE(retval < 0))
+> +		return ERR_PTR(-EMSGSIZE);
 
-I guess this is due to a merge conflict with:
+Hi, sunichi.  Thanks for the patch!  Though I don't think this is the right
+solution.  Instead of just failing the request, we should allocate appropriate
+amount of memory for it instead.  The fact that the array is sort of unbounded
+today is also a problem.
 
-69050f8d6d07 ("treewide: Replace kmalloc with kmalloc_obj for non-scalar types")
+So, what I'd suggest is, let's limit the number of upcall pids for a vport with
+the number of CPUs as it is done for the upcall_pids array on the datapath level.
+This will give us some reasonable upper value as there is no point for the
+application to have more handlers than there are CPUs, and the existing userspace
+never does that, so the limit should be safe.  Next we can create a new function
+ovs_vport_cmd_msg_size() similar to the existing ovs_dp_cmd_msg_size() that would
+calculate and allocate the appropriate message size, so the allocation is always
+correct.
 
-Repost will not help in that case. Not sure what to do
-here. The only thing that would fix it is a forced rebase
-of the ipsec tree onto the net tree.
+P.S.: This patch also needs a Fixes tag and should be targeted for the 'net'
+tree, i.e. have [PATCH net] as a subject prefix.  Also, IIRC, kernel requires
+a full name in the sign-off tag.
+
+AI review also points out a memory leak in case we just return without freeing
+and potentially leaving half- or even fully configured port while returning an
+error to the userspace.
+
+Best regards, Ilya Maximets.
 
