@@ -1,139 +1,182 @@
-Return-Path: <netdev+bounces-271192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271193-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0J3DBX3EwmlflgQAu9opvQ
-	(envelope-from <netdev+bounces-271192-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:06:05 +0100
+	id cJ+mJg3HwmmIlgQAu9opvQ
+	(envelope-from <netdev+bounces-271193-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:17:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 731CF319AC3
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:06:04 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14AD4319E12
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:17:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1CF32313D886
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:00:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6A41330053BE
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2064E4070E9;
-	Tue, 24 Mar 2026 17:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDEAE3CFF6C;
+	Tue, 24 Mar 2026 17:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="JJPGGqPp";
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="e3+ogGaA"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="JBlhowD/"
 X-Original-To: netdev@vger.kernel.org
-Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
+Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402893A0B39;
-	Tue, 24 Mar 2026 17:00:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49EF73D34BE
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 17:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774371614; cv=none; b=kd6eB8HtdIj52U0LLig+GZ+JadiHAj6OvQKutzhLdeusDs0CkvqKEa/Q/s7X4q9ycXe3qz2yMzVoqtVLrNnI86y4YKSo2iz35P7BFlw+2GUhn5J6xwOChka30QWAOKxfvXuwvfzMJ61SVTILphLplEm1wOlWNhBu10+U4jt6+oc=
+	t=1774372155; cv=none; b=lmFnkzDQC5dJ5GNKLnK3jWxeuq6NEr30QNYMwCiNLXFAvGmfWan3MGiKRsb31JT5KUg3oLZTwalfFVIhlTzw57frS9qnV0A7X1U+mWJm+Xzsu22e+zAIyr8PPGIUaZDir2PSVS7cWFne5eDuI/YFxyY1UAza7o6lHjkp30Hyuh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774371614; c=relaxed/simple;
-	bh=u38ICIkw85dvG9+E0F0nmzvZgnzaHXcn9KNBe8qnq1w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h5yMGEXoGkDTBzGMxy1+UBTWx6jcc9LQqdnwYCLD0RU+aJIwwgv6ylF3JGcn0j10hqDX0QocMvkizKsU/byGrlS8ZhL4i4hX905IHo5spdpOOCvmcAtc2s10r/aCfDoH7Wy98fTmC4wuaYHxZBiT1ZdqCtGrzTkmfNasoV6vpn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=JJPGGqPp; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=e3+ogGaA; arc=none smtp.client-ip=23.88.97.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1774371610;
-	bh=u38ICIkw85dvG9+E0F0nmzvZgnzaHXcn9KNBe8qnq1w=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JJPGGqPp9WS4zDU3VQJMBcD6vZEEBfLEUZNnE8pobkbi4VPIARNJwtqroLcYeOSS+
-	 9s54WB3Xt8y2v2GmQq9JcDEpwoAl4vENmEBicNmXqu3HZYL4osHGWx+W4fBd3BaObm
-	 gwKySMoaEgU0WUyybO5BgFB+FL95aEV5v/0w6rugSOQiM2V7MDXgI76egl1ApBVIEt
-	 bHCPOus4kDcp/tsS9xKKDqpyDExb1NjDKv1gBt/1YLj0+zJbkgdZWRvM478h9cNhyh
-	 FUncr581tFpb2pzZa7hYABa9UKgUgBHMKWk2+FzXWwj2v7yHIkLjGf0uzAztTtzb8N
-	 wsR38EtL11CIw==
-Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
-	id 1212C4006A; Tue, 24 Mar 2026 17:00:10 +0000 (UTC)
-X-Spam-Level: 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1774371608;
-	bh=u38ICIkw85dvG9+E0F0nmzvZgnzaHXcn9KNBe8qnq1w=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=e3+ogGaADFKrGah/pp6CbM4PKY/jvYT7WUKnlOUyLnpFQmSIXttQsHuNNr7LRH/G+
-	 kvuTmBkyVmw+HxGdHW2HkPEnw2Vfc1NxOkmNKkvegfZ/Vu0JidnTPL/dW8uk7pJWWJ
-	 Yx9XMIv6IJ99MfUtfJ8lqeb/mJFRQQtJYfrbkz03oM/jq6Z9aFFkORqeqsViyDomVp
-	 +3837ujWhJDvfRluCwDa2uoExvgX6GTqEP4rC44o4kK1pYKJtZnKtLXmKjNOwCswI2
-	 hxonwCIKCAGPyXY1DJSfO9P1gv9CRS+TOLNTJaEEpP9TThlJJMgbocHE86fyUUGJJg
-	 AEbluBIQJ3tCw==
-Received: from [IPV6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb] (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
-	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id E7CFC4005B;
-	Tue, 24 Mar 2026 17:00:07 +0000 (UTC)
-Message-ID: <eb941ea7-4bca-457f-9a40-5300affe7e8e@birger-koblitz.de>
-Date: Tue, 24 Mar 2026 18:00:07 +0100
+	s=arc-20240116; t=1774372155; c=relaxed/simple;
+	bh=jQjmfK7wVzXZt3XDwE4POrg9WFrVR0rn1KcplLuWa0g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a7zGCp/Mlmv8CNQ2ZhdG1qwiI1bM2RCOUsPhoUuL5EHXHjPRXvu9GnaUc4pmoX8a78W0vz6k8an98P/dtZIbX8Kks/xVS9J1t8A6XUQ/k+GMZpu0IQ4HuAD9U67esjfCC0KK4mS79whcmxX1kLf3gLzrzv2tNE9DJiLChFAmBIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=JBlhowD/; arc=none smtp.client-ip=49.212.198.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
+Received: from x1 (39.25.31.150.dy.iij4u.or.jp [150.31.25.39])
+	(authenticated bits=0)
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 62OH8Sa1000982
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Wed, 25 Mar 2026 02:08:29 +0900 (JST)
+	(envelope-from kohei@enjuk.jp)
+DKIM-Signature: a=rsa-sha256; bh=jyHsLzXWaR2zRPbZGuPTHNB97BRLzepDzCHvvesUcbY=;
+        c=relaxed/relaxed; d=enjuk.jp;
+        h=From:Message-ID:To:Subject:Date;
+        s=rs20251215; t=1774372110; v=1;
+        b=JBlhowD/CR2vejrT+7U7Cxl5IYnPvFmZUiK3tbHfRagOgB7FoVa9MJ1xWBUGSHSd
+         XTmWEs4NUzP3MSUn6swQFFM/wTR2uEXrAWQ4T8iMTELmZHefn6IBOGcOpz4lN1fu
+         kPHcrgUMksSyFYHPatAhihvA1svL11+70oA+Q0M4ug8s73eq/zSlofVTBpryBTU2
+         zLNmzNOW3yUp7Mowq1Yp/GACjryfTfwGEW0FTrgyREkCdInBpNQHieprh18+E95q
+         P6u2VY9EQVIaJR4eIUlQLMgOL032xdm/2iFg4fDean0qnDnkwE5NIoieYHPhf06x
+         R3lKQMhBZL3lgf7Uu5uEew==
+Date: Wed, 25 Mar 2026 02:08:28 +0900
+From: Kohei Enju <kohei@enjuk.jp>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+        nxne.cnse.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 3/5] ice: migrate to netdev
+ ops lock
+Message-ID: <acLExfyijq7HCEc4@x1>
+References: <20260318163505.31765-1-aleksander.lobakin@intel.com>
+ <20260318163505.31765-4-aleksander.lobakin@intel.com>
+ <abripOPt4oVu-Ksb@x1>
+ <abrzq5_S7p-YjqhE@x1>
+ <1ec79e7b-50e8-4c64-9e79-fc377a505cfa@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/2] r8152: Add support for the RTL8157
- hardware
-To: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260320-rtl8157_next-v3-0-1aefeca7fda7@birger-koblitz.de>
- <20260320-rtl8157_next-v3-2-1aefeca7fda7@birger-koblitz.de>
- <5ff51617-deb6-48b0-b9e2-2d7066fa2562@redhat.com>
-From: Birger Koblitz <mail@birger-koblitz.de>
-Content-Language: en-US
-In-Reply-To: <5ff51617-deb6-48b0-b9e2-2d7066fa2562@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1ec79e7b-50e8-4c64-9e79-fc377a505cfa@intel.com>
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[birger-koblitz.de:+];
-	TAGGED_FROM(0.00)[bounces-271192-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[birger-koblitz.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271193-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[enjuk.jp:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,birger-koblitz.de:dkim,birger-koblitz.de:mid]
-X-Rspamd-Queue-Id: 731CF319AC3
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:dkim,enjuk.jp:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 14AD4319E12
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 24/03/2026 11:58 am, Paolo Abeni wrote:
-> On 3/20/26 12:14 PM, Birger Koblitz wrote:
->> @@ -2022,14 +2277,14 @@ static void intr_callback(struct urb *urb)
->>   	}
->>   }
->>   
->> -static inline void *rx_agg_align(void *data)
->> +static inline void *rx_agg_align(struct r8152 *tp, void *data)
->>   {
->> -	return (void *)ALIGN((uintptr_t)data, RX_ALIGN);
->> +	return (void *)ALIGN((uintptr_t)data, tp->rx_desc.align);
->>   }
->>   
->> -static inline void *tx_agg_align(void *data)
->> +static inline void *tx_agg_align(struct r8152 *tp, void *data)
+On 03/24 17:56, Alexander Lobakin wrote:
+> From: Kohei Enju <kohei@enjuk.jp>
+> Date: Thu, 19 Mar 2026 03:56:19 +0900
 > 
-> Since you are touching this functions, in the next revision please
-> additionally drop the 'inline' keyword; the compiler should be good
-> enough to get them inlined anyway.
-Will be fixed in the next version.
+> > On 03/19 02:55, Kohei Enju wrote:
+> >> On 03/18 17:35, Alexander Lobakin wrote:
+> >>> Queue management ops unconditionally enable netdev locking. The same
+> >>> lock is taken by default by several NAPI configuration functions,
+> >>> such as napi_enable() and netif_napi_set_irq().
+> >>> Request ops locking in advance and make sure we use the _locked
+> >>> counterparts of those functions to avoid deadlocks, taking the lock
+> >>> manually where needed (suspend/resume, queue rebuild and resets).
+> >>
+> >> Hi Alexander,
+> 
+> 
+> Uff, sorry, I didn't notice this thread for some reason. Maybe it landed
+> into the IWL folder in my mail client and I haven't checked it for some
+> time... But I read LKML online on a daily basis and missed this reports =\
+
+NP, thanks for taking a look!
+
+Regards,
+Kohei
+
+> 
+> >> After applying this patch (3/5) along with the preceding ones on top of
+> >> net-next, I got some WARNING splats when changing the admin state
+> >> (up/down) using the ip link command. [1, 2]
+> >>
+> >> Since I haven't looked into this series in detail, I'm reporting the
+> >> splats anyway. 
+> >> I'm wondering why I haven't seen anyone report this type of issue up to
+> >> v3. Maybe there is something wrong with my setup or devices?
+> >>
+> >> Device: Intel Corporation Ethernet Controller E810-XXV for SFP (rev 02)
+> > 
+> > Ah, I think I figured out the reason. My adapter accidentally fell into
+> > safe mode. When the adapter is in the safe mode, netdev->queue_mgmt_ops
+> > == NULL and netdev->request_ops_lock == false, so
+> > netdev_assert_locked_or_invisible() complains about not holding the
+> > netdev lock.
+> > 
+> > Setting netdev->request_ops_lock = true in the safe mode path also
+> > worked fine for me.
+> > 
+> > ---
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+> > index 9ef258d5ab48..3477c53316ba 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> > @@ -3519,6 +3519,7 @@ static void ice_set_ops(struct ice_vsi *vsi)
+> > 
+> >         if (ice_is_safe_mode(pf)) {
+> >                 netdev->netdev_ops = &ice_netdev_safe_mode_ops;
+> > +               netdev->request_ops_lock = true;
+> 
+> This fix looks good to me, thanks!
+> 
+> >                 ice_set_ethtool_safe_mode_ops(netdev);
+> >                 return;
+> >         }
+> 
+> Tony, could you please pick it up to patch 3/5 when sending a new PR?
+> 
+> Thanks,
+> Olek
 
