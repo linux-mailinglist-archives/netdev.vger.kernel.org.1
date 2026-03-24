@@ -1,151 +1,173 @@
-Return-Path: <netdev+bounces-271177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271179-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFEwLBXBwmmjlQQAu9opvQ
-	(envelope-from <netdev+bounces-271177-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:51:33 +0100
+	id WJnYF4PAwmmjlQQAu9opvQ
+	(envelope-from <netdev+bounces-271179-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:49:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8928E319685
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:51:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B70F93195AF
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:49:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EDBAC3069279
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:38:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 328AC3059F15
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2EE3F7A8F;
-	Tue, 24 Mar 2026 16:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5213F7ABC;
+	Tue, 24 Mar 2026 16:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="RBPNLUhO";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="GXSHEnLW"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="vbxFv6Bp"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AB73EF0DD
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 16:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247783A1693
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 16:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774370304; cv=none; b=rE6MfPVNHUx6lR+/f5Y9WU11aWpP+Aj9EO1g1ET13zxt06+HN7TMK1HEMi5TV0e+jh1ENQ2Mb6ejAnpvIXNLbjqloaCtA0oT7TNoAZsZn2oZHtrOJQlht6eOMguOZeW4sPuZxzS/mkrmA9J6MHBWNveviW3lWLma3ybBQ5H6VIk=
+	t=1774370514; cv=none; b=SiluVzlW5ABeLjPXcYHGCkkakGgDAVdlvCNXoZVMvk5G+vpc3jEB6GyHEUk/EdV14gmWG/INP0SkwRq0fJd/gKaKTx2QtmzY36bZL1jEYQagrM2veEtSw9dS+ASqgEzbdftBVNODKffqY+tv902m/vS+eESPydwePHOWGLIYkI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774370304; c=relaxed/simple;
-	bh=9nsFY7QyMnvQRCi1ZhAg0AmwNAl4qNb2zJwv+6wvvb8=;
+	s=arc-20240116; t=1774370514; c=relaxed/simple;
+	bh=7MatbDgQaWgyh+g+DD4yZjrx8Tdr7YMJC0zFSYrDllM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cLFfJ1/Wy5tBpMUEdH2uxnM4gOWljEuslh9aJPIBHHsKaaQlZhzJ5EW27PEMUVjICoyBv91OZuM2QVjL/9T4JI7Q6LUe9X+n2z6nrt6astaZ0jjoFD5akMzzpNHhdPAICvhi2l9YICM5ysIZn3QMAdxDvdrpFwn5Ma2odRWWjNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=RBPNLUhO; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=GXSHEnLW; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 24 Mar 2026 17:38:20 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1774370301;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4OwcY17kG5h3GJj8hGqhZl+mr4nThdAAmN0om3fgan0=;
-	b=RBPNLUhONgKgV8L/Ko1uutpVFGL+QUyAYE72RJxD1g9c6uTc/+7xTiME6s5zu964bUlNph
-	j6VIb4OBDSVGLiXE1GZUWLnFOib73wnXC+DInnEhs1Q9r0CietvAvSxaTz5PJ9Lyyughrt
-	eA0ipl883ZViW6DdY7nzi7w5uWv+qwLQka4z3M7O9TpvO0vtIwSC392z48g6onQ70LwpS1
-	S1JF54XE6oUz1OTWPCPjjwlmTFJdZC7erVwLbM7MclLeyrBeuOjN3UL1zOkdSPAJ13JPtt
-	07+XWmDPsOh3z5hqus0TPbc99YZMKvh9QY3UVBLLVmHVmQ1BAZi1vHV00ZFNiw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1774370301;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4OwcY17kG5h3GJj8hGqhZl+mr4nThdAAmN0om3fgan0=;
-	b=GXSHEnLWBbHV2bv7iDnZGbeT6zXWKMixSBKWQ/f04qzmrhpVkykh63HfZmrIU8QAE60Zho
-	RBuaDAG8nvDsnBBQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, "(JC), Jayachandran" <j-rameshbabu@ti.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=mvG8GfaGQ43Qkqp8kCwGJ1gNzEPmaB0WPY2ZOq5kSlbqXQUuDfxsqgcZyh+oLZpIhfpgJvlYcbl+yg/i6SR3x5cGnILU47dGQsN9AJ9l0Jz+azltztU9Nk064j+84gnr1d9QTif/gfQNbBZT0ijNkjG5KBQZN49Qu1tOoxiW/a4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=vbxFv6Bp; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2b05761bec1so224095ad.1
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 09:41:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1774370512; x=1774975312; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7MatbDgQaWgyh+g+DD4yZjrx8Tdr7YMJC0zFSYrDllM=;
+        b=vbxFv6BpcqIkm4AeKu4gyPUI1iEFsAyCEl24gZHOyAdza8EdaWF5k2vTgofZ8ULd7U
+         SqbNmZmGm/cq7IpxfaILIWCpyFxg6OYMHvNFlwTfZSL3t/w4+m2fdTQmjybYB0lEPGJZ
+         025SQy1ldvBeNF3XEuLBqzWR6Q3Ix96oRIurRN5aHrY03Ujnz/f7Kq4hkgbI0SZr2nav
+         FKAa+6zZAHE37XN+BBgNeXhsnwhEJNoY8eQD+wWd0stw1it+HNWScHefkkGc+BeXGcv9
+         JiLzcQlcits5/rHdm/3u1O9BGE9iDfJbJj8R+iX7beD+Q3czz/kzf7E+4UAN3IBbjezu
+         5s7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774370512; x=1774975312;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7MatbDgQaWgyh+g+DD4yZjrx8Tdr7YMJC0zFSYrDllM=;
+        b=mjpS2j00Ly1fr+aW4vbLXHqR9r1yI1piFcm2bFQHz1wJFiD0MrbZAQTmu7NsBTJKau
+         HbRoRcVDkHeCl23vMrmnYDP1Q8w1icGPAla5eg4JgN8CIZ9WEIWkJO7k8xPuvIGHQBwF
+         tWZ/6bD2zxXPeqGuyItdodbrd4p37GJ81QtfP+ADqu+YpvoYtWLJdosCpXepVrWL0803
+         Wv2kFzuU1nobIBFFb9lN4eIbQGqeQl30vR7LP6mvRdhgimFDKLScvD684GIhbdYvB7Sl
+         gHv1hDUG9xifumVxL2xsQ9I6hnePLvQFOhy6LZ3++oH3hi94zblgR5FgaaJB5ZHE7mH4
+         eliA==
+X-Forwarded-Encrypted: i=1; AJvYcCUw4amjY43A29bCR1Ok/2FiWmp0U8Ma+8e6zxEQknI21dyNxv3k/BjS9Lmb35FRkPmY/cO4J0g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhWNJen8V2yMC7q+n1wAiFJQexjOTfPRMLORdgSNWj0A6Hfq7C
+	CKb71r+XMfFaZkuZhnyau/wYTNZdWTPV+1p9QpvR7VocrEuupLdFkLdydE6nIkCQiQM=
+X-Gm-Gg: ATEYQzy2vXi6E0ka/M6ygprW3opx70EZlXvOINLRahTyWTX2VX0V1Nm+7vSH1cNCLsj
+	sDedFxoYEUQ8QrdQxxdSXk1kMCgLAPAMMJ/pAkaQfSY4wrjYnUXPBjNRYy/7Rj96OmLSwH2Kiob
+	iG5eLJqGLcnB68tsUQt0ETif4xaLWelCQrpuf6GQ/mg2P2u3IBPJcEUS6SGVpf/pFyg3E2Oibiw
+	mCwTnFZyJOUmlUQJJKUWKrDkrPbvKN5WRFoTX6Es6dfueWtTPYmsxXPL/zvoiROVsMi5BQj5/xM
+	l/yTNSKOpZo2POJr9paK5vwQZFe0Q+8JjnwAjqztPx2aZskpEy8fHHgilSxvFwVWqJdQaooZ6dE
+	6/3Pb1k3LMZdKbvJQDl+rYIsLdKnTBJwYX5kZwvC9QJ1swgHRYHgYUbBGMyvRDkPX/kJu5xkdDI
+	Jh7AC2
+X-Received: by 2002:a17:902:db0e:b0:2b0:5a4c:726f with SMTP id d9443c01a7336-2b0a4e0f962mr38951665ad.15.1774370512477;
+        Tue, 24 Mar 2026 09:41:52 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:50::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b083516b96sm191790655ad.7.2026.03.24.09.41.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2026 09:41:52 -0700 (PDT)
+Date: Tue, 24 Mar 2026 09:41:51 -0700
+From: Joe Damato <joe@dama.to>
+To: Matteo Croce <technoboy85@gmail.com>
+Cc: Mohsin Bashir <mohsin.bashr@gmail.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Chintan Vankar <c-vankar@ti.com>, Danish Anwar <danishanwar@ti.com>,
-	Daolin Qiu <d-qiu@ti.com>, Eric Dumazet <edumazet@google.com>,
-	Felix Maurer <fmaurer@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH RFC net-next v2 2/2] af_packet: Add port specific
- handling for HSR
-Message-ID: <20260324163820.p9M2z27W@linutronix.de>
-References: <willemdebruijn.kernel.3693c9aa8271@gmail.com>
- <20260312154253.UC-QUPvD@linutronix.de>
- <willemdebruijn.kernel.be379ee17449@gmail.com>
- <20260313092226.SscHp2zQ@linutronix.de>
- <20260313160410.LEhav8Xz@linutronix.de>
- <willemdebruijn.kernel.1fbf050c50d62@gmail.com>
- <20260317172906.eG2LxlZ7@linutronix.de>
- <willemdebruijn.kernel.17068ce38efa5@gmail.com>
- <20260319142613.KHz32I-V@linutronix.de>
- <willemdebruijn.kernel.8e323262df61@gmail.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/2] e1000e: add basic XDP support
+Message-ID: <acK+z8Udlg1qyDeu@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Matteo Croce <technoboy85@gmail.com>,
+	Mohsin Bashir <mohsin.bashr@gmail.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+References: <20260320132356.63194-1-teknoraver@meta.com>
+ <20260320132356.63194-2-teknoraver@meta.com>
+ <1d708196-7b89-431f-bb17-177564196894@gmail.com>
+ <CAFnufp0LRVxwh50cLrg=hUe6itshTqrNy53HkvBWk6MQ7uL0KA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <willemdebruijn.kernel.8e323262df61@gmail.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+In-Reply-To: <CAFnufp0LRVxwh50cLrg=hUe6itshTqrNy53HkvBWk6MQ7uL0KA@mail.gmail.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271177-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271179-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[dama.to];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,ti.com,davemloft.net,lunn.ch,google.com,redhat.com,kernel.org,gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,vger.kernel.org,lists.osuosl.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:dkim,linutronix.de:mid]
-X-Rspamd-Queue-Id: 8928E319685
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,devvm20253.cco0.facebook.com:mid]
+X-Rspamd-Queue-Id: B70F93195AF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-03-19 12:27:57 [-0400], Willem de Bruijn wrote:
-> 
-> Right, so this is simple without hardware offload. Does this HW
-> offload exist, or is this aspirational. At least for infrequent PTP
-> it does not sound important.
+On Sun, Mar 22, 2026 at 03:11:56AM +0100, Matteo Croce wrote:
+> Il giorno ven 20 mar 2026 alle ore 22:23 Mohsin Bashir
+> <mohsin.bashr@gmail.com> ha scritto:
 
-The snippet below was for the icssg driver as-is and it works with
-updated firmware to ignore PTP packets while HW offloading is enabled.
+[...]
 
-The hardware offload in general forwards the packets without linux so if
-a packet arrives on port A, the HW forwards it on port B and the linux
-networking stack receives one copy and does not need to forward it
-anymore.
-This "cut-through" forwarding is beneficial because the packet is
-forwarded instantly without getting delayed by the software stack.
+> I addressed all the comments and I'll send a v4 soon, thanks!
 
-For PTP packets I don't want any of this because the forwarding breaks
-the timestamp information. So I need to tell the driver not do any of
-the offloading while sending and the updated firmware does the same for
-incoming packets.
+I was paging through the code last night and I was wondering: have you
+considered splitting this patch into multiple smaller patches?
 
-There is no HW-offloading of PTP related packets.
+It would probably make it easier for reviewers to read and comment on.
 
-With the skb_ext I had, the mechanism was mostly the same but it relied
-only on the skb_ext data. Now it has to look at skb->mark.
-
-Sebastian
+Just my 2 cents since you are sending a v4.
 
