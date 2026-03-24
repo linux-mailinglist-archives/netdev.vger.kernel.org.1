@@ -1,163 +1,200 @@
-Return-Path: <netdev+bounces-271164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271165-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +ELSBti5wmlilAQAu9opvQ
-	(envelope-from <netdev+bounces-271164-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:20:40 +0100
+	id KHp7Miq7wmlilAQAu9opvQ
+	(envelope-from <netdev+bounces-271165-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:26:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C43B318E5E
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:20:39 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5887D318FCD
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 17:26:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7B3F53038AC3
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:13:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BD358306D2C9
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1C33D16F6;
-	Tue, 24 Mar 2026 16:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1AD73EE1C1;
+	Tue, 24 Mar 2026 16:18:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="szwYRCD8"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="D4/fbmV/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hNWNiVrH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9C637F72A
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 16:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBC03E9F6F
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 16:18:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774368800; cv=none; b=jJFBsi738LYcB/D82EGQhuFc3iBw2dldqsF0nxBNFrQPwRk+DzG3BFa9gxHI25xZgZn3ZF10u0n3ze5Um4UzQscZ1sRtP2TiPdDaHQ7r+EhPPKLDpgC4xLlAnxLe5noSNv+g38uqcCmlMaOtGn2vU5sMizQkfGwIBY3JDAKix3E=
+	t=1774369096; cv=none; b=rECfo2/tBxv3xZ4yJDIVg5GGqXNCAeQVD6Y0M5mOGpPCzERv36tguxQS9Prt56BNe5WAbBgQWN8+15ZlE0ZvMo8itYL2p5gCZ3J5rsDn4r2p+p2rd1ZZoeI6TBtddDXtRcow/d0gECCybCd+e2wjKHPnCmMzlId5nYNaXWiDvm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774368800; c=relaxed/simple;
-	bh=oYHQGhASPStF1F6gI09Wy+VEIW+XOsrmKO9LSY6Yn7U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b22tQX3Y05uJm2WKb1lcWO11VJk4+c5MwanwJGWiSRhskrU1loPdwbHw65SAOVsehSAcArjEUIBuSfRGBP69GAUps9N8BajSaYqwZRDZ60bakF6JpoCG4iD97YrH+4hiOAygi3Mc8MKwR9nSpG2sPeqHMwiPdmEzYOf2ws45uqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=szwYRCD8; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-486fe655187so52542475e9.2
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 09:13:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774368797; x=1774973597; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Efpb+LqGSJ0Wl4bNfNJO+gjcYGiuows2jBcjKXLuEQ=;
-        b=szwYRCD8bW2Xhr6ooZbkCVrsMQvQF5jlajnfmGsGtZDESh5zOuWfhH+gClewSDDlAP
-         f9NT2ptiCOwu8KRKTLpZ4n7SzHV675nnJzil3avN8ojQmdkLcZDyaUHZlQ6x96PrBcll
-         RPKZocy2EU/SB6WlAiKiIcE1DnQwm4IGepZFAj/MQjzzaq2XQbC7vO54VaPlbBVsPeLm
-         6+Iox0xSGfMF5pc9zbVhLxYVhxMEe4A1uFV/NKs+FMtFf3Pm9y1TDoFAYUurc/bhfWEZ
-         h+EnMx6eq811+AOZ3VQ/ifTqjNj1VQsryPgqGbvRTyAdM57EZlzek6h3SUOl7K1aYFY2
-         g6NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774368797; x=1774973597;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1Efpb+LqGSJ0Wl4bNfNJO+gjcYGiuows2jBcjKXLuEQ=;
-        b=gvmm/CkjqUxV9EFhptlO2mGqr6A5LJ7e4yjOxRnVQbyX8xkW5IuBXZDzYtkcT0ng4i
-         ZMucekcMxRPRzTNGjNZtVLysjnkes6cSM+0EUVkvZ4p2xihZ3BebO2YRXVqry9cB8CQA
-         HKmnFjUknRxv9QPqW4au77U/shxJP7dpY5+JDH9rutH4BmYskx5zkC4hWp49jUdhLM72
-         r9dCMvCM+kwVsMXEJ9MFApyddOn7Vp7IWqXuornbK6MKXzRpc8ZWV3pqscZERsQyC6AV
-         3z0iCR0LhulGnxT5vo+ghJCnafGDh8IjeQ9SHGTChEfA02siLpK2Seg/ejKN/clUaDeX
-         fNLQ==
-X-Gm-Message-State: AOJu0YzK8vtuOcBfk/f2IjGZ1T/gxMlaW03N0gAZ0GOQ2MLAdUQo2TjN
-	LlaHIGt7keopISoz6RzPGFAM96wwrkwTwiu5d9jbuLg1IsN6pBtCwkUk
-X-Gm-Gg: ATEYQzxWcjnzra3KZBQjEgWieCVjzpiwh33g3lZT3EEaoFhqETTBAy7g7MRdHxxWtCx
-	UK6jo+G1GYDWC4b9ammWFuVOdLBTb7y63ebPgXrDSsDAZrkAR/pWAzhaXWeJEmyN89YgTFYXP3R
-	Pnj6pDrYNcEbNQBdYqvsfDvx1TgfLYx2++32SNLEScPc6Qi+7w10rpgfiPqdX0g/1cWqpSvl40j
-	I0S+PU5fyPZlOhY7IV6Mx4aJJjHC1W/aJs76q+umeZGPczd/w/Rw7PeLE65JTWnaKlGq44u1X4b
-	nRASHtst6A60acyasNPEjQlTl7b/KWtITrgctmsJLhw1xajf3Mt4fWbSowql7/3DbyuKtsQGDew
-	Wq7DcvC9yJgnhcxzV+8hgj9HAo4QSn58Of6KWwyw7GzVXvqp8abPfltJNeP8lOQ7au9JUlrYiMj
-	nJA4MOelo8ECxbJhL9UhFYwHNoycinYBy6lQSdKB58XM8moO6/M68LTE/8bWeamOSecI2PFRGT3
-	5zHbiEA7CK9
-X-Received: by 2002:a05:600c:1d1d:b0:486:ffa3:592 with SMTP id 5b1f17b1804b1-48716071b2amr4895765e9.24.1774368797178;
-        Tue, 24 Mar 2026 09:13:17 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-487116ac0a8sm109272685e9.6.2026.03.24.09.13.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 09:13:16 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
-	David Carlier <devnexen@gmail.com>
-Subject: [PATCH] igbvf: fix DMA mapping leak in TX error path
-Date: Tue, 24 Mar 2026 16:13:14 +0000
-Message-ID: <20260324161314.308433-1-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1774369096; c=relaxed/simple;
+	bh=8C/DjBp39jYkBAqNxvGamQZqh1deDXx2p5oGCfa56L0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IY1jKE50yrCiGdxh2+aw5X2p0DCQ4Y1YZPLY0z9glRkb92hV+2DsFXU6CpiAXtqtflc2PH6ov9MbKsHv2wqbbxdx1XPxUiyjtWATKD+elI3V43PmtBH2Tp0yzdVoak2nvlaFmtLDM0XdckgS2h/Nv7ZGuRXcdy+Hk0x/t11fgZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=D4/fbmV/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hNWNiVrH; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
+	by mailfout.phl.internal (Postfix) with ESMTP id AA425EC01C6;
+	Tue, 24 Mar 2026 12:18:13 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-08.internal (MEProxy); Tue, 24 Mar 2026 12:18:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1774369093; x=
+	1774455493; bh=Vp4gyJHp4EnpMatG4byhKohMN8YYHeEtYBPYsAxo4N4=; b=D
+	4/fbmV/2xaEQUi2GFrkcykd0K4l/Mq8czbEjPZOUtDfwY/faC12L3jFJHMENhLX0
+	NwXN9oy61rAj2P3TubRxJ/Sk6qArVuxTQ+KEn+bjDoNqNTf8zefiK7TKEz9ndWu5
+	u7c8XEclgs78QZfYDiUMM+B5vPTrofvxBsycsv/8GQ80zZ+TDkdJYbgmXN89BdWg
+	9prAQQVJH1j4UP5B546+loyB+J4uZFY9SJiCtWKUH/Z9pKfk8nL63cGJgpGSp4Gj
+	so1Ga9DLq3JS8K3zjznlTRsgIc25xHUz2+/qPkhbQWSv3s+tGk86t4F4mg4o3jqM
+	peVzpDGTb3DYNCQ6zlGuw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1774369093; x=1774455493; bh=Vp4gyJHp4EnpMatG4byhKohMN8YYHeEtYBP
+	YsAxo4N4=; b=hNWNiVrHJn9+ORahaDBKAiSeensm0b4SHVRuH6try9r1XoAMPjp
+	g2L4nn1rJt8u5GvOet8YuiEJ576gzeUbfDcuIZpTW95yP3h8z/VZm6Vq2DeMc5pH
+	85CT1xFso1XUgzcsGzkBjhe/WCXJ8MJnSOzL4s4+4odFE79DV5TtLz5toql+S9kL
+	9x0xT+3IZj52uQsJ325trofpQlH31qfcQL8/iOLY/s1EzKHgXLv7tNOU8rGmo5wv
+	YTW+pLnuB/tpT88HPM3Xaag01NDmkij3owL3h/xgTVC/AqcHuH3Ukzaxt/mWfFYJ
+	G+qSEbmVdvFkcn3mnJopNtlbz8qGW6jFBGw==
+X-ME-Sender: <xms:RbnCaQ-BSZSUD5a0ytmT9Jm8PSfbqzbYrbxrjFevDhi0ybex-wJhZA>
+    <xme:RbnCaZbbwreVU6HBGGbAjeQIDM8Z-gNCfOIuzyFEFCbV8ug1f4p6YSDctaYYmwBrH
+    BMytu-BYVR2Afm0lk3i4vF7UQVNCCZjT-deD1rWtuc4Wfnp2NbC-EI>
+X-ME-Received: <xmr:RbnCaUMXPRkRsXiA94-TlAwQ4WUypXf77cMrwwsIJEXGndvwUveq-W3tHgRW>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefvddvtdegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeejpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopegtvghlsehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthho
+    pehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrh
+    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhgvrhhnvghlqdhtlhhsqdhhrghnughs
+    hhgrkhgvsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheptghhuhgtkhdrlh
+    gvvhgvrhesohhrrggtlhgvrdgtohhmpdhrtghpthhtohephhgrrhgvsehsuhhsvgdruggv
+X-ME-Proxy: <xmx:RbnCaVB5-n8msAh7Z3vjBJzsFOs-3aZAwSc_UnlLH5tjnRcjU7LYcQ>
+    <xmx:RbnCabLiPTB7OxoaILKqhtOAGxJO_ia8_D0RaueApeyX0Mg-Q-GLpQ>
+    <xmx:RbnCaeNshgpVTrbIXbUq51NkfGWpF_STMgIWvzmYrFzuOs9qHxKrIA>
+    <xmx:RbnCaZ4M4Q8yPBYogg4ZV4p65RG5DNQuvm7pVdJlj6w-pSz_MeczGA>
+    <xmx:RbnCaRlp6JtnzLiSDBwpehtFFyrCvoaqt0YnLBGusqr9ZbJNOhii2BNx>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 24 Mar 2026 12:18:12 -0400 (EDT)
+Date: Tue, 24 Mar 2026 17:18:10 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Chuck Lever <cel@kernel.org>
+Cc: john.fastabend@gmail.com, kuba@kernel.org, netdev@vger.kernel.org,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH net-next v5 6/6] tls: Flush backlog before waiting for a
+ new record
+Message-ID: <acK5Qj-F0wGFLUhj@krikkit>
+References: <20260324-tls-read-sock-v5-0-5408befe5774@oracle.com>
+ <20260324-tls-read-sock-v5-6-5408befe5774@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260324-tls-read-sock-v5-6-5408befe5774@oracle.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-271165-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271164-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,lists.linux.dev,oracle.com,suse.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9C43B318E5E
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,queasysnail.net:dkim,queasysnail.net:email]
+X-Rspamd-Queue-Id: 5887D318FCD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When a DMA mapping error occurs in igbvf_tx_map_adv(), the error
-cleanup code decrements count before the unmap loop, causing exactly
-one successfully mapped DMA buffer to be leaked.
+2026-03-24, 08:53:28 -0400, Chuck Lever wrote:
+> From: Chuck Lever <chuck.lever@oracle.com>
+> 
+> While lock_sock is held, incoming TCP segments land on
+> sk->sk_backlog rather than sk->sk_receive_queue.
+> tls_rx_rec_wait() inspects only sk_receive_queue, so
+> backlog data remains invisible. For non-blocking callers
+> (read_sock, and recvmsg or splice_read with MSG_DONTWAIT)
+> this causes a spurious -EAGAIN. For blocking callers it
+> forces an unnecessary sleep/wakeup cycle.
+> 
+> Flush the backlog inside tls_rx_rec_wait() before checking
+> sk_receive_queue so the strparser can parse newly-arrived
+> segments immediately.
+> 
+> Fixes: 20ffc7adf53a ("net/tls: missing received data after fast remote close")
 
-This is the same off-by-one bug that was fixed in e1000/e1000e by
-commit e94eaef11142 ("e1000/e1000e: Fix leak in DMA error cleanup"),
-which noted: "This issue may still exist in the igbvf driver."
+How did you pick that Fixes tag? That commit mentions FIN/connection
+closing, which doesn't seem related to the local backlog.
 
-Remove the erroneous decrement so the while loop correctly unmaps
-all successfully mapped buffers.
+And it's quite possible there was a similar problem when kTLS was
+using the generic strparser, but the code has changed so much with
+84c61fe1a75b ("tls: rx: do not use the standard strparser") and the
+work around that, that blaming something older probably doesn't make
+too much sense.
 
-Fixes: c1fa347f20f1 ("e1000/e1000e/igb/igbvf/ixgb/ixgbe: Fix tests of unsigned in *_tx_map()")
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
- drivers/net/ethernet/intel/igbvf/netdev.c | 2 --
- 1 file changed, 2 deletions(-)
+> Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+> ---
+>  net/tls/tls_sw.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> index 8fb2f2a93846..84c4ae0330d1 100644
+> --- a/net/tls/tls_sw.c
+> +++ b/net/tls/tls_sw.c
+> @@ -1372,6 +1372,7 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
+>  		if (ret < 0)
+>  			return ret;
+>  
+> +		sk_flush_backlog(sk);
 
-diff --git a/drivers/net/ethernet/intel/igbvf/netdev.c b/drivers/net/ethernet/intel/igbvf/netdev.c
-index 5d04541072b3..88c6ce5040e2 100644
---- a/drivers/net/ethernet/intel/igbvf/netdev.c
-+++ b/drivers/net/ethernet/intel/igbvf/netdev.c
-@@ -2190,8 +2190,6 @@ static inline int igbvf_tx_map_adv(struct igbvf_adapter *adapter,
- 	buffer_info->time_stamp = 0;
- 	buffer_info->length = 0;
- 	buffer_info->mapped_as_page = false;
--	if (count)
--		count--;
- 
- 	/* clear timestamp and dma mappings for remaining portion of packet */
- 	while (count--) {
+Do we need to update released when this returns true, like callers of
+tls_read_flush_backlog() do? I also wonder if we'd want to update the
+caller's flushed_at to avoid bypassing the "smart checks" in
+tls_read_flush_backlog().
+
+>  		if (!skb_queue_empty(&sk->sk_receive_queue)) {
+>  			/* Defer notification to the exit point;
+>  			 * this thread will consume the record
+
 -- 
-2.53.0
-
+Sabrina
 
