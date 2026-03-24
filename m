@@ -1,79 +1,105 @@
-Return-Path: <netdev+bounces-271064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271065-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EHCtMZqPwmn/ewQAu9opvQ
-	(envelope-from <netdev+bounces-271064-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:20:26 +0100
+	id kFhXH2iNwmlvewQAu9opvQ
+	(envelope-from <netdev+bounces-271065-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:11:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB29B3093D7
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:20:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E927930902F
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:11:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 28DD13046623
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:04:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B403C30783A1
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:05:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B003BC680;
-	Tue, 24 Mar 2026 13:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5BBF3EFD0D;
+	Tue, 24 Mar 2026 13:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JO4krb76"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="EFzEjqL1"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1420390999;
-	Tue, 24 Mar 2026 13:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FFBF3DEAD7
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 13:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774357491; cv=none; b=XR+dCsOJdZRid3Q93snFxQlFShS+rBsDvKuBQeHMr7tTKU0QSnvs1aPPwvHU28LAoVOuOT3rinQPkz5TnQNyASnFnqfXp8TBtrO85egzZQoj63rFwsd37LsUKJJmhwBA7mY58z7ma19N6jTwZbvxyQFosxaHKA7ucFEq1l/B3jo=
+	t=1774357536; cv=none; b=L/sPt1S1T5rjU0a6trsDTUEUexuqcGSnebb7qU/ayzCUU/X7c1wIul3OMl1jeybUlkL+gsnYC8ABoYDLw89CPlPpHTUuy7CP//1JUHVpJFCfvCHA7sKhyh/oIGK7bOoxp3R0H4mbC8niW8tCI+QO+VmfPA5382xomyUDJHkM57A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774357491; c=relaxed/simple;
-	bh=Sj+d5N6JtCmiB6OYc3c9qCEma5tAXaqtiZ+NbtcW0HI=;
+	s=arc-20240116; t=1774357536; c=relaxed/simple;
+	bh=c5ob8x+63Jafk7vg3P7eaQn2ve59Nggw5TcAv/2m3zw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UJ+iWoyLyobzDx0ikQfTB/bWD5PIpRhDVeLYcurxnuWMkR42vVb4oOH6ygAlDVH3slodxBBtiZqTm/hz9hpCMWSGsSBpp//GS+/ocU/UVhTwFHtAZOAK2mcb4kxgIMDDGrzk1fKVNBIGk0WgbBged8eypxj4+Pxynwhlb3aiAPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JO4krb76; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=WN2wTNGMgM5bYbRGfOQZgYj/JyTydD59C5V7z3tIw28=; b=JO4krb767LEVW4/gzQbytGjPP0
-	FIMh0JO+ZsFiQqlgXLpEQXy+eQz2g1WGOjXNbzS/NKmGHCMkdlLFXkjvL60PFC3f/G9a6py6A95Gm
-	96ru2QzKxJQQS/k6iUDn7Dg3FxM7m8nYjcTRlIb3HuBYR6O3quUUlNs2OW2TrV6WAFJjPQ2+2Q0bT
-	mmgDDxr+rwB2aMz/UIIRPsLkxdp5Zpx7UZbRIJm20tcHSeOK7cIbnHJoqGQwKSh2lVbAUpgMCEM/Q
-	QUsRNCxtLrGZ/884HjkfwvmSZ7+VurZEZR6m0RiLmmeUrmXRsh8T2Gnvr44ouJMTk87XQFyG67lKP
-	1fXJtbMQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38946)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w51Qz-0000000021Z-0snn;
-	Tue, 24 Mar 2026 13:04:37 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w51Qw-00000000558-0Eg7;
-	Tue, 24 Mar 2026 13:04:34 +0000
-Date: Tue, 24 Mar 2026 13:04:33 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Paolo Abeni <pabeni@redhat.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-Cc: Michal Piekos <michal.piekos@mmpsystems.pl>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net: stmmac: skip VLAN restore when VLAN hash ops are
- missing
-Message-ID: <acKL4RoM-zdwj1Ib@shell.armlinux.org.uk>
-References: <20260321-vlan-restore-error-v2-1-45cf56a5223d@mmpsystems.pl>
- <5e5706bb-0f04-4bb1-94f4-45083a3c76fd@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sQdokeMRKq5zxfLVKF7VtI13EKGCWO6mUPGZewW7wSMDEwr4eu18sk5We9JpR2khUXtIbmcnCpQa5zNCx9nLlNnWjE5EyugcMNOlanNKU50BxXoa9KEZoa8X+i953bqwpnKphcVaerR1eTAcDUVG62Zq0HmAzpv3Dzq4Yb7pW/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=EFzEjqL1; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-48558d6ef83so37787925e9.3
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 06:05:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1774357534; x=1774962334; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c5ob8x+63Jafk7vg3P7eaQn2ve59Nggw5TcAv/2m3zw=;
+        b=EFzEjqL1CrH9+xTEQCCpzA5wU2vTa0ZY3RcosBio97hIDcHZBskxxAceCFYxV67SFM
+         PsTcBXmJJvz4+0zHWTzSrknsIRvi1p7y9gYNNDPeAy6cBzEUo4GHYGzSilSFRbUdOhBY
+         shUTABQWxsLpoSzpCZFYP6G9GqGEMj90LW9rmoQwemQ6I9/otaeFCWu9SP/rKdtOcV2N
+         RvyJsoJ+5I/0lFD5fi+ZjIej+CX+layGDTrr9dJUmgQdQVZwYcZafg8XEa/nZSkm45a2
+         MXtwhLewzXFRS37telw/QsZrlr9R1w/prdiV7ebHrNdCbRvSWCdfyMihQCLi4MxiZtni
+         bT7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774357534; x=1774962334;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c5ob8x+63Jafk7vg3P7eaQn2ve59Nggw5TcAv/2m3zw=;
+        b=eJ2kL8zyBSjr6l0Y0alfV5mT2IU2GYctxff40ygfhvVF1vvs5HCAkzqju5OtAb6L1x
+         O80EctqDYfBjl7t7yu/OxprJkloBtkikqqHg42XWAeJ8pknkpl0Py3p3KURBReQ4T8cM
+         xAGNGR//UBAmjaHNrkZcmTzeHst6mmxR2Gki8slpS7ClN/MB5cbOh2aoHdlkAHWrhc3a
+         MeWkBEkC6kuRziG1k64Z6R23Sc9xRGokFx4HfZest4F/pajFTT5rk0qq84MofrKUMjFS
+         B0hw1DgwCuo3Y7a+KQ97/SXcyRgq5wX4JeCD9B9SayL4j2ZjhsBPkLJ51JbMJMCzipxF
+         5FVg==
+X-Forwarded-Encrypted: i=1; AJvYcCXFvNNhq+JkPU7H0295Em6gR8m9N/0xgCJtNYu/6BKDZTn9Oy8jcc57QD8i13Aixq9Fi7vYBXQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxlg9D6f3lIBKvg2Y9e+YT0J4/OOPqwCYS1ZYXCL4iWtiOOknE6
+	zBEFghVUlatca8TvBqyUMVORDUeeYUnUMALZzxoKSfWdVFTNTijYsbcNwsOXCAtIRlIGIZYs0h8
+	Kn3X5XcE=
+X-Gm-Gg: ATEYQzxsPirCuGh2ZdMDhGZ6LT5m+M3xO9TzMlvicS028DqRgEqhG9OCjO8HxZlVje2
+	F2xrzTgQkNyZZ4lvBzneUAAa3JZ/+5Vw0UC3jG/VJd2ok4kvnmzaRP2WFkHhpPSFBu2Quxt1OeZ
+	O7ZTPhg3z9G+R7tIv+6FRpv24FsAxVmwEx1e0dE8scwOJV+xfeW2SumAKiCEo4UUnj2hgzan+j2
+	vE3uu0ZqCjex0u5aRRaHTq6VfMNuMN20suk0s3Grkp42uzdnSpeAv7A0jKE+ZtPJTVTklXLHoe5
+	cOs0rlk5RJ2rr2L0b7r19OsSWEEqMyWk4x3jvSln8Z7/gm0HiKcL1z9mTaUDRFN5/uiyFVZ9FZp
+	EJpXa6pysuDzNOVyiPUynLgjJXabrDH8gBzA4S8iWJmB0q8vbTWXnjSUsMZ9B6na2saymejaql2
+	QOqaVhpR2JvVDdZR2964KUvE/g0Xwj72nHaiQ=
+X-Received: by 2002:a05:600c:4f10:b0:487:2e8:69c5 with SMTP id 5b1f17b1804b1-48702e86a88mr205126035e9.15.1774357533835;
+        Tue, 24 Mar 2026 06:05:33 -0700 (PDT)
+Received: from FV6GYCPJ69 ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48710fa0e35sm46182275e9.3.2026.03.24.06.05.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2026 06:05:33 -0700 (PDT)
+Date: Tue, 24 Mar 2026 14:05:30 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, 
+	Chuck Lever <chuck.lever@oracle.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+	Cosmin Ratiu <cratiu@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, 
+	Daniel Zahka <daniel.zahka@gmail.com>, Shay Drory <shayd@nvidia.com>, Kees Cook <kees@kernel.org>, 
+	Daniel Jurgens <danielj@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, 
+	Adithya Jayachandran <ajayachandra@nvidia.com>, Willem de Bruijn <willemb@google.com>, 
+	David Wei <dw@davidwei.uk>, Petr Machata <petrm@nvidia.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-kselftest@vger.kernel.org, Gal Pressman <gal@nvidia.com>, 
+	Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next V8 03/14] devlink: Migrate from info->user_ptr
+ to info->ctx
+Message-ID: <yfpepx63i2om7y62kspzizq7a3xxknfnzrg7j27ppt2oxpeou2@kfbomamxpdo4>
+References: <20260324122848.36731-1-tariqt@nvidia.com>
+ <20260324122848.36731-4-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,180 +108,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5e5706bb-0f04-4bb1-94f4-45083a3c76fd@redhat.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+In-Reply-To: <20260324122848.36731-4-tariqt@nvidia.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271064-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[mmpsystems.pl,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,foss.st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271065-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[35];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,gmail.com,lwn.net,linuxfoundation.org,nvidia.com,oracle.com,davidwei.uk,fomichev.me,linux.dev,vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.942];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mmpsystems.pl:email,renesas.com:email,shell.armlinux.org.uk:mid,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: DB29B3093D7
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: E927930902F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 24, 2026 at 01:14:29PM +0100, Paolo Abeni wrote:
-> On 3/21/26 6:38 AM, Michal Piekos wrote:
-> > stmmac_vlan_restore() unconditionally calls stmmac_vlan_update() when
-> > NETIF_F_VLAN_FEATURES is set. On platforms where priv->hw->vlan (or
-> > ->update_vlan_hash) is not provided, stmmac_update_vlan_hash() returns
-> > -EINVAL via stmmac_do_void_callback(), resulting in a spurious
-> > "Failed to restore VLANs" error even when no VLAN filtering is in use.
-> > 
-> > Check presence of VLAN HW FILTER flags before stmmac_vlan_update().
-> > 
-> > Tested on Orange Pi Zero 3.
-> > 
-> > Fixes: bd7ad51253a7 ("net: stmmac: Fix VLAN HW state restore")
-> > Signed-off-by: Michal Piekos <michal.piekos@mmpsystems.pl>
-> > ---
-> > This patch fixes a noisy "Failed to restore VLANs" message on platforms
-> > where stmmac VLAN hash ops are not implemented.
-> > stmmac_vlan_restore() calls stmmac_vlan_update() without checking for
-> > VLAN hash ops presence which results in -EINVAL. 
-> > ---
-> > Changes in v2:
-> > - Replace check for hash ops with check for HW FILTER flags
-> > - Link to v1: https://lore.kernel.org/r/20260314-vlan-restore-error-v1-1-4fc6c3e2115f@mmpsystems.pl
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > index 6827c99bde8c..cfc0ce9cec9c 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > @@ -6863,7 +6863,8 @@ static int stmmac_vlan_restore(struct stmmac_priv *priv)
-> >  {
-> >  	int ret;
-> >  
-> > -	if (!(priv->dev->features & NETIF_F_VLAN_FEATURES))
-> > +	if (!(priv->dev->features &
-> > +	      (NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_VLAN_STAG_FILTER)))
-> >  		return 0;
-> >  
-> >  	if (priv->hw->num_vlan)
-> Adding Russell.
-> 
-> It's not obvious to me that with this change the
-> restore_hw_vlan_rx_fltr() and vlan_update() callback are still invoked
-> in all the relevant driver/features permutation.
+Tue, Mar 24, 2026 at 01:28:37PM +0100, tariqt@nvidia.com wrote:
+>From: Cosmin Ratiu <cratiu@nvidia.com>
+>
+>Replace deprecated info->user_ptr[0]/[1] with a typed
+>devlink_nl_ctx struct stored in info->ctx. The struct aliases
+>the same union memory, so the migration is safe.
+>
+>There are no functionality changes here.
+>
+>Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+>Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-I think there's a few questions here.
-
-When CONFIG_VLAN_8021Q is enabled, then we set the filter features
-if the vlhash dma capability is set:
-
-        if (priv->dma_cap.vlhash) {
-                ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
-                ndev->features |= NETIF_F_HW_VLAN_STAG_FILTER;
-        }
-
-Only dwmac4 and dwxgmac2 have the ability to set this feature (and
-thus be synthesised with the feature enabled.) From what I understand,
-when present, these features are permanently enabled (as they're not
-set in hw_Features).
-
-However, in stmmac_vlan_update() there is:
-
-        if (!priv->dma_cap.vlhash) {
-                if (count > 2) /* VID = 0 always passes filter */
-                        return -EOPNOTSUPP;
-
-                pmatch = vid;
-                hash = 0;
-        }
-
-So, it is clear that the intention is that stmmac_vlan_update() will
-be called even when the NETIF_F_HW_VLAN_*TAG_FILTER features are not
-present - consider a core that implements the VLAN ops, but has
-priv->dma_cap.vlhash false.
-
-It looks like vlan support was added in dwmac v4.0 and later cores
-(from the hwif table.) As the vlan ops are NULL before that, the
-horrid stmmac_do_void_callback() crud will return -EINVAL (yuck). The
-method it calls is a void function, so the only possible return values
-are zero if implemented, or -EINVAL if not.
-
-stmmac_vlan_update() itself only ever returns zero if the netif
-isn't running, or the above return value. So, an error returned from
-stmmac_vlan_update() just means that the driver has no support for
-programming the vlan configuration.
-
-Looking at the implementations for the case where vlhash is false,
-(where stmmac_update_vlan_hash() will be called with hash=0 and
-perfect_match with a vid, vlan_update_hash() still write
-to the VLAN_TAG register to configure vlan handling. I haven't
-looked up exactly what it does.
-
-The other possibility is dwxgmac2_update_vlan_hash(). This looks
-similar.
-
-So, I don't think that the correct solution is to only call this
-function when one or more of NETIF_F_HW_VLAN_*TAG_FILTER feature flags
-are set - clearly the code is written to handle the case where the
-update_vlan_hash method is populated but vlhash is false and these
-feature flags are clear.
-
-Now I'm wondering whether the code in the STMMAC_VLAN_TAG_USED block
-is correct:
-
-        /* Both mac100 and gmac support receive VLAN tag detection */
-        ndev->features |= NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_STAG_RX;
-        if (dwmac_is_xmac(priv->plat->core_type)) {
-                ndev->hw_features |= NETIF_F_HW_VLAN_CTAG_RX;
-                priv->hw->hw_vlan_en = true;
-        }
-        if (priv->dma_cap.vlhash) {
-                ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
-                ndev->features |= NETIF_F_HW_VLAN_STAG_FILTER;
-        }
-        if (priv->dma_cap.vlins)
-                ndev->features |= NETIF_F_HW_VLAN_CTAG_TX;
-
-The test for dwmac_is_xmac() matches for dwmac4 and dwxgmac cores. If
-this is true, then we will have the vlan ops populated, and it means
-that NETIF_F_HW_VLAN_CTAG_RX can be configured by the user rather than
-being always-enabled. Is this correct? I'm not sure - I haven't dug
-into enough of the documentation for this yet. However, I suggest
-that we need to always call stmmac_update_vlan_hash() for these cores.
-
-So, I'm coming to the conclusion that we either need a test for
-dwmac_is_xmac() and not the feature flags, or maybe we just get rid
-of the "Failed to restore VLANs" error print and make
-stmmac_vlan_restore() return void (nothing uses the return value.)
-
-In summary, I'm not sure what the correct approach is - please reach
-out to Ovidiu Panait <ovidiu.panait.rb@renesas.com> who recently added
-this code, but I'm fairly sure that this solution is incorrect.
-
-Really, Ovidiu Panait should be reviewing this patch as his recent
-change introduced the problematical error print.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
