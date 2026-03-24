@@ -1,153 +1,212 @@
-Return-Path: <netdev+bounces-270872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-270874-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ELmAM/sgwmnHZgQAu9opvQ
-	(envelope-from <netdev+bounces-270872-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:28:27 +0100
+	id wLpFJoohwmnHZgQAu9opvQ
+	(envelope-from <netdev+bounces-270874-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:30:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F8813023DF
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:28:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F017E302418
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 06:30:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C89773037473
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 05:28:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1ACB1304600B
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 05:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37E72E0901;
-	Tue, 24 Mar 2026 05:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663952F2607;
+	Tue, 24 Mar 2026 05:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oDz0jr45"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IwWTEQB3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C783F42AA6
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 05:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774330079; cv=pass; b=ID1r8P2P0zZfzaSHu2OE6fTfXtEVutFZBP/PF3JXZ/bU1m3prr/YnXwJnb+iCt6WA1M8FYRV/I9HfLF1pgmcBGKJrxItw/gUCt+isAhIIlhJUAOvSkpG0bWRvxzJLiJ4ZnFdNCMMzJmtWuLfmAvBPP0kLmzyyyFZj2/cl1vD6lA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774330079; c=relaxed/simple;
-	bh=RNjbcd2eV8/Fk8qF+ylPyEnsEtnpckM6nrd+K19etO0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mpB1bUl3Z/S6E0aAPOtPTuxxg+nUyDUIelNW05YfnjSOx0nGb7QojwfHJj/n2q2VPZxZu2KhxpMS1m3qGSq0UsimHjSoapA4KH+5yALNQDnqZ+snbLSGL+bgnbCbaCrY1P5YBBgyYHBwkGNdpdDfMl6fX0rFUwB6JXpxLJBPy6w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oDz0jr45; arc=pass smtp.client-ip=74.125.82.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-12a74039dc6so744694c88.0
-        for <netdev@vger.kernel.org>; Mon, 23 Mar 2026 22:27:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774330078; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JB95sc5bUeGb8o7mDGPRxIowMihOUTUEGEO0MLmyPDc9dCUEqWEkq60DuqjgkrP7Gc
-         51CZimtdV6mFfIAw9IIaTBx/8soRB9Q/dDcIl2xAJ58p440AGur3utffNoOnK7X92kXm
-         Sw0QsjhTpKEuEBXTi9P87NlfpQU1fd9O683LHHZ6rMlGa4k2io7DgPVtaIzA+lpGNez4
-         4CqA8CVe3sBZh5+zRs+FtctohW6r+Zj4R285KHgMvCJXu8pxPCyFJ/9FVj8T+GoU3l/o
-         BNe3Jy+Ppe82M0z0HxorNpB57Of5ZlGvxDUYsD1lcLm6lkNRe53Ywc2Kk0cZjTpP8W9B
-         KcNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=RNjbcd2eV8/Fk8qF+ylPyEnsEtnpckM6nrd+K19etO0=;
-        fh=IkQ6CVtaL/7aESb/2yeFOjnDNxNKsDakGPl8vFNk1kg=;
-        b=OPGJZAyz5LzF1NPilUNrc53gABQHYY5ebvCjzH23jWU6jXuCZnab1U0G0swgny6QTH
-         K2DoZKNVaZXRkiqRq31NQ0K+Ge6h4ide1+F+pNJNYsNTRGch8Q53D5JZjGSmR/0fq3ac
-         TZNAifsc1p4aK4rkO+Q1H4WVBCTS1EbKDWhwYg0sSknnKeAi2mfyOejMbJ3gxUq5jMmn
-         9pH5h6uqUTBJDSq99OJeInf3Caue4K5libFbQVpFaBtku70yluj8SbyDm9vBKH475Rm6
-         dI1mfdHJEPsGLrHSbl+WRC0Ky2DJ7K03sR2lOpo2xuFfFnEcYLPvIkIOxMFfZemNO4Oj
-         Tq2A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774330078; x=1774934878; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RNjbcd2eV8/Fk8qF+ylPyEnsEtnpckM6nrd+K19etO0=;
-        b=oDz0jr45eM5Oyxk4iUgGUrN8DzBZe5vWoYT7d/3kbvsJ24XyH0yGzIuxhqcf/7jltO
-         MoLT7C/rBanhRa537/N30B4A+dBLzJ+dijrnaoBSItgTDgB0UV8yFZE1u/2e/Q4cWzU2
-         qnSsg2iqh14hY4YvZHj5V+D1sKeg55nrhbUY6QaBzZzSs3pW+kTESLHVWhorMKyrlP9P
-         FtykjTP/cy2iD19EDoGruGYQnkZIhAMp09BP4twgc3ccVoUrqqzrl3IJ8hq2zW1UpWLm
-         uplWT0YuqUqliWqAxm3gtlGXLQqYI3NMDe7d4WjXvg4idlGL4OrRss965Go+lY/vBwbz
-         OBBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774330078; x=1774934878;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RNjbcd2eV8/Fk8qF+ylPyEnsEtnpckM6nrd+K19etO0=;
-        b=ZXOm+VJG2/VfaeEig43RPiE/7QciEyafpCnySsrR9GtX8GqlNQbG+wSiP7+gH+ZPu+
-         CvLTO4UQfgsypvUo5S31c/3Gtj46HVKulLh9An4YR9I7eOmmpz5v4hqBINpEtbgvgmzK
-         m9Q8YcJQRFf5yV3KUo4twZdOsnocJMqxdobfHJU0NhjsXEa+3UyW4NkrWApg2kxjRnBx
-         gD1NX8yXNd+hKTJWPbM6B+wJ6EFrDtKsIY5978sqX7hlzJKO5+OFXq6GRsh3wCYI9Zdz
-         sULS8eOR7pDSLrdjGbbBIG5H8T4ROAoB91CSkViK0RleA5/7jyQoAW1s/6odZiY7+aV2
-         rbag==
-X-Gm-Message-State: AOJu0Yxe57PRrF6dURTDssHTwdidRsc6427xE+Tl9pgGUV2qQ8IJUr3U
-	AJYIXWAvdQUUYG4HxOCMQccjHR47TOD318Snt4DeFhII4AwuJDpGp5KP98IxLYtp6falr4z1z4c
-	Ois71dmmuDeiMAtazLzU23OIsq7Wvx7o=
-X-Gm-Gg: ATEYQzxS1yOasxYrixwgvBZr8uLpVJfsmc/Qix7c7iW+f/XjqsNm2Or+fadW+5mJudL
-	uG9bvtoO9V5aSexVx7Joz/5ybojdtrI0FOI24IrbNskiTX/QR8GP7s6C0ftwLahYe+bwTh4dXvM
-	TPmlhmyS8KP6mETPPGKBZb0ZCX9bhdX8+/PvYJzc6d5sfQ1OtHdIcqd8QquEQVbsaxwlAIBb0U5
-	Dzy5YwVgL/GF4ptEJTwr8XWJLW/1fB7sS3u//tnL3xqlb65uUUDyXCy2z7NXmAzlqbtFzCnYTpZ
-	RtLnq5S3flfUfdoeCws5Y5JYNqzt/E9lOm0aty2w
-X-Received: by 2002:a05:7022:327:b0:128:d494:a1ab with SMTP id
- a92af1059eb24-12a72652be2mr6281945c88.15.1774330077945; Mon, 23 Mar 2026
- 22:27:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23792175A68;
+	Tue, 24 Mar 2026 05:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774330227; cv=none; b=nsyYgyCw2NAXcTTInDi34iQ0ibhtYFkFh8cVMwLgHpCaEqZoAhT07o7/iK4mbFEGn0M4ErHzA1UhA3Gcf+wZBKXKXFryLKYPUHVWhThPjLVp4PoB92ejPpQqpOx24iigtOsuZbCsSrKtRIkmJ/yZEjrnoVz9rbn9CHDmJDCRTUg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774330227; c=relaxed/simple;
+	bh=526IhjsOFPVmG2tNWNSg5v0vlx2brzpXsRolpXsjTxo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=An5CmZRstep0cxpg/2N/1a7x3tx7/s1KWQxWxDZa8G2/n2TN5dj9gJqdK8bzzV3hgYKp07Mb4Qp/3n4HewvTHvM4+SIrOr2tTSQnEhH2s/6dSgZ7ndhLK4Q+mBQO+D30BbnRyN7ztc+/vBnFMJBVMGB4vWwxcQA31uEKF7c+jNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IwWTEQB3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB708C19424;
+	Tue, 24 Mar 2026 05:30:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774330227;
+	bh=526IhjsOFPVmG2tNWNSg5v0vlx2brzpXsRolpXsjTxo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IwWTEQB3juSgzdL+5oAblN8Vg5C2TndIzXIJ+/psD+qLI87dPTnoZjI03lh86g1OB
+	 mpSx1LZMSw/DBe07y/3Zp7OwHRoXIwmNyksCLyArn6Wgy/ZHCvMbVGNpS90y0hARXP
+	 F0cEESScMmvPYn5UufI98xv5QMoRbgZrZzhD7xIu0KifQHEz3rXAPZncO9dZT6B7kz
+	 f7eteFWu1GwBo5+I9vrgiWwlDtSUwgSH1mRAXD6RYsxRwmK/CWvAd8Nwsx8c7aA7z2
+	 z6dYz7z5nVUXZFH9xdB88UIr+/EMARSpJjWMql6MVkuv6lSlxP20W2BfZ5GZOiuE6l
+	 rVsq+mtBjuYfg==
+Date: Tue, 24 Mar 2026 11:00:10 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org, 
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-media@vger.kernel.org, linux-pci@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-rockchip@lists.infradead.org, 
+	linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org, linux-sunxi@lists.linux.dev, 
+	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
+	spacemit@lists.linux.dev, UNGLinuxDriver@microchip.com, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
+	Nitin Rawat <quic_nitirawa@quicinc.com>
+Subject: Re: [PATCH v5 phy-next 10/27] scsi: ufs: qcom: keep parallel track
+ of PHY power state
+Message-ID: <ezrcjjwtg5n76w4m65l27szu5mywx66ti3xuprkfcp3x6quvbf@2rew4zrnnbt2>
+References: <20260319223241.1351137-1-vladimir.oltean@nxp.com>
+ <20260319223241.1351137-11-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260317065137.1533226-1-atwellwea@gmail.com> <20260317065137.1533226-4-atwellwea@gmail.com>
- <acAZoCnlITtD7ufM@gandalf.schnuecks.de>
-In-Reply-To: <acAZoCnlITtD7ufM@gandalf.schnuecks.de>
-From: Wesley Atwell <atwellwea@gmail.com>
-Date: Mon, 23 Mar 2026 23:27:48 -0600
-X-Gm-Features: AaiRm50Z9iLjwnRJbgwDlL-7pxLJace2gfxIa3Rg-XB7nLCBzCA2DVlascvPydg
-Message-ID: <CAN=sVvwBfu1zMipnPmTiejJm=Ai3korkNuxSRLee9DZztZWnRA@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] selftests: packetdrill: cover scaled rwnd
- quantization slack
-To: Simon Baatz <gmbnomis@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
-	ncardwell@google.com, pabeni@redhat.com, shuah@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260319223241.1351137-11-vladimir.oltean@nxp.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-270872-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-270874-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[28];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[atwellwea@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[mani@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7F8813023DF
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,quicinc.com:email,nxp.com:email,oracle.com:email]
+X-Rspamd-Queue-Id: F017E302418
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+On Fri, Mar 20, 2026 at 12:32:24AM +0200, Vladimir Oltean wrote:
+> As explained in the similar ufs-exynos.c change, PHY consumer drivers
+> should not look at the phy->power_count, because in the general case
+> there might also be other consumers who have called phy_power_on() too,
+> so the fact that the power_count is non-zero does not mean that we did.
+> 
+> Moreover, struct phy will become opaque soon, so the qcom UFS driver
+> will not be able to apply this pattern. Keep parallel track of the PHY
+> power state, instead of looking at a field which will become unavailable
+> (phy->power_count).
+> 
+> About treating the phy_power_off() return code: from an API perspective,
+> this should have probably returned void, otherwise consumers would be
+> stuck in a state they can't escape. The provider, phy-qcom-qmp-ufs.c,
+> does return 0 in its power_off() implementation. I consider it safe to
+> discard potential errors from phy_power_off() instead of complicating
+> the phy_powered_on logic.
+> 
 
-Thanks for pointing that out, have a V3 coming that should fix all nits.
+You could even simplify the code by getting rid of the 'phy_powered_on' check
+altogether. There is no real need to track the PHY power state in this driver.
+It is safe to call phy_power_off() without any checks.
 
-Thanks,
-Wesley Atwell
+- Mani
+
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+> Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+> Cc: Manivannan Sadhasivam <mani@kernel.org>
+> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+> Cc: Nitin Rawat <quic_nitirawa@quicinc.com>
+> 
+> v4->v5: patch is new
+> ---
+>  drivers/ufs/host/ufs-qcom.c | 9 +++++++--
+>  drivers/ufs/host/ufs-qcom.h | 1 +
+>  2 files changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/ufs/host/ufs-qcom.c b/drivers/ufs/host/ufs-qcom.c
+> index 375fd24ba458..3b8bd9968235 100644
+> --- a/drivers/ufs/host/ufs-qcom.c
+> +++ b/drivers/ufs/host/ufs-qcom.c
+> @@ -508,9 +508,10 @@ static int ufs_qcom_power_up_sequence(struct ufs_hba *hba)
+>  	if (ret)
+>  		return ret;
+>  
+> -	if (phy->power_count)
+> +	if (host->phy_powered_on) {
+>  		phy_power_off(phy);
+> -
+> +		host->phy_powered_on = false;
+> +	}
+>  
+>  	/* phy initialization - calibrate the phy */
+>  	ret = phy_init(phy);
+> @@ -531,6 +532,7 @@ static int ufs_qcom_power_up_sequence(struct ufs_hba *hba)
+>  			__func__, ret);
+>  		goto out_disable_phy;
+>  	}
+> +	host->phy_powered_on = true;
+>  
+>  	ret = phy_calibrate(phy);
+>  	if (ret) {
+> @@ -1268,6 +1270,7 @@ static int ufs_qcom_setup_clocks(struct ufs_hba *hba, bool on,
+>  				dev_err(hba->dev, "phy power off failed, ret=%d\n", err);
+>  				return err;
+>  			}
+> +			host->phy_powered_on = false;
+>  		}
+>  		break;
+>  	case POST_CHANGE:
+> @@ -1277,6 +1280,7 @@ static int ufs_qcom_setup_clocks(struct ufs_hba *hba, bool on,
+>  				dev_err(hba->dev, "phy power on failed, ret = %d\n", err);
+>  				return err;
+>  			}
+> +			host->phy_powered_on = true;
+>  
+>  			/* enable the device ref clock for HS mode*/
+>  			if (ufshcd_is_hs_mode(&hba->pwr_info))
+> @@ -1467,6 +1471,7 @@ static void ufs_qcom_exit(struct ufs_hba *hba)
+>  
+>  	ufs_qcom_disable_lane_clks(host);
+>  	phy_power_off(host->generic_phy);
+> +	host->phy_powered_on = false;
+>  	phy_exit(host->generic_phy);
+>  }
+>  
+> diff --git a/drivers/ufs/host/ufs-qcom.h b/drivers/ufs/host/ufs-qcom.h
+> index 1111ab34da01..72ce0687fa42 100644
+> --- a/drivers/ufs/host/ufs-qcom.h
+> +++ b/drivers/ufs/host/ufs-qcom.h
+> @@ -282,6 +282,7 @@ struct ufs_qcom_host {
+>  	struct clk_bulk_data *clks;
+>  	u32 num_clks;
+>  	bool is_lane_clks_enabled;
+> +	bool phy_powered_on;
+>  
+>  	struct icc_path *icc_ddr;
+>  	struct icc_path *icc_cpu;
+> -- 
+> 2.43.0
+> 
+
+-- 
+மணிவண்ணன் சதாசிவம்
 
