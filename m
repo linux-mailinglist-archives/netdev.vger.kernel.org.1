@@ -1,135 +1,206 @@
-Return-Path: <netdev+bounces-271004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271005-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJATG1R1wmnqdAQAu9opvQ
-	(envelope-from <netdev+bounces-271004-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:28:20 +0100
+	id iDUSA6F2wmnqdAQAu9opvQ
+	(envelope-from <netdev+bounces-271005-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:33:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 271003074F5
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:28:20 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D9AF3075B7
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:33:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E5203307BB72
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:22:18 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9E450308AF7A
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0AD382382;
-	Tue, 24 Mar 2026 11:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F205A3E3D83;
+	Tue, 24 Mar 2026 11:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l/hgYGwP"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="jZSbPSl7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EFF3EDACA
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 11:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46301384241;
+	Tue, 24 Mar 2026 11:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774351225; cv=none; b=qF1Gs70Tu4Jrr/jg1o9mOAvoBgVTw/bUh3dgr0Ezm3ImoJ2cYETzD0/reoTVFdS7zXxMyIFb/R4P9urYjIU8/oi2Kg1YVNeOYgiauJnWnM8+tqGaFqLbNZTWzTvkxz4QqtMTDawHflpfhyVGN7HbqRpUAXWJn6i2y2BmLoa5QWs=
+	t=1774351335; cv=none; b=qs5urduhfAKvwim4p+rNV4FNWjNNL69TtePvJMUQNcyh9jbt2brR/65Fb8HSnUGmmdtTA2SuQYpojq21AfJ1XHsKUOzcMZy7oTIihcTPidlTH0Bne/FlYZZizQhff9zNHufdF+Exakb66wAIWvAXk4/DM5muDSqGvwq2+eKBQb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774351225; c=relaxed/simple;
-	bh=/VGB9nDd+/GqixMK/Q1YavpbNhgLz5r5U6tvuEB+cXY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=owD8xxOdwrYM8Fm7B2hB3L/cw/2lsIXZlIrHaV6GHnUZCB7u22zAbSGSkiuY/1uRchSAbaWkWNvYn03x7QCtf7+kdj2o2Z82VVAn4UHO0xCI4AlZx5jbv2pyJCxGj4Dl1BzI6qvOwICWpMctcgR6zdz2F89wmmmGDYjL+0fxlh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l/hgYGwP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23EFAC19424;
-	Tue, 24 Mar 2026 11:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774351225;
-	bh=/VGB9nDd+/GqixMK/Q1YavpbNhgLz5r5U6tvuEB+cXY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=l/hgYGwPIylBRr2b7EK+ZSRcvcDiOQEreu0KBHfd+RJFFiPiQ0w8YDUyOePjCxDRi
-	 hKmfDCq57RRCm4s8eBPIfQ4j2o6O1YqxmPGABv5cg178ckxxyYG7IJ2XnGKKYFpZyW
-	 Qfo7s+2pH5TAjHr7CqAM4GKDe3zPUVpUORp6peyu0sA4y6W54URZCCjk27IovDdBAB
-	 jK3BmoajfAu1505VN89k1ESTMTl1ffMr381p7NN5MgCMG3oK/KoqUAoiIBWqP0mj1j
-	 zIA64jnsZX1rmfuOB/BfR4SVvY8ffIBuxSkhW3gWr7tBXphL3CTY1p4BmIOxmg4ckB
-	 wUZ4cqU71qtjw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FECB3808200;
-	Tue, 24 Mar 2026 11:20:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1774351335; c=relaxed/simple;
+	bh=H3irzzFXP1QUhS0MEN06n7KdYszJkAZOu85FhuOsUlE=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=lijp51B/RKolgWFDOg8al65FIDXWqGnIwMAv6cf1X3OKqVBFZFG/ZhU45oXLnqBymqXLvbTS7X6nd46q8bbz3nDueuLKB0SPkkEQSfFCVGruXUF6ENmfhW1+wDX3k1hxJukLYZ6/cXV7mcUEvq1ffgYp4LagYN4jH/+7JdCiVYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=jZSbPSl7; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1774351325; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=cE5P4JOASd3UJaIvS7LJ8jdDwbmm6PYOejELrZOvIYM=;
+	b=jZSbPSl7MfzIWeYzCoyYFZSqtRCtvkcPFJdkWE74cKWOcSx+WMfyksV9rt0lRUZbwsr5XFeGSAHF/JrX0lzn6ieJ8sJ/v3IMLQMsvlDGaQ+EtfS2XkrdOUevptaMzdur1IiywfkKhitDXxHgorZzdCW+hr7R/G4/FJO+73VNls4=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0X.eM0GG_1774351324;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X.eM0GG_1774351324 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 24 Mar 2026 19:22:04 +0800
+Message-ID: <1774351314.2550466-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net v2] virtio_net: Fix UAF on dst_ops when IFF_XMIT_DST_RELEASE is cleared and napi_tx is false
+Date: Tue, 24 Mar 2026 19:21:54 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: xietangxin <xietangxin@yeah.net>,
+ netdev@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
+References: <20260312025406.15641-1-xietangxin@yeah.net>
+ <1774335943.3427165-1-xuanzhuo@linux.alibaba.com>
+ <CANn89iJYj9Jc8-usgAYcFMoSo+Po3aOxsMkhg+F8BA_kME2e9g@mail.gmail.com>
+In-Reply-To: <CANn89iJYj9Jc8-usgAYcFMoSo+Po3aOxsMkhg+F8BA_kME2e9g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/6] net: stmmac: cleanup stmmac_xmit()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177435121274.629137.16512237981909489281.git-patchwork-notify@kernel.org>
-Date: Tue, 24 Mar 2026 11:20:12 +0000
-References: <ab15_JvLGFtUH_3x@shell.armlinux.org.uk>
-In-Reply-To: <ab15_JvLGFtUH_3x@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, alexandre.torgue@foss.st.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
- pabeni@redhat.com
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-4.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	MISSING_MIME_VERSION(2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-271005-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271004-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[yeah.net,vger.kernel.org,lists.linux.dev,redhat.com,davemloft.net,kernel.org,lunn.ch];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 271003074F5
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[yeah.net:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,alibaba.com:email,linux.alibaba.com:dkim,linux.alibaba.com:mid]
+X-Rspamd-Queue-Id: 0D9AF3075B7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+On Tue, 24 Mar 2026 00:46:27 -0700, Eric Dumazet <edumazet@google.com> wrot=
+e:
+> On Tue, Mar 24, 2026 at 12:11=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibab=
+a.com> wrote:
+> >
+> > On Thu, 12 Mar 2026 10:54:06 +0800, xietangxin <xietangxin@yeah.net> wr=
+ote:
+> > > A UAF issue occurs when the virtio_net driver is configured with napi=
+_tx=3DN
+> > > and the device's IFF_XMIT_DST_RELEASE flag is cleared
+> > > (e.g., during the configuration of tc route filter rules).
+> > >
+> > > When IFF_XMIT_DST_RELEASE is removed from the net_device, the network=
+ stack
+> > > expects the driver to hold the reference to skb->dst until the packet
+> > > is fully transmitted and freed. In virtio_net with napi_tx=3DN,
+> > > skbs may remain in the virtio transmit ring for an extended period.
+> > >
+> > > If the network namespace is destroyed while these skbs are still pend=
+ing,
+> > > the corresponding dst_ops structure has freed. When a subsequent pack=
+et
+> > > is transmitted, free_old_xmit() is triggered to clean up old skbs.
+> > > It then calls dst_release() on the skb associated with the stale dst_=
+entry.
+> > > Since the dst_ops (referenced by the dst_entry) has already been free=
+d,
+> > > a UAF kernel paging request occurs.
+> >
+> > Sorry, this sounds a bit off to me. We know that napi_tx=3DN merely pro=
+longs the
+> > presence of the skb on the device side. However, even without napi_tx=
+=3DN, there
+> > is no guarantee that the skb will be freed within any specific timefram=
+e.
+> > Therefore, napi_tx=3DN just makes the issue more reproducible; it is no=
+t the root
+> > cause. Also, I'm surprised that the dst could be freed while it is still
+> > referenced/held. I have a feeling that something is being overlooked he=
+re.
+> >
+> > Thanks.
+> >
+> > >
+> > > fix it by adds skb_dst_drop(skb) in start_xmit to explicitly release
+> > > the dst reference before the skb is queued in virtio_net.
+> > >
+> > > Call Trace:
+> > >  Unable to handle kernel paging request at virtual address ffff80007e=
+150000
+> > >  CPU: 2 UID: 0 PID: 6236 Comm: ping Kdump: loaded Not tainted 7.0.0-r=
+c1+ #6 PREEMPT
+> > >   ...
+> > >   percpu_counter_add_batch+0x3c/0x158 lib/percpu_counter.c:98 (P)
+> > >   dst_release+0xe0/0x110  net/core/dst.c:177
+> > >   skb_release_head_state+0xe8/0x108 net/core/skbuff.c:1177
+> > >   sk_skb_reason_drop+0x54/0x2d8 net/core/skbuff.c:1255
+> > >   dev_kfree_skb_any_reason+0x64/0x78 net/core/dev.c:3469
+> > >   napi_consume_skb+0x1c4/0x3a0 net/core/skbuff.c:1527
+> > >   __free_old_xmit+0x164/0x230  drivers/net/virtio_net.c:611 [virtio_n=
+et]
+> > >   free_old_xmit drivers/net/virtio_net.c:1081 [virtio_net]
+> > >   start_xmit+0x7c/0x530 drivers/net/virtio_net.c:3329 [virtio_net]
+> > >   ...
+> > >
+> > > Reproduction Steps:
+> > > NETDEV=3D"enp3s0"
+> > >
+> > > config_qdisc_route_filter() {
+> > >     tc qdisc del dev $NETDEV root
+> > >     tc qdisc add dev $NETDEV root handle 1: prio
+> > >     tc filter add dev $NETDEV parent 1:0 \
+> > >       protocol ip prio 100 route to 100 flowid 1:1
+> > >     ip route add 192.168.1.100/32 dev $NETDEV realm 100
+> > > }
+> > >
+> > > test_ns() {
+> > >     ip netns add testns
+> > >     ip link set $NETDEV netns testns
+> > >     ip netns exec testns ifconfig $NETDEV  10.0.32.46/24
+> > >     ip netns exec testns ping -c 1 10.0.32.1
+> > >     ip netns del testns
+> > > }
+> > >
+> > > config_qdisc_route_filter
+> > >
+> > > test_ns
+> > > sleep 2
+> > > test_ns
+>
+> I took a stab at this, please look at
+>
+> https://lore.kernel.org/netdev/20260324073750.1500328-1-edumazet@google.c=
+om/T/#u
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+I see.
 
-On Fri, 20 Mar 2026 16:46:52 +0000 you wrote:
-> This series continues on from part 2 of the descriptor cleanups, making
-> stmmac_xmit() more readable.
-> 
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 103 +++++++++++-----------
->  1 file changed, 52 insertions(+), 51 deletions(-)
-
-Here is the summary with links:
-  - [net-next,1/6] net: stmmac: move stmmac_xmit() skb head handling
-    https://git.kernel.org/netdev/net-next/c/fcbf106189aa
-  - [net-next,2/6] net: stmmac: move first xmit descriptor SARC and TBS config
-    https://git.kernel.org/netdev/net-next/c/cafacdc48a74
-  - [net-next,3/6] net: stmmac: move stmmac_xmit() first entry index code
-    https://git.kernel.org/netdev/net-next/c/7b8683115034
-  - [net-next,4/6] net: stmmac: move stmmac_xmit() initial variable init
-    https://git.kernel.org/netdev/net-next/c/2e3bfeb1bc0c
-  - [net-next,5/6] net: stmmac: use first_desc for TBS
-    https://git.kernel.org/netdev/net-next/c/557ccd54ba14
-  - [net-next,6/6] net: stmmac: elminate tbs_desc in stmmac_xmit()
-    https://git.kernel.org/netdev/net-next/c/cd1f306e2815
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks.
 
