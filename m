@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-271038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLaUCVSJwmkLewQAu9opvQ
-	(envelope-from <netdev+bounces-271038-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:53:40 +0100
+	id MKo0I2aGwmkAegQAu9opvQ
+	(envelope-from <netdev+bounces-271042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:41:10 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 640C1308B73
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:53:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E31A6308734
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:41:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1C09331A7B67
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:32:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BC35331C5762
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE633FBED0;
-	Tue, 24 Mar 2026 12:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17C73FE347;
+	Tue, 24 Mar 2026 12:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="wGvFuPpF"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="XSy5qu4K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A593FBEC7
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 12:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C7F23F9F56
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 12:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774355449; cv=none; b=cMmX2J7b6Lb4AnG05bNCPUL+KT9nGVxuRx1GiBoOYA6p2EUCEjPR7PUwEwk5GRvw3rrOWQ3joIX2rNgRQZwfh8YprzSRSqDvUZs9qfiJeefI7XE0Aw4CqjyGut/7YPVX76PIRm4+qw2/m2UplsUdDC2nu2d0uCpqGBsjhmi1SKU=
+	t=1774355470; cv=none; b=kYFPBXMA5vcHERDhbdEVvrpnjpWuGceldGh+s59NcVPJYQFLeuHpNjOwTM7IGTZqTjxuZyW9jrm/5aGEr3CcKKGCfOAvjnwqbZJ+ZwG8hEMEApz2dUS+bZqNTK/Ttq9Tj7ESuTWWYEF9ksL7nPgzvOAHyIm6sSfcdB3AkoWb+ZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774355449; c=relaxed/simple;
-	bh=kPbtBPPqa6qiIBKdA2aE5ynH8ryoYXd5xSPnEa57yjg=;
+	s=arc-20240116; t=1774355470; c=relaxed/simple;
+	bh=cNaZ16Av/pHiTgNmSUlJBQ+S1AKjelzqjrsdrMAWcQU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NoVXR5uqHmJtdUbYW53+ItHq5iB1NBjjzgYV/hBGeFXV/SQQpTMGtsaU0DrSXwbqUEyLLoqPnf9y3NxHltgnYklaOO6tDEv8mQZiCA+3XShJ7ZnIrW2hddxlF/eajKhDNvTaWQvLq5aXvjbpkYrxtNtzdYEYY6aZgXk1QgTNV+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=wGvFuPpF; arc=none smtp.client-ip=209.85.128.54
+	 Content-Type:Content-Disposition:In-Reply-To; b=esyc4FwdlkDGtgxWYssGxr14tuQpwHJhPHqIqRNl8Qo2qHpP7gHOGuTRVI2vQdGmOs9WWgd/BUKJqd99WEJb7b8PMKdePAoL/kCwNyHSkFg5h1U8s19NrOMAoqvQbbKSLfK61jzx8V0ZP36texOfBUzw/PDwZLu3sZQPw2iAv+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=XSy5qu4K; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4852e9ca034so36561325e9.2
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 05:30:42 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso44036585e9.3
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 05:31:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1774355441; x=1774960241; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=650cxGRTwGdCgB7/1Uuk1bSKY+xLpPUDI9BTHKCNycA=;
-        b=wGvFuPpFruTdERbK42drlw4gZwix1mh5LWkYB1iw9sqOFlkiFbMAl3MdYysYrPCWw1
-         EeF28u2K9iLbS5a54quGbUjDciE69MVABAu/Ql5ksQQJatNM6ZV+4YT5idLNIVWjuEb3
-         ++sg3XItWcb0VDwiOXAkScAzkV7QDEoYjeccZ9sIg7/uuJbPdv5gD3JuUezDuJTrH2Yf
-         mTvRQWQn/yYyAbhHzILGnc+j2cJHiuwwE+s6cV2KdeJrgvFHWTD/+6UpKyThH4ezDvQK
-         vpv18lt28/2Q12BCH+i8+PqyHd7A2jsfxA6rVo5bVfsf+xNFfN5kkMlM5YEjbHnE/06Q
-         uuSQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1774355467; x=1774960267; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cNaZ16Av/pHiTgNmSUlJBQ+S1AKjelzqjrsdrMAWcQU=;
+        b=XSy5qu4KzRKl14Z+UdXlcYZpz0fwL9Eju2kFdlOFDtqesNvdEATHgQvi0hp+vesHd0
+         VoedIflO03vLEo0qAIzdd0Q1ZexkI7EKBfZyXN98RA7TSWjrbvRDez1SHPzIJhm7z7W4
+         Djiamsktn7SfuvMIrEM73weCzbY57uMuZmQ0mt7iNXzivWprP/VcEaPoT+VWZdfJWY8C
+         e+yck7xKVnRbbms/VERjYWOKwEUwbwrHmzo20NTZ0tFEBx74sINndNLw558U/ShnKoHm
+         23ARZFEXA7VbafPM6L0DqqAaRzIFIj9pIk1f04xLx0P4qKENtTWumNMzpZjPHF5h9ALD
+         SoHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774355441; x=1774960241;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=650cxGRTwGdCgB7/1Uuk1bSKY+xLpPUDI9BTHKCNycA=;
-        b=dvRD/aQe/Bnl88jj2RMYuIDcMXako3HggssoaGOCWyvSUX5fFkAElG8iH4o/PzYwNe
-         oXmnAlcqca9LACvshnU3AtiS4ABorHNt5+039GEMYBSxecbX1RNwh6fAW8euDJCnotxH
-         9DncZ7509JrHLJESd0VuYMdFChEoGU1Zg4mG/W1J2nfES9GM7YNmykmwAoiqv81W0bn5
-         KaaEP0ixSPB7njVEanFvMO6SMguHuv1aOjaZHb2pKelWZJpbszScb9aETNiZ7lAqgqi+
-         A0ow3qgVL/heY+zN7A1rSJBHN3z330yrg39dj12JYGrjHivygre1OG6+qi7KK5bwO6/7
-         JMug==
-X-Gm-Message-State: AOJu0YwMWMWb4DF4uABZcAs0s7/aIvOD/A1mi4YfGjXJMYuIgb6EbIAs
-	jZDXGnJHSv1XnNaxqckrY7X+GiwqyV+Ie4A+x/hKuEIVk2xAzm9BHFHoK2Tus/W1Pbk=
-X-Gm-Gg: ATEYQzyqYGXOg/EnZTyUBz7zINxCW2tIfe/CqyYkRBrksneHQX1ow9WKYVfOW0N6pQH
-	PJpOFyjURJC/zZ18C5KtaUnnomxjWcOSpr8k/3rCNGv5OxbWzSYz01q8IBfCSKjIOqjwVdigUhJ
-	WL1ZZIK53fFWs2t0+62RgiFqY6Dw6vv1t9y1jQ7rQezhi6zQPNEi+ydJ4mw6sL4/OoJq8Tm+toE
-	gYkCP0s+R2kyb0/UhqtF14d5l76TQV2R2fvBfr636/Zm/2C4Ui8efbnt+QXjjA3EDP5f5CiHbg4
-	OmUYS+/GaIPR3GOIZUm5Wu5Q8sd0J4NVt/j9T1cYyWKqtjalpR1CKbfHZUgcLs9qCnhiaamIowI
-	50eyhX+pVop8Y/NmjaWV/1U36i5iKhY/wo7iKF4JLc8vgMZ8Zm7wd+fJuQCsbjAoBSNbzNMqj4r
-	T4+My+n9OSrWySKrdvYti8zus4Es+Kervvug==
-X-Received: by 2002:a05:600c:524e:b0:485:3ae8:2231 with SMTP id 5b1f17b1804b1-486ff01efd8mr208630005e9.30.1774355440868;
-        Tue, 24 Mar 2026 05:30:40 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1774355467; x=1774960267;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cNaZ16Av/pHiTgNmSUlJBQ+S1AKjelzqjrsdrMAWcQU=;
+        b=VNgEz9sL8qrHEgp4h27gj5aWDyKGDg1A0VBoeWXQbFqleGlZtb9sQCOgFkgHpdZx+Q
+         GBRHdGWBI2jb2jQFp6Zz+JVPNAkq9e8VR7kw85zzUOgf3hDiQpX8ZdtdT07JYBtPmBG8
+         uqiN579JzNcHhu87upfjPFaavoPXWMDxFM9kl5AKOSrBt/IWtwb1Wn1aYHrTIVrVSKpn
+         vnDvG63tRYIQOrd8k0XH6p2zESzD+C07zcIzCLZMaE48qJMunLPSeBhftD+w7kCskPNX
+         JZWhu6A+mO8/GRJSNVse7fOuakCvcsz5PT7HwqhSwbZfgUOf0OQFRlfCB+EtoRn4oxci
+         40yQ==
+X-Gm-Message-State: AOJu0YxTr6W23bciXX7Pl1f1B0zE2gnjfzuNch2TzOvYZXmK0lNwPvxg
+	WX2RaWCCSq3/MojsNTxkBp8lSePMSzskriqrXpdv+Qn7cg4eHBzp/auy5Vbra4sC+xZdb0i1Bix
+	xkUoRNHo=
+X-Gm-Gg: ATEYQzw12VmlQY/urfW9e5wPpxAwVLekXCOzyK0IlV/S1jAS8YwYIIBFXQRFl5kmSQk
+	yOJ/lTvHclFV7xISU9MnhdNXcgLx71SFgccHAjHCsSEyZ88GciQf39jGRPVucn0/BHU4g+dsQhb
+	pzdjva90W3EjwK4CqcwiFik3AbjMvIqO+gHN7QRo9KM1IunI9WjO6C5nlW0yjYo2bVCZxIyabM+
+	E9GCgXdPxSFFFBTthGElViIsHH8fQfW5HQtit7yX+6KkJ/HSL98D1wA4S3h+TNLH9n+v1xdJG7w
+	ZaZ9ANtZJlbMVw6sTnodX4X7TKZhV4fzUl+ByIvVQ2+NvFVR9nFZnOsDuSn3HkjnadYDYC8dT/C
+	W/otwt/5SU8UITC1vBu0v56LypyOH4O7Lm1cq4RKcgJMWKA3VAOnSdeY0U6M6e2QgEzYOX9gc5O
+	64wOKRyiEm2dqHLyX1c8GmENDePRMvVU64L1c=
+X-Received: by 2002:a05:600c:528e:b0:485:3fc8:de9c with SMTP id 5b1f17b1804b1-486fedb2ef0mr212873175e9.12.1774355467376;
+        Tue, 24 Mar 2026 05:31:07 -0700 (PDT)
 Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-487117077cbsm45683595e9.6.2026.03.24.05.30.39
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48711764625sm50073125e9.14.2026.03.24.05.31.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 05:30:40 -0700 (PDT)
-Date: Tue, 24 Mar 2026 13:30:37 +0100
+        Tue, 24 Mar 2026 05:31:06 -0700 (PDT)
+Date: Tue, 24 Mar 2026 13:31:04 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,21 +85,20 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	vadim.fedorenko@linux.dev, donald.hunter@gmail.com, horms@kernel.org, pabeni@redhat.com, 
 	kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH v2 net-next 3/8] dpll: extend pin notifier and netlink
- events with notification source ID
-Message-ID: <ose4zofbqvlzfhdina5nlolbj64inrhkr3nqok3dkheav2s6px@warnjuzviid5>
+Subject: Re: [PATCH v2 net-next 1/8] dpll: add new DPLL type for transmit
+ clock (TXC) usage
+Message-ID: <ao4eviden4pqqxpxhnrymdv2nkb4qumewoevuf4khbhqprvv5n@7ie2fsz77t63>
 References: <20260321222627.1193603-1-grzegorz.nitka@intel.com>
- <20260321222627.1193603-4-grzegorz.nitka@intel.com>
+ <20260321222627.1193603-2-grzegorz.nitka@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260321222627.1193603-4-grzegorz.nitka@intel.com>
+In-Reply-To: <20260321222627.1193603-2-grzegorz.nitka@intel.com>
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -110,7 +109,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271038-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271042-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
@@ -128,83 +127,25 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,resnulli-us.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 640C1308B73
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,resnulli-us.20230601.gappssmtp.com:dkim,intel.com:email]
+X-Rspamd-Queue-Id: E31A6308734
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Sat, Mar 21, 2026 at 11:26:22PM +0100, grzegorz.nitka@intel.com wrote:
->Extend the DPLL pin notification API to include a source identifier
->indicating where the notification originates. This allows notifier
->consumers and netlink listeners to distinguish between notifications
->coming from an associated DPLL instance, a parent pin, or the pin
->itself.
+Sat, Mar 21, 2026 at 11:26:20PM +0100, grzegorz.nitka@intel.com wrote:
+>Extend the DPLL subsystem with a new DPLL type, DPLL_TYPE_TXC,
+>representing devices that drive a transmit reference clock. Certain
+>PHYs, MACs and SerDes blocks use a dedicated TX reference clock for
+>link operation, and this clock domain is distinct from PPS- and
+>EEC-driven synchronization sources. Defining a dedicated type allows
+>user space and drivers to correctly classify and configure DPLLs
+>intended for TX clock generation.
 >
->A new field, src_id, is added to struct dpll_pin_notifier_info and is
->passed through all pin-related notification paths. Callers of
->dpll_pin_notify() are updated to provide a meaningful source identifier
->based on their context:
->  - pin registration/unregistration use the DPLL's clock_id,
->  - pin-on-pin operations use the parent pin's clock_id,
->  - pin changes use the pin's own clock_id.
+>The corresponding netlink specification is updated to expose "txc"
 >
->This enables richer event routing and more accurate state handling in
->user space and in-kernel consumers.
->
->The current DPLL pin notification infrastructure does not provide any
->way to identify where a pin-related notification originates. Both the
->in-kernel notifier chain and the netlink notification path only carry
->information about the pin itself, not about the component that triggered
->the event.
->
->This becomes problematic on platforms where multiple DPLL devices or
->drivers share the same physical pin via firmware description (fwnode).
->In such setups pin creation, deletion, or state changes can be triggered
->from several independent contexts:
->
->  - from the DPLL device that owns the pin,
->  - from another DPLL device that re-registers or rebinds the same
->    fwnode-described pin,
->  - or from a pin-on-pin relationship (parent pin registering child
->    pins).
->
->Without a source identifier all these notifications look identical to
->listeners. Drivers cannot reliably determine whether a received event
->is a result of their own registration/unregistration actions or
->originated from a different DPLL instance. This leads to several types
->of problems:
->
->  * risk of duplicate pin registration when a driver reacts to its own
->    event,
->  * difficulty suppressing notifications that are merely internal
->    bookkeeping side effects,
->  * inability to implement correct pin‑multiplexing or cross‑device
->    synchronization logic when pins are shared across fwnode domains.
->
->To address this, extend `struct dpll_pin_notifier_info` with a new
->`src_id` field that identifies the originator of the event. The DPLL
->core sets this field for all pin notifications:
->
->  - pin registration/unregistration: the source is the clock_id of the
->    DPLL initiating the operation,
->  - pin-on-pin relationships: the source is the parent pin's clock_id,
->  - pin property/state updates: the source is the pin's own clock_id.
->
->Netlink notifications now also carry this additional field.
->
->With this information notifier consumers can differentiate true external
->events from internal ones and ignore the latter when appropriate.
->As shown later in this series, ICE/E825 devices rely on this to avoid
->reacting to the events that their own registration logic triggers
->when a shared-fwnode pin appears.
->
->This change only extends the notification metadata and does not alter
->existing semantics for drivers that do not use the new field.
->
+>Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+>Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 
-This lenghty and verbose AI-generated patch description are so annoying.
-Care to cut it down to something like 1/8 without unnecessary things?
-
-
-
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
