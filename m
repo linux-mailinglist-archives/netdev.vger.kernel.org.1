@@ -1,194 +1,196 @@
-Return-Path: <netdev+bounces-271006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271007-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mLOHNlN0wmmncwQAu9opvQ
-	(envelope-from <netdev+bounces-271006-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:24:03 +0100
+	id iLiYK6Z0wmmncwQAu9opvQ
+	(envelope-from <netdev+bounces-271007-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:25:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 932113073D1
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:24:03 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50614307433
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:25:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 82D04304A989
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:22:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8E7293005AA7
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 11:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28ED839A7FB;
-	Tue, 24 Mar 2026 11:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4FF63E557B;
+	Tue, 24 Mar 2026 11:25:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="i06DupKj"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eSegUAEU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="a9qfK3Ly";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eSegUAEU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="a9qfK3Ly"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE042D5922;
-	Tue, 24 Mar 2026 11:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3123E1215
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 11:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774351352; cv=none; b=q9SWfp/4AgVQRwaUzDq02wPljMj4ScQiPRGT+hd/5pgVNb0m3yYYNGYJySKxWl5F5UlDq3B/89Xm58tjqVHRRxWcEI9zzBbvjVl/Lkjh6JrDTbrNOTHeZOUilWAEiaxXt7frJ8dZKXrWqBD9ia0XcuG0J4pFCVszCqeMCMle1H4=
+	t=1774351524; cv=none; b=oZGd66pLnIUZXtQUzBWmzthPOmB1KXnsGabm6l+P9BnfNzgm4Ci+MXcUEP9ckWHyBtKZNPcsF3SXXfxBgfcGsOJ+JEabAb8ZTrLdeGUn8BIT6E+3+SL1DmDVo+TkJpDeN9LwYmTbv1a5ngjGi3r3foUT6eHFTJrxBZcouwvn344=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774351352; c=relaxed/simple;
-	bh=0JcRo3UHHrIr/KGaixyboJ6ouTqPUVV8YCykw/D2f8E=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=gCMUDw36fc8oRkJ2KF6sDovKnua7B4lV8xuMD9z4q6IvA5a8Gojx+tIEUdUB3lR8VLXZ9J4s9Wb8Fdm1hCSCprXrnlBBMo2ThbPnedQXslIRP06DOoJKn9t/11qCjmjiycdBhw2UdUZSPYfA45eJgWGKzWXyT1mZ0N2wK1Xrh90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=i06DupKj; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1774351339; h=Message-ID:Subject:Date:From:To;
-	bh=OVb3zYyT8YTObrbTL1yZntWexibFBnvRHX4plD2H4LA=;
-	b=i06DupKjAVGbAuzwrql0YHgrJBcXjRPAK5lrYpgI0ok2OLVTrkXkDQSSK4faI8N6Tt/j0/TnZOcNHnTP06snLmbrh3PfPt/k3pwucFZxkC0yNFkH3v8e9jAoU4QxWj41okPIC5keoMql90w2I/5TfuBO5an2Yh9zRbZI1beFBhg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037033178;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0X.eHXz9_1774351338;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X.eHXz9_1774351338 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 24 Mar 2026 19:22:18 +0800
-Message-ID: <1774351331.0326343-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net v2] virtio_net: Fix UAF on dst_ops when IFF_XMIT_DST_RELEASE is cleared and napi_tx is false
-Date: Tue, 24 Mar 2026 19:22:11 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: xietangxin <xietangxin@yeah.net>
-Cc: netdev@vger.kernel.org,
- virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org,
- stable@vger.kernel.org,
- xietangxin <xietangxin@yeah.net>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
-References: <20260312025406.15641-1-xietangxin@yeah.net>
-In-Reply-To: <20260312025406.15641-1-xietangxin@yeah.net>
+	s=arc-20240116; t=1774351524; c=relaxed/simple;
+	bh=pVSDz6DxsOdWN7qj5RNP8F0p0Ixbv3dvmRicMj7vfFk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qEmVi4949bJPs6FNxaPRYNT/bnC1Sku7VCuSF9SHcunh+rFu97dZPhVrWgoMvbJ9EX2uidEyCQHNODJZSa2hbTT5+SUgPd+6Q2BwGc+NG/OOtFl3K+lF5nvnxIw+wEK4gCoilZ1t7vNKvfjnnF6zGB5akmuCZw4OKFQ0A4oyQXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eSegUAEU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=a9qfK3Ly; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eSegUAEU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=a9qfK3Ly; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 6C2495BCEB;
+	Tue, 24 Mar 2026 11:25:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1774351521; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/XX6J1/Eby9nFmxdT584BJ7ZWUplo+F4aY4cqZSpkYg=;
+	b=eSegUAEUB71MbXjkvL/UBbExptInVvBXSEXRNWP2CAxrV07kL69imJJnPTolcqC5bsxoJ1
+	jW1LhB5wQEbbXN78f4itIxA14z2dj5bDi+/ymQJdNTFCqsq+p7yR7i2vUZBfgjzKatUJGy
+	FHvzT+CfsFRUubAJ99mbCjkfSMP4EGM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1774351521;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/XX6J1/Eby9nFmxdT584BJ7ZWUplo+F4aY4cqZSpkYg=;
+	b=a9qfK3LyJzAbT/+ahnGHyFqzYFmWIfpi7VcjZdWTBm2hm5Gg4IwvBG4kMEZkeSec90yHQc
+	/W3v6Z25q+qnFODg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=eSegUAEU;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=a9qfK3Ly
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1774351521; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/XX6J1/Eby9nFmxdT584BJ7ZWUplo+F4aY4cqZSpkYg=;
+	b=eSegUAEUB71MbXjkvL/UBbExptInVvBXSEXRNWP2CAxrV07kL69imJJnPTolcqC5bsxoJ1
+	jW1LhB5wQEbbXN78f4itIxA14z2dj5bDi+/ymQJdNTFCqsq+p7yR7i2vUZBfgjzKatUJGy
+	FHvzT+CfsFRUubAJ99mbCjkfSMP4EGM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1774351521;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/XX6J1/Eby9nFmxdT584BJ7ZWUplo+F4aY4cqZSpkYg=;
+	b=a9qfK3LyJzAbT/+ahnGHyFqzYFmWIfpi7VcjZdWTBm2hm5Gg4IwvBG4kMEZkeSec90yHQc
+	/W3v6Z25q+qnFODg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D48A643DF2;
+	Tue, 24 Mar 2026 11:25:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id n+7iMKB0wmlRKAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 24 Mar 2026 11:25:20 +0000
+Message-ID: <d2318105-4bfc-435f-af4b-d3e10d50e37c@suse.de>
+Date: Tue, 24 Mar 2026 12:25:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 05/11 net-next v4] ipv6: prepare headers for ipv6_stub
+ removal
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, =?UTF-8?Q?Ricardo_B=2E_Marli=C3=A8re?=
+ <rbm@suse.com>, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+References: <20260320185649.5411-1-fmancera@suse.de>
+ <20260320185649.5411-6-fmancera@suse.de> <20260324082209.GA365237@shredder>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260324082209.GA365237@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-271006-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[yeah.net];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,yeah.net,redhat.com,davemloft.net,google.com,kernel.org,lunn.ch];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-271007-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[yeah.net:email,alibaba.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.alibaba.com:dkim,linux.alibaba.com:mid]
-X-Rspamd-Queue-Id: 932113073D1
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 50614307433
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 12 Mar 2026 10:54:06 +0800, xietangxin <xietangxin@yeah.net> wrote:
-> A UAF issue occurs when the virtio_net driver is configured with napi_tx=N
-> and the device's IFF_XMIT_DST_RELEASE flag is cleared
-> (e.g., during the configuration of tc route filter rules).
->
-> When IFF_XMIT_DST_RELEASE is removed from the net_device, the network stack
-> expects the driver to hold the reference to skb->dst until the packet
-> is fully transmitted and freed. In virtio_net with napi_tx=N,
-> skbs may remain in the virtio transmit ring for an extended period.
->
-> If the network namespace is destroyed while these skbs are still pending,
-> the corresponding dst_ops structure has freed. When a subsequent packet
-> is transmitted, free_old_xmit() is triggered to clean up old skbs.
-> It then calls dst_release() on the skb associated with the stale dst_entry.
-> Since the dst_ops (referenced by the dst_entry) has already been freed,
-> a UAF kernel paging request occurs.
->
-> fix it by adds skb_dst_drop(skb) in start_xmit to explicitly release
-> the dst reference before the skb is queued in virtio_net.
->
-> Call Trace:
->  Unable to handle kernel paging request at virtual address ffff80007e150000
->  CPU: 2 UID: 0 PID: 6236 Comm: ping Kdump: loaded Not tainted 7.0.0-rc1+ #6 PREEMPT
->   ...
->   percpu_counter_add_batch+0x3c/0x158 lib/percpu_counter.c:98 (P)
->   dst_release+0xe0/0x110  net/core/dst.c:177
->   skb_release_head_state+0xe8/0x108 net/core/skbuff.c:1177
->   sk_skb_reason_drop+0x54/0x2d8 net/core/skbuff.c:1255
->   dev_kfree_skb_any_reason+0x64/0x78 net/core/dev.c:3469
->   napi_consume_skb+0x1c4/0x3a0 net/core/skbuff.c:1527
->   __free_old_xmit+0x164/0x230  drivers/net/virtio_net.c:611 [virtio_net]
->   free_old_xmit drivers/net/virtio_net.c:1081 [virtio_net]
->   start_xmit+0x7c/0x530 drivers/net/virtio_net.c:3329 [virtio_net]
->   ...
->
-> Reproduction Steps:
-> NETDEV="enp3s0"
->
-> config_qdisc_route_filter() {
->     tc qdisc del dev $NETDEV root
->     tc qdisc add dev $NETDEV root handle 1: prio
->     tc filter add dev $NETDEV parent 1:0 \
-> 	protocol ip prio 100 route to 100 flowid 1:1
->     ip route add 192.168.1.100/32 dev $NETDEV realm 100
-> }
->
-> test_ns() {
->     ip netns add testns
->     ip link set $NETDEV netns testns
->     ip netns exec testns ifconfig $NETDEV  10.0.32.46/24
->     ip netns exec testns ping -c 1 10.0.32.1
->     ip netns del testns
-> }
->
-> config_qdisc_route_filter
->
-> test_ns
-> sleep 2
-> test_ns
->
-> Fixes: f2fc6a54585a ("[NETNS][IPV6] route6 - move ip6_dst_ops inside the network namespace")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: xietangxin <xietangxin@yeah.net>
+On 3/24/26 9:22 AM, Ido Schimmel wrote:
+> On Fri, Mar 20, 2026 at 07:55:57PM +0100, Fernando Fernandez Mancera wrote:
+>> +#if IS_ENABLED(CONFIG_IPV6)
+>>   int ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
+>>   		 int (*output)(struct net *, struct sock *, struct sk_buff *));
+>> +#else
+>> +static inline int ip6_fragment(struct net *net, struct sock *sk,
+>> +			       struct sk_buff *skb,
+>> +			       int (*output)(struct net *, struct sock *,
+>> +					     struct sk_buff *))
+>> +{
+>> +	kfree_skb(skb);
+>> +	return -EAFNOSUPPORT;
+>> +}
+>> +#endif
+> 
+> [...]
+> 
+>> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+>> index 8e2a6b28cea7..79f7ee93ceff 100644
+>> --- a/net/ipv6/ip6_output.c
+>> +++ b/net/ipv6/ip6_output.c
+>> @@ -873,6 +873,8 @@ int ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
+>>   	__be32 frag_id;
+>>   	u8 *prevhdr, nexthdr = 0;
+>>   
+>> +	if (!ipv6_mod_enabled())
+>> +		return -EAFNOSUPPORT;
+> 
+> Free the skb?
+> 
 
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Ah right. Makes sense, thanks!
 
-> ---
-> change in v2: add cc stable and fix tag
->
-> v1: https://lore.kernel.org/all/20260307035110.7121-1-xietangxin@yeah.net/
-> ---
->  drivers/net/virtio_net.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 72d6a9c6a..5b13a61b3 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -3351,6 +3351,7 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
->  	/* Don't wait up for transmitted skbs to be freed. */
->  	if (!use_napi) {
->  		skb_orphan(skb);
-> +		skb_dst_drop(skb);
->  		nf_reset_ct(skb);
->  	}
->
-> --
-> 2.43.0
->
+>>   	err = ip6_find_1stfragopt(skb, &prevhdr);
+>>   	if (err < 0)
+>>   		goto fail;
+>> @@ -1045,6 +1047,7 @@ int ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
+>>   	kfree_skb(skb);
+>>   	return err;
+>>   }
+>> +EXPORT_SYMBOL_GPL(ip6_fragment);
+> 
+
 
