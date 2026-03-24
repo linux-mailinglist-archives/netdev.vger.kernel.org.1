@@ -1,205 +1,202 @@
-Return-Path: <netdev+bounces-271015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271017-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6MG0N52BwmlneQQAu9opvQ
-	(envelope-from <netdev+bounces-271015-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:20:45 +0100
+	id uKaJEs+DwmlneQQAu9opvQ
+	(envelope-from <netdev+bounces-271017-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:30:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 599CE30812D
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:20:45 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51CCB3083D1
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:30:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 21D3930F357E
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:14:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8BF9A30200CF
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A773F166A;
-	Tue, 24 Mar 2026 12:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113A63EF0D4;
+	Tue, 24 Mar 2026 12:17:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ng8YRZ6s";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HTPZAIXC"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tI78zPN7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013010.outbound.protection.outlook.com [40.93.196.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748383F165F
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 12:14:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774354479; cv=none; b=rnluRAWGe1IoCQ71PHhVUp/FtmJx/RyGEJcYfQ/Vw4OHZJF/jZYL8uIh8NxcuNARfezfseA797ITPyLgDVSpxWA7IFQRNCTaq0kOdxNftnl/WugeznHCS0b4koYlaOfPdEefS+PHuz14YB46SAvFyFBVM3hL06OSiC+e7n0Hlog=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774354479; c=relaxed/simple;
-	bh=0nweOpQUF7Iy+owNcebuaUY1s9BD82NErGlE6LW5YXI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rKrMkFra1k1RbSSMP0ubvuUrNo8ta/yk0FCwxF5C1zKkIC1i+RLlNOL41fVP3CG4mdTxNINSbvmlG7yMggsTLTs/qya7pVwZ+RQZnP5NlNCY/KFGCkeaUnmuVvjksfPiAJVKHqp9QiqNnlWXPmsIKvzsVyrtnxfhLAU9l7kdx0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ng8YRZ6s; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HTPZAIXC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774354474;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i878IeteLCFxRLD+ZUMxJT9JCdjyYuc7imdtSz1y2IY=;
-	b=Ng8YRZ6sk22aNfy6KuuNXVjCs3nSumeNIbiz0oZt8awuB1gmZpqTRAMzdbe7mUl23ZYJfR
-	zj0OxZjCdjcQHhUC2Z+x6fT6PL0qmoMrjbQewUtlIMlx2ejgk/BkyipA6Jt3Gy6FH4Yy6W
-	lGkMTlg2P5aoEssQabbjPL3zXAtgWd0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-445-gckjYsesOWaI5gpbtdbyaQ-1; Tue, 24 Mar 2026 08:14:33 -0400
-X-MC-Unique: gckjYsesOWaI5gpbtdbyaQ-1
-X-Mimecast-MFC-AGG-ID: gckjYsesOWaI5gpbtdbyaQ_1774354472
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-486f89b7f69so38819665e9.0
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 05:14:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774354472; x=1774959272; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=i878IeteLCFxRLD+ZUMxJT9JCdjyYuc7imdtSz1y2IY=;
-        b=HTPZAIXC8Yvw+4QNCDhItzSTJP73OqmBB6TdoAO0rWUB1jXcvyYYIirBCs520RiJTj
-         +Tj7HqmI+l7V7L2nwNT6urmo6sAV9pkajjZ8PrPgVwSGwQOefHPUICR29Tx+HIpJIf6i
-         Y8rHxm7FR361Y5C177vUaugP5rVE523vNf5YLlgNA9gWXjK4Au2pGmSnbfPtc/MrxiAq
-         oDsHJDud9FWdFa3fr+QRD0dA0b8sly3UOdxaRYdVUjmM6kQmAg54Tv3VfLeNA58IzUBl
-         A+Pnr3pUy8lxtHdUki/1NsVp0L2BuJqKZsVvsVn8ZZ4rIl1rgQSRJUiFo+YI81az7gns
-         rcLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774354472; x=1774959272;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=i878IeteLCFxRLD+ZUMxJT9JCdjyYuc7imdtSz1y2IY=;
-        b=QH/2SQsi5/5Dk+FkJzYZYpcDzEkubjf6HRYO1aIo8mpc9OJuGTzb+1gWl4X1v6AL7t
-         82bGAXE5pfIKr0Q4u4siIRYl9GsamFyO8LDGrbG2vlbO+loAj7GYsqxYHPcTI0hGbKUI
-         B/HzUDnKtLWjGE7GM4GBvULlkvGyWZx8+CnpLYNCyAeGED9e7dBnLM6mNfiCd4lhokdW
-         UKby/0eqsdUpFPKPt9wzl4YWMa9pvZYz83JrCBdAUof/HnN8/k3LGdB3a99HiqWIy30A
-         J9hQ4S8nbVwgxq4T1d01YCwJmTZYT8e4R8tiaQQxYJtjGlPJs784x6Imz0yCKWUGFppn
-         N4lA==
-X-Gm-Message-State: AOJu0YxeDcbcmxbPnyRABqn/i9KzR24XW07DE+NYQfQ1VQh37x8pDSTq
-	UtQday7IzqLEm8igSgzzxV09k5INudsAEl3il+YzFScGvQGPgqVTw33WJOFiOKYfqKbd8Wa6dsz
-	f+BKw9DWeuQ3KJtmdCRQnOawnRzEIGLj3ztutmOlV6mGLApMTg3srVTj1Jw==
-X-Gm-Gg: ATEYQzxRygYZU2hogMjvmNpMCfhw0vEE9NkROAGTL9ocRAgF2mB2kkfJl6zIcNyHhEj
-	Kf0Ib6zzxzZ/j/DgZfJXVJV3hWt67X3lQczgcymgUn5h8xJniJ+P9tHS0W5894FzdUT3ZKXaBrU
-	8VMRGcoWOoWnUBakgjDCfgTJpnZpkjqZ1ov0Nz9dEtqJTuizUbs9gwgFbZ+Wy4AylfqHIeuJLRM
-	5ii4zpPqfux7zex3r4/RFxzieiRk52mM3y1hm7+3uzVXV0qdswF+huD/XiVkxL5KuBJwPFOGTa2
-	twcipNnX1Ljd5uZoDgthNY0YU64fnn0G3/8fn93ha0pTSFecWjsdKUf3+drJZmMKD+QhwYtx3sa
-	tUs8XmMsLa0dpbgWvZRslenJZJoE3uXUSPInCNC5yOPhIg+hHWzqhQhm0
-X-Received: by 2002:a05:600c:35c1:b0:485:3b50:fe54 with SMTP id 5b1f17b1804b1-486fedb2545mr263590855e9.11.1774354472326;
-        Tue, 24 Mar 2026 05:14:32 -0700 (PDT)
-X-Received: by 2002:a05:600c:35c1:b0:485:3b50:fe54 with SMTP id 5b1f17b1804b1-486fedb2545mr263590405e9.11.1774354471864;
-        Tue, 24 Mar 2026 05:14:31 -0700 (PDT)
-Received: from [192.168.88.32] ([212.105.153.60])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4871107eda1sm28749405e9.0.2026.03.24.05.14.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Mar 2026 05:14:31 -0700 (PDT)
-Message-ID: <5e5706bb-0f04-4bb1-94f4-45083a3c76fd@redhat.com>
-Date: Tue, 24 Mar 2026 13:14:29 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9795275AFD;
+	Tue, 24 Mar 2026 12:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774354622; cv=fail; b=AwFQKfospnvMUN/Ftmxnfr1JN4lgCjIAmslF4ObVq4KG6fbiVXCVsdRxWYSKjGnXGp7b7eHJ9wo5ljTVUhJXtWCLNs76tWUAMqs43EiGA/JSDA73obZ2259qMJMgul2/dVqP+/cFe4GcsghkKVr1V+JFkIpWTLinwB3GAzYzgz8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774354622; c=relaxed/simple;
+	bh=7/zoarReCe5ltLe5UEv5NKV0ssGjfDPJpFrnIsVAGxk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rV+36ToVP1BgpmYO+cSVUZixEIaAnbHWoopNV/doqXwKONrKcD7GcM8aMzlI7E/GI7chJsIW6Yi1KR/IYq3THHR5LuOh9SHvcWvHSjmbn51WSf81LQzSyqYBVaThUrXVl73wguo9WnfGAm6xDDc3OGDFvTToytXEBCYoLL5CKr0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tI78zPN7; arc=fail smtp.client-ip=40.93.196.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jabWI8jktdbIWL7KbEsNoAfn/K+1GKh1tjb4oDbBpktd2Mzt/AT1Znaz97ypxfNoFsQMOqQ8bK4ldQ884vOMitbpkZbiM+8L8a//Cpq2CgFE66W9CT/6p1DuG4aMV7tsrShcBTrpDossD7TohVA5yJJ4r6pq7iZORxSfAtBM3lcH2gJzI1H8pet8B8fX+MJoeM94Pm+/ctB2lwmyBl3Bl/oQgpVpG/JXabtEvL2db4ZigTW7aljq5g5r70dUIXnq442AQSNwcuEtEMULmvheR8vI/tqYe6EZtkCufkzwgOpHNvWpC7byCWM/G6c9uRSoD4Qnr6tNoGTdn0/GDoVfHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8/x1jaJUOoT/3onlB8DsJf2GaKQJ84wZlrzxo7+nXwA=;
+ b=BrEWxHNttBHhmyVBPHP6x2gWHzLr6SwcEkj1kAXDwGtDyD2YPBrr5/uH2fY5/n0V9EVFcSPXCMWexfMpfH67FUHIPYeGnzW33lcmbcpbBxB+gS1ZsycI6yMuIYa+rJdZigUxRSouscGDAALN9Em9It14xT1Vh02hFxQoTxA8uzLgIgTPC7PpvKytZYYLD60tu7lE8Dx8VlmqdqO28DyIjbXwo+wrLZfLBGP+TQsTmq/dY3H/EfuhXlLJ8JbFbPqJZ4mrDk+xUaxyOzEm/3jN9GTn6RTAKHDC+YkvNr8YteWyFSKj8DdRZkNpptROn/6+8i27WJEyZUkCpAB49pVZ4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=lunn.ch smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8/x1jaJUOoT/3onlB8DsJf2GaKQJ84wZlrzxo7+nXwA=;
+ b=tI78zPN7mrWcyef5+9ivOrkVbIoo0Qz/2mHon8hznB/M7vpNlUR/6T/MbIXq1T6xgS3WEix4IxqCoIcfB0zs+6fIGY46qIjrm3Pv+5m0org8ZjVTk/TH4wyEzwuI4JBKg18qsBOFWfm3xOaxvPKKC870ty3NSgxxMOAn2LlfjgK+hyqWXdudFskOLzYSYaLy8FoAORXjCSB3QTFH33MTI/eAK0VkIo5lp1ekNxs/H3G03OvnNU921M5RlpkD+ibxQvURXWf/PwFweduSlYja7e6X2nHumZLiVLi0SiCtxtNOxkvkywd0UUsTSsY+tRY26vQKRpqQ2QA1c62qXJol3w==
+Received: from DM6PR12CA0004.namprd12.prod.outlook.com (2603:10b6:5:1c0::17)
+ by DS7PR12MB5983.namprd12.prod.outlook.com (2603:10b6:8:7e::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Tue, 24 Mar
+ 2026 12:16:54 +0000
+Received: from DS2PEPF000061C3.namprd02.prod.outlook.com
+ (2603:10b6:5:1c0:cafe::75) by DM6PR12CA0004.outlook.office365.com
+ (2603:10b6:5:1c0::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.31 via Frontend Transport; Tue,
+ 24 Mar 2026 12:16:55 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS2PEPF000061C3.mail.protection.outlook.com (10.167.23.70) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9723.19 via Frontend Transport; Tue, 24 Mar 2026 12:16:53 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Mar
+ 2026 05:16:38 -0700
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Mar
+ 2026 05:16:37 -0700
+Received: from moonraker.nvidia.com (10.127.8.14) by mail.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Tue, 24 Mar 2026 05:16:34 -0700
+From: Jon Hunter <jonathanh@nvidia.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Thierry Reding <thierry.reding@gmail.com>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-tegra@vger.kernel.org>, Jon Hunter <jonathanh@nvidia.com>
+Subject: [PATCH V2 0/3] net: stmmac: Fix Tegra234 MGBE clock
+Date: Tue, 24 Mar 2026 12:16:28 +0000
+Message-ID: <20260324121631.771628-1-jonathanh@nvidia.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: stmmac: skip VLAN restore when VLAN hash ops are
- missing
-To: Michal Piekos <michal.piekos@mmpsystems.pl>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Ovidiu Panait
- <ovidiu.panait.rb@renesas.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20260321-vlan-restore-error-v2-1-45cf56a5223d@mmpsystems.pl>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260321-vlan-restore-error-v2-1-45cf56a5223d@mmpsystems.pl>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-NVConfidentiality: public
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF000061C3:EE_|DS7PR12MB5983:EE_
+X-MS-Office365-Filtering-Correlation-Id: 496af39e-e57b-4902-5d39-08de899f3c37
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700016|82310400026|376014|7416014|13003099007|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	PvtpcvO4raJEW9pXsJSqjrZPGTSHCMZpQq33TmSMUNL2gOXMcM06x+Bjj+zsL7uoJFx7cl7N8b8+r/f7r6p7v5SXWsYCXPQ/FgQoji4+sMxl5+uPkgES7e2QUp3nRDa4Ndep11E5jw/VSLqNYb6QdvxOBVsaklIMEGaytkmNExpW/VFqT7bXf/pFrNF7y4J3d/Mauc8fZqBrc/8w76Rk20ktchdT00+zI8n7FQgKEFuD0T6IeYF7Fi61spDmwqjV6e8p68ZrcD9o8EJCEkN8shqscU0BrNSIeBvtkFo+yd9+JVSCQbQEUH4oCdWLvoUii82fslWTECoQC029SrdMUt1tAd8vdeA13f/4j+icQtI61Z7FlW386Jddg87rzCzSsT13xS0OS+IAp4lClf/DJEgzBGqRwMZJQ53frusx3Vt6MR6ZgZu8j0zr0Z+MJZJk9K5Bo85QLsLcBkzjQ595Z19JzOra/C+Kmr2LLact1VTjRJHy8H78xdzTYbgsOBxUmN8DcLzMOJbme+UsCfhjZIynI9nFgHGSFUnttRwmCnMU8bsRzENM9oyNnStnD1PcfMK2DyGWK0yM3EzQsepaPYlX8TWnponiJ4OMPqZyHUJHSQeT3fC0CYVqQ3agkR+WeZ5IPce9iYjCn3OqlrbWnEyQP++6Y2ypvnLna5DkIrcJOJBXyY2GCAKusPAS+3nxAXcnvsb7Apqvnpp+SyXd+KjnL4+UfTtAP8lpx/9KBdCIVhb+Ph7YiNC1z2wZ7opm2Nw7PK578T3q80WjbPEYlQ==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(82310400026)(376014)(7416014)(13003099007)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	s41Ia4Ep9tznzhjQCb3g85wbhfGwHEn3A3ic6zHqEWsQuKPOqdXCfyU/Bk6kTYbkVA5whX3sQvWxri0bnH+K5/sKm2pIyJ2TU8R+JxXhhMl9vgxubG5KVEvUQ7UgFY0kF0yZe/OQbuZNUDztjlPYLSDRcyXEf73dI4Tlo5+vJ+w2fxB9/d2eF5NqcnMkaJn7ydPj08V0hYRFFY1KQKfD2324xy2CQg+not+DsGslvK2XzEhHrOYMTSnBVpz9gTzev0LfDQlEUtfgjUmd0AC40CNwKzeBuD8k+jgWbfxVQR7/ynaHsxpW3CQnhLKpQ+kyNZ49i8Rf/VgZwVZV/T8y137ckUpKjmojFwuP//iHrcRoSqe66UVMLqfFIfXd0aRxlt4Y2cCK+TgHL9E9uROg8Ja9Jrnzbg4jqv33k/3+ZCFJftf/453jWt96oIZse/yY
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2026 12:16:53.4760
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 496af39e-e57b-4902-5d39-08de899f3c37
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF000061C3.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5983
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271015-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[mmpsystems.pl,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,foss.st.com,renesas.com,armlinux.org.uk];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271017-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jonathanh@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,Nvidia.com:dkim];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mmpsystems.pl:email]
-X-Rspamd-Queue-Id: 599CE30812D
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 51CCB3083D1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/21/26 6:38 AM, Michal Piekos wrote:
-> stmmac_vlan_restore() unconditionally calls stmmac_vlan_update() when
-> NETIF_F_VLAN_FEATURES is set. On platforms where priv->hw->vlan (or
-> ->update_vlan_hash) is not provided, stmmac_update_vlan_hash() returns
-> -EINVAL via stmmac_do_void_callback(), resulting in a spurious
-> "Failed to restore VLANs" error even when no VLAN filtering is in use.
-> 
-> Check presence of VLAN HW FILTER flags before stmmac_vlan_update().
-> 
-> Tested on Orange Pi Zero 3.
-> 
-> Fixes: bd7ad51253a7 ("net: stmmac: Fix VLAN HW state restore")
-> Signed-off-by: Michal Piekos <michal.piekos@mmpsystems.pl>
-> ---
-> This patch fixes a noisy "Failed to restore VLANs" message on platforms
-> where stmmac VLAN hash ops are not implemented.
-> stmmac_vlan_restore() calls stmmac_vlan_update() without checking for
-> VLAN hash ops presence which results in -EINVAL. 
-> ---
-> Changes in v2:
-> - Replace check for hash ops with check for HW FILTER flags
-> - Link to v1: https://lore.kernel.org/r/20260314-vlan-restore-error-v1-1-4fc6c3e2115f@mmpsystems.pl
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 6827c99bde8c..cfc0ce9cec9c 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -6863,7 +6863,8 @@ static int stmmac_vlan_restore(struct stmmac_priv *priv)
->  {
->  	int ret;
->  
-> -	if (!(priv->dev->features & NETIF_F_VLAN_FEATURES))
-> +	if (!(priv->dev->features &
-> +	      (NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_VLAN_STAG_FILTER)))
->  		return 0;
->  
->  	if (priv->hw->num_vlan)
-Adding Russell.
+The name of the PTP ref clock for the Tegra234 MGBE ethernet controller
+does not match the generic name in the stmmac platform driver. Despite
+this basic ethernet is functional on the Tegra234 platforms that use
+this driver and as far as I know, we have not tested PTP support with
+this driver. Hence, the risk of breaking any functionality is low.
 
-It's not obvious to me that with this change the
-restore_hw_vlan_rx_fltr() and vlan_update() callback are still invoked
-in all the relevant driver/features permutation.
+The previous attempt to fix this in the stmmac platform driver, by
+supporting the Tegra234 PTP clock name, was rejected [0]. The preference
+from the netdev maintainers is to fix this in the DT binding for
+Tegra234.
 
-/P
+This series fixes this by correcting the device-tree binding to align
+with the generic name for the PTP clock. I understand that this is
+breaking the ABI for this device, which we should never do, but this
+is a last resort for getting this fixed. I am open to any better ideas
+to fix this. Please note that we still maintain backward compatibility
+in the driver to allow older device-trees to work, but we don't
+advertise this via the binding, because I did not see any value in doing
+so.
+
+Changes since V1:
+- Moved handling of different PTP clock names into Tegra234 MGBE driver.
+- Add changes to update the Tegra234 MGBE DT binding and DT source.
+
+[0] https://lore.kernel.org/linux-tegra/20250612062032.293275-1-jonathanh@nvidia.com/
+
+Jon Hunter (3):
+  net: stmmac: Fix PTP ref clock for Tegra234
+  dt-bindings: net: Fix Tegra234 MGBE PTP clock
+  arm64: tegra: Fix Tegra234 MGBE PTP clock
+
+ .../bindings/net/nvidia,tegra234-mgbe.yaml    |  2 +-
+ arch/arm64/boot/dts/nvidia/tegra234.dtsi      |  8 ++++----
+ .../net/ethernet/stmicro/stmmac/dwmac-tegra.c | 19 +++++++++++++++++--
+ 3 files changed, 22 insertions(+), 7 deletions(-)
+
+-- 
+2.43.0
 
 
