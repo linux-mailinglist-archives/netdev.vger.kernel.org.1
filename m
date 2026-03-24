@@ -1,227 +1,223 @@
-Return-Path: <netdev+bounces-271326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271327-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yCioB6ETw2lCoAQAu9opvQ
-	(envelope-from <netdev+bounces-271326-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:43:45 +0100
+	id 4EcUNxsVw2lCoAQAu9opvQ
+	(envelope-from <netdev+bounces-271327-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:50:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E8D31D68E
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:43:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44C9831D753
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 23:50:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F26AB30F5ED6
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 22:40:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA9E43117CAA
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 22:46:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05F137EFE7;
-	Tue, 24 Mar 2026 22:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="mkzCyYtE";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="rKZV6CEv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D428E3C5DDA;
+	Tue, 24 Mar 2026 22:46:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE323259CB9
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 22:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F893361DA7
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 22:46:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774392042; cv=none; b=m7uQaG2xJ9zzqo/05PdFlM8L7ON7fbqTqYm/E+J1x0t76++PSyropzuBEdf0X7oP4w+FooWhpSHFOZ6iDHB2ZjqgZH4e3pmvi7ZNUNTJe5Ar4cQNDDbOohaBIfLcDXHqOj1SRgosT5SEcVz+TxSx3Eu3YFGSFNj+A3SX89gUDOo=
+	t=1774392395; cv=none; b=eeNgRdZB7jYrH4ivxiVsoomnkrMS6u8nNacdl4e8+7hhx6rchW4yCLD7TbJzBKlrlComQyX3jfYsflH/zoagWygdC4owDSywx8zaGP4ZKNa1G0q8uiK2YJ8N/Er51ckb0tHKIHHnoOuT8bMTSDeVABzRO1eR7aZP76Yxuq+olW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774392042; c=relaxed/simple;
-	bh=y80G8CZNr0PtsGN8kGOp2idNZbMoLcOcKFayVbHkADE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T8SSx9CAgw943rFpNZ19yUuUe1/2K0FpThruehtMS68fM0vYw/AGcrIB/dRFI6gM8JJ7R7y0KFmh1LQEzi8AcnVFiFLeNcY19+iwlP2VyAkBOjitvVg/dtisM+Ek6MpEvSEM24aHe9uEcPx79ACXztBjTrKtt7sivgwMaOHtEcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=mkzCyYtE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=rKZV6CEv; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id CFE3D1400199;
-	Tue, 24 Mar 2026 18:40:38 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Tue, 24 Mar 2026 18:40:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1774392038; x=
-	1774478438; bh=Y/qzKJVk6RCMmDetjX3l4jadRQTOGTgY3apk3tAloB0=; b=m
-	kzCyYtEV6ydPCiOVZYyFGuCL0NrJc1Tzln1s8wr6juWuei87Zxy7rzcyrbsgCkme
-	Sn44yXi7e/bX1g7ArwNbz9zsH9V/9ynoDH2WkHUibqwLOZTEjg9icqL6BqVzV28p
-	t3sM3GhPIgFJDPOHZ7F7XZctoBWyQ9sIM9EtobAL3lIFwf2Mnd6LeGBDXPl5SEJs
-	hQo5n8f94q87gxX9ebf2Udb15kF4D9PNpF6NlEn+0+bEXRLCKZrvoCasHJMr+wrY
-	fYWETufqAA2JAFKHPk7S/u08K/f8aAfxAZ6ehEe6+YPYkW2EqXWytkf7mwoO+bwo
-	C1ZvnUxUPsJk93dSCQ2jg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1774392038; x=1774478438; bh=Y/qzKJVk6RCMmDetjX3l4jadRQTOGTgY3ap
-	k3tAloB0=; b=rKZV6CEvfbyT9UK7SVvVojWYVDs07zCzNOxEgdd4chxMs8k7rc3
-	Y0BOQYCh2Exg/yyQCRRD8/Bk9TXviYI0leEm3PQB5o9dExFI4q3uEUOUPJhjVYNZ
-	AnSyUAHJq2HjyB/w3r+dvpMtpA4gKHk/T4+xZVCHocGztX43kx1GVs7Boqd/FcKC
-	YZmSoEUs46qLC5HyKbmLiOB1Z4j0brwhFSvmQ6mOIxtIXsTeYzekNAEicxXNd3yb
-	MGzvoSA/1wRv1lJYHcw0eYrEdPOzu9HBke3MlC8eobF1UWuO/qoo3lPXKCvDIorV
-	vTUT8xWcilWukC/gcMnFk0FP3EscQHTPGJw==
-X-ME-Sender: <xms:5hLDaR2EbbRby16HOxDlMVDFkEz5akGDSdDM_fXrGynvkvleMe3raw>
-    <xme:5hLDaXJJeLbTQKlApK0iNoVckFcd3nuHBytSZ256NEs25uJcEKF1W_a7xTtZSKtWv
-    g7WJr1cVnmq8B21jLr4oEg8E47R5gHbTmkviA-fxeMnZoE04NHrbFk>
-X-ME-Received: <xmr:5hLDaYFv2OfGGktX9w4zYploiIp_GRf6EeF9AsnhXAVPdk8xp3on9YxTbw8P>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefvddvkedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeekpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtoheprghnthhonhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvght
-    uggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehimhhvgegsvghlse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdp
-    rhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtoh
-    epuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigv
-    thesghhoohhglhgvrdgtohhm
-X-ME-Proxy: <xmx:5hLDabV9KklyA5mEhsWIjkT0z4z_gK76fQr2CoU4B2Cfss_Dn7i14Q>
-    <xmx:5hLDaYyyIlUjwMp00aCIHLIDGbyiniFY47sUUcMs1qYcdz90CRK3xg>
-    <xmx:5hLDaYTL901ndapmCubWPwRZhUwaPnV5CJRXANYueghPNA9D7U6_vQ>
-    <xmx:5hLDaciPzWsGbMfVrTJKbPOHGafmcFIuEYCcLLKUq2b5liyekBP8-A>
-    <xmx:5hLDaR_PCS_3DXY1vpuj_AVFmfTCWqVL2G8PLrgZsXy6-mnsxsEA_vLj>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 24 Mar 2026 18:40:37 -0400 (EDT)
-Date: Tue, 24 Mar 2026 23:40:36 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org,
-	Hyunwoo Kim <imv4bel@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net 1/1] ovpn: fix race between deleting interface and
- adding new peer
-Message-ID: <acMS5PU_CfOMQPtQ@krikkit>
-References: <20260320100351.2283994-1-antonio@openvpn.net>
- <20260320100351.2283994-2-antonio@openvpn.net>
- <20260323184304.42c3930f@kernel.org>
- <20260323184543.764a903e@kernel.org>
- <acJix6cQZyqb94pA@krikkit>
- <20260324143006.60e7ca2e@kernel.org>
+	s=arc-20240116; t=1774392395; c=relaxed/simple;
+	bh=3YDYe+eKvpUXHiyvLACVGcDJXT1eIj28IFAVn7VoE+4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K8bGT8WHBeNgOBU52P6j4jhEnijtNy865bibOe781vdEiMfXqnl8KsVMl8X0zkeECR+S/GPMzAdQJ9RnQ2+KQcggbWMjpW6vnZbABs5IEMYrg4/2Mtjr1a0P51koOZqhyLmxH0nDGjVoIN+uO/40p6NEiwZJheUrE3t3SJcAwnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5a27c329e98so5751240e87.3
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 15:46:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774392393; x=1774997193;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cwV/BjEvjB+2xLn3P/yF4TbYfG+FKFLU/kxsrZgmYEA=;
+        b=UYa27jx+V6s4wucthW3bx+bBuZdicwxd4TkTmVoJPehhYCrDQtg9GOsRax+JiXmDyY
+         Sv/KDkG26igwq8Q1BfEfZKBqV7hwiGNeQlPxYF81Yx8ruz/Y3NAYM+FHPLG3y39bByGi
+         crt7+f3D/pd02y3OO4dThtP3MLCgJ+KLaUxZ46mpI4/DRSoNFBN8bpwiJAMmX11SAFfp
+         Kh+JdtY7jP+HWDzMC2Z2qjqdgxWXpxgQ2WJKLbI3MxOmo4MuOM3q5DwJsn2tVJL8ZLma
+         X5cbkcJ+GHTmP3YVqLXQKHskdlcVDqC5MsGfReF1WAykbRIyR/b3tOL6C/NGxZl9E7Oo
+         OzQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUd5i3t1phdp5oHQpugAMo4nOZqAj0v0bL2azpmIcwL2cXvqqsN7HsAdVslq5tZtL+ihVrDZPs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwI3F86ZaqMBMp6RM6RWrmSBN6oR5c9waQokas0WcSfO5sj7PU/
+	e+xypTfeMkRf36HngfSl0QM0FqhPqTTElH5ZR3NYX9PtAB3YuZFIpNWJ
+X-Gm-Gg: ATEYQzyDll8ZbHtSOplZrsnEzqXqXx1FFp6lfo4/oZV7C7YpukErMKl3ib5VQUBJJhm
+	Bi6aKf7fJeZfGhBAfUGxUgg/bG/MRYgpj3EZS0KSwBjQlmAj4v3LmK4FZb/INF5d2iMmGAlFYV6
+	XQG626ddeUNLLatv6Q5Kbxg11jvM5XsTh6hQYjlMseMPjeApuaRSQ72fRF2WiW9bql2RHmd1f3J
+	GqiVPgfImiF7lhWcs0MQzBYujXqqE0+EOljj+H4QvT+/0I8M5dZqiRHPGwpx5x2jzh/LnV29Oli
+	yRSx0y16zDkR2UkGXFHR17zqwE+aG60ACttpGsrw+LJ03edzqpyDUmVxisOa1zCweK73W6whsNp
+	sFgIbynBo+VQ4e7+6uNtATUcnp+LsqM0rPw3GA0Mbpe3zE0a9OQ1EEKsjuQ87/hMl4Nnp/kDxga
+	WJSqzmmFB1MWsh8rdhFcbp
+X-Received: by 2002:a05:6512:1250:b0:5a2:86bf:28cf with SMTP id 2adb3069b0e04-5a29b990918mr350145e87.29.1774392392094;
+        Tue, 24 Mar 2026 15:46:32 -0700 (PDT)
+Received: from hackbase ([213.87.129.220])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a298fe3383sm626971e87.9.2026.03.24.15.46.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2026 15:46:30 -0700 (PDT)
+From: Alexander Popov <alex.popov@linux.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Michal Kubecek <mkubecek@suse.cz>,
+	Gal Pressman <gal@nvidia.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	James Guan <guan_yufei@163.com>,
+	Kees Cook <kees@kernel.org>,
+	Paul Moses <p@1g4.org>,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alexander Popov <alex.popov@linux.com>
+Cc: security@kernel.org,
+	notify@kernel.org
+Subject: [PATCH] wifi: virt_wifi: remove SET_NETDEV_DEV to avoid use-after-free
+Date: Wed, 25 Mar 2026 01:46:02 +0300
+Message-ID: <20260324224607.374327-1-alex.popov@linux.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260324143006.60e7ca2e@kernel.org>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.14 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[linux.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271326-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_CC(0.00)[openvpn.net,vger.kernel.org,gmail.com,redhat.com,lunn.ch,davemloft.net,google.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-271327-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[lunn.ch,kernel.org,davemloft.net,google.com,redhat.com,bootlin.com,suse.cz,nvidia.com,pengutronix.de,gmail.com,linuxfoundation.org,sipsolutions.net,163.com,1g4.org,vger.kernel.org,linux.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alex.popov@linux.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:dkim,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: 74E8D31D68E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.com:email,linux.com:mid]
+X-Rspamd-Queue-Id: 44C9831D753
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-03-24, 14:30:06 -0700, Jakub Kicinski wrote:
-> On Tue, 24 Mar 2026 11:09:11 +0100 Sabrina Dubroca wrote:
-> > -------- 8< --------
-> > diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
-> > index c7f382437630..ebec8c2ff427 100644
-> > --- a/drivers/net/ovpn/netlink.c
-> > +++ b/drivers/net/ovpn/netlink.c
-> > @@ -90,8 +90,11 @@ void ovpn_nl_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
-> >  	netdevice_tracker *tracker = (netdevice_tracker *)&info->user_ptr[1];
-> >  	struct ovpn_priv *ovpn = info->user_ptr[0];
-> >  
-> > -	if (ovpn)
-> > +	if (ovpn) {
-> > +		if (READ_ONCE(dev->reg_state) >= NETREG_UNREGISTERING)
-> > +			ovpn_peers_free(ovpn, NULL, OVPN_DEL_PEER_REASON_TEARDOWN);
-> >  		netdev_put(ovpn->dev, tracker);
-> > +	}
-> >  }
-> >  
-> >  static bool ovpn_nl_attr_sockaddr_remote(struct nlattr **attrs,
-> > -------- 8< --------
-> > 
-> > This would clean up a peer that may have been added while we were
-> > starting device unregistration. We hold a reference on the device so
-> > no UAF possible, netdev_wait_allrefs_any will wait for this. If we
-> > don't have a racing peer creation, ndo_uninit takes care of the peers.
-> 
-> LGTM. This or change all the write paths to check if the device is still
-> alive after taking the lock.
+Currently we execute `SET_NETDEV_DEV(dev, &priv->lowerdev->dev)` for
+the virt_wifi net devices. However, unregistering a virt_wifi device in
+netdev_run_todo() can happen together with the device referenced by
+SET_NETDEV_DEV().
 
-I think peer_new is the only relevant path here (other paths use an
-existing peer and modify/delete the peer itself or its keys while
-holding a reference), and we don't take a lock except to insert the
-peer in the ovpn instance (ie netdev)'s hashtable (or peer slot, for
-single-peer instances). I guess we could add the reg_state >=
-NETREG_UNREGISTERING check to ovpn_peer_add_{p2p,mp} and reject adding
-the peer. It seems cleaner than my ovpn_nl_post_doit() diff above.
+It can result in use-after-free during the ethtool operations performed
+on a virt_wifi device that is currently being unregistered. Such a net
+device can have the `dev.parent` field pointing to the freed memory,
+but ethnl_ops_begin() calls `pm_runtime_get_sync(dev->dev.parent)`.
 
-> > Or we can call ovpn_peers_free on every NETDEV_UNREGISTER notification
-> > that netdev_wait_allrefs_any sends us (but then we don't need it in
-> > ndo_uninit).
-> 
-> Hm, wouldn't we need a notification _after_ netdev_wait_allrefs_any() ?
+Let's remove SET_NETDEV_DEV for virt_wifi to avoid bugs like this:
 
-netdev_wait_allrefs_any() will never complete if we don't clean up all
-the peers, since they hold a ref on the netdev.
+ ==================================================================
+ BUG: KASAN: slab-use-after-free in __pm_runtime_resume+0xe2/0xf0
+ Read of size 2 at addr ffff88810cfc46f8 by task pm/606
 
-But calling ovpn_peers_free on netdev_wait_allrefs_any()'s
+ Call Trace:
+  <TASK>
+  dump_stack_lvl+0x4d/0x70
+  print_report+0x170/0x4f3
+  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+  kasan_report+0xda/0x110
+  ? __pm_runtime_resume+0xe2/0xf0
+  ? __pm_runtime_resume+0xe2/0xf0
+  __pm_runtime_resume+0xe2/0xf0
+  ethnl_ops_begin+0x49/0x270
+  ethnl_set_features+0x23c/0xab0
+  ? __pfx_ethnl_set_features+0x10/0x10
+  ? kvm_sched_clock_read+0x11/0x20
+  ? local_clock_noinstr+0xf/0xf0
+  ? local_clock+0x10/0x30
+  ? kasan_save_track+0x25/0x60
+  ? __kasan_kmalloc+0x7f/0x90
+  ? genl_family_rcv_msg_attrs_parse.isra.0+0x150/0x2c0
+  genl_family_rcv_msg_doit+0x1e7/0x2c0
+  ? __pfx_genl_family_rcv_msg_doit+0x10/0x10
+  ? __pfx_cred_has_capability.isra.0+0x10/0x10
+  ? stack_trace_save+0x8e/0xc0
+  genl_rcv_msg+0x411/0x660
+  ? __pfx_genl_rcv_msg+0x10/0x10
+  ? __pfx_ethnl_set_features+0x10/0x10
+  netlink_rcv_skb+0x121/0x380
+  ? __pfx_genl_rcv_msg+0x10/0x10
+  ? __pfx_netlink_rcv_skb+0x10/0x10
+  ? __pfx_down_read+0x10/0x10
+  genl_rcv+0x23/0x30
+  netlink_unicast+0x60f/0x830
+  ? __pfx_netlink_unicast+0x10/0x10
+  ? __pfx___alloc_skb+0x10/0x10
+  netlink_sendmsg+0x6ea/0xbc0
+  ? __pfx_netlink_sendmsg+0x10/0x10
+  ? __futex_queue+0x10b/0x1f0
+  ____sys_sendmsg+0x7a2/0x950
+  ? copy_msghdr_from_user+0x26b/0x430
+  ? __pfx_____sys_sendmsg+0x10/0x10
+  ? __pfx_copy_msghdr_from_user+0x10/0x10
+  ___sys_sendmsg+0xf8/0x180
+  ? __pfx____sys_sendmsg+0x10/0x10
+  ? __pfx_futex_wait+0x10/0x10
+  ? fdget+0x2e4/0x4a0
+  __sys_sendmsg+0x11f/0x1c0
+  ? __pfx___sys_sendmsg+0x10/0x10
+  do_syscall_64+0xe2/0x570
+  ? exc_page_fault+0x66/0xb0
+  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  </TASK>
 
-    /* Rebroadcast unregister notification */
+This fix may be combined with another one in the ethtool subsystem:
+https://lore.kernel.org/all/20260322075917.254874-1-alex.popov@linux.com/T/#u
 
-should clean up peers that got added while we were unregistering.
+Fixes: d43c65b05b848e0b ("ethtool: runtime-resume netdev parent in ethnl_ops_begin")
+Cc: stable@vger.kernel.org
+Signed-off-by: Alexander Popov <alex.popov@linux.com>
+---
+ drivers/net/wireless/virtual/virt_wifi.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-> > And s/cancel_delayed_work_sync/disable_delayed_work_sync/ for the
-> > keepalive_work.
-> > 
-> > 
-> > LLM claims it's because of parallel_ops, I don't think this is
-> > related? It also claims this issue is only for UDP sockets (and TCP
-> > would see a UAF on the keepalive), but ovpn_peer_new always holds the
-> > ovpn netdev, so I don't think there's a difference there.
-> 
-> Yup, I think the LLMs are trying to be helpful and are looking for some
-> write lock earlier in the path. As much as they are annoying I can't
-> blame them here, I feel like we try to make things lockless too often.
-
-Well, if we want to protect against netdev removal, we have to use the
-one lock one we're trying hard to not depend on so much (rtnl)?
-At the ovpn level operations are not lockless.
-
-The LLM found a legit race that I missed, but I'm always puzzled by
-inconsistencies like that.
-
+diff --git a/drivers/net/wireless/virtual/virt_wifi.c b/drivers/net/wireless/virtual/virt_wifi.c
+index 885dc7243e8d..97bd39d89e98 100644
+--- a/drivers/net/wireless/virtual/virt_wifi.c
++++ b/drivers/net/wireless/virtual/virt_wifi.c
+@@ -557,7 +557,6 @@ static int virt_wifi_newlink(struct net_device *dev,
+ 	eth_hw_addr_inherit(dev, priv->lowerdev);
+ 	netif_stacked_transfer_operstate(priv->lowerdev, dev);
+ 
+-	SET_NETDEV_DEV(dev, &priv->lowerdev->dev);
+ 	dev->ieee80211_ptr = kzalloc_obj(*dev->ieee80211_ptr);
+ 
+ 	if (!dev->ieee80211_ptr) {
 -- 
-Sabrina
+2.53.0
+
 
