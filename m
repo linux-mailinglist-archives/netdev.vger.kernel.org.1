@@ -1,209 +1,194 @@
-Return-Path: <netdev+bounces-271237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271238-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uFrGA+vYwmllmgQAu9opvQ
-	(envelope-from <netdev+bounces-271237-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:33:15 +0100
+	id ECBFDR7bwmm0mwQAu9opvQ
+	(envelope-from <netdev+bounces-271238-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:42:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04F1831AE9C
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:33:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95D6231AFC8
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 19:42:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A0A8D30138E1
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:31:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6FDB305149E
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 18:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B94539479D;
-	Tue, 24 Mar 2026 18:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6400F3A3E88;
+	Tue, 24 Mar 2026 18:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Z8NJKZP7"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="1ioic6PB";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="zXpGbIJr"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDCB133A6EB
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 18:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E983A3E6F;
+	Tue, 24 Mar 2026 18:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774377066; cv=none; b=D7KWZXF6i2vxdi55zO5fNuzBIXaJxuiv0S+tOme+6BzMQ9JVqtKv1oMVMRzY4J5/aA8a/xEf/H2HxivFeTBzq9/1M+DfZd67zzlEQfmKTbG1IYy8KZpurTHLoLUePzTGFaseWDyRpALmFyDdZA/NPaYXDb6RU6m8mNFxV670HeM=
+	t=1774377483; cv=none; b=QQQkbKS1hV5zNyu9BR53rpzBlYw06jEzzGbQ6Al5qMlu6O0236ax3pkzI8x1CLoJo+KbN48mgJ8LzboHOdkeBm4VsMSHOeQkxv4mYTAMSMjnlTgcBI6ldNqg8kwwKHITc/d+aNHlyGt63XgAyAF59Ehgqrryzq37lHiR8EKaqxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774377066; c=relaxed/simple;
-	bh=CkRrkLNRGh2zCKqsmt+SPMhud/dqY9HlhebCsfTZwIk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zu79p7Q6JT9wm3Ejzo49u3cnvy870LWMxPTbhqSKK+UflJfArSaZ6Gt6tqAnRuhfBboSSx83adI+6MeaU/rTQfx9/NRYUcve38t4qPWOoyrJQIMU8b/aVy5ac05FhlYGOB/kjARdHpndTUTJZfyW9ldqLVF3CIvh1ff6AB81+f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Z8NJKZP7; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <60a0b32d-b02b-419d-9d71-3293261333cb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774377053;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L9fTdPH1aCElwFWRzX6/IMyrZGmyXLUmrj2QhF1Rny8=;
-	b=Z8NJKZP7HM7wGHfKLM8Ss8Ax9rDQPBpQYbWcL07MZeQyaZOv2IO9cTyo9gxuocOvQVRXZ7
-	xXfOsngesNEjmU2La6z3/JHRpyeiUq2oDdPmK1AhF6mgWipwraJAlFd04xtHSJCLSG/zmp
-	9eYQy+0MUyARbKGBLLoYBuInpOinqSc=
-Date: Tue, 24 Mar 2026 11:30:43 -0700
+	s=arc-20240116; t=1774377483; c=relaxed/simple;
+	bh=KhcuTXadNnnj+zJMirrxnmXMH060XrbjAHeS8sI18iM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Rd/GTMOhrm9RR/a+1+PD/Se5kdRu57VWI01Jt0XktDGEIX16OlNG7lLxke6swyGCz/8J4ZIqVv0Rx0WsalAtcghbOgkrQkK86rTWOFL2hVuu1jw6xwiEdO9PK9h3nGDLijPZWGDoj9VXkrzCEHsweEXgYbj9X2199/qtjYfZyCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=1ioic6PB; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=zXpGbIJr; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1774377479;
+	bh=KhcuTXadNnnj+zJMirrxnmXMH060XrbjAHeS8sI18iM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=1ioic6PBeCMnscU2BCzFZReYbvO0E2gx3YN+uLUe8dnxQsxPJ0EFqGpkVcijXz/a6
+	 skS2wtf+0QVA6krTaDauqnLj5jFZHnbYN9urMh/0Nk6n6plQRljd0QRjxVNlEwLMAV
+	 ksb3W7AnXKDPNtFAjVnDNYgkMbVpGvlCpK+8dIj3JYV7gOgwFyEXQ8NV3/e0LxXIZA
+	 cRFZDFDhaDJt1NNq+S8WMaUADVj5iH5icmPFTRWS1qIW2vaVZVt0eJdO4F8/moXcgQ
+	 917GeX5nqE/+kjw31hypcHI1Gt00V1pEGgRPzJ5Sdf4fDj9Nj5RLnyfPKwtRyhm4S/
+	 JBCoM9HNPK3ug==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id EAFBA40073; Tue, 24 Mar 2026 18:37:59 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1774377477;
+	bh=KhcuTXadNnnj+zJMirrxnmXMH060XrbjAHeS8sI18iM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=zXpGbIJrJP4C2bS4bVsQv7PtRSKlhXmnUuAP60IMAb/EjcaKlYjsu5SFV4YDmfyB5
+	 DhRnYGNP1hy2ihNE15SfkUdtqtl+5/avW9Zy4m0Jc3mxCvIkQjZ9eN7CAtl1KCxJn8
+	 o/zAr0MnSuAiggf6PL3YohT04firdzc3J23icExDYV+IZhX8r2xvB6b9ErrHO74uTs
+	 VG/ZmsCKDY9moAb4mSYKraLj9KNS7eVdek2QsjBhP6WCf4VsvwTIc7ef4s9a8Z69O1
+	 80vJugbhEUtRBUjS9jlHiXX0Iq1hIX1mvraV/LsKkF9I9qiJGXSrFVYpBCkj9hrtTv
+	 ZowPL6KjuPgBA==
+Received: from AMDDesktop.lan (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 7092C3FF6A;
+	Tue, 24 Mar 2026 18:37:57 +0000 (UTC)
+From: Birger Koblitz <mail@birger-koblitz.de>
+Subject: [PATCH net-next v4 0/2] r8152: Add support for the RTL8157 5Gbit
+ USB Ethernet chip
+Date: Tue, 24 Mar 2026 19:37:54 +0100
+Message-Id: <20260324-rtl8157_next-v4-0-034312b12de5@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 4/5] bpf: allow new DECAP flags and add guard rails
-To: Nick Hudson <nhudson@akamai.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Max Tottenham <mtottenh@akamai.com>, Anna Glasgall <aglasgal@akamai.com>,
- Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260318134242.2725749-1-nhudson@akamai.com>
- <20260318134242.2725749-5-nhudson@akamai.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20260318134242.2725749-5-nhudson@akamai.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-B4-Tracking: v=1; b=H4sIAALawmkC/3XNQQ6CMBAF0KuYrq1pS6XVlfcwxkzpFBoJmNIQl
+ HB3CytCcPnz578ZSYfBY0euh5EE7H3n2yYFeTyQooKmROptykQwkbOMSxpirflZPRscIgXkOtc
+ ZGumApMk7oPPDwt1Jg5HOV+SRmsp3sQ2f5U/Pl36f7Dll9GJAKSOFBmdvxocSA321pvbxe7K4g
+ L1YI2qDiIRwhsAdSK0t/4dkK0SwDZLNCKDDApSzoPaQaZp+5B35tkQBAAA=
+X-Change-ID: 20260314-rtl8157_next-ae18683eb4fa
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Birger Koblitz <mail@birger-koblitz.de>
+X-Mailer: b4 0.14.2
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271237-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,akamai.com,iogearbox.net,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[birger-koblitz.de:+];
+	TAGGED_FROM(0.00)[bounces-271238-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[birger-koblitz.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,akamai.com:email,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: 04F1831AE9C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,birger-koblitz.de:dkim,birger-koblitz.de:email,birger-koblitz.de:mid]
+X-Rspamd-Queue-Id: 95D6231AFC8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Add support for the RTL8157, which is a 5GBit USB-Ethernet adapter
+chip in the RTL815x family of chips.
 
+The RTL8157 uses a different frame descriptor format, and different
+SRAM/ADV access methods, plus offers 5GBit/s Ethernet, so support for these
+features is added in addition to chip initialization and configuration.
 
-On 3/18/26 6:42 AM, Nick Hudson wrote:
-> Add checks to require shrink-only decap, reject conflicting decap flag
-> combinations, and verify removed length is sufficient for claimed header
-> decapsulation.
-> 
-> Co-developed-by: Max Tottenham <mtottenh@akamai.com>
-> Signed-off-by: Max Tottenham <mtottenh@akamai.com>
-> Co-developed-by: Anna Glasgall <aglasgal@akamai.com>
-> Signed-off-by: Anna Glasgall <aglasgal@akamai.com>
-> Signed-off-by: Nick Hudson <nhudson@akamai.com>
-> ---
->   net/core/filter.c | 47 +++++++++++++++++++++++++++++++++++++----------
->   1 file changed, 37 insertions(+), 10 deletions(-)
-> 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 7c2871b40fe4..47aec44a9cd3 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -56,6 +56,7 @@
->   #include <net/sock_reuseport.h>
->   #include <net/busy_poll.h>
->   #include <net/tcp.h>
-> +#include <net/gre.h>
->   #include <net/xfrm.h>
->   #include <net/udp.h>
->   #include <linux/bpf_trace.h>
-> @@ -3496,7 +3497,9 @@ static u32 bpf_skb_net_base_len(const struct sk_buff *skb)
->   					 BPF_F_ADJ_ROOM_ENCAP_L2( \
->   					  BPF_ADJ_ROOM_ENCAP_L2_MASK))
->   
-> -#define BPF_F_ADJ_ROOM_DECAP_MASK	(BPF_F_ADJ_ROOM_DECAP_L3_MASK)
-> +#define BPF_F_ADJ_ROOM_DECAP_MASK	(BPF_F_ADJ_ROOM_DECAP_L3_MASK | \
-> +					 BPF_F_ADJ_ROOM_DECAP_L4_MASK | \
-> +					 BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK)
->   
->   #define BPF_F_ADJ_ROOM_MASK		(BPF_F_ADJ_ROOM_FIXED_GSO | \
->   					 BPF_F_ADJ_ROOM_ENCAP_MASK | \
-> @@ -3743,20 +3746,44 @@ BPF_CALL_4(bpf_skb_adjust_room, struct sk_buff *, skb, s32, len_diff,
->   		return -ENOTSUPP;
->   	}
->   
-> -	if (flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) {
-> +	if (flags & BPF_F_ADJ_ROOM_DECAP_MASK) {
+The module was tested with an OEM RTL8157 USB adapter:
+[25758.328238] usb 4-1: new SuperSpeed Plus Gen 2x1 USB device number 2 using xhci_hcd
+[25758.345565] usb 4-1: New USB device found, idVendor=0bda, idProduct=8157, bcdDevice=30.00
+[25758.345585] usb 4-1: New USB device strings: Mfr=1, Product=2, SerialNumber=7
+[25758.345593] usb 4-1: Product: USB 10/100/1G/2.5G/5G LAN
+[25758.345599] usb 4-1: Manufacturer: Realtek
+[25758.345605] usb 4-1: SerialNumber: 000300E04C68xxxx
+[25758.534241] r8152-cfgselector 4-1: reset SuperSpeed Plus Gen 2x1 USB device number 2 using xhci_hcd
+[25758.603511] r8152 4-1:1.0: skip request firmware
+[25758.653351] r8152 4-1:1.0 eth0: v1.12.13
+[25758.689271] r8152 4-1:1.0 enx00e04c68xxxx: renamed from eth0
+[25763.271682] r8152 4-1:1.0 enx00e04c68xxxx: carrier on
 
-This change should be done together with the macro refactoring patch 
-mentioned in patch 3.
+The RTL8157 adapter was tested against an AQC107 PCIe-card supporting
+10GBit/s and an RTL8126 5Gbit PCIe-card supporting 5GBit/s for
+performance, link speed and EEE negotiation. Using USB3.2 Gen 1 with
+the RTL8157 USB adapter and running iperf3 against the AQC107 PCIe
+card resulted in 3.47 Gbits/sec, whereas using USB3.2 Gen2 resulted
+in 4.70 Gbits/sec, speeds against the RTL8126-card were the same.
 
-> +		u32 len_decap_min = 0;
-> +
->   		if (!shrink)
->   			return -EINVAL;
->   
-> -		switch (flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) {
-> -		case BPF_F_ADJ_ROOM_DECAP_L3_IPV4:
-> +		/* Reject mutually exclusive decap flag pairs. */
-> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) ==
-> +		    BPF_F_ADJ_ROOM_DECAP_L3_MASK)
+As the code integrates the RTL8157-specific code with existing RTL8156 code
+in order to improve code maintainability (instead of adding RTL8157-specific
+functions duplicaing most of the RTL8156 code), regression tests were done
+with an Edimax EU-4307 V1.0 USB-Ethernet adapter with RTL8156.
 
-iiuc, this 'if' and the len_min assignment changes below replace the 
-existing switch case. Please separate this no-op change from the new 
-flag validation logic. It is small enough to be done together in the 
-macro refactoring patch also.
+The code is based on the out-of-tree r8152 driver published by Realtek under
+the GPL.
 
-> +			return -EINVAL;
-> +
-> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_MASK) ==
-> +		    BPF_F_ADJ_ROOM_DECAP_L4_MASK)
-> +			return -EINVAL;
-> +
-> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK) ==
-> +		    BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK)
-> +			return -EINVAL;
-> +
-> +		/* Reject mutually exclusive decap tunnel type flags. */
-> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_MASK) &&
-> +		    (flags & BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK))
-> +			return -EINVAL;
-> +
-> +		if (flags & BPF_F_ADJ_ROOM_DECAP_L4_UDP)
-> +			len_decap_min += sizeof(struct udphdr);
-> +
-> +		if (flags & BPF_F_ADJ_ROOM_DECAP_L4_GRE)
-> +			len_decap_min += sizeof(struct gre_base_hdr);
-> +
-> +		if (len_diff_abs < len_decap_min)
-> +			return -EINVAL;
-> +
-> +		if (flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV4)
->   			len_min = sizeof(struct iphdr);
-> -			break;
-> -		case BPF_F_ADJ_ROOM_DECAP_L3_IPV6:
-> +
-> +		if (flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
->   			len_min = sizeof(struct ipv6hdr);
-> -			break;
-> -		default:
-> -			return -EINVAL;
-> -		}
->   	}
->   
->   	len_cur = skb->len - skb_network_offset(skb);
+This patch is on top of linux-next as the code re-uses the 2.5 Gbit EEE
+recently added in r8152.c.
+
+Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
+---
+Changes in v4:
+- Fix return type of ocp_adv_read()
+- In r8152_tx_csum() use tx_desc
+- Use TCPHO_MAX_2 for RTL8157 in rtl8152_features_check()
+- Include RTL_VER_12 in RTL8156B chip versions in rtl8156_init()
+- Remove inline keyword from rx_agg_align and tx_agg_align
+- Link to v3: https://lore.kernel.org/r/20260320-rtl8157_next-v3-0-1aefeca7fda7@birger-koblitz.de
+
+Changes in v3:
+- Apply reverse Christmas tree order for declarations
+- Use poll_timeout_us for register polling
+- In rtl8156_enable(), fix version comparison: tp->version >= RTL_VER_16
+- Correct error handling of r8153_phy_status in r8157_hw_phy_cfg()
+- Fix use of ocp_word_clr_bits for PLA_MCU_SPDWN_EN register
+- Link to v2: https://lore.kernel.org/r/20260317-rtl8157_next-v2-0-10ea1fa488d1@birger-koblitz.de
+
+Changes in v2:
+- Fixed missing initialization of ret value in wait_cmd_ready()
+- Combine all parts with RTL8157-specific code to avoid undefined functions
+- Link to v1: https://lore.kernel.org/r/20260314-rtl8157_next-v1-0-9ba77b428afd@birger-koblitz.de
+
+---
+Birger Koblitz (2):
+      r8152: Add support for 5Gbit Link Speeds and EEE
+      r8152: Add support for the RTL8157 hardware
+
+ drivers/net/usb/r8152.c | 1083 ++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 836 insertions(+), 247 deletions(-)
+---
+base-commit: 5c9e55fecf9365890c64f14761a80f9413a3b1d1
+change-id: 20260314-rtl8157_next-ae18683eb4fa
+
+Best regards,
+-- 
+Birger Koblitz <mail@birger-koblitz.de>
 
 
