@@ -1,128 +1,169 @@
-Return-Path: <netdev+bounces-271051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271052-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eG0RBAKGwmltegQAu9opvQ
-	(envelope-from <netdev+bounces-271051-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:39:30 +0100
+	id II0yKmqIwmkAegQAu9opvQ
+	(envelope-from <netdev+bounces-271052-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:49:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 747B83086C0
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:39:29 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50CD9308A12
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:49:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6788530146B9
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:39:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7C8BA3021426
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 12:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5120B3D349E;
-	Tue, 24 Mar 2026 12:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7FB2C0299;
+	Tue, 24 Mar 2026 12:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0vQskzlO"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Ed3oZcZu"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABED314B9A;
-	Tue, 24 Mar 2026 12:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24FC241665
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 12:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774355937; cv=none; b=LcNlORh1BSxRs9AYs3WjDxDxCkY0pf3pbDY5Jwt1rPFxYLW8sycfnDpICQ1q0Xdie1+FJxgkxiHtwSuWxbbCBIfoj7K0VRD6e+e2xR7u0lkrxXkMAhH3KHgne5oK1ND9pXqLUd/CwQeyD2Pad4z7jNaLk1DVJbg++KcWDOFSuF4=
+	t=1774356057; cv=none; b=pPWujhco8FrvFIAM2K2hGOxLWBxQs2loKcWGMS5lLsYDwV2MOQCkl/KJpz1ZaUutpMRoM/Xy0LLexjLjbTfodyz/+yEXZNrYPpopTyhDEU5lJqJZbCLbS9iUDvY/vmuCfNPa4v2dc5lBtJVHST/TYWjQJlQZw56VJ6ogBqEcMvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774355937; c=relaxed/simple;
-	bh=n0h1AinUMAzmZCaro/6NFeRSXzDQyEyEdmYM2DZbM7U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zns6BizFEunjr9tvOwga50N12+IJk2KHqXUPM3GNtB4FbrKGtWcJ6ruXt/pIwL1Abb4kF+8pldLC2C+Xm1VBPW7BI+VKzQORRyIKaqYQ3XbQ+UG23dr9gnaprhASV1+ntxt3tFXViEOEF6UVkDczxjgxjxpt9DjRYsgGzkh1aMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0vQskzlO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CIe/1Rs/fwVWVoErQ7DrPISOxhRMH4MZG/IidA4tHfs=; b=0vQskzlO/DTD0Wx4J/r0CToJDm
-	vIGPrTTuufQIxhO3xeYfWRSWHWfEdLDCL4ZNVw7m8VU1Pb/2rw8HnBiiiRwBfWVvD0jkFOW0I5A0K
-	VKWty3NmPxu62SFRnhBkgXxrYZO2By/U6VQ4wZaOeD/XScVisgug0vodM6fiNCfbptUo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w511q-00D654-ES; Tue, 24 Mar 2026 13:38:38 +0100
-Date: Tue, 24 Mar 2026 13:38:38 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parvathi Pudi <parvathi@couthit.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	Kevin Hilman <khilman@baylibre.com>, nm <nm@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>, afd <afd@ti.com>,
-	rogerq <rogerq@kernel.org>, tony <tony@atomide.com>,
-	robh <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>,
-	conor+dt <conor+dt@kernel.org>,
-	richardcochran <richardcochran@gmail.com>,
-	aaro koskinen <aaro.koskinen@iki.fi>,
-	andreas <andreas@kemnade.info>,
-	linux-omap <linux-omap@vger.kernel.org>,
-	devicetree <devicetree@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	netdev <netdev@vger.kernel.org>, danishanwar <danishanwar@ti.com>,
-	pratheesh <pratheesh@ti.com>, j-rameshbabu <j-rameshbabu@ti.com>,
-	praneeth <praneeth@ti.com>, srk <srk@ti.com>,
-	rogerq <rogerq@ti.com>, m-malladi <m-malladi@ti.com>,
-	krishna <krishna@couthit.com>, mohan <mohan@couthit.com>,
-	pmohan <pmohan@couthit.com>, basharath <basharath@couthit.com>,
-	Murali Karicheri <m-karicheri2@ti.com>
-Subject: Re: [PATCH v5 3/3] arm: dts: ti: Add device tree support for
- PRU-ICSS on AM335x
-Message-ID: <6c523569-928b-4df5-89f3-9a460d5f6020@lunn.ch>
-References: <20260307122641.738450-1-parvathi@couthit.com>
- <20260307122641.738450-4-parvathi@couthit.com>
- <7ho6ks1r4s.fsf@baylibre.com>
- <91797572.667989.1773662409130.JavaMail.zimbra@couthit.local>
- <ee2ec279-ee5d-4d6d-b6ff-35187e3f03e6@kernel.org>
- <1868242922.724201.1774332140293.JavaMail.zimbra@couthit.local>
+	s=arc-20240116; t=1774356057; c=relaxed/simple;
+	bh=mtUz9q4etv0YHVPmOccQN1oM80hPcnvw5ZO3ZQ2IGy4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TqBmGS+0bRsPeo9jriCItmMaCWAkm9m2cV3G7DhIgNsgnK9INPeMk5Se15FwyzM4AOChIZija3SHvhAEwxPnhC/cUMci4dwxJaPaJtMlbxfjH92oA/dHWPejYegn5zkXsngK0VrwtnCcnKi5Q4n9GJxZOkVLiP+GZxwg0K5hDyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Ed3oZcZu; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 0C7F5205DD;
+	Tue, 24 Mar 2026 13:40:53 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ndsuqjvj-bWZ; Tue, 24 Mar 2026 13:40:52 +0100 (CET)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 6297D20190;
+	Tue, 24 Mar 2026 13:40:52 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 6297D20190
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1774356052;
+	bh=ZwD3FsudODxrDtfXNfd0myxeAouVNP1Cnwc4Q+0F7fw=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=Ed3oZcZuJC9TnESmD5WEPlCU1Yjn+d5/fV2OZWIwLV6dnOqoyBI/avcYEQ1oyPZRz
+	 RSRX9mOjDuqFCh8XOo9efNpw2Ai0Q3bRHtKYGMaYHyWCDJ1hplhlZ1tbisE1Uk1RO9
+	 oI5eNjqb+yp4WT/hvE34cSJiEB3ByHDV2O/d4+6Eaw7DAqnV/elZ340EQ/yYQGYksB
+	 QECOfhTO3+q/+RsJyunjXvPkR0snm1E3sIOle5zeutbp3NrGi70JSRt36zlrWqtgvA
+	 tzUXIgjYMkQ/bA7/1jd0n9kxFAQDl1k9Im8k2tr7Xxa0Sx/ZMnFj2YnMqGi4nklEqY
+	 jTzCYpiHQw8Zw==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 24 Mar
+ 2026 13:40:51 +0100
+Received: (nullmailer pid 3719584 invoked by uid 1000);
+	Tue, 24 Mar 2026 12:40:51 -0000
+Date: Tue, 24 Mar 2026 13:40:51 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Paolo Abeni <pabeni@redhat.com>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>, David
+ Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH 20/20] xfrm: iptfs: only publish mode_data after clone
+ setup
+Message-ID: <acKGU5rF-yH2LI7v@secunet.com>
+References: <20260323083440.2741292-1-steffen.klassert@secunet.com>
+ <20260323083440.2741292-21-steffen.klassert@secunet.com>
+ <4cc9cb27-90b9-45fb-8d90-28cca9e12b96@redhat.com>
+ <acJ66ndBOEs7d-1D@secunet.com>
+ <75af5781-0ed2-4b05-879f-db6628af0692@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <1868242922.724201.1774332140293.JavaMail.zimbra@couthit.local>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <75af5781-0ed2-4b05-879f-db6628af0692@redhat.com>
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_ALL(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271051-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,baylibre.com,ti.com,atomide.com,gmail.com,iki.fi,kemnade.info,vger.kernel.org,couthit.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[1g4.org:email,secunet.com:dkim,secunet.com:email,secunet.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	TAGGED_FROM(0.00)[bounces-271052-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 747B83086C0
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 50CD9308A12
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> We have verified that dtbs_check does report this issue, and we will update
-> our test setup to retain full dtbs_check output to avoid missing such warnings
-> in the future.
+On Tue, Mar 24, 2026 at 01:35:25PM +0100, Paolo Abeni wrote:
+> On 3/24/26 12:52 PM, Steffen Klassert wrote:
+> > On Tue, Mar 24, 2026 at 12:33:15PM +0100, Paolo Abeni wrote:
+> >> On 3/23/26 9:34 AM, Steffen Klassert wrote:
+> >>> From: Paul Moses <p@1g4.org>
+> >>>
+> >>> iptfs_clone_state() stores x->mode_data before allocating the reorder
+> >>> window. If that allocation fails, the code frees the cloned state and
+> >>> returns -ENOMEM, leaving x->mode_data pointing at freed memory.
+> >>>
+> >>> The xfrm clone unwind later runs destroy_state() through x->mode_data,
+> >>> so the failed clone path tears down IPTFS state that clone_state()
+> >>> already freed.
+> >>>
+> >>> Keep the cloned IPTFS state private until all allocations succeed so
+> >>> failed clones leave x->mode_data unset. The destroy path already
+> >>> handles a NULL mode_data pointer.
+> >>>
+> >>> Fixes: 6be02e3e4f37 ("xfrm: iptfs: handle reordering of received packets")
+> >>> Cc: stable@vger.kernel.org
+> >>> Signed-off-by: Paul Moses <p@1g4.org>
+> >>> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+> >>
+> >> While applying this series to verify the PR, I get the following error:
+> >>
+> >> Applying: xfrm: iptfs: only publish mode_data after clone setup
+> >> error: sha1 information is lacking or useless (net/xfrm/xfrm_iptfs.c).
+> >> error: could not build fake ancestor
+> >> Patch failed at 0020 xfrm: iptfs: only publish mode_data after clone setup
+> >>
+> >> The above also prevents the CI from testing the series. Steffen, could
+> >> you please have a look? Possibly a repost could be needed.
+> > 
+> > I guess this is due to a merge conflict with:
+> > 
+> > 69050f8d6d07 ("treewide: Replace kmalloc with kmalloc_obj for non-scalar types")
+> > 
+> > Repost will not help in that case. Not sure what to do
+> > here. The only thing that would fix it is a forced rebase
+> > of the ipsec tree onto the net tree.
+> 
+> Out of blatant naiveness on my side, how much of a pain would be that
+> option? If more than negligible, I guess we should avoid it.
 
-I would expect the exit value is set to something other than 0 when it
-finds an error. Why not just fail the test based on that?
-
-      Andrew
+It is some work on my side, but the bigger problem is for
+those who cloned my ipsec tree. They all need to do this
+forced rebase then. This will hit them by surprise then.
+So IMO, if we can avoid it, we should better not rebase.
 
