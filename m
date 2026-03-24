@@ -1,73 +1,91 @@
-Return-Path: <netdev+bounces-271129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271130-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mIHNCfiswmkyggQAu9opvQ
-	(envelope-from <netdev+bounces-271129-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:25:44 +0100
+	id GNslBWqwwmmRkwQAu9opvQ
+	(envelope-from <netdev+bounces-271130-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:40:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B68B317F8A
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:25:43 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DAFF3183AB
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 16:40:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8BDCE30C2FD7
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 15:22:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7D5D5309CAC2
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 15:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 561103FF89C;
-	Tue, 24 Mar 2026 15:22:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12FE406263;
+	Tue, 24 Mar 2026 15:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AiyHZzH3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q5CcpmHZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3863F7876
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 15:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDEC406278
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 15:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774365755; cv=none; b=nY4EArd0aWh9zE/a+yTDxpbTBDRQX+lbKbXSPDHwtmYIWGlwNDEjOQcyaUETLoxWCL/gGIjlz0ekZY7pAYBIoXp73ol4Nbtc1S4cAsUwhY81Ducev8yyDRBnQcx5vyGHzuOLZXUfdrj8Xr8y/jfCGqy+0TUrtrn9MlxDAK/fyu0=
+	t=1774366009; cv=none; b=Tob2tavt2Xn+KQ9vDPKNX53o45QBFJwrG09xNzRnnRvCdn2ON3EWlF+U34mjGV1iel0xrAtAYiINKjlEcVLzQaZR66yzXYt/xxW9e/jse7+iprEeLRf/Q9kcNvAKxnVRFlb8kFZS+P1tr+69hI999e8EzHhAJWLk0jwteWx6Bsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774365755; c=relaxed/simple;
-	bh=cDv4z8F3ZU1hhs7Pr440qDVgfpZge4BRntmyZP3PyQE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XJtM8zOXNxoj62gqazAPAhwl2lq6NYt8fZSljOuT+RPDWbsEs+z5WGdChfblgDIfWi8GhUWokcpZeViRJNpjYnSiJW2vpxiJaVcWLHSsJdfPiwfAS++kRQ7AONxpaTmAC6NGb8A8e/7CMaJw82D7dbUX3Y1AZnnpnCs0DElZNeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AiyHZzH3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774365752;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=AljYupB1W5aqbCV281Bnsa6QEAqHijDWaQk+OgN80V4=;
-	b=AiyHZzH3iZIoq+nRpBmMqwYtcwnXm3RSui/XvKtSOmpdang31mxtL46000sB92dMoDCIce
-	nzAPfWXBlBeMxkFoPhnYw+S6KR/td/NqF9UMWru//ERqj+X4ocmvH+tYY+ixHNJOKPKhKr
-	B+2H+0jOa9nRDAp0ngB/ywTPws0jCNE=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-227-Jz810WUoOXyAdPYLnfaQXQ-1; Tue,
- 24 Mar 2026 11:22:28 -0400
-X-MC-Unique: Jz810WUoOXyAdPYLnfaQXQ-1
-X-Mimecast-MFC-AGG-ID: Jz810WUoOXyAdPYLnfaQXQ_1774365746
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 95E981800245;
-	Tue, 24 Mar 2026 15:22:26 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.158])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8C2A218001FE;
-	Tue, 24 Mar 2026 15:22:24 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
+	s=arc-20240116; t=1774366009; c=relaxed/simple;
+	bh=h1Cgxv/MbBovDfmYb+eCNblRESOnhBD3a8P7TeNNyfE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gIKmyYPB4cQkIZUEpje4K8PgCQ/S819HoGpUP8jS7+zW97zGYCN4UcguZlSCOBFhN7b9npPkENTIeX2pB1sSqHGsm5d0C9upVl9U7U3I+cwR/FT9mpKYrH016vXsmO7lYuNK7yklqoyg/Dtx8K/4SHoon5XYcQvOCI5a17XuIs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q5CcpmHZ; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-486ff3a0fc1so35280265e9.2
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 08:26:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774366004; x=1774970804; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=l9X7xuJzrFVA61UqL5AZpBVCs0izcfwIXnfX+VPlxo0=;
+        b=Q5CcpmHZwFaVMzwn+fvMfy8UvFAjfQ5ubqaiyAL6ZM/HMZfRiwqIY7wk8POyTUtRsF
+         VIikOVvtVqDRjPNPr3eBjqXRLRCBG07OWjk/+I2r080s9SSGKzRaufdhzMgRhFTtkdAO
+         jniJVhbjHg17O+11EIrXF3qnHsejCX/63LS3VcSbl0i+vtSZOUNaO9/9Jg2RvDr6Jsd9
+         9quITOA0gwqJD3qPlh1a34sYmrKU3fcJ49jMIbWTIsrkEFM/7iTPBoJrrjR8x6+EdLxc
+         bhQVASaPUB+TY6WftvQ054lTuncFmHCHND0++cR3007sTDE7EcR+RxJbI34sFZJGZde/
+         iqbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774366004; x=1774970804;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l9X7xuJzrFVA61UqL5AZpBVCs0izcfwIXnfX+VPlxo0=;
+        b=c9sOIO7LWiYsFCQ76jXVOLue7qcGoDChl0hiGzvOOCAu3/o0FQDp9lNL8O+1gkfL7R
+         uycK89w8VMCfveyvEANHQbliqJ7UU4PkToqa9f7Rj71jy8BcfDHg0bo0HCfC7cYx2490
+         ojB/TuT4bsgD29DZJaCfKjGj87aZEPWAmQeQ1c2VWamtYQPLSyicqdnT+tOiho95+5FV
+         iccJCXNzOxWRxBbgHHNUIlVRGlGQ7FjTTBAtdIg6QxBjnxX3fBWHXdt049hQb9UJkYas
+         7fwcB4mAb10lB5uaxIhbt33OrFfygeLb/OLXDBnYQQ9Kq+TTN2kzaFJdSfpHMKjcx4qU
+         ZtJA==
+X-Gm-Message-State: AOJu0Yzv2AbHY485KHGOp/I/G/w8mekE1ZoOI5YSo6/eH7Gu1KXxZGXK
+	PF77vF2lTHZrIwh4bgiot2KBmbZqC9K/CISIHQKuOeb0K8OZyy0pVxRgmG/Tpw==
+X-Gm-Gg: ATEYQzwtspURhPMh27R0crWnetiz83VouTMIPz6+mG2z5ZCqk8qFdQUASiaIfrCw4ZS
+	6fHimAKFNL09kMSeGtz1j5EnZIwQMGAymrBUn51x2W+vUyNgcVLcj8Q3Bixkwq22LcFcAAFPuV2
+	lhHRDZ8MRQPQk9kTprCm658Ffz24kegdzIEwV9+D0p2iP14mT/EklUsGpz7A509PkulBoWzP+/3
+	/bA6NMQH6FAqCtMzZZhwlRwhHVn2t91Ua817BHLzbj00tXJ4dcxohpXuqkZXUiiCJL32OHIhxQu
+	kiWpt2JuHG77q2J3gkSOz8eWe+JWP3j31kXadlCIFhkdEJdJtn8v6oeSldwINfYNsGo/yw4uq7x
+	ooRjTSDGuxkdbTceFCNF2iuSQvonmtCpUNSnMrxE+EoGHUqzpI9Tr0XV3xPZlyHeBYKtJ8jtCz1
+	7QLv7ouhYGjtGib4t5d6vqLmXmaY6zd3deM15Dhx3avaShY6fHexjYu83z0wWb4F0d42xk78OYf
+	e3SE69a2LvcX3H5
+X-Received: by 2002:a05:600c:4447:b0:485:445a:87d1 with SMTP id 5b1f17b1804b1-48715fd4baamr2647745e9.8.1774366003895;
+        Tue, 24 Mar 2026 08:26:43 -0700 (PDT)
+Received: from 6850u.ox.dtw.sh (cpc69060-oxfd26-2-0-cust335.4-3.cable.virginm.net. [82.6.49.80])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4871174f2desm73626725e9.9.2026.03.24.08.26.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2026 08:26:43 -0700 (PDT)
+From: Daniel Wagner <wagner.daniel.t@gmail.com>
 To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next] ipv6: move IFA_F_PERMANENT percpu allocation in process scope
-Date: Tue, 24 Mar 2026 16:22:08 +0100
-Message-ID: <8c8bfe2e1a324e501f0e15fef404a77443fd8caf.1774365668.git.pabeni@redhat.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	bcm-kernel-feedback-list@broadcom.com,
+	Daniel Wagner <wagner.daniel.t@gmail.com>
+Subject: [PATCH net-next] net: phy: bcm84881: add BCM84891/BCM84892 support
+Date: Tue, 24 Mar 2026 15:25:04 +0000
+Message-ID: <20260324152503.1522071-2-wagner.daniel.t@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,177 +93,237 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271129-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271130-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[broadcom.com,lunn.ch,gmail.com,armlinux.org.uk];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wagnerdanielt@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8B68B317F8A
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4DAFF3183AB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Observed at boot time:
+The BCM84891 and BCM84892 are 10GBASE-T PHYs in the same family as the
+BCM84881, sharing the register map and most callbacks. They add USXGMII
+as a host interface mode.
 
- CPU: 43 UID: 0 PID: 3595 Comm: (t-daemon) Not tainted 6.12.0 #1
- Call Trace:
-  <TASK>
-  dump_stack_lvl+0x4e/0x70
-  pcpu_alloc_noprof.cold+0x1f/0x4b
-  fib_nh_common_init+0x4c/0x110
-  fib6_nh_init+0x387/0x740
-  ip6_route_info_create+0x46d/0x640
-  addrconf_f6i_alloc+0x13b/0x180
-  addrconf_permanent_addr+0xd0/0x220
-  addrconf_notify+0x93/0x540
-  notifier_call_chain+0x5a/0xd0
-  __dev_notify_flags+0x5c/0xf0
-  dev_change_flags+0x54/0x70
-  do_setlink+0x36c/0xce0
-  rtnl_setlink+0x11f/0x1d0
-  rtnetlink_rcv_msg+0x142/0x3f0
-  netlink_rcv_skb+0x50/0x100
-  netlink_unicast+0x242/0x390
-  netlink_sendmsg+0x21b/0x470
-  __sys_sendto+0x1dc/0x1f0
-  __x64_sys_sendto+0x24/0x30
-  do_syscall_64+0x7d/0x160
-  entry_SYSCALL_64_after_hwframe+0x76/0x7e
- RIP: 0033:0x7f5c3852f127
- Code: 0c 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 80 3d 85 ef 0c 00 00 41 89 ca 74 10 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 71 c3 55 48 83 ec 30 44 89 4c 24 2c 4c 89 44
- RSP: 002b:00007ffe86caf4c8 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
- RAX: ffffffffffffffda RBX: 0000556c5cd93210 RCX: 00007f5c3852f127
- RDX: 0000000000000020 RSI: 0000556c5cd938b0 RDI: 0000000000000003
- RBP: 00007ffe86caf5a0 R08: 00007ffe86caf4e0 R09: 0000000000000080
- R10: 0000000000000000 R11: 0000000000000202 R12: 0000556c5cd932d0
- R13: 00000000021d05d1 R14: 00000000021d05d1 R15: 0000000000000001
+There are three behavioral differences from BCM84881:
 
-IFA_F_PERMANENT addresses require the allocation of a bunch of percpu
-pointers, currently in atomic scope.
+- USXGMII host interface: the 0x4011 host mode register reports 10GBASER
+  (the USXGMII SerDes line rate) regardless of the negotiated copper
+  speed. Skip it for USXGMII; phy_resolve_aneg_linkmode() has already
+  set the correct speed from standard C45 AN resolution.
 
-Similar to commit 51454ea42c1a ("ipv6: fix locking issues with loops
-over idev->addr_list"), move fixup_permanent_addr() outside the
-&idev->lock scope, and do the allocations with GFP_KERNEL. With such
-change fixup_permanent_addr() is invoked with the BH enabled, and the
-ifp lock acquired there needs the BH variant.
+- Low power: the PHY firmware has been observed setting MDIO_CTRL1_LPOWER
+  autonomously (e.g. during SerDes reconfiguration). Clear it in
+  config_aneg() so AN can proceed.
 
-Note that we don't need to acquire a reference to the permanent
-addresses before releasing the mentioned write lock, because
-addrconf_permanent_addr() runs under RTNL and ifa removal always happens
-under RTNL, too.
+- Speed LED: bicolor (green/amber) via vendor registers Dev1:0xa82f
+  (amber gate) and Dev1:0xa83b (color select). 10G = green, else amber,
+  matching vendor firmware behavior. Cleared at config_init() since the
+  bootloader may leave it on.
 
-Also the PERMANENT flag is constant in the relevant scope, as it can be
-cleared only by inet6_addr_modify() under the RTNL lock.
+The is_bcm8489x() helper checks phydev->drv->phy_id rather than
+phydev->phy_id: for C45-enumerated devices, phy_id is left at 0 by
+get_phy_device() and matching uses c45_ids.device_ids[].
 
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Tested on TRENDnet TEG-S750 (RTL9303 + 1x BCM84891 + 4x BCM84892)
+running OpenWrt, where the MDIO controller driver is currently
+OpenWrt-specific. Link verified at 100M, 1G, 2.5G, 10G.
+
+Signed-off-by: Daniel Wagner <wagner.daniel.t@gmail.com>
 ---
-explicitly targeting net-next as this is IMHO an improvement more than a
-bug fix
----
- net/ipv6/addrconf.c | 32 ++++++++++++++++++++------------
- 1 file changed, 20 insertions(+), 12 deletions(-)
+ drivers/net/phy/bcm84881.c | 97 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 96 insertions(+), 1 deletion(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 0e55f139e05d..5f61dd27bddd 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -3585,15 +3585,15 @@ static int fixup_permanent_addr(struct net *net,
- 		struct fib6_info *f6i, *prev;
+diff --git a/drivers/net/phy/bcm84881.c b/drivers/net/phy/bcm84881.c
+index d7f7cc44c5..e95242486d 100644
+--- a/drivers/net/phy/bcm84881.c
++++ b/drivers/net/phy/bcm84881.c
+@@ -20,6 +20,10 @@ enum {
+ 	MDIO_AN_C22 = 0xffe0,
+ };
  
- 		f6i = addrconf_f6i_alloc(net, idev, &ifp->addr, false,
--					 GFP_ATOMIC, NULL);
-+					 GFP_KERNEL, NULL);
- 		if (IS_ERR(f6i))
- 			return PTR_ERR(f6i);
- 
- 		/* ifp->rt can be accessed outside of rtnl */
--		spin_lock(&ifp->lock);
-+		spin_lock_bh(&ifp->lock);
- 		prev = ifp->rt;
- 		ifp->rt = f6i;
--		spin_unlock(&ifp->lock);
-+		spin_unlock_bh(&ifp->lock);
- 
- 		fib6_info_release(prev);
- 	}
-@@ -3601,7 +3601,7 @@ static int fixup_permanent_addr(struct net *net,
- 	if (!(ifp->flags & IFA_F_NOPREFIXROUTE)) {
- 		addrconf_prefix_route(&ifp->addr, ifp->prefix_len,
- 				      ifp->rt_priority, idev->dev, 0, 0,
--				      GFP_ATOMIC);
-+				      GFP_KERNEL);
- 	}
- 
- 	if (ifp->state == INET6_IFADDR_STATE_PREDAD)
-@@ -3612,29 +3612,37 @@ static int fixup_permanent_addr(struct net *net,
- 
- static void addrconf_permanent_addr(struct net *net, struct net_device *dev)
++/* BCM84891/92 vendor registers */
++#define BCM8489X_LED_GATE		0xa82f	/* Dev1: gates amber only */
++#define BCM8489X_LED_COLOR		0xa83b	/* Dev1: color select */
++
+ static int bcm84881_wait_init(struct phy_device *phydev)
  {
--	struct inet6_ifaddr *ifp, *tmp;
-+	struct inet6_ifaddr *ifp;
-+	LIST_HEAD(tmp_addr_list);
- 	struct inet6_dev *idev;
- 
-+	/* Mutual exclusion with other if_list_aux users. */
-+	ASSERT_RTNL();
-+
- 	idev = __in6_dev_get(dev);
- 	if (!idev)
- 		return;
- 
- 	write_lock_bh(&idev->lock);
-+	list_for_each_entry(ifp, &idev->addr_list, if_list) {
-+		if (ifp->flags & IFA_F_PERMANENT)
-+			list_add_tail(&ifp->if_list_aux, &tmp_addr_list);
-+	}
-+	write_unlock_bh(&idev->lock);
- 
--	list_for_each_entry_safe(ifp, tmp, &idev->addr_list, if_list) {
--		if ((ifp->flags & IFA_F_PERMANENT) &&
--		    fixup_permanent_addr(net, idev, ifp) < 0) {
--			write_unlock_bh(&idev->lock);
-+	while (!list_empty(&tmp_addr_list)) {
-+		ifp = list_first_entry(&tmp_addr_list,
-+				       struct inet6_ifaddr, if_list_aux);
-+		list_del(&ifp->if_list_aux);
-+
-+		if (fixup_permanent_addr(net, idev, ifp) < 0) {
- 			in6_ifa_hold(ifp);
- 			ipv6_del_addr(ifp);
--			write_lock_bh(&idev->lock);
- 
- 			net_info_ratelimited("%s: Failed to add prefix route for address %pI6c; dropping\n",
- 					     idev->dev->name, &ifp->addr);
- 		}
- 	}
--
--	write_unlock_bh(&idev->lock);
+ 	int val;
+@@ -29,6 +33,17 @@ static int bcm84881_wait_init(struct phy_device *phydev)
+ 					 100000, 2000000, false);
  }
  
- static int addrconf_notify(struct notifier_block *this, unsigned long event,
++static bool bcm84881_is_bcm8489x(struct phy_device *phydev)
++{
++	/* For C45 PHYs, phydev->phy_id is 0; match via the driver entry's
++	 * declared ID, which is what phy_bus_match() used to bind us.
++	 */
++	u32 id = phydev->drv->phy_id;
++
++	return (id & 0xfffffff0) == 0x35905080 ||
++	       (id & 0xfffffff0) == 0x359050a0;
++}
++
+ static void bcm84881_fill_possible_interfaces(struct phy_device *phydev)
+ {
+ 	unsigned long *possible = phydev->possible_interfaces;
+@@ -42,10 +57,22 @@ static int bcm84881_config_init(struct phy_device *phydev)
+ {
+ 	bcm84881_fill_possible_interfaces(phydev);
+ 
++	if (bcm84881_is_bcm8489x(phydev)) {
++		__set_bit(PHY_INTERFACE_MODE_USXGMII,
++			  phydev->possible_interfaces);
++		/* Bootloader may have left the speed LED on, and
++		 * link_change_notify won't fire for ports with no cable.
++		 * Clear both color bits (green ignores the gate register).
++		 */
++		phy_clear_bits_mmd(phydev, MDIO_MMD_PMAPMD,
++				   BCM8489X_LED_COLOR, 0x0012);
++	}
++
+ 	switch (phydev->interface) {
+ 	case PHY_INTERFACE_MODE_SGMII:
+ 	case PHY_INTERFACE_MODE_2500BASEX:
+ 	case PHY_INTERFACE_MODE_10GBASER:
++	case PHY_INTERFACE_MODE_USXGMII:
+ 		break;
+ 	default:
+ 		return -ENODEV;
+@@ -96,6 +123,17 @@ static int bcm84881_config_aneg(struct phy_device *phydev)
+ 	if (ret)
+ 		return ret;
+ 
++	/* BCM84891/92 firmware has been observed setting MDIO_CTRL1_LPOWER
++	 * autonomously (e.g. during SerDes reconfiguration). Clear it so AN
++	 * can proceed.
++	 */
++	if (bcm84881_is_bcm8489x(phydev)) {
++		ret = phy_clear_bits_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_CTRL1,
++					 MDIO_CTRL1_LPOWER);
++		if (ret < 0)
++			return ret;
++	}
++
+ 	/* We don't support manual MDI control */
+ 	phydev->mdix_ctrl = ETH_TP_MDI_AUTO;
+ 
+@@ -201,6 +239,15 @@ static int bcm84881_read_status(struct phy_device *phydev)
+ 		return 0;
+ 	}
+ 
++	/* For BCM84891/92 in USXGMII mode, the host-side register 0x4011
++	 * reports 10GBASER (the USXGMII SerDes line rate) regardless of the
++	 * negotiated copper speed. Skip it; phy_resolve_aneg_linkmode()
++	 * above already set the correct speed from standard AN resolution.
++	 */
++	if (bcm84881_is_bcm8489x(phydev) &&
++	    phydev->interface == PHY_INTERFACE_MODE_USXGMII)
++		return genphy_c45_read_mdix(phydev);
++
+ 	/* Set the host link mode - we set the phy interface mode and
+ 	 * the speed according to this register so that downshift works.
+ 	 * We leave the duplex setting as per the resolution from the
+@@ -235,6 +282,26 @@ static int bcm84881_read_status(struct phy_device *phydev)
+ 	return genphy_c45_read_mdix(phydev);
+ }
+ 
++/* BCM8489x speed LED control.
++ * Dev1:a83b bit 1 (0x0002) = green, bit 4 (0x0010) = amber.
++ * Dev1:a82f = 0x0020 gates amber on; green ignores the gate.
++ * Writes are best-effort (LED is cosmetic; this callback is void).
++ */
++static void bcm84881_link_change_notify(struct phy_device *phydev)
++{
++	if (phydev->link) {
++		/* 10G = green, else amber; matches vendor firmware */
++		u16 color = (phydev->speed == SPEED_10000) ? 0x0002 : 0x0010;
++
++		phy_write_mmd(phydev, MDIO_MMD_PMAPMD, BCM8489X_LED_GATE, 0x0020);
++		phy_modify_mmd(phydev, MDIO_MMD_PMAPMD, BCM8489X_LED_COLOR,
++			       0x0012, color);
++	} else {
++		phy_clear_bits_mmd(phydev, MDIO_MMD_PMAPMD,
++				   BCM8489X_LED_COLOR, 0x0012);
++	}
++}
++
+ /* The Broadcom BCM84881 in the Methode DM7052 is unable to provide a SGMII
+  * or 802.3z control word, so inband will not work.
+  */
+@@ -257,6 +324,32 @@ static struct phy_driver bcm84881_drivers[] = {
+ 		.aneg_done	= bcm84881_aneg_done,
+ 		.read_status	= bcm84881_read_status,
+ 	},
++	{
++		.phy_id		= 0x35905081,
++		.phy_id_mask	= 0xfffffff0,
++		.name		= "Broadcom BCM84891",
++		.inband_caps	= bcm84881_inband_caps,
++		.config_init	= bcm84881_config_init,
++		.probe		= bcm84881_probe,
++		.get_features	= bcm84881_get_features,
++		.config_aneg	= bcm84881_config_aneg,
++		.aneg_done	= bcm84881_aneg_done,
++		.read_status	= bcm84881_read_status,
++		.link_change_notify = bcm84881_link_change_notify,
++	},
++	{
++		.phy_id		= 0x359050a1,
++		.phy_id_mask	= 0xfffffff0,
++		.name		= "Broadcom BCM84892",
++		.inband_caps	= bcm84881_inband_caps,
++		.config_init	= bcm84881_config_init,
++		.probe		= bcm84881_probe,
++		.get_features	= bcm84881_get_features,
++		.config_aneg	= bcm84881_config_aneg,
++		.aneg_done	= bcm84881_aneg_done,
++		.read_status	= bcm84881_read_status,
++		.link_change_notify = bcm84881_link_change_notify,
++	},
+ };
+ 
+ module_phy_driver(bcm84881_drivers);
+@@ -264,9 +357,11 @@ module_phy_driver(bcm84881_drivers);
+ /* FIXME: module auto-loading for Clause 45 PHYs seems non-functional */
+ static const struct mdio_device_id __maybe_unused bcm84881_tbl[] = {
+ 	{ 0xae025150, 0xfffffff0 },
++	{ 0x35905081, 0xfffffff0 },
++	{ 0x359050a1, 0xfffffff0 },
+ 	{ },
+ };
+ MODULE_AUTHOR("Russell King");
+-MODULE_DESCRIPTION("Broadcom BCM84881 PHY driver");
++MODULE_DESCRIPTION("Broadcom BCM84881/BCM84891/BCM84892 PHY driver");
+ MODULE_DEVICE_TABLE(mdio, bcm84881_tbl);
+ MODULE_LICENSE("GPL");
 -- 
-2.53.0
+2.47.3
 
 
