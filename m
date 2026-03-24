@@ -1,242 +1,234 @@
-Return-Path: <netdev+bounces-271300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271301-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GOhZN9H5wmlDngQAu9opvQ
-	(envelope-from <netdev+bounces-271300-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 21:53:37 +0100
+	id MKHDAYb8wmlXngQAu9opvQ
+	(envelope-from <netdev+bounces-271301-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 22:05:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A042131C8C7
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 21:53:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56BA831CA8A
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 22:05:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 14F933070B79
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:53:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A2C5A318AAAB
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 20:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB273603D9;
-	Tue, 24 Mar 2026 20:53:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE7035F5FB;
+	Tue, 24 Mar 2026 20:59:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l8gOfnNb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JWvj8IZh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB4E35A3B2
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 20:53:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABE335E956;
+	Tue, 24 Mar 2026 20:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774385594; cv=none; b=tt34yJPbDr2bQnv9l0PPiQkuZ9JQn8mp00NOB392FdrQ/5Q7886vfbX1P1j4nN2H5LvWjuSGRiPrnSCCCEX6onodboP+I7WL6YVNkUU+Yb40HnDaSdPrzQZqk0FmOP1FnSjG8DFulwOX+6fj2F+FeLjoY1FRolKPG6cYmGY1T0M=
+	t=1774385965; cv=none; b=MVq4HazlPjjexFyexqfhGe4GpTP55SMGgyP5saq8OjL0yoibuVRDK/InNPQRzv6gVM9uI+FhRXh8sTZrjtKDD0oss4qXI9cVNgVjNMLDWlyd1roRXDNHMya6wIc2PQgnSg3qdqJLMmnA65Zf8or8f+AfjP/kBotI1yIJFBM42gQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774385594; c=relaxed/simple;
-	bh=xqZQ3SvaBjFkGhtlaYhusneOcuRfyDHHa5x9/WtiaUc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dfe1dwVuQTQkhUygzOg1LVpj26SbW4ItW1LoYbRVgcCx30Xyeoe3ft4BP5t4gHLrN8O9FgeQKVZEOoruWDBApLaHFNFO3soKaf7+jX6JURD2eN2knrFfymXT2mSJZ0Sg9a45gca5xTTU5FVKzYWJzeZQvafPf0iiVc2MK4+cwLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l8gOfnNb; arc=none smtp.client-ip=209.85.161.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-67df618d095so861174eaf.0
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 13:53:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774385592; x=1774990392; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QV9GcPB3CgMH11snwri74jW6U7GqWaCu+8vUwZySiUA=;
-        b=l8gOfnNbJKIFBeQ/BPo23ak2J4hM+ICAT4sm/uxpT18Lcxio6Doqdrh1D0e5AsXlG5
-         kKrMd0Fv2fpp+DtJgqAIvWZpFgwx8tRlALGUahnfVRwHfeE6FIjPxw7emClgpusR3IeU
-         5h2k1iPWf2uanaOWijx0D8G2QzMGrcTUgywreZXp8ZCGWsPlR+Gsv13jSxDowsLHAt1r
-         DrXv0eP+SbdTGM4R3XvUsIQ9jZU+ACrhY5JmYBDXgO9qvjbIAOxHTSzlMQ+4YlKUo3M2
-         zPlZRYa6TDaeRQvDwOCRopTh1f8OsGIJ344wTzYpSeerbpxdrYHPqAUE9TY8vXKXL/OD
-         tD+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774385592; x=1774990392;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QV9GcPB3CgMH11snwri74jW6U7GqWaCu+8vUwZySiUA=;
-        b=E0pxSMxYVAS4Fq/yKT1/slznHqE6cSxISjo1IBO3UePtOC4qukNqsDcEAu048RxMa8
-         dnWjsGkgVutrsh0cyqQH1EZlKnck1Di8bnpSF6M26Wkp3n4qYtgDSBcU2av6dY6CmiOf
-         8Z3mNqAqUwFy5aNSKTga24lW39GRfNGr+cBpyHS7f8i6KV05z2/RQvsAYRD3iv1noyQj
-         o/eQivQFDVtnxz2fWPCanp5KfrCwom72+aFmqGUIwH1WensaCff8jBcqJAmH4YDp7Tyf
-         SmZ7JKe8EU1j1eDTiAnEkXZKD8ENUSY4ARVcfR8GQisMbLwuFmAopI4031qHx+CyaMlI
-         v+fQ==
-X-Gm-Message-State: AOJu0YyiF9pFv2qrG1yuDFq+CW5nfQjmnuGb5t9iKC3FXIcb6k84NiXy
-	M/xV3E/7gpdbl4wGtc93Uo5GCoTcHvYU9BtvPrLKwD75xtbpWffHPgVz0KaAzsqD
-X-Gm-Gg: ATEYQzzEuOQzpMcxUDL38R54yRynlFnyreXQ+x/wpXGXk8DF0WG5uakzKY8GpdMhZSH
-	gRRhdMnKbE9THhfZje+mgaAW/KXBW5V86F7vpeUXplqz0XWh7qoYmcCSfrL9ugFOtJ/rhd8FemE
-	q2tM4+5DO0tjd04dr0xlV+2eUbZg6UzJTO+7RSnxY+9o/t/F3/Ewer51uSM3QUrWxm709m7qK4r
-	FQ3cCTinaCeQcRzj7HCPEYFhVrgETa7GrTxdtfS9uAsBV0MSHDs1u7bBIwVkIBRHXRvtwyW3Ezx
-	Dtvz+D/GA2KZ6c6Q1v9zIMA95/BIIgXGu+Gdyc8SQSLspbZlJc96uP42NCrkimodwFNcDzsZuDt
-	nHB3wLE28AoxO8nT+hGMhd3j/RLqPUAVn7uaFIQREq+Dq+xx+vezZcS+KxRBgO+p5F9mqdCdTY9
-	b9iQWzgoUISAYj1+GqQ5qH9gEkJOaPJ2lwvtN1b0nvICOVhnERgEhtSDoQMHLBcafHQ7svps6wx
-	+lUvtsCB+9IztW+CAtcpMKSpi86HrAOJ8ZRlxM/sA==
-X-Received: by 2002:a05:6820:3108:b0:679:88aa:7531 with SMTP id 006d021491bc7-67dff566397mr657706eaf.62.1774385592564;
-        Tue, 24 Mar 2026 13:53:12 -0700 (PDT)
-Received: from Atwell-Laptop.. (108-212-132-20.lightspeed.irvnca.sbcglobal.net. [108.212.132.20])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-67c252c91d0sm9125161eaf.5.2026.03.24.13.53.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 13:53:12 -0700 (PDT)
-From: Wesley Atwell <atwellwea@gmail.com>
-To: netdev@vger.kernel.org,
+	s=arc-20240116; t=1774385965; c=relaxed/simple;
+	bh=4hyMla9M/Y6avVaVN56ryzCX6CTzBLSgs1vNFOe2kRU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bWUAelMkKyPyicDrNMqhncWHmdTkBT1QJsQD9W6tZ85Bme7oobrMBFFpvCjnZ33WYVNtU219ZnFaZuFgK/ScTfHLw+RPeiEtLWZN2x8sfsdfWJDWH6ndyAQzPaOjKAw8y+sbW08xe8g+H2wyi4ssYRh2NQQFlsycYlpi0yyNlSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JWvj8IZh; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774385963; x=1805921963;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4hyMla9M/Y6avVaVN56ryzCX6CTzBLSgs1vNFOe2kRU=;
+  b=JWvj8IZhTnTPA6f5aoSJ6Z8dEe+JgSJ0RFf82h+4DaF1jRLKMR8vf6hd
+   dGF1UR3fwNchTXWjZ7+Mli5t1Po84sXad69ykrTEMRd+THmuigik0ETTa
+   vudEFbOuPEG6uqUmYx+HoY0AOuXwr73rMx03UdJH76+e4ydg2mY7IONKx
+   Ydajclt4ZoJqDjg3MGvBWSiFI8mmGvYEdaK7I3PbDdvkfKDhn9Vw7NRp2
+   5StSQVVG9uO/LD3P0fDJhnPfXiKD6f1iS/q7Y0ZBKyRySaRbmWWuanH4L
+   I3Knse3/+KX9LprR26GB5SmQwfamjESrexpICubN3uJvn8/VNvkbVl0e/
+   g==;
+X-CSE-ConnectionGUID: M+tBtjaxRq6dxlHnIntCzA==
+X-CSE-MsgGUID: qgEStOZERiS6JvUIhLLpeA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="85725388"
+X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
+   d="scan'208";a="85725388"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 13:59:23 -0700
+X-CSE-ConnectionGUID: 2y/TFWZdSqW0+gqVPTpxFQ==
+X-CSE-MsgGUID: +qdRDBy0TYCxZkBtxOwwrg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
+   d="scan'208";a="224483735"
+Received: from lkp-server01.sh.intel.com (HELO 3905d212be1b) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 24 Mar 2026 13:59:18 -0700
+Received: from kbuild by 3905d212be1b with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w58qI-000000005R3-1p3e;
+	Tue, 24 Mar 2026 20:59:14 +0000
+Date: Wed, 25 Mar 2026 04:58:28 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Simon Baatz <gmbnomis@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wesley Atwell <atwellwea@gmail.com>
-Subject: [PATCH net-next v3 3/3] selftests: packetdrill: cover scaled rwnd quantization slack
-Date: Tue, 24 Mar 2026 14:53:01 -0600
-Message-ID: <20260324205301.1361608-4-atwellwea@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260324205301.1361608-1-atwellwea@gmail.com>
-References: <20260324205301.1361608-1-atwellwea@gmail.com>
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
+	Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v6 2/4] net: dsa: add bridge member iteration
+ macro and port mask helper
+Message-ID: <202603250450.uUuzfUx3-lkp@intel.com>
+References: <ff936ce4ad3044102c367c55e7a455ab0020e4b7.1774136876.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ff936ce4ad3044102c367c55e7a455ab0020e4b7.1774136876.git.daniel@makrotopia.org>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-271300-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271301-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[atwellwea@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A042131C8C7
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 56BA831CA8A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a packetdrill reproducer for the free_space-limited scaled
-no-shrink quantization case.
+Hi Daniel,
 
-Grow rcv_ssthresh with in-order data, then queue tiny OOO skbs so
-receive memory drives raw free_space just below rcv_ssthresh without
-advancing rcv_nxt. The final ACK reaches the case where raw free_space
-sits just above 84 scaled units while rcv_ssthresh stays slightly
-larger.
+kernel test robot noticed the following build errors:
 
-Old code rounds that final free_space value up and advertises 85. With
-the fix, the ACK stays at 84.
+[auto build test ERROR on net-next/main]
 
-This gives fail-before/pass-after coverage for the actual raw
-free_space bug rather than the separate rcv_ssthresh-limited ALIGN-up
-behavior.
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/net-dsa-add-driver-private-pointer-to-struct-dsa_bridge/20260323-041502
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/ff936ce4ad3044102c367c55e7a455ab0020e4b7.1774136876.git.daniel%40makrotopia.org
+patch subject: [PATCH net-next v6 2/4] net: dsa: add bridge member iteration macro and port mask helper
+config: riscv-allyesconfig (https://download.01.org/0day-ci/archive/20260325/202603250450.uUuzfUx3-lkp@intel.com/config)
+compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260325/202603250450.uUuzfUx3-lkp@intel.com/reproduce)
 
-Signed-off-by: Wesley Atwell <atwellwea@gmail.com>
----
-v2:
-- replace the old rcv_ssthresh-limited sequence with an OOO-memory
-  reproducer for the raw free_space case
-- drop the follow-on ACK transition and keep the final free_space
-  failure case that proves the bug
-- drop the IPv4-only restriction after verifying the test passes for
-  ipv4, ipv6, and ipv4-mapped-ipv6
-- reword the in-file comments to describe the observed behavior without
-  referring to a removed path as "buggy"
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603250450.uUuzfUx3-lkp@intel.com/
 
- .../packetdrill/tcp_rcv_quantization_credit.pkt    | 62 ++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_rcv_quantization_credit.pkt
+All errors (new ones prefixed by >>):
 
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_rcv_quantization_credit.pkt b/tools/testing/selftests/net/packetdrill/tcp_rcv_quantization_credit.pkt
-new file mode 100644
-index 0000000000000000000000000000000000000000..bb4f63772326fb1146574ad3f43d59082ee49c18
---- /dev/null
-+++ b/tools/testing/selftests/net/packetdrill/tcp_rcv_quantization_credit.pkt
-@@ -0,0 +1,62 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+--mss=1000
-+
-+`./defaults.sh
-+sysctl -q net.ipv4.tcp_moderate_rcvbuf=0
-+sysctl -q net.ipv4.tcp_shrink_window=0
-+sysctl -q net.ipv4.tcp_rmem="4096 131072 $((32*1024*1024))"`
-+
-+// Exercise the scaled no-shrink path when raw backed free_space, not
-+// rcv_ssthresh, limits the post-ACK window in __tcp_select_window().
-+//
-+// Grow rcv_ssthresh with in-order data, then queue tiny OOO skbs so receive
-+// memory drops raw free_space to just over 84 scaled units while the current
-+// rcv_ssthresh stays slightly larger. The final OOO ACK should keep the
-+// sender-visible window at 84 rather than reopening it to 85.
-+   +0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
-+   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
-+   +0 bind(3, ..., ...) = 0
-+   +0 listen(3, 1) = 0
-+
-+   +0 < S 0:0(0) win 32792 <mss 1000,nop,wscale 7>
-+   +0 > S. 0:0(0) ack 1 <mss 1460,nop,wscale 10>
-+   +0 < . 1:1(0) ack 1 win 257
-+
-+   +0 accept(3, ..., ...) = 4
-+
-+   +0 < P. 1:10001(10000) ack 1 win 257
-+   * > .  1:1(0) ack 10001
-+
-+   +0 < P. 10001:11024(1023) ack 1 win 257
-+   * > .  1:1(0) ack 11024
-+
-+   +0 < P. 12024:12025(1) ack 1 win 257
-+   * > .  1:1(0) ack 11024
-+
-+   +0 < P. 13024:13025(1) ack 1 win 257
-+   * > .  1:1(0) ack 11024
-+
-+   +0 < P. 14024:14025(1) ack 1 win 257
-+   * > .  1:1(0) ack 11024
-+
-+   +0 < P. 15024:15025(1) ack 1 win 257
-+   * > .  1:1(0) ack 11024
-+
-+   +0 < P. 16024:16025(1) ack 1 win 257
-+   * > .  1:1(0) ack 11024
-+
-+   +0 < P. 17024:17025(1) ack 1 win 257
-+   * > .  1:1(0) ack 11024
-+
-+   +0 < P. 18024:18025(1) ack 1 win 257
-+   * > .  1:1(0) ack 11024
-+
-+   +0 < P. 19024:19025(1) ack 1 win 257
-+   * > .  1:1(0) ack 11024
-+
-+// The last tiny OOO skb pushes raw free_space just below rcv_ssthresh
-+// without crossing the next lower scaled unit.
-+   +0 < P. 20024:20025(1) ack 1 win 257
-+   * > .  1:1(0) ack 11024 win 84
-+   +0 %{ assert (tcpi_rcv_wnd >> 10) == 84, tcpi_rcv_wnd }%
+   drivers/net/dsa/yt921x.c:2158:1: error: conflicting types for 'dsa_bridge_ports'
+   dsa_bridge_ports(struct dsa_switch *ds, const struct net_device *bdev)
+   ^
+   include/net/dsa.h:845:19: note: previous definition is here
+   static inline u32 dsa_bridge_ports(struct dsa_switch *ds,
+                     ^
+>> drivers/net/dsa/yt921x.c:2213:38: error: incompatible pointer types passing 'struct net_device *' to parameter of type 'const struct dsa_bridge *' [-Werror,-Wincompatible-pointer-types]
+                           ports_mask = dsa_bridge_ports(ds, bdev);
+                                                             ^~~~
+   include/net/dsa.h:846:33: note: passing argument to parameter 'bridge' here
+                                      const struct dsa_bridge *bridge)
+                                                               ^
+   drivers/net/dsa/yt921x.c:2285:36: error: incompatible pointer types passing 'struct net_device *' to parameter of type 'const struct dsa_bridge *' [-Werror,-Wincompatible-pointer-types]
+           ports_mask = dsa_bridge_ports(ds, bridge.dev);
+                                             ^~~~~~~~~~
+   include/net/dsa.h:846:33: note: passing argument to parameter 'bridge' here
+                                      const struct dsa_bridge *bridge)
+                                                               ^
+   3 errors generated.
+
+
+vim +2213 drivers/net/dsa/yt921x.c
+
+186623f4aa724c David Yang 2025-10-17  2169  
+186623f4aa724c David Yang 2025-10-17  2170  static int
+186623f4aa724c David Yang 2025-10-17  2171  yt921x_bridge_flags(struct yt921x_priv *priv, int port,
+186623f4aa724c David Yang 2025-10-17  2172  		    struct switchdev_brport_flags flags)
+186623f4aa724c David Yang 2025-10-17  2173  {
+186623f4aa724c David Yang 2025-10-17  2174  	struct yt921x_port *pp = &priv->ports[port];
+186623f4aa724c David Yang 2025-10-17  2175  	bool do_flush;
+186623f4aa724c David Yang 2025-10-17  2176  	u32 mask;
+186623f4aa724c David Yang 2025-10-17  2177  	int res;
+186623f4aa724c David Yang 2025-10-17  2178  
+186623f4aa724c David Yang 2025-10-17  2179  	if (flags.mask & BR_LEARNING) {
+186623f4aa724c David Yang 2025-10-17  2180  		bool learning = flags.val & BR_LEARNING;
+186623f4aa724c David Yang 2025-10-17  2181  
+186623f4aa724c David Yang 2025-10-17  2182  		mask = YT921X_PORT_LEARN_DIS;
+186623f4aa724c David Yang 2025-10-17  2183  		res = yt921x_reg_toggle_bits(priv, YT921X_PORTn_LEARN(port),
+186623f4aa724c David Yang 2025-10-17  2184  					     mask, !learning);
+186623f4aa724c David Yang 2025-10-17  2185  		if (res)
+186623f4aa724c David Yang 2025-10-17  2186  			return res;
+186623f4aa724c David Yang 2025-10-17  2187  	}
+186623f4aa724c David Yang 2025-10-17  2188  
+186623f4aa724c David Yang 2025-10-17  2189  	/* BR_FLOOD, BR_MCAST_FLOOD: see the comment where ACT_UNK_ACTn_TRAP
+186623f4aa724c David Yang 2025-10-17  2190  	 * is set
+186623f4aa724c David Yang 2025-10-17  2191  	 */
+186623f4aa724c David Yang 2025-10-17  2192  
+186623f4aa724c David Yang 2025-10-17  2193  	/* BR_BCAST_FLOOD: we can filter bcast, but cannot trap them */
+186623f4aa724c David Yang 2025-10-17  2194  
+186623f4aa724c David Yang 2025-10-17  2195  	do_flush = false;
+186623f4aa724c David Yang 2025-10-17  2196  	if (flags.mask & BR_HAIRPIN_MODE) {
+186623f4aa724c David Yang 2025-10-17  2197  		pp->hairpin = flags.val & BR_HAIRPIN_MODE;
+186623f4aa724c David Yang 2025-10-17  2198  		do_flush = true;
+186623f4aa724c David Yang 2025-10-17  2199  	}
+186623f4aa724c David Yang 2025-10-17  2200  	if (flags.mask & BR_ISOLATED) {
+186623f4aa724c David Yang 2025-10-17  2201  		pp->isolated = flags.val & BR_ISOLATED;
+186623f4aa724c David Yang 2025-10-17  2202  		do_flush = true;
+186623f4aa724c David Yang 2025-10-17  2203  	}
+186623f4aa724c David Yang 2025-10-17  2204  	if (do_flush) {
+186623f4aa724c David Yang 2025-10-17  2205  		struct dsa_switch *ds = &priv->ds;
+186623f4aa724c David Yang 2025-10-17  2206  		struct dsa_port *dp = dsa_to_port(ds, port);
+186623f4aa724c David Yang 2025-10-17  2207  		struct net_device *bdev;
+186623f4aa724c David Yang 2025-10-17  2208  
+186623f4aa724c David Yang 2025-10-17  2209  		bdev = dsa_port_bridge_dev_get(dp);
+186623f4aa724c David Yang 2025-10-17  2210  		if (bdev) {
+186623f4aa724c David Yang 2025-10-17  2211  			u32 ports_mask;
+186623f4aa724c David Yang 2025-10-17  2212  
+186623f4aa724c David Yang 2025-10-17 @2213  			ports_mask = dsa_bridge_ports(ds, bdev);
+186623f4aa724c David Yang 2025-10-17  2214  			ports_mask |= priv->cpu_ports_mask;
+186623f4aa724c David Yang 2025-10-17  2215  			res = yt921x_bridge(priv, ports_mask);
+186623f4aa724c David Yang 2025-10-17  2216  			if (res)
+186623f4aa724c David Yang 2025-10-17  2217  				return res;
+186623f4aa724c David Yang 2025-10-17  2218  		}
+186623f4aa724c David Yang 2025-10-17  2219  	}
+186623f4aa724c David Yang 2025-10-17  2220  
+186623f4aa724c David Yang 2025-10-17  2221  	return 0;
+186623f4aa724c David Yang 2025-10-17  2222  }
+186623f4aa724c David Yang 2025-10-17  2223  
+
 -- 
-2.43.0
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
