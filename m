@@ -1,201 +1,153 @@
-Return-Path: <netdev+bounces-271086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271087-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2HN3I4WSwmkXfAQAu9opvQ
-	(envelope-from <netdev+bounces-271086-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:32:53 +0100
+	id 8MzPMfuTwmkXfAQAu9opvQ
+	(envelope-from <netdev+bounces-271087-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:39:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33FF13097C1
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:32:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2773C309922
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:39:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 358453036153
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:31:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 61BA33041BF3
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 384423FBEC9;
-	Tue, 24 Mar 2026 13:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A729E3FBEC6;
+	Tue, 24 Mar 2026 13:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jkfDCxHE"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="EUcwtJUv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92413FBEBE
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 13:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AC63845C1;
+	Tue, 24 Mar 2026 13:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774359099; cv=none; b=iF35AKNMNXr202eJ6PAZ7RArxtQtv8CnesY2K+gBWQ/6FRzp6UDBJQsEQ/cegCB4ZY+h+UCN2fRFg0LEzE/V79tIf8FauZOso+jhXeNItGtz3butjK5rhg5rfv8rr9D7tiLZxSZ0TSZu9NiK4azknV7rf/6VlZDWYWk7XosZBbQ=
+	t=1774359162; cv=none; b=RkTccak4kee84Gwo/a15+chVFKPSyOu692TbUt5mWB5gHQrjg5bfP5q0OF+TIrPGKmvmLrCSmuxXbFw+ITFbhSrPdiHpH41Ky9wD/OppeYfa/0Qkk9nLSo1qvocgqanNnpr/YvjCk8jBjVJluZFSkPswma0GdZaUXwkSAhg9Vos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774359099; c=relaxed/simple;
-	bh=5KKYSPI3rw/doEDBMB40vif9gXCUEgZMU7+a7r46+3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D68Wx+J7laIbhJuVrZWHtCZZzjz1T1r1FZM+AMPmhdNvlypce0Q+hQnRl0ZM/tNZEtjEMnYluK46aNH+CG6l2WZWePqiaEjZsWmI3NahmVAPutISal5+Nm8pPlWdlBYs54bgje3Vk7bWQQZosiLIQWnK3sRbxvCgQpgsiUuEjRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jkfDCxHE; arc=none smtp.client-ip=74.125.82.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-2bdcf5970cdso4298951eec.0
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 06:31:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774359096; x=1774963896; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=T+THgERNXEixU8E55abUJWDlOXGs5Yh00bX0FGl5sGA=;
-        b=jkfDCxHE2xPcfT4w+vxI5gDXqX/RpYB3kzqomLIMVh+BzqcwNsktAS2TaLaXylLVx8
-         x4FxJwVHsV3lZ1pg5PCGMPhKFACQGRd/r5GYlB7GTs1+YzHZMys3zRkzJOAIOjAqMGKg
-         GnN7ffqkvpD0ZVmiPcNZBuYR2mbyL927/DbWnyAwcvIiCFBwiUKBMlYAOyYh/c6BzrJi
-         1/y5m9UZq/rRJ4eo/g7bU8vJ4WXgFzMX9rK0A2GEbI/kFqnYur1IU9mKL5yZ7IQD/P+K
-         FCT9+Emxn8hbANFiGCwmwkYvOQNzEQ69dtblSZiU0B7Y+BaH0FnU02JvLQpE1ce1FUzF
-         BwrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774359096; x=1774963896;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=T+THgERNXEixU8E55abUJWDlOXGs5Yh00bX0FGl5sGA=;
-        b=D3AaRafrUMHBzCg8S6Z7B4zCofEbuXIMrDLXnCLUtfCtk2+UHMqfsCFrMEv3To7P9E
-         it4vkfYiYKSip44PP/LT6rgMCSpszxFcnPRShFGdzbfPQy0wJm4Pwf55vrM/aPQqDKTQ
-         VeKbEd38Eha26hfF71KGm5jE3kDC9WGQT31ife05QajMCYh/7mHbk3I1yqh1GkYWSlSy
-         qScvjihDBTonBq4uikIMEQ2wvbwVcL39wdrEbyU8QSyUwkud163Y4Fo314fW6XyXWRH3
-         cXMDGQ6tGZRCboljyA9Qc188kbGWT0/Cw/mVuqy8IA0LwhI++dTGFsNo2giChkCLVFN3
-         9qAA==
-X-Forwarded-Encrypted: i=1; AJvYcCXYGPc8uu1puA/rzxuWQMMTVeA9B4oIHBug0ftK28lAsjF//Aa0JhzR+C+aLJfD/D2cdNJorqk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBBJFIYn28liv7aFv9KBP+K99lKs9UcrqUyUWnLHhAm9hUbJpQ
-	XxRk8URoHqVrfbXV6AlKVw85CkmfrblslJBBZ4MJrFmqveN7y9AV9m4k
-X-Gm-Gg: ATEYQzxnYvGP4SacDQ43NAT0p+0bs71ENB+SS2B1LQZfw9ysSC6AMXDKgU1UUyzWBjQ
-	UBSeQo6Ejxq/CgaAAgznhqOXHAEjhF7gXDkdeuE5Jbohrr2nwGUImJjNe0rGK11YdbmldDULu5d
-	6Qew3Y0n2sOtZSEXyh3d9wzEVJ4KWkON41H2Yg16VR80S2z20BHdhZM1MGvAZako1qvnoiAZF4G
-	2tl4RbUj4nK5ayzROR61Vk/ynyF9u2Jz38vbu/hqUd/dGDmPicEIY0L8Fi5MHb5IpG3Mhx8Byxw
-	ybqG7I2pvUsreXLfjUU4RqYVI1gzHgO8IcysyWsAQ6YH9ASQEorH3getc4/ak3ORQEnDGIm+aQc
-	Dc0u4Yb4gmIRTzKAXq6JwzD4ghWvpitwUpK35oajNRJsbqDWZdTa3ohenF3q3iRuntaHvDvhbhs
-	NDIv8qPRODpvsVPpzu1nPPG986nPuXwJOGyb5b
-X-Received: by 2002:a05:7300:80c2:b0:2a4:701a:b9ba with SMTP id 5a478bee46e88-2c14b52e935mr1425760eec.14.1774359095222;
-        Tue, 24 Mar 2026 06:31:35 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c10b17a7c1sm15469884eec.7.2026.03.24.06.31.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 06:31:33 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Tue, 24 Mar 2026 06:31:32 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-Subject: Re: [PATCH net 5/5] nfc: rawsock: cancel tx_work before socket
- teardown
-Message-ID: <a5c1322d-4a24-4919-92c8-27351a58b692@roeck-us.net>
-References: <20260303162346.2071888-1-kuba@kernel.org>
- <20260303162346.2071888-6-kuba@kernel.org>
+	s=arc-20240116; t=1774359162; c=relaxed/simple;
+	bh=uRREZHQ6UvLvw+UtUfpgXFm6p/fFCBlLtr3me5Hydxc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Q2QmMC53DNLeH4XZi0diRUz4EkKbaoMVGDtm2kJhasNd1iHQzXSohSabVI61GeTKr41I25KM2efHvCx3gACHllbOVkmU/fJHFgtPwhf7vvULa8deyVbpTFL2A/+VXtKhSFrKp8LtFT6F5J8tEwrjj2fjnWHh4zzqGqcVojJUn9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=EUcwtJUv; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 7BDB6A0CB0;
+	Tue, 24 Mar 2026 14:32:34 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=yQvc1G0NsM7Wd8sgPniOCT4tfMBGaEGtNGqp9sTR2l4=; b=
+	EUcwtJUvbIZXdg1Mkg/TKgz8uLIV0XcM42jNwFvFDcZE1X5GD+C82D99/D81frfe
+	IeH9B5TCvZsk0k3G69xUXnwzurHN51DzulEmZkN8j3NZrx0fxgxLSNbg4P9ZJPUv
+	6rh0jEhy9U2cCQKTmVC4jdLRuIMo6OSxsLLf378dIo6kzPoKe89o5mJBPiGYu+AV
+	wQiPgrImF22F/iPb+4EkQCjoPQD3cJxDGJJcot5G3dkZZ+OobCTP/DVPwmgRXbxd
+	APUe6QvZsvJ7oMRQd/efF1Qv3kH/urXlLZcvDVT9DZmAhCvk2iGWkc+t31SridBC
+	6inxaC26wYB+5rYOQ+Z8bVm3j+tGc1pP3WizlA1iOlwbaEptCvA3HznJYdNgt25a
+	+AwBHH2TF4F4I/zzVpVt5SNUDOS9+xAfTKmgapoGNfE9/xcPCyqsB/jFRk77pQl9
+	djk2TCoGZTTpLN5fRHPjpUMmuvqy/IY8Hv/ADobCbMjkleuWbprG4vxAiSIRXIec
+	kAZ6JAeTZ7YOVqvidpGKv+KnG9z+LxOApeDK/8Zh/lYy2wb78R4vdkkIIlEMrSpX
+	OxVbxdCOYLY/ExG9dBavnQE2C5FDNyyn/APYSmD2eE+2zX9q44DGDqzD2W7gJSxz
+	HMCLrW0etYeca1wwpq7C8HCVsbI6qm9y0YceH3USqeA=
+From: Buday Csaba <buday.csaba@prolan.hu>
+To: Wei Fang <wei.fang@nxp.com>, Frank Li <frank.li@nxp.com>, Shenwei Wang
+	<shenwei.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
+	<richardcochran@gmail.com>, Francesco Dolcini
+	<francesco.dolcini@toradex.com>, =?UTF-8?q?Bence=20Cs=C3=B3k=C3=A1s?=
+	<bence98@sch.bme.hu>, <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: Buday Csaba <buday.csaba@prolan.hu>
+Subject: [PATCH net v3 1/1] net: fec: fix the PTP periodic output sysfs interface
+Date: Tue, 24 Mar 2026 14:32:30 +0100
+Message-ID: <8ec2afe88423c2231f9cf8044d212ce57846670e.1774359059.git.buday.csaba@prolan.hu>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260303162346.2071888-6-kuba@kernel.org>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1774359153;VERSION=8008;MC=4004315875;ID=133597;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29676715506D7162
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[prolan.hu,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[prolan.hu:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271086-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271087-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[roeck-us.net];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,toradex.com,sch.bme.hu,lists.linux.dev,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[prolan.hu:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[buday.csaba@prolan.hu,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@roeck-us.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,roeck-us.net:mid]
-X-Rspamd-Queue-Id: 33FF13097C1
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,prolan.hu:dkim,prolan.hu:email,prolan.hu:mid]
+X-Rspamd-Queue-Id: 2773C309922
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+When the PPS channel configuration was implemented, the channel
+index for the periodic outputs was configured as the hardware
+channel number.
 
-On Tue, Mar 03, 2026 at 08:23:45AM -0800, Jakub Kicinski wrote:
-> In rawsock_release(), cancel any pending tx_work and purge the write
-> queue before orphaning the socket.  rawsock_tx_work runs on the system
-> workqueue and calls nfc_data_exchange which dereferences the NCI
-> device.  Without synchronization, tx_work can race with socket and
-> device teardown when a process is killed (e.g. by SIGKILL), leading
-> to use-after-free or leaked references.
-> 
-> Set SEND_SHUTDOWN first so that if tx_work is already running it will
-> see the flag and skip transmitting, then use cancel_work_sync to wait
-> for any in-progress execution to finish, and finally purge any
-> remaining queued skbs.
-> 
-> Fixes: 23b7869c0fd0 ("NFC: add the NFC socket raw protocol")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  net/nfc/rawsock.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/net/nfc/rawsock.c b/net/nfc/rawsock.c
-> index b049022399ae..f7d7a599fade 100644
-> --- a/net/nfc/rawsock.c
-> +++ b/net/nfc/rawsock.c
-> @@ -67,6 +67,17 @@ static int rawsock_release(struct socket *sock)
->  	if (sock->type == SOCK_RAW)
->  		nfc_sock_unlink(&raw_sk_list, sk);
->  
-> +	if (sk->sk_state == TCP_ESTABLISHED) {
-> +		/* Prevent rawsock_tx_work from starting new transmits and
-> +		 * wait for any in-progress work to finish.  This must happen
-> +		 * before the socket is orphaned to avoid a race where
-> +		 * rawsock_tx_work runs after the NCI device has been freed.
-> +		 */
-> +		sk->sk_shutdown |= SEND_SHUTDOWN;
-> +		cancel_work_sync(&nfc_rawsock(sk)->tx_work);
-> +		rawsock_write_queue_purge(sk);
-> +	}
-> +
+The sysfs interface uses a logical channel index, and rejects numbers
+greater than `n_per_out` (see period_store() in ptp_sysfs.c).
+That property was left at 1, since the driver implements channel
+selection, not simultaneous operation of multiple PTP hardware timer
+channels.
 
-Google's AI agent had the following fedback on this patch:
+A second check in fec_ptp_enable() returns -EOPNOTSUPP when the two
+channel numbers disagree, making channels 1..3 unusable from sysfs.
 
-  Does cancel_work_sync() properly wait for the asynchronous nfc_data_exchange()
-  to complete?
+Fix by removing this redundant check in the FEC PTP driver.
 
-  Since rawsock_tx_work() only initiates the exchange and then returns, the work
-  item is no longer running or pending while the exchange is in flight. This
-  means cancel_work_sync() might return immediately.
+Fixes: 566c2d83887f ("net: fec: make PPS channel configurable")
+Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
+---
+ drivers/net/ethernet/freescale/fec_ptp.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-  > +		rawsock_write_queue_purge(sk);
+diff --git a/drivers/net/ethernet/freescale/fec_ptp.c b/drivers/net/ethernet/freescale/fec_ptp.c
+index 4b7bad9a485d..56801c2009d5 100644
+--- a/drivers/net/ethernet/freescale/fec_ptp.c
++++ b/drivers/net/ethernet/freescale/fec_ptp.c
+@@ -545,9 +545,6 @@ static int fec_ptp_enable(struct ptp_clock_info *ptp,
+ 		if (rq->perout.flags)
+ 			return -EOPNOTSUPP;
+ 
+-		if (rq->perout.index != fep->pps_channel)
+-			return -EOPNOTSUPP;
+-
+ 		period.tv_sec = rq->perout.period.sec;
+ 		period.tv_nsec = rq->perout.period.nsec;
+ 		period_ns = timespec64_to_ns(&period);
 
-  If the hardware completes the data exchange after cancel_work_sync() has
-  returned, but before rawsock_write_queue_purge() empties the write queue,
-  rawsock_data_exchange_complete() will see a non-empty queue and call
-  schedule_work().
+base-commit: 8a63baadf08453f66eb582fdb6dd234f72024723
+-- 
+2.39.5
 
-  Because cancel_work_sync() has already finished, this newly scheduled tx_work
-  could execute after rawsock_release() has freed the socket. Can this lead
-  to a use-after-free?
 
-On top of that, I don't see how the this patch change would prevent the
-problem it tries to fix if tx_work is running and has proceeded beyond
-the SEND_SHUTDOWN check.
-
-My apologies if this is all just noise. If so, please let me know what is
-wrong with the analysis to help improve the agent.
-
-Thanks,
-Guenter
 
