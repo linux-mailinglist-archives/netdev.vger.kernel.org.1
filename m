@@ -1,416 +1,261 @@
-Return-Path: <netdev+bounces-271063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271064-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IHyMGHKOwmneewQAu9opvQ
-	(envelope-from <netdev+bounces-271063-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:15:30 +0100
+	id EHCtMZqPwmn/ewQAu9opvQ
+	(envelope-from <netdev+bounces-271064-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:20:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD0CE309216
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:15:29 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB29B3093D7
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:20:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DD0BF30A164F
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:02:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 28DD13046623
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78CD7345CD0;
-	Tue, 24 Mar 2026 13:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B003BC680;
+	Tue, 24 Mar 2026 13:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ReflY+QB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JO4krb76"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919C43CC9F4
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 13:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1420390999;
+	Tue, 24 Mar 2026 13:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774357335; cv=none; b=XGIF0HYVaBXDNSIRoC0ond6K/65Jcdnqyo155b4u+HwTmo/uTYeiFxMAMum2kM6qc7wSJ87E2zFwBjeDzVq5qXjGFW2KILTpNDTndJRnVgoEWmeW8MXK/iNbXqsf/GYMMgk9+pq8JluavsGb5HS1XCW6eSh99KpmpMzlwzdP4AQ=
+	t=1774357491; cv=none; b=XR+dCsOJdZRid3Q93snFxQlFShS+rBsDvKuBQeHMr7tTKU0QSnvs1aPPwvHU28LAoVOuOT3rinQPkz5TnQNyASnFnqfXp8TBtrO85egzZQoj63rFwsd37LsUKJJmhwBA7mY58z7ma19N6jTwZbvxyQFosxaHKA7ucFEq1l/B3jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774357335; c=relaxed/simple;
-	bh=iH+8nMJ+Gx2BUOZ05IBDCgtLVuNf2PciAGOreblsBTw=;
+	s=arc-20240116; t=1774357491; c=relaxed/simple;
+	bh=Sj+d5N6JtCmiB6OYc3c9qCEma5tAXaqtiZ+NbtcW0HI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AiHSlq4jyWjbaIAqOsGoZTgu8gJ0HdCXUeDcKtG8HT9XERW0I96Ii0nO9x8cLXCeUM1NciAw6Y+jVoPO4yTcLMFkXmAM5fSGLJWFSopGL7VVj0pGVQRWKhUjdcufCnpdA90q5z1AfCnRBqCN9Vkq2SIT7nm3g1z1TwyYhcx8kbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ReflY+QB; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-48557c8ad47so8810765e9.0
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 06:02:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1774357332; x=1774962132; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2+t2Qf3QvHovGsqJwobXChl1JyVBxvgvfqIjcVOT4is=;
-        b=ReflY+QBTBeYq/Lr7PPkhIyNWZ4+e6j6fr1Pi5yNN9bqF7uY0lbWi2Ob0xNdZg9Iup
-         th8wX9NaiMmMoV6qAtKBH3rRMFZjjELsI5XAkPvgwNta1dtnKOXWPk0cyIa5f1PfPvWM
-         t8LWvdIBFnCroSWzJNtLUhOT48DuGSvWGDA7Kmmz1KbezOU3ZoO8l3HkZAaOViAuTZr7
-         wKpTkudHlwdVIbEa6mP3hC+ZM4piVP3nmOeQU24SO5mDHt4O2HhNpM7DGyhVVNivW+I1
-         8+ANpAfhn8/1A/OBbwp+Zh2q8ORkyNnT20moQ9StTYY8min+rBTIfnxn04CvnYrLVb0U
-         QX4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774357332; x=1774962132;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2+t2Qf3QvHovGsqJwobXChl1JyVBxvgvfqIjcVOT4is=;
-        b=LkwYulPrQZ+0ZcIDrYsWLk9reyXigZe5Si3WtWRUJRdqee8zBPdhg4NTN8yHoNBVwi
-         dHRhs86fJltbrYnxGRkFqvh9uePbqfWxqSv4KxyFKMMcgZK7ZM9iCgA/KhHp7xnK5ozJ
-         78BRZsoeG+SGbcKcx5TuTLVSX3HAQbrljwzGBzPk9EESnsrK2MoQ68omCXxgihus5ogV
-         1VhEqg5PXT1J4QrwNPzBLIksHdk6VXfvco9TecdF29C+rb4fIxK8qFR3TQVaGluwePWe
-         eCzmSo/wu9gMbkvwV64RGu9Gy679+Cn2htjFUV2Ksqd9yLCgLYavtNP+1t2rTnYEJBk2
-         mLTA==
-X-Gm-Message-State: AOJu0YxE7v1e19/YsQoTemaC1TZMHR+HKU00HVb2zh9/1c7UrQWn3psb
-	Fp72wys+ib9NOd+cPDJgtCH4tz76uJtWrVPnrvVw6cEg6HZliXxcpGcD4Hzqr/FPTDU=
-X-Gm-Gg: ATEYQzy3x7V3mZPUZBWgfgWzlJavIaWFQJg1TJCuc19li1RQQbu1fu+Am5yT7v9FVjJ
-	kb23j+XYq0dMQAIdBS6JPYU+M8WRK62Tup6+8VsHlpp6GKEUvB4Rce4yEU6YcsW87R8BQEACpVO
-	N8WQQOHpsga8cNU8J7RCshzgaNr+8dp2kjdbNsQY5985CAsEAUhM2NhfExmYWfd/FoIkkvMJBaC
-	TLizLEYDwhH3T5rt7TFXJ4u59GImjX6nZTH/xsjMXfSItaQXbpGuoFmW9NRrWCLCq1+NpAJ3MXJ
-	LsfkCWQP7Y/3LRZbjXgT/VeZ/y5yKcgjtZ29XxLxLNLha17nqcB6ET5ImeBdqaa5M7AvkU0VpmD
-	2NX3XpZtS7CMdCiyvDUeQeoaTHRJ8c1PcpEX5gGzsBPx6JpWbVLzj+UgtYYY5K/r4QBdgrbqunK
-	jPUP+Itut1k6Vi4djMAn2uEJ0AyIjR3tTt0dc=
-X-Received: by 2002:a05:600c:47ca:b0:487:169:9f64 with SMTP id 5b1f17b1804b1-4870169a1eemr122188205e9.12.1774357327203;
-        Tue, 24 Mar 2026 06:02:07 -0700 (PDT)
-Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4871169384dsm54132135e9.1.2026.03.24.06.02.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 06:02:06 -0700 (PDT)
-Date: Tue, 24 Mar 2026 14:02:05 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Adam Young <admiyo@amperemail.onmicrosoft.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4 13/13] net/mlx5: Add a shared devlink
- instance for PFs on same chip
-Message-ID: <sim5ddxllwk5dwnbax4w4ieseziqnis7j2hr2vffaymzsvxcsw@b5q2r4shnlg7>
-References: <20260312100407.551173-1-jiri@resnulli.us>
- <20260312100407.551173-14-jiri@resnulli.us>
- <bab5b6bc-aa42-4af1-80d1-e56bcef06bc2@amperemail.onmicrosoft.com>
- <c37ee2a7-8e19-4aaa-aaf3-4cd5a9c171d1@amperemail.onmicrosoft.com>
- <ib6r4armffxw3f56fxxor3bg4ejhnsfg5ddg4dncae5u6lonty@ds6bfkjoykbl>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UJ+iWoyLyobzDx0ikQfTB/bWD5PIpRhDVeLYcurxnuWMkR42vVb4oOH6ygAlDVH3slodxBBtiZqTm/hz9hpCMWSGsSBpp//GS+/ocU/UVhTwFHtAZOAK2mcb4kxgIMDDGrzk1fKVNBIGk0WgbBged8eypxj4+Pxynwhlb3aiAPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JO4krb76; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=WN2wTNGMgM5bYbRGfOQZgYj/JyTydD59C5V7z3tIw28=; b=JO4krb767LEVW4/gzQbytGjPP0
+	FIMh0JO+ZsFiQqlgXLpEQXy+eQz2g1WGOjXNbzS/NKmGHCMkdlLFXkjvL60PFC3f/G9a6py6A95Gm
+	96ru2QzKxJQQS/k6iUDn7Dg3FxM7m8nYjcTRlIb3HuBYR6O3quUUlNs2OW2TrV6WAFJjPQ2+2Q0bT
+	mmgDDxr+rwB2aMz/UIIRPsLkxdp5Zpx7UZbRIJm20tcHSeOK7cIbnHJoqGQwKSh2lVbAUpgMCEM/Q
+	QUsRNCxtLrGZ/884HjkfwvmSZ7+VurZEZR6m0RiLmmeUrmXRsh8T2Gnvr44ouJMTk87XQFyG67lKP
+	1fXJtbMQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38946)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w51Qz-0000000021Z-0snn;
+	Tue, 24 Mar 2026 13:04:37 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w51Qw-00000000558-0Eg7;
+	Tue, 24 Mar 2026 13:04:34 +0000
+Date: Tue, 24 Mar 2026 13:04:33 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Paolo Abeni <pabeni@redhat.com>,
+	Ovidiu Panait <ovidiu.panait.rb@renesas.com>
+Cc: Michal Piekos <michal.piekos@mmpsystems.pl>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: stmmac: skip VLAN restore when VLAN hash ops are
+ missing
+Message-ID: <acKL4RoM-zdwj1Ib@shell.armlinux.org.uk>
+References: <20260321-vlan-restore-error-v2-1-45cf56a5223d@mmpsystems.pl>
+ <5e5706bb-0f04-4bb1-94f4-45083a3c76fd@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ib6r4armffxw3f56fxxor3bg4ejhnsfg5ddg4dncae5u6lonty@ds6bfkjoykbl>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+In-Reply-To: <5e5706bb-0f04-4bb1-94f4-45083a3c76fd@redhat.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271064-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	DMARC_NA(0.00)[resnulli.us];
-	TAGGED_FROM(0.00)[bounces-271063-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[mmpsystems.pl,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,foss.st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.942];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mellanox.com:email,nvidia.com:email,resnulli-us.20230601.gappssmtp.com:dkim,onmicrosoft.com:email,resnulli.us:email]
-X-Rspamd-Queue-Id: BD0CE309216
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mmpsystems.pl:email,renesas.com:email,shell.armlinux.org.uk:mid,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: DB29B3093D7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Mon, Mar 23, 2026 at 04:05:19PM +0100, jiri@resnulli.us wrote:
->Sat, Mar 21, 2026 at 12:37:06AM +0100, admiyo@amperemail.onmicrosoft.com wrote:
->>
->>
->>0005:01:00.0 Ethernet controller: Mellanox Technologies MT27710 Family
->>[ConnectX-4 Lx]
->
->Cool. Will try to reproduce this locally. Thanks!
->
+On Tue, Mar 24, 2026 at 01:14:29PM +0100, Paolo Abeni wrote:
+> On 3/21/26 6:38 AM, Michal Piekos wrote:
+> > stmmac_vlan_restore() unconditionally calls stmmac_vlan_update() when
+> > NETIF_F_VLAN_FEATURES is set. On platforms where priv->hw->vlan (or
+> > ->update_vlan_hash) is not provided, stmmac_update_vlan_hash() returns
+> > -EINVAL via stmmac_do_void_callback(), resulting in a spurious
+> > "Failed to restore VLANs" error even when no VLAN filtering is in use.
+> > 
+> > Check presence of VLAN HW FILTER flags before stmmac_vlan_update().
+> > 
+> > Tested on Orange Pi Zero 3.
+> > 
+> > Fixes: bd7ad51253a7 ("net: stmmac: Fix VLAN HW state restore")
+> > Signed-off-by: Michal Piekos <michal.piekos@mmpsystems.pl>
+> > ---
+> > This patch fixes a noisy "Failed to restore VLANs" message on platforms
+> > where stmmac VLAN hash ops are not implemented.
+> > stmmac_vlan_restore() calls stmmac_vlan_update() without checking for
+> > VLAN hash ops presence which results in -EINVAL. 
+> > ---
+> > Changes in v2:
+> > - Replace check for hash ops with check for HW FILTER flags
+> > - Link to v1: https://lore.kernel.org/r/20260314-vlan-restore-error-v1-1-4fc6c3e2115f@mmpsystems.pl
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index 6827c99bde8c..cfc0ce9cec9c 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -6863,7 +6863,8 @@ static int stmmac_vlan_restore(struct stmmac_priv *priv)
+> >  {
+> >  	int ret;
+> >  
+> > -	if (!(priv->dev->features & NETIF_F_VLAN_FEATURES))
+> > +	if (!(priv->dev->features &
+> > +	      (NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_VLAN_STAG_FILTER)))
+> >  		return 0;
+> >  
+> >  	if (priv->hw->num_vlan)
+> Adding Russell.
+> 
+> It's not obvious to me that with this change the
+> restore_hw_vlan_rx_fltr() and vlan_update() callback are still invoked
+> in all the relevant driver/features permutation.
 
-Hi. Testing this with:
-08:00.0 Ethernet controller: Mellanox Technologies MT27710 Family [ConnectX-4 Lx]
-works fine. What's your output of "devlink dev info"?
+I think there's a few questions here.
 
+When CONFIG_VLAN_8021Q is enabled, then we set the filter features
+if the vlhash dma capability is set:
 
->
->
->
->>0005:01:00.1 Ethernet controller: Mellanox Technologies MT27710 Family
->>[ConnectX-4 Lx]
->>
->>On 3/20/26 19:16, Adam Young wrote:
->>> This breaks on my system:
->>> 
->>> On 7.0.0 It boots fine.  With net-next/main currently at this commit
->>> 
->>> 
->>> commit 8737d7194d6d5947c3d7d8813895b44a25b84477 (net-next/main,
->>> net-next/HEAD)
->>> Author: Lorenzo Bianconi <lorenzo@kernel.org>
->>> Date:   Fri Mar 13 17:28:36 2026 +0100
->>> 
->>> I get:
->>> 
->>> [   21.859081] mlx5_core 0005:01:00.0: probe_one:2017:(pid 10):
->>> mlx5_shd_init failed with error code -2
->>> [   21.863266] mlx5_core 0005:01:00.0: probe with driver mlx5_core failed
->>> with error -2
->>> [   21.866360] mlx5_core 0005:01:00.1: probe_one:2017:(pid 10):
->>> mlx5_shd_init failed with error code -2
->>> [   21.869937] mlx5_core 0005:01:00.1: probe with driver mlx5_core failed
->>> with error -2
->>> 
->>> 
->>> I am happy to help debug:   what do you need from me?
->>> 
->>> 
->>> On 3/12/26 06:04, Jiri Pirko wrote:
->>> > From: Jiri Pirko <jiri@nvidia.com>
->>> > 
->>> > Use the previously introduced shared devlink infrastructure to create
->>> > a shared devlink instance for mlx5 PFs that reside on the same physical
->>> > chip. The shared instance is identified by the chip's serial number
->>> > extracted from PCI VPD (V3 keyword, with fallback to serial number
->>> > for older devices).
->>> > 
->>> > Each PF that probes calls mlx5_shd_init() which extracts the chip serial
->>> > number and uses devlink_shd_get() to get or create the shared instance.
->>> > When a PF is removed, mlx5_shd_uninit() calls devlink_shd_put()
->>> > to release the reference. The shared instance is automatically destroyed
->>> > when the last PF is removed.
->>> > 
->>> > Make the PF devlink instances nested in this shared devlink instance,
->>> > allowing userspace to identify which PFs belong to the same physical
->>> > chip.
->>> > 
->>> > Example:
->>> > 
->>> > pci/0000:08:00.0: index 0
->>> >    nested_devlink:
->>> >      auxiliary/mlx5_core.eth.0
->>> > devlink_index/1: index 1
->>> >    nested_devlink:
->>> >      pci/0000:08:00.0
->>> >      pci/0000:08:00.1
->>> > auxiliary/mlx5_core.eth.0: index 2
->>> > pci/0000:08:00.1: index 3
->>> >    nested_devlink:
->>> >      auxiliary/mlx5_core.eth.1
->>> > auxiliary/mlx5_core.eth.1: index 4
->>> > 
->>> > Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->>> > ---
->>> > v2->v3:
->>> > - removed "const" from "sn"
->>> > - passing driver pointer to devlink_shd_get()
->>> > ---
->>> >   .../net/ethernet/mellanox/mlx5/core/Makefile  |  5 +-
->>> >   .../net/ethernet/mellanox/mlx5/core/main.c    | 17 ++++++
->>> >   .../ethernet/mellanox/mlx5/core/sh_devlink.c  | 61 +++++++++++++++++++
->>> >   .../ethernet/mellanox/mlx5/core/sh_devlink.h  | 12 ++++
->>> >   include/linux/mlx5/driver.h                   |  1 +
->>> >   5 files changed, 94 insertions(+), 2 deletions(-)
->>> >   create mode 100644
->>> > drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
->>> >   create mode 100644
->>> > drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
->>> > 
->>> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
->>> > b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
->>> > index 8ffa286a18f5..d39fe9c4a87c 100644
->>> > --- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
->>> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
->>> > @@ -16,8 +16,9 @@ mlx5_core-y :=    main.o cmd.o debugfs.o fw.o eq.o
->>> > uar.o pagealloc.o \
->>> >           transobj.o vport.o sriov.o fs_cmd.o fs_core.o pci_irq.o \
->>> >           fs_counters.o fs_ft_pool.o rl.o lag/debugfs.o lag/lag.o
->>> > dev.o events.o wq.o lib/gid.o \
->>> >           lib/devcom.o lib/pci_vsc.o lib/dm.o lib/fs_ttc.o
->>> > diag/fs_tracepoint.o \
->>> > -        diag/fw_tracer.o diag/crdump.o devlink.o diag/rsc_dump.o
->>> > diag/reporter_vnic.o \
->>> > -        fw_reset.o qos.o lib/tout.o lib/aso.o wc.o fs_pool.o
->>> > lib/nv_param.o
->>> > +        diag/fw_tracer.o diag/crdump.o devlink.o sh_devlink.o
->>> > diag/rsc_dump.o \
->>> > +        diag/reporter_vnic.o fw_reset.o qos.o lib/tout.o lib/aso.o
->>> > wc.o fs_pool.o \
->>> > +        lib/nv_param.o
->>> >     #
->>> >   # Netdev basic
->>> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>> > b/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>> > index fdc3ba20912e..1c35c3fc3bb3 100644
->>> > --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>> > @@ -74,6 +74,7 @@
->>> >   #include "mlx5_irq.h"
->>> >   #include "hwmon.h"
->>> >   #include "lag/lag.h"
->>> > +#include "sh_devlink.h"
->>> >     MODULE_AUTHOR("Eli Cohen <eli@mellanox.com>");
->>> >   MODULE_DESCRIPTION("Mellanox 5th generation network adapters
->>> > (ConnectX series) core driver");
->>> > @@ -1520,10 +1521,16 @@ int mlx5_init_one(struct mlx5_core_dev *dev)
->>> >       int err;
->>> >         devl_lock(devlink);
->>> > +    if (dev->shd) {
->>> > +        err = devl_nested_devlink_set(dev->shd, devlink);
->>> > +        if (err)
->>> > +            goto unlock;
->>> > +    }
->>> >       devl_register(devlink);
->>> >       err = mlx5_init_one_devl_locked(dev);
->>> >       if (err)
->>> >           devl_unregister(devlink);
->>> > +unlock:
->>> >       devl_unlock(devlink);
->>> >       return err;
->>> >   }
->>> > @@ -2005,6 +2012,13 @@ static int probe_one(struct pci_dev *pdev,
->>> > const struct pci_device_id *id)
->>> >           goto pci_init_err;
->>> >       }
->>> >   +    err = mlx5_shd_init(dev);
->>> > +    if (err) {
->>> > +        mlx5_core_err(dev, "mlx5_shd_init failed with error code %d\n",
->>> > +                  err);
->>> > +        goto shd_init_err;
->>> > +    }
->>> > +
->>> >       err = mlx5_init_one(dev);
->>> >       if (err) {
->>> >           mlx5_core_err(dev, "mlx5_init_one failed with error code
->>> > %d\n",
->>> > @@ -2018,6 +2032,8 @@ static int probe_one(struct pci_dev *pdev,
->>> > const struct pci_device_id *id)
->>> >       return 0;
->>> >     err_init_one:
->>> > +    mlx5_shd_uninit(dev);
->>> > +shd_init_err:
->>> >       mlx5_pci_close(dev);
->>> >   pci_init_err:
->>> >       mlx5_mdev_uninit(dev);
->>> > @@ -2039,6 +2055,7 @@ static void remove_one(struct pci_dev *pdev)
->>> >       mlx5_drain_health_wq(dev);
->>> >       mlx5_sriov_disable(pdev, false);
->>> >       mlx5_uninit_one(dev);
->>> > +    mlx5_shd_uninit(dev);
->>> >       mlx5_pci_close(dev);
->>> >       mlx5_mdev_uninit(dev);
->>> >       mlx5_adev_idx_free(dev->priv.adev_idx);
->>> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
->>> > b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
->>> > new file mode 100644
->>> > index 000000000000..bc33f95302df
->>> > --- /dev/null
->>> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
->>> > @@ -0,0 +1,61 @@
->>> > +// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
->>> > +/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights
->>> > reserved. */
->>> > +
->>> > +#include <linux/mlx5/driver.h>
->>> > +#include <net/devlink.h>
->>> > +
->>> > +#include "sh_devlink.h"
->>> > +
->>> > +static const struct devlink_ops mlx5_shd_ops = {
->>> > +};
->>> > +
->>> > +int mlx5_shd_init(struct mlx5_core_dev *dev)
->>> > +{
->>> > +    u8 *vpd_data __free(kfree) = NULL;
->>> > +    struct pci_dev *pdev = dev->pdev;
->>> > +    unsigned int vpd_size, kw_len;
->>> > +    struct devlink *devlink;
->>> > +    char *sn, *end;
->>> > +    int start;
->>> > +    int err;
->>> > +
->>> > +    if (!mlx5_core_is_pf(dev))
->>> > +        return 0;
->>> > +
->>> > +    vpd_data = pci_vpd_alloc(pdev, &vpd_size);
->>> > +    if (IS_ERR(vpd_data)) {
->>> > +        err = PTR_ERR(vpd_data);
->>> > +        return err == -ENODEV ? 0 : err;
->>> > +    }
->>> > +    start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size, "V3",
->>> > &kw_len);
->>> > +    if (start < 0) {
->>> > +        /* Fall-back to SN for older devices. */
->>> > +        start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size,
->>> > +                             PCI_VPD_RO_KEYWORD_SERIALNO, &kw_len);
->>> > +        if (start < 0)
->>> > +            return -ENOENT;
->>> > +    }
->>> > +    sn = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
->>> > +    if (!sn)
->>> > +        return -ENOMEM;
->>> > +    /* Firmware may return spaces at the end of the string, strip
->>> > it. */
->>> > +    end = strchrnul(sn, ' ');
->>> > +    *end = '\0';
->>> > +
->>> > +    /* Get or create shared devlink instance */
->>> > +    devlink = devlink_shd_get(sn, &mlx5_shd_ops, 0, pdev->dev.driver);
->>> > +    kfree(sn);
->>> > +    if (!devlink)
->>> > +        return -ENOMEM;
->>> > +
->>> > +    dev->shd = devlink;
->>> > +    return 0;
->>> > +}
->>> > +
->>> > +void mlx5_shd_uninit(struct mlx5_core_dev *dev)
->>> > +{
->>> > +    if (!dev->shd)
->>> > +        return;
->>> > +
->>> > +    devlink_shd_put(dev->shd);
->>> > +}
->>> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
->>> > b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
->>> > new file mode 100644
->>> > index 000000000000..8ab8d6940227
->>> > --- /dev/null
->>> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
->>> > @@ -0,0 +1,12 @@
->>> > +/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
->>> > +/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights
->>> > reserved. */
->>> > +
->>> > +#ifndef __MLX5_SH_DEVLINK_H__
->>> > +#define __MLX5_SH_DEVLINK_H__
->>> > +
->>> > +#include <linux/mlx5/driver.h>
->>> > +
->>> > +int mlx5_shd_init(struct mlx5_core_dev *dev);
->>> > +void mlx5_shd_uninit(struct mlx5_core_dev *dev);
->>> > +
->>> > +#endif /* __MLX5_SH_DEVLINK_H__ */
->>> > diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
->>> > index 04dcd09f7517..1268fcf35ec7 100644
->>> > --- a/include/linux/mlx5/driver.h
->>> > +++ b/include/linux/mlx5/driver.h
->>> > @@ -798,6 +798,7 @@ struct mlx5_core_dev {
->>> >       enum mlx5_wc_state wc_state;
->>> >       /* sync write combining state */
->>> >       struct mutex wc_state_lock;
->>> > +    struct devlink *shd;
->>> >   };
->>> >     struct mlx5_db {
->>> 
+        if (priv->dma_cap.vlhash) {
+                ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
+                ndev->features |= NETIF_F_HW_VLAN_STAG_FILTER;
+        }
+
+Only dwmac4 and dwxgmac2 have the ability to set this feature (and
+thus be synthesised with the feature enabled.) From what I understand,
+when present, these features are permanently enabled (as they're not
+set in hw_Features).
+
+However, in stmmac_vlan_update() there is:
+
+        if (!priv->dma_cap.vlhash) {
+                if (count > 2) /* VID = 0 always passes filter */
+                        return -EOPNOTSUPP;
+
+                pmatch = vid;
+                hash = 0;
+        }
+
+So, it is clear that the intention is that stmmac_vlan_update() will
+be called even when the NETIF_F_HW_VLAN_*TAG_FILTER features are not
+present - consider a core that implements the VLAN ops, but has
+priv->dma_cap.vlhash false.
+
+It looks like vlan support was added in dwmac v4.0 and later cores
+(from the hwif table.) As the vlan ops are NULL before that, the
+horrid stmmac_do_void_callback() crud will return -EINVAL (yuck). The
+method it calls is a void function, so the only possible return values
+are zero if implemented, or -EINVAL if not.
+
+stmmac_vlan_update() itself only ever returns zero if the netif
+isn't running, or the above return value. So, an error returned from
+stmmac_vlan_update() just means that the driver has no support for
+programming the vlan configuration.
+
+Looking at the implementations for the case where vlhash is false,
+(where stmmac_update_vlan_hash() will be called with hash=0 and
+perfect_match with a vid, vlan_update_hash() still write
+to the VLAN_TAG register to configure vlan handling. I haven't
+looked up exactly what it does.
+
+The other possibility is dwxgmac2_update_vlan_hash(). This looks
+similar.
+
+So, I don't think that the correct solution is to only call this
+function when one or more of NETIF_F_HW_VLAN_*TAG_FILTER feature flags
+are set - clearly the code is written to handle the case where the
+update_vlan_hash method is populated but vlhash is false and these
+feature flags are clear.
+
+Now I'm wondering whether the code in the STMMAC_VLAN_TAG_USED block
+is correct:
+
+        /* Both mac100 and gmac support receive VLAN tag detection */
+        ndev->features |= NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_STAG_RX;
+        if (dwmac_is_xmac(priv->plat->core_type)) {
+                ndev->hw_features |= NETIF_F_HW_VLAN_CTAG_RX;
+                priv->hw->hw_vlan_en = true;
+        }
+        if (priv->dma_cap.vlhash) {
+                ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
+                ndev->features |= NETIF_F_HW_VLAN_STAG_FILTER;
+        }
+        if (priv->dma_cap.vlins)
+                ndev->features |= NETIF_F_HW_VLAN_CTAG_TX;
+
+The test for dwmac_is_xmac() matches for dwmac4 and dwxgmac cores. If
+this is true, then we will have the vlan ops populated, and it means
+that NETIF_F_HW_VLAN_CTAG_RX can be configured by the user rather than
+being always-enabled. Is this correct? I'm not sure - I haven't dug
+into enough of the documentation for this yet. However, I suggest
+that we need to always call stmmac_update_vlan_hash() for these cores.
+
+So, I'm coming to the conclusion that we either need a test for
+dwmac_is_xmac() and not the feature flags, or maybe we just get rid
+of the "Failed to restore VLANs" error print and make
+stmmac_vlan_restore() return void (nothing uses the return value.)
+
+In summary, I'm not sure what the correct approach is - please reach
+out to Ovidiu Panait <ovidiu.panait.rb@renesas.com> who recently added
+this code, but I'm fairly sure that this solution is incorrect.
+
+Really, Ovidiu Panait should be reviewing this patch as his recent
+change introduced the problematical error print.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
