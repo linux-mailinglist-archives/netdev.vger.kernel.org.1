@@ -1,158 +1,269 @@
-Return-Path: <netdev+bounces-271066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271067-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GL/5GmCPwmn/ewQAu9opvQ
-	(envelope-from <netdev+bounces-271066-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:19:28 +0100
+	id 4CFQNcePwmn/ewQAu9opvQ
+	(envelope-from <netdev+bounces-271067-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:21:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B94DA309324
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:19:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EBBA30942F
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 14:21:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3DC0730A581B
-	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:06:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D7C983063A1F
+	for <lists+netdev@lfdr.de>; Tue, 24 Mar 2026 13:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 926483EF659;
-	Tue, 24 Mar 2026 13:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F7236680F;
+	Tue, 24 Mar 2026 13:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="oVZK9Ujd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S7JyPlau"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27184390999
-	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 13:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160F8368263
+	for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 13:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774357557; cv=none; b=uXGfdnfW6/D7wJEf4CvDM8wvzkU9Z07qynQO7uJSZzmB38CRbKf0IwUJyhD8c5aHsceRxUyReTcjf8BNSOf9Mehi8OlTuZkopquia/57nR7zdJJRQkJ2xpzPxiXvVmdCEVwHgM74ZRaMqiqyl4nDhgunHBBsMB9X6ae1Mid77V8=
+	t=1774357768; cv=none; b=iP6OJN7WVsLTYAX83DFM2DIDOvqK+HLQSHocJJA+mo1oTDgeYDOJM1EJIrW5hyaa22K87bmOeTAYsOmltObQ5aYfpSz3A1MdR0QT32uAH1xADXfi3WBFm5alw0KmZehij9oIG86j+uCTU0eihFw/ILTSZIYbS+YzLchpY3dn6+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774357557; c=relaxed/simple;
-	bh=cw7XrKGnbZgtS8pgMWwXTOKSgj52ibjy+qLdH1G/JKw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OgbGkWE+vd9buTlBB167VswRr0JtSkFXbe0QmLkAhEEZ/HADSaJBFti5CZAUPPX6wwUtlBi2QHHP6MwknNV+KnAIohrESDKux6QAgnq4qtD5frVcSl1a53XcjU/ZxETjQmCDL979klsLQNR9qd7zCZodb8aFKFYwRp3uX/2uR2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=oVZK9Ujd; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43b48ac2727so943708f8f.3
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 06:05:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1774357554; x=1774962354; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cw7XrKGnbZgtS8pgMWwXTOKSgj52ibjy+qLdH1G/JKw=;
-        b=oVZK9Ujd78g0Pee4oP9+FcW9HkdDEYJlXIyPt7P9zsznQ7tleTZLYqY9mZpwaNfzcD
-         vvd5aGwpceZu+h2owPWJYqbCYZZxib7wkxYkVWxOIsufLK39khk9o5FTThQN8Qy4y5EB
-         YiA1V8w7YXUDiu4bLWsRK1GOKGWGfvL8HT2JbtpIc2RFfRfwwuaNZ7kHgLgWCCji5JEp
-         b0Og8mAZ+oawtXJXusLXtQCwbNUoEitcpGdW+c9bhFm1ixUmksiyxLs2lKlRYxMByLM6
-         WpexxVihYehx96+g2pDgi6wXZz6yZ1ELRpkNpOX4mncGvmyZyUk5HZtTToHDDigLmrPk
-         Wj6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774357554; x=1774962354;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cw7XrKGnbZgtS8pgMWwXTOKSgj52ibjy+qLdH1G/JKw=;
-        b=eY9G+ss6fLYhqNseZT5QIZVXmkJ9yLnbnEmHUjWuSPwGLaxNi3BKx4Jrjy73GlWurf
-         8qT5L6yUiNEwzBXH759X/g7agSmFten9uJqIaVcW4yVJL/GStevvOnAUm0CxeJYeuoWs
-         eRBVY0h4IT+2iQwtpTRR8MQ66hEE4vM0Of76UiNa6AafrDQvctClajepT6/PpZHrU4MN
-         xmcQ0PKhlkrRgjLXcCnysYALsvIyLO5plhcXmobfDHPS3N4bo7US9/d/BjAuBJWy08XM
-         bZxouEJNQpid8qXgs2Q1S1YC62/ofstfS+b9hpXMQIf1P5Yqs7KosluDPr7GZ0zhlaVR
-         6zJw==
-X-Forwarded-Encrypted: i=1; AJvYcCWgD0dUm4NLQppg0nzbVKtioIsuVnwngf+V4HQLVD/JEDlzxy7J32YWtbHcdXWX3OVR7oBWrUw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLjTNzA8rTsyEerbh3eeu4pEGZa0LzRjv8g+j7CKzraLVOWBTT
-	9v/8KU2Ta7ZBEJWSMavurheIPVnjroRUyzfAdJ/P7Nrmxr0ktx0nnUNkNcGrmqio2Vo=
-X-Gm-Gg: ATEYQzxKxzf8WIssUYif8ICEzHg3DM7KMWDSDbAjlWeYah9PC/CMhx1U54+lBU9LgxQ
-	m1rpyQ70ZDnm0A8jLZ01sfe5RvLiITcZmOgeU1tEA/l6/Y8Nsw/zhNbMAuIUYD5MsJnjXy3vdwm
-	LS4RoRxYm4kLX7IBuzUrGz1oGW3W3xSRHKs9pAOxiAnupOxUDvRARbQqcPnUFn74BA50Brq2N1e
-	gKBUcm/N2FXShy76xZxgxM5nLDfkOnGpBqC6Mv4izLxv9SkkkFC7JwkileWMxy3s14bFvHgmgLQ
-	P2gKNDIu9SZDNqHysDbrbICx3Dn9REXD4pV+5fdXzjp73EePD2M+YxNQu6296dxlq+9GPs82kVS
-	w236R/Lv/YG04azFZX6B/hWaHeC74O0jCP95uXQt0lqQDFCPydG/J7OOav7HdINFY4DyKXm0t2/
-	Q6GBM1NTv6hDsd/5NXXkF73qLORQHMQx1nqI9QuDfVgy3+bQ==
-X-Received: by 2002:a05:6000:26d2:b0:43b:3d4f:e18d with SMTP id ffacd0b85a97d-43b64287044mr25237105f8f.39.1774357554406;
-        Tue, 24 Mar 2026 06:05:54 -0700 (PDT)
-Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b6470f902sm39989765f8f.28.2026.03.24.06.05.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 06:05:54 -0700 (PDT)
-Date: Tue, 24 Mar 2026 14:05:51 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, 
-	Chuck Lever <chuck.lever@oracle.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
-	Cosmin Ratiu <cratiu@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, 
-	Daniel Zahka <daniel.zahka@gmail.com>, Shay Drory <shayd@nvidia.com>, Kees Cook <kees@kernel.org>, 
-	Daniel Jurgens <danielj@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, 
-	Adithya Jayachandran <ajayachandra@nvidia.com>, Willem de Bruijn <willemb@google.com>, 
-	David Wei <dw@davidwei.uk>, Petr Machata <petrm@nvidia.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-kselftest@vger.kernel.org, Gal Pressman <gal@nvidia.com>, 
-	Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next V8 01/14] devlink: Update nested instance
- locking comment
-Message-ID: <owfpttw4n7ft5gisy4gvmd7z22hcafjlcr5i3e4t22j4w3rgz5@drxvpqqmiuen>
-References: <20260324122848.36731-1-tariqt@nvidia.com>
- <20260324122848.36731-2-tariqt@nvidia.com>
+	s=arc-20240116; t=1774357768; c=relaxed/simple;
+	bh=7IExQLdoaklosTrWWL0AAMEuAjaaUus+8pe4mqx3XOU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RmIIuWA83KDMDZsBULdiWjXK76VlqHF5rLJre4vggHSdVuugO2aSiRvig8XTvQlS7tqETau912hCTZqRPsqcDODk9kqOc0XPG9YsT72TnAPMGZo8a8JdS/QpXQEmEY8P2MsOsmQvJcMKQEdcW17N1Jja+5OthN88oM8Du4xmL+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S7JyPlau; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774357766; x=1805893766;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7IExQLdoaklosTrWWL0AAMEuAjaaUus+8pe4mqx3XOU=;
+  b=S7JyPlaubYLFsiQ+4rK0HcZ5E1SVivFd5rB7FYhJl1P9PkD0bYd5mvpj
+   HdmnF1dwENwSufCXyv2QpTtEZgtwCKd1MNfccDZr1l96srFWCpBuzSv7a
+   ygO2pOiXqyNWOwLLTngt2Z73hOst4UFMDoUa2ZMpgciq0/C2KH7fjl8YA
+   B22FWiZ9ZYTNkoslSqLohAUXnHubErTTY7gUKmchlWprVHQ0Ih6fGyOre
+   o43aPuEMFoGlMJWRaUmSbBEKggP7OAVHnw/3HHQrKH+OyYEmISYOwOfph
+   1Y9fKXAynjP/J8FXob0uFBsjOhrRwK3N899K/RjaIOuZlGWctmKiRn/ZJ
+   Q==;
+X-CSE-ConnectionGUID: 1OypTzq4SxKrWIc20tTEfQ==
+X-CSE-MsgGUID: naPzCyXFQn2Kf0DyHM8X5A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="77975886"
+X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
+   d="scan'208";a="77975886"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 06:09:25 -0700
+X-CSE-ConnectionGUID: 1if/zWsiRuy9X9x3yuid1w==
+X-CSE-MsgGUID: 4l+BDvUWQdepVfqWHfssWA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
+   d="scan'208";a="228400158"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by orviesa003.jf.intel.com with ESMTP; 24 Mar 2026 06:09:24 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH iwl-net v1] i40e: fix napi_enable/disable skipping ringless q_vectors
+Date: Tue, 24 Mar 2026 14:09:22 +0100
+Message-ID: <20260324130922.562714-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260324122848.36731-2-tariqt@nvidia.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271066-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[35];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,gmail.com,lwn.net,linuxfoundation.org,nvidia.com,oracle.com,davidwei.uk,fomichev.me,linux.dev,vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,resnulli-us.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B94DA309324
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271067-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
+X-Rspamd-Queue-Id: 0EBBA30942F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Tue, Mar 24, 2026 at 01:28:35PM +0100, tariqt@nvidia.com wrote:
->From: Cosmin Ratiu <cratiu@nvidia.com>
->
->In commit [1] a comment about nested instance locking was updated. But
->there's another place where this is mentioned, so update that as well.
->
->[1] commit 0061b5199d7c ("devlink: Reverse locking order for nested
->instances")
->
->Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
->Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
->Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+After ethtool -L reduces the queue count, i40e_napi_disable_all() sets
+NAPI_STATE_SCHED on all q_vectors, then i40e_vsi_map_rings_to_vectors()
+clears ring pointers on the excess ones.  i40e_napi_enable_all() skips
+those with:
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+	if (q_vector->rx.ring || q_vector->tx.ring)
+		napi_enable(&q_vector->napi);
+
+leaving them on dev->napi_list with NAPI_STATE_SCHED permanently set.
+
+Writing to /sys/class/net/<iface>/threaded calls napi_stop_kthread()
+on every entry in dev->napi_list.  The function loops on msleep(20)
+waiting for NAPI_STATE_SCHED to clear -- which never happens for the
+stale q_vectors.  The task hangs in D state forever; a concurrent write
+deadlocks on dev->lock held by the first.
+
+Commit 13a8cd191a2b added the guard to prevent a divide-by-zero in
+i40e_napi_poll() when epoll busy-poll iterated all device NAPIs (4.x
+era).  Since 7adc3d57fe2b ("net: Introduce preferred busy-polling",
+v5.11) napi_busy_loop() polls by napi_id keyed to the socket, so
+ringless q_vectors are never selected.  i40e_msix_clean_rings() also
+independently avoids scheduling NAPI for them.  The guard is safe to
+remove.
+
+Add an early return in i40e_napi_poll() for num_ringpairs == 0 so the
+function is self-defending against a NULL tx.ring dereference at the
+WB_ON_ITR check, should the NAPI ever fire through an unexpected path.
+
+Reported-by: Jakub Kicinski <kuba@kernel.org>
+Closes: https://lore.kernel.org/intel-wired-lan/20260316133100.6054a11f@kernel.org/
+Fixes: 13a8cd191a2b ("i40e: Do not enable NAPI on q_vectors that have no rings")
+Cc: stable@vger.kernel.org
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+Test configuration:
+  Kernel   : Linux 6.19.0-rc8+
+  NIC      : Intel Ethernet Controller XXV710 for 25GbE SFP28 [8086:158b]
+  Driver   : i40e (in-tree)
+  Firmware : 9.40 0x8000ed12 1.3429.0
+  CPU      : 2 x Intel Xeon Gold 6238M (88 logical CPUs, x86_64)
+  RAM      : 64 GiB
+
+Reproduction steps (FAIL before fix):
+  # 1. Reduce queues so excess q_vectors lose their ring pointers
+  ethtool -L <iface> combined 1
+
+  # 2. Enable threaded NAPI (completes fast in 6.19, no hang on enable path)
+  echo 1 > /sys/class/net/<iface>/threaded
+
+  # 3. Two concurrent writes to disable -- fires the msleep deadlock
+  echo 0 > /sys/class/net/<iface>/threaded &
+  echo 0 > /sys/class/net/<iface>/threaded &
+
+  Both background tasks enter uninterruptible sleep (D state) immediately
+  and never return.
+
+  Observed kernel stack (W1, holds dev->lock):
+    msleep+0x2d/0x50
+    napi_set_threaded+0x10b/0x110
+    netif_set_threaded+0xe1/0x140
+    threaded_store+0xd2/0x100
+    kernfs_fop_write_iter+0x138/0x1d0
+
+  Kernel hung_task message (~120 s after trigger):
+    INFO: task bash blocked for more than 122 seconds.
+    INFO: task bash is blocked on a mutex likely owned by task bash.
+
+Validation (PASS with fix):
+  Both background tasks exit within 1 second.
+  D-state process count: 0.
+  Busy-poll (net.core.busy_poll=50) + 50000-packet UDP flood with
+  1 active queue: no NULL dereference, no crash.
+
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 28 ++++++++++++---------
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c | 10 ++++++++
+ 2 files changed, 26 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index 926d001..5042f8c 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -5182,6 +5182,14 @@ static void i40e_clear_interrupt_scheme(struct i40e_pf *pf)
+ /**
+  * i40e_napi_enable_all - Enable NAPI for all q_vectors in the VSI
+  * @vsi: the VSI being configured
++ *
++ * Enable NAPI on every q_vector that is registered with the netdev,
++ * regardless of whether it currently has rings assigned.  After a queue-
++ * count reduction (e.g. ethtool -L combined 1) the excess q_vectors lose
++ * their ring pointers inside i40e_vsi_map_rings_to_vectors but remain on
++ * dev->napi_list.  Leaving them in the napi_disable()-ed state
++ * (NAPI_STATE_SCHED set) causes napi_set_threaded() to spin forever on
++ * msleep(20) waiting for that bit to clear.
+  **/
+ static void i40e_napi_enable_all(struct i40e_vsi *vsi)
+ {
+@@ -5190,17 +5198,17 @@ static void i40e_napi_enable_all(struct i40e_vsi *vsi)
+ 	if (!vsi->netdev)
+ 		return;
+ 
+-	for (q_idx = 0; q_idx < vsi->num_q_vectors; q_idx++) {
+-		struct i40e_q_vector *q_vector = vsi->q_vectors[q_idx];
+-
+-		if (q_vector->rx.ring || q_vector->tx.ring)
+-			napi_enable(&q_vector->napi);
+-	}
++	for (q_idx = 0; q_idx < vsi->num_q_vectors; q_idx++)
++		napi_enable(&vsi->q_vectors[q_idx]->napi);
+ }
+ 
+ /**
+  * i40e_napi_disable_all - Disable NAPI for all q_vectors in the VSI
+  * @vsi: the VSI being configured
++ *
++ * Mirror of i40e_napi_enable_all: operate on every registered q_vector so
++ * enable/disable calls are always balanced, even when some q_vectors carry
++ * no rings (as happens after a queue-count reduction).
+  **/
+ static void i40e_napi_disable_all(struct i40e_vsi *vsi)
+ {
+@@ -5209,12 +5217,8 @@ static void i40e_napi_disable_all(struct i40e_vsi *vsi)
+ 	if (!vsi->netdev)
+ 		return;
+ 
+-	for (q_idx = 0; q_idx < vsi->num_q_vectors; q_idx++) {
+-		struct i40e_q_vector *q_vector = vsi->q_vectors[q_idx];
+-
+-		if (q_vector->rx.ring || q_vector->tx.ring)
+-			napi_disable(&q_vector->napi);
+-	}
++	for (q_idx = 0; q_idx < vsi->num_q_vectors; q_idx++)
++		napi_disable(&vsi->q_vectors[q_idx]->napi);
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+index 894f2d0..3123459 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+@@ -2760,6 +2760,16 @@ int i40e_napi_poll(struct napi_struct *napi, int budget)
+ 		return 0;
+ 	}
+ 
++	/* A q_vector can have its ring pointers cleared after a queue-count
++	 * reduction (ethtool -L combined N) while napi_enable() was already
++	 * called on it.  Complete immediately so the poll loop exits cleanly
++	 * and we never dereference the NULL ring pointer below.
++	 */
++	if (unlikely(!q_vector->num_ringpairs)) {
++		napi_complete_done(napi, 0);
++		return 0;
++	}
++
+ 	/* Since the actual Tx work is minimal, we can give the Tx a larger
+ 	 * budget and be more aggressive about cleaning up the Tx descriptors.
+ 	 */
+-- 
+2.52.0
+
 
