@@ -1,110 +1,77 @@
-Return-Path: <netdev+bounces-271524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271525-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cAA2Ca3Ww2lwuQQAu9opvQ
-	(envelope-from <netdev+bounces-271524-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 13:35:57 +0100
+	id cKjXKGzaw2lwuQQAu9opvQ
+	(envelope-from <netdev+bounces-271525-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 13:51:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DFBE324F70
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 13:35:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07B89325320
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 13:51:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 68FBD3166DD2
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 12:13:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 810C8335DE9C
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 12:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164433DB638;
-	Wed, 25 Mar 2026 12:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HCymKhvu";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hILDJom6";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HCymKhvu";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hILDJom6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2883DBD40;
+	Wed, 25 Mar 2026 12:11:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDFF3DA7E3
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 12:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9ABD3D566B
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 12:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774440689; cv=none; b=RSTo0xzsPNWu0Z/rKgE2Ku/Idd6NerBoqS1/nyIPoI0LGvtnb8hk+kCnM4UhK/3gWd16XmU/FYX9nS9cSXKexZ4Sia8KHp1RGQtVWsPTmj+4rKEgV/ojSgd057BrDQ7X2WGVPF4kfuk++NFtQDD+/OAChBNEXtb/u0biMBhul8E=
+	t=1774440696; cv=none; b=CPgIaQG8glwJwpN0wk6oSNS/n1aXIj/W4hR1iUm3ElUqaQTZdB+lPF7l3BnJnFL3f9jHXTwD2HYC6kASJkP9f83jhbcpy+iwV4OouiIhipBkhH+RG025dmJVMvMo+6QRuyVQivB8AS88gXaoAjotj7EDGLciwEg2Htb8niOsA6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774440689; c=relaxed/simple;
-	bh=uvc/oFHdNoZKiacIaapij73qjvotaDSVAlVkne8H+n8=;
+	s=arc-20240116; t=1774440696; c=relaxed/simple;
+	bh=zu3aLA0rvDaDrhmPPuqjpIE3CrfmdSxcAd9b1qb2ZYQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E3rF5fhNQoBExDZYUeNvrV+3wgbXYdw9G0W+hSy+iNnmNePcZd/g79bPhkCLIkk4sLT55IDZy4ipn+u6JD1TIzCgRnxShuG4sPnbvfmhRSBF3jJ8zTO9C7mbDlw3Cqx4A8xTAnWlfCZNvrZMoZiz01eU+q8uFe1eOMkhJArTr/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HCymKhvu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hILDJom6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HCymKhvu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hILDJom6; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version:Content-Type; b=pdeSiwD6Hps+t5+opNVSs8m3nsqNj6cECs0VCtADdPz77iDVnwFTTRDMCIe27ToxhmfHHvBQRhvw762rAp5EY5OMzLD5Y0tF9ewqkZ9R2c8KfoHGp25k6iI5prsKdlaLBmDWTrnuBE8YvMOCs1R78xvacE1jCY1GWwLg75FRuxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id C336D5BCCF;
-	Wed, 25 Mar 2026 12:11:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1774440680; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IIeqtjPrEfWXXR7DA3h8n7OIs5BFX7/wUbz+m8e3AY0=;
-	b=HCymKhvuy8eAv19yTrgOZ95N41HA55Nron2wOqybPHn2IrxTt0oHVAD1HmyAl+PFSAkHBY
-	M/8NAMoUzseZrbCEAcr4xdiLru3v2y9X6/0/1jakDZhd9ioP0WV89+NQVTcqX91UQyPTi/
-	LUfMS9bCTQAWTwVfCKdwXwjcSWUNuAo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1774440680;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IIeqtjPrEfWXXR7DA3h8n7OIs5BFX7/wUbz+m8e3AY0=;
-	b=hILDJom6CvVrhPtOvTZvfiNV5/4ntxBx/FBS8DQdE1XSYr2DfLpOT66T2uFqPvoZMHfefm
-	VjCg5KGXkuMl9cCQ==
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0ABA15BCD0;
+	Wed, 25 Mar 2026 12:11:25 +0000 (UTC)
 Authentication-Results: smtp-out2.suse.de;
 	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1774440680; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IIeqtjPrEfWXXR7DA3h8n7OIs5BFX7/wUbz+m8e3AY0=;
-	b=HCymKhvuy8eAv19yTrgOZ95N41HA55Nron2wOqybPHn2IrxTt0oHVAD1HmyAl+PFSAkHBY
-	M/8NAMoUzseZrbCEAcr4xdiLru3v2y9X6/0/1jakDZhd9ioP0WV89+NQVTcqX91UQyPTi/
-	LUfMS9bCTQAWTwVfCKdwXwjcSWUNuAo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1774440680;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IIeqtjPrEfWXXR7DA3h8n7OIs5BFX7/wUbz+m8e3AY0=;
-	b=hILDJom6CvVrhPtOvTZvfiNV5/4ntxBx/FBS8DQdE1XSYr2DfLpOT66T2uFqPvoZMHfefm
-	VjCg5KGXkuMl9cCQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 277D9443BE;
-	Wed, 25 Mar 2026 12:11:20 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0407F443BE;
+	Wed, 25 Mar 2026 12:11:23 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id cKKqBujQw2kbNgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Wed, 25 Mar 2026 12:11:20 +0000
+	id mO2VOevQw2kbNgAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Wed, 25 Mar 2026 12:11:23 +0000
 From: Fernando Fernandez Mancera <fmancera@suse.de>
 To: netdev@vger.kernel.org
 Cc: Fernando Fernandez Mancera <fmancera@suse.de>,
 	=?UTF-8?q?Ricardo=20B=2E=20Marli=C3=A8re?= <rbm@suse.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 10/11 net-next v5] ipv6: remove ipv6_stub infrastructure completely
-Date: Wed, 25 Mar 2026 13:08:51 +0100
-Message-ID: <20260325120928.15848-11-fmancera@suse.de>
+	David Ahern <dsahern@kernel.org>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org,
+	bridge@lists.linux.dev
+Subject: [PATCH 11/11 net-next v5] netfilter: remove nf_ipv6_ops and use direct function calls
+Date: Wed, 25 Mar 2026 13:08:52 +0100
+Message-ID: <20260325120928.15848-12-fmancera@suse.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260325120928.15848-1-fmancera@suse.de>
 References: <20260325120928.15848-1-fmancera@suse.de>
@@ -116,438 +83,505 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -7.30
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spam-Score: -4.00
 X-Spam-Level: 
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[suse.de : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.de:+];
+	TAGGED_FROM(0.00)[bounces-271525-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271524-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.de:dkim,suse.de:email,suse.de:mid]
-X-Rspamd-Queue-Id: 2DFBE324F70
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:email,suse.de:mid,suse.com:email]
+X-Rspamd-Queue-Id: 07B89325320
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-As IPv6 is built-in only and there are no more users of ipv6_stub, the
-ipv6_stub is now entirely obsolete.
+As IPv6 is built-in only, nf_ipv6_ops can be removed completely as it is
+not longer necessary.
 
-Remove all the code related to the definition, initialization and usage.
+Convert all nf_ipv6_ops usage to direct function calls instead. In
+addition, remove the ipv6_netfilter_init/fini() functions as they are
+not necessary any longer.
 
 Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 Tested-by: Ricardo B. Marlière <rbm@suse.com>
 ---
- include/net/ip6_fib.h     |  1 -
- include/net/ipv6_stubs.h  | 80 ----------------------------------
- include/net/ndisc.h       | 25 +----------
- include/net/udp_tunnel.h  |  1 -
- net/ipv6/addrconf_core.c  | 91 ---------------------------------------
- net/ipv6/af_inet6.c       | 40 -----------------
- net/ipv6/ip6_fib.c        |  8 ----
- net/ipv6/ip6_udp_tunnel.c |  3 +-
- 8 files changed, 3 insertions(+), 246 deletions(-)
- delete mode 100644 include/net/ipv6_stubs.h
+ include/linux/netfilter_ipv6.h    | 102 ++----------------------------
+ net/bridge/br_netfilter_hooks.c   |  12 +---
+ net/bridge/br_netfilter_ipv6.c    |   7 +-
+ net/ipv6/af_inet6.c               |   6 --
+ net/ipv6/netfilter.c              |  48 --------------
+ net/netfilter/core.c              |   3 -
+ net/netfilter/nf_nat_masquerade.c |  21 +-----
+ net/netfilter/nfnetlink_queue.c   |  22 +++++--
+ net/netfilter/utils.c             |   1 -
+ 9 files changed, 32 insertions(+), 190 deletions(-)
 
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index f01ef8ffe296..3e72cce4fe0f 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -602,7 +602,6 @@ static inline void fib6_update_sernum_upto_root(struct net *net, struct fib6_inf
- {
- }
- #endif
--void fib6_update_sernum_stub(struct net *net, struct fib6_info *f6i);
+diff --git a/include/linux/netfilter_ipv6.h b/include/linux/netfilter_ipv6.h
+index 61aa48f46dd7..5ce45b6d890f 100644
+--- a/include/linux/netfilter_ipv6.h
++++ b/include/linux/netfilter_ipv6.h
+@@ -34,59 +34,13 @@ struct ip6_rt_info {
+ struct nf_queue_entry;
+ struct nf_bridge_frag_data;
  
- void fib6_metric_set(struct fib6_info *f6i, int metric, u32 val);
- static inline bool fib6_metric_locked(struct fib6_info *f6i, int metric)
-diff --git a/include/net/ipv6_stubs.h b/include/net/ipv6_stubs.h
-deleted file mode 100644
-index dc708d9eca7a..000000000000
---- a/include/net/ipv6_stubs.h
-+++ /dev/null
-@@ -1,80 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef _IPV6_STUBS_H
--#define _IPV6_STUBS_H
--
--#include <linux/in6.h>
--#include <linux/netdevice.h>
--#include <linux/skbuff.h>
--#include <net/dst.h>
--#include <net/flow.h>
--#include <net/neighbour.h>
--#include <net/sock.h>
--#include <net/ipv6.h>
--
--/* structs from net/ip6_fib.h */
--struct fib6_info;
--struct fib6_nh;
--struct fib6_config;
--struct fib6_result;
--
--/* This is ugly, ideally these symbols should be built
-- * into the core kernel.
+-/*
+- * Hook functions for ipv6 to allow xt_* modules to be built-in even
+- * if IPv6 is a module.
 - */
--struct ipv6_stub {
--	int (*ipv6_sock_mc_join)(struct sock *sk, int ifindex,
--				 const struct in6_addr *addr);
--	int (*ipv6_sock_mc_drop)(struct sock *sk, int ifindex,
--				 const struct in6_addr *addr);
--	struct dst_entry *(*ipv6_dst_lookup_flow)(struct net *net,
--						  const struct sock *sk,
--						  struct flowi6 *fl6,
--						  const struct in6_addr *final_dst);
--	int (*ipv6_route_input)(struct sk_buff *skb);
--
--	struct fib6_table *(*fib6_get_table)(struct net *net, u32 id);
--	int (*fib6_lookup)(struct net *net, int oif, struct flowi6 *fl6,
--			   struct fib6_result *res, int flags);
--	int (*fib6_table_lookup)(struct net *net, struct fib6_table *table,
--				 int oif, struct flowi6 *fl6,
--				 struct fib6_result *res, int flags);
--	void (*fib6_select_path)(const struct net *net, struct fib6_result *res,
--				 struct flowi6 *fl6, int oif, bool oif_match,
--				 const struct sk_buff *skb, int strict);
--	u32 (*ip6_mtu_from_fib6)(const struct fib6_result *res,
--				 const struct in6_addr *daddr,
--				 const struct in6_addr *saddr);
--
--	int (*fib6_nh_init)(struct net *net, struct fib6_nh *fib6_nh,
--			    struct fib6_config *cfg, gfp_t gfp_flags,
--			    struct netlink_ext_ack *extack);
--	void (*fib6_nh_release)(struct fib6_nh *fib6_nh);
--	void (*fib6_nh_release_dsts)(struct fib6_nh *fib6_nh);
--	void (*fib6_update_sernum)(struct net *net, struct fib6_info *rt);
--	int (*ip6_del_rt)(struct net *net, struct fib6_info *rt, bool skip_notify);
--	void (*fib6_rt_update)(struct net *net, struct fib6_info *rt,
--			       struct nl_info *info);
--
--	void (*udpv6_encap_enable)(void);
--	void (*ndisc_send_na)(struct net_device *dev, const struct in6_addr *daddr,
--			      const struct in6_addr *solicited_addr,
--			      bool router, bool solicited, bool override, bool inc_opt);
--#if IS_ENABLED(CONFIG_XFRM)
--	void (*xfrm6_local_rxpmtu)(struct sk_buff *skb, u32 mtu);
--	int (*xfrm6_udp_encap_rcv)(struct sock *sk, struct sk_buff *skb);
--	struct sk_buff *(*xfrm6_gro_udp_encap_rcv)(struct sock *sk,
--						   struct list_head *head,
--						   struct sk_buff *skb);
--	int (*xfrm6_rcv_encap)(struct sk_buff *skb, int nexthdr, __be32 spi,
--			       int encap_type);
+-struct nf_ipv6_ops {
+-#if IS_MODULE(CONFIG_IPV6)
+-	int (*chk_addr)(struct net *net, const struct in6_addr *addr,
+-			const struct net_device *dev, int strict);
+-	int (*route_me_harder)(struct net *net, struct sock *sk, struct sk_buff *skb);
+-	int (*dev_get_saddr)(struct net *net, const struct net_device *dev,
+-		       const struct in6_addr *daddr, unsigned int srcprefs,
+-		       struct in6_addr *saddr);
+-	int (*route)(struct net *net, struct dst_entry **dst, struct flowi *fl,
+-		     bool strict);
+-	u32 (*cookie_init_sequence)(const struct ipv6hdr *iph,
+-				    const struct tcphdr *th, u16 *mssp);
+-	int (*cookie_v6_check)(const struct ipv6hdr *iph,
+-			       const struct tcphdr *th);
 -#endif
--	struct neigh_table *nd_tbl;
--
--	int (*ipv6_fragment)(struct net *net, struct sock *sk, struct sk_buff *skb,
--			     int (*output)(struct net *, struct sock *, struct sk_buff *));
--	struct net_device *(*ipv6_dev_find)(struct net *net, const struct in6_addr *addr,
--					    struct net_device *dev);
--	int (*ip6_xmit)(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
--			__u32 mark, struct ipv6_txoptions *opt, int tclass, u32 priority);
+-	void (*route_input)(struct sk_buff *skb);
+-	int (*fragment)(struct net *net, struct sock *sk, struct sk_buff *skb,
+-			int (*output)(struct net *, struct sock *, struct sk_buff *));
+-	int (*reroute)(struct sk_buff *skb, const struct nf_queue_entry *entry);
+-#if IS_MODULE(CONFIG_IPV6)
+-	int (*br_fragment)(struct net *net, struct sock *sk,
+-			   struct sk_buff *skb,
+-			   struct nf_bridge_frag_data *data,
+-			   int (*output)(struct net *, struct sock *sk,
+-					 const struct nf_bridge_frag_data *data,
+-					 struct sk_buff *));
+-#endif
 -};
--extern const struct ipv6_stub *ipv6_stub __read_mostly;
--#endif
-diff --git a/include/net/ndisc.h b/include/net/ndisc.h
-index 19e2a177bd29..3da1a6f8d3f9 100644
---- a/include/net/ndisc.h
-+++ b/include/net/ndisc.h
-@@ -2,8 +2,6 @@
- #ifndef _NDISC_H
- #define _NDISC_H
- 
--#include <net/ipv6_stubs.h>
 -
- /*
-  *	ICMP codes for neighbour discovery messages
-  */
-@@ -359,14 +357,6 @@ static inline struct neighbour *__ipv6_neigh_lookup_noref(struct net_device *dev
- 	return ___neigh_lookup_noref(&nd_tbl, neigh_key_eq128, ndisc_hashfn, pkey, dev);
- }
- 
--static inline
--struct neighbour *__ipv6_neigh_lookup_noref_stub(struct net_device *dev,
--						 const void *pkey)
--{
--	return ___neigh_lookup_noref(ipv6_stub->nd_tbl, neigh_key_eq128,
--				     ndisc_hashfn, pkey, dev);
--}
--
- static inline struct neighbour *__ipv6_neigh_lookup(struct net_device *dev, const void *pkey)
- {
- 	struct neighbour *n;
-@@ -391,25 +381,13 @@ static inline void __ipv6_confirm_neigh(struct net_device *dev,
- 	rcu_read_unlock();
- }
- 
--static inline void __ipv6_confirm_neigh_stub(struct net_device *dev,
--					     const void *pkey)
--{
--	struct neighbour *n;
--
--	rcu_read_lock();
--	n = __ipv6_neigh_lookup_noref_stub(dev, pkey);
--	neigh_confirm(n);
--	rcu_read_unlock();
--}
--
--/* uses ipv6_stub and is meant for use outside of IPv6 core */
- static inline struct neighbour *ip_neigh_gw6(struct net_device *dev,
- 					     const void *addr)
- {
- #if IS_ENABLED(CONFIG_IPV6)
- 	struct neighbour *neigh;
- 
--	neigh = __ipv6_neigh_lookup_noref_stub(dev, addr);
-+	neigh = __ipv6_neigh_lookup_noref(dev, addr);
- 	if (unlikely(!neigh))
- 		neigh = __neigh_create(&nd_tbl, addr, dev, false);
- 
-@@ -438,6 +416,7 @@ void ndisc_send_skb(struct sk_buff *skb, const struct in6_addr *daddr,
- 
- void ndisc_send_rs(struct net_device *dev,
- 		   const struct in6_addr *saddr, const struct in6_addr *daddr);
-+
- void ndisc_send_na(struct net_device *dev, const struct in6_addr *daddr,
- 		   const struct in6_addr *solicited_addr,
- 		   bool router, bool solicited, bool override, bool inc_opt);
-diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
-index 40089fc4c1ba..47c23d4a1740 100644
---- a/include/net/udp_tunnel.h
-+++ b/include/net/udp_tunnel.h
-@@ -7,7 +7,6 @@
- 
- #if IS_ENABLED(CONFIG_IPV6)
- #include <net/ipv6.h>
--#include <net/ipv6_stubs.h>
- #endif
- 
- #define UDP_TUNNEL_PARTIAL_FEATURES	NETIF_F_GSO_ENCAP_ALL
-diff --git a/net/ipv6/addrconf_core.c b/net/ipv6/addrconf_core.c
-index c008d21925d7..fa27a90ab3cd 100644
---- a/net/ipv6/addrconf_core.c
-+++ b/net/ipv6/addrconf_core.c
-@@ -6,7 +6,6 @@
- 
- #include <linux/export.h>
- #include <net/ipv6.h>
--#include <net/ipv6_stubs.h>
+ #ifdef CONFIG_NETFILTER
  #include <net/addrconf.h>
- #include <net/ip.h>
  
-@@ -129,96 +128,6 @@ int inet6addr_validator_notifier_call_chain(unsigned long val, void *v)
+-extern const struct nf_ipv6_ops __rcu *nf_ipv6_ops;
+-static inline const struct nf_ipv6_ops *nf_get_ipv6_ops(void)
+-{
+-	return rcu_dereference(nf_ipv6_ops);
+-}
+-
+ static inline int nf_ipv6_chk_addr(struct net *net, const struct in6_addr *addr,
+ 				   const struct net_device *dev, int strict)
+ {
+-#if IS_MODULE(CONFIG_IPV6)
+-	const struct nf_ipv6_ops *v6_ops = nf_get_ipv6_ops();
+-
+-	if (!v6_ops)
+-		return 1;
+-
+-	return v6_ops->chk_addr(net, addr, dev, strict);
+-#elif IS_BUILTIN(CONFIG_IPV6)
++#if IS_ENABLED(CONFIG_IPV6)
+ 	return ipv6_chk_addr(net, addr, dev, strict);
+ #else
+ 	return 1;
+@@ -99,15 +53,7 @@ int __nf_ip6_route(struct net *net, struct dst_entry **dst,
+ static inline int nf_ip6_route(struct net *net, struct dst_entry **dst,
+ 			       struct flowi *fl, bool strict)
+ {
+-#if IS_MODULE(CONFIG_IPV6)
+-	const struct nf_ipv6_ops *v6ops = nf_get_ipv6_ops();
+-
+-	if (v6ops)
+-		return v6ops->route(net, dst, fl, strict);
+-
+-	return -EHOSTUNREACH;
+-#endif
+-#if IS_BUILTIN(CONFIG_IPV6)
++#if IS_ENABLED(CONFIG_IPV6)
+ 	return __nf_ip6_route(net, dst, fl, strict);
+ #else
+ 	return -EHOSTUNREACH;
+@@ -129,14 +75,7 @@ static inline int nf_br_ip6_fragment(struct net *net, struct sock *sk,
+ 						   const struct nf_bridge_frag_data *data,
+ 						   struct sk_buff *))
+ {
+-#if IS_MODULE(CONFIG_IPV6)
+-	const struct nf_ipv6_ops *v6_ops = nf_get_ipv6_ops();
+-
+-	if (!v6_ops)
+-		return 1;
+-
+-	return v6_ops->br_fragment(net, sk, skb, data, output);
+-#elif IS_BUILTIN(CONFIG_IPV6)
++#if IS_ENABLED(CONFIG_IPV6)
+ 	return br_ip6_fragment(net, sk, skb, data, output);
+ #else
+ 	return 1;
+@@ -147,14 +86,7 @@ int ip6_route_me_harder(struct net *net, struct sock *sk, struct sk_buff *skb);
+ 
+ static inline int nf_ip6_route_me_harder(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+-#if IS_MODULE(CONFIG_IPV6)
+-	const struct nf_ipv6_ops *v6_ops = nf_get_ipv6_ops();
+-
+-	if (!v6_ops)
+-		return -EHOSTUNREACH;
+-
+-	return v6_ops->route_me_harder(net, sk, skb);
+-#elif IS_BUILTIN(CONFIG_IPV6)
++#if IS_ENABLED(CONFIG_IPV6)
+ 	return ip6_route_me_harder(net, sk, skb);
+ #else
+ 	return -EHOSTUNREACH;
+@@ -165,15 +97,8 @@ static inline u32 nf_ipv6_cookie_init_sequence(const struct ipv6hdr *iph,
+ 					       const struct tcphdr *th,
+ 					       u16 *mssp)
+ {
+-#if IS_ENABLED(CONFIG_SYN_COOKIES)
+-#if IS_MODULE(CONFIG_IPV6)
+-	const struct nf_ipv6_ops *v6_ops = nf_get_ipv6_ops();
+-
+-	if (v6_ops)
+-		return v6_ops->cookie_init_sequence(iph, th, mssp);
+-#elif IS_BUILTIN(CONFIG_IPV6)
++#if IS_ENABLED(CONFIG_IPV6) && IS_ENABLED(CONFIG_SYN_COOKIES)
+ 	return __cookie_v6_init_sequence(iph, th, mssp);
+-#endif
+ #endif
+ 	return 0;
  }
- EXPORT_SYMBOL(inet6addr_validator_notifier_call_chain);
+@@ -181,15 +106,8 @@ static inline u32 nf_ipv6_cookie_init_sequence(const struct ipv6hdr *iph,
+ static inline int nf_cookie_v6_check(const struct ipv6hdr *iph,
+ 				     const struct tcphdr *th)
+ {
+-#if IS_ENABLED(CONFIG_SYN_COOKIES)
+-#if IS_MODULE(CONFIG_IPV6)
+-	const struct nf_ipv6_ops *v6_ops = nf_get_ipv6_ops();
+-
+-	if (v6_ops)
+-		return v6_ops->cookie_v6_check(iph, th);
+-#elif IS_BUILTIN(CONFIG_IPV6)
++#if IS_ENABLED(CONFIG_IPV6) && IS_ENABLED(CONFIG_SYN_COOKIES)
+ 	return __cookie_v6_check(iph, th);
+-#endif
+ #endif
+ 	return 0;
+ }
+@@ -198,14 +116,6 @@ __sum16 nf_ip6_checksum(struct sk_buff *skb, unsigned int hook,
+ 			unsigned int dataoff, u_int8_t protocol);
  
--static struct dst_entry *eafnosupport_ipv6_dst_lookup_flow(struct net *net,
--							   const struct sock *sk,
--							   struct flowi6 *fl6,
--							   const struct in6_addr *final_dst)
--{
--	return ERR_PTR(-EAFNOSUPPORT);
--}
+ int nf_ip6_check_hbh_len(struct sk_buff *skb, u32 *plen);
 -
--static int eafnosupport_ipv6_route_input(struct sk_buff *skb)
--{
--	return -EAFNOSUPPORT;
--}
+-int ipv6_netfilter_init(void);
+-void ipv6_netfilter_fini(void);
 -
--static struct fib6_table *eafnosupport_fib6_get_table(struct net *net, u32 id)
--{
--	return NULL;
--}
+-#else /* CONFIG_NETFILTER */
+-static inline int ipv6_netfilter_init(void) { return 0; }
+-static inline void ipv6_netfilter_fini(void) { return; }
+-static inline const struct nf_ipv6_ops *nf_get_ipv6_ops(void) { return NULL; }
+ #endif /* CONFIG_NETFILTER */
+ 
+ #endif /*__LINUX_IP6_NETFILTER_H*/
+diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_hooks.c
+index 083e2fe96441..0ab1c94db4b9 100644
+--- a/net/bridge/br_netfilter_hooks.c
++++ b/net/bridge/br_netfilter_hooks.c
+@@ -32,6 +32,7 @@
+ 
+ #include <net/ip.h>
+ #include <net/ipv6.h>
++#include <net/ip6_route.h>
+ #include <net/addrconf.h>
+ #include <net/dst_metadata.h>
+ #include <net/route.h>
+@@ -890,7 +891,6 @@ static int br_nf_dev_queue_xmit(struct net *net, struct sock *sk, struct sk_buff
+ 	}
+ 	if (IS_ENABLED(CONFIG_NF_DEFRAG_IPV6) &&
+ 	    skb->protocol == htons(ETH_P_IPV6)) {
+-		const struct nf_ipv6_ops *v6ops = nf_get_ipv6_ops();
+ 		struct brnf_frag_data *data;
+ 
+ 		if (br_validate_ipv6(net, skb))
+@@ -906,15 +906,9 @@ static int br_nf_dev_queue_xmit(struct net *net, struct sock *sk, struct sk_buff
+ 		skb_copy_from_linear_data_offset(skb, -data->size, data->mac,
+ 						 data->size);
+ 
+-		if (v6ops) {
+-			ret = v6ops->fragment(net, sk, skb, br_nf_push_frag_xmit);
+-			local_unlock_nested_bh(&brnf_frag_data_storage.bh_lock);
+-			return ret;
+-		}
++		ret = ip6_fragment(net, sk, skb, br_nf_push_frag_xmit);
+ 		local_unlock_nested_bh(&brnf_frag_data_storage.bh_lock);
 -
--static int
--eafnosupport_fib6_table_lookup(struct net *net, struct fib6_table *table,
--			       int oif, struct flowi6 *fl6,
--			       struct fib6_result *res, int flags)
+-		kfree_skb(skb);
+-		return -EMSGSIZE;
++		return ret;
+ 	}
+ 	nf_bridge_info_free(skb);
+ 	return br_dev_queue_push_xmit(net, sk, skb);
+diff --git a/net/bridge/br_netfilter_ipv6.c b/net/bridge/br_netfilter_ipv6.c
+index 76ce70b4e7f3..d8548428929e 100644
+--- a/net/bridge/br_netfilter_ipv6.c
++++ b/net/bridge/br_netfilter_ipv6.c
+@@ -30,6 +30,7 @@
+ 
+ #include <net/ip.h>
+ #include <net/ipv6.h>
++#include <net/ip6_route.h>
+ #include <net/addrconf.h>
+ #include <net/route.h>
+ #include <net/netfilter/br_netfilter.h>
+@@ -95,15 +96,13 @@ br_nf_ipv6_daddr_was_changed(const struct sk_buff *skb,
+ 
+ /* PF_BRIDGE/PRE_ROUTING: Undo the changes made for ip6tables
+  * PREROUTING and continue the bridge PRE_ROUTING hook. See comment
+- * for br_nf_pre_routing_finish(), same logic is used here but
+- * equivalent IPv6 function ip6_route_input() called indirectly.
++ * for br_nf_pre_routing_finish(), same logic is used here.
+  */
+ static int br_nf_pre_routing_finish_ipv6(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct nf_bridge_info *nf_bridge = nf_bridge_info_get(skb);
+ 	struct rtable *rt;
+ 	struct net_device *dev = skb->dev, *br_indev;
+-	const struct nf_ipv6_ops *v6ops = nf_get_ipv6_ops();
+ 
+ 	br_indev = nf_bridge_get_physindev(skb, net);
+ 	if (!br_indev) {
+@@ -120,7 +119,7 @@ static int br_nf_pre_routing_finish_ipv6(struct net *net, struct sock *sk, struc
+ 	nf_bridge->in_prerouting = 0;
+ 	if (br_nf_ipv6_daddr_was_changed(skb, nf_bridge)) {
+ 		skb_dst_drop(skb);
+-		v6ops->route_input(skb);
++		ip6_route_input(skb);
+ 
+ 		if (skb_dst(skb)->error) {
+ 			kfree_skb(skb);
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index 33abd8d8cd7d..ee341a8254bf 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -38,7 +38,6 @@
+ #include <linux/inet.h>
+ #include <linux/netdevice.h>
+ #include <linux/icmpv6.h>
+-#include <linux/netfilter_ipv6.h>
+ 
+ #include <net/ip.h>
+ #include <net/ipv6.h>
+@@ -1066,9 +1065,6 @@ static int __init inet6_init(void)
+ 	if (err)
+ 		goto igmp_fail;
+ 
+-	err = ipv6_netfilter_init();
+-	if (err)
+-		goto netfilter_fail;
+ 	/* Create /proc/foo6 entries. */
+ #ifdef CONFIG_PROC_FS
+ 	err = -ENOMEM;
+@@ -1199,8 +1195,6 @@ static int __init inet6_init(void)
+ 	raw6_proc_exit();
+ proc_raw6_fail:
+ #endif
+-	ipv6_netfilter_fini();
+-netfilter_fail:
+ 	igmp6_cleanup();
+ igmp_fail:
+ 	ndisc_cleanup();
+diff --git a/net/ipv6/netfilter.c b/net/ipv6/netfilter.c
+index c3dc90dfab80..6d80f85e55fa 100644
+--- a/net/ipv6/netfilter.c
++++ b/net/ipv6/netfilter.c
+@@ -86,21 +86,6 @@ int ip6_route_me_harder(struct net *net, struct sock *sk_partial, struct sk_buff
+ }
+ EXPORT_SYMBOL(ip6_route_me_harder);
+ 
+-static int nf_ip6_reroute(struct sk_buff *skb,
+-			  const struct nf_queue_entry *entry)
 -{
--	return -EAFNOSUPPORT;
--}
+-	struct ip6_rt_info *rt_info = nf_queue_entry_reroute(entry);
 -
--static int
--eafnosupport_fib6_lookup(struct net *net, int oif, struct flowi6 *fl6,
--			 struct fib6_result *res, int flags)
--{
--	return -EAFNOSUPPORT;
--}
--
--static void
--eafnosupport_fib6_select_path(const struct net *net, struct fib6_result *res,
--			      struct flowi6 *fl6, int oif, bool have_oif_match,
--			      const struct sk_buff *skb, int strict)
--{
--}
--
--static u32
--eafnosupport_ip6_mtu_from_fib6(const struct fib6_result *res,
--			       const struct in6_addr *daddr,
--			       const struct in6_addr *saddr)
--{
+-	if (entry->state.hook == NF_INET_LOCAL_OUT) {
+-		const struct ipv6hdr *iph = ipv6_hdr(skb);
+-		if (!ipv6_addr_equal(&iph->daddr, &rt_info->daddr) ||
+-		    !ipv6_addr_equal(&iph->saddr, &rt_info->saddr) ||
+-		    skb->mark != rt_info->mark)
+-			return ip6_route_me_harder(entry->state.net, entry->state.sk, skb);
+-	}
 -	return 0;
 -}
 -
--static int eafnosupport_fib6_nh_init(struct net *net, struct fib6_nh *fib6_nh,
--				     struct fib6_config *cfg, gfp_t gfp_flags,
--				     struct netlink_ext_ack *extack)
--{
--	NL_SET_ERR_MSG(extack, "IPv6 support not enabled in kernel");
--	return -EAFNOSUPPORT;
--}
+ int __nf_ip6_route(struct net *net, struct dst_entry **dst,
+ 		   struct flowi *fl, bool strict)
+ {
+@@ -243,36 +228,3 @@ int br_ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(br_ip6_fragment);
 -
--static int eafnosupport_ip6_del_rt(struct net *net, struct fib6_info *rt,
--				   bool skip_notify)
--{
--	return -EAFNOSUPPORT;
--}
--
--static int eafnosupport_ipv6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
--				      int (*output)(struct net *, struct sock *, struct sk_buff *))
--{
--	kfree_skb(skb);
--	return -EAFNOSUPPORT;
--}
--
--static struct net_device *eafnosupport_ipv6_dev_find(struct net *net, const struct in6_addr *addr,
--						     struct net_device *dev)
--{
--	return ERR_PTR(-EAFNOSUPPORT);
--}
--
--const struct ipv6_stub *ipv6_stub __read_mostly = &(struct ipv6_stub) {
--	.ipv6_dst_lookup_flow = eafnosupport_ipv6_dst_lookup_flow,
--	.ipv6_route_input  = eafnosupport_ipv6_route_input,
--	.fib6_get_table    = eafnosupport_fib6_get_table,
--	.fib6_table_lookup = eafnosupport_fib6_table_lookup,
--	.fib6_lookup       = eafnosupport_fib6_lookup,
--	.fib6_select_path  = eafnosupport_fib6_select_path,
--	.ip6_mtu_from_fib6 = eafnosupport_ip6_mtu_from_fib6,
--	.fib6_nh_init	   = eafnosupport_fib6_nh_init,
--	.ip6_del_rt	   = eafnosupport_ip6_del_rt,
--	.ipv6_fragment	   = eafnosupport_ipv6_fragment,
--	.ipv6_dev_find     = eafnosupport_ipv6_dev_find,
+-static const struct nf_ipv6_ops ipv6ops = {
+-#if IS_MODULE(CONFIG_IPV6)
+-	.chk_addr		= ipv6_chk_addr,
+-	.route_me_harder	= ip6_route_me_harder,
+-	.dev_get_saddr		= ipv6_dev_get_saddr,
+-	.route			= __nf_ip6_route,
+-#if IS_ENABLED(CONFIG_SYN_COOKIES)
+-	.cookie_init_sequence	= __cookie_v6_init_sequence,
+-	.cookie_v6_check	= __cookie_v6_check,
+-#endif
+-#endif
+-	.route_input		= ip6_route_input,
+-	.fragment		= ip6_fragment,
+-	.reroute		= nf_ip6_reroute,
+-#if IS_MODULE(CONFIG_IPV6)
+-	.br_fragment		= br_ip6_fragment,
+-#endif
 -};
--EXPORT_SYMBOL_GPL(ipv6_stub);
 -
- /* IPv6 Wildcard Address and Loopback Address defined by RFC2553 */
- const struct in6_addr in6addr_loopback __aligned(BITS_PER_LONG/8)
- 	= IN6ADDR_LOOPBACK_INIT;
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index 07ae6ea7743a..33abd8d8cd7d 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -51,7 +51,6 @@
- #include <net/transp_v6.h>
- #include <net/ip6_route.h>
- #include <net/addrconf.h>
--#include <net/ipv6_stubs.h>
- #include <net/ndisc.h>
- #ifdef CONFIG_IPV6_TUNNEL
- #include <net/ip6_tunnel.h>
-@@ -996,42 +995,6 @@ static struct pernet_operations inet6_net_ops = {
- 	.exit = inet6_net_exit,
+-int __init ipv6_netfilter_init(void)
+-{
+-	RCU_INIT_POINTER(nf_ipv6_ops, &ipv6ops);
+-	return 0;
+-}
+-
+-/* This can be called from inet6_init() on errors, so it cannot
+- * be marked __exit. -DaveM
+- */
+-void ipv6_netfilter_fini(void)
+-{
+-	RCU_INIT_POINTER(nf_ipv6_ops, NULL);
+-}
+diff --git a/net/netfilter/core.c b/net/netfilter/core.c
+index d5df44ea9e7b..675a1034b340 100644
+--- a/net/netfilter/core.c
++++ b/net/netfilter/core.c
+@@ -27,9 +27,6 @@
+ 
+ #include "nf_internals.h"
+ 
+-const struct nf_ipv6_ops __rcu *nf_ipv6_ops __read_mostly;
+-EXPORT_SYMBOL_GPL(nf_ipv6_ops);
+-
+ #ifdef CONFIG_JUMP_LABEL
+ struct static_key nf_hooks_needed[NFPROTO_NUMPROTO][NF_MAX_HOOKS];
+ EXPORT_SYMBOL(nf_hooks_needed);
+diff --git a/net/netfilter/nf_nat_masquerade.c b/net/netfilter/nf_nat_masquerade.c
+index a5a23c03fda9..4de6e0a51701 100644
+--- a/net/netfilter/nf_nat_masquerade.c
++++ b/net/netfilter/nf_nat_masquerade.c
+@@ -220,23 +220,6 @@ static struct notifier_block masq_inet_notifier = {
  };
  
--static int ipv6_route_input(struct sk_buff *skb)
+ #if IS_ENABLED(CONFIG_IPV6)
+-static int
+-nat_ipv6_dev_get_saddr(struct net *net, const struct net_device *dev,
+-		       const struct in6_addr *daddr, unsigned int srcprefs,
+-		       struct in6_addr *saddr)
 -{
--	ip6_route_input(skb);
--	return skb_dst(skb)->error;
+-#ifdef CONFIG_IPV6_MODULE
+-	const struct nf_ipv6_ops *v6_ops = nf_get_ipv6_ops();
+-
+-	if (!v6_ops)
+-		return -EHOSTUNREACH;
+-
+-	return v6_ops->dev_get_saddr(net, dev, daddr, srcprefs, saddr);
+-#else
+-	return ipv6_dev_get_saddr(net, dev, daddr, srcprefs, saddr);
+-#endif
 -}
 -
--static const struct ipv6_stub ipv6_stub_impl = {
--	.ipv6_sock_mc_join = ipv6_sock_mc_join,
--	.ipv6_sock_mc_drop = ipv6_sock_mc_drop,
--	.ipv6_dst_lookup_flow = ip6_dst_lookup_flow,
--	.ipv6_route_input  = ipv6_route_input,
--	.fib6_get_table	   = fib6_get_table,
--	.fib6_table_lookup = fib6_table_lookup,
--	.fib6_lookup       = fib6_lookup,
--	.fib6_select_path  = fib6_select_path,
--	.ip6_mtu_from_fib6 = ip6_mtu_from_fib6,
--	.fib6_nh_init	   = fib6_nh_init,
--	.fib6_nh_release   = fib6_nh_release,
--	.fib6_nh_release_dsts = fib6_nh_release_dsts,
--	.fib6_update_sernum = fib6_update_sernum_stub,
--	.fib6_rt_update	   = fib6_rt_update,
--	.ip6_del_rt	   = ip6_del_rt,
--	.udpv6_encap_enable = udpv6_encap_enable,
--	.ndisc_send_na = ndisc_send_na,
--#if IS_ENABLED(CONFIG_XFRM)
--	.xfrm6_local_rxpmtu = xfrm6_local_rxpmtu,
--	.xfrm6_udp_encap_rcv = xfrm6_udp_encap_rcv,
--	.xfrm6_gro_udp_encap_rcv = xfrm6_gro_udp_encap_rcv,
--	.xfrm6_rcv_encap = xfrm6_rcv_encap,
--#endif
--	.nd_tbl	= &nd_tbl,
--	.ipv6_fragment = ip6_fragment,
--	.ipv6_dev_find = ipv6_dev_find,
--	.ip6_xmit = ip6_xmit,
--};
--
- static int __init inet6_init(void)
- {
- 	struct list_head *r;
-@@ -1188,9 +1151,6 @@ static int __init inet6_init(void)
- 		goto sysctl_fail;
- #endif
+ unsigned int
+ nf_nat_masquerade_ipv6(struct sk_buff *skb, const struct nf_nat_range2 *range,
+ 		       const struct net_device *out)
+@@ -251,8 +234,8 @@ nf_nat_masquerade_ipv6(struct sk_buff *skb, const struct nf_nat_range2 *range,
+ 	WARN_ON(!(ct && (ctinfo == IP_CT_NEW || ctinfo == IP_CT_RELATED ||
+ 			 ctinfo == IP_CT_RELATED_REPLY)));
  
--	/* ensure that ipv6 stubs are visible only after ipv6 is ready */
--	wmb();
--	ipv6_stub = &ipv6_stub_impl;
- out:
- 	return err;
+-	if (nat_ipv6_dev_get_saddr(nf_ct_net(ct), out,
+-				   &ipv6_hdr(skb)->daddr, 0, &src) < 0)
++	if (ipv6_dev_get_saddr(nf_ct_net(ct), out,
++			       &ipv6_hdr(skb)->daddr, 0, &src) < 0)
+ 		return NF_DROP;
  
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index a935004ec9df..3d52044e0bdb 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -1408,14 +1408,6 @@ void fib6_update_sernum_upto_root(struct net *net, struct fib6_info *rt)
- 	__fib6_update_sernum_upto_root(rt, fib6_new_sernum(net));
+ 	nat = nf_ct_nat_ext_add(ct);
+diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
+index a91ae07db059..2aa2380d976a 100644
+--- a/net/netfilter/nfnetlink_queue.c
++++ b/net/netfilter/nfnetlink_queue.c
+@@ -356,9 +356,25 @@ static int nf_ip_reroute(struct sk_buff *skb, const struct nf_queue_entry *entry
+ 	return 0;
  }
  
--/* allow ipv4 to update sernum via ipv6_stub */
--void fib6_update_sernum_stub(struct net *net, struct fib6_info *f6i)
--{
--	spin_lock_bh(&f6i->fib6_table->tb6_lock);
--	fib6_update_sernum_upto_root(net, f6i);
--	spin_unlock_bh(&f6i->fib6_table->tb6_lock);
--}
--
- /*
-  *	Add routing information to the routing tree.
-  *	<destination addr>/<source addr>
-diff --git a/net/ipv6/ip6_udp_tunnel.c b/net/ipv6/ip6_udp_tunnel.c
-index cef3e0210744..405ef1cb8864 100644
---- a/net/ipv6/ip6_udp_tunnel.c
-+++ b/net/ipv6/ip6_udp_tunnel.c
-@@ -162,8 +162,7 @@ struct dst_entry *udp_tunnel6_dst_lookup(struct sk_buff *skb,
- 	fl6.fl6_dport = dport;
- 	fl6.flowlabel = ip6_make_flowinfo(dsfield, key->label);
++static int nf_ip6_reroute(struct sk_buff *skb,
++			  const struct nf_queue_entry *entry)
++{
++	struct ip6_rt_info *rt_info = nf_queue_entry_reroute(entry);
++
++	if (entry->state.hook == NF_INET_LOCAL_OUT) {
++		const struct ipv6hdr *iph = ipv6_hdr(skb);
++
++		if (!ipv6_addr_equal(&iph->daddr, &rt_info->daddr) ||
++		    !ipv6_addr_equal(&iph->saddr, &rt_info->saddr) ||
++		    skb->mark != rt_info->mark)
++			return nf_ip6_route_me_harder(entry->state.net,
++						      entry->state.sk, skb);
++	}
++	return 0;
++}
++
+ static int nf_reroute(struct sk_buff *skb, struct nf_queue_entry *entry)
+ {
+-	const struct nf_ipv6_ops *v6ops;
+ 	int ret = 0;
  
--	dst = ipv6_stub->ipv6_dst_lookup_flow(net, sock->sk, &fl6,
--					      NULL);
-+	dst = ip6_dst_lookup_flow(net, sock->sk, &fl6, NULL);
- 	if (IS_ERR(dst)) {
- 		netdev_dbg(dev, "no route to %pI6\n", &fl6.daddr);
- 		return ERR_PTR(-ENETUNREACH);
+ 	switch (entry->state.pf) {
+@@ -366,9 +382,7 @@ static int nf_reroute(struct sk_buff *skb, struct nf_queue_entry *entry)
+ 		ret = nf_ip_reroute(skb, entry);
+ 		break;
+ 	case AF_INET6:
+-		v6ops = rcu_dereference(nf_ipv6_ops);
+-		if (v6ops)
+-			ret = v6ops->reroute(skb, entry);
++		ret = nf_ip6_reroute(skb, entry);
+ 		break;
+ 	}
+ 	return ret;
+diff --git a/net/netfilter/utils.c b/net/netfilter/utils.c
+index 008419db815a..29c4dcc362c7 100644
+--- a/net/netfilter/utils.c
++++ b/net/netfilter/utils.c
+@@ -163,7 +163,6 @@ EXPORT_SYMBOL_GPL(nf_checksum_partial);
+ int nf_route(struct net *net, struct dst_entry **dst, struct flowi *fl,
+ 	     bool strict, unsigned short family)
+ {
+-	const struct nf_ipv6_ops *v6ops __maybe_unused;
+ 	int ret = 0;
+ 
+ 	switch (family) {
 -- 
 2.53.0
 
