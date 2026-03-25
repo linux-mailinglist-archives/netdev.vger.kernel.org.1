@@ -1,193 +1,162 @@
-Return-Path: <netdev+bounces-271625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271629-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SPxiEiAHxGk+vgQAu9opvQ
-	(envelope-from <netdev+bounces-271625-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 17:02:40 +0100
+	id ePaKLo3/w2lXvQQAu9opvQ
+	(envelope-from <netdev+bounces-271629-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 16:30:21 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE113289F1
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 17:02:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 527F1327FEF
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 16:30:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2598C33A83F5
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:16:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E59733382A8A
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:19:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFCB13E2753;
-	Wed, 25 Mar 2026 15:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D6C9265606;
+	Wed, 25 Mar 2026 15:18:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="D3B8pcER"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="e3hHqZCY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BFA222E3E9;
-	Wed, 25 Mar 2026 15:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635632874FA;
+	Wed, 25 Mar 2026 15:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774451796; cv=none; b=q/DZVel9qZwoXAM2lxrBui4ohVvVhWKComfYegd/cFQlWm2tYGEnOVXvEs/bQRc6KwpGxdO7sZ4OswSaXewD/XwPSNOeiFiZFbUObE90NRfeK/IWA2EUG4n4rXqz5IB89IGIid39pxGE1A+tLCAIWDIjfEVeHRlU88FLOg1Jxno=
+	t=1774451934; cv=none; b=fpwS46+u3bgfmSq+0bMBzwpO3oD9NdSJmy9Mia/fByhgsz5Wr4DIp74dmNl90MpJsYJ554XsxbXFga/LK5+aneaqde4NdkZvJ+ZSWlaQhUloyREcDPPwHRCu4XMCcAjzvSyNSMpYYVGf2o1XSnhZtD2MZLVSHJ1QrVcgTo0Hd38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774451796; c=relaxed/simple;
-	bh=NhspUJx9w1VVKJpz++cvxMB4eYCccI/wl+Vo7BADFfc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=F3HIwakhwhzWXFPeKN+kZAHpKnbCaD5xsmNrqyN8aQyYEnqvhOcqglK2LheYKHyhnRpRzpyRZxR3OphhRBeSl+yhvy+G1tTO2/UpTLJ856Cp0apn8m9WnBfuqy1alsnm3WgLlDoTzYeAcDj/7pR+gVVAm4EE+9QShXyNhB6wFPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=D3B8pcER; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62PBQIeS511484;
-	Wed, 25 Mar 2026 15:16:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=4nUrHb
-	OAPxrqOyZDmI8Ux9wOjU9BEC8kz64uahnDd30=; b=D3B8pcERoXiLb7Vy4tSbOR
-	aa82x4PDntPy1WYe7xrDU9URflYWTZZXbiYpEu3x9itJRiw9/qeRKbRF5meN4FDX
-	eHRF/0McLSziPJGkYhAhL9nKQupncnrXWF5fPM1DP2IFBBR31RU0gRr3H8x+3iuN
-	9ERii2ifyFxZZGgqHj+lsjychiw4V4MlaBgFV1dSI0+F9fPlVYuydCCjadNSYl0a
-	x+/q+y3syWZcK/w7HqtdQy4nVRAoULHBxpqx3cXIv2MGa81KfmVxitsP/wecjPVW
-	D2tI2u4MyxEO1T7FY6xQ9z0sSOhi0Wa/yMp0Er3gQwW8TjS9E3IDATBcpmv8Z0yQ
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4d1kwa1314-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Mar 2026 15:16:30 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 62PC68IX004387;
-	Wed, 25 Mar 2026 15:16:29 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4d28c26sgn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Mar 2026 15:16:28 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 62PFGPin46530934
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Mar 2026 15:16:25 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3027F20040;
-	Wed, 25 Mar 2026 15:16:25 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E170B20043;
-	Wed, 25 Mar 2026 15:16:24 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 25 Mar 2026 15:16:24 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-Date: Wed, 25 Mar 2026 16:16:18 +0100
-Subject: [PATCH v6 2/2] PCI: AtomicOps: Update references to PCIe spec
+	s=arc-20240116; t=1774451934; c=relaxed/simple;
+	bh=6m/MmvYSE/2Ygtum1ZsGcZJVuBOOGdOrW5mny9KmDFk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VlH7sqBhtwUGOwaCPUqO173ccAY7XB3asPb2tTNlFnpmOxbt17fRRW4bhXU0sXctnekBNwdlkSTE1lA+Wl4edd50FX6OBqXMzTWWOeadQh0kNoyVe8++hwRD//ipP9UrIGROisYR7a//QqGr5TVlaAandtGt8T+DqdAVEfg21jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=e3hHqZCY; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 58F7460178;
+	Wed, 25 Mar 2026 16:18:49 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1774451929;
+	bh=x7JNqP/5ocp87OzSoqZMy229QOtYkmJPDg2MSYVgTZc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e3hHqZCYGoseBnrzwF5sFL6/D3LhGOfLTyGapPTZlQ49V+OpE3JwCRPxAEl6PIBmX
+	 GmJhfxG/iLAx2eVWicZoyeD1uWWLBDPCk/MxOyIW7TlncqU2jFXpH1i8orwiDixGao
+	 LX2Aj+pJNmUavvCKJW+zlrN2bqeySwk4TAuEf64Mb3m84nl8YsICoRQjVOxghpcZrt
+	 EpNKki+io2lNl81N8tUHxuQHO3/SFPvUpp2qjlguvOPoH5FSaDQjE0MmyzRBR2xIF1
+	 uPBV73UESrRQNLINCHS+ZV/NfEZiwV8ymGB6ZswUPBEXVyiAtWx4rcPEFKuQYA5EVm
+	 m4f5LwV7punOQ==
+Date: Wed, 25 Mar 2026 16:18:47 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Hyunwoo Kim <imv4bel@gmail.com>, phil@nwl.cc, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] netfilter: nf_flow_table_offload: fix heap overflow
+ in flow_action_entry_next()
+Message-ID: <acP810hDQY7O99-f@chamomile>
+References: <aaxe-uH2Qr6qM4E9@v4bel>
+ <aax2yZtJce0d19gd@strlen.de>
+ <abfhRFfZ1LOgWEsf@strlen.de>
+ <abfoTBGLhav-iPQb@v4bel>
+ <abfuEe_PpDCyA64B@strlen.de>
+ <abgQ7GSjz2v2_QnX@v4bel>
+ <abgajW6KJM5KD3bN@strlen.de>
+ <acPw54RoNOSgsfdE@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260325-fix_pciatops-v6-2-10bf19d76dd1@linux.ibm.com>
-References: <20260325-fix_pciatops-v6-0-10bf19d76dd1@linux.ibm.com>
-In-Reply-To: <20260325-fix_pciatops-v6-0-10bf19d76dd1@linux.ibm.com>
-To: Bjorn Helgaas <bhelgaas@google.com>, Jay Cornwall <Jay.Cornwall@amd.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Leon Romanovsky <leon@kernel.org>,
-        Alexander Schmidt <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Gerd Bayer <gbayer@linux.ibm.com>
-X-Mailer: b4 0.14.2
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-ORIG-GUID: VwmHIEthOOEXBIOUMOhdt2WMoFnPH4Dj
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzI1MDEwNiBTYWx0ZWRfX3PbbJQ1k+U/+
- gmKijxUsLKuQVsbARuhI5MqqvyN1nbjaVzHfPVzfxBK9Z1qOy9Vads9JBFit9ocWAQEuM8WlivJ
- wXK8zz4RDKCxmuRHs45A3qlxhw4/Zs6v9bTSK4e+vYwDw0OUQmyK0S+V6tg/J7u94n2w0cUt9i7
- lQpSIc9DXQoYT+XLHGCFekoRV1GjXUilCnlI8P/FXTwRUhRXNv8sc7VQMT5NeNxuKZr8xS312Cf
- eZIAEhNJicXr0DseQ1f0XJeZaUnXGg/LS0eRtW0oXiezxCpLr+jO++z6KSA5yNtHwuCZqfI6F5r
- HBAlwYxJG8WEG7pIxacaSwS6bGNUkxY3JoRoa/nBHE4rIF+SNsw5xnyVx9FsPMZ/rYUQFEqB1Hm
- aUp+oy2bzxRugeIPfibNSh3m9RZtO3hO8mB+7HJEqmKrzOv4q5GMJPurSI3MRH2dZQ8mx7GZn5z
- xod4jRxBgGn5/BFSmZg==
-X-Proofpoint-GUID: J2oMZxSS8Q3GN44Y4yOuo_IS5f3AHtID
-X-Authority-Analysis: v=2.4 cv=OsZCCi/t c=1 sm=1 tr=0 ts=69c3fc4f cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8
- a=sHiWSa_0ZEpyENxDyHEA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-25_04,2026-03-24_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 adultscore=0 clxscore=1015 phishscore=0 suspectscore=0
- lowpriorityscore=0 priorityscore=1501 bulkscore=0 spamscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603250106
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <acPw54RoNOSgsfdE@strlen.de>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-271625-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gbayer@linux.ibm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[netfilter.org];
+	TAGGED_FROM(0.00)[bounces-271629-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,netfilter.org];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 0AE113289F1
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 527F1327FEF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Point to the relevant sections in the most recent release 7.0 of the
-PCIe spec. Text has mostly just moved around without any semantic
-change.
+On Wed, Mar 25, 2026 at 03:27:51PM +0100, Florian Westphal wrote:
+> Florian Westphal <fw@strlen.de> wrote:
+> > Hyunwoo Kim <imv4bel@gmail.com> wrote:
+> > > hmm. So, based on what you said, I assume the run-time check would look 
+> > > something like this?
+> > > 
+> > > diff --git a/net/netfilter/nf_flow_table_offload.c b/net/netfilter/nf_flow_table_offload.c
+> > > index 9b677e116487..69ffefbdd5e8 100644
+> > > --- a/net/netfilter/nf_flow_table_offload.c
+> > > +++ b/net/netfilter/nf_flow_table_offload.c
+> > > @@ -218,6 +218,9 @@ flow_action_entry_next(struct nf_flow_rule *flow_rule)
+> > >  {
+> > >         int i = flow_rule->rule->action.num_entries++;
+> > > 
+> > > +       if (WARN_ON_ONCE(i >= NF_FLOW_RULE_ACTION_MAX))
+> > > +               return NULL;
+> > > +
+> > >         return &flow_rule->rule->action.entries[i];
+> > >  }
+> > > 
+> > > However, if we add a runtime check in this way, all callers of 
+> > > flow_action_entry_next() would also need to handle a NULL return value, 
+> > > since none of them currently perform a null check.
+> > > 
+> > > Because of the potential risk, this would require modifying quite a number 
+> > > of call sites carefully. What do you think about this approach?
+> > 
+> > Can't we reject this at configuration time?
+> > 
+> > I mean, userspace has to ask for this action sequence, no?
+> 
+> Guess:
+> 
+> diff --git a/net/netfilter/nf_tables_offload.c b/net/netfilter/nf_tables_offload.c
+> --- a/net/netfilter/nf_tables_offload.c
+> +++ b/net/netfilter/nf_tables_offload.c
+> @@ -105,6 +105,9 @@ struct nft_flow_rule *nft_flow_rule_create(struct net *net,
+>         if (num_actions == 0)
+>                 return ERR_PTR(-EOPNOTSUPP);
+> 
+> +       if (num_actions > NF_FLOW_RULE_ACTION_MAX)
+> +               return ERR_PTR(-EOPNOTSUPP);
+> +
+>         flow = nft_flow_rule_alloc(num_actions);
+>         if (!flow)
+>                 return ERR_PTR(-ENOMEM);
+> 
 
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
----
- drivers/pci/pci.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+That is good enough, thanks.
 
-diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-index 006aa589926cb290de43f152100ddaf9961407d1..fc211af0b6361cd8f5101b681a97bd1ad1304d9d 100644
---- a/drivers/pci/pci.c
-+++ b/drivers/pci/pci.c
-@@ -3694,7 +3694,7 @@ int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
- 	u32 ctl2;
- 
- 	/*
--	 * Per PCIe r5.0, sec 9.3.5.10, the AtomicOp Requester Enable bit
-+	 * Per PCIe r7.0, sec 7.5.3.16, the AtomicOp Requester Enable bit
- 	 * in Device Control 2 is reserved in VFs and the PF value applies
- 	 * to all associated VFs.
- 	 */
-@@ -3705,9 +3705,9 @@ int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
- 		return -EINVAL;
- 
- 	/*
--	 * Per PCIe r4.0, sec 6.15, endpoints and root ports may be
-+	 * Per PCIe r7.0, sec 6.15, endpoints and root ports may be
- 	 * AtomicOp requesters.  For now, we only support endpoints as
--	 * requesters and root ports as completers.  No endpoints as
-+	 * requesters and root ports as completers. No endpoints as
- 	 * completers, and no peer-to-peer.
- 	 */
- 
+Would you submit this?
 
--- 
-2.51.0
-
+This is nf-next material, it is not possible to reach such number of
+actions (16) in the flowtable.
 
