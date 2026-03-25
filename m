@@ -1,174 +1,202 @@
-Return-Path: <netdev+bounces-271585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271586-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aJzAHPjzw2lZvAQAu9opvQ
-	(envelope-from <netdev+bounces-271585-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:40:56 +0100
+	id qI+YFoP1w2lZvAQAu9opvQ
+	(envelope-from <netdev+bounces-271586-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:47:31 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14DDE326E93
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:40:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D7CF327118
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:47:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 49E59308668C
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 14:38:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 04846309DB34
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 14:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF263E274F;
-	Wed, 25 Mar 2026 14:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22A63ED5A3;
+	Wed, 25 Mar 2026 14:40:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UDjn2G4M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gMX6BZnt"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6943DD506
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 14:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D72E3E5EC1;
+	Wed, 25 Mar 2026 14:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774449449; cv=none; b=ir72Px1t9In139hr9Pd48q5Mai6dK9Zh+bJqgmd0h1P6Fhf1f8qHfuatvxcCxv+SeDOJA/wVJYZQzUSDBAoe935TA9zLEqBJK6GYwdXodxJfL6jN6Z79pf019WEKvJsj25yMRPIWecUGjokBBGmLDwhuSU10IMZhgza+2jNjpNY=
+	t=1774449650; cv=none; b=or9DAVvS2VdekAV3UV2QpSwkiAWVkGCUSTIvYRaszRwKmySbqyBY07gbzJNvmbHlhGo44FM6kl9/qF158kiySUNFJejKjEf5vgJvHuKl28+sjUAWdNdRKT2ce1T6BRBb8ksx6/ZiEy7WQgxAJfWw9GcECI2lo6W5TxeV6A+to1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774449449; c=relaxed/simple;
-	bh=ujhOZwbSzzOOvYmG+TOGPe3QUIrHOcld3yL6AWCpPJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RNRN5CCvXmkoKenpNPOCV7sYvuduTQWwQZmxSKaD0Gd54LVT8D/zYYWmsCRgn+wOehoa8It9oFTbQyAdXzzCaSTar1KekJ++0shZaeAMCHVpjPEd5ARfz35AfEtFjzSE3f9yiVxMqh/C/7AUGeXMEYgwfJObs29o6Cw28jPyEu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UDjn2G4M; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=YTPjRKoJrKkPqSHoXxV1KY7bysIh/k+vDLIycJCoKm0=; b=UDjn2G4MWnqTw/9saQeG4R2X4w
-	Q8wZPPKWwoYTc1cImSIed6YLreqhjOx0qDfayXXTxW9wndzSNNOwO5bGQmrnwtFfyIY5p3SryzsT1
-	6ylGJ1gEW0LTva74Vg7c4ky9NaGEqEcMsHqZ0M9NoYYc62IiNCm2c3ccxrvFfMjPot+IUdLcvSsu8
-	+kBXMkJ9DV827D3oKKYZMB8y5+9fSeRpiO3OwM6lCRj5egOvlbiwOUxVFEy5kf4hgEFzxHxxabtYW
-	eDH5MqZVhcaGsX1c4klBvmiOgAeDpZcX+lP6GvRuUtHt5sjFqj7Tm2wIx1kNOOYGtRiY+Uo+h+gQX
-	tWEkeopQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37058)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w5PMF-000000003W9-43fF;
-	Wed, 25 Mar 2026 14:37:20 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w5PMC-0000000066Z-1aVs;
-	Wed, 25 Mar 2026 14:37:16 +0000
-Date: Wed, 25 Mar 2026 14:37:16 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] ptp: ocp: fix resource freeing order
-Message-ID: <acPzHPYF8y2Vh1DT@shell.armlinux.org.uk>
-References: <20260325120510.34481-1-vadim.fedorenko@linux.dev>
- <20260325122005.jvis4ydmogfkrxl7@skbuf>
+	s=arc-20240116; t=1774449650; c=relaxed/simple;
+	bh=cAAOA+Ib++sfZfQFqGE0pWVQoWWdGsHOX+ELRTbhc8I=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CLo0ZIZ0E7shb8B0jZ32xBT9y+p86L7vmb74XcTr5SmVN/E4+Yw0RqmOjpN17JUf96HvausEuF9DFP+gkM+VSyd6izmT8mtkx5nWpW3Z1Q8KJUt1xzb6kshwvqN4Im9v7E2zcqJJj4AUVQDv2KtfcCj4say0ncApiYdH7fXZur4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gMX6BZnt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A64DCC2BCB2;
+	Wed, 25 Mar 2026 14:40:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774449650;
+	bh=cAAOA+Ib++sfZfQFqGE0pWVQoWWdGsHOX+ELRTbhc8I=;
+	h=From:Subject:Date:To:Cc:From;
+	b=gMX6BZntjr9TUNHqgHx7hCTNA7HV7lblIC8krhE5ybClaJ2VX2xe2ebuAyj/0M/pP
+	 44AAGV5z/8/x1Oei05Pohmh9s/l4cjqAQj7VYYk8fMF4w+f37pY0L8oHqqkZIqn4XG
+	 rdznFUPDHQ4F48G32i5RZSrMjzVtsch+H+9Nqb2lcstidzGjpo/cC8FZVyQIWXyDhT
+	 8tT0s9zX6lCoByhWasq0ZrjpYSos878eAE9wZUFlexL9AuwjqpYtzYe48cYGphDHIV
+	 oVo9G/hm0FSpwp1nv9UcGCpbwaEfGzHo/U+plF5SFxrxq0gy34a5gSjzwTxteLs1QQ
+	 8Bt+nJQIjgd8w==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH v2 00/13] nfsd/sunrpc: add support for netlink upcalls for
+ mountd/exportd
+Date: Wed, 25 Mar 2026 10:40:21 -0400
+Message-Id: <20260325-exportd-netlink-v2-0-067df016ea95@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260325122005.jvis4ydmogfkrxl7@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WNQQqDMBBFryKzbopJSMCueo/ioiajDkoikxAs4
+ t2buu/yPfjvH5CQCRM8mgMYCyWKoYK6NeDmd5hQkK8MqlW21dIK3LfI2YuAeaWwCOm6cTDKaIs
+ a6mpjHGm/iq++8kwpR/5cB0X+7P9WkaIVVirjnVVDZ8xzQQ643iNP0J/n+QVmXzhKrwAAAA==
+X-Change-ID: 20260316-exportd-netlink-1c9fb52536e3
+To: Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Donald Hunter <donald.hunter@gmail.com>
+Cc: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+ linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3895; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=cAAOA+Ib++sfZfQFqGE0pWVQoWWdGsHOX+ELRTbhc8I=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBpw/Poud+JpHknVbcIs8VRMM6RnDaBSukcrZm/n
+ AVO5NAD3lKJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCacPz6AAKCRAADmhBGVaC
+ FXRuEADVXyq2swDQQZ6zPzpDuym5nTSQpkfjwQ0fc8hct2xKrTFpyBmMVwgCJ9Szxgp+f803bq6
+ PfMavZkNcZTUItQy/CMxvL+ULkf1jBG5pXitgIk3qYTGV+vbsnWGbY4XXAYCNOY7IBA7Y1Y0vWG
+ gVwmnU2OSf8nORwMW0EnfLbqB3uiy+9lRzHIQyDYAw5F2brdC+p5dhbmA0GwW3fikmQxrND5qB9
+ mdennZZl7Hh1mbO2QF+ARTOH9cmQZOW035W4Cpu2BF5ebj5B1CgzGsNqiNsMCrbL1qq3ugePjze
+ yUGLXriK3hYPD5NzGvTNHwj4UTeo4SFoAPZFEhYZ0xChveoRUmGdPIs2vVR3D5axpZtfU2XGZyN
+ 5UWAjcg1sVeZn/1s5vth9Yra/88roUAwtS3vjVBx4g+VhGPKXIQJMMFiA2wDHnaUueYIdqxO/ce
+ SdpYoB+4f/R7VJ13LnmXuEXMroeRMqURnI1h50wBihxaXHwFhgC8cnqAihtYilbMTVOhqcAvLPY
+ dtcBvnjZVnH6n09of2Fxz2GSPRPn4s1bKws94qJ97HgMkdCA71VB3ycaprCdXONj7pxH1055gF7
+ 5GogbmabS+uuqisj7N/QnTdZuwvo473wegV9gXN1REMgkXwbs8pP4vbAiIAuCqHGldfeRTUVNsp
+ DAkyeXvcRQKWutQ==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,gmail.com,lunn.ch,davemloft.net,redhat.com,kernel.org,vger.kernel.org];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271585-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-271586-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[oracle.com,brown.name,redhat.com,talpey.com,davemloft.net,google.com,kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.960];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jlayton@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:email,shell.armlinux.org.uk:mid,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: 14DDE326E93
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0D7CF327118
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 25, 2026 at 02:20:05PM +0200, Vladimir Oltean wrote:
-> On Wed, Mar 25, 2026 at 12:05:10PM +0000, Vadim Fedorenko wrote:
-> > Commit a60fc3294a37 ("ptp: rework ptp_clock_unregister() to disable
-> > events") added a call to ptp_disable_all_events() which changes the
-> > configuration of pins if they support EXTTS events. In ptp_ocp_detach()
-> > pins resources are freed before ptp_clock_unregister() and it leads to
-> > use-after-free during driver removal. Fix it by changing the order of
-> > free/unregister calls.
-> > 
-> > Fixes: a60fc3294a37 ("ptp: rework ptp_clock_unregister() to disable events")
-> > Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> > ---
-> >  drivers/ptp/ptp_ocp.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-> > index d88ab2f86b1b..16fd4804fc6a 100644
-> > --- a/drivers/ptp/ptp_ocp.c
-> > +++ b/drivers/ptp/ptp_ocp.c
-> > @@ -4558,6 +4558,9 @@ ptp_ocp_detach(struct ptp_ocp *bp)
-> >  	ptp_ocp_detach_sysfs(bp);
-> >  	ptp_ocp_attr_group_del(bp);
-> >  	timer_delete_sync(&bp->watchdog);
-> > +	if (bp->ptp)
-> > +		ptp_clock_unregister(bp->ptp);
-> > +	kfree(bp->ptp_info.pin_config);
-> >  	ptp_ocp_unregister_ext(bp->ts0);
-> >  	ptp_ocp_unregister_ext(bp->ts1);
-> >  	ptp_ocp_unregister_ext(bp->ts2);
-> > @@ -4575,9 +4578,6 @@ ptp_ocp_detach(struct ptp_ocp *bp)
-> >  		clk_hw_unregister_fixed_rate(bp->i2c_clk);
-> >  	if (bp->n_irqs)
-> >  		pci_free_irq_vectors(bp->pdev);
-> > -	if (bp->ptp)
-> > -		ptp_clock_unregister(bp->ptp);
-> > -	kfree(bp->ptp_info.pin_config);
-> >  	device_unregister(&bp->dev);
-> >  }
-> >  
-> > -- 
-> > 2.47.3
-> >
-> 
-> The code wasn't safe even before the patch, since user space could have
-> emitted a PTP ioctl that passed into the driver in between the
-> ptp_ocp_unregister_ext() calls and the subsequent ptp_clock_unregister()
-> call. It's just that the patch you blame made it more obvious.
+This version should address most of Chuck's review comments. The
+userland patch series is unchanged. I've added the netdev folks this
+time too in order to get more experienced eyes on the netlink bits.
 
-Indeed.
+Original cover letter follows:
 
-We've been talking about "setup, then publish interfaces, unpublish
-interfaces, tear down" for decades. I remember it coming up at the
-Ottawa Linux Symposiums in the early 2000s when the driver model was
-in its infancy. Yet, here we are in 2026, and the same problem
-persists. :(
+mountd/exportd use the sunrpc cache mechanism for some of its internal
+caches that are populated by userland. These currently use some very
+antiquated interfaces in /proc to handle upcalls and downcalls. While it
+has worked well for decades and is relatively stable, it has some
+problems.
 
+Most notably, it's very difficult to extend to add support for new
+export options. There is also the matter of requiring /proc which is not
+always desirable in a container.
+
+This patchset adds new netlink-based interfaces for handling the sunrpc
+cache upcalls. The basic idea is to add a new "cache_notify" operation
+to struct cache_detail. That causes the kernel to send a notification to
+userland which then fetches any outstanding cache_requests and then
+responds to them via netlink.
+
+There is also a companion patchset for nfs-utils that adds the necessary
+support for these interfaces to mountd/exportd and exportfs.
+
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Changes in v2:
+- Reword comment above cache_do_upcall()
+- Delay adding include of genetlink.h until needed
+- Implement proper netlink dump continuation support in all downcalls
+- Only ->cache_notify if request is still PENDING
+- Add comments to svc_export netlink flag enums
+- Shrink size passed to genlmsg_new for notify requests to sizeof(u32)
+- move nfsd_cache_notify() out of autogenerated file
+- Link to v1: https://lore.kernel.org/r/20260316-exportd-netlink-v1-0-6125dc62b955@kernel.org
+
+---
+Jeff Layton (13):
+      nfsd: move struct nfsd_genl_rqstp to nfsctl.c
+      sunrpc: rename sunrpc_cache_pipe_upcall() to sunrpc_cache_upcall()
+      sunrpc: rename sunrpc_cache_pipe_upcall_timeout()
+      sunrpc: rename cache_pipe_upcall() to cache_do_upcall()
+      sunrpc: add a cache_notify callback
+      sunrpc: add helpers to count and snapshot pending cache requests
+      sunrpc: add a generic netlink family for cache upcalls
+      sunrpc: add netlink upcall for the auth.unix.ip cache
+      sunrpc: add netlink upcall for the auth.unix.gid cache
+      nfsd: add netlink upcall for the svc_export cache
+      nfsd: add netlink upcall for the nfsd.fh cache
+      sunrpc: add SUNRPC_CMD_CACHE_FLUSH netlink command
+      nfsd: add NFSD_CMD_CACHE_FLUSH netlink command
+
+ Documentation/netlink/specs/nfsd.yaml         | 241 +++++++++
+ Documentation/netlink/specs/sunrpc_cache.yaml | 149 ++++++
+ fs/nfs/dns_resolve.c                          |   2 +-
+ fs/nfsd/export.c                              | 713 +++++++++++++++++++++++++-
+ fs/nfsd/netlink.c                             | 107 ++++
+ fs/nfsd/netlink.h                             |  18 +
+ fs/nfsd/nfs4idmap.c                           |   4 +-
+ fs/nfsd/nfsctl.c                              |  79 +++
+ fs/nfsd/nfsd.h                                |  17 +-
+ include/linux/sunrpc/cache.h                  |  15 +-
+ include/uapi/linux/nfsd_netlink.h             | 141 +++++
+ include/uapi/linux/sunrpc_netlink.h           |  84 +++
+ net/sunrpc/Makefile                           |   2 +-
+ net/sunrpc/auth_gss/svcauth_gss.c             |   2 +-
+ net/sunrpc/cache.c                            | 127 ++++-
+ net/sunrpc/netlink.c                          | 111 ++++
+ net/sunrpc/netlink.h                          |  35 ++
+ net/sunrpc/sunrpc_syms.c                      |  10 +
+ net/sunrpc/svcauth_unix.c                     | 516 ++++++++++++++++++-
+ 19 files changed, 2332 insertions(+), 41 deletions(-)
+---
+base-commit: e111174758bddc84136446ae283c741d855c7f8f
+change-id: 20260316-exportd-netlink-1c9fb52536e3
+
+Best regards,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Jeff Layton <jlayton@kernel.org>
+
 
