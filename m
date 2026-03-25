@@ -1,144 +1,166 @@
-Return-Path: <netdev+bounces-271741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271742-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OPO9Ar5KxGn5xwQAu9opvQ
-	(envelope-from <netdev+bounces-271741-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:51:10 +0100
+	id kPc7ALdLxGn5xwQAu9opvQ
+	(envelope-from <netdev+bounces-271742-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:55:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2EF232C01B
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:51:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F6B232C090
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:55:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E9EF5301DBAC
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:51:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1E6A8305DA9F
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:52:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32246313277;
-	Wed, 25 Mar 2026 20:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0E536CE1C;
+	Wed, 25 Mar 2026 20:52:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="lSUT0jRI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bJgocfdz"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895A32C3257
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 20:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA363451AF;
+	Wed, 25 Mar 2026 20:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774471867; cv=none; b=jpg6jm9AFp0Wx1+hK2zhOwYGADPLhzbdKtVLwGaIR48CWGnHBP9wQZ5NwE7U00IhjbTU0cnimQa3pP03eelHvwywRPsO44avL3K6N3hPbPFAMiz9GnhdLYJD59T5tSbmqHrsG9duNAmCiBIZ5oOXDjZpkwgKsmatQWPeDYfEgmI=
+	t=1774471952; cv=none; b=NIc7ZgdxxIwj4KPEWEUTSLoWLYcE9y7uNuOunrDDuImc4CWxLci/vuWZFlmSO8nVoQA1i2EPayCUnRce2qgHfH/oni5wDHb13OufQ/oz6/9Vw9goFRVTuYvRGuELnl7LasaMlsyZWLpksgKHuzQy33E9drc+9MeAVXPQQdQTsu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774471867; c=relaxed/simple;
-	bh=5G6TUiuRIZ9w4CWAjML67g9Ly4xSYU+OdcnxpggGXdc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XxTzj7N3UUlFGRRchBW0RDhfC4THg7aX0jQnTQotg8HmKTCvKQpGbGE3ci23/dKt0Mp13Re/p1Bkb14x3b3lAUbDVsuz2oRYaeD/gBXFpYUVC8u59Y+wtO3TM3sh1xnzoCUVIftGEmF0idoYbY7qxHuWgpqKnMEI66D49ebVFyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=lSUT0jRI; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from ms-a2 (39.25.31.150.dy.iij4u.or.jp [150.31.25.39])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 62PKou8B020293
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 26 Mar 2026 05:50:56 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=e+ypmhgEo15svmjeaPLlvAZjVEpBxo8jHbFD3xFAMjM=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20251215; t=1774471856; v=1;
-        b=lSUT0jRI1tAoWK5D8wckc74+l+HU26AoMJa853f/ULNa73hsWYW6Sk3J3x9pcD5y
-         RIeaobmuvBF+s+DVLQYilGkBPgXs0AWQr6B0foQjHbWjgDBCHGDQdFBhleAWmTs3
-         VuFeLz3y0/XQWGxreyXY55v/9KcfkpCeztMIFzb83ej5bVH4q2uzoQrtbQ2ImzCT
-         H69am2/zMVOqKbaTRqFd7/Tn305KcKzvtSPto3nDh+fCVEtXZIACnKOZQYEvsAlj
-         CWPMUae4CVUrNIZP65nz0xQG8OXoDnc4VxMqoek9v9jiiQEvdiMD63LhV3Fn4/CQ
-         DRVhYrpsEVyqMgod0NUvbQ==
-From: Kohei Enju <kohei@enjuk.jp>
-To: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Shannon Nelson <sln@onemain.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>, kohei.enju@gmail.com,
-        Kohei Enju <kohei@enjuk.jp>
-Subject: [PATCH iwl-net v1] i40e: don't advertise IFF_SUPP_NOFCS
-Date: Wed, 25 Mar 2026 20:50:06 +0000
-Message-ID: <20260325205054.109822-1-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1774471952; c=relaxed/simple;
+	bh=7tfnYTF1fs0ROH1wH33nuz71pGj4lwF/JonOh4LcOu4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JoF0ZjtCNVw6WKPPyzfT9ZxJVLBJfcJiROtgFBIDZG0u7xfLg8K0fcUAzxHxTLq+L/WSLBl8eZXVk4AMFU6CUjafpue+4dVlpDfwWPCId/80yvHySQ/e7FcB8Jrh8XViX/VO5GCFiAStuLckTavIpkAWZIUYq+vvnbA3K+QAt1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bJgocfdz; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=5TaF136hS7gyiN2INSsjbTVG4M1m+RcQW4RSzUAK8mc=; b=bJgocfdzLBKes2wMXa50BQ/Sgw
+	2VNxUldZJFRFO1DH1e3sWYkf+HpUKst8qeo6mEmxzisIlT9F643+8G7mP8W0cEG97CX9EddaPFnAx
+	0auvwtk71mLu472gb4M/pgwwwT7auS75QFoEuI3Ulc0t8Td1yqPpRlQhMRL9Q0sVOXjuT1KRASHvT
+	KyQkPoRHlhfR1LscoVZHueKBsDdovNbEjbfAFOMWWjTHfKoz7+lVqv6Pq5sNuqrikvfHErcf50ZxE
+	dLM4luhf9tuxdUXNx8G4p2TIcbxgKN3UURxz0Ib/Wm84DDDPrXllvWnYoO6lVBmszS+dAvfAa4kcZ
+	Cij15muw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36514)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w5VD1-000000003uJ-1ODG;
+	Wed, 25 Mar 2026 20:52:11 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w5VCy-000000006MD-0rz1;
+	Wed, 25 Mar 2026 20:52:08 +0000
+Date: Wed, 25 Mar 2026 20:52:08 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Chen-Yu Tsai <wens@kernel.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Shawn Guo <shawnguo@kernel.org>, Fabio Estevam <festevam@gmail.com>,
+	Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Christophe Roullier <christophe.roullier@foss.st.com>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Radu Rendec <rrendec@redhat.com>, linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Drew Fustini <dfustini@tenstorrent.com>,
+	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org,
+	linux-mips@vger.kernel.org, imx@lists.linux.dev,
+	linux-renesas-soc@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, sophgo@lists.linux.dev,
+	linux-riscv@lists.infradead.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH net-next v9 5/6] net: stmmac: qcom-ethqos: split power
+ management context into a separate struct
+Message-ID: <acRK-F6TACsZqEhx@shell.armlinux.org.uk>
+References: <20260316-qcom-sa8255p-emac-v9-0-c58934e76ff2@oss.qualcomm.com>
+ <20260316-qcom-sa8255p-emac-v9-5-c58934e76ff2@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260316-qcom-sa8255p-emac-v9-5-c58934e76ff2@oss.qualcomm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,onemain.com,gmail.com,enjuk.jp];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-271741-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271742-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,st.com,linaro.org,baylibre.com,oss.nxp.com,nxp.com,oss.qualcomm.com,bootlin.com,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,tenstorrent.com,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[48];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.964];
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A2EF232C01B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,linaro.org:email,armlinux.org.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9F6B232C090
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-i40e advertises IFF_SUPP_NOFCS, allowing users to use the SO_NOFCS
-socket option. However, this option is silently ignored, as the driver
-does not check skb->no_fcs, and always enables FCS insertion offload.
+On Mon, Mar 16, 2026 at 01:05:10PM +0100, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> With match data split into general and power-management sections, let's
+> now do the same with runtime device data.
 
-Fix this by removing the advertisement of IFF_SUPP_NOFCS.
+As I've already said, this conflicts with work that I have in progress,
+which will remove the serdes support from this driver _if_ we can get
+forward progress on the PCS bits from Mohd - that has become dependent
+on sorting out the MDIO bus clock which seems to have been totally
+broken in this driver for quite some time so that we can have confidence
+that any testing that is done is actually being done on a setup which is
+running within correct specification (and not running the MDIO bus at
+some insane speed that may lead to data corruption.)
 
-This behavior can be reproduced with a simple AF_PACKET socket:
-
-  import socket
-  s = socket.socket(socket.AF_PACKET, socket.SOCK_RAW)
-  s.setsockopt(socket.SOL_SOCKET, 43, 1) # SO_NOFCS
-  s.bind(("eth0", 0))
-  s.send(b'\xff' * 64)
-
-Previously, send() succeeds but the driver ignores SO_NOFCS.
-With this change, send() fails with -EPROTONOSUPPORT, as expected.
-
-Fixes: 41c445ff0f48 ("i40e: main driver core")
-Signed-off-by: Kohei Enju <kohei@enjuk.jp>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 3749f32ef95a..a3c52aa6255b 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -13831,7 +13831,6 @@ static int i40e_config_netdev(struct i40e_vsi *vsi)
- 	netdev->neigh_priv_len = sizeof(u32) * 4;
- 
- 	netdev->priv_flags |= IFF_UNICAST_FLT;
--	netdev->priv_flags |= IFF_SUPP_NOFCS;
- 	/* Setup netdev TC information */
- 	i40e_vsi_config_netdev_tc(vsi, vsi->tc_config.enabled_tc);
- 
 -- 
-2.51.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
