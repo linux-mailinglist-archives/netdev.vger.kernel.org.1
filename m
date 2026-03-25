@@ -1,165 +1,130 @@
-Return-Path: <netdev+bounces-271713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271714-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SLxyH587xGmMxgQAu9opvQ
-	(envelope-from <netdev+bounces-271713-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:46:39 +0100
+	id 4Ot9GqA7xGmMxgQAu9opvQ
+	(envelope-from <netdev+bounces-271714-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:46:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA8DF32B747
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:46:38 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6B1C32B74E
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:46:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6F97A3019C83
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 19:44:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EAD96300C34C
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 19:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11EB13FCB1C;
-	Wed, 25 Mar 2026 19:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94EFC41325D;
+	Wed, 25 Mar 2026 19:46:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JEX9SAxp"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0X/v1cF5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407AE331A4C
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 19:44:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883F43DDDD3;
+	Wed, 25 Mar 2026 19:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774467852; cv=none; b=mUwfTVLpQQLKv+FcIszNOZyhy08alpjW1jtBssyLsjR+kO/xBDXIAu+vPJTu5hNou5RySNzkbFlbi5KhCkbtUwlzhVxSrRe3nwB2fZJtwvPvfE1KrpaZ03GyrZmwFgM7Ybwx2TvA5BgHQYHnPQC22NTuNEkEziMztBHiQ9roODc=
+	t=1774467990; cv=none; b=Fj3WC8aNrL6Hp9HtJRiwDnEYRQwP5RVQbT+MgQfl/l1Da26zqkVMCpfFmPKuYZGVum2TpQtN/wpv4fkJNR/QnDGyTtbHOSoMRC/1QfEpD3rrs1y5AYRFoFNW5oLyLJQTAaI183OUoJTlPM5kvG0w5ED9suNg4BbDzt5e4edJ9ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774467852; c=relaxed/simple;
-	bh=78c9neIIAyWLevt4ozwWCiA4bTLgXpJDR+RWtdoP8iQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b1MlwKh+2tCr4qEnNwCYE8d9+16qQcMAmmW1iGOt9CzE/TSEJ02f3Iv0auBgqs6X/gq2Tke0R3qdzncZ8OBNFMWJ0CDCwLJCh+poJscyYO113DvKI1YpFm1c3ktJMYZZnUhn4wlcb6vyQ7UWllZv9nb7AprEYYmDLy0MztX6YLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JEX9SAxp; arc=none smtp.client-ip=209.85.221.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-56b6c7c8d00so201031e0c.3
-        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 12:44:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774467849; x=1775072649; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vG63buxikYzZRa5bTcoW9Euem18H8lifInafLz0wjA0=;
-        b=JEX9SAxpy4edbn+QLPPcSaZLrTpl5he6WE/GqwC4wMl+p02yQulTExeyDS2GROYZMq
-         JjGlKAMsEk5FpUYoyHMOp6u3w5I/LI5KTO0alNhBZH25WD32VI0q1iftimECCjpmVIzP
-         4czU/MuRKvucu5w0x7fGYTJeb+jB471Zm6yEIbPuqoYtzTdUrHv46CxZ3fjhibXEyD5+
-         yYV840EZoIy008adJnPzhTnLFPMkobriRnH/AtwtalVe+6up7L92GcELY+tqI+JOWkp0
-         rQgeyfRB8XqnB4xEWjs5kdMvvo/gBuYPw47wNgGFDpSxhLnii+0hqiqCOX5OR6g9Ndv6
-         Sciw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774467849; x=1775072649;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vG63buxikYzZRa5bTcoW9Euem18H8lifInafLz0wjA0=;
-        b=nPDEG0k/0T9hCYz5ZhJ3gxiVVkLaRF5+Mg0NJ8peyHnLXw0z99hJF8AgoSYmM579LX
-         lGTmR46w1DFnYiWK9gdJIOnTNY0KafMpu1N3kgNqGl4+nLXJV+djvt4AkD+5jLz6nl8M
-         6G+nomDugQEtaOd/3w9oS0vMdVEKEwYI+PMTYI7JzcwZywGL20YGFS8Cu/wuXryP4v9V
-         se15viGFLihVchBjwnAx/6E9cz3VvxK2wGIArCzKMMI2+hMs821hH0hShCZeXh5Rb67p
-         9gUfqthsjzX7kT3FrRtjoBwvwVf7EhzANUFRRUJvY0flA1PrD3Lp200LIDFtm+vpZLf+
-         LmBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVTXLy76lRtXgTe6/MKHO/oFOqnNFr/SFPtKxg3xKJrdG0w9yuO5HRAFcGScsIUYelZZpR8ZpY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyesCovzm6LhFXmORHKkyd/39O7AOUPzBltED/D/uNAJKZELdHB
-	qUFF5o/AKUHZvZY5KnNaWTj0zhgqBVP7MhsvcKcCJpVM68hDGk1bSNwd
-X-Gm-Gg: ATEYQzxvjG3VWlybJRrkVh2RubujWx7xOoKQ+n0Ab7kupXcbro598lO/YiMRQ2gLUzt
-	zPQ1USyukAz6xZjTmW2tXP6QW83W1HyGCidfJ9hL63tdY8DZdB/9TYzkuj0ufFAE+C5qPvTJ1Ng
-	RJA0b64OQHqqbrnR9hsEmt4QMyLPikNFFlIEZ6qL5o1FnoP/PYpIsTFMmQsv8Dy5zqUoDD4V6Hd
-	ZTgHUAT3DSmcVNYtnvMNq10JQfldHqGLjYhRO4lEGEjP85fWqku0wTrBK9N3ttdmKG7qiPps42m
-	TxdGGehfN1QHY1ruKsnv2LCKVsg2VEr89ldzdd9YoX6erS9DhXKaO0sNieHQGysftp+iZmryfkU
-	xWsJS0xhgtMRAO1kEWbRHT/LU0k8RSNhNS9VmM4rSVDtjSIWWcJe2KMrel+JgBus9K0yPptN2eA
-	rDLWVimlQevJCgidO82KiIwYM5ckbK+Zco0VQwIqkr/ljYKQQZG/XH0kbHVcbv8pBVd4ApY14dK
-	DREmNyIKqlE8OwLxEab9vXGiVjs
-X-Received: by 2002:a05:6122:8289:b0:56a:fcbf:8aa4 with SMTP id 71dfb90a1353d-56d21f3d2c7mr2718324e0c.2.1774467848270;
-        Wed, 25 Mar 2026 12:44:08 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56d31d38abfsm1312353e0c.11.2026.03.25.12.44.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2026 12:44:07 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2026-03-25
-Date: Wed, 25 Mar 2026 15:43:58 -0400
-Message-ID: <20260325194358.618892-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1774467990; c=relaxed/simple;
+	bh=Jb3L4ICqeroI6Gyf9PM/GhshoEIuMXl08eMVhHGaW5Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ifo7ppa6KUFHmVKVfav0/vMf/vJzct+ctZ9Zqm5wsbvu92AytKcVTNFrmWHZIbSGWpc6/ox9Z+2WVcstm3y0rdmn0b2nwoc0Cgo1qXP37xZ4SE6MgMFwsCK9M87Ekhqj8KjtSw7eIQ//G6u9a3zFK9fPTX/EcxCkWgQNch/VvwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0X/v1cF5; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7LYOU/TLhQLEYy/E7Cpnl7qWbK1lzoWToXQcIDhc9hU=; b=0X/v1cF5lfqypgKdvgWcxL3F1E
+	WNiHNjrWD0/SmejAkVNBaFX2ZuNNM04cylxPRGXzxsJhshZjfd/Xx2s0eBtWZett7oYiM8229zId9
+	Jm8WCuaVgwxARfFNLd65aMwzFHKDWl8bBCUniK96alDmsGNfCL4EtdARV96JZvLv4Xr0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w5UAw-00DLrq-Pm; Wed, 25 Mar 2026 20:45:58 +0100
+Date: Wed, 25 Mar 2026 20:45:58 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, kevin-kw.huang@airoha.com,
+	macpaul.lin@mediatek.com, matthias.bgg@gmail.com,
+	kernel@collabora.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: phy: Introduce Airoha AN8801/R Gigabit
+ Ethernet PHY driver
+Message-ID: <75c10c97-8355-457d-9458-0d88d598445e@lunn.ch>
+References: <20260304-add-airoha-an8801-support-v1-0-0ae4ee5a2f9d@collabora.com>
+ <20260304-add-airoha-an8801-support-v1-2-0ae4ee5a2f9d@collabora.com>
+ <3fbfabf7-b3af-405b-ade4-4f62db2c1c45@lunn.ch>
+ <199e674cfdbccad104db761964611b1d6352f9f3.camel@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <199e674cfdbccad104db761964611b1d6352f9f3.camel@collabora.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-271713-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-271714-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,gmail.com,armlinux.org.uk,airoha.com,mediatek.com,vger.kernel.org,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EA8DF32B747
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A6B1C32B74E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The following changes since commit c4ea7d8907cf72b259bf70bd8c2e791e1c4ff70f:
+> > You configure the PHY to support downshift. If it has performed a
+> > downshift, does it report the actual speed in the usual registers
+> > read
+> > by genphy_read_status(), or is it necessary to read a vendor
+> > register?
+> >From the tests I've done, I got the actual speed read correctly by
+> genphy_read_status function.
+> I did a test by adding in this function the vendor register reading at
+> the same time and comparing it and did not get a discrepancy too when
+> switching with ethtool between different speed configurations.
+> 
+> Would it be more reliable to use the vendor register instead?
 
-  net: mana: fix use-after-free in add_adev() error path (2026-03-24 21:07:58 -0700)
+It is unusual to report the actually speed in BMSR etc, which is why i
+asked. But if it works, this is fine.
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-03-25
-
-for you to fetch changes up to 129fa608b6ad08b8ab7178eeb2ec272c993aaccc:
-
-  Bluetooth: btusb: clamp SCO altsetting table indices (2026-03-25 15:32:55 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - L2CAP: Fix deadlock in l2cap_conn_del()
- - L2CAP: Fix ERTM re-init and zero pdu_len infinite loop
- - L2CAP: Fix send LE flow credits in ACL link
- - btintel: serialize btintel_hw_error() with hci_req_sync_lock
- - btusb: clamp SCO altsetting table indices
-
-----------------------------------------------------------------
-Cen Zhang (1):
-      Bluetooth: btintel: serialize btintel_hw_error() with hci_req_sync_lock
-
-Hyunwoo Kim (2):
-      Bluetooth: L2CAP: Fix deadlock in l2cap_conn_del()
-      Bluetooth: L2CAP: Fix ERTM re-init and zero pdu_len infinite loop
-
-Pengpeng Hou (1):
-      Bluetooth: btusb: clamp SCO altsetting table indices
-
-Zhang Chen (1):
-      Bluetooth: L2CAP: Fix send LE flow credits in ACL link
-
- drivers/bluetooth/btintel.c | 11 ++++++++---
- drivers/bluetooth/btusb.c   |  5 ++++-
- net/bluetooth/l2cap_core.c  | 31 +++++++++++++++++++------------
- 3 files changed, 31 insertions(+), 16 deletions(-)
+       Andrew
 
