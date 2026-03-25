@@ -1,557 +1,268 @@
-Return-Path: <netdev+bounces-271570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271571-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cHhtOzXsw2kAvAQAu9opvQ
-	(envelope-from <netdev+bounces-271570-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:07:49 +0100
+	id MMlKG23sw2kAvAQAu9opvQ
+	(envelope-from <netdev+bounces-271571-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:08:45 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CE9432670B
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:07:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C85326750
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:08:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E9DAE3032988
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 13:46:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C43733146489
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 13:47:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684C63AF64B;
-	Wed, 25 Mar 2026 13:46:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87EF3D647E;
+	Wed, 25 Mar 2026 13:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J/spztVF"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="C/Y7Ht1Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012049.outbound.protection.outlook.com [52.101.66.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43648242D67;
-	Wed, 25 Mar 2026 13:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774446364; cv=none; b=jAelHbtIWSiowmZnyBDuxX7i0tAp811khCr5Mfyq9a2Mq4bbr7PpKXEO6xowVBNfrqAR3tkOzt3m0fWXHaUpJElXSGJtPM4XOWc2+dlqRoo0MCx76btx7B9tjajPdrw5fpLIs4mUCYCMD6EnJ4hEr4122BFIFEeVTZwvybpLatA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774446364; c=relaxed/simple;
-	bh=TSXGQzfP711qrPB0j3RMTHQ/TMRpAy/A6hAklaBDA4k=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mx4G4I4CGbhenMlmmyAcSGipU9pa3PoOKnoqtq3amS9hZ0YXw1aU3onzBpaPOZ64mb5tKGlYVh9N58oALncAsKyUKhNyJby0UHGTIhBi4Lrvycpre+DVjo3MzabDVqS+x+j7BfymGeBD1iqiDF3ZSHHfXs1OAPsr3AEb7l6P/ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J/spztVF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34EB4C4CEF7;
-	Wed, 25 Mar 2026 13:46:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774446364;
-	bh=TSXGQzfP711qrPB0j3RMTHQ/TMRpAy/A6hAklaBDA4k=;
-	h=From:To:Cc:Subject:Date:From;
-	b=J/spztVFpXILaV+6ISmNoFIGf1Mui271QWTcRyRoDb3SPrr3NxvDFhuPASQEbQhf8
-	 3K4ugQYSfJfFA5Z1JDdkJr05RYbVEcwVqb5JAJY7jRlH5QjoP47pxerzooHtYPyG9r
-	 nROPr3OA04hZpxq9YihKZWYR04DshQIa9eBCzPPFObwxQeqyf94IfX/p3TvvXgBTQg
-	 Cq6r0O7ufY2SjiUkL32ItHj7p8t02CQABqsFD8uZ20es3Chk61kKFvbSqsLjAJel/V
-	 R+C5N+C1OHEInDbsFsjKAwe+pOqGmHnhKQIr9F8tvcM9SSblh85T15PZ8XDDzGm2+b
-	 1rhwJWh62NviQ==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Edward Cree <ecree.xilinx@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Jeff Garzik <jgarzik@redhat.com>,
-	Ben Hutchings <bhutchings@solarflare.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Breno Leitao <leitao@debian.org>,
-	Kees Cook <kees@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-net-drivers@amd.com,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH] [v2] net: sfc: avoid format string warning
-Date: Wed, 25 Mar 2026 14:45:44 +0100
-Message-Id: <20260325134557.3406655-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F7A3D6CC8;
+	Wed, 25 Mar 2026 13:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774446457; cv=fail; b=kfCAy/AzO7RhMaNlcS4TgLFvzxnBKT1IlYJhMYbBCn3Kf3Zv6oZOtv/huOgdJZVoOmDpmrTMWSFzn0WvsJ95tcL4hx5kpHD8BDUhxi2JreRX3JrwEYzP+WPfs87c7aL+xEbKcdxHHedUp0UOeDle0Hs39Yh2OGY7ygpgMHvAAzQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774446457; c=relaxed/simple;
+	bh=ya5C+YyAINPE9aYJgmszNzF2ejzBQBrT2/G2VmsQJqM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=AWwZKfmDM/G1i6AH0sHpuzKOChSRBfjfojYzQ8+QL7FFRoc26UIaWJlUjwVFzvquSXvC6dWyq2rRDdeF6VpHJR4kh2tywlYD+PIq59gnZdqtkzHj5M1bxHt6j0m9uPJKBkBhqzmzE9xU4lanIL9k2HSB8gGwmAZw14TECqiXkIs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=C/Y7Ht1Q; arc=fail smtp.client-ip=52.101.66.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Xn7psNnuowpP7H98gO2UEiYz/Qydzg4/xy+tZgOCBvZZinmnrLQSmc9KPbBtylvXc8dd1OZoHs4DD/w9YRsSLADtcWjUeRpe6kVrLgCpcBru0G1ctuRTRDBSDQmlvxnEjalwhRPYHa1Z0oJO0gf5m2lwgWFas9WTWqapLSuMS0wMRNT1AIcqwntnXJt0Jr3nFrXC9gbTmgFKF453Xvn1uFY7HCo8WhHsQkWbbvPlrE0xxLN0CKUn7qFFeIbbNcoNch4pxb6mo6XYkbhzfW2pgq01uLWa1QYSDh2IXXC/pc9sOdDZnVxcfdxthgRiQN+ZQi4dBIeQK9l3tfzBN+8IKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=opp+k1cuUQUgjMyx10BNSQ/I6OGmNEL3cqSEkRbxmb8=;
+ b=N2CfbldazLoFbVoGSlPRCFUIRlFs5kpP9uybzSDd4Dk8yzoGsVO4gVJ/JA16mKtHAXOJuMSI9rEHWMsXiyACP7X+QX6lX4xsvSOZj7hvCNmEVXg2BM9nN7JejyaxVTSU2gzUoXquQkyrkZk8Yy6ExLSKh38eTnCP7Cmn1QO29U3QYkVBsc9eKkHItXVU6LOcGnrIMhKCqB4nFbT3oRUWkm4hnzbJHqjqGsW77dq7tT57drw1XEEju87wnxuC7yTbgOTZ4DWD3Yyso+3iAAF/X/g13OwQ0/f1RDd0KzqosB4UaRItx6M3PY6HwvqbGzXBnaD6YLdEg5hF4LJ8T6oPew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=opp+k1cuUQUgjMyx10BNSQ/I6OGmNEL3cqSEkRbxmb8=;
+ b=C/Y7Ht1QFwoMcUEti9AdgdYlXdZ7orGH1ut3INZdQ9DmDEi2F/aBn1WJfSN+Q+7Ugt2YY+lraxkL8mRlkmAgYxCz0PRgPK6/ZZfCGtmdIjibldyQ2J4VTaSF2h3Yuku0RdTtYGYcbJd54+Ju73cckUwrNmcrsI1EBSbAzM1nFr5BHp/0c7BiC6FRS0T8WstEk02YBicLfH8zJIWTJk9scuK77Bdd1fR8KAIZB2sTUVvueZV+sx7VU32rXrxc/Qc+IbU6cN9TXqcFu+fwvDn2aSHLBmuktFXDomDsDM8OV38hseU0STC23yyySS733CBofpuRuDUcAiAEaGkz4WjQ5w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
+ by DU4PR04MB10482.eurprd04.prod.outlook.com (2603:10a6:10:562::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.31; Wed, 25 Mar
+ 2026 13:47:27 +0000
+Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
+ ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
+ ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9745.019; Wed, 25 Mar 2026
+ 13:47:27 +0000
+Date: Wed, 25 Mar 2026 15:47:23 +0200
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 3/3] net: dpaa2-mac: export standard
+ statistics
+Message-ID: <ak725sqoa46ip5kzm4hbkf2rqxbdaldudvudl66r33i3c3dvgk@kb4mq5dhiwpb>
+References: <20260323115039.3932600-1-ioana.ciornei@nxp.com>
+ <20260323115039.3932600-4-ioana.ciornei@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260323115039.3932600-4-ioana.ciornei@nxp.com>
+X-ClientProxiedBy: AS8P189CA0054.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:458::26) To PAXPR04MB8253.eurprd04.prod.outlook.com
+ (2603:10a6:102:1bf::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|DU4PR04MB10482:EE_
+X-MS-Office365-Filtering-Correlation-Id: 19823417-84c7-4837-5942-08de8a750d6b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|376014|366016|1800799024|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	TW4fbD/blk3U5KAlYk5OzHhUKUwoSLCKpajSCsN0jeOG1YotMs7ZWg1hPyv2Cn4g/ZFB/gVl9w2i0zEMIcozYWLm3Or9e4DLvIkXJQh6zgN0/J10Qm6IxeRyruODZ3/SpoZSRShQRVQhjbF+tFozVy43ElF5oy/8RVkavTYVSChsFSavafFaPTTeZWMzKCV2rKGoiEavLtBIPY4YoKqZfr86WzrRKVLKXklR7T6HPUKxciSYP7P2gu0/Ac74yPLjt8wLBx0SpTEwHL3hSLpOBR03gmtsR710hwpI0bUa228XQr9kNmL7lEcJkYAn8CFyKX1+99BK+qKJ0IeuThbd4LxLhAqhJLFXC3ogqNzz06Qo4/Xzx7MEhTOVY/6Fz9iC60JaI9N0XNJvRFwEWds2J9v/lgNyN3Ahz6ukhfsvhAr0/6yfES5BioMvetnv7CHd2T3tzxD7LmLEaz3emPwjm/JaoC77ioXPIMyeMKX5rDLZF7cSarZp5uSPlQvf7HpbvJHAM4fCCjRKe03Zmb/YQ06gtkApl9szuUdPvRuNSVh4ymp9aUYgcpZae609AVtopoPSG6G6NCva0glsHaubl6c0e78bvmPH+yWSOV9CFoW7ugQbLUYz5Glvk2Vgu1F9WwEtLwaKzFnYlWD7Veo44sR/1XAFjupdg6jkCvOKsxzgZEKSBGeCaQJ3Ph/+kJKHIIL58lsfUDvURtYO74pjZwlKqZtnOBppXNOpa2Gb9Gbxvw7UD/4sM9c1oKFgSQyP
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(376014)(366016)(1800799024)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?7gW9iqGI22XFTF5x/f8AGLKhsCGfQ4BBLdItqJ33WsKz4q/KUbExcQii9ZJS?=
+ =?us-ascii?Q?vMVVG+mbqtfdbE7uqaI4Kv02/vrvpeWNXudzIWluGcHRHLV5fKjxod7HsQ+i?=
+ =?us-ascii?Q?NFl130RrbZhpgYOwSR5Nokq8JSad+4DWPcNFSU+IeXVx3S5ip5xZ40oiMWyu?=
+ =?us-ascii?Q?SBsuakPvN0m4UI+1gDqsJbk40XETvGfcOGpT56H2NdefrwNPSyTTYeXmC/g9?=
+ =?us-ascii?Q?teGz2/fUqVjY1GLqcwLt551Suy7DcgA4XHk1DlW/YNlhtIcgoeL8iZIquzB8?=
+ =?us-ascii?Q?gjvf4uPsIe5LEKIo9lSibnIu+kZDCihl8qV5V20nUHQXuFsF/+KUOo+D/dWd?=
+ =?us-ascii?Q?CtA+VU4IAx5id+qNWa1NenhHCNrjDZTIY9Y4yM4tVzgdf9/j6EHw3l65x4aV?=
+ =?us-ascii?Q?pdRoeRcOSr37Yh4X29c079ytkwsY6acI9OgfquHD4G4C1kzCNM3iZsEz6ZM5?=
+ =?us-ascii?Q?/U/2ZdLT25lkydGMnYOnaG3HgJNekHqOZWQDd6foMNNI28XT1eVuJv0ZlTTP?=
+ =?us-ascii?Q?3Jwvi7qsc1+GqDQxCQpwmZVpF11LznG5bUytNwsLRtffK3tQF6SS7/vpxvYJ?=
+ =?us-ascii?Q?A5XAllVJcI+ExtThmAWRcuDyC2+wlG5sfu6ri4zR7wo/GG3oTiN5y17QJ1yp?=
+ =?us-ascii?Q?TpLsKZAj+UJqo6GyUN2WiH43S4LyFxKBaTxJN0wTwGrQLsUPkyPByBBETAMv?=
+ =?us-ascii?Q?0o6W7Y7TS54JzFTECVn1F7H57g6ov8eFEuIGk65qN51jX2o57bUTVErEmomH?=
+ =?us-ascii?Q?FnL1tUrxDmKh9LX9w7J86TkQgLBNCLKpFrgisp4hURqGkNUndVwQiJ5uO1GP?=
+ =?us-ascii?Q?Rvb/NTYIgLR3qiHSyqdMSrwLFZgZkXwl9raG7q6ictk8Un+Z8txM8wlTasyK?=
+ =?us-ascii?Q?bmiXrNUyt4LXzGR7CSjk1KaxpiWaFFDa5cEYsJnZd3gm723sy3/ey8vNV5k/?=
+ =?us-ascii?Q?3+i3K5zwqU80V0Xwlq6DBzUDOm9KZdz4jLNeD+0HL0Oz5auTW+ObF3o6LAgk?=
+ =?us-ascii?Q?BkgPRO/p996440HUWr90TnWWc+vC4mUL5IlrXmYG1ePe5sw7af5By3P86MYQ?=
+ =?us-ascii?Q?CLMk5aayDXUTOl06eBtpYw3fOwDNyJDyzuM3in+Z+z1rm7PX9CRFmZ+Lvees?=
+ =?us-ascii?Q?4WYhrFrH7Tariur6MApfywYI+VuRSiO8FkS7btxH8hDKFrAm07EG3k1uRCpZ?=
+ =?us-ascii?Q?vXYAQhxV5MTWc48wvNYfzEXHn3dglcGTcgLOVV+OOmTWvd5tyzbPqnfN5nme?=
+ =?us-ascii?Q?+bfz74C5n1UVudej/rBMEgVVBMaVqBeOb2TQ92Zo6YWYGcH0GfAvYE4Htlu9?=
+ =?us-ascii?Q?18T7KsjeIYg7eW5nC5cSFw3K7fhjLtofJf6uXdJ4E5MU4CZRUtum3JbbjiN/?=
+ =?us-ascii?Q?BEsNsjNTOwVBo4igEKWJGO+Wlyiq5xjMduAn14xVWsAVgVnXcJBl6NSJfNcA?=
+ =?us-ascii?Q?jwD3B+wGnT1j7F3+w5bxbnBgkli4sb+y/xruJwlaGtbOqp3R6+GLAA5bSrH+?=
+ =?us-ascii?Q?8OGKLOD1la8q4TDKJQv6EQrLLJXWg/USCsjCxeZpEyfZWxAx5EitmxwDnypy?=
+ =?us-ascii?Q?nZazT5wwO6nEX+V5jLCz3lfYEx3rsc7sUpqKgE+YR6xHZUpGIMw4rc5BXFJu?=
+ =?us-ascii?Q?gqj4YMxS0ydD5oHl73Wr3V1H61irDrP8FYh2Jiy00trdO0vEnZOrtSONLtD3?=
+ =?us-ascii?Q?fGngsffOkW5+FZ2QNZRlKD7pZv0QttXpkcBy5NYQEiaSXSOanM8VWHFiLBhK?=
+ =?us-ascii?Q?MypUpyZyPg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19823417-84c7-4837-5942-08de8a750d6b
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2026 13:47:27.5884
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KEJyxiO35LkXSrA+BhCsybvCpDg0LkAVV353R4xfa7HHKY9jS8zO1iyOcd6WYeGSm1M5YkFVAOx1exGXJO9IBg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB10482
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271570-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,solarflare.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[arndb.de,gmail.com,google.com,amd.com,debian.org,kernel.org,vger.kernel.org,lists.linux.dev];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-271571-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,lkml];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4CE9432670B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:dkim,nxp.com:email]
+X-Rspamd-Queue-Id: E1C85326750
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Mon, Mar 23, 2026 at 01:50:39PM +0200, Ioana Ciornei wrote:
+> Take advantage of all the newly added MAC counters available through the
+> MC API and export them through the standard statistics structures -
+> rmon, eth-ctrl, eth-mac and pause.
+> 
+> A new version based feature is added into dpaa2-mac -
+> DPAA2_MAC_FEATURE_STANDARD_STATS - and based on the two memory zones
+> needed for gathering the MAC counters are setup for each statistics
+> group.
+> 
+> The dpmac_counter structure is extended with a new field - size_t offset
+> - which is being used to instruct the dpaa2_mac_transfer_stats()
+> function where exactly to store a counter value inside the standard
+> statistics structure.
+> 
+> The newly added support is used both in the dpaa2-eth driver as well as
+> the dpaa2-switch one.
+> 
+> Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
+> ---
+> Changes in v5:
+> - use DPMAC_CNT_ING_UNDERSIZED for the rmon etherStatsUndersizePkts
+>   counter
+> Changes in v4:
+> - add dma_sync_single_for_device before calling the MC API
+> Changes in v3:
+> - reduce the number of lines that have more than 80 chars
+> Changes in v2:
+> - none
+> 
+>  .../ethernet/freescale/dpaa2/dpaa2-ethtool.c  |  61 ++++-
+>  .../net/ethernet/freescale/dpaa2/dpaa2-mac.c  | 214 ++++++++++++++++++
+>  .../net/ethernet/freescale/dpaa2/dpaa2-mac.h  |  17 ++
+>  .../freescale/dpaa2/dpaa2-switch-ethtool.c    |  48 +++-
+>  4 files changed, 338 insertions(+), 2 deletions(-)
+> 
 
-Three sfc drivers contain the same *_fill_test() function that takes
-a format string argument that gets passed down to snprintf(), producing
-a warning with clang-22:
+(...)
 
-drivers/net/ethernet/sfc/falcon/ethtool.c:227:60: error: diagnostic behavior may be improved by adding
-      the 'format(printf, 7, 8)' attribute to the declaration of 'ef4_fill_test' [-Werror,-Wmissing-format-attribute]
-  210 |                 snprintf(test_str, sizeof(test_str), test_format, test_id);
-      |                                                                          ^
-drivers/net/ethernet/sfc/falcon/ethtool.c:210:13: note: 'ef4_fill_test' declared here
+> +static const struct dpmac_counter dpaa2_mac_rmon_stats[] = {
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_64, hist[0]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_127, hist[1]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_255, hist[2]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_511, hist[3]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_1023, hist[4]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_1518, hist[5]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAME_1519_MAX, hist[6]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_64, hist_tx[0]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_127, hist_tx[1]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_255, hist_tx[2]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_511, hist_tx[3]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_1023, hist_tx[4]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_1518, hist_tx[5]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_EGR_FRAME_1519_MAX, hist_tx[6]),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_UNDERSIZED, undersize_pkts),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_OVERSIZED, oversize_pkts),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_FRAG, fragments),
+> +	DPMAC_RMON_COUNTER(DPMAC_CNT_ING_JABBER, jabbers),
+> +};
 
-Rework these to take a varargs based test_format that allows better
-type checking and a non-varargs unit name that gets pre-filled by
-the caller, so that the compiler can validate all format strings.
+The AI still gives here the following feedback:
 
-Fixes: 3273c2e8c66a ("[netdrvr] sfc: sfc: Add self-test support")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-v2: open-code the unit name format as well
-    reformat the function prototype
----
- drivers/net/ethernet/sfc/ethtool_common.c     | 67 +++++++++---------
- drivers/net/ethernet/sfc/falcon/ethtool.c     | 68 +++++++++---------
- .../net/ethernet/sfc/siena/ethtool_common.c   | 69 +++++++++----------
- 3 files changed, 99 insertions(+), 105 deletions(-)
+	According to RFC 2819, the etherStatsUndersizePkts counter tracks the
+	number of undersized packets received. Should this map to an ingress
+	counter rather than the egress counter DPMAC_CNT_EGR_UNDERSIZED used
+	here?
 
-diff --git a/drivers/net/ethernet/sfc/ethtool_common.c b/drivers/net/ethernet/sfc/ethtool_common.c
-index 54f8e4626568..62a94c995241 100644
---- a/drivers/net/ethernet/sfc/ethtool_common.c
-+++ b/drivers/net/ethernet/sfc/ethtool_common.c
-@@ -247,18 +247,17 @@ int efx_ethtool_set_pauseparam(struct net_device *net_dev,
-  * @strings:		Ethtool strings, or %NULL
-  * @data:		Ethtool test results, or %NULL
-  * @test:		Pointer to test result (used only if data != %NULL)
-- * @unit_format:	Unit name format (e.g. "chan\%d")
-- * @unit_id:		Unit id (e.g. 0 for "chan0")
-+ * @unit_name:		Unit name
-  * @test_format:	Test name format (e.g. "loopback.\%s.tx.sent")
-- * @test_id:		Test id (e.g. "PHYXS" for "loopback.PHYXS.tx_sent")
-  *
-  * Fill in an individual self-test entry.
-  */
--static void efx_fill_test(unsigned int test_index, u8 *strings, u64 *data,
--			  int *test, const char *unit_format, int unit_id,
--			  const char *test_format, const char *test_id)
-+static void __printf(6, 7) efx_fill_test(unsigned int test_index, u8 *strings,
-+					 u64 *data, int *test,
-+					 const char *unit_name,
-+					 const char *test_format, ...)
- {
--	char unit_str[ETH_GSTRING_LEN], test_str[ETH_GSTRING_LEN];
-+	char test_str[ETH_GSTRING_LEN];
- 
- 	/* Fill data value, if applicable */
- 	if (data)
-@@ -266,20 +265,16 @@ static void efx_fill_test(unsigned int test_index, u8 *strings, u64 *data,
- 
- 	/* Fill string, if applicable */
- 	if (strings) {
--		if (strchr(unit_format, '%'))
--			snprintf(unit_str, sizeof(unit_str),
--				 unit_format, unit_id);
--		else
--			strcpy(unit_str, unit_format);
--		snprintf(test_str, sizeof(test_str), test_format, test_id);
-+		va_list args;
-+
-+		va_start(args, test_format);
-+		vsnprintf(test_str, sizeof(test_str), test_format, args);
-+		va_end(args);
- 		snprintf(strings + test_index * ETH_GSTRING_LEN,
--			 ETH_GSTRING_LEN,
--			 "%-6s %-24s", unit_str, test_str);
-+			 ETH_GSTRING_LEN, "%-6s %-24s", unit_name, test_str);
- 	}
- }
- 
--#define EFX_CHANNEL_NAME(_channel) "chan%d", _channel->channel
--#define EFX_TX_QUEUE_NAME(_tx_queue) "txq%d", _tx_queue->label
- #define EFX_LOOPBACK_NAME(_mode, _counter)			\
- 	"loopback.%s." _counter, STRING_TABLE_LOOKUP(_mode, efx_loopback_mode)
- 
-@@ -306,23 +301,23 @@ static int efx_fill_loopback_test(struct efx_nic *efx,
- 	struct efx_tx_queue *tx_queue;
- 
- 	efx_for_each_channel_tx_queue(tx_queue, channel) {
-+		char unit_str[ETH_GSTRING_LEN];
-+
-+		snprintf(unit_str, sizeof(unit_str), "txq%d", tx_queue->label);
-+
- 		efx_fill_test(test_index++, strings, data,
- 			      &lb_tests->tx_sent[tx_queue->label],
--			      EFX_TX_QUEUE_NAME(tx_queue),
--			      EFX_LOOPBACK_NAME(mode, "tx_sent"));
-+			      unit_str, EFX_LOOPBACK_NAME(mode, "tx_sent"));
- 		efx_fill_test(test_index++, strings, data,
- 			      &lb_tests->tx_done[tx_queue->label],
--			      EFX_TX_QUEUE_NAME(tx_queue),
--			      EFX_LOOPBACK_NAME(mode, "tx_done"));
-+			      unit_str, EFX_LOOPBACK_NAME(mode, "tx_done"));
- 	}
- 	efx_fill_test(test_index++, strings, data,
- 		      &lb_tests->rx_good,
--		      "rx", 0,
--		      EFX_LOOPBACK_NAME(mode, "rx_good"));
-+		      "rx", EFX_LOOPBACK_NAME(mode, "rx_good"));
- 	efx_fill_test(test_index++, strings, data,
- 		      &lb_tests->rx_bad,
--		      "rx", 0,
--		      EFX_LOOPBACK_NAME(mode, "rx_bad"));
-+		      "rx", EFX_LOOPBACK_NAME(mode, "rx_bad"));
- 
- 	return test_index;
- }
-@@ -349,28 +344,30 @@ int efx_ethtool_fill_self_tests(struct efx_nic *efx,
- 	enum efx_loopback_mode mode;
- 
- 	efx_fill_test(n++, strings, data, &tests->phy_alive,
--		      "phy", 0, "alive", NULL);
-+		      "phy", "alive");
- 	efx_fill_test(n++, strings, data, &tests->nvram,
--		      "core", 0, "nvram", NULL);
-+		      "core", "nvram");
- 	efx_fill_test(n++, strings, data, &tests->interrupt,
--		      "core", 0, "interrupt", NULL);
-+		      "core", "interrupt");
- 
- 	/* Event queues */
- 	efx_for_each_channel(channel, efx) {
-+		char unit_str[ETH_GSTRING_LEN];
-+
-+		snprintf(unit_str, sizeof(unit_str), "txq%d", channel->channel);
-+
- 		efx_fill_test(n++, strings, data,
- 			      &tests->eventq_dma[channel->channel],
--			      EFX_CHANNEL_NAME(channel),
--			      "eventq.dma", NULL);
-+			      unit_str, "eventq.dma");
- 		efx_fill_test(n++, strings, data,
- 			      &tests->eventq_int[channel->channel],
--			      EFX_CHANNEL_NAME(channel),
--			      "eventq.int", NULL);
-+			      unit_str, "eventq.int");
- 	}
- 
- 	efx_fill_test(n++, strings, data, &tests->memory,
--		      "core", 0, "memory", NULL);
-+		      "core", "memory");
- 	efx_fill_test(n++, strings, data, &tests->registers,
--		      "core", 0, "registers", NULL);
-+		      "core", "registers");
- 
- 	for (i = 0; true; ++i) {
- 		const char *name;
-@@ -380,7 +377,7 @@ int efx_ethtool_fill_self_tests(struct efx_nic *efx,
- 		if (name == NULL)
- 			break;
- 
--		efx_fill_test(n++, strings, data, &tests->phy_ext[i], "phy", 0, name, NULL);
-+		efx_fill_test(n++, strings, data, &tests->phy_ext[i], "phy", "%s", name);
- 	}
- 
- 	/* Loopback tests */
-diff --git a/drivers/net/ethernet/sfc/falcon/ethtool.c b/drivers/net/ethernet/sfc/falcon/ethtool.c
-index 807c587eba3b..260340b291d3 100644
---- a/drivers/net/ethernet/sfc/falcon/ethtool.c
-+++ b/drivers/net/ethernet/sfc/falcon/ethtool.c
-@@ -200,18 +200,17 @@ static void ef4_ethtool_set_msglevel(struct net_device *net_dev, u32 msg_enable)
-  * @strings:		Ethtool strings, or %NULL
-  * @data:		Ethtool test results, or %NULL
-  * @test:		Pointer to test result (used only if data != %NULL)
-- * @unit_format:	Unit name format (e.g. "chan\%d")
-- * @unit_id:		Unit id (e.g. 0 for "chan0")
-+ * @unit_name:		Unit name
-  * @test_format:	Test name format (e.g. "loopback.\%s.tx.sent")
-- * @test_id:		Test id (e.g. "PHYXS" for "loopback.PHYXS.tx_sent")
-  *
-  * Fill in an individual self-test entry.
-  */
--static void ef4_fill_test(unsigned int test_index, u8 *strings, u64 *data,
--			  int *test, const char *unit_format, int unit_id,
--			  const char *test_format, const char *test_id)
-+static void __printf(6, 7) ef4_fill_test(unsigned int test_index, u8 *strings,
-+					 u64 *data, int *test,
-+					 const char *unit_name,
-+					 const char *test_format, ...)
- {
--	char unit_str[ETH_GSTRING_LEN], test_str[ETH_GSTRING_LEN];
-+	char test_str[ETH_GSTRING_LEN];
- 
- 	/* Fill data value, if applicable */
- 	if (data)
-@@ -219,21 +218,17 @@ static void ef4_fill_test(unsigned int test_index, u8 *strings, u64 *data,
- 
- 	/* Fill string, if applicable */
- 	if (strings) {
--		if (strchr(unit_format, '%'))
--			snprintf(unit_str, sizeof(unit_str),
--				 unit_format, unit_id);
--		else
--			strcpy(unit_str, unit_format);
--		snprintf(test_str, sizeof(test_str), test_format, test_id);
-+		va_list arg;
-+
-+		va_start(arg, test_format);
-+		vsnprintf(test_str, sizeof(test_str), test_format, arg);
-+		va_end(arg);
- 		snprintf(strings + test_index * ETH_GSTRING_LEN,
- 			 ETH_GSTRING_LEN,
--			 "%-6s %-24s", unit_str, test_str);
-+			 "%-6s %-24s", unit_name, test_str);
- 	}
- }
- 
--#define EF4_CHANNEL_NAME(_channel) "chan%d", _channel->channel
--#define EF4_TX_QUEUE_NAME(_tx_queue) "txq%d", _tx_queue->queue
--#define EF4_RX_QUEUE_NAME(_rx_queue) "rxq%d", _rx_queue->queue
- #define EF4_LOOPBACK_NAME(_mode, _counter)			\
- 	"loopback.%s." _counter, STRING_TABLE_LOOKUP(_mode, ef4_loopback_mode)
- 
-@@ -260,23 +255,23 @@ static int ef4_fill_loopback_test(struct ef4_nic *efx,
- 	struct ef4_tx_queue *tx_queue;
- 
- 	ef4_for_each_channel_tx_queue(tx_queue, channel) {
-+		char unit_str[ETH_GSTRING_LEN];
-+
-+		snprintf(unit_str, sizeof(unit_str), "txq%d", tx_queue->queue);
-+
- 		ef4_fill_test(test_index++, strings, data,
- 			      &lb_tests->tx_sent[tx_queue->queue],
--			      EF4_TX_QUEUE_NAME(tx_queue),
--			      EF4_LOOPBACK_NAME(mode, "tx_sent"));
-+			      unit_str, EF4_LOOPBACK_NAME(mode, "tx_sent"));
- 		ef4_fill_test(test_index++, strings, data,
- 			      &lb_tests->tx_done[tx_queue->queue],
--			      EF4_TX_QUEUE_NAME(tx_queue),
--			      EF4_LOOPBACK_NAME(mode, "tx_done"));
-+			      unit_str, EF4_LOOPBACK_NAME(mode, "tx_done"));
- 	}
- 	ef4_fill_test(test_index++, strings, data,
- 		      &lb_tests->rx_good,
--		      "rx", 0,
--		      EF4_LOOPBACK_NAME(mode, "rx_good"));
-+		      "rx", EF4_LOOPBACK_NAME(mode, "rx_good"));
- 	ef4_fill_test(test_index++, strings, data,
- 		      &lb_tests->rx_bad,
--		      "rx", 0,
--		      EF4_LOOPBACK_NAME(mode, "rx_bad"));
-+		      "rx", EF4_LOOPBACK_NAME(mode, "rx_bad"));
- 
- 	return test_index;
- }
-@@ -303,28 +298,31 @@ static int ef4_ethtool_fill_self_tests(struct ef4_nic *efx,
- 	enum ef4_loopback_mode mode;
- 
- 	ef4_fill_test(n++, strings, data, &tests->phy_alive,
--		      "phy", 0, "alive", NULL);
-+		      "phy", "alive");
- 	ef4_fill_test(n++, strings, data, &tests->nvram,
--		      "core", 0, "nvram", NULL);
-+		      "core", "nvram");
- 	ef4_fill_test(n++, strings, data, &tests->interrupt,
--		      "core", 0, "interrupt", NULL);
-+		      "core", "interrupt");
- 
- 	/* Event queues */
- 	ef4_for_each_channel(channel, efx) {
-+		char unit_str[ETH_GSTRING_LEN];
-+
-+		snprintf(unit_str, sizeof(unit_str), "chan%d",
-+			 channel->channel);
-+
- 		ef4_fill_test(n++, strings, data,
- 			      &tests->eventq_dma[channel->channel],
--			      EF4_CHANNEL_NAME(channel),
--			      "eventq.dma", NULL);
-+			      unit_str, "eventq.dma");
- 		ef4_fill_test(n++, strings, data,
- 			      &tests->eventq_int[channel->channel],
--			      EF4_CHANNEL_NAME(channel),
--			      "eventq.int", NULL);
-+			      unit_str, "eventq.int");
- 	}
- 
- 	ef4_fill_test(n++, strings, data, &tests->memory,
--		      "core", 0, "memory", NULL);
-+		      "core", "memory");
- 	ef4_fill_test(n++, strings, data, &tests->registers,
--		      "core", 0, "registers", NULL);
-+		      "core", "registers");
- 
- 	if (efx->phy_op->run_tests != NULL) {
- 		EF4_BUG_ON_PARANOID(efx->phy_op->test_name == NULL);
-@@ -338,7 +336,7 @@ static int ef4_ethtool_fill_self_tests(struct ef4_nic *efx,
- 				break;
- 
- 			ef4_fill_test(n++, strings, data, &tests->phy_ext[i],
--				      "phy", 0, name, NULL);
-+				      "phy", "%s", name);
- 		}
- 	}
- 
-diff --git a/drivers/net/ethernet/sfc/siena/ethtool_common.c b/drivers/net/ethernet/sfc/siena/ethtool_common.c
-index 76cbce2b9592..e49cc604b43a 100644
---- a/drivers/net/ethernet/sfc/siena/ethtool_common.c
-+++ b/drivers/net/ethernet/sfc/siena/ethtool_common.c
-@@ -199,18 +199,17 @@ int efx_siena_ethtool_set_pauseparam(struct net_device *net_dev,
-  * @strings:		Ethtool strings, or %NULL
-  * @data:		Ethtool test results, or %NULL
-  * @test:		Pointer to test result (used only if data != %NULL)
-- * @unit_format:	Unit name format (e.g. "chan\%d")
-- * @unit_id:		Unit id (e.g. 0 for "chan0")
-+ * @unit_name:		Unit name
-  * @test_format:	Test name format (e.g. "loopback.\%s.tx.sent")
-- * @test_id:		Test id (e.g. "PHYXS" for "loopback.PHYXS.tx_sent")
-  *
-  * Fill in an individual self-test entry.
-  */
--static void efx_fill_test(unsigned int test_index, u8 *strings, u64 *data,
--			  int *test, const char *unit_format, int unit_id,
--			  const char *test_format, const char *test_id)
-+static void __printf(6, 7) efx_fill_test(unsigned int test_index, u8 *strings,
-+					 u64 *data, int *test,
-+					 const char *unit_name,
-+					 char *test_format, ...)
- {
--	char unit_str[ETH_GSTRING_LEN], test_str[ETH_GSTRING_LEN];
-+	char test_str[ETH_GSTRING_LEN];
- 
- 	/* Fill data value, if applicable */
- 	if (data)
-@@ -218,20 +217,16 @@ static void efx_fill_test(unsigned int test_index, u8 *strings, u64 *data,
- 
- 	/* Fill string, if applicable */
- 	if (strings) {
--		if (strchr(unit_format, '%'))
--			snprintf(unit_str, sizeof(unit_str),
--				 unit_format, unit_id);
--		else
--			strcpy(unit_str, unit_format);
--		snprintf(test_str, sizeof(test_str), test_format, test_id);
-+		va_list args;
-+
-+		va_start(args, test_format);
-+		vsnprintf(test_str, sizeof(test_str), test_format, args);
-+		va_end(args);
- 		snprintf(strings + test_index * ETH_GSTRING_LEN,
--			 ETH_GSTRING_LEN,
--			 "%-6s %-24s", unit_str, test_str);
-+			 ETH_GSTRING_LEN, "%-6s %-24s", unit_name, test_str);
- 	}
- }
- 
--#define EFX_CHANNEL_NAME(_channel) "chan%d", _channel->channel
--#define EFX_TX_QUEUE_NAME(_tx_queue) "txq%d", _tx_queue->label
- #define EFX_LOOPBACK_NAME(_mode, _counter)			\
- 	"loopback.%s." _counter, STRING_TABLE_LOOKUP(_mode, efx_siena_loopback_mode)
- 
-@@ -258,23 +253,23 @@ static int efx_fill_loopback_test(struct efx_nic *efx,
- 	struct efx_tx_queue *tx_queue;
- 
- 	efx_for_each_channel_tx_queue(tx_queue, channel) {
-+		char unit_str[ETH_GSTRING_LEN];
-+
-+		snprintf(unit_str, sizeof(unit_str), "txq%d",tx_queue->label);
-+
- 		efx_fill_test(test_index++, strings, data,
- 			      &lb_tests->tx_sent[tx_queue->label],
--			      EFX_TX_QUEUE_NAME(tx_queue),
--			      EFX_LOOPBACK_NAME(mode, "tx_sent"));
-+			      unit_str, EFX_LOOPBACK_NAME(mode, "tx_sent"));
- 		efx_fill_test(test_index++, strings, data,
- 			      &lb_tests->tx_done[tx_queue->label],
--			      EFX_TX_QUEUE_NAME(tx_queue),
--			      EFX_LOOPBACK_NAME(mode, "tx_done"));
-+			      unit_str, EFX_LOOPBACK_NAME(mode, "tx_done"));
- 	}
- 	efx_fill_test(test_index++, strings, data,
- 		      &lb_tests->rx_good,
--		      "rx", 0,
--		      EFX_LOOPBACK_NAME(mode, "rx_good"));
-+		      "rx", EFX_LOOPBACK_NAME(mode, "rx_good"));
- 	efx_fill_test(test_index++, strings, data,
- 		      &lb_tests->rx_bad,
--		      "rx", 0,
--		      EFX_LOOPBACK_NAME(mode, "rx_bad"));
-+		      "rx", EFX_LOOPBACK_NAME(mode, "rx_bad"));
- 
- 	return test_index;
- }
-@@ -301,28 +296,31 @@ static int efx_ethtool_fill_self_tests(struct efx_nic *efx,
- 	enum efx_loopback_mode mode;
- 
- 	efx_fill_test(n++, strings, data, &tests->phy_alive,
--		      "phy", 0, "alive", NULL);
-+		      "phy", "alive");
- 	efx_fill_test(n++, strings, data, &tests->nvram,
--		      "core", 0, "nvram", NULL);
-+		      "core", "nvram");
- 	efx_fill_test(n++, strings, data, &tests->interrupt,
--		      "core", 0, "interrupt", NULL);
-+		      "core", "interrupt");
- 
- 	/* Event queues */
- 	efx_for_each_channel(channel, efx) {
-+		char unit_str[ETH_GSTRING_LEN];
-+
-+		snprintf(unit_str, sizeof(unit_str), "chan%d",
-+			 channel->channel);
-+
- 		efx_fill_test(n++, strings, data,
- 			      &tests->eventq_dma[channel->channel],
--			      EFX_CHANNEL_NAME(channel),
--			      "eventq.dma", NULL);
-+			      unit_str, "eventq.dma");
- 		efx_fill_test(n++, strings, data,
- 			      &tests->eventq_int[channel->channel],
--			      EFX_CHANNEL_NAME(channel),
--			      "eventq.int", NULL);
-+			      unit_str, "eventq.int");
- 	}
- 
- 	efx_fill_test(n++, strings, data, &tests->memory,
--		      "core", 0, "memory", NULL);
-+		      "core", "memory");
- 	efx_fill_test(n++, strings, data, &tests->registers,
--		      "core", 0, "registers", NULL);
-+		      "core", "registers");
- 
- 	for (i = 0; true; ++i) {
- 		const char *name;
-@@ -332,7 +330,8 @@ static int efx_ethtool_fill_self_tests(struct efx_nic *efx,
- 		if (name == NULL)
- 			break;
- 
--		efx_fill_test(n++, strings, data, &tests->phy_ext[i], "phy", 0, name, NULL);
-+		efx_fill_test(n++, strings, data, &tests->phy_ext[i], "phy",
-+			      "%s", name);
- 	}
- 
- 	/* Loopback tests */
--- 
-2.39.5
+	Jakub Kicinski raised this concern in v4 review (Fri, 20 Mar 2026):
+	https://lore.kernel.org/netdev/20260320191943.2325cf38@kernel.org/
 
+As it can be seen above, in v5 I changed the counter used to be the one
+for the ingress side. This is not an issue, from my point of view.
+
+(...)
+
+>  const struct ethtool_ops dpaa2_switch_port_ethtool_ops = {
+>  	.get_drvinfo		= dpaa2_switch_get_drvinfo,
+>  	.get_link		= ethtool_op_get_link,
+> @@ -218,4 +261,7 @@ const struct ethtool_ops dpaa2_switch_port_ethtool_ops = {
+>  	.get_strings		= dpaa2_switch_ethtool_get_strings,
+>  	.get_ethtool_stats	= dpaa2_switch_ethtool_get_stats,
+>  	.get_sset_count		= dpaa2_switch_ethtool_get_sset_count,
+> +	.get_rmon_stats		= dpaa2_switch_get_rmon_stats,
+> +	.get_eth_ctrl_stats	= dpaa2_switch_get_ctrl_stats,
+> +	.get_eth_mac_stats	= dpaa2_switch_get_eth_mac_stats,
+>  };
+
+I know that the AI complains about the lack of the .get_pause_stats()
+callback in the dpaa2-switch driver and the fact that memory is
+alocated for the pause statistics is not actually used.
+
+Since the dpaa2-switch does not currently expose pause configuration, I
+also didn't expose the pause statistics. I also didn't want to pollute
+this set by adding more unrelated changes to the dpaa2-switch. Hope
+that's ok.
+
+Ioana
 
