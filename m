@@ -1,184 +1,195 @@
-Return-Path: <netdev+bounces-271478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271479-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oKynBtauw2nAtAQAu9opvQ
-	(envelope-from <netdev+bounces-271478-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:45:58 +0100
+	id OLYhNkmvw2nAtAQAu9opvQ
+	(envelope-from <netdev+bounces-271479-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:47:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B988322694
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:45:57 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CBFD3226DA
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:47:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 16781303CD14
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 09:40:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E848E3058687
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 09:47:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453BB39A7F8;
-	Wed, 25 Mar 2026 09:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2B239FCC1;
+	Wed, 25 Mar 2026 09:47:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SHoPhh5o"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EfKaWPpC";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pUu5Q1Fv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B3738D6A4;
-	Wed, 25 Mar 2026 09:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F92B23D281
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 09:47:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774431626; cv=none; b=cbRLZJaImoKoSZv1Z+ISDJqA59PhF3nnAigCQ6NuPTXUY+tR3aaWlH60Klsn9Ba6UlOLgqEXc9baPfp8qCTzje6E84xj7YdcF+b9u9ou90aIwWEu9xRgJuyXmlSbdKc2xKwLhbgoFUnk4jSlfjUwbbH1wI4gB0Q7c7F5DYsQLDw=
+	t=1774432071; cv=none; b=Ct+Rbl3/olPxoWsMa+eKQsouLTY8TOg1Bg4Ck3kFi1v6UZObOp7Go6BW3QrBW5CfzDecGmKqOSb8lcmoLP/tcZe/q/2vXV0kj73dd131X9+0/2Cip7UwWLBhkpNt7rlvqg4HH1NPaksipI7aJGAf32mwyVW36h8dao19XUgpmeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774431626; c=relaxed/simple;
-	bh=ic4ovVVbngDbHXUn1s4sSFh/sIJ+WuTucWOFyOVbcJc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ETyBSi1e13h+Y2QndeLg5lMMCDc56zVajmXbJmyBeWHRa+aqcmT5FgkLedN0T1a8Te+nQrYvrf6lB0GhTE6CWZSkzZNOxxu0zu9IUtg5YFC1MlBBUK/Q7lsmjIlebTKbTMFnD9y85TFhALFpp0Iq9bTNvweAIl0nWrJjQja6JQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SHoPhh5o; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 858994E427E9;
-	Wed, 25 Mar 2026 09:40:20 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4CCBE601A1;
-	Wed, 25 Mar 2026 09:40:20 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E950A104513B2;
-	Wed, 25 Mar 2026 10:40:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1774431619; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=0ixsUbiwjr2cUCJBEr3rNQHAH9XP6hNBHzk2pZT9agY=;
-	b=SHoPhh5ohLqKRFyhAtzIElxDGJCK3uhMK5h3vKQRUgiXWVtAGX9DX1SGCIhFfzM/klpmUP
-	UIoSjK8c9VkbQPtoW23LBM1zpaaXPmf6+N581B0om6GuzHgoPiOEG+PQ3ANksPIHYjItTr
-	qNBrbyfpFXhyplGPqXH2nDVBu2LvgMiP3zhsMpDAhivvpo88LfxODZWSgI1jNHzQaxp3pB
-	p56CA3fy7Fe8YsXPpQfJrB6RdoulJwAVHjeoqKyo2RV/hjbCc7YgkiB5Q7DqNwhWUjaLQB
-	3mHB+g7ENoPmJSdYBJf5uvFk6eGrOcCEwWYwVI2ZqFvKEY8PDpZerf3nmlVV9Q==
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Mark Brown <broonie@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject:
- Re: [PATCH net-next 2/2] net: sfp: manage receiver and transmitter regulators
-Date: Wed, 25 Mar 2026 10:40:09 +0100
-Message-ID: <5088970.31r3eYUQgx@fw-rgant>
-In-Reply-To: <ab1diwlayiWMsBIx@shell.armlinux.org.uk>
-References:
- <20260303-sfp-regulators-v1-0-7101ae34cb84@bootlin.com>
- <6022954.DvuYhMxLoT@fw-rgant> <ab1diwlayiWMsBIx@shell.armlinux.org.uk>
+	s=arc-20240116; t=1774432071; c=relaxed/simple;
+	bh=W9VsU7ayZ8RVpTIhzcUcmUQ6PvuDoGrgazbk6OfstuA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=R51gV7bh4j0nZKSIAKDLBsBI/k/Ci3smYY7C2X7rnsW0j3VBF8KBUI1k6F25V+LYe48TgXczWkbH3uNvn1KmlsHJnSEmcmzhybyjcDaLggbiVjOmXuckkUGGdoSfChl4lTU2EEp+3sqhs0Qc6IHuusxqlGIFJEHEa7XerTNaw8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EfKaWPpC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pUu5Q1Fv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774432069;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=568F2IklrqZnJkVpdlO2OonyYtNDZb7P6ec0zUCHe3Q=;
+	b=EfKaWPpCAUsePTyya+dKudwO3IGWr5Dmj2eqNCsqSMpCCnIs+0qQAjEp4luqyQcWIQrXKI
+	hyu7WTl08+1GwRYBPpNbgLqhNYKrDsC1XnnVA3h0JGZICf1sE2b50IPJPnO7p+nxstO7QE
+	/v3I2sieNBhc1896T/0C0u5sTfPbuSM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-456-jSTA9GjwNcaOcUOdU1bCcQ-1; Wed, 25 Mar 2026 05:47:48 -0400
+X-MC-Unique: jSTA9GjwNcaOcUOdU1bCcQ-1
+X-Mimecast-MFC-AGG-ID: jSTA9GjwNcaOcUOdU1bCcQ_1774432067
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4836abfc742so35878615e9.0
+        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 02:47:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1774432067; x=1775036867; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=568F2IklrqZnJkVpdlO2OonyYtNDZb7P6ec0zUCHe3Q=;
+        b=pUu5Q1FvrnGky3NpnbohpKOlKhW+ceKeTES9yxnvUzMisGUIdNZUG6LvT+1MRy3kUR
+         LdO2tlNfe8CVFvO0BE8WhkcxdY5wVYSlvUwBSQquV8ih+bekeA1WqPZMpfXQYXPpAFYv
+         03l9Ol0YG3PDQVwK3KyWnqFpOESIcHfvSlNQRuG5CxmtlYIWn0Yyy3jrNbFMSQdzuq0o
+         Q/T0ZzuyRQJ7ZT6uSfutQvVDUTHIBpRrX2CqfLQr7zvhKk6v3RlWyhUFWjgi/MbK53t7
+         LSU4FAca2voUy9wJjw/cc0+vBrThlysiUpmBOCVWfgecd89P50ML+DHC1J+HWbzKMCSh
+         xTkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774432067; x=1775036867;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=568F2IklrqZnJkVpdlO2OonyYtNDZb7P6ec0zUCHe3Q=;
+        b=SIfJSWLzbWt1gnxXr6fsGM2qTlHHJmhT82ExCNkhcQvftfl/lKm9kSckwdISBrJLEw
+         f8rrPjZbUe3d0jj/9A92KT+CPhuR6JeUgGoQPYYMWlBp/GR4ym0CLMoXfAfCCcOCCed3
+         qDFiJp4/okrK2yKrgQFPXSs7DWxVSTNM/KbXZkZ+bzPWdZoxtTqDbU7mTYoqcPetIa4L
+         u0NU8tYwJ7RBhKkOcO2/g795Fd6g6xGCnuLMly82SixsNKS72F/+c9UaIWZiFl5LIEbF
+         zU6V6FUDa7q8UHjCfoa9o729Dbko2ktpJ0pghXNDwaCBi4lPhBQX7ZpgnAaJzrVhWB5r
+         zW1g==
+X-Forwarded-Encrypted: i=1; AJvYcCWpbFaL4tprjhBDNLi8I9BGQgenKaY5EaE0tYknv/DdxI8v9nOtiHoP7/HCIbRmR+Em0pvAwS0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNnm1bARjTthQ+/1725BiiHUc6DApuJz1I7uCfFkTqwum9EWN4
+	MKyzhWhzvOmjg3fdeKDbjghyQkefvxApLXSl+dYoPP91VRb+z1D+OvmOfIn+K48AgiSRt3G136D
+	so0CR6TxGKhX0Y1wkkNJF5lz38FHYEMgt6BiUKLIRUaKsVg+VTEEiPk3V9Q==
+X-Gm-Gg: ATEYQzztjIVEPyDR/Xgb0RjEJfCU0I7+GCfdxvog0uzdQ0oTN5X6yJ5q90yN778WeQu
+	arrd4/sl9lmytIQB4c5HPOmrGT//TJXiatpR/QPnMA4l9j/YSJCGECdx+ne2kJEQDE0Shsd0z0H
+	VZtyGdYCKfH7SnnSNcPxBq8Z5ja5OjKVkqzOEKxNNCsLdzZI5Rv38lSltzNx3zPg5ECYIdcSEog
+	bG2C4CpFXPeM4ivb4KSFlS0mczXKTwEqSbfOFBYgjc20mNwPAMXW0z5gSlvvFGkwYUpMNzkTQqz
+	H1HhNSG9rNjD5aZlFqiqCEbriSbVfBmOuQu36g5hMDJdxb1+4meihT6yjE772XggwSsx5QM/kRi
+	C8ioJJxAjPEc4vQCzcA==
+X-Received: by 2002:a05:600c:a15:b0:486:fa9c:185 with SMTP id 5b1f17b1804b1-4871606c89dmr38627425e9.31.1774432066866;
+        Wed, 25 Mar 2026 02:47:46 -0700 (PDT)
+X-Received: by 2002:a05:600c:a15:b0:486:fa9c:185 with SMTP id 5b1f17b1804b1-4871606c89dmr38626985e9.31.1774432066386;
+        Wed, 25 Mar 2026 02:47:46 -0700 (PDT)
+Received: from fedora (g3.ign.cz. [91.219.240.17])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-487116d820bsm113568205e9.10.2026.03.25.02.47.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Mar 2026 02:47:45 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Li Tian <litian@redhat.com>, netdev@vger.kernel.org,
+ linux-hyperv@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Haiyang Zhang <haiyangz@microsoft.com>,
+ Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Long Li
+ <longli@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
+ <kuba@kernel.org>, Jason Wang <jasowang@redhat.com>, Li Tian
+ <litian@redhat.com>
+Subject: Re: [PATCH net] netvsc: transfer lower device max tso size during
+ VF transition
+In-Reply-To: <20260325045006.18607-1-litian@redhat.com>
+References: <20260325045006.18607-1-litian@redhat.com>
+Date: Wed, 25 Mar 2026 10:47:44 +0100
+Message-ID: <87a4vwnsu7.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart4723872.LvFx2qVVIh";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+Content-Type: text/plain
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271478-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,bootlin.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271479-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[vkuznets@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[romain.gantois@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7B988322694
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9CBFD3226DA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---nextPart4723872.LvFx2qVVIh
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Date: Wed, 25 Mar 2026 10:40:09 +0100
-Message-ID: <5088970.31r3eYUQgx@fw-rgant>
-In-Reply-To: <ab1diwlayiWMsBIx@shell.armlinux.org.uk>
-MIME-Version: 1.0
+Li Tian <litian@redhat.com> writes:
 
-On Friday, 20 March 2026 15:45:31 CET Russell King (Oracle) wrote:
-> On Fri, Mar 20, 2026 at 10:39:10AM +0100, Romain Gantois wrote:
-> > Originally, I implemented a runtime PM support in the SFP core. This
-> > allowed to cut power to the cages when the attached network interface was
-> > down, thereby saving power.
-> 
-> Have you measured how much power is saved by this?
+> When netvsc is accelerated by the lower device, we can advertise the
+> lower device max tso size in order to get better performance.
+> While a long-term migration to user-space bonding is planned, current
+> users on RHEL 10 / Azure are experiencing significant performance
+> regressions in 802.3ad environments. This patch provides a localized,
+> safe fix within netvsc without introducing new core networking helpers.
+>
+> Signed-off-by: Li Tian <litian@redhat.com>
+> ---
+>  drivers/net/hyperv/netvsc_drv.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+> index ee5ab5ceb2be..971607c7406f 100644
+> --- a/drivers/net/hyperv/netvsc_drv.c
+> +++ b/drivers/net/hyperv/netvsc_drv.c
+> @@ -2428,10 +2428,14 @@ static int netvsc_vf_changed(struct net_device *vf_netdev, unsigned long event)
+>  		 * This value is only increased for netvsc NIC when datapath is
+>  		 * switched over to the VF
+>  		 */
+> -		if (vf_is_up)
+> +		if (vf_is_up) {
+>  			netif_set_tso_max_size(ndev, vf_netdev->tso_max_size);
+> -		else
+> +			WRITE_ONCE(ndev->gso_max_size, READ_ONCE(vf_netdev->gso_max_size));
+> +			WRITE_ONCE(ndev->gso_ipv4_max_size,
+> +				   READ_ONCE(vf_netdev->gso_ipv4_max_size));
 
-Sure, here are a few measures of saved power with several different modules 
-I've tested. The measures were done with a shunt resistor on the regulator 
-line feeding all power pins on both SFP cages. Only one SFP cage was occupied 
-during each measure and the upper network interface was down.
+It seems netif_set_gso_max_size() helper does exactly that, i.e. sets both
+gso_max_size and gso_ipv4_max_size.
 
-Module           | Power saved (uW)
-SFP-10G-T-I    | 80
-SFP-10G-T-30 | 359
-SFP-GB-GE-T  | 191
-CHAMPION ONE 1000SFPT | 188
-SFP-H10GB-CU1M | 0
-ES8512-3LCD05 | 248
-SFP100BFXST | 351
 
-So with both SFP cages occupied, we could see about 0.7mW of saved power by 
-cutting the regulators to the cages.
-
-Thanks,
+> +		} else {
+>  			netif_set_tso_max_size(ndev, netvsc_dev->netvsc_gso_max_size);
+> +		}
+>  	}
+>  
+>  	return NOTIFY_OK;
 
 -- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
---nextPart4723872.LvFx2qVVIh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEIcCsAScRrtr7W0x0KCYAIARzeA4FAmnDrXkACgkQKCYAIARz
-eA6+Ow//bX4geV5K72UhtlUIxoYgnv1tWC40NCjRX+2zNNJKc2eWRMakvQEc0IZy
-chaHitXDIGm8ePOd2GYuSfjz9lCID2XJZ1hV0tfLI79roWbj32wSipFzZ0bNhoP9
-n4HunjB/fw4zthihRlXObsfNOPJ18LAnfGgvlbxnIGj7pVkOkxXfJyNaFcUZA8Pu
-jfGuq+bUsvZ5qO/24aBjHT4Hmtnl4BQno7ubaJHfiBa9JoMMU7JPIVKHIatCw/oK
-3V/PzrUrRbwCtik4bY/quJqdXMnsI0xM5CBOSYT3oObzTCBec+ANJwBEtY1b/ZtW
-HCgWA7hRHh1FD5CHJC1WBj7gRi6bIWn4vw4rafvTvw49KV7UKND1jg4ma6sESwg/
-sfAc3QLCU+TujUJ0zMWrdGyRc/KlgPLTZCuSP0esGlRuzY/pb+nhdYNusmgKJURE
-LQVzyokDVZHnbWROvdwxokMMdE0Z3JHUyhO8IK0GZdDfTJk/GVPUwyzD2glsLfBP
-CqccXVB+n8wDoHfJgYKt67BoYH21ZR5mvwyEq2gxGDxLHlnIGxoVnFhCUmENRY+3
-N2uotbdEYqi9uZ+kOXMDU+uPcLXPTQkbuDWlRyD0cC9HmnQIFJOTqZ1VMPwxcgW8
-V8E6f0JcrX4+XZfg7C97sOYjdrJ7t87bJsHCZ6BjOwEfp7ZVBj8=
-=EX2l
------END PGP SIGNATURE-----
-
---nextPart4723872.LvFx2qVVIh--
-
-
+Vitaly
 
 
