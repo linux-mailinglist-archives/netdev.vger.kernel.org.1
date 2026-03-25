@@ -1,529 +1,242 @@
-Return-Path: <netdev+bounces-271729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271730-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJ09DixCxGlHxwQAu9opvQ
-	(envelope-from <netdev+bounces-271729-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:14:36 +0100
+	id 8IltHT9CxGlHxwQAu9opvQ
+	(envelope-from <netdev+bounces-271730-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:14:55 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F4D32BB44
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:14:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EB70232BB54
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:14:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D1C230D2067
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:12:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6DAA4307C258
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:12:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C42936D51E;
-	Wed, 25 Mar 2026 20:12:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F15368961;
+	Wed, 25 Mar 2026 20:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="TywyPjGK"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KBNxdokK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011013.outbound.protection.outlook.com [40.107.208.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB3136828B
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 20:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774469524; cv=none; b=HLpLMbzenfiB5JoVHVHvQtkDheZmLAxO0EqjAqwaSNHD6OQo2YjcFa5dy6NC9Fq05UMnkUJWiA3trzJGt9Dw1LYhhz7DqswBzJjKxa3QqDZcSG6hGQkA2CNoa/8P6xT0py1FIdWY7q/aAyEaCpsPZNFVNOS/ZSV01atT6iFwlXI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774469524; c=relaxed/simple;
-	bh=utMsfZOZJ1ksHw1TYvbDldQzKk31PLXTA3EAZE+aH80=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fW20ELZt+Bso2pvYuwmxXx4la/L7RiddGSU5wyknHahrvuwyKKXyYYHg5qNBxGAoVjwSeNooj7N+G967r0XnrmOrj/EaDo7NK/ifa/pZZ9fBNL4zedUC45rhzYI8rwLDlUmM7s5hpH60SQuiLFNfnI6iZ5LXINSUCKp/4Ksxl5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=TywyPjGK; arc=none smtp.client-ip=209.85.210.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7d4c12ff3d5so179480a34.2
-        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 13:12:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1774469521; x=1775074321; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xj0FJa7urNwO6Pwe1g44OlVN73NKWJtkJ0e2tlVWaqY=;
-        b=TywyPjGKe298ExWXLvB+cXLI/jbAj5gRL4S2MVt6HOJ+VzVCPpXQ5zoiM00Wu9n0OX
-         GHA8nuVk+vsOyYGI/Mdws+ycztOk0NloK6EQLRt3dUbw6PNnyCEOlyma+mOR4dgqqxDy
-         aiga2pwIbpkp2JSvkJk59ViSHHwJYbwc9B010KlbVxOS/lC6fQZVT8motxIL8simaNdx
-         lYXNTwHxMDq3XL3oJGR4TnxclBzT/D/xBneCFpFI9M7JUXfR7/IBGPMZ97KmK6DUIQv9
-         rHbbwaZ9P8ei/pHz9bIG6mSFPiVVwTfurhcf9azHd5JuMfnSq1ewb4tUkQSoKrgk7PtP
-         G2ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774469521; x=1775074321;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Xj0FJa7urNwO6Pwe1g44OlVN73NKWJtkJ0e2tlVWaqY=;
-        b=fqQ9YMtPebepqgB/VaQ2I2ZM7zZn03+K/sSdrKHb9P4s/cHthPzqP63ZMnoQGJtFIx
-         9bAOeCAM3uOtzf6GeSq6hhQ6n7x2JI2fZm/ZTFj9mN+d6Ldha2FFb6m6MqMgV4AIK2Vy
-         YDhl/Sq+tJy7Jt4uTt4ztY5L27UW1RHUP5pAtvT9r9Cyk9iJ+NXIgLn4e7YQKmIDeD4g
-         CfkmrTND7Vg9+6rNgM9ZapKacj03cQAWOalxiHV6pC2kgKFSvyEIMth0oKW/wRPuXMPL
-         wv0exrQqHC9T0hJVeMelitDOCTzx/u8+K1lZhf0L4NllIUQUKYKZzYaw8XfD5NhZi6Z7
-         VF8w==
-X-Gm-Message-State: AOJu0YxtYfmQTkgmxr9VX7PlnxQ53zQSecZUPrNT7msEDuRAgHjF/V/n
-	z5xDqDrWMnCAonuys29V3z69BZwmRC4jpLjMUSmirwf2BynoHeY4sIyGRm0c8UAFXCNT4qLi26/
-	odGH0tpOuAA==
-X-Gm-Gg: ATEYQzyGOsc63BecFa9Y2GGT0lZJuSur2Li3NFhCKmOUSfXYJH7qCOqoSUZ9nhmKpv8
-	e/c/PGUtgsfwe6Cw10wzEpQm5+VCI1u2hYSbdZvgvZem3sCJDvp/hCQ9IdRXzcQR8CModcUWcvO
-	Mm9kB1lnVUyTMhtVhLRO7ILzhQE4DgAcNXnMuBPLI7SHl60EBkXZoC7AeoFXWiDdReCXckVN2ke
-	bHz3HIqa3SbjebK3e89DGUeMVsYjEodVscZqk/30uq6/b6X0M9jFxJ1LkhMM+7g3NLyAD69XAPX
-	22FAjDjfdEHzxltJEe6N1QPricBYJl1OKdjzMHtwJeX2+wCi2HFr/lpcRMI0AMUap1QDphtR/36
-	bIkW78DdvraPOrgBJzAUScfrY4cnPPgmaS+AwZ5g2ZXdPoX7wRNVLMtLO1tpwcwjjPNDDBvUPfv
-	e0dJasqdWehUPWShQIlISjzGM=
-X-Received: by 2002:a05:6820:985:b0:67b:c7a0:e4ec with SMTP id 006d021491bc7-67dff41e541mr2754119eaf.22.1774469520908;
-        Wed, 25 Mar 2026 13:12:00 -0700 (PDT)
-Received: from 20HS2G4.aus01.local ([2a09:bac6:bf21:2632::3ce:1a])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-67e0ab274c7sm549764eaf.13.2026.03.25.13.11.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2026 13:12:00 -0700 (PDT)
-From: Chris J Arges <carges@cloudflare.com>
-To: netdev@vger.kernel.org,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	davem@davemloft.net,
-	joe@dama.to,
-	gospo@broadcom.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com
-Cc: andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	shuah@kernel.org,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kernel-team@cloudflare.com,
-	Chris J Arges <carges@cloudflare.com>
-Subject: [PATCH net-next v5 6/6] selftests: drv-net: xdp: Add rss_hash metadata tests
-Date: Wed, 25 Mar 2026 15:09:52 -0500
-Message-ID: <20260325201139.2501937-7-carges@cloudflare.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260325201139.2501937-1-carges@cloudflare.com>
-References: <20260325201139.2501937-1-carges@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200DD33B95E
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 20:12:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774469533; cv=fail; b=QuaY1qkPMVQ+hS1JRL4b3lyuOSfvdRhHMhlE4WiJR4vhz3oCQqUeB3T7znT52UlV8g14iAcq30JW2dqdQT3F1BS+ADCQ3v3g6Os9zI7ttfdw6Evl0axt2BYwO22XonEf/vIsjhdhky60/BUn1PVcJ/dERjVV5xhE0uklU/ykGtM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774469533; c=relaxed/simple;
+	bh=34W1PeA/dlcGSrwA1dRnfzFL5+QoQMXY3eT/QyK5NcA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Zq7IKXW/B7yOCsPFMlud4eSv/iDiYF4VKFVP3oVr0vQQBqdcSj+B0XaaMCE+bLOe5Y0hjcQFTvXliN/OyBUdhKYBfoFBG0BinLt/5QP1CuLpQzqSJebcd3AHgn5IcvbjVF+D41QD1Qn+1j/40MwviMkmnYHm3YpZbn7mNd21r7o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KBNxdokK; arc=fail smtp.client-ip=40.107.208.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UyKfHlM/PPueC6nuBWpm7KbEttgN7voLf1SWMN+G9exVsbaoTCDRKfN9Pv6UY5GcVHRb3rvUjh9EcpMm4z6eOfNrpZwz3XrGVyNYgh4KikdDNHucdQjw6L70UVV/38s0jQic9BWHLZoZTw2Iifk6f1q7gHS4VdZGltF36Egsfgx+TrtmpQx28IfRSUiKkVl2FBaoKdcqf2gNKAyepIJsJiyH/q61no61s29Gzf9n21v/oWXh5jGmNw+y97jtpWXUcjDBST8e7xowtiLQYKO44uoIzOlCZVrEEHog36f8Dwft/XcBYYfzFfH4cYwqO7eWGVTpcCFJXJpIRnlduVigKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4Cvw93fB6XRbeffzPbUsNcUeSqUfyE0p/TpZvACLm8o=;
+ b=UKbU32/cLR5ZtqzgjL7rHAcOr0/FnFxG4ZKMse1qt74beq1BOHohOQo234g1gf9vdXCrwmQeY1Oe3sJ+16MmovC7+MOB9A67hSvX5h5fXEziAcKyT7MynWSg8leg/x2EYYxVt1ew5rBQw3FLTtKAQk5DKEh37artHcjjoT4rqYCi8mb1DWUIsvTyzXAE9RH7stxOJ3AGv63UY7D9WWAqT8LZa45vhx/w9yZOCfxjzI+R8NJqa08hvEWqj65bEq7UAwDswnHJQEqpjZvV2BsMeTg8JYY2nDgvToitXwxYJ0JVIgC+V3WgNU27QeztagmGIqmOFYIEr2Tvxj8a3o9tEw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4Cvw93fB6XRbeffzPbUsNcUeSqUfyE0p/TpZvACLm8o=;
+ b=KBNxdokKNO/4t9cACYjhVxiVhLVp8ciDjbSmv+E/GRoj1om7OTBRLbaaD2hf3DptuBTrBApqhjvUd7qa0RY1jKoEKyS3ulfHKCRWCkdw9yb2Kmq1UlD0vie1WuDDAqYZC2sUUljqHMrxOzvVHoDHA3ceWnTr8XBBqATIVTZDI62Ntmklj3Hd/8/DoJdGHucI0vmGs04tEihIm/puZZOeepnspRa2TwvQT8f/gmF4OfpAckyYIepsvtMCebbY4UZCDrTQZjoJNxDCLDjiGmCOePYk/0ST3+Sa/hRXWfv5F3U+3i7oLsvy8/RCD4FMFofnYRxbqtjHgiUp8cNpOHFgVg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10)
+ by MW6PR12MB8866.namprd12.prod.outlook.com (2603:10b6:303:24c::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Wed, 25 Mar
+ 2026 20:12:05 +0000
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3033:67fc:3646:c62f]) by DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3033:67fc:3646:c62f%5]) with mapi id 15.20.9745.007; Wed, 25 Mar 2026
+ 20:12:05 +0000
+Date: Wed, 25 Mar 2026 22:11:55 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, dsahern@kernel.org
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, petrm@nvidia.com, lirongqing@baidu.com
+Subject: Re: [PATCH net-next 3/3] vrf: Remove unnecessary synchronize_rcu()
+ invocations
+Message-ID: <20260325201155.GA909880@shredder>
+References: <20260324155521.525292-1-idosch@nvidia.com>
+ <20260324155521.525292-4-idosch@nvidia.com>
+ <CANn89iJ9hD3vBiViEz886sVwuqQVbaocnE0UJHZMhchFHKiM-w@mail.gmail.com>
+ <1ea4c187-9c1f-4e15-b472-07a82abd3260@kernel.org>
+ <20260325144228.GA686135@shredder>
+ <CANn89iJ9MQ_3af3XiNAGQWwr-t1kF=E-mKmu6h-XVDVyi7c4mA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iJ9MQ_3af3XiNAGQWwr-t1kF=E-mKmu6h-XVDVyi7c4mA@mail.gmail.com>
+X-ClientProxiedBy: TL2P290CA0009.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::10) To DS0PR12MB7900.namprd12.prod.outlook.com
+ (2603:10b6:8:14e::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB7900:EE_|MW6PR12MB8866:EE_
+X-MS-Office365-Filtering-Correlation-Id: f42ca08f-69a8-42ee-9655-08de8aaac8ce
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|366016|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	RaHoex7phukQrbZ6Os9wBJ5/AZUamPYb0jhzB/e5qHkBq/Nez3Hy8AtpNYdgPyBIzPZxsdocgn9qVDtTdkJMwIlhJxqLrTMiMxdlw53QpgmHgYSQrHyAdEl82y6jFnEGNO0Pn0/mA4B5XZYw39xEUi4JJlZQ3x55QheWgBlevUnuMbxajHt8gI8J+UsGVRuSxF5TUqsQpvA5XUXKQpYPONMbwz18RKYpyp624a0JUSTrZqMO8rRnbyZgY7VJbC3jEMyp6Bjd0pvyU0XP/b0SttMcc9369ieyGN2nXjokGSMt6dgyKrr29wDLGNJtQNxTPmumGFMWp/tyY8MJ8yiaombdf1atqY9Eei7FzSrOWvfSExgwYMHn1b7+ZJs8WPdkZJOrbK2KbxKduOlVNT50k5s428RnTS6IVUP1bq835xyDQrTcu8gIK3bQZI9G6+2e/BhzZ91IkV0GvkDnDBoSQJ41qBrMxwszMo1gAs4F4xjpk+6hLA3Pn7mCd3caFQSxwTNl6Zc+ei+wrcuF4poilo/gLhQFLh5BG7EHRUgnUBb+mxRphRfmBZyu3RJzL56H8SIphwoYluhlarz4Fxtpfvi+uDCfvLKrbc7E+YZHE/PHFPOO6pA4s3wh9fUiqFhheEVX5OEKWVuImEDbQWC+uZHww2bclDqM66jc1IMxKV7zm14kbbH3KZWde1lQkWhQjbJG833mdW95gWXdlgGBCwsjm3FdihPM9pN0ueAFcU1yMQhRk/siJVOhD+GIZREk
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB7900.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VlJEaExTTHBnM1lGOVhENVgzMTJMeG1TWktXdWpBSWhqUWpkOFd5UnBWdUpj?=
+ =?utf-8?B?Q3lzZjRVRy96NDdwby9YTGIxN2dkOXFSSWlEdXk0UWdkdDRjNmNWWjFqSFVE?=
+ =?utf-8?B?ZGZoQWd4NmVqWktGTUxqZjlZV2s5ZmpvV0kvS1BwQWRHTXpUSGlQOEJLSitt?=
+ =?utf-8?B?aW92NFA5NTNoMU9uNlZpODVsY0dSbVE5MW5CWFoybUtXVTA3YktYamcxM2I4?=
+ =?utf-8?B?T0VPazNuSG5yekZJcTlBOHhBT1RsV01YbWxjWkJZb3pRUlpHalFtdyt4aDVp?=
+ =?utf-8?B?YVBmTFRnLzZVTWQ1RDhJZ3dLd2M0Q0FOYjE0dWNmWTRaZ2ozSDJqZ3hLSEY5?=
+ =?utf-8?B?cmE5N3UzNHIybEdLekhTMTZlQ2RlenB6dllBaUpId215bERkR2gzTm9ORzVu?=
+ =?utf-8?B?alNwcmcrN2gyTjdPeXpiM3BpQytsUWNvMlBsL1FyRklFbWZuZC9TVFVzalk1?=
+ =?utf-8?B?SjJtR0trdVBTM2Ftd3JOeUNPdThCMmZIczQrK2V0dGNHdU5ncVk0ODBZSWdG?=
+ =?utf-8?B?SWxzR05vRXFlOTZCcFVwazBId2MyYnVyZjMwK01zTFVDODZuNm1XbHhUektT?=
+ =?utf-8?B?UWRIZ25Yd0c1Q2lTZW91WGYvczdsV3diaWVIbys2YUx5SzZJSVRLOWRyeHMr?=
+ =?utf-8?B?RndDalkzM2ZaR0hEUW5vSEwzREFSc25PMFJ6ZGVDZlFCVy8xRVNNMzM2VGlZ?=
+ =?utf-8?B?NjVwbVlRQkJuME9IazM1NHFhd3pBTEdXdUxsMDFwMGFpK3M4QjVJRGg3RDhE?=
+ =?utf-8?B?U2ZiS2dVL3dmQ2tyU2JGK0lYNjJncWlFS2RSVmxmNHZWOXBVcUF3QjIwTmE4?=
+ =?utf-8?B?aG9Ya2VZN2hmMFRhYjBjMDFLTkthdkQzeFZQSGhWV0l5Wi9KdFpES251OW9X?=
+ =?utf-8?B?cW84OFJ1Z3p3cnZSVHYrTUx3bURVeVZMRWh3MVVZaXVtZjkxK3c2Z2pLdkF6?=
+ =?utf-8?B?dlNuK2lFcVU1Mis1dGlqZkI3OW1ObHhSdnBJWXdwa0laazhwY3Nacy9Tc1M5?=
+ =?utf-8?B?bVZ1Mm4zanlUWjlyelkyVUNFL0g2b09BM3ZzckZpejc3NlMya3VDcWtFZU1w?=
+ =?utf-8?B?TWEwQnNrM2FZWGprN1Q2Z3luL0p4b3BPUXN3aTh2UURqSjB0UEoyVTRyM0w5?=
+ =?utf-8?B?Vi9waGttdlJQL3JXcDVBYS9zSFE0WlZVaFdWRGU0a2NJRVFCNzRyVXI2b3U1?=
+ =?utf-8?B?Nm9yQ1lCNWZUWG9MU3k1VEJLdCtNU1RvZVdUWmQvaCs5SHZLSXRUMlA3NGhP?=
+ =?utf-8?B?RHcrcHBjNFJqSm5nUmhaZHovY3VuQnVYYXk2a1ZYMllJa2gxdEU2N0tKdC9C?=
+ =?utf-8?B?a2JMWXRXU2dJZU1kK0ZyN0tTVE1PL0dOY0dhZzFKMHFZZXhaUzhyL1puUTlD?=
+ =?utf-8?B?Z3VwK0JlRzNQS0JrSjBKN2xROU5FOTllYXBRZStOV2JMWGRJQjg3SThnZUFF?=
+ =?utf-8?B?TGhyNXdyc3FDQmZTR3NycTZ4YU9TZ21odis4WEJiK0k2VTRuZTRIejhLRUFm?=
+ =?utf-8?B?dGlEbDB2NUtaTWwrU2pSNVdwVEdDOU0zWlZXOUVPVTJPNTg3djJNYllvbUJq?=
+ =?utf-8?B?M3RqN0pudDVRUzBhbzRWQkdHMHNMTlBud240Ri9HZzB3NENhLzhuWGpGVFMr?=
+ =?utf-8?B?eVJGS09xbkZIb2tESFA5alNPUzQwbXBCVGFDMElNNDk5ZnM5anZJaGZPTlUr?=
+ =?utf-8?B?UUdIT1FVb0crK0ozWGRCdzE1K3ZSRFUzb1ZrTE9walZ3RnpxWWFQY2xrUGRX?=
+ =?utf-8?B?OHpCb2JKVnhwdVpIVXJlM2xPRW9RK1hRRFlCOExnZU1NS1RSdSs1LzMvNzZT?=
+ =?utf-8?B?NnhUb3Z3ZlZxZlZiZTVtalMyaTZJUEwrWDdVQ2tmTEFKakxCdTRqMjNiTVhy?=
+ =?utf-8?B?MlNyaThkK3Y1NjcwdGE3OHVLcjNTYk5vUDNJUGNXREpaQUJhZzQvLzE3azIr?=
+ =?utf-8?B?UTY2dEdveWlYVkZkbS95YmFHVUxtYTBZQm9sc3VTSmNWbTB5dUpmV2RoRzd6?=
+ =?utf-8?B?aGkzSnlKcnpaclJpSjVpalhOUkV0QkZuVnoyUEtjNmkwTDNEK3RWdGk1dnpN?=
+ =?utf-8?B?V2RTZHpZcFNEZmJKYzVXb2xiMUJjdG9sZ09GcTc4NGpuM29yZ1R5ek9NcEZ0?=
+ =?utf-8?B?Q2RpT1Q0ZlBlRXlBZENyNmppMHI3R214bGNhQ211M210MTJvRU43QkNOM2lY?=
+ =?utf-8?B?VGFMRVJETnhpZTl0OUZzb1lIekZsN0xWa0JaazczdVZkQTNqSlZ0d0QvUURW?=
+ =?utf-8?B?RW8xUWEzRkxWN1NtSTU2UExnNE5nNWg3UzhLTXk5WSs1YTI1RWM5UXMvWExQ?=
+ =?utf-8?B?QmpwYmMzcm9CV1JsSGZrL1ZOdXJnaFFBZ1ErSy8rcDUrbzFRZHQ1Zz09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f42ca08f-69a8-42ee-9655-08de8aaac8ce
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB7900.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2026 20:12:05.3269
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: M2WEyY9m5UFQCyIPzaRS+y00htsVWn08/+zkiWHOQv39BWv5GvWRXUG1EkwhJ939KYkRdm23ykBtXLb4I1up+Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8866
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,cloudflare.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271729-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[carges@cloudflare.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-271730-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[cloudflare.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[xdp_metadata.py:url,lib.py:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid]
-X-Rspamd-Queue-Id: D3F4D32BB44
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: EB70232BB54
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This test loads xdp_metadata.bpf which calls bpf_xdp_metadata_rx_hash() on
-incoming packets. The metadata from that packet is then sent to a BPF
-map for validation. It borrows structure from xdp.py, reusing common
-functions.
+On Wed, Mar 25, 2026 at 07:57:37AM -0700, Eric Dumazet wrote:
+> On Wed, Mar 25, 2026 at 7:42 AM Ido Schimmel <idosch@nvidia.com> wrote:
+> >
+> > On Wed, Mar 25, 2026 at 08:17:30AM -0600, David Ahern wrote:
+> > > On 3/24/26 2:39 PM, Eric Dumazet wrote:
+> > > > On Tue, Mar 24, 2026 at 8:56 AM Ido Schimmel <idosch@nvidia.com> wrote:
+> > > >>
+> > > >> vrf_rtable_release() and vrf_rt6_release() are called as part of the VRF
+> > > >> device's ndo_uninit() callback. As such, an RCU grace period passes
+> > > >> between the removal of the VRF slaves and the closing of the VRF device
+> > > >> until these functions are invoked.
+> > > >>
+> > > >> Therefore, it should not be possible for any concurrent RCU readers to
+> > > >> try and acquire a reference on the dst entry while we are potentially
+> > > >> releasing the last reference via dst_release().
+> > > >>
+> > > >> Given the above, the synchronize_rcu() invocations in these functions
+> > > >> seem unnecessary and only add unnecessary delay when deleting VRF
+> > > >> devices. Remove them.
+> > > >>
+> > > >> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> > > >> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> > > >> ---
+> > > >>  drivers/net/vrf.c | 2 --
+> > > >>  1 file changed, 2 deletions(-)
+> > > >>
+> > > >> diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+> > > >> index bfc9ea91ac20..75edb8eba87f 100644
+> > > >> --- a/drivers/net/vrf.c
+> > > >> +++ b/drivers/net/vrf.c
+> > > >> @@ -753,7 +753,6 @@ static void vrf_rt6_release(struct net_device *dev, struct net_vrf *vrf)
+> > > >>         struct rt6_info *rt6 = rtnl_dereference(vrf->rt6);
+> > > >>
+> > > >>         RCU_INIT_POINTER(vrf->rt6, NULL);
+> > > >
+> > > > We could argue that the vrf->rt6 clearing is not needed,
+> > > > or should be done before the RCU grace period mentioned in the
+> > > > changelog started ?
+> > > >
+> > >
+> > > AIUI Ido's point is that the synchronize_net() in
+> > > unregister_netdevice_many_notify() occurs before the ndo_uninit call
+> > > making the synchronize_rcu here unnecessary. There is also a second
+> > > synchronize_net after it.
+> > >
+> > > I get your point about skipping the clearing the poiniters.
+> >
+> > We can probably remove more code than just the synchronize_rcu() calls.
+> > Looking into that right now.
+> 
+> This was a minor point, the synchronize_rcu() is far more interesting of course.
 
-The test checks the device's xdp-rx-metadata-features via netlink
-before running and skips on devices that do not advertise hash support.
-This can be run on veth devices as well as real hardware.
+Did some more digging. I don't see a reason for keeping the dst pointers
+RCU protected. I can replace patch #3 with the following one in v2:
 
-The test is fairly simple and just verifies that a TCP or UDP packet can be
-identified as an L4 flow. This minimal test also passes if run on a veth
-device.
-
-Signed-off-by: Chris J Arges <carges@cloudflare.com>
----
-v5: no changes
----
- .../testing/selftests/drivers/net/hw/Makefile |   1 +
- .../drivers/net/hw/lib/py/__init__.py         |   2 +
- .../selftests/drivers/net/hw/xdp_metadata.py  | 146 ++++++++++++++++
- .../selftests/net/lib/xdp_metadata.bpf.c      | 163 ++++++++++++++++++
- 4 files changed, 312 insertions(+)
- create mode 100644 tools/testing/selftests/drivers/net/hw/xdp_metadata.py
- create mode 100644 tools/testing/selftests/net/lib/xdp_metadata.bpf.c
-
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index 3c97dac9baaa..884cc77daeaa 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -42,6 +42,7 @@ TEST_PROGS = \
- 	rss_input_xfrm.py \
- 	toeplitz.py \
- 	tso.py \
-+	xdp_metadata.py \
- 	xsk_reconfig.py \
- 	#
- 
-diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-index b8d9ae282390..df4da5078c48 100644
---- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-+++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-@@ -25,6 +25,7 @@ try:
-     from net.lib.py import bkg, cmd, bpftool, bpftrace, defer, ethtool, \
-         fd_read_timeout, ip, rand_port, rand_ports, wait_port_listen, \
-         wait_file, tool
-+    from net.lib.py import bpf_map_set, bpf_map_dump, bpf_prog_map_ids
-     from net.lib.py import KsftSkipEx, KsftFailEx, KsftXfailEx
-     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
-         ksft_setup, ksft_variants, KsftNamedVariant
-@@ -40,6 +41,7 @@ try:
-                "bkg", "cmd", "bpftool", "bpftrace", "defer", "ethtool",
-                "fd_read_timeout", "ip", "rand_port", "rand_ports",
-                "wait_port_listen", "wait_file", "tool",
-+               "bpf_map_set", "bpf_map_dump", "bpf_prog_map_ids",
-                "KsftSkipEx", "KsftFailEx", "KsftXfailEx",
-                "ksft_disruptive", "ksft_exit", "ksft_pr", "ksft_run",
-                "ksft_setup", "ksft_variants", "KsftNamedVariant",
-diff --git a/tools/testing/selftests/drivers/net/hw/xdp_metadata.py b/tools/testing/selftests/drivers/net/hw/xdp_metadata.py
-new file mode 100644
-index 000000000000..33a1985356d9
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/xdp_metadata.py
-@@ -0,0 +1,146 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+"""
-+Tests for XDP metadata kfuncs (e.g. bpf_xdp_metadata_rx_hash).
-+
-+These tests load device-bound XDP programs from xdp_metadata.bpf.o
-+that call metadata kfuncs, send traffic, and verify the extracted
-+metadata via BPF maps.
-+"""
-+from lib.py import ksft_run, ksft_eq, ksft_exit, ksft_ge, ksft_ne, ksft_pr
-+from lib.py import KsftNamedVariant, ksft_variants
-+from lib.py import CmdExitFailure, KsftSkipEx, NetDrvEpEnv
-+from lib.py import NetdevFamily
-+from lib.py import bkg, cmd, rand_port, wait_port_listen
-+from lib.py import ip, bpftool, defer
-+from lib.py import bpf_map_set, bpf_map_dump, bpf_prog_map_ids
-+
-+
-+def _load_xdp_metadata_prog(cfg, prog_name, bpf_file="xdp_metadata.bpf.o"):
-+    """Load a device-bound XDP metadata program and return prog/map info.
-+
-+    Returns:
-+        dict with 'id', 'name', and 'maps' (name -> map_id).
-+    """
-+    abs_path = cfg.net_lib_dir / bpf_file
-+    pin_dir = "/sys/fs/bpf/xdp_metadata_test"
-+
-+    cmd(f"rm -rf {pin_dir}", shell=True, fail=False)
-+    cmd(f"mkdir -p {pin_dir}", shell=True)
-+
-+    try:
-+        bpftool(f"prog loadall {abs_path} {pin_dir} type xdp "
-+                f"xdpmeta_dev {cfg.ifname}")
-+    except CmdExitFailure as e:
-+        cmd(f"rm -rf {pin_dir}", shell=True, fail=False)
-+        raise KsftSkipEx(
-+            f"Failed to load device-bound XDP program '{prog_name}'"
-+        ) from e
-+    defer(cmd, f"rm -rf {pin_dir}", shell=True, fail=False)
-+
-+    pin_path = f"{pin_dir}/{prog_name}"
-+    ip(f"link set dev {cfg.ifname} xdpdrv pinned {pin_path}")
-+    defer(ip, f"link set dev {cfg.ifname} xdpdrv off")
-+
-+    xdp_info = ip(f"-d link show dev {cfg.ifname}", json=True)[0]
-+    prog_id = xdp_info["xdp"]["prog"]["id"]
-+
-+    return {"id": prog_id,
-+            "name": xdp_info["xdp"]["prog"]["name"],
-+            "maps": bpf_prog_map_ids(prog_id)}
-+
-+
-+def _send_probe(cfg, port, proto="tcp"):
-+    """Send a single payload from the remote end using socat.
-+
-+    Args:
-+        cfg: Configuration object containing network settings.
-+        port: Port number for the exchange.
-+        proto: Protocol to use, either "tcp" or "udp".
-+    """
-+    cfg.require_cmd("socat", remote=True)
-+
-+    if proto == "tcp":
-+        rx_cmd = f"socat -{cfg.addr_ipver} -T 2 TCP-LISTEN:{port},reuseport STDOUT"
-+        tx_cmd = f"echo -n rss_hash_test | socat -t 2 -u STDIN TCP:{cfg.baddr}:{port}"
-+    else:
-+        rx_cmd = f"socat -{cfg.addr_ipver} -T 2 -u UDP-RECV:{port},reuseport STDOUT"
-+        tx_cmd = f"echo -n rss_hash_test | socat -t 2 -u STDIN UDP:{cfg.baddr}:{port}"
-+
-+    with bkg(rx_cmd, exit_wait=True):
-+        wait_port_listen(port, proto=proto)
-+        cmd(tx_cmd, host=cfg.remote, shell=True)
-+
-+
-+# BPF map keys matching the enums in xdp_metadata.bpf.c
-+_SETUP_KEY_PORT = 1
-+
-+_RSS_KEY_HASH = 0
-+_RSS_KEY_TYPE = 1
-+_RSS_KEY_PKT_CNT = 2
-+_RSS_KEY_ERR_CNT = 3
-+
-+XDP_RSS_L4 = 0x8  # BIT(3) from enum xdp_rss_hash_type
-+
-+
-+@ksft_variants([
-+    KsftNamedVariant("tcp", "tcp"),
-+    KsftNamedVariant("udp", "udp"),
-+])
-+def test_xdp_rss_hash(cfg, proto):
-+    """Test RSS hash metadata extraction via bpf_xdp_metadata_rx_hash().
-+
-+    This test will only run on devices that support xdp-rx-metadata-features.
-+
-+    Loads the xdp_rss_hash program from xdp_metadata, sends a packet using
-+    the specified protocol, and verifies that the program extracted a non-zero
-+    hash with an L4 hash type.
-+    """
-+    dev_info = cfg.netnl.dev_get({"ifindex": cfg.ifindex})
-+    rx_meta = dev_info.get("xdp-rx-metadata-features", [])
-+    if "hash" not in rx_meta:
-+        raise KsftSkipEx("device does not support XDP rx hash metadata")
-+
-+    prog_info = _load_xdp_metadata_prog(cfg, "xdp_rss_hash")
-+
-+    port = rand_port()
-+    bpf_map_set("map_xdp_setup", _SETUP_KEY_PORT, port)
-+
-+    rss_map_id = prog_info["maps"]["map_rss"]
-+
-+    _send_probe(cfg, port, proto=proto)
-+
-+    rss = bpf_map_dump(rss_map_id)
-+
-+    pkt_cnt = rss.get(_RSS_KEY_PKT_CNT, 0)
-+    err_cnt = rss.get(_RSS_KEY_ERR_CNT, 0)
-+    hash_val = rss.get(_RSS_KEY_HASH, 0)
-+    hash_type = rss.get(_RSS_KEY_TYPE, 0)
-+
-+    ksft_ge(pkt_cnt, 1, comment="should have received at least one packet")
-+    ksft_eq(err_cnt, 0, comment=f"RSS hash error count: {err_cnt}")
-+
-+    ksft_ne(hash_val, 0,
-+            f"RSS hash should be non-zero for {proto.upper()} traffic")
-+    ksft_pr(f"  RSS hash: {hash_val:#010x}")
-+
-+    ksft_pr(f"  RSS hash type: {hash_type:#06x}")
-+    ksft_ne(hash_type & XDP_RSS_L4, 0,
-+            f"RSS hash type should include L4 for {proto.upper()} traffic")
-+
-+
-+def main():
-+    """Run XDP metadata kfunc tests against a real device."""
-+    with NetDrvEpEnv(__file__) as cfg:
-+        cfg.netnl = NetdevFamily()
-+        ksft_run(
-+            [
-+                test_xdp_rss_hash,
-+            ],
-+            args=(cfg,))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/net/lib/xdp_metadata.bpf.c b/tools/testing/selftests/net/lib/xdp_metadata.bpf.c
-new file mode 100644
-index 000000000000..f71f59215239
---- /dev/null
-+++ b/tools/testing/selftests/net/lib/xdp_metadata.bpf.c
-@@ -0,0 +1,163 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <stddef.h>
-+#include <linux/bpf.h>
-+#include <linux/in.h>
-+#include <linux/if_ether.h>
-+#include <linux/ip.h>
-+#include <linux/ipv6.h>
-+#include <linux/udp.h>
-+#include <linux/tcp.h>
-+#include <bpf/bpf_endian.h>
-+#include <bpf/bpf_helpers.h>
-+
-+enum {
-+	XDP_PORT = 1,
-+	XDP_PROTO = 4,
-+} xdp_map_setup_keys;
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 5);
-+	__type(key, __u32);
-+	__type(value, __s32);
-+} map_xdp_setup SEC(".maps");
-+
-+/* RSS hash results: key 0 = hash, key 1 = hash type,
-+ * key 2 = packet count, key 3 = error count.
-+ */
-+enum {
-+	RSS_KEY_HASH = 0,
-+	RSS_KEY_TYPE = 1,
-+	RSS_KEY_PKT_CNT = 2,
-+	RSS_KEY_ERR_CNT = 3,
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__type(key, __u32);
-+	__type(value, __u32);
-+	__uint(max_entries, 4);
-+} map_rss SEC(".maps");
-+
-+/* Mirror of enum xdp_rss_hash_type from include/net/xdp.h.
-+ * Needed because the enum is not part of UAPI headers.
-+ */
-+enum xdp_rss_hash_type {
-+	XDP_RSS_L3_IPV4 = 1U << 0,
-+	XDP_RSS_L3_IPV6 = 1U << 1,
-+	XDP_RSS_L3_DYNHDR = 1U << 2,
-+	XDP_RSS_L4 = 1U << 3,
-+	XDP_RSS_L4_TCP = 1U << 4,
-+	XDP_RSS_L4_UDP = 1U << 5,
-+	XDP_RSS_L4_SCTP = 1U << 6,
-+	XDP_RSS_L4_IPSEC = 1U << 7,
-+	XDP_RSS_L4_ICMP = 1U << 8,
-+};
-+
-+extern int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, __u32 *hash,
-+				    enum xdp_rss_hash_type *rss_type) __ksym;
-+
-+static __always_inline __u16 get_dest_port(void *l4, void *data_end,
-+					   __u8 protocol)
-+{
-+	if (protocol == IPPROTO_UDP) {
-+		struct udphdr *udp = l4;
-+
-+		if ((void *)(udp + 1) > data_end)
-+			return 0;
-+		return udp->dest;
-+	} else if (protocol == IPPROTO_TCP) {
-+		struct tcphdr *tcp = l4;
-+
-+		if ((void *)(tcp + 1) > data_end)
-+			return 0;
-+		return tcp->dest;
-+	}
-+
-+	return 0;
-+}
-+
-+SEC("xdp")
-+int xdp_rss_hash(struct xdp_md *ctx)
-+{
-+	void *data_end = (void *)(long)ctx->data_end;
-+	void *data = (void *)(long)ctx->data;
-+	enum xdp_rss_hash_type rss_type = 0;
-+	struct ethhdr *eth = data;
-+	__u8 l4_proto = 0;
-+	__u32 hash = 0;
-+	__u32 key, val;
-+	void *l4 = NULL;
-+	__u32 *cnt;
-+	int ret;
-+
-+	if ((void *)(eth + 1) > data_end)
-+		return XDP_PASS;
-+
-+	if (eth->h_proto == bpf_htons(ETH_P_IP)) {
-+		struct iphdr *iph = (void *)(eth + 1);
-+
-+		if ((void *)(iph + 1) > data_end)
-+			return XDP_PASS;
-+		l4_proto = iph->protocol;
-+		l4 = (void *)(iph + 1);
-+	} else if (eth->h_proto == bpf_htons(ETH_P_IPV6)) {
-+		struct ipv6hdr *ip6h = (void *)(eth + 1);
-+
-+		if ((void *)(ip6h + 1) > data_end)
-+			return XDP_PASS;
-+		l4_proto = ip6h->nexthdr;
-+		l4 = (void *)(ip6h + 1);
-+	}
-+
-+	if (!l4)
-+		return XDP_PASS;
-+
-+	/* Filter on the configured protocol (map_xdp_setup key XDP_PROTO).
-+	 * When set, only process packets matching the requested L4 protocol.
-+	 */
-+	key = XDP_PROTO;
-+	__s32 *proto_cfg = bpf_map_lookup_elem(&map_xdp_setup, &key);
-+
-+	if (proto_cfg && *proto_cfg != 0 && l4_proto != (__u8)*proto_cfg)
-+		return XDP_PASS;
-+
-+	/* Filter on the configured port (map_xdp_setup key XDP_PORT).
-+	 * Only applies to protocols with ports (UDP, TCP).
-+	 */
-+	key = XDP_PORT;
-+	__s32 *port_cfg = bpf_map_lookup_elem(&map_xdp_setup, &key);
-+
-+	if (port_cfg && *port_cfg != 0) {
-+		__u16 dest = get_dest_port(l4, data_end, l4_proto);
-+
-+		if (!dest || bpf_ntohs(dest) != (__u16)*port_cfg)
-+			return XDP_PASS;
-+	}
-+
-+	ret = bpf_xdp_metadata_rx_hash(ctx, &hash, &rss_type);
-+	if (ret < 0) {
-+		key = RSS_KEY_ERR_CNT;
-+		cnt = bpf_map_lookup_elem(&map_rss, &key);
-+		if (cnt)
-+			__sync_fetch_and_add(cnt, 1);
-+		return XDP_PASS;
-+	}
-+
-+	key = RSS_KEY_HASH;
-+	bpf_map_update_elem(&map_rss, &key, &hash, BPF_ANY);
-+
-+	key = RSS_KEY_TYPE;
-+	val = (__u32)rss_type;
-+	bpf_map_update_elem(&map_rss, &key, &val, BPF_ANY);
-+
-+	key = RSS_KEY_PKT_CNT;
-+	cnt = bpf_map_lookup_elem(&map_rss, &key);
-+	if (cnt)
-+		__sync_fetch_and_add(cnt, 1);
-+
-+	return XDP_PASS;
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.43.0
-
+https://github.com/idosch/linux/commit/3fbc1cad610df95cfcde117394c2c3d9e9a04e65.patch
 
