@@ -1,166 +1,222 @@
-Return-Path: <netdev+bounces-271668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271669-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6HhAO0wcxGnlwQQAu9opvQ
-	(envelope-from <netdev+bounces-271668-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:33:00 +0100
+	id QG84LCwdxGnlwQQAu9opvQ
+	(envelope-from <netdev+bounces-271669-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:36:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6085E329DE7
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:33:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32F0C329F1F
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:36:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 93DE130F6957
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 17:24:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4C7BA301CDB5
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 17:26:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0D3405ACC;
-	Wed, 25 Mar 2026 17:24:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5555C4014A8;
+	Wed, 25 Mar 2026 17:26:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2KgyqFj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DE1401A0B
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 17:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED75E3E0259
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 17:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774459497; cv=none; b=NVBSUcQai6aqYhRtYGfRlHAg3o70sUbkTZ7ymnS3Zkxjt0vPHPC30ZTixAIfIvAAuEgP2xKsWGTfVQVANfSCgpwF+F2Mloodtyd1td7xs8fj7PzIl1ONMnllS6a/jh0BHQ0TFbI0lygehecr/JKVYJwUh44IzX8S1O5LvLrjHFE=
+	t=1774459604; cv=none; b=Jy4UusPTiwUAJ+wpkI1U7ky0oT4MeUy/F4CDiBXjzC75quFW2okmcwqTzFyNIHahCID0um8/qs8MTVMD775NZ8rCsUn3tPbBfSFPCThErHqjLV+8T3FyyDOfHP2XIvDruLmfOMlgNfXI290jVApBGxvADokSnUfAbqe5XYn0dvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774459497; c=relaxed/simple;
-	bh=WJCHadKIGcaNougMBQMInd24II9CRRJ+fXNCPrZLcj4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MgJr3MJRxbwQAb/a7vHW/6gr+Ae5cN8v1FmILiFOhTN8bnnkpDOx2kuM/zDVqT7IlIUf/0RNPrS+SO0n+g50+2I0erSx4zmPkVak3VQoaxVi0kfJGnKIiVykfjUYkakPiWF8Am62yagpSBawvTlX6JQqBtdZ/g+lmuSMroxasyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-48557c8ad47so933225e9.0
-        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 10:24:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774459490; x=1775064290;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wiw/GUjidliX10Xt88+2grOFSA9ojrEc+pd+AHSqD4Y=;
-        b=IBAS+GwFiypAfc77pl3dGdS9Q9klgLqvoxhwZeaB1stb6RqRm6oveRX3mNate109+x
-         r2h0QN08l/rhs7zBYNQGdtNhuhwdojya1lwgqsDp2z+dCvblB3oR1+VyszownHLV4ORF
-         ktGXXdhPLTZe2xoUHugR4LTzPEgnRoNkltE3GXGzO5Jf0U4LIoeC1lQiwvZmEoBxO7aT
-         vhcw50Ugw+d0C62snSrXIdNgl3hCidar8ns/SYtEouvVCXLyeyO6QB6u1gKILz3RBx2C
-         sa7hpSRcK5ldts0piUKbVNBcXsqeGFuK+1Ma8qb5KhICwQ53VMo5lp6VOWPWAZD36vdT
-         aDiw==
-X-Forwarded-Encrypted: i=1; AJvYcCWDvHYht8e+VkvWw+LO8nSwHxAZSl0a4TShYRkvPzHMJttvDwY/4FivwbmWlGqHJQ/T8Jn/r/w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjTpQ6b2ltcDNE3neEa0VTH1LjguslotICvEvuhzgvphjko39j
-	iErwOOMPM9RrLyyKS8AcP4/mnUvsqh82KootRlH/0rQz9x5wqZ2OAIyc
-X-Gm-Gg: ATEYQzxfhIpsbzPYkNyu4PSHJzEFZhHYAaAQ2woLVI31M+fxY2iCHSzYvDSAw58jVN6
-	5nk6+WFGuI/QFnRcG2Ai75oDruH7Z3ckIc9/p9zgfsrDUgDjENXGiKGxPqUw1htqUlPZf2v6BxU
-	Gv6C7D5hqHn0aJPWTKYBHF4BJxRUsUWwGJYGCGuLberhlC1Cx5ED7Ru2j9entXXeLL+7UQO1Zz6
-	jWv+RVUxc55yutB2ytY9v1ZvK4fszOcpDhupyhtQvi3nUH/uGTrtkYFrZgb99SlDUAOomJ3dxRY
-	dizTWZqeXloLWtQF8Zq98oE2Oz1ApLIzowOVyRWgii6Wjgnq7HWZPc5s1LurZ6Kq53E15oa2qMK
-	CgbFPEIAehNPVse6hABetXH+Ip6EUnY1F3HZ7vgVg36YpiUL5esJ5GZg3V/7DwjgMZfykxJc0QY
-	19L2hP7DAPoYVZS0/5ktg=
-X-Received: by 2002:a05:600c:4705:b0:485:a4de:f4f9 with SMTP id 5b1f17b1804b1-4871608406dmr70720405e9.27.1774459489238;
-        Wed, 25 Mar 2026 10:24:49 -0700 (PDT)
-Received: from [0.0.0.0] ([94.156.174.93])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4871e5d195bsm8481415e9.3.2026.03.25.10.24.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Mar 2026 10:24:48 -0700 (PDT)
-Message-ID: <76bba9e1-1e87-413e-94d7-80e7c352a55b@linux.com>
-Date: Wed, 25 Mar 2026 20:24:42 +0300
+	s=arc-20240116; t=1774459604; c=relaxed/simple;
+	bh=8MKiB5e+7wU5JMRzvptDLH6dhESil3VUSqbtlMcTZuo=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=gO2iNtkVbvNhL0TvzE/itYhZUhIHCAx2hSr3LHU4REwgDukveiqT8ydKDh/6+4eeREWnMG52bO4ZVFQixwMICMGXjjaedGRmweWpyZbkKSndIFWq3ZLz4uspOhfNxRIdQWiddWh9XPDRJXUAXgQRhbTNCWdHgV7U2xL8bpwQ7ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2KgyqFj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A612C19423;
+	Wed, 25 Mar 2026 17:26:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774459603;
+	bh=8MKiB5e+7wU5JMRzvptDLH6dhESil3VUSqbtlMcTZuo=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=e2KgyqFjz6lx9UPb1Acn7jv987HppCSYpFVXquvg7iB4GYqk7WWOs56LHWoBcByjs
+	 Q3qg9wuNNMfNmx4Z2zTreksSuBMSF0UENwBddzM2090FC7LQt+bFJD/EtqiXP851GJ
+	 aZk+dFvepJ1z0vo4BV7ZVzHT4fKWL8LcX5WRecltj9jUDCOXFaLNTxH5aBlQt1BMtc
+	 TknlxWKbaLm3FUTAC+vLNTYpSzdYh9I885rUnCspFKnxl0R5Mw7iFAWh3E9odMazoJ
+	 W46alJmfyxn+HpyhEL0URuJuXoPbAWw9oppwa2x68JZ4PcemzOpJP2FJ73m/73PxLb
+	 fTUgc/vPNYfmA==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 1B705F4006E;
+	Wed, 25 Mar 2026 13:26:42 -0400 (EDT)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Wed, 25 Mar 2026 13:26:42 -0400
+X-ME-Sender: <xms:0RrEadAZVvCcZD5UoJjuYkc2UKomG5u8aIZIDmA1aMvD_lsLgBYqxw>
+    <xme:0RrEaWWxKLcDk3WpBUpYgfrTOuDupuNsqp659RvsL4oxBF5JTEErGLKsUy_Dt6AUJ
+    irO6MRRGvhU1n8jRbGkhDkQfnIPTlL1T4FiuBYM0FJ5GSJT-UM44x8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefvdehtdeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
+    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
+    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
+    hilhdrtghomhdpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghp
+    thhtohepghhushhtrghvohgrrhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkvg
+    gvsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheptghhuhgtkhdrlhgvvhgvrhesohhr
+    rggtlhgvrdgtohhmpdhrtghpthhtoheplhhinhhugidqsghlohgtkhesvhhgvghrrdhkvg
+    hrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhfshguvghvvghlsehvghgvrhdr
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqhhgrrhguvghnihhnghesvh
+    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhk
+    vghrnhgvlhdrohhrghdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidroh
+    hrghdruhhk
+X-ME-Proxy: <xmx:0hrEaciY_Eefhlg7ZXsfQz56aA9-v4gO6O7hd1-ic03dRQdmbYqxqA>
+    <xmx:0hrEaRmk_FfkqLRKZDroLRG6i3HcrWdtEbjgAnFWYWDYPEL5eGiPCA>
+    <xmx:0hrEaYiNstqPBqa3noi3DhTwKjnmJW_03_WYtB1nHvbfdQ0VDq8yuQ>
+    <xmx:0hrEaUF0AyO5FiQPVc94gS_2soX9DtEt6NO1xl20JQWZ56PZq3kXMA>
+    <xmx:0hrEaau99OhYO1WQlm846Zq84gmzP4vVpFDK8bFF4TLPC4LTvGEz2ALD>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id D77E2780075; Wed, 25 Mar 2026 13:26:41 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: alex.popov@linux.com
-Subject: Re: [PATCH] wifi: virt_wifi: remove SET_NETDEV_DEV to avoid
- use-after-free
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Michal Kubecek <mkubecek@suse.cz>, Gal Pressman <gal@nvidia.com>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>, Ido Schimmel <idosch@nvidia.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Greg KH
- <gregkh@linuxfoundation.org>, Johannes Berg <johannes@sipsolutions.net>,
- James Guan <guan_yufei@163.com>, Kees Cook <kees@kernel.org>,
- Paul Moses <p@1g4.org>, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, security@kernel.org,
- notify@kernel.org
-References: <20260324224607.374327-1-alex.popov@linux.com>
- <fa3c91c3-9ceb-4fb2-9250-cc239fb0c1b6@lunn.ch>
-Content-Language: en-US
-From: Alexander Popov <alex.popov@linux.com>
-In-Reply-To: <fa3c91c3-9ceb-4fb2-9250-cc239fb0c1b6@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-ThreadId: AyMVdAmERJ9c
+Date: Wed, 25 Mar 2026 13:26:21 -0400
+From: "Chuck Lever" <cel@kernel.org>
+To: "Alexander Viro" <viro@zeniv.linux.org.uk>, kees@kernel.org,
+ gustavoars@kernel.org
+Cc: linux-hardening@vger.kernel.org,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+ "Chuck Lever" <chuck.lever@oracle.com>
+Message-Id: <cc8ff9a7-d7f6-4588-82ba-e77c99574e93@app.fastmail.com>
+In-Reply-To: <20260303162932.22910-1-cel@kernel.org>
+References: <20260303162932.22910-1-cel@kernel.org>
+Subject: Re: [RFC PATCH] iov: Bypass usercopy hardening for kernel iterators
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-2.15 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[linux.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,bootlin.com,suse.cz,nvidia.com,pengutronix.de,gmail.com,linuxfoundation.org,sipsolutions.net,163.com,1g4.org,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-271668-lists,netdev=lfdr.de];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	XM_UA_NO_VERSION(0.01)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	TAGGED_FROM(0.00)[bounces-271669-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	HAS_REPLYTO(0.00)[alex.popov@linux.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alex.popov@linux.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[app.fastmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,oracle.com:email];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.com:replyto,linux.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6085E329DE7
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 32F0C329F1F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/25/26 15:34, Andrew Lunn wrote:
-> On Wed, Mar 25, 2026 at 01:46:02AM +0300, Alexander Popov wrote:
->> Currently we execute `SET_NETDEV_DEV(dev, &priv->lowerdev->dev)` for
->> the virt_wifi net devices. However, unregistering a virt_wifi device in
->> netdev_run_todo() can happen together with the device referenced by
->> SET_NETDEV_DEV().
->>
->> It can result in use-after-free during the ethtool operations performed
->> on a virt_wifi device that is currently being unregistered. Such a net
->> device can have the `dev.parent` field pointing to the freed memory,
->> but ethnl_ops_begin() calls `pm_runtime_get_sync(dev->dev.parent)`.
->>
->> Let's remove SET_NETDEV_DEV for virt_wifi to avoid bugs like this:
-> 
-> Did you have a look at all user of SET_NETDEV_DEV() to see if there
-> are other examples of the same bug?
-> 
-> What i found was:
-> 
-> https://elixir.bootlin.com/linux/v6.19.9/source/drivers/net/ethernet/mellanox/mlx4/en_netdev.c#L3180
-> 
-> Does this have the same problem?
 
-Andrew, I can't say about this particular net device. Looks like it refers to a 
-specific ethernet adapter.
 
-How can we distinguish security-relevant bugs similar to this use-after-free:
-an unprivileged user must be able to create a given net device via user namespaces.
+On Tue, Mar 3, 2026, at 11:29 AM, Chuck Lever wrote:
+> From: Chuck Lever <chuck.lever@oracle.com>
+>
+> Profiling NFSD under an iozone workload showed that hardened
+> usercopy checks consume roughly 1.3% of CPU in the TCP receive
+> path. The runtime check in check_object_size() validates that
+> copy buffers reside in expected slab regions, which is
+> meaningful when data crosses the user/kernel boundary but adds
+> no value when both source and destination are kernel addresses.
+>
+> Split check_copy_size() so that copy_to_iter() can bypass the
+> runtime check_object_size() call for kernel-only iterators
+> (ITER_BVEC, ITER_KVEC). Existing callers of check_copy_size()
+> are unaffected; user-backed iterators still receive the full
+> usercopy validation.
+>
+> This benefits all kernel consumers of copy_to_iter(), including
+> the TCP receive path used by the NFS client and server,
+> NVMe-TCP, and any other subsystem that uses ITER_BVEC or
+> ITER_KVEC receive buffers.
+>
+> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+> ---
+>  include/linux/ucopysize.h | 10 +++++++++-
+>  include/linux/uio.h       |  9 +++++++--
+>  2 files changed, 16 insertions(+), 3 deletions(-)
+>
+> diff --git a/include/linux/ucopysize.h b/include/linux/ucopysize.h
+> index 41c2d9720466..b3eacb4869a8 100644
+> --- a/include/linux/ucopysize.h
+> +++ b/include/linux/ucopysize.h
+> @@ -42,7 +42,7 @@ static inline void copy_overflow(int size, unsigned 
+> long count)
+>  }
+> 
+>  static __always_inline __must_check bool
+> -check_copy_size(const void *addr, size_t bytes, bool is_source)
+> +check_copy_size_nosec(const void *addr, size_t bytes, bool is_source)
+>  {
+>  	int sz = __builtin_object_size(addr, 0);
+>  	if (unlikely(sz >= 0 && sz < bytes)) {
+> @@ -56,6 +56,14 @@ check_copy_size(const void *addr, size_t bytes, bool 
+> is_source)
+>  	}
+>  	if (WARN_ON_ONCE(bytes > INT_MAX))
+>  		return false;
+> +	return true;
+> +}
+> +
+> +static __always_inline __must_check bool
+> +check_copy_size(const void *addr, size_t bytes, bool is_source)
+> +{
+> +	if (!check_copy_size_nosec(addr, bytes, is_source))
+> +		return false;
+>  	check_object_size(addr, bytes, is_source);
+>  	return true;
+>  }
+> diff --git a/include/linux/uio.h b/include/linux/uio.h
+> index a9bc5b3067e3..f860529abfbe 100644
+> --- a/include/linux/uio.h
+> +++ b/include/linux/uio.h
+> @@ -216,8 +216,13 @@ size_t copy_page_to_iter_nofault(struct page 
+> *page, unsigned offset,
+>  static __always_inline __must_check
+>  size_t copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
+>  {
+> -	if (check_copy_size(addr, bytes, true))
+> -		return _copy_to_iter(addr, bytes, i);
+> +	if (user_backed_iter(i)) {
+> +		if (check_copy_size(addr, bytes, true))
+> +			return _copy_to_iter(addr, bytes, i);
+> +	} else {
+> +		if (check_copy_size_nosec(addr, bytes, true))
+> +			return _copy_to_iter(addr, bytes, i);
+> +	}
+>  	return 0;
+>  }
+> 
+> -- 
+> 2.53.0
 
-As I mentioned, applying this fix in ethtool could help against them:
-https://lore.kernel.org/all/20260322075917.254874-1-alex.popov@linux.com/T/#u
+Ping: Any further thoughts on this? Al, Kees, Gustavo?
 
-Best regards,
-Alexander
+
+-- 
+Chuck Lever
 
