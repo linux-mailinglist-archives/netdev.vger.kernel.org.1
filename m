@@ -1,239 +1,193 @@
-Return-Path: <netdev+bounces-271664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271665-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wI0hDuoWxGlvwQQAu9opvQ
-	(envelope-from <netdev+bounces-271664-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:10:02 +0100
+	id qL0BIEcaxGkPwgQAu9opvQ
+	(envelope-from <netdev+bounces-271665-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:24:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C15D8329A60
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:10:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3B13329BF6
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:24:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 468F43039B89
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 17:09:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BC617311FA67
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 17:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90693FB7C8;
-	Wed, 25 Mar 2026 17:09:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34322401498;
+	Wed, 25 Mar 2026 17:14:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TbeMhuQd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ajY4ZCU9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4EE3F6605;
-	Wed, 25 Mar 2026 17:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10233401499
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 17:14:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774458568; cv=none; b=PVz1x6r+/izO/fzsPsAAjowfJhSdh2aDSYsnLKILP0HJU6qy7Ua4KYrCKdDSBhh5pJr6m/xTpDZpWIlpwoLbNC4dhx3tX0xytLRZI8+PDB/bYw07UuLDn8Ex3Nb7nkmrDmsfqUrAqeHlEbb03lRAn+KkpaCMHAaN2dqhUBBNVCU=
+	t=1774458871; cv=none; b=RjdfBuael5JGRmZ5JCoid8BeH1fcjg7QXafr9HPwwRgJgDibxCYlhzTa9bPuzVUOYAZpBEi20R6zNtlPzko+TOrG4gR7CNRzlAfXaHa2GAH39cKkkQG9O/9CFRz720n8I3D8fjF9tYGw2lf4I3L8P5S4hoaQDkqIr4itjlVx3XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774458568; c=relaxed/simple;
-	bh=6172EdHmthvw5crdoc1Hns6OepuVcQaX3UoIrgriuGU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kZaDWlSrtAHI7gifL0dmApIexU7zJ7RRvOs4TXrEF+a1NHyZZbHGItOWPywYMQo8Nn0qMlvoDpwNLlsRm8xUHiqsCVa9AcS4linQ/RfyHXOlASBBn5KcK7fbcRbBfSPXhPl1l7Yt/6CwaUvBltEXuac5LwFbA3zl530l6zYKvpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TbeMhuQd; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=HQWZdasIxp6APQSzsPpDV5QuKag2pZIMS9HO32BplR4=; b=TbeMhuQdoKnFY9qnqBAFAltn35
-	2D/E4LuaawD32y7VfHEJcq9BTgeFlmgUNgI8zvqtdssWBCCCT5zUwBtV06PlcNo1gO+uh/QvxDM7G
-	LaqsfFj1qIK/FzoLFWObTKdEb9+47IhL7eRd7VwtZfga6vh94KTr7IFKoFKB6wbUw0HrWEVQcAXo1
-	3fLSb2EfdnC4Njvd7YXEXYkW61+CEYP80PAqM9ateNLLRCScPT2BrzzzSEfVXK2ScU6GRtrYernxO
-	Al5OgSMbDsau481s6KGAo7YK2Vq9Ev0FtFGZvlue6iGCXN9XS16BmajLvrAbVHBiAsOLYXGHaF4Lt
-	9UL3dORg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41972)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w5RjE-000000003j0-3Mz5;
-	Wed, 25 Mar 2026 17:09:12 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w5Rj9-000000006Bm-2Pxo;
-	Wed, 25 Mar 2026 17:09:07 +0000
-Date: Wed, 25 Mar 2026 17:09:07 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Tyllis Xu <livelycarpet87@gmail.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, maxime.chevallier@bootlin.com,
-	peppe.cavallaro@st.com, rayagond@vayavyalabs.com,
-	stable@vger.kernel.org, danisjiang@gmail.com,
-	ychen@northwestern.edu
-Subject: Re: [PATCH] net: stmmac: fix integer underflow in chain mode
- jumbo_frm
-Message-ID: <acQWs7sXUgWjGsCM@shell.armlinux.org.uk>
-References: <20260321041058.901149-1-LivelyCarpet87@gmail.com>
- <20260323141822.GB69756@horms.kernel.org>
- <CAJsYhQJga9M1aqeOLu0ni4i5iRirTDTxP1c8qyWz4=-9pBpRtw@mail.gmail.com>
+	s=arc-20240116; t=1774458871; c=relaxed/simple;
+	bh=LLyymZIMfRKmZkgYEOo8ux+5+r6WmWR/Azjh6ed+MpE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rlMvtEzfmwtiVzxWVfH0gmyCDaiuWF51Lk8aRFgvTJxX2Jx/HLzfXcdAl09idUK4Be+nsoRC6R6aRlCS1Xh0R7LLr/LkxjkIrU6RSA0jT0S0EIOyT28dZDygSZkRsEpuBoSYEa5BDsnjJIei/MLSdl4f8BqeFV7UI3q5CEhN+ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ajY4ZCU9; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8cd7de0e161so46028785a.2
+        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 10:14:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774458867; x=1775063667; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=B7BTZE0TnTJ3zAa3XvH4+aR30FTe1TSAo+Mvl5lfMwI=;
+        b=ajY4ZCU9RI3lsIJFTcgD7UWaqf6sKUZkD0xK4w/Ie+4Jd47W9cOmRbGJ+by4j7iBTJ
+         ZmpX286GEJ0IxZA5CxNq1Z4K0sgHOoQED3hmdE/2AFIQ1tFElJNFtjLKzU0ZaqzUS1ft
+         EdkQ2kMSpu2z91e48Jqh0XDwxQKXxPM8S7Bx2KrP+7c7IrHJFabSrdDCE5XmAO99q4cY
+         ICuAN9A9c5Dzvrk1KswyUCKXrAphuLN2Ioa3Do1ZNj2iFqeQlGqweBNXZEPkq0jElyFS
+         qTu45PjtGshOoyuG01JY0qKloOKrJ+dCI5Lsj482y8N+auhcqyHpfULAsxO7B/tn6thO
+         jAxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774458867; x=1775063667;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B7BTZE0TnTJ3zAa3XvH4+aR30FTe1TSAo+Mvl5lfMwI=;
+        b=RxdK9IZyAihh/eNnRorAS8+CmHxfHwNhqQ4VNGvJc2E44vAWduAVKwYLGkz2gOoW8M
+         YRvxM+9h08rWREwCctgAyQtpdjYpI5ddjeNQ+AstDn5JTlSHjoCYql5BlVS24Ac5PjXE
+         IyBfP1gYyC2dzA93TK6oo/wGNbDzMJzwoGnFz2NfpBbSvNrwNJhXF6awv+vY4W/NYGvu
+         DZXX7/ZVzs9FHe98Tn8YIgWHE4dUXIAnBmzGcvI1waMlu9bn8bbuzO2jADPvilhEk9Nr
+         JWb0NAkfB2eeeKjZJ2dYQpO+8W4x07iI1okeba9EbsnLb0EEYXSoX4uLhbk+ITOlUVSS
+         qqYA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2lzveWADcowowFjMBFJrvgy1HjFDXPbRZWUdOsmD3muE8W/whHrPSWScvVvVmsZOgxV0LC7M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFJYCR0Tn32nyHqCqVBARxSpbdJ03Uoi38lyo6O1GQzJo4RABQ
+	SQD4CYQs/8Vs9C35FvzpOpEQijXz2tb96eJqfGfUrhUeH9A+LdRm7xaGxRu1PFMYBiZlEJyUK52
+	2eYPCwEcT//yUmA==
+X-Received: from qknty11.prod.google.com ([2002:a05:620a:3f4b:b0:8cd:7d21:ea78])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:44d4:b0:8cb:3a1d:79f5 with SMTP id af79cd13be357-8d000f53929mr613571485a.26.1774458866404;
+ Wed, 25 Mar 2026 10:14:26 -0700 (PDT)
+Date: Wed, 25 Mar 2026 17:14:25 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJsYhQJga9M1aqeOLu0ni4i5iRirTDTxP1c8qyWz4=-9pBpRtw@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
+Message-ID: <20260325171425.3920372-1-edumazet@google.com>
+Subject: [PATCH net] ip6_tunnel: validate ipv4 header in ip4ip6_err()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	Oskar Kjos <oskar.kjos@hotmail.com>, Ido Schimmel <idosch@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271664-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,bootlin.com,st.com,vayavyalabs.com,gmail.com,northwestern.edu];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,hotmail.com,nvidia.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271665-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.079];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: C15D8329A60
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: A3B13329BF6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 24, 2026 at 01:07:47AM -0500, Tyllis Xu wrote:
-> I will try to change the code to consolidate with the ring-mode
-> code, avoid whitespace diff, and resubmit the patch with a new
-> correct subject line. Thank you for your feedback!
+Oskar Kjos reported the following problem.
 
-I mentioned the possibilities of other problems. How about this:
+ip4ip6_err() calls icmp_send() on a cloned skb whose cb[] was written
+by the IPv6 receive path as struct inet6_skb_parm. icmp_send() passes
+IPCB(skb2) to __ip_options_echo(), which interprets that cb[] region
+as struct inet_skb_parm (IPv4). The layouts differ: inet6_skb_parm.nhoff
+at offset 14 overlaps inet_skb_parm.opt.rr, producing a non-zero rr
+value. __ip_options_echo() then reads optlen from attacker-controlled
+packet data at sptr[rr+1] and copies that many bytes into dopt->__data,
+a fixed 40-byte stack buffer (IP_OPTIONS_DATA_FIXED_SIZE).
 
-static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
-{
-        unsigned int nopaged_len = skb_headlen(skb);
-...
-        enh_desc = priv->plat->enh_desc;
-        /* To program the descriptors according to the size of the frame */
-        if (enh_desc)
-                is_jumbo = stmmac_is_jumbo_frm(priv, skb->len, enh_desc);
+To fix this we could simply clear skb2->cb[].
 
-1. enh_desc is set if priv->dma_cap.enh_desc is set and DMA capabilities
-   exist (dmwac1000 and more recent.)
+In this patch I chose to validate the inner IPv4 header and
+recompute options if any were included.
 
-2. in chain mode, is_jumbo will be true if skb->len > 8KiB.
-   in ring mode, is_jumbo will be true if skb->len >= 4KiB
-   (note the >= vs > there which is suspicious.)
+Fixes: c4d3efafcc93 ("[IPV6] IP6TUNNEL: Add support to IPv4 over IPv6 tunnel.")
+Reported-by: Oskar Kjos <oskar.kjos@hotmail.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Ido Schimmel <idosch@nvidia.com>
+---
+ net/ipv6/ip6_tunnel.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-Let's consider the case where is_jumbo is false. So this could be a
-packet with skb->len up to 4KiB-1 or 8KiB.
-
-        if (unlikely(is_jumbo)) {
-        } else {
-                dma_addr = dma_map_single(priv->device, skb->data,
-                                          nopaged_len, DMA_TO_DEVICE);
-
-                stmmac_set_desc_addr(priv, first_desc, dma_addr);
-
-                /* Prepare the first descriptor without setting the OWN bit */
-                stmmac_prepare_tx_desc(priv, first_desc, 1, nopaged_len,
-                                       csum_insertion, priv->descriptor_mode,
-                                       0, last_segment, skb->len);
-
-This can call one of several functions.
-
-ndesc_prepare_tx_desc():
-        if (descriptor_mode == STMMAC_CHAIN_MODE)
-                norm_set_tx_desc_len_on_chain(p, len);
-        else
-                norm_set_tx_desc_len_on_ring(p, len);
-
-static inline void norm_set_tx_desc_len_on_chain(struct dma_desc *p, int len)
-{
-        p->des1 |= cpu_to_le32(len & TDES1_BUFFER1_SIZE_MASK);
-}
-
-#define TDES1_BUFFER1_SIZE_MASK         GENMASK(10, 0)
-
-So, this masks the length with 0x7ff, meaning this can represent
-buffers up to 2047 bytes _max_ for normal descriptors in chain
-mode.
-
-static inline void norm_set_tx_desc_len_on_ring(struct dma_desc *p, int len)
-{
-        unsigned int buffer1_max_length = BUF_SIZE_2KiB - 1;
-
-        if (unlikely(len > buffer1_max_length)) {
-                p->des1 |= cpu_to_le32(FIELD_PREP(TDES1_BUFFER2_SIZE_MASK,
-                                                  len - buffer1_max_length) |
-                                       FIELD_PREP(TDES1_BUFFER1_SIZE_MASK,
-                                                  buffer1_max_length));
-        } else {
-                p->des1 |= cpu_to_le32(FIELD_PREP(TDES1_BUFFER1_SIZE_MASK,
-                                                  len));
-        }
-}
-
-#define TDES1_BUFFER2_SIZE_MASK         GENMASK(21, 11)
-
-This works around the 2KiB limitation, and fills buffer 1 with
-2047 bytes and buffer 2 with the remainder... but there is _no_ code
-that writes buffer 2's address in this case. This means we will
-transmit garbage - and unknowingly of transmit COE is enabled (because
-the checksums will be based on the data the NIC read from memory.)
-
-However, normal descriptors in ring mode can correctly transmit up
-to 2047 bytes correctly, or garbage after that up to 4094 bytes.
-
-Now, this in the probe function:
-
-                ndev->max_mtu = SKB_MAX_HEAD(NET_SKB_PAD + NET_IP_ALIGN);
-
-equates to:
-
-   PAGE_SIZE - NET_SKB_PAD - NET_IP_ALIGN - aligned skb_shared_info.
-
-Notice that this doesn't limit by what the hardware can actually do.
-
-Consider the implications where PAGE_SIZE is 16KiB or 64KiB and the
-stmmac hardware only supports normal descriptors. max_mtu gets set
-to something close to PAGE_SIZE. Even for 4KiB, it'll be close to that.
-If skb_headlen(skb) can approach max_mtu, then we have the very real
-possibility of overflowing the first descriptor - which in normal
-mode can only really handle up to 2047 bytes.
-
-This has been on my list of issues to try and sort out at some point,
-at the moment I don't have any patches, but I'm instead trying to
-clean up the code to make it more understandable so I can start
-thinking about possible solutions. The code here has been a total
-trainwreck, and some of those cleanups have recently gone in to
-net-next.
-
-I think the driver has only really been tested with the standard
-1500 byte MTU, and maybe briefly with the 9KiB jumbo MTU, but honestly
-I feel like saying that the transmit paths need thrown away and totally
-rewritten - including that absolutely wrong max_mtu setting in the
-probe function.
-
-However, the problem is... I don't have hardware that uses normal nor
-enhanced descriptors - my hardware is a nVidia Xavier, which is a
-dwmac4/5 implementation using a different descriptor format, so I
-can only make changes through sets of simple transformations.
-
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 4c29aa94e86eb9439458e4b23426bfda8b3b8922..1901348617f0a4f48358c1c8135068f4b861059f 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -561,6 +561,7 @@ ip4ip6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
+ 	   u8 type, u8 code, int offset, __be32 info)
+ {
+ 	__u32 rel_info = ntohl(info);
++	struct inet_skb_parm parm;
+ 	const struct iphdr *eiph;
+ 	struct sk_buff *skb2;
+ 	int err, rel_msg = 0;
+@@ -606,6 +607,8 @@ ip4ip6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
+ 	skb_pull(skb2, offset);
+ 	skb_reset_network_header(skb2);
+ 	eiph = ip_hdr(skb2);
++	if (eiph->version != 4 || eiph->ihl < 5)
++		goto out;
+ 
+ 	/* Try to guess incoming interface */
+ 	rt = ip_route_output_ports(dev_net(skb->dev), &fl4, NULL, eiph->saddr,
+@@ -617,6 +620,18 @@ ip4ip6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
+ 	skb2->dev = rt->dst.dev;
+ 	ip_rt_put(rt);
+ 
++	memset(&parm, 0, sizeof(parm));
++	if (eiph->ihl > 5) {
++		if (!pskb_network_may_pull(skb2, eiph->ihl * 4))
++			goto out;
++		eiph = ip_hdr(skb2);
++		parm.opt.optlen = eiph->ihl * 4 - sizeof(struct iphdr);
++
++		err = __ip_options_compile(dev_net(skb->dev), &parm.opt, skb2, NULL);
++
++		if (err)
++			goto out;
++	}
+ 	/* route "incoming" packet */
+ 	if (rt->rt_flags & RTCF_LOCAL) {
+ 		rt = ip_route_output_ports(dev_net(skb->dev), &fl4, NULL,
+@@ -644,7 +659,7 @@ ip4ip6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
+ 		skb_dst_update_pmtu_no_confirm(skb2, rel_info);
+ 	}
+ 
+-	icmp_send(skb2, rel_type, rel_code, htonl(rel_info));
++	__icmp_send(skb2, rel_type, rel_code, htonl(rel_info), &parm);
+ 
+ out:
+ 	kfree_skb(skb2);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.53.0.1018.g2bb0e51243-goog
+
 
