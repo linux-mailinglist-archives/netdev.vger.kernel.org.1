@@ -1,378 +1,312 @@
-Return-Path: <netdev+bounces-271343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271344-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kAtVHic+w2nspQQAu9opvQ
-	(envelope-from <netdev+bounces-271343-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 02:45:11 +0100
+	id GI0GNkxBw2kFpgQAu9opvQ
+	(envelope-from <netdev+bounces-271344-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 02:58:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D93E831E619
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 02:45:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C62B31E886
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 02:58:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9E9B13045AB6
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 01:44:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ABB1F3008766
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 01:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3527218845;
-	Wed, 25 Mar 2026 01:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5ED275AE4;
+	Wed, 25 Mar 2026 01:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cLt2Guxm"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="dZq/nCLa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011027.outbound.protection.outlook.com [40.107.130.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B56C272E61
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 01:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774403063; cv=none; b=hYTG5q0y14bg70h/mrzbVAnb+LhZ11x9YURHcv+NW4Se+0eE25ZRQCUGHGspZIJlhXZ/ptfomGKdU+o6r3ubTIzfy/7EFUBl/Jm2NNGbWUWSjIbEqi76HTLzHwKdxsCULi4eoA4cT9mMRjTyHS/3+G8x7bYT1d0WnSQTkk+GdqQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774403063; c=relaxed/simple;
-	bh=576MJS9EDhNf7+XHS+Xt78KQm6PiKqmAjAB1dJ1OtlI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JhXHY3WFpBn0YO0E7EUB1sdF/TpV1TtsFCWWZ2GLlZeZ3dycVN6eJrHCO+ecs27QP0w0LRdpmuVVJ1beSHZVipujAzFuJQryvmisjHghfyV/4aQrchn15e2FouBCZFEgbOfacinZ5W/51Ge+56dLhFtgockjeT3vqPE+Vg5jbEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cLt2Guxm; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-661d20c9787so2818676a12.0
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 18:44:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774403060; x=1775007860; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dnFsogw3+Zpl0Is4+Zoa7M6DndwQbNQ16wLAr1kyBQQ=;
-        b=cLt2GuxmvwrwSHxfpdB6hJjute09Lzh64bAROwoSzLgMNvvj/wygKzGNXex+peSNat
-         DHRj/WEqwSEQJeBuwEfJk3E+gF6am835P0uWC+YbYigf25g0agTD+XuFQ3zJyi86QLCD
-         ZZcpYQqBaGb6dAkN80jEgzOlkXT8PyA6SgnADWxZnBaW9i3cFZ7g49dTOxB0MDvpfirJ
-         wJVZugLodNgmRhXAad0PT9T0XHk6no052MQsFfAKXzXKNlFlf12zFJ+YCp/KlPy2pZr3
-         fHgvAQpr3VWDTru8VrRU5e5qhM7TwAVuiMFZLoJLXv2lWuJ9OZXstzTTW5/jBl5iDwbZ
-         O+zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774403060; x=1775007860;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dnFsogw3+Zpl0Is4+Zoa7M6DndwQbNQ16wLAr1kyBQQ=;
-        b=oFVaLXPSFLBCB0KZZKGRjPyigDqVIFDg0q9ujGjfF2mzglk6pdpz1Qer6T4FRCiDGm
-         tppzvN9PwXoiU4enx4kNtGYN0No2GQT4dBr18puDdEK30LhKd7ZjJwwm4F+2kwKZQMIS
-         bdr84+IQKkIF42/ck3A28ZB2pheyrQUsqp/Jr2cywCksOTIk5nvmUN+QMSqeFNUceHd0
-         AkUtSTCjPQg+vGMMHKaCRdRrJUXJ4WXL2pGt6r8hDLzhLEHGo3X5uImymhZZUX74CHIk
-         typO/6ENIFz5DL6XC2WVzFPuhvcKwcDqUYNtoAKzflsYYrchT2tJAuYKumog1TtjHYnM
-         L9Ow==
-X-Forwarded-Encrypted: i=1; AJvYcCWcD9s0CS1bNIGFJqUEk3fqyuHlRZlVjewRHeg7c2QinnyWOqpYTzYKypzKeZdPjS5V84b7mag=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdPd2NgEZjRrUlenR63GQvyO0HGlLOu4Ksa/YVZOptmoblriRf
-	OIh2U4m0bncPJaN4vv+QuW/h628fk7aa7L6f9X2cwUpAy9xJUx+MLiyhfxgQilpxIX0=
-X-Gm-Gg: ATEYQzzdwJ1l0YiXT8pVDxQM+7os/93khR1J+cpM5XGrKU1P1OJbQ/FRa+6Etkhsom7
-	c7HAfvvmrcvfOwgU7eW42s9wM18KGgfuAR6YJWTg7Q7NLxxyrA3wL5JgH2HEQbcoQjxSDsU56AK
-	GCuKD+ECkFh775HrkUg4Y5oVY91bb4cIKG6Tj3yRRNZDBV8n4DMMs3r3biX+shcNyQnHy2FPleF
-	hYCS1gtIDSOfVoSowvpLKZZgYvthlc9i141OcpgifkQuZFBe9Yb49PFI5mpWrUMdcCxrTZ5NDhj
-	ofBTJ2PUHtKbRZpPUF3wZuOasv878wpqHuthA8HbEwme7C++Z/jOF4FqgBz0UOkQRQMN7JVUpeo
-	ETHsT4xMLYOT4VST6eC74jaHaKCCRmv0YVaB8XOPhnklwyL7yq364K2z9VmjuwMkLi1WS0aAYaD
-	slD0LeI34R/3uZ
-X-Received: by 2002:a17:906:f59c:b0:b98:8a4a:7d15 with SMTP id a640c23a62f3a-b9a3f1a70fdmr99510166b.19.1774403060215;
-        Tue, 24 Mar 2026 18:44:20 -0700 (PDT)
-Received: from gmail.com ([2a09:bac5:4e22:270f::3e4:5])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b98335ddfa1sm714031166b.32.2026.03.24.18.44.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 18:44:19 -0700 (PDT)
-From: Qingfang Deng <dqfext@gmail.com>
-To: Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Felix Maurer <fmaurer@redhat.com>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	Petr Machata <petrm@nvidia.com>,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Paul Mackerras <paulus@ozlabs.org>
-Subject: [PATCH net-next v3] selftests: net: add tests for PPP
-Date: Wed, 25 Mar 2026 09:43:54 +0800
-Message-ID: <20260325014411.3596-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDBEE13DDAA;
+	Wed, 25 Mar 2026 01:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.27
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774403617; cv=fail; b=iNnjB/pbGUHQ4tv4SFYgxsPrLTXJ4cw5VzIE7K1F8l/B9mBk+5XwTqGXEUxvSklKnMmifDD7gU0jnQ9iGHUR0uLQh/UYpf9LExM8VxePneGZ8fuzMGa3evZDb7yZExm8ZPn96kZSZIGPHfwKSX0t3GJXFbz3U8vfC0JQyaZ/q3A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774403617; c=relaxed/simple;
+	bh=HX/PDNHEoP6hXlBf+QPSRv/XY6uANuUkwlJ3AJYkBIo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gT8jfbp1HFrH6dkF+GlKZ8+YWDpbJLqz8S19/AFg87UyoCPSnK2TNmPYVduqoX3I2p7vZSh3m5pYMjXdlG3wgMiSNQ0C9NiWafv0YVVI0y+Y6WaY6JykS25pHFFs+suWUhyB9D8++lx+mre/PM+sMB+E63v6AblJ2MvuMO47VSg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=dZq/nCLa; arc=fail smtp.client-ip=40.107.130.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZhSlFQq7qgQgq4zUE6aqhZ0EKK/a+yos//WBo9vgn/kPQTnLKqHYoGKRjkQH7iiUyY8UhkozcJHT0MCKXo0g5mTC9Qs0ulX8yT3AjOedtmXVCJ6iDt3xDt2YVSZ96FR8wuml1xlscXlHvhd3LhzeuL30LB5njjmY7TOKP/obVw7VqNPYasAUPZXIQOpiTgDSa0DY3rYvigTe3hKvUPbNWNbV3sccnNRp1nzcjacOIoPA9thSjc38ZAVlW6Oj8aCswxmW+vA/nj6xPxn0/DXGGnB2UU/wSrHG4IS3F+7ah8BQa8RJ9etMv14wKX2vdVZRXJM7ibjtINsiV3Xs3mCReQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wDppV0/PVtQMkWNtR+DOHowtE6IeHsFRTHyY8wN2sWU=;
+ b=nRhCiUVFy3FViqV9bF7uBwhjOpAB39DmWNetKab2xKMWUU+3r2HQqoKVRCrxnjz3IKHoSSD03HUznrCOwPu26g+AToT+pl7o2FsIGigkWQjrId4l8Bg9nO+0Jvmi7ZX8U6Trnrwwdq2AFypQFyuk3d0i/RvpEJxFMwXWC4m7X5n2GvWop3AXRy8utI6uo6rX1xhgLkpj3Hjh2ZjELYAgqYI509M7IgpsgXHlEkUz1Nz/w8ZHAg5u0tLUVcVS8/24riBH+q/aqjXNkttDIqamnoLqt0qtW86H/4oGEsksK2EuKzdKYO0DdVFzt+DN8ch5kVUyfFeVqU9mWNmPUdrgJg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wDppV0/PVtQMkWNtR+DOHowtE6IeHsFRTHyY8wN2sWU=;
+ b=dZq/nCLavmmvfraGUmDDRl7boWYBVa1PqsGDVJEJasvpVNMKTUbMBZqXTTgKUUAU2r4w/snJN6niH0dPL8MWULfYpOAYqBos1BsyZaEkpTRZ6wy2Dx8zYckjFKSj4lGOueFzfPL2jKfuVv9uBSs3NV7ytBEqg1Raw3Rrzf/nNCxGlgF9QuZCHqbyLKfeDnBU3ZY+ut2xIvmqWSp6oTrLNLRugwT+E1tXqza1LlYAr5n0sn/oaViUz5iRvti5pifto52eOCQWtXeTkWEGU8Gesx90cCkjnqXt0hH5HeObz8nlRyGMlVBqmlteCICTRCaqU1l3P5N/+iY0kgwFGSL4lQ==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by AM8PR04MB7202.eurprd04.prod.outlook.com (2603:10a6:20b:1da::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Wed, 25 Mar
+ 2026 01:53:32 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::b476:c19a:24cd:3694]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::b476:c19a:24cd:3694%3]) with mapi id 15.20.9745.019; Wed, 25 Mar 2026
+ 01:53:32 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Simon Horman <horms@kernel.org>
+CC: Clark Wang <xiaoning.wang@nxp.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "kuba@kernel.org"
+	<kuba@kernel.org>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"chleroy@kernel.org" <chleroy@kernel.org>, "andrew@lunn.ch" <andrew@lunn.ch>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "edumazet@google.com"
+	<edumazet@google.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, Frank Li <frank.li@nxp.com>,
+	"robh@kernel.org" <robh@kernel.org>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, Claudiu Manoil <claudiu.manoil@nxp.com>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, "linuxppc-dev@lists.ozlabs.org"
+	<linuxppc-dev@lists.ozlabs.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>
+Subject: RE: [PATCH v2 net-next 13/14] net: dsa: netc: initialize buffer bool
+ table and implement flow-control
+Thread-Topic: [PATCH v2 net-next 13/14] net: dsa: netc: initialize buffer bool
+ table and implement flow-control
+Thread-Index: AQHcuote84lxYz/saUypBRN66PVRZbW95VIAgACYkLA=
+Date: Wed, 25 Mar 2026 01:53:32 +0000
+Message-ID:
+ <PAXPR04MB8510C8FA7D3E0635EC23E2178849A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20260323060752.1157031-14-wei.fang@nxp.com>
+ <20260324164234.238201-1-horms@kernel.org>
+In-Reply-To: <20260324164234.238201-1-horms@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|AM8PR04MB7202:EE_
+x-ms-office365-filtering-correlation-id: 6b126050-cd03-4d14-bef0-08de8a1151c3
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|366016|19092799006|1800799024|56012099003|22082099003|18002099003|38070700021;
+x-microsoft-antispam-message-info:
+ iMLCGKbe1evIbv8dm8/JR72lHW6gljniCGxlRBlVk+0QMtbiMz/GJ4Owru31weNOKW+Mb8k6DkgYrxFOiFCvS97JGEK0PLop1U+tdZvIKdvaYCAfIdKks9Pu7p23hw98dzskDl9bj41MIFH5zGDCawgdpZi5+U6mHNWii4rrwin1J1fg/BZUUc+IshfCinOaCPMSbfALD5O4xHYdL1zFfpd/C/qH7Xn84yQcdHbjYvDuLoU31hNcvF/XIvIffh6uKLuq2tBMy6CUMBqB9l09tdFaF23kzqFj7BEWi/7uBQP89AmbScvq84MAnN1eAov04kq8ZJmq3jR0jaEulVA+aiNzJT0N8KS0OVC118S5LyxPUOVzUchzNcjo06/eDqqaXKXoPZ1oGsqmUQ2GODFHM4by9kirGL9BXa/v49TYBktcVHWH+/pfiN+SHph7ZQqVn0PkfhOv0kjZdjPJJlcnSuQMFH+fF56sGlTPJUcls/8EE/QBurUvbnGbBqUnvrNJACZFa2RU62iU6zn66nSYMKSlivxeuLCmocuE8NIG7arHEk8KUxuZDio0O4HvgHTA7O4vEYjK3fDZv4J1alvPa/pu1EWxTaQS6cdfE0L8L1Hd0uDXVicsBzR/+047XFPY1fvjcSJAIItTRLJYZZBcUMOWoF2c2lD1/SLmO85aP7zdgwKKJqWYwSbJoVa+vVTwP/UD5+x0Fyihf8HqrCFixFThKsm/h9m3gS9TiNKH6/PPgr+1+kAX2eMCIFjbxfcIFrros4c3L61av/afgl7WOCuX9UU4VpWtBzoVLoaFdQE=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(19092799006)(1800799024)(56012099003)(22082099003)(18002099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?g4jLznmHFxWYc6m8LzKds/hEkLPvJRnWepDYKrKJlz3wTNjAf4S5OBlkAwzi?=
+ =?us-ascii?Q?J0Zw0SrWuvF3VF6S6kQU2iYYRkSSjOZw6pQuAXr/90OvqWE/nc6uwJzTPA0j?=
+ =?us-ascii?Q?PcJvZEcG140Q8RPTm1kv3oLO925qBJ+mNqqU++tDBv05rwMGWggR3IYkN5/Y?=
+ =?us-ascii?Q?+oq44NYRZK6B2oyJwKtutY2bzPHfG4dUZZG5kK5P2i5fxF4D0hnRyEF0wmNG?=
+ =?us-ascii?Q?S1e9lS19neZ/DO0ULChW15U8OhpNCxZ9rsrlIlQ8GXgJMPyEAr2cZl+tFDnF?=
+ =?us-ascii?Q?YHTUp5RsWvukMcforptSwaTdaMAIv9yXVGSu2TnwcPdX3kgCm16BvIC26RQI?=
+ =?us-ascii?Q?xKPhUsFy+uYh1f4yDbGtOKN85FVjOLv4lRZsSVcGx+fYgRz4NimYdZ5P8hlm?=
+ =?us-ascii?Q?+zzJtpM1MJ/oXVsxwqBGi9+vNEl62qwfVlxAwy6CDLYrwSHmQZ8YNRzFbo56?=
+ =?us-ascii?Q?NH63ialX+2bRS1RTpoVdphSutDbj9eTEsV3GfsNedRbw7C5sPIfzKP3/Kthy?=
+ =?us-ascii?Q?7FU9O4mTc7MfKWTTMAMHKUOh0i0IIrzbwXquywanjUPwOohetUydnLcD3H7b?=
+ =?us-ascii?Q?sZ6/dJxVgalyOAKCkVNOXT2kjGYiTGlbgByrDNzs+2bTeh9QPZElRs2TIrvs?=
+ =?us-ascii?Q?S8Rw/F/OEWO3LRWDztrAQwCNCJhk8fQo4+GMutlCfdUAAVdPboT+DtrjYqYH?=
+ =?us-ascii?Q?rOeEX9ys0jZI5Va4b3F4U6pvlfP6312FNspw8owzZFAfjtIMbLFsg3gYw4cN?=
+ =?us-ascii?Q?XCqXg2t2HwiKcb9AmRLcxYCk/gFp7m4YFS8Qro0sielGHzkj2oXMm2DPfQrm?=
+ =?us-ascii?Q?mM/Nbaf6qQ+lrsEcBbr9J/igx97jVdhQVonvIKpshUCr0PVL9oVWde2XXooU?=
+ =?us-ascii?Q?I6f0B97FounfKzsy88EkuEFeM/scn1qHh26mdScyTuWp08QGphwAZ0tQbEYw?=
+ =?us-ascii?Q?zD04PBozWeYC5HlKxhWKhikF+FJV3u+/26GQBNfemJpyUOssB4ZwIQdov09S?=
+ =?us-ascii?Q?x8xJzAL0QcqZ2FiK0lyuwHz63NFRTcM75nG4FGfUr1VA4KT5F1kmPR7OqmR+?=
+ =?us-ascii?Q?QDstYPaDiy0fdi6HWETtLc6CyklXbmyFSJTgb64V1zNFmeMzV5CBAd6wSk3U?=
+ =?us-ascii?Q?Z8hFZoB6DI90IfnbFDtTnJTI42FSi0/UQGUndFE5srVjJqIyHBjZDbj4BIhx?=
+ =?us-ascii?Q?ukuZCTbYJoR19lfDfw3s52ZdtivM6Q2lfW/ayDiMBugb++VmQnanh1yBf6AX?=
+ =?us-ascii?Q?IAVZo3P7EuCXWb4cyTye4JzGhOW/JBHIAH8+TxCvtkinopkKGaI+MjgsNsNr?=
+ =?us-ascii?Q?JWvqIsZU8DbRJNvgkJuD9rcTckYA15P5J0wZfG8krYznnvjjLx4CZQ0kUGK2?=
+ =?us-ascii?Q?MmyxZ0bLy4sjpvyNAwIxMo+Ce21XVPYcqTLRdzbP0hGT0a7vKii2HiHvSoOq?=
+ =?us-ascii?Q?CPLbOtlNTfCNPFsogLSwjkns9mSsmJyGhG5h5JjNE/Lfr3GCqk94I1SYyLgC?=
+ =?us-ascii?Q?iyCRShPwhSrqOTwRzgRNUyY/AfPW5FOitLyhqiibvrmucL8LOAvNAa1EKm95?=
+ =?us-ascii?Q?Qg79GOhTuO2S2sSno6bDKOCp+JaFx46Pz1tmH9DWyiX8AgzwNUuDTwcfJ8yS?=
+ =?us-ascii?Q?8h9AmbF0tz1WlshGklfczuB3QZSAkzASnAJ7fP3i7XZuveq6UHPtbnNKIAy/?=
+ =?us-ascii?Q?hZQK2xjietvw8VxMqySk7hSGVTnonI4+rKuk5NqWrZkws3dw?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6b126050-cd03-4d14-bef0-08de8a1151c3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2026 01:53:32.3772
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: KfTzxF/R8v234/WkQ1o2t1R6W62ruLA6253gaW2VHjzvqJaGIaMnq4bmpBo4xtgna8pW8xKQWs4OOaOue0Pzow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7202
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-271343-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271344-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nxp.com,vger.kernel.org,armlinux.org.uk,kernel.org,lunn.ch,google.com,lists.infradead.org,gmail.com,lists.ozlabs.org,redhat.com,davemloft.net,lists.linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[pppoe.so:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pppoe.sh:url,enneenne.com:email,ppp_async.sh:url]
-X-Rspamd-Queue-Id: D93E831E619
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,PAXPR04MB8510.eurprd04.prod.outlook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7C62B31E886
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add ping and iperf3 tests for ppp_async.c and pppoe.c.
+> > +static u32 netc_get_buffer_pool_num(struct netc_switch *priv)
+> > +{
+> > +	return netc_base_rd(&priv->regs, NETC_BPCAPR) & BPCAPR_NUM_BP;
+> > +}
+> > +
+> > +static void netc_port_set_pbpmcr(struct netc_port *np, u64 mapping)
+> > +{
+> > +	u32 pbpmcr0 =3D lower_32_bits(mapping);
+> > +	u32 pbpmcr1 =3D upper_32_bits(mapping);
+> > +
+> > +	netc_port_wr(np, NETC_PBPMCR0, pbpmcr0);
+> > +	netc_port_wr(np, NETC_PBPMCR1, pbpmcr1);
+> > +}
+> > +
+> > +static void netc_ipv_to_buffer_pool_mapping(struct netc_switch *priv)
+> > +{
+> > +	int num_port_bp =3D priv->num_bp / priv->info->num_ports;
+> > +	int q =3D NETC_IPV_NUM / num_port_bp;
+> >                ^^^^
+>=20
+> Can this cause a division by zero?  If netc_get_buffer_pool_num() reads
 
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
----
-v3:
- - run on virtme-ng and fix dependencies
- - delete tmp files at cleanup
- - add log_test
- https://lore.kernel.org/linux-ppp/20260321154616.2754-1-dqfext@gmail.com/
+From hardware perspective, num_bp is more than num_ports, so num_port_bp
+will not be zero. Let me think how to improve it to avoid such false positi=
+ve.
 
- MAINTAINERS                                   |  1 +
- tools/testing/selftests/Makefile              |  1 +
- tools/testing/selftests/net/ppp/Makefile      | 15 +++++++
- tools/testing/selftests/net/ppp/config        |  9 ++++
- tools/testing/selftests/net/ppp/ppp_async.sh  | 43 ++++++++++++++++++
- tools/testing/selftests/net/ppp/ppp_common.sh | 44 +++++++++++++++++++
- .../selftests/net/ppp/pppoe-server-options    |  2 +
- tools/testing/selftests/net/ppp/pppoe.sh      | 40 +++++++++++++++++
- 8 files changed, 155 insertions(+)
- create mode 100644 tools/testing/selftests/net/ppp/Makefile
- create mode 100644 tools/testing/selftests/net/ppp/config
- create mode 100755 tools/testing/selftests/net/ppp/ppp_async.sh
- create mode 100644 tools/testing/selftests/net/ppp/ppp_common.sh
- create mode 100644 tools/testing/selftests/net/ppp/pppoe-server-options
- create mode 100755 tools/testing/selftests/net/ppp/pppoe.sh
+> the hardware register NETC_BPCAPR and returns 0, then num_port_bp would
+> be
+> 0 and this division would crash the kernel.
+>=20
+> The call chain is:
+>=20
+> netc_setup()
+>   netc_switch_bpt_default_config()
+>     priv->num_bp =3D netc_get_buffer_pool_num()
+>     netc_ipv_to_buffer_pool_mapping()
+>       num_port_bp =3D priv->num_bp / priv->info->num_ports;
+>       q =3D NETC_IPV_NUM / num_port_bp;  <- division by zero
+>=20
+> Should netc_switch_bpt_default_config() validate that priv->num_bp is
+> non-zero before proceeding?
+>=20
+> > +	int r =3D NETC_IPV_NUM % num_port_bp;
+> > +	int num =3D q + r;
+> > +
+> > +	/* IPV-to-buffer-pool mapping per port:
+>=20
+> [ ... ]
+>=20
+> > +static int netc_switch_bpt_default_config(struct netc_switch *priv)
+> > +{
+> > +	priv->num_bp =3D netc_get_buffer_pool_num(priv);
+> > +	priv->bpt_list =3D devm_kcalloc(priv->dev, priv->num_bp,
+> > +				      sizeof(struct bpt_cfge_data),
+> > +				      GFP_KERNEL);
+> > +	if (!priv->bpt_list)
+> > +		return -ENOMEM;
+> > +
+> > +	/* Initialize the maximum threshold of each buffer pool entry */
+> > +	for (int i =3D 0; i < priv->num_bp; i++) {
+> > +		struct bpt_cfge_data *cfge =3D &priv->bpt_list[i];
+> > +		int err;
+> > +
+> > +		cfge->max_thresh =3D cpu_to_le16(NETC_BP_THRESH);
+> > +		err =3D ntmp_bpt_update_entry(&priv->ntmp, i, cfge);
+> > +		if (err)
+> > +			return err;
+> > +	}
+> > +
+> > +	netc_ipv_to_buffer_pool_mapping(priv);
+> > +
+> > +	return 0;
+> > +}
+> > +
+>=20
+> [ ... ]
+>=20
+> > @@ -1224,6 +1313,40 @@ static void netc_port_set_hd_flow_control(struct
+> netc_port *np, bool en)
+> >  			  en ? PM_CMD_CFG_HD_FCEN : 0);
+> >  }
+> >
+> > +static void netc_port_set_tx_pause(struct netc_port *np, bool tx_pause=
+)
+> > +{
+> > +	struct netc_switch *priv =3D np->switch_priv;
+> > +	int port =3D np->dp->index;
+> > +	int i, j, num_bp;
+> > +
+> > +	num_bp =3D priv->num_bp / priv->info->num_ports;
+> > +	for (i =3D 0, j =3D port * num_bp; i < num_bp; i++, j++) {
+> > +		struct bpt_cfge_data *cfge;
+> > +
+> > +		cfge =3D &priv->bpt_list[j];
+> > +		if (tx_pause) {
+> > +			cfge->fc_on_thresh =3D cpu_to_le16(NETC_FC_THRESH_ON);
+> > +			cfge->fc_off_thresh =3D cpu_to_le16(NETC_FC_THRESH_OFF);
+> > +			cfge->fccfg_sbpen =3D FIELD_PREP(BPT_FC_CFG,
+> > +						       BPT_FC_CFG_EN_BPFC);
+> > +			cfge->fc_ports =3D cpu_to_le32(BIT(port));
+> > +		} else {
+> > +			cfge->fc_on_thresh =3D cpu_to_le16(0);
+> > +			cfge->fc_off_thresh =3D cpu_to_le16(0);
+> > +			cfge->fccfg_sbpen =3D 0;
+> > +			cfge->fc_ports =3D cpu_to_le32(0);
+> > +		}
+> > +
+> > +		ntmp_bpt_update_entry(&priv->ntmp, j, cfge);
+> >                 ^^^^
+>=20
+> Should the return value of ntmp_bpt_update_entry() be checked here?
+>=20
+> Simon Horman noted in v1 review that other NTMP table operations in the
+> driver propagate errors from the update functions. While this was fixed
+> in netc_switch_bpt_default_config() in v2, the same issue remains here.
+>=20
+> If the hardware update fails (for example, DMA allocation failure or
+> hardware timeout), the driver's bpt_list will have flow control values th=
+at
+> do not match the actual hardware state, potentially causing incorrect flo=
+w
+> control behavior.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a09bf30a057d..d553437d5ac1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -21078,6 +21078,7 @@ PPP PROTOCOL DRIVERS AND COMPRESSORS
- L:	linux-ppp@vger.kernel.org
- S:	Orphan
- F:	drivers/net/ppp/ppp_*
-+F:	tools/testing/selftests/net/ppp/
- 
- PPS SUPPORT
- M:	Rodolfo Giometti <giometti@enneenne.com>
-diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-index 450f13ba4cca..65f84e8a0cf0 100644
---- a/tools/testing/selftests/Makefile
-+++ b/tools/testing/selftests/Makefile
-@@ -78,6 +78,7 @@ TARGETS += net/netfilter
- TARGETS += net/openvswitch
- TARGETS += net/ovpn
- TARGETS += net/packetdrill
-+TARGETS += net/ppp
- TARGETS += net/rds
- TARGETS += net/tcp_ao
- TARGETS += nolibc
-diff --git a/tools/testing/selftests/net/ppp/Makefile b/tools/testing/selftests/net/ppp/Makefile
-new file mode 100644
-index 000000000000..b39b0abadde6
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/Makefile
-@@ -0,0 +1,15 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+top_srcdir = ../../../../..
-+
-+TEST_PROGS := \
-+	ppp_async.sh \
-+	pppoe.sh \
-+# end of TEST_PROGS
-+
-+TEST_FILES := \
-+	ppp_common.sh \
-+	pppoe-server-options \
-+# end of TEST_FILES
-+
-+include ../../lib.mk
-diff --git a/tools/testing/selftests/net/ppp/config b/tools/testing/selftests/net/ppp/config
-new file mode 100644
-index 000000000000..b45d25c5b970
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/config
-@@ -0,0 +1,9 @@
-+CONFIG_IPV6=y
-+CONFIG_PACKET=y
-+CONFIG_PPP=m
-+CONFIG_PPP_ASYNC=m
-+CONFIG_PPP_BSDCOMP=m
-+CONFIG_PPP_DEFLATE=m
-+CONFIG_PPPOE=m
-+CONFIG_PPPOE_HASH_BITS_4=y
-+CONFIG_VETH=y
-diff --git a/tools/testing/selftests/net/ppp/ppp_async.sh b/tools/testing/selftests/net/ppp/ppp_async.sh
-new file mode 100755
-index 000000000000..2238f1b8d1db
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/ppp_async.sh
-@@ -0,0 +1,43 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+source ppp_common.sh
-+
-+# Temporary files for PTY symlinks
-+TTY_DIR=$(mktemp -d /tmp/ppp.XXXXXX)
-+TTY_SERVER="$TTY_DIR"/server
-+TTY_CLIENT="$TTY_DIR"/client
-+
-+cleanup() {
-+	cleanup_all_ns
-+	[ -n "$SOCAT_PID" ] && kill_process "$SOCAT_PID"
-+	rm -fr "$TTY_DIR"
-+}
-+
-+trap cleanup EXIT
-+
-+require_command socat
-+ppp_common_init
-+modprobe -q ppp_async
-+
-+# Create the virtual serial device
-+socat -d PTY,link="$TTY_SERVER",rawer PTY,link="$TTY_CLIENT",rawer &
-+SOCAT_PID=$!
-+
-+# Wait for symlinks to be created
-+slowwait 5 [ -L "$TTY_SERVER" ]
-+
-+# Start the PPP Server
-+ip netns exec "$NS_SERVER" pppd "$TTY_SERVER" 115200 \
-+	"$IP_SERVER":"$IP_CLIENT" \
-+	local noauth nodefaultroute debug
-+
-+# Start the PPP Client
-+ip netns exec "$NS_CLIENT" pppd "$TTY_CLIENT" 115200 \
-+	local noauth updetach nodefaultroute debug
-+
-+ppp_test_connectivity
-+
-+log_test "PPP async"
-+
-+exit $EXIT_STATUS
-diff --git a/tools/testing/selftests/net/ppp/ppp_common.sh b/tools/testing/selftests/net/ppp/ppp_common.sh
-new file mode 100644
-index 000000000000..c72218813f95
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/ppp_common.sh
-@@ -0,0 +1,44 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# shellcheck disable=SC2153
-+
-+source ../lib.sh
-+
-+IP_SERVER="192.168.200.1"
-+IP_CLIENT="192.168.200.2"
-+
-+ppp_common_init() {
-+	# Package requirements
-+	require_command pppd
-+	require_command iperf3
-+
-+	# Check for root privileges
-+	if [ "$(id -u)" -ne 0 ];then
-+		echo "SKIP: Need root privileges"
-+		exit $ksft_skip
-+	fi
-+
-+	# Namespaces
-+	setup_ns NS_SERVER NS_CLIENT
-+}
-+
-+ppp_check_addr() {
-+	dev=$1
-+	addr=$2
-+	ns=$3
-+	ip -netns "$ns" -4 addr show dev "$dev" 2>/dev/null | grep -q "$addr"
-+	return $?
-+}
-+
-+ppp_test_connectivity() {
-+	slowwait 10 ppp_check_addr "ppp0" "$IP_CLIENT" "$NS_CLIENT"
-+
-+	ip netns exec "$NS_CLIENT" ping -c 3 "$IP_SERVER"
-+	check_err $?
-+
-+	ip netns exec "$NS_SERVER" iperf3 -s -1 -D
-+	wait_local_port_listen "$NS_SERVER" 5201 tcp
-+
-+	ip netns exec "$NS_CLIENT" iperf3 -c "$IP_SERVER" -Z -t 2
-+	check_err $?
-+}
-diff --git a/tools/testing/selftests/net/ppp/pppoe-server-options b/tools/testing/selftests/net/ppp/pppoe-server-options
-new file mode 100644
-index 000000000000..66c8c9d319e9
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/pppoe-server-options
-@@ -0,0 +1,2 @@
-+noauth
-+noipdefault
-diff --git a/tools/testing/selftests/net/ppp/pppoe.sh b/tools/testing/selftests/net/ppp/pppoe.sh
-new file mode 100755
-index 000000000000..c6a96ac44a31
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/pppoe.sh
-@@ -0,0 +1,40 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+source ppp_common.sh
-+
-+VETH_SERVER="veth-server"
-+VETH_CLIENT="veth-client"
-+
-+cleanup() {
-+	cleanup_all_ns
-+}
-+
-+trap cleanup EXIT
-+
-+require_command pppoe-server
-+ppp_common_init
-+modprobe -q pppoe
-+
-+# Create the veth pair
-+ip link add "$VETH_SERVER" type veth peer name "$VETH_CLIENT"
-+ip link set "$VETH_SERVER" netns "$NS_SERVER"
-+ip link set "$VETH_CLIENT" netns "$NS_CLIENT"
-+ip -netns "$NS_SERVER" link set "$VETH_SERVER" up
-+ip -netns "$NS_CLIENT" link set "$VETH_CLIENT" up
-+
-+# Start the PPP Server
-+ip netns exec "$NS_SERVER" pppoe-server -I "$VETH_SERVER" \
-+	-L "$IP_SERVER" -R "$IP_CLIENT" -N 1 -q "$(command -v pppd)" \
-+	-k -O "$(pwd)/pppoe-server-options"
-+
-+# Start the PPP Client
-+ip netns exec "$NS_CLIENT" pppd \
-+	local debug updetach noipdefault noauth nodefaultroute \
-+	plugin pppoe.so nic-"$VETH_CLIENT"
-+
-+ppp_test_connectivity
-+
-+log_test "PPPoE"
-+
-+exit $EXIT_STATUS
--- 
-2.43.0
+Okay, I will improve it.
 
 
