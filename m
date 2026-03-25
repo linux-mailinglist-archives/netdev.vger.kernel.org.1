@@ -1,282 +1,213 @@
-Return-Path: <netdev+bounces-271722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271723-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AH1GHtJAxGlTxwQAu9opvQ
-	(envelope-from <netdev+bounces-271722-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:08:50 +0100
+	id iHenEq1BxGlHxwQAu9opvQ
+	(envelope-from <netdev+bounces-271723-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:12:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 389E332B9C0
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:08:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0BE032BAAE
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:12:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BA2E0303EFFA
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:08:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB8C2301778E
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3319346A0D;
-	Wed, 25 Mar 2026 20:08:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF90367F5C;
+	Wed, 25 Mar 2026 20:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z9Kn5rjL"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="WVHuBdjd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7C4F4F1;
-	Wed, 25 Mar 2026 20:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3EDC1D798E
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 20:11:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774469317; cv=none; b=Utloc6mUignDphi2XTgUiPBJhnRaSo6d6GMq8RX3wyRWoFnvtzGltqZIW6PFfMj+ArU9K+lwKdANLnCslBQ7tO2QN0wETW4hv0kqepWGjAi1COU6hoSSOt71P6CGl43qWvqMghWDk7sSB2QXfanZUGwVF10GO/paL3/KLIHEW04=
+	t=1774469511; cv=none; b=C75RdDzp1okvvPYeZ9XInNxejWIlSUnV7fRrGm/cWAFpQo8m8BieL0tuLrjhu6D2nKLqJq8gRIChg4YU1PWqWexoZfd+bYZSfCXNsULHHkF/o3y69+ml5aflolEkNMpI71Xmn8eM2QnmFKdwjUByqwugPufnl6GMW4px1MFcjRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774469317; c=relaxed/simple;
-	bh=u0Cd5omrwW3YhsWw9m4ecHl9huofQib83nNWmHHNvaM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=g/ZEWvVUvtDougtFY+CmzeCM7/05Ly55P1SWq/v52HNPdueXyWrNL42CbJbIsPmZGUrwzLUg4LE03FoWbrrS3Ob3Ep/HIj7yuS86ZY4Dn3dd75w2LjkQV+LVFPr+AQvsw0EZjmi9H5lyFA/YHFTMPwhauj+xuFtUI26i92YtHnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z9Kn5rjL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06011C4CEF7;
-	Wed, 25 Mar 2026 20:08:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774469317;
-	bh=u0Cd5omrwW3YhsWw9m4ecHl9huofQib83nNWmHHNvaM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=Z9Kn5rjLrhwK1kdqyaXdq9wyvg4ZxB1tPZ9jrqFS7RwJK2jJUBL+K3GypmqN49WUc
-	 7DF+RGwWI5JuMyhsC0VEXPeh93v1wJO7JvfeAJO0ldnRt6wJfPjLvSBUQai2E9Z94y
-	 rYO+BbiXWGd1o+13OdefEL0nuHWpvX+F0iemDZ2+CKOk6mHrz7Le9Q+mA03UxWfvFO
-	 VB5JM9Ml5U+22RVNF76VLqtK+gMk2Oz4adIOgGsd3tIKIV+b0RbOP1CEW5SPVZZMvh
-	 FGpia0iUKWLj+azTSqC1objNUboZrH/JXpm/l94LrGqBGhna07ebvTkNnVrNiN6EjE
-	 Vh7QS5w2CLHOg==
-Date: Wed, 25 Mar 2026 15:08:35 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Gerd Bayer <gbayer@linux.ibm.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>,
-	Jay Cornwall <Jay.Cornwall@amd.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Alexander Schmidt <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v6 1/2] PCI: AtomicOps: Do not enable without support in
- root complex
-Message-ID: <20260325200835.GA1290451@bhelgaas>
+	s=arc-20240116; t=1774469511; c=relaxed/simple;
+	bh=W1rk8b1TxvRXUjyaOv5Nn3VlDflyKDjP5xegWKvAqM8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nGAPDOhFzl9AhDofNFteKMxOSZyURgjZKeXsHgHfUUk98ngKIHDTDuR5I2sXv/6ewzCtnefXR5isTUMgZOHB7ACQ1wmktQKAy5QkkuvdE0rT42w7S788LxBlg3dhxRwuczQy5vcVS1wUyhU/5UD+drx3puUaWS570jBTIL3JfBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=WVHuBdjd; arc=none smtp.client-ip=209.85.160.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-40974bf7781so1073435fac.0
+        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 13:11:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1774469509; x=1775074309; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yOK0NjVYr78bPbpIye+WMvOgHZn0ILapKUb+9KhRM08=;
+        b=WVHuBdjdfVmicGdQJoUmiH7gqWJidWcLezU6B1e9VX8l567K81UK4rnVDj9wBI22yI
+         b+AM1D3Ow6xYt54D4V46t5hLsaIO882cpRG3Xqy3gIa/9nHCiT6cSAbO3zeDO4+hoaPx
+         8isFrwVBqc8f1AA/JQRiBUyh9aedCw2+0zvo+/jGfcBd4DP145NE8a5amohouelaDUR4
+         WSt1Szetgha9HmA0n/te0FB1SzDBCRuPFtxcwafl/1/1r3j5zCmzXG00Np6xice+3t3e
+         ZDhqukzWvUSL2KtJf15Q0HZHQXpuUc0Tl+GIvKQOVFQEPLnCJx9gGZ0RT2bpHyQNEfih
+         QsIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774469509; x=1775074309;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yOK0NjVYr78bPbpIye+WMvOgHZn0ILapKUb+9KhRM08=;
+        b=UtaOEsitS+DhMXuf6ZEEParulmDb/Aj+zd1+hLMBEynBjwpYL5VFrWnjESYiXKyuh4
+         KJNCTgNRK2mtGZ6w8WSW303LkXHhCqUoBVw88e7g9vCICn5LKzUypz2W9TkXyFUvdgG7
+         eUTAWgOP1nUkVJgS8RSMx+qFLCmtAGw9n4ZQo14SUWdkr3R6VHqwV5wzTvwNWTdiDJ38
+         Fonu/I405LLMi1tf3gm/sn54saI2YRRywpX3RFN+4aO2UjUyyaxEnzYJBKvBJsCSiU7o
+         c3y/Ci0Yo0gOMPYcy/scCNKMiDYZt2CDUFSn3h6EbP8kCem5JhIaPM/QmHjSNxW+4BOs
+         iYbg==
+X-Gm-Message-State: AOJu0YzlKNA+/N2WJdnmzUBnjax+1pPdhwbF8I59xTZ6lDkWrdc2iW/0
+	dytX3ski41yQSqsCsKa1ABBC79LXR9Z6OYBeJUW/GrTpJ7c53yjQ+2gJxDDRXLqMLkAVwRzfTo0
+	Y9J3Fp8lPLA==
+X-Gm-Gg: ATEYQzy2auHDkhGwp76RQplWvpWFhk6GjBsuzqDPcDoZ7JlbOr5AVzNKjU8jHSc0E3m
+	eDx//5LH6PY0Mq/AiDOQYDFjrZLj+gSXGw2iV/qpBRZO1WiTuljtAwrnShPOm4uAAvRK49kPeZi
+	FZ4igelQsGnGYU290N5c974TlmRogS4DB5xpSDo9kGXG2ay03mLOyvFANf6ljOuPoL+sofFk75i
+	WsNa4vA36MeGWTAQ/Z/F/l4h+SE64WWMEquMxN9tSdYWDXpzt3RNrpg2OXgtitWDvkc10VqI/ge
+	U1BB18olHO917o+EYoZ5SvVIlc8vgQjHa5rG/BTvjdas8WFSQ5OHW6bOTJdToRQMSSOmrIqWNvn
+	nMbHCPJLPUvm+LnMfp44a/xJe1QBtNQzRnBMymwvT89JAO1TdZaZH25rJOQ7uYuuRKWio5/Hoj3
+	oaDHAUZSjrrwyS4bVIS/iB1H0=
+X-Received: by 2002:a05:6820:1c8a:b0:67d:e8b6:fb4d with SMTP id 006d021491bc7-67dff4b41c6mr2208620eaf.13.1774469509007;
+        Wed, 25 Mar 2026 13:11:49 -0700 (PDT)
+Received: from 20HS2G4.aus01.local ([2a09:bac6:bf21:2632::3ce:1a])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-67e0ab274c7sm549764eaf.13.2026.03.25.13.11.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Mar 2026 13:11:48 -0700 (PDT)
+From: Chris J Arges <carges@cloudflare.com>
+To: netdev@vger.kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	davem@davemloft.net,
+	joe@dama.to,
+	gospo@broadcom.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	shuah@kernel.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	kernel-team@cloudflare.com,
+	Chris J Arges <carges@cloudflare.com>
+Subject: [PATCH net-next v5 0/6] bnxt_en: Add XDP RSS hash metadata support
+Date: Wed, 25 Mar 2026 15:09:46 -0500
+Message-ID: <20260325201139.2501937-1-carges@cloudflare.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260325-fix_pciatops-v6-1-10bf19d76dd1@linux.ibm.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,cloudflare.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271722-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-271723-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[helgaas@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[carges@cloudflare.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[cloudflare.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 389E332B9C0
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,cloudflare.com:dkim,cloudflare.com:mid]
+X-Rspamd-Queue-Id: E0BE032BAAE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 25, 2026 at 04:16:17PM +0100, Gerd Bayer wrote:
-> When inspecting the config space of a Connect-X physical function in an
-> s390 system after it was initialized by the mlx5_core device driver, we
-> found the function to be enabled to request AtomicOps despite the
-> system's root-complex lacking support for completing them:
-> 
-> 1ed0:00:00.1 Ethernet controller: Mellanox Technologies MT2894 Family [ConnectX-6 Lx]
-> 	Subsystem: Mellanox Technologies Device 0002
->   [...]
-> 	DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-
-> 		 AtomicOpsCtl: ReqEn+
-> 		 IDOReq- IDOCompl- LTR- EmergencyPowerReductionReq-
-> 		 10BitTagReq- OBFF Disabled, EETLPPrefixBlk-
-> 
-> Turns out the device driver calls pci_enable_atomic_ops_to_root() which
-> defaulted to enable AtomicOps requests even if it had no information
-> about the root-port that the PCIe device is attached to. Similarly,
-> AtomicOps requests are enabled for root complex integrated endpoints
-> (RCiEPs) unconditionally.
-> 
-> Change the logic of pci_enable_atomic_ops_to_root() to fully traverse the
-> PCIe tree upwards, check that the bridge devices support delivering
-> AtomicOps transactions, and finally check that there is a root port at
-> the end that does support completing AtomicOps - or that the support for
-> completing AtomicOps at the root complex is announced through some other
-> arch specific way.
-> 
-> Introduce a new pcibios_connects_to_atomicops_capable_rc() function to
-> implement the check - and default to always "true". This leaves the
-> semantics for today's RCiEPs intact. Pass in the device in question and
-> the requested capabilities for future expansions.
-> For s390, override pcibios_connects_to_atomicops_capable_rc() to
-> always return "false".
-> 
-> Do not change the enablement of AtomicOps requests if there is no
-> positive confirmation that the root complex can complete PCIe AtomicOps.
-> 
-> Reported-by: Alexander Schmidt <alexs@linux.ibm.com>
-> Cc: stable@vger.kernel.org
-> Fixes: 430a23689dea ("PCI: Add pci_enable_atomic_ops_to_root()")
-> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-> ---
->  arch/s390/pci/pci.c |  5 +++++
->  drivers/pci/pci.c   | 48 +++++++++++++++++++++++++++++++-----------------
->  include/linux/pci.h |  1 +
->  3 files changed, 37 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
-> index 2a430722cbe415dd56c92fed2e513e524f46481a..a0bef77082a153a258fbe4abb1070b22e020888e 100644
-> --- a/arch/s390/pci/pci.c
-> +++ b/arch/s390/pci/pci.c
-> @@ -265,6 +265,11 @@ static int zpci_cfg_store(struct zpci_dev *zdev, int offset, u32 val, u8 len)
->  	return rc;
->  }
->  
-> +bool pcibios_connects_to_atomicops_capable_rc(struct pci_dev *dev, u32 cap_mask)
-> +{
-> +	return false;
-> +}
-> +
->  resource_size_t pcibios_align_resource(void *data, const struct resource *res,
->  				       resource_size_t size,
->  				       resource_size_t align)
-> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> index 8479c2e1f74f1044416281aba11bf071ea89488a..006aa589926cb290de43f152100ddaf9961407d1 100644
-> --- a/drivers/pci/pci.c
-> +++ b/drivers/pci/pci.c
-> @@ -3660,6 +3660,19 @@ void pci_acs_init(struct pci_dev *dev)
->  	pci_disable_broken_acs_cap(dev);
->  }
->  
-> +static bool pci_is_atomicops_capable_rp(struct pci_dev *dev, u32 cap, u32 cap_mask)
-> +{
-> +	if (!dev || !(pci_pcie_type(dev) == PCI_EXP_TYPE_ROOT_PORT))
-> +		return false;
-> +
-> +	return (cap & cap_mask) == cap_mask;
-> +}
-> +
-> +bool __weak pcibios_connects_to_atomicops_capable_rc(struct pci_dev *dev, u32 cap_mask)
-> +{
-> +	return true;
-> +}
-> +
->  /**
->   * pci_enable_atomic_ops_to_root - enable AtomicOp requests to root port
->   * @dev: the PCI device
-> @@ -3676,8 +3689,9 @@ void pci_acs_init(struct pci_dev *dev)
->  int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
->  {
->  	struct pci_bus *bus = dev->bus;
-> -	struct pci_dev *bridge;
-> -	u32 cap, ctl2;
-> +	struct pci_dev *bridge = NULL;
-> +	u32 cap = 0;
-> +	u32 ctl2;
->  
->  	/*
->  	 * Per PCIe r5.0, sec 9.3.5.10, the AtomicOp Requester Enable bit
-> @@ -3714,29 +3728,29 @@ int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
->  		switch (pci_pcie_type(bridge)) {
->  		/* Ensure switch ports support AtomicOp routing */
->  		case PCI_EXP_TYPE_UPSTREAM:
-> -		case PCI_EXP_TYPE_DOWNSTREAM:
-> -			if (!(cap & PCI_EXP_DEVCAP2_ATOMIC_ROUTE))
-> -				return -EINVAL;
-> -			break;
-> -
-> -		/* Ensure root port supports all the sizes we care about */
-> -		case PCI_EXP_TYPE_ROOT_PORT:
-> -			if ((cap & cap_mask) != cap_mask)
-> -				return -EINVAL;
-> -			break;
-> -		}
-> -
-> -		/* Ensure upstream ports don't block AtomicOps on egress */
-> -		if (pci_pcie_type(bridge) == PCI_EXP_TYPE_UPSTREAM) {
-> +			/* Upstream ports must not block AtomicOps on egress */
->  			pcie_capability_read_dword(bridge, PCI_EXP_DEVCTL2,
->  						   &ctl2);
->  			if (ctl2 & PCI_EXP_DEVCTL2_ATOMIC_EGRESS_BLOCK)
->  				return -EINVAL;
-> +			fallthrough;
-> +		/* All switch ports need to route AtomicOps */
-> +		case PCI_EXP_TYPE_DOWNSTREAM:
-> +			if (!(cap & PCI_EXP_DEVCAP2_ATOMIC_ROUTE))
-> +				return -EINVAL;
-> +			break;
->  		}
-> -
->  		bus = bus->parent;
->  	}
->  
-> +	/*
-> +	 * Finally, last bridge must be root port and support requested sizes
-> +	 * or firmware asserts support
-> +	 */
-> +	if (!(pci_is_atomicops_capable_rp(bridge, cap, cap_mask) ||
-> +	      pcibios_connects_to_atomicops_capable_rc(dev, cap_mask)))
-> +		return -EINVAL;
+This series adds XDP RSS hash metadata extraction support for the bnxt_en
+driver and includes selftests to validate the functionality. I was able
+to test this on a BCM57414 NIC.
 
-Sashiko says:
+Patches 1-4 implement the driver support:
+  - Patch 1 adds bnxt_xdp_buff to wrap xdp_buff with
+    pointers to the hardware RX completion descriptors and the
+    completion type. This is similar to other driver implementations.
+  - Patch 2 adds xmo_rx_hash callback for CMP_TYPE_RX_L2_CMP completions.
+  - Patch 3 moves bnxt_rss_ext_op to bnxt.h
+  - Patch 4 adds handling for CMP_TYPE_RX_L2_V3_CMP completions
 
-  Since the generic weak implementation of
-  pcibios_connects_to_atomicops_capable_rc() unconditionally returns
-  true, the logical OR expression pci_is_atomicops_capable_rp(...) ||
-  true will always evaluate to true. This makes the entire if
-  condition evaluate to false.
+Patches 5-6 add selftest coverage:
+  - Patch 5 refactors common BPF map helper functions out of the
+    existing xdp.py selftest into a shared net/lib/py/bpf.py module.
+  - Patch 6 adds an XDP metadata selftest that loads an XDP program
+    calling bpf_xdp_metadata_rx_hash. The test skips on devices without
+    xdp-rx-metadata-features.
 
-  Because of this, it appears -EINVAL is never returned here, and any
-  standard endpoint behind a Root Port will successfully be granted
-  AtomicOps even if the Root Port lacks the capability in its
-  PCI_EXP_DEVCAP2 register.
+Changes from v4: https://lore.kernel.org/all/20260313223029.454755-1-carges@cloudflare.com/
+  - address RCT again
+  - make _format_hex_bytes private
+  - remove redundant bpf_map_set
+  - rebased on net-next
 
-> +
->  	pcie_capability_set_word(dev, PCI_EXP_DEVCTL2,
->  				 PCI_EXP_DEVCTL2_ATOMIC_REQ);
->  	return 0;
-> diff --git a/include/linux/pci.h b/include/linux/pci.h
-> index 1c270f1d512301de4d462fe7e5097c32af5c6f8d..ef90604c39859ea8e61e5392d0bdaa1b0e43874b 100644
-> --- a/include/linux/pci.h
-> +++ b/include/linux/pci.h
-> @@ -692,6 +692,7 @@ void pci_set_host_bridge_release(struct pci_host_bridge *bridge,
->  				 void *release_data);
->  
->  int pcibios_root_bridge_prepare(struct pci_host_bridge *bridge);
-> +bool pcibios_connects_to_atomicops_capable_rc(struct pci_dev *dev, u32 cap_mask);
->  
->  #define PCI_REGION_FLAG_MASK	0x0fU	/* These bits of resource flags tell us the PCI region flags */
->  
-> 
-> -- 
-> 2.51.0
-> 
+Changes from v3: https://lore.kernel.org/netdev/20260306230600.1628196-1-carges@cloudflare.com/
+  - split out bnxt_rss_ext_op into header
+  - address RCT issue
+  - rebased on net-next
+
+Changes from v2: https://lore.kernel.org/netdev/20260303024510.644962-1-carges@cloudflare.com/
+  - bnxt xdp: actually fixed RCT issues
+  - bnxt xdp: Added patch 3 to handle CMP_TYPE_RX_L2_V3_CMP completions.
+
+Changes from v1: https://lore.kernel.org/netdev/cover.1772211065.git.carges@cloudflare.com/
+  - selftests: moved tests into net/hw
+  - selftests: fix pylinter errors
+  - selftests: add check for no error count
+  - bnxt_xdp: followed RCT for variable declaration
+  - rebased on net-next
+
+Chris J Arges (6):
+  bnxt_en: use bnxt_xdp_buff for xdp context
+  bnxt_en: Implement XDP RSS hash metadata extraction
+  bnxt_en: Move bnxt_rss_ext_op into header
+  bnxt_en: Implement XDP RSS hash metadata extraction for V3_CMP
+  selftests: net: move common xdp.py functions into lib
+  selftests: drv-net: xdp: Add rss_hash metadata tests
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  51 +++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  19 ++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  57 ++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |  10 ++
+ .../testing/selftests/drivers/net/hw/Makefile |   1 +
+ .../drivers/net/hw/lib/py/__init__.py         |   2 +
+ .../selftests/drivers/net/hw/xdp_metadata.py  | 146 ++++++++++++++++
+ .../selftests/drivers/net/lib/py/__init__.py  |   2 +
+ tools/testing/selftests/drivers/net/xdp.py    |  96 +++--------
+ .../testing/selftests/net/lib/py/__init__.py  |   2 +
+ tools/testing/selftests/net/lib/py/bpf.py     |  68 ++++++++
+ .../selftests/net/lib/xdp_metadata.bpf.c      | 163 ++++++++++++++++++
+ 12 files changed, 516 insertions(+), 101 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/xdp_metadata.py
+ create mode 100644 tools/testing/selftests/net/lib/py/bpf.py
+ create mode 100644 tools/testing/selftests/net/lib/xdp_metadata.bpf.c
+
+-- 
+2.43.0
+
 
