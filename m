@@ -1,184 +1,132 @@
-Return-Path: <netdev+bounces-271476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8NNsKWasw2nAtAQAu9opvQ
-	(envelope-from <netdev+bounces-271476-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:35:34 +0100
+	id EAtjE/mtw2nAtAQAu9opvQ
+	(envelope-from <netdev+bounces-271477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:42:17 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 122543224CC
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:35:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9DE23225ED
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:42:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3E1453010175
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 09:29:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A3B6630F6960
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 09:35:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689513537C7;
-	Wed, 25 Mar 2026 09:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18D8030CD92;
+	Wed, 25 Mar 2026 09:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hq/MrWFW"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="RgZM/yfN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CC832D441
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 09:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B4232FA14;
+	Wed, 25 Mar 2026 09:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774430960; cv=none; b=NXTWY4uYT6xQTgTN1phGoFa02uXEIp7w41wV23NX6N1kUrsGOzkalJJc4XfqFsNNz3WIwIoVDLSOY9Et/vZxvVu0nE/hbhHthxhi7uZ8vU71VbLc0OkObjfMuO9xwXhqvde/UqO696IkkCZQmO6yImQ1R5d1MAJlttoBUkD+PXo=
+	t=1774431329; cv=none; b=AT+tYkQfLAd9T2CMZtlpZOGqNp2ulo34MqYqElDG24v1nJDnrUeBdhnjcWQKbBTZUouzCp96bGoHJ5vzHxJivdH8nOnRhnLgAMZK6MaLIDGHnRQIzHlBZn3G+p7JOVj54f3mCmOgZ5WxCHzr6iFPW104IiyGovUFE1jGz+UctR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774430960; c=relaxed/simple;
-	bh=Fl4i/2qN90vAZ3AxnzKlLBVeZaxs7Fb4skAITwEHPgE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rQso82iWnNm6H8hpvil4GUGjTCh6L6U4NdaQmE+LDbcl0bYEoRH5fYVhngBm0BkuzYi9JDyCeKnNqQTzsZZ9+els79Kz0I8bGPFimi5O+0STev18uXN2GxQJTALAbuKcUT5yxNxHm6JsJsuuCiWEWajNFYa+wRLGEPfz4bkoqUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hq/MrWFW; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-439b9b1900bso3306520f8f.1
-        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 02:29:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774430956; x=1775035756; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=13dm/ncu2NQrsod/TJ+EG09PLS3Jy1pWWd8SpfRZVX0=;
-        b=hq/MrWFW4ROABy00qJ4jt0w/1JY+u72n0oRWE5VdRY7HJQcLAHZExTuE4nYVWgJuCa
-         QWovtQy2EOAbAu6+yDDQWetOiO9OhwGcMiyNqKC0VN844gE/4H4X76V5VH0fLdSafk0R
-         fWmSGfXLd7t8bAjmHMB16gNi5Wfg8JJPqLMRRkevWQU4tt4rvOMzlCuKIz+o5yJen4AP
-         zFtfHJH768gQ6ZetXQLvK2mSo3DdbNL7UN8Lf5U6OzRn/2UuhjJBnBk2PNtgyhmBsd7n
-         7ETQEdbVzhnnmKpymEgZ16bWpe8eErnwa8bncrZcxQIrf4D7YLYbjSe3D+l2DTFg/och
-         SnBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774430956; x=1775035756;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=13dm/ncu2NQrsod/TJ+EG09PLS3Jy1pWWd8SpfRZVX0=;
-        b=RAbeURc1uBdBZ4cwqmkX3EK7jh7GTpQKvNubsLsGhEV154bPb/dMbRRhq1DRyhKa2p
-         CRvusvurO1vZmH47iYlMX4+36K487bR110KWGDKnyHfabQsiZdOpctkCUijrG1Pnxn5Q
-         PF6K5R8EU04k01ksxx1fbAY8Am/KypXOSxjvnfR96/aq9sjvDgpOZMC/uqB6mEKC8E53
-         1js5vc0lT6AaHhI5MIH+hP+KOoL51nB5+lnWQAsYHYoSKqjI0FIX8HfDdT73W0ZLkjD0
-         vjLA3i2QpMHRBE7xSVRtNxEcR2fbakWXCOcYhd8bP9Q0aiNeOqQK0QRj3nMjc+8+1mLt
-         AZPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXe/7uTNWmd8avMWoqYZQAQQWGDfCWL6CBIPjSTJvt0IsRuCAwPDM8NdqVVmOaWX7GxPQ7LLsU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwrwwJh+SEQTwQczJhKnuMDsnTxbBvWOulKvQYK+OvJMOhqNnb
-	/Y4OxUivwGKJ2kMbRihI+YV+pLTgE0yCuzbRVn2tKgFxJKd3xee+gGdv
-X-Gm-Gg: ATEYQzykK/1s8YBUr0Et5kqpqnROGqQC6oUIC5+kg2bA/8ngDSQqHA8rkckjwfYM5Lx
-	0rJQ2fmVB7UoxgPGdLxXaKw39dmq7hEj7tEMa94kIiy4ihmNHyKoUnCVk2LuUuDSWvX6+2xzxx+
-	8aMZe3/5tTeJCxSKVv9VWEP/2OCFYcemZgiwmh39BStTDAJ+f4JIRTgZ1BAajKWEx5fXOnGLWjJ
-	Yhz0rKSVYvcBKiufwXirPJBghqCGI2nLI/seGclyFhOhFoXeaQtWMbIFZt3h6NR2C6DfyK2UHoo
-	v7mZoOqeDCjpZq94a/+0YNbx1mo4lA325tD/Y77hqbi8wxETpGlEphgukIDaLd6Sx/WmWrle/Gj
-	RgCxgaFDqlKtzfoCKr/6uLLm13xLKnQBLQTwM3XLQyigfD7piNYhtSJpQ/sMcPRve6JjDUaE3z8
-	pf9DIlD/BuUCTkuWTkNn7dtX1ujY4I+L1fjGKIZOhE7bERPtODM5S04RBKDfo/sijObNfvXL5WR
-	V/iRN+uDAdEdG/3ckNhsew=
-X-Received: by 2002:a05:6000:4381:b0:43b:4468:b114 with SMTP id ffacd0b85a97d-43b889db4b2mr3732457f8f.23.1774430955917;
-        Wed, 25 Mar 2026 02:29:15 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b644ae16fsm46000145f8f.8.2026.03.25.02.29.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2026 02:29:15 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: danishanwar@ti.com,
-	rogerq@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: m-malladi@ti.com,
-	netdev@vger.kernel.org,
-	David Carlier <devnexen@gmail.com>
-Subject: [PATCH] net: ti: icssg-prueth: fix missing data copy and wrong recycle in ZC RX dispatch
-Date: Wed, 25 Mar 2026 09:28:57 +0000
-Message-ID: <20260325092857.47962-1-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260324211402.342474-1-devnexen@gmail.com>
-References: <20260324211402.342474-1-devnexen@gmail.com>
+	s=arc-20240116; t=1774431329; c=relaxed/simple;
+	bh=AtcVS7doo0cKRIoG0V5SoR7go8tkrbBz6Smpy+neHKU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OAbaXWNmab3t4uvFdJGpwCTurrW770UyP379fZDQjSCAWZw/lE8wdvYNxpHjMUvz7+oCueLpXkJUPpZN0xkOnONEt1kxjsNa93AOG2ymEQI3u+TDuWkGo5y/qGPJYJtParIsgpgQ2m3wMnUK52ucfo6oxXBnjBn9dHSKFP+Rcxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=RgZM/yfN; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=TyJfWggum4hTPQqcIuHDMDd1blS+adBA6XDjzohGGKE=; b=RgZM/yfNODreEQKeyhl2nYpxFC
+	jeZVqqBwkO/MvbBXzHLkTNHT/4+f5WmvhoRzapYEidvwsLrog3xQ2EHz4QgQH8utkLtaScGQP9KxH
+	V1XmVh7K8EcbWRzS9xLy2vi+GXsCecxcLTYYAA/OVN+0jIgHv0btGCRuWqg0ZIiZj4AYq1XA9GbDn
+	8iozRC8nTn5/ZiiuGHOMP6CpGpSqOsSIJeZie4i4vEGocfOvoC/B3uRMxR+Dn9UAcZVpVlIaRc3W2
+	dcdizuVI7RtmnpsGeO3iGwevSLkNNsCZQlRNW6R8gR277X3CO89jRGOJYwOYZRw2SRZzBCOOxmk3O
+	ldm2EwZQ==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1w5Kdy-008yqj-PS; Wed, 25 Mar 2026 09:35:17 +0000
+Date: Wed, 25 Mar 2026 02:35:12 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Izabela Bakollari <ibakolla@redhat.com>
+Cc: Edward Cree <ecree.xilinx@gmail.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-net-drivers@amd.com, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] sfc: add transmit timestamping support
+Message-ID: <acOrt0LqV__xh_93@gmail.com>
+References: <20260324160823.151472-1-ibakolla@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260324160823.151472-1-ibakolla@redhat.com>
+X-Debian-User: leitao
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[ti.com,vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271476-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-271477-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[debian.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,amd.com];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 122543224CC
+X-Rspamd-Queue-Id: E9DE23225ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-emac_dispatch_skb_zc() allocates a new skb via napi_alloc_skb() but
-never copies the packet data from the XDP buffer into it. The skb is
-passed up the stack containing uninitialized heap memory instead of
-the actual received packet, leaking kernel heap contents to userspace.
+On Tue, Mar 24, 2026 at 05:08:21PM +0100, Izabela Bakollari wrote:
+> Enable software TX Timestamping. The out of tree driver 
+> also implements this.
 
-Add the missing memcpy from xdp->data into the skb data area.
+"The out of tree driver also implements this" is not the most technical
+justification.
 
-Additionally, remove the skb_mark_for_recycle() call since the skb is
-backed by the NAPI page frag allocator, not page_pool. Marking a
-non-page_pool skb for recycle causes the free path to return pages to
-a page_pool that does not own them, corrupting page_pool state.
+>
+> Signed-off-by: Izabela Bakollari <ibakolla@redhat.com>
+> ---
+>  drivers/net/ethernet/sfc/ethtool.c | 2 ++
+>  drivers/net/ethernet/sfc/tx.c      | 2 ++
+>  2 files changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/sfc/ethtool.c b/drivers/net/ethernet/sfc/ethtool.c
+> index 362388754a29..c0038b942913 100644
+> --- a/drivers/net/ethernet/sfc/ethtool.c
+> +++ b/drivers/net/ethernet/sfc/ethtool.c
+> @@ -231,6 +231,8 @@ static int efx_ethtool_get_ts_info(struct net_device *net_dev,
+>  {
+>  	struct efx_nic *efx = efx_netdev_priv(net_dev);
+>  
+> +	ts_info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE;
 
-The non-ZC path (emac_rx_packet) does not have these issues because it
-uses napi_build_skb() to wrap the existing page_pool page directly,
-requiring no copy, and correctly marks for recycle since the page comes
-from page_pool_dev_alloc_pages().
+Don't you need to append SOF_TIMESTAMPING_TX_SOFTWARE instead of
+assinging it?
 
-Fixes: 7a64bb388df3 ("net: ti: icssg-prueth: Add AF_XDP zero copy for RX")
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
- drivers/net/ethernet/ti/icssg/icssg_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-index fd4e7622f123..a28a608f9bf4 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_common.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
-@@ -902,6 +902,7 @@ static void emac_dispatch_skb_zc(struct prueth_emac *emac, struct xdp_buff *xdp,
- 
- 	skb_reserve(skb, headroom);
- 	skb_put(skb, pkt_len);
-+	skb_copy_to_linear_data(skb, xdp->data, pkt_len);
- 	skb->dev = ndev;
- 
- 	/* RX HW timestamp */
-@@ -912,7 +913,6 @@ static void emac_dispatch_skb_zc(struct prueth_emac *emac, struct xdp_buff *xdp,
- 		skb->offload_fwd_mark = emac->offload_fwd_mark;
- 	skb->protocol = eth_type_trans(skb, ndev);
- 
--	skb_mark_for_recycle(skb);
- 	napi_gro_receive(&emac->napi_rx, skb);
- 	ndev->stats.rx_bytes += pkt_len;
- 	ndev->stats.rx_packets++;
--- 
-2.53.0
-
+	ts_info->so_timestamping |= SOF_TIMESTAMPING_TX_SOFTWARE;
 
