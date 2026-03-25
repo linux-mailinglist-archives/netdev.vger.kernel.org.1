@@ -1,139 +1,96 @@
-Return-Path: <netdev+bounces-271682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271683-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sNBJNRsfxGmZwgQAu9opvQ
-	(envelope-from <netdev+bounces-271682-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:44:59 +0100
+	id IFk6OIwfxGmZwgQAu9opvQ
+	(envelope-from <netdev+bounces-271683-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:46:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5345032A0FD
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:44:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E55432A13E
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:46:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4A766307342C
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 17:38:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B2DCC3009F83
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 17:43:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0705D3FF8B4;
-	Wed, 25 Mar 2026 17:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="iQEDGglA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01526406278;
+	Wed, 25 Mar 2026 17:43:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72BC73E4C8B;
-	Wed, 25 Mar 2026 17:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1F43E1228;
+	Wed, 25 Mar 2026 17:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774460316; cv=none; b=VOZ+V7SCmZcXS/pyI0+tiyBnKUrYoaimsE3/oQTx2aG6D6MNnerZjwkX8mmJmnEtpmw1qp9cPEXB49CxUFNZ1ABHIRc5tawi90rjxdMVVUaFaWKdTreTUUekQljg9p4zwvs/mXWXsrMKZ8WXAub01V5nhGjSwdR+G+Qj/aaOsFk=
+	t=1774460594; cv=none; b=WlLKbPgrdJdm8FcSMZC34DFYsJXJpFeU5LPA5dZUlzkOoAClA5A9Ps6iAttErd6GK6y2ONoyCP/I0bo0gV2c8DNBmBSlFVTBmQYvTenGMX28bNlXw/bU2faHZluGARK1GML3kP4dY96+imRjrA8qlbhbfZJhtm/490lq9lUGEcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774460316; c=relaxed/simple;
-	bh=i/PCW2KwbkSGnN7UFnNGlu/tnmgSOsRklYCvWppu7pU=;
+	s=arc-20240116; t=1774460594; c=relaxed/simple;
+	bh=9nOzvTOWDYHYjqWZEIDiCZjN6zoOgRNM98wjdmmg10M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iE0NTzxXXsi+JlWs0Lbrsgj5F//yvX1cTWq1w4y320PgP4OJIKwUxnzS+SYjFyyBUQw1gAqbF2eqFL+gmyYGyLbJCU4TD3RU8qPuFUUXnNFczFPtCTa6zNSUZaDfg87lqnzMUmdtJswqqiALT7c7Q46/NGBXXv3nrmy6pQmNz6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=iQEDGglA; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 5377B600B9;
-	Wed, 25 Mar 2026 18:38:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1774460313;
-	bh=rRXcHrpcOVkMBFaBuInNnRfkXXu/rgto+v/iY4SduS4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iQEDGglAVYhEpXWdWadAsO6dZeaqMrwThOuncC6TyEXiLeOHwoYdAu1YRlxmF740h
-	 9nElGCkiH7tmrWvoBif7c+S90KH5NSmHmjLXwCNb+9ka88FERr/5atV+AHSME9rOzy
-	 tmDMx0p49q7USHeJSeP5JLNgoXBkvuJ3gG5Jgy0P9gznaSRYhYOdQnietuunVoknYL
-	 4x+PMnv8P+ehjSKKI4RT5pPQuTL0+ZzaYbY+MdQx9cjYcmXsJMdUNusF0+SD1UPTV4
-	 OVDqbijSryVeJbj7agWiY7Fm3CW/wpoQ5ogKx7Y2VnCxTGKyy501yuwmsqu8PyjAMm
-	 VdabeOUiqJjDA==
-Date: Wed, 25 Mar 2026 18:38:30 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=HzFFNBNlSeuKf1ik+DC1wAgV3LgdEBv81beQQxKUhrKkS7SNgzRyrTfkz+FJp3leuQ7dBoyoajRyZcae5qXRkj5yZlmMxvNvXu5VacpqAtIp2PRm3ApBN62zdVn0H/P33u45Yy9EVXwUw2aNhnVkic2/BN4uWXj0E9Nr09eQeiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 7D32D608BD; Wed, 25 Mar 2026 18:43:10 +0100 (CET)
+Date: Wed, 25 Mar 2026 18:42:50 +0100
+From: Florian Westphal <fw@strlen.de>
+To: netdev@vger.kernel.org
+Cc: Paolo Abeni <pabeni@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH net 10/14] netfilter: ctnetlink: ensure safe access to
- master conntrack
-Message-ID: <acQdlj8hkZhKWnT4@chamomile>
+	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org,
+	pablo@netfilter.org
+Subject: Re: [PATCH net 00/14] netfilter: updates for net
+Message-ID: <acQemtlq03AZvjL7@strlen.de>
 References: <20260325131108.23045-1-fw@strlen.de>
- <20260325131108.23045-11-fw@strlen.de>
- <acQa30IdYh3PeLAh@chamomile>
- <acQbWvJUK20gbTWg@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <acQbWvJUK20gbTWg@strlen.de>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+In-Reply-To: <20260325131108.23045-1-fw@strlen.de>
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[netfilter.org];
-	TAGGED_FROM(0.00)[bounces-271682-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
+	TAGGED_FROM(0.00)[bounces-271683-lists,netdev=lfdr.de];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[strlen.de];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,netfilter.org:dkim,netfilter.org:email]
-X-Rspamd-Queue-Id: 5345032A0FD
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4E55432A13E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 25, 2026 at 06:28:58PM +0100, Florian Westphal wrote:
-> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > Sorry for this late followup incremental fix.
+Florian Westphal <fw@strlen.de> wrote:
+> Hi,
 > 
-> I'm tired.
-> 
-> > diff --git a/net/netfilter/nf_conntrack_expect.c b/net/netfilter/nf_conntrack_expect.c
-> > index 509d3eb6f56a..cf39662c4b97 100644
-> > --- a/net/netfilter/nf_conntrack_expect.c
-> > +++ b/net/netfilter/nf_conntrack_expect.c
-> > @@ -325,7 +325,9 @@ void nf_ct_expect_init(struct nf_conntrack_expect *exp, unsigned int class,
-> >  		       u_int8_t proto, const __be16 *src, const __be16 *dst)
-> >  {
-> >  	struct net *net = read_pnet(&exp->master->ct_net);
-> > -
-> > +	struct nf_conntrack_helper *helper;
-> > +	struct nf_conn *ct = exp->master;
-> > +	struct nf_conn_help *help;
-> >  	int len;
-> >  
-> >  	if (family == AF_INET)
-> > @@ -336,7 +338,14 @@ void nf_ct_expect_init(struct nf_conntrack_expect *exp, unsigned int class,
-> >  	exp->flags = 0;
-> >  	exp->class = class;
-> >  	exp->expectfn = NULL;
-> > -	rcu_assign_pointer(exp->helper, nfct_help(exp->master)->helper);
-> > +	help = nfct_help(ct);
-> 
-> Do we have a reference here? Is that safe?
+> The following patchset contains Netfilter fixes for *net*.
+> Note that most bugs fixed here stem from 2.6 days, the large PR
+> is not due to an increase in regressions.
 
-This ct is coming from the skb from packet path, while rcu_read_lock()
-is held, the skb owns this ct.
+please toss this.  I'm not sending a new PR.
 
-> I'm not looking forward to a new PR.
-
-Apologies.
+I hate my life.
 
