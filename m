@@ -1,266 +1,237 @@
-Return-Path: <netdev+bounces-271563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271564-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QBOmOCzrw2lvugQAu9opvQ
-	(envelope-from <netdev+bounces-271563-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:03:24 +0100
+	id OK69OB7ow2lvugQAu9opvQ
+	(envelope-from <netdev+bounces-271564-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 14:50:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 681CE3265AD
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:03:24 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1F89326228
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 14:50:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 89DB53021EA2
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 13:37:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 946E4307B1DA
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 13:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A67E23EA94;
-	Wed, 25 Mar 2026 13:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFEF264FBD;
+	Wed, 25 Mar 2026 13:41:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="HD4kmuHo"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bIGemVPy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011015.outbound.protection.outlook.com [52.101.62.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDBB23D291
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 13:37:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774445866; cv=none; b=J2eMtW/z+Hgg+T9f8X0s6AQFzoF+LaiwFMITDyLfmA0I8PdctOmUAZaYlGiz8VUKFUCeSoTqltzvutacewzNWEj1Pyi0KQjNcZxkFnB0KNfmW+oGRTwgU0rlTswZpdQ1o1DdxFiLY1CqNKsUYF9D//eM3VZw/umBSQ2AIfkY32c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774445866; c=relaxed/simple;
-	bh=ncR5lhX/qsO2JVZYs7+Bp85yHeEaVm57g6ZMzG6QEns=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Iherj6508k/Rk8HTGSbQPs05VdOnfJc6reQNH56/Q9EDC5c0LS5wxqMI1xvNdxhemojFL3P+l8hkHC/BnrHDyDkK0dXK0MVjqtFpboF1CFz2uq9yryNVBsdNhqbKUHPx7iPaBPCdoP8l3DDVduGAWMAMFfd1DjTmEDxcK2+EguY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=HD4kmuHo; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-509061dab77so21477511cf.2
-        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 06:37:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1774445863; x=1775050663; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+5YqW3fm6oigALPQ3wls8hGT97SVDJk+JdeJhpsggHE=;
-        b=HD4kmuHo+jT7bXCb/jiOx8xY04kKiLbzlNbcQulLYr1R9u9jdkVBSw6aUCXcYpJQyh
-         EhuyQ7qSuUNgcgLPIdM09i36j3XyAbpO+r0nKESALxMooVm/cuvVc8eMzH36MJtsDu18
-         rxEPXSrXq5yB9Jmz7cYIQc5a9Sw9+L6fef6TSD0fb0D6xw+sO4Q3ZPDQzRqFZxEH9E0V
-         +H891HU0wBgD5CFNHzNQ1KrS2juQw2FKeLjh6kp5ns0hzCe7INFLEd09Mk3adzC7TZ9J
-         LGk6202oXxb5NUqeDoOrRlHMf1lB8IcUsHieZ10uMluxccjWmN9x70jnRYqXJHFP7It4
-         T6Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774445863; x=1775050663;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+5YqW3fm6oigALPQ3wls8hGT97SVDJk+JdeJhpsggHE=;
-        b=o8PACEahotnJ+vqi43f94r6/VtVBRP89bNONb78CjyVdOG4gH3990zLFk1yUmwGOAf
-         FxecTm0ZkxroF80spHe5fpMHjkGtjhXR1BaHYs5+MoVtu98lq9C6gsEJkziaGomaIOSi
-         kbqTeJW40Cf+FzYIqeajvfCRclntpU/FyIBA/dTLfFhvk6Q9i7ym1BnG6xcJ/m24P8Gl
-         x4pp2t5UZL9XMZcBtuvez1k5jpkqqZuCiBZ8n3GEqQ7bsXRgpiWwrxAxzJmFxoyuIA/q
-         3Hk6sLLOX2nefk0SZ48uCLgTF3DlVzv8u3dpwV+ENye8bPJGpK/2E/y4v+MAeHGaurqy
-         8jjQ==
-X-Gm-Message-State: AOJu0YxhU/V+9XyobJBBDvBzOQsObpO+XViNl3zOB7Xjx75eBpbIrVne
-	aqKjUWnea5aTw7Uy6F3jEugsPXZKbkZvBykPO1QYiLqvihbzk1xexxa6UEuCJAdcgDLGiXwisUw
-	Ze1xsT4w15Cy+UcvMn466DEIwf2en7JNoEHrA7BwSKWgcFB+CUX7O0VjBrzxv3mLf
-X-Gm-Gg: ATEYQzxmGxR9qWEJOu2C0Irt4gC+Ar6AcyJAYp+bxCeU84KcwZFKL0QhYnCHx6OytMY
-	SjZsGfhIp675G+lEiHf+WDGGej1SVqS+gBkKC4GUU9ATV6Z1fWOuqmh1MNLeyFah2HSifsFvkVZ
-	U0gA+jyF3rkzoclsoRVm3UkM6fPWmE/J72fdfKegT9WaARB14WPs0MbZ2qgY4MSGzHaVS1YTlLK
-	aR8iialGMFkUCkHxmlsrJ+g4qOkiiCExeiX3OAI9yHRaYOmJjW3OUXzjR2rK8SNbBLee4LaBpfM
-	NhOaFKy0vaiZQYLQ4VNqmeH7Cuo42rkTqfMnPguQn4uYnNsuqfSvpFjMYGw12VLjU5qN22b6+0b
-	re6aUAkaMWKo3e0okcsNIVqeyhIndilfM+mBhjWXY/vnKaIzsfc5zqCQrpLLHmOYrae3fAkArqA
-	v3NjQXSgnfzDH1NffN6MFVM6Tiq3opO84HNZJkxoTbXG4Ow0JIzqKlKU16
-X-Received: by 2002:a05:622a:1e99:b0:50b:29a6:8696 with SMTP id d75a77b69052e-50b80cced67mr48052361cf.7.1774445859374;
-        Wed, 25 Mar 2026 06:37:39 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:b607:a944:9f53:da? ([2001:67c:2fbc:1:b607:a944:9f53:da])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b36d04889sm136409611cf.9.2026.03.25.06.37.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Mar 2026 06:37:38 -0700 (PDT)
-Message-ID: <9c891d6c-1064-4f35-8982-3e2dcb3290f5@openvpn.net>
-Date: Wed, 25 Mar 2026 14:37:36 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD032BD5A8;
+	Wed, 25 Mar 2026 13:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774446116; cv=fail; b=rpgyY9SkpIQnqnc251O0Blhtt847S4PAx/Ui2pMTIIef8jRk9fzDIEe1vhqn6tsr90Uv/7IZTlurKmhntqVS+dvrGC3XCpb1SGUjmba1LyMkQnfGjcQ4Mh5Z2roxRcRRnuvU7myqo9Bogs7upoo/nVfvIDDEVX2TmCTjab7CZds=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774446116; c=relaxed/simple;
+	bh=iMUg7JtwFWyXVzncdx0nzytetsXUo16hsgzGE2X/dQ8=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=MST1t3nN9pf1SofVSHubDinqy2ZCkXB50Q1iZWW6Et+Teg1JK9azpqvpNcBmR6tMJf5NyOgD/G6/8PTLLGS1XHcIR64rG3oOxnnYJKumCXCS2NFRmV6mGAi1QSRseJFe7i1qaJnRJTPvpH/dp7rm5/01F3WQ9HrHtXuA2Prcnas=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bIGemVPy; arc=fail smtp.client-ip=52.101.62.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QIyfAljAtyNh52nMoH1GWfMcVrbASmNRJKS8AGWGd+SSv8loWj4r/nsHO229T0cSv92o9QfCqYPd4GCXj5espSILUz1EJv8qEJH6Ttt8v20UeuRNirMbpffX+ZVOqdgX0i+DkQCt7/+aeBt9WuE7sEsRxt+URZXFx5ztssL6GvnaxRcBGayAiFB5zlOWhsaiNjmre4x2B7Sm791zKsgkEykWmaOSYm8IvJ0cwTRIxocu0cgQDa1B+9s7EDRRRPTE7PMYrgMzqzzc8FawCqwTFGiuxr+xbH0yMBZNOlnxEnIvt76A1TEtGMfGU5BRobWDnMZccoShtAsbcK6WYKvggw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BYbga98ZiTETqFdLGeijs+DqY3dCAyYo5vUQTwv0kK0=;
+ b=tDBk5v/E0at3ua7zv4Gfz6KYLmgknXkFUqt8CTTdjgyMzLWDEqCoWVkHHKKcQTuGXw1sINpHur8+2xVrRz4TTAK5Ua9X3OlH8H0mDGJhybDEf9Q3p47zl39rWYgGLfrWx8qnjG+mUsWTLiVENU1YKpZ7z8HZGdW6QRz1yyuneSh/uJ6id0hdMnr+6qQSTACBafZqaHJRFwvZHU1x5MgYT9pF/EDKAYQ0dKRYw6nckcyqpFETbLroRjJxb/jvbaW0yPylPnG5w5g7Mexinh7Msy2d5upYjp14yYwPODyNpsyuskJxFBOTawQgTgipCWDJWFMyw6jQFcjPvS+CW3vnlw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BYbga98ZiTETqFdLGeijs+DqY3dCAyYo5vUQTwv0kK0=;
+ b=bIGemVPyqqlyvrsgEb4tg4J3eibMoI5u6GlQjdKWiynfI9NgxVHk4PbzwensMKgEMNL/wNi7o/Vg9yu6kdbALwBEgTm6RCmrSLFa3rn3FI5amBJ1wTo2Sl+rop8f/VKHV+wQubIYnp5fQB05BPZc7GhmIbQUzvRDXJT21uKKwjATf2j3zfEQqjDfLzJCWXer1Chb3SaR3kb+mKjOojR6+Sn3zaBHFz2H/z2RGOyoDBE9z5OR5FlDdBKy/HZEit4/rvNhhd0ZAxthwVUabsF9rTqVWiEfGi8d5Yq0ajH4srCYbXM4eN4MozKVbSrnJHFByfhZRyyPaemolL2DlziT6Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS2PR12MB9750.namprd12.prod.outlook.com (2603:10b6:8:2b0::12)
+ by MN6PR12MB8470.namprd12.prod.outlook.com (2603:10b6:208:46d::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Wed, 25 Mar
+ 2026 13:41:52 +0000
+Received: from DS2PR12MB9750.namprd12.prod.outlook.com
+ ([fe80::56a8:d6bf:e24c:b391]) by DS2PR12MB9750.namprd12.prod.outlook.com
+ ([fe80::56a8:d6bf:e24c:b391%6]) with mapi id 15.20.9769.004; Wed, 25 Mar 2026
+ 13:41:52 +0000
+Message-ID: <954da5a0-1e85-4b43-9b7d-c1f025d5d1c7@nvidia.com>
+Date: Wed, 25 Mar 2026 13:41:47 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 2/3] dt-bindings: net: Fix Tegra234 MGBE PTP clock
+From: Jon Hunter <jonathanh@nvidia.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Thierry Reding <thierry.reding@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ linux-tegra@vger.kernel.org
+References: <20260324121631.771628-1-jonathanh@nvidia.com>
+ <20260324121631.771628-3-jonathanh@nvidia.com>
+ <177439307874.2078673.11304788250514370726.robh@kernel.org>
+ <5e0a6a5a-dded-449d-8789-e2a5e0a169e8@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <5e0a6a5a-dded-449d-8789-e2a5e0a169e8@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO2P265CA0189.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:a::33) To DS2PR12MB9750.namprd12.prod.outlook.com
+ (2603:10b6:8:2b0::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/1] ovpn: fix race between deleting interface and
- adding new peer
-To: Sabrina Dubroca <sd@queasysnail.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Hyunwoo Kim <imv4bel@gmail.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-References: <20260320100351.2283994-1-antonio@openvpn.net>
- <20260320100351.2283994-2-antonio@openvpn.net>
- <20260323184304.42c3930f@kernel.org> <20260323184543.764a903e@kernel.org>
- <acJix6cQZyqb94pA@krikkit> <20260324143006.60e7ca2e@kernel.org>
- <acMS5PU_CfOMQPtQ@krikkit>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <acMS5PU_CfOMQPtQ@krikkit>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PR12MB9750:EE_|MN6PR12MB8470:EE_
+X-MS-Office365-Filtering-Correlation-Id: e005798b-d28c-4c2f-07a1-08de8a744580
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|10070799003|366016|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	aQvmdEuM2uWItcHWWGd0A7wMzBi7DKYxgEL4mXg/oCv2Khnrdj5au4I3hvqgjybyJzj8SWIgHvFMa9VyQsJ1yChYfwXRD2Iet1iN+L/AkE3Pc+CLUsq+nREelzMBw4OLMhbKludj6v3OHHpQmZyeatiGb7cVmzOGtFZLcETNiC1OioRIQFwQuvluvRg+fIfavjBohVM0jGajYUo0L1ShgaIbHu9xxNHYH4vHmm5pqdFGmffSGLd5WW3+ty890RacqE7lTGAs1br3YHGzBVSaldPq3DPlq32UU+gP+++DDt2j1o+xkBkrGd2rUDHYemekWL44hNWWFZzHu0AW6PJuVUQJZWORBDvrEoUHRzt5nnIMiLlf377wfDDha450ziNOmnU2+SHPRK3hXIBncI4TleKwpk+63tNq/UMMnCVee5OGPrz7SIsWShJtHwPCimRtWagsDi9QEz2WpfPLMFHB3PxD1JHp1h+Pbn/uo+/ZB7DWpEIXWXIHey79uyPndiOr6JZIliyDi0cU2HFmcbpZrhPXn4TUFKiFGm2+UyEtorDGPZsh4ySM9DsFWO+6mdftVY/At4FoHzMUQsg/5vMh+De0Xl25b+85K7rUMbG4HFgccxj7YZZmpGUz8nM+juRMOZsutQ+WBqT9yYpaZ4Ez3TkzbbIY6Of1idLYFdtR0JqtcI4h/HQbRW6HOPsMPcHDt1xzeYLfKowT3j2+j6ZnWF45l+Z1+kcZg1uTMd72c00=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS2PR12MB9750.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(10070799003)(366016)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Wno2aWFkd0d5ZEU3VnFHeGUvVWhEUUplcVN1eTQzay9NQ0doaFhvNFFYRFVY?=
+ =?utf-8?B?SndsaXlrRTBTZHN6YjRNeGE5Qno4M3BhTUZsemtlWkhGVXZ1TUdob0x6MVhI?=
+ =?utf-8?B?OEVmbUo3T09XeXFTVFNzWWJHMURCN01iWkh2OWg5Qm9taHF3aE4rUVNHcVBw?=
+ =?utf-8?B?QWQ2WG5KSmJqRVF4U3RWU28rSmxML1RUdDVzalpneWRka0FGaDRmaUg1d2dy?=
+ =?utf-8?B?NEROUFA1M1ZvVFgwbnZLb2Z1bE05RU50amZWSmNETE96UTBZdnpDc3NpS3F2?=
+ =?utf-8?B?Nk1EcVc4bGRZMmF2NldsT1lmUFNFRmJvYWN1NUc0SzBzWGt5K3BIY0pIcXNW?=
+ =?utf-8?B?bWsvdDVyMm5qWVRoUVRTRHowZnhlL0RxS2lTQW5UcVFaTnJnWHZYdHN4MzFx?=
+ =?utf-8?B?anVIU2FEWkM2bTNoTkwzYmx2TEkxYndzRjRzWi9tMnE0NlZNVWNuUCtKMTha?=
+ =?utf-8?B?aVM5cW54VHBhcWgvUWI2RjlmTVFpRmhuUnA4TzQvRXM0SzAvVXdLeEpTNHQr?=
+ =?utf-8?B?Z3cvL1NMYlo3K0JBeC8vVUVhRXBERzVpeHE2MHFYSlh6WVF3ZUxFdHF2eFdw?=
+ =?utf-8?B?N2VRTEJ6VUhMZy9Va29icHUxbzJYcXo1ZjZQSHZzaldxVko3dzNrSnNVVi9t?=
+ =?utf-8?B?eHY3MTNKeUl4b0R3M0t1NmpoUlowWW01MWRzemRPckxyTzBsRVVlVy9aZXNj?=
+ =?utf-8?B?dXZEQkF4UklOWTFSakNUQkFUNTJGb29adll5UmNrMFNnTmVsbzJId0JqL2Jn?=
+ =?utf-8?B?VGxvYkd0MGV4bnJFSnBEamtMOHlrU1hQRm5kZEtkMHB5dlc2Uk9VVm56aVNE?=
+ =?utf-8?B?cGtrUFdnZjFvZ3RjeVRPSDVxZmtUQzVXSlFiaGZFWTJ0VUpwb0U0VmZ0MWtD?=
+ =?utf-8?B?b2N0a2F0QmRmSlBObVJRSHl4ZDM5U0wwYXBIV0hDMnptbmVJcXM2b0U2Skt4?=
+ =?utf-8?B?d0NCYlpZSHg3bkRqL3NsamtlelpyVzE2Ti9vNFdsRkhwTzFOUHBzaVZocWFz?=
+ =?utf-8?B?TVhzSmZaTG1SYzZndVFLNDZsbnFjQ2U4TTBsMmR1VkRORTMxdmUwVW5mMG52?=
+ =?utf-8?B?UytodXUzYk1TalZUYjcxbW41QkEzOXduTTJBWUwwd0xJditHYXFoVSt2eXRz?=
+ =?utf-8?B?REtXY0dWTHRVYjdzaFpmVVVPYzBwaE9Tb0QzTzBFUTNWamhHYVVvSHZDYlNC?=
+ =?utf-8?B?QmtaRGxvamhIWGRyaUNySXo0dGR1QmdrcDVMdWZCM2xGSURnZ0I0S2tJeTdO?=
+ =?utf-8?B?SnM0ZUVsa01MNll5RWVjeUwyTFZWRzN4WnVwWGVXK2NES0Mza3JsQU55ZmhO?=
+ =?utf-8?B?UVFRTEQ3OW9zRlVZUDIyVDVBOXprMlcrNmdmNlFDSHVUVDBYQmd3dDJjSlNS?=
+ =?utf-8?B?UEJBdFhjc3JBRjNPb21HZ1ZBTUZ5SzdqR2FYaVpIUmdnczlLN0xjeW0yenN6?=
+ =?utf-8?B?RFFTY0s5UDlVd3AxZzBzT2U0QUtaZllyTHIwNUVMQ0gvb0hkN2Z1SkdDWWYr?=
+ =?utf-8?B?K29ET0dCN0h3aVZ2azdnNnpMeVhLZmNIZEdzam5nMFd4OWcxTHY2NWs5WExN?=
+ =?utf-8?B?ZkI2QlFlNUJmKzZ5Zkg0R0RRbUhHY3JESE1KMzBiS2c5S3NPZUhQRFRQUWx6?=
+ =?utf-8?B?R0NRbmF6YW41TWFIRTdSdGdzbk9TMUovWDBzWkJGczBhMWpXcll4THdBcDBZ?=
+ =?utf-8?B?RFl4L1k5Q1EvQm1iTEdWc0huNXRBQVk5V3lHSEFQUi9wbEpEclFJUFlMOTk4?=
+ =?utf-8?B?WUNpTzRKaTR4ekhyekRIRWFEdzNEeElRV25nRk9QN2FaWTVxcTdyV0k2VzZj?=
+ =?utf-8?B?dVYyR0xYM1Q3cUNhQ1BreFpISmFNcFI3MlVjQ05BblFyZDc3ck4zZnphdGox?=
+ =?utf-8?B?M1FYSnQ4eDVQSWVUUzRnSFkyNlRhYTdTYUkzdFBaNWhUaWlLN3ZMdUxWNEVY?=
+ =?utf-8?B?WE9hSy9FQ3pJRVA0Z3BsajJGKzJYSU9Pd1pqTWNLRHV1SGJMZXc1TDRZdUdW?=
+ =?utf-8?B?K2F1T3FuS1lmSlN4cXFPVmFKUlAvYnFYckhZMlladkFPTlQ1Y1lQd2pHNjUy?=
+ =?utf-8?B?c2xQckhEVFN1ait3NUFSWGIvRGpJY3REczhEQjNiM2NVUmhlckRMWGt3R0oy?=
+ =?utf-8?B?NXc2SE5TOVU0YVJLOFlhYkJ3SWFRc0RzVGVtQWtLLzU1THZQdjF5N01uUkxP?=
+ =?utf-8?B?RzhUcVRSVjkwZTZFQVdadW5Sb2lZSEc0R090QklzUlNkcGJQTE5HcUsxK1dh?=
+ =?utf-8?B?Zm1LUnUyZExmemFoYXo2Z3BtcDY2blVYOFNmYjVRZEpVbmE0NlFoaGRVL21U?=
+ =?utf-8?B?NW1kSTJZVEJZRDVlczdjZnpXWjFQeVJ2ZGdQSnF4dmNuZGQ2ZnJ2dEJZRWhn?=
+ =?utf-8?Q?w+gB/EUL6rHtCpV2LzUCLRMzFxpPvvN8tjPW5Sqr/1fF7?=
+X-MS-Exchange-AntiSpam-MessageData-1: 1L5ehhJVMi/O5A==
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e005798b-d28c-4c2f-07a1-08de8a744580
+X-MS-Exchange-CrossTenant-AuthSource: DS2PR12MB9750.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2026 13:41:52.2545
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 48zKuqKzFoErW2BTEZjDEch34mpUbnF4bfQh5H3lciyn93wBZng/CZDmX78U3xdMpF9hr+kafTCihSNax4aV+A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8470
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,redhat.com,lunn.ch,davemloft.net,google.com];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271563-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[openvpn.net:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271564-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,gmail.com,davemloft.net,vger.kernel.org,lunn.ch];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jonathanh@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 681CE3265AD
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[0.103.194.128:email,Nvidia.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,devicetree.org:url,nvidia.com:email,nvidia.com:mid]
+X-Rspamd-Queue-Id: D1F89326228
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi!
 
-On 24/03/2026 23:40, Sabrina Dubroca wrote:
-> 2026-03-24, 14:30:06 -0700, Jakub Kicinski wrote:
->> On Tue, 24 Mar 2026 11:09:11 +0100 Sabrina Dubroca wrote:
->>> -------- 8< --------
->>> diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
->>> index c7f382437630..ebec8c2ff427 100644
->>> --- a/drivers/net/ovpn/netlink.c
->>> +++ b/drivers/net/ovpn/netlink.c
->>> @@ -90,8 +90,11 @@ void ovpn_nl_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
->>>   	netdevice_tracker *tracker = (netdevice_tracker *)&info->user_ptr[1];
->>>   	struct ovpn_priv *ovpn = info->user_ptr[0];
->>>   
->>> -	if (ovpn)
->>> +	if (ovpn) {
->>> +		if (READ_ONCE(dev->reg_state) >= NETREG_UNREGISTERING)
->>> +			ovpn_peers_free(ovpn, NULL, OVPN_DEL_PEER_REASON_TEARDOWN);
->>>   		netdev_put(ovpn->dev, tracker);
->>> +	}
->>>   }
->>>   
->>>   static bool ovpn_nl_attr_sockaddr_remote(struct nlattr **attrs,
->>> -------- 8< --------
->>>
->>> This would clean up a peer that may have been added while we were
->>> starting device unregistration. We hold a reference on the device so
->>> no UAF possible, netdev_wait_allrefs_any will wait for this. If we
->>> don't have a racing peer creation, ndo_uninit takes care of the peers.
+On 25/03/2026 06:18, Jon Hunter wrote:
+> 
+> On 24/03/2026 22:57, Rob Herring (Arm) wrote:
 >>
->> LGTM. This or change all the write paths to check if the device is still
->> alive after taking the lock.
-> 
-> I think peer_new is the only relevant path here (other paths use an
-> existing peer and modify/delete the peer itself or its keys while
-> holding a reference), and we don't take a lock except to insert the
-> peer in the ovpn instance (ie netdev)'s hashtable (or peer slot, for
-> single-peer instances). I guess we could add the reg_state >=
-> NETREG_UNREGISTERING check to ovpn_peer_add_{p2p,mp} and reject adding
-> the peer. It seems cleaner than my ovpn_nl_post_doit() diff above.
-
-Yeah, I like the check in ovpn_peer_add_* too.
-
-> 
->>> Or we can call ovpn_peers_free on every NETDEV_UNREGISTER notification
->>> that netdev_wait_allrefs_any sends us (but then we don't need it in
->>> ndo_uninit).
->>
->> Hm, wouldn't we need a notification _after_ netdev_wait_allrefs_any() ?
-> 
-> netdev_wait_allrefs_any() will never complete if we don't clean up all
-> the peers, since they hold a ref on the netdev.
-> 
-> But calling ovpn_peers_free on netdev_wait_allrefs_any()'s
-> 
->      /* Rebroadcast unregister notification */
-> 
-> should clean up peers that got added while we were unregistering.
-
-But with the check in ovpn_peer_add_*, we don't need this extra call to 
-ovpn_peers_free(), right?
-
-> 
->>> And s/cancel_delayed_work_sync/disable_delayed_work_sync/ for the
->>> keepalive_work.
-
-ACK
-
-Regards,
-
+>> On Tue, 24 Mar 2026 12:16:30 +0000, Jon Hunter wrote:
+>>> The PTP clock for the Tegra234 MGBE device is incorrectly named
+>>> 'ptp-ref' and should be 'ptp_ref'. This is causing the following
+>>> warning to be observed on Tegra234 platforms that use this device:
 >>>
+>>>   ERR KERN tegra-mgbe 6800000.ethernet eth0: Invalid PTP clock rate
+>>>   WARNING KERN tegra-mgbe 6800000.ethernet eth0: PTP init failed
 >>>
->>> LLM claims it's because of parallel_ops, I don't think this is
->>> related? It also claims this issue is only for UDP sockets (and TCP
->>> would see a UAF on the keepalive), but ovpn_peer_new always holds the
->>> ovpn netdev, so I don't think there's a difference there.
+>>> Although this constitutes an ABI breakage in the binding for this
+>>> device, PTP support has clearly never worked and so fix this now
+>>> so we can correct the device-tree for this device. Note that the
+>>> MGBE driver still supports the legacy 'ptp-ref' clock name and so
+>>> older/existing device-trees will still work, but given that this
+>>> is not the correct name, there is no point to advertise this in the
+>>> binding.
+>>>
+>>> Fixes: 189c2e5c7669 ("dt-bindings: net: Add Tegra234 MGBE")
+>>> Signed-off-by: Jon Hunter <jonathanh@nvidia.com>
+>>> ---
+>>>   Documentation/devicetree/bindings/net/nvidia,tegra234-mgbe.yaml | 2 +-
+>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
 >>
->> Yup, I think the LLMs are trying to be helpful and are looking for some
->> write lock earlier in the path. As much as they are annoying I can't
->> blame them here, I feel like we try to make things lockless too often.
+>> My bot found errors running 'make dt_binding_check' on your patch:
+>>
+>> yamllint warnings/errors:
+>>
+>> dtschema/dtc warnings/errors:
+>> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/ 
+>> bindings/net/nvidia,tegra234-mgbe.example.dtb: ethernet@6800000 
+>> (nvidia,tegra234-mgbe): clock-names:3: 'ptp_ref' was expected
+>>     from schema $id: http://devicetree.org/schemas/net/ 
+>> nvidia,tegra234-mgbe.yaml
 > 
-> Well, if we want to protect against netdev removal, we have to use the
-> one lock one we're trying hard to not depend on so much (rtnl)?
-> At the ovpn level operations are not lockless.
-> 
-> The LLM found a legit race that I missed, but I'm always puzzled by
-> inconsistencies like that.
+> Yes this is expected until patch 3/3 is applied.
+
+Well apparently somehow I managed to miss the example. I will fix that now.
+
+Jon
 
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+nvpublic
 
 
