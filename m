@@ -1,498 +1,382 @@
-Return-Path: <netdev+bounces-271415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271416-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJUjAAyEw2kPrQQAu9opvQ
-	(envelope-from <netdev+bounces-271415-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 07:43:24 +0100
+	id sOUtBVyGw2lRrQQAu9opvQ
+	(envelope-from <netdev+bounces-271416-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 07:53:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D025320473
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 07:43:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B5C5320548
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 07:53:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 991493093E19
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 06:39:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A872D300694D
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 06:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD1F218E91;
-	Wed, 25 Mar 2026 06:39:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE57435C193;
+	Wed, 25 Mar 2026 06:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iAT2AotZ"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="QfrAd8Ls";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Oyp0gIA1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C9435A398
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 06:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7572066DE
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 06:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774420743; cv=none; b=EdjVZWGrds3VDNnYqEkBJGIlw/4IFhV3jT2pzwcsvw7yC7fPNM952o+XBzvE0ZcaPyFRcLy6xN8F82FHceWRP0o/Y5kyHmbzKuGUtce3+Bclo8TqLNQOiCUGN5D7UGX2Fw9cmMIh7xFAyCmNwMw0shcDvrz3DAoFCS3Ai0OHkEY=
+	t=1774421592; cv=none; b=hIXNt3hMrthaZUKacIkLW+XtXnacEXBTonP5QIi/vesas0pH+zBm0ROyg3EkyAkpzReHVZRxqY+7nHcXZEn43CI29cjZNWhx+QEMp1J1F7zV1kuPPk/E4SvokqHLIsq6vIVsA0+LR9Kd5QbU3jEOGT8mYqF/CRqBIYal5MKZ5Yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774420743; c=relaxed/simple;
-	bh=SrpKzkmoRGx7aazaCTA107jF2QwXhaZk67Ma+gjHqFY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pvLmtsHBw62TtRMgxkI3KRgQ3AKEeIaiCmZsLRR2uc940+7bZRqhhToAsGzJz2ITyCe5A295OZGbfVSb26mKU4VHqazhefCefVqitt5ysRxq1z+ewIv2KsFdljIJC3OihSVu6sEQ1sPYBP2UhaKw34uQxFnU2JmCr/HfmPpTLSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iAT2AotZ; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b0554888cfso29125895ad.3
-        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 23:39:00 -0700 (PDT)
+	s=arc-20240116; t=1774421592; c=relaxed/simple;
+	bh=8H+GdAKBFaCchsjv5ttuJOMI+f0XuIoJ1n1G5Tfk6vA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qPOXiRhkwMVLTcYzTMB838LnIVV+C46ES7xkPlBCm5EDQQIDDHM5zwZ+upCFQxL9z0aGub6mdkTwHq4eAZSVeQDCo6Ou98AwWLSrOxMYEQAiyfhz+vuyue10KmANBYxFXMmnIHB3cW3JL1eBKvz4gg6/Uzuyk8N++kSMpyvlKbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=QfrAd8Ls; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Oyp0gIA1; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62P4tMmH3110462
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 06:53:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	UI7m2+0UYHSeLOdZmZkD5IzpLl2JDpfBb2Td0CnCpfk=; b=QfrAd8Ls5ooL30O9
+	SS2DrmlSMnutr4g8mjVXa1K377COiWNwGWgGa3JMkDXiZ0kigwZcw7mRnCNJUXmO
+	i/mVpb+KAj7w8AOapWh/3BSxEvw32FCSUrO3VkqWi76TbkZdGxTVVD7/mzOZdbp0
+	342DEVghTgL+8Sq7QFf5mIQA9Cb5HrpwIn/cXf2eRCQMlgeyMicjOjGMPvrFg3DW
+	Fg44UWCfjMi1tq8BYhtr5/s0RUqw/iI5suuYblji4C8jkIsDLThuXBGFCSXepuxm
+	G6EIy+sb5+JgTs7E7hHuZdm16sJrzzTdT+hpAJzjYNCRD/L+xeHdyZcAA1y9Ljn3
+	c+jQuQ==
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d3vhvu4s4-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 06:53:10 +0000 (GMT)
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-c741f038f7cso3829142a12.2
+        for <netdev@vger.kernel.org>; Tue, 24 Mar 2026 23:53:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774420740; x=1775025540; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=td6V/HkD0jTQ2Ddg/5MFuwcSeqzl2MK0WzcLyWTHSrw=;
-        b=iAT2AotZBK3FS0g33BAAhhY7cK/sarBzTbsFJ3qSUS3UdiR/i1iysdzudGaxtEq1Xl
-         LprSgLIHJR4M6wyLo5qoJ+3zuvRF/re31WDVzTNK4KGlEMwITuAQEtx7+Qz+/rcqkJqj
-         kYvAr2rfvhnswi7rODCpfG69A/ViHtGJm2+02UrZktw8OiI497T+gA2yljIFcBG0T2Ct
-         5wLsEwz1AT+It3GD4Pn8CZ8mDc6WllbnFF1isvQZq2lAm6GAe59SqFjxuXFwhcaRTBoy
-         e7PbVP+y80yItNhwlOqT4uUT7MO2mJ6NacOHWCc6nWmg3O5opk4kxXPxMKZJxeugZJUQ
-         uUJw==
+        d=oss.qualcomm.com; s=google; t=1774421590; x=1775026390; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UI7m2+0UYHSeLOdZmZkD5IzpLl2JDpfBb2Td0CnCpfk=;
+        b=Oyp0gIA1sCAWNt7KDHhRoidFPwYRcT8FiabMTcjnFk/ZZfs4RcLvxa5yRm1k0wwUfo
+         AigJ4dUigzQCTjT9QtGEwSw0e7UMTqS9gWSlvQsrqiSBawzfFjqtIvUokexRWcwx+Hmb
+         91ejbp/Ye+RyMEgX/3FaAzQwbj9QI80c9gSVCKvGworU5QOtd8uANZefMc3bbEz3Rs5f
+         SQwIfxWndeqjyd4Ean1jh0NiV0ENAeXvdCD10CQgASN9UaXjQ0j2DRuIMfjhs+nSCfsg
+         PBSDGX2limNt+tF89jnO8MHrlWNAZtan9E5TpyV9+dpe+r7KSopLRIAilzXKBeiPVpSS
+         vaDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774420740; x=1775025540;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=td6V/HkD0jTQ2Ddg/5MFuwcSeqzl2MK0WzcLyWTHSrw=;
-        b=X3CyS8OOkb/d4rVtVlkMNX/IxAvVwrSiXnmJUxYV6S1pvEBzDGcTVrXx/cKx8w8Mr1
-         P356lVbFV7LFWQWKGuO2+W9oltM8pPxQQVksNvsT8Uqqt1j81Ew7dZbGw90IBPVAYJmk
-         7+k2+Fn/CW67KratKTVAMR5AJXNo2jqpSJP/uFgc2vKSRWwUWT8W899YPxHY1J2ELuwE
-         S8lYwSjAKxIFo70R+pXTUYgBwnsmMoQEkig6snk+KSgQtFrbvyjOwaqIThRgRMsykFu4
-         KBR6jdeckiG2Deq9RLo7W4C8EgeL7fdg8MNiPXu8jgOZJUZfzBVlNdtkb6XMmMn+ckHS
-         Pauw==
-X-Forwarded-Encrypted: i=1; AJvYcCXW64RjzzV3hrUKcw12dtOZFOI1B8ct9tt15gi4NhRgB/Ncdo5Ik+/JajyL6xt6sqnGRdI9aPc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJZFvspslzzgIfiCZ2xtPecoZTJ5CrsdbWCRU63HeRH47b5uv0
-	fc0R2zlEnNZ/p4cbi1BvafL/lKz6HlthZ4GU11vWnQWnVFqz4vkrHjrytMjMrceclpl4ifg4nSM
-	c73B4Hw==
-X-Received: from pgmp22.prod.google.com ([2002:a63:1e56:0:b0:c74:497:507e])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:918b:b0:39b:e9e1:699f
- with SMTP id adf61e73a8af0-39c4aa688bbmr2702365637.12.1774420740019; Tue, 24
- Mar 2026 23:39:00 -0700 (PDT)
-Date: Wed, 25 Mar 2026 06:38:26 +0000
-In-Reply-To: <20260325063843.1790782-1-kuniyu@google.com>
+        d=1e100.net; s=20251104; t=1774421590; x=1775026390;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UI7m2+0UYHSeLOdZmZkD5IzpLl2JDpfBb2Td0CnCpfk=;
+        b=RmZberwSf6hEVPOgVmooa0J52EXtYYZ+FE2D8mcRlG8GKbufaiB6bfQkfDF01OS8ZL
+         SYxjWy1boyCB/3nK8a7DHi8/R/LqURFrs4j44gxK26pxb6WosAUgdEmTDnRUyS4tYOz7
+         r1CRiHuSnNKks7GSlwAZm5QoPXJP6MI7rdHfZJyyNQTlq+alNO9/iqO1CLAAHo0EpNv/
+         5A6HYBLDvTTJRz3iL4OERC09IxCAAD6YEhgtaA3PYukDQtwnz2zarfl+geUmvN5H6Pyh
+         XZuN4YlTiL061eaPYhS/SndGoD6kmClEtg/pn59x62pI17Q4Wj7JzUGQ/+qoxsXQ7lWV
+         f7lA==
+X-Forwarded-Encrypted: i=1; AJvYcCWssoZvY5HuJlW3lz3QQG+BofgHW630R/EHLtZgT7UPRWB5R09W/4vH9IMelpXpIYvc7+jgGeE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYm4SqP8xo2WL2ea9Wi9sDMzR3SQdBsb7WIrdp0svdgiOwKafw
+	+ythnm23sHoXaMSdGzBPNOXMxmJ6RikUknyK753foAMEWCfmN4ag5qxPTFqwsyWj6nCFDu5ciMX
+	HDyqYr6MPqesLvDmptisPHN5iRcAe5tS0UeMulxUo2gi50o7dcTG06t15vqo=
+X-Gm-Gg: ATEYQzxqY7tfym6VgcPS6rl+0IiM45Yg3CIfqwiqpJy2IT8j3/Qre1Qo5oRcWEL+Q3/
+	vIorrKv/JgnVraV9UgYrcOV4Xzgr6t5JtfXEPil4Ilz50hOnPoiXKeqNkIWktqzrzVUpPxkNMA8
+	5DVTW1KH17eWfwnt1OLm9WmjIq3X5XGOnHwfFD9wzHIBX3GnUCx53iGDQhAz2OVdpw4kARsHXAZ
+	ukkwDngDgzsNqZsmPkwO7GWW2iujO84GB6yAQAtnDMUTZKogI2JpejK8+LXu6CxuNn/SZgLErlQ
+	DHdUbRySRbGniAUlXOpivYmRS1slZe6MlYd2W8nO2P7uJ5f/McQRhFApQPyNrF6/C0f/uhmQY0I
+	C4oOd2mF/esxWvhZ7EH8Ap1W2SXlTyK2diljUlQq9gCdMuTtAWM8O8xzO
+X-Received: by 2002:a05:6a00:3d4b:b0:81f:394a:4897 with SMTP id d2e1a72fcca58-82c6e0d4280mr2597261b3a.44.1774421589776;
+        Tue, 24 Mar 2026 23:53:09 -0700 (PDT)
+X-Received: by 2002:a05:6a00:3d4b:b0:81f:394a:4897 with SMTP id d2e1a72fcca58-82c6e0d4280mr2597246b3a.44.1774421589280;
+        Tue, 24 Mar 2026 23:53:09 -0700 (PDT)
+Received: from [10.218.37.132] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82c66487634sm3576109b3a.29.2026.03.24.23.53.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Mar 2026 23:53:08 -0700 (PDT)
+Message-ID: <1bc9ab9f-e59d-4dad-aa0d-c4d6fefc957d@oss.qualcomm.com>
+Date: Wed, 25 Mar 2026 12:23:04 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260325063843.1790782-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
-Message-ID: <20260325063843.1790782-6-kuniyu@google.com>
-Subject: [PATCH 5/5] nbd: Use lock_sock_try() for TCP sendmsg() and shutdown().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, linux-block@vger.kernel.org, nbd@other.debian.org, 
-	netdev@vger.kernel.org, syzbot+7b4f368d3955d2c9950e@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 1/2] net: mhi: Enable Ethernet interface support
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20260324-vdev_eth_next-20260323-v9-0-da6e4e486437@oss.qualcomm.com>
+ <20260324-vdev_eth_next-20260323-v9-1-da6e4e486437@oss.qualcomm.com>
+ <CAFEp6-0zgCwJb8yOZD6hM2KDApoisMYMmw57xJ0uwSvtEHxU1w@mail.gmail.com>
+Content-Language: en-US
+From: vivek pernamitta <vivek.pernamitta@oss.qualcomm.com>
+In-Reply-To: <CAFEp6-0zgCwJb8yOZD6hM2KDApoisMYMmw57xJ0uwSvtEHxU1w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzI1MDA0NyBTYWx0ZWRfXxpZcdRRxS1yM
+ +0b/1RGQhSLmoZ5RWb/uGnudc2OVML4eL6kGxJsoN7nYVs441FmtHX+UHJDTwuc/CFFCshk5EDB
+ 7DbbC8XCa6flBmwMp0i5lp/BfUIeiqXQ3Bpg6pAhJ0S4ZobHRuglV9uL4JelO6ClMu+iyhEJNgI
+ iWBjjgY8BJymzEb2WLTyn28bTCyyOduHZ1THyw1VJT3lkpE3GregCPnJAJs3URRCkoV3dNOMqKv
+ xVj0vcG1vcj6angnZmtCX0WkvhUqQbPUCp5k/aYHnwVHTALdHdSdPVeJRzDq8VJwdc38ji4CClh
+ sMh4onjSMy52QjhJgzW0r1U2bRuN+vU8Rmj24uA79XH3QpDpln3dUlxInwNgOWUc3yB0PVAjd/q
+ QpM/8PUdYaYNU/SO4Of7fcMmNvXDoWIulQbMEF7DL6Un4XjBGLB1pExak2t5XcPByFnt/GSGnjp
+ aRJaejlYmIw5se85X3Q==
+X-Authority-Analysis: v=2.4 cv=P5M3RyAu c=1 sm=1 tr=0 ts=69c38656 cx=c_pps
+ a=Oh5Dbbf/trHjhBongsHeRQ==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
+ a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=KKAkSRfTAAAA:8 a=UIrkJHBKaNELrq0Sgc0A:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=_Vgx9l1VpLgwpw_dHYaR:22
+ a=cvBusfyB2V15izCimMoJ:22
+X-Proofpoint-ORIG-GUID: ifmMjDokycqDSQuS4MaQaM7sG2A9XGSM
+X-Proofpoint-GUID: ifmMjDokycqDSQuS4MaQaM7sG2A9XGSM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-25_02,2026-03-24_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 phishscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
+ priorityscore=1501 spamscore=0 bulkscore=0 clxscore=1015 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603250047
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271415-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,linaro.org:email,qualcomm.com:dkim,qualcomm.com:email];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	TAGGED_FROM(0.00)[bounces-271416-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org,other.debian.org,syzkaller.appspotmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[vivek.pernamitta@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,7b4f368d3955d2c9950e];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email]
-X-Rspamd-Queue-Id: 7D025320473
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 6B5C5320548
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-As reported by syzbot [0], NBD can trigger a deadlock during
-memory reclaim.
 
-This occurs when a process holds lock_sock() on a backend TCP
-socket and triggers a memory allocation that leads to fs reclaim.
-If it eventually calls into NBD to send data or shut down the
-socket, NBD will attempt to acquire the same lock_sock(),
-resulting in the deadlock.
 
-While NBD sets sk->sk_allocation to GFP_NOIO before calling
-sendmsg(), this does not prevent the issue in some paths where
-GFP_KERNEL is used directly under lock_sock().
+On 3/24/2026 3:35 PM, Loic Poulain wrote:
+> Hi Vivek,
+> 
+> On Tue, Mar 24, 2026 at 10:02 AM Vivek Pernamitta
+> <vivek.pernamitta@oss.qualcomm.com> wrote:
+>>
+>> Add support to configure a new client as Ethernet type over MHI by
+>> setting "mhi_device_info.ethernet_if = true". Create a new Ethernet
+>> interface named eth%d. This complements existing NET driver support.
+>>
+>> Allocate MHI netdevs using NET_NAME_ENUM to reflect kernel-enumerated
+>> naming. This updates the reported name_assign_type for MHI net
+>> interfaces created by this driver, aligning naming semantics across
+>> existing and new devices. No functional or interface naming changes
+>> are introduced
+>>
+>> Introduce ETH0 and ETH1 network interfaces required for NETCONF
+>> and S-plane components.
+>>
+>> IP_ETH channels represent the Ethernet interface exposed by the
+>> MHI device. The driver creates a corresponding netdev instance,
+>> allowing the host to access and operate the device’s Ethernet
+>> interface.
+>>
+>> NETCONF:
+>> Use NETCONF protocol for configuration operations such as fetching,
+>> modifying, and deleting network device configurations.
+>>
+>> S-plane:
+>> Support frequency and time synchronization between O-DUs and O-RUs
+>> using Synchronous Ethernet and IEEE 1588. Assume PTP transport over
+>> L2 Ethernet (ITU-T G.8275.1) for full timing support; allow PTP over
+>> UDP/IP (ITU-T G.8275.2) with reduced reliability. as per ORAN spec
+>> O-RAN.WG4.CUS.0-R003-v12.00.
+>>
+>> Signed-off-by: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
+>> ---
+>>   drivers/net/mhi_net.c | 65 +++++++++++++++++++++++++++++++++++++++++----------
+>>   1 file changed, 53 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
+>> index ae169929a9d8e449b5a427993abf68e8d032fae2..87d8c61fab983005eaea99603d74a557d1483b6e 100644
+>> --- a/drivers/net/mhi_net.c
+>> +++ b/drivers/net/mhi_net.c
+>> @@ -4,6 +4,7 @@
+>>    * Copyright (C) 2020 Linaro Ltd <loic.poulain@linaro.org>
+>>    */
+>>
+>> +#include <linux/etherdevice.h>
+>>   #include <linux/if_arp.h>
+>>   #include <linux/mhi.h>
+>>   #include <linux/mod_devicetable.h>
+>> @@ -42,6 +43,7 @@ struct mhi_net_dev {
+>>
+>>   struct mhi_device_info {
+>>          const char *netname;
+>> +       bool ethernet_if;
+>>   };
+>>
+>>   static int mhi_ndo_open(struct net_device *ndev)
+>> @@ -119,11 +121,29 @@ static void mhi_ndo_get_stats64(struct net_device *ndev,
+>>          } while (u64_stats_fetch_retry(&mhi_netdev->stats.tx_syncp, start));
+>>   }
+>>
+>> +static int mhi_mac_address(struct net_device *dev, void *p)
+>> +{
+>> +       if (dev->type == ARPHRD_ETHER)
+>> +               return eth_mac_addr(dev, p);
+>> +
+>> +       return 0;
+> 
+> return -EOPNOTSUPP ?
 
-To resolve this, let's use lock_sock_try() for TCP sendmsg() and
-shutdown().
+Sure , will make changes
+> 
+>> +}
+>> +
+>> +static int mhi_validate_address(struct net_device *dev)
+>> +{
+>> +       if (dev->type == ARPHRD_ETHER)
+>> +               return eth_validate_addr(dev);
+>> +
+>> +       return 0;
+>> +}
+>> +
+>>   static const struct net_device_ops mhi_netdev_ops = {
+>>          .ndo_open               = mhi_ndo_open,
+>>          .ndo_stop               = mhi_ndo_stop,
+>>          .ndo_start_xmit         = mhi_ndo_xmit,
+>>          .ndo_get_stats64        = mhi_ndo_get_stats64,
+>> +       .ndo_set_mac_address    = mhi_mac_address,
+>> +       .ndo_validate_addr      = mhi_validate_address,
+>>   };
+>>
+>>   static void mhi_net_setup(struct net_device *ndev)
+>> @@ -140,6 +160,13 @@ static void mhi_net_setup(struct net_device *ndev)
+>>          ndev->tx_queue_len = 1000;
+>>   }
+>>
+>> +static void mhi_ethernet_setup(struct net_device *ndev)
+>> +{
+>> +       ndev->netdev_ops = &mhi_netdev_ops;
+>> +       ether_setup(ndev);
+>> +       ndev->max_mtu = ETH_MAX_MTU;
+>> +}
+>> +
+>>   static struct sk_buff *mhi_net_skb_agg(struct mhi_net_dev *mhi_netdev,
+>>                                         struct sk_buff *skb)
+>>   {
+>> @@ -208,17 +235,20 @@ static void mhi_net_dl_callback(struct mhi_device *mhi_dev,
+>>                          skb = mhi_net_skb_agg(mhi_netdev, skb);
+>>                          mhi_netdev->skbagg_head = NULL;
+>>                  }
+>> -
+>> -               switch (skb->data[0] & 0xf0) {
+>> -               case 0x40:
+>> -                       skb->protocol = htons(ETH_P_IP);
+>> -                       break;
+>> -               case 0x60:
+>> -                       skb->protocol = htons(ETH_P_IPV6);
+>> -                       break;
+>> -               default:
+>> -                       skb->protocol = htons(ETH_P_MAP);
+>> -                       break;
+>> +               if (mhi_netdev->ndev->type == ARPHRD_ETHER) {
+>> +                       skb->protocol = eth_type_trans(skb, mhi_netdev->ndev);
+>> +               } else {
+>> +                       switch (skb->data[0] & 0xf0) {
+>> +                       case 0x40:
+>> +                               skb->protocol = htons(ETH_P_IP);
+>> +                               break;
+>> +                       case 0x60:
+>> +                               skb->protocol = htons(ETH_P_IPV6);
+>> +                               break;
+>> +                       default:
+>> +                               skb->protocol = htons(ETH_P_MAP);
+>> +                               break;
+>> +                       }
+>>                  }
+>>
+>>                  u64_stats_update_begin(&mhi_netdev->stats.rx_syncp);
+>> @@ -306,6 +336,9 @@ static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev)
+>>          struct mhi_net_dev *mhi_netdev;
+>>          int err;
+>>
+>> +       if (!!ndev->header_ops)
+> 
+> The double negation does nothing useful here, you don't need it.
 
-For sock_sendmsg(), if lock_sock_try() fails, -ERESTARTSYS is
-returned, allowing the request to be retried later (e.g., via
-was_interrupted() logic).
+OK sure , will correct it
 
-For sock_sendmsg() for NBD_CMD_DISC and kernel_sock_shutdown(),
-the operation might be skipped if the lock cannot be acquired.
-However, this is not expected to occur in practice because the
-backend TCP socket should not be touched by userspace once it is
-handed over to NBD.
+>> +               eth_hw_addr_random(ndev);
+>> +
+>>          mhi_netdev = netdev_priv(ndev);
+>>
+>>          dev_set_drvdata(&mhi_dev->dev, mhi_netdev);
+>> @@ -356,7 +389,8 @@ static int mhi_net_probe(struct mhi_device *mhi_dev,
+>>          int err;
+>>
+>>          ndev = alloc_netdev(sizeof(struct mhi_net_dev), info->netname,
+>> -                           NET_NAME_PREDICTABLE, mhi_net_setup);
+>> +                           NET_NAME_ENUM, info->ethernet_if ?
+>> +                           mhi_ethernet_setup : mhi_net_setup);
+>>          if (!ndev)
+>>                  return -ENOMEM;
+>>
+>> @@ -386,11 +420,18 @@ static const struct mhi_device_info mhi_swip0 = {
+>>          .netname = "mhi_swip%d",
+>>   };
+>>
+>> +static const struct mhi_device_info mhi_eth0 = {
+>> +       .netname = "eth%d",
+> 
+> We named other interfaces `mhi_hwipX/mhi_swipX`, would it make sense
+> to have similar naming here as well?
+> 
+Thanks for suggestion.
+Incorporated the recommendation to use eth%d for Ethernet interface naming.
+https://lore.kernel.org/all/20250725171053.03c0c44d@kernel.org/
 
-Note that sock_recvmsg() does not require this special handling
-because it is only called from the workqueue context.
-
-Also note that AF_UNIX sockets continue to use sock_sendmsg()
-and kernel_sock_shutdown() because unix_stream_sendmsg() and
-unix_shutdown() do not acquire lock_sock().
-
-[0]:
-WARNING: possible circular locking dependency detected
-syzkaller #0 Tainted: G             L
-syz.7.2282/12353 is trying to acquire lock:
-ffffffff8e9aa700 (fs_reclaim){+.+.}-{0:0}, at: might_alloc include/linux/sched/mm.h:317 [inline]
-ffffffff8e9aa700 (fs_reclaim){+.+.}-{0:0}, at: slab_pre_alloc_hook mm/slub.c:4489 [inline]
-ffffffff8e9aa700 (fs_reclaim){+.+.}-{0:0}, at: slab_alloc_node mm/slub.c:4843 [inline]
-ffffffff8e9aa700 (fs_reclaim){+.+.}-{0:0}, at: kmem_cache_alloc_node_noprof+0x53/0x6f0 mm/slub.c:4918
-
-but task is already holding lock:
-ffff88806f972a20 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
-ffff88806f972a20 (sk_lock-AF_INET6){+.+.}-{0:0}, at: tcp_close+0x1d/0x110 net/ipv4/tcp.c:3349
-
-which lock already depends on the new lock.
-
-the existing dependency chain (in reverse order) is:
-
--> #6 (sk_lock-AF_INET6){+.+.}-{0:0}:
-       lock_sock_nested+0x41/0xf0 net/core/sock.c:3780
-       lock_sock include/net/sock.h:1709 [inline]
-       inet_shutdown+0x67/0x410 net/ipv4/af_inet.c:919
-       nbd_mark_nsock_dead+0xae/0x5c0 drivers/block/nbd.c:318
-       sock_shutdown+0x16b/0x200 drivers/block/nbd.c:411
-       nbd_clear_sock drivers/block/nbd.c:1427 [inline]
-       nbd_config_put+0x1eb/0x750 drivers/block/nbd.c:1451
-       nbd_genl_connect+0xaf8/0x1a40 drivers/block/nbd.c:2248
-       genl_family_rcv_msg_doit+0x214/0x300 net/netlink/genetlink.c:1114
-       genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
-       genl_rcv_msg+0x560/0x800 net/netlink/genetlink.c:1209
-       netlink_rcv_skb+0x159/0x420 net/netlink/af_netlink.c:2550
-       genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
-       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
-       netlink_sendmsg+0x8b0/0xda0 net/netlink/af_netlink.c:1894
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0x9e1/0xb70 net/socket.c:2592
-       ___sys_sendmsg+0x190/0x1e0 net/socket.c:2646
-       __sys_sendmsg+0x170/0x220 net/socket.c:2678
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x106/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #5 (&nsock->tx_lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
-       __mutex_lock+0x1a2/0x1b90 kernel/locking/mutex.c:776
-       nbd_handle_cmd drivers/block/nbd.c:1143 [inline]
-       nbd_queue_rq+0x428/0x1080 drivers/block/nbd.c:1207
-       blk_mq_dispatch_rq_list+0x422/0x1e70 block/blk-mq.c:2148
-       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
-       blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
-       __blk_mq_sched_dispatch_requests+0xcea/0x1620 block/blk-mq-sched.c:307
-       blk_mq_sched_dispatch_requests+0xd7/0x1c0 block/blk-mq-sched.c:329
-       blk_mq_run_hw_queue+0x23c/0x670 block/blk-mq.c:2386
-       blk_mq_dispatch_list+0x51d/0x1360 block/blk-mq.c:2949
-       blk_mq_flush_plug_list block/blk-mq.c:2997 [inline]
-       blk_mq_flush_plug_list+0x130/0x600 block/blk-mq.c:2969
-       __blk_flush_plug+0x2c4/0x4b0 block/blk-core.c:1230
-       blk_finish_plug block/blk-core.c:1257 [inline]
-       __submit_bio+0x584/0x6c0 block/blk-core.c:649
-       __submit_bio_noacct_mq block/blk-core.c:722 [inline]
-       submit_bio_noacct_nocheck+0x562/0xc10 block/blk-core.c:753
-       submit_bio_noacct+0xd17/0x2010 block/blk-core.c:884
-       blk_crypto_submit_bio include/linux/blk-crypto.h:203 [inline]
-       submit_bh_wbc+0x59c/0x770 fs/buffer.c:2821
-       submit_bh fs/buffer.c:2826 [inline]
-       block_read_full_folio+0x264/0x8e0 fs/buffer.c:2444
-       filemap_read_folio+0xfc/0x3b0 mm/filemap.c:2501
-       do_read_cache_folio+0x2d7/0x6b0 mm/filemap.c:4101
-       read_mapping_folio include/linux/pagemap.h:1028 [inline]
-       read_part_sector+0xd1/0x370 block/partitions/core.c:723
-       adfspart_check_ICS+0x93/0x910 block/partitions/acorn.c:360
-       check_partition block/partitions/core.c:142 [inline]
-       blk_add_partitions block/partitions/core.c:590 [inline]
-       bdev_disk_changed+0x7f8/0xc80 block/partitions/core.c:694
-       blkdev_get_whole+0x187/0x290 block/bdev.c:764
-       bdev_open+0x2c7/0xe40 block/bdev.c:973
-       blkdev_open+0x34e/0x4f0 block/fops.c:697
-       do_dentry_open+0x6d8/0x1660 fs/open.c:949
-       vfs_open+0x82/0x3f0 fs/open.c:1081
-       do_open fs/namei.c:4671 [inline]
-       path_openat+0x208c/0x31a0 fs/namei.c:4830
-       do_file_open+0x20e/0x430 fs/namei.c:4859
-       do_sys_openat2+0x10d/0x1e0 fs/open.c:1366
-       do_sys_open fs/open.c:1372 [inline]
-       __do_sys_openat fs/open.c:1388 [inline]
-       __se_sys_openat fs/open.c:1383 [inline]
-       __x64_sys_openat+0x12d/0x210 fs/open.c:1383
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x106/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #4 (&cmd->lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
-       __mutex_lock+0x1a2/0x1b90 kernel/locking/mutex.c:776
-       nbd_queue_rq+0xba/0x1080 drivers/block/nbd.c:1199
-       blk_mq_dispatch_rq_list+0x422/0x1e70 block/blk-mq.c:2148
-       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
-       blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
-       __blk_mq_sched_dispatch_requests+0xcea/0x1620 block/blk-mq-sched.c:307
-       blk_mq_sched_dispatch_requests+0xd7/0x1c0 block/blk-mq-sched.c:329
-       blk_mq_run_hw_queue+0x23c/0x670 block/blk-mq.c:2386
-       blk_mq_dispatch_list+0x51d/0x1360 block/blk-mq.c:2949
-       blk_mq_flush_plug_list block/blk-mq.c:2997 [inline]
-       blk_mq_flush_plug_list+0x130/0x600 block/blk-mq.c:2969
-       __blk_flush_plug+0x2c4/0x4b0 block/blk-core.c:1230
-       blk_finish_plug block/blk-core.c:1257 [inline]
-       __submit_bio+0x584/0x6c0 block/blk-core.c:649
-       __submit_bio_noacct_mq block/blk-core.c:722 [inline]
-       submit_bio_noacct_nocheck+0x562/0xc10 block/blk-core.c:753
-       submit_bio_noacct+0xd17/0x2010 block/blk-core.c:884
-       blk_crypto_submit_bio include/linux/blk-crypto.h:203 [inline]
-       submit_bh_wbc+0x59c/0x770 fs/buffer.c:2821
-       submit_bh fs/buffer.c:2826 [inline]
-       block_read_full_folio+0x264/0x8e0 fs/buffer.c:2444
-       filemap_read_folio+0xfc/0x3b0 mm/filemap.c:2501
-       do_read_cache_folio+0x2d7/0x6b0 mm/filemap.c:4101
-       read_mapping_folio include/linux/pagemap.h:1028 [inline]
-       read_part_sector+0xd1/0x370 block/partitions/core.c:723
-       adfspart_check_ICS+0x93/0x910 block/partitions/acorn.c:360
-       check_partition block/partitions/core.c:142 [inline]
-       blk_add_partitions block/partitions/core.c:590 [inline]
-       bdev_disk_changed+0x7f8/0xc80 block/partitions/core.c:694
-       blkdev_get_whole+0x187/0x290 block/bdev.c:764
-       bdev_open+0x2c7/0xe40 block/bdev.c:973
-       blkdev_open+0x34e/0x4f0 block/fops.c:697
-       do_dentry_open+0x6d8/0x1660 fs/open.c:949
-       vfs_open+0x82/0x3f0 fs/open.c:1081
-       do_open fs/namei.c:4671 [inline]
-       path_openat+0x208c/0x31a0 fs/namei.c:4830
-       do_file_open+0x20e/0x430 fs/namei.c:4859
-       do_sys_openat2+0x10d/0x1e0 fs/open.c:1366
-       do_sys_open fs/open.c:1372 [inline]
-       __do_sys_openat fs/open.c:1388 [inline]
-       __se_sys_openat fs/open.c:1383 [inline]
-       __x64_sys_openat+0x12d/0x210 fs/open.c:1383
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x106/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #3 (set->srcu){.+.+}-{0:0}:
-       srcu_lock_sync include/linux/srcu.h:199 [inline]
-       __synchronize_srcu+0xa1/0x2a0 kernel/rcu/srcutree.c:1505
-       blk_mq_wait_quiesce_done block/blk-mq.c:284 [inline]
-       blk_mq_wait_quiesce_done block/blk-mq.c:281 [inline]
-       blk_mq_quiesce_queue block/blk-mq.c:304 [inline]
-       blk_mq_quiesce_queue+0x149/0x1c0 block/blk-mq.c:299
-       elevator_switch+0x17b/0x7e0 block/elevator.c:576
-       elevator_change+0x352/0x530 block/elevator.c:681
-       elevator_set_default+0x29e/0x360 block/elevator.c:754
-       blk_register_queue+0x412/0x590 block/blk-sysfs.c:946
-       __add_disk+0x73f/0xe40 block/genhd.c:528
-       add_disk_fwnode+0x118/0x5c0 block/genhd.c:597
-       add_disk include/linux/blkdev.h:785 [inline]
-       nbd_dev_add+0x77a/0xb10 drivers/block/nbd.c:1984
-       nbd_init+0x291/0x2b0 drivers/block/nbd.c:2692
-       do_one_initcall+0x11d/0x760 init/main.c:1382
-       do_initcall_level init/main.c:1444 [inline]
-       do_initcalls init/main.c:1460 [inline]
-       do_basic_setup init/main.c:1479 [inline]
-       kernel_init_freeable+0x6e5/0x7a0 init/main.c:1692
-       kernel_init+0x1f/0x1e0 init/main.c:1582
-       ret_from_fork+0x754/0xd80 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #2 (&q->elevator_lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
-       __mutex_lock+0x1a2/0x1b90 kernel/locking/mutex.c:776
-       elevator_change+0x1bc/0x530 block/elevator.c:679
-       elevator_set_none+0x92/0xf0 block/elevator.c:769
-       blk_mq_elv_switch_none block/blk-mq.c:5110 [inline]
-       __blk_mq_update_nr_hw_queues block/blk-mq.c:5155 [inline]
-       blk_mq_update_nr_hw_queues+0x4c1/0x15f0 block/blk-mq.c:5220
-       nbd_start_device+0x1a6/0xbd0 drivers/block/nbd.c:1489
-       nbd_genl_connect+0xff2/0x1a40 drivers/block/nbd.c:2239
-       genl_family_rcv_msg_doit+0x214/0x300 net/netlink/genetlink.c:1114
-       genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
-       genl_rcv_msg+0x560/0x800 net/netlink/genetlink.c:1209
-       netlink_rcv_skb+0x159/0x420 net/netlink/af_netlink.c:2550
-       genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
-       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
-       netlink_sendmsg+0x8b0/0xda0 net/netlink/af_netlink.c:1894
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0x9e1/0xb70 net/socket.c:2592
-       ___sys_sendmsg+0x190/0x1e0 net/socket.c:2646
-       __sys_sendmsg+0x170/0x220 net/socket.c:2678
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x106/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (&q->q_usage_counter(io)#49){++++}-{0:0}:
-       blk_alloc_queue+0x610/0x790 block/blk-core.c:461
-       blk_mq_alloc_queue+0x174/0x290 block/blk-mq.c:4429
-       __blk_mq_alloc_disk+0x29/0x120 block/blk-mq.c:4476
-       nbd_dev_add+0x492/0xb10 drivers/block/nbd.c:1954
-       nbd_init+0x291/0x2b0 drivers/block/nbd.c:2692
-       do_one_initcall+0x11d/0x760 init/main.c:1382
-       do_initcall_level init/main.c:1444 [inline]
-       do_initcalls init/main.c:1460 [inline]
-       do_basic_setup init/main.c:1479 [inline]
-       kernel_init_freeable+0x6e5/0x7a0 init/main.c:1692
-       kernel_init+0x1f/0x1e0 init/main.c:1582
-       ret_from_fork+0x754/0xd80 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #0 (fs_reclaim){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3165 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
-       validate_chain kernel/locking/lockdep.c:3908 [inline]
-       __lock_acquire+0x14b8/0x2630 kernel/locking/lockdep.c:5237
-       lock_acquire kernel/locking/lockdep.c:5868 [inline]
-       lock_acquire+0x1cf/0x380 kernel/locking/lockdep.c:5825
-       __fs_reclaim_acquire mm/page_alloc.c:4348 [inline]
-       fs_reclaim_acquire+0xc4/0x100 mm/page_alloc.c:4362
-       might_alloc include/linux/sched/mm.h:317 [inline]
-       slab_pre_alloc_hook mm/slub.c:4489 [inline]
-       slab_alloc_node mm/slub.c:4843 [inline]
-       kmem_cache_alloc_node_noprof+0x53/0x6f0 mm/slub.c:4918
-       __alloc_skb+0x140/0x710 net/core/skbuff.c:702
-       alloc_skb include/linux/skbuff.h:1383 [inline]
-       tcp_send_active_reset+0x8b/0xa60 net/ipv4/tcp_output.c:3862
-       __tcp_close+0x41e/0x1110 net/ipv4/tcp.c:3223
-       tcp_close+0x28/0x110 net/ipv4/tcp.c:3350
-       inet_release+0xed/0x200 net/ipv4/af_inet.c:443
-       inet6_release+0x4f/0x70 net/ipv6/af_inet6.c:479
-       __sock_release+0xb3/0x260 net/socket.c:662
-       sock_close+0x1c/0x30 net/socket.c:1455
-       __fput+0x3ff/0xb40 fs/file_table.c:469
-       task_work_run+0x150/0x240 kernel/task_work.c:233
-       resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-       __exit_to_user_mode_loop kernel/entry/common.c:67 [inline]
-       exit_to_user_mode_loop+0x100/0x4a0 kernel/entry/common.c:98
-       __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
-       syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
-       syscall_exit_to_user_mode include/linux/entry-common.h:325 [inline]
-       do_syscall_64+0x67c/0xf80 arch/x86/entry/syscall_64.c:100
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  fs_reclaim --> &nsock->tx_lock --> sk_lock-AF_INET6
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(sk_lock-AF_INET6);
-                               lock(&nsock->tx_lock);
-                               lock(sk_lock-AF_INET6);
-  lock(fs_reclaim);
-
- *** DEADLOCK ***
-
-Fixes: fd8383fd88a2 ("nbd: convert to blkmq")
-Reported-by: syzbot+7b4f368d3955d2c9950e@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/69c37e6a.a70a0220.234938.0046.GAE@google.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- drivers/block/nbd.c | 38 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 36 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 1877554d362e..d0d57f8816db 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -45,6 +45,8 @@
- #include <linux/nbd.h>
- #include <linux/nbd-netlink.h>
- #include <net/genetlink.h>
-+#include <net/tcp.h>
-+#include <net/inet_common.h>
- 
- #define CREATE_TRACE_POINTS
- #include <trace/events/nbd.h>
-@@ -302,6 +304,21 @@ static int nbd_disconnected(struct nbd_config *config)
- 		test_bit(NBD_RT_DISCONNECT_REQUESTED, &config->runtime_flags);
- }
- 
-+static void nbd_sock_shutdown(struct socket *sock)
-+{
-+	struct sock *sk = sock->sk;
-+
-+	if (sk_is_stream_unix(sk)) {
-+		kernel_sock_shutdown(sock, SHUT_RDWR);
-+		return;
-+	}
-+
-+	if (lock_sock_try(sk)) {
-+		inet_shutdown_locked(sock, SHUT_RDWR);
-+		release_sock(sk);
-+	}
-+}
-+
- static void nbd_mark_nsock_dead(struct nbd_device *nbd, struct nbd_sock *nsock,
- 				int notify)
- {
-@@ -315,7 +332,8 @@ static void nbd_mark_nsock_dead(struct nbd_device *nbd, struct nbd_sock *nsock,
- 		}
- 	}
- 	if (!nsock->dead) {
--		kernel_sock_shutdown(nsock->sock, SHUT_RDWR);
-+		nbd_sock_shutdown(nsock->sock);
-+
- 		if (atomic_dec_return(&nbd->config->live_connections) == 0) {
- 			if (test_and_clear_bit(NBD_RT_DISCONNECT_REQUESTED,
- 					       &nbd->config->runtime_flags)) {
-@@ -548,6 +566,22 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req)
- 	return BLK_EH_DONE;
- }
- 
-+static int nbd_sock_sendmsg(struct socket *sock, struct msghdr *msg)
-+{
-+	struct sock *sk = sock->sk;
-+	int err = -ERESTARTSYS;
-+
-+	if (sk_is_stream_unix(sk))
-+		return sock_sendmsg(sock, msg);
-+
-+	if (lock_sock_try(sk)) {
-+		err = tcp_sendmsg_locked(sk, msg, msg_data_left(msg));
-+		release_sock(sk);
-+	}
-+
-+	return err;
-+}
-+
- static int __sock_xmit(struct nbd_device *nbd, struct socket *sock, int send,
- 		       struct iov_iter *iter, int msg_flags, int *sent)
- {
-@@ -573,7 +607,7 @@ static int __sock_xmit(struct nbd_device *nbd, struct socket *sock, int send,
- 			msg.msg_flags = msg_flags | MSG_NOSIGNAL;
- 
- 			if (send)
--				result = sock_sendmsg(sock, &msg);
-+				result = nbd_sock_sendmsg(sock, &msg);
- 			else
- 				result = sock_recvmsg(sock, &msg, msg.msg_flags);
- 
--- 
-2.53.0.1018.g2bb0e51243-goog
+>> +       .ethernet_if = true,
+>> +};
+>> +
+>>   static const struct mhi_device_id mhi_net_id_table[] = {
+>>          /* Hardware accelerated data PATH (to modem IPA), protocol agnostic */
+>>          { .chan = "IP_HW0", .driver_data = (kernel_ulong_t)&mhi_hwip0 },
+>>          /* Software data PATH (to modem CPU) */
+>>          { .chan = "IP_SW0", .driver_data = (kernel_ulong_t)&mhi_swip0 },
+>> +       { .chan = "IP_ETH0", .driver_data = (kernel_ulong_t)&mhi_eth0 },
+>> +       { .chan = "IP_ETH1", .driver_data = (kernel_ulong_t)&mhi_eth0 },
+>>          {}
+>>   };
+>>   MODULE_DEVICE_TABLE(mhi, mhi_net_id_table);
+>>
+>> --
+>> 2.34.1
+>>
+>>
 
 
