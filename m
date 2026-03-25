@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-271375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271376-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eG1AEYRcw2m1qQQAu9opvQ
-	(envelope-from <netdev+bounces-271375-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:54:44 +0100
+	id ACfGEo1cw2m1qQQAu9opvQ
+	(envelope-from <netdev+bounces-271376-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:54:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA3D931F4C2
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:54:43 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 503EE31F4C9
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:54:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 52022304115D
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 03:50:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E58453051AAB
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 03:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179622D5932;
-	Wed, 25 Mar 2026 03:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BDAE2DC76F;
+	Wed, 25 Mar 2026 03:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BGxLgyeJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lU6KOqBM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61FA1428F4;
-	Wed, 25 Mar 2026 03:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576C21B983F;
+	Wed, 25 Mar 2026 03:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774410618; cv=none; b=KWyhXbCDO41ZiwyMep8GIPMuf+xkctK/JPvNb5CmiJPGc2PKr/fA2NGiPLImiyF4BSpu7xPYssehGLGGP5ZM0yy01qurJn8IcDu+h5GsqNSKEyunTMZbsQFYU9eefiXZDZhXm/ItLP/0qQano9W3GAo8vjiCm8KliYwZtA+AS7g=
+	t=1774410626; cv=none; b=gut1NNu4z9mgO/7wo/KanHRCdoQoCVTINMxQX5naFLtVgXfI+dHfcGkEWOPubKAyWo6lq4qZ/elxvKmi8IclHXt2UpzdTzqzEUE5/gjOrNRwC+X9UDL+j5niqrANdvyl9aascs9g9WGzleVrb7d5+ZK0qY7Y8t0mBjJedk68+J0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774410618; c=relaxed/simple;
-	bh=y9MIOuw2Ly0TzHzNpn7/wuF3fbyAN9ULuyr4UQBY41M=;
+	s=arc-20240116; t=1774410626; c=relaxed/simple;
+	bh=4jGndeVI5NjhSSlbjbmcTZ4pJvm9kcTBKIa6dC0RgPA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=puIfdvQsCsixcCSVVW6sqKg9IK1iqA2ClBQRd9+dul5iSdZc8cNQzWuYfp1cNQpDMezSby7kmeUElO1uDmsb3tyQf0Ktj26lKszxFmbDEhHKbvuYXVpKo8Zd9P5Mc0GDcgxTKqqgPsrux+pBIboohOapYdjOXaaqMAzwXBv1GDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BGxLgyeJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85065C4CEF7;
-	Wed, 25 Mar 2026 03:50:17 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=cpxASEW1pD6lzJfENCUZ7n5TkWZ38q3VuILPCqaelSuF4MzKZ1bYT9bCU6Trvb0PVAlKglL5fNZLfy+NV4vbSiQh7/DeKy7BpzObo19UtM5rwp7NdH227dMLuS/9pmYqUDCEoFjBCuGMgGyzHG/PORrOQ/P+y/CbqCSt8roWiQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lU6KOqBM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0506AC4CEF7;
+	Wed, 25 Mar 2026 03:50:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774410617;
-	bh=y9MIOuw2Ly0TzHzNpn7/wuF3fbyAN9ULuyr4UQBY41M=;
+	s=k20201202; t=1774410626;
+	bh=4jGndeVI5NjhSSlbjbmcTZ4pJvm9kcTBKIa6dC0RgPA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BGxLgyeJI1UHCLzpRcYdH0I7SoOusC9G8Gs7FBhNT5A/t/CqZ2F+f3Q+gVqVfomuy
-	 cc35IO1RuNS37M+8QCvceqLwnS8VUcrC3qVpSNQWW9Ib/sHZDAvKsyZdVk9mcpCAgi
-	 W8vJS6zLecrTsH6YldYKCb2uCpc2X7unNfC2Aqk9RzCvG4vuotlqcuMlivoPmvuf71
-	 n0+UulWuT0TGm32LoTsmFoFT29STFMA54BEBkO1i2LymXnced/N/u5XIyVNq3ix1c0
-	 /KTcsrAXYznfssln2q8VZg1HD6zx0CXgHAXAia1RXlrWxqSUuYgTRFQ6SidPzEYZz0
-	 vFD022Ovcyv/Q==
+	b=lU6KOqBM60lI8irgi6Q4V4TY4Z6//9eN86Al2yc5OTNxzjtzNM3NxgnxXyXutqD6X
+	 ozjpjXW1RhBiuNzgVkl19r7F8Hp2cOtTzfMXPoo5D47o0G3ztKXpfdhKj79dBrK+2J
+	 JsXlrdpgqIh2Kh0pEbouYT0LhpCcMw47cbGkpNYiiNzB1KN55WNXuPI3P2/SNfvljA
+	 XLipE9lHLMG8FMpXi+Y+lTv8T3/Gu4+PieXqz19XZoV3N3IKt5+V/aExmbSyahuN0K
+	 fUIQdFeN7YCzL5pRlPCZGCIc1pfa53HiBrbaOZ24rGl7lNmU+Xk/k3p0hfYn/jOgqE
+	 O4EPq/Gyeh2nA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD833808203;
-	Wed, 25 Mar 2026 03:50:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9FDB3808203;
+	Wed, 25 Mar 2026 03:50:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,73 +55,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] virtio_net: Fix UAF on dst_ops when
- IFF_XMIT_DST_RELEASE is cleared and napi_tx is false
+Subject: Re: [PATCH net-next] net: ethtool: pass genl_info to the ethnl
+ parse_request operation
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177441060504.1414050.1860151290582447060.git-patchwork-notify@kernel.org>
-Date: Wed, 25 Mar 2026 03:50:05 +0000
-References: <20260312025406.15641-1-xietangxin@yeah.net>
-In-Reply-To: <20260312025406.15641-1-xietangxin@yeah.net>
-To: xietangxin <xietangxin@yeah.net>
-Cc: mst@redhat.com, jasowang@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
- netdev@vger.kernel.org, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+ <177441061328.1414050.10772318671382842266.git-patchwork-notify@kernel.org>
+Date: Wed, 25 Mar 2026 03:50:13 +0000
+References: <20260323095833.136266-1-maxime.chevallier@bootlin.com>
+In-Reply-To: <20260323095833.136266-1-maxime.chevallier@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: andrew@lunn.ch, kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, thomas.petazzoni@bootlin.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-271375-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[yeah.net];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271376-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DA3D931F4C2
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 503EE31F4C9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 12 Mar 2026 10:54:06 +0800 you wrote:
-> A UAF issue occurs when the virtio_net driver is configured with napi_tx=N
-> and the device's IFF_XMIT_DST_RELEASE flag is cleared
-> (e.g., during the configuration of tc route filter rules).
+On Mon, 23 Mar 2026 10:58:32 +0100 you wrote:
+> The .parse_request() ethnl operation extracts the relevant attributes
+> from the netlink request to populate the private req_info.
 > 
-> When IFF_XMIT_DST_RELEASE is removed from the net_device, the network stack
-> expects the driver to hold the reference to skb->dst until the packet
-> is fully transmitted and freed. In virtio_net with napi_tx=N,
-> skbs may remain in the virtio transmit ring for an extended period.
+> By passing genl_info as a parameter to this callback, we can use
+> the GENL_REQ_ATTR_CHECK() macro to check for missing mandatory
+> parameters.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] virtio_net: Fix UAF on dst_ops when IFF_XMIT_DST_RELEASE is cleared and napi_tx is false
-    https://git.kernel.org/netdev/net/c/ba8bda9a0896
+  - [net-next] net: ethtool: pass genl_info to the ethnl parse_request operation
+    https://git.kernel.org/netdev/net-next/c/10171b938330
 
 You are awesome, thank you!
 -- 
