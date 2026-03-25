@@ -1,56 +1,74 @@
-Return-Path: <netdev+bounces-271584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271585-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gPDCNbb0w2lZvAQAu9opvQ
-	(envelope-from <netdev+bounces-271584-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:44:06 +0100
+	id aJzAHPjzw2lZvAQAu9opvQ
+	(envelope-from <netdev+bounces-271585-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:40:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3D11326F94
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:44:05 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14DDE326E93
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:40:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0B8763035C72
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 14:28:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 49E59308668C
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 14:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAAB03E0C6F;
-	Wed, 25 Mar 2026 14:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF263E274F;
+	Wed, 25 Mar 2026 14:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UDjn2G4M"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF8D3DD537;
-	Wed, 25 Mar 2026 14:28:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6943DD506
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 14:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774448897; cv=none; b=H6tTXoykLAszI+BWOc+K6i3dZToi7tpgDGd5yg+jQLpTg/Vrte2oi0bDuZNxKwpsEZcsJ2jJK1GYEwfabIQElda5YiRYrscA+4qWa47dmBYVlVv8XfjtpVZXnoE1Oyp0qb8fBrNC3mpwgHOrkMlTYVhUAEzqpSNDV+AZL5c9OOQ=
+	t=1774449449; cv=none; b=ir72Px1t9In139hr9Pd48q5Mai6dK9Zh+bJqgmd0h1P6Fhf1f8qHfuatvxcCxv+SeDOJA/wVJYZQzUSDBAoe935TA9zLEqBJK6GYwdXodxJfL6jN6Z79pf019WEKvJsj25yMRPIWecUGjokBBGmLDwhuSU10IMZhgza+2jNjpNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774448897; c=relaxed/simple;
-	bh=O2Gf8X5RLnOS8yFEf/UX3fzOa0YqnwPiqSnZP2zBuhM=;
+	s=arc-20240116; t=1774449449; c=relaxed/simple;
+	bh=ujhOZwbSzzOOvYmG+TOGPe3QUIrHOcld3yL6AWCpPJg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dkxgmbxPHLa6CX/O+/YNCSqrP9aa8+qj6ir2zh3RgRodFes7zviQyjaFTE2Of83lKP1nEjCn6Y5eu5qCcdCuk+yt/KAGy10UEgGa9pV5zGSR2XY+s44X+15yixUYIw6dnbkY+ROX9lLMxsoDNurr7WrCHxQ4BfP7SplUj928+xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 5CE2A60CBB; Wed, 25 Mar 2026 15:28:12 +0100 (CET)
-Date: Wed, 25 Mar 2026 15:27:51 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: pablo@netfilter.org, phil@nwl.cc, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] netfilter: nf_flow_table_offload: fix heap overflow
- in flow_action_entry_next()
-Message-ID: <acPw54RoNOSgsfdE@strlen.de>
-References: <aaxe-uH2Qr6qM4E9@v4bel>
- <aax2yZtJce0d19gd@strlen.de>
- <abfhRFfZ1LOgWEsf@strlen.de>
- <abfoTBGLhav-iPQb@v4bel>
- <abfuEe_PpDCyA64B@strlen.de>
- <abgQ7GSjz2v2_QnX@v4bel>
- <abgajW6KJM5KD3bN@strlen.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RNRN5CCvXmkoKenpNPOCV7sYvuduTQWwQZmxSKaD0Gd54LVT8D/zYYWmsCRgn+wOehoa8It9oFTbQyAdXzzCaSTar1KekJ++0shZaeAMCHVpjPEd5ARfz35AfEtFjzSE3f9yiVxMqh/C/7AUGeXMEYgwfJObs29o6Cw28jPyEu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UDjn2G4M; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=YTPjRKoJrKkPqSHoXxV1KY7bysIh/k+vDLIycJCoKm0=; b=UDjn2G4MWnqTw/9saQeG4R2X4w
+	Q8wZPPKWwoYTc1cImSIed6YLreqhjOx0qDfayXXTxW9wndzSNNOwO5bGQmrnwtFfyIY5p3SryzsT1
+	6ylGJ1gEW0LTva74Vg7c4ky9NaGEqEcMsHqZ0M9NoYYc62IiNCm2c3ccxrvFfMjPot+IUdLcvSsu8
+	+kBXMkJ9DV827D3oKKYZMB8y5+9fSeRpiO3OwM6lCRj5egOvlbiwOUxVFEy5kf4hgEFzxHxxabtYW
+	eDH5MqZVhcaGsX1c4klBvmiOgAeDpZcX+lP6GvRuUtHt5sjFqj7Tm2wIx1kNOOYGtRiY+Uo+h+gQX
+	tWEkeopQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37058)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w5PMF-000000003W9-43fF;
+	Wed, 25 Mar 2026 14:37:20 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w5PMC-0000000066Z-1aVs;
+	Wed, 25 Mar 2026 14:37:16 +0000
+Date: Wed, 25 Mar 2026 14:37:16 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] ptp: ocp: fix resource freeing order
+Message-ID: <acPzHPYF8y2Vh1DT@shell.armlinux.org.uk>
+References: <20260325120510.34481-1-vadim.fedorenko@linux.dev>
+ <20260325122005.jvis4ydmogfkrxl7@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,81 +77,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <abgajW6KJM5KD3bN@strlen.de>
-X-Spamd-Result: default: False [-1.46 / 15.00];
+In-Reply-To: <20260325122005.jvis4ydmogfkrxl7@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271584-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,lunn.ch,davemloft.net,redhat.com,kernel.org,vger.kernel.org];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-271585-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.960];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,strlen.de:email,strlen.de:mid]
-X-Rspamd-Queue-Id: D3D11326F94
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:email,shell.armlinux.org.uk:mid,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: 14DDE326E93
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Florian Westphal <fw@strlen.de> wrote:
-> Hyunwoo Kim <imv4bel@gmail.com> wrote:
-> > hmm. So, based on what you said, I assume the run-time check would look 
-> > something like this?
+On Wed, Mar 25, 2026 at 02:20:05PM +0200, Vladimir Oltean wrote:
+> On Wed, Mar 25, 2026 at 12:05:10PM +0000, Vadim Fedorenko wrote:
+> > Commit a60fc3294a37 ("ptp: rework ptp_clock_unregister() to disable
+> > events") added a call to ptp_disable_all_events() which changes the
+> > configuration of pins if they support EXTTS events. In ptp_ocp_detach()
+> > pins resources are freed before ptp_clock_unregister() and it leads to
+> > use-after-free during driver removal. Fix it by changing the order of
+> > free/unregister calls.
 > > 
-> > diff --git a/net/netfilter/nf_flow_table_offload.c b/net/netfilter/nf_flow_table_offload.c
-> > index 9b677e116487..69ffefbdd5e8 100644
-> > --- a/net/netfilter/nf_flow_table_offload.c
-> > +++ b/net/netfilter/nf_flow_table_offload.c
-> > @@ -218,6 +218,9 @@ flow_action_entry_next(struct nf_flow_rule *flow_rule)
-> >  {
-> >         int i = flow_rule->rule->action.num_entries++;
+> > Fixes: a60fc3294a37 ("ptp: rework ptp_clock_unregister() to disable events")
+> > Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> > ---
+> >  drivers/ptp/ptp_ocp.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
 > > 
-> > +       if (WARN_ON_ONCE(i >= NF_FLOW_RULE_ACTION_MAX))
-> > +               return NULL;
-> > +
-> >         return &flow_rule->rule->action.entries[i];
+> > diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> > index d88ab2f86b1b..16fd4804fc6a 100644
+> > --- a/drivers/ptp/ptp_ocp.c
+> > +++ b/drivers/ptp/ptp_ocp.c
+> > @@ -4558,6 +4558,9 @@ ptp_ocp_detach(struct ptp_ocp *bp)
+> >  	ptp_ocp_detach_sysfs(bp);
+> >  	ptp_ocp_attr_group_del(bp);
+> >  	timer_delete_sync(&bp->watchdog);
+> > +	if (bp->ptp)
+> > +		ptp_clock_unregister(bp->ptp);
+> > +	kfree(bp->ptp_info.pin_config);
+> >  	ptp_ocp_unregister_ext(bp->ts0);
+> >  	ptp_ocp_unregister_ext(bp->ts1);
+> >  	ptp_ocp_unregister_ext(bp->ts2);
+> > @@ -4575,9 +4578,6 @@ ptp_ocp_detach(struct ptp_ocp *bp)
+> >  		clk_hw_unregister_fixed_rate(bp->i2c_clk);
+> >  	if (bp->n_irqs)
+> >  		pci_free_irq_vectors(bp->pdev);
+> > -	if (bp->ptp)
+> > -		ptp_clock_unregister(bp->ptp);
+> > -	kfree(bp->ptp_info.pin_config);
+> >  	device_unregister(&bp->dev);
 > >  }
-> > 
-> > However, if we add a runtime check in this way, all callers of 
-> > flow_action_entry_next() would also need to handle a NULL return value, 
-> > since none of them currently perform a null check.
-> > 
-> > Because of the potential risk, this would require modifying quite a number 
-> > of call sites carefully. What do you think about this approach?
+> >  
+> > -- 
+> > 2.47.3
+> >
 > 
-> Can't we reject this at configuration time?
-> 
-> I mean, userspace has to ask for this action sequence, no?
+> The code wasn't safe even before the patch, since user space could have
+> emitted a PTP ioctl that passed into the driver in between the
+> ptp_ocp_unregister_ext() calls and the subsequent ptp_clock_unregister()
+> call. It's just that the patch you blame made it more obvious.
 
-Guess:
+Indeed.
 
-diff --git a/net/netfilter/nf_tables_offload.c b/net/netfilter/nf_tables_offload.c
---- a/net/netfilter/nf_tables_offload.c
-+++ b/net/netfilter/nf_tables_offload.c
-@@ -105,6 +105,9 @@ struct nft_flow_rule *nft_flow_rule_create(struct net *net,
-        if (num_actions == 0)
-                return ERR_PTR(-EOPNOTSUPP);
+We've been talking about "setup, then publish interfaces, unpublish
+interfaces, tear down" for decades. I remember it coming up at the
+Ottawa Linux Symposiums in the early 2000s when the driver model was
+in its infancy. Yet, here we are in 2026, and the same problem
+persists. :(
 
-+       if (num_actions > NF_FLOW_RULE_ACTION_MAX)
-+               return ERR_PTR(-EOPNOTSUPP);
-+
-        flow = nft_flow_rule_alloc(num_actions);
-        if (!flow)
-                return ERR_PTR(-ENOMEM);
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
