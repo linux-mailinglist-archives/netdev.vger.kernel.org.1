@@ -1,216 +1,429 @@
-Return-Path: <netdev+bounces-271356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271357-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kCXxJhxYw2k2qQQAu9opvQ
-	(envelope-from <netdev+bounces-271356-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:35:56 +0100
+	id qz1OHedZw2m1qQQAu9opvQ
+	(envelope-from <netdev+bounces-271357-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:43:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C95031F2A7
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:35:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A05FB31F2E5
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:43:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C5B5A3069E53
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 03:35:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DC7703046573
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 03:43:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A4412DAFDE;
-	Wed, 25 Mar 2026 03:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B942BDC26;
+	Wed, 25 Mar 2026 03:43:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="rKWU2SJa"
+	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="afnIYKw4"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-m16.yeah.net (mail-m16.yeah.net [220.197.32.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26A229ACFD;
-	Wed, 25 Mar 2026 03:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B06238D52
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 03:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.32.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774409750; cv=none; b=riNbzkUSF8akkJsKxZriD81wO26GW06+fy+5EAXU1m8BLkHxi6Hdhyo5QkOB6j4mHrXRBimhFArWpA9pwE6phaWoMmsN3Nrai2cTocz6aaukl+k1NKakTiYldM9Nj6XnUlv1tvaeH8TaLqjPksakGJpPNLFGcQ6hiOQ3GQbrlJU=
+	t=1774410212; cv=none; b=G2eu7p0VuEMFuENqKnvX59jMUf3sAswWvO8pDBEoNxYstjenxaK+fC80T6i+Qy8ToyWP+5SLc3ZFr60b0Ql6UfxPOSyiWiFghKqyChqY2m1ixYGRUZ8MrUYMGd3nLOh6PnPkLelKVm9pAkmsXAQ00KuGrmpKaBwcrQe7uDoWxg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774409750; c=relaxed/simple;
-	bh=QVIFwR/mwZqYthNaikzkc6MBA2j9Cwj3pb0Mr2CM02o=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tRSBemYHbqKNObUAqehhFpCfRPvDLzgj1LW7iGgn2I25t5WX8V7ls3OUioGRS2Y7BqsNkujz4m5aet5KtJ/+tpt6q4j3a+QqeQP9OSV/LJkhB7u8NcyDiQ4j+r8bvKqByz3MNnemOV7AvpBVi4v+n5HdkLyNADG1BjbOaznSUEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=rKWU2SJa; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 62P3ZOr242511677, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1774409724; bh=v04juolaJ/wsId2SeR2JQN0nCdrirBXuzFwAIhDcfsI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=rKWU2SJarAyZAifs/tl9a6BOfSE12l0fHFY1y7Vg+JMw4gsj79epQfTuDccUQQsF/
-	 bqodn94BuOlmN81X55YFL1mx/bCF//31bgMp51rdAqPg+YMKlczC1xS7+C/eQomlFX
-	 ZcuO+Any+cJvYagb16juDhm5EWbz1vJ9a13LKv2r+K6xrhSaALmBKnm6sBvh+O9xqC
-	 ne57/FwZwMl4OQV1Fx1ssD14VSt9eqj8BCLiY2pq+SOs4tq653cUSvMDbxpz8I0UyX
-	 AIDG83ySsGeIgLbZnAWEIi9LRBBS2iDU84b2sG6z6yTuNtJydCXyd1fdjIvrihTMOG
-	 4UsCzEMXHVpow==
-Received: from mail.realtek.com (rtkexhmbs03.realtek.com.tw[10.21.1.53])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 62P3ZOr242511677
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Mar 2026 11:35:24 +0800
-Received: from RTKEXHMBS03.realtek.com.tw (10.21.1.53) by
- RTKEXHMBS03.realtek.com.tw (10.21.1.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Wed, 25 Mar 2026 11:35:24 +0800
-Received: from RTKEXHMBS03.realtek.com.tw ([::1]) by
- RTKEXHMBS03.realtek.com.tw ([fe80::368f:61f6:1754:de7d%9]) with mapi id
- 15.02.1748.010; Wed, 25 Mar 2026 11:35:24 +0800
-From: Chih Kai Hsu <hsu.chih.kai@realtek.com>
-To: Simon Horman <horms@kernel.org>
-CC: nic_swsd <nic_swsd@realtek.com>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "bjorn@mork.no" <bjorn@mork.no>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>
-Subject: RE: [PATCH net-next v3 1/2] r8152: add helper functions for PLA/USB
- OCP registers
-Thread-Topic: [PATCH net-next v3 1/2] r8152: add helper functions for PLA/USB
- OCP registers
-Thread-Index: AQHcup5ZqnjknxQNN0m9fKk+ygYNm7W9dkMAgAEb9QA=
-Date: Wed, 25 Mar 2026 03:35:24 +0000
-Message-ID: <9be8e74588604d9d9f5c10d33c6881e3@realtek.com>
-References: <20260323082226.2601-451-nic_swsd@realtek.com>
- <20260324180532.261099-1-horms@kernel.org>
-In-Reply-To: <20260324180532.261099-1-horms@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1774410212; c=relaxed/simple;
+	bh=JIje5Mbu3I1isNu+YZ915MyDrANjyqxm1+Mw+q0z6wM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Es38G7Lqg55IZh4jLRrXkjPWdtFSuYeQJzi/rh+NISRo9/pdA1RZvkvgOeC48ds13y3N4jsSBMXPPMk3QlZnHdqIn/BniwGRYtPjdHif7HgplPRrw4vN/wynd3BlgFkDZ2VzUeNZqd/s1gmy7kEEq/v3S/61PDmF0Ix0OU6zm6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=afnIYKw4; arc=none smtp.client-ip=220.197.32.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
+	Content-Type; bh=ngx+HEFlKh/MH6bM7RwCetWGTwsF0iECi2yLZMUL3hI=;
+	b=afnIYKw4FkfZE1RSSzXNyiozPOW6JPvj1UAWS9ZYTfMP1j0yV6QgqoqrXA9X+x
+	XFVfwCL4Ba87Kp4FglzDHcvSx6oKsVyiY96hl7KAgbu6QlC0gXrBF9sF7WxSe4/S
+	jcbi6pPhYUOxDciZfm2B4tnAO+XrLWuZ94XS4L0Ern/JU=
+Received: from [7.247.167.152] (unknown [])
+	by gzsmtp2 (Coremail) with UTF8SMTPA id Ms8vCgCXv0W1WcNpDDgWAA--.46983S2;
+	Wed, 25 Mar 2026 11:42:46 +0800 (CST)
+Message-ID: <ac86fb62-d036-47af-b8ed-9d1f4ba2a835@yeah.net>
+Date: Wed, 25 Mar 2026 11:42:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-2.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/dst: improve dst_ops refcounting with
+ per-dst bit
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+References: <20260324073750.1500328-1-edumazet@google.com>
+From: xietangxin <xietangxin@yeah.net>
+In-Reply-To: <20260324073750.1500328-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:Ms8vCgCXv0W1WcNpDDgWAA--.46983S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3uF4UXr13Ww1ftrWrJFWxXrb_yoWktF1xpF
+	4qkayakF48trnIgFWxZ3WxWrWagF48GF1UG34jkw1SyrnxW3W8Xr1UWr4UAF1YyrZ5u3y3
+	ZFZ0gFyUCFWkZrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jc4SrUUUUU=
+X-CM-SenderInfo: x0lh3tpqj0x0o61htxgoqh3/1tbiIRfOA2nDWbcK5wAA3S
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[yeah.net,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[yeah.net:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[realtek.com:+];
+	TAGGED_FROM(0.00)[bounces-271357-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-271356-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hsu.chih.kai@realtek.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[yeah.net];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[yeah.net:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,realtek.com:dkim,realtek.com:mid]
-X-Rspamd-Queue-Id: 1C95031F2A7
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[yeah.net:dkim,yeah.net:email,yeah.net:mid]
+X-Rspamd-Queue-Id: A05FB31F2E5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 25/03/26 2:06 am, Simon Horman wrote:
->=20
-> This is an AI-generated review of your patch. The human sending this emai=
-l has
-> considered the AI review valid, or at least plausible.
->=20
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
-l.html
+
+
+On 3/24/2026 3:37 PM, Eric Dumazet wrote:
+> Before a netns is destroyed, we make sure that all its dst_entries
+> have been removed, or went through dst_dev_put().
+> 
+> Problem:
+> 
+> dst that went through dst_dev_put() might call dst_release() way after
+> the netns has been dismantled/freed.
+> 
+> IPv6 keeps its ip6_dst_ops embedded in struct netns_ipv6.
+> 
+> This means dst_count_dec() might be called with a dst->ops pointing
+> to freed memory.
+> 
+> Similarly dst->ops->kmem_cachep can cause UAF.
+> 
+> In this patch, I added a dst_count_dec() call from dst_dev_put(),
+> and I added an atomic bit to make sure the dst_ops refcount is released
+> at most once.
+> 
+> Then when dst_dev_put() is called, switch dst->ops to the 'template'
+> object, so that dst->ops points back to static memory.
+> 
+> We might later add more READ_ONCE(dst->ops) to avoid hypothetical load-tearing.
+> 
+> Or we could move the counters into a separate structure, so that dst->ops
+> is never changed.
+> 
+> DEBUG_NET_WARN_ON_ONCE(dst_entries_get_slow(dst) > 0) is added to
+> dst_entries_destroy() to warn if a dst_ops is destroyed while still
+> having active dst_entry references.
+> 
+> DEBUG_NET_WARN_ON_ONCE(dst->dst_ops_refcounted) is added to dst_destroy()
+> to warn if a dst_entry is being freed but its dst_ops_refcounted bit
+> is still set, indicating a potential refcount leak.
+> 
+> Note: IFF_XMIT_DST_RELEASE was added as a performance improvement, not
+> specifically to fix this bug.
+> 
+> We can still audit drivers to make sure they call skb_dst_drop()
+> before holding an skb for arbitrary amount of time.
+> 
+> Fixes: f2fc6a54585a ("[NETNS][IPV6] route6 - move ip6_dst_ops inside the network namespace")
+> Closes: https://lore.kernel.org/netdev/20260312024902.15627-1-xietangxin@yeah.net/
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: xietangxin <xietangxin@yeah.net>
 > ---
-> r8152: add helper functions for PLA/USB OCP registers
->=20
-> This commit introduces new helper functions (ocp_dword_w0w1,
-> ocp_word_w0w1, ocp_byte_w0w1, and their _clr_bits/_set_bits variants) to
-> simplify bitwise operations on PLA/USB OCP registers throughout the
-> r8152 driver.
->=20
-> > diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c index
-> > 3b6d4252d34c..ba6dc4dbfd80 100644
-> > --- a/drivers/net/usb/r8152.c
-> > +++ b/drivers/net/usb/r8152.c
->=20
-> [ ... ]
->=20
-> > @@ -3875,35 +3873,30 @@ static void r8153c_ups_en(struct r8152 *tp,
-> > bool enable)
-> >
-> >  static void r8156_ups_en(struct r8152 *tp, bool enable)  {
-> > -     u32 ocp_data =3D ocp_read_byte(tp, MCU_TYPE_USB,
-> USB_POWER_CUT);
-> > -
-> >       if (enable) {
-> >               r8156_ups_flags(tp);
-> >
-> > -             ocp_data |=3D UPS_EN | USP_PREWAKE | PHASE2_EN;
-> > -             ocp_write_byte(tp, MCU_TYPE_USB, USB_POWER_CUT,
-> ocp_data);
-> > +             ocp_byte_set_bits(tp, MCU_TYPE_USB, USB_POWER_CUT,
-> > +                               UPS_EN | USP_PREWAKE |
-> PHASE2_EN);
-> >
-> > -             ocp_data =3D ocp_read_byte(tp, MCU_TYPE_USB,
-> USB_MISC_2);
-> > -             ocp_data |=3D UPS_FORCE_PWR_DOWN;
-> > -             ocp_write_byte(tp, MCU_TYPE_USB, USB_MISC_2,
-> ocp_data);
-> > +             ocp_byte_set_bits(tp, MCU_TYPE_USB, USB_MISC_2,
-> > +                               UPS_FORCE_PWR_DOWN);
-> >
-> >               switch (tp->version) {
-> >               case RTL_VER_13:
-> >               case RTL_VER_15:
-> > -                     ocp_data =3D ocp_read_word(tp, MCU_TYPE_USB,
-> USB_UPHY_XTAL);
-> > -                     ocp_data &=3D ~OOBS_POLLING;
-> > -                     ocp_write_byte(tp, MCU_TYPE_USB,
-> USB_UPHY_XTAL, ocp_data);
-> > +                     ocp_word_clr_bits(tp, MCU_TYPE_USB,
-> USB_UPHY_XTAL,
-> > +                                       OOBS_POLLING);
->                               ^^^^
->=20
-> Does this actually change the hardware behavior for RTL_VER_13 and
-> RTL_VER_15?
->=20
-> The old code read a 16-bit word with ocp_read_word() to get OOBS_POLLING
-> (BIT(8)), then cleared BIT(8) in the local variable, but wrote it back us=
-ing
-> ocp_write_byte(). Since ocp_write_byte() masks the data with 0xff, the wr=
-ite
-> operation would only touch the low 8 bits and never actually clear BIT(8)=
- in
-> the hardware register. This made the old code effectively a no-op for cle=
-aring
-> OOBS_POLLING.
->=20
-> The new code uses ocp_word_clr_bits() which calls ocp_word_w0w1(), and
-> that performs a proper 16-bit read-modify-write cycle with ocp_write_word=
-().
-> This means BIT(8) will now actually be cleared in the hardware.
->=20
-The OOBS_POLLING (BIT(8)) must be cleared in the USB_UPHY_XTAL register.
-The old code using ocp_write_byte() is wrong.
+>  include/net/dst.h         |  1 +
+>  include/net/dst_ops.h     |  3 +++
+>  net/bridge/br_nf_core.c   |  1 +
+>  net/core/dst.c            | 31 +++++++++++++++++++++----------
+>  net/core/pktgen.c         |  1 +
+>  net/ipv4/route.c          |  2 ++
+>  net/ipv4/xfrm4_policy.c   |  1 +
+>  net/ipv6/route.c          |  2 ++
+>  net/ipv6/xfrm6_policy.c   |  1 +
+>  net/openvswitch/actions.c |  1 +
+>  net/sched/sch_frag.c      |  1 +
+>  11 files changed, 35 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/net/dst.h b/include/net/dst.h
+> index 307073eae7f83456aa80dfa8686f839b302ca004..793f38452bf49a57bf2ed9d875efa831be360ed2 100644
+> --- a/include/net/dst.h
+> +++ b/include/net/dst.h
+> @@ -95,6 +95,7 @@ struct dst_entry {
+>  #ifdef CONFIG_64BIT
+>  	struct lwtunnel_state   *lwtstate;
+>  #endif
+> +	unsigned long		dst_ops_refcounted; /* Use one (atomic) bit */
+>  };
+>  
+>  struct dst_metrics {
+> diff --git a/include/net/dst_ops.h b/include/net/dst_ops.h
+> index 3a9001a042a5c392a79cfc59af528ef410a28668..dc4ab11c3eed022cf346e38301e2d66eee7ed44a 100644
+> --- a/include/net/dst_ops.h
+> +++ b/include/net/dst_ops.h
+> @@ -4,6 +4,7 @@
+>  #include <linux/types.h>
+>  #include <linux/percpu_counter.h>
+>  #include <linux/cache.h>
+> +#include <net/net_debug.h>
+>  
+>  struct dst_entry;
+>  struct kmem_cachep;
+> @@ -39,6 +40,7 @@ struct dst_ops {
+>  						 const void *daddr);
+>  
+>  	struct kmem_cache	*kmem_cachep;
+> +	struct dst_ops		*template;
+>  
+>  	struct percpu_counter	pcpuc_entries ____cacheline_aligned_in_smp;
+>  };
+> @@ -67,6 +69,7 @@ static inline int dst_entries_init(struct dst_ops *dst)
+>  
+>  static inline void dst_entries_destroy(struct dst_ops *dst)
+>  {
+> +	DEBUG_NET_WARN_ON_ONCE(dst_entries_get_slow(dst) > 0);
+>  	percpu_counter_destroy(&dst->pcpuc_entries);
+>  }
+>  
+> diff --git a/net/bridge/br_nf_core.c b/net/bridge/br_nf_core.c
+> index a8c67035e23c00cc689801c89fcc444f96c5650c..fc6548475ac3b626fa022eae29418588ddf16d76 100644
+> --- a/net/bridge/br_nf_core.c
+> +++ b/net/bridge/br_nf_core.c
+> @@ -56,6 +56,7 @@ static struct dst_ops fake_dst_ops = {
+>  	.cow_metrics	= fake_cow_metrics,
+>  	.neigh_lookup	= fake_neigh_lookup,
+>  	.mtu		= fake_mtu,
+> +	.template	= &fake_dst_ops,
+>  };
+>  
+>  /*
+> diff --git a/net/core/dst.c b/net/core/dst.c
+> index 092861133023c819000be59931ac365ac1651a1f..d1efd3e7c44e3885f00a687f0de4d7865d145174 100644
+> --- a/net/core/dst.c
+> +++ b/net/core/dst.c
+> @@ -72,8 +72,11 @@ void dst_init(struct dst_entry *dst, struct dst_ops *ops,
+>  	dst->__use = 0;
+>  	dst->lastuse = jiffies;
+>  	dst->flags = flags;
+> -	if (!(flags & DST_NOCOUNT))
+> +	dst->dst_ops_refcounted = 0;
+> +	if (!(flags & DST_NOCOUNT)) {
+> +		dst->dst_ops_refcounted = 1;
+>  		dst_entries_add(ops, 1);
+> +	}
+>  }
+>  EXPORT_SYMBOL(dst_init);
+>  
+> @@ -100,6 +103,7 @@ EXPORT_SYMBOL(dst_alloc);
+>  static void dst_destroy(struct dst_entry *dst)
+>  {
+>  	struct dst_entry *child = NULL;
+> +	const struct dst_ops *ops;
+>  
+>  	smp_rmb();
+>  
+> @@ -110,16 +114,18 @@ static void dst_destroy(struct dst_entry *dst)
+>  		child = xdst->child;
+>  	}
+>  #endif
+> -	if (dst->ops->destroy)
+> -		dst->ops->destroy(dst);
+> +	ops = READ_ONCE(dst->ops);
+> +	if (ops->destroy)
+> +		ops->destroy(dst);
+>  	netdev_put(dst->dev, &dst->dev_tracker);
+>  
+>  	lwtstate_put(dst->lwtstate);
+>  
+> +	DEBUG_NET_WARN_ON_ONCE(dst->dst_ops_refcounted);
+>  	if (dst->flags & DST_METADATA)
+>  		metadata_dst_free((struct metadata_dst *)dst);
+>  	else
+> -		kmem_cache_free(dst->ops->kmem_cachep, dst);
+> +		kmem_cache_free(ops->kmem_cachep, dst);
+>  
+>  	dst = child;
+>  	if (dst)
+> @@ -133,6 +139,14 @@ static void dst_destroy_rcu(struct rcu_head *head)
+>  	dst_destroy(dst);
+>  }
+>  
+> +static void dst_count_dec(struct dst_entry *dst)
+> +{
+> +	struct dst_ops *ops = READ_ONCE(dst->ops);
+> +
+> +	if (cmpxchg(&dst->dst_ops_refcounted, 1, 0) == 1)
+> +		dst_entries_add(ops, -1);
+> +}
+> +
+>  /* Operations to mark dst as DEAD and clean up the net device referenced
+>   * by dst:
+>   * 1. put the dst under blackhole interface and discard all tx/rx packets
+> @@ -146,9 +160,11 @@ void dst_dev_put(struct dst_entry *dst)
+>  {
+>  	struct net_device *dev = dst->dev;
+>  
+> +	dst_count_dec(dst);
+>  	WRITE_ONCE(dst->obsolete, DST_OBSOLETE_DEAD);
+>  	if (dst->ops->ifdown)
+>  		dst->ops->ifdown(dst, dev);
+> +	WRITE_ONCE(dst->ops, dst->ops->template);
+>  	WRITE_ONCE(dst->input, dst_discard);
+>  	WRITE_ONCE(dst->output, dst_discard_out);
+>  	rcu_assign_pointer(dst->dev_rcu, blackhole_netdev);
+> @@ -157,12 +173,6 @@ void dst_dev_put(struct dst_entry *dst)
+>  }
+>  EXPORT_SYMBOL(dst_dev_put);
+>  
+> -static void dst_count_dec(struct dst_entry *dst)
+> -{
+> -	if (!(dst->flags & DST_NOCOUNT))
+> -		dst_entries_add(dst->ops, -1);
+> -}
+> -
+>  void dst_release(struct dst_entry *dst)
+>  {
+>  	if (dst && rcuref_put(&dst->__rcuref)) {
+> @@ -276,6 +286,7 @@ static struct dst_ops dst_blackhole_ops = {
+>  	.update_pmtu	= dst_blackhole_update_pmtu,
+>  	.redirect	= dst_blackhole_redirect,
+>  	.mtu		= dst_blackhole_mtu,
+> +	.template	= &dst_blackhole_ops,
+>  };
+>  
+>  static void __metadata_dst_init(struct metadata_dst *md_dst,
+> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+> index 8e185b318288530fd2e1111feb343d25b30b4817..a21bb8a8f2752ba6d057c3b206eadcb76d1a1ea4 100644
+> --- a/net/core/pktgen.c
+> +++ b/net/core/pktgen.c
+> @@ -3894,6 +3894,7 @@ static int pktgen_add_device(struct pktgen_thread *t, const char *ifname)
+>  	 * performance under such circumstance.
+>  	 */
+>  	pkt_dev->dstops.family = AF_INET;
+> +	pkt_dev->dstops.template = &pkt_dev->dstops;
+>  	pkt_dev->xdst.u.dst.dev = pkt_dev->odev;
+>  	dst_init_metrics(&pkt_dev->xdst.u.dst, pktgen_dst_metrics, false);
+>  	pkt_dev->xdst.child = &pkt_dev->xdst.u.dst;
+> diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+> index 463236e0dc2d5f2ffefbdd8677c2baa14930ab57..31c5cc26188523427a72dd5ebdbbb33ecb8c127c 100644
+> --- a/net/ipv4/route.c
+> +++ b/net/ipv4/route.c
+> @@ -165,6 +165,7 @@ static struct dst_ops ipv4_dst_ops = {
+>  	.local_out =		__ip_local_out,
+>  	.neigh_lookup =		ipv4_neigh_lookup,
+>  	.confirm_neigh =	ipv4_confirm_neigh,
+> +	.template =		&ipv4_dst_ops,
+>  };
+>  
+>  #define ECN_OR_COST(class)	TC_PRIO_##class
+> @@ -2887,6 +2888,7 @@ static struct dst_ops ipv4_dst_blackhole_ops = {
+>  	.update_pmtu		= dst_blackhole_update_pmtu,
+>  	.redirect		= dst_blackhole_redirect,
+>  	.mtu			= dst_blackhole_mtu,
+> +	.template		= &ipv4_dst_blackhole_ops,
+>  };
+>  
+>  struct dst_entry *ipv4_blackhole_route(struct net *net, struct dst_entry *dst_orig)
+> diff --git a/net/ipv4/xfrm4_policy.c b/net/ipv4/xfrm4_policy.c
+> index 58faf1ddd2b151e4569bb6351029718dac37521b..d20849dcfc29a75809222e4a6308c42aa541e003 100644
+> --- a/net/ipv4/xfrm4_policy.c
+> +++ b/net/ipv4/xfrm4_policy.c
+> @@ -130,6 +130,7 @@ static struct dst_ops xfrm4_dst_ops_template = {
+>  	.ifdown =		xfrm_dst_ifdown,
+>  	.local_out =		__ip_local_out,
+>  	.gc_thresh =		32768,
+> +	.template = 		&xfrm4_dst_ops_template,
+>  };
+>  
+>  static const struct xfrm_policy_afinfo xfrm4_policy_afinfo = {
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> index 08cd86f49bf96383e3c37dbe1e662b42859afe90..658c0f742e458a5573dffdb905834911d72373fb 100644
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -263,6 +263,7 @@ static struct dst_ops ip6_dst_ops_template = {
+>  	.local_out		=	__ip6_local_out,
+>  	.neigh_lookup		=	ip6_dst_neigh_lookup,
+>  	.confirm_neigh		=	ip6_confirm_neigh,
+> +	.template		=	&ip6_dst_ops_template,
+>  };
+>  
+>  static struct dst_ops ip6_dst_blackhole_ops = {
+> @@ -275,6 +276,7 @@ static struct dst_ops ip6_dst_blackhole_ops = {
+>  	.update_pmtu		= dst_blackhole_update_pmtu,
+>  	.redirect		= dst_blackhole_redirect,
+>  	.mtu			= dst_blackhole_mtu,
+> +	.template		= &ip6_dst_blackhole_ops,
+>  };
+>  
+>  static const u32 ip6_template_metrics[RTAX_MAX] = {
+> diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
+> index 125ea9a5b8a082052380b7fd7ed7123f5247d7cc..caabc6de4a7f1376482c229648e26c15b9bf00c4 100644
+> --- a/net/ipv6/xfrm6_policy.c
+> +++ b/net/ipv6/xfrm6_policy.c
+> @@ -165,6 +165,7 @@ static struct dst_ops xfrm6_dst_ops_template = {
+>  	.ifdown =		xfrm6_dst_ifdown,
+>  	.local_out =		__ip6_local_out,
+>  	.gc_thresh =		32768,
+> +	.template =		&xfrm6_dst_ops_template,
+>  };
+>  
+>  static const struct xfrm_policy_afinfo xfrm6_policy_afinfo = {
+> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+> index 792ca44a461da0bb98d49bfe9f233214fb57a61e..0cf26afaa5cf9533aa946566f672627c12881d20 100644
+> --- a/net/openvswitch/actions.c
+> +++ b/net/openvswitch/actions.c
+> @@ -731,6 +731,7 @@ ovs_dst_get_mtu(const struct dst_entry *dst)
+>  static struct dst_ops ovs_dst_ops = {
+>  	.family = AF_UNSPEC,
+>  	.mtu = ovs_dst_get_mtu,
+> +	.template = &ovs_dst_ops,
+>  };
+>  
+>  /* prepare_frag() is called once per (larger-than-MTU) frame; its inverse is
+> diff --git a/net/sched/sch_frag.c b/net/sched/sch_frag.c
+> index d1d87dce7f3f72e33e3c8ec0c0eb35bdd9b5c9f1..f8e1071ca1fd229d43c9208f00e2bbbd3ab4a4a1 100644
+> --- a/net/sched/sch_frag.c
+> +++ b/net/sched/sch_frag.c
+> @@ -83,6 +83,7 @@ sch_frag_dst_get_mtu(const struct dst_entry *dst)
+>  static struct dst_ops sch_frag_dst_ops = {
+>  	.family = AF_UNSPEC,
+>  	.mtu = sch_frag_dst_get_mtu,
+> +	.template = &sch_frag_dst_ops,
+>  };
+>  
+>  static int sch_fragment(struct net *net, struct sk_buff *skb,
+Hi Eric,
 
-> While this looks like it fixes a latent bug where OOBS_POLLING was never
-> being cleared, the commit message describes this as pure refactoring to
-> simplify the code with no mention of a behavioral change.
->=20
-I will mention this fix in the v4 commit message.
+I tested your patch with my reproduction script, but the UAF still occurs
+with a warning in dst_entries_destroy() just before the crash.
 
-Thanks for your review.
+The reason is that for IPv6, dst_entries on the rt6_uncached_list are
+handled by rt6_uncached_list_flush_dev() during netns destruction,
+which bypasses dst_dev_put().
 
-Best Regards,
-Chih-Kai
+I tested add changes like dst_dev_put() inside rt6_uncached_list_flush_dev(),
+the UAF is gone and the dst_entries_destroy warning no longer appears.
+
+Best regards,
+Tangxin Xie
+
 
