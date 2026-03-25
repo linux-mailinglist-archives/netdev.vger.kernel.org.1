@@ -1,166 +1,208 @@
-Return-Path: <netdev+bounces-271732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271733-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QPTqHPpBxGlHxwQAu9opvQ
-	(envelope-from <netdev+bounces-271732-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:13:46 +0100
+	id OO3rOeVCxGlHxwQAu9opvQ
+	(envelope-from <netdev+bounces-271733-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:17:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75F7732BB17
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:13:45 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D85C32BBB6
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:17:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 993103015FE2
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:13:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id ECD2C3029B5C
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BF71371867;
-	Wed, 25 Mar 2026 20:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B32C33537D3;
+	Wed, 25 Mar 2026 20:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="B0AC0wLn"
+	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="vtBU1FTI"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+Received: from ixit.cz (ixit.cz [185.100.197.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D38636BCDB
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 20:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0826C329C71;
+	Wed, 25 Mar 2026 20:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.100.197.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774469621; cv=none; b=osgOudV14+cpkhEQaXiQqloJzuoW/df23LP0b/kGssJPWfLKvc2sKsr5ubo7HOEvqF9EQDg6PJ8u37GQ0Y5CRVHURFYS2mDBt1gHlCn2PbJOzyDz2yIiX2GbcZthwRosbPEG/lI10WQKZk76S1IBS7ge/izmClJBNabWUGXaJxo=
+	t=1774469859; cv=none; b=BvP5GdIF1K0SgrAfPAio7o0vVFlrtY4LYtjfvbBpXVPZ8KmDKgnY1CiufsmfRHCUUpYtEbHdqnXUdSW4lc7PiPdD63Ra1nLiWvOb5gCyB1+mfkUrIj3of3Dg/t3l8h05cQOa6Z3c+W6f6rc3RtGbHMdhqC5dvutcQxJkZoFFx3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774469621; c=relaxed/simple;
-	bh=7BsRlEHo9DuNRcemqGPBLT932bs5lLCqHzyJZhsZrS4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kb4e+dsGdMwtrquFUcRD83GOcxApyh7j9J9U7eyYZ2RY+pjT6jx2Yg9DyQQlmE13q1wU5HAeWMLKqIyp+gOZqXOmZLJM+wnNnbIZrcymhxFNVLnDkOW5zzwU86iwjg/gf8hY2DEvx5eRocglh/+AeAkEeL8anNIV+4emB01N3O8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=B0AC0wLn; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from killaraus.ideasonboard.com (2001-14ba-703d-e500--2a1.rev.dnainternet.fi [IPv6:2001:14ba:703d:e500::2a1])
-	by perceval.ideasonboard.com (Postfix) with UTF8SMTPSA id 06C8D1BA;
-	Wed, 25 Mar 2026 21:12:15 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1774469536;
-	bh=7BsRlEHo9DuNRcemqGPBLT932bs5lLCqHzyJZhsZrS4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B0AC0wLn3Ob992yC9suQRcS93NkYNC9Ll/NgROD2xXR6oqAMCm78nzYvCg2EIY4gF
-	 f6Jbp405eKuz1i9nTY0+PS5tHE8c/9RKIHI12Ecp49luwgITLgdzHPvck9js6zRLoy
-	 ftEim5hQ4AMyO7uN2YyLcQ2sQLCjZrn+7inbXkvg=
-Date: Wed, 25 Mar 2026 22:13:32 +0200
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: netdev@vger.kernel.org
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, imx@lists.linux.dev,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Francesco Dolcini <francesco.dolcini@toradex.com>,
-	Frank Li <Frank.Li@nxp.com>, Jakub Kicinski <kuba@kernel.org>,
-	Joy Zou <joy.zou@nxp.com>,
-	Kieran Bingham <kieran.bingham@ideasonboard.com>,
-	Marco Felsch <m.felsch@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Stefan Klug <stefan.klug@ideasonboard.com>,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 1/2] net: stmmac: provide flag to disable EEE
-Message-ID: <20260325201332.GA2670326@killaraus.ideasonboard.com>
-References: <20260323093933.1785583-1-laurent.pinchart@ideasonboard.com>
- <20260323093933.1785583-2-laurent.pinchart@ideasonboard.com>
- <acEOGMHfYsxv3GOk@shell.armlinux.org.uk>
- <20260323100801.GA1514659@killaraus.ideasonboard.com>
+	s=arc-20240116; t=1774469859; c=relaxed/simple;
+	bh=xxdiRusDCg8XggyxbKv/ax5A4cpWZxxs0MIE2E/4MHQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tgGOyRpAfGUztRtUZ0tlvFqyecFBYfBc4KLVG1oX9tEwuuaXMLo1f/PM8xkqzJUAsZGsTW4vMYvXhj7LiV3AJ2s62gWigjRMdLTMKq3aTSESYdfhfMb0vcJbxvjnAEO4v04DfkUTvE/JSjD4FM+J9NIrLQCBtYewX0rN+jv8TL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=vtBU1FTI; arc=none smtp.client-ip=185.100.197.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
+Received: from [IPV6:2a02:f000:10bd:e301::1d7] (unknown [IPv6:2a02:f000:10bd:e301::1d7])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ixit.cz (Postfix) with ESMTPSA id A55F553404AA;
+	Wed, 25 Mar 2026 21:17:32 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
+	t=1774469852;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=+bUy/E5OiYj4aWK3bmB4/FAGi3LnIZH7GVH1QKUs9JQ=;
+	b=vtBU1FTIhWz942b+WIghkHhiYRvbUTvPWpiaUxys1No8HaAdG5mdhzrtwVf+nUjmOwX+3w
+	9jU+YAqPL148s/V5X9PIOTx1neO+ADwqafCTOzPFORl8+RzsMxSbdf/pMHzgZex4Kx0HUz
+	G0c7w2PTB0QkGJQHbNfEnc6qM0B18pY=
+Message-ID: <6638c874-8472-4383-bf83-21c5b632e73e@ixit.cz>
+Date: Wed, 25 Mar 2026 21:17:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260323100801.GA1514659@killaraus.ideasonboard.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: sdm845-shift-axolotl: Enable NFC
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Konrad Dybcio <konradybcio@kernel.org>,
+ Alexander Martinz <amartinz@shift.eco>
+Cc: Petr Hodina <petr.hodina@protonmail.com>,
+ biemster <l.j.beemster@gmail.com>, netdev@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, Rob Herring <robh@kernel.org>,
+ oe-linux-nfc@lists.linux.dev, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+ linux-kernel@vger.kernel.org, phone-devel@vger.kernel.org,
+ Bjorn Andersson <andersson@kernel.org>
+References: <20260324-oneplus-nfc-v2-0-3eef052c9bc6@ixit.cz>
+ <20260324-oneplus-nfc-v2-2-3eef052c9bc6@ixit.cz>
+ <9d9ec994-c954-445d-97b2-772614d66f35@oss.qualcomm.com>
+ <041766dd-422e-40e1-9e5d-c220580871f5@ixit.cz>
+ <a0da2236-27b3-4491-862a-457a03cb4c5e@oss.qualcomm.com>
+Content-Language: en-US
+From: David Heidelberg <david@ixit.cz>
+Autocrypt: addr=david@ixit.cz; keydata=
+ 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
+In-Reply-To: <a0da2236-27b3-4491-862a-457a03cb4c5e@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ideasonboard.com,none];
-	R_DKIM_ALLOW(-0.20)[ideasonboard.com:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271732-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,lists.linux.dev,lunn.ch,davemloft.net,google.com,gmail.com,toradex.com,nxp.com,kernel.org,ideasonboard.com,pengutronix.de,redhat.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[protonmail.com,gmail.com,vger.kernel.org,kernel.org,lists.linux.dev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-271733-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[laurent.pinchart@ideasonboard.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[ideasonboard.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: 75F7732BB17
+	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ixit.cz:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 8D85C32BBB6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 23, 2026 at 12:08:02PM +0200, Laurent Pinchart wrote:
-> On Mon, Mar 23, 2026 at 09:55:36AM +0000, Russell King (Oracle) wrote:
-> > On Mon, Mar 23, 2026 at 11:39:32AM +0200, Laurent Pinchart wrote:
-> > > From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-> > > 
-> > > Some platforms have problems when EEE is enabled, and thus need a way
-> > > to disable stmmac EEE support. Add a flag before the other LPI related
-> > > flags which tells stmmac to avoid populating the phylink LPI
-> > > capabilities, which causes phylink to call phy_disable_eee() for any
-> > > PHY that is attached to the affected phylink instance.
-> > > 
-> > > iMX8MP is an example - the lpi_intr_o signal is wired to an OR gate
-> > > along with the main dwmac interrupts. Since lpi_intr_o is synchronous
-> > > to the receive clock domain, and takes four clock cycles to clear, this
-> > > leads to interrupt storms as the interrupt remains asserted for some
-> > > time after the LPI control and status register is read.
-> > > 
-> > > This problem becomes worse when the receive clock from the PHY stops
-> > > when the receive path enters LPI state - which means that lpi_intr_o
-> > > can not deassert until the clock restarts. Since the LPI state of the
-> > > receive path depends on the link partner, this is out of our control.
-> > > We could disable RX clock stop at the PHY, but that doesn't get around
-> > > the slow-to-deassert lpi_intr_o mentioned in the above paragraph.
-> > > 
-> > > Previously, iMX8MP worked around this by disabling gigabit EEE, but
-> > > this is insufficient - the problem is also visible at 100M speeds,
-> > > where the receive clock is slower.
-> > > 
-> > > There is extensive discussion and investigation in the thread linked
-> > > below, the result of which is summarised in this commit message.
-> > > 
-> > > Reported-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-> > > Closes: https://lore.kernel.org/r/20251026122905.29028-1-laurent.pinchart@ideasonboard.com
-> > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > 
-> > As you are sending this on my behalf, you need to add your s-o-b after
-> > mine:
-> 
-> Oops, I'm not sure how I missed that. Sorry.
-> 
-> Signed-off-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+On 25/03/2026 12:20, Konrad Dybcio wrote:
+> On 3/24/26 7:08 PM, David Heidelberg wrote:
+>>
+>>
+>> On 24/03/2026 14:12, Konrad Dybcio wrote:
+>>> On 3/24/26 12:20 AM, David Heidelberg via B4 Relay wrote:
+>>>> From: David Heidelberg <david@ixit.cz>
+>>>>
+>>>> Definition of the NFC.
+>>>
+>>> "meh" commit message
+>>>
+>>> [...]
+>>>
+>>>> +    nfc_enable_default: nfc-enable-default-state {
+>>>> +        pins = "gpio12", "gpio62";
+>>>> +        function = "gpio";
+>>>> +        drive-strength = <2>;
+>>>> +        bias-pull-up;
 
-Should I submit a v4, or can this series be picked for v7.1 with my SoB
-added ?
+               bias-disable;
+>>>
+>>> Are you sure about pulling up an active-high pin?
+>>
+>> I'm not sure, but downstream does it (and "works for me"). Maybe Alexander would know more details here.
+> 
+> Would changing it to bias-disable also "work for you"?
 
-> >  Any further SoBs (Signed-off-by:'s) following the author's SoB are from
-> >  people handling and transporting the patch, but were not involved in its
-> >  development. SoB chains should reflect the **real** route a patch took
-> >  as it was propagated to the maintainers and ultimately to Linus, with
-> >  the first SoB entry signalling primary authorship of a single author.
+Yeah, works for me. Should OnePlus 6 do the same?
+
+Looking at OP6 datasheet, there is no pull-up/down on 12,62,nor IRQ 63.
+
+David
+
+> 
+>>
+>> David
+>>
+>>>
+>>> FWIW TLMM subnodes are best sorted by pin index (although the file
+>>> currently doesn't really do that) as per dts coding style
+>>
+>> I assume when I group the -pins into -state it doesn't apply anymore? As I don't feel having pins relevant to one device / subsystem all over the place is extra clean.
+> 
+> Krzysztof?
+> 
+> Konrad
 
 -- 
-Regards,
+David Heidelberg
 
-Laurent Pinchart
 
