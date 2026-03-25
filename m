@@ -1,168 +1,229 @@
-Return-Path: <netdev+bounces-271628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271623-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IGqWAhYBxGmlvQQAu9opvQ
-	(envelope-from <netdev+bounces-271628-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 16:36:54 +0100
+	id uNJwDvQCxGnOvQQAu9opvQ
+	(envelope-from <netdev+bounces-271623-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 16:44:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A36132825D
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 16:36:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D63213284F5
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 16:44:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9552F3006215
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:18:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 77FCD33D57DA
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3343ED5BF;
-	Wed, 25 Mar 2026 15:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5981E39A7FE;
+	Wed, 25 Mar 2026 15:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b="A5C0Y/LV"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gneg3v9y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.amicon.ru (mail.amicon.ru [77.108.111.100])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CEB3EC2FC;
-	Wed, 25 Mar 2026 15:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.108.111.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE00020010C;
+	Wed, 25 Mar 2026 15:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774451807; cv=none; b=Ttzpu2yFsXGBk1rnnNP1OQRkJsnVtEQQMyIuaob6mksaqdE0UqgBh/sJOlSukRn7MFbgLdvgAmMi/6TjBUZZ8XDy6ob82puBXrEywGNDsFAqysfZKZwRqQMewVkg4dOFenITA7soigiSYiIU/q7MzEEaY66dWc96dYBRo5js63I=
+	t=1774451796; cv=none; b=BRocw2/GmocDGHjCEe9NjOww3xVAW2or7m4NAjOfoLjxplZx+ol9WjGEMAxUwcZFob4CUkekkKFyk5PZzwHCCW1Kc1cEBYqTy3RylINKhVB6pIngrplnjoZEVv+ochaakO+60vA1uY3oMbmOUlHofkuldhlGkk+8VuuFwwseOcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774451807; c=relaxed/simple;
-	bh=CCk76vE/xjR+yNkkzEFs2kbv/+OqHzHF8wQdMwc3Q+c=;
-	h=Content-Type:From:To:CC:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version; b=chaqpl6igRa63lGAvqJgxwLglpTU9ThM/gB+WKRuhu7RnX9aSdyaKHoAWw2Vwd6XexcdG5YVLiYQHJm1uZ4LpMzDLx+AMrOSHmNuvJCsfd3bG3v423H9PgQ0cta4KNSW/vJPMaNNXYArcxpdRhoL4vI1ACMj08Dway1+NbK8IWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru; spf=pass smtp.mailfrom=amicon.ru; dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b=A5C0Y/LV; arc=none smtp.client-ip=77.108.111.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amicon.ru
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; d=amicon.ru; s=mail; c=simple/simple;
-	t=1774451801; h=from:subject:to:date:message-id;
-	bh=CCk76vE/xjR+yNkkzEFs2kbv/+OqHzHF8wQdMwc3Q+c=;
-	b=A5C0Y/LVSQQHJPx1q2vu01IU5HhZXytE2wVXMcKZ5SboKny2Zh5XMXxtNd4VeJY+PcGWZ+/HCyw
-	LyqXCQyorG5fKzj3ZeH0SZaGqC4DLNQ1fz1FexS0ybo5G5ngCgVi2PY6IIsxtafI0BNs+8Ris+QhW
-	d4ngJs3tCGvD8KufBFpqyt/MNgaGvrRHdCzrmdxQDlcZVWDYjDoNd4QUJigt/Ddq+UqL3di1GMOGa
-	aex9kbDq6Pv5LRy9yYI7fo6h6x2IEfZzMSDoOJTmFv3TxT+NmeY9KkXjB0ZwoAOuw5J6/TiOuOYaC
-	fW1DocDPYclpEIU0273DX8lLLJiDwTZ3ftUQ==
-Received: from example.com (172.16.2.46) by mail.amicon.lan (192.168.0.59)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.27; Wed, 25 Mar
- 2026 18:16:40 +0300
-From: Agalakov Daniil <ade@amicon.ru>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-CC: Agalakov Daniil <ade@amicon.ru>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>, "Daniil
- Iskhakov" <dish@amicon.ru>, Roman Razov <rrv@amicon.ru>
-Subject: [PATCH net-next v2 2/2] e1000e: limit endianness conversion to boundary words
-Date: Wed, 25 Mar 2026 18:16:04 +0300
-Message-ID: <20260325151615.1407182-3-ade@amicon.ru>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260325151615.1407182-1-ade@amicon.ru>
-References: <a70a49a0-43f8-4908-993a-50999bf0dfa8@intel.com>
- <20260325151615.1407182-1-ade@amicon.ru>
+	s=arc-20240116; t=1774451796; c=relaxed/simple;
+	bh=VpbZhNuuSl/ns05S2kGFJP+U2qoOXBtQ2LQID/TIRtI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CvcXbzVNs7E1EUqwKThaVEewUw5ffP3WkLhl+ZJrTKYoCa4mfVTG/kahN08BXghm8k61xTaMc+eKKo0ekRv69Nj6T6lciCIMoy/pa3/hHO8/GDZ/K/Uk2eTstxFXDWmIlmIf0V0gKyGWb49lDB3p9iL/mrWRRQL4hR5mqGyuhJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gneg3v9y; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62P1HmXV2945148;
+	Wed, 25 Mar 2026 15:16:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=02sTmvQ1zAB6bEnH7R8KDUUjdfiw
+	m1jwy5u8OYUaRS8=; b=gneg3v9ykjLDh13RUpbib2s6I9us1k/FkHkgS7uMJeZ8
+	RUmp323tjLcEzXoN4Z8uyGKoHgLUcBR81qZNuKyyldGoghVWID6AiBzgMsE+5uLc
+	R9WyUuB6D5R4r5iZsmwvZtuZNNUxmgfQvCuvWZFaCzAeIKpeWkTWOsYKxq99MOWx
+	Yw224eEVbv/jihc4EyGsuRE0hTsK2hSRvVq9aYGlLpJMsGFU/Tsoorg5pb3RSXYk
+	A0lcp1fzbJ+34yvp8q/yjUnXJ/HjnD1gOc1tbgjbq/+CKOVJ6zlqY3z71x1HH1tm
+	qNSxTIUtrRt+Rw5bK7uFGtZWrMF9hCVH06m1A8tFGw==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4d1ktv08m7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Mar 2026 15:16:29 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 62PC6MbX004380;
+	Wed, 25 Mar 2026 15:16:28 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4d28c26sgh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Mar 2026 15:16:28 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 62PFGOOd41156904
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 25 Mar 2026 15:16:24 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8B3092004B;
+	Wed, 25 Mar 2026 15:16:24 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3F0EB20040;
+	Wed, 25 Mar 2026 15:16:24 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 25 Mar 2026 15:16:24 +0000 (GMT)
+From: Gerd Bayer <gbayer@linux.ibm.com>
+Subject: [PATCH v6 0/2] PCI: AtomicOps: Fix pci_enable_atomic_ops_to_root()
+Date: Wed, 25 Mar 2026 16:16:16 +0100
+Message-Id: <20260325-fix_pciatops-v6-0-10bf19d76dd1@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: mail.amicon.lan (192.168.0.59) To mail.amicon.lan
- (192.168.0.59)
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAED8w2kC/23P3WrDMAwF4Fcpvp6LLdV23Ku9xxjDP8pqWJMQd
+ 6aj5N3nlI11JpdH4nxIN5ZpTpTZcXdjM5WU0zjUoJ92LJzc8E48xZoZCFBSCs37dH2bQnKXccr
+ cUKdFRyF4gaxWppnq/s69vNZ8Svkyzl93vch1+gNJ8R8qkgtOMajOKeM10PNHGj6v++TP+zCe2
+ YoV+ANANpcUqEAUEsl6Q0CbAP4CWmD7SsEKWBsl+OB6L+0WcHgAJDbAYQXQByOcRotqC1APALS
+ AqkDvojOA6Mh1LbAsyzeQ/xyisAEAAA==
+X-Change-ID: 20251106-fix_pciatops-7e8608eccb03
+To: Bjorn Helgaas <bhelgaas@google.com>, Jay Cornwall <Jay.Cornwall@amd.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Leon Romanovsky <leon@kernel.org>,
+        Alexander Schmidt <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Gerd Bayer <gbayer@linux.ibm.com>, stable@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-ORIG-GUID: uQjG6wlYtha8bjQIqZwWRzjebZrwsQDO
+X-Authority-Analysis: v=2.4 cv=aMr9aL9m c=1 sm=1 tr=0 ts=69c3fc4d cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=vQOT1DpSoXcvsw1ccD4A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzI1MDEwNiBTYWx0ZWRfX2GpDRAcc6WTz
+ 1HSdAIaG00oASGwIuCFa6XeHxOR0NoGEHIKMQFmACACBss1N41BmzFVu63Ha//zUCjHgN2AAJW+
+ K3tFA3s0pOfj7Swva3WEFJJB70AuF+HSXhBlnEMf9Nbwiuf20Ggwjg3bwowAFt5TrrkSeD/LwyV
+ FXyC7FfxgwoG1JNG8nbzZvSqe+msGrPgxrbggPgxscqf82gMJsix/VmvjecEkp2jRpX4RxgScbn
+ IogOwZZ/+ka6J378SkulTFktb6oPiryxPOpm+dsmgsakLYmC5NPs9TjRzSS1At6/UFm7VpSB17+
+ bNOrHq6UK8CRkNtMG7dLQGqt2vb2fGON2mHVICp2M0XIblt2PAXH/XtUXLSOgAi5uCy6ud1nJkX
+ r455av+7ObpP8nAdwhLzF7n90SutxmmgOm88oXVxt6NDvJ7Tmy/q49X9Aae+ykrScIEbe6aSuoy
+ HZo88bJJ0GlPWMxv7EQ==
+X-Proofpoint-GUID: joWoaCiOBWI4xkTdCkeMdT5UmKbpaHg5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-25_04,2026-03-24_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 lowpriorityscore=0 adultscore=0 impostorscore=0 malwarescore=0
+ suspectscore=0 phishscore=0 priorityscore=1501 bulkscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603250106
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[amicon.ru,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[amicon.ru:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-271628-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-271623-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[ibm.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ade@amicon.ru,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[gbayer@linux.ibm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amicon.ru:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,amicon.ru:dkim,amicon.ru:email,amicon.ru:mid,linuxtesting.org:url]
-X-Rspamd-Queue-Id: 1A36132825D
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: D63213284F5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-[Why]
-In e1000_set_eeprom(), the eeprom_buff is allocated to hold a range of
-words. However, only the boundary words (the first and the last) are
-populated from the EEPROM if the write request is not word-aligned.
-The words in the middle of the buffer remain uninitialized because they
-are intended to be completely overwritten by the new data via memcpy().
+Hi Bjorn et al.
 
-The previous implementation had a loop that performed le16_to_cpus()
-on the entire buffer. This resulted in endianness conversion being
-performed on uninitialized memory for all interior words.
+On s390, AtomicOp Requests are enabled on a PCI function that supports
+them, despite the helper being ignorant about the root port's capability
+to supporting their completion.
 
-Fix this by converting the endianness only for the boundary words
-immediately after they are successfully read from the EEPROM.
+Patch 1: Fix the logic in pci_enable_atomic_ops_to_root()
+Patch 2: Update references to PCIe spec in that function.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+I did test that the issue is fixed with these patches. Also, I verified
+that on a Mellanox/Nvidia ConnectX-6 adapter plugged straight into the
+root port of a x86 system still gets AtomicOp Requests enabled.
 
-Co-developed-by: Iskhakov Daniil <dish@amicon.ru>
-Signed-off-by: Iskhakov Daniil <dish@amicon.ru>
-Signed-off-by: Agalakov Daniil <ade@amicon.ru>
+Due to lacking the required hardware, I did not test this with any PCIe
+switches between root port and endpoint. So test exposure to other
+environments is highly appreciated. One particularly rare setup is a
+RCiEP that might act as a AtomicOps Requestor - but was subject to a
+regression in v4 as reported by Sashiko.
+
+v5 of this series tries to make no functional changes for that class of
+devices either.
+
+Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
 ---
-v2:
- - Split from the original bugfix series and targeted at 'net-text'.
- - Removed the Fixes: tag; limiting the conversion scope is an
-   improvement to avoid unnecessary processing of uninitialized memory.
- - Improved commit description for clarity.
- - Note on e1000e: this driver already contains the necessary return
-   value checks for EEPROM reads, so only the endianness conversion
-   cleanup is included for e1000e.
+Changes in v6:
+- Incorporate Ilpo's editorial comments.
+- Correct logic in pci_is_atomicops_capable_rp() (annotated by Sashiko)
+- Link to v5: https://lore.kernel.org/r/20260323-fix_pciatops-v5-0-fada7233aea8@linux.ibm.com
 
- drivers/net/ethernet/intel/e1000e/ethtool.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Changes in v5:
+- Introduce new pcibios_connects_to_atomicops_capable_rc() so arch's can
+  declare AtomicOps support outside of PCIe config space. Defaults to
+  "true" - except s390.
+- rebase to 7.0-rc5
+- Link to v4: https://lore.kernel.org/r/20260313-fix_pciatops-v4-0-93bc70a63935@linux.ibm.com
 
-diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
-index dbed30943ef4..785d89477c43 100644
---- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-@@ -583,13 +583,21 @@ static int e1000_set_eeprom(struct net_device *netdev,
- 		/* need read/modify/write of first changed EEPROM word */
- 		/* only the second byte of the word is being modified */
- 		ret_val = e1000_read_nvm(hw, first_word, 1, &eeprom_buff[0]);
-+
-+		/* Device's eeprom is always little-endian, word addressable */
-+		le16_to_cpus(&eeprom_buff[0]);
-+
- 		ptr++;
- 	}
--	if (((eeprom->offset + eeprom->len) & 1) && (!ret_val))
-+	if (((eeprom->offset + eeprom->len) & 1) && (!ret_val)) {
- 		/* need read/modify/write of last changed EEPROM word */
- 		/* only the first byte of the word is being modified */
- 		ret_val = e1000_read_nvm(hw, last_word, 1,
- 					 &eeprom_buff[last_word - first_word]);
-+	
-+		/* Device's eeprom is always little-endian, word addressable */
-+		le16_to_cpus(&eeprom_buff[last_word - first_word]);
-+	}
- 
- 	if (ret_val)
- 		goto out;
+Changes in v4:
+- drop patch 1 - it will become the base of a new series
+- previous patch 2, now 1: reword commit message
+- add a new patch to update references to PCI spec within
+  pci_enable_atomic_ops_to_root()
+- rebase to latest master
+- Link to v3: https://lore.kernel.org/r/20260306-fix_pciatops-v3-0-99d12bcafb19@linux.ibm.com
+
+Changes in v3:
+- rebase to 7.0-rc2
+- gentle ping
+- add netdev and rdma lists for awareness
+- Link to v2: https://lore.kernel.org/r/20251216-fix_pciatops-v2-0-d013e9b7e2ee@linux.ibm.com
+
+Changes in v2:
+- rebase to 6.19-rc1
+- otherwise unchanged to v1
+- Link to v1: https://lore.kernel.org/r/20251110-fix_pciatops-v1-0-edc58a57b62e@linux.ibm.com
+
+---
+Gerd Bayer (2):
+      PCI: AtomicOps: Do not enable without support in root complex
+      PCI: AtomicOps: Update references to PCIe spec
+
+ arch/s390/pci/pci.c |  5 +++++
+ drivers/pci/pci.c   | 54 +++++++++++++++++++++++++++++++++--------------------
+ include/linux/pci.h |  1 +
+ 3 files changed, 40 insertions(+), 20 deletions(-)
+---
+base-commit: c369299895a591d96745d6492d4888259b004a9e
+change-id: 20251106-fix_pciatops-7e8608eccb03
+
+Best regards,
 -- 
-2.51.0
+Gerd Bayer <gbayer@linux.ibm.com>
 
 
