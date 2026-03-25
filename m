@@ -1,216 +1,219 @@
-Return-Path: <netdev+bounces-271756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271757-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iCdnEVFfxGkuywQAu9opvQ
-	(envelope-from <netdev+bounces-271756-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 23:18:57 +0100
+	id uHzcL8BhxGlmywQAu9opvQ
+	(envelope-from <netdev+bounces-271757-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 23:29:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CD4132CD59
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 23:18:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61F7D32CFE2
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 23:29:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 097F43082FAD
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 22:12:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC6C7303716D
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 22:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6548538E109;
-	Wed, 25 Mar 2026 22:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B60583563FB;
+	Wed, 25 Mar 2026 22:26:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="YbHAB8dk"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="YNKOJTHR"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11020075.outbound.protection.outlook.com [52.101.61.75])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E6D358376;
-	Wed, 25 Mar 2026 22:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.75
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774476703; cv=fail; b=cfdpJhnlAqRoeL0Dh3ziDJ/kfk65VsxGLTiO0GezeKYAtJr2miMArURdCVS6ilCI7nCUCwoPaofNZSlRij2Sr8KP5qWudUMDSR8jCsiPqubIXwyFAhOFX6o26It767EKPf1eo0eW9tZC/jxnH+jU5Fh+izjYya1sD/8urE/IUHE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774476703; c=relaxed/simple;
-	bh=DNRWL1haq9vNczFjccnI63e0FbYcAEJjr/IKft2ygHY=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=gHIvRAKJMM9f7SWU3idYziVgiDYJKamEoNWN9OMxaSbl/y4QwszrBxI2QxIr7EilQbxwRf8b/TMSGBZADIUDpbH6xutSckb4lWQb+hffImiQTzKCCldS78wzN7Xluar5Dq6P59PS6xa5jAde8Pxd11L4n7IPwdnPsGN9PrYd4Ec=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=YbHAB8dk; arc=fail smtp.client-ip=52.101.61.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=svKoRqxeSBPJL6ukeZc0xeaDvSIR3XUhc5nP1gvRq5ybvgdhsQuE8TGCbl/cvbcXWtVo/fM3TBo5GCBcG5Z55XRiPYJSU3OxX81tQ0dy+VaBu4Bf+wnfz3+1o++q6TUdW1ov0ZH5yrMs9e4+gFPYqQFgDo1HRohCsyYFzWsn5SiM6aSTeyJJVX895nudX/ILVWLn8ULs5QwDsgGoCjwE2Hotx/o6L7Ur3KuOn8N1biWiow1F84iIw9m5x69GofgxjKvCZWo80ebzmJEmO+92QBkYgyEpFlh09+58J5pOv3QfRdM8qnJhHlj6fYT7EZvSp5xguhIG/bOyOfYoyE7TbA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=21ru2M39FKhKemr2Qsv10q2gpQ35dKcc56w9WcQyde4=;
- b=f3BNZ5jbGyhcAJ3VO4GX/FT7RoFpsRKByMbK0gny6r7v0rHCuHnNlMJ0ftAtYDTUAeLvSqQe41ocSmmO1HFd8F8tivhafes+fGgkMLjnxbBIWcJCieR9g8CMSQjWIvTY8bNfQc+lrFmGqzP0JOJy7/GETn8VQH8ZRuT1hOceARsy2cEIBX5l8LSyL63XxQnRyZfRrtDMFXU1T235ABrK0GqnxFPazLITRpRJglM5gQxCF7DkWHs/kb90qq9g8pfKyCjz9hImpgwWJdBhsVYxWAcEE5RUb60Uog2dOo1zldIexzdl0bIi+zbNxsUNuk6RMF0DhfItuCDKruwlLSCO5w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=21ru2M39FKhKemr2Qsv10q2gpQ35dKcc56w9WcQyde4=;
- b=YbHAB8dk7OtxmUm2Ejii2chGA1SfBkxF+ZzBWtKI7ZpJnYCXBu7OBh+L/a04vRCcOUS+hi41gTs3lipfglGUVHDr8F6NHGwt8nozKiWnxPfyzGjsxeW2K/1+z3wFtuSyVu4NiEwRnOvIFKKM522TgmXZsisXHboHscsNEtnX7Eg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from BN3PR01MB9212.prod.exchangelabs.com (2603:10b6:408:2cb::8) by
- IA0PR01MB8237.prod.exchangelabs.com (2603:10b6:208:48d::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9745.20; Wed, 25 Mar 2026 22:11:36 +0000
-Received: from BN3PR01MB9212.prod.exchangelabs.com
- ([fe80::44f3:1050:dce8:1ea9]) by BN3PR01MB9212.prod.exchangelabs.com
- ([fe80::44f3:1050:dce8:1ea9%6]) with mapi id 15.20.9723.030; Wed, 25 Mar 2026
- 22:11:36 +0000
-From: Adam Young <admiyo@os.amperecomputing.com>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next v1.5] mlx5_core: fall back to dev->board_id for shd id
-Date: Wed, 25 Mar 2026 18:11:31 -0400
-Message-ID: <20260325221131.1001431-1-admiyo@os.amperecomputing.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR05CA0079.namprd05.prod.outlook.com
- (2603:10b6:a03:e0::20) To BN3PR01MB9212.prod.exchangelabs.com
- (2603:10b6:408:2cb::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C021351C29;
+	Wed, 25 Mar 2026 22:26:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774477594; cv=none; b=LK4+qT3r402EQl6P85zLOR2M1NEX89OH0ZnD0hzwKyGqul2g2aP/vMqy1UqU+YAyL0FJkg3UGJwpaky0TOUwbh9CL5J5iYSkOV3tBLA7WDuGD3bhkQfC6aEHWAoWWLOV+Vv1x83xjlGvmbEOG45DUtA5oxkoPFLvLHOzvS65WsE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774477594; c=relaxed/simple;
+	bh=pg794jaVPX8QzPqN7UckjYCBK8loy+hFCf2qk6G8d98=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UgE8i0P8Z6S/+k5TERAZ1VpOL9q+z5D8ZqbuYbm+1nz+7uSmeYu6hSdNEyHEK3EFMVv1jOMTRnSqVUuK8Wp8ElKo8oI+AH6oCxcVRn+zehRyoMsK5J6XXOObDwx1xWsMy09+fwAy+JPPMBaDo2qVwz2/yPoBgAPnAi3xitOvyYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=YNKOJTHR; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id E3F9D600B5;
+	Wed, 25 Mar 2026 23:26:22 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1774477583;
+	bh=1xdP0sMLn1d6eA4OzBuO1xsEpVaIUqNUAmwsyF/O6i8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=YNKOJTHR5mxbGkIG7sAfweToPuwZTqqHcosoQ41iAurRqXpiOuyv30u2DO8bSuSb4
+	 s1iRCCV/q1BRyVbL3Vmj40mvGPCWkifcf7SuHAlwXoafSs0Vx1QkyywMzzr6v4eEup
+	 rcuECOSUCUfCNWIaDgpQ5dc0bP4mKB3SCAYzYghy3gnt9xyh54khyoySopwshcl138
+	 JAWY6Czi+ckpxFCc537Uo/qsVaHzxgWJsbv4hiQG3fDXBFgEKa+LLAkzbONFYIIpxo
+	 LgYme/ZByq+BvVnLWsBb4R0CGXRdth8eA9pDOuBi3TLTDcfOMVkGx7+8HAwWwekwOw
+	 BiSF04H7vuIeQ==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net,v2 00/14] Netfilter fixes for net
+Date: Wed, 25 Mar 2026 23:26:01 +0100
+Message-ID: <20260325222615.637793-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PR01MB9212:EE_|IA0PR01MB8237:EE_
-X-MS-Office365-Filtering-Correlation-Id: 38654a26-471f-4224-e8f6-08de8abb7b43
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|10070799003|55112099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	LnGKqer1Qb7+X47UVKtL7LxZffDayCyX975ET5Ngtw0ASnGsITOA797DrttbS6yVbkG2VuAuisU3QBWAgTox2DXHHeMCgIfypB65jtTwh9NGvFiXg8Nc9Re98TQ3p1eg76+V0op7vZIZqJFAfJ+JndctMuNC/WLnjCClyKAB+k0VDpddQ/Q/cHe19X5+WmVxK8hzcFaXrlCWcgrCEaFlzoGW90ueMp9Pe6Fjfv6cfRZfo7LktuacrpdOPPkI9ypZ7W2XgKuN4Ga0BoFBJ5xq9j6uKOB1p9QSWhEaRpdTpOdLg3zDN/R7oBDLDxtrXNY5e39zHgP6lTC/4yzh+k0QpIiSA8Aw3F+f2xVGsdfB+0T+9ehvvdw6PSc8e0c6II1urzrjWDDcmeeBYFE1YhyHTB5hMXbpXQu5p5fHRHXL2rQWyiAxdrPCEC0zOYPeV0npdxzlg0nygeCZzrGLALxeRM/BygUSTGhZO13JcFKLN4a+aww5e/2/usb6VDFgFrkkTnKqNdVjo+mxWqNAvBv9tyawcjAiJzVdpfBNpCkn35571YBImNyuLSM2ij/uV0hhAu5uRhbnjWkXHAzSdKbSXa3WOEBKee0N7OHYIZqg2zlYtDcjMjUBd5SVlhCRZ1qrWImEa0y+vsspUlOlXW2boele9jhibzzjz2uavo6VbaY2UwHHYzgFPE1R/S7aKavsBEJ0H85VwqjOYSW1oidvgK/fZHHtwj9OFHKaoMv2foA=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN3PR01MB9212.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(10070799003)(55112099003)(18002099003)(56012099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?iuHg9/pFoDvnkYDuYWhOi6USKXg+EnUggFOdv0DojlVsEujhBBLmh+kK3GaS?=
- =?us-ascii?Q?NLizelmzWRPuGjgift5hwBUzOKb597k409gBXbflxQb+PUC79t8FvswBbWEz?=
- =?us-ascii?Q?R0Eb2t5xdAY6JDIZuW5O2Pa9WCrQY+7yjiF65rgbUBvEds1t2z9BsEx2bTup?=
- =?us-ascii?Q?DMDiGqbux5lVqjgNg8Ma2geuZ0Jiw666Ijxi9wlrmLm1yx092Tr3k7GQnA7k?=
- =?us-ascii?Q?CkUVFC4TUlA3oNq7Y+MgpQ9BIE8iD1wApiSyHosSd4TxgJbDkB0/NiomXS5X?=
- =?us-ascii?Q?IZlHpVxJyq28qpefPZ+cbJy1h+D4cuO0fIacCMa7zxgKIi63pRJL6Iq4S0l5?=
- =?us-ascii?Q?QZLquNoBsieNZ5STnR3EhhavBp26Wg4fbJr/QdoE2JhzG7ulV4pV6xoR5zeX?=
- =?us-ascii?Q?tm7fOwrU05PBfxClF6uYWejdmwmdKcfiU6SnQkhGb5MGXBjn1Oga71zlo+8g?=
- =?us-ascii?Q?GQFnMuaxWOlZOR/KL1oxBTlqcaAKmupjhd2MWEiQMM5KsJawE524ai5+n/w0?=
- =?us-ascii?Q?nHFSAPSmIqf8W8bYmVCbetXn4uOrFooUbef8xHWckI26g0y87xjGlqWWZp7F?=
- =?us-ascii?Q?lK5/SpHANisTw7tOfgrHcp74V8/LMC1dkobS3k+ey+rdVUle0YHjnkglACYv?=
- =?us-ascii?Q?/E90CaS59Vlz8H+Cu1VHD9zun7Q3nIhcmLQ0MvNxgajP7Fpuec3qIwKUHJMc?=
- =?us-ascii?Q?VlZB/+hd6dQq+vC/9dB7mXIjHQ08LJpP2/TY71x5n1+8rGslFS99rI0r76Gk?=
- =?us-ascii?Q?Qpz6KJtaXPsirz2uy4zmVnYCbSU4cQ92CxaE84ouOs6miCaVN3+IHX8uJad/?=
- =?us-ascii?Q?A45hF1WtkMjVWjbmGZIVxGhuFZwV/pkZd+bjldGXWayKBAZzVXec/qeZZzgJ?=
- =?us-ascii?Q?ZwyF3/H5Y8esoU50fWyxk7VMj57wVE0cUILIxHRbNQQkPNHGN5mvUdXGCwPb?=
- =?us-ascii?Q?bDO0xlBT69ank6DfulumeNeGj1aBmQ/oaO1I55RCshCXARFirokTua+KVpju?=
- =?us-ascii?Q?IkiQIoUJrjJqB7fzlaNrU+9/yOd+5J/NCJCzyjEzLEBC1BgK3unH3wg0IVG6?=
- =?us-ascii?Q?v6BsXMKenupwpTnUfbougldZZds0JRoXAZA3Zw1/bzNT0S+6c2OPy+HVKMBa?=
- =?us-ascii?Q?Ev+qg5ZxRho8yamKnx5DlXQYzY43/wWFdLCNPO9Tx3AmzhI26TqABl3dcz9L?=
- =?us-ascii?Q?u8cvSUCwWxzHu5N3n7Go3vOIzpp65jM2nqwnZ9qvpSXnSWTD4hI1JgLuaS/r?=
- =?us-ascii?Q?41Ej6vOG23/HEuKE42CZl3Vbie6SbzfIQduvoK0DXfNU4WS7F80y/1sn/z7c?=
- =?us-ascii?Q?PgdTMwJsjQ8ZEAvSfEjM31qTYSJ1/s4zf+HfJe5WZOk5FD4gY9BD7h7pWkrr?=
- =?us-ascii?Q?AxkFOMpePZTQvkfg5sd73RgNUiOb9lB0t+bDxwDpq7JnL84Xw4ppbd3Ihm8r?=
- =?us-ascii?Q?ak7MD+hPZZoa0ZcXa06w1pk8zFvEtWTS5/db4RM4YXbPJP1ugNbf0py2VN7h?=
- =?us-ascii?Q?eJqbN4YFmCf1Xf25d8cLm9NthWGo20+HZEu6CogGk0M+yacqVysztNsgYpaH?=
- =?us-ascii?Q?ZJU5tWZWcWoDuPkW59GsCvMuLdqOFY9CV1/3fzlobd47RCCuyIJn4w1TqCCP?=
- =?us-ascii?Q?Der7eQbKnX1Z5DcxOFpyd5BDAoW+jO3xLtmC63LlpXeI7ttETDJ6wEpiNT+d?=
- =?us-ascii?Q?JD0a6Yca57kRbzB8Ou0EfcZ3x6p8kxyRv2bEpzYz8nfPokBctvOKdDCwUsvi?=
- =?us-ascii?Q?fVqfoAca5UwxJE8ZeaC0F0ATU630INcvcGvkTepXcRRs4R1PohQt2SalzOTQ?=
-X-MS-Exchange-AntiSpam-MessageData-1:
-	At4Lie+Xah0vycbxqBpYkYr1mPyWVSIc2XYYlzgGfu3cWquEe4t48EvH
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 38654a26-471f-4224-e8f6-08de8abb7b43
-X-MS-Exchange-CrossTenant-AuthSource: BN3PR01MB9212.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2026 22:11:36.6036
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8jfSc5udrk1lJknawbcBnBY6fuoJas0kYosgxlNxOMufqK8X+up9FbZE/S9zfOaLPJ4cBncikIR4G7wyG7zy/uXgA2JJnsmlRwCXaUTH4yUgk6A0UzaEPQOZMwstGGgY
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR01MB8237
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amperecomputing.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[os.amperecomputing.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-271756-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	DMARC_NA(0.00)[netfilter.org];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[os.amperecomputing.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[admiyo@os.amperecomputing.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271757-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amperecomputing.com:email,os.amperecomputing.com:dkim,os.amperecomputing.com:mid]
-X-Rspamd-Queue-Id: 9CD4132CD59
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netfilter.org:dkim,netfilter.org:mid]
+X-Rspamd-Queue-Id: 61F7D32CFE2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Making the devlink device shared requires an identifier
-to uniquely related the netlink device and the physical
-board.  The original code used the serial number, requested
-from the boards attributes.   However, not all members of
-the family of cards expose that attribute.  The module init
-will fail on these devices.  As a fall back, the driver can
-use the board_id, which is guaranteed to be present, and
-which is unique for every board in a deployment.
+This is v2, fixing an issue in patch 8/12, this PR is work from
+Florian, I am pickup from his previous PR. Apologies for this late PR.
+Thanks for considering this submission.
 
-Signed-off-by: Adam Young <admiyo@os.amperecomputing.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+-o-
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
-index bc33f95302df..6fa691aca81f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
-@@ -32,12 +32,14 @@ int mlx5_shd_init(struct mlx5_core_dev *dev)
- 		/* Fall-back to SN for older devices. */
- 		start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size,
- 						     PCI_VPD_RO_KEYWORD_SERIALNO, &kw_len);
--		if (start < 0)
--			return -ENOENT;
- 	}
--	sn = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
-+	if (start < 0)
-+		sn = kstrndup(dev->board_id, MLX5_BOARD_ID_LEN, GFP_KERNEL);
-+	else
-+		sn = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
- 	if (!sn)
- 		return -ENOMEM;
-+
- 	/* Firmware may return spaces at the end of the string, strip it. */
- 	end = strchrnul(sn, ' ');
- 	*end = '\0';
--- 
-2.43.0
+Hi,
+ 
+The following patchset contains Netfilter fixes for *net*.
 
+Note that most bugs fixed here stem from 2.6 days, the large PR is not
+due to an increase in regressions.
+ 
+1) Fix incorrect reject of set updates with nf_tables pipapo set
+   avx2 backend.  This comes with a regression test in patch 2.
+   From Florian Westphal.
+ 
+3) Fix a syzkaller reported data race in ipset, from Jozsef Kadlecsik.
+ 
+4) nfnetlink_log needs to zero padding to prevent infoleak to userspace,
+   from Weiming Shi.
+ 
+5) pay more attention to xtables hook masks + NFPROTO_UNSPEC.
+   UNSPEC+hook_mask is only valid for ipv4, ipv6 and bridge families.
+   This can cause a crash because arp family has different meaning for
+   hook constants. We need to reject rule adds when we have a match that
+   sets both a hook mask and proto_unspec, unless the requesting family
+   is one of ip/ip6/bridge. Also from Weiming Shi.
+ 
+6) xtables ip6t_rt module never validated that addrnr length is within the
+   allowed array boundary. Reject bogus values.  From Ren Wei.
+ 
+7) Fix high memory usage in rbtree set backend that was unwanted side-effect
+   of the recently added binary search blob. From Pablo Neira Ayuso.
+ 
+Patches 8 to 12, also from Pablo, address long-standing RCU safety bugs
+in conntracks handling of expectations: We can never safely defer
+a conntrack extension area without holding a reference. Yet expectation
+handling does so in multiple places.  Fix this by avoiding the need to
+look into the master conntrack to begin with and by extending locked
+sections in a few places.
+
+13) Fix use of uninitialized rtp_addr in the sip conntrack helper,
+    also from Weiming Shi.
+ 
+14) Add stricter netlink policy checks in ctnetlink, from David Carlier.
+    This avoids undefined behaviour when userspace provides huge wscale
+    value.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-03-25
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit c4ea7d8907cf72b259bf70bd8c2e791e1c4ff70f:
+
+  net: mana: fix use-after-free in add_adev() error path (2026-03-24 21:07:58 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-03-25
+
+for you to fetch changes up to 09ea20890536f84d121d0ab2b007dc3f808513d7:
+
+  netfilter: ctnetlink: use netlink policy range checks (2026-03-25 22:44:33 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 26-03-25
+
+----------------------------------------------------------------
+David Carlier (1):
+      netfilter: ctnetlink: use netlink policy range checks
+
+Florian Westphal (2):
+      netfilter: nft_set_pipapo_avx2: don't return non-matching entry on expiry
+      selftests: netfilter: nft_concat_range.sh: add check for flush+reload bug
+
+Jozsef Kadlecsik (1):
+      netfilter: ipset: Fix data race between add and list header in all hash types
+
+Pablo Neira Ayuso (6):
+      netfilter: nft_set_rbtree: revisit array resize logic
+      netfilter: nf_conntrack_expect: honor expectation helper field
+      netfilter: nf_conntrack_expect: use expect->helper
+      netfilter: ctnetlink: ensure safe access to master conntrack
+      netfilter: nf_conntrack_expect: store netns and zone in expectation
+      netfilter: nf_conntrack_expect: skip expectations in other netns via proc
+
+Ren Wei (1):
+      netfilter: ip6t_rt: reject oversized addrnr in rt_mt6_check()
+
+Weiming Shi (3):
+      netfilter: nfnetlink_log: fix uninitialized padding leak in NFULA_PAYLOAD
+      netfilter: x_tables: reject unsupported families in xt_check_match/xt_check_target
+      netfilter: nf_conntrack_sip: fix use of uninitialized rtp_addr in process_sdp
+
+ include/net/netfilter/nf_conntrack_core.h          |  5 ++
+ include/net/netfilter/nf_conntrack_expect.h        | 20 ++++-
+ include/uapi/linux/netfilter/nf_conntrack_common.h |  4 +
+ net/ipv6/netfilter/ip6t_rt.c                       |  4 +
+ net/netfilter/ipset/ip_set_core.c                  |  4 +-
+ net/netfilter/nf_conntrack_broadcast.c             |  2 +-
+ net/netfilter/nf_conntrack_ecache.c                |  2 +
+ net/netfilter/nf_conntrack_expect.c                | 37 +++++++--
+ net/netfilter/nf_conntrack_h323_main.c             | 12 +--
+ net/netfilter/nf_conntrack_helper.c                | 11 +--
+ net/netfilter/nf_conntrack_netlink.c               | 73 +++++++++--------
+ net/netfilter/nf_conntrack_proto_tcp.c             | 10 +--
+ net/netfilter/nf_conntrack_sip.c                   | 18 +++--
+ net/netfilter/nfnetlink_log.c                      |  8 +-
+ net/netfilter/nft_set_pipapo_avx2.c                | 20 ++---
+ net/netfilter/nft_set_rbtree.c                     | 92 ++++++++++++++++++----
+ net/netfilter/x_tables.c                           | 36 +++++++++
+ net/netfilter/xt_devgroup.c                        |  5 ++
+ .../selftests/net/netfilter/nft_concat_range.sh    | 70 +++++++++++++++-
+ 19 files changed, 330 insertions(+), 103 deletions(-)
 
