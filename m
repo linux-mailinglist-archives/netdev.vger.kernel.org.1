@@ -1,176 +1,218 @@
-Return-Path: <netdev+bounces-271469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271472-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aOmTEGGpw2nAtAQAu9opvQ
-	(envelope-from <netdev+bounces-271469-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:22:41 +0100
+	id 6DaPBoapw2nAtAQAu9opvQ
+	(envelope-from <netdev+bounces-271472-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:23:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9581932218E
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:22:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74E843221AB
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:23:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F13C6303C4C6
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 09:14:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D4543305128C
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 09:14:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52732350A1F;
-	Wed, 25 Mar 2026 09:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD21E351C05;
+	Wed, 25 Mar 2026 09:14:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="plX75fj6"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="FoU/RaA2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010022.outbound.protection.outlook.com [52.101.193.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9B8347BC1;
-	Wed, 25 Mar 2026 09:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774430043; cv=none; b=p69hyiCNsZ2JR4rRDBgvVsIfwcAer9GJQOdAj0Lfs/CwC/HDrOYj3mzObNUd5nb90kGT4lBf7FIs6aqvVXbrBCyBcpphrZbFHYSl+T3RhjUiLN5klDIStVtk/APmKto2ZKClpxaDGmMMwqD7O+2aAt5ZWwxKCHRdF3G2DnEUzCY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774430043; c=relaxed/simple;
-	bh=78pyxin5qndZKSJzDXsFFmZnhzDT7LLyrqA2VFYSpPo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=upkUNpIsg+06/j0pVK744setFYNMOqu13OtPvWqwnUVhb4PeXxSN3cAwyS4YMm5lAXPvutUpP3oF2pd/Z3v03HYQt/VSIba/ieiSYtdTo08P3qR2GZIOvXHHqBR0nqVvFBxFO0Wa/YEXxzz8p/9Qcue0xpofdhyI+6/dJlm8xwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=plX75fj6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32EFCC4CEF7;
-	Wed, 25 Mar 2026 09:14:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774430043;
-	bh=78pyxin5qndZKSJzDXsFFmZnhzDT7LLyrqA2VFYSpPo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=plX75fj6Fi/CInEUCv8w5cHIDsad+uaIJX11gWXQZPLJJfOjxOosFJurvATwdmzyf
-	 XM1fLbDydsi7l/I4rpFP1BhjUzFOQ6/hjYw54HGBxNQsrwyEtfT2GI0a4cA2FlfiHb
-	 Sov+e/lBVY+RfSyA0pCltMc0T/7xgv642U1NGI0MXjy8jQyo/dCKntQ7HYnpgUgil6
-	 50NrK30hAVvx6h94jAhu8o0u0oOb2WcEjPIS4o6//SY9KR923JbehewO+oIH9PAMhT
-	 stADXCjZPDMiqTzvvHa2LGYvmbBAg6lKE7Lk6gOOGIJPio4X+XTCnZWFF3z1ULGLKk
-	 TlxBWeUuqn+DQ==
-Date: Wed, 25 Mar 2026 11:13:57 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Long Li <longli@microsoft.com>
-Cc: Konstantin Taranov <kotaranov@microsoft.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH rdma v2] RDMA/mana_ib: Disable RX steering on RSS QP
- destroy
-Message-ID: <20260325091357.GP814676@unreal>
-References: <20260323201106.1768705-1-longli@microsoft.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1462350A1B
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 09:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.22
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774430093; cv=fail; b=jrDSbsF77+ZcXpbe4d89PILbm3muw2NjocZk1dHi+aQOs1+8vpgq/CGOdijS7PYgEBFIO2bv6QYtqea+TjMDdoUvVpcdi4a3Tnh8ipzDDZQCVxMVZ2oyhBYvt4ZlJPrYzU5lAqboFwK4lbsnMPnZVR889TU49yVb+EkmuaegoA4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774430093; c=relaxed/simple;
+	bh=lFXZACsPw4HMcVBtJ1xUmRajRq5oKKCGucz8Y6s37II=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Yv3DNcOSD+dejg+bSve0YVwRVF77KqDTBqc8nG/CYI1+ztm9fDLDn2c+roiNFzUmbSdhd6sOgSpGhUOxb9JV2aPjn04gpcTfMzHVl63sZUr/Auid4tCDXwXtLc7OznIbkuQa/8EytB3bOKwBvraAWFKHaE4ufPJXQqbSKmsb1as=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=FoU/RaA2; arc=fail smtp.client-ip=52.101.193.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kEJW1alAlMbGDxni7Za/gT75BZbM/pAvsXQcfmxcDP2jmlPKd7T3nyMUkaKRTT9e9JliTjf2PC2KMcLwszxRzFKLdaEz8MD7zRcesHIn1P5ZofnbNDPh0vDe+pnt6+IItaiCBfqcUNbMWOSzSI9OH/aKjLQxeYp6fsaWUuUvODS3VIZP8nIukbadSaewgAbuhJjbLwqc/jFUAQ6PYrDzP8toEifu4lPIdDRWcgzcDMtLkPqmJqwu5ZD0OGnbJ1rKni/Aq96eB6+1BVXtja9YiqpJKLvVMajshaR0g2TbBMlxJDQ8F80+E7h2KJlv8Xb9voKBAZP0+ihjXnoUht/Anw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zS0sDxxPWmOKH/gisJ6ypqXfC13SbKVnFfH4BFCY1ps=;
+ b=cVNxbz0dKm4IDwI40o9cy7IW8ga0rN8UG7b/vvorA3SuFQIuZbibJhFY4M5Ie2UdzPAMjnGwrv7yKyFDrjEDzQX7uykNsH3ffLxBLXzfcV+SloUHxpBIPq/TuLzrzS2UXxoreiO/ggZRjuRywPuOhNjgYswMAUQvhfT6OJ6PFlnW4VA/sD0HmkrxgpVp0fF3lkc/EouhSB1X/wiFuLcxqvf3+oWxBhBnglIlrAQkzIfOJCvb2UJZVCMTuOw0VpMCS3AQaR2ez1k3kfI+OnY36S2ERsQ1jKmjgMlsUKF44LuCXGfKHW42zqI5LHxEOU7WjoSaXFvSvvAulsEMXanjCw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.195) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zS0sDxxPWmOKH/gisJ6ypqXfC13SbKVnFfH4BFCY1ps=;
+ b=FoU/RaA29rtiQiLJ9Q6mA0dTmsz1Zd+9WVPHGPG4/C8a+pnthsxPvI71IcRMY7I6J2NfqrYa0klf2d8itqvsoNPW0ywS7gLSdVmKIgjxiETvLbSQbi5GC76gzmJLpLzkj8WlbjcrGQgdo08FtE0eBx8zNV1qyPOpUbnPt/+6fW0=
+Received: from SJ0PR03CA0156.namprd03.prod.outlook.com (2603:10b6:a03:338::11)
+ by DS7PR10MB7129.namprd10.prod.outlook.com (2603:10b6:8:e6::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9723.31; Wed, 25 Mar 2026 09:14:49 +0000
+Received: from SJ1PEPF00002326.namprd03.prod.outlook.com
+ (2603:10b6:a03:338:cafe::cd) by SJ0PR03CA0156.outlook.office365.com
+ (2603:10b6:a03:338::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.31 via Frontend Transport; Wed,
+ 25 Mar 2026 09:14:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
+Received: from lewvzet201.ext.ti.com (198.47.23.195) by
+ SJ1PEPF00002326.mail.protection.outlook.com (10.167.242.89) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9745.21 via Frontend Transport; Wed, 25 Mar 2026 09:14:49 +0000
+Received: from DLEE205.ent.ti.com (157.170.170.85) by lewvzet201.ext.ti.com
+ (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Mar
+ 2026 04:14:48 -0500
+Received: from DLEE215.ent.ti.com (157.170.170.118) by DLEE205.ent.ti.com
+ (157.170.170.85) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Mar
+ 2026 04:14:48 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE215.ent.ti.com
+ (157.170.170.118) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Wed, 25 Mar 2026 04:14:48 -0500
+Received: from [10.24.69.13] (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62P9Ej8a016525;
+	Wed, 25 Mar 2026 04:14:46 -0500
+Message-ID: <39c8e4ff-240f-4bb4-b4d6-cb8aea930c53@ti.com>
+Date: Wed, 25 Mar 2026 14:44:44 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260323201106.1768705-1-longli@microsoft.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ti: icssg-prueth: fix missing data copy and wrong
+ recycle in ZC RX dispatch
+To: David Carlier <devnexen@gmail.com>, <danishanwar@ti.com>,
+	<rogerq@kernel.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>
+References: <20260324211402.342474-1-devnexen@gmail.com>
+Content-Language: en-US
+From: Meghana Malladi <m-malladi@ti.com>
+In-Reply-To: <20260324211402.342474-1-devnexen@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002326:EE_|DS7PR10MB7129:EE_
+X-MS-Office365-Filtering-Correlation-Id: 68d889af-8d8b-4279-9e00-08de8a4ef75b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700016|82310400026|376014|1800799024|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	q/+T1//cDjU4HWbhMv3WL8J9vo+zagTmKFBPq6PVvLHnmsp/68d6b24oO8Nf6alEpBXQJnyH0tZphF8F9Iru8ocnm6ceu+Ra2U5/pLjE85i3j1zZOQJzpIZfPtbP5xl3KUoFcX2fau8kqL+HYN9yxz2R4XkmqnpfO012vWa5PZpqm6pL5d5R3yUjUhJ8zuPHWRCFa6/z6bKhxThxptT6USGovyTExPKKoiVQ+bJX3xRxQEhVF1C7baZB29ZUAaFXmXtAhgOVOtIDprG8sJT6bw8JgOAmH2z9ptNKrRcsAEdGNJ03+mGeg72MvVKzSvZgpwYyWRseuwbepi104QhZ8e2zsy//aoF5ijHXaFFDyQCypOJ8jh8wS4uSoig2d2TfWyoV/g7P4e2KLNKaq1OIdzHrug/bCwQEuRvbido0/BuogltTqO4BpA8+fq8+gzthmMjqO3SSRxvdIiJCKmHfif7axJaorUiXun727XUJ5fetbGTsLTcrS4VbvasKjKL00eBQCnHwn3NxxT1oyDXP+SZIqx1kqSgv5bPbL86wgTRnQXq3IUjNbuBKJu6Zt8h5gs2tkGUjNYumXM5dUJVTKfg+26d6Vs1v13RJjcGdXGNBu9c68UibrKZaqZff4O0c+KeWfAnxC6iYGmN8ct9tbd78gw0smQsoMcqRqC9cqYMHccH65amW+fm8qU8uVv5ABlkdvfmC/WNeK9pQ4yfym1HXAUfOXBzDYFWVdpAdY/DmPTp6kkgzjpCB9bRoEDRFDmiIVS+Nljjku6gsSjABdg==
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(376014)(1800799024)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	IihcwDvLMbJWTexF+32xELN47kC3Hd3kH/x5tHP39oAt39FfFSHFJ4NHrSMD8/RtgfapUT/cFWQuzTb1OtYxDSa7BB7ibtJgnojcKL9hiMonmcTA/h/nR8p4Ibw9LMGsnOz/Nl8b03st5T02rZkiPS301a2SGNV+joudLSxAl4BHNN6uQ9BA4qP3QOhk5Mn7b0+IJkmNR+Tw75Tsw9YDTz+Em1Pg1pFsYdiZV21PqhLR6HtAN9uu5hwWur8rjT2jkVb/3FSOoJkCneGNC4B9XrExqQyHYciWWlGNYoatxEplB5CYL9LbuySbE4NGfjlBZltq1k/QQryq3861nzvSY2TQRI3IstLSZzG5c5R/CH0WhL+zCmzezmy1/TTpNUKfB5OkUJi5zCqTI8//o6mdb3G055SUZ20XTjDyuGm/ZC5YHioaqwCznifC2qm9erwU
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2026 09:14:49.3928
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 68d889af-8d8b-4279-9e00-08de8a4ef75b
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002326.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB7129
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-271472-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ti.com:dkim,ti.com:mid];
+	FREEMAIL_TO(0.00)[gmail.com,ti.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271469-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[ti.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9581932218E
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 74E843221AB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 23, 2026 at 01:10:56PM -0700, Long Li wrote:
-> When an RSS QP is destroyed (e.g. DPDK exit), mana_ib_destroy_qp_rss()
-> destroys the RX WQ objects but does not disable vPort RX steering in
-> firmware. This leaves stale steering configuration that still points to
-> the destroyed RX objects.
+Hi David,
+
+On 3/25/26 02:44, David Carlier wrote:
+> emac_dispatch_skb_zc() allocates a new skb via napi_alloc_skb() but
+> never copies the packet data from the XDP buffer into it. The skb is
+> passed up the stack containing uninitialized heap memory instead of
+> the actual received packet, leaking kernel heap contents to userspace.
 > 
-> If traffic continues to arrive (e.g. peer VM is still transmitting) and
-> the VF interface is subsequently brought up (mana_open), the firmware
-> may deliver completions using stale CQ IDs from the old RX objects.
-> These CQ IDs can be reused by the ethernet driver for new TX CQs,
-> causing RX completions to land on TX CQs:
+> Add the missing memcpy from xdp->data into the skb data area.
 > 
->   WARNING: mana_poll_tx_cq+0x1b8/0x220 [mana]  (is_sq == false)
->   WARNING: mana_gd_process_eq_events+0x209/0x290 (cq_table lookup fails)
+> Additionally, remove the skb_mark_for_recycle() call since the skb is
+> backed by the NAPI page frag allocator, not page_pool. Marking a
+> non-page_pool skb for recycle causes the free path to return pages to
+> a page_pool that does not own them, corrupting page_pool state.
 > 
-> Fix this by disabling vPort RX steering before destroying RX WQ objects.
-> Note that mana_fence_rqs() cannot be used here because the fence
-> completion is delivered on the CQ, which is polled by user-mode (e.g.
-> DPDK) and not visible to the kernel driver.
+> The non-ZC path (emac_rx_packet) does not have these issues because it
+> uses napi_build_skb() to wrap the existing page_pool page directly,
+> requiring no copy, and correctly marks for recycle since the page comes
+> from page_pool_dev_alloc_pages().
 > 
-> Refactor the disable logic into a shared mana_disable_vport_rx() in
-> mana_en, exported for use by mana_ib, replacing the duplicate code.
-> The ethernet driver's mana_dealloc_queues() is also updated to call
-> this common function.
-> 
-> Fixes: 0266a177631d ("RDMA/mana_ib: Add a driver for Microsoft Azure Network Adapter")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Long Li <longli@microsoft.com>
+
+Thanks for the patch. I wonder how were you able to catch this bug?
+
+> Fixes: 7a64bb388df3 ("net: ti: icssg-prueth: Add AF_XDP zero copy for RX")
+> Signed-off-by: David Carlier <devnexen@gmail.com>
 > ---
-> v2:
->   - Removed redundant ibdev_err on mana_disable_vport_rx() failure as
->     mana_cfg_vport_steering() already logs all failure scenarios.
->   - Added comment clarifying this is best effort.
->  drivers/infiniband/hw/mana/qp.c               | 15 +++++++++++++++
->  drivers/net/ethernet/microsoft/mana/mana_en.c | 11 ++++++++++-
->  include/net/mana/mana.h                       |  1 +
->  3 files changed, 26 insertions(+), 1 deletion(-)
+>   drivers/net/ethernet/ti/icssg/icssg_common.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+> index fd4e7622f123..9638a03bebb4 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+> @@ -902,6 +902,7 @@ static void emac_dispatch_skb_zc(struct prueth_emac *emac, struct xdp_buff *xdp,
+>   
+>   	skb_reserve(skb, headroom);
+>   	skb_put(skb, pkt_len);
+> +	memcpy(skb->data, xdp->data, pkt_len);
 
+Why not use skb_copy_to_linear_data() ?
 
-It doesn't apply to rdma-rc.
+>   	skb->dev = ndev;
+>   
+>   	/* RX HW timestamp */
+> @@ -912,7 +913,6 @@ static void emac_dispatch_skb_zc(struct prueth_emac *emac, struct xdp_buff *xdp,
+>   		skb->offload_fwd_mark = emac->offload_fwd_mark;
+>   	skb->protocol = eth_type_trans(skb, ndev);
+>   
+> -	skb_mark_for_recycle(skb);
+>   	napi_gro_receive(&emac->napi_rx, skb);
+>   	ndev->stats.rx_bytes += pkt_len;
+>   	ndev->stats.rx_packets++;
 
-Looking up https://lore.kernel.org/all/20260323201106.1768705-1-longli@microsoft.com/
-Grabbing thread from lore.kernel.org/all/20260323201106.1768705-1-longli@microsoft.com/t.mbox.gz
-Checking for newer revisions
-Grabbing search results from lore.kernel.org
-Analyzing 3 messages in the thread
-Looking for additional code-review trailers on lore.kernel.org
-Analyzing 0 code-review messages
-Checking attestation on all messages, may take a moment...
----
-  [PATCH v2] RDMA/mana_ib: Disable RX steering on RSS QP destroy
-    + Link: https://patch.msgid.link/20260323201106.1768705-1-longli@microsoft.com
-    + Signed-off-by: Leon Romanovsky <leon@kernel.org>
-  ---
-  NOTE: install dkimpy for DKIM signature verification
----
-Total patches: 1
----
-Applying: RDMA/mana_ib: Disable RX steering on RSS QP destroy
-Patch failed at 0001 RDMA/mana_ib: Disable RX steering on RSS QP destroy
-error: patch failed: drivers/net/ethernet/microsoft/mana/mana_en.c:3339
-error: drivers/net/ethernet/microsoft/mana/mana_en.c: patch does not apply
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
-Press any key to continue...
-
-Thanks
 
