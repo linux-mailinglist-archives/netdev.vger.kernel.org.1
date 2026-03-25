@@ -1,491 +1,210 @@
-Return-Path: <netdev+bounces-271707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271708-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KKGoH6w6xGnkxQQAu9opvQ
-	(envelope-from <netdev+bounces-271707-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:42:36 +0100
+	id OKa7AaU6xGnkxQQAu9opvQ
+	(envelope-from <netdev+bounces-271708-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:42:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05AE332B63E
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:42:35 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 750BE32B626
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:42:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 517ED302DA13
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 19:39:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3DEB3304A120
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 19:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80A135F170;
-	Wed, 25 Mar 2026 19:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d4NHm0Sm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3F1358364;
+	Wed, 25 Mar 2026 19:41:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDD5358364
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 19:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D032B331A41;
+	Wed, 25 Mar 2026 19:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774467587; cv=none; b=CV+da6MsN2zLIe+4JiADPNWA+X9ZQXZ07yHF9Hf/82VIhlNzfLtdIa8vO0DmMdBTW7Q6jFCKr9psrPk1xiBgsnT+OllOjapil0RRsn+gSlhM8a6UBI6cV4AmJmqwo/4wdEMY1Ndm3XL4TJbxrMt2neLgit5rUpwcjjrHPG2Vz0c=
+	t=1774467664; cv=none; b=A28mP8M8BpKa5YyHyELlsabKuCGFwnSMff02/pjdRY9ZRxbDm8eqczsL/Wftde0DQ0xuburRTupY4gNYcpQv/Untxsy3HWhmAdnudCXtzEa2J3IuegMooM43gTkiiozZwfnub4nKmX6Qz8kJcz9kPatZH8NpjLi243mAU2vjfxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774467587; c=relaxed/simple;
-	bh=kRo6QftaW6wF7WuH5FvdWYvlDgKPLlyLq+uhPeIBWGY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mHIGsgVVS/VgwfbXvyk2J9pZBGuW18d1ryDjmXAfGvlew3V6xUHW6lmpONqdPIbONbHBEjtmD68pa3zS7XSDfR5RVOaIFjOyM6tCmlbZH57RQLcLAeq9sxovFE2rkpt6oUEI+pE/X6R6gm11rR9VDk57JRkXSUlseXGJrnVChy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d4NHm0Sm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774467585;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I8cr8yZnWN3YfRBl8zoQwupsbMQpbgMEVkKEUoL2yhY=;
-	b=d4NHm0SmpYcOb+XNWJ8w+4eLVnRR+H8cqybr7+IUBKtVYRHlGchtfa8RB/4HxgPxUNnPiM
-	Lv0EN/FUW/KOMJBqJFfUHBEDP8nyzYQms1B0fpijf13oZ9dslByrExp2ULaWfcd5B2FYKR
-	fSqMeGIkzLv45jT7sevlqS5cy4jssFk=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-102-elh-j2MwNDWUK9Fdf4XJwQ-1; Wed,
- 25 Mar 2026 15:39:41 -0400
-X-MC-Unique: elh-j2MwNDWUK9Fdf4XJwQ-1
-X-Mimecast-MFC-AGG-ID: elh-j2MwNDWUK9Fdf4XJwQ_1774467579
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C588819560A1;
-	Wed, 25 Mar 2026 19:39:38 +0000 (UTC)
-Received: from p16v.redhat.com (unknown [10.44.32.254])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A55043000223;
-	Wed, 25 Mar 2026 19:39:32 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1774467664; c=relaxed/simple;
+	bh=BqKYKxS+fD+Li5X4iSypVe7kEkWxNLBgTnD+rUHOmzI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EzpaMMZoK+DGoyV0TTeTCMam5tqJJ/8WOLeQ4wneTJG2iM7qNI+ipPIHdRKj0u7DBuUh2qFExJfH+N6Gy8VHPVGDae49O1MkCGlVY1FtSxg4qYWDSuLHW7mqA0cWe8qeHbTkrEtMuPfQlS90HPPF1+avEj2X+q0Y6BRf64+NQA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id B0ADB20B710C; Wed, 25 Mar 2026 12:41:02 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B0ADB20B710C
+From: Long Li <longli@microsoft.com>
+To: Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
 	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Petr Oros <poros@redhat.com>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 3/3] dpll: zl3073x: implement actual frequency monitoring
-Date: Wed, 25 Mar 2026 20:39:14 +0100
-Message-ID: <20260325193914.124898-4-ivecera@redhat.com>
-In-Reply-To: <20260325193914.124898-1-ivecera@redhat.com>
-References: <20260325193914.124898-1-ivecera@redhat.com>
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH rdma v3] RDMA/mana_ib: Disable RX steering on RSS QP destroy
+Date: Wed, 25 Mar 2026 12:40:57 -0700
+Message-ID: <20260325194100.1929056-1-longli@microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [3.04 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,intel.com,resnulli.us,lwn.net,linuxfoundation.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,microchip.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-271707-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-271708-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 05AE332B63E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 750BE32B626
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Extract common measurement latch logic from zl3073x_ref_ffo_update()
-into a new zl3073x_ref_freq_meas_latch() helper and add
-zl3073x_ref_freq_meas_update() that uses it to latch and read absolute
-input reference frequencies in Hz.
+When an RSS QP is destroyed (e.g. DPDK exit), mana_ib_destroy_qp_rss()
+destroys the RX WQ objects but does not disable vPort RX steering in
+firmware. This leaves stale steering configuration that still points to
+the destroyed RX objects.
 
-Add meas_freq field to struct zl3073x_ref and the corresponding
-zl3073x_ref_meas_freq_get() accessor. The measured frequencies are
-updated periodically alongside the existing FFO measurements.
+If traffic continues to arrive (e.g. peer VM is still transmitting) and
+the VF interface is subsequently brought up (mana_open), the firmware
+may deliver completions using stale CQ IDs from the old RX objects.
+These CQ IDs can be reused by the ethernet driver for new TX CQs,
+causing RX completions to land on TX CQs:
 
-Add freq_monitor boolean to struct zl3073x_dpll and implement the
-freq_monitor_set/get device callbacks to enable/disable frequency
-monitoring via the DPLL netlink interface.
+  WARNING: mana_poll_tx_cq+0x1b8/0x220 [mana]  (is_sq == false)
+  WARNING: mana_gd_process_eq_events+0x209/0x290 (cq_table lookup fails)
 
-Implement actual_freq_get pin callback for input pins that returns the
-measured input frequency in Hz.
+Fix this by disabling vPort RX steering before destroying RX WQ objects.
+Note that mana_fence_rqs() cannot be used here because the fence
+completion is delivered on the CQ, which is polled by user-mode (e.g.
+DPDK) and not visible to the kernel driver.
 
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+Refactor the disable logic into a shared mana_disable_vport_rx() in
+mana_en, exported for use by mana_ib, replacing the duplicate code.
+The ethernet driver's mana_dealloc_queues() is also updated to call
+this common function.
+
+Fixes: 0266a177631d ("RDMA/mana_ib: Add a driver for Microsoft Azure Network Adapter")
+Cc: stable@vger.kernel.org
+Signed-off-by: Long Li <longli@microsoft.com>
 ---
- drivers/dpll/zl3073x/core.c | 88 +++++++++++++++++++++++++++++++------
- drivers/dpll/zl3073x/dpll.c | 88 ++++++++++++++++++++++++++++++++++++-
- drivers/dpll/zl3073x/dpll.h |  2 +
- drivers/dpll/zl3073x/ref.h  | 14 ++++++
- 4 files changed, 178 insertions(+), 14 deletions(-)
+v3:
+- Rebased onto rdma for-rc.
 
-diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
-index 6363002d48d46..320c199637efa 100644
---- a/drivers/dpll/zl3073x/core.c
-+++ b/drivers/dpll/zl3073x/core.c
-@@ -632,22 +632,21 @@ int zl3073x_ref_phase_offsets_update(struct zl3073x_dev *zldev, int channel)
- }
+v2:
+- Removed redundant ibdev_err on mana_disable_vport_rx() failure
+  as mana_cfg_vport_steering() already logs all failure scenarios.
+- Added comment clarifying this is best effort.
+
+ drivers/infiniband/hw/mana/qp.c               | 15 +++++++++++++++
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 11 ++++++++++-
+ include/net/mana/mana.h                       |  1 +
+ 3 files changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/infiniband/hw/mana/qp.c b/drivers/infiniband/hw/mana/qp.c
+index 82f84f7ad..c8a7129bb 100644
+--- a/drivers/infiniband/hw/mana/qp.c
++++ b/drivers/infiniband/hw/mana/qp.c
+@@ -822,6 +822,21 @@ static int mana_ib_destroy_qp_rss(struct mana_ib_qp *qp,
+ 	ndev = mana_ib_get_netdev(qp->ibqp.device, qp->port);
+ 	mpc = netdev_priv(ndev);
  
- /**
-- * zl3073x_ref_ffo_update - update reference fractional frequency offsets
-+ * zl3073x_ref_freq_meas_latch - latch reference frequency measurements
-  * @zldev: pointer to zl3073x_dev structure
-+ * @type: measurement type (ZL_REF_FREQ_MEAS_CTRL_*)
-  *
-- * The function asks device to update fractional frequency offsets latch
-- * registers the latest measured values, reads and stores them into
-+ * The function waits for the previous measurement to finish, selects all
-+ * references and requests a new measurement of the given type.
-  *
-  * Return: 0 on success, <0 on error
-  */
- static int
--zl3073x_ref_ffo_update(struct zl3073x_dev *zldev)
-+zl3073x_ref_freq_meas_latch(struct zl3073x_dev *zldev, u8 type)
- {
--	int i, rc;
-+	int rc;
- 
--	/* Per datasheet we have to wait for 'ref_freq_meas_ctrl' to be zero
--	 * to ensure that the measured data are coherent.
--	 */
-+	/* Wait for previous measurement to finish */
- 	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
- 				  ZL_REF_FREQ_MEAS_CTRL);
- 	if (rc)
-@@ -663,15 +662,64 @@ zl3073x_ref_ffo_update(struct zl3073x_dev *zldev)
- 	if (rc)
- 		return rc;
- 
--	/* Request frequency offset measurement */
--	rc = zl3073x_write_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
--			      ZL_REF_FREQ_MEAS_CTRL_REF_FREQ_OFF);
-+	/* Request measurement */
-+	rc = zl3073x_write_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL, type);
- 	if (rc)
- 		return rc;
- 
- 	/* Wait for finish */
--	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
--				  ZL_REF_FREQ_MEAS_CTRL);
-+	return zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
-+				    ZL_REF_FREQ_MEAS_CTRL);
-+}
-+
-+/**
-+ * zl3073x_ref_freq_meas_update - update measured input reference frequencies
-+ * @zldev: pointer to zl3073x_dev structure
-+ *
-+ * The function asks device to latch measured input reference frequencies
-+ * and stores the results in the ref state.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_ref_freq_meas_update(struct zl3073x_dev *zldev)
-+{
-+	int i, rc;
-+
-+	rc = zl3073x_ref_freq_meas_latch(zldev, ZL_REF_FREQ_MEAS_CTRL_REF_FREQ);
-+	if (rc)
-+		return rc;
-+
-+	/* Read measured frequencies in Hz (unsigned 32-bit, LSB = 1 Hz) */
-+	for (i = 0; i < ZL3073X_NUM_REFS; i++) {
-+		u32 value;
-+
-+		rc = zl3073x_read_u32(zldev, ZL_REG_REF_FREQ(i), &value);
-+		if (rc)
-+			return rc;
-+
-+		zldev->ref[i].meas_freq = value;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * zl3073x_ref_ffo_update - update reference fractional frequency offsets
-+ * @zldev: pointer to zl3073x_dev structure
-+ *
-+ * The function asks device to update fractional frequency offsets latch
-+ * registers the latest measured values, reads and stores them into
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_ref_ffo_update(struct zl3073x_dev *zldev)
-+{
-+	int i, rc;
-+
-+	rc = zl3073x_ref_freq_meas_latch(zldev,
-+					 ZL_REF_FREQ_MEAS_CTRL_REF_FREQ_OFF);
- 	if (rc)
- 		return rc;
- 
-@@ -714,6 +762,20 @@ zl3073x_dev_periodic_work(struct kthread_work *work)
- 		dev_warn(zldev->dev, "Failed to update phase offsets: %pe\n",
- 			 ERR_PTR(rc));
- 
-+	/* Update measured input reference frequencies if any DPLL has
-+	 * frequency monitoring enabled.
++	/* Disable vPort RX steering before destroying RX WQ objects.
++	 * Otherwise firmware still routes traffic to the destroyed queues,
++	 * which can cause bogus completions on reused CQ IDs when the
++	 * ethernet driver later creates new queues on mana_open().
++	 *
++	 * Unlike the ethernet teardown path, mana_fence_rqs() cannot be
++	 * used here because the fence completion CQE is delivered on the
++	 * CQ which is polled by userspace (e.g. DPDK), so there is no way
++	 * for the kernel to wait for fence completion.
++	 *
++	 * This is best effort — if it fails there is not much we can do,
++	 * and mana_cfg_vport_steering() already logs the error.
 +	 */
-+	list_for_each_entry(zldpll, &zldev->dplls, list) {
-+		if (zldpll->freq_monitor) {
-+			rc = zl3073x_ref_freq_meas_update(zldev);
-+			if (rc)
-+				dev_warn(zldev->dev,
-+					 "Failed to update measured frequencies: %pe\n",
-+					 ERR_PTR(rc));
-+			break;
-+		}
-+	}
++	mana_disable_vport_rx(mpc);
 +
- 	/* Update references' fractional frequency offsets */
- 	rc = zl3073x_ref_ffo_update(zldev);
- 	if (rc)
-diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
-index a29f606318f6d..bc2e4fc51a797 100644
---- a/drivers/dpll/zl3073x/dpll.c
-+++ b/drivers/dpll/zl3073x/dpll.c
-@@ -39,6 +39,7 @@
-  * @pin_state: last saved pin state
-  * @phase_offset: last saved pin phase offset
-  * @freq_offset: last saved fractional frequency offset
-+ * @actual_freq: last saved actual (measured) frequency
-  */
- struct zl3073x_dpll_pin {
- 	struct list_head	list;
-@@ -54,6 +55,7 @@ struct zl3073x_dpll_pin {
- 	enum dpll_pin_state	pin_state;
- 	s64			phase_offset;
- 	s64			freq_offset;
-+	u32			actual_freq;
- };
- 
- /*
-@@ -202,6 +204,20 @@ zl3073x_dpll_input_pin_ffo_get(const struct dpll_pin *dpll_pin, void *pin_priv,
- 	return 0;
+ 	for (i = 0; i < (1 << ind_tbl->log_ind_tbl_size); i++) {
+ 		ibwq = ind_tbl->ind_tbl[i];
+ 		wq = container_of(ibwq, struct mana_ib_wq, ibwq);
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 933e9d681..e4268bf2f 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -2869,6 +2869,13 @@ static void mana_rss_table_init(struct mana_port_context *apc)
+ 			ethtool_rxfh_indir_default(i, apc->num_queues);
  }
  
-+static int
-+zl3073x_dpll_input_pin_actual_freq_get(const struct dpll_pin *dpll_pin,
-+				       void *pin_priv,
-+				       const struct dpll_device *dpll,
-+				       void *dpll_priv, u64 *actual_freq,
-+				       struct netlink_ext_ack *extack)
++int mana_disable_vport_rx(struct mana_port_context *apc)
 +{
-+	struct zl3073x_dpll_pin *pin = pin_priv;
-+
-+	*actual_freq = pin->actual_freq;
-+
-+	return 0;
++	return mana_cfg_vport_steering(apc, TRI_STATE_FALSE, false, false,
++				       false);
 +}
++EXPORT_SYMBOL_NS(mana_disable_vport_rx, "NET_MANA");
 +
- static int
- zl3073x_dpll_input_pin_frequency_get(const struct dpll_pin *dpll_pin,
- 				     void *pin_priv,
-@@ -1116,6 +1132,35 @@ zl3073x_dpll_phase_offset_monitor_set(const struct dpll_device *dpll,
- 	return 0;
- }
+ int mana_config_rss(struct mana_port_context *apc, enum TRI_STATE rx,
+ 		    bool update_hash, bool update_tab)
+ {
+@@ -3253,10 +3260,12 @@ static int mana_dealloc_queues(struct net_device *ndev)
+ 	 */
  
-+static int
-+zl3073x_dpll_freq_monitor_get(const struct dpll_device *dpll,
-+			      void *dpll_priv,
-+			      enum dpll_feature_state *state,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll *zldpll = dpll_priv;
-+
-+	if (zldpll->freq_monitor)
-+		*state = DPLL_FEATURE_STATE_ENABLE;
-+	else
-+		*state = DPLL_FEATURE_STATE_DISABLE;
-+
-+	return 0;
-+}
-+
-+static int
-+zl3073x_dpll_freq_monitor_set(const struct dpll_device *dpll,
-+			      void *dpll_priv,
-+			      enum dpll_feature_state state,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll *zldpll = dpll_priv;
-+
-+	zldpll->freq_monitor = (state == DPLL_FEATURE_STATE_ENABLE);
-+
-+	return 0;
-+}
-+
- static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
- 	.direction_get = zl3073x_dpll_pin_direction_get,
- 	.esync_get = zl3073x_dpll_input_pin_esync_get,
-@@ -1123,6 +1168,7 @@ static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
- 	.ffo_get = zl3073x_dpll_input_pin_ffo_get,
- 	.frequency_get = zl3073x_dpll_input_pin_frequency_get,
- 	.frequency_set = zl3073x_dpll_input_pin_frequency_set,
-+	.actual_freq_get = zl3073x_dpll_input_pin_actual_freq_get,
- 	.phase_offset_get = zl3073x_dpll_input_pin_phase_offset_get,
- 	.phase_adjust_get = zl3073x_dpll_input_pin_phase_adjust_get,
- 	.phase_adjust_set = zl3073x_dpll_input_pin_phase_adjust_set,
-@@ -1151,6 +1197,8 @@ static const struct dpll_device_ops zl3073x_dpll_device_ops = {
- 	.phase_offset_avg_factor_set = zl3073x_dpll_phase_offset_avg_factor_set,
- 	.phase_offset_monitor_get = zl3073x_dpll_phase_offset_monitor_get,
- 	.phase_offset_monitor_set = zl3073x_dpll_phase_offset_monitor_set,
-+	.freq_monitor_get = zl3073x_dpll_freq_monitor_get,
-+	.freq_monitor_set = zl3073x_dpll_freq_monitor_set,
- 	.supported_modes_get = zl3073x_dpll_supported_modes_get,
- };
+ 	apc->rss_state = TRI_STATE_FALSE;
+-	err = mana_config_rss(apc, TRI_STATE_FALSE, false, false);
++	err = mana_disable_vport_rx(apc);
+ 	if (err && mana_en_need_log(apc, err))
+ 		netdev_err(ndev, "Failed to disable vPort: %d\n", err);
  
-@@ -1593,6 +1641,39 @@ zl3073x_dpll_pin_ffo_check(struct zl3073x_dpll_pin *pin)
- 	return false;
- }
++	mana_fence_rqs(apc);
++
+ 	/* Even in err case, still need to cleanup the vPort */
+ 	mana_destroy_vport(apc);
  
-+/**
-+ * zl3073x_dpll_pin_actual_freq_check - check for pin actual frequency change
-+ * @pin: pin to check
-+ *
-+ * Check for the given pin's actual (measured) frequency change.
-+ *
-+ * Return: true on actual frequency change, false otherwise
-+ */
-+static bool
-+zl3073x_dpll_pin_actual_freq_check(struct zl3073x_dpll_pin *pin)
-+{
-+	struct zl3073x_dpll *zldpll = pin->dpll;
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	const struct zl3073x_ref *ref;
-+	u8 ref_id;
-+
-+	if (!zldpll->freq_monitor)
-+		return false;
-+
-+	ref_id = zl3073x_input_pin_ref_get(pin->id);
-+	ref = zl3073x_ref_state_get(zldev, ref_id);
-+
-+	if (pin->actual_freq != ref->meas_freq) {
-+		dev_dbg(zldev->dev, "%s actual freq changed: %u -> %u\n",
-+			pin->label, pin->actual_freq, ref->meas_freq);
-+		pin->actual_freq = ref->meas_freq;
-+
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- /**
-  * zl3073x_dpll_changes_check - check for changes and send notifications
-  * @zldpll: pointer to zl3073x_dpll structure
-@@ -1677,13 +1758,18 @@ zl3073x_dpll_changes_check(struct zl3073x_dpll *zldpll)
- 			pin_changed = true;
- 		}
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index a078af283..743bfa8ad 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -568,6 +568,7 @@ struct mana_port_context {
+ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev);
+ int mana_config_rss(struct mana_port_context *ac, enum TRI_STATE rx,
+ 		    bool update_hash, bool update_tab);
++int mana_disable_vport_rx(struct mana_port_context *apc);
  
--		/* Check for phase offset and ffo change once per second */
-+		/* Check for phase offset, ffo, and actual freq change
-+		 * once per second.
-+		 */
- 		if (zldpll->check_count % 2 == 0) {
- 			if (zl3073x_dpll_pin_phase_offset_check(pin))
- 				pin_changed = true;
- 
- 			if (zl3073x_dpll_pin_ffo_check(pin))
- 				pin_changed = true;
-+
-+			if (zl3073x_dpll_pin_actual_freq_check(pin))
-+				pin_changed = true;
- 		}
- 
- 		if (pin_changed)
-diff --git a/drivers/dpll/zl3073x/dpll.h b/drivers/dpll/zl3073x/dpll.h
-index 115ee4f67e7ab..ec27a5c854363 100644
---- a/drivers/dpll/zl3073x/dpll.h
-+++ b/drivers/dpll/zl3073x/dpll.h
-@@ -15,6 +15,7 @@
-  * @id: DPLL index
-  * @check_count: periodic check counter
-  * @phase_monitor: is phase offset monitor enabled
-+ * @freq_monitor: is real frequency monitor enabled
-  * @ops: DPLL device operations for this instance
-  * @dpll_dev: pointer to registered DPLL device
-  * @tracker: tracking object for the acquired reference
-@@ -28,6 +29,7 @@ struct zl3073x_dpll {
- 	u8				id;
- 	u8				check_count;
- 	bool				phase_monitor;
-+	bool				freq_monitor;
- 	struct dpll_device_ops		ops;
- 	struct dpll_device		*dpll_dev;
- 	dpll_tracker			tracker;
-diff --git a/drivers/dpll/zl3073x/ref.h b/drivers/dpll/zl3073x/ref.h
-index 06d8d4d97ea26..be16be20dbc7e 100644
---- a/drivers/dpll/zl3073x/ref.h
-+++ b/drivers/dpll/zl3073x/ref.h
-@@ -23,6 +23,7 @@ struct zl3073x_dev;
-  * @sync_ctrl: reference sync control
-  * @config: reference config
-  * @ffo: current fractional frequency offset
-+ * @meas_freq: measured input frequency in Hz
-  * @mon_status: reference monitor status
-  */
- struct zl3073x_ref {
-@@ -40,6 +41,7 @@ struct zl3073x_ref {
- 	);
- 	struct_group(stat, /* Status */
- 		s64	ffo;
-+		u32	meas_freq;
- 		u8	mon_status;
- 	);
- };
-@@ -68,6 +70,18 @@ zl3073x_ref_ffo_get(const struct zl3073x_ref *ref)
- 	return ref->ffo;
- }
- 
-+/**
-+ * zl3073x_ref_meas_freq_get - get measured input frequency
-+ * @ref: pointer to ref state
-+ *
-+ * Return: measured input frequency in Hz
-+ */
-+static inline u32
-+zl3073x_ref_meas_freq_get(const struct zl3073x_ref *ref)
-+{
-+	return ref->meas_freq;
-+}
-+
- /**
-  * zl3073x_ref_freq_get - get given input reference frequency
-  * @ref: pointer to ref state
+ int mana_alloc_queues(struct net_device *ndev);
+ int mana_attach(struct net_device *ndev);
 -- 
-2.52.0
+2.43.0
 
 
