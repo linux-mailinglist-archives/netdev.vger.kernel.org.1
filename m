@@ -1,140 +1,129 @@
-Return-Path: <netdev+bounces-271378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271379-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id woXvLq1ew2lLqgQAu9opvQ
-	(envelope-from <netdev+bounces-271378-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 05:03:57 +0100
+	id yAY7KMpgw2loqgQAu9opvQ
+	(envelope-from <netdev+bounces-271379-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 05:12:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A0BB31F68F
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 05:03:57 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FF7331F881
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 05:12:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7FAC23137EEF
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 03:57:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A401230767B0
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:00:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873932E6CA8;
-	Wed, 25 Mar 2026 03:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94B2D2EA72A;
+	Wed, 25 Mar 2026 04:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rxiumUV4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pqfSIuso"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6264717BEBF;
-	Wed, 25 Mar 2026 03:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E28284672;
+	Wed, 25 Mar 2026 04:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774410947; cv=none; b=o2R5RJURhS1ob96+w2k4nJTsg+MVXeqSCLEKUVpliFyHhxLrbUiigVZfCweVylTznmOwCvUpb9CFKSjVO3zBZrdDpaIfqDHaWbBbexXU5DZaO4i+uPca7N/pDEPxcAFRLsPw96lnLB2038FACbqgzwL/3Q8kOaXXX43ZzKOFxOk=
+	t=1774411218; cv=none; b=IfoBigWRxdg26DCDGHOtx5MpPzbRmKmCLBsGfdhIWE/rkBHH9r/WvjmP+FJXUPxFK2nACxQz44dyhjFHV7SWOp23yhc7jSPRD0C+8Rl+oaqd3AgMH9VyK8I+JslJB5lFW+kORyFSPdjnq1QyL47MPLVOQGnY1acTgxheyIVBbrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774410947; c=relaxed/simple;
-	bh=ecEYSLeERewWN89IgeuDUXiRprg8d06yYRo95t3oLZk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tp5yF/hIqg0nWgPdeRpVMnAcR9ei1S5k059auBKf43VCc+NAep9//LRIH1NngG9VpKMNzJGqhEZ3Hv+ioSNgkiCPvdoJBa2WvEI/e3PWxc7aBRF6h2lyfTLxSrV4Ye/TZG518ACYyhhiY+I/iDutkFAe3UpLXRIjk1n0dvQCF8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rxiumUV4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C39DC4CEF7;
-	Wed, 25 Mar 2026 03:55:46 +0000 (UTC)
+	s=arc-20240116; t=1774411218; c=relaxed/simple;
+	bh=y7doqZTIe+tirsAelIkVCicIvRqFu6O6DeNHII+CVIY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=O6CrqseRY9Vo+flWK+4w7IGq9arv3tpAJpag3G/O59dytMG7M5GsLPkKQxuedDlpoCzhtIAuqQ6651c6P7WhUZJIz1tmuOfPRJXUWEFILKj77vEvb8CMuVYfprpp7M6t6s7sFiKPernNG1yWPLjcYAsnx4FlH79QjgQu9JHz8oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pqfSIuso; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03109C4CEF7;
+	Wed, 25 Mar 2026 04:00:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774410946;
-	bh=ecEYSLeERewWN89IgeuDUXiRprg8d06yYRo95t3oLZk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rxiumUV4hJzKBiPBF+9ocT4oGqv8xVpTEn62Hp+7/IYRnshnSfyYBDaeguD2uXoyO
-	 CN8S8UyM8zoQkJCHmwm4ugNcLRU2CeOUZEtRQrpTcD0IKDtUppP9E7USWuj4X+IwYc
-	 5B/6e+10Rq+V8mmeV3v21mJzwZUdbIIcIc3oLsm5/BT3k6uOchCGhygpEaTESGucvh
-	 +8S43uSJCJbq2AT7WtX7UrfY8ScFgGVx3KRlhnWYHEEiJ2SQ5qDBOq64xYPcuX/cmX
-	 MbAW7XL9FQ5SuA9zc+vJkBG7ZxrgBkJAum+4oFJXqLPNYa3Gtxqf5aqt7/d8S4Euc4
-	 SXdHG+6NK1CRA==
-Date: Tue, 24 Mar 2026 20:55:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Cosmin Ratiu <cratiu@nvidia.com>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, Dragos
- Tatulea <dtatulea@nvidia.com>, "shuah@kernel.org" <shuah@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "edumazet@google.com" <edumazet@google.com>
-Subject: Re: [PATCH net v5 0/3] macsec: Add support for VLAN filtering in
- offload mode
-Message-ID: <20260324205545.7bbd8fdc@kernel.org>
-In-Reply-To: <acKrRrOG0v9KDk_J@krikkit>
-References: <20260323123633.756163-1-cratiu@nvidia.com>
-	<acFODtfaa8LCKX4r@krikkit>
-	<5ae5d08d578fce1a01a548fad8552a14df8c5679.camel@nvidia.com>
-	<acFWIxzM-GxpAhjH@krikkit>
-	<20260323093243.17c14edb@kernel.org>
-	<acF1jeGLpq7qDKgY@krikkit>
-	<62b3b47291879328a868aa15fb7319b5ff13a20e.camel@nvidia.com>
-	<acKrRrOG0v9KDk_J@krikkit>
+	s=k20201202; t=1774411218;
+	bh=y7doqZTIe+tirsAelIkVCicIvRqFu6O6DeNHII+CVIY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pqfSIusoxY0CeOXt3lkgZ3Ug6xcNEt05Ko2YS0tD11jzH6MIh4GaMd//MjsTGLm3T
+	 EJVzf/JdhX7mi8Yr91RC2Hdtx6I04Kp42Wuylji5XzCv0P7TUvvLm2n9XEksaTg6UD
+	 YEC8HulEizKOwlPmFaNxg9H2jrqT4pRK88/ThlhjJ1Z2PMwJXxjw+GODM/BMaYS1kJ
+	 79kg7dKizlJ3fnvkxuAyx86ZBiJv/HeBI2mTwU63mq7Qzs7MBlBEKn3I4fDuLWL2xb
+	 c587Z98JW6/W6e+N8Xvi8IGqTrHP4a6QGFuWZ/EqSw7m6OuupRvi0gj6IasJjLUUQQ
+	 n1OjKokNQx2+g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9F143808203;
+	Wed, 25 Mar 2026 04:00:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: lan743x: fix duplex configuration in mac_link_up
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177441120534.1418231.4565108469032926267.git-patchwork-notify@kernel.org>
+Date: Wed, 25 Mar 2026 04:00:05 +0000
+References: <20260323065345.144915-1-thangaraj.s@microchip.com>
+In-Reply-To: <20260323065345.144915-1-thangaraj.s@microchip.com>
+To: Thangaraj Samynathan <thangaraj.s@microchip.com>
+Cc: bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+ Raju.Lakkaraju@microchip.com, maxime.chevallier@bootlin.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271378-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-271379-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2A0BB31F68F
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9FF7331F881
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 24 Mar 2026 16:18:30 +0100 Sabrina Dubroca wrote:
-> > Adding back the nsim debugfs file and test assertions guarded by "if
-> > cfg._ns" would ensure filter propagation correctness, but would feel
-> > non-Pythonic and a little hacky given that the same assertion can't
-> > work on real HW.  
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 23 Mar 2026 12:23:45 +0530 you wrote:
+> The driver does not explicitly configure the MAC duplex mode when
+> bringing the link up. As a result, the MAC may retain a stale duplex
+> setting from a previous link state, leading to duplex mismatches with
+> the link partner and degraded network performance.
 > 
-> I think that's fine. The tests are anyway python wrappers around
-> iproute commands, it's neither "Pythonic" nor pretty.
-> Jakub, any objection?
+> Update lan743x_phylink_mac_link_up() to set or clear the MAC_CR_DPX_
+> bit according to the negotiated duplex mode.
+> 
+> [...]
 
-No objections, I already added this nasty little piece of code in gro.py
+Here is the summary with links:
+  - [net] net: lan743x: fix duplex configuration in mac_link_up
+    https://git.kernel.org/netdev/net/c/71399707876b
 
-    try:
-        # Disable TSO for local tests
-        cfg.require_nsim()  # will raise KsftXfailEx if not running on nsim
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-        _set_ethtool_feat(cfg.remote_ifname, cfg.remote_feat,
-                          {"tcp-segmentation-offload": False},
-                          host=cfg.remote)
-    except KsftXfailEx:
-        pass
 
-I agree with Cosmin that the check feels a bit non-Pythonic. Dunno
-if the try except ends up being any better tho :S
-
-Let's not use "if cfg._ns" tho, please add a method that will return
-true / false (or feel free to come up with a cleaner way if you can
-think of it). We definitely don't want to encourage nsim-only checks,
-if you add new methods please mention in their documentation that we
-strongly prefer if the authors can think of a way to prove correctness
-that would also work on real HW.
 
