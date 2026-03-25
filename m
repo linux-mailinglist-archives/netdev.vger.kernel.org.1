@@ -1,129 +1,134 @@
-Return-Path: <netdev+bounces-271390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271392-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sKxEIndfw2m1qQQAu9opvQ
-	(envelope-from <netdev+bounces-271390-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 05:07:19 +0100
+	id CGwLNchgw2loqgQAu9opvQ
+	(envelope-from <netdev+bounces-271392-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 05:12:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 337B831F766
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 05:07:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D61D31F87A
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 05:12:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AE7673099EA3
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:03:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 77667308CC52
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D2C2EA72A;
-	Wed, 25 Mar 2026 04:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4449D2DC765;
+	Wed, 25 Mar 2026 04:10:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eCXTVWx/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OORmGIY0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8902D5950;
-	Wed, 25 Mar 2026 04:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2140C23BF9B;
+	Wed, 25 Mar 2026 04:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774411424; cv=none; b=G0HMPnKeZinZukv96VcF3rjZvs4i68gL36/T7oyokPZWPxsi4exKDq4Djkb1mEW4uo8cpzIpH/i7J/BSw4hj7JfKjmSTg9Pa3AqgqRUyRXer460rkea3qBcOGM0HMmUmjufxEhtaVN8PwubS60mS9nqEY9MwqSbOLk9WVGkzygw=
+	t=1774411820; cv=none; b=Omz6XUEcBUa1bA7YbcOAHdZMHi0K5HLiOCbfUDnlinKHs/S6zGOojaMVNfzeU/3k23vXM/Xks+iHvVrGZxNx9hb01MmcebtKgNEqBYiJQ/xVWebiTihjoBVOPjxh7RXvejX+1mbqaBEJbjNZGrL9O1W2LJHfiT8BABzS3E6tk0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774411424; c=relaxed/simple;
-	bh=rKjBFwTl8y/aFDsfkycqbaBWF5p3amFnYH+OOdOGJH4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uiRg3dT1fs58Tzd2Pwpsqwyqv4tQ/f4t6uZ6pxfo+d1d7tN2tbZjOhABp/wOmS8BmjmUsef0+7JR5n7/a8kmoQqb5S+jebQ9ksAhHFZWYoCXcEqTUtx5MylWGbnCHpjabmX2Xzt+Lojek/2Z7Dk4gflwuFmBQLKcrqybaQUQMDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eCXTVWx/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2B43C4CEF7;
-	Wed, 25 Mar 2026 04:03:42 +0000 (UTC)
+	s=arc-20240116; t=1774411820; c=relaxed/simple;
+	bh=YVVJrC6lw4JgBCw4Kxevuq5mZKtsANAXjEOqe+5DUMM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KWDGAIlcmeQzu5om+jLy4Wr4AFxFxNxxqDYTh/aYgf6lw0tTp01BOX+bHvrpoY603jMWAymsBpqy5sbwdiKXOVYq4W5jkRVEc59jfwf73CtfBXpLxY3u63Doq63klLJ0vmz7V8kL0Rzd3VZNTRkIxcuBqTX3Y0coyFetdTxnjQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OORmGIY0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE00FC4CEF7;
+	Wed, 25 Mar 2026 04:10:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774411423;
-	bh=rKjBFwTl8y/aFDsfkycqbaBWF5p3amFnYH+OOdOGJH4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eCXTVWx/J7qoyx8JMFP/pZWjXDY3JfisKDEUp5PmU0+XnzZ07ItWe+obtPr53BSBR
-	 7ArpBufimHSENmQQLd8Vpb99+nzF5ECvpzOmJQmcq/S6YvmYpzFH7YtAvGm6ndcEia
-	 hz8us2dfMdY6LwGxdMOOceS63yzNDmjh6gWsiUdmvcInpQXRInAM6teuwgH4mNGSsn
-	 +qBodKTQ+6tfmnmfAFu+yrMbdYH/Atm8YCjrgbzVKdNGSM9fnJuPxzZHeU24dnydou
-	 wK/pfopTAu8+BboMoriYTF9zO0c1vuuFbA1uY37UNBHs62QC6ZrCVsU5QsylSgkTzz
-	 NRf4n/HUM9S9Q==
-Date: Tue, 24 Mar 2026 21:03:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: netdev@vger.kernel.org, Justin Chen <justin.chen@broadcom.com>, Simon
- Horman <horms@kernel.org>, Doug Berger <opendmb@gmail.com>, Florian
- Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel review
- list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v4 4/6] net: bcmgenet: add XDP_TX support
-Message-ID: <20260324210342.61b0b5f8@kernel.org>
-In-Reply-To: <20260323120539.136029-5-nb@tipi-net.de>
-References: <20260323120539.136029-1-nb@tipi-net.de>
-	<20260323120539.136029-5-nb@tipi-net.de>
+	s=k20201202; t=1774411819;
+	bh=YVVJrC6lw4JgBCw4Kxevuq5mZKtsANAXjEOqe+5DUMM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OORmGIY0qBkkhwJtsQwAn6CqXIvGRsHLzSVUUPHUsc8+ISiChQHf/BHeb6ciWZcUl
+	 F4aFXlOoEWAhWEzlJ248ELkc92MVbAW8qjxbYq73Eg8wRoE4tvAzQLIRBdiSSlQqq7
+	 PTQX/i9l0LT57P4G7Tt5iIfqcC5hx7mFfcJhAuHq6QtUx9Y7BZwTPDcPgYC7r449Vf
+	 8iR8zKedf6KuSFpxh3GZ0h6sMDpVIK8BnfFFymKV7gUoqYP227cI8gL18YolvwK8Xs
+	 KrIDmJsOL0M+hdghivAZ9Oq/5i73lFBDatZsQ1TrEM/AkZA/0QvKsd3UcadQV7ASRo
+	 KseSYZilZU3qw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D4113808203;
+	Wed, 25 Mar 2026 04:10:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net_sched: codel: fix stale state for empty flows in
+ fq_codel
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177441180729.1422230.5368917976493908584.git-patchwork-notify@kernel.org>
+Date: Wed, 25 Mar 2026 04:10:07 +0000
+References: <20260323174920.253526-1-hawk@kernel.org>
+In-Reply-To: <20260323174920.253526-1-hawk@kernel.org>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-kernel@vger.kernel.org, kernel-team@cloudflare.com,
+ j.koeppeler@tu-berlin.de, carges@cloudflare.com, toke@redhat.com
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271390-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271392-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,broadcom.com,kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 337B831F766
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tu-berlin.de:email]
+X-Rspamd-Queue-Id: 4D61D31F87A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 23 Mar 2026 13:05:33 +0100 Nicolai Buchwitz wrote:
-> Implement XDP_TX using ring 16 (DESC_INDEX), the hardware default
-> descriptor ring, dedicated to XDP TX for isolation from SKB TX queues.
-> 
-> Ring 16 gets 32 BDs carved from ring 0's allocation. TX completion is
-> piggybacked on RX NAPI poll since ring 16's INTRL2_1 bit collides with
-> RX ring 0, similar to how bnxt, ice, and other XDP drivers handle TX
-> completion within the RX poll path.
-> 
-> The GENET MAC has TBUF_64B_EN set globally, requiring every TX buffer
-> to start with a 64-byte struct status_64 (TSB). For local XDP_TX, the
-> TSB is prepended by backing xdp->data into the RSB area (unused after
-> BPF execution) and zeroing it. For foreign frames redirected from other
-> devices, the TSB is written into the xdp_frame headroom.
-> 
-> The page_pool DMA direction is changed from DMA_FROM_DEVICE to
-> DMA_BIDIRECTIONAL to allow TX reuse of the existing DMA mapping.
+Hello:
 
-drivers/net/ethernet/broadcom/genet/bcmgenet.c:2420:27: warning: variable 'tx_ring' set but not used [-Wunused-but-set-variable]
- 2420 |         struct bcmgenet_tx_ring *tx_ring;
-      |                                  ^
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 23 Mar 2026 18:49:20 +0100 you wrote:
+> From: Jonas Köppeler <j.koeppeler@tu-berlin.de>
+> 
+> When codel_dequeue() finds an empty queue, it resets vars->dropping
+> but does not reset vars->first_above_time.  The reference CoDel
+> algorithm (Nichols & Jacobson, ACM Queue 2012) resets both:
+> 
+>   dodeque_result codel_queue_t::dodeque(time_t now) {
+>       ...
+>       if (r.p == NULL) {
+>           first_above_time = 0;   // <-- Linux omits this
+>       }
+>       ...
+>   }
+> 
+> [...]
+
+Here is the summary with links:
+  - net_sched: codel: fix stale state for empty flows in fq_codel
+    https://git.kernel.org/netdev/net/c/815980fe6dbb
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
