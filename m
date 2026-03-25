@@ -1,187 +1,190 @@
-Return-Path: <netdev+bounces-271737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271738-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cEeSEPBHxGn5xwQAu9opvQ
-	(envelope-from <netdev+bounces-271737-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:39:12 +0100
+	id wHgzFnBIxGn5xwQAu9opvQ
+	(envelope-from <netdev+bounces-271738-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:41:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0186932BE82
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:39:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A814A32BEEC
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:41:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3FECD301CC87
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:39:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 84E22300CC85
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 20:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940FE374195;
-	Wed, 25 Mar 2026 20:39:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8A9634F49F;
+	Wed, 25 Mar 2026 20:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lIcidpz1";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="adIw+3+t";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lIcidpz1";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="adIw+3+t"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mceejZKQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7F5308F38
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 20:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B0EBA45
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 20:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774471149; cv=none; b=HWOOuE8TZmJJ9VCxPyw97+zIv0ZvHG201YkFSpYd5+xnVPr7x2lXyvx2gWJ5P+GgSp4jdJLfUoBqG8R4GIU6E3pe9EwXNiKJx8RzWErHHjh7P+rBVkaUe1wgVFdYNezq14TQihs7ytEigtrWm957hNODKHANXBk/IuxaockX014=
+	t=1774471213; cv=none; b=QtHc3A/8RDvaiskZpULj16P/v/umKxB2n5anDXh0dHgXbrwAi8tNP6wwmXS77rBc5Sd2BzKV/aVAnqHIrpv0Mzl9CAUDORKEHpeKYbbZA/QiwO61xsP+6gSqn02JBXdOXGQRBrwrE+PV/O4pDCDOytmLCHDy2UH50XRzhjAngOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774471149; c=relaxed/simple;
-	bh=41UAIRmk7Lv/hucfqbrnpErXwXBNPsKaFkf1TvCfAHo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dPhRAUBUF69YbyaooX0RIzE20N3y3Y/HVxQ69jXoWIFNhkWLvGLXEd+HoHVDADrDTOM9U6I/USh0+hPLk4JS4yTTeAUrwE7EyM9H0497MZ8ky4L1ZEXLdl9DW/Req2P9CtjYZwZqITzSK1jzp7dJGN/Q9jD++mko8MYTTSGJqb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lIcidpz1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=adIw+3+t; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lIcidpz1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=adIw+3+t; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 6522E5BDE2;
-	Wed, 25 Mar 2026 20:39:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1774471146; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CQIPGjdjyd1dum29OmxtciN1iNLNz3H/rMBrQeCduwQ=;
-	b=lIcidpz1RGXd6qvEtprShO1icP92i6sjMO3BOEiYBcUirQOC8ZZG0TwrhjusA9OaB6rUQm
-	6zW5imbAIuQKn2z9qJqHBGC7GdneFihO25p0f4YoBDg6GDU4VZLWhXEAnDBMSF1hkKOMY9
-	rf7ydHiSyVEWHf3kzYkXhii81rfvtTQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1774471146;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CQIPGjdjyd1dum29OmxtciN1iNLNz3H/rMBrQeCduwQ=;
-	b=adIw+3+t0R6DP2yCxNiJZCRU9XS+ZXFe8feVyY3+z/iP/LB88xw/jd5897shz+8DhID41Z
-	nwPfQ10zeLLBtoBQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1774471146; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CQIPGjdjyd1dum29OmxtciN1iNLNz3H/rMBrQeCduwQ=;
-	b=lIcidpz1RGXd6qvEtprShO1icP92i6sjMO3BOEiYBcUirQOC8ZZG0TwrhjusA9OaB6rUQm
-	6zW5imbAIuQKn2z9qJqHBGC7GdneFihO25p0f4YoBDg6GDU4VZLWhXEAnDBMSF1hkKOMY9
-	rf7ydHiSyVEWHf3kzYkXhii81rfvtTQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1774471146;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CQIPGjdjyd1dum29OmxtciN1iNLNz3H/rMBrQeCduwQ=;
-	b=adIw+3+t0R6DP2yCxNiJZCRU9XS+ZXFe8feVyY3+z/iP/LB88xw/jd5897shz+8DhID41Z
-	nwPfQ10zeLLBtoBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E74F64A0A2;
-	Wed, 25 Mar 2026 20:39:05 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id t8jDNOlHxGnBQgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Wed, 25 Mar 2026 20:39:05 +0000
-Message-ID: <9ba63bbe-1222-4b97-9698-a9c847b0a47b@suse.de>
-Date: Wed, 25 Mar 2026 21:39:05 +0100
+	s=arc-20240116; t=1774471213; c=relaxed/simple;
+	bh=+GEUfA+dQ7kaTZDoTzOD8hzNGGZvKoPVSlncYyIgycA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dMYs61fRi4KWLmOvKqam0aI31aUC0H0TiFsEwjHeRubQP+ljPfJVrp7vWWeAYIVxFSlI1SavmkoKFJQbUY4hZS3lvw3NSSTGei3Bj5xRuE5RPzBgA4zYS74VomgpNaBAzpfw2urovJHg+Q9OD+BoMQTKSJz5xW4la838llgHGd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mceejZKQ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/L649BGHfzjPeUOm873tBDJOzKxxjacvMmrNB1ND0NY=; b=mceejZKQu1r5osaBGGu8D5bmS6
+	LlEGU+Kj4Gojb9WRVpB20EU9bwop0rMed2nI16rOt/8R/YDM0mFc+tazI99PdrL+KjH3ypxVY/16a
+	8NCVmvUtAcSYtTsC6D6H6ftl2pxWHEom1saTEQNov3hl7aAhxwZf/a5nwLt/BsDvGCOU1SXXVngSb
+	AA2je89k6Lecuk0X0Qc8XD7TROev9I9ilXzezAxsBhz2vjciDh1JY2vSClMzk6iJ4qIsxX/Rhpozj
+	s+Y6bOijsUrxL2U/SF+NqpfWXJcBYz2srxbaceuWm9TbtLhYpl7YPy67P7QNnlG0Ao5kzefy2AGmm
+	wKy7OD2A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33832)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w5V1L-000000003s4-3MDN;
+	Wed, 25 Mar 2026 20:40:07 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w5V1I-000000006Lq-1xqC;
+	Wed, 25 Mar 2026 20:40:04 +0000
+Date: Wed, 25 Mar 2026 20:40:04 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: netdev@vger.kernel.org, imx@lists.linux.dev,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Frank Li <Frank.Li@nxp.com>, Jakub Kicinski <kuba@kernel.org>,
+	Joy Zou <joy.zou@nxp.com>,
+	Kieran Bingham <kieran.bingham@ideasonboard.com>,
+	Marco Felsch <m.felsch@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Stefan Klug <stefan.klug@ideasonboard.com>,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 1/2] net: stmmac: provide flag to disable EEE
+Message-ID: <acRIJMQSTt-N52C0@shell.armlinux.org.uk>
+References: <20260323093933.1785583-1-laurent.pinchart@ideasonboard.com>
+ <20260323093933.1785583-2-laurent.pinchart@ideasonboard.com>
+ <acEOGMHfYsxv3GOk@shell.armlinux.org.uk>
+ <20260323100801.GA1514659@killaraus.ideasonboard.com>
+ <20260325201332.GA2670326@killaraus.ideasonboard.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2 net-next] ipv4: ipv4: handle devconf post-set actions
- on netlink updates
-To: netdev@vger.kernel.org
-Cc: horms@kernel.org, pabeni@redhat.com, kuba@kernel.org,
- edumazet@google.com, dsahern@kernel.org, davem@davemloft.net
-References: <20260325161020.3516-1-fmancera@suse.de>
- <20260325161020.3516-2-fmancera@suse.de>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260325161020.3516-2-fmancera@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Score: -4.30
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260325201332.GA2670326@killaraus.ideasonboard.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_FROM(0.00)[bounces-271737-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271738-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,lunn.ch,davemloft.net,google.com,gmail.com,toradex.com,nxp.com,kernel.org,ideasonboard.com,pengutronix.de,redhat.com,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.de:dkim,suse.de:email,suse.de:mid]
-X-Rspamd-Queue-Id: 0186932BE82
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.887];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,armlinux.org.uk:email,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: A814A32BEEC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/25/26 5:10 PM, Fernando Fernandez Mancera wrote:
-> When IPv4 device configuration parameters are updated via netlink, the
-> kernel currently only updates the value. This bypasses several
-> post-modification actions that occur when these same parameters are
-> updated via sysctl, such as flushing the routing cache or emitting
-> RTM_NEWNETCONF notifications.
+On Wed, Mar 25, 2026 at 10:13:32PM +0200, Laurent Pinchart wrote:
+> On Mon, Mar 23, 2026 at 12:08:02PM +0200, Laurent Pinchart wrote:
+> > On Mon, Mar 23, 2026 at 09:55:36AM +0000, Russell King (Oracle) wrote:
+> > > On Mon, Mar 23, 2026 at 11:39:32AM +0200, Laurent Pinchart wrote:
+> > > > From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+> > > > 
+> > > > Some platforms have problems when EEE is enabled, and thus need a way
+> > > > to disable stmmac EEE support. Add a flag before the other LPI related
+> > > > flags which tells stmmac to avoid populating the phylink LPI
+> > > > capabilities, which causes phylink to call phy_disable_eee() for any
+> > > > PHY that is attached to the affected phylink instance.
+> > > > 
+> > > > iMX8MP is an example - the lpi_intr_o signal is wired to an OR gate
+> > > > along with the main dwmac interrupts. Since lpi_intr_o is synchronous
+> > > > to the receive clock domain, and takes four clock cycles to clear, this
+> > > > leads to interrupt storms as the interrupt remains asserted for some
+> > > > time after the LPI control and status register is read.
+> > > > 
+> > > > This problem becomes worse when the receive clock from the PHY stops
+> > > > when the receive path enters LPI state - which means that lpi_intr_o
+> > > > can not deassert until the clock restarts. Since the LPI state of the
+> > > > receive path depends on the link partner, this is out of our control.
+> > > > We could disable RX clock stop at the PHY, but that doesn't get around
+> > > > the slow-to-deassert lpi_intr_o mentioned in the above paragraph.
+> > > > 
+> > > > Previously, iMX8MP worked around this by disabling gigabit EEE, but
+> > > > this is insufficient - the problem is also visible at 100M speeds,
+> > > > where the receive clock is slower.
+> > > > 
+> > > > There is extensive discussion and investigation in the thread linked
+> > > > below, the result of which is summarised in this commit message.
+> > > > 
+> > > > Reported-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> > > > Closes: https://lore.kernel.org/r/20251026122905.29028-1-laurent.pinchart@ideasonboard.com
+> > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > 
+> > > As you are sending this on my behalf, you need to add your s-o-b after
+> > > mine:
+> > 
+> > Oops, I'm not sure how I missed that. Sorry.
+> > 
+> > Signed-off-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
 > 
-> This patch addresses the inconsistency by calling the
-> devinet_conf_post_set() helper inside inet_set_link_af(). If a flush is
-> required, we defer it until the netlink attribute parsing loop
-> completes.
-> 
-> This ensures consistent behavior and side-effects for devconf changes,
-> regardless of whether they are initiated via sysctl or netlink.
-> 
-> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-> ---
->   net/ipv4/devinet.c | 22 ++++++++++++++++++++--
->   1 file changed, 20 insertions(+), 2 deletions(-)
-> 
-[...]
-> @@ -2507,6 +2521,10 @@ static bool devinet_conf_post_set(struct net *net, struct ipv4_devconf *cnf,
->   		return false;
->   
->   	switch (attr) {
-> +	case IPV4_DEVCONF_FORWARDING:
-> +		if (new == 1)
-> +			return true;
-> +		break;
+> Should I submit a v4, or can this series be picked for v7.1 with my SoB
+> added ?
 
-This is missing disabling LRO and also the proper netlink notification.
+I don't see it in patchwork's pending queue, so yes please. Don't forget
+to specify the tree in the subject line:
 
-I will fix that on a V2. *facepalm* it does not matter how much I 
-reviewed this, I missed that detail, sorry.
+[PATCH net-next v4 0/2] net: stmmac: ...
 
->   	case IPV4_DEVCONF_ROUTE_LOCALNET:
->   	case IPV4_DEVCONF_ACCEPT_LOCAL:
->   		if (new == 0)
+which may be a factor in it not showing up.
 
+It's worth keeping an eye on:
+
+https://patchwork.kernel.org/project/netdevbpf/list/?delegate=123371
+
+about 24h after submission in case of any issues.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
