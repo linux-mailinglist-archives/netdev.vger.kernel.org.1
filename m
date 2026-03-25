@@ -1,134 +1,140 @@
-Return-Path: <netdev+bounces-271377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271378-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mOfUBb1cw2m1qQQAu9opvQ
-	(envelope-from <netdev+bounces-271377-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:55:41 +0100
+	id woXvLq1ew2lLqgQAu9opvQ
+	(envelope-from <netdev+bounces-271378-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 05:03:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89BCD31F4E6
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 04:55:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A0BB31F68F
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 05:03:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1695A3114578
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 03:50:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7FAC23137EEF
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 03:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010102EB878;
-	Wed, 25 Mar 2026 03:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873932E6CA8;
+	Wed, 25 Mar 2026 03:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bh5h3/J9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rxiumUV4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29BF2EAD15;
-	Wed, 25 Mar 2026 03:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6264717BEBF;
+	Wed, 25 Mar 2026 03:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774410627; cv=none; b=S6rLf/BRydm6kESOMjTmpaSHAF5KjfL/Cp5RQMj6pYcsG5KpUQry1zS8hKlVb1++wYwcG+/cXxWOxXtOZE05wjHBz6Mup/wN/rjJvl+gqoYOJ14s30e8Y38PyHAWZY1eI/pYbvRurTsDitVwjNPGAiOLXT7KoQZIrQFX4t+FOkk=
+	t=1774410947; cv=none; b=o2R5RJURhS1ob96+w2k4nJTsg+MVXeqSCLEKUVpliFyHhxLrbUiigVZfCweVylTznmOwCvUpb9CFKSjVO3zBZrdDpaIfqDHaWbBbexXU5DZaO4i+uPca7N/pDEPxcAFRLsPw96lnLB2038FACbqgzwL/3Q8kOaXXX43ZzKOFxOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774410627; c=relaxed/simple;
-	bh=RGHQa5QsG4ig4avoKy58WbOnXoXgJmnhA8I6Wj34rJY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LRrF/oj9sobVrajK8CilrjghprQf0ibSIS/98FcSFGJxFjQO7NoTEIH4c4o9Rv6JCrDcjUgWmevCujT1cIdplLqhV/UbdgHaZ96HHZQvHq3UxeZPQrxUX40tFrLd53bpjr5c5REY4YXEpp3MWCfLtUqXQYqeKZjU24hlJTwtoBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bh5h3/J9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 757E2C4CEF7;
-	Wed, 25 Mar 2026 03:50:27 +0000 (UTC)
+	s=arc-20240116; t=1774410947; c=relaxed/simple;
+	bh=ecEYSLeERewWN89IgeuDUXiRprg8d06yYRo95t3oLZk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tp5yF/hIqg0nWgPdeRpVMnAcR9ei1S5k059auBKf43VCc+NAep9//LRIH1NngG9VpKMNzJGqhEZ3Hv+ioSNgkiCPvdoJBa2WvEI/e3PWxc7aBRF6h2lyfTLxSrV4Ye/TZG518ACYyhhiY+I/iDutkFAe3UpLXRIjk1n0dvQCF8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rxiumUV4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C39DC4CEF7;
+	Wed, 25 Mar 2026 03:55:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774410627;
-	bh=RGHQa5QsG4ig4avoKy58WbOnXoXgJmnhA8I6Wj34rJY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Bh5h3/J9zeRCCx5LCs1Y9LMLUATioi1+aOI7ZkYSKdKxb3CFlkskQRjnHfQ49ZQfN
-	 Qrs01zIssAON8Sx0DILgXMOZ18PVHVU0FWMIoyourDtVey6uKYELd9QT2+jqGwUaaS
-	 RSBWzLHCTtGhlZhVYIGBoSpebMkZxOdpuqbyGp743b/BtcWZL7dyAlQTCJDPRzZ2wI
-	 7eUFI/7HgL5VqzXP0JQB4T0oGJnkjGXoWFPGlCzb45in1/gptse2XiCJKJAs3boUKr
-	 EdurI2mvrX6G8kYz2gu5tn5AZD7PcMP9dTSfV7uknEBjVuNDISnYr6sPKfDf13d3pT
-	 w5TnDL+Ptg6jg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FE663808203;
-	Wed, 25 Mar 2026 03:50:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1774410946;
+	bh=ecEYSLeERewWN89IgeuDUXiRprg8d06yYRo95t3oLZk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rxiumUV4hJzKBiPBF+9ocT4oGqv8xVpTEn62Hp+7/IYRnshnSfyYBDaeguD2uXoyO
+	 CN8S8UyM8zoQkJCHmwm4ugNcLRU2CeOUZEtRQrpTcD0IKDtUppP9E7USWuj4X+IwYc
+	 5B/6e+10Rq+V8mmeV3v21mJzwZUdbIIcIc3oLsm5/BT3k6uOchCGhygpEaTESGucvh
+	 +8S43uSJCJbq2AT7WtX7UrfY8ScFgGVx3KRlhnWYHEEiJ2SQ5qDBOq64xYPcuX/cmX
+	 MbAW7XL9FQ5SuA9zc+vJkBG7ZxrgBkJAum+4oFJXqLPNYa3Gtxqf5aqt7/d8S4Euc4
+	 SXdHG+6NK1CRA==
+Date: Tue, 24 Mar 2026 20:55:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Cosmin Ratiu <cratiu@nvidia.com>, "andrew+netdev@lunn.ch"
+ <andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, Dragos
+ Tatulea <dtatulea@nvidia.com>, "shuah@kernel.org" <shuah@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "edumazet@google.com" <edumazet@google.com>
+Subject: Re: [PATCH net v5 0/3] macsec: Add support for VLAN filtering in
+ offload mode
+Message-ID: <20260324205545.7bbd8fdc@kernel.org>
+In-Reply-To: <acKrRrOG0v9KDk_J@krikkit>
+References: <20260323123633.756163-1-cratiu@nvidia.com>
+	<acFODtfaa8LCKX4r@krikkit>
+	<5ae5d08d578fce1a01a548fad8552a14df8c5679.camel@nvidia.com>
+	<acFWIxzM-GxpAhjH@krikkit>
+	<20260323093243.17c14edb@kernel.org>
+	<acF1jeGLpq7qDKgY@krikkit>
+	<62b3b47291879328a868aa15fb7319b5ff13a20e.camel@nvidia.com>
+	<acKrRrOG0v9KDk_J@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2] net: dsa: mxl862xx: MDIO bus integrity
- and
- optimization
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177441061478.1414050.14973716725330389642.git-patchwork-notify@kernel.org>
-Date: Wed, 25 Mar 2026 03:50:14 +0000
-References: <cover.1774185953.git.daniel@makrotopia.org>
-In-Reply-To: <cover.1774185953.git.daniel@makrotopia.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux@armlinux.org.uk, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- frankwu@gmx.de, chad@monroe.io, cezary.wilmanski@adtran.com,
- lxu@maxlinear.com, yweng@maxlinear.com, jverdu@maxlinear.com,
- ajayaraman@maxlinear.com, john@phrozen.org
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
-	TAGGED_FROM(0.00)[bounces-271377-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-271378-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 89BCD31F4E6
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2A0BB31F68F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 22 Mar 2026 13:27:12 +0000 you wrote:
-> The MxL862xx firmware offers opt-in CRC validation on the MDIO/MMD
-> command interface to guard against bit errors on the bus.
-> The driver has not used this until now.
+On Tue, 24 Mar 2026 16:18:30 +0100 Sabrina Dubroca wrote:
+> > Adding back the nsim debugfs file and test assertions guarded by "if
+> > cfg._ns" would ensure filter propagation correctness, but would feel
+> > non-Pythonic and a little hacky given that the same assertion can't
+> > work on real HW.  
 > 
-> This series enables CRC protection on both the command registers (CRC-6)
-> and data payloads (CRC-16), and reduces MDIO bus traffic by bulk-zeroing
-> registers instead of writing zero-valued words individually.
-> 
-> [...]
+> I think that's fine. The tests are anyway python wrappers around
+> iproute commands, it's neither "Pythonic" nor pretty.
+> Jakub, any objection?
 
-Here is the summary with links:
-  - [net-next,v2,1/2] net: dsa: mxl862xx: add CRC for MDIO communication
-    https://git.kernel.org/netdev/net-next/c/a319d0c8c8ce
-  - [net-next,v2,2/2] net: dsa: mxl862xx: use RST_DATA to skip writing zero words
-    https://git.kernel.org/netdev/net-next/c/7c20f6c1cfb1
+No objections, I already added this nasty little piece of code in gro.py
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+    try:
+        # Disable TSO for local tests
+        cfg.require_nsim()  # will raise KsftXfailEx if not running on nsim
 
+        _set_ethtool_feat(cfg.remote_ifname, cfg.remote_feat,
+                          {"tcp-segmentation-offload": False},
+                          host=cfg.remote)
+    except KsftXfailEx:
+        pass
 
+I agree with Cosmin that the check feels a bit non-Pythonic. Dunno
+if the try except ends up being any better tho :S
+
+Let's not use "if cfg._ns" tho, please add a method that will return
+true / false (or feel free to come up with a cleaner way if you can
+think of it). We definitely don't want to encourage nsim-only checks,
+if you add new methods please mention in their documentation that we
+strongly prefer if the authors can think of a way to prove correctness
+that would also work on real HW.
 
