@@ -1,249 +1,186 @@
-Return-Path: <netdev+bounces-271420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271421-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aHn9ObyIw2lRrQQAu9opvQ
-	(envelope-from <netdev+bounces-271420-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 08:03:24 +0100
+	id gMryNZqKw2nnrQQAu9opvQ
+	(envelope-from <netdev+bounces-271421-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 08:11:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D36632062E
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 08:03:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53FC6320864
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 08:11:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2043D30191B3
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 07:01:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1DD17302FE9F
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 07:11:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64016256C70;
-	Wed, 25 Mar 2026 07:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD5C352C29;
+	Wed, 25 Mar 2026 07:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kecPcPPW"
+	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="lR+VBjYv";
+	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="jjcJKck8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC697260D
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 07:01:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774422074; cv=fail; b=WoRPbvcAxLFcOICdXORZpsZwz1cOxUMlylVS+nwMuPuONs2cD+v4ZDO5eZ77TMKwrePqpN6zxyB0dbmStKDZS3n8AT2FDm8RerqGPhx4tFYQZj7MIBl9dVuHcqSsoUKCQcObLwp6/VEVlA1IuzkQNaJsh5/Nin7gi5QOXdEmfyA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774422074; c=relaxed/simple;
-	bh=OIsndLW/onXvf65nbzSaq8s04U5PAZ45oDVy8nnCjg8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=dFK45hd7F+Zapq37RO8hOU6i/zsY05hQ9obO59tJu2vl3doxRhkGDCJ8pgK+3YJQjc9tSk08gtUpLVGlPYrWSRhZ18Q50icgChTYKl9qCeUqr+5Ls5Xyd6NuoDkPr06X3b/C/G5KJVamsSkjJXd97VDiujIG/QJguiNAI4TmBdg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kecPcPPW; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774422073; x=1805958073;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=OIsndLW/onXvf65nbzSaq8s04U5PAZ45oDVy8nnCjg8=;
-  b=kecPcPPW1UxoVryzBi1PqyeCXZ30im3Rt8/5lwGlXb8Vq9JFwstGPZoN
-   yEw26TP+tAACKEsrF8JO/CsPRxU0Z/pq2rbBRGcML5VKat+5cTyAwNpaR
-   Xm9nVIUz5V3H0tNd5Usg4KZ3PvWIprfusUAGKNQcYLN8w93NEnjJmnIT0
-   9mzF93atsFia1tN/QRzPAHHRqu6rKJSiU8F7UVO/Jf5B4OOHkqKC+Xzah
-   8JgZDb8RI8DtO//so1oTYx2bOsLU6++B6wygVK3+P4rXXosyiuTIByxCi
-   bqv5i2Yjy8bwR8J1ZUxiiRbdIRAjqP33/d1V9N2xymm37rbl0ODWD1OaO
-   A==;
-X-CSE-ConnectionGUID: f+i9jZOzSmK6RWG/7qqGEQ==
-X-CSE-MsgGUID: fPH7ezf4TBq9Yds/wtnxww==
-X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="63003063"
-X-IronPort-AV: E=Sophos;i="6.23,139,1770624000"; 
-   d="scan'208";a="63003063"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2026 00:01:12 -0700
-X-CSE-ConnectionGUID: Zj6dHBNkSj+CTdej109sTw==
-X-CSE-MsgGUID: ob39bNb8T66ekQoEf33IEg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,139,1770624000"; 
-   d="scan'208";a="229513513"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2026 00:01:12 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 25 Mar 2026 00:01:11 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Wed, 25 Mar 2026 00:01:11 -0700
-Received: from BN8PR05CU002.outbound.protection.outlook.com (52.101.57.46) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 25 Mar 2026 00:01:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=U63gKisg8xEl7rMM2iGuCvtaJIB6uaXSC0dRAAtAo/CBbAP+LX0SmZ5Od2yOF8wCcWiWDAaS1o8SlWz8OFZp5sHsKo/YZjYw6P/65Be3RhijmGwLOTNFPDIRvT8RhLLHFxFV/Yy+dA/JflhdOhuOpPSFM0VKZ6DiLEaqIfHbMqCxsRnW4xVbK4NhQa5ckVz6gzj43NKFAaRkfTFx9MvwxVPcXdUyni+QB/2x/FHmr/B91S9RE7NzG2HuAfSn0May2EFBiwx2SbwgmWTMccgmwmHGOiQyZy4uAPsO/rRIVfWYcqyo9g8wSL4pkvBQ6VD8+oUI4T15XSfs1t7UC/9w3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0+a6a/EvvbcHxL0laa99kxy2Hlp/qwvRakxu/1GfXLc=;
- b=ZC3iyJ8UggpI7Ha5SAh87qUsx9BJJurt0wmgP55TUCs0t7o9925mc3yxiOaPwZiwfstcBxG7bJoihK2SHN57UCn00l2wglly1n248Q1gSxLCfC6It2yQVzSiHHAsmBi2/T6MbbnQLsZpV0tU62OwS08QwaCchkuHoG0cjXVRUL5bvLgi7c3m2Q4j/pDSWuKBc+m1Tyyq8E5L+jt933OljHA004ocfP5FUFxEjmmhBTgz8M0EVieQFWGk9e8RM+Y2eiAPeMjIpw6dO+O1HQgxk4zJqEheSbnMzWGRf+Ap7ho+VmBITcJZrP3hr27B9WqYkT9QysGeXNVitOUepk04bQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by SA0PR11MB7159.namprd11.prod.outlook.com (2603:10b6:806:24b::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Wed, 25 Mar
- 2026 07:01:02 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9745.012; Wed, 25 Mar 2026
- 07:01:02 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Simon Horman <horms@kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Greenwalt, Paul" <paul.greenwalt@intel.com>
-Subject: RE: [PATCH iwl-next v2] ice: update ice_link_mode_str_high() with
- 200G
-Thread-Topic: [PATCH iwl-next v2] ice: update ice_link_mode_str_high() with
- 200G
-Thread-Index: AQHcuqNG1ShPLlj3BkeoMsbqzAkbGLW9/1AAgADVg6A=
-Date: Wed, 25 Mar 2026 07:01:02 +0000
-Message-ID: <IA3PR11MB8986A390B490C2B585B436E5E549A@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260323085840.3272274-1-aleksandr.loktionov@intel.com>
- <20260324181612.GE111839@horms.kernel.org>
-In-Reply-To: <20260324181612.GE111839@horms.kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|SA0PR11MB7159:EE_
-x-ms-office365-filtering-correlation-id: 59618e48-8135-4690-6825-08de8a3c46c3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700021|22082099003|18002099003|56012099003;
-x-microsoft-antispam-message-info: jPDYE4MgI3rXXuJo1KrKork6PsW9z7Sp0fWkfYaUSNz7gHwuEzt9uZgI8UA9CzwW8gTZmsveha99CDySghL/JPXWUYBCuAzReqw7RmRlCsKIBSceSlcoseBlcbVE69MT5EEDto4ybP1jj8qwdWjzKaEUj/IOL5paAEZR/g4LGMV2k7hJTCptm3Ei5EPIPln3xGkSHSXAv2jMTV1FxfYR58rKJ0y2+d2thekQqQmFmuA0iyvJ+gsRr00QIvk/kmB3dUNc9aK9lzh2flixvM6ChTZ/sZDg4Ol1vcFxkK8p4iVBDBHdQx6SQiYve+OU31FR01YVJJnO/CMHvHlfpP0pwnlnHv6P+2K9xVkT+987jvtOiN7KVyNnHunkMB+Nvbmbfk9qYeT4A3FKeAwYH8seEH3LR0GjxIIpGrPp/6bJ51d7rFWqygscmu+zvda9PYXK4TV1ZSBYKb+HcOxfii49fdBwgM18jKjcsiQvlNyg2Rgl9nMmtUyD4AOrqbprNr2oGUkiZnhwcSikZe3Fpo6kY4LOIMta176Nibo217o6z/y45KgYlR53T+yf8GDc46NILAFFBDTtq7VaqzpoR4ARjmcrq9nRjv9bP5LW2by+tkuLIxCC8svx+W76VjfHjhatDk4RGFBFLwwQ4zAhrDYeXMlk5VBINbO3r3xOJ2OEjya6vocLyiGlqthvK0zUJst1oeCpusNef9UIjbD47jdoP2jM5adp8YM19w0yLRlf23Z6lZlXr9sdz3ZIU//ZGyCqoSl+1iSTeo2An17oqqRyMjxwg0ko+yZ0mBrR99A1yB0=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Q5+XKA+4hSbe9hDvzDzWh1c7cEqPGsCvf/uXJVoD+w9bzbSPyPKbdr85aTqG?=
- =?us-ascii?Q?kPp1IlRLMMGEDPdc4zNxg4lPr9Ck9OT3DDMAEQ584an0X5pe0Jmitg0Ub9KV?=
- =?us-ascii?Q?Uh2TPRFoRdJ6hfvuHYanWbUNkmrXgi8pxnE8oO87AbJEhYNp0nfdTbGAIrNv?=
- =?us-ascii?Q?rObifqa86nWPB2wC1hR8N3nx1s89zrPSH4jbnmh9R+RCiKLftm/oquXX/zye?=
- =?us-ascii?Q?zuE/cu6NXym47gBpR+D/GTHcj/oeTJQTjMVOqKxE99inLl9j70XRkRg9AZxs?=
- =?us-ascii?Q?b3qx8+QJoU5QYYgrbVcMPyXkErxqKKfrvxMZnRm4/l+Xk7tXr+lD2Z2nslX+?=
- =?us-ascii?Q?t7LHQZeBVK1XzZQTrHO7qQCiEuTmCHlU7ieJYjbwgZdlQV2vora91wsAyHM6?=
- =?us-ascii?Q?dPX+okdztmP1C6zAibIH6JVjq5vtK/pK7zX4QeQHsnxj8nQvtWXJOS64Am5v?=
- =?us-ascii?Q?cruTKAA11Uf0G+0EUuPf72klQ3I/XNkvpOPPIfuc/295iXg+PhtaKlGvA6Ao?=
- =?us-ascii?Q?e5syiccZNOdzRfK3HLBl+r+P3aUXNQ0X1ktqmL6o6Tu2zHMSqoXZAp27XJu6?=
- =?us-ascii?Q?tpqlLk6EgHK6cwDkm4y67AxHmS4gDVzO0kURMh9mN1nmkZ5Z5XF/OYVCNpGM?=
- =?us-ascii?Q?Wc5KwgRkE0OIufTQxmMdUtHnUQAcN6k3WQqOuNllgBthYTi9QDCoa0DH8fOn?=
- =?us-ascii?Q?ClXY+8aaDN9hA9IbHPdKsTZgrWTn0IHkg99wbWP+JzO59oD3/cPfiMI0RV0b?=
- =?us-ascii?Q?33QyR4Y59BTpol8cmv9tJU8H5XK1D+0cqGFmAYJFFXh5J1lfqICs9the4Tvt?=
- =?us-ascii?Q?LEeaTzCqtFwRrJ/VYgDUeLTZmE5vPwWKfEn0hH8pCQR3QelfEiwXFhA62C3c?=
- =?us-ascii?Q?odlXjveptdwe0a6QME4F4e53X8h1sKtKvH8aPzjolpi/noqs4f9E0vA4cJLo?=
- =?us-ascii?Q?rWvRLhLx3BMbf4bXyfYnkK1IugjSj/29gjtdsTzOkYknckIvTzvj4f1mQ0Gv?=
- =?us-ascii?Q?IfUCVBcccLrZTeQSgtN0EJ+t8cIG9HKUE2IIGR54eFuSUkcM/+IDQSYjhjQx?=
- =?us-ascii?Q?vq2T5ZPjAd18XE+PQQ6Rresg6vwbTN4cSzvgubHZd5Cx2yieUmD3KFf5ySvi?=
- =?us-ascii?Q?DcJCeGHRinW/m3GRPK7Usoq2eoNUxrG3Q2tjEf87lW/kdLRH13EUUVAQBpp/?=
- =?us-ascii?Q?QGcxP9+24Y7ugIjH9yywkyXfU9kXjoEFW48MEqOwjlENIhRkaD8vm3T7l0UB?=
- =?us-ascii?Q?NjOYqUceOTXVJMgXHKLenVRhgiYZiHa5TiT8Cy6c8LD1ZGBtveqEqA45Jsr2?=
- =?us-ascii?Q?lCs9F3cB+pZWCFSRSrM61AhUuofHuALhEIkVhsm+JfBKPcz8YmGwDbyKHako?=
- =?us-ascii?Q?TXvU7ahULhuYiX5p4WA/pXyvmB6pIEMBJdZLJ02gAREJRYfO1nkW6SPfrShu?=
- =?us-ascii?Q?hs7eM/vuSQ39A6xLKIoXXiQMDYUINKFdnvxIp8oevOyiJDmScjX8gCqA70wa?=
- =?us-ascii?Q?3Bcko9Hf7OlzFTj/CUofIr/wn8UhQ5zObNhUjleiPFKd3nfCMiAwHyBiWqeN?=
- =?us-ascii?Q?sWDntcoD019P0Y/CCAvPDq8KYw4v/ktdX6LM33jZ0Cz3o6llURkUgTe2dqms?=
- =?us-ascii?Q?vaJsUYqpIhqodDkXNW5WTMxXEAH74/22IpgHS4bQH3gNKSmqpnCTJ2p2jeAX?=
- =?us-ascii?Q?woiB2+rI/8rnimIz6ieZ9YfWxXycl4pSPAMvigbTrpzOJF34iBFcENaY68UZ?=
- =?us-ascii?Q?hEukDaM5I539gJ9tar3WA5iAF8wNFj8=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A89287247;
+	Wed, 25 Mar 2026 07:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774422678; cv=none; b=sOTbNU43PwUHdigX59hFgZGk9DBIr4vrgbtkxDqkJLi33D5jvcbcag4pTLjND1pPWgudB3wNaFma80X2Nnno27NmhcnRd39Pw919ffMpLRL0efssQl/yiHbCwxhF2BmJyW/4474b5RywV5FUFcKhvQcza6uv755LYstKLTK0wDk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774422678; c=relaxed/simple;
+	bh=sQ7nWEiakocS+buPtMUVAsLAmLNsEzZHf9uuHLljolI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pEoEl7oMzF+7Uyh9pmcg8pNH8UEkXmt6xJgDu0uRn04pvsJox1VqZcej1EAH5o1s0ccDn2Mooy3F4bkGEVGfHUaewY8v9UccWgY0ahobGKQYmJjZHJOURy1zin78fX0BxPrQLOXPrnCCmP2+TMzM6Pq/pub1ID9NfJ2YkMEh5Ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=lR+VBjYv; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=jjcJKck8; arc=none smtp.client-ip=160.80.4.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 62P7AfJP026754;
+	Wed, 25 Mar 2026 08:10:46 +0100
+Received: from [10.102.162.121] (31-131-247-74.ip252.fastwebnet.it [31.131.247.74])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id D30AF122966;
+	Wed, 25 Mar 2026 08:10:37 +0100 (CET)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1774422638; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BtHr0mlAZWlS4uzhBz4o05EFXCNhnd52KDmF7pDcJOw=;
+	b=lR+VBjYvyUsKDY4Sksj04Q7F3HRMgnyPGKrkE6Z/ePXxlf53WGBTBXu3+ONV6zKzW8RFMW
+	mE8gvDP1bk9jLdBQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1774422638; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BtHr0mlAZWlS4uzhBz4o05EFXCNhnd52KDmF7pDcJOw=;
+	b=jjcJKck8rY/nC70GwNElfxHYd2wbPj5if6tYo9xjlcDsE2qRsM6iHwq/Huta/0lGa6G/h7
+	/qm0hn74IJeD407GHP6R/QFTXa4UJXSVVOW0B/J0cdG/DBHJQxwpdI1BezEvT6wj1Fy294
+	LR1BVS8fzLPRG0wW/4iwm4qB9EUbkOIBxRFrUAoCtjbuAjWk+dYPaJY338P49tVduQGKGG
+	YoNKOCjQ7Iouy0QZluR8VwLiT7FiHaBASFEMlmC7k5t7PtMTLGopluk1u2JasjDFxfb7GS
+	8b6xZ/wZvCpT5MGe7nJtbtt93jL2J7VzUaxK13wBs8m6Rsy60+NhX3E2PN2Zsg==
+Message-ID: <6fef33af-b351-4bf6-a210-ae2283ec9f69@uniroma2.it>
+Date: Wed, 25 Mar 2026 08:10:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: HRBDvq7mHiLyaM1nw6uJ+CagbmA2ZGhBFJUSQHiHI2owyRonxN9Sx1ZhI+3+2Bd8R2WzAa7wUFxQLf7dTuN9Fcq7oEkfyCNyuK5JxYykA+HjnTnTdOgkEYYftW40D0UWGAcFoQ+PWJhz+dlx/de5jCqpoROEa+TfsC6XjL4yMueeL1Aaox8LQJBnS3u9xVxqa1YeTO+ZFEEPUNWPP1ptpSmCVDBGy+Qu2OUJiXDV+ER7YD9Ju8hMlrBvXhr4dg7EcZuDgsjCqKPpBAYsBvih3GH0VIRyWi9TNYiP4cEP5Hn4Ac9TpK1iMtfKeEiTuMMuxhd4q32dE56ZYdHfU41xaA==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 59618e48-8135-4690-6825-08de8a3c46c3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2026 07:01:02.2729
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qzcfIturRu0sk3gPpNZANa6Y8tkpdCsypN32KmMHXB45b4u8l1/KWh52do8x7HMYpnh/rKhJ32gxLW34HywuEXQtdubSjklSirs1hzP+944=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB7159
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next 0/3] seg6: SRv6 L2 VPN with End.DT2U and srl2
+ device
+Content-Language: it-IT
+To: Justin Iurman <justin.iurman@6wind.com>,
+        Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+        David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>,
+        Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
+        Ahmed Abdelsalam <ahabdels@cisco.com>, linux-kernel@vger.kernel.org
+References: <20260322000557.12559-1-andrea.mayer@uniroma2.it>
+ <CAOY2Bqx-ZmBm-o-BoUYCxJjGQn31WF8V2u7gbnB52gOSYvG5Rg@mail.gmail.com>
+From: Stefano Salsano <stefano.salsano@uniroma2.it>
+In-Reply-To: <CAOY2Bqx-ZmBm-o-BoUYCxJjGQn31WF8V2u7gbnB52gOSYvG5Rg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271420-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,osuosl.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-271421-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[uniroma2.it:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stefano.salsano@uniroma2.it,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 6D36632062E
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,uniroma2.it:dkim,uniroma2.it:mid,uniroma2.it:email,uniroma2.it:url]
+X-Rspamd-Queue-Id: 53FC6320864
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Il 24/03/2026 17:00, Justin Iurman ha scritto:
+> On Sun, Mar 22, 2026 at 12:06 AM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
+>>
+>> Hi all,
+>>
+>> this RFC series adds support for the SRv6 End.DT2U behavior and
+>> introduces the srl2 Ethernet pseudowire device, together with
+>> corresponding selftests.
+> 
+> Hi Andrea,
+> 
+> Thanks for the work you (and Stefano) put into this series! As
+> discussed offline, there is interest in such a solution.
+
+Hi Justin,
+
+thx for your interest!
+
+> A general comment: I'm not sure about the name "srl2", as we're
+> talking about SRv6 specifically here. 
+
+fair point
+
+> I would personally love to have
+> "l2srv6", although I suspect we may end up with "l2seg6" to remain
+> consistent.
+
+I'd like to keep it as short as possible, our initial idea was seg6l2, 
+very close to your last suggestion, then we opted for srl2 losing the 
+"6" concept
+
+now it comes to my mind that l2 is somehow redudant in an interface type 
+name, as an interface is an l2 concept per se, so my preferred option 
+becomes:
+
+sr6
+
+(short and memorable...)
+
+as an alternative seg6 can work but I strongly prefer sr6
+
+ciao
+Stefano
 
 
-> -----Original Message-----
-> From: Simon Horman <horms@kernel.org>
-> Sent: Tuesday, March 24, 2026 7:16 PM
-> To: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
-> Cc: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; netdev@vger.kernel.org; Greenwalt, Paul
-> <paul.greenwalt@intel.com>
-> Subject: Re: [PATCH iwl-next v2] ice: update ice_link_mode_str_high()
-> with 200G
->=20
-> On Mon, Mar 23, 2026 at 09:58:40AM +0100, Aleksandr Loktionov wrote:
-> > From: Paul Greenwalt <paul.greenwalt@intel.com>
-> >
-> > Update ice_link_mode_str_high() with strings for 200G PHY types.
-> > Without these entries the ice_dump_phy_type() debug helper prints
-> > nothing for phy_type_high bits [5..15], covering all 200G and
-> > 400GBASE-FR8 PHY types supported by E825C hardware.
-> >
-> > Also add the corresponding ICE_PHY_TYPE_HIGH_* bit definitions for
-> > indices 13-15 (200G_AUI8_AOC_ACC, 200G_AUI8, 400GBASE_FR8) that were
-> > missing from ice_adminq_cmd.h, and update
-> ICE_PHY_TYPE_HIGH_MAX_INDEX
-> > from 12 to 15.  Without these definitions ice_get_phy_type_high()
-> > would stop iterating at index 12, leaving the new PHY types
-> invisible
-> > to all code that bounds-checks against MAX_INDEX.
-> >
-> > Fixes: none (new hardware support)
->=20
-> AFAIK this is not a valid Fixes tag.
-> If it's not a fix, please simply omit the tag.
-> If you want to say something about why then use free form text.
->=20
-Good day, Simon
-There is v3 version, please have a look
+> 
+> Cheers,
+> Justin
 
-> > Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
-> > Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> > ---
-> > v1 -> v2 update ICE_PHY_TYPE_HIGH_MAX_INDEX
->=20
-> ...
+
+-- 
+*******************************************************************
+Prof. Stefano Salsano
+Dipartimento Ingegneria Elettronica
+Universita' di Roma Tor Vergata
+Viale Politecnico, 1 - 00133 Roma - ITALY
+
+http://netgroup.uniroma2.it/Stefano_Salsano/
+
+E-mail  : stefano.salsano@uniroma2.it
+Office  : (Tel.) +39 06 72597770 (Fax.) +39 06 72597435
+*******************************************************************
+
 
