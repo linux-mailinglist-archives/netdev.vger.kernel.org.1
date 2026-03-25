@@ -1,233 +1,141 @@
-Return-Path: <netdev+bounces-271747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271748-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yJKEEflRxGljyAQAu9opvQ
-	(envelope-from <netdev+bounces-271747-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 22:22:01 +0100
+	id gNhnMOpSxGljyAQAu9opvQ
+	(envelope-from <netdev+bounces-271748-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 22:26:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97D9832C5E4
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 22:22:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2603F32C664
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 22:26:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C2E15306774C
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:15:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 04BD1305E340
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 21:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792F834CFC7;
-	Wed, 25 Mar 2026 21:15:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 755D92C0270;
+	Wed, 25 Mar 2026 21:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wrp8frWY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HCBcwE5K"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F5434B1B0;
-	Wed, 25 Mar 2026 21:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633EE38E13F
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 21:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774473300; cv=none; b=RIkaC9xNZmPFfzR4CK+vG6KWn9+YRRU8IKX3pV3eUNCES6VRam6ng/UB/2gtQYgmF4GsDwoLkRDCThm/lEPcEdhQ2HWUKxnHvrXwaD723Lu4SiSh+8qVsdGmloKkOwleBJtbWlAQOHVN6B4NaxyysIpnhaGoncO4eV5RF5C7vGQ=
+	t=1774473886; cv=none; b=Txzm6PWh1NyOrtC9wLZCnGQ05sxo1vOeIVA72seaZHeSQEixI4C/cXD7/VbHBXsKVlY1R+ebmTcpdgTUHXD+XfYjt7/LaF5rT8ccMzZY/ahlc4CivOyTmCSF+uIYhlR/lmORMS4cT8gdZS//lDByXRmLchkjwEG2sWzsb+iCHeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774473300; c=relaxed/simple;
-	bh=inSsd9F7dfooKB81GS0hABhVhpWOhoy17TwPWXiUcD0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hs25Rzp3orzwReAoEpR1eFitWbCfTEP3HQGDuKtPHC8678xUkLWCS3IUbHOswDHGapEvc8nv6BRARVO48JbIYwr6T3g4xE2W6m0JcxraU0Y5/Wnyo0OhCZ9yis+Fhj6C8hj6lTeH2lCPsoCAMVslgLnmhELidd9h1Ms+gTLAPCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wrp8frWY; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9T4ILjzpSI8Km2SYP2+R54L0ASfcwMMayhnKu46qcs4=; b=wrp8frWYdflVifRHX74kmry/Q2
-	r/4/Pg35KjXCbZvWTgAj4EASo/gshPXzA5HWOrsZr9QyIMPzKmsOw0d8yr+g8Gl4HWfax7TOiXvKS
-	cjGemaSaFRDRSqeArT+DX9tYxZ95k89H+XEeM8Nwyy3h0NLcnAyp21hkkC7SvjdFVGtFq8gjI/mqK
-	QHWw0MzyFnDe38O26aNmCE/mxx6vg4TgBtU5/Yw3f5xiURVzP9s7HXJ9DDPV5ymuz9KL/HeZXpsI+
-	RreCpn5SAG+W/aNkLtWY1LUIFgfZROeJpLARzV/qAlzMt5R9arFb9osgBB34l9Xm1/+F6s0G5uRae
-	c7lA2VKQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40038)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w5VYh-000000003wd-1uuC;
-	Wed, 25 Mar 2026 21:14:35 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w5VYe-000000006NW-3R79;
-	Wed, 25 Mar 2026 21:14:32 +0000
-Date: Wed, 25 Mar 2026 21:14:32 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Chen-Yu Tsai <wens@kernel.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Shawn Guo <shawnguo@kernel.org>, Fabio Estevam <festevam@gmail.com>,
-	Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Radu Rendec <rrendec@redhat.com>, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Drew Fustini <dfustini@tenstorrent.com>,
-	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org,
-	linux-mips@vger.kernel.org, imx@lists.linux.dev,
-	linux-renesas-soc@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, sophgo@lists.linux.dev,
-	linux-riscv@lists.infradead.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH net-next v10 2/6] net: stmmac: qcom-ethqos: use generic
- device properties
-Message-ID: <acRQOLJ2wWF3rIHb@shell.armlinux.org.uk>
-References: <20260323-qcom-sa8255p-emac-v10-0-79302b238a16@oss.qualcomm.com>
- <20260323-qcom-sa8255p-emac-v10-2-79302b238a16@oss.qualcomm.com>
+	s=arc-20240116; t=1774473886; c=relaxed/simple;
+	bh=ohq5LI+tvC3WN6rzfGFvW+5Wk0NRLxkKVo5xChInWBw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Fvbd1v3v4DVoH/81Mr/FqCat/Wx1veW8c3eHhLsdawNm21P57d2mK/thMeTE4TkVY+GKgE8QuFS911p1oLiRiQA+mCFTbUXqkaXgMY5VxcFsv6Spxq3+q6Lb1qlz75IiirGJzCc51IABJ7+xVosEcX8mOSrtvGU8oBfi2d6QuqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HCBcwE5K; arc=none smtp.client-ip=209.85.160.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-50b44f7b7bbso11582561cf.3
+        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 14:24:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774473882; x=1775078682; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0moPH9lNF8lhFs5nw1BWpXVMdkjYFNcHZVV82K+iuRc=;
+        b=HCBcwE5KAUwXpsw/HCDizgLpdYQ44LSwl7uuh1M4kl3Q0/eJIm/Wr6eF+loTXI41G7
+         db3CTQOF0mpxr08NnlIr1hkB1lZz194ieIJgbHYnnC/hyS9OIN7bGCfUqz4zera2z3+U
+         IhJ1meWNpNnWzjuX/bAs3HDeDFJx8mOcYwl6fulDcESGHS/K0lfmObbQDxqObanJtfDI
+         hhdiCh/XzWileii1xET9zHx7HpO6/qm09MTCaI60EwdDqy+cFRPwKNixuLsEtAFlUJkN
+         RmQGJpPVvyzQrQD/hOEccttaCQM9UVaFvuFDBozpfQQVQXaG5kXT+I9quai+Mc3fwYfV
+         UWUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774473882; x=1775078682;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0moPH9lNF8lhFs5nw1BWpXVMdkjYFNcHZVV82K+iuRc=;
+        b=YrnFT7xrC8SU3gVLgb5VhsNV/D5FzELWofL6i/irfl1U91jvMOEYEk8SdMmvF9kZpb
+         ehGne/18VZCJ+SKzW6pMFVVUT0XXMOfVDN/ihiP/zTVpjU4tqIIfsOk5dwk8iEypLlVN
+         6P7iue7OSvWkHoAhX0/ThKk3X8N6I1DJetzmGmfLcGUJT5Tts3qzta/JmE1mhvmCmhMQ
+         ntvoR5McrNUU4mjd72G6wg1B4A6HYTGIN2D9LjQfE/soLlSg/MLC6xHFvAbP96dMuuCX
+         CbH0imd7/p2f4llu4iF9s9OYojtq69hI8e7/7Vzu3uxn9kPX82GdyMz94/yuwJIjQy5m
+         xfkA==
+X-Forwarded-Encrypted: i=1; AJvYcCVu6hUixSXHw/h8rjDR6eM8n8g6izNxoODpgb/ILskfxlee5dJRU4DfwVGJmYLA6oD9xpk5iG0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyysIiUTPVEiCDz+kQ5fXTZyIbMg6mHZ8mq329+gePeawhc6pLk
+	SPt/Ax4P6YlUW6PoJSThLmHplmafqPTnzajRJEsDfc1SzM5KEW8ja5RMSA+0svI53mYUn/qcwR/
+	+fXKQX4RX0IM1Hg==
+X-Received: from qtbbb27.prod.google.com ([2002:a05:622a:1b1b:b0:509:217e:82c9])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:831b:b0:50b:31ad:32a2 with SMTP id d75a77b69052e-50b80f2ba09mr66085651cf.65.1774473881951;
+ Wed, 25 Mar 2026 14:24:41 -0700 (PDT)
+Date: Wed, 25 Mar 2026 21:24:39 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260323-qcom-sa8255p-emac-v10-2-79302b238a16@oss.qualcomm.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
+Message-ID: <20260325212440.4146579-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: tcp_vegas: use tcp_vegas_cwnd_event_tx_start()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271747-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,st.com,linaro.org,baylibre.com,oss.nxp.com,nxp.com,oss.qualcomm.com,bootlin.com,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,tenstorrent.com,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[48];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271748-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.963];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 97D9832C5E4
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2603F32C664
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The comments I just gave to v9 (which is incomplete as received) apply
-to v10 as well, although I have no idea what the differences are
-between v9 and v10 as I never received the cover message. I only
-seem to receive patches 2, 4, 5 and 6.
+While net/ipv4/tcp_yeah.c is correctly setting .cwnd_event_tx_start
+to tcp_vegas_cwnd_event_tx_start(), I forgot to do the same in tcp_vegas.c
 
-On Mon, Mar 23, 2026 at 02:20:54PM +0100, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> In order to drop the dependency on CONFIG_OF, convert all device property
-> getters from OF-specific to generic device properties and stop pulling
-> in any linux/of.h symbols.
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/Kconfig             | 2 +-
->  drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 9 ++++-----
->  2 files changed, 5 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> index d3a6ab7383fc1e1b2e4b12c670b12a8ad1606e6c..4148805a82b106471a25f9496b60be5bb9ce5c00 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> @@ -135,7 +135,7 @@ config DWMAC_MESON
->  config DWMAC_QCOM_ETHQOS
->  	tristate "Qualcomm ETHQOS support"
->  	default ARCH_QCOM
-> -	depends on OF && (ARCH_QCOM || COMPILE_TEST)
-> +	depends on ARCH_QCOM || COMPILE_TEST
->  	help
->  	  Support for the Qualcomm ETHQOS core.
->  
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> index 3ccf20fdf52a8ec4649b43ade8ee7b85d613e1c5..66fd2ed2c2c8428694c07d89220d0e1608546791 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> @@ -1,8 +1,8 @@
->  // SPDX-License-Identifier: GPL-2.0
->  // Copyright (c) 2018-19, Linaro Limited
->  
-> +#include <linux/mod_devicetable.h>
->  #include <linux/module.h>
-> -#include <linux/of.h>
->  #include <linux/of_net.h>
->  #include <linux/platform_device.h>
->  #include <linux/phy.h>
-> @@ -728,7 +728,6 @@ static void ethqos_ptp_clk_freq_config(struct stmmac_priv *priv)
->  
->  static int qcom_ethqos_probe(struct platform_device *pdev)
->  {
-> -	struct device_node *np = pdev->dev.of_node;
->  	const struct ethqos_emac_driver_data *data;
->  	struct plat_stmmacenet_data *plat_dat;
->  	struct stmmac_resources stmmac_res;
-> @@ -778,7 +777,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->  		return dev_err_probe(dev, PTR_ERR(ethqos->rgmii_base),
->  				     "Failed to map rgmii resource\n");
->  
-> -	data = of_device_get_match_data(dev);
-> +	data = device_get_match_data(dev);
->  	ethqos->rgmii_por = data->rgmii_por;
->  	ethqos->num_rgmii_por = data->num_rgmii_por;
->  	ethqos->rgmii_config_loopback_en = data->rgmii_config_loopback_en;
-> @@ -818,9 +817,9 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->  	if (ethqos->has_emac_ge_3)
->  		plat_dat->dwmac4_addrs = &data->dwmac4_addrs;
->  	plat_dat->pmt = true;
-> -	if (of_property_read_bool(np, "snps,tso"))
-> +	if (device_property_present(dev, "snps,tso"))
->  		plat_dat->flags |= STMMAC_FLAG_TSO_EN;
-> -	if (of_device_is_compatible(np, "qcom,qcs404-ethqos"))
-> +	if (device_is_compatible(dev, "qcom,qcs404-ethqos"))
->  		plat_dat->flags |= STMMAC_FLAG_RX_CLK_RUNS_IN_LPI;
->  	if (data->dma_addr_width)
->  		plat_dat->host_dma_width = data->dma_addr_width;
-> 
-> -- 
-> 2.47.3
-> 
-> 
-> 
+Fixes: d1e59a469737 ("tcp: add cwnd_event_tx_start to tcp_congestion_ops")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/tcp_vegas.c | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/net/ipv4/tcp_vegas.c b/net/ipv4/tcp_vegas.c
+index cf12fb6be079d8ccd65f297a3a90a9a5e90036e8..950a66966059e89fc108a31c106805a0f76fc6f0 100644
+--- a/net/ipv4/tcp_vegas.c
++++ b/net/ipv4/tcp_vegas.c
+@@ -319,6 +319,7 @@ static struct tcp_congestion_ops tcp_vegas __read_mostly = {
+ 	.pkts_acked	= tcp_vegas_pkts_acked,
+ 	.set_state	= tcp_vegas_state,
+ 	.cwnd_event	= tcp_vegas_cwnd_event,
++	.cwnd_event_tx_start = tcp_vegas_cwnd_event_tx_start,
+ 	.get_info	= tcp_vegas_get_info,
+ 
+ 	.owner		= THIS_MODULE,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.53.0.1018.g2bb0e51243-goog
+
 
