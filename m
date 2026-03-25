@@ -1,170 +1,213 @@
-Return-Path: <netdev+bounces-271500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271501-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKooLgnHw2lKuAQAu9opvQ
-	(envelope-from <netdev+bounces-271500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 12:29:13 +0100
+	id oDX3NwrLw2lKuAQAu9opvQ
+	(envelope-from <netdev+bounces-271501-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 12:46:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36E43323E46
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 12:29:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37DA2324271
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 12:46:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 56F99313B429
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 11:21:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 30D8E30C3CE7
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 11:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC95B347536;
-	Wed, 25 Mar 2026 11:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564863CD8B1;
+	Wed, 25 Mar 2026 11:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zdjcJNJH";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="QGzhLg7T";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zdjcJNJH";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="QGzhLg7T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MycwOQlt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C8A3C6A27
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 11:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8B83C7E13;
+	Wed, 25 Mar 2026 11:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774437664; cv=none; b=QjoCIbZrxVJQKFhAfYRxi+y/eGohbi6WxAvAr2hR+j64EHZEkvFlux8KcIM6typ9vAYm+WZUuT0QdIFLtelw8fFX4q7idinzaJzDchAXgZkKxwwFo+quykQaO69L+2QP2NmrEXnw4vWxWvIte2/2YOqEe8eaWKIbh5yLETYYd1I=
+	t=1774438323; cv=none; b=BEc20ByUjGiIx6ZCkjhhG+01PbODW+boNthOlQQ8INQ4rpNENlaTmp/hjkmHNvA7jwNnOzRQMJff7o0k7iR9RQZAupcbuGSLUiP+7MV8gRAay9LWBcsx9atfFRSnia8BG0/IOqPlCemWh+oR82kbQEfLNjZ8tBkZiZM5iTBxngU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774437664; c=relaxed/simple;
-	bh=GG0nl2on0VewYM1GlAFT6peou8owq2vZ8Sq7vLDd9XE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=T4Kb0ufSMHzpWt/+z77p7oc7qW4JFjrRxNSkmLxkzqa1q/uFoC7jd6bAwGWkq8Sv+G/DQVaeq9lgMNwkwiqJ2ZdZLkosjyoZJL5/LXWk2Rweb3kFEtO7JS2alHu+BuE8zbWZvNV7ABv96rMm1/lRmfKq9w1DhquM9rU4Y1lglw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zdjcJNJH; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=QGzhLg7T; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zdjcJNJH; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=QGzhLg7T; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id F42265BCE8;
-	Wed, 25 Mar 2026 11:21:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1774437662; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=YtQXCFM9mJfWQys+devYf0oIE8i/ZK8S4Lnr93L1wpI=;
-	b=zdjcJNJH+9NdJHUl9iwaxG7iAFk1+P2rmA/NpY9I8MXTZhkkFI82dS2q6sgN2WIExKaCKJ
-	yfMy1qY8TPbvGE15zDTo3DxtxqCdw/o5gSr0ceYNmRV3VOMnjof+tPzqe444m/F5p8HdJb
-	VbICkq3V6xkbCc6PltDY4rIGwYROWAs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1774437662;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=YtQXCFM9mJfWQys+devYf0oIE8i/ZK8S4Lnr93L1wpI=;
-	b=QGzhLg7ToJUufv2TXySOGiny/XjPiP3Y3jQGd9DR7vKSVevz1ggDEVdRaF4DEzIoz4R0BF
-	fVSZo0MtWZ0RCPDA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1774437662; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=YtQXCFM9mJfWQys+devYf0oIE8i/ZK8S4Lnr93L1wpI=;
-	b=zdjcJNJH+9NdJHUl9iwaxG7iAFk1+P2rmA/NpY9I8MXTZhkkFI82dS2q6sgN2WIExKaCKJ
-	yfMy1qY8TPbvGE15zDTo3DxtxqCdw/o5gSr0ceYNmRV3VOMnjof+tPzqe444m/F5p8HdJb
-	VbICkq3V6xkbCc6PltDY4rIGwYROWAs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1774437662;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=YtQXCFM9mJfWQys+devYf0oIE8i/ZK8S4Lnr93L1wpI=;
-	b=QGzhLg7ToJUufv2TXySOGiny/XjPiP3Y3jQGd9DR7vKSVevz1ggDEVdRaF4DEzIoz4R0BF
-	fVSZo0MtWZ0RCPDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B8E374438D;
-	Wed, 25 Mar 2026 11:21:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id FjzgLB3Fw2kTBAAAD6G6ig
-	(envelope-from <tbogendoerfer@suse.de>); Wed, 25 Mar 2026 11:21:01 +0000
-From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nithin Sujir <nsujir@broadcom.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] tg3: Fix race for querying speed/duplex
-Date: Wed, 25 Mar 2026 12:20:53 +0100
-Message-ID: <20260325112054.108988-1-tbogendoerfer@suse.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1774438323; c=relaxed/simple;
+	bh=Pdu9z57yDEEmN+aEzcYH+0eI2CjV3sgqjGJN6kagq+k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mFhMk8R1zmLjIaCXryJsw88E78MilV7Fr+YQnwZoYS74qE2zU5beol07XDFOfGoo/IO1Td0CofemEQWj1BtPLI3dR78oQ7J2qWQktxETgGpV2cGvC3t1/kkK27FaMMafiGp4SA1w5g20Egus7DacDOBF+MSGO7Vun/4SfCuIv3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MycwOQlt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 728F5C2BCB0;
+	Wed, 25 Mar 2026 11:31:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774438322;
+	bh=Pdu9z57yDEEmN+aEzcYH+0eI2CjV3sgqjGJN6kagq+k=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MycwOQltwHMQhaOInlNbtVPzW33iD0/ZecRnirjfS3QxJxrUTIGXatJdA8voseq2z
+	 BHdEbL4LOZHbGd9a9n57pyFmwjklfgHosWJpDC/hA/Su9+p0CS9hN6z+snpPwoVscg
+	 bLJMJk4f1KfM5hOKEeedJ1xx1p4FZXr+55mLoXmPtP3buxiVlCyvOFoaY+ZiSleu64
+	 KSgK1ZEnFIToM92CowrDCGxMw2Ku0toUbWD9MNf3J48eNPWmKp8Pp+MasBBcHrM9jv
+	 q495/4m8p7iUhtR/7/QEhNSiVg/eU3xSeKOPEcLEBE6xOyrDANf8hXt9IJUlDLhoxn
+	 68pvz/cLSbAYw==
+Message-ID: <c607e5e9-2e2c-450d-9ca2-5727ba99578c@kernel.org>
+Date: Wed, 25 Mar 2026 12:31:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -1.30
-X-Spam-Level: 
-X-Spamd-Result: default: False [0.84 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: sdm845-shift-axolotl: Enable NFC
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ David Heidelberg <david@ixit.cz>, Konrad Dybcio <konradybcio@kernel.org>,
+ Alexander Martinz <amartinz@shift.eco>
+Cc: Petr Hodina <petr.hodina@protonmail.com>,
+ biemster <l.j.beemster@gmail.com>, netdev@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, Rob Herring <robh@kernel.org>,
+ oe-linux-nfc@lists.linux.dev, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+ linux-kernel@vger.kernel.org, phone-devel@vger.kernel.org,
+ Bjorn Andersson <andersson@kernel.org>
+References: <20260324-oneplus-nfc-v2-0-3eef052c9bc6@ixit.cz>
+ <20260324-oneplus-nfc-v2-2-3eef052c9bc6@ixit.cz>
+ <9d9ec994-c954-445d-97b2-772614d66f35@oss.qualcomm.com>
+ <041766dd-422e-40e1-9e5d-c220580871f5@ixit.cz>
+ <a0da2236-27b3-4491-862a-457a03cb4c5e@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <a0da2236-27b3-4491-862a-457a03cb4c5e@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[tbogendoerfer@suse.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271500-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-271501-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[protonmail.com,gmail.com,vger.kernel.org,kernel.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[suse.de:+];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:dkim,suse.de:email,suse.de:mid]
-X-Rspamd-Queue-Id: 36E43323E46
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 37DA2324271
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When driver signals carrier up via netif_carrier_on() its internal
-link_up state isn't updated immediately. This leads to inconsistent
-speed/duplex in /proc/net/bonding/bondX where the speed and duplex
-is shown as unknown while ethtool shows correct values. Fix this by
-using netif_carrier_ok() for link checking in get_ksettings function.
+On 25/03/2026 12:20, Konrad Dybcio wrote:
+>>
+>>>
+>>> FWIW TLMM subnodes are best sorted by pin index (although the file
+>>> currently doesn't really do that) as per dts coding style
+>>
+>> I assume when I group the -pins into -state it doesn't apply anymore? As I don't feel having pins relevant to one device / subsystem all over the place is extra clean.
+> 
 
-Fixes: 84421b99cedc ("tg3: Update link_up flag for phylib devices")
-Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
----
- drivers/net/ethernet/broadcom/tg3.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+	nfc_int_default: nfc-int-default-state {
+		pins = "gpio63";
+	};
 
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 21a5dd342724..73a4b569b03e 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -12299,7 +12299,7 @@ static int tg3_get_link_ksettings(struct net_device *dev,
- 	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.advertising,
- 						advertising);
- 
--	if (netif_running(dev) && tp->link_up) {
-+	if (netif_running(dev) && netif_carrier_ok(dev)) {
- 		cmd->base.speed = tp->link_config.active_speed;
- 		cmd->base.duplex = tp->link_config.active_duplex;
- 		ethtool_convert_legacy_u32_to_link_mode(
--- 
-2.43.0
+	nfc_enable_default: nfc-enable-default-state {
+		pins = "gpio12", "gpio62";
+	};
 
+ 	sde_dsi_active: sde-dsi-active-state {
+ 		pins = "gpio6", "gpio11";
+	}
+
+Let's imagine future possible implementation of DTS coding style
+linter/checkpatch. How it would sort the nodes? Either by node name or
+the first value in "pins", this this would be:
+
+ 	sde_dsi_active: sde-dsi-active-state {
+ 		pins = "gpio6", "gpio11";
+	}
+
+	nfc_enable_default: nfc-enable-default-state {
+		pins = "gpio12", "gpio62";
+	};
+
+	nfc_int_default: nfc-int-default-state {
+		pins = "gpio63";
+	};
+
+So that's how you code. Less work for future linter/checkpatch.
+
+The trouble is that "pins" property sorting can result in nodes being
+spread all over, imagine:
+
+	nfc_enable_default: nfc-enable-default-state {
+		pins = "gpio5", "gpio62";
+			// ^^^^^ DIFFERENCE!
+	};
+
+ 	sde_dsi_active: sde-dsi-active-state {
+ 		pins = "gpio6", "gpio11";
+	}
+
+	nfc_int_default: nfc-int-default-state {
+		pins = "gpio63";
+	};
+
+That's why I would propose to keep everything sorted by node name, but I
+am fine with both choices. Qualcomm maintainers decide about such
+detailed style they want to impose.
+
+Best regards,
+Krzysztof
 
