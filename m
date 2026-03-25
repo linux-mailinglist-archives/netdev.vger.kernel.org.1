@@ -1,169 +1,185 @@
-Return-Path: <netdev+bounces-271565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271567-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YOJsChHsw2kAvAQAu9opvQ
-	(envelope-from <netdev+bounces-271565-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:07:13 +0100
+	id cPmLKM3ow2lvugQAu9opvQ
+	(envelope-from <netdev+bounces-271567-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 14:53:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 736A83266CF
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:07:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A3DB3262C4
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 14:53:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EDB29321E472
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 13:43:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 719F13109D71
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 13:44:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285173D669E;
-	Wed, 25 Mar 2026 13:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E633090DE;
+	Wed, 25 Mar 2026 13:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="O0+yIvEG"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="W3BrBHXd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-wr1-f103.google.com (mail-wr1-f103.google.com [209.85.221.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBD83B27E0
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 13:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774446210; cv=pass; b=dGCufyBfN7pZAeLGHFMXsNYTMRK8QWfaxrYEtqO8wR7QU3uW1H5kZ1eUVkV0Yr9i4sZuDfERUai/Zi6/VWe0RSyGF0riUjrr4KPtIvzOnZ4in323VO368Zp/uoFMEC3+/Nx+Kr7gH+87gaqQbVyEfAeTyS1qzCFUteOZ3SunR0E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774446210; c=relaxed/simple;
-	bh=Ty+ZwtUIfiM1TTQbdI9KSw5FmoX7nhAYATEh+143UEQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cMTKhhUWoZjlDzGJS9t2CGGGjo8AOqS0zSEM3sXph/DgER61gwS5WOiFwcCGekWXHhqW4QiA+P2bL7FTIqPyzJExc94nUFMo+cGqYg/Bh298IS65bxZ2tukaBubu91s2aIgZycqAAaBApRmve1/MayIc8Htm9s8mwa2OCTSveL4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=O0+yIvEG; arc=pass smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1FB2459C9
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 13:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.103
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774446285; cv=none; b=Fg5X4Ba6YPF0n6oewqV293/gnwJpO8LgqfJ1LKK67GnqeAUHrkIoCojexC79W66Io/JLeKxn8W9MfEoXY5xDwURUjqxj6ltRFPTjdA/7qsgfeOCAY6CQ/VLsm/kZV+p/D4MMvyvvhTwtVGQC1mHzwF2vmYC5DHnL39h8Vi24DRM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774446285; c=relaxed/simple;
+	bh=qsL98HCWKiKaSLCtXakBUZxhV7iELMqHWhkmVizwwIw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P42QFBhd3Hk91wVCcwheSimWAlMTKG68xedDo9DBIeSdqRCd0JGQxQNLLO7KaBBGMtKVK0zS300JzrxEKS1Jkse/5czCetVF4pdA5aV0IVOT9Dv3Yy5IN7qDTW8B/jOaBR1fY0Wx8hWPL5iulNEKfWnBzz0Z7oUWy2BYXvmOrJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=W3BrBHXd; arc=none smtp.client-ip=209.85.221.103
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-66abe08cdf5so334638a12.0
-        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 06:43:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774446207; cv=none;
-        d=google.com; s=arc-20240605;
-        b=iSD7EdjaQv7ffhfv0udewPEkW6whGOM7RqaiG93FxJz1PQkKsPhrWVo5eQRopHuMS8
-         LmKe87aXKlqyYPjQguisK54uzlbY93If/cGTfjELphciXH8XmiyE1kxhsTEzkrEC89Ko
-         WaM+jC3ya22iHDY65Tl+pzdnCOoQaXfrw3Ox1utZTM+EJkETsR6ypJriLovSq3JjOYEE
-         gC9oOewLrtvJuOPCbwPatb13yGu9rHRgqvf2XIvyX48Bm8OSP+8Agnc1EG6jZTYDI6kV
-         CnVNeHmFmQ1ekT783qE4OAS4dWtYy0++GROS99MjOPggquqPkmEmnvbs1fCTnFu6NW3f
-         EoyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=lphqKf4F/uYNN8qYKbbQ1dR8GaPySrJrOoIkVeC30Gk=;
-        fh=6onRMPJOFnN+SFYsH7i1T3oxeslPNmAyryxlffkEzvg=;
-        b=QWowEXGzSg5OQLbeC9HXgNLnynsxxAmFWngcY3NYPxU6w2LuIhsOIYaJF3xglrzZeL
-         i/AaPSHBuJNmS2iEwDUKcZR1D00Rp6OS4bOnRaiDNFUpLsGvl/iUax0xGDeq1P68LqPR
-         75hkV0axfGmA5PPraSvPrm3BbYlSVqWE89c8X4um/ZjPjydRR8dxK5nGNNfCIDbnAHG5
-         6mRyGXFwJ6RaYxU0Ol3AGCOpyypWJESyV0JBCgmxBHc97TyykTrxH91/C8hJ2q0hyE23
-         frV/Lxm/as9kAQ2iGF+/5nwroTTd6Z1J4WG95YHbTba2z+4xLUd2AoeNV3OJ571rIeLR
-         jDdA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-wr1-f103.google.com with SMTP id ffacd0b85a97d-439cd6b0aedso4327365f8f.1
+        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 06:44:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1774446207; x=1775051007; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lphqKf4F/uYNN8qYKbbQ1dR8GaPySrJrOoIkVeC30Gk=;
-        b=O0+yIvEG8NwTKVKyAiwaEouQbKQVnrDIizVFsXFS8fsB1m1kkx56AEhB+wmFkwvEwR
-         bGviQSUlBeb/rALyJxD0K1EZ6I26cophWc/eh4lmTMBqq1aVzJcjBqxipdvA4DWkrdf6
-         k7a7es4kzyvPhA0DtTAP4xepAQ3CLaxOmyrC3CCpUW45Tkm2sUSU1i6VPnU5NLl9oPCo
-         phU91kKYFj2tVXlPVWR0gVMMy59wQvCvuXFoYdT0Oc89m/jGRTWp/PzHGyP2o7cndyKt
-         o0kt8JhXR6HOabzTsUQBxWcRjiprg2qo9yJDWQI9pNVpBw/IHHXNiwsdAHT9PmR+456k
-         WXdA==
+        d=6wind.com; s=google; t=1774446282; x=1775051082; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5Djl3a9JK+lUi9uG1HATPHnI66G0NG0PJGY/xhrTxTs=;
+        b=W3BrBHXdEAmLVoA6Js0ByweXwOpNX96EyNC4gr/fc1DaBBJGtTlRZLUqc5ZO4ENi89
+         h6mnFjHy7PjbuzRS5xuVD6B+8ySk3gwK65v2SEN9qjR8bUSHhu+G79z5JLD+3Ay6ETCN
+         ax82tuRejaX6YZDJWzYl0pA1X+WXOxZ1NkeGQLfo+ZK3cQaUy/sHHR4v7YcDzO+qdEWr
+         N/c5JNWoAyzqyZ6QioauPS5qLnuwVsEkcR/Jy6TcNnQU7j4A2X4odKY4c8/chcx/M434
+         SGgKIqXqtAEOg97nLUWHu0AKx4TTkKgm2C7gegXkmyV9W6xgqPPTir3DojFcVACBWXy/
+         WJsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774446207; x=1775051007;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=lphqKf4F/uYNN8qYKbbQ1dR8GaPySrJrOoIkVeC30Gk=;
-        b=YqqyjGPx+rz0KgG0z0shrG+/9IWipEMDxsQf/vtNzA9PW2s233dolAAnsq+8uk3cXl
-         dvV8loNdj2tNSdmJMypBKmDevSeD1SEufTbIhh34Fieyea+tIGgTepIsH1EzEq0s28hu
-         bM9DCVp9aRtIjOeCbVcfrEXj/AJcWvHTXQuv39Rv8Sx98RmKF5ewTJSuE9HdCqIhQ/Am
-         Td0hR1Hps9a7nYLW42nmJp8aGbopu5K7mDGUYNVSa9t43rYL+e0EeuK7InKXi6bFgLwU
-         AIVv37ZNSH4xyCTTwjfp+Y7JMtwXyMD3E8qICZ7RZ8aydIwHFAsDXMvdzHdTs61tXFnA
-         yZDA==
-X-Gm-Message-State: AOJu0YxR2IY0zffLfz8RMVCuGNm0FpLAxtogJr48l4F+W5d8vEFuPsiN
-	zTBtB++/fD7hqIcGh5kxkykCtkvgLT0nM8YQVC2EiE9Qq8nms0PNw0OjlTGb6HeUrlVrR5dUutA
-	GHH85tNLpuUp0V+a/piZLab5xSPeQBRdEXuekMVYpmg==
-X-Gm-Gg: ATEYQzxd5Oqc+tWDELneCfiHg/YeHdtZMgMfCs8pI5gdAy7P96cz3DcHX2OdYj7WLmO
-	bOXkZkwiOeOmWE6KGDQPoRyXisqV96T0U7j2+o7v+CUvp8nNldJUfDGFqLI4oQbXmofYIeW8afD
-	iVLaXvEBJy8KMS9udJtXGCJ29HN/UvqTUwRiL+9WIhTsw+FZyp37K/Nz453YCwDg0ntSo8+n//R
-	/UIOKR74zil62QSDb5rREElXQC3rya8Vq32Y9Rc4Zk/PBCEFRLTzB8SCkrV0nvfRG3q2fDvdEz0
-	cIBZX7Om19zkRUD8hONGfIx5DRgnv7/wq9us88rW+Q==
-X-Received: by 2002:a17:907:d096:b0:b98:2df5:9bf0 with SMTP id
- a640c23a62f3a-b9a3f18cc41mr271759566b.22.1774446206701; Wed, 25 Mar 2026
- 06:43:26 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1774446282; x=1775051082;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5Djl3a9JK+lUi9uG1HATPHnI66G0NG0PJGY/xhrTxTs=;
+        b=VRxIzXxv+zTyIfTUaKfwk0ZpBHoSbumOoNgBFqSpZ2i0zw+0ycrH8PqsxNjwwtB2ip
+         LyzLra84VFWF+kRD4ha+PlqovJPhfyzHEQ2s2DJk2cVNHZ5AxLyJcO6G4/bAvrPyH6pc
+         ZbrVm07PaWp8b9TEPD9110M/UjkioPub5f5lFdpMnhbMHYbJLvyWi0yIXpek33gOBULC
+         k4EqSQg8HYx9+VDwAuRxjYuf789ZPNyzBjG/NKpVSG4ND/VD214k87DUSIyrs258IQYf
+         rGYGd6qnf5SMQO+mm2GN8tt5KO9OpCYU01wueA2izRS6Q3O8vqgK4k/T5cKWctQrZtHi
+         8BVQ==
+X-Gm-Message-State: AOJu0YyBSq8K2JLxxJGejoodjY34feTVqIkXF/0DqszbeE6ITROKfS5w
+	OMtRXqYhk9IrflkWOTJpLQsvtGafk46skAiTCC6Z6OWY1rHFRlHO86J7aoInpp/kalBLhw7vIpq
+	fO2UydJCG5c6KzYcZC5MVYAzMUZlfwPQ3G+he
+X-Gm-Gg: ATEYQzzEHnFnme899GkZbubwVC9ketol6jB3BNew/awCJAwByX/qrnD+NWHiStf4jlA
+	yW2Pd7bEH2A4vGCXDmKEoF7WVx2oj/vawstuiisdN6fzDHX9XLFvBC3yLyRDII9xZ7+6GKfREgl
+	Jybzt4CntPkT0Z1jslKcZx/BL+TaPy0Fy8RD4L7fxer9nsCfIcC+GTd6STmkf9JZVB07GTwiBqu
+	HER/KJP+QGHpqfu8L53HD9YHQFegtLnzmFiG97f0jnhwHrAGSzzHx/xehGqvCzIwlzBg4XNtb4E
+	mkzNEaaDsNpQIVfWNTrZsjBnI1AxkJdLd952n3K8nVmJiVG3Q0gKHNdtzqbcZXaBi94P9GGGe9d
+	wgecrauWMVkA+iWeG/vbjWke3boI/1lrTUZtRo2IxHpTbum1+T+On
+X-Received: by 2002:a05:6000:40c7:b0:43b:4951:6479 with SMTP id ffacd0b85a97d-43b88a0ca38mr5155173f8f.37.1774446282474;
+        Wed, 25 Mar 2026 06:44:42 -0700 (PDT)
+Received: from smtpservice.6wind.com ([185.13.181.2])
+        by smtp-relay.gmail.com with ESMTP id ffacd0b85a97d-43b870d9ec1sm229271f8f.24.2026.03.25.06.44.42;
+        Wed, 25 Mar 2026 06:44:42 -0700 (PDT)
+X-Relaying-Domain: 6wind.com
+Received: from stryper.dev.6wind.com (stryper.dev.6wind.com [10.17.2.5])
+	by smtpservice.6wind.com (Postfix) with ESMTP id 5CA2D1EF6D;
+	Wed, 25 Mar 2026 14:44:42 +0100 (CET)
+From: Louis Scalbert <louis.scalbert@6wind.com>
+To: netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	jv@jvosburgh.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	fbl@redhat.com,
+	andy@greyhouse.net,
+	shemminger@vyatta.com,
+	Louis Scalbert <louis.scalbert@6wind.com>
+Subject: [PATCH net v2 0/3] bonding: 3ad: fix mux port state on oper down 
+Date: Wed, 25 Mar 2026 14:44:36 +0100
+Message-Id: <20260325134439.3048615-1-louis.scalbert@6wind.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260322000557.12559-1-andrea.mayer@uniroma2.it> <20260322000557.12559-3-andrea.mayer@uniroma2.it>
-In-Reply-To: <20260322000557.12559-3-andrea.mayer@uniroma2.it>
-From: Justin Iurman <justin.iurman@6wind.com>
-Date: Wed, 25 Mar 2026 13:43:15 +0000
-X-Gm-Features: AQROBzAHzQ59MoQMqYBo9gvtuAAC5KYkGPyBexA5BkJcYV-H6wYp6Sd3JHvprkI
-Message-ID: <CAOY2Bqxb1C6myf7DBmfLM_3wZSweYQaQSAVSj_wDihf-N9vQJg@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next 2/3] seg6: add SRv6 L2 tunnel device (srl2)
-To: Andrea Mayer <andrea.mayer@uniroma2.it>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefano Salsano <stefano.salsano@uniroma2.it>, Paolo Lungaroni <paolo.lungaroni@uniroma2.it>, 
-	Ahmed Abdelsalam <ahabdels@cisco.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	SUBJECT_ENDS_SPACES(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271565-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justin.iurman@6wind.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-271567-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[louis.scalbert@6wind.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[6wind.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,6wind.com:dkim,mail.gmail.com:mid,uniroma2.it:email]
-X-Rspamd-Queue-Id: 736A83266CF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,6wind.com:dkim,6wind.com:mid]
+X-Rspamd-Queue-Id: 1A3DB3262C4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Mar 22, 2026 at 12:06=E2=80=AFAM Andrea Mayer <andrea.mayer@uniroma=
-2.it> wrote:
->
-> Introduce srl2, an Ethernet pseudowire device over SRv6. It
-> encapsulates L2 frames in IPv6 with a Segment Routing Header for
-> transmission across an SRv6 network.
->
-> The encapsulation logic reuses seg6_do_srh_encap() with
-> IPPROTO_ETHERNET. The transmit path uses the standard IPv6 tunnel
-> infrastructure (dst_cache, ip6_route_output, ip6tunnel_xmit).
->
-> The device is configured with a segment list for point-to-point
-> L2 encapsulation.
->
-> Usage:
->
->   ip link add srl2-0 type srl2 segs fc00::a,fc00::b
+Hi everyone,
 
-Thinking out loud...
+This series addresses a blackholing issue and a subsequent link-flapping
+issue in the 802.3ad bonding driver when dealing with inactive slaves
+and the `min_links` parameter.
 
-We'll likely need SRv6 encap configurations specific to each entry
-(i.e., MAC address), rather than (or in addition to) per interface.
+Currently, when an 802.3ad bond has no slaves in the collecting
+/ distributing state, the bonding master still reports its carrier as up.
+This causes upper-layer protocols to consider the interface operational,
+resulting in silently dropped traffic. 
 
-We could also add a "mode" (e.g., "normal" mode or reduced mode?).
+Patch 1 fixes the core issue by ensuring the carrier is only asserted when
+at least `min_links` slaves are genuinely in a valid state (collecting/
+distributing, or collecting only if coupled_control is disabled).
+
+Patch 2 fixes a side effect of the first patch. Tightening the carrier 
+logic exposes a state persistence bug: when a physical link goes down, 
+the LACP collecting/distributing flags remain set. When the link returns, 
+the interface briefly hallucinates that it is ready, bounces the carrier 
+up, and then drops it again once LACP renegotiation starts. Unsetting the 
+SELECTED flag when the link goes down forces the state machine through 
+DETACHED, clearing the stale flags and preventing the flap.
+
+Patch 3 fixes a side effect of the second patch caused by clearing the
+SELECTED flag on disabled ports. After all ports in an aggregator go
+down, if only a subset of ports comes back up, those ports can no
+longer renegotiate LACP unless all aggregator ports come back up.
+
+Changelog:
+
+v1 -> v2
+  - Patch 1: split a comment line that exceeded 80 characters.
+  - Move the change from patch 2 in __agg_ports_are_ready() into a third
+    patch, as it is actually a side effect of the fix introduced in
+    patch 2.
+  - Patch 2: Expand the commit message and add a code comment describing
+    the change in ad_port_selection_logic().
+  - Patch 3: Check the READY_N flag only on ports in the WAITING state,
+    rather than on all enabled ports. This more closely matches 802.3ad.
+  Link: https://lore.kernel.org/netdev/20260316131838.3257889-1-louis.scalbert@6wind.com/
+
+Louis Scalbert (3):
+  bonding: 3ad: fix carrier when no valid slaves
+  bonding: 3ad: fix mux port state on oper down
+  bonding: 3ad: fix stuck negotiation on recovery
+
+ drivers/net/bonding/bond_3ad.c | 36 +++++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
+
+-- 
+2.39.2
+
 
