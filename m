@@ -1,182 +1,216 @@
-Return-Path: <netdev+bounces-271755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271756-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id e+TSMTdfxGkuywQAu9opvQ
-	(envelope-from <netdev+bounces-271755-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 23:18:31 +0100
+	id iCdnEVFfxGkuywQAu9opvQ
+	(envelope-from <netdev+bounces-271756-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 23:18:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1516132CD52
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 23:18:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CD4132CD59
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 23:18:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F8E63064E28
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 22:11:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 097F43082FAD
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 22:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90D9639E183;
-	Wed, 25 Mar 2026 22:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6548538E109;
+	Wed, 25 Mar 2026 22:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZB0+kL+Z"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="YbHAB8dk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f226.google.com (mail-oi1-f226.google.com [209.85.167.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11020075.outbound.protection.outlook.com [52.101.61.75])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0942F39769B
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 22:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.226
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774476682; cv=none; b=BRp61bHlH+Il2YNreX6qb78jtyNuKzb3diSuDBklb5XlFV1wmdMkwP+PXrztrDFu9SRvkzCCH9OGoqDVNnQD25qjCdDdqiBlQmjUemerGGN8nkN7vrBXw4Iy/nLOdKo+O7NpoE2H3J+iQBIZQDbk9pkhki26IfZieLJeVo9a+OE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774476682; c=relaxed/simple;
-	bh=zXKgry6IT7kKIlSxJ8aohxD9hL/rThgEOx2ispAOZfA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EUMSQ8/yb57Vb8mW7DZMgZyqDAet8CAeP7m1O43XEc/Ff0a35LxoF54aHJP/k4eS2gmw8dTKoqJle9zTgyevJXHYOYz4COpArzSiWQ3U8T9Gcn0qhwbfapyzSKcMot/7zFzIkvKhwLgWwZ59aBoncS9MAl/up2W1R+QHkoPanDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ZB0+kL+Z; arc=none smtp.client-ip=209.85.167.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oi1-f226.google.com with SMTP id 5614622812f47-463f00cda04so156647b6e.2
-        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 15:11:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774476680; x=1775081480;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3EsVKT/T0m3KfafHCDtG3SbO+x/uq+F3nuhtS5ZgxOo=;
-        b=o0CzyeybGWKBUC+L3dMt4BihJkGrlXPrqOQzrFk4t00BbGDft7fTn975EIk7HH5XEm
-         /ofWve0jyHtk7Z/jKtTEwreQaM2pBgJJ942uqMGrQiyz1ganzGIXZkJMypQA11S9sqJe
-         JJJT3yzR03/7zdJyOAEo2LcbbRUJXaOSeu46da8RQZMSoJV8sVfeN2XWgNs5OUiRGFxt
-         ALD20Yw2ITc9nQivoPfzYd6N6T5umFd6YdKtgjsyuZ2BSMMSS7CIIFw76Sb+KV1kxWOd
-         wLc5967f7oTenzvwBmfgLvbt8EIH7JHZ/Z4YUFWASnNWaAZWBSbn5etbaqe5n7HiIEXE
-         8yeA==
-X-Forwarded-Encrypted: i=1; AJvYcCXzOL4MfQu/ETmsOKfnZBUhNuZ426qX4f/Y4PTm2GYNZv3Wi0dcRiFASIVPZdo5o8dqXEPz0P4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQ/S3+ojf4p2x0AoTcTQEF6GJddRw/s7DHXuCpcLvl6BaJSYlG
-	Qqtv+16OvuZHqAfwzbuhG6FSDao/HOmu/aa7VDpK1Veqw9v2aCXlUNMRSvgobmlwOPo4j3BIuV+
-	YioeqTN/hzhsXySdiyYSlD+o/IrM3L6S/i5SHXtOXpp0u+t1+9dlOJ/IK9xGpIdSoEWHGHgAxab
-	LJGcGhY5Kt+gAoW+MiA5TH7Piv4QelYOZiQ9/lWn2zBUwdHu0SKQErlAcCkLeBwxuvOaLIGJ05B
-	F/tRA6W6w==
-X-Gm-Gg: ATEYQzyE/yQM2rsBHPayGJ7zzUOf41X7v16nmWWWVDFY/tA+b31sZYskmzZixuS64Jz
-	m5T6qjpjLuTCj+gjZpzMnk34Xn+vE9CVid0Hz2AYzVk5SBHwpfL6H6Y8jnFZ66OC7Fm4VquHU42
-	X4Dh1w7HSgzNa1WcE/I55NgGH1tKXi/8T/zOT+MSvFkm8l1c7iMkWitTj1kWv06DeFbQf29AtH2
-	L1qB7PfNPDpozwnm38w4DhKbOtKsuwFdSVkHGzYpRb0cxHzndqxGcBEcICMq3J8UCTeamusqpAA
-	66rhtTrXjq+FOlvDn972GWEG3ZRYGV1Tid0Wway1pVkiA7VqY+CzmtIO9eVhidIkxAmC82svBbg
-	OTyQI79J+Enyq5WT3iHioEHZZvGeGO1q0CnLK4f7mK0EE7tDhbbKBJn2Le0WYbYmN3e63cHYyjW
-	iA7fX2Pu6CyiNiKai3lfNHLPKLIdz7UJYlyKcmZsEUW5njbUlTq5LFWZk=
-X-Received: by 2002:a05:6871:42ce:b0:3e7:ecd7:b292 with SMTP id 586e51a60fabf-41ca70e9e9dmr3366968fac.46.1774476679726;
-        Wed, 25 Mar 2026 15:11:19 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-22.dlp.protect.broadcom.com. [144.49.247.22])
-        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-41cc7725677sm100601fac.4.2026.03.25.15.11.19
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 25 Mar 2026 15:11:19 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dl1-f71.google.com with SMTP id a92af1059eb24-128d0b690feso1604702c88.0
-        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 15:11:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E6D358376;
+	Wed, 25 Mar 2026 22:11:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774476703; cv=fail; b=cfdpJhnlAqRoeL0Dh3ziDJ/kfk65VsxGLTiO0GezeKYAtJr2miMArURdCVS6ilCI7nCUCwoPaofNZSlRij2Sr8KP5qWudUMDSR8jCsiPqubIXwyFAhOFX6o26It767EKPf1eo0eW9tZC/jxnH+jU5Fh+izjYya1sD/8urE/IUHE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774476703; c=relaxed/simple;
+	bh=DNRWL1haq9vNczFjccnI63e0FbYcAEJjr/IKft2ygHY=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=gHIvRAKJMM9f7SWU3idYziVgiDYJKamEoNWN9OMxaSbl/y4QwszrBxI2QxIr7EilQbxwRf8b/TMSGBZADIUDpbH6xutSckb4lWQb+hffImiQTzKCCldS78wzN7Xluar5Dq6P59PS6xa5jAde8Pxd11L4n7IPwdnPsGN9PrYd4Ec=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=YbHAB8dk; arc=fail smtp.client-ip=52.101.61.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=svKoRqxeSBPJL6ukeZc0xeaDvSIR3XUhc5nP1gvRq5ybvgdhsQuE8TGCbl/cvbcXWtVo/fM3TBo5GCBcG5Z55XRiPYJSU3OxX81tQ0dy+VaBu4Bf+wnfz3+1o++q6TUdW1ov0ZH5yrMs9e4+gFPYqQFgDo1HRohCsyYFzWsn5SiM6aSTeyJJVX895nudX/ILVWLn8ULs5QwDsgGoCjwE2Hotx/o6L7Ur3KuOn8N1biWiow1F84iIw9m5x69GofgxjKvCZWo80ebzmJEmO+92QBkYgyEpFlh09+58J5pOv3QfRdM8qnJhHlj6fYT7EZvSp5xguhIG/bOyOfYoyE7TbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=21ru2M39FKhKemr2Qsv10q2gpQ35dKcc56w9WcQyde4=;
+ b=f3BNZ5jbGyhcAJ3VO4GX/FT7RoFpsRKByMbK0gny6r7v0rHCuHnNlMJ0ftAtYDTUAeLvSqQe41ocSmmO1HFd8F8tivhafes+fGgkMLjnxbBIWcJCieR9g8CMSQjWIvTY8bNfQc+lrFmGqzP0JOJy7/GETn8VQH8ZRuT1hOceARsy2cEIBX5l8LSyL63XxQnRyZfRrtDMFXU1T235ABrK0GqnxFPazLITRpRJglM5gQxCF7DkWHs/kb90qq9g8pfKyCjz9hImpgwWJdBhsVYxWAcEE5RUb60Uog2dOo1zldIexzdl0bIi+zbNxsUNuk6RMF0DhfItuCDKruwlLSCO5w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1774476678; x=1775081478; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3EsVKT/T0m3KfafHCDtG3SbO+x/uq+F3nuhtS5ZgxOo=;
-        b=ZB0+kL+Z1jH2tV9MW5nbNk3x1E7rqSskcuGKRwgBHvABIi1lXx0RJsYoC/MLRfVsBp
-         2PMQMhfk2i8Cg5h2pF4Rve8GBezzU3UzFvJVDBAJHAeXZkzP8qVuovhTClmz71QcZhEv
-         oxk4MU1hrp/K+l8UPnUxkFzVt4qSjnOYBjZKk=
-X-Forwarded-Encrypted: i=1; AJvYcCXcXnqYn2pj6a3zZEk1NGJ58fmswZcW7errSz3CJxzBbwmntsppi/9Y60xJ3ZVH0IeyKX5huJo=@vger.kernel.org
-X-Received: by 2002:a05:7022:4583:b0:127:5cda:fb7d with SMTP id a92af1059eb24-12a96e3eea9mr3158085c88.6.1774476678242;
-        Wed, 25 Mar 2026 15:11:18 -0700 (PDT)
-X-Received: by 2002:a05:7022:4583:b0:127:5cda:fb7d with SMTP id a92af1059eb24-12a96e3eea9mr3158066c88.6.1774476677640;
-        Wed, 25 Mar 2026 15:11:17 -0700 (PDT)
-Received: from [10.14.5.144] ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12aa6513e9bsm1912010c88.0.2026.03.25.15.11.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Mar 2026 15:11:17 -0700 (PDT)
-Message-ID: <eb7b544f-7fde-4b3e-863c-633c04329edd@broadcom.com>
-Date: Wed, 25 Mar 2026 15:11:16 -0700
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=21ru2M39FKhKemr2Qsv10q2gpQ35dKcc56w9WcQyde4=;
+ b=YbHAB8dk7OtxmUm2Ejii2chGA1SfBkxF+ZzBWtKI7ZpJnYCXBu7OBh+L/a04vRCcOUS+hi41gTs3lipfglGUVHDr8F6NHGwt8nozKiWnxPfyzGjsxeW2K/1+z3wFtuSyVu4NiEwRnOvIFKKM522TgmXZsisXHboHscsNEtnX7Eg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from BN3PR01MB9212.prod.exchangelabs.com (2603:10b6:408:2cb::8) by
+ IA0PR01MB8237.prod.exchangelabs.com (2603:10b6:208:48d::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9745.20; Wed, 25 Mar 2026 22:11:36 +0000
+Received: from BN3PR01MB9212.prod.exchangelabs.com
+ ([fe80::44f3:1050:dce8:1ea9]) by BN3PR01MB9212.prod.exchangelabs.com
+ ([fe80::44f3:1050:dce8:1ea9%6]) with mapi id 15.20.9723.030; Wed, 25 Mar 2026
+ 22:11:36 +0000
+From: Adam Young <admiyo@os.amperecomputing.com>
+To: Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next v1.5] mlx5_core: fall back to dev->board_id for shd id
+Date: Wed, 25 Mar 2026 18:11:31 -0400
+Message-ID: <20260325221131.1001431-1-admiyo@os.amperecomputing.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR05CA0079.namprd05.prod.outlook.com
+ (2603:10b6:a03:e0::20) To BN3PR01MB9212.prod.exchangelabs.com
+ (2603:10b6:408:2cb::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net] net: bcmgenet: fix leaking and racing timeout
- handler
-To: Florian Fainelli <florian.fainelli@broadcom.com>, netdev@vger.kernel.org
-Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch,
- bcm-kernel-feedback-list@broadcom.com
-References: <20260325173602.3676778-1-justin.chen@broadcom.com>
- <77801f99-517e-4b60-846a-f26469a7526a@broadcom.com>
-Content-Language: en-US
-From: Justin Chen <justin.chen@broadcom.com>
-In-Reply-To: <77801f99-517e-4b60-846a-f26469a7526a@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PR01MB9212:EE_|IA0PR01MB8237:EE_
+X-MS-Office365-Filtering-Correlation-Id: 38654a26-471f-4224-e8f6-08de8abb7b43
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|10070799003|55112099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	LnGKqer1Qb7+X47UVKtL7LxZffDayCyX975ET5Ngtw0ASnGsITOA797DrttbS6yVbkG2VuAuisU3QBWAgTox2DXHHeMCgIfypB65jtTwh9NGvFiXg8Nc9Re98TQ3p1eg76+V0op7vZIZqJFAfJ+JndctMuNC/WLnjCClyKAB+k0VDpddQ/Q/cHe19X5+WmVxK8hzcFaXrlCWcgrCEaFlzoGW90ueMp9Pe6Fjfv6cfRZfo7LktuacrpdOPPkI9ypZ7W2XgKuN4Ga0BoFBJ5xq9j6uKOB1p9QSWhEaRpdTpOdLg3zDN/R7oBDLDxtrXNY5e39zHgP6lTC/4yzh+k0QpIiSA8Aw3F+f2xVGsdfB+0T+9ehvvdw6PSc8e0c6II1urzrjWDDcmeeBYFE1YhyHTB5hMXbpXQu5p5fHRHXL2rQWyiAxdrPCEC0zOYPeV0npdxzlg0nygeCZzrGLALxeRM/BygUSTGhZO13JcFKLN4a+aww5e/2/usb6VDFgFrkkTnKqNdVjo+mxWqNAvBv9tyawcjAiJzVdpfBNpCkn35571YBImNyuLSM2ij/uV0hhAu5uRhbnjWkXHAzSdKbSXa3WOEBKee0N7OHYIZqg2zlYtDcjMjUBd5SVlhCRZ1qrWImEa0y+vsspUlOlXW2boele9jhibzzjz2uavo6VbaY2UwHHYzgFPE1R/S7aKavsBEJ0H85VwqjOYSW1oidvgK/fZHHtwj9OFHKaoMv2foA=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN3PR01MB9212.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(10070799003)(55112099003)(18002099003)(56012099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?iuHg9/pFoDvnkYDuYWhOi6USKXg+EnUggFOdv0DojlVsEujhBBLmh+kK3GaS?=
+ =?us-ascii?Q?NLizelmzWRPuGjgift5hwBUzOKb597k409gBXbflxQb+PUC79t8FvswBbWEz?=
+ =?us-ascii?Q?R0Eb2t5xdAY6JDIZuW5O2Pa9WCrQY+7yjiF65rgbUBvEds1t2z9BsEx2bTup?=
+ =?us-ascii?Q?DMDiGqbux5lVqjgNg8Ma2geuZ0Jiw666Ijxi9wlrmLm1yx092Tr3k7GQnA7k?=
+ =?us-ascii?Q?CkUVFC4TUlA3oNq7Y+MgpQ9BIE8iD1wApiSyHosSd4TxgJbDkB0/NiomXS5X?=
+ =?us-ascii?Q?IZlHpVxJyq28qpefPZ+cbJy1h+D4cuO0fIacCMa7zxgKIi63pRJL6Iq4S0l5?=
+ =?us-ascii?Q?QZLquNoBsieNZ5STnR3EhhavBp26Wg4fbJr/QdoE2JhzG7ulV4pV6xoR5zeX?=
+ =?us-ascii?Q?tm7fOwrU05PBfxClF6uYWejdmwmdKcfiU6SnQkhGb5MGXBjn1Oga71zlo+8g?=
+ =?us-ascii?Q?GQFnMuaxWOlZOR/KL1oxBTlqcaAKmupjhd2MWEiQMM5KsJawE524ai5+n/w0?=
+ =?us-ascii?Q?nHFSAPSmIqf8W8bYmVCbetXn4uOrFooUbef8xHWckI26g0y87xjGlqWWZp7F?=
+ =?us-ascii?Q?lK5/SpHANisTw7tOfgrHcp74V8/LMC1dkobS3k+ey+rdVUle0YHjnkglACYv?=
+ =?us-ascii?Q?/E90CaS59Vlz8H+Cu1VHD9zun7Q3nIhcmLQ0MvNxgajP7Fpuec3qIwKUHJMc?=
+ =?us-ascii?Q?VlZB/+hd6dQq+vC/9dB7mXIjHQ08LJpP2/TY71x5n1+8rGslFS99rI0r76Gk?=
+ =?us-ascii?Q?Qpz6KJtaXPsirz2uy4zmVnYCbSU4cQ92CxaE84ouOs6miCaVN3+IHX8uJad/?=
+ =?us-ascii?Q?A45hF1WtkMjVWjbmGZIVxGhuFZwV/pkZd+bjldGXWayKBAZzVXec/qeZZzgJ?=
+ =?us-ascii?Q?ZwyF3/H5Y8esoU50fWyxk7VMj57wVE0cUILIxHRbNQQkPNHGN5mvUdXGCwPb?=
+ =?us-ascii?Q?bDO0xlBT69ank6DfulumeNeGj1aBmQ/oaO1I55RCshCXARFirokTua+KVpju?=
+ =?us-ascii?Q?IkiQIoUJrjJqB7fzlaNrU+9/yOd+5J/NCJCzyjEzLEBC1BgK3unH3wg0IVG6?=
+ =?us-ascii?Q?v6BsXMKenupwpTnUfbougldZZds0JRoXAZA3Zw1/bzNT0S+6c2OPy+HVKMBa?=
+ =?us-ascii?Q?Ev+qg5ZxRho8yamKnx5DlXQYzY43/wWFdLCNPO9Tx3AmzhI26TqABl3dcz9L?=
+ =?us-ascii?Q?u8cvSUCwWxzHu5N3n7Go3vOIzpp65jM2nqwnZ9qvpSXnSWTD4hI1JgLuaS/r?=
+ =?us-ascii?Q?41Ej6vOG23/HEuKE42CZl3Vbie6SbzfIQduvoK0DXfNU4WS7F80y/1sn/z7c?=
+ =?us-ascii?Q?PgdTMwJsjQ8ZEAvSfEjM31qTYSJ1/s4zf+HfJe5WZOk5FD4gY9BD7h7pWkrr?=
+ =?us-ascii?Q?AxkFOMpePZTQvkfg5sd73RgNUiOb9lB0t+bDxwDpq7JnL84Xw4ppbd3Ihm8r?=
+ =?us-ascii?Q?ak7MD+hPZZoa0ZcXa06w1pk8zFvEtWTS5/db4RM4YXbPJP1ugNbf0py2VN7h?=
+ =?us-ascii?Q?eJqbN4YFmCf1Xf25d8cLm9NthWGo20+HZEu6CogGk0M+yacqVysztNsgYpaH?=
+ =?us-ascii?Q?ZJU5tWZWcWoDuPkW59GsCvMuLdqOFY9CV1/3fzlobd47RCCuyIJn4w1TqCCP?=
+ =?us-ascii?Q?Der7eQbKnX1Z5DcxOFpyd5BDAoW+jO3xLtmC63LlpXeI7ttETDJ6wEpiNT+d?=
+ =?us-ascii?Q?JD0a6Yca57kRbzB8Ou0EfcZ3x6p8kxyRv2bEpzYz8nfPokBctvOKdDCwUsvi?=
+ =?us-ascii?Q?fVqfoAca5UwxJE8ZeaC0F0ATU630INcvcGvkTepXcRRs4R1PohQt2SalzOTQ?=
+X-MS-Exchange-AntiSpam-MessageData-1:
+	At4Lie+Xah0vycbxqBpYkYr1mPyWVSIc2XYYlzgGfu3cWquEe4t48EvH
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 38654a26-471f-4224-e8f6-08de8abb7b43
+X-MS-Exchange-CrossTenant-AuthSource: BN3PR01MB9212.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2026 22:11:36.6036
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8jfSc5udrk1lJknawbcBnBY6fuoJas0kYosgxlNxOMufqK8X+up9FbZE/S9zfOaLPJ4cBncikIR4G7wyG7zy/uXgA2JJnsmlRwCXaUTH4yUgk6A0UzaEPQOZMwstGGgY
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR01MB8237
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amperecomputing.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[os.amperecomputing.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271755-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271756-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[os.amperecomputing.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[admiyo@os.amperecomputing.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 1516132CD52
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amperecomputing.com:email,os.amperecomputing.com:dkim,os.amperecomputing.com:mid]
+X-Rspamd-Queue-Id: 9CD4132CD59
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Making the devlink device shared requires an identifier
+to uniquely related the netlink device and the physical
+board.  The original code used the serial number, requested
+from the boards attributes.   However, not all members of
+the family of cards expose that attribute.  The module init
+will fail on these devices.  As a fall back, the driver can
+use the board_id, which is guaranteed to be present, and
+which is unique for every board in a deployment.
 
+Signed-off-by: Adam Young <admiyo@os.amperecomputing.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-On 3/25/26 3:00 PM, Florian Fainelli wrote:
-> On 3/25/26 10:36, justin.chen@broadcom.com wrote:
->> From: Justin Chen <justin.chen@broadcom.com>
->>
->> The bcmgenet_timeout handler tries to take down all tx queues when
->> a single queue times out. This is over zealous and causes many race
->> conditions with queues that are still chugging along. Instead lets
->> only restart the timed out queue.
->>
->> While reclaiming the tx queue we fast forward the write pointer to
->> drop any data in flight. These dropped frames are not added back
->> to the pool of free bds. We also need to tell the netdev that we
->> are dropping said data.
->>
->> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
-> 
-> The first bits in bcmgenet_tx_reclaim would be fixing:
-> 
-> Fixes: f1bacae8b655 ("net: bcmgenet: support reclaiming unsent Tx packets")
-> 
-> and the other part in bcmgenet_tx_timeout() would have:
-> 
-> Fixes: 13ea657806cf ("net: bcmgenet: improve TX timeout")
-> 
-> Both fixes look good to me:
-> 
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
+index bc33f95302df..6fa691aca81f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
+@@ -32,12 +32,14 @@ int mlx5_shd_init(struct mlx5_core_dev *dev)
+ 		/* Fall-back to SN for older devices. */
+ 		start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size,
+ 						     PCI_VPD_RO_KEYWORD_SERIALNO, &kw_len);
+-		if (start < 0)
+-			return -ENOENT;
+ 	}
+-	sn = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
++	if (start < 0)
++		sn = kstrndup(dev->board_id, MLX5_BOARD_ID_LEN, GFP_KERNEL);
++	else
++		sn = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
+ 	if (!sn)
+ 		return -ENOMEM;
++
+ 	/* Firmware may return spaces at the end of the string, strip it. */
+ 	end = strchrnul(sn, ' ');
+ 	*end = '\0';
+-- 
+2.43.0
 
-Thanks. I will resend v2 as two patches once we get verification the 
-patch is working as intended.
-
-Justin
 
