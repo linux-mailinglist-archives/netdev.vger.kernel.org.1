@@ -1,186 +1,188 @@
-Return-Path: <netdev+bounces-271421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gMryNZqKw2nnrQQAu9opvQ
-	(envelope-from <netdev+bounces-271421-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 08:11:22 +0100
+	id gDtbJdeMw2nJrQQAu9opvQ
+	(envelope-from <netdev+bounces-271422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 08:20:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53FC6320864
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 08:11:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDAB5320981
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 08:20:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1DD17302FE9F
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 07:11:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E316F307EBC4
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 07:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD5C352C29;
-	Wed, 25 Mar 2026 07:11:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B2D2EC0AE;
+	Wed, 25 Mar 2026 07:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="lR+VBjYv";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="jjcJKck8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ujsjc+Yf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A89287247;
-	Wed, 25 Mar 2026 07:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E6A29DB9A;
+	Wed, 25 Mar 2026 07:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774422678; cv=none; b=sOTbNU43PwUHdigX59hFgZGk9DBIr4vrgbtkxDqkJLi33D5jvcbcag4pTLjND1pPWgudB3wNaFma80X2Nnno27NmhcnRd39Pw919ffMpLRL0efssQl/yiHbCwxhF2BmJyW/4474b5RywV5FUFcKhvQcza6uv755LYstKLTK0wDk=
+	t=1774423015; cv=none; b=UNgUfou++wW4AQfoQNoI1rcRiz93TbCR4hGFmVntb/k1VrhBZJLtB7/V2NmQ2N40KNXLPNDmXvQ2jqsJKlZUU342/NskJrO03ZyFthOaYfnj6woSPYnfNTJh0bvjKwIM9NNkUesz6ETJSiWy//7ahup4QPRJaaeeDi6B4j4gekE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774422678; c=relaxed/simple;
-	bh=sQ7nWEiakocS+buPtMUVAsLAmLNsEzZHf9uuHLljolI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pEoEl7oMzF+7Uyh9pmcg8pNH8UEkXmt6xJgDu0uRn04pvsJox1VqZcej1EAH5o1s0ccDn2Mooy3F4bkGEVGfHUaewY8v9UccWgY0ahobGKQYmJjZHJOURy1zin78fX0BxPrQLOXPrnCCmP2+TMzM6Pq/pub1ID9NfJ2YkMEh5Ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=lR+VBjYv; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=jjcJKck8; arc=none smtp.client-ip=160.80.4.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 62P7AfJP026754;
-	Wed, 25 Mar 2026 08:10:46 +0100
-Received: from [10.102.162.121] (31-131-247-74.ip252.fastwebnet.it [31.131.247.74])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id D30AF122966;
-	Wed, 25 Mar 2026 08:10:37 +0100 (CET)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1774422638; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BtHr0mlAZWlS4uzhBz4o05EFXCNhnd52KDmF7pDcJOw=;
-	b=lR+VBjYvyUsKDY4Sksj04Q7F3HRMgnyPGKrkE6Z/ePXxlf53WGBTBXu3+ONV6zKzW8RFMW
-	mE8gvDP1bk9jLdBQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1774422638; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BtHr0mlAZWlS4uzhBz4o05EFXCNhnd52KDmF7pDcJOw=;
-	b=jjcJKck8rY/nC70GwNElfxHYd2wbPj5if6tYo9xjlcDsE2qRsM6iHwq/Huta/0lGa6G/h7
-	/qm0hn74IJeD407GHP6R/QFTXa4UJXSVVOW0B/J0cdG/DBHJQxwpdI1BezEvT6wj1Fy294
-	LR1BVS8fzLPRG0wW/4iwm4qB9EUbkOIBxRFrUAoCtjbuAjWk+dYPaJY338P49tVduQGKGG
-	YoNKOCjQ7Iouy0QZluR8VwLiT7FiHaBASFEMlmC7k5t7PtMTLGopluk1u2JasjDFxfb7GS
-	8b6xZ/wZvCpT5MGe7nJtbtt93jL2J7VzUaxK13wBs8m6Rsy60+NhX3E2PN2Zsg==
-Message-ID: <6fef33af-b351-4bf6-a210-ae2283ec9f69@uniroma2.it>
-Date: Wed, 25 Mar 2026 08:10:35 +0100
+	s=arc-20240116; t=1774423015; c=relaxed/simple;
+	bh=7QXUZOFF7dVaO5ocvHKjtARthhgEwEQEzL0MIxKBkE0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=UlPipTXEIrf8YYXw/Cn71olqVBAyKUylZ1j5q79GD2aoftBkflcBVIZNv+/qe0+sLyfOS7q1TU6Ebe0weBa3NPmjQatVDwBE0/4BmIsA1GB+cTttn7DGuMQK3aFL9Xt58Anaed/iaakn69OuOIhpn1ePskCXVOPgWeoQ+n1ADCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ujsjc+Yf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F808C4CEF7;
+	Wed, 25 Mar 2026 07:16:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774423014;
+	bh=7QXUZOFF7dVaO5ocvHKjtARthhgEwEQEzL0MIxKBkE0=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=Ujsjc+Yf9ZYAwP2fi+NDzniWBVFVcwbwPjPFFMPpxOQaprM1/gi4j8NnOPBpNIMVu
+	 CvfeYT8n3WUVFVjl1YTWUPfiFdLExWzS6JSsI/v0TpSizhlJFpqbP2OTLmefKQP/CD
+	 ProfjJs0oBD4oIzVrRP1Qvt7V2+wGlbCF0BbTmIOXfgbc9MVfxJwqsokq876rzFyT+
+	 M2PJJi2PCMhVKfX5e0TOZKCdk1m6BVo8krQtfYyqCKgooa3iY7QB0V032q8B5Rh+bQ
+	 Cue48Rv6jNH/rT9k6XEylsZcXr6B5dxnsC1XPl9ybqqn3Bi7n4w5v6inLlkL/fy33X
+	 3BBE7XJWsuoDg==
+Date: Wed, 25 Mar 2026 08:16:46 +0100
+From: Matthieu Baerts <matttbe@kernel.org>
+To: Li Xiasong <lixiasong1@huawei.com>
+Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, mptcp@lists.linux.dev,
+	linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
+	zhangchangzhong@huawei.com, weiyongjun1@huawei.com
+Message-ID: <5d5d6905-4348-409a-9bb3-8eee30f215b1@kernel.org>
+In-Reply-To: <2da353a7-96cf-40ed-9d83-f256ec6965e1@huawei.com>
+References: <20260324085131.4187473-1-lixiasong1@huawei.com> <12ad947e-f386-4fcc-9043-bf4f95a7db83@kernel.org> <2da353a7-96cf-40ed-9d83-f256ec6965e1@huawei.com>
+Subject: Re: [PATCH net v2] mptcp: fix soft lockup in mptcp_recvmsg()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next 0/3] seg6: SRv6 L2 VPN with End.DT2U and srl2
- device
-Content-Language: it-IT
-To: Justin Iurman <justin.iurman@6wind.com>,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-        David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Simon Horman <horms@kernel.org>,
-        Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
-        Ahmed Abdelsalam <ahabdels@cisco.com>, linux-kernel@vger.kernel.org
-References: <20260322000557.12559-1-andrea.mayer@uniroma2.it>
- <CAOY2Bqx-ZmBm-o-BoUYCxJjGQn31WF8V2u7gbnB52gOSYvG5Rg@mail.gmail.com>
-From: Stefano Salsano <stefano.salsano@uniroma2.it>
-In-Reply-To: <CAOY2Bqx-ZmBm-o-BoUYCxJjGQn31WF8V2u7gbnB52gOSYvG5Rg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Correlation-ID: <5d5d6905-4348-409a-9bb3-8eee30f215b1@kernel.org>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-271421-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[uniroma2.it:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271422-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stefano.salsano@uniroma2.it,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,uniroma2.it:dkim,uniroma2.it:mid,uniroma2.it:email,uniroma2.it:url]
-X-Rspamd-Queue-Id: 53FC6320864
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:email]
+X-Rspamd-Queue-Id: EDAB5320981
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Il 24/03/2026 17:00, Justin Iurman ha scritto:
-> On Sun, Mar 22, 2026 at 12:06 AM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
+Hi Li,
+
+25 Mar 2026 03:39:13 Li Xiasong <lixiasong1@huawei.com>:
+
+> Hi Matt,
+>
+> On 3/25/2026 3:23 AM, Matthieu Baerts wrote:
+>> Hi Li,
 >>
->> Hi all,
+>> On 24/03/2026 09:51, Li Xiasong wrote:
+>>> syzbot reported a soft lockup in mptcp_recvmsg() [0].
+>>>
+>>> When receiving data with MSG_PEEK | MSG_WAITALL flags, the skb is not
+>>> removed from the sk_receive_queue. This causes sk_wait_data() to always
+>>> find available data and never perform actual waiting, leading to a soft
+>>> lockup.
+>>>
+>>> Fix this by adding a 'last' parameter to track the last peeked skb.
+>>> This allows sk_wait_data() to make informed waiting decisions and preve=
+nt
+>>> infinite loops when MSG_PEEK is used.
 >>
->> this RFC series adds support for the SRv6 End.DT2U behavior and
->> introduces the srl2 Ethernet pseudowire device, together with
->> corresponding selftests.
-> 
-> Hi Andrea,
-> 
-> Thanks for the work you (and Stefano) put into this series! As
-> discussed offline, there is interest in such a solution.
+>> (...)
+>>
+>>> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+>>> index cf1852b99963..401fb2b17685 100644
+>>> --- a/net/mptcp/protocol.c
+>>> +++ b/net/mptcp/protocol.c
+>>> @@ -2006,7 +2006,7 @@ static void mptcp_eat_recv_skb(struct sock *sk, s=
+truct sk_buff *skb)
+>>> static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 size_t len, int flags, int copied_total,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 struct scm_timestamping_internal *tss,
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 int *cmsg_flags)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 int *cmsg_flags, struct sk_buff **last)
+>>> {
+>>> =C2=A0=C2=A0=C2=A0 struct mptcp_sock *msk =3D mptcp_sk(sk);
+>>> =C2=A0=C2=A0=C2=A0 struct sk_buff *skb, *tmp;
+>>> @@ -2048,6 +2048,7 @@ static int __mptcp_recvmsg_mskq(struct sock *sk, =
+struct msghdr *msg,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 copied +=3D count;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *last =3D skb;
+>>
+>> My bad, my recommendation to move this assignment here was not a good
+>> idea, because 'skb' can be freed at some points after mptcp_eat_recv_skb
+>> that can be called here below.
+>>
+>> If I'm not mistaken, when MSG_PEEK is not used, sk_wait_data() can
+>> always be called with NULL for the last skb, because the queue is
+>> supposed to be empty. If not, no need to wait for new packets, so NULL
+>> can be used. Is that correct?
+>>
+>> If yes, then I guess 'last' can be initialised to NULL before calling
+>> __mptcp_recvmsg_mskq (limit scope), and only set to 'skb' here below,
+>> when MSG_PEEK is not used (what you had in v1).
+>>
+>> Would that work for you?
+>>
+>> Cheers,
+>> Matt
+>
+> Thanks for the review. I analyzed the concern about the 'last' pointer.
+>
+> When writing the v2 patch, I did consider this case - in non-MSG_PEEK
+> scenario, the skb is freed by mptcp_eat_recv_skb() after setting *last =
+=3D
+> skb, making 'last' point to freed memory. However, in sk_wait_data(), the
+> 'last' parameter is only used for pointer comparison:
+>
+> =C2=A0=C2=A0=C2=A0 skb_peek_tail(&sk->sk_receive_queue) !=3D skb
+>
+> It only compares the pointer value without dereferencing, so there's no
+> actual UAF issue.
 
-Hi Justin,
+Indeed, but the skb could be (unlikely) reused at that stage.
 
-thx for your interest!
+For me, the main point is that mptcp_eat_recv_skb() will remove the
+skb from the queue. Then NULL can be passed instead, safer.
 
-> A general comment: I'm not sure about the name "srl2", as we're
-> talking about SRv6 specifically here. 
-
-fair point
-
-> I would personally love to have
-> "l2srv6", although I suspect we may end up with "l2seg6" to remain
-> consistent.
-
-I'd like to keep it as short as possible, our initial idea was seg6l2, 
-very close to your last suggestion, then we opted for srl2 losing the 
-"6" concept
-
-now it comes to my mind that l2 is somehow redudant in an interface type 
-name, as an interface is an l2 concept per se, so my preferred option 
-becomes:
-
-sr6
-
-(short and memorable...)
-
-as an alternative seg6 can work but I strongly prefer sr6
-
-ciao
-Stefano
-
-
-> 
-> Cheers,
-> Justin
-
-
--- 
-*******************************************************************
-Prof. Stefano Salsano
-Dipartimento Ingegneria Elettronica
-Universita' di Roma Tor Vergata
-Viale Politecnico, 1 - 00133 Roma - ITALY
-
-http://netgroup.uniroma2.it/Stefano_Salsano/
-
-E-mail  : stefano.salsano@uniroma2.it
-Office  : (Tel.) +39 06 72597770 (Fax.) +39 06 72597435
-*******************************************************************
-
+Cheers,
+Matt
 
