@@ -1,182 +1,181 @@
-Return-Path: <netdev+bounces-271348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271349-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id U/rdBZtCw2mopgQAu9opvQ
-	(envelope-from <netdev+bounces-271348-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 03:04:11 +0100
+	id FqvfHRhLw2m5pwQAu9opvQ
+	(envelope-from <netdev+bounces-271349-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 03:40:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 702B831E8DE
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 03:04:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1BB931EC3E
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 03:40:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AAA88300FB67
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 02:03:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 28C19302DA0D
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 02:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5EEA27F18B;
-	Wed, 25 Mar 2026 02:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E48283FCF;
+	Wed, 25 Mar 2026 02:39:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FW6+c/Jh"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="D6FT7Yu+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1391E279DC3
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 02:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F03200C2;
+	Wed, 25 Mar 2026 02:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774404237; cv=none; b=TUi1jjfHkIBj8ktRyEt5w2X+ZIAQ0ljOdzVGyFj7afKhfyCA91PupxFBUdczb0LuD11fMIhS3Uj+Nf5KNQ9b+Psyj3FQL0cUvp4FZ4lYcno41CMYcUWGmDiUWUNEX7D0ioSCfo9yAsAA6iSXeLEmal6rqPTvhenqn5ME0chJYG0=
+	t=1774406353; cv=none; b=ZbeYtyni5GFmDcE9B6ExvV6CDJaOFv/O/BVLaPhEs9o7ipyn/Q3T8zv06WRH0Z+OlgSHgSZFBcfIcbty2a6jMhdZ6dcUffbE9vp0+bPZZqFW2fahRlCWHOQldJA2aQOF3biR17AOfTYoxzWOQvApOndctrWEu+0yW0/A0GLO7SQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774404237; c=relaxed/simple;
-	bh=FBj2k2onSYkiwjhaLRfcgj6oQDXAwjnNmWP90B5dd2U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FvJFTiv9jFL/gGJCfY6Bu2AtO9CygOBbkyFZlqnUqn8jHlJ7ZBh+SeON/XVsH71dH3cCfU1wBx0zfOypF6G4Yzm8AJESglWdzjtFIuf34mr720YmckxnQtQIlwH4CioWCb4E+Wqi1wLR1b5GvY03ImPv1LYnqUcAmA1UvJzRXkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FW6+c/Jh; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3ced5df7-eae7-429c-ae4b-997c8e0757a3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774404234;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vJ6L7c17NwUK0cThq8qvVRNBfwezsgTcXadk51qOIX0=;
-	b=FW6+c/JhlVJ71xjNdi5liTuY1+UYVNzs3qc5QyaGhNQOl0mcHMOmVX/ppUPT7bhetl6RPP
-	hmEX0AyyCM5n+S1x0i8ZQtkEI9x5cTo3h/R146FsqceCjzWt8aOKM8rUfTfoMJ8lVbYczx
-	E1sscW613hq/NC0EyCVV4TmlKRlIA4Q=
-Date: Wed, 25 Mar 2026 10:03:43 +0800
+	s=arc-20240116; t=1774406353; c=relaxed/simple;
+	bh=tQAu0jm1kX0ppMikCJFUNAJd6Iw62diSkDbvaRgAVQo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=DGl6P73HByIX7ns3knbwp+Im60k/o2MwVeN/Ea7g9pw6xWi3/l5F0aITJU1LOJbftTomCFLMNQ1a4VmQS4ASks/70iFkwWKs2h6sqVuVhkHBISuYatYaiGS4YsVVBe16MnIbS+3yTLNW34z98teDIoKqHL5uOSxmHnsCJ0m1xzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=D6FT7Yu+; arc=none smtp.client-ip=113.46.200.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=2KHcoEZPDiLl6N30smgqqmnldeFbyCyk1rIWaG45Ruc=;
+	b=D6FT7Yu+ElxikcHB6JVUplKG9jqJaQ5pPjbQB1eWqiSqGKjvo/QPgSsu/m2r3t9V2IqutRma5
+	rgKrXmQr8bIs0qx+Vp+QmG1gIT4AgNQCuneZLK7V22sLwSsi+vrUmzRPqv2AwM2l2XUa1o6+nYd
+	nx3brWmwFWpN5dWhTn2gyzI=
+Received: from mail.maildlp.com (unknown [172.19.163.0])
+	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4fgWDb6JXpz1T4Fq;
+	Wed, 25 Mar 2026 10:33:35 +0800 (CST)
+Received: from kwepemj500018.china.huawei.com (unknown [7.202.194.48])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8B56740561;
+	Wed, 25 Mar 2026 10:39:06 +0800 (CST)
+Received: from [10.174.178.79] (10.174.178.79) by
+ kwepemj500018.china.huawei.com (7.202.194.48) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 25 Mar 2026 10:39:05 +0800
+Message-ID: <2da353a7-96cf-40ed-9d83-f256ec6965e1@huawei.com>
+Date: Wed, 25 Mar 2026 10:39:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v1 2/2] selftests/bpf: Add protocol check test for
- bpf_sk_assign_tcp_reqsk()
-To: Martin KaFai Lau <martin.lau@linux.dev>,
- Kuniyuki Iwashima <kuniyu@google.com>, Eric Dumazet <edumazet@google.com>
-Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Shuah Khan <shuah@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20260323105510.51990-1-jiayuan.chen@linux.dev>
- <20260323105510.51990-3-jiayuan.chen@linux.dev>
- <9adc3c2e-0d5a-4863-b3ed-194d8f9fd630@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <9adc3c2e-0d5a-4863-b3ed-194d8f9fd630@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] mptcp: fix soft lockup in mptcp_recvmsg()
+To: Matthieu Baerts <matttbe@kernel.org>
+CC: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
+	<zhangchangzhong@huawei.com>, <weiyongjun1@huawei.com>
+References: <20260324085131.4187473-1-lixiasong1@huawei.com>
+ <12ad947e-f386-4fcc-9043-bf4f95a7db83@kernel.org>
+From: Li Xiasong <lixiasong1@huawei.com>
+In-Reply-To: <12ad947e-f386-4fcc-9043-bf4f95a7db83@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemj500018.china.huawei.com (7.202.194.48)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271348-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[shopee.com,kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-271349-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[huawei.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[lixiasong1@huawei.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 702B831E8DE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:dkim,huawei.com:mid]
+X-Rspamd-Queue-Id: E1BB931EC3E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Matt,
 
-On 3/25/26 5:59 AM, Martin KaFai Lau wrote:
-> On 3/23/26 3:54 AM, Jiayuan Chen wrote:
->> +void test_tcp_custom_syncookie_protocol_check(void)
->> +{
->> +    struct test_tcp_custom_syncookie *skel;
->> +    struct sockaddr_in tcp_addr, udp_addr;
->> +    socklen_t addr_len = sizeof(tcp_addr);
->> +    int tcp_server = -1, udp_client = -1;
->> +    char buf[32] = "test";
->> +    int ret;
->> +
->> +    if (setup_netns())
->> +        return;
->> +
->> +    skel = test_tcp_custom_syncookie__open_and_load();
->> +    if (!ASSERT_OK_PTR(skel, "open_and_load"))
->> +        return;
->>   +    /* Create a TCP listener so the BPF can find a LISTEN socket */
->> +    tcp_server = start_server(AF_INET, SOCK_STREAM, "127.0.0.1", 0, 0);
->> +    if (!ASSERT_NEQ(tcp_server, -1, "start tcp_server"))
->> +        goto destroy_skel;
->> +
->> +    ret = getsockname(tcp_server, (struct sockaddr *)&tcp_addr, 
->> &addr_len);
->> +    if (!ASSERT_OK(ret, "getsockname"))
->> +        goto close_tcp;
->> +
->> +    skel->bss->tcp_listener_port = ntohs(tcp_addr.sin_port);
->> +    skel->bss->udp_test_port = 9999;
->> +
->> +    ret = bpf_program__fd(skel->progs.tcp_custom_syncookie_badproto);
->> +    if (setup_tc(ret))
->> +        goto close_tcp;
->> +
->> +    udp_client = socket(AF_INET, SOCK_DGRAM, 0);
->> +    if (!ASSERT_NEQ(udp_client, -1, "udp socket"))
->> +        goto cleanup_tc;
->> +
->> +    memset(&udp_addr, 0, sizeof(udp_addr));
->> +    udp_addr.sin_family = AF_INET;
->> +    udp_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
->> +    udp_addr.sin_port = htons(9999);
->> +
->> +    ret = sendto(udp_client, buf, sizeof(buf), 0,
->> +             (struct sockaddr *)&udp_addr, sizeof(udp_addr));
->> +    ASSERT_EQ(ret, sizeof(buf), "sendto udp");
->> +
->> +    /* Wait for TC ingress BPF to process the skb. */
->> +    kern_sync_rcu();
->
-> hmm... is it guaranteed to work? Regardless, it checks the error 
-> returned from bpf_sk_assign_tcp_reqsk(). Maybe bpf_prog_test_run is 
-> simpler?
->
-> pw-bot: cr
->
+On 3/25/2026 3:23 AM, Matthieu Baerts wrote:
+> Hi Li,
+> 
+> On 24/03/2026 09:51, Li Xiasong wrote:
+>> syzbot reported a soft lockup in mptcp_recvmsg() [0].
+>>
+>> When receiving data with MSG_PEEK | MSG_WAITALL flags, the skb is not
+>> removed from the sk_receive_queue. This causes sk_wait_data() to always
+>> find available data and never perform actual waiting, leading to a soft
+>> lockup.
+>>
+>> Fix this by adding a 'last' parameter to track the last peeked skb.
+>> This allows sk_wait_data() to make informed waiting decisions and prevent
+>> infinite loops when MSG_PEEK is used.
+> 
+> (...)
+> 
+>> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+>> index cf1852b99963..401fb2b17685 100644
+>> --- a/net/mptcp/protocol.c
+>> +++ b/net/mptcp/protocol.c
+>> @@ -2006,7 +2006,7 @@ static void mptcp_eat_recv_skb(struct sock *sk, struct sk_buff *skb)
+>>  static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
+>>  				size_t len, int flags, int copied_total,
+>>  				struct scm_timestamping_internal *tss,
+>> -				int *cmsg_flags)
+>> +				int *cmsg_flags, struct sk_buff **last)
+>>  {
+>>  	struct mptcp_sock *msk = mptcp_sk(sk);
+>>  	struct sk_buff *skb, *tmp;
+>> @@ -2048,6 +2048,7 @@ static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
+>>  		}
+>>  
+>>  		copied += count;
+>> +		*last = skb;
+> 
+> My bad, my recommendation to move this assignment here was not a good
+> idea, because 'skb' can be freed at some points after mptcp_eat_recv_skb
+> that can be called here below.
+> 
+> If I'm not mistaken, when MSG_PEEK is not used, sk_wait_data() can
+> always be called with NULL for the last skb, because the queue is
+> supposed to be empty. If not, no need to wait for new packets, so NULL
+> can be used. Is that correct?
+> 
+> If yes, then I guess 'last' can be initialised to NULL before calling
+> __mptcp_recvmsg_mskq (limit scope), and only set to 'skb' here below,
+> when MSG_PEEK is not used (what you had in v1).
+> 
+> Would that work for you?
+> 
+> Cheers,
+> Matt
 
+Thanks for the review. I analyzed the concern about the 'last' pointer.
 
-Hi Martin,
+When writing the v2 patch, I did consider this case - in non-MSG_PEEK
+scenario, the skb is freed by mptcp_eat_recv_skb() after setting *last =
+skb, making 'last' point to freed memory. However, in sk_wait_data(), the
+'last' parameter is only used for pointer comparison:
 
-Thanks for your suggestion.
+    skb_peek_tail(&sk->sk_receive_queue) != skb
 
-The intent of using the real network stack was to demonstrate the
-actual null-ptr-deref panic, so reviewers can better understand the
-issue. Once we agree the root cause is the missing protocol check in
-bpf_sk_assign_tcp_reqsk(), switching to bpf_prog_test_run to just
-validate the return value makes sense.
+It only compares the pointer value without dereferencing, so there's no
+actual UAF issue.
 
+However, I agree it's still risky to keep a dangling pointer around. I
+appreciate your suggestion and will adopt it in v3.
 
+Best regards,
+Li Xiasong
 
