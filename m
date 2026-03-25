@@ -1,218 +1,185 @@
-Return-Path: <netdev+bounces-271472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271473-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6DaPBoapw2nAtAQAu9opvQ
-	(envelope-from <netdev+bounces-271472-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:23:18 +0100
+	id kFEnAaOpw2nAtAQAu9opvQ
+	(envelope-from <netdev+bounces-271473-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:23:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E843221AB
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:23:17 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B899A3221D7
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 10:23:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D4543305128C
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 09:14:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 209B23039737
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 09:23:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD21E351C05;
-	Wed, 25 Mar 2026 09:14:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4629734EEF1;
+	Wed, 25 Mar 2026 09:23:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="FoU/RaA2"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="YOrMot5R"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010022.outbound.protection.outlook.com [52.101.193.22])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1462350A1B
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 09:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.22
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774430093; cv=fail; b=jrDSbsF77+ZcXpbe4d89PILbm3muw2NjocZk1dHi+aQOs1+8vpgq/CGOdijS7PYgEBFIO2bv6QYtqea+TjMDdoUvVpcdi4a3Tnh8ipzDDZQCVxMVZ2oyhBYvt4ZlJPrYzU5lAqboFwK4lbsnMPnZVR889TU49yVb+EkmuaegoA4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774430093; c=relaxed/simple;
-	bh=lFXZACsPw4HMcVBtJ1xUmRajRq5oKKCGucz8Y6s37II=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Yv3DNcOSD+dejg+bSve0YVwRVF77KqDTBqc8nG/CYI1+ztm9fDLDn2c+roiNFzUmbSdhd6sOgSpGhUOxb9JV2aPjn04gpcTfMzHVl63sZUr/Auid4tCDXwXtLc7OznIbkuQa/8EytB3bOKwBvraAWFKHaE4ufPJXQqbSKmsb1as=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=FoU/RaA2; arc=fail smtp.client-ip=52.101.193.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kEJW1alAlMbGDxni7Za/gT75BZbM/pAvsXQcfmxcDP2jmlPKd7T3nyMUkaKRTT9e9JliTjf2PC2KMcLwszxRzFKLdaEz8MD7zRcesHIn1P5ZofnbNDPh0vDe+pnt6+IItaiCBfqcUNbMWOSzSI9OH/aKjLQxeYp6fsaWUuUvODS3VIZP8nIukbadSaewgAbuhJjbLwqc/jFUAQ6PYrDzP8toEifu4lPIdDRWcgzcDMtLkPqmJqwu5ZD0OGnbJ1rKni/Aq96eB6+1BVXtja9YiqpJKLvVMajshaR0g2TbBMlxJDQ8F80+E7h2KJlv8Xb9voKBAZP0+ihjXnoUht/Anw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zS0sDxxPWmOKH/gisJ6ypqXfC13SbKVnFfH4BFCY1ps=;
- b=cVNxbz0dKm4IDwI40o9cy7IW8ga0rN8UG7b/vvorA3SuFQIuZbibJhFY4M5Ie2UdzPAMjnGwrv7yKyFDrjEDzQX7uykNsH3ffLxBLXzfcV+SloUHxpBIPq/TuLzrzS2UXxoreiO/ggZRjuRywPuOhNjgYswMAUQvhfT6OJ6PFlnW4VA/sD0HmkrxgpVp0fF3lkc/EouhSB1X/wiFuLcxqvf3+oWxBhBnglIlrAQkzIfOJCvb2UJZVCMTuOw0VpMCS3AQaR2ez1k3kfI+OnY36S2ERsQ1jKmjgMlsUKF44LuCXGfKHW42zqI5LHxEOU7WjoSaXFvSvvAulsEMXanjCw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.23.195) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zS0sDxxPWmOKH/gisJ6ypqXfC13SbKVnFfH4BFCY1ps=;
- b=FoU/RaA29rtiQiLJ9Q6mA0dTmsz1Zd+9WVPHGPG4/C8a+pnthsxPvI71IcRMY7I6J2NfqrYa0klf2d8itqvsoNPW0ywS7gLSdVmKIgjxiETvLbSQbi5GC76gzmJLpLzkj8WlbjcrGQgdo08FtE0eBx8zNV1qyPOpUbnPt/+6fW0=
-Received: from SJ0PR03CA0156.namprd03.prod.outlook.com (2603:10b6:a03:338::11)
- by DS7PR10MB7129.namprd10.prod.outlook.com (2603:10b6:8:e6::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9723.31; Wed, 25 Mar 2026 09:14:49 +0000
-Received: from SJ1PEPF00002326.namprd03.prod.outlook.com
- (2603:10b6:a03:338:cafe::cd) by SJ0PR03CA0156.outlook.office365.com
- (2603:10b6:a03:338::11) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.31 via Frontend Transport; Wed,
- 25 Mar 2026 09:14:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
-Received: from lewvzet201.ext.ti.com (198.47.23.195) by
- SJ1PEPF00002326.mail.protection.outlook.com (10.167.242.89) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9745.21 via Frontend Transport; Wed, 25 Mar 2026 09:14:49 +0000
-Received: from DLEE205.ent.ti.com (157.170.170.85) by lewvzet201.ext.ti.com
- (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Mar
- 2026 04:14:48 -0500
-Received: from DLEE215.ent.ti.com (157.170.170.118) by DLEE205.ent.ti.com
- (157.170.170.85) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Mar
- 2026 04:14:48 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE215.ent.ti.com
- (157.170.170.118) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Wed, 25 Mar 2026 04:14:48 -0500
-Received: from [10.24.69.13] (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62P9Ej8a016525;
-	Wed, 25 Mar 2026 04:14:46 -0500
-Message-ID: <39c8e4ff-240f-4bb4-b4d6-cb8aea930c53@ti.com>
-Date: Wed, 25 Mar 2026 14:44:44 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7964B2D877D;
+	Wed, 25 Mar 2026 09:23:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774430624; cv=none; b=tzyTemUdSl7W6BQbVOXKNv2CnQ+o+ZtlO+rX78aSDgt1buinhxRj8lFZcU3mg6gY9cBu7TSnu27bh0Jr6eA/jyv5ln3/is9da/b72XWVjtKf6yVTz8JirN+JUx5Zuw8Xr1F/T7FcErT2qZQKvTWkfRjOBMax/gm8lzVQF+2CjzQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774430624; c=relaxed/simple;
+	bh=qr6JRabDJJK1h/crA9vo1OfH4td6qAvjFmMpKGxuqg0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D5bEjJnuDwSUg7iK7lkop8xgim/Sa2V/62rsAn5Eb9ZFoMAH5Tt2DZV8O89NzBwRYzt5IuOnHxWWWUZaIHpkbGNwXsqbcjxcSDhaXFDupx23UJPlz3BJjBiQwllqvHA8GGDH4vW2+O0doJDrK1d9x3waw6DL597BQzM7hu+NZtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=YOrMot5R; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=eEO1uFB+ct6oY6BEGcxeJRyxc+jpLvp5NYqxbVyu6DY=; b=YOrMot5Rq8riRSLxn/3+DnQipm
+	afV6VpLSLm/2e83u1fAfkSR9vHgxKhIuXY364JjmaMBfBKV2nxr4hv/E8jIDFZG4N9jwVFl6EiVBf
+	Az+4AHgXINNY2f7UZihktXbKNG1Ow79YQMqJYrf0oVq26T5c9oO03PA/gsONQLcMazBuNPKQeH/QA
+	6qH6k0xSaZbD6kEooeOzWfV9bu8eBf+PtEsaDOY3NhM4NghpIoSC5VmDXpyYU+En5Ei+vaZ/lzTPZ
+	rrCLoPkZ6p70XxuC4nETOV4LCE3aRAqebUpXVWOdirIPTCc2zlHoaA4a/RccD9vtJH2LuoYxSBlou
+	dKKol9eQ==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1w5KSH-008yQ3-Kn; Wed, 25 Mar 2026 09:23:12 +0000
+Date: Wed, 25 Mar 2026 02:23:05 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Alexander Popov <alex.popov@linux.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, 
+	David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Michal Kubecek <mkubecek@suse.cz>, Gal Pressman <gal@nvidia.com>, 
+	Kory Maincent <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>, 
+	Ido Schimmel <idosch@nvidia.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Greg KH <gregkh@linuxfoundation.org>, Johannes Berg <johannes@sipsolutions.net>, 
+	James Guan <guan_yufei@163.com>, Kees Cook <kees@kernel.org>, Paul Moses <p@1g4.org>, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	security@kernel.org, notify@kernel.org
+Subject: Re: [PATCH] wifi: virt_wifi: remove SET_NETDEV_DEV to avoid
+ use-after-free
+Message-ID: <acOpZ76jptETE7Bd@gmail.com>
+References: <20260324224607.374327-1-alex.popov@linux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: ti: icssg-prueth: fix missing data copy and wrong
- recycle in ZC RX dispatch
-To: David Carlier <devnexen@gmail.com>, <danishanwar@ti.com>,
-	<rogerq@kernel.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>
-References: <20260324211402.342474-1-devnexen@gmail.com>
-Content-Language: en-US
-From: Meghana Malladi <m-malladi@ti.com>
-In-Reply-To: <20260324211402.342474-1-devnexen@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002326:EE_|DS7PR10MB7129:EE_
-X-MS-Office365-Filtering-Correlation-Id: 68d889af-8d8b-4279-9e00-08de8a4ef75b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|82310400026|376014|1800799024|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	q/+T1//cDjU4HWbhMv3WL8J9vo+zagTmKFBPq6PVvLHnmsp/68d6b24oO8Nf6alEpBXQJnyH0tZphF8F9Iru8ocnm6ceu+Ra2U5/pLjE85i3j1zZOQJzpIZfPtbP5xl3KUoFcX2fau8kqL+HYN9yxz2R4XkmqnpfO012vWa5PZpqm6pL5d5R3yUjUhJ8zuPHWRCFa6/z6bKhxThxptT6USGovyTExPKKoiVQ+bJX3xRxQEhVF1C7baZB29ZUAaFXmXtAhgOVOtIDprG8sJT6bw8JgOAmH2z9ptNKrRcsAEdGNJ03+mGeg72MvVKzSvZgpwYyWRseuwbepi104QhZ8e2zsy//aoF5ijHXaFFDyQCypOJ8jh8wS4uSoig2d2TfWyoV/g7P4e2KLNKaq1OIdzHrug/bCwQEuRvbido0/BuogltTqO4BpA8+fq8+gzthmMjqO3SSRxvdIiJCKmHfif7axJaorUiXun727XUJ5fetbGTsLTcrS4VbvasKjKL00eBQCnHwn3NxxT1oyDXP+SZIqx1kqSgv5bPbL86wgTRnQXq3IUjNbuBKJu6Zt8h5gs2tkGUjNYumXM5dUJVTKfg+26d6Vs1v13RJjcGdXGNBu9c68UibrKZaqZff4O0c+KeWfAnxC6iYGmN8ct9tbd78gw0smQsoMcqRqC9cqYMHccH65amW+fm8qU8uVv5ABlkdvfmC/WNeK9pQ4yfym1HXAUfOXBzDYFWVdpAdY/DmPTp6kkgzjpCB9bRoEDRFDmiIVS+Nljjku6gsSjABdg==
-X-Forefront-Antispam-Report:
-	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(376014)(1800799024)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	IihcwDvLMbJWTexF+32xELN47kC3Hd3kH/x5tHP39oAt39FfFSHFJ4NHrSMD8/RtgfapUT/cFWQuzTb1OtYxDSa7BB7ibtJgnojcKL9hiMonmcTA/h/nR8p4Ibw9LMGsnOz/Nl8b03st5T02rZkiPS301a2SGNV+joudLSxAl4BHNN6uQ9BA4qP3QOhk5Mn7b0+IJkmNR+Tw75Tsw9YDTz+Em1Pg1pFsYdiZV21PqhLR6HtAN9uu5hwWur8rjT2jkVb/3FSOoJkCneGNC4B9XrExqQyHYciWWlGNYoatxEplB5CYL9LbuySbE4NGfjlBZltq1k/QQryq3861nzvSY2TQRI3IstLSZzG5c5R/CH0WhL+zCmzezmy1/TTpNUKfB5OkUJi5zCqTI8//o6mdb3G055SUZ20XTjDyuGm/ZC5YHioaqwCznifC2qm9erwU
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2026 09:14:49.3928
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 68d889af-8d8b-4279-9e00-08de8a4ef75b
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002326.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB7129
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260324224607.374327-1-alex.popov@linux.com>
+X-Debian-User: leitao
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271472-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ti.com:dkim,ti.com:mid];
-	FREEMAIL_TO(0.00)[gmail.com,ti.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[debian.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ti.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-271473-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,davemloft.net,google.com,redhat.com,bootlin.com,suse.cz,nvidia.com,pengutronix.de,gmail.com,linuxfoundation.org,sipsolutions.net,163.com,1g4.org,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 74E843221AB
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.com:email]
+X-Rspamd-Queue-Id: B899A3221D7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi David,
-
-On 3/25/26 02:44, David Carlier wrote:
-> emac_dispatch_skb_zc() allocates a new skb via napi_alloc_skb() but
-> never copies the packet data from the XDP buffer into it. The skb is
-> passed up the stack containing uninitialized heap memory instead of
-> the actual received packet, leaking kernel heap contents to userspace.
+On Wed, Mar 25, 2026 at 01:46:02AM +0300, Alexander Popov wrote:
+> Currently we execute `SET_NETDEV_DEV(dev, &priv->lowerdev->dev)` for
+> the virt_wifi net devices. However, unregistering a virt_wifi device in
+> netdev_run_todo() can happen together with the device referenced by
+> SET_NETDEV_DEV().
 > 
-> Add the missing memcpy from xdp->data into the skb data area.
+> It can result in use-after-free during the ethtool operations performed
+> on a virt_wifi device that is currently being unregistered. Such a net
+> device can have the `dev.parent` field pointing to the freed memory,
+> but ethnl_ops_begin() calls `pm_runtime_get_sync(dev->dev.parent)`.
 > 
-> Additionally, remove the skb_mark_for_recycle() call since the skb is
-> backed by the NAPI page frag allocator, not page_pool. Marking a
-> non-page_pool skb for recycle causes the free path to return pages to
-> a page_pool that does not own them, corrupting page_pool state.
+> Let's remove SET_NETDEV_DEV for virt_wifi to avoid bugs like this:
 > 
-> The non-ZC path (emac_rx_packet) does not have these issues because it
-> uses napi_build_skb() to wrap the existing page_pool page directly,
-> requiring no copy, and correctly marks for recycle since the page comes
-> from page_pool_dev_alloc_pages().
+>  ==================================================================
+>  BUG: KASAN: slab-use-after-free in __pm_runtime_resume+0xe2/0xf0
+>  Read of size 2 at addr ffff88810cfc46f8 by task pm/606
 > 
-
-Thanks for the patch. I wonder how were you able to catch this bug?
-
-> Fixes: 7a64bb388df3 ("net: ti: icssg-prueth: Add AF_XDP zero copy for RX")
-> Signed-off-by: David Carlier <devnexen@gmail.com>
-> ---
->   drivers/net/ethernet/ti/icssg/icssg_common.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>  Call Trace:
+>   <TASK>
+>   dump_stack_lvl+0x4d/0x70
+>   print_report+0x170/0x4f3
+>   ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+>   kasan_report+0xda/0x110
+>   ? __pm_runtime_resume+0xe2/0xf0
+>   ? __pm_runtime_resume+0xe2/0xf0
+>   __pm_runtime_resume+0xe2/0xf0
+>   ethnl_ops_begin+0x49/0x270
+>   ethnl_set_features+0x23c/0xab0
+>   ? __pfx_ethnl_set_features+0x10/0x10
+>   ? kvm_sched_clock_read+0x11/0x20
+>   ? local_clock_noinstr+0xf/0xf0
+>   ? local_clock+0x10/0x30
+>   ? kasan_save_track+0x25/0x60
+>   ? __kasan_kmalloc+0x7f/0x90
+>   ? genl_family_rcv_msg_attrs_parse.isra.0+0x150/0x2c0
+>   genl_family_rcv_msg_doit+0x1e7/0x2c0
+>   ? __pfx_genl_family_rcv_msg_doit+0x10/0x10
+>   ? __pfx_cred_has_capability.isra.0+0x10/0x10
+>   ? stack_trace_save+0x8e/0xc0
+>   genl_rcv_msg+0x411/0x660
+>   ? __pfx_genl_rcv_msg+0x10/0x10
+>   ? __pfx_ethnl_set_features+0x10/0x10
+>   netlink_rcv_skb+0x121/0x380
+>   ? __pfx_genl_rcv_msg+0x10/0x10
+>   ? __pfx_netlink_rcv_skb+0x10/0x10
+>   ? __pfx_down_read+0x10/0x10
+>   genl_rcv+0x23/0x30
+>   netlink_unicast+0x60f/0x830
+>   ? __pfx_netlink_unicast+0x10/0x10
+>   ? __pfx___alloc_skb+0x10/0x10
+>   netlink_sendmsg+0x6ea/0xbc0
+>   ? __pfx_netlink_sendmsg+0x10/0x10
+>   ? __futex_queue+0x10b/0x1f0
+>   ____sys_sendmsg+0x7a2/0x950
+>   ? copy_msghdr_from_user+0x26b/0x430
+>   ? __pfx_____sys_sendmsg+0x10/0x10
+>   ? __pfx_copy_msghdr_from_user+0x10/0x10
+>   ___sys_sendmsg+0xf8/0x180
+>   ? __pfx____sys_sendmsg+0x10/0x10
+>   ? __pfx_futex_wait+0x10/0x10
+>   ? fdget+0x2e4/0x4a0
+>   __sys_sendmsg+0x11f/0x1c0
+>   ? __pfx___sys_sendmsg+0x10/0x10
+>   do_syscall_64+0xe2/0x570
+>   ? exc_page_fault+0x66/0xb0
+>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>   </TASK>
 > 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-> index fd4e7622f123..9638a03bebb4 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
-> @@ -902,6 +902,7 @@ static void emac_dispatch_skb_zc(struct prueth_emac *emac, struct xdp_buff *xdp,
->   
->   	skb_reserve(skb, headroom);
->   	skb_put(skb, pkt_len);
-> +	memcpy(skb->data, xdp->data, pkt_len);
+> This fix may be combined with another one in the ethtool subsystem:
+> https://lore.kernel.org/all/20260322075917.254874-1-alex.popov@linux.com/T/#u
+> 
+> Fixes: d43c65b05b848e0b ("ethtool: runtime-resume netdev parent in ethnl_ops_begin")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Alexander Popov <alex.popov@linux.com>
 
-Why not use skb_copy_to_linear_data() ?
-
->   	skb->dev = ndev;
->   
->   	/* RX HW timestamp */
-> @@ -912,7 +913,6 @@ static void emac_dispatch_skb_zc(struct prueth_emac *emac, struct xdp_buff *xdp,
->   		skb->offload_fwd_mark = emac->offload_fwd_mark;
->   	skb->protocol = eth_type_trans(skb, ndev);
->   
-> -	skb_mark_for_recycle(skb);
->   	napi_gro_receive(&emac->napi_rx, skb);
->   	ndev->stats.rx_bytes += pkt_len;
->   	ndev->stats.rx_packets++;
-
+Reviewed-by: Breno Leitao <leitao@debian.org>
 
