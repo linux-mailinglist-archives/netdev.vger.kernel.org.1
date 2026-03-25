@@ -1,158 +1,213 @@
-Return-Path: <netdev+bounces-271621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271618-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wMrdKKr+w2mSvQQAu9opvQ
-	(envelope-from <netdev+bounces-271621-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 16:26:34 +0100
+	id KIiiOTX/w2lXvQQAu9opvQ
+	(envelope-from <netdev+bounces-271618-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 16:28:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16758327EB1
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 16:26:34 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA276327F6E
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 16:28:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8ED3B34643F9
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:14:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 97C743081AB9
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 15:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF0029D29E;
-	Wed, 25 Mar 2026 15:12:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3DF3E9288;
+	Wed, 25 Mar 2026 15:06:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b="EXaqtQB8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bxsBW043"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.amicon.ru (unknown [77.108.111.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5F532AABD;
-	Wed, 25 Mar 2026 15:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.108.111.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC283E6DE4
+	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 15:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774451520; cv=none; b=tdOYliaRZvzgTlF91x1PYEhodyklsULBXKjgC6caCKgoBN7IOPyxPpgi5CgSGe1FSq1SrDPUgGRiBkqLoAl/qVs3m4+EQ7wm3nG9FGreCGofK5QG8GR97zIdo7p4aFTcrX9AInzGs95akP1WmWOBBKRzYwVeVcnuVk1Gt8IkGYo=
+	t=1774451192; cv=none; b=Mb1F/iWcxnYZov0rGA34VXi+MsDLL1G2fndX0IBRuItg8xYtQ21/Qq6/6b9Ha/LRTOvFW12uTHDRiTBla8M2DRzLMPnNAv5/hGi+oCNV4h06znG2Jj1sdqxTEqXo3EgkHhKCdDIIxr2iVprV7CrMiKEKyoHNHUZ9zwLq26Kfklo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774451520; c=relaxed/simple;
-	bh=AE2guXMBp5DQPNbyJ1WdoFUb172juDOs9bZKDoSilTQ=;
-	h=Content-Type:From:To:CC:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version; b=DYW8gmd9tHuqS9NLpOi4MUVx5urBgpVokQa+Pdi4NfuFgkQPdXdHBi8I2agczaDU+0RIc3nyUhOzYAAVwMRW1XnNoptAeowllwow4O0NFqgrTqpQHNLi0QXT7lhrJrEspab+MARr5jxKZGk9YfxwViLUtTfNnNAAqQ+gFPfH17U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru; spf=pass smtp.mailfrom=amicon.ru; dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b=EXaqtQB8; arc=none smtp.client-ip=77.108.111.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amicon.ru
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; d=amicon.ru; s=mail; c=simple/simple;
-	t=1774451514; h=from:subject:to:date:message-id;
-	bh=AE2guXMBp5DQPNbyJ1WdoFUb172juDOs9bZKDoSilTQ=;
-	b=EXaqtQB8KUspwu79iQIwBlh7uPDjwVNXL27lIYm1NdEKxdsJNzPjIToBnw9JESsy7HSIAO5HumS
-	FpYEIVrVHHuRKJ2dp5c6JHN0Zi4YzCo7XqfK8FbkN2JKx98VqId1tKgbV8WXNhuf9+U3EG4+LI1+i
-	yNsfeym+UQYduB57J7lksJltmgV86fSXZ3ek8PLtZQ1LL8I2Z0Rs+pSq8FABwl09FMPoKy0RWUMOL
-	n7ziIINxNWFSSHXGnCsqjG0iWnPzIqiUwpwds3EIf/vePzmlQwn4Rhoau0C5u9Bjh8goNdgLQjE8L
-	3HN0Cyzm0aAwbKPuqHzG3eBNGJmJgwt5ZYPw==
-Received: from example.com (172.16.2.46) by mail.amicon.lan (192.168.0.59)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.27; Wed, 25 Mar
- 2026 18:11:54 +0300
-From: Agalakov Daniil <ade@amicon.ru>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-CC: Agalakov Daniil <ade@amicon.ru>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>, "Daniil
- Iskhakov" <dish@amicon.ru>, Roman Razov <rrv@amicon.ru>
-Subject: [PATCH net v2] e1000: check return value of e1000_read_eeprom
-Date: Wed, 25 Mar 2026 18:02:20 +0300
-Message-ID: <20260325151132.1399812-1-ade@amicon.ru>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <a70a49a0-43f8-4908-993a-50999bf0dfa8@intel.com>
-References: <a70a49a0-43f8-4908-993a-50999bf0dfa8@intel.com>
+	s=arc-20240116; t=1774451192; c=relaxed/simple;
+	bh=hueUun48O4250wdQs94dWOVmghwrQOiUb0g955DTCkk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U586udyECuRa//7JDDNwbVtUM046znI6FIH/W1eguUKYdkIj+zjK0VKk9ufrnCUSVylyZrwA7DSKCvQBxLCbHspThc3El8eqQ+bMjoKqLO5hZi6VEtcFzlewviFfBrWNztimMi0hbOFxQIXDP5Tp6PGiuXkFhuzBlhZTcZF4g9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bxsBW043; arc=none smtp.client-ip=74.125.82.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-2c0c955a481so924380eec.1
+        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 08:06:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774451190; x=1775055990; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/d4Gn1kS5MGurytQaHUUdFFZv/IQSTbByU+x/UA/BgI=;
+        b=bxsBW043Y5w/Dz8Y7N/NIiibrY68N4RdaHozWOv+rAlIeRZyuQqI2cujs3ZfRtTMCc
+         RCO+i4urjzpZM9YVvNvg6cbNOBhzrhgQcFqq3CrLCxR3IgjvqUcRIT5b8kIF403L0dcc
+         05XD9q5JXZ5kRRBn6vQrz65dzfz9pavFtAAHKGiBYlFkMsZpeRR1dvTUfY/QMEYoYqKx
+         F2frc57Z8FHTlkTPdVhlzcwIu0/beNFkPhyYMJFNfqZq0qO2OTI2d9KFYnYFCsWUfCrG
+         WO5HKQKePtf+5mhwrbLyOd+0aDHDhmsWogVgXOPCmo65kTvjM+FdYcqFdd8OKuxTUHbX
+         wyCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774451190; x=1775055990;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/d4Gn1kS5MGurytQaHUUdFFZv/IQSTbByU+x/UA/BgI=;
+        b=QmGoks3ffKXtuOGLuuu8Lxh2rBcW/yoUZtgQQq6Csq4226kp4slynM2uzDOt8tY9Vw
+         OI+1h481rE3GzIH6CMPQyr0dqEewBTiteSdtrIqZxauilI/65r9nTz9+n0AONqef0NbT
+         tcZpXgN4XygGlK4tkwjuUKi3MqBolQatCuYW44IwPMAOK5Pp+Fqm3hZqid6EeCYYrfbx
+         saF1ekh2IBIy/r2/vLcuPpY8bXiUuIGHQvLfDROQM5jsTm/wAtXcvRGmfg73y3gUn8B8
+         1HGmo6Ttz0ckXV6ENp1W5py+U0dFMeSABEpZohqmVWkSBlt3n4tI+9LLFWLBll3Dhik5
+         mo5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWEW8Iukzcpr1Q//HHG4NFWdPOKR4SThBXDiCbmTJY2vkD/1/B90CpKFtcL80/tNpjwm1/uvwg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUw6vFQd0yKJGhqj5aFrNnfaFY35qRbJY29kROy8izPazwyGgt
+	heX4SmE49dlXf1fPGp2Iows6jAzGZZ5bgmKehWq2JVBK4PdlUD2cDCb46x9h
+X-Gm-Gg: ATEYQzy7vBiKIr9PZoLTpiYUlixk5em83raWeiJvbQzUNYrC97QJeor1LzpQiywDniN
+	P6+SJGHX8vs1ogvpm+4NJq5yQTeMSRWtCWK4NUfE9YX07n15wtMZhLBrCZz4noB8u1Y8t9MD55d
+	BEkJlEzLkvZjm4WcLp28Bec/dIWHJ9lgKKJUOopzt0A+knJkmpD95ZzPWfumJOhVAjFxz1UyLwD
+	7wp/Ym2lxmgMmzYIsno8cTrwojhE6lCMdnqQeCjQnO+x9oLjZ/VBnVI6pigwMNeUcVusPVI3H/F
+	yJUA/J37b/iugo2n4AjUozGVV5VHEYU2Bl7PLT2nrhdPtUheje4NR/zhAm/vu2CFTuyoeH06lYE
+	ugz3//YcYNTvgLyOG0wmjF2E66ULgdM1X8pIda5ftIIawGE3uv2gBRl2ngCjr9ONuSSLTYx11t0
+	7pIyFMbCk0eGA5SS4jAj+ppgNA4vtlPCF6jVaY1+uZEBPM7NPZMbjfbvJMJ1mU+P1hvk5QydqUH
+	szRLP2td5WWkpZerQ==
+X-Received: by 2002:a05:7022:6984:b0:128:ca6f:adf0 with SMTP id a92af1059eb24-12a96e69cffmr1941893c88.17.1774451190214;
+        Wed, 25 Mar 2026 08:06:30 -0700 (PDT)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12aa7248731sm29001c88.4.2026.03.25.08.06.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Mar 2026 08:06:29 -0700 (PDT)
+Date: Wed, 25 Mar 2026 08:06:28 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	horms@kernel.org, corbet@lwn.net, skhan@linuxfoundation.org,
+	andrew+netdev@lunn.ch, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, saeedm@nvidia.com, tariqt@nvidia.com,
+	mbloch@nvidia.com, alexanderduyck@fb.com, kernel-team@meta.com,
+	johannes@sipsolutions.net, sd@queasysnail.net, jianbol@nvidia.com,
+	dtatulea@nvidia.com, mohsin.bashr@gmail.com,
+	jacob.e.keller@intel.com, willemb@google.com, skhawaja@google.com,
+	bestswngs@gmail.com, aleksandr.loktionov@intel.com, kees@kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	leon@kernel.org
+Subject: Re: [PATCH net-next v3 03/13] net: introduce ndo_set_rx_mode_async
+ and dev_rx_mode_work
+Message-ID: <acP59NM6HZhV9oAe@mini-arch>
+Mail-Followup-To: Stanislav Fomichev <stfomichev@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	horms@kernel.org, corbet@lwn.net, skhan@linuxfoundation.org,
+	andrew+netdev@lunn.ch, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, saeedm@nvidia.com, tariqt@nvidia.com,
+	mbloch@nvidia.com, alexanderduyck@fb.com, kernel-team@meta.com,
+	johannes@sipsolutions.net, sd@queasysnail.net, jianbol@nvidia.com,
+	dtatulea@nvidia.com, mohsin.bashr@gmail.com,
+	jacob.e.keller@intel.com, willemb@google.com, skhawaja@google.com,
+	bestswngs@gmail.com, aleksandr.loktionov@intel.com, kees@kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	leon@kernel.org
+References: <20260320012501.2033548-1-sdf@fomichev.me>
+ <20260320012501.2033548-4-sdf@fomichev.me>
+ <20260323162003.0d155055@kernel.org>
+ <acLUMN1BYkIVyOk8@mini-arch>
+ <20260324142114.216fcb01@kernel.org>
+ <acMU93XN02PHmAGi@mini-arch>
+ <20260324204440.1752423d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: mail.amicon.lan (192.168.0.59) To mail.amicon.lan
- (192.168.0.59)
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260324204440.1752423d@kernel.org>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[amicon.ru,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[amicon.ru:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-271621-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271618-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	FREEMAIL_CC(0.00)[fomichev.me,vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,lwn.net,linuxfoundation.org,lunn.ch,broadcom.com,intel.com,nvidia.com,fb.com,meta.com,sipsolutions.net,queasysnail.net,gmail.com,lists.osuosl.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ade@amicon.ru,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amicon.ru:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[stfomichev@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linuxtesting.org:url,amicon.ru:dkim,amicon.ru:email,amicon.ru:mid]
-X-Rspamd-Queue-Id: 16758327EB1
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BA276327F6E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-[Why]
-e1000_set_eeprom() performs a read-modify-write operation when the write
-range is not word-aligned. This requires reading the first and last words
-of the range from the EEPROM to preserve the unmodified bytes.
+On 03/24, Jakub Kicinski wrote:
+> On Tue, 24 Mar 2026 15:49:27 -0700 Stanislav Fomichev wrote:
+> > > > Not sure why cancel+release, maybe you're thinking about the unregister
+> > > > path? This is rtnl_unlock -> netdev_run_todo -> __rtnl_unlock + some
+> > > > extras.
+> > > > 
+> > > > And the flush is here to plumb the addresses to the real devices
+> > > > before we return to the callers. Mostly because of the following
+> > > > things we have in the tests:
+> > > > 
+> > > > # TEST: team cleanup mode lacp                                        [FAIL]
+> > > > #       macvlan unicast address not found on a slave
+> > > > 
+> > > > Can you explain a bit more on the suggestion?  
+> > > 
+> > > Oh, I thought it's here for unregister! Feels like it'd be cleaner to
+> > > add the flush in dev_*c_add() and friends? How hard would it be to
+> > > identify the callers in atomic context?  
+> > 
+> > Not sure we can do it in dev_xc_add because it runs under rtnl :-(
+> > I currently do flush in netdev_run_todo because that's the place that
+> > doesn't hold rtnl. Otherwise flush will get stuck because the work
+> > handler grabs it...
+> 
+> I was thinking of something a'la linkwatch. We can "steal" / "flush"
+> the pending work inline. I guess linkwatch is a major source of races
+> over the years...
+>
+> Does the macvlan + team problem still happens with the current
+> implementation minus the flush? We are only flushing once so only
+> pushing the addresses thru one layer of async callbacks.
 
-However, the code does not check the return value of e1000_read_eeprom().
-If the read fails, the operation continues using uninitialized data from
-eeprom_buff. This results in corrupted data being written back to the
-EEPROM for the boundary words.
+Yes, it does happen consistently when I remove the flush. It also
+happens with my internal v4, so I need to look again at what's going on.
+Not sure whether it's my internal regression or I was just sloppy/lucky
+(since you're correct in pointing out that we flush only once).
 
-Add the missing error checks and abort the operation if reading fails.
-
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Co-developed-by: Iskhakov Daniil <dish@amicon.ru>
-Signed-off-by: Iskhakov Daniil <dish@amicon.ru>
-Signed-off-by: Agalakov Daniil <ade@amicon.ru>
----
-v2:
- - Split from original series.
- - Updated the error checking logic to be consistent with the
-   implementation in the e1000e driver.
-
- drivers/net/ethernet/intel/e1000/e1000_ethtool.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_ethtool.c b/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
-index ab232b3fbbd0..a9c56505adcb 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
-@@ -506,6 +506,10 @@ static int e1000_set_eeprom(struct net_device *netdev,
- 					    &eeprom_buff[last_word - first_word]);
- 	}
- 
-+	if (ret_val)
-+		goto out;
-+
-+
- 	/* Device's eeprom is always little-endian, word addressable */
- 	for (i = 0; i < last_word - first_word + 1; i++)
- 		le16_to_cpus(&eeprom_buff[i]);
-@@ -522,6 +526,7 @@ static int e1000_set_eeprom(struct net_device *netdev,
- 	if ((ret_val == 0) && (first_word <= EEPROM_CHECKSUM_REG))
- 		e1000_update_eeprom_checksum(hw);
- 
-+out:
- 	kfree(eeprom_buff);
- 	return ret_val;
- }
--- 
-2.51.0
-
+Before I went down the workqueue route, I had a simple
+net_todo_list-like approach: `list_add_tail` on enqueue and
+`while(!list_empty) run_work()` on rtnl_unlock. This had a nice properly of
+tracking re-submissions (by checking whether the device's list_head is
+linked into the list or not) and it was relatively easy to do the
+recursive flush. Let me try get back to this approach and see whether
+it solves the flush? Not sure what wq buys us at this point.
 
