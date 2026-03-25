@@ -1,185 +1,113 @@
-Return-Path: <netdev+bounces-271684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271685-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SPTCHqcfxGmZwgQAu9opvQ
-	(envelope-from <netdev+bounces-271684-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:47:19 +0100
+	id aA97IR4gxGmZwgQAu9opvQ
+	(envelope-from <netdev+bounces-271685-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:49:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD51A32A15A
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:47:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAB9A32A181
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 18:49:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1D35E300C037
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 17:45:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4C5A3011F11
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 17:49:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65E7407104;
-	Wed, 25 Mar 2026 17:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5609D40B6CE;
+	Wed, 25 Mar 2026 17:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LaW1Roma"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="dLrB24iW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9062A30F548
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 17:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EFF402B89;
+	Wed, 25 Mar 2026 17:48:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774460732; cv=none; b=J5ZuPQT7acEvpmrqsbK0NvBsJQB7Vp9mEpXK9UhfvY5H7LmURD5HVGRi0tW5v36ZJGy++PeSjoeEUPyN5iPZIcIQvnOKHwDSgVsETC2h5u3riqy6eQxRT3EBYeO8KEqmyQfvSpIWRCVoNgNVbm2n/i+2VMQbcPOf3j/e4wPwgA8=
+	t=1774460941; cv=none; b=B4CjL0YvN7T/s1lcOJpwsDiiWOZjsM7d4cvm6PjpFHRwXSnDLFvbX/XJ18o90T7/ps+4bIW1jn3OyeiVC1ZYPQ8Xj0BVA8P33zB/979fInR1EuL9w6Tk+igbjRrYuwj5P8Rd5p5fULwy0Dhe8CoMSsbgh08ZY/6Gi7hpypLhmFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774460732; c=relaxed/simple;
-	bh=G8gZmrgydL6oZ4QqLh5ZZiDwq2SmBhx8hBCagxRpaZQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tWQLBdsb6wi0O8rx44qyf8rzmfJsaJoLzL+1t1FrrUx+y79v7kyvttvPMNBeW4o8Yy/mkwfpwFl1hBFBXtwrHBdopx5ZdSOsMBCtSJfWn3l0QQ2QQIx9x6FtzzMk8ZyVOKunHzSVfpaoSbF6yuFJFmIJH9I3tK+CAK68ECwm8d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LaW1Roma; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91186C19423;
-	Wed, 25 Mar 2026 17:45:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774460732;
-	bh=G8gZmrgydL6oZ4QqLh5ZZiDwq2SmBhx8hBCagxRpaZQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LaW1Roma+GSHv7CyWs5dDNriNTvqEX/qGq6xtzAKBqiTEcxiAto/JvpX5zJzFr8UA
-	 a17aviTGd5m/u0NnBJZOsPBCAH/2mSZnnAbi7cu2/bMeVbXvwLTqka5Uwf1Hl3OOtP
-	 yjWk/9k4Y2t/PsHF6d73Iep0Sbt1b79OtsR3ovS11d60VkZAXrPApPTwL2mJADiyrv
-	 dFwbgh3zGKsaXZhjPGsBpwml78UHDzRLcqSRHx8DO8V0tv2VEQhYY3wDIu2IfglD5g
-	 NudobHWypgV9JTok1KdN5Fgob0lELzaRv1pXcL8xbMw/EgWw6EQDifwlDzyY7Tgzay
-	 Ir0SvhIRJHqyQ==
-From: Simon Horman <horms@kernel.org>
-To: pvalerio@redhat.com
-Cc: Simon Horman <horms@kernel.org>,
-	edumazet@google.com,
-	claudiu.beznea@tuxon.dev,
-	nb@tipi-net.de,
-	theo.lebrun@bootlin.com,
-	lorenzo@kernel.org,
-	kuba@kernel.org,
-	nicolas.ferre@microchip.com,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v6 3/7] net: macb: Add page pool support handle multi-descriptor frame rx
-Date: Wed, 25 Mar 2026 17:45:25 +0000
-Message-ID: <20260325174525.340041-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260323221047.2749577-4-pvalerio@redhat.com>
-References: <20260323221047.2749577-4-pvalerio@redhat.com>
+	s=arc-20240116; t=1774460941; c=relaxed/simple;
+	bh=hNlZT99ZtZwiTYpq5bBjvL5AKd1qeEcHL4Ekvpii4Ew=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=omO1xQZzPpy3OxXEwNFa5688PD95w61dKz2sWZhFSpeZfnW/Xm5r8Fhjh/RQq8UKajp22D6y+TasDt7j28RK9q1UzDCzPoceNnT/VsgazpMlHPAFbqqHRmyiMRYbLlHOlVm1QtsiUNVTnZ30eNEnywW6+t8ySMHuQqFl0qQkQ+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=dLrB24iW; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 3F33B600B5;
+	Wed, 25 Mar 2026 18:48:56 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1774460936;
+	bh=3a98aCNzUG7RIJEQkjk8/YAJhffjtA16hOkwN0kGb0c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dLrB24iWJZu0JkCYy2cHOU5jmR2DVGeVd1q2WnLVRTslU/OVKXX8nz0l8qUqxWecL
+	 C9fmo6wzkobE9Y2squ9jmnMJyUBR+0DH0Ky4hY9YSh0iNgUY32YAaohD6kR0tRCr6s
+	 JMvj8teK0sxVzHJKcJYZ/FnnZNqAp9PnmyAYaIEbTqUCYUMq27V/eVrR6/iCeJzavl
+	 lOpGdFJQ67J/y92nXmhdB7i5qSEl+tMLjrMpLPLf17fCaQByQ+4xlJdr5M+9D4mXEY
+	 DDcu1K2g/lPSenzHLSoweFSDamHG+urgBSi6maoirck4fuHHPdl7LgzI7eVkHDzRBQ
+	 z/EeOigtboaEg==
+Date: Wed, 25 Mar 2026 18:48:53 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH net 00/14] netfilter: updates for net
+Message-ID: <acQgBRbJHRqbu--0@chamomile>
+References: <20260325131108.23045-1-fw@strlen.de>
+ <acQemtlq03AZvjL7@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <acQemtlq03AZvjL7@strlen.de>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-271684-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
+	TAGGED_FROM(0.00)[bounces-271685-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: CD51A32A15A
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,strlen.de:email]
+X-Rspamd-Queue-Id: DAB9A32A181
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Wed, Mar 25, 2026 at 06:42:50PM +0100, Florian Westphal wrote:
+> Florian Westphal <fw@strlen.de> wrote:
+> > Hi,
+> > 
+> > The following patchset contains Netfilter fixes for *net*.
+> > Note that most bugs fixed here stem from 2.6 days, the large PR
+> > is not due to an increase in regressions.
+> 
+> please toss this.  I'm not sending a new PR.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: macb: Add page pool support handle multi-descriptor frame rx
+Will you please collapse this incremental fix to 8/14 in the new PR?
 
-This commit adds page pool support for the Cadence MACB/GEM Ethernet
-driver and enables multi-descriptor frame reception. It replaces
-netdev_alloc_skb() with page pool allocation and removes the limitation
-that frames must fit in a single descriptor.
-
-> diff --git a/drivers/net/ethernet/cadence/Kconfig b/drivers/net/ethernet/cadence/Kconfig
-> index 5b2a461dfd28..ae500f717433 100644
-> --- a/drivers/net/ethernet/cadence/Kconfig
-> +++ b/drivers/net/ethernet/cadence/Kconfig
-
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index fca7b9c6b670..84989ff0c3a9 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-
-[ ... ]
-
-> @@ -2600,12 +2700,22 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb, struct net_device *dev)
->  	return ret;
->  }
->
-> -static void macb_init_rx_buffer_size(struct macb *bp, size_t size)
-> +static void macb_init_rx_buffer_size(struct macb *bp, unsigned int mtu)
->  {
-> +	unsigned int overhead;
-> +	size_t size;
-> +
->  	if (!macb_is_gem(bp)) {
->  		bp->rx_buffer_size = MACB_RX_BUFFER_SIZE;
->  	} else {
-> -		bp->rx_buffer_size = MIN(size, RX_BUFFER_MAX);
-> +		size = mtu + ETH_HLEN + ETH_FCS_LEN;
-> +		bp->rx_buffer_size = SKB_DATA_ALIGN(size + bp->rx_ip_align);
-> +		if (gem_total_rx_buffer_size(bp) > PAGE_SIZE) {
-> +			overhead = bp->rx_headroom +
-> +				SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> +			bp->rx_buffer_size = rounddown(PAGE_SIZE - overhead,
-> +						       RX_BUFFER_MULTIPLE);
-> +		}
->
->  		if (bp->rx_buffer_size % RX_BUFFER_MULTIPLE) {
->  			netdev_dbg(bp->dev,
-
-Can this overflow the hardware register field? The old code clamped size
-against RX_BUFFER_MAX (16320), but the new code only guards against
-PAGE_SIZE. Looking at the RXBS field in the hardware (GEM_RXBS_SIZE=8 bits
-at macb.h:356), it can only represent values 0-255, encoding buffer sizes
-0-16320 (value * RX_BUFFER_MULTIPLE where RX_BUFFER_MULTIPLE=64).
-
-On systems with large page sizes (e.g., ARM64 with CONFIG_ARM64_64K_PAGES),
-the PAGE_SIZE guard doesn't trigger for jumbo MTU values. If rx_buffer_size
-reaches 16384 (SKB_DATA_ALIGN(16320+2)), then buffer_size = 16384/64 = 256,
-which overflows the 8-bit field to 0 when written via GEM_BF(RXBS,
-buffer_size) in macb_configure_dma():
-
-drivers/net/ethernet/cadence/macb_main.c:macb_configure_dma() {
-	buffer_size = bp->rx_buffer_size / RX_BUFFER_MULTIPLE;
-	...
-	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
-		if (q)
-			queue_writel(queue, RBQS, buffer_size);
-		else
-			dmacfg |= GEM_BF(RXBS, buffer_size);
-	}
-}
-
-This would cause the hardware to use an incorrect (zero) buffer size.
-
-Should the code clamp rx_buffer_size to ensure buffer_size stays within
-0-255 after the division?
+Thanks.
 
