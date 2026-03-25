@@ -1,93 +1,50 @@
-Return-Path: <netdev+bounces-271545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271546-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cK5rJRTmw2lvugQAu9opvQ
-	(envelope-from <netdev+bounces-271545-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 14:41:40 +0100
+	id KM/jBljmw2lvugQAu9opvQ
+	(envelope-from <netdev+bounces-271546-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 14:42:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4AB3325FA1
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 14:41:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D93325FF3
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 14:42:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1DC9D30DDAEA
-	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 13:10:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B4A7C3118F6D
+	for <lists+netdev@lfdr.de>; Wed, 25 Mar 2026 13:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD1053DA5C4;
-	Wed, 25 Mar 2026 13:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RcwWwE64"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF933D8115;
+	Wed, 25 Mar 2026 13:11:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561B63D9DCC
-	for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 13:09:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BD1309DDF;
+	Wed, 25 Mar 2026 13:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774444165; cv=none; b=PK3D4oEkp5YWoVCFJDEWmZvCbjNrduICeBAjgmKNp7qfMszksd6N1uzijs/3L8sLTYYymyGNc3mk616vR3YXHdwFyEcEw1Otrcw13tS9wxU/T3oS6Hja/aEhgdXTb7/hvvoy8t6ocDiq3lpbgW9wJKhKkiL8hPFDaweVxxgeJks=
+	t=1774444302; cv=none; b=VHH6zPkj9HfMV6qQxr4rgrZwHSVAfO/AIt+VPtmKwK0Lcn4+R6s7F26zh4/gw743DpokKueFOHuSMpgM1OZE6zy7f+WNUuJr5QZhM/VKY07bKGtYsPCdj3ZP3oqUcLwgClIZVD6rKAV63LLQZW1Vq9EeBk2RjVyIo155revK16g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774444165; c=relaxed/simple;
-	bh=9pVS1tph9jbVSLdoQwmJN+/bmkwxN4ab7cvUzQYqS3o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PKrrDHlgC6jFxyKzQ2WHUnLUnfylNm6AcESf4MG/+rzgmfjCkkO66Ve6qYjECdeWMe6siBAG0eweMbeDpqRHQhUJdXxIGFhw25kQ2W9wCe1GV+IssgkNlmjxTn3PxaQdqw74+c7Bu3hD62tPbDieTRbuSb2ZCmPduhdddPWVSi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RcwWwE64; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-439d8df7620so4185545f8f.0
-        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 06:09:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774444163; x=1775048963; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5uqkekRSIh11YxOvK1NGZWJnPZup9GIGf6LTY+NlKwY=;
-        b=RcwWwE64KO2HxvYqlHJuwpu3p4IY4iG1MzYAU9w9l8k4mMb5qySFpHbkRXNNL47H8L
-         6LKDLzdLVqZg7KrDnxK3hFVxrmuwBQ9FhM7ZsJz7cZh9/FGLNClnVwoP+D2yDsQh5XQS
-         tGf7/vwS8n5blE0MsNKHxoFFjFPDQHWYo/BADFDrPA6VunEjEcZHUOpq7rz5ZZkL8FIz
-         p56GVk8sO66GwODEU5CR92C/Sjr+m7LrlzGhmDYBqYq6CD1k6emimiKDzr7bru8BNhkc
-         kqGooTJk+sUlYo1jxpBrJh8ezxXNyvCSOma4WW9FzG6ANGX6CqLGoVcPpKwas/p3gD0I
-         8DsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774444163; x=1775048963;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=5uqkekRSIh11YxOvK1NGZWJnPZup9GIGf6LTY+NlKwY=;
-        b=RPlSB7sk1DzgtO+yHgX6dqHnPiCYcEI7KKFLQXAkvMYvf5yja5AEt3Fg9aofJ4+Th3
-         XANQL6WZLQrGkGj5PEw4aiDZXpkWJAHlZOmE7IUIEaVKKvMIXVMF/unFv2uyRr9QXSq3
-         DpIonJGGXt13Q+3UiPovpnc3WbXzmzcxWVrmPCjSWpD68puPDvGkQmNdW9YBT3vcJ5Hx
-         9vqc/LgkEzpXbnP9pZvx+qOLky+XK2nn5f7emeJJqqJyTbJVgQFIqXXC+U5uYFJ+E5bf
-         hDLzwo49wcW31KrwdnwdDcLaVU+a4H3I0pAOtAvedUuKog1l+RQm6Ptz5JTTHUMXJcH4
-         NmEA==
-X-Forwarded-Encrypted: i=1; AJvYcCX4/JgCozgjC8OGS8vl6O3oewUhfDk8EX9x1MgjsliNhZygxph5u2Q7QoWee3rWk8Z4gHLa3ck=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAEZ7lA/TAue0zuwFBIQG8VRFXEAVlRnfR+xWzrC1uUEy/gZdp
-	ya4rfENmqC8XZdmrxe1odOUNw4WizjmlJt851RSkPS+UWYZlY9VFByDJ
-X-Gm-Gg: ATEYQzyUUoslSWVfqWMjVBPb83gLlAv8S/dZ/K41XiEHxiju2H0s6wbztFpptS0Y8GK
-	vD7fW71XS7ii97tQEkrCNxHXuI+YAVs06sQ+5ihn8M0o45gDNfIQ86K/TPDaKhJFkQiMF/nlgSZ
-	c8m57E+vU4yau5IhrTyLJqY0iCvxJ+PTpvFXZ8HDIdbdJNcGrMsYDS8KTp8WenQJV5OEN49Wzep
-	oZ2OWhS3jzfA7Vd7J2GDrSBL6XfRmVEU6afXtN3dan4W1JQD+OCrxtCIzFT5upckFXZjVyRnOqM
-	dB1EVMQ2RX2UT/CxaBsD7n1M+4Zkz2qvXQN432qhuDrQSa8FvYubp813TL3sE7xFBOwMBRRa+ux
-	u6mPLutmf4719Cj0Z8IeO31pUW/sWyqxnac6yHoKYGqyaChAmQ33GFq2ohmX6C3lENGOT77NyMA
-	2JCY5kLICexlq2+HEUpFQj7y0LpLIb32cEpMMnCEvjwCGNWnQMgUEF9QO1vDz+disrGK8TlUr66
-	2MMSRBIfro6rQPjm7XU
-X-Received: by 2002:a05:6000:2007:b0:439:c550:d920 with SMTP id ffacd0b85a97d-43b88a250e5mr5533066f8f.47.1774444162694;
-        Wed, 25 Mar 2026 06:09:22 -0700 (PDT)
-Received: from 127.com ([2620:10d:c092:600::1:8126])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b644bd923sm54062611f8f.12.2026.03.25.06.09.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2026 06:09:22 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: io-uring@vger.kernel.org
-Cc: asml.silence@gmail.com,
-	axboe@kernel.dk,
-	netdev@vger.kernel.org
-Subject: [PATCH io_uring-7.1 v2 5/5] io_uring/zcrx: use correct mmap off constants
-Date: Wed, 25 Mar 2026 13:09:22 +0000
-Message-ID: <31f58c90bd1222b420f24a71f2b9eea4cccefe45.1774444007.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <cover.1774444007.git.asml.silence@gmail.com>
-References: <cover.1774444007.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1774444302; c=relaxed/simple;
+	bh=3AmlJPot+VL+VEaLAr7y61rdZG26HyCu2M4NIujBSLA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IOdKAYRQOVF7L8hzXsjb1gtbJKnsJglVzcjCdy/z8eFuoJjL/P1++tKD7xgflhqhJBUT8q8ZWlyvXPjwSuw4B3PsGErRpaXLBqHSrg25MXgS5WAghQJffI9tLMR5JboaUZBa8yfU0zT5KiHXF5rGCaGRqZg78KDbr/tcRsFLfeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 540316080C; Wed, 25 Mar 2026 14:11:33 +0100 (CET)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net 00/14] netfilter: updates for net
+Date: Wed, 25 Mar 2026 14:10:54 +0100
+Message-ID: <20260325131108.23045-1-fw@strlen.de>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,62 +52,140 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_FROM(0.00)[bounces-271545-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.dk,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-271546-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[strlen.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E4AB3325FA1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,strlen.de:mid]
+X-Rspamd-Queue-Id: 29D93325FF3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-zcrx was using IORING_OFF_PBUF_SHIFT during first iterations, but there
-is now a separate constant it should use. Both are 16 so it doesn't
-change anything, but improve it for the future.
+Hi,
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- io_uring/zcrx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The following patchset contains Netfilter fixes for *net*.
+Note that most bugs fixed here stem from 2.6 days, the large PR
+is not due to an increase in regressions.
 
-diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index e1d2e1f1b766..df8dae724be4 100644
---- a/io_uring/zcrx.c
-+++ b/io_uring/zcrx.c
-@@ -386,7 +386,7 @@ static int io_allocate_rbuf_ring(struct io_ring_ctx *ctx,
- 		return -EINVAL;
- 
- 	mmap_offset = IORING_MAP_OFF_ZCRX_REGION;
--	mmap_offset += id << IORING_OFF_PBUF_SHIFT;
-+	mmap_offset += id << IORING_OFF_ZCRX_SHIFT;
- 
- 	ret = io_create_region(ctx, &ifq->rq_region, rd, mmap_offset);
- 	if (ret < 0)
+1) Fix incorrect reject of set updates with nf_tables pipapo set
+   avx2 backend.  This comes with a regression test in patch 2.
+
+3) Fix a syzkaller reported data race in ipset, from Jozsef Kadlecsik.
+
+4) nfnetlink_log needs to zero padding to prevent infoleak to userspace,
+   from Weiming Shi.
+
+5) pay more attention to xtables hook masks + NFPROTO_UNSPEC.
+   UNSPEC+hook_mask is only valid for ipv4, ipv6 and bridge families.
+   This can cause a crash because arp family has different meaning for
+   hook constants. We need to reject rule adds when we have a match that
+   sets both a hook mask and proto_unspec, unless the requesting family
+   is one of ip/ip6/bridge. Also from Weiming Shi.
+
+6) xtables ip6t_rt module never validated that addrnr length is within the
+   allowed array boundary. Reject bogus values.  From Ren Wei.
+
+7) Fix high memory usage in rbtree set backend that was unwanted side-effect
+   of the recently added binary search blob. From Pablo Neira Ayuso.
+
+Patches 8 to 12, also from Pablo, address long-standing RCU safety bugs
+in conntracks handling of expectations: We can never safely defer
+a conntrack extension area without holding a reference. Yet expectation
+handling does so in multiple places.  Fix this by avoiding the need to
+look into the master conntrack to begin with and by extending locked
+sections in a few places.
+
+13) fix use of uninitialized rtp_addr in the sip conntrack helper,
+    also from Weiming Shi.
+
+14) Add stricter netlink policy checks in ctnetlink, from David Carlier.
+    This avoids undefined behaviour when userspace provides huge wscale
+    value.
+
+Please, pull these changes from:
+The following changes since commit c4ea7d8907cf72b259bf70bd8c2e791e1c4ff70f:
+
+  net: mana: fix use-after-free in add_adev() error path (2026-03-24 21:07:58 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-03-25
+
+for you to fetch changes up to 65182deffd243cb451c7e1f532e7de1ed59afbeb:
+
+  netfilter: ctnetlink: use netlink policy range checks (2026-03-25 13:36:45 +0100)
+
+----------------------------------------------------------------
+netfilter pull request nf-26-03-25
+
+----------------------------------------------------------------
+David Carlier (1):
+  netfilter: ctnetlink: use netlink policy range checks
+
+Florian Westphal (2):
+  netfilter: nft_set_pipapo_avx2: don't return non-matching entry on expiry
+  selftests: netfilter: nft_concat_range.sh: add check for flush+reload bug
+
+Jozsef Kadlecsik (1):
+  netfilter: ipset: Fix data race between add and list header in all hash types
+
+Pablo Neira Ayuso (6):
+  netfilter: nft_set_rbtree: revisit array resize logic
+  netfilter: nf_conntrack_expect: honor expectation helper field
+  netfilter: nf_conntrack_expect: use expect->helper
+  netfilter: ctnetlink: ensure safe access to master conntrack
+  netfilter: nf_conntrack_expect: store netns and zone in expectation
+  netfilter: nf_conntrack_expect: skip expectations in other netns via proc
+
+Ren Wei (1):
+  netfilter: ip6t_rt: reject oversized addrnr in rt_mt6_check()
+
+Weiming Shi (3):
+  netfilter: nfnetlink_log: fix uninitialized padding leak in NFULA_PAYLOAD
+  netfilter: x_tables: reject unsupported families in xt_check_match/xt_check_target
+  netfilter: nf_conntrack_sip: fix use of uninitialized rtp_addr in process_sdp
+
+ include/net/netfilter/nf_conntrack_core.h     |  5 +
+ include/net/netfilter/nf_conntrack_expect.h   | 20 +++-
+ .../linux/netfilter/nf_conntrack_common.h     |  4 +
+ net/ipv6/netfilter/ip6t_rt.c                  |  4 +
+ net/netfilter/ipset/ip_set_core.c             |  4 +-
+ net/netfilter/nf_conntrack_broadcast.c        |  2 +-
+ net/netfilter/nf_conntrack_ecache.c           |  2 +
+ net/netfilter/nf_conntrack_expect.c           | 30 +++++-
+ net/netfilter/nf_conntrack_h323_main.c        | 12 +--
+ net/netfilter/nf_conntrack_helper.c           | 11 ++-
+ net/netfilter/nf_conntrack_netlink.c          | 73 ++++++++-------
+ net/netfilter/nf_conntrack_proto_tcp.c        | 10 +-
+ net/netfilter/nf_conntrack_sip.c              | 18 ++--
+ net/netfilter/nfnetlink_log.c                 |  8 +-
+ net/netfilter/nft_set_pipapo_avx2.c           | 20 ++--
+ net/netfilter/nft_set_rbtree.c                | 92 +++++++++++++++----
+ net/netfilter/x_tables.c                      | 36 ++++++++
+ net/netfilter/xt_devgroup.c                   |  5 +
+ .../net/netfilter/nft_concat_range.sh         | 70 +++++++++++++-
+ 19 files changed, 323 insertions(+), 103 deletions(-)
+
 -- 
-2.53.0
-
+2.52.0
 
