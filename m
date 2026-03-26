@@ -1,168 +1,282 @@
-Return-Path: <netdev+bounces-272100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272101-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ILNhL2ZIxWkU8wQAu9opvQ
-	(envelope-from <netdev+bounces-272100-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:53:26 +0100
+	id eDrVBKBKxWkU8wQAu9opvQ
+	(envelope-from <netdev+bounces-272101-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:02:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BE9E337156
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:53:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEA6B337390
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:02:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B8FE73117C9E
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:44:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E3504301F4A0
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:55:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1784C395268;
-	Thu, 26 Mar 2026 14:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D42183FF8B7;
+	Thu, 26 Mar 2026 14:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TXaBPP8c"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VmA+Sgi+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE4D37756C
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 14:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A623FB05E
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 14:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774536250; cv=pass; b=UpmXzmiMPhvJ7yfGTvPvlqBrPHSZFAvu26b5mNFXfL0hW4SeYOWzykpOm4ZuJe70PRoM2sTdLRZ4cf0vK02YrK88hwW6yvO0SXIBUDIJv1j0PGLx2YsATJpNYSGs9NYSnOmJUCEnozE2v1i1hSJSUCdktqYIR5k5lrk1yeUhltA=
+	t=1774536934; cv=pass; b=G/T4n1HhHLER6iaCPpGvoVM1MxxWixyqeV4/r1EgXxNFS8LlqBa4TJeeb9H4SCOUGqJAv9aVYc4jFp6lhjCz0oKrv1jWnHAzGIVp0gc7Suxx/ARy2+NVsY209sg5S9Al57WnGPHoTWbLAqx5I3ZQll5/Cfr0+ILp2d989w9Dju8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774536250; c=relaxed/simple;
-	bh=d2b1AenXbF8WtFPruJXyv0RsQxaTrh+JdXuGW9HMB+c=;
+	s=arc-20240116; t=1774536934; c=relaxed/simple;
+	bh=tZ0yr/CZY3LYhWiMsNShnpb27MpRn7kLmYKx9zn63ZE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T45z9GlwPUr8vToFZnsKdJg7WiKbPn1fc4u6wIvRGY4jcHKcwdo0kDxcXK+ZFefOcWv2nJNNb5cCPuLmkgDPzsgPL5Ci5Zk0d5/Sfj1CjzoSeHikEt/X2ZxiCyfsK3T3R1j0sZP8CmKeV4xxr2enx11PO9U83E/rbVRAuzDGpHs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TXaBPP8c; arc=pass smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-82c4b5dfe6cso542401b3a.2
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 07:44:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774536248; cv=none;
+	 To:Cc:Content-Type; b=F/xExc1Ac9egmbPsZccoSVztpHL4YrOyZ+thC+3cYZyrrDfYMh32+4CicqUXYKaSoWIcBk/Mu+JCKvPEothc+isB55awfZDwugypNwwjwX0t7Jf+XDr3iaXufmYAJdo8aQPS64eMyW+FkkVqP/tT6ZaxFYsRmB9EB70IzCumupQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VmA+Sgi+; arc=pass smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-505a1789a27so6038731cf.3
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 07:55:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774536930; cv=none;
         d=google.com; s=arc-20240605;
-        b=Wuw+Zih0PxnTM86EZox1bIJ4WSKbVX8mE1QarDHO1/7qtQg4yvgJOzfrIotRMNkxB5
-         mcE3QMgEY28znyeeKyUiRUc7GvkG99tdChjTyL8ks5LPkGXvSF/minkP8aQZ5DitK36X
-         9PXx+0qhUJemRg5pkjF/nIy44QBCSg4LN9Lf8rkHIsKC4gE2wgQCoyWiROso7GJvXYzu
-         +lmp0NNZ8FCBhihuqEowpZBLtEA+CVngpK4A7zBV8/GFlN30S8Rfz7VMkgKViXL16Ctj
-         Idpqc0HbNbvwHdI7gxg4wbH0MvNqUhUzFBK7iqze8Gq/p5wArAThV1AL4kN34nqj2TpP
-         Iplg==
+        b=Nu7Y1bQujojOzG6ZBbj1fuDOII72Wm3kzuN7HrYF4Ih7mQp/e9GoM4SCluEnW+xQgW
+         PWzOfaQ8WL7csVyHwNTqj4x77xduP5xx7Oyu0nUbFXfE/UruXXctuLbO77F43W+hiwjJ
+         wBMA9EXGcs+hN9nkqR0yupTrrsSEQMDv5foayFt1waPxkCiEHL35xRFPn9mmCUbLwQOH
+         oF9wy0ofPaR9xSNZ0zXkSRshSMxqbqRL5Qd1nihWXJHjetNC+yTXpFaotgxfhMzxDxgX
+         khhpXjsAwWcufrhVuTBv+oEi0V7VNOfpX34sza4aZKdxWmv0aW3gJ+6Dkr9knQQGRj/e
+         uK7w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=d2b1AenXbF8WtFPruJXyv0RsQxaTrh+JdXuGW9HMB+c=;
-        fh=MNeE+mtGKZbogijNDjRbKxB/8kv888xxZOWyE5JRC+g=;
-        b=IuyA1vK1uYmRtZ5a5bCSB/EBiSIw9o+C7ImvDF87E/HkJNzEfssgKRuZw7zgXuLjoD
-         j5PF8R7y2Vm47aggfKyYRtZbKjjA+7zI0DorcM4NyTs8C2RcdW/34nfelYgCuH86LuKQ
-         vXPSeGV4C7a+eya6VJiclzn7skEdtZMmdI2l3RanEMmj5D+39qAtqsMkNprq7j5gCORO
-         MA8tu01XcpYP6JfptqYzny5eMTzNFB2uvPs02vQh47tJtQ+R645XtoESW1hrneQkBKnM
-         6daa8wjfTmOKqT5HwJiySJOJKMneEL0Hm5b+RpttVzwQBmNgqxLwcMHSl1NKfsdXEBh3
-         xIWQ==;
+        bh=yQELiFlrY5cAsCmeCqDi8o2YKzJRpE8ymDVP3+0x8ns=;
+        fh=E+okvSgNM5pVOLtQytV7kD1ZlNANeDh4Tc0L9gFVHCk=;
+        b=BLjtQk9oTdofWmP+pR1Vjj0wVyibdzzu1vnUl9mkTKu86L53Rq2Js16H4Sp6wpOjwm
+         80f0N8SkKQ4t2pXRFBwrVmV/SxX7Olcqh2sDPpDNpbl5hRzqI+YSLr/wwbR4k2nX6bZ+
+         3Yqb7a+k7YW2LGIbbmMk1xC0XXXJgDvbkCuQxBzsvAm/E2YdRYWBeg+9hoZEw4f3Eg0G
+         FNAWa2WBkpwREP/uqmdLasg15ucRinfEstnTVf1It1tOL89KeOMiaSg2LOnOkH4gJUWW
+         6f6ELpUZzSsj7v6r764uaxeb6I75NQPhB0cXNtnHgMgbmiyskfAHLf+BtBGk7i0N7C86
+         Z3rQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774536248; x=1775141048; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1774536930; x=1775141730; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=d2b1AenXbF8WtFPruJXyv0RsQxaTrh+JdXuGW9HMB+c=;
-        b=TXaBPP8c7thizJAJNA79E2T9QrBHA2aINV9d6GcBkQsPnKHXFT+R0db6fH5vA54ZTP
-         Mn1ALU89uvbAxuyJw7KomX83UGwUh+rdMjCs61R0/HYIbz6WWofEYGgpIWoJoSFCBEsy
-         gVNrJSJSczAy7NIAOMq+KFjyDwZQPFlbBIFje0DNSVM7kKq+ekhnF/9c6m1ElzU8e8on
-         WNob8E45z6y+8dWQEqQ41giAyZUEF0w38qsk6BEZIgyeXUVl69Oq0u/2o51vYQrlhBxF
-         w8UCQ+GpfI+xZnwm5HFaIXN+v7Wh7RR/aZISYCGWeSQ60ZFZXwTGuZjuSUFapvsHlj8q
-         wCGg==
+        bh=yQELiFlrY5cAsCmeCqDi8o2YKzJRpE8ymDVP3+0x8ns=;
+        b=VmA+Sgi+ZF80ovDEFzG9CH/XyfvOBkqxhC/IBdi75HFcY3jtEiVB1LOKAcRC2wwV/r
+         Rf28rKTSJcYVO7kaTFh0RcHef5TNsd2rI2JEuGNzpnQRa4uxXY1oPAPVbBo3yT5ZKyGO
+         KQUHv2nbjNFiueMfRavSXMWq82Brr8rrhdlZ2aZSBWDq2otrWoYzFe4kDyw1jOdFmHxT
+         KlHOJM94ahD7OHnMAzHT2YWDVFrkL5SlWb7cFqpz9xwfbEDGOJTc9Kl6oMPjxa+yV3Ii
+         bGERYyjNP+WZudV7ljVIoCgPNOb3guhdBqs7cj15IvaVP2nLQqoxV8g1U+qXpsSGTKMG
+         UHIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774536248; x=1775141048;
+        d=1e100.net; s=20251104; t=1774536930; x=1775141730;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=d2b1AenXbF8WtFPruJXyv0RsQxaTrh+JdXuGW9HMB+c=;
-        b=Fyg9JOJvCCT8wNh3A4nloulImPs2L7xNa4kr0uWsFXPxRi8vDiLwfPXnOhBfQ4Gajh
-         /qJhuRdTFqK6z+tCxie3/KRCACXba0X1dTEtWulCYKQVrmWR75HJJ8qqrXvrv4QIAxX/
-         yfZrO9Lwa6FRuUnFUlk3qL4AYovUEG9vBxbj1cROpyJclSo+gBMliz7u5JkntrAU8J8m
-         LqnptZh2QtF9rKoL/kc7BRkWbVfy3oU3BytUVBFUj3v8B95LnIkhamg+YtURuOGVX+t0
-         FzPqCfxbq58arHOKt6NTpEBDxJ6mQLl/PQvGj0aCY0Dsrwc2ArJjirSoBiI7KnpY6uDe
-         6DQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU5+4ySy76Yj/KcCcMVjJu9+UVbeMLvFMxOc4nnOLxZfK8OtKma4NJ3HCwG7egWIzqRJIwG8UE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyvGsxfQ0jeugIzmBWEbuCw3hCH8ZSzIKWSTaX4Q0q5S4jRCUk
-	1+lWOVtB+8MRM4gaPXALhNnH4gBqwxwnY2Wp11fxgMtDzLVUHw2rgdTnzwJ8fOQU9kci5bmMldU
-	WjlAhyX78XE/EBotgyaPAjiHtXCk+3Ag=
-X-Gm-Gg: ATEYQzyd0a5MKs5QtfABjBN2CQKD8myOk75JClfqNHAoAmjeMTsViHAre+BhR6sITXq
-	oKU6dl+P3HgEfs8pinUfVDXZUSqJc7R8AFNsIeKtmeIF+thxvOIgRt13rVPm0w8qbYuyX4i7c69
-	15PkcBbkLfAz7LxRKedBIBZZCKROc5MajPYzfaL2WwwB+4yMu4zGbaJpBKiQgw7dEFNMrPCqnh5
-	NqMNgc2fNGl+UYG9zWYEolDhRzYQ+G4XL9IPZIVT/4zwfLbB7YzZoRvVYLzpoK9ehjSaE7YRZGI
-	R7io8aLTIJKWFKcuJPu8FJ4r1YaGkzAmxt9T9XnjvIXA2LsS4clHrV4iv/Oea1oKrhCECiuVu25
-	+XIQMVP1aQadrdHdhjw4msVWwb4QbpphoLwGsaWXM
-X-Received: by 2002:a05:6a00:f8e:b0:829:7057:b99e with SMTP id
- d2e1a72fcca58-82c6e14675amr7240862b3a.54.1774536248015; Thu, 26 Mar 2026
- 07:44:08 -0700 (PDT)
+        bh=yQELiFlrY5cAsCmeCqDi8o2YKzJRpE8ymDVP3+0x8ns=;
+        b=H5Svscf87aKZ++QFMf7Hwk07dS/SLbtx2mF3IdcniqomKiryw3BhkFDbdIVWNThZJF
+         VK/HprbdQ950fcMLd8FVOf9LTkJwRf0y8R0v0MBsHrRa8sxfkfojrZLjAX8o3in9gA+c
+         J6xQoX74lIRkhHXLSgfV+Gh+tdRofRV7ZB811n4z91xqrYz5Df/XHptbb99C6U9zyAn9
+         0AHZHiR4Qs87fhD5X9yGQzO6fozRFOjSP2qV8GuISO+0l2or5T6HEBzLSkkO80jCxvvN
+         l8CqB4jw9D6Ufe/5wu2rnLlVnqPL/OoghsHx7ygeQf0m2aB4zqpGrNskXiY+PTJ0BUoi
+         7Zew==
+X-Forwarded-Encrypted: i=1; AJvYcCUPAFl1dKnL7xzimsrcmhP8xSfSwfdzCZDRXeIkbJN9HHFMqe7cGGeDJfUFDS/xUWZLahDg69I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMkgRf0sTJ3LTHwx52DZWYasUfJNAGhij3YYpSXbT8zwPKjJMn
+	JymKVyFL2e+LG625owiMJdtRWh8kvoy5thkIRVXbNOU8JNctS/HxbGDM5slpHLN5vnjansvD25I
+	C4TjU0CL8zx+lXgxh4JWUgMvU9ozE7RyyRxjIGfjE
+X-Gm-Gg: ATEYQzy7vqNZY+CwzIDM+p/DVFgeZ4i8vPVuxbsF+p1UWSNe8hHawL3i9Ic/PnFbHHI
+	ld8dk5ZROtWIYHbPBxBcxYl/gKvVrXU2wsDW7ppWBOCuuDma3afEIp2SEwB9BLOO2IgbZHpp3Nz
+	QosiPiEFxkJhseBoskocBj6sBX+uCzt2FV29ooV2ieQJbpi20dtT+Lc55TXIrrAHBgl5LaJaGAz
+	/NoM6IT6mK5r5rDj2AXt4XWG9SzkkDbEFN15MqmIIwmx7dCn8e1olSd+KeCvQCtzeN+eCVUNGFu
+	Eroyyk9fqlSTgX1pRh8z7VdRoaxs0evBKjnkPA==
+X-Received: by 2002:a05:622a:900c:b0:509:1949:7b36 with SMTP id
+ d75a77b69052e-50b80d6adfamr98705351cf.30.1774536929323; Thu, 26 Mar 2026
+ 07:55:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260305013852.3769-1-dqfext@gmail.com> <CALW65jZRyKydW6bs-mYwh2mEn0dpv3opVEr=WczKn_0952_+Yg@mail.gmail.com>
- <CADvbK_fj_26MLP=+U+rzOMfqdPpdvFQJgN_fozd2uAjRsfHweQ@mail.gmail.com>
-In-Reply-To: <CADvbK_fj_26MLP=+U+rzOMfqdPpdvFQJgN_fozd2uAjRsfHweQ@mail.gmail.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 26 Mar 2026 10:43:54 -0400
-X-Gm-Features: AQROBzCmY5h-d4E66DSyoIkaUfNQKP2g7Esgvdfp7L2gh6AVWsUfdsoPzpij108
-Message-ID: <CADvbK_f3LwEt+-BG-1Pcr4jMn6Jxry+0p-Fu_s0C6Px+F_NHCA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5] net: pppoe: implement GRO/GSO support
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Felix Fietkau <nbd@nbd.name>, linux-ppp@vger.kernel.org, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Richard Gobert <richardbgobert@gmail.com>
+References: <20260326144249.97213-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20260326144249.97213-1-kerneljasonxing@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 26 Mar 2026 07:55:17 -0700
+X-Gm-Features: AQROBzDH6mwfGDFLJnM_M_-H65T_AScWrH_KahstKAMiF6roZPGzr8VbYDWWgbM
+Message-ID: <CANn89iL6FyoHBrfpwYSd5wPzFh3Y_1T8C6bVFuRRf7PP5p=WRw@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: add sysctl to toggle napi_consume_skb()
+ alien skb defer
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272100-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-272101-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,nbd.name,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 1BE9E337156
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6]
+X-Rspamd-Queue-Id: AEA6B337390
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 10:43=E2=80=AFAM Xin Long <lucien.xin@gmail.com> wr=
-ote:
+On Thu, Mar 26, 2026 at 7:43=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
 >
-> On Wed, Mar 25, 2026 at 10:43=E2=80=AFPM Qingfang Deng <dqfext@gmail.com>=
- wrote:
-> >
-> > Hi all,
-> >
-> > In some cases (such as BIG TCP) a GRO skb length can overflow a u16,
-> > then what should I do with the u16 length field here?
+> Commit e20dfbad8aab ("net: fix napi_consume_skb() with alien skbs")
+> defers freeing of alien SKBs (alloc_cpu !=3D current cpu) via
+> skb_attempt_defer_free() on the TX completion path to reduce cross-NUMA
+> SLUB spinlock contention to improve multi-queue UDP workloads.
 >
-> I think you can either add a check in pppoe_gro_complete() to ensure
-sorry, I meant add a check in pppoe_gro_receive().
-> the aggregated size does not exceed U16_MAX, avoiding BIG TCP
-> behavior; Or, set phdr->length to 0 and rely on skb->len to determine
-> the actual length, as done in BIG TCP itself.
+> However, this unconditionally impacts the napi_skb_cache fast recycle
+> path for single-flow / few-flow workloads (e.g. AF_XDP benchmarks[1]):
+> when the TX completion NAPI CPU differs from the SKB allocation CPU,
+> SKBs are deferred instead of being returned to the local napi_skb_cache,
+> forcing RX allocations back to the slow slab path.
+>
+> The existing net.core.skb_defer_max=3D0 could disable this, but it is a
+> global switch that also disables the defer mechanism in TCP/UDP/MPTCP
+> recvmsg paths, losing its positive SLUB locality benefits there. AF_XDP
+> can co-exist with other protocols. That's the reason why I gave up
+> reusing skb_defer_disable_key. Besides, if the defer path is disabled,
+> that means TCP/UDP/MPTCP in process path will trigger directly freeing
+> skb with enabling/disabling bottom half(in kfree_skb_napi_cache())
+> which could affect others. So my thinking is not to touch this path.
+>
+> Add a dedicated sysctl net.core.napi_consume_skb_defer backed by a
+> static key to selectively control the alien skb defer feature. Let
+> users decide which is the best fit for their own requirements.
+>
+> This patch also avoids touching local_bh* pair(in
+> kfree_skb_napi_cache())
+> to minimize the overhead.
+>
+> [1]: taskset -c 0 ./xdpsock -i enp2s0f1 -q 1 -t -S -s 64
+> 1) sysctl -w net.core.napi_consume_skb_defer=3D1 (as default)
+>  sock0@enp2s0f1:1 txonly xdp-skb
+>                    pps            pkts           1.00
+> rx                 0              0
+> tx                 1,851,950      20,397,952
+>
+> 2)sysctl -w net.core.napi_consume_skb_defer=3D0
+>  sock0@enp2s0f1:1 txonly xdp-skb
+>                    pps            pkts           1.00
+> rx                 0              0
+> tx                 1,985,067      25,530,432
+>
+> For AF_XDP scenario, it turns out to be around 6.6% improvement.
+>
+> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+> ---
+>  net/core/net-sysfs.h       |  1 +
+>  net/core/skbuff.c          |  5 ++++-
+>  net/core/sysctl_net_core.c | 35 +++++++++++++++++++++++++++++++++++
+>  3 files changed, 40 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/core/net-sysfs.h b/net/core/net-sysfs.h
+> index 38e2e3ffd0bd..a026f757867e 100644
+> --- a/net/core/net-sysfs.h
+> +++ b/net/core/net-sysfs.h
+> @@ -14,4 +14,5 @@ int netdev_change_owner(struct net_device *, const stru=
+ct net *net_old,
+>  extern struct mutex rps_default_mask_mutex;
+>
+>  DECLARE_STATIC_KEY_FALSE(skb_defer_disable_key);
+> +DECLARE_STATIC_KEY_TRUE(napi_consume_skb_defer_key);
+>  #endif
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 3d6978dd0aa8..3db90a9aa61d 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -94,6 +94,7 @@
+>
+>  #include "dev.h"
+>  #include "devmem.h"
+> +#include "net-sysfs.h"
+>  #include "netmem_priv.h"
+>  #include "sock_destructor.h"
+>
+> @@ -1519,7 +1520,8 @@ void napi_consume_skb(struct sk_buff *skb, int budg=
+et)
+>
+>         DEBUG_NET_WARN_ON_ONCE(!in_softirq());
+>
+> -       if (skb->alloc_cpu !=3D smp_processor_id() && !skb_shared(skb)) {
+> +       if (static_branch_likely(&napi_consume_skb_defer_key) &&
+> +           skb->alloc_cpu !=3D smp_processor_id() && !skb_shared(skb)) {
+>                 skb_release_head_state(skb);
+>                 return skb_attempt_defer_free(skb);
+>         }
+> @@ -7257,6 +7259,7 @@ static void kfree_skb_napi_cache(struct sk_buff *sk=
+b)
+>  }
+>
+>  DEFINE_STATIC_KEY_FALSE(skb_defer_disable_key);
+> +DEFINE_STATIC_KEY_TRUE(napi_consume_skb_defer_key);
+>
+>  /**
+>   * skb_attempt_defer_free - queue skb for remote freeing
+> diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+> index b508618bfc12..33e8217ee1ce 100644
+> --- a/net/core/sysctl_net_core.c
+> +++ b/net/core/sysctl_net_core.c
+> @@ -372,6 +372,35 @@ static int proc_do_skb_defer_max(const struct ctl_ta=
+ble *table, int write,
+>         return ret;
+>  }
+>
+> +static int proc_do_napi_consume_skb_defer(const struct ctl_table *table,
+> +                                         int write, void *buffer,
+> +                                         size_t *lenp, loff_t *ppos)
+> +{
+> +       static DEFINE_MUTEX(napi_consume_skb_defer_mutex);
+> +       int val, ret;
+> +
+> +       mutex_lock(&napi_consume_skb_defer_mutex);
+> +
+> +       val =3D static_key_enabled(&napi_consume_skb_defer_key);
+> +       struct ctl_table tmp =3D {
+> +               .data   =3D &val,
+> +               .maxlen =3D sizeof(val),
+> +               .extra1 =3D SYSCTL_ZERO,
+> +               .extra2 =3D SYSCTL_ONE,
+> +       };
+> +
+> +       ret =3D proc_dointvec_minmax(&tmp, write, buffer, lenp, ppos);
+> +       if (!ret && write) {
+> +               if (val)
+> +                       static_branch_enable(&napi_consume_skb_defer_key)=
+;
+> +               else
+> +                       static_branch_disable(&napi_consume_skb_defer_key=
+);
+> +       }
+> +
+> +       mutex_unlock(&napi_consume_skb_defer_mutex);
+> +       return ret;
+> +}
+> +
+
+Seems a copy/paste of proc_do_static_key() ?
 
