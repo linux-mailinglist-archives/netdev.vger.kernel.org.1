@@ -1,183 +1,133 @@
-Return-Path: <netdev+bounces-271949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271948-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yHmLFKj/xGkz5gQAu9opvQ
-	(envelope-from <netdev+bounces-271949-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:43:04 +0100
+	id iIBILHL/xGny5QQAu9opvQ
+	(envelope-from <netdev+bounces-271948-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:42:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48FEC332814
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:43:03 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20F893327DA
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:42:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DA178300BE1A
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:33:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 649943120BE5
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD75423BCFD;
-	Thu, 26 Mar 2026 09:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6971434B190;
+	Thu, 26 Mar 2026 09:33:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="JIfL9S6Q"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="fdMqbocP"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6893148DD;
-	Thu, 26 Mar 2026 09:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9427346E68;
+	Thu, 26 Mar 2026 09:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774517621; cv=none; b=nKtWGAzp6I5Vq/Rzum5sLsRGyhI91wADxJD3peU+TynOia0FffR/R1ZCMdzq8VYYyyC50noXonO+oPl4UQftEvFREGoPDXbln+ytrK1fNOAfVXHoUkeuGoHf7Cs/F6aOYJEU5Y7HeBGi6WohPRLv6QQkscPVGytk0Ta04Fg738M=
+	t=1774517588; cv=none; b=Zo7uzO5ltOX3LHcjTEXEgGjyOtUNIxQS7ndeWQkjgXSGY8c4LBHRycThD8DI0o4bJ8K5v5r6hXb+k5oXG3KeMpfWnrpR5HuHHi7Befcg2nK+5qdvTaCM8sueyrFdFLR0cToEJ/e1ujlmFDZ2ElcV7o3i+ZIlbQfzMP3oZWnRIo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774517621; c=relaxed/simple;
-	bh=TlgZPqsifYUNanuJk7ktg2DgD57MAfIdrP8qwPSF/Yc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dal61+L59LYiRB1D7KoStoRRXCYaYwfUAYj5Ay6bNO/V3LIFN/Cx3yHDSQF+UlQGom4ba2ntuK10k+hDfR9M06L4kKXam6rF8WmgnIvIIhjs+Qc+zBQ43rejq3t+rdu6Xr/ym6bMx7f3faJTyNEoeia9J1CvEkUX7EHvbrfBORs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=JIfL9S6Q; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=kpD74HZQXAuyN2XDecX4PjgJkz7NNLyVJZ/YVPKmMoY=; t=1774517620; x=1775727220; 
-	b=JIfL9S6QbT7dW93TWHrqbLMJJ256kQAz5x/8WOpv/Nu2P0a+yjcwhqdXmum/ZDTsLAEPLlwpopM
-	ZUTHGVXXF8Pd8HbD+nSR6KWIO62i9hBxWpbLvxcI27LK1T36cQ+vpucBfwAgvV9x65NwZGqvhEhk7
-	nKsjFB+ck7Zbgg4fIH+6cc+YTFv83QrP7Iw4aejibAue2eYnJTEmoKEnRBLqzN0rURtgLk5GfH0tL
-	J0jlWbZn4ijqk4CGsXhV1EVCYr6Q5hCfoJibOuf3NfYd83ba54x+ZiSxNcUwaXH/vBqiyriU1zZgC
-	98OGZAxMtijn3Bh1n8GJIhXo/ifNYpjwtaZA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1w5h5o-0000000CyVs-1pJE;
-	Thu, 26 Mar 2026 10:33:32 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-2026-03-26
-Date: Thu, 26 Mar 2026 10:31:35 +0100
-Message-ID: <20260326093329.77815-3-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1774517588; c=relaxed/simple;
+	bh=lr+fL1xZKdJvJ+cIO01kA3TTYfyVOiqIfSGhQyVjGKc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cSjC3ZisnrBbxT2ArjQbBMi9T+I+eKTxtnQiRIenv6fu1guK/zMvpzcIYHgYNBDYTg9EKl0JD3DtesiNjLumCcmI2Id5ch7E04nME6NL6Q+D902Xvoau7lYtTF9JcJNVA50x4abKcaj36b8Scl8e3HGG9ieWJTuPoWC7bejsyLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=fdMqbocP; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Reply-To:Content-ID:Content-Description;
+	bh=Z0WUXCv4keO15fOq2l2m6s3jGy09mN43/z1icMRS0wY=; b=fdMqbocPxjGNnT5Ya5fGprjYIh
+	Hat0N0TO/7vRh3HaWvtE3QMCwmYzBJy8kcaPkVz44Fg4Vmb4JN4O6SP8YgN2YPU+YxwbymKEiJlJk
+	KDNcZpg+GubLqZSUb11th+uLQM2c5aFg3vftBlC3MCLbQ8wL6wnRnvLnJNDDR+SngKaF/zuy1LXs0
+	+3yMAD6VbfEsSokXz7Wu7jzPAkQQe51VFyeNCzMarAu/NnknLIkpuGGxDg4TLK1lADrobVDjxZ5dL
+	oBZVVBNsMqAFBSIbxV9nlirP+JUnn7t0vJQFj2xzg8Nhs7C7iBlcOIqT+JI3RMl7vcgKqG5pHGMF7
+	7sWWC3LQ==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1w5h5J-009kkg-25; Thu, 26 Mar 2026 09:33:01 +0000
+Date: Thu, 26 Mar 2026 02:32:54 -0700
+From: Breno Leitao <leitao@debian.org>
+To: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Donald Hunter <donald.hunter@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Naveen Mamindlapalli <naveenm@marvell.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Danielle Ratson <danieller@nvidia.com>, Hariprasad Kelam <hkelam@marvell.com>, 
+	Ido Schimmel <idosch@nvidia.com>, Kory Maincent <kory.maincent@bootlin.com>, 
+	Leon Romanovsky <leon@kernel.org>, Michael Chan <michael.chan@broadcom.com>, 
+	Oleksij Rempel <o.rempel@pengutronix.de>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	Willem de Bruijn <willemb@google.com>, Kees Cook <kees@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next v2 09/12] selftests: drv-net: Add MAC loopback
+ netdevsim test
+Message-ID: <acT8O5vHc7gl6hzG@gmail.com>
+References: <20260325145022.2607545-1-bjorn@kernel.org>
+ <20260325145022.2607545-10-bjorn@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+In-Reply-To: <20260325145022.2607545-10-bjorn@kernel.org>
+X-Debian-User: leitao
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271949-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[debian.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[sipsolutions.net:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-271948-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[29];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 48FEC332814
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[debian.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,gmail.com,google.com,kernel.org,bootlin.com,marvell.com,redhat.com,nvidia.com,broadcom.com,pengutronix.de,armlinux.org.uk];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 20F893327DA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+On Wed, Mar 25, 2026 at 03:50:16PM +0100, Björn Töpel wrote:
 
-And ... more fixes from drivers came in, notably iwlwifi with
-a bunch of things (their maintainer had been on vacation).
+> +def _dfs_write_u32(cfg, path, val):
+> +    with open(os.path.join(_nsim_dfs_path(cfg), path), "w",
+> +              encoding="utf-8") as f:
+> +        f.write(str(val))
 
-I'm going to be on vacation next week, but I'm also not aware
-of anything missing from drivers etc. right now, so we'll see.
-I doubt this is the _last_ pull request for 7.0, but I think
-not much more will come in.
+This function doesn't seem to be called, right?
 
-Please pull and let us know if there's any problem.
+> +def main() -> None:
+> +    """Run netdevsim loopback tests."""
+> +    with NetDrvEnv(__file__) as cfg:
+> +        cfg.ethnl = EthtoolFamily()
 
-Thanks,
-johannes
+Given some functions above assume this is nsim, should you call
+cfg.require_nsim() ?
 
-
-
-The following changes since commit a1d9d8e833781c44ab688708804ce35f20f3cbbd:
-
-  Merge tag 'net-7.0-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-03-19 11:25:40 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2026-03-26
-
-for you to fetch changes up to 789b06f9f39cdc7e895bdab2c034e39c41c8f8d6:
-
-  wifi: virt_wifi: remove SET_NETDEV_DEV to avoid use-after-free (2026-03-25 20:46:57 +0100)
-
-----------------------------------------------------------------
-Couple more fixes:
- - virt_wifi: remove SET_NETDEV_DEV to avoid UAF on teardown
- - iwlwifi:
-   - fix (some) devices that don't have 6 GHz (WiFi6E)
-   - fix potential OOB read of firmware notification
-   - set WiFi generation for firmware to avoid packet drops
-   - fix multi-link scan timing
- - wilc1000: fix integer overflow
- - ath11k/ath12k: fix TID during A-MPDU session teardown
- - wl1251: don't trust firmware TX status response index
-
-----------------------------------------------------------------
-Alexander Popov (1):
-      wifi: virt_wifi: remove SET_NETDEV_DEV to avoid use-after-free
-
-Alexey Velichayshiy (1):
-      wifi: iwlwifi: mvm: fix potential out-of-bounds read in iwl_mvm_nd_match_info_handler()
-
-Emmanuel Grumbach (1):
-      wifi: iwlwifi: mvm: don't send a 6E related command when not supported
-
-Johannes Berg (3):
-      wifi: iwlwifi: mld: correctly set wifi generation data
-      Merge tag 'iwlwifi-fixes-2026-03-24' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
-      Merge tag 'ath-current-20260324' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-
-Pagadala Yesu Anjaneyulu (1):
-      wifi: iwlwifi: mld: Fix MLO scan timing
-
-Pengpeng Hou (1):
-      wifi: wl1251: validate packet IDs before indexing tx_frames
-
-Reshma Immaculate Rajkumar (2):
-      wifi: ath11k: Pass the correct value of each TID during a stop AMPDU session
-      wifi: ath12k: Pass the correct value of each TID during a stop AMPDU session
-
-Yasuaki Torimaru (1):
-      wifi: wilc1000: fix u8 overflow in SSID scan buffer size calculation
-
- drivers/net/wireless/ath/ath11k/dp_rx.c            |  15 ++-
- drivers/net/wireless/ath/ath12k/dp_rx.c            |   4 +-
- .../net/wireless/intel/iwlwifi/fw/api/commands.h   |   5 +
- drivers/net/wireless/intel/iwlwifi/fw/api/scan.h   |  10 ++
- drivers/net/wireless/intel/iwlwifi/mld/iface.c     | 101 ++++++++++++++-------
- drivers/net/wireless/intel/iwlwifi/mld/mac80211.c  |  19 ++++
- drivers/net/wireless/intel/iwlwifi/mld/mld.c       |   1 +
- drivers/net/wireless/intel/iwlwifi/mld/mlo.c       |   4 +-
- drivers/net/wireless/intel/iwlwifi/mld/notif.c     |   5 +
- drivers/net/wireless/intel/iwlwifi/mld/scan.c      |  30 +++++-
- drivers/net/wireless/intel/iwlwifi/mld/scan.h      |   9 +-
- drivers/net/wireless/intel/iwlwifi/mvm/d3.c        |   2 +-
- drivers/net/wireless/intel/iwlwifi/mvm/fw.c        |   3 +-
- drivers/net/wireless/microchip/wilc1000/hif.c      |   2 +-
- drivers/net/wireless/ti/wl1251/tx.c                |   8 +-
- drivers/net/wireless/virtual/virt_wifi.c           |   1 -
- 16 files changed, 163 insertions(+), 56 deletions(-)
+Reviewed-by: Breno Leitao <leitao@debian.org>
 
