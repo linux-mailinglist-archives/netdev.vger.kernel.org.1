@@ -1,154 +1,176 @@
-Return-Path: <netdev+bounces-271852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271853-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ILtDGBvNxGnb3wQAu9opvQ
-	(envelope-from <netdev+bounces-271852-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 07:07:23 +0100
+	id aJIINP7QxGli4AQAu9opvQ
+	(envelope-from <netdev+bounces-271853-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 07:23:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF3B632F939
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 07:07:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 049A532FBC3
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 07:23:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 24EFC3015C81
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 06:06:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3FCC33029C0C
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 06:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55403AD51C;
-	Thu, 26 Mar 2026 06:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAAEE340DB8;
+	Thu, 26 Mar 2026 06:23:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="C4BgC/+o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8FC3ACA42
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 06:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B5B19C553
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 06:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774505196; cv=none; b=MwUcHoynuh75WxOJpfz9G1nKrP/vAomsLCBPZ0mco9U2dYtSDzUYkwVkWd3IRgKfea8dGBFp2huW+0A63/F1CkFaHIJfrXHUWcHh71F98alV+30zWCQHhH+iB6LPkdVYz2oOgQlO9FyK3RrG3uB5mKs8DVq60SjuondiOJEW5Co=
+	t=1774506222; cv=none; b=aDCTchVTbwZZYxKOXuCMm1jeUSgCxKEUyVVd4JzA+WvqSxzH/y2SMVCg1XMPK3QQrEvM/6H+haDlFIHgv/NW8bWoNEhU2UxS5FSrJCkU5DZtuDBo8u41nffqJbfGriQ31HeIHeU8m5pNw9IgaGk8bk2Qj0xm3T3hIbZe6IJOgHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774505196; c=relaxed/simple;
-	bh=jKQN0iBrcScq5eR49A7LfWAR0cZADZ8Nys0z/YcPWTI=;
+	s=arc-20240116; t=1774506222; c=relaxed/simple;
+	bh=Wcl/HUbZdbmzHuYrbjQlKN2pZsh/arU4d1STsyIKqz4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lbxfb27kOYTpN6NzFpj6P611jomgklfSIod+PHuDrMsPbUK0HgsVh88pHbCIcU3MuXDvMMeqKYlbvy0MHCCdpfMWeRj6E9U6KRg7++GWysxTTldMESEBgJehkXjGSdHAYQadCTuMVAVc0Kj8Y5FhMjHLs/vWrgFBsPxRmLl0uys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.229] (p57bd9c29.dip0.t-ipconnect.de [87.189.156.41])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 788C54C2C37D70;
-	Thu, 26 Mar 2026 07:05:21 +0100 (CET)
-Message-ID: <d59fc665-3400-4513-844e-a9529b7498ce@molgen.mpg.de>
-Date: Thu, 26 Mar 2026 07:05:15 +0100
+	 In-Reply-To:Content-Type; b=u8OsecAms7G74tQtFQ3lfChq7EccVHnte37lavtB/E/lpc52R+vZateFN/6JCicFSNeWQYTApEyxpNXi56alPmRaWlxmxylIJW0WM6h0Sk9gUUbayTn+5lKRXFDIP4M8zeKh/vTeRsH3YRKznoL/HsNb6npWzpm2k3MyvINdrv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=C4BgC/+o; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e53a26e9-1120-4486-8b53-5caa8b959a28@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774506209;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=X3Lvn4WgpjdGbU01O6fXE/PPi5QdHBhd60ON0hwzs0Q=;
+	b=C4BgC/+o9Y3vcPLoOaz9RxDJAd4dCnUu+7ecwm7dCf7Itwuz1SP5KDuWsarFeu2XUPsKaU
+	IuG5BhcY/mb7ZgwAcSlBvaTUh2+TboK8QtvmjMPkq/P8JXEahvYJm9f+NBYW6RjUbqMwlA
+	q4B0fwdi7C8DoUtRYrk8TI2Dc+m68qs=
+Date: Thu, 26 Mar 2026 14:23:15 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] i40e: don't advertise
- IFF_SUPP_NOFCS
-To: Kohei Enju <kohei@enjuk.jp>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shannon Nelson <sln@onemain.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>, kohei.enju@gmail.com
-References: <20260325205054.109822-1-kohei@enjuk.jp>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260325205054.109822-1-kohei@enjuk.jp>
+Subject: Re: [PATCH net] ipv6: fix data race in fib6_metric_set() using
+ cmpxchg
+To: Hangbin Liu <liuhangbin@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Fei Liu <feliu@redhat.com>
+References: <20260326-b4-fib6_metric_set-kmemleak-v1-1-c89fc1b312c0@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260326-b4-fib6_metric_set-kmemleak-v1-1-c89fc1b312c0@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271852-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[mpg.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lists.osuosl.org,vger.kernel.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,onemain.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271853-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,redhat.com];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,kernel.org,google.com,redhat.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,molgen.mpg.de:mid,enjuk.jp:email]
-X-Rspamd-Queue-Id: AF3B632F939
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 049A532FBC3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Dear Kohei,
 
-
-Thank you for your patch.
-
-Am 25.03.26 um 21:50 schrieb Kohei Enju:
-> i40e advertises IFF_SUPP_NOFCS, allowing users to use the SO_NOFCS
-> socket option. However, this option is silently ignored, as the driver
-> does not check skb->no_fcs, and always enables FCS insertion offload.
-> 
-> Fix this by removing the advertisement of IFF_SUPP_NOFCS.
-> 
-> This behavior can be reproduced with a simple AF_PACKET socket:
-> 
->    import socket
->    s = socket.socket(socket.AF_PACKET, socket.SOCK_RAW)
->    s.setsockopt(socket.SOL_SOCKET, 43, 1) # SO_NOFCS
->    s.bind(("eth0", 0))
->    s.send(b'\xff' * 64)
-> 
-> Previously, send() succeeds but the driver ignores SO_NOFCS.
-
-Would I check that with tcpdump?
-
-> With this change, send() fails with -EPROTONOSUPPORT, as expected.
-
-Great commit message! Thank you.
-
-One question, did you look into, what is needed to implement working 
-SO_NOFC support?
-
-> Fixes: 41c445ff0f48 ("i40e: main driver core")
-> Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+On 3/26/26 12:22 PM, Hangbin Liu wrote:
+> fib6_metric_set() may be called concurrently from softirq context without
+> holding the FIB table lock. A typical path is:
+>
+>    ndisc_router_discovery()
+>      spin_unlock_bh(&table->tb6_lock)        <- lock released
+>      fib6_metric_set(rt, RTAX_HOPLIMIT, ...) <- lockless call
+>
+> When two CPUs process Router Advertisement packets for the same router
+> simultaneously, they can both arrive at fib6_metric_set() with the same
+> fib6_info pointer whose fib6_metrics still points to dst_default_metrics.
+>
+>    if (f6i->fib6_metrics == &dst_default_metrics) {   /* both CPUs: true */
+>        struct dst_metrics *p = kzalloc_obj(*p, GFP_ATOMIC);
+>        refcount_set(&p->refcnt, 1);
+>        f6i->fib6_metrics = p;   /* CPU1 overwrites CPU0's p -> p0 leaked */
+>    }
+>
+> The dst_metrics allocated by the losing CPU has refcnt=1 but no pointer
+> to it anywhere in memory, producing a kmemleak report:
+>
+>    unreferenced object 0xff1100025aca1400 (size 96):
+>      comm "softirq", pid 0, jiffies 4299271239
+>      backtrace:
+>        kmalloc_trace+0x28a/0x380
+>        fib6_metric_set+0xcd/0x180
+>        ndisc_router_discovery+0x12dc/0x24b0
+>        icmpv6_rcv+0xc16/0x1360
+>
+> Fix this by replacing the plain pointer store with cmpxchg() and free
+> the allocation safely when competition failed.
+>
+> Fixes: d4ead6b34b67 ("net/ipv6: move metrics from dst to rt6_info")
+> Reported-by: Fei Liu <feliu@redhat.com>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 > ---
->   drivers/net/ethernet/intel/i40e/i40e_main.c | 1 -
->   1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> index 3749f32ef95a..a3c52aa6255b 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -13831,7 +13831,6 @@ static int i40e_config_netdev(struct i40e_vsi *vsi)
->   	netdev->neigh_priv_len = sizeof(u32) * 4;
+>   net/ipv6/ip6_fib.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+> index dd26657b6a4a..64de761f40d5 100644
+> --- a/net/ipv6/ip6_fib.c
+> +++ b/net/ipv6/ip6_fib.c
+> @@ -730,14 +730,16 @@ void fib6_metric_set(struct fib6_info *f6i, int metric, u32 val)
+>   	if (!f6i)
+>   		return;
 >   
->   	netdev->priv_flags |= IFF_UNICAST_FLT;
-> -	netdev->priv_flags |= IFF_SUPP_NOFCS;
->   	/* Setup netdev TC information */
->   	i40e_vsi_config_netdev_tc(vsi, vsi->tc_config.enabled_tc);
+> -	if (f6i->fib6_metrics == &dst_default_metrics) {
+> +	if (READ_ONCE(f6i->fib6_metrics) == &dst_default_metrics) {
+> +		struct dst_metrics *dflt = (struct dst_metrics *)&dst_default_metrics;
+>   		struct dst_metrics *p = kzalloc_obj(*p, GFP_ATOMIC);
+>   
+>   		if (!p)
+>   			return;
+>   
+>   		refcount_set(&p->refcnt, 1);
+> -		f6i->fib6_metrics = p;
+> +		if (cmpxchg(&f6i->fib6_metrics, dflt, p) != dflt)
+> +			kfree(p);
+>   	}
+>   
 
-Nice catch.
+
+[...]
+
+>   	f6i->fib6_metrics->metrics[metric - 1] = val;
+
+Suggest using marked accessors to suppress KCSAN warnings:
+
+struct dst_metrics *m = READ_ONCE(f6i->fib6_metrics);
+WRITE_ONCE(m->metrics[metric - 1], val);
 
 
-Kind regards,
-
-Paul
 
