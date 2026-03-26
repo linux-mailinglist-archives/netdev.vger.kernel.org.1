@@ -1,175 +1,183 @@
-Return-Path: <netdev+bounces-271947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271949-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aMxqKdj8xGny5QQAu9opvQ
-	(envelope-from <netdev+bounces-271947-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:31:04 +0100
+	id yHmLFKj/xGkz5gQAu9opvQ
+	(envelope-from <netdev+bounces-271949-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:43:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 499B23325F9
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:31:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48FEC332814
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:43:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D5AF83059827
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:30:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DA178300BE1A
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:33:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C02327C0D;
-	Thu, 26 Mar 2026 09:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD75423BCFD;
+	Thu, 26 Mar 2026 09:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cGraHzZq"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="JIfL9S6Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9F7749C;
-	Thu, 26 Mar 2026 09:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6893148DD;
+	Thu, 26 Mar 2026 09:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774517427; cv=none; b=clYsNcFpP2ozptCVZ/VJJTXFaqI3Shek2l/5rRtVLQLBHocg5hrFF+h26uSf0KZEUaP8W53iY0ZIAzPdou2pyf5uUyoWQ/9xq43C7KbneUuqQ2i0AMr92IAm6LAyHI1FvZLnbmCeG+t8KZWUKTt8bNG5JvNFLbP35gN0+/c8SVM=
+	t=1774517621; cv=none; b=nKtWGAzp6I5Vq/Rzum5sLsRGyhI91wADxJD3peU+TynOia0FffR/R1ZCMdzq8VYYyyC50noXonO+oPl4UQftEvFREGoPDXbln+ytrK1fNOAfVXHoUkeuGoHf7Cs/F6aOYJEU5Y7HeBGi6WohPRLv6QQkscPVGytk0Ta04Fg738M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774517427; c=relaxed/simple;
-	bh=TAQ3eRNYXmeS2TuKDVL+vvlsP2LBU8S7kf6GbjrTDlI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yuc4YyGBZBUmvlFdSaXwfNY6KX8Nmmth6mog5U++gTSo/y/sNFWxD1WHzryfLXCApKU0F9sZNXpy7jfwZhYrPgKVi5D4U8ABeqIFmS7eKwDztoZ0NFE9WjAdXADiy0vQgFyPLiL76XXGjtsdcpj2IrS/9DZ/IA1yGkDzdedeRAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cGraHzZq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEFB9C116C6;
-	Thu, 26 Mar 2026 09:30:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774517427;
-	bh=TAQ3eRNYXmeS2TuKDVL+vvlsP2LBU8S7kf6GbjrTDlI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cGraHzZqE1oGqS3tF2J4R3OWQn/hgaywvaNWs3WnUoAW/Qn2BcsDSeEFD9BdOVPAd
-	 hSU556KMki4gF7sEWOJcUgTpLzi4gpmzpAYvWJRGEEJ1PRo3Pzzm95o8bXoIKyOGFc
-	 7EZo0G5lD3XuxsmPOCM7Ngom2jcdhAwCpX62lrPDL0/ULEq4tzQnTbwxzdX1MpU+dR
-	 t1u1Zc4BvyrYky2pEHJ1iPW3o3wNfMjmXlqLyaVJ/e4T6vJLQW35UKDcshtVYOi8LG
-	 v2dvOIG11tMWL9xm9NJto8TZWtG1o5QuDGin4mzN/g9q3+O+I+BeEdbuec5lV/UHRO
-	 Y5P6xhEimVtVg==
-Message-ID: <be72b72c-81a9-4dbc-8e11-10c60732690f@kernel.org>
-Date: Thu, 26 Mar 2026 10:30:22 +0100
+	s=arc-20240116; t=1774517621; c=relaxed/simple;
+	bh=TlgZPqsifYUNanuJk7ktg2DgD57MAfIdrP8qwPSF/Yc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dal61+L59LYiRB1D7KoStoRRXCYaYwfUAYj5Ay6bNO/V3LIFN/Cx3yHDSQF+UlQGom4ba2ntuK10k+hDfR9M06L4kKXam6rF8WmgnIvIIhjs+Qc+zBQ43rejq3t+rdu6Xr/ym6bMx7f3faJTyNEoeia9J1CvEkUX7EHvbrfBORs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=JIfL9S6Q; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=kpD74HZQXAuyN2XDecX4PjgJkz7NNLyVJZ/YVPKmMoY=; t=1774517620; x=1775727220; 
+	b=JIfL9S6QbT7dW93TWHrqbLMJJ256kQAz5x/8WOpv/Nu2P0a+yjcwhqdXmum/ZDTsLAEPLlwpopM
+	ZUTHGVXXF8Pd8HbD+nSR6KWIO62i9hBxWpbLvxcI27LK1T36cQ+vpucBfwAgvV9x65NwZGqvhEhk7
+	nKsjFB+ck7Zbgg4fIH+6cc+YTFv83QrP7Iw4aejibAue2eYnJTEmoKEnRBLqzN0rURtgLk5GfH0tL
+	J0jlWbZn4ijqk4CGsXhV1EVCYr6Q5hCfoJibOuf3NfYd83ba54x+ZiSxNcUwaXH/vBqiyriU1zZgC
+	98OGZAxMtijn3Bh1n8GJIhXo/ifNYpjwtaZA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1w5h5o-0000000CyVs-1pJE;
+	Thu, 26 Mar 2026 10:33:32 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2026-03-26
+Date: Thu, 26 Mar 2026 10:31:35 +0100
+Message-ID: <20260326093329.77815-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] dt-bindings: net: pse-pd: add poll-interval-ms
- property
-To: Carlo Szelinsky <github@szelinsky.de>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org
-References: <20260323201225.1836561-1-github@szelinsky.de>
- <20260323201225.1836561-2-github@szelinsky.de>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20260323201225.1836561-2-github@szelinsky.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271947-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271949-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,szelinsky.de:email]
-X-Rspamd-Queue-Id: 499B23325F9
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 48FEC332814
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 23/03/2026 21:12, Carlo Szelinsky wrote:
-> Add the optional poll-interval-ms property for PSE controllers that
-> use poll-based event detection instead of interrupts. Defaults to
-> 500ms if not specified.
-> 
-> Signed-off-by: Carlo Szelinsky <github@szelinsky.de>
+Hi,
+
+And ... more fixes from drivers came in, notably iwlwifi with
+a bunch of things (their maintainer had been on vacation).
+
+I'm going to be on vacation next week, but I'm also not aware
+of anything missing from drivers etc. right now, so we'll see.
+I doubt this is the _last_ pull request for 7.0, but I think
+not much more will come in.
+
+Please pull and let us know if there's any problem.
+
+Thanks,
+johannes
 
 
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC. It might happen, that command when run on an older
-kernel, gives you outdated entries. Therefore please be sure you base
-your patches on recent Linux kernel.
 
-Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, instead use mainline) or work on fork of kernel
-(don't, instead use mainline). Just use b4 and everything should be
-fine, although remember about `b4 prep --auto-to-cc` if you added new
-patches to the patchset.
+The following changes since commit a1d9d8e833781c44ab688708804ce35f20f3cbbd:
 
-You missed at least devicetree list (maybe more), so this won't be
-tested by automated tooling. Performing review on untested code might be
-a waste of time.
+  Merge tag 'net-7.0-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-03-19 11:25:40 -0700)
 
-Please kindly resend and include all necessary To/Cc entries.
+are available in the Git repository at:
 
-Best regards,
-Krzysztof
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2026-03-26
+
+for you to fetch changes up to 789b06f9f39cdc7e895bdab2c034e39c41c8f8d6:
+
+  wifi: virt_wifi: remove SET_NETDEV_DEV to avoid use-after-free (2026-03-25 20:46:57 +0100)
+
+----------------------------------------------------------------
+Couple more fixes:
+ - virt_wifi: remove SET_NETDEV_DEV to avoid UAF on teardown
+ - iwlwifi:
+   - fix (some) devices that don't have 6 GHz (WiFi6E)
+   - fix potential OOB read of firmware notification
+   - set WiFi generation for firmware to avoid packet drops
+   - fix multi-link scan timing
+ - wilc1000: fix integer overflow
+ - ath11k/ath12k: fix TID during A-MPDU session teardown
+ - wl1251: don't trust firmware TX status response index
+
+----------------------------------------------------------------
+Alexander Popov (1):
+      wifi: virt_wifi: remove SET_NETDEV_DEV to avoid use-after-free
+
+Alexey Velichayshiy (1):
+      wifi: iwlwifi: mvm: fix potential out-of-bounds read in iwl_mvm_nd_match_info_handler()
+
+Emmanuel Grumbach (1):
+      wifi: iwlwifi: mvm: don't send a 6E related command when not supported
+
+Johannes Berg (3):
+      wifi: iwlwifi: mld: correctly set wifi generation data
+      Merge tag 'iwlwifi-fixes-2026-03-24' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+      Merge tag 'ath-current-20260324' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
+
+Pagadala Yesu Anjaneyulu (1):
+      wifi: iwlwifi: mld: Fix MLO scan timing
+
+Pengpeng Hou (1):
+      wifi: wl1251: validate packet IDs before indexing tx_frames
+
+Reshma Immaculate Rajkumar (2):
+      wifi: ath11k: Pass the correct value of each TID during a stop AMPDU session
+      wifi: ath12k: Pass the correct value of each TID during a stop AMPDU session
+
+Yasuaki Torimaru (1):
+      wifi: wilc1000: fix u8 overflow in SSID scan buffer size calculation
+
+ drivers/net/wireless/ath/ath11k/dp_rx.c            |  15 ++-
+ drivers/net/wireless/ath/ath12k/dp_rx.c            |   4 +-
+ .../net/wireless/intel/iwlwifi/fw/api/commands.h   |   5 +
+ drivers/net/wireless/intel/iwlwifi/fw/api/scan.h   |  10 ++
+ drivers/net/wireless/intel/iwlwifi/mld/iface.c     | 101 ++++++++++++++-------
+ drivers/net/wireless/intel/iwlwifi/mld/mac80211.c  |  19 ++++
+ drivers/net/wireless/intel/iwlwifi/mld/mld.c       |   1 +
+ drivers/net/wireless/intel/iwlwifi/mld/mlo.c       |   4 +-
+ drivers/net/wireless/intel/iwlwifi/mld/notif.c     |   5 +
+ drivers/net/wireless/intel/iwlwifi/mld/scan.c      |  30 +++++-
+ drivers/net/wireless/intel/iwlwifi/mld/scan.h      |   9 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/d3.c        |   2 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/fw.c        |   3 +-
+ drivers/net/wireless/microchip/wilc1000/hif.c      |   2 +-
+ drivers/net/wireless/ti/wl1251/tx.c                |   8 +-
+ drivers/net/wireless/virtual/virt_wifi.c           |   1 -
+ 16 files changed, 163 insertions(+), 56 deletions(-)
 
