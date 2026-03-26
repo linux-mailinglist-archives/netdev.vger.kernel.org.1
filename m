@@ -1,115 +1,160 @@
-Return-Path: <netdev+bounces-272211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272212-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WHFQE8GFxWlc+wQAu9opvQ
-	(envelope-from <netdev+bounces-272211-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:15:13 +0100
+	id ECbqGwCIxWlc+wQAu9opvQ
+	(envelope-from <netdev+bounces-272212-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:24:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D646C33ACA0
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:15:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E80BE33AE43
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:24:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4E53E31B3422
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:04:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D51AD313E0B4
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E9D39F182;
-	Thu, 26 Mar 2026 19:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F2D38A2BF;
+	Thu, 26 Mar 2026 19:14:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oP0tU7kC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="maMJlxGb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834871EEA31;
-	Thu, 26 Mar 2026 19:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37573288CA3;
+	Thu, 26 Mar 2026 19:13:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774551823; cv=none; b=hnVH10yE1QqpLkPmysfIFiB9n8UCQrPV0eY2mncCLk7TiFfnuh7ZALh+OQmcV7QK7fgpTS9LQLxK8vaMkGc/17BEfGUIEAU+D1mA0McDFZ6A/IMcKfcoRr2ROtJ4fdZ2CrW9CCQTSPcqO6FbCMh8Gzmjxq5knoSE9HfSZyXEYNM=
+	t=1774552441; cv=none; b=dSUDRcPkoc4p2Z2g3fdMGVgRUut1FlZVY17cotApHyWeiI/o6emBHt1eBET7Zvake8d2d/vRGbpemzK2jW825vQ1rf7SUQ6IceJlzGxuF3KKNPc/T65voIcWvnChLtRTg5fhWgTk7c4LMGpOQGErPfEAxcjJuUAjcq+8bJBHjBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774551823; c=relaxed/simple;
-	bh=XhS3vsFXT6ameFcC2ocqdTNMuW6DssqcgyuUmYHgN1A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P6ktKJvtIwgER4JhclG/U4bboMagKuZQov0mhxGDbDJyU1tjqzRi3hrUXEVoylE/9rnBDx8JwvuyUtSSzs81isWSCmNRztXF9BjF2MH5ocrggUHrEog+FvoAXdHXulqSBOXwNBrKfOkGzfQiofT8qP8pwMCXcjeDgEiJPihHC3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oP0tU7kC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC723C116C6;
-	Thu, 26 Mar 2026 19:03:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774551823;
-	bh=XhS3vsFXT6ameFcC2ocqdTNMuW6DssqcgyuUmYHgN1A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oP0tU7kCos5UpGCBGT2uaUoTHNLK+I/vNvvf1lcp5fBz97vovM2fgg1GxN/Oe5BFC
-	 hu5+5ZhVN8ov97no9b/y5WwzAspuJj8Y9VJIBlyQJwPwiNMMpdW783I7zMG9eINGki
-	 ToBjPE1Zu6peLQyii6zEIuNLz9jycI2G0xxzCTxVFqCKCJFhcazfO9ZnEfNUiEJcfc
-	 SPloJA9nARMtmQzekuvYGnMMg/B5gWc1XSrc52JB4wPNZkGR5CJe9sq3fdrzAtaSzj
-	 ShWLPQq71oYD3R19hDCsdxNkFvuq/xQN5LvZpUwe924YdynyISpNFoDH3aF4UdHUdA
-	 O6gFqQbHFKjfQ==
-Date: Thu, 26 Mar 2026 12:03:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, petrm@nvidia.com, willemb@google.com,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v4 00/10] selftests: drivers: bash support for
- remote traffic generators
-Message-ID: <20260326120342.6429fbdc@kernel.org>
-In-Reply-To: <20260326132828.805703-1-ioana.ciornei@nxp.com>
-References: <20260326132828.805703-1-ioana.ciornei@nxp.com>
+	s=arc-20240116; t=1774552441; c=relaxed/simple;
+	bh=tltjxf8jFcPq7OEubyq8By6LslzVEqdhOSnFAcg5Ie4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C9drsLNcKfNjkLaqWmfxt0s0+EJyW5oB/p42rw2FUoWRE61rxy7Tn+7Qm/XhkeT+JAuI3tH1+Ku1AZvckYe9zqsJBSRR3/0g4cG0LjSu7/541+Zbho+BqxfT9hCXIg7hcn5Ou05tOkBk0daryhBOKoLZICiP6/uACX5pPpBb2QM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=maMJlxGb; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774552440; x=1806088440;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tltjxf8jFcPq7OEubyq8By6LslzVEqdhOSnFAcg5Ie4=;
+  b=maMJlxGbnB6wf7apRx3ZTlihBJF49O77b0gnmY979H2m0g4Cmkv5HKtL
+   S44Q2f/CENiDWaUnR3Fp4jnUWIDmKeOSzFxvH7vSpPYMO6I3Kskc5eNny
+   i6E2ln27PgNoTNcakw50HC2YiH0WAr/DnaPYKGCai7fT4Ej72P9JUejcN
+   Iw4o0WmeOkat0HvAtbuB9wwj6TWyO9e9qq7ryDrgkHlTBbv0KK6ufiNq1
+   /xLhh0tKvCsVJJic9vi1BGZUOJuT6S14azE8+POeHmustnYi+JvUDet+e
+   fjYEk4brFPnI375/a5cG7YquAjmQOzcxDuvq4VeL2H7tzBjO7d/PLjoC6
+   g==;
+X-CSE-ConnectionGUID: fUjNMor/Q9KFN8zw9pdwjQ==
+X-CSE-MsgGUID: rVALtPF/QeWSAiHqXD+q1g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11741"; a="63181178"
+X-IronPort-AV: E=Sophos;i="6.23,142,1770624000"; 
+   d="scan'208";a="63181178"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2026 12:13:59 -0700
+X-CSE-ConnectionGUID: weliWc2oSCaLWztwRBeIEg==
+X-CSE-MsgGUID: bRjTQAYVTpiEQpSUIRbmlA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,142,1770624000"; 
+   d="scan'208";a="222183335"
+Received: from lkp-server01.sh.intel.com (HELO 3905d212be1b) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 26 Mar 2026 12:13:56 -0700
+Received: from kbuild by 3905d212be1b with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w5q9R-000000009FV-2Up5;
+	Thu, 26 Mar 2026 19:13:53 +0000
+Date: Fri, 27 Mar 2026 03:13:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>, linux-block@vger.kernel.org,
+	nbd@other.debian.org, netdev@vger.kernel.org,
+	syzbot+7b4f368d3955d2c9950e@syzkaller.appspotmail.com
+Subject: Re: [PATCH 5/5] nbd: Use lock_sock_try() for TCP sendmsg() and
+ shutdown().
+Message-ID: <202603270301.kJulQgkT-lkp@intel.com>
+References: <20260325063843.1790782-6-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260325063843.1790782-6-kuniyu@google.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272211-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272212-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,7b4f368d3955d2c9950e];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: D646C33ACA0
+X-Rspamd-Queue-Id: E80BE33AE43
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 26 Mar 2026 15:28:18 +0200 Ioana Ciornei wrote:
-> This patch set aims to add the necessary support so that bash written
-> selftests are also able to easily run with a remote traffic generator
-> system, either be it in another netns or one accessible through ssh.
-> 
-> This patch set is a result of the discussion from v1:
-> https://lore.kernel.org/all/20260303084330.340b6459@kernel.org/
-> Even though the python infrastructure is already established, some
-> things are easier in bash and it would be a shame to leave behind the
-> bash tests that we already have.
+Hi Kuniyuki,
 
-I think this introduces a bunch of regressions, eg:
+kernel test robot noticed the following build errors:
 
-https://netdev-ctrl.bots.linux.dev/logs/vmksft/forwarding/results/575622/4-local-termination-sh/stdout
+[auto build test ERROR on axboe/for-next]
+[also build test ERROR on linus/master v7.0-rc5]
+[cannot apply to next-20260325]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-https://netdev-ctrl.bots.linux.dev/logs/vmksft/netdevsim/results/575802/18-netcons-resume-sh/stdout
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/nbd-Remove-redundant-sock-ops-shutdown-check-in-nbd_get_socket/20260325-175457
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
+patch link:    https://lore.kernel.org/r/20260325063843.1790782-6-kuniyu%40google.com
+patch subject: [PATCH 5/5] nbd: Use lock_sock_try() for TCP sendmsg() and shutdown().
+config: x86_64-buildonly-randconfig-004-20260326 (https://download.01.org/0day-ci/archive/20260327/202603270301.kJulQgkT-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260327/202603270301.kJulQgkT-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603270301.kJulQgkT-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> ld.lld: error: undefined symbol: inet_shutdown_locked
+   >>> referenced by nbd.c
+   >>>               drivers/block/nbd.o:(nbd_mark_nsock_dead) in archive vmlinux.a
+--
+>> ld.lld: error: undefined symbol: tcp_sendmsg_locked
+   >>> referenced by nbd.c
+   >>>               drivers/block/nbd.o:(__sock_xmit) in archive vmlinux.a
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
