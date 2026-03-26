@@ -1,336 +1,552 @@
-Return-Path: <netdev+bounces-272152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272153-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IKOgHmpkxWkn+AQAu9opvQ
-	(envelope-from <netdev+bounces-272152-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:52:58 +0100
+	id EC1iLhtnxWkn+AQAu9opvQ
+	(envelope-from <netdev+bounces-272153-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:04:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D35B3338BBF
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:52:57 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7B9D338DD9
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:04:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EB0DA30F9E0F
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:40:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1A3D53008095
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6293D40FD8F;
-	Thu, 26 Mar 2026 16:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C725E3FD156;
+	Thu, 26 Mar 2026 16:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pisLqagj"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="E1ExEmsQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A91F4035CD;
-	Thu, 26 Mar 2026 16:40:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB51239C63D
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 16:44:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774543204; cv=none; b=mJPOPdO8twPDzSqtwwy74+gCJnqE1Up6ToPA6vLThG99qYeQRjctwX+She/+zcil7neKm6ayEBqniWqNH9YhV1sY9TLJ7gyvcwJTemBJULYuAgFRitudfLW7e5j2cdcfvFHqElQPbB2Sd0KD4cZyRHbmjHbRjVRUB36FW1zV1hU=
+	t=1774543473; cv=none; b=uGFhRI1QdM2ud5chj3bX9zAfwUp3M6aBSvW6grRW5DWsXEAjybQDUzFRD39S6jg9xo120jR+nTKD2rlypS4JrxFJf93kVmO9S5S6Q97Z0qB/Vg6sAeXLKEr7qlW1NMX4dZUBn6w86yE9NHk8OjfjMmCtzO73DGDsDLKSfsjZclE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774543204; c=relaxed/simple;
-	bh=v9OxL3z6qKsfDWe7vgJygT5T/5mg3FeLB6gOdPjSyDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=AzwpW9huwKCjMnbMx3SFlL/M+7ZOzAVIYiZIp77Ap2h3AnY5WOw8Nd21+fB8oNIbiYvZDI3fyUfmtALHBhNFXAhdw/keQyHSTjceuEgewNng0cLINE/XjNKoZGEWYLal2r9dt95wh02nEQdVXfMFx5QpDoASVkvyDcz33meQqXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pisLqagj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BD1BC116C6;
-	Thu, 26 Mar 2026 16:40:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774543203;
-	bh=v9OxL3z6qKsfDWe7vgJygT5T/5mg3FeLB6gOdPjSyDk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=pisLqagj3vB7EHVWtrYeETBb1Gl8iQLkOtglrdUeLgotRTEpoTq6BAXEW845d4eTN
-	 DbK7B6mnUv8MXwuZy+l8Ewm1Bp4/wszn0Itp3iNaoURdrX4Vzb+EMTyANgbZJpqO3+
-	 Y641c7/ZpyRQV9qxCKNZmtH/wN1HWyA7PAFtaH/hUtCqlIJKajhEIgUGJlQoOvZKJ3
-	 rP/VpkLPjhOnP6NMR2/N4iMdpN4DFyZxnqRQnK/c8/XChTyXH8pv6P0BGsONKLOFSU
-	 QhDYiEU+YTg6LoechbtMk8kIA8WLWnwdnAeRqyKMIvrDYLDp35X3k32Bmf3LoSi0Bf
-	 EE4YkDDj60FvA==
-Date: Thu, 26 Mar 2026 11:40:02 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Gerd Bayer <gbayer@linux.ibm.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>,
-	Jay Cornwall <Jay.Cornwall@amd.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Alexander Schmidt <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	stable@vger.kernel.org, Gerd Bayer <gerd.bayer@de.ibm.com>
-Subject: Re: [PATCH v6 1/2] PCI: AtomicOps: Do not enable without support in
- root complex
-Message-ID: <20260326164002.GA1325368@bhelgaas>
+	s=arc-20240116; t=1774543473; c=relaxed/simple;
+	bh=/G2bs0BwAXEyEVW9j93XdQ/22tQtf/E5LusP/Tpp5hw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u9XOPwjP+TQ0kAggNnhjzjQ68lJ3xKPtmyxENlZx77I7ki73DyhlRCjt9VqzS1NCAE6xc8oLXn6IKSGTd1FbyJtKEXqGPLaAksytBNLLDoSjiAFnWnC78hJB8BvOxvjxjGX2d1JPwOVoPzmdyzq5U/Cvdn3InojiRq3V3s8fiqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=E1ExEmsQ; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-43b9109374eso41824f8f.0
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 09:44:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1774543470; x=1775148270; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=vGBNnYcyMccpdpNhrK4WEI6MensrK6wWkxqJK4annYs=;
+        b=E1ExEmsQODmQbVdLnNpJhP0tZgNCmRvinCqmml611H2Qub0F3NZ8Nyrpe4/ybGK37P
+         49fzJbKgdwMGHvff/eEVi7IS75V5kijuzh6uUAQVyTc5MaPAc1ePl8aDwrGgjxmiwNpq
+         55J590RYubyOF5uj5zwFN/0p2NODQn2OMY5o5UFzzN8WsyfjD5evkHqT9X9MHdPADCe5
+         xRhnhOz3MGeFEiBrZPAlQwXL/1aARk52SbvAEzg+QPZ+5F6PQ5XLJ14RylyhEH8jq0IK
+         mUqi+AliJujhhZT+qgxulfTKy2pERCMzCGfKdqL0g4WDKkUOlU6wtD9pqzceWMrc+q79
+         XtTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774543470; x=1775148270;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vGBNnYcyMccpdpNhrK4WEI6MensrK6wWkxqJK4annYs=;
+        b=qfL847Y1645SQ/r182iGLV1mVBTcBjQ1BjXWLvlXtR5VnRfWmlKhFS8kn8/6kVrDMt
+         gqQ0piEdkkA/KJX7Ez5Fd905JLZQ98S1fsjhx+nocB73g4QQ1WeXKYfexuAtatqk7TPh
+         Lqpc6LcDV6z4+W4K+ocsv/pyc+V12rTyjiUUbTSKBtyilHD8Vj/SW47B48iCoEkmrkQJ
+         fN+JiuIS01//NVK7wZW7TOxFmFz8SoDYUe8pDs8HTAoo2ItzAZyIjwEAIFBe6HJox+lC
+         imBCbkbq7jkqYjHvE+TV/u2qLVwB+yTw8wXFcr38jpbrDuD56QsxCBDBA+T41ygyeWP0
+         oFmw==
+X-Forwarded-Encrypted: i=1; AJvYcCVjnLVpFXVpGOHItWJ8aVk/1/9xprqes2uNW6pxpHsRMvK+vdjyZnq3P3hpE2vmsvd6uP6NDss=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5YKSY8FMxwvjE0/XAM3RCCQg/zUoxxfVHLuonGqPppTVnIS9q
+	lafmSLUbnFdJLQYd0nkV26z3k50XONq7TugWWuCEGp1Z8RtQriFxi4rOGvo6ZdUOfw8=
+X-Gm-Gg: ATEYQzxDsl0ikqHsk+FQj7iOYUXU3KffzLxVQ+x1Uz3ucRreTYMSmfyqRnTvHlqs8Ku
+	ne2n3hcCzUY0h2NikzqBLnuR1YYpZxe11cd5CEeRC37J3ZBdYn+KN1HPb0TxOE7qzw7MW/94Sgd
+	wc8C9FX0E/QJJTyH9d5D+wwtL4qUjGUOrCY+QWlFisNBDBHRtm1bGhfONzbUAxnHoVVUascOTpA
+	spklfWsVyBV/gWq4eePcK4ZdzEuX5btfxa4tywKacA1mpN5478JNP0XGn8sW71v8U3M/s1wPrnt
+	pHocxxiOxMMildUHYnOsLJAfvVvqNA8AK7GtWTIJhTeD7fJ1R6hl6S64/pg3S+hjBEWoeV1zyH1
+	Ra6GrtrLlg772+rE+KimX9+1ZyqluATBTBKrU74dUmHXaWvPCS/tC9Gi0gQF6ujXMg+EYvNJQWz
+	pyt/hJ0pT5zVlAvgA2UqEP5WW60uPjEKn8ZalfmI0QP4sfxzJ6pFjO7GmWMchkKyz7IBFIUtHWn
+	RHi
+X-Received: by 2002:adf:b648:0:b0:43b:8820:58cf with SMTP id ffacd0b85a97d-43b88a7472bmr5093339f8f.4.1774543470011;
+        Thu, 26 Mar 2026 09:44:30 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b9192e35esm8469873f8f.6.2026.03.26.09.44.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Mar 2026 09:44:29 -0700 (PDT)
+Message-ID: <a4a4ba6d-da13-4bb1-b6b2-1f9a5de190a7@6wind.com>
+Date: Thu, 26 Mar 2026 17:44:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4183b471777efa949ce6f7b860c81282e91666ef.camel@linux.ibm.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [RFC PATCH net-next 2/3] seg6: add SRv6 L2 tunnel device (srl2)
+To: Andrea Mayer <andrea.mayer@uniroma2.it>, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Stefano Salsano <stefano.salsano@uniroma2.it>,
+ Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
+ Ahmed Abdelsalam <ahabdels@cisco.com>,
+ Justin Iurman <justin.iurman@6wind.com>, linux-kernel@vger.kernel.org
+References: <20260322000557.12559-1-andrea.mayer@uniroma2.it>
+ <20260322000557.12559-3-andrea.mayer@uniroma2.it>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <20260322000557.12559-3-andrea.mayer@uniroma2.it>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272152-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[helgaas@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D35B3338BBF
+	DKIM_TRACE(0.00)[6wind.com:+];
+	HAS_ORG_HEADER(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272153-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[6wind.com:dkim,6wind.com:replyto,6wind.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,uniroma2.it:email]
+X-Rspamd-Queue-Id: D7B9D338DD9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 10:51:19AM +0100, Gerd Bayer wrote:
-> On Wed, 2026-03-25 at 15:08 -0500, Bjorn Helgaas wrote:
-> > On Wed, Mar 25, 2026 at 04:16:17PM +0100, Gerd Bayer wrote:
-> > > When inspecting the config space of a Connect-X physical function in an
-> > > s390 system after it was initialized by the mlx5_core device driver, we
-> > > found the function to be enabled to request AtomicOps despite the
-> > > system's root-complex lacking support for completing them:
-> > > 
-> > > 1ed0:00:00.1 Ethernet controller: Mellanox Technologies MT2894 Family [ConnectX-6 Lx]
-> > > 	Subsystem: Mellanox Technologies Device 0002
-> > >   [...]
-> > > 	DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-
-> > > 		 AtomicOpsCtl: ReqEn+
-> > > 		 IDOReq- IDOCompl- LTR- EmergencyPowerReductionReq-
-> > > 		 10BitTagReq- OBFF Disabled, EETLPPrefixBlk-
-> > > 
-> > > Turns out the device driver calls pci_enable_atomic_ops_to_root() which
-> > > defaulted to enable AtomicOps requests even if it had no information
-> > > about the root-port that the PCIe device is attached to. Similarly,
-> > > AtomicOps requests are enabled for root complex integrated endpoints
-> > > (RCiEPs) unconditionally.
-> > > 
-> > > Change the logic of pci_enable_atomic_ops_to_root() to fully traverse the
-> > > PCIe tree upwards, check that the bridge devices support delivering
-> > > AtomicOps transactions, and finally check that there is a root port at
-> > > the end that does support completing AtomicOps - or that the support for
-> > > completing AtomicOps at the root complex is announced through some other
-> > > arch specific way.
-> > > 
-> > > Introduce a new pcibios_connects_to_atomicops_capable_rc() function to
-> > > implement the check - and default to always "true". This leaves the
-> > > semantics for today's RCiEPs intact. Pass in the device in question and
-> > > the requested capabilities for future expansions.
-> > > For s390, override pcibios_connects_to_atomicops_capable_rc() to
-> > > always return "false".
-> > > 
-> > > Do not change the enablement of AtomicOps requests if there is no
-> > > positive confirmation that the root complex can complete PCIe AtomicOps.
-> > > 
-> > > Reported-by: Alexander Schmidt <alexs@linux.ibm.com>
-> > > Cc: stable@vger.kernel.org
-> > > Fixes: 430a23689dea ("PCI: Add pci_enable_atomic_ops_to_root()")
-> > > Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-> > > ---
-> > >  arch/s390/pci/pci.c |  5 +++++
-> > >  drivers/pci/pci.c   | 48 +++++++++++++++++++++++++++++++-----------------
-> > >  include/linux/pci.h |  1 +
-> > >  3 files changed, 37 insertions(+), 17 deletions(-)
-> > > 
-> > > diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
-> > > index 2a430722cbe415dd56c92fed2e513e524f46481a..a0bef77082a153a258fbe4abb1070b22e020888e 100644
-> > > --- a/arch/s390/pci/pci.c
-> > > +++ b/arch/s390/pci/pci.c
-> > > @@ -265,6 +265,11 @@ static int zpci_cfg_store(struct zpci_dev *zdev, int offset, u32 val, u8 len)
-> > >  	return rc;
-> > >  }
-> > >  
-> > > +bool pcibios_connects_to_atomicops_capable_rc(struct pci_dev *dev, u32 cap_mask)
-> > > +{
-> > > +	return false;
-> > > +}
-> > > +
-> > >  resource_size_t pcibios_align_resource(void *data, const struct resource *res,
-> > >  				       resource_size_t size,
-> > >  				       resource_size_t align)
-> > > diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> > > index 8479c2e1f74f1044416281aba11bf071ea89488a..006aa589926cb290de43f152100ddaf9961407d1 100644
-> > > --- a/drivers/pci/pci.c
-> > > +++ b/drivers/pci/pci.c
-> > > @@ -3660,6 +3660,19 @@ void pci_acs_init(struct pci_dev *dev)
-> > >  	pci_disable_broken_acs_cap(dev);
-> > >  }
-> > >  
-> > > +static bool pci_is_atomicops_capable_rp(struct pci_dev *dev, u32 cap, u32 cap_mask)
-> > > +{
-> > > +	if (!dev || !(pci_pcie_type(dev) == PCI_EXP_TYPE_ROOT_PORT))
-> > > +		return false;
-> > > +
-> > > +	return (cap & cap_mask) == cap_mask;
-> > > +}
-> > > +
-> > > +bool __weak pcibios_connects_to_atomicops_capable_rc(struct pci_dev *dev, u32 cap_mask)
-> > > +{
-> > > +	return true;
-> > > +}
-> > > +
-> > >  /**
-> > >   * pci_enable_atomic_ops_to_root - enable AtomicOp requests to root port
-> > >   * @dev: the PCI device
-> > > @@ -3676,8 +3689,9 @@ void pci_acs_init(struct pci_dev *dev)
-> > >  int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
-> > >  {
-> > >  	struct pci_bus *bus = dev->bus;
-> > > -	struct pci_dev *bridge;
-> > > -	u32 cap, ctl2;
-> > > +	struct pci_dev *bridge = NULL;
-> > > +	u32 cap = 0;
-> > > +	u32 ctl2;
-> > >  
-> > >  	/*
-> > >  	 * Per PCIe r5.0, sec 9.3.5.10, the AtomicOp Requester Enable bit
-> > > @@ -3714,29 +3728,29 @@ int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
-> > >  		switch (pci_pcie_type(bridge)) {
-> > >  		/* Ensure switch ports support AtomicOp routing */
-> > >  		case PCI_EXP_TYPE_UPSTREAM:
-> > > -		case PCI_EXP_TYPE_DOWNSTREAM:
-> > > -			if (!(cap & PCI_EXP_DEVCAP2_ATOMIC_ROUTE))
-> > > -				return -EINVAL;
-> > > -			break;
-> > > -
-> > > -		/* Ensure root port supports all the sizes we care about */
-> > > -		case PCI_EXP_TYPE_ROOT_PORT:
-> > > -			if ((cap & cap_mask) != cap_mask)
-> > > -				return -EINVAL;
-> > > -			break;
-> > > -		}
-> > > -
-> > > -		/* Ensure upstream ports don't block AtomicOps on egress */
-> > > -		if (pci_pcie_type(bridge) == PCI_EXP_TYPE_UPSTREAM) {
-> > > +			/* Upstream ports must not block AtomicOps on egress */
-> > >  			pcie_capability_read_dword(bridge, PCI_EXP_DEVCTL2,
-> > >  						   &ctl2);
-> > >  			if (ctl2 & PCI_EXP_DEVCTL2_ATOMIC_EGRESS_BLOCK)
-> > >  				return -EINVAL;
-> > > +			fallthrough;
-> > > +		/* All switch ports need to route AtomicOps */
-> > > +		case PCI_EXP_TYPE_DOWNSTREAM:
-> > > +			if (!(cap & PCI_EXP_DEVCAP2_ATOMIC_ROUTE))
-> > > +				return -EINVAL;
-> > > +			break;
-> > >  		}
-> > > -
-> > >  		bus = bus->parent;
-> > >  	}
-> > >  
-> > > +	/*
-> > > +	 * Finally, last bridge must be root port and support requested sizes
-> > > +	 * or firmware asserts support
-> > > +	 */
-> > > +	if (!(pci_is_atomicops_capable_rp(bridge, cap, cap_mask) ||
-> > > +	      pcibios_connects_to_atomicops_capable_rc(dev, cap_mask)))
-> > > +		return -EINVAL;
-> > 
-> > Sashiko says:
-> > 
-> >   Since the generic weak implementation of
-> >   pcibios_connects_to_atomicops_capable_rc() unconditionally returns
-> >   true, the logical OR expression pci_is_atomicops_capable_rp(...) ||
-> >   true will always evaluate to true. This makes the entire if
-> >   condition evaluate to false.
-> > 
-> >   Because of this, it appears -EINVAL is never returned here, and any
-> >   standard endpoint behind a Root Port will successfully be granted
-> >   AtomicOps even if the Root Port lacks the capability in its
-> >   PCI_EXP_DEVCAP2 register.
+
+
+Le 22/03/2026 à 01:05, Andrea Mayer a écrit :
+> Introduce srl2, an Ethernet pseudowire device over SRv6. It
+> encapsulates L2 frames in IPv6 with a Segment Routing Header for
+> transmission across an SRv6 network.
 > 
-> I've made the generic implementation of
-> pcibios_connects_to_atomicops_capable_rc() default to return "true" to
-> preserve the current code's handling of RCiEPs: Since they are not
-> attached to a root port, their dev->bus->parent is NULL and the entire
-> while-loop is bypassed - before this patch and after. (Sashiko was
-> pointing at that being regressed with v4.)
-
-The v4 patch definitely changed the behavior for RCiEPs: the current
-v7.0-rc1 code always enables AtomicOps for RCiEPs, and the v4 patch
-never enables AtomicOps for RCiEPs.  But I'm not sure this is a
-regression.  It definitely *could* break an RCiEP, but AFAIK we have
-no information about whether the RC supports AtomicOps, so enabling
-them and telling the driver that AtomicOps work might be a lie.
-
-IIUC, the motivation for this series was to avoid enabling AtomicOps
-on s390 where there is no visible Root Port, and you have platform
-knowledg that whatever is upstream from the endpoint in fact does not
-support them.
-
-I think we should avoid enabling AtomicOps unless we know for certain
-that the completer (Root Port or RC) supports them.  To me that sounds
-like:
-
-  1) Never enable AtomicOps for RCiEPs.
-
-  2) Only enable AtomicOps for endpoints below a Root Port that
-  supports AtomicOps.
-
-This could be two separate patches, where the second would fix the
-s390 issue reported by Alexander.
-
-If we come across RCiEPs that need AtomicOps and we somehow know that
-the RC supports them, we can add a quirk or something to take
-advantage of it.
-
-We are still hand-waving about peer-to-peer transactions; we don't
-even try to account for that because we don't know what peer might be
-the completer.
-
-> The whole point of pcibios_connects_to_atomicops_capable_rc() is to
-> allow different architectures to implement a discriminator outside of
-> PCIe's structure - potentially depending on CPU model or more.
+> The encapsulation logic reuses seg6_do_srh_encap() with
+> IPPROTO_ETHERNET. The transmit path uses the standard IPv6 tunnel
+> infrastructure (dst_cache, ip6_route_output, ip6tunnel_xmit).
 > 
-> The only point I wonder about: Should
-> pcibios_connects_to_atomicops_capable_rc() default to return "false"
-> and deliberately change the behavior for today's RCiEP's (if there are
-> any...)?
+> The device is configured with a segment list for point-to-point
+> L2 encapsulation.
 > 
-> > 
-> > > +
-> > >  	pcie_capability_set_word(dev, PCI_EXP_DEVCTL2,
-> > >  				 PCI_EXP_DEVCTL2_ATOMIC_REQ);
-> > >  	return 0;
-> > > diff --git a/include/linux/pci.h b/include/linux/pci.h
-> > > index 1c270f1d512301de4d462fe7e5097c32af5c6f8d..ef90604c39859ea8e61e5392d0bdaa1b0e43874b 100644
-> > > --- a/include/linux/pci.h
-> > > +++ b/include/linux/pci.h
-> > > @@ -692,6 +692,7 @@ void pci_set_host_bridge_release(struct pci_host_bridge *bridge,
-> > >  				 void *release_data);
-> > >  
-> > >  int pcibios_root_bridge_prepare(struct pci_host_bridge *bridge);
-> > > +bool pcibios_connects_to_atomicops_capable_rc(struct pci_dev *dev, u32 cap_mask);
-> > >  
-> > >  #define PCI_REGION_FLAG_MASK	0x0fU	/* These bits of resource flags tell us the PCI region flags */
-> > >  
-> > > 
-> > > -- 
-> > > 2.51.0
-> > > 
+> Usage:
 > 
-> Thanks,
-> Gerd
+>   ip link add srl2-0 type srl2 segs fc00::a,fc00::b
+> 
+> Co-developed-by: Stefano Salsano <stefano.salsano@uniroma2.it>
+> Signed-off-by: Stefano Salsano <stefano.salsano@uniroma2.it>
+> Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
+> ---
+>  include/linux/srl2.h      |   7 +
+>  include/uapi/linux/srl2.h |  20 +++
+>  net/ipv6/Kconfig          |  16 +++
+>  net/ipv6/Makefile         |   1 +
+>  net/ipv6/seg6.c           |   1 +
+>  net/ipv6/srl2.c           | 269 ++++++++++++++++++++++++++++++++++++++
+>  6 files changed, 314 insertions(+)
+>  create mode 100644 include/linux/srl2.h
+>  create mode 100644 include/uapi/linux/srl2.h
+>  create mode 100644 net/ipv6/srl2.c
+> 
+> diff --git a/include/linux/srl2.h b/include/linux/srl2.h
+> new file mode 100644
+> index 000000000000..c1342b979402
+> --- /dev/null
+> +++ b/include/linux/srl2.h
+> @@ -0,0 +1,7 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +#ifndef _LINUX_SRL2_H
+> +#define _LINUX_SRL2_H
+> +
+> +#include <uapi/linux/srl2.h>
+> +
+> +#endif
+Is this really needed?
+
+> diff --git a/include/uapi/linux/srl2.h b/include/uapi/linux/srl2.h
+> new file mode 100644
+> index 000000000000..e7c8f6fc0791
+> --- /dev/null
+> +++ b/include/uapi/linux/srl2.h
+> @@ -0,0 +1,20 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later WITH Linux-syscall-note */
+> +/*
+> + *  SRv6 L2 tunnel device
+> + *
+> + *  Author:
+> + *  Andrea Mayer <andrea.mayer@uniroma2.it>
+> + */
+> +
+> +#ifndef _UAPI_LINUX_SRL2_H
+> +#define _UAPI_LINUX_SRL2_H
+> +
+> +enum {
+> +	IFLA_SRL2_UNSPEC,
+> +	IFLA_SRL2_SRH,	/* binary: struct ipv6_sr_hdr + segments */
+> +	__IFLA_SRL2_MAX,
+> +};
+> +
+> +#define IFLA_SRL2_MAX (__IFLA_SRL2_MAX - 1)
+It should probably be generated automatically from specs, see
+https://docs.kernel.org/userspace-api/netlink/intro-specs.html
+
+> +
+> +#endif
+> diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
+> index b8f9a8c0302e..9c8f7e254435 100644
+> --- a/net/ipv6/Kconfig
+> +++ b/net/ipv6/Kconfig
+> @@ -318,6 +318,22 @@ config IPV6_SEG6_BPF
+>  	depends on IPV6_SEG6_LWTUNNEL
+>  	depends on IPV6 = y
+>  
+> +config IPV6_SRL2
+> +	tristate "IPv6: SRv6 L2 tunnel device"
+> +	depends on IPV6_SEG6_LWTUNNEL
+> +	select DST_CACHE
+> +	help
+> +	  SRv6 virtual Ethernet device that encapsulates L2 frames in
+> +	  IPv6 with a Segment Routing Header (SRH) for transmission
+> +	  over an SRv6 network.
+> +	  Intended for use with a remote seg6local L2 decapsulation
+> +	  behavior, such as End.DT2U or End.DX2.
+> +
+> +	  To compile this as a module, choose M here: the module will
+> +	  be called srl2.
+> +
+> +	  If unsure, say N.
+> +
+>  config IPV6_RPL_LWTUNNEL
+>  	bool "IPv6: RPL Source Routing Header support"
+>  	depends on IPV6
+> diff --git a/net/ipv6/Makefile b/net/ipv6/Makefile
+> index 2c9ce2ccbde1..a7e81d0293ca 100644
+> --- a/net/ipv6/Makefile
+> +++ b/net/ipv6/Makefile
+> @@ -24,6 +24,7 @@ ipv6-$(CONFIG_SYN_COOKIES) += syncookies.o
+>  ipv6-$(CONFIG_NETLABEL) += calipso.o
+>  ipv6-$(CONFIG_IPV6_SEG6_LWTUNNEL) += seg6_iptunnel.o seg6_local.o
+>  ipv6-$(CONFIG_IPV6_SEG6_HMAC) += seg6_hmac.o
+> +obj-$(CONFIG_IPV6_SRL2) += srl2.o
+>  ipv6-$(CONFIG_IPV6_RPL_LWTUNNEL) += rpl_iptunnel.o
+>  ipv6-$(CONFIG_IPV6_IOAM6_LWTUNNEL) += ioam6_iptunnel.o
+>  
+> diff --git a/net/ipv6/seg6.c b/net/ipv6/seg6.c
+> index 1c3ad25700c4..23213ab4fefd 100644
+> --- a/net/ipv6/seg6.c
+> +++ b/net/ipv6/seg6.c
+> @@ -72,6 +72,7 @@ bool seg6_validate_srh(struct ipv6_sr_hdr *srh, int len, bool reduced)
+>  
+>  	return true;
+>  }
+> +EXPORT_SYMBOL_GPL(seg6_validate_srh);
+>  
+>  struct ipv6_sr_hdr *seg6_get_srh(struct sk_buff *skb, int flags)
+>  {
+> diff --git a/net/ipv6/srl2.c b/net/ipv6/srl2.c
+> new file mode 100644
+> index 000000000000..66aa5375d218
+> --- /dev/null
+> +++ b/net/ipv6/srl2.c
+> @@ -0,0 +1,269 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + *  SRv6 L2 tunnel device (srl2)
+> + *
+> + *  A virtual Ethernet device that encapsulates L2 frames in IPv6 with a
+> + *  Segment Routing Header (SRH) for transmission over an SRv6 network.
+> + *  On the remote side, a seg6_local behavior such as End.DT2U or End.DX2
+> + *  decapsulates the inner Ethernet frame for L2 delivery.
+> + *
+> + *  The encapsulation logic reuses seg6_do_srh_encap() from seg6_iptunnel.c
+> + *  with IPPROTO_ETHERNET (143). The transmit path uses the standard IPv6
+> + *  tunnel infrastructure (dst_cache, ip6_route_output, ip6tunnel_xmit).
+> + *
+> + *  Authors:
+> + *	Andrea Mayer <andrea.mayer@uniroma2.it>
+> + *	Stefano Salsano <stefano.salsano@uniroma2.it>
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/netdevice.h>
+> +#include <linux/etherdevice.h>
+> +#include <net/dst_cache.h>
+> +#include <net/ip6_route.h>
+> +#include <net/ip_tunnels.h>
+> +#include <net/ip6_tunnel.h>
+> +#include <net/seg6.h>
+> +#include <linux/seg6.h>
+> +#include <linux/srl2.h>
+> +
+> +/* Conservative initial estimate for SRH size before newlink provides
+> + * the actual value. 256 bytes accommodates up to 15 SIDs.
+> + */
+> +#define SRL2_SRH_HEADROOM_EST	256
+> +
+> +struct srl2_priv {
+> +	struct ipv6_sr_hdr	*srh;
+> +	struct dst_cache	dst_cache;
+> +};
+> +
+> +/*
+> + * srl2_xmit - encapsulate an L2 frame in IPv6+SRH and transmit
+> + *
+> + * When the bridge (or local stack) sends a frame through this device,
+> + * skb->data points to the inner Ethernet header.  We look up a route
+> + * towards the first SID, prepend the outer IPv6+SRH via
+> + * seg6_do_srh_encap(), and transmit via ip6tunnel_xmit().
+> + *
+> + * The route lookup result is cached per-cpu in dst_cache. Since the
+> + * first SID is constant for the lifetime of the device, the cache
+> + * avoids repeated route lookups in the common case.
+> + */
+> +static netdev_tx_t srl2_xmit(struct sk_buff *skb, struct net_device *dev)
+> +{
+> +	struct srl2_priv *priv = netdev_priv(dev);
+> +	struct net *net = dev_net(dev);
+> +	struct dst_entry *dst;
+> +	struct flowi6 fl6;
+> +	int err;
+> +
+> +	local_bh_disable();
+> +	dst = dst_cache_get(&priv->dst_cache);
+> +	local_bh_enable();
+> +
+> +	if (unlikely(!dst)) {
+> +		memset(&fl6, 0, sizeof(fl6));
+> +		fl6.daddr = priv->srh->segments[priv->srh->first_segment];
+> +
+> +		dst = ip6_route_output(net, NULL, &fl6);
+> +		if (dst->error) {
+> +			dst_release(dst);
+> +			DEV_STATS_INC(dev, tx_carrier_errors);
+> +			goto drop;
+> +		}
+> +
+> +		if (dst_dev(dst) == dev) {
+> +			dst_release(dst);
+> +			DEV_STATS_INC(dev, collisions);
+> +			goto drop;
+> +		}
+> +
+> +		local_bh_disable();
+> +		/* saddr is unused */
+> +		dst_cache_set_ip6(&priv->dst_cache, dst, &fl6.saddr);
+> +		local_bh_enable();
+> +	}
+> +
+> +	skb_scrub_packet(skb, false);
+> +
+> +	skb_dst_set(skb, dst);
+> +
+> +	err = seg6_do_srh_encap(skb, priv->srh, IPPROTO_ETHERNET);
+> +	if (unlikely(err)) {
+> +		DEV_STATS_INC(dev, tx_errors);
+> +		kfree_skb(skb);
+> +		return NETDEV_TX_OK;
+> +	}
+> +
+> +	skb->protocol = htons(ETH_P_IPV6);
+> +
+> +	ip6tunnel_xmit(NULL, skb, dev, 0);
+> +
+> +	return NETDEV_TX_OK;
+> +
+> +drop:
+> +	DEV_STATS_INC(dev, tx_dropped);
+> +	kfree_skb(skb);
+> +	return NETDEV_TX_OK;
+> +}
+> +
+> +static int srl2_dev_init(struct net_device *dev)
+> +{
+> +	struct srl2_priv *priv = netdev_priv(dev);
+> +
+> +	return dst_cache_init(&priv->dst_cache, GFP_KERNEL);
+> +}
+> +
+> +static void srl2_dev_uninit(struct net_device *dev)
+> +{
+> +	struct srl2_priv *priv = netdev_priv(dev);
+> +
+> +	dst_cache_destroy(&priv->dst_cache);
+> +}
+> +
+> +static void srl2_dev_free(struct net_device *dev)
+> +{
+> +	struct srl2_priv *priv = netdev_priv(dev);
+> +
+> +	kfree(priv->srh);
+> +}
+> +
+> +static const struct net_device_ops srl2_netdev_ops = {
+> +	.ndo_init		= srl2_dev_init,
+> +	.ndo_uninit		= srl2_dev_uninit,
+> +	.ndo_start_xmit		= srl2_xmit,
+> +	.ndo_set_mac_address	= eth_mac_addr,
+> +	.ndo_validate_addr	= eth_validate_addr,
+> +};
+> +
+> +static void srl2_setup(struct net_device *dev)
+> +{
+> +	ether_setup(dev);
+> +
+> +	dev->netdev_ops = &srl2_netdev_ops;
+> +	dev->needs_free_netdev = true;
+> +	dev->pcpu_stat_type = NETDEV_PCPU_STAT_DSTATS;
+> +	dev->needed_headroom = LL_MAX_HEADER + sizeof(struct ipv6hdr) +
+> +			       SRL2_SRH_HEADROOM_EST;
+> +
+> +	dev->priv_flags &= ~IFF_TX_SKB_SHARING;
+> +	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
+> +	dev->lltx = true;
+> +
+Maybe setting dev->netns_immutable to true ?
+
+Regards,
+Nicolas
+
+> +	eth_hw_addr_random(dev);
+> +}
+> +
+> +static const struct nla_policy srl2_policy[IFLA_SRL2_MAX + 1] = {
+> +	[IFLA_SRL2_SRH]	= { .type = NLA_BINARY },
+> +};
+> +
+> +static int srl2_validate(struct nlattr *tb[], struct nlattr *data[],
+> +			 struct netlink_ext_ack *extack)
+> +{
+> +	if (!data || !data[IFLA_SRL2_SRH]) {
+> +		NL_SET_ERR_MSG(extack, "SRH with segment list is required");
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int srl2_newlink(struct net_device *dev,
+> +			struct rtnl_newlink_params *params,
+> +			struct netlink_ext_ack *extack)
+> +{
+> +	struct srl2_priv *priv = netdev_priv(dev);
+> +	struct nlattr **data = params->data;
+> +	struct ipv6_sr_hdr *srh;
+> +	int srhlen;
+> +	int len;
+> +
+> +	srh = nla_data(data[IFLA_SRL2_SRH]);
+> +	len = nla_len(data[IFLA_SRL2_SRH]);
+> +
+> +	if (len < sizeof(*srh) + sizeof(struct in6_addr)) {
+> +		NL_SET_ERR_MSG(extack, "SRH too short");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!seg6_validate_srh(srh, len, false)) {
+> +		NL_SET_ERR_MSG(extack, "Invalid SRH");
+> +		return -EINVAL;
+> +	}
+> +
+> +	priv->srh = kmemdup(srh, len, GFP_KERNEL);
+> +	if (!priv->srh)
+> +		return -ENOMEM;
+> +
+> +	srhlen = ipv6_optlen(srh);
+> +
+> +	dev->needed_headroom = LL_MAX_HEADER + sizeof(struct ipv6hdr) + srhlen;
+> +
+> +	/* dev->mtu is the inner L3 payload size. Since SRv6 encapsulation
+> +	 * carries the full inner Ethernet frame, subtract both the outer
+> +	 * IPv6+SRH overhead and ETH_HLEN from ETH_DATA_LEN.
+> +	 */
+> +	dev->mtu = ETH_DATA_LEN - sizeof(struct ipv6hdr) - srhlen - ETH_HLEN;
+> +	dev->min_mtu = ETH_MIN_MTU;
+> +	dev->max_mtu = IP_MAX_MTU - sizeof(struct ipv6hdr) - srhlen - ETH_HLEN;
+> +
+> +	dev->priv_destructor = srl2_dev_free;
+> +
+> +	return register_netdevice(dev);
+> +}
+> +
+> +static void srl2_dellink(struct net_device *dev, struct list_head *head)
+> +{
+> +	unregister_netdevice_queue(dev, head);
+> +}
+> +
+> +static size_t srl2_get_size(const struct net_device *dev)
+> +{
+> +	const struct srl2_priv *priv = netdev_priv(dev);
+> +	int srhlen = ipv6_optlen(priv->srh);
+> +
+> +	return nla_total_size(srhlen);
+> +}
+> +
+> +static int srl2_fill_info(struct sk_buff *skb, const struct net_device *dev)
+> +{
+> +	const struct srl2_priv *priv = netdev_priv(dev);
+> +	int srhlen = ipv6_optlen(priv->srh);
+> +
+> +	if (nla_put(skb, IFLA_SRL2_SRH, srhlen, priv->srh))
+> +		return -EMSGSIZE;
+> +
+> +	return 0;
+> +}
+> +
+> +static struct rtnl_link_ops srl2_link_ops __read_mostly = {
+> +	.kind		= "srl2",
+> +	.maxtype	= IFLA_SRL2_MAX,
+> +	.policy		= srl2_policy,
+> +	.priv_size	= sizeof(struct srl2_priv),
+> +	.setup		= srl2_setup,
+> +	.validate	= srl2_validate,
+> +	.newlink	= srl2_newlink,
+> +	.dellink	= srl2_dellink,
+> +	.get_size	= srl2_get_size,
+> +	.fill_info	= srl2_fill_info,
+> +};
+> +
+> +static int __init srl2_init(void)
+> +{
+> +	return rtnl_link_register(&srl2_link_ops);
+> +}
+> +
+> +static void __exit srl2_exit(void)
+> +{
+> +	rtnl_link_unregister(&srl2_link_ops);
+> +}
+> +
+> +module_init(srl2_init);
+> +module_exit(srl2_exit);
+> +
+> +MODULE_AUTHOR("Andrea Mayer <andrea.mayer@uniroma2.it>");
+> +MODULE_AUTHOR("Stefano Salsano <stefano.salsano@uniroma2.it>");
+> +MODULE_DESCRIPTION("SRv6 L2 tunnel device");
+> +MODULE_LICENSE("GPL");
+> +MODULE_ALIAS_RTNL_LINK("srl2");
+
 
