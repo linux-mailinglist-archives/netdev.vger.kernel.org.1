@@ -1,154 +1,225 @@
-Return-Path: <netdev+bounces-272082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272083-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qNShHWQ6xWn/8AQAu9opvQ
-	(envelope-from <netdev+bounces-272082-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:53:40 +0100
+	id WKwfHdU9xWn88gQAu9opvQ
+	(envelope-from <netdev+bounces-272083-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:08:21 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35410336531
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:53:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FF7B3368B7
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:08:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3224F3063A8A
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:51:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 460B430B3CC9
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:01:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2453531AA94;
-	Thu, 26 Mar 2026 13:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A6F2F12B3;
+	Thu, 26 Mar 2026 14:01:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oJmAg929"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PlsL8dNK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A765631065B;
-	Thu, 26 Mar 2026 13:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774533071; cv=none; b=Z7jA9nIqRstjAyjg/wcITMnWQLFsWZoVWuO2JpUda9HGbbPjAWXugjerh72Sjmq2CyOcbEOKgF/aXilVbUthTeJCBjXGGL46cfdubdNgmJpXwaIKefFEuHPUSWMWEHFt9nSyvHVcx3q7QbMavonSBpiY9//n5i2D1wkiyN810FE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774533071; c=relaxed/simple;
-	bh=jiLVEzDzHDZPGnoP7mb55lkJ+Rbb62sBUfVjghFNLAI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Of2gtYzShcKMNSij0K6aSMSY/v3gV5V5dtkw1uoNZjTzJRKh1kCixCQqiMyxySPDPygC1nupUyzVkd7bLY0Mi+O80ZRtQmU2RdAZNroW7uYP1r8N4RmymfOTmGVzbltzIttLTM55aQ8MTtDT+FOXBY9dZJsneO6IxMpmCfuT3HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oJmAg929; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDB5DC116C6;
-	Thu, 26 Mar 2026 13:51:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774533071;
-	bh=jiLVEzDzHDZPGnoP7mb55lkJ+Rbb62sBUfVjghFNLAI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=oJmAg929t3GqARJ4rsvGsDFw8nqSJxZqbL/2QYWMovj7D5YtrNXrYjB5NO15M/oSg
-	 MHg9m+2NPoAYDG93iCbGYP7DVjYc4vOXyWjOgclaa+EgD+sG1O/NUC/IkZvadKzKjH
-	 ZCSsMpaJ+0rrM2x5FDYPvFkm20PK4kzJf0fT5Bmo17MUvZKo470zSpuiX4kw07SAaK
-	 KLpzeqn7DPm0qlGCtWRsWbBMkHn4+YvUyMVmiGSNd+gyEzYqkfpk0bavIf/+ep3+gi
-	 tC48clC8t7iWra+MstVqdqEs8VmpfkAl/wfa+qdZFJlTxYNpO8GaB0igd9O5Kys5Ds
-	 6ZbX4d68fGwRw==
-From: Chuck Lever <cel@kernel.org>
-Date: Thu, 26 Mar 2026 09:50:51 -0400
-Subject: [PATCH net-next v6 6/6] tls: Flush backlog before waiting for a
- new record
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 452E8309EE7
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 14:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774533711; cv=pass; b=qeG5Zr/aSLQPysZZSVgigJIL1TE+mzfzM2Femfsr7q7UnnH1bhaNiHHXQUXdG4QbpHVdj5T5mLECoChcmeatLmPw77j6ihQbjLimD8LRbVWfM/ZDtdTCByXPxkqvbN42Oe5T8hy2JyIDU1QEYOFgM6ZPJrvDXxWrISiQ09amFrM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774533711; c=relaxed/simple;
+	bh=1mCWJ6GmgyrWdrBzqF7RYvjEZZMj6tQLN0C0SoLxPdw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RM8Jc5Sb4e33q0VNy0KUrEZer8sEWXbQtDth+hkCAWmoZfSf8cqiE57KwLLkyYuYkLj0eHEO3dktPj7Go5PfivXhLu1mPF3rCeWOpy4ZgaMshqIpjqv/H9LJIY74xlt/NU91aCB+JUlHwNJFV+G8aZpWVForeuvsuEwQmeutzlk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PlsL8dNK; arc=pass smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-464bc03efd8so537142b6e.2
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 07:01:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774533709; cv=none;
+        d=google.com; s=arc-20240605;
+        b=GBqX2VpkROf/eun07nGg0QxuoVAyou12rpB3pGmcybqRrzTz3Ug9gQm45s4wDIL9p0
+         nRZkSlFcLu4RYW/LVlq22JPLvCO67bQ8mq6WS/Mdc0egZFXoCLGAulqfBHBkF9N4rNkg
+         hIq/Kn4rIAyA859d9E5Yq7foKqYDrgaIRfmE05qGDGaExxQ599eXv1zGPyJxqetRJnB8
+         xXTWQXVxSIDosrQgjF58/T6ST1CV44gNgavL9lb5pzOby56uJeB4qXqc0Wm3boRju5Ft
+         u6ENzSyfVNVOd/m1daQ/NVvX8PB52fM3pg544XkQyB3zhi8oPAPxoXb1z3iTiaK6/M1F
+         +dlQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=wQeZU/Ln24Gl12sg/XRCOP5LERM0uhGV9FWQ6YSt9CM=;
+        fh=buZMbO1W+8GJEqkRpKgb6QHaFwShUc+UltRPfok3Y1w=;
+        b=B/O7xDuJsHKbiqfxLTj4gN2sCyjIs05QBfMe19GQi4hXI0rYm/cbRHFayrXqBcrnX6
+         jrnlsThMNDtxrBXxFBON3Yi/kb3uu69xPcRPwtA5XLStRL1L5xmzHSfM217tbgbQusVs
+         lj52uuxDWAxM/CLVs3jAJwQrxZ8R37BXGWfpynJBx+3mpoOZKpZjREkiHnhExfNx6cNJ
+         gYvsMVPhokoTFQuViWlGuGdvgU53/oWBVfWZHAqnr8n8SaAjkfHDiXLI1wpMjUmJiN4i
+         gXW0Eo/cc5+6DN0vgOoO3XuwmJIPR9rAWoMNVD4N8rltVscutHBhm7xOpJEjrYE7u3Ds
+         rDKQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774533709; x=1775138509; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wQeZU/Ln24Gl12sg/XRCOP5LERM0uhGV9FWQ6YSt9CM=;
+        b=PlsL8dNKfzh9WivLqLooLvLPNl6M8YVOJDjRoNTmVyMf71fQgd4wshXS0hVIEuQVZH
+         qwdmdtftfGVg7uPhkdYnWwlNSH76AsBofXEWxBi5ORxgh79Us0mkm0Kavj7Bu1zF24hf
+         hwOoMzYs3OMLEtGFpc3vgmzmCiJYUiSMghxHNXFlAIwzzjlAUulf63M8j7YfQXxdb1xy
+         X1cfNJqw3Wp/ZE3oLPGmzM/kKynTwfvNOIn7ATfJFLQyTzOcMfSQVmilhwBGX2sejwc2
+         hc3okh5V4VsxvRWyVEojwQrWXBDh0b9bNZuIn4U52fm7p1CVL9mxB4IceNaDDNz8R1DX
+         SXOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774533709; x=1775138509;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=wQeZU/Ln24Gl12sg/XRCOP5LERM0uhGV9FWQ6YSt9CM=;
+        b=U9PCwgSIKj8pGPD4KqX3T2p1YfKQKnxutdq/ZZPoM/hXbMH0ayoZvufMrjUdFXfw4u
+         VipRdrdOm7v43dSZBo5emyyEG8SEChnt4OEm5frvL187EzJg+vyHZ4XoWUlc8FBf3rtY
+         x3+iYNYBppNzocZ5wphoL+CqYi3yMzh3PtPiXzy2dUol1ZWY4qV2FpF711RSv02ghSmb
+         E1+UypEeOTFS3QZNv7xA0KAMC/VgBAHFzpozcnn5UXKeH9QT0w2LbYr0ceik5AtPbWlM
+         X2Zhaz1GwOWKQFgRU5sZcBd4MXpvsCBN5Pn9pidIx/cdxLGcpN5hG5s1Hn+XHuqbEPW1
+         XcjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXc//MdpU+jgqi7ctdoEpFuDj66qZZn1mg5ZDGNCJ7BU+zggH11u5Rw0ZHKR2H07jByOdsw9GM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvbQNKJ09Zpvx8s0pNzYaVBex4olTKQ6gRgQIsDDOzqkt9Ryqk
+	matl30pDX3v4vNd3pIwRJA31B1aWh6RdwDJvO+cr33EKlOx+w1KspKyutqFUhJov1OdPtbxXv7a
+	iJrnabkEm0w2HQQUdxCo+ZNlXmWkKClXyzIlLsbt4
+X-Gm-Gg: ATEYQzw5l3vWnSx+rbfQjGzucR9YO0yrMYqffCMVVY10jZwQl2MofSMSXA9vU5AnT3v
+	ECFDbHUk1+GwWPX2Yv7fMVXBv0VbzMBQmds6b7A4bbbjkr2pzRnhsPxdAjEmAVQltov9yg5+xqb
+	Rmz22FG3n4ZXDHv2goaQX5r2AAgmk+CAt0ZFCCctR8diLunOi4Ybn+RjcESqXzTrTJxOkxyOBfC
+	+QqBL3E89Ct/qzxp8AK9VelYByHbFU8YcIeePewJG1+x90/o/Mh0O++wZdxnbx5zIkdZeg5++5n
+	InIH5mzTvpi0JqFH
+X-Received: by 2002:a05:6808:6715:b0:463:4f2e:c50f with SMTP id
+ 5614622812f47-46a5c60a264mr3482954b6e.24.1774533708193; Thu, 26 Mar 2026
+ 07:01:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260326-tls-read-sock-v6-6-fd887b9e7f06@oracle.com>
-References: <20260326-tls-read-sock-v6-0-fd887b9e7f06@oracle.com>
-In-Reply-To: <20260326-tls-read-sock-v6-0-fd887b9e7f06@oracle.com>
-To: john.fastabend@gmail.com, kuba@kernel.org, sd@queasysnail.net
-Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev, 
- Chuck Lever <chuck.lever@oracle.com>, Hannes Reinecke <hare@suse.de>
-X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1346;
- i=chuck.lever@oracle.com; h=from:subject:message-id;
- bh=zVo2aWZU16cWfzKR5efuUXrBNgjYfftgJHVqojqViVA=;
- b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBpxTnK+zZakvzfptNBnELREwywLEDi04Wpfc3dy
- LEnvCDE+7mJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCacU5ygAKCRAzarMzb2Z/
- l1N3D/40RUfqq5O6VNsoZUQppDf3uPn3aNar3diGLlDuyisCSKGgW8C+8LXRsdPUYWIGnwahRJe
- EnqXmzPscItI3YJT3X/BrlNMpOmrzByt4huQzhcDCMtU6lWMkiMHR5TuiNfYL2QmxQ4xeBYHkb/
- QRrZU6oycsNgglHQ+l7t8Zlkz8yfnDQFcUTq/deikF/jwsm7usgZyeK2XvD5kkek++3HG1eSL9/
- 9LcEy3klfx5kEb8yAfkulN3n+QeVIW9kLyss3liH5HSAHRPpkblDYswd3GpKsi+IrY9emtzh2XW
- Wql502aja8+oD1ny1jMmQ9QWgp6h2WDgb4RM47dGn8U/hkY8jklM/PFUHFsiJKV6PTdyv4YRV3a
- 1KLLwbbOzyI+kNxbsVeZr/YAIUtic0M9qVRDJ7d6LP29QjMDdwlK3IVQiqIr/r1E8pMPs4/Hnt/
- 4ERhEKL94xTQddftPwuC0R5F4Ehb22WLXnFTJ7b/9RRMg16qKG/gm9U6J5h1OJkwo7tndatuxiU
- j/2gRtzLWBRqYe7pMoHHqo0oZjO1LvbEGmSutjMMNGbwEypRR7pD0TOmRpAPJlHPclJ+1tmLg2M
- uOMgQkoXRfUm2Edn7vJfKni89CQMmVMp2UxYA1pvx2oehfdzXozcVOD8R0NEwK1go7SUe8AX8dH
- yBtZVJCZxoxNwAQ==
-X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
- fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+References: <20260326-b4-fib6_metric_set-kmemleak-v1-1-c89fc1b312c0@gmail.com>
+ <CANn89i+SX1Kp7D2JzzEtg-zRkJzi4bdjzc2snvM7npJQzNp0+Q@mail.gmail.com>
+ <acUw8zYwbbpgo8KJ@fedora> <39c100fe-1f6f-46d2-8dd5-cf82320508ff@linux.dev>
+In-Reply-To: <39c100fe-1f6f-46d2-8dd5-cf82320508ff@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 26 Mar 2026 07:01:36 -0700
+X-Gm-Features: AQROBzB-h1a84INWJg1WUHbUag-_QTLSszzHuJ_Wpn9wYIQWW2ViNROKJgE6sQo
+Message-ID: <CANn89i+wuKmY7NNoe+RNPN0XZNHvzTDOyKDSwA3QJZE3BMgVfQ@mail.gmail.com>
+Subject: Re: [PATCH net] ipv6: fix data race in fib6_metric_set() using cmpxchg
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Fei Liu <feliu@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272082-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,queasysnail.net];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272083-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,oracle.com:email,oracle.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,queasysnail.net:email]
-X-Rspamd-Queue-Id: 35410336531
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,linux.dev:email]
+X-Rspamd-Queue-Id: 0FF7B3368B7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Chuck Lever <chuck.lever@oracle.com>
+On Thu, Mar 26, 2026 at 6:44=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linux.de=
+v> wrote:
+>
+>
+> On 3/26/26 9:13 PM, Hangbin Liu wrote:
+> > On Thu, Mar 26, 2026 at 05:05:57AM -0700, Eric Dumazet wrote:
+> >>> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+> >>> index dd26657b6a4a..64de761f40d5 100644
+> >>> --- a/net/ipv6/ip6_fib.c
+> >>> +++ b/net/ipv6/ip6_fib.c
+> >>> @@ -730,14 +730,16 @@ void fib6_metric_set(struct fib6_info *f6i, int=
+ metric, u32 val)
+> >>>          if (!f6i)
+> >>>                  return;
+> >>>
+> >>> -       if (f6i->fib6_metrics =3D=3D &dst_default_metrics) {
+> >>> +       if (READ_ONCE(f6i->fib6_metrics) =3D=3D &dst_default_metrics)=
+ {
+> >>> +               struct dst_metrics *dflt =3D (struct dst_metrics *)&d=
+st_default_metrics;
+> >>>                  struct dst_metrics *p =3D kzalloc_obj(*p, GFP_ATOMIC=
+);
+> >>>
+> >>>                  if (!p)
+> >>>                          return;
+> >>>
+> >>>                  refcount_set(&p->refcnt, 1);
+> >>> -               f6i->fib6_metrics =3D p;
+> >>> +               if (cmpxchg(&f6i->fib6_metrics, dflt, p) !=3D dflt)
+> >>> +                       kfree(p);
+> >>>          }
+> >>>
+> >> The following line should happen before the cmpxchg(),
+> >>   ->metrics[X] accesses also need READ_ONCE()/WRITE_ONCE() annotations=
+.
+> > Hi Eric,
+> >
+> > Jiayuan also suggested to using READ_ONCE()/WRITE_ONCE() for metrics[X]
+> > accesses. But I don't get why this line should happen before the cmpxch=
+g(),
+> > Would you please help explain?
+>
+>
+> I think what Eric means is something like this:
+>
+>
+> ...
+>          struct dst_metrics *p =3D kzalloc_obj(*p, GFP_ATOMIC);
+>
+>          if (!p)
+>              return;
+>
+>          p->metrics[metric - 1] =3D val;
+>          refcount_set(&p->refcnt, 1);
+>          if (cmpxchg(&f6i->fib6_metrics, dflt, p) !=3D dflt)
+>              kfree(p);
+>          else
+>              return;
+>      }
+> }
+>
+> m =3D READ_ONCE(f6i->fib6_metrics);
+> WRITE_ONCE(m->metrics[metric - 1], val);
+>
+>
+> Since p is private data before being published via cmpxchg(), we can
+> safely initialize its metrics beforehand. This way we don't need to
+> worry about concurrent access to f6i->fib6_metrics->metrics[] during
+> initialization. Right?
 
-While lock_sock is held, incoming TCP segments land on
-sk->sk_backlog rather than sk->sk_receive_queue.
-tls_rx_rec_wait() inspects only sk_receive_queue, so
-backlog data remains invisible. For non-blocking callers
-(read_sock, and recvmsg or splice_read with MSG_DONTWAIT)
-this causes a spurious -EAGAIN. For blocking callers it
-forces an unnecessary sleep/wakeup cycle.
+Yes.  Think about RCU (Read Copy Update) rules.
 
-Flush the backlog inside tls_rx_rec_wait() before checking
-sk_receive_queue so the strparser can parse newly-arrived
-segments immediately. On the next loop iteration
-tls_read_flush_backlog() may redundantly flush, but this
-path is cold and the cost is negligible.
+We allocate an object, and populate it, then make sure changes are
+committed, before publishing the new pointer.
 
-Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
----
- net/tls/tls_sw.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 8fb2f2a93846..e15adf250d78 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -1372,6 +1372,8 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
- 		if (ret < 0)
- 			return ret;
- 
-+		if (sk_flush_backlog(sk))
-+			released = true;
- 		if (!skb_queue_empty(&sk->sk_receive_queue)) {
- 			/* Defer notification to the exit point;
- 			 * this thread will consume the record
-
--- 
-2.53.0
-
+Othewise an other cpu could read a 0 metric, while we wanted something else=
+.
 
