@@ -1,122 +1,81 @@
-Return-Path: <netdev+bounces-272266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272267-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MNiTBEmtxWlrAwUAu9opvQ
-	(envelope-from <netdev+bounces-272266-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:03:53 +0100
+	id wDUEOO+wxWlrAwUAu9opvQ
+	(envelope-from <netdev+bounces-272267-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:19:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A4D33C31C
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:03:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B0B933C4AD
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:19:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 646F8303D3AB
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 22:03:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4E74F301F4AC
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 22:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F198E33689B;
-	Thu, 26 Mar 2026 22:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCAD131F988;
+	Thu, 26 Mar 2026 22:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HheJeDSZ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="eiPjsoJz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TR9hJYiw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118EB32A3FF
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 22:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05072FDC2C;
+	Thu, 26 Mar 2026 22:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774562620; cv=none; b=q6kO2o1PP9APlhLwAMoFqYL5lQKLKuzmqbFa1FPiGrFB8Semjo74ZeM/Gc1YNj53dMHo6ZcIweGlHdbAKgVxZdeEHZflWlwMHcpbwfFxt74ATLs0eSMeTxwUhf2d4/L4/DbeTrj7a2GrUu+eyq+K41ikWhe3OfjZMldynzWq03I=
+	t=1774563387; cv=none; b=aQt2CP0DMtc21qyD55Ha3M1MX9bt+FP+hUSfX18YTjr1Ggoeof0Ke8osv4d5RqxScxDmY+I+Vyew09cMYKR7uxXQhybIBEWcWaxzHocG29kx96Tmz4TYU2m3vmv6o2DclXuVhLmyDl3NWOP1La4P3aydcVMjK32ybGDF5WzCSUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774562620; c=relaxed/simple;
-	bh=/0I5PlNTDmo42F78lIX7rXVUcj3Vn1T+pJs/PmebPl4=;
+	s=arc-20240116; t=1774563387; c=relaxed/simple;
+	bh=YOSJL3ZbWWzth1tihGZMzEyUwAdDEdd4LPoVWKuEock=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qmdrHJyjbeN/X8OQQyCDT9gGxMwCu+GjzyF9r4Ka4S0lLh2LJCjtNoOrOOG805R0LgsztoiXRX6PhFVzxxFXdDwYJeHyZrmCst4YcivsNngaczH5bDVoG2B8Bph+RYTEqYSjnDoFjCatQwoz/k7sF0NWzRQ5bpuxCnYbRccYoiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HheJeDSZ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=eiPjsoJz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774562617;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Lpgob1tvHT4IKRz9W+hPWJKbEluQbBFuXgVxhpqe0s0=;
-	b=HheJeDSZXc+D2HUtSd8Ne+tBU418qwkpfwGl5vY29faBCl10gqqdA3rbsG87WwS9Ef50PI
-	5n3ZFahDU6x9KhqFl1x7OASUwTCYsk45NDP7nc2NmJky/1SiBTokdg+a8fxSZH+nnOpX8b
-	0iWFGrTdHIXiyQi47kW6ywaQnJqIhuQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-680-zBCwDhb9P2yScNGSmV8dNA-1; Thu, 26 Mar 2026 18:03:34 -0400
-X-MC-Unique: zBCwDhb9P2yScNGSmV8dNA-1
-X-Mimecast-MFC-AGG-ID: zBCwDhb9P2yScNGSmV8dNA_1774562614
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4852cf0318dso15776615e9.3
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 15:03:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774562613; x=1775167413; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lpgob1tvHT4IKRz9W+hPWJKbEluQbBFuXgVxhpqe0s0=;
-        b=eiPjsoJz10dXgxEAcpTuDqkDtqydJOTYGojrrxbVhxYA0GcO12tv70RlsMbeWavyvs
-         wE7k8Pvrq/4CJagj9Wmt+KO8n1ZGCNNM6LrqoxiweOqf9a+3yyQyw72sU95EmiEN8Oz1
-         WLGHBUBUBZuJJ05cxVdYhZWM89XueTwqnbmLmqhfrlq0JfohgYb2DnlosWotj6YfUrWK
-         TZsMi5I7AYxzQsVi9ug32CUIaeLakfh2U/TKBUvPi8ILfUW1ktDqnvPjTXxDQf4aJXMS
-         oAptCpjHe9/YGN6sMcbKo2+MEqJHB5bhwYOzYaJF75fgffd8NU3kf1oNNYbTrnuAc8bw
-         1FDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774562613; x=1775167413;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Lpgob1tvHT4IKRz9W+hPWJKbEluQbBFuXgVxhpqe0s0=;
-        b=qF7yOj1ge/mqMl8gaKQZh+H1u8x6+qjWefiFAlk9LtDuHDpuyz+6Ejs4jf//GcaIrW
-         pZCM/lJOCXVXnOetEZ0TTlTQ6kttwGXqGO9gAZVW40nLHfaVtxP+fMUrv9weDfpLwwrC
-         eZKvrwF8qmXognLrcQ5BRvFaRwPAUsCURdftWFl78YTDyADZi+wpVGR30HN8XzLoqJ38
-         z0Pq6uV/gNcLmHOH6K3rL7YyA8vMuvnYppyoYmF8+jb8Ph4T8L5mWKUW/gV8uLJ//nht
-         H44ZVgULAvZ1S3y1XrYal9m8/yKG0rsQhBvhnf7GLA405RPKe3xoAAUhOzY1T+fM7ctv
-         bSFw==
-X-Forwarded-Encrypted: i=1; AJvYcCU0PMPA6Sa+//LMtqsCda9+QmlFf89OOC0SwF2kW1NNoznjxukMQuh4SsFOOHSXzl48CO2Aj4c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZ1eqouj/J9eVqwdgPd5z81r0+OkK4O9sQ7OjS1+2c/mhtI05d
-	1EhhnHLBxDucQMvzYWtTX7c6/yaX65ObXSK4b5ZaaGUKKnnSSpJISv6DFtxwRXYNtGQ0S2qy5gi
-	TUv1CnmKTIyC2cTX86jdTzdswPdjybT3H4vjBg0vzj+M8rwb7vsTqQhPpvg==
-X-Gm-Gg: ATEYQzxhBtdCPx3fPaFaM5c3OcQ8vRERpfCEMgC811nQU3X3pPEUrZcrj2eAtr8NTub
-	X0VCWcNPFdU45gf2bUTSjRBSharYnPlEIU6FDr1kYIXXIZ1wnmaBrV5DwfgpDpkDS2lhBqQzM+y
-	SFNyrAshBYPved6yBaL6hdFBzesZVAUA8H0dUIRMnOIxbPpOuKtj200QuzA0nSifqYfYU/9dlQV
-	c6dgjDMBk4RBcP0BM4j0q3x4haOxXuSMRBhNHHLCX5kCB7uS5e8vcyNE0mURvxC1/Bh7jzOS3ko
-	uBUJvzBDFswMCI+yKwANMEuRMgbtx3AvcT+PVT25LdC0xWaYwBilNOEkY6afsxE4+lMflNo0BkT
-	HgKGenyZk9b9tq+4b
-X-Received: by 2002:a05:600c:3d87:b0:487:1114:d42f with SMTP id 5b1f17b1804b1-48727d59da0mr4643895e9.1.1774562613602;
-        Thu, 26 Mar 2026 15:03:33 -0700 (PDT)
-X-Received: by 2002:a05:600c:3d87:b0:487:1114:d42f with SMTP id 5b1f17b1804b1-48727d59da0mr4643465e9.1.1774562613107;
-        Thu, 26 Mar 2026 15:03:33 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1525:da00:3ac2:1a22:72ff:4256])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48722c9f58fsm90811505e9.11.2026.03.26.15.03.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 15:03:32 -0700 (PDT)
-Date: Thu, 26 Mar 2026 18:03:28 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Simon Horman <horms@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Omar Elghoul <oelghoul@linux.ibm.com>,
-	Srikanth Aithal <sraithal@amd.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Vishwanath Seshagiri <vishs@meta.com>, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next] virtio_net: sync RX buffer before reading the
- header
-Message-ID: <20260326180313-mutt-send-email-mst@kernel.org>
-References: <f4caa9be9e5addae7851c012cab0a733be7f0974.1774365273.git.mst@redhat.com>
- <20260326181736.GV111839@horms.kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MYV6Wd6/BgFZZx81rXUlEkYQTcsBe4c+phTqsRTBIpvSiE1Gc1S7JOWnAx/zkvq2O8Cw3U70Y8HU5cybKfBTmhEJrcmWWplL2xpIwRY6A73tyKcKVORTEbJDJzUrVGHt6IQuDT9VKnh6/cHTMF9F7weuMU3ryca2iR1HOGSlCtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TR9hJYiw; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774563386; x=1806099386;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YOSJL3ZbWWzth1tihGZMzEyUwAdDEdd4LPoVWKuEock=;
+  b=TR9hJYiwM6hcRK/s6CJmNHC9jmtQOhjLhv0xjftcQyq7gIEa35IbuxQZ
+   TaETFecGF85NZVO0j3ApgSGQggDf5Ty3vyhs/VDYdOwGInkn+edkgsGQD
+   pUQ/frcRaQjGMDZZ24RAZxzJoMDa/U1hC+U0YA6blHhUIwD89KVP1vWy+
+   a490LiZqkkD4HixXnw3XQI5gDOSTxJMJmt/aKrCZcYVSKMCXAbSJFt7M5
+   UPSQjanoFF0adfDe4i0Er8Attj1EJz5EW6HsY1FX8Ceu0HGddXz3QE4e/
+   FFEVz84hOlf0BHDq7GN7KrbJOwyvg18sS5oKbtPy3GZgrzwHcp0p+eW/V
+   A==;
+X-CSE-ConnectionGUID: IQeULMkMQ0S8oLcp0WO65w==
+X-CSE-MsgGUID: V/A7zVldT6OML1k56ZTv1Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11741"; a="75749407"
+X-IronPort-AV: E=Sophos;i="6.23,142,1770624000"; 
+   d="scan'208";a="75749407"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2026 15:16:25 -0700
+X-CSE-ConnectionGUID: Dip07NFMROe6r/pQ9wVM7w==
+X-CSE-MsgGUID: LRo6rxZ5QYKkYzaB4fTlFA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,142,1770624000"; 
+   d="scan'208";a="225389378"
+Received: from lkp-server01.sh.intel.com (HELO 3905d212be1b) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 26 Mar 2026 15:16:21 -0700
+Received: from kbuild by 3905d212be1b with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w5szy-000000009Qn-2XtG;
+	Thu, 26 Mar 2026 22:16:18 +0000
+Date: Fri, 27 Mar 2026 06:16:04 +0800
+From: kernel test robot <lkp@intel.com>
+To: luka.gejak@linux.dev, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, horms@kernel.org,
+	fmaurer@redhat.com, liuhangbin@gmail.com,
+	linux-kernel@vger.kernel.org, Luka Gejak <luka.gejak@linux.dev>
+Subject: Re: [PATCH net-next v1 2/7] net: hsr: replace fallthrough comments
+ with fallthrough macro
+Message-ID: <202603270658.FJCTgZee-lkp@intel.com>
+References: <20260324144630.189094-3-luka.gejak@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -125,74 +84,221 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260326181736.GV111839@horms.kernel.org>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_RHS_MATCH_TO(1.00)[];
+In-Reply-To: <20260324144630.189094-3-luka.gejak@linux.dev>
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,linux.ibm.com,amd.com,redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,meta.com,lists.linux.dev];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272266-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-272267-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.linux.dev,kernel.org,redhat.com,gmail.com,vger.kernel.org,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:email]
-X-Rspamd-Queue-Id: C4A4D33C31C
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: 6B0B933C4AD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 06:17:36PM +0000, Simon Horman wrote:
-> On Tue, Mar 24, 2026 at 11:15:54AM -0400, Michael S. Tsirkin wrote:
-> > receive_buf() reads the virtio header through buf before
-> > page_pool_dma_sync_for_cpu() runs in receive_small() or
-> > receive_mergeable(). The header buffer is thus unsynchronized at the
-> > point where flags and, for mergeable buffers, num_buffers are consumed.
-> > 
-> > Omar Elghoul reported that on s390x Secure Execution this showed up as
-> > greatly reduced virtio-net performance together with "bad gso" and
-> > "bad csum" messages in dmesg. This is because with SE sync actually
-> > copies data, so the header is uninitialized.
-> > 
-> > Move the sync into receive_buf() so the
-> > header is synchronized before any access through buf.
-> > 
-> > Tool use: Cursor with GPT-5.4 drafted the initial code move from prompt:
-> > "in drivers/net/virtio_net.c, move page_pool_dma_sync_for_cpu on receive
-> > path to before memory is accessed through buf".
-> > The result and the commit log were reviewed and edited manually.
-> > 
-> > Fixes: 168b61da6871 ("virtio_net: add page_pool support for buffer allocation")
-> 
-> Hi Michael,
-> 
-> The hash for a patch with that subject in net-next appears to be 24fbd3967f3f.
+Hi,
 
-Thanks, will fix in the next version.
+kernel test robot noticed the following build errors:
 
-> > Reported-by: Omar Elghoul <oelghoul@linux.ibm.com>
-> > Tested-by: Srikanth Aithal <sraithal@amd.com>
-> > Tested-by: Omar Elghoul <oelghoul@linux.ibm.com>
-> > Link: https://lore.kernel.org/r/20260323150136.14452-1-oelghoul@linux.ibm.com
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> ...
+[auto build test ERROR on net-next/main]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/luka-gejak-linux-dev/net-hsr-constify-hsr_ops-and-prp_ops-protocol-operation-structures/20260326-143638
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260324144630.189094-3-luka.gejak%40linux.dev
+patch subject: [PATCH net-next v1 2/7] net: hsr: replace fallthrough comments with fallthrough macro
+config: i386-randconfig-001-20260327 (https://download.01.org/0day-ci/archive/20260327/202603270658.FJCTgZee-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260327/202603270658.FJCTgZee-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603270658.FJCTgZee-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> net/hsr/hsr_netlink.c:436:2: error: fallthrough annotation is outside switch statement
+     436 |         fallthrough;
+         |         ^
+   include/linux/compiler_attributes.h:214:56: note: expanded from macro 'fallthrough'
+     214 | # define fallthrough                    __attribute__((__fallthrough__))
+         |                                                        ^
+   net/hsr/hsr_netlink.c:527:2: error: fallthrough annotation is outside switch statement
+     527 |         fallthrough;
+         |         ^
+   include/linux/compiler_attributes.h:214:56: note: expanded from macro 'fallthrough'
+     214 | # define fallthrough                    __attribute__((__fallthrough__))
+         |                                                        ^
+   2 errors generated.
+
+
+vim +436 net/hsr/hsr_netlink.c
+
+   300	
+   301	/* HSR_C_GET_NODE_STATUS lets userspace query the internal HSR node table
+   302	 * about the status of a specific node in the network, defined by its MAC
+   303	 * address.
+   304	 *
+   305	 * Input: hsr ifindex, node mac address
+   306	 * Output: hsr ifindex, node mac address (copied from request),
+   307	 *	   age of latest frame from node over slave 1, slave 2 [ms]
+   308	 */
+   309	static int hsr_get_node_status(struct sk_buff *skb_in, struct genl_info *info)
+   310	{
+   311		/* For receiving */
+   312		struct nlattr *na;
+   313		struct net_device *hsr_dev;
+   314	
+   315		/* For sending */
+   316		struct sk_buff *skb_out;
+   317		void *msg_head;
+   318		struct hsr_priv *hsr;
+   319		struct hsr_port *port;
+   320		unsigned char hsr_node_addr_b[ETH_ALEN];
+   321		int hsr_node_if1_age;
+   322		u16 hsr_node_if1_seq;
+   323		int hsr_node_if2_age;
+   324		u16 hsr_node_if2_seq;
+   325		int addr_b_ifindex;
+   326		int res;
+   327	
+   328		if (!info)
+   329			goto invalid;
+   330	
+   331		na = info->attrs[HSR_A_IFINDEX];
+   332		if (!na)
+   333			goto invalid;
+   334		na = info->attrs[HSR_A_NODE_ADDR];
+   335		if (!na)
+   336			goto invalid;
+   337	
+   338		rcu_read_lock();
+   339		hsr_dev = dev_get_by_index_rcu(genl_info_net(info),
+   340					       nla_get_u32(info->attrs[HSR_A_IFINDEX]));
+   341		if (!hsr_dev)
+   342			goto rcu_unlock;
+   343		if (!is_hsr_master(hsr_dev))
+   344			goto rcu_unlock;
+   345	
+   346		/* Send reply */
+   347		skb_out = genlmsg_new(NLMSG_GOODSIZE, GFP_ATOMIC);
+   348		if (!skb_out) {
+   349			res = -ENOMEM;
+   350			goto fail;
+   351		}
+   352	
+   353		msg_head = genlmsg_put(skb_out, NETLINK_CB(skb_in).portid,
+   354				       info->snd_seq, &hsr_genl_family, 0,
+   355				       HSR_C_SET_NODE_STATUS);
+   356		if (!msg_head) {
+   357			res = -ENOMEM;
+   358			goto nla_put_failure;
+   359		}
+   360	
+   361		res = nla_put_u32(skb_out, HSR_A_IFINDEX, hsr_dev->ifindex);
+   362		if (res < 0)
+   363			goto nla_put_failure;
+   364	
+   365		hsr = netdev_priv(hsr_dev);
+   366		res = hsr_get_node_data(hsr,
+   367					(unsigned char *)
+   368					nla_data(info->attrs[HSR_A_NODE_ADDR]),
+   369						 hsr_node_addr_b,
+   370						 &addr_b_ifindex,
+   371						 &hsr_node_if1_age,
+   372						 &hsr_node_if1_seq,
+   373						 &hsr_node_if2_age,
+   374						 &hsr_node_if2_seq);
+   375		if (res < 0)
+   376			goto nla_put_failure;
+   377	
+   378		res = nla_put(skb_out, HSR_A_NODE_ADDR, ETH_ALEN,
+   379			      nla_data(info->attrs[HSR_A_NODE_ADDR]));
+   380		if (res < 0)
+   381			goto nla_put_failure;
+   382	
+   383		if (addr_b_ifindex > -1) {
+   384			res = nla_put(skb_out, HSR_A_NODE_ADDR_B, ETH_ALEN,
+   385				      hsr_node_addr_b);
+   386			if (res < 0)
+   387				goto nla_put_failure;
+   388	
+   389			res = nla_put_u32(skb_out, HSR_A_ADDR_B_IFINDEX,
+   390					  addr_b_ifindex);
+   391			if (res < 0)
+   392				goto nla_put_failure;
+   393		}
+   394	
+   395		res = nla_put_u32(skb_out, HSR_A_IF1_AGE, hsr_node_if1_age);
+   396		if (res < 0)
+   397			goto nla_put_failure;
+   398		res = nla_put_u16(skb_out, HSR_A_IF1_SEQ, hsr_node_if1_seq);
+   399		if (res < 0)
+   400			goto nla_put_failure;
+   401		port = hsr_port_get_hsr(hsr, HSR_PT_SLAVE_A);
+   402		if (port)
+   403			res = nla_put_u32(skb_out, HSR_A_IF1_IFINDEX,
+   404					  port->dev->ifindex);
+   405		if (res < 0)
+   406			goto nla_put_failure;
+   407	
+   408		res = nla_put_u32(skb_out, HSR_A_IF2_AGE, hsr_node_if2_age);
+   409		if (res < 0)
+   410			goto nla_put_failure;
+   411		res = nla_put_u16(skb_out, HSR_A_IF2_SEQ, hsr_node_if2_seq);
+   412		if (res < 0)
+   413			goto nla_put_failure;
+   414		port = hsr_port_get_hsr(hsr, HSR_PT_SLAVE_B);
+   415		if (port)
+   416			res = nla_put_u32(skb_out, HSR_A_IF2_IFINDEX,
+   417					  port->dev->ifindex);
+   418		if (res < 0)
+   419			goto nla_put_failure;
+   420	
+   421		rcu_read_unlock();
+   422	
+   423		genlmsg_end(skb_out, msg_head);
+   424		genlmsg_unicast(genl_info_net(info), skb_out, info->snd_portid);
+   425	
+   426		return 0;
+   427	
+   428	rcu_unlock:
+   429		rcu_read_unlock();
+   430	invalid:
+   431		netlink_ack(skb_in, nlmsg_hdr(skb_in), -EINVAL, NULL);
+   432		return 0;
+   433	
+   434	nla_put_failure:
+   435		kfree_skb(skb_out);
+ > 436		fallthrough;
+   437	
+   438	fail:
+   439		rcu_read_unlock();
+   440		return res;
+   441	}
+   442	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
