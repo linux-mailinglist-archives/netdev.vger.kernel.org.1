@@ -1,131 +1,149 @@
-Return-Path: <netdev+bounces-272180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272178-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4ML4GEl0xWnw+QQAu9opvQ
-	(envelope-from <netdev+bounces-272180-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:00:41 +0100
+	id ePBFEDZ0xWnw+QQAu9opvQ
+	(envelope-from <netdev+bounces-272178-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:00:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBA15339B3C
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:00:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF376339B25
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:00:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F0EC930EE4BC
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:46:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2A03230BDFA1
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74FF38F64E;
-	Thu, 26 Mar 2026 17:46:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BA90351C06;
+	Thu, 26 Mar 2026 17:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mwtKWOOI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SlpkwBfJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1B235E923
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 17:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD9F280330;
+	Thu, 26 Mar 2026 17:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774547194; cv=none; b=Tj4d1o7WForcVfbiSkMzhrkEakOb8WeaRSD3BgV1GxivHAe/8cs/+NWXqyVgFNsygh4fEzl0wCb0x5oz32U5188QdNyQTGmuzQKu8rUsG2Tl6khHkSVPcrGx0SMADODuVP3IOSjLm7hF0rK+hfpY1gtHH/2B/V892sMPiFVeb/M=
+	t=1774547188; cv=none; b=d6iD4GcSEouB51LUxsQdaX6ycsBxvTN6YXh+/Iu7eZDGszE0Bi5vHwLrOMEMYW2elNJDyHkhaupFvDzOJK/4otp9oVZ0KJs3l3ak2oXdnQo0R3OA10LTAWoWz0HOlF770hD67dnC6+fpQlffZhBbAu0s48XfJSdGl6f4isGIERs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774547194; c=relaxed/simple;
-	bh=j+f3uClfjMHsdo332pJtQTIhUZDYivfEjSJPDjJCbgA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nWFURv3Ry+0se56W79k1Jns0SY4D2pGm1xnDQN+Y9d/eSAO3BiEGkRC+ewOUVz40XogGkurfbv0GAXWYnrP8ugZiqOwwgviCDHUGpxeZq2KpuHiFBt83PYgxRywVabxteqO+0OFoCYFtD645zY7MOlxkjew98yIA9LZsy/X9OG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mwtKWOOI; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774547188;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KzyxAYRyx/x/x8wyor+HCtuz83L/riqOOKLGxAKi7fs=;
-	b=mwtKWOOIPEcjFjkeaXeJBYUrdQdNGSYE6T/gZ49TXy9YmdCfmoSnYj87ziKMAGjxn6HhoE
-	VrU9qdjgSR1GC3nRX9mEW6JXxmrqgCff7sdywyLbLui5hwr+PYmrWMKoqsXgYDMIIMZcj0
-	sFCsPTobsWs6uNPl1BpGekFEfwnbDUc=
-From: luka.gejak@linux.dev
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Cc: horms@kernel.org,
-	fmaurer@redhat.com,
-	liuhangbin@gmail.com,
-	linux-kernel@vger.kernel.org,
-	luka.gejak@linux.dev
-Subject: [PATCH net-next v2 2/2] net: hsr: use __func__ instead of hardcoded function name
-Date: Thu, 26 Mar 2026 18:46:00 +0100
-Message-ID: <20260326174600.136232-3-luka.gejak@linux.dev>
-In-Reply-To: <20260326174600.136232-1-luka.gejak@linux.dev>
-References: <20260326174600.136232-1-luka.gejak@linux.dev>
+	s=arc-20240116; t=1774547188; c=relaxed/simple;
+	bh=xjm4GKUt6/7LWYUwaSbsNRs8Q/I9UKOobgqP/owDPhg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DmDvDca3D/PDPgstz6fzdOJxzpeCXWoCZWW1Qwi1pUZhBDjUoHPdxW6yYgfrGmrAxxoV7GVskJ9Toeu5aYu/vtq4GZnjsDYgiqJ0DCU7xiA8n0Z516BreExuW2jq318bWOWUVUqBohMIBBA04oXutBSeGSH2A63M5OU0s2xuKn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SlpkwBfJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51C0BC116C6;
+	Thu, 26 Mar 2026 17:46:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774547188;
+	bh=xjm4GKUt6/7LWYUwaSbsNRs8Q/I9UKOobgqP/owDPhg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SlpkwBfJwmRh2sDnUjKpV5AdmQxZ+CR+lA+1ReSGMukQWhfFf1AQucAcZ0QWkGFVf
+	 GmTSe8MXsSRmcCtejYX/qcMlZIiWCuwv5V7pO03ntbWg715XYcQmyL1NQyGdfQUwcZ
+	 kD0mtB/UvSaJTuu1d3lQXrzNHiMvHBYQaLFAh2v687ZJxN+02RifoKkRwXv7YUY4aH
+	 yZFpbnvi6RPKjBz9sNGXISjZ+EB3r75t67oKjhjc3HwRoitGRVZ+t92YVaBqW2kJKt
+	 nTIjyiYvfHboyk2M0FVjHXouhudhmlWCbPIy6mC9L6JqbzJ7Uu/Pln/yw6yV/v6kNx
+	 LCKcHzHAap7ug==
+Date: Thu, 26 Mar 2026 17:46:23 +0000
+From: Simon Horman <horms@kernel.org>
+To: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] qed: fcoe: limit command queue array fill to the ramrod
+ array size
+Message-ID: <20260326174623.GS111839@horms.kernel.org>
+References: <20260324105647.92763-1-pengpeng@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260324105647.92763-1-pengpeng@iscas.ac.cn>
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,gmail.com,vger.kernel.org,linux.dev];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	TAGGED_FROM(0.00)[bounces-272180-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272178-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luka.gejak@linux.dev,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CBA15339B3C
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,iscas.ac.cn:email]
+X-Rspamd-Queue-Id: AF376339B25
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Luka Gejak <luka.gejak@linux.dev>
+On Tue, Mar 24, 2026 at 06:56:47PM +0800, Pengpeng Hou wrote:
+> qed_sp_fcoe_func_start() validates fcoe_pf_params->num_cqs against the
+> number of command queues exposed by the hardware resource table, but it
+> then uses that count to fill q_params.cq_cmdq_sb_num_arr[] in the FCoE
+> init ramrod. That array is fixed at SCSI_MAX_NUM_OF_CMDQS entries.
+> 
+> The in-tree qedf caller derives num_cqs from the device's reported
+> num_cqs and the online CPU count, so current-tree callers can request
+> more queues than fit in the fixed ramrod array on sufficiently large
+> systems even though the existing hardware-resource check passes.
+> 
+> Reject queue counts that exceed the command queue array capacity before
+> filling the ramrod.
+> 
+> Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+> ---
+>  drivers/net/ethernet/qlogic/qed/qed_fcoe.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/qlogic/qed/qed_fcoe.c b/drivers/net/ethernet/qlogic/qed/qed_fcoe.c
+> index 2ae3639d6cf7..5fbf78f6adca 100644
+> --- a/drivers/net/ethernet/qlogic/qed/qed_fcoe.c
+> +++ b/drivers/net/ethernet/qlogic/qed/qed_fcoe.c
+> @@ -126,6 +126,15 @@ qed_sp_fcoe_func_start(struct qed_hwfn *p_hwfn,
+>  		goto err;
+>  	}
+>  
 
-Replace the hardcoded string "hsr_get_untagged_frame" with the
-standard __func__ macro in netdev_warn_once() call to make the code
-more robust to refactoring.
+Hi,
 
-Signed-off-by: Luka Gejak <luka.gejak@linux.dev>
----
- net/hsr/hsr_forward.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The code immediately above checks fcoe_pf_params->num_cqs
+against p_hwfn->hw_info.feat_num[QED_FCOE_CQ], which I assume
+is derived from hardware.
 
-diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-index aefc9b6936ba..0aca859c88cb 100644
---- a/net/hsr/hsr_forward.c
-+++ b/net/hsr/hsr_forward.c
-@@ -184,7 +184,7 @@ struct sk_buff *hsr_get_untagged_frame(struct hsr_frame_info *frame,
- 				create_stripped_skb_hsr(frame->skb_hsr, frame);
- 		else
- 			netdev_warn_once(port->dev,
--					 "Unexpected frame received in hsr_get_untagged_frame()\n");
-+					 "Unexpected frame received in %s()\n", __func__);
- 
- 		if (!frame->skb_std)
- 			return NULL;
--- 
-2.53.0
+Is that sufficient to avoid the OOB access you describe?
 
+> +	if (fcoe_pf_params->num_cqs > ARRAY_SIZE(p_data->q_params.cq_cmdq_sb_num_arr)) {
+> +		DP_ERR(p_hwfn,
+> +		       "Cannot fit %u queues in %zu command queue slots. Aborting function start\n",
+> +		       fcoe_pf_params->num_cqs,
+> +		       ARRAY_SIZE(p_data->q_params.cq_cmdq_sb_num_arr));
+> +		rc = -EINVAL;
+> +		goto err;
+> +	}
+> +
+>  	p_data->mtu = cpu_to_le16(fcoe_pf_params->mtu);
+>  	tmp = cpu_to_le16(fcoe_pf_params->sq_num_pbl_pages);
+>  	p_data->sq_num_pages_in_pbl = tmp;
+> -- 
+> 2.50.1 (Apple Git-155)
+> 
 
