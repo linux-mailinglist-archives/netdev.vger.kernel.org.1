@@ -1,200 +1,228 @@
-Return-Path: <netdev+bounces-271789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271790-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yO5jDUiHxGl50AQAu9opvQ
-	(envelope-from <netdev+bounces-271789-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 02:09:28 +0100
+	id ODi7Cw2NxGlr0QQAu9opvQ
+	(envelope-from <netdev+bounces-271790-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 02:34:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 889EC32DC48
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 02:09:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFE5432DF2D
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 02:34:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 29AB13035249
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 01:08:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5C25530474C2
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 01:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D2430C61B;
-	Thu, 26 Mar 2026 01:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B872637B012;
+	Thu, 26 Mar 2026 01:28:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3k+TjSE4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MLfhqhkz"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553DE2F6565;
-	Thu, 26 Mar 2026 01:08:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82FBAF4F1;
+	Thu, 26 Mar 2026 01:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774487329; cv=none; b=Xu5ixHmGqsn203IT4tIoTaKN4vE/KxJCYHO7B/obcPvaGp0/YxlxRThmum5ELWSUmTxLIzFzoktrpHFtqpxuPASz/8TqsXluduA95sliV6+5eNa2RJlSWGmZwOsDEAgEWp+RjYPvqFe1G+/xf3f9eeu9Y82+ebx3LN7e5LBUdw4=
+	t=1774488531; cv=none; b=PfZcJtRbXoGVAEVhBuPV/c8amRd0+d9nPDDbcTRhcSRkSlozRgxI4LJvZx1N/VrC80RHM3LZ/ocKuQPJV2arhQoYk01jYtCCA0qkqOho9eL/k0wiHSDMoc/DEqUrWTYJt3YsffIBxctROBTU7nowukEM4Y3mghA7t7ve9zuE9P4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774487329; c=relaxed/simple;
-	bh=4uecKRHDBhbz6GMEPeOcd+SqBF5xnJKMd0h9nwTDfzc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BWJgV14UBUG0dy8VgshPnNDlcBBLIOX3jlOGml4zxUZJn7VIGUWpm8YvGOwYpeMCuZeuC0sH/vb4SHlpi83fx5+xFqwEh3Jm863+LfCyi1HRbRyTUC+bejz9qXO7dQ/IwpHAXwpEO79TZ3m87sdomsHxmTqUpbl9BpGSFasM7u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3k+TjSE4; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=HZk9cX6zPb++VDwxFCjztWsZ6cPWXsFQhOd6PIpC+jg=; b=3k+TjSE4T5siYJvmjf+q67z7Bo
-	blgq/01N77awBnx7m8dxKS+XWCjvcdDITItvnD/oPHPgdpnl/fYTwqn9SZnLpumvD+4pQ9MuXPyJz
-	LLcgWn8WmSKGBEQCaDnMeONlaYVoPwlRLHNuJiDEDQk8r41BKPWSIExdHBN5qyXIf2iA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w5ZD0-00DNsG-6i; Thu, 26 Mar 2026 02:08:26 +0100
-Date: Thu, 26 Mar 2026 02:08:26 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Chen-Yu Tsai <wens@kernel.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Shawn Guo <shawnguo@kernel.org>, Fabio Estevam <festevam@gmail.com>,
-	Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Radu Rendec <rrendec@redhat.com>, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Drew Fustini <dfustini@tenstorrent.com>,
-	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org,
-	linux-mips@vger.kernel.org, imx@lists.linux.dev,
-	linux-renesas-soc@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, sophgo@lists.linux.dev,
-	linux-riscv@lists.infradead.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH net-next v9 2/6] net: stmmac: qcom-ethqos: use generic
- device properties
-Message-ID: <409265d8-532a-44d4-abc6-02ac5a19d286@lunn.ch>
-References: <20260316-qcom-sa8255p-emac-v9-0-c58934e76ff2@oss.qualcomm.com>
- <20260316-qcom-sa8255p-emac-v9-2-c58934e76ff2@oss.qualcomm.com>
+	s=arc-20240116; t=1774488531; c=relaxed/simple;
+	bh=0Cq7OMqDyz29Hy/YQIvOOTgh39yp/jjxAwDycnlq/O0=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=WUy6Adt/wTSA2KclWJzTRK3DBM6NvXfdRYO9O51OS3uJiN2S7VmuEBVqfV8fJKFB2cSIbxPioovUs2hkuyPWfq91a2RmVbTK4c8EEq1oxtWUObO/STRlK9n4A+qNfMA5NFkC4CyQ1uy1srPr8fUy2zIJnxggaM3wMmZZPJef4YM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MLfhqhkz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3592AC4CEF7;
+	Thu, 26 Mar 2026 01:28:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774488531;
+	bh=0Cq7OMqDyz29Hy/YQIvOOTgh39yp/jjxAwDycnlq/O0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MLfhqhkzsxa7tc0jHzhytzV6qchl81dHU9KAPgpYRYmOHYLzk4wblKHPtqEHyv28p
+	 Q/b1ZGVBAKVMA2DtsWIH4xs0i1VJ2p7crVWlc/njQGIq3j2rxJcz4zZlqQtGtXSKGY
+	 qE7kmn3skAAmdHpynUh6G1IcDYzRBpRJQJ2v9dHtuEYl1SHM9u79m3ODxDTtFbRHwF
+	 TrXVRIXikjQcC748T/h8YzRRuj5Is74hno4IqadGPqhCATzpJM+vXtHmT1645lImlw
+	 xbcKSEnaeY6vjDCFgor9rDZ7RPAf5TB+nN0PUncVs3G3ToCrGTMxxDR5q52eHlIdvK
+	 yL93d9yknBOTA==
+Date: Thu, 26 Mar 2026 10:28:40 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Peter Zijlstra
+ <peterz@infradead.org>, Dmitry Ilvokhin <d@ilvokhin.com>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ io-uring@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Marcelo Ricardo Leitner
+ <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, Jon Maloy
+ <jmaloy@redhat.com>, Aaron Conole <aconole@redhat.com>, Eelco Chaudron
+ <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-sctp@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net, dev@openvswitch.org, Jiri Pirko
+ <jiri@resnulli.us>, Oded Gabbay <ogabbay@kernel.org>, Koby Elbaz
+ <koby.elbaz@intel.com>, dri-devel@lists.freedesktop.org,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar
+ <viresh.kumar@linaro.org>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>,
+ Huang Rui <ray.huang@amd.com>, Mario Limonciello
+ <mario.limonciello@amd.com>, Len Brown <lenb@kernel.org>, Srinivas
+ Pandruvada <srinivas.pandruvada@linux.intel.com>, linux-pm@vger.kernel.org,
+ MyungJoo Ham <myungjoo.ham@samsung.com>, Kyungmin Park
+ <kyungmin.park@samsung.com>, Chanwoo Choi <cw00.choi@samsung.com>,
+ Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, Sumit Semwal
+ <sumit.semwal@linaro.org>, linaro-mm-sig@lists.linaro.org, Eddie James
+ <eajames@linux.ibm.com>, Andrew Jeffery <andrew@codeconstruct.com.au>, Joel
+ Stanley <joel@jms.id.au>, linux-fsi@lists.ozlabs.org, David Airlie
+ <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Alex Deucher
+ <alexander.deucher@amd.com>, Danilo Krummrich <dakr@kernel.org>, Matthew
+ Brost <matthew.brost@intel.com>, Philipp Stanner <phasta@kernel.org>, Harry
+ Wentland <harry.wentland@amd.com>, Leo Li <sunpeng.li@amd.com>,
+ amd-gfx@lists.freedesktop.org, Jiri Kosina <jikos@kernel.org>, Benjamin
+ Tissoires <bentiss@kernel.org>, linux-input@vger.kernel.org, Wolfram Sang
+ <wsa+renesas@sang-engineering.com>, linux-i2c@vger.kernel.org, Mark Brown
+ <broonie@kernel.org>, Michael Hennerich <michael.hennerich@analog.com>,
+ Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, linux-spi@vger.kernel.org,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, Chris Mason <clm@fb.com>, David Sterba
+ <dsterba@suse.com>, linux-btrfs@vger.kernel.org, Thomas Gleixner
+ <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, SeongJae
+ Park <sj@kernel.org>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/19] tracepoint: Add trace_call__##name() API
+Message-Id: <20260326102840.80a270ec818fea7e000aeef4@kernel.org>
+In-Reply-To: <20260323160052.17528-2-vineeth@bitbyteword.org>
+References: <20260323160052.17528-1-vineeth@bitbyteword.org>
+	<20260323160052.17528-2-vineeth@bitbyteword.org>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260316-qcom-sa8255p-emac-v9-2-c58934e76ff2@oss.qualcomm.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271789-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,st.com,linaro.org,baylibre.com,oss.nxp.com,nxp.com,oss.qualcomm.com,bootlin.com,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,tenstorrent.com,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[48];
+	FREEMAIL_CC(0.00)[goodmis.org,infradead.org,ilvokhin.com,kernel.org,efficios.com,redhat.com,kernel.dk,vger.kernel.org,davemloft.net,google.com,iogearbox.net,gmail.com,ovn.org,lists.sourceforge.net,openvswitch.org,resnulli.us,intel.com,lists.freedesktop.org,linaro.org,amd.com,linux.intel.com,samsung.com,lists.linaro.org,linux.ibm.com,codeconstruct.com.au,jms.id.au,lists.ozlabs.org,ffwll.ch,sang-engineering.com,analog.com,HansenPartnership.com,oracle.com,fb.com,suse.com,linutronix.de,linux-foundation.org,kvack.org,alien8.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271790-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_GT_50(0.00)[81];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FROM_NEQ_ENVFROM(0.00)[mhiramat@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,bootlin.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email,linaro.org:email]
-X-Rspamd-Queue-Id: 889EC32DC48
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:email,goodmis.org:email,bitbyteword.org:email]
+X-Rspamd-Queue-Id: AFE5432DF2D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 16, 2026 at 01:05:07PM +0100, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Mon, 23 Mar 2026 12:00:20 -0400
+"Vineeth Pillai (Google)" <vineeth@bitbyteword.org> wrote:
+
+> Add trace_call__##name() as a companion to trace_##name().  When a
+> caller already guards a tracepoint with an explicit enabled check:
 > 
-> In order to drop the dependency on CONFIG_OF, convert all device property
-> getters from OF-specific to generic device properties and stop pulling
-> in any linux/of.h symbols.
+>   if (trace_foo_enabled() && cond)
+>       trace_foo(args);
 > 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> trace_foo() internally repeats the static_branch_unlikely() test, which
+> the compiler cannot fold since static branches are patched binary
+> instructions.  This results in two static-branch evaluations for every
+> guarded call site.
+> 
+> trace_call__##name() calls __do_trace_##name() directly, skipping the
+> redundant static-branch re-check.  This avoids leaking the internal
+> __do_trace_##name() symbol into call sites while still eliminating the
+> double evaluation:
+> 
+>   if (trace_foo_enabled() && cond)
+>       trace_invoke_foo(args);   /* calls __do_trace_foo() directly */
+
+nit: trace_call_foo() instead of trace_invoke_foo()?
+
+Anyway looks good to me.
+
+Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+
+
+> 
+> Three locations are updated:
+> - __DECLARE_TRACE: invoke form omits static_branch_unlikely, retains
+>   the LOCKDEP RCU-watching assertion.
+> - __DECLARE_TRACE_SYSCALL: same, plus retains might_fault().
+> - !TRACEPOINTS_ENABLED stub: empty no-op so callers compile cleanly
+>   when tracepoints are compiled out.
+> 
+> Suggested-by: Steven Rostedt <rostedt@goodmis.org>
+> Suggested-by: Peter Zijlstra <peterz@infradead.org>
+> Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
+> Assisted-by: Claude:claude-sonnet-4-6
 > ---
->  drivers/net/ethernet/stmicro/stmmac/Kconfig             | 2 +-
->  drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 9 ++++-----
->  2 files changed, 5 insertions(+), 6 deletions(-)
+>  include/linux/tracepoint.h | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> index 07088d03dbab5bd1abf66e9460613b839c1d565e..e2af4fdd654340d618477ed87d3889dbb9aab456 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> @@ -135,7 +135,7 @@ config DWMAC_MESON
->  config DWMAC_QCOM_ETHQOS
->  	tristate "Qualcomm ETHQOS support"
->  	default ARCH_QCOM
-> -	depends on OF && (ARCH_QCOM || COMPILE_TEST)
-> +	depends on ARCH_QCOM || COMPILE_TEST
->  	help
->  	  Support for the Qualcomm ETHQOS core.
+> diff --git a/include/linux/tracepoint.h b/include/linux/tracepoint.h
+> index 22ca1c8b54f32..ed969705341f1 100644
+> --- a/include/linux/tracepoint.h
+> +++ b/include/linux/tracepoint.h
+> @@ -294,6 +294,10 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
+>  			WARN_ONCE(!rcu_is_watching(),			\
+>  				  "RCU not watching for tracepoint");	\
+>  		}							\
+> +	}								\
+> +	static inline void trace_call__##name(proto)			\
+> +	{								\
+> +		__do_trace_##name(args);				\
+>  	}
+>  
+>  #define __DECLARE_TRACE_SYSCALL(name, proto, args, data_proto)		\
+> @@ -313,6 +317,11 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
+>  			WARN_ONCE(!rcu_is_watching(),			\
+>  				  "RCU not watching for tracepoint");	\
+>  		}							\
+> +	}								\
+> +	static inline void trace_call__##name(proto)			\
+> +	{								\
+> +		might_fault();						\
+> +		__do_trace_##name(args);				\
+>  	}
+>  
+>  /*
+> @@ -398,6 +407,8 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
+>  #define __DECLARE_TRACE_COMMON(name, proto, args, data_proto)		\
+>  	static inline void trace_##name(proto)				\
+>  	{ }								\
+> +	static inline void trace_call__##name(proto)			\
+> +	{ }								\
+>  	static inline int						\
+>  	register_trace_##name(void (*probe)(data_proto),		\
+>  			      void *data)				\
+> -- 
+> 2.53.0
+> 
 
-Are you sure you want to do that?
 
-static int qcom_ethqos_probe(struct platform_device *pdev)
-{
-	struct device_node *np = pdev->dev.of_node;
-	const struct ethqos_emac_driver_data *data;
-	struct plat_stmmacenet_data *plat_dat;
-	struct stmmac_resources stmmac_res;
-	struct device *dev = &pdev->dev;
-	struct qcom_ethqos *ethqos;
-	int ret, i;
-
-	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-	if (ret)
-		return dev_err_probe(dev, ret,
-				     "Failed to get platform resources\n");
-
-	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
-	if (IS_ERR(plat_dat)) {
-		return dev_err_probe(dev, PTR_ERR(plat_dat),
-				     "dt configuration failed\n");
-	}
-
-https://elixir.bootlin.com/linux/v6.19.9/source/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c#L684
-
-
-#else
-struct plat_stmmacenet_data *
-devm_stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
-{
-	return ERR_PTR(-EINVAL);
-}
-#endif /* CONFIG_OF */
-
-It seems like this is just going to result in the probe failing with
--EINVAL.
-
-	Andrew
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
 
