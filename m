@@ -1,226 +1,165 @@
-Return-Path: <netdev+bounces-271937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271938-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aPCfNKv5xGmC5QQAu9opvQ
-	(envelope-from <netdev+bounces-271937-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:17:31 +0100
+	id MFKEJrr6xGny5QQAu9opvQ
+	(envelope-from <netdev+bounces-271938-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:22:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52FA433222A
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:17:31 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C407D332350
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:22:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 97058316121D
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 08:59:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C6B42301B859
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A179D36B047;
-	Thu, 26 Mar 2026 08:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3654A3B893B;
+	Thu, 26 Mar 2026 09:09:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="jjI/xIsg";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hCrhXgzo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="egxOrybp"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09356377EB8
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 08:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774515560; cv=none; b=eFXY0n4YWM1IYwnGC7F4QlzRvpL4A7twqB8DqCApZbtvdzaFaElouLGlyAuQTce7BNjY9pSlRO+0Dsdivr5Ncei9EPUovMOkQcAuUuaj72AZNsXZRhIcv3GxOD+/eAhe/6Li5LKdYSp4h+YTs7e8311Jf2SmWZemeCEQeMHBvpk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774515560; c=relaxed/simple;
-	bh=t/VfX5jtoOH2eu7a5//RzMmx9sFhmdFE2NAx60AXS7k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C5abtGEeiBUBg6Y+mxtd0FdnJSpXdIgOAOlDLUpcvaGxY/UjPM7PwTvVJ4O0O8JmwaNqNUawmTN1i6HhLEISR8cVO+KI5FVyZhnmBQzlu8eui7rCRsCkibb2G/58ZWxDgCINLbOFPIOcKzAbq5BvCJZY8zUiREng2INVJGmwBNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=jjI/xIsg; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hCrhXgzo; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id E5FA97A0258;
-	Thu, 26 Mar 2026 04:59:15 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Thu, 26 Mar 2026 04:59:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1774515555; x=
-	1774601955; bh=iwrgke0RUOWsMUihjCBwqZr4DRWvE8pmLmjvaz/6ge0=; b=j
-	jI/xIsgI7rly1l4ziTnINjvEWDTvaFXo+PBIgcg4Zb4+a7zhLZY6JPxELe8MNEwx
-	glciZTnvR8VbB26mTB/YxyrzV9oBjfXpTOo37S0YCPqGeGOf0h5wzEYoLew1O60A
-	j+4iasEDnkp7L508k6MUCOHsQr9Xn6qdL6Z3Qv6xxfQpGY2Pj4I8GZIVf5cO+QDn
-	31OI7difexUqqB6R63gPht9k9qT7oc2wA2jDw3L1klCxgVkSMHZ0TH80MvQdJ9aC
-	I3ANDUWnnslEQLIfADxVmA22DBwJ55Xs+cIwPF51OYlrPgryjrE/8KZ+8HG8eJkc
-	W+GHq3f5x2sDktwjByv4w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1774515555; x=1774601955; bh=iwrgke0RUOWsMUihjCBwqZr4DRWvE8pmLmj
-	vaz/6ge0=; b=hCrhXgzoavDKiRc/P+M47MqRzcint43VZeUQgj6OGG/RvFYgMh1
-	mnM0uvM1j+mMZULvIWgt6sO/RYolkeA87A38A+775QrGoFVT7moLhqZEIaOc52FC
-	kvGM2iNvhGFSzfA1CLuTzJm67hzAE0G44XP1B7qjMq/heI8It2hoMAhVBctXY7cx
-	7E4ljzMGD79IltqOtK2IFqx0e/jeNTS05ctk52NcjOpj5oaDCEspDW3fys2TSV5e
-	a99YcAYVJXHe2NYmHqADVUvxFpwJo5GPK466EXaKEmH5/3rFz7A1tp9GxXsUN1tE
-	2oR8UCbO6VAl973y70fbyuVwBlBv3tQNKCA==
-X-ME-Sender: <xms:YvXEaVhsv_Nh3CMc2zFpSqlG5AKezBwChUeLqQFhjMauOAQ1B_pabw>
-    <xme:YvXEaaufp4MGRCH8ISEkO73XSiVTiXBukDuOeZDE4FOZMEMtbHbK9sL-KdSjGCUR_
-    __Tn45SFt4Pg7UXZcwhlc2ndSoGLIoW5miTe-JNQCd9C5ls5qdDZ8E>
-X-ME-Received: <xmr:YvXEaTRyK2tPRkX4KmjhU67h-u4hO3V_0jiSg_kQK6KI2TZ98V5GdKgsjKDc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefvdeileehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeejpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegtvghlsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthho
-    pehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrh
-    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhgvrhhnvghlqdhtlhhsqdhhrghnughs
-    hhgrkhgvsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheptghhuhgtkhdrlh
-    gvvhgvrhesohhrrggtlhgvrdgtohhmpdhrtghpthhtohephhgrrhgvsehsuhhsvgdruggv
-X-ME-Proxy: <xmx:Y_XEae23V1zsXnOuvvo0sRf4THuIY50Ye2KsiaYYchsFDwF6-itRjQ>
-    <xmx:Y_XEaYuZ7qjHXSbdHKt8ELnEvUcGcLRsgO1-YlWST6kDDltY8Zk4vA>
-    <xmx:Y_XEaUg9F_C5KBwDAp0Muq6yaHv9DUs3GAfsaU2Oy6Dl3kNI_S8hQg>
-    <xmx:Y_XEaZ-F4Jz7Opn1PwVajRkZVhmhNtaxX-QR50nmGjK2yeiWPMHB6Q>
-    <xmx:Y_XEaUbZWbHmsLhxw3J23V4aPN3iDGxPLtEF-FHQKiES5wHwUCOgTg7k>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 26 Mar 2026 04:59:14 -0400 (EDT)
-Date: Thu, 26 Mar 2026 09:59:13 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Chuck Lever <cel@kernel.org>
-Cc: john.fastabend@gmail.com, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH net-next v5 6/6] tls: Flush backlog before waiting for a
- new record
-Message-ID: <acT1YXwDNbU73qHb@krikkit>
-References: <20260324-tls-read-sock-v5-0-5408befe5774@oracle.com>
- <20260324-tls-read-sock-v5-6-5408befe5774@oracle.com>
- <acK5Qj-F0wGFLUhj@krikkit>
- <66157d87-2cb8-4cd7-b8cd-1e2086825995@app.fastmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04EA3AC0FA
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 09:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774516145; cv=pass; b=oKp3R3tqjbMvfKxpYom3BtjGb2SayFOOKuo0wgVsoB8gozHI+sZ48A7elNBDDSMrWwx/xs1fhyNal1j+UlEQyKTtLqfTmCeWaR8N6BaO/G+BkTFLDUf6m1bt0RtPTr1VY9IfN4730YfceTTeL6qsgotuvx7vm2+4yGKisMxxt7s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774516145; c=relaxed/simple;
+	bh=uA25o5lpi6eVBSrg/N1K6ROoeMRwYMOMW3SOAr/2gF0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FtUODbRvI/AdnbyTxbSP52s/XsFMtU7VeSR5bnbAEQ2K/pJE3uZP5g/VrOK9tdvyRulXO5GpvKTr6vVhScZcdB88YjqR0peJ7RUeZzxrW/ELhQO7IMhTLfTx2jLIU4OaL+1zK/v+3sk8fjmdCyr0ax5tF6v12S38j2gdG5kr3To=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=egxOrybp; arc=pass smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-7986e538decso6571297b3.1
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 02:09:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774516143; cv=none;
+        d=google.com; s=arc-20240605;
+        b=GP9jRRFROIwlQhtSQxM9+69UcSZ+pfyDAhW0TxQM2Jw6s+4y54BXMJbvFXpppyihoX
+         /4c7CcwR/pVAOA4IutUlavsB+EvILErZFSVINCsLsmy70/nvVxraOgcYj1kE7KHb/keA
+         +prA5jcUiUlmriGJhYd4cHpP+yuLGudTEZnlcRtd3X6BDZ1zEYYltXRunhQBIokBjNMh
+         h5NpHyNko0yqM1Mj4hAX4ESAlsHb/peM0sslkdfpAqtUyGnwXQ6uvzx7zj8I85vC7b3K
+         cAqyM/dBBscZpvuo6HEQ/DjtCHMOOZ/vsn3AK1gLG4zZFk6Cy8oxueoaSvoFhOh4z2XJ
+         2jEg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=uA25o5lpi6eVBSrg/N1K6ROoeMRwYMOMW3SOAr/2gF0=;
+        fh=3vrntfd5hH25oSqoE5N3A54ysyp2x4qXVO67fQLwmZA=;
+        b=DFES28NOF74Kn8GeneG8tCJWWiwOzjNm19fXfXynBqEtOZ97npre9h6TH2nz7Hbro9
+         LD62iR832rRmDcg+JB9FItWf6bVfiRmee0mcSVcsjonrMoqlVBIJvVj9cAZaBbbXssUJ
+         lS2XUFQgeYKN8/oT9ZgMgHkc7i3IlEhQpbt2ZNg3TG+Fw77SsVleS5HSEw2a7BZITfjM
+         rjS+rDDVyUBNR//nL5bh7pOEJDx5jk9O6HSiRPdnKeeJsf30i3X4J+C40P17MLw4EhYp
+         x2ZBCOmVcUDKc8CB2+gtjJXe6jHCscO39GtCARUDyfAMm3k/smn+XF8euergWCDjKfqO
+         zS6Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774516143; x=1775120943; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uA25o5lpi6eVBSrg/N1K6ROoeMRwYMOMW3SOAr/2gF0=;
+        b=egxOrybplSlmvCycHtCuGYbW1A5P5oNITAlKux98JNdH32W3gd7FvITIugTC40APEq
+         Nf/gdQIFAgV2ksdsLd7vNMwXcKGMK9ojGYEyh87o8SKjGvdQp1cq332eGVhJ96pus4y0
+         3t13kiyljwG+ATCz/fWGN/CqRtf5GPblFfgMNE+jXRdHUs+9j+6mYLoDppfXgKQr51xt
+         u8Bu+X9v6yx/7TYZq0lXHgnTrkhf6d4cpVuv3d6D8YAtR0lqGSKu6klwi2djtA/SuIc5
+         ecpDDEaouBk6qPRzoWTlsMeKegO8HRjY2SFUb6fs+HqAbuKrEk+c0z3ZkmsO9RK0eD/s
+         SLNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774516143; x=1775120943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uA25o5lpi6eVBSrg/N1K6ROoeMRwYMOMW3SOAr/2gF0=;
+        b=qZLbpO4L7I1cobLboXkiglQizyyhEmsycwoT3BhKs7A36Uy2FsKnI2pf55lp4z4IJT
+         yil2jn7ZV4grS4P3DUvdiQVlDS7XY3H/wnlQPnqEIVCofHo+JnvPXuXzUQ5xJOJlY63n
+         pXQ7r0eNZBhAeWp2zNTYa3uuSgK5QECS5ike+2yJGR+2cNvxfbReRWS9newe3SrcvAzG
+         Cev2URciQ6OsjscjkCxT0YBAFx6L0k+A1Q+2uNodlwuL8wQXGSDFFG8ipn8CJoEJDAAl
+         25OYvOXKFIQRCdsdaWSyKxnRPqYaa5UvfvBaKpPiW4vlAyZiGaVxK9jsnDpB3zp4eUmQ
+         d4eg==
+X-Forwarded-Encrypted: i=1; AJvYcCU79W2+W/WzW8raErBjV0y5w23VO9OaV8atZaM9HFeneEKfFaysVefUVsaQigs8kBP1fR6n9Gs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywe8M0RCSm7dglgwMHkAUQV6kJl7GoIyItUhyc7lp/Vws9R7C9z
+	zXSmxZKmhf96SNJxS8DIGJ+c3ZZH9pptTYoLwjJkyxxS4K/CeEPme9cq1RAWRUCiAXgLgaO+ZE4
+	Kb0DkJ729ddNl/YttuLsJoJ49T2g0JEg=
+X-Gm-Gg: ATEYQzzq5zemb50nnXsYv1Ml/qh/30g2dqv2hG5YqNRPD2C7rmbJHBzTgBm/Y5sehXX
+	4QmAq6bd0eUJ2NMmbQoZIy2jacMZrMKfWQQklUgLl8A4s6Jzb+1ZlzXXbYa8H07mlFZcnNn0gV3
+	WOBdzXgpYwDUTKn5FPpMAfR2jFGY9UV3d3OnqcMojlClHKwFx/fgNtg/NQ8DywA9KpgfaLGJvXo
+	ttnk/11ll4CfhGjGFlGFtkT6as7guDFLAUnJdQ+LHhAouYReL5zTBTZm4Nb2b44eKA5q+Lvqc2/
+	Ym47QZtprWEYT0rX
+X-Received: by 2002:a05:690c:46c4:b0:799:3a3:2f25 with SMTP id
+ 00721157ae682-79acf67c2cfmr77450957b3.38.1774516142930; Thu, 26 Mar 2026
+ 02:09:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <66157d87-2cb8-4cd7-b8cd-1e2086825995@app.fastmail.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+References: <20260326021642.29170-1-dqfext@gmail.com> <20260326081304.xKa7-s_1@linutronix.de>
+ <CALW65jYdzn_rZWa2zwYd5J+Gd=kyaGMsVFyX0fMJfKfgULMO6w@mail.gmail.com> <20260326083020.2fOQj5br@linutronix.de>
+In-Reply-To: <20260326083020.2fOQj5br@linutronix.de>
+From: Qingfang Deng <dqfext@gmail.com>
+Date: Thu, 26 Mar 2026 17:08:50 +0800
+X-Gm-Features: AQROBzAFY5MiCnvJ2DMtdJfFsNq_yFZ6iw3jGYwdcM9wBpkBnMh9AY45ZZy5_aw
+Message-ID: <CALW65jY48_cq7tZR2S_b+Y1zJw90PGtQcM9JzK1wDako4yUaWg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4] selftests: net: add tests for PPP
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Felix Maurer <fmaurer@redhat.com>, 
+	Antonio Quartulli <antonio@openvpn.net>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-ppp@vger.kernel.org, 
+	netdev@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>, 
+	Guillaume Nault <gnault@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271937-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,lists.linux.dev,oracle.com,suse.de];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-271938-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,messagingengine.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:dkim]
-X-Rspamd-Queue-Id: 52FA433222A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: C407D332350
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-03-24, 15:07:00 -0400, Chuck Lever wrote:
-> 
-> 
-> On Tue, Mar 24, 2026, at 12:18 PM, Sabrina Dubroca wrote:
-> > 2026-03-24, 08:53:28 -0400, Chuck Lever wrote:
-> >> From: Chuck Lever <chuck.lever@oracle.com>
-> >> 
-> >> While lock_sock is held, incoming TCP segments land on
-> >> sk->sk_backlog rather than sk->sk_receive_queue.
-> >> tls_rx_rec_wait() inspects only sk_receive_queue, so
-> >> backlog data remains invisible. For non-blocking callers
-> >> (read_sock, and recvmsg or splice_read with MSG_DONTWAIT)
-> >> this causes a spurious -EAGAIN. For blocking callers it
-> >> forces an unnecessary sleep/wakeup cycle.
-> >> 
-> >> Flush the backlog inside tls_rx_rec_wait() before checking
-> >> sk_receive_queue so the strparser can parse newly-arrived
-> >> segments immediately.
-> >> 
-> >> Fixes: 20ffc7adf53a ("net/tls: missing received data after fast remote close")
-> >
-> > How did you pick that Fixes tag? That commit mentions FIN/connection
-> > closing, which doesn't seem related to the local backlog.
-> 
-> 20ffc7adf53a introduced the sk_receive_queue check inside the
-> wait loop (then called tls_wait_data(), later refactored into
-> tls_rx_rec_wait()).
-> 
-> When lock_sock is held, incoming TCP will segments land on
-> sk->sk_backlog, not sk->sk_receive_queue. The sk_receive_queue
-> check introduced by 20ffc7adf53a doesn't see backlog data.
+On Thu, Mar 26, 2026 at 4:30=E2=80=AFPM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+>
+> > AFAIK, this can only happen with PPTP or L2TP, which were not included
+> > in this patch.
+>
+> Yeah, that one. I was sort of looking into but gave up after a while
+> digging through code, since I had no idea how to setup that up=E2=80=A6
 
-But without this check, we'd go straight to the EAGAIN/sleep cycle, so
-things were even worse before?
+I used Google's Antigravity to generate the skeleton of the test, and
+the rest was some manual tweak and trial and error.
 
-(btw, you don't need a Fixes tag for net-next patches. if you think
-this is a bug, the patch should be extracted from this series and
-submitted separately for the "net" tree, with the appropriate Fixes
-tag)
-
-
-> >> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> >> index 8fb2f2a93846..84c4ae0330d1 100644
-> >> --- a/net/tls/tls_sw.c
-> >> +++ b/net/tls/tls_sw.c
-> >> @@ -1372,6 +1372,7 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
-> >>  		if (ret < 0)
-> >>  			return ret;
-> >>  
-> >> +		sk_flush_backlog(sk);
-> >
-> > Do we need to update released when this returns true, like callers of
-> > tls_read_flush_backlog() do?
-> 
-> Good catch. v6 will do that.
-> 
-> 
-> > I also wonder if we'd want to update the
-> > caller's flushed_at to avoid bypassing the "smart checks" in
-> > tls_read_flush_backlog().
-> 
-> The flush in tls_rx_rec_wait() only fires when the loop finds
-> no ready message, which is the cold path.
-
-Right.
-
-> The redundant flush
-> from tls_read_flush_backlog() on the next iteration is wasteful
-> but harmless. I'm not sure the additional complexity would be
-> worth it, but if you believe it will add some value, let me
-> know and I will add it.
-
-No, that sounds ok. But probably worth a quick mention in the commit
-message about this wasteful sk_flush_backlog() when we've already gone
-on the cold path, and we can revisit in the future if needed.
-
--- 
-Sabrina
+Regards,
+Qingfang
 
