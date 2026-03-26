@@ -1,419 +1,143 @@
-Return-Path: <netdev+bounces-271987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271988-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHUJIWMaxWnr6QQAu9opvQ
-	(envelope-from <netdev+bounces-271987-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:37:07 +0100
+	id qO6XFwcYxWnr6QQAu9opvQ
+	(envelope-from <netdev+bounces-271988-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:27:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 662FF3349BB
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:37:06 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB3F7334758
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:27:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 84958301807B
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:20:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 645303058E2B
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36BC34FF6C;
-	Thu, 26 Mar 2026 11:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C3838C430;
+	Thu, 26 Mar 2026 11:21:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SGrfwt9h"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="l3oJhkAq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D40A35AC3A
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 11:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88575381C4
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 11:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774524000; cv=none; b=lMAKQTHJEXI4e2vWHEXRcWVVKPb/o9+qu6sozEDq9a55DhZWV4D9XRR4trnPuKxzIdKWwbOWSsloRia1HBxt0zy5aQCsB15pcRO597YEKuAimErTioeQSLb7AbDgiJeEnVyGfL+Fwggk7cWf/iiy7xGlo+oGGa9e4IoE+GeFdMo=
+	t=1774524084; cv=none; b=NV7DvYqZbxbWEnIc9kDnihfUuT+YFWkDT9sO6yF5hM3RLArDUtgpcZXRpXn6seHUduUIuurGZ44bIaoKJ9OlCKWQLYncvBToouu/u4LsbOBlxPorO9MskmusT3VNq+YZWROFslJ894Px+UevLOe2lqGe2+Q0uz1lmFZQJqe+bYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774524000; c=relaxed/simple;
-	bh=Qy2fXtmRxd7VA9k7EKSdssF4PxyY6yYYzS3EMmeGPHc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mfjodCzptB6q4b/Xu0H49G+wVTaB44cyLdVHRlx4nG6vezDxT6rKOrD2JHPdn96gLcf2sz64JQ0G3gRj8fzdWvDsC+XiSYm4tuoskgahxIRbyP2iyrrd0XpeD8FW1CsegueV4k0qPDrGCxO9p+cRVkEBgdCLdmmtfKH7eZJrZP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SGrfwt9h; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-486ff3a0fc1so8072245e9.2
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 04:19:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774523997; x=1775128797; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I8E08ul8zmISMenfMLCtg7m1Lcl+41Nsx8Zd8llNhro=;
-        b=SGrfwt9h+UzYoqoz+ddIgVoL15mVkzrUIWmXymW6r61B0gOy0IvECqjCEJU4xCKTmU
-         DEw1K3YrpRsSULD1Fa/lBn/7xAGqnRx4Ad3sFfklDtraZkv8NN6X8ucWdocjZSfBS8Hb
-         3Nv8YTRMYf+cQ+OYKvnY9nExD5U3IqeymzXnSy8iqWFbkD4KA5N4p3xFxXMvGZSJ0VML
-         LSlWeVhzCYQ9a+22MdQgcuwpkJ0oOgOnSEOLSOkfY6S0cQTcNXNpmZQb6OeCxONvyTes
-         HI4frd4LjLvi2q1EuCjMpGIgkhEbhIDDrVtsP5Su9hK8N9a/yRMyetI/vFiJdIUGma+r
-         Bl6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774523997; x=1775128797;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=I8E08ul8zmISMenfMLCtg7m1Lcl+41Nsx8Zd8llNhro=;
-        b=Y/VpZ/e4c1EG/jt4lRJXdJmoHOKcv77lJ2lVt7IaP67LIcLnP299Rd+5794cLEtiyG
-         FEo4B1KZEYVG7Qf78A428WM61JZJwdWCo04Lmx+9dIhPm5AbO50aKLZiiXKOHAj4txqm
-         cypDdYF/833KVEWKKerfqIQxXlJQw3tfPRBvDJ3FCvwb/VC6linJ36sk2kwUtpl4CbhK
-         c34idDBimI12835FLxLpR70Ccq71IytofMNhmw5z80aG8MUciXAGbRUe9k8upYYxJm0s
-         6b18RqgPAGi4XgrKl8JXpZn4ZKT3BmdpENtNk0LxI+fYhNsr46sWAS+DxdkBggeEyWvX
-         g5SQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXet549hQRbpC3cJk2IjVhMwtHNHBdv9c2BhJubfFU7O+eYbt5S6+eUm+FDJCWXLGnTL1crqks=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIi5FVHPmFbYTKMZfQmANJ/Lp7Kfdrz9AsE+YfB+DefuHOckH6
-	W4toVfHArSn222mybZtbPOPYVv+nFceFC2Tt2C8iJXN1eIZOp8AVG0Hh
-X-Gm-Gg: ATEYQzxsTXmMMn7p2TajR0gBtOOTR+z2TUfv7QWfn79xgdHQOrIHjKTNuQgCsDRVECe
-	/dfuEEg4lH77oUnfieRse29bOJAx13XZxxWL9lKiI5T+gJqHGId1K/NO3zfh0+wcjSYn43miocc
-	qJ5XhNP6KNiyRXNxKgYj07IFjR3kafhQfL5RUBHMJqHi49GVhcAEn/VedDAWO8kvCSizeNTufNZ
-	OuqVBe698kUy6PzXC316N2erxDTDv1Z5L2V0ZaKrFUx2ic6rNbCoJeWjZvX/bHp2kOVHAfx6b9s
-	uQNjELoBAVImJomKm5yGhx1uTevmJH7ymlZVojtctH8Gx5FjpXg5ZU1529GTUrkX+wf+cY1cVsf
-	R4wdlPjOu54thODuNlX1ks1kWm2gOI5zD8c3WccjA4qn3pNocvnaYCgqIEyVYyDMbcvIRn/JlEj
-	3pyP8oZdg49uH8G45KanGndTmCW8Fcw/XYSrAmT34U7IRkvWhI
-X-Received: by 2002:a05:600c:4692:b0:485:4eaf:eb54 with SMTP id 5b1f17b1804b1-48716039b83mr104672885e9.20.1774523996795;
-        Thu, 26 Mar 2026 04:19:56 -0700 (PDT)
-Received: from localhost.localdomain ([2a00:23c4:a758:8a01:377f:9a3e:6c94:560d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4872092e105sm13428045e9.29.2026.03.26.04.19.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 04:19:56 -0700 (PDT)
-From: Biju <biju.das.au@gmail.com>
-X-Google-Original-From: Biju <biju.das.jz@bp.renesas.com>
-To: Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>,
-	linux-renesas-soc@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Biju Das <biju.das.au@gmail.com>
-Subject: [PATCH v3 1/2] arm64: dts: renesas: r9a08g046: Add GBETH nodes
-Date: Thu, 26 Mar 2026 11:19:49 +0000
-Message-ID: <20260326111953.31024-2-biju.das.jz@bp.renesas.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260326111953.31024-1-biju.das.jz@bp.renesas.com>
-References: <20260326111953.31024-1-biju.das.jz@bp.renesas.com>
+	s=arc-20240116; t=1774524084; c=relaxed/simple;
+	bh=X0Do9qkcftjMRF5OFnXzgQtZlAZLmNeCZnVSabSiuik=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sd8TwltUjLjtsJj4CQc01tBbuRO0l1054dgxnoTMAkv975E8BFP+xbXNgnk1MMFye4zn/WQDqKhGFO7/GGhQYVkFDFS3uVBUkUWzT63gKqmYzlQrdnwfEa07n6Yi4dKBSgGyQwH8pBvOyFVDQ8WE+aMR4Bn6MJgPKX/lGJuzBC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=l3oJhkAq; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d0a6d302-c5af-4ad1-87e2-fa017bdd96a8@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774524071;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MeaHEVMmFG+GkHSOXJpAtPu+S6loJl/i8IeYwFoTz/E=;
+	b=l3oJhkAqUZ4Mf3rXVV8kXB75aHPvwXDf4/GShZtn85EmACTtGe+0rJNOQ4ovsCJ7BRHP90
+	Dx5kH6fcIcrvwnbo6C03/cF5QjwERa5LruoLGWVRbCCJWbFqa+SrYl2wcq1YW6gTpK+TjA
+	s3L62PEvjmRTIC4KIqCu4OgkBElludU=
+Date: Thu, 26 Mar 2026 11:21:07 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Subject: Re: [PATCH net-next 2/3] dpll: add actual frequency monitoring
+ callback ops
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>, Petr Oros
+ <poros@redhat.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260325193914.124898-1-ivecera@redhat.com>
+ <20260325193914.124898-3-ivecera@redhat.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260325193914.124898-3-ivecera@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[bp.renesas.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-271987-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[glider.be,gmail.com,kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271988-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bijudasau@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[intel.com,resnulli.us,lwn.net,linuxfoundation.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,microchip.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_PROHIBIT(0.00)[0.189.53.128:email];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:email,bp.renesas.com:mid,11e40000:email,11c40000:email,11c10000:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 662FF3349BB
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: CB3F7334758
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Biju Das <biju.das.jz@bp.renesas.com>
+On 25/03/2026 19:39, Ivan Vecera wrote:
 
-Renesas RZ/G3L SoC is equipped with 2x Synopsys DesignWare Ethernet
-(10/100/1000 BASE) with TSN, IP block version 5.30. Add GBETH nodes
-to R9A08G046 RZ/G3L SoC DTSI.
+> +static int dpll_msg_add_actual_freq(struct sk_buff *msg, struct dpll_pin *pin,
+> +				    struct dpll_pin_ref *ref,
+> +				    struct netlink_ext_ack *extack)
+> +{
+> +	const struct dpll_device_ops *dev_ops = dpll_device_ops(ref->dpll);
+> +	const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
+> +	struct dpll_device *dpll = ref->dpll;
+> +	enum dpll_feature_state state;
+> +	u64 actual_freq;
+> +	int ret;
+> +
+> +	if (!ops->actual_freq_get)
+> +		return 0;
+> +	if (dev_ops->freq_monitor_get) {
+> +		ret = dev_ops->freq_monitor_get(dpll, dpll_priv(dpll),
+> +						&state, extack);
+> +		if (ret)
+> +			return ret;
+> +		if (state == DPLL_FEATURE_STATE_DISABLE)
+> +			return 0;
 
-Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
----
-v2->v3:
- * Rebased to boot series.
-v1->v2:
- * Added rmii_{tx,rx) clocks.
----
- arch/arm64/boot/dts/renesas/r9a08g046.dtsi | 241 +++++++++++++++++++++
- 1 file changed, 241 insertions(+)
+I think we have to signal back to user that frequency monitoring is
+disabled via extack.
 
-diff --git a/arch/arm64/boot/dts/renesas/r9a08g046.dtsi b/arch/arm64/boot/dts/renesas/r9a08g046.dtsi
-index e030e785ea2a..0987c531ecf4 100644
---- a/arch/arm64/boot/dts/renesas/r9a08g046.dtsi
-+++ b/arch/arm64/boot/dts/renesas/r9a08g046.dtsi
-@@ -171,6 +171,240 @@ sdhi1: mmc@11c10000 {
- 			/* placeholder */
- 		};
- 
-+		eth0: ethernet@11c30000 {
-+			compatible = "renesas,r9a08g046-gbeth", "snps,dwmac-5.30a";
-+			reg = <0 0x11c30000 0 0x10000>;
-+			interrupts = <GIC_SPI 78 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 79 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 85 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 86 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 87 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 88 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 81 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 82 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 83 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 84 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 89 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 90 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 91 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 92 IRQ_TYPE_EDGE_RISING>;
-+			interrupt-names = "macirq", "eth_wake_irq", "eth_lpi",
-+					  "rx-queue-0", "rx-queue-1", "rx-queue-2",
-+					  "rx-queue-3", "tx-queue-0", "tx-queue-1",
-+					  "tx-queue-2", "tx-queue-3", "ptp-pps-0",
-+					  "ptp-pps-1", "ptp-pps-2", "ptp-pps-3";
-+			clocks =  <&cpg CPG_MOD R9A08G046_ETH0_CLK_AXI>,
-+				  <&cpg CPG_MOD R9A08G046_ETH0_CLK_CHI>,
-+				  <&cpg CPG_MOD R9A08G046_ETH0_CLK_PTP_REF_I>,
-+				  <&cpg CPG_MOD R9A08G046_ETH0_CLK_TX_I>,
-+				  <&cpg CPG_MOD R9A08G046_ETH0_CLK_RX_I>,
-+				  <&cpg CPG_MOD R9A08G046_ETH0_CLK_TX_180_I>,
-+				  <&cpg CPG_MOD R9A08G046_ETH0_CLK_RX_180_I>,
-+				  <&cpg CPG_MOD R9A08G046_ETH0_CLK_RMII_I>,
-+				  <&cpg CPG_MOD R9A08G046_ETH0_CLK_TX_I_RMII>,
-+				  <&cpg CPG_MOD R9A08G046_ETH0_CLK_RX_I_RMII>;
-+			clock-names = "stmmaceth", "pclk", "ptp_ref",
-+				      "tx", "rx", "tx-180", "rx-180",
-+				      "rmii", "rmii_tx", "rmii_rx";
-+			resets = <&cpg R9A08G046_ETH0_ARESET_N>;
-+			power-domains = <&cpg>;
-+			snps,multicast-filter-bins = <256>;
-+			snps,perfect-filter-entries = <128>;
-+			rx-fifo-depth = <8192>;
-+			tx-fifo-depth = <8192>;
-+			snps,fixed-burst;
-+			snps,no-pbl-x8;
-+			snps,force_thresh_dma_mode;
-+			snps,axi-config = <&stmmac_axi_setup>;
-+			snps,mtl-rx-config = <&mtl_rx_setup0>;
-+			snps,mtl-tx-config = <&mtl_tx_setup0>;
-+			snps,txpbl = <32>;
-+			snps,rxpbl = <32>;
-+			status = "disabled";
-+
-+			mdio0: mdio {
-+				compatible = "snps,dwmac-mdio";
-+				#address-cells = <1>;
-+				#size-cells = <0>;
-+			};
-+
-+			mtl_rx_setup0: rx-queues-config {
-+				snps,rx-queues-to-use = <4>;
-+				snps,rx-sched-sp;
-+
-+				queue0 {
-+					snps,dcb-algorithm;
-+					snps,priority = <0x1>;
-+					snps,map-to-dma-channel = <0>;
-+				};
-+
-+				queue1 {
-+					snps,dcb-algorithm;
-+					snps,priority = <0x2>;
-+					snps,map-to-dma-channel = <1>;
-+				};
-+
-+				queue2 {
-+					snps,dcb-algorithm;
-+					snps,priority = <0x4>;
-+					snps,map-to-dma-channel = <2>;
-+				};
-+
-+				queue3 {
-+					snps,dcb-algorithm;
-+					snps,priority = <0x8>;
-+					snps,map-to-dma-channel = <3>;
-+				};
-+			};
-+
-+			mtl_tx_setup0: tx-queues-config {
-+				snps,tx-queues-to-use = <4>;
-+				snps,tx-sched-wrr;
-+
-+				queue0 {
-+					snps,weight = <0x10>;
-+					snps,dcb-algorithm;
-+					snps,priority = <0x1>;
-+				};
-+
-+				queue1 {
-+					snps,weight = <0x12>;
-+					snps,dcb-algorithm;
-+					snps,priority = <0x2>;
-+				};
-+
-+				queue2 {
-+					snps,weight = <0x14>;
-+					snps,dcb-algorithm;
-+					snps,priority = <0x4>;
-+				};
-+
-+				queue3 {
-+					snps,weight = <0x18>;
-+					snps,dcb-algorithm;
-+					snps,priority = <0x8>;
-+				};
-+			};
-+		};
-+
-+		eth1: ethernet@11c40000 {
-+			compatible = "renesas,r9a08g046-gbeth", "snps,dwmac-5.30a";
-+			reg = <0 0x11c40000 0 0x10000>;
-+			interrupts = <GIC_SPI 93 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 95 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 100 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 101 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 102 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 103 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 96 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 97 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 98 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 99 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 104 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 105 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 106 IRQ_TYPE_EDGE_RISING>,
-+				     <GIC_SPI 107 IRQ_TYPE_EDGE_RISING>;
-+			interrupt-names = "macirq", "eth_wake_irq", "eth_lpi",
-+					  "rx-queue-0", "rx-queue-1", "rx-queue-2",
-+					  "rx-queue-3", "tx-queue-0", "tx-queue-1",
-+					  "tx-queue-2", "tx-queue-3", "ptp-pps-0",
-+					  "ptp-pps-1", "ptp-pps-2", "ptp-pps-3";
-+			clocks = <&cpg CPG_MOD R9A08G046_ETH1_CLK_AXI>,
-+				 <&cpg CPG_MOD R9A08G046_ETH1_CLK_CHI>,
-+				 <&cpg CPG_MOD R9A08G046_ETH1_CLK_PTP_REF_I>,
-+				 <&cpg CPG_MOD R9A08G046_ETH1_CLK_TX_I>,
-+				 <&cpg CPG_MOD R9A08G046_ETH1_CLK_RX_I>,
-+				 <&cpg CPG_MOD R9A08G046_ETH1_CLK_TX_180_I>,
-+				 <&cpg CPG_MOD R9A08G046_ETH1_CLK_RX_180_I>,
-+				 <&cpg CPG_MOD R9A08G046_ETH1_CLK_RMII_I>,
-+				 <&cpg CPG_MOD R9A08G046_ETH1_CLK_TX_I_RMII>,
-+				 <&cpg CPG_MOD R9A08G046_ETH1_CLK_RX_I_RMII>;
-+			clock-names = "stmmaceth", "pclk", "ptp_ref",
-+				      "tx", "rx", "tx-180", "rx-180",
-+				      "rmii", "rmii_tx", "rmii_rx";
-+			resets = <&cpg R9A08G046_ETH1_ARESET_N>;
-+			power-domains = <&cpg>;
-+			snps,multicast-filter-bins = <256>;
-+			snps,perfect-filter-entries = <128>;
-+			rx-fifo-depth = <8192>;
-+			tx-fifo-depth = <8192>;
-+			snps,fixed-burst;
-+			snps,no-pbl-x8;
-+			snps,force_thresh_dma_mode;
-+			snps,axi-config = <&stmmac_axi_setup>;
-+			snps,mtl-rx-config = <&mtl_rx_setup1>;
-+			snps,mtl-tx-config = <&mtl_tx_setup1>;
-+			snps,txpbl = <32>;
-+			snps,rxpbl = <32>;
-+			status = "disabled";
-+
-+			mdio1: mdio {
-+				compatible = "snps,dwmac-mdio";
-+				#address-cells = <1>;
-+				#size-cells = <0>;
-+			};
-+
-+			mtl_rx_setup1: rx-queues-config {
-+				snps,rx-queues-to-use = <4>;
-+				snps,rx-sched-sp;
-+
-+				queue0 {
-+					snps,dcb-algorithm;
-+					snps,priority = <0x1>;
-+					snps,map-to-dma-channel = <0>;
-+				};
-+
-+				queue1 {
-+					snps,dcb-algorithm;
-+					snps,priority = <0x2>;
-+					snps,map-to-dma-channel = <1>;
-+				};
-+
-+				queue2 {
-+					snps,dcb-algorithm;
-+					snps,priority = <0x4>;
-+					snps,map-to-dma-channel = <2>;
-+				};
-+
-+				queue3 {
-+					snps,dcb-algorithm;
-+					snps,priority = <0x8>;
-+					snps,map-to-dma-channel = <3>;
-+				};
-+			};
-+
-+			mtl_tx_setup1: tx-queues-config {
-+				snps,tx-queues-to-use = <4>;
-+				snps,tx-sched-wrr;
-+
-+				queue0 {
-+					snps,weight = <0x10>;
-+					snps,dcb-algorithm;
-+					snps,priority = <0x1>;
-+				};
-+
-+				queue1 {
-+					snps,weight = <0x12>;
-+					snps,dcb-algorithm;
-+					snps,priority = <0x2>;
-+				};
-+
-+				queue2 {
-+					snps,weight = <0x14>;
-+					snps,dcb-algorithm;
-+					snps,priority = <0x4>;
-+				};
-+
-+				queue3 {
-+					snps,weight = <0x18>;
-+					snps,dcb-algorithm;
-+					snps,priority = <0x8>;
-+				};
-+			};
-+		};
-+
- 		pcie: pcie@11e40000 {
- 			reg = <0 0x11e40000 0 0x10000>;
- 			ranges = <0x02000000 0 0x30000000 0 0x30000000 0 0x08000000>;
-@@ -200,6 +434,13 @@ gic: interrupt-controller@12400000 {
- 		};
- 	};
- 
-+	stmmac_axi_setup: stmmac-axi-config {
-+		snps,lpi_en;
-+		snps,wr_osr_lmt = <0xf>;
-+		snps,rd_osr_lmt = <0xf>;
-+		snps,blen = <16 8 4 0 0 0 0>;
-+	};
-+
- 	timer {
- 		compatible = "arm,armv8-timer";
- 		interrupts = <GIC_PPI 13 IRQ_TYPE_LEVEL_LOW>,
--- 
-2.43.0
-
+> +	}
+> +	ret = ops->actual_freq_get(pin, dpll_pin_on_dpll_priv(dpll, pin),
+> +				   dpll, dpll_priv(dpll), &actual_freq, extack);
+> +	if (ret)
+> +		return ret;
+> +	if (nla_put_64bit(msg, DPLL_A_PIN_ACTUAL_FREQUENCY,
+> +			  sizeof(actual_freq), &actual_freq, DPLL_A_PIN_PAD))
+> +		return -EMSGSIZE;
+> +
+> +	return 0;
 
