@@ -1,84 +1,53 @@
-Return-Path: <netdev+bounces-272002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272003-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sDsrEakfxWnr6QQAu9opvQ
-	(envelope-from <netdev+bounces-272002-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:59:37 +0100
+	id gJPyOg0gxWnr6QQAu9opvQ
+	(envelope-from <netdev+bounces-272003-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:01:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC5C4334D66
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:59:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D022F334DA9
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:01:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 550823170ADD
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:53:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 26500303A86A
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB4C3FBED0;
-	Thu, 26 Mar 2026 11:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E25366DCC;
+	Thu, 26 Mar 2026 12:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iwARNHFY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ESl97Qfz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8101D3FCB00;
-	Thu, 26 Mar 2026 11:50:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E0FA31F9A6;
+	Thu, 26 Mar 2026 12:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774525820; cv=none; b=SFGdoIZQn3OpA+K2kZ7CJkpUoxaqDTAp3duqVYTe3Ln/1LZi91cY6GA0RA3dbCuy69vevMSsHhXDPxIZROBU1XopdU0cHpZiMNOYDqqCSdDtnU3+r5KE7gmbULYZydAkE/DfgIbgEFXA4s9udEOdFH8QG0mHZ7boFxbAGXnXGCE=
+	t=1774526423; cv=none; b=INPRChZDNRPmZ97vpJSHVKtcc1nG7eZw9MGamwUk8sgGfIxCNG5Ju/t8QVldyVohVHBBaRksLWINvMe7j4xT7EJM4q9uNqzMSrWWOEAnddaVNhntmIT0Eem6tDcWuTP7yRBf8s8PmiUgpYi+EujbahDq4E5YQ94JbJWX1cijxOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774525820; c=relaxed/simple;
-	bh=myyyHzF18ETXSFGD0y8bKJpnNgDMMQUFoiUMdnyxD5c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qAFWN3UiraSc2ZHHEt8l4UJId3DpMUAO5JC3YMutEmJ4ZW0gZagMv5q0EFW5mqwsOdxV08vPtnPpaOjSqvRCR1DC6MoVmuZlNg/d/q7BjTvgYcNGUPNkJm5jwjCg7Gyed6+3dq9t5aNqgx0gHO1cL+fACHmFyR4hT5aiomgsSro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iwARNHFY; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774525812; x=1806061812;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=myyyHzF18ETXSFGD0y8bKJpnNgDMMQUFoiUMdnyxD5c=;
-  b=iwARNHFYjDFnr/zLT+wHws34g/psqJVYCSt3rcsjD8XbZtkHAvTS9oKh
-   q5VQXXT9oZngMiOU76I0OztAnMiLPSToJiiqM3Jrluk6TrA0vz2wX8/Mu
-   ayqStuOMHrPUvvp4nH/7kRowstXhflE2YkLj7F7zEW/YPYNelKp0bUw2v
-   mS+H9GUq3cFobq2N+BZsX8JDY9R9ki1hVbbhTF/4frDVf0HlM+Kmr9HFK
-   TOXJ2y72jpJUmmQYVPgp0uqpV+UKJgrVvs4TFtWZK2DrgOV3yX8KsYfzu
-   zpsE6F5HnU+PNByLnJ8FgZycc4HAI6KYNMrT8CxFSPkNlLNYQHqKF0etA
-   A==;
-X-CSE-ConnectionGUID: zDXg+7H3RVKstg+UUV205g==
-X-CSE-MsgGUID: czvlOV5/S96M0Zyu++mqKg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11740"; a="75776291"
-X-IronPort-AV: E=Sophos;i="6.23,142,1770624000"; 
-   d="scan'208";a="75776291"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2026 04:49:59 -0700
-X-CSE-ConnectionGUID: li8zI4mfRx+bARUZsilJ5Q==
-X-CSE-MsgGUID: 10ADcOp/R4WF/QyFiY/ExQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,142,1770624000"; 
-   d="scan'208";a="248029100"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmviesa002.fm.intel.com with ESMTP; 26 Mar 2026 04:49:57 -0700
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	stfomichev@gmail.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	larysa.zaremba@intel.com,
-	aleksander.lobakin@intel.com,
-	bjorn@kernel.org,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH v4 net 11/11] gve: remove home-grown xsk's frame size validation
-Date: Thu, 26 Mar 2026 12:49:19 +0100
-Message-Id: <20260326114919.519456-12-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20260326114919.519456-1-maciej.fijalkowski@intel.com>
-References: <20260326114919.519456-1-maciej.fijalkowski@intel.com>
+	s=arc-20240116; t=1774526423; c=relaxed/simple;
+	bh=u2HJmS/78KG7FoybFH+fCZmDSRZd13BgRzNbeZyfrKk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Y3MmpGPkmc0Tjmbcs81SOmC1hhUiAmW/tH2lbXhAHmpVjt8J/GXT/Rlag7bUCeijH0nW0bS4Awpr/nri4DrNDh5eCs6HJPFdQD3UCuLu4YLTZctfAckfDn9k54xlVTVetNUd59bcxKVh/OeY1fKa9WbESZiwN7Z4aUP+zQdRLwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ESl97Qfz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCA2CC116C6;
+	Thu, 26 Mar 2026 12:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774526422;
+	bh=u2HJmS/78KG7FoybFH+fCZmDSRZd13BgRzNbeZyfrKk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ESl97Qfzgv/NASh+RLt9v64k/t2hcJI1lA3HRFN1WIpBcQStEKirSqkSTjDuHraoA
+	 YEn8Ytgy7KJBFC8qgrQonwh30OsPFOa7ZiNGDgDcYGfEcC0UpuNv8aWBy4ciwmfLat
+	 hNTNQUQr5ODoPyH1edhPyaYIkV97zGGZInHMhHt0C8Vuv9RKpZH7PPjkdyFHevJdPv
+	 +b05iWsSn48bgcmuaJFqPatJI63Ziw5m3v0sveETyqvxm4iYm/cMR/k7Rbitdk0RRC
+	 c9iZrUjypX+NNDGqq0OyuNSqIxTbwDeRaLWnpi8x0hvnAFXjHfKc8SsjvDRfh2aa75
+	 ZzsZy9y2i4Gkw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E0B39E961D;
+	Thu, 26 Mar 2026 12:00:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,62 +55,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5 0/3] net: dpaa2-mac: export standard
+ statistics
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177452640929.2519455.2404595307977667457.git-patchwork-notify@kernel.org>
+Date: Thu, 26 Mar 2026 12:00:09 +0000
+References: <20260323115039.3932600-1-ioana.ciornei@nxp.com>
+In-Reply-To: <20260323115039.3932600-1-ioana.ciornei@nxp.com>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-kernel@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272002-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[intel.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-272003-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DC5C4334D66
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D022F334DA9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Since this check is now present in core in xp_assign_dev(), remove
-redundant statement from gve_xsk_pool_enable().
+Hello:
 
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
----
- drivers/net/ethernet/google/gve/gve_main.c | 5 -----
- 1 file changed, 5 deletions(-)
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 9eb4b3614c4f..b63e0a0459fb 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -1596,11 +1596,6 @@ static int gve_xsk_pool_enable(struct net_device *dev,
- 		dev_err(&priv->pdev->dev, "xsk pool invalid qid %d", qid);
- 		return -EINVAL;
- 	}
--	if (xsk_pool_get_rx_frame_size(pool) <
--	     priv->dev->max_mtu + sizeof(struct ethhdr)) {
--		dev_err(&priv->pdev->dev, "xsk pool frame_len too small");
--		return -EINVAL;
--	}
- 
- 	err = xsk_pool_dma_map(pool, &priv->pdev->dev,
- 			       DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING);
+On Mon, 23 Mar 2026 13:50:36 +0200 you wrote:
+> This patch set adds support for standard ethtool statistics - rmon,
+> eth-ctrl, eth-mac and pause - to dpaa2-mac and its users dpaa2-eth and
+> dpaa2-switch.
+> 
+> The first patch extends the firmware APIs related to MAC counters and
+> adds dpmac_get_statistics() which can be used to retrieve multiple counter
+> values through a single firmware call.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v5,1/3] net: dpaa2-mac: extend APIs related to statistics
+    https://git.kernel.org/netdev/net-next/c/fbf3fecf6ae1
+  - [net-next,v5,2/3] net: dpaa2-mac: retrieve MAC statistics in one firmware command
+    https://git.kernel.org/netdev/net-next/c/d369154d9d7f
+  - [net-next,v5,3/3] net: dpaa2-mac: export standard statistics
+    https://git.kernel.org/netdev/net-next/c/dd1d4ccb8602
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
