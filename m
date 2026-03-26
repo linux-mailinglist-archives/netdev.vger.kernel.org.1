@@ -1,169 +1,145 @@
-Return-Path: <netdev+bounces-271963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271966-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UBP9NaEJxWnn5gQAu9opvQ
-	(envelope-from <netdev+bounces-271963-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:25:37 +0100
+	id mEB7FeIJxWnn5gQAu9opvQ
+	(envelope-from <netdev+bounces-271966-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:26:42 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60B5F33348D
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:25:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C74E43334C8
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:26:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1246031FF122
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:07:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3CB89321D49B
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:08:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36963BC66C;
-	Thu, 26 Mar 2026 10:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D573C13F5;
+	Thu, 26 Mar 2026 10:04:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="ijMJ9dSk"
+	dkim=pass (1024-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b="ce/L/9iX";
+	dkim=pass (2048-bit key) header.d=outbound.mailhop.org header.i=@outbound.mailhop.org header.b="P9w+v+cQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from out-ip0052.fra.mailhop.org (out-ip0052.fra.mailhop.org [18.158.144.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F343DA7E0;
-	Thu, 26 Mar 2026 10:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7483B224AF7
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 10:04:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.158.144.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774519337; cv=none; b=i48molvcGsAOMoqsgYwkZRQ2mP/hLb7a+1Sl0DXjR74+Q8D76l4Cpus7/2vV26UAyHoxnyieBNoybmofev0b8BV3FelY1DMn5tyV4b6AYRJowoUWW/YzDyacjQxP7cI3Q9e+0/WdAultYkN5m0syEh9fP/WMnyrGHObX26ooBGg=
+	t=1774519446; cv=none; b=i5i2VN7r8jlxOLcATm3GpU/gVyBGoNryIBfVjWoADz/R5lkGF49NUyeYKhC5Y64J383r5DL8ssqYRhQpfyxzBtQ79wAQqLKsN2UUv2XQbO6PZNw0m4MhtPWrfMYstzmEuU2urEMaK+hydSQJLvMosJbjPLsj1bgY78l+jNNBg8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774519337; c=relaxed/simple;
-	bh=UXJmkilgCUI/u+gPAR4mHLGMXteOiBgjgCWr/Gty7iQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NjLNwmb5JR2YXoMK5ZWIwmBuq7cpiBJ1Ya8OD3hrBPaSqfglZHPh6kKkUUcJ+fjz+qSPPj6BSXTeeDmLcMwog9vkNNPnW5la3ibw+P/irrLFPHsuyK54yc4ZK/mEzokr+xPrf9yX5LOGCrG5BcR9gROUd03cAqrRt3gXgJPwvak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=ijMJ9dSk; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8492640E015B;
-	Thu, 26 Mar 2026 10:02:10 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id MsheAMuzPrx7; Thu, 26 Mar 2026 10:02:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1774519325; bh=C2mWFe1qNi3PMZA4pOcAbJW8lmILDzuIi8XH3/XIOf4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ijMJ9dSk7+FFkbX12jIwy02uXnJL10wiFXoCPlwyUqT13WtlMZYKjbxhSv6iYc2V8
-	 nUsd00ftkQEUSwaK2E8alb0ef0/Xupyc18HwfYLnMtaijlwsn+75oPXw9IfCKIFI83
-	 RHVX7eE26VoJ5RkSC25P344LGu7gvbWuaxieYQirZGWgh6SzurTshnpHRQ00s4d5nj
-	 CNbq3g4A7hcApqUVqYTdPUzLrN8f8Yz97R8rmza03yD0SKlewWB23DacOnI3rnbs+e
-	 OfLHcLTgKyi0xISxpH6ZxdE0XoT4Tg98OsWAocu4lxrtE/noMbsP00NjCt77wGW0BM
-	 LlodWonuMOXUtG/PQwiUnR84xAs9n8OB5RedkQC/v7W6YTECWY+QjdAXmMiwddEYnS
-	 HckdK7FGeZtdMD5SWlmZ7HEIyCFn5WEHYx0OEe94m7OecMA0vBubPauJQrCQFzxUHm
-	 c2kAHHiOlnKIdCpDEFfvGX15hQ/NbwV5R4yxFdmd7+RLQSbY19hvOVAXwGQrz3SDbn
-	 ioNRWPdf69PAI3UX7KuhcQ63egfggLs8jKUJfW5mx7c445PFGK1T3Eud9r2pJisEWG
-	 /xTdFmPl3sUGISDldtEsZehMg3aiW1BhxxDgHb4cJUS1Oc+kD8NmUhVFtMLfP+6SlB
-	 XQ4dP5hDqOLsb+WVplWrz9TE=
-Received: from zn.tnic (p5de8e020.dip0.t-ipconnect.de [93.232.224.32])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id BF59740E0140;
-	Thu, 26 Mar 2026 10:01:27 +0000 (UTC)
-Date: Thu, 26 Mar 2026 11:01:20 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v8 02/10] x86/bhi: Make clear_bhb_loop() effective on
- newer CPUs
-Message-ID: <20260326100120.GAacUD8BVziYzLxZHB@fat_crate.local>
-References: <20260324-vmscape-bhb-v8-0-68bb524b3ab9@linux.intel.com>
- <20260324-vmscape-bhb-v8-2-68bb524b3ab9@linux.intel.com>
- <20260324205930.GQacL7Mp7vwGBKX1W7@fat_crate.local>
- <20260324221308.7sh6afdy6r6tsf4w@desk>
- <20260325203759.GCacRHp2t8a7c4Bp6E@fat_crate.local>
- <20260326083934.fk4wyhe6rgiss34z@desk>
+	s=arc-20240116; t=1774519446; c=relaxed/simple;
+	bh=QfWEIqf+Wp46qmgxsgwYftEzg52EL1A1VTmkcb9WrPg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QGm014VDAbQdmgLrA9/hMFXRvgAOQ4BPaTj7zzlk0m6T/BgFuwVieXtn4lT0UnJshhdP2gCrNqELDPB8ur2pGX/nX1iY0hS0aHYGjsmYDe7WrPJLE1hOYnf7FHJ+dHWhAxz4/EnStOgnJ5w+vRIIoQwtcmxlNtNqcvIZWdz9vU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com; spf=pass smtp.mailfrom=hitachienergy.com; dkim=pass (1024-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b=ce/L/9iX; dkim=pass (2048-bit key) header.d=outbound.mailhop.org header.i=@outbound.mailhop.org header.b=P9w+v+cQ; arc=none smtp.client-ip=18.158.144.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hitachienergy.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=hitachienergy.com; s=duo-1630306886989-947ac67a;
+	h=content-transfer-encoding:mime-version:message-id:date:subject:cc:to:from:
+	 cfbl-address:cfbl-feedback-id:from;
+	bh=8mHjX6TyFjTvn38dtQM0Lm04BitL+7nkhimd3emS1kk=;
+	b=ce/L/9iXo1+wtsbWX1FWQlukl1rPpDnsGRwerxkYvfVZnb1rnRp43MjWjYQ7bSsjzt3XxN51EHNY6
+	 JBLDbwMEhzMIithPgX2hgcnBdhg8EhPZ1QA9iOMEgBkcug+Prt4cgOYWINERXE9pzbZbnfmTNg/NJs
+	 oGmgzO2W9B3DrTZw=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=outbound.mailhop.org; s=dkim-high;
+	h=content-transfer-encoding:mime-version:message-id:date:subject:cc:to:from:
+	 cfbl-address:cfbl-feedback-id:from;
+	bh=8mHjX6TyFjTvn38dtQM0Lm04BitL+7nkhimd3emS1kk=;
+	b=P9w+v+cQ6/3NywsZDlfe7ZbTpRCl7hSa4Nmudc0SVDhz7KODrPcvS11jNgvpQBrpa9SI0CVnBeHHX
+	 C99gS+z67l9EWYzQSxa0iblwqXewo19usAUKK2606QwNoXzMBl5cHcbsFAAWaL+K8LJh0jCQnv4mCM
+	 iTe3qbssmmAs7RY2bbfawX6p/wTxa+KPWLe5oXlEo0QcQ7qWJW3LdWb8RLgVHUQ21zeEaurv4Q3QR8
+	 niBVgantLHQPgjCJXm48JwWTJB9gWmLBYNMYvaCkjk410WZG/tOM/UabJasSfvQoYmTSqIAyV/QdjY
+	 ndxT162zwFWt++9W/M0ErrCX5XPP6pQ==
+X-MHO-RoutePath: aGVkY3NtdHA=
+X-MHO-User: f387f247-28fa-11f1-8751-f54febe22707
+X-Report-Abuse-To: https://support.duocircle.com/support/solutions/articles/5000540958-duocircle-standard-smtp-abuse-information
+X-Mail-Handler: DuoCircle Outbound SMTP
+CFBL-Feedback-ID: f387f247-28fa-11f1-8751-f54febe22707:9
+CFBL-Address: prvs=05455ff80f=abuse@outbound.mailhop.org; report=arf
+Received: from HPG0000000548.corp.hitachi-powergrids.com (unknown [20.62.140.138])
+	by outbound3.eu.mailhop.org (Halon) with ESMTPSA
+	id f387f247-28fa-11f1-8751-f54febe22707;
+	Thu, 26 Mar 2026 10:02:53 +0000 (UTC)
+Received: from gitsiv.hitachienergy.com (unknown [10.54.139.14])
+	by HPG0000000548.corp.hitachi-powergrids.com (Postfix) with ESMTP id 7BFAC161F;
+	Thu, 26 Mar 2026 10:02:51 +0000 (UTC)
+Received: from chbrn3-p-dev026.keymile.net (chbrn3-p-dev026.keymile.net [172.31.41.203])
+	by gitsiv.hitachienergy.com (Postfix) with ESMTP id 0474960B7D47;
+	Thu, 26 Mar 2026 11:02:51 +0100 (CET)
+From: Tomas Alvarez Vanoli <tomas.alvarez-vanoli@hitachienergy.com>
+To: netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org
+Cc: qiang.zhao@nxp.com,
+	andrew+netdev@lunn.ch,
+	Tomas Alvarez Vanoli <tomas.alvarez-vanoli@hitachienergy.com>
+Subject: [PATCH] net: wan/fsl_ucc_hdlc: cleanup ucc_hdlc_poll
+Date: Thu, 26 Mar 2026 11:02:32 +0100
+Message-ID: <20260326100232.904289-1-tomas.alvarez-vanoli@hitachienergy.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260326083934.fk4wyhe6rgiss34z@desk>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[alien8.de,none];
-	R_DKIM_ALLOW(-0.20)[alien8.de:s=alien8];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[hitachienergy.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[hitachienergy.com:s=duo-1630306886989-947ac67a,outbound.mailhop.org:s=dkim-high];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271963-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,vger.kernel.org,intel.com];
-	RCPT_COUNT_TWELVE(0.00)[37];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271966-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[hitachienergy.com:+,outbound.mailhop.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tomas.alvarez-vanoli@hitachienergy.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bp@alien8.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[alien8.de:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alien8.de:dkim,fat_crate.local:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 60B5F33348D
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,outbound.mailhop.org:dkim,hitachienergy.com:dkim,hitachienergy.com:email,hitachienergy.com:mid]
+X-Rspamd-Queue-Id: C74E43334C8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 01:39:34AM -0700, Pawan Gupta wrote:
-> I believe the equivalent for cpu_feature_enabled() in asm is the
-> ALTERNATIVE. Please let me know if I am missing something.
+Immediately after setting to 0 we are adding to it, and subtracting 0
+from budget. Replace with just assignment and no subtraction.
 
-Yes, you are.
+Signed-off-by: Tomas Alvarez Vanoli <tomas.alvarez-vanoli@hitachienergy.com>
+---
+ drivers/net/wan/fsl_ucc_hdlc.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-The point is that you don't want to stick those alternative calls inside some
-magic bhb_loop function but hand them in from the outside, as function
-arguments.
-
-Basically what I did.
-
-Then you were worried about this being C code and it had to be noinstr... So
-that outer function can be rewritten in asm, I think, and still keep it well
-separate.
-
-I'll try to rewrite it once I get a free minute, and see how it looks.
-
+diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdlc.c
+index b72ab9951875e..3bd57527b1be6 100644
+--- a/drivers/net/wan/fsl_ucc_hdlc.c
++++ b/drivers/net/wan/fsl_ucc_hdlc.c
+@@ -628,8 +628,7 @@ static int ucc_hdlc_poll(struct napi_struct *napi, int budget)
+ 	hdlc_tx_done(priv);
+ 	spin_unlock(&priv->lock);
+ 
+-	howmany = 0;
+-	howmany += hdlc_rx_done(priv, budget - howmany);
++	howmany = hdlc_rx_done(priv, budget);
+ 
+ 	if (howmany < budget) {
+ 		napi_complete_done(napi, howmany);
 -- 
-Regards/Gruss,
-    Boris.
+2.47.3
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
