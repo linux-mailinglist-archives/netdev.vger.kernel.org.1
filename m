@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-272064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272065-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GI6SMEM1xWn/8AQAu9opvQ
-	(envelope-from <netdev+bounces-272064-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:31:47 +0100
+	id EMAqFHk1xWn/8AQAu9opvQ
+	(envelope-from <netdev+bounces-272065-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:32:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E51D335FD6
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:31:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA7AD336006
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:32:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8E64C303EC3C
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:28:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD064305E373
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B36D33EB1B;
-	Thu, 26 Mar 2026 13:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0ED386C0A;
+	Thu, 26 Mar 2026 13:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Ir8QhvKY"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="JFc8/ToL"
 X-Original-To: netdev@vger.kernel.org
 Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013027.outbound.protection.outlook.com [52.101.83.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156F42F5328;
-	Thu, 26 Mar 2026 13:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34882D8379;
+	Thu, 26 Mar 2026 13:28:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.27
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774531728; cv=fail; b=PHDJtH5fGXPWg+cxJd2grmHvItQt2FI6csGMAVXf7cKya4gCbP3sBum4iBR9g2DOzunSxVaU8BHPz0LVsKOx0gZR8FspfoIjf+piJA3Rx60EboxgopTR/TRY14mvCSZ0mCzTgchjf5p892QFRY8fAmlCQnAT1c0h90fBh+Qwgro=
+	t=1774531730; cv=fail; b=T1NW0j30VwzpgKRYWtj6+rbQigMe3NKzzokjapEZ7v4UXJQ34MLgKF11qK3kK261I/tS77NFCbbklPGdOfK0A7tp8htKVc3UUZTHz2TSUQjm91t4+ZUKIq/JbJBjm527ijvk8ceKRaOiXhSa/3RGjQeiBH+M37C6ahpNKC3hDOk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774531728; c=relaxed/simple;
-	bh=uWxdDB+kJCGXMBvLAxL+wBPOw36rSMAijTuJPRYVSww=;
+	s=arc-20240116; t=1774531730; c=relaxed/simple;
+	bh=+UO7DZH0bs/ZfvgbiHUptVJzUI52pXM1zsBFtcI+DCw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=kKiM37kIj31vuhMOEAKXDI46+dbl6HsUN40OOEhORqeZKcRGfpe8wGu8/0cORlNkVhy5xzj1HDtNb0POTZM/A/HP1b2RvYuSbRxnB1LTqvPiGGKZIFgFxzr/ktGuWljbgdPo9VkDIaOrlZt4qYmBoH6G7BShCGixTIMg3lpu9nI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Ir8QhvKY; arc=fail smtp.client-ip=52.101.83.27
+	 Content-Type:MIME-Version; b=B9JiwE8UAPGd1JcidZoLqF7OYtE1z0LUmrKwjGwtjBhQQaGMiO0ejaDYUYWmuSioinO8TxJivKY+fGfJhnQYCBYg9olK1pB2WyGzD36nUU0kYEVFFAdG0N60SB1ZAohbChQf486loTLUB1U2GWnFX8iOZskfqlvKtD3hwc0EsfA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=JFc8/ToL; arc=fail smtp.client-ip=52.101.83.27
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wz3gVknSg90R5xBh2ELVWrYVIsFby2rKgvIqTCNaXe+vqv5uio74la/BNmygA5OS9ysyEvgRh089hTw27wTRBr5uDXgxvfFMYklcxeOGx7lqZNeow967sE78CwYofbse46PBGCTcq9aHm/ewnHqBXlzRXhkuJiabIropJW7b/s6ZseYcituyuNirsA1rUbuAsEA7dhg90iXPVi9lkskHHarBy2DiVaIIV7jM4mMVx5iU+hVorV1zPQazeXZgXvTwpv6Y/OriXBpBM4dC20kg0PEhVwsPFDg6IWEfpaSCytW/4PGo0pKr8+I90SWtxETv9aAwJr1i5A6YceHbASToZw==
+ b=V+sHoLqoz8AAshf/rmK28QQOaWpH42LCeC+VFJIkEUDIWsM8NnbqxSjCIxISW0VKYMF+77/UpV/+ivO283tdJOexRQ8FuOjK6w8GH2zrMApnqY8LkIEXkQ7WD1wsv+wtkohz1+hgbfA6QtXYbUZ7YdK0UewCerBy8zQ23R4fRHXJhFKaWZhsYlrGeDef3iCTIExBz/SBP4Gufdn28EMkGpQAY2hqjAnwZ86AE+41nge66zPNzqL0ofl1rUOyf0eCeFFYOlzIJYxpnhF1L7oMel7FEW/VRX5ZEG9ykG14lxC/O3NIOnatY1G8L4wdfsmliFuUSBbr1ojMy/pxY0UnPQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=81H2nsAaubONUmWvvg1H2SpZQE59zW4pgOlPNyC3PwU=;
- b=FQmlFWqzNVXkXdt5ZJg8wrTnRlzW4/OZ/SZZ0CVgs0y6VOuAaNsbtcVzCfYVlOVEFw1pZBimPfiY+nGcKbzdsOVEB5364Yukb3VQdO7w8i2mJLToU+vSaQdVMlhOATmlN1+84DXfr3YltEGo3M5gqrWpdPRSBE0iDUmIeEn0WausTMg2F1imYpTSx664wtR27Qy4GKiWteWLVgk59aJuwkfvJ4IDg+IzXgF4+UAutl1CLtEn1kMl4BbYqYBaLoG0dHNoB/AH4uJdCMffR79Yl31Y7BNjd2+1U0qk3FL6to6pywDD1cT3TiteGr20+mj6YAIxCK8dEn1FdJUpUkA1Gw==
+ bh=m8S8E8JwbuECkRPplODiyz4gHYoYz3IYZz8bKz5nvxI=;
+ b=tlIPmca2h5iPmyF4YKgPGIxzEZcYhMx8M5BR8X3+oKVzKTy3acRUIoK1peZUNdDjQ4MBq/Ck3uyoOeiW9Z9OGo1d6MSlzDqdZWVaXeRsbU+5qujjDZ/VPlpXe49eOKQzt2DG+bOu8vaVcgGGwvkP+a1dKfXmK+sQox5BPBwmD8g7K6/jP6C/913krILLtcajCgwsugYfEZBS7SkxBzWsHMJkn14caIrp+yevzFDoqNi1/J2nz7aQ8igCr/mWXeotErsc0GUD+7yxKc/AK6CzogMb8FVxmlGDN4GFtnwOOJY+z3h+uY1EUWz1CCOri9Tv8XeZk20eqSkkHRNXdeeo3g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=81H2nsAaubONUmWvvg1H2SpZQE59zW4pgOlPNyC3PwU=;
- b=Ir8QhvKY6r6AOGKRflcS8PdlbcQhbLsHOrHSBNO8QepEd23whBk59Nkl2a4BCEFmCATAVCgkBxR62bPLK8WQCgeiCN3hk3DJAFkknJ4mHcfSCySR1zOK6RQ4c3qKFzXSyVQYrkjnl1ectIjewW7Qps0Uf4lNCI48Iwk15wVPPIo0BUcOM2JFwip6IPglk0GWSMtrIMDj31ke60Piuadctx9hRRkW5W7ewkZh9eBPgxnCO9k31bXiBaPaqPJ1vcbVhyGVsuyMaHTZGjABFDlfe2vDGEKzoQVTZ7NpsSIs4Iyn6W2gEMr7yiKBhfWtP/wLRSzfkcFAA32DV6jFVC4tPg==
+ bh=m8S8E8JwbuECkRPplODiyz4gHYoYz3IYZz8bKz5nvxI=;
+ b=JFc8/ToLObc0/CeIcLldXHKe1vYkp9ZCKJSnvIcQ438DCLRpADlFIT1uLRYbX0t31Q+KPVev3iu7qiM6S6GDjuwGqa5lEMsGUS4VXwwvfdx8dbt8qyjOwf3Fa6j+pFlv+zFdhK6VsfFoZXalLj0bfM+kohLazvVthWqmx5tAcNGYlpIjFjpdjbLia7qn36VWDWcSNM/Dh1DwYOYHyjpL5FByHEFBYHEoQL5yr+rrOjyZ3UUA1m95ODGPoUbJuDgk4xkSEw7BKsg4xKjADtuf75rdN8RcEI5uoavK6r25ERH8luwUsvaflw9I3gaFxp02Yt/xNu2ZxfyD2TYPuze5og==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
  by AM9PR04MB8337.eurprd04.prod.outlook.com (2603:10a6:20b:3e8::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.22; Thu, 26 Mar
- 2026 13:28:44 +0000
+ 2026 13:28:46 +0000
 Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
  ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
  ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9745.019; Thu, 26 Mar 2026
- 13:28:44 +0000
+ 13:28:46 +0000
 From: Ioana Ciornei <ioana.ciornei@nxp.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -71,16 +71,16 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	petrm@nvidia.com,
 	willemb@google.com,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v4 01/10] selftests: forwarding: extend ethtool_std_stats_get with pause statistics
-Date: Thu, 26 Mar 2026 15:28:19 +0200
-Message-Id: <20260326132828.805703-2-ioana.ciornei@nxp.com>
+Subject: [PATCH net-next v4 02/10] selftests: net: add helpers for running a command on other targets
+Date: Thu, 26 Mar 2026 15:28:20 +0200
+Message-Id: <20260326132828.805703-3-ioana.ciornei@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260326132828.805703-1-ioana.ciornei@nxp.com>
 References: <20260326132828.805703-1-ioana.ciornei@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: FR4P281CA0362.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f8::14) To PAXPR04MB8253.eurprd04.prod.outlook.com
+X-ClientProxiedBy: FR4P281CA0372.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f8::18) To PAXPR04MB8253.eurprd04.prod.outlook.com
  (2603:10a6:102:1bf::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -90,57 +90,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|AM9PR04MB8337:EE_
-X-MS-Office365-Filtering-Correlation-Id: 538cd8e8-f7ac-4530-d6d3-08de8b3b9a65
+X-MS-Office365-Filtering-Correlation-Id: d7122a3f-c4e4-4e44-cbb8-08de8b3b9bca
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|19092799006|1800799024|7416014|376014|18002099003|22082099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	mCo0dzUxOxVqYDkOJL39x5QfF/Nvu/U6bC6TczOMvA2678vM8kXLsXSiNhV3vFWje+mKDQpSB14eHLIaFOT+rgWK8+xlqwdOfzhZbe85O+a8eiMkFKd8COAyUYqrw+9PLCS8GdsEHRotUxQTijIWwohVRYh+EZOdXqaSIqQQ4bkJc3T7W2blbF7vaMMT8ku8qtgV8CHXOKSoGvNG8eyIwcNkVAg7SWb7j1hd4+TB/vmZgeG4bd0of+SOMUoc3UyoDOz61pICj08NRDhqa7WOJN6HyVMNGVUb42gdyk6CBl/OOxge37YuQIIaqLli06FvjGM4hdFePBVbeElxmFxkfmcto8KorZJpav/ZrjZfS918bWJsfAod0ZDFFyDDGzUhEXh5oD9EicRUE65gzv24Ae9EI5e4AGohYMLuTrwii4dOsLDPmhT8Sh06zawd4Pgnuq4mEYi6qrcP2RbQuyKUigS7xRBreG+1crDAZqJ+LveSBNG+dLq2+eHXPJ74TsqIsGphOJfhLCdGxWd718Jo5VXX29fKbPlihEmwys0yoiLNTwGOBTjtKKroomgiyysh/5K7bV/RstKLQjSQnp+6I0y3EXOFv9k0YdypbLlXTTUecH2ZnzNorVgIM6X+hS9/XK/rnSo0P4dNPCZHgl0D1X0Ve0pg9KuRVXRt37s8z0KGDm56OETDKJwufpSWqrC4PZ20Dcp3H0YzK3u5GLqUky18DZIIyXZgGdVl9Y5B/iM=
+	eRJu0bcW0i9ac8FErVzZ1c8fEqUTh/r63UGW2NgOP9jIiFwyrB3vxrrfIaQhWGSW0SHs+DkQwSNkqFk3BUoh8xXMkdco+3rdGSzSzmIgp3VtFZc8sxFwGmTdHMb/dNACN4H7NZ6xWcIcMm9qfLFuvnbdGCluB20NHarqJd8HC7z5JMS3XrfjpMIx51ht6MyJblQOVXZxfqs/no+Y6a2vhmTdeEwv5ElhwcIWNTLeURaMEOl9jANkfCJ3ppLvoVU7hxcBEGD3EDbKUTv4ZuZuubHHUMKGtsZXoBmfytvFFWKTfcTqMpeIxWxZ5ZWo7z9nI/wZKtOrvKp1jF2K0M0H1ga9HrC5QkHib7ruF2CuNpjK/6BUrcKvrGnLRonDsLpCABVCUwfM2jIKiXMpnsyThr0KhIrA5MXBIJbropDcHQBrZED+UV0No4oVfBuhrCas/E61trM4l9LVzhG4qqdgRY5OYDdAMvfwasLRHXWZOlVNwdM908nqB5T3Ww0kdGqKMZCyX6t0Zw8MbcwOYUPzaDSYMJDH8biQug1HiA5HCqE2GaFhp6M6lHl8j9vOosskMRPehmZy6EsEG2H83EPooejWPZEUZ7icBV6rgTF3Vu1/BhY3P8oMch0JkvSClr3p+viB6JDrRhlkwl1Y/a7AvmhYGtfxfEKIntY5jQ3G5pMi5g4zI13fBh6Qe0rray50PWMIWS9gDlmK+FDTTrNCB2689WnCE4ASB/WDgjDHHvw=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(7416014)(376014)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?/P7lTAvuyW+RXFWPKDPmJW/DcioA/poPg9O/O9VqM7FXASpemsNZjcECb9YY?=
- =?us-ascii?Q?9yiG2NPQPhTk0eHat7i8YnoFMaZ6Bu2tMmNWdyW6ir1j6UYMkgw2yfb2wXh6?=
- =?us-ascii?Q?rfPDrCIfym70nMJrAe+QLHLM/kvZFZz3I2P+Y5azx/ttKJc8c7T0dgviWZ1J?=
- =?us-ascii?Q?2phnW9OPgVk5afi0QlkH7SGFWwfREP8Auzr/lhr5GYBbrcLNBHZo+LCTQxJn?=
- =?us-ascii?Q?AJj4z3HvZsXsn4GP9l+sOzFLikbNovMLeSNGQLjZi0PfpzBOMcNev7aRyLlc?=
- =?us-ascii?Q?bM7yiJ17Ez404HDNkaACNJ9pcMuWwSBi/mQ7J4gi3Jiix1dx5QNxkl1GFTwn?=
- =?us-ascii?Q?lMF+SbO79sytUfOTFiShKGU5qiSJlBogICpsnez3RybTlka7+it7S6lhxmiP?=
- =?us-ascii?Q?ES/G/rGmovgfdVD032DTUYL73Jp4sywNcitfut+oKRZUGfkea8hLh+T44ERM?=
- =?us-ascii?Q?rYT9c20NsV/nBoijpsEyZHgbrtzJkRFSf9NNfRlLW2jWxVyfn5Ksbu6aMjEB?=
- =?us-ascii?Q?kUROn/VsSxCyFHerYJWWvF66SlbdxiKXs7P0NDDJ4dgkJynNYHMTxLqg04Xb?=
- =?us-ascii?Q?Bf2AKYtgfP6bsgfuD90S9uTjTHY8VU2UR5NYuM3aRytF4ipMKITPzkb0BKYy?=
- =?us-ascii?Q?xCLtXAI+B+ogw7VwNmbXsdspxQUdu0v48yK3vy+VXFxvtXro1apC+ylKGI/9?=
- =?us-ascii?Q?xH6n/I8ppym7TC+yCJFnW9woI8VVWrty8pQwUMEsbUmgtPLbCRGXosuMdbbf?=
- =?us-ascii?Q?UBqz4eyBNJ5FvE63/FO7H+Gu2E/WMFvXfkmtqa9xBLUJcFQoVtYRiFWG+dEM?=
- =?us-ascii?Q?46nDQ556+TVK0P/zf1lEEri1z7c0GcSg+spjXmdCq1GRW7y13B37ZEEjsPnM?=
- =?us-ascii?Q?s4U+eYKiy+gl8nHGb92995KOgv5M39/jh2d2uCkHfrLTEkub3p5/WCXzdUgv?=
- =?us-ascii?Q?BNCbIoBQqvJeenPYpvuDpkBiASdfvFU62upt15mWbs3ScAdxMJUXsxgmhA7D?=
- =?us-ascii?Q?9HjPAFsZFdFXmMT+vqEv4kT9AkjE73ICH5RSpcwREHpriGU6KVIBxsEmha72?=
- =?us-ascii?Q?fkqYQY0IyBeAw6CXy6Br+bk/4iNM4HK9DXLi7OGPw2pCI5ervX2g+ZevBLqH?=
- =?us-ascii?Q?TGucH2xMiW5MDoIbPTTSElnKcrPx+LtUf4nzFSDaioPP+fpTV0XZlgmreJV0?=
- =?us-ascii?Q?+bLdGB9guxJF+6HbtQ0iZTN3jbVwQrWVF/u/2muYs8m7tlmHd79f3AMfn6r7?=
- =?us-ascii?Q?rAKCsnwQxNqrNNY0Hm1zX7b0LciQwlsOkCG5cTrQf70vMLTn1RNPSXS9hZqg?=
- =?us-ascii?Q?xtlmbStdH7NvDYUmElZwb4TYOrPdQx+6llGuyqHWS/NtAXdK+tcGgptq7GoD?=
- =?us-ascii?Q?XWBghbsXRqCNk7eBgaMeAVNRQjNI76wKLc/DH+mJqYm4iiNtNxL9AvD6vFLi?=
- =?us-ascii?Q?sgwVdwUqW3aIhP60VGZo/4mH5bdOgZQRDfOZ071nkkf7PqQqoG9pEIFLsniD?=
- =?us-ascii?Q?8EFtoYq3A3TRJNVLAC94Yz/vA0Y5qbUag3ytMNJvvj/iNlCu6PyyGyHvCuDs?=
- =?us-ascii?Q?ZqnA5T+5nWtkOSwRYsLeA7khKi1h5yqfABZxDCf8XTjDEcHJ7YbVBBBKgCmm?=
- =?us-ascii?Q?lXlMgPFsgKmDdsjTmmN9sEfD75TxpgklDokrvhxt0A5SjlR4Dh8yyUVp7AwB?=
- =?us-ascii?Q?csigICqN1JiCGqsigQjnznysqnrpAuX8AgraLuqbS/iMIkzIWDJn+HNSvmxs?=
- =?us-ascii?Q?zwjxZEWF6Q=3D=3D?=
+	=?us-ascii?Q?T8BV9/k3WQdVRZTZW5dTnNFvIw45PJ4umTkb3QZLKTzMJP5/gcUrwlU8FX6Z?=
+ =?us-ascii?Q?zAgR7YoG71S0rQ2+YmaUkTcY9TiH0IiwP1bqttQByaAfti6zkMqOurc2W6Q+?=
+ =?us-ascii?Q?ESMzshk0nl+F2nAqnWsKLyTbIODGYuDmb/bUF1/az0yMCMs8i8B4zEDZO1JE?=
+ =?us-ascii?Q?0hDG9/o5RlhVpoWhrH/0KBYZD1wmKCl4pKHaHofSIPxjVlZnWizzf3CcoLXe?=
+ =?us-ascii?Q?WV1hlvUeqjnYcf8GW1oWdWzfSgZBcjBHU72WKt74i6FT+TNJPM1G8BMWJv+X?=
+ =?us-ascii?Q?Olktv4BK/zXDDj8Yn5WeMdC6aLKCdH+mPGiwEdMfyLcUquw1mfdLf0/q0rOw?=
+ =?us-ascii?Q?vNw0eUwz6eurTfavQjkv8yZRu7tCHxy6udMFvGQcIFxXd7172MSX4CbhyBcD?=
+ =?us-ascii?Q?pambMdx+4EUPZnO5ISQdToHQT6oZk8tD17e3OaDOuirek0zOA1Nl0/N8Q80Q?=
+ =?us-ascii?Q?JyLsuK2k0E3XE+lZyf7e0dJQ8woivsPZDEoEFwAWVPmfbk31HAdzTcTTAJZS?=
+ =?us-ascii?Q?fj/WjPraeVgysbaD1QAxpYvcJ+seJwecBdiuceKlLDM3cKe64Rc3y6YAeteE?=
+ =?us-ascii?Q?PkVRrup1my02ZAGUIhA6W3r5F6A/SnSmj2ZDXI2+pya7NVoaBXD28zLMb8W3?=
+ =?us-ascii?Q?+Alm80fQ9/QfyTalSwB9WUvHj1Y0ZJkbznh3BTIYDZYQi7kamAjUkJlP7rwR?=
+ =?us-ascii?Q?pGuAQlg+guYsbPT83iYT7jmDH+LgismJAJwtPMFSjMZ41maYC5QbTZcuncCK?=
+ =?us-ascii?Q?6NQ8l1YjoczU9gYtCX+80sHpCUIM9iWOOIdQex370OkW6CJ561bFPTBffpJ1?=
+ =?us-ascii?Q?Gx6MJRgKXMe8R3w523LzvGKSQUZ7F9dsmZxOW6t45DI+W/rc9v+QZZpj3YWA?=
+ =?us-ascii?Q?G+9Zb+mwe5SZDVv9ZqjYcLOEFNJQv19yy/Qk9yVN3HiYXjYfTZfy1RLYUurD?=
+ =?us-ascii?Q?Lrir7B7T3p7oKtGPguyuGG3ty1iOEm5tSNwsE7+k7MXiCYXITUPs/cHeJ2ac?=
+ =?us-ascii?Q?DfJbTPdX76Z1xZnV29dXZFU0OiECtmodpfzORjcCuMZ6jSku646fpbSNKtXa?=
+ =?us-ascii?Q?RtmTSIvT9ZDxbZ20y/btGcPkLquVZWpb1+AgunL1wkRb63a0K0zwD5WDQSjy?=
+ =?us-ascii?Q?6TRHlKAPc3ylkHcWYfD/rV4q57MvZii6sUxjgk0e52iy0+noqhcRCY8C2hyT?=
+ =?us-ascii?Q?kgYtv3sPtBGsgc8+JLZ6glAzdBwHxA4FiViJTbvGKW2HfrlVd083dxyT7Gme?=
+ =?us-ascii?Q?KsRCT8+vDhTaoo4authmjeD9uQEFqPBtRw7yeRSb8mv0UeBIRUXRLDeAiJXI?=
+ =?us-ascii?Q?P8mNeJ3bbOlYbgqf7gNfPcysvVdXzj3v7MyiM+ICF1dUjWIIkPGKFT/SoVAl?=
+ =?us-ascii?Q?tTAi+2dNc4/zNp4muQR+QbqcMO0vH933TYTXx8/CkRtnMZhkrckmc7tKhK3D?=
+ =?us-ascii?Q?iqaBDPfZ+d2CiD61/qZwB7FA4gNI54C/1/RaQnhMpaJvmH2DhmIquMAvVWLG?=
+ =?us-ascii?Q?Hd+TE964C/T6JwY7R/+bvtoYpkNTLabCvIXUOHc3QcjT7DVW0eXOORcjGhSs?=
+ =?us-ascii?Q?k8Z+bxLHnhxl0ot8rtPXBF9DzYl3pNA6HLTFuPAcjMAyIZRFRxfsKYMBloec?=
+ =?us-ascii?Q?Qnm7Fc7Ew05X0f+1zN82k2GUuMX0W+ays/BVf7b+XVrwCj/sPWYsgQvNfTr+?=
+ =?us-ascii?Q?wpcK38jf35uRK/OJpBJU/c8z6Tph7rGJOwPxHagr53Oz01uEXJQZfeGXuOzI?=
+ =?us-ascii?Q?JRtlWD+AwA=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 538cd8e8-f7ac-4530-d6d3-08de8b3b9a65
+X-MS-Exchange-CrossTenant-Network-Message-Id: d7122a3f-c4e4-4e44-cbb8-08de8b3b9bca
 X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2026 13:28:44.4275
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2026 13:28:46.8382
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xCOg8m7+G4iAburu+glXyzzBZfznHLmTT9pm3Tj4akcMc/jmCxt8tBvWnTtufhQ95rKRVD90BYduURK3qwCE0g==
+X-MS-Exchange-CrossTenant-UserPrincipalName: ezDq5FKJIY5WOh/aanbJbnq2kF0cYZ/aL1p4qQnETB6tR61hg/O0D3u9/a1+616bD4YlI97hYZw5HD+JaKCz/g==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8337
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -148,17 +148,17 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-272064-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272065-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[nxp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
@@ -168,55 +168,81 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:dkim,nxp.com:email,nxp.com:mid]
-X-Rspamd-Queue-Id: 5E51D335FD6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,host:email,nxp.com:dkim,nxp.com:email,nxp.com:mid]
+X-Rspamd-Queue-Id: EA7AD336006
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Even though pause frame statistics are not exported through the same
-ethtool command, there is no point in adding another helper just for
-them. Extent the ethtool_std_stats_get() function so that we are able to
-interrogate using the same helper all the standard statistics.
+Add a couple of helpers which can be used by tests which need to run a
+specific bash command on a different target than the local system, be it
+either another netns or a remote system accessible through ssh.
 
-And since we are touching the function, convert the initial ethtool call
-as well to the jq --arg form in order to be easier to read.
+The __run_on() function is passed through $1 the target on which the
+command should be executed while run_on() is passed the name of the
+interface that is then used to retrieve the target from the TARGETS
+array.
 
 Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
-Reviewed-by: Petr Machata <petrm@nvidia.com>
 ---
 Changes in v4:
-- wrap the lines to max 80 chars
-- replace the if-else with a simple if and return in order to be easier
-  to maintain the 80 chars limit.
+- reworked the helpers so that no global variable is used and
+  information is passed only through parameters
 Changes in v3:
-- none
+- s/TARGET/CUR_TARGET
+- always fallback on running a command locally when either TARGETS is
+  not declared or there is no entry for a specific interface
 Changes in v2:
-- convert jq to the --arg usage form
+- patch is new
 
- tools/testing/selftests/net/forwarding/lib.sh | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ tools/testing/selftests/net/lib.sh | 38 ++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index a9034f0bb58b..3009ce00c5dc 100644
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -831,8 +831,14 @@ ethtool_std_stats_get()
- 	local name=$1; shift
- 	local src=$1; shift
- 
--	ethtool --json -S $dev --groups $grp -- --src $src | \
--		jq '.[]."'"$grp"'"."'$name'"'
-+	if [[ "$grp" == "pause" ]]; then
-+		ethtool -I --json -a "$dev" --src "$src" | \
-+			jq --arg name "$name" '.[].statistics[$name]'
-+		return
+diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
+index b40694573f4c..6c0d613a4de5 100644
+--- a/tools/testing/selftests/net/lib.sh
++++ b/tools/testing/selftests/net/lib.sh
+@@ -670,3 +670,41 @@ cmd_jq()
+ 	# return success only in case of non-empty output
+ 	[ ! -z "$output" ]
+ }
++
++__run_on()
++{
++	local target=$1; shift
++	local type args
++
++	IFS=':' read -r type args <<< "$target"
++
++	case "$type" in
++	netns)
++		# Execute command in network namespace
++		# args contains the namespace name
++		ip netns exec "$args" "$@"
++		;;
++	ssh)
++		# Execute command via SSH args contains user@host
++		ssh -n "$args" "$@"
++		;;
++	local|*)
++		# Execute command locally. This is also the fallback
++		# case for when the interface's target is not found in
++		# the TARGETS array.
++		"$@"
++		;;
++	esac
++}
++
++run_on()
++{
++	local iface=$1; shift
++	local target="local:"
++
++	if declare -p TARGETS &>/dev/null; then
++		target="${TARGETS[$iface]}"
 +	fi
 +
-+	ethtool --json -S "$dev" --groups "$grp" -- --src "$src" | \
-+		jq --arg grp "$grp" --arg name "$name" '.[][$grp][$name]'
- }
- 
- qdisc_stats_get()
++	__run_on "$target" "$@"
++}
 -- 
 2.25.1
 
