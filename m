@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-271991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271992-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qL46E1YexWnr6QQAu9opvQ
-	(envelope-from <netdev+bounces-271991-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:53:58 +0100
+	id WF/QE2MexWnr6QQAu9opvQ
+	(envelope-from <netdev+bounces-271992-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:54:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDAC6334BE8
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:53:57 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4567334BF2
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:54:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4BB4030846B5
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:52:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B3EFD3086337
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462C53F7895;
-	Thu, 26 Mar 2026 11:49:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDBA33F788F;
+	Thu, 26 Mar 2026 11:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Od1nT4lc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ArzXS/Mi"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A50A3FA5C7;
-	Thu, 26 Mar 2026 11:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC483F87E1;
+	Thu, 26 Mar 2026 11:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774525782; cv=none; b=C5bFDCX4hFD4ouV/fXGJFyiJqJbVHwqdq24C33MaWJgK3jvaxJbkC8wb+RKiZAVlO73M/jdE85/yM4/IBMeXDB0vDS/07OMNYlQf6MXp1xbuq2U4riCD7P/ZlosD3GVRvnpOJWT7Odd1tl97CgvHSfV50IiKeNQvyKWkbJ7YtG0=
+	t=1774525784; cv=none; b=bc1e8FObZ7NPxc+MirmqvtCawnKtJruYDb10K9NSHTr8j0UqrqWXt3ASo7JQjmosvqsCHqiN6rhzkZ9RauwCol9w/T4HfU7ess4pOfZHLmqdoh2sBo3Y9ZDiE7/eIj0qRdB/Ne1Gf9qpexATooHGw0/0nF4YcQ/QWtGnXxbJYd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774525782; c=relaxed/simple;
-	bh=xFjviNipDLhR8rwfNROglO91Kk/zyF+M3xCXT4MhVmY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=OU2NHAkVcuL0I49WUQqqBNrxIjwFwetGSgiq5OmPQ7ytCcUDmOhxwJRr+sIKRlwtrlvgqnx+mP9XorOTKF7QHahFUX3aJIrncdMWMbZiTb37rvX8I+4LSL6cUK04zyZ9lovciO4dPjVn2sfX9lIg4X8L+30yl6YXee4UCt+jBjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Od1nT4lc; arc=none smtp.client-ip=198.175.65.16
+	s=arc-20240116; t=1774525784; c=relaxed/simple;
+	bh=zC9NdznL7SwECGii6q9vWpfRFEHrBpEzALMlj8xuFmM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=W1MFsI41d8DqzKtq1DuoNhMqC+G7VefQ5z85Es4ZvAjJNsDbbwQkHeO+79/7ftrEk3iD60rlBJy0HIzwArPEhzpPQLUpv2YTW4+VvLGk9oeSHAeasJnzNvBEElj2RQz+OggXSIVLRup6k+WUo64Yx+mDw7CCDQq2QGscK1i8t8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ArzXS/Mi; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774525773; x=1806061773;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xFjviNipDLhR8rwfNROglO91Kk/zyF+M3xCXT4MhVmY=;
-  b=Od1nT4lcb2LQOQZBltQjWQIWhg4V4CstFhTQW+cyPeV/SzwnpIqCk00Y
-   uQFqIrFbkugFZ7EEbPPQX2OMV/qRKjpvm0xBuWsUCTM4fxbjodCVDQkcl
-   RFd/9bkraq9nxWzPK2hYPxuf76YWYT7zwrKUqW3hQIhaM6dK+g55/5p9U
-   zsCpDvULyDNHbuYv1A8AGZg5FxBzmR9WC8ZmtQEoT3j1UTEO7+efmftsi
-   K2T6mtonSeYJJMAK9IxXu90RVaurP8i+QpxmXSzqJRFzBKknI7eiYnorh
-   p2ojin+48YHogDDSN1Rl0mtsYUbC0seSG5RfBnRUAhSRbBGFXbSpqMiJx
-   Q==;
-X-CSE-ConnectionGUID: d4TH90QERvuanzo9iVsZJQ==
-X-CSE-MsgGUID: Q/rxDpIQTBKegxS0cmAGlQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11740"; a="75776226"
+  t=1774525775; x=1806061775;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=zC9NdznL7SwECGii6q9vWpfRFEHrBpEzALMlj8xuFmM=;
+  b=ArzXS/MiVIHmh9HrtP3YPm0bSRFcH7iGyWCcRWa/DTmJ6y2Z5ov0AS8+
+   C+nFzj5auhxEXciAdzqEDc78kewfwNdmziA1IVEzkeij0Q7jWbkrvm93z
+   P+MfyzQjbesBjWtnivkHR0UCn1zn9sCQFF71f0GF5bA+7tDgh6PXvBhRe
+   t0tbRFVFlUPxvU2oyuiSQj4HdZiweQdmjAR4FpieciWqxLr4VUwThE4WA
+   VuHSgWkBSZy8fDIWPdXev6Vj/+2bwVaOKfgCQMDL45MRvqACOUgNA2UEn
+   /0cyrU0idUjyVU4ZBi07yz5x018+iLdzfvnwDtpbAzup8IfWvIaZYLVd3
+   g==;
+X-CSE-ConnectionGUID: RAJfvj65QUa2EVxZmbzCLw==
+X-CSE-MsgGUID: Mkn68MR2RYyCg0SWhaj/0Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11740"; a="75776230"
 X-IronPort-AV: E=Sophos;i="6.23,142,1770624000"; 
-   d="scan'208";a="75776226"
+   d="scan'208";a="75776230"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2026 04:49:31 -0700
-X-CSE-ConnectionGUID: FhUjxxA7Ssq/OJzPnxPy7g==
-X-CSE-MsgGUID: rM5bBhoMTxywHz8kefW4uA==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2026 04:49:34 -0700
+X-CSE-ConnectionGUID: jkobp5pqTI2zsbW1AkbFWw==
+X-CSE-MsgGUID: vP73laxhT2u9tjcXApMLuQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,142,1770624000"; 
-   d="scan'208";a="248028994"
+   d="scan'208";a="248029008"
 Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmviesa002.fm.intel.com with ESMTP; 26 Mar 2026 04:49:29 -0700
+  by fmviesa002.fm.intel.com with ESMTP; 26 Mar 2026 04:49:31 -0700
 From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 To: netdev@vger.kernel.org
 Cc: bpf@vger.kernel.org,
@@ -71,11 +72,14 @@ Cc: bpf@vger.kernel.org,
 	larysa.zaremba@intel.com,
 	aleksander.lobakin@intel.com,
 	bjorn@kernel.org,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH v4 net 00/11] xsk: tailroom reservation and MTU validation
-Date: Thu, 26 Mar 2026 12:49:08 +0100
-Message-Id: <20260326114919.519456-1-maciej.fijalkowski@intel.com>
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: [PATCH v4 net 01/11] xsk: tighten UMEM headroom validation to account for tailroom and min frame
+Date: Thu, 26 Mar 2026 12:49:09 +0100
+Message-Id: <20260326114919.519456-2-maciej.fijalkowski@intel.com>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20260326114919.519456-1-maciej.fijalkowski@intel.com>
+References: <20260326114919.519456-1-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,114 +92,66 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271991-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271992-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com,fomichev.me];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,intel.com:mid,intel.com:url]
-X-Rspamd-Queue-Id: DDAC6334BE8
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
+X-Rspamd-Queue-Id: E4567334BF2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-v3->v4:
-- allow exact 128 bytes of space when user defined headroom is deducted
-  from total frame size
-- provide a routine for reading procfs entries within xskxceiver
-  * use it to fetch cache line size and calculate skb_shared_info size
-    on our own
-- clean up gve and igc xsk pool enablement routines
-- include mtu vs frame size * max zc segments validation in
-  xp_assign_dev()
+The current headroom validation in xdp_umem_reg() could leave us with
+insufficient space dedicated to even receive minimum-sized ethernet
+frame. Furthermore if multi-buffer would come to play then
+skb_shared_info stored at the end of XSK frame would be corrupted.
 
-v2->v3:
-- add tags from Bjorn/Stan
-- provide at least 128 bytes instead ETH_ZLEN when validating frame
-  headroom
-  * this way we can get rid of i40e/ice changes
-  * make sure xsk_pool_get_rx_frame_size() returns value 128b-aligned
-  * and remove pre-check from idpf
-- separate XDP_UMEM_SG_FLAG fixes from MTU validation in xsk_bind()
-- make drop_idx a local variable in xsk's xdp drop prog
-- adjust rx_dropped to new 128b related values
-- move ugly placed define (Bjorn)
-- remove READ_ONCE when fetching netdev->mtu (Bjorn)
+HW typically works with 128-aligned sizes so let us provide this value
+as bare minimum.
 
-v1->v2:
-- remove xsk_pool_get_tailroom() definition for !CONFIG_XDP_SOCKETS
-  (Stan)
-- do not rely on pool->umem->zc when configuring tailroom (Stan, Bjorn)
-- simplify dbuff setting in ZC drivers (Bjorn)
-- use defines for {head,tail}room in tests (Bjorn)
-- return EINVAL instead of EOPNOTSUPP when mtu setting is wrong (Bjorn)
-- include vlan headers and fcs length when validating mtu (Olek)
-- tighten umem headroom validation when registering umem (Sashiko AI)
-- set XDP_USE_SG in xp_assign_dev_shared() (Sashiko AI)
-- adjust rx dropped xskxceiver test
+Multi-buffer setting is known later in the configuration process so
+besides accounting for 128 bytes, let us also take care of tailroom space
+upfront.
 
-Hi,
+Reviewed-by: Björn Töpel <bjorn@kernel.org>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Fixes: 99e3a236dd43 ("xsk: Add missing check on user supplied headroom size")
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+---
+ net/xdp/xdp_umem.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-here we fix a long-standing issue regarding multi-buffer scenario in ZC
-mode - we have not been providing space at the end of the buffer where
-multi-buffer XDP works on skb_shared_info. This has been brought to our
-attention via [0].
-
-Unaligned mode does not get any specific treatment, it is user's
-responsibility to properly handle XSK addresses in queues.
-
-With adjustments included here in this set against xskxceiver I have
-been able to pass the full test suite on ice.
-
-Thanks,
-Maciej
-
-[0]: https://community.intel.com/t5/Ethernet-Products/X710-XDP-Packet-Corruption-Issue-DRV-MODE-Zero-Copy-Multi-Buffer/m-p/1724208
-
-
-Maciej Fijalkowski (11):
-  xsk: tighten UMEM headroom validation to account for tailroom and min
-    frame
-  xsk: respect tailroom for ZC setups
-  xsk: fix XDP_UMEM_SG_FLAG issues
-  xsk: validate MTU against usable frame size on bind
-  selftests: bpf: introduce a common routine for reading procfs
-  selftests: bpf: fix pkt grow tests
-  selftests: bpf: have a separate variable for drop test
-  selftests: bpf: adjust rx_dropped xskxceiver's test to respect
-    tailroom
-  idpf: remove xsk frame size check against alignment
-  igc: remove home-grown xsk's frame size validation
-  gve: remove home-grown xsk's frame size validation
-
- drivers/net/ethernet/google/gve/gve_main.c    |  5 --
- drivers/net/ethernet/intel/idpf/xsk.c         | 10 ----
- drivers/net/ethernet/intel/igc/igc_xdp.c      | 11 ----
- include/net/xdp_sock.h                        |  2 +-
- include/net/xdp_sock_drv.h                    | 17 +++++-
- net/xdp/xdp_umem.c                            |  3 +-
- net/xdp/xsk_buff_pool.c                       | 11 +++-
- .../selftests/bpf/prog_tests/test_xsk.c       | 55 +++++++++----------
- .../selftests/bpf/prog_tests/test_xsk.h       |  2 +
- .../selftests/bpf/progs/xsk_xdp_progs.c       |  4 +-
- tools/testing/selftests/bpf/xskxceiver.c      | 44 +++++++++++++++
- 11 files changed, 104 insertions(+), 60 deletions(-)
-
+diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
+index 066ce07c506d..58da2f4f4397 100644
+--- a/net/xdp/xdp_umem.c
++++ b/net/xdp/xdp_umem.c
+@@ -203,7 +203,8 @@ static int xdp_umem_reg(struct xdp_umem *umem, struct xdp_umem_reg *mr)
+ 	if (!unaligned_chunks && chunks_rem)
+ 		return -EINVAL;
+ 
+-	if (headroom >= chunk_size - XDP_PACKET_HEADROOM)
++	if (headroom > chunk_size - XDP_PACKET_HEADROOM -
++		       SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) - 128)
+ 		return -EINVAL;
+ 
+ 	if (mr->flags & XDP_UMEM_TX_METADATA_LEN) {
 -- 
 2.43.0
 
