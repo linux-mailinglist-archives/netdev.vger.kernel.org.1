@@ -1,166 +1,201 @@
-Return-Path: <netdev+bounces-272128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272129-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YKBTEGNZxWkk9gQAu9opvQ
-	(envelope-from <netdev+bounces-272128-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:05:55 +0100
+	id iJ5FAl1YxWkk9gQAu9opvQ
+	(envelope-from <netdev+bounces-272129-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:01:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7B5B3381CE
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:05:54 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF3FE33807C
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:01:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 53DC8304B5ED
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:51:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 97CFE300B180
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C8438734D;
-	Thu, 26 Mar 2026 15:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC05F3C944F;
+	Thu, 26 Mar 2026 15:53:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="akl7Rcfy"
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="joWP8ZbJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C473FE34F
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 15:51:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58EB83EC2CF
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 15:53:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774540303; cv=none; b=RstFX7SU1i48+hHF7CNEKKtwpwLKw1woJmhw9HZhGK5NDR+ehdR31JBXJnnWlwuKGuTAmRwGNVoF/75Wl+CRCNlsXbM1nsArLjEAjAF10QP4RU1x44ocF/NaU9z18Xdu6yIMjTRbjdcGMATDCy7Pts4FG2Yx5nbpkrTi5mjg6JM=
+	t=1774540406; cv=none; b=Ra4H+3NGhO725H5yF8oG3WB68xZSnx/Hh1jtssBOHp/0bHVk8NMDsXqdeNsJRkH1M7mTNNePKvITcn2IEq0IQymWUhOwn/NcT/sxGSYNkXID+s7PZ3AaBFkKvYThIV3w6y5NKbrw4b8E9mRe8TX0XWL94C8qhlVNyuQlGnbzJCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774540303; c=relaxed/simple;
-	bh=9qxNSmjmmwx5hARRcvi9vM7Jjk1tgqqzAXn1qFN9kV0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HW0lemVd4xS7PB3PRRNTMfSJMYFIJfp9VYLZuaAZIq0iLQzi2+KTqouBAjrpaFm0DfLfx83QpXRXb7k5LjeEF9ctJUnFOf/SGzFNOUOngqym37liBN4uomI0SW1nqYD62L5SUfPC8yr86Z3Tt/6iUQQPo/DDZlKpzuTtB7FlkxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=akl7Rcfy; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-509044f54aaso34949631cf.1
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 08:51:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774540301; x=1775145101; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uJxiyNB1GFRgzCoGMWokYIzWiU1euw82rZPXBr5G14Y=;
-        b=akl7RcfyXCO4Emlm4r2XcljSqXvKo+2hx9+zui98c/a7qUU01hKhSNAnuBUzuLMN+V
-         qxIgt2riQ879q4ihYvNUkgX1uSEOfRxjD3AdiVa0YDc4lMUMEnwkJs2nSLu2iFfNTi+s
-         rY5aFLHSYYbiE6YhicgOzMi5tyxoYPFX79P6jJNJxGWEx4rK+/ceryDPgdbVQ4PiuKEq
-         vfJEIGuy3ozBo7sseD5AamI8ES2HvwH4Qv34biZKq56uxdMOKd3az2C1UBwICR/c8JIg
-         sr9u0em8TnZLYsiPNej4AGSxEYNeMf/XH0xvSPu9TUAWcmA0s2wL+gsf9AKb9H4OU3lr
-         3Fig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774540301; x=1775145101;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uJxiyNB1GFRgzCoGMWokYIzWiU1euw82rZPXBr5G14Y=;
-        b=AbVmXvYYqN4Aj2edYUiFA5gu5AQ4wusQoDXMahy8wJqwRZnnbBzqD8emIdDNqjdPSQ
-         w5+FnL23BUDmwUV1YlmVc233t1a8Hoa/RqahSwgLglVSlOZGLkwAyZN2uJb9w5MqBps9
-         RJew/mkJgeY6Cdvc7jiCPGC3PnCz4lVZLIlvXErUnrjp1vhm1O0CEEim6GGS2yx+Yl7z
-         7xMZK6QXTr1FCmLSWXuPr8olav1xQYWjBrlmQ1ELj7w3zz87+UFlnnIrQfb9OPPquIPy
-         WB0B3LHzgnOTQIToZEp8ZpyR7I46D8ywd1C1R5nuq1PHR4U2U4g86/njTrI0sqgXUkXP
-         0E4A==
-X-Forwarded-Encrypted: i=1; AJvYcCVDmJRnVzUaFFZZP1wFwnT/4MF3JCPUFT4dkEjK/bLUAHZkMy4X5zXxRBS8i1p5gb0eM9e+IYc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGfes3G6ejiSw4G2kBolKW2A5SFpL9cdux7L01hvDO5wFG9j+M
-	/7kl5RO1iqB4Iy6n7m8fZFvGZ3jxfyNSMtUbP15KDAQMoaAtG/Tubpdq2sAnSeilfB4J9ei/otB
-	NjdoCNrkR5cM/2A==
-X-Received: from qtwy9.prod.google.com ([2002:a05:622a:49:b0:50b:7d38:9450])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5888:0:b0:50b:444c:e268 with SMTP id d75a77b69052e-50b80d2c161mr111055611cf.19.1774540299691;
- Thu, 26 Mar 2026 08:51:39 -0700 (PDT)
-Date: Thu, 26 Mar 2026 15:51:38 +0000
+	s=arc-20240116; t=1774540406; c=relaxed/simple;
+	bh=jWCzCO8aMHEZUZ7DQtZDmmJccLhh6PSRxwep9L4gXII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wn2aI669SDo9QnN0yg17GRzJR+f3jhhUbgXwVbA7rW+S0819oB2Yr6OiKRE9F6ahWaeg5tnvcjNefV2Kwh7tHYKGGb7I2DGVXj2pQE7bEsPHjhhYWMCR26QJ35Pt8Yz6DwdK+1lDkMT4NFRqpT2toPoKJxGk4yg6YWqHF8R9Viw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=joWP8ZbJ; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from killaraus.ideasonboard.com (2001-14ba-703d-e500--2a1.rev.dnainternet.fi [IPv6:2001:14ba:703d:e500::2a1])
+	by perceval.ideasonboard.com (Postfix) with UTF8SMTPSA id 312F39A9;
+	Thu, 26 Mar 2026 16:52:03 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1774540323;
+	bh=jWCzCO8aMHEZUZ7DQtZDmmJccLhh6PSRxwep9L4gXII=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=joWP8ZbJ4pAXm4DFioLVh0FvhCYCPI2Jv1TfsVBxaf1l2Z7EREDeQUXU3WOu87FSy
+	 aQW9zeIZcL2jeCdbhgOk5CT/RA1qzlqrJbeWcPitiNxIHwOlZ5rJYp63cHL83p0Qds
+	 pazg0Vl/Jic2PmKa5/02oasm+6KHQh/MY/7KceCQ=
+Date: Thu, 26 Mar 2026 17:53:20 +0200
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: netdev@vger.kernel.org, imx@lists.linux.dev
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Frank Li <Frank.Li@nxp.com>, Jakub Kicinski <kuba@kernel.org>,
+	Joy Zou <joy.zou@nxp.com>,
+	Kieran Bingham <kieran.bingham@ideasonboard.com>,
+	Marco Felsch <m.felsch@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Stefan Klug <stefan.klug@ideasonboard.com>,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v4 1/2] net: stmmac: provide flag to disable EEE
+Message-ID: <20260326155320.GA2929106@killaraus.ideasonboard.com>
+References: <20260325210003.2752013-1-laurent.pinchart@ideasonboard.com>
+ <20260325210003.2752013-2-laurent.pinchart@ideasonboard.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
-Message-ID: <20260326155138.2429480-1-edumazet@google.com>
-Subject: [PATCH v2 net] ip6_tunnel: clear skb2->cb[] in ip4ip6_err()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	Oskar Kjos <oskar.kjos@hotmail.com>, Ido Schimmel <idosch@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260325210003.2752013-2-laurent.pinchart@ideasonboard.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[ideasonboard.com,none];
+	R_DKIM_ALLOW(-0.20)[ideasonboard.com:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,hotmail.com,nvidia.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272128-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272129-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,gmail.com,toradex.com,nxp.com,kernel.org,ideasonboard.com,pengutronix.de,redhat.com,armlinux.org.uk,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: A7B5B3381CE
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[laurent.pinchart@ideasonboard.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ideasonboard.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,renesas.com:email,armlinux.org.uk:email,ideasonboard.com:dkim,ideasonboard.com:email]
+X-Rspamd-Queue-Id: DF3FE33807C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Oskar Kjos reported the following problem.
+On Wed, Mar 25, 2026 at 11:00:02PM +0200, Laurent Pinchart wrote:
+> From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+> 
+> Some platforms have problems when EEE is enabled, and thus need a way
+> to disable stmmac EEE support. Add a flag before the other LPI related
+> flags which tells stmmac to avoid populating the phylink LPI
+> capabilities, which causes phylink to call phy_disable_eee() for any
+> PHY that is attached to the affected phylink instance.
+> 
+> iMX8MP is an example - the lpi_intr_o signal is wired to an OR gate
+> along with the main dwmac interrupts. Since lpi_intr_o is synchronous
+> to the receive clock domain, and takes four clock cycles to clear, this
+> leads to interrupt storms as the interrupt remains asserted for some
+> time after the LPI control and status register is read.
+> 
+> This problem becomes worse when the receive clock from the PHY stops
+> when the receive path enters LPI state - which means that lpi_intr_o
+> can not deassert until the clock restarts. Since the LPI state of the
+> receive path depends on the link partner, this is out of our control.
+> We could disable RX clock stop at the PHY, but that doesn't get around
+> the slow-to-deassert lpi_intr_o mentioned in the above paragraph.
+> 
+> Previously, iMX8MP worked around this by disabling gigabit EEE, but
+> this is insufficient - the problem is also visible at 100M speeds,
+> where the receive clock is slower.
+> 
+> There is extensive discussion and investigation in the thread linked
+> below, the result of which is summarised in this commit message.
+> 
+> Reported-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> Closes: https://lore.kernel.org/r/20251026122905.29028-1-laurent.pinchart@ideasonboard.com
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Tested-by: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
 
-ip4ip6_err() calls icmp_send() on a cloned skb whose cb[] was written
-by the IPv6 receive path as struct inet6_skb_parm. icmp_send() passes
-IPCB(skb2) to __ip_options_echo(), which interprets that cb[] region
-as struct inet_skb_parm (IPv4). The layouts differ: inet6_skb_parm.nhoff
-at offset 14 overlaps inet_skb_parm.opt.rr, producing a non-zero rr
-value. __ip_options_echo() then reads optlen from attacker-controlled
-packet data at sptr[rr+1] and copies that many bytes into dopt->__data,
-a fixed 40-byte stack buffer (IP_OPTIONS_DATA_FIXED_SIZE).
+And I just realized I haven't sent an R-b tag, despite having reviewed
+the patch.
 
-To fix this we clear skb2->cb[], as suggested by Oskar Kjos.
+Reviewed-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
 
-Also add minimal IPv4 header validation (version == 4, ihl >= 5).
+> Signed-off-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  7 ++++++-
+>  include/linux/stmmac.h                            | 13 +++++++------
+>  2 files changed, 13 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 9b6b49331639..ce51b9c22129 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -1438,7 +1438,12 @@ static int stmmac_phylink_setup(struct stmmac_priv *priv)
+>  				 config->supported_interfaces,
+>  				 pcs->supported_interfaces);
+>  
+> -	if (priv->dma_cap.eee) {
+> +	/* Some platforms, e.g. iMX8MP, wire lpi_intr_o to the same interrupt
+> +	 * used for stmmac's main interrupts, which leads to interrupt storms.
+> +	 * STMMAC_FLAG_EEE_DISABLE allows EEE to be disabled on such platforms.
+> +	 */
+> +	if (priv->dma_cap.eee &&
+> +	    !(priv->plat->flags & STMMAC_FLAG_EEE_DISABLE)) {
+>  		/* The GMAC 3.74a databook states that EEE is only supported
+>  		 * in MII, GMII, and RGMII interfaces.
+>  		 */
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index 5b2bece81448..e62d21afd56d 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -207,12 +207,13 @@ enum dwmac_core_type {
+>  #define STMMAC_FLAG_MULTI_MSI_EN		BIT(7)
+>  #define STMMAC_FLAG_EXT_SNAPSHOT_EN		BIT(8)
+>  #define STMMAC_FLAG_INT_SNAPSHOT_EN		BIT(9)
+> -#define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
+> -#define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
+> -#define STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP	BIT(12)
+> -#define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(13)
+> -#define STMMAC_FLAG_KEEP_PREAMBLE_BEFORE_SFD	BIT(14)
+> -#define STMMAC_FLAG_SERDES_SUPPORTS_2500M	BIT(15)
+> +#define STMMAC_FLAG_EEE_DISABLE			BIT(10)
+> +#define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(11)
+> +#define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(12)
+> +#define STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP	BIT(13)
+> +#define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(14)
+> +#define STMMAC_FLAG_KEEP_PREAMBLE_BEFORE_SFD	BIT(15)
+> +#define STMMAC_FLAG_SERDES_SUPPORTS_2500M	BIT(16)
+>  
+>  struct mac_device_info;
+>  
 
-Fixes: c4d3efafcc93 ("[IPV6] IP6TUNNEL: Add support to IPv4 over IPv6 tunnel.")
-Reported-by: Oskar Kjos <oskar.kjos@hotmail.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Ido Schimmel <idosch@nvidia.com>
----
-v2: dot not even try to take care of IP options.
-
- net/ipv6/ip6_tunnel.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-index 4c29aa94e86eb9439458e4b23426bfda8b3b8922..0b53488a922900270903cc55840014436bd946f9 100644
---- a/net/ipv6/ip6_tunnel.c
-+++ b/net/ipv6/ip6_tunnel.c
-@@ -601,11 +601,16 @@ ip4ip6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
- 	if (!skb2)
- 		return 0;
- 
-+	/* Remove debris left by IPv6 stack. */
-+	memset(IPCB(skb2), 0, sizeof(*IPCB(skb2)));
-+
- 	skb_dst_drop(skb2);
- 
- 	skb_pull(skb2, offset);
- 	skb_reset_network_header(skb2);
- 	eiph = ip_hdr(skb2);
-+	if (eiph->version != 4 || eiph->ihl < 5)
-+		goto out;
- 
- 	/* Try to guess incoming interface */
- 	rt = ip_route_output_ports(dev_net(skb->dev), &fl4, NULL, eiph->saddr,
 -- 
-2.53.0.1018.g2bb0e51243-goog
+Regards,
 
+Laurent Pinchart
 
