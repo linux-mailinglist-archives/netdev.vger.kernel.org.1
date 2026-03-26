@@ -1,850 +1,193 @@
-Return-Path: <netdev+bounces-272151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272136-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uDMiFY5gxWlM9wQAu9opvQ
-	(envelope-from <netdev+bounces-272151-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:36:30 +0100
+	id QClRDjdixWkJ+AQAu9opvQ
+	(envelope-from <netdev+bounces-272136-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:43:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABF133387EC
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:36:29 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FF22338A03
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:43:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 055E630166E1
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:35:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A80F830E1EA6
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D8D3B47C8;
-	Thu, 26 Mar 2026 16:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D604070F3;
+	Thu, 26 Mar 2026 16:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LtaI87uf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jb5+RN/w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CAA3F0AB9;
-	Thu, 26 Mar 2026 16:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC24D401485
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 16:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774542809; cv=none; b=VKZ50+83JLEbDDe7ves3wbY8xaoHUkwK0eIa52Xsyn8jcbB3s9CIXATRK/IqqycWLGxdOMjdiLKCF1N44KhIOLSWMuEGWDWPEavRNDJtKT4pvu5iQHXYhEXIsTYQyfjmeAMipxexFnsj1hj9pyhVE+tOpWC2S/90gDwdmDV5pjs=
+	t=1774542551; cv=none; b=AIrI6aQj/WJG5RdV6QdlINDSF42C8eqXDxCoQnbXM+4eOI2wJkFhv5pvBcVRk63Sx1vh0ONffeQCbDOd2fky1/327MncwazLUHM/VnzO24QQ1J5Drx4q1TsG3Fm9oTsd28gyXJRKAxRevZx7earz/Kb/5uiX0ykNhQEnhsHdBqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774542809; c=relaxed/simple;
-	bh=YvFe7Mrp0/nooPRVRV/8VS/UW7rTm2ND8U7tebxBNaU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bX5lABvO67NzEWo65g+ZiXIkZhklVV199jENdlVr64ck6Mds0kiTOxSumvRFB5yCmu/M/lLKbL4xjCVof01eQl4uRPouu8VjeGXtCZULI/63x20hWeT8mXwvPgvDLvmwG0SEGHKH/FgIByhqXSWU3dH+E0pf4fge4DtNLW/4VsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LtaI87uf; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774542807; x=1806078807;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=YvFe7Mrp0/nooPRVRV/8VS/UW7rTm2ND8U7tebxBNaU=;
-  b=LtaI87ufk8q9PFN7SkZtSlp+uJff7lfJK5z3lYh9j/K8POeeuI5Y/klE
-   kdSg0s7lBZGE5M3A0qPWHu5fY4eJONGCIHossFm/G0eH3cppV31Rf3LWq
-   of0QtiX9N9OzUlT7BUaBn90o6d3AvRPYgk8W57O0TasHEZxzsuN49RxQU
-   84ISVl2ofYwH/i5TWYxcBDbG4tYy35Y01gVTeGfd5xay3uRXvQVb0dDfP
-   EpxvVjH6j7/VlQ1f9xrMQfBkQkaYm1Evkz8g6WGRV036oYG1XT+Kn/7RD
-   L3X15MjI4dD7PDDQvtBhCS2B+CheHFzVbx2awKocZstOhJLKOvRt33ylr
-   w==;
-X-CSE-ConnectionGUID: RnceLxo3RceYEHxvjtVPoQ==
-X-CSE-MsgGUID: q6qISCppTS+CXIjPSqyiPA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11741"; a="74636783"
-X-IronPort-AV: E=Sophos;i="6.23,142,1770624000"; 
-   d="scan'208";a="74636783"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2026 09:33:25 -0700
-X-CSE-ConnectionGUID: CtUyLLrVTx61STSSPn75cA==
-X-CSE-MsgGUID: koG7bDrXSyWxLH3L+XrkuA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,142,1770624000"; 
-   d="scan'208";a="225311414"
-Received: from gklab-003-001.igk.intel.com ([10.91.173.48])
-  by orviesa007.jf.intel.com with ESMTP; 26 Mar 2026 09:33:21 -0700
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	poros@redhat.com,
-	richardcochran@gmail.com,
-	andrew+netdev@lunn.ch,
-	przemyslaw.kitszel@intel.com,
-	anthony.l.nguyen@intel.com,
-	Prathosh.Satish@microchip.com,
-	ivecera@redhat.com,
-	jiri@resnulli.us,
-	arkadiusz.kubalewski@intel.com,
-	vadim.fedorenko@linux.dev,
-	donald.hunter@gmail.com,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>
-Subject: [PATCH v4 net-next 8/8] ice: add TX reference clock (tx_clk) control for E825 devices
-Date: Thu, 26 Mar 2026 17:28:32 +0100
-Message-Id: <20260326162832.3135857-9-grzegorz.nitka@intel.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20260326162832.3135857-1-grzegorz.nitka@intel.com>
-References: <20260326162832.3135857-1-grzegorz.nitka@intel.com>
+	s=arc-20240116; t=1774542551; c=relaxed/simple;
+	bh=z6GMWOCYmwQPpclwbRHQ3L8tkjcwK1pnli6GFBfiIKE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=ZiDcTDD9rAIrr2qnlYZDbf2LXgDqUptl6VWIresqMmi8yCGQ6F19nJkiXlkoyzo2heLQtruYql9HJUULNkS2r2mdWohqbxStWhYo2MBrshQQ6nifO9uph/BjV88WUD+i2YQJ/Qspp+p/VY3475aZXCHDc5LxVrs4dnqJodHH0SI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jb5+RN/w; arc=none smtp.client-ip=74.125.224.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-64ae222d978so1287809d50.1
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 09:29:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774542549; x=1775147349; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CDlf2p6914NjJVCVaq2Q/Nq8XSjjhMKVxHPhxp+UG88=;
+        b=Jb5+RN/wcmRrbnOKzgXeeDbTGMsRT1cr+jjEF+HdsswaqYWH9wBOTKkHp3MQ/Z/0iG
+         KmcOQuVStTRWRh0vCysHuGOHtd7tkfUTHzXpIUJtP8Nc0TGmwrBw5QbsPEjO8FjoEA8N
+         W+rcytTfs9K3Atk3eZ+dxwE4dSlAVOga9QOyBv2/nv0uJVivXhzLlHiMmxF/TNdC0xE4
+         JjO5xiuz27vdWX9zno1Z6blJ30yXzLfRg9w1k5uY36O0j1wH4gBpXo093g2jlfAL4xyX
+         ztXKRS5NRfJs+LJtPPdmiHMX+rRWk5adv0vl7IrYPg8b0XeYNMUcE4ZXivkmf40VCnav
+         WsvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774542549; x=1775147349;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CDlf2p6914NjJVCVaq2Q/Nq8XSjjhMKVxHPhxp+UG88=;
+        b=cvs6whMaB9LHyBFdFxgG4BkJVHgeNxfgiizDCldIXQdh/kaFeLKrb7bab8GKMDHIto
+         e4zjGCj9U3By8FnP2GGSlf97XtChzqBXd4FXfLkhT4O0N3BHetKnZ+p1Fs4HZqpK9yiz
+         kLN77MZBgnUSLy/d0/g1kaIFWkuwndzREvuxsj57+LjU3mV91q01QPCNkPJSiQ8WIKJ8
+         lneAXynmz9llXPqrsAxuLu7LWkYAeu7B3ngNYpkD+S9TNXul5Aq2s8baS2vo0Y3cj+g7
+         2hn22tXb32hQEUrFwXTqz8qCllBMV7Jy/Mxdu+LiJArgAMyfJJkwgbXBL0powIOp9l5Z
+         5hZw==
+X-Forwarded-Encrypted: i=1; AJvYcCVE3gygtlWW0fZ72cVoSOp7W6si18RaZh++a589pVrvSm0cN3o6qaHHNXJLzWLVVPTEXW9rKBg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJvWLlyzIqIFiOabYjKVVyigWQbDczJ6QKvV9Pv5bhJbPlk3s7
+	3S7X8Pil+d25Lrsjo2bBSkeNru7Mr7iT/3CvZjP972wXLO4OXwXYc1lv
+X-Gm-Gg: ATEYQzyDyXjEJ0jMEn13qr2Y372ZnHYq1B3fKN5fiskiVUQ1s9gLWfFhAia7PJJzDGC
+	2FEoKbT6MJUfK8bMm90uS/9qHojwc70E4D9+GAazd+vLi87rMPTOOEM9Uf9CsYHpiSKYVdpUeko
+	q4GMvLqr3MSaBmR+zhqw+XdMyzyvbMYhFqc5H/77EcOf+cATqe+qUPQJd55alFutofHRUlK8HGH
+	s9+Tt7cNOV3kIgGGquPug4/6HB7E1FT/wM0cuCQs71r3rVEhCSCK9O3vCCHO+gR2KSSq1l726xg
+	5lmvgBNMA9L98eVpX8bwFYIhiOubn7Mju/0gTLdKp49ArJ4L9hKYz6nKlCj71NTlJJoiMJamzjD
+	vZldUjPF2Mz0akCNWxbdxyD+dOe+2em25p6mFwkFRqah3bUC7TIQwGq7USsynpvplIOXOcx1Jxo
+	l8ZOtBW9GSOOtUuX14ZUIQJh+RlcA1xUZnf1L/ikDYutdTHR7e7Us3GLyAXE9XuidUaR0dHqGiY
+	ziWMkD+QQ11sGw=
+X-Received: by 2002:a53:e105:0:b0:64e:ba77:8412 with SMTP id 956f58d0204a3-64ee6185ff2mr5998843d50.73.1774542548777;
+        Thu, 26 Mar 2026 09:29:08 -0700 (PDT)
+Received: from gmail.com (180.134.85.34.bc.googleusercontent.com. [34.85.134.180])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-64ef58ca09csm1662948d50.5.2026.03.26.09.29.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Mar 2026 09:29:08 -0700 (PDT)
+Date: Thu, 26 Mar 2026 12:29:07 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Qingfang Deng <dqfext@gmail.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Petr Machata <petrm@nvidia.com>, 
+ Richard Gobert <richardbgobert@gmail.com>, 
+ Anubhav Singh <anubhavsinggh@google.com>, 
+ Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>, 
+ netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Cc: linux-ppp@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.29bf4e0691478@gmail.com>
+In-Reply-To: <20260326081127.61229-2-dqfext@gmail.com>
+References: <20260326081127.61229-1-dqfext@gmail.com>
+ <20260326081127.61229-2-dqfext@gmail.com>
+Subject: Re: [RFC PATCH net-next v6 2/2] selftests: net: test PPPoE packets in
+ gro.sh
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.34 / 15.00];
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
-	TAGGED_FROM(0.00)[bounces-272151-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272136-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com,nokia-bell-labs.com,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: ABF133387EC
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4FF22338A03
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add full support for selecting and controlling the TX SERDES reference
-clock on E825C hardware. E825C devicede supports selecting among
-multiple SERDES transmit reference clock sources (ENET, SyncE, EREF0),
-but imposes several routing constraints: on some paths a reference
-must be enabled on both PHY complexes, and ports sharing a PHY must
-coordinate usage so that a reference is not disabled while still in
-active use. Until now the driver did not expose this domain through
-the DPLL API, nor did it provide a coherent control layer for enabling,
-switching, or tracking TX reference clocks.
+Qingfang Deng wrote:
+> Add PPPoE test-cases to the GRO selftest.
+> 
+> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+> ---
+> v6: new patch
+> 
+> I'm not sure if I should include all the existing IPv4/v6 tests for
+> PPPoE. There are tests that hardcode ETH_HLEN as the NH offset, which
+> are meant to test the L3 protocol, not the underlying protocol, and
+> changing all of them seems too invasive.
 
-This patch implements full TX reference clock management for E825
-devices. Compared to previous iterations, the logic is now separated
-into a dedicated module (ice_txclk.c) which encapsulates all
-clock-selection rules, cross‑PHY dependencies, and the bookkeeping
-needed to ensure safe transitions. This allows the DPLL layer and
-the PTP code to remain focused on their respective roles.
+Overall this change looks good to me. But indeed all the churn of
 
-Key additions:
+    (pppoe ? PPPOE_SES_HLEN : 0)
+ 
+is a bit annoying. Left a few representative snippets below.
+I think that could be avoided similar to MAX_HDR_LEN by having a
+global definition and using that everywhere. Still a lot of churn, but
+at least no repeated open-coded logic.
 
-  * A new txclk control module (`ice_txclk.c`) implementing:
-      - software usage tracking for each reference clock per PHY,
-      - peer‑PHY enable rules (SyncE required on both PHYs when used on
-        PHY0, EREF0 required on both when used on PHY1),
-      - safe disabling of unused reference clocks after switching,
-      - a single, driver‑internal entry point for clock changes.
+Also consider whether running all these tests again in PPPoE adds
+value, if not, then indeed trim the tests to those that truly add
+code coverage. 
 
-  * Integration with the DPLL pin ops:
-      - pin‑set now calls into `ice_txclk_set_clk()` to request a
-        hardware switch,
-      - pin‑get reports the current SERDES reference by reading back the
-        active selector (`ice_get_serdes_ref_sel_e825c()`).
+> @@ -745,7 +777,7 @@ static void add_ipv4_ts_option(void *buf, void *optpkt)
+>  	memcpy(optpkt + tcp_offset + optlen, buf + tcp_offset,
+>  	       sizeof(struct tcphdr) + PAYLOAD_LEN);
+>  
+> -	iph = (struct iphdr *)(optpkt + ETH_HLEN);
+> +	iph = (struct iphdr *)(optpkt + ETH_HLEN + (pppoe ? PPPOE_SES_HLEN : 0));
+>  	iph->ihl = 5 + (optlen / 4);
+>  	iph->tot_len = htons(ntohs(iph->tot_len) + optlen);
+>  	iph->check = 0;
+> @@ -755,7 +787,7 @@ static void add_ipv4_ts_option(void *buf, void *optpkt)
+>  static void add_ipv6_exthdr(void *buf, void *optpkt, __u8 exthdr_type, char *ext_payload)
+>  {
+>  	struct ipv6_opt_hdr *exthdr = (struct ipv6_opt_hdr *)(optpkt + tcp_offset);
+> -	struct ipv6hdr *iph = (struct ipv6hdr *)(optpkt + ETH_HLEN);
+> +	struct ipv6hdr *iph = (struct ipv6hdr *)(optpkt + ETH_HLEN + (pppoe ? PPPOE_SES_HLEN : 0));
+>  	char *exthdr_payload_start = (char *)(exthdr + 1);
+>  
+>  	exthdr->hdrlen = 0;
 
-  * Wiring the requested reference clock into Auto‑Negotiation restart
-    through the already‑extended `ice_aq_set_link_restart_an()`.
-
-  * After each link-up the driver verifies the effective hardware state
-    (`ice_txclk_verify()`) and updates its per‑PHY usage bitmaps,
-    correcting the requested/active state if the FW or AN flow applied a
-    different reference.
-
-  * PTP PF initialization now seeds the ENET reference clock as enabled
-    by default for its port.
-
-All reference clock transitions are serialized through the DPLL lock,
-and usage information is shared across all PFs belonging to the
-same E825C controller PF. This ensures that concurrent changes are
-coordinated and that shared PHYs never see an unexpected disable.
-
-With this patch, E825 devices gain full userspace‑driven TXC reference
-clock selection via the DPLL subsystem, enabling complete SyncE support,
-precise multi‑clock setups, and predictable clock routing behavior.
-
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
----
- drivers/net/ethernet/intel/ice/Makefile     |   2 +-
- drivers/net/ethernet/intel/ice/ice.h        |  12 +
- drivers/net/ethernet/intel/ice/ice_dpll.c   |  53 +++-
- drivers/net/ethernet/intel/ice/ice_ptp.c    |  27 ++-
- drivers/net/ethernet/intel/ice/ice_ptp.h    |   7 +
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c |  37 +++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  27 +++
- drivers/net/ethernet/intel/ice/ice_txclk.c  | 256 ++++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_txclk.h  |  41 ++++
- 9 files changed, 445 insertions(+), 17 deletions(-)
- create mode 100644 drivers/net/ethernet/intel/ice/ice_txclk.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_txclk.h
-
-diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
-index 38db476ab2ec..95fd0c49800f 100644
---- a/drivers/net/ethernet/intel/ice/Makefile
-+++ b/drivers/net/ethernet/intel/ice/Makefile
-@@ -54,7 +54,7 @@ ice-$(CONFIG_PCI_IOV) +=	\
- 	ice_vf_mbx.o		\
- 	ice_vf_vsi_vlan_ops.o	\
- 	ice_vf_lib.o
--ice-$(CONFIG_PTP_1588_CLOCK) += ice_ptp.o ice_ptp_hw.o ice_dpll.o ice_tspll.o ice_cpi.o
-+ice-$(CONFIG_PTP_1588_CLOCK) += ice_ptp.o ice_ptp_hw.o ice_dpll.o ice_tspll.o ice_cpi.o ice_txclk.o
- ice-$(CONFIG_DCB) += ice_dcb.o ice_dcb_nl.o ice_dcb_lib.o
- ice-$(CONFIG_RFS_ACCEL) += ice_arfs.o
- ice-$(CONFIG_XDP_SOCKETS) += ice_xsk.o
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 2b2b22af42be..b42df789295f 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -1133,4 +1133,16 @@ static inline struct ice_hw *ice_get_primary_hw(struct ice_pf *pf)
- 	else
- 		return &pf->adapter->ctrl_pf->hw;
- }
-+
-+/**
-+ * ice_get_ctrl_pf - Get pointer to Control PF of the adapter
-+ * @pf: pointer to the current PF structure
-+ *
-+ * Return: A pointer to ice_pf structure which is Control PF,
-+ * NULL if it's not initialized yet.
-+ */
-+static inline struct ice_pf *ice_get_ctrl_pf(struct ice_pf *pf)
-+{
-+	return !pf->adapter ? NULL : pf->adapter->ctrl_pf;
-+}
- #endif /* _ICE_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index 72518fd1398d..ac0bfc2f0f0e 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -4,6 +4,7 @@
- #include "ice.h"
- #include "ice_lib.h"
- #include "ice_trace.h"
-+#include "ice_txclk.h"
- #include <linux/dpll.h>
- #include <linux/property.h>
- 
-@@ -2538,7 +2539,9 @@ ice_dpll_rclk_state_on_pin_get(const struct dpll_pin *pin, void *pin_priv,
-  *
-  * Dpll subsystem callback, set a state of a Tx reference clock pin
-  *
-+ * Context: Acquires and releases pf->dplls.lock
-  * Return:
-+ * * 0 - success
-  * * negative - failure
-  */
- static int
-@@ -2547,11 +2550,24 @@ ice_dpll_txclk_state_on_dpll_set(const struct dpll_pin *pin, void *pin_priv,
- 				 void *dpll_priv, enum dpll_pin_state state,
- 				 struct netlink_ext_ack *extack)
- {
--	/*
--	 * TODO: set HW accordingly to selected TX reference clock.
--	 * To be added in the follow up patches.
--	 */
--	return -EOPNOTSUPP;
-+	struct ice_dpll_pin *p = pin_priv;
-+	struct ice_pf *pf = p->pf;
-+	enum ice_e825c_ref_clk new_clk;
-+	int ret = 0;
-+
-+	if (ice_dpll_is_reset(pf, extack))
-+		return -EBUSY;
-+
-+	mutex_lock(&pf->dplls.lock);
-+	new_clk = (state == DPLL_PIN_STATE_DISCONNECTED) ? ICE_REF_CLK_ENET :
-+			p->tx_ref_src;
-+	if (new_clk == pf->ptp.port.tx_clk)
-+		goto unlock;
-+
-+	ret = ice_txclk_set_clk(pf, new_clk);
-+unlock:
-+	mutex_unlock(&pf->dplls.lock);
-+	return ret;
- }
- 
- /**
-@@ -2565,8 +2581,10 @@ ice_dpll_txclk_state_on_dpll_set(const struct dpll_pin *pin, void *pin_priv,
-  *
-  * dpll subsystem callback, get a state of a TX clock reference pin.
-  *
-+ * Context: Acquires and releases pf->dplls.lock
-  * Return:
-  * * 0 - success
-+ * * negative - failure
-  */
- static int
- ice_dpll_txclk_state_on_dpll_get(const struct dpll_pin *pin, void *pin_priv,
-@@ -2575,13 +2593,26 @@ ice_dpll_txclk_state_on_dpll_get(const struct dpll_pin *pin, void *pin_priv,
- 				 enum dpll_pin_state *state,
- 				 struct netlink_ext_ack *extack)
- {
--	/*
--	 * TODO: query HW status to determine if the TX reference is selected.
--	 * To be added in the follow up patches.
--	 */
--	*state = DPLL_PIN_STATE_DISCONNECTED;
-+	struct ice_dpll_pin *p = pin_priv;
-+	enum ice_e825c_ref_clk clk;
-+	struct ice_pf *pf = p->pf;
-+	int ret;
- 
--	return 0;
-+	if (ice_dpll_is_reset(pf, extack))
-+		return -EBUSY;
-+
-+	mutex_lock(&pf->dplls.lock);
-+	ret = ice_get_serdes_ref_sel_e825c(&pf->hw, pf->ptp.port.port_num,
-+					   &clk);
-+	if (ret)
-+		goto unlock;
-+
-+	*state = (clk == p->tx_ref_src) ? DPLL_PIN_STATE_CONNECTED :
-+			DPLL_PIN_STATE_DISCONNECTED;
-+unlock:
-+	mutex_unlock(&pf->dplls.lock);
-+
-+	return ret;
- }
- 
- static const struct dpll_pin_ops ice_dpll_rclk_ops = {
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 094e96219f45..a75a1380097b 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -4,6 +4,7 @@
- #include "ice.h"
- #include "ice_lib.h"
- #include "ice_trace.h"
-+#include "ice_txclk.h"
- 
- static const char ice_pin_names[][64] = {
- 	"SDP0",
-@@ -54,11 +55,6 @@ static const struct ice_ptp_pin_desc ice_pin_desc_dpll[] = {
- 	{  SDP3, {  3, -1 }, { 0, 0 }},
- };
- 
--static struct ice_pf *ice_get_ctrl_pf(struct ice_pf *pf)
--{
--	return !pf->adapter ? NULL : pf->adapter->ctrl_pf;
--}
--
- static struct ice_ptp *ice_get_ctrl_ptp(struct ice_pf *pf)
- {
- 	struct ice_pf *ctrl_pf = ice_get_ctrl_pf(pf);
-@@ -1325,6 +1321,10 @@ void ice_ptp_link_change(struct ice_pf *pf, bool linkup)
- 				return;
- 			}
- 		}
-+
-+		if (linkup)
-+			ice_txclk_verify(pf);
-+
- 		mutex_unlock(&pf->dplls.lock);
- 	}
- 
-@@ -3079,6 +3079,7 @@ static int ice_ptp_setup_pf(struct ice_pf *pf)
- {
- 	struct ice_ptp *ctrl_ptp = ice_get_ctrl_ptp(pf);
- 	struct ice_ptp *ptp = &pf->ptp;
-+	u8 port_num, phy;
- 
- 	if (WARN_ON(!ctrl_ptp) || pf->hw.mac_type == ICE_MAC_UNKNOWN)
- 		return -ENODEV;
-@@ -3090,6 +3091,10 @@ static int ice_ptp_setup_pf(struct ice_pf *pf)
- 		 &pf->adapter->ports.ports);
- 	mutex_unlock(&pf->adapter->ports.lock);
- 
-+	port_num = ptp->port.port_num;
-+	phy = port_num / pf->hw.ptp.ports_per_phy;
-+	set_bit(port_num, &ctrl_ptp->tx_refclks[phy][pf->ptp.port.tx_clk]);
-+
- 	return 0;
- }
- 
-@@ -3290,6 +3295,7 @@ static void ice_ptp_init_tx_interrupt_mode(struct ice_pf *pf)
-  */
- void ice_ptp_init(struct ice_pf *pf)
- {
-+	enum ice_e825c_ref_clk tx_ref_clk;
- 	struct ice_ptp *ptp = &pf->ptp;
- 	struct ice_hw *hw = &pf->hw;
- 	int err;
-@@ -3318,6 +3324,17 @@ void ice_ptp_init(struct ice_pf *pf)
- 			goto err_exit;
- 	}
- 
-+	ptp->port.tx_clk = ICE_REF_CLK_ENET;
-+	ptp->port.tx_clk_req = ICE_REF_CLK_ENET;
-+	if (hw->mac_type == ICE_MAC_GENERIC_3K_E825) {
-+		err = ice_get_serdes_ref_sel_e825c(hw, ptp->port.port_num,
-+						   &tx_ref_clk);
-+		if (!err) {
-+			ptp->port.tx_clk = tx_ref_clk;
-+			ptp->port.tx_clk_req = tx_ref_clk;
-+		}
-+	}
-+
- 	err = ice_ptp_setup_pf(pf);
- 	if (err)
- 		goto err_exit;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
-index 8c44bd758a4f..8b385271ab36 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-@@ -144,6 +144,8 @@ struct ice_ptp_tx {
-  * @link_up: indicates whether the link is up
-  * @tx_fifo_busy_cnt: number of times the Tx FIFO was busy
-  * @port_num: the port number this structure represents
-+ * @tx_clk: currently active Tx reference clock source
-+ * @tx_clk_req: requested Tx reference clock source (new target)
-  */
- struct ice_ptp_port {
- 	struct list_head list_node;
-@@ -153,6 +155,8 @@ struct ice_ptp_port {
- 	bool link_up;
- 	u8 tx_fifo_busy_cnt;
- 	u8 port_num;
-+	enum ice_e825c_ref_clk tx_clk;
-+	enum ice_e825c_ref_clk tx_clk_req;
- };
- 
- enum ice_ptp_tx_interrupt {
-@@ -236,6 +240,7 @@ struct ice_ptp_pin_desc {
-  * @info: structure defining PTP hardware capabilities
-  * @clock: pointer to registered PTP clock device
-  * @tstamp_config: hardware timestamping configuration
-+ * @tx_refclks: bitmaps table to store the information about TX reference clocks
-  * @reset_time: kernel time after clock stop on reset
-  * @tx_hwtstamp_good: number of completed Tx timestamp requests
-  * @tx_hwtstamp_skipped: number of Tx time stamp requests skipped
-@@ -261,6 +266,8 @@ struct ice_ptp {
- 	struct ptp_clock_info info;
- 	struct ptp_clock *clock;
- 	struct kernel_hwtstamp_config tstamp_config;
-+#define ICE_E825_MAX_PHYS 2
-+	unsigned long tx_refclks[ICE_E825_MAX_PHYS][ICE_REF_CLK_MAX];
- 	u64 reset_time;
- 	u64 tx_hwtstamp_good;
- 	u32 tx_hwtstamp_skipped;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 61c0a0d93ea8..c0720525ac49 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -461,6 +461,43 @@ static int ice_read_phy_eth56g(struct ice_hw *hw, u8 port, u32 addr, u32 *val)
- 	return err;
- }
- 
-+/**
-+ * ice_get_serdes_ref_sel_e825c - Read current Tx ref clock source
-+ * @hw: pointer to the HW struct
-+ * @port: port number for which Tx reference clock is read
-+ * @clk: Tx reference clock value (output)
-+ *
-+ * Return: 0 on success, other error codes when failed to read from PHY
-+ */
-+int ice_get_serdes_ref_sel_e825c(struct ice_hw *hw, u8 port,
-+				 enum ice_e825c_ref_clk *clk)
-+{
-+	u8 lane = port % hw->ptp.ports_per_phy;
-+	u32 serdes_rx_nt, serdes_tx_nt;
-+	u32 val;
-+	int ret;
-+
-+	ret = ice_read_phy_eth56g(hw, port,
-+				  SERDES_IP_IF_LN_FLXM_GENERAL(lane, 0),
-+				  &val);
-+	if (ret)
-+		return ret;
-+
-+	serdes_rx_nt = FIELD_GET(CFG_ICTL_PCS_REF_SEL_RX_NT, val);
-+	serdes_tx_nt = FIELD_GET(CFG_ICTL_PCS_REF_SEL_TX_NT, val);
-+
-+	if (serdes_tx_nt == REF_SEL_NT_SYNCE &&
-+	    serdes_rx_nt == REF_SEL_NT_SYNCE)
-+		*clk = ICE_REF_CLK_SYNCE;
-+	else if (serdes_tx_nt == REF_SEL_NT_EREF0 &&
-+		 serdes_rx_nt == REF_SEL_NT_EREF0)
-+		*clk = ICE_REF_CLK_EREF0;
-+	else
-+		*clk = ICE_REF_CLK_ENET;
-+
-+	return 0;
-+}
-+
- /**
-  * ice_phy_res_address_eth56g - Calculate a PHY port register address
-  * @hw: pointer to the HW struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index cbc9693179a1..820ba953ea01 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -381,6 +381,8 @@ int ice_stop_phy_timer_eth56g(struct ice_hw *hw, u8 port, bool soft_reset);
- int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port);
- int ice_phy_cfg_intr_eth56g(struct ice_hw *hw, u8 port, bool ena, u8 threshold);
- int ice_phy_cfg_ptp_1step_eth56g(struct ice_hw *hw, u8 port);
-+int ice_get_serdes_ref_sel_e825c(struct ice_hw *hw, u8 port,
-+				 enum ice_e825c_ref_clk *clk);
- 
- #define ICE_ETH56G_NOMINAL_INCVAL	0x140000000ULL
- #define ICE_ETH56G_NOMINAL_PCS_REF_TUS	0x100000000ULL
-@@ -790,4 +792,29 @@ static inline u64 ice_get_base_incval(struct ice_hw *hw)
- #define PHY_PTP_1STEP_PD_DELAY_M	GENMASK(30, 1)
- #define PHY_PTP_1STEP_PD_DLY_V_M	BIT(31)
- 
-+#define SERDES_IP_IF_LN_FLXM_GENERAL(n, m) \
-+	(0x32B800 + (m) * 0x100000 + (n) * 0x8000)
-+#define CFG_RESERVED0_1                         GENMASK(1, 0)
-+#define CFG_ICTL_PCS_MODE_NT                    BIT(2)
-+#define CFG_ICTL_PCS_RCOMP_SLAVE_EN_NT          BIT(3)
-+#define CFG_ICTL_PCS_CMN_FORCE_PUP_A            BIT(4)
-+#define CFG_ICTL_PCS_RCOMP_SLAVE_VALID_A        BIT(5)
-+#define CFG_ICTL_PCS_REF_SEL_RX_NT              GENMASK(9, 6)
-+#define REF_SEL_NT_ENET                         0
-+#define REF_SEL_NT_EREF0                        1
-+#define REF_SEL_NT_SYNCE                        2
-+#define CFG_IDAT_DFX_OBS_DIG_                   GENMASK(11, 10)
-+#define CFG_IRST_APB_MEM_B                      BIT(12)
-+#define CFG_ICTL_PCS_DISCONNECT_NT              BIT(13)
-+#define CFG_ICTL_PCS_ISOLATE_NT                 BIT(14)
-+#define CFG_RESERVED15_15                       BIT(15)
-+#define CFG_IRST_PCS_TSTBUS_B_A                 BIT(16)
-+#define CFG_ICTL_PCS_REF_TERM_HIZ_EN_NT         BIT(17)
-+#define CFG_RESERVED18_19                       GENMASK(19, 18)
-+#define CFG_ICTL_PCS_SYNTHLCSLOW_FORCE_PUP_A    BIT(20)
-+#define CFG_ICTL_PCS_SYNTHLCFAST_FORCE_PUP_A    BIT(21)
-+#define CFG_RESERVED22_24                       GENMASK(24, 22)
-+#define CFG_ICTL_PCS_REF_SEL_TX_NT              GENMASK(28, 25)
-+#define CFG_RESERVED29_31                       GENMASK(31, 29)
-+
- #endif /* _ICE_PTP_HW_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_txclk.c b/drivers/net/ethernet/intel/ice/ice_txclk.c
-new file mode 100644
-index 000000000000..ccb8411dca94
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ice/ice_txclk.c
-@@ -0,0 +1,256 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (C) 2026 Intel Corporation */
-+
-+#include "ice.h"
-+#include "ice_cpi.h"
-+#include "ice_txclk.h"
-+
-+#define ICE_PHY0	0
-+#define ICE_PHY1	1
-+
-+/**
-+ * ice_txclk_enable_peer - Enable required TX reference clock on peer PHY
-+ * @pf: pointer to the PF structure
-+ * @clk: TX reference clock that must be enabled
-+ *
-+ * Some TX reference clocks on E825-class devices (SyncE and EREF0) must
-+ * be enabled on both PHY complexes to allow proper routing:
-+ *
-+ *   - SyncE must be enabled on both PHYs when used by PHY0
-+ *   - EREF0 must be enabled on both PHYs when used by PHY1
-+ *
-+ * If the requested clock is not yet enabled on the peer PHY, enable it.
-+ * ENET does not require duplication and is ignored.
-+ *
-+ * Return: 0 on success or negative error code on failure.
-+ */
-+static int ice_txclk_enable_peer(struct ice_pf *pf, enum ice_e825c_ref_clk clk)
-+{
-+	struct ice_pf *ctrl_pf = ice_get_ctrl_pf(pf);
-+	u8 port_num, phy;
-+	int err;
-+
-+	if (clk == ICE_REF_CLK_ENET)
-+		return 0;
-+
-+	if (IS_ERR_OR_NULL(ctrl_pf)) {
-+		dev_err(ice_pf_to_dev(pf),
-+			"Can't enable tx-clk on peer: no controlling PF\n");
-+		return -EINVAL;
-+	}
-+
-+	port_num = pf->ptp.port.port_num;
-+	phy = port_num / pf->hw.ptp.ports_per_phy;
-+
-+	if ((clk == ICE_REF_CLK_SYNCE && phy == ICE_PHY0 &&
-+	     !ice_txclk_any_port_uses(ctrl_pf, ICE_PHY1, clk)) ||
-+	    (clk == ICE_REF_CLK_EREF0 && phy == ICE_PHY1 &&
-+	     !ice_txclk_any_port_uses(ctrl_pf, ICE_PHY0, clk))) {
-+		u8 peer_phy = phy ? ICE_PHY0 : ICE_PHY1;
-+
-+		err = ice_cpi_ena_dis_clk_ref(&pf->hw, peer_phy, clk, true);
-+		if (err) {
-+			dev_err(ice_hw_to_dev(&pf->hw),
-+				"Failed to enable the %u TX clock for the %u PHY\n",
-+				clk, peer_phy);
-+			return err;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_txclk_disable_unused - Disable TX reference clock no longer in use
-+ * @pf: pointer to the PF structure
-+ * @ref_clk: TX reference clock source to evaluate for disabling
-+ *
-+ * Disable (from power-saving reasons) a TX reference clock after a clock
-+ * switch, provided that:
-+ *   - no port on the local PHY uses this clock, and
-+ *   - for SyncE: no port on PHY0 or PHY1 requires the clock, depending on
-+ *     where it must remain enabled for routing.
-+ *   - for EREF0: same logic as above but inverted PHY roles.
-+ *
-+ * Some reference clocks must be enabled on both PHY complexes when used
-+ * (SyncE for PHY0, EREF0 for PHY1). The function therefore also attempts
-+ * to implicitly disable the peer PHY copy when no port requires it.
-+ *
-+ * Return: 0 on success or negative error code if disabling fails.
-+ */
-+static int
-+ice_txclk_disable_unused(struct ice_pf *pf, enum ice_e825c_ref_clk ref_clk)
-+{
-+	struct ice_pf *ctrl_pf = ice_get_ctrl_pf(pf);
-+	struct ice_hw *hw = &pf->hw;
-+	int err = 0;
-+	u8 cur_phy;
-+
-+	if (IS_ERR_OR_NULL(ctrl_pf)) {
-+		dev_err(ice_pf_to_dev(pf),
-+			"Can't disable unused tx-clk: no controlling PF\n");
-+		return -EINVAL;
-+	}
-+
-+	cur_phy = pf->ptp.port.port_num / hw->ptp.ports_per_phy;
-+
-+	if (ref_clk == ICE_REF_CLK_SYNCE) {
-+		/* Don't disable SyncE clock if it's still in use on PHY 0 */
-+		if (ice_txclk_any_port_uses(ctrl_pf, ICE_PHY0, ref_clk))
-+			return 0;
-+		if (cur_phy == ICE_PHY0 &&
-+		    !ice_txclk_any_port_uses(ctrl_pf, ICE_PHY1, ref_clk)) {
-+			err = ice_cpi_ena_dis_clk_ref(hw, ICE_PHY1, ref_clk,
-+						      false);
-+			if (err) {
-+				cur_phy = ICE_PHY1;
-+				goto err;
-+			}
-+		}
-+	} else if (ref_clk == ICE_REF_CLK_EREF0) {
-+		/* Don't disable EREF0 clock if it's still in use on PHY 1 */
-+		if (ice_txclk_any_port_uses(ctrl_pf, ICE_PHY1, ref_clk))
-+			return 0;
-+		if (cur_phy == ICE_PHY1 &&
-+		    !ice_txclk_any_port_uses(ctrl_pf, ICE_PHY0, ref_clk)) {
-+			err = ice_cpi_ena_dis_clk_ref(hw, ICE_PHY0, ref_clk,
-+						      false);
-+			if (err) {
-+				cur_phy = ICE_PHY0;
-+				goto err;
-+			}
-+		}
-+	}
-+
-+	if (!ice_txclk_any_port_uses(ctrl_pf, cur_phy, ref_clk))
-+		err = ice_cpi_ena_dis_clk_ref(hw, cur_phy, ref_clk, false);
-+err:
-+	if (err)
-+		dev_warn(ice_pf_to_dev(pf), "Failed to disable the %u TX clock for the %u PHY\n",
-+			 ref_clk, cur_phy);
-+
-+	return err;
-+}
-+
-+#define ICE_REFCLK_USER_TO_AQ_IDX(x) ((x) + 1)
-+
-+/**
-+ * ice_txclk_set_clk - Set Tx reference clock
-+ * @pf: pointer to pf structure
-+ * @clk: new Tx clock
-+ *
-+ * Return: 0 on success, negative value otherwise.
-+ */
-+int ice_txclk_set_clk(struct ice_pf *pf, enum ice_e825c_ref_clk clk)
-+{
-+	struct ice_pf *ctrl_pf = ice_get_ctrl_pf(pf);
-+	struct ice_port_info *port_info;
-+	u8 port_num, phy;
-+	int err;
-+
-+	if (pf->ptp.port.tx_clk == clk)
-+		return 0;
-+
-+	if (IS_ERR_OR_NULL(ctrl_pf)) {
-+		dev_err(ice_pf_to_dev(pf),
-+			"Can't set tx-clk: no controlling PF\n");
-+		return -EINVAL;
-+	}
-+
-+	port_num = pf->ptp.port.port_num;
-+	phy = port_num / pf->hw.ptp.ports_per_phy;
-+	port_info = pf->hw.port_info;
-+
-+	/* Check if the TX clk is enabled for this PHY, if not - enable it */
-+	if (!ice_txclk_any_port_uses(ctrl_pf, phy, clk)) {
-+		err = ice_cpi_ena_dis_clk_ref(&pf->hw, phy, clk, true);
-+		if (err) {
-+			dev_err(ice_hw_to_dev(&pf->hw), "Failed to enable the %u TX clock for the %u PHY\n",
-+				clk, phy);
-+			return err;
-+		}
-+		err = ice_txclk_enable_peer(pf, clk);
-+		if (err)
-+			return err;
-+	}
-+
-+	pf->ptp.port.tx_clk_req = clk;
-+
-+	/* We are ready to switch to the new TX clk. */
-+	err = ice_aq_set_link_restart_an(port_info, true, NULL,
-+					 ICE_REFCLK_USER_TO_AQ_IDX(clk));
-+	if (err)
-+		dev_err(ice_hw_to_dev(&pf->hw), "Failed to switch to %u TX clock for the %u PHY\n",
-+			clk, phy);
-+
-+	return err;
-+}
-+
-+/**
-+ * ice_txclk_verify - Validate TX reference clock switch and update usage state
-+ * @pf: pointer to PF structure
-+ *
-+ * After a link-up event, verify whether the previously requested TX reference
-+ * clock transition actually succeeded. The SERDES reference selector reflects
-+ * the effective hardware choice, which may differ from the requested clock
-+ * when Auto-Negotiation or firmware applies additional policy.
-+ *
-+ * If the hardware-selected clock differs from the requested one, update the
-+ * software state accordingly and stop further processing.
-+ *
-+ * When the switch is successful, update the per‑PHY usage bitmaps so that the
-+ * driver knows which reference clock is currently in use by this port. Using
-+ * these bitmaps, disable any reference clocks that are no longer required by
-+ * any port on the local PHY or, when applicable, on the peer PHY (according
-+ * to E825 clock‑routing rules).
-+ *
-+ * This function does not initiate a clock switch; it only validates the result
-+ * of a previously triggered transition and performs cleanup of unused clocks.
-+ */
-+void ice_txclk_verify(struct ice_pf *pf)
-+{
-+	struct ice_ptp_port *ptp_port = &pf->ptp.port;
-+	struct ice_pf *ctrl_pf = ice_get_ctrl_pf(pf);
-+	struct ice_hw *hw = &pf->hw;
-+	enum ice_e825c_ref_clk clk;
-+	int err;
-+	u8 phy;
-+
-+	phy = ptp_port->port_num / hw->ptp.ports_per_phy;
-+
-+	/* verify current Tx reference settings */
-+	err = ice_get_serdes_ref_sel_e825c(hw,
-+					   ptp_port->port_num,
-+					   &clk);
-+	if (err)
-+		return;
-+
-+	if (clk != pf->ptp.port.tx_clk_req) {
-+		dev_warn(ice_pf_to_dev(pf),
-+			 "Failed to switch tx-clk for phy %d and clk %u (current: %u)\n",
-+			 phy, pf->ptp.port.tx_clk_req, clk);
-+		pf->ptp.port.tx_clk = clk;
-+		pf->ptp.port.tx_clk_req = clk;
-+		return;
-+	}
-+
-+	if (IS_ERR_OR_NULL(ctrl_pf)) {
-+		dev_err(ice_pf_to_dev(pf),
-+			"Can't set tx-clk: no controlling PF\n");
-+		return;
-+	}
-+
-+	/* update Tx reference clock usage map */
-+	for (int i = 0; i < ICE_REF_CLK_MAX; i++)
-+		(clk == i) ?
-+		 set_bit(ptp_port->port_num,
-+			 &ctrl_pf->ptp.tx_refclks[phy][i]) :
-+		 clear_bit(ptp_port->port_num,
-+			   &ctrl_pf->ptp.tx_refclks[phy][i]);
-+
-+	ice_txclk_disable_unused(pf, pf->ptp.port.tx_clk);
-+
-+	pf->ptp.port.tx_clk = clk;
-+	pf->ptp.port.tx_clk_req = clk;
-+}
-+
-diff --git a/drivers/net/ethernet/intel/ice/ice_txclk.h b/drivers/net/ethernet/intel/ice/ice_txclk.h
-new file mode 100644
-index 000000000000..6423b448841e
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ice/ice_txclk.h
-@@ -0,0 +1,41 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (C) 2026 Intel Corporation */
-+
-+#ifndef _ICE_TXCLK_H_
-+#define _ICE_TXCLK_H_
-+
-+/**
-+ * ice_txclk_any_port_uses - check if any port on a PHY uses this TX refclk
-+ * @ctrl_pf: control PF (owner of the shared tx_refclks map)
-+ * @phy: PHY index
-+ * @clk: TX reference clock
-+ *
-+ * Return: true if any bit (port) is set for this clock on this PHY
-+ */
-+static inline bool
-+ice_txclk_any_port_uses(const struct ice_pf *ctrl_pf, u8 phy,
-+			enum ice_e825c_ref_clk clk)
-+{
-+	return find_first_bit(&ctrl_pf->ptp.tx_refclks[phy][clk],
-+			BITS_PER_LONG) < BITS_PER_LONG;
-+}
-+
-+/**
-+ * ice_txclk_port_uses - check if a specific port uses this TX refclk
-+ * @ctrl_pf: control PF
-+ * @phy: PHY index
-+ * @clk: TX reference clock
-+ * @port: port number to test
-+ *
-+ * Return: true if this port uses the given clock
-+ */
-+static inline bool
-+ice_txclk_port_uses(const struct ice_pf *ctrl_pf, u8 phy,
-+		    enum ice_e825c_ref_clk clk, u8 port)
-+{
-+	return test_bit(port, &ctrl_pf->ptp.tx_refclks[phy][clk]);
-+}
-+
-+int ice_txclk_set_clk(struct ice_pf *pf, enum ice_e825c_ref_clk clk);
-+void ice_txclk_verify(struct ice_pf *pf);
-+#endif /* _ICE_TXCLK_H_ */
--- 
-2.39.3
 
 
