@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-272077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAcdB147xWn/8AQAu9opvQ
-	(envelope-from <netdev+bounces-272077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:57:50 +0100
+	id eO2gNYg7xWn/8AQAu9opvQ
+	(envelope-from <netdev+bounces-272078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:58:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EA0933667D
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:57:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F4823366A5
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:58:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C3DF3084ACD
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:51:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 04589308FE5C
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D991E308F38;
-	Thu, 26 Mar 2026 13:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7C930E851;
+	Thu, 26 Mar 2026 13:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QqBt9+1y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rqh8Rawr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B624D306B31;
-	Thu, 26 Mar 2026 13:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2A2231A23;
+	Thu, 26 Mar 2026 13:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774533067; cv=none; b=TM4KWbHsqidZiTIbl6TWxXB6Betic+xg1aUGMUiwO1UaPMehWpmk8OLtMbmc+WDIzLQp8WuLZadf/BMTGI51VVvsbMU0E2Bw2YBwWIwKrDkB7GSjfc5rQqF4sCufEDZvVDdzjm1ez82vqK397Nko/nRGS6u2nVg+eMzh2bMKB8s=
+	t=1774533068; cv=none; b=azHzlx2GMOC6Aw6RyK/Lg2nVvN7sOgnWP2wqFIpeNvbFn5bA1vxl8YLXzbG/VaioW///o1OBURa1v0E7D32dU7usxvygYPueUJmzGhJbKvuqiUYU0YAl/HaJvfMFsOx9juru8velscbiPZbBoEHqTOxEzldZ3x33S/QbGRJMUkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774533067; c=relaxed/simple;
-	bh=XRcp5CqcavXkypO6W1a54aqoK0QKIg7PMkm0IjwEUc4=;
+	s=arc-20240116; t=1774533068; c=relaxed/simple;
+	bh=MKqHx2DsVWgIqTTYLAkpvdX9hb59MkEI5VpTYdIILjY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=f5GaRczVxQSIseQ/IqXnK4TCmoi6iu2qg+F7vsSde/qm1nljI8Lv3hRl0tibxDf3x1qkap4sQgL6orUnf8ud2V/ecKIk7yAsrRQRwLQLFC/mO9krPG4smZq3cuwiUBkmy20YXUg3L6pscu6MIm+BlnaOg+m7Iz/37TEa4SReN9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QqBt9+1y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00EAAC19424;
-	Thu, 26 Mar 2026 13:51:06 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=sdT/PTzy+OPnjuWQYJaFOwutoQR1ae7Xv0tUn+/yB5KkZFezZcT9oez5zWS7RXOBAu/DH7pXSz7hc0Z/mGJduebb96oiuqPIeE4O0vIIifa0dXDirwwEUy98zPtZDaGSnxt2jTiv+XDVuDputaMDCtZRC1nH2UU6+XZO6S2CJ+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rqh8Rawr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD056C4AF09;
+	Thu, 26 Mar 2026 13:51:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774533067;
-	bh=XRcp5CqcavXkypO6W1a54aqoK0QKIg7PMkm0IjwEUc4=;
+	s=k20201202; t=1774533068;
+	bh=MKqHx2DsVWgIqTTYLAkpvdX9hb59MkEI5VpTYdIILjY=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=QqBt9+1y+I9stsaP3IrJvAJLmfpRaZho1FOd0IC2hxkoDVenuE/RNFRj2YWyiRJI2
-	 AkLvuXs4M8USy6Sv9PWS7ZlO9zDoGmZZMjVYLSiAAWYT8hylvys+hlfzeGluC3/rLw
-	 ZZDdx1hyBnwxdDDzbyss8ocR6MMyTFD86tCkOR3MeIdZ1zVm/OHdezKjL8RxFl2EbU
-	 KKJc0xuVuEAaNjt1JHprNojFAC6WjpxXoAXV4UQP/o6rHXBAidxVuV/UgsgXBLtY4p
-	 BYoIYrcIr1K05BPfAb619lBYtMKsvQFZhCqagETdjVctZLLupGhm2qi2IgB3DleDuF
-	 wuytsr4Rc31uA==
+	b=Rqh8RawrezX9QxVPHnoY/yaMv+OFJewTqMgRoLcBnXPe9glMkbz8A3wXSoww7tiPY
+	 3lfERnlIpjOT+ryAMBnPqTtXxa+GfD2uIl816/TY2JtpzGI5skjvZ+k0/Vcu3iSQt3
+	 lpOec/k44tfusKC0fCnlcpT9kPqd4cyTIoRzJUmB2B8yaVbtN0LEPSNsIAVYyhH2k9
+	 Kp/eosABeEHX6+IQqlDma7o3CACETDjo5Yp6yr0M4wS8DpVs1AH1eV5zTOjHFwhpjz
+	 WeFHgbeAL6lfQSMn5D4acFgtqwV9fKUulSsyrbF3U1Avh2Em3BmRMFfWWP2G/A09gG
+	 P3zRFn2NxswLQ==
 From: Chuck Lever <cel@kernel.org>
-Date: Thu, 26 Mar 2026 09:50:46 -0400
-Subject: [PATCH net-next v6 1/6] tls: Purge async_hold in
- tls_decrypt_async_wait()
+Date: Thu, 26 Mar 2026 09:50:47 -0400
+Subject: [PATCH net-next v6 2/6] tls: Abort the connection on decrypt
+ failure
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,28 +56,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260326-tls-read-sock-v6-1-fd887b9e7f06@oracle.com>
+Message-Id: <20260326-tls-read-sock-v6-2-fd887b9e7f06@oracle.com>
 References: <20260326-tls-read-sock-v6-0-fd887b9e7f06@oracle.com>
 In-Reply-To: <20260326-tls-read-sock-v6-0-fd887b9e7f06@oracle.com>
 To: john.fastabend@gmail.com, kuba@kernel.org, sd@queasysnail.net
 Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev, 
  Chuck Lever <chuck.lever@oracle.com>, Hannes Reinecke <hare@suse.de>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1615;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2599;
  i=chuck.lever@oracle.com; h=from:subject:message-id;
- bh=xu58UA/lURyxQjkJP5uUa+sAXuRxEVniz6m85Q5Af+Y=;
- b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBpxTnJZYZDe6/ZoQz7NuaMUwv3roZ72EsPGQAHX
- kO6XvwogMGJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCacU5yQAKCRAzarMzb2Z/
- l0tVD/4hpygJHM6+GhRj//R2D5lfvbu0vM1hqXDHXaDjrUbvSVahYN6aaQIcMJY6+1Y1nUwbhX7
- LOGHkTe9cBxgJMGY4cpXfxz/BkF+hZusm70U+yd4ZNJQ1uEW0j3fPgZIX62DiHoH1nyksZIxZnA
- jE3EY+DvS/yi43rcwLV/mRzANHq6mFF+nU1dJO1V6sIAtSBc3wvv8QsyYs+pURdeAUrWdVQdt9c
- ++xURNJVpyS+ZCiL4vaVHYx32p6ZHIgr8ZYnI48gpYcwY+MpxeDow4Z83EevY9vALoLT+u3deS7
- HdMMklZrZ+Fr+SaWQHVanZvNrE4safkyKtrdmgDr+Ob5ab5u0zi8Vws2LOGgmuC8XHpixCcIEa7
- Jv+hvVCY5/jGHZsaeN6rQ1ZAalhLdWQe+/xliPSzjziti1HGw/8ELBrm7DopJUcR6pyUnSQv0aL
- 8ifgJ22QXyXaIQApETIkky9ING9u1joZCVYkaH0/dG+QC6mWVEr5/lXQCFW0z/yR/Xze4Gy69fK
- t65dkzHQZkHGyD1YxNf7Zb4kL4BWicB5PFwIQPeKjAM4wJeRIjZQB98FV32gNgKeto6zQuNRW8U
- kprtMfFbzU0zatxUkBAVA7pJEQ27xe+LYNSpc061Kimk51rJ0COp57WEeZ9GPkSRDNGOn6pE2hs
- bWZIror66mLs3tg==
+ bh=8rkFUaZwGHp34oZtLBHCP2ihwiz9+QlviZCigfPoS+o=;
+ b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBpxTnJy/P5cyHP3VEj9CDbhEY3Zkn2F2Zv3R5wl
+ ZwIlk1uUdyJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCacU5yQAKCRAzarMzb2Z/
+ l6qaD/9D1h/qTX0UoXUBPaoc6DOhZKg4RUyKzelopS/8AEm23anoCIicNJQlJyLnpij6tBCtkmQ
+ nvPL4cj/RilPNpvH6lMUL4pCVIk02Iqx5fQpLQM+hAoW+VjnHwfkx1nAlRMwb9HVj3A1ZzUL4gB
+ m4Fo4zFursIKU8x4qWtKG9cIZsvZ31IB6oT6luXCNVv3qGrXQAdCSbqsB6MpV7k3D8T0NaY4tBq
+ jsx7Ryj9Y7dzI61MoV4P+0gQ3l0kHmrylsdkWLSbOf5s6xWdZwXVCsq1UTWNKl6DCFzMq2jmsy+
+ Sy6k421ErRm0pEEyCdfx6oNsr1ge97j+5CKAl7sJ+ftnbIfL598+3GvBSpA7NQTMGm7pDtD7Hwx
+ J8KpZD3sCeU03gtd81+NbsmDM8g2nanTAlrFNTsXy7wyFdTHp0/HHdDnT4nTGZDMlELylCfA2w8
+ 1chIiA88VcKuEhz8EZa3/CmHebEURt+/4zVBnk2C3qHQoDraMy+gRRbKc8FPepitpSKhTokz79w
+ dOCp5b4xDhQSqua2Oyt9S5QVGbiVItRZJtFJB6x3+YinFbcjO1m0bwCjOnDXfdBgHJXQ3w5k+SR
+ Ev6jv+JZzsR1+TgLPaYs4kJyA73OROnUxvvCgP1vmH/R279d4TjNMgMAiZr51D26ajYmwnBEUNU
+ NoFKlXC/xKxOBDg==
 X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
  fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -85,18 +85,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272077-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272078-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,kernel.org,queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
@@ -106,55 +106,93 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oracle.com:email,oracle.com:mid,suse.de:email]
-X-Rspamd-Queue-Id: 6EA0933667D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:email,oracle.com:email,oracle.com:mid]
+X-Rspamd-Queue-Id: 3F4823366A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Chuck Lever <chuck.lever@oracle.com>
 
-The async_hold queue pins encrypted input skbs while
-the AEAD engine references their scatterlist data. Once
-tls_decrypt_async_wait() returns, every AEAD operation
-has completed and the engine no longer references those
-skbs, so they can be freed unconditionally.
+recvmsg, read_sock, and splice_read each open-code a
+tls_err_abort() call after tls_rx_one_record() fails. Move
+the abort into tls_rx_one_record() so each receive path
+shares a single decrypt-and-abort sequence.
 
-A subsequent patch adds batch async decryption to
-tls_sw_read_sock(), introducing a new call site that
-must drain pending AEAD operations and release held
-skbs. Move __skb_queue_purge(&ctx->async_hold) into
-tls_decrypt_async_wait() so the purge is centralized
-and every caller -- recvmsg's drain path, the -EBUSY
-fallback in tls_do_decryption(), and the new read_sock
-batch path -- releases held skbs on synchronization
-without each site managing the purge independently.
+A tls_check_pending_rekey() failure after successful
+decryption no longer triggers tls_err_abort(). That path
+fires only when skb_copy_bits() fails on a valid skb,
+which is not a realistic scenario.
 
+Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
 ---
- net/tls/tls_sw.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/tls/tls_sw.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
 diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index a656ce235758..20f8fc84c5f5 100644
+index 20f8fc84c5f5..5626fdd4ea0a 100644
 --- a/net/tls/tls_sw.c
 +++ b/net/tls/tls_sw.c
-@@ -246,6 +246,7 @@ static int tls_decrypt_async_wait(struct tls_sw_context_rx *ctx)
- 		crypto_wait_req(-EINPROGRESS, &ctx->async_wait);
- 	atomic_inc(&ctx->decrypt_pending);
- 
-+	__skb_queue_purge(&ctx->async_hold);
- 	return ctx->async_wait.err;
+@@ -1799,6 +1799,9 @@ static int tls_check_pending_rekey(struct sock *sk, struct tls_context *ctx,
+ 	return 0;
  }
  
-@@ -2224,7 +2225,6 @@ int tls_sw_recvmsg(struct sock *sk,
++/* Decrypt and return one TLS record. On decrypt failure the connection is
++ * aborted (sk_err set) before returning a negative errno.
++ */
+ static int tls_rx_one_record(struct sock *sk, struct msghdr *msg,
+ 			     struct tls_decrypt_arg *darg)
+ {
+@@ -1810,8 +1813,10 @@ static int tls_rx_one_record(struct sock *sk, struct msghdr *msg,
+ 	err = tls_decrypt_device(sk, msg, tls_ctx, darg);
+ 	if (!err)
+ 		err = tls_decrypt_sw(sk, tls_ctx, msg, darg);
+-	if (err < 0)
++	if (err < 0) {
++		tls_err_abort(sk, -EBADMSG);
+ 		return err;
++	}
  
- 		/* Wait for all previously submitted records to be decrypted */
- 		ret = tls_decrypt_async_wait(ctx);
--		__skb_queue_purge(&ctx->async_hold);
+ 	rxm = strp_msg(darg->skb);
+ 	rxm->offset += prot->prepend_size;
+@@ -2122,10 +2127,8 @@ int tls_sw_recvmsg(struct sock *sk,
+ 			darg.async = false;
  
- 		if (ret) {
- 			if (err >= 0 || err == -EINPROGRESS)
+ 		err = tls_rx_one_record(sk, msg, &darg);
+-		if (err < 0) {
+-			tls_err_abort(sk, -EBADMSG);
++		if (err < 0)
+ 			goto recv_end;
+-		}
+ 
+ 		async |= darg.async;
+ 
+@@ -2284,10 +2287,8 @@ ssize_t tls_sw_splice_read(struct socket *sock,  loff_t *ppos,
+ 		memset(&darg.inargs, 0, sizeof(darg.inargs));
+ 
+ 		err = tls_rx_one_record(sk, NULL, &darg);
+-		if (err < 0) {
+-			tls_err_abort(sk, -EBADMSG);
++		if (err < 0)
+ 			goto splice_read_end;
+-		}
+ 
+ 		tls_rx_rec_done(ctx);
+ 		skb = darg.skb;
+@@ -2370,10 +2371,8 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
+ 			memset(&darg.inargs, 0, sizeof(darg.inargs));
+ 
+ 			err = tls_rx_one_record(sk, NULL, &darg);
+-			if (err < 0) {
+-				tls_err_abort(sk, -EBADMSG);
++			if (err < 0)
+ 				goto read_sock_end;
+-			}
+ 
+ 			released = tls_read_flush_backlog(sk, prot, INT_MAX,
+ 							  0, decrypted,
 
 -- 
 2.53.0
