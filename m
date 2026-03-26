@@ -1,205 +1,154 @@
-Return-Path: <netdev+bounces-271972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271973-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sCbkEroNxWkI6AQAu9opvQ
-	(envelope-from <netdev+bounces-271972-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:43:06 +0100
+	id 2CJYIMkNxWkI6AQAu9opvQ
+	(envelope-from <netdev+bounces-271973-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:43:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6EF6333A47
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:43:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08AA6333A56
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:43:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7358A300D467
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:25:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4203230730A3
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025C13C3424;
-	Thu, 26 Mar 2026 10:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB550396D0A;
+	Thu, 26 Mar 2026 10:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FiJKmcUG";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="IVvXAVfh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cPVG1VLl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E80E3168EB
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 10:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2AC3C13ED
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 10:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774520737; cv=none; b=i5nzt+sgReT6e0WUmAkZjlNd4B7c/I9cjfHbOh1Yg4GhZ8KjhPT4Seo9O7L/O0QtnnxTZDLjs8ibw7Wwk/ibcdZ53+DSgQ0y1S2ubWw+ygTYk1awRdTmDqqc6DUpMv0+DADDiB9o+YnGwSI3F1HmHov5Gh7AMgxp85nnWkSGLSs=
+	t=1774520771; cv=none; b=G5ud6pOJpw0zZzX9PlEFohNf6ytW9VWjytRWys1Z+Z7gFtYU9PeTZsFa6zmPCBcydUiZjQSzucJDSboO1nakFSdWd70jlyriUSd7JflG2n9f6LmhoR860pUW79gw8opbJPz9D3eLe6pA1y8KktTAl8sWg3KqDb3hr1JOQuqWZsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774520737; c=relaxed/simple;
-	bh=JgpRYIF9T/Z+29y0i99grSqwIODB8HiI8W9wpOXNZQ8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RX2dJw0SxTgyNppcDPsefWKF457M6I8+HtPqyGvg+iXDWqdwIJhWhdEDU2aAo+v1lOQ9/TkknYRKwCyEIj7CpUoV5XV+9jxSjZIkh5H2ofIR27byjsnqX9K01eGmwaLR9CxxmYuqd3Dii7jC818D+KqCQ/+FB3AGFXkiFN7MSmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FiJKmcUG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IVvXAVfh; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774520735;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BZMdR5mD3YAWrVXEIuBlAnHV2JLWFbsl0mHokYFYrkA=;
-	b=FiJKmcUGnJAiuH8SxvQaneljfSF6hJ2mi09wuY98H3xlk4t93yIQiiqNpCmk430zzsej7n
-	50A7ZOBoC+/NvbxZAHR4/qiOQN8k4gRT6YruBDjUgZ3haHgke2p3CaGgbQGIH83SBTHD8e
-	6O7Dz7icrg3JSufDbqoRJ8KMDRu/a+Q=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-xFTRybJ1Ok6lVN5bpv8H3g-1; Thu, 26 Mar 2026 06:25:34 -0400
-X-MC-Unique: xFTRybJ1Ok6lVN5bpv8H3g-1
-X-Mimecast-MFC-AGG-ID: xFTRybJ1Ok6lVN5bpv8H3g_1774520733
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4853b5b0fafso16298905e9.3
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 03:25:34 -0700 (PDT)
+	s=arc-20240116; t=1774520771; c=relaxed/simple;
+	bh=OsJNSK3Vqae23Fdd0htdFqcqyByWndsGk15G5ve4+eQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZoZz4JvDm+KyKb9wPZc3VFqc+3FbKY8dSjkTNgHH0H6I0YkbIpXixciz1grhW0CfTqSCwukGu1ZSrtU1Qq5s6tYHeIQPx6UpalXbh1XsPs04REE+enUkFkL+DtkVIWwS9pOZna6Y+o/7iB8n434uboNF+vfF6Ecu8CFfgvX+tYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cPVG1VLl; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-48371104ffdso1280825e9.1
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 03:26:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774520733; x=1775125533; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BZMdR5mD3YAWrVXEIuBlAnHV2JLWFbsl0mHokYFYrkA=;
-        b=IVvXAVfhvkxQKnC9IJQhPi5qaSkzNC/2Um25gPP2y7+2Bk5ZaW0Y/XC2OuicHvR6ip
-         AzsZ3UGg41G21eWILds0I1Q2fGW/D8H1jxOyLJT3xl8073PdmTFW14SbKd1V3tH5mQj1
-         bsnkL4W7KaqTYI/0rwdVq75PyCAZuAmlt+1TAmnZENqffPLTAGCz6Sl4AbvfulqXC36F
-         Y9dhlB+kELFCKG0TP4yU6iu6C+Y4pdIrbnWaKjVuP4bgk7rw6KIqGeF8HeIkS/6+gOLc
-         1MFfEsLCQgTbPEi2zyC33Bptnw1hiwp2+rntljo14ZE3ac/QzWSpgV3+xxoSYAN4f1yc
-         s0VA==
+        d=gmail.com; s=20251104; t=1774520769; x=1775125569; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w21MILqtQX7tm3Tp3FSO4ZH4iaGfvegT/Zu1Ld8yyR0=;
+        b=cPVG1VLl/Qt2+MjfWmKQnNXuOG/02tBLOdZtj9OUFzN/WSA7xtWY3pngNrA5NMjPpu
+         HY3dx+sUKqFVTcBsgbITrdLdGyu/FPeGC2p98DA2qAUYMKGcCi3pgatku79KDU1W8zro
+         8ebEChblzD1zRVZm931Vlh3umcfWMrtS497fsG+uJaWS+MbALDZUT6LwUmtIeYRma/K+
+         fwEMg0ZywG8YLW0bL23Mh4AJDhe6ZTn5Mjd1x8Oe1jc0/KLLIhTuWMskTr3YIwVbAO9V
+         mEoBC4r8TdF5Z8fG5Ti6RdqcDLrDT/+uCIAlj7PP6JrRmXNa0t27feuNofR6KcfE94xC
+         GCNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774520733; x=1775125533;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BZMdR5mD3YAWrVXEIuBlAnHV2JLWFbsl0mHokYFYrkA=;
-        b=QY/Cx1tPeChHS4PRqmu0RtQ6fkaqwq0AGOPJgQHnb+cEI4cDa6CNdeZFCbS3HP++6l
-         eOYUiT+kuILF/x/LTQxDKchr3JcBD69zLuZIdyNHIgXMzAKxwS9+m72lq5WLJeSq+rVi
-         Y3G3Y7TcgomEwpPRJDXtRDwCQ5ixJoD7sP2jHPzG8FXgHxYtLKnkF4b6hB22Qifpgvk2
-         tl+Q2gcjwKcxf3rsgYP9I38iX/rbs4VgJANyMA6FY4JzW/uNSvp0Wmny3nAMj/7vRK94
-         tsmKhktqtcA09GsHtOYG9Kwa9QKMDR72qf6EbXDaGYf2R9SN263ecOoBi166AqBrIaNZ
-         Y3sg==
-X-Forwarded-Encrypted: i=1; AJvYcCVmnEX8LGX7pJHLfFNMu+pFBflfmEsxWnfpFUE5JandYxpAqnQeSd/En6uKFobOlMk1GmYmJgQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdWQeDzSoCoouDUStWrpCT0ciU9XhK9nx+I+ovs1cO2sRKYU+x
-	h8FVW8fmf31SjZSfej2XzzFKNO9dRSTqEmno725Bm0JBeBrsbtLvj8FI7KS3RZhim6EiWv+avQj
-	Z24FL344xf3PKSQb2zvSf6OHrqoAZSD2CBu0v/k7D4dA7Mk3iYFm1w7ImGA==
-X-Gm-Gg: ATEYQzxIPtt7dAXTNOj8jfeSPEvULeCTffSIFe067CNxSmuYDhAvya+6iOYENOK6PZv
-	8iyBnGk9m9TCZr85t6yJ5PEM13PkolplhLYD/q3fzVzf1ckUbz+z2gPZxoAQke6BigewguFafwN
-	B75SmZv+QotpjtwU1iVa+vWgjNRtg6Iwobo0rhGh8Bco5iWL6z8ExwXLcWeOr5b80vkxyIwwbNd
-	06v7/6zpYshWZUWi9DRzehT+d/9SSQBstWF0tVi5z3zRSsex8z5+1bpuNB5xLlIFFJ3xCtM10pl
-	a9P6tgIaF6H4Brozcgq9EUIIQxyW3zTBrLYEyLhcu6OY4GhJla5yQchRlqu3aJRmk6Mm6EdTyAO
-	Z1iI7MMTN8FJ8y69fWTdrDT0JL3jad6PE85VM9ujNmpXxZ20icph0g27v
-X-Received: by 2002:a05:600c:6087:b0:483:2c98:4368 with SMTP id 5b1f17b1804b1-4871605a9a5mr100245255e9.18.1774520733164;
-        Thu, 26 Mar 2026 03:25:33 -0700 (PDT)
-X-Received: by 2002:a05:600c:6087:b0:483:2c98:4368 with SMTP id 5b1f17b1804b1-4871605a9a5mr100244675e9.18.1774520732670;
-        Thu, 26 Mar 2026 03:25:32 -0700 (PDT)
-Received: from [192.168.88.32] ([212.105.153.60])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48722cb10fcsm22392255e9.14.2026.03.26.03.25.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Mar 2026 03:25:31 -0700 (PDT)
-Message-ID: <c5c71526-047b-480d-bf4f-6ebc47357f49@redhat.com>
-Date: Thu, 26 Mar 2026 11:25:30 +0100
+        d=1e100.net; s=20251104; t=1774520769; x=1775125569;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w21MILqtQX7tm3Tp3FSO4ZH4iaGfvegT/Zu1Ld8yyR0=;
+        b=AGdrttrZRLDG/vgSZYasCdjMj29EjblVAleRh3b3XsfZdrdm555TeqB7YHkOb2XXrt
+         5LIpSYqtDImSJDhMydf9YkbQkfii1q71jf6nlzp24FhSP+vCQQ0REWNUmhlqTWggrOqI
+         AUw8JC02tFgat7F3QDOjXPhRisSis11ER91B8vXVFwRzqqq6JguWr9WIng6/ICAqcI3J
+         j94KH4O+/TrjEFu+w/kp2/dj88tJ7XXV7Sz46d2I4XfQEPz4DL1yZ2h1w45GKVffO/72
+         efLlmE7DN3LJ5K6Eovc8vv875IHDTl30yyVJudU8wY0gSfmZiTZlvMUzMOhjeqHmA68g
+         tAsg==
+X-Forwarded-Encrypted: i=1; AJvYcCUmX6T018eDBqlvCVOHqiu3SIAYtBf45GdTMMwDLl+QuZ01cQB5lkTmsv+2Agt930LB+cN0t7s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzzg5BTdjN97M6oEkkV1im/IJzNbW5+6+YAR3esM8ef1nzzS9tQ
+	ea2ybVMMilrzYV+1fTDHNn1HfcG7OmzsxSG4dfw3yH3folHkdSWPx+/r
+X-Gm-Gg: ATEYQzzt7lVnCiK0Euvz5SYgg7sOKDaujwNpQKmTYk4Q0AcigxVPUhfBfHj0xTgzqG3
+	X9Raxu6Hb865dqJjLFgdfKgV+tXTcVRWydVZDRdoKn4/2QFgC9Ss6msbUI8vGkbaZ5jbUZQUwA9
+	ESqAXorFfVtSj/K/QovxshoY9CSnFAmZjUjSMRvR+puoS8hExb4gKCRfFgCRmHvylRldjji5UfM
+	fZm6tDxv+0jk4tqRv/JtiItlGAVuhSCj09z70uagd3cygmrXCVu7ysNftBtEoLSUgNhWjTWm92h
+	C3SqtDcNe1zLrTQ68ew7k3VUTAEQKpdftSPuraSk/xfcxFEEKjmsPndOFzuIwsouAr9V1pwzM4R
+	m3ir8iQeigEi49uCtm4eDnHuyDMV/jySXNsgg2BiT85A0YIVAkjrtCLD0qICc+bdEqwy6KfOqIW
+	lDl+nV0aDyQKixD+Tb7L4eJblGYg==
+X-Received: by 2002:a05:6000:471c:b0:439:c122:4fe3 with SMTP id ffacd0b85a97d-43b889b9d54mr5592527f8f.1.1774520768577;
+        Thu, 26 Mar 2026 03:26:08 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d50a:b400:cf79:b8bb:14ce:d80f])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b919e7111sm6875026f8f.37.2026.03.26.03.26.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Mar 2026 03:26:07 -0700 (PDT)
+Date: Thu, 26 Mar 2026 12:26:05 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linusw@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net v4 4/4] net: dsa: ks8995: Add stub bridge join/leave
+Message-ID: <20260326102605.krboxk3re5hjcggx@skbuf>
+References: <20260326-ks8995-fixups-v4-0-989abba8f077@kernel.org>
+ <20260326-ks8995-fixups-v4-4-989abba8f077@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/mpls: fix missing NULL check in
- mpls_valid_fib_dump_req
-To: sunichi <sunyiqixm@gmail.com>, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org
-Cc: horms@kernel.org, kuniyu@google.com, gnault@redhat.com,
- leitao@debian.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260323071515.1945612-1-sunyiqixm@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260323071515.1945612-1-sunyiqixm@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260326-ks8995-fixups-v4-4-989abba8f077@kernel.org>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-271972-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org];
+	TAGGED_FROM(0.00)[bounces-271973-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D6EF6333A47
+X-Rspamd-Queue-Id: 08AA6333A56
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/23/26 8:15 AM, sunichi wrote:
-> The attribute tb[RTA_OIF] is dereferenced without verifying if it is NULL.
-> If this attribute is missing in the user netlink message, it will cause a
-> NULL pointer dereference and kernel panic.
+On Thu, Mar 26, 2026 at 10:57:35AM +0100, Linus Walleij wrote:
+> Implementing ks8995_port_pre_bridge_flags() and
+> ks8995_port_bridge_flags() without port_bridge_join()
+> is a no-op.
 > 
-> Add the necessary check before using the pointer to prevent the crash.
+> This adds stubs for bridge join/leave callbacks following
+> the pattern of drivers/net/dsa/microchip/ksz_common.c:
+> as we have STP callbacks and these will be called right
+> after bridge join/leave these will take care of the
+> job of setting up the learning which is all we support.
 > 
-> Signed-off-by: sunichi <sunyiqixm@gmail.com>
+> Fixes: a7fe8b266f65 ("net: dsa: ks8995: Add basic switch set-up")
+> Reported-by: Vladimir Oltean <olteanv@gmail.com>
+> Signed-off-by: Linus Walleij <linusw@kernel.org>
 > ---
->  net/mpls/af_mpls.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-> index d5417688f69e..28bbea30aae3 100644
-> --- a/net/mpls/af_mpls.c
-> +++ b/net/mpls/af_mpls.c
-> @@ -2174,6 +2174,8 @@ static int mpls_valid_fib_dump_req(struct net *net, const struct nlmsghdr *nlh,
->  		int ifindex;
->  
->  		if (i == RTA_OIF) {
-> +			if (!tb[i])
-> +				return -EINVAL;
->  			ifindex = nla_get_u32(tb[i]);
->  			filter->dev = dev_get_by_index_rcu(net, ifindex);
->  			if (!filter->dev)
 
-If you reorder the check I think it will lead to better code:
-
----
-diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-index b32311f5cbf7..41510dce5329 100644
---- a/net/mpls/af_mpls.c
-+++ b/net/mpls/af_mpls.c
-@@ -2170,13 +2170,16 @@ static int mpls_valid_fib_dump_req(struct net
-*net, const struct nlmsghdr *nlh,
-        for (i = 0; i <= RTA_MAX; ++i) {
-                int ifindex;
-
-+               if (!tb[i])
-+                       continue;
-+
-                if (i == RTA_OIF) {
-                        ifindex = nla_get_u32(tb[i]);
-                        filter->dev = dev_get_by_index_rcu(net, ifindex);
-                        if (!filter->dev)
-                                return -ENODEV;
-                        filter->filter_set = 1;
--               } else if (tb[i]) {
-+               } else {
-                        NL_SET_ERR_MSG_MOD(extack, "Unsupported
-attribute in dump request");
-                        return -EINVAL;
-                }
-
+Yes, but there are important differences to ksz_update_port_member() too.
+For one, ksz_common keeps track of which port belongs to which bridge
+(dsa_port_bridge_same), in order to separate forwarding domains, and
+ks8995_port_stp_state_set() doesn't. So I have my doubts that the
+complexity of the driver is currently sufficient to behave in a
+satisfactory manner. If lan0 and lan1 were under br0 while lan2 and lan3
+were under br1, I don't see what would prevent lan0 <-> lan2 forwarding.
 
