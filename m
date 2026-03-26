@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-272275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272276-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oB8DBhu3xWnxAwUAu9opvQ
-	(envelope-from <netdev+bounces-272275-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:45:47 +0100
+	id kHx1GVu3xWnxAwUAu9opvQ
+	(envelope-from <netdev+bounces-272276-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:46:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEDD133CBD4
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:45:46 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D279D33CC0A
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:46:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 832AF301EF0D
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 22:45:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3B4CF305D4C4
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 22:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596AF347BC6;
-	Thu, 26 Mar 2026 22:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5CA234BA59;
+	Thu, 26 Mar 2026 22:45:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pVXuBtEs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k7hmAYUf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0499F34216C
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 22:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D23934B183
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 22:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774565134; cv=none; b=MNANOb4Xkg2CsjsnlEkqqLlppqM7ilc6JIiwC2WlJ+l9vjzZpOHB5WqVRiDWGa/OLsLPpWscfb8tagwbUbkATyymwMe1sPbYAse7ns9H3D6Yum5CWoxTMz2S1KJW2MgDTwEIQ+rmlFeFUBn1wP3RLVB7Xp0elU4b4jcLMBSkoMY=
+	t=1774565137; cv=none; b=Kt9RXqCHvzKbtvp1aFNVg7QhBYxFqHSNiYudfYFMzKOUJaWLbl6gFznZH4MDJL7NUTureSz2dCaA8ewPOWMbkwoC6eJvd5GNklc52UNU5sJoqM0uUYZmamWqUWqiFtFqwoQV5aKMnEzg4w3fBPxptrmp3YjMVUfDUqkrhj1/FD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774565134; c=relaxed/simple;
-	bh=oZYgYFj1aqx2X4B8JT5W6Sywd6j3ZYGmoQ5hWKQDfVM=;
+	s=arc-20240116; t=1774565137; c=relaxed/simple;
+	bh=5Txi5dwhnQhZbwtiLFvwxvxiOL2+dETMit3sCsC05fs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tokEYcDyimsH1xOX37COYRvwcy8/Txq+WhDpYC7Wosk5p7a17BHWX+avslT6FItgGvHdb7qFi7MtLWuO/hdOzdhWgE+yWRHavwAhEvxtF8VB1OOtkA6BBQmsOsBZ5Y0+erH0SCIRzNb7N/q3APVeZqXm/nqO0RO6I6PlpA548YM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pVXuBtEs; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=eN7SxbVeww2vA2jWRHK5863EElCwIyy5h+/12huQXtEBE3Hpq3MsM3oeeUJDcQ/L9oWwyCWqQgwNb1EdI/RRNgn7Xj6vsz3kpPqmZsOZEdHmZm4oxM68osCHNcxXiG3TKdFETxoYlTld4QQxfs6VuVe9t/LtvlIHTzE3vroUoFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k7hmAYUf; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35c0f03b2a1so4280308a91.2
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 15:45:32 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b059ab124dso19637865ad.1
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 15:45:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774565132; x=1775169932; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1774565135; x=1775169935; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bEniFEpXYdog1o1ES50Hw6/3TT14/XWuA8fK5Ar+y7E=;
-        b=pVXuBtEsS+x41nYy9uCU7Oc31h+E+a3wCT8JCRrS5uTzdt9+XlmQ1DkI2XXkrdAIO6
-         IWZc6AcsLSteEL+sBIsPhKcKXo0itCTFLLmXEzzgWmFCCN7TtzTz8Ubx7+6mxN0r3x5C
-         d+htrDeCp7FJLbemfbURk3WQMLiRPSzWHFpqXwJ410C00J+5o4eQ5wThs1vJsm5K1Yi7
-         cgKKV1OwB2Qq2I7EXk+4EtA5yWkNQjtNpezIA4twxyi3EDiRnVuXHAmsrgKRXop0e5xz
-         pLbQC/woW4n+nk1qQQ4ZqIGolTYsOG+3KKsiUbJ0BjfN0ZyeTSSlv4/d/6Nhu07C/uGZ
-         Dr1A==
+        bh=UBqjipqe1hWrqGUrEp4FoAUnPSZh4H54A4uK3kM6Occ=;
+        b=k7hmAYUf/SkMqVS5ApGgaNZy+iSJvnwxBRUnsWNe82Grv3xHSG0djWyB+k9AzELHPo
+         7EbrUmLYfSiKlJaQIK5JZ4yoaq+eFnJi02RSq5His1isYkZQrwzfg45Yn7AGjmhHesDv
+         X+rEaw+mwS1qCsAUe0xBUO9lIMfr2Pr8TMMpjmFx+8Pn/Z1IhBuMtd8msg8Cb2f1YBaj
+         8zb8KxYfvNtKCquCbkTXAXR6P2w+GXyau5bOC1HRNLpXWG2eROvCYb7ed+Zd6r8BTYAe
+         MUzH6vqvE7+mOD/cHjHdnYdei41eElm0/KJM1CDvso0pSX4ueI77ya/NXD172tdJHW2+
+         UaSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774565132; x=1775169932;
+        d=1e100.net; s=20251104; t=1774565135; x=1775169935;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bEniFEpXYdog1o1ES50Hw6/3TT14/XWuA8fK5Ar+y7E=;
-        b=krUdthu5HUaSpsQ7dXckZNJSrntYyRDn+ZF3WKqk2cTL4R6T+HhiEtf0smrTx1/8YZ
-         ufekJ4bsW18oaJxR2lzD1NaJstFySdC716F6SFfJ2ygsK4OYb9U+FWwEcVN9e9ar3/pb
-         rTOOv7mgbQCRVKjhEs9hEK4kJb8+9kb48rYAGr5npNqwJUtqGwsZy5Wf+VmoCUru4oDd
-         liIB/7rBb5fEtLy1Q7vPdFCkFtb9MUMlIMWyMehpnorrOTygHjDvQ5oy5h1DxcTHkOxI
-         J2qg0RLr5PrQoXmHi3gSfL98HU8vi6hMUdCRQjvzIB9H2UijqRLvbp6bFIIbTgRRPQ+s
-         q5nA==
-X-Gm-Message-State: AOJu0YzAFXM8Vk4fFDjQvq4/94A+CiF2aduQHUfZmLmNUsgv2DEhQn59
-	CPNYjTE5W1Mg/lbGRX3dYKW7XJTI/P9bQsY/zRyoUEfs1pjaCgk8nVlSH36C8496YQKv9B2Uz3G
-	EdLVsIw0aIN2rgMjMoilKQMSHksJOItjv3uENAd7yEAcugJ7HfQBHq9lha5i4xKhcrdPFflR5AY
-	viHMcZz3TMAnUNYpBKV892QsRuaOaT4WPiTVf16UoC4H4GHGSsY7/K+lU3IGH8SzE=
-X-Received: from pgip3.prod.google.com ([2002:a63:c143:0:b0:c5e:84e5:d15c])
+        bh=UBqjipqe1hWrqGUrEp4FoAUnPSZh4H54A4uK3kM6Occ=;
+        b=dkmcU5Zg6Kmox6eaDE71r3Ar2angKqZhLPFh+6J7QhqrIwx8109Y5vr82Y0Yp8vhVu
+         DMNb9EZKDvVvqPgCiJHuGfmv7OM9uvZXCOovoX8GTrf8PuSGjOjGyj3KSOSKgfGPLHoS
+         EMfbcaM1kvfPr9FIhhXzRjoMAKRSQ3/6/45FQNPViAZADz4OJmOWerLLfmW1Ea9KIwTZ
+         56e65mqhyAsgE0YAYIcnOH0CiZKp7qCxf/qb++k0liuxh8Wkj/6XhGJ2Kb41+ZcGUIwR
+         fBcKXRcXKYMIQ2cKTC2+DI01hf0eq9do/ijlP4jtXOV+VIzhl8ITNVG/7E1VQG8+sON3
+         Xe9A==
+X-Gm-Message-State: AOJu0Yym02xwiK3IJU6f7AgWGICV13G+4BpCzGta0ezRw4E8Z99elx4U
+	fMXeBy71URBdH/WB+m2T7WMSnv3PDmHKBcoNei9UcMYRsCtk6AAVjms61g9z08FbBAI8LD0nCxF
+	6pg60FwsWQAH3T0L96bV6RQQviUSnHDuWLGtX0vTlCRvVnXCYqowDp9U92aTmvtO4iScwwHamwS
+	TR6tS8Mp0JXSIGwPpTl9x6Y2uVwTIcsXkCGqUMuvVC0kVUZNuOGQUsIw9Nwi2a/oE=
+X-Received: from pgvf17.prod.google.com ([2002:a65:6291:0:b0:c73:97d4:afe0])
  (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:3d83:b0:39b:edcd:d936 with SMTP id adf61e73a8af0-39c8787f016mr349555637.16.1774565131988;
- Thu, 26 Mar 2026 15:45:31 -0700 (PDT)
-Date: Thu, 26 Mar 2026 22:45:25 +0000
+ 2002:a05:6a20:432b:b0:39b:8b8b:39ed with SMTP id adf61e73a8af0-39c87c0179fmr368442637.68.1774565134419;
+ Thu, 26 Mar 2026 15:45:34 -0700 (PDT)
+Date: Thu, 26 Mar 2026 22:45:26 +0000
 In-Reply-To: <20260326224527.1044097-1-hramamurthy@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260326224527.1044097-1-hramamurthy@google.com>
 X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
-Message-ID: <20260326224527.1044097-2-hramamurthy@google.com>
-Subject: [PATCH net-next v2 1/3] gve: skip error logging for retryable AdminQ commands
+Message-ID: <20260326224527.1044097-3-hramamurthy@google.com>
+Subject: [PATCH net-next v2 2/3] gve: make nic clock reads thread safe
 From: Harshitha Ramamurthy <hramamurthy@google.com>
 To: netdev@vger.kernel.org
 Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
@@ -93,14 +93,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-272275-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272276-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -113,82 +113,147 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AEDD133CBD4
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D279D33CC0A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jordan Rhee <jordanrhee@google.com>
+From: Ankit Garg <nktgrg@google.com>
 
-AdminQ commands may return -EAGAIN under certain transient conditions.
-These commands are intended to be retried by the driver, so logging
-a formal error to the system log is misleading and creates
-unnecessary noise.
-
-Modify the logging logic to skip the error message when the result
-is -EAGAIN.
+Add a mutex to protect the shared DMA buffer that receives NIC
+timestamp reports. The NIC timestamp will be read from two different
+threads: the periodic worker and upcoming `gettimex64`.
 
 Reviewed-by: Joshua Washington <joshwash@google.com>
+Signed-off-by: Ankit Garg <nktgrg@google.com>
 Signed-off-by: Jordan Rhee <jordanrhee@google.com>
 Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
 ---
- drivers/net/ethernet/google/gve/gve_adminq.c | 26 +++++++++++++++-----
- 1 file changed, 20 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/google/gve/gve.h     |  6 +----
+ drivers/net/ethernet/google/gve/gve_ptp.c | 32 +++++++++++++++--------
+ 2 files changed, 22 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-index 08587bf40ed4..c7834614c5f0 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.c
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-@@ -416,11 +416,6 @@ static bool gve_adminq_wait_for_cmd(struct gve_priv *priv, u32 prod_cnt)
+diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+index 1d66d3834f7e..7b8f78bd1968 100644
+--- a/drivers/net/ethernet/google/gve/gve.h
++++ b/drivers/net/ethernet/google/gve/gve.h
+@@ -923,6 +923,7 @@ struct gve_priv {
+ 	bool nic_timestamp_supported;
+ 	struct gve_ptp *ptp;
+ 	struct kernel_hwtstamp_config ts_config;
++	struct mutex nic_ts_read_lock; /* Protects nic_ts_report */
+ 	struct gve_nic_ts_report *nic_ts_report;
+ 	dma_addr_t nic_ts_report_bus;
+ 	u64 last_sync_nic_counter; /* Clock counter from last NIC TS report */
+@@ -1321,14 +1322,9 @@ int gve_flow_rules_reset(struct gve_priv *priv);
+ int gve_init_rss_config(struct gve_priv *priv, u16 num_queues);
+ /* PTP and timestamping */
+ #if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
+-int gve_clock_nic_ts_read(struct gve_priv *priv);
+ int gve_init_clock(struct gve_priv *priv);
+ void gve_teardown_clock(struct gve_priv *priv);
+ #else /* CONFIG_PTP_1588_CLOCK */
+-static inline int gve_clock_nic_ts_read(struct gve_priv *priv)
+-{
+-	return -EOPNOTSUPP;
+-}
  
- static int gve_adminq_parse_err(struct gve_priv *priv, u32 status)
+ static inline int gve_init_clock(struct gve_priv *priv)
  {
--	if (status != GVE_ADMINQ_COMMAND_PASSED &&
--	    status != GVE_ADMINQ_COMMAND_UNSET) {
--		dev_err(&priv->pdev->dev, "AQ command failed with status %d\n", status);
--		priv->adminq_cmd_fail++;
--	}
- 	switch (status) {
- 	case GVE_ADMINQ_COMMAND_PASSED:
- 		return 0;
-@@ -455,6 +450,16 @@ static int gve_adminq_parse_err(struct gve_priv *priv, u32 status)
- 	}
+diff --git a/drivers/net/ethernet/google/gve/gve_ptp.c b/drivers/net/ethernet/google/gve/gve_ptp.c
+index 06b1cf4a5efc..140b8fbce4f4 100644
+--- a/drivers/net/ethernet/google/gve/gve_ptp.c
++++ b/drivers/net/ethernet/google/gve/gve_ptp.c
+@@ -11,19 +11,20 @@
+ #define GVE_NIC_TS_SYNC_INTERVAL_MS 250
+ 
+ /* Read the nic timestamp from hardware via the admin queue. */
+-int gve_clock_nic_ts_read(struct gve_priv *priv)
++static int gve_clock_nic_ts_read(struct gve_priv *priv, u64 *nic_raw)
+ {
+-	u64 nic_raw;
+ 	int err;
+ 
++	mutex_lock(&priv->nic_ts_read_lock);
+ 	err = gve_adminq_report_nic_ts(priv, priv->nic_ts_report_bus);
+ 	if (err)
+-		return err;
++		goto out;
+ 
+-	nic_raw = be64_to_cpu(priv->nic_ts_report->nic_timestamp);
+-	WRITE_ONCE(priv->last_sync_nic_counter, nic_raw);
++	*nic_raw = be64_to_cpu(priv->nic_ts_report->nic_timestamp);
+ 
+-	return 0;
++out:
++	mutex_unlock(&priv->nic_ts_read_lock);
++	return err;
  }
  
-+static bool gve_adminq_is_retryable(enum gve_adminq_opcodes opcode)
-+{
-+	switch (opcode) {
-+	case GVE_ADMINQ_REPORT_NIC_TIMESTAMP:
-+		return true;
-+	default:
-+		return false;
+ static int gve_ptp_gettimex64(struct ptp_clock_info *info,
+@@ -43,15 +44,19 @@ static long gve_ptp_do_aux_work(struct ptp_clock_info *info)
+ {
+ 	const struct gve_ptp *ptp = container_of(info, struct gve_ptp, info);
+ 	struct gve_priv *priv = ptp->priv;
++	u64 nic_raw;
+ 	int err;
+ 
+ 	if (gve_get_reset_in_progress(priv) || !gve_get_admin_queue_ok(priv))
+ 		goto out;
+ 
+-	err = gve_clock_nic_ts_read(priv);
+-	if (err && net_ratelimit())
+-		dev_err(&priv->pdev->dev,
+-			"%s read err %d\n", __func__, err);
++	err = gve_clock_nic_ts_read(priv, &nic_raw);
++	if (err) {
++		dev_err_ratelimited(&priv->pdev->dev, "%s read err %d\n",
++				    __func__, err);
++		goto out;
 +	}
-+}
-+
- /* Flushes all AQ commands currently queued and waits for them to complete.
-  * If there are failures, it will return the first error.
-  */
-@@ -482,9 +487,18 @@ static int gve_adminq_kick_and_wait(struct gve_priv *priv)
- 		cmd = &priv->adminq[i & priv->adminq_mask];
- 		status = be32_to_cpu(READ_ONCE(cmd->status));
- 		err = gve_adminq_parse_err(priv, status);
--		if (err)
-+		if (err) {
-+			enum gve_adminq_opcodes opcode =
-+				be32_to_cpu(READ_ONCE(cmd->opcode));
-+			priv->adminq_cmd_fail++;
-+			if (!gve_adminq_is_retryable(opcode) || err != -EAGAIN)
-+				dev_err_ratelimited(&priv->pdev->dev,
-+						    "AQ command %d failed with status %d\n",
-+						    opcode, status);
-+
- 			// Return the first error if we failed.
- 			return err;
-+		}
++	WRITE_ONCE(priv->last_sync_nic_counter, nic_raw);
+ 
+ out:
+ 	return msecs_to_jiffies(GVE_NIC_TS_SYNC_INTERVAL_MS);
+@@ -109,6 +114,7 @@ static void gve_ptp_release(struct gve_priv *priv)
+ 
+ int gve_init_clock(struct gve_priv *priv)
+ {
++	u64 nic_raw;
+ 	int err;
+ 
+ 	err = gve_ptp_init(priv);
+@@ -125,17 +131,20 @@ int gve_init_clock(struct gve_priv *priv)
+ 		err = -ENOMEM;
+ 		goto release_ptp;
  	}
+-	err = gve_clock_nic_ts_read(priv);
++	mutex_init(&priv->nic_ts_read_lock);
++	err = gve_clock_nic_ts_read(priv, &nic_raw);
+ 	if (err) {
+ 		dev_err(&priv->pdev->dev, "failed to read NIC clock %d\n", err);
+ 		goto release_nic_ts_report;
+ 	}
++	WRITE_ONCE(priv->last_sync_nic_counter, nic_raw);
+ 	ptp_schedule_worker(priv->ptp->clock,
+ 			    msecs_to_jiffies(GVE_NIC_TS_SYNC_INTERVAL_MS));
  
  	return 0;
+ 
+ release_nic_ts_report:
++	mutex_destroy(&priv->nic_ts_read_lock);
+ 	dma_free_coherent(&priv->pdev->dev,
+ 			  sizeof(struct gve_nic_ts_report),
+ 			  priv->nic_ts_report, priv->nic_ts_report_bus);
+@@ -150,6 +159,7 @@ void gve_teardown_clock(struct gve_priv *priv)
+ 	gve_ptp_release(priv);
+ 
+ 	if (priv->nic_ts_report) {
++		mutex_destroy(&priv->nic_ts_read_lock);
+ 		dma_free_coherent(&priv->pdev->dev,
+ 				  sizeof(struct gve_nic_ts_report),
+ 				  priv->nic_ts_report, priv->nic_ts_report_bus);
 -- 
 2.53.0.1018.g2bb0e51243-goog
 
