@@ -1,395 +1,224 @@
-Return-Path: <netdev+bounces-272277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272278-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0C3tD3C3xWnxAwUAu9opvQ
-	(envelope-from <netdev+bounces-272277-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:47:12 +0100
+	id GOIsFeu6xWkeBAUAu9opvQ
+	(envelope-from <netdev+bounces-272278-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 00:02:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D37A133CC20
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:47:11 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B0333CDD1
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 00:02:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 29B93304F6C6
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 22:45:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A632B300846C
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 22:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697D634D4EC;
-	Thu, 26 Mar 2026 22:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541D134216C;
+	Thu, 26 Mar 2026 22:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GYSNvvuy"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="S+c8kVnG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017B834C981
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 22:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774565139; cv=none; b=DCd0CeSBHIyyvHCy5VZXKNfXhd0/tNgTG+T+hEyrotcq7CoBE7EQOQqKsgb+rQenYNIEF/v5sCvGQo4H0nfBDNnfnAeN/d032YbuKLmVI1lgvGBciSKQDUFNi0+ITUFhrQMoqgG4BHxHyTKoHV3jFxw4rS5BywrPoV/r4bnNrkQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774565139; c=relaxed/simple;
-	bh=zF9ZSuygMLZDE5w3B0M+2FQ0B1fwuBNYwWZg+W0KJl8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gCSgpwfqhtkap9OaQpoups13V4iCiqtp1ihdlY6Xcj7apkzW0rKuUtWQv82243j6kF+/fgXZ67smuFhmLGo2jsMFzJnL9PRrZrX+Z08sUQguvUuCrINqOtx5BT9tezN1WdUDudkAb5EZABI12XTB3n+JEFE/4PSE0Oa2qLNlez4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GYSNvvuy; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-82c69a734a4so1197548b3a.1
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 15:45:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774565137; x=1775169937; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V7bKIh/7T7RPEt2Wwiu9b1ishS0moS3CmH7Dh0I7XDo=;
-        b=GYSNvvuyh0WRrnnpkIE2+J4+kiFp5e9wRhIWqTgxFIGSdBGRqvPx8i5BfY7NasQJz4
-         oRGf45dkumCr7dAPmZbkMjx1a+3iw/1qBaS0V7w24M1brrc6jpnAHdEbDZWk/qcSQ2XK
-         7VHjnrwch34c3AHL9fqWLSAG8HAairLPddKAE5VPSs/Z1oR/F1exeKSeCIuHcAUUyGPb
-         chvLk7jEWMc6MRKoJHlND29NoIKG4BjO3gnL0hc6JaQAJqdT12qFYoJWXmf9SinR3o5j
-         44SHN8luQe5p/EfrLHJei/WSMemL1HOPfHnKI6h8IdbNsbq+mXar3Tn588/YaGVrgS4y
-         NYXA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E9E336880
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 22:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.145.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774565759; cv=fail; b=q83Mj2tAwERZIZnzrEMK3U8fUaixmcs1QKsfPtRQxDhd01PECiWOB+/D0A+ScPVpYRpZ6XJ+dr2tov82DZ7Wg44YkmoG9Z9EWWH+/fhvsQh02vEZHPn55vhs1brBAHRpds1kZ1Kut0SuhQ7c66kY4Nrn2ThQJjcoZXdroAOBNqA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774565759; c=relaxed/simple;
+	bh=BdyUGS9qVrZC2M4zs7j3VJuPzuCzCdpvDKaUG3wf5J8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a5TKORBIHI/IdxBEWLh0Z0btgauVIt4vIQoRIoEzsj5CgWuu7uIpzqwRaskFgkKDQ9jwR0gtjnTk5vAGl5LyFBmXAPlYPUwtweZyNtbllcR2Lx/AzmX9ExxUhD74Rq6uqla8pu3IEPdGr83CBfq5wDFywHeXgFMkW+JukFHs3oQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=S+c8kVnG; arc=fail smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62QIB8F03259024
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 15:55:57 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=gWmaYzOqDIhtbUb8Zs5Nf1ednm4S50xRfwW0Jz6U+w0=; b=S+c8kVnGsspV
+	a654lLZZ0b8EsEWQ7eZrMsM3U42hl5QQn43gPcbCwg1iIRVkzVp2dRFBMOENsKwv
+	SFukOMCLHJB+BVExRhe9tAQ85TnRLm8BMieG/xu8T5GxAF4nxZYBRBXXNSu81mfz
+	72IHHjWgJ7wrMUq4HLUK01uWKkwfjjbYiSew0OJdVYtTd9jpySKJMO9QYnD5wD1F
+	hO4pop4o2ClGk5kOI5qvHHOrYSB5X7rKufRQLoSTlAVCrJgs3+MLzJEtviKWKK4E
+	rl7jpexzUWHR2QNxm3b2slr+Jfm5udNi6cLbkjrHBtc/MhaQw/bPV2OzMvUx4TNz
+	3tP95BR8hg==
+Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com [209.85.160.71])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4d4yjpjasa-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 15:55:57 -0700 (PDT)
+Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-40f09403c56so7159863fac.1
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 15:55:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774565756; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VJDVhowsqRy5UsaiA64pu5ihEaypfwkxCHYBpF9YBBNZLTQ/NVRjeIjyw+KvfYFG8J
+         XFv2tYM5jss6lv2l4Mu+Ir62uKr7tBTFa+T4MLSsj+jlHeFup80Ejra+nRi9E3Q0oVwA
+         pGv/9CWACEPMSbvO2U5QCXu67t9XnnVICTQ50kzq50pdyEh0a0x0hqoIZncuHB+kLzMy
+         XD9CTzyRpVmSOZ0mVjlg+WwfrBrgRNlTM14jx4QpvqbZ1qWa9a1vpeW3kZjeF3TB4nMR
+         DcBa9b8MloG/OkKtsG7ep4kpOwRAW9udp1NSg8xpIBWedDiiqwWQgmkmWsiAHH/13Ceq
+         CGPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version;
+        bh=VGlyvxOOFksgPXoMLERC1kCayld4eO3E5k/3hyTOpHg=;
+        fh=eqKjjJbMBMtC5jL9NPI2/uEkO1a6Rqeo4EpRYIET3lA=;
+        b=W7bMWoJ3mLNAw0GHB0O5cI0AUoYt3ku3sOhIC14Df6MiFG4xIB9Oc81mmahYvMLIux
+         9pwUimCClOoisXlWBpE9B6EWsF9AdWTQClwA9ZkjXI/L3e/PNtdvkFtetOi+hxiJV1LA
+         uELrcOe4jpT9xIA6xe05MUzkNlRpiVxg4YsB/GRfKKAJBwj5djBbeIzeMlYZXTo1fn97
+         VFz3hjEj5phTVDK7k6nWubsgOcwvtgrWvuo54loh03yOKKvSQe8mL94xbBImUojopsNs
+         vDcgAKPlXO4YWuTQ9oBhwLTf/Q3dKsu1T/v95VqhcVjmO6/k6RgXbmloMUsnrDcQxeng
+         WX2Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774565137; x=1775169937;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V7bKIh/7T7RPEt2Wwiu9b1ishS0moS3CmH7Dh0I7XDo=;
-        b=cjRNWj3FKi1Z/hsgzITp9z/pItWbfdsu6BHPOiTSkH+Y1q1iUv/CtLEf8s4DxmWPjc
-         4qaD3e9Lxnh7gtQekd7g4JgCSvk9xhmN/WxPPS6omoT+okpAeQb4fBLMXARWZYklCoLe
-         ZpRtiMW3pcVw4P5/Sc7ebd4Idau6IBbJ9ABn4PswVRmQc37ODSYRWWdxdwe8fSMeH9GJ
-         qPMmYUUTg6fQZOrnPoLXjDDuAn64XvUariUg+aTQnRWug0YzYkqKAg8IvuNr3ieSdJd5
-         ztD+lcRLxhJPKFuLuBoXkSlWxnOB8/9OxK6PA0YyuNxrngydWxbhnMUCSf4WvBfoV2NJ
-         Fikg==
-X-Gm-Message-State: AOJu0Yy12R4NyanblEc5r8e0nKTI6xWdUezkv7r8ihqeQcvbbp8T7w5+
-	QM6aCp+KYi8t5yEG1vKgthH+ihb3Y4Xm/WSgeX5ivZldcIa/uCQWWhlTYbwZf+/pv6aw0MC02dt
-	BvEes3cWqrMnBadxIPdfq3CKLsGTZ5JA710Jq5++q7qUIQq58IL7+c0YBWsLkjdHFk5ixl11+e2
-	id8z2MfhVW3EJhTk4+QtOpiivExZKk5hOV3lQ+lKzjfRYsuOC/W7AreqsTynR5gxY=
-X-Received: from pfbdo1.prod.google.com ([2002:a05:6a00:4a01:b0:829:7f86:623])
- (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:440d:b0:824:a22c:c6d7 with SMTP id d2e1a72fcca58-82c95d4fbddmr187720b3a.18.1774565137050;
- Thu, 26 Mar 2026 15:45:37 -0700 (PDT)
-Date: Thu, 26 Mar 2026 22:45:27 +0000
-In-Reply-To: <20260326224527.1044097-1-hramamurthy@google.com>
+        d=1e100.net; s=20251104; t=1774565756; x=1775170556;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=VGlyvxOOFksgPXoMLERC1kCayld4eO3E5k/3hyTOpHg=;
+        b=U/jul5FtGCBjDW0Y6WLdzyv9KiAM77nTXNC+ruAMkMKBfz7dA5gEDgPxv7NwpuLRJ4
+         DEMuOcogI62YNMwmLu71VmtuoMEOG8kpTUUhWKsVPHHW9TJ3jShQGthf66+JPCRoFa2T
+         lKsfuzjz2OhU65DWrTXu576rFiRdCzqnJIzazB2mXTG8WRxn1Ghx+6OkY026ArEcqm8v
+         7eumTSrG9dMhpxIJCf6Z/AohcBI224RB2llvPDyDZ8P3mN5BihNbFR21JO0tFWbz5LIN
+         0GYbEf1CAhTJcCesEljW6DOOMtntPhKSncl/T10ZYW8SwOvDyoV1TzIgm5yUYPq8PGO7
+         Vf7A==
+X-Forwarded-Encrypted: i=1; AJvYcCX/JchhY5mgLJ5lCkn8hvwa0VEdPaOLKb0EKvNDfeRY5ccmU/mJzegPy2KVdei/c9Wbdk+d5Q8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUDF0aAka0SIZi7tEJeajWbxYB8r6cCbFcX0nHi7qUQ0eXATKS
+	WQu//9wjCkyj7S8xhf5BiXgy0YDdWXpMgW/B87m6TeNiRb+gEIobNZIt/hNot+EE95io/d5GepK
+	PTFEHwin3QzN77UmRu4+joPPOGG2aKVUQv5o7ZsrfDt1QQtwRELs21QWxjxZMXpufO4HaDQBdJa
+	ObC5VwYT/sp555QwLVnD23VrOib6sFcik=
+X-Gm-Gg: ATEYQzywUTEcsKjrqO/89QYKVDfqIY4wARS2xthkS9bO2g+jRWfwyuX5keNBfKplSTt
+	T9Z5Aua7vSEbOLRFJKsZUIOVoCcAS8EXjq7vucqqancNpOjr++cxEWJL7ENRZw0Vgfs68W7gU83
+	gghWNSZr8jYZb0Xurj6AqR+y97/ODywLMzXkIrm+0/jtUcWRlKE9FvoSEbWo2RAIAHfuFSFUuCd
+	zwBGAzGAeUN2L29JwIfPQ==
+X-Received: by 2002:a05:6808:1b20:b0:45e:fd68:3dd7 with SMTP id 5614622812f47-46a7aa42abemr1548511b6e.32.1774565756385;
+        Thu, 26 Mar 2026 15:55:56 -0700 (PDT)
+X-Received: by 2002:a05:6808:1b20:b0:45e:fd68:3dd7 with SMTP id
+ 5614622812f47-46a7aa42abemr1548497b6e.32.1774565755966; Thu, 26 Mar 2026
+ 15:55:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260326224527.1044097-1-hramamurthy@google.com>
-X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
-Message-ID: <20260326224527.1044097-4-hramamurthy@google.com>
-Subject: [PATCH net-next v2 3/3] gve: implement PTP gettimex64
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-To: netdev@vger.kernel.org
-Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	richardcochran@gmail.com, willemb@google.com, nktgrg@google.com, 
-	jfraker@google.com, ziweixiao@google.com, maolson@google.com, 
-	thostet@google.com, jordanrhee@google.com, jefrogers@google.com, 
-	alok.a.tiwari@oracle.com, yyd@google.com, linux-kernel@vger.kernel.org, 
-	Naman Gulati <namangulati@google.com>
+MIME-Version: 1.0
+References: <20260324234615.3731237-1-zhipingz@meta.com> <20260324234615.3731237-2-zhipingz@meta.com>
+ <20260325082534.GN814676@unreal> <acW2BwQKaUbS3eL9@kbusch-mbp>
+In-Reply-To: <acW2BwQKaUbS3eL9@kbusch-mbp>
+From: Zhiping Zhang <zhipingz@meta.com>
+Date: Thu, 26 Mar 2026 15:55:44 -0700
+X-Gm-Features: AQROBzDisNUSNgd3TlIskyBeYU1qigTy8IXoqXl2UWp2Iq9LIcNA3h_mkSfPwow
+Message-ID: <CAH3zFs1nbAKpYxwzMcwpC_Sdy+3tE0n0wUzxJ411gV-q1O++qQ@mail.gmail.com>
+Subject: Re: [RFC v2 1/2] vfio: add callback to get tph info for dmabuf
+To: Keith Busch <kbusch@kernel.org>
+Cc: Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Bjorn Helgaas <bhelgaas@google.com>, linux-rdma@vger.kernel.org,
+        linux-pci@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, Yochai Cohen <yochai@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>, Bjorn Helgaas <helgaas@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzI2MDE2NCBTYWx0ZWRfX66srKGqxH20f
+ W223qfWNCjD51q1p8gmajOyXwJtP7sLsX4G+D/1h64dL5fDcitvIbEgfWdvlxHAjnkL6q3ri9TM
+ 9EExQz0vYp1/nzwJG9uM2XGUooS9uvCBn7xYsWyCVm00fS6zYlnnbNGmIDjuXP+/beT5wODoFia
+ HKntbOwBs0c0HtAXMRAMdNkH8LaTmenx4dvDKmbOWawpVkK8jokak3kLIb7nTpRYPbyON2hw/99
+ jtDRQc/o/Br77JJJEfipJ5gB1ncjfzOeE0zhkqYeQT/NtJ6zPholMmULjHfcBbvFAA23f0myWTx
+ jZCREltb11f974Xndm32nEhOo+75Qf47vunWOHd1F0xYotBypHV9jybV4nXRUhCbcsUQNjvsikv
+ H8tQH4NQx4ocjvAh8DS6M++0PE/Wl99YkztOjmIPg4i5t/oaYsb/H2HEDn6a8xK5lBpH0GiK0ft
+ h7TTyJAi1XwHBth1ilQ==
+X-Proofpoint-ORIG-GUID: IaEFJrLnR2H6hY45zyfPfqvsSqgO5QUn
+X-Proofpoint-GUID: IaEFJrLnR2H6hY45zyfPfqvsSqgO5QUn
+X-Authority-Analysis: v=2.4 cv=a4E9NESF c=1 sm=1 tr=0 ts=69c5b97d cx=c_pps
+ a=CWtnpBpaoqyeOyNyJ5EW7Q==:117 a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22 a=tpM8CJlwf7uhpglF1g9U:22
+ a=VwQbUJbxAAAA:8 a=NFdbOB6VLuGm633tFYQA:9 a=QEXdDO2ut3YA:10
+ a=vh23qwtRXIYOdz9xvnmn:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-26_03,2026-03-26_01,2025-10-01_01
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272277-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272278-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[meta.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D37A133CC20
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 47B0333CDD1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jordan Rhee <jordanrhee@google.com>
+On Thu, Mar 26, 2026 at 3:41=E2=80=AFPM Keith Busch <kbusch@kernel.org> wro=
+te:
+>
+> >
+> On Wed, Mar 25, 2026 at 10:25:34AM +0200, Leon Romanovsky wrote:
+> > On Tue, Mar 24, 2026 at 04:46:02PM -0700, Zhiping Zhang wrote:
+> > >  struct vfio_device_feature_dma_buf {
+> > >     __u32   region_index;
+> > >     __u32   open_flags;
+> > > -   __u32   flags;
+> > > -   __u32   nr_ranges;
+> > > +   __u32   flags;
+> > > +#define VFIO_DMABUF_FL_TPH         (1U << 0) /* TPH info is present =
+*/
+> > > +#define VFIO_DMABUF_TPH_PH_SHIFT   1         /* bits 1-2: PH (2-bit)=
+ */
+> > > +#define VFIO_DMABUF_TPH_PH_MASK    0x6U
+> > > +#define VFIO_DMABUF_TPH_ST_SHIFT   16        /* bits 16-31: steering=
+ tag */
+> > > +#define VFIO_DMABUF_TPH_ST_MASK            0xffff0000U
+> >
+> > This extension of flags is basically kills future extension of this
+> > struct for anything that includes TPH.
+> >
+> > Add new
+> > enum vfio_device_feature_dma_buf_flags {
+> >     VFIO_DMABUF_FL_TPH  =3D 1 << 0
+> > }
 
-Enable chrony and phc2sys to synchronize system clock to NIC clock.
+yes we can do that.
 
-The system cycle counters are sampled by the device to minimize the
-uncertainty window. If the system times are sampled in the host, the
-delta between pre and post readings is 100us or more due to AQ command
-latency. The system times returned by the device have a delta of ~1us,
-which enables significantly more accurate clock synchronization.
+> >
+> > > +   __u32   nr_ranges;
+> >
+> > add your "__u16 steering_tag" and "__u8 ph" fields here.
+>
+That is what I did in V1, Leon.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Reviewed-by: Kevin Yang <yyd@google.com>
-Reviewed-by: Naman Gulati <namangulati@google.com>
-Signed-off-by: Jordan Rhee <jordanrhee@google.com>
-Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
----
-Changes in v2:
- - fix compilation warning on ARM by casting cycles_t to u64
----
- drivers/net/ethernet/google/gve/gve_adminq.h |   4 +-
- drivers/net/ethernet/google/gve/gve_ptp.c    | 189 ++++++++++++++++++-
- 2 files changed, 184 insertions(+), 9 deletions(-)
+> You're suggesting that Ziping append the new fields to the end of this
+> struct? I don't think we can modify the layout of a uapi.
+>
+> If we can't carve the space for this out of the existing unused flags
+> field, I think we'd have to introduce a new vfio device feature that
+> basically copies VFIO_DEVICE_FEATURE_DMA_BUF with the extra hints
+> fields.
+>
+if not using the fields in the flag, then we probably have to
+introduce a new vfio
+device feature.
 
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/ethernet/google/gve/gve_adminq.h
-index 22a74b6aa17e..e6dcf6da9091 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.h
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.h
-@@ -411,8 +411,8 @@ static_assert(sizeof(struct gve_adminq_report_nic_ts) == 16);
- 
- struct gve_nic_ts_report {
- 	__be64 nic_timestamp; /* NIC clock in nanoseconds */
--	__be64 reserved1;
--	__be64 reserved2;
-+	__be64 pre_cycles; /* System cycle counter before NIC clock read */
-+	__be64 post_cycles; /* System cycle counter after NIC clock read */
- 	__be64 reserved3;
- 	__be64 reserved4;
- };
-diff --git a/drivers/net/ethernet/google/gve/gve_ptp.c b/drivers/net/ethernet/google/gve/gve_ptp.c
-index 140b8fbce4f4..bea794541f30 100644
---- a/drivers/net/ethernet/google/gve/gve_ptp.c
-+++ b/drivers/net/ethernet/google/gve/gve_ptp.c
-@@ -10,28 +10,203 @@
- /* Interval to schedule a nic timestamp calibration, 250ms. */
- #define GVE_NIC_TS_SYNC_INTERVAL_MS 250
- 
-+/*
-+ * Stores cycle counter samples in get_cycles() units from a
-+ * sandwiched NIC clock read
-+ */
-+struct gve_sysclock_sample {
-+	/* Cycle counter from NIC before clock read */
-+	u64 nic_pre_cycles;
-+	/* Cycle counter from NIC after clock read */
-+	u64 nic_post_cycles;
-+	/* Cycle counter from host before issuing AQ command */
-+	cycles_t host_pre_cycles;
-+	/* Cycle counter from host after AQ command returns */
-+	cycles_t host_post_cycles;
-+};
-+
-+/*
-+ * Read NIC clock by issuing the AQ command. The command is subject to
-+ * rate limiting and may need to be retried. Requires nic_ts_read_lock
-+ * to be held.
-+ */
-+static int gve_adminq_read_timestamp(struct gve_priv *priv,
-+				     cycles_t *pre_cycles,
-+				     cycles_t *post_cycles)
-+{
-+	unsigned long delay_us = 1000;
-+	int retry_count = 0;
-+	int err;
-+
-+	lockdep_assert_held(&priv->nic_ts_read_lock);
-+
-+	do {
-+		*pre_cycles = get_cycles();
-+		err = gve_adminq_report_nic_ts(priv, priv->nic_ts_report_bus);
-+
-+		/* Ensure cycle counter is sampled after AdminQ cmd returns */
-+		rmb();
-+		*post_cycles = get_cycles();
-+		if (likely(err != -EAGAIN))
-+			return err;
-+
-+		fsleep(delay_us);
-+
-+		/* Exponential backoff */
-+		delay_us *= 2;
-+		retry_count++;
-+	} while (retry_count < 5);
-+
-+	return -ETIMEDOUT;
-+}
-+
- /* Read the nic timestamp from hardware via the admin queue. */
--static int gve_clock_nic_ts_read(struct gve_priv *priv, u64 *nic_raw)
-+static int gve_clock_nic_ts_read(struct gve_priv *priv, u64 *nic_raw,
-+				 struct gve_sysclock_sample *sysclock)
- {
-+	cycles_t host_pre_cycles, host_post_cycles;
-+	struct gve_nic_ts_report *ts_report;
- 	int err;
- 
- 	mutex_lock(&priv->nic_ts_read_lock);
--	err = gve_adminq_report_nic_ts(priv, priv->nic_ts_report_bus);
--	if (err)
-+	err = gve_adminq_read_timestamp(priv, &host_pre_cycles,
-+					&host_post_cycles);
-+	if (err) {
-+		dev_err_ratelimited(&priv->pdev->dev,
-+				    "AdminQ timestamp read failed: %d\n", err);
- 		goto out;
-+	}
- 
--	*nic_raw = be64_to_cpu(priv->nic_ts_report->nic_timestamp);
-+	ts_report = priv->nic_ts_report;
-+	*nic_raw = be64_to_cpu(ts_report->nic_timestamp);
-+
-+	if (sysclock) {
-+		sysclock->nic_pre_cycles = be64_to_cpu(ts_report->pre_cycles);
-+		sysclock->nic_post_cycles = be64_to_cpu(ts_report->post_cycles);
-+		sysclock->host_pre_cycles = host_pre_cycles;
-+		sysclock->host_post_cycles = host_post_cycles;
-+	}
- 
- out:
- 	mutex_unlock(&priv->nic_ts_read_lock);
- 	return err;
- }
- 
-+struct gve_cycles_to_clock_callback_ctx {
-+	u64 cycles;
-+};
-+
-+static int gve_cycles_to_clock_fn(ktime_t *device_time,
-+				  struct system_counterval_t *system_counterval,
-+				  void *ctx)
-+{
-+	struct gve_cycles_to_clock_callback_ctx *context = ctx;
-+
-+	*device_time = 0;
-+
-+	system_counterval->cycles = context->cycles;
-+	system_counterval->use_nsecs = false;
-+
-+	if (IS_ENABLED(CONFIG_X86))
-+		system_counterval->cs_id = CSID_X86_TSC;
-+	else if (IS_ENABLED(CONFIG_ARM64))
-+		system_counterval->cs_id = CSID_ARM_ARCH_COUNTER;
-+	else
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+/*
-+ * Convert a raw cycle count (e.g. from get_cycles()) to the system clock
-+ * type specified by clockid. The system_time_snapshot must be taken before
-+ * the cycle counter is sampled.
-+ */
-+static int gve_cycles_to_timespec64(struct gve_priv *priv, clockid_t clockid,
-+				    struct system_time_snapshot *snap,
-+				    u64 cycles, struct timespec64 *ts)
-+{
-+	struct gve_cycles_to_clock_callback_ctx ctx = {0};
-+	struct system_device_crosststamp xtstamp;
-+	int err;
-+
-+	ctx.cycles = cycles;
-+	err = get_device_system_crosststamp(gve_cycles_to_clock_fn, &ctx, snap,
-+					    &xtstamp);
-+	if (err) {
-+		dev_err_ratelimited(&priv->pdev->dev,
-+				    "get_device_system_crosststamp() failed to convert %lld cycles to system time: %d\n",
-+				    cycles,
-+				    err);
-+		return err;
-+	}
-+
-+	switch (clockid) {
-+	case CLOCK_REALTIME:
-+		*ts = ktime_to_timespec64(xtstamp.sys_realtime);
-+		break;
-+	case CLOCK_MONOTONIC_RAW:
-+		*ts = ktime_to_timespec64(xtstamp.sys_monoraw);
-+		break;
-+	default:
-+		dev_err_ratelimited(&priv->pdev->dev,
-+				    "Cycle count conversion to clockid %d not supported\n",
-+				    clockid);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
- static int gve_ptp_gettimex64(struct ptp_clock_info *info,
- 			      struct timespec64 *ts,
- 			      struct ptp_system_timestamp *sts)
- {
--	return -EOPNOTSUPP;
-+	struct gve_ptp *ptp = container_of(info, struct gve_ptp, info);
-+	struct gve_sysclock_sample sysclock = {0};
-+	struct gve_priv *priv = ptp->priv;
-+	struct system_time_snapshot snap;
-+	u64 nic_ts;
-+	int err;
-+
-+	/* Take system clock snapshot before sampling cycle counters */
-+	if (sts)
-+		ktime_get_snapshot(&snap);
-+
-+	err = gve_clock_nic_ts_read(priv, &nic_ts, &sysclock);
-+	if (err)
-+		return err;
-+
-+	if (sts) {
-+		/* Reject samples with out of order system clock values */
-+		if (!(sysclock.host_pre_cycles <= sysclock.nic_pre_cycles &&
-+		      sysclock.nic_pre_cycles  <= sysclock.nic_post_cycles &&
-+		      sysclock.nic_post_cycles <= sysclock.host_post_cycles)) {
-+			dev_err_ratelimited(&priv->pdev->dev,
-+					    "AdminQ system clock cycle counts out of order. Expecting %llu <= %llu <= %llu <= %llu\n",
-+					    (u64)sysclock.host_pre_cycles,
-+					    sysclock.nic_pre_cycles,
-+					    sysclock.nic_post_cycles,
-+					    (u64)sysclock.host_post_cycles);
-+			return -EBADMSG;
-+		}
-+
-+		err = gve_cycles_to_timespec64(priv, sts->clockid, &snap,
-+					       sysclock.nic_pre_cycles,
-+					       &sts->pre_ts);
-+		if (err)
-+			return err;
-+
-+		err = gve_cycles_to_timespec64(priv, sts->clockid, &snap,
-+					       sysclock.nic_post_cycles,
-+					       &sts->post_ts);
-+		if (err)
-+			return err;
-+	}
-+
-+	*ts = ns_to_timespec64(nic_ts);
-+
-+	return 0;
- }
- 
- static int gve_ptp_settime64(struct ptp_clock_info *info,
-@@ -50,7 +225,7 @@ static long gve_ptp_do_aux_work(struct ptp_clock_info *info)
- 	if (gve_get_reset_in_progress(priv) || !gve_get_admin_queue_ok(priv))
- 		goto out;
- 
--	err = gve_clock_nic_ts_read(priv, &nic_raw);
-+	err = gve_clock_nic_ts_read(priv, &nic_raw, NULL);
- 	if (err) {
- 		dev_err_ratelimited(&priv->pdev->dev, "%s read err %d\n",
- 				    __func__, err);
-@@ -132,7 +307,7 @@ int gve_init_clock(struct gve_priv *priv)
- 		goto release_ptp;
- 	}
- 	mutex_init(&priv->nic_ts_read_lock);
--	err = gve_clock_nic_ts_read(priv, &nic_raw);
-+	err = gve_clock_nic_ts_read(priv, &nic_raw, NULL);
- 	if (err) {
- 		dev_err(&priv->pdev->dev, "failed to read NIC clock %d\n", err);
- 		goto release_nic_ts_report;
--- 
-2.53.0.1018.g2bb0e51243-goog
-
+> > >     struct vfio_region_dma_range dma_ranges[] __counted_by(nr_ranges);
+> > >  };
 
