@@ -1,146 +1,170 @@
-Return-Path: <netdev+bounces-272183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272184-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SEe+IKR0xWnw+QQAu9opvQ
-	(envelope-from <netdev+bounces-272183-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:02:12 +0100
+	id AE0HFf9yxWkU+QQAu9opvQ
+	(envelope-from <netdev+bounces-272184-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:55:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A38CD339BE1
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:02:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACF68339912
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:55:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 56069301624B
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:48:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 53684310DDBF
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270953A5437;
-	Thu, 26 Mar 2026 17:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B8039C638;
+	Thu, 26 Mar 2026 17:48:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XRgb8Lsv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V3eP2azS"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59FD39D6CE;
-	Thu, 26 Mar 2026 17:47:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFED397E89
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 17:48:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774547263; cv=none; b=Lto5ZQFf1iTAhdv0P45RZCAEpuYYgsyw9GIQygl9Ulo2cpoDipYAMsiaXotLJ9JUlnDsqL8i5UTh8VdVhw/8LH3z3FgX9gynK1z+Li5Mqo1QpHNFdLDVnQnzyN8VC0TiHD1/hKunGnDzrgmOXA2z7lEGNb/jAVTG0JZQyGA30bo=
+	t=1774547299; cv=none; b=L7XqzY0EVTASCu/CuOQVwLL/KIuIk+4Bu2XFAA8V2CENL6A7pX2x61i1m4a0c7KsnksRY8dzp7F3I/Vtr8SxaCoz5jAxjiYsRv7tl9rhsqgFl+Zo+O/dNgv6TdL30ytjJhSpAlMYoFkm0C2qXMRuxpLArPOqlpqn2nFlTF6U+/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774547263; c=relaxed/simple;
-	bh=CUrYFcbk3w4Lb6jYsZ+v76HQreQicFweUxr8XUQzyvE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PWbtH4qPA9M5qG0oEqSmfua+pH8plW84S+mIaoDBXdFbtKEFBOuFRZydfeDqjjlyoJHeJbUybZ4tuVOY4ypEIByD/Jze4t0Qe2fF6r5PX9W9gkcAlzFB+yfyX4r6Bj6xXmQMR0nU0XHdEMCbtLNyqyVgHML39ueTx2phHDA3X3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XRgb8Lsv; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AxDSnNL/u8N3iCRzT8SvQaiyV0V6Lf/VVxcJwZ5quX4=; b=XRgb8LsvWYsTTIlo8Zxg3c8Mg2
-	SroOvC7VmpQrHi01O5KeJdSNXpz85f0PncL1ARLtaBuEHhNLTeOrAX3l1k7M4BgeMXUzy4BFO6nUz
-	uIA5/7yikZ2Ba2kWKNxYmleFglUmhOyrDo1FZAIA4lvV3m9t80slEZwWjWi6I/CRVu3MBgHBH7Bp6
-	Ozof29IoG+XDLRvsvYviwE3RkLTeBHSRl/qHyMr5MWHyJl/6Gw5H1wSE/TYY6ASRkuqEWYr6wK7G2
-	Xsauw971tdYRmcOyvKPB55AyTzLe4pC8/g9wD6Sh1Cd79upmI1Owk88xXslWvnHd9k2H9sE6jO88U
-	x3LYWhgg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34394)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w5onv-0000000057d-27mi;
-	Thu, 26 Mar 2026 17:47:35 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w5ons-000000007Ec-4AcB;
-	Thu, 26 Mar 2026 17:47:33 +0000
-Date: Thu, 26 Mar 2026 17:47:32 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-	Yao Zi <me@ziyao.cc>
-Subject: Re: [PATCH net-next 1/2] net: stmmac: remove axi_kbbe, axi_mb and
- axi_rb members
-Message-ID: <acVxNBLE8Ck2qfjc@shell.armlinux.org.uk>
-References: <acJh4z3pRKkeaFbR@shell.armlinux.org.uk>
- <E1w4ydo-0000000Dlpb-34jd@rmk-PC.armlinux.org.uk>
- <20260326172943.GR111839@horms.kernel.org>
+	s=arc-20240116; t=1774547299; c=relaxed/simple;
+	bh=dG9nCN/76PXX68Yyw0iuEnwVUAKreuOZlC86CqD/KwU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OKO1B4e6cW3zY2Oo7SEXkIPkDrg3V2Km7+PmjnvJSAs4G/324HZQANr5iZM2wSmwOs2hh8cVpxoi0cCVYjWSoCP53DbZITuBQNpa6jVnkaSR36sBhLYcQc4wiSjOyvA2atLOy/8fi6dBaKTBMjZSjy/JY1s74EcQEAHgzznU4X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V3eP2azS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774547296;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oz4hGmj4k26d71ek48gh0eEaTkMFDaljaJ8kWGBYZhA=;
+	b=V3eP2azSXzHAcWQciMkiMFawxp3dDiGNZAdCMA9HOSJuvFS5S5LA9ORX7AoKq7lXaX6CD8
+	J3MYDFGLKd/o9IGcKAH98f7ZL9reoeFuQyU9bGPB7jcy619yA/mR8ReF+W3Qwygcu0EYKX
+	xO32Duhb60vEzY8it8qdbxjtONUHijA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-75-7qFBstFSPZK8EkP5wW6X5A-1; Thu,
+ 26 Mar 2026 13:48:13 -0400
+X-MC-Unique: 7qFBstFSPZK8EkP5wW6X5A-1
+X-Mimecast-MFC-AGG-ID: 7qFBstFSPZK8EkP5wW6X5A_1774547291
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1BE1618002CB;
+	Thu, 26 Mar 2026 17:48:10 +0000 (UTC)
+Received: from [10.44.32.95] (unknown [10.44.32.95])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 663E1180036E;
+	Thu, 26 Mar 2026 17:48:04 +0000 (UTC)
+Message-ID: <e4372a58-13ba-4581-af4e-28d0c880c7bc@redhat.com>
+Date: Thu, 26 Mar 2026 18:48:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260326172943.GR111839@horms.kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/3] dpll: add actual frequency monitoring
+ callback ops
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>, Petr Oros
+ <poros@redhat.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260325193914.124898-1-ivecera@redhat.com>
+ <20260325193914.124898-3-ivecera@redhat.com>
+ <d0a6d302-c5af-4ad1-87e2-fa017bdd96a8@linux.dev>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <d0a6d302-c5af-4ad1-87e2-fa017bdd96a8@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272183-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272184-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[intel.com,resnulli.us,lwn.net,linuxfoundation.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,microchip.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.989];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,armlinux.org.uk:email,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: A38CD339BE1
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: ACF68339912
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 05:29:43PM +0000, Simon Horman wrote:
-> On Tue, Mar 24, 2026 at 10:05:40AM +0000, Russell King (Oracle) wrote:
-> > axi_kbbe, axi_mb and axi_rb are all written, but nothing ever reads
-> > their values. Remove the code that sets these and the struct members.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+On 3/26/26 12:21 PM, Vadim Fedorenko wrote:
+> On 25/03/2026 19:39, Ivan Vecera wrote:
 > 
-> Hi Russell,
+>> +static int dpll_msg_add_actual_freq(struct sk_buff *msg, struct 
+>> dpll_pin *pin,
+>> +                    struct dpll_pin_ref *ref,
+>> +                    struct netlink_ext_ack *extack)
+>> +{
+>> +    const struct dpll_device_ops *dev_ops = dpll_device_ops(ref->dpll);
+>> +    const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
+>> +    struct dpll_device *dpll = ref->dpll;
+>> +    enum dpll_feature_state state;
+>> +    u64 actual_freq;
+>> +    int ret;
+>> +
+>> +    if (!ops->actual_freq_get)
+>> +        return 0;
+>> +    if (dev_ops->freq_monitor_get) {
+>> +        ret = dev_ops->freq_monitor_get(dpll, dpll_priv(dpll),
+>> +                        &state, extack);
+>> +        if (ret)
+>> +            return ret;
+>> +        if (state == DPLL_FEATURE_STATE_DISABLE)
+>> +            return 0;
 > 
-> FYI, AI review suggests that these fields should also be removed from
-> Documentation/networking/device_drivers/ethernet/stmicro/stmmac.rst
+> I think we have to signal back to user that frequency monitoring is
+> disabled via extack.
 
-I noticed. I've prepared an update if netdev folk want that to happen
-as I've noticed that that documentation is fairly out of date now.
+Hi Vadim,
 
-Do we think it's still useful, or should we consider deleting or
-trimming it down? Would it be better to move the struct definitions
-into the header file and making the header file part of the docs so
-that the documentation is local to the structs?
+This would break pin-get operation... Do or dump pin-get operation would
+fail with this extack message.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Here we can check if the freq-monitoring is enabled and conditionally
+call actual_freq_get() or measured_freq_get()
+
+-or-
+
+Call this callback unconditionally and check for return code and if a
+driver returns e.g. -ENODATA then skip nla_put_64bit() but return
+success.
+
+WDYT?
+
+Thanks,
+Ivan
+
 
