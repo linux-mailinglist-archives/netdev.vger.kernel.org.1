@@ -1,94 +1,89 @@
-Return-Path: <netdev+bounces-272209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272210-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Hc5FneCxWlc+wQAu9opvQ
-	(envelope-from <netdev+bounces-272209-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:01:11 +0100
+	id AHrTEZeCxWlc+wQAu9opvQ
+	(envelope-from <netdev+bounces-272210-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:01:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BAE833AA20
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:01:10 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB69F33AA3F
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:01:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C4DB3307F550
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:58:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4F1C330A573B
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:58:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED8D3426EBC;
-	Thu, 26 Mar 2026 18:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD615427A07;
+	Thu, 26 Mar 2026 18:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="SgFCCtie"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QU6otSQL"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013056.outbound.protection.outlook.com [40.93.201.56])
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011016.outbound.protection.outlook.com [52.101.57.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEC3426D29;
-	Thu, 26 Mar 2026 18:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404124279F0;
+	Thu, 26 Mar 2026 18:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774551327; cv=fail; b=PtCHz/XyCA2iybvDLRcXxksB08NXZakKEYPvWUovCABYq7ngkU5zJdWlaGpowrEk64WdPuQ05LeYhXnacbpKOnOpDWOSTW3iaRZvzvUF4OswaCygefT7cRxELFTPjyvG/kkmkrvzd+2CgrsBvMlzJyBU/WinHSndtepsHgSB6I0=
+	t=1774551330; cv=fail; b=VTXWRRgy+qJKPNroJjRFBr6vBZ5oRbHhFRa7SiOc6Qs3J/DdTH/TioUhQl3cu+MBlKVur3z2F7qAEA9CjeRX0FrT0UqRMBtkYjPKkN2mvR1pzjB1GA9+Dn9cFouuPosVdW18myb2eI7koLbnCNUAaAFjSH3rckeVUf2BhFxcbwg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774551327; c=relaxed/simple;
-	bh=Hj51bsHEaR9q/eCWx3OGIikyeRR1ixuhNrGD2+8ONs8=;
+	s=arc-20240116; t=1774551330; c=relaxed/simple;
+	bh=Ey4lvG51ccME4BAdsKx9o1fWse39ILhpdDi2Fw6yYOw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rNa8LAmigiiFrCkZLYHdTgKBY/voPuMTk+dFRwxX6wp0r4Xlf1GmSsP/Y3IcvmyTDrs+AY6O/wdU+KXcVCZtLuhpvy5GlWXSv+yqqOTvTR73vbLUHVfUcG8d6f8bXee2nFyX27HhCFP8rgrMj8D9LwDBiJeU5fnSK6M/L3vaFrw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=SgFCCtie; arc=fail smtp.client-ip=40.93.201.56
+	 MIME-Version:Content-Type; b=Zd6iGLpfAWBI/JNEge95Tong5LW3TJgfDtq4Z0xq4t8Er8zav4WQfFIWF7+9CIpHf01LHCbw/sHkaBil9d0OqM3i9nOPuOM2rSM06IWDalQ/70z6x5XVL1Nc3yrzKyh+ODheYw7C4tYHErtR8rbr9INIn3Vq13IoWL3ZVhpn36o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QU6otSQL; arc=fail smtp.client-ip=52.101.57.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yibpGYJ6JzKfv2ADy2NnRLyK3wXfDjCQrJfMzOkUCXC9XqTLqTpbafXXYZgyu+9H3pb+oRTQ5TOxMO5XP5whx1fPzCi9UmY2BOdgITZlNxUCOr+02GFs12B7DDpXqCO+JlpabA/5rvxKr99eTZX/ruAhmPojZvVbmOq+W5ZUFEMs+cXXVR72wT2XMisMTAikrBOGBhmJsWFVj2DJx8VykxnK+/NbmQN2B2qZkBRExRSkdu7I9fFcpPyjvkuXdvffeTvq/opDpJrDo6PBvqpg4UYgjCJ16Xn2ESSfHwtboMw8xh0ij4JHdTspQzUMevri7Od52gs2GyMKgVshdSaayQ==
+ b=hJte43xrv/jxqMne5foj8yjpDC/oJzV5fsIMbpGParBYS4xLlfLlD5OUUT83ui0SdDSvt/Vy0WOfeLJMizzNabh3RHmgvvSe3AsMIdqauz5wF/73agWf4G9SFZ6gN+IHp+N7pc5QtZDzYL+qxf4UOcqebiBHoXYBS2x+f1yUkAf+6ViR4uLPzx72f7B7FHPsvjMoHh/vGHTboVk3AQTcVrlBgE9LpaUmW6OT4/RRGwAYP0IAlXyXhK0CT3OQPZir/UVWfLvp+K5VpCLCfM2h++9sX0xlNR/kHhhIYyGoQdvy4rYborv0y1KmM/eeoQSqlxODIQ9JwvXWWBsEXnqC0A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uiz0L0xlqs4WTumHwdZBH2LzZMDEmvkBffFlvoDjP4Y=;
- b=q7zy2f+61ZtRZeFaRYYBXNPf0o9K9F/HaaAjQ68NgVlELtv5zNkYoD046ge8+S5sdNoxOf900iX7g2kbqjiN/IBy989ohrC/HGxGWZXsKMFyQ0dY/57ZcK3qSgwKkjVOTvs0p8mcEuD9ENfK9b/CsPiHO91sMWoTLCC/3ia3T9DtCgrax2RU4It+0BK9yjQbCThJRhUQDTMPwge6CJ/x3WCOETutQZgkckmfkJPKDRWf821WLB25vuqAkPfUivQ/GyvlUQb3eUU8rFfAg/0RK13hc92RxxqlVxGyQhHmqyk881nZDz7w+w7FTBlYkdd0kHGBTR6Bs0rHzFtVboartg==
+ bh=2OkNDbfqNYkWEd6na3FA+WiA8ea+lgrEfpBKAoleC1I=;
+ b=bhSyRhHjzsabrE5colKoPk5rEYBLSCXDeguZKbrFhIMTvbww2JSTffIqfUOaYHDHgk7sFVPuNk8smxD+lMNqNzCsIOCyoQuYYF7asI1PL4WnEvcFxBZW/HeGWRMzKLWuQyBNKjthAy6GvKl4SxT7Z06AAFfXcHDrcXTSD1ScmYrVuWaAwl314m/FOJr6O/FgKHpQ/kLNecGjWOkAo4pAKuDECClbN+/449UIVNc4K/wHf2Cqtg1iBjAdFfxiSlNTYVvxsxyf79MnnCgvT86ZcrpNJkeX+9qAk5tX6Z78KB6ULMBfrpOPgBGLCSOFkla1FqdbCENOYGy15+VgLoJgew==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uiz0L0xlqs4WTumHwdZBH2LzZMDEmvkBffFlvoDjP4Y=;
- b=SgFCCtiepgktmUk/JEQrivSmY8wvyK2x99Iz8Of0c0vZRwgWALu2sET8udTPun27spQV46Hvvb0tnaYxOzpyBay/Ru1CetzaJ8i+xGJO9HXAUjmKgB51zyHw/c0tvP+RUw0X7QdvATGZwSGlyNIzeQPE4iZOlGuERt08R+TjiZE=
-Received: from BN9PR03CA0415.namprd03.prod.outlook.com (2603:10b6:408:111::30)
- by DM4PR12MB8498.namprd12.prod.outlook.com (2603:10b6:8:183::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.7; Thu, 26 Mar
- 2026 18:55:18 +0000
-Received: from BN2PEPF0000449F.namprd02.prod.outlook.com
- (2603:10b6:408:111:cafe::d5) by BN9PR03CA0415.outlook.office365.com
- (2603:10b6:408:111::30) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.31 via Frontend Transport; Thu,
- 26 Mar 2026 18:55:18 +0000
+ bh=2OkNDbfqNYkWEd6na3FA+WiA8ea+lgrEfpBKAoleC1I=;
+ b=QU6otSQL4uuOr+O4uhhZg9qMyLK4nQNrtNpz1kZcfGO7YJ0cO+yw9GDuwJKDzIblfKYS0vtn8KibI+I01VfmBFySI1nw4nhijiw0/3dPuZKUrBTMfITbE5+VyU1afVD34PmEBwf4G8SIPkh3vSSDhgqJPtvvQADjO1w9Sn3YXZ0=
+Received: from DS7PR03CA0312.namprd03.prod.outlook.com (2603:10b6:8:2b::21) by
+ DS7PR12MB6007.namprd12.prod.outlook.com (2603:10b6:8:7e::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9769.6; Thu, 26 Mar 2026 18:55:24 +0000
+Received: from CH3PEPF00000017.namprd21.prod.outlook.com
+ (2603:10b6:8:2b:cafe::95) by DS7PR03CA0312.outlook.office365.com
+ (2603:10b6:8:2b::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.33 via Frontend Transport; Thu,
+ 26 Mar 2026 18:55:19 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- BN2PEPF0000449F.mail.protection.outlook.com (10.167.243.150) with Microsoft
+ client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
+Received: from satlexmb08.amd.com (165.204.84.17) by
+ CH3PEPF00000017.mail.protection.outlook.com (10.167.244.122) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9745.21 via Frontend Transport; Thu, 26 Mar 2026 18:55:18 +0000
-Received: from Satlexmb09.amd.com (10.181.42.218) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.9769.0 via Frontend Transport; Thu, 26 Mar 2026 18:55:21 +0000
+Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 26 Mar
- 2026 13:55:17 -0500
-Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb09.amd.com
- (10.181.42.218) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 26 Mar
- 2026 11:55:17 -0700
+ 2026 13:55:21 -0500
 Received: from xhdsuragupt40.xilinx.com (10.180.168.240) by satlexmb08.amd.com
  (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Thu, 26 Mar 2026 13:55:14 -0500
+ Transport; Thu, 26 Mar 2026 13:55:18 -0500
 From: Suraj Gupta <suraj.gupta2@amd.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<kuba@kernel.org>, <pabeni@redhat.com>, <michal.simek@amd.com>,
 	<sean.anderson@linux.dev>, <radhey.shyam.pandey@amd.com>, <horms@kernel.org>
 CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-kernel@vger.kernel.org>, <harini.katakam@amd.com>
-Subject: [PATCH net V2 1/2] net: xilinx: axienet: Correct BD length masks to match AXIDMA IP spec
-Date: Fri, 27 Mar 2026 00:25:08 +0530
-Message-ID: <20260326185510.3840084-2-suraj.gupta2@amd.com>
+Subject: [PATCH net V2 2/2] net: xilinx: axienet: Fix BQL accounting for multi-BD TX packets
+Date: Fri, 27 Mar 2026 00:25:09 +0530
+Message-ID: <20260326185510.3840084-3-suraj.gupta2@amd.com>
 X-Mailer: git-send-email 2.49.1
 In-Reply-To: <20260326185510.3840084-1-suraj.gupta2@amd.com>
 References: <20260326185510.3840084-1-suraj.gupta2@amd.com>
@@ -102,47 +97,47 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF0000449F:EE_|DM4PR12MB8498:EE_
-X-MS-Office365-Filtering-Correlation-Id: e296ebdc-198f-4b46-6eac-08de8b69396d
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000017:EE_|DS7PR12MB6007:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32e6ab47-3ba3-4f24-9abe-08de8b693b3f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|7416014|376014|36860700016|56012099003|22082099003|18002099003;
+	BCL:0;ARA:13230040|36860700016|1800799024|376014|7416014|82310400026|22082099003|56012099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	19uRujjrEswMKI+0E316OhnR0/Rv8AsmwjlegCV7aiYb48sAjz2b5gyy0JUAlQsRtMcxHtxX7F2iNYa/GZNSVYqTfNVOk9iguo/lsAL7izDWK/pzqAmA5zJaVJI+3AvZSt5kn3qG8ulwnZsUsLU3+7fSy/tPGGulc82URtskSOvIr5w0kEKZdWXEsMGSHYudZhu3mqqzoto+ehBAW7i6kYvwT26ciXaYRofl0blPayzTuzCJgOCgHSJ5NHfmo1xIJDtJpYyH5cPQg0yncafz+8rZDw7/Aq0YPbkkRZT3jY3T5FCd7LKXOZ4av4dzzkbKLEVNxDD8+AAxFfKf3YFEIOIu7kE/wJvOfBXPorkV1inxuZ2DmKY9rXnspoirohzJEEov5MPtqREagUqPhi/5y/11ZX7pHI8mk56yjJfodVLdvxMRtzCmpos1VlzNJAajGPTI6o03NLWhBmOFksjSCsejLYGHHf41syY7YcOUdWdsv6zME8Q1BBH9zNdvAMGfoVO247yT6PsOe0KU7yKGwgyFVl+sNmLdnwpzn+er9y9/KODST+6feu3D0zJVBNlIws0HyeELiHxUFz4J71KyILVfarJjcTtjxxq87okxgCMHqMcwzsvlujTg0OJk+YATKdvQ18UM0BwnKf96UqtDoIdUbXQJyMTsr33OuKPbrPDvirNjz5zs26tV8Lu8VpFZBYmTNXH6jqMrnRIXMq3KgRJqd/mJI/p+HxKmr7sZYbgdx1y8J+yfAj86OeUXSr1TEPNGvW4AVHYeVFngUgggrA==
+	/Tem4Aw+1kkUbhJdesgrdIs2kkOfJWecpuCfM9VZRgaKH1xLSgf0caoqkKGuvE5x13NxqYCHqBnTexNwTZYXDCVm0G83qzQu04lDKwVzbk3/J4Asu4hFjWD7pK2f0FwvJxXyJxn9QEbTxZqwRNXB7pZZeEYLY29532FFhOlwLwxYu/WjaBPqFc2gS7qKS3uUudECvUTqEw6ufe3Xgzrm2GxF9UymR33KRclttBCChieMQosQKtE0IZD6cmjzJwasGzDBhNGyNYSwOJwF22MmfmktHRIEx7h9fYdBQ2OnRHs2+dbahXYIBaVleB7uW9ko7RibsbL5H6teOgsYfIKMHVg6feyNeNkYmGTUwVFXbAfoMGxe/gI9DyIbiYiM9r+rVQBtDKE/IwtLCLx5nbXZoQIcoDxIPaF1QTJXrgCM08xSCXPPCybH2adj6E2YzeMzAJeR8kQanD3heaA4vI+bb/JqJth82eOggUSZsXJdzd1INvDYSRdcHdTQHtaij+u7RJJIual8VpW93Ye8dVRDQgU+r7dclE3s1l0KC/ZKoLXrEQ3SGB0IU7kS7k5X1nRRAyVIXFzB2Hp7jKTalIfDp0zPYJb6EQDTPWK47FTIkINBeUY5xkSDo5+Rzp69CqXqH8swkvt7hXv4Y+MJvxPfw5+bgICks2oqqimXDogmLnMndj3M/oOJPri0wfCOZVr7PtyR2r5BPOQdpgUGN5kmjnZ/VlTY0RK0z6hTUxtVj6Pi/ee4p5Vszdja7D3pM9Y1kKPbxy5uT48/JhTPJJzHsA==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(7416014)(376014)(36860700016)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(1800799024)(376014)(7416014)(82310400026)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	N5UtcK8fBvoMaUXXB5aENkLiCgWdTAozMHPhX+oGR4gWSJ+qsjy5L3wHFa6ZtafedHKAevzhR/z0Q7WlqwlNc6F9bjF2564ONykwSAK2ioaD9uYjUUE9/77hP8yGQ5xiXo1W+IOjKQF0XqkKlYnjSY0d/WoXCZ9dKZLUZkVjiH8uLkil84NEHHqr3wdyoS0p24u0/qDxX1OIGv/0ZyxkKio5bw3i3dzytxqSvqD9brUKj+WUhRiX02eaTwGlkX9GkawRObl/iPH4uoGmm/aMqErFVHXnpnXO3x5yuD5lCV1jpKzcuSaZbN455LIQdfvhMYy1enGSCIOLB+2kCmk87hu8PJ69sZj1wUvSiPMK/+8lEymXwuGLYhHiKAVElBPBNQQ5qSv1I3eDWK+CPvnbqTjxSdOHC384vVBfzhZQ/Ulchvx+9+HLLelSaa26fpZK
+	u2QNeneyxFvgt8X3JbyGc6aImdZA2mK0duCPGtaWioM9sONQOKfueMnE9IIYtEBi6NLUCYo1MPHiZfGh53ko+kgUfDjyUMp/xECCeh9qBFvQwS6qibRh1Q+DI9T4tJLDacJM/zyN5NQEbQvoHqJh3tmFXZEmOylidKu1JpoHVHauUMVU+Cvc1M3UFrmw9A43cycTs9LCjfLDNUROZzhVUjb3E0OhIXx1lqHiD1HpeMUPa9+kGAWQuSqi5TL3FpzaxItNsblA/qXkCLzGo7jzf1+dJ/uCSu+F/z85MZUVxEAnYmLPcFtSkZoDzdz+nIHbWwmSzuC5TV4qq0EC29XcHqQJ2/QIvWPLA462MmAIsIEmCHAgffX44LuDIcDCiLSH7ACkdDdgF9jmZFW2aRDn/I7m5INBFQZYHPc7tsrHGlJMXODC5+T2V4/IizTB31Kr
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2026 18:55:18.4107
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2026 18:55:21.4710
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e296ebdc-198f-4b46-6eac-08de8b69396d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32e6ab47-3ba3-4f24-9abe-08de8b693b3f
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF0000449F.namprd02.prod.outlook.com
+	CH3PEPF00000017.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8498
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6007
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-272209-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272210-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[suraj.gupta2@amd.com,netdev@vger.kernel.org];
@@ -152,48 +147,124 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:dkim,amd.com:email,amd.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: 1BAE833AA20
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: DB69F33AA3F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The XAXIDMA_BD_CTRL_LENGTH_MASK and XAXIDMA_BD_STS_ACTUAL_LEN_MASK
-macros were defined as 0x007FFFFF (23 bits), but the AXI DMA IP
-product guide (PG021) specifies the buffer length field as bits 25:0
-(26 bits). Update both masks to match the IP documentation.
+When a TX packet spans multiple buffer descriptors (scatter-gather),
+the per-BD byte count is accumulated into a local variable that resets
+on each NAPI poll. If the BDs for a single packet complete across
+different polls, the earlier bytes are lost and never credited to BQL.
+This causes BQL to think bytes are permanently in-flight, eventually
+stalling the TX queue.
 
-In practice this had no functional impact, since Ethernet frames are
-far smaller than 2^23 bytes and the extra bits were always zero, but
-the masks should still reflect the hardware specification.
+Fix this by replacing the local accumulator with a persistent counter
+(tx_compl_bytes) that survives across polls and is reset only after
+updating BQL and stats.
 
-Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet driver")
+Fixes: c900e49d58eb ("net: xilinx: axienet: Implement BQL")
 Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
 ---
- drivers/net/ethernet/xilinx/xilinx_axienet.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |  3 +++
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 20 +++++++++----------
+ 2 files changed, 13 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-index 5ff742103beb..602389843342 100644
+index 602389843342..a4444c939451 100644
 --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
 +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-@@ -105,7 +105,7 @@
- #define XAXIDMA_BD_HAS_DRE_MASK		0xF00 /* Whether has DRE mask */
- #define XAXIDMA_BD_WORDLEN_MASK		0xFF /* Whether has DRE mask */
+@@ -509,6 +509,8 @@ struct skbuf_dma_descriptor {
+  *		complete. Only updated at runtime by TX NAPI poll.
+  * @tx_bd_tail:	Stores the index of the next Tx buffer descriptor in the ring
+  *              to be populated.
++ * @tx_compl_bytes: Accumulates TX completion length until a full packet is
++ *              reported to the stack.
+  * @tx_packets: TX packet count for statistics
+  * @tx_bytes:	TX byte count for statistics
+  * @tx_stat_sync: Synchronization object for TX stats
+@@ -592,6 +594,7 @@ struct axienet_local {
+ 	u32 tx_bd_num;
+ 	u32 tx_bd_ci;
+ 	u32 tx_bd_tail;
++	u32 tx_compl_bytes;
+ 	u64_stats_t tx_packets;
+ 	u64_stats_t tx_bytes;
+ 	struct u64_stats_sync tx_stat_sync;
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index b06e4c37ff61..95bf61986cb7 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -692,6 +692,8 @@ static void axienet_dma_stop(struct axienet_local *lp)
+ 	axienet_lock_mii(lp);
+ 	__axienet_device_reset(lp);
+ 	axienet_unlock_mii(lp);
++
++	lp->tx_compl_bytes = 0;
+ }
  
--#define XAXIDMA_BD_CTRL_LENGTH_MASK	0x007FFFFF /* Requested len */
-+#define XAXIDMA_BD_CTRL_LENGTH_MASK	GENMASK(25, 0) /* Requested len */
- #define XAXIDMA_BD_CTRL_TXSOF_MASK	0x08000000 /* First tx packet */
- #define XAXIDMA_BD_CTRL_TXEOF_MASK	0x04000000 /* Last tx packet */
- #define XAXIDMA_BD_CTRL_ALL_MASK	0x0C000000 /* All control bits */
-@@ -130,7 +130,7 @@
- #define XAXIDMA_BD_CTRL_TXEOF_MASK	0x04000000 /* Last tx packet */
- #define XAXIDMA_BD_CTRL_ALL_MASK	0x0C000000 /* All control bits */
+ /**
+@@ -770,8 +772,6 @@ static int axienet_device_reset(struct net_device *ndev)
+  * @first_bd:	Index of first descriptor to clean up
+  * @nr_bds:	Max number of descriptors to clean up
+  * @force:	Whether to clean descriptors even if not complete
+- * @sizep:	Pointer to a u32 filled with the total sum of all bytes
+- *		in all cleaned-up descriptors. Ignored if NULL.
+  * @budget:	NAPI budget (use 0 when not called from NAPI poll)
+  *
+  * Would either be called after a successful transmit operation, or after
+@@ -780,7 +780,7 @@ static int axienet_device_reset(struct net_device *ndev)
+  * Return: The number of packets handled.
+  */
+ static int axienet_free_tx_chain(struct axienet_local *lp, u32 first_bd,
+-				 int nr_bds, bool force, u32 *sizep, int budget)
++				 int nr_bds, bool force, int budget)
+ {
+ 	struct axidma_bd *cur_p;
+ 	unsigned int status;
+@@ -819,8 +819,8 @@ static int axienet_free_tx_chain(struct axienet_local *lp, u32 first_bd,
+ 		cur_p->cntrl = 0;
+ 		cur_p->status = 0;
  
--#define XAXIDMA_BD_STS_ACTUAL_LEN_MASK	0x007FFFFF /* Actual len */
-+#define XAXIDMA_BD_STS_ACTUAL_LEN_MASK	GENMASK(25, 0) /* Actual len */
- #define XAXIDMA_BD_STS_COMPLETE_MASK	0x80000000 /* Completed */
- #define XAXIDMA_BD_STS_DEC_ERR_MASK	0x40000000 /* Decode error */
- #define XAXIDMA_BD_STS_SLV_ERR_MASK	0x20000000 /* Slave error */
+-		if (sizep)
+-			*sizep += status & XAXIDMA_BD_STS_ACTUAL_LEN_MASK;
++		if (!force)
++			lp->tx_compl_bytes += status & XAXIDMA_BD_STS_ACTUAL_LEN_MASK;
+ 	}
+ 
+ 	if (!force) {
+@@ -999,18 +999,18 @@ static int axienet_tx_poll(struct napi_struct *napi, int budget)
+ {
+ 	struct axienet_local *lp = container_of(napi, struct axienet_local, napi_tx);
+ 	struct net_device *ndev = lp->ndev;
+-	u32 size = 0;
+ 	int packets;
+ 
+ 	packets = axienet_free_tx_chain(lp, lp->tx_bd_ci, lp->tx_bd_num, false,
+-					&size, budget);
++					budget);
+ 
+ 	if (packets) {
+-		netdev_completed_queue(ndev, packets, size);
++		netdev_completed_queue(ndev, packets, lp->tx_compl_bytes);
+ 		u64_stats_update_begin(&lp->tx_stat_sync);
+ 		u64_stats_add(&lp->tx_packets, packets);
+-		u64_stats_add(&lp->tx_bytes, size);
++		u64_stats_add(&lp->tx_bytes, lp->tx_compl_bytes);
+ 		u64_stats_update_end(&lp->tx_stat_sync);
++		lp->tx_compl_bytes = 0;
+ 
+ 		/* Matches barrier in axienet_start_xmit */
+ 		smp_mb();
+@@ -1115,7 +1115,7 @@ axienet_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 				netdev_err(ndev, "TX DMA mapping error\n");
+ 			ndev->stats.tx_dropped++;
+ 			axienet_free_tx_chain(lp, orig_tail_ptr, ii + 1,
+-					      true, NULL, 0);
++					      true, 0);
+ 			dev_kfree_skb_any(skb);
+ 			return NETDEV_TX_OK;
+ 		}
 -- 
 2.49.1
 
